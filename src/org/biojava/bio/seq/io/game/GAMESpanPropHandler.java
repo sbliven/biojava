@@ -37,11 +37,10 @@ import org.xml.sax.*;
  * Currently, it just ignores it!
  *
  * @author David Huen
- * @since 1.8
+ * @since 1.2
  */
 public class GAMESpanPropHandler 
-               extends StAXPropertyHandler 
-               implements GAMEStartEndCallbackItf {
+               extends StAXPropertyHandler {
   // the <span> element supplies limits of a sequence span.
   // unfortunately, the spans can be either numeric or
   // alphanumeric (with cytological map_position).
@@ -69,19 +68,38 @@ public class GAMESpanPropHandler
 
     // setup handlers
     super.addHandler(new ElementRecognizer.ByLocalName("start"),
-      GAMEStartEndPropHandler.GAME_STARTEND_PROP_HANDLER_FACTORY);
+//      GAMEStartEndPropHandler.GAME_STARTEND_PROP_HANDLER_FACTORY);
+      new StAXHandlerFactory() {
+           public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
+             return new StartHandler(); }
+      }
+    );
+
     super.addHandler(new ElementRecognizer.ByLocalName("end"),
-      GAMEStartEndPropHandler.GAME_STARTEND_PROP_HANDLER_FACTORY);
+//      GAMEStartEndPropHandler.GAME_STARTEND_PROP_HANDLER_FACTORY);
+      new StAXHandlerFactory() {
+           public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
+             return new StopHandler(); }
+      }
+    );
   }
 
-// handlers for <start> and <stop>
-  public void setStartValue(int value) {
-    start = value;
+  private class StartHandler extends IntElementHandlerBase
+  {
+    protected void setIntValue(int val)
+    {
+      start = val;
+    }
+  }
+ 
+  private class StopHandler extends IntElementHandlerBase
+  {
+    protected void setIntValue(int val)
+    {
+      stop = val;
+    }
   }
 
-  public void setEndValue(int value) {
-    stop = value;
-  }
 /*
   public void startElementHandler(
                 String nsURI,
