@@ -696,6 +696,13 @@ public class DASSequence
 				  Feature.Template temp)
 	throws BioException
     {
+	// workaround for features with bad locations - usualy starting at 0
+	// e.g. enxembl830 has a cytogenetic band starting at 0
+	if(temp.location.getMin() < 1 || temp.location.getMax() > length()) {
+            temp.location = LocationTools.intersection(temp.location,
+	                                               new RangeLocation(1, length()) );
+	}
+	
 	return featureRealizer.realizeFeature(this, dest, temp);
     }
 
