@@ -125,7 +125,7 @@ class FeatureRequestManager {
             
 	    // System.err.println("Wheee, extended fetch of " + matchingTickets.size() + " requests (" + triggerType + "," + triggerCategory + ")");
 
-	    DAS.startedActivity(this);
+	    DAS.startedActivity(trigger);
 	    startedActivity = true;
 
 	    URL fURL = new URL(dataSourceURL, "features");
@@ -211,7 +211,7 @@ class FeatureRequestManager {
 	    throw new ParseException(ex);
 	} finally {
 	    if (startedActivity) {
-		DAS.completedActivity(this);
+		DAS.completedActivity(trigger);
 	    }
 	}
 
@@ -226,7 +226,7 @@ class FeatureRequestManager {
 	// System.err.println("Sigh, just fetching one featureSet (" + t.getType() + "," + t.getCategory() + ")");
 
 	try {
-	    DAS.startedActivity(this);
+	    DAS.startedActivity(t);
 	    boolean useXFF = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
 							  DASCapabilities.CAPABILITY_FEATURETABLE,
 							  DASCapabilities.CAPABILITY_FEATURETABLE_XFF);
@@ -252,7 +252,7 @@ class FeatureRequestManager {
 	} catch (IOException ex) {
 	    throw new ParseException(ex);
 	} finally {
-	    DAS.completedActivity(this);
+	    DAS.completedActivity(t);
 	}
     }
 

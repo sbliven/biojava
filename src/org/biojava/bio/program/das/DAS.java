@@ -57,21 +57,21 @@ public class DAS extends AbstractChangeable {
 	activityListeners.remove(al);
     }
 
-    public static synchronized void startedActivity(Object source) {
+    static synchronized void startedActivity(Object source) {
 	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
 	    ActivityListener al = (ActivityListener) i.next();
 	    al.startedActivity(source);
 	}
     }
 
-    public static synchronized void completedActivity(Object source) {
+    static synchronized void completedActivity(Object source) {
 	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
 	    ActivityListener al = (ActivityListener) i.next();
 	    al.completedActivity(source);
 	}
     }
 
-    public static synchronized void activityProgress(Object source, int current, int target) {
+    static synchronized void activityProgress(Object source, int current, int target) {
 	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
 	    ActivityListener al = (ActivityListener) i.next();
 	    al.activityProgress(source, current, target);
