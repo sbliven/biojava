@@ -108,7 +108,7 @@ public class AcePerlParser {
 	    if (s.startsWith("ty=>")) {
         ty = s.substring(4).trim();
 	    } else if (s.startsWith("va=>")) {
-        va = s.substring(4).trim();
+        va = Ace.encode(s.substring(4).trim());
 	    } else if (s.startsWith("cl=>")) {
         cl = s.substring(4).trim();
 	    } else if (s.equals("Pn=>")) {

@@ -180,8 +180,14 @@ class SocketDatabase implements Database {
 	AceSocket sock = null;
 	try {
 	    sock = takeSocket();
-	    String result = sock.transact("find " + clazz + " " +
-					  namePattern);
+      String _clazz = clazz;
+      _clazz = Ace.decode(clazz);
+	    String result = sock.transact(
+        "find " +
+        _clazz +
+        " " +
+			  namePattern
+      );
 	    int mpos = result.indexOf("// Found ");
 	    if (mpos < 0)
 		return null; // FIXME?
@@ -193,14 +199,15 @@ class SocketDatabase implements Database {
 	    StringTokenizer listToke = new StringTokenizer(result, "\r\n");
 	    List nameList = new ArrayList();
 	    while (listToke.hasMoreTokens()) {
-		String l = listToke.nextToken();
-		if (l.startsWith("?")) {
-		    StringTokenizer ltoke = new StringTokenizer(l, "?");
-		    if (ltoke.countTokens() < 2) 
-			continue;
-		    ltoke.nextToken();
-		    nameList.add(ltoke.nextToken());
-		}
+        String l = listToke.nextToken();
+        if (l.startsWith("?")) {
+          StringTokenizer ltoke = new StringTokenizer(l, "?");
+          if (ltoke.countTokens() < 2) {
+            continue;
+          }
+          ltoke.nextToken();
+          nameList.add(ltoke.nextToken());
+        }
 	    }
 	    
 	    return new SocketResultSet(
@@ -242,8 +249,6 @@ class SocketDatabase implements Database {
 
 	    String obj = sock.transact("show -p");
 	    o = parser.parseObject(obj);
-	} catch (AceException ex) {
-	    throw new AceException(ex);
 	} finally {
       if(sock != null)
   	    putSocket(sock);

@@ -22,6 +22,7 @@
 package org.acedb;
 
 import java.util.*;
+import java.net.*;
 
 public class Ace {
     /**
@@ -105,6 +106,38 @@ public class Ace {
 	String host = url.getHost();
 	int port = url.getPort();
 	return new AceURL(protocol, host, port, null, null, null, userInfo, authority);
+    }
+    
+    public static String encode(String s) {
+      s = URLEncoder.encode(s);
+      if(s.indexOf("%") != -1) {
+        StringBuffer sb = new StringBuffer(s);
+        for(int i = sb.length()-1; i >= 0; i--) {
+          if(sb.charAt(i) == '%') {
+            sb.setCharAt(i, '-');
+          }
+        }
+        s = sb.toString();
+      }
+      return s;
+    }
+    
+    public static String decode(String s) throws AceException {
+      if(s.indexOf("-") != -1) {
+        StringBuffer sb = new StringBuffer(s);
+        for(int i = sb.length()-1; i >= 0; i--) {
+          if(sb.charAt(i) == '-') {
+            sb.setCharAt(i, '%');
+          }
+        }
+        s = sb.toString();
+      }
+      try {
+        s = URLDecoder.decode(s);
+      } catch (Exception e) {
+        throw new AceException(e, "Couldn't decode " + s);
+      }
+      return s;
     }
 }
 
