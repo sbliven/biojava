@@ -16,16 +16,23 @@ import org.biojava.bio.symbol.Symbol;
 /**
  * Class for modelling non-deterministic finite automata.
  * <p>
- * It differs from its superclass by implementing epsilon
- * transitions and its replaceNode() method remove epsilon self-transitions.
- * <p>
+ * This implementation has epsilon and lambda transitions.
+ * Both transitions are silent but the former is intended
+ * to be optimised away while the latter must be retained
+ * during optimisation.  This is necessary to implement
+ * limited closure for the REs that one may want to build
+ * with this NFA.
+ *
  * @author David Huen
  * @since 1.4
  */
 public class Nfa
     extends FiniteAutomaton
 {
+    // Used to indicate a silent transition that can be munged and optimised away.
     private Symbol EPSILON = null;
+    // Used to indicate a silent transition that must be preserved during munging.
+    private Symbol LAMBDA = AlphabetManager.createSymbol("lambda");
 
     public Nfa(String name, FiniteAlphabet alfa)
     {
@@ -37,9 +44,20 @@ public class Nfa
         return nodes.contains(node);
     }
 
+    /**
+     * Add a silent optimisable transition to instance.
+     */
     public void addEpsilonTransition(Node start, Node end)
     {
         addTransition(start, end, EPSILON);
+    }
+
+    /**
+     * Add a silent persistent transition to instance.
+     */
+    public void addLambdaTransition(Node start, Node end)
+    {
+        addTransition(start, end, LAMBDA);
     }
 
     /**
@@ -101,6 +119,26 @@ public class Nfa
             }
         }
         while (foundEpsilonTransitions);
+    }
+
+    /**
+     * Retrieve all Nodes reachable from the specified node by
+     * emissionless lambda transitions.
+     */
+    NodeSet getLambdaClosure(Node node)
+        throws AutomatonException
+    {
+        NodeSet closureSet = createNodeSet();
+
+        NodeSet thisClosure = getClosure(node, LAMBDA);
+        closureSet.addNodeSet(thisClosure);
+
+        for (Iterator closI = thisClosure.iterator(); closI.hasNext(); ) {
+            Node currNode = (Node) closI.next();
+            closureSet.addNodeSet(getLambdaClosure(currNode));
+        }
+
+        return closureSet;
     }
 
     /**
