@@ -120,7 +120,7 @@ public abstract class AbstractAnnotation
   }
 
   public Map asMap() {
-    return new HashMap(getProperties());
+    return Collections.unmodifiableMap(getProperties());
   }
 
   public void addChangeListener(ChangeListener cl) {
