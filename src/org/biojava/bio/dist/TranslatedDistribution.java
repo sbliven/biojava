@@ -42,10 +42,46 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * Creates a distribution that is a translated view of an underlying
- * distribution.
+ * A translated view of some underlying distribution.  The <code>getWeight</code>
+ * method returns the result of calling <code>getWeight</code> on the underlying
+ * distribution, having first translated the <code>Symbol</code> parameter using
+ * the supplied <code>ReversibleTranslationTable</code>.  All changes to the
+ * underlying distribution are reflected by the <code>TranslatedDistribution</code>.
+ *
+ * <p>
+ * The <code>TranslatedDistribution</code> is not directly mutable: calling
+ * <code>setWeight</code> will result in a <code>ChangeVetoException</code>.
+ * However, a <code>DistributionTrainer</code> may be registered for a
+ * <code>TranslatedDistribution</code>.  Any counts received by this trainer
+ * are untranslated then forwarded to the underlying distribution.  It is
+ * valid to add counts to both a <code>TranslatedDistribution</code> and
+ * its underlying distribution in a single training session, so
+ * <code>TranslatedDistribution</code> objects are useful for tying
+ * parameters together when training Markov Models.
+ * </p>
+ *
+ * <h2>Example usage</h2>
+ *
+ * <pre>
+ * Distribution d = DistributionFactory.DEFAULT.createDistribution(DNATools.getDNA());
+ * d.setWeight(DNATools.a(), 0.7);
+ * d.setWeight(DNATools.c(), 0.1);
+ * d.setWeight(DNATools.g(), 0.1);
+ * d.setWeight(DNATools.t(), 0.1);
+ * Distribution complemented = new TranslatedDistribution(
+ *     DNATools.complementTable(),
+ *     d,
+ *     DistributionFactory.DEFAULT
+ * );
+ * System.out.println(
+ *    "complemented.getWeight(DNATools.t()) = " +
+ *    complemented.getWeight(DNATools.t())
+ * );  // Should print 0.7
+ * </pre>
+ * 
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  * @since 1.1
  */
 public class TranslatedDistribution
@@ -59,6 +95,7 @@ public class TranslatedDistribution
   private final Distribution delegate;
   private final ReversibleTranslationTable table;
   private transient ChangeListener forwarder;
+  private transient ChangeListener delegateUpdate;
 
   /**
    * Create a new TranslatedDistribution.
@@ -75,6 +112,10 @@ public class TranslatedDistribution
     Distribution other,
     DistributionFactory distFact
   ) throws IllegalAlphabetException {
+    if (! (other.getAlphabet() instanceof FiniteAlphabet)) {
+        throw new IllegalAlphabetException("The current implementation of TranslatedDistribution is only valid for distributions over finite alphabets");
+    }
+      
     if(!table.getTargetAlphabet().equals(other.getAlphabet())) {
       throw new IllegalAlphabetException(
         "Table target alphabet and distribution alphabet don't match: " +
@@ -85,6 +126,50 @@ public class TranslatedDistribution
     this.other = other;
     this.table = table;
     this.delegate = distFact.createDistribution(table.getSourceAlphabet());
+    
+    syncDelegate();
+    
+    delegateUpdate = new ChangeListener() {
+        public void preChange(ChangeEvent ce) {}
+        public void postChange(ChangeEvent ce) {
+            ChangeType ct = ce.getType();
+            Object change = ce.getChange();
+            if(ct == Distribution.WEIGHTS) {
+                boolean synced = false;
+                if((change != null) && (change instanceof Object[]) ) {
+                    Object[] ca = (Object[]) change;
+                    if( (ca.length == 2) && (ca[0] instanceof Symbol) && (ca[1] instanceof Number)) {
+                        try {
+                            delegate.setWeight(
+                                (Symbol) ca[0],
+                                ((Number) ca[1]).doubleValue()
+                            );
+                            synced = true;
+                        } catch (Exception ise) {
+                            throw new BioError("Couldn't synchronize weight", ise);
+                        }
+                    }
+                }
+                if (!synced) {
+                    // Weights have changed, but we can't understand the event, so re-sync them
+                    // all.
+                    syncDelegate();
+                }
+            }
+        }
+    } ;
+    addChangeListener(delegateUpdate);
+  }
+  
+  private void syncDelegate() {
+      for (Iterator i = ((FiniteAlphabet) delegate.getAlphabet()).iterator(); i.hasNext(); ) {
+        Symbol s = (Symbol) i.next();
+        try {
+            delegate.setWeight(s, other.getWeight(table.untranslate(s)));
+        } catch (Exception ex) {
+            throw new BioError(ex, "Assertion failed: couldn't map distributions");
+        }
+    }
   }
 
   public Alphabet getAlphabet() {
@@ -92,13 +177,15 @@ public class TranslatedDistribution
   }
 
   public double getWeight(Symbol sym)
-  throws IllegalSymbolException {
+    throws IllegalSymbolException
+  {
     return delegate.getWeight(sym);
   }
 
   public void setWeight(Symbol sym, double weight)
-  throws IllegalSymbolException, ChangeVetoException {
-    delegate.setWeight(sym, weight);
+    throws IllegalSymbolException, ChangeVetoException 
+  {
+    throw new ChangeVetoException("Can't directly edit a TranslatedDistribution");
   }
 
   public Symbol sampleSymbol() {
@@ -144,28 +231,10 @@ public class TranslatedDistribution
       }
 
       public void train(DistributionTrainerContext dtc, double weight)
-      throws ChangeVetoException {
-        DistributionTrainerContext subCtxt
-          = new SimpleDistributionTrainerContext();
-        subCtxt.setNullModelWeight(weight);
-        subCtxt.registerDistribution(delegate);
-
-        for(
-          Iterator i = ((FiniteAlphabet) other.getAlphabet()).iterator();
-          i.hasNext();
-        ) {
-          AtomicSymbol sym = (AtomicSymbol) i.next();
-          try {
-            subCtxt.addCount(
-                delegate,
-                table.translate(sym),
-                dtc.getCount(other, sym)
-            );
-          } catch (IllegalSymbolException ise) {
-            throw new BioError("Assertion Failed: Can't train", ise);
-          }
-        }
-        subCtxt.train();
+        throws ChangeVetoException 
+      {
+          // This is a no-op, since our counts have already been passed on to
+          // the sister Distribution.
       }
 
       public void clearCounts(DistributionTrainerContext dtc) {
@@ -180,7 +249,7 @@ public class TranslatedDistribution
        (Distribution.WEIGHTS.isMatchingType(ct) || ct.isMatchingType(Distribution.WEIGHTS)))
     {
       forwarder = new Forwarder(this, cs);
-      delegate.addChangeListener(forwarder, Distribution.WEIGHTS);
+      other.addChangeListener(forwarder, Distribution.WEIGHTS);
     }
 
     return cs;
