@@ -27,6 +27,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.*;
 import java.util.*;
+import java.lang.ref.*;
 
 /**
  * SequenceDB implementation that caches the results of another SequenceDB.
