@@ -38,6 +38,8 @@ import org.biojava.bio.BioException;
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @author Greg Cox
  * @since 1.2
+ * @see <code>SequenceFormat</code>
+ * @see <code>SequenceFileFomer</code>
  */
 public abstract class SeqFileFormerFactory
 {
@@ -53,18 +55,24 @@ public abstract class SeqFileFormerFactory
      *
      * <p>The valid arguments are described in the public static final
      * <code>Map</code> </code>SequenceFormat.FORMATS</code>. Those
-     * currently available Embl or Genbank. Whether capitalization is
-     * important depends on the implmentation of
-     * <code>SequenceFormat</code>; see the <code>writeSequence</code>
-     * method in each implemetation. Current implementations are
-     * <strong>not</strong> case-sensitive.</p>
+     * currently available are Embl or Genbank. Capitalization is
+     * important.</p>
+
+     * <p>How the public methods see this depends on the
+     * implementation of <code>SequenceFormat</code>; see the
+     * <code>writeSequence</code> method in each
+     * implementation. Current implementations are
+     * <strong>not</strong> case-sensitive because they check the
+     * argument to <code>writeSequence</code> using
+     * <code>equalsIgnoreCase()</code> before calling this method
+     * (which <strong>is</strong> case-sensitive) with the correct
+     * case.</p>
      *
      * @param format a <code>String</code> identifer which specifies
      * the file format name.
      * @param factory a <code>SeqFileFormerFactory</code> to be
      * installed. 
      *     
-     * @see <code>SequenceFormat</code>
      * @see <code>EmblLikeFormat</code>
      * @see <code>GenbankFormat</code>
      */
