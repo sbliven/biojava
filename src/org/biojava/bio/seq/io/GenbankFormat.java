@@ -697,7 +697,8 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     {
 	boolean isHeaderTag = false;
 	char[] l = line.toCharArray();
-	for (int i = 0; i < TAG_LENGTH; i++)
+  int len = Math.min(l.length, TAG_LENGTH); // handles empty lines better
+	for (int i = 0; i < len; i++)
 	{
 	    try
 	    {

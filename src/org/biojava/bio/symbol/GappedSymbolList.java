@@ -571,8 +571,8 @@ extends AbstractSymbolList implements Serializable {
     int i = findViewBlock(indx);
     if(i < 0) {
       if(
-        (indx < ((Block) blocks.get(0)).viewStart) ||
-        (indx > ((Block) blocks.get(blocks.size() - 1)).viewEnd)
+        (indx < firstNonGap()) ||
+        (indx > lastNonGap())
       ) {
         return Alphabet.EMPTY_ALPHABET.getGapSymbol();
       } else {
@@ -583,7 +583,7 @@ extends AbstractSymbolList implements Serializable {
       return source.symbolAt(b.sourceStart - b.viewStart + indx);
     }
   }
-
+  
   /**
    * Return the index of the first Symbol that is not a Gap character.
    * <p>
