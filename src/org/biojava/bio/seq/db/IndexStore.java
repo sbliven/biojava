@@ -60,7 +60,8 @@ public interface IndexStore {
    *
    * @param indx the Index to add
    * @throws IllegalIDException if the index has an invalid ID field
-   * @throws BioException if the store failed */
+   * @throws BioException if the store failed
+   */
   void store(Index indx) throws IllegalIDException, BioException;
   
   /**

@@ -96,6 +96,16 @@ public class Ligand {
       return new ParserListener(PARSER, tagDelegator);
     }
 
+    /**
+     * @metaData AnnotationType
+     * <java version="1.0" class="java.beans.XMLDecoder">
+     * <object class="javax.swing.JLabel">
+     *   <void property="text">
+     *     <string>pigs</string>
+     *   </void>
+     * </object>
+     * </java>
+     */
     public AnnotationType getType() {
       return ANNO_TYPE;
     }
