@@ -27,10 +27,22 @@ public class DataSource {
     return name;
   }
   
-  public String getDescription() {
-    return description;
-  }
+    void setName(String name) {
+	this.name = name;
+    }
+
+    public String getDescription() {
+	return description;
+    }
+
+    void setDescription(String description) {
+	this.description = description;
+    }
   
+    public int hashCode() {
+	return getURL().hashCode();
+    }
+
   public boolean equals(Object other) {
     if(! (other instanceof DataSource) ) {
       return false;

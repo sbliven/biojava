@@ -104,7 +104,7 @@ public class DAS extends AbstractChangeable {
   }
   
   // fixme: can leave the object in an inconsistent state. Should be made into
-  // an attomic operation
+  // an atomic operation
   private void addDasURLImpl(URL dasURL)
   throws BioException, ChangeVetoException {
     try {
@@ -113,7 +113,6 @@ public class DAS extends AbstractChangeable {
       HttpURLConnection huc = (HttpURLConnection) dsnURL.openConnection();
       huc.connect();
       int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
-      // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
       if(status == 0) {
         throw new BioException("Not a DAS server: " + dsnURL);
       } else if(status != 200) {
@@ -149,13 +148,13 @@ public class DAS extends AbstractChangeable {
           ReferenceServer master = (ReferenceServer) dataSources.get(mapURL);
           
           if(dsURL.equals(mapURL)) { // reference server URL
-            ReferenceServer ds = new ReferenceServer(dsURL, sourceText, descrText);
             if(master != null) { // merge this entry with old stub entry
-              for(Iterator ai = master.getAnnotaters().iterator(); ai.hasNext(); ) {
-                ds.addAnnotator( (DataSource) ai.next() );
-              }
-            }
-            dataSources.put(dsURL, ds);
+		master.setName(sourceText);
+		master.setDescription(descrText);
+            } else {
+		ReferenceServer ds = new ReferenceServer(dsURL, sourceText, descrText);
+		dataSources.put(dsURL, ds);
+	    }
           } else { // annotation server
             if(master == null) {
               master = new ReferenceServer(mapURL, null, null);
