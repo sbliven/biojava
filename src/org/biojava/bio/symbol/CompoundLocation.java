@@ -19,10 +19,9 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.symbol;
 
 import java.util.*;
-import org.biojava.bio.symbol.*;
 
 /**
  * A comlex location. It is made up from multiple sub-locations and is essential

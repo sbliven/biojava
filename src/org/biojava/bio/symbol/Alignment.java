@@ -23,8 +23,6 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 
-import org.biojava.bio.seq.Location; // is this good?
-
 /**
  * An alignment containing multiple <span class="type">SymbolList</span>s.
  * <P>

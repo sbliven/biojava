@@ -158,7 +158,7 @@ public class SuffixTreeKernel implements SVMKernel {
   /**
    * Scale using a <span class="type">BitSet</span> to allow/dissalow depths.
    *
-   * @param Matthew Pocock
+   * @author Matthew Pocock
    */
   public static class SelectionScalar implements DepthScaler {
     private BitSet bSet;
@@ -190,7 +190,7 @@ public class SuffixTreeKernel implements SVMKernel {
   /**
    * Scale using a multiple of two <span class="type">DepthScaler</span>s.
    *
-   * @param Matthew Pocock
+   * @author Matthew Pocock
    */
   public static class MultipleScalar implements DepthScaler {
     private DepthScaler a;

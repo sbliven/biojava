@@ -19,10 +19,9 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.symbol;
 
 import java.util.ArrayList;
-import org.biojava.bio.symbol.*;
 
 /**
  * A biological location.
