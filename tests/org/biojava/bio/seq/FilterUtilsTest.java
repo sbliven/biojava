@@ -190,6 +190,9 @@ public class FilterUtilsTest extends TestCase
 
 	assertTrue(FilterUtils.areProperSubset(clf1, olf1));
 	assertTrue(! FilterUtils.areProperSubset(olf1, clf1));
+
+	assertTrue(FilterUtils.areDisjoint(olf1, clf2));
+	assertTrue(FilterUtils.areDisjoint(clf1, olf2));
     }
 
     public void testNot() throws Exception {
