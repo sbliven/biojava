@@ -11,11 +11,6 @@ import org.biojava.bio.symbol.Symbol;
 
 public class DfaBuilder
 {
-
-    private Nfa nfa;
-    private FiniteAutomaton dfa;
-    private Map closureSets = new HashMap();
-
     private class DfaNode
     {
         FiniteAutomaton.NodeSet closureSet;
@@ -23,8 +18,17 @@ public class DfaBuilder
 
         private DfaNode(FiniteAutomaton.NodeSet closureSet)
         {
+            //System.out.println("in DfaNode constructor");
             this.closureSet = closureSet;
+            //System.out.println("initialising this.closureSet");
             node = dfa.addNode(isTerminal());
+            //System.out.println("DfaNode created.");
+        }
+
+        private DfaNode(FiniteAutomaton.Node node, FiniteAutomaton.NodeSet closureSet)
+        {
+            this.closureSet = closureSet;
+            this.node = node;
         }
 
         /**
@@ -35,19 +39,67 @@ public class DfaBuilder
         {
             for (Iterator closI = closureSet.iterator(); closI.hasNext(); ) {
                 FiniteAutomaton.Node currNode = (FiniteAutomaton.Node) closI.next();
+                //System.out.println("isTerminal() checking: " + currNode);
                 if (currNode.isTerminal())
                     return true;
             }
             return false;
         }
+
+        public String toString()
+        {
+            StringBuffer output = new StringBuffer();
+
+            output.append(node.toString());
+            output.append("\n");
+            output.append(closureSet.toString());
+            output.append("\n");
+
+            return output.toString();
+        }
     }
+
+    private Nfa nfa;
+    private FiniteAutomaton dfa;
+    private boolean converted = false;
+    private Map closureSets = new HashMap();
 
     DfaBuilder(Nfa nfa)
+        throws AutomatonException
     {
         this.nfa = nfa;
+
         dfa = new FiniteAutomaton("dfa_" + nfa.getName(), nfa.getAlphabet());
+
+        // initialise DFA and the closureSets Map with the initial mapping.
+        FiniteAutomaton.NodeSet initialSet = nfa.createNodeSet();
+        initialSet.addNode(nfa.getStart());
+        closureSets.put(initialSet, new DfaNode(dfa.getStart(), initialSet));
     }
 
+    public FiniteAutomaton getDFA()
+        throws AutomatonException
+    {
+        //System.out.println("getDFA called.");
+        if (!converted) {
+            constructSubsets();
+            converted = true;
+        }
+        return dfa;
+    }
+
+    public void constructSubsets()
+        throws AutomatonException
+    {
+        //System.out.println("constructSubsets() called.");
+        // create a NodeSet comprising only the start state.
+        FiniteAutomaton.NodeSet initialSet = nfa.createNodeSet();
+        //System.out.println("adding initial node to dfa.");
+        initialSet.addNode(nfa.getStart());
+        
+        //System.out.println("starting constructSubsets(...)");
+        constructSubsets(getDfaNode(initialSet));
+    }
 
     /**
      * Given a DFA node representing a Set of NFA nodes,
@@ -56,6 +108,7 @@ public class DfaBuilder
     private void constructSubsets(DfaNode dfaNode)
         throws AutomatonException
     {
+        //System.out.println("constructSubsets:\n" + dfaNode.toString());
         // retrieve the NFA nodes
         FiniteAutomaton.NodeSet closureSet = dfaNode.closureSet;
 
@@ -64,20 +117,24 @@ public class DfaBuilder
         for (Iterator closI = closureSet.iterator(); closI.hasNext(); ) {
             org.biojava.utils.automata.Nfa.Node node = (org.biojava.utils.automata.Nfa.Node) closI.next();
 
-            symbolSet.add(nfa.getSymbols(node));
+            symbolSet.addAll(nfa.getSymbols(node));
         }
 
         // for each of the NFA nodes and each Symbol, compute
         // the next closure Sets and their associated DFA node.
+        //System.out.println("constructSubsets going thru symbols for closure. " + symbolSet);
         for (Iterator symI = symbolSet.iterator(); symI.hasNext(); ) {
             Symbol currSymbol = (Symbol) symI.next();
+
             FiniteAutomaton.NodeSet closureForSymbol = nfa.createNodeSet();
 
+            //System.out.println("constructSubsets going thru Nodes for Symbol.");
             for (Iterator closI = closureSet.iterator(); closI.hasNext(); ) {
                 org.biojava.utils.automata.Nfa.Node node = (org.biojava.utils.automata.Nfa.Node) closI.next();
 
                 // compute closure set for current symbol for this NFA node    
                 FiniteAutomaton.NodeSet currNodeSet = nfa.getClosure(node, currSymbol);
+                //System.out.println("closure set for " + currSymbol.getName() + " from NFA node " + node.getID() + " is " + currNodeSet.toString());
                 closureForSymbol.addNodeSet(currNodeSet);
             }
 
@@ -108,15 +165,20 @@ public class DfaBuilder
 
     /**
      * get the DFA Node associated with the closure Set of NFA nodes.
+     * If it does not exist, create it.
      */
     private DfaNode getDfaNode(FiniteAutomaton.NodeSet nfaNodes)
     {
-        DfaNode dfaNode;
+        //System.out.println("getDfaNode called with " + nfaNodes.toString());
+        DfaNode dfaNode = (DfaNode) closureSets.get(nfaNodes);
 
-        if ((dfaNode = (DfaNode) closureSets.get(nfaNodes)) == null) {
-             return (DfaNode) closureSets.put(nfaNodes, new DfaNode(nfaNodes));
+        //System.out.println("dfaNode is " + dfaNode);
+        if (dfaNode == null) {
+            //System.out.println("putting new DfaNode into closureSets.");
+            dfaNode = new DfaNode(nfaNodes);
+            closureSets.put(nfaNodes, dfaNode);
         }
-        else
-            return dfaNode;
+
+        return dfaNode;
     }
 }

@@ -82,7 +82,7 @@ public class FiniteAutomaton
         /**
          * returns the Node ID.
          */
-        private int getID() { return nodeID; }
+        int getID() { return nodeID; }
 
         /**
          * Two Nodes are equal if they share the same
@@ -149,7 +149,7 @@ public class FiniteAutomaton
         public boolean equals(Object o)
         {
             // only NodeSets can be compared.
-            if ((o instanceof NodeSet))
+            if (!(o instanceof NodeSet))
                 return false;
 
             // Contents of NodeSets must be from same model.
@@ -158,6 +158,7 @@ public class FiniteAutomaton
                 return false;
 
             // sets themselves must be equal
+            //System.out.println(toString() + " equals? " + other.toString());
             return super.equals(o);
         }
 
@@ -169,7 +170,7 @@ public class FiniteAutomaton
             int sum = 0;
 
             for (Iterator setI = iterator(); setI.hasNext(); ) {
-                sum += hashCode();
+                sum += setI.next().hashCode();
             }
 
             return sum;
@@ -182,6 +183,23 @@ public class FiniteAutomaton
         FiniteAutomaton parent()
         {
             return FiniteAutomaton.this;
+        }
+
+        public String toString()
+        {
+            StringBuffer output = new StringBuffer();
+
+            // dump nodes
+            output.append("[");
+            int count = 0;
+            for (Iterator nodeI = iterator(); nodeI.hasNext(); ) {
+                Node node = (Node) nodeI.next();
+                if (count++ != 0) output.append(", ");
+                output.append(node.getID());
+            }
+            output.append("]");
+
+            return output.toString();
         }
     }
 
@@ -402,6 +420,11 @@ public class FiniteAutomaton
 
     NodeSet createNodeSet() { return new NodeSet(); }
 
+    /**
+     * dumps internal data of Nodes and Transitions that describe
+     * this FiniteAutomaton. It is not possible to dump it as a 
+     * regex as there are FA that cannot be expressed as a regex.
+     */
     public String toString()
     {
         StringBuffer output = new StringBuffer();
