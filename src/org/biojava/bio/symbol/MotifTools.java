@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.Iterator;
+import java.util.Stack;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
@@ -41,11 +42,10 @@ public class MotifTools
 {
     /**
      * <code>createRegex</code> creates a regular expression which
-     * matches the <code>SymbolList</code>. At the moment ambiguous
-     * <code>Symbol</code>s are simply expanded into character
-     * classes. For example the nucleotide sequence "CTNNG" is
-     * expanded to "CT[ACGT][ACGT]G" rather than "CT[ACTG]{2}G". This
-     * will be addressed in the future.
+     * matches the <code>SymbolList</code>. Ambiguous
+     * <code>Symbol</code>s are simply transformed into character
+     * classes. For example the nucleotide sequence "AAGCTT" becomes
+     * "A{2}GCT{2}" and "CTNNG" is expanded to "CT[ACGT]{2}G".
      *
      * @param motif a <code>SymbolList</code>.
      *
@@ -53,7 +53,12 @@ public class MotifTools
      */
     public static String createRegex(SymbolList motif)
     {
+        if (motif.length() == 0)
+            throw new IllegalArgumentException("SymbolList was empty");
+
+        StringBuffer regex = new StringBuffer();
         StringBuffer sb = new StringBuffer();
+        Stack stack = new Stack();
 
         try
         {
@@ -63,9 +68,6 @@ public class MotifTools
             {
                 Symbol sym = motif.symbolAt(i);
                 FiniteAlphabet ambiAlpha = (FiniteAlphabet) sym.getMatches();
-                int ambiSize = ambiAlpha.size();
-                if (ambiSize > 1)
-                    sb.append("[");
 
                 for (Iterator ai = ambiAlpha.iterator(); ai.hasNext();)
                 {
@@ -73,8 +75,36 @@ public class MotifTools
                     sb.append(sToke.tokenizeSymbol(ambiSym));
                 }
 
-                if (ambiSize > 1)
-                    sb.append("]");
+                String result = sb.substring(0);
+
+                if (i == 1)
+                {
+                    stack.push(result);
+                }
+                else if (i < motif.length())
+                {
+                    if (! stack.isEmpty() && stack.peek().equals(result))
+                    {
+                        stack.push(result);
+                    }
+                    else
+                    {
+                        regex = extendRegex(stack, regex);
+                        stack.push(result);
+                    }
+                }
+                else
+                {
+                    if (! stack.isEmpty() && stack.peek().equals(result))
+                    {
+                        stack.push(result);
+                    }
+
+                    regex = extendRegex(stack, regex);
+                    regex.append(result);
+                }
+
+                sb.setLength(0);
             }
         }
         catch (IllegalSymbolException ise)
@@ -86,6 +116,40 @@ public class MotifTools
             throw new BioError(be, "Internal error: failed to get SymbolTokenization for SymbolList alphabet");
         }
 
-        return sb.substring(0);
+        return regex.substring(0);
+    }
+
+    private static StringBuffer extendRegex(Stack stack, StringBuffer regex)
+    {
+        String component = (String) stack.peek();
+
+        if (component.length() == 1)
+        {
+            regex.append(component);
+
+            if (stack.size() > 1)
+            {                                
+                regex.append("{");
+                regex.append(stack.size());
+                regex.append("}");
+            }
+        }
+        else
+        {
+            regex.append("[");
+            regex.append(component);
+            regex.append("]");
+
+            if (stack.size() > 1)
+            {
+                regex.append("{");
+                regex.append(stack.size());
+                regex.append("}");
+            }
+        }
+
+        stack.clear();
+
+        return regex;
     }
 }
