@@ -121,6 +121,12 @@ public interface Ontology extends Changeable {
     public Triple createTriple(Term subject, Term object, Term relation) throws AlreadyExistsException, ChangeVetoException;
     
     /**
+     * See if a triple exists in this ontology
+     */
+    
+    public boolean containsTriple(Term subject, Term object, Term relation);
+    
+    /**
      * Remove a triple from an ontology
      */
     
@@ -329,6 +335,10 @@ public interface Ontology extends Changeable {
         
         private boolean containsTerm(Term t) {
             return (terms.get(t.getName()) == t);
+        }
+        
+        public boolean containsTriple(Term subject, Term object, Term relation) {
+          return triples.contains(new Triple.Impl(subject, object, relation));
         }
         
         public Triple createTriple(Term subject, Term object, Term relation)

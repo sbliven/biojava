@@ -25,7 +25,7 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.utils.*;
 
-public class AlreadyExistsException extends BioException {
+public class AlreadyExistsException extends OntologyException {
     public AlreadyExistsException() {
         super();
     }

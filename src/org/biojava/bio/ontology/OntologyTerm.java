@@ -28,7 +28,18 @@ import org.biojava.bio.*;
 /**
  * A term in an ontology which identifies another ontology.
  *
+ * <p>
+ * This Term type has an associated ontology. It is meant to represent that
+ * ontology so that you can reason over them. For example, you could add
+ * information to an Ontology containing an OntologyTerm stating how the
+ * OntologyTerm's Ontology relates to other entities. This allows
+ * classifications of Ontologies to be built. You could say that GO is a
+ * biological ontoloogy, as is SO or perhaps declar something about the source
+ * of the information.
+ * </p>
+ *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.4
  */
 

@@ -26,9 +26,26 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * A term in an ontology
+ * A term in another ontology.
+ *
+ * <p>
+ * This is how you allow one ontology to refer to terms in another one. Since
+ * these ontologies are designed to be modular and self-contained, it is
+ * expected that you would not copy terms from one ontology into another. The
+ * best-practice way to represent terms from another ontology in your one is to
+ * use RemoteTerm instances. Ontology has a method importTerm that does this
+ * for you.
+ * </p>
+ *
+ * <p>
+ * The imported term will have the same name as the original term. They are
+ * implicitly identical to each other. The most common use of imports will be
+ * to slurp in the "core" ontology so that opperations such as <code>is-a</code>
+ * and <code>has-a</code> are available.
+ * </p>
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.4
  */
 

@@ -88,5 +88,11 @@ public class OntologyTest extends TestCase {
         assertEquals(onto.getTriples(sprocket, machine, partof).size(), 1);
         assertEquals(onto.getTriples(sprocket, machine, isa).size(), 0);
     }
+    
+    public void testOntoToos_Core() {
+      Ontology onto = OntoTools.getCoreOntology();
+      
+      onto.getTriples(null, null, null);
+    }
 }
 

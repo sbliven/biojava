@@ -28,7 +28,21 @@ import org.biojava.bio.*;
 /**
  * A term in an ontology which identifies a set of triples.
  *
+ * <p>
+ * In order to describe a relation, it is important to both describe it at the
+ * level of general properties (such as symmetry) and also at the level of
+ * constraints on the complete set of Terms that are part of that relation.
+ * TripleTerm allows you to reason over Triples, or over sets of Tripples.
+ * For example, you could state that Triples involving is-a and has-a in your
+ * ontology are exclusive. That is, you chose to either allow is-a or has-a
+ * relations between any pair of terms, but not both. By using the size
+ * operator, it is possible to constrain the cardinality of relations, for
+ * example, to ensure that each car has four wheels or that only 1 Term can
+ * ever be in the object slot of a singleton property.
+ * </p>
+ *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.4
  */
 

@@ -34,6 +34,8 @@ import org.biojava.utils.*;
  * This uses biological coordinates (1 to length).
  *
  * @author Matthew Pocock
+ * @author Mark Schreiber
+ * @author Francois Pepin
  */
 public interface SymbolList extends Changeable {
   /**
@@ -130,6 +132,72 @@ public interface SymbolList extends Changeable {
   
   /**
    * Apply an edit to the SymbolList as specified by the edit object.
+   *
+   * <h2>Description</h2>
+   *
+   * <p>
+   * All edits can be broken down into a series of operations that change
+   * contiguous blocks of the sequence. This represent a one of those operations.
+   * </p>
+   *
+   * <p>
+   * When applied, this Edit will replace 'length' number of symbols starting a
+   * position 'pos' by the SymbolList 'replacement'. This allow to do insertions
+   * (length=0), deletions (replacement=SymbolList.EMPTY_LIST) and replacements
+   * (length>=1 and replacement.length()>=1).
+   * </p>
+   *
+   * <p>
+   * The pos and pos+length should always be valid positions on the SymbolList
+   * to:
+   * <ul>
+   * <li>be edited (between 0 and symL.length()+1).</li>
+   * <li>To append to a sequence, pos=symL.length()+1, pos=0.</li>
+   * <li>To insert something at the beginning of the sequence, set pos=1 and
+   * length=0.</li>
+   * </ul>
+   * </p>
+   *
+   * <h2>Examples</h2>
+   *
+   * <code><pre>
+   * SymbolList seq = DNATools.createDNA("atcaaaaacgctagc");
+   * System.out.println(seq.seqString());
+   *
+   * // delete 5 bases from position 4
+   * Edit ed = new Edit(4, 5, SymbolList.EMPTY_LIST);
+   * seq.edit(ed);
+   * System.out.println(seq.seqString());
+   *
+   * // delete one base from the start
+   * ed = new Edit(1, 1, SymbolList.EMPTY_LIST);
+   * seq.edit(ed);
+   *
+   * // delete one base from the end
+   * ed = new Edit(seq.length(), 1, SymbolList.EMPTY_LIST);
+   * seq.edit(ed);
+   * System.out.println(seq.seqString());
+   *
+   * // overwrite 2 bases from position 3 with "tt"
+   * ed = new Edit(3, 2, DNATools.createDNA("tt"));
+   * seq.edit(ed);
+   * System.out.println(seq.seqString());
+   *
+   * // add 6 bases to the start
+   * ed = new Edit(1, 0, DNATools.createDNA("aattgg");
+   * seq.edit(ed);
+   * System.out.println(seq.seqString());
+   *
+   * // add 4 bases to the end
+   * ed = new Edit(seq.length() + 1, 0, DNATools.createDNA("tttt"));
+   * seq.edit(ed);
+   * System.out.println(seq.seqString());
+   *
+   * // full edit
+   * ed = new Edit(3, 2, DNATools.createDNA("aatagaa");
+   * seq.edit(ed);
+   * System.out.println(seq.seqString());
+   * </pre></code>
    *
    * @param edit the Edit to perform
    * @throws IndexOutOfBoundsException if the edit does not lie within the

@@ -26,29 +26,11 @@ import java.io.Serializable;
 /**
  * <p>
  * Encapsulates an edit operation on a SymbolList.
- * </p>
- *
- * <p>
- * All edits can be broken down into a series of operations that change
- * contiguous blocks of the sequence. This represent a one of those operations.
- * </p>
- * <p>
- * When applied, this Edit will replace 'length' number of symbols starting a
- * position 'pos' by the SymbolList 'replacement'. This allow to do insertions
- * (length=0), deletions (replacement=SymbolList.EMPTY_LIST) and replacements
- * (length>=1 and replacement.length()>=1).
- * </p>
- *
- *<p>
- * The pos and pos+length should always be valid positions on the SymbolList to
- * be edited (between 0 and symL.length()+1).<br>
- * To append to a sequence, pos=symL.length()+1, pos=0.<br>
- * To insert something at the beginning of the sequence, set pos=1 and
- * length=0.
+ * See {@link org.biojava.bio.symbol.SymbolList
+ * SymbolList} for a full description.
  * </p>
  *
  * @author Matthew Pocock
- * @author Francois Pepin (docs)
  */
 public final class Edit implements Serializable {
   public final int pos;

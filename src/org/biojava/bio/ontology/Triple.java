@@ -52,6 +52,44 @@ public interface Triple {
     public Term getRelation();
     
     /**
+     * The hashcode for a Tripple.
+     *
+     * <p>This <em>must</em> be implemented as:
+     * <pre>
+     * return getSubject().hashCode() +
+              31 * getObject().hashCode() + 
+              31 * 31 * getRelation().hashCode();
+     * </pre>
+     * If you do not implement hashcode in this way then you have no guarantee
+     * that your Triple objects will be found in an otology and that they will
+     * not be duplicated.
+     * </p>
+     */
+    public int hashCode();
+    
+    /**
+     * Check to see if an object is an equivalent Tripple.
+     *
+     * <p>
+     * Two tripples are equivalent if they have the same subject, object and
+     * relation fields.
+     * <pre>
+     * if (! (o instanceof Triple)) {
+     *     return false;
+     * }
+     * Triple to = (Triple) o;
+     * return to.getSubject() == getSubject() &&
+     *        to.getObject() == getObject() &&
+     *        to.getRelation() == getRelation();
+     * </pre>
+     * If you do not implement hashcode in this way then you have no guarantee
+     * that your Triple objects will be found in an otology and that they will
+     * not be duplicated.
+     * </p>
+     */
+    public boolean equals(Object obj);
+    
+    /**
      * Basic in-memory implementation of a Triple in an ontology
      *
      * @for.developer This can be used to implement Ontology.createTriple
@@ -105,7 +143,9 @@ public interface Triple {
         }
         
         public int hashCode() {
-            return getSubject().hashCode() + getObject().hashCode() + getRelation().hashCode();
+            return getSubject().hashCode() +
+              31 * getObject().hashCode() + 
+              31 * 31 * getRelation().hashCode();
         }
         
         public String toString() {
