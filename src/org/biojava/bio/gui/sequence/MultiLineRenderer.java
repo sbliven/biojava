@@ -50,7 +50,7 @@ public class MultiLineRenderer extends AbstractChangeable
                        "RENDERERS",
                        SequenceRenderContext.LAYOUT);
 
-    private List renderers = new ArrayList();
+    protected List renderers = new ArrayList();
     private transient ChangeForwarder rendererForwarder = null;
 
     protected ChangeSupport getChangeSupport(ChangeType ct) {
