@@ -327,6 +327,7 @@
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
           <include name="**/*Test*" />
+          <include name="**/*$*" />
         </fileset>
       </batchtest>
     </junit>
@@ -351,6 +352,7 @@
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
           <include name="org/biojava/bio/seq/*Test*" />
+          <include name="org/biojava/bio/seq/*$*" />
         </fileset>
       </batchtest>
     </junit>
@@ -375,6 +377,7 @@
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
           <include name="org/biojava/bio/symbol/*Test*" />
+          <exclude name="org/biojava/bio/symbol/*$*" />
         </fileset>
       </batchtest>
     </junit>
