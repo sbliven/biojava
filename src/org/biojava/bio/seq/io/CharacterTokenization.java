@@ -105,7 +105,9 @@ public class CharacterTokenization
 	if (!symbolsToCharacters.containsKey(s)) {
 	    symbolsToCharacters.put(s, chr);
 	}
-	charactersToSymbols.put(chr, s);
+	if (!charactersToSymbols.containsKey(chr)) {
+	    charactersToSymbols.put(chr, s);
+	}
 	tokenTable = null;
     }
 
@@ -166,13 +168,26 @@ public class CharacterTokenization
 	return sym;
     }
 
-    public String tokenizeSymbol(Symbol s) throws IllegalSymbolException {
+    private Character _tokenizeSymbol(Symbol s)
+        throws IllegalSymbolException
+    {
 	Character c = (Character) symbolsToCharacters.get(s);
 	if (c == null) {
-	    throw new IllegalSymbolException("No mapping for symbol " + s.getName());
+	    Alphabet alpha = getAlphabet();
+	    alphabet.validate(s);
+	    if (alpha instanceof FiniteAlphabet) {
+		c = (Character) symbolsToCharacters.get(AlphabetManager.getAllAmbiguitySymbol((FiniteAlphabet) alpha));
+	    }
+	    if (c == null) {
+		throw new IllegalSymbolException("No mapping for symbol " + s.getName());
+	    }
 	}
+	
+	return c;
+    }
 
-	return "" + c.charValue();
+    public String tokenizeSymbol(Symbol s) throws IllegalSymbolException {
+	return "" + _tokenizeSymbol(s).charValue();
     }
 
     public String tokenizeSymbolList(SymbolList sl)
@@ -184,12 +199,12 @@ public class CharacterTokenization
 	StringBuffer sb = new StringBuffer();
 	for (Iterator i = sl.iterator(); i.hasNext(); ) {
 	    Symbol sym = (Symbol) i.next();
-	    Character c = (Character) symbolsToCharacters.get(sym);
-	    if (c == null) {
-		throw new IllegalAlphabetException("No mapping for symbol " + sym.getName());
+	    try {
+		Character c = _tokenizeSymbol(sym);
+		sb.append(c.charValue());
+	    } catch (IllegalSymbolException ex) {
+		throw new IllegalAlphabetException(ex, "Couldn't tokenize");
 	    }
-
-	    sb.append(c.charValue());
 	}
 
 	return sb.substring(0);
