@@ -34,7 +34,7 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 
-import org.apache.xerces.parsers.*;
+import javax.xml.parsers.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import org.w3c.dom.*;
@@ -65,9 +65,8 @@ class DASGFFParser {
         throws BioException, ParseException, IOException, SAXException
     {
 	    InputSource is = new InputSource(data);
-	    DOMParser parser = new DOMParser();
-	    parser.parse(is);
-	    Element el = parser.getDocument().getDocumentElement();
+	    DocumentBuilder parser = DASSequence.nonvalidatingParser();
+	    Element el = parser.parse(is).getDocumentElement();
 	    NodeList gffl = el.getElementsByTagName("GFF");
 	    if (gffl.getLength() != 1)
 		throw new BioException("Couldn't find GFF element");

@@ -32,7 +32,7 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.bio.symbol.*;
 
-import org.apache.xerces.parsers.*;
+import javax.xml.parsers.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import org.w3c.dom.*;
@@ -207,9 +207,8 @@ public class DASSequenceDB implements SequenceDB {
 
 
 		InputSource is = new InputSource(huc.getInputStream());
-		DOMParser parser = DASSequence.nonvalidatingParser();
-		parser.parse(is);
-		Element el = parser.getDocument().getDocumentElement();
+		DocumentBuilder parser = DASSequence.nonvalidatingParser();
+		Element el = parser.parse(is).getDocumentElement();
 		
 		NodeList segl = el.getElementsByTagName("SEGMENT");
 		Element segment = null;

@@ -36,7 +36,7 @@ import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 
-import org.apache.xerces.parsers.*;
+import javax.xml.parsers.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import org.w3c.dom.*;
@@ -529,7 +529,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
             }
 
 	    InputSource is = new InputSource(inStream);
-	    SAXParser parser = nonvalidatingSAXParser();
+	    XMLReader parser = nonvalidatingSAXParser();
 	    parser.setContentHandler(new SAX2StAXAdaptor(dnaHandler));
 	    parser.parse(is);
 	    SymbolList sl = sb.makeSequence();
@@ -812,37 +812,48 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     // Utility method to turn of the awkward bits of Xerces-J
     //
 
-    static DOMParser nonvalidatingParser() {
-	DOMParser dp = new DOMParser();
-	try {
-	    dp.setFeature("http://xml.org/sax/features/validation", false);
-	    // dp.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-	    dp.setFeature("http://xml.org/sax/features/namespaces", true);
-	} catch (SAXNotRecognizedException ex) {
-	    ex.printStackTrace();
-	} catch (SAXNotSupportedException ex) {
-	    ex.printStackTrace();
-	} 
+    private static DocumentBuilderFactory dbf;
+    private static SAXParserFactory spf;
 
-	return dp;
-    }
-
-    static SAXParser nonvalidatingSAXParser() {
-	SAXParser dp = new SAXParser();
+    static {
+	dbf = DocumentBuilderFactory.newInstance();
+	spf = SAXParserFactory.newInstance();
 	try {
-	    dp.setFeature("http://xml.org/sax/features/validation", false);
+	    spf.setFeature("http://xml.org/sax/features/validation", false);
 	    // dp.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+	    spf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+	    spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 	    // dp.setFeature("http://xml.org/sax/features/namespaces", true);
 	} catch (SAXNotRecognizedException ex) {
 	    ex.printStackTrace();
 	} catch (SAXNotSupportedException ex) {
 	    ex.printStackTrace();
-	} 
+	} catch (ParserConfigurationException ex) {
+	    ex.printStackTrace();
+	}
+    }
+	
 
-	return dp;
+    static DocumentBuilder nonvalidatingParser() {
+	try {
+	    return DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	} catch (Exception ex) {
+	    throw new BioError(ex);
+	} 
+    }
+
+    static XMLReader nonvalidatingSAXParser() {
+	try {
+	    SAXParserFactory spf = SAXParserFactory.newInstance();
+	    spf.setNamespaceAware(true);
+	    // spf.setFeature("http://xml.org/sax/features/validation", false);
+	    // dp.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+	    // spf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+	    // spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+	    // spf.setFeature("http://xml.org/sax/features/namespaces", true);
+	    return spf.newSAXParser().getXMLReader();
+	} catch (Exception ex) {
+	    throw new BioError(ex);
+	}
     }
 }

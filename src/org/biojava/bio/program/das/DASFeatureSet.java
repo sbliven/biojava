@@ -33,11 +33,6 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.program.xff.*;
 
-import org.apache.xerces.parsers.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import org.w3c.dom.*;
-
 /**
  * FeatureHolder reflecting features provided by a DAS annotation
  * server.

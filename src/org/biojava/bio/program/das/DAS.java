@@ -25,7 +25,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.apache.xerces.parsers.*;
+import javax.xml.parsers.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import org.w3c.dom.*;
@@ -121,10 +121,9 @@ public class DAS extends AbstractChangeable {
       }
       
       InputSource is = new InputSource(huc.getInputStream());
-      DOMParser parser = DASSequence.nonvalidatingParser();
-      parser.parse(is);
+      DocumentBuilder parser = DASSequence.nonvalidatingParser();
       NodeList nl = parser
-        .getDocument()
+	.parse(is)
         .getDocumentElement()
         .getElementsByTagName("DSN");
       

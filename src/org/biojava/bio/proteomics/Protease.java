@@ -25,7 +25,7 @@ package org.biojava.bio.proteomics;
 //import com.sun.xml.tree.XmlDocument;
 import org.biojava.bio.BioError;
 
-import org.apache.xerces.parsers.DOMParser;
+import javax.xml.parsers.*;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -63,10 +63,8 @@ public class Protease {
               }
 
               InputSource is = new InputSource(tablesStream);
-              DOMParser parser = new DOMParser();
-              parser.parse(is);
-              doc = parser.getDocument();
-
+              DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	      doc = parser.parse(is);
             }catch (MissingResourceException mre) {
                 System.err.println(mre.getMessage());
             }catch(Exception e){//err

@@ -35,10 +35,8 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.program.xff.*;
 
-import org.apache.xerces.parsers.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
-import org.w3c.dom.*;
 
 /**
  * Encapsulate a single batch of feature requests to a DAS server.
@@ -214,7 +212,7 @@ class FeatureFetcher {
 	    } else if (fetchEncoding.equals("xff")) {
 		InputSource is = new InputSource(inStream);
 		DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsByID, this);
-		SAXParser parser = DASSequence.nonvalidatingSAXParser();
+		XMLReader parser = DASSequence.nonvalidatingSAXParser();
 		parser.setContentHandler(new SAX2StAXAdaptor(dfh));
 		parser.parse(is);
 
