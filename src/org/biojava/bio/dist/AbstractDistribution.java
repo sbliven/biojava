@@ -23,16 +23,14 @@
 package org.biojava.bio.dist;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * <p>
  * An abstract implementation of Distribution.
- * </p>
- *
  * <p>
  * You will need to over-ride <code>getWeight()</code> for a simple
  * implementation. You may also wish to over-ride the other methods if the
@@ -48,11 +46,33 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Mark Schreiber (serialization support)
  */
 
-public abstract class AbstractDistribution implements Distribution {
+public abstract class AbstractDistribution implements Distribution, Serializable {
   protected transient ChangeSupport changeSupport = null;
   protected transient Distribution.NullModelForwarder nullModelForwarder = null;
+
+  protected Map symbolIndices = null;//used for serialization
+  protected String alphaName = null;//used for serialization
+
+  private void writeObject(ObjectOutputStream stream)throws IOException{
+    AlphabetIndex index = AlphabetManager.getAlphabetIndex((FiniteAlphabet)getAlphabet());
+    alphaName = index.getAlphabet().getName();
+    int size = ((FiniteAlphabet)getAlphabet()).size();
+    symbolIndices = new HashMap(size);
+    for(int i = 0; i < size; i++){
+      try{
+        symbolIndices.put(index.symbolForIndex(i).getName(),
+        new Double(getWeight(index.symbolForIndex(i))));
+      }catch(IllegalSymbolException e){
+        throw new BioError(e);
+      }
+    }
+    stream.defaultWriteObject();
+  }
+
+
 
   protected void generateChangeSupport(ChangeType ct) {
     if(changeSupport == null) {
@@ -102,15 +122,11 @@ public abstract class AbstractDistribution implements Distribution {
   throws IllegalSymbolException, ChangeVetoException;
 
   /**
-   * <p>
    * Set the weight of a given symbol in this distribution.
-   * </p>
-   *
-   * <p>
+   * <P>
    * This implementation informs all listeners of the change, and then calls
    * setWeightImpl to make the actual change. Sub-classes should over-ride
    * setWeightImpl to implement the actual storage of the weights.
-   * </p>
    */
   final public void setWeight(Symbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException {
@@ -184,15 +200,11 @@ public abstract class AbstractDistribution implements Distribution {
   }
 
   /**
-   * <p>
    * Retrieve the weight for this distribution.
-   * </p>
-   *
-   * <p>
+   * <P>
    * Performs the standard munge to handle ambiguity symbols. The actual weights
    * for each attomic symbol should be calculated by the getWeightImpl
    * functions.
-   * </p>
    *
    * @param amb the Symbol to find the probability of
    * @return the probability that one of the symbols matching amb was emitted
