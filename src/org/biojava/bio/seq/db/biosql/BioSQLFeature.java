@@ -37,9 +37,9 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
 
     // Feature stuff
 
-    private final String type;
-    private final String source;
-    private final Location location;
+    private String type;
+    private String source;
+    private Location location;
 
     // Relationship to sequences
 
@@ -89,7 +89,18 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     public void setType(String s)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException();
+	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+	ChangeEvent cev = new ChangeEvent(this, Feature.TYPE, getType(), s);
+	synchronized (hub) {
+	    hub.fireFeaturePreChange(cev);
+	    try {
+		((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().setFeatureType(id, s);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex, "Error updating feature in database");
+	    }
+	    this.type = s;
+	    hub.fireFeaturePostChange(cev);
+	}
     }
 
     public String getType() {
@@ -99,7 +110,18 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     public void setSource(String s)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException();
+	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+	ChangeEvent cev = new ChangeEvent(this, Feature.SOURCE, getSource(), s);
+	synchronized (hub) {
+	    hub.fireFeaturePreChange(cev);
+	    try {
+		((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().setFeatureSource(id, s);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex, "Error updating feature in database");
+	    }
+	    this.source = s;
+	    hub.fireFeaturePostChange(cev);
+	}
     }
 
     public String getSource() {
@@ -109,7 +131,18 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     public void setLocation(Location l)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException();
+	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+	ChangeEvent cev = new ChangeEvent(this, Feature.LOCATION, getLocation(), l);
+	synchronized (hub) {
+	    hub.fireFeaturePreChange(cev);
+	    try {
+		((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().setFeatureLocation(id, l, StrandedFeature.UNKNOWN);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex, "Error updating feature in database");
+	    }
+	    this.location = l;
+	    hub.fireFeaturePostChange(cev);
+	}
     }
 
     public Location getLocation() {

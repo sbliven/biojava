@@ -491,6 +491,127 @@ class FeaturesSQL {
     }
 
     //
+    // Feature live updates
+    //
+
+    void setFeatureType(int feature_id, String type)
+        throws SQLException
+    {
+	Connection conn = null;
+	try {
+	    conn = seqDB.getPool().takeConnection();
+	    conn.setAutoCommit(false);
+	    
+	    int seqfeature_key = seqDB.intern_ontology_term(conn, type);
+	    PreparedStatement update_key = conn.prepareStatement("update seqfeature " + 
+                                                                 "   set seqfeature_key_id = ? " +
+								 " where seqfeature_id = ?");
+	    update_key.setInt(1, seqfeature_key);
+	    update_key.setInt(2, feature_id);
+	    update_key.executeUpdate();
+
+	    conn.commit();
+	    seqDB.getPool().putConnection(conn);
+	} catch (SQLException ex) {
+	    boolean rolledback = false;
+	    if (conn != null) {
+		try {
+		    conn.rollback();
+		    rolledback = true;
+		} catch (SQLException ex2) {}
+	    }
+	    throw ex;
+	}
+    }
+
+    void setFeatureSource(int feature_id, String source)
+        throws SQLException
+    {
+	Connection conn = null;
+	try {
+	    conn = seqDB.getPool().takeConnection();
+	    conn.setAutoCommit(false);
+	    
+	    int seqfeature_source = seqDB.intern_seqfeature_source(conn, source);
+	    PreparedStatement update_source = conn.prepareStatement("update seqfeature " + 
+								    "   set seqfeature_source_id = ? " +
+								    " where seqfeature_id = ?");
+	    update_source.setInt(1, seqfeature_source);
+	    update_source.setInt(2, feature_id);
+	    update_source.executeUpdate();
+
+	    conn.commit();
+	    seqDB.getPool().putConnection(conn);
+	} catch (SQLException ex) {
+	    boolean rolledback = false;
+	    if (conn != null) {
+		try {
+		    conn.rollback();
+		    rolledback = true;
+		} catch (SQLException ex2) {}
+	    }
+	    throw ex;
+	}
+    }
+
+    void setFeatureLocation(int feature_id, Location location, StrandedFeature.Strand s)
+        throws SQLException
+    {
+	Connection conn = null;
+	try {
+	    conn = seqDB.getPool().takeConnection();
+	    conn.setAutoCommit(false);
+	    
+	    PreparedStatement del_oldlocation = conn.prepareStatement(
+		    "delete from seqfeature_location " +
+		    " where seqfeature_id = ?"
+	    );
+	    del_oldlocation.setInt(1, feature_id);
+	    del_oldlocation.executeUpdate();
+	    del_oldlocation.close();
+
+	    PreparedStatement add_locationspan = conn.prepareStatement(
+                    "insert into seqfeature_location " +
+	            "       (seqfeature_id, seq_start, seq_end, seq_strand, location_rank) " +
+    		    "values (?, ?, ?, ?, ?)"
+	    );
+
+	    int strandNum;
+	    if (s == StrandedFeature.POSITIVE) {
+		strandNum = 1;
+	    } else if (s== StrandedFeature.NEGATIVE) {
+		strandNum = -1;
+	    } else {
+		strandNum = 0;
+	    }
+
+	    int rank = 0;
+	    for (Iterator i = location.blockIterator(); i.hasNext(); ) {
+		Location bloc = (Location) i.next();
+		add_locationspan.setInt(1, feature_id);
+		add_locationspan.setInt(2, bloc.getMin());
+		add_locationspan.setInt(3, bloc.getMax());
+		add_locationspan.setInt(4, strandNum);
+		add_locationspan.setInt(5, ++rank);
+		add_locationspan.executeUpdate();
+	    }
+	    add_locationspan.close();
+
+	    conn.commit();
+	    seqDB.getPool().putConnection(conn);
+	} catch (SQLException ex) {
+	    boolean rolledback = false;
+	    if (conn != null) {
+		try {
+		    conn.rollback();
+		    rolledback = true;
+		} catch (SQLException ex2) {}
+	    }
+	    throw ex;
+	}
+    }
+
+    //
     // Feature persistance
     //
 
