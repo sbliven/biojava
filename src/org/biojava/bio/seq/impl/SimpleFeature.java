@@ -252,4 +252,20 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
 	getFeatureHolder().addFeature(f);
 	return f;
     }
+
+    public int hashCode() {
+	return makeTemplate().hashCode();
+    }
+
+    public boolean equals(Object o) {
+	if (! (o instanceof Feature)) {
+	    return false;
+	}
+
+	Feature fo = (Feature) o;
+	if (! fo.getSequence().equals(getSequence())) 
+	    return false;
+    
+	return makeTemplate().equals(fo.makeTemplate());
+    }
 }
