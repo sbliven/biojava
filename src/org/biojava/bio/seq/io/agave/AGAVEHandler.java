@@ -62,7 +62,7 @@ public class AGAVEHandler extends StAXFeatureHandler implements AGAVECallbackItf
   }
 
   /**
-   * add @param sequence from sub-tag <bio_sequence>/<contig>/<chromosome>
+   * @param sequence from sub-tag &lt;bio_sequence&gt;/&lt;contig&gt;/&lt;chromosome&gt;
    * <pre>
    * bio_sequence --> SimpleSequence
    * contig   --> SimpleAssembly
