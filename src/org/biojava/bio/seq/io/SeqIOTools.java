@@ -22,6 +22,7 @@
 package org.biojava.bio.seq.io;
 
 import java.io.*;
+
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
@@ -32,12 +33,11 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  * @since 1.1
  */
-
 public class SeqIOTools  {
+
     /**
      * This can't be instantiated.
      */
-
     private SeqIOTools() {
     }
 
@@ -63,7 +63,6 @@ public class SeqIOTools  {
      * Get a default SequenceBuilderFactory for handling EMBL
      * files.
      */
-
     public static SequenceBuilderFactory getEmblBuilderFactory() {
 	if (_emblBuilderFactory == null) {
 	    _emblBuilderFactory = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
@@ -74,7 +73,6 @@ public class SeqIOTools  {
     /**
      * Iterate over the sequences in an EMBL-format stream.
      */
-
     public static SequenceIterator readEmbl(BufferedReader br) {
 	return new StreamReader(br,
 				new EmblLikeFormat(),
@@ -88,7 +86,6 @@ public class SeqIOTools  {
      * Get a default SequenceBuilderFactory for handling GenBank
      * files.
      */
-
     public static SequenceBuilderFactory getGenbankBuilderFactory() {
 	if (_genbankBuilderFactory == null) {
 	    _genbankBuilderFactory = new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
@@ -97,9 +94,8 @@ public class SeqIOTools  {
     }
 
     /**
-     * Iterate over the sequences in an GenBAnk-format stream.
+     * Iterate over the sequences in an GenBank-format stream.
      */
-
     public static SequenceIterator readGenbank(BufferedReader br) {
 	return new StreamReader(br,
 				new GenbankFormat(),
@@ -113,7 +109,6 @@ public class SeqIOTools  {
      * Get a default SequenceBuilderFactory for handling Swissprot
      * files.
      */
-
     public static SequenceBuilderFactory getSwissprotBuilderFactory() {
 	if (_swissprotBuilderFactory == null) {
 	    _swissprotBuilderFactory = new SwissprotProcessor.Factory(SimpleSequenceBuilder.FACTORY);
@@ -124,7 +119,6 @@ public class SeqIOTools  {
     /**
      * Iterate over the sequences in an Swissprot-format stream.
      */
-
     public static SequenceIterator readSwissprot(BufferedReader br) {
 	return new StreamReader(br,
 				new EmblLikeFormat(),
@@ -138,7 +132,6 @@ public class SeqIOTools  {
      * Get a default SequenceBuilderFactory for handling FASTA
      * files.
      */
-
     public static SequenceBuilderFactory getFastaBuilderFactory() {
 	if (_fastaBuilderFactory == null) {
 	    _fastaBuilderFactory = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
@@ -149,7 +142,6 @@ public class SeqIOTools  {
     /**
      * Iterate over the sequences in an FASTA-format stream of DNA sequences.
      */
-
     public static SequenceIterator readFastaDNA(BufferedReader br) {
 	return new StreamReader(br,
 				new FastaFormat(),
@@ -160,7 +152,6 @@ public class SeqIOTools  {
     /**
      * Iterate over the sequences in an FASTA-format stream of Protein sequences.
      */
-
     public static SequenceIterator readFastaProtein(BufferedReader br) {
 	return new StreamReader(br,
 				new FastaFormat(),

@@ -112,14 +112,20 @@ public class GenbankFormat implements SequenceFormat, Serializable
 		throw new IOException("Premature end of	stream for GENBANK");
 	}
 
-	/**
-	 * This	is not implemented.	It does	not	write anything to the stream.
-	 */
-	public void	writeSequence(Sequence seq,	PrintStream	os)
-		throws IOException
-	{
-		throw new RuntimeException("Can't write	in GENBANK format...");
-	}
+    /**
+     * This	is not implemented.	It does	not	write anything to the stream.
+     */
+    public void	writeSequence(Sequence seq,	PrintStream	os)
+	throws IOException
+    {
+	throw new RuntimeException("Can't write	in GENBANK format...");
+    }
+
+    public void writeSequence(Sequence seq, String format, PrintStream os)
+	throws IOException
+    {
+	throw new RuntimeException("Can't write	in GENBANK format...");
+    }
 }
 
 /**

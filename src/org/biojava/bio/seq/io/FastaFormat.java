@@ -187,4 +187,10 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	    os.println(seq.subStr(pos, end));
 	}
     }
+
+    public void writeSequence(Sequence seq, String format, PrintStream os)
+	throws IOException
+    {
+
+    }
 }

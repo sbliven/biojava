@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.biojava.bio.seq.io;
 
 import java.io.*;
@@ -31,47 +30,41 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Format processor for handling EMBL records and similar
- * files.  This takes a very simple approach: all
- * `normal' attribute lines are passed to the listener
- * as a tag (first two characters) and a value (the
- * rest of the line from the 6th character onwards).
- * Any data between the special `SQ' line and the
- * "//" entry terminator is passed as a SymbolReader.
+ * Format processor for handling EMBL records and similar files.  This
+ * takes a very simple approach: all `normal' attribute lines are
+ * passed to the listener as a tag (first two characters) and a value
+ * (the rest of the line from the 6th character onwards).  Any data
+ * between the special `SQ' line and the "//" entry terminator is
+ * passed as a SymbolReader.
  *
- * <p>
- * This low-level format processor should normally be
- * used in conjunction with one or more `filter' objects,
- * such as EmblProcessor.
- * </p>
+ * <p>This low-level format processor should normally be used in
+ * conjunction with one or more `filter' objects, such as
+ * EmblProcessor.</p>
  *
- * <p>
- * Many ideas borrowed from the old EmblFormat processor
- * by Thomas Down and Thad Welch.
- * </p>
+ * <p>Many ideas borrowed from the old EmblFormat processor by Thomas
+ * Down and Thad Welch.</p>
  *
  * @author Thomas Down
  * @author Greg Cox
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.1
  */
 
-public class EmblLikeFormat implements SequenceFormat, Serializable {
+public class EmblLikeFormat implements SequenceFormat, Serializable
+{
     private boolean elideSymbols = false;
 
     /**
-     * Should we ignore the symbols (SQ) part of the
-     * entry?  If this property is set to <code>true</code>,
-     * the parser will never call addSymbols on the
-     * <code>SeqIOListener</code>, but parsing will be faster
-     * if you're only interested in header information.
+     * Should we ignore the symbols (SQ) part of the entry? If this
+     * property is set to <code>true</code>, the parser will never
+     * call addSymbols on the <code>SeqIOListener</code>, but parsing
+     * will be faster if you're only interested in header information.
      *
-     * <p>
-     * This property also allows the header to be parsed for
-     * files which have invalid sequence data.
-     * </p>
+     * <p>This property also allows the header to be parsed for files
+     * which have invalid sequence data.</p>
      */
-
-    public void setElideSymbols(boolean b) {
+    public void setElideSymbols(boolean b)
+    {
 	elideSymbols = b;
     }
 
@@ -79,25 +72,28 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
      * Return a flag indicating if symbol data will be skipped
      * when parsing streams.
      */
-
-    public boolean getElideSymbols() {
+    public boolean getElideSymbols()
+    {
 	return elideSymbols;
     }
-
+    
     public boolean readSequence(BufferedReader reader,
-			     SymbolParser symParser,
-			     SeqIOListener listener)
+				SymbolParser   symParser,
+				SeqIOListener  listener)
 	throws IllegalSymbolException, IOException, ParseException
     {
-	String line;
-	StreamParser sparser = null;
+	String            line;
+	StreamParser    sparser = null;
 	boolean hasMoreSequence = true;
 
 	listener.startSequence();
 
-	while ((line = reader.readLine()) != null) {
-	    if (line.startsWith("//")) {
-		if (sparser != null) {
+	while ((line = reader.readLine()) != null)
+	{
+	    if (line.startsWith("//"))
+	    {
+		if (sparser != null)
+		{
 		    // End of symbol data
 		    sparser.close();
 		    sparser = null;
@@ -111,24 +107,32 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 
 		listener.endSequence();
 		return hasMoreSequence;
-		} else if (line.startsWith("SQ")) {
-		// Adding a null property to flush the last feature;  Needed for
-		// Swissprot files because there is no gap between the feature table
-		// and the sequence data
+	    }
+	    else if (line.startsWith("SQ"))
+	    {
+		// Adding a null property to flush the last feature;
+		// Needed for Swissprot files because there is no gap
+		// between the feature table and the sequence data
 		listener.addSequenceProperty("XX", "");
 		sparser = symParser.parseStream(listener);
-	    } else {
-		if (sparser == null) {
+	    }
+	    else
+	    {
+		if (sparser == null)
+		{
 		    // Normal attribute line
-		    String tag = line.substring(0, 2);
+		    String tag  = line.substring(0, 2);
 		    String rest = null;
-		    if (line.length() > 5) {
+		    if (line.length() > 5)
+		    {
 			rest = line.substring(5);
 		    }
 		    listener.addSequenceProperty(tag, rest);
-		} else {
+		}
+		else
+		{
 		    // Sequence line
-		    if (!elideSymbols)
+		    if (! elideSymbols)
 			processSequenceLine(line, sparser);
 		}
 	    }
@@ -140,16 +144,16 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
     /**
      * Dispatch symbol data from SQ-block line of an EMBL-like file.
      */
-
     protected void processSequenceLine(String line, StreamParser parser)
         throws IllegalSymbolException, ParseException
     {
 	char[] cline = line.toCharArray();
 	int parseStart = 0;
-	int parseEnd = 0;
+	int parseEnd   = 0;
 
-	while (parseStart < cline.length) {
-	    while( parseStart < cline.length && cline[parseStart] == ' ')
+	while (parseStart < cline.length)
+	{
+	    while (parseStart < cline.length && cline[parseStart] == ' ')
 		++parseStart;
 	    if (parseStart >= cline.length)
 		break;
@@ -162,20 +166,30 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 		++parseEnd;
 
 	    // Got a segment of read sequence data
-
 	    parser.characters(cline, parseStart, parseEnd - parseStart);
 
 	    parseStart = parseEnd;
 	}
     }
 
-    /**
-     * This is not implemented. It does not write anything to the stream.
-     */
-
     public void writeSequence(Sequence seq, PrintStream os)
 	throws IOException
     {
-	throw new RuntimeException("Can't write in EMBL format...");
+	
+    }
+
+    public void writeSequence(Sequence seq, String format, PrintStream os)
+	throws IOException
+    {
+	try
+	{
+	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(format);
+
+	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
+	}
+	catch (BioException bex)
+	{
+	    bex.printStackTrace();
+	}
     }
 }

@@ -107,6 +107,12 @@ class FeatureTableParser {
 	    }
 	    break;
 	case ATTRIBUTE:
+	    // If the attribute contains whitespace it probably
+	    // consists of whitespace-delimited words. Therefore a
+	    // space should be inserted at EOL otherwise words will
+	    // get fused.
+	    if (countChar(featureBuf, ' ') > 0)
+		featureBuf.append(" ");
 	    featureBuf.append(line);
 	    if (countChar(featureBuf, '"') % 2 == 0) {
 		processAttribute(featureBuf.toString());

@@ -39,7 +39,7 @@ import org.biojava.bio.*;
 public class EmblProcessor extends SequenceBuilderFilter {
     public static final String PROPERTY_EMBL_ACCESSIONS = "embl_accessions";
 
-	private boolean mBadFeature = false;
+    private boolean mBadFeature = false;
 
     /**
      * Factory which wraps SequenceBuilders in an EmblProcessor
@@ -84,66 +84,64 @@ public class EmblProcessor extends SequenceBuilderFilter {
 
     public void addSequenceProperty(Object key, Object value) throws ParseException
     {
-		try
+	try
+	{
+	    if (mBadFeature)
+	    {
+		// If this feature is bad in some way, ignore it.
+		String featureLine = value.toString();
+		if((key.equals("FT")) && (featureLine.charAt(0) != ' '))
 		{
-			if(mBadFeature)
+		    // If the offending feature is past, start reading data again
+		    mBadFeature = false;
+		    features.startFeature(featureLine.substring(0, 15).trim());
+		    features.featureData(featureLine.substring(16));
+		}
+	    }
+	    else
+	    {
+		// Tidy up any end-of-block jobbies
+		if (features.inFeature() && !key.equals("FT"))
+		{
+		    features.endFeature();
+		}
+
+		if (key.equals("FT"))
+		{
+		    String featureLine = value.toString();
+		    if (featureLine.charAt(0) != ' ')
+		    {
+			// This is a featuretype field
+			if (features.inFeature())
 			{
-				// If this feature is bad in some way, ignore it.
-				String featureLine = value.toString();
-				if((key.equals("FT")) && (featureLine.charAt(0) != ' '))
-				{
-					// If the offending feature is past, start reading data again
-					mBadFeature = false;
-					features.startFeature(featureLine.substring(0, 15).trim());
-					features.featureData(featureLine.substring(16));
-				}
+			    features.endFeature();
 			}
-			else
+
+			features.startFeature(featureLine.substring(0, 15).trim());
+		    }
+		    features.featureData(featureLine.substring(16));
+		}
+		else
+		{
+		    getDelegate().addSequenceProperty(key, value);
+
+		    if (key.equals("AC"))
+		    {
+			String acc = value.toString();
+			StringTokenizer toke = new StringTokenizer(acc, "; ");
+			while (toke.hasMoreTokens())
 			{
-			    // Tidy up any end-of-block jobbies
-
-			    if (features.inFeature() && !key.equals("FT"))
-			    {
-					features.endFeature();
-		    	}
-
-			    if (key.equals("FT"))
-			    {
-					String featureLine = value.toString();
-					if (featureLine.charAt(0) != ' ')
-					{
-					    // This is a featuretype field
-					    if (features.inFeature())
-					    {
-							features.endFeature();
-						}
-
-					    features.startFeature(featureLine.substring(0, 15).trim());
-					}
-					features.featureData(featureLine.substring(16));
-		    	}
-		    	else
-		    	{
-					getDelegate().addSequenceProperty(key, value);
-
-					if (key.equals("AC"))
-					{
-					    String acc= value.toString();
-					    StringTokenizer toke = new StringTokenizer(acc, "; ");
-					    while (toke.hasMoreTokens())
-					    {
-							accessions.add(toke.nextToken());
-						}
-					}
-		    	}
+			    accessions.add(toke.nextToken());
+			}
 		    }
 		}
-		catch (BioException ex)
-		{
-			// If an exception is thrown, read past the offending feature
-			mBadFeature = true;
-			System.err.println(ex);
-
-		}
+	    }
+	}
+	catch (BioException ex)
+	{
+	    // If an exception is thrown, read past the offending feature
+	    mBadFeature = true;
+	    System.err.println(ex);
+	}
     }
 }
