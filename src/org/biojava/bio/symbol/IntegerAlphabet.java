@@ -67,7 +67,23 @@ public class IntegerAlphabet
     }
   }
 
-
+  /**
+   * Construct a finite contiguous subset of the <code>IntegerAlphabet</code>.
+   * Useful for making CrossProductAlphabets with other <code>FiniteAlphabet</code>s.
+   *
+   * @param min the lower bound of the Alphabet
+   * @param max the upper bound of the Alphabet
+   * @throws IllegalArgumentException if max < min
+   * @return A FiniteAlphabet from min to max <b>inclusive</b>.
+   */
+  public static FiniteAlphabet getSubAlphabet(int min, int max)throws IllegalArgumentException{
+    String name = "SubIntegerAlphabet["+min+".."+max+"]";
+    if(AlphabetManager.alphabetForName(name) == null){
+      FiniteAlphabet a = new SubIntegerAlphabet(min, max);
+      AlphabetManager.registerAlphabet(a.getName(),a);
+    }
+    return (FiniteAlphabet)(AlphabetManager.alphabetForName(name));
+  }
 
   /**
    * Retrieve a SymbolList view of an array of integers.
@@ -148,7 +164,7 @@ public class IntegerAlphabet
   /**
    * @param name Currently only "token" is supported.
    * @return an IntegerParser.
-   * author Mark Schreiber 3 May 2001.
+   * @author Mark Schreiber 3 May 2001.
    */
   public SymbolTokenization getTokenization(String name) {
     if(name.equals("token")){
@@ -230,4 +246,45 @@ public class IntegerAlphabet
     }
   }
 
+  /**
+   * A class to represent a finite contiguous subset of the infinite IntegerAlphabet
+   *
+   * @author Mark Schreiber
+   * @since 1.3
+   */
+  private static class SubIntegerAlphabet extends SimpleAlphabet{
+    private int min;
+    private int max;
+
+    /**
+     * Construct a contiguous sub alphabet with the integers from min to max inclusive.
+     */
+    SubIntegerAlphabet(int min, int max) throws IllegalArgumentException{
+      if(max > min) throw new IllegalArgumentException("min must be less than max: "+min+" : "+max);
+      this.min = min;
+      this.max = max;
+
+      for(int i = min; i <= max; i++){
+        try{
+          this.addSymbol(new IntegerSymbol(i));
+        }catch(Exception e){
+          throw new NestedError(e,"Could not make SubIntegerAlphabet["+min+".."+max+"]");
+        }
+      }
+
+      this.setName("SubIntegerAlphabet["+min+".."+max+"]");
+    }
+
+    /**
+     * @param name Currently only "token" is supported.
+     * @return an IntegerParser.
+     */
+    public SymbolTokenization getTokenization(String name) {
+      if(name.equals("token")){
+        return new IntegerTokenization();
+      }else{
+        throw new NoSuchElementException(name + " parser not supported by IntegerAlphabet yet");
+      }
+    }
+  }
 }
