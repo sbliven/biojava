@@ -120,6 +120,7 @@
         use="true"
         windowtitle="${name} API"
         doctitle="${name}"
+        maxmemory="64m"
     />
   </target>
         

@@ -21,6 +21,10 @@
 
 package org.biojava.bio.program.search;
 
+import java.util.Map;
+
+import org.biojava.bio.BioException;
+
 /**
  * <code>SearchContentHandler</code> is a notification interface for
  * objects which listen to search stream parsers. This is applicable
@@ -84,4 +88,57 @@ public interface SearchContentHandler
      * formatted subhit.
      */
     public void endSubHit();
+
+    /**
+     * The <code>addSearchProperty</code> method adds a key/value pair
+     * containing some property of the overall search result.
+     *
+     * @param key an <code>Object</code> instance.
+     * @param value an <code>Object</code> instance.
+     */
+    public void addSearchProperty(Object key, Object value);
+
+    /**
+     * The <code>addHitProperty</code> method adds a key/value pair
+     * containing some property of a particular hit.
+     *
+     * @param key an <code>Object</code> instance.
+     * @param value an <code>Object</code> instance.
+     */
+    public void addHitProperty(Object key, Object value);
+
+    /**
+     * The <code>addSubHitProperty</code> method adds a key/value pair
+     * containing some property of a particular subhit.
+     *
+     * @param key an <code>Object</code> instance.
+     * @param value an <code>Object</code> instance.
+     */
+    public void addSubHitProperty(Object key, Object value);
+
+    /**
+     * <code>setQuerySeq</code> identifies the query sequence as being
+     * known by a particular name, ID or URN.
+     *
+     * @param identifier a <code>String</code> which should be an
+     * unambiguous identifer for the sequence.
+     *
+     * @exception BioException if the sequence cannot be obtained from
+     * the identifier.
+     */
+    public void setQuerySeq(String identifier)
+	throws BioException;
+
+    /**
+     * <code>setSubjectDB</code> identifies the database searched
+     * by means of a name, ID or URN.
+     *
+     * @param id a <code>String</code> which should be an unambiguous
+     * identifier for the database searched.
+     *
+     * @exception BioException if the database cannot be obtained from
+     * the identifier.
+     */
+    public void setSubjectDB(String identifier)
+	throws BioException;
 }

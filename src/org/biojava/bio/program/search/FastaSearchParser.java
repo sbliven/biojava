@@ -42,12 +42,12 @@ import org.biojava.utils.ParserException;
  */
 public class FastaSearchParser implements SearchParser
 {
-    private static final int NODATA    = 0;
-    private static final int INHEADER  = 1;
-    private static final int INHIT     = 2;
-    private static final int INQUERY   = 3;
+    private static final int    NODATA = 0;
+    private static final int  INHEADER = 1;
+    private static final int     INHIT = 2;
+    private static final int   INQUERY = 3;
     private static final int INSUBJECT = 4;
-    private static final int INALIGN   = 5;
+    private static final int   INALIGN = 5;
 
     // Valid line identifiers for result annotation
     private static HashSet resultAnnoTokens =
@@ -71,7 +71,8 @@ public class FastaSearchParser implements SearchParser
 					  "fa_bits",    "sw_score",
 					  "sw_ident",   "sw_gident",
 					  "sw_overlap", "fa_ident",
-					  "fa_gident",  "fa_overlap" },
+					  "fa_gident",  "fa_overlap",
+					  "fa_score" },
 			  new HashSet());
 
     // Valid line identifiers for hit data
@@ -82,18 +83,18 @@ public class FastaSearchParser implements SearchParser
     // Set which values should be parsed from String to a number
     private static HashSet toDouble =
 	(HashSet) fillSet(new String [] { "fa_expect", "fa_z-score",
-					  "fa_bits" },
+					  "fa_bits",   "fa_initn", 
+					  "fa_init1",  "fa_opt",
+					  "fa_score",  "sw_score" },
 			  new HashSet());
 
     private static HashSet toFloat =
-	(HashSet) fillSet(new String [] { "sw_ident", "fa_ident",
-					  "fa_gident" },
+	(HashSet) fillSet(new String [] { "sw_ident",  "fa_ident",
+					  "fa_gident"  },
 			  new HashSet());
 
     private static HashSet toInteger =
-	(HashSet) fillSet(new String [] { "fa_initn",   "fa_init1",
-					  "fa_opt",     "sw_score",
-					  "sw_overlap", "fa_overlap" },
+	(HashSet) fillSet(new String [] { "sw_overlap", "fa_overlap" },
 			  new HashSet());
 
     private int              searchStatus = NODATA;
@@ -101,24 +102,21 @@ public class FastaSearchParser implements SearchParser
     private boolean          searchParsed = false;
     private boolean moreSearchesAvailable = false;
 
-    private BufferedReader reader;
-    private String         line;
-    private int            lineNumber;
+    private SearchContentHandler handler;
+    private BufferedReader       reader;
+    private String               line;
+    private int                  lineNumber;
 
-    Map resultPreAnnotation = new HashMap();
-    Map resultSearchParm    = new HashMap();
-    Map hitPreAnnotation    = new HashMap();
-    Map hitData             = new HashMap();
-
-    StringBuffer querySeqTokens   = new StringBuffer(1024);
+    StringBuffer   querySeqTokens = new StringBuffer(1024);
     StringBuffer subjectSeqTokens = new StringBuffer(1024);
+    StringBuffer      matchTokens = new StringBuffer(1024);
 
     /**
      * The <code>parseSearch</code> method performs the core parsing
      * operations.
      *
      * @param reader a <code>BufferedReader</code> to read from.
-     * @param scHandler a <code>SearchContentHandler</code> to notify
+     * @param handler a <code>SearchContentHandler</code> to notify
      * of events.
      *
      * @return a <code>boolean</code> value, true if a further search
@@ -133,19 +131,19 @@ public class FastaSearchParser implements SearchParser
      * line.
      */
     public boolean parseSearch(final BufferedReader       reader,
-			       final SearchContentHandler scHandler)
+			       final SearchContentHandler handler)
 	throws IOException, BioException, ParserException
     {
 	boolean foundQuerySeqID = false;
 	lineNumber = 0;
 
-	FastaSearchBuilder handler = (FastaSearchBuilder) scHandler;
+	this.handler = handler;
 
     LINE:
 	while ((line = reader.readLine()) != null)
 	{
 	    lineNumber++;
-	    // System.out.println("Parser:" + line);
+	    // System.out.println("Parser working on:" + line);
 
 	    // This token indicates the end of the formatted search
 	    // data. Some outputs don't have any alignment consensus
@@ -155,8 +153,9 @@ public class FastaSearchParser implements SearchParser
 		searchStatus = NODATA;
 
 		// Pass final data to handler
-		hitData.put("querySeqTokens",   querySeqTokens.toString());
-		hitData.put("subjectSeqTokens", subjectSeqTokens.toString());
+		handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
+		handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.toString());
+		handler.addSubHitProperty("matchTokens",      matchTokens.toString());
 
 		handler.endSubHit();
 		handler.endSearch();
@@ -182,9 +181,7 @@ public class FastaSearchParser implements SearchParser
 			handler.setSubjectDB(parseDB(line));
 
 			handler.startSearch();
-			// Clear the data store
-			resultSearchParm.clear();
-			resultPreAnnotation.clear();
+			handler.startHeader();
 
 			// If we already saw an end of search token
 			// then this is the start of another
@@ -209,22 +206,20 @@ public class FastaSearchParser implements SearchParser
 		    {
 			searchStatus = INHIT;
 
-			handler.setSearchAnnotationData(resultPreAnnotation);
 			handler.endHeader();
-
 			handler.startHit();
-			// Clear the data store
-			hitData.clear();
-			hitPreAnnotation.clear();
+
 			querySeqTokens.setLength(0);
 			subjectSeqTokens.setLength(0);
+			matchTokens.setLength(0);
 
-			hitData.put("id", parseID(line));
+			handler.addHitProperty("id",   parseId(line));
+			handler.addHitProperty("desc", parseDesc(line));
 		    }
 		    else
 		    {
-			if (! parseLine(line, resultAnnoTokens, resultPreAnnotation))
-			    if (! parseLine(line, resultSearchParmTokens, resultSearchParm))
+			if (! parseHeaderLine(line, resultAnnoTokens))
+			    if (! parseHeaderLine(line, resultSearchParmTokens))
 				throw new ParserException("Fasta parser failed to recognise line type",
 							  null,
 							  lineNumber,
@@ -241,7 +236,7 @@ public class FastaSearchParser implements SearchParser
 
 			if (! foundQuerySeqID)
 			{
-			    handler.setQuerySeq(parseID(line));
+			    handler.setQuerySeq(parseId(line));
 			    foundQuerySeqID = true;
 			}
 
@@ -250,8 +245,8 @@ public class FastaSearchParser implements SearchParser
 		    }
 		    else
 		    {
-			if (! parseLine(line, hitAnnoTokens, hitPreAnnotation))
-			    if (! parseLine(line, hitDataTokens, hitData))
+			if (! parseHitLine(line, hitAnnoTokens))
+			    if (! parseHitLine(line, hitDataTokens))
 				throw new ParserException("Fasta parser failed to recognise line type",
 							  null,
 							  lineNumber,
@@ -268,11 +263,7 @@ public class FastaSearchParser implements SearchParser
 		    }
 		    else
 		    {
-			if (! parseSequence(line, "query", hitData))
-			    throw new ParserException("Fasta parser failed to recognise line type",
-						      null,
-						      lineNumber,
-						      line);
+			parseQuerySequence(line);
 		    }
 		    break STATUS;
 
@@ -289,29 +280,23 @@ public class FastaSearchParser implements SearchParser
 			searchStatus = INHIT;
 
 			// Pass data to handler
-			hitData.put("querySeqTokens",   querySeqTokens.toString());
-			hitData.put("subjectSeqTokens", subjectSeqTokens.toString());
+			handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
+			handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.toString());
+			handler.addSubHitProperty("matchTokens",      matchTokens.toString());
 
-			handler.setHitData(hitData);
-			handler.setHitAnnotationData(hitPreAnnotation);
 			handler.endSubHit();
-
 			handler.startHit();
-			// Clear the data store
-			hitData.clear();
-			hitPreAnnotation.clear();
+
 			querySeqTokens.setLength(0);
 			subjectSeqTokens.setLength(0);
+			matchTokens.setLength(0);
 
-			hitData.put("id", parseID(line));
+			handler.addHitProperty("id",   parseId(line));
+			handler.addHitProperty("desc", parseDesc(line));
 		    }
 		    else
 		    {
-			if (! parseSequence(line, "subject", hitData))
-			    throw new ParserException("Fasta parser failed to recognise line type",
-						      null,
-						      lineNumber,
-						      line);
+			parseSubjectSequence(line);
 		    }
 		    break STATUS;
 
@@ -321,29 +306,28 @@ public class FastaSearchParser implements SearchParser
 			searchStatus = INHIT;
 
 			// Pass data to handler
-			hitData.put("querySeqTokens",   querySeqTokens.toString());
-			hitData.put("subjectSeqTokens", subjectSeqTokens.toString());
+			handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
+			handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.toString());
+			handler.addSubHitProperty("matchTokens",      matchTokens.toString());
 
-			handler.setHitData(hitData);
-			handler.setHitAnnotationData(hitPreAnnotation);
 			handler.endSubHit();
-
 			handler.startHit();
-			// Clear the data store
-			hitData.clear();
-			hitPreAnnotation.clear();
+
 			querySeqTokens.setLength(0);
 			subjectSeqTokens.setLength(0);
+			matchTokens.setLength(0);
 
-			hitData.put("id", parseID(line));
+			handler.addHitProperty("id",   parseId(line));
+			handler.addHitProperty("desc", parseDesc(line));
 		    }
 		    else if (line.startsWith(">>><<<"))
 		    {
 			searchStatus = NODATA;
 
 			// Pass final data to handler
-			hitData.put("querySeqTokens",   querySeqTokens.toString());
-			hitData.put("subjectSeqTokens", subjectSeqTokens.toString());
+			handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
+			handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.toString());
+			handler.addSubHitProperty("matchTokens",      matchTokens.toString());
 
 			handler.endSubHit();
 			handler.endSearch();
@@ -353,6 +337,10 @@ public class FastaSearchParser implements SearchParser
 
 			continue LINE;
 		    }
+		    else
+		    {
+			matchTokens.append(line);
+		    }
 		    break STATUS;
 
 		default:
@@ -360,6 +348,7 @@ public class FastaSearchParser implements SearchParser
 	    } // end switch
 	} // end while
 
+	// This is false if we reach here
 	return moreSearchesAvailable;
     }
 
@@ -381,41 +370,68 @@ public class FastaSearchParser implements SearchParser
     }
 
     /**
-     * The <code>parseID</code> method parses sequence IDs from lines
+     * The <code>parseId</code> method parses sequence Ids from lines
      * starting with '>' and '>>'.
      *
      * @param line a <code>String</code> to be parsed.
      *
-     * @return a <code>String</code> containing the ID.
+     * @return a <code>String</code> containing the Id.
      *
      * @exception ParserException if an error occurs. 
      */
-    private String parseID(final String line)
+    private String parseId(final String line)
 	throws ParserException
     {
-	StringTokenizer st = new StringTokenizer(line);
-	String id;
-	if (st.hasMoreTokens())
-	    id = st.nextToken();
-	else
-	    throw new ParserException("Fasta parser failed to parse a sequence ID",
-				      null,
-				      lineNumber,
-				      line);
-	// For Hit header lines
-	if (id.startsWith(">>"))
-	    return id.substring(2);
+	String trimmed = line.trim();
+	int firstSpace = trimmed.indexOf(' ');
 
-	// For SubHit header lines where the sequence in the Fasta
-	// file had no ID
-	if (id == ">")
-	    throw new ParserException("Fasta parser encountered a sequence with no ID",
-				      null,
-				      lineNumber,
-				      line);
-	// For SubHit header lines where the sequence in the Fasta did
-	// have an ID
-	return id.substring(1);
+	// For Hit header lines (always start with >>)
+	if (trimmed.startsWith(">>"))
+	{
+	    if (trimmed.length() == 2)
+		throw new ParserException("Fasta parser encountered a sequence with no Id",
+					  null,
+					  lineNumber,
+					  line);
+
+	    if (firstSpace == -1)
+		return trimmed.substring(2);
+	    else
+		return trimmed.substring(2, firstSpace);
+	}
+	// For SubHit header lines (always start with >)
+	else
+	{
+	    if (trimmed.length() == 1)
+		throw new ParserException("Fasta parser encountered a sequence with no Id",
+					  null,
+					  lineNumber,
+					  line);
+
+	    if (firstSpace == -1)
+		return trimmed.substring(1);
+	    else
+		return trimmed.substring(1, firstSpace);
+	}
+    }
+
+    /**
+     * The <code>parseDesc</code> method parses the sequence
+     * description from subject header lines.
+     *
+     * @param line a <code>String</code> to be parsed.
+     *
+     * @return a <code>String</code> containing the description.
+     */
+    private String parseDesc(final String line)
+    {
+	String trimmed = line.trim();
+	int firstSpace = trimmed.indexOf(' ');
+
+	if (firstSpace == -1)
+	    return "No description";
+
+	return trimmed.substring(firstSpace + 1);
     }
 
     /**
@@ -434,7 +450,7 @@ public class FastaSearchParser implements SearchParser
 	StringTokenizer st = new StringTokenizer(line);
 	String db;
 	String previous = null;
-	String current  = null;
+	String  current = null;
 
 	// The database filename is the second-to-last token on the line
 	while (st.hasMoreTokens())
@@ -456,25 +472,40 @@ public class FastaSearchParser implements SearchParser
 	return previous;
     }
 
-    /**
-     * The <code>parseLine</code> method parses values from Fasta data
-     * lines, accepting only lines with recognised leader tokens
-     * specified in the Set. The result is entered in the Map with the
-     * token as key (as a side-effect) and the method returns true if
-     * successful.
-     *
-     * @param line a <code>String</code> to be parsed.
-     * @param tokenSet a <code>Set</code> containing valid leader tokens.
-     * @param dataMap a <code>Map</code> to contain the result.
-     *
-     * @return a <code>boolean</code> value, true if a token and value
-     * were recognised.
-     *
-     * @exception ParserException if an error occurs.
-     */
-    private boolean parseLine(final String line,
-			      final Set    tokenSet,
-			      final Map    dataMap)
+    private boolean parseHeaderLine(final String line,
+				    final Set    tokenSet)
+	throws ParserException	    
+    {
+	Object [] data = parseLine(line, tokenSet);
+
+	if (data.length > 0)
+	{
+	    handler.addSearchProperty(data[0], data[1]);
+	    return true;
+	}
+	else
+	{
+	    return false;
+	}
+    }
+
+    private boolean parseHitLine(final String line,
+				 final Set    tokenSet)
+	throws ParserException	    
+    {
+	Object [] data = parseLine(line, tokenSet);
+
+	if (data.length > 0)
+	{
+	    handler.addHitProperty(data[0], data[1]);
+	    return true;
+	}
+
+	return false;
+    }
+
+    private Object [] parseLine(final String line,
+				final Set    tokenSet)
 	throws ParserException
     {
 	int idTokenStart = line.indexOf(";");
@@ -493,107 +524,108 @@ public class FastaSearchParser implements SearchParser
 		if (toDouble.contains(idToken))
 		{
 		    Double val = Double.valueOf(idValue);
-		    dataMap.put(idToken, val);
-		    return true;
+		    return new Object [] { idToken, val };
 		}
 
 		if (toFloat.contains(idToken))
 		{
 		    Float val = Float.valueOf(idValue);
-		    dataMap.put(idToken, val);
-		    return true;
+		    return new Object [] { idToken, val };
 		}
 
 		if (toInteger.contains(idToken))
 		{
 		    Integer val = Integer.valueOf(idValue);
-		    dataMap.put(idToken, val);
-		    return true;
+		    return new Object [] { idToken, val };
 		}
 	    }
 	    catch (NumberFormatException nfe)
 	    {
-		throw new ParserException("Fasta parser failed to parse a double value",
+		throw new ParserException("Fasta parser failed to parse a numeric value",
 					  null,
 					  lineNumber,
 					  line);
 	    }
 
 	    // Otherwise leave as a string
-	    dataMap.put(idToken, idValue);
-	    return true;
+	    return new Object [] { idToken, idValue };
 	}
 
-	return false;
+	return new Object [0];
     }
 
-    /**
-     * The <code>parseSequence</code> method parses the sequence
-     * alignment lines of the Fasta subhits.
-     *
-     * @param line a <code>String</code> object to parse.
-     * @param name a <code>String</code> object with value "query" or
-     * "subject" to indicate where to store the data.
-     * @param dataMap a <code>Map</code> object to contain the parsed data.
-     *
-     * @return a <code>boolean</code> value, true if the line was
-     * parsed successfully.
-     */
-    private boolean parseSequence(final String line,
-				  final String name,
-				  final Map    dataMap)
+    private void parseQuerySequence(final String line)
+    {
+	Object [] data = parseSequence(line);
+
+	if (data.length > 0)
+	{
+	    // We have a key/value pair
+	    handler.addSubHitProperty("query" + data[0].toString(),
+				      data[1]);
+	}
+	else
+	{
+	    // We have a line of sequence tokens
+	    querySeqTokens.append(line);
+	}
+    }
+
+    private void parseSubjectSequence(final String line)
+    {
+	Object [] data = parseSequence(line);
+
+	if (data.length > 0)
+	{
+	    // We have a key/value pair
+	    handler.addSubHitProperty("subject" + data[0].toString(),
+				      data[1]);
+	}
+	else
+	{
+	    // We have a line of sequence tokens
+	    subjectSeqTokens.append(line);
+	}
+    }
+
+    private Object [] parseSequence(final String line)
     {
 	if (line.startsWith(";"))
 	{
 	    // Check the sequence type given by the report
 	    if (line.equals("; sq_type: p"))
 	    {
-		dataMap.put(name, "protein");
-		return true;
+		return new Object [] { "_sq_type", "protein"};
 	    }
 	    else if (line.equals("; sq_type: D"))
 	    {
-		dataMap.put(name, "dna");
-		return true;
+		return new Object [] { "_sq_type", "DNA"};
 	    }
 
 	    // Record the coordinates and offset of the alignment
 	    if (line.startsWith("; al_start:"))
 	    {
-		dataMap.put(name + "al_start", parseCoord(line));
-		return true;
+		return new Object [] { "_al_start", parseCoord(line) };
 	    }
 	    else if (line.startsWith("; al_stop:"))
 	    {
-		dataMap.put(name + "al_stop", parseCoord(line));
-		return true;
+		 return new Object [] { "_al_stop", parseCoord(line) };
 	    }
 	    else if (line.startsWith("; al_display_start:"))
 	    {
-		dataMap.put(name + "al_display_start", parseCoord(line));
-		return true;
+		return new Object [] {"_al_display_start", parseCoord(line) };
 	    }
-
-	    // Query and subject sequence type should never be
-	    // different, but check anyway
-	    if (dataMap.containsKey("query") && dataMap.containsKey("subject"))
+	    else if (line.startsWith("; sq_len:"))
 	    {
-		if (! dataMap.get("query").equals(dataMap.get("subject")))
-		    return false;
+		return new Object [] { "_sq_len", parseCoord(line) };
 	    }
-	    return true;
+	    else if (line.startsWith("; sq_offset:"))
+	    {
+		return new Object [] { "_sq_offset", parseCoord(line) };
+	    }
 	}
 
-	// Otherwise record the sequence tokens
-	if (name.equals("query"))
-	{
-	    querySeqTokens.append(line);
-	}
-	else if (name.equals("subject"))
-	{	 
-	    subjectSeqTokens.append(line);
-	}
-	return true;
+	return new Object [0];
     }
 
     /**

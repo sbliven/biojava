@@ -59,7 +59,6 @@ public class FastaSearchBuilder implements SearchBuilder
 
     private Map                     resultPreAnnotation;
     private Map                     searchParameters;
-    private Map                     hitPreAnnotation;
     private Map                     hitData;
 
     // Hits are appended to this ArrayList as they are parsed from a
@@ -119,7 +118,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @exception BioException if the sequence cannot be obtained.
      */
-    void setQuerySeq(final String querySeqID)
+    public void setQuerySeq(final String querySeqID)
 	throws BioException
     {
 	try
@@ -145,7 +144,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @exception BioException if the database cannot be obtained.
      */
-    void setSubjectDB(final String subjectDBFileName)
+    public void setSubjectDB(final String subjectDBFileName)
 	throws BioException
     {
 	// System.out.println("Setting subject DB with filename/ID: " + subjectDBFileName);
@@ -160,22 +159,49 @@ public class FastaSearchBuilder implements SearchBuilder
 
     public void endSearch() { }
 
-    public void startHeader() { }
+    public void startHeader()
+    {
+	// System.out.println("startHeader called");
+	resultPreAnnotation = new HashMap();
+	searchParameters    = new HashMap();
+    }
+
+    public void addSearchProperty(final Object key, final Object value)
+    {
+	// System.out.println("addSearchProperty called: " + key + " -> " + value);
+	resultPreAnnotation.put(key, value);
+    }
 
     public void endHeader()
     {
 	resultAnnotation = createAnnotation(resultPreAnnotation);
     }
 
-    public void startHit() { }
+    public void startHit()
+    {
+	// System.out.println("startHit called");
+	hitData = new HashMap();
+    }
+
+    public void addHitProperty(final Object key, final Object value)
+    {
+	// System.out.println("addHitProperty called: " + key + " -> " + value);
+	hitData.put(key, value);
+    }
 
     public void endHit() { }
 
     public void startSubHit() { }
 
+    public void addSubHitProperty(final Object key, final Object value)
+    {
+	// System.out.println("addSubHitProperty called: " + key + " -> " + value);
+	hitData.put(key, value);
+    }
+
     public void endSubHit()
     {
-	hitAnnotation = createAnnotation(hitPreAnnotation);
+	hitAnnotation = createAnnotation(hitData);
 
 	try
 	{
@@ -189,52 +215,6 @@ public class FastaSearchBuilder implements SearchBuilder
     }
 
     /**
-     * The <code>setSearchResultData</code> method sets up the search
-     * parameters. It is called by the parser once per search.
-     *
-     * @param resultData a <code>Map</code> object.
-     */
-    void setSearchResultData(final Map resultData)
-    {
-	searchParameters = resultData;
-    }
-
-    /**
-     * The <code>setSearchAnnotationData</code> method sets up the
-     * search result annotation. It is called by the parser once per
-     * search.
-     *
-     * @param resultPreAnnotation a <code>Map</code> object.
-     */
-    void setSearchAnnotationData(final Map resultPreAnnotation)
-    {
-	this.resultPreAnnotation = resultPreAnnotation;
-    }
-
-    /**
-     * The <code>setHitData</code> method sets up the hit data for the
-     * currently parsed hit. It is called by the parser once per hit.
-     *
-     * @param hitData a <code>Map</code> object.
-     */
-    void setHitData(final Map hitData)
-    {
-	this.hitData = hitData;
-    }
-
-    /**
-     * The <code>setHitAnnotationData</code> method sets up the hit
-     * annotation data for the currently parsed hit. It is called by
-     * the parser once per hit.
-     *
-     * @param hitPreAnnotation a <code>Map</code> object.
-     */
-    void setHitAnnotationData(final Map hitPreAnnotation)
-    {
-	this.hitPreAnnotation = hitPreAnnotation;
-    }
-
-    /**
      * The <code>createHit</code> method makes a new Hit object from
      * the hit data and an annotation.
      *
@@ -243,21 +223,22 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @return a <code>SeqSimilaritySearchHit</code> object.
      */
-    private SeqSimilaritySearchHit createHit(final Map        dataMap,
+    private SeqSimilaritySearchHit createHit(final Map        hitData,
 					     final Annotation hitAnnotation)
 	throws BioException
     {
-	String subjectSeqID  = (String) dataMap.get("id");
-	Double score         = (Double) dataMap.get("fa_z-score");
-	Double eValue        = (Double) dataMap.get("fa_expect");
-	Double pValue        = (Double) dataMap.get("fa_expect");
+	String subjectSeqID  = (String) hitData.get("id");
+	Double score         = (Double) hitData.get("fa_z-score");
+	Double eValue        = (Double) hitData.get("fa_expect");
+	Double pValue        = (Double) hitData.get("fa_expect");
 
 	// There is only ever one subhit in a Fasta hit
 	List subHits = new ArrayList();
 
 	try
 	{
-	    Alignment alignment = createAlignment(subjectSeqID, dataMap);
+	    // System.out.println("Making alignment with: " + hitData);
+	    Alignment alignment = createAlignment(subjectSeqID, hitData);
 
 	    SeqSimilaritySearchSubHit subHit =
 		new SequenceDBSearchSubHit(score.doubleValue(),
@@ -292,12 +273,17 @@ public class FastaSearchBuilder implements SearchBuilder
     private Annotation createAnnotation(final Map preAnnotation)
     {
 	Annotation annotation = new SimpleAnnotation();
-	Set annotationKeySet  = preAnnotation.keySet();
+	Set  annotationKeySet = preAnnotation.keySet();
 
 	for (Iterator ksi = annotationKeySet.iterator(); ksi.hasNext();)
 	{
-	    Object annotationKey   = ksi.next();
+	    Object   annotationKey = ksi.next();
 	    Object annotationValue = preAnnotation.get(annotationKey);
+
+//  	    System.out.println("Setting annotation: key -> "
+//  			       + annotationKey
+//  			       + " value -> "
+//  			       + annotationValue);
 
 	    try
 	    {
@@ -318,7 +304,7 @@ public class FastaSearchBuilder implements SearchBuilder
      * @param subjectSeqID a <code>String</code> which will be used to
      * set the label of the subject sequence. The query label is a
      * static field in the SeqSimilaritySearchSubHit interface.
-     * @param dataMap a <code>Map</code> object.
+     * @param hitData a <code>Map</code> object.
      *
      * @return an <code>Alignment</code> object.
      *
@@ -326,23 +312,23 @@ public class FastaSearchBuilder implements SearchBuilder
      * are not recognised in the chosen alphabet.
      */
     private Alignment createAlignment(final String subjectSeqID,
-				      final Map dataMap)
+				      final Map    hitData)
 	throws IllegalSymbolException
     {
-	String seqType = (String) dataMap.get("query");
+	String seqType = (String) hitData.get("query_sq_type");
 
 	FiniteAlphabet alpha;
 
 	// What happens if Fasta is given an RNA sequence?
-	if (seqType.equals("dna"))
+	if (seqType.equals("DNA"))
 	    alpha = DNATools.getDNA();
 	else
 	    alpha = ProteinTools.getAlphabet();
 
 	StringBuffer querySeqTokens =
-	    new StringBuffer(prepSeqTokens("query",   dataMap));
+	    new StringBuffer(prepSeqTokens("query",   hitData));
 	StringBuffer subjectSeqTokens =
-	    new StringBuffer(prepSeqTokens("subject", dataMap));
+	    new StringBuffer(prepSeqTokens("subject", hitData));
 
 	Map labelMap = new HashMap();
 
@@ -373,22 +359,22 @@ public class FastaSearchBuilder implements SearchBuilder
      * @param name a <code>String</code> value (either "query" or
      * "subject" indicating which sequence to grab from the
      * accompanying Map object.
-     * @param dataMap a <code>Map</code> object containing the data to
+     * @param hitData a <code>Map</code> object containing the data to
      * process.
      *
      * @return a <code>String</code> value consisting of a subsequence
      * containing only the interesting alignment.
      */
-    private String prepSeqTokens(final String name, final Map dataMap)
+    private String prepSeqTokens(final String name, final Map hitData)
     {
-	// System.out.println("dataMap: " + dataMap);
+	// System.out.println("hitData: " + hitData);
 
-	Integer alDispStart = (Integer) dataMap.get(name + "al_display_start");
-	Integer alStart     = (Integer) dataMap.get(name + "al_start");
-	Integer alStop      = (Integer) dataMap.get(name + "al_stop");    
+	Integer alDispStart = (Integer) hitData.get(name + "_al_display_start");
+	Integer     alStart = (Integer) hitData.get(name + "_al_start");
+	Integer      alStop = (Integer) hitData.get(name + "_al_stop");    
 
 	StringBuffer seqTokens =
-	    new StringBuffer((String) dataMap.get(name + "SeqTokens"));
+	    new StringBuffer((String) hitData.get(name + "SeqTokens"));
 
 	// Strip leading gap characters
 	while (seqTokens.charAt(0) == '-')
