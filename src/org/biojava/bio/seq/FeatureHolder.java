@@ -59,4 +59,21 @@ public interface FeatureHolder {
    *                just emediate children should be filtered
    */
   FeatureHolder filter(FeatureFilter fc, boolean recurse);
+  
+  public static final FeatureHolder EMPTY_FEATURE_HOLDER =
+    new EmptyFeatureHolder();
+    
+  public final class EmptyFeatureHolder implements FeatureHolder {
+    public int countFeatures() {
+      return 0;
+    }
+    
+    public Iterator features() {
+      return Collections.EMPTY_SET.iterator();
+    }
+    
+    public FeatureHolder filter(FeatureFilter fc, boolean recurse) {
+      return this;
+    }
+  }
 }

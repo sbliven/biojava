@@ -29,7 +29,7 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleFeatureHolder implements FeatureHolder {
+public class SimpleFeatureHolder extends AbstractFeatureHolder {
   /**
    * The child features.
    */
@@ -60,21 +60,5 @@ public class SimpleFeatureHolder implements FeatureHolder {
 
   public void removeFeature(Feature f) {
     features.remove(f);
-  }
-
-  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-    MutableFeatureHolder res = new SimpleMutableFeatureHolder();
-    for(Iterator f = features(); f.hasNext();) {
-      Feature feat = (Feature) f.next();
-      if(ff.accept(feat))
-        res.addFeature(feat);
-      if(recurse) {
-        FeatureHolder r = feat.filter(ff, recurse);
-        for(Iterator rf = r.features(); rf.hasNext();) {
-          res.addFeature((Feature) rf.next());
-        }
-      }
-    }
-    return res;
   }
 }
