@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.gui;
+package org.biojava.bio.gui.sequence;
 
 import java.util.*;
 import java.beans.*;
@@ -38,7 +38,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.sequence.*;
 
-import java.util.List; // useful trick to 'hide' javax.swing.List
+import java.util.List; // usefull trick to 'hide' javax.swing.List
 
 /**
  * A panel that visualy displays a Sequence.
@@ -105,6 +105,9 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     };
   }
 
+  /**
+   * Create a new SeqeuncePanel.
+   */
   public SequencePanel() {
     super();
     if(getFont() == null) {
@@ -112,7 +115,13 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     }
     this.addPropertyChangeListener(theMonitor);
   }
-    
+  
+  /**
+   * Set the SymboList to be rendered. This symbol list will be passed onto the
+   * SequenceRenderer instances registered with this SequencePanel.
+   *
+   * @param s  the SymboList to render
+   */
   public void setSequence(SymbolList s) {
     SymbolList oldSequence = sequence;
     if(oldSequence instanceof Changeable) {
@@ -126,10 +135,23 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     }
   }
 
+  /**
+   * Retrieve the currently rendered SymbolList
+   *
+   * @return  the current SymbolList
+   */
   public SymbolList getSequence() {
     return sequence;
   }
 
+  /**
+   * Set the direction that this SequencePanel renders in. The direction can be
+   * one of HORIZONTAL or VERTICAL. Once the direction is set, the display will
+   * redraw. HORIZONTAL represents left-to-right rendering. VERTICAL represents
+   * AceDB-style vertical rendering.
+   *
+   * @param dir  the new rendering direction
+   */
   public void setDirection(int dir) 
   throws IllegalArgumentException {
     if(dir != HORIZONTAL && dir != VERTICAL) {
@@ -143,10 +165,26 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     firePropertyChange("direction", oldDirection, direction);
   }
 
+  /**
+   * Retrieve the current rendering direction.
+   *
+   * @return the rendering direction (one of HORIZONTAL and VERTICAL)
+   */
   public int getDirection() {
     return direction;
   }
 
+  /**
+   * Set the number of pixles to leave blank between each block of sequence
+   * information.
+   * <P>
+   * If the SeqeuncePanel chooses to display the sequence information split
+   * across multiple lines, then the spacer parameter indicates how many pixles
+   * will seperate each line.
+   *
+   * @param spacer  the number of pixles seperating each line of sequence
+   * information
+   */
   public void setSpacer(int spacer) {
     int oldSpacer = this.spacer;
     this.spacer = spacer;
@@ -154,10 +192,25 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     firePropertyChange("spacer", oldSpacer, spacer);
   }
   
+  /**
+   * Retrieve the current spacer value
+   *
+   * @return the number of pixles between each line of sequence information
+   */
   public int getSpacer() {
     return spacer;
   }
   
+  /**
+   * Set the scale.
+   * <P>
+   * The scale parameter is interpreted as the number of pixles per symbol. This
+   * may take on a wide range of values - for example, to render the symbols as
+   * text, you will need a scale of > 8, where as to render chromosome 1 you
+   * will want a scale &lt; 0.00000001
+   *
+   * @param scale the new pixles-per-symbol ratio
+   */
   public void setScale(double scale) {
     double oldScale = this.scale;
     this.scale = scale;
@@ -165,10 +218,25 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     firePropertyChange("scale", oldScale, scale);
   }
 
+  /**
+   * Retrieve the current scale.
+   *
+   * @return the number of pixles used to render one symbol
+   */
   public double getScale() {
     return scale;
   }
 
+  /**
+   * Set the absolute number of lines that the sequence will be rendered on. If
+   * this is set to 0, then the number of lines will be calculated according to
+   * how many lines will be needed to render the sequence in the currently
+   * available space. If it is set to any positive non-zero value, the sequence
+   * will be rendered using that many lines, and the SequencePanel will request
+   * enough space to accomplish this.
+   *
+   * @param lines  the number of lines to split the sequence information over
+   */
   public void setLines(int lines) {
     int oldLines = this.lines;
     this.lines = lines;
@@ -176,18 +244,41 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     firePropertyChange("lines", oldLines, lines);
   }
   
+  /**
+   * Retrieve the number of lines that the sequence will be rendered over.
+   *
+   * @return the current number of lines (0 if autocalculated)
+   */
   public int getLines() {
     return lines;
   }
   
+  /**
+   * Retrieve the object that encapsulates the leading border area - the space
+   * before sequence information is rendered.
+   *
+   * @return a SequenceRenderContext.Border instance
+   */
   public SequenceRenderContext.Border getLeadingBorder() {
     return leadingBorder;
   }
   
+  /**
+   * Retrieve the object that encapsulates the trailing border area - the space
+   * after sequence information is rendered.
+   *
+   * @return a SequenceRenderContext.Border instance
+   */
   public SequenceRenderContext.Border getTrailingBorder() {
     return trailingBorder;
   }
   
+  /**
+   * Paint this component.
+   * <P>
+   * This calls the paint method of each SequenceRenderer registered with this
+   * SequncePanel after setting up the graphics apropreately.
+   */
   public void paintComponent(Graphics g) {
     if(sequence == null) {
       return;
