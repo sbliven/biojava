@@ -45,6 +45,11 @@ public class XFFTools {
     public static void writeXFF(File xffFile, FeatureHolder features)
     throws IOException {
         PrintWriter xffPR = new PrintWriter(new FileWriter(xffFile));
+        writeXFF(xffPR, features);
+    }
+    
+    public static void writeXFF(PrintWriter xffPR, FeatureHolder features)
+    throws IOException {
         XMLWriter xmlWriter = new PrettyXMLWriter(xffPR);
         XFFWriter xffWriter = new XFFWriter(new PropertyWriter());
         xffWriter.writeFeatureSet(features, xmlWriter);
