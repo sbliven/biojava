@@ -152,8 +152,8 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
 		while (rs.next()) {
 		    int feature_id = rs.getInt(1);
 		    StrandedFeature.Template templ = new StrandedFeature.Template();
-		    templ.type = rs.getString(2);
-		    templ.source = rs.getString(3);
+		    templ.type = rs.getString(2).trim();     // HACK due to stupid schema change    
+		    templ.source = rs.getString(3).trim();
 		    templ.annotation = new BioSQLFeatureAnnotation(seqDB, feature_id);
 		    fmap.put(new Integer(feature_id), templ);
 		}
@@ -177,8 +177,8 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
 		    while (rs.next()) {
 			LocationQualifierMemento lqm = new LocationQualifierMemento();
 			int location_id = rs.getInt(1);
-			lqm.qualifier_name = rs.getString(2);
-			lqm.qualifier_value = rs.getString(3);
+			lqm.qualifier_name = rs.getString(2).trim();    // HACK due to stupid schema change
+			lqm.qualifier_value = rs.getString(3).trim();
 			lqm.qualifier_int = rs.getInt(4);
    
 			Integer location_id_boxed = new Integer(location_id);

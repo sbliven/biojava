@@ -71,7 +71,7 @@ class BioSQLFeatureAnnotation implements Annotation {
 	    
 	    underlyingAnnotation = new SmallAnnotation();
 	    while (rs.next()) {
-		String key = rs.getString(1);
+		String key = rs.getString(1).trim();   // HACK due to stupid schema change
 		String value = rs.getString(2);
 		try {
 		    underlyingAnnotation.setProperty(key, value);

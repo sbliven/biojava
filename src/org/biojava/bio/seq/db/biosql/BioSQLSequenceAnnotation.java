@@ -100,7 +100,7 @@ class BioSQLSequenceAnnotation implements Annotation {
 		get_properties.setInt(1, bioentry_id);
 		rs = get_properties.executeQuery();
 		while (rs.next()) {
-		    String key = rs.getString(1);
+		    String key = rs.getString(1).trim();   // HACK due to stupid schema change
 		    String value = rs.getString(2);
 		    if (underlyingAnnotation.containsProperty(key)) {
 			Object current = underlyingAnnotation.getProperty(key);
