@@ -19,9 +19,7 @@
  *
  */
 
-package org.biojava.bio.seq.db.biosql;
-
-import org.biojava.utils.cache.*;
+package org.biojava.utils.cache;
 
 import java.util.*;
 import java.lang.ref.*;

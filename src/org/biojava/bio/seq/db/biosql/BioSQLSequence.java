@@ -34,7 +34,7 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * SequenceDB keyed off a BioSQL database.
+ * Sequence keyed off a BioSQL biosequence.
  *
  * @author Thomas Down
  * @since 1.3
@@ -48,6 +48,7 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     private ChangeSupport changeSupport;
     private Annotation annotation;
     private Alphabet alphabet;
+    private BioEntryFeatureSet features;
 
     private void initChangeSupport() {
 	changeSupport = new ChangeSupport();
@@ -74,6 +75,8 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 	} catch (NoSuchElementException ex) {
 	    throw new BioException(ex, "Can't load sequence with unknown alphabet " + alphaName);
 	}
+
+	features = new BioEntryFeatureSet(this, seqDB, bioentry_id);
     }
 
     public String getName() {
@@ -183,6 +186,10 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     // implements FeatureHolder
     //
 
+    private BioEntryFeatureSet getFeatures() {
+	return features;
+    }
+
     public Iterator features() {
 	return getFeatures().features();
     }
@@ -202,233 +209,25 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     public Feature createFeature(Feature.Template ft)
         throws ChangeVetoException, BioException
     {
-	Feature f = realizeFeature(this, ft);
-	if (changeSupport == null) {
-	    persistFeature(f, -1);
-	    getFeatures().addFeature(f);
-	} else {
-	    synchronized (changeSupport) {
-		ChangeEvent cev = new ChangeEvent(this, FeatureHolder.FEATURES, f);
-		changeSupport.firePreChangeEvent(cev);
-		persistFeature(f, -1); // No parent
-		getFeatures().addFeature(f);
-		changeSupport.firePostChangeEvent(cev);
-	    }
-	}
-
-	return f;
+	return getFeatures().createFeature(ft);
     }
 
     public void removeFeature(Feature f)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Don't (yet) support feature removal");
+	getFeatures().removeFeature(f);
     }
-
-    private SimpleFeatureHolder features;
-
-    protected synchronized SimpleFeatureHolder getFeatures() {
-	if (features == null) {
-	    try {
-		Connection conn = seqDB.getPool().takeConnection();
-		Map fmap = new HashMap();
-		Map lmap = new HashMap();
-
-		PreparedStatement get_features = conn.prepareStatement(
-                        "select seqfeature.seqfeature_id, " +
-			"seqfeature_key.key_name, " +
-			"seqfeature_source.source_name " +
-			"from seqfeature, seqfeature_key, seqfeature_source " +
-			"where seqfeature_key.seqfeature_key_id = seqfeature.seqfeature_key_id and " +
-			"      seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-			"      seqfeature.bioentry_id = ?"
-			);
-		get_features.setInt(1, bioentry_id);
-		ResultSet rs = get_features.executeQuery();
-		while (rs.next()) {
-		    int feature_id = rs.getInt(1);
-		    StrandedFeature.Template templ = new StrandedFeature.Template();
-		    templ.type = rs.getString(2);
-		    templ.source = rs.getString(3);
-		    templ.annotation = new BioSQLFeatureAnnotation(seqDB, feature_id);
-		    fmap.put(new Integer(feature_id), templ);
-		}
-		get_features.close();
-
-		// Fetch locations
-
-		PreparedStatement get_locations = conn.prepareStatement(
-		        "select seqfeature_location.seqfeature_id, " +
-			"seqfeature_location.seq_start, " +
-			"seqfeature_location.seq_end, " +
-			"seqfeature_location.seq_strand " +
-			"from seqfeature, seqfeature_location " +
-			"where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-			"seqfeature.bioentry_id = ?"
-			);
-		get_locations.setInt(1, bioentry_id);
-		rs = get_locations.executeQuery();
-		while (rs.next()) {
-		    Integer fid = new Integer(rs.getInt(1));
-		    int start = rs.getInt(2);
-		    int end = rs.getInt(3);
-		    int istrand = rs.getInt(4);
-
-		    StrandedFeature.Strand strand = StrandedFeature.UNKNOWN;
-		    if (istrand > 0) {
-			strand = StrandedFeature.POSITIVE;
-		    } else if (istrand < 0) {
-			strand = StrandedFeature.NEGATIVE;
-		    }
-		    StrandedFeature.Template templ = (StrandedFeature.Template) fmap.get(fid);
-		    if (templ.strand != null && templ.strand != strand) {
-			throw new BioRuntimeException("Feature strands don't match");
-		    } else {
-			templ.strand = strand;
-		    }
-
-		    Location bloc = new RangeLocation(start, end);
-		    List ll = (List) lmap.get(fid);
-		    if (ll == null) {
-			ll = new ArrayList();
-			lmap.put(fid, ll);
-		    }
-		    ll.add(bloc);
-		}
-		get_locations.close();
-
-		// Bind location information to features
-		
-		for (Iterator i = fmap.entrySet().iterator(); i.hasNext(); ) {
-		    Map.Entry me = (Map.Entry) i.next();
-		    Integer fid = (Integer) me.getKey();
-		    StrandedFeature.Template templ = (StrandedFeature.Template) me.getValue();
-		    
-		    List ll = (List) lmap.get(fid);
-		    if (ll == null) {
-			throw new BioRuntimeException("BioSQL SeqFeature doesn't have any associated location spans");
-		    }
-
-		    Location loc = null;
-		    if (ll.size() == 1) {
-			loc = (Location) ll.get(0);
-		    } else {
-			loc = LocationTools.union(ll);
-		    }
-		    templ.location = loc;
-		}
-
-		// Check hierarchy
-
-		Set toplevelFeatures = new HashSet(fmap.keySet());
-		Map featureHierarchy = new HashMap();
-		if (seqDB.isHierarchySupported()) {
-		    PreparedStatement get_hierarchy = conn.prepareStatement("select parent, child from seqfeature_hierarchy, seqfeature where parent = seqfeature.seqfeature_id and seqfeature.bioentry_id = ?");
-		    get_hierarchy.setInt(1, bioentry_id);
-		    rs = get_hierarchy.executeQuery();
-		    while (rs.next()) {
-			Integer parent = new Integer(rs.getInt(1));
-			Integer child = new Integer(rs.getInt(2));
-
-			toplevelFeatures.remove(child);
-			List cl = (List) featureHierarchy.get(parent);
-			if (cl == null) {
-			    cl = new ArrayList();
-			    featureHierarchy.put(parent, cl);
-			}
-			cl.add(child);
-		    }
-		    get_hierarchy.close();
-		}
-
-		seqDB.getPool().putConnection(conn);
-		conn = null;
-		
-		features = new SimpleFeatureHolder();
-		for (Iterator tlfi = toplevelFeatures.iterator(); tlfi.hasNext(); ) {
-		    Integer fid = (Integer) tlfi.next();
-		    try {
-			Feature f = reRealizeFeature(fid, fmap, featureHierarchy, this);
-			features.addFeature(f);
-		    } catch (BioException ex) {
-			throw new BioRuntimeException(ex);
-		    } catch (ChangeVetoException ex) {
-			throw new BioError("Assertion failure: couldn't add to newly created FeatureHolder");
-		    }
-		}
-	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "Oooops, couldn't read features!");
-	    }
-	}
-
-	return features;
-    }
-
-    private Feature reRealizeFeature(Integer fid, Map fmap, Map featureHierarchy, FeatureHolder parent)
-        throws BioException, ChangeVetoException
-    {
-	Feature.Template templ = (Feature.Template) fmap.get(fid);
-	Feature f = realizeFeature(parent, templ);
-	if (f instanceof BioSQLFeatureI) {
-	    ((BioSQLFeatureI) f)._setInternalID(fid.intValue());
-	    ((BioSQLFeatureI) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, fid.intValue()));
-	    List children = (List) featureHierarchy.get(fid);
-	    if (children != null) {
-		for (Iterator ci = children.iterator(); ci.hasNext(); ) {
-		    Integer childID = (Integer) ci.next();
-		    ((BioSQLFeatureI) f)._addFeature(reRealizeFeature(childID, fmap, featureHierarchy, f));
-		}
-	    }
-	}
-	return f;
-    }
-
-    //
-    // implements RealizingFeatureHolder
-    //
 
     public Feature realizeFeature(FeatureHolder parent, Feature.Template templ)
         throws BioException
     {
-	if (parent != this && !seqDB.isHierarchySupported()) {
-	    throw new BioException("This database doesn't support feature hierarchy.  Please create a seqfeature_hierarchy table");
-	}
-
-	if (templ instanceof StrandedFeature.Template && getAlphabet() == DNATools.getDNA()) {
-	    return new BioSQLStrandedFeature(this, parent, (StrandedFeature.Template) templ);
-	} else {
-	    return new BioSQLFeature(this, parent, templ);
-	}
+	return getFeatures().realizeFeature(parent, templ);
     }
-
-    //
-    // Feature persistance
-    //
 
     void persistFeature(Feature f, int parent_id)
         throws BioException
     {
-	Connection conn = null;
-	try {
-	    conn = seqDB.getPool().takeConnection();
-	    conn.setAutoCommit(false);
-	    int f_id = seqDB.persistFeature(conn, bioentry_id, f, parent_id);
-	    if (f instanceof BioSQLFeatureI) {
-		((BioSQLFeatureI) f)._setInternalID(f_id);
-		((BioSQLFeatureI) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, f_id));
-	    }
-	    conn.commit();
-	    seqDB.getPool().putConnection(conn);
-	} catch (SQLException ex) {
-	    boolean rolledback = false;
-	    if (conn != null) {
-		try {
-		    conn.rollback();
-		    rolledback = true;
-		} catch (SQLException ex2) {}
-	    }
-	    throw new BioException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
-	}
+	getFeatures().persistFeature(f, parent_id);
     }
 
     // 
@@ -445,6 +244,7 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 	}
 
 	changeSupport.addChangeListener(cl, ct);
+	features.addChangeListener(cl, ct);
     }
 
     public void removeChangeListener(ChangeListener cl) {
@@ -455,5 +255,6 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 	if (changeSupport != null) {
 	    changeSupport.removeChangeListener(cl, ct);
 	}
+	features.removeChangeListener(cl, ct);
     }
 }

@@ -128,8 +128,9 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    throw new BioException(ex, "Can't store sequences in BioSQL unless they can be sensibly tokenized/detokenized");
 	}
 
+	Connection conn = null;
 	try {
-	    Connection conn = pool.takeConnection();
+	    conn = pool.takeConnection();
 	    conn.setAutoCommit(false);
 	    ResultSet rs;
 
@@ -237,9 +238,17 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
                 create_bioentry_taxa.close();
 	    }
 
+	    conn.commit();
 	    pool.putConnection(conn);
 	} catch (SQLException ex) {
-	    throw new BioException(ex, "Error inserting data into BioSQL tables: " + seq.getName());
+	    boolean rolledback = false;
+	    if (conn != null) {
+		try {
+		    conn.rollback();
+		    rolledback = true;
+		} catch (SQLException ex2) {}
+	    }
+	    throw new BioRuntimeException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
 	}
     }
 
