@@ -53,9 +53,15 @@ public abstract class AbstractRangeLocation implements Location {
   *Tests for object equality against another location
   *@param l the location to compare against
   */  
-  public boolean equals(Location l) {
-    return getMin() == l.getMin() &&
-           getMax() == l.getMax() && l.isContiguous();
+  public boolean equals(Object o) {
+    if(o instanceof Location) {
+      Location l = (Location) o;
+
+      return getMin() == l.getMin() &&
+             getMax() == l.getMax() && l.isContiguous();
+    } else {
+      return false;
+    }
   }
 
   public Location intersection(Location l) {
