@@ -50,8 +50,8 @@ public class SimpleFramedFeature extends SimpleStrandedFeature implements Framed
       throw new IllegalAlphabetException("Cannot create a FramedFeature on the negative strand of an RNA");
     }
     else if (sourceSeq.getAlphabet() != DNATools.getDNA()) {
-      throw new IllegalAlphabetException("Cannot create a FramedFeature on a sequence of type "+
-                                          sourceSeq.getAlphabet().getName());
+      //throw new IllegalAlphabetException("Cannot create a FramedFeature on a sequence of type "+
+      //                                    sourceSeq.getAlphabet().getName());
     }
   }
   public ReadingFrame getReadingFrame() {

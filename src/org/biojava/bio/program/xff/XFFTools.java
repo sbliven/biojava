@@ -40,7 +40,11 @@ import org.biojava.bio.seq.impl.*;
 public class XFFTools {
     public static void annotateXFF(File xffFile, final Sequence sequence)
     throws IOException, SAXException, BioException {
-        
+        annotateXFF(xffFile, sequence, Annotation.EMPTY_ANNOTATION);
+    }
+    
+    public static void annotateXFF(File xffFile, final Sequence sequence, Annotation ann)
+    throws IOException, SAXException, BioException {
         SequenceBuilder sb = new SequenceBuilderBase() {
             { seq = sequence; }
             public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length) {}
@@ -48,6 +52,7 @@ public class XFFTools {
         
         XFFFeatureSetHandler xffHandler = new XFFFeatureSetHandler();
         xffHandler.setFeatureListener(sb);
+        xffHandler.setMergeAnnotation(ann);
         
         ContentHandler saxHandler = new SAX2StAXAdaptor(xffHandler);
         XMLReader parser;

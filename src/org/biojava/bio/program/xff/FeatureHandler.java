@@ -23,10 +23,12 @@ package org.biojava.bio.program.xff;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.MergeAnnotation;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.AssertionFailure;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
@@ -134,9 +136,19 @@ public class FeatureHandler extends StAXContentHandlerBase {
 	}
 
 	Feature.Template templ = getFeatureTemplate();
+        Annotation ann = getXFFEnvironment().getMergeAnnotation();
 	if (templ.annotation == null) {
-	    templ.annotation = Annotation.EMPTY_ANNOTATION;
-	}
+	    templ.annotation = ann;
+	} else if(ann != Annotation.EMPTY_ANNOTATION) {
+            try {
+                MergeAnnotation ma = new MergeAnnotation();
+                ma.addAnnotation(templ.annotation);
+                ma.addAnnotation(ann);
+                templ.annotation = ma;
+            } catch (ChangeVetoException cve) {
+                throw new AssertionFailure(cve);
+            }
+        }
 	getXFFEnvironment().getFeatureListener().startFeature(templ);
 	startFired = true;
     }

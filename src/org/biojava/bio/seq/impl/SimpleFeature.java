@@ -380,7 +380,7 @@ implements
         }
 	
 	if (template.location.getMin() < 1 || template.location.getMax() > sourceSeq.length()) {
-	    throw new IllegalArgumentException("Location " + template.location.toString() + " is outside 1.." + sourceSeq.length());
+	    //throw new IllegalArgumentException("Location " + template.location.toString() + " is outside 1.." + sourceSeq.length());
 	}
 
 	this.parent = parent;

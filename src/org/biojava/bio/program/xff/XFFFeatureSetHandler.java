@@ -24,6 +24,7 @@ package org.biojava.bio.program.xff;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
@@ -48,11 +49,13 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
     private List featureHandlers;
     private List detailHandlers;
     private SeqIOListener featureListener;
+    private Annotation mergeAnnotation;
 
     {
 	featureHandlers = new ArrayList();
 	detailHandlers = new ArrayList();
-    }		
+        mergeAnnotation = Annotation.EMPTY_ANNOTATION;
+    }
 
     //
     // Current parse status
@@ -88,6 +91,16 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
 
     public SeqIOListener getFeatureListener() {
 	return featureListener;
+    }
+    
+    public void setMergeAnnotation(Annotation ann)
+    {
+        this.mergeAnnotation = ann;
+    }
+    
+    public Annotation getMergeAnnotation()
+    {
+        return this.mergeAnnotation;
     }
 
     /**
