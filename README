@@ -5,32 +5,38 @@ biological community with objects for representing and manipulating
 biological information. We hope that it becomes the one-stop solution for
 every-day biological programming.
 
-This distribution contains the biojava classes and resources, along with
+This distribution contains the BioJava classes and resources, along with
 scripts for building the .class files and the documentation tree. The CVS
 directories are arranged as follows:
 
 biojava-live
  |
- |- src : java source files and package documentation
+ |- demos : a selection of demo programs
  |
- |- resources : resource files - images, xml documents
+ |- demos-1.4 : demo programs which require Java 1.4
  |
- |- tests : java unit test source files
+ |- demos-obsolete : demo programs for deperecated API
+ |
+ |- docs : documentation
+ |
+ |- manifest : manifest file for building jars
  |
  |- reports : reports (currently test logs)
  |
- |- build : scripts for managing your copy of the repository
+ |- resources : resource files - images, xml documents
  |
- |- demos : demo programs that test useful functionality
+ |- src : Java source files and package documentation
+ |
+ |- src-1.4 : Java source files which require Java 1.4
+ |
+ |- tests : Java unit test source files
+ |
 
 BioJava relies on the Xerces-J XML parser, supplied by the Apache
 Software Foundation.  We currently include Xerces-J 1.1.3 in the
 source tree.  For more information, see:
 
   http://xml.apache.org/xerces-j/index.html
-
-In addition, the scripts will generate the non-cvs directories docs and
-class, which will contain the javadoc documentation and the class files.
 
 BioJava now uses the Java based build tool Ant, supplied by the Apache
 Jakarta Project (see http://jakarta.apache.org). To build the project,
@@ -39,9 +45,12 @@ change to biojava-live and type:
 ant package
 ant javadocs
 
+Ant will automatically detect Java 1.4 and build the optional source
+files which require this version.
+
 If you have Ant >= 1.3 and the Java based unit testing tool JUnit (see
 http://www.junit.org) you can run the supplied tests. To build and run
-the tests, change to biojava-live and type:
+the tests, change directory to biojava-live and type:
 
 ant runtests
 
@@ -51,31 +60,22 @@ To check for edits type:
 and then for each directory under src with at least one modified file, build
 the package.
 
-To use biojava, put biojava.jar and xml.jar into your classpath.
+To use biojava, put biojava.jar, bytecode.jar and xerces.jar into your
+classpath.
 
-To build and run the demos:
+BioJava now uses Ant to build the demos. To build the demos, change
+directory to biojava-live and type:
 
-make sure that biojava.jar and xerces.jar are in your classpath.
-change into the demos directory, and make sure that it is also in your
-classpath. type:
+ant compile-demos
 
-> javac demoDir/demoName.java
-> java demoDir.demoName
+Ant will automatically detect Java 1.4 and build the optional demo
+source files which require this version.
 
-e.g.
+To run the demos change directory to demos. Most have either a comment
+explaining their purpose, or will print out a usage message when run
+without arguments.
 
-> javac dp/Dice.java
-> java dp.Dice
-
-on unix systems, you may be able to build all of the demos at once by typing:
-
-> find . -name "*.java" | xargs javac
-
-Most demos have either a comment explaining their purpose, or will print out a
-usage message when run without arguments.
-
-Contact Matthew Pocock (mrp@sanger.ac.uk) for more details, or mail the
-biojava mailing list (biojava-l@biojava.org).
+Mail the BioJava mailing list (biojava-l@biojava.org) for more details.
 
 
 
