@@ -31,7 +31,8 @@ import java.util.Iterator;
  * @author David Huen
  */
 public class SimpleOrthoPairSet
-    implements OrthoPairSet
+    extends AbstractOrthoPairSet
+//    implements OrthoPairSet
 {
     String name;
     Set orthologies = new HashSet();

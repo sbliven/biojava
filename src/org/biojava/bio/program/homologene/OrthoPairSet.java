@@ -23,6 +23,8 @@ package org.biojava.bio.program.homologene;
 
 import java.util.Set;
 
+import org.biojava.utils.ChangeVetoException;
+
 /**
  * represents the Homologene Group.
  */
@@ -51,7 +53,7 @@ public interface OrthoPairSet
      * adds a specified OrthoPair relationship
      * to this group.
      */
-    public void addOrthoPair(OrthoPair orthology);
+    public void addOrthoPair(OrthoPair orthology) throws ChangeVetoException;
 
     /**
      * removes a specified OrthoPair relationship
@@ -80,5 +82,10 @@ public interface OrthoPairSet
      * in this Group
      */
     public double getMinIdentity();
+
+     /**
+      * filter an OrthoPairSet
+      */
+    public OrthoPairSet filter(OrthoPairFilter filter);
 }
 
