@@ -202,11 +202,17 @@ public class DistributionTools {
     return Math.log((double)size)/Math.log(2.0) - totalEntropy;
   }
 
+  public static Distribution[] distOverAlignment(Alignment a)
+      throws IllegalAlphabetException{
+    return distOverAlignment(a,false,0.0);
+  }
+
   /**
    * Creates an array of distributions, one for each column of the alignment
    * @throws IllegalAlphabetException if all sequences don't use the same alphabet
    * @param a the <code>Alignment </code>to build the <code>Distribution[]</code> over.
    * @param countGaps if true gaps will be included in the distributions
+   * (NOT YET IMPLEMENTED!!, CURRENTLY EITHER OPTION WILL PRODUCE THE SAME RESULT)
    * @param nullWeight the number of pseudo counts to add to each distribution
    * @return a <code>Distribution[]</code> where each member of the array is a
    * <code>Distribution </code>of the <code>Symbols </code>found at that position

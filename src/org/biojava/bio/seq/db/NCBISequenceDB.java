@@ -19,15 +19,32 @@ extends WebSequenceDB {
   public static final String DB_PROTEIN = "protein";
 
 
-
+  /**
+   * Default constructor, querys the Genbank nucleotide database on "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi"
+   * and retrieves sequences in FastaFormat.
+   */
   public NCBISequenceDB(){
     this("http://www.ncbi.nlm.nih.gov/","entrez/query.fcgi",DB_NUCLEOTIDE,new FastaFormat());
   }
 
+  /**
+   * Parameterized constructor
+   * @param database must be one of "nucleotide" or "protein" (use the static DB fields)
+   * @param format must be one of <code>GenbankFormat</code> or <code>FastaFormat</code>
+   * @throws BioRuntimeException if the database or format is invalid
+   */
   public NCBISequenceDB(String database, SequenceFormat format){
     this("http://www.ncbi.nlm.nih.gov/","entrez/query.fcgi",database,format);
   }
 
+  /**
+   * Parameterized constructor
+   * @param server eg "http://www.ncbi.nlm.nih.gov/"
+   * @param CGI eg "entrez/query.fcgi"
+   * @param database must be one of "nucleotide" or "protein" (use the static DB fields)
+   * @param format must be one of <code>GenbankFormat</code> or <code>FastaFormat</code>
+   * @throws BioRuntimeException if the database or format is invalid
+   */
   public NCBISequenceDB(String server, String CGI, String database, SequenceFormat format)
         throws BioRuntimeException{
 
@@ -55,6 +72,11 @@ extends WebSequenceDB {
     return dataBase;
   }
 
+  /**
+   *
+   * @param dataBase must be one of "nucleotide" or "protein" (use the static DB fields)
+   * @throws BioException if an unknown database name is used.
+   */
   public void setDatabase(String dataBase) throws BioException{
     if (dataBase == DB_NUCLEOTIDE) {
 
@@ -81,6 +103,11 @@ extends WebSequenceDB {
     return format;
   }
 
+  /**
+   *
+   * @param format must be one of <code>FastaFormat</code> or <code>GenbankFormat</code>
+   * @throws BioException if an unknown <code>SequenceFormat</code> is used
+   */
   public void setSequenceFormat(SequenceFormat format) throws BioException{
 
     if (format instanceof FastaFormat ) {

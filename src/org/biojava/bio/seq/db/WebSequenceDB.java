@@ -37,6 +37,7 @@ import org.biojava.utils.*;
  *
  * @author Jason Stajich
  * @author Matthew Pocock
+ * @author Mark Schreiber
  */
 
 public abstract class WebSequenceDB
@@ -49,6 +50,13 @@ implements SequenceDBLite {
 
   protected abstract Alphabet getAlphabet();
 
+  /**
+   * Gets a sequence using its unique ID (eg for GenBank this would be the GI number)
+   * @param id the unique ID
+   * @return the matching sequence
+   * @throws BioException if the ID is invalid
+   * @throws IOException if the io operation times out or has problems connecting. Can also indicate an invalid URL has been constructed.
+   */
   public Sequence getSequence(String id)
   throws BioException {
     if( id.equals("") ) {
@@ -81,7 +89,11 @@ implements SequenceDBLite {
     }
   }
 
-
+  /**
+   * Not supported, You can't add sequences to a WebDB!
+   * @param seq the sequence you tried to add
+   * @throws ChangeVetoException always!
+   */
   public void addSequence(Sequence seq)
   throws ChangeVetoException {
     throw new ChangeVetoException(
@@ -90,6 +102,11 @@ implements SequenceDBLite {
     );
   }
 
+  /**
+   * Not supported, you can't remove a sequence from a WebDB!
+   * @param id the sequence you tried to change.
+   * @throws ChangeVetoException always!
+   */
   public void removeSequence(String id)
   throws ChangeVetoException {
     throw new ChangeVetoException(
