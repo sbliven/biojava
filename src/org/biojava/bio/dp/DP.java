@@ -28,6 +28,28 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 public abstract class DP {
+  /**
+    * Scores the SymbolList from symbol start to symbol (start+columns) with a
+    * weight matrix.
+    *
+    * @param matrix  the weight matrix used to evaluate the sequences
+    * @param symList the SymbolList to assess
+    * @param start   the index of the first symbol in the window to evaluate
+    * @return  the log probability or likelyhood of this weight matrix
+    *          having generated symbols start to (start + columns) of symList
+    */
+  public static double scoreWeightMatrix(
+    WeightMatrix matrix, SymbolList symList, int start)
+  throws IllegalSymbolException {
+    double score = 0;
+    int cols = matrix.columns();
+
+    for (int c = 0; c < cols; c++)
+      score += matrix.getWeight(symList.symbolAt(c + start), c);
+
+    return score;
+  }
+
   private static final TransitionListener BLOCKER = new TransitionListener() {
     public void preCreateTransition(TransitionEvent te)
     throws ModelVetoException {

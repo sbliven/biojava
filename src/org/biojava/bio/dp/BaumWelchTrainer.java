@@ -31,7 +31,6 @@ public class BaumWelchTrainer extends AbstractTrainer {
     ModelTrainer trainer,
     SymbolList resList
   ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
-    System.out.println("Training");
     DP dp = getDP();
     State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();
@@ -41,36 +40,34 @@ public class BaumWelchTrainer extends AbstractTrainer {
     
     SymbolList [] rll = { resList };
     
-    System.out.println("Forward");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll);
     double fs = fm.getScore();
-    System.out.println("fs = " + fs);
     
-    System.out.println("Backward");
     SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll);
     double bs = bm.getScore();
-    System.out.println("bs = " + bs);
 
-    System.out.println("State training");
     // state trainer
     for (int i = 1; i <= resList.length(); i++) {
       Symbol res = resList.symbolAt(i);
       for (int s = 0; s < dp.getDotStatesIndex(); s++) {
+        double [] fsc = fm.scores[i];
+        double [] bsc = bm.scores[i];
         if (! (states[s] instanceof MagicalState)) {
           trainer.addStateCount(
             (EmissionState) states[s],
             res,
-            Math.exp(fm.scores[i][s] + bm.scores[i][s] - fs)
+            Math.exp(fsc[s] + bsc[s] - fs)
           );
         }
       }
     }
 
-    System.out.println("Transition training");
     // transition trainer
     for (int i = 0; i <= resList.length(); i++) {
       Symbol res = (i < resList.length()) ? resList.symbolAt(i + 1) :
                     MagicalState.MAGICAL_RESIDUE;
+      double [] fsc = fm.scores[i];
+      double [] bsc = bm.scores[i+1];
       for (int s = 0; s < states.length; s++) {  // any -> emission transitions
         int [] ts = backwardTransitions[s];
         double [] tss = backwardTransitionScores[s];
@@ -83,7 +80,11 @@ public class BaumWelchTrainer extends AbstractTrainer {
             try {
               trainer.addTransitionCount(
                 states[s], states[t],
-                Math.exp(fm.scores[i][s] + tss[tc] + weight + bm.scores[i+1][t] - fs)
+                Math.exp(
+                  fsc[s] + tss[tc] + weight + bsc[t]
+                  -
+                  fs
+                )
               );
             } catch (IllegalTransitionException ite) {
               throw new BioError(
@@ -96,7 +97,6 @@ public class BaumWelchTrainer extends AbstractTrainer {
       }
     }
     
-    System.out.println("Done");
     return fs;
   }
   

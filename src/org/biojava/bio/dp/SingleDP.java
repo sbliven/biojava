@@ -28,26 +28,6 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 class SingleDP extends DP {
-  /**
-    * Scores the SymbolList from symbol 1 to symbol columns with a weight
-    * matrix.
-    *
-    * @param matrix  the weight matrix used to evaluate the sequences
-    * @param resList the SymbolList to assess
-    * @return  the log probability or likelyhood of this weight matrix
-    *          having generated symbols 1 to columns of resList
-    */
-  public static double scoreWeightMatrix(WeightMatrix matrix, SymbolList resList)
-  throws IllegalSymbolException {
-    double score = 0;
-    int cols = matrix.columns();
-
-    for (int c = 0; c < cols; c++)
-      score += matrix.getWeight(resList.symbolAt(c + 1), c);
-
-    return score;
-  }
-
   public SingleDP(MarkovModel flat)
   throws IllegalSymbolException, IllegalTransitionException, BioException {
     super(flat);
@@ -310,12 +290,17 @@ class SingleDP extends DP {
     int stateCount = states.length;
     int [][] transitions = getBackwardTransitions();
     double [][] transitionScore = getBackwardTransitionScores();
+    double [] prevScores = new double[getDotStatesIndex()];
 
     while (dpCursor.canAdvance()) {
       dpCursor.advance();
       Symbol res = dpCursor.lastRes();
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
+      for(int k = getDotStatesIndex() - 1; k >= 0; k--) {
+        prevScores[k] = ((EmissionState) states[k]).getWeight(res);
+      }
+      
 //System.out.println(res.getName());
       for (int k = stateCount-1; k >= 0; k--) {
 //System.out.println("State " + k + " of " + stateCount + ", " + transitions.length);
@@ -338,7 +323,7 @@ class SingleDP extends DP {
             continue;
           }
 //System.out.println(states[k].getName() + " -> " + states[l].getName());
-          double weight = ((EmissionState) states[l]).getWeight(res);
+          double weight = prevScores[l];
 //System.out.println("weight = " + weight);
           if (
             lastCol[l] != Double.NEGATIVE_INFINITY &&

@@ -55,6 +55,14 @@ public class SimpleTranslationTable implements TranslationTable {
     return r;
   }
   
+  /**
+   * Alter the translation mapping.
+   *
+   * @param from source Symbol
+   * @param to   target Symbol to be returned by translate(from)
+   * @throws IllefalSymbolException if either from is not in the source
+   *         alphabet or to is not in the target alphabet
+   */
   public void setTranslation(Symbol from, Symbol to)
   throws IllegalSymbolException {
     source.validate(from);
@@ -62,12 +70,37 @@ public class SimpleTranslationTable implements TranslationTable {
     transMap.put(from, to);
   }
   
+  /**
+   * Create a new translation table that will translate symbols from source to
+   * target.
+   * <P>
+   * The source alphabet must be finite, as a Map object is used to associate
+   * a source Symbol with a target Symbol.
+   * The target alphabet need not be finite.
+   *
+   * @param source  the FiniteAlphabet to translate from
+   * @param target  the Alphabet to translate into
+   */
   public SimpleTranslationTable(FiniteAlphabet source, Alphabet target) {
     this.source = source;
     this.target = target;
     this.transMap = new HashMap();
   }
 
+  /**
+   * Create a new translation table that will translate symbols from source to
+   * target.
+   * <P>
+   * The Map transMap should contain keys in the source alphabet with values in
+   * the target alphabet. However, this is not currently checked.
+   * <P>
+   * The source alphabet must be finite, as a Map object is used to associate
+   * a source Symbol with a target Symbol.
+   * The target alphabet need not be finite.
+   *
+   * @param source  the FiniteAlphabet to translate from
+   * @param target  the Alphabet to translate into
+   */
   public SimpleTranslationTable(
     FiniteAlphabet source, Alphabet target, Map transMap
   ) {

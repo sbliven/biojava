@@ -51,7 +51,7 @@ public class WeightMatrixAnnotator extends AbstractAnnotator {
     for(int offset = 1;
         offset <= seq.length() - cols + 1;
         offset++) {
-      double score = SingleDP.scoreWeightMatrix(matrix, seq.subList(offset, offset+cols-1));
+      double score = SingleDP.scoreWeightMatrix(matrix, seq, offset);
       double q = Math.exp(score) * prior;
       double pmd = q/(1.0+q);
       if(pmd >= threshold) {

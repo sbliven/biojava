@@ -26,12 +26,39 @@ import org.biojava.bio.seq.*;
 
 /**
  * Encapsulates the mapping from a source to a destination alphabet.
+ * <P>
+ * A TranslationTable is in effect a map or function with the source domain
+ * being getSourceAlphabet() and the target domain being getTargetAlphabet().
+ * The method translate() maps a single symbol from source to target. If you
+ * wish to translate every symbol in a symbol list then use TranslatedSymbolList
+ * to automate the job. If you want to translate windowed regions then first
+ * construct a WindowedSymbolList from the original sequence and then build a
+ * TranslatedSymbolList from this windowed view.
  *
  * @author Matthew Pocock
  */
 public interface TranslationTable {
+  /**
+   * The alphabet of Symbols that can be translated.
+   *
+   * @return the source Alphabet
+   */
   public Alphabet getSourceAlphabet();
+  
+  /**
+   * The alphabet of Symbols that will be produced.
+   *
+   * @return the target Alphabet
+   */
   public Alphabet getTargetAlphabet();
   
-  public Symbol translate(Symbol res) throws IllegalSymbolException;
+  /**
+   * Translate a single symbol from source alphabet to the target alphabet.
+   *
+   * @param sym the Symbol to translate (member of source alphabet)
+   * @return the translated version of sym (member of target alphabet)
+   * @throws IllegalSymbolException if sym is not a member of the source
+   *         alphabet
+   */
+  public Symbol translate(Symbol sym) throws IllegalSymbolException;
 }
