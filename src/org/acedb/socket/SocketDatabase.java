@@ -108,6 +108,8 @@ class SocketDatabase implements Database {
 
 	String file = url.getFile();
 
+	file = (file == null ? "" : file);
+
 	StringTokenizer toke = new StringTokenizer(file, "/");
 	if (toke.countTokens() == 0)
 	    return allClasses();
@@ -116,13 +118,13 @@ class SocketDatabase implements Database {
 	    resultSet = allClasses().retrieve(clazz);
 	} else {
 	    String clazz = toke.nextToken();
-      if(clazz == null) {
-        throw new AceException("Couldn't extract class name from URL " + file);
-      }
+	    if(clazz == null) {
+		throw new AceException("Couldn't extract class name from URL " + file);
+	    }
 	    String objname = toke.nextToken();
-      if(objname == null) {
-        throw new AceException("Couldn't extract class name from URL " + file);
-      }
+	    if(objname == null) {
+		throw new AceException("Couldn't extract class name from URL " + file);
+	    }
       
 	    resultSet = getObject(clazz, objname);
 
@@ -173,6 +175,8 @@ class SocketDatabase implements Database {
     AceSet select(String clazz, String namePattern)
 	                  throws AceException
     {
+	System.out.println("Selecting, clazz=" + clazz + ", pattern=" + namePattern);
+
 	AceSocket sock = null;
 	try {
 	    sock = takeSocket();
@@ -183,7 +187,7 @@ class SocketDatabase implements Database {
 		return null; // FIXME?
 	    int numFound = Integer.parseInt(new StringTokenizer(
                                result.substring(mpos + 9)).nextToken());
-	    // System.out.println("found "+numFound);
+	    System.out.println("found "+numFound);
 
 	    result = sock.transact("list -j");
 	    StringTokenizer listToke = new StringTokenizer(result, "\r\n");

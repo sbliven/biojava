@@ -40,6 +40,7 @@ class SocketClazzSet implements AceSet {
 	this.url = url;
 	this.parent = parent;
 	this.ourDB = ourDB;
+	this.name = name;
     }
 
     private AceSet allMembers() throws AceException {
