@@ -157,7 +157,8 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
 
     public void endElement(String nsURI,
 			   String localName,
-			   String qName)
+			   String qName,
+			   StAXContentHandler handler)
     {
 	if (localName.equals("featureSet")) {
 	    inFeatureSet = false;

@@ -245,7 +245,8 @@ public class FeatureHandler extends StAXContentHandlerBase {
 
     public void endElement(String nsURI,
 			   String localName,
-			   String qName)
+			   String qName,
+			   StAXContentHandler handler)
 	throws SAXException
     {
 	level--;
