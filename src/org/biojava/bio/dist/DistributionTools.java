@@ -24,6 +24,7 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.impl.*;
 
 import java.util.*;
 
@@ -311,4 +312,78 @@ public class DistributionTools {
        throw new NestedError(cve, "The Distribution has become locked");
     }
   }
+
+  /**
+   * Produces a sequence by randomly sampling the Distribution
+   * @param name the name for the sequence
+   * @param d the distribution to sample. If this distribution is of order N a
+   * seed sequence is generated allowed to 'burn in' for 1000 iterations and used
+   * to produce a sequence over the conditioned alphabet.
+   * @param length the number of symbols in the sequence.
+   * @return a SimpleSequence with name and urn = to name and an Empty Annotation.
+   */
+  public static final Sequence generateSequence(String name, Distribution d, int length){
+    if(d instanceof OrderNDistribution){
+      return generateOrderNSequence(name, (OrderNDistribution)d, length);
+    }
+
+    SymbolList sl = null;
+
+    List l = new ArrayList(length);
+    for (int i = 0; i < l.size(); i++) {
+      l.add(d.sampleSymbol());
+    }
+
+    try {
+      sl = new SimpleSymbolList(d.getAlphabet(),l);
+    }
+    catch (IllegalSymbolException ex) {
+      //shouldn't happen but...
+      throw new BioError("Distribution emitting Symbols not from its Alphabet?");
+    }
+    return new SimpleSequence(sl,name,name,Annotation.EMPTY_ANNOTATION);
+  }
+
+  protected static final Sequence generateOrderNSequence(String name, OrderNDistribution d, int length){
+    SymbolList sl = null;
+    List l = new ArrayList(length);
+
+    /*
+     * When emitting an orderN sequence a seed sequence is required that is of the
+     * length of the conditioning alphabet. The emissions will also be allowed
+     * to 'burn in' for 1000 emissions so that the 'end effect' of the seed
+     * is negated.
+     */
+     FiniteAlphabet cond = (FiniteAlphabet)d.getConditioningAlphabet();
+     UniformDistribution uni = new UniformDistribution(cond);
+     BasisSymbol seed = (BasisSymbol)uni.sampleSymbol();
+     //using the linked list the seed becomes like a history buffer.
+     LinkedList ll = new LinkedList(seed.getSymbols());
+
+    try {
+
+      for(int i = 0; i < 1000+ length; i++){
+         //get a symbol using the seed
+         Symbol sym = d.getDistribution(seed).sampleSymbol();
+         if(i >= 1000){
+           l.add(sym);
+         }
+         //add the symbol to the end of the seed
+         ll.addLast(sym);
+         //remove the first basis symbol of the seed
+         ll.removeFirst();
+         //regenerate the seed
+         seed = (BasisSymbol)cond.getSymbol(ll);
+       }
+
+       sl = new SimpleSymbolList(d.getConditionedAlphabet(),l);
+    }
+    catch (IllegalSymbolException ex) {
+      //shouldn't happen but...
+      throw new BioError("Distribution emitting Symbols not from its Alphabet?");
+    }
+
+    return new SimpleSequence(sl, name, name, Annotation.EMPTY_ANNOTATION);
+  }
+
 }//End of class
