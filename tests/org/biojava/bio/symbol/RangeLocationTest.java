@@ -68,8 +68,8 @@ public class RangeLocationTest extends TestCase
      */
     public void testAreEqual()
     {
-	assert(LocationTools.areEqual(r1, r1));
-	assert(LocationTools.areEqual(r1, new RangeLocation(1, 100)));
+	assertTrue(LocationTools.areEqual(r1, r1));
+	assertTrue(LocationTools.areEqual(r1, new RangeLocation(1, 100)));
     }
 
     /**
@@ -79,12 +79,12 @@ public class RangeLocationTest extends TestCase
      */
     public void testOverlaps()
     {
-	assert(LocationTools.overlaps(r1, r1));
-	assert(LocationTools.overlaps(r2, r2));
-	assert(LocationTools.overlaps(r1, r2));
-	assert(LocationTools.overlaps(r2, r1));
+	assertTrue(LocationTools.overlaps(r1, r1));
+	assertTrue(LocationTools.overlaps(r2, r2));
+	assertTrue(LocationTools.overlaps(r1, r2));
+	assertTrue(LocationTools.overlaps(r2, r1));
 
-	assert(! LocationTools.overlaps(r1, r3));
+	assertTrue(! LocationTools.overlaps(r1, r3));
     }
 
     /**
@@ -94,12 +94,12 @@ public class RangeLocationTest extends TestCase
      */
     public void testContains()
     {
-	assert(LocationTools.contains(r3, r4));
-	assert(! LocationTools.contains(r4, r3));
+	assertTrue(LocationTools.contains(r3, r4));
+	assertTrue(! LocationTools.contains(r4, r3));
 
-	assert(r1.contains(1));
-	assert(r1.contains(100));
-	assert(! r1.contains(101));
+	assertTrue(r1.contains(1));
+	assertTrue(r1.contains(100));
+	assertTrue(! r1.contains(101));
     }
 
     /**
@@ -135,6 +135,6 @@ public class RangeLocationTest extends TestCase
      */
     public void testIsContiguous()
     {
-	assert(r1.isContiguous());
+	assertTrue(r1.isContiguous());
     } 
 }

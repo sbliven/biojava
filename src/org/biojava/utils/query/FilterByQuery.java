@@ -13,6 +13,7 @@ import java.util.*;
 public class FilterByQuery extends Filter {
   private final Query query;
   private final Node startNode;
+  private final Node endNode;
   private final Filter.CompareInteger.Comparison comparison;
   private final int value;
   
@@ -28,11 +29,13 @@ public class FilterByQuery extends Filter {
   public FilterByQuery(
     Query query,
     Node startNode,
+    Node endNode,
     Filter.CompareInteger.Comparison comparison,
     int value
   ) {
     this.query = query;
     this.startNode = startNode;
+    this.endNode = endNode;
     this.comparison = comparison;
     this.value = value;
   }
@@ -73,6 +76,7 @@ public class FilterByQuery extends Filter {
     Queryable res = QueryTools.select(
       query,
       startNode,
+      endNode,
       QueryTools.createQueryable(Collections.singleton(object), Object.class)
     );
     
@@ -80,10 +84,10 @@ public class FilterByQuery extends Filter {
   }
   
   public Class getInputClass() {
-    return Object.class;
+    return startNode.getInputClass();
   }
   
   public Class getOutputClass() {
-    return Object.class;
+    return startNode.getInputClass();
   }
 }

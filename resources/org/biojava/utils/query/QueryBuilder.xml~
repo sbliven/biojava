@@ -1,0 +1,18 @@
+<query id="filterChains">
+  <description>
+    Takes a query, and extracts all nodes that have a single operator in and
+    out, and where both of these operations are filters. These nodes can then be
+    removed and replaced by FilterSet operations between the nodes to the left
+    and right of each chain.
+  </description>
+  
+  <node id="start">
+    <javaclass>org.biojava.utils.query.Query</javaclass>
+  </node>
+  <node id="queryNode">
+    <tuple>
+      <javaclass>org.biojava.utils.query.Query</javaclass>
+      <javaclass>org.biojava.utils.query.Node</javaclass>
+    </tuple>
+  </node>
+</query>

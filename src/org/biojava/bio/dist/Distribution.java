@@ -30,15 +30,17 @@ import org.biojava.utils.*;
  * An encapsulation of a probability distribution over the Symbols within an
  * alphabet.
  * <P>
- * A distribution is effectively a map from symbol to probability. You may
- * choose to store something else instead, but it is not guaranteed that
- * all algorithms will work correctly.
+ * A distribution can be implemented as a map from symbol to probability. It is
+ * more correct to think of them as being integrals or sums over probability
+ * dencity funcitons. In this world view, getWeight should look at the
+ * getMatches of the symbol it is given and then perform the apropreate sum or
+ * integral to return the probability of something within that set of symbols
+ * being emitted.
  * <P>
  * This interface should handle the case of emitting an ambiguity symbol.
  * This should be just the sum of the probabiltiy of emitting each matching
  * symbol. It is up to the code using the Distribution instance to divide out
  * the null model appropreately.
- * </code>
  *
  * @author Matthew Pocock
  */

@@ -66,5 +66,22 @@ public class FilterSet extends Filter {
   public void remove(Filter filt) {
     filters.remove(filt);
   }
+  
+  public int hashCode() {
+    return filters.hashCode();
+  }
+  
+  public boolean equals(Object o) {
+    if(o instanceof FilterSet) {
+      FilterSet that = (FilterSet) o;
+      return that.filters.equals(this.filters);
+    } else {
+      return false;
+    }
+  }
+  
+  public String toString() {
+    return filters.toString();
+  }
 }
 

@@ -33,4 +33,32 @@ public class SimpleQueryable implements Queryable {
   public boolean contains(Object item) {
     return items.contains(item);
   }
+  
+  public int hashCode() {
+    return items.hashCode();
+  }
+  
+  public boolean equals(Object o) {
+    if(o instanceof SimpleQueryable) {
+      SimpleQueryable that = (SimpleQueryable) o;
+      return this.items.equals(that.items);
+    } else if(o instanceof Queryable) {
+      Queryable that = (Queryable) o;
+      if(that.size() != this.size()) {
+        return false;
+      }
+      for(Iterator i = iterator(); i.hasNext(); ) {
+        if(!that.contains(i.next())) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  public String toString() {
+    return items.toString();
+  }
 }

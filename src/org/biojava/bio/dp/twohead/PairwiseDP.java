@@ -232,7 +232,7 @@ public class PairwiseDP extends DP implements Serializable {
     }
 
     // Traceback...  
-	
+
     BackPointer[] bpCol = currentCell.backPointers;
     BackPointer bp = bpCol[l];
     List statel = new ArrayList();
@@ -245,7 +245,7 @@ public class PairwiseDP extends DP implements Serializable {
   
     // parse 1
     //System.out.println("Parse 1");
-    for(BackPointer bpi =	bp.back; bpi != TERMINAL_BP; bpi = bpi.back) {
+    for(BackPointer bpi = bp.back; bpi != TERMINAL_BP; bpi = bpi.back) {
       try {
       /*System.out.print(
         "Processing " + bpi.state.getName()

@@ -36,8 +36,8 @@ import org.biojava.bio.symbol.*;
 
 
 public class PairDistribution
-extends AbstractDistribution
-implements Serializable {
+extends AbstractChangeable
+implements Serializable, Distribution {
   private static Map cache;
   private static ListWrapper gopher;
   
@@ -82,7 +82,7 @@ implements Serializable {
     return getNullModel(first, second);
   }
   
-  protected void setNullModelImpl(Distribution nullModel)
+  public void setNullModel(Distribution nullModel)
   throws IllegalAlphabetException, ChangeVetoException {
     throw new ChangeVetoException(
       "PairDistribution objects can't have their null models changed."
@@ -100,16 +100,26 @@ implements Serializable {
     trainer.registerTrainer(this, new PairTrainer());
   }
 
-  public double getWeightImpl(AtomicSymbol sym)
+  public double getWeight(Symbol sym)
   throws IllegalSymbolException {
-    List symL = sym.getSymbols();
-    Symbol f = (Symbol) symL.get(0);
-    Symbol s = (Symbol) symL.get(1);
-
-    return first.getWeight(f) * second.getWeight(s);      
+    if(sym instanceof BasisSymbol) {
+      List symL = ((BasisSymbol) sym).getSymbols();
+      Symbol f = (Symbol) symL.get(0);
+      Symbol s = (Symbol) symL.get(1);
+      
+      return first.getWeight(f) * second.getWeight(s);
+    } else {
+      double score = 0.0;
+      for(Iterator i = ((FiniteAlphabet) sym.getMatches()).iterator();
+      i.hasNext(); ) {
+        AtomicSymbol s = (AtomicSymbol) i.next();
+        score += getWeight(s);
+      }
+      return score;
+    }
   }
   
-  public void setWeightImpl(AtomicSymbol sym, double weight)
+  public void setWeight(Symbol sym, double weight)
   throws ChangeVetoException {
     throw new ChangeVetoException(
       "Can't set the weight directly in a PairDistribution. " +
@@ -125,6 +135,10 @@ implements Serializable {
         first.getAlphabet(), second.getAlphabet()
       })
     );
+  }
+  
+  public void registerWithTrainer(DistributionTrainerContext dtc) {
+    dtc.registerTrainer(this, new PairTrainer());
   }
   
   private class PairTrainer
@@ -148,6 +162,17 @@ implements Serializable {
       
       dtc.addCount(first, f, times);
       dtc.addCount(second, s, times);
+    }
+  }
+  
+  public Symbol sampleSymbol() {
+    try {
+      return getAlphabet().getSymbol(Arrays.asList( new Symbol[] {
+        first.sampleSymbol(),
+        second.sampleSymbol()
+      }));
+    } catch (IllegalSymbolException ise) {
+      throw new BioError(ise, "Couldn't sample symbol");
     }
   }
 }

@@ -114,4 +114,29 @@ public abstract class Follow implements Operation {
       return method.getReturnType();
     }
   }
+  
+  public static final class FollowField extends Follow {
+    private final Field field;
+    
+    public FollowField(Field field) {
+      this.field = field;
+    }
+    
+    public Queryable follow(Object item)
+    throws OperationException {
+      try {
+        return QueryTools.createSingleton(field.get(item));
+      } catch (IllegalAccessException iae) {
+        throw new OperationException(iae, "Couldn't access field");
+      }
+    }
+    
+    public Class getInputClass() {
+      return field.getDeclaringClass();
+    }
+    
+    public Class getOutputClass() {
+      return field.getType();
+    }
+  }
 }

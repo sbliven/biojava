@@ -189,7 +189,22 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
       if(sym == null) {
         throw new NullPointerException("Symbols can't be null");
       }
-      for(Iterator i = ((FiniteAlphabet) sym.getMatches()).iterator(); i.hasNext(); ) {
+      FiniteAlphabet matches = (FiniteAlphabet) sym.getMatches();
+      if(matches.size() == 0) {
+        //System.out.println("Got empty symbol " + sym.getName());
+        if(sym.equals(AlphabetManager.getGapSymbol())) {
+          //System.out.println("Global gap symbol");
+          return true;
+        } else if(sym instanceof BasisSymbol) {
+          if(((BasisSymbol) sym).getSymbols().size() == getAlphabets().size()) {
+            //System.out.println("Basis symbol and the right length");
+            return true;
+          }
+        }
+        //System.out.println("Empty symbol and not basis - let's accept it.");
+        return true;
+      }
+      for(Iterator i = matches.iterator(); i.hasNext(); ) {
         AtomicSymbol s = (AtomicSymbol) i.next();
         if(!containsImpl(s)) {
           return false;
@@ -207,15 +222,15 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   throws IllegalSymbolException {
     if(!contains(sym)) {
       StringBuffer sb = new StringBuffer("{");
-      Iterator i = iterator();
+      /*Iterator i = iterator();
       if(i.hasNext()) {
-        sb.append(((Symbol) i.next()).getToken());
+        sb.append(((Symbol) i.next()).getName());
       }
       while(i.hasNext()) {
         sb.append(',');
-        sb.append(((Symbol) i.next()).getToken());
+        sb.append(((Symbol) i.next()).getName());
       }
-      sb.append("}");
+      sb.append("}");*/
         
       throw new IllegalSymbolException(
         "Symbol " + sym.getName() + " not found in alphabet " + this.getName() +
@@ -238,6 +253,10 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
     getChangeSupport(ct).removeChangeListener(cl, ct);
   } 
+  
+  public String toString() {
+    return getName();
+  }
   
   protected AbstractAlphabet() {}
 }

@@ -30,11 +30,12 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * This distribution emits only the gap symbol.
+ * This distribution emits gap symbols.
  * <P>
  * It is a useful thing to have around for pair-wise alignment, as you can
  * build a PairDistribution that emits gaps in one sequence and Symbols in the
- * other.
+ * other. The GapDistriution will always emit with a probability of 1, as every
+ * symbol has a matches alphabet that contains the empty set. Or is this so?
  *
  * @author Matthew Pocock
  */
@@ -42,9 +43,7 @@ public class GapDistribution implements Distribution {
   private final Alphabet alpha;
     
   public double getWeight(Symbol sym) throws IllegalSymbolException {
-    return sym == getAlphabet().getGapSymbol()
-      ? 1.0
-      : 0.0;
+    return 1.0;
   }
 
   public void setWeight(Symbol s, double w) throws IllegalSymbolException,

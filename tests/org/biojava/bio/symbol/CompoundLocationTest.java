@@ -84,7 +84,7 @@ public class CompoundLocationTest extends TestCase
      */
     public void testAreEqual()
     {
-	assert(LocationTools.areEqual(r1, r1));
+	assertTrue(LocationTools.areEqual(r1, r1));
 	assertEquals(r1, LocationTools.buildLoc(locs1));
     }
 
@@ -95,8 +95,8 @@ public class CompoundLocationTest extends TestCase
      */
     public void testOverlaps()
     {
-	assert(LocationTools.overlaps(r1, r2));
-	assert(! LocationTools.overlaps(r1, r3));
+	assertTrue(LocationTools.overlaps(r1, r2));
+	assertTrue(! LocationTools.overlaps(r1, r3));
     }
 
     /**
@@ -106,17 +106,17 @@ public class CompoundLocationTest extends TestCase
      */
     public void testContains()
     {
-	assert(LocationTools.contains(r1, r2));
-	assert(! LocationTools.contains(r1, r3));
-	assert(r1.contains(1));
-	assert(r1.contains(100));
-	assert(r1.contains(150));
-	assert(r1.contains(200));
+	assertTrue(LocationTools.contains(r1, r2));
+	assertTrue(! LocationTools.contains(r1, r3));
+	assertTrue(r1.contains(1));
+	assertTrue(r1.contains(100));
+	assertTrue(r1.contains(150));
+	assertTrue(r1.contains(200));
 
 	// Between contained ranges
-	assert(! r1.contains(101));
+	assertTrue(! r1.contains(101));
 	// Outside contained ranges
-	assert(! r1.contains(201));
+	assertTrue(! r1.contains(201));
     }
 
     /**
@@ -155,12 +155,12 @@ public class CompoundLocationTest extends TestCase
      */
     public void testIsContiguous()
     {
-	assert(! r1.isContiguous());
+	assertTrue(! r1.isContiguous());
 
 	List single = new ArrayList();
 	single.add(new RangeLocation(1, 100));
 	Location contig = LocationTools.buildLoc(single);
 
-	assert(contig.isContiguous());
+	assertTrue(contig.isContiguous());
     }
 }

@@ -34,7 +34,7 @@ public interface Query {
    * Usefull instance of a Query that will always return everything that you put
    * into it.
    */
-  public static NullQuery NULL_QUERY = new NullQuery();
+  public static IdentityQuery IDENTITY_QUERY = new IdentityQuery(Object.class);
 
   /**
    * The Query that return everything put in to it.
@@ -42,16 +42,16 @@ public interface Query {
    * @author Matthew Pocock
    * @since 1.2
    */
-  public class NullQuery implements Query {
-    private final ResultNode node;
+  public class IdentityQuery implements Query {
+    private final Node node;
     private final Set nodeSet;
     
-    {
-      node = new SimpleResultNode("result", Object.class);
+    public IdentityQuery(Class clazz) {
+      node = new SimpleNode("result", clazz);
       nodeSet = Collections.singleton(node);
     }
     
-    public ResultNode getNode() {
+    public Node getNode() {
       return node;
     }
     

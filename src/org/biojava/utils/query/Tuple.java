@@ -89,6 +89,7 @@ public interface Tuple {
     }
   }
   
+  
   /**
    * Follow a Tuple to a new Tuple made by including some arbitrary list of
    * columns from a source Tuple.
@@ -161,6 +162,51 @@ public interface Tuple {
     }
   }
   
+  public static class FilterByIndex extends Filter {
+    private final Filter filter;
+    private int indx;
+    
+    public Filter getFilter() {
+      return filter;
+    }
+    
+    public int getIndex() {
+      return indx;
+    }
+    
+    public FilterByIndex(Filter filter, int indx) {
+      this.filter = filter;
+      this.indx = indx;
+    }
+    
+    public boolean accept(Object item)
+    throws OperationException {
+      Tuple tup = (Tuple) item;
+      return filter.accept(tup.getObject(indx));
+    }
+    
+    public Class getInputClass() {
+      return Tuple.class;
+    }
+    
+    public Class getOutputClass() {
+      return Tuple.class;
+    }
+    
+    public int hashCode() {
+      return filter.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof Tuple.FilterByIndex) {
+        Tuple.FilterByIndex that = (Tuple.FilterByIndex) o;
+        return that.indx == this.indx && that.filter.equals(this.filter);
+      } else {
+        return false;
+      }
+    }
+  }
+
   /**
    * Produce a new Tuple by replacing one of the slots with the result of
    * another Follow.
@@ -172,6 +218,18 @@ public interface Tuple {
     private final Follow follow;
     private final int indx;
     private final ClassList classList;
+    
+    public Follow getFollow() {
+      return follow;
+    }
+    
+    public int getIndex() {
+      return indx;
+    }
+    
+    public ClassList getClassList() {
+      return classList;
+    }
     
     public FollowTupleTo(int indx, Follow follow, ClassList classList) {
       this.indx = indx;
@@ -187,6 +245,11 @@ public interface Tuple {
     public Queryable follow(Object item)
     throws OperationException {
       Tuple tup = (Tuple) item;
+      if(tup.getClassList().size() != classList.size()) {
+        throw new OperationException(
+          "Can't apply " + tup.getClassList() + " to " + classList
+        );
+      }
       Queryable res = follow.follow(tup.getObject(indx));
       Set items = new HashSet();
       
@@ -194,8 +257,7 @@ public interface Tuple {
         Object o = ri.next();
         Object [] values = new Object[classList.size()];
         for(int i = 0; i < values.length; i++) {
-          values[i] = (i == indx) ? follow.getOutputClass()
-                                  : o;
+          values[i] = (i == indx) ? o : tup.getObject(i);
         }
         items.add(new SimpleTuple(values, classList));
       }
@@ -209,6 +271,26 @@ public interface Tuple {
     
     public Class getOutputClass() {
       return Tuple.class;
+    }
+    
+    public int hashCode() {
+      return follow.hashCode() ^ classList.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof Tuple.FollowTupleTo) {
+        Tuple.FollowTupleTo that = (Tuple.FollowTupleTo) o;
+        return
+          this.getFollow().equals(that.getFollow()) &&
+          this.getClassList().equals(that.getClassList()) &&
+          this.getIndex() == that.getIndex();
+      } else {
+        return false;
+      }
+    }
+    
+    public String toString() {
+      return "FollowTupleTo index: " + indx + " follow: " + follow;
     }
   }
   
@@ -229,6 +311,14 @@ public interface Tuple {
     private final Method method;
     private final ClassList classList;
     private final int indx;
+    
+    public Method getMethod() {
+      return method;
+    }
+    
+    public ClassList getClassList() {
+      return classList;
+    }
     
     public FollowMethod(Method method, ClassList classList) {
       this.method = method;
@@ -258,18 +348,13 @@ public interface Tuple {
       classArray[indx-1] = returnType;
       
       this.classList = new SimpleTuple.ClassList(classArray);
-      
-      System.out.println("Input class list:  " + classList);
-      System.out.println("Output class list: " + this.classList);
-      System.out.println("indx: " + indx);
-      System.out.println("Method: " + method);
     }
     
     public Queryable follow(Object item)
     throws OperationException {
       Tuple tup = (Tuple) item;
       Object[] params = new Object[method.getParameterTypes().length];
-      for(int i = 0; i < classList.size(); i++) {
+      for(int i = 0; i < params.length; i++) {
         params[i] = tup.getObject(i+indx);
       }
       
@@ -287,7 +372,8 @@ public interface Tuple {
           "\n\tmethod " + method +
           "\n\ton " + tup.getObject(indx-1) +
           "\n\tin tuple of type " + tup.getClassList() +
-          "\n\non tuple " + tup);
+          "\n\ton tuple " + tup +
+          "\n\twith index " + indx);
       }
       
       if(indx == 1) {
@@ -312,6 +398,25 @@ public interface Tuple {
       } else {
         return Tuple.class;
       }
+    }
+    
+    public int hashCode() {
+      return method.hashCode() ^ classList.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof Tuple.FollowMethod) {
+        Tuple.FollowMethod that = (Tuple.FollowMethod) o;
+        return
+          that.getClassList().equals(this.getClassList()) &&
+          that.getMethod().equals(this.getMethod());
+      } else {
+        return false;
+      }
+    }
+    
+    public String toString() {
+      return "Tuple.FollowMethod: " + method + " classList: " + classList;
     }
   }
 }

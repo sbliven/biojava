@@ -495,13 +495,8 @@ public final class AlphabetManager {
           cpa =  new InfiniteCrossProductAlphabet(aList);
           break;
         }
-        size *= ((FiniteAlphabet) aa).size();
-        // Richard J. Fox found an overflow error here. I think we can just stop
-        // incrementing size at our decision value and everything wil work
-        // except in the special case where we are working with individual
-        // finite alphabets with > 2^32 elements
-        if(size >= 1000) {
-          break;
+        if(size <= 1000) {
+          size *= ((FiniteAlphabet) aa).size();
         }
       }
       if(cpa == null) {

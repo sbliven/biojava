@@ -34,9 +34,12 @@ public class QueryBuilder {
     ) {
       Map.Entry arcOp = (Map.Entry) i.next();
       Arc arc = (Arc) arcOp.getKey();
-      Operation op = (Operation) arcOp.getValue();
+      Set opSet = (Set) arcOp.getValue();
       try {
-        addArc(arc, op);
+        for(Iterator oi = opSet.iterator(); oi.hasNext(); ) {
+          Operation op = (Operation) oi.next();
+          addArc(arc, op);
+        }
       } catch (OperationException oe) {
         throw new NestedError(oe, "This should never happen");
       }
@@ -82,7 +85,12 @@ public class QueryBuilder {
   public void removeNode(Node node) {
     nodes.remove(node);
     
-    for(Iterator i = getArcsFrom(node).iterator(); i.hasNext(); ) {
+    for(Iterator i = new HashSet(getArcsFrom(node)).iterator(); i.hasNext(); ) {
+      Arc arc = (Arc) i.next();
+      removeArc(arc);
+    }
+    
+    for(Iterator i = new HashSet(getArcsTo(node)).iterator(); i.hasNext(); ) {
       Arc arc = (Arc) i.next();
       removeArc(arc);
     }
@@ -90,13 +98,27 @@ public class QueryBuilder {
   
   public void addArc(Arc arc, Operation op)
   throws OperationException {
-    if(!op.getInputClass().isAssignableFrom(arc.from.getOutputClass())) {
-      throw new OperationException("Can't assign " + arc.from.getOutputClass() +
-      " to " + op.getInputClass());
+    if(
+      !QueryTools.convertPrimatives(op.getInputClass())
+      .isAssignableFrom(QueryTools.convertPrimatives(arc.from.getOutputClass()))
+    ) {
+      throw new OperationException(
+        "Invalid operation input: can't assign " + arc.from.getOutputClass() +
+        " to " + op.getInputClass() +
+        " in " + arc.from + " -> " + arc.to +
+        " for operator " + op
+      );
     }
-    if(!op.getOutputClass().isAssignableFrom(arc.to.getInputClass())) {
-      throw new OperationException("Can't assign " +  op.getOutputClass() +
-      " to " + arc.to.getInputClass());
+    if(
+      !QueryTools.convertPrimatives(arc.to.getInputClass())
+      .isAssignableFrom(QueryTools.convertPrimatives(op.getOutputClass())) 
+    ) {
+      throw new OperationException(
+        "Invalid operation output: can't assign " + op.getOutputClass() +
+        " to " + arc.to.getInputClass() +
+        " in " + arc.from + " -> " + arc.to +
+        " for operator " + op
+      );
     }
 
     nodes.add(arc.from);

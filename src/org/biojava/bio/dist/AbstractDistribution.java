@@ -194,6 +194,10 @@ public abstract class AbstractDistribution implements Distribution {
       return getWeightImpl((AtomicSymbol) sym);
     } else {
       Alphabet ambA = sym.getMatches();
+      if(((FiniteAlphabet) ambA).size() == 0) {
+        getAlphabet().validate(sym);
+        return 0.0;
+      }
       if(ambA instanceof FiniteAlphabet) {
         FiniteAlphabet fa = (FiniteAlphabet) ambA;
         double sum = 0.0;

@@ -71,6 +71,24 @@ public interface Queryable {
     public boolean contains(Object item) {
       return false;
     }
+    
+    public int hashCode() {
+      return Collections.EMPTY_SET.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof Queryable) {
+        Queryable that = (Queryable) o;
+        if(that.size() == this.size()) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    public String toString() {
+      return Collections.EMPTY_SET.toString();
+    }
   }
   
   /**
@@ -105,6 +123,27 @@ public interface Queryable {
     
     public boolean contains(Object item) {
       return this.item.equals(item);
+    }
+    
+    public int hashCode() {
+      return item.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof Queryable) {
+        Queryable that = (Queryable) o;
+        if(
+          that.size() == this.size() &&
+          this.item.equals(that.iterator().next())
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    public String toString() {
+      return "{" + item.toString() + "}";
     }
   }
 }

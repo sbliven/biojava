@@ -42,7 +42,8 @@ import org.biojava.bio.dp.*;
  * @since 1.1
  */ 
 public class DPCompiler implements CellCalculatorFactoryMaker {
-  private final boolean debug = false; //true;
+  private final boolean debug = false;
+  //private final boolean debug = true;
   
   private final boolean dumpToDisk;
   
@@ -95,21 +96,30 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
     return nameBuffer.toString();
   }
 
-  public Class generateForardClass(DP dp) {    
+  public Class generateForardClass(DP dp) {
     // forward recursion is:
+    //
     // score[state_i] =
     //   emission * sum_j(prev_score[state_j] * transition[state_j, state_i])
+    //
     // where prev_score is found as score[advance_i[0][advance_i[1]]
     // however, in log space (as we use), this becomes:
+    //
     // score[state_i] =
     //   emission + log( sum_j (
-    //     exp(prev_score[state_j] + transition[state_i, state_j)
+    //     exp(prev_score[state_j] + transition[state_i, state_j])
     //   ))
     //
     // In practice, for sequences of any length, the sum terms are too
     // near to zero for numerical instablilty not to play a huge part. So, we
     // take out a factor of max_j( prev_score[state_j] ) from the sum and add
     // it to the total.
+    //
+    // score[state_i] =
+    //   emission + log( sum_j (
+    //     exp(transition[state_i, state_j] + (prev_score[state_j]- factor) )
+    //   )) + factor
+
 
     try {
       MarkovModel model = dp.getModel();
@@ -994,13 +1004,21 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             ));
           }
           
-          // sum logs of exponents - prime sum with zero
+          LocalVariable maxDB = new LocalVariable(CodeUtils.TYPE_DOUBLE, "max");
+          InstructionVector dbi = new InstructionVector();
+          dbi.add( ByteCode.make_dload (max));
+          dbi.add( ByteCode.make_dstore (maxDB));
+          dbi.add( message("Max " + i + " = ", maxDB));
+          stateV.add( debug(dbi));
+          
+          // log sum of exponents - prime the sum with zero
           stateV.add( ByteCode.make_dconst (0.0));
           
           each_j = trans.iterator();
           while(each_j.hasNext()) {
             State state_j = (State) each_j.next();
             int state_jIndx = stateIndex.indexForSymbol(state_j);
+            
             // score
             stateV.add( ByteCode.make_aload  (j_scores));
             stateV.add( ByteCode.make_iconst (state_jIndx));
@@ -1012,7 +1030,8 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             stateV.add( ByteCode.make_dcmpl());
             
             InstructionVector scoreNotNaN = new InstructionVector();
-            // load max & subtract it from score, then exponentiate
+            // load max & subtract it from score
+            // (j_score - max)
             scoreNotNaN.add( ByteCode.make_dload  (max));
             scoreNotNaN.add( ByteCode.make_dsub   ());
             
@@ -1021,7 +1040,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             scoreNotNaN.add( ByteCode.make_getfield     (transitionFields[state_jIndx]));
             scoreNotNaN.add( ByteCode.make_iconst       (transitionIndexers[state_jIndx].indexForSymbol(state)));
             scoreNotNaN.add( ByteCode.make_daload       ());
-            scoreNotNaN.add( ByteCode.make_dadd());
+            scoreNotNaN.add( ByteCode.make_dadd         ());
             scoreNotNaN.add( ByteCode.make_invokestatic (_Math_exp));
             
             // sum this and current sum
@@ -1209,7 +1228,8 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           int state_jIndx = stateIndex.indexForSymbol(state_j);
           
           // work out advance
-          // only one source. B[i] = trans_j[i] + B[j] + e[j] // only add e[j] if emitting state
+          // only one source. B[i] = trans_j[i] + B[j] + e[j]
+          // only add e[j] if emitting state
           int [] advance = getAdvance(state_j);
           
           stateV.add( ByteCode.make_aload    (method.getThis()));

@@ -92,7 +92,7 @@ public class LightPairDPCursor implements PairDPCursor {
       int depth2, 
       int numStates, 
       EmissionCache eCache
-      ) throws IllegalSymbolException {
+  ) throws IllegalSymbolException {
     this.numStates = numStates;
     //      this.alpha = alpha;
     this.zeroCol = new double[this.numStates];

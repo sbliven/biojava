@@ -80,44 +80,50 @@ implements Symbol, Serializable {
     );
   }
 
-    public String getName() {
-	Alphabet a = getMatches();
-
-	if (this instanceof BasisSymbol) {
-	    List l = ((BasisSymbol) this).getSymbols();
-	    if (l.size() > 1) {
-		StringBuffer sb = new StringBuffer();
-		sb.append('(');
-		for (Iterator si = l.iterator(); si.hasNext(); ) {
-		    Symbol sym = (Symbol) si.next();
-		    sb.append(sym.getName());
-		    if (si.hasNext())
-			sb.append(' ');
-		}
-		sb.append(')');
-		return sb.toString();
-	    }
-	} 
-
-	if (a instanceof FiniteAlphabet) {
-	    FiniteAlphabet fa = (FiniteAlphabet) a;
-	    if (fa.size() <= 1)
-		return null;
-
-	    StringBuffer sb = new StringBuffer();
-	    sb.append('[');
-	    for (Iterator si = fa.iterator();
-		 si.hasNext(); )
-		{
-		    Symbol sym = (Symbol) si.next();
-		    sb.append(sym.getName());
-		    if (si.hasNext())
-			sb.append(' ');
-		}
-	    sb.append(']');
-	    return sb.toString();
-	} else {
-	    return "Infinite";
-	}
+  public String getName() {
+    // basis symbol name is a join of the names of each aymbol it spans
+    if (this instanceof BasisSymbol) {
+      List l = ((BasisSymbol) this).getSymbols();
+      if (l.size() > 1) {
+        StringBuffer sb = new StringBuffer();
+        sb.append('(');
+        Iterator si = l.iterator();
+        if(si.hasNext()) {
+          Symbol sym = (Symbol) si.next();
+          sb.append(sym.getName());
+        }
+        while(si.hasNext()) {
+          Symbol sym = (Symbol) si.next();
+          sb.append(' ');
+          sb.append(sym.getName());
+        }
+        sb.append(')');
+        return sb.toString();
+      }
     }
+    
+    // not a basis symbol - let's name it by they symbols it contains.
+    Alphabet a = getMatches();
+    if (a instanceof FiniteAlphabet) {
+      FiniteAlphabet fa = (FiniteAlphabet) a;
+      
+      StringBuffer sb = new StringBuffer();
+      sb.append('[');
+      Iterator si = fa.iterator();
+      if(si.hasNext()) {
+        Symbol sym = (Symbol) si.next();
+        sb.append(sym.getName());
+      }
+      while(si.hasNext()) {
+        Symbol sym = (Symbol) si.next();
+        sb.append(' ');
+        sb.append(sym.getName());
+      }
+      sb.append(']');
+      return sb.toString();
+    }
+    
+    // an infinite alphabet - pants!
+    return "Infinite";
+  }
 }

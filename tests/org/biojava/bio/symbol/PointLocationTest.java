@@ -64,8 +64,8 @@ public class PointLocationTest extends TestCase
      */
     public void testAreEqual()
     {
-	assert(LocationTools.areEqual(r1, r1));
-	assert(LocationTools.areEqual(r1, new PointLocation(1)));
+	assertTrue(LocationTools.areEqual(r1, r1));
+	assertTrue(LocationTools.areEqual(r1, new PointLocation(1)));
     }
 
     /**
@@ -75,8 +75,8 @@ public class PointLocationTest extends TestCase
      */
     public void testOverlaps()
     {
-	assert(LocationTools.overlaps(r1, r1));
-	assert(! LocationTools.overlaps(r1, r2));
+	assertTrue(LocationTools.overlaps(r1, r1));
+	assertTrue(! LocationTools.overlaps(r1, r2));
     }
 
     /**
@@ -86,11 +86,11 @@ public class PointLocationTest extends TestCase
      */
     public void testContains()
     {
-	assert(LocationTools.contains(r1, new PointLocation(1)));
-	assert(! LocationTools.contains(r1, r2));
+	assertTrue(LocationTools.contains(r1, new PointLocation(1)));
+	assertTrue(! LocationTools.contains(r1, r2));
 
-	assert(r1.contains(1));
-	assert(! r1.contains(2));
+	assertTrue(r1.contains(1));
+	assertTrue(! r1.contains(2));
     }
 
     /**
@@ -124,6 +124,6 @@ public class PointLocationTest extends TestCase
      */
     public void testIsContiguous()
     {
-	assert(r1.isContiguous());
+	assertTrue(r1.isContiguous());
     } 
 }

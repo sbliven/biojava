@@ -22,120 +22,111 @@ public class TestQuery {
     Queryable people = QueryTools.createQueryable(peopleSet, Map.class);
     
     // filter people by age
-    Node startNode = new SimpleNode("startNode", Map.class);
-    Query ageQuery25 = buildAgeQuery(25, startNode);
-    Query ageQuery32 = buildAgeQuery(32, startNode);
-    Query ageQuery45 = buildAgeQuery(45, startNode);
+    Query ageQuery25 = buildAgeQuery(25);
+    Query ageQuery32 = buildAgeQuery(32);
+    Query ageQuery45 = buildAgeQuery(45);
     
-    display("Age is 25", QueryTools.select(ageQuery25, startNode, people));
-    display("Age is 32", QueryTools.select(ageQuery32, startNode, people));
-    display("Age is 45", QueryTools.select(ageQuery45, startNode, people));
+    System.out.println("nodes: " + ageQuery25.getNodes());
+    System.out.println("arcs->ops: " + ageQuery25.getArcsToOperators());
+    
+    display("Age is 25", ageQuery25, people);
+    display("Age is 32", ageQuery32, people);
+    display("Age is 45", ageQuery45, people);
     pause();
     
-    Query carQuery = buildCarQuery(startNode);
+    Query carQuery = buildCarQuery();
     
-    display("Finding cars", QueryTools.select(carQuery, startNode, people));
+    display("Finding cars", carQuery, people);
     pause();
     
-    Query carQuery25 = buildCarByAgeQuery(25, startNode);
-    Query carQuery32 = buildCarByAgeQuery(32, startNode);
-    Query carQuery45 = buildCarByAgeQuery(45, startNode);
+    Query carQuery25 = buildCarByAgeQuery(25);
+    Query carQuery32 = buildCarByAgeQuery(32);
+    Query carQuery45 = buildCarByAgeQuery(45);
     
-    display("Cars where age is 25", QueryTools.select(carQuery25, startNode, people));
-    display("Cars where age is 32", QueryTools.select(carQuery32, startNode, people));
-    display("Cars where age is 45", QueryTools.select(carQuery45, startNode, people));
+    display("Cars where age is 25", carQuery25, people);
+    display("Cars where age is 32", carQuery32, people);
+    display("Cars where age is 45", carQuery45, people);
     pause();
     
-    Query age25or32 = buildAgeQuery(25, 32, startNode);
-    Query age25or42 = buildAgeQuery(25, 42, startNode);
-    Query age32or42 = buildAgeQuery(32, 42, startNode);
+    Query age25or32 = buildAgeQuery(25, 32);
+    Query age25or42 = buildAgeQuery(25, 42);
+    Query age32or42 = buildAgeQuery(32, 42);
     
-    display("Cars where age25 or 32", QueryTools.select(age25or32, startNode, people));
-    display("Cars where age25 or 42", QueryTools.select(age25or42, startNode, people));
-    display("Cars where age32 or 42", QueryTools.select(age32or42, startNode, people));
+    display("Cars where age25 or 32", age25or32, people);
+    display("Cars where age25 or 42", age25or42, people);
+    display("Cars where age32 or 42", age32or42, people);
     pause();
     
-    Query age25CarC1 = buildAgeCarQuery(25, c1, startNode);
-    Query age25CarC2 = buildAgeCarQuery(25, c2, startNode);
+    Query age25CarC1 = buildAgeCarQuery(25, c1);
+    Query age25CarC2 = buildAgeCarQuery(25, c2);
     
-    display("People aged 25 and driving c1", QueryTools.select(age25CarC1, startNode, people));
-    display("People aged 25 and driving c2", QueryTools.select(age25CarC2, startNode, people));
+    display("People aged 25 and driving c1", age25CarC1, people);
+    display("People aged 25 and driving c2", age25CarC2, people);
     pause();
     
-    Query usingC1 = buildPersonByCarQuery(c1, startNode);
-    Query usingC2 = buildPersonByCarQuery(c2, startNode);
+    Query usingC1 = buildPersonByCarQuery(c1);
+    Query usingC2 = buildPersonByCarQuery(c2);
     
-    display("People driving c1", QueryTools.select(usingC1, startNode, people));
-    display("People driving c2", QueryTools.select(usingC2, startNode, people));
+    display("People driving c1", usingC1, people);
+    display("People driving c2", usingC2, people);
     pause();
 
-    Query drivingRed = buildPersonByCarColorQuery(Color.red, startNode);
-    Query drivingGray = buildPersonByCarColorQuery(Color.gray, startNode);
+    Query drivingRed = buildPersonByCarColorQuery(Color.red);
+    Query drivingGray = buildPersonByCarColorQuery(Color.gray);
     
-    display("People driving red", QueryTools.select(drivingRed, startNode, people));
-    display("People driving gray", QueryTools.select(drivingGray, startNode, people));
+    display("People driving red", drivingRed, people);
+    display("People driving gray", drivingGray, people);
     pause();
-    
-    Query original = optimizableQuery();
-    Query optimized = QueryTools.optimize(original);
-    display("Original query", original);
-    display("Optimized query", optimized);
-    pause();
-    
   }
   
-  public static void display(String message, Queryable items) {
+  public static void display(String message, Query query, Queryable items)
+  throws OperationException {
+    Node startNode
+      = (Node) QueryTools.findNodeByLabel(query, "start").iterator().next();
+    Node endNode
+      = (Node) QueryTools.findNodeByLabel(query, "end").iterator().next();
     System.out.println(message);
-    System.out.println(items);
-    for(Iterator i = items.iterator(); i.hasNext(); ) {
+    Queryable result = QueryTools.select(query, startNode, endNode, items);
+    for(Iterator i = result.iterator(); i.hasNext(); ) {
       Object o = i.next();
       System.out.println("\t" + o);
     }
   }
   
-  public static void display(String message, Query query) {
-    System.out.println(message);
-    System.out.println("Nodes: " + query.getNodes().size());
-    for(Iterator ni = query.getNodes().iterator(); ni.hasNext(); ) {
-      Node n = (Node) ni.next();
-      for(Iterator ai = query.getArcsFrom(n).iterator(); ai.hasNext(); ) {
-        Arc a = (Arc) ai.next();
-        System.out.println("\t" + a);
-        for(Iterator oi = query.getOperations(a).iterator(); oi.hasNext(); ) {
-          System.out.println("\t\t-> " + oi.next());
-        }
-      }
-    }
-  }
-  
-  public static Query buildAgeQuery(int age, Node startNode) {
+  public static Query buildAgeQuery(int age)
+  throws OperationException {
     QueryBuilder qb = new QueryBuilder();
-    Node selectNode = new SimpleResultNode("selectNode", Map.class);
+    Node startNode = new SimpleNode("start", Map.class);
+    Node endNode = new SimpleNode("end", Map.class);
 
     qb.addArc(
-      new Arc(startNode, selectNode),
+      new Arc(startNode, endNode),
       new MapValueFilter("age", new Integer(age))
     );
     
     return qb.buildQuery();
   }
   
-  public static Query buildCarQuery(Node startNode) {
+  public static Query buildCarQuery()
+  throws OperationException {
     QueryBuilder qb = new QueryBuilder();
-    Node selectNode = new SimpleResultNode("selectNode", Map.class);
+    Node startNode = new SimpleNode("start", Map.class);
+    Node endNode = new SimpleNode("end", Map.class);
 
     qb.addArc(
-      new Arc(startNode, selectNode),
+      new Arc(startNode, endNode),
       new MapFollower("car", Map.class)
     );
     
     return qb.buildQuery();
   }
   
-  public static Query buildCarByAgeQuery(int age, Node startNode) {
+  public static Query buildCarByAgeQuery(int age)
+  throws OperationException {
     QueryBuilder qb = new QueryBuilder();
     
-    Node selectNode = new SimpleResultNode("selectNode", Map.class);
+    Node startNode = new SimpleNode("start", Map.class);
+    Node endNode = new SimpleNode("end", Map.class);
     Node ageSelected = new SimpleNode("ageSelected", Map.class);
 
     qb.addArc(
@@ -143,18 +134,20 @@ public class TestQuery {
       new MapValueFilter("age", new Integer(age))
     );
     qb.addArc(
-      new Arc(ageSelected, selectNode),
+      new Arc(ageSelected, endNode),
       new MapFollower("car", Map.class)
     );
     
     return qb.buildQuery();
   }
   
-  public static Query buildAgeQuery(int age1, int age2, Node startNode) {
+  public static Query buildAgeQuery(int age1, int age2)
+  throws OperationException {
     QueryBuilder qb = new QueryBuilder();
     
-    Node selectNode = new SimpleResultNode("selectNode", Map.class);
-    Arc startSelect = new Arc(startNode, selectNode);
+    Node startNode = new SimpleNode("start", Map.class);
+    Node endNode = new SimpleNode("end", Map.class);
+    Arc startSelect = new Arc(startNode, endNode);
 
     qb.addArc(startSelect, new MapValueFilter("age", new Integer(age1)));
     qb.addArc(startSelect, new MapValueFilter("age", new Integer(age2)));
@@ -162,89 +155,70 @@ public class TestQuery {
     return qb.buildQuery();
   }
   
-  public static Query buildAgeCarQuery(int age, Map car, Node startNode) {
+  public static Query buildAgeCarQuery(int age, Map car)
+  throws OperationException {
     QueryBuilder qb = new QueryBuilder();
     
+    Node startNode = new SimpleNode("start", Map.class);
     Node aged = new SimpleNode("aged", Map.class);
-    Node selectNode = new SimpleResultNode("selectNode", Map.class);
+    Node endNode = new SimpleNode("end", Map.class);
     
     qb.addArc(
       new Arc(startNode, aged),
       new MapValueFilter("age", new Integer(age))
     );
     qb.addArc(
-      new Arc(aged, selectNode),
+      new Arc(aged, endNode),
       new MapValueFilter("car", car)
     );
     
     return qb.buildQuery();
   }
   
-  public static Query buildPersonByCarQuery(Map car, Node startNode) {
-    Node selectNode = new SimpleResultNode("selectNode", Map.class);
+  public static Query buildPersonByCarQuery(Map car)
+  throws OperationException {
+    Node startNode = new SimpleNode("start", Map.class);
+    Node endNode = new SimpleNode("end", Map.class);
     
     // select cars,  and count them
     QueryBuilder qb1 = new QueryBuilder();
     Node cars = new SimpleNode("cars", Map.class);
-    Node ourCar = new SimpleResultNode("ourCar", Map.class);
+    Node ourCar = new SimpleNode("ourCar", Map.class);
     qb1.addArc(new Arc(startNode, cars), new MapFollower("car", Map.class));
     qb1.addArc(new Arc(cars, ourCar), new Filter.Equals(car, Map.class));
     Query carQuery = qb1.buildQuery();
     
     Filter sizeFilter = new FilterByQuery(
-      carQuery, startNode, Filter.CompareInteger.EQ, 1
+      carQuery, startNode, ourCar,
+      Filter.CompareInteger.EQ, 1
     );
     
     QueryBuilder qb2 = new QueryBuilder();
-    qb2.addArc(new Arc(startNode, selectNode), sizeFilter);
+    qb2.addArc(new Arc(startNode, endNode), sizeFilter);
     
     return qb2.buildQuery();
   }
   
-  public static Query optimizableQuery() {
-    Node[] nodes = new Node[10];
-    double follow = 0.4;
-    double filter = 0.2;
-    
-    QueryBuilder qb = new QueryBuilder();
-    
-    for(int i = 0; i < nodes.length; i++ ) {
-      nodes[i] = new SimpleNode("node " + i, Object.class);
-    }
-    
-    for(int i = 0; i < nodes.length; i++) {
-      for(int j = 0; j < nodes.length; j++) {
-        double p = Math.random();
-        if(p <= follow) {
-          if(p <= filter) {
-            qb.addArc(new Arc(nodes[i], nodes[j]), new Filter.AcceptAll(Object.class));
-          } else {
-            qb.addArc(new Arc(nodes[i], nodes[j]), new Operation.Count(Object.class));
-          }
-        }
-      }
-    }
-    
-    return qb.buildQuery();
-  }
-  
-  public static Query buildPersonByCarColorQuery(Color color, Node startNode) {
-    Node selectNode = new SimpleResultNode("selectNode", Map.class);
+  public static Query buildPersonByCarColorQuery(Color color)
+  throws OperationException {
+    Node startNode = new SimpleNode("start", Map.class);
+    Node endNode = new SimpleNode("end", Map.class);
     
     // select cars,  and count them
     QueryBuilder qb1 = new QueryBuilder();
     Node cars = new SimpleNode("cars", Map.class);
-    Node ourCar = new SimpleResultNode("ourCar", Map.class);
+    Node ourCar = new SimpleNode("ourCar", Map.class);
     qb1.addArc(new Arc(startNode, cars), new MapFollower("car", Map.class));
     qb1.addArc(new Arc(cars, ourCar), new MapValueFilter("color", color));
     Query carQuery = qb1.buildQuery();
     
     Filter sizeFilter = new FilterByQuery(
-      carQuery, startNode, Filter.CompareInteger.EQ, 1
+      carQuery, startNode, ourCar,
+      Filter.CompareInteger.EQ, 1
     );
     
     QueryBuilder qb2 = new QueryBuilder();
-    qb2.addArc(new Arc(startNode, selectNode), sizeFilter);
+    qb2.addArc(new Arc(startNode, endNode), sizeFilter);
     
     return qb2.buildQuery();
   }

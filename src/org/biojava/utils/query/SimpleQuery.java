@@ -8,7 +8,7 @@ import java.util.*;
  * @author Matthew Pocock
  * @version 1.2
  */
-public class SimpleQuery implements Query {
+class SimpleQuery implements Query {
   private final Set nodes;
   private final Map operationsToLabel;
   private final Map arcsFrom;
@@ -34,7 +34,11 @@ public class SimpleQuery implements Query {
   public Set getOperations(Arc arc) {
     Set ops = (Set) operationsToLabel.get(arc);
     if(ops == null) {
-      ops = Collections.EMPTY_SET;
+      if(nodes.contains(arc.from) && nodes.contains(arc.to)) {
+        ops = Collections.EMPTY_SET;
+      } else {
+        throw new NullPointerException("Can't find data for arc: " + arc);
+      }
     }
     return ops;
   }
@@ -65,5 +69,20 @@ public class SimpleQuery implements Query {
       map.put(key, result = new HashSet());
     }
     return result;
+  }
+  
+  public int hashCode() {
+    return nodes.hashCode();
+  }
+  
+  public boolean equals(Object o) {
+    if(o instanceof Query) {
+      Query that = (Query) o;
+      return
+        that.getNodes() == this.getNodes() &&
+        that.getArcsToOperators() == this.getArcsToOperators();
+    } else {
+      return false;
+    }
   }
 }

@@ -9,4 +9,5 @@ package org.biojava.utils.query;
 public interface Node {
   public Class getInputClass();
   public Class getOutputClass();
+  public String getLabel();
 }

@@ -43,6 +43,7 @@ public class EmissionCache {
   private final State[] states;
   private final int dsi;
   private final ScoreType scoreType;
+  private final Symbol[] gap;
   
   public EmissionCache(
     Alphabet alpha,
@@ -56,6 +57,12 @@ public class EmissionCache {
     this.states = states;
     this.dsi = dsi;
     this.scoreType = scoreType;
+    
+    List alphas = alpha.getAlphabets();
+    this.gap = new Symbol[alphas.size()];
+    for(int i = 0; i < this.gap.length; i++) {
+      this.gap[i] = ((Alphabet) alphas.get(i)).getGapSymbol();
+    }
   }
   
   public final double [] getEmissions(List symList)
@@ -63,20 +70,20 @@ public class EmissionCache {
     gopher.setList(symList);
     double [] emission = (double []) eMap.get(gopher);
     if(emission == null) {
-      //System.out.print(".");
+      //System.out.println(".");
       Symbol sym[][] = new Symbol[2][2];
       List ll = new ArrayList(symList);
-      Symbol gap = sym[0][0] = AlphabetManager.getGapSymbol();
+      sym[0][0] = AlphabetManager.getGapSymbol();
       sym[1][1] = alpha.getSymbol(Arrays.asList(new Symbol [] {
         (Symbol) symList.get(0),
         (Symbol) symList.get(1)
       }));
       sym[1][0] = alpha.getSymbol(Arrays.asList(new Symbol [] {
         (Symbol) symList.get(0),
-        gap
+        gap[1]
       }));
       sym[0][1] = alpha.getSymbol(Arrays.asList(new Symbol [] {
-        gap,
+        gap[0],
         (Symbol) symList.get(1)
       }));
       emission = new double[dsi];
