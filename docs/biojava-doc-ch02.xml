@@ -2,10 +2,11 @@
                       "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
 ]-->
 
-<chapter id="bd-ch02">
-  <title>Symbols and SymbolLists</title>
-
-  <abstract id="bd-ch02-abstract">
+<chapter id="bd-symbols">
+  <title><classname>Symbol</classname>s and
+  <classname>SymbolList</classname>s</title>
+    
+  <abstract id="bd-symbols-abstract">
     <para>This chapter covers the fundamentals of accessing biological
     sequence data from BioJava, and explains how BioJava's treatment
     of sequences differs from other libraries. This chapter refers to
@@ -17,8 +18,9 @@
     documentation</ulink>.</para>
   </abstract>
 
-  <sect1 id="bd-ch02-sym">
-    <title>Symbols and Alphabets</title>
+  <sect1 id="bd-symbols-sym">
+    <title><classname>Symbol</classname>s and
+    <classname>Alphabet</classname>s</title>
 
     <para>When biological sequence data first became available, it was
     necessary to find a convenient way to communicate it. A logical
@@ -107,8 +109,8 @@ while (dnaSymbols.hasNext()) {
 </programlisting>
   </sect1>
 
-  <sect1 id="bd-ch02-simple">
-    <title><classname>SymbolList<classname>: the simple
+  <sect1 id="bd-symbols-simple">
+    <title><classname>SymbolList</classname>: the simple
     sequence</title>
 
     <para>The basic interface for sequence data in biojava is
@@ -153,7 +155,7 @@ System.out.println("First symbol = " + seq.symbolAt(1).getName());
     <classname>MutableSymbolList</classname> interface.</para>
     </sect1>
 
-  <sect1 id="bd-ch02-memory">
+  <sect1 id="bd-symbols-memory">
     <title>Doesn't this all waste memory?</title>
 
     <para>A common concern with BioJava's
@@ -168,7 +170,7 @@ System.out.println("First symbol = " + seq.symbolAt(1).getName());
     class. Whenever a thymidine residue is stored in a sequence, all
     that is really stored is a reference to the single thymidine
     object (Flyweight design pattern <xref
-    linkend="bd-biblio-GoF98" />). Typically, this takes up four
+    linkend="bd-biblio-GoF98"/>). Typically, this takes up four
     bytes of memory: more than the two bytes used by a Java char, but
     still manageable.</para>
 
@@ -218,7 +220,7 @@ System.out.println("Complement: " + backward.symbolAt(backward.length()).
     string representation of a typical genome sequence.</para>
   </sect1>
 
-  <sect1 id="bd-ch02-seqdata">
+  <sect1 id="bd-symbols-seqdata">
     <title>How do I access my sequence data?</title>
 
     <para>Each <classname>Alphabet</classname> object can have one or
@@ -254,7 +256,7 @@ System.out.println("Strings match: " + seqString2.equalsIgnoreCase(seqString));
     packages are required to BioCorba and Ensembl support).</para>
   </sect1>
 
-    <sect1 id="bd-ch02-interface">
+    <sect1 id="bd-symbols-interface">
       <title>What about the <classname>Sequence</classname>
       interface?</title>
 
@@ -277,7 +279,7 @@ System.out.println("Strings match: " + seqString2.equalsIgnoreCase(seqString));
     program.</para>
   </sect1>
 
-  <sect1 id="bd-ch02-example">
+  <sect1 id="bd-symbols-example">
     <title>A simple example</title>
 
     <para>The following program is a very simple example, which reads
@@ -327,7 +329,7 @@ public class GCContent {
 </programlisting>
   </sect1>
 
-  <sect1 id="bd-ch02-ambiguous">
+  <sect1 id="bd-symbols-ambiguous">
     <title>Ambiguous symbols</title>
 
     <para>Sometimes it is useful to represent sequences which are not

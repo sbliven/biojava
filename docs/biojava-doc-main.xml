@@ -7,6 +7,9 @@
     <!ENTITY chapter04 SYSTEM "biojava-doc-ch04.xml">
     <!ENTITY chapter05 SYSTEM "biojava-doc-ch05.xml">
     <!ENTITY chapter06 SYSTEM "biojava-doc-ch06.xml">
+    <!ENTITY chapter07 SYSTEM "biojava-doc-ch07.xml">
+    <!ENTITY chapter08 SYSTEM "biojava-doc-ch08.xml">
+    <!ENTITY chapter09 SYSTEM "biojava-doc-ch09.xml">
 ]>
 
 <!--
@@ -73,7 +76,7 @@
   </bookinfo>
 
   <!-- This demonstrates the id convention for a preface -->
-  <preface id="bd-pre01">
+  <preface id="bd-pre-forward">
     <title>Foreward</title>
 
     <para>The <ulink url="http://biojava.org">BioJava Project</ulink>
@@ -90,7 +93,7 @@
     the API documentation.</para>
   </preface>
 
-  <preface id="bd-pre02">
+  <preface id="bd-pre-intro">
     <title>Introduction to the documentation</title>
 
     <para>The documentation uses an SGML/XML-based authoring format
@@ -98,7 +101,7 @@
     which allows different types of output, including HTML and
     printable formats, to be generated from a single source without
     compromising quality or portability across computing platforms. To
-    find out more about DocBook see <xref linkend="bd-apdx03"/>.</para>
+    find out more about DocBook see <xref linkend="bd-apdx-docbook"/>.</para>
 
     <para>The following authors/groups have contributed to this
     document:</para>
@@ -110,13 +113,13 @@
 
         <itemizedlist>
           <listitem>
-            <para>Chapter 2: Symbols and SymbolLists</para>
+            <para><xref linkend="bd-symbols"/></para>
           </listitem>
           <listitem>
-            <para>Chapter 3: Sequences and Features</para>
+            <para><xref linkend="bd-seqfeat"/></para>
           </listitem>
           <listitem>
-            <para>Chapter 4: Sequence IO</para>
+            <para><xref linkend="bd-seqio"/></para>
           </listitem>
         </itemizedlist>
       </listitem>
@@ -136,7 +139,10 @@
 
         <itemizedlist>
           <listitem>
-            <para>Chapter 6: Representing Search Results</para>
+            <para><xref linkend="bd-search"/></para>
+          </listitem>
+          <listitem>
+            <para><xref linkend="bd-motifs"/></para>
           </listitem>
         </itemizedlist>
       </listitem>
@@ -146,7 +152,7 @@
 
         <itemizedlist>
           <listitem>
-            <para>Chapter 5: Changeability, Mutability and Events</para>
+            <para><xref linkend="bd-change"/></para>
           </listitem>
         </itemizedlist>
       </listitem>
@@ -190,8 +196,14 @@
 
   &chapter06;
 
+  &chapter07;
+
+  &chapter08;
+
+  &chapter09;
+
   <!-- This demonstrates the id convention for appendices -->
-  <appendix label="A" id="bd-apdx01">
+  <appendix label="A" id="bd-apdx-javadoc">
     <title>BioJava API JavaDoc</title>
 
     <itemizedlist>
@@ -210,7 +222,7 @@
     </itemizedlist>
   </appendix>
 
-  <appendix label="B" id="bd-apdx02">
+  <appendix label="B" id="bd-apdx-style">
     <title>Style guide</title>
 
     <itemizedlist>
@@ -261,10 +273,10 @@
     </itemizedlist>
   </appendix>
 
-  <appendix label="C" id="bd-apdx03" xreflabel="Appendix C: Using DocBook">
+  <appendix label="C" id="bd-apdx-docbook" xreflabel="Appendix C: Using DocBook">
     <title>Using DocBook</title>
 
-    <sect1 id="bd-apdx03-whatis">
+    <sect1 id="bd-apdx-docbook-whatis">
       <title>What is DocBook</title>
 
       <para>DocBook is a document authoring system which allows the
@@ -280,7 +292,7 @@
       acceptable structure is available for each these forms.</para>
     </sect1>
 
-    <sect1 id="bd-apdx03-why">
+    <sect1 id="bd-apdx-docbook-why">
       <title>Why use DocBook?</title>
 
       <para>The advantage of this approach over an "all-in-one"
@@ -297,7 +309,7 @@
       able to operate on XML DocBook documents.</para>
     </sect1>
 
-    <sect1 id="bd-apdx03-biojava">
+    <sect1 id="bd-apdx-docbook-biojava">
       <title>DocBook and the BioJava Documentation</title>
 
       <para>If all you need to do is refer to the documentation then
@@ -310,17 +322,53 @@
       DocBook SGML 4.1 and the DocBook XML 4.2 DTD. Currently the
       document is being validated against the XML DTD and should build
       out of the box if you have the DocBook XML DTD, stylesheets and
-      an XSLT processor installed.</para>
+      an XSLT processor installed. You will need to do the
+      following:</para>
+
+      <procedure>
+        <step>
+          <para>Check that you have Jakarta Ant version 1.5 or greater
+          installed.</para>
+        </step>
+        <step>
+          <para>Edit the DOCTYPE of the file
+          <filename>doc/biojava-doc-main.xml</filename> to point to
+          your installation of the DocBook XML DTD. The file to
+          reference is <filename>docbookx.dtd</filename>.</para>
+        </step>
+        <step>
+          <para>Edit <filename>build.xml</filename> to point to the
+          same DTD and to the your installation of the DocBook XSL
+          stylesheets. The file to reference is
+          <filename>xhtml/chunk.xsl</filename>.</para>
+        </step>
+        <step>
+          <para>Type <userinput>ant docbook</userinput></para>
+        </step>
+      </procedure>
+
+      <para>DocBook support is currently not perfect, but given the
+      importance of documentation we now include an option to build it
+      from the XML source in the default Ant build file. There are
+      known problems with using certain versions of the DocBook XSL
+      stylesheets in combination with certain XSLT processors. In
+      particular, the version of Xalan shipped with JDK 1.4 is known
+      to be incompatible with DocBook XSL stylesheet versions higher
+      than 1.44. (The latest version at the time of writing is
+      1.57.0) This appears to due to the stylesheet exposing bugs in
+      Xalan. We currently recommend using version 1.44 but will
+      continue to evaluate new stylesheet releases and revise this
+      advice when appropriate.</para>
     </sect1>
 
-    <sect1 id="bd-apdx03-resources">
+    <sect1 id="bd-apdx-docbook-resources">
       <title>DocBook resources</title>
 
       <para>There are many useful DocBook resources available,
       including software, examples and tutorials, some of which are
       listed here.</para>
 
-      <sect2 id="bd-apdx03-resources-sware">
+      <sect2 id="bd-apdx-docbook-sware">
         <title>Software</title>
 
         <itemizedlist>
@@ -343,7 +391,7 @@
       </itemizedlist>
       </sect2>
 
-      <sect2 id="bd-apdx03-resources-doc">
+      <sect2 id="bd-apdx-docbook-doc">
         <title>Documentation</title>
 
         <itemizedlist>
@@ -367,6 +415,33 @@
 
   <bibliography id="bd-biblio">
     <title>Bibliography</title>
+
+    <bibliodiv>
+      <title>Journal articles</title>
+
+      <biblioentry id="bd-biblio-KMP77">
+        <abbrev>KMP77</abbrev>
+        <authorgroup>
+          <author>
+            <firstname>D. E.</firstname>
+            <surname>Knuth</surname>
+          </author>
+          <author>
+            <firstname>J. H.</firstname>
+            <surname>Morris (Jr)</surname>
+          </author>
+          <author>
+            <firstname>V. R.</firstname>
+            <surname>Pratt</surname>
+          </author>
+        </authorgroup>
+        <title> SIAM Journal on Computing</title>
+        <issuenum>6</issuenum>
+        <volumenum>1</volumenum>
+        <pagenums>323-350</pagenums>
+        <date>1977</date>
+      </biblioentry>
+    </bibliodiv>
 
     <bibliodiv id="bd-biblio-book">
       <title>Books</title>

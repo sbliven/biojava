@@ -1,0 +1,21 @@
+<!--DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                      "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
+]-->
+
+<chapter id="bd-annotation">
+  <title><classname>Annotation</classname>: Maintaining and
+  Constraining Biodata</title>
+
+  <abstract id="bd-annotation-abstract">
+    <para>This chapter examines the BioJava
+    <classname>Annotation</classname> API which provides structured
+    storage for complex biological data. The Java API referred to in
+    this chapter is located in the package
+    <classname>org.biojava.bio</classname>. However, as so many
+    classes implement the <classname>Annotatable</classname>
+    interface, it is applicable throughout. For a complete overview of
+    the APIs provided by these packages, please consult the <ulink
+    url="api/index.html">JavaDoc documentation</ulink>.</para>
+  </abstract>
+
+  </chapter>

@@ -2,10 +2,10 @@
                       "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
 ]-->
 
-<chapter id="bd-ch06">
+<chapter id="bd-search">
   <title>Representing Search Results</title>
 
-  <abstract id="bd-ch06-abstract">
+  <abstract id="bd-search-abstract">
     <para>This chapter covers BioJava's support for processing the
     output from common sequence similarity search programs such as
     Blast and Fasta. The Java API referred to in this chapter is
@@ -19,7 +19,7 @@
     documentation</ulink>.</para>
   </abstract>
 
-  <sect1 id="bd-ch06-represent">
+  <sect1 id="bd-search-represent">
     <title>A tour of search results</title>
 
     <para>Sequence similarity search programs are amongst the most
@@ -33,14 +33,13 @@
     framework. This produces SAX2 events conforming to a common DTD
     for NCBI Blast, Wu Blast, Fasta and HMMER.</para>
 
-    <para>The Java package
-    <classname>org.biojava.bio.search</classname> contains interfaces
-    and classes purely for representing sequence similarity search
-    results, regardless of the program that supplied the original
-    data. When a query sequence is searched against a database of
-    other sequences, the entire set of database hits is known as a
-    "result". These are represented by the interface <classname>
-    SeqSimilaritySearchResult</classname>:</para>
+    <para>The package <classname>org.biojava.bio.search</classname>
+    contains interfaces and classes purely for representing sequence
+    similarity search results, regardless of the program that supplied
+    the original data. When a query sequence is searched against a
+    database of other sequences, the entire set of database hits is
+    known as a "result". These are represented by the interface
+    <classname> SeqSimilaritySearchResult</classname>:</para>
 
 <programlisting>
 public interface SeqSimilaritySearchResult {
@@ -126,7 +125,7 @@ public interface SeqSimilaritySearchSubHit {
     conforming to the BioJava BlastLikeDataSetCollection DTD.</para>
   </sect1>
 
-  <sect1 id="bd-ch06-blastlike">
+  <sect1 id="bd-search-blastlike">
     <title>The Blast-like parsing framework</title>
 
     <para>The Blast-like parsing framework is a system which parses
@@ -145,7 +144,7 @@ public interface SeqSimilaritySearchSubHit {
     also the <classname>org.biojava.utils.stax</classname> package for
     writing modular XML handlers of your own.</para>
 
-    <sect2 id="bd-ch06-fromblast">
+    <sect2 id="bd-search-fromblast">
       <title>Creating objects from Blast output</title>
 
       <para>This example assumes that you have some Blast search
@@ -212,7 +211,7 @@ for (Iterator ri = searchResults.iterator(); ri.hasNext();) {
       you.</para>
     </sect2>
 
-    <sect2 id="bd-ch06-fromfasta">
+    <sect2 id="bd-search-fromfasta">
       <title>Creating objects from Fasta output</title>
 
       <para>The procedure for creating
@@ -274,7 +273,7 @@ builder.setSubjectDBInstallation(dbs);
       </sect2>
   </sect1>
 
-  <sect1 id="bd-ch06-blastnative">
+  <sect1 id="bd-search-blastnative">
     <title>Handling native Blast XML</title>
 
     <para>NCBI Blast now produces result data its own XML

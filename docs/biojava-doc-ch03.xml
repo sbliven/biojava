@@ -2,12 +2,12 @@
                       "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
 ]-->
 
-<chapter id="bd-ch03">
+<chapter id="bd-seqfeat">
     <title><classname>Sequence</classname>s and
     <classname>Feature</classname>s</title>
 
-  <abstract id="bd-ch03-abstract">
-    <para><xref linkend="bd-ch02"/> covered the
+  <abstract id="bd-seqfeat-abstract">
+    <para><xref linkend="bd-symbols"/> covered the
     <classname>SymbolList</classname> interface, BioJava's basic
     representation of biological sequence data. This chapter examines
     the <classname>Sequence</classname> interface. This adds extra
@@ -20,7 +20,7 @@
     url="javadoc/index.html">JavaDoc documentation</ulink>.</para>
   </abstract>
 
-  <sect1 id="bd-ch03-tour">
+  <sect1 id="bd-seqfeat-tour">
     <title>A tour of a <classname>Sequence</classname></title>
 
     <para><classname>Sequence</classname> is a sub-interface of
@@ -81,7 +81,7 @@
     properties will emerge.</para>
   </sect1>
 
-  <sect1 id="bd-ch03-annotation">
+  <sect1 id="bd-seqfeat-annotation">
     <title>Other annotations</title>
 
     <para>In addition to the two 'identifier' properties of the
@@ -116,7 +116,7 @@ for (Iterator i = seqAn.keys().iterator(); i.hasNext(); ) {
     introduced as BioJava develops.</para>
   </sect1>
 
-  <sect1 id="bd-ch03-features">
+  <sect1 id="bd-seqfeat-features">
     <title><classname>Feature</classname>s and
     <classname>FeatureHolder</classname>s</title>
 
@@ -206,7 +206,7 @@ public void printFeatures(FeatureHolder fh,
     <classname>FeatureHolder</classname>.</para>
   </sect1>
 
-  <sect1 id="bd-ch03-newfeatures">
+  <sect1 id="bd-seqfeat-newfeatures">
     <title>Creating new features</title>
 
     <para>It is expected that there will never be any publicly visible
@@ -223,7 +223,8 @@ public void printFeatures(FeatureHolder fh,
     mechanisms, may wish to use their own special implementations of
     the <classname>Feature</classname> interface.</para>
 
-    <para>The createFeature method has the following signature:</para>
+    <para>The <methodname>createFeature</methodname> method has the
+    following signature:</para>
 <programlisting>
 public Feature createFeature(Feature.Template template);
 </programlisting>

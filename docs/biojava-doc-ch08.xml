@@ -1,0 +1,213 @@
+<!--DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                      "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
+]-->
+
+<chapter id="bd-change">
+  <title>Changeability, Mutability and Events</title>
+
+  <abstract>
+    <para>BioJava contains a powerful API for communicating when
+    objects wish to change their state, and potentially preventing
+    them from changing if it would invalidate the state of another
+    object, all without violating the principals of encapsulation. The
+    main classes are in the <classname>org.biojava.utils</classname>
+    package and include <classname>Changeable</classname>,
+    <classname>ChangeEvent</classname>,
+    <classname>ChangeListener</classname>,
+    <classname>ChangeType</classname> and
+    <classname>ChangeVetoException</classname>. For full descriptions
+    of all the API used here, please consult the <ulink
+    url="javadoc/index.html">JavaDoc documentation</ulink>.</para>
+  </abstract>
+
+  <sect1 id="bd-change-changeability">
+    <title>What is the difference between Changeability and Mutability?</title>
+
+    <para>Many Java objects are mutable. That is, you can invoke
+    methods that change their state. The
+    <classname>Collections</classname> API supplies mutable
+    implementations of the <classname>List</classname>
+    interface. There is also a method
+    <methodname>Collections.immutableList(List l)</methodname> that
+    returns a view of the underlying list where the mutators throw
+    exceptions. Through this view object there is no way to edit the
+    list. However, if the underlying list is modified then the
+    'immutable' view will reflect this. That is, although it is
+    immutable, it is still changeable.</para>
+
+    <para>Things get even more complicated in the world of
+    bioinformatics. Many instances need to be mutable with respect to
+    some clients and immutable for others. Also, some processes rely
+    on objects remaining constant throughout. You can't perform a
+    database search reliably if the database is being
+    modified. However, once the search is complete there is no reason
+    not to change the database. This transient immutability can't be
+    modeled using the design pattern used for the
+    <classname>Collection</classname>s. The situation above is
+    complicated even further because while a search is going on, every
+    single sequence must be maintained in an uneditable
+    state. However, a search object realy doesn't want to go through
+    the process of modifying every single sequence object. This would
+    be very inefficient. Something more flexible is needed, and the
+    Changeability API is it.</para>
+  </sect1>
+
+  <sect1 id="bd-change-changeevent">
+    <title>What is a <classname>ChangeEvent</classname>?</title>
+
+    <para><classname>ChangeEvent</classname> extends
+    <classname>java.util.EventObject</classname> and adds the
+    methods:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><methodname>getChange</methodname> - the new
+        value</para>
+      </listitem>
+      <listitem>
+        <para><methodname>getPrevious</methodname> - the old
+        value</para>
+      </listitem>
+      <listitem>
+        <para><methodname>getType</methodname> - the 'type' of
+        event</para>
+      </listitem>
+      <listitem>
+        <para><methodname>getChained</methodname> - an event that
+        caused this event to be fired</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>In constrast to the classical Java events model, one event
+    class is shared among all types of BioJava events. The 'type' of
+    the event is signaled by the value of the type
+    property. <classname>ChangeType</classname> is a final class. Each
+    interface that will fire <classname>ChangeEvent</classname>s will
+    have public static final <classname>ChangeType</classname> fields
+    with descriptive names. <classname>ChangeEvent</classname> objects
+    store a descriptive name but are always compared with the ==
+    operator. This scheme is a type-safe extension of the Swing
+    <classname>PropertyChangeEvent</classname> system, but BioJava
+    interfaces explicitly publish what types of event they may
+    fire.</para>
+  </sect1>
+
+  <sect1 id="bd-change-changelistener">
+    <title><classname>ChangeListener</classname>: The contract for
+    handling events</title>
+
+    <para>Objects that wish to be informed of
+    <classname>ChangeEvent</classname>s must implement the
+    <classname>ChangeListener</classname> interface. This has just two
+    methods:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><methodname>preChange(ChangeEvent
+        ce)</methodname></para>
+      </listitem>
+      <listitem>
+        <para><methodname>postChange(ChangeEvent
+        ce)</methodname></para>
+      </listitem>
+    </itemizedlist>
+
+    <para>An object will invoke preChange to inform listeners that it
+    wishes to alter its state. A <classname>ChangeListener</classname>
+    may fire a <classname>ChangeVetoException</classname> to prevent
+    this change from taking place. The event source must respect
+    this. Once the event source has finished updating its state, it
+    will invoke the <methodname>postChangeEvent</methodname> method
+    with an equivalent <classname>ChangeEvent</classname> (one with
+    the same values for its properties). The postChange method should
+    then take appropriate action to update the state of the listening
+    object.</para>
+
+    <para>There are two <classname>ChangeListener</classname>
+    implementations supplied by
+    default. <classname>ChangeListener.ALWAYS_VETO</classname> always
+    throws a <classname>ChangeException</classname> in preChange. This
+    object is useful if you wish to unconditionaly lock an object's
+    property. In the exceptional circumstance when
+    <classname>ChangeListener.ALWAYS_VETO</classname> is registered
+    and a postChange is reached, it throws a
+    <classname>NestedError</classname> with an assertion failure
+    message. This should only be able to happen if the event source is
+    incorrectly implemented.</para>
+
+    <para><classname>ChangeException.LOG_TO_OUT</classname> prints all
+    changes out to <classname>System.out</classname>. If you want to
+    log to a different stream, construct a new instance of
+    <classname>ChangeListener.LoggingListener</classname> with the
+    stream.</para>
+  </sect1>
+
+  <sect1 id="bd-change-changesupport">
+    <title>Using <classname>ChangeSupport</classname> to implement
+    <classname>Changeable</classname></title>
+
+    <para>To flag that an object is a source of
+    <classname>ChangeEvent</classname>s, it should implement
+    <classname>Changeable</classname>. This interface has the
+    following methods:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><methodname>addChangeListener(ChangeListener
+        cl)</methodname></para>
+      </listitem>
+      <listitem>
+        <para><methodname>addChangeListener(ChangeListener cl,
+        ChangeType ct)</methodname></para>
+      </listitem>
+      <listitem>
+        <para><methodname>removeChangeListener(ChangeListener
+        cl)</methodname></para>
+      </listitem>
+      <listitem>
+        <para><methodname>removeChangeListener(ChangeListener cl,
+        ChangeType ct)</methodname></para>
+      </listitem>
+    </itemizedlist>
+
+    <para>The methods with <classname>ChangeType</classname> arguments
+    register the listener for that type of event only. The methods
+    without register the listener for all events. Wherever possible,
+    the type of event should be specified. This potentially allows for
+    lazy instantiation of various resources and will result in fewer
+    events actualy being fired.</para>
+
+    <para><classname>ChangeSupport</classname> is a utility class that
+    handles 99% of the cases where you wish to implement the
+    <classname>Changeable</classname> interface. Ideally, you should
+    instantiate one of these objects and then delegate the listener
+    methods to this. In addition to the methods in
+    <classname>Changeable</classname>,
+    <classname>ChangeSupport</classname> supplies the methods:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><methodname>firePreChangeEvent(ChangeEvent
+        ce)</methodname></para>
+      </listitem>
+      <listitem>
+        <para><methodname>firePostChangeEvent(ChangeEvent
+        ce)</methodname></para>
+      </listitem>
+    </itemizedlist>
+
+    <para>These methods invoke the preChange and postChange methods of
+    the appropriate
+    listeners. <methodname>firePreChangeEvent</methodname> will pass
+    on any <classname>ChangeVetoException</classname>s that the
+    listeners throw.</para>
+
+    <para><classname>AbstractChangeable</classname> is an abstract
+    implementation of <classname>Changeable</classname> that delegates
+    to a <classname>ChangeSupport</classname>. In the cases where your
+    class does not have to inherit from any class but must implement
+    <classname>Changeable</classname>, this is a perfect base
+    class. It will lazily instantiate the delegate only when listeners
+    need to be registered.</para>
+  </sect1>
+  </chapter>

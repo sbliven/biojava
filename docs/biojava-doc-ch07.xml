@@ -1,0 +1,121 @@
+<!--DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                      "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
+]-->
+
+<chapter id="bd-motifs">
+  <title>Motifs and Restriction Sites in
+  <classname>SymbolLists</classname></title>
+
+    <abstract id="bd-motifs-abstract">
+      <para>This chapter describes how to perform simple pattern
+      searches on <classname>SymbolLists</classname>s and includes
+      coverage of BioJava's support for restriction enzymes. The Java
+      API referred to in this chapter is located in the packages
+      <classname>org.biojava.bio.symbol</classname>,
+      <classname>org.biojava.bio.molbio</classname>, and
+      <classname>org.biojava.bio.search</classname>. For a complete
+      overview of the APIs provided by these packages, please consult
+      the <ulink url="api/index.html">JavaDoc
+      documentation</ulink>.</para>
+  </abstract>
+
+    <sect1 id="bd-motifs-types">
+      <title>Types of motif search</title>
+
+      <para>This chapter covers searching for exact matches or for
+      patterns defined by regular expressions. It does not address
+      more advanced possibilities, such as searches using hidden
+      Markov models, which are possible using packages in the BioJava
+      API other than those mentioned above.</para>
+
+      <para>As BioJava uses a model of biological sequences which is
+      not based on character strings (described in <xref
+      linkend="bd-symbols-sym"/>) <classname>SymbolList</classname>s
+      may not be used directly by standard Java string-searching or
+      regular expression classes. However, a simple decorator
+      (Decorator design pattern <xref linkend="bd-biblio-GoF98"/>) for
+      <classname>java.lang.CharSequence</classname>,
+      <classname>org.biojava.bio.seq.io.SymbolListCharSequence</classname>,
+      is provided to allow classname>SymbolList</classname>s efficient
+      access to these classes. More on this in <xref
+      linkend="bd-motifs-regex"/>.</para>
+    </sect1>
+
+    <sect1 id="bd-motifs-exact">
+      <title>Finding exact matches</title>
+
+      <para><classname>SymbolList</classname>s are amenable to
+      standard string indexing and searching techniques. Currently the
+      best way to find an exact match in a sequence (without using
+      regular expressions) is using
+      <classname>KnuthMorrisPrattSearch</classname> in the
+      <classname>org.biojava.bio.search</classname> package. This
+      implements the Knuth, Morris and Pratt search algorithm <xref
+      linkend="bd-biblio-KMP77"/>. The algorithm finds exact matches
+      therefore ambiguity symbols will match only themselves. The
+      class operates on all alphabets thus if searching for a DNA
+      pattern you should compile both the pattern and its reverse
+      complement. The following example searches for "aagctt" within a
+      longer sequence.</para>
+
+<programlisting>
+SymbolList syms = DNATools.createDNA("tttttataaagcttgtagatggatata");
+SymbolList pattern = DNATools.createDNA("aagctt");
+
+KnuthMorrisPrattSearch search = new KnuthMorrisPrattSearch(pattern);
+int [] indices = search.findMatches(pattern);
+</programlisting>
+
+      <para>Calling <methodname>search</methodname> returns an array
+      of integers which are the start indices of every occurrence of
+      the query in the sequence being searched.</para>
+
+      <para>It is also possible to index
+      <classname>SymbolList</classname>s using a trie or suffix
+      tree. Although the <classname>org.biojava.bio.symbol</classname>
+      package includes a suffix tree implementation, it's probably
+      best to use the KMP matcher unless you really know what you are
+      doing as there is no easy API for using the tree to find
+      patterns once it has been created.</para>
+    </sect1>
+
+    <sect1 id="bd-motifs-regex">
+      <title>Finding regular expression matches</title>
+
+      <para>To find a regular expression in a
+      <classname>SymbolList</classname> you first need to create a
+      <classname>CharSequence</classname> from it. There are two
+      restrictions on the type of <classname>SymbolList</classname>
+      which may be used.</para>
+      <itemizedlist>
+        <listitem>
+          <para>Only <classname>SymbolList</classname>s using a
+          <classname>FiniteAlphabet</classname> are supported.</para>
+        </listitem>
+        <listitem>
+          <para>Only <classname>FiniteAlphabet</classname>s using a
+          character token are supported. (A token is BioJava's term
+          for an ASCII character representation of a
+          <classname>Symbol</classname> object.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>These are logical requirements; there must be a finite
+      choice of <classname>Symbol</classname>s at each index and it
+      must be possible to represent each <classname>Symbol</classname>
+      as a single character. To create a
+      <classname>CharSequence</classname> is simple.</para>
+
+<programlisting>
+SymbolList syms = DNATools.createDNA("tttttataaagcttgtagatggatata");
+CharSequence seq = new SymbolListCharSequence(syms);
+</programlisting>
+
+      <para>This process does not copy the
+      <classname>SymbolList</classname> and so is space
+      efficient. Should the underlying sequence be mutated, these
+      changes will be reflected in the
+      <classname>CharSequence</classname>.</para>
+    </sect1>
+
+  </chapter>

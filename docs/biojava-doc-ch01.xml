@@ -3,13 +3,13 @@
 ]-->
 
 <!-- This demonstrates the id convention for chapters -->
-<chapter id="bd-ch01">
+<chapter id="bd-begin">
   <title>Beginning BioJava</title>
 
-  <sect1 id="bd-ch01-obtain">
+  <sect1 id="bd-begin-obtain">
     <title>Obtaining</title>
 
-    <sect2 id="bd-ch01-obtain-bin">
+    <sect2 id="bd-begin-obtain-bin">
       <title>Binary distribution</title>
 
       <para>Binary distributions in .jar (Java ARchive) format may be
@@ -19,7 +19,7 @@
       url="http://biojava.org/download/">download area</ulink>.</para>
     </sect2>
 
-    <sect2 id="bd-ch01-obtain-src">
+    <sect2 id="bd-begin-obtain-src">
       <title>Source code distribution</title>
 
       <para>If you want to modify BioJava, you can obtain a copy of
@@ -34,7 +34,7 @@
       server</ulink>.</para>
     </sect2>
 
-    <sect2 id="bd-ch01-obtain-cvs">
+    <sect2 id="bd-begin-obtain-cvs">
       <title>Anonymous CVS server</title>
 
       <para>To download source code from anonymous CVS:</para>
@@ -78,7 +78,7 @@
       </procedure>
     </sect2>
 
-    <sect2 id="bd-ch01-depend">
+    <sect2 id="bd-begin-depend">
       <title>Dependencies</title>
 
       <para>BioJava will compile and run on any computer with a Java
@@ -129,10 +129,10 @@
     </sect2>
   </sect1>
 
-  <sect1 id="bd-ch01-install">
+  <sect1 id="bd-begin-install">
     <title>Installation</title>
 
-    <sect2 id="bd-ch01-install-bin">
+    <sect2 id="bd-begin-install-bin">
       <title>Binary distribution</title>
 
       <para>To use the binary distribution add the biojava.jar,
@@ -190,7 +190,7 @@ set CLASSPATH=C:\biojava.jar;C:\xerces.jar;C:\bytecode.jar;.
       </variablelist>
     </sect2>
 
-    <sect2 id="bd-ch01-install-src">
+    <sect2 id="bd-begin-install-src">
       <title>Source distribution</title>
 
       <para>BioJava uses the <ulink

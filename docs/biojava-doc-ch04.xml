@@ -2,7 +2,7 @@
                       "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
 ]-->
 
-<chapter id="bd-ch04">
+<chapter id="bd-seqio">
   <title>Sequence I/O</title>
 
   <abstract>
@@ -13,7 +13,7 @@
     url="javadoc/index.html">JavaDoc documentation</ulink>.</para>
   </abstract>
 
-  <sect1 id="bd-ch04-started">
+  <sect1 id="bd-seqio-started">
     <title>Getting started with sequence I/O</title>
       
     <para>The BioJava sequence I/O code is designed to be flexible and
@@ -38,7 +38,7 @@ while (stream.hasNext()) {
     Javadoc documentation for the SeqIOTools class.</para>
   </sect1>
 
-  <sect1 id="bd-ch04-goals">
+  <sect1 id="bd-seqio-goals">
     <title>Sequence input goals</title>
 
     <para>A typical biological sequence file contains three
@@ -102,7 +102,7 @@ while (stream.hasNext()) {
     </variablelist>
   </sect1>
 
-  <sect1 id="bd-ch04-seqbuild">
+  <sect1 id="bd-seqio-seqbuild">
     <title>SequenceBuilders</title>
 
     <para>The sequence input framework is based around the
@@ -177,7 +177,7 @@ SequenceBuilderFactory mySBF =
     implementing <classname>SequenceBuilderFactory</classname>.</para>
   </sect1>
 
-  <sect1 id="bd-ch04-stream">
+  <sect1 id="bd-seqio-stream">
     <title>Putting it together: StreamReader</title>
 
     <para>The simplest way to use the BioJava sequence input code is
@@ -223,7 +223,7 @@ StreamReader stream = new StreamReader(br,
 </programlisting>
 
     <para>(this is just a snippet from the example program in <xref
-    linkend="bd-ch01"/>, and you may like to refer back for more
+    linkend="bd-begin"/>, and you may like to refer back for more
     information).</para>
 
     <para>The <classname>StreamReader</classname> class implements the
@@ -238,7 +238,7 @@ while (stream.hasNext()) {
 </programlisting>
   </sect1>
 
-  <sect1 id="bd-ch04-indexed">
+  <sect1 id="bd-seqio-indexed">
     <title>Another application: IndexedSequenceDB</title>
 
     <para>As biology enters the post-genomic era, it is common to need

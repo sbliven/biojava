@@ -51,7 +51,18 @@
                classname="junit.framework.TestCase"
                property="junit.present" />
 
-    <!-- Check the current system classpath for JUnit support in Ant (only in >= 1.3) -->
+    <!-- Check the current system classpath for Trax -->
+    <available classpath="${java.class.path}"
+               classname="javax.xml.transform.Transformer"
+               property="trax.present">
+    </available>
+
+    <!-- Check for XSLT OutputProperty support in Ant (only in Ant >= 1.5) -->
+    <available classpath="${java.class.path}"
+               classname="org.apache.tools.ant.taskdefs.XSLTProcess$OutputProperty"
+               property="outputproperty.support" />
+
+    <!-- Check for JUnit support in Ant (only in >= 1.3) -->
     <available classpath="${java.class.path}"
                classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTest"
                property="junit.support" />
@@ -62,38 +73,21 @@
                property="java14">
     </available>
 
-    <!-- Check the current system classpath for Trax -->
-    <available classpath="${java.class.path}"
-               classname="javax.xml.transform.Transformer"
-               property="trax.present">
-    </available>
-
-    <!-- DocBook XML DTD path -->
+    <!-- DocBook XML DTD path. Change to reflect your system -->
     <property name="docbook.dir" value="/usr/share/sgml/docbook/xml-dtd" />
     <property name="docbook.dtd" value="${docbook.dir}/docbookx.dtd" />
-    <!-- DocBook XML stylesheet path -->
+
+    <!-- DocBook XML stylesheet path. Change to reflect your system -->
     <property name="stylesheet.dir" value="/usr/share/sgml/docbook/xsl-stylesheets-1.44" />
-    <property name="docbook.xsl" value="${stylesheet.dir}/html/chunk.xsl" />
+    <property name="docbook.xsl" value="${stylesheet.dir}/xhtml/chunk.xsl" />
+
+    <!-- DocBook Public ID -->
+    <property name="docbook.public.id" value="-//OASIS//DTD DocBook XML V4.2//EN" />
 
     <!-- Check for DocBook DTD -->
-    <available file="${docbook.dtd}" type="file" property="docbook.dtd.present" />
+    <available file="${docbook.dtd}" property="docbook.dtd.present" />
     <!-- Check for DocBook XML stylesheet -->
-    <available file="${docbook.xsl}" type="file" property="docbook.xsl.present" />
-
-    <!-- DocBook catalog -->
-    <xmlcatalog id="docbook.cat">
-      <dtd publicId="-//OASIS//DTD DocBook XML V4.2//EN"
-           location="${docbook.dtd}" />
-    </xmlcatalog>
- 
-    <!-- Check for complete DocBook kit -->
-    <condition property="docbook.support">
-      <and>
-        <isset property="docbook.dtd.present" />
-        <isset property="docbook.xsl.present" />
-        <isset property="trax.present" />
-      </and>
-    </condition>
+    <available file="${docbook.xsl}" property="docbook.xsl.present" />
 
     <!-- Echo information -->
     <echo message="JUnit present:                   ${junit.present}" />
@@ -101,7 +95,6 @@
     <echo message="Trax API present:                ${trax.present}" />
     <echo message="DocBook DTD present:             ${docbook.dtd.present}" />
     <echo message="DocBook XSL stylesheets present: ${docbook.xsl.present}" />
-    <echo message="Full DocBook kit present:        ${docbook.support}" />
 
     <property name="readme" value="./README" />
     <property name="license" value="./LICENSE" />
@@ -243,6 +236,24 @@
         <exclude name="**/CVS/**" />
       </fileset>
     </copy>
+  </target>
+
+  <!-- Prepares DocBook environment and encloses it from older Ant versions -->
+  <target name="prepare-docs" depends="init,prepare-core" if="outputproperty.support">
+    <!-- DocBook catalog -->
+    <xmlcatalog id="docbook.cat">
+      <dtd publicId="${docbook.public.id}"
+           location="${docbook.dtd}" />
+    </xmlcatalog>
+
+    <!-- Check for complete DocBook kit -->
+    <condition property="docbook.support">
+      <and>
+        <isset property="docbook.dtd.present" />
+        <isset property="docbook.xsl.present" />
+        <isset property="trax.present" />
+      </and>
+    </condition>
   </target>
 
   <target name="prepare-src" depends="init,prepare-core,prepare-14" />
@@ -420,7 +431,7 @@
   </target>
 
   <!-- Creates the DocBook documentation -->
-  <target name="docbook" depends="init" if="docbook.support">
+  <target name="docbook" depends="init,prepare,prepare-core,prepare-docs" if="docbook.support">
     <xslt
       in="${build.src.docs}/biojava-doc-main.xml"
       out="${build.dest.docs}/index.html"
@@ -434,8 +445,8 @@
         <param name="use.id.as.filename" expression="1" />
         <outputproperty name="method" value="xml" />
         <outputproperty name="standalone" value="yes" />
-        <outputproperty name="encoding" value="iso8859_1" />
-        <outputproperty name="indent" value="yes" />
+        <outputproperty name="encoding" value="UTF-8" />
+        <outputproperty name="indent" value="no" />
     </xslt>
     <!-- CSS file used by HTML output -->
     <copy file="${build.src.docs}/${doc.css.file}" todir="${build.dest.docs}" />
