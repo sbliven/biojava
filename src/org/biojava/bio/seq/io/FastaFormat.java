@@ -40,6 +40,8 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  */
 public class FastaFormat implements SequenceFormat, Serializable {
+  private final static int MAX_LINELENGTH = 1024;
+
   /**
    * The default description reader.
    */
@@ -136,7 +138,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
 
     // read in all the sequence up untill > or eof
     ArrayList resList = new ArrayList();
-    in.mark(120);
+    in.mark(MAX_LINELENGTH);
     line = in.readLine();
     while(line != null && !line.startsWith(">")) {
       StringTokenizer st = new StringTokenizer(line, " ", false);
@@ -145,7 +147,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
         resList.ensureCapacity(resList.size() + getLineWidth());
         resList.addAll(resParser.parse(token).toList());
       }
-      in.mark(120);
+      in.mark(MAX_LINELENGTH);
       line = in.readLine();
     }
     
