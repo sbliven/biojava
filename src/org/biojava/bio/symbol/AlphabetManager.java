@@ -846,6 +846,13 @@ public final class AlphabetManager {
       public GapSymbol() {
       }
 
+	  public java.util.List getSymbols() {
+	  java.util.ArrayList al=new java.util.ArrayList();
+ 	  al.add(AlphabetManager.getGapSymbol());
+      return(al);
+	  }
+
+
       public String getName() {
 	  return "gap";
       }
