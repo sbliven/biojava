@@ -92,12 +92,22 @@ public interface Location {
   Location getDecorator(Class decoratorClass);
   /**
    * The minimum position contained.
+   * <p>
+   * <b>WARNING:</b> The location will <b>not</b> contain every point between <code>getMin()</code>
+   * and <code>getMax()</code> if <code>isContiguous()</code> is false. If <code>isContiguous()</code>
+   * does return false you should use the <code>Iterator</code> returned by <code>blockIterator()</code>
+   * to iterate over the minimum set of contiguous blocks that make up this <code>Location</code>
    *
    * @return	the minimum position contained
    */
   int getMin();
   /**
    * The maximum position contained.
+   * <p>
+   * <b>WARNING:</b> The location will <b>not</b> contain every point between <code>getMin()</code>
+   * and <code>getMax()</code> if <code>isContiguous()</code> is false. If <code>isContiguous()</code>
+   * does return false you should use the <code>Iterator</code> returned by <code>blockIterator()</code>
+   * to iterate over the minimum set of contiguous blocks that make up this <code>Location</code>
    *
    * @return	the maximum position contained
    */
