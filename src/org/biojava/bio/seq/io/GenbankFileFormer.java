@@ -83,6 +83,9 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 
     private SymbolTokenization dnaTokenization;
 
+    //vector NTI requires a slightly different flavour of Genbank
+    private boolean vecNTISupport = false;
+
     {
         try
         {
@@ -396,19 +399,41 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
         }
     }
 
+    /**
+     * VectorNTI requires GenBank format to be a little more specific than
+     * required by the GenBank definition. By setting this to true the produced
+     * output should be parsable by VectorNTI. By default this is false.
+     *
+     * @param b to support or not to support.
+     */
+    public void setVectorNTISupport(boolean b){
+      vecNTISupport = b;
+    }
+
+    /**
+     * Is VectorNTI compatable output being produced?
+     * @return false by default.
+     */
+    public boolean getVectorNTISupport(){
+      return vecNTISupport;
+    }
+
     private String sequenceBufferCreator(Object key, Object value) {
         StringBuffer temp = new StringBuffer();
 
         if (value == null) {
-            // FIXME: (kj) unsafe cast to String
-            temp.append((String) key);
+            temp.append(key.toString());
         }
         else if (value instanceof ArrayList) {
             Iterator iter = ((ArrayList) value).iterator();
-            // FIXME: (kj) unsafe cast to String
-            temp.append((String) key + " " + iter.next());
+            temp.append(key.toString() + " " + iter.next());
             while (iter.hasNext()) {
+              if (vecNTISupport) {
+                temp.append(nl + key.toString() +"            " + iter.next());
+              }
+              else {
                 temp.append(nl + "            " + iter.next());
+              }
             }
         }
         else {
