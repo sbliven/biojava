@@ -47,7 +47,7 @@ public class AcePerlParser {
 	    throw new AceException("Empty object!");
     }
 
-    StringTokenizer toke = new StringTokenizer(obj, "{},[] \t\n\r", true);
+    PeekStringTokenizer toke = new PeekStringTokenizer(obj, "{},[] \t\n\r", true);
     if (! toke.nextToken().equals("{")) {
       throw new AceError("Unrecoverable parsing error: expecting {");
     }
@@ -97,59 +97,70 @@ public class AcePerlParser {
   }
 	
 
-  private AceNode getNode(StaticAceNode parent, StringTokenizer t) 
-  throws AceException {
-    String ty = null;
-    String va = null;
-    String cl = null;
-    StaticAceNode obj = null;
+    private AceNode getNode(StaticAceNode parent, PeekStringTokenizer t) 
+	throws AceException 
+    {
+	String ty = null;
+	String va = null;
+	String cl = null;
+	StaticAceNode obj = null;
 
-    while (true) {
-      String s = t.nextToken();
-      if(s.equals(",")) {
-      } else if (s.startsWith("ty=>")) {
-        if(ty != null) {
-          throw new AceError("Resetting old ty value " + ty + " with " + s);
-        }
-        ty = s.substring(4).trim();
+	while (true) {
+	    String s = t.nextToken();
+	    if(s.equals(",")) {
+	    } else if (s.startsWith("ty=>")) {
+		if(ty != null) {
+		    throw new AceError("Resetting old ty value " + ty + " with " + s);
+		}
+		ty = s.substring(4).trim();
 	    } else if (s.startsWith("va=>")) {
-        if(va != null) {
-          throw new AceError("Resetting old ty value " + va + " with " + s);
-        }
-        va = Ace.encode(s.substring(4).trim());
+		if(va != null) {
+		    throw new AceError("Resetting old ty value " + va + " with " + s);
+		}
+		va = Ace.encode(s.substring(4));
+		boolean done = false;
+		do {
+		    String peek = t.peekToken();
+		    if (! (peek.equals(",") && peek.equals("}"))) {
+			va = va + " " + peek;
+		    } else {
+			done = true;
+		    }
+		} while (!done);
+		va = va.trim();
 	    } else if (s.startsWith("cl=>")) {
-        if(ty != null) {
-          throw new AceError("Resetting old ty value " + cl + " with " + s);
-        }
-        cl = s.substring(4).trim();
+		if(ty != null) {
+		    throw new AceError("Resetting old ty value " + cl + " with " + s);
+		}
+		cl = s.substring(4).trim();
 	    } else if (s.equals("Pn=>")) {
-        if (! t.nextToken().equals("[")) {
-          throw new AceError("Unrecoverable parsing error: expecting [");
-        }
-        if(ty == null) {
-          throw new AceError("Got null ty field for object");
-        }
-        System.out.println("Constructing node with " + parent + ", " + ty + ", " + va + ", " + cl);
-        obj = constructNode(parent, ty, va, cl);
-        getChildren(obj, t);
-        ty = null;
-        va = null;
-        cl = null;
-      } else /* { */ if (s.equals("}")) {
-        if (obj != null) {
-          return obj;
-        } else{ 
-          return constructNode(parent, ty, va, cl);
-        }
-      } else {
-        ty = "model";
-        System.out.println("Found " + s);
-        va = Ace.encode(s.trim());
-      }
+		if (! t.nextToken().equals("[")) {
+		    throw new AceError("Unrecoverable parsing error: expecting [");
+		}
+		if(ty == null) {
+		    throw new AceError("Got null ty field for object");
+		}
+		System.out.println("Constructing node with " + parent + ", " + ty + ", " + va + ", " + cl);
+		obj = constructNode(parent, ty, va, cl);
+		getChildren(obj, t);
+		ty = null;
+		va = null;
+		cl = null;
+	    } else /* { */ if (s.equals("}")) {
+		if (obj != null) {
+		    return obj;
+		} else{ 
+		    return constructNode(parent, ty, va, cl);
+		}
+	    } else {
+		ty = "model";
+		System.out.println("Found " + s);
+		va = Ace.encode(s.trim());
+	    }
+	}
     }
-  }
 
-  private void getChildren(StaticAceNode parent, StringTokenizer t) 
+  private void getChildren(StaticAceNode parent, PeekStringTokenizer t) 
   throws AceException {
     while (true) {
       String s = t.nextToken();
@@ -160,4 +171,48 @@ public class AcePerlParser {
       }
     }
   }
+}
+
+
+
+class PeekStringTokenizer {
+    private StringTokenizer toke;
+    private String cache = null;
+
+    public PeekStringTokenizer(String s) {
+	toke = new StringTokenizer(s);
+    }
+
+    public PeekStringTokenizer(String s, String b) {
+	toke = new StringTokenizer(s, b);
+    }
+
+    public PeekStringTokenizer(String s, String b, boolean r) {
+	toke = new StringTokenizer(s, b, r);
+    }
+
+    public int countTokens() {
+	return toke.countTokens() + (cache == null ? 0 : 1);
+    }
+
+    public boolean hasMoreTokens() {
+	return (cache == null ? toke.hasMoreTokens() : true);
+    }
+
+    public String nextToken() {
+	if (cache == null) {
+	    return toke.nextToken();
+	} else {
+	    String t = cache;
+	    cache = null;
+	    return t;
+	}
+    }
+
+    public String peekToken() {
+	if (cache == null) {
+	    cache = toke.nextToken();
+	}
+	return cache;
+    }
 }
