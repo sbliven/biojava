@@ -171,8 +171,15 @@ public class AssembledSymbolList extends AbstractSymbolList {
 
     public int length() {
       if(autoLength) {
-        Location last = (Location) componentList.get(componentList.size() - 1);
-        return last.getMax();
+        int componentCount = componentList.size();
+
+        if (componentCount == 0)
+          // there's nothing in 'ere.
+          return 0;
+        else {
+          Location last = (Location) componentList.get(componentCount - 1);
+          return last.getMax();
+        }
       } else {
         return length;
       }
