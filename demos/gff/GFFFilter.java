@@ -28,8 +28,28 @@ import org.biojava.bio.seq.tools.*;
 import org.biojava.bio.program.gff.*;
 
 /**
- * This tests the gff code to check that we can read in features, add them to
- * a sequence, and then print something out.
+ * This tests the parsing and writing of GFF features.
+ * <p>
+ * Use: GFFToFeatures [in.gff [out.gff]]
+ * <p>
+ * If you do not supply out.gff, then output will go to stdout. If you do not
+ * supply in.gff, then input will come from stdin.
+ * <P>
+ * in.gff will be parsed into a stream of comments and
+ * <span class="type">GFFRecord</span>s. These will pass directly to a 
+ * <span class="type">GFFWriter</span>, which will write out the GFF.
+ * <P>
+ * You can extend this simple application to include a filter between the
+ * parser and the writer. This would allow you to write a GFFGrep application
+ * that only allows through GFF files that have some value in a given column.
+ * <P>
+ * You may notice that the input is not exactly identical to the output. In
+ * particular, white-space will be changed and some missing values will be
+ * written according to the GFF2 specification, regardless of what was read
+ * in. Also, the attribute value-list text may be re-ordered. None of this
+ * affects the validity of the file.
+ * <P>
+ * Have fun!
  *
  * @author Matthew Pocock
  */

@@ -21,6 +21,8 @@
 
 package org.biojava.bio.seq.tools;
 
+import java.util.BitSet;
+
 import org.biojava.bio.seq.*;
 import org.biojava.stats.svm.SVMKernel;
 
@@ -28,21 +30,54 @@ import org.biojava.stats.svm.SVMKernel;
  * Computes the dot-product of two suffix-trees as the sum of the products
  * of the counts of all nodes they have in common.
  * <P>
- * This implementation allows you to scale the sub-space for each word length.
+ * This implementation allows you to scale the sub-space for each word length
+ * independantly.
  *
  * @author Matthew Pocock
  */
 public class SuffixTreeKernel implements SVMKernel {
+  /**
+   * The <span class="type">DepthScaler</span> that will scale each sub-space.
+   * This defaults to <span class="type">UniformScaler</type>.
+   */
   private DepthScaler depthScaler = new UniformScaler();
   
+  /**
+   * Retrieve the current <span class="type">DepthScaler</span>.
+   *
+   * @return the current <span class="type">DepthScaler</span>
+   */
   public DepthScaler getDepthScaler() {
     return depthScaler;
   }
   
+  /**
+   * Change the current <span class="type">DepthScaler</span> to
+   * <span class="arg">depthScaler</span>.
+   *
+   * @param depthScaler  the new <span class="type">DepthScaler</span> to use
+   */
   public void setDepthScaler(DepthScaler depthScaler) {
     this.depthScaler = depthScaler;
   }
   
+  /**
+   * Calculate the dot product between the
+   * <span class="type">SuffixTree</span>s <span class="arg">a</span> and
+   * <span class="arg">b</span>.
+   * <P>
+   * This is the sum of the dot products of each subspace for a given word
+   * length. Each subspace is scaled using the
+   * <span class="type">DepthScaler</span> returned by
+   * <span class="method">getDepthScaler</span>.
+   *
+   * @param a  the first <span class="type">Object</span>
+   * @param b  the second <span class="type">Object</span>
+   * @return <span class="arg">a</span>.<span class="arg">b</span>
+   * @throws <span class="type">ClassCastException</span> if either
+   *         <span class="arg">a</span> or <span class="arg">b</span> are not
+   *         castable to <span class="type">SuffixTree</span>
+   */
   public double evaluate(Object a, Object b) {
     SuffixTree st1 = (SuffixTree) a;
     SuffixTree st2 = (SuffixTree) b;
@@ -51,7 +86,20 @@ public class SuffixTreeKernel implements SVMKernel {
       
     return dot(n1, n2, st1.alphabet().size(), 0);
   }
-    
+  
+  /**
+   * Recursive method to compute the dot product of the
+   * <span class="type">SuffixTree.SuffixNode</span>s
+   * <span class="arg">n1</span> and <span class="arg">n2</span>.
+   * <P>
+   * This scales <span class="arg">n1</span>.
+   * <span class="method">getNumber</span><code>()</code> *
+   * <span class="arg">n2</span>.
+   * <span class="method">getNumber</span><code>()</code>
+   * by <span class="const">this</span>.<span class="method">getDepthScaler</span>
+   * (<span class="arg">depth</span>), and then returns the sum of this and the
+   * dot products for all children of the suffix nodes.
+   */
   private double dot(SuffixTree.SuffixNode n1,
                      SuffixTree.SuffixNode n2, int size, int depth)
   {
@@ -85,9 +133,12 @@ public class SuffixTreeKernel implements SVMKernel {
   }
   
   /**
-   * Scales by 4^depth - equivalent to dividing by a flat null model
+   * Scales by 4^depth - equivalent to dividing by a probablistic flatt prior
+   * null model
+   *
+   * @author Matthew Pocock
    */
-  public class NullModelScaler implements DepthScaler {
+  public static class NullModelScaler implements DepthScaler {
     public double getScale(int depth) {
       return Math.pow(4.0, (double) depth);
     }
@@ -95,10 +146,63 @@ public class SuffixTreeKernel implements SVMKernel {
   
   /**
    * Scale all depths by 1.0
+   *
+   * @author Matthew Pocock
    */
-  public class UniformScaler implements DepthScaler {
+  public static class UniformScaler implements DepthScaler {
     public double getScale(int depth) {
       return 1.0;
+    }
+  }
+  
+  /**
+   * Scale using a <span class="type">BitSet</span> to allow/dissalow depths.
+   *
+   * @param Matthew Pocock
+   */
+  public static class SelectionScalar implements DepthScaler {
+    private BitSet bSet;
+    
+    /**
+     * Make a new <span class="type">SelectionScalar</span> that masks in different
+     * depths.
+     *
+     * @param bSet  the mask for which depths to allow
+     */
+    public SelectionScalar(BitSet bSet) {
+      this.bSet = new BitSet();
+      this.bSet.or(bSet);
+    }
+    
+    /**
+     * @return 1.0 or 0.0 depending on whether the bit at
+     *         <span class="arg">depth</span> is set or not
+     */
+    public double getScale(int depth) {
+      if(bSet.get(depth)) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+  }
+  
+  /**
+   * Scale using a multiple of two <span class="type">DepthScaler</span>s.
+   *
+   * @param Matthew Pocock
+   */
+  public static class MultipleScalar implements DepthScaler {
+    private DepthScaler a;
+    private DepthScaler b;
+    
+    public MultipleScalar(DepthScaler a, DepthScaler b) {
+      this.a = a;
+      this.b = b;
+    }
+    
+    public double getScale(int depth) {
+      return a.getScale(depth) * b.getScale(depth);
     }
   }
 }
