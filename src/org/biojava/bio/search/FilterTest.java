@@ -21,6 +21,9 @@
 
 package org.biojava.bio.search;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 /**
  * Class for implementing tests with BlastLikeSearchFilter
  * objects.  Several precanned tests are included.
@@ -60,6 +63,60 @@ public interface FilterTest
 
     /**
      * Tests that the value associated with the specified
+     * key is matched in its entirety by the supplied regex.
+     * A value of false is returned by accept() if a
+     * ClassCastException is thrown on comparing the objects.
+     */
+    public static class MatchRegex
+    {
+        private Pattern pattern;
+
+        public MatchRegex(String regex)
+            throws PatternSyntaxException
+        {
+            pattern = Pattern.compile(regex);
+        }
+
+        public boolean accept(Object value)
+        {
+            try {
+                return pattern.matcher((String) value).matches();
+            }
+            catch (ClassCastException ce) {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Tests that the value associated with the specified
+     * key contains a part matched by the supplied regex.
+     * A value of false is returned by accept() if a
+     * ClassCastException is thrown on comparing the objects.
+     */
+    public static class FindRegex
+    {
+        private Pattern pattern;
+
+        public FindRegex(String regex)
+            throws PatternSyntaxException
+        {
+            pattern = Pattern.compile(regex);
+        }
+
+        public boolean accept(Object value)
+        {
+            try {
+                return pattern.matcher((String) value).find();
+            }
+            catch (ClassCastException ce) {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Tests that the value associated with the specified
      * key is less than the specified threshold.  The test
      * assumes that value is a String representing a real
      * number.  If not, the test will return null.
@@ -74,6 +131,25 @@ public interface FilterTest
         public boolean accept(Object value)
         {
             return (value instanceof String) && (Double.parseDouble((String) value) < threshold);
+        }
+    }
+
+    /**
+     * Tests that the value associated with the specified
+     * key is greater than the specified threshold.  The test
+     * assumes that value is a String representing a real
+     * number.  If not, the test will return null.
+     */
+    public static class GreaterThan
+        implements FilterTest
+    {
+        private double threshold;
+
+        public GreaterThan(double threshold) { this. threshold = threshold; }
+
+        public boolean accept(Object value)
+        {
+            return (value instanceof String) && (Double.parseDouble((String) value) > threshold);
         }
     }
 }
