@@ -30,6 +30,11 @@ public class JDBCConnectionPool {
 	dbPass = pass;
     }
 
+    public JDBCConnectionPool(String url)
+    {
+        this(url, null, null);
+    }
+
     //
     // Manage a pool of transactions with the database.
     //
@@ -59,7 +64,11 @@ public class JDBCConnectionPool {
 
 	// Statement-pool was empty -- let's create a new connection.
 
-	conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+        if(dbUser != null) {
+ 	  conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
+        } else {
+          conn = DriverManager.getConnection(dbURL);
+        }
 	Statement st = conn.createStatement();
 	// st.execute("SET OPTION SQL_BIG_SELECTS=1");
 	st.close();
