@@ -35,7 +35,6 @@ public class PointLocationTest extends TestCase
 {
     protected Location r1;
     protected Location r2;
-    protected Location r3;
 
     public PointLocationTest(String name)
     {
@@ -103,7 +102,7 @@ public class PointLocationTest extends TestCase
     {
 	assertEquals(LocationTools.intersection(r1, r1),
 		     new PointLocation(1));
-	assertEquals(LocationTools.intersection(r1, r3),
+	assertEquals(LocationTools.intersection(r1, r2),
 		     Location.empty);
     }
 

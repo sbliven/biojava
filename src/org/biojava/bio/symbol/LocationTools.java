@@ -106,10 +106,11 @@ final public class LocationTools {
    * @return a Location that is the intersection of locA and locB
    */
   public static Location intersection(Location locA, Location locB) {
-  	if(isDecorated(locA) || isDecorated(locB))
-  	{
-  		handleDecorations();
-  	}
+
+    if(isDecorated(locA) || isDecorated(locB))
+    {
+	handleDecorations();
+    }
     if(locA.isContiguous() && locB.isContiguous()) {
       // handle easy case of solid locations
       if(locA.overlaps(locB)) {
@@ -120,6 +121,7 @@ final public class LocationTools {
         return Location.empty;
       }
     } else {
+
       // One or other of the locations is compound. Build a list of all
       // locations created by finding intersection of all pairwise combinations
       // of blocks in locA and locB. Ignore all Location.empty. Create the
