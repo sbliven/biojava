@@ -57,14 +57,24 @@ public class Calc {
     /**
      * calculate distance between two atoms
      */
-    public static double getDistance(Atom a, Atom b) {
-    
+    public static double getDistance(Atom a, Atom b) 
+	throws StructureException
+    {
+
 	Atom   c    = substract(b,a);
 	double dist = amount(c)     ;
     
 	return dist ;
     }
 
+
+    private static void nullCheck(Atom a) 
+	throws StructureException
+    {
+	if  (a == null) {
+	    throw new StructureException("Atom is null!");
+	}
+    }
 
     /** add two atoms ( a + b)
      */
@@ -82,9 +92,14 @@ public class Calc {
 
     /** substract two atoms ( a - b)
      */
-    public static Atom substract(Atom a, Atom b) {
+    public static Atom substract(Atom a, Atom b) 
+	throws StructureException
+    {
+	nullCheck(a) ;
+	nullCheck(b) ;
+
 	double[] coords = new double[3] ;
-    
+	
 	coords[0] = a.getX() - b.getX();
 	coords[1] = a.getY() - b.getY();
 	coords[2] = a.getZ() - b.getZ();
@@ -140,13 +155,30 @@ public class Calc {
 	return angle;
     }
 
+    /** return the unit vector of vector a */
+    public static Atom unitVector(Atom a) {
+	double amount = amount(a) ;
+	Atom U = a ;
+	
+	double[] coords = new double[3];
 
+	coords[0] = a.getX() / amount ;
+	coords[1] = a.getY() / amount ;
+	coords[2] = a.getZ() / amount ;
+	
+	U.setCoords(coords);
+	return U ;
+	
+    }
+    
     /** torsion angle 
      * = angle between the normal vectors of the 
      * two plains a-b-c and b-c-d
      */
     
-    public static double torsionAngle(Atom a, Atom b, Atom c, Atom d){
+    public static double torsionAngle(Atom a, Atom b, Atom c, Atom d)
+	throws StructureException
+    {
 	
 	Atom ab = substract(a,b);
 	Atom cb = substract(c,b);
@@ -206,20 +238,27 @@ public class Calc {
     }
 
     /** test if two amino acids are connected, i.e.
-     * if the distance from C to N < 2 Angstrom
+     * if the distance from C to N < 2,5 Angstrom
      */    
-    public static boolean isConnected(AminoAcid a, AminoAcid b){
+    public static boolean isConnected(AminoAcid a, AminoAcid b)
+	throws StructureException
+    {
 	Atom C = a.getC();
 	Atom N = b.getN();
 
 	// one could also check if the CA atoms are < 4 A...
 	double distance = getDistance(C,N);
-	if ( distance < 2.0) { 
+	if ( distance < 2.5) { 
 	    return true ;
 	} else {
 	    return false ;
 	}
     }
+
+
+    
+
+
 }
 
 

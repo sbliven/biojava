@@ -75,7 +75,7 @@ public class ChainImpl implements Chain {
     /** return an array of all groups of a special type (e.g. amino,
      * hetatm, nucleotide)
      */
-    public Group[] getGroups( String type) {
+    public ArrayList getGroups( String type) {
 	ArrayList tmp = new ArrayList() ;
 	for (int i=0;i<groups.size();i++){
 	    Group g = (Group)groups.get(i);
@@ -83,8 +83,8 @@ public class ChainImpl implements Chain {
 		tmp.add(g);
 	    }
 	}
-	Group[] g = (Group[])tmp.toArray(new Group[tmp.size()]);
-	return g ;
+	//Group[] g = (Group[])tmp.toArray(new Group[tmp.size()]);
+	return tmp ;
     }
 
     
@@ -93,8 +93,8 @@ public class ChainImpl implements Chain {
     
     public int getLengthAminos() {
 
-	Group[] g = getGroups("amino");
-	return g.length ;
+	ArrayList g = getGroups("amino");
+	return g.size() ;
     }
 
 
@@ -121,9 +121,9 @@ public class ChainImpl implements Chain {
     /** get amino acid sequence */
     public String getSequence(){
 	String str = "" ;
-	Group[] gr = getGroups("amino");
-	for (int i=0 ; i<gr.length;i++){
-	    AminoAcid a = (AminoAcid)gr[i];
+	ArrayList gr = getGroups("amino");
+	for (int i=0 ; i<gr.size();i++){
+	    AminoAcid a = (AminoAcid)gr.get(i);
 	    
 	    str += a.getPDBName() ;
 	}

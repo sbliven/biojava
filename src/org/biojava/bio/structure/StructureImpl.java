@@ -140,15 +140,15 @@ public class StructureImpl implements Structure {
 	    for (int j=0;j<size(i);j++){
 		//System.out.println("getting chain "+i+" "+j); 
 		Chain cha = (Chain)getChain(i,j); 
-		Group[] agr = cha.getGroups("amino");
-		Group[] hgr = cha.getGroups("hetatm");
-		Group[] ngr = cha.getGroups("nucleotide");
+		ArrayList agr = cha.getGroups("amino");
+		ArrayList hgr = cha.getGroups("hetatm");
+		ArrayList ngr = cha.getGroups("nucleotide");
 		    
 		str += "chain: >"+cha.getName()+"<"+
 		    " length: " +cha.getLength()+
-		    " aminos: " +agr.length+
-		    " hetatms: "+hgr.length+
-		    " nucleotides: "+ngr.length +"\n";
+		    " aminos: " +agr.size()+
+		    " hetatms: "+hgr.size()+
+		    " nucleotides: "+ngr.size() +"\n";
 	    }
 	}
 
@@ -173,7 +173,7 @@ public class StructureImpl implements Structure {
     } 
     
     /** return number of chains of of model */
-    public int size(int modelnr) { return getChains(modelnr).length;   }
+    public int size(int modelnr) { return getChains(modelnr).size();   }
 
     // some NMR stuff : 
 
@@ -191,19 +191,16 @@ public class StructureImpl implements Structure {
     
 
     /** retrieve all chains of a model*/
-    public Chain[] getChains(int modelnr){
+    public ArrayList getChains(int modelnr){
 	return getModel(modelnr);
     }
 
-
     /** retrieve all Chains belonging to a model */
-    public Chain[] getModel(int modelnr) {
+    public ArrayList getModel(int modelnr) {
 
-	ArrayList model = (ArrayList)models.get(modelnr);
-	
-	Chain[] chains = (Chain[])model.toArray(new Chain[model.size()]);
-	return chains ;
-    }
+	ArrayList model = (ArrayList)models.get(modelnr);		
+	return model ;
+    }    
 
    
     

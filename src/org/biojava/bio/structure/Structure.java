@@ -125,8 +125,16 @@ public interface Structure {
     /** add a new model */
     public void addModel(ArrayList model);
 
-    /** retrieve all Chains belonging to a model */
-    public Chain[] getModel(int modelnr);
+    /** retrieve all Chains belonging to a model 
+     * @see getChains
+     */
+    public ArrayList getModel(int modelnr);
+
+    /** retrieve all chains of a model
+     * @see getModel
+     */
+    public ArrayList getChains(int modelnr);
+
 
     /** add a new chain */
     public void addChain(Chain chain);
@@ -140,8 +148,7 @@ public interface Structure {
     /** retrieve a chain by it's position within the Structure and model number*/
     public Chain getChain(int pos, int modelnr);
 
-    /** retrieve all chains of a model*/
-    public Chain[] getChains(int modelnr);
+    
 
  
 

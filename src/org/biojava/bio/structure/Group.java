@@ -67,10 +67,13 @@ public interface Group {
     public void addAtom(Atom atom);
     
     /** get list of atoms */
-    public Atom[] getAtoms();
+    public Atom[] getAtoms() ;
     
-    /** get an atom */
-    public Atom getAtom(String name);
+    /** get an atom throws StructureException if atom not found*/
+    public Atom getAtom(String name) throws StructureException;
+    
+    /** returns flag whether a particular atom is existing within this group */
+    public boolean hasAtom(String name);
     
     /** set the PDB 3 character name for this group
      * 
@@ -79,4 +82,12 @@ public interface Group {
 
     /** get the PDB 3 character name for this group */
     public void setPDBName(String s) throws PDBParseException;
+
+    /** calculate if a groups has all atoms required for an amino acid
+	this allows to include chemically modified amino acids that
+	are labeled hetatoms into some computations ... the usual way
+	to identify if a group is an amino acid is getType() !
+	@see getType()
+    */
+    public boolean hasAminoAtoms() ;
 }

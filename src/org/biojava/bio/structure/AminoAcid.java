@@ -25,6 +25,8 @@ package org.biojava.bio.structure;
 import  org.biojava.bio.structure.io.PDBParseException;
 
 import java.util.ArrayList ;
+import java.util.HashMap   ;
+
 /**
  *
  *  AminoAcid inherits most from Hetatom.  Adds a few AminoAcid
@@ -39,6 +41,8 @@ public class AminoAcid extends Hetatom {
      */
     Character amino_char ;
           
+    HashMap   secstruc   ;
+    
 
     /*
      * inherits most from Hetero and has just a few extensions
@@ -47,25 +51,34 @@ public class AminoAcid extends Hetatom {
 	super();
 
 	amino_char = null;
-
-	
+	secstruc = new HashMap();
     }
 
     
     public String getType(){ return type;}
     
-   
+    /** set the secondary structure data for this amino acids the data
+     * is a HashMap with the following indeces (@see Secstruc)
+     */
+    public void setSecStruc(HashMap secstr) {
+	secstruc = secstr ;
+    }
+    
+    /** get secondary structure data */
+    public HashMap getSecStruc(){
+	return secstruc ;
+    }
 
     /** get N atom*/
-    public Atom getN()  {return getAtom("N");  }
+    public Atom getN()  throws StructureException {return getAtom("N");  }
     /** get CA atom*/
-    public Atom getCA() {return getAtom("CA"); }
+    public Atom getCA() throws StructureException {return getAtom("CA"); }
     /** get C atom*/
-    public Atom getC()  {return getAtom("C");  }
+    public Atom getC()  throws StructureException {return getAtom("C");  }
     /** get O atom*/
-    public Atom getO()  {return getAtom("O");  }
+    public Atom getO()  throws StructureException {return getAtom("O");  }
     /** get CB atom*/
-    public Atom getCB() {return getAtom("CB"); }
+    public Atom getCB() throws StructureException {return getAtom("CB"); }
 
     
 

@@ -104,17 +104,32 @@ public class Hetatom implements Group {
     }
 
     /** get an Atom or null, if Atom not in this group */
-    public Atom getAtom(String name){
-
+    public Atom getAtom(String name)
+	throws StructureException
+    {
+	
 	for (int i=0;i<atoms.size();i++){
 	    Atom atom = (Atom)atoms.get(i);
 	    if (atom.getName().equals(name)){
 		return atom;
 	    }
 	}
-	return null;
+
+	throw new StructureException(" No atom "+name + " in group " + pdb_name + " " + pdb_code + " !");
 	
     }
+
+    /** test is an Atom with name is existing */
+    public boolean hasAtom(String name){
+	for (int i=0;i<atoms.size();i++){
+	    Atom atom = (Atom)atoms.get(i);
+	    if (atom.getName().equals(name)){
+		return true;
+	    }
+	}
+	return false ;
+    }
+
     public String getType(){ return type;}
 
     public String toString(){
@@ -126,5 +141,40 @@ public class Hetatom implements Group {
 	return str ;
 		
     }
+
+    /** calculate if a groups has all atoms required for an amino acid
+	this allows to include chemically modified amino acids that
+	are labeled hetatoms into some computations ...  the usual way
+	to identify if a group is an amino acid is getType() !
+	@see getType()
+	<p>
+	amino atoms are : N, CA, C, O, CB
+	GLY does not have CB (unless we would calculate some artificially
+	</p>
+
+	if this method call is performed too often, it should become a
+	private method and set a flag ...
+     */
+    public boolean hasAminoAtoms(){
+
+	String[] atoms ; 
+	if ( getType().equals("amino") & getPDBName().equals("GLY")){
+	    atoms = new String[] { "N","CA","C","O"};
+	} else {
+	    atoms = new String[] { "N","CA","C","O","CB" };
+	}
+
+	
+	for (int i = 0 ; i < atoms.length; i++) {
+	    if ( ! hasAtom(atoms[i])) {
+		//System.out.println("not amino atoms");
+		return false ;
+	    }
+	}
+	     
+	return true ;
+    }
+
+    
 
 }

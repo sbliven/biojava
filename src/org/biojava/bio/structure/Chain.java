@@ -23,6 +23,8 @@
  */
 package org.biojava.bio.structure;
 
+import java.util.ArrayList ;
+
 public interface Chain {
 	
     /** add a group to this chain
@@ -35,10 +37,10 @@ public interface Chain {
      */
     public Group getGroup (int position);
 	
-    /** return an array of all groups of a special type (e.g. amino,
+    /** return an ArrayList of all groups of a special type (e.g. amino,
      * hetatm, nucleotide)
      */
-    public Group[] getGroups (String type);
+    public ArrayList getGroups (String type);
 
     /** get total length of chain, including HETATMs.*/
     public int getLength();
