@@ -60,6 +60,9 @@ public abstract class AbstractDistribution
   protected transient Distribution.NullModelForwarder nullModelForwarder = null;
   protected Map symbolIndices = null;//used for serialization
 
+  /**
+   * Governs serialization behaivour.
+   */
   private void writeObject(ObjectOutputStream stream)throws IOException{
     AlphabetIndex index = AlphabetManager.getAlphabetIndex((FiniteAlphabet)getAlphabet());
     int size = ((FiniteAlphabet)getAlphabet()).size();

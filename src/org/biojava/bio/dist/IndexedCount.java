@@ -25,30 +25,36 @@ package org.biojava.bio.dist;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
+import java.io.*;
+import java.util.*;
 
 /**
  * An encapsulation of a count over the Symbols within a FiniteAlphabet using
  * an AlphabetIndex object.
  *
  * @author Matthew Pocock
+ * @author Mark Schreiber (serialization)
  */
-public class IndexedCount
+public final class IndexedCount
   extends
     AbstractChangeable
   implements
-    Count
+    Count, Serializable
 {
-  private final AlphabetIndex indexer;
-  private final double[] counts;
-  
+  //must be transient as indices may vary between VM's
+  private transient AlphabetIndex indexer;
+  private transient double[] counts;
+  private Map symbolIndices = null; //for serialization
+  private FiniteAlphabet alpha;
+
   public Alphabet getAlphabet() {
-    return indexer.getAlphabet();
+    return alpha;
   }
-    
+
   public double getCount(AtomicSymbol s) throws IllegalSymbolException {
     return counts[indexer.indexForSymbol(s)];
   }
-  
+
   public void setCount(AtomicSymbol s, double c)
   throws IllegalSymbolException, ChangeVetoException {
     if(!hasListeners()) {
@@ -68,7 +74,7 @@ public class IndexedCount
       }
     }
   }
-  
+
   public void increaseCount(AtomicSymbol s, double c)
   throws IllegalSymbolException, ChangeVetoException {
     if(!hasListeners()) {
@@ -86,11 +92,11 @@ public class IndexedCount
         );
         changeSupport.firePreChangeEvent(ce);
         counts[index] = nc;
-        changeSupport.firePostChangeEvent(ce);        
+        changeSupport.firePostChangeEvent(ce);
       }
     }
   }
-  
+
   public void setCounts(Count c)
   throws IllegalAlphabetException, ChangeVetoException {
     if(c.getAlphabet() != getAlphabet()) {
@@ -100,7 +106,7 @@ public class IndexedCount
       );
     }
 
-    try {    
+    try {
       if(!hasListeners()) {
         for(int i = 0; i < counts.length; i++) {
           counts[i] = c.getCount((AtomicSymbol) indexer.symbolForIndex(i));
@@ -124,7 +130,7 @@ public class IndexedCount
       );
     }
   }
-  
+
   public void zeroCounts()
   throws ChangeVetoException {
     if(!hasListeners()) {
@@ -145,14 +151,46 @@ public class IndexedCount
       }
     }
   }
-  
+
+  private void writeObject(ObjectOutputStream stream)throws IOException{
+    symbolIndices = new HashMap(counts.length);
+    for (int i = 0; i < counts.length; i++) {
+      symbolIndices.put(indexer.symbolForIndex(i), new Double(counts[i]));
+    }
+
+    stream.defaultWriteObject();
+  }
+
+  private void readObject(ObjectInputStream stream)
+         throws IOException, ClassNotFoundException{
+
+    stream.defaultReadObject();
+    indexer = AlphabetManager.getAlphabetIndex(alpha);
+    counts = new double[alpha.size()];
+
+    for(int i = 0; i < alpha.size(); i++){
+      Symbol key = indexer.symbolForIndex(0);
+      Double d  = (Double)symbolIndices.get(key);
+      if (d == null) {//no value, set to 0.0
+        counts[i] = 0.0;
+      }
+      else {
+        counts[i] = d.doubleValue();
+      }
+    }
+
+    //mark for garbage collection
+    symbolIndices = null;
+  }
+
   public IndexedCount(FiniteAlphabet fa) {
     this(AlphabetManager.getAlphabetIndex(fa));
   }
-  
+
   public IndexedCount(AlphabetIndex indexer) {
     indexer.addChangeListener(ChangeListener.ALWAYS_VETO, AlphabetIndex.INDEX);
     this.indexer = indexer;
     this.counts = new double[indexer.getAlphabet().size()];
+    this.alpha = indexer.getAlphabet();
   }
 }

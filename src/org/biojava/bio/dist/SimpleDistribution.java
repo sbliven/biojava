@@ -80,6 +80,9 @@ extends AbstractDistribution implements Serializable{
         weights[i] = 0.0;
       }
     }
+
+    //mark for garbage collection
+    symbolIndices = null;
   }
 
   public Alphabet getAlphabet() {
