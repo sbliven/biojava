@@ -95,7 +95,10 @@ public class Meme {
       if(st.nextToken() == StreamTokenizer.TT_WORD) {
           if(st.sval != null && st.sval.startsWith("*"))
             break SEQLIST;
-          seqIDs.add(st.sval.intern());
+
+          //need this cause lines sometimes wrap!?
+          if(! st.sval.startsWith("Length"))
+           seqIDs.add(st.sval.intern());
       }
     }
 
@@ -126,7 +129,7 @@ public class Meme {
         if (nt == StreamTokenizer.TT_EOF) {
             break OUTER;
         } else if (nt == StreamTokenizer.TT_WORD) {
-            if(st.sval.startsWith("log")) {
+            if(st.sval.startsWith("letter")) {
               while(st.nextToken() != StreamTokenizer.TT_EOL) {}
               break FINDWEIGHTS;
             }

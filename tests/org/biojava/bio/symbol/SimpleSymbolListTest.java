@@ -38,21 +38,21 @@ public class SimpleSymbolListTest extends TestCase {
     protected SymbolList sl2;
 
     public SimpleSymbolListTest(String name) {
-	super(name);
+        super(name);
     }
 
-    protected void setUp() 
+    protected void setUp()
         throws Exception
     {
-	sl1 = DNATools.createDNA("gataca");
-	sl2 = DNATools.createDNA("atgga");
+        sl1 = DNATools.createDNA("gataca");
+        sl2 = DNATools.createDNA("atgga");
     }
 
     public void testCopyConstructor()
         throws Exception
     {
-	SimpleSymbolList tsl = new SimpleSymbolList(sl1);
-	assertTrue(compareSymbolList(tsl, sl1));
+        SimpleSymbolList tsl = new SimpleSymbolList(sl1);
+        assertTrue(compareSymbolList(tsl, sl1));
     }
 
    public void testEquals() throws Exception{
@@ -65,83 +65,85 @@ public class SimpleSymbolListTest extends TestCase {
     public void testAddSymbol()
         throws Exception
     {
-	SimpleSymbolList tsl = new SimpleSymbolList(sl1);
-	tsl.addSymbol(DNATools.a());
-	assertTrue(compareSymbolList(tsl, DNATools.createDNA("gatacaa")));
+        SimpleSymbolList tsl = new SimpleSymbolList(sl1);
+        tsl.addSymbol(DNATools.a());
+        assertTrue(compareSymbolList(tsl, DNATools.createDNA("gatacaa")));
     }
 
     public void testInsertAtStart()
         throws Exception
     {
-	SimpleSymbolList tsl = new SimpleSymbolList(sl1);
-	tsl.edit(new Edit(1, 0, sl2));
-	assertTrue(compareSymbolList(tsl, DNATools.createDNA("atggagataca")));
+        SimpleSymbolList tsl = new SimpleSymbolList(sl1);
+        tsl.edit(new Edit(1, 0, sl2));
+        assertTrue(compareSymbolList(tsl, DNATools.createDNA("atggagataca")));
     }
 
     public void testInsertInMiddle()
         throws Exception
     {
-	SimpleSymbolList tsl = new SimpleSymbolList(sl1);
-	tsl.edit(new Edit(4, 0, sl2));
-	assertTrue(compareSymbolList(tsl, DNATools.createDNA("gatatggaaca")));
+        SimpleSymbolList tsl = new SimpleSymbolList(sl1);
+        tsl.edit(new Edit(4, 0, sl2));
+        assertTrue(compareSymbolList(tsl, DNATools.createDNA("gatatggaaca")));
     }
-    
+
     public void testInsertAtEnd() throws Exception {
       SimpleSymbolList ts1 = new SimpleSymbolList(sl1);
       ts1.edit(new Edit(7,0,sl2));
       assertTrue(compareSymbolList(ts1, DNATools.createDNA("gatacaatgga")));
+      ts1.edit(new Edit(ts1.length()+1, 0, sl2));
+      assertTrue(compareSymbolList(ts1, DNATools.createDNA("gatacaatggaatgga")));
     }
 
     public void testDeletion()
         throws Exception
     {
-	SimpleSymbolList tsl = new SimpleSymbolList(sl1);
-	tsl.edit(new Edit(4, 2, SymbolList.EMPTY_LIST));
-	assertTrue(compareSymbolList(tsl, DNATools.createDNA("gata")));
+        SimpleSymbolList tsl = new SimpleSymbolList(sl1);
+        tsl.edit(new Edit(4, 2, SymbolList.EMPTY_LIST));
+        assertTrue(compareSymbolList(tsl, DNATools.createDNA("gata")));
     }
 
     public void testReplacement()
         throws Exception
     {
-	SimpleSymbolList tsl = new SimpleSymbolList(sl1);
-	tsl.edit(new Edit(4, 2, sl2));
-	assertTrue(compareSymbolList(tsl, DNATools.createDNA("gatatggaa")));
+        SimpleSymbolList tsl = new SimpleSymbolList(sl1);
+        tsl.edit(new Edit(4, 2, sl2));
+        assertTrue(compareSymbolList(tsl, DNATools.createDNA("gatatggaa")));
     }
-    
+
     public void testEditSuperlist()
         throws Exception
     {
-	SimpleSymbolList tsl = new SimpleSymbolList(sl1);
-	SymbolList sub_tsl = tsl.subList(2, 6);
-	tsl.edit(new Edit(4, 2, sl2));
-	assertTrue(compareSymbolList(tsl, DNATools.createDNA("gatatggaa")));
-	assertTrue(compareSymbolList(sub_tsl, DNATools.createDNA("ataca")));
+        SimpleSymbolList tsl = new SimpleSymbolList(sl1);
+        SymbolList sub_tsl = tsl.subList(2, 6);
+        tsl.edit(new Edit(4, 2, sl2));
+        assertTrue(compareSymbolList(tsl, DNATools.createDNA("gatatggaa")));
+        assertTrue(compareSymbolList(sub_tsl, DNATools.createDNA("ataca")));
     }
 
     public void testEditSublist()
         throws Exception
     {
-	SimpleSymbolList tsl = new SimpleSymbolList(sl1);
-	SymbolList sub_tsl = tsl.subList(2, 6);
-	sub_tsl.edit(new Edit(3, 2, sl2));
-	assertTrue(compareSymbolList(sub_tsl, DNATools.createDNA("atatggaa")));
-	assertTrue(compareSymbolList(tsl, DNATools.createDNA("gataca")));
+        SimpleSymbolList tsl = new SimpleSymbolList(sl1);
+        SymbolList sub_tsl = tsl.subList(2, 6);
+        sub_tsl.edit(new Edit(3, 2, sl2));
+        assertTrue(compareSymbolList(sub_tsl, DNATools.createDNA("atatggaa")));
+        assertTrue(compareSymbolList(tsl, DNATools.createDNA("gataca")));
     }
-	
-    private boolean compareSymbolList(SymbolList sl1, SymbolList sl2) {
-	if (sl1.length() != sl2.length()) {
-	    return false;
-	}
-	
-	Iterator si1 = sl1.iterator();
-	Iterator si2 = sl2.iterator();
-	while (si1.hasNext()) {
-	    if (! (si1.next() == si2.next())) {
-		return false;
-	    }
-	}
 
-	return true;
+    private boolean compareSymbolList(SymbolList sl1, SymbolList sl2) {
+        if (sl1.length() != sl2.length()) {
+            return false;
+        }
+
+        Iterator si1 = sl1.iterator();
+        Iterator si2 = sl2.iterator();
+        while (si1.hasNext()) {
+            if (! (si1.next() == si2.next())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 
