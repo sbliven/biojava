@@ -484,6 +484,7 @@ public class EmblLikeLocationParser
 		switch (thisChar)
 		{
 		    case ' ' : case '\t' :
+            nextCharIndex++;
 			continue;
 
 		    case ':' : case '^' : case ',' :
