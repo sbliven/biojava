@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -74,19 +75,19 @@ public abstract class DBHelper {
         } catch (SQLException se) {
             se.printStackTrace();
         }
-	return new UnknownDBHelper();
+        return new UnknownDBHelper();
     }
 
     public static final class DeleteStyle {
-	private final String name;
+        private final String name;
 
-	private DeleteStyle(String name) {
-	    this.name = name;
-	}
+        private DeleteStyle(String name) {
+            this.name = name;
+        }
 
-	public String toString() {
-	    return "DBHelper.DeleteStyle: " + name;
-	}
+        public String toString() {
+            return "DBHelper.DeleteStyle: " + name;
+        }
     }
 
     public static final DeleteStyle DELETE_POSTGRESQL = new DeleteStyle("Postgresql");
@@ -133,9 +134,9 @@ public abstract class DBHelper {
         try {
             boolean present;
             PreparedStatement ps = null;
-						Connection conn = null;
+            Connection conn = null;
             try {
-							  conn = ds.getConnection();
+                conn = ds.getConnection();
                 ps = conn.prepareStatement("select * from " + tablename + " limit 1");
                 ps.executeQuery();
                 present = true;
@@ -145,9 +146,9 @@ public abstract class DBHelper {
             if (ps != null) {
                 ps.close();
             }
-						if (conn != null) {
-							conn.close();
-						}
+            if (conn != null) {
+                conn.close();
+            }
             return present;
         } catch (SQLException ex) {
             throw new BioRuntimeException(ex);
