@@ -41,15 +41,21 @@ import org.biojava.utils.*;
 
 public class PairwiseDP extends DP implements Serializable {
     private EmissionState magicalState;
-    private HashMap emissions;
+    private HashMap emissionsProb;
+    private HashMap emissionsOdds;
+    private HashMap emissionsNull;
 
-    public PairwiseDP(MarkovModel mm) throws IllegalSymbolException,
-                                           IllegalTransitionException,
-                                           BioException
+    public PairwiseDP(MarkovModel mm)
+    throws
+      IllegalSymbolException,
+      IllegalTransitionException,
+      BioException
     {
-	super(mm);
-	magicalState = mm.magicalState();
-  emissions = new HashMap();
+      super(mm);
+      magicalState = mm.magicalState();
+      emissionsProb = new HashMap();
+      emissionsOdds = new HashMap();
+      emissionsNull = new HashMap();
     }
 
     private final static int[] ia00 = {0, 0};
@@ -61,8 +67,14 @@ public class PairwiseDP extends DP implements Serializable {
   public void updateTransitions() {
     super.updateTransitions();
     // workaround for bug in vm
-    if(emissions != null) {
-      emissions.clear();
+    if(emissionsProb != null) {
+      emissionsProb.clear();
+    }
+    if(emissionsOdds != null) {
+      emissionsOdds.clear();
+    }
+    if(emissionsNull != null) {
+      emissionsNull.clear();
     }
   }
   
@@ -70,10 +82,20 @@ public class PairwiseDP extends DP implements Serializable {
     new ListWrapper();
 
 
-  protected double [] getEmission(List symList, CrossProductAlphabet alpha)
+  protected double [] getEmission(List symList, CrossProductAlphabet alpha, ScoreType scoreType)
   throws IllegalSymbolException {
     gopher.setList(symList);
-    double [] emission = (double []) emissions.get(gopher);
+    Map eMap;
+    if(scoreType == DP.PROBABILITY) {
+      eMap = emissionsProb;
+    } else if(scoreType == DP.ODDS) {
+      eMap = emissionsOdds;
+    } else if(scoreType == DP.NULL_MODEL) {
+      eMap = emissionsNull;
+    } else {
+      throw new BioError("Unknown score type: " + scoreType);
+    }
+    double [] emission = (double []) eMap.get(gopher);
     if(emission == null) {
       //System.out.print(".");
       Symbol sym[][] = new Symbol[2][2];
@@ -99,7 +121,7 @@ public class PairwiseDP extends DP implements Serializable {
         int [] advance = es.getAdvance();
         Distribution dis = es.getDistribution();
         Symbol s = sym[advance[0]][advance[1]]; 
-        emission[i] = Math.log(dis.getWeight(s));
+        emission[i] = Math.log(scoreType.calculateScore(dis, s));
         /*System.out.println(
           advance[0] + ", " + advance[1] + " " +
           s.getName() + " " +
@@ -107,21 +129,21 @@ public class PairwiseDP extends DP implements Serializable {
           emission[i]
         );*/
       }
-      emissions.put(new ListWrapper(ll), emission);
+      eMap.put(new ListWrapper(ll), emission);
     } else {
       //System.out.print("-");
     }
     return emission;
   }
 
-  public double backward(SymbolList[] seqs) 
+  public double backward(SymbolList[] seqs, ScoreType scoreType) 
   throws IllegalSymbolException,
   IllegalAlphabetException,
   IllegalTransitionException {
-    return backwardMatrix(seqs).getScore();
+    return backwardMatrix(seqs, scoreType).getScore();
   }
 
-  public DPMatrix backwardMatrix(SymbolList[] seqs) 
+  public DPMatrix backwardMatrix(SymbolList[] seqs, ScoreType scoreType) 
   throws IllegalSymbolException,
   IllegalAlphabetException,
   IllegalTransitionException {
@@ -135,19 +157,20 @@ public class PairwiseDP extends DP implements Serializable {
       seqs[0], seqs[1],
       (CrossProductAlphabet) getModel().emissionAlphabet(),
       2, 2,
-      matrix
+      matrix,
+      scoreType
     );
-    double score = b.runBackward(cursor);
+    double score = b.runBackward(cursor, scoreType);
     unlockModel();
     matrix.setScore(score);
     return matrix;
   }
 
-  public DPMatrix backwardMatrix(SymbolList[] seqs, DPMatrix d) 
+  public DPMatrix backwardMatrix(SymbolList[] seqs, DPMatrix d, ScoreType scoreType) 
   throws IllegalSymbolException,
   IllegalAlphabetException,
   IllegalTransitionException {
-    return backwardMatrix(seqs);
+    return backwardMatrix(seqs, scoreType);
   }
 
   private class Backward {
@@ -159,7 +182,7 @@ public class PairwiseDP extends DP implements Serializable {
     private boolean initializationHack;
 
     public double runBackward(
-      PairDPCursor curs
+      PairDPCursor curs, ScoreType scoreType
     ) throws
       IllegalSymbolException,
       IllegalAlphabetException,
@@ -169,7 +192,7 @@ public class PairwiseDP extends DP implements Serializable {
       cursor = curs;
       alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
       transitions = getBackwardTransitions();
-      transitionScores = getBackwardTransitionScores();
+      transitionScores = getBackwardTransitionScores(scoreType);
 
 
       // initialization
@@ -209,11 +232,10 @@ public class PairwiseDP extends DP implements Serializable {
           if(curState == magicalState) {
             curCol[l] = 0.0;
           } else {
-            curCol[l] = Double.NEGATIVE_INFINITY;
+            curCol[l] = Double.NaN;
           }
           continue STATELOOP;
         }
-        double score = 0.0;
         int [] tr = transitions[l];
         double[] trs = transitionScores[l];
 
@@ -232,6 +254,10 @@ public class PairwiseDP extends DP implements Serializable {
             int [] advance = ((EmissionState)destS).getAdvance();
             targetCell = cells[advance[0]][advance[1]];
             weight = targetCell.emissions[destI];
+            if(Double.isNaN(weight)) {
+              curCol[l] = Double.NaN;
+              continue STATELOOP;
+            }
             sCol = targetCell.scores;
           } else {
             targetCell = curCell;
@@ -241,25 +267,35 @@ public class PairwiseDP extends DP implements Serializable {
         }
 
         // Find base for addition
-        int ci = 0;
-        while (ci < tr.length && sourceScores[ci] == Double.NEGATIVE_INFINITY) {
-          ++ci;
+        double constant = Double.NaN;
+        for(
+          int ci = 0;
+          ci < tr.length && (
+            constant == Double.NEGATIVE_INFINITY ||
+            constant == Double.NaN
+          );
+          ci++
+        ) {
+          constant = sourceScores[tr[ci]];
         }
-        double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
-	    
-  	    for (int kc = 0; kc < tr.length; ++kc) {
-          //System.out.println("In from " + states[kc].getName());
-          //System.out.println("prevScore = " + sourceScores[kc]);
+        if(Double.isNaN(constant)) {
+          curCol[l] = Double.NaN;
+        } else {
+          double score = 0.0;
+          for (int kc = 0; kc < tr.length; ++kc) {
+            //System.out.println("In from " + states[kc].getName());
+            //System.out.println("prevScore = " + sourceScores[kc]);
 
-          int k = tr[kc];
-          double skc = sourceScores[kc];
-          if (skc != Double.NEGATIVE_INFINITY) {
-            double t = trs[kc];
-            score += Math.exp(t + skc - constant);
+            int k = tr[kc];
+            double skc = sourceScores[kc];
+            if (skc != Double.NEGATIVE_INFINITY && !Double.isNaN(skc)) {
+              double t = trs[kc];
+              score += Math.exp(t + skc - constant);
+            }
           }
+          curCol[l] = Math.log(score) + constant;
+          //System.out.println(curCol[l]);
         }
-        curCol[l] = Math.log(score) + constant;
-        //System.out.println(curCol[l]);
       }
     }
   }
@@ -268,7 +304,7 @@ public class PairwiseDP extends DP implements Serializable {
     // FORWARD
     // 
 
-  public double forward(SymbolList[] seqs) 
+  public double forward(SymbolList[] seqs, ScoreType scoreType) 
   throws IllegalSymbolException,
   IllegalAlphabetException,
   IllegalTransitionException {
@@ -279,13 +315,13 @@ public class PairwiseDP extends DP implements Serializable {
     Forward f = new Forward();
     PairDPCursor cursor = new LightPairDPCursor(
       seqs[0], seqs[1], (CrossProductAlphabet) getModel().emissionAlphabet(),
-      2, 2, getStates().length
+      2, 2, getStates().length, scoreType
     );
     unlockModel();
-    return f.runForward(cursor);
+    return f.runForward(cursor, scoreType);
   }
 
-  public DPMatrix forwardMatrix(SymbolList[] seqs) 
+  public DPMatrix forwardMatrix(SymbolList[] seqs, ScoreType scoreType) 
   throws
     IllegalSymbolException,
     IllegalAlphabetException,
@@ -299,21 +335,21 @@ public class PairwiseDP extends DP implements Serializable {
     PairDPMatrix matrix = new PairDPMatrix(this, seqs[0], seqs[1]);
     PairDPCursor cursor = new MatrixPairDPCursor(
       seqs[0], seqs[1], (CrossProductAlphabet) getModel().emissionAlphabet(),
-      2, 2, matrix
+      2, 2, matrix, scoreType
     );
-    double score = f.runForward(cursor);
+    double score = f.runForward(cursor, scoreType);
     matrix.setScore(score);
     unlockModel();
     return matrix;
   }
 
-  public DPMatrix forwardMatrix(SymbolList[] seqs, DPMatrix d) 
+  public DPMatrix forwardMatrix(SymbolList[] seqs, DPMatrix d, ScoreType scoreType) 
   throws
     IllegalSymbolException,
     IllegalAlphabetException,
     IllegalTransitionException
   {
-    return forwardMatrix(seqs);
+    return forwardMatrix(seqs, scoreType);
   }
 
   private class Forward {
@@ -323,14 +359,14 @@ public class PairwiseDP extends DP implements Serializable {
     private PairDPCursor cursor;
     private boolean initializationHack;
 
-    public double runForward(PairDPCursor curs) 
+    public double runForward(PairDPCursor curs, ScoreType scoreType) 
         throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       states = getStates();
       cursor = curs;
 
       transitions = getForwardTransitions();
-      transitionScores = getForwardTransitionScores();
+      transitionScores = getForwardTransitionScores(scoreType);
 
       Cell[][] cells = cursor.press();
       initializationHack = true;
@@ -364,7 +400,8 @@ public class PairwiseDP extends DP implements Serializable {
       Cell curCell = cells[0][0];
       double[] curCol = curCell.scores;
       double[] emissions = curCell.emissions;
-
+      //System.out.println("curCol = " + curCol);
+      
      STATELOOP:
       for (int l = 0; l < states.length; ++l) {
         State curState = states[l];
@@ -374,7 +411,7 @@ public class PairwiseDP extends DP implements Serializable {
             if(curState == magicalState) {
               curCol[l] = 0.0;
             } else {
-              curCol[l] = Double.NEGATIVE_INFINITY;
+              curCol[l] = Double.NaN;
             }
             //System.out.println("Initialized state to " + curCol[l]);
             continue STATELOOP;
@@ -388,41 +425,62 @@ public class PairwiseDP extends DP implements Serializable {
             sourceScores = curCol;
           } else {
             weight = emissions[l];
-            if(weight == Double.NEGATIVE_INFINITY) {
-              curCol[l] = Double.NEGATIVE_INFINITY;
+            //System.out.println("Weight " + emissions[l]);
+            if(weight == Double.NEGATIVE_INFINITY || Double.isNaN(weight)) {
+              curCol[l] = Double.NaN;
               continue STATELOOP;
             }
             int [] advance = ((EmissionState)curState).getAdvance(); 
             sourceScores = cells[advance[0]][advance[1]].scores;
+            //System.out.println("Values from " + advance[0] + ", " + advance[1] + " " + sourceScores);
           }
           //System.out.println("weight = " + weight);
 
-          double score = 0.0;
           int [] tr = transitions[l];
           double[] trs = transitionScores[l];
+          
+          /*for(int ci = 0; ci < tr.length; ci++) {
+            System.out.println(
+              "Source = " + states[tr[ci]] +
+              "\t= " + sourceScores[tr[ci]].getName()
+            );
+          }*/
 
           // Calculate probabilities for states with transitions
           // here.
 	
           // Find base for addition
-          int ci = 0;
-          while (ci < tr.length && sourceScores[ci] == Double.NEGATIVE_INFINITY) {
-            ++ci;
+          double constant = Double.NaN;
+          for (
+            int ci = 0;
+            ci < tr.length && (
+              constant == Double.NEGATIVE_INFINITY ||
+              Double.isNaN(constant)
+            );
+            ci++
+          ) {
+            constant = sourceScores[tr[ci]];
+            //System.out.println("trying source: " + states[tr[ci]].getName() + " = " + constant);
           }
-          double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
-          for (int kc = 0; kc < tr.length; ++kc) {
-            //System.out.println("In from " + states[kc].getName());
-            //System.out.println("prevScore = " + sourceScores[kc]);
+          if(Double.isNaN(constant)) {
+            curCol[l] = Double.NaN;
+            //System.out.println("found no source");
+          } else {
+            double score = 0.0;
+            for (int kc = 0; kc < tr.length; ++kc) {
+              //System.out.println("In from " + states[kc].getName());
+              //System.out.println("prevScore = " + sourceScores[kc]);
 
-            int k = tr[kc];
-            double sk = sourceScores[k];
-            if (sk != Double.NEGATIVE_INFINITY) {
-              double t = trs[kc];
-              score += Math.exp(t + sk - constant);
+              int k = tr[kc];
+              double sk = sourceScores[k];
+              if (sk != Double.NEGATIVE_INFINITY && !Double.isNaN(sk)) {
+                double t = trs[kc];
+                score += Math.exp(t + sk - constant);
+              }
             }
+            curCol[l] = weight + Math.log(score) + constant;
+            //System.out.println("Setting col score to " + curCol[l]);
           }
-          curCol[l] = weight + Math.log(score) + constant;
-          //System.out.println("Setting col score to " + curCol[l]);
         } catch (Exception e) {
           throw new BioError(
             e,
@@ -435,6 +493,13 @@ public class PairwiseDP extends DP implements Serializable {
           );
         }
       }
+      /*for (int l = 0; l < states.length; ++l) {
+        State curState = states[l];
+        System.out.println(
+          "State = " + states[l].getName() +
+          "\t = " + curCol[l]
+        );
+      }*/
     }
   }
 
@@ -442,7 +507,7 @@ public class PairwiseDP extends DP implements Serializable {
   // VITERBI!
   //
 
-  public StatePath viterbi(SymbolList[] seqs) 
+  public StatePath viterbi(SymbolList[] seqs, ScoreType scoreType) 
   throws
     IllegalSymbolException,
     IllegalAlphabetException,
@@ -453,7 +518,7 @@ public class PairwiseDP extends DP implements Serializable {
     }
     lockModel();
     Viterbi v = new Viterbi();
-    StatePath sp = v.runViterbi(seqs[0], seqs[1]);
+    StatePath sp = v.runViterbi(seqs[0], seqs[1], scoreType);
     unlockModel();
     return sp;
   }
@@ -467,7 +532,7 @@ public class PairwiseDP extends DP implements Serializable {
     private boolean initializationHack = true;
     private BackPointer TERMINAL_BP;
 
-    public StatePath runViterbi(SymbolList seq0, SymbolList seq1) 
+    public StatePath runViterbi(SymbolList seq0, SymbolList seq1, ScoreType scoreType) 
     throws
       IllegalSymbolException,
       IllegalAlphabetException,
@@ -478,11 +543,11 @@ public class PairwiseDP extends DP implements Serializable {
       states = getStates();
       cursor = new LightPairDPCursor(
         seq0, seq1, (CrossProductAlphabet) getModel().emissionAlphabet(),
-        2, 2, states.length
+        2, 2, states.length, scoreType
       );
       
       transitions = getForwardTransitions();
-      transitionScores = getForwardTransitionScores();
+      transitionScores = getForwardTransitionScores(scoreType);
       
       initializationHack = true;
       Cell[][] cells = cursor.press();
@@ -591,11 +656,6 @@ public class PairwiseDP extends DP implements Serializable {
       double[] curCol = curCell.scores;
       BackPointer[] curBPs = curCell.backPointers;
       double[] emissions = curCell.emissions;
-      /*(System.out.println(
-        "Got symbols " + cells[0][0] + "->" +
-        cells[0][0].symbols[0].getName() + ", " +
-        cells[0][0].symbols[1].getName()
-      );*/
       //System.out.println("Scores " + curCol);
      STATELOOP:
       for (int l = 0; l < states.length; ++l) {
@@ -608,7 +668,7 @@ public class PairwiseDP extends DP implements Serializable {
               curCol[l] = 0.0;
               curBPs[l] = TERMINAL_BP;
             } else {
-              curCol[l] = Double.NEGATIVE_INFINITY;
+              curCol[l] = Double.NaN;
               curBPs[l] = null;
             }
             //System.out.println("Initialized state to " + curCol[l]);
@@ -624,8 +684,8 @@ public class PairwiseDP extends DP implements Serializable {
             oldBPs = curBPs;
           } else {
             weight = emissions[l];
-            if(weight == Double.NEGATIVE_INFINITY) {
-              curCol[l] = Double.NEGATIVE_INFINITY;
+            if(weight == Double.NEGATIVE_INFINITY || Double.isNaN(weight)) {
+              curCol[l] = Double.NaN;
               curBPs[l] = null;
               continue STATELOOP;
             }
@@ -633,6 +693,7 @@ public class PairwiseDP extends DP implements Serializable {
             Cell oldCell = cells[advance[0]][advance[1]];
             sourceScores = oldCell.scores;
             oldBPs = oldCell.backPointers;
+            //System.out.println("Looking back " + advance[0] + ", " + advance[1]);
           }
           //System.out.println("weight = " + weight);
 
@@ -645,22 +706,25 @@ public class PairwiseDP extends DP implements Serializable {
             int k = tr[kc]; // actual state index
             double sk = sourceScores[k];
 
-            //System.out.println("kc is " + kc);
-            //System.out.println("with from " + k + "=" + states[k].getName());
-            //System.out.println("prevScore = " + sourceScores[k]);
-            if (sk != Double.NEGATIVE_INFINITY) {
+            /*System.out.println("kc is " + kc);
+            System.out.println("with from " + k + "=" + states[k].getName());
+            System.out.println("prevScore = " + sk);*/
+            if (sk != Double.NEGATIVE_INFINITY && !Double.isNaN(sk)) {
               double t = trs[kc];
+              //System.out.println("Transition score = " + t);
               double newScore = t + sk;
               if (newScore > score) {
                 score = newScore;
                 bestK = k;
-                //System.out.println("New best source at " + kc);
+                //System.out.println("New best source at " + kc + " is " + score);
               }
             }
           }
           if (bestK != -1) {
             curCol[l] = weight + score;
-            /*System.out.println(
+            /*System.out.println("Weight = " + weight);
+            System.out.println("Score = " + score);
+            System.out.println(
               "Creating " + states[bestK].getName() +
               " -> " + states[l].getName() +
               " (" + curCol[l] + ")"
@@ -680,10 +744,10 @@ public class PairwiseDP extends DP implements Serializable {
               );
             }
           } else {
+            //System.out.println("No where to come from");;
             curBPs[l] = null;
-            curCol[l] = Double.NEGATIVE_INFINITY;
+            curCol[l] = Double.NaN;
           }
-          // System.out.println(curCol[l]);
         } catch (Exception e) {
           throw new BioError(
             e,
@@ -698,12 +762,15 @@ public class PairwiseDP extends DP implements Serializable {
       }
       /*System.out.println("backpointers:");
       for(int l = 0; l < states.length; l++) {
+        System.out.print(states[l].getName() + "\t" + curCol[l] + "\t");
         BackPointer b = curBPs[l];
         if(b != null) {
           for(BackPointer bb = b; bb.back != bb; bb = bb.back) {
-	    System.out.print(bb.state.getName() + " -> ");
+            System.out.print(bb.state.getName() + " -> ");
           }
           System.out.println("!");
+        } else {
+          System.out.print("\n");
         }
       }*/
     }
@@ -771,6 +838,7 @@ public class PairwiseDP extends DP implements Serializable {
     protected double[] zeroCol;
     protected BackPointer[] emptyBP;
     protected int[] depth;
+    protected ScoreType scoreType;
     
     public LightPairDPCursor(
       SymbolList seq1,
@@ -778,7 +846,8 @@ public class PairwiseDP extends DP implements Serializable {
       CrossProductAlphabet alpha,
       int depth1,
       int depth2,
-      int numStates
+      int numStates,
+      ScoreType scoreType
     ) throws IllegalSymbolException {
       this.numStates = numStates;
       this.alpha = alpha;
@@ -796,6 +865,7 @@ public class PairwiseDP extends DP implements Serializable {
       this.depth = new int[2];
       this.depth[0] = depth1;
       this.depth[1] = depth2;
+      this.scoreType = scoreType;
       
       this.flip = this.seqs[1].length() > this.seqs[0].length();
       //System.out.println("flip=" + this.flip);
@@ -824,15 +894,7 @@ public class PairwiseDP extends DP implements Serializable {
           }
         }
       }
-/*      for(int i = 1; i < emissions.length; i++) {
-        double [][] ei = emissions[i];
-        for(int j = 0; j < ei.length; j++) {
-          double [] ej = ei[j];
-          for(int k = 0; k < ej.length; k++) {
-            ej[k] = Double.NEGATIVE_INFINITY;
-          }
-        }
-      }*/
+
       calcEmissions(emissions[0]);
     }
 
@@ -968,7 +1030,7 @@ public class PairwiseDP extends DP implements Serializable {
           symL[1] = (j < 1 || j > seqs[1].length())
             ? AlphabetManager.getGapSymbol()
             : seqs[1].symbolAt(j);
-          em[j] = getEmission(symList, alpha);
+          em[j] = getEmission(symList, alpha, scoreType);
           //System.out.println("symbol " + symL[0].getName() + ", " + symL[1].getName() + "->" + em[j]);
         }
       } else {
@@ -984,7 +1046,7 @@ public class PairwiseDP extends DP implements Serializable {
             ? AlphabetManager.getGapSymbol()
             : seqs[0].symbolAt(i);
           //System.out.println("symbol " + symL[0].getName() + ", " + symL[1].getName());
-          em[i] = getEmission(symList, alpha);
+          em[i] = getEmission(symList, alpha, scoreType);
         }
       }
     }
@@ -1011,7 +1073,8 @@ public class PairwiseDP extends DP implements Serializable {
       int start2,
       int depth1,
       int depth2,
-      PairDPMatrix matrix
+      PairDPMatrix matrix,
+      ScoreType scoreType
     ) throws IllegalSymbolException {
       this.numStates = matrix.states().length;
 
@@ -1046,7 +1109,7 @@ public class PairwiseDP extends DP implements Serializable {
           symArray[1] = (j < 1 || j > seq2.length())
             ? AlphabetManager.getGapSymbol()
             : seq2.symbolAt(j);
-          ei[j] = getEmission(symList, alpha);
+          ei[j] = getEmission(symList, alpha, scoreType);
         }
       }
     }
@@ -1075,9 +1138,10 @@ public class PairwiseDP extends DP implements Serializable {
       CrossProductAlphabet alpha,
       int depth1,
       int depth2,
-      PairDPMatrix matrix
+      PairDPMatrix matrix,
+      ScoreType scoreType
     ) throws IllegalSymbolException {
-      super(seq1, seq2, alpha, 0, 0, depth1, depth2, matrix);
+      super(seq1, seq2, alpha, 0, 0, depth1, depth2, matrix, scoreType);
     }
     
     public boolean hasNext() {
@@ -1134,13 +1198,15 @@ public class PairwiseDP extends DP implements Serializable {
       CrossProductAlphabet alpha,
       int depth1,
       int depth2,
-      PairDPMatrix matrix
+      PairDPMatrix matrix,
+      ScoreType scoreType
     ) throws IllegalSymbolException {
       super(
         seq1, seq2, alpha,
         seq1.length()+1, seq2.length()+1,
         depth1, depth2,
-        matrix
+        matrix,
+        scoreType
       );
     }
 

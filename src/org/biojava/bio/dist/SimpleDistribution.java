@@ -93,6 +93,12 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
         "Can't set the weight for an ambiguity symbol " + s.getName()
       );
     }
+    if(w < 0.0) {
+      throw new IllegalArgumentException(
+        "Can't set weight to negative score: " +
+        s.getName() + " -> " + w
+      );
+    }
     Double d = new Double(w);
     weight.put(s, d);
   }

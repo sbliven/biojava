@@ -35,7 +35,6 @@ import org.biojava.bio.symbol.*;
 public class UniformDistribution
 extends AbstractDistribution implements Serializable {
   private final FiniteAlphabet alphabet;
-  private final double weight;
   private Distribution nullModel;
   
   public Alphabet getAlphabet() {
@@ -64,7 +63,7 @@ extends AbstractDistribution implements Serializable {
   throws IllegalSymbolException {
     alphabet.validate(s);
     if(s instanceof AtomicSymbol) {
-      return weight;
+      return 1.0 / (double) alphabet.size();
     } else {
       return getAmbiguityWeight(s);
     }
@@ -76,7 +75,6 @@ extends AbstractDistribution implements Serializable {
   
   public UniformDistribution(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
-    this.weight = 1.0 / (double) alphabet.size();
     this.nullModel = this;
   }
 }

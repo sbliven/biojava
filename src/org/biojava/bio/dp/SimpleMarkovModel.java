@@ -251,8 +251,10 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     }
       
     stateAlphabet().addSymbol(toAdd);
-    transFrom.put(toAdd, new SimpleAlphabet("Transitions from " + toAdd.getName()));
+    FiniteAlphabet fa = new SimpleAlphabet("Transitions from " + toAdd.getName());
+    transFrom.put(toAdd, fa);
     transTo.put(toAdd, new SimpleAlphabet("Transitions to " + toAdd.getName()));
+    transWeights.put(toAdd, new SimpleDistribution(fa));
   }
   
   public void removeState(State toGo)
@@ -296,15 +298,6 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     this.stateAlpha = new SimpleAlphabet();
     this.magicalState = MagicalState.getMagicalState(emissionAlpha, heads);
     
-    try {
-      ((SimpleAlphabet) stateAlpha).addSymbol(magicalState);
-    } catch (IllegalSymbolException ire) {
-      throw new BioError(
-        ire,
-        "Alphabet went screwey on me & wouldn't accept the magical state"
-      );
-    }
-
     try {
       addState(magicalState);
     } catch (IllegalSymbolException ise) {

@@ -34,20 +34,21 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
     ModelTrainer trainer,
     SymbolList resList
   ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
+    DP.ScoreType scoreType = DP.PROBABILITY;
     DP dp = getDP();
     State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();
-    double [][] forwardTransitionScores = dp.getForwardTransitionScores();    
+    double [][] forwardTransitionScores = dp.getForwardTransitionScores(scoreType);    
     int [][] backwardTransitions = dp.getBackwardTransitions();
-    double [][] backwardTransitionScores = dp.getBackwardTransitionScores();    
+    double [][] backwardTransitionScores = dp.getBackwardTransitionScores(scoreType);    
     MarkovModel model = dp.getModel();
     
     SymbolList [] rll = { resList };
     
-    SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll);
+    SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll, scoreType);
     double fs = fm.getScore();
     
-    SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll);
+    SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll, scoreType);
     double bs = bm.getScore();
 
     Symbol gap = AlphabetManager.getGapSymbol();

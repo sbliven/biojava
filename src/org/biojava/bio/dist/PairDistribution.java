@@ -28,6 +28,7 @@ import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 
 /**
  * Class for pairing up two independant distributions.
@@ -37,32 +38,30 @@ import org.biojava.bio.symbol.*;
 public class PairDistribution
 extends AbstractDistribution implements Serializable {
   private static Map cache;
+  private static ListWrapper gopher;
   
   static {
     cache = new HashMap();
+    gopher = new ListWrapper();
   }
   
-  protected static Distribution getNullModel(Distribution source) {
+  protected static Distribution getNullModel(Distribution first, Distribution second) {
     synchronized(cache) {
-      SoftReference ref = (SoftReference) cache.get(source);
+      first = first.getNullModel();
+      second = second.getNullModel();
+      List distL = Arrays.asList(new Object [] { first, second } );
+      gopher.setList(distL);
+      SoftReference ref = (SoftReference) cache.get(gopher);
       Distribution dist;
-      try {
-        if(ref == null) {
-          dist = new ComplementaryDistribution(source);
-          cache.put(source, new SoftReference(dist));
-        } else {
-          dist = (Distribution) ref.get();
-          if(dist == null) {
-            dist = new ComplementaryDistribution(source);
-            cache.put(source, new SoftReference(dist));
-          }
+      if(ref == null) {
+        dist = new PairDistribution(first, second);
+        cache.put(distL, new SoftReference(dist));
+      } else {
+        dist = (Distribution) ref.get();
+        if(dist == null) {
+          dist = new PairDistribution(first, second);
+          cache.put(distL, new SoftReference(dist));
         }
-      } catch (IllegalAlphabetException iae) {
-        throw new BioError(
-          iae,
-          "The parent's null distribution is not complementable, " +
-          "but the parent is. Something is wrong with the parent"
-        );
       }
       return dist;
     }
@@ -79,7 +78,7 @@ extends AbstractDistribution implements Serializable {
   }
   
   public Distribution getNullModel() {
-    return getNullModel(this);
+    return getNullModel(first, second);
   }
   
   /**

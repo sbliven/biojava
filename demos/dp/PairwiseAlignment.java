@@ -50,7 +50,7 @@ public class PairwiseAlignment {
       DP aligner = generateAligner(
         alpha,
         0.5, 0.8,
-        0.5, 0.8
+        0.2, 0.8
       );
       
       SymbolParser rParser = alpha.getParser("token");
