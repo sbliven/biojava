@@ -234,5 +234,5 @@ public final class LifeScienceIdentifier
 					 security);
     }
 
-    //private static final long serialVersionUID = (long) 1;
+    private static final long serialVersionUID = 1836992936659290633L;
 }
