@@ -354,6 +354,8 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	public void mark(int limit)
 	    throws IOException
 	{
+	    //	    System.err.println("*** Mark");
+
 	    if (limit + 1> buffer.length) {
 		char[] newBuffer = new char[limit + 1];
 		System.arraycopy(buffer, buffPos, newBuffer, 0, buffFill - buffPos);
@@ -373,6 +375,8 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	public void reset()
 	    throws IOException
 	{
+	    //	    System.err.println("*** Reset");
+
 	    if (mark < 0)
 		throw new IOException("The mark is not currently in scope");
 
@@ -406,6 +410,8 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	private void fillBuffer()
 	    throws IOException
 	{
+	    // System.err.println("*** Fill buffer");
+
 	    if (mark < 0) {
 		buffFill = stream.read(buffer);
 		if (buffFill == -1) {
@@ -416,7 +422,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 		
 		buffPos = 0;
 	    } else {
-		if (buffPos >= (markLimit - mark)) {
+		if (buffPos >= (markLimit + mark)) {
 		    // Mark's gone out of scope -- wheee!
 		    mark = -1;
 		    markLimit = -1;
