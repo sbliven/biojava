@@ -1,0 +1,142 @@
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
+                      "/nfs/team81/kdj/local/lib/sgml/docbook.dtd" [
+]>
+
+<!--
+
+        Aim is to keep this both SGML and XML compliant so it can be
+        processed with any of Jade, Xalan etc.
+
+        Note that this file will be broken into separate entities when it
+        grows too big.
+
+-->
+
+<!--
+        First priorities:
+
+        Docbook stuff. How to get and use.
+        Collate existing documentation and add.
+        Add recent bootcamp material.
+        Trawl mailing list and start FAQ.
+        Add Ant task to build docs and link to Javadoc.
+
+-->
+
+<book>
+  <title>The BioJava Documentation Project</title>
+
+  <bookinfo>
+    <!-- Add your name as a collaborative author if you contribute -->
+    <authorgroup>
+      <collab>
+        <collabname>Keith James</collabname>
+        <affiliation>
+          <orgname>The Wellcome Trust Sanger Institute</orgname>
+        </affiliation>
+      </collab>
+    </authorgroup>
+
+    <!-- Change this to reflect the current editor -->
+    <editor>
+      <firstname>Keith</firstname>
+      <surname>James</surname>
+      <affiliation>
+        <orgname>The Wellcome Trust Sanger Institute</orgname>
+      </affiliation>
+    </editor>
+
+    <!-- Increment only for major changes and CVS will track
+    everything else -->
+    <revhistory>
+      <revision>
+        <revnumber>1</revnumber>
+        <!-- Please use this ISO standard for representing dates -->
+        <date>2002/03/26</date>
+        <authorinitials>KJ</authorinitials>
+        <revdescription>
+          <para>Initial draft</para>
+        </revdescription>        
+      </revision>
+    </revhistory>
+  </bookinfo>
+
+  <preface>
+    <title>Foreward</title>
+
+    <para>The <ulink url="http://biojava.org">BioJava Project</ulink>
+    is an open-source project dedicated to providing <ulink
+    url="http://java.sun.com">Java</ulink> tools for processing
+    biological data. The BioJava library is useful for automating
+    those daily and mundane bioinformatics tasks. As the library
+    matures, the BioJava libraries will provide a foundation upon
+    which both free software and commercial packages can be
+    developed.</para>
+
+    <para>The BioJava Documentation Project aims to provide
+    information about all aspects of BioJava and to link into other
+    resources, such as the API documentation.</para>
+  </preface>
+
+  <preface>
+    <title>Introduction to the documentation</title>
+
+    <para>The documentation takes as its model the <ulink
+    url="http://linuxdoc.org">Linux Documentation Project</ulink>
+    (LDP) which aims to develop free, high quality documentation for
+    the GNU/Linux operating system. By using an SGML/XML-based
+    authoring format (<ulink
+    url="http://www.oasis-open.org/docbook/">DocBook</ulink>) many
+    different types of output may be generated from a single source,
+    including HTML and printable formats, without compromising quality
+    or portability across computing platforms.</para>
+
+    <para></para>
+
+  </preface>
+
+  <chapter>
+    <title>Beginning BioJava</title>
+
+    <sect1>
+      <title>Obtaining BioJava</title>
+
+    </sect1>
+
+    <sect1>
+      <title>Installing BioJava</title>
+
+    </sect1>
+
+    <sect1>
+      <title>Running the demo programs</title>
+
+    </sect1>
+  </chapter>
+
+
+  <appendix label="A">
+    <title>Style guide</title>
+
+  </appendix>
+
+  <appendix label="B">
+    <title>Using DocBook</title>
+
+    <sect1>
+      <title>What is DocBook</title>
+
+    </sect1>
+
+    <sect1>
+      <title>Why use DocBook?</title>
+
+    </sect1>
+
+    <sect1>
+      <title>DocBook and the BioJava Documentation Project</title>
+
+    </sect1>
+
+  </appendix>
+</book>
