@@ -51,6 +51,7 @@ import org.biojava.bio.seq.*;
  * </p>
  *
  * @author Thomas Down
+ * @author Greg Cox
  * @since 1.1
  */
 
@@ -93,7 +94,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 	boolean hasMoreSequence = true;
 
 	listener.startSequence();
-	
+
 	while ((line = reader.readLine()) != null) {
 	    if (line.startsWith("//")) {
 		if (sparser != null) {
@@ -107,10 +108,14 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 		    hasMoreSequence = false;
 		else
 		    reader.reset();
-		
+
 		listener.endSequence();
 		return hasMoreSequence;
-	    } else if (line.startsWith("SQ")) {
+		} else if (line.startsWith("SQ")) {
+		// Adding a null property to flush the last feature;  Needed for
+		// Swissprot files because there is no gap between the feature table
+		// and the sequence data
+		listener.addSequenceProperty("XX", "");
 		sparser = symParser.parseStream(listener);
 	    } else {
 		if (sparser == null) {
@@ -136,7 +141,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
      * Dispatch symbol data from SQ-block line of an EMBL-like file.
      */
 
-    protected void processSequenceLine(String line, StreamParser parser) 
+    protected void processSequenceLine(String line, StreamParser parser)
         throws IllegalSymbolException, ParseException
     {
 	char[] cline = line.toCharArray();
@@ -169,7 +174,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
      */
 
     public void writeSequence(Sequence seq, PrintStream os)
-	throws IOException 
+	throws IOException
     {
 	throw new RuntimeException("Can't write in EMBL format...");
     }

@@ -33,141 +33,113 @@ import org.biojava.bio.*;
  * Skeleton implementation, please add more functionality.
  *
  * <p>
- * <strong>FIXME:</strong> Note that this is currently rather incomplete, 
+ * <strong>FIXME:</strong> Note that this is currently rather incomplete,
  * and doesn't handle any of the header information sensibly except for
  * ID and AC.
  * </p>
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.1
  */
 
-public class SwissprotProcessor extends SequenceBuilderFilter {
-  public static final String PROPERTY_SWISSPROT_ACCESSIONS = "swissprot.accessions";
-  public static final String PROPERTY_SWISSPROT_COMMENT = "swissprot.comment";
-  /**
-   * Factory which wraps SequenceBuilders in a SwissprotProcessor
-   *
-   * @author Thomas Down
-   */
+public class SwissprotProcessor extends SequenceBuilderFilter
+{
+	public static final String PROPERTY_SWISSPROT_ACCESSIONS = "swissprot.accessions";
+	public static final String PROPERTY_SWISSPROT_COMMENT = "swissprot.comment";
 
-  public static class Factory implements SequenceBuilderFactory, Serializable {
-    private SequenceBuilderFactory delegateFactory;
-    
-    public Factory(SequenceBuilderFactory delegateFactory) {
-      this.delegateFactory = delegateFactory;
-    }
-    
-    public SequenceBuilder makeSequenceBuilder() {
-      return new SwissprotProcessor(delegateFactory.makeSequenceBuilder());
-    }
-  }
+	/**
+	 * Factory which wraps SequenceBuilders in a SwissprotProcessor
+	 *
+	 * @author Thomas Down
+	 */
 
-  private List accessions;
-  private Feature.Template tplt;
-  private boolean inFeature;
-  private String featureKey;
-  private StringBuffer featureValue;
+	public static class Factory implements SequenceBuilderFactory, Serializable
+	{
+		private SequenceBuilderFactory delegateFactory;
 
-  public SwissprotProcessor(SequenceBuilder delegate) {
-    super(delegate);
+		public Factory(SequenceBuilderFactory delegateFactory)
+		{
+			this.delegateFactory = delegateFactory;
+		}
 
-    accessions = new ArrayList();
-    tplt = new Feature.Template();
-    tplt.annotation = Annotation.EMPTY_ANNOTATION;
-    tplt.source="SWISSPROT";
-    inFeature = false;
-    featureValue = new StringBuffer();
-  }
+		public SequenceBuilder makeSequenceBuilder()
+		{
+			return new SwissprotProcessor(delegateFactory.makeSequenceBuilder());
+		}
+	}
 
-  public void endSequence() throws ParseException {
-    if (accessions.size() > 0) {
-      String id = (String) accessions.get(0);
-      getDelegate().setName(id);
-      getDelegate().setURI("urn:sequence/swissprot:" + id);
-      getDelegate().addSequenceProperty(PROPERTY_SWISSPROT_ACCESSIONS, accessions);
-      accessions = new ArrayList();
-    }
-    if(inFeature) {
-      getDelegate().endFeature();
-    }
-    getDelegate().endSequence();
-  }
+	private SwissprotFeatureTableParser features;
+	private static HashSet featureKeys = null;
+	private List accessions;
+	{
+		accessions = new ArrayList();
+	}
 
-  public void addSequenceProperty(Object key, Object value) throws ParseException {
-    if (key.equals("ID")) {
-      String line = (String) value;
-      int space = line.indexOf(' ');
-      String id = line.substring(0, space);
-    } else if (key.equals("AC")) {
-      String acc= value.toString();
-      StringTokenizer toke = new StringTokenizer(acc, "; ");
-      while (toke.hasMoreTokens()) {
-        accessions.add(toke.nextToken());
-      }
-    } else if (key.equals("FT")) {
-      try {
-        String line = (String) value;
-        String type = line.substring(0, 8).trim();
-        if(type.length() != 0) {
-          if(inFeature) {
-            flushFeature();
-            getDelegate().endFeature();
-          }
-          tplt.type = type;
-          // flush any feature info for the previous feature
-          featureKey = PROPERTY_SWISSPROT_COMMENT;
-          
-          // process this feature into a type and a location
-          String locStart = line.substring(8, 15).trim();
-          String locEnd = line.substring(15, 22).trim();
-          
-          int start;
-          int end;
-          try {
-            start = Integer.parseInt(locStart);
-          } catch (NumberFormatException nfe) {
-            start = Integer.MIN_VALUE;
-          }
-          
-          try {
-            end = Integer.parseInt(locEnd);
-          } catch (NumberFormatException nfe) {
-            end = Integer.MAX_VALUE;
-          }
+	public SwissprotProcessor(SequenceBuilder delegate)
+	{
+		super(delegate);
+		features = new SwissprotFeatureTableParser(this, "SWISSPROT");
+	}
 
-          tplt.location = new RangeLocation(start, end);
-          
-          getDelegate().startFeature(tplt);
-        }
-        if(line.length() > 28) {
-          String rest = line.substring(28).trim();
-          if(rest.startsWith("/")) {
-            flushFeature();
-            int eq = rest.indexOf("=");
-            featureKey = rest.substring(1, eq);
-            featureValue.append(rest.substring(eq+1));
-          } else {
-            featureValue.append(rest);
-          }
-        }
-      } catch (Exception e) {
-        // fixme: should be throwing some parse exception
-        throw new BioError(e, "Can't parse FT line:\n" + value.toString());
-      }
-    } else {
-      getDelegate().addSequenceProperty(key, value);
-    }
-  }
-  
-  protected void flushFeature() throws ParseException {
-    int l = featureValue.length();
-    if(l >= 0) {
-      if(featureValue.charAt(l-1) == '.') {
-        featureValue.setLength(l-1);
-      }
-      getDelegate().addFeatureProperty(featureKey, featureValue.toString());
-    }
-  }
+	public void endSequence() throws ParseException
+	{
+		if (accessions.size() > 0)
+		{
+			String id = (String) accessions.get(0);
+			getDelegate().setName(id);
+			getDelegate().setURI("urn:sequence/swissprot:" + id);
+			getDelegate().addSequenceProperty(PROPERTY_SWISSPROT_ACCESSIONS, accessions);
+			accessions = new ArrayList();
+		}
+
+		getDelegate().endSequence();
+	}
+
+	public void addSequenceProperty(Object key, Object value) throws ParseException
+	{
+		try
+		{
+	    	// Tidy up any end-of-block jobbies
+			if (features.inFeature() && !key.equals("FT"))
+			{
+				features.endFeature();
+			}
+
+			if (key.equals("FT"))
+			{
+				String featureLine = value.toString();
+				if (featureLine.charAt(0) != ' ')
+				{
+					// This is a featuretype field
+					if (features.inFeature())
+					{
+						features.endFeature();
+					}
+
+		    		features.startFeature(featureLine.substring(0, 8).trim());
+				}
+				features.featureData(featureLine.substring(9));
+			}
+			else
+			{
+				getDelegate().addSequenceProperty(key, value);
+
+				if (key.equals("AC"))
+				{
+					String acc= value.toString();
+					StringTokenizer toke = new StringTokenizer(acc, "; ");
+					while (toke.hasMoreTokens())
+					{
+						accessions.add(toke.nextToken());
+					}
+				}
+			}
+		}
+		catch (BioException ex)
+		{
+	    	throw new BioError(ex, "FIXME");
+	    }
+	}
 }
