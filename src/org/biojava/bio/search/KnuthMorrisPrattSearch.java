@@ -1,3 +1,25 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+
 package org.biojava.bio.search;
 
 
@@ -16,6 +38,22 @@ import java.util.*;
  * Reference: KNUTH D.E., MORRIS (Jr) J.H., PRATT V.R., 1977,
  * Fast pattern matching in strings, SIAM Journal on Computing 6(1):323-350.
  *
+ * <b>USAGE:</b><p>
+   * When the object is constructed the <code>findMatches()</code>
+   * method would be called. This will return an int[] giving the offsets
+   * (ie the location of the first symbol of each match in the text).
+   * The <code>getKMPNextTable()</code> returns the table of border lengths
+   * used in the algorithm. This method is protected as it is unlikely it
+   * will be needed except for debugging.<p>
+   *
+   * The algorithm finds exact matches therefor ambiguity symbols will match
+   * only themselves. The class cannot perform regular expressions. The class
+   * operates on all alphabets thus if searching for a DNA pattern you should
+   * compile both the pattern and its reverse complement.<p>
+   *
+   * <b>WARNING the behaivour of a pattern containing gaps is undefined
+   *  it's not recommended that you try it.</b>
+ *
  * @author Mark Schreiber
  * @version 1.0
  */
@@ -32,21 +70,6 @@ public final class KnuthMorrisPrattSearch {
    * A new class should be constructed for each occurance of
    * <code>pattern</code>.<p>
    *
-   * USAGE:<p>
-   * When the object is constructed the <code>findMatches()</code>
-   * method would be called. This will return an int[] giving the offsets
-   * (ie the location of the first symbol of each match in the text).
-   * The <code>getKMPNextTable()</code> returns the table of border lengths
-   * used in the algorithm. This method is protected as it is unlikely it
-   * will be needed except for debugging.<p>
-   *
-   * The algorithm finds exact matches therefor ambiguity symbols will match
-   * only themselves. The class cannot perform regular expressions. The class
-   * operates on all alphabets thus if searching for a DNA pattern you should
-   * compile both the pattern and its reverse complement.<p>
-   *
-   * <b>WARNING the behaivour of a pattern containing gaps is undefined
-   *  it's not recommended that you try it.</b>
    */
   public KnuthMorrisPrattSearch(SymbolList pattern) {
     Alphabet alpha = pattern.getAlphabet();
