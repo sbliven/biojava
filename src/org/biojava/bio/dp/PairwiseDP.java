@@ -440,28 +440,33 @@ private class Forward {
     {
 	double[] curCol = (double[]) matrix[0][0];
 	int[] advance;
+
 	for (int l = 0; l < states.length; ++l) {
-	    if (initializationHack && states[l] == magicalState)
+	    if (initializationHack && states[l] == magicalState) {
+		System.out.println("Init fixup");
 		continue;
+	    }
 
 	    // System.out.println("State = " + states[l].getName());
 
-	    if (states[l] instanceof EmissionState)
-		advance = ((EmissionState) states[l]).getAdvance();
-	    else
-		advance = ia00;
-	    Residue res = resMatrix[advance[0]][advance[1]];
 	    double weight = Double.NEGATIVE_INFINITY;
-	    if (res == null) {
-		weight = Double.NEGATIVE_INFINITY;
-	    } else if (! (states[l] instanceof EmissionState)) {
-		weight = 0.0;
-	    } else if (res == MagicalState.MAGICAL_RESIDUE) {
-		try {
+
+	    if (states[l] instanceof EmissionState) {
+		advance = ((EmissionState) states[l]).getAdvance();
+		Residue res = resMatrix[advance[0]][advance[1]];
+		
+		if (res == null) {
+		    weight = Double.NEGATIVE_INFINITY;
+		} else if (res == MagicalState.MAGICAL_RESIDUE) {
+		    try {
+			weight = ((EmissionState) states[l]).getWeight(res);
+		    } catch (Exception ex) {}
+		} else {
 		    weight = ((EmissionState) states[l]).getWeight(res);
-		} catch (Exception ex) {}
+		}
 	    } else {
-		weight = ((EmissionState) states[l]).getWeight(res);
+		advance = ia00;
+		weight = 0.0;
 	    }
 
 	    if (weight == Double.NEGATIVE_INFINITY) {
@@ -475,23 +480,9 @@ private class Forward {
 		// Calculate probabilities for states with transitions
 		// here.
 		
-//		double[] lastCol = new double[states.length];
-//  		for (int ci = 0; ci < states.length; ++ci) {
-//  		    advance = states[ci].getAdvance();
-//  		    double[] sCol = (double[]) matrix[advance[0]][advance[1]];
-//  		    lastCol[ci] = sCol[ci];
-//  		}
-
 		double[] sourceScores = new double[tr.length];
 		double[] sCol = (double[]) matrix[advance[0]][advance[1]];
 		for (int ci = 0; ci < tr.length; ++ci) {
-		    //  if (states[tr[ci]] instanceof EmissionState) {
-//  			advance = ((EmissionState)states[tr[ci]]).getAdvance();
-//  		        sCol = (double[]) matrix[advance[0]][advance[1]];
-//  		    } else {
-//  			System.out.println("Evaluating dot transition from " + tr[ci] + " to " + l);
-//  			sCol = (double[]) matrix[0][0];
-//  		    }
 		    sourceScores[ci] = sCol[tr[ci]];
 		}
 
