@@ -42,6 +42,15 @@ import org.biojava.bio.symbol.RangeLocation;
  */
 
 public class FilterUtils {
+  
+    //that block avoids problems in WalkerFactory.generateWalker(Class visitorClass),
+    //if none of these filters are instanciated before invoking that method.
+    static {
+      WalkerFactory.getInstance().addTypeWithParent(FeatureFilter.Not.class);
+      WalkerFactory.getInstance().addTypeWithParent(FeatureFilter.And.class);
+      WalkerFactory.getInstance().addTypeWithParent(FeatureFilter.Or.class);
+    }  
+  
     private FilterUtils() {
     }
     
