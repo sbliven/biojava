@@ -39,7 +39,7 @@ import java.util.*;
 public class CircularLocation
 extends AbstractLocationDecorator {
   private final int length;
-  
+
   public final int getLength() {
     return length;
   }
@@ -48,14 +48,14 @@ extends AbstractLocationDecorator {
     super(wrapped);
     this.length = length;
   }
-  
+
   protected Location decorate(Location loc) {
     return new CircularLocation(loc, getLength());
   }
-  
+
   public boolean contains(int p) {
     int pp = p % getLength() + (super.getMin() / getLength());
-    
+
     return getWrapped().contains(pp);
   }
 }

@@ -4,6 +4,9 @@ import java.util.*;
 
 /**
  * Repository for binary operators on Location instances.
+ * @author Matthew Pocock
+ * @author Greg Cox
+ * @since 1.2
  */
 final public class LocationTools {
   /**
@@ -17,21 +20,10 @@ final public class LocationTools {
    * @return a Location that is the union of locA and locB
    */
   public static Location union(Location locA, Location locB) {
-    if(
-      locA.hasDecorator(CircularLocation.class) &&
-      locB.hasDecorator(CircularLocation.class)
-    ) {
-      // FIXME:
-      throw new ClassCastException("Can't deal with CircularLocation yet");
-    }
-
-    if(
-      locA.hasDecorator(CircularLocation.class) ||
-      locB.hasDecorator(CircularLocation.class)
-    ) {
-      // FIXME:
-      throw new ClassCastException("Can't deal with CircularLocation yet");
-    }
+  	if(isDecorated(locA) || isDecorated(locB))
+  	{
+  		return(handleDecorations());
+  	}
 
     if(
       locA.isContiguous() &&
@@ -47,37 +39,37 @@ final public class LocationTools {
       // either may be compound. They may not overlap. We must build the
       // complete list of blocks, merge overlapping blocks and then create the
       // apropreate implementation of Location for the resulting list.
-      
+
       // list of all blocks
       List locList = new ArrayList();
-      
+
       // add all blocks in locA
       for(Iterator i = locA.blockIterator(); i.hasNext(); ) {
         locList.add(i.next());
       }
-      
+
       // add all blocks in locB
       for(Iterator i = locB.blockIterator(); i.hasNext(); ) {
         locList.add(i.next());
       }
-      
+
       // sort these blocks
       Collections.sort(locList, Location.naturalOrder);
-      
+
       // merge into this list...
       List joinList = new ArrayList();
-      
+
       // start iterating over sorted list.
       // last is used as loop variable. We must be careful about zero lengthed
       // lists and also careful to merge overlaps before adding to joinList.
       Iterator i = locList.iterator();
       Location last = Location.empty;
-      
+
       // prime last
       if(i.hasNext()) {
         last = (Location) i.next();
       }
-      
+
       // merge or add last with next location
       while(i.hasNext()) {
         Location cur = (Location) i.next();
@@ -90,19 +82,19 @@ final public class LocationTools {
           last = cur;
         }
       }
-      
+
       // handle the end of the loop
       if(last == Location.empty) {
         return Location.empty;
       } else {
         joinList.add(last);
       }
-      
+
       // now make the apropreate Location instance
       return buildLoc(joinList);
     }
   }
-  
+
   /**
    * Return the intersection of two locations.
    * <P>
@@ -114,6 +106,10 @@ final public class LocationTools {
    * @return a Location that is the intersection of locA and locB
    */
   public static Location intersection(Location locA, Location locB) {
+  	if(isDecorated(locA) || isDecorated(locB))
+  	{
+  		return(handleDecorations());
+  	}
     if(locA.isContiguous() && locB.isContiguous()) {
       // handle easy case of solid locations
       if(locA.overlaps(locB)) {
@@ -126,7 +122,7 @@ final public class LocationTools {
     } else {
       // One or other of the locations is compound. Build a list of all
       // locations created by finding intersection of all pairwise combinations
-      // of blocks in locA and locB. Ignore all Location.empty. Create the 
+      // of blocks in locA and locB. Ignore all Location.empty. Create the
       // apropreate Location instance.
       List locList = new ArrayList();
       Iterator aI = locA.blockIterator();
@@ -141,11 +137,11 @@ final public class LocationTools {
           }
         }
       }
-      
+
       return buildLoc(locList);
     }
   }
-  
+
   /**
    * Returns whether the two locations overlap or not.
    * <P>
@@ -156,6 +152,10 @@ final public class LocationTools {
    * @param return true if they overlap, false otherwise
    */
   public static boolean overlaps(Location locA, Location locB) {
+  	if(isDecorated(locA) || isDecorated(locB))
+  	{
+  		handleDecorations();
+  	}
     if(locA.isContiguous() && locB.isContiguous()) {
       // if they are both solid, return whether the extents overlap
       return !(
@@ -174,13 +174,17 @@ final public class LocationTools {
           }
         }
       }
-      
+
       // could find no overlapping regions - return false.
       return false;
     }
   }
-  
+
   public static boolean contains(Location locA, Location locB) {
+  	if(isDecorated(locA) || isDecorated(locB))
+  	{
+  		handleDecorations();
+  	}
     if(locA.isContiguous() && locB.isContiguous()) {
       // both solid - check the extents
       return
@@ -200,11 +204,11 @@ final public class LocationTools {
         // this block is not contained therefore b is not contained within a.
         return false;
       }
-      
+
       return true;
     }
   }
-  
+
   /**
    * Return wether two locations are equal.
    * <P>
@@ -216,29 +220,33 @@ final public class LocationTools {
    * @return true if they are equivalent, false otherwise
    */
   public static boolean areEqual(Location locA, Location locB) {
+  	if(isDecorated(locA) || isDecorated(locB))
+  	{
+  		handleDecorations();
+  	}
     // simple check - if one is broken and the other isn't, they aren't equal.
     if(locA.isContiguous() != locB.isContiguous()) {
       return false;
     }
-    
+
     // both contiguous if one is - check extent only
     if(locA.isContiguous()) {
       return
         (locA.getMin() == locB.getMin()) &&
         (locA.getMax() == locB.getMax());
     }
-    
+
     // ok - both compound. The blocks returned from blockIterator should each be
     // equivalent.
     Iterator i1 = locA.blockIterator();
     Iterator i2 = locB.blockIterator();
-    
+
     // while there are more pairs to check...
     while(i1.hasNext() && i2.hasNext()) {
       // check that this pair is equivalent
       Location l1 = (Location) i1.next();
       Location l2 = (Location) i2.next();
-      
+
       if(
         (l1.getMin() != l2.getMin()) ||
         (l1.getMax() != l2.getMax())
@@ -247,16 +255,16 @@ final public class LocationTools {
         return false;
       }
     }
-    
+
     // One of the locations had more blocks than the other
     if(i1.hasNext() || i2.hasNext()) {
       return false;
     }
-    
+
     // Same number of blocks, all equivalent. Must be equal.
     return true;
   }
-  
+
   /**
    * Create a Location instance from the list of contiguous locations in
    * locList.
@@ -271,7 +279,7 @@ final public class LocationTools {
    */
   protected static Location buildLoc(List locList) {
     Collections.sort(locList, Location.naturalOrder);
-    
+
     if(locList.size() == 0) {
       return Location.empty;
     } else if(locList.size() == 1) {
@@ -297,5 +305,44 @@ final public class LocationTools {
     } else {
       return new RangeLocation(min, max);
     }
+  }
+
+  /**
+   * Checks if the location has a decorator.
+   *
+   * @todo Currently this method walks through circular and between
+   * decorators.  This is crude and ugly.
+   * @param theLocation The location to test for decorators
+   * @return True if the location has a decorator and false otherwise
+   */
+  protected static boolean isDecorated(Location theLocation)
+  {
+  	// If you know a cleaner way to do this, please change it and drop me a line
+  	// gcox@netgenics.com
+	Class circularDecoratorClass;
+	Class betweenDecoratorClass;
+	try
+	{
+		circularDecoratorClass = Class.forName("org.biojava.bio.symbol.CircularLocation");
+	  	betweenDecoratorClass = Class.forName("org.biojava.bio.symbol.BetweenLocation");
+	}
+	catch (ClassNotFoundException cnfe)
+	{
+		throw new org.biojava.bio.BioError("CircularLocation or BetweenLocation could not be found");
+	}
+
+  	return(theLocation.hasDecorator(circularDecoratorClass) ||
+  		(theLocation.hasDecorator(betweenDecoratorClass)));
+  }
+
+  /**
+   * Short answer: We don't.  This method logs a message and returns the empty
+   * location
+   *
+   * @todo Handle decorations.
+   */
+  protected static void handleDecorations()
+  {
+	throw new ClassCastException("Decorated locations are not handled in this version");
   }
 }

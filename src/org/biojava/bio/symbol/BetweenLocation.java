@@ -33,6 +33,7 @@ import java.util.*;
  * Between view onto an underlying Location instance.
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.2
  */
 public class BetweenLocation
@@ -40,7 +41,7 @@ extends AbstractLocationDecorator {
   public BetweenLocation(Location wrapped) {
     super(wrapped);
   }
-  
+
   protected Location decorate(Location loc) {
     return new BetweenLocation(loc);
   }
