@@ -60,18 +60,11 @@ public class SymbolListCharSequence implements CharSequence
         if (! (alphabet instanceof FiniteAlphabet))
             throw new IllegalArgumentException("Only SymbolLists using a FiniteAlphabet are supported by SymbolListCharSequence");
 
-        SymbolTokenization sToke;
-        try
-        {
-            sToke = alphabet.getTokenization("token");
-        }
-        catch (BioException be)
-        {
-            throw new BioError("Internal error: failed to get SymbolTokenization for SymbolList alphabet", be);
-        }
-
-        if (sToke.getTokenType() != SymbolTokenization.CHARACTER)
-            throw new IllegalArgumentException("Only FiniteAlphabets using a char token are supported by SymbolListCharSequence");
+        SymbolTokenization sToke = getTokenizer(alphabet, "token");
+        if (sToke == null)
+            sToke = getTokenizer(alphabet, "unicode");
+        if (sToke == null)
+            throw new BioError("unable to get a character tokenization for alphabet " + alphabet.getName());
 
         this.syms = syms;
         alphaTokens = new HashMap(Math.round(alphabet.size() / 0.75f) + 1);
@@ -91,6 +84,24 @@ public class SymbolListCharSequence implements CharSequence
         {
             throw new BioError("Internal error: failed to tokenize a Symbol from an existing SymbolList", ise);
         }
+    }
+
+    private SymbolTokenization getTokenizer(FiniteAlphabet alphabet, String tokenType)
+    {
+        SymbolTokenization sToke = null;
+        try
+        {
+            sToke = alphabet.getTokenization(tokenType);
+        }
+        catch (BioException be)
+        {
+            return null;
+        }
+
+        if (sToke.getTokenType() != SymbolTokenization.CHARACTER)
+            return null;
+        else
+            return sToke;
     }
 
     private SymbolListCharSequence(SymbolList syms, Map alphaTokens)
