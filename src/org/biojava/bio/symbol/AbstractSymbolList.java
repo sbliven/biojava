@@ -149,18 +149,18 @@ public abstract class AbstractSymbolList implements SymbolList {
 	    return new SubList(sstart + start - 1, send + start - 1);
 	}
 
-  public String seqString() {
-    return subStr(1, length());
-  }
+	public String seqString() {
+	    return subStr(1, length());
+	}
   
-  public String subStr(int start, int end) throws IndexOutOfBoundsException {
-    if(start < 1 || start > this.end ||
-       end < 1 || end > this.end ||
-       start > end) {
-      throw new IndexOutOfBoundsException();
-    }
-    return AbstractSymbolList.this.subStr(start + this.start, end + this.start);
-  }
+	public String subStr(int start, int end) throws IndexOutOfBoundsException {
+	    if(start < 1 || start > this.end ||
+	       end < 1 || end > this.end ||
+	       start > end) {
+		throw new IndexOutOfBoundsException();
+	    }
+	    return AbstractSymbolList.this.subStr(start + this.start - 1, end + this.start - 1);
+	}
   
 	public List toList() {
 	    return new ListView(this);
