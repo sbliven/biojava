@@ -99,7 +99,7 @@ public class ProteinTools {
             getAlphabet(),
             SymbolPropertyTable.MONO_MASS
             );
-	    
+
 	    SimpleSymbolPropertyTable avgMassPropertyTable = new SimpleSymbolPropertyTable(
             getAlphabet(),
             SymbolPropertyTable.AVG_MASS
@@ -109,7 +109,7 @@ public class ProteinTools {
             getAlphabet(),
             SymbolPropertyTable.PK
             );
- 
+
 	    SymbolTokenization tokens = getAlphabet().getTokenization("token");
 
             NodeList children = doc.getDocumentElement().getChildNodes();
@@ -122,7 +122,7 @@ public class ProteinTools {
 		if(child.getNodeName().equals("residue")) {
 		    String token = child.getAttribute("token");
 		    Symbol s = tokens.parseToken(token);
-			
+
 		    NodeList properyNodes = child.getChildNodes();
 		    for(int j = 0; j < properyNodes.getLength(); j++) {
 			cnode = (Node) properyNodes.item(j);
@@ -207,7 +207,7 @@ public class ProteinTools {
    * @throws IllegalSymbolException if <span class="arg">protein</span> contains
    *         any non-PROTEIN characters
    */
-  public static Sequence createDNASequence(String protein, String name)
+  public static Sequence createProteinSequence(String protein, String name)
   throws IllegalSymbolException {
     try {
       return new SimpleSequenceFactory().createSequence(
@@ -215,7 +215,7 @@ public class ProteinTools {
         "", name, new SimpleAnnotation()
       );
     } catch (BioException se) {
-      throw new BioError(se, "Something has gone badly wrong with DNA");
+      throw new BioError(se, "Something has gone badly wrong with ProteinTAlpha");
     }
   }
 }
