@@ -40,7 +40,7 @@ public class AcePerlParser {
     parentDB = db;
   }
 
-  public AceObject parseObject(String obj) 
+  public AceNode parseObject(String obj) 
   throws AceException {
     obj = obj.trim();
     if (obj.startsWith("/")) {
@@ -52,7 +52,7 @@ public class AcePerlParser {
       throw new AceError("Unrecoverable parsing error: expecting {");
     }
     
-    return (AceObject) getNode(null, toke);
+    return /*(AceObject)*/ getNode(null, toke);
   }
 
   private StaticAceNode constructNode(
@@ -85,8 +85,12 @@ public class AcePerlParser {
           cl
         );
 	    }
-    } else /* if (ty.equals("tg")) */ {
+    } else if (ty.equals("tg")) {
 	    obj = new StaticAceNode(va, parent);
+    } else if (ty.equals("model")) {
+      obj = new StaticModelNode(va, parent);
+    } else {
+      throw new AceError("Don't know how to handle type " + ty);
     }
 
     return obj;
@@ -101,9 +105,9 @@ public class AcePerlParser {
     StaticAceNode obj = null;
 
     while (true) {
-	    String s = t.nextToken();
- 
-	    if (s.startsWith("ty=>")) {
+      String s = t.nextToken();
+      if(s.equals(",")) {
+      } else if (s.startsWith("ty=>")) {
         ty = s.substring(4).trim();
 	    } else if (s.startsWith("va=>")) {
         va = Ace.encode(s.substring(4).trim());
@@ -113,6 +117,10 @@ public class AcePerlParser {
         if (! t.nextToken().equals("[")) {
           throw new AceError("Unrecoverable parsing error: expecting [");
         }
+        if(ty == null) {
+          throw new AceError("Got null ty field for object");
+        }
+        System.out.println("Constructing node with " + parent + ", " + ty + ", " + va + ", " + cl);
         obj = constructNode(parent, ty, va, cl);
         getChildren(obj, t);
       } else /* { */ if (s.equals("}")) {
@@ -121,7 +129,11 @@ public class AcePerlParser {
         } else{ 
           return constructNode(parent, ty, va, cl);
         }
-	    }
+      } else {
+        ty = "model";
+        System.out.println("Found " + s);
+        va = Ace.encode(s.trim());
+      }
     }
   }
 

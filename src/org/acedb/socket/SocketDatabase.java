@@ -229,14 +229,14 @@ class SocketDatabase implements Database {
 	return dbURL;
     }
 
-    public AceObject getObject(String clazz, String name) 
+    public AceNode getObject(String clazz, String name) 
             throws AceException
     {
       if(clazz == null) {
         throw new NullPointerException("Class name was null");
       }
 	String cacheName = clazz + ":" + name;
-	AceObject o = (AceObject) getFromCache(cacheName);
+	AceNode o = (AceNode) getFromCache(cacheName);
 	if (o != null)
 	    return o;
 	// get object

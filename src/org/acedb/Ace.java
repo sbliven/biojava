@@ -66,19 +66,26 @@ public class Ace {
      */
 
     static Database getDatabase(AceURL url) throws AceException {
-	url = rootURL(url);
-	Database db = (Database) databases.get(url);
-	if(db == null) {
-	    for(Iterator i = drivers.iterator(); i.hasNext(); ) {
-		Driver d = (Driver) i.next();
-		if(d.accept(url)) {
-		    db = d.connect(url);
-		    databases.put(url, db);
-		    break;
-		}
-	    }
-	}
-	return db;
+      url = rootURL(url);
+      System.out.println("Retrieving database for URL " + url);
+      Database db = (Database) databases.get(url);
+     
+     LOAD_DRIVER:
+      if(db == null) {
+        for(Iterator i = drivers.iterator(); i.hasNext(); ) {
+          Driver d = (Driver) i.next();
+          if(d.accept(url)) {
+            db = d.connect(url);
+            if(db == null) {
+              throw new NullPointerException("Driver returned null when connecting to URL " + url);
+            }
+            databases.put(url, db);
+            break LOAD_DRIVER;
+          }
+        }
+        throw new NullPointerException("Couldn't find driver for URL " + url);
+      }
+      return db;
     }
 
     /**
@@ -86,8 +93,11 @@ public class Ace {
      */
 
     public static AceSet fetch(AceURL url) throws AceException {
-	Database db = getDatabase(url);
-	return db.fetch(url);
+      Database db = getDatabase(url);
+      if(db == null) {
+        throw new NullPointerException("getDatabase(" + url + ") returned null");
+      }
+      return db.fetch(url);
     }
 
     public static Connection getConnection(AceURL url) throws AceException {
