@@ -25,6 +25,8 @@ import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 
+import java.io.Serializable;
+
 /**
  * This class computes the score that is used to be used
  * in a DP optimisation.
@@ -46,7 +48,7 @@ public interface ScoreType {
    *
    * @author Matthew Pocock
    */
-  public static class Probability implements ScoreType {
+  public static class Probability implements ScoreType, Serializable {
     public double calculateScore(Distribution dist, Symbol sym)
     throws IllegalSymbolException {
       return dist.getWeight(sym);
@@ -63,7 +65,7 @@ public interface ScoreType {
    *
    * @author Matthew Pocock
    */
-  public static class Odds implements ScoreType {
+  public static class Odds implements ScoreType, Serializable {
     public double calculateScore(Distribution dist, Symbol sym)
     throws IllegalSymbolException {
       double d = dist.getWeight(sym);
@@ -81,7 +83,7 @@ public interface ScoreType {
    *
    * @author Matthew Pocock
    */
-  public static class NullModel implements ScoreType {
+  public static class NullModel implements ScoreType, Serializable {
     public double calculateScore(Distribution dist, Symbol sym)
     throws IllegalSymbolException {
       return dist.getNullModel().getWeight(sym);
