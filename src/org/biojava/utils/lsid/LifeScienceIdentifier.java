@@ -46,9 +46,9 @@ import java.util.StringTokenizer;
  * urn:lsid:ncbi.nlm.nih.gov:Genbank/accession:NT_001063:2
  * </pre></p>
  *
- * As described in the memo <i>URN Namespace for Life Science Identifiers</i><br/>
+ * <p>As described in the memo <i>URN Namespace for Life Science Identifiers</i><br/>
  * &gt; <a href="http://www.i3c.org/workgroups/technical_architecture/resources/lsid/docs/LSIDSyntax9-20-02.htm">
- * http://www.i3c.org/workgroups/technical_architecture/resources/lsid/docs/LSIDSyntax9-20-02.htm</a>
+ * http://www.i3c.org/workgroups/technical_architecture/resources/lsid/docs/LSIDSyntax9-20-02.htm</a></p>
  *
  * @author Michael Heuer
  */
