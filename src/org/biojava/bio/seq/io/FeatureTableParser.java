@@ -99,18 +99,6 @@ public class FeatureTableParser {
             case LOCATION:
                 featureBuf.append(line);
                 if (countChar(featureBuf, '(') == countChar(featureBuf, ')')) {
-                    // Save the original location in the feature's
-                    // annotation bundle
-                    try {
-                        Map dat = new HashMap();
-                        dat.put("location", featureBuf.substring(0));
-                        featureTemplate.annotation.setProperty(Feature.PROPERTY_DATA_KEY, dat);
-                    }
-                    catch (ChangeVetoException cve) {
-                        throw new BioException("Unable to add location string to feature annotation: "
-                                               + featureBuf);
-                    }
-
                     featureTemplate = locParser.parseLocation(featureBuf.substring(0), featureTemplate);
                     listener.startFeature(featureTemplate);
                     featureStatus = WITHIN;

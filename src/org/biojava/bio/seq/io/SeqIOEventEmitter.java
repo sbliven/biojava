@@ -62,87 +62,87 @@ public class SeqIOEventEmitter
      * @param listener a <code>SeqIOListener</code>.
      */
     public static void getSeqIOEvents(Sequence      seq,
-				      SeqIOListener listener)
-	throws BioException
+                                      SeqIOListener listener)
+        throws BioException
     {
-	try
-	{
-	    // Inform listener of sequence start
-	    listener.startSequence();
+        try
+        {
+            // Inform listener of sequence start
+            listener.startSequence();
 
-	    // Pass name to listener
-	    listener.setName(seq.getName());
+            // Pass name to listener
+            listener.setName(seq.getName());
 
-	    // Pass URN to listener
-	    listener.setURI(seq.getURN());
+            // Pass URN to listener
+            listener.setURI(seq.getURN());
 
-	    // Pass sequence properties to listener
-	    Annotation a = seq.getAnnotation();
+            // Pass sequence properties to listener
+            Annotation a = seq.getAnnotation();
 
-	    for (Iterator ai = a.keys().iterator(); ai.hasNext();)
-	    {
-		Object key = ai.next();
-		listener.addSequenceProperty(key, a.getProperty(key));
-	    }
+            for (Iterator ai = a.keys().iterator(); ai.hasNext();)
+            {
+                Object key = ai.next();
+                listener.addSequenceProperty(key, a.getProperty(key));
+            }
 
-	    // Recurse through sub feature tree, flattening it for
-	    // EMBL
-	    List subs = getSubFeatures(seq);
-	    Collections.sort(subs, Feature.byEmblOrder);
+            // Recurse through sub feature tree, flattening it for
+            // EMBL
+            List subs = getSubFeatures(seq);
+            Collections.sort(subs, Feature.byEmblOrder);
 
-	    // Put the source features first for EMBL
+            // Put the source features first for EMBL
+            for (Iterator fi = subs.iterator(); fi.hasNext();)
+            {		
+                // The template is required to call startFeature
+                Feature.Template t = ((Feature) fi.next()).makeTemplate();
 
-	    for (Iterator fi = subs.iterator(); fi.hasNext();)
-	    {		
-		// The template is required to call startFeature
-		Feature.Template t = ((Feature) fi.next()).makeTemplate();
+                // Inform listener of feature start
+                listener.startFeature(t);
 
-		// Inform listener of feature start
-		listener.startFeature(t);
+                // Pass feature properties (i.e. qualifiers to
+                // listener)
+                List keys = new ArrayList();
+                keys.addAll(t.annotation.keys());
+                Collections.sort(keys);
 
-		// Pass feature properties (i.e. qualifiers to
-		// listener)
-		List keys = new ArrayList();
-		keys.addAll(t.annotation.keys());
-		Collections.sort(keys);
+                for (Iterator ki = keys.iterator(); ki.hasNext();)
+                {
+                    Object key = ki.next();
 
-		for (Iterator ki = keys.iterator(); ki.hasNext();)
-		{
-		    Object key = ki.next();
+                    // Skip internal data
+                    if (key.equals(Feature.PROPERTY_DATA_KEY))
+                        continue;
 
-		    if (key.equals(Feature.PROPERTY_DATA_KEY))
-			continue;
+                    listener.addFeatureProperty(key, t.annotation.getProperty(key));
+                }
 
-		    listener.addFeatureProperty(key, t.annotation.getProperty(key));
-		}
+                // Inform listener of feature end
+                listener.endFeature();
+            }
 
-		// Inform listener of feature end
-		listener.endFeature();
-	    }
-
-	    // Add symbols
-	    listener.addSymbols(seq.getAlphabet(),
-				(Symbol []) seq.toList().toArray(new Symbol [0]),
-				0,
-				seq.length());
+            // Add symbols
+            listener.addSymbols(seq.getAlphabet(),
+                                (Symbol []) seq.toList().toArray(new Symbol [0]),
+                                0,
+                                seq.length());
 	    
-	    // Inform listener of sequence end
-	    listener.endSequence();
-	}
-	catch (IllegalAlphabetException iae)
-	{
-	    // This should never happen as the alphabet is being used
-	    // by this Sequence instance
-	    throw new BioException(iae, "An internal error occurred processing symbols of "
-				   + seq.toString()
-				   + " into SeqIO events");
-	}
-	catch (ParseException pe)
-	{
-	    throw new BioException(pe, "An internal error occurred processing "
-				   + seq.toString()
-				   + " into SeqIO events");
-	}
+            // Inform listener of sequence end
+            listener.endSequence();
+        }
+        catch (IllegalAlphabetException iae)
+        {
+            // This should never happen as the alphabet is being used
+            // by this Sequence instance
+            throw new BioException(iae, "An internal error occurred processing symbols of "
+                                   + seq.toString()
+                                   + " into SeqIO events");
+        }
+        catch (ParseException pe)
+        {
+            throw new BioException(pe, "An internal error occurred processing "
+                                   + seq.toString()
+                                   + " into SeqIO events");
+        }
     }
 
     /**
@@ -156,15 +156,15 @@ public class SeqIOEventEmitter
      */
     private static List getSubFeatures(FeatureHolder fh)
     {
-	List subfeat = new ArrayList();
+        List subfeat = new ArrayList();
 
-	for (Iterator fi = fh.features(); fi.hasNext();)
-	{
-	    FeatureHolder sfh = (FeatureHolder) fi.next();
+        for (Iterator fi = fh.features(); fi.hasNext();)
+        {
+            FeatureHolder sfh = (FeatureHolder) fi.next();
 
-	    subfeat.addAll((Collection) getSubFeatures(sfh));
-	    subfeat.add(sfh);
-	}
-	return subfeat;
+            subfeat.addAll((Collection) getSubFeatures(sfh));
+            subfeat.add(sfh);
+        }
+        return subfeat;
     }
 }

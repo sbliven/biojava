@@ -68,7 +68,7 @@ class AbstractGenEmblFileFormer
 
     static
     {
-	// This loads an XML file containing information on which
+        // This loads an XML file containing information on which
         // qualifiers are valid (or even mandatory) for a particular
         // feature key. It also indicates whether the value should be
         // contained within quotes.
@@ -113,88 +113,88 @@ class AbstractGenEmblFileFormer
      * @return a <code>StringBuffer</code>.
      */
     StringBuffer formatQualifierBlock(StringBuffer sb,
-				      String       text,
-				      String       leader,
-				      int          wrapWidth)
+                                      String       text,
+                                      String       leader,
+                                      int          wrapWidth)
     {
-	int tokenType = FIRST;
-	int  position = leader.length();
+        int tokenType = FIRST;
+        int  position = leader.length();
 
-	sb.append(leader);
+        sb.append(leader);
 
-	StringTokenizer t = new StringTokenizer(text);
+        StringTokenizer t = new StringTokenizer(text);
 
     TOKEN:
-	while (t.hasMoreTokens())
-	{
-	    String s = t.nextToken();
-	    String separator = "";
+        while (t.hasMoreTokens())
+        {
+            String s = t.nextToken();
+            String separator = "";
 
-	    // The first token has to be treated differently. It
-	    // always starts immediately after the '=' character
-	    if (! (tokenType == FIRST))
-	    {
-		separator = " ";
+            // The first token has to be treated differently. It
+            // always starts immediately after the '=' character
+            if (! (tokenType == FIRST))
+            {
+                separator = " ";
 
-		if (s.length() + 1 > wrapWidth)
-		    tokenType = OVERWIDE;
-		else if (position + s.length() + 1 > wrapWidth)
-		    tokenType = NOFIT;
-		else
-		    tokenType = FIT;
-	    }
+                if (s.length() + 1 > wrapWidth)
+                    tokenType = OVERWIDE;
+                else if (position + s.length() + 1 > wrapWidth)
+                    tokenType = NOFIT;
+                else
+                    tokenType = FIT;
+            }
 
-	    switch (tokenType)
-	    {
-		case FIRST:
-		    // The first line always always starts immediately
-		    // after the '=' character, even if it means
-		    // forcing a break
-		    if (! (position + s.length() > wrapWidth))
-		    {
-			sb.append(s);
-			position += s.length();
-			tokenType = FIT;
-			continue TOKEN;
-		    }
-		    separator = " ";
+            switch (tokenType)
+            {
+                case FIRST:
+                    // The first line always always starts immediately
+                    // after the '=' character, even if it means
+                    // forcing a break
+                    if (! (position + s.length() > wrapWidth))
+                    {
+                        sb.append(s);
+                        position += s.length();
+                        tokenType = FIT;
+                        continue TOKEN;
+                    }
+                    separator = " ";
 
-		case OVERWIDE:
-		    // Force breaks in the token until the end is
-		    // reached
-		    for (int i = 0; i < s.length(); i++)
-		    {
-			if (position == wrapWidth)
-			{
-			    sb.append(nl + leader);
-			    position = leader.length();
-			}
-			sb.append(s.charAt(i));
-			position++;
-		    }
+                case OVERWIDE:
+                    // Force breaks in the token until the end is
+                    // reached
+                    for (int i = 0; i < s.length(); i++)
+                    {
+                        if (position == wrapWidth)
+                        {
+                            sb.append(nl + leader);
+                            position = leader.length();
+                        }
+                        sb.append(s.charAt(i));
+                        position++;
+                    }
 
-		    position = s.length() % wrapWidth;
-		    break;
+                    position = s.length() % wrapWidth;
+                    break;
 
-		case NOFIT:
-		    // Token won't fit, so pass it to the next line
-		    sb.append(nl + leader + s);
-		    position = s.length() + leader.length();
-		    break;
+                case NOFIT:
+                    // Token won't fit, so pass it to the next line
+                    sb.append(nl + leader + s);
+                    position = s.length() + leader.length();
+                    break;
 
-		case FIT:
-		    // Token fits on this line
-		    sb.append(separator + s);
-		    position += (s.length() + 1);
-		    break;
+                case FIT:
+                    // Token fits on this line
+                    sb.append(separator + s);
+                    position += (s.length() + 1);
+                    break;
 
-		default:
-		    // Nothing
-		    break;
-	    } // end switch
-	} // end while
+                default:
+                    // Nothing
+                    break;
+            } // end switch
+        } // end while
 
-	return sb;
+        return sb;
     }
 
     /**
@@ -210,14 +210,14 @@ class AbstractGenEmblFileFormer
      */
     StringBuffer formatQualifier(StringBuffer sb, Object key, Object value)
     {
-	sb.append("/" + key);
+        sb.append("/" + key);
 
-	// Default is to quote unknown qualifiers
-	String form = "quoted";
-	if (QUALIFIER_DATA.containsKey(key))
+        // Default is to quote unknown qualifiers
+        String form = "quoted";
+        if (QUALIFIER_DATA.containsKey(key))
             form = (String) ((Map) QUALIFIER_DATA.get(key)).get("form");
 
-	// This is a slight simplification. There are some types of
+        // This is a slight simplification. There are some types of
         // qualifier which are unquoted unless they contain
         // spaces. We all love special cases, don't we?
         if (form.equals("quoted"))
@@ -227,10 +227,10 @@ class AbstractGenEmblFileFormer
         else if (form.equals("paren"))
             sb.append("(" + value + ")");
         else if (! form.equals("empty"))
-	{
+        {
             System.err.println("Unrecognised qualifier format: " + form);
-	    sb.append("=" + value);
-	}
+            sb.append("=" + value);
+        }
 
         return sb;
     }
@@ -248,18 +248,18 @@ class AbstractGenEmblFileFormer
      * @return a <code>StringBuffer</code>.
      */
     StringBuffer formatTokenBlock(StringBuffer       sb,
-				  Symbol []          syms,
-				  int                blockSize,
-				  SymbolTokenization tokenization)
-	throws IllegalSymbolException
+                                  Symbol []          syms,
+                                  int                blockSize,
+                                  SymbolTokenization tokenization)
+        throws IllegalSymbolException
     {
-	for (int i = 0; i < syms.length; i++)
-	{
-	    sb.append(tokenization.tokenizeSymbol(syms[i]));
-	    if ((i > 0) && ((i + 1) % blockSize == 0))
-		sb.append(' ');
-	}
-	return sb;
+        for (int i = 0; i < syms.length; i++)
+        {
+            sb.append(tokenization.tokenizeSymbol(syms[i]));
+            if ((i > 0) && ((i + 1) % blockSize == 0))
+                sb.append(' ');
+        }
+        return sb;
     }
 
     /**
@@ -278,12 +278,19 @@ class AbstractGenEmblFileFormer
         StrandedFeature.Strand featureStrand = StrandedFeature.POSITIVE;
 
         String joinType = "join";
-        if(theFeature.getAnnotation().containsProperty("JoinType"))
+        Annotation ann = theFeature.getAnnotation();
+
+        if (ann.containsProperty(Feature.PROPERTY_DATA_KEY))
         {
-            joinType = (String)theFeature.getAnnotation().getProperty("JoinType");
+            Map dat = (Map) ann.getProperty(Feature.PROPERTY_DATA_KEY);
+
+            if (dat.containsKey("JoinType"))
+            {
+                joinType = (String) dat.get("JoinType");
+            }
         }
 
-        if(theFeature instanceof RemoteFeature)
+        if (theFeature instanceof RemoteFeature)
         {
             StringBuffer tempBuffer = new StringBuffer();
             List regionList = ((RemoteFeature)theFeature).getRegions();
@@ -312,9 +319,8 @@ class AbstractGenEmblFileFormer
                 {
                     featureStrand = ((StrandedFeature)theFeature).getStrand();
                 }
-		tempLocation = this.formatLocation(
-				tempRegion.getLocation(), featureStrand);
-		tempBuffer.append(tempLocation);
+                tempLocation = this.formatLocation(tempRegion.getLocation(), featureStrand);
+                tempBuffer.append(tempLocation);
 
                 // Only have commas between two subregions
                 if(tempIterator.hasNext())
@@ -362,18 +368,18 @@ class AbstractGenEmblFileFormer
      * @return a <code>StringBuffer</code>.
      */
     public String formatLocation(Location               loc,
-				 StrandedFeature.Strand strand)
+                                 StrandedFeature.Strand strand)
     {
-	// Using arbitrary leader and wrapwidth wide enough to always
-	// make one line.
-	StringBuffer sb = formatLocationBlock(new StringBuffer(),
-					      loc,
-					      strand.getValue(),
-					      "",
-					      Integer.MAX_VALUE,
-					      "join");
+        // Using arbitrary leader and wrapwidth wide enough to always
+        // make one line.
+        StringBuffer sb = formatLocationBlock(new StringBuffer(),
+                                              loc,
+                                              strand.getValue(),
+                                              "",
+                                              Integer.MAX_VALUE,
+                                              "join");
 
-	return sb.substring(0);
+        return sb.substring(0);
     }
 
     /**
@@ -409,12 +415,12 @@ class AbstractGenEmblFileFormer
      * @return a <code>StringBuffer</code>.
      */
     public StringBuffer formatLocation(StringBuffer           sb,
-				       Location               loc,
-				       StrandedFeature.Strand strand)
+                                       Location               loc,
+                                       StrandedFeature.Strand strand)
     {
-	// Using arbitrary leader and wrapwidth wide enough to always
-	// make one line
-	return formatLocationBlock(sb, loc, strand.getValue(), "", Integer.MAX_VALUE, "join");
+        // Using arbitrary leader and wrapwidth wide enough to always
+        // make one line
+        return formatLocationBlock(sb, loc, strand.getValue(), "", Integer.MAX_VALUE, "join");
     }
 
     /**
@@ -439,10 +445,10 @@ class AbstractGenEmblFileFormer
      * @return a <code>StringBuffer</code>.
      */
     StringBuffer formatLocationBlock(StringBuffer sb,
-				     Location     loc,
-				     int          strand,
-				     String       leader,
-				     int          wrapWidth)
+                                     Location     loc,
+                                     int          strand,
+                                     String       leader,
+                                     int          wrapWidth)
     {
         return this.formatLocationBlock(sb, loc, strand, leader, wrapWidth, "join");
     }
@@ -465,157 +471,157 @@ class AbstractGenEmblFileFormer
      * @return a <code>StringBuffer</code>.
      */
     StringBuffer formatLocationBlock(StringBuffer sb,
-				     Location     loc,
-				     int          strand,
-				     String       leader,
-				     int          wrapWidth,
-				     String	  joinType)
+                                     Location     loc,
+                                     int          strand,
+                                     String       leader,
+                                     int          wrapWidth,
+                                     String	      joinType)
     {
-	// Indicates how many characters have been added to the
-	// current line
-	int       position = leader.length();
-	boolean       join = false;
-	boolean complement = false;
+        // Indicates how many characters have been added to the
+        // current line
+        int       position = leader.length();
+        boolean       join = false;
+        boolean complement = false;
 
-	List locs = new ArrayList();
-	for (Iterator li = loc.blockIterator(); li.hasNext();)
-	{
-	    locs.add(li.next());
-	}
+        List locs = new ArrayList();
+        for (Iterator li = loc.blockIterator(); li.hasNext();)
+        {
+            locs.add(li.next());
+        }
 
-	/* There are issues here about choosing various forms:
-	 * join(complement(...),complement(...))
-	 * complement(join(...,...))
-	 *
-	 * The former has the locations sorted in reverse order.
-	 */
+        /* There are issues here about choosing various forms:
+         * join(complement(...),complement(...))
+         * complement(join(...,...))
+         *
+         * The former has the locations sorted in reverse order.
+         */
 
-	Collections.sort(locs, Location.naturalOrder);
+        Collections.sort(locs, Location.naturalOrder);
 
-	if (loc instanceof CompoundLocation)
-	{
-	    join = true;
-	    sb.append(joinType);
-	    sb.append("(");
-	    position += 5;
-	}
+        if (loc instanceof CompoundLocation)
+        {
+            join = true;
+            sb.append(joinType);
+            sb.append("(");
+            position += 5;
+        }
 
-	if (strand == -1)
-	{
-	    Collections.reverse(locs);
-	    complement = true;
-	}
+        if (strand == -1)
+        {
+            Collections.reverse(locs);
+            complement = true;
+        }
 
-	int locType = 0;
+        int locType = 0;
 
-	// Records the length of the String(s) added to the buffer to
-	// determine whether we need to wrap the line
-	int pre, post;
-	int diff = 0;
+        // Records the length of the String(s) added to the buffer to
+        // determine whether we need to wrap the line
+        int pre, post;
+        int diff = 0;
 
-	for (Iterator li = locs.iterator(); li.hasNext();)
-	{
-	    Location thisLoc = (Location) li.next();
+        for (Iterator li = locs.iterator(); li.hasNext();)
+        {
+            Location thisLoc = (Location) li.next();
 
-	    pre = sb.length();
+            pre = sb.length();
 
-	    if (PointLocation.class.isInstance(thisLoc))
-		locType = POINT;
-	    else if (FuzzyLocation.class.isInstance(thisLoc))
-		locType = FUZZY_RANGE;
-	    else if (FuzzyPointLocation.class.isInstance(thisLoc))
-		locType = FUZZY_POINT;
-	    else if (BetweenLocation.class.isInstance(thisLoc))
-		locType = BETWEEN_LOCATION;
-	    else
-		locType = RANGE;
+            if (PointLocation.class.isInstance(thisLoc))
+                locType = POINT;
+            else if (FuzzyLocation.class.isInstance(thisLoc))
+                locType = FUZZY_RANGE;
+            else if (FuzzyPointLocation.class.isInstance(thisLoc))
+                locType = FUZZY_POINT;
+            else if (BetweenLocation.class.isInstance(thisLoc))
+                locType = BETWEEN_LOCATION;
+            else
+                locType = RANGE;
 
-	    ub.setLength(0);
-	    switch (locType)
-	    {
-		case POINT:
-		    PointLocation pl = (PointLocation) thisLoc;
+            ub.setLength(0);
+            switch (locType)
+            {
+                case POINT:
+                    PointLocation pl = (PointLocation) thisLoc;
 
-		    sb.append(complement                                     ?
-			      toComplement(formatPoint(ub, pl).substring(0)) :
-			      formatPoint(ub, pl).substring(0));
-		    break;
+                    sb.append(complement                                     ?
+                              toComplement(formatPoint(ub, pl).substring(0)) :
+                              formatPoint(ub, pl).substring(0));
+                    break;
 
-		case FUZZY_RANGE:
-		    FuzzyLocation fl = (FuzzyLocation) thisLoc;
+                case FUZZY_RANGE:
+                    FuzzyLocation fl = (FuzzyLocation) thisLoc;
 
-		    sb.append(complement                                          ?
-			      toComplement(formatFuzzyRange(ub, fl).substring(0)) :
-			      formatFuzzyRange(ub, fl).substring(0));
-		    break;
+                    sb.append(complement                                          ?
+                              toComplement(formatFuzzyRange(ub, fl).substring(0)) :
+                              formatFuzzyRange(ub, fl).substring(0));
+                    break;
 
-		case FUZZY_POINT:
-		    FuzzyPointLocation fpl = (FuzzyPointLocation) thisLoc;
+                case FUZZY_POINT:
+                    FuzzyPointLocation fpl = (FuzzyPointLocation) thisLoc;
 
-		    sb.append(complement                                           ?
-			      toComplement(formatFuzzyPoint(ub, fpl).substring(0)) :
-			      formatFuzzyPoint(ub, fpl).substring(0));
-		    break;
+                    sb.append(complement                                           ?
+                              toComplement(formatFuzzyPoint(ub, fpl).substring(0)) :
+                              formatFuzzyPoint(ub, fpl).substring(0));
+                    break;
 
-		case RANGE:
-		    RangeLocation rl = (RangeLocation) thisLoc;
+                case RANGE:
+                    RangeLocation rl = (RangeLocation) thisLoc;
 
-		    sb.append(complement                                     ?
-			      toComplement(formatRange(ub, rl).substring(0)) :
-			      formatRange(ub, rl).substring(0));
-		    break;
+                    sb.append(complement                                     ?
+                              toComplement(formatRange(ub, rl).substring(0)) :
+                              formatRange(ub, rl).substring(0));
+                    break;
 
-		case BETWEEN_LOCATION:
-		    BetweenLocation tempLocation = (BetweenLocation) thisLoc;
-		    String formattedLocation = formatBetween(ub, tempLocation).toString();
-		    if (complement)
-		    {
-			formattedLocation = toComplement(formattedLocation);
-		    }
-		    sb.append(formattedLocation);
-		    break;
+                case BETWEEN_LOCATION:
+                    BetweenLocation tempLocation = (BetweenLocation) thisLoc;
+                    String formattedLocation = formatBetween(ub, tempLocation).toString();
+                    if (complement)
+                    {
+                        formattedLocation = toComplement(formattedLocation);
+                    }
+                    sb.append(formattedLocation);
+                    break;
 
-		default:
-		    // Maybe exception here?
-		    break;
-	    }
+                default:
+                    // Maybe exception here?
+                    break;
+            }
 
-	    // If there is another location after this
-	    if ((locs.indexOf(thisLoc) + 1) < locs.size())
-		sb.append(",");
+            // If there is another location after this
+            if ((locs.indexOf(thisLoc) + 1) < locs.size())
+                sb.append(",");
 
-	    post = sb.length();
+            post = sb.length();
 
-	    // The number of characters just added
-	    diff = post - pre;
+            // The number of characters just added
+            diff = post - pre;
 
-	    // If we have exceeded the line length
-	    if ((position + diff) > wrapWidth)
-	    {
-		// Insert a newline just prior to this location string
-		sb.insert((sb.length() - diff), nl + leader);
-		position = leader.length() + diff;
-	    }
-	    else
-	    {
-		position += diff;
-	    }
-	}
+            // If we have exceeded the line length
+            if ((position + diff) > wrapWidth)
+            {
+                // Insert a newline just prior to this location string
+                sb.insert((sb.length() - diff), nl + leader);
+                position = leader.length() + diff;
+            }
+            else
+            {
+                position += diff;
+            }
+        }
 
-	if (join)
-	{
-	    sb.append(")");
-	    // If adding the ")" has made the line too long, move the
-	    // last range to the next line
-	    if ((position + 1) > wrapWidth)
-	    {
-		sb.insert((sb.length() - diff), nl + leader);
-		position++;
-		diff++;
-	    }
-	}
+        if (join)
+        {
+            sb.append(")");
+            // If adding the ")" has made the line too long, move the
+            // last range to the next line
+            if ((position + 1) > wrapWidth)
+            {
+                sb.insert((sb.length() - diff), nl + leader);
+                position++;
+                diff++;
+            }
+        }
 
-	return sb;
+        return sb;
     }
 
     /**
@@ -629,47 +635,47 @@ class AbstractGenEmblFileFormer
      */
     private StringBuffer formatFuzzyRange(StringBuffer sb, FuzzyLocation fl)
     {
-	if (! fl.hasBoundedMin())
-	{
-	    // <123
-	    sb.append("<");
-	    sb.append(fl.getMin());
-	}
-	else if (fl.getOuterMin() != fl.getInnerMin())
-	{
-	    // (123.567)
-	    sb.append("(" + fl.getOuterMin());
-	    sb.append(".");
-	    sb.append(fl.getInnerMin() + ")");
-	}
-	else
-	{
-	    // 123
-	    sb.append(fl.getMin());
-	}
+        if (! fl.hasBoundedMin())
+        {
+            // <123
+            sb.append("<");
+            sb.append(fl.getMin());
+        }
+        else if (fl.getOuterMin() != fl.getInnerMin())
+        {
+            // (123.567)
+            sb.append("(" + fl.getOuterMin());
+            sb.append(".");
+            sb.append(fl.getInnerMin() + ")");
+        }
+        else
+        {
+            // 123
+            sb.append(fl.getMin());
+        }
 
-	sb.append("..");
+        sb.append("..");
 
-	if (! fl.hasBoundedMax())
-	{
-	    // >567
-	    sb.append(">");
-	    sb.append(fl.getMax());
-	}
-	else if (fl.getInnerMax() != fl.getOuterMax())
-	{
-	    // (567.789)
-	    sb.append("(" + fl.getInnerMax());
-	    sb.append(".");
-	    sb.append(fl.getOuterMax() + ")");
-	}
-	else
-	{
-	    // 567
-	    sb.append(fl.getMax());
-	}
+        if (! fl.hasBoundedMax())
+        {
+            // >567
+            sb.append(">");
+            sb.append(fl.getMax());
+        }
+        else if (fl.getInnerMax() != fl.getOuterMax())
+        {
+            // (567.789)
+            sb.append("(" + fl.getInnerMax());
+            sb.append(".");
+            sb.append(fl.getOuterMax() + ")");
+        }
+        else
+        {
+            // 567
+            sb.append(fl.getMax());
+        }
 
-	return sb;
+        return sb;
     }
 
     /**
@@ -683,27 +689,27 @@ class AbstractGenEmblFileFormer
      */
     private StringBuffer formatFuzzyPoint(StringBuffer sb, FuzzyPointLocation fpl)
     {
-	if (! fpl.hasBoundedMin())
-	{
-	    // <123
-	    sb.append("<");
-	    sb.append(fpl.getMax());
-	}
-	else if (! fpl.hasBoundedMax())
-	{
-	    // >567
-	    sb.append(">");
-	    sb.append(fpl.getMin());
-	}
-	else
-	{
-	    // (567.789)
-	    sb.append("(" + fpl.getMin());
-	    sb.append(".");
-	    sb.append(fpl.getMax() + ")");
-	}
+        if (! fpl.hasBoundedMin())
+        {
+            // <123
+            sb.append("<");
+            sb.append(fpl.getMax());
+        }
+        else if (! fpl.hasBoundedMax())
+        {
+            // >567
+            sb.append(">");
+            sb.append(fpl.getMin());
+        }
+        else
+        {
+            // (567.789)
+            sb.append("(" + fpl.getMin());
+            sb.append(".");
+            sb.append(fpl.getMax() + ")");
+        }
 
-	return sb;
+        return sb;
     }
 
     /**
@@ -717,12 +723,12 @@ class AbstractGenEmblFileFormer
      */
     private StringBuffer formatRange(StringBuffer sb, RangeLocation rl)
     {
-	// 123..567
-	sb.append(rl.getMin());
-	sb.append("..");
-	sb.append(rl.getMax());
+        // 123..567
+        sb.append(rl.getMin());
+        sb.append("..");
+        sb.append(rl.getMax());
 
-	return sb;
+        return sb;
     }
 
     /**
@@ -736,8 +742,8 @@ class AbstractGenEmblFileFormer
      */
     private StringBuffer formatPoint(StringBuffer sb, PointLocation pl)
     {
-	sb.append(Integer.toString(pl.getMin()));
-	return sb;
+        sb.append(Integer.toString(pl.getMin()));
+        return sb;
     }
 
     /**
@@ -750,10 +756,10 @@ class AbstractGenEmblFileFormer
      */
     private StringBuffer formatBetween(StringBuffer sb, BetweenLocation theLocation)
     {
-	sb.append(theLocation.getMin());
-	sb.append('^');
-	sb.append(theLocation.getMax());
-	return sb;
+        sb.append(theLocation.getMin());
+        sb.append('^');
+        sb.append(theLocation.getMax());
+        return sb;
     }
 
     /**
@@ -768,7 +774,7 @@ class AbstractGenEmblFileFormer
      */
     private String toComplement(String value)
     {
-	return "complement(" + value + ")";
+        return "complement(" + value + ")";
     }
 
     /**
@@ -788,80 +794,80 @@ class AbstractGenEmblFileFormer
      * qualifier data.
      */
     static void loadFeatureData(String featureDataFile,
-				Map    featureData,
-				Map    qualifierData)
+                                Map    featureData,
+                                Map    qualifierData)
     {
-	try
-	{
-	    InputStream featureDataStream  =
-		EmblFileFormer.class.getClassLoader().getResourceAsStream(featureDataFile);
-	    if (featureDataStream == null)
-		throw new BioError("Failed to find resource: "
-				   + featureDataFile);
+        try
+        {
+            InputStream featureDataStream  =
+                EmblFileFormer.class.getClassLoader().getResourceAsStream(featureDataFile);
+            if (featureDataStream == null)
+                throw new BioError("Failed to find resource: "
+                                   + featureDataFile);
 
-	    InputSource   is = new InputSource(featureDataStream);
-	    DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource   is = new InputSource(featureDataStream);
+            DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
-	    // Get document and then the root element
-	    Document doc          = parser.parse(is);
-	    NodeList featureNodes = doc.getDocumentElement().getChildNodes();
+            // Get document and then the root element
+            Document doc          = parser.parse(is);
+            NodeList featureNodes = doc.getDocumentElement().getChildNodes();
 
-	    // For nodes in root element (features)
-	    for (int i = 0; i < featureNodes.getLength(); i++)
-	    {
-		Node featureNode = featureNodes.item(i);
-		if (! (featureNode instanceof Element))
-		    continue;
+            // For nodes in root element (features)
+            for (int i = 0; i < featureNodes.getLength(); i++)
+            {
+                Node featureNode = featureNodes.item(i);
+                if (! (featureNode instanceof Element))
+                    continue;
 
-		Element  feature = (Element) featureNode;
-		String fNodeName = feature.getNodeName();
+                Element  feature = (Element) featureNode;
+                String fNodeName = feature.getNodeName();
 
-		if (fNodeName.equals("feature"))
-		{
-		    String featureKey = feature.getAttribute("key");
+                if (fNodeName.equals("feature"))
+                {
+                    String featureKey = feature.getAttribute("key");
 
-		    NodeList qualifierNodes = feature.getChildNodes();
+                    NodeList qualifierNodes = feature.getChildNodes();
 
-		    // For nodes in each feature (qualifiers)
-		    for (int j = 0; j < qualifierNodes.getLength(); j++)
-		    {
-			Node qualifierNode = qualifierNodes.item(j);
-			if (! (qualifierNode instanceof Element))
-			    continue;
+                    // For nodes in each feature (qualifiers)
+                    for (int j = 0; j < qualifierNodes.getLength(); j++)
+                    {
+                        Node qualifierNode = qualifierNodes.item(j);
+                        if (! (qualifierNode instanceof Element))
+                            continue;
 
-			Element qualifier = (Element) qualifierNode;
-			String  qNodeName = qualifier.getNodeName();
+                        Element qualifier = (Element) qualifierNode;
+                        String  qNodeName = qualifier.getNodeName();
 
-			if (qNodeName.equals("qualifier"))
-			{
-			    Map qData = new HashMap();
+                        if (qNodeName.equals("qualifier"))
+                        {
+                            Map qData = new HashMap();
 
-			    qData.put("form", qualifier.getAttribute("form"));
-			    qData.put("mandatory",
-				      new Boolean(qualifier.getAttribute("mandatory")));
+                            qData.put("form", qualifier.getAttribute("form"));
+                            qData.put("mandatory",
+                                      new Boolean(qualifier.getAttribute("mandatory")));
 
-			    qualifierData.put(qualifier.getAttribute("name"), qData);
-			}
-		    }
-		    featureData.put(featureKey, qualifierData.keySet());
-		}
+                            qualifierData.put(qualifier.getAttribute("name"), qData);
+                        }
+                    }
+                    featureData.put(featureKey, qualifierData.keySet());
+                }
 
                 featureDataStream.close();
-	    }
-	}
-	catch (IOException ioe)
-	{
-	    ioe.printStackTrace();
-	}
-	catch (SAXException se)
-	{
-	    se.printStackTrace();
-	}
-	catch (BioError be)
-	{
-	    be.printStackTrace();
-	} catch (ParserConfigurationException ex) {
-	    ex.printStackTrace();
-	}
+            }
+        }
+        catch (IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
+        catch (SAXException se)
+        {
+            se.printStackTrace();
+        }
+        catch (BioError be)
+        {
+            be.printStackTrace();
+        } catch (ParserConfigurationException ex) {
+            ex.printStackTrace();
+        }
     }
 }

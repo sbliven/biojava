@@ -58,7 +58,7 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  */
 
 public interface Feature extends FeatureHolder, Annotatable {
@@ -111,7 +111,7 @@ public interface Feature extends FeatureHolder, Annotatable {
     Location getLocation();
     
     /**
-     * The new locatoin for this feature.
+     * The new location for this feature.
      * <p>
      * The location may be complicated or simply a range. The annotation is
      * assumed to apply to the entire region contained within the location.
@@ -122,7 +122,7 @@ public interface Feature extends FeatureHolder, Annotatable {
      * @throws ChangeVetoException if the location can't be altered
      */
     void setLocation(Location loc)
-    throws ChangeVetoException;
+        throws ChangeVetoException;
   
     /**
      * The type of the feature.
@@ -138,7 +138,7 @@ public interface Feature extends FeatureHolder, Annotatable {
      * @throws ChangeVetoException if the type can't be altered
      */
     void setType(String type)
-    throws ChangeVetoException;
+        throws ChangeVetoException;
   
     /**
      * The source of the feature. This may be a program or process.
@@ -154,7 +154,7 @@ public interface Feature extends FeatureHolder, Annotatable {
      * @throws ChangeVetoException if the source can't be altered
      */
     void setSource(String source)
-    throws ChangeVetoException;
+        throws ChangeVetoException;
     
     /**
      * Return a list of symbols that are contained in this feature.

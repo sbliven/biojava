@@ -55,11 +55,6 @@ import org.biojava.utils.ParseErrorListener;
  *   AL123465:(123..567)
  * </pre>
  *
- * Use of 'order' rather than 'join' is not retained over a read/write
- * cycle. i.e. 'order' is converted to 'join'. At some point we will
- * need to store this information in the <code>Feature</code>'s
- * annotation bundle.
- *
  * The only EMBL header information retained over a read/write cycle
  * is the accession number (all numbers).
  *
@@ -101,8 +96,8 @@ public class EmblProcessor
     private FeatureTableParser features;
 
     public EmblProcessor(SequenceBuilder delegate) {
-	super(delegate);
-	features = new FeatureTableParser(this, "EMBL");
+        super(delegate);
+        features = new FeatureTableParser(this, "EMBL");
     }
 
     public void endSequence() throws ParseException {
@@ -112,99 +107,100 @@ public class EmblProcessor
         // ParseException.
         //String  id = "";
         String uri = "";
-	if (accessions.size() > 0) {
-	    //id = (String) accessions.get(0);
+        if (accessions.size() > 0) {
+            //id = (String) accessions.get(0);
             uri = "urn:sequence/embl:" + (String) accessions.get(0);
-	    getDelegate().addSequenceProperty(PROPERTY_EMBL_ACCESSIONS, accessions);
-	}
+            getDelegate().addSequenceProperty(PROPERTY_EMBL_ACCESSIONS, accessions);
+        }
 
         //getDelegate().setName(id);
         getDelegate().setURI(uri);
-	getDelegate().endSequence();
+        getDelegate().endSequence();
     }
 
     private List accessions;
 
     {
-	accessions = new ArrayList();
+        accessions = new ArrayList();
     }
 
-    public void addSequenceProperty(Object key, Object value) throws ParseException
+    public void addSequenceProperty(Object key, Object value)
+        throws ParseException
     {
-	try
-	{
-	    if (mBadFeature)
-	    {
-		// If this feature is bad in some way, ignore it.
-		if (value != null)
-		{
-		    String featureLine = value.toString();
-		    if((key.equals("FT")) && (featureLine.charAt(0) != ' '))
-		    {
-			// If the offending feature is past, start reading data again
-			mBadFeature = false;
-			features.startFeature(featureLine.substring(0, 15).trim());
-			features.featureData(featureLine.substring(16));
-		    }
-		}
-	    }
-	    else
-	    {
-		// Tidy up any end-of-block jobbies
-		if (features.inFeature() && !key.equals("FT"))
-		{
-		    features.endFeature();
-		}
+        try
+        {
+            if (mBadFeature)
+            {
+                // If this feature is bad in some way, ignore it.
+                if (value != null)
+                {
+                    String featureLine = value.toString();
+                    if((key.equals("FT")) && (featureLine.charAt(0) != ' '))
+                    {
+                        // If the offending feature is past, start reading data again
+                        mBadFeature = false;
+                        features.startFeature(featureLine.substring(0, 15).trim());
+                        features.featureData(featureLine.substring(16));
+                    }
+                }
+            }
+            else
+            {
+                // Tidy up any end-of-block jobbies
+                if (features.inFeature() && !key.equals("FT"))
+                {
+                    features.endFeature();
+                }
 
-		if (key.equals("FT"))
-		{
-		    String featureLine = value.toString();
-		    if (featureLine.charAt(0) != ' ')
-		    {
-			// This is a featuretype field
-			if (features.inFeature())
-			{
-			    features.endFeature();
-			}
+                if (key.equals("FT"))
+                {
+                    String featureLine = value.toString();
+                    if (featureLine.charAt(0) != ' ')
+                    {
+                        // This is a featuretype field
+                        if (features.inFeature())
+                        {
+                            features.endFeature();
+                        }
 
-			features.startFeature(featureLine.substring(0, 15).trim());
-		    }
-		    features.featureData(featureLine.substring(16));
-		}
-		else
-		{
-		    getDelegate().addSequenceProperty(key, value);
+                        features.startFeature(featureLine.substring(0, 15).trim());
+                    }
+                    features.featureData(featureLine.substring(16));
+                }
+                else
+                {
+                    getDelegate().addSequenceProperty(key, value);
 
-		    if (key.equals("AC"))
-		    {
-			String acc = value.toString();
-			StringTokenizer toke = new StringTokenizer(acc, "; ");
-			while (toke.hasMoreTokens())
-			{
-			    accessions.add(toke.nextToken());
-			}
-		    }
+                    if (key.equals("AC"))
+                    {
+                        String acc = value.toString();
+                        StringTokenizer toke = new StringTokenizer(acc, "; ");
+                        while (toke.hasMoreTokens())
+                        {
+                            accessions.add(toke.nextToken());
+                        }
+                    }
                     else if (key.equals("ID")) {
                         StringTokenizer toke = new StringTokenizer((String) value);
                         getDelegate().setName(toke.nextToken());
                     }
-		}
-	    }
-	}
-	catch (BioException ex)
-	{
-	    // If an exception is thrown, read past the offending feature
-	    mBadFeature = true;
-		ParseErrorEvent offendingLineEvent = new ParseErrorEvent(this, "This line could not be parsed: " + value.toString());
-		this.notifyParseErrorEvent(offendingLineEvent);
-	}
-    catch (IndexOutOfBoundsException ex)
-    {
-    	// This occurs when for some line min > max
-    	mBadFeature = true;
-    	ParseErrorEvent offendingLineEvent = new ParseErrorEvent(this, "From must be less than To: " + value.toString());
-		this.notifyParseErrorEvent(offendingLineEvent);
-    }
+                }
+            }
+        }
+        catch (BioException ex)
+        {
+            // If an exception is thrown, read past the offending feature
+            mBadFeature = true;
+            ParseErrorEvent offendingLineEvent = new ParseErrorEvent(this, "This line could not be parsed: " + value.toString());
+            this.notifyParseErrorEvent(offendingLineEvent);
+        }
+        catch (IndexOutOfBoundsException ex)
+        {
+            // This occurs when for some line min > max
+            mBadFeature = true;
+            ParseErrorEvent offendingLineEvent = new ParseErrorEvent(this, "From must be less than To: " + value.toString());
+            this.notifyParseErrorEvent(offendingLineEvent);
+        }
     }
 
 	/**
@@ -213,8 +209,7 @@ public class EmblProcessor
 	 *
 	 * @param theListener Listener to be added.
 	 */
-	public synchronized void addParseErrorListener(
-			ParseErrorListener theListener)
+	public synchronized void addParseErrorListener(ParseErrorListener theListener)
 	{
 		if(mListeners.contains(theListener) == false)
 		{
@@ -228,8 +223,7 @@ public class EmblProcessor
 	 *
 	 * @param theListener Listener to be removed.
 	 */
-	public synchronized void removeParseErrorListener(
-			ParseErrorListener theListener)
+	public synchronized void removeParseErrorListener(ParseErrorListener theListener)
 	{
 		if(mListeners.contains(theListener) == true)
 		{

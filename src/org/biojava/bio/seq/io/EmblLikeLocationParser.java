@@ -21,13 +21,17 @@
 
 package org.biojava.bio.seq.io;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 
 import org.biojava.bio.BioException;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.SmallMap;
 
 /**
  * <code>EmblLikeLocationParser</code> parses EMBL/Genbank style
@@ -43,17 +47,10 @@ import org.biojava.bio.symbol.*;
  *   123..456
  *  <123..567 or 123..>567 or <123..>567
  *   123^567
- * </pre>
- *
- * Specifically not supported are:
- * <pre>
  *   AL123465:(123..567)
  * </pre>
  *
- * Use of 'order' rather than 'join' is not retained over a read/write
- * cycle. i.e. 'order' is converted to 'join'
- *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Greg Cox
  * @since 1.2
  */
@@ -67,10 +64,14 @@ public class EmblLikeLocationParser
 
     // Stores join/order/complement instructions
     private List instructStack = new ArrayList();
-	// joinType is a hack to store if a compound location is a join(...) or an
-	// order(...) location.  If this isn't sufficient for your needs, feel free
-	// to fix it.  If you do, please make sure the AbstractGenEmblFileFormer
-	// class is still able to format join and order correctly
+	// joinType is a hack to store if a compound location is a
+	// join(...) or an order(...) location.  If this isn't sufficient
+	// for your needs, feel free to fix it.  If you do, please make
+	// sure the AbstractGenEmblFileFormer class is still able to
+	// format join and order correctly. The joinType is stored in the
+	// Feature Annotation under the internal data key
+	// Feature.PROPERTY_DATA_KEY which means that it won't get printed
+	// in flatfile dumps.
 	private String joinType = null;
 
     // List of sublocations.  Used for compound locations on the current
@@ -98,7 +99,7 @@ public class EmblLikeLocationParser
 
     EmblLikeLocationParser()
     {
-	this.lexer = new LocationLexer();
+        this.lexer = new LocationLexer();
     }
 
     /**
@@ -118,13 +119,15 @@ public class EmblLikeLocationParser
 
         if ((countChar(location, '(')) != (countChar(location, ')')))
             throw new BioException("Unbalanced parentheses in location: "
-				   + location);
+                                   + location);
 
         nextCharIndex = 0;
 
         instructStack.clear();
         subLocations.clear();
         subRegions.clear();
+
+        // 'join' vs. 'order'
         joinType = null;
 
         thisToken = lexer.getNextToken();
@@ -220,12 +223,12 @@ public class EmblLikeLocationParser
 			theTemplate.location = LocationTools.union(subLocations);
 		}
 
-		if(theTemplate instanceof StrandedFeature.Template)
+		if (theTemplate instanceof StrandedFeature.Template)
 		{
-			((StrandedFeature.Template)theTemplate).strand = mStrandType;
+			((StrandedFeature.Template) theTemplate).strand = mStrandType;
 		}
 
-		if(subRegions.size() > subLocations.size())
+		if (subRegions.size() > subLocations.size())
 		{
 			// This is a remote feature, so a new template has to be made
 			RemoteFeature.Template newTemplate = new RemoteFeature.Template(theTemplate);
@@ -239,15 +242,20 @@ public class EmblLikeLocationParser
 			theTemplate = newTemplate;
 		}
 
-		if(joinType != null)
+		if (joinType != null)
 		{
 			try
 			{
-				theTemplate.annotation.setProperty("JoinType", joinType);
+                // Feature.PROPERTY_DATA_KEY signifies internal (not
+                // for flatfile) data
+                Map dat = new SmallMap();
+                dat.put("JoinType", joinType);
+                theTemplate.annotation.setProperty(Feature.PROPERTY_DATA_KEY,
+                                                   dat);
 			}
-			catch(org.biojava.utils.ChangeVetoException cve)
+			catch (ChangeVetoException cve)
 			{
-				throw new org.biojava.bio.BioError(cve);
+				throw new BioError(cve);
 			}
 		}
 		return theTemplate;
@@ -262,196 +270,191 @@ public class EmblLikeLocationParser
      *
      * @exception BioException if an error occurs.
      */
-    private void processCoords()
-	throws BioException
+    private void processCoords() throws BioException
     {
-	int outerMin, innerMin, innerMax, outerMax;
-	Location createdLocation = null;
+        int outerMin, innerMin, innerMax, outerMax;
+        Location createdLocation = null;
 
-	// This is expected where two calls to processCoords() are
-	// made sequentially e.g. where two levels of parens are
-	// closed. The second call will have no data to process.
-	if (startCoords.isEmpty() && endCoords.isEmpty())
-	    return;
+        // This is expected where two calls to processCoords() are
+        // made sequentially e.g. where two levels of parens are
+        // closed. The second call will have no data to process.
+        if (startCoords.isEmpty() && endCoords.isEmpty())
+            return;
 
-	// Range of form 5^6 or 5^7
-	if (isBetweenLocation)
-	{
-		// Create a ranged location, and wrap it in a between location
-		int minCoord = ((Integer)startCoords.get(0)).intValue();
-		int maxCoord = ((Integer)startCoords.get(1)).intValue();
-		createdLocation = new BetweenLocation(new RangeLocation(minCoord, maxCoord));
-	}
-	// Range of form: 123
-	else if (startCoords.size() == 1 && endCoords.isEmpty())
-	{
-	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
-	    innerMax = outerMax = innerMin;
+        // Range of form 5^6 or 5^7
+        if (isBetweenLocation)
+        {
+            // Create a ranged location, and wrap it in a between location
+            int minCoord = ((Integer) startCoords.get(0)).intValue();
+            int maxCoord = ((Integer) startCoords.get(1)).intValue();
+            createdLocation = new BetweenLocation(new RangeLocation(minCoord, maxCoord));
+        }
+        // Range of form: 123
+        else if (startCoords.size() == 1 && endCoords.isEmpty())
+        {
+            innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
+            innerMax = outerMax = innerMin;
 
-	    // This looks like a point, but is actually a range which
-	    // lies entirely outside the current entry
-	    if (unboundMin || unboundMax)
-	    {
-		createdLocation = new FuzzyPointLocation(unboundMin ? Integer.MIN_VALUE : innerMin,
-							unboundMax ? Integer.MAX_VALUE : innerMax,
-							FuzzyPointLocation.RESOLVE_AVERAGE);
-	    }
-	    else if (isPointLoc)
-	    {
-		createdLocation = new PointLocation(innerMin);
-	    }
-	    else
-	    {
-		// I'm really sorry about this exception message! This
-		// should not happen
-		throw new BioException("Internal error in location parsing; parser became confused: "
-				       + location);
-	    }
-	}
-	// Range of form: (123.567)
-	else if (startCoords.size() == 2 && endCoords.isEmpty())
-	{
-	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
-	    innerMax = outerMax = ((Integer) startCoords.get(1)).intValue();
+            // This looks like a point, but is actually a range which
+            // lies entirely outside the current entry
+            if (unboundMin || unboundMax)
+            {
+                createdLocation = new FuzzyPointLocation(unboundMin ? Integer.MIN_VALUE : innerMin,
+                                                         unboundMax ? Integer.MAX_VALUE : innerMax,
+                                                         FuzzyPointLocation.RESOLVE_AVERAGE);
+            }
+            else if (isPointLoc)
+            {
+                createdLocation = new PointLocation(innerMin);
+            }
+            else
+            {
+                throw new BioException("Internal error in location parsing; parser became confused: "
+                                       + location);
+            }
+        }
+        // Range of form: (123.567)
+        else if (startCoords.size() == 2 && endCoords.isEmpty())
+        {
+            innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
+            innerMax = outerMax = ((Integer) startCoords.get(1)).intValue();
 
-	    createdLocation = new FuzzyPointLocation(innerMin,
-						    innerMax,
-						    FuzzyPointLocation.RESOLVE_AVERAGE);
-	}
-	// Range of form: 123..567 or <123..567 or 123..>567 or <123..>567
-	else if (startCoords.size() == 1 && endCoords.size() == 1)
-	{
-	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
-	    innerMax = outerMax = ((Integer) endCoords.get(0)).intValue();
+            createdLocation = new FuzzyPointLocation(innerMin,
+                                                     innerMax,
+                                                     FuzzyPointLocation.RESOLVE_AVERAGE);
+        }
+        // Range of form: 123..567 or <123..567 or 123..>567 or <123..>567
+        else if (startCoords.size() == 1 && endCoords.size() == 1)
+        {
+            innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
+            innerMax = outerMax = ((Integer) endCoords.get(0)).intValue();
 
-	    if (unboundMin || unboundMax)
-	    {
-		createdLocation = new FuzzyLocation(unboundMin ? Integer.MIN_VALUE : outerMin,
-						   unboundMax ? Integer.MAX_VALUE : outerMax,
-						   innerMin,
-						   innerMax,
-						   FuzzyLocation.RESOLVE_INNER);
-	    }
-	    else
-	    {
-		try
-		{
-		    createdLocation = new RangeLocation(outerMin, outerMax);
-		}
-		catch (IndexOutOfBoundsException ioe)
-		{
-		    throw new BioException(ioe);
-		}
-	    }
-	}
-	// Range of form: (123.567)..789
-	else if (startCoords.size() == 2 && endCoords.size() == 1)
-	{
-	    outerMin = ((Integer) startCoords.get(0)).intValue();
-	    innerMin = ((Integer) startCoords.get(1)).intValue();
-	    innerMax = outerMax = ((Integer) endCoords.get(0)).intValue();
+            if (unboundMin || unboundMax)
+            {
+                createdLocation = new FuzzyLocation(unboundMin ? Integer.MIN_VALUE : outerMin,
+                                                    unboundMax ? Integer.MAX_VALUE : outerMax,
+                                                    innerMin,
+                                                    innerMax,
+                                                    FuzzyLocation.RESOLVE_INNER);
+            }
+            else
+            {
+                try
+                {
+                    createdLocation = new RangeLocation(outerMin, outerMax);
+                }
+                catch (IndexOutOfBoundsException ioe)
+                {
+                    throw new BioException(ioe);
+                }
+            }
+        }
+        // Range of form: (123.567)..789
+        else if (startCoords.size() == 2 && endCoords.size() == 1)
+        {
+            outerMin = ((Integer) startCoords.get(0)).intValue();
+            innerMin = ((Integer) startCoords.get(1)).intValue();
+            innerMax = outerMax = ((Integer) endCoords.get(0)).intValue();
 
-	    createdLocation = new FuzzyLocation(outerMin,
-					       outerMax,
-					       innerMin,
-					       innerMax,
-					       FuzzyLocation.RESOLVE_INNER);
-	}
-	// Range of form: 123..(567.789)
-	else if (startCoords.size() == 1 && endCoords.size() == 2)
-	{
-	    outerMin = innerMin = ((Integer) startCoords.get(0)).intValue();
-	    innerMax = ((Integer) endCoords.get(0)).intValue();
-	    outerMax = ((Integer) endCoords.get(1)).intValue();
+            createdLocation = new FuzzyLocation(outerMin,
+                                                outerMax,
+                                                innerMin,
+                                                innerMax,
+                                                FuzzyLocation.RESOLVE_INNER);
+        }
+        // Range of form: 123..(567.789)
+        else if (startCoords.size() == 1 && endCoords.size() == 2)
+        {
+            outerMin = innerMin = ((Integer) startCoords.get(0)).intValue();
+            innerMax = ((Integer) endCoords.get(0)).intValue();
+            outerMax = ((Integer) endCoords.get(1)).intValue();
 
-	    createdLocation = new FuzzyLocation(outerMin,
-					       outerMax,
-					       innerMin,
-					       innerMax,
-					       FuzzyLocation.RESOLVE_INNER);
-	}
-	// Range of form: (123.345)..(567.789)
-	else if (startCoords.size() == 2 && endCoords.size() == 2)
-	{
-	    outerMin = ((Integer) startCoords.get(0)).intValue();
-	    innerMin = ((Integer) startCoords.get(1)).intValue();
-	    innerMax = ((Integer) endCoords.get(0)).intValue();
-	    outerMax = ((Integer) endCoords.get(1)).intValue();
+            createdLocation = new FuzzyLocation(outerMin,
+                                                outerMax,
+                                                innerMin,
+                                                innerMax,
+                                                FuzzyLocation.RESOLVE_INNER);
+        }
+        // Range of form: (123.345)..(567.789)
+        else if (startCoords.size() == 2 && endCoords.size() == 2)
+        {
+            outerMin = ((Integer) startCoords.get(0)).intValue();
+            innerMin = ((Integer) startCoords.get(1)).intValue();
+            innerMax = ((Integer) endCoords.get(0)).intValue();
+            outerMax = ((Integer) endCoords.get(1)).intValue();
 
-	    createdLocation = new FuzzyLocation(outerMin,
-					       outerMax,
-					       innerMin,
-					       innerMax,
-					       FuzzyLocation.RESOLVE_INNER);
-	}
-	else
-	{
-	    // I'm really sorry about this exception message! This
-	    // should not happen
-  	    throw new BioException("Internal error in location parsing; parser became confused; "
-  				   + location);
-	}
+            createdLocation = new FuzzyLocation(outerMin,
+                                                outerMax,
+                                                innerMin,
+                                                innerMax,
+                                                FuzzyLocation.RESOLVE_INNER);
+        }
+        else
+        {
+            throw new BioException("Internal error in location parsing; parser became confused; "
+                                   + location);
+        }
 
-	startCoords.clear();
-	endCoords.clear();
+        startCoords.clear();
+        endCoords.clear();
 
-	if(mRegionSeqID == null)
-	{
-		subLocations.add(createdLocation);
-		subRegions.add(new RemoteFeature.Region(createdLocation, null));
-	}
-	else
-	{
-		subRegions.add(new RemoteFeature.Region(createdLocation, mRegionSeqID));
-	}
-	mRegionSeqID = null;
-	isPointLoc   = true;
-	unboundMin   = false;
-	unboundMax   = false;
-	fuzzyCoord   = false;
-	isBetweenLocation = false;
-	mStrandType  = StrandedFeature.POSITIVE;
+        if (mRegionSeqID == null)
+        {
+            subLocations.add(createdLocation);
+            subRegions.add(new RemoteFeature.Region(createdLocation, null));
+        }
+        else
+        {
+            subRegions.add(new RemoteFeature.Region(createdLocation, mRegionSeqID));
+        }
+
+        mRegionSeqID = null;
+        isPointLoc   = true;
+        unboundMin   = false;
+        unboundMax   = false;
+        fuzzyCoord   = false;
+        isBetweenLocation = false;
+        mStrandType  = StrandedFeature.POSITIVE;
     }
-
+    
     /**
      * <code>processInstructs</code> pops an instruction off the stack
      * and applies it to the sub(locations).
      *
      * @exception BioException if an unsupported instruction is found.
      */
-    private void processInstructs()
-	throws BioException
+    private void processInstructs() throws BioException
     {
-	String instruct = (String) instructStack.remove(instructStack.size() - 1);
-	if (instruct.equals("join") || instruct.equals("order"))
-	{
-		joinType = instruct;
-	}
-	else if (instruct.equals("complement"))
-	{
-	    // This should only set the strand for a single range
-	    // within a feature. However, BioJava Locations have no
-	    // concept of strand and therefore are unable to support
-	    // construction of Features where some ranges are on
-	    // different strands. As a result the mStrandType
-	    // flag currently sets the strand for the whole feature.
-	    mStrandType = StrandedFeature.NEGATIVE;
-	}
-	else
-	{
-	    // This is a primary accession number
-	    // e.g. J00194:(100..202)
-  	     mRegionSeqID = instruct;
-	}
+        String instruct = (String) instructStack.remove(instructStack.size() - 1);
+        if (instruct.equals("join") || instruct.equals("order"))
+        {
+            joinType = instruct;
+        }
+        else if (instruct.equals("complement"))
+        {
+            // This should only set the strand for a single range
+            // within a feature. However, BioJava Locations have no
+            // concept of strand and therefore are unable to support
+            // construction of Features where some ranges are on
+            // different strands. As a result the mStrandType
+            // flag currently sets the strand for the whole feature.
+            mStrandType = StrandedFeature.NEGATIVE;
+        }
+        else
+        {
+            // This is a primary accession number
+            // e.g. J00194:(100..202)
+            mRegionSeqID = instruct;
+        }
     }
 
-    private int countChar(final String s, final char c)
+    private int countChar(String s, char c)
     {
-	int cnt = 0;
-	for (int i = 0; i < s.length(); ++i)
-	    if (s.charAt(i) == c)
-		++cnt;
-	return cnt;
+        int cnt = 0;
+        for (int i = 0; i < s.length(); ++i)
+            if (s.charAt(i) == c)
+                ++cnt;
+        return cnt;
     }
 
     /**
@@ -460,118 +463,123 @@ public class EmblLikeLocationParser
      * Kim Rutherford.
      *
      * @author Kim Rutherford
-     * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+     * @author Keith James
      * @author Greg Cox
      * @since 1.2
      */
     private class LocationLexer
     {
-	/**
-	 * <code>getNextToken</code> returns the next token. A null
-	 * indicates no more tokens.
-	 *
-	 * @return an <code>Object</code> value.
-	 */
-	Object getNextToken()
-	{
-	    while (true)
-	    {
-		if (nextCharIndex == location.length())
-		    return null;
+        private StringBuffer  intString = new StringBuffer();
+        private StringBuffer textString = new StringBuffer();
 
-		char thisChar = location.charAt(nextCharIndex);
+        /**
+         * <code>getNextToken</code> returns the next token. A null
+         * indicates no more tokens.
+         *
+         * @return an <code>Object</code> value.
+         */
+        Object getNextToken()
+        {
+            while (true)
+            {
+                if (nextCharIndex == location.length())
+                    return null;
 
-		switch (thisChar)
-		{
-		    case ' ' : case '\t' :
-            nextCharIndex++;
-			continue;
+                char thisChar = location.charAt(nextCharIndex);
 
-		    case ':' : case '^' : case ',' :
-		    case '(' : case ')' : case '<' :
-		    case '>' :
-			nextCharIndex++;
-			return new Character(thisChar);
+                switch (thisChar)
+                {
+                    case ' ' : case '\t' :
+                        nextCharIndex++;
+                        continue;
 
-		    case '.' :
-			if (location.charAt(nextCharIndex + 1) == '.')
-			{
-			    nextCharIndex += 2;
-			    return "..";
-			}
-			else
-			{
-			    nextCharIndex++;
-			    return new Character('.');
-			}
+                    case ':' : case '^' : case ',' :
+                    case '(' : case ')' : case '<' :
+                    case '>' :
+                        nextCharIndex++;
+                        return new Character(thisChar);
 
-		    case '0' : case '1' : case '2' : case '3' : case '4' :
-		    case '5' : case '6' : case '7' : case '8' : case '9' :
-			return followInteger();
+                    case '.' :
+                        if (location.charAt(nextCharIndex + 1) == '.')
+                        {
+                            nextCharIndex += 2;
+                            return "..";
+                        }
+                        else
+                        {
+                            nextCharIndex++;
+                            return new Character('.');
+                        }
 
-		    default :
-			String text = followText();
-			if (text.equals(""))
-			{
-			    nextCharIndex++;
-			    return new String("" + thisChar);
-			}
-			else
-			    return text;
-		}
-	    }
-	}
+                    case '0' : case '1' : case '2' : case '3' : case '4' :
+                    case '5' : case '6' : case '7' : case '8' : case '9' :
+                        return followInteger();
 
-	/**
-	 * <code>followInteger</code> returns single sequence
-	 * coordinate.
-	 *
-	 * @return an <code>Integer</code> value.
-	 */
-	private Integer followInteger()
-	{
-	    StringBuffer intString = new StringBuffer();
-	    char thisChar = location.charAt(nextCharIndex);
+                    default :
+                        String text = followText();
+                        if (text.equals(""))
+                        {
+                            nextCharIndex++;
+                            return new String("" + thisChar);
+                        }
+                        else
+                            return text;
+                }
+            }
+        }
 
-	    while (Character.isDigit(thisChar))
-	    {
-		intString.append(thisChar);
-		nextCharIndex++;
+        /**
+         * <code>followInteger</code> returns single sequence
+         * coordinate.
+         *
+         * @return an <code>Integer</code> value.
+         */
+        private Integer followInteger()
+        {
+            intString.setLength(0);
+            char thisChar = location.charAt(nextCharIndex);
 
-		if (nextCharIndex >= location.length())
-		    break;
+            while (Character.isDigit(thisChar))
+            {
+                intString.append(thisChar);
+                nextCharIndex++;
 
-		thisChar = location.charAt(nextCharIndex);
-	    }
-	    return new Integer(intString.substring(0));
-	}
+                if (nextCharIndex >= location.length())
+                    break;
 
-	/**
-	 * <code>followText</code> returns a single text string.
-	 *
-	 * @return a <code>String</code> value.
-	 */
-	private String followText()
-	{
-	    StringBuffer textString = new StringBuffer("");
-	    char thisChar = location.charAt(nextCharIndex);
+                thisChar = location.charAt(nextCharIndex);
+            }
 
-	    // First character must be a letter
-	    if (! Character.isLetter(thisChar))
-		return "";
+            return new Integer(intString.substring(0));
+        }
 
-	    while (Character.isLetterOrDigit(thisChar) ||
-		   thisChar == '.')
-	    {
-		textString.append(thisChar);
-		nextCharIndex++;
+        /**
+         * <code>followText</code> returns a single text string.
+         *
+         * @return a <code>String</code> value.
+         */
+        private String followText()
+        {
+            textString.setLength(0);
+            char thisChar = location.charAt(nextCharIndex);
 
-		if (nextCharIndex >= location.length())
-		    break;
+            // First character must be a letter
+            if (! Character.isLetter(thisChar))
+                return "";
 
-		thisChar = location.charAt(nextCharIndex);
-	    }
-	    return textString.substring(0);
-	}
+            while (Character.isLetterOrDigit(thisChar) ||
+                   thisChar == '.')
+            {
+                textString.append(thisChar);
+                nextCharIndex++;
+
+                if (nextCharIndex >= location.length())
+                    break;
+
+                thisChar = location.charAt(nextCharIndex);
+            }
+
+            return textString.substring(0);
+        }
     }
 }
