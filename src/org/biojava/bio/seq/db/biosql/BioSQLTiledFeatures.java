@@ -279,7 +279,7 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
 		featuresRef = seqDB.getTileCache().makeReference(features);
 		return features;
 	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "SQL error while reading features");
+		throw new BioRuntimeException("SQL error while reading features", ex);
 	    } catch (BioException ex) {
 		throw new BioRuntimeException(ex);
 	    } 

@@ -135,7 +135,7 @@ class BioSQLAllFeatures implements FeatureHolder, RealizingFeatureHolder
 		FeaturesSQL adaptor = seqDB.getFeaturesSQL();
 		adaptor.retrieveFeatures(bioentry_id, new FeatureReceiver(), null, -1, -1);
 	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "SQL error while reading features");
+		throw new BioRuntimeException("SQL error while reading features", ex);
 	    } catch (BioException ex) {
 		throw new BioRuntimeException(ex);
 	    } 

@@ -54,6 +54,7 @@ import org.biojava.utils.ChangeVetoException;
  * Behind-the-scenes adaptor to the features sub-schema of BioSQL.
  *
  * @author Thomas Down
+ * @author Simon Foote (modifications for schema version 1.0)
  * @since 1.3
  */
 
@@ -111,11 +112,11 @@ class FeaturesSQL {
 			        "select seqfeature.seqfeature_id, " +
                     "       seqfeature.type_term_id, " +
                     "       seqfeature.source_term_id " +
-                    "  from seqfeature_location, seqfeature " +
+                    "  from location, seqfeature " +
                     " where seqfeature.bioentry_id = ? and " +
-                    "       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-                    "       seqfeature_location.start_pos >= ? and " +
-                    "       seqfeature_location.end_pos <= ? " +
+                    "       location.seqfeature_id = seqfeature.seqfeature_id and " +
+                    "       location.end_pos >= ? and " +
+                    "       location.start_pos <= ? " +
                     " group by seqfeature.seqfeature_id, seqfeature.type_term_id, seqfeature.source_term_id"
              );
              get_features.setInt(1, bioentry_id);
@@ -127,8 +128,8 @@ class FeaturesSQL {
                     "       seqfeature.type_term_id, " +
                     "       seqfeature.source_term_id " +
                     "  from seqfeature, seqfeature_relationship " +
-                    " where seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
-                    "       seqfeature_relationship.parent_seqfeature_id = ?"
+                    " where seqfeature.seqfeature_id = seqfeature_relationship.subject_seqfeature_id and " +
+                    "       seqfeature_relationship.object_seqfeature_id = ?"
 	         );
              get_features.setInt(1, immediateChildrenOfParent);
         } else if (featureID >= 0) {
@@ -168,7 +169,7 @@ class FeaturesSQL {
         if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
             get_annotations = conn.prepareStatement(
 		            "select seqfeature_qualifier_value.seqfeature_id, " +
-                    "       seqfeature_qualifier_value.ontology_term_id, " +
+                    "       seqfeature_qualifier_value.term_id, " +
                     "       seqfeature_qualifier_value.value " +
                     "  from seqfeature, seqfeature_qualifier_value " +
                     " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
@@ -178,16 +179,16 @@ class FeaturesSQL {
         } else if (overlappingRegion != null) {
            get_annotations = conn.prepareStatement(
 		            "select seqfeature_qualifier_value.seqfeature_id, " +
-                    "       seqfeature_qualifier_value.ontology_term_id, " +
+                    "       seqfeature_qualifier_value.term_id, " +
                     "       seqfeature_qualifier_value.value " +
-                    "  from seqfeature, seqfeature_qualifier_value, seqfeature_location " +
+                    "  from seqfeature, seqfeature_qualifier_value, location " +
                     " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
                     "       seqfeature.bioentry_id = ? and" +
-                    "       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-                    "       seqfeature_location.seq_end >= ? and " +
-                    "       seqfeature_location.seq_start <= ? " +
+                    "       location.seqfeature_id = seqfeature.seqfeature_id and " +
+                    "       location.end_pos >= ? and " +
+                    "       location.start_pos <= ? " +
                     "       group by seqfeature_qualifier_value.seqfeature_id, " +
-                    "                seqfeature_qualifier_value.ontology_term_id, " +
+                    "                seqfeature_qualifier_value.term_id, " +
                     "                seqfeature_qualifier_value.value"
            );
            get_annotations.setInt(1, bioentry_id);
@@ -196,17 +197,17 @@ class FeaturesSQL {
         } else if (immediateChildrenOfParent >= 0) {
             get_annotations = conn.prepareStatement(
            		   "select seqfeature_qualifier_value.seqfeature_id, " +
-                   "       seqfeature_qualifier_value.ontology_term_id, " +
+                   "       seqfeature_qualifier_value.term_id, " +
                    "       seqfeature_qualifier_value.value " +
                    "  from seqfeature_qualifier_value, seqfeature_relationship " +
-                   " where seqfeature_qualifier_value.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
-                   "       seqfeature_relationship.parent_seqfeature_id = ?"
+                   " where seqfeature_qualifier_value.seqfeature_id = seqfeature_relationship.subject_seqfeature_id and " +
+                   "       seqfeature_relationship.object_seqfeature_id = ?"
            );
            get_annotations.setInt(1, immediateChildrenOfParent);
         } else if (featureID >= 0) {
            get_annotations = conn.prepareStatement(
 		            "select seqfeature_qualifier_value.seqfeature_id, " +
-                    "       seqfeature_qualifier_value.ontology_term_id, " +
+                    "       seqfeature_qualifier_value.term_id, " +
                     "       seqfeature_qualifier_value.value " +
                     "  from seqfeature_qualifier_value " +
                     " where seqfeature_qualifier_value.seqfeature_id = ?"
@@ -232,14 +233,14 @@ class FeaturesSQL {
 
 	if (seqDB.isLocationQualifierSupported()) {
 	    PreparedStatement get_location_crap = conn.prepareStatement(
-			    "select location_qualifier_value.seqfeature_location_id, " +
+			    "select location_qualifier_value.location_id, " +
 			    "       seqfeature_qualifier.qualifier_name, " +
 			    "       location_qualifier_value.qualifier_value, " +
 			    "       location_qualifier_value.qualifier_int_value " +
-			    "  from location_qualifier_value, seqfeature_location, seqfeature, seqfeature_qualifier " +
+			    "  from location_qualifier_value, location, seqfeature, seqfeature_qualifier " +
 			    " where seqfeature.bioentry_id = ? and " +
-			    "       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-			    "       location_qualifier_value.seqfeature_location_id = seqfeature_location.seqfeature_location_id and " +
+			    "       location.seqfeature_id = seqfeature.seqfeature_id and " +
+			    "       location_qualifier_value.location_id = location.location_id and " +
 			    "       seqfeature_qualifier.seqfeature_qualifier_id = location_qualifier_value.seqfeature_qualifier_id");
 	    get_location_crap.setInt(1, bioentry_id);
 	    rs = get_location_crap.executeQuery();
@@ -268,59 +269,59 @@ class FeaturesSQL {
        PreparedStatement get_locations = null;
        if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
             get_locations = conn.prepareStatement(
-		            "select seqfeature_location.seqfeature_location_id, " +
-                    "       seqfeature_location.seqfeature_id, " +
-                    "       seqfeature_location.start_pos, " +
-                    "       seqfeature_location.end_pos, " +
-                    "       seqfeature_location.strand " +
-                    "  from seqfeature, seqfeature_location " +
-                    " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+		            "select location.location_id, " +
+                    "       location.seqfeature_id, " +
+                    "       location.start_pos, " +
+                    "       location.end_pos, " +
+                    "       location.strand " +
+                    "  from seqfeature, location " +
+                    " where location.seqfeature_id = seqfeature.seqfeature_id and " +
                     "       seqfeature.bioentry_id = ?"
             );
             get_locations.setInt(1, bioentry_id);
        } else if (overlappingRegion != null) {
            get_locations = conn.prepareStatement(
-		           "select seqfeature_location.seqfeature_location_id, " +
-                   "       seqfeature_location.seqfeature_id, " +
-                   "       seqfeature_location.start_pos, " +
-                   "       seqfeature_location.end_pos, " +
-                   "       seqfeature_location.strand " +
-                   "  from seqfeature_location, seqfeature_location as sfl2, seqfeature " +
-                   " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+		           "select location.location_id, " +
+                   "       location.seqfeature_id, " +
+                   "       location.start_pos, " +
+                   "       location.end_pos, " +
+                   "       location.strand " +
+                   "  from location, location as sfl2, seqfeature " +
+                   " where location.seqfeature_id = seqfeature.seqfeature_id and " +
                    "       seqfeature.bioentry_id = ? and " +
                    "       sfl2.seqfeature_id = seqfeature.seqfeature_id and " +
                    "       sfl2.end_pos >= ? and " +
                    "       sfl2.start_pos <= ? " +
-                   " group by seqfeature_location.seqfeature_location_id, " +
-                   "          seqfeature_location.seqfeature_id, " +
-                   "          seqfeature_location.start_pos, " +
-                   "          seqfeature_location.end_pos, " +
-                   "          seqfeature_location.strand"
+                   " group by location.location_id, " +
+                   "          location.seqfeature_id, " +
+                   "          location.start_pos, " +
+                   "          location.end_pos, " +
+                   "          location.strand"
            );
            get_locations.setInt(1, bioentry_id);
            get_locations.setInt(2, overlappingRegion.getMin());
            get_locations.setInt(3, overlappingRegion.getMax());
        } else if (immediateChildrenOfParent >= 0) {
            get_locations = conn.prepareStatement(
-		           "select seqfeature_location.seqfeature_location_id, " +
-                   "       seqfeature_location.seqfeature_id, " +
-                   "       seqfeature_location.start_pos, " +
-                   "       seqfeature_location.end_pos, " +
-                   "       seqfeature_location.strand " +
-                   "  from seqfeature_location, seqfeature_relationship " +
-                   " where seqfeature_location.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
-                   "       seqfeature_relationship.parent_seqfeature_id = ?"
+		           "select location.location_id, " +
+                   "       location.seqfeature_id, " +
+                   "       location.start_pos, " +
+                   "       location.end_pos, " +
+                   "       location.strand " +
+                   "  from location, seqfeature_relationship " +
+                   " where location.seqfeature_id = seqfeature_relationship.subject_seqfeature_id and " +
+                   "       seqfeature_relationship.object_seqfeature_id = ?"
            );
            get_locations.setInt(1, immediateChildrenOfParent);
        } else if (featureID >= 0) {
            get_locations = conn.prepareStatement(
-		            "select seqfeature_location.seqfeature_location_id, " +
-                    "       seqfeature_location.seqfeature_id, " +
-                    "       seqfeature_location.start_pos, " +
-                    "       seqfeature_location.end_pos, " +
-                    "       seqfeature_location.strand " +
-                    "  from seqfeature_location " +
-                    " where seqfeature_location.seqfeature_id = ?");
+		            "select location.location_id, " +
+                    "       location.seqfeature_id, " +
+                    "       location.start_pos, " +
+                    "       location.end_pos, " +
+                    "       location.strand " +
+                    "  from location " +
+                    " where location.seqfeature_id = ?");
            get_locations.setInt(1, featureID);
        }
 
@@ -472,22 +473,22 @@ class FeaturesSQL {
             PreparedStatement get_hierarchy;
             if (overlappingRegion == null) {
                 get_hierarchy = conn.prepareStatement(
-                        "select parent_seqfeature_id, child_seqfeature_id " +
+                        "select object_seqfeature_id, subject_seqfeature_id " +
                         "  from seqfeature_relationship, seqfeature " +
-                        " where parent_seqfeature_id = seqfeature.seqfeature_id and " +
+                        " where object_seqfeature_id = seqfeature.seqfeature_id and " +
                         "       seqfeature.bioentry_id = ?"
                 );
                 get_hierarchy.setInt(1, bioentry_id);
             } else {
                 get_hierarchy = conn.prepareStatement(
-                        "select parent_seqfeature_id, child_seqfeature_id " +
-                        "  from seqfeature_relationship, seqfeature, seqfeature_location " +
-                        " where parent_seqfeature_id = seqfeature.seqfeature_id and " +
+                        "select object_seqfeature_id, subject_seqfeature_id " +
+                        "  from seqfeature_relationship, seqfeature, location " +
+                        " where object_seqfeature_id = seqfeature.seqfeature_id and " +
                         "       seqfeature.bioentry_id = ? and " +
-                        "       seqfeature_location.seqfeature_id = parent_seqfeature_id and " +
-                        "       seqfeature_location.end_pos >= ? and " +
-                        "       seqfeature_location.start_pos <= ? " +
-                        "       group by parent_seqfeature_id, child_seqfeature_id"
+                        "       location.seqfeature_id = object_seqfeature_id and " +
+                        "       location.end_pos >= ? and " +
+                        "       location.start_pos <= ? " +
+                        "       group by object_seqfeature_id, subject_seqfeature_id"
                  );
                  get_hierarchy.setInt(1, bioentry_id);
                  get_hierarchy.setInt(2, overlappingRegion.getMin());
@@ -511,9 +512,9 @@ class FeaturesSQL {
             specifiedParent = immediateChildrenOfParent;
         } else if (featureID >= 0) {
             PreparedStatement discover_parent = conn.prepareStatement(
-		            "select parent_seqfeature_id " +
+		            "select object_seqfeature_id " +
                     "  from seqfeature_relationship " +
-                    " where parent_seqfeature_id = ?"
+                    " where object_seqfeature_id = ?"
             );
             discover_parent.setInt(1, featureID);
             rs = discover_parent.executeQuery();
@@ -650,7 +651,7 @@ class FeaturesSQL {
 	    conn.setAutoCommit(false);
 	    
 	    PreparedStatement del_oldlocation = conn.prepareStatement(
-		    "delete from seqfeature_location " +
+		    "delete from location " +
 		    " where seqfeature_id = ?"
 	    );
 	    del_oldlocation.setInt(1, feature_id);
@@ -658,7 +659,7 @@ class FeaturesSQL {
 	    del_oldlocation.close();
 
 	    PreparedStatement add_locationspan = conn.prepareStatement(
-                    "insert into seqfeature_location " +
+                    "insert into location " +
 	            "       (seqfeature_id, start_pos, end_pos, strand, rank) " +
     		    "values (?, ?, ?, ?, ?)"
 	    );
@@ -705,11 +706,29 @@ class FeaturesSQL {
     void persistFeatures(Connection conn, int bioentry_id, FeatureHolder features, int parent)
         throws BioException, SQLException
     {
+			
+	// HashMap to track rank for each feature_type
+	// This allows the unique key constraint in seqfeature to be valid as
+	// bioentries can have multiple features of same type/source (ie. Genbank CDS)
+	// Not sure if this is the best way to do it or just increase the rank value each
+	// time no matter what the feature type is.
+	HashMap rankType = new HashMap();
+	
 	for (Iterator fi = features.features(); fi.hasNext(); ) {
 	    Feature f = (Feature) fi.next();
-
+			
+			// Get next rank value for feature type
+			int rank = 0;
+			String fType = f.getType();
+			if (rankType.containsKey(fType)) {
+				rank = ((Integer) rankType.get(fType)).intValue() + 1;
+				rankType.put(fType, new Integer(rank));
+			} else {
+				rankType.put(fType, new Integer(0));
+			}
+			
 	    if (! (f instanceof ComponentFeature)) {
-		int id = persistFeature(conn, bioentry_id, f, parent);
+		int id = persistFeature(conn, bioentry_id, f, parent, rank);
 		if (seqDB.isHierarchySupported()) {
 		    persistFeatures(conn, bioentry_id, f, id);
 		}
@@ -720,7 +739,8 @@ class FeaturesSQL {
     int persistFeature(Connection conn,
 		       int bioentry_id,
 		       Feature f,
-		       int parent_id)
+		       int parent_id,
+					 int typeRank)
 	throws BioException, SQLException
     {
 	int id = -1;
@@ -776,12 +796,13 @@ class FeaturesSQL {
 
 	    PreparedStatement add_feature = conn.prepareStatement(
 		"insert into seqfeature "+
-		"       (bioentry_id, type_term_id, source_term_id) " +
-		"values (?, ?,  ?)"
+		"       (bioentry_id, type_term_id, source_term_id, rank) " +
+		"values (?, ?, ?, ?)"
 	    );
 	    add_feature.setInt(1, bioentry_id);
 	    add_feature.setInt(2, seqfeature_key);
 	    add_feature.setInt(3, seqfeature_source);
+			add_feature.setInt(4, typeRank);
 	    add_feature.executeUpdate();
 	    add_feature.close();
 
@@ -790,7 +811,7 @@ class FeaturesSQL {
 
 	if (!locationWritten) {
 	    PreparedStatement add_locationspan = conn.prepareStatement(
-                    "insert into seqfeature_location " +
+                    "insert into location " +
 	            "       (seqfeature_id, start_pos, end_pos, strand, rank) " +
     		    "values (?, ?, ?, ?, ?)"
 	    );
@@ -839,7 +860,7 @@ class FeaturesSQL {
 	if (parent_id >= 0) {
 	    PreparedStatement add_hierarchy = conn.prepareStatement(
 		"insert into seqfeature_relationship "+
-		"       (parent_seqfeature_id, child_seqfeature_id, ontology_term_id) " +
+		"       (object_seqfeature_id, subject_seqfeature_id, term_id) " +
 		"values (?, ?, ?)"
 		);
 	    add_hierarchy.setInt(1, parent_id);
@@ -872,7 +893,8 @@ class FeaturesSQL {
 		    rolledback = true;
 		} catch (SQLException ex2) {}
 	    }
-	    throw new BioRuntimeException(ex, "Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	    throw new BioRuntimeException("Error removing from BioSQL tables" 
+					+ (rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }
 
@@ -889,8 +911,8 @@ class FeaturesSQL {
 
         int feature_id = f._getInternalID();
 
-        PreparedStatement delete_locs = conn.prepareStatement("delete from seqfeature_location " +
-                                                              " where seqfeature_location.seqfeature_id = ?");
+        PreparedStatement delete_locs = conn.prepareStatement("delete from location " +
+                                                              " where location.seqfeature_id = ?");
         delete_locs.setInt(1, feature_id);
         delete_locs.executeUpdate();
         delete_locs.close();
@@ -902,7 +924,7 @@ class FeaturesSQL {
         delete_fqv.close();
 
         PreparedStatement delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
-                                                             " where child_seqfeature_id = ?");
+                                                             " where subject_seqfeature_id = ?");
         delete_rel.setInt(1, feature_id);
         delete_rel.executeUpdate();
         delete_rel.close();
@@ -930,7 +952,7 @@ class FeaturesSQL {
 	if (removeFirst) {
 	    int id = seqDB.intern_ontology_term(conn, keyString);
 	    PreparedStatement remove_old_value = conn.prepareStatement("delete from seqfeature_qualifier_value " +
-								       " where seqfeature_id = ? and ontology_term_id = ?");
+								       " where seqfeature_id = ? and term_id = ?");
 	    remove_old_value.setInt(1, feature_id);
 	    remove_old_value.setInt(2, id);
 	    remove_old_value.executeUpdate();
@@ -941,7 +963,7 @@ class FeaturesSQL {
         PreparedStatement insert_new;
         if (seqDB.isSPASupported()) {
             insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                              "       (seqfeature_id, ontology_term_id, rank, value) " +
+                                              "       (seqfeature_id, term_id, rank, value) " +
                     					      "values (?, intern_ontology_term( ? ), ?, ?)");
             if (value instanceof Collection) {
                 int cnt = 0;
@@ -962,7 +984,7 @@ class FeaturesSQL {
             insert_new.close();
         } else {
             insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                               "       (seqfeature_id, ontology_term_id, rank, value) " +
+                                               "       (seqfeature_id, term_id, rank, value) " +
 			  	 	                           "values (?, ?, ?, ?)");
 	        int sfq = seqDB.intern_ontology_term(conn, keyString);
             if (value instanceof Collection) {
@@ -994,7 +1016,8 @@ class FeaturesSQL {
 	try {
 	    conn = seqDB.getPool().takeConnection();
 	    conn.setAutoCommit(false);
-	    int f_id = seqDB.getFeaturesSQL().persistFeature(conn, bioentry_id, f, parent_id);
+			// Set rank to 0, not sure if need a unique value generated here or not????
+	    int f_id = seqDB.getFeaturesSQL().persistFeature(conn, bioentry_id, f, parent_id, 0);
 	    if (f instanceof BioSQLFeature) {
 		((BioSQLFeature) f)._setInternalID(f_id);
 		((BioSQLFeature) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, f_id));
@@ -1009,7 +1032,8 @@ class FeaturesSQL {
 		    rolledback = true;
 		} catch (SQLException ex2) {}
 	    }
-	    throw new BioException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	    throw new BioException("Error adding BioSQL tables" 
+					+ (rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }
 }

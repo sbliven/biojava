@@ -47,9 +47,8 @@ class BioSQLStrandedFeature extends BioSQLFeature implements StrandedFeature {
 		symList = DNATools.reverseComplement(symList);
 	    } catch (IllegalAlphabetException iae) {
 		throw new BioError(
-				   iae,
 				   "Could not retrieve symbols for feature as " +
-				   "the alphabet can not be complemented."
+				   "the alphabet can not be complemented.", iae
 				   );
 	    }
 	}

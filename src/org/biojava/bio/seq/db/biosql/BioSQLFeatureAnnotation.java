@@ -71,10 +71,10 @@ class BioSQLFeatureAnnotation
 	try {
 	    Connection conn = seqDB.getPool().takeConnection();
 
-	    PreparedStatement get_annotations = conn.prepareStatement("select ontology_term.name, seqfeature_qualifier_value.value " +
-								      "  from ontology_term, seqfeature_qualifier_value " +
+	    PreparedStatement get_annotations = conn.prepareStatement("select term.name, seqfeature_qualifier_value.value " +
+								      "  from term, seqfeature_qualifier_value " +
 								      " where seqfeature_qualifier_value.seqfeature_id = ? and " +
-								      "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id");
+								      "       term.term_id = seqfeature_qualifier_value.term_id");
 	    get_annotations.setInt(1, feature_id);
 	    ResultSet rs = get_annotations.executeQuery();
 	    
@@ -91,7 +91,7 @@ class BioSQLFeatureAnnotation
 	    get_annotations.close();
 	    seqDB.getPool().putConnection(conn);
 	} catch (SQLException ex) {
-	    throw new BioRuntimeException(ex, "Error fetching annotations");
+	    throw new BioRuntimeException("Error fetching annotations", ex);
 	}
     }
 
@@ -187,7 +187,8 @@ class BioSQLFeatureAnnotation
 		    rolledback = true;
 		} catch (SQLException ex2) {}
 	    }
-	    throw new BioRuntimeException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	    throw new BioRuntimeException("Error adding BioSQL tables" + 
+					(rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }
 

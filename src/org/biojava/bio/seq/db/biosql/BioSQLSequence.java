@@ -55,6 +55,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Simon Foote (modifications for schema version 1.0)
  * @since 1.3
  */
 
@@ -100,7 +101,7 @@ class BioSQLSequence
 	try {
 	    this.alphabet = AlphabetManager.alphabetForName(alphaName.toUpperCase());
 	} catch (NoSuchElementException ex) {
-	    throw new BioException(ex, "Can't load sequence with unknown alphabet " + alphaName);
+	    throw new BioException("Can't load sequence with unknown alphabet " + alphaName, ex);
 	}
 
 	// features = new BioEntryFeatureSet(this, seqDB, bioentry_id);
@@ -181,7 +182,7 @@ class BioSQLSequence
 		
 		PreparedStatement get_symbols = conn.prepareStatement("select seq " +
 								      "from   biosequence " +
-								      "where  entry_id = ?");
+								      "where  bioentry_id = ?");
 		get_symbols.setInt(1, bioentry_id);
 		ResultSet rs = get_symbols.executeQuery();
 		String seqString = null;
@@ -201,7 +202,7 @@ class BioSQLSequence
 			SymbolTokenization toke = alpha.getTokenization("token");
 			symbols = new SimpleSymbolList(toke, seqString);
 		    } catch (Exception ex) {
-			throw new BioRuntimeException(ex, "Couldn't parse tokenized symbols");
+			throw new BioRuntimeException("Couldn't parse tokenized symbols", ex);
 		    }
 		} else {
                     if (! (length >= 0)) {
@@ -211,7 +212,7 @@ class BioSQLSequence
 		    symbols = new DummySymbolList((FiniteAlphabet) alphabet, length);
 		}
 	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "Unknown error getting symbols from BioSQL.  Oh dear.");
+		throw new BioRuntimeException("Unknown error getting symbols from BioSQL.  Oh dear.", ex);
 	    }
 	}
 

@@ -222,8 +222,8 @@ class OntologySQL {
     {
         Connection conn = seqDB.getPool().takeConnection();
         PreparedStatement get_terms = conn.prepareStatement(
-                "select ontology_term_id, name, definition " +
-                "  from ontology_term " +
+                "select term_id, name, definition " +
+                "  from term " +
                 " where ontology_id = ?"
         );
         get_terms.setInt(1, id);
@@ -304,8 +304,8 @@ class OntologySQL {
             get_onts.close();
             
             PreparedStatement get_rels = conn.prepareStatement(
-                "select ontology_id, subject_id, object_id, predicate_id " +
-                "  from ontology_relationship"
+                "select ontology_id, subject_term_id, object_term_id, predicate_term_id " +
+                "  from term_relationship"
             );
             
             rs = get_rels.executeQuery();
@@ -454,7 +454,7 @@ class OntologySQL {
         throws SQLException
     {
         PreparedStatement import_term = conn.prepareStatement(
-            "insert into ontology_term " +
+            "insert into term " +
             "       (name, definition, ontology_id) " +
             "values (?, ?, ?)"
         );
@@ -462,7 +462,7 @@ class OntologySQL {
         import_term.setString(2, term.getDescription());
         import_term.setInt(3, ontologyID(term.getOntology()));
         import_term.executeUpdate();
-        int id = seqDB.getDBHelper().getInsertID(conn, "ontology_term", "ontology_term_id");
+        int id = seqDB.getDBHelper().getInsertID(conn, "term", "term_id");
         Integer tid = new Integer(id);
         termsByID.put(tid, term);
         IDsByTerm.put(term, tid);
@@ -494,8 +494,8 @@ class OntologySQL {
         throws SQLException
     {
         PreparedStatement import_trip = conn.prepareStatement(
-            "insert into ontology_relationship " +
-            "       (subject_id, predicate_id, object_id, ontology_id) " +
+            "insert into term_relationship " +
+            "       (subject_term_id, predicate_term_id, object_term_id, ontology_id) " +
             "values (?, ?, ?, ?)"
         );
         import_trip.setInt(1, termID(triple.getSubject()));

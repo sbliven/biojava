@@ -66,8 +66,12 @@ import org.biojava.utils.cache.WeakValueHashMap;
  * implementation of the BioJava Sequence, SequenceDB, and Feature interfaces,
  * and can be used in a wide range of applications.
  *
+ * Note: It now uses BioSQL schema version 1.0 (Post Singapore)
+ * 			 All previous versions are no longer supported.
+ *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Simon Foote (modifications for schema version 1.0)
  * @since 1.3
  */
 
@@ -143,9 +147,16 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     {
 	helper = DBHelper.getDBHelperForURL(dbURL);
 	pool = new JDBCConnectionPool(dbURL, dbUser, dbPass);
-
+	
+	// Check that BioSQL database schema is post-Singapore
+	if (! isDbSchemaSupported()) {
+		throw new BioException("This database appears to be an old (pre-Singapore) BioSQL."
+					+ " If you need to access it, try an older BioJava snapshot (1.3pre1 or earlier)");
+	}
+	
 	if (! isBioentryPropertySupported()) {
-	    throw new BioException("This database appears to be an old (pre-Cape-Town) BioSQL.  If you need to access it, try an older BioJava snapshot");
+	    throw new BioException("This database appears to be an old (pre-Cape-Town) BioSQL."
+					+ " If you need to access it, try an older BioJava snapshot");
 	}
 
 	// Create adapters
@@ -153,7 +164,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     try {
         ontologySQL = new OntologySQL(this);
     } catch (SQLException ex) {
-        throw new BioException(ex, "Error accessing ontologies");
+        throw new BioException("Error accessing ontologies", ex);
     }
 
 	// Create helpers
@@ -165,6 +176,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 	try {
 	    Connection conn = pool.takeConnection();
+			conn.setAutoCommit(false);  // Added by Simon
 	    PreparedStatement getID = conn.prepareStatement("select * from biodatabase where name = ?");
 	    getID.setString(1, biodatabase);
 	    ResultSet rs = getID.executeQuery();
@@ -180,7 +192,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		PreparedStatement createdb = conn.prepareStatement("insert into biodatabase (name) values ( ? )");
 		createdb.setString(1, biodatabase);
 		createdb.executeUpdate();
-                conn.commit();
+    conn.commit();
 		createdb.close();
 
 		dbid = getDBHelper().getInsertID(conn, "biodatabase", "biodatabase_id");
@@ -188,7 +200,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		throw new BioException("Biodatabase " + biodatabase + " doesn't exist");
 	    }
 	} catch (SQLException ex) {
-	    throw new BioException(ex, "Error connecting to BioSQL database");
+	    throw new BioException("Error connecting to BioSQL database: " + ex.getMessage(), ex);
 	}
     }
 
@@ -252,8 +264,6 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    create_bioentry.executeUpdate();
 	    create_bioentry.close();
 
-	    // System.err.println("Created bioentry");
-
 	    int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
 
 	    PreparedStatement create_dummy = conn.prepareStatement("insert into biosequence " +
@@ -277,7 +287,8 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		    rolledback = true;
 		} catch (SQLException ex2) {}
 	    }
-	    throw new BioRuntimeException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	    throw new BioRuntimeException("Error adding BioSQL tables" + 
+					(rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }
 
@@ -303,7 +314,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	try {
 	    seqToke = seqAlpha.getTokenization("token");
 	} catch (Exception ex) {
-	    throw new BioException(ex, "Can't store sequences in BioSQL unless they can be sensibly tokenized/detokenized");
+	    throw new BioException("Can't store sequences in BioSQL unless they can be sensibly tokenized/detokenized", ex);
 	}
 
 	Connection conn = null;
@@ -485,7 +496,8 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		    rolledback = true;
 		} catch (SQLException ex2) {}
 	    }
-	    throw new BioRuntimeException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	    throw new BioRuntimeException("Error adding BioSQL tables" + 
+					(rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }
 
@@ -587,7 +599,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		return seq;
 	    }
 	} catch (SQLException ex) {
-	    throw new BioException(ex, "Error accessing BioSQL tables");
+	    throw new BioException("Error accessing BioSQL tables", ex);
 	}
 
 	throw new BioException("BioEntry " + id + " exists with unknown sequence type");
@@ -608,7 +620,9 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     private void _removeSequence(String id)
         throws BioException, IllegalIDException, ChangeVetoException
     {
+			
 	Sequence seq = (Sequence) sequencesByName.get(id);
+	
 	if (seq != null) {
 	    seq = null;  // Don't want to be holding the reference ourselves!
 	    try {
@@ -664,13 +678,13 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
                 PreparedStatement delete_locs;
 		if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-		    delete_locs = conn.prepareStatement("delete from seqfeature_location " +
-							" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+		    delete_locs = conn.prepareStatement("delete from location " +
+							" where location.seqfeature_id = seqfeature.seqfeature_id and " +
 							"       seqfeature.bioentry_id = ?");
 		} else {
-		    delete_locs = conn.prepareStatement("delete from seqfeature_location " +
-							" using seqfeature_location, seqfeature " + 
-							" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+		    delete_locs = conn.prepareStatement("delete from location " +
+							" using location, seqfeature " + 
+							" where location.seqfeature_id = seqfeature.seqfeature_id and " +
 							"       seqfeature.bioentry_id = ?");
 		}
                 delete_locs.setInt(1, bioentry_id);
@@ -695,12 +709,12 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 PreparedStatement delete_rel;
 		if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
 		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
-						       " where parent_seqfeature_id = seqfeature.seqfeature_id " +
+						       " where object_seqfeature_id = seqfeature.seqfeature_id " +
 						       "   and seqfeature.bioentry_id = ?");
 		} else {
 		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
 						       " using seqfeature_relationship, seqfeature " + 
-						       " where parent_seqfeature_id = seqfeature.seqfeature_id " +
+						       " where object_seqfeature_id = seqfeature.seqfeature_id " +
 						       "   and seqfeature.bioentry_id = ?");
 		}
                 delete_rel.setInt(1, bioentry_id);
@@ -739,7 +753,8 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		    rolledback = true;
 		} catch (SQLException ex2) {}
 	    }
-	    throw new BioException(ex, "Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	    throw new BioException("Error removing from BioSQL tables" + 
+					(rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }
 
@@ -759,7 +774,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    pool.putConnection(conn);
 	    return Collections.unmodifiableSet(_ids);
 	} catch (SQLException ex) {
-	    throw new BioRuntimeException(ex, "Error reading from BioSQL tables");
+	    throw new BioRuntimeException("Error reading from BioSQL tables", ex);
 	}
     }
 
@@ -780,7 +795,8 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 	// Ought to check for special-case keys. (or just wait 'til the special case
 	// tables get nuked :-)
-
+	// ex. references, dbxrefs
+	
 	if (!isBioentryPropertySupported()) {
 	    if (silent) {
 		return;
@@ -792,7 +808,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	if (removeFirst) {
 	    int id = intern_ontology_term(conn, keyString);
 	    PreparedStatement remove_old_value = conn.prepareStatement("delete from bioentry_qualifier_value " +
-								       " where bioentry_id = ? and ontology_term_id = ?");
+								       " where bioentry_id = ? and term_id = ?");
 	    remove_old_value.setInt(1, bioentry_id);
 	    remove_old_value.setInt(2, id);
 	    remove_old_value.executeUpdate();
@@ -803,43 +819,43 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         PreparedStatement insert_new;
         if (isSPASupported()) {
             insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
-                                              "       (bioentry_id, ontology_term_id, qualifier_value) " +
-                    					      "values (?, intern_ontology_term( ? ), ?)");
+                                              "       (bioentry_id, term_id, value, rank) " +
+                    					      "values (?, intern_ontology_term( ? ), ?, ?)");
             if (value instanceof Collection) {
                 int cnt = 0;
                 for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
                     insert_new.setInt(1, bioentry_id);
                     insert_new.setString(2, keyString);
-                    // insert_new.setInt(3, ++cnt);
+                    insert_new.setInt(4, ++cnt);
                     insert_new.setString(3, i.next().toString());
                     insert_new.executeUpdate();
                 }
             } else {
                 insert_new.setInt(1, bioentry_id);
                 insert_new.setString(2, keyString);
-                // insert_new.setInt(3, 1);
+                insert_new.setInt(3, 1);
                 insert_new.setString(3, value.toString());
                 insert_new.executeUpdate();
             }
         } else {
             insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
-                                              "       (bioentry_id, ontology_term_id, qualifier_value) " +
-					                          "values (?, ?, ?)");
+                                              "       (bioentry_id, term_id, rank, value) " +
+					                          "values (?, ?, ?, ?)");
 	        int termID = intern_ontology_term(conn, keyString);
             if (value instanceof Collection) {
                 int cnt = 0;
                 for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
                     insert_new.setInt(1, bioentry_id);
                     insert_new.setInt(2, termID);
-                    // insert_new.setInt(3, ++cnt);
-                    insert_new.setString(3, i.next().toString());
+                    insert_new.setInt(3, ++cnt);
+                    insert_new.setString(4, i.next().toString());
                     insert_new.executeUpdate();
                 }
             } else {
                 insert_new.setInt(1, bioentry_id);
                 insert_new.setInt(2, termID);
-                // insert_new.setInt(3, 1);
-                insert_new.setString(3, value.toString());
+                insert_new.setInt(3, 1);
+                insert_new.setString(4, value.toString());
                 insert_new.executeUpdate();
             }
         }
@@ -855,12 +871,18 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         throws SQLException
     {
         Ontology legacy = ontologySQL.getLegacyOntology();
-        if (legacy.containsTerm(s)) {
-            return ontologySQL.termID(legacy.getTerm(s));
+        String ts = s.trim();  // Hack for schema change
+				if (legacy.containsTerm(ts)) {
+					return ontologySQL.termID(legacy.getTerm(ts));
+				// Same term but different case causes error when try to add it
+				// This hack prevents it.  ex. genbank can have ORGANISM & organism keys            
+				} else if (legacy.containsTerm(ts.toLowerCase())) {
+					return ontologySQL.termID(legacy.getTerm(ts.toLowerCase()));
         } else {
             try {
-                return ontologySQL.termID(legacy.createTerm(s, ""));
+                return ontologySQL.termID(legacy.createTerm(ts, ""));
             } catch (Exception ex) {
+//							System.err.println("Term: " + ts + "   " + ex.getMessage());
                 throw new SQLException("Couldn't create term in legacy ontology namespace");
             }
         }
@@ -998,29 +1020,30 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	return bioentryPropertySupported;
     }
 
-    private boolean bioentryDblinkChecked = false;
-    private boolean bioentryDblinkSupported = false;
+		
+    private boolean dbSchemaChecked = false;
+    private boolean dbSchemaSupported = false;
 
-    boolean isBioentryDblinkSupported() {
-	if (!bioentryDblinkChecked) {
+    boolean isDbSchemaSupported() {
+	if (!dbSchemaChecked) {
 	    try {
 		Connection conn = pool.takeConnection();
-		PreparedStatement ps = conn.prepareStatement("select * from bioentry_dblink limit 1");
+		PreparedStatement ps = conn.prepareStatement("select * from location limit 1");
 		try {
 		    ps.executeQuery();
-		    bioentryDblinkSupported = true;
+		    dbSchemaSupported = true;
 		} catch (SQLException ex) {
-		    bioentryDblinkSupported = false;
+		    dbSchemaSupported = false;
 		}
 		ps.close();
 		pool.putConnection(conn);
 	    } catch (SQLException ex) {
 		throw new BioRuntimeException(ex);
 	    }
-	    bioentryDblinkChecked = true;
+	    dbSchemaChecked = true;
 	}
 
-	return bioentryPropertySupported;
+	return dbSchemaSupported;
     }
 
     private boolean dbxrefQualifierValueChecked = false;
@@ -1095,13 +1118,13 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    if (ff instanceof FeatureFilter.ByType) {
 		String type = ((FeatureFilter.ByType) ff).getType();
 		String tableName = "ot_" + (used_ot++);
-		tables.add("ontology_term as " + tableName);
-		return tableName + ".term_name " + eq(negate) + qw(type) + " and seqfeature.seqfeature_key_id = " + tableName + ".ontology_term_id";
+		tables.add("term as " + tableName);
+		return tableName + ".name " + eq(negate) + qw(type) + " and seqfeature.type_term_id = " + tableName + ".term_id";
 	    } else if (ff instanceof FeatureFilter.BySource) {
 		String source = ((FeatureFilter.BySource) ff).getSource();
 		String tableName = "sfs_" + (used_sfs++);
-		tables.add("seqfeature_source as " + tableName);
-		return tableName + ".source_name " + eq(negate) + qw(source) + " and seqfeature.seqfeature_source_id = " + tableName + ".seqfeature_source_id";
+		tables.add("term as " + tableName);
+		return tableName + ".name " + eq(negate) + qw(source) + " and seqfeature.source_term_id = " + tableName + ".term_id";
 	    } else if (ff instanceof FeatureFilter.ByAnnotation) {
             
             return "";
@@ -1133,7 +1156,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		}
 
 		return sqvName + ".qualifier_value" + eq(negate) + qw(valueString) + " and " +
-		       sqvName + ".ontology_term_id = " + otName + ".ontology_term_id and " +
+		       sqvName + ".term_id = " + otName + ".term_id and " +
 		       otName + ".term_name = " + qw(keyString) + " and " +
 		       "seqfeature.seqfeature_id = " + sqvName + ".seqfeature_id";
                
@@ -1252,11 +1275,11 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 	    return fh;
 	} catch (SQLException ex) {
-	    throw new BioRuntimeException(ex, "Error accessing BioSQL tables");
+	    throw new BioRuntimeException("Error accessing BioSQL tables", ex);
 	} catch (ChangeVetoException ex) {
-	    throw new BioError(ex, "Assert failed: couldn't modify internal FeatureHolder");
+	    throw new BioError("Assert failed: couldn't modify internal FeatureHolder", ex);
 	} catch (BioException ex) {
-	    throw new BioRuntimeException(ex, "Error fetching sequence");
+	    throw new BioRuntimeException("Error fetching sequence", ex);
 	}
     }
 
@@ -1344,7 +1367,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		return (BioSQLFeature) receiver.getFeature();
 	    }
 	} catch (SQLException ex) {
-	    throw new BioRuntimeException(ex, "Database error");
+	    throw new BioRuntimeException("Database error", ex);
 	} catch (BioException ex) {
 	    throw new BioRuntimeException(ex);
 	}

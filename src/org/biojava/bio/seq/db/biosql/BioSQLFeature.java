@@ -48,6 +48,7 @@ import org.biojava.utils.ChangeVetoException;
 
 /**
  * @author Thomas Down
+ * @author Simon Foote (modifications for schema version 1.0)
  */
 class BioSQLFeature implements Feature, RealizingFeatureHolder {
     private Annotation _annotation;
@@ -114,7 +115,7 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
 	    try {
 		((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().setFeatureType(id, s);
 	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "Error updating feature in database");
+		throw new BioRuntimeException("Error updating feature in database", ex);
 	    }
 	    this.type = s;
 	    featureHub.firePostChange(cev);
@@ -145,7 +146,7 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
 	    try {
 		((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().setFeatureSource(id, s);
 	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "Error updating feature in database");
+		throw new BioRuntimeException("Error updating feature in database", ex);
 	    }
 	    this.source = s;
             featureHub.firePostChange(cev);
@@ -176,7 +177,7 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
 	    try {
 		((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().setFeatureLocation(id, l, StrandedFeature.UNKNOWN);
 	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "Error updating feature in database");
+		throw new BioRuntimeException("Error updating feature in database", ex);
 	    }
 	    this.location = l;
             featureHub.firePostChange(cev);
@@ -337,7 +338,7 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
 					 id,
 					 -1);
 	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "SQL error while reading features");
+		throw new BioRuntimeException("SQL error while reading features", ex);
 	    } catch (BioException ex) {
 		throw new BioRuntimeException(ex);
 	    } 

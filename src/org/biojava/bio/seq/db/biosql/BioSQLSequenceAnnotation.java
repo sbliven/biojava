@@ -106,10 +106,10 @@ class BioSQLSequenceAnnotation
 
 	    if (seqDB.isBioentryPropertySupported()) {
 		PreparedStatement get_properties = conn.prepareStatement(
-			"select ontology_term.name as qn, bioentry_qualifier_value.value " + /*, bioentry_property.property_rank as rank " + */
-			"  from bioentry_qualifier_value, ontology_term " +
+			"select term.name as qn, bioentry_qualifier_value.value " + /*, bioentry_property.property_rank as rank " + */
+			"  from bioentry_qualifier_value, term " +
 			" where bioentry_qualifier_value.bioentry_id = ? " +
-			"   and ontology_term.ontology_term_id = bioentry_qualifier_value.ontology_term_id " /* + */
+			"   and term.term_id = bioentry_qualifier_value.term_id " /* + */
 			/* " order by qn, rank" */);
 		get_properties.setInt(1, bioentry_id);
 		ResultSet rs = get_properties.executeQuery();
@@ -135,7 +135,7 @@ class BioSQLSequenceAnnotation
 	    
 	    seqDB.getPool().putConnection(conn);
 	} catch (SQLException ex) {
-	    throw new BioRuntimeException(ex, "Error fetching annotations");
+	    throw new BioRuntimeException("Error fetching annotations", ex);
 	} catch (ChangeVetoException ex) {
 	    throw new BioError(ex);
 	} /* catch (CircularReferenceException ex) {
@@ -214,7 +214,8 @@ class BioSQLSequenceAnnotation
 		    rolledback = true;
 		} catch (SQLException ex2) {}
 	    }
-	    throw new BioRuntimeException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	    throw new BioRuntimeException("Error adding BioSQL tables" + 
+					(rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }
 
