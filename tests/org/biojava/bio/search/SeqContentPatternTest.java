@@ -44,21 +44,25 @@ extends TestCase {
 
     scm = scp.matcher(sevenMatch1);
     assertTrue("Hit in 7-1", scm.find());
-    assertEquals("Hit in 7-1 at 1", 1, scm.pos());
+    assertEquals("Hit in 7-1 at 1", 1, scm.start());
     assertFalse("No more hits in 7-1", scm.find());
 
     scm = scp.matcher(sevenMatch2);
     assertTrue("Hit in 7-2", scm.find());
-    assertEquals("Hit in 7-2 at 2", 2, scm.pos());
+    assertEquals("Hit in 7-2 at 2", 2, scm.start());
     assertFalse("No more hits in 7-2", scm.find());
 
     scm = scp.matcher(sevenMatchAll);
     assertTrue("Hit in 7-all", scm.find());
-    assertEquals("Hit in 7-all at 1", 1, scm.pos());
+    assertEquals("Hit in 7-all at 1", 1, scm.start());
     assertTrue("Hit in 7-all", scm.find());
-    assertEquals("Hit in 7-all at 2", 2, scm.pos());
+    assertEquals("Hit in 7-all at 2", 2, scm.start());
 
     scm = scp.matcher(sevenNoMatch);
     assertFalse("No hit in seven no hits", scm.find());
   }
+
+  // we should have tests for various boundary conditions
+  // on the counts
+  // also - check that obviously impossible count ranges never match
 }

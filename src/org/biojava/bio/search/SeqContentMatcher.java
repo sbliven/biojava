@@ -1,5 +1,7 @@
 package org.biojava.bio.search;
 
+import java.util.*;
+
 import org.biojava.utils.AssertionFailure;
 import org.biojava.bio.symbol.*;
 
@@ -42,7 +44,18 @@ public class SeqContentMatcher {
 
         // getting the initial counts
         for(int i = 1; i <= length; i++) {
-          curCounts[index.indexForSymbol(symList.symbolAt(i))]++;
+          Symbol s = symList.symbolAt(i);
+          if(s instanceof AtomicSymbol) {
+            curCounts[index.indexForSymbol(s)]++;
+          } else {
+            for(
+              Iterator si = ((FiniteAlphabet) s.getMatches()).iterator();
+              si.hasNext();
+            ) {
+              AtomicSymbol as = (AtomicSymbol) si.next();
+              curCounts[index.indexForSymbol(as)]++;
+            }
+          }
         }
 
         pos = 1;
@@ -59,8 +72,32 @@ public class SeqContentMatcher {
         pos <= ourMax;
         pos++
       ) {
-        curCounts[index.indexForSymbol(symList.symbolAt(pos - 1))]--;
-        curCounts[index.indexForSymbol(symList.symbolAt(pos + length - 1))]++;
+        Symbol s;
+        s = symList.symbolAt(pos - 1);
+        if(s instanceof AtomicSymbol) {
+          curCounts[index.indexForSymbol(s)]--;
+        } else {
+          for(
+            Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
+            i.hasNext();
+          ) {
+            AtomicSymbol as = (AtomicSymbol) i.next();
+            curCounts[index.indexForSymbol(as)]--;
+          }
+        }
+
+        s = symList.symbolAt(pos + length - 1);
+        if(s instanceof AtomicSymbol) {
+          curCounts[index.indexForSymbol(s)]++;
+        } else {
+          for(
+            Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
+            i.hasNext();
+          ) {
+            AtomicSymbol as = (AtomicSymbol) i.next();
+            curCounts[index.indexForSymbol(as)]++;
+          }
+        }
 
         if(acceptable()) {
           return true;
@@ -86,8 +123,12 @@ public class SeqContentMatcher {
     return true;
   }
 
-  public int pos() {
+  public int start() {
     return pos;
+  }
+
+  public int end() {
+    return pos + length - 1;
   }
 
   public SymbolList group() {
