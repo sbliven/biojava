@@ -30,8 +30,8 @@ public final class GUITools {
                     new Point2D.Double(clip.getMaxX(), clip.getMaxY())
             ) + 1 );
 
-    System.err.println("Originally: " + src.getRange());
-    System.err.println("Now: " + min + ".." + max);
+    //System.err.println("Originally: " + src.getRange());
+    //System.err.println("Now: " + min + ".." + max);
 
     return new RangeLocation(min, max);
   }
