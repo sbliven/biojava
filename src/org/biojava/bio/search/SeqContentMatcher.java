@@ -141,7 +141,7 @@ public class SeqContentMatcher {
       }
 
       // no match could be found
-      pos = symList.size() + 1;
+      pos = symList.length() + 1;
       return false;
     } catch (IllegalSymbolException ise) {
       throw new AssertionFailure(
@@ -171,7 +171,7 @@ public class SeqContentMatcher {
       throw new IllegalStateException("Can't call start() before find()");
     }
 
-    if(pos > symList.size()) {
+    if(pos > symList.length()) {
       throw new IllegalStateException("Can't call start() after find() has returned false");
     }
 
@@ -189,7 +189,7 @@ public class SeqContentMatcher {
       throw new IllegalStateException("Can't call end() before find()"); 
     } 
 
-    if(pos > symList.size()) {
+    if(pos > symList.length()) {
       throw new IllegalStateException("Can't call end() after find() has returned false");
     }
 
@@ -207,7 +207,7 @@ public class SeqContentMatcher {
       throw new IllegalStateException("Can't call group() before find()"); 
     } 
 
-    if(pos > symList.size()) {
+    if(pos > symList.length()) {
       throw new IllegalStateException("Can't call group() after find() has returned false");
     }
 
