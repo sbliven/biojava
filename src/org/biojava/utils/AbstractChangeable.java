@@ -69,10 +69,7 @@ public abstract class AbstractChangeable implements Changeable {
    */
   
   protected ChangeSupport getChangeSupport(ChangeType ct) {
-    if(changeSupport != null) {
-      return changeSupport;
-    }
-    
+
     synchronized(this) {
       if(changeSupport == null) {
         changeSupport = generateChangeSupport();
