@@ -55,12 +55,13 @@ import org.biojava.utils.ChangeVetoException;
  * Behind-the-scenes adaptor to the features sub-schema of BioSQL.
  *
  * @author Thomas Down
- * @author Simon Foote (modifications for schema version 1.0)
+ * @author Simon Foote
  * @author Len Trigg
  * @since 1.3
  */
 class FeaturesSQL {
     private BioSQLSequenceDB seqDB;
+		private HashMap rankType;
 
     FeaturesSQL(BioSQLSequenceDB seqDB) {
 	this.seqDB = seqDB;
@@ -718,9 +719,12 @@ class FeaturesSQL {
 	// HashMap to track rank for each feature_type
 	// This allows the unique key constraint in seqfeature to be valid as
 	// bioentries can have multiple features of same type/source (ie. Genbank CDS)
-	// Not sure if this is the best way to do it or just increase the rank value each
-	// time no matter what the feature type is.
-	HashMap rankType = new HashMap();
+	// This way is faster than just increasing the rank value each time
+	// Only set Map for parent, otherwise adding children of same type throws 
+	// a duplicate key error
+	if (parent < 0) {
+		rankType = new HashMap();
+	}
 	
 	for (Iterator fi = features.features(); fi.hasNext(); ) {
 	    Feature f = (Feature) fi.next();
@@ -742,13 +746,15 @@ class FeaturesSQL {
 		}
 	    }
 	}
+
     }
+		
 
     int persistFeature(Connection conn,
 		       int bioentry_id,
 		       Feature f,
 		       int parent_id,
-                       int typeRank)
+           int typeRank)
 	throws BioException, SQLException
     {
 	int id = -1;
