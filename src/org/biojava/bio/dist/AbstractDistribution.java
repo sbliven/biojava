@@ -50,10 +50,9 @@ import org.biojava.utils.*;
  * </p>
  *
  * <p>
- * Note that, in this implementation, the <code>setWeight</code> implementation
- * throws an exception.  The <code>registerWithTrainer</code> method registers
+ * The <code>registerWithTrainer</code> method registers
  * an <code>IgnoreCountsTrainer</code>.  To make an <code>AbstractDistribution</code>
- * subclass trainable, both these methods must be overridden.
+ * subclass trainable, this method must be overridden.
  * </p>
  *
  * @author Matthew Pocock
@@ -181,7 +180,7 @@ public abstract class AbstractDistribution
   }
 
   /**
-   * Implemnet this to set the null model.
+   * Implement this to set the null model.
    *
    * <p>
    * You should not inform any change listeners in this method. All of that
