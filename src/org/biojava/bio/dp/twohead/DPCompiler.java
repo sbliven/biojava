@@ -854,6 +854,8 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
 
     InstructionVector ccV = new InstructionVector();
     
+    ccV.add( debug(message("Retrieving local variables")));
+    
     // if(isInit && state instanceof emission) {
     //   cell[0][0] = (state == Magical) ? 0.0 : NaN;
     // } else {
@@ -1058,6 +1060,18 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
       ccV.add( stateV );
     }
     
+    // dump out state scores
+    LocalVariable sc = new LocalVariable(CodeUtils.TYPE_DOUBLE, "score_i");
+    InstructionVector dbi = new InstructionVector();
+    for(int i = 0; i < states.length; i++) {
+      dbi.add( ByteCode.make_aload  (score[0][0]));
+      dbi.add( ByteCode.make_iconst (i));
+      dbi.add( ByteCode.make_daload ());
+      dbi.add( ByteCode.make_dstore (sc));
+      dbi.add( message("Score " + i + " = ", sc));
+    }
+    ccV.add( debug(dbi));
+
     ccV.add( ByteCode.make_return ());
     
     return ccV;

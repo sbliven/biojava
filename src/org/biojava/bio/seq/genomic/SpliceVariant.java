@@ -33,6 +33,11 @@ import org.biojava.bio.seq.*;
  */
 
 public interface SpliceVariant extends RNAFeature {
+  /**
+   * The template for splice variants.
+   *
+   * @author Matthew Pocock
+   */
     public static class Template extends RNAFeature.Template {
     }
 }

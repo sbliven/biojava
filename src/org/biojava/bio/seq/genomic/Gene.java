@@ -40,6 +40,11 @@ public interface Gene extends StrandedFeature {
      */
     public Set getExons();
 
+    /**
+     * The template for representing stranded features.
+     *
+     * @author Thomas Down
+     */
     public static class Template extends StrandedFeature.Template {
     }
 }

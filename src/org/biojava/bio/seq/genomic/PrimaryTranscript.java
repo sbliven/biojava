@@ -32,6 +32,11 @@ import org.biojava.bio.seq.*;
  */
 
 public interface PrimaryTranscript extends RNAFeature {
+  /**
+   * The template for PrimaryTransript features.
+   *
+   * @author Thomas Down
+   */
     public static class Template extends RNAFeature.Template {
     }
 }

@@ -32,6 +32,11 @@ import org.biojava.bio.seq.*;
  */
 
 public interface Exon extends RNAFeature {
+  /**
+   * The template for representing RNA features.
+   *
+   * @author Thomas Down
+   */
     public static class Template extends RNAFeature.Template {
     }
 }
