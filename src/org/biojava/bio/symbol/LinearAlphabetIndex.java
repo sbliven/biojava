@@ -47,6 +47,21 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
     alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
   }
   
+  public LinearAlphabetIndex(Symbol[] syms)
+  throws BioException {
+    Set si = new HashSet();
+    Symbol[] symbols = new Symbol[syms.length];
+    for(int i = 0; i < syms.length; i++) {
+      Symbol s = syms[i];
+      symbols[i] = s; 
+      si.add(s);
+    }
+    
+    this.alpha = new SimpleAlphabet(si);
+    alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
+    this.symbols = symbols;
+  }
+  
   private Symbol[] buildIndex(FiniteAlphabet alpha) {
     Symbol[] symbols = new Symbol[alpha.size()];
     

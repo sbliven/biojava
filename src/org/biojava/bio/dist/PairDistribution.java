@@ -55,12 +55,12 @@ extends AbstractDistribution implements Serializable {
       Distribution dist;
       if(ref == null) {
         dist = new PairDistribution(first, second);
-        cache.put(distL, new SoftReference(dist));
+        cache.put(new ListWrapper(distL), new SoftReference(dist));
       } else {
         dist = (Distribution) ref.get();
         if(dist == null) {
           dist = new PairDistribution(first, second);
-          cache.put(distL, new SoftReference(dist));
+          cache.put(new ListWrapper(distL), new SoftReference(dist));
         }
       }
       return dist;

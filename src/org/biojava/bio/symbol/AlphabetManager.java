@@ -756,4 +756,17 @@ public final class AlphabetManager {
     }
     return ai;
   }
+  
+  /**
+   * Get an indexer for an array of symbols.
+   *
+   * @param syms the Symbols to index in that order
+   * @return an AlphabetIndex instance
+   * @since 1.1
+   */
+  public static AlphabetIndex getAlphabetIndex (
+    Symbol[] syms
+  ) throws IllegalSymbolException, BioException {
+    return new LinearAlphabetIndex(syms);
+  }
 }
