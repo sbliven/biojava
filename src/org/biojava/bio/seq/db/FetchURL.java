@@ -1,11 +1,20 @@
 /**
+
  * This class stores base URL and some cgi arguments for 
+
  * accessing web-based sequences in NCBI and Swiss-prot, pubmed articles and locuslinks.
+
  */
 
-//package org.biojava.bio.seq.db;
+
+
+package org.biojava.bio.seq.db;
+
+
 
 import java.net.*;
+
+
 
 public class FetchURL
 {
@@ -15,8 +24,11 @@ public class FetchURL
 	String retmode;//return mode 
 	
 	/**
+
 	 * Constructs a fetchURL object based on the database name 
+
 	 * and specified return format of sequence.
+
 	 */
 	public FetchURL(String databaseName, String format) 
 	{	
