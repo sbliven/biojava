@@ -145,7 +145,7 @@ public final class RNATools {
       return 3;
     }
     getRNA().validate(sym);
-    throw new IllegalSymbolException("Realy confused. Can't find index for " +
+    throw new IllegalSymbolException("Really confused. Can't find index for " +
                                       sym.getName());
   }
 
@@ -279,21 +279,26 @@ public final class RNATools {
 
   /**
    * Retrieve a TranslationTable by name. The valid names are:
+   *
    * <ul>
-   * <li>"UNIVERSAL"
-   * <li>"BACTERIAL"
-   * <li>"YEAST_MITOCHONDRIAL"
-   * <li>"VERTEBRATE_MITOCHONDRIAL"
-   * <li>"MOLD_MITOCHONDRIAL"
-   * <li>"INVERTEBRATE_MITOCHONDRIAL"
-   * <li>"ECHINODERM_MITOCHONDRIAL"
-   * <li>"ASCIDIAN_MITOCHONDRIAL"
-   * <li>"FLATWORM_MITOCHONDRIAL"
-   * <li>"CILIATE_NUCLEAR"
-   * <li>"EUPLOTID_NUCLEAR"
-   * <li>"ALTERNATIVE_YEAST_NUCLEAR"
-   * <li>"BLEPHARISMA_MACRONUCLEAR"
+   * <li>"UNIVERSAL"</li>
+   * <li>"BACTERIAL"</li>
+   * <li>"YEAST_MITOCHONDRIAL"</li>
+   * <li>"VERTEBRATE_MITOCHONDRIAL"</li>
+   * <li>"MOLD_MITOCHONDRIAL"</li>
+   * <li>"INVERTEBRATE_MITOCHONDRIAL"</li>
+   * <li>"ECHINODERM_MITOCHONDRIAL"</li>
+   * <li>"ASCIDIAN_MITOCHONDRIAL"</li>
+   * <li>"FLATWORM_MITOCHONDRIAL"</li>
+   * <li>"CILIATE_NUCLEAR"</li>
+   * <li>"EUPLOTID_NUCLEAR"</li>
+   * <li>"ALTERNATIVE_YEAST_NUCLEAR"</li>
+   * <li>"BLEPHARISMA_MACRONUCLEAR"</li>
    * </ul>
+   *
+   * There are public static final fields in the TranslationTable
+   * interface which contain these values. One of these should be used
+   * as the argument for this method.
    *
    * @since 1.1
    */
