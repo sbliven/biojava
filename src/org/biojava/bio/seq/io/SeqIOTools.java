@@ -360,7 +360,7 @@ public final class SeqIOTools  {
      */
     public static void writeGenpept(OutputStream os, SequenceIterator in)
         throws IOException, BioException {
-        SequenceFormat former = new GenbankFormat();
+        SequenceFormat former = new GenpeptFormat();
         PrintStream ps = new PrintStream(os);
         while (in.hasNext()) {
             former.writeSequence(in.nextSequence(), ps);
