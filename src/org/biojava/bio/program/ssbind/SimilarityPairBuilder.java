@@ -29,6 +29,7 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SmallAnnotation;
+
 import org.biojava.bio.search.SearchContentHandler;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
@@ -42,6 +43,7 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -327,8 +329,17 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
             qt.alignment = a;
             st.alignment = a;
 
-            qt.sibling = (SimilarityPairFeature) subjectView.createFeature(st);
-            st.sibling = (SimilarityPairFeature) queryView.createFeature(qt);
+            SimilarityPairFeature qf =
+                (SimilarityPairFeature) queryView.createFeature(qt);
+
+            SimilarityPairFeature sf =
+                (SimilarityPairFeature) queryView.createFeature(qt);
+
+            sf.setSibling(qf);
+            qf.setSibling(sf);
+
+            qf.addChangeListener(ChangeListener.ALWAYS_VETO);
+            sf.addChangeListener(ChangeListener.ALWAYS_VETO);
         }
         catch (ChangeVetoException cve)
         {

@@ -66,6 +66,12 @@ import org.biojava.utils.Unchangeable;
 public interface SimilarityPairFeature extends StrandedFeature
 {
     /**
+     * The sibling of this feature has altered.
+     */
+    public static final ChangeType SIBLING =
+        new ChangeType("Sibling has altered", SimilarityPairFeature.class, "SIBLING");
+
+    /**
      * Constant <code>QUERY_LABEL</code> is the alignment label used
      * for all query sequences.
      */
@@ -93,6 +99,15 @@ public interface SimilarityPairFeature extends StrandedFeature
     public SimilarityPairFeature getSibling();
 
     /**
+     * <code>setSibling</code> sets the sibling feature of the
+     * pair. This is used to set the reciprocal
+     * <code>SimilarityPairFeature</code> as both cannot be set using
+     * the <code>Template</code>.
+     */
+    public void setSibling(SimilarityPairFeature sibling)
+        throws ChangeVetoException;
+
+    /**
      * <code>getAlignment</code> returns the <code>Alignment</code> of
      * two similar features.
      *
@@ -115,7 +130,9 @@ public interface SimilarityPairFeature extends StrandedFeature
     {
         /**
          * <code>sibling</code> <code>SimilarityPairFeature</code>
-         * field.
+         * field. May be null if the reciprocal
+         * <code>SimilarityPairFeature</code> has not yet been
+         * created.
          */
         public SimilarityPairFeature sibling;
 
@@ -135,11 +152,8 @@ public interface SimilarityPairFeature extends StrandedFeature
      * <code>EmptyPairwiseAlignment</code> empty pairwise alignment
      * which has labels to empty symbol lists.
      */
-    static final class EmptyPairwiseAlignment
-      extends
-        Unchangeable
-      implements
-        Alignment
+    static final class EmptyPairwiseAlignment extends Unchangeable
+        implements Alignment
     {
         private List labels = new ArrayList(2);
 
@@ -224,13 +238,15 @@ public interface SimilarityPairFeature extends StrandedFeature
         }
 
         public void edit(Edit edit)
-            throws IndexOutOfBoundsException,IllegalAlphabetException, ChangeVetoException
+            throws IndexOutOfBoundsException,IllegalAlphabetException,
+                   ChangeVetoException
         {
             throw new ChangeVetoException("You can't edit the empty symbol list");
         }
       
-        public Iterator symbolListIterator() {
-          return new Alignment.SymbolListIterator(this);
+        public Iterator symbolListIterator()
+        {
+            return new Alignment.SymbolListIterator(this);
         }
     }
 }

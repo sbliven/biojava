@@ -27,6 +27,9 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.homol.SimilarityPairFeature;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <code>SimpleSimilarityPairFeature</code> represents a similarity
@@ -73,6 +76,27 @@ public class SimpleSimilarityPairFeature extends SimpleStrandedFeature
         return sibling;
     }
 
+    public void setSibling(SimilarityPairFeature sibling)
+        throws ChangeVetoException
+    {
+        if (hasListeners())
+        {
+            ChangeSupport cs = getChangeSupport(SimilarityPairFeature.SIBLING);
+            synchronized(cs)
+            {
+                ChangeEvent ce = new ChangeEvent(this, SimilarityPairFeature.SIBLING,
+                                                 this.sibling, sibling);
+                cs.firePreChangeEvent(ce);
+                this.sibling = sibling;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+        else
+        {
+            this.sibling = sibling;
+        }
+    }
+
     /**
      * <code>getAlignment</code> returns the alignment between the two
      * features.
@@ -92,6 +116,21 @@ public class SimpleSimilarityPairFeature extends SimpleStrandedFeature
     public double getScore()
     {
         return score;
+    }
+
+    public Feature.Template makeTemplate()
+    {
+        SimilarityPairFeature.Template ft = new SimilarityPairFeature.Template();
+        fillTemplate(ft);
+        return ft;
+    }
+
+    protected void fillTemplate(SimilarityPairFeature.Template ft)
+    {
+        super.fillTemplate(ft);
+        ft.sibling = getSibling();
+        ft.alignment = getAlignment();
+        ft.score = getScore();
     }
 
     public String toString()
