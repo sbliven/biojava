@@ -63,6 +63,15 @@ public interface Alignment extends ResidueList {
   throws NoSuchElementException;
   
   /**
+   * Retrieve a single row of the alignment by label.
+   *
+   * @return  a ResidueList that contains each token in a row of the alignment
+   * @throws NoSuchElementException if there is no row for 'label'
+   */
+  ResidueList residueListForLabel(Object label)
+  throws NoSuchElementException;
+  
+  /**
    * Make a view onto this alignment.
    *
    * @param residueLists the set of sequences to include
