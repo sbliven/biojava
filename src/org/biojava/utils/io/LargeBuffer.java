@@ -25,7 +25,7 @@ public class LargeBuffer {
   
   static {
     PAGE_OVERLAP = Constants.BYTES_IN_LONG;
-    PAGE_SIZE = Integer.MAX_VALUE / 2 - PAGE_OVERLAP;
+    PAGE_SIZE = Integer.MAX_VALUE / 8 - PAGE_OVERLAP;
   }
   
   private final long pos;
@@ -53,16 +53,17 @@ public class LargeBuffer {
   private MappedByteBuffer getBuffer(int index)
   throws IOException {
     if(index != lastBufferIndex) {
-      // System.out.println("Allocating page: " + index);
+      System.out.println("Allocating page: " + index);
       long offset = PAGE_SIZE * index;
-      // System.out.println("From: " + (pos + offset));
-      // System.out.println("Size: " + Math.min(size - offset, PAGE_SIZE + PAGE_OVERLAP));
+      System.out.println("From: " + (pos + offset));
+      System.out.println("Size: " + Math.min(size - offset, PAGE_SIZE + PAGE_OVERLAP));
       lastBuffer = channel.map(
         mode,
         pos + offset,
         Math.min(size - offset, PAGE_SIZE + PAGE_OVERLAP)
       );
       lastBufferIndex = index;
+      System.out.println("Done");
     }
     
     return lastBuffer;

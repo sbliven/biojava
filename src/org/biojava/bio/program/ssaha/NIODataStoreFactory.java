@@ -302,7 +302,7 @@ implements DataStoreFactory {
     int offset,
     int seqNumber,
     int word
-  ) {
+  ) throws IOException {
     long kmerPointer = hashTable.get(word+1);
     if(kmerPointer != -1) {
       kmerPointer += Constants.BYTES_IN_LONG;

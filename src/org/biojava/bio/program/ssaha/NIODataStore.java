@@ -7,6 +7,7 @@ import java.nio.channels.*;
 import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
 
+import org.biojava.utils.NestedException;
 import org.biojava.utils.Constants;
 import org.biojava.utils.io.LargeBuffer;
 
@@ -119,7 +120,7 @@ class NIODataStore implements DataStore {
     String seqID,
     SymbolList symList,
     SearchListener listener
-  ) {
+  ) throws NestedException {
     try {
       int word = PackingFactory.primeWord(symList, wordLength, packing);
       listener.startSearch(seqID);
@@ -131,24 +132,31 @@ class NIODataStore implements DataStore {
       listener.endSearch(seqID);
     } catch (IllegalSymbolException ise) {
       throw new BioError("Assertion Failure: Symbol dissapeared");
+    } catch (IOException ioe) {
+      throw new NestedException(ioe);
     }
   }
   
-  public String seqNameForID(int id) {;
-    nameTable.position(id);
-    int length = nameTable.getShort();
-    StringBuffer sbuff = new StringBuffer(length);
-    for(int i = 0; i < length; i++) {
-      sbuff.append(nameTable.getChar());
-    }
-    return sbuff.toString();
+  public String seqNameForID(int id)
+  throws NestedException {;
+//    try {
+      nameTable.position(id);
+      int length = nameTable.getShort();
+      StringBuffer sbuff = new StringBuffer(length);
+      for(int i = 0; i < length; i++) {
+        sbuff.append(nameTable.getChar());
+      }
+      return sbuff.toString();
+//    } catch (IOException ioe) {
+//      throw new NestedException(ioe);
+//    }
   }
   
   private void fireHits(
     int word,
     int offset,
     SearchListener listener
-  ) {
+  ) throws IOException {
     long hitOffset = hashTable.get(word);
     //System.out.println("hitOffset: " + hitOffset);
     if(hitOffset != -1) {
