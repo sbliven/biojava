@@ -65,8 +65,11 @@ class DASFeatureSet implements FeatureHolder {
 	try {
 	    realFeatures = new SimpleFeatureHolder();
 
-	    URL fURL = new URL(dataSource, "features?ref=" + sourceID);
-	    DASGFFParser.INSTANCE.parseURL(fURL, new SeqIOAdapter() {
+	    
+	    SeqIOListener listener = new SeqIOAdapter() {
+		    private List featureStack = new ArrayList();
+		    private Feature stackTop = null;
+
 		    public void startFeature(Feature.Template temp) 
 		        throws ParseException
 		    {
@@ -74,18 +77,50 @@ class DASFeatureSet implements FeatureHolder {
 			    // I'm not convinced there's an easy, safe, way to say we don't
 			    // want these server side, so we'll elide them here instead.
 
-			    return;
-			}
-
-			try {
-			    Feature f = ((RealizingFeatureHolder) refSequence).realizeFeature(refSequence, temp);
-			    realFeatures.addFeature(f);
-			} catch (Exception ex) {
-			    throw new ParseException(ex, "Couldn't realize feature in DAS");
+			    featureStack.add(null);
+			} else {
+			    try {
+				Feature f = null;
+				
+				if (stackTop == null) {
+				    f = ((RealizingFeatureHolder) refSequence).realizeFeature(refSequence, temp);
+				    realFeatures.addFeature(f);
+				} else {
+				    f = stackTop.createFeature(temp);
+				}
+				
+				featureStack.add(f);
+				stackTop = f;
+			    } catch (Exception ex) {
+				throw new ParseException(ex, "Couldn't realize feature in DAS");
+			    }
 			}
 		    }
-		} );
-	    
+
+		    public void endFeature()
+		        throws ParseException
+		    {
+			if (featureStack.size() < 1) {
+			    throw new BioError("Missmatched endFeature()");
+			} else {
+			    featureStack.remove(featureStack.size() - 1);
+			    int pos = featureStack.size() - 1;
+			    stackTop = null;
+			    while (stackTop == null && pos >= 0) {
+				stackTop = (Feature) featureStack.get(pos--);
+			    }
+			}
+		    }
+		} ;
+
+	    if (DASSequenceDB.USE_XFF) {
+		URL fURL = new URL(dataSource, "features?encoding=xff;ref=" + sourceID);
+		DASXFFParser.INSTANCE.parseURL(fURL, listener);
+	    } else {
+		URL fURL = new URL(dataSource, "features?ref=" + sourceID);
+		DASGFFParser.INSTANCE.parseURL(fURL, listener);
+	    }
+	   
 	} catch (IOException ex) {
 	    throw new BioError(ex, "Error connecting to DAS server");
 	} catch (ParseException ex) {

@@ -48,6 +48,12 @@ import org.w3c.dom.*;
  */
 
 public class DASSequenceDB implements SequenceDB {
+    static boolean USE_XFF;
+
+    static {
+	USE_XFF = Boolean.getBoolean("org.biojava.use_xff");
+    }
+
     private final URL dataSourceURL;
     private Map sequences;
     private Cache symbolsCache;

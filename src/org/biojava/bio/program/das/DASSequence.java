@@ -107,8 +107,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
 	    structure = new SimpleFeatureHolder();
 
-	    URL fUrl = new URL(dataSourceURL, "features?ref=" + seqID + ";category=component");
-	    DASGFFParser.INSTANCE.parseURL(fUrl, new SeqIOAdapter() {
+	    SeqIOListener listener = new SeqIOAdapter() {
 		    public void addSequenceProperty(Object key, Object value)
 		        throws ParseException
 		    {
@@ -150,7 +149,16 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 			    // features on the client side.
 			}
 		    }
-		} );
+		} ;
+
+	    if (DASSequenceDB.USE_XFF) {
+		URL fUrl = new URL(dataSourceURL, "features?encoding=xff;ref=" + seqID + ";category=component");
+		DASXFFParser.INSTANCE.parseURL(fUrl, listener);
+	    } else {
+		URL fUrl = new URL(dataSourceURL, "features?ref=" + seqID + ";category=component");
+		DASGFFParser.INSTANCE.parseURL(fUrl, listener);
+	    }
+
 	    if (structure.countFeatures() > 0) {
 		features.addFeatureHolder(structure);
 	    }
