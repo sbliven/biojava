@@ -80,7 +80,7 @@ class RagbagXFFParser implements RagbagFileParser
   public void parse()
     throws BioException
   {
-    // set up GAME handler
+    // set up XFF handler
     final XFFFeatureSetHandler xffhandler = new XFFFeatureSetHandler();
  
     // create SAX parser for job

@@ -22,6 +22,7 @@
 package org.biojava.bio.seq.ragbag;
 
 import org.biojava.utils.cache.*;
+import java.lang.String;
 
 /**
  * class that is passed to a RagbagAssembly to use
@@ -35,8 +36,8 @@ public class RagbagUncachedSeqFactory implements RagbagSequenceFactory
     cache = new SoftReferenceCache();
   }
 
-  public RagbagSequence getSequenceObject()
+  public RagbagSequenceItf getSequenceObject(String name, String urn)
   {
-    return new RagbagSequence();
+    return (RagbagSequenceItf) new RagbagSequence(name, urn);
   }
 }

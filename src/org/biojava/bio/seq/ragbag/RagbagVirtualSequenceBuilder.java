@@ -47,6 +47,7 @@ class RagbagVirtualSequenceBuilder
   private SimpleAssemblyBuilder sab = null;
   private RagbagMap map = null;
   private String seqName;
+  private String uri;
   private RagbagSequenceFactory factory;
   private RagbagComponentDirectory compDir;
 /**
@@ -64,11 +65,14 @@ class RagbagVirtualSequenceBuilder
     throws BioException, SAXException
   {
     this.seqName = seqName;
+    this.uri     = uri;
     this.factory = factory;
     this.compDir = compDir;
 
     // create mapping object
     map = new RagbagMap(mapFile);
+  
+//    System.out.println("RagbagVirtualSequenceBuilder constructor: " + seqName + " " + uri);
 
     try {
       map.parse();
@@ -106,14 +110,14 @@ class RagbagVirtualSequenceBuilder
     // the sequence may either be in a sequence file or a virtual sequence directory
     if (seqfile.isFile()) {
       // sequence is in a file
-      currSequence = factory.getSequenceObject();
-      ((RagbagSequence) currSequence).addSequenceFile(seqfile);
-      ((RagbagSequence) currSequence).makeSequence();
+      currSequence = factory.getSequenceObject(map.getRef(seqfile.getName()), "");
+      ((RagbagSequenceItf) currSequence).addSequenceFile(seqfile);
+      ((RagbagSequenceItf) currSequence).makeSequence();
     }
     else if (seqfile.isDirectory()) {
       // it's a virtual sequence in a represented by a directory
       try {
-        currSequence = new RagbagAssembly(seqfile, factory, compDir);
+        currSequence = new RagbagAssembly(map.getRef(seqfile.getName()), "", seqfile, factory, compDir);
       }
       catch (FileNotFoundException fne) {
         throw new BioException("Directory " + seqfile.getName() + "could not be found.");
@@ -149,7 +153,7 @@ class RagbagVirtualSequenceBuilder
 
         // should the feature be logged?
         if (compDir != RagbagComponentDirectory.UNLOGGED) {
-          compDir.addComponentFeature(mapping.getRef(), cf);
+          compDir.addComponentFeature(map.getRef(seqfile.getName()), cf);
         }
       }
       catch (ChangeVetoException cve) {

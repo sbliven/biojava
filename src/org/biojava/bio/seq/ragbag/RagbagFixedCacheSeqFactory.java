@@ -22,6 +22,7 @@
 package org.biojava.bio.seq.ragbag;
 
 import org.biojava.utils.cache.*;
+import java.lang.String;
 
 /**
  * class that is passed to a RagbagAssembly to use
@@ -39,8 +40,8 @@ public class RagbagFixedCacheSeqFactory implements RagbagSequenceFactory
     cache = new FixedSizeCache(size);
   }
 
-  public RagbagSequence getSequenceObject()
+  public RagbagSequenceItf getSequenceObject(String name, String urn)
   {
-    return (RagbagSequence) new RagbagCachedSequence(cache);
+    return (RagbagSequenceItf) new RagbagCachedSequence(name, urn, cache);
   }
 }

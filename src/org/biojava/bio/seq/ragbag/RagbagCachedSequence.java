@@ -45,12 +45,19 @@ import org.biojava.utils.cache.*;
  * and caching behaviour.
  * It should reduce memory requirements when creating large
  * assemblies.
+ * <p>
+ * It functionally proxies for RagbagSequence.
  */
-class RagbagCachedSequence extends RagbagSequence
+class RagbagCachedSequence implements RagbagSequenceItf
 {
   private Cache cache;
-  private String seqFilename = null;
-  private List annotFilenames = null;
+
+  // these are the names of files associated with the RagbagSequence
+  protected String seqFilename = null;
+  protected List annotFilenames = null;
+
+  private String name;
+  private String urn;
 
   private CacheReference cachedSequence;
   private boolean gotSequenceFile = false;
@@ -58,16 +65,20 @@ class RagbagCachedSequence extends RagbagSequence
 /**
  * @param cache object that controls cache behaviour.
  */
-  public RagbagCachedSequence(Cache cache)
+  public RagbagCachedSequence(String name, String urn, Cache cache)
   {
-    System.out.println("RagbagCachedSequence: constructor entered");
+//    System.out.println("RagbagCachedSequence: constructor entered");
     this.cache = cache;
+
+    this.name = name;
+    this.urn = urn;
+    System.out.println("RagbagCachedSequence constructor: " + name + " " + urn);
   }
 
   public void addFeatureFile(File thisFile)
     throws BioException
   {
-    System.out.println("RagbagCachedSequence: addfeatureFile entered");
+//    System.out.println("RagbagCachedSequence: addfeatureFile entered");
 
     // verify that the file exists
     if (!thisFile.exists() || !thisFile.isFile())
@@ -101,7 +112,7 @@ class RagbagCachedSequence extends RagbagSequence
   public void addSequenceFile(File thisFile)
     throws BioException
   {
-    System.out.println("RagbagCachedSequence: addSequenceFile entered");
+//    System.out.println("RagbagCachedSequence: addSequenceFile entered");
 
     // verify that the file exists
     if (!thisFile.exists() || !thisFile.isFile())
@@ -142,14 +153,14 @@ class RagbagCachedSequence extends RagbagSequence
   private Sequence instantiateSequence()
 //    throws BioException
   {
-    System.out.println("RagbagCachedSequence: instantiateSequence entered");
+//    System.out.println("RagbagCachedSequence: instantiateSequence entered");
 
-    RagbagSequence seq;
+    RagbagSequenceItf seq;
 
     // check if we have a CacheReference yet
     if (cachedSequence != null) {
       // got cache but is it still there?
-      seq = (RagbagSequence) cachedSequence.get();
+      seq = (RagbagSequenceItf) cachedSequence.get();
 
       // if it is, return it.
       if (seq != null) return seq;
@@ -161,9 +172,9 @@ class RagbagCachedSequence extends RagbagSequence
 
     // looks like we'll have to recreate the sequence object
     try {
-      seq = new RagbagSequence();
+      seq = new RagbagSequence(name, urn);
 
-      seq.addSequenceFile(seqFilename);
+      seq.addSequenceFile(new File(seqFilename));
 
       // now add any features if necessary
       if (annotFilenames != null) {
@@ -195,12 +206,11 @@ class RagbagCachedSequence extends RagbagSequence
 
   public String getName()
   {
-    Sequence tempSeq = instantiateSequence();
-    return tempSeq.getName();
+    return name;
   }
-  public String getURN() {
-    Sequence tempSeq = instantiateSequence();
-    return tempSeq.getURN();
+  public String getURN() 
+  {
+    return urn;
   }
  
   public void edit(Edit edit)

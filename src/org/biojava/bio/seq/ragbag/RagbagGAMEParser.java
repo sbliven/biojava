@@ -36,7 +36,7 @@ import org.apache.xerces.parsers.*;
 /**
  * Ragbag FileParser class for handling GAME formatted files.
  *
- * @author Thomas Down
+ * @author David Huen
  */
 class RagbagGAMEParser implements RagbagFileParser
 {

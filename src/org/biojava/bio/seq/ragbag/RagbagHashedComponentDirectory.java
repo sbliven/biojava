@@ -49,6 +49,7 @@ public class RagbagHashedComponentDirectory implements RagbagComponentDirectory
  */
   public void addComponentFeature(String ref, ComponentFeature cf)
   {
+//    System.out.println("addComponentFeature " + ref);
     componentDir.put(ref, cf);
   }
 

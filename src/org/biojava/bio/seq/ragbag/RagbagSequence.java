@@ -45,16 +45,42 @@ import org.biojava.utils.*;
  * @author David Huen
  * @since 1.2
  */
-class RagbagSequence extends RagbagAbstractSequence
+class RagbagSequence 
+  extends RagbagAbstractSequence
+  implements RagbagSequenceItf
 {
   // class variables
   private SequenceBuilder builder;  // this is the SeqIOListener that will build the sequence
   private boolean haveSequence = false; // prevents attempting to input more than one sequence.
+  private String name;
+  private String urn;
+//  private RagbagFilterFactory filterFactory = null;
 
-  public RagbagSequence()
+  public RagbagSequence(String name, String urn)
   {
     // create SequenceBuilder
     builder = new SimpleSequenceBuilder();
+
+    this.name = name;
+    this.urn = urn;
+    System.out.println("RagbagSequence constructor: " + name + " " + urn);
+  }
+
+  public RagbagSequence(String name, String urn, SequenceBuilder builder)
+  {
+    this.builder = builder;
+    this.name    = name;
+    this.urn     = urn;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public String getURN()
+  {
+    return urn;
   }
 
 /**
@@ -75,15 +101,12 @@ class RagbagSequence extends RagbagAbstractSequence
     if ((!thisFile.exists())
            || !thisFile.isFile()) throw new BioException("RagbagSequence: can't use the specified file");
 
-    // ******** test line to check function ***********
     RagbagFileParser parser = RagbagParserFactory.FACTORY.getParser(thisFile);
 
     // set listener and parse
     parser.setListener(builder);
     parser.parse();
     
-    // at this stage, the GAMEHandler and SAX parser will go out of scope 
-    // and be destroyed in eternal digital oblivion.
   }
 
   public void addFeatureFile(String filename)
@@ -114,7 +137,7 @@ class RagbagSequence extends RagbagAbstractSequence
 
     haveSequence = true;
   }
-
+/*
   public void addSequenceFile(String filename)
     throws BioException
   {
@@ -127,7 +150,7 @@ class RagbagSequence extends RagbagAbstractSequence
     // use common parsing code.
     addSequenceFile(thisFile);
   }
-
+*/
   public void makeSequence()
     throws BioException
   {
