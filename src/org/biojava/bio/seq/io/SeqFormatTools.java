@@ -47,19 +47,14 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.symbol.CompoundLocation;
-import org.biojava.bio.symbol.FuzzyLocation;
-import org.biojava.bio.symbol.FuzzyPointLocation;
-import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.PointLocation;
-import org.biojava.bio.symbol.RangeLocation;
-import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.*;
 
 /**
  * <code>SeqFormatTools</code> is a utility class for common sequence
  * formatting operations required when writing flat files.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Greg Cox
  * @since 1.2
  */
 public class SeqFormatTools
@@ -97,6 +92,7 @@ public class SeqFormatTools
     private static final int       POINT = 1;
     private static final int FUZZY_RANGE = 2;
     private static final int FUZZY_POINT = 3;
+    private static final int BETWEEN_LOCATION = 4;
 
     /**
      * <code>SeqFormatTools</code> can not be instantiated.
@@ -335,7 +331,7 @@ public class SeqFormatTools
      * <code>formatLocationBlock</code> creates an EMBL/Genbank style
      * representation of a <code>Location</code>. Supported location
      * forms:
-     *     
+     *
      * <pre>
      *   123
      *  <123 or >123
@@ -349,7 +345,6 @@ public class SeqFormatTools
      *
      * Specifically not supported are:
      * <pre>
-     *   123^567
      *   AL123465:(123..567)
      * </pre>
      *
@@ -386,7 +381,7 @@ public class SeqFormatTools
 	/* There are issues here about choosing various forms:
 	 * join(complement(...),complement(...))
 	 * complement(join(...,...))
-	 * 
+	 *
 	 * The former has the locations sorted in reverse order.
 	 */
 
@@ -426,6 +421,8 @@ public class SeqFormatTools
 		locType = FUZZY_RANGE;
 	    else if (FuzzyPointLocation.class.isInstance(thisLoc))
 		locType = FUZZY_POINT;
+	    else if (BetweenLocation.class.isInstance(thisLoc))
+	    locType = BETWEEN_LOCATION;
 	    else
 		locType = RANGE;
 
@@ -462,6 +459,16 @@ public class SeqFormatTools
 			      toComplement(formatRange(rl)) :
 			      formatRange(rl));
 		    break;
+
+		case BETWEEN_LOCATION:
+			BetweenLocation tempLocation = (BetweenLocation) thisLoc;
+			String formattedLocation = formatBetween(tempLocation);
+			if(complement)
+			{
+				formattedLocation = toComplement(formattedLocation);
+			}
+			sb.append(formattedLocation);
+			break;
 
 		default:
 		    // Maybe exception here?
@@ -614,7 +621,22 @@ public class SeqFormatTools
 	fb.append(rl.getMax());
 
 	return fb.toString();
-    }
+	}
+
+	/**
+	 * Formats a between location x y into x^y.
+	 *
+	 * @param theLocation The between location object to be formatted
+	 * @return A string representation of the location
+	 */
+	public static String formatBetween(final BetweenLocation theLocation)
+	{
+		StringBuffer formattedLocation = new StringBuffer();
+		formattedLocation.append(theLocation.getMin());
+		formattedLocation.append('^');
+		formattedLocation.append(theLocation.getMax());
+		return formattedLocation.toString();
+	}
 
     /**
      * <code>formatPoint</code> creates an EMBL/Genbank style String
