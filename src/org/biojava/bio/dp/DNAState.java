@@ -89,7 +89,7 @@ public class DNAState extends AbstractState {
       double sum = 0.0;
       for(int i = 0; i < c.length; i++) {
         Symbol r = DNATools.forIndex(i);
-        sum += c[i] += Math.exp(nullModel.getWeight(r))*weight;
+        sum += c[i] += (nullModel == null) ? 0.0 : Math.exp(nullModel.getWeight(r))*weight;
       }
       for(int i = 0; i < c.length; i++) {
         Symbol r = DNATools.forIndex(i);
