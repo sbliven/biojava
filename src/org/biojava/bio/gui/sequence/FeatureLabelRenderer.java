@@ -120,7 +120,7 @@ implements FeatureRenderer {
     g.drawString(
       label,
       (float) (src.sequenceToGraphics(mid)),
-      (float) (getDepth(src) + 2.0)
+      (float) (getDepth(src) - 2.0)
     );
   }
 
