@@ -54,6 +54,14 @@ public class SeqIOTools  {
         }
     }
 
+    private static SymbolTokenization getRNAParser() {
+        try {
+            return RNATools.getRNA().getTokenization("token");
+        } catch (BioException ex) {
+            throw new BioError(ex, "Assertion failing: Couldn't get RNA token parser");
+        }
+    }
+
     private static SymbolTokenization getProteinParser() {
         try {
             return ProteinTools.getTAlphabet().getTokenization("token");
@@ -82,6 +90,16 @@ public class SeqIOTools  {
         return new StreamReader(br,
                                 new EmblLikeFormat(),
                                 getDNAParser(),
+                                getEmblBuilderFactory());
+    }
+
+    /**
+     * Iterate over the sequences in an EMBL-format stream, but for RNA.
+     */
+    public static SequenceIterator readEmblRNA(BufferedReader br) {
+        return new StreamReader(br,
+                                new EmblLikeFormat(),
+                                getRNAParser(),
                                 getEmblBuilderFactory());
     }
 
