@@ -33,7 +33,7 @@ import org.biojava.bio.seq.io.SymbolTokenization;
 `*/
 public class PatternMaker
 {
-    private class Range
+    private static class Range
     {
         private int min = 1;
         private int max = 1;
@@ -120,82 +120,89 @@ public class PatternMaker
         }
     }
 
-    private Tokenizer toke;
-    private PatternSearch.Pattern pattern;
-    private SymbolTokenization symToke;
-    private FiniteAlphabet alfa;
+    /**
+     * a collection of data required during parsing.
+     */
+    private static class Context
+    {
+        private Tokenizer toke;
+        private PatternSearch.Pattern pattern;
+        private SymbolTokenization symToke;
+        private FiniteAlphabet alfa;
+    }
 
     /**
      * Convert String into a PatternSearch.Pattern object in the specified alphabet.
      */
-    public PatternSearch.Pattern parsePattern(String patternTxt, FiniteAlphabet alfa)
+    public static PatternSearch.Pattern parsePattern(String patternTxt, FiniteAlphabet alfa)
         throws BioException, IllegalSymbolException, IllegalAlphabetException, ParserException
     {
-        toke = new Tokenizer(patternTxt);
-        pattern = new PatternSearch.Pattern(patternTxt, alfa);
-        symToke = alfa.getTokenization("token");
-        this.alfa = alfa;
+        Context ctxt = new Context();
+        ctxt.toke = new Tokenizer(patternTxt);
+        ctxt.pattern = new PatternSearch.Pattern(patternTxt, alfa);
+        ctxt.symToke = alfa.getTokenization("token");
+        ctxt.alfa = alfa;
 
         // check for empty pattern
-        if (!toke.hasNext()) return null;
+        if (!ctxt.toke.hasNext()) return null;
 
-        while (toke.hasNext()) {
-            int tokenType = toke.nextTokenType();
+        while (ctxt.toke.hasNext()) {
+            int tokenType = ctxt.toke.nextTokenType();
 
             switch (tokenType) {
                 case Tokenizer.SYMBOL_TOKEN:
-                    Symbol sym = symToke.parseToken(Character.toString(toke.getToken()));
-                    if (toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
-                        Range range = getIterations();
-                        PatternSearch.Pattern thisP = new PatternSearch.Pattern(symToke.tokenizeSymbol(sym), alfa);
+                    Symbol sym = ctxt.symToke.parseToken(Character.toString(ctxt.toke.getToken()));
+                    if (ctxt.toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
+                        Range range = getIterations(ctxt);
+                        PatternSearch.Pattern thisP = new PatternSearch.Pattern(ctxt.symToke.tokenizeSymbol(sym), alfa);
                         thisP.addSymbol(sym);
                         thisP.setMin(range.getMin());
                         thisP.setMax(range.getMax());
-                        pattern.addPattern(thisP);
+                        ctxt.pattern.addPattern(thisP);
                     }
                     else {
-                        pattern.addSymbol(sym);
+                        ctxt.pattern.addSymbol(sym);
                     }
                     break;
                 case Tokenizer.LEFT_BRACKET:
-                    PatternSearch.Pattern thisP = parsePattern();
-                    if (toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
-                        Range range = getIterations();
+                    PatternSearch.Pattern thisP = parsePattern(ctxt);
+                    if (ctxt.toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
+                        Range range = getIterations(ctxt);
                         thisP.setMin(range.getMin());
                         thisP.setMax(range.getMax());
                     }
-                    pattern.addPattern(thisP);
+                    ctxt.pattern.addPattern(thisP);
                     break;
                 default:
-                    throw new ParserException(toke.getToken() + " is not valid at this point.");
+                    throw new ParserException(ctxt.toke.getToken() + " is not valid at this point.");
             }
         }
 
-        return pattern;
+        return ctxt.pattern;
     }
 
-    private Range getIterations()
+    private static Range getIterations(Context ctxt)
         throws ParserException
     {
         Range range = new Range();
 
         // consume the left brace
-        toke.getToken();
+        ctxt.toke.getToken();
 
         // there can either be one or two numbers
         boolean onSecondArg = false;
         StringBuffer numString = new StringBuffer();
 
-        while (toke.hasNext()) {
-            int tokenType = toke.nextTokenType();
+        while (ctxt.toke.hasNext()) {
+            int tokenType = ctxt.toke.nextTokenType();
 
             switch (tokenType) {
                 case Tokenizer.NUMERIC:
                     //System.out.println("adding symbol");
-                    numString.append(toke.getToken());
+                    numString.append(ctxt.toke.getToken());
                     break;
                 case Tokenizer.COMMA:
-                    toke.getToken();
+                    ctxt.toke.getToken();
                     if (!onSecondArg) {
                         //System.out.println("numString is " + numString);
                         range.setMin(Integer.parseInt(numString.toString()));
@@ -207,7 +214,7 @@ public class PatternMaker
                     }
                     break;
                 case Tokenizer.RIGHT_BRACE:
-                    toke.getToken();
+                    ctxt.toke.getToken();
                     if (onSecondArg) {
                         range.setMax(Integer.parseInt(numString.toString()));
                     }
@@ -217,32 +224,32 @@ public class PatternMaker
                     }
                     return range;
                 default:
-                    throw new ParserException(toke.getToken() + " is not valid at this point.");
+                    throw new ParserException(ctxt.toke.getToken() + " is not valid at this point.");
             }
         }
 
         throw new ParserException("unexpected error.");
     }
 
-    private PatternSearch.Pattern parsePattern()
+    private static PatternSearch.Pattern parsePattern(Context ctxt)
         throws IllegalSymbolException, IllegalAlphabetException, ParserException
     {
         // consume left bracket
-        toke.getToken();
+        ctxt.toke.getToken();
 
-        PatternSearch.Pattern pattern = new PatternSearch.Pattern("", alfa);
+        PatternSearch.Pattern pattern = new PatternSearch.Pattern("", ctxt.alfa);
         boolean hasContent = false;
 
-        while (toke.hasNext()) {
-            int tokenType = toke.nextTokenType();
+        while (ctxt.toke.hasNext()) {
+            int tokenType = ctxt.toke.nextTokenType();
 
             switch (tokenType) {
                 case Tokenizer.SYMBOL_TOKEN:
-                    Symbol sym = symToke.parseToken(Character.toString(toke.getToken()));
+                    Symbol sym = ctxt.symToke.parseToken(Character.toString(ctxt.toke.getToken()));
                     hasContent = true;
-                    if (toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
-                        Range range = getIterations();
-                        PatternSearch.Pattern thisP = new PatternSearch.Pattern("", alfa);
+                    if (ctxt.toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
+                        Range range = getIterations(ctxt);
+                        PatternSearch.Pattern thisP = new PatternSearch.Pattern("", ctxt.alfa);
                         thisP.addSymbol(sym);
                         thisP.setMin(range.getMin());
                         thisP.setMax(range.getMax());
@@ -253,24 +260,24 @@ public class PatternMaker
                     }
                     break;
                 case Tokenizer.LEFT_BRACKET:
-                    PatternSearch.Pattern thisP = parsePattern();
+                    PatternSearch.Pattern thisP = parsePattern(ctxt);
                     hasContent = true;
-                    if (toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
-                        Range range = getIterations();
+                    if (ctxt.toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
+                        Range range = getIterations(ctxt);
                         thisP.setMin(range.getMin());
                         thisP.setMax(range.getMax());
                     }
                     pattern.addPattern(thisP);
                     break;
                 case Tokenizer.RIGHT_BRACKET:
-                    toke.getToken();
+                    ctxt.toke.getToken();
                     if (hasContent)
                         return pattern;
                     else    
                         throw new ParserException("empty pattern!");
 
                 default:
-                    throw new ParserException(toke.getToken() + " is not valid at this point.");
+                    throw new ParserException(ctxt.toke.getToken() + " is not valid at this point.");
             }
         }
 
