@@ -53,6 +53,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Eric Haugen
  * @since 1.4
  */
 
@@ -246,17 +247,27 @@ class OntologySQL {
           throws SQLException, OntologyException, ChangeVetoException
   {
     Connection conn = seqDB.getDataSource().getConnection();
-    PreparedStatement get_terms = conn.prepareStatement(
-            "SELECT term.term_id, term.name, term.definition, " +
-            "       term_relationship.term_relationship_id, " +
-            "       term_relationship.subject_term_id, " +
-            "       term_relationship.object_term_id, " +
-            "       term_relationship.predicate_term_id " +
-            "FROM term LEFT OUTER JOIN term_relationship_term " +
-            "     ON term.term_id = term_relationship_term.term_id LEFT OUTER JOIN term_relationship " +
-            "     ON term_relationship_term.term_relationship_id = term_relationship.term_relationship_id " +
-            "WHERE term.ontology_id = ? " +
-            "ORDER BY term.term_id" );
+    String query =  
+        " SELECT term.term_id, term.name, term.definition, " +
+        "       term_relationship.term_relationship_id, " +
+        "       term_relationship.subject_term_id, " +
+        "       term_relationship.object_term_id, " +
+        "       term_relationship.predicate_term_id ";
+    if (seqDB.getDBHelper().getJoinStyle() == DBHelper.JOIN_ORACLE8) {
+      query += 
+        "FROM term, term_relationship_term, term_relationship " +
+        "     WHERE term.term_id = term_relationship_term.term_id (+) " +
+        "     AND term_relationship_term.term_relationship_id = term_relationship.term_relationship_id (+) " +
+        "AND term.ontology_id = ? ";
+    } else {
+      query += 
+        "FROM term LEFT OUTER JOIN term_relationship_term " +
+        "     ON term.term_id = term_relationship_term.term_id LEFT OUTER JOIN term_relationship " +
+        "     ON term_relationship_term.term_relationship_id = term_relationship.term_relationship_id " +
+        "WHERE term.ontology_id = ? ";
+    }
+    query += "ORDER BY term.term_id";
+    PreparedStatement get_terms = conn.prepareStatement(query);
 
     get_terms.setInt(1, id);
     ResultSet rs = get_terms.executeQuery();
