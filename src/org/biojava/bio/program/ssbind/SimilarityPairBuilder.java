@@ -70,7 +70,7 @@ import org.biojava.utils.ChangeVetoException;
  * instantiated and a large object network could be created during
  * processing.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Greg Cox
  * @since 1.2
  */
@@ -80,7 +80,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
      * Constant <code>SIMILARITY_PAIR_FEATURE_TYPE</code> the type
      * String used by <code>SimilarityPairBuilder</code> when creating
      * <code>SimilarityPairFeature</code>s. This is the String which
-     * is returned when an <code>SimilarityPairFeature</code>'s
+     * is returned when a <code>SimilarityPairFeature</code>'s
      * <code>getType()</code> method is called.
      */
     public static final String SIMILARITY_PAIR_FEATURE_TYPE = "similarity";
@@ -125,7 +125,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
         tokenBuffer      = new StringBuffer(1024);
     }
 
-    public Sequence getAnnotatedQuerySeq(final String queryId)
+    public Sequence getAnnotatedQuerySeq(String queryId)
         throws IllegalIDException
     {
         if (! queryViewCache.containsKey(queryId))
@@ -136,7 +136,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
         return (Sequence) queryViewCache.get(queryId);
     }
 
-    public Sequence getAnnotatedSubjectSeq(final String subjectId)
+    public Sequence getAnnotatedSubjectSeq(String subjectId)
         throws IllegalIDException
     {
         if (! subjectViewCache.containsKey(subjectId))
@@ -166,7 +166,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
      * @param querySeqHolder a <code>SequenceDB</code> containing the
      * query sequence(s).
      */
-    public void setQuerySeqHolder(final SequenceDB querySeqHolder)
+    public void setQuerySeqHolder(SequenceDB querySeqHolder)
     {
         this.querySeqHolder = querySeqHolder;
     }
@@ -192,12 +192,12 @@ public class SimilarityPairBuilder implements SearchContentHandler
      * @param subjectDBs a <code>SequenceDBInstallation</code>
      * containing the subject database(s)
      */
-    public void setSubjectDBInstallation(final SequenceDBInstallation subjectDBs)
+    public void setSubjectDBInstallation(SequenceDBInstallation subjectDBs)
     {
         this.subjectDBs = subjectDBs;
     }
 
-    public void setQuerySeq(final String querySeqId)
+    public void setQuerySeq(String querySeqId)
         throws BioException
     {
         if (querySeqHolder == null)
@@ -216,7 +216,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
         queryViewCache.put(querySeqId, queryView);
     }
 
-    public void setSubjectDB(final String subjectDBName)
+    public void setSubjectDB(String subjectDBName)
         throws BioException
     {
         if (subjectDBs == null)
@@ -235,7 +235,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
         return moreSearchesAvailable;
     }
 
-    public void setMoreSearches(final boolean value)
+    public void setMoreSearches(boolean value)
     {
         moreSearchesAvailable = value;
     }
@@ -277,17 +277,17 @@ public class SimilarityPairBuilder implements SearchContentHandler
         }
     }
 
-    public void addSearchProperty(final Object key, final Object value)
+    public void addSearchProperty(Object key, Object value)
     {
         resultData.put(key, value);
     }
 
-    public void addHitProperty(final Object key, final Object value)
+    public void addHitProperty(Object key, Object value)
     {
         hitData.put(key, value);
     }
 
-    public void addSubHitProperty(final Object key, final Object value)
+    public void addSubHitProperty(Object key, Object value)
     {
         subHitData.put(key, value);
     }
