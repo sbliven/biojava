@@ -35,19 +35,55 @@ import java.util.*;
  */
 
 public class MergeFeatureHolder extends AbstractFeatureHolder {
-    private Set featureHolders;
+    private Map featureHolders;
 
-    {
-	featureHolders = new HashSet();
+    /**
+     * Create a new, empty, MergeFeatureHolder.
+     */
+
+    public MergeFeatureHolder() {
+	featureHolders = new HashMap();
+    }
+
+    /**
+     * Create a populated MFH
+     */
+
+    private MergeFeatureHolder(Map m) {
+	featureHolders = m;
     }
 
     /**
      * Add an extra FeatureHolder to the set of FeatureHolders which
-     * are merged.
+     * are merged.  This method is provided for backward compatibility,
+     * and is equivalent to:
+     *
+     * <pre>
+     *     mfh.addFeatureHolder(fh, FeatureFilter.all);
+     * </pre>
+     *
+     * <p>
+     * You should always use the two-arg version in preference if you
+     * are able to define the membership of a FeatureHolder.
+     * </p>
      */
 
     public void addFeatureHolder(FeatureHolder fh) {
-	featureHolders.add(fh);
+	featureHolders.put(fh, FeatureFilter.all);
+    }
+
+    /**
+     * Add an extra FeatureHolder to the set of FeatureHolders which
+     * are merged, with a filter defining the membership of the new
+     * child.
+     *
+     * @param fh A featureholder
+     * @param membershipFilter A featureFilter defining the membership of fh
+     * @since 1.2
+     */
+
+    public void addFeatureHolder(FeatureHolder fh, FeatureFilter membershipFilter) {
+	featureHolders.put(fh, membershipFilter);
     }
 
     /**
@@ -61,20 +97,26 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 
     public int countFeatures() {
 	int fc = 0;
-	for (Iterator i = featureHolders.iterator(); i.hasNext(); ) {
+	for (Iterator i = featureHolders.keySet().iterator(); i.hasNext(); ) {
 	    fc += ((FeatureHolder) i.next()).countFeatures();
 	}
 	return fc;
     }
     
     public boolean containsFeature(Feature f) {
-      for(Iterator i = featureHolders.iterator(); i.hasNext(); ) {
-        if(((FeatureHolder) i.next()).containsFeature(f)) {
-          return true;
-        }
-      }
+	for (Iterator i = featureHolders.entrySet().iterator(); i.hasNext(); ) {
+	    Map.Entry me = (Map.Entry) i.next();
+	    FeatureHolder subFH = (FeatureHolder) me.getKey();
+	    FeatureFilter membership = (FeatureFilter) me.getValue();
+
+	    if (membership.accept(f)) {
+		if(subFH.containsFeature(f)) {
+		    return true;
+		}
+	    }
+	}
       
-      return false;
+	return false;
     }
 
     /**
@@ -94,12 +136,44 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      */
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	MergeFeatureHolder mfh = new MergeFeatureHolder();
-	for (Iterator fhi = featureHolders.iterator(); fhi.hasNext(); ) {
-	    FeatureHolder fh = (FeatureHolder) fhi.next();
-	    mfh.addFeatureHolder(fh.filter(ff, recurse));
+	// MergeFeatureHolder mfh = new MergeFeatureHolder();
+	// for (Iterator fhi = featureHolders.iterator(); fhi.hasNext(); ) {
+	//    FeatureHolder fh = (FeatureHolder) fhi.next();
+	//    mfh.addFeatureHolder(fh.filter(ff, recurse));
+	// }
+	// return mfh;
+
+	Map results = new HashMap();
+	for (Iterator fhi = featureHolders.entrySet().iterator(); fhi.hasNext(); ) {
+	    Map.Entry me = (Map.Entry) fhi.next();
+	    FeatureHolder fh = (FeatureHolder) me.getKey();
+	    FeatureFilter mf = (FeatureFilter) me.getValue();
+	    if (!recurse && FilterUtils.areDisjoint(mf, ff)) {
+		// Nothing interesting here...
+
+		continue;
+	    }
+
+	    if (recurse) {
+		FeatureHolder filterResult = fh.filter(ff, true);
+		if (filterResult.countFeatures() > 0) {
+		    results.put(filterResult, FeatureFilter.all);
+		}
+	    } else {
+		FeatureHolder filterResult = fh.filter(ff, false);
+		if (filterResult.countFeatures() > 0) {
+		    results.put(filterResult, new FeatureFilter.And(mf, ff));
+		}
+	    }
 	}
-	return mfh;
+
+	if (results.size() == 0) {
+	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
+	} else if (results.size() == 1) {
+	    return (FeatureHolder) results.keySet().iterator().next();
+	} else {
+	    return new MergeFeatureHolder(results);
+	}
     }
 
     private class MFHIterator implements Iterator {
@@ -107,7 +181,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 	private Iterator fIterator;
 
 	public MFHIterator() {
-	    fhIterator = featureHolders.iterator();
+	    fhIterator = featureHolders.keySet().iterator();
 	    if (fhIterator.hasNext())
 		fIterator = ((FeatureHolder) fhIterator.next()).features();
 	    else

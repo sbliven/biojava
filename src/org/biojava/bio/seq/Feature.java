@@ -24,6 +24,7 @@ package org.biojava.bio.seq;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -37,18 +38,21 @@ import org.biojava.bio.symbol.*;
  * 'CDS', 'repeat_unit', 'misc_feature'. The source of the feature is
  * something like 'genscan', 'repeatmasker' or 'made-up'. </p>
  *
- * <p> Features are <em>always</em> contained by a parent
- * <code>FeatureHolder</code>, which may either be a
- * <code>Sequence</code> or another <code>Feature</code>. Feature
- * instances should never be constructed directly by client code, and
- * the BioJava core does not contain any publicly accessible
- * implementations of the <code>Feature</code> interface. Instead, you
- * should create a suitable <code>Feature.Template</code>, then pass
- * this to the <code>createFeature</code> method of a
- * <code>Sequence</code> or <code>Feature</code>. </p>
+ * <p>
+ * Features are <em>always</em> contained by a parent <code>FeatureHolder</code>,
+ * which may either be a <code>Sequence</code> or another <code>Feature</code>. 
+ * Feature instances should never be constructed directly by client
+ * code, and the BioJava core does not contain any publicly accessible
+ * implementations of the <code>Feature</code> interface.  Instead, you
+ * should create a suitable <code>Feature.Template</code>, then pass this
+ * to the <code>createFeature</code> method of a <code>Sequence</code>
+ * or <code>Feature</code>.
+ * </p>
  *
- * <p> We may need some standardisation for what the fields mean. In
- * particular, we should be compliant where sensible with GFF. </p>
+ * <p>
+ * We may need some standardisation for what the fields mean. In particular, we
+ * should be compliant where sensible with GFF.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -121,6 +125,14 @@ public interface Feature extends FeatureHolder, Annotatable {
      * @return the ultimate parent Sequence
      */
     public Sequence getSequence();
+
+    /**
+     * Iterate over any child features which are held by this
+     * feature.  The order of iteration <em>MAY</em> be significant
+     * for some types of Feature.
+     */
+
+    public Iterator features();
 
     /**
      * Create a new Template that could be used to generate a feature identical

@@ -86,15 +86,22 @@ public class AssembledSymbolList extends AbstractSymbolList {
      * locations.
      */
 
+    private Location lastLocation = Location.empty;
+
     public Location locationOfPoint(int p) {
+	if (lastLocation.contains(p))
+	    return lastLocation;
+
 	int first = 0;
 	int last = componentList.size() - 1;
 	
 	while (first <= last) {
 	    int check = (first + last) / 2;
 	    Location checkL = (Location) componentList.get(check);
-	    if (checkL.contains(p))
+	    if (checkL.contains(p)) {
+		lastLocation = checkL;
 		return checkL;
+	    }
 
 	    if (p < checkL.getMin())
 		last = check - 1;

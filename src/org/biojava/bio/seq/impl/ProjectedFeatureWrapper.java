@@ -138,6 +138,8 @@ public class ProjectedFeatureWrapper implements Feature {
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	FeatureFilter membershipFilter = new FeatureFilter.ContainedByLocation(newLocation);
 	if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
+	    // System.err.println("Wheeeee! Disjunction in ProjectedFeatureWrapper");
+
 	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
 	}
 

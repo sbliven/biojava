@@ -77,7 +77,7 @@ class SimpleComponentFeature implements ComponentFeature {
 	this.componentLocation = temp.componentLocation;
 
 	if (temp.strand == StrandedFeature.NEGATIVE) {
-	    this.translation = temp.location.getMax() - temp.componentLocation.getMin() + 1;
+	    this.translation = temp.location.getMax() - temp.componentLocation.getMin();
 	    this.projectedFeatures = new ProjectedFeatureHolder(componentSequence, this, translation, true);
 	} else if (temp.strand == StrandedFeature.POSITIVE) {
 	    this.translation = temp.location.getMin() - temp.componentLocation.getMin();
