@@ -42,11 +42,11 @@ import org.biojava.bio.symbol.*;
  */
 public class SeqFormatTools
 {
-    private static final String featureDataFile =
+    private static final String FEATURE_DATA_FILE =
 	"org/biojava/bio/seq/io/FeatureQualifier.xml";
 
-    private static final Map   featureData = new HashMap();
-    private static final Map qualifierData = new HashMap();
+    private static final Map   FEATURE_DATA = new HashMap();
+    private static final Map QUALIFIER_DATA = new HashMap();
 
     static
     {
@@ -54,7 +54,7 @@ public class SeqFormatTools
         // qualifiers are valid (or even mandatory) for a particular
         // feature key. It also indicates whether the value should be
         // contained within quotes.
-	loadFeatureData(featureDataFile, featureData, qualifierData);
+        loadFeatureData(FEATURE_DATA_FILE, FEATURE_DATA, QUALIFIER_DATA);
     }
 
     /* Defines types of qualifier lines encountered: FIRST - the first
@@ -90,7 +90,7 @@ public class SeqFormatTools
      * functionality from the <code>EmblFileFormer</code> and
      * <code>GenbankFileFormer</code> classes. However, they print the
      * data in response to SeqIO events. This convenience method dumps
-     * an entire feature ata single mehtod call.
+     * an entire feature at single method call.
      *
      * @param f a <code>Feature</code> to write.
      * @param leader a <code>String</code> to attach to the start of

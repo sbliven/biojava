@@ -33,7 +33,7 @@ import org.biojava.utils.*;
  * to retrieve a property that is not set.
  *
  * @author Matthew Pocock
- * @atuhor Greg Cox
+ * @author Greg Cox
  */
 public class SimpleAnnotation implements Annotation, Serializable {
   /**
@@ -49,7 +49,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
   private Map properties;
 
   /**
-   * Retrieves properties, potentialy creating it if it was null.
+   * Retrieves properties, potentially creating it if it was null.
    *
    * @return the properties Map
    */
