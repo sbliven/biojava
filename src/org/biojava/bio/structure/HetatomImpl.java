@@ -114,7 +114,7 @@ public class HetatomImpl implements Group {
 	pdb_code = pdb ;
     }
 
-    /** set three character name of Amino acid .
+    /** set three character name of Group .
      *
      * @param s  a String specifying the PDBName value
      * @see #getPDBName
@@ -123,9 +123,10 @@ public class HetatomImpl implements Group {
     public void setPDBName(String s) 
 	throws PDBParseException
     {
-	if (s.length() != 3) {
-	    throw new PDBParseException("amino acid name is not of length 3!");
-	}
+	// hetatoms can have pdb_name length < 3. e.g. CU (see 1a4a position 1200 )
+	//if (s.length() != 3) {
+	//throw new PDBParseException("amino acid name is not of length 3!");
+	//}
 	pdb_name =s ;
     }
 
