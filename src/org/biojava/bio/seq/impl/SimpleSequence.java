@@ -107,8 +107,10 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io
     private FeatureRealizer featureRealizer;
 
     protected SimpleFeatureHolder getFeatureHolder() {
-	if(featureHolder == null)
+	if(featureHolder == null) {
 	    featureHolder = new SimpleFeatureHolder();
+	    registerFeatureForwarder();
+	}
 	return featureHolder;
     }
     
@@ -212,11 +214,7 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io
     public void edit(Edit edit) throws ChangeVetoException {
       throw new ChangeVetoException("Can't edit the underlying SymbolList");
     }
-   
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}    
+ 
     
     /**
      * Create a SimpleSequence with the symbols and alphabet of sym, and the
@@ -257,5 +255,57 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io
 	setName(name);
 	this.annotation = annotation;
 	this.featureRealizer = realizer;
+    }
+
+    //
+    // Changeable stuff
+    //
+
+    protected transient ChangeSupport changeSupport;
+    private transient ChangeListener featureForwarder;
+      
+    public void addChangeListener(ChangeListener cl) {
+	addChangeListener(cl, ChangeType.UNKNOWN);
+    }
+
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	if (changeSupport == null) {
+	    generateChangeSupport();
+	}
+	changeSupport.addChangeListener(cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	removeChangeListener(cl, ChangeType.UNKNOWN);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	if (changeSupport != null) {
+	    changeSupport.removeChangeListener(cl, ct);
+	}
+    }
+
+    protected void generateChangeSupport() {
+	changeSupport = new ChangeSupport();
+	registerFeatureForwarder();
+    }
+
+    protected void registerFeatureForwarder() {
+	if (featureForwarder == null && featureHolder != null && changeSupport != null) {
+	    featureForwarder = new FeatureForwarder();
+	    featureHolder.addChangeListener(featureForwarder, ChangeType.UNKNOWN);
+	}
+    }
+
+    private class FeatureForwarder implements ChangeListener {
+	public void preChange(ChangeEvent cev)
+	    throws ChangeVetoException
+	{
+	    changeSupport.firePreChangeEvent(cev);
+	}
+
+	public void postChange(ChangeEvent cev) {
+	    changeSupport.firePostChangeEvent(cev);
+	}
     }
 }
