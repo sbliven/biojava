@@ -278,7 +278,14 @@ class SimpleComponentFeature
     }
     
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	    return getProjectedFeatures().filter(ff, recurse);
+        FeatureFilter childFilter = new FeatureFilter.And(new FeatureFilter.ByParent(new FeatureFilter.ByClass(ComponentFeature.class)),
+                                                          new FeatureFilter.Not(FeatureFilter.top_level));
+                                                          
+        if (FilterUtils.areDisjoint(ff, childFilter)) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        } else {
+            return getProjectedFeatures().filter(ff, recurse);
+        }
     }
 
     public Feature createFeature(Feature.Template temp)
