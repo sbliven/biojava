@@ -10,6 +10,11 @@ import org.biojava.bio.program.tagvalue.*;
 
 public class UnigeneTools {
   public static final AnnotationType UNIGENE_ANNOTATION;
+  public static final AnnotationType LIBRARY_ANNOTATION;
+  
+  public static final UnigeneFactory FLAT_FILE_FACTORY =
+    new FlatFileUnigeneFactory();
+  
 
   private static final Map shortName2SpeciesName;
   
@@ -96,14 +101,22 @@ public class UnigeneTools {
     unigene.setPropertyConstraint("SEQUENCE", pc_sequence);
     
     UNIGENE_ANNOTATION = unigene;
+    
+    AnnotationType.Impl library = new AnnotationType.Impl();
+    library.setPropertyConstraint("ID", pc_string);
+    library.setPropertyConstraint("TITLE", pc_string);
+    library.setPropertyConstraint("TISSUE", pc_string);
+    library.setPropertyConstraint("VECTOR", pc_string);
+    
+    LIBRARY_ANNOTATION = library;
   }
   
   public static String getSpeciesForShortName(String name) {
     return (String) shortName2SpeciesName.get(name);
   }
   
-  public static ParserListener buildParser(TagValueListener listener)
-  throws IOException, ParserException{
+  public static ParserListener buildDataParser(TagValueListener listener)
+  throws ParserException {
     try {
       LineSplitParser entryParser = (LineSplitParser) LineSplitParser.GENBANK.clone();
       entryParser.setTrimValue(true);
@@ -133,6 +146,19 @@ public class UnigeneTools {
       throw new BioError(cnse);
     }
   }
+  
+  public static ParserListener buildLibInfoParser(TagValueListener listener)
+  throws IOException, ParserException{
+    RegexParser parser = new RegexParser();
+    parser.setContinueOnEmptyTag(false);
+    parser.setEndOfRecord(TagValueParser.EMPTY_LINE_EOR);
+    parser.setMergeSameTag(false);
+    parser.setPattern(Pattern.compile("([^=]+)=(.*)"));
+    parser.setTagGroup(1);
+    parser.setValueGroup(2);
+    
+    return new ParserListener(parser, listener);
+  }  
   
   private static class SplitAndProp
   extends TagValueWrapper {
