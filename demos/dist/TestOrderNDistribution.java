@@ -30,11 +30,12 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
 /**
- * Demonstration of the OrderNDistribution class.
+ * Demonstration of the using OrderNDistribution
  * <P>
- * This program generates a random DNA sequence. It then constructs
- * views of this sequence of the required order and collates the frequencies
- * of given n-mers.
+ * This sequence constructs a random sequence.  it then creates an
+ * OrderNDistribution to which consists of an (N-1)th order crossproduct
+ * alphabet for the conditioning alphabet and an ordinary alphabet as
+ * the conditioned alphabet.
  *
  * @author David Huen, who cobbled it together from code by all and sundry.
  */
@@ -53,13 +54,19 @@ public class TestOrderNDistribution {
         // generate the Nth order view of this sequence
         SymbolList view = SymbolListViews.orderNSymbolList(res, order);
 
-        // create a cross product Alphabet of required order
-        List alphas = Collections.nCopies(order, DNATools.getDNA());
-        FiniteAlphabet orderNAlfa = (FiniteAlphabet) AlphabetManager.getCrossProductAlphabet(alphas);
+        // create a crossproduct alphabet of order N-1.
+        List alfaList = Collections.nCopies(order-1, DNATools.getDNA());
+        FiniteAlphabet NlessOneAlfa = (FiniteAlphabet) AlphabetManager.getCrossProductAlphabet(alfaList);
+
+        // now create alphabet of (DNA)[N-1]th x DNA
+        alfaList = new Vector();
+        alfaList.add(NlessOneAlfa);
+        alfaList.add(DNATools.getDNA());
+        FiniteAlphabet NAlfa = (FiniteAlphabet) AlphabetManager.getCrossProductAlphabet(alfaList);
 
         // create a distribution training context for this job and register it for training
         DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
-        Distribution orderNDistribution = DistributionFactory.DEFAULT.createDistribution(orderNAlfa);
+        OrderNDistribution orderNDistribution = (OrderNDistribution) OrderNDistributionFactory.DEFAULT.createDistribution(NAlfa);
         dtc.registerDistribution(orderNDistribution);
         dtc.clearCounts();
 
@@ -77,17 +84,26 @@ public class TestOrderNDistribution {
         }
 
         // we have to be able to tokenise the symbols!
-        SymbolTokenization tokenizer = orderNAlfa.getTokenization("name");
+        SymbolTokenization orderNTokenizer = orderNDistribution.getConditioningAlphabet().getTokenization("name");
+        SymbolTokenization tokenizer = orderNDistribution.getConditionedAlphabet().getTokenization("name");
+        FiniteAlphabet conditioningAlfa = (FiniteAlphabet) orderNDistribution.getConditioningAlphabet();
+        FiniteAlphabet conditionedAlfa = (FiniteAlphabet) orderNDistribution.getConditionedAlphabet();
 
         // now print out the observed distribution
-        for (Iterator i = orderNAlfa.iterator(); i.hasNext();) {
+        for (Iterator i = conditioningAlfa.iterator(); i.hasNext();) {
             Symbol s = (Symbol) i.next();
 
-            // print the weights
-            System.out.println(
-                tokenizer.tokenizeSymbol(s) + "\t" +
-                orderNDistribution.getWeight(s)
-            );
+            System.out.print(orderNTokenizer.tokenizeSymbol(s));
+
+            // get the conditioned distribution
+            Distribution conditionedDist = orderNDistribution.getDistribution(s);
+
+            for (Iterator j = conditionedAlfa.iterator(); j.hasNext();) {
+                Symbol s1 = (Symbol) j.next();
+                System.out.print("\t" + tokenizer.tokenizeSymbol(s1) + "\t" + conditionedDist.getWeight(s1));
+            }
+
+            System.out.println("");
         }
 
     } catch (Throwable t) {
