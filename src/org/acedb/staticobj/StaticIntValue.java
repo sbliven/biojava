@@ -21,7 +21,6 @@
 
 package org.acedb.staticobj;
 
-import java.net.*;
 import org.acedb.*;
 
 /**
@@ -38,9 +37,5 @@ public class StaticIntValue extends StaticAceNode implements IntValue {
 
     public int toInt() {
 	return val;
-    }
-
-    public AceType getType() {
-	return AceType.INT;
     }
 }

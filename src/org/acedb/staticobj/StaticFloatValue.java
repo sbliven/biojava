@@ -23,7 +23,6 @@
 package org.acedb.staticobj;
 
 import org.acedb.*;
-import java.net.*;
 
 /**
  * @author Thomas Down
@@ -35,15 +34,11 @@ public class StaticFloatValue extends StaticAceNode
     private float val;
 
     public StaticFloatValue(float val, AceNode parent) {
-	super(String.valueOf(val), parent);
-	this.val = val;
+      super(String.valueOf(val), parent);
+      this.val = val;
     }
 
     public float toFloat() {
-	return val;
-    }
-
-    public AceType getType() {
-	return AceType.FLOAT;
+      return val;
     }
 }

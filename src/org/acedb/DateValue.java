@@ -30,7 +30,7 @@ import java.util.Date;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public interface DateValue extends AceValue {
+public interface DateValue extends AceNode {
     /**
      * Get the value as a Java date.
      */

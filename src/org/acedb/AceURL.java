@@ -33,15 +33,16 @@ public class AceURL {
     private String query;
     private String ref;
 
-    public AceURL(String protocol,
+    public AceURL(
+      String protocol,
 		  String host,
 		  int port,
 		  String file,
 		  String query,
 		  String ref,
 		  String userInfo,
-		  String authority)
-    {
+		  String authority
+    ) {
 	this.protocol = protocol;
 	this.host = host;
 	this.port = port;
@@ -64,6 +65,19 @@ public class AceURL {
 	this.authority = authority;
     }
 
+    public AceURL relativeURL(String fragment) {
+      return new AceURL(
+        protocol,
+        host,
+        port,
+        file + "/" + fragment,
+        null,
+        null,
+        userInfo,
+        authority
+      );
+    }
+    
     public String getAuthority() {
 	return authority;
     }

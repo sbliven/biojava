@@ -22,8 +22,8 @@
 
 package org.acedb.staticobj;
 
+import java.net.URLEncoder;
 import org.acedb.*;
-import java.net.*;
 
 /**
  * @author Thomas Down
@@ -32,24 +32,14 @@ import java.net.*;
 public class StaticReference extends StaticAceNode
         implements Reference 
 {
-    private AceType.RefType clazz;
-    private Database db;
+    private AceURL target;
 
-    public StaticReference(AceType.RefType clazz,
-			   String name,
-			   AceNode parent,
-			   Database db)
-    {
-	super(name, parent);
-	this.clazz = clazz;
-	this.db = db;
+    public StaticReference(String name, AceNode parent, AceURL classURL) {
+      super(name, parent);
+      this.target = classURL.relativeURL(URLEncoder.encode(name));
     }
 
-    public AceObject follow() throws AceException {
-	return db.getObject(clazz.getClassType(), getName());
-    }
-
-    public AceType getType() {
-	return clazz;
+    public AceURL getTarget() {
+      return target;
     }
 }

@@ -28,7 +28,7 @@ package org.acedb;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public interface FloatValue extends AceValue {
+public interface FloatValue extends AceNode {
   float toFloat();
 }
 

@@ -31,10 +31,9 @@ package org.acedb;
  */
 public interface Reference extends AceNode {
     /**
-     * Return the actual object encapsulated by the reference.
+     * Return a url to the object on the other end of the reference.
      */
-
-    public AceObject follow() throws AceException;
+    public AceURL getTarget();
 }
 
 

@@ -23,39 +23,13 @@
 package org.acedb.staticobj;
 
 import org.acedb.*;
-import java.net.*;
-import java.util.*;
 
 /**
  * @author Thomas Down
  */
 
 public class StaticAceObject extends StaticAceNode implements AceObject {
-    private AceType type;
-    private Database db;
-
-    public StaticAceObject(String name,
-			   AceType type,
-			   Map contents,
-			   Database db) 
-    {
-	super(name, contents, null);
-	this.type = type;
-	this.db = db;
-    }
-
-    public AceType getType() {
-	return type;
-    }
-
-    public URL toURL() {
-	String parURL = db.toURL().toString();
-	String myName = parURL + (parURL.endsWith("/") ? "" : "/") + 
-	    type.getName() + "/" + getName();
-	try {
-	    return new URL(myName);
-	} catch (MalformedURLException ex) {
-	    throw new AceError(ex, "Unable to generate URL for " + myName);
-	}
+    public StaticAceObject(String name, AceSet parent) {
+      super(name, parent);
     }
 }

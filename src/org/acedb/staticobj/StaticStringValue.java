@@ -23,7 +23,6 @@
 package org.acedb.staticobj;
 
 import org.acedb.*;
-import java.net.*;
 
 /**
  * @author Thomas Down
@@ -41,9 +40,5 @@ public class StaticStringValue extends StaticAceNode
 
     public String toString() {
 	return val;
-    }
-
-    public AceType getType() {
-	return AceType.STRING;
     }
 }

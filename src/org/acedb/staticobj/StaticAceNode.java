@@ -22,8 +22,9 @@
 
 package org.acedb.staticobj;
 
-import java.net.*;
+import java.net.URLEncoder;
 import java.util.*;
+
 import org.acedb.*;
 
 /**
@@ -32,16 +33,16 @@ import org.acedb.*;
 
 public class StaticAceNode implements AceNode {
     private Map subSets;
-    private AceNode parent;
+    private AceSet parent;
     private String name;
 
-    public StaticAceNode(String name, Map contents, AceNode parent) {
+    public StaticAceNode(String name, Map contents, AceSet parent) {
 	this.name = name;
 	this.subSets = contents;
 	this.parent = parent;
     }
 
-    public StaticAceNode(String name, AceNode parent) {
+    public StaticAceNode(String name, AceSet parent) {
 	this.name = name;
 	this.parent = parent;
 	this.subSets = null;
@@ -51,25 +52,20 @@ public class StaticAceNode implements AceNode {
 	return name;
     }
 
-    public AceType getType() {
-	return AceType.TAG;
+    public AceSet getParent() {
+      return parent;
     }
 
-    public URL toURL() {
-	String parURL = parent.toURL().toString();
-	String myName = parURL + (parURL.endsWith("/") ? "" : "/") + 
-	                URLEncoder.encode(name); 
-	try {
-	    return new URL(myName);
-	} catch (MalformedURLException ex) {
-	    throw new AceError(ex, "Unable to generate URL for " + myName);
-	}
+    public AceURL toURL() throws AceURLException {
+      return parent.toURL().relativeURL(URLEncoder.encode(name));
     }
 
     public int size() {
-	if (subSets != null)
-	    return subSets.size();
-	return 0;
+      if (subSets != null) {
+        return subSets.size();
+      } else {
+        return 0;
+      }
     }
 
     public Iterator nameIterator() {
@@ -105,5 +101,9 @@ public class StaticAceNode implements AceNode {
 	if (subSets == null)
 	    subSets = new HashMap();
 	subSets.put(nd.getName(), nd);
+    }
+    
+    public AceSet filter(String pattern) {
+      throw new UnsupportedOperationException("Haven't implemented filtering of nodes yet");
     }
 }

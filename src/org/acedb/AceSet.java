@@ -65,7 +65,7 @@ public interface AceSet {
    *
    * @throws AceException if for any reason the URL can't be constructed
    */
-  AceURL toURL() throws AceException;
+  AceURL toURL() throws AceURLException;
   
   /**
    * Retrieve a memeber by name.

@@ -28,7 +28,7 @@ package org.acedb;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public interface IntValue extends AceValue {
+public interface IntValue extends AceNode {
   int toInt();
 }
 

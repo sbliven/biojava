@@ -32,11 +32,11 @@ public class AceException extends BioException {
   	super(message);
   }
 
-  public AceException(Exception ex) {
+  public AceException(Throwable ex) {
     super(ex);
   }
 
-  public AceException(Exception ex, String message) {
+  public AceException(Throwable ex, String message) {
     super(ex, message);
   }
 
