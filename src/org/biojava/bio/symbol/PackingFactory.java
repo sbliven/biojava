@@ -20,6 +20,7 @@ import org.biojava.bio.seq.*;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class PackingFactory {
   private final static Map packForAlpha;
@@ -75,7 +76,7 @@ public class PackingFactory {
   ) throws IllegalSymbolException {
     word = word >> (int) packing.wordSize();
     int p = packing.pack(symList.symbolAt(offset));
-    word |= (int) p << ((int) wordLength * packing.wordSize() - 1);
+    word |= (int) p << ((int) (wordLength - 1) * packing.wordSize());
     return word;
   }
   
