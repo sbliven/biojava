@@ -39,7 +39,6 @@ public class PairDistribution
 extends AbstractChangeable
 implements Serializable, Distribution {
   private static Map cache;
-  private static ListWrapper gopher;
   
   static {
     cache = new HashMap();
