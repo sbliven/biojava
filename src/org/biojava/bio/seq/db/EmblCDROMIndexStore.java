@@ -61,8 +61,13 @@ import org.biojava.bio.seq.io.SymbolTokenization;
  * <p>The binary index files may be created using the EMBOSS programs
  * dbifasta, dbiblast, dbiflat or dbigcg. The least useful from the
  * BioJava perspective is dbigcg because we do not have a
- * <code>SequenceFormat</code> implementation for GCG format files.
- * </p>
+ * <code>SequenceFormat</code> implementation for GCG format
+ * files.</p>
+ *
+ * <p>The <code>Index</code> instances returned by this class do not
+ * have the record length set because this information is not
+ * available in the binary index. The value -1 is used instead, as
+ * described in the <code>Index</code> interface.</p>
  *
  * @author Keith James
  * @since 1.2
@@ -170,7 +175,7 @@ public class EmblCDROMIndexStore implements IndexStore
      */
     public File getPathPrefix()
     {
-	return pathPrefix;
+        return pathPrefix;
     }
 
     /**
@@ -190,7 +195,7 @@ public class EmblCDROMIndexStore implements IndexStore
      */
     public void setPathPrefix(File pathPrefix)
     {
-	this.pathPrefix = pathPrefix;
+        this.pathPrefix = pathPrefix;
     }
 
     /**
@@ -254,13 +259,12 @@ public class EmblCDROMIndexStore implements IndexStore
             if (enRecord.length == 0)
                 throw new IllegalIDException("Failed to find ID: " + id);
 
-	    // Append current pathPrefix
+            // Append current pathPrefix
             index =
                 new SimpleIndex(new File(pathPrefix,
                                          (String) seqFiles.get((Integer)
                                                                enRecord[3])),
-                                ((Long) enRecord[1]).longValue(),
-                                entryRecordLength, id);
+                                ((Long) enRecord[1]).longValue(), -1, id);
         }
         catch (IOException ioe)
         {

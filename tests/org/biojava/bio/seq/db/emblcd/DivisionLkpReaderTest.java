@@ -34,7 +34,7 @@ import junit.framework.TestCase;
  * <code>DivisionLkpReaderTest</code> is a unit test of reading the
  * binary division.lkp file type.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class DivisionLkpReaderTest extends TestCase
@@ -98,8 +98,7 @@ public class DivisionLkpReaderTest extends TestCase
             Object [] rec = div.readRecord();
 
             assertEquals(i, ((Integer) rec[0]).intValue());
-            assertEquals("protDB" + Integer.toString(i) + ".aa",
-                         (String) rec[1]);
+            assertEquals("protDB" + i + ".aa", (String) rec[1]);
         }
     }
 }

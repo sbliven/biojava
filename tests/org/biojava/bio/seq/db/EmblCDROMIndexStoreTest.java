@@ -34,12 +34,8 @@ import junit.framework.TestCase;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.seq.io.FastaDescriptionLineParser;
-import org.biojava.bio.seq.io.FastaFormat;
-import org.biojava.bio.seq.io.SequenceBuilderFactory;
-import org.biojava.bio.seq.io.SequenceFormat;
-import org.biojava.bio.seq.io.SimpleSequenceBuilder;
-import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 
@@ -56,6 +52,7 @@ public class EmblCDROMIndexStoreTest extends TestCase
     protected Alphabet               alpha;
     protected SymbolTokenization     parser;
     protected SequenceBuilderFactory factory;
+    protected SequenceDB             sequenceDB;
 
     protected IndexStore emblCDIndexStore;
 
@@ -83,6 +80,10 @@ public class EmblCDROMIndexStoreTest extends TestCase
                                                    format,
                                                    factory,
                                                    parser);
+
+        ((EmblCDROMIndexStore) emblCDIndexStore).setPathPrefix(entryNamIdx.getParentFile().getAbsoluteFile());
+
+        sequenceDB = new IndexedSequenceDB(emblCDIndexStore);
     }
 
     protected void tearDown() throws Exception
@@ -104,7 +105,7 @@ public class EmblCDROMIndexStoreTest extends TestCase
         fail("Expected BioException");
     }
 
-    public void testFetch() throws BioException, IllegalIDException
+    public void testFetch() throws Exception
     {
         // Fetch from file 1
         Index i1 = emblCDIndexStore.fetch("NMA0007");
@@ -113,6 +114,7 @@ public class EmblCDROMIndexStoreTest extends TestCase
         // Fetch from file 3
         Index i3 = emblCDIndexStore.fetch("NMA0030");
 
+        // Test index fetches
         assertEquals(1811, i1.getStart());
         assertEquals("protDB1.aa", i1.getFile().getName());
 
@@ -121,6 +123,19 @@ public class EmblCDROMIndexStoreTest extends TestCase
 
         assertEquals(2510, i3.getStart());
         assertEquals("protDB3.aa", i3.getFile().getName());
+
+        // Test actual sequence fetches
+        Sequence seq = sequenceDB.getSequence("NMA0007");
+        assertEquals("NMA0007", seq.getName());
+        assertEquals(235, seq.length());
+
+        seq = sequenceDB.getSequence("NMA0020");
+        assertEquals("NMA0020", seq.getName());
+        assertEquals(494, seq.length());
+
+        seq = sequenceDB.getSequence("NMA0030");
+        assertEquals("NMA0030", seq.getName());
+        assertEquals(245, seq.length());
     }
 
     public void testIllegalIDFetch() throws BioException
@@ -191,7 +206,7 @@ public class EmblCDROMIndexStoreTest extends TestCase
         {
             emblCDIndexStore.store(new SimpleIndex(new File("dummy"),
                                                    0,
-						   -1,
+                                                   -1,
                                                    "dummyID"));
         }
         catch (BioException be)

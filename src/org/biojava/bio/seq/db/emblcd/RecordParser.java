@@ -40,15 +40,10 @@ class RecordParser
     private byte [] recNumBytes = new byte [4];
     private byte [] recTotBytes = new byte [4];
 
-    private StringBuffer sb;
-
     /**
      * Creates a new <code>RecordParser</code> object.
      */
-    RecordParser()
-    {
-        sb = new StringBuffer(512);
-    }
+    RecordParser() { }
 
     /**
      * <code>parseInt4</code> creates a long from Little-endian. Named
@@ -150,14 +145,14 @@ class RecordParser
     Object [] parseDivRecord(byte [] divRecord)
     {
         // The variable part of record is the name. Other parts are
-	// int which sum to 2
-	int nameLen = divRecord.length - 2;
-	byte [] fNameBytes = new byte [nameLen];
+        // int which sum to 2
+        int nameLen = divRecord.length - 2;
+        byte [] fNameBytes = new byte [nameLen];
 
         System.arraycopy(divRecord, 0, fNumBytes, 0, 2);
         System.arraycopy(divRecord, 2, fNameBytes, 0, nameLen);
 
-        sb.setLength(0);
+        StringBuffer sb = new StringBuffer(512);
         Integer fileNumber = new Integer(parseInt2(fNumBytes));
         String    fileName = parseString(sb, fNameBytes);
 
@@ -175,16 +170,16 @@ class RecordParser
     Object [] parseEntryNamRecord(byte [] enRecord)
     {
         // The variable part of record is the id. Other parts are
-	// long, long, int which sum to 10
-	int idLen = enRecord.length - 10;
-	byte [] idBytes =  new byte [idLen];
+        // long, long, int which sum to 10
+        int idLen = enRecord.length - 10;
+        byte [] idBytes =  new byte [idLen];
 
         System.arraycopy(enRecord, 0,           idBytes, 0, idLen);
         System.arraycopy(enRecord, idLen,     rPosBytes, 0, 4);
         System.arraycopy(enRecord, idLen + 4, sPosBytes, 0, 4);
         System.arraycopy(enRecord, idLen + 8, fNumBytes, 0, 2);
 
-        sb.setLength(0);
+        StringBuffer sb = new StringBuffer(512);
         String       seqID = parseString(sb, idBytes);
         Long     rPosition = new Long(parseInt4(rPosBytes));
         Long     sPosition = new Long(parseInt4(sPosBytes));
@@ -204,15 +199,15 @@ class RecordParser
     Object [] parseAcnumTrgRecord(byte [] acRecord)
     {
         // The variable part of record is the acc. Other parts are
-	// long, long which sum to 8
-	int accLen = acRecord.length - 8;
-	byte [] accBytes = new byte [accLen];
+        // long, long which sum to 8
+        int accLen = acRecord.length - 8;
+        byte [] accBytes = new byte [accLen];
 
         System.arraycopy(acRecord, 0, recNumBytes, 0, 4);
         System.arraycopy(acRecord, 4, recTotBytes, 0, 4);
         System.arraycopy(acRecord, 8, accBytes,    0, accLen);
 
-        sb.setLength(0);
+        StringBuffer sb = new StringBuffer(512);
         Long  rNumber = new Long(parseInt4(recNumBytes));
         Long   rTotal = new Long(parseInt4(recTotBytes));
         String seqAcc = parseString(sb, accBytes);

@@ -34,7 +34,7 @@ import junit.framework.TestCase;
  * <code>EntryNamRandomAccessTest</code> is a unit test of random
  * access reading the binary entrynam.idx file type.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class EntryNamRandomAccessTest extends TestCase
