@@ -206,11 +206,12 @@ public final class IntegerAlphabet
   /**
    * Creates a new parser (Mark Schreiber 3 May 2001).
    *
-   * @param name Currently only "token" is supported.
+   * @param name Currently only "token" is supported. You may also
+   * use "default" as a synonym of "token"
    * @return an IntegerParser.
    */
   public SymbolTokenization getTokenization(String name) {
-    if(name.equals("token")){
+    if(name.equals("token") || name.equals("default")){
       return new IntegerTokenization();
     }else{
       throw new NoSuchElementException(name + " parser not supported by IntegerAlphabet yet");
