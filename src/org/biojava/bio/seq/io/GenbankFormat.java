@@ -36,52 +36,64 @@ import org.biojava.bio.seq.*;
  */
 
 public class GenbankFormat implements SequenceFormat {
-    private FeatureBuilder featureBuilder;
+  private FeatureBuilder featureBuilder;
 
-    /**
-     * Constuct a GENBANK format processor using a default
-     * FeatureBuilder object. (actually a SimpleFeatureBuilder).
-     */
+  /**
+   * Constuct a GENBANK format processor using a default
+   * FeatureBuilder object. (actually a SimpleFeatureBuilder).
+   */
 
-    public GenbankFormat() {
-	featureBuilder = new SimpleFeatureBuilder();
-    }
+  public GenbankFormat() {
+    featureBuilder = new SimpleFeatureBuilder();
+  }
 
-    /**
-     * Construct a GENBANK format processor using the specified
-     * FeatureBuilder object.
-     */
+  /**
+   * Construct a GENBANK format processor using the specified
+   * FeatureBuilder object.
+   */
 
-    public GenbankFormat(FeatureBuilder fb) {
-	this.featureBuilder = fb;
-    }
+  public GenbankFormat(FeatureBuilder fb) {
+    this.featureBuilder = fb;
+  }
 
-    public Sequence readSequence(StreamReader.Context context,
-				 SymbolParser resParser,
-				 SequenceFactory sf)
-	throws IllegalSymbolException, IOException, BioException
-    {
-	GenbankContext ctx = new GenbankContext(resParser, sf);
+  public Sequence readSequence(
+    StreamReader.Context context,
+		SymbolParser resParser,
+		SequenceFactory sf
+  )	throws IllegalSymbolException, IOException, BioException {
+    GenbankContext ctx = new GenbankContext(resParser, sf);
 
-	BufferedReader in = context.getReader();
-	String line;
+    BufferedReader in = context.getReader();
+    String line;
 
-	while ((line = in.readLine()) != null) {
-	    if (line.startsWith("//")) {
-		in.mark(2);
-		if (in.read() == -1)
-		    context.streamEmpty();
-		else
-		    in.reset();
-		return ctx.makeSequence();
+    while ((line = in.readLine()) != null) {
+	    if (line.startsWith("//")) { // end of entry
+        in.mark(160);
+        line = in.readLine();
+        if(line == null) {
+          context.streamEmpty();
+        } else if(line.length() > 0) { // entry follows directly on
+          in.reset();
+        } else { // some blank lines after it
+          while(line.length() == 0) { // trim all blank lines
+            in.mark(160);
+            line = in.readLine();
+            if(line == null) {
+              context.streamEmpty();
+              break;
+            }
+          }
+          in.reset();
+        }
+        return ctx.makeSequence();
 	    }
 
 	    ctx.processLine(line);
-	}
-
-	context.streamEmpty();
-	throw new IOException("Premature end of stream for EMBL");
     }
+
+    context.streamEmpty();
+    throw new IOException("Premature end of stream for GENBANK");
+  }
 
     private class GenbankContext {
 	private final static int HEADER = 1;
