@@ -65,6 +65,70 @@ public class AceURL {
 	this.authority = authority;
     }
 
+    public AceURL(String spec) 
+        throws AceURLException
+    {
+	int colon = spec.indexOf(':');
+	if (colon == -1)
+	    throw new AceURLException("No protocol");
+	protocol = spec.substring(0, colon);
+	
+	int locatorPart = spec.indexOf("//");
+	String localSection = null;
+	if (locatorPart == -1) {
+	    localSection = spec.substring(colon + 1);
+	} else {
+	    String locator = null;
+	    int startLocal = spec.indexOf('/', locatorPart + 2);
+	    if (startLocal != -1) {
+		localSection = spec.substring(startLocal);
+		locator = spec.substring(locatorPart + 2, startLocal);
+	    } else {
+		locator = spec.substring(locatorPart + 2);
+	    }
+	    int at = locator.indexOf('@');
+	    if (at != -1) {
+		String authData = locator.substring(0, at);
+		colon = authData.indexOf(':');
+		if (colon == -1) {
+		    userInfo = authData;
+		} else {
+		    userInfo = authData.substring(0, colon);
+		    authority = authData.substring(colon + 1);
+		}
+		locator = locator.substring(at + 1);
+	    }
+
+	    colon = locator.indexOf(':');
+	    if (colon == -1) {
+		host = locator;
+	    } else {
+		host = locator.substring(0, colon);
+		try {
+		    port = Integer.parseInt(locator.substring(colon + 1));
+		} catch (NumberFormatException ex) {
+		    throw new AceURLException(ex, "Bad port number");
+		}
+	    }
+	}
+
+	if (localSection != null) {
+	    int hash = localSection.indexOf('#');
+	    if (hash != -1) {
+		ref = localSection.substring(hash + 1);
+		localSection = localSection.substring(0, hash);
+	    }
+
+	    int queryq = localSection.indexOf('?');
+	    if (queryq == -1) {
+		file = localSection;
+	    } else {
+		query = localSection.substring(queryq + 1);
+		file = localSection.substring(0, queryq);
+	    }
+	}
+    }
+
     public AceURL relativeURL(String fragment) {
       return new AceURL(
         protocol,
