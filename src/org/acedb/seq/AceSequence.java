@@ -133,8 +133,8 @@ public class AceSequence implements Sequence {
       resList = new SimpleResidueList(alphabet(), rl);
       con.dispose();
       
-      // make features for each 'Sequence_Feature:' child.
-      FeatureFactory fFact = new SimpleFeatureFactory();
+      // Feature template for stuff
+      Feature.Template template = new Feature.Template();
 
       // make features for 'Subsequence' objects
       if(seqObj.contains("Details:")) {
@@ -149,10 +149,12 @@ public class AceSequence implements Sequence {
               IntValue end = (IntValue) eI.next();
               Annotation fAnn = new SimpleAnnotation();
               fAnn.setProperty("references", ref);
-              fHolder.addFeature(
-                fFact.createFeature(this, new RangeLocation(start.toInt(), end.toInt()),
-                                    name, "AceDB", fAnn)
-              );
+              template.annotation = fAnn;
+              template.location = new RangeLocation(start.toInt(), end.toInt());
+              template.source = "ACeDB";
+              template.type = name;
+              Feature f = new SimpleFeature(this, template);
+              fHolder.addFeature(f);
             }
           }
         }
@@ -178,10 +180,12 @@ public class AceSequence implements Sequence {
                 fAnn = new SimpleAnnotation();
                 fAnn.setProperty("description", comment.toString());
               }
-              fHolder.addFeature(
-                fFact.createFeature(this, new RangeLocation(start.toInt(), end.toInt()),
-                                    name, "AceDB", fAnn)
-              );
+              template.location = new RangeLocation(start.toInt(), end.toInt());
+              template.source = "ACeDB";
+              template.type = name;
+              template.annotation = fAnn;
+              Feature f = new SimpleFeature(this, template);
+              fHolder.addFeature(f);
             }
           }
         }
