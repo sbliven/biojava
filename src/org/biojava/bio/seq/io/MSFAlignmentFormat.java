@@ -3,7 +3,8 @@
  * formatted with JxBeauty (c) johann.langhofer@nextra.at
  */
 
-package org.biojava.bio.seq.io;
+
+package  org.biojava.bio.seq.io;
 
 import  org.biojava.bio.seq.io.AlignmentFormat;
 import  org.biojava.bio.symbol.Alignment;
@@ -25,7 +26,7 @@ import  java.util.*;
  * @version 1.0
  */
 public class MSFAlignmentFormat
-implements AlignmentFormat {
+        implements AlignmentFormat {
     private static final boolean DEBUGPRINT = false;
 
     /**
@@ -35,13 +36,13 @@ implements AlignmentFormat {
     }
 
     /**
-     * put your documentation comment here
+     * used to quick test the code
      * @param args
      */
     public static void main (String[] args) {
         String filename;
         if (args.length < 1) {
-            filename = "D:\\SimpleMSF.msf";
+            filename = "SimpleMSF.msf";         //change to your favorite
         }
         else {
             filename = args[0];
@@ -67,7 +68,7 @@ implements AlignmentFormat {
         try {
             RE mtc = new RE("Name:\\s+(.*)\\s+Len:");
             RE removewhitespace = new RE("\\s");
-           // REMatch rem = null;
+            // REMatch rem = null;
             String line = reader.readLine();
             //parse past header
             while (line.indexOf("..") == -1) {
@@ -77,10 +78,9 @@ implements AlignmentFormat {
             //read each name (between Name:   and Len:
             line = reader.readLine();
             while ((line.indexOf("//") == -1) && ((line.trim()).length() !=
-                                                  0)) {
-				mtc.match(line);
-                sequenceName =
-line.substring(mtc.getParenStart(1),mtc.getParenEnd(1));
+                    0)) {
+                mtc.match(line);
+                sequenceName = line.substring(mtc.getParenStart(1), mtc.getParenEnd(1));
                 if (sequenceName == null) {
                     break;
                 }               //end of sequence names
@@ -110,9 +110,9 @@ line.substring(mtc.getParenStart(1),mtc.getParenEnd(1));
                         break;
                     }           //error
                     startOfData = line.indexOf((String)sequenceNames.get(currSeqCount))
-                    + ((String)sequenceNames.get(currSeqCount)).length();
+                            + ((String)sequenceNames.get(currSeqCount)).length();
                     line = (line.substring(startOfData));
-                    line = removewhitespace.subst(line, "",RE.REPLACE_ALL);
+                    line = removewhitespace.subst(line, "", RE.REPLACE_ALL);
                     sequenceData[currSeqCount] = sequenceData[currSeqCount].concat(line);
                     line = reader.readLine();
                     if ((line.trim()).length() == 0) {
@@ -120,9 +120,8 @@ line.substring(mtc.getParenStart(1),mtc.getParenEnd(1));
                     }           //could be an error
                 }
                 //until you get a line that matches the first sequence
-                while ((line != null)
-                        && (line.indexOf((String)sequenceNames.get(0))
-                            == -1))                 // || (   (line.trim()) .length()>0  )    )
+                while ((line != null) && (line.indexOf((String)sequenceNames.get(0))
+                        == -1))                 // || (   (line.trim()) .length()>0  )    )
                 {
                     line = reader.readLine();
                 }
@@ -131,7 +130,7 @@ line.substring(mtc.getParenStart(1),mtc.getParenEnd(1));
             if (DEBUGPRINT) {
                 for (currSeqCount = 0; currSeqCount < sequenceNames.size(); currSeqCount++) {
                     System.out.println((String)sequenceNames.get(currSeqCount)
-                                       + ":" + sequenceData[currSeqCount]);
+                            + ":" + sequenceData[currSeqCount]);
                 }
             }
             //check DNA, RNA or Prot
@@ -161,33 +160,26 @@ line.substring(mtc.getParenStart(1),mtc.getParenEnd(1));
                     alph = DNATools.getDNA();
                 }
                 else {          //get DNA alph
-                    //   Symbol ns=new FundamentalAtomicSymbol("gap",'-',null);
-                    //  DNATools.getDNA().addSymbol(ns);
                     alph = DNATools.getDNA();
                 }
             }
             else {
-
                 alph = ProteinTools.getTAlphabet();
-
             }
             SymbolParser parse = alph.getParser("token");
             for (currSeqCount = 0; currSeqCount < sequenceNames.size(); currSeqCount++) {
                 String sd = null;
                 //change stop codons to specified symbols
-                sd = sequenceData[currSeqCount].replace('~',
-                                                        '-');              //umm how to deal with Term Signals, this should be fixed with synanyms
-                sd = sequenceData[currSeqCount].replace('.',
-                                                        '-');              //umm how to deal with Term Signals, this should be fixed with synanyms
+                sd = sequenceData[currSeqCount].replace('~', '-');              //sometimes this is a term signal not a gap
+                sd = sequenceData[currSeqCount].replace('.', '-');              //sometimes this is a term signal not a gap
                 StringBuffer sb = new StringBuffer();
                 SymbolList sl = null;
                 sequenceDataMap.put((String)sequenceNames.get(currSeqCount),
-                                    parse.parse(sd));
+                        parse.parse(sd));
             }
-
             return  (new SimpleAlignment(sequenceDataMap));
         } catch (Exception e) {
-            System.out.println("msfofrmat " + e.getMessage());
+            System.err.println("MSFFormatReader " + e.getMessage());
             //  throw (e);
         }
         return  (null);

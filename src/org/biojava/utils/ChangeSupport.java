@@ -57,14 +57,14 @@ public class ChangeSupport {
   private int delta;
   private Reference[] listeners;
   private ChangeType[] types;
-  
+
   /**
    * Generate a new ChangeSupport instance.
    */
   public ChangeSupport() {
     this(5);
   }
-  
+
   /**
    * Generate a new ChangeSupport instance which has room for initialSize
    * listeners before it needs to grow any resources.
@@ -75,7 +75,7 @@ public class ChangeSupport {
   public ChangeSupport(int initialSize) {
     this(initialSize, 5);
   }
-  
+
   /**
    * Generate a new ChangeSupport instance which has room for initialSize
    * listeners before it needs to grow any resources, and which will grow by
@@ -90,7 +90,7 @@ public class ChangeSupport {
     this.listenerCount = 0;
     this.listeners = new Reference[initialSize];
     this.types = new ChangeType[initialSize];
-    
+
     this.delta = delta;
   }
 
@@ -102,14 +102,16 @@ public class ChangeSupport {
   public void addChangeListener(ChangeListener cl) {
     addChangeListener(cl, ChangeType.UNKNOWN);
   }
-  
+
   /**
    * Add a listener that will be informed of changes of a given type (and it's subtypes)
    *
    * @param cl  the ChangeListener
    * @param ct  the ChangeType it is to be informed of
    */
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+  public synchronized void addChangeListener(ChangeListener cl, ChangeType ct) {
+      // Needed to synchronize this method in case multiple threads attempt to add a change listener at the same time.
+      // Richard J. Fox  05/30/2001
       if (ct == null) {
 	  throw new NestedError("Since 1.2, listeners registered for the null changetype are not meaningful.  Please register a listener for ChangeType.UNKNOWN instead");
       }
@@ -119,7 +121,7 @@ public class ChangeSupport {
       listeners[listenerCount] = new WeakReference(cl);
       listenerCount++;
   }
-  
+
   /**
    * Grows the internal resources if by adding one more listener they would be
    * full.
@@ -129,15 +131,15 @@ public class ChangeSupport {
       int newLength = listenerCount + delta;
       Reference[] newList = new Reference[newLength];
       ChangeType[] newTypes = new ChangeType[newLength];
-      
+
       System.arraycopy(listeners, 0, newList, 0, listenerCount);
       System.arraycopy(types, 0, newTypes, 0, listenerCount);
-      
+
       listeners = newList;
       types = newTypes;
     }
   }
-  
+
   /**
    * Remove a listener that was interested in all types of changes.
    *
@@ -146,7 +148,7 @@ public class ChangeSupport {
   public void removeChangeListener(ChangeListener cl) {
     removeChangeListener(cl, ChangeType.UNKNOWN);
   }
-  
+
   /**
    * Remove a listener that was interested in a specific types of changes.
    *
@@ -182,7 +184,7 @@ public class ChangeSupport {
 	}
 	listenerCount = pp;
     }
-  
+
   /**
    * Inform the listeners that a change is about to take place using their
    * firePreChangeEvent methods.
@@ -201,10 +203,10 @@ public class ChangeSupport {
     int listenerCount = this.listenerCount;
     ChangeType[] types = new ChangeType[listenerCount];
     System.arraycopy(this.types, 0, types, 0, listenerCount);
-    
+
     Reference[] listeners = new Reference[listenerCount];
     System.arraycopy(this.listeners, 0, listeners, 0, listenerCount);
-    
+
     for(int i = 0; i < listenerCount; i++) {
       ChangeType lt = types[i];
       if( ct.isMatchingType(lt)) {
@@ -220,7 +222,7 @@ public class ChangeSupport {
     if (needToReap)
 	reapGarbageListeners();
   }
-  
+
   /**
    * Inform the listeners that a change has taken place using their
    * firePostChangeEvent methods.
@@ -238,7 +240,7 @@ public class ChangeSupport {
     int listenerCount = this.listenerCount;
     ChangeType[] types = new ChangeType[listenerCount];
     System.arraycopy(this.types, 0, types, 0, listenerCount);
-    
+
     Reference[] listeners = new Reference[listenerCount];
     System.arraycopy(this.listeners, 0, listeners, 0, listenerCount);
 
