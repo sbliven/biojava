@@ -61,6 +61,7 @@ import java.util.Set;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Keith James (docs)
+ * @author Kalle Naslund (tiny bugfix)
  * @since 1.1
  */
 
@@ -88,7 +89,7 @@ public class ChangeSupport {
    */
   public boolean hasListeners(ChangeType ct)
   {
-  	for(int i = 0; i < types.length; i++ ) {
+  	for(int i = 0; i < listenerCount ; i++ ) {
   	  ChangeType type = (ChangeType) types[i];
   	  if(type.isMatchingType(ct)) {
   	  	return true;
