@@ -72,18 +72,18 @@ public final class RNATools {
 
       // add all other ambiguity symbols
       for(Iterator i = AlphabetManager.getAllSymbols(rna).iterator(); i.hasNext();) {
-	  Symbol as = (Symbol) i.next();
-	  FiniteAlphabet matches = (FiniteAlphabet) as.getMatches();
-	  if (matches.size() > 1) {   // We've hit an ambiguous symbol.
-	      Set l = new HashSet();
-	      for(Iterator j = matches.iterator(); j.hasNext(); ) {
-		  l.add(complement((Symbol) j.next()));
-	      }
-	      symbolToComplement.put(as, rna.getAmbiguity(l));
-	  }
+          Symbol as = (Symbol) i.next();
+          FiniteAlphabet matches = (FiniteAlphabet) as.getMatches();
+          if (matches.size() > 1) {   // We've hit an ambiguous symbol.
+              Set l = new HashSet();
+              for(Iterator j = matches.iterator(); j.hasNext(); ) {
+                  l.add(complement((Symbol) j.next()));
+              }
+              symbolToComplement.put(as, rna.getAmbiguity(l));
+          }
       }
       complementTable = new RNAComplementTranslationTable();
-      
+
       transcriptionTable = new SimpleReversibleTranslationTable(DNATools.getDNA(), rna);
       transcriptionTable.setTranslation(DNATools.a(), a);
       transcriptionTable.setTranslation(DNATools.c(), c);
@@ -109,6 +109,14 @@ public final class RNATools {
    */
   public static FiniteAlphabet getRNA() {
     return rna;
+  }
+
+  /**
+   * Gets the (RNA x RNA x RNA) Alphabet
+   * @return a flyweight version of the (RNA x RNA x RNA) alphabet
+   */
+  public static FiniteAlphabet getCodonAlphabet(){
+    return (FiniteAlphabet)AlphabetManager.generateCrossProductAlphaFromName("(RNA x RNA x RNA)");
   }
 
   /**
@@ -153,7 +161,7 @@ public final class RNATools {
       throw new BioError(se, "Something has gone badly wrong with RNA");
     }
   }
-  
+
   /**
    * Return an integer index for a symbol - compatible with forIndex.
    * <p>
@@ -356,7 +364,7 @@ public final class RNATools {
     throws IllegalAlphabetException
   {
       if (syms.getAlphabet() == getRNA()) {
-	  syms = SymbolListViews.windowedSymbolList(syms, 3);
+          syms = SymbolListViews.windowedSymbolList(syms, 3);
       }
       return SymbolListViews.translate(syms, getGeneticCode("UNIVERSAL"));
   }
@@ -406,19 +414,19 @@ public final class RNATools {
               String from = te.getAttribute("from");
               String to = te.getAttribute("to");
 
-	      //
-	      // Not the most elegant solution, but I wanted this working
-	      // quickly for 1.1.  It's been broken for ages.
-	      //     -td 26/i/20001
-	      //
+              //
+              // Not the most elegant solution, but I wanted this working
+              // quickly for 1.1.  It's been broken for ages.
+              //     -td 26/i/20001
+              //
 
-	      SymbolList fromSymbols = RNATools.createRNA(from);
-	      if (fromSymbols.length() != 3) {
-		  throw new BioError("`" + from + "' is not a valid codon");
-	      }
+              SymbolList fromSymbols = RNATools.createRNA(from);
+              if (fromSymbols.length() != 3) {
+                  throw new BioError("`" + from + "' is not a valid codon");
+              }
 
               // AtomicSymbol fromS = (AtomicSymbol) sourceP.parseToken(from);
-	      AtomicSymbol fromS = (AtomicSymbol) sourceA.getSymbol(fromSymbols.toList());
+              AtomicSymbol fromS = (AtomicSymbol) sourceA.getSymbol(fromSymbols.toList());
               AtomicSymbol toS   = (AtomicSymbol) targetP.parseToken(to);
               table.setTranslation(fromS, toS);
             }
@@ -431,15 +439,15 @@ public final class RNATools {
       throw new BioError(e, "Couldn't parse TranslationTables.xml");
     }
   }
-  
+
   private abstract static class AbstractTT
   implements ReversibleTranslationTable {
     protected abstract AtomicSymbol doTranslate(AtomicSymbol sym)
     throws IllegalSymbolException;
     protected abstract AtomicSymbol doUntranslate(AtomicSymbol sym)
     throws IllegalSymbolException;
-    
-    
+
+
     public Symbol translate(Symbol s)
     throws IllegalSymbolException {
       if(s instanceof AtomicSymbol) {
@@ -456,7 +464,7 @@ public final class RNATools {
         return getTargetAlphabet().getAmbiguity(syms);
       }
     }
-    
+
     public Symbol untranslate(Symbol s)
     throws IllegalSymbolException {
       if(s instanceof AtomicSymbol) {
@@ -474,7 +482,7 @@ public final class RNATools {
       }
     }
   }
-  
+
   /**
    * Sneaky class for complementing RNA bases.
    */
@@ -482,22 +490,22 @@ public final class RNATools {
   private static class RNAComplementTranslationTable
   extends AbstractTT {
     public AtomicSymbol doTranslate(AtomicSymbol s)
-	  throws IllegalSymbolException {
-	    return (AtomicSymbol) RNATools.complement(s);
-	  }
+          throws IllegalSymbolException {
+            return (AtomicSymbol) RNATools.complement(s);
+          }
 
-	  public AtomicSymbol doUntranslate(AtomicSymbol s)
-	  throws IllegalSymbolException {
-	    return (AtomicSymbol) RNATools.complement(s);
+          public AtomicSymbol doUntranslate(AtomicSymbol s)
+          throws IllegalSymbolException {
+            return (AtomicSymbol) RNATools.complement(s);
     }
 
-	  public Alphabet getSourceAlphabet() {
-	    return RNATools.getRNA();
-	  }
+          public Alphabet getSourceAlphabet() {
+            return RNATools.getRNA();
+          }
 
-	  public Alphabet getTargetAlphabet() {
-	    return RNATools.getRNA();
-	  }
+          public Alphabet getTargetAlphabet() {
+            return RNATools.getRNA();
+          }
   }
 }
 

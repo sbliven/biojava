@@ -37,15 +37,15 @@ import org.biojava.bio.symbol.*;
 public final class DNATools {
   private static final ReversibleTranslationTable complementTable;
   static private final FiniteAlphabet dna;
-    private static final SymbolTokenization dnaTokens;  
-  
+    private static final SymbolTokenization dnaTokens;
+
   static private final AtomicSymbol a;
   static private final AtomicSymbol g;
   static private final AtomicSymbol c;
   static private final AtomicSymbol t;
   static private final Symbol n;
 
-    
+
   static private Map symbolToComplement;
 
   static {
@@ -58,24 +58,24 @@ public final class DNATools {
       c = (AtomicSymbol) syms.symbolAt(3);
       t = (AtomicSymbol) syms.symbolAt(4);
       n = syms.symbolAt(5);
-      
+
       symbolToComplement = new HashMap();
 
       // add the gap symbol
       Symbol gap = dna.getGapSymbol();
       symbolToComplement.put(gap, gap);
-      
+
       // add all other ambiguity symbols
       for(Iterator i = AlphabetManager.getAllSymbols(dna).iterator(); i.hasNext();) {
-	  Symbol as = (Symbol) i.next();
-	  FiniteAlphabet matches = (FiniteAlphabet) as.getMatches();
-	  if (matches.size() > 1) {   // We've hit an ambiguous symbol.
-	      Set l = new HashSet();
-	      for(Iterator j = matches.iterator(); j.hasNext(); ) {
-		  l.add(complement((Symbol) j.next()));
-	      }
-	      symbolToComplement.put(as, dna.getAmbiguity(l));
-	  }
+          Symbol as = (Symbol) i.next();
+          FiniteAlphabet matches = (FiniteAlphabet) as.getMatches();
+          if (matches.size() > 1) {   // We've hit an ambiguous symbol.
+              Set l = new HashSet();
+              for(Iterator j = matches.iterator(); j.hasNext(); ) {
+                  l.add(complement((Symbol) j.next()));
+              }
+              symbolToComplement.put(as, dna.getAmbiguity(l));
+          }
       }
 
 
@@ -84,7 +84,7 @@ public final class DNATools {
       throw new BioError(t, "Unable to initialize DNATools");
     }
   }
-  
+
   public static AtomicSymbol a() { return a; }
   public static AtomicSymbol g() { return g; }
   public static AtomicSymbol c() { return c; }
@@ -98,6 +98,14 @@ public final class DNATools {
    */
   public static FiniteAlphabet getDNA() {
     return dna;
+  }
+
+  /**
+   * Gets the (DNA x DNA x DNA) Alphabet
+   * @return a flyweight version of the (DNA x DNA x DNA) alphabet
+   */
+  public static FiniteAlphabet getCodonAlphabet(){
+    return (FiniteAlphabet)AlphabetManager.generateCrossProductAlphaFromName("(DNA x DNA x DNA)");
   }
 
   /**
@@ -142,7 +150,7 @@ public final class DNATools {
       throw new BioError(se, "Something has gone badly wrong with DNA");
     }
   }
-  
+
   /**
    * Return an integer index for a symbol - compatible with
    * <code>forIndex</code>.
@@ -172,7 +180,7 @@ public final class DNATools {
     throw new IllegalSymbolException("Really confused. Can't find index for " +
                                       sym.getName());
   }
-  
+
   /**
    * Return the symbol for an index - compatible with <code>index</code>.
    *
@@ -198,7 +206,7 @@ public final class DNATools {
       return t;
     else throw new IndexOutOfBoundsException("No symbol for index " + index);
   }
-  
+
   /**
    * Complement the symbol.
    *
@@ -228,7 +236,7 @@ public final class DNATools {
       );
     }
   }
-  
+
   /**
    * Retrieve the symbol for a symbol.
    *
@@ -249,7 +257,7 @@ public final class DNATools {
     }
     throw new IllegalSymbolException("Unable to find symbol for token " + token);
   }
-  
+
   /**
    * Retrieve a complement view of list.
    *
@@ -273,7 +281,7 @@ public final class DNATools {
   throws IllegalAlphabetException {
     return SymbolListViews.translate(SymbolListViews.reverse(list), complementTable());
   }
-  
+
   /**
    * Get a translation table for complementing DNA symbols.
    *
@@ -283,7 +291,7 @@ public final class DNATools {
   public static ReversibleTranslationTable complementTable() {
     return complementTable;
   }
-    
+
     /**
      * Get a single-character token for a DNA symbol
      *
@@ -293,7 +301,7 @@ public final class DNATools {
     public static char dnaToken(Symbol sym)
         throws IllegalSymbolException
     {
-	return dnaTokens.tokenizeSymbol(sym).charAt(0);
+        return dnaTokens.tokenizeSymbol(sym).charAt(0);
     }
 
   /**
@@ -302,23 +310,23 @@ public final class DNATools {
 
   private static class DNAComplementTranslationTable
   implements ReversibleTranslationTable {
-    public Symbol translate(Symbol s) 
-	  throws IllegalSymbolException {
-	    return DNATools.complement(s);
-	  }
+    public Symbol translate(Symbol s)
+          throws IllegalSymbolException {
+            return DNATools.complement(s);
+          }
 
-    public Symbol untranslate(Symbol s) 
-	  throws IllegalSymbolException	{
-	    return DNATools.complement(s);
-	  }
+    public Symbol untranslate(Symbol s)
+          throws IllegalSymbolException	{
+            return DNATools.complement(s);
+          }
 
-	  public Alphabet getSourceAlphabet() {
-	    return DNATools.getDNA();
-	  }
+          public Alphabet getSourceAlphabet() {
+            return DNATools.getDNA();
+          }
 
-	  public Alphabet getTargetAlphabet() {
-	    return DNATools.getDNA();
-	  }
+          public Alphabet getTargetAlphabet() {
+            return DNATools.getDNA();
+          }
   }
 }
 

@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.SymbolList;
+import java.util.*;
 
 /**
  * <code>DNAToolsTest</code> tests are to ensure that the class can be
@@ -65,6 +66,11 @@ public class DNAToolsTest extends TestCase
     {
         assertEquals(AlphabetManager.alphabetForName("DNA"),
                      DNATools.getDNA());
+    }
+
+    public void testGetCodon(){
+      List l = Collections.nCopies(3, DNATools.getDNA());
+      assertEquals(DNATools.getCodonAlphabet(), AlphabetManager.getCrossProductAlphabet(l));
     }
 
     public void testCreateDNA() throws Exception
