@@ -34,6 +34,11 @@ package org.biojava.utils;
 public class ChangeVetoException extends NestedException {
   private final ChangeEvent change;
 
+  public ChangeVetoException() {
+    super();
+    change = null;
+  }
+  
   /**
    *  Construct an exception to veto a change without explanation. 
    *
