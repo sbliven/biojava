@@ -30,13 +30,22 @@ import org.biojava.bio.seq.homol.SimilarityPairFeature;
 
 /**
  * A filter for accepting or rejecting a feature.
+ *
  * <p>
- * This may implement arbitrary rules, or be based upon the feature's
- * annotation, type, location or source.
+ * It is possible to write custom <code>FeatureFilter</code>s by implementing this
+ * interface.  There are also a wide range of built-in features, and it is possible
+ * to build complex queries using <code>FeatureFilter.And</code>, <code>FeatureFilter.Or</code>,
+ * and <code>FeatureFilter.Not</code>.  Where possible, use of the built-in filters
+ * is preferable to writing new filters, since the methods in the <code>FilterUtils</code>
+ * class have access to special knowledge about the built-in filter types and how they
+ * relate to one another.
+ * </p>
+ *
  * <p>
  * If the filter is to be used in a remote process, it is recognized that it may
  * be serialized and sent over to run remotely, rather than each feature being
  * retrieved locally.
+ * </p>
  *
  * @since 1.0
  * @author Matthew Pocock
@@ -53,12 +62,12 @@ public interface FeatureFilter extends Serializable {
   boolean accept(Feature f);
 
   /**
-   * All features are selected in with this filter.
+   * All features are selected by this filter.
    */
   static final public FeatureFilter all = new AcceptAllFilter();
 
   /**
-   * No features are selected in with this filter.
+   * No features are selected by this filter.
    */
   static final public FeatureFilter none = new AcceptNoneFilter();
 
@@ -530,6 +539,12 @@ public interface FeatureFilter extends Serializable {
       } else if(sup instanceof OverlapsLocation) {
         Location supL = ((OverlapsLocation) sup).getLocation();
         return supL.contains(this.getLocation());
+      } else if (sup instanceof ShadowOverlapsLocation) {
+        Location supL = ((ShadowOverlapsLocation) sup).getLocation();
+        return supL.contains(this.getLocation());
+      } else if (sup instanceof ShadowContainedByLocation) {
+        Location supL = ((ShadowContainedByLocation) sup).getLocation();
+        return supL.contains(this.getLocation());
       }
       return (sup instanceof AcceptAllFilter);
     }
@@ -539,8 +554,14 @@ public interface FeatureFilter extends Serializable {
         Location loc = ((ContainedByLocation) filt).getLocation();
         return !getLocation().overlaps(loc);
       } else if (filt instanceof OverlapsLocation) {
-	  Location filtL = ((OverlapsLocation) filt).getLocation();
-	  return !filtL.overlaps(this.getLocation());
+	    Location filtL = ((OverlapsLocation) filt).getLocation();
+	    return !filtL.overlaps(this.getLocation());
+      } else if (filt instanceof ShadowOverlapsLocation) {
+        Location filtL = ((ShadowOverlapsLocation) filt).getLocation();
+        return filtL.getMax() < loc.getMin() || filtL.getMin() > loc.getMax();
+      } else if (filt instanceof ShadowContainedByLocation) {
+        Location filtL = ((ShadowContainedByLocation) filt).getLocation();
+        return filtL.getMax() < loc.getMin() || filtL.getMin() > loc.getMax();
       }
 
       return (filt instanceof AcceptNoneFilter);
@@ -595,8 +616,11 @@ public interface FeatureFilter extends Serializable {
 
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof OverlapsLocation) {
-        Location supL = ((OverlapsLocation) sup).getLocation();
-        return supL.contains(this.getLocation());
+          Location supL = ((OverlapsLocation) sup).getLocation();
+          return supL.contains(this.getLocation());
+      } else if (sup instanceof ShadowOverlapsLocation) {
+          Location supL = ((ShadowOverlapsLocation) sup).getLocation();
+          return supL.contains(this.getLocation());
       }
       return (sup instanceof AcceptAllFilter);
     }
@@ -605,12 +629,182 @@ public interface FeatureFilter extends Serializable {
       if (filt instanceof ContainedByLocation)  {
         Location loc = ((ContainedByLocation) filt).getLocation();
         return !getLocation().overlaps(loc);
+      } else if (filt instanceof ShadowContainedByLocation) {
+        Location loc = ((ShadowContainedByLocation) filt).getLocation();
+        return getLocation().getMax() < loc.getMin() || getLocation().getMin() > loc.getMax();
       }
       return (filt instanceof AcceptNoneFilter);
     }
     
     public String toString() {
       return "Overlaps(" + loc + ")";
+    }
+  }
+  
+  /**
+   *  A filter that accepts all features whose shadow overlaps a specified
+   * <code>Location</code>.  The shadow is defined as the interval between the
+   * minimum and maximum positions of the feature's location.  For features
+   * with contiguous locations, this filter is equivalent to
+   * <code>FeatureFilter.OverlapsLocation</code>..
+   *
+   * <p>
+   * A typical use of this filter is in graphics code where you are rendering
+   * features with non-contiguous locations in a `blocks and connectors' style,
+   * and wish to draw the connector even when no blocks fall within the
+   * selected field of view
+   * </p>
+   *
+   * @author Thomas Down
+   * @since 1.3
+   */
+   
+  public final static class ShadowOverlapsLocation implements OptimizableFilter {
+    private Location loc;
+
+    public Location getLocation() {
+      return loc;
+    }
+
+    /**
+     * Creates a filter that returns everything overlapping loc.
+     *
+     * @param loc  the location that will overlap the accepted features
+     */
+    public ShadowOverlapsLocation(Location loc) {
+        if (loc == null) {
+            throw new NullPointerException("Loc may not be null");
+        }
+        this.loc = loc;
+    }
+
+    /**
+     * Returns true if the feature overlaps this filter's location.
+     */
+    public boolean accept(Feature f) {
+        Location floc = f.getLocation();
+        if (!floc.isContiguous()) {
+            floc = new RangeLocation(floc.getMin(), floc.getMax());
+        }
+        return loc.overlaps(floc);
+    }
+
+    public boolean equals(Object o) {
+      return
+        (o instanceof ShadowOverlapsLocation) &&
+        (((ShadowOverlapsLocation) o).getLocation().equals(this.getLocation()));
+    }
+
+    public int hashCode() {
+      return getLocation().hashCode() +77;
+    }
+
+    public boolean isProperSubset(FeatureFilter sup) {
+      if(sup instanceof ShadowOverlapsLocation) {
+        Location supL = ((ShadowOverlapsLocation) sup).getLocation();
+        return supL.contains(this.getLocation());
+      }
+      return (sup instanceof AcceptAllFilter);
+    }
+
+    public boolean isDisjoint(FeatureFilter filt) {
+      if (filt instanceof ShadowContainedByLocation)  {
+          Location loc = ((ShadowContainedByLocation) filt).getLocation();
+          return !getLocation().overlaps(loc);
+      }  else if (filt instanceof ContainedByLocation) {
+          Location loc = ((ContainedByLocation) filt).getLocation();
+          return (loc.getMax() < getLocation().getMin() || loc.getMin() > getLocation().getMax());
+      }
+      return (filt instanceof AcceptNoneFilter);
+    }
+    
+    public String toString() {
+      return "ShadowOverlaps(" + loc + ")";
+    }
+  }
+  
+  /**
+   *  A filter that accepts all features whose shadow is contained by a specified
+   * <code>Location</code>.  The shadow is defined as the interval between the
+   * minimum and maximum positions of the feature's location.  For features
+   * with contiguous locations, this filter is equivalent to
+   * <code>FeatureFilter.ContainedByLocation</code>.
+   *
+   * @author Thomas Down
+   * @since 1.3
+   */
+
+  public final static class ShadowContainedByLocation implements OptimizableFilter {
+    private Location loc;
+
+    public Location getLocation() {
+      return loc;
+    }
+
+    /**
+     * Creates a filter that returns everything contained within loc.
+     *
+     * @param loc  the location that will contain the accepted features
+     */
+    public ShadowContainedByLocation(Location loc) {
+        if (loc == null) {
+            throw new NullPointerException("Loc may not be null");
+        }
+        this.loc = loc;
+    }
+
+    /**
+     * Returns true if the feature is within this filter's location.
+     */
+    public boolean accept(Feature f) {
+        Location floc = f.getLocation();
+        if (!floc.isContiguous()) {
+            floc = new RangeLocation(floc.getMin(), floc.getMax());
+        }
+        return loc.contains(floc);
+    }
+
+    public boolean equals(Object o) {
+      return
+        (o instanceof ShadowContainedByLocation) &&
+        (((ShadowContainedByLocation) o).getLocation().equals(this.getLocation()));
+    }
+
+    public int hashCode() {
+      return getLocation().hashCode() + 88;
+    }
+
+    public boolean isProperSubset(FeatureFilter sup) {
+      if(sup instanceof ShadowContainedByLocation) {
+        Location supL = ((ShadowContainedByLocation) sup).getLocation();
+        return supL.contains(this.getLocation());
+      } else if (sup instanceof ShadowOverlapsLocation) {
+        Location supL = ((ShadowOverlapsLocation) sup).getLocation();
+        return supL.contains(this.getLocation());
+      }
+      return (sup instanceof AcceptAllFilter);
+    }
+
+    public boolean isDisjoint(FeatureFilter filt) {
+      if(filt instanceof ContainedByLocation) {
+        Location filtL = ((ShadowContainedByLocation) filt).getLocation();
+        return filtL.getMax() < loc.getMin() || filtL.getMin() > loc.getMax();
+      } if(filt instanceof ShadowContainedByLocation) {
+        Location loc = ((ShadowContainedByLocation) filt).getLocation();
+        return !getLocation().overlaps(loc);
+      } else if (filt instanceof OverlapsLocation) {
+	    Location filtL = ((OverlapsLocation) filt).getLocation();
+	    return filtL.getMax() < loc.getMin() || filtL.getMin() > loc.getMax();
+      } else if (filt instanceof ShadowOverlapsLocation) {
+        Location filtL = ((ShadowOverlapsLocation) filt).getLocation();
+        return !filtL.overlaps(this.getLocation());
+      }
+
+      return (filt instanceof AcceptNoneFilter);
+    }
+
+    public String toString() {
+      return "ShadowContainedBy(" + loc + ")";
     }
   }
   
@@ -1537,8 +1731,21 @@ public interface FeatureFilter extends Serializable {
         }
     }
     
+    /**
+     * A filter which accepts only top-level Features.  This is true
+     * is <code>getParent()</code> returns a <code>Sequence</code> instance.
+     *
+     * @since 1.3
+     */
+    
     public static final FeatureFilter top_level = new IsTopLevel();
 
+    /**
+     * A filter which accepts features with no children
+     *
+     * @since 1.3
+     */
+    
     public static final FeatureFilter leaf = new IsLeaf();
     
     // Note: this implements OptimizableFilter, but cheats :-).  Consequently,
