@@ -75,27 +75,35 @@ public class MotifTools
                 throw new IllegalArgumentException("SymbolList alphabet did not have a character token type");
 
             int motifLen = motif.length();
+            Symbol gap = AlphabetManager.getGapSymbol();
 
             for (int i = 1; i <= motifLen; i++)
             {
                 Symbol sym = motif.symbolAt(i);
                 FiniteAlphabet ambiAlpha = (FiniteAlphabet) sym.getMatches();
 
-                Symbol [] ambiSyms = (Symbol [])
-                    AlphabetManager.getAllSymbols(ambiAlpha).toArray(symProto);
-
-                // getAllSymbols returns a Set (i.e. unordered) so
-                // we convert to char array so we can sort tokens
-                char [] ambiChars = new char [ambiSyms.length];
-
-                for (int j = 0; j < ambiSyms.length; j++)
+                if (ambiAlpha.size() == 1)
                 {
-                    ambiChars[j] =
-                        sToke.tokenizeSymbol(ambiSyms[j]).charAt(0);
+                    sb.append(sToke.tokenizeSymbol(sym));
                 }
+                else
+                {
+                    Symbol [] ambiSyms = (Symbol [])
+                        AlphabetManager.getAllSymbols(ambiAlpha).toArray(symProto);
 
-                Arrays.sort(ambiChars);
-                sb.append(ambiChars);
+                    // getAllSymbols returns a Set (i.e. unordered) so
+                    // we convert to char array so we can sort tokens
+                    char [] ambiChars = new char [ambiSyms.length];
+
+                    for (int j = 0; j < ambiSyms.length; j++)
+                    {
+                        ambiChars[j] =
+                            sToke.tokenizeSymbol(ambiSyms[j]).charAt(0);
+                    }
+
+                    Arrays.sort(ambiChars);
+                    sb.append(ambiChars);
+                }
 
                 String result = sb.substring(0);
 

@@ -45,6 +45,8 @@ public class MotifToolsTest
             AlphabetManager.getAllSymbols(na).toArray(new Symbol [0]);
         char [] nChars = new char [nSyms.length];
 
+        Symbol gap = AlphabetManager.getGapSymbol();
+
         for (int i = 0; i < nSyms.length; i++)
         {
             nChars[i] = sTok.tokenizeSymbol(nSyms[i]).charAt(0);
