@@ -113,7 +113,7 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
     {
         protected void setStringValue(String s)
         {
-            ssContext.getSearchContentHandler().addHitProperty("queryDescription", s);
+            ssContext.getSearchContentHandler().addSearchProperty("queryDescription", s);
         }
     }
 
