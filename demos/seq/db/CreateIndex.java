@@ -30,7 +30,7 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.db.*;
 
 /**
- * This demo file is a simple implementation of pairwise-alignment.
+ * This demo file is a simple implementation of an index file generator.
  *
  * @author Matthew Pocock
  */

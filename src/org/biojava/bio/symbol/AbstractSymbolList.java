@@ -55,9 +55,9 @@ import org.biojava.bio.*;
  */
 
 
-public abstract class AbstractSymbolList implements SymbolList {
-  protected transient ChangeSupport changeSupport = null;
-  
+public abstract class AbstractSymbolList
+extends AbstractChangeable
+implements SymbolList {
   protected AbstractSymbolList() {
   }
 
@@ -94,58 +94,6 @@ public abstract class AbstractSymbolList implements SymbolList {
     );
   }
   
-  /**
-   * If there is any work that you need to do when the ChangeSupport is
-   * instantiated, override this method. You should emediately call
-   * super.generateChangeSupport, and then create any event forarders and the
-   * like.
-   * <P>
-   * You can use the changeType field to decide if event forwarders need to be
-   * instantiated or not. If nobody is interested, then wait.
-   *
-   * @param changeType  the ChangeType that a ChangeListener is interested in or
-   *        null if it interested in everything
-   */
-
-  protected void generateChangeSupport(ChangeType changeType) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
-  }
-
-
   /**
    *  
    * An Iterator over each Symbol in a range of a SymbolList.
@@ -203,10 +151,11 @@ public abstract class AbstractSymbolList implements SymbolList {
    * @author     Matthew Pocock
    */
 
-  private class SubList implements SymbolList, Serializable {
+  private class SubList
+  extends AbstractChangeable
+  implements SymbolList, Serializable {
     private int start, end;
 
-    private transient ChangeSupport changeSupport = null;
     private transient EditTranslater editTranslater = null;
     private transient Annotatable.AnnotationForwarder annotationForwarder = null;
 
@@ -279,16 +228,14 @@ public abstract class AbstractSymbolList implements SymbolList {
       ));
     }
     
-    private void generateChangeSupport(ChangeType changeType) {
-      if(changeSupport == null) {
-        changeSupport = new ChangeSupport();
-      }
+    protected ChangeSupport getChangeSupport(ChangeType changeType) {
+      ChangeSupport cs = super.getChangeSupport(changeType);
       
       if(
         ((changeType == null) || (changeType == SymbolList.EDIT)) &&
         (editTranslater == null)
       ) {
-        editTranslater = new EditTranslater(this, changeSupport, start, end);
+        editTranslater = new EditTranslater(this, cs, start, end);
         AbstractSymbolList.this.addChangeListener(editTranslater, SymbolList.EDIT);
       }
             
@@ -296,41 +243,11 @@ public abstract class AbstractSymbolList implements SymbolList {
         ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
         (annotationForwarder == null)
       ) {
-        annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);
+        annotationForwarder = new Annotatable.AnnotationForwarder(this, cs);
         AbstractSymbolList.this.addChangeListener(annotationForwarder, Annotation.PROPERTY);
       }
-    }
-    
-    public void addChangeListener(ChangeListener cl) {
-      generateChangeSupport(null);
       
-      synchronized(changeSupport) {
-        changeSupport.addChangeListener(cl);
-      }
-    }
-    
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-      generateChangeSupport(ct);
-      
-      synchronized(changeSupport) {
-        changeSupport.addChangeListener(cl, ct);
-      }
-    }
-    
-    public void removeChangeListener(ChangeListener cl) {
-      if(changeSupport != null) {
-        synchronized(changeSupport) {
-          changeSupport.removeChangeListener(cl);
-        }
-      }
-    }
-    
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-      if(changeSupport != null) {
-        synchronized(changeSupport) {
-          changeSupport.removeChangeListener(cl, ct);
-        }
-      }
+      return cs;
     }
   }
 
