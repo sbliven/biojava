@@ -824,4 +824,155 @@ public interface FeatureFilter extends Serializable {
       );
     }
   }
+
+    /**
+     * Filter by applying a nested <code>FeatureFilter</code> to the
+     * parent feature.  Always <code>false</code> if the parent
+     * is not a feature (e.g. top-level features, where the
+     * parent is a sequence).
+     *
+     * @author Thomas Down
+     * @since 1.2
+     */
+
+    public static class ByParent implements OptimizableFilter {
+	private FeatureFilter filter;
+
+	public ByParent(FeatureFilter ff) {
+	    filter = ff;
+	}
+
+	public FeatureFilter getFilter() {
+	    return filter;
+	}
+
+	public boolean accept(Feature f) {
+	    FeatureHolder fh = f.getParent();
+	    if (fh instanceof Feature) {
+		return filter.accept((Feature) fh);
+	    }
+
+	    return false;
+	}
+
+	public int hashCode() {
+	    return filter.hashCode() + 173;
+	}
+
+	public boolean equals(Object o) {
+	    if (! (o instanceof FeatureFilter.ByParent)) {
+		return false;
+	    }
+
+	    FeatureFilter.ByParent ffbp = (FeatureFilter.ByParent) o;
+	    return ffbp.getFilter().equals(filter);
+	}
+
+	public boolean isProperSubset(FeatureFilter ff) {
+	    FeatureFilter ancFilter = null;
+	    if (ff instanceof FeatureFilter.ByParent) {
+		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
+	    } else if (ff instanceof FeatureFilter.ByAncestor) {
+		ancFilter = ((FeatureFilter.ByAncestor) ff).getFilter();
+	    }
+
+	    if (ancFilter != null) {
+		return FilterUtils.areProperSubset(ancFilter, filter);
+	    } else {
+		return false;
+	    }
+	}
+
+	public boolean isDisjoint(FeatureFilter ff) {
+	    FeatureFilter ancFilter = null;
+	    if (ff instanceof FeatureFilter.ByParent) {
+		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
+	    } 
+
+	    if (ancFilter != null) {
+		return FilterUtils.areDisjoint(ancFilter, filter);
+	    } else {
+		return false;
+	    }
+	}
+    }
+
+    /**
+     * Filter by applying a nested <code>FeatureFilter</code> to all
+     * ancestor features.  Returns <code>true</code> if at least one
+     * of them matches the filter.  Always <code>false</code> if the
+     * parent is not a feature (e.g. top-level features, where the
+     * parent is a sequence).
+     *
+     * @author Thomas Down
+     * @since 1.2 
+     */
+
+    public static class ByAncestor implements OptimizableFilter {
+	private FeatureFilter filter;
+
+	public ByAncestor(FeatureFilter ff) {
+	    filter = ff;
+	}
+
+	public FeatureFilter getFilter() {
+	    return filter;
+	}
+
+	public boolean accept(Feature f) {
+	    do {
+		FeatureHolder fh = f.getParent();
+		if (fh instanceof Feature) {
+		    f = (Feature) fh;
+		    if (filter.accept(f)) {
+			return true;
+		    }
+		} else {
+		    return false;
+		}
+	    } while (true);
+	}
+
+	public int hashCode() {
+	    return filter.hashCode() + 186;
+	}
+
+	public boolean equals(Object o) {
+	    if (! (o instanceof FeatureFilter.ByAncestor)) {
+		return false;
+	    }
+
+	    FeatureFilter.ByAncestor ffba = (FeatureFilter.ByAncestor) o;
+	    return ffba.getFilter().equals(filter);
+	}
+
+
+	public boolean isProperSubset(FeatureFilter ff) {
+	    FeatureFilter ancFilter = null;
+	    if (ff instanceof FeatureFilter.ByAncestor) {
+		ancFilter = ((FeatureFilter.ByAncestor) ff).getFilter();
+	    }
+
+	    if (ancFilter != null) {
+		return FilterUtils.areProperSubset(ancFilter, filter);
+	    } else {
+		return false;
+	    }
+	}
+
+	public boolean isDisjoint(FeatureFilter ff) {
+	    FeatureFilter ancFilter = null;
+	    if (ff instanceof FeatureFilter.ByParent) {
+		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
+	    } else if (ff instanceof FeatureFilter.ByParent) {
+		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
+	    } 
+
+	    if (ancFilter != null) {
+		return FilterUtils.areDisjoint(ancFilter, filter);
+	    } else {
+		return false;
+	    }
+	}
+    }
 }

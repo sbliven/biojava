@@ -46,6 +46,11 @@ public class FilterUtilsTest extends TestCase
     protected FeatureFilter cf_ComponentFeature;
     protected FeatureFilter cf_SpliceVariant;
 
+    protected FeatureFilter parent_cf_ComponentFeature;
+    protected FeatureFilter ancestor_cf_ComponentFeature;
+    protected FeatureFilter not_parent_cf_ComponentFeature;
+    protected FeatureFilter not_ancestor_cf_ComponentFeature;
+
     protected FeatureFilter ntf1;
     protected FeatureFilter ntf2;
 
@@ -111,6 +116,10 @@ public class FilterUtilsTest extends TestCase
 	ntf1 = new FeatureFilter.Not(tf1);
 	ntf2 = new FeatureFilter.Not(tf2);
 
+	//
+	// Various locations
+	//
+
 	Location l1 = new RangeLocation(1000, 2000);
 	Location l2 = new RangeLocation(10000, 11000);
 	Location l3 = new PointLocation(10500);
@@ -126,6 +135,10 @@ public class FilterUtilsTest extends TestCase
 	clf3 = new FeatureFilter.ContainedByLocation(l3);
 	clf4 = new FeatureFilter.ContainedByLocation(l4);
 
+	//
+	// ANDs and ORs
+	//
+
 	tf1_or_tf2 = new FeatureFilter.Or(tf1, tf2);
 	tf2_or_tf3 = new FeatureFilter.Or(tf2, tf3);
 	tf1_or_tf3 = new FeatureFilter.Or(tf1, tf3);
@@ -140,6 +153,16 @@ public class FilterUtilsTest extends TestCase
 
 	pf1_AND_tf1_or_tf2 = new FeatureFilter.And(pf1, tf1_or_tf2);
 	pf1_and_pf2_OR_tf1 = new FeatureFilter.Or(pf1_and_pf2, tf1);
+
+	//
+	// Parent and Ancestor filters.
+	//
+	
+	parent_cf_ComponentFeature = new FeatureFilter.ByParent(cf_ComponentFeature);
+	ancestor_cf_ComponentFeature = new FeatureFilter.ByAncestor(cf_ComponentFeature);
+	not_parent_cf_ComponentFeature = new FeatureFilter.Not(parent_cf_ComponentFeature);
+	not_ancestor_cf_ComponentFeature = new FeatureFilter.Not(ancestor_cf_ComponentFeature);
+	
     }
 
     public void testTypes() throws Exception {
@@ -217,5 +240,12 @@ public class FilterUtilsTest extends TestCase
     public void testAndOr() throws Exception {
 	assertTrue(FilterUtils.areProperSubset(pf1_and_tf1, pf1_AND_tf1_or_tf2));
 	assertTrue(FilterUtils.areProperSubset(pf1_and_pf2_and_tf1, pf1_and_pf2_OR_tf1));
+    }
+
+    public void testParentAncestor() throws Exception {
+	assertTrue(FilterUtils.areProperSubset(parent_cf_ComponentFeature, ancestor_cf_ComponentFeature));
+	assertTrue(! FilterUtils.areProperSubset(ancestor_cf_ComponentFeature, parent_cf_ComponentFeature));
+	assertTrue(FilterUtils.areDisjoint(ancestor_cf_ComponentFeature, not_ancestor_cf_ComponentFeature));
+	assertTrue(FilterUtils.areDisjoint(not_ancestor_cf_ComponentFeature, parent_cf_ComponentFeature));
     }
 }

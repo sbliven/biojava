@@ -230,7 +230,10 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 		    }
 		} );
 	    } else if ("TARGET".equals(localName)) {
-		target_id = attrs.getValue("ref");
+		target_id = attrs.getValue("id");
+		if (target_id == null) {
+		    target_id = attrs.getValue("ref");
+		}
 		try {
 		    target_start = Integer.parseInt(attrs.getValue("start"));
 		    target_stop = Integer.parseInt(attrs.getValue("stop"));
