@@ -109,7 +109,7 @@ public class QueryBuilder extends QueryData {
   }
   
   public Query buildQuery() {
-    return new SimpleQuery(nodes, operationsToLabel);
+    return new SimpleQuery(this);
   }
 
   // ensures that superType is infact a supertype of subType - that is
