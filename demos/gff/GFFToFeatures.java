@@ -27,35 +27,34 @@ public class GFFToFeatures {
       }
     
       // load in the GFF
-      System.out.println("Loading gff");
-      GFFRecordFilter.SourceFilter filter = new GFFRecordFilter.SourceFilter();
-      filter.setSource("hand_built");
-      GFFEntrySet gffEntries = loadGFF(new File(args[1]), filter);
-      System.out.println("Features:");
-      for(Iterator i = gffEntries.lineIterator(); i.hasNext(); ) {
-        Object o = i.next();
-        if(o instanceof GFFRecord) {
-          GFFRecord rec = (GFFRecord) o;
-          System.out.println("\t" + rec.getSeqName());
-        }
-      }
-    
+      System.out.println("Loading gff with 'hand_built' source");
+
+      GFFEntrySet gffEntries = new GFFEntrySet();
+
+      GFFRecordFilter.SourceFilter sFilter = new GFFRecordFilter.SourceFilter();
+      sFilter.setSource("hand_built");
+      GFFFilterer filterer = new GFFFilterer(gffEntries.getAddHandler(), sFilter);
+
+      GFFParser parser = new GFFParser();
+      parser.parse(
+        new BufferedReader(
+          new InputStreamReader(
+            new FileInputStream(
+              new File(args[1])))),
+        filterer);
+
       // add the features to the sequences
       System.out.println("Adding features from gff to sequences");
       gffEntries.getAnnotator().annotate(seqDB);
     
-      // print something out...
-      System.out.println("Printing out annotated sequences");
-      for(SequenceIterator si = seqDB.sequenceIterator(); si.hasNext(); ) {
-        Sequence seq = si.nextSequence();
-        System.out.println("\t" + seq.getName());
-        for(Iterator i = seq.features(); i.hasNext(); ) {
-          Feature feature = (Feature) i.next();
-          System.out.println(
-            "\t\t" + feature
-          );
-        }
-      }
+      // now converting back to gff
+      System.out.println("Dumping sequence features as GFF");
+      PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
+      GFFWriter writer = new GFFWriter(out);
+      SequenceDBAsGFF seqDBAsGFF = new SequenceDBAsGFF();
+      
+      seqDBAsGFF.processDB(seqDB, writer);
+      
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -81,12 +80,5 @@ public class GFFToFeatures {
     }
     
     return seqDB;
-  }
-  
-  private static GFFEntrySet loadGFF(File gffFile, GFFRecordFilter filter)
-  throws Exception {
-    BufferedReader bReader = new BufferedReader(
-      new InputStreamReader(new FileInputStream(gffFile)));
-    return new GFFEntrySet(new GFFParser(), bReader, filter);
   }
 }
