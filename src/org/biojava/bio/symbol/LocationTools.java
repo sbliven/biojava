@@ -7,6 +7,7 @@ import java.util.*;
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Thomas Down
+ * @author Mark Schreiber (makeCircularLocation)
  * @since 1.2
  */
 final public class LocationTools {
@@ -374,7 +375,6 @@ final public class LocationTools {
      * be applied to (for purposes of determining origin).
      * @throws IllegalArgumentException if min, max, or seqLength are 0;
      *
-     * @author Mark Schreiber
      */
     public static CircularLocation makeCircularLocation(int min,
                     int max, int seqLength){

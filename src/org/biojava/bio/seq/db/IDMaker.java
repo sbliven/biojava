@@ -40,6 +40,7 @@ public interface IDMaker {
    * Calculate the id for a sequence.
    * <p>
    * Each unique sequence should return a unique ID.
+   * @author Matthew Pocock
    *
    * @param seq the sequence to ID
    * @return the id for the sequence
@@ -50,7 +51,6 @@ public interface IDMaker {
   /**
    * A simple implementation of IDMaker that hashes by URN.
    *
-   * @author Matthew Pocock
    */
   public final static IDMaker byURN = new ByURN();
   
@@ -75,7 +75,6 @@ public interface IDMaker {
   /**
    * A simple implementation of IDMaker that hashes by sequence name.
    *
-   * @author Matthew Pocock
    */
   public final static IDMaker byName = new ByName();
   

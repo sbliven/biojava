@@ -26,6 +26,9 @@ import java.io.Serializable;
 
 import org.biojava.utils.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public abstract class AbstractAnnotation
   implements
     Annotation,

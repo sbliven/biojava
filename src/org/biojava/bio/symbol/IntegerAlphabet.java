@@ -138,7 +138,7 @@ public class IntegerAlphabet implements Alphabet, Serializable {
   /**
    * @param name Currently only "token" is supported.
    * @return an IntegerParser.
-   * @author Mark Schreiber 3 May 2001.
+   * author Mark Schreiber 3 May 2001.
    */
   public SymbolTokenization getTokenization(String name) {
     if(name.equals("token")){

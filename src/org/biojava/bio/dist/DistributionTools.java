@@ -67,7 +67,6 @@ public class DistributionTools {
    *
    * @param logBase  - the log base for the entropy calculation. 2 is standard.
    * @return  - A HashMap mapping Symbol to <code>(Double)</code> relative entropy.
-   * @author Mark Schreiber
    * @since 1.2
    */
   public static HashMap KLDistance(Distribution observed,
@@ -99,7 +98,6 @@ public class DistributionTools {
    *
    * @param logBase  - the log base for the entropy calculation. 2 is standard.
    * @return  - A HashMap mapping Symbol to <code>(Double)</code> entropy.
-   * @author Mark Schreiber
    * @since 1.2
    */
   public static HashMap shannonEntropy(Distribution observed, double logBase){
@@ -125,7 +123,6 @@ public class DistributionTools {
 
   /**
    * Calculates the total bits of information for a distribution.
-   * @author Mark Schreiber
    * @since 1.2
    */
   public static double bitsOfInformation(Distribution observed){
@@ -143,7 +140,6 @@ public class DistributionTools {
    * @throws BioRuntimeException if all sequences don't use the same alphabet
    * @param countGaps if true gaps will be included in the distributions
    * @nullWeight the number of pseudo counts to add to each distribution
-   * @author Mark Schreiber
    * @since 1.2
    */
   public static Distribution[] distOverAlignment(Alignment a,
@@ -193,7 +189,6 @@ public class DistributionTools {
    * No pseudo counts are used.
    * @param countGaps if true gaps will be included in the distributions
    *
-   * @author Mark Schreiber
    * @since 1.2
    */
   public static Distribution[] distOverAlignment(Alignment a,
@@ -203,7 +198,6 @@ public class DistributionTools {
 
   /**
    * Averages two or more distributions. NOTE the current implementation ignore the null model.
-   * @author Mark Schreiber
    * @since 1.2
    */
   public static Distribution average (Distribution [] dists){

@@ -114,7 +114,6 @@ public class CircularView extends ViewSequence{
    * coordinates outside of the sequence length (which are needed to
    * describe locations that overlap the origin of a circular sequence).
    *
-   * @author Mark Schreiber
    * @since 1.2
    */
   public Feature createFeature(Feature.Template template)

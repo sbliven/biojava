@@ -33,6 +33,7 @@ import org.biojava.utils.*;
  * A set of convenience methods for handling common file formats.
  *
  * @author Thomas Down
+ * @author Mark Schreiber (readFasta,writeFasta))
  * @since 1.1
  */
 public class SeqIOTools  {
@@ -166,7 +167,6 @@ public class SeqIOTools  {
    * Note this somewhat duplicates functionality in the readFastaDNA and readFastaProtein methods but
    * uses a stream rather than a reader and returns a SequenceDB rather than a SequenceIterator. If
    * the returned DB is likely to be large then the above mentioned methods should be used.
-   * @author Mark Schreiber
    * @throws BioException if problems occur during reading of the stream.
    * @since 1.2
    */
@@ -187,7 +187,6 @@ public class SeqIOTools  {
 
   /**
    * Write a sequenceDB to an output stream in fasta format
-   * @author Mark Schreiber
    * @since 1.2
    */
   public static void writeFasta(OutputStream os, SequenceDB db) throws IOException{
@@ -198,7 +197,6 @@ public class SeqIOTools  {
    * Writes sequences from a SequenceIterator to an OutputStream in Fasta Format.
    * This makes for a useful format filter where a StreamReader can be sent to the
    * StreamWriter after formatting.
-   * @author Mark Schreiber
    * @since 1.2
    */
    public static void writeFasta(OutputStream os, SequenceIterator in) throws IOException{

@@ -51,7 +51,6 @@ public class PhredTools {
    * @param db a bunch of PhredSequence objects
    * @param qual the OutputStream to write the quality data to.
    * @param seq the OutputStream to write the sequence data to.
-   * @author Mark Schreiber
    * @since 1.2
    */
    public static void writePhredQuality(OutputStream qual, OutputStream seq, SequenceDB db)

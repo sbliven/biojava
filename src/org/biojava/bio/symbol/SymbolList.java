@@ -147,7 +147,6 @@ public interface SymbolList extends Changeable {
    * A useful object that represents an empty symbol list, to avoid returning
    * null.
    *
-   * @author Matthew Pocock
    */
   static final SymbolList EMPTY_LIST = new EmptySymbolList();
     
