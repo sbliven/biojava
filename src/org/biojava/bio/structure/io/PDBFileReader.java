@@ -1,5 +1,3 @@
-
-
 /*
  *                    BioJava development code
  *
@@ -25,7 +23,7 @@
  *
  * some interesting PDB files ...
  * /nfs/disk100/pdb/pdbent/pdb1dw9.ent
- * selenomethionine
+  * chain a first group -> selenomethionine
  */
 package org.biojava.bio.structure.io;
 
