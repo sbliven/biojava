@@ -98,7 +98,7 @@ public class MassCalcTest extends TestCase
      *
      * @exception IllegalSymbolException if an error occurs.
      */
-    public void testGetMass()
+    public void testGetMass() throws IllegalSymbolException
     {
         double delta = 0.0;
         MassCalc mCalc;
@@ -132,7 +132,7 @@ public class MassCalcTest extends TestCase
      * <code>testGetTermMass</code> which returns the terminal mass
      * being added by the instance.
      */
-    public void testGetTermMass()
+    public void testGetTermMass() throws IllegalSymbolException
     {
         double delta = 0.0;
         MassCalc mCalc;

@@ -171,11 +171,13 @@ public class LayeredRenderer {
             double maxP = src.sequenceToGraphics(src.getRange().getMax() + 1) +
                 sRend.getMinimumTrailer(src);
 
+            // Added +1 to these as the outer edge of features was
+            // being clipped off
             if (dir == src.HORIZONTAL) {
-                clip.setFrame(minP, 0.0, maxP - minP, depth);
+                clip.setFrame(minP, 0.0, maxP - minP + 1, depth + 1);
                 g.translate(0.0, offset);
             } else {
-                clip.setFrame(0.0, minP, depth, maxP - minP);
+                clip.setFrame(0.0, minP, depth + 1, maxP - minP + 1);
                 g.translate(offset, 0.0);
             }
 
