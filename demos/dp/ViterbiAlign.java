@@ -95,14 +95,14 @@ public class ViterbiAlign {
       // make dp object
       DP dp = DPFactory.DEFAULT.createDP(model);
       
-      SequenceFactory sFact = new SimpleSequenceFactory();
+      SequenceBuilderFactory sbFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
       FastaFormat fFormat = new FastaFormat();
       SequenceIterator stateI = null;
 
       for(SequenceIterator seqI = new StreamReader(new FileInputStream(seqFile),
                                                    fFormat,
                                                    rParser,
-                                                   sFact);
+                                                   sbFact);
           seqI.hasNext(); )
       {
         Sequence seq = seqI.nextSequence();
@@ -120,7 +120,7 @@ public class ViterbiAlign {
         );
         for(int i = 0; i <= statePath.length() / 60; i++) {
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            CrossProductSymbol x = (CrossProductSymbol) statePath.symbolAt(StatePath.SEQUENCE, j+1);
+            BasisSymbol x = (BasisSymbol) statePath.symbolAt(StatePath.SEQUENCE, j+1);
 	    System.out.print(((Symbol) x.getSymbols().get(0)).getToken());
           }
           System.out.print("\n");

@@ -148,8 +148,8 @@ public class PairwiseAlignment {
     double pEnd = 1.0 - pMatch - 2.0*pGap; 
     
     FiniteAlphabet dna = alpha;
-    CrossProductAlphabet dna2 =
-      AlphabetManager.getCrossProductAlphabet(
+    FiniteAlphabet dna2 =
+      (FiniteAlphabet) AlphabetManager.getCrossProductAlphabet(
         Collections.nCopies(2, dna)
       );
       
@@ -242,7 +242,7 @@ public class PairwiseAlignment {
     double missWeigth = (1.0 - pMatch) / (size - matches);
     
     for(Iterator i = dna2.iterator(); i.hasNext(); ) {
-      CrossProductSymbol cps = (CrossProductSymbol) i.next();
+      BasisSymbol cps = (BasisSymbol) i.next();
       List sl = cps.getSymbols();
       if(sl.get(0) == sl.get(1)) {
         dist.setWeight(cps, matchWeight);

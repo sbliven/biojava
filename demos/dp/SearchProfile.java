@@ -108,7 +108,7 @@ public class SearchProfile {
   throws Exception {
     HashSequenceDB seqDB = new HashSequenceDB(IDMaker.byName);
     
-    SequenceFactory sFact = new SimpleSequenceFactory();
+    SequenceBuilderFactory sbFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
     FastaFormat fFormat = new FastaFormat();
     SequenceIterator stateI = null;
 
@@ -117,7 +117,7 @@ public class SearchProfile {
         new FileInputStream(seqFile),
         fFormat,
         alpha.getParser("token"),
-        sFact
+        sbFact
       );
       seqI.hasNext();
     ) {
