@@ -48,7 +48,7 @@ import org.biojava.utils.Changeable;
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
-public class DummySequenceDB extends AbstractChangeable
+public class DummySequenceDB extends AbstractSequenceDB
     implements SequenceDB
 {
     private String name;

@@ -147,6 +147,10 @@ public class DummySequence extends AbstractChangeable
         return features.filter(ff, recurse);
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return features.filter(ff);
+    }
+    
     public Feature createFeature(Feature.Template template)
         throws BioException, ChangeVetoException
     {

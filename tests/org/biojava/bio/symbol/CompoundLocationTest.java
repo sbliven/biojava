@@ -156,6 +156,10 @@ public class CompoundLocationTest extends TestCase
 		     Location.empty);
 	assertEquals(LocationTools.intersection(r3, r1),
 		     Location.empty);
+	assertEquals(LocationTools.intersection(r1, new RangeLocation(1, 1000)),
+		     r1);
+	assertEquals(LocationTools.intersection(new RangeLocation(1, 1000), r1),
+		     r1);
     }
 
     /**
