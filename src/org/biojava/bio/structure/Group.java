@@ -24,6 +24,10 @@
 package org.biojava.bio.structure;
 import  org.biojava.bio.structure.io.PDBParseException ;
 
+
+import java.util.HashMap ;
+import java.util.ArrayList ;
+
 /**
  *  
  * This is the datastructure for a single Group of atoms.  A protein
@@ -67,11 +71,14 @@ public interface Group {
     public void addAtom(Atom atom);
     
     /** get list of atoms */
-    public Atom[] getAtoms() ;
-    
+    public ArrayList getAtoms() ;
+        
     /** get an atom throws StructureException if atom not found*/
     public Atom getAtom(String name) throws StructureException;
     
+    /** get at atom by position */
+    public Atom getAtom(int position) throws StructureException;
+
     /** returns flag whether a particular atom is existing within this group */
     public boolean hasAtom(String name);
     
@@ -90,4 +97,24 @@ public interface Group {
 	@see getType()
     */
     public boolean hasAminoAtoms() ;
+
+
+
+    /** properties of this amino acid. currerntly available properties
+     * are:
+     * phi
+     * psi
+     * 
+     */
+
+    public void setProperties(HashMap properties) ;
+    
+    /** return properties. @see setProperties() */
+    public HashMap getProperties() ;
+
+    /** set a single property */
+    public void setProperty(String key, Object value) ;
+    /** get a single property */
+    public Object getProperty(String key) ;
+
 }

@@ -25,6 +25,7 @@ package org.biojava.bio.structure;
 import org.biojava.bio.structure.io.PDBParseException;
 
 import java.util.ArrayList ;
+import java.util.HashMap ;
 /**
  *
  * Generic Implementation of a Group interface.
@@ -35,6 +36,9 @@ import java.util.ArrayList ;
 public class Hetatom implements Group {
     
     public static String type = "hetatm" ;
+    
+    HashMap properties ;
+
 
     /* stores if 3d coordinates are available */
     boolean pdb_flag ;
@@ -51,8 +55,13 @@ public class Hetatom implements Group {
 	pdb_flag = false;
 	pdb_name = null ;
 	pdb_code = null ;
-	atoms    = new ArrayList();
+	atoms    = new ArrayList();    
+	properties = new HashMap();
+	
     }
+
+
+
     public boolean has3D() {
 	// TODO Auto-generated method stub
 	return pdb_flag;
@@ -98,9 +107,10 @@ public class Hetatom implements Group {
     public int size(){ return atoms.size();   }
     
     /** get all atoms of this group */
-    public Atom[] getAtoms(){
-	Atom[] atms = (Atom[])atoms.toArray(new Atom[atoms.size()]);
-	return atms ;
+    public ArrayList getAtoms(){
+	//Atom[] atms = (Atom[])atoms.toArray(new Atom[atoms.size()]);
+	
+	return atoms ;
     }
 
     /** get an Atom or null, if Atom not in this group */
@@ -117,6 +127,17 @@ public class Hetatom implements Group {
 
 	throw new StructureException(" No atom "+name + " in group " + pdb_name + " " + pdb_code + " !");
 	
+    }
+
+    /** return an atom by its position in the internal ArrayList */
+    public Atom getAtom(int position) 
+	throws StructureException
+    {
+	if ((position < 0)|| ( position >= atoms.size())) {
+	    throw new StructureException("No atom found at position "+position);
+	}
+	Atom a = (Atom)atoms.get(position);
+	return a ;	
     }
 
     /** test is an Atom with name is existing */
@@ -138,6 +159,8 @@ public class Hetatom implements Group {
 	if (pdb_flag) {
 	    str = str + "atoms: "+atoms.size();
 	}
+
+		    
 	return str ;
 		
     }
@@ -175,6 +198,31 @@ public class Hetatom implements Group {
 	return true ;
     }
 
-    
 
+    /** properties of this amino acid. currerntly available properties
+     * are:
+     * phi
+     * psi
+     * 
+     */
+    public void setProperties(HashMap props) {
+	properties = props ;
+    }
+
+    /** return properties. @see setProperties() */
+    public HashMap getProperties() {
+	return properties ;
+    }
+
+    /** set a single property */
+    public void setProperty(String key, Object value){
+	properties.put(key,value);
+    }
+
+    /** get a single property */
+    public Object getProperty(String key){
+	return properties.get(key);
+    }
+    
+   
 }
