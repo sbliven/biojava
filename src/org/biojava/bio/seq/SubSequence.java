@@ -32,6 +32,7 @@ import java.util.*;
  * features intersecting that region.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.1
  */
 
@@ -123,6 +124,10 @@ public class SubSequence implements Sequence {
 	return features.features();
     }
 
+    public boolean containsFeature(Feature f) {
+      return features.containsFeature(f);
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	return features.filter(ff, recurse);
     }

@@ -21,6 +21,10 @@
 
 package org.biojava.bio.seq;
 
+import java.util.*;
+
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.Location;
 
 /**
@@ -103,7 +107,7 @@ public class FilterUtils {
   /**
    * Recurse over the tree in filt, adding things to polish as we go.
    */
-  private static reversePolish(List polish, filt) {
+  private static void reversePolish(List polish, FeatureFilter filt) {
     if(filt instanceof FeatureFilter.And) {
       FeatureFilter.And and = (FeatureFilter.And) filt;
       FeatureFilter c1 = and.getChild1();
@@ -119,7 +123,7 @@ public class FilterUtils {
       reversePolish(polish, c1);
       reversePolish(polish, c2);
     } else if(filt instanceof FeatureFilter.Or) {
-      FeatureFilter.Or or = (FeatureFilter.AndNot) filt;
+      FeatureFilter.Or or = (FeatureFilter.Or) filt;
       FeatureFilter c1 = or.getChild1();
       FeatureFilter c2 = or.getChild2();
       
@@ -133,5 +137,100 @@ public class FilterUtils {
     }
 
     polish.add(filt);
+  }
+  
+  public FeatureHolder evaluate(FeatureFilter filt, FeatureHolder fh)
+  throws BioException {
+    return evaluatePolish(reversePolish(filt), fh);
+  }
+  
+  public FeatureHolder evaluatePolish(List polish, FeatureHolder fh)
+  throws BioException {
+    try {
+      Stack stack = new Stack();
+      
+      for (Iterator i = polish.iterator(); i.hasNext(); ) {
+        FeatureFilter filt = (FeatureFilter) i.next();
+        
+        if(filt instanceof FeatureFilter.And) {
+          SimpleFeatureHolder result = new SimpleFeatureHolder();
+          FeatureHolder b = (FeatureHolder) stack.pop();
+          FeatureHolder a = (FeatureHolder) stack.pop();
+          
+          // largest set in a
+          if(a.countFeatures() < b.countFeatures()) {
+            FeatureHolder t = a;
+            a = b;
+            b = t;
+          }
+          
+          for(
+            Iterator fi = b.features();
+            fi.hasNext();
+          ) {
+            Feature f = (Feature) fi.next();
+            if(a.containsFeature(f)) {
+              result.addFeature(f);
+            }
+          }
+          
+          stack.push(result);
+        } else if(filt instanceof FeatureFilter.AndNot) {
+          FeatureHolder b = (FeatureHolder) stack.pop();
+          SimpleFeatureHolder a = (SimpleFeatureHolder) stack.peek();
+          
+          for(
+            Iterator fi = b.features();
+            fi.hasNext();
+          ) {
+            Feature f = (Feature) fi.next();
+            if(a.containsFeature(f)) {
+              a.removeFeature(f);
+            }
+          }
+        } else if(filt instanceof FeatureFilter.Or) {
+          FeatureHolder b = (FeatureHolder) stack.pop();
+          SimpleFeatureHolder a = (SimpleFeatureHolder) stack.peek();
+          
+          for(
+            Iterator fi = b.features();
+            fi.hasNext();
+          ) {
+            Feature f = (Feature) fi.next();
+            if(!a.containsFeature(f)) {
+              a.addFeature(f);
+            }
+          }
+        } else if(filt instanceof FeatureFilter.Not) {
+          throw new IllegalArgumentException(
+                "Can't evaluate Not - transform them into AndNot statements"
+          );
+        } else if(filt instanceof FilterWrapper) {
+          stack.add(fh.filter(((FilterWrapper) filt).getWrapped(), false));
+        } else {
+          stack.add(fh.filter(filt, false));
+        }
+      }
+      
+      return (FeatureHolder) stack.pop();
+    } catch (ChangeVetoException cve) {
+      throw new BioException(cve, "Couldn't evaluate the query");
+    }
+  }
+  
+  private static class FilterWrapper implements FeatureFilter {
+    private FeatureFilter wrapped;
+    
+    public FilterWrapper(FeatureFilter wrapped) {
+      this.wrapped = wrapped;
+    }
+    
+    public FeatureFilter getWrapped() {
+      return wrapped;
+    }
+    
+    public boolean accept(Feature f) {
+      return wrapped.accept(f);
+    }
   }
 }

@@ -31,6 +31,7 @@ import java.util.*;
  * annotation systems.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public class MergeFeatureHolder extends AbstractFeatureHolder {
@@ -64,6 +65,16 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 	    fc += ((FeatureHolder) i.next()).countFeatures();
 	}
 	return fc;
+    }
+    
+    public boolean containsFeature(Feature f) {
+      for(Iterator i = featureHolders.iterator(); i.hasNext(); ) {
+        if(((FeatureHolder) i.next()).containsFeature(f)) {
+          return true;
+        }
+      }
+      
+      return false;
     }
 
     /**

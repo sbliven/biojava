@@ -120,6 +120,10 @@ implements SequenceRenderContext {
       fh.removeFeature(f);
     }
     
+    public boolean containsFeature(Feature f) {
+      return fh.containsFeature(f);
+    }
+    
     public Alphabet getAlphabet() {
       return seq.getAlphabet();
     }

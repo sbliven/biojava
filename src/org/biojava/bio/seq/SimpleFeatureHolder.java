@@ -96,4 +96,8 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
       }
     }
   }
+  
+  public boolean containsFeature(Feature f) {
+    return features.contains(f);
+  }
 }

@@ -48,6 +48,7 @@ import org.biojava.bio.symbol.*;
  * </p>
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.1
  */
 
@@ -206,6 +207,10 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 
     public Iterator features() {
 	return getProjectedFeatures().features();
+    }
+    
+    public boolean containsFeature(Feature f) {
+      return getProjectedFeatures().containsFeature(f);
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {

@@ -42,6 +42,7 @@ import org.w3c.dom.*;
  *
  * @since 1.1
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 class DASFeatureSet implements FeatureHolder {
@@ -92,6 +93,10 @@ class DASFeatureSet implements FeatureHolder {
 
     public Iterator features() {
 	return getFeatures().features();
+    }
+    
+    public boolean containsFeature(Feature f) {
+      return getFeatures().containsFeature(f);
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {

@@ -35,6 +35,7 @@ import org.biojava.bio.seq.impl.*;
  * Sequence without modifying it.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public class ViewSequence implements Sequence, RealizingFeatureHolder {
@@ -177,6 +178,10 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
       addedFeatures.removeFeature(f);
     }
 
+    public boolean containsFeature(Feature f) {
+      return exposedFeatures.containsFeature(f);
+    }
+    
     //
     // Get our annotation
     //

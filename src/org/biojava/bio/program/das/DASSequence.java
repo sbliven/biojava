@@ -52,6 +52,7 @@ import org.w3c.dom.*;
  *
  * @since 1.1
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public class DASSequence implements Sequence, RealizingFeatureHolder {
@@ -446,6 +447,10 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	return features.features();
     }
 
+    public boolean containsFeature(Feature f) {
+      return features.containsFeature(f);
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	//
 	// We optimise for the case of just wanting `structural' features,

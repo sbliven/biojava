@@ -32,6 +32,7 @@ import org.biojava.utils.*;
  * Component feature mapping a DAS landmark sequence onto its parent.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 class DASComponentFeature implements ComponentFeature {
@@ -171,6 +172,10 @@ class DASComponentFeature implements ComponentFeature {
 
     public Iterator features() {
 	return getProjectedFeatures().features();
+    }
+    
+    public boolean containsFeature(Feature f) {
+      return getProjectedFeatures().containsFeature(f);
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {

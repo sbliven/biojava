@@ -108,6 +108,14 @@ public class ProjectedFeatureWrapper implements Feature {
     public int countFeatures() {
 	return feature.countFeatures();
     }
+    
+    public boolean containsFeature(Feature f) {
+      if(countFeatures() > 0) {
+        return getProjectedFeatures().containsFeature(f);
+      } else {
+        return false;
+      }
+    }
 
     protected FeatureHolder getProjectedFeatures() {
 	if (projectedFeatures == null) {

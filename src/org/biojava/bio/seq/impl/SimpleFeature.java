@@ -186,6 +186,14 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
 	getFeatureHolder().removeFeature(f);
     }
 
+    public boolean containsFeature(Feature f) {
+      if(featureHolderAllocated()) {
+        return getFeatureHolder().containsFeature(f);
+      } else {
+        return false;
+      }
+    }
+
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	if(featureHolderAllocated())
 	    return getFeatureHolder().filter(ff, recurse);

@@ -37,6 +37,7 @@ import org.biojava.bio.symbol.*;
  * </p>
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.1
  */
 
@@ -208,6 +209,10 @@ public class SimpleAssembly extends AbstractSymbolList
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	return features.filter(ff, recurse);
+    }
+    
+    public boolean containsFeature(Feature f) {
+      return features.containsFeature(f);
     }
 
     public Feature createFeature(Feature.Template temp) 

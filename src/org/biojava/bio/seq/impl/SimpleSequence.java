@@ -162,6 +162,14 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io
 	return FeatureHolder.EMPTY_FEATURE_HOLDER;
     }
 
+    public boolean containsFeature(Feature f) {
+      if(featureHolderAllocated()) {
+        return getFeatureHolder().containsFeature(f);
+      } else {
+        return false;
+      }
+    }
+    
     public Feature realizeFeature(FeatureHolder parent, Feature.Template template)
         throws BioException
     {

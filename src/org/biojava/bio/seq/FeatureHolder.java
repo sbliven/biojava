@@ -94,6 +94,15 @@ public interface FeatureHolder extends Changeable {
      */
     public void removeFeature(Feature f)
     throws ChangeVetoException;
+    
+    /**
+     * Check if the feature is present in this holder.
+     *
+     * @since 1.2
+     * @param f the Feature to check
+     * @return true if f is in this set
+     */
+    public boolean containsFeature(Feature f);
 
     public static final FeatureHolder EMPTY_FEATURE_HOLDER =
 	new EmptyFeatureHolder();
@@ -118,6 +127,10 @@ public interface FeatureHolder extends Changeable {
 	public void removeFeature(Feature f) {
 	    throw new UnsupportedOperationException();
 	}
+        
+        public boolean containsFeature(Feature f) {
+          return false;
+        }
     
     public void addChangeListener(ChangeListener cl) {}
     public void addChangeListener(ChangeListener cl, ChangeType ct) {}

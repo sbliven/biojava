@@ -140,9 +140,11 @@ public interface FeatureFilter extends Serializable {
         (o instanceof ByType) &&
         (((ByType) o).getType() == this.getType());
     }
+    
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup) || (sup instanceof AcceptAllFilter);
     }
+    
     public boolean isDisjoint(FeatureFilter filt) {
       return (filt instanceof AcceptNoneFilter) || (
         (filt instanceof ByType) &&

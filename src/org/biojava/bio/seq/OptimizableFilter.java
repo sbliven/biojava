@@ -26,7 +26,7 @@ package org.biojava.bio.seq;
  * compare themselves with other filters.
  *
  * @author Matthew Pocock
- * @since 1.1
+ * @since 1.2
  */
 interface OptimizableFilter extends FeatureFilter {
   /**

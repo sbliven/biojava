@@ -177,6 +177,10 @@ class SimpleComponentFeature implements ComponentFeature {
 	return getProjectedFeatures().features();
     }
 
+    public boolean containsFeature(Feature f) {
+      return getProjectedFeatures().containsFeature(f);
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	return getProjectedFeatures().filter(ff, recurse);
     }
