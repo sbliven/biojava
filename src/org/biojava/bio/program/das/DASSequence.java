@@ -462,11 +462,24 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    if (structure.countFeatures() == 0) {
 		sl = getTrueSymbols();
 	    } else {
+		//
+		// VERY, VERY, naive approach to identifying canonical components.  FIXME
+		//
+
+		Location coverage = Location.empty;
 		AssembledSymbolList asl = new AssembledSymbolList();
 		asl.setLength(length);
+
 		for (Iterator i = structure.features(); i.hasNext(); ) {
 		    ComponentFeature cf = (ComponentFeature) i.next();
-		    asl.putComponent(cf.getLocation(), cf);
+		    Location loc = cf.getLocation();
+		    if (LocationTools.overlaps(loc, coverage)) {
+			// Assume that this is non-cannonical.  Maybe not a great thing to
+			// do, but...
+		    } else {
+			asl.putComponent(loc, cf);
+			coverage = LocationTools.union(coverage, loc);
+		    }
 		}
 
 		sl = asl;
