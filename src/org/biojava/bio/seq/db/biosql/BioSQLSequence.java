@@ -169,9 +169,7 @@ class BioSQLSequence
 	throw new ChangeVetoException("Can't edit sequence in BioSQL -- or at least not yet...");
     }    
 
-    protected synchronized SymbolList getSymbols()
-        throws BioRuntimeException
-    {
+    protected synchronized SymbolList getSymbols() {
 	if (symbols == null) {
 	    try {
 		Connection conn = seqDB.getPool().takeConnection();
@@ -188,6 +186,7 @@ class BioSQLSequence
                         seqString = null;
                     }
 		}
+                rs.close();
 		get_symbols.close();
 
 		seqDB.getPool().putConnection(conn);

@@ -605,7 +605,7 @@ class FeaturesSQL {
 	    update_key.setInt(1, seqfeature_key);
 	    update_key.setInt(2, feature_id);
 	    update_key.executeUpdate();
-            
+            update_key.close();
 	    conn.commit();
 	    seqDB.getPool().putConnection(conn);
 	} catch (SQLException ex) {
@@ -635,7 +635,7 @@ class FeaturesSQL {
 	    update_source.setInt(1, seqfeature_source);
 	    update_source.setInt(2, feature_id);
 	    update_source.executeUpdate();
-
+            update_source.close();
 	    conn.commit();
 	    seqDB.getPool().putConnection(conn);
 	} catch (SQLException ex) {
@@ -782,6 +782,7 @@ class FeaturesSQL {
 		if (rs.next()) {
 		    id = rs.getInt(1);
 		}
+                rs.close();
 		add_feature.close();
 
 		locationWritten = true;
@@ -796,6 +797,7 @@ class FeaturesSQL {
 		if (rs.next()) {
 		    id = rs.getInt(1);
 		}
+                rs.close();
 		add_feature.close();
 	    }
 	} else {
@@ -815,6 +817,8 @@ class FeaturesSQL {
 				if (rs.next()) {
 					typeRank = rs.getInt(1) + 1;
 				}
+                                rs.close();
+                                select_rank.close();
 			}
 			
 	    PreparedStatement add_feature = conn.prepareStatement(
@@ -985,7 +989,7 @@ class FeaturesSQL {
     if (value != null) {
         PreparedStatement insert_new;
         if (seqDB.isSPASupported()) {
-            insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
+            insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
                                               "       (seqfeature_id, term_id, rank, value) " +
                     					      "values (?, intern_ontology_term( ? ), ?, ?)");
             if (value instanceof Collection) {

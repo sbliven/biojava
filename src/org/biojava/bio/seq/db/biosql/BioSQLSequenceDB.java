@@ -181,17 +181,21 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 	try {
 	    Connection conn = pool.takeConnection();
-			conn.setAutoCommit(false);  // Added by Simon
+            conn.setAutoCommit(false);  // Added by Simon
 	    PreparedStatement getID = conn.prepareStatement("select * from biodatabase where name = ?");
 	    getID.setString(1, biodatabase);
 	    ResultSet rs = getID.executeQuery();
 	    if (rs.next()) {
 		dbid = rs.getInt(1);
 		name = rs.getString(2);
+                rs.close();
 		getID.close();
 		pool.putConnection(conn);
 		return;
-	    }
+	    } else {
+                rs.close();
+                getID.close();
+            }
 
 	    if (create) {
 		PreparedStatement createdb = conn.prepareStatement("insert into biodatabase (name) values ( ? )");
@@ -234,7 +238,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     public void createDummySequence(String id,
 				    Alphabet alphabet,
 				    int length)
-	throws IllegalIDException, ChangeVetoException, BioException
+	throws ChangeVetoException, BioException
     {
         synchronized (this) {
           ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
@@ -247,7 +251,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     private void _createDummySequence(String id,
 				      Alphabet seqAlpha,
 				      int length)
-        throws IllegalIDException, ChangeVetoException, BioException
+        throws ChangeVetoException, BioException
     {
 	int version = 1;
 
@@ -297,7 +301,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     public void addSequence(Sequence seq)
-	throws IllegalIDException, ChangeVetoException, BioException
+	throws ChangeVetoException, BioException
     {
 	synchronized (this) {
           ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, seq);
@@ -308,7 +312,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     private void _addSequence(Sequence seq)
-        throws IllegalIDException, ChangeVetoException, BioException
+        throws ChangeVetoException, BioException
     {
 	String seqName = idmaker.calcID(seq);
 	int version = 1;
@@ -506,6 +510,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             taxon_id = getDBHelper().getInsertID(conn, "taxon", "taxon_id");
             addTaxonNames(conn, taxon, taxon_id);
         }
+        trs.close();
         selectTaxon.close();
         return taxon_id;
     }
@@ -533,13 +538,13 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 
     public Sequence getSequence(String id)
-        throws BioException, IllegalIDException
+        throws BioException
     {
         return getSequence(id, -1);
     }
 
     Sequence getSequence(String id, int bioentry_id)
-        throws BioException, IllegalIDException
+        throws BioException
     {
 	Sequence seq = null;
 	if (id != null) {
@@ -568,6 +573,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		if (rs.next()) {
 		    bioentry_id = rs.getInt(1);
 		}
+                rs.close();
 		get_bioentry.close();
 
 		if (bioentry_id < 0) {
@@ -582,6 +588,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		if (rs.next()) {
 		    id = rs.getString(1);
 		}
+                rs.close();
 		get_accession.close();
 
 		if (id == null) {
@@ -604,6 +611,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                     }
                     seq = new BioSQLSequence(this, id, bioentry_id, molecule, length);
 		}
+                rs.close();
 		get_biosequence.close();
 	    }
 
@@ -619,6 +627,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		    String molecule = rs.getString(3);
 		    seq = new BioSQLAssembly(this, id, bioentry_id, assembly_id, molecule, length);
 		}
+                rs.close();
 		get_assembly.close();
 	    }
 
@@ -637,7 +646,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     public void removeSequence(String id)
-	throws IllegalIDException, ChangeVetoException, BioException
+	throws ChangeVetoException, BioException
     {
      
         synchronized (this) {
@@ -649,7 +658,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     private void _removeSequence(String id)
-        throws BioException, IllegalIDException, ChangeVetoException
+        throws BioException, ChangeVetoException
     {
 			
 	Sequence seq = (Sequence) sequencesByName.get(id);
@@ -769,6 +778,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		delete_entry.executeUpdate();
 		delete_entry.close();
 	    }
+            rs.close();
 	    get_sequence.close();
 
 	    conn.commit();
@@ -801,6 +811,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    while (rs.next()) {
 		_ids.add(rs.getString(1));
 	    }
+            rs.close();
 	    st.close();
 
 	    pool.putConnection(conn);
@@ -850,7 +861,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     if (value != null) {
         PreparedStatement insert_new;
         if (isSPASupported()) {
-            insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
+            insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
                                               "       (bioentry_id, term_id, value, rank) " +
                     					      "values (?, intern_ontology_term( ? ), ?, ?)");
             if (value instanceof Collection) {
@@ -870,7 +881,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 insert_new.executeUpdate();
             }
         } else {
-            insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
+            insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
                                               "       (bioentry_id, term_id, rank, value) " +
 					                          "values (?, ?, ?, ?)");
 	        int termID = intern_ontology_term(conn, keyString);
@@ -1032,6 +1043,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 			    // System.err.println("*** Accelerators present in the database: level " + level);
 			}
 		    }
+                    rs.close();
 		} catch (SQLException ex) {
 		}
 		ps.close();
@@ -1212,7 +1224,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		    fh.addFeature(f);
 		}
 	    }
-
+            rs.close();
 	    get_features.close();
 	    pool.putConnection(conn);
 

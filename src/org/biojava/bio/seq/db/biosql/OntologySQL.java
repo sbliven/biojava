@@ -462,6 +462,7 @@ class OntologySQL {
         import_term.setString(2, term.getDescription());
         import_term.setInt(3, ontologyID(term.getOntology()));
         import_term.executeUpdate();
+        import_term.close();
         int id = seqDB.getDBHelper().getInsertID(conn, "term", "term_id");
         Integer tid = new Integer(id);
         termsByID.put(tid, term);
@@ -503,6 +504,7 @@ class OntologySQL {
         import_trip.setInt(3, termID(triple.getObject()));
         import_trip.setInt(4, ontologyID(ont));
         import_trip.executeUpdate();
+        import_trip.close();
     }
 
     private void persistOntology(Ontology onto)
@@ -539,6 +541,7 @@ class OntologySQL {
         insert_ontology.setString(1, ont.getName());
         insert_ontology.setString(2, ont.getDescription());
         insert_ontology.executeUpdate();
+        insert_ontology.close();
         int id = seqDB.getDBHelper().getInsertID(conn, "ontology", "ontology_id");
         Integer tid = new Integer(id);
         ontologiesByID.put(tid, ont);

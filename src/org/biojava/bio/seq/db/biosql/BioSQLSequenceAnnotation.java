@@ -131,6 +131,8 @@ class BioSQLSequenceAnnotation
 			underlyingAnnotation.setProperty(key, value);
 		    }
 		}
+                rs.close();
+                get_properties.close();
 	    }
 	    
 	    seqDB.getPool().putConnection(conn);

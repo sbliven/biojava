@@ -88,7 +88,7 @@ class BioSQLFeatureAnnotation
 		    throw new BioError(ex);
 		}
 	    }
-
+            rs.close();
 	    get_annotations.close();
 	    seqDB.getPool().putConnection(conn);
 	} catch (SQLException ex) {

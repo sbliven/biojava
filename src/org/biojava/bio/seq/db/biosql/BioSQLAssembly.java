@@ -202,7 +202,8 @@ class BioSQLAssembly
 		    temp.componentLocation = new RangeLocation(fragment_start, fragment_end);
 		    componentFeatures.addFeature(new BioSQLComponentFeature(seqDB, this, temp, assembly_fragment_id));
 		}
-
+                rs.close();
+                get_assembly.close();
 		seqDB.getPool().putConnection(conn);
 	    } catch (SQLException ex) {
 		throw new BioRuntimeException("Error fetching assembly data", ex);
