@@ -227,6 +227,11 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
         if(!(parent instanceof Feature) && !(parent instanceof Sequence)) {
             throw new IllegalArgumentException("Parent must be sequence or feature, not: " + parent.getClass() + " " + parent);
         }
+	
+	if (template.location.getMin() < 1 || template.location.getMax() > sourceSeq.length()) {
+	    throw new IllegalArgumentException("Location " + template.location.toString() + " is outside 1.." + sourceSeq.length());
+	}
+
 	this.parent = parent;
 	this.loc = template.location;
 	this.type = template.type;
