@@ -13,18 +13,9 @@ public class ParseEmbl {
       )
     );
     
-    
     LineSplitParser lsp = LineSplitParser.EMBL;
     
-    
-    AnnotationBuilder annBuilder = new AnnotationBuilder(
-      new AnnotationType.AnyOfType(
-        new PropertyConstraint.IsCollectionOf(
-          java.util.ArrayList.class,
-          PropertyConstraint.ANY
-        )
-      )
-    );
+    AnnotationBuilder annBuilder = new AnnotationBuilder(AnnotationType.ANY);
     TagDelegator td = new TagDelegator(annBuilder);
     
     LineSplitParser ftParser = new LineSplitParser();
