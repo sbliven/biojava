@@ -34,12 +34,31 @@ import java.util.*;
  * @author Matthew Pocock
  */
 public class SimpleSequence extends SimpleResidueList implements Sequence {
+  /**
+   * The default feature factory for all SimpleSequence objects.
+   */
+  protected static FeatureFactory SIMPLE_FEATURE_FACTORY;
+  
+  /**
+   * Initialize SIMPLE_FEATURE_FACTORY.
+   */
+  static {
+    SIMPLE_FEATURE_FACTORY = new SimpleFeatureFactory();
+  }
+  
   private FeatureFactory fFact;
   private String urn;
   private String name;
   private Annotation annotation;
   private MutableFeatureHolder featureHolder;
- 
+
+  /**
+   * Initialize fFact.
+   */
+  {
+    fFact = SIMPLE_FEATURE_FACTORY;
+  }
+  
   protected MutableFeatureHolder getFeatureHolder() {
     if(featureHolder == null)
       featureHolder = new SimpleMutableFeatureHolder();
