@@ -44,7 +44,7 @@ import org.biojava.utils.*;
  * Note that Phred is a copyright of CodonCode Corporation
  */
 
-public class PhredTools {
+public final class PhredTools {
 
    static{
      List l = new ArrayList(2);
@@ -72,6 +72,100 @@ public class PhredTools {
    */
   public static final FiniteAlphabet getPhredAlphabet(){
     return (FiniteAlphabet)AlphabetManager.alphabetForName("PHRED");
+  }
+
+  /**
+   * Retrives the DNA symbol component of the Phred BasisSymbol from the
+   * PHRED alphabet.
+   * @throws IllegalSymbolException if the provided symbol is not from the
+   * PHRED alphabet.
+   */
+  public static final AtomicSymbol dnaSymbolFromPhred(Symbol phredSym)
+    throws IllegalSymbolException{
+    //validate the symbol
+    getPhredAlphabet().validate(phredSym);
+    //get the DNA component of the Phred Symbol
+    List l = ((BasisSymbol)phredSym).getSymbols();
+    //the first symbol should be DNA
+    return (AtomicSymbol)(l.get(0));
+  }
+
+  /**
+   * Retrives the IntegerSymbol component of the Phred BasisSymbol from the
+   * PHRED alphabet.
+   * @throws IllegalSymbolException if the provided symbol is not from the
+   * PHRED alphabet.
+   */
+  public static final IntegerAlphabet.IntegerSymbol integerSymbolFromPhred(Symbol phredSym)
+    throws IllegalSymbolException{
+    //validate the symbol
+    getPhredAlphabet().validate(phredSym);
+    //get the IntegerSymbol component of the Phred Symbol
+    List l = ((BasisSymbol)phredSym).getSymbols();
+    //the second symbol should be the IntegerSymbol
+    return (IntegerAlphabet.IntegerSymbol)(l.get(1));
+  }
+
+  /**
+   * Merges a Symbol List from the DNA alphabet with a SymbolList from the
+   * [0..60] subset of the IntegerAlphabet into a SymbolList from
+   * the PHRED alphabet.
+   * @throws IllegalAlphabetException if the alphabets are not of the required alphabets
+   * @throws IllegalArgumentException if the two SymbolLists are not of equal length.
+   * @throws IllegalSymbolException if a combination of Symbols cannot be represented by
+   * the PHRED alphabet.
+   */
+  public static SymbolList createPhred(SymbolList dna, SymbolList quality)
+    throws IllegalArgumentException, IllegalAlphabetException, IllegalSymbolException{
+    //perform initial checks
+    if(dna.length() != quality.length()){
+      throw new IllegalArgumentException("SymbolLists must be of equal length "+
+        dna.length()+" : "+quality.length());
+    }
+    if(dna.getAlphabet() != DNATools.getDNA()){
+      throw new IllegalAlphabetException(
+        "Expecting SymbolList 'dna' to use the DNA alphabet, uses "
+        +dna.getAlphabet().getName());
+    }
+    Alphabet subint = IntegerAlphabet.getSubAlphabet(0,60);
+    if(quality.getAlphabet() != subint && quality.getAlphabet() != IntegerAlphabet.getInstance()){
+      throw new IllegalAlphabetException(
+        "Expecting SymbolList quality to use the "+subint.getName()+" alphabet"+
+        "or IntegerAlphabet instead uses "+
+        quality.getAlphabet().getName());
+    }
+
+    //build the symbollist
+    SimpleSymbolList sl = new SimpleSymbolList(getPhredAlphabet());
+
+    for(int i = 1; i <= dna.length(); i++){
+      Symbol d = dna.symbolAt(i);
+      Symbol q = quality.symbolAt(i);
+      try{
+        sl.addSymbol(getPhredSymbol(d,q));
+      }catch(ChangeVetoException e){
+        throw new NestedError(e);
+      }
+    }
+
+    return sl;
+  }
+
+  /**
+   * Creates a symbol from the PHRED alphabet by combining a Symbol from the
+   * DNA alphabet and a Symbol from the IntegerAlphabet (or one of its subsets).
+   * @throws IllegalSymbolException if there is no Symbol in the PHRED alphabet
+   * that represents the two arguments.
+   */
+  public static final Symbol getPhredSymbol(Symbol dna, Symbol integer)
+    throws IllegalSymbolException{
+    try{
+      SymbolTokenization toke = getPhredAlphabet().getTokenization("name");
+      String word = "("+dna.getName()+" "+integer.getName()+")";
+      return toke.parseToken(word);
+    }catch(BioException e){
+      throw new NestedError(e);
+    }
   }
 
   /**

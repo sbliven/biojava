@@ -78,9 +78,12 @@ public class IntegerAlphabet
    */
   public static FiniteAlphabet getSubAlphabet(int min, int max)throws IllegalArgumentException{
     String name = "SubIntegerAlphabet["+min+".."+max+"]";
-
-    FiniteAlphabet a = new SubIntegerAlphabet(min, max);
-    AlphabetManager.registerAlphabet(a.getName(),a);
+    try{
+      return (FiniteAlphabet)(AlphabetManager.alphabetForName(name));
+    }catch(Exception e){
+      FiniteAlphabet a = new SubIntegerAlphabet(min, max);
+      AlphabetManager.registerAlphabet(a.getName(),a);
+    }
 
     return (FiniteAlphabet)(AlphabetManager.alphabetForName(name));
   }
