@@ -131,8 +131,8 @@ public class SequencesAsGFF {
         Object value = fMap.get(key);
         String keyS = key.toString();
         List valueList;
-        if(value instanceof List) {
-          valueList = (List) value;
+        if(value instanceof Collection) {
+	    valueList = new ArrayList((Collection) value);
         } else {
           //valueList = Collections.singletonList(value); 1.3?
           valueList = new ArrayList();
