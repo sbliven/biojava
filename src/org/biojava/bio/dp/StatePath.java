@@ -28,7 +28,7 @@ import org.biojava.bio.symbol.*;
 /**
  * Extends the Alignment interface so that it is explicitly used to represent
  * a state path through an HMM, and the associated emitted sequence and
- * likelyhoods.
+ * likelihoods.
  * <P>
  * A state path should have the following structure:
  * <bq>
@@ -57,11 +57,13 @@ import org.biojava.bio.symbol.*;
  * sake of least-suprise, single-head HMMs should emit an alignment of one
  * sequence, where the label is the input sequence, and the associated
  * SymbolList is also the input sequence.
- * <P>
- * I think that this scheim keeps the emitted alignment as close as possible to
+ *
+ * <p>
+ * I think that this scheme keeps the emitted alignment as close as possible to
  * a sensible path through the sequence coordinate space, while making this
  * gappable adapts this to the same co-ordinate system as the HMM state-path
  * space.
+ * </p>
  *
  * @author Matthew Pocock
  */

@@ -31,7 +31,7 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.dp.onehead.*;
 
 /**
- * Train a hidden markov model using maximum likelyhood.
+ * Train a hidden markov model using maximum likelihood.
  * 
  * <p>Note: this class currently only works for one-head models.
  * </p>

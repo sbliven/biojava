@@ -31,8 +31,11 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
 /**
- * Wraps a weight matrix up so that it appears to be a very simple hmm.
+ * Wraps a weight matrix up so that it appears to be a very simple HMM.
+ *
+ * @author Matthew Pocock
  */
+
 public class WMAsMM implements MarkovModel, Serializable {
   private static final int [] advance = {1};
   
