@@ -28,18 +28,63 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * A no-frills implementation of Sequence.
- * <P>
- * It implements the SymbolList portion of Sequence by extending
- * SimpleResideList. This should probably be changed to delegation to allow
- * custom SymbolList implementations to be wrapped.
+ * A basic implementation of the <code>Sequence</code> interface.
+ * <p>
+ * This class now implements all methods in the SymbolList
+ * interface by delegating to another SymbolList object.  This
+ * avoids unnecessary copying, but means that any changes in
+ * the underlying SymbolList will be silently reflected in
+ * the SimpleSequence.  In general, SimpleSequences should <em>only</em>
+ * be constructed from SymbolLists which are known to be immutable.
+ * <p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public class SimpleSequence extends SimpleSymbolList 
-                            implements Sequence, MutableFeatureHolder 
+public class SimpleSequence implements Sequence, MutableFeatureHolder 
 {
+    //
+    // This section is for the SymbolList implementation-by-delegation
+    //
+
+    /**
+     * Delegate SymbolList.
+     */
+
+    private SymbolList symList;
+
+    public Alphabet getAlphabet() {
+	return symList.getAlphabet();
+    }
+
+    public Iterator iterator() {
+	return symList.iterator();
+    }
+
+    public int length() {
+	return symList.length();
+    }
+
+    public String seqString() {
+	return symList.seqString();
+    }
+
+    public String subStr(int start, int end) {
+	return symList.subStr(start, end);
+    }
+
+    public SymbolList subList(int start, int end) {
+	return symList.subList(start, end);
+    }
+
+    public Symbol symbolAt(int indx) {
+	return symList.symbolAt(indx);
+    }
+
+    public List toList() {
+	return symList.toList();
+    }
+
   /**
    * List of magic for working out what types of features to create.
    */
@@ -194,10 +239,11 @@ public class SimpleSequence extends SimpleSymbolList
    * @param annotation the annotation object to use or null
    */
   public SimpleSequence(SymbolList res, String urn, String name, Annotation annotation) {
-    super(res);
-    setURN(urn);
-    setName(name);
-    this.annotation = annotation;
+      symList = res;
+
+      setURN(urn);
+      setName(name);
+      this.annotation = annotation;
   }
   
 
