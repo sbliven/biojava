@@ -51,19 +51,19 @@ implements FeatureRenderer {
     "org.biojava.bio.gui.sequence.TickFeatureRenderer",
     "FILL"
   );
-  
+
   public static final ChangeType OUTLINE = new ChangeType(
     "The outline paint has changed",
     "org.biojava.bio.gui.sequence.TickFeatureRenderer",
     "OUTLINE"
   );
-  
+
   public static final ChangeType DEPTH = new ChangeType(
     "The size of the arrow has changed",
     "org.biojava.bio.gui.sequence.TickFeatureRenderer",
     "DEPTH"
   );
-  
+
   private Paint fill;
   private Paint outline;
   private double depth = 25.0;
@@ -92,11 +92,11 @@ implements FeatureRenderer {
       fill = p;
     }
   }
-  
+
   public Paint getFill() {
     return fill;
   }
-  
+
   public void setOutline(Paint p)
   throws ChangeVetoException {
     if(hasListeners()) {
@@ -116,11 +116,11 @@ implements FeatureRenderer {
       outline = p;
     }
   }
-  
+
   public Paint getOutline() {
     return outline;
   }
-  
+
   public void setDepth(double arrowSize)
   throws ChangeVetoException {
     if(hasListeners()) {
@@ -140,14 +140,14 @@ implements FeatureRenderer {
       this.depth = arrowSize;
     }
   }
-  
+
   public double getDepth() {
     return depth;
   }
 
   public void renderFeature(
     Graphics2D g,
-    Feature f, 
+    Feature f,
     SequenceRenderContext src
   ) {
     Shape s = null;
@@ -160,44 +160,44 @@ implements FeatureRenderer {
     float fDepthByThree = fDepth / 3.0F;
 
     if (f instanceof StrandedFeature) {
-        StrandedFeature.Strand strand = ((StrandedFeature) f).getStrand();
-        if(src.getDirection() == SequenceRenderContext.HORIZONTAL) {
-	    if(strand == StrandedFeature.POSITIVE) {
-		GeneralPath path = new GeneralPath();
-		path.moveTo(pos, 0.0F);
-		path.lineTo(pos, fDepth);
-		path.lineTo(pos + fDepthByThree, fDepth);
-		path.lineTo(pos, fDepth - fDepthByThree);
-		path.closePath();
-		s = path;
-	    } else if(strand == StrandedFeature.NEGATIVE) {
-		GeneralPath path = new GeneralPath();
-		path.moveTo(pos, 0.0F);
-		path.lineTo(pos, fDepth);
-		path.lineTo(pos - fDepthByThree, fDepth);
-		path.lineTo(pos, fDepth - fDepthByThree);
-		path.closePath();
-		s = path;
-	    }
-        } else { // vertical
-	    if(strand == StrandedFeature.POSITIVE) {
-		GeneralPath path = new GeneralPath();
-		path.moveTo(0.0F, pos);
-		path.lineTo(fDepth, pos);
-		path.lineTo(fDepth, pos + fDepthByThree);
-		path.lineTo(fDepth - fDepthByThree, pos);
-		path.closePath();
-		s = path;
-	    } else if(strand == StrandedFeature.NEGATIVE) {
-		GeneralPath path = new GeneralPath();
-		path.moveTo(0.0F, pos);
-		path.lineTo(fDepth, pos);
-		path.lineTo(fDepth, pos - fDepthByThree);
-		path.lineTo(fDepth - fDepthByThree, pos);
-		path.closePath();
-		s = path;
-	    }
+      StrandedFeature.Strand strand = ((StrandedFeature) f).getStrand();
+      if(src.getDirection() == SequenceRenderContext.HORIZONTAL) {
+        if(strand == StrandedFeature.POSITIVE) {
+          GeneralPath path = new GeneralPath();
+          path.moveTo(pos, 0.0F);
+          path.lineTo(pos, fDepth);
+          path.lineTo(pos + fDepthByThree, fDepth);
+          path.lineTo(pos, fDepth - fDepthByThree);
+          path.closePath();
+          s = path;
+        } else if(strand == StrandedFeature.NEGATIVE) {
+          GeneralPath path = new GeneralPath();
+          path.moveTo(pos, 0.0F);
+          path.lineTo(pos, fDepth);
+          path.lineTo(pos - fDepthByThree, fDepth);
+          path.lineTo(pos, fDepth - fDepthByThree);
+          path.closePath();
+          s = path;
         }
+      } else { // vertical
+        if(strand == StrandedFeature.POSITIVE) {
+          GeneralPath path = new GeneralPath();
+          path.moveTo(0.0F, pos);
+          path.lineTo(fDepth, pos);
+          path.lineTo(fDepth, pos + fDepthByThree);
+          path.lineTo(fDepth - fDepthByThree, pos);
+          path.closePath();
+          s = path;
+        } else if(strand == StrandedFeature.NEGATIVE) {
+          GeneralPath path = new GeneralPath();
+          path.moveTo(0.0F, pos);
+          path.lineTo(fDepth, pos);
+          path.lineTo(fDepth, pos - fDepthByThree);
+          path.lineTo(fDepth - fDepthByThree, pos);
+          path.closePath();
+          s = path;
+        }
+      }
     }
 
     if(fill != null) {
@@ -213,11 +213,11 @@ implements FeatureRenderer {
       g.setPaint(prevPaint);
     }
   }
-  
+
   public double getDepth(SequenceRenderContext src) {
       return depth;
   }
-  
+
   public FeatureHolder processMouseEvent(
     FeatureHolder hits,
     SequenceRenderContext src,

@@ -131,5 +131,20 @@ public interface Term extends Annotatable {
             }
             return annotation;
         }
+
+      public int hashCode() {
+        return getName().hashCode();
+      }
+
+      public boolean equals(Object obj)
+      {
+        if(obj == this) return true;
+        if(!(obj instanceof Term)) return false;
+
+        Term that = (Term) obj;
+
+        return this.getOntology() == that.getOntology() &&
+                this.getName() == that.getName();
+      }
     }
 }

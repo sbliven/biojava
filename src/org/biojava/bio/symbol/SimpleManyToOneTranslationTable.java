@@ -36,7 +36,7 @@ import java.util.Set;
  *
  * @author David Huen
  */
-public class SimpleManyToOneTranslationTable 
+public class SimpleManyToOneTranslationTable
       extends AbstractManyToOneTranslationTable
       implements Serializable {
   private final Map transMap;
@@ -113,7 +113,7 @@ public class SimpleManyToOneTranslationTable
    * @param source  the source FiniteAlphabet
    * @param target the target FiniteAlphabet
    */
-  public SimpleManyToOneTranslationTable(FiniteAlphabet source, FiniteAlphabet target) 
+  public SimpleManyToOneTranslationTable(FiniteAlphabet source, FiniteAlphabet target)
   {
 
     this.source = source;

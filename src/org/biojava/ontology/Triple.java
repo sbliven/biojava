@@ -57,7 +57,7 @@ public interface Triple
    * Return a Term which defines the type of relationship between the subject and object terms.
    */
 
-  public Term getRelation();
+  public Term getPredicate();
 
   /**
    * The hashcode for a Triple.
@@ -66,7 +66,7 @@ public interface Triple
    * <pre>
    * return getSubject().hashCode() +
    31 * getObject().hashCode() +
-   31 * 31 * getRelation().hashCode();
+   31 * 31 * getPredicate().hashCode();
    * </pre>
    * If you do not implement hashcode in this way then you have no guarantee
    * that your Triple objects will be found in an ontology and that they will
@@ -80,7 +80,7 @@ public interface Triple
    *
    * <p>
    * Two triples are equivalent if they have the same subject, object and
-   * relation fields.
+   * predicate fields.
    * <pre>
    * if (! (o instanceof Triple)) {
    *     return false;
@@ -88,7 +88,7 @@ public interface Triple
    * Triple to = (Triple) o;
    * return to.getSubject() == getSubject() &&
    *        to.getObject() == getObject() &&
-   *        to.getRelation() == getRelation();
+   *        to.getPredicate() == getPredicate();
    * </pre>
    * If you do not implement equals in this way then you have no guarantee
    * that your Triple objects will be found in an ontology and that they will
@@ -108,17 +108,17 @@ public interface Triple
           implements Triple, java.io.Serializable {
     private final Term subject;
     private final Term object;
-    private final Term relation;
+    private final Term predicate;
     private /*final*/ String name;
     private final String description;
 
-    public Impl(Term subject, Term object, Term relation) {
-      this(subject, object, relation, null, null);
+    public Impl(Term subject, Term object, Term predicate) {
+      this(subject, object, predicate, null, null);
     }
 
     public Impl(Term subject,
                 Term object,
-                Term relation,
+                Term predicate,
                 String name,
                 String description)
     {
@@ -128,19 +128,19 @@ public interface Triple
       if (object == null) {
         throw new NullPointerException("Object must not be null");
       }
-      if (relation == null) {
-        throw new NullPointerException("Relation must not be null");
+      if (predicate == null) {
+        throw new NullPointerException("predicate must not be null");
       }
 
       if(
               subject.getOntology() != object.getOntology() ||
-              subject.getOntology() != relation.getOntology()
+              subject.getOntology() != predicate.getOntology()
       ) {
         throw new IllegalArgumentException(
                 "All terms must be from the same ontology: " +
                 subject.getOntology().getName() + ", " +
                 object.getOntology().getName() + ", " +
-                relation.getOntology().getName());
+                predicate.getOntology().getName());
       }
 
       if(description == null) {
@@ -149,14 +149,14 @@ public interface Triple
 
       this.subject = subject;
       this.object = object;
-      this.relation = relation;
+      this.predicate = predicate;
       this.name = name;
       this.description = description;
     }
 
     public String getName() {
       if(name == null) {
-        name = relation + "(" + subject + ", " + object + ")";
+        name = predicate + "(" + subject + ", " + object + ")";
       }
       return name;
     }
@@ -177,8 +177,8 @@ public interface Triple
       return object;
     }
 
-    public Term getRelation() {
-      return relation;
+    public Term getPredicate() {
+      return predicate;
     }
 
     public Annotation getAnnotation() {
@@ -196,13 +196,13 @@ public interface Triple
       Triple to = (Triple) o;
       return to.getSubject().equals(getSubject()) &&
               to.getObject().equals(getObject()) &&
-              to.getRelation().equals(getRelation());
+              to.getPredicate().equals(getPredicate());
     }
 
     public int hashCode() {
       return getSubject().hashCode() +
               31 * getObject().hashCode() +
-              31 * 31 * getRelation().hashCode();
+              31 * 31 * getPredicate().hashCode();
     }
 
     public String toString() {

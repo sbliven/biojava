@@ -99,10 +99,10 @@ public interface Ontology extends Changeable {
    *
    * @param subject The subject to search for, or <code>null</code>
    * @param object The object to search for, or <code>null</code>
-   * @param relation The relationship to search for, or <code>null</code>.
+   * @param predicate The relationship to search for, or <code>null</code>.
    */
 
-  public Set getTriples(Term subject, Term object, Term relation);
+  public Set getTriples(Term subject, Term object, Term predicate);
 
   /**
    * Return the associated OntologyOps.
@@ -177,18 +177,18 @@ public interface Ontology extends Changeable {
    *
    * @param subject     the subject Term
    * @param object      the object Term
-   * @param relation    the relation Term
+   * @param predicate    the predicate Term
    * @param name        the name of the triple, or null
    * @param description the description of the triple, or null
    * @return  a new Triple over these three terms
    * @throws AlreadyExistsException if a triple already exists with the same
-   *      subject, object and relation, regardless of the name and description
+   *      subject, object and predicate, regardless of the name and description
    * @throws ChangeVetoException
-   * @throws NullPointerException if subject, object or relation are null
-   * @throws IllegalArgumentException if subject, object or relation are not all
+   * @throws NullPointerException if subject, object or predicate are null
+   * @throws IllegalArgumentException if subject, object or predicate are not all
    *      from the same ontology
    */
-  public Triple createTriple(Term subject, Term object, Term relation, String name, String description)
+  public Triple createTriple(Term subject, Term object, Term predicate, String name, String description)
           throws
           AlreadyExistsException,
           ChangeVetoException;
@@ -197,7 +197,7 @@ public interface Ontology extends Changeable {
    * See if a triple exists in this ontology
    */
 
-  public boolean containsTriple(Term subject, Term object, Term relation);
+  public boolean containsTriple(Term subject, Term object, Term predicate);
 
   /**
    * Remove a term from an ontology, together with all triples which refer to it.
@@ -278,23 +278,35 @@ public interface Ontology extends Changeable {
       }
     }
 
-    public Set getTriples(Term subject, Term object, Term relation) {
+    public Set getTriples(Term subject, Term object, Term predicate) {
+      if(subject != null && subject.getOntology() != this) {
+        throw new IllegalArgumentException("Subject is not in this ontology: " + subject + " " + this);
+      }
+
+      if(object != null && object.getOntology() != this) {
+        throw new IllegalArgumentException("Object is not in this ontology: " + object + " " + this);
+      }
+
+      if(predicate != null && predicate.getOntology() != this) {
+        throw new IllegalArgumentException("Predicate is not in this ontology: " + predicate + " " + this);
+      }
+
       if (subject != null) {
-        return filterTriples((Set) subjectTriples.get(subject), null, object, relation);
+        return filterTriples((Set) subjectTriples.get(subject), null, object, predicate);
       } else if (object != null) {
-        return filterTriples((Set) objectTriples.get(object), subject, null, relation);
-      } else if (relation != null) {
-        return filterTriples((Set) relationTriples.get(relation), subject, object, null);
+        return filterTriples((Set) objectTriples.get(object), subject, null, predicate);
+      } else if (predicate != null) {
+        return filterTriples((Set) relationTriples.get(predicate), subject, object, null);
       } else {
-        return filterTriples(triples, subject, object, relation);
+        return filterTriples(triples, subject, object, predicate);
       }
     }
 
-    private Set filterTriples(Set base, Term subject, Term object, Term relation) {
+    private Set filterTriples(Set base, Term subject, Term object, Term predicate) {
       if (base == null) {
         return Collections.EMPTY_SET;
-      } else if (subject == null && object == null && relation == null) {
-        return Collections.unmodifiableSet(base);
+      } else if (subject == null && object == null && predicate == null) {
+        return Collections.unmodifiableSet(new HashSet(base));
       }
 
       Set retval = new HashSet();
@@ -306,7 +318,7 @@ public interface Ontology extends Changeable {
         if (object != null && t.getObject() != object) {
           continue;
         }
-        if (relation != null && t.getRelation() != relation) {
+        if (predicate != null && t.getPredicate() != predicate) {
           continue;
         }
         retval.add(t);
@@ -433,17 +445,17 @@ public interface Ontology extends Changeable {
       return (terms.get(t.getName()) == t);
     }
 
-    public boolean containsTriple(Term subject, Term object, Term relation) {
+    public boolean containsTriple(Term subject, Term object, Term predicate) {
       if(!(subject.getOntology() == this)) return false;
       if(!(object.getOntology() == this)) return false;
-      if(!(relation.getOntology() == this)) return false;
+      if(!(predicate.getOntology() == this)) return false;
 
-      return triples.contains(new Triple.Impl(subject, object, relation));
+      return triples.contains(new Triple.Impl(subject, object, predicate));
     }
 
     public Triple createTriple(Term subject,
                                Term object,
-                               Term relation,
+                               Term predicate,
                                String name,
                                String description)
             throws
@@ -453,12 +465,12 @@ public interface Ontology extends Changeable {
             NullPointerException,
             IllegalArgumentException
     {
-      Triple t = new Triple.Impl(subject, object, relation);
+      Triple t = new Triple.Impl(subject, object, predicate);
       if (!containsTerm(subject)) {
         throw new IllegalArgumentException("Ontology " + getName() + " doesn't contain " + subject);
       }
-      if (!containsTerm(relation)) {
-        throw new IllegalArgumentException("Ontology " + getName() + " doesn't contain " + relation);
+      if (!containsTerm(predicate)) {
+        throw new IllegalArgumentException("Ontology " + getName() + " doesn't contain " + predicate);
       }
       if (!containsTerm(object)) {
         throw new IllegalArgumentException("Ontology " + getName() + " doesn't contain " + object);
@@ -492,7 +504,7 @@ public interface Ontology extends Changeable {
       triples.add(t);
       pushTriple(subjectTriples, t.getSubject(), t);
       pushTriple(objectTriples, t.getObject(), t);
-      pushTriple(relationTriples, t.getRelation(), t);
+      pushTriple(relationTriples, t.getPredicate(), t);
     }
 
     private void pushTriple(Map m, Term key, Triple t) {
@@ -508,7 +520,7 @@ public interface Ontology extends Changeable {
       triples.remove(t);
       pullTriple(subjectTriples, t.getSubject(), t);
       pullTriple(objectTriples, t.getObject(), t);
-      pullTriple(relationTriples, t.getRelation(), t);
+      pullTriple(relationTriples, t.getPredicate(), t);
     }
 
     private void pullTriple(Map m, Term key, Triple t) {

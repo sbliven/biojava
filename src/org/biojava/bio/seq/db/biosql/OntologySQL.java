@@ -140,7 +140,7 @@ class OntologySQL {
                 Triple localT = ont.createTriple(
                     (Term) localTerms.get(t.getSubject()),
                     (Term) localTerms.get(t.getObject()),
-                    (Term) localTerms.get(t.getRelation()),
+                    (Term) localTerms.get(t.getPredicate()),
                     null, null
                 );
 
@@ -198,7 +198,7 @@ class OntologySQL {
                 Triple localT = ont.createTriple(
                 (Term) localTerms.get(t.getSubject()),
                 (Term) localTerms.get(t.getObject()),
-                (Term) localTerms.get(t.getRelation()),
+                (Term) localTerms.get(t.getPredicate()),
                 null, null
                 );
 
@@ -508,7 +508,7 @@ class OntologySQL {
             "values (?, ?, ?, ?)"
         );
         import_trip.setInt(1, termID(triple.getSubject()));
-        import_trip.setInt(2, termID(triple.getRelation()));
+        import_trip.setInt(2, termID(triple.getPredicate()));
         import_trip.setInt(3, termID(triple.getObject()));
         import_trip.setInt(4, ontologyID(ont));
         import_trip.executeUpdate();

@@ -44,7 +44,7 @@ extends TestCase {
   {
     Ontology core = OntoTools.getCoreOntology();
     Ontology derived = OntoTools.getDefaultFactory().createOntology("derived", "");
-    derived.importTerm(OntoTools.ISA, null);
+    derived.importTerm(OntoTools.SUB_TYPE_OF, null);
 
     // just core explicitly added & removed - this drags core.integer allong
     ReasoningDomain rDom1 = new ReasoningDomain.Impl();
@@ -97,44 +97,49 @@ extends TestCase {
 
     // isa relationships
     Iterator matcher;
-    matcher = coreD.getMatching(OntoTools.ISA, OntoTools.PARTIAL_ORDER, OntoTools.ISA);
+
+
+    System.out.println("Searching: " + OntoTools.PARTIAL_ORDER + " " + OntoTools.REFLEXIVE + " " + OntoTools.SUB_TYPE_OF);
+    matcher = coreD.getMatching(OntoTools.PARTIAL_ORDER, OntoTools.REFLEXIVE, OntoTools.SUB_TYPE_OF);
     while(matcher.hasNext()) {
-      System.err.println("\t-> " + matcher.next());
+      System.out.println("\t-> " + matcher.next());
     }
 
-    matcher = coreD.getMatching(OntoTools.PARTIAL_ORDER, OntoTools.REFLEXIVE, OntoTools.ISA);
+    System.out.println("Searching: " + OntoTools.REFLEXIVE + " " + OntoTools.RELATION + " " + OntoTools.SUB_TYPE_OF);
+    matcher = coreD.getMatching(OntoTools.REFLEXIVE, OntoTools.RELATION, OntoTools.SUB_TYPE_OF);
     while(matcher.hasNext()) {
-      System.err.println("\t-> " + matcher.next());
+      System.out.println("\t-> " + matcher.next());
     }
 
-    matcher = coreD.getMatching(OntoTools.REFLEXIVE, OntoTools.RELATION, OntoTools.ISA);
+    System.out.println("Searching: " + OntoTools.PARTIAL_ORDER + " " + OntoTools.RELATION + " " + OntoTools.SUB_TYPE_OF);
+    matcher = coreD.getMatching(OntoTools.PARTIAL_ORDER, OntoTools.RELATION, OntoTools.SUB_TYPE_OF);
     while(matcher.hasNext()) {
-      System.err.println("\t-> " + matcher.next());
+      System.out.println("\t-> " + matcher.next());
     }
 
-    matcher = coreD.getMatching(OntoTools.PARTIAL_ORDER, OntoTools.RELATION, OntoTools.ISA);
+    System.out.println("Searching: " + OntoTools.SUB_TYPE_OF + " " + OntoTools.PARTIAL_ORDER + " " + OntoTools.INSTANCE_OF);
+    matcher = coreD.getMatching(OntoTools.SUB_TYPE_OF, OntoTools.PARTIAL_ORDER, OntoTools.INSTANCE_OF);
     while(matcher.hasNext()) {
-      System.err.println("\t-> " + matcher.next());
+      System.out.println("\t-> " + matcher.next());
     }
 
-    matcher = coreD.getMatching(OntoTools.ISA, OntoTools.RELATION, OntoTools.ISA);
+    System.out.println("Searching: " + OntoTools.SUB_TYPE_OF + " " + OntoTools.RELATION + " " + OntoTools.INSTANCE_OF);
+    matcher = coreD.getMatching(OntoTools.SUB_TYPE_OF, OntoTools.RELATION, OntoTools.INSTANCE_OF);
     while(matcher.hasNext()) {
-      System.err.println("\t-> " + matcher.next());
+      System.out.println("\t-> " + matcher.next());
     }
 
-    matcher = coreD.getMatching(OntoTools.ISA, coreD.createVariable("_parent"), OntoTools.ISA);
+    System.out.println("Searching: " + OntoTools.SUB_TYPE_OF + " " + OntoTools.ANY + " " + OntoTools.INSTANCE_OF);
+    matcher = coreD.getMatching(OntoTools.SUB_TYPE_OF, OntoTools.ANY, OntoTools.INSTANCE_OF);
     while(matcher.hasNext()) {
-      System.err.println("\t-> " + matcher.next());
+      System.out.println("\t-> " + matcher.next());
+    }
+    System.out.println("Searching: " + OntoTools.SUB_TYPE_OF + " * " + OntoTools.INSTANCE_OF);
+    matcher = coreD.getMatching(OntoTools.SUB_TYPE_OF, coreD.createVariable("_parent"), OntoTools.INSTANCE_OF);
+    while(matcher.hasNext()) {
+      System.out.println("\t-> " + matcher.next());
     }
 
-
-    //assertTrue(coreD.getMatching(OntoTools.RELATION, OntoTools.ANY, OntoTools.ISA));
-    //assertTrue(coreD.getMatching(OntoTools.ISA, OntoTools.ISA, OntoTools.ISA));
-    //assertTrue(coreD.getMatching(OntoTools.ISA, OntoTools.RELATION, OntoTools.ISA));
-    //assertTrue(coreD.getMatching(OntoTools.ISA, OntoTools.ANY, OntoTools.ISA));
-    //assertTrue(coreD.getMatching(OntoTools.PARTIAL_ORDER, OntoTools.RELATION, OntoTools.ISA));
-    //assertFalse(coreD.getMatching(OntoTools.REFLEXIVE, OntoTools.SYMMETRIC, OntoTools.ISA));
-    //assertFalse(coreD.getMatching(OntoTools.ANY, OntoTools.RELATION, OntoTools.ISA));
   }
 
 /*  public void testReasoningUserNamespace()
@@ -147,7 +152,7 @@ extends TestCase {
       Term bird = onto.createTerm("bird", "Homeothermic animals which lay hard-shelled eggs");
       Term cow = onto.createTerm("cow", "moo");
       Term pig = onto.createTerm("pig", "oink");
-      Term isa = onto.importTerm(OntoTools.ISA, null);
+      Term isa = onto.importTerm(OntoTools.SUB_TYPE_OF, null);
       onto.createTriple(mammal, animal, isa, null, null);
       onto.createTriple(cow, mammal, isa, null, null);
       onto.createTriple(pig, mammal, isa, null, null);
@@ -157,7 +162,7 @@ extends TestCase {
       Term organ = onto.createTerm("organ", "It's a bit of an animal");
       Term has_organ = onto.createTerm("has_organ", "Animals have organs.  Yeah.");
       onto.createTriple(animal, organ, has_organ, null, null);
-      onto.createTriple(has_organ, onto.importTerm(OntoTools.HAS_A, null), onto.importTerm(OntoTools.ISA, null), null, null);
+      onto.createTriple(has_organ, onto.importTerm(OntoTools.HAS_A, null), onto.importTerm(OntoTools.SUB_TYPE_OF, null), null, null);
       Term mammary_glands = onto.createTerm("mammary_glands", "mammals have these");
       onto.createTriple(mammary_glands, organ, isa, null, null);
       onto.createTriple(mammal, mammary_glands, has_organ, null, null);
@@ -165,10 +170,10 @@ extends TestCase {
       ReasoningDomain rd = new ReasoningDomain.Impl();
       rd.addOntology(onto);
 
-      assertTrue(rd.getMatching(cow, animal, OntoTools.ISA));
-      assertTrue(rd.getMatching(bird, animal, OntoTools.ISA));
-      assertFalse(rd.getMatching(pig, bird, OntoTools.ISA));
-      assertFalse(rd.getMatching(bird, mammal, OntoTools.ISA));
+      assertTrue(rd.getMatching(cow, animal, OntoTools.SUB_TYPE_OF));
+      assertTrue(rd.getMatching(bird, animal, OntoTools.SUB_TYPE_OF));
+      assertFalse(rd.getMatching(pig, bird, OntoTools.SUB_TYPE_OF));
+      assertFalse(rd.getMatching(bird, mammal, OntoTools.SUB_TYPE_OF));
 
       assertTrue(rd.getMatching(cow, mammary_glands, OntoTools.HAS_A));
       assertFalse(rd.getMatching(bird, mammary_glands, OntoTools.HAS_A));

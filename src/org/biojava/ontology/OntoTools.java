@@ -18,9 +18,22 @@ public final class OntoTools {
   private static final IntegerOntology CORE_INTEGER;
   //private static final Ontology CORE_STRING;
 
+  public static final Term TYPE;
+  public static final Term RELATION;
+  public static final Term ANY;
+  public static final Term NONE;
+  public static final Term SUB_TYPE_OF;
+  public static final Term INSTANCE_OF;
+  public static final Term DOMAIN;
+  public static final Term CO_DOMAIN;
+  public static final Term HAS_DOMAIN;
+  public static final Term HAS_CO_DOMAIN;
+
   public static final Term BOOLEAN;
   public static final Term TRUE;
   public static final Term FALSE;
+  public static final Term PREDICATE;
+
   public static final Term AND;
   public static final Term OR;
   public static final Term XOR;
@@ -28,30 +41,11 @@ public final class OntoTools {
   public static final Term NOT_EQUAL;
   public static final Term IMPLIES;
 
-  public static final Term TYPE;
-  public static final Term INSTANCEOF;
-  public static final Term ISA;
-  public static final Term ANY;
-  public static final Term NONE;
-  public static final Term RELATION;
-  public static final Term DOMAIN;
-  public static final Term CO_COMAIN;
-
-  public static final Term SET;
-  public static final Term UNIVERSAL;
-  public static final Term EMPTY;
-  public static final Term CONTAINS;
-  public static final Term NOT_CONTAINS;
-  public static final Term SUB_SET;
-
-  public static final Term PREDICATE;
   public static final Term REFLEXIVE;
   public static final Term SYMMETRIC;
   public static final Term TRANSITIVE;
   public static final Term EQUIVALENCE;
   public static final Term PARTIAL_ORDER;
-
-  public static final Term PART_OF;
 
   static {
     DEFAULT_FACTORY = new OntologyFactory() {
@@ -79,9 +73,22 @@ public final class OntoTools {
               DEFAULT_FACTORY,
               rdom);
 
+      TYPE = CORE_ONTOLOGY.getTerm("type");
+      RELATION = CORE_ONTOLOGY.getTerm("relation");
+      ANY = CORE_ONTOLOGY.getTerm("any");
+      NONE = CORE_ONTOLOGY.getTerm("none");
+      SUB_TYPE_OF = CORE_ONTOLOGY.getTerm("sub_type_of");
+      INSTANCE_OF = CORE_ONTOLOGY.getTerm("instance_of");
+      DOMAIN = CORE_ONTOLOGY.getTerm("domain");
+      CO_DOMAIN = CORE_ONTOLOGY.getTerm("co_domain");
+      HAS_DOMAIN = CORE_ONTOLOGY.getTerm("has_domain");
+      HAS_CO_DOMAIN = CORE_ONTOLOGY.getTerm("has_co_domain");
+
       BOOLEAN = CORE_ONTOLOGY.getTerm("boolean");
       TRUE = CORE_ONTOLOGY.getTerm("true");
       FALSE = CORE_ONTOLOGY.getTerm("false");
+      PREDICATE = CORE_ONTOLOGY.getTerm("predicate");
+
       AND = CORE_ONTOLOGY.getTerm("and");
       OR = CORE_ONTOLOGY.getTerm("or");
       XOR = CORE_ONTOLOGY.getTerm("xor");
@@ -89,31 +96,12 @@ public final class OntoTools {
       NOT_EQUAL = CORE_ONTOLOGY.getTerm("not_equal");
       IMPLIES = CORE_ONTOLOGY.getTerm("implies");
 
-      TYPE = CORE_ONTOLOGY.getTerm("type");
-      INSTANCEOF = CORE_ONTOLOGY.getTerm("instanceof");
-      ISA = CORE_ONTOLOGY.getTerm("isa");
-      ANY = CORE_ONTOLOGY.getTerm("any");
-      NONE = CORE_ONTOLOGY.getTerm("none");
-
-      RELATION = CORE_ONTOLOGY.getTerm("relation");
-      DOMAIN = CORE_ONTOLOGY.getTerm("domain");
-      CO_COMAIN = CORE_ONTOLOGY.getTerm("co_domain");
-
-      SET = CORE_ONTOLOGY.getTerm("set");
-      UNIVERSAL = CORE_ONTOLOGY.getTerm("universal");
-      EMPTY = CORE_ONTOLOGY.getTerm("empty");
-      CONTAINS = CORE_ONTOLOGY.getTerm("contains");
-      NOT_CONTAINS = CORE_ONTOLOGY.getTerm("not_contains");
-      SUB_SET = CORE_ONTOLOGY.getTerm("sub_set");
-
-      PREDICATE = CORE_ONTOLOGY.getTerm("predicate");
       REFLEXIVE = CORE_ONTOLOGY.getTerm("reflexive");
       EQUIVALENCE = CORE_ONTOLOGY.getTerm("equivalence");
       SYMMETRIC = CORE_ONTOLOGY.getTerm("symmetric");
       TRANSITIVE = CORE_ONTOLOGY.getTerm("transitive");
       PARTIAL_ORDER = CORE_ONTOLOGY.getTerm("partial_order");
 
-      PART_OF = null;
     } catch (Exception e) {
       throw new BioError("Could not initialize OntoTools", e);
     }
@@ -126,7 +114,7 @@ public final class OntoTools {
    * Get the Ontology that defines our core "central dogma".
    *
    * <p>This contains definitions that we have to have, such as <code>any</code>,
-   * <code>relation</code>, <code>is-a</code> and <code>transient</code>. These
+   * <code>predicate</code>, <code>is-a</code> and <code>transient</code>. These
    * are our axioms, upon which the default interpreters build.</p>
    *
    * @return the "core" Ontology

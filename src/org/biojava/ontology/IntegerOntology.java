@@ -64,7 +64,7 @@ public class IntegerOntology
     return resolveInt(val);
   }
 
-  public Set getTriples(Term subject, Term object, Term relation) {
+  public Set getTriples(Term subject, Term object, Term predicate) {
     return Collections.EMPTY_SET;
   }
 
@@ -101,14 +101,14 @@ public class IntegerOntology
     throw new ChangeVetoException(getName() + " is immutable");
   }
 
-  public Triple createTriple(Term subject, Term object, Term relation, String name, String description)
+  public Triple createTriple(Term subject, Term object, Term predicate, String name, String description)
           throws
           AlreadyExistsException,
           ChangeVetoException {
     throw new ChangeVetoException(getName() + " is immutable");
   }
 
-  public boolean containsTriple(Term subject, Term object, Term relation) {
+  public boolean containsTriple(Term subject, Term object, Term predicate) {
     return false;
   }
 

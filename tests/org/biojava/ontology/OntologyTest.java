@@ -50,7 +50,7 @@ public class OntologyTest extends TestCase {
         description = "Our Description";
         onto = OntoTools.getDefaultFactory().createOntology(name, description);
 
-        isa = onto.importTerm(OntoTools.ISA, null);
+        isa = onto.importTerm(OntoTools.SUB_TYPE_OF, null);
         animal = onto.createTerm("Animal", "An animal");
         fish = onto.createTerm("Fish", "A swimming, cold-blooded thingy");
         mammal = onto.createTerm("Mammal", "A milk-producing quadraped");

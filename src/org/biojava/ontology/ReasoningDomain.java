@@ -111,7 +111,7 @@ extends Changeable {
   throws ChangeVetoException;
 
   /**
-   * Decide if two terms are linked by a given relation.
+   * Decide if two terms are linked by a given predicate.
    *
    * <p>This method must use all information within this domain, and no
    * information not present in this domain to see if a relationship of the
@@ -126,16 +126,16 @@ extends Changeable {
    *
    * <p>The first clause is equivalent to scanning the ontologies for a triple
    * with exactly the right terms in this domain. The seccond clause states that
-   * this relation holds if there is any other relation that would imply it, and
-   * that relation holds.</p>
+   * this predicate holds if there is any other predicate that would imply it, and
+   * that predicate holds.</p>
    *
    * <p>Imported terms should be handled using the seccond clause. If x, y or S
    * are imported versions of a, b or R respectively, then the proposition
    * holds.</p>
    *
    * @for.developer
-   * <p>There are four types of relation that allow you to explore solutions
-   * involving a range of related terms for a given relation.</p>
+   * <p>There are four types of predicate that allow you to explore solutions
+   * involving a range of related terms for a given predicate.</p>
    *
    * <table>
    * <tr><td>symmetric</td><td>i R j implies j R i</td></tr>
@@ -180,11 +180,11 @@ extends Changeable {
    *
    * @param subject  the subject Term
    * @param object   the object Term
-   * @param relation the relation term
+   * @param predicate the predicate term
    * @return true if this relationship can be inferred within this domain
-   * @throws InvalidTermException  if the relation term is not a relation
+   * @throws InvalidTermException  if the predicate term is not a predicate
    */
-  public Iterator getMatching(Term subject, Term object, Term relation)
+  public Iterator getMatching(Term subject, Term object, Term predicate)
   throws InvalidTermException;
 
   /**
@@ -217,14 +217,6 @@ extends Changeable {
     private final Set explicitOntologies;
     private final Map allOntologies;
 
-    /**
-     * Working values for relations.
-     *
-     * Relation->true means we can prove that the relation holds
-     * Relation->false means that we can not prove that the relation holds
-     * Relation->null means that we are in the process of proving things
-     */
-    private final Map resultCache;
     //private final Map proofs;
     private final Ontology scratchOnto;
 
@@ -232,7 +224,6 @@ extends Changeable {
       try {
         explicitOntologies = new HashSet();
         allOntologies = new HashMap();
-        resultCache = new HashMap();
         //proofs = new HashMap();
         scratchOnto = OntoTools.getDefaultFactory().createOntology(
                 "Scratch",
@@ -394,13 +385,13 @@ extends Changeable {
       return new Variable.Impl(scratchOnto, name, "");
     }
 
-    public Iterator getMatching(Term subject, Term object, Term relation)
+    public Iterator getMatching(Term subject, Term object, Term predicate)
             throws InvalidTermException
     {
-      Triple virtualTerm = createVirtualTerm(subject, object, relation, null, null);
-      //System.err.println("Getting all matches for: " + virtualTerm);
+      Triple virtualTerm = createVirtualTerm(subject, object, predicate, null, null);
+      //System.out.println("Getting all matches for: " + virtualTerm);
       Set propTerms = new HashSet();
-      extractTerms(virtualTerm, propTerms);
+      //extractTerms(virtualTerm, propTerms);
 
       return new MatchIterator(virtualTerm,
                                getConstantAxioms(),
@@ -415,7 +406,7 @@ extends Changeable {
         Triple trip = (Triple) term;
         extractTerms(trip.getSubject(),  terms);
         extractTerms(trip.getObject(),   terms);
-        extractTerms(trip.getRelation(), terms);
+        extractTerms(trip.getPredicate(), terms);
 
         return;
       } else {
@@ -462,17 +453,19 @@ extends Changeable {
 
     Set getAxioms() {
       if(_axioms == null) {
-        _axioms = new HashSet(getTriples());
+        Set axioms = new HashSet(getTriples());
 
-        for(Iterator i = new HashSet(_axioms).iterator(); i.hasNext(); ) {
+        for(Iterator i = new HashSet(axioms).iterator(); i.hasNext(); ) {
           Term t = (Term) i.next();
           if(t instanceof Triple) {
             Triple trip = (Triple) t;
-            _axioms.remove(trip.getSubject());
-            _axioms.remove(trip.getObject());
-            _axioms.remove(trip.getRelation());
+            axioms.remove(trip.getSubject());
+            axioms.remove(trip.getObject());
+            axioms.remove(trip.getPredicate());
           }
         }
+
+        _axioms = Collections.unmodifiableSet(axioms);
       }
 
       return _axioms;
@@ -482,15 +475,17 @@ extends Changeable {
 
     Set getConstantAxioms() {
       if(_constantAxioms == null) {
-        _constantAxioms = new HashSet(getAxioms());
+        Set constantAxioms = new HashSet(getAxioms());
 
-        for(Iterator i = _constantAxioms.iterator(); i.hasNext(); ) {
+        for(Iterator i = constantAxioms.iterator(); i.hasNext(); ) {
           Term t = (Term) i.next();
 
           if(findFirstVariable(t) != null) {
             i.remove();
           }
         }
+
+        _constantAxioms = Collections.unmodifiableSet(constantAxioms);
       }
 
       return _constantAxioms;
@@ -500,105 +495,126 @@ extends Changeable {
 
     Set getVariableAxioms() {
       if(_variableAxioms == null) {
-        _variableAxioms = new HashSet(getAxioms());
+        Set variableAxioms = new HashSet(getAxioms());
 
-        for(Iterator i = _variableAxioms.iterator(); i.hasNext();) {
+        for(Iterator i = variableAxioms.iterator(); i.hasNext();) {
           Term t = (Term) i.next();
 
           if(findFirstVariable(t) == null) {
             i.remove();
           }
         }
+
+        _variableAxioms = Collections.unmodifiableSet(variableAxioms);
       }
 
       return _variableAxioms;
     }
 
-    Triple createVirtualTerm(Term subject, Term object, Term relation,
+    Triple createVirtualTerm(Term subject, Term object, Term predicate,
                              String name, String description) {
       try {
         if(subject.getOntology() != scratchOnto)
           subject = scratchOnto.importTerm(subject, null);
         if(object.getOntology() != scratchOnto)
           object = scratchOnto.importTerm(object, null);
-        if(relation.getOntology() != scratchOnto)
-          relation = scratchOnto.importTerm(relation, null);
+        if(predicate.getOntology() != scratchOnto)
+          predicate = scratchOnto.importTerm(predicate, null);
       } catch (ChangeVetoException e) {
         throw new AssertionFailure(e);
       }
 
-      return new Triple.Impl(subject, object, relation, name, description);
+      return new Triple.Impl(subject, object, predicate, name, description);
     }
 
     boolean areTriplesEqual(Triple a, Triple b)
     {
-      //System.err.println("areTriplesEqual:\n\t: " + a + "\n\t: " + b);
+      //System.out.println("areTriplesEqual:\n\t: " + a + "\n\t: " + b);
 
       if(a == b) {
-        //System.err.println("areTriplesEqual: Identical refferences");
+        //System.out.println("areTriplesEqual: Identical refferences");
         return true;
       }
 
-      if(!areTermsEqual(a.getRelation(), b.getRelation())) {
-        //System.err.println("areTriplesEqual: different relations");
+      if(!areTermsEqual(a.getPredicate(), b.getPredicate())) {
+        //System.out.println("areTriplesEqual: different relations");
         return false;
       }
 
       if(!areTermsEqual(a.getSubject(), b.getSubject())) {
-        //System.err.println("areTriplesEqual: different subjects");
+        //System.out.println("areTriplesEqual: different subjects");
         return false;
       }
 
       if(!areTermsEqual(a.getObject(), b.getObject())) {
-        //System.err.println("areTriplesEqual: different objects");
+        //System.out.println("areTriplesEqual: different objects");
         return false;
       }
 
-      //System.err.println("Same subject, object and relation");
+      //System.out.println("Same subject, object and predicate");
       return true;
     }
 
     boolean areTermsEqual(Term a, Term b)
     {
-      //System.err.println("areTermsEqual:\n\t: " + a + "\n\t: " + b);
+      //System.out.println("areTermsEqual:\n\t: " + a + "\n\t: " + b);
       a = resolveRemote(a);
       b = resolveRemote(b);
 
-      //System.err.println("areTermsEqual resolved:\n\t: " + a + "\n\t: " + b);
+      //System.out.println("areTermsEqual resolved:\n\t: " + a + "\n\t: " + b);
 
       if(a == b) {
-        //System.err.println("areTermsEqual: Identical terms");
+        //System.out.println("areTermsEqual: Identical terms");
         return true;
       }
 
       if(a instanceof Triple & b instanceof Triple) {
-        //System.err.println("areTermsEqual: Triples - calling areTriplesEqual");
+        //System.out.println("areTermsEqual: Triples - calling areTriplesEqual");
         return areTriplesEqual((Triple) a, (Triple) b);
       }
 
-      //System.err.println("Terms are not equal");
+      //System.out.println("Terms are not equal");
       return false;
     }
 
     boolean evaluateExpression(Term expr)
     {
-      //System.err.println("evaluateExpression: " + expr);
+      //System.out.println("evaluateExpression: " + expr);
       if(expr instanceof Triple) expr = evaluateTriple((Triple) expr);
 
       if(areTermsEqual(expr, OntoTools.TRUE)) {
-        //System.err.println("evaluateExpression: true <- " + expr);
+        //System.out.println("evaluateExpression: true <- " + expr);
         return true;
       } else {
-        //System.err.println("evaluateExpression: false <- " + expr);
+        //System.out.println("evaluateExpression: false <- " + expr);
         return false;
       }
     }
 
+    /**
+     * Working values for relations.
+     *
+     * predicate->true means we can prove that the predicate holds
+     * predicate->false means that we can not prove that the predicate holds
+     * predicate->null means that we are in the process of proving things
+     */
+    private Map resultCache = null;
+
+    Map getResultCache() {
+      if(resultCache == null) {
+        resultCache = new HashMap();
+      }
+
+      return resultCache;
+    }
+
     Term evaluateTriple(Triple expr)
     {
-      //System.err.println("evaluateTriple: Evaluating: " + expr);
+      //System.out.println("evaluateTriple: Evaluating: " + expr);
 
       // see if we already know the answer
+      Map resultCache = getResultCache();
+      //System.out.println("evaluateTriple: results so far: " + resultCache.keySet().size());
       if(resultCache.keySet().contains(expr)) {
         Term res = (Term) resultCache.get(expr);
 
@@ -606,15 +622,20 @@ extends Changeable {
           res = OntoTools.FALSE;
         }
 
-        //System.err.println("evaluateTriple: Known result: " + res);
+        //System.out.println("evaluateTriple: Known result: " + res);
         return res;
+      } else {
+        //System.out.println("evaluateTriple: Never seen this before: " + expr.hashCode() + " " + expr);
       }
+
+      resultCache.put(expr, null);
 
       for(Iterator i = getAxioms().iterator();
           i.hasNext(); ) {
         Term t = (Term) i.next();
         if(areTermsEqual(t, expr)) {
-          //System.err.println("evaluateTriple: this is an axiom, so is true");
+          //System.out.println("evaluateTriple: this is an axiom, so is true");
+          resultCache.put(expr, OntoTools.TRUE);
           return OntoTools.TRUE;
         }
       }
@@ -622,7 +643,7 @@ extends Changeable {
       // we need to do some real evaluation - first resolve our terms
       Term sub = resolveRemote(expr.getSubject());
       Term obj = resolveRemote(expr.getObject());
-      Term rel = resolveRemote(expr.getRelation());
+      Term rel = resolveRemote(expr.getPredicate());
 
 
       // let's evaluate the 3 components
@@ -631,14 +652,18 @@ extends Changeable {
 
       // bit hairy here - doing some funkey recursive shit
       /*try {
+        //System.out.println("evaluateTriple: Recursive call for: " + depth + " " + expr);
         Iterator mi = getMatching(sub, obj, rel);
         Term value = (mi.hasNext()) ? OntoTools.TRUE : OntoTools.FALSE;
+        //System.out.println("evaluateTriple: Evaluated: " + expr + " to " + value);
         resultCache.put(expr, value);
-        //System.err.println("evaluateTriple: Evaluated: " + expr + " to " + value);
         return value;
       } catch (InvalidTermException ie) {
         throw new AssertionFailure(ie);
       }*/
+
+      //System.out.println("evaluateTriple: Unable to prove proposition");
+      resultCache.put(expr, OntoTools.FALSE);
       return OntoTools.FALSE;
     }
 
@@ -653,9 +678,9 @@ extends Changeable {
 
     Term substitute(Term expr, Term origVal, Term newVal)
     {
-      //System.err.println("substitute: expression: " + expr + " origVal: " + origVal + " newVal: " + newVal);
+      //System.out.println("substitute: expression: " + expr + " origVal: " + origVal + " newVal: " + newVal);
       if(areTermsEqual(expr, origVal)) {
-        //System.err.println("substitute: expression and origVal are equal");
+        //System.out.println("substitute: expression and origVal are equal");
         return newVal;
       }
 
@@ -663,13 +688,13 @@ extends Changeable {
         Triple trip = (Triple) expr;
         Term res = createVirtualTerm(substitute(trip.getSubject(), origVal, newVal),
                                      substitute(trip.getObject(), origVal, newVal),
-                                     substitute(trip.getRelation(), origVal, newVal),
+                                     substitute(trip.getPredicate(), origVal, newVal),
                                      null,
                                      null);
-        //System.err.println("substitute: transformed " + expr + " into " + res);
+        //System.out.println("substitute: transformed " + expr + " into " + res);
         return res;
       }
-      //System.err.println("substitute: not changed " + expr);
+      //System.out.println("substitute: not changed " + expr);
       return expr;
     }
 
@@ -684,7 +709,7 @@ extends Changeable {
 
         Variable r;
 
-        r = findFirstVariable(trip.getRelation());
+        r = findFirstVariable(trip.getPredicate());
         if(r != null) return r;
 
         r = findFirstVariable(trip.getSubject());
@@ -698,12 +723,12 @@ extends Changeable {
     }
 
     private Set _values;
-    private Map _knownVals;
+    //private Map _knownVals;
 
     Set findValues(Term term, Variable var) {
       if(_values == null) {
         _values = new HashSet(getTerms());
-        _knownVals = new HashMap();
+        //_knownVals = new HashMap();
 
         for(Iterator i = _values.iterator(); i.hasNext(); ) {
           Term t = (Term) i.next();
@@ -722,46 +747,45 @@ extends Changeable {
         }
       }
 
-      Set vals = (Set) _knownVals.get(var);
+      //Set vals = (Set) _knownVals.get(var);
+      Set vals = null;
       if(vals == null) {
-        Set types = new HashSet();
-        populateMembership(term, var, types);
-        System.err.println("Variable: " + var + " should be of types: " + types + "\n" + term);
+        try {
+          Set types = new HashSet();
+          populateMembership(term, var, types);
+          //System.out.println("Variable: " + var + " should be of types: " + types + "\n\t" + term);
 
-        if(types.isEmpty()) {
-          System.err.println("Unable to work out the type of " + var + " in " + term);
-        }
-
-        vals = new HashSet(_values);
-        System.err.println("Starting with values: " + vals.size());
-        for(Iterator i = vals.iterator(); i.hasNext(); ) {
-          Term tested = (Term) i.next();
-          for(Iterator typeI = types.iterator(); typeI.hasNext();) {
-            Term type = (Term) typeI.next();
-            if(type == OntoTools.ANY) {
-              continue;
-            }
-
-            if(type == OntoTools.NONE) {
-              i.remove();
-              break;
-            }
-
-            boolean shouldKeep = false;
-            for(Iterator tci = transitiveClosure(null, type, OntoTools.ISA).iterator(); tci.hasNext(); ) {
-              Triple matches = (Triple) tci.next();
-              Term tc = matches.getSubject();
-
-              if(tripleExists(tested, tc, OntoTools.INSTANCEOF)) {
-                shouldKeep = true;
-                break;
-              }
-            }
-            if(!shouldKeep) i.remove();
+          if(types.isEmpty()) {
+            //System.out.println("Unable to work out the type of " + var + " in " + term);
+            types.add(OntoTools.ANY);
           }
+
+          Ontology ioC = getInstanceOfClosure();
+          Term io = ioC.importTerm(OntoTools.INSTANCE_OF, null);
+
+          HashSet values = new HashSet();
+          Iterator typeI = types.iterator();
+          Term type = ioC.importTerm((Term) typeI.next(), null);
+
+          values.addAll(ioC.getTriples(null, type, io));
+          //System.out.println("\tvalues: " + type + " " + values);
+          while(typeI.hasNext()) {
+            type = ioC.importTerm((Term) typeI.next(), null);
+            values.retainAll(ioC.getTriples(null, type, io));
+            //System.out.println("\tvalues: " + type + " " + values);
+          }
+
+          vals = new HashSet();
+          for(Iterator i = values.iterator(); i.hasNext(); )  {
+            Triple trip = (Triple) i.next();
+            vals.add(trip.getSubject());
+          }
+
+          //_knownVals.put(var, vals);
+          //System.out.println("Final values: " + vals.size() + " " + vals);
+        } catch (ChangeVetoException e) {
+          throw new AssertionFailure(e);
         }
-        _knownVals.put(var, vals);
-        System.err.println("Final values: " + vals.size() + " " + vals);
       }
 
       return vals;
@@ -769,110 +793,189 @@ extends Changeable {
 
     Map _closures = new HashMap();
 
-    Set transitiveClosure(Term subject, Term object, Term relation) {
-      if(relation == null) {
-        throw new IllegalArgumentException("Relation must not be null");
-      }
+    Ontology _subTypeOfClosure;
 
-      Ontology closure = (Ontology) _closures.get(resolveRemote(relation));
-
-      if(closure == null) {
+    Ontology getSubTypeOfClosure() {
+      if(_subTypeOfClosure == null) {
+        //System.out.println("Creating closure over SUB_TYPE_OF");
         try {
-          closure = OntoTools.getDefaultFactory().createOntology(
-                  "closure over: " + subject + ", " + object + ", " + relation,
-                  null);
+          _subTypeOfClosure = OntoTools.getDefaultFactory().createOntology(
+                  "sub_type_of_closure",
+                  "Closure over sub_type_of");
+          Term sto = _subTypeOfClosure.importTerm(OntoTools.SUB_TYPE_OF, null);
 
-          Set triples = getTriples(null, null, relation);
-          Set terms = new HashSet();
-          for(Iterator i = triples.iterator(); i.hasNext(); ) {
-            Triple t = (Triple) i.next();
-            terms.add(resolveRemote(t.getSubject()));
-            terms.add(resolveRemote(t.getObject()));
-            terms.add(resolveRemote(t.getRelation()));
+          Set typeDecls = getTriples(null, OntoTools.TYPE, OntoTools.SUB_TYPE_OF);
+          //System.out.println("Top Types: " + typeDecls);
+
+          Set types = new HashSet();
+          for(Iterator i = typeDecls.iterator(); i.hasNext(); ) {
+            Triple trip = (Triple) i.next();
+            types.add(trip.getSubject());
+          }
+          types.add(OntoTools.TYPE); // incase it gets missed
+          //System.out.println("Main types: " + types);
+
+          Set allTypes = new HashSet();
+          // if we say x instance_of type, then x is a type
+          for(Iterator ti = types.iterator(); ti.hasNext();) {
+            Term type = (Term) ti.next();
+            allTypes.addAll(getTriples(null, type, OntoTools.INSTANCE_OF));
+          }
+          // if we say x sub_type_of y, then x and y must be types
+          allTypes.addAll(getTriples(null, null, OntoTools.SUB_TYPE_OF));
+
+          //System.out.println("ALL types: " + allTypes);
+
+          for(Iterator ti = allTypes.iterator(); ti.hasNext(); ) {
+            Triple type = (Triple) ti.next();
+            Term rt = _subTypeOfClosure.importTerm(type.getSubject(), null);
+
+            if(!_subTypeOfClosure.containsTriple(rt, rt, sto)) {
+              _subTypeOfClosure.createTriple(rt, rt, sto, null, null);
+            }
           }
 
-          for(Iterator i = terms.iterator(); i.hasNext(); ) {
-            Term t = (Term) i.next();
-            Term rt = closure.importTerm(t, null);
+          Set existingRelations = getTriples(null, null, OntoTools.SUB_TYPE_OF);
+          //System.out.println("Exploring existing relations: " + existingRelations);
+          for(Iterator eri = existingRelations.iterator(); eri.hasNext(); ) {
+            Triple triple = (Triple) eri.next();
 
-            closure.createTriple(rt, rt, relation, null, null);
+            objectClosure(_subTypeOfClosure.importTerm(triple.getSubject(), null),
+                          _subTypeOfClosure.importTerm(triple.getObject(), null),
+                          sto,
+                          _subTypeOfClosure);
           }
-
-          for(Iterator i = triples.iterator(); i.hasNext(); ) {
-            Triple t = (Triple) i.next();
-            closure.createTriple(closure.importTerm(t.getSubject(), null),
-                                 closure.importTerm(t.getObject(), null),
-                                 closure.importTerm(t.getRelation(), null),
-                                 null,
-                                 null);
-          }
-
-          for(Iterator i = closure.getTriples(null, null, relation).iterator();
-              i.hasNext();
-                  ) {
-            Triple t = (Triple) i.next();
-            objectClosure(t.getSubject(), t.getObject(), relation, closure);
-          }
-        } catch (ChangeVetoException e) {
-          throw new AssertionFailure(e);
-        } catch (AlreadyExistsException e) {
-          throw new AssertionFailure(e);
+          //System.out.println("Full closure: " + _subTypeOfClosure.getTriples(null, null, sto));
         } catch (OntologyException e) {
+          throw new AssertionFailure(e);
+        } catch (ChangeVetoException e) {
           throw new AssertionFailure(e);
         }
       }
 
-      try {
-        if(subject != null) subject = closure.importTerm(subject, null);
-        if(object != null) object = closure.importTerm(object, null);
-        if(relation != null) relation = closure.importTerm(relation, null);
-      } catch (ChangeVetoException e) {
-        throw new AssertionFailure(e);
+      return _subTypeOfClosure;
+    }
+
+    Ontology _instanceOfClosure;
+
+    Ontology getInstanceOfClosure() {
+      if(_instanceOfClosure == null) {
+        //System.out.println("Creating instance_of closure");
+        try {
+          _instanceOfClosure = OntoTools.getDefaultFactory().createOntology(
+                  "instance_of_closure",
+                  "Closure over instance_of");
+          Term io = _instanceOfClosure.importTerm(OntoTools.INSTANCE_OF, null);
+
+          Ontology sub_types = getSubTypeOfClosure();
+          Term sto = sub_types.importTerm(OntoTools.SUB_TYPE_OF, null);
+
+          Set instancesOf = getTriples(null, null, OntoTools.INSTANCE_OF);
+          for(Iterator i = instancesOf.iterator(); i.hasNext(); ) {
+            Triple trip = (Triple) i.next();
+            //System.out.println("\tProcessing:" + trip);
+
+            Term instance = _instanceOfClosure.importTerm(trip.getSubject(), null);
+            Term type = trip.getObject();
+
+            typeIoIsaClosure(sub_types, type, sto, instance, io);
+
+            Term sub = sub_types.importTerm(trip.getSubject(), null);
+            Set subTypes = sub_types.getTriples(null, sub, sto);
+            for(Iterator sti = subTypes.iterator(); sti.hasNext(); ) {
+              Triple stTrip = (Triple) sti.next();
+              typeIoIsaClosure(sub_types, type, sto, _instanceOfClosure.importTerm(stTrip.getSubject(), null), io);
+            }
+          }
+
+          Term any = _instanceOfClosure.importTerm(OntoTools.ANY, null);
+          for(Iterator i = getTerms().iterator(); i.hasNext(); ) {
+            Term t = (Term) i.next();
+            Term rt = _instanceOfClosure.importTerm(t, null);
+            if(!_instanceOfClosure.containsTriple(rt, any, io) ) {
+              _instanceOfClosure.createTriple(rt, any, io, null, null);
+            }
+          }
+
+          //System.out.println("All instance_of relations: " + _instanceOfClosure.getTriples(null, null, null));
+        } catch (ChangeVetoException e) {
+          throw new AssertionFailure(e);
+        } catch (OntologyException e){
+          throw new AssertionFailure(e);
+        }
       }
 
-      return closure.getTriples(subject, object, relation);
+      return _instanceOfClosure;
+    }
+
+    private void typeIoIsaClosure(Ontology sub_types, Term type, Term sto, Term instance, Term io) throws ChangeVetoException, AlreadyExistsException
+    {
+      Set typeClosure = sub_types.getTriples(sub_types.importTerm(type, null),
+                                             null,
+                                             sto);
+      for(Iterator tci = typeClosure.iterator(); tci.hasNext(); ) {
+        Triple typeTrip = (Triple) tci.next();
+        Term tp = _instanceOfClosure.importTerm(typeTrip.getObject(), null);
+        if(!_instanceOfClosure.containsTriple(instance,  tp, io)) {
+          _instanceOfClosure.createTriple(instance,
+                                          tp,
+                                          io,
+                                          null,
+                                          null);
+        }
+      }
     }
 
     private void objectClosure(Term subject,
                                Term object,
-                               Term relation,
+                               Term predicate,
                                Ontology closure)
     {
-      Set targets = closure.getTriples(object, null, relation);
-      for(Iterator i = targets.iterator(); i.hasNext(); ) {
-        Term t = (Term) i.next();
-        if(t != subject && t != object) {
-          objectClosure(subject, t, relation, closure);
-          try {
-            closure.createTriple(subject, t, relation, null, null);
-          } catch (AlreadyExistsException e) {
-            throw new AssertionFailure(e);
-          } catch (ChangeVetoException e) {
-            throw new AssertionFailure(e);
-          }
+      try {
+        Term sub = closure.importTerm(subject, null);
+        Term obj = closure.importTerm(object, null);
+        Term prd = closure.importTerm(predicate, null);
+        if(!closure.containsTriple(sub, obj, prd)) {
+          closure.createTriple(sub, obj, prd, null, null);
+        }
+      } catch (AlreadyExistsException e) {
+        throw new AssertionFailure(e);
+      } catch (ChangeVetoException e) {
+        throw new AssertionFailure(e);
+      }
+
+      Set targets = getTriples(object, null, predicate);
+      for(Iterator i = targets.iterator(); i.hasNext();) {
+        Triple t = (Triple) i.next();
+        Term tObj = t.getObject();
+        if(tObj != subject && tObj != object && !(tObj instanceof Variable)) {
+          objectClosure(subject, tObj, predicate, closure);
         }
       }
     }
 
-    boolean tripleExists(Term subject, Term object, Term relation) {
-      return !getTriples(subject, object, relation).isEmpty();
+    boolean tripleExists(Term subject, Term object, Term predicate) {
+      return !getTriples(subject, object, predicate).isEmpty();
     }
 
-    Set getTriples(Term subject, Term object, Term relation) {
-      MergingSet mSet = new MergingSet();
+    Set getTriples(Term subject, Term object, Term predicate) {
+      Set triples = new HashSet();
 
       for(Iterator i = getOntologies().iterator(); i.hasNext(); ) {
         Ontology o = (Ontology) i.next();
         try {
-          mSet.addSet(o.getTriples(o.importTerm(subject, null),
-                                   o.importTerm(object, null),
-                                   o.importTerm(relation, null)));
+          if(subject  != null) subject  = o.importTerm(subject,  null);
+          if(object   != null) object   = o.importTerm(object,   null);
+          if(predicate != null) predicate = o.importTerm(predicate, null);
+          triples.addAll(o.getTriples(subject,
+                                     object,
+                                     predicate));
         } catch (ChangeVetoException e) {
           throw new AssertionFailure(e);
         }
       }
 
-      return mSet;
+      return triples;
     }
 
     private void populateMembership(Term term, Variable var, Set membership)
@@ -881,25 +984,29 @@ extends Changeable {
         Triple trip = (Triple) term;
         Term sub = resolveRemote(trip.getSubject());
         Term obj = resolveRemote(trip.getObject());
-        Term rel = resolveRemote(trip.getRelation());
+        Term rel = resolveRemote(trip.getPredicate());
 
-        if(resolveRemote(sub) == var) {
+        if(sub == var) {
+          //System.out.println("Variable used as subject: " + var + " " + trip);
           findDomain(rel, membership);
         } else {
           populateMembership(sub, var, membership);
         }
 
-        if(resolveRemote(obj) == var) {
+        if(obj == var) {
+          //System.out.println("Variable used as object: " + var + " " + trip);
           findCodomain(rel, membership);
         } else {
           populateMembership(obj, var, membership);
         }
 
-        if(resolveRemote(rel) == var) {
+        if(rel == var) {
+          //System.out.println("Variable used as relation: " + var + " " + trip);
           membership.add(OntoTools.RELATION);
         }
 
-        if(resolveRemote(rel) == OntoTools.INSTANCEOF) {
+        if(sub == var && rel == OntoTools.INSTANCE_OF) {
+          //System.out.println("Variable with INSTANCE_OF constraint: " + var + " " + trip);
           membership.add(obj);
         }
 
@@ -908,13 +1015,13 @@ extends Changeable {
 
     private void findDomain(Term term, Set membrs) {
       // dumb search - probably wrong
-      //System.err.println("findDomain: " + term);
+      //System.out.println("findDomain: " + term);
       for(Iterator i = getOntologies().iterator(); i.hasNext(); ) {
         Ontology onto = (Ontology) i.next();
         Set domains = onto.getTriples(null, term, OntoTools.DOMAIN);
         for(Iterator di = domains.iterator(); di.hasNext(); ) {
           Triple trip = (Triple) di.next();
-          //System.err.println("\t->" + trip);
+          //System.out.println("\t->" + trip);
           membrs.add(trip.getSubject());
         }
       }
@@ -925,8 +1032,8 @@ extends Changeable {
       // dumb search - probably wrong
       for(Iterator i = getOntologies().iterator(); i.hasNext();) {
         Ontology onto = (Ontology) i.next();
-        Set domains = onto.getTriples(null, term, OntoTools.CO_COMAIN);
-        for(Iterator di = domains.iterator(); di.hasNext();) {
+        Set co_domains = onto.getTriples(null, term, OntoTools.CO_DOMAIN);
+        for(Iterator di = co_domains.iterator(); di.hasNext();) {
           Triple trip = (Triple) di.next();
           membrs.add(trip.getSubject());
         }
@@ -934,11 +1041,10 @@ extends Changeable {
     }
 
     private static int depth = 0;
-    private static int tries = 0;
 
     /**
      * An Iterator that implements the state-machine that matches a given
-     * relation against all the things proveable by the ontology.
+     * predicate against all the things proveable by the ontology.
      *
      * @author Matthew Pocock
      */
@@ -973,12 +1079,12 @@ extends Changeable {
         }
         nextProposition = (Triple) propI.next();
 
-        System.err.println("Matcher for: " + proposition);
-        System.err.println("Propositioning: " + nextProposition);
+        //System.out.println("matchIterator: Matcher for: " + proposition);
+        //System.out.println("matchIterator: Propositioning: " + nextProposition);
 
         nextResult = findNextMatch();
-        //System.err.println("Created: " + this + ": " + depth);
-        if(depth > 5) throw new Error("Depth exceeded: " + depth);
+        //System.out.println("Created: " + this + ": " + depth);
+        if(depth > 400) throw new Error("Depth exceeded: " + depth);
       }
 
       public Object next() {
@@ -1000,10 +1106,8 @@ extends Changeable {
       }
 
       Triple findNextMatch() {
-        //System.err.println("findNextMatch in " + this.toString());
+        //System.out.println("findNextMatch in " + this.toString());
         while(true) {
-          tries++;
-
           Triple next;
           if(constI.hasNext()) {
             next = (Triple) constI.next();
@@ -1013,18 +1117,18 @@ extends Changeable {
             nextProposition = (Triple) propI.next();
             constI = constExps.iterator();
             varI = varI = new ExpressionIterator(extraVals, varExps);
-            System.err.println("Propositioning: " + nextProposition);
+            //System.out.println("findNextMatch: Propositioning: " + nextProposition);
             continue;
           } else {
-            //System.err.println("findNextMatch: Found no matches");
+            //System.out.println("findNextMatch: Found no matches");
             depth--;
             return null;
           }
 
-          //if(tries % 10000 == 0) System.err.println("Iteration: " + tries + "\n\t" + next);
+          //if(tries % 10000 == 0) //System.out.println("Iteration: " + tries + "\n\t" + next);
 
-          //System.err.println("findNextMatch: Proposition: " + nextProposition);
-          //System.err.println("findNextMatch: Evaluating: " + next);
+          //System.out.println("findNextMatch: Proposition: " + nextProposition);
+          //System.out.println("findNextMatch: Evaluating: " + next);
 
           Term ifTrue = substitute(next, nextProposition, OntoTools.TRUE);
           if(evaluateExpression(ifTrue) == false) continue;
@@ -1032,7 +1136,7 @@ extends Changeable {
           Term ifFalse = substitute(next, nextProposition, OntoTools.FALSE);
           if(evaluateExpression(ifFalse) == true) continue;
 
-          //System.err.println("findNextMatch: Accepted: " + next);
+          //System.out.println("findNextMatch: Accepted: " + next);
 
           return next;
         }
@@ -1073,30 +1177,37 @@ extends Changeable {
       }
 
       Triple findNext() {
-        //System.err.println("findNext: Finding next term to evaluate");
+        //System.out.println("findNext: Finding next term to evaluate");
 
         if(stack.size() == 0) {
-          //System.err.println("findNext: Nothing left in subs");
+          //System.out.println("findNext: Nothing left in subs");
           while(true) {
             if(!axI.hasNext()) {
-              //System.err.println("findNext: No more axioms");
+              //System.out.println("findNext: No more axioms");
               return null;
             }
 
             Triple expr = (Triple) axI.next();
-            //System.err.println("findNext: Testing next axiom: " + expr);
+            //System.out.println("findNext: Testing next axiom: " + expr);
             Variable var = findFirstVariable(expr);
 
-            //System.err.println("findNext: First variable is: " + var);
+            //System.out.println("findNext: First variable is: " + var);
 
             Set vals = findValues(expr, var);
+            //if(var.getName().equals("_x:76")) System.out.println("Values for " + var + " = " + vals);
             vals.addAll(propTerms);
+            for(Iterator i = vals.iterator(); i.hasNext(); ) {
+              Term t = resolveRemote((Term) i.next());
+              if(t instanceof Variable) i.remove();
+              if(t instanceof Triple) i.remove();
+            }
+            //System.out.println("Possible values: " + var + " " + vals);
 
             // got one
             OptionSearcher subs = new OptionSearcher(expr, var, vals.iterator());
-            //System.err.println("findNext: Created new option searcher: " + subs);
+            //System.out.println("findNext: Created new option searcher: " + subs);
             stack.push(subs);
-            //System.err.println("findNext: Pushing a new frame: " + stack);
+            //System.out.println("findNext: Pushing a new frame: " + stack);
             break;
           }
         }
@@ -1106,9 +1217,9 @@ extends Changeable {
         while(true) {
           if(!subs.hasNext()) {
             stack.pop();
-            //System.err.println("findNext: Run out of options: " + stack);
+            //System.out.println("findNext: Run out of options: " + stack);
             if(stack.isEmpty()) {
-              //System.err.println("findNext: Empty stack - out of options");
+              //System.out.println("findNext: Empty stack - out of options");
               return findNext();
             }
 
@@ -1124,7 +1235,14 @@ extends Changeable {
           if(var == null) return wrap(expr, stack);        // this contains no variables
 
           Set vals = findValues(expr, var);
+          //if(var.getName().equals("_x:76")) System.out.println("Values for " + var + " = " + vals);
           vals.addAll(propTerms);
+          for(Iterator i = vals.iterator(); i.hasNext();) {
+            Term t = resolveRemote((Term) i.next());
+            if(t instanceof Variable) i.remove();
+            if(t instanceof Triple) i.remove();
+          }
+          //System.out.println("Possible values: " + var + " " + vals);
 
           subs = new OptionSearcher(expr, var, vals.iterator());
           //System.out.println("findNext: Creating new option searcher: " + subs + " " + vals);
@@ -1151,7 +1269,7 @@ extends Changeable {
 
         return createVirtualTerm(expr.getSubject(),
                                  expr.getObject(),
-                                 expr.getRelation(),
+                                 expr.getPredicate(),
                                  name.toString(),
                                  null);
       }
@@ -1210,6 +1328,30 @@ extends Changeable {
       {
         return "@" + hashCode() + " " + getVar();
       }
+    }
+  }
+
+  static class Expression {
+    private final Term term;
+    private final Term value;
+    private final Term reason;
+
+    public Expression(Term term, Term value, Term reason) {
+      this.term = term;
+      this.value = value;
+      this.reason = reason;
+    }
+
+    public Term getTerm() {
+      return term;
+    }
+
+    public Term getValue() {
+      return value;
+    }
+
+    public Term getReason() {
+      return reason;
     }
   }
 }
