@@ -129,6 +129,39 @@ public class SeqIOToolsTest extends TestCase
           fail(ex.getMessage());
         }
 
+        /******* test readGenbankXml ***********/
+        
+        // get access to the test file
+        inputS = this.getClass().getResourceAsStream("/files/AY069118-gb.xml");
+        assertNotNull(inputS);
+
+        // get SequenceIterator
+        seqI = SeqIOTools.readGenbankXml(
+            new BufferedReader(new InputStreamReader(inputS)));
+
+        // get sequence
+        assertTrue(seqI.hasNext());
+        Sequence genbankXmlDNASeq = null;
+        try {
+            genbankXmlDNASeq = seqI.nextSequence();
+        }
+        catch (BioException be) {}
+
+        assertNotNull(genbankXmlDNASeq);
+        
+        // is its length correct?
+        assertEquals("GenbankXml sequence AY069118-gb.xml had incorrect length", genbankXmlDNASeq.length(), 1502);
+        
+        // compare with fasta reference
+        assertTrue(compareSymbolLists(fastaDNASeq, genbankXmlDNASeq));
+        
+        baos = new ByteArrayOutputStream();
+        try {
+          SeqIOTools.writeFasta(baos, genbankXmlDNASeq);
+        }
+        catch (IOException ex) {
+          fail(ex.getMessage());
+        }
 
         /******* test readEmblNucleotide **********/
 
@@ -165,7 +198,7 @@ public class SeqIOToolsTest extends TestCase
         }
 
       }
-
+    
     public void testProteinReadersAndWriters()
     {
         /******* test readFastaProtein *********/
