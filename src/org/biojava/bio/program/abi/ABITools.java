@@ -9,7 +9,7 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
 /**
- * Usefull functionality for working with fasta files where the quality of the
+ * Useful functionality for working with fasta files where the quality of the
  * DNA is encoded as upper and lower case DNA characters.
  *
  * @author Matthew Pocock
@@ -88,7 +88,7 @@ public class ABITools {
    *
    * <p>
    * The alignment will have labels of SEQUENCE and SUPPORT that retrieve the
-   * dna sequence and the binary support values respectively.
+   * DNA sequence and the binary support values respectively.
    * </p>
    *
    * @param abiSeq  the SymbolList over the QUALITY alphabet to view

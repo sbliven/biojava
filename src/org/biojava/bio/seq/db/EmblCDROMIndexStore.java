@@ -248,7 +248,7 @@ public class EmblCDROMIndexStore implements IndexStore
             Object [] enRecord = entryRandomAccess.findRecord(id);
 
             if (enRecord.length == 0)
-                throw new IllegalIDException("Failed to find id: " + id);
+                throw new IllegalIDException("Failed to find ID: " + id);
 
 	    // Append current pathPrefix
             index = new SimpleIndex(new File(pathPrefix, (String) seqFiles.get((Integer) enRecord[3])),
@@ -258,7 +258,7 @@ public class EmblCDROMIndexStore implements IndexStore
         }
         catch (IOException ioe)
         {
-            throw new BioException("Failed to retrieve index for id: " + id);
+            throw new BioException("Failed to retrieve index for ID: " + id);
         }
 
         return index;
