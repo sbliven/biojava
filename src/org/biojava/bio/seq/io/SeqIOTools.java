@@ -684,7 +684,7 @@ public final class SeqIOTools  {
             case SeqIOConstants.RNA:
                 return RNATools.getRNA();
             case SeqIOConstants.AA:
-                return ProteinTools.getAlphabet();
+                return ProteinTools.getTAlphabet();
             default:
                 throw new BioException("No FiniteAlphabet available for "
                                        + "alphabet identifier '"
