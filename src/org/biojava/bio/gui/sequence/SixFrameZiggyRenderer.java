@@ -33,7 +33,6 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.*;
 
 import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.genomic.*;
 
 import java.util.List;
 
