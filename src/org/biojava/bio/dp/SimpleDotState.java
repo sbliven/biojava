@@ -39,11 +39,26 @@ import org.biojava.bio.symbol.*;
  */
 public class SimpleDotState
 extends FundamentalAtomicSymbol implements DotState, Serializable {
-  public SimpleDotState(char symbol, String name, Annotation annotation) {
-    super(name, symbol, annotation);
+  /**
+   * Construct a new state with the specified name and annotation.
+   * The token parameter is ignored but included for compatibility.
+   *
+   * @deprecated token is ignored since 1.2.  Use the 2-arg constructor instead.
+   */
+    
+  public SimpleDotState(char token, String name, Annotation annotation) {
+    super(name, annotation);
+  }
+  
+  /**
+   * Construct a new state with the specified name and annotation
+   */
+    
+  public SimpleDotState(String name, Annotation annotation) {
+    super(name, annotation);
   }
   
   public SimpleDotState(String name) {
-    super(name, name.charAt(0), Annotation.EMPTY_ANNOTATION);
+    super(name, Annotation.EMPTY_ANNOTATION);
   }
 }

@@ -29,18 +29,26 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * A no-frills implementation of BasisSymbol.
+ * A basic implementation of BasisSymbol.
+ *
+ * @for.user
+ * If you wish to construct new Symbols, you should normally do so via utility methods
+ * on <code>AlphabetManager</code>.
+ *
+ * @for.developer
+ * This may be a useful base class for custom implementations.
  *
  * @author Matthew Pocock
  */
+ 
 class SimpleBasisSymbol extends SimpleSymbol
 implements BasisSymbol {
   protected List symbols;
   
   protected SimpleBasisSymbol(
-    char token, Annotation annotation, List symbols
+    Annotation annotation, List symbols
   ) throws IllegalSymbolException {
-    this(token, annotation);
+    this(annotation);
     if(symbols == null) {
       throw new NullPointerException("symbols can't be null");
     }
@@ -53,25 +61,26 @@ implements BasisSymbol {
   }
   
   protected SimpleBasisSymbol(
-    char token, Annotation annotation
+    Annotation annotation
   ) {
-    super(token, annotation);
+    super(annotation);
   }
   
   public SimpleBasisSymbol(
-    char token, Annotation annotation,
+    Annotation annotation,
     Alphabet matches
   ) {
-    this(token, annotation);
+    this(annotation);
     this.matches = matches;
     this.symbols = Collections.nCopies(1, this);
   }
   
   public SimpleBasisSymbol(
-    char token, Annotation annotation,
-    List symbols, Alphabet matches
+    Annotation annotation,
+    List symbols,
+    Alphabet matches
   ) throws IllegalSymbolException {
-    this(token, annotation, symbols);
+    this(annotation, symbols);
     this.matches = matches;
   }
   
@@ -82,7 +91,6 @@ implements BasisSymbol {
     if(symbols.size() == 0) {
       throw new BioError(
         "Assertion Failure: symbols array is of length 0 in " + this +
-        "\n\ttoken: " + getToken() +
         "\n\tname: " + getName() +
         "\n\tsymbols: " + this.symbols +
         "\n\tmatches: " + this.matches

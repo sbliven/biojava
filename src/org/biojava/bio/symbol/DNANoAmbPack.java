@@ -25,6 +25,11 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 /**
+ * A <code>Packing</code> implementation which handles the DNA alphabet, without any
+ * support for ambiguity symbols.  In normal use, the only returns values between
+ * 0 and 3, and so requires only two bits of storage per symbol.
+ *
+ * @since 1.3
  * @author Matthew Pocock
  * @author Thomas Down
  */  
@@ -35,10 +40,20 @@ public class DNANoAmbPack
 {
   final byte placeHolder;
     
-
+    /**
+     * Construct a new packing which returns the specified byte value for unknown Symbols
+     * (such as ambiguity symbols).  This might be outside the normal range of return
+     * values (0-3), allowing callers to detect ambiguity symbols and ignore them.
+     */
+    
     public DNANoAmbPack(byte placeHolder) {
-	this.placeHolder = placeHolder;
+        this.placeHolder = placeHolder;
     }
+  
+    /**
+     * Construct a new packing which translates unknown symbols into
+     * the specified symbol.
+     */
   
     public DNANoAmbPack(Symbol placeHolderSymbol) {
 	this.placeHolder = pack(placeHolderSymbol);

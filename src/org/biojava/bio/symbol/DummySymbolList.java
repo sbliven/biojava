@@ -30,7 +30,17 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
 /**  
- * Symbol list which just consists of 'N' symbols.
+ * Symbol list which just consists of non-informative symbols.
+ * A DummySymbolList can be constructed over any Alphabet, and may
+ * be of any length.  Calls to the symbolAt method will always return
+ * the non-informative symbol for the alphabet in question (i.e.
+ * 'n' for DNA, 'X' for protein, etc.).
+ *
+ * @for.user
+ * If you wish to work with <code>Feature</code> objects, but don't
+ * have the actual sequence data available, you can construct a
+ * <code>SimpleSequence</code> from a <code>DummySequence</code>,
+ * and create features. on that.
  *
  * @author Thomas Down
  * @since 1.2
@@ -42,22 +52,22 @@ public class DummySymbolList extends AbstractSymbolList implements Serializable 
     private final int length;
 
     public DummySymbolList(FiniteAlphabet alpha, int length) {
-	super();
-	this.alpha = alpha;
-	this.length = length;
-	sym = AlphabetManager.getAllAmbiguitySymbol(alpha);
+        super();
+        this.alpha = alpha;
+        this.length = length;
+        sym = AlphabetManager.getAllAmbiguitySymbol(alpha);
     }
 
     public Alphabet getAlphabet() {
-	return alpha;
+        return alpha;
     }
 
     public int length() {
-	return length;
+        return length;
     }
 
     public Symbol symbolAt(int i) {
-	return sym;
+        return sym;
     }
 }
     

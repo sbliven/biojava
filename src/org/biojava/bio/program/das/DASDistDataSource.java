@@ -60,7 +60,7 @@ import org.biojava.utils.stax.*;
  * @since 1.2 [MetaDAS] 
  */
 
-public class DASDistDataSource implements DistDataSource {
+class DASDistDataSource implements DistDataSource {
     private DASSequenceDB db;
 
     public URL getURL() {

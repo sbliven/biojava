@@ -29,20 +29,23 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * A no-frills implementation of AtomicSymbol.
- * <p>
- * In general, you should use the methods in AlphabetManager to instantiate
- * Symbol objects. However, this class is public with a protected constructor
- * to help out when you need to implement and extend AtomicSymbol.
+ * A basic implementation of AtomicSymbol.
+ *
+ * @for.user
+ * If you wish to construct new Symbols, you should normally do so via utility methods
+ * on <code>AlphabetManager</code>.
+ *
+ * @for.developer
+ * This may be a useful base class for custom implementations.
  *
  * @author Matthew Pocock
  */
 public class SimpleAtomicSymbol extends SimpleBasisSymbol
 implements AtomicSymbol {  
   protected SimpleAtomicSymbol(
-    char token, Annotation annotation, List syms
+    Annotation annotation, List syms
   ) throws IllegalSymbolException {
-    super(token, annotation, syms);
+    super(annotation, syms);
   }
 
   protected Alphabet createMatches() {

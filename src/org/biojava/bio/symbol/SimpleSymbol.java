@@ -29,7 +29,14 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * A no-frills implementation of Symbol.
+ * A basic implementation of Symbol.
+ *
+ * @for.user
+ * If you wish to construct new Symbols, you should normally do so via utility methods
+ * on <code>AlphabetManager</code>.
+ *
+ * @for.developer
+ * This may be a useful base class for custom implementations.
  *
  * @author Matthew Pocock
  * @author Greg Cox
@@ -41,21 +48,19 @@ class SimpleSymbol
     Symbol,
     Serializable
 {
-  private final char token;
   private final Annotation annotation;
   protected Alphabet matches;
 
-  protected SimpleSymbol(char token, Annotation annotation)
+  protected SimpleSymbol(Annotation annotation)
   {
-    this.token = token;
     this.annotation = new SimpleAnnotation(annotation);
   }
 
   public SimpleSymbol(
-    char token, Annotation annotation,
+    Annotation annotation,
     Alphabet matches
   ) {
-    this(token, annotation);
+    this(annotation);
     if(matches == null) {
       throw new NullPointerException(
         "Can't construct SimpleSymbol with a null matches alphabet"
@@ -63,10 +68,6 @@ class SimpleSymbol
     } else {
       this.matches = matches;
     }
-  }
-
-  public char getToken() {
-    return token;
   }
 
   public Annotation getAnnotation() {

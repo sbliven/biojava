@@ -41,7 +41,7 @@ import org.biojava.bio.program.xff.*;
  * @author Thomas Down
  */
 
-public interface TypesListener {
+interface TypesListener {
     public void startSegment();
     public void registerType(String type);
     public void registerType(String type, int count);

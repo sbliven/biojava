@@ -145,9 +145,9 @@ public final class AnnotationTools {
      *
      * @param ann  the Annotation to scan
      * @param query  the AnnotationType to match against all nodes in the tree
-     * @for.users when trying to find interesting bits of data presented as
+     * @for.user when trying to find interesting bits of data presented as
      * Annotations.
-     * @for.developers as a fall-through implementation of AnnotationDB.search()
+     * @for.developer as a fall-through implementation of AnnotationDB.search()
      */
     public static Set searchAnnotation(Annotation ann, AnnotationType query) {
       Set hits = new HashSet();

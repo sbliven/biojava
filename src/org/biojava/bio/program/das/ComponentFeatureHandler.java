@@ -41,7 +41,7 @@ import org.xml.sax.*;
  */
 
 
-public class ComponentFeatureHandler extends StrandedFeatureHandler {
+class ComponentFeatureHandler extends StrandedFeatureHandler {
     boolean inFeature = false;
     
     // workaround for compiler/vm bug

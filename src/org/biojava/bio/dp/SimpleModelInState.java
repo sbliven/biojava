@@ -40,7 +40,7 @@ implements ModelInState {
   }
   
   public SimpleModelInState(MarkovModel model, String name) {
-    super(name, name.charAt(0), null);
+    super(name, null);
     this.model = model;
   }
 }

@@ -29,9 +29,12 @@ import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.distributed.*;
 
 /**
+ * Reflects a reference server on the DAS network.
+ *
  * @author Matthew Pocock
  * @author Thomas Down
  */
+ 
 public class ReferenceServer
   extends
     DataSource

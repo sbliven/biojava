@@ -247,7 +247,6 @@ public final class AlphabetManager {
         }
         try {
           s = new SimpleBasisSymbol(
-            '-',
             Annotation.EMPTY_ANNOTATION,
             symList,
             Alphabet.EMPTY_ALPHABET
@@ -267,6 +266,27 @@ public final class AlphabetManager {
 
   /**
    * <p>
+   * Generate a new AtomicSymbol instance with a name and Annotation.
+   * </p>
+   *
+   * <p>
+   * Use this method if you wish to create an AtomicSymbol instance. Initially it
+   * will not be a member of any alphabet.
+   * </p>
+   *
+   * @param name  the String returned by getName()
+   * @param annotation the Annotation returned by getAnnotation()
+   * @return a new AtomicSymbol instance
+   */
+  static public AtomicSymbol createSymbol(
+    String name, Annotation annotation
+  ) {
+    AtomicSymbol as = new FundamentalAtomicSymbol(name, annotation);
+    return as;
+  }
+  
+  /**
+   * <p>
    * Generate a new AtomicSymbol instance with a token, name and Annotation.
    * </p>
    *
@@ -275,15 +295,16 @@ public final class AlphabetManager {
    * will not be a member of any alphabet.
    * </p>
    *
-   * @param token  the Char token returned by getToken()
+   * @param token  the Char token returned by getToken() (ignpred as of BioJava 1.2)
    * @param name  the String returned by getName()
    * @param annotatin the Annotation returned by getAnnotation()
    * @return a new AtomicSymbol instance
+   * @deprecated Use the two-arg version of this method instead.
    */
   static public AtomicSymbol createSymbol(
     char token, String name, Annotation annotation
   ) {
-    AtomicSymbol as = new FundamentalAtomicSymbol(name, token, annotation);
+    AtomicSymbol as = new FundamentalAtomicSymbol(name, annotation);
     return as;
   }
 
@@ -294,17 +315,40 @@ public final class AlphabetManager {
    * </p>
    *
    * <p>
-   * This method is most usefull for writing Alphabet implementations. It should
+   * This method is most useful for writing Alphabet implementations. It should
    * not be invoked by casual users. Use alphabet.getSymbol(List) instead.
    * </p>
    *
-   * @param token   the Symbol's token
+   * @param token   the Symbol's token [ignored since 1.2]
+   * @param symList a list of Symbol objects
+   * @param alpha   the Alphabet that this Symbol will reside in
+   * @return a Symbol that encapsulates that List
+   * @deprecated use the new version, without the token argument
+   */
+  static public Symbol createSymbol(
+    char token, Annotation annotation,
+    List symList, Alphabet alpha
+  ) throws IllegalSymbolException {
+      return createSymbol(annotation, symList, alpha);
+  }
+  
+  /**
+   * <p>
+   * Generates a new Symbol instance that represents the tuple of Symbols in
+   * symList.
+   * </p>
+   *
+   * <p>
+   * This method is most useful for writing Alphabet implementations. It should
+   * not be invoked by casual users. Use alphabet.getSymbol(List) instead.
+   * </p>
+   *
    * @param symList a list of Symbol objects
    * @param alpha   the Alphabet that this Symbol will reside in
    * @return a Symbol that encapsulates that List
    */
   static public Symbol createSymbol(
-    char token, Annotation annotation,
+    Annotation annotation,
     List symList, Alphabet alpha
   ) throws IllegalSymbolException {
     Iterator i = symList.iterator();
@@ -321,10 +365,10 @@ public final class AlphabetManager {
     }
 
     if(atomC == symList.size()) {
-      return new SimpleAtomicSymbol(token, annotation, symList);
+      return new SimpleAtomicSymbol(annotation, symList);
     } else if(basis == symList.size()) {
       return new SimpleBasisSymbol(
-        token, annotation,
+        annotation,
         symList,
         new SimpleAlphabet(
           expandMatches(alpha, symList, new ArrayList())
@@ -332,7 +376,7 @@ public final class AlphabetManager {
       );
     } else {
       return new SimpleSymbol(
-        token, annotation,
+        annotation,
         new SimpleAlphabet(
           expandBasis(alpha, symList, new ArrayList())
         )
@@ -385,14 +429,38 @@ public final class AlphabetManager {
    * not be invoked by users. Use alphabet.getSymbol(Set) instead.
    * </p>
    *
-   * @param token   the Symbol's token
+   * @param token   the Symbol's token [ignored since 1.2]
+   * @param name    the Symbol's name
+   * @param symSet  a Set of Symbol objects
+   * @param alpha   the Alphabet that this Symbol will reside in
+   * @return a Symbol that encapsulates that List
+   * @deprecated use the three-arg version of this method instead.
+   */
+  static public Symbol createSymbol(
+    char token, Annotation annotation,
+    Set symSet, Alphabet alpha
+  ) throws IllegalSymbolException {
+      return createSymbol(annotation, symSet, alpha);
+  }
+  
+  /**
+   * <p>
+   * Generates a new Symbol instance that represents the tuple of Symbols in
+   * symList.
+   * </p>
+   *
+   * <p>
+   * This method is most useful for writing Alphabet implementations. It should
+   * not be invoked by users. Use alphabet.getSymbol(Set) instead.
+   * </p>
+   *
    * @param name    the Symbol's name
    * @param symSet  a Set of Symbol objects
    * @param alpha   the Alphabet that this Symbol will reside in
    * @return a Symbol that encapsulates that List
    */
   static public Symbol createSymbol(
-    char token, Annotation annotation,
+    Annotation annotation,
     Set symSet, Alphabet alpha
   ) throws IllegalSymbolException {
     if(symSet.size() == 0) {
@@ -442,18 +510,18 @@ public final class AlphabetManager {
     } else {
       if(len == 1) {
         return new SimpleBasisSymbol(
-          token, annotation, new SimpleAlphabet(asSet)
+          annotation, new SimpleAlphabet(asSet)
         );
       } else {
         List fs = factorize(alpha, asSet);
         if(fs == null) {
           return new SimpleSymbol(
-            token, annotation,
+            annotation,
             new SimpleAlphabet(asSet)
           );
         } else {
           return new SimpleBasisSymbol(
-            token, annotation,
+            annotation,
             fs, new SimpleAlphabet(
               expandBasis(alpha, fs, new ArrayList())
             )
@@ -759,7 +827,6 @@ public final class AlphabetManager {
                 new Alphabet[] { DoubleAlphabet.getInstance() }
         )),
         new SimpleBasisSymbol(
-                '-',
                 Annotation.EMPTY_ANNOTATION,
                 Arrays.asList(new Symbol[] { gapSymbol }),
                 Alphabet.EMPTY_ALPHABET
@@ -898,7 +965,7 @@ public final class AlphabetManager {
              }
 
              public void endTree() {
-                 symbol = new FundamentalAtomicSymbol(name, '?', annotation);
+                 symbol = new FundamentalAtomicSymbol(name, annotation);
              }
 
              Symbol getSymbol() {

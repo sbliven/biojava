@@ -35,6 +35,12 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.SequenceIterator;
 
+/**
+ * Tools class for constructing views of <code>SymbolList</code> objects.
+ *
+ * @since 1.2
+ */
+
 public final class SymbolListViews {
   private SymbolListViews() {}
   
@@ -114,10 +120,26 @@ public final class SymbolListViews {
 	return new TranslatedSymbolList(symbols, table);
     }
     
+    /**
+     * Construct an alignment of the SymbolLists contained in the values collection
+     * of <code>labelToSymList</code>.
+     *
+     * @param labelToSymList A Map containing label -> SymbolList mappings
+     */
+    
     public static Alignment alignment(Map labelToSymList)
     throws IllegalArgumentException {
       return new SimpleAlignment(labelToSymList);
     }
+    
+    /**
+     * View a SymbolList over a cross-product Alphabet as an Alignment.
+     *
+     * @param labels a List of labels, which should be the same length
+     *               as the order <code>symList</code>'s Alphabet.
+     * @param symList a SymbolList over a cross-product alphabet.
+     */
+     
     
     public static Alignment alignment(List labels, SymbolList symList)
     throws IllegalArgumentException {

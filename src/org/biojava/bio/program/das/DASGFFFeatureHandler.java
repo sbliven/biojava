@@ -41,7 +41,7 @@ import org.xml.sax.*;
  * @since 1.2
  */
 
-public class DASGFFFeatureHandler extends StAXContentHandlerBase {
+class DASGFFFeatureHandler extends StAXContentHandlerBase {
     private SeqIOListener featureListener;
 
     private String f_id = null;

@@ -32,41 +32,42 @@ import org.biojava.bio.*;
  * An atomic symbol consisting only of itself.  This is the
  * fundamental type of symbol, and needs a special implementation.
  *
+ * @for.user
+ * If you wish to construct new Symbols, you should normally do so via utility methods
+ * on <code>AlphabetManager</code>.
+ *
+ * @for.developer
+ * This may be useful as a base-class for other <code>Symbol</code> implementations.
+ *
  * @author Thomas Down
  * @since 1.1
  */
 
 public class FundamentalAtomicSymbol extends AbstractSymbol implements AtomicSymbol, Serializable {
     private final String name;
-    private final char token;
     private final Annotation annotation;
 
-    public FundamentalAtomicSymbol(String name, 
-				   char token,
-				   Annotation annotation)
+    public FundamentalAtomicSymbol(
+        String name,
+        Annotation annotation)
     {
-	this.name = name;
-	this.token = token;
-	this.annotation = annotation;
+        this.name = name;
+        this.annotation = annotation;
     }
 
     public String getName() {
-	return name;
-    }
-
-    public char getToken() {
-	return token;
+        return name;
     }
 
     public Alphabet getMatches() {
-	return new SingletonAlphabet(this);
+        return new SingletonAlphabet(this);
     }
 
     public List getSymbols() {
-	return Collections.nCopies(1, this);
+        return Collections.nCopies(1, this);
     }
 
     public Annotation getAnnotation() {
-	return annotation;
+        return annotation;
     }
 }

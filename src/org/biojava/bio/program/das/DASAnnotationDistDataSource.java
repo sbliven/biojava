@@ -62,7 +62,7 @@ import org.biojava.utils.stax.*;
  * @since 1.2 [MetaDAS] 
  */
 
-public class DASAnnotationDistDataSource implements DistDataSource {
+class DASAnnotationDistDataSource implements DistDataSource {
     private URL datasource;
     private DASSequenceDB dummyDB = new DASSequenceDB();
 

@@ -35,6 +35,8 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
 /**
+ * A collection of DAS datasources.
+ *
  * @author Matthew Pocock
  * @author Thomas Down
  */
