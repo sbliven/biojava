@@ -146,7 +146,7 @@ public abstract class AbstractSymbolList implements SymbolList {
 	}
 
 	public SymbolList subList(int sstart, int send) {
-	    return new SubList(sstart + start - 1, sstart + end - 1);
+	    return new SubList(sstart + start - 1, send + start - 1);
 	}
 
   public String seqString() {
