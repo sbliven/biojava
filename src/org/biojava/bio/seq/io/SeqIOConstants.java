@@ -167,16 +167,63 @@ public final class SeqIOConstants
      */
     public static final int PHRED = 30 | DNA | INTEGER;
 
-    public static final int    EMBL_DNA = EMBL    | DNA;
-    public static final int    EMBL_RNA = EMBL    | RNA;
-    public static final int     EMBL_AA = EMBL    | AA;
+    /**
+     * <code>EMBL_DNA</code> premade EMBL | DNA.
+     */
+    public static final int EMBL_DNA = EMBL | DNA;
+
+    /**
+     * <code>EMBL_RNA</code> premade EMBL | RNA.
+     */
+    public static final int EMBL_RNA = EMBL | RNA;
+
+    /**
+     * <code>EMBL_AA</code> premade EMBL | AA.
+     */
+    public static final int EMBL_AA = EMBL | AA;
+
+    /**
+     * <code>GENBANK_DNA</code> premade GENBANK | DNA.
+     */
     public static final int GENBANK_DNA = GENBANK | DNA;
+
+    /**
+     * <code>GENBANK_DNA</code> premade GENBANK | RNA.
+     */
     public static final int GENBANK_RNA = GENBANK | RNA;
+
+    /**
+     * <code>GENBANK_DNA</code> premade GENBANK | AA.
+     */
     public static final int  GENBANK_AA = GENBANK | AA;
-    public static final int  REFSEQ_DNA = REFSEQ  | DNA;
-    public static final int  REFSEQ_RNA = REFSEQ  | RNA;
-    public static final int   REFSEQ_AA = REFSEQ  | AA;
-    public static final int   FASTA_DNA = FASTA   | DNA;
-    public static final int   FASTA_RNA = FASTA   | RNA;
-    public static final int    FASTA_AA = FASTA   | AA;
+
+    /**
+     * <code>REFSEQ_DNA</code> premade REFSEQ | RNA.
+     */
+    public static final int REFSEQ_DNA = REFSEQ | DNA;
+
+    /**
+     * <code>REFSEQ_RNA</code> premade REFSEQ | RNA.
+     */
+    public static final int REFSEQ_RNA = REFSEQ | RNA;
+
+    /**
+     * <code>REFSEQ_AA</code> premade REFSEQ | AA.
+     */
+    public static final int REFSEQ_AA = REFSEQ | AA;
+
+    /**
+     * <code>FASTA_DNA</code> premade FASTA | DNA.
+     */
+    public static final int FASTA_DNA = FASTA | DNA;
+
+    /**
+     * <code>FASTA_RNA</code> premade FASTA | RNA.
+     */
+    public static final int FASTA_RNA = FASTA | RNA;
+
+    /**
+     * <code>FASTA_AA</code> premade FASTA | AA.
+     */
+    public static final int FASTA_AA = FASTA | AA;
 }

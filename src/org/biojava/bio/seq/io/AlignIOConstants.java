@@ -52,22 +52,92 @@ package org.biojava.bio.seq.io;
  */
 public final class AlignIOConstants
 {
+    /**
+     * <code>UNKNOWN</code> indicates that the alignment format is
+     * unknown.
+     */
     public static final int UNKNOWN = 100;
-    public static final int     RAW = 101;
-    public static final int   FASTA = 102;
-    public static final int CLUSTAL = 103;
-    public static final int     MSF = 104;
 
-    public static final int RAW_DNA     = RAW     | SeqIOConstants.DNA;
-    public static final int RAW_RNA     = RAW     | SeqIOConstants.RNA;
-    public static final int RAW_AA      = RAW     | SeqIOConstants.AA;
-    public static final int FASTA_DNA   = FASTA   | SeqIOConstants.DNA;
-    public static final int FASTA_RNA   = FASTA   | SeqIOConstants.RNA;
-    public static final int FASTA_AA    = FASTA   | SeqIOConstants.AA;
+    /**
+     * <code>RAW</code> indicates that the alignment format is raw
+     * (symbols only).
+     */
+    public static final int RAW = 101;
+
+    /**
+     * <code>FASTA</code> indicates that the alignment format is
+     * Fasta.
+     */
+    public static final int FASTA = 102;
+
+    /**
+     * <code>CLUSTAL</code> indicates that the alignment format is
+     * Clustal.
+     */
+    public static final int CLUSTAL = 103;
+
+    /**
+     * <code>MSF</code> indicates that the alignment format is MSF.
+     */
+    public static final int MSF = 104;
+
+    /**
+     * <code>RAW_DNA</code> premade RAW | DNA.
+     */
+    public static final int RAW_DNA = RAW | SeqIOConstants.DNA;
+
+    /**
+     * <code>RAW_RNA</code> premade RAW | RNA.
+     */
+    public static final int RAW_RNA = RAW | SeqIOConstants.RNA;
+
+    /**
+     * <code>RAW_AA</code> premade RAW | AA.
+     */
+    public static final int RAW_AA = RAW | SeqIOConstants.AA;
+
+    /**
+     * <code>FASTA_DNA</code> premade FASTA | DNA;
+     */
+    public static final int FASTA_DNA = FASTA | SeqIOConstants.DNA;
+
+    /**
+     * <code>FASTA_RNA</code> premade FASTA | RNA;
+     */
+    public static final int FASTA_RNA = FASTA | SeqIOConstants.RNA;
+
+    /**
+     * <code>FASTA_AA</code> premade FASTA | AA;
+     */
+    public static final int FASTA_AA = FASTA | SeqIOConstants.AA;
+
+    /**
+     * <code>CLUSTAL_DNA</code> premade CLUSTAL | DNA;
+     */
     public static final int CLUSTAL_DNA = CLUSTAL | SeqIOConstants.DNA;
+
+    /**
+     * <code>CLUSTAL_RNA</code> premade CLUSTAL | RNA;
+     */
     public static final int CLUSTAL_RNA = CLUSTAL | SeqIOConstants.RNA;
+
+    /**
+     * <code>CLUSTAL_AA</code> premade CLUSTAL | AA;
+     */
     public static final int CLUSTAL_AA  = CLUSTAL | SeqIOConstants.AA;
-    public static final int MSF_DNA     = MSF     | SeqIOConstants.DNA;
-    public static final int MSF_RNA     = MSF     | SeqIOConstants.RNA;
-    public static final int MSF_AA      = MSF     | SeqIOConstants.AA;
+
+    /**
+     * <code>MSF_DNA</code> premade MSF | DNA;
+     */
+    public static final int MSF_DNA = MSF | SeqIOConstants.DNA;
+
+    /**
+     * <code>MSF_DNA</code> premade MSF | RNA;
+     */
+    public static final int MSF_RNA = MSF | SeqIOConstants.RNA;
+
+    /**
+     * <code>MSF_AA</code> premade MSF | AA;
+     */
+    public static final int MSF_AA = MSF | SeqIOConstants.AA;
 }
