@@ -31,8 +31,8 @@ import org.biojava.bio.*;
  * in a set of ComponentFeature objects.
  *
  * <p>
- * Currently, this class is rather inefficient for bulk
- * SymbolList operations -- I'll fix it soon.
+ * There is still some potential for optimising SymbolList
+ * operations on this class.
  * </p>
  *
  * @author Thomas Down
@@ -47,7 +47,10 @@ public class SimpleAssembly extends AbstractSymbolList
     private String uri;
     private Annotation annotation;
     private SimpleFeatureHolder features;
+
     private SortedMap components;
+    private List componentList;
+
     private FeatureRealizer featureRealizer = SimpleFeatureRealizer.DEFAULT;
 
     private final static Symbol N;
@@ -63,6 +66,43 @@ public class SimpleAssembly extends AbstractSymbolList
     {
 	features = new SimpleFeatureHolder();
 	components = new TreeMap(Location.naturalOrder);
+	componentList = new ArrayList();
+    }
+
+    private void putComponent(Location loc, SymbolList symbols) {
+	components.put(loc, symbols);
+	componentList.clear();
+	componentList.addAll(components.keySet());
+    }
+
+    private void removeComponent(Location loc) {
+	components.remove(loc);
+	componentList.clear();
+	componentList.addAll(components.keySet());
+    }
+
+    /**
+     * Find the location containing p in a sorted list of non-overlapping contiguous
+     * locations.
+     */
+
+    private Location locationOfPoint(int p) {
+	int first = 0;
+	int last = componentList.size() - 1;
+	
+	while (first <= last) {
+	    int check = (first + last) / 2;
+	    Location checkL = (Location) componentList.get(check);
+	    if (checkL.contains(p))
+		return checkL;
+
+	    if (p < checkL.getMin())
+		last = check - 1;
+	    else
+		first = check + 1;
+	}
+	
+	return null;
     }
 
     /**
@@ -83,7 +123,7 @@ public class SimpleAssembly extends AbstractSymbolList
     }
 
     //
-    // SymbolList (could do with a /lot/ of optimisation)
+    // SymbolList
     //
 
     public Alphabet getAlphabet() {
@@ -95,16 +135,27 @@ public class SimpleAssembly extends AbstractSymbolList
     }
 
     public Symbol symbolAt(int pos) {
-	for (Iterator i = components.entrySet().iterator(); i.hasNext(); ) {
-	    Map.Entry me = (Map.Entry) i.next();
-	    Location l = (Location) me.getKey();
-	    if (l.contains(pos)) {
-		SymbolList syms = (SymbolList) me.getValue();
-		return syms.symbolAt(pos - l.getMin() + 1);
-	    }
+	Location l = locationOfPoint(pos);
+	if (l != null) {
+	    SymbolList syms = (SymbolList) components.get(l);
+	    return syms.symbolAt(pos - l.getMin() + 1);
 	}
 
 	return N;
+    }
+
+    public SymbolList subList(int start, int end) {
+	Location l = locationOfPoint(start);
+	if (l.contains(end)) {
+	    SymbolList symbols = (SymbolList) components.get(l);
+	    int tstart = start - l.getMin() + 1;
+	    int tend = end - l.getMin() + 1;
+	    return symbols.subList(tstart, tend);
+	}
+
+	// All is lost.  Fall back onto `view' subList from AbstractSymbolList
+
+	return super.subList(start, end);
     }
 
     //
@@ -163,14 +214,14 @@ public class SimpleAssembly extends AbstractSymbolList
 	    ComponentFeature cf = (ComponentFeature) f;
 	    Location loc = cf.getLocation();
 	    SymbolList cfsyms = cf.getSymbols();
-	    components.put(loc, cfsyms);
+	    putComponent(loc, cfsyms);
 	}
 	return f;
     }
 
     public void removeFeature(Feature f) {
 	if (f instanceof ComponentFeature)
-	    components.remove(f.getLocation());
+	    removeComponent(f.getLocation());
 	features.removeFeature(f);
     }
 

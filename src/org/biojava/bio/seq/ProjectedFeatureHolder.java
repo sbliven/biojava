@@ -68,7 +68,11 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	    for (Iterator i = wrapped.features(); i.hasNext(); ) {
 		Feature f = (Feature) i.next();
 		Feature wf = null;
-		if (f instanceof StrandedFeature) {
+		if (f instanceof ComponentFeature) {
+		    wf = new ProjectedComponentFeatureWrapper((ComponentFeature) f,
+							      parent,
+							      translate);
+		} else if (f instanceof StrandedFeature) {
 		    wf = new ProjectedStrandedFeatureWrapper((StrandedFeature) f,
 							     parent,
 							     translate);
