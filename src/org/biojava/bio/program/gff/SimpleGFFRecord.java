@@ -24,7 +24,7 @@ package org.biojava.bio.program.gff;
 import java.util.*;
 
 /**
- * A no-frills implementation of a GFFRecord.
+ * A no-frills implementation of a <span class="type">GFFRecord</span>.
  *
  * @author Matthew Pocock
  */
@@ -62,7 +62,8 @@ public class SimpleGFFRecord implements GFFRecord {
    */
   private int frame;
   /**
-   * The group-name -> List <attribute> map
+   * The group-name -> <span class="type">List</span> &lt;attribute&gt;
+   * <span class="type">Map</span>
    */
   private Map groupAttributes;
   /**
@@ -71,7 +72,7 @@ public class SimpleGFFRecord implements GFFRecord {
   private String comment;
   
   /**
-   * Set the sequence name.
+   * Set the sequence name to <span class="arg">seqName</span>.
    *
    * @param seqName  the new name
    */
@@ -84,7 +85,7 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Set the feature source.
+   * Set the feature source to <span class="arg">source</source>.
    *
    * @param source  the new source
    */
@@ -97,7 +98,7 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Set the feature type.
+   * Set the feature type to <span class="arg">type</source>.
    *
    * @param feature  the new feature type
    */
@@ -110,7 +111,7 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Set the start coordinate.
+   * Set the start coordinate to <span class="arg">start</source>.
    *
    * @param start  the new start coordinate
    */
@@ -123,7 +124,7 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Set the end coordinate.
+   * Set the end coordinate to <span class="arg">end</source>.
    *
    * @param end  the new end coordinate
    */
@@ -136,10 +137,11 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Set the score.
+   * Set the score to <span class="arg">score</source>.
    * <P>
-   * The score must be a double, inclusive of 0. If you wish to indicate that
-   * there is no score, then use GFFRecord.NO_SCORE.
+   * The score must be a double, inclusive of <code>0</code>.
+   * If you wish to indicate that there is no score, then use
+   * <span class="type">GFFRecord</span>.<span class="const">NO_SCORE</span>.
    *
    * @param score  the new score
    */
@@ -152,14 +154,15 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Set the score.
+   * Set the strand to <span class="arg">strand</source>.
    * <P>
-   * The score must be a double, inclusive of 0. If you wish to indicate that
-   * there is no score, then use GFFRecord.NO_SCORE.
+   * The strand must be one of
+   * <span class="type">GFFRecord</span>.<span class="const">NO_STRAND</span>,
+   * <span class="type">GFFRecord</span>.<span class="const">POSITIVE_STRAND</span> or
+   * <span class="type">GFFRecord</span>.<span class="const">NEGATIVE_STRAND</span>.
    *
    * @param score  the new score
-   * @throws IllegalArgumentException if strand is not one of the GFFRecord
-   *         strand constants.
+   * @throws IllegalArgumentException if strand is not a legal strand
    */
   public void setStrand(int strand) throws IllegalArgumentException {
     if(strand != GFFRecord.POSITIVE_STRAND &&
@@ -176,9 +179,10 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Set the frame.
+   * Set the frame to <span class="arg">frame</source>.
    * <P>
-   * The score must be  one of 0, 1, 2 or GFFRecord.NO_FRAME.
+   * The score must be  one of <code>{0, 1, 2}</code> or
+   * <span class="type">GFFRecord</span>.<span class="const">NO_FRAME</span>.
    *
    * @param score  the new score
    * @throws IllegalArgumentException if score is not valid.
@@ -197,11 +201,13 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Replace the group-attribute map with a new one.
+   * Replace the group-attribute <span class="type">Map</span> with 
+   * <span class="arg">ga</span>.
    * <P>
-   * To efficiently add a key, call getGroupAttributes and modify the map.
+   * To efficiently add a key, call <span class="method">getGroupAttributes</span>
+   * and modify the <span class="type">Map</span>.
    *
-   * @param ga  the new group-attribute map
+   * @param ga  the new group-attribute <span class="type">Map</span>
    */
   public void setGroupAttributes(Map ga) {
     this.groupAttributes = ga;
@@ -215,7 +221,7 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Set the comment.
+   * Set the comment to <span class="arg">comment</source>.
    * <P>
    * If you set it to null, then the comment for this line will be ignored.
    *
@@ -229,6 +235,20 @@ public class SimpleGFFRecord implements GFFRecord {
     return comment;
   }
   
+  /**
+   * Parse <span class="arg">attValList</span> into a
+   * <span class="type">Map</span> of attributes and value lists.
+   * <P>
+   * The resulting <span class="type">Map</span> will have
+   * <span class="type">String</span> keys, with
+   * <span class="type">List</span> values. If there are no values
+   * associated with a key, then it will have an empty
+   * <span class="type">List</span>, not <span class="kw">null</span> as
+   * its value.
+   *
+   * @param attValList  the <span class="type">String</span> to parse
+   * @return a <span class="type">Map</span> of parsed attributes and value lists
+   */
   public static Map parseAttribute(String attValList) {
     Map attMap = new HashMap();
     
@@ -271,6 +291,17 @@ public class SimpleGFFRecord implements GFFRecord {
     return attMap;
   }
   
+  /**
+   * Create a <span class="type">String</span> representation of
+   * <span class="arg">attMap</span>.
+   *
+   * <span class="arg">attMap</span> is assumed to contain
+   * <span class="type">String</span> keys and
+   * <span class="type">List</span> values.
+   *
+   * @param attMap  the <span class="type">Map</span> of attributes and value lists
+   * @return  a GFF attribute/value <span class="type">String</span>
+   */
   public static String stringifyAttributes(Map attMap) {
     StringBuffer sBuff = new StringBuffer();
     Iterator ki = attMap.keySet().iterator();

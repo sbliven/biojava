@@ -34,25 +34,68 @@ import org.biojava.bio.seq.*;
  * @author Thomas Down
  */
 public class SequencesAsGFF {
+  /**
+   * The <span class="type">FeatureFilter</span> for selecting features to
+   * report as <span class="type">GFFRecord</span>s.
+   */
   private FeatureFilter filter = FeatureFilter.all;
+  
+  /**
+   * Whether or not to recurse through the features during searching.
+   */
   private boolean recurse = false;
   
+  /**
+   * Return the current <span class="type">FeatureFilter</span>.
+   * <P>
+   * This is the object that will accept or reject individual features.
+   *
+   * @return the current <span class="type">FeatureFilter</span>
+   */
   public FeatureFilter getFeatureFilter() {
     return filter;
   }
   
+  /**
+   * Replace the current <span class="type">FeatureFilter</span> with
+   * <span class="arg">filter</span>.
+   *
+   * @param filter  the new <span class="type">FeatureFilter</span>
+   */
   public void setFeatureFilter(FeatureFilter filter) {
     this.filter = filter;
   }
   
+  /**
+   * Return whether features will be filtered recursively or not.
+   *
+   * @return whether or not to recurse
+   */
   public boolean getRecurse() {
     return recurse;
   }
   
+  /**
+   * Set whether features will be filtered recursively to
+   * <span class="arg">recurse</span>.
+   *
+   * @param recurse  <span class="kw">true</span> if you want to recurse,
+   *                 <span class="kw">false</span> otherwise
+   */
   public void setRecurse(boolean recurse) {
     this.recurse = recurse;
   }
   
+  /**
+   * Internal method to process an individual <span class="type">Sequence</span>.
+   *
+   * @param seq  the <span class="type">Sequence</span> to GFFify
+   * @param handler the <span class="type">GFFDocumentHandler</span> that will
+   *                receive the GFF for all suitable features within
+   *                <span class="arg">seq</span>
+   * @param id the value of the <span class="method">seqName</span> field in any
+   *           <span class="type">GFFRecord</span>s produced
+   */
   protected void doProcessSequence(Sequence seq,
                                    GFFDocumentHandler handler,
                                    String id) 
@@ -105,6 +148,15 @@ public class SequencesAsGFF {
     }
   }
 
+  /**
+   * Process an individual <span class="type">Sequence</span>, informing
+   * <span class="arg">handler</span> of any suitable features.
+   *
+   * @param seq  the <span class="type">Sequence</span> to GFFify
+   * @param handler the <span class="type">GFFDocumentHandler</span> that will
+   *                receive the GFF for all suitable features within
+   *                <span class="arg">seq</span>
+   */
   public void processSequence(Sequence seq, GFFDocumentHandler handler) 
   throws SeqException, BioException {
     handler.startDocument();
@@ -112,6 +164,16 @@ public class SequencesAsGFF {
     handler.endDocument();
   }
 
+  /**
+   * Process all <span class="type">Sequence</span>s within a
+   * <span class="type">SequenceDB</span>, informing
+   * <span class="arg">handler</span> of any suitable features.
+   *
+   * @param seqDB  the <span class="type">SequenceDB</span> to GFFify
+   * @param handler the <span class="type">GFFDocumentHandler</span> that will
+   *                receive the GFF for all suitable features within
+   *                <span class="arg">seqDB</span>
+   */
   public void processDB(SequenceDB seqDB, GFFDocumentHandler handler)
   throws SeqException, BioException {
     handler.startDocument();

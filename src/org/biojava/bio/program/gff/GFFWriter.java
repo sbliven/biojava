@@ -27,7 +27,8 @@ import java.util.*;
 import org.biojava.bio.*;
 
 /**
- * Listens to a stream of GFF events and writes the lines to a PrintWriter.
+ * Listens to a stream of GFF events and writes the lines to a
+ * <span class="type">PrintWriter</span>.
  * <P>
  * This will ignore all exceptions. Mabey the error-handeling needs to move into
  * an error handeling interface?
@@ -41,9 +42,10 @@ public class GFFWriter implements GFFDocumentHandler {
   private PrintWriter out;
   
   /**
-   * Create a new GFFWriter that will write to 'out'.
+   * Create a new <span class="type">GFFWriter</span> that will write to 
+   * <span class="arg">out</span>.
    *
-   * @param out  the PrintWriter to write to
+   * @param out  the <span class="type">PrintWriter</span> to write to
    */
   public GFFWriter(PrintWriter out) {
     this.out = out;
@@ -52,21 +54,22 @@ public class GFFWriter implements GFFDocumentHandler {
   public void startDocument() {}
   
   /**
-   * Flushes the PrintWriter to make sure that everything is written.
+   * Flushes the <span class="type">PrintWriter</span> to make sure that everything is written.
    */
   public void endDocument()   {
     out.flush();
   }
   
   /**
-   * Prints the comment directly to the PrintWriter.
+   * Prints the comment directly to the <span class="type">PrintWriter</span>
+   * after adding a leading '<code>#</code>'.
    */
   public void commentLine(String comment) {
     out.println("#" + comment);
   }
   
   /**
-   * Prints the gff record to the PrintWriter.
+   * Prints <span class="arg">record</span> to the <span class="type">PrintWriter</span>.
    */
   public void recordLine(GFFRecord record) {
     out.print(

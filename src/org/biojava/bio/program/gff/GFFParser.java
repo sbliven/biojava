@@ -1,3 +1,24 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.program.gff;
 
 import java.util.*;
@@ -5,7 +26,24 @@ import java.io.*;
 
 import org.biojava.bio.*;
 
+/**
+ * Parse a stream of GFF text into a stream of records and comments.
+ *
+ * @author Matthew Pocock
+ */
 public class GFFParser {
+  /**
+   * Informs <span class="arg">handler</span> of each line of
+   * gff read from <span class="arg">bReader</span> and any associated errors.
+   *
+   * @param bReader the <span class="type">BufferedReader</span> to parse
+   * @param handler the <span class="type">GFFDocumentHandler</span> that will
+   *                listen for 'stuff'
+   * @throws <span class="type">IOException</span> if for any reason
+   *         <span class="arg">bReader</span> throws one
+   * @throws <span class="type">BioException</span> if
+   *         <span class="arg">handler</span> can not correct a parse error
+   */
   public void parse(BufferedReader bReader, GFFDocumentHandler handler)
   throws IOException, BioException {
     handler.startDocument();
@@ -42,7 +80,22 @@ public class GFFParser {
     handler.endDocument();
   }
   
-  protected GFFRecord createRecord(GFFDocumentHandler handler, ArrayList aList, String rest, String comment)
+  /**
+   * Actualy turns a list of tokens, some value string and a comment into a
+   * <span class="type">GFFRecord</span> and informs
+   * <span class="arg">handler</span>.
+   *
+   * @param handler a <span class="type">GFFDocumentHandler</span> to inform of
+   *                any parse errors, and the completed <span class="type">GFFRecord</span>
+   * @param aList   a <span class="type">List</span> containing the 8 mandatory GFF columns
+   * @param rest    a <span class="type">String</span> representing the unparsed
+   *                attribute-value text, or <span class="kw">null</span> if there is none
+   * @param comment a <span class="type">String</span> containing the comment (without the
+   *                leading '<code>#</code>' character.
+   * @throws <span class="type">BioException</span> if <span class="arg">handler</span>
+   *         could not correct a parse error
+   */
+  protected GFFRecord createRecord(GFFDocumentHandler handler, List aList, String rest, String comment)
   throws BioException {
     SimpleGFFRecord record = new SimpleGFFRecord();
     

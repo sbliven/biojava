@@ -1,3 +1,24 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.program.gff;
 
 import java.util.*;
@@ -9,6 +30,8 @@ import java.util.*;
  * usefull constants.
  * <P>
  * Gff is described at http://www.sanger.ac.uk/Software/formats/GFF/
+ *
+ * @author Matthew Pocock
  */
 public interface GFFRecord {
   /**
@@ -55,7 +78,8 @@ public interface GFFRecord {
   /**
    * The score of the feature.
    * <P>
-   * For sequences that have no score, this will be set to GFFRecord.NO_SCORE.
+   * For sequences that have no score, this will be set to
+   * <span class="type">GFFRecord</span>.<span class="const">NO_SCORE</span>.
    *
    * @return the score, or NO_SCORE
    */
@@ -64,8 +88,9 @@ public interface GFFRecord {
   /**
    * The strand of the feature.
    * <P>
-   * This will be one of GFFRecord.POSITIVE_STRAND or GFFRecord.NEGATIVE_STRAND,
-   * or GFFRecord.NO_STRAND.
+   * This will be one of <span class="type">GFFRecord</span>.<span class="const">POSITIVE_STRAND</span>,
+   * <span class="type">GFFRecord</span>.<span class="const">NEGATIVE_STRAND</span>,
+   * or <span class="type">GFFRecord</span>.<span class="const">NO_STRAND</span>.
    *
    * @return the strand field
    */
@@ -74,25 +99,27 @@ public interface GFFRecord {
   /**
    * The frame of the feature.
    * <P>
-   * This will be one of {1, 2, 3} or GFFRecord.NO_FRAME.
+   * This will be one of <code>{1, 2, 3}</code> or
+   * <span class="type">GFFRecord</span>.<span class="const">NO_FRAME</span>.
    *
    * @return the frame field
    */
   public int getFrame();
   
   /**
-   * A Map containing the group / attribute information.
+   * A <span class="type">Map</span> containing the group / attribute information.
    * <P>
-   * This will be a map of group-names to List objects.
+   * This will be a <span class="type">Map</span> of group-names to
+   * <span class="type">List</span> objects.
    *
-   * @return a Map containing the group and attribute info.
+   * @return a <span class="type">Map</span> containing the group and attribute info.
    */
   public Map getGroupAttributes();
   
   /**
    * The feature comment.
    *
-   * @return null or the feature comment
+   * @return <span class="kw">null</span> or the feature comment
    */
   public String getComment();
   
