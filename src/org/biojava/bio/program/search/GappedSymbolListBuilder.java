@@ -72,6 +72,7 @@ class GappedSymbolListBuilder
      *
      * @param tokeBuffer a <code>StringBuffer</code> object containing
      * the sequence tokens.
+     *
      * @return a <code>SymbolList</code> object which consists of a
      * GappedSymbolList with an ungapped underlying sequence and all
      * the gaps added in the gapped view.

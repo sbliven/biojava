@@ -96,6 +96,7 @@ public class FastaSearchBuilder implements SearchBuilder
      * representing a the result of a single search.
      *
      * @return a <code>SeqSimilaritySearchResult</code> object.
+     *
      * @exception BioException if parsing or instantiation fails
      * internally.
      */
@@ -116,6 +117,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @param querySeqID a <code>String</code> which should be the
      * sequence ID in the querySeqHolder.
+     *
      * @exception BioException if the sequence cannot be obtained.
      */
     void setQuerySeq(String querySeqID)
@@ -141,6 +143,7 @@ public class FastaSearchBuilder implements SearchBuilder
      * @param subjectDBFileName a <code>String</code> which should be
      * an identifier of the corresponding database in the subjectDBs
      * installation.
+     *
      * @exception BioException if the database cannot be obtained.
      */
     void setSubjectDB(String subjectDBFileName)
@@ -238,6 +241,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @param dataMap a <code>Map</code> object.
      * @param hitAnnotation an <code>Annotation</code> object.
+     *
      * @return a <code>SeqSimilaritySearchHit</code> object.
      */
     private SeqSimilaritySearchHit createHit(Map        dataMap,
@@ -283,6 +287,7 @@ public class FastaSearchBuilder implements SearchBuilder
      * instance from the preannotation Map data.
      *
      * @param preAnnotation a <code>Map</code> object.
+     *
      * @return an <code>Annotation</code> object.
      */
     private Annotation createAnnotation(Map preAnnotation)
@@ -315,7 +320,9 @@ public class FastaSearchBuilder implements SearchBuilder
      * set the label of the subject sequence. The query label is a
      * static field in the SeqSimilaritySearchSubHit interface.
      * @param dataMap a <code>Map</code> object.
+     *
      * @return an <code>Alignment</code> object.
+     *
      * @exception IllegalSymbolException if tokens from the sequence
      * are not recognised in the chosen alphabet.
      */
@@ -369,6 +376,7 @@ public class FastaSearchBuilder implements SearchBuilder
      * accompanying Map object.
      * @param dataMap a <code>Map</code> object containing the data to
      * process.
+     *
      * @return a <code>String</code> value consisting of a subsequence
      * containing only the interesting alignment.
      */

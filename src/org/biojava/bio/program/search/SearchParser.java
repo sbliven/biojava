@@ -47,7 +47,9 @@ public interface SearchParser
      * @param reader a <code>BufferedReader</code> to read from.
      * @param handler a <code>SearchContentHandler</code> to notify of
      * events.
+     *
      * @return a <code>boolean</code> value.
+     *
      * @exception IOException if an error occurs in the
      * BufferedReader.
      * @exception BioException if an internal error occurs.

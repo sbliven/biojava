@@ -78,6 +78,15 @@ public class SearchReader implements Iterator
      */
     public boolean hasNext()
     {
+	if (! moreSearchesAvailable)
+	    try
+	    {
+		reader.close();
+	    }
+	    catch (IOException iox)
+	    {
+		iox.printStackTrace();
+	    }
 	return moreSearchesAvailable;
     }
 
@@ -86,6 +95,7 @@ public class SearchReader implements Iterator
      * is up to the client to cast this to a suitable search result.
      *
      * @return an Object.
+     *
      * @exception NoSuchElementException if there is no <i>valid</i>
      * result in the stream.
      */

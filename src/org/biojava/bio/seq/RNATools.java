@@ -190,7 +190,7 @@ public final class RNATools {
     } else {
       getRNA().validate(sym);
       throw new BioError(
-        "Realy confused. Can't find symbol " +
+        "Really confused. Can't find symbol " +
         sym.getName()
       );
     }

@@ -43,12 +43,12 @@ import org.biojava.utils.ParserException;
  */
 public class FastaSearchParser implements SearchParser
 {
-    private static final int NODATA      = 0;
-    private static final int INHEADER    = 1;
-    private static final int INHIT       = 2;
-    private static final int INQUERY     = 3;
-    private static final int INSUBJECT   = 4;
-    private static final int INALIGN     = 5;
+    private static final int NODATA    = 0;
+    private static final int INHEADER  = 1;
+    private static final int INHIT     = 2;
+    private static final int INQUERY   = 3;
+    private static final int INSUBJECT = 4;
+    private static final int INALIGN   = 5;
 
     // Valid line identifiers for result annotation
     private static HashSet resultAnnoTokens =
@@ -121,9 +121,11 @@ public class FastaSearchParser implements SearchParser
      * @param reader a <code>BufferedReader</code> to read from.
      * @param scHandler a <code>SearchContentHandler</code> to notify
      * of events.
+     *
      * @return a <code>boolean</code> value, true if a further search
      * result remains to be parsed, false if no further results were
      * detected.
+     *
      * @exception IOException if the BufferedReader fails.
      * @exception BioException if the parser (via the registered
      * SearchContentHandler) fails to resolve a query sequence and
@@ -353,6 +355,9 @@ public class FastaSearchParser implements SearchParser
 			continue LINE;
 		    }
 		    break STATUS;
+
+		default:
+		    break STATUS;
 	    } // end switch
 	} // end while
 
@@ -365,6 +370,7 @@ public class FastaSearchParser implements SearchParser
      *
      * @param tokenArray a <code>String []</code> array.
      * @param set a <code>Set</code> object.
+     *
      * @return a Set object.
      */
     private static Set fillSet(String [] tokenArray, Set set)
@@ -380,7 +386,9 @@ public class FastaSearchParser implements SearchParser
      * starting with '>' and '>>'.
      *
      * @param line a <code>String</code> to be parsed.
+     *
      * @return a <code>String</code> containing the ID.
+     *
      * @exception ParserException if an error occurs. 
      */
     private String parseID(String line)
@@ -416,7 +424,9 @@ public class FastaSearchParser implements SearchParser
      * the relevant output line.
      *
      * @param line a <code>String</code> to be parsed.
+     *
      * @return a <code>String</code> containing the filename.
+     *
      * @exception ParserException if an error occurs.
      */
     private String parseDB(String line)
@@ -457,8 +467,10 @@ public class FastaSearchParser implements SearchParser
      * @param line a <code>String</code> to be parsed.
      * @param tokenSet a <code>Set</code> containing valid leader tokens.
      * @param dataMap a <code>Map</code> to contain the result.
+     *
      * @return a <code>boolean</code> value, true if a token and value
      * were recognised.
+     *
      * @exception ParserException if an error occurs.
      */
     private boolean parseLine(String line, Set tokenSet, Map dataMap)
@@ -522,6 +534,7 @@ public class FastaSearchParser implements SearchParser
      * @param name a <code>String</code> object with value "query" or
      * "subject" to indicate where to store the data.
      * @param dataMap a <code>Map</code> object to contain the parsed data.
+     *
      * @return a <code>boolean</code> value, true if the line was
      * parsed successfully.
      */
@@ -585,6 +598,7 @@ public class FastaSearchParser implements SearchParser
      * from Fasta output lines.
      *
      * @param line a <code>String</code> object to parse.
+     *
      * @return an <code>Integer</code> coordinate.
      */
     private Integer parseCoord(String line)
