@@ -61,8 +61,9 @@ public final class DoubleAlphabet
     Alphabet,
     Serializable
 {
-  private static DoubleAlphabet INSTANCE;
-  
+
+  public static DoubleAlphabet INSTANCE;
+
   private Object writeReplace() throws ObjectStreamException {
     try {
       return new StaticMemberPlaceHolder(DoubleAlphabet.class.getField("INSTANCE"));
@@ -70,7 +71,7 @@ public final class DoubleAlphabet
       throw new NotSerializableException(nsfe.getMessage());
     }
   }
-  
+
   /**
    * <p>
    * Retrieve a SymbolList view of an array of doubles.
@@ -98,13 +99,13 @@ public final class DoubleAlphabet
     if(INSTANCE == null) {
       INSTANCE = new DoubleAlphabet();
     }
-    
+
     return INSTANCE;
   }
 
     private List alphabets = null;
     private WeakValueHashMap doubleToSym;
-  
+
     private DoubleAlphabet() {
 	doubleToSym = new WeakValueHashMap();
     }
@@ -124,11 +125,11 @@ public final class DoubleAlphabet
       }
       return sym;
   }
- 
+
   public Annotation getAnnotation() {
     return Annotation.EMPTY_ANNOTATION;
   }
-  
+
   public boolean contains(Symbol s) {
     if(s instanceof DoubleSymbol) {
       return true;
@@ -136,7 +137,7 @@ public final class DoubleAlphabet
       return false;
     }
   }
-  
+
   public void validate(Symbol s) throws IllegalSymbolException {
     if(!contains(s)) {
       throw new IllegalSymbolException(
@@ -145,18 +146,18 @@ public final class DoubleAlphabet
       );
     }
   }
-  
+
   public List getAlphabets() {
     if(alphabets == null) {
       alphabets = new SingletonList(this);
     }
     return alphabets;
   }
-  
+
   public Symbol getGapSymbol() {
     return AlphabetManager.getGapSymbol(getAlphabets());
   }
-  
+
   public Symbol getAmbiguity(Set syms) throws IllegalSymbolException {
     for(Iterator i = syms.iterator(); i.hasNext(); ) {
       Symbol sym = (Symbol) i.next();
@@ -164,23 +165,23 @@ public final class DoubleAlphabet
     }
     throw new BioError("Operation not implemented");
   }
-  
+
   public Symbol getSymbol(List symList) throws IllegalSymbolException {
     if(symList.size() != 1) {
       throw new IllegalSymbolException(
         "Can't build symbol from list " + symList.size() + " long"
       );
     }
-    
+
     Symbol s = (Symbol) symList.get(0);
     validate(s);
     return s;
   }
-  
+
   public String getName() {
     return "Alphabet of all doubles.";
   }
-  
+
   public SymbolTokenization getTokenization(String name) {
     if(!name.equals("name")) {
     	throw new NoSuchElementException(
@@ -189,7 +190,7 @@ public final class DoubleAlphabet
     }
     return new DoubleTokenization();
   }
-  
+
   /**
    * A single double value.
    *
@@ -204,40 +205,40 @@ public final class DoubleAlphabet
   {
     private final double val;
     private final Alphabet matches;
-    
+
     public Annotation getAnnotation() {
       return Annotation.EMPTY_ANNOTATION;
     }
-    
+
     public String getName() {
       return val + "";
     }
-    
+
     /**
      * @return the double value associated with this double symbol
      */
     public double doubleValue() {
       return val;
     }
-    
+
     public Alphabet getMatches() {
       return matches;
     }
-    
+
     public List getSymbols() {
       return new SingletonList(this);
     }
-    
+
     public Set getBases() {
       return Collections.singleton(this);
     }
-    
+
     protected DoubleSymbol(double val) {
       this.val = val;
       this.matches = new SingletonAlphabet(this);
     }
   }
-  
+
   /**
    * A light-weight implementation of SymbolList that allows an array to
    * appear to be a SymbolList.
@@ -251,19 +252,19 @@ public final class DoubleAlphabet
     Serializable
   {
     private final double [] dArray;
-    
+
     public Alphabet getAlphabet() {
       return INSTANCE;
     }
-    
+
     public Symbol symbolAt(int i) {
       return new DoubleSymbol(dArray[i-1]);
     }
-    
+
     public int length() {
       return dArray.length;
     }
-    
+
     public DoubleArray(double [] dArray) {
       this.dArray = dArray;
     }

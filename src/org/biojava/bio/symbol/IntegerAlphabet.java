@@ -65,7 +65,7 @@ public final class IntegerAlphabet
   /**
    * The singleton instance of the IntegerAlphabet class.
    */
-  private static IntegerAlphabet INSTANCE;
+  public static IntegerAlphabet INSTANCE;
 
   private Object writeReplace() throws ObjectStreamException {
     try {
@@ -120,7 +120,7 @@ public final class IntegerAlphabet
     if(INSTANCE == null) {
       INSTANCE = new IntegerAlphabet();
     }
-    
+
     return INSTANCE;
   }
 
@@ -128,11 +128,11 @@ public final class IntegerAlphabet
    * Canonicalization map for ints and references to symbols.
    */
     private WeakValueHashMap intToSym;
-  
+
   private IntegerAlphabet() {
       intToSym = new WeakValueHashMap();
   }
-  
+
   /**
    * Retrieve the Symbol for an int.
    *
@@ -146,7 +146,7 @@ public final class IntegerAlphabet
       if(sym == null) {
 	  sym = new IntegerSymbol(val);
 	  intToSym.put(i, sym);
-      } 
+      }
       return sym;
   }
 
@@ -319,13 +319,13 @@ public final class IntegerAlphabet
           min + " : " + max
         );
       }
-      
+
       this.min = min;
       this.max = max;
 
       this.name = "SubIntegerAlphabet["+min+".."+max+"]";
     }
-    
+
     public String getName() {
       return name;
     }
@@ -350,7 +350,7 @@ public final class IntegerAlphabet
         throw new NoSuchElementException(name + " parser not supported by IntegerAlphabet yet");
       }
     }
-    
+
     public IntegerSymbol getSymbol(int val)
     throws IllegalSymbolException {
       if(val < min || val > max) {
@@ -360,23 +360,23 @@ public final class IntegerAlphabet
           min + " : " + max
         );
       }
-      
+
       return IntegerAlphabet.getInstance().getSymbol(val);
     }
-    
+
     public int size() {
       return max - min + 1;
     }
-    
+
     public List getAlphabets() {
       return new SingletonList(this);
     }
-    
+
     protected AtomicSymbol getSymbolImpl(List symL)
     throws IllegalSymbolException {
       return (AtomicSymbol) symL.get(0);
     }
-    
+
     protected void addSymbolImpl(AtomicSymbol sym)
     throws ChangeVetoException {
       throw new ChangeVetoException(
@@ -384,7 +384,7 @@ public final class IntegerAlphabet
         getName()
       );
     }
-    
+
     public void removeSymbol(Symbol sym)
     throws ChangeVetoException {
       throw new ChangeVetoException(
@@ -392,20 +392,20 @@ public final class IntegerAlphabet
         getName()
       );
     }
-    
+
     public SymbolList symbols()
     throws UnsupportedOperationException {
       throw new UnsupportedOperationException();
     }
-    
+
     public Iterator iterator() {
       return new Iterator() {
         int indx = min;
-        
+
         public boolean hasNext() {
           return indx <= max;
         }
-        
+
         public Object next() {
           try {
             Symbol sym = getSymbol(indx);
@@ -419,13 +419,13 @@ public final class IntegerAlphabet
             );
           }
         }
-        
+
         public void remove() {
           throw new UnsupportedOperationException();
         }
       };
     }
-    
+
     public Annotation getAnnotation() {
       return Annotation.EMPTY_ANNOTATION;
     }

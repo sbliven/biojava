@@ -50,7 +50,7 @@ public class SeqSerializationTest extends TestCase
 				       "fragment1",
 				       "fragment1",
 				       Annotation.EMPTY_ANNOTATION);
-	
+
 	Feature.Template sft = new Feature.Template();
 	sft.type = "test";
 	sft.source = "test";
@@ -62,7 +62,7 @@ public class SeqSerializationTest extends TestCase
 	seq.createFeature(sft);
 
 	File f = File.createTempFile("SeqSerTest",".tmp");
-	ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));        
+	ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
 	oos.writeObject(seq);
 	oos.flush();
 	oos.close();
@@ -74,7 +74,7 @@ public class SeqSerializationTest extends TestCase
 	if (sl1.length() != sl2.length()) {
 	    return false;
 	}
-	
+
 	Iterator si1 = sl1.iterator();
 	Iterator si2 = sl2.iterator();
 	while (si1.hasNext()) {
@@ -104,5 +104,9 @@ public class SeqSerializationTest extends TestCase
 	for(Iterator i = seq2.features(); i.hasNext();){
 	    assertTrue(features.contains(i.next()));
 	}
+    }
+
+    public void testTokenization(){
+      assertEquals(seq.seqString(), seq2.seqString());
     }
 }
