@@ -44,13 +44,13 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
     private BioSQLSequenceDB seqDB;
     private String name;
     private int bioentry_id = -1;
-    private int dummy_id = -1;
     private int biosequence_id;
     private ChangeSupport changeSupport;
     private Annotation annotation;
     private Alphabet alphabet;
     private BioEntryFeatureSet features;
     private SymbolList symbols;
+    private int length;
 
     private void initChangeSupport() {
 	changeSupport = new ChangeSupport();
@@ -60,42 +60,19 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 	return seqDB.getDBHelper();
     }
 
-    static BioSQLSequence reflectBiosequence(BioSQLSequenceDB seqDB,
-					     String name,
-					     int bioentry_id,
-					     int biosequence_id,
-					     String alphaName)
-	throws BioException
-    {
-	BioSQLSequence seq = new BioSQLSequence(seqDB, name, bioentry_id, alphaName);
-	seq.biosequence_id = biosequence_id;
-	return seq;
-    }
-
-    static BioSQLSequence reflectDummy(BioSQLSequenceDB seqDB,
-				       String name,
-				       int bioentry_id,
-				       int dummy_id,
-				       int length,
-				       String alphaName)
-	 throws BioException
-    {
-	BioSQLSequence seq = new BioSQLSequence(seqDB, name, bioentry_id, alphaName);
-	seq.dummy_id = dummy_id;
-	seq.symbols = new DummySymbolList((FiniteAlphabet) seq.alphabet, length);
-	return seq;
-    }
-
-    private BioSQLSequence(BioSQLSequenceDB seqDB,
-			   String name,
-			   int bioentry_id,
-			   String alphaName)
+    BioSQLSequence(BioSQLSequenceDB seqDB,
+	           String name,
+	           int bioentry_id,
+                   int biosequence_id,
+                   String alphaName,
+                   int length)
 	throws BioException
     {
 	this.seqDB = seqDB;
 	this.name = name;
 	this.bioentry_id = bioentry_id;
 	this.biosequence_id = biosequence_id;
+        this.length = length;
 
 	try {
 	    this.alphabet = AlphabetManager.alphabetForName(alphaName.toUpperCase());
@@ -135,7 +112,11 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
     }
 
     public int length() {
-	return getSymbols().length();
+        if (length >= 0) {
+            return length;
+        } else {
+	    return getSymbols().length();
+        }
     }
 
     public Symbol symbolAt(int i) {
@@ -180,14 +161,16 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 		Connection conn = seqDB.getPool().takeConnection();
 		
 		PreparedStatement get_symbols = conn.prepareStatement("select biosequence_str " +
-								      "from biosequence " +
-								      "where biosequence_id = ?");
-		// FIXME should handle NULL biosequence_str (thomasd, Cape Town)
+								      "from   biosequence " +
+								      "where  biosequence_id = ?");
 		get_symbols.setInt(1, biosequence_id);
 		ResultSet rs = get_symbols.executeQuery();
 		String seqString = null;
 		if (rs.next()) {
 		    seqString = rs.getString(1);  // FIXME should do something stream-y
+                    if (rs.wasNull()) {
+                        seqString = null;
+                    }
 		}
 		get_symbols.close();
 
@@ -202,7 +185,11 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 			throw new BioRuntimeException(ex, "Couldn't parse tokenized symbols");
 		    }
 		} else {
-		    throw new BioRuntimeException("Sequence " + name + " has gone missing!");
+                    if (! (length >= 0)) {
+                        throw new BioRuntimeException("Length not available from database");
+                    }
+                                
+		    symbols = new DummySymbolList((FiniteAlphabet) alphabet, length);
 		}
 	    } catch (SQLException ex) {
 		throw new BioRuntimeException(ex, "Unknown error getting symbols from BioSQL.  Oh dear.");

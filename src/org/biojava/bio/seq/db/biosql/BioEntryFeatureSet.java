@@ -100,7 +100,26 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
     public void removeFeature(Feature f)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Don't (yet) support feature removal");
+	FeatureHolder fh = getFeatures();
+        if (!fh.containsFeature(f)) {
+            throw new ChangeVetoException("Feature doesn't come from this sequence");
+        }
+        if (!(f instanceof BioSQLFeatureI)) {
+            throw new ChangeVetoException("This isn't a normal BioSQL feature");
+        }
+        
+        if (changeSupport == null) {
+            seqDB.removeFeature((BioSQLFeatureI) f);
+            fh.removeFeature(f);
+        } else {
+            synchronized (changeSupport) {
+                ChangeEvent cev = new ChangeEvent(seq, FeatureHolder.FEATURES, f);
+                changeSupport.firePreChangeEvent(cev);
+                seqDB.removeFeature((BioSQLFeatureI) f);
+                fh.removeFeature(f);
+                changeSupport.firePostChangeEvent(cev);
+            }
+        }
     }
 
     private SimpleFeatureHolder features;
