@@ -34,7 +34,7 @@ public interface RNAFeature extends StrandedFeature {
   /**
    * Retrieve the Sequence that represents the RNA associated with this feature.
    *
-   * @return Sequnece the associated RNA
+   * @return Sequence the associated RNA
    */
   public Sequence getRNA();
   
