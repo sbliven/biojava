@@ -21,20 +21,43 @@
 
 package org.biojava.bio.program.tagvalue;
 
+/**
+ * <code>ParserListener</code> is an immutable pairing of a parser and
+ * listener.
+ *
+ * @author Matthew Pocock
+ * @author Keith James
+ */
 public class ParserListener {
   private final TagValueParser parser;
   private final TagValueListener listener;
   
-  public ParserListener(TagValueParser parser, TagValueListener listener) {
+    /**
+     * Creates a new <code>ParserListener</code> instance.
+     *
+     * @param parser a <code>TagValueParser</code>.
+     * @param listener a <code>TagValueListener</code>.
+     */
+    public ParserListener(TagValueParser parser, TagValueListener listener) {
     this.parser = parser;
     this.listener = listener;
   }
   
-  public TagValueParser getParser() {
+    /**
+     * <code>getParser</code> returns the parser of the pair.
+     *
+     * @return a <code>TagValueParser</code>.
+     */
+    public TagValueParser getParser() {
     return parser;
   }
   
-  public TagValueListener getListener() {
+    /**
+     * <code>getListener</code> returns the listener of the pair.
+     *
+     * @return a <code>TagValueListener</code>.
+     */
+    public TagValueListener getListener() {
     return listener;
   }
 }
