@@ -21,8 +21,9 @@ public abstract class AbstractSymbolEventTest
   protected void setUp()
           throws Exception
   {
-    ann = new SmallAnnotation();
-    sym = createSymbol(ann);
+    Annotation initialAnno = new SmallAnnotation();
+    sym = createSymbol(initialAnno);
+    ann = sym.getAnnotation();
   }
 
   protected abstract Symbol createSymbol(Annotation ann) throws Exception;

@@ -1,9 +1,8 @@
 package org.biojava.bio.symbol;
 
 import org.biojava.bio.Annotation;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeSupport;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.utils.*;
 
 import java.util.Collections;
 
@@ -16,6 +15,6 @@ public class SimpleBasisSymbolEventTest
   protected Symbol createSymbol(Annotation ann)
           throws Exception
   {
-    return new SimpleBasisSymbol(Annotation.EMPTY_ANNOTATION, Collections.EMPTY_LIST);
+    return new SimpleBasisSymbol(ann, new ListTools.Doublet(DNATools.c(), DNATools.n()));
   }
 }

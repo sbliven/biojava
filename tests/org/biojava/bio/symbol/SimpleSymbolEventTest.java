@@ -11,7 +11,7 @@ public class SimpleSymbolEventTest extends AbstractSymbolEventTest
   protected Symbol createSymbol(Annotation ann)
           throws Exception
   {
-    return new SimpleSymbol(Annotation.EMPTY_ANNOTATION);
+    return new SimpleSymbol(ann);
   }
 }
 
