@@ -328,6 +328,10 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
         }
     }
     
+    /**
+     * Create a single projected feature using the rules of this <code>ProjectedFeatureHolder</code>.
+     */
+    
     public Feature projectFeature(Feature f) {
         return ProjectionEngine.DEFAULT.projectFeature(f, this);
     }
@@ -411,6 +415,10 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
 	    {
 	        throw new ChangeVetoException("Can't create features in this projection");
 	    }
+        
+        //
+        // Event wiring coming soon --THOMASD
+        //
         
     public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
     public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
