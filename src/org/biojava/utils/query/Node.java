@@ -7,4 +7,6 @@ package org.biojava.utils.query;
  * @since 1.2
  */
 public interface Node {
+  public Class getInputClass();
+  public Class getOutputClass();
 }

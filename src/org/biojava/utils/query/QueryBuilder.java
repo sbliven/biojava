@@ -2,6 +2,8 @@ package org.biojava.utils.query;
 
 import java.util.*;
 
+import org.biojava.utils.*;
+
 /**
  * A helper class for creating query objects.
  * <P>
@@ -33,7 +35,11 @@ public class QueryBuilder {
       Map.Entry arcOp = (Map.Entry) i.next();
       Arc arc = (Arc) arcOp.getKey();
       Operation op = (Operation) arcOp.getValue();
-      addArc(arc, op);
+      try {
+        addArc(arc, op);
+      } catch (OperationException oe) {
+        throw new NestedError(oe, "This should never happen");
+      }
     }
   }
   
@@ -82,7 +88,17 @@ public class QueryBuilder {
     }
   }
   
-  public void addArc(Arc arc, Operation op) {
+  public void addArc(Arc arc, Operation op)
+  throws OperationException {
+    if(!op.getInputClass().isAssignableFrom(arc.from.getOutputClass())) {
+      throw new OperationException("Can't assign " + arc.from.getOutputClass() +
+      " to " + op.getInputClass());
+    }
+    if(!op.getOutputClass().isAssignableFrom(arc.to.getInputClass())) {
+      throw new OperationException("Can't assign " +  op.getOutputClass() +
+      " to " + arc.to.getInputClass());
+    }
+
     nodes.add(arc.from);
     nodes.add(arc.to);
     

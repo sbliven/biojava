@@ -31,6 +31,52 @@ import java.util.*;
  */
 public interface Query {
   /**
+   * Usefull instance of a Query that will always return everything that you put
+   * into it.
+   */
+  public static NullQuery NULL_QUERY = new NullQuery();
+
+  /**
+   * The Query that return everything put in to it.
+   *
+   * @author Matthew Pocock
+   * @since 1.2
+   */
+  public class NullQuery implements Query {
+    private final ResultNode node;
+    private final Set nodeSet;
+    
+    {
+      node = new SimpleResultNode("result", Object.class);
+      nodeSet = Collections.singleton(node);
+    }
+    
+    public ResultNode getNode() {
+      return node;
+    }
+    
+    public Set getNodes() {
+      return nodeSet;
+    }
+    
+    public Map getArcsToOperators() {
+      return Collections.EMPTY_MAP;
+    }
+    
+    public Set getOperations(Arc arc) {
+      return Collections.EMPTY_SET;
+    }
+    
+    public Set getArcsFrom(Node from) {
+      return Collections.EMPTY_SET;
+    }
+    
+    public Set getArcsTo(Node from) {
+      return Collections.EMPTY_SET;
+    }
+  }
+  
+  /**
    * Return the nodes in this Query.
    *
    * @return Set <Node>

@@ -13,5 +13,5 @@ package org.biojava.utils.query;
  *
  * @author Matthew Pocock
  */
-public class ResultNode implements Node {
+public interface ResultNode extends Node {
 }

@@ -28,6 +28,12 @@ public class FilterSet extends Filter {
     outputClass = Object.class;
   }
   
+  public FilterSet(Set filters) {
+    this.filters = filters;
+    inputClass = Object.class;
+    outputClass = Object.class;
+  }
+  
   public Iterator filters() {
     return filters.iterator();
   }
@@ -40,7 +46,8 @@ public class FilterSet extends Filter {
     return outputClass;
   }
   
-  public boolean accept(Object o) {
+  public boolean accept(Object o)
+  throws OperationException {
     for(Iterator i = filters(); i.hasNext(); ) {
       Filter filt = (Filter) i.next();
       

@@ -13,7 +13,8 @@ import java.util.*;
 public class FilterByQuery extends Filter {
   private final Query query;
   private final Node startNode;
-  private final Filter filter;
+  private final Filter.CompareInteger.Comparison comparison;
+  private final int value;
   
   /**
    * Create a new filter that will evaluate <code>query</code> starting from
@@ -24,10 +25,16 @@ public class FilterByQuery extends Filter {
    * @param startNode  the Node to start evaluation from
    * @param filter  the filter to check the result of the sub-query with
    */
-  public FilterByQuery(Query query, Node startNode, Filter filter) {
+  public FilterByQuery(
+    Query query,
+    Node startNode,
+    Filter.CompareInteger.Comparison comparison,
+    int value
+  ) {
     this.query = query;
     this.startNode = startNode;
-    this.filter = filter;
+    this.comparison = comparison;
+    this.value = value;
   }
   
   /**
@@ -53,18 +60,23 @@ public class FilterByQuery extends Filter {
    *
    * @return the Filter
    */
-  public Filter getFilter() {
-    return filter;
+  public Filter.CompareInteger.Comparison getComparison() {
+    return comparison;
   }
   
-  public boolean accept(Object object) {
+  public int getValue() {
+    return value;
+  }
+  
+  public boolean accept(Object object)
+  throws OperationException {
     Queryable res = QueryTools.select(
       query,
       startNode,
       QueryTools.createQueryable(Collections.singleton(object), Object.class)
     );
     
-    return filter.accept(res);
+    return comparison.compare(res.size(), value);
   }
   
   public Class getInputClass() {
