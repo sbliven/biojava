@@ -28,7 +28,7 @@ import java.lang.ref.*;
  * A utility class to provide management for informing ChangeListeners of
  * ChangeEvents.
  * <P>
- * This is loosly modeled after the standard PropertyChangeEvent objects.
+ * This is loosely modelled after the standard PropertyChangeEvent objects.
  * <P>
  * For an object to correctly fire these events, they must follow a broad
  * outline like this:
@@ -48,6 +48,7 @@ import java.lang.ref.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Keith James (docs)
  * @since 1.1
  */
 

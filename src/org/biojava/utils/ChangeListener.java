@@ -28,16 +28,17 @@ import java.util.*;
  *
  * @author     Thomas Down
  * @author     Matthew Pocock
+ * @author     Keith James (docs)
  * @created    September 29, 2000 
  * @since      1.1 
  */
 
 public interface ChangeListener extends EventListener {
   /**
-   * Conventience implementation which vetoes every change of which it is
+   * Convenience implementation which vetoes every change of which it is
    * notified. You could add this to an object directly to stop it changing
    * in any way, or alternatively you could add it for a specific ChangeType
-   * to stop that single item form altering.
+   * to stop that single item from altering.
    */
   final static ChangeListener ALWAYS_VETO = new AlwaysVetoListener();
 
@@ -53,7 +54,7 @@ public interface ChangeListener extends EventListener {
    * This method does not indicate that the change will definitely take place.
    *
    * @param  cev                      
-   * An event encapsulting the change which is about 
+   * An event encapsulating the change which is about 
    * to take place.
    * @exception  ChangeVetoException  Description of Exception 
    * @throws                          
@@ -69,7 +70,7 @@ public interface ChangeListener extends EventListener {
    *  Called when a change has just taken place.
    *
    * @param  cev  
-   * An event encapulating the change which has 
+   * An event encapsulating the change which has 
    * occured.
    */
 
@@ -86,7 +87,7 @@ public interface ChangeListener extends EventListener {
 
   static class AlwaysVetoListener implements ChangeListener {
     /**
-     *  Private construtor to stop people pissing about.
+     *  Private constructor to stop people pissing about.
      */
     protected AlwaysVetoListener() {
     }

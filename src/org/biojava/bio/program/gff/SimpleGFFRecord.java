@@ -193,7 +193,7 @@ public class SimpleGFFRecord implements GFFRecord {
    * Replace the group-attribute <span class="type">Map</span> with 
    * <span class="arg">ga</span>.
    * <P>
-   * To efficiently add a key, call <span class="method">getGroupAttributes</span>
+   * To efficiently add a key, call <span class="method">getGroupAttributes()</span>
    * and modify the <span class="type">Map</span>.
    *
    * @param ga  the new group-attribute <span class="type">Map</span>

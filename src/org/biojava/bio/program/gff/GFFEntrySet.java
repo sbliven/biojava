@@ -32,11 +32,12 @@ import org.biojava.bio.seq.*;
 /**
  * A set of entries and comments as a representation of a GFF file.
  * <P>
- * This is an intermediate stoorage solution for GFF stuff. It lets you
+ * This is an intermediate storage solution for GFF stuff. It lets you
  * collect together an arbitrary set of GFF records and comments, and then
  * do something with them later.
  *
  * @author Matthew Pocock
+ * @author Keith James (docs)
  */
 public class GFFEntrySet {
   /**
@@ -58,7 +59,7 @@ public class GFFEntrySet {
    * will return <span class="type">String</span> and <span class="type">
    * GFFRecord</span> objects in the order that they were added to this set.
    * It is your responsibility to check the type of
-   * <span class="method">hasNext</span> before casting it.
+   * <span class="method">hasNext()</span> before casting it.
    */
   public Iterator lineIterator() {
     return lines.iterator();
@@ -142,7 +143,7 @@ public class GFFEntrySet {
   /**
    * Filter this entry set into another set.
    *
-   * @param filter  the <span class="type">GFFRecordFilter</span> to filter with
+   * @param filter the <span class="type">GFFRecordFilter</span> to filter with
    * @return  a new <span class="type">GFFEntrySet</span> containing only the
    *          items filtered in by the filter
    */

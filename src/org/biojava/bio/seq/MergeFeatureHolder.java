@@ -79,7 +79,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 
     /**
      * When applied to a MergeFeatureHolder, this filters each child
-     * FeatureHolder independantly.
+     * FeatureHolder independently.
      */
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {

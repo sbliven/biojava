@@ -31,10 +31,11 @@ import org.biojava.bio.seq.*;
  * A filter that will accept or reject a <span class="type">GFFEntry</span>.
  *
  * @author Matthew Pocock
+ * @author Keith James (docs)
  */
 public interface GFFRecordFilter {
   /**
-   * Return wether or not to accept <span class="arg">record</span>.
+   * Return whether or not to accept <span class="arg">record</span>.
    *
    * @param entry the <span class="type">GFFRecord</span> to filter
    * @return <span class="kw">true</span> if <span class="arg">record</span>

@@ -40,7 +40,7 @@ import org.biojava.bio.symbol.*;
  */
 public interface FeatureFilter extends Serializable {
   /**
-   * This method determines whether a fetaure is to be accepted.
+   * This method determines whether a feature is to be accepted.
    *
    * @param f the Feature to evaluate
    * @return  true if this feature is to be selected in, or false if it is to be ignored

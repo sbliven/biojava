@@ -21,11 +21,12 @@
 package org.biojava.utils;
 
 /**
- * This is a ChangeListener that ignores everything. This is a usefull
- * base-class for throw-a-way ChangeListener objects in a similar veign to
- * MouseAdapter ect..
+ * This is a ChangeListener that ignores everything. This is a useful
+ * base-class for throw-a-way ChangeListener objects in a similar vein to
+ * MouseAdapter etc.
  *
  * @author Matthew Pocock
+ * @author Keith James (docs)
  */
 public class ChangeAdapter implements ChangeListener {
   public void preChange(ChangeEvent ce)

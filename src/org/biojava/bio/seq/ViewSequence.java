@@ -31,7 +31,7 @@ import org.biojava.bio.seq.impl.*;
 
 /**
  * A view onto another Sequence object.  This class allows new
- * features and annotations to be overlayed onto an existing
+ * features and annotations to be overlaid onto an existing
  * Sequence without modifying it.
  *
  * @author Thomas Down

@@ -48,11 +48,11 @@ import org.biojava.utils.*;
  *
  *     annFor = new Annotatable.AnnotationForwarder(
  *       this, // this is the source of the new events
- *       getChangeSupport(Changeable.ANNOTATION) // the type of the events
+ *       getChangeSupport(Annotatable.ANNOTATION) // the type of the events
  *     );
  *
  *     // add the forwarder to our ann delegate
- *     ann.addChangeListener(annFor, Changeable.ANNOTATION);
+ *     ann.addChangeListener(annFor, Annotatable.ANNOTATION);
  *   }
  *
  *   public Annotation getAnnotation() {
@@ -62,6 +62,7 @@ import org.biojava.utils.*;
  * </pre>
  *
  * @author  Matthew Pocock
+ * @author  Keith James (docs)
  */
 public interface Annotatable extends Changeable {
   /**
@@ -70,7 +71,7 @@ public interface Annotatable extends Changeable {
    * Annotation object.
    */
   public static final ChangeType ANNOTATION = new ChangeType(
-    "the assicated annotation has changed",
+    "the associated annotation has changed",
     "org.biojava.bio.Annotatable",
     "ANNOTATION"
   );
@@ -78,13 +79,13 @@ public interface Annotatable extends Changeable {
   /**
    * Should return the associated annotation object.
    *
-   * @return	an Annotation object, never null
+   * @return an Annotation object, never null
    */
   Annotation getAnnotation();
 
   /**
    * A helper class so that you don't have to worry about forwarding events from
-   * the Annotaion object to the Annotatable one.
+   * the Annotation object to the Annotatable one.
    * <P>
    * Once a listener is added to your Annotatable that is interested in
    * ANNOTATION events, then instantiate one of these and add it as a listener

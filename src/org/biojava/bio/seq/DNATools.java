@@ -28,9 +28,10 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * Usefull functionality for processing DNA sequences.
+ * Useful functionality for processing DNA sequences.
  *
  * @author Matthew Pocock
+ * @author Keith James (docs)
  */
 public final class DNATools {
   private static final ReversibleTranslationTable complementTable;
@@ -111,7 +112,7 @@ public final class DNATools {
   /**
    * Return an integer index for a symbol - compatible with forIndex.
    * <P>
-   * The index for a symbol is stable accross virtual machines & invokations.
+   * The index for a symbol is stable accross virtual machines & invocations.
    *
    * @param sym  the Symbol to index
    * @return     the index for that symbol
@@ -135,7 +136,7 @@ public final class DNATools {
   /**
    * Return the symbol for an index - compatible with index.
    * <P>
-   * The index for a symbol is stable accross virtual machines & invokations.
+   * The index for a symbol is stable accross virtual machines & invocations.
    *
    * @param index  the index to look up
    * @return       the symbol at that index

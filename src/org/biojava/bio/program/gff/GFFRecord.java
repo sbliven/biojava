@@ -29,17 +29,18 @@ import org.biojava.bio.seq.StrandedFeature;
  * A single GFF record.
  * <P>
  * This object has fields for each GFF field. It also defines a couple of
- * usefull constants.
+ * useful constants.
  * <P>
- * Gff is described at http://www.sanger.ac.uk/Software/formats/GFF/
+ * GFF is described at http://www.sanger.ac.uk/Software/formats/GFF/
  *
  * @author Matthew Pocock
+ * @author Keith James (docs)
  */
 public interface GFFRecord {
   /**
    * The sequence name field.
    * <P>
-   * This should be the name of the sequence that this gff record is within.
+   * This should be the name of the sequence that this GFF record is within.
    *
    * @return the name of the sequence
    */

@@ -27,18 +27,19 @@ import org.biojava.bio.*;
  * The interface for things that listen to GFF event streams.
  * <P>
  * This allows the GFF push model to run over large collections of GFF, filter
- * them and access other resources without requiering vast numbers of GFF
+ * them and access other resources without requiring vast numbers of GFF
  * records to be in memory at any one time.
  * <P>
  * The stream includes both GFF records and comment lines. A particular
  * handeler may choose to discard either of these.
  * <P>
- * It is assumed that a particular handeler will only be used to listen to
+ * It is assumed that a particular handler will only be used to listen to
  * a single stream of events in a single thread. Particular implementations
  * may not impose this restriction.
  * 
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Keith James (docs)
  */
 
 public interface GFFDocumentHandler {

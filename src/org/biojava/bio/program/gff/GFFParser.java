@@ -33,6 +33,7 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Keith James (docs)
  */
 public class GFFParser {
     private GFFErrorHandler errors = GFFErrorHandler.ABORT_PARSING;
@@ -77,7 +78,7 @@ public class GFFParser {
 
     /**
      * Informs <span class="arg">handler</span> of each line of
-     * gff read from <span class="arg">bReader</span>
+     * GFF read from <span class="arg">bReader</span>
      *
      * @param bReader the <span class="type">BufferedReader</span> to parse
      * @param handler the <span class="type">GFFDocumentHandler</span> that will
@@ -139,7 +140,7 @@ public class GFFParser {
     }
   
   /**
-   * Actualy turns a list of tokens, some value string and a comment into a
+   * Actually turns a list of tokens, some value string and a comment into a
    * <span class="type">GFFRecord</span> and informs
    * <span class="arg">handler</span>.
    *

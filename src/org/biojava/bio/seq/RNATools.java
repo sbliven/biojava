@@ -33,9 +33,10 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * Usefull functionality for processing DNA sequences.
+ * Useful functionality for processing DNA and RNA sequences.
  *
  * @author Matthew Pocock
+ * @author Keith James (docs)
  */
 public final class RNATools {
   private static final ReversibleTranslationTable complementTable;
@@ -122,7 +123,7 @@ public final class RNATools {
   /**
    * Return an integer index for a symbol - compatible with forIndex.
    * <P>
-   * The index for a symbol is stable accross virtual machines & invokations.
+   * The index for a symbol is stable accross virtual machines & invocations.
    *
    * @param sym  the Symbol to index
    * @return     the index for that symbol
@@ -146,7 +147,7 @@ public final class RNATools {
   /**
    * Return the symbol for an index - compatible with index.
    * <P>
-   * The index for a symbol is stable accross virtual machines & invokations.
+   * The index for a symbol is stable accross virtual machines & invocations.
    *
    * @param index  the index to look up
    * @return       the symbol at that index
