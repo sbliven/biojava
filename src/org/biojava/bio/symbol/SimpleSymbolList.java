@@ -70,6 +70,8 @@ import org.biojava.bio.seq.io.*;
  */
 
 public class SimpleSymbolList extends AbstractSymbolList implements ChangeListener, Serializable {
+    private static int instanceCount;
+
     private static final int INCREMENT = 100;
 
     private Alphabet alphabet;
@@ -80,11 +82,21 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
     private SymbolList referenceSymbolList; // the original SymbolList subLists of views become sublists of original
 
     private void addListener() {
+        incCount();
         alphabet.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
     }
 
+    private static synchronized int incCount() {
+        return ++instanceCount;
+    }
+    
+    private static synchronized int decCount() {
+        return --instanceCount;
+    }
+    
     protected void finalize() throws Throwable {
         super.finalize();
+        // System.err.println("Finalizing a SimpleSymbolList: " + decCount());
         alphabet.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
         if (isView){
             referenceSymbolList.removeChangeListener(this);

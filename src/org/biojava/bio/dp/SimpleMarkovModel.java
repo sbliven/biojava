@@ -65,7 +65,7 @@ public class SimpleMarkovModel
     ChangeSupport changeSupport = super.getChangeSupport(ct);
     
   	if(
-	    MarkovModel.PARAMETER.isMatchingType(ChangeType.UNKNOWN) &&
+	    (MarkovModel.PARAMETER.isMatchingType(ct) || ct.isMatchingType(MarkovModel.PARAMETER))  &&
 	    distForwarder == null
   	) {
 	    distForwarder = new MarkovModel.DistributionForwarder(

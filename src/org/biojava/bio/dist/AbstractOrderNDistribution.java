@@ -47,7 +47,7 @@ implements OrderNDistribution{
     ChangeSupport changeSupport = super.getChangeSupport(ct);
     
     if(
-      ( (ct == null) || (ct.isMatchingType(Distribution.WEIGHTS)) ) &&
+      ( (Distribution.WEIGHTS.isMatchingType(ct)) || (ct.isMatchingType(Distribution.WEIGHTS)) ) &&
       weightForwarder == null
     ) {
       weightForwarder = new WeigthForwarder(this, changeSupport);

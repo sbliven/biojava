@@ -58,15 +58,15 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
     
     SymbolList [] rll = { symList };
     
-    System.out.print("Forward...  ");
+    // System.out.print("Forward...  ");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll, scoreType);
     double fs = fm.getScore();
-    System.out.println("Score = " + fs);
+    // System.out.println("Score = " + fs);
 
-    System.out.print("Backward... ");
+    // System.out.print("Backward... ");
     SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll, scoreType);
     double bs = bm.getScore();
-    System.out.println("Score = " + bs);
+    // System.out.println("Score = " + bs);
 
     Symbol gap = AlphabetManager.getGapSymbol();
     

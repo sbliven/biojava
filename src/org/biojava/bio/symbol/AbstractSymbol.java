@@ -43,7 +43,7 @@ public abstract class AbstractSymbol
     ChangeSupport changeSupport = super.getChangeSupport(changeType);
 
     if(
-      ((changeType == null) || (changeType.isMatchingType(Annotation.PROPERTY))) &&
+      (changeType.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(changeType)) &&
       (annotationForwarder == null)
     ) {
       annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);

@@ -284,7 +284,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
         ChangeSupport cs = super.getChangeSupport(ct);
 
         if (annotationForwarder == null &&
-            (ct == null || ct == Annotatable.ANNOTATION))
+            (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct)))
         {
             annotationForwarder =
                 new Annotatable.AnnotationForwarder(this, cs);

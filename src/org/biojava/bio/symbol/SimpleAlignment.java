@@ -45,6 +45,11 @@ extends AbstractSymbolList implements Alignment, Serializable {
   private Alphabet alphabet;
   private int length;
 
+  protected void finalize() throws Throwable {
+      super.finalize();
+      // System.err.println("Finalizing a SimpleAlignement");
+  }
+  
   public int length() {
     return length;
   }

@@ -291,7 +291,7 @@ implements SymbolList {
       ChangeSupport cs = super.getChangeSupport(changeType);
 
       if(
-        ((changeType == null) || (changeType == SymbolList.EDIT)) &&
+        (SymbolList.EDIT.isMatchingType(changeType) || changeType.isMatchingType(SymbolList.EDIT)) &&
         (editTranslater == null)
       ) {
         editTranslater = new EditTranslater(this, cs, start, end);

@@ -82,7 +82,7 @@ public abstract class AbstractDistribution
       ChangeSupport changeSupport = super.getChangeSupport(ct);
 
     if(
-      ((ct == null) || (ct.isMatchingType(Distribution.NULL_MODEL))) &&
+      ((Distribution.NULL_MODEL.isMatchingType(ct)) || (ct.isMatchingType(Distribution.NULL_MODEL))) &&
       nullModelForwarder == null
     ) {
       nullModelForwarder = new Distribution.NullModelForwarder(this, changeSupport);

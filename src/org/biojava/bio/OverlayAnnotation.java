@@ -61,7 +61,7 @@ public class OverlayAnnotation
     ChangeSupport changeSupport = super.getChangeSupport(changeType);
 
     if(
-      ((changeType == null) || (changeType.isMatchingType(Annotation.PROPERTY))) &&
+      (Annotation.PROPERTY.isMatchingType(changeType) || changeType.isMatchingType(Annotation.PROPERTY)) &&
       (propertyForwarder == null)
     ) {
       propertyForwarder = new PropertyForwarder(

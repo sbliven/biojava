@@ -157,7 +157,9 @@ public class TranslatedDistribution
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     ChangeSupport cs = super.getChangeSupport(ct);
     
-    if(forwarder == null && ct.isMatchingType(Distribution.WEIGHTS)) {
+    if(forwarder == null && 
+       (Distribution.WEIGHTS.isMatchingType(ct) || ct.isMatchingType(Distribution.WEIGHTS))) 
+    {
       forwarder = new Forwarder(this, cs);
       delegate.addChangeListener(forwarder, Distribution.WEIGHTS);
     }

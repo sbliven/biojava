@@ -52,7 +52,7 @@ public class SingleDP extends DP implements Serializable {
   }
 
   public void update() {
-    //System.out.println("Updating emissions as underlying model has changed!");
+    // System.out.println("Updating emissions as underlying model has changed!");
     super.update();
     // workaround for bug in vm
     if(emissionsProb != null) {
