@@ -105,7 +105,7 @@ public class DistributionTools {
     HashMap ent = shannonEntropy(observed, 2.0);
     double totalEntropy = 0.0;
 
-    for(Iterator i = ent.entrySet().iterator(); i.hasNext();){
+    for(Iterator i = ent.values().iterator(); i.hasNext();){
       totalEntropy =+ ((Double)i.next()).doubleValue();
     }
     return 2.0 - totalEntropy;
@@ -130,7 +130,7 @@ public class DistributionTools {
 
         for(Iterator j = seqs.iterator(); j.hasNext();){// of each sequence
           Object seqLabel = j.next();
-          Symbol s = a.symbolAt(seqLabel,i);
+          Symbol s = a.symbolAt(seqLabel,i + 1);
           if(countGaps == false && s.equals(a.getAlphabet().getGapSymbol())){
             //do nothing, not counting gaps
           }else{

@@ -198,7 +198,7 @@ public class WMAsMM implements MarkovModel, Serializable {
         transFrom.put(prev, current.getMatches());
         transTo.put(current, fa);
         Distribution dist = new UniformDistribution(fa);
-        transWeights.put(prev, fa);
+        transWeights.put(prev, dist);
       }
       sa.setName("Weight Matrix columns");
     } catch (ChangeVetoException cve) {
