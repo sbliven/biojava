@@ -44,14 +44,26 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
     return target;
   }
   
-  public Symbol translate(Symbol sym)
+  public Symbol translate(final Symbol sym)
   throws IllegalSymbolException {
     Symbol s = (Symbol) transMap.get(sym);
     if(s == null) {
-      source.validate(sym);
-      throw new IllegalSymbolException(
-        "Unable to map " + sym.getName()
-      );
+      if(s instanceof AtomicSymbol) {
+        getSourceAlphabet().validate(sym);
+        throw new IllegalSymbolException(
+          "Unable to map " + sym.getName()
+        );
+      } else {
+        if(sym == null) {
+          throw new NullPointerException("Can't translate null");
+        }
+        Set syms = new HashSet();
+        for(Iterator i = ((FiniteAlphabet) sym.getMatches()).iterator(); i.hasNext(); ) {
+          Symbol is = (Symbol) i.next();
+          syms.add(this.translate(is));
+        }
+        s = AlphabetManager.getAmbiguitySymbol(syms);
+      }
     }
     return s;
   }
@@ -59,12 +71,12 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
   /**
    * Alter the translation mapping.
    *
-   * @param from source Symbol
-   * @param to   target Symbol to be returned by translate(from)
+   * @param from source AtomicSymbol
+   * @param to   target AtomicSymbol to be returned by translate(from)
    * @throws IllefalSymbolException if either from is not in the source
    *         alphabet or to is not in the target alphabet
    */
-  public void setTranslation(Symbol from, Symbol to)
+  public void setTranslation(AtomicSymbol from, AtomicSymbol to)
   throws IllegalSymbolException {
     source.validate(from);
     target.validate(to);

@@ -40,7 +40,7 @@ implements ReversibleTranslationTable, Serializable {
    */
   private Map revMap;
 
-  public void setTranslation(Symbol from, Symbol to)
+  public void setTranslation(AtomicSymbol from, AtomicSymbol to)
   throws IllegalSymbolException {
     super.setTranslation(from, to);
     revMap.put(to, from);
@@ -50,10 +50,19 @@ implements ReversibleTranslationTable, Serializable {
   throws IllegalSymbolException {
     Symbol s = (Symbol) revMap.get(sym);
     if(s == null) {
-      getTargetAlphabet().validate(sym);
-      throw new IllegalSymbolException(
-        "Unable to map " + sym.getName()
-      );
+      if(s instanceof AtomicSymbol) {
+        getTargetAlphabet().validate(sym);
+        throw new IllegalSymbolException(
+          "Unable to map " + sym.getName()
+        );
+      } else {
+        Set syms = new HashSet();
+        for(Iterator i = ((FiniteAlphabet) s.getMatches()).iterator(); i.hasNext(); ) {
+          Symbol is = (Symbol) i.next();
+          syms.add(this.untranslate(is));
+        }
+        s = AlphabetManager.getAmbiguitySymbol(syms);
+      }
     }
     return s;
   }

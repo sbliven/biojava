@@ -31,7 +31,9 @@ package org.biojava.bio.symbol;
  * <P>
  * It is assumed that untranslate(translate(x)) = x for all x in the source
  * alphabet, and that translate(untranslate(y)) = y for all y in the target
- * alphabet.
+ * alphabet. Note, one interesting sub-set of reversible transforms are of the
+ * form translate(x) = untranslate(x), and represent 'mirror image'
+ * transformations.
  */
 public interface ReversibleTranslationTable extends TranslationTable {
   /**

@@ -344,8 +344,8 @@ public final class RNATools {
               Element te = (Element) tn;
               String from = te.getAttribute("from");
               String to = te.getAttribute("to");
-              Symbol fromS = sourceP.parseToken(from);
-              Symbol toS = targetP.parseToken(to);
+              AtomicSymbol fromS = (AtomicSymbol) sourceP.parseToken(from);
+              AtomicSymbol toS   = (AtomicSymbol) targetP.parseToken(to);
               table.setTranslation(fromS, toS);
             }
           }
