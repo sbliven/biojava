@@ -57,7 +57,7 @@ import org.biojava.bio.symbol.*;
  * @author Greg Cox
  * @since 1.2
  */
-class EmblLikeLocationParser
+public class EmblLikeLocationParser
 {
     // For the LocationLexer inner classs
     private String        location;
