@@ -62,11 +62,29 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 			    String dbUser,
 			    String dbPass,
 			    String biodatabase,
-			    boolean create,
-			    DBHelper helper)
+			    boolean create)
 	throws BioException
     {
-	this.helper = helper;
+	String ourURL = dbURL;
+	if (ourURL.startsWith("jdbc:")) {
+	    ourURL = ourURL.substring(5);
+	}
+	int colon = ourURL.indexOf(':');
+	if (colon > 0) {
+	    String protocol = ourURL.substring(0, colon);
+	    if (protocol.equals("mysql")) {
+		System.err.println("MySQL");
+		helper = new MySQLDBHelper();
+	    } else {
+		System.err.println("PostgreSQL");
+		helper = new PostgreSQLDBHelper();
+	    }
+	}
+
+	if (helper == null) {
+	    helper = new UnknownDBHelper();
+	}
+
 	pool = new JDBCConnectionPool(dbURL, dbUser, dbPass);
 	try {
 	    Connection conn = pool.takeConnection();
