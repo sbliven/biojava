@@ -50,13 +50,10 @@ public class ServeAceAsCorba {
       String passwd = args[3];
       String seqname = (args.length < 5) ? "*" : args[4];
       
-      DatabaseManager.registerDriver(new SocketDriver());
-      URL dbURL = new URL("acedb://" + host + ":" + port + "/");
+      Ace.registerDriver(new SocketDriver());
+      AceURL dbURL = new AceURL("acedb://" + user + ':' + passwd + '@' + host + ':' + port);
       System.out.println("Connecting to " + dbURL);
-      Database aceDB = DatabaseManager.getDatabase(dbURL, user, passwd);
-      AceType seqClass = AceType.getClassType(aceDB, "Sequence");
-      
-      SequenceDB seqDB = new AceSequenceDB(aceDB, seqname);
+      SequenceDB seqDB = new AceSequenceDB(dbURL);
       System.out.println("Contains");
       for(Iterator i = seqDB.ids().iterator(); i.hasNext(); ) {
         System.out.println("\t" + i.next());

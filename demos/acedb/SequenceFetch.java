@@ -47,15 +47,13 @@ public class SequenceFetch {
       File fastaOut = new File(args[4]);
       String seqname = (args.length < 6) ? "*" : args[5];
       
-      DatabaseManager.registerDriver(new SocketDriver());
-      URL dbURL = new URL("acedb://" + host + ":" + port + "/");
+      Ace.registerDriver(new SocketDriver());
+      AceURL dbURL = new AceURL("acedb://" + user + ':' + passwd + '@' + host + ':' + port);
       System.out.println("Connecting to " + dbURL);
-      Database aceDB = DatabaseManager.getDatabase(dbURL, user, passwd);
-      AceType seqClass = AceType.getClassType(aceDB, "Sequence");
       
       SequenceFormat sFormat = new FastaFormat();
       OutputStream out = new FileOutputStream(fastaOut);
-      SequenceDB seqs = new AceSequenceDB(aceDB, seqname);
+      SequenceDB seqs = new AceSequenceDB(dbURL);
       StreamWriter fastaWriter = new StreamWriter(out, sFormat);
       
       fastaWriter.writeStream(seqs.sequenceIterator());
