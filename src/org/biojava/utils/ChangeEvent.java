@@ -1,6 +1,6 @@
 /*
  * BioJava development code
- * 
+ *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
  * be distributed with the code.  If you do not have a copy,
@@ -44,7 +44,6 @@ public class ChangeEvent extends EventObject {
    * @param  source  The object being changed. 
    * @param  type    The type of change being made. 
    */
-
   public ChangeEvent(Object source, ChangeType type) {
     this(source, type, null, null, null);
   }
@@ -59,7 +58,6 @@ public class ChangeEvent extends EventObject {
    * @param  type    The type of change being made. 
    * @param  change  The new value of the property being changed. 
    */
-
   public ChangeEvent(
     Object source, 
     ChangeType type, 
@@ -67,7 +65,6 @@ public class ChangeEvent extends EventObject {
   ) {
     this(source, type, change, null, null);
   }
-
 
   /**
    *  
@@ -79,7 +76,6 @@ public class ChangeEvent extends EventObject {
    * @param  change    The new value of the property being changed. 
    * @param  previous  The old value of the property being changed. 
    */
-
   public ChangeEvent(
       Object source, 
       ChangeType type, 
@@ -122,7 +118,6 @@ public class ChangeEvent extends EventObject {
    *
    * @return    The Type value 
    */
-
   public ChangeType getType() {
     return type;
   }
@@ -141,7 +136,6 @@ public class ChangeEvent extends EventObject {
     return change;
   }
 
-
   /**
    *  
    * Return the old value of a property being changed.  May return
@@ -154,7 +148,6 @@ public class ChangeEvent extends EventObject {
     return previous;
   }
 
-
   /**
    *  
    * Return the event which caused this to be fired, or <code>null</code>
@@ -165,5 +158,17 @@ public class ChangeEvent extends EventObject {
 
   public ChangeEvent getChainedEvent() {
     return chain;
+ 
+  }
+  
+  public String toString() {
+    return
+      super.toString() +
+      "[" +
+        "type:" + getType() +
+        ", change: " + getChange() +
+        ", previous: " + getPrevious() +
+        ", chainedEvent: " + getChainedEvent() +
+      "]";
   }
 }

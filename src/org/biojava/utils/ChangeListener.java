@@ -20,6 +20,7 @@
 
 package org.biojava.utils;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -33,16 +34,18 @@ import java.util.*;
 
 public interface ChangeListener extends EventListener {
   /**
-   *  
    * Conventience implementation which vetoes every change of which it is
-   * notified.
- You could add this to an object directly to stop it changing
+   * notified. You could add this to an object directly to stop it changing
    * in any way, or alternatively you could add it for a specific ChangeType
    * to stop that single item form altering.
    */
   final static ChangeListener ALWAYS_VETO = new AlwaysVetoListener();
 
-
+  /**
+   * Convenience implementation that echoes all events to out.
+   */
+  final static ChangeListener LOG_TO_OUT = new LoggingListener(System.out);
+   
   /**
    * Called before a change takes place. 
    * <P>
@@ -104,6 +107,22 @@ public interface ChangeListener extends EventListener {
         ),
         "Assertion failure: A locked object has been modified"
       );
+    }
+  }
+  
+  public class LoggingListener implements ChangeListener {
+    private PrintStream out;
+    
+    public LoggingListener(PrintStream out) {
+      this.out = out;
+    }
+    
+    public void preChange(ChangeEvent cev) throws ChangeVetoException {
+      out.println("preChange for event " + cev);
+    }
+    
+    public void postChange(ChangeEvent cev) {
+      out.println("postChange for event " + cev);
     }
   }
 }
