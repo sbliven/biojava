@@ -28,6 +28,7 @@ import org.biojava.bio.*;
 
 class BioSQLStrandedFeature extends SimpleStrandedFeature {
     private Annotation _annotation;
+    private int id;
 
     BioSQLStrandedFeature(Sequence seq,
 			  FeatureHolder parent,
@@ -50,5 +51,14 @@ class BioSQLStrandedFeature extends SimpleStrandedFeature {
 
     public Annotation getAnnotation() {
 	return _annotation;
+    }
+
+
+    public void _setInternalID(int i) {
+	this.id = i;
+    }
+
+    public int _getInternalID() {
+	return id;
     }
 } 

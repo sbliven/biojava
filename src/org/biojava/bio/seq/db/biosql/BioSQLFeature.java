@@ -28,6 +28,7 @@ import org.biojava.bio.*;
 
 class BioSQLFeature extends SimpleFeature implements BioSQLFeatureI {
     private Annotation _annotation;
+    private int id;
 
     BioSQLFeature(Sequence seq,
 		  FeatureHolder parent,
@@ -53,5 +54,13 @@ class BioSQLFeature extends SimpleFeature implements BioSQLFeatureI {
 
     public Annotation getAnnotation() {
 	return _annotation;
+    }
+
+    public void _setInternalID(int i) {
+	this.id = i;
+    }
+
+    public int _getInternalID() {
+	return id;
     }
 } 

@@ -311,6 +311,11 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 		    templ.location = loc;
 
 		    try {
+			Feature f = realizeFeature(this, templ);
+			if (f instanceof BioSQLFeatureI) {
+			    ((BioSQLFeatureI) f)._setInternalID(fid.intValue());
+			    ((BioSQLFeatureI) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, fid.intValue()));
+			}
 			features.addFeature(realizeFeature(this, templ));
 		    } catch (BioException ex) {
 			throw new BioRuntimeException(ex);
@@ -354,6 +359,7 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 	    conn.setAutoCommit(false);
 	    int f_id = seqDB.persistFeature(conn, bioentry_id, f);
 	    if (f instanceof BioSQLFeatureI) {
+		((BioSQLFeatureI) f)._setInternalID(f_id);
 		((BioSQLFeatureI) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, f_id));
 	    }
 	    conn.commit();
