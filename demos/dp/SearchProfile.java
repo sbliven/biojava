@@ -13,11 +13,14 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.dp.*;
 
-public class SearchProfile {
+public class SearchProfile 
+{
   public static Distribution nullModel;
   
-  public static void main(String [] args) {
-    try {
+  public static void main(String [] args) 
+  {
+    try 
+	{
       File seqFile = new File(args[0]);
 
       FiniteAlphabet PROTEIN = ProteinTools.getAlphabet();
@@ -41,8 +44,8 @@ public class SearchProfile {
       
       System.out.println("Training whole profile");
       TrainingAlgorithm ta = new BaumWelchTrainer(dp);
-      ta.train(seqDB, 5, new StoppingCriteria() {
-        public boolean isTrainingComplete(TrainingAlgorithm ta) {
+      ta.train(seqDB, 5, new StoppingCriteria(){
+		public boolean isTrainingComplete(TrainingAlgorithm ta) {
           System.out.println("Cycle " + ta.getCycle() + " completed");
           System.out.println("Score: " + ta.getCurrentScore());
           if(ta.getCycle() == 5) {
