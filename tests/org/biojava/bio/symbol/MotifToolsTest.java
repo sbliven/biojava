@@ -38,12 +38,15 @@ public class MotifToolsTest
         sb.append("[");
         SymbolTokenization sTok = DNATools.getDNA().getTokenization("token");
         FiniteAlphabet na = (FiniteAlphabet) DNATools.n().getMatches();
-        for(Iterator i = na.iterator(); i.hasNext(); ) {
-          Symbol sym = (Symbol) i.next();
-          sb.append(sTok.tokenizeSymbol(sym));
+        AlphabetIndex nai = AlphabetManager.getAlphabetIndex(na);
+
+        for (int i = 0; i < na.size(); i++)
+        {
+            Symbol sym = (Symbol) nai.symbolForIndex(i);
+            sb.append(sTok.tokenizeSymbol(sym));
         }
+
         sb.append("]");
-        
         n = sb.toString();
       } catch (Exception e) {
         throw new NestedError(e, "Couldn't initialize motif tools test");
