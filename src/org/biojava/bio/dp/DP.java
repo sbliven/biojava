@@ -552,18 +552,16 @@ public abstract class DP {
       oldState = newState;
     }
 
-    List resListList = new ArrayList(3);
-
     SymbolList tokens = new SimpleSymbolList(model.emissionAlphabet(), tokenList);
     SymbolList states = new SimpleSymbolList(model.stateAlphabet(), stateList);
     SymbolList scores = new SimpleSymbolList(dAlpha, scoreList);
-    
-    Map labelToResList = new HashMap();
-    labelToResList.put(StatePath.SEQUENCE, tokens);
-    labelToResList.put(StatePath.STATES, states);
-    labelToResList.put(StatePath.SCORES,
-                       new SimpleSymbolList(dAlpha, scoreList));
-    return new SimpleStatePath(totScore, labelToResList);
+
+    return new SimpleStatePath(
+      totScore,
+      tokens,
+      states,
+      new SimpleSymbolList(dAlpha, scoreList)
+    );
   }
 
   public static class ReverseIterator implements Iterator, Serializable {

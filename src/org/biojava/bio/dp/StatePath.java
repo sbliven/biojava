@@ -29,6 +29,41 @@ import org.biojava.bio.symbol.*;
  * Extends the Alignment interface so that it is explicitly used to represent
  * a state path through an HMM, and the associated emitted sequence and
  * likelyhoods.
+ * <P>
+ * A state path should have the following structure:
+ * <bq>
+ * STATES -> list of all states used by the machine
+ * <br>
+ * SCORES -> list of step-wise scores for each state (transition + emission)
+ * <br>
+ * SEQUENCE -> sequence emitted by the machine 
+ * </bq>
+ * The sequence emitted by the machine will be some function of the sequences
+ * that were aligned to the machine, and the state-path taken. Whenever the
+ * state used is a non-emitting state, this emitted sequence is a gap. Whenever
+ * it is an emission state, it is the symbol matched by that state. This is
+ * modeled by the following nesting:
+ * <bq><pre>
+ * SEQUENCE
+ *   -> Gapped view (gap inserted for every position aligned with a dot-state
+ *     -> Sequence emitted by emission states as Alignment
+ *       label_n = input_SymbolList_n
+ *         -> gapped view of SymbolList_n
+ * </pre></bq>
+ * A multi-head HMM (2 or more) emits a single sequence that is
+ * an alignment of the input sequences with gaps added. In this case, the
+ * emitted sequence should be an Alignment object with labels being the input
+ * sequences, and the associated SymbolList objects being gapped views. For the
+ * sake of least-suprise, single-head HMMs should emit an alignment of one
+ * sequence, where the label is the input sequence, and the associated
+ * SymbolList is also the input sequence.
+ * <P>
+ * I think that this scheim keeps the emitted alignment as close as possible to
+ * a sensible path through the sequence coordinate space, while making this
+ * gappable adapts this to the same co-ordinate system as the HMM state-path
+ * space.
+ *
+ * @author Matthew Pocock
  */
 public interface StatePath extends Alignment {
   /**

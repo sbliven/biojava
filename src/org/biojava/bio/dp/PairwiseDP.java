@@ -69,11 +69,11 @@ public class PairwiseDP extends DP implements Serializable {
     new AlphabetManager.ListWrapper();
 
 
-  protected Col getEmission(List symList, CrossProductAlphabet alpha)
+  protected double [] getEmission(List symList, CrossProductAlphabet alpha)
   throws IllegalSymbolException {
     gopher.setList(symList);
-    Col col = (Col) emissions.get(gopher);
-    if(col == null) {
+    double [] emission = (double []) emissions.get(gopher);
+    if(emission == null) {
       //System.out.print(".");
       Symbol sym[][] = new Symbol[2][2];
       List ll = new ArrayList(symList);
@@ -91,25 +91,25 @@ public class PairwiseDP extends DP implements Serializable {
         (Symbol) symList.get(1)
       }));
       int dsi = getDotStatesIndex();
-      double [] em = new double[dsi];
+      emission = new double[dsi];
       State [] states = getStates();
       for(int i = 0; i < dsi; i++) {
         EmissionState es = (EmissionState) states[i];
         int [] advance = es.getAdvance();
         Distribution dis = es.getDistribution();
         Symbol s = sym[advance[0]][advance[1]]; 
+        emission[i] = Math.log(dis.getWeight(s));
         /*System.out.println(
-          "Evaluating state " + es.getName() +
-          " with advance " + advance[0] + ", " + advance[1] +
-          " and symbol " + s
+          s.getName() + " " +
+          es.getName() + " " +
+          emission[i]
         );*/
-        em[i] = Math.log(dis.getWeight(s));
       }
-      emissions.put(new AlphabetManager.ListWrapper(ll), col = new Col(sym, em));
+      emissions.put(new AlphabetManager.ListWrapper(ll), emission);
     } else {
       //System.out.print("-");
     }
-    return col;
+    return emission;
   }
 
     public double backward(SymbolList[] seqs) 
@@ -551,6 +551,7 @@ private class Viterbi {
     public StatePath runViterbi(SymbolList seq0, SymbolList seq1) 
         throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
+      State magic = getModel().magicalState();
 	states = getStates();
 	cursor = new LightPairDPCursor(seq0, seq1, states.length, true);
 	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
@@ -561,9 +562,7 @@ private class Viterbi {
 	transitionScores = getForwardTransitionScores();
 
 	double[] col = cursor.getColumn(ia00);
-	for (int l = 0; l < states.length; ++l)
-	    col[l] = (states[l] == magicalState) ? 0.0 :
-	                Double.NEGATIVE_INFINITY;
+  initializationHack = true;
   viterbiPrepareCol(0, 0);
   initializationHack = false;
   
@@ -600,42 +599,78 @@ private class Viterbi {
 	BackPointer[] bpCol = (BackPointer[]) cursor.getBackPointers(colId);
 	BackPointer bp = bpCol[l];
 	List statel = new ArrayList();
-	List resl = new ArrayList();
 	List scorel = new ArrayList();
-	bp = bp.back; // skip final MagicalState match
+  GappedSymbolList gap0 = new GappedSymbolList(seq0);
+  GappedSymbolList gap1 = new GappedSymbolList(seq1);
+  int i0 = seq0.length();
+  int i1 = seq1.length();
   DoubleAlphabet dAlpha = DoubleAlphabet.getInstance();
-	while (bp != null) {
-	    statel.add(bp.state);
-	    resl.add(bp.symbol);
-	    scorel.add(dAlpha.getSymbol(bp.score));
-	    bp = bp.back;
+  
+  // parse 1
+  System.out.println("Got back-pointer " + bp);
+  System.out.println("Got back " + bp.back);
+  System.out.println("Parse 1");
+	for(BackPointer bpi =	bp.back; bpi.back != TERMINAL_BP; bpi = bpi.back) {
+    System.out.println("Processing " + bpi.state.getName() + " at + " + i0 + ", " + i1);
+	  statel.add(bpi.state);
+    if(bpi.state instanceof EmissionState) {
+      int [] advance = ((EmissionState) bpi.state).getAdvance();
+      if(advance[0] == 0) {
+        gap0.addGapInSource(i0);
+      } else {
+        i0--;
+      }
+      if(advance[1] == 0) {
+        gap1.addGapInSource(i1);
+      } else {
+        i1--;
+      }
+    }
 	}
+  
+  double [] scoreA = new double[statel.size()];
+  Map aMap = new HashMap();
+  aMap.put(seq0, gap0);
+  aMap.put(seq1, gap1);
+  Alignment ali = new SimpleAlignment(aMap);
+  GappedSymbolList gappedAli = new GappedSymbolList(ali);
+  // parse 2
+  System.out.println("Parse 2");
+  int di = statel.size()-1;
+  int dj = ali.length();
+	for(BackPointer bpi =	bp.back; bpi.back != TERMINAL_BP; bpi = bpi.back) {
+    scoreA[di] = bpi.score;
+    if(!(bpi.state instanceof EmissionState)) {
+      gappedAli.addGapInSource(dj);
+      dj--;
+    }
+    di--;
+  }
+  
 	Collections.reverse(statel);
-	Collections.reverse(resl);
-	Collections.reverse(scorel);
-	Map labelToList = new HashMap();
-	labelToList.put(StatePath.SEQUENCE,
-			new SimpleSymbolList(alpha, resl));
-	labelToList.put(StatePath.STATES, 
-			new SimpleSymbolList(getModel().stateAlphabet(), statel));
-	labelToList.put(StatePath.SCORES,
-			new SimpleSymbolList(dAlpha,
-					      scorel));
-	return new SimpleStatePath(col[l], labelToList);
+  SymbolList states =	new SimpleSymbolList(getModel().stateAlphabet(), statel);
+  SymbolList scores = DoubleAlphabet.fromArray(scoreA);
+	return new SimpleStatePath(col[l], gappedAli, states, scores);
     }
 
     private List symL = new ArrayList();
     private double[][][] matrix = new double[2][2][];
     private BackPointer[][][] bpMatrix = new BackPointer[2][2][];
     private int[] colId = new int[2];
+    private BackPointer TERMINAL_BP = new BackPointer();
 
     private void viterbiPrepareCol(int i, int j)
 	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
+      //System.out.println("Calculating " + i + ", " + j);
 	symL.clear();
 	symL.add(cursor.symbol(0, i));
 	symL.add(cursor.symbol(1, j));
-  Col col = getEmission(symL, alpha);
+  /*System.out.println(
+    "Symbols " + cursor.symbol(0, i).getName() +
+    ", " + cursor.symbol(1, j).getName()
+  );*/
+  double [] col = getEmission(symL, alpha);
 
 	colId[0] = i;
 	colId[1] = j;
@@ -660,86 +695,98 @@ private class Viterbi {
   }
     }
 
-    private void viterbiCalcStepMatrix(Col col)
+    private void viterbiCalcStepMatrix(double [] emissions)
     throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
-      double[] curCol = (double[]) matrix[0][0];
-      double [] emissions = col.emissions;
-      Symbol [][] sym = col.sym;
+      double[] curCol = matrix[0][0];
       BackPointer[] curBPs = bpMatrix[0][0];
+      
+      //System.out.println("curCol=" + curCol);
+     STATELOOP:
       for (int l = 0; l < states.length; ++l) {
+  	    //System.out.println("State = " + l + "=" + states[l].getName());
+
         try {
-          if (initializationHack && states[l] == magicalState) {
-            continue;
+          //System.out.println("trying initialization");
+          if(initializationHack && (states[l] instanceof EmissionState)) {
+            if(states[l] == magicalState) {
+              curCol[l] = 0.0;
+              curBPs[l] = TERMINAL_BP;
+            } else {
+              curCol[l] = Double.NEGATIVE_INFINITY;
+              curBPs[l] = null;
+            }
+            //System.out.println("Initialized state to " + curCol[l]);
+            continue STATELOOP;
           }
     
-  	      // System.out.println("State = " + states[l].getName());
-
+          //System.out.println("Calculating weight");
           double weight = Double.NEGATIVE_INFINITY;
           if (! (states[l] instanceof EmissionState)) {
             weight = 0.0;
           } else {
             weight = emissions[l];
           }
+          //System.out.println("weight = " + weight);
 
           if (weight == Double.NEGATIVE_INFINITY) {
+            //System.out.println("Not reachable");
             curCol[l] = Double.NEGATIVE_INFINITY;
             curBPs[l] = null;
           } else {
-            // System.out.println("weight = " + weight);
             double score = Double.NEGATIVE_INFINITY;
             int [] tr = transitions[l];
             double[] trs = transitionScores[l];
 
-        // Calculate probabilities for states with transitions
-        // here.
-
 		        double[] sourceScores = new double[tr.length];
             BackPointer[] oldBPs = new BackPointer[tr.length];
-            for (int ci = 0; ci < tr.length; ++ci) {
-              double[] sCol;
-              BackPointer[] bpCol;
-              if (states[tr[ci]] instanceof EmissionState) {
-                int [] advance = ((EmissionState)states[tr[ci]]).getAdvance();
-                sCol = matrix[advance[0]][advance[1]];
-                bpCol = bpMatrix[advance[0]][advance[1]];
-              } else {
-                sCol = matrix[0][0];
-                bpCol = bpMatrix[0][0];
-              }
-              sourceScores[ci] = sCol[tr[ci]];
-              oldBPs[ci] = bpCol[tr[ci]];
-            }
+            int [] advance = (states[l] instanceof EmissionState)
+              ? ((EmissionState)states[l]).getAdvance()
+              : ia00;
+            sourceScores = matrix[advance[0]][advance[1]];
+            oldBPs = bpMatrix[advance[0]][advance[1]];
 
-            int bestKC = -1;
+            int bestKC = -1; // index into states[l]
             for (int kc = 0; kc < tr.length; ++kc) {
-              // System.out.println("In from " + states[kc].getName());
-              // System.out.println("prevScore = " + sourceScores[kc]);
-              
-              int k = tr[kc];
-              if (sourceScores[kc] != Double.NEGATIVE_INFINITY) {
+              int k = tr[kc]; // actual state index
+
+              //System.out.println("kc is " + kc);
+              //System.out.println("with from " + k + "=" + states[k].getName());
+              //System.out.println("prevScore = " + sourceScores[k]);
+              if (sourceScores[k] != Double.NEGATIVE_INFINITY) {
                 double t = trs[kc];
-                double newScore = t + sourceScores[kc];
+                double newScore = t + sourceScores[k];
                 if (newScore > score) {
                   score = newScore;
-                  bestKC = kc;
+                  bestKC = k;
+                  //System.out.println("New best source at " + kc);
                 }
               }
             }
-            curCol[l] = weight + score;
-            if (bestKC >= 0) {
-              State s = states[l];
-              int [] advance = (s instanceof EmissionState)
-                ? ((EmissionState) s).getAdvance()
-                : ia00;
-              curBPs[l] = new BackPointer(
-                s,
-                oldBPs[bestKC],
-                curCol[l],
-                sym[advance[0]][advance[1]]
-              );
+            if (bestKC != -1) {
+              /*System.out.println(
+                "Using index " + bestKC +
+                " with backpointer at " + oldBPs[bestKC] +
+                " from state " + states[bestKC]
+              );*/
+              curCol[l] = weight + score;
+              try {
+                State s = states[l];
+                curBPs[l] = new BackPointer(
+                  s,
+                  oldBPs[bestKC],
+                  curCol[l]
+                );
+              } catch (Throwable t) {
+                throw new BioError(
+                  t,
+                  "Couldn't generate backpointer for " + states[l].getName() +
+                  " back to " + states[tr[bestKC]].getName()
+                );
+              }
             } else {
               curBPs[l] = null;
+              curCol[l] = Double.NEGATIVE_INFINITY;
             }
             // System.out.println(curCol[l]);
           }
@@ -759,16 +806,26 @@ private class Viterbi {
   }
 
   private static class BackPointer {
-    State state;
-    BackPointer back;
-    double score;
-    Symbol symbol;
+    final public State state;
+    final public BackPointer back;
+    final public double score;
     
-    BackPointer(State state, BackPointer back, double score, Symbol symbol) {
+    public BackPointer(State state, BackPointer back, double score) {
       this.state = state;
       this.back = back;
       this.score = score;
-      this.symbol = symbol;
+      if(back == null) {
+        throw new NullPointerException(
+          "Can't construct backpointer for state " + state.getName() +
+          " with a null source"
+        );
+      }
+    }
+    
+    public BackPointer() {
+      this.state = null;
+      this.back = null;
+      this.score = Double.NaN;
     }
   }
 
@@ -1146,16 +1203,6 @@ private class Viterbi {
 
     public BackPointer[] getBackPointers(int[] coords) {
       throw new NoSuchElementException("This cursor isn't storing BackPointers.");
-    }
-  }
-  
-  private static class Col {
-    public final Symbol [][] sym;
-    public final double [] emissions;
-    
-    public Col(Symbol [][] sym, double [] emissions) {
-      this.sym = sym;
-      this.emissions = emissions;
     }
   }
 }

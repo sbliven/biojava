@@ -436,7 +436,7 @@ class SingleDP extends DP implements Serializable {
     {
       double [] vc = dpCursor.currentCol();
       double [] vl = dpCursor.lastCol();
-      for (int l = 0; l < stateCount; l++) {
+      for (int l = 0; l < getDotStatesIndex(); l++) {
         if(states[l] == getModel().magicalState()) {
           //System.out.println("Initializing start state to 0.0");
           vc[l] = vl[l] = 0.0;
@@ -445,6 +445,35 @@ class SingleDP extends DP implements Serializable {
           vc[l] = vl[l] = Double.NEGATIVE_INFINITY;
         }
       }
+      for (int l = getDotStatesIndex(); l < stateCount; l++) {
+        int [] tr = transitions[l];
+        double [] trs = transitionScore[l];
+        double transProb = Double.NEGATIVE_INFINITY;
+        double trans = Double.NEGATIVE_INFINITY;
+        int prev = -1;
+        for (int kc = 0; kc < tr.length; kc++) {
+          int k = tr[kc];
+          double t = trs[kc];
+          double s = vc[k];
+          double p = t + s;
+          if (p > transProb) {
+            transProb = p;
+            prev = k;
+            trans = t;
+          }
+        }
+        if(prev != -1) {
+          vc[l] = vl[l] = transProb;
+          oldPointers[l] = newPointers[l] = new BackPointer(
+            states[l],
+            newPointers[prev],
+            trans
+          );
+        } else {
+          vc [l] = vl[l] = Double.NEGATIVE_INFINITY;
+          oldPointers[l] = newPointers[l] = null;
+        }
+      }          
     }
 
     // viterbi
@@ -544,7 +573,10 @@ class SingleDP extends DP implements Serializable {
       b2 = b2.back;
     };
 
-    GappedSymbolList resView = new GappedSymbolList(dpCursor.resList());
+    Map aMap = new HashMap();
+    aMap.put(dpCursor.resList(), dpCursor.resList());
+    Alignment ali = new SimpleAlignment(aMap);
+    GappedSymbolList resView = new GappedSymbolList(ali);
     double [] scores = new double[len];
     List stateList = new ArrayList(len);
     for (int j = 0; j < len; j++) {
@@ -579,15 +611,13 @@ class SingleDP extends DP implements Serializable {
     System.out.println("Added gaps: " + gaps);
     System.out.println("Gapped view has length " + resView.length());*/
 
-    Map labelToResList = new HashMap();
-    labelToResList.put(StatePath.SEQUENCE, resView);
-    labelToResList.put(StatePath.STATES,
-                       new SimpleSymbolList(getModel().stateAlphabet(), stateList));
-    labelToResList.put(StatePath.SCORES,
-                       DoubleAlphabet.fromArray(scores));
-
     unlockModel();
-    return new SimpleStatePath(bestScore, labelToResList);
+    return new SimpleStatePath(
+      bestScore,
+      resView,
+      new SimpleSymbolList(getModel().stateAlphabet(), stateList),
+      DoubleAlphabet.fromArray(scores)
+    );
   }
 
   private static class BackPointer {

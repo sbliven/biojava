@@ -70,7 +70,11 @@ extends AbstractDistribution implements Serializable {
   public double getWeight(Symbol s)
   throws IllegalSymbolException {
     alphabet.validate(s);
-    return weight;
+    if(s instanceof AtomicSymbol) {
+      return weight;
+    } else {
+      return getAmbiguityWeight(s);
+    }
   }
   
   public void registerWithTrainer(DistributionTrainerContext dtc) {
