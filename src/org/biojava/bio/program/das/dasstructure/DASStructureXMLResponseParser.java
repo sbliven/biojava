@@ -108,7 +108,7 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	    // if DAS server sets modelnr -> a NMR structure ...
 	    structure.setNmr(true);
 
-	    if ( modnr > structure.nrModels() ) {
+	    if ( modnr -1 > structure.nrModels() ) {
 		// a new model starts !
 		structure.addModel(current_model);
 		current_model = new ArrayList();	    
