@@ -465,7 +465,7 @@ public interface Ontology extends Changeable {
             NullPointerException,
             IllegalArgumentException
     {
-      Triple t = new Triple.Impl(subject, object, predicate);
+      Triple t = new Triple.Impl(subject, object, predicate, name, description);
       if (!containsTerm(subject)) {
         throw new IllegalArgumentException("Ontology " + getName() + " doesn't contain " + subject);
       }
