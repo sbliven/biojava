@@ -71,11 +71,11 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     public static final String PROPERTY_FEATUREID = "org.biojava.bio.program.das.feature_id";
     public static final String PROPERTY_FEATURELABEL = "org.biojava.bio.program.das.feature_label";
 
-    private final DASSequenceDB parentdb;
-    private final Alphabet alphabet = DNATools.getDNA();
-    private final URL dataSourceURL;
-    private final String seqID;
-    private final FeatureRealizer featureRealizer = FeatureImpl.DEFAULT;
+    private DASSequenceDB parentdb;
+    private Alphabet alphabet = DNATools.getDNA();
+    private URL dataSourceURL;
+    private String seqID;
+    private FeatureRealizer featureRealizer = FeatureImpl.DEFAULT;
 
     private CacheReference refSymbols;
     private int length = -1;
