@@ -42,18 +42,30 @@ extends SearchableFileAsList {
     KeyPair kp = (KeyPair) item;
     
     int i = 0;
-    byte[] str;
+    byte[] str = null;
     
-    str = kp.getPrimary().getBytes();
-    for(int j = 0; j < str.length; j++) {
-      buffer[i++] = str[j];
+    try {
+      str = kp.getPrimary().getBytes();
+      for(int j = 0; j < str.length; j++) {
+        buffer[i++] = str[j];
+      }
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new ArrayIndexOutOfBoundsException(
+        "Over ran buffer with primary ID: " + str + " : " + buffer.length
+      );
     }
     
     buffer[i++] = '\t';
     
-    str = kp.getSecondary().getBytes();
-    for(int j = 0; j < str.length; j++) {
-      buffer[i++] = str[j];
+    try {
+      str = kp.getSecondary().getBytes();
+      for(int j = 0; j < str.length; j++) {
+        buffer[i++] = str[j];
+      }
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new ArrayIndexOutOfBoundsException(
+        "Over ran buffer with secondary ID: " + str + " : " + buffer.length
+      );
     }
     
     while(i < buffer.length) {

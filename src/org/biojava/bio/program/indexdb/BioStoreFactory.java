@@ -76,7 +76,7 @@ public class BioStoreFactory {
       } else {
         new SecondaryFileAsList(
           makeSecondaryFile(storeLoc, key),
-          calculateSecRecLen(length, primaryKey)
+          calculateSecRecLen(length, primaryKey, keys)
         );
       
         if(keyList.length() != 0) {
@@ -125,10 +125,11 @@ public class BioStoreFactory {
       String.valueOf(Integer.MAX_VALUE).length(); // length
   }
   
-  static int calculateSecRecLen(int idLen, String primaryKey) {
+  static int calculateSecRecLen(int idLen, String primaryKey, Map keys) {
+    int primLength = ((Integer) keys.get(primaryKey)).intValue();
     return
       idLen +
       "\t".length() +
-      primaryKey.length();
+      primLength;
   }
 }

@@ -164,7 +164,11 @@ public class BioStore implements IndexStore {
         Map.Entry me = (Map.Entry) mei.next();
         String sid = (String) me.getKey();
         SecondaryFileAsList sfl = (SecondaryFileAsList) idToList.get(sid);
-        sfl.add(new KeyPair.Impl(sid, id));
+        List svals = (List) me.getValue();
+        for(Iterator i = svals.iterator(); i.hasNext(); ) {
+          String sval = (String) i.next();
+          sfl.add(new KeyPair.Impl(sval, id));
+        }
       }
     }
   }
