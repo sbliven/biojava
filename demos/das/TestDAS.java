@@ -16,7 +16,7 @@ public class TestDAS {
 	    throw new Exception("java das.TestDAS <url>");
 	String dbURLString = args[0];
 
-	URL dbURL = new URL(dasURLString);
+	URL dbURL = new URL(dbURLString);
 	
 	DASSequenceDB dasDB = new DASSequenceDB(dbURL);
 	System.out.println("Top-level entry points:");
