@@ -61,7 +61,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
      */
 
     public final static String PROPERTY_DESCRIPTIONLINE = "description_line";
-  
+
     /**
      * The line width for output.
      */
@@ -87,13 +87,13 @@ public class FastaFormat implements SequenceFormat, Serializable {
      */
 
     public void setLineWidth(int width) {
-	this.lineWidth = lineWidth;
+	this.lineWidth = width;
     }
 
     public boolean readSequence(BufferedReader reader,
 				SymbolParser symParser,
 				SeqIOListener siol)
-	throws IllegalSymbolException, IOException, ParseException 
+	throws IllegalSymbolException, IOException, ParseException
     {
 	String line = reader.readLine();
 	if (line == null) {
@@ -104,17 +104,17 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	}
 
 	siol.startSequence();
-    
+
 	String description = line.substring(1).trim();
 	siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
 
 	boolean seenEOF = readSequenceData(reader, symParser, siol);
 	siol.endSequence();
-    
+
 	return !seenEOF;
     }
 
-    private boolean readSequenceData(BufferedReader r, 
+    private boolean readSequenceData(BufferedReader r,
 				     SymbolParser parser,
 				     SeqIOListener listener)
         throws IOException, IllegalSymbolException
@@ -134,8 +134,8 @@ public class FastaFormat implements SequenceFormat, Serializable {
 		while (!reachedEnd && parseStart < bytesRead && cache[parseStart] != '>') {
 		    parseEnd = parseStart;
 
-		    while (parseEnd < bytesRead && 
-			   cache[parseEnd] != '\n' && 
+		    while (parseEnd < bytesRead &&
+			   cache[parseEnd] != '\n' &&
 			   cache[parseEnd] != '\r')
 		    {
 			++parseEnd;
@@ -179,7 +179,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	return description;
     }
 
-    public void writeSequence(Sequence seq, PrintStream os) 
+    public void writeSequence(Sequence seq, PrintStream os)
 	throws IOException
     {
 	os.print(">");
