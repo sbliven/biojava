@@ -29,6 +29,8 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.utils.*;
 
+import org.apache.regexp.RE;
+
 /**
  * A set of convenience methods for handling common file formats.
  *
