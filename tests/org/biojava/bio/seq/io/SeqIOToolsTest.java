@@ -327,13 +327,15 @@ public class SeqIOToolsTest extends TestCase
                                             "nbrf", "ig",
                                             "embl", "genbank",
                                             "refseq", "gcg",
-                                            "gff" };
+                                            "gff",
+                                            "clustal", "msf" };
 
         int [] formatIds = new int [] { SeqIOConstants.RAW, SeqIOConstants.FASTA,
                                         SeqIOConstants.NBRF, SeqIOConstants.IG,
                                         SeqIOConstants.EMBL, SeqIOConstants.GENBANK,
                                         SeqIOConstants.REFSEQ, SeqIOConstants.GCG,
-                                        SeqIOConstants.GFF };
+                                        SeqIOConstants.GFF,
+                                        AlignIOConstants.CLUSTAL, AlignIOConstants.MSF };
 
         String [] alphas = new String [] { "dna", "rna",
                                            "aa", "protein" };

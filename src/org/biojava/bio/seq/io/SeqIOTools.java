@@ -493,7 +493,12 @@ public final class SeqIOTools  {
                                                    + " + "
                                                    + alphabetName);
             }
-        } else {
+        } else if (formatName.equalsIgnoreCase("clustal")) {
+            format = AlignIOConstants.CLUSTAL;
+        } else if (formatName.equalsIgnoreCase("msf")) {
+            format = AlignIOConstants.MSF;
+        }
+        else {
             return SeqIOConstants.UNKNOWN;
         }
 
