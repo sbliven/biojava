@@ -40,17 +40,20 @@ import org.biojava.directory.SystemRegistry;
  * indexing standard. See the BIODATABASE-ACCESS-HOWTO for more
  * information.</p>
  *
- * <pre>
- * usage: java org.biojava.app.BioGetSeq
- *  -d,--dbname       Specifies a symbolic data source
- *  -f,--format       Specifies the output format (optional, defaults to
- *                    'fasta')
- *  -h,--help         Command line help
- *  -n,--namespace    Specifies the namespace within which to search
- *                    (optional, defaults to 'ID')
- * </pre>
+ * @biojava.use -d dataSource [-n namespace] [-f format]
+ * @biojava.use -h
+ * @biojava.option -d --dbname
+ *                  Specifies a symbolic data source
+ * @biojava.option -f --format
+ *                  The output format {@biojava.default fasta}
+ * @biojava.option -h --help
+ *                  Command-line help
+ * @biojava.option -n --namespace
+ *                  Specifies the namespace within which to search
+ *                  {@biojava.default ID}
  *
  * @author Keith James
+ * @author Matthew Pocock
  */
 public class BioGetSeq
 {
@@ -68,7 +71,7 @@ public class BioGetSeq
             }
 
             String namespace = cmd.getOptionValue('n', "id");
- 
+
             // Currently BioJava SequenceDBs only understand the ID
             // namespace
             if (! namespace.equalsIgnoreCase("ID"))

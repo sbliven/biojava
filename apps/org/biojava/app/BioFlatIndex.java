@@ -52,22 +52,26 @@ import org.biojava.utils.lsid.LifeScienceIdentifierParseException;
  * the sequence retrieval code to determine how to treat the indexed
  * file(s). See the FLAT-DATABASES-HOWTO for more information.</p>
  *
- * <pre>
- * usage: java org.biojava.app.BioFlatIndex
- * -a,--alphabet    Specifies the source file alphabet (required if
- *                  creating an index)
- * -c,--create      Create a new index (optional)
- * -d,--dbname      Specifies the symbolic database name (used as the index
- *                  root directory name)
- * -f,--format      Specifies the source file format (required if creating
- *                  an index)
- * -h,--help        Command line help
- * -i,--index       Specifies the indexing scheme (optional, defaults to
- *                  'flat')
- * -l,--location    Path to the index root directory (optional, defaults to
- *                  cwd)
- * </pre>
- *
+ * @biojava.use -c -a alphabet -d dbName -f format [-i indexScheme -l indexRoot] seqFileList
+ * @biojava.use -d [-l] seqFileList
+ * @biojava.use -h
+ * @biojava.option -a --alphabet
+ *                  Source file alphabet {@biojava.values dna rna aa}
+ * @biojava.option -c --create
+ *                  Create a new index
+ * @biojava.option -d --dbname
+ *                  Specify the symbolic database name (used as the index root
+ *                  directory name)
+ * @biojava.option -f --format
+ *                  Specifies the source file format
+ * @biojava.option -h --help
+ *                  Command line help
+ * @biojava.option -i --index
+ *                  Specify the indexing scheme {@biojava.default flat}
+ * @biojava.option -l --location
+ *                  Path to the index root directory {@biojava.default `cwd`}
+ * @biojava.argument seqFileList
+ *                  Any number of sequence file names of the apropreate format
  * @author Keith James
  * @author Matthew Pocock
  */
