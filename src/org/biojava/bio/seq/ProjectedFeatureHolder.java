@@ -259,7 +259,11 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     }
 
     public int countFeatures() {
-	return wrapped.countFeatures();
+	if (filter != null) {
+	    return getProjectedFeatures().countFeatures();
+	} else {
+	    return wrapped.countFeatures();
+	}
     }
 
     public Iterator features() {
