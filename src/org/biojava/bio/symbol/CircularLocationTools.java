@@ -51,6 +51,7 @@ final class CircularLocationTools {
   private static int realValue(int val, int length){
     val = ((val-1)%length)+1;
     if(val<0)val = length+1 + val;
+    if(val == 0) val = 1;
     return val;
   }
 
@@ -81,9 +82,21 @@ final class CircularLocationTools {
         RangeLocation loc = new RangeLocation(rmin,rmax);
         return new CircularLocation(loc,seqLength);
       }else{
-        RangeLocation locB = new RangeLocation(rmin, seqLength);
-        RangeLocation locA = new RangeLocation(1,rmax - seqLength);
-        Location compound = LocationTools.union(locA,locB);
+        Location locA;
+        Location locB;
+        Location compound;
+
+        if(rmin == seqLength){
+          locB = new PointLocation(rmin);
+        }else{
+          locB = new RangeLocation(rmin, seqLength);
+        }
+        if(rmax - seqLength == 1){
+          locA = new PointLocation(1);
+        }else{
+          locA = new RangeLocation(1,rmax - seqLength);
+        }
+        compound = LocationTools.union(locA,locB);
         return new CircularLocation(compound,seqLength);
       }
   }
