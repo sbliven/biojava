@@ -319,20 +319,8 @@ final public class LocationTools {
   {
   	// If you know a cleaner way to do this, please change it and drop me a line
   	// gcox@netgenics.com
-	Class circularDecoratorClass;
-	Class betweenDecoratorClass;
-	try
-	{
-		circularDecoratorClass = Class.forName("org.biojava.bio.symbol.CircularLocation");
-	  	betweenDecoratorClass = Class.forName("org.biojava.bio.symbol.BetweenLocation");
-	}
-	catch (ClassNotFoundException cnfe)
-	{
-		throw new org.biojava.bio.BioError("CircularLocation or BetweenLocation could not be found");
-	}
-
-	boolean hasCircular = theLocation.getDecorator(circularDecoratorClass) == null;
-	boolean hasBetween = theLocation.getDecorator(betweenDecoratorClass) == null;
+	boolean hasCircular = theLocation.getDecorator(CircularLocation.class) != null;
+	boolean hasBetween = theLocation.getDecorator(BetweenLocation.class) != null;
 
   	return(hasCircular || hasBetween);
   }

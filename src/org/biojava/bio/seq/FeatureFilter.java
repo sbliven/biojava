@@ -701,6 +701,10 @@ public interface FeatureFilter extends Serializable {
         )
       );
     }
+    
+    public String toString() {
+      return getKey() + " == " + getValue();
+    }
   }
   
   /**
