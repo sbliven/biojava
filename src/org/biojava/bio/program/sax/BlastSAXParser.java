@@ -193,6 +193,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
             //things that can end header section
             //start of summmary section
             //start of detail section
+            //start of trailer when there are no hits
 
             if (poLine.startsWith("Query=")) {
                 StringTokenizer st = new StringTokenizer(poLine);
@@ -210,49 +211,24 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 
             if ((poLine.startsWith("Sequences producing significant alignments")) ||
                 (poLine.startsWith("Sequences producing High-scoring Segment Pairs")) ||
+                (poLine.startsWith(" ***** No hits found ******")) ||
                 (poLine.startsWith("-------- "))) {
-
                 this.emitRawOutput(oBuffer);
-
-                // Set attributes for QueryId element
-                oAtts.clear();
-                oAttQName.setQName("id");
-                oAtts.addAttribute(oAttQName.getURI(),
-                                   oAttQName.getLocalName(),
-                                   oAttQName.getQName(),
-                                   "CDATA", oQueryId);
-                oAttQName.setQName("metaData");
-                oAtts.addAttribute(oAttQName.getURI(),
-                                   oAttQName.getLocalName(),
-                                   oAttQName.getQName(),
-                                   "CDATA", "none");
-
-                // Fire the QueryId element
-                this.startElement(new QName(this,this.prefix("QueryId")),
-                                  (Attributes) oAtts);
-                this.endElement(new QName(this,this.prefix("QueryId")));
-
-                // Set attributes for DatabaseId element
-                oAtts.clear();
-                oAttQName.setQName("id");
-                oAtts.addAttribute(oAttQName.getURI(),
-                                   oAttQName.getLocalName(),
-                                   oAttQName.getQName(),
-                                   "CDATA", oDatabaseId);
-                oAttQName.setQName("metaData");
-                oAtts.addAttribute(oAttQName.getURI(),
-                                   oAttQName.getLocalName(),
-                                   oAttQName.getQName(),
-                                   "CDATA", "none");
-
-                // Fire the DatabaseId element
-                this.startElement(new QName(this,this.prefix("DatabaseId")),
-                                  (Attributes) oAtts);
-                this.endElement(new QName(this,this.prefix("DatabaseId")));
+                this.emitHeaderIds();
 
                 oAtts.clear();
                 this.endElement(new QName(this,this.prefix("Header")));
-        
+
+                if (poLine.startsWith(" ***** No hits found ******")) {
+
+                    oAtts.clear();
+                    this.startElement(new QName(this,this.prefix("Trailer")),
+                                      (Attributes) oAtts);
+                    this.changeState(IN_TRAILER);
+                    oBuffer.clear();
+                    return;
+                }
+
                 //change state
                 this.changeState(IN_SUMMARY);
                 oAtts.clear();
@@ -265,7 +241,6 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 
                 try {
                     poLine = oContents.readLine();
-
                 } catch (java.io.IOException x) {
                     System.err.println(x.getMessage());
                     System.err.println("File read interrupted");
@@ -451,8 +426,9 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 
         this.endElement(new QName(this,this.prefix("RawOutput")));
     }
+
     /**
-     * Parses a summary line.  Actualy parsing functionality
+     * Parses a summary line.  Actually parsing functionality
      * is delegated to static method of a reusable Helper Class.
      *
      * For NCBI Blast, a summary line looks something like:
@@ -555,6 +531,48 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 
         oMap.clear();
     }
+
+    /**
+     * Fires the QueryId and DatabaseId events.
+     */
+    private void emitHeaderIds() throws SAXException {
+        // Set attributes for QueryId element
+        oAtts.clear();
+        oAttQName.setQName("id");
+        oAtts.addAttribute(oAttQName.getURI(),
+                           oAttQName.getLocalName(),
+                           oAttQName.getQName(),
+                           "CDATA", oQueryId);
+        oAttQName.setQName("metaData");
+        oAtts.addAttribute(oAttQName.getURI(),
+                           oAttQName.getLocalName(),
+                           oAttQName.getQName(),
+                           "CDATA", "none");
+
+        // Fire the QueryId element
+        this.startElement(new QName(this,this.prefix("QueryId")),
+                          (Attributes) oAtts);
+        this.endElement(new QName(this,this.prefix("QueryId")));
+
+        // Set attributes for DatabaseId element
+        oAtts.clear();
+        oAttQName.setQName("id");
+        oAtts.addAttribute(oAttQName.getURI(),
+                           oAttQName.getLocalName(),
+                           oAttQName.getQName(),
+                           "CDATA", oDatabaseId);
+        oAttQName.setQName("metaData");
+        oAtts.addAttribute(oAttQName.getURI(),
+                           oAttQName.getLocalName(),
+                           oAttQName.getQName(),
+                           "CDATA", "none");
+
+        // Fire the DatabaseId element
+        this.startElement(new QName(this,this.prefix("DatabaseId")),
+                          (Attributes) oAtts);
+        this.endElement(new QName(this,this.prefix("DatabaseId")));
+    }
+
     /**
      * From the specified line, hand over
      * parsing of stream to a helperclass
@@ -767,12 +785,11 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
     private boolean checkNewBlastLikeDataSet(String poLine) {
 
         if ((poLine.startsWith("BLAST")) ||
-            (poLine.startsWith("TBLAST")))
-	    {
+            (poLine.startsWith("TBLAST"))) {
             return true;
-	    } else {
+        } else {
             return false;
-	    }
+        }
     }
     /**
      * Choose particular implementations of Part objects
