@@ -47,7 +47,7 @@ import org.xml.sax.helpers.*;
  */
 
 class FeatureFetcher {
-    private HashMap ticketsByID;
+    private HashMap ticketsBySegment;
     private List doneTickets = Collections.EMPTY_LIST;
     
     private boolean useXMLFetch = false;
@@ -56,7 +56,7 @@ class FeatureFetcher {
     private URL dataSource;
 
     {
-	ticketsByID = new HashMap();
+	ticketsBySegment = new HashMap();
     }
 
     FeatureFetcher(URL dataSource, String type, String category) {
@@ -70,11 +70,18 @@ class FeatureFetcher {
     }
 
     void addTicket(FeatureRequestManager.Ticket ticket) {
-	ticketsByID.put(ticket.getID(), ticket);
+	Location loc = ticket.getLocation();
+	Object seg;
+	if (loc != null) {
+	    seg = new Segment(ticket.getID(), loc.getMin(), loc.getMax());
+	} else {
+	    seg = ticket.getID();
+	}
+	ticketsBySegment.put(seg, ticket);
     }
 
     int size() {
-	return ticketsByID.size();
+	return ticketsBySegment.size();
     }
 
     List getDoneTickets() {
@@ -103,83 +110,64 @@ class FeatureFetcher {
 		fetchEncoding = "xff";
 	    }
 
+	    // We don't bother with XML-encoded fetches any more.
+	    // Nice idea, but now kind-of redundant.
+
 	    HttpURLConnection huc = null;
-	    
-	    if (useXMLFetch) {
-		fURL = new URL(dataSource, "features");
-		huc = (HttpURLConnection) fURL.openConnection();
-		huc.setRequestMethod("POST");
-		huc.setRequestProperty("Content-Type", "text/xml");
-		huc.setRequestProperty("Accept-Encoding", "gzip");
-		huc.setDoOutput(true);
-		 
-		OutputStream os = huc.getOutputStream();
-		PrintStream ps = new PrintStream(os);
-		
-		ps.print("<featureRequest encoding=\"" + fetchEncoding + "\"");
-		if (type != null) {
-		    ps.print(" type=\"" + type + "\"");
-		}
-		if (category != null) {
-		    ps.print(" category=\"" + category + "\"");
-		}
-		ps.println(">");
-		
-		for (Iterator i = ticketsByID.keySet().iterator(); i.hasNext() ;) {
-		    String id = (String) i.next();
-		    ps.println("  <segment id=\"" + id + "\" />");
-		}
-		ps.println("</featureRequest>");
-		ps.close();
-	    } else {
-		String segments;
-		Set segmentIDs = ticketsByID.keySet();
-		if (segmentIDs.size() == 1) {
-		    segments = "ref=" + (String) segmentIDs.iterator().next();
+	    Set segmentObjs = ticketsBySegment.keySet();
+	    StringBuffer sb = new StringBuffer();
+	    for (Iterator i = segmentObjs.iterator(); i.hasNext(); ) {
+		Object seg = (Object) i.next();
+		sb.append("segment=");
+		if (seg instanceof Segment) {
+		    Segment segment = (Segment) seg;
+		    sb.append(segment.getID());
+		    sb.append(':');
+		    sb.append(segment.getStart());
+		    sb.append(',');
+		    sb.append(segment.getStop());
 		} else {
-		    StringBuffer sb = new StringBuffer();
-		    for (Iterator i = segmentIDs.iterator(); i.hasNext(); ) {
-			String id = (String) i.next();
-			sb.append("segment=");
-			sb.append(id);
-			if (i.hasNext()) {
-			    sb.append(';');
-			}
-		    }
-		    segments = sb.toString();
+		    sb.append(seg.toString());
 		}
-
-		String encodingRequest;
-		if (fetchEncoding.equals("dasgff")) {
-		    encodingRequest = "";
-		} else {
-		    encodingRequest = "encoding=" + fetchEncoding + ";";
+		
+		if (i.hasNext()) {
+		    sb.append(';');
 		}
-
-		String typeRequest = "";
-		if (type != null) {
-		    typeRequest = "type=" + type + ";";
-		}
-
-		String categoryRequest = "";
-		if (category != null) {
-		    categoryRequest = "category=" + category + ";";
-		}
-
-		// fURL = new URL(dataSource, "features?" + encodingRequest + categoryRequest + typeRequest + segments);
-		// huc = (HttpURLConnection) fURL.openConnection();
-
-		fURL = new URL(dataSource, "features");
-		huc = (HttpURLConnection) fURL.openConnection();
-		huc.setRequestMethod("POST");
-		huc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-		huc.setRequestProperty("Accept-Encoding", "gzip");
-		huc.setDoOutput(true);
-		OutputStream os = huc.getOutputStream();
-		PrintStream ps = new PrintStream(os);
-		ps.print(encodingRequest + categoryRequest + typeRequest + segments);
-		ps.close();
 	    }
+	    String segments = sb.toString();
+	    // System.err.println("Fetching: " + segments);
+	    
+	    String encodingRequest;
+	    if (fetchEncoding.equals("dasgff")) {
+		encodingRequest = "";
+	    } else {
+		encodingRequest = "encoding=" + fetchEncoding + ";";
+	    }
+	    
+	    String typeRequest = "";
+	    if (type != null) {
+		typeRequest = "type=" + type + ";";
+	    }
+
+	    String categoryRequest = "";
+	    if (category != null) {
+		categoryRequest = "category=" + category + ";";
+	    }
+
+	    // fURL = new URL(dataSource, "features?" + encodingRequest + categoryRequest + typeRequest + segments);
+	    // huc = (HttpURLConnection) fURL.openConnection();
+	    // huc.setRequestProperty("Accept-Encoding", "gzip");
+	    
+	    fURL = new URL(dataSource, "features");
+	    huc = (HttpURLConnection) fURL.openConnection();
+	    huc.setRequestMethod("POST");
+	    huc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+	    huc.setRequestProperty("Accept-Encoding", "gzip");
+	    huc.setDoOutput(true);
+	    OutputStream os = huc.getOutputStream();
+	    PrintStream ps = new PrintStream(os);
+	    ps.print(encodingRequest + categoryRequest + typeRequest + segments);
+	    ps.close();
 
 	    huc.connect();
 
@@ -188,7 +176,7 @@ class FeatureFetcher {
 	    if (status == 0) {
 		throw new BioError("Not a DAS server: " + fURL.toString());
 	    } else if (status != 200) {
-		throw new BioError("DAS error (status code = " + status + ")");
+		throw new BioError("DAS error (status code = " + status + ") fetching " + fURL.toString());
 	    }
 
             // determine if I'm getting a gzipped reply
@@ -200,24 +188,18 @@ class FeatureFetcher {
                 if (contentEncoding.indexOf("gzip") != -1) {
 		    // we have gzip encoding
 		    inStream = new GZIPInputStream(inStream);
-		    // System.out.println("gzip encoding!");
+		    System.out.println("gzip encoding!");
                 }
             }
 
 	    InputSource is = new InputSource(inStream);
 	    is.setSystemId(fURL.toString());
-	    if (fetchEncoding.equals("dasgff")) {
-		DASGFFParser gffParser = new DASGFFParser(ticketsByID);
-		gffParser.parseStream(is);
-		doneTickets = gffParser.getDoneTickets();
-	    } else if (fetchEncoding.equals("xff")) {
-		DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsByID, this);
-		XMLReader parser = DASSequence.nonvalidatingSAXParser();
-		parser.setContentHandler(new SAX2StAXAdaptor(dfh));
-		parser.parse(is);
-
-		doneTickets = dfh.getDoneTickets();
-	    }
+	    DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsBySegment, this, fetchEncoding);
+	    XMLReader parser = DASSequence.nonvalidatingSAXParser();
+	    parser.setContentHandler(new SAX2StAXAdaptor(dfh));
+	    parser.parse(is);
+	    
+	    doneTickets = dfh.getDoneTickets();
 	} catch (IOException ex) {
 	    throw new ParseException(ex);
 	} catch (SAXException ex) {
@@ -228,23 +210,28 @@ class FeatureFetcher {
     }
 
     //
-    // StAX handler for the new, generic, DASFEATURES document (only in XFF mode atm.
+    // StAX handler for the new, generic, DASFEATURES document
     //
 
     private class DASFeaturesHandler extends StAXContentHandlerBase {
 	private boolean inDocument = false;
-	private Map ticketsById;
+	private Map ticketsBySegment;
 	private FeatureRequestManager.Ticket thisTicket;
 	private List doneTickets = new ArrayList();
+	private String fetchEncoding; 
         private Object trigger;
 
 	public List getDoneTickets() {
 	    return doneTickets;
 	}
 
-	public DASFeaturesHandler(Map ticketsById, Object trigger) {
-	    this.ticketsById = ticketsById;
+	public DASFeaturesHandler(Map ticketsBySegment,
+				  Object trigger,
+				  String fetchEncoding) 
+	{
+	    this.ticketsBySegment = ticketsBySegment;
             this.trigger = trigger;
+	    this.fetchEncoding = fetchEncoding;
 	}
 
 	public void startElement(String nsURI,
@@ -262,23 +249,40 @@ class FeatureFetcher {
 		    if (segID == null) {
 			throw new SAXException("Missing segment ID");
 		    }
-		    thisTicket = (FeatureRequestManager.Ticket) ticketsById.get(segID);
+		    thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(segID);
 		    if (thisTicket == null) {
-			throw new SAXException("Response segment " + segID + " wasn't requested");
+			int start = Integer.parseInt(attrs.getValue("start"));
+			int stop = Integer.parseInt(attrs.getValue("stop"));
+			Segment seg = new Segment(segID, start, stop);
+			thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(seg);
+			if (thisTicket == null) {
+			    throw new SAXException("Response segment " + segID + ":" + start + 
+						   "," + stop + " wasn't requested");
+			}
+			segID = segID + ":" + start + "," + stop;
 		    }
 
-		    dm.delegate(new DASSegmentHandler(thisTicket.getOutputListener()));
+		    // System.err.println("Got segment: " + segID);
+
+		    dm.delegate(new DASSegmentHandler(thisTicket.getOutputListener(), fetchEncoding));
 		} else if (localName.equals("segmentNotAnnotated")) {
 		    String segID = attrs.getValue("id");
 		    if (segID == null) {
 			throw new SAXException("Missing segment ID");
 		    }
-		    FeatureRequestManager.Ticket t = (FeatureRequestManager.Ticket) ticketsById.get(segID);
-		    if (t == null) {
-			throw new SAXException("Response segment " + segID + " wasn't requested");
+		    thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(segID);
+		    if (thisTicket == null) {
+			int start = Integer.parseInt(attrs.getValue("start"));
+			int stop = Integer.parseInt(attrs.getValue("stop"));
+			Segment seg = new Segment(segID, start, stop);
+			thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(seg);
+			if (thisTicket == null) {
+			    throw new SAXException("Response segment " + segID + ":" + start + 
+						   "," + stop + " wasn't requested");
+			}
 		    }
 
-		    SeqIOListener siol = t.getOutputListener();
+		    SeqIOListener siol = thisTicket.getOutputListener();
 		    try {
 			siol.startSequence();
 			siol.endSequence();
@@ -286,8 +290,8 @@ class FeatureFetcher {
 			throw new SAXException(ex);
 		    }
 		    
-		    t.setAsFetched();
-		    doneTickets.add(t);
+		    thisTicket.setAsFetched();
+		    doneTickets.add(thisTicket);
 		} else if (localName.equals("segmentError")) {
 		    String segID = attrs.getValue("id");
 		    String segError = attrs.getValue("error");
@@ -307,7 +311,7 @@ class FeatureFetcher {
 		thisTicket.setAsFetched();
 		doneTickets.add(thisTicket);
                 DAS.activityProgress(trigger, doneTickets.size()
-                , ticketsById.size());
+                , ticketsBySegment.size());
 	    }
 	}
     }
@@ -315,9 +319,13 @@ class FeatureFetcher {
     private class DASSegmentHandler extends StAXContentHandlerBase {
 	private SeqIOListener siol;
 	private int level = 0;
+	private String fetchEncoding;
 
-	public DASSegmentHandler(SeqIOListener siol) {
+	public DASSegmentHandler(SeqIOListener siol,
+				 String fetchEncoding) 
+	{
 	    this.siol = siol;
+	    this.fetchEncoding = fetchEncoding;
 	}
 
 	public void startElement(String nsURI,
@@ -357,8 +365,10 @@ class FeatureFetcher {
 									 "links"),
 					  DASLinkHandler.LINKDETAIL_HANDLER_FACTORY);
 		    dm.delegate(xffh);
+		} else if (localName.equals("FEATURE")) {
+		    dm.delegate(new DASGFFFeatureHandler(siol));
 		} else {
-		    throw new SAXException("Expecting an XFF featureSet and got " + localName);
+		    throw new SAXException("Expecting an XFF featureSet or DASGFF FEATURE, but got " + localName);
 		}
 	    }
 	}
@@ -377,6 +387,47 @@ class FeatureFetcher {
 		}
 	    }
 	    --level;
+	}
+    }
+
+    private class Segment {
+	private String id;
+	private int start;
+	private int stop;
+
+	public Segment(String id, int start, int stop) {
+	    this.id = id;
+	    this.start = start;
+	    this.stop = stop;
+	}
+
+	String getID() {
+	    return id;
+	}
+
+	int getStart() {
+	    return start;
+	}
+
+	int getStop() {
+	    return stop;
+	}
+
+	public int hashCode() {
+	    return id.hashCode() ^ start ^ stop;
+	}
+
+	public boolean equals(Object o) {
+	    if (! (o instanceof FeatureFetcher.Segment)) {
+		return false;
+	    }
+
+	    Segment so = (FeatureFetcher.Segment) o;
+	    if (!so.getID().equals(getID())) {
+		return false;
+	    } else {
+		return so.getStart() == getStart() && so.getStop() == getStop();
+	    }
 	}
     }
 }

@@ -115,8 +115,6 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	// really exists, and hopefully picks up the length along the way.
 	//
 
-	this.structure = new SimpleFeatureHolder();
-	
 	SeqIOListener listener = new SkeletonListener();
 	FeatureRequestManager frm = getParentDB().getFeatureRequestManager();
 	this.structureTicket = frm.requestFeatures(dataSourceURL, seqID, listener, null, "component");
@@ -201,7 +199,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	return parentdb;
     }
     
-    private FeatureHolder getStructure() throws BioException {
+    FeatureHolder getStructure() throws BioException {
 	if(!this.structureTicket.isFetched()) {
 	    this.structureTicket.doFetch();   
 	}
@@ -294,6 +292,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
 
     private int registerLocalFeatureFetchers() {
+	// System.err.println(getName() + ": registerLocalFeatureFetchers()");
+
 	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
 	    DASFeatureSet dfs = (DASFeatureSet) i.next();
 	    dfs.registerFeatureFetcher();
@@ -302,8 +302,26 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	return featureSets.size();
     }
 
+    private int registerLocalFeatureFetchers(Location l) {
+	// System.err.println(getName() + ": registerLocalFeatureFetchers(" + l.toString() + ")");
+
+	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
+	    DASFeatureSet dfs = (DASFeatureSet) i.next();
+	    dfs.registerFeatureFetcher(l);
+	}
+
+	return featureSets.size();
+    }
+
     int registerFeatureFetchers() throws BioException {
-	int num = registerLocalFeatureFetchers();
+	// System.err.println(getName() + ": registerFeatureFetchers()");
+
+	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
+	    DASFeatureSet dfs = (DASFeatureSet) i.next();
+	    dfs.registerFeatureFetcher();
+	}
+
+	int num = featureSets.size();
 
         FeatureHolder structure = getStructure();
 	if (length() < SIZE_THRESHOLD && structure.countFeatures() > 0) {
@@ -324,7 +342,14 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
 
     int registerFeatureFetchers(Location l) throws BioException {
-	int num = registerLocalFeatureFetchers();
+	// System.err.println(getName() + ": registerFeatureFetchers(" + l.toString() + ")");
+
+	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
+	    DASFeatureSet dfs = (DASFeatureSet) i.next();
+	    dfs.registerFeatureFetcher(l);
+	}
+
+	int num = featureSets.size();
 	
         FeatureHolder structure = getStructure();
 	if (structure.countFeatures() > 0) {
@@ -676,8 +701,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    // Otherwise they want /real/ features, I'm afraid...
 	    //
 	    
+	    Location ffl = extractInterestingLocation(ff);
 	    if (recurse) {
-		Location ffl = extractInterestingLocation(ff);
 		int numComponents = 1;
 		if (ffl != null) {
 		    numComponents = registerFeatureFetchers(ffl);
@@ -686,7 +711,12 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		}
 		getParentDB().ensureFeaturesCacheCapacity(numComponents * 3);
 	    } else {
-		registerLocalFeatureFetchers();
+		if (ffl != null) {
+		    registerLocalFeatureFetchers(ffl);
+		} else {
+		    new Exception("Hmmm, this is dangerous...").printStackTrace();
+		    registerLocalFeatureFetchers();
+		}
 	    }
 	    
 	    return features.filter(ff, recurse);

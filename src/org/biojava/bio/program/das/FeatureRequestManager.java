@@ -72,9 +72,22 @@ class FeatureRequestManager {
 	return requestFeatures(ds, id, l, null, null);
     }
 
-    public Ticket requestFeatures(URL ds, String id, SeqIOListener l, String type, String category)
+    public Ticket requestFeatures(URL ds, String id, SeqIOListener l, Location loc) {
+	return requestFeatures(ds, id, l, loc, null, null);
+    }
+
+    public Ticket requestFeatures(URL ds, String id, SeqIOListener l, String type, String category) {
+	return requestFeatures(ds, id, l, null, type, category);
+    }
+
+    public Ticket requestFeatures(URL ds,
+				  String id,
+				  SeqIOListener l,
+				  Location loc,
+				  String type,
+				  String category)
     {
-	Ticket t = new Ticket(ds, id, l, type, category);
+	Ticket t = new Ticket(ds, id, l, loc, type, category);
 	openTickets.add(t);
 	return t;
     }
@@ -245,6 +258,7 @@ class FeatureRequestManager {
     public class Ticket {
 	private boolean _isFired = false;
 	private String id;
+	private Location location;
 	private String type;
 	private String category;
 	private SeqIOListener outputListener;
@@ -253,6 +267,7 @@ class FeatureRequestManager {
 	public Ticket(URL dataSource,
 		      String id,
 		      SeqIOListener listener,
+		      Location location,
 		      String type,
 		      String category)
 	{
@@ -261,6 +276,7 @@ class FeatureRequestManager {
 	    this.outputListener = listener;
 	    this.type = type;
 	    this.category = category;
+	    this.location = location;
 	}
 
 	private URL getDataSource() {
@@ -281,6 +297,10 @@ class FeatureRequestManager {
 
 	private String getCategory() {
 	    return category;
+	}
+
+	public Location getLocation() {
+	    return location;
 	}
 
 	void setAsFetched() {

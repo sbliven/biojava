@@ -43,8 +43,11 @@ import org.biojava.bio.program.xff.*;
  */
 
 class DASFeatureSet implements FeatureHolder {
-    private FeatureRequestManager.Ticket featureTicket;
-    private CacheReference realFeatures;
+    private FeatureRequestManager.Ticket[] featureTickets;
+    private Location[]                     tiles;
+    private CacheReference[]               tileFeatures;
+    private SimpleFeatureHolder            unrulyFeatures = new SimpleFeatureHolder();
+    private FeatureHolder                  allFeatures;
 
     private DASSequence refSequence;
     private URL dataSource;
@@ -60,47 +63,88 @@ class DASFeatureSet implements FeatureHolder {
 	dataSourceString = dataSource.toString();
     }
 
-    void registerFeatureFetcher() {
-	if (realFeatures != null && realFeatures.get() == null) {
-	    realFeatures = null;
-	    featureTicket = null;
-	    // System.err.println("*** Real features got cleared out");
+    private final static int TILE_SIZE = 100000;
+
+    private Location[] getTiles() {
+	if (tiles == null) {
+	    int seqLength = refSequence.length();
+	    if (seqLength > 2000000 &&
+		refSequence.filter(new FeatureFilter.ByClass(ComponentFeature.class), false).countFeatures() == 0)
+	    {
+		int numTiles = (int) Math.ceil(1.0 * seqLength / TILE_SIZE);
+		tiles = new Location[numTiles];
+		featureTickets = new FeatureRequestManager.Ticket[numTiles];
+		tileFeatures = new CacheReference[numTiles];
+		for (int i = 0; i < numTiles; ++i) {
+		    tiles[i] = new RangeLocation(i * TILE_SIZE + 1, Math.min((i + 1) * TILE_SIZE + 1, seqLength));
+		}
+	    } else {
+		tiles = new Location[1];
+		tiles[0] = new RangeLocation(1, seqLength);
+	    }
+
+	    featureTickets = new FeatureRequestManager.Ticket[tiles.length];
+	    tileFeatures = new CacheReference[tiles.length];
 	}
 
-	if (featureTicket == null) {
-	    SeqIOListener listener = new DASFeatureSetPopulator();
-	    FeatureRequestManager frm = refSequence.getParentDB().getFeatureRequestManager();
-	    featureTicket = frm.requestFeatures(dataSource, sourceID, listener);
+	return tiles;
+    }
+
+    private void registerFeatureFetcher(int tileNum) {
+	Location[] tiles = getTiles();
+
+	if (tileFeatures[tileNum] == null || tileFeatures[tileNum].get() == null) {
+	    if (featureTickets[tileNum] == null) {
+		SeqIOListener listener = new DASFeatureSetPopulator(tileNum);
+		FeatureRequestManager frm = refSequence.getParentDB().getFeatureRequestManager();
+		if (tiles.length > 1) {
+		    featureTickets[tileNum] = frm.requestFeatures(dataSource, 
+								  sourceID,
+								  listener,
+								  tiles[tileNum]);
+		} else {
+		    featureTickets[tileNum] = frm.requestFeatures(dataSource, 
+								 sourceID,
+								 listener);
+		}
+	    }
+	}
+    }
+
+    void registerFeatureFetcher(Location loc) {
+	Location[] tiles = getTiles();
+	for (int t = 0; t < tiles.length; ++t) {
+	    if (LocationTools.overlaps(tiles[t], loc)) {
+		registerFeatureFetcher(t);
+	    }
+	}
+    }
+
+    void registerFeatureFetcher() {
+	Location[] tiles = getTiles();
+	for (int t = 0; t < tiles.length; ++t) {
+	    registerFeatureFetcher(t);
 	}
     }
 
     protected FeatureHolder getFeatures() {
-	if (realFeatures != null) {
-	    FeatureHolder fh = (FeatureHolder) realFeatures.get();
-	    if (fh != null) {
-		return fh;
+	if (allFeatures == null) {
+	    Location[] tiles = getTiles();
+	    if (tiles.length == 1) {
+		allFeatures = new TileFeaturesWrapper(0);
+	    } else {
+		MergeFeatureHolder mfhAllFeatures = new MergeFeatureHolder();
+		for (int t = 0; t < tiles.length; ++t) {
+		    mfhAllFeatures.addFeatureHolder(new TileFeaturesWrapper(t),
+						    new FeatureFilter.ContainedByLocation(tiles[t]));
+		}
+		mfhAllFeatures.addFeatureHolder(unrulyFeatures, FeatureFilter.all);
+
+		allFeatures = mfhAllFeatures;
 	    }
 	}
 
-	try {
-	    registerFeatureFetcher();
-	    featureTicket.doFetch();
-	} catch (ParseException ex) {
-	    throw new BioError(ex, "Error parsing feature table");
-	} catch (BioException ex) {
-	    throw new BioError(ex);
-	}
-
-	if (realFeatures == null) {
-	    throw new BioError("Assertion failure: features didn't get fetched.");
-	}
-
-	FeatureHolder fh = (FeatureHolder) realFeatures.get();
-	if (fh == null) {
-	    throw new BioError("Assertion failure: cache is stupidly small...");
-	}
-
-	return fh;
+	return allFeatures;
     }
 
     public Iterator features() {
@@ -156,13 +200,24 @@ class DASFeatureSet implements FeatureHolder {
 	private SimpleFeatureHolder holder;
 	private List featureStack = new ArrayList();
 	private Feature stackTop = null;
-	
+	private int thisTile;
+	private Location tileLocation = null;
+
+	DASFeatureSetPopulator(int thisTile) {
+	    this.thisTile = thisTile;
+	    Location[] tiles = getTiles();
+	    if (tiles.length > 1) {
+		this.tileLocation = tiles[thisTile];
+	    }
+	}
+
 	public void startSequence() {
 	    holder = new SimpleFeatureHolder();
 	}
 
 	public void endSequence() {
-	    realFeatures = refSequence.getParentDB().getFeaturesCache().makeReference(holder);
+	    tileFeatures[thisTile] = refSequence.getParentDB().getFeaturesCache().makeReference(holder);
+	    featureTickets[thisTile] = null;
 	}
 
 	public void startFeature(Feature.Template temp) 
@@ -190,7 +245,14 @@ class DASFeatureSet implements FeatureHolder {
 		    
 		    if (stackTop == null) {
 			f = ((RealizingFeatureHolder) refSequence).realizeFeature(refSequence, temp);
-			holder.addFeature(f);
+
+			if (tileLocation == null || LocationTools.contains(tileLocation, f.getLocation())) {
+			    holder.addFeature(f);
+			} else {
+			    if (! unrulyFeatures.containsFeature(f)) {
+				unrulyFeatures.addFeature(f);
+			    }
+			}
 		    } else {
 			f = stackTop.createFeature(temp);
 		    }
@@ -253,6 +315,79 @@ class DASFeatureSet implements FeatureHolder {
 		    stackTop = (Feature) featureStack.get(pos--);
 		}
 	    }
+	}
+    }
+
+    private class TileFeaturesWrapper implements FeatureHolder {
+	private int tileNum;
+
+	TileFeaturesWrapper(int tileNum) {
+	    this.tileNum = tileNum;
+	}
+
+	protected FeatureHolder getFeatures() {
+	    if (tileFeatures[tileNum] != null) {
+		FeatureHolder fh = (FeatureHolder) tileFeatures[tileNum].get();
+		if (fh != null) {
+		    return fh;
+		}
+	    }
+
+	    registerFeatureFetcher(tileNum);
+	    try {
+		featureTickets[tileNum].doFetch();
+	    } catch (Exception ex) {
+		throw new BioRuntimeException(ex);
+	    }
+
+	    if (tileFeatures[tileNum] != null) {
+		FeatureHolder fh = (FeatureHolder) tileFeatures[tileNum].get();
+		if (fh != null) {
+		    return fh;
+		}
+	    }
+
+	    throw new BioRuntimeException("Feature fetch failed for now good reason...");
+	}
+
+	public int countFeatures() {
+	    return getFeatures().countFeatures();
+	}
+
+	public Iterator features() {
+	    return getFeatures().features();
+	}
+
+	public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	    return getFeatures().filter(ff, recurse);
+	}
+
+	public Feature createFeature(Feature.Template templ)
+	    throws ChangeVetoException
+	{
+	    throw new ChangeVetoException("NO");
+	}
+
+	public void removeFeature(Feature f) 
+	    throws ChangeVetoException
+	{
+	    throw new ChangeVetoException("NO");
+	}
+
+	public boolean containsFeature(Feature f) {
+	    return getFeatures().containsFeature(f);
+	}
+
+	public void addChangeListener(ChangeListener cl) {
+	}
+
+	public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	}
+
+	public void removeChangeListener(ChangeListener cl) {
+	}
+
+	public void removeChangeListener(ChangeListener cl, ChangeType ct) {
 	}
     }
 }
