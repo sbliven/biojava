@@ -90,7 +90,7 @@ public class ViterbiAlign {
 
       // make dp object
       DP dp = DPFactory.createDP(model);
-    
+      
       SequenceFactory sFact = new SimpleSequenceFactory();
       FastaFormat fFormat = new FastaFormat();
       SequenceIterator stateI = null;

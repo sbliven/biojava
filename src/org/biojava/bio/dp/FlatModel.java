@@ -135,6 +135,7 @@ public class FlatModel implements MarkovModel {
     State from, State to,
     MarkovModel within, State source, State dest
   ) {
+    //System.out.println("Adding: " + from.getName() + " -> " + to.getName());
     try {
       ModelTransition mt = getMT(from, to);
       if(mt == null) {
@@ -150,10 +151,11 @@ public class FlatModel implements MarkovModel {
     } catch (IllegalResidueException ire) {
       throw new BioError(ire, "Something is fucked up in FlatModel - a residue dissapeared");
     }
+    
   }
   
   private void addAState(State s) {
-    System.out.println("Adding state: " + s.getName());
+    //System.out.println("Adding state: " + s.getName());
     try {
       stateAlpha.addResidue(s);
       transFrom.put(s, new HashSet());
@@ -176,7 +178,7 @@ public class FlatModel implements MarkovModel {
     addAState(model.magicalState());
     
     // add all the states
-    System.out.println("Adding states");
+    //System.out.println("Adding states");
     Map fromM = new HashMap();
     Map toM = new HashMap();
     Map inModel = new HashMap();
@@ -194,7 +196,7 @@ public class FlatModel implements MarkovModel {
         inModel.put(s, model);
         fromM.put(s, dsw);
         toM.put(s, dsw);
-        System.out.println("Added dot state " + dsw.getName());
+        //System.out.println("Added dot state " + dsw.getName());
       } else if(s instanceof EmissionState) {  // simple emission state in model
         if(s instanceof MagicalState) {
           continue;
@@ -205,9 +207,9 @@ public class FlatModel implements MarkovModel {
         inModel.put(s, model);
         fromM.put(s, esw);
         toM.put(s, esw);
-        System.out.println("Added emission state " + esw.getName());
+        //System.out.println("Added emission state " + esw.getName());
       } else if(s instanceof ModelInState) { // complex model inside state
-        System.out.println("Adding a model-in-state");
+        //System.out.println("Adding a model-in-state");
         ModelInState mis = (ModelInState) s;
         MarkovModel mism = mis.getModel();
         FlatModel flatM = new FlatModel(mism);
@@ -221,7 +223,7 @@ public class FlatModel implements MarkovModel {
         toM.put(s, start);
         modelStart.put(mism, start);
         modelEnd.put(mism, end);
-        System.out.println("Added " + start.getName() + " and " + end.getName());
+        //System.out.println("Added " + start.getName() + " and " + end.getName());
 
         for(Iterator j = flatM.stateAlphabet().residues().iterator(); j.hasNext(); ) {
           State t = (State) j.next();
@@ -231,7 +233,7 @@ public class FlatModel implements MarkovModel {
             inModel.put(t, mism);
             fromM.put(t, dsw);
             toM.put(t, dsw);
-            System.out.println("Added wrapped dot state " + dsw.getName());
+            //System.out.println("Added wrapped dot state " + dsw.getName());
           } else if(t instanceof EmissionState) {
             if(t instanceof MagicalState) {
               continue;
@@ -242,7 +244,7 @@ public class FlatModel implements MarkovModel {
             inModel.put(t, mism);
             fromM.put(t, esw);
             toM.put(t, esw);
-            System.out.println("Added wrapped emission state " + esw.getName());
+            //System.out.println("Added wrapped emission state " + esw.getName());
           } else { // unknown eventuality
             throw new IllegalResidueException(s, "Don't know how to handle state: " + s.getName());
           }
@@ -255,7 +257,7 @@ public class FlatModel implements MarkovModel {
     // wire them
     for(Iterator i = stateAlpha.residues().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
-      System.out.println("Processing transitions involving " + s.getName());
+      //System.out.println("Processing transitions involving " + s.getName());
       if(s instanceof MagicalState) {
         continue;
       }
@@ -266,6 +268,12 @@ public class FlatModel implements MarkovModel {
         createTransition(
           magicalState(), s,
           model, (State) modelStart.get(model), swrapped
+        );
+      }
+      if(sModel.containsTransition(swrapped, sModel.magicalState())) {
+        createTransition(
+          s, magicalState(),
+          model, swrapped, (State) modelStart.get(model)
         );
       }
       for(Iterator j = sModel.transitionsFrom(swrapped).iterator(); j.hasNext();) {
@@ -285,7 +293,7 @@ public class FlatModel implements MarkovModel {
         createTransition(t, s, sModel, tw, swrapped);
       }
     }
-    System.out.println("Done");
+    //System.out.println("Done");
   }
   
   public void createTransition(State from, State to)
