@@ -64,16 +64,33 @@ implements SequenceRenderer {
   }
   
   private void renderTrace(int[] baseCalls, int[] trace, Graphics2D g, SequenceRenderContext ctxt, int min, int max) {
-    double scale = depth / 1000.0; // assume 1000 gredations
+    double depthScale = depth / 1600.0; // assume 1000 gredations
     Line2D line = new Line2D.Float();
     for(int pos = min; pos <= max; pos++) {
       // hack - just draw base calls
-      if(pos > 1) {
+      int minT;
+      int maxT;
+      
+      if(pos == 1) {
+        minT = 0;
+      } else {
+        minT = (baseCalls[pos - 2] + baseCalls[pos - 1]) / 2;
+      }
+      
+      if(pos == baseCalls.length) {
+        maxT = trace.length - 1;
+      } else { 
+        maxT = (baseCalls[pos - 1] + baseCalls[pos - 0]) / 2;
+      }
+      
+      double scale = ctxt.getScale() / (double) (maxT - minT);
+      
+      for(int i = minT; i < maxT; i++) {
         line.setLine(
-          ctxt.sequenceToGraphics(pos - 1) + ctxt.getScale() * 0.5,
-          trace[baseCalls[pos - 2]],
-          ctxt.sequenceToGraphics(pos) + ctxt.getScale() * 0.5,
-          trace[baseCalls[pos - 1]]
+          ctxt.sequenceToGraphics(pos - 1) + scale * (0.5 + i - minT),
+          trace[i] * depthScale,
+          ctxt.sequenceToGraphics(pos - 1) + scale * (0.5 + i + 1 - minT),
+          trace[i + 1] * depthScale
         );
         
         g.draw(line);

@@ -81,10 +81,7 @@ implements FeatureRenderer {
       ChangeSupport cs = getChangeSupport(SequenceRenderContext.REPAINT);
       synchronized(cs) {
         ChangeEvent ce = new ChangeEvent(
-          this, SequenceRenderContext.REPAINT,
-          null, null, new ChangeEvent(
-            this, FILL, p, fill
-          )
+          this, FILL, p, fill
         );
         cs.firePreChangeEvent(ce);
         fill = p;
@@ -105,10 +102,7 @@ implements FeatureRenderer {
       ChangeSupport cs = getChangeSupport(SequenceRenderContext.REPAINT);
       synchronized(cs) {
         ChangeEvent ce = new ChangeEvent(
-          this, SequenceRenderContext.REPAINT,
-          null, null, new ChangeEvent(
-            this, OUTLINE, p, outline
-          )
+          this, OUTLINE, p, outline
         );
         cs.firePreChangeEvent(ce);
         outline = p;
