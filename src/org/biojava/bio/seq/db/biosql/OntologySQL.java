@@ -280,7 +280,11 @@ class OntologySQL {
                 String name = rs.getString(2);
                 String description = rs.getString(3);
                 Ontology ont = new Ontology.Impl(name, description);
-                loadTerms(ont, id);
+                try {
+                    loadTerms(ont, id);
+                } catch (OntologyException ex) {
+                    throw new BioException("Error loading ontology terms", ex);
+                }
                 ontologiesByID.put(new Integer(id), ont);
                 ontologiesByName.put(name, ont);
             }

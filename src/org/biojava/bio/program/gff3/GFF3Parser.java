@@ -110,10 +110,15 @@ public class GFF3Parser {
   throws IOException, BioException, ParserException
   {
     Set featureIDs = new HashSet();
-    Ontology fallBack = OntoTools.getDefaultFactory().createOntology(
-      "Unknown in " + locator,
-      ""
-    );
+    Ontology fallBack;
+    try {
+        fallBack = OntoTools.getDefaultFactory().createOntology(
+            "Unknown in " + locator,
+            ""
+        );
+    } catch (OntologyException ex) {
+        throw new ParserException("Couldn't create fallback ontology", ex);
+    }
     
     handler.startDocument(locator);
     ArrayList aList = new ArrayList();
