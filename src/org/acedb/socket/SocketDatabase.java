@@ -200,13 +200,16 @@ class SocketDatabase implements Database {
 	    List nameList = new ArrayList();
 	    while (listToke.hasMoreTokens()) {
         String l = listToke.nextToken();
-        if (l.startsWith("?")) {
-          StringTokenizer ltoke = new StringTokenizer(l, "?");
-          if (ltoke.countTokens() < 2) {
-            continue;
+        Ace.encode(l);
+        if (l.startsWith("?") && l.endsWith("?")) {
+          int indx = l.indexOf("?", 1);
+          String itemClazz = l.substring(1, indx);
+          String itemName = l.substring(indx+1, l.length()-1);
+          if(itemName.startsWith("\\?")) {
+            itemName = itemName.substring(1);
           }
-          ltoke.nextToken();
-          nameList.add(ltoke.nextToken());
+          itemName = Ace.encode(itemName);
+          nameList.add(itemName);
         }
 	    }
 	    
@@ -241,10 +244,14 @@ class SocketDatabase implements Database {
 	AceSocket sock = null;
 	try {
 	    sock = takeSocket();
-	    String result = sock.transact("find " + clazz + " " +
-					  name);
+      String query =
+        "find " +
+        Ace.decode(clazz) +
+        " " +
+			  Ace.decode(name);
+	    String result = sock.transact(query);
 	    if (result.indexOf("// Found 1 object") < 0) {
-		throw new AceException("Couldn't find object " + cacheName + " - does it exist?");
+		throw new AceException("Couldn't find object " + cacheName + " using query " + query + " - does it exist?");
 	    }
 
 	    String obj = sock.transact("show -p");

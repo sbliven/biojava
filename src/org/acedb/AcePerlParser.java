@@ -52,11 +52,7 @@ public class AcePerlParser {
       throw new AceError("Unrecoverable parsing error: expecting {");
     }
     
-    try {
-	    return (AceObject) getNode(null, toke);
-    } catch (Exception ex) {
-	    throw new AceError(ex);
-    }
+    return (AceObject) getNode(null, toke);
   }
 
   private StaticAceNode constructNode(
