@@ -22,12 +22,12 @@
 package org.biojava.bio.program.homologene;
 
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.AbstractChangeable;
 
-public abstract class AbstractOrthologueSet implements OrthologueSet
+public abstract class AbstractOrthologueSet 
+    extends AbstractChangeable
+    implements OrthologueSet
 {
-    public abstract Orthologue createOrthologue(int taxonID, String locusID, String homologeneID, String accession);
-    public abstract Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession);
-    public abstract Orthologue getOrthologue(String homologeneID);
 
     public OrthologueSet filter(OrthologueFilter filter)
     {

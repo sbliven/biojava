@@ -24,29 +24,15 @@ package org.biojava.bio.program.homologene;
 import java.util.Set;
 
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.AbstractChangeable;
 
 /**
  * represents the Homologene Group.
  */
 public abstract class AbstractOrthoPairSet
+    extends AbstractChangeable
     implements OrthoPairSet
 {
-
-    public abstract String getName();
-
-    public abstract void setName(String name);
-
-    public abstract void addOrthoPair(OrthoPair orthology) throws ChangeVetoException;
-
-    public abstract void removeOrthoPair(OrthoPair orthology);
-
-    public abstract int size();
-
-    public abstract Iterator iterator();
-
-    public abstract Set getTaxa();
-
-    public abstract double getMinIdentity();
 
     public OrthoPairSet filter(OrthoPairFilter filter)
     {

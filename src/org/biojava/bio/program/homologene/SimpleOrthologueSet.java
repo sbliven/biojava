@@ -25,6 +25,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
+
 public class SimpleOrthologueSet extends AbstractOrthologueSet
 {
 
@@ -53,32 +57,46 @@ public class SimpleOrthologueSet extends AbstractOrthologueSet
     private Set orthologueSet = new HashSet();
     private Map orthologueByHomologeneID = new HashMap();
 
-    public Orthologue createOrthologue(int taxonID, String locusID, String homologeneID, String accession)
-        throws IllegalArgumentException
     {
-        // create the Orthologue
-        Orthologue newOrthologue = new SimpleOrthologue(taxonID, locusID, homologeneID, accession);
-
-        // stash it
-        orthologueSet.add(newOrthologue);
-        orthologueByHomologeneID.put(homologeneID, newOrthologue);
-        return newOrthologue;
-    }
-
-    public Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession)
-    {
-        // create the Orthologue
-        Orthologue newOrthologue = new SimpleOrthologue(taxon, locusID, homologeneID, accession);
-
-        // stash it
-        orthologueSet.add(newOrthologue);
-        orthologueByHomologeneID.put(homologeneID, newOrthologue);
-        return newOrthologue;
+        generateChangeSupport();
     }
 
     public void addOrthologue(Orthologue ortho)
+        throws ChangeVetoException
     {
-        orthologueSet.add(ortho);
+        if (!hasListeners()) {
+            orthologueSet.add(ortho);
+        }
+        else {
+            // get the change support
+            ChangeSupport cs = getChangeSupport(OrthologueSet.MODIFY);
+
+            synchronized(cs) {
+                ChangeEvent ce = new ChangeEvent(this, OrthologueSet.MODIFY);
+                cs.firePreChangeEvent(ce);
+                orthologueSet.add(ortho);
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
+
+    public void removeOrthologue(Orthologue ortho)
+        throws ChangeVetoException
+    {
+        if (!hasListeners()) {
+            orthologueSet.remove(ortho);
+        }
+        else {
+            // get the change support
+            ChangeSupport cs = getChangeSupport(OrthologueSet.MODIFY);
+
+            synchronized(cs) {
+                ChangeEvent ce = new ChangeEvent(this, OrthologueSet.MODIFY);
+                cs.firePreChangeEvent(ce);
+                orthologueSet.remove(ortho);
+                cs.firePostChangeEvent(ce);
+            }
+        }
     }
 
     public Orthologue getOrthologue(String homologeneID)

@@ -1,8 +1,27 @@
-
-
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
 
 package org.biojava.bio.program.homologene;
 
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Homologene is a NCBI dataset that curates sets
@@ -18,7 +37,14 @@ public interface HomologeneDB
     /**
      * create a orthologue
      */
-    public Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession);
+    public Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession)
+        throws ChangeVetoException;
+
+    /**
+     * create a orthologue
+     */
+    public Orthologue createOrthologue(int taxonID, String locusID, String homologeneID, String accession)
+        throws ChangeVetoException;
 
     /**
      * returns an orthologue of specified ID

@@ -35,9 +35,8 @@ public class SimpleHomologeneDB
     implements HomologeneDB
 {
 
-    // every Orthologue is stored in a Set
-    private Set orthologueSet = new HashSet();
-    private Map orthologueByHomologeneID = new HashMap();
+    // every Orthologue is stored in an OrthologueSet delegate
+    private OrthologueSet orthologues = new SimpleOrthologueSet();
 
     // orthologies are also stored in a set
     private Set orthologySet = new HashSet();
@@ -47,31 +46,28 @@ public class SimpleHomologeneDB
     private Map orthologyBySimilarityType = new HashMap();
 
     public Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession)
+        throws ChangeVetoException
     {
         // create the Orthologue
         Orthologue newOrthologue = new SimpleOrthologue(taxon, locusID, homologeneID, accession);
 
-        // stash it
-        orthologueSet.add(newOrthologue);
-        orthologueByHomologeneID.put(homologeneID, newOrthologue);
+        orthologues.addOrthologue(newOrthologue);
         return newOrthologue;
     }
 
     public Orthologue createOrthologue(int taxonID, String locusID, String homologeneID, String accession)
-        throws IllegalArgumentException
+        throws IllegalArgumentException, ChangeVetoException
     {
         // create the Orthologue
         Orthologue newOrthologue = new SimpleOrthologue(taxonID, locusID, homologeneID, accession);
 
-        // stash it
-        orthologueSet.add(newOrthologue);
-        orthologueByHomologeneID.put(homologeneID, newOrthologue);
+        orthologues.addOrthologue(newOrthologue);
         return newOrthologue;
-    }
+   }
 
     public Orthologue getOrthologue(String homologeneID)
     {
-        return (Orthologue) orthologueByHomologeneID.get(homologeneID);
+        return orthologues.getOrthologue(homologeneID);
     }
 
     public OrthoPair createOrthoPair(Orthologue first, Orthologue second, SimilarityType type, double percentIdentity)

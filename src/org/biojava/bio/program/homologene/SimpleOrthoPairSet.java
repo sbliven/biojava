@@ -25,6 +25,10 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
+
 /**
  * a no-frills implementation of a Homologene Group
  *
@@ -32,7 +36,6 @@ import java.util.Iterator;
  */
 public class SimpleOrthoPairSet
     extends AbstractOrthoPairSet
-//    implements OrthoPairSet
 {
     String name;
     Set orthologies = new HashSet();
@@ -58,6 +61,10 @@ public class SimpleOrthoPairSet
 
     }
 
+    {
+        generateChangeSupport();
+    }
+
     public String getName()
     {
         return name;
@@ -69,13 +76,41 @@ public class SimpleOrthoPairSet
     }
 
     public void addOrthoPair(OrthoPair orthology)
+        throws ChangeVetoException
     {
-        orthologies.add(orthology);
+        if (!hasListeners()) {
+            orthologies.add(orthology);
+        }
+        else {
+            // get the change support
+            ChangeSupport cs = getChangeSupport(OrthoPairSet.MODIFY);
+
+            synchronized(cs) {
+                ChangeEvent ce = new ChangeEvent(this, OrthoPairSet.MODIFY);
+                cs.firePreChangeEvent(ce);
+                orthologies.add(orthology);
+                cs.firePostChangeEvent(ce);
+            }
+        }
     }
 
     public void removeOrthoPair(OrthoPair orthology)
+        throws ChangeVetoException
     {
-        orthologies.remove(orthology);
+        if (!hasListeners()) {
+            orthologies.remove(orthology);
+        }
+        else {
+            // get the change support
+            ChangeSupport cs = getChangeSupport(OrthoPairSet.MODIFY);
+
+            synchronized(cs) {
+                ChangeEvent ce = new ChangeEvent(this, OrthoPairSet.MODIFY);
+                cs.firePreChangeEvent(ce);
+                orthologies.remove(orthology);
+                cs.firePostChangeEvent(ce);
+            }
+        }
     }
 
     public OrthoPairSet.Iterator iterator()

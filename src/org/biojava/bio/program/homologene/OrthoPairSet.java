@@ -24,12 +24,19 @@ package org.biojava.bio.program.homologene;
 import java.util.Set;
 
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ChangeType;
 
 /**
  * represents the Homologene Group.
  */
 public interface OrthoPairSet
 {
+
+    public static final ChangeType MODIFY =
+        new ChangeType("OrthoPairSet modified",
+            "org.biojava.bio.program.homologene.OrthoPairSet",
+            "MODIFY");
+
     public interface Iterator
     {
         public boolean hasNext();
@@ -59,7 +66,7 @@ public interface OrthoPairSet
      * removes a specified OrthoPair relationship
      * from this group.
      */
-    public void removeOrthoPair(OrthoPair orthology);
+    public void removeOrthoPair(OrthoPair orthology) throws ChangeVetoException;
 
     /**
      returns an iterator to the contents of the set.
