@@ -49,7 +49,7 @@ public interface FramedFeature extends StrandedFeature {
   Strand getStrand();
 
   public static class Template extends StrandedFeature.Template{
-    public static ReadingFrame readingFrame;
+    public ReadingFrame readingFrame;
   }
 
   /**
