@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.io.*;
 
 /**
@@ -31,13 +32,17 @@ import org.biojava.bio.seq.io.*;
  * length.
  */
 public class TestAmbiguity {
+
   public static void main(String [] args) {
+
     try {
       String things = "agctrymkswhbvdn-AGCTRYMKSWHBVDN";
-      FiniteAlphabet dna = DNATools.getDNA();
-      SymbolParser sParser = dna.getParser("token");
+      FiniteAlphabet dna = DNATools.getDNA(); 	
+
+ SymbolParser sParser = dna.getParser("token");
       SymbolList sList = sParser.parse(things);
-      for(int i = 1; i <= sList.length(); i++) {
+      
+for(int i = 1; i <= sList.length(); i++) {
         Symbol s = sList.symbolAt(i);
         System.out.print(s.getName() + " -> {");
         Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
@@ -49,6 +54,28 @@ public class TestAmbiguity {
         }
         System.out.println("}");
       }
+  	
+
+      System.out.println("Now Testing Prot"); 
+   things = "agctrymkswhvdn-AGCTRYMKSWHVDN*";
+   dna = ProteinTools.getTAlphabet(); 
+   dna.addSymbol(AlphabetManager.getGapSymbol());//problem here, even when explicitly adding the gap symbol it doesn't parse
+  sParser = dna.getParser("token");
+   sList = sParser.parse(things);
+      
+for(int i = 1; i <= sList.length(); i++) {
+        Symbol s = sList.symbolAt(i);
+        System.out.print(s.getName() + " -> {");
+        Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
+        if(j.hasNext()) {
+          System.out.print(((Symbol) j.next()).getName());
+        }
+        while(j.hasNext()) {
+          System.out.print(", " + ((Symbol) j.next()).getName());
+        }
+        System.out.println("}");
+      }
+
     } catch (Throwable t) {
       t.printStackTrace();
       System.exit(1);
