@@ -21,10 +21,10 @@
 
 package org.biojava.bio.seq.db.flat;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.NoSuchElementException;
 
 import org.biojava.bio.Annotation;
@@ -98,12 +98,12 @@ public class FlatSequenceDB extends Unchangeable implements SequenceDBLite
         {
             Record record = index.get(id);
             RAF seqRAF = record.getFile();
+            int recLength = record.getLength();
             seqRAF.seek(record.getOffset());
-           
-            File seqFile = seqRAF.getFile();
 
-            BufferedReader br =
-                new BufferedReader(new FileReader(seqFile));
+            byte [] bytes = new byte [recLength];
+            seqRAF.readFully(bytes, 0, recLength);
+            InputStream is = new ByteArrayInputStream(bytes);
 
             int formatId = SeqIOTools.identifyFormat(format.getNamespaceId(),
                                                      format.getObjectId());
@@ -113,7 +113,7 @@ public class FlatSequenceDB extends Unchangeable implements SequenceDBLite
             SymbolTokenization toke = alpha.getTokenization("token");
             SequenceBuilderFactory sbf = SeqIOTools.fileToFactory(formatId);
 
-            SequenceIterator si = new StreamReader(br, sf, toke, sbf);
+            SequenceIterator si = new StreamReader(is, sf, toke, sbf);
             return si.nextSequence();
         }
         catch (NoSuchElementException nsee)

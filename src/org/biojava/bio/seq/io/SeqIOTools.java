@@ -382,6 +382,11 @@ public final class SeqIOTools  {
     public static int identifyFormat(String formatName, String alphabetName) {
         int format, alpha;
 
+        System.err.println("Identifying format: "
+                           + formatName
+                           + " alpha: "
+                           + alphabetName);
+
         if (formatName.equalsIgnoreCase("raw"))
             format = SeqIOConstants.RAW;
         else if (formatName.equalsIgnoreCase("fasta"))
@@ -612,8 +617,12 @@ public final class SeqIOTools  {
             case SeqIOConstants.FASTA_AA:
                 return new FastaFormat();
             case SeqIOConstants.EMBL:
+            case SeqIOConstants.EMBL_DNA:
+            case SeqIOConstants.EMBL_RNA:
                 return new EmblLikeFormat();
             case SeqIOConstants.GENBANK:
+            case SeqIOConstants.GENBANK_DNA:
+            case SeqIOConstants.GENBANK_RNA:
                 return new GenbankFormat();
             case SeqIOConstants.SWISSPROT:
                 return new EmblLikeFormat();

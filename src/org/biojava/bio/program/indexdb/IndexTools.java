@@ -65,59 +65,80 @@ public class IndexTools
     private IndexTools() { }
 
     public static void indexFastaDNA(File location, File [] seqFiles)
-        throws FileNotFoundException, IOException, BioException
+        throws FileNotFoundException, IOException, ParserException,
+               BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setPrimaryKey("ID");
-        bsf.setStoreLocation(location);
         bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
                                                             "fasta",
                                                             "dna" ));
-        bsf.addKey("ID", 10);
-
-        BioStore store = bsf.createBioStore();
-        SymbolTokenization toke =
-            DNATools.getDNA().getTokenization("token");
-        indexFasta(store, toke, seqFiles);
+        indexFasta(bsf, location, seqFiles);
     }
 
     public static void indexFastaRNA(File location, File [] seqFiles)
-        throws FileNotFoundException, IOException, BioException
+        throws FileNotFoundException, IOException, ParserException,
+               BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setPrimaryKey("ID");
-        bsf.setStoreLocation(location);
         bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
                                                             "fasta",
                                                             "rna" ));
-        bsf.addKey("ID", 10);
-
-        BioStore store = bsf.createBioStore();
-        SymbolTokenization toke =
-            RNATools.getRNA().getTokenization("token");
-        indexFasta(store, toke, seqFiles);
+        indexFasta(bsf, location, seqFiles);
     }
 
     public static void indexFastaProtein(File location, File [] seqFiles)
-        throws FileNotFoundException, IOException, BioException
+        throws FileNotFoundException, IOException, ParserException,
+               BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setPrimaryKey("ID");
-        bsf.setStoreLocation(location);
         bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
                                                             "fasta",
                                                             "protein" ));
-        bsf.addKey("ID", 10);
-
-        BioStore store = bsf.createBioStore();
-        SymbolTokenization toke =
-            ProteinTools.getAlphabet().getTokenization("token");
-        indexFasta(store, toke, seqFiles);
+        indexFasta(bsf, location, seqFiles);
     }
 
-    public static void indexEmbl(File location, File [] seqFiles)
+    public static void indexEmblDNA(File location, File [] seqFiles)
+        throws FileNotFoundException, IOException, ParserException,
+               BioException
     {
-        
+        BioStoreFactory bsf = new BioStoreFactory();
+        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                            "embl",
+                                                            "dna" ));
+        indexEmblLike(bsf, location, seqFiles);
+    }
+
+    public static void indexEmblRNA(File location, File [] seqFiles)
+        throws FileNotFoundException, IOException, ParserException,
+               BioException
+    {
+        BioStoreFactory bsf = new BioStoreFactory();
+        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                            "embl",
+                                                            "rna" ));
+        indexEmblLike(bsf, location, seqFiles);
+    }
+
+    public static void indexGenbankDNA(File location, File [] seqFiles)
+        throws FileNotFoundException, IOException, ParserException,
+               BioException
+    {
+        BioStoreFactory bsf = new BioStoreFactory();
+        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                            "genbank",
+                                                            "dna" ));
+        indexGenbank(bsf, location, seqFiles);
+    }
+
+    public static void indexGenbankRNA(File location, File [] seqFiles)
+        throws FileNotFoundException, IOException, ParserException,
+               BioException
+    {
+        BioStoreFactory bsf = new BioStoreFactory();
+        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                            "genbank",
+                                                            "rna" ));
+        indexGenbank(bsf, location, seqFiles);
     }
 
     public static void indexSwissprot(File location, File [] seqFiles)
@@ -125,6 +146,84 @@ public class IndexTools
                BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
+        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                            "swiss",
+                                                            "protein" ));
+        indexEmblLike(bsf, location, seqFiles);
+    }
+
+    private static void indexFasta(BioStoreFactory bsf,
+                                   File location, File [] seqFiles)
+       throws FileNotFoundException, IOException, BioException
+    {
+        bsf.setPrimaryKey("ID");
+        bsf.setStoreLocation(location);
+        bsf.addKey("ID", 10);
+
+        BioStore store = bsf.createBioStore();
+
+        for (int i = 0; i < seqFiles.length; i++)
+        {
+            // File data
+            long newOffset = 0L;
+            long oldOffset = 0L;
+            RAF raf = new RAF(seqFiles[i], "r");
+            Map map = new HashMap();
+
+            CountedBufferedReader reader =
+                new CountedBufferedReader(new FileReader(raf.getFile()));
+
+            // Record data
+            String id = "";
+
+            String line = null;
+            while ((line = reader.readLine()) != null)
+            {
+                if (line.startsWith(">"))
+                {
+                    // Write at end of record
+                    if (newOffset > 0)
+                    {
+                        store.writeRecord(raf, oldOffset,
+                                          (int) (newOffset - oldOffset),
+                                          id, map);
+                        oldOffset = newOffset;
+                    }
+                    newOffset = reader.getFilePointer();
+
+                    int delimeter = line.indexOf(" ");
+                    if (delimeter < 0)
+                        id = line.substring(1);
+                    else
+                        id = line.substring(1, delimeter);
+                }
+                else
+                {
+                    newOffset = reader.getFilePointer();
+                }
+            }
+
+            // Write final record
+            store.writeRecord(raf, oldOffset,
+                              (int) (newOffset - oldOffset),
+                              id, map);
+        }
+
+        try
+        {
+            store.commit();
+        }
+        catch (NestedException ne)
+        {
+            throw new BioException(ne, "Failed to commit new index to file");
+        }
+    }
+
+    private static void indexEmblLike(BioStoreFactory bsf,
+                                      File location, File [] seqFiles)
+        throws FileNotFoundException, IOException, ParserException,
+               BioException
+    {
         bsf.setPrimaryKey("ID");
         bsf.setStoreLocation(location);
         bsf.addKey("AC", 10);
@@ -177,96 +276,60 @@ public class IndexTools
         }
     }
 
-    private static void indexFasta(BioStore store, SymbolTokenization toke,
-                                   File [] seqFiles)
-        throws FileNotFoundException, IOException, BioException
+    private static void indexGenbank(BioStoreFactory bsf,
+                                     File location, File [] seqFiles)
+        throws FileNotFoundException, IOException, ParserException,
+               BioException
     {
-         FastaFormat format = new FastaFormat();
+        bsf.setPrimaryKey("LOCUS");
+        bsf.setStoreLocation(location);
+        bsf.addKey("LOCUS", 10);
+        bsf.addKey("ACCESSION", 10);
 
-         for (int i = 0; i < seqFiles.length; i++)
-         {
-             RAF raf = new RAF(seqFiles[i], "r");
+        BioStore store = bsf.createBioStore();
 
-             FastaIndexer indexer = new FastaIndexer(raf, store);
-             StreamReader reader =
-                 new StreamReader(indexer.getReader(), format, toke, indexer);
-
-             while (reader.hasNext())
-             {
-                 reader.nextSequence();
-             }
-        }
-
-         try
-         {
-             store.commit();
-         }
-         catch (NestedException ne)
-         {
-             throw new BioException(ne, "Failed to commit new index to file");
-         }
-    }
-
-    private static class FastaIndexer implements SequenceBuilderFactory
-    {
-        private final Map map = new HashMap();
-        private final RAF raf;
-        private final IndexStore store;
-        private final CountedBufferedReader reader;
-    
-        public FastaIndexer(RAF raf, IndexStore store) throws IOException
+        for (int i = 0; i < seqFiles.length; i++)
         {
-            this.raf = raf;
-            this.store = store;
-            reader = new CountedBufferedReader(new FileReader(raf.getFile()));
-        }
+            Indexer indexer = new Indexer(seqFiles[i], store);
+            indexer.setPrimaryKeyName("LOCUS");
+            indexer.addSecondaryKey("ACCESSION");
 
-        public CountedBufferedReader getReader()
-        {
-            return reader;
-        }
+            ChangeTable changeTable = new ChangeTable();
 
-        public SequenceBuilder makeSequenceBuilder()
-        {
-            return new SeqIOIndexer();
-        }
-
-        class SeqIOIndexer extends SeqIOAdapter implements SequenceBuilder
-        {
-            long offset = 0L;
-            String id;
-
-            public void startSequence()
-            {
-                id = null;
-                offset = reader.getFilePointer();
-            }
-
-            public void addSequenceProperty(Object key, Object value)
-            {
-                if (key.equals(FastaFormat.PROPERTY_DESCRIPTIONLINE))
+            changeTable.setChanger("LOCUS", new ChangeTable.Changer()
                 {
-                    String line = (String) value;
-                    int a = line.indexOf(" ");
+                    public Object change(Object value)
+                    {
+                        String s = (String) value;
+                        int i = s.indexOf(" ");
+                        return s.substring(0, i);
+                    }
+                });
 
-                    if (a != -1)
-                        id = line.substring(0, a);
-                    else
-                        id = line;
-                }
-            }
+            changeTable.setChanger("ACCESSION", new ChangeTable.Changer()
+                {
+                    public Object change(Object value)
+                    {
+                        String s = (String) value;
+                        int i = s.indexOf(" ");
+                        return s.substring(0, i);
+                    }
+                });
 
-            public void endSequence()
-            {
-                long nof = reader.getFilePointer();
-                store.writeRecord(raf, offset, (int) (nof - offset), id, map);
-                offset = nof;
-            }
+            ValueChanger changer = new ValueChanger(indexer, changeTable);
+            Parser parser = new Parser();
 
-            public Sequence makeSequence()
-            {
-                return null;
-            }
+            while(parser.read(indexer.getReader(),
+                              LineSplitParser.GENBANK, changer));
+        }
+
+        try
+        {
+            store.commit();
+        }
+        catch (NestedException ne)
+        {
+            throw new BioException(ne, "Failed to commit new index to file");
         }
     }
 }
