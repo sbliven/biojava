@@ -1,19 +1,42 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.search;
 
-import org.biojava.utils.contract.Contract;
-import org.biojava.utils.ObjectUtil;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.Alignment;
+import java.util.Collections;
+import java.util.List;
 
-import java.util.*;
+import org.biojava.bio.seq.StrandedFeature.Strand;
+import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.contract.Contract;
 
 /**
- * A simple implementation of interface SeqSimilaritySearchHit that
+ * <p>A simple implementation of interface SeqSimilaritySearchHit that
  * takes care of all the housekeeping. Objects of this class are
- * immutable.
+ * immutable.</p>
  *
+ * <p>It is up to the user to define the meaning of the hit's
+ * query/subject start/end/strand with respect to its constituent
+ * sub-hits.</p>
+ * 
  * @author <a href="mailto:Gerald.Loeffler@vienna.at">Gerald
  * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
@@ -21,42 +44,78 @@ import java.util.*;
 public class SimpleSeqSimilaritySearchHit
     implements SeqSimilaritySearchHit, Cloneable
 {
-    private double                    score;
-    private double                    pValue;
-    private double                    eValue;
-    private String                    sequenceID;
-    private List                      subHits;
+    private double score;
+    private double pValue;
+    private double eValue;
+    private int    qStart;
+    private int    qEnd;
+    private Strand qStrand;
+    private int    sStart;
+    private int    sEnd;
+    private Strand sStrand;
+    private String sequenceID;
+    private List   subHits;
 
     /**
-     * Construct an immutable object from the values of all
-     * properties.
+     * Construct an immutable object from the values of all properties.
+     *
      * @param score the overall score of this hit. This is a mandatory
      * piece of information and may hence not be NaN.
-     * @param pValue the overall P-value of this hit. May be NaN.
-     * @param eValue the overall E-value of this hit. May be NaN.
+     * @param pValue the overall P-value of this hit, which may be
+     * NaN.
+     * @param eValue the overall E-value of this hit, which may be
+     * NaN.
+     * @param qStart the start of the first sub-hit on the query
+     * sequence.
+     * @param qEnd the end of the last sub-hit on the query
+     * sequence.
+     * @param qStrand the strand of the sub-hits on the query
+     * sequence, which may not be null. If they are no all positive or
+     * all negative, then this should be the unknown strand.
+     * @param sStart the start of the first sub-hit on the subject
+     * sequence.
+     * @param sEnd the end of the last sub-hit on the subject
+     * sequence.
+     * @param sStrand the strand of the sub-hits on the subject
+     * sequence, which may not be null. If they are no all positive or
+     * all negative, then this should be the unknown strand.
      * @param sequenceID the (unique) sequence identifier for this
      * hit, valid within the sequence database against which this
-     * search was performed. Not null.
+     * search was performed, which may not be null.
      * @param subHits a List of SeqSimilaritySearchSubHit objects
-     * containing all sub-hits for this hit. Not null.
+     * containing all sub-hits for this hit, which may not be null.
      */
-    public SimpleSeqSimilaritySearchHit(String                    sequenceID,
-					double                    score,
-					double                    eValue,
-					double                    pValue,
-					List                      subHits)
+    public SimpleSeqSimilaritySearchHit(double score,
+					double eValue,
+					double pValue,
+                                        int    qStart,
+                                        int    qEnd,
+                                        Strand qStrand,
+                                        int    sStart,
+                                        int    sEnd,
+                                        Strand sStrand,
+                                        String sequenceID,
+					List   subHits)
     {
 	Contract.pre(! Double.isNaN(score), "score was NaN");
 	// pValue may be NaN
 	// eValue may be NaN
+        Contract.pre(qStrand    != null, "query strand was null");
+        Contract.pre(sStrand    != null, "subject strand was null");
 	Contract.pre(sequenceID != null, "sequenceID was null");
-	Contract.pre(subHits != null, "subHits was null");
+	Contract.pre(subHits    != null, "subHits was null");
 
-	this.score        = score;
-	this.pValue       = pValue;
-	this.eValue       = eValue;
-	this.sequenceID   = sequenceID;
-	this.subHits      = subHits;
+	this.score      = score;
+	this.pValue     = pValue;
+	this.eValue     = eValue;
+	this.sequenceID = sequenceID;
+        this.qStart     = qStart;
+        this.qEnd       = qEnd;
+        this.qStrand    = qStrand;
+        this.sStart     = sStart;
+        this.sEnd       = sEnd;
+        this.sStrand    = sStrand;
+	this.subHits    = subHits;
     }
 
     public double getScore()
@@ -72,6 +131,36 @@ public class SimpleSeqSimilaritySearchHit
     public double getEValue()
     {
 	return eValue;
+    }
+
+    public int getQueryStart()
+    {
+        return qStart;
+    }
+
+    public int getQueryEnd()
+    {
+        return qEnd;
+    }
+
+    public Strand getQueryStrand()
+    {
+        return qStrand;
+    }
+
+    public int getSubjectStart()
+    {
+        return sStart;
+    }
+
+    public int getSubjectEnd()
+    {
+        return sEnd;
+    }
+
+    public Strand getSubjectStrand()
+    {
+        return sStrand;
     }
 
     public String getSequenceID()

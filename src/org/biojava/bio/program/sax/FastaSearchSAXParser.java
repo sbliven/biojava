@@ -28,6 +28,7 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -237,8 +238,10 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 			 (Attributes) attributes);
 
 	    // Reconstitute the 'raw' header from the properties Map
+            Set spKeys = searchProperties.keySet();
+
 	    String [] searchPropKeys =
-		(String []) searchProperties.keySet().toArray(new String [0]);
+		(String []) spKeys.toArray(new String [spKeys.size() - 1]);
 	    Arrays.sort(searchPropKeys);
 
 	    StringBuffer props = new StringBuffer(2048);
@@ -318,7 +321,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				qName.getLocalName(),
 				qName.getQName(),
 				"CDATA",
-				hitProperties.get("query_sq_len").toString());
+				(String) hitProperties.get("query_sq_len"));
 
 	try
 	{
@@ -333,7 +336,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    hitProperties.get("id").toString());
+				    (String) hitProperties.get("id"));
 	    // Metadata attribute
 	    qName.setQName("metaData");
 	    attributes.addAttribute(qName.getURI(),
@@ -374,9 +377,9 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 
 	    String score;
 	    if (hitProperties.containsKey("fp_score"))
-		score = hitProperties.get("fp_score").toString();
+		score = (String) hitProperties.get("fp_score");
 	    else if (hitProperties.containsKey("sw_score"))
-		score = hitProperties.get("sw_score").toString();
+		score = (String) hitProperties.get("sw_score");
 	    else
 		score = "none";
 
@@ -393,7 +396,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    hitProperties.get("fa_expect").toString());
+				    (String) hitProperties.get("fa_expect"));
 	    // numberOfIdentities attribute
 	    qName.setQName("numberOfIdentities");
 	    attributes.addAttribute(qName.getURI(),
@@ -418,9 +421,9 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 
 	    float percentId;
 	    if (hitProperties.containsKey("fa_ident"))
-		percentId = ((Float) hitProperties.get("fa_ident")).floatValue();
+		percentId = Float.parseFloat((String) hitProperties.get("fa_ident"));
 	    else
-	 	percentId = ((Float) hitProperties.get("sw_ident")).floatValue();
+	 	percentId = Float.parseFloat((String) hitProperties.get("sw_ident"));
 
 	    // percentageIdentity attribute
 	    qName.setQName("percentageIdentity");
@@ -429,6 +432,28 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getQName(),
 				    "CDATA",
 				    nFormat.format(percentId * 100));
+
+	    // queryStrand attribute (always plus for Fasta)
+	    qName.setQName("queryStrand");
+	    attributes.addAttribute(qName.getURI(),
+				    qName.getLocalName(),
+				    qName.getQName(),
+				    "CDATA",
+				    "plus");
+
+	    String strand;
+	    if (hitProperties.get("fa_frame").equals("f"))
+		strand = "plus";
+	    else
+		strand = "minus";
+
+	    // hitStrand attribute (may be minus for Fasta vs. nt sequence)
+	    qName.setQName("subjectStrand");
+	    attributes.addAttribute(qName.getURI(),
+				    qName.getLocalName(),
+				    qName.getQName(),
+				    "CDATA",
+				    strand);
 
 	    // Start the HSPSummary
 	    startElement(new QName(this, this.prefix("HSPSummary")),
@@ -440,8 +465,10 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 			 (Attributes) attributes);
 
 	    // Reconstitute the 'raw' header from the properties Map
+            Set hpKeys = hitProperties.keySet();
+
 	    String [] hitPropKeys =
-		(String []) hitProperties.keySet().toArray(new String [0]);
+		(String []) hpKeys.toArray(new String [hpKeys.size() - 1]);
 	    Arrays.sort(hitPropKeys);
 
 	    StringBuffer props = new StringBuffer(2048);
@@ -450,7 +477,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    for (int i = 0; i < hitPropKeys.length; i++)
 	    {
 		// Skip the sequence and consensus tokens
-		if (((String) hitPropKeys[i]).endsWith("Tokens"))
+		if (hitPropKeys[i].endsWith("Tokens"))
 		    continue;
 		props.append(hitPropKeys[i] + ": ");
 		props.append(hitProperties.get(hitPropKeys[i]).toString() + nl);
@@ -478,7 +505,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    hitProperties.get("query_al_start").toString());
+				    (String) hitProperties.get("query_al_start"));
 
 	    // Query sequence stopPosition attribute
 	    qName.setQName("stopPosition");
@@ -486,7 +513,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    hitProperties.get("query_al_stop").toString());
+				    (String) hitProperties.get("query_al_stop"));
 
 	    // Start the QuerySequence
 	    startElement(new QName(this, this.prefix("QuerySequence")),
@@ -534,7 +561,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    hitProperties.get("subject_al_start").toString());
+				    (String) hitProperties.get("subject_al_start"));
 
 	    // Hit sequence stopPosition attribute
 	    qName.setQName("stopPosition");
@@ -542,7 +569,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    hitProperties.get("subject_al_stop").toString());
+				    (String) hitProperties.get("subject_al_stop"));
 
 	    // Start the HitSequence
 	    startElement(new QName(this, this.prefix("HitSequence")),

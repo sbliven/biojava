@@ -26,19 +26,33 @@ import java.util.List;
 
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ObjectUtil;
 import org.biojava.utils.contract.Contract;
 
 /**
- * <code>SequenceDBSearchHit</code> objects represent a similarity
+ * <p><code>SequenceDBSearchHit</code> objects represent a similarity
  * search hit of a query sequence to a sequence referenced in a
  * SequenceDB object. The core data (score, E-value, P-value) have
  * accessors, while supplementary data are stored in the Annotation
  * object. Supplementary data are typically the more loosely formatted
  * details which vary from one search program to another (and between
- * versions of those programs).
+ * versions of those programs).</p>
+ *
+ * <p>It is up to the user to define the meaning of the hit's
+ * query/subject start/end/strand with respect to its constituent
+ * sub-hits. One approach could be:</p>
+ *
+ * <ul>
+ * <li>Hit query/subject start == start of first sub-hit</li>
+ * <li>Hit query/subject   end == end of last sub-hit</li>
+ * <li>Hit strand == POSITIVE if all sub-hits have strand POSITIVE</li>
+ * <li>Hit strand == NEGATIVE if all sub-hits have strand NEGATIVE</li>
+ * <li>Hit strand == UNKNOWN if sub-hits have either mixed or any UNKNOWN
+ *     strands</li>
+ * </ul>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.1
@@ -53,6 +67,12 @@ public class SequenceDBSearchHit extends AbstractChangeable
     private double     score;
     private double     pValue;
     private double     eValue;
+    private int        qStart;
+    private int        qEnd;
+    private Strand     qStrand;
+    private int        sStart;
+    private int        sEnd;
+    private Strand     sStrand;
     private List       subHits;
     private Annotation annotation;
 
@@ -65,31 +85,60 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * @param score a <code>double</code> value; the score of the hit,
      * which may not be NaN.
      * @param eValue a <code>double</code> value; the E-value of the
-     * hit, which may not be NaN.
+     * hit, which may be NaN.
      * @param pValue a <code>double</code> value; the P-value of the
-     * hit, which may not be NaN.
+     * hit, which may be NaN.
+     * @param qStart the start of the first sub-hit on the query
+     * sequence.
+     * @param qEnd the end of the last sub-hit on the query
+     * sequence.
+     * @param qStrand the strand of the sub-hits on the query
+     * sequence, which may not be null. If they are no all positive or
+     * all negative, then this should be the unknown strand.
+     * @param sStart the start of the first sub-hit on the subject
+     * sequence.
+     * @param sEnd the end of the last sub-hit on the subject
+     * sequence.
+     * @param sStrand the strand of the sub-hits on the subject
+     * sequence, which may not be null. If they are no all positive or
+     * all negative, then this should be the unknown strand.
      * @param subHits a <code>List</code> object containing the
-     * subhits, which may not be null.
+     * subhits, which may not be null. They should be sorted in the
+     * order specified by the search program.
      * @param annotation an <code>Annotation</code> object. If null a
      * new SimpleAnnotation object is created internally.
      */
-    public SequenceDBSearchHit(final String     sequenceID,
-			       final double     score,
+    public SequenceDBSearchHit(final double     score,
 			       final double     eValue,
 			       final double     pValue,
-			       final List       subHits,
-			       final Annotation annotation)
+                               final int        qStart,
+                               final int        qEnd,
+                               final Strand     qStrand,
+                               final int        sStart,
+                               final int        sEnd,
+                               final Strand     sStrand,
+                               final String     sequenceID,
+			       final Annotation annotation,
+                               final List       subHits)
     {
-	Contract.pre(sequenceID != null, "sequenceID was null");
-	Contract.pre(! Double.isNaN(score), "score was NaN");
+        Contract.pre(! Double.isNaN(score), "score was NaN");
 	// pValue may be NaN
 	// eValue may be NaN
-	Contract.pre(subHits != null, "subHits was null");
+	Contract.pre(sequenceID != null, "sequenceID was null");
+        Contract.pre(qStrand    != null, "query strand was null");
+        Contract.pre(sStrand    != null, "subject strand was null");
+	Contract.pre(subHits    != null, "subHits was null");
 
 	this.sequenceID = sequenceID;
 	this.score      = score;
 	this.eValue     = eValue;
 	this.pValue     = pValue;
+        this.qStart     = qStart;
+        this.qEnd       = qEnd;
+        this.qStrand    = qStrand;
+        this.sStart     = sStart;
+        this.sEnd       = sEnd;
+        this.sStrand    = sStrand;
 	this.subHits    = subHits;
 	this.annotation = annotation;
 
@@ -110,6 +159,36 @@ public class SequenceDBSearchHit extends AbstractChangeable
     public double getEValue()
     {
 	return eValue;
+    }
+
+    public int getQueryStart()
+    {
+        return qStart;
+    }
+
+    public int getQueryEnd()
+    {
+        return qEnd;
+    }
+
+    public Strand getQueryStrand()
+    {
+        return qStrand;
+    }
+
+    public int getSubjectStart()
+    {
+        return sStart;
+    }
+
+    public int getSubjectEnd()
+    {
+        return sEnd;
+    }
+
+    public Strand getSubjectStrand()
+    {
+        return sStrand;
     }
 
     public String getSequenceID()

@@ -80,23 +80,6 @@ public class FastaSearchParser implements SearchParser
 	(HashSet) fillSet(new String [] { "fa_expect", "fa_z-score" },
 			  new HashSet());
 
-    // Set which values should be parsed from String to a number
-    private static HashSet toDouble =
-	(HashSet) fillSet(new String [] { "fa_expect", "fa_z-score",
-					  "fa_bits",   "fa_initn", 
-					  "fa_init1",  "fa_opt",
-					  "fa_score",  "sw_score" },
-			  new HashSet());
-
-    private static HashSet toFloat =
-	(HashSet) fillSet(new String [] { "sw_ident",  "fa_ident",
-					  "fa_gident"  },
-			  new HashSet());
-
-    private static HashSet toInteger =
-	(HashSet) fillSet(new String [] { "sw_overlap", "fa_overlap" },
-			  new HashSet());
-
     private int              searchStatus = NODATA;
 
     private boolean          searchParsed = false;
@@ -476,7 +459,7 @@ public class FastaSearchParser implements SearchParser
 				    final Set    tokenSet)
 	throws ParserException	    
     {
-	Object [] data = parseLine(line, tokenSet);
+	String [] data = parseLine(line, tokenSet);
 
 	if (data.length > 0)
 	{
@@ -493,7 +476,7 @@ public class FastaSearchParser implements SearchParser
 				 final Set    tokenSet)
 	throws ParserException	    
     {
-	Object [] data = parseLine(line, tokenSet);
+	String [] data = parseLine(line, tokenSet);
 
 	if (data.length > 0)
 	{
@@ -504,7 +487,7 @@ public class FastaSearchParser implements SearchParser
 	return false;
     }
 
-    private Object [] parseLine(final String line,
+    private String [] parseLine(final String line,
 				final Set    tokenSet)
 	throws ParserException
     {
@@ -517,52 +500,20 @@ public class FastaSearchParser implements SearchParser
 	String   idValue = line.substring(idTokenEnd + 1);
 	idValue          = idValue.trim();
 
-	if (tokenSet.contains(idToken))
-	{
-	    try
-	    {
-		if (toDouble.contains(idToken))
-		{
-		    Double val = Double.valueOf(idValue);
-		    return new Object [] { idToken, val };
-		}
-
-		if (toFloat.contains(idToken))
-		{
-		    Float val = Float.valueOf(idValue);
-		    return new Object [] { idToken, val };
-		}
-
-		if (toInteger.contains(idToken))
-		{
-		    Integer val = Integer.valueOf(idValue);
-		    return new Object [] { idToken, val };
-		}
-	    }
-	    catch (NumberFormatException nfe)
-	    {
-		throw new ParserException("Fasta parser failed to parse a numeric value",
-					  null,
-					  lineNumber,
-					  line);
-	    }
-
-	    // Otherwise leave as a string
-	    return new Object [] { idToken, idValue };
-	}
-
-	return new Object [0];
+  	if (tokenSet.contains(idToken))
+	    return new String [] { idToken, idValue };
+        else
+	    return new String [0];
     }
 
     private void parseQuerySequence(final String line)
     {
-	Object [] data = parseSequence(line);
+	String [] data = parseSequence(line);
 
 	if (data.length > 0)
 	{
 	    // We have a key/value pair
-	    handler.addSubHitProperty("query" + data[0].toString(),
-				      data[1]);
+	    handler.addSubHitProperty("query" + data[0], data[1]);
 	}
 	else
 	{
@@ -573,13 +524,12 @@ public class FastaSearchParser implements SearchParser
 
     private void parseSubjectSequence(final String line)
     {
-	Object [] data = parseSequence(line);
+	String [] data = parseSequence(line);
 
 	if (data.length > 0)
 	{
 	    // We have a key/value pair
-	    handler.addSubHitProperty("subject" + data[0].toString(),
-				      data[1]);
+	    handler.addSubHitProperty("subject" + data[0], data[1]);
 	}
 	else
 	{
@@ -588,59 +538,57 @@ public class FastaSearchParser implements SearchParser
 	}
     }
 
-    private Object [] parseSequence(final String line)
+    private String [] parseSequence(final String line)
     {
 	if (line.startsWith(";"))
 	{
 	    // Check the sequence type given by the report
 	    if (line.equals("; sq_type: p"))
 	    {
-		return new Object [] { "_sq_type", "protein"};
+		return new String [] { "_sq_type", "protein"};
 	    }
 	    else if (line.equals("; sq_type: D"))
 	    {
-		return new Object [] { "_sq_type", "DNA"};
+		return new String [] { "_sq_type", "DNA"};
 	    }
 
 	    // Record the coordinates and offset of the alignment
 	    if (line.startsWith("; al_start:"))
 	    {
-		return new Object [] { "_al_start", parseCoord(line) };
+		return new String [] { "_al_start", parseCoord(line) };
 	    }
 	    else if (line.startsWith("; al_stop:"))
 	    {
-		 return new Object [] { "_al_stop", parseCoord(line) };
+		 return new String [] { "_al_stop", parseCoord(line) };
 	    }
 	    else if (line.startsWith("; al_display_start:"))
 	    {
-		return new Object [] {"_al_display_start", parseCoord(line) };
+		return new String [] {"_al_display_start", parseCoord(line) };
 	    }
 	    else if (line.startsWith("; sq_len:"))
 	    {
-		return new Object [] { "_sq_len", parseCoord(line) };
+		return new String [] { "_sq_len", parseCoord(line) };
 	    }
 	    else if (line.startsWith("; sq_offset:"))
 	    {
-		return new Object [] { "_sq_offset", parseCoord(line) };
+		return new String [] { "_sq_offset", parseCoord(line) };
 	    }
 	}
 
-	return new Object [0];
+	return new String [0];
     }
 
     /**
      * The <code>parseCoord</code> method extracts integer coordinates
      * from Fasta output lines.
      *
-     * @param line a <code>String</code> object to parse.
+     * @param line a <code>String</code> to parse.
      *
-     * @return an <code>Integer</code> coordinate.
+     * @return a <code>String</code> coordinate.
      */
-    private Integer parseCoord(final String line)
+    private String parseCoord(final String line)
     {
 	int sepIndex = line.lastIndexOf(":");
-	String coord = line.substring(sepIndex + 1);
-
-	return Integer.valueOf(coord.trim());
+	return line.substring(sepIndex + 1).trim();
     }
 }

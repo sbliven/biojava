@@ -1,13 +1,34 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.search;
 
-import org.biojava.utils.contract.Contract;
-import org.biojava.utils.ObjectUtil;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.BioException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.contract.Contract;
 
 /**
  * A class that implements the trivial (housekeeping) responsibilities
@@ -29,17 +50,18 @@ public class SimpleSeqSimilaritySearchResult
   /** 
    * Construct an immutable object by giving all its properties.
    * @param searcher the sequence similarity searcher that produced
-   * this search result. Not null.
+   * this search result, which may not be null.
    * @param querySequence the query sequence that gave rise to this
-   * search result. Not null.
+   * search result, which may not be null.
    * @param sequenceDB the sequence database against the search that
-   * produced this results was done. Not null.
+   * produced this results was done, which may not be null.
    * @param searchParameters the search parameters used in the search
-   * that produced this result. May be null. If not null, the getter
-   * for this property returns an unmodifiable view of this object.
+   * that produced this result, which may be null. If not null, the
+   * getter for this property returns an unmodifiable view of this
+   * object.
    * @param hits the list of SeqSimilaritySearchHit objects that make
-   * up this result. Not null. The getter for this property returns an
-   * unmodifiable view of this object.
+   * up this result, which may not null. The getter for this property
+   * returns an unmodifiable view of this object.
    */
     public SimpleSeqSimilaritySearchResult(SymbolList querySequence,
 					   SequenceDB sequenceDB,

@@ -33,6 +33,8 @@ import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.search.SeqSimilaritySearchHit;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.search.SeqSimilaritySearchSubHit;
@@ -256,22 +258,28 @@ public class FastaSearchBuilder implements SearchBuilder
 					     final Annotation hitAnnotation)
 	throws BioException
     {
+	String      seqType = (String) hitData.get("query_sq_type");
 	String subjectSeqID = (String) hitData.get("id");
-	Double        score = (Double) hitData.get("fa_z-score");
-	Double       eValue = (Double) hitData.get("fa_expect");
-	Double       pValue = (Double) hitData.get("fa_expect");
+	double        score = Double.parseDouble((String) hitData.get("fa_z-score"));
+	double       eValue = Double.parseDouble((String) hitData.get("fa_expect"));
+	double       pValue = Double.parseDouble((String) hitData.get("fa_expect"));
 
-	Integer     queryStart = (Integer) hitData.get("query_al_start");
-	Integer       queryEnd = (Integer) hitData.get("query_al_stop");
-	Integer queryDispStart = (Integer) hitData.get("query_al_display_start");
-	String  querySeqTokens = (String)  hitData.get("querySeqTokens");
+	int        queryStart = Integer.parseInt((String) hitData.get("query_al_start"));
+	int          queryEnd = Integer.parseInt((String) hitData.get("query_al_stop"));
+	int    queryDispStart = Integer.parseInt((String) hitData.get("query_al_display_start"));
+	String querySeqTokens = (String) hitData.get("querySeqTokens");
+	Strand querySeqStrand = StrandedFeature.POSITIVE;
 
-	Integer     subjectStart = (Integer) hitData.get("subject_al_start");
-	Integer       subjectEnd = (Integer) hitData.get("subject_al_stop");
-	Integer subjectDispStart = (Integer) hitData.get("subject_al_display_start");
-	String  subjectSeqTokens = (String)  hitData.get("subjectSeqTokens");
+	int        subjectStart = Integer.parseInt((String) hitData.get("subject_al_start"));
+	int          subjectEnd = Integer.parseInt((String) hitData.get("subject_al_stop"));
+	int    subjectDispStart = Integer.parseInt((String) hitData.get("subject_al_display_start"));
+	String subjectSeqTokens = (String) hitData.get("subjectSeqTokens");
 
-	String           seqType = (String)  hitData.get("query_sq_type");
+	Strand subjectSeqStrand;
+	if (((String) hitData.get("fa_frame")).equals("f"))
+	    subjectSeqStrand = StrandedFeature.POSITIVE;
+	else
+	    subjectSeqStrand = StrandedFeature.NEGATIVE;
 
 	// What happens if Fasta is given an RNA sequence?
 	FiniteAlphabet alpha;
@@ -314,13 +322,15 @@ public class FastaSearchBuilder implements SearchBuilder
 						  gslBuilder);
 
 	    SeqSimilaritySearchSubHit subHit =
-		new SequenceDBSearchSubHit(queryStart.intValue(),
-					   queryEnd.intValue(),
-					   subjectStart.intValue(),
-					   subjectEnd.intValue(),
-					   score.doubleValue(),
-					   eValue.doubleValue(),
-					   pValue.doubleValue(),
+		new SequenceDBSearchSubHit(score,
+					   eValue,
+					   pValue,
+                                           queryStart,
+					   queryEnd,
+					   querySeqStrand,
+					   subjectStart,
+					   subjectEnd,
+					   subjectSeqStrand,
 					   alignment);
 
 	    subHits.add(subHit);
@@ -331,12 +341,20 @@ public class FastaSearchBuilder implements SearchBuilder
 				   + subjectSeqID);
 	}
 
-	return new SequenceDBSearchHit(subjectSeqID,
-				       score.doubleValue(),
-				       eValue.doubleValue(),
-				       pValue.doubleValue(),
-				       subHits,
-				       hitAnnotation);
+        // For Fasta the query/subject start/end/strand are easy to
+        // calculate; they are the same as for the single 'sub-hit'
+	return new SequenceDBSearchHit(score,
+				       eValue,
+				       pValue,
+                                       queryStart,
+                                       queryEnd,
+                                       querySeqStrand,
+                                       subjectStart,
+                                       subjectEnd,
+                                       subjectSeqStrand,
+                                       subjectSeqID,
+				       hitAnnotation,
+                                       subHits);
     }
 
     /**
@@ -429,12 +447,12 @@ public class FastaSearchBuilder implements SearchBuilder
      * of a flanking context in the original sequence.
      *
      * @return a <code>String</code> value consisting of a subsequence
-     * containing only the interesting alignment.#
+     * containing only the interesting alignment.
      */
-    private String prepSeqTokens(final StringBuffer  seqTokens,
-				 final Integer       alStart,
-				 final Integer       alStop,
-				 final Integer       alDispStart)
+    private String prepSeqTokens(final StringBuffer seqTokens,
+				 final int          alStart,
+				 final int          alStop,
+				 final int          alDispStart)
     {
 	// Strip leading gap characters
 	while (seqTokens.charAt(0) == '-')
@@ -451,8 +469,7 @@ public class FastaSearchBuilder implements SearchBuilder
 	// Calculate the position at which the real alignment
 	// starts/stops, allowing for the gaps, which are not counted
 	// in the numbering system
-	return seqTokens.substring(alStart.intValue() - alDispStart.intValue(),
-				   alStop.intValue()  - alDispStart.intValue()
-				   + gapCount + 1);
+	return seqTokens.substring(alStart - alDispStart,
+				   alStop  - alDispStart + gapCount + 1);
     }
 }

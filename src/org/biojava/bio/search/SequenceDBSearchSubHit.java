@@ -21,8 +21,8 @@
 
 package org.biojava.bio.search;
 
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
-
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ObjectUtil;
 import org.biojava.utils.contract.Contract;
@@ -41,39 +41,67 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
     private double    eValue;
     private int       queryStart;
     private int       queryEnd;
+    private Strand    queryStrand;
     private int       subjectStart;
     private int       subjectEnd;
+    private Strand    subjectStrand;
     private Alignment alignment;
 
     /**
      * Creates a new <code>SequenceDBSearchSubHit</code> object.
      *
+     * @param queryStart an <code>int</code> value indicating the
+     * start coordinate of the hit on the query sequence.
+     * @param queryEnd an <code>int</code> value indicating the end
+     * coordinate of the hit on the query sequence.
+     * @param queryStrand a <code>Strand</code> object indicating the
+     * strand of the hit with respect to the query sequence, which may
+     * not be null.
+     * @param subjectStart an <code>int</code> value indicating the
+     * start coordinate of the hit on the subject sequence.
+     * @param subjectEnd an <code>int</code> value indicating the end
+     * coordinate of the hit on the query sequence.
+     * @param subjectStrand a <code>Strand</code> object indicating
+     * the strand of the hit with respect to the query sequence, which
+     * may not be null.
      * @param score a <code>double</code> value; the score of the
      * subhit, which may not be NaN.
-     * @param eValue a <code>double</code> value; the E-value of the
+     * @param eValue a <code>double</code> the E-value of the
      * subhit, which may not be NaN.
      * @param pValue a <code>double</code> value; the P-value of the
      * hit, which may not be NaN.
      * @param alignment an <code>Alignment</code> object containing
-     * the alignemnt described by the subhit region.
+     * the alignment described by the subhit region, which may not be
+     * null. 
      */
-    public SequenceDBSearchSubHit(final int       queryStart,
-				  final int       queryEnd,
-				  final int       subjectStart,
-				  final int       subjectEnd,
-				  final double    score,
+    public SequenceDBSearchSubHit(final double    score,
 				  final double    eValue,
 				  final double    pValue,
+                                  final int       queryStart,
+				  final int       queryEnd,
+				  final Strand    queryStrand,
+				  final int       subjectStart,
+				  final int       subjectEnd,
+				  final Strand    subjectStrand,
 				  final Alignment alignment)
     {
-	this.score        = score;
-	this.pValue       = eValue;
-	this.eValue       = pValue;
-	this.queryStart   = queryStart;
-	this.queryEnd     = queryEnd;
-	this.subjectStart = subjectStart;
-	this.subjectEnd   = subjectEnd;
-	this.alignment    = alignment;
+        Contract.pre(! Double.isNaN(score), "score was NaN");
+        // pValue may be NaN
+	// eValue may be NaN
+	Contract.pre(queryStrand   != null, "queryStrand was null");
+	Contract.pre(subjectStrand != null, "subjectStrand was null");
+	Contract.pre(alignment     != null, "alignment was null");
+
+	this.score         = score;
+	this.pValue        = eValue;
+	this.eValue        = pValue;
+	this.queryStart    = queryStart;
+	this.queryEnd      = queryEnd;
+	this.queryStrand   = queryStrand;
+	this.subjectStart  = subjectStart;
+	this.subjectEnd    = subjectEnd;
+	this.subjectStrand = subjectStrand;
+	this.alignment     = alignment;
 
 	// Lock alignment by vetoing all changes
 	this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
@@ -104,6 +132,11 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
 	return queryEnd;
     }
 
+    public Strand getQueryStrand()
+    {
+	return queryStrand;
+    }
+
     public int getSubjectStart()
     {
 	return subjectStart;
@@ -112,6 +145,11 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
     public int getSubjectEnd()
     {
 	return subjectEnd;
+    }
+
+    public Strand getSubjectStrand()
+    {
+	return subjectStrand;
     }
 
     public Alignment getAlignment()
@@ -145,9 +183,13 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
 	    return false;
 	if (! ObjectUtil.equals(this.queryEnd, that.queryEnd))
 	    return false;
+	if (! ObjectUtil.equals(this.queryStrand, that.queryStrand))
+	    return false;
 	if (! ObjectUtil.equals(this.subjectStart, that.subjectStart))
 	    return false;
 	if (! ObjectUtil.equals(this.subjectEnd, that.subjectEnd))
+	    return false;
+	if (! ObjectUtil.equals(this.subjectStrand, that.subjectStrand))
 	    return false;
 
 	return true;
@@ -155,16 +197,18 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
   
     public int hashCode()
     {
-	int hCode = 0;
+	int hc = 0;
 
-	hCode = ObjectUtil.hashCode(hCode, score);
-	hCode = ObjectUtil.hashCode(hCode, pValue);
-	hCode = ObjectUtil.hashCode(hCode, eValue);
-	hCode = ObjectUtil.hashCode(hCode, queryStart);
-	hCode = ObjectUtil.hashCode(hCode, queryEnd);
-	hCode = ObjectUtil.hashCode(hCode, subjectStart);
-	hCode = ObjectUtil.hashCode(hCode, subjectEnd);
+	hc = ObjectUtil.hashCode(hc, score);
+	hc = ObjectUtil.hashCode(hc, pValue);
+	hc = ObjectUtil.hashCode(hc, eValue);
+	hc = ObjectUtil.hashCode(hc, queryStart);
+	hc = ObjectUtil.hashCode(hc, queryEnd);
+	hc = ObjectUtil.hashCode(hc, queryStrand);
+	hc = ObjectUtil.hashCode(hc, subjectStart);
+	hc = ObjectUtil.hashCode(hc, subjectEnd);
+	hc = ObjectUtil.hashCode(hc, subjectStrand);
 
-	return hCode;
+	return hc;
     }
 }

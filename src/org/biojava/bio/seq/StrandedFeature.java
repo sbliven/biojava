@@ -91,7 +91,7 @@ public interface StrandedFeature extends Feature {
   /**
    * Class to represent the 'strandedness' of a feature.
    * <P>
-   * Strandedness may be re-used in other situations, but basicaly what it means
+   * Strandedness may be re-used in other situations, but basically what it means
    * is whether the feature has directionality, and if it does, does it travel
    * from its location min to max, or max to min.
    *

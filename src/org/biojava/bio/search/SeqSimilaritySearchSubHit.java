@@ -1,8 +1,27 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.search;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.BioException;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
 
 /**
@@ -16,7 +35,6 @@ import org.biojava.bio.symbol.Alignment;
  */
 public interface SeqSimilaritySearchSubHit
 {
-
     /**
      * This object is used as the label for the query sequence in the
      * alignment of the query sequence with this sub-hit sequence
@@ -29,7 +47,7 @@ public interface SeqSimilaritySearchSubHit
      * @return the score of this sub-hit. This is a mandatory piece of
      * information and may hence not be NaN.
      */
-    double getScore();
+    public double getScore();
 
     /**
      * Return the P-value of this sub-hit.
@@ -38,7 +56,7 @@ public interface SeqSimilaritySearchSubHit
      * interface may return NaN if a P-value is not available for this
      * hit.
      */
-    double getPValue();
+    public double getPValue();
   
     /**
      * Return the E-value of this sub-hit.
@@ -47,21 +65,29 @@ public interface SeqSimilaritySearchSubHit
      * interface may return NaN if an E-value is not available for
      * this hit.
      */
-    double getEValue();
+    public double getEValue();
   
     /**
      * Return the start position of the sub-hit in the query sequence.
      *
      * @return an <code>int</code> value.
      */
-    int getQueryStart();
+    public int getQueryStart();
 
     /**
      * Return the end position of the sub-hit in the query sequence.
      *
      * @return an <code>int</code> value.
      */
-    int getQueryEnd();
+    public int getQueryEnd();
+
+    /**
+     * Return the strand of the sub-hit with respect to the query
+     * sequence.
+     *
+     * @return a <code>Strand</code> value.
+     */
+    public Strand getQueryStrand();
 
     /**
      * Return the start position of the sub-hit in the subject
@@ -69,7 +95,7 @@ public interface SeqSimilaritySearchSubHit
      *
      * @return an <code>int</code> value.
      */
-    int getSubjectStart();
+    public int getSubjectStart();
 
     /**
      * Return the start position of the sub-hit in the subject
@@ -77,7 +103,15 @@ public interface SeqSimilaritySearchSubHit
      *
      * @return an <code>int</code> value.
      */
-    int getSubjectEnd();
+    public int getSubjectEnd();
+
+    /**
+     * Return the strand of the sub-hit with respect to the subject
+     * sequence.
+     *
+     * @return a <code>Strand</code> value.
+     */
+    public Strand getSubjectStrand();
 
     /**
      * Return an alignment of (possibly part of) the query sequence
@@ -85,7 +119,7 @@ public interface SeqSimilaritySearchSubHit
      * alignment, the query is identified by the label given by the
      * static field QUERY_LABEL.
      * @return the alignment of the query sequence against this hit
-     * sequence. May return null.
+     * sequence.
      */
-    Alignment getAlignment();
+    public Alignment getAlignment();
 }

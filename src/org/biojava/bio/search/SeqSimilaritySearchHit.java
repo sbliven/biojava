@@ -1,11 +1,29 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.search;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.Alignment;
-
 import java.util.List;
+
+import org.biojava.bio.seq.StrandedFeature.Strand;
 
 /**
  * Objects of this type represent one particular hit (sequence and
@@ -17,14 +35,13 @@ import java.util.List;
  */
 public interface SeqSimilaritySearchHit
 {
-
   /**
    * Return the overall score of this hit in the units defined by the
    * search algorithm.
    * @return the overall score of this hit. This is a mandatory piece
    * of information and may hence not be NaN.
    */
-    double getScore();
+    public double getScore();
 
     /**
      * Return the overall P-value of this hit.
@@ -33,7 +50,7 @@ public interface SeqSimilaritySearchHit
      * interface may return NaN if a P-value is not available for this
      * hit.
      */
-    double getPValue();
+    public double getPValue();
   
     /**
      * Return the overall E-value of this hit.
@@ -42,18 +59,66 @@ public interface SeqSimilaritySearchHit
      * interface may return NaN if an E-value is not available for
      * this hit.
      */
-    double getEValue();
+    public double getEValue();
+
+    /**
+     * Return the start position of the first sub-hit in the query
+     * sequence.
+     *
+     * @return an <code>int</code> value.
+     */
+    public int getQueryStart();
+
+    /**
+     * Return the end position of the last sub-hit in the query
+     * sequence.
+     *
+     * @return an <code>int</code> value.
+     */
+    public int getQueryEnd();
+
+    /**
+     * Return the strand of the hit with respect to the query
+     * sequence. If the sub-hits are not all on the same strand this
+     * should return the unknown strand.
+     *
+     * @return a <code>Strand</code> value.
+     */
+    public Strand getQueryStrand();
+
+    /**
+     * Return the start position of the first sub-hit in the subject
+     * sequence.
+     *
+     * @return an <code>int</code> value.
+     */
+    public int getSubjectStart();
+
+    /**
+     * Return the end position of the last sub-hit in the subject
+     * sequence.
+     *
+     * @return an <code>int</code> value.
+     */
+    public int getSubjectEnd();
+
+    /**
+     * Return the strand of the sub-hit with respect to the subject
+     * sequence. If the sub-hits are not all on the same strand this
+     * should return the unknown strand.
+     *
+     * @return a <code>Strand</code> value.
+     */
+    public Strand getSubjectStrand();
 
     /**
      * The sequence identifier of this hit within the sequence
-     * database against which the search was performed.  Use
-     * getSearchResult().getSequenceDB().getSequence(id) to actually
-     * retrieve the sequence with this ID.
+     * database against which the search was performed.
      * @return the (unique) sequence identifier for this hit, valid
      * within the sequence database against which this search was
      * performed. Never returns null.
      */
-    String getSequenceID();
+    public String getSequenceID();
   
     /**
      * Return all sub-hits for this sequence similarity search
@@ -65,5 +130,5 @@ public interface SeqSimilaritySearchHit
      * all sub-hits for this hit.  Never returns null and the List is
      * guaranteed to contain at least 1 entry.
      */
-    List getSubHits();
+    public List getSubHits();
 }

@@ -1,11 +1,30 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.search;
 
-import org.biojava.utils.contract.Contract;
-import org.biojava.utils.ObjectUtil;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.BioException;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
+import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.contract.Contract;
 
 /**
  * A simple implementation of interface SeqSimilaritySearchSubHit that
@@ -24,42 +43,68 @@ public class SimpleSeqSimilaritySearchSubHit
     private double    eValue;
     private int       queryStart;
     private int       queryEnd;
+    private Strand    queryStrand;
     private int       subjectStart;
     private int       subjectEnd;
+    private Strand    subjectStrand;
     private Alignment alignment;
 
     /**
      * Construct an immutable object of this class by providing all
      * properties.
-     * @param score the score of this hit. This is a mandatory piece of
-     * information and may hence not be NaN.
-     * @param pValue the P-value of this hit. May be NaN.
-     * @param eValue the E-value of this hit. May be NaN.
-     * @param alignment the alignment of the query sequence against this
-     * hit sequence. May be null.
+     *
+     * @param queryStart an <code>int</code> value indicating the
+     * start coordinate of the hit on the query sequence.
+     * @param queryEnd an <code>int</code> value indicating the end
+     * coordinate of the hit on the query sequence.
+     * @param queryStrand a <code>Strand</code> object indicating the
+     * strand of the hit with respect to the query sequence, which may
+     * not be null.
+     * @param subjectStart an <code>int</code> value indicating the
+     * start coordinate of the hit on the subject sequence.
+     * @param subjectEnd an <code>int</code> value indicating the end
+     * coordinate of the hit on the query sequence.
+     * @param subjectStrand a <code>Strand</code> object indicating
+     * the strand of the hit with respect to the query sequence, which
+     * may not be null.
+     * @param score a <code>double</code> value; the score of the
+     * subhit, which may not be NaN.
+     * @param eValue a <code>double</code> the E-value of the
+     * subhit, which may not be NaN.
+     * @param pValue a <code>double</code> value; the P-value of the
+     * hit, which may not be NaN.
+     * @param alignment an <code>Alignment</code> object containing
+     * the alignment described by the subhit region, which may not be
+     * null.
      */
-    public SimpleSeqSimilaritySearchSubHit(int       queryStart,
-					   int       queryEnd,
-					   int       subjectStart,
-					   int       subjectEnd,
-					   double    score,
+    public SimpleSeqSimilaritySearchSubHit(double    score,
 					   double    eValue,
 					   double    pValue,
+                                           int       queryStart,
+					   int       queryEnd,
+					   Strand    queryStrand,
+					   int       subjectStart,
+					   int       subjectEnd,
+					   Strand    subjectStrand,
 					   Alignment alignment)
     {
-	Contract.pre(!Double.isNaN(score), "score was NaN");
-	// pValue may be NaN
+        Contract.pre(! Double.isNaN(score), "score was NaN");
+        // pValue may be NaN
 	// eValue may be NaN
-	// alignment may be null
+	Contract.pre(queryStrand   != null, "queryStrand was null");
+	Contract.pre(subjectStrand != null, "subjectStrand was null");
+	Contract.pre(alignment     != null, "alignment was null");
 
-	this.score        = score;
-	this.pValue       = pValue;
-	this.eValue       = eValue;
-	this.queryStart   = queryStart;
-	this.queryEnd     = queryEnd;
-	this.subjectStart = subjectStart;
-	this.subjectEnd   = subjectEnd;
-	this.alignment    = alignment;
+	this.score         = score;
+	this.pValue        = pValue;
+	this.eValue        = eValue;
+	this.queryStart    = queryStart;
+	this.queryEnd      = queryEnd;
+	this.queryStrand   = queryStrand;
+	this.subjectStart  = subjectStart;
+	this.subjectEnd    = subjectEnd;
+	this.subjectStrand = subjectStrand;
+	this.alignment     = alignment;
     }
   
     public double getScore()
@@ -87,6 +132,11 @@ public class SimpleSeqSimilaritySearchSubHit
 	return queryEnd;
     }
 
+    public Strand getQueryStrand()
+    {
+	return queryStrand;
+    }
+
     public int getSubjectStart()
     {
 	return subjectStart;
@@ -96,7 +146,12 @@ public class SimpleSeqSimilaritySearchSubHit
     {
 	return subjectEnd;
     }
-  
+
+    public Strand getSubjectStrand()
+    {
+	return subjectStrand;
+    }
+
     public Alignment getAlignment()
     {
 	return alignment;
@@ -128,9 +183,13 @@ public class SimpleSeqSimilaritySearchSubHit
 	    return false;
 	if (! ObjectUtil.equals(this.queryEnd, that.queryEnd))
 	    return false;
+	if (! ObjectUtil.equals(this.queryStrand, that.queryStrand))
+	    return false;
 	if (! ObjectUtil.equals(this.subjectStart, that.subjectStart))
 	    return false;
 	if (! ObjectUtil.equals(this.subjectEnd, that.subjectEnd))
+	    return false;
+	if (! ObjectUtil.equals(this.subjectStrand, that.subjectStrand))
 	    return false;
     
 	// this and that are identical if we made it 'til here
@@ -148,8 +207,10 @@ public class SimpleSeqSimilaritySearchSubHit
 	hc = ObjectUtil.hashCode(hc, eValue);
 	hc = ObjectUtil.hashCode(hc, queryStart);
 	hc = ObjectUtil.hashCode(hc, queryEnd);
+	hc = ObjectUtil.hashCode(hc, queryStrand);
 	hc = ObjectUtil.hashCode(hc, subjectStart);
 	hc = ObjectUtil.hashCode(hc, subjectEnd);
+	hc = ObjectUtil.hashCode(hc, subjectStrand);
 
 	return hc;
     }
