@@ -27,6 +27,7 @@ package org.biojava.bio.structure.io;
 
 import org.biojava.bio.structure.* ;
 import java.io.*;
+import java.net.Socket ;
 
 /** reads a PDB file from a local SRS installation using getz Actually
  * is the same as PDBFileReader, but instead of reading from a file stream, reads from a
@@ -35,25 +36,57 @@ import java.io.*;
 
 public class PDBSRSReader extends PDBFileReader {  
     
-    static String GETZSTRING = "/nfs/team71/phd/ap3/BIN/getz -view PDBdata";
-    
 
     private BufferedReader getBufferedReader() 
 	throws IOException
     {
-	// e.g. getz -view PDBdata '[pdb:5pti] 
+	// getz -view PDBdata '[pdb:5pti] 
+	Socket          client  = null;
+	DataInputStream input   = null;
+	PrintStream     output  = null;
+	String          machine = ""  ;
+	int             port    = 0   ;
 
-	//String shellcommand = GETZSTRING+pdb_code+"]'" ;
-	String argument = " [pdb:" + pdb_code+"]" ;
-	//GETZSTRING += argument ;
-	System.out.println(GETZSTRING + argument);
-	Process proc = Runtime.getRuntime().exec(GETZSTRING+argument);
-	System.out.println("command executed");
+	String message = "please set System properties PFETCH_machine and PFETCH_port !" ;
+
+	try {
+	    machine     = System.getProperty("PFETCH_host");
+	    String p    = System.getProperty("PFETCH_port");
+	    port        = Integer.parseInt(p);
+
+	} catch ( NullPointerException e) {
+	    System.err.println(message);
+	    e.printStackTrace();
+	    throw new IOException() ;
+	} catch (IllegalArgumentException  e) {
+	    System.err.println(message);
+	    e.printStackTrace(); 
+	    throw new IOException() ;
+	}
+
+	if (port  == 0 ) {
+	    throw new IOException(message);
+	}
+	if ( (machine.equals(""))) {	   
+	    throw new IOException(message); 
+	}
+	System.out.println("contacting: " + machine + " " + port);
+	//Process proc = Runtime.getRuntime().exec(GETZSTRING+argument);
+	client = new Socket(machine , port);
+	client.setSoTimeout(10000) ; // 10 seconds
+	System.out.println("socket o.k.");
+	input  = new DataInputStream(client.getInputStream());
+	BufferedReader buf = new BufferedReader (new InputStreamReader (input));
+	
+	output = new PrintStream(client.getOutputStream());	  
+	output.println("--pdb "+ pdb_code);
+	output.flush();
+	
 	// get its output (your input) stream
 	
 	//DataInputStream instr = new DataInputStream(proc.getInputStream());
-	InputStream instr = proc.getInputStream() ;
-	BufferedReader buf = new BufferedReader (new InputStreamReader (instr));
+	//InputStream instr = proc.getInputStream() ;
+	//BufferedReader buf = new BufferedReader (new InputStreamReader (instr));
 	return buf ;
 
 
@@ -98,8 +131,15 @@ public class PDBSRSReader extends PDBFileReader {
     {
 	
 	pdb_code = filename ;
+	Structure s = null ;
+	try {
+	    s = getStructure();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    throw new IOException();
+	}
 
-	return getStructure() ;
+	return s ;
 
 
     }
