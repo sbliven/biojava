@@ -1,3 +1,24 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.program.indexdb;
 
 import java.util.*;
@@ -6,86 +27,90 @@ import java.io.*;
 import org.biojava.bio.*;
 import org.biojava.utils.*;
 
+/**
+ * <code>ConfigFile</code> implements reading, updating and writing
+ * of OBDA tab-delimited index files.
+ *
+ * @author Unknown
+ * @author Keith James
+ */
 class ConfigFile
-extends AbstractAnnotation
-implements Commitable
+    extends AbstractAnnotation
+    implements Commitable
 {
-  private File file;
-  private Map map;
-  
-  public ConfigFile(File file)
-  throws IOException {
-    this.file = file;
-    map = new HashMap();
-    if(file.exists()) {
-      parseFile();
-    }
-  }
-  
-  public void commit()
-  throws BioException {
-    try {
-      writeFile();
-    } catch (IOException e) {
-      throw new BioException(e, "Couldn't commit");
-    }
-  }
-  
-  public void rollback() {
-    try {
-      parseFile();
-    } catch (IOException e) {
-      throw new BioError(e, "Couldn't roll back: your data may be invalid");
-    }
-  }
-  
-  private void parseFile()
-  throws IOException {
-    BufferedReader reader = new BufferedReader(
-      new FileReader(
-        file
-      )
-    );
-    
-    for(
-      String line = reader.readLine();
-      line != null;
-      line = reader.readLine()
-    ) {
-      int tab = line.indexOf("\t");
-      String key = line.substring(0, tab).trim();
-      String value = line.substring(tab+1).trim();
-      
-      map.put(key, value);
-    }
-  }
-  
-  private void writeFile()
-  throws IOException {
-    PrintWriter writer = new PrintWriter(
-      new FileWriter(
-        file
-      )
-    );
-    
-    writer.println("index\t" + map.get("index"));
-    
-    for(Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
-      Map.Entry me = (Map.Entry) i.next();
-      if(!me.getKey().equals("index")) {
-        writer.println(me.getKey() + "\t" + me.getValue());
-      }
-    }
-    
-    writer.flush();
-  }
+    private File file;
+    private Map map;
 
-  
-  protected Map getProperties() {
-    return map;
-  }
-  
-  protected boolean propertiesAllocated() {
-    return true;
-  }
+    /**
+     * Creates a new <code>ConfigFile</code> using the specified
+     * <code>File</code>, which may or may not already exist.
+     *
+     * @param file a <code>File</code>.
+     *
+     * @exception IOException if an error occurs.
+     */
+    public ConfigFile(File file)
+        throws IOException {
+        this.file = file;
+        map = new HashMap();
+        if(file.exists()) {
+            parseFile();
+        }
+    }
+
+    public void commit()
+        throws BioException {
+        try {
+            writeFile();
+        } catch (IOException e) {
+            throw new BioException(e, "Couldn't commit");
+        }
+    }
+
+    public void rollback() {
+        try {
+            parseFile();
+        } catch (IOException e) {
+            throw new BioError(e, "Couldn't roll back: your data may be invalid");
+        }
+    }
+
+    private void parseFile()
+        throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        for(String line = reader.readLine();
+            line != null;
+            line = reader.readLine()) {
+            int tab = line.indexOf("\t");
+            String key = line.substring(0, tab).trim();
+            String value = line.substring(tab+1).trim();
+
+            map.put(key, value);
+        }
+    }
+
+    private void writeFile()
+        throws IOException {
+        PrintWriter writer = new PrintWriter(new FileWriter(file));
+
+        writer.println("index\t" + map.get("index"));
+
+        for(Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry me = (Map.Entry) i.next();
+            if(!me.getKey().equals("index")) {
+                writer.println(me.getKey() + "\t" + me.getValue());
+            }
+        }
+
+        writer.flush();
+    }
+
+    protected Map getProperties() {
+        return map;
+    }
+
+    protected boolean propertiesAllocated() {
+        return true;
+    }
 }
