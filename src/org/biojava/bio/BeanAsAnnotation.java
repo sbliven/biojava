@@ -28,6 +28,9 @@ import java.io.*;
 import org.biojava.utils.*;
 
 /**
+ * Create an Annotation with properties matching those of a JavaBean intance.
+ *
+ * @since 1.3
  * @author Matthew Pocock
  */
 
@@ -41,7 +44,12 @@ public class BeanAsAnnotation extends AbstractAnnotation {
   protected final boolean propertiesAllocated() {
     return true;
   }
-
+  
+  /**
+   * Create a new BeanAsAnnotation for a bean.
+   *
+   * @param bean the JavaBean to view
+   */
   public BeanAsAnnotation(Object bean)
   throws IntrospectionException {
     properties = new BeanAsMap(bean);

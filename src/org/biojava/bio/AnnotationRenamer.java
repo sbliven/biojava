@@ -30,6 +30,8 @@ import org.biojava.bio.program.tagvalue.TagMapper;
  * <code>Annotation</code> to new keys specified by a
  * <code>TagMapper</code>.
  *
+ * @since 1.3
+ * @author Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
  */
 public class AnnotationRenamer extends AbstractAnnotation

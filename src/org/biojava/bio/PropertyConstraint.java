@@ -26,9 +26,27 @@ import java.util.*;
 import org.biojava.utils.*;
 
 /**
+ * <p>
  * <code>PropertyConstraint</code>s describes a constraint applied to
  * the members of an annotation bundle.
+ * </p>
  *
+ * <p>
+ * <code>PropertyConstraint</code>s are usualy used in conjunction with the
+ * <code>AnnotationType</code> interface to describe a class of annotations by
+ * the falues of their properties. In this way, you can generate controled
+ * vocabularies over java objects.
+ * </p>
+ *
+ * <p>
+ * The constraints accept or reject individual objects and provide an accessor
+ * method to appropreately manipulate properties of their type. In general,
+ * it is not possible to get back a set of all items that would be accepted by
+ * a particular constraint.
+ * </p>
+ *
+ * @since 1.3
+ * @author Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
  */
 public interface PropertyConstraint {
@@ -42,9 +60,27 @@ public interface PropertyConstraint {
     public boolean accept(Object value);
 
     /**
+     * <p>
      * <code>subConstraintOf</code> returns true if the constraint is
-     * a sub-constraint. <strong>Javadoc FIXME - I don't know how to
-     * define this <KJ></strong>
+     * a sub-constraint.
+     * <p>
+     *
+     * <p>
+     * A pair of constraints super and sub are in a
+     * superConstraint/subConstraint relationship if every object accepted
+     * by sub is also accepted by super. To put it another way, if
+     * instanceOf was used as a set-membership indicator function over some
+     * set of objects, then the set produced by super would be a superset of
+     * that produced by sub.
+     * </p>
+     *
+     * <p>
+     * It is not expected that constraints will necisarily maintain references
+     * to super/sub types. It will be more usual to infer this relationship by
+     * introspecting the constraints themselves. For example,
+     * PropertyConstraint.ByClass will infer subConstraintOf by looking at the
+     * possible class of all items matching subConstraint.
+     * </p>
      *
      * @param subConstraint a <code>PropertyConstraint</code> to check.
      * @return a <code>boolean</code>.
@@ -73,6 +109,9 @@ public interface PropertyConstraint {
     /**
      * <code>ByClass</code> accepts a property value if it is an
      * instance of a specific Java class.
+     *
+     * @since 1.3
+     * @author Matthew Pocock
      */
     public class ByClass implements PropertyConstraint {
         private Class cl;
@@ -111,6 +150,9 @@ public interface PropertyConstraint {
     /**
      * <code>ByAnnotationType</code> accepts a property value if it
      * belongs to type defined by AnnotationType.
+     *
+     * @since 1.3
+     * @author Matthew Pocock
      */
     public class ByAnnotationType implements PropertyConstraint {
         private AnnotationType annType;
@@ -154,6 +196,9 @@ public interface PropertyConstraint {
      * <code>IsCollectionOf</code> accepts a property value if it is a
      * collection of objects which themselves conform to a specified
      * constraint.
+     *
+     * @since 1.3
+     * @author Matthew Pocock
      */
     public class IsCollectionOf implements PropertyConstraint {
         private PropertyConstraint elementType;
@@ -296,6 +341,9 @@ public interface PropertyConstraint {
     /**
      * <code>Enumeration</code> accepts a property if it is present
      * in the specified set of values.
+     *
+     * @since 1.3
+     * @author Matthew Pocock
      */
     public class Enumeration implements PropertyConstraint {
         private Set values;

@@ -27,6 +27,9 @@ import java.io.Serializable;
 import org.biojava.utils.*;
 
 /**
+ * A utility class to ease the problem of implementing an Annotatoin to that of
+ * providing an apropreate implementatin of Map.
+ *
  * @author Matthew Pocock
  */
 public abstract class AbstractAnnotation

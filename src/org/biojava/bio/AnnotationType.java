@@ -77,9 +77,9 @@ public interface AnnotationType {
     public PropertyConstraint getPropertyConstraint(Object key);
 
     /**
-     * Retrieve the complete set of properties that must be present for
+     * <p>Retrieve the complete set of properties that must be present for
      * an <code>Annotation</code> to be accepted by this
-     * <code>AnnotationType</code>.
+     * <code>AnnotationType</code>.</p>
      *
      * @return the Set of properties to validate.
      */
@@ -96,6 +96,7 @@ public interface AnnotationType {
      * setPropertyConstraint method to build the property->constraint
      * mapping.</p>
      * 
+     * @since 1.3
      * @author Matthew Pocock
      */
     public class Impl implements AnnotationType {

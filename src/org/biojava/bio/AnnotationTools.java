@@ -28,14 +28,22 @@ import org.biojava.utils.*;
  * <code>AnnotationTools</code> is a set of static utility methods for
  * manipulating <code>Annotation</code>s.
  *
+ * @since 1.3
+ * @author Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
  */
 public final class AnnotationTools {
     /**
+     * <p>
+     * Destructive down-cast an annotation to a type.
+     * </p>
+     *
+     * <p>
      * <code>allIn</code> returns a new <code>Annotation</code>
      * containing only those values in the <code>Annotation</code>
      * argument which are of a type specified by the
      * <code>AnnotationType</code>.
+     * </p>
      *
      * @param annotation an <code>Annotation</code> to scan.
      * @param annType an <code>AnnotationType</code>.
