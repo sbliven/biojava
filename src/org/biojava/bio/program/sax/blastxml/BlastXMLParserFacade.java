@@ -20,6 +20,7 @@
  */
 package org.biojava.bio.program.sax.blastxml;
 
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.stax.SAX2StAXAdaptor;
 import org.biojava.bio.BioException;
 
@@ -85,7 +86,7 @@ public class BlastXMLParserFacade
                     resourceName = resourceName + "NCBI_BlastOutput.mod";
                 }
 
-                InputStream is = Resolver.class.getClassLoader().getResourceAsStream(resourceName);
+                InputStream is = ClassTools.getClassLoader(Resolver.class).getResourceAsStream(resourceName);
 
                 return new InputSource(is);
         }

@@ -41,6 +41,7 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ClassTools;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -59,7 +60,7 @@ public final class ProteaseManager {
   static {
     try {
       InputStream tablesStream =
-         ProteaseManager.class.getClassLoader().getResourceAsStream(
+         ClassTools.getClassLoader(ProteaseManager.class).getResourceAsStream(
             "org/biojava/bio/proteomics/ProteaseManager.xml"
           );
 

@@ -9,6 +9,7 @@ import org.biojava.bio.EcNumber;
 import org.biojava.bio.program.tagvalue.ChangeTable;
 import org.biojava.bio.program.tagvalue.Formats;
 import org.biojava.bio.program.tagvalue.Parser;
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.Services;
 import org.biojava.utils.lsid.LifeScienceIdentifier;
 import org.biojava.utils.lsid.LifeScienceIdentifierParseException;
@@ -74,7 +75,7 @@ public class FormatTools {
       Class formatClass = null;
 
       try {
-        formatClass = Parser.class.getClassLoader().loadClass(formatName);
+        formatClass = ClassTools.getClassLoader(Parser.class).loadClass(formatName);
       } catch (ClassNotFoundException cnfe1) {
       }
 
@@ -82,7 +83,7 @@ public class FormatTools {
         String fn = "org.biojava.bio.program.formats." +
                     formatName;
         try {
-          formatClass = Parser.class.getClassLoader().loadClass(fn);
+          formatClass = ClassTools.getClassLoader(Parser.class).loadClass(fn);
         } catch (ClassNotFoundException cnfe2) {
         }
       }
@@ -91,7 +92,7 @@ public class FormatTools {
         String fn = "org.biojava.bio.program.formats." +
                     formatName.replace('.', '$');
         try {
-          formatClass = Parser.class.getClassLoader().loadClass(fn);
+          formatClass = ClassTools.getClassLoader(Parser.class).loadClass(fn);
         } catch (ClassNotFoundException cnfe2) {
         }
       }
@@ -121,7 +122,7 @@ public class FormatTools {
     if(LSID_2_FORMAT == null) {
       try {
         LSID_2_FORMAT = new HashMap();
-        ClassLoader loader = Formats.class.getClassLoader();
+        ClassLoader loader = ClassTools.getClassLoader(Formats.class);
 
         Iterator implNames = Services.getImplementationNames(
           Format.class, loader ).iterator();

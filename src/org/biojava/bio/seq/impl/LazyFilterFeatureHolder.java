@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FilterUtils;
 import org.biojava.bio.BioException;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
@@ -72,10 +73,16 @@ public class LazyFilterFeatureHolder implements FeatureHolder {
     }
     
     public FeatureHolder filter(FeatureFilter ff) {
+        if (FilterUtils.areDisjoint(ff, featureFilter)) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        }
         return featureHolder.filter(new FeatureFilter.And(ff, featureFilter));
     }
     
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+        if (FilterUtils.areDisjoint(ff, featureFilter)) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        }
         return featureHolder.filter(new FeatureFilter.And(ff, featureFilter), recurse);
     }
     

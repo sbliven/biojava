@@ -8,6 +8,7 @@ import java.sql.Statement;
 
 import org.biojava.bio.BioException;
 import org.biojava.utils.JDBCConnectionPool;
+import org.biojava.utils.ClassTools;
 
 /**
  * <p>An implementatoin of UnigeneFactory that manages it's data in an SQL
@@ -33,7 +34,7 @@ implements UnigeneFactory {
       StringBuffer stmt = new StringBuffer();
       BufferedReader stmtIn = new BufferedReader(
         new InputStreamReader(
-          SQLUnigeneFactory.class.getClassLoader().getResourceAsStream(
+          ClassTools.getClassLoader(SQLUnigeneFactory.class).getResourceAsStream(
             "/org/biojava/bio/program/unigene/createUnigene.sql"
           )
         )

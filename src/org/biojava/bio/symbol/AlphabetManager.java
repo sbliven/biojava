@@ -52,6 +52,7 @@ import org.biojava.bio.seq.io.NameTokenization;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.StreamParser;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
@@ -967,7 +968,7 @@ public final class AlphabetManager {
 
     ambiguitySymbols.put(new HashSet(), gapSymbol);
     try {
-      InputStream alphabetStream = AlphabetManager.class.getClassLoader().getResourceAsStream(
+      InputStream alphabetStream = ClassTools.getClassLoader(AlphabetManager.class).getResourceAsStream(
         "org/biojava/bio/symbol/AlphabetManager.xml"
       );
       if (alphabetStream == null) {

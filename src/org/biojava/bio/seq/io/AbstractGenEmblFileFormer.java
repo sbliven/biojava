@@ -36,6 +36,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.biojava.utils.ClassTools;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
@@ -901,7 +902,7 @@ class AbstractGenEmblFileFormer
         try
         {
             InputStream featureDataStream  =
-                EmblFileFormer.class.getClassLoader().getResourceAsStream(featureDataFile);
+                ClassTools.getClassLoader(EmblFileFormer.class).getResourceAsStream(featureDataFile);
             if (featureDataStream == null)
                 throw new BioError("Failed to find resource: "
                                    + featureDataFile);

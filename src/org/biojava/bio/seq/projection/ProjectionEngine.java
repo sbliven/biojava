@@ -27,6 +27,7 @@ import java.util.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.bytecode.*;
 import org.biojava.utils.AssertionFailure;
 
@@ -89,7 +90,7 @@ public class ProjectionEngine {
   private final Instantiator instantiator;
 
   {
-    loader = new PEClassLoader(ProjectionEngine.class.getClassLoader());
+    loader = new PEClassLoader(ClassTools.getClassLoader(ProjectionEngine.class));
     _projectionClasses = new HashMap();
     try {
       instantiator = new InstantiatorImpl();

@@ -48,7 +48,7 @@ public class Services {
         throws IOException
     {
         return getImplementationNames(serviceIF,
-                                      Services.class.getClassLoader());
+                                      ClassTools.getClassLoader(Services.class));
     }
 
     /**

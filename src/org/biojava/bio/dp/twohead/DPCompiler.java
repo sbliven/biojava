@@ -51,6 +51,7 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.bytecode.ByteCode;
 import org.biojava.utils.bytecode.CodeClass;
 import org.biojava.utils.bytecode.CodeException;
@@ -86,7 +87,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
 
   public DPCompiler(boolean dumpToDisk) {
     this.dumpToDisk = dumpToDisk;
-    classLoader = new GeneratedClassLoader(getClass().getClassLoader());
+    classLoader = new GeneratedClassLoader(ClassTools.getClassLoader(this));
   }
 
   public CellCalculatorFactory make(DP dp) {

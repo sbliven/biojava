@@ -30,6 +30,7 @@ import java.util.MissingResourceException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.biojava.utils.ClassTools;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
@@ -97,7 +98,7 @@ public class ProteinTools {
             doc = XmlDocument.createXmlDocument(is, true);*/
 
       try {
-          InputStream tablesStream = ProteinTools.class.getClassLoader().getResourceAsStream(
+          InputStream tablesStream = ClassTools.getClassLoader(ProteinTools.class).getResourceAsStream(
             "org/biojava/bio/symbol/ResidueProperties.xml"
           );
           if(tablesStream == null ) {

@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.db.SequenceDBLite;
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.Services;
 
 /**
@@ -113,7 +114,7 @@ public class Registry {
     private SequenceDBProvider getProvider(String providerName)
         throws RegistryException {
         try {
-            ClassLoader loader = getClass().getClassLoader();
+            ClassLoader loader = ClassTools.getClassLoader(this);
             Iterator implNames =
                 Services.getImplementationNames(SequenceDBProvider.class, loader).iterator();
 

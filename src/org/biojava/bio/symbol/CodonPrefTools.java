@@ -51,6 +51,7 @@ import org.biojava.bio.dist.SimpleDistribution;
 import org.biojava.bio.dist.Count;
 import org.biojava.bio.dist.IndexedCount;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.xml.XMLWriter;
 import org.biojava.utils.xml.PrettyXMLWriter;
@@ -141,7 +142,7 @@ public class CodonPrefTools
     {
         try {
             // parse the predefined codon preferences
-            InputStream prefStream = CodonPrefTools.class.getClassLoader().getResourceAsStream(
+            InputStream prefStream = ClassTools.getClassLoader(CodonPrefTools.class).getResourceAsStream(
                 "org/biojava/bio/symbol/CodonPrefTables.xml"
             );
 

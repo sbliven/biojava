@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.biojava.utils.ClassTools;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
@@ -406,7 +407,7 @@ public final class RNATools {
 
   private static void loadGeneticCodes() {
     try {
-      InputStream tablesStream = RNATools.class.getClassLoader().getResourceAsStream(
+      InputStream tablesStream = ClassTools.getClassLoader(RNATools.class).getResourceAsStream(
         "org/biojava/bio/seq/TranslationTables.xml"
       );
       if(tablesStream == null ) {

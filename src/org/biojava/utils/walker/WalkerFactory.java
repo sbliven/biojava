@@ -10,6 +10,7 @@ import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.BioException;
 import org.biojava.utils.bytecode.*;
 import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ClassTools;
 
 import java.util.*;
 import java.lang.reflect.Method;
@@ -46,7 +47,7 @@ public class WalkerFactory {
 
   private WalkerFactory(Class typeClazz) {
     walkers = new HashMap();
-    classLoader = new GeneratedClassLoader(this.getClass().getClassLoader());
+    classLoader = new GeneratedClassLoader(ClassTools.getClassLoader(this));
     typesWithParents = new ArrayList();
     this.typeClazz = typeClazz;
   }

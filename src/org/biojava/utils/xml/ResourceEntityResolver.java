@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.biojava.utils.ClassTools;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -61,7 +62,7 @@ public class ResourceEntityResolver implements EntityResolver {
     public ResourceEntityResolver(String path) {
 	super();
 	this.path = parsePath(path);
-	this.classLoader = getClass().getClassLoader();
+	this.classLoader = ClassTools.getClassLoader(this);
     }
     
     /**
@@ -72,7 +73,7 @@ public class ResourceEntityResolver implements EntityResolver {
     public ResourceEntityResolver(String[] path) {
 	super();
 	this.path = path;
-	this.classLoader = getClass().getClassLoader();
+	this.classLoader = ClassTools.getClassLoader(this);
     }
 
     /**

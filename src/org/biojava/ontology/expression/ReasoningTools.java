@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
+import org.biojava.utils.ClassTools;
 import org.biojava.ontology.format.triples.lexer.LexerException;
 import org.biojava.ontology.format.triples.parser.ParserException;
 
@@ -52,7 +53,7 @@ public class ReasoningTools {
           throws IOException, LexerException, ParserException
   {
     return loadNamespaceFromResource(resName,
-                                     ReasoningTools.class.getClassLoader());
+                                     ClassTools.getClassLoader(ReasoningTools.class));
   }
 
   public static Namespace loadNamespaceFromResource(String resName,

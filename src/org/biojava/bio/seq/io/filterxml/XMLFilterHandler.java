@@ -33,6 +33,7 @@ import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
 import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
@@ -156,7 +157,7 @@ public class XMLFilterHandler {
                     throws SAXException
                 {
                     try {
-                        return new FeatureFilter.ByClass(getClass().getClassLoader().loadClass(s));
+                        return new FeatureFilter.ByClass(ClassTools.getClassLoader(this).loadClass(s));
                     } catch (Exception ex) {
                         throw new SAXException("Couldn't load class " + s);
                     }

@@ -9,6 +9,7 @@ import javax.naming.NamingException;
 import javax.naming.Name;
 import javax.naming.directory.BasicAttributes;
 import javax.xml.parsers.SAXParserFactory;
+import org.biojava.utils.ClassTools;
 import java.util.Hashtable;
 
 /**
@@ -25,8 +26,7 @@ public class ObdaInitialContextFactory
           throws NamingException
   {
     try {
-      InputSource iSource = new InputSource(ObdaInitialContextFactory
-              .class.getClassLoader().getResourceAsStream(CORE));
+      InputSource iSource = new InputSource(ClassTools.getClassLoader(ObdaInitialContextFactory.class).getResourceAsStream(CORE));
       SAXParserFactory spf = SAXParserFactory.newInstance();
       spf.setValidating(false);
       spf.setNamespaceAware(true);

@@ -37,6 +37,7 @@ import org.biojava.bio.PropertyConstraint;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
 import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
@@ -193,7 +194,7 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
                     throws SAXException
                 {
                     try {
-                        return new PropertyConstraint.ByClass(getClass().getClassLoader().loadClass(s));
+                        return new PropertyConstraint.ByClass(ClassTools.getClassLoader(this).loadClass(s));
                     } catch (Exception ex) {
                         throw new SAXException("Couldn't find class " + s);
                     }

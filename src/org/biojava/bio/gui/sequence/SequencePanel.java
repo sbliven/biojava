@@ -270,11 +270,13 @@ public class SequencePanel
 
   private ChangeListener layoutListener = new ChangeAdapter() {
     public void postChange(ChangeEvent ce) {
+        System.err.println("Layout event");
       resizeAndValidate();
     }
   };
   private ChangeListener repaintListener = new ChangeAdapter() {
     public void postChange(ChangeEvent ce) {
+        System.err.println("Repaint event for " + hashCode());
       repaint();
     }
   };

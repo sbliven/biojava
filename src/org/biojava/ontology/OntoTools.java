@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 
+import org.biojava.utils.ClassTools;
 import org.biojava.bio.BioError;
 import org.biojava.ontology.io.TriplesParser;
 
@@ -58,7 +59,7 @@ public final class OntoTools {
     try {
       BufferedReader reader = new BufferedReader(
         new InputStreamReader(
-          OntoTools.class.getClassLoader().getResourceAsStream(
+          ClassTools.getClassLoader(OntoTools.class).getResourceAsStream(
             "org/biojava/ontology/core.pred"
           )
         )
