@@ -24,27 +24,32 @@ package org.biojava.bio.alignment;
 import java.util.*;
 import java.io.*;
 import org.biojava.bio.symbol.*;
-/** UnequalLengthAlignment
-*  Behavior<p>
-*      Two or more SymbolLists may align in such a way that there ends do not overlap<br>
-*      example                                                 <br>    
-*         1         aaaaaatttcttt                              <br>    
-*         2               tttgtttggggggc                       <br>            
-*                                                              <br>
-*     length returns                                           <br>                      
-*     symbolAt(1,1) returns 20                                 <br>                                 
-*     symbolAt(2,1) returns null -- NOT an exception           <br>                                                 
-*     symbolAt(2,99) throws NoSuchElementException             <br>                                               
-*     leftMost returns 1                                       <br>                                        
-*     rightMost returns 2                                      <br>
-*     locInAlignment (1) returns (1,13)                        <br>
-*     locInAlignment (2) returns (7,20)                        <br>
-*     alignmentRange() returns (7,13)                          <br>
-*     
-*
- * @author David Waring
-*/
 
+/**
+ * <p>UnequalLengthAlignment has the following behavior.  Two or more
+ * SymbolLists may align in such a way that their ends do not
+ * overlap.</p>
+ *
+ * <pre>
+ *      example
+ *         1         aaaaaatttcttt
+ *         2               tttgtttggggggc
+ * </pre>
+ *
+ * <p>
+ *     length returns ??                                        <br>
+ *     symbolAt(1,1) returns 20                                 <br>
+ *     symbolAt(2,1) returns null -- NOT an exception           <br>
+ *     symbolAt(2,99) throws NoSuchElementException             <br>
+ *     leftMost returns 1                                       <br>
+ *     rightMost returns 2                                      <br>
+ *     locInAlignment (1) returns (1,13)                        <br>
+ *     locInAlignment (2) returns (7,20)                        <br>
+ *     alignmentRange() returns (7,13)                          <br>
+ * </p>
+ *
+ * @author David Waring
+ */
 
 public interface UnequalLengthAlignment extends Alignment{
         

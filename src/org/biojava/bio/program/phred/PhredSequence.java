@@ -28,11 +28,11 @@ import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * Title:        PhredSequence.java<p>
- * Description:  An extension of SimpleSequence that implements Qualitative to hold Phred quality scores.
- *               <p>
- * Copyright:    Copyright (c) 2001<p>
- * Company:      AgResearch<p>
+ * <p>PhredSequence is an extension of SimpleSequence that implements
+ * Qualitative to hold Phred quality scores.</p>
+ *     
+ * <p>Copyright:    Copyright (c) 2001</p>
+ * <p>Company:      AgResearch</p>
  * @author Mark Schreiber
  * @since 1.1
  */

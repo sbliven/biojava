@@ -29,10 +29,11 @@ import org.biojava.utils.*;
 
 
 /** 
-* SimpleSLPair <p>
-* Simple implementation of AlignmentElement.
+ * <p>SimpleSimpleAlignment is a simple implementation of
+ * AlignmentElement.</p>
+ *
  * @author David Waring
-*/
+ */
 
 public class SimpleAlignmentElement implements AlignmentElement{
     

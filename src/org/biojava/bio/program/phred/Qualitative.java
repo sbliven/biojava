@@ -25,10 +25,12 @@ import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 
 /**
- * Title:        Qualitative.java
- * Description:  An interface for Classes wanting to hold quality data in symbolic form such as Phred scores<p>
- * Copyright (c) 2001<p>
- * Company:      AgResearch<p>
+ * <p>Qualitative is an interface for classes wanting to hold quality
+ * data in symbolic form such as Phred scores.<p>
+ *
+ * <p>Copyright (c) 2001</p>
+ * <p>Company:      AgResearch</p>
+ *
  * @author Mark Schreiber
  * @since 1.1
  */

@@ -22,9 +22,10 @@
 
 package org.biojava.bio.alignment;
 /**
-* QualitativeAlignment for SymbolLists that implement Qualitative
+ * QualitativeAlignment for SymbolLists that implement Qualitative.
+ *
  * @author David Waring
-*/
+ */
 
 import java.util.*;
 import java.io.*;

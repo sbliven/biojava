@@ -30,19 +30,17 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * <p>
- * Implementation of SymbolTokenization which binds symbols
- * to single unicode characters,
- * </p>
+ * <p>Implementation of SymbolTokenization which binds symbols to
+ * single unicode characters.</p>
  *
- * <p>
- * Many alphabets (and all simple built-in alphabets like DNA, RNA and Protein)
- * will have an instance of CharacterTokenization registered under the name
- * 'token', so that you could say <code>CharacterTokenization ct
- * = (CharacterTokenization) alpha.getTokenization('token');</code> and expect
- * it to work. When you construct a new instance of this class for an alphabet,
- * there will be no intial associations of Symbols with characters. It is your
- * responsibility to populate the new tokenization appropreately.
+ * <p>Many alphabets (and all simple built-in alphabets like DNA, RNA
+ * and Protein) will have an instance of CharacterTokenization
+ * registered under the name 'token', so that you could say
+ * <code>CharacterTokenization ct = (CharacterTokenization)
+ * alpha.getTokenization('token');</code> and expect it to work. When
+ * you construct a new instance of this class for an alphabet, there
+ * will be no initial associations of Symbols with characters. It is
+ * your responsibility to populate the new tokenization appropriately.
  * </p>
  *
  * @author Thomas Down

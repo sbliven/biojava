@@ -29,10 +29,11 @@ import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 
 /** 
-* ARAlignment <p>
-* Interface that defines methods for adding and removing seqeunces from an Alignment
+ * <p>ARAlignment is an interface that defines methods for adding and
+ * removing seqeunces from an Alignment.</p>
+ *
  * @author David Waring
-*/
+ */
 
 public interface ARAlignment extends Alignment{
     

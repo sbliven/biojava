@@ -21,11 +21,6 @@
 
 
 package org.biojava.bio.alignment;
-/** 
-* EditableAlignment <p>
-* Interface that defines methods for shifting bases within an Alignment
- * @author David Waring
-*/
 
 import java.util.*;
 import java.io.*;
@@ -33,18 +28,30 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 
-    /**
-    * <P>shift should works as follows. Bases within a sequence can be shifted to the right
-    * with offset > 1 to the left with offset < 1. Shifting bases will be allowed if:
-    * <li>1: Shift would remove only gaps on one side, they will be replace with gaps on the other
-    * <li>2: Shift is at the end of a sequence. It will add gaps if the range location is less
-    * than the whole sequence. 
-    * <li> Shifts that would delete bases will throw a IllegalEditException
-    * <BR> If the Alignment is an UnequalLengthAlignment it should be acceptable to shift
-    * bases in such a way as to increase (or decrease) the size of the overall length of the alignment,
-    * i.e. shift them over the edge.
-    */
-
+/**
+ * <p>EditableAlignment is an interface that defines methods for
+ * shifting bases within an Alignment.</p>
+ *
+ * <p>Shift should work as follows. Bases within a sequence can be
+ * shifted to the right with offset > 1 to the left with offset <
+ * 1. Shifting bases will be allowed if:</p>
+ *
+ * <li>1: Shift would remove only gaps on one side, they will be
+ * replace with gaps on the other.
+ *
+ * <li>2: Shift is at the end of a sequence. It will add gaps if the
+ * range location is less than the whole sequence.
+ *
+ * <li>Shifts that would delete bases will throw a
+ * IllegalEditException
+ *
+ * <p>If the Alignment is an UnequalLengthAlignment it should be
+ * acceptable to shift bases in such a way as to increase (or
+ * decrease) the size of the overall length of the alignment,
+ * i.e. shift them over the edge.</p>
+ *
+ * @author David Waring
+ */
 public interface EditableAlignment{
     
     /**

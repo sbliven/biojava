@@ -34,14 +34,16 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.utils.*;
 
 /**
- * Title:        PhredTools<p>
- * Description:  Static methods for working with phred quality data<p>
- * Copyright (c) 2001<p>
- * Company:      AgResearch<p>
+ * <p>PhredTools contains static methods for working with phred
+ * quality data.</p>
+ *
+ * <p>Copyright (c) 2001</p>
+ * <p>Company:      AgResearch</p>
+ *
  * @author Mark Schreiber
  * @since 1.1
  *
- * Note that Phred is a copyright of CodonCode Corporation
+ * Note that Phred is a copyright of CodonCode Corporation.
  */
 
 public final class PhredTools {

@@ -19,10 +19,12 @@
  *
  */
 
-/** AbstractULAlignment
-* 
+/**
+ * <p>AbstractULAlignment is an abstract base class for alignments
+ * where the constituent sequences have unequal lengths.</p>
+ * 
  * @author David Waring
-*/
+ */
 
 
 package org.biojava.bio.alignment;

@@ -30,12 +30,12 @@ import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 
 /** 
-* AlignmentElement <p>
-* This class represents a SymbolList and its location within an Alignment
-* This is for use in UnequalLengthAlignments and ARAlignments
+ * <p>AlignmentElement is a class which represents a SymbolList and its
+ * location within an Alignment This is for use in
+ * UnequalLengthAlignments and ARAlignments.</p>
+ *
  * @author David Waring
-*/
-
+ */
 
 public interface AlignmentElement{
     

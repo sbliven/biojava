@@ -29,16 +29,18 @@ import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 
 /** 
-* FlexibleAlignment <p>
-* This class implements UnequalLengthAlignment,ARAlignment and EditableAlignment<b>
-* It places no restriction on where any sequence can be in the alignment
-* so there could be gaps in the alignment. You tell it where to put the
-* sequence, it will do it. I think I will be adding an Exception NonContinuousAlignmentException.
-* STILL UNDER CONSTRUCTION. seqString does not work because there it does not seem to support tokenization
-* 'token' this is true for SimpleAlignment too.
+ * <p>FlexibleAlignment is a class which implements
+ * UnequalLengthAlignment, ARAlignment and EditableAlignment <b>It
+ * places no restriction on where any sequence can be in the alignment
+ * so there could be gaps in the alignment. You tell it where to put
+ * the sequence, it will do it. I think I will be adding an Exception
+ * NonContinuousAlignmentException. STILL UNDER
+ * CONSTRUCTION. seqString does not work because there it does not
+ * seem to support tokenization 'token' this is true for
+ * SimpleAlignment too.</b>
+ *
  * @author David Waring
-*/
-
+ */
 public class FlexibleAlignment
     extends AbstractULAlignment
     implements ARAlignment, EditableAlignment{
@@ -498,8 +500,4 @@ debug("OOOPS something is wrong " + loc.toString() + " " + absOffset);
         int max = posInSeq(label,viewLoc.getMax());
         return  new RangeLocation(min,max);
     }
-    
-         
-
-
 }
