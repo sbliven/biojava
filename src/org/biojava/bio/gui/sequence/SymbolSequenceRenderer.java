@@ -48,6 +48,8 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
     }
 
     public void paint(Graphics2D g, SequenceRenderContext sp, Rectangle2D seqBox) {
+      Shape oldClip = g.getClip();
+
       SymbolList seq = sp.getSequence();
       int direction = sp.getDirection();
       int minP;
@@ -103,5 +105,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
           //g.draw(charBox);
         }
       }
+
+      g.setClip(oldClip);
     }
 }

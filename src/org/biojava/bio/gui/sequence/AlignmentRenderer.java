@@ -24,6 +24,7 @@ package org.biojava.bio.gui.sequence;
 import java.util.*;
 import java.beans.*;
 import java.lang.reflect.*;
+import java.lang.ref.*;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -36,10 +37,13 @@ import java.util.List;
 public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListener {
     private List renderList;
     protected PropertyChangeSupport pcs;
+    protected Map cache;  // FIXME: is a simple cache the Right Way to solve
+                          // performance questions?
 
     {
 	renderList = new ArrayList();
 	pcs = new PropertyChangeSupport(this);
+	cache = new HashMap();
     }
 
     public void addRenderer(SequenceRenderer sr, Object label) {
@@ -95,6 +99,8 @@ public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListen
 		      Rectangle2D seqBox)
     {
 	double offset = 0.0;
+	Rectangle2D subSeqBox = new Rectangle2D.Double();
+
 	for (Iterator i = renderList.iterator(); i.hasNext(); ) {
 	    LabelAndRenderer lar = (LabelAndRenderer) i.next();
 	    SequenceRenderContext subctx = new SequenceRenderContextForLabel(ctx, lar.getLabel());
@@ -102,11 +108,15 @@ public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListen
 	    int dir = ctx.getDirection();
 	    if (dir == ctx.HORIZONTAL) {
 		g.translate(0.0, offset);
+		subSeqBox.setRect(seqBox.getX(), seqBox.getY() + offset,
+				  seqBox.getWidth(), depth);
 	    } else {
 		g.translate(offset, 0.0);
+		subSeqBox.setRect(seqBox.getX() + offset, seqBox.getY(),
+				  depth, seqBox.getHeight());
 	    }
 
-	    lar.getRenderer().paint(g, subctx, seqBox);
+	    lar.getRenderer().paint(g, subctx, subSeqBox);
 
 	    if (dir == ctx.HORIZONTAL) {
 		g.translate(0.0, -offset);
@@ -139,10 +149,9 @@ public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListen
 	pcs.firePropertyChange("sequenceRenderer", null, null);
     }
 
-    private static class SequenceRenderContextForLabel implements SequenceRenderContext {
+    private class SequenceRenderContextForLabel implements SequenceRenderContext {
 	private SequenceRenderContext parent;
 	private Object label;
-	private SymbolList symbolList = null; // FIXME is this safe to cache?
 
 	private SequenceRenderContextForLabel(SequenceRenderContext parent,
 					      Object label)
@@ -168,14 +177,20 @@ public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListen
 	}
 
 	public SymbolList getSequence() {
-	    if (symbolList == null) {
-		SymbolList pseq = parent.getSequence();
-		if (pseq instanceof Alignment)
-		    symbolList = ((Alignment) pseq).symbolListForLabel(label);
-		else
-		    symbolList = pseq;
+	    SymbolList pseq = parent.getSequence();
+	    if (pseq instanceof Alignment) {
+		Alignment aseq = (Alignment) pseq;
+		LabelAlignment la = new LabelAlignment(aseq, label);
+		Reference r = (Reference) cache.get(la);
+		SymbolList sl = (r == null) ? null : (SymbolList) r.get();
+		if (sl == null) {
+		    sl = aseq.symbolListForLabel(label);
+		    cache.put(la, new SoftReference(sl));
+		}
+		return sl;
+	    } else {
+		return pseq;
 	    }
-	    return symbolList;
 	}
 
 	public SequenceRenderContext.Border getLeadingBorder() {
@@ -188,6 +203,36 @@ public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListen
 
 	public Font getFont() {
 	    return parent.getFont();
+	}
+    }
+
+    private static class LabelAlignment {
+	private Alignment alignment;
+	private Object label;
+
+	private LabelAlignment(Alignment a, Object l) {
+	    alignment = a;
+	    label = l;
+	}
+
+	public Alignment getAlignment() {
+	    return alignment;
+	}
+
+	public Object getLabel() {
+	    return label;
+	}
+
+	public boolean equals(Object o) {
+	    if (! (o instanceof LabelAlignment))
+		return false;
+	    LabelAlignment la = (LabelAlignment) o;
+	    return alignment.equals(la.getAlignment()) &&
+                   label.equals(la.getLabel());
+	}
+
+	public int hashCode() {
+	    return alignment.hashCode() + label.hashCode();
 	}
     }
 
