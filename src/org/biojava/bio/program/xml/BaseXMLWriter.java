@@ -28,6 +28,10 @@ import org.xml.sax.Attributes;
  * Base XMLWriter class for writing XML representations of Java Value
  * Objects with bespoke architectures.
  *
+ * Currently reporting QNames for all attribute values as a fix
+ * for needing to defining namespaces by attributes with QNames.
+ * This may not be ideal.
+ *
  * <p>
  * Copyright &copy; 2000 Cambridge Antibody Technology.
  * All Rights Reserved.
@@ -42,7 +46,7 @@ import org.xml.sax.Attributes;
  *</ul>
  *
  * @author Cambridge Antibody Technology (CAT)
- * @version 1.0
+ * @version 1.01
  *
  */
 public class BaseXMLWriter {
@@ -141,7 +145,8 @@ public class BaseXMLWriter {
             oSpaceStore.append(" ");
         for (i = 0; i < attributes.getLength() - 1; i++)
         {
-            oAttName = attributes.getLocalName(i);
+            //oAttName = attributes.getLocalName(i);
+            oAttName = attributes.getQName(i);
             oAttValue = attributes.getValue(i);
             oStr.append(" ");
             if (i > 0)
@@ -152,7 +157,9 @@ public class BaseXMLWriter {
             oStr.append("\"");
             oStr.append(nl());
         }
-        oAttName = attributes.getLocalName(i);
+
+	//oAttName = attributes.getLocalName(i);
+	oAttName = attributes.getQName(i);
         oAttValue = attributes.getValue(i);
         oStr.append(" ");
         if (attributes.getLength() > 1)
@@ -190,7 +197,8 @@ public class BaseXMLWriter {
         oStr.append(string);
         for (int i = 0; i < attributes.getLength(); i++)
         {
-            oAttName = attributes.getLocalName(i);
+            //oAttName = attributes.getLocalName(i);
+            oAttName = attributes.getQName(i);
             oAttValue = attributes.getValue(i);
             oStr.append(" ");
             oStr.append(oAttName);
