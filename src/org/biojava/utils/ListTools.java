@@ -1,6 +1,7 @@
 package org.biojava.utils;
 
 import java.util.*;
+import java.io.*;
 
 public class ListTools {
   public static List createList(List l) {
@@ -37,7 +38,7 @@ public class ListTools {
     }
   }
   
-  public static class Doublet extends AbstractList {
+  public static class Doublet extends AbstractList implements Serializable {
     private Object a;
     private Object b;
     
@@ -123,7 +124,7 @@ public class ListTools {
     }
   }
   
-  public static class Triplet extends AbstractList {
+  public static class Triplet extends AbstractList implements Serializable {
     private Object a;
     private Object b;
     private Object c;
