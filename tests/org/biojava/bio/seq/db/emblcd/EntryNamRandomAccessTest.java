@@ -56,7 +56,7 @@ public class EntryNamRandomAccessTest extends TestCase
         URL url = EntryNamRandomAccessTest.class.getResource("entrynam.idx");
         File  f = new File(url.getFile());
 
-        rand =  new EntryNamRandomAccess(f, 300, 30, 30);
+        rand = new EntryNamRandomAccess(f, 300, 30, 30);
 
         // First 10 sequence IDs.
         seqID   = new String [] {"NMA0001", "NMA0003", "NMA0004", "NMA0007", "NMA0011",
@@ -69,11 +69,6 @@ public class EntryNamRandomAccessTest extends TestCase
 
         // First 10 sequence file numbers.
         fileNum = new int [] { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3 };
-    }
-
-    protected void tearDown() throws Exception
-    {
-        rand.close();
     }
 
     public void testFindRecord() throws IOException

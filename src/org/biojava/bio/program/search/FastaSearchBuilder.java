@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.search.SeqSimilaritySearchHit;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.search.SeqSimilaritySearchSubHit;
@@ -381,7 +381,7 @@ public class FastaSearchBuilder implements SearchBuilder
      */
     private Annotation makeAnnotation(final Map preAnnotation)
     {
-	Annotation annotation = new SimpleAnnotation();
+	Annotation annotation = new SmallAnnotation();
 	Set  annotationKeySet = preAnnotation.keySet();
 
 	for (Iterator ksi = annotationKeySet.iterator(); ksi.hasNext();)
@@ -395,6 +395,7 @@ public class FastaSearchBuilder implements SearchBuilder
 	    }
 	    catch (ChangeVetoException cve)
 	    {
+                System.err.println("Failed to add mapping to Annotation:");
 		cve.printStackTrace();
 	    }
 	}

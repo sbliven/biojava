@@ -56,11 +56,6 @@ public class DivisionLkpReaderTest extends TestCase
         div = new DivisionLkpReader(bis);
     }
 
-    protected void tearDown() throws Exception
-    {
-        div.close();
-    }
-
     public void testReadFileLength()
     {
         assertTrue(366 == div.readFileLength());

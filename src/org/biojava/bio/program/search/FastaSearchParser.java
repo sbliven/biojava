@@ -126,7 +126,7 @@ public class FastaSearchParser implements SearchParser
 	while ((line = reader.readLine()) != null)
 	{
 	    lineNumber++;
-	    // System.out.println("Parser working on:" + line);
+	    // System.err.println("Parser working on:" + line);
 
 	    // This token indicates the end of the formatted search
 	    // data. Some outputs don't have any alignment consensus

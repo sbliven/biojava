@@ -84,11 +84,6 @@ public class EmblCDROMIndexStoreTest extends TestCase
                                                    parser);
     }
 
-    protected void tearDown() throws Exception
-    {
-        ((EmblCDROMIndexStore) emblCDIndexStore).close();
-    }
-
     public void testCommit()
     {
         try

@@ -73,11 +73,6 @@ public class EntryNamIdxReaderTest extends TestCase
         fileNum = new int [] { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3 };
     }
 
-    protected void tearDown() throws Exception
-    {
-        ent.close();
-    }
-
     public void testReadFileLength()
     {
         assertTrue(1200 == ent.readFileLength());
