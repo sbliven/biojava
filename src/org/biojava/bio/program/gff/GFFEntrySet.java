@@ -201,6 +201,26 @@ public class GFFEntrySet {
   public GFFDocumentHandler getAddHandler() {
     return new EntrySetBuilder();
   }
+  
+  /**
+   * Write all records in this set out to a handler.
+   *
+   * @param handler  the GFFDocumentHandler to inform of the records
+   */
+  public void streamRecords(GFFDocumentHandler handler) {
+      handler.startDocument("");
+      
+      for(Iterator i = lineIterator(); i.hasNext(); ) {
+          Object line = i.next();
+          if(line instanceof String) {
+              handler.commentLine((String) line);
+          } else {
+              handler.recordLine((GFFRecord) line);
+          }
+      }
+      
+      handler.endDocument();
+  }
 
   /**
    * The type of object returned by <span class="method">getAddHandler</span>.

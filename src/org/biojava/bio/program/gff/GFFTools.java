@@ -80,10 +80,7 @@ public class GFFTools {
     throws IOException
   {
     GFFWriter writer = new GFFWriter(new PrintWriter(new FileWriter(fileName)));
-    for(Iterator line = ents.lineIterator(); line.hasNext();){
-      writer.recordLine((GFFRecord)line.next());
-    }
-    writer.endDocument();
+    ents.streamRecords(writer);
   }
 
   /**
