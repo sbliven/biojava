@@ -31,8 +31,14 @@ import java.text.DecimalFormat;
 import org.biojava.utils.xml.*;
 import java.io.IOException ;
 
+/** methods to convert a structure object into different file formats
+ * @author Andreas Prlic
+ * @since 1.4
+ */
 public class FileConvert {
     Structure structure ;
+
+    //static String DEFAULTCHAIN = "_" ;
 
     public FileConvert(Structure struc) {
 	structure = struc ;
@@ -59,7 +65,8 @@ public class FileConvert {
     }
 
 
-
+    /** convert a structure into a PDB file
+     */
     public String toPDB() {
 	
 
@@ -68,21 +75,24 @@ public class FileConvert {
 	
 	DecimalFormat d3 = new DecimalFormat("0.000");
 	DecimalFormat d2 = new DecimalFormat("0.00");
-	
+
 	// do for all models
 	int nrModels = structure.nrModels() ;
+	if ( structure.isNmr()) {
+	    str.append("EXPDTA    NMR, "+ nrModels+" STRUCTURES\n") ;
+	}
 	for (int m = 0 ; m < nrModels ; m++) {
-	    ArrayList model = structure.getModel(m);
+	    ArrayList model = (ArrayList)structure.getModel(m);
 	    // todo support NMR structures ...
-	    //if ( structure.isNMR()) {
-	    //str += "MODEL  " + (m+1);
-	    //}
+	    if ( structure.isNmr()) {
+		str.append("MODEL      " + (m+1)+"\n");
+	    }
 	    // do for all chains
 	    int nrChains = model.size();
 	    for ( int c =0; c<nrChains;c++) {
 		Chain  chain   = (Chain)model.get(c);
 		String chainID = chain.getName();
-
+		//if ( chainID.equals(DEFAULTCHAIN) ) chainID = " ";
 		// do for all groups
 		int nrGroups = chain.getLength();
 		for ( int h=0; h<nrGroups;h++){
@@ -135,6 +145,11 @@ public class FileConvert {
 		    }
 		}
 	    }
+	    
+	    if ( structure.isNmr()) {
+		str.append("ENDMDL\n");
+	    }
+
 
 	}
     
@@ -143,14 +158,16 @@ public class FileConvert {
 	return str.toString() ;
     }
 
-    // convert a protein Structure to a DAS Structure XML response .
+    /** convert a protein Structure to a DAS Structure XML response .
+     *
+     */
     public void toDASStructure(XMLWriter xw)
 	throws IOException 
     {
 
 	/*xmlns="http://www.sanger.ac.uk/xml/das/2004/06/17/dasalignment.xsd" xmlns:align="http://www.sanger.ac.uk/xml/das/2004/06/17/alignment.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:schemaLocation="http://www.sanger.ac.uk/xml/das/2004/06/17/dasalignment.xsd http://www.sanger.ac.uk/xml/das//2004/06/17/dasalignment.xsd"*/
 
-	HashMap header = structure.getHeader();
+	HashMap header = (HashMap) structure.getHeader();
 	
 	xw.openTag("object");
 	xw.attribute("dbAccessionId",structure.getPDBCode());	    
@@ -210,7 +227,7 @@ public class FileConvert {
 	
 	// do connectivity for all chains:
 	
-	ArrayList cons = structure.getConnections();
+	ArrayList cons = (ArrayList) structure.getConnections();
 	for (int cnr = 0; cnr<cons.size();cnr++){
 		
 
