@@ -149,25 +149,36 @@ class FeatureFetcher implements Fetcher {
 	    // huc.setRequestProperty("Accept-Encoding", "gzip");
 
 	    fURL = new URL(dataSource, "features");
-	    huc = (HttpURLConnection) fURL.openConnection();
-	    huc.setRequestMethod("POST");
-	    huc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-	    huc.setRequestProperty("Accept-Encoding", "gzip");
-	    huc.setDoOutput(true);
-	    OutputStream os = huc.getOutputStream();
-	    PrintStream ps = new PrintStream(os);
-	    ps.print(queryString);
-	    ps.close();
-
-	    huc.connect();
-
-	    // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
-	    if (status == 0) {
-		throw new BioRuntimeException("Not a DAS server: " + fURL.toString());
-	    } else if (status != 200) {
-		throw new BioRuntimeException("DAS error (status code = " + status + ") fetching " + fURL.toString() + " with query " + queryString);
-	    }
+        {
+            int tries = 0;
+            
+            while(true) {
+                huc = (HttpURLConnection) fURL.openConnection();
+                huc.setRequestMethod("POST");
+                huc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                huc.setRequestProperty("Accept-Encoding", "gzip");
+                huc.setDoOutput(true);
+                OutputStream os = huc.getOutputStream();
+                PrintStream ps = new PrintStream(os);
+                ps.print(queryString);
+                ps.close();
+                
+                huc.connect();
+                tries++;
+                
+                // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+                int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
+                if(status == 200) {
+                    break;
+                } else if(tries >= 3) {
+                    if (status == 0) {
+                        throw new BioRuntimeException("Not a DAS server: " + fURL.toString());
+                    } else if (status != 200) {
+                        throw new BioRuntimeException("DAS error (status code = " + status + ") fetching " + fURL.toString() + " with query " + queryString);
+                    }
+                }
+            }
+        }
 
             // determine if I'm getting a gzipped reply
             String contentEncoding = huc.getContentEncoding();
