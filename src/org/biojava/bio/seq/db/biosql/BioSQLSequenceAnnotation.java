@@ -65,6 +65,7 @@ class BioSQLSequenceAnnotation
 	try {
 	    Connection conn = seqDB.getPool().takeConnection();
 	    underlyingAnnotation = new SmallAnnotation();
+            underlyingAnnotation.setProperty("bioentry_id", new Integer(bioentry_id));
 
 	    //
 	    // Handle all the hacky special cases first
