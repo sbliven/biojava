@@ -122,6 +122,7 @@ class FeatureRequestManager {
 	    URL fURL = new URL(dataSourceURL, "features");
 	    HttpURLConnection huc = (HttpURLConnection) fURL.openConnection();
 	    huc.setRequestMethod("POST");
+	    huc.setRequestProperty("Content-Type", "text/xml");
 	    huc.setDoOutput(true);
 
 	    OutputStream os = huc.getOutputStream();
