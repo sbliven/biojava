@@ -32,7 +32,7 @@ import junit.framework.TestCase;
  * tests ProjectedFeatureHolder and SimpleAssembly.
  *
  * @author Thomas Down
- * @since 1.2
+ * @since 1.3
  */
 
 public class SubSequenceTest extends TestCase
@@ -60,6 +60,15 @@ public class SubSequenceTest extends TestCase
 	sft.location = new RangeLocation(10, 12);
 	seq.createFeature(sft);
 
+	sft.location = new RangeLocation(5, 13);
+	Feature choppedFeature = seq.createFeature(sft);
+
+	sft.location = new RangeLocation(5,6);
+	choppedFeature.createFeature(sft);
+	
+	sft.location = new RangeLocation(9,10);
+	choppedFeature.createFeature(sft);
+
 	subseq = new SubSequence(seq, 8, 14);
     }
 
@@ -73,16 +82,38 @@ public class SubSequenceTest extends TestCase
     public void testFeatureClipping()
         throws Exception
     {
-	assertEquals(subseq.countFeatures(), 1);
+	assertEquals(subseq.countFeatures(), 2);
     }
 
     public void testFeatureProjection()
         throws Exception
     {
-	Feature f = (Feature) subseq.features().next();
+	Feature f = (Feature) subseq.filter(new FeatureFilter.Not(new FeatureFilter.ByClass(RemoteFeature.class)), false).features().next();
 	Location fl = f.getLocation();
 	assertEquals(fl.getMin(), 3);
 	assertEquals(fl.getMax(), 5);
+    }
+
+    public void testRemoteFeature()
+        throws Exception
+    {
+	RemoteFeature f = (RemoteFeature) subseq.filter(new FeatureFilter.ByClass(RemoteFeature.class), false).features().next();
+	Location fl = f.getLocation();
+	assertEquals(fl.getMin(), 1);
+	assertEquals(fl.getMax(), 6);
+	assertEquals(f.getRemoteFeature().getSequence().getName(), seq.getName());
+    }
+
+    public void testRemoteChildFeature()
+        throws Exception
+    {
+	Feature f = (RemoteFeature) subseq.filter(new FeatureFilter.ByClass(RemoteFeature.class), false).features().next();
+	assertEquals(f.countFeatures(), 1);
+	
+	Feature cf = (Feature) f.features().next();
+	Location cfl = cf.getLocation();
+	assertEquals(cfl.getMin(), 2);
+	assertEquals(cfl.getMax(), 3);
     }
 
     private boolean compareSymbolList(SymbolList sl1, SymbolList sl2) {
