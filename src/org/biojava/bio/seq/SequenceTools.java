@@ -29,6 +29,12 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.impl.*;
 
 public final class SequenceTools {
+  public static Sequence createSequence(
+    SymbolList syms, String uri, String name, Annotation ann
+  ) {
+    return new SimpleSequence(syms, uri, name, ann);
+  }
+
   public static Sequence subSequence(Sequence seq, int start, int end)
   throws IndexOutOfBoundsException {
     return new SubSequence(seq, start, end);

@@ -42,8 +42,10 @@ implements SequenceRenderer {
     }
     
     try {
-      int min = ctxt.getRange().getMin();
-      int max = ctxt.getRange().getMax();
+      Rectangle2D clip = g.getClip().getBounds2D();
+      
+      int min = Math.max(ctxt.getRange().getMin(), ctxt.graphicsToSequence(clip.getMinX()));
+      int max = Math.min(ctxt.getRange().getMax(), ctxt.graphicsToSequence(clip.getMaxX()));;
       int[] baseCalls = trace.getBasecalls();
       int[] traceA = trace.getTrace(DNATools.a());
       int[] traceG = trace.getTrace(DNATools.g());
@@ -85,11 +87,13 @@ implements SequenceRenderer {
       
       double scale = ctxt.getScale() / (double) (maxT - minT);
       
+      double stg = ctxt.sequenceToGraphics(pos - 1);
       for(int i = minT; i < maxT; i++) {
+        int j = i - minT;
         line.setLine(
-          ctxt.sequenceToGraphics(pos - 1) + scale * (0.5 + i - minT),
+          stg + scale * (0.5 + j),
           trace[i] * depthScale,
-          ctxt.sequenceToGraphics(pos - 1) + scale * (0.5 + i + 1 - minT),
+          stg + scale * (0.5 + j + 1),
           trace[i + 1] * depthScale
         );
         
