@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.ViewSequence;
+import org.biojava.bio.seq.impl.ViewSequence;
 
 /**
  * SequenceDB implementation that returns new SequenceView instances

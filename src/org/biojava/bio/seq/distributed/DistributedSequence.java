@@ -29,11 +29,8 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.SmallAnnotation;
-import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.FeatureFilter;
-import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.MergeFeatureHolder;
-import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.Symbol;
@@ -53,195 +50,192 @@ import org.biojava.utils.ChangeVetoException;
  */
 
 class DistributedSequence
-  extends
-    AbstractChangeable
-  implements
-    Sequence
-{
-    private DistributedSequenceDB db;
-    private DistDataSource seqSource;
-    private Set featureSources;
-    private String id;
+        extends
+        AbstractChangeable
+        implements
+        Sequence {
+  private DistributedSequenceDB db;
+  private DistDataSource seqSource;
+  private Set featureSources;
+  private String id;
 
-    private SymbolList symbols;
-    private MergeFeatureHolder mfh;
+  private SymbolList symbols;
+  private MergeFeatureHolder mfh;
 
-    private transient ChangeListener dsListener;
+  private transient ChangeListener dsListener;
 
-    DistributedSequence(String id,
-			DistributedSequenceDB db,
-			DistDataSource seqSource,
-			Set featureSources)
-    {
-	//System.err.println("*** Constructing DistributedSequence: " + id);
+  DistributedSequence(String id,
+                      DistributedSequenceDB db,
+                      DistDataSource seqSource,
+                      Set featureSources) {
+//System.err.println("*** Constructing DistributedSequence: " + id);
 
-	this.id = id;
-	this.seqSource = seqSource;
-	this.featureSources = featureSources;
-	this.db = db;
-	installListener();
+    this.id = id;
+    this.seqSource = seqSource;
+    this.featureSources = featureSources;
+    this.db = db;
+    installListener();
+  }
+
+  private void installListener() {
+    dsListener = new ChangeListener() {
+      public void preChange(ChangeEvent cev)
+              throws ChangeVetoException {
+        if (cev.getPrevious() == seqSource) {
+          throw new ChangeVetoException(cev, "Can't remove this datasource, since it is providing sequence data");
+        }
+
+        if (hasListeners()) {
+          getChangeSupport(ChangeType.UNKNOWN).firePreChangeEvent(makeChainedEvent(cev));
+        }
+      }
+
+      public void postChange(ChangeEvent cev) {
+        if (cev.getType() == DistributedSequenceDB.DATASOURCE_SELECTION) {
+          if (cev.getChange() != null && cev.getPrevious() == null) {
+            DistDataSource added = (DistDataSource) cev.getChange();
+            featureSources.add(added);
+          } else if (cev.getChange() == null && cev.getPrevious() != null) {
+            DistDataSource removed = (DistDataSource) cev.getChange();
+            featureSources.remove(removed);
+          }
+        }
+
+        mfh = null;  // C'mon, we can do better than that...
+
+        if (hasListeners()) {
+          getChangeSupport(ChangeType.UNKNOWN).firePostChangeEvent(makeChainedEvent(cev));
+        }
+      }
+
+      private ChangeEvent makeChainedEvent(ChangeEvent cev) {
+        return new ChangeEvent(DistributedSequence.this,
+                               FeatureHolder.FEATURES,
+                               null, null,
+                               cev);
+      }
+    };
+    db.addChangeListener(dsListener, DistributedSequenceDB.DATASOURCE);
+  }
+
+  public DistributedSequenceDB getSequenceDB() {
+    return db;
+  }
+
+  public String getName() {
+    return id;
+  }
+
+  public String getURN() {
+    return id;
+  }
+
+  public Annotation getAnnotation() {
+    return Annotation.EMPTY_ANNOTATION;
+  }
+
+
+  public Alphabet getAlphabet() {
+    return getSymbols().getAlphabet();
+  }
+
+  public int length() {
+    return getSymbols().length();
+  }
+
+  public Symbol symbolAt(int i) {
+    return getSymbols().symbolAt(i);
+  }
+
+  public SymbolList subList(int start, int end) {
+    return getSymbols().subList(start, end);
+  }
+
+  public List toList() {
+    return getSymbols().toList();
+  }
+
+  public Iterator iterator() {
+    return getSymbols().iterator();
+  }
+
+  public String seqString() {
+    return getSymbols().seqString();
+  }
+
+  public String subStr(int start, int end) {
+    return getSymbols().subStr(start, end);
+  }
+
+  public void edit(Edit e)
+          throws ChangeVetoException {
+    throw new ChangeVetoException("Can't edit sequence in EGADS -- or at least not yet...");
+  }
+
+  public Iterator features() {
+    return getFeatures().features();
+  }
+
+  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+    return getFeatures().filter(ff, recurse);
+  }
+
+  public FeatureHolder filter(FeatureFilter ff) {
+    return getFeatures().filter(ff);
+  }
+
+  public void removeFeature(Feature f)
+          throws ChangeVetoException {
+    throw new ChangeVetoException("Can't edit sequence in EGADS -- or at least not yet...");
+  }
+
+  public Feature createFeature(Feature.Template f)
+          throws ChangeVetoException {
+    throw new ChangeVetoException("Can't edit sequence in EGADS -- or at least not yet...");
+  }
+
+  public boolean containsFeature(Feature f) {
+    return getFeatures().containsFeature(f);
+  }
+
+  public int countFeatures() {
+    return getFeatures().countFeatures();
+  }
+
+  protected SymbolList getSymbols() {
+    if (symbols == null) {
+      try {
+        symbols = seqSource.getSequence(id);
+      } catch (BioException ex) {
+        throw new BioRuntimeException(ex);
+      }
     }
 
-    private void installListener() {
-	dsListener = new ChangeListener() {
-		public void preChange(ChangeEvent cev)
-		    throws ChangeVetoException
-		{
-		    if (cev.getPrevious() == seqSource) {
-			throw new ChangeVetoException(cev, "Can't remove this datasource, since it is providing sequence data");
-		    }
+    return symbols;
+  }
 
-		    if (hasListeners()) {
-			getChangeSupport(ChangeType.UNKNOWN).firePreChangeEvent(makeChainedEvent(cev));
-		    }
-		}
-
-		public void postChange(ChangeEvent cev) {
-		    if (cev.getType() == DistributedSequenceDB.DATASOURCE_SELECTION) {
-			if (cev.getChange() != null && cev.getPrevious() == null) {
-			    DistDataSource added = (DistDataSource) cev.getChange();
-			    featureSources.add(added);
-			} else if (cev.getChange() == null && cev.getPrevious() != null) {
-			    DistDataSource removed = (DistDataSource) cev.getChange();
-			    featureSources.remove(removed);
-			}
-		    }
-
-		    mfh = null;  // C'mon, we can do better than that...
-
-		    if (hasListeners()) {
-			getChangeSupport(ChangeType.UNKNOWN).firePostChangeEvent(makeChainedEvent(cev));
-		    }
-		}
-
-		private ChangeEvent makeChainedEvent(ChangeEvent cev) {
-		    return new ChangeEvent(DistributedSequence.this,
-					   FeatureHolder.FEATURES,
-					   null, null,
-					   cev);
-		}
-	    };
-	db.addChangeListener(dsListener, DistributedSequenceDB.DATASOURCE);    
+  protected FeatureHolder getFeatures() {
+    if (mfh == null) {
+      mfh = new MergeFeatureHolder();
+      for (Iterator i = featureSources.iterator(); i.hasNext();) {
+        DistDataSource dds = (DistDataSource) i.next();
+        try {
+          Annotation ann = new SmallAnnotation();
+          ann.setProperty("source", dds);
+          mfh.addFeatureHolder(
+                  new ProjectedFeatureHolder(
+                          new DistProjectionContext(dds.getFeatures(id, FeatureFilter.all, false),
+                                                    this,
+                                                    ann)));
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
+      }
     }
+    return mfh;
+  }
 
-    public DistributedSequenceDB getSequenceDB() {
-	return db;
-    }
-
-    public String getName() {
-	return id;
-    }
-
-    public String getURN() {
-	return id;
-    }
-
-    public Annotation getAnnotation() {
-	return Annotation.EMPTY_ANNOTATION;
-    }
-    
-
-    public Alphabet getAlphabet() {
-	return getSymbols().getAlphabet();
-    }
-
-    public int length() {
-	return getSymbols().length();
-    }
-
-    public Symbol symbolAt(int i) {
-	return getSymbols().symbolAt(i);
-    }
-
-    public SymbolList subList(int start, int end) {
-	return getSymbols().subList(start, end);
-    }
-
-    public List toList() {
-	return getSymbols().toList();
-    }
-
-    public Iterator iterator() {
-	return getSymbols().iterator();
-    }
-
-    public String seqString() {
-	return getSymbols().seqString();
-    }
-
-    public String subStr(int start, int end) {
-	return getSymbols().subStr(start, end);
-    }
-
-    public void edit(Edit e) 
-        throws ChangeVetoException 
-    {
-	throw new ChangeVetoException("Can't edit sequence in EGADS -- or at least not yet...");
-    }
-
-    public Iterator features() {
-	return getFeatures().features();
-    }
-
-    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-        return getFeatures().filter(ff, recurse);
-    }
-
-    public FeatureHolder filter(FeatureFilter ff) {
-        return getFeatures().filter(ff);
-    }
-    
-    public void removeFeature(Feature f) 
-        throws ChangeVetoException
-    {
-	throw new ChangeVetoException("Can't edit sequence in EGADS -- or at least not yet...");
-    }
-
-    public Feature createFeature(Feature.Template f)
-        throws ChangeVetoException
-    {
-	throw new ChangeVetoException("Can't edit sequence in EGADS -- or at least not yet...");
-    }
-
-    public boolean containsFeature(Feature f) {
-	return getFeatures().containsFeature(f);
-    }
-
-    public int countFeatures() {
-	return getFeatures().countFeatures();
-    }
-
-    protected SymbolList getSymbols() {
-	if (symbols == null) {
-	    try {
-		symbols = seqSource.getSequence(id);
-	    } catch (BioException ex) {
-		throw new BioRuntimeException(ex);
-	    }
-	}
-
-	return symbols;
-    }
-
-    protected FeatureHolder getFeatures() {
-	if (mfh == null) {
-	    mfh = new MergeFeatureHolder();
-	    for (Iterator i = featureSources.iterator(); i.hasNext(); ) {
-		DistDataSource dds = (DistDataSource) i.next();
-		try {
-		    Annotation ann = new SmallAnnotation();
-		    ann.setProperty("source", dds);
-		    mfh.addFeatureHolder(new DistProjectedFeatureHolder(dds.getFeatures(id, FeatureFilter.all, false),
-									this, ann));
-		} catch (Exception ex) {
-		    ex.printStackTrace();
-		}
-	    }
-	}
-	return mfh;
-    }
-    
-    public FeatureFilter getSchema() {
-        return FeatureFilter.all; // FIXME!
-    }
+  public FeatureFilter getSchema() {
+    return FeatureFilter.all; // FIXME!
+  }
 }

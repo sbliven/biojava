@@ -398,7 +398,7 @@ public class ChunkedSymbolListFactory
             // no.  The only chunk if any is at headChunk.
             if (headChunkPos == 0) {
                 // no symbols!
-                return new SymbolList.EmptySymbolList();
+                return SymbolList.EMPTY_LIST;
             }
             else {
                 // we do have ONE chunk to deal with.

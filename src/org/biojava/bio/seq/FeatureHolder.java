@@ -118,9 +118,10 @@ public interface FeatureHolder extends Changeable {
      *
      * @throws ChangeVetoException if this FeatureHolder does not support
      *         feature removal or if the change was vetoed
+     * @throws BioException if there was an error removing the feature
      */
     public void removeFeature(Feature f)
-        throws ChangeVetoException;
+        throws ChangeVetoException, BioException;
     
     /**
      * Check if the feature is present in this holder.

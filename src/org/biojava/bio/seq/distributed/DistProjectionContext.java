@@ -31,7 +31,8 @@ import org.biojava.bio.MergeAnnotation;
 import org.biojava.bio.seq.ComponentFeature;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.ProjectedFeatureHolder;
+import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
+import org.biojava.bio.seq.projection.ReparentContext;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -47,26 +48,16 @@ import org.biojava.utils.ChangeVetoException;
  */
 
 
-class DistProjectedFeatureHolder extends ProjectedFeatureHolder {
+class DistProjectionContext
+        extends ReparentContext {
     private Annotation annotation;
     private Map componentFeatureCache = new HashMap();
     
-    /**
-     * Construct a new FeatureHolder which projects a set of features
-     * into a new coordinate system.  If <code>translation</code> is 0
-     * and <code>oppositeStrand</code> is <code>false</code>, the features
-     * are simply reparented without any transformation.
-     *
-     * @param fh The set of features to project.
-     * @param parent The FeatureHolder which is to act as parent
-     *               for the projected features.
-     */
-
-    public DistProjectedFeatureHolder(FeatureHolder fh,
+    public DistProjectionContext(FeatureHolder fh,
 				                      FeatureHolder parent,
                                       Annotation annotation)
     {
-        super(fh, parent, 0, false);
+        super(fh, parent);
         this.annotation = annotation;
     }
     

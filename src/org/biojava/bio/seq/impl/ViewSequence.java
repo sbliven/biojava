@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.impl;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,6 +32,9 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.OverlayAnnotation;
 import org.biojava.bio.seq.impl.FeatureImpl;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.projection.ReparentContext;
+import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.Location;
@@ -45,17 +48,22 @@ import org.biojava.utils.Unchangeable;
  * features and annotations to be overlaid onto an existing
  * Sequence without modifying it.
  *
+ * @for.user
+ * You will almost certainly want to be calling
+ * @{link org.biojava.bio.seq.SequenceTools.view} instead of instantiating this
+ * class directly.
+ *
  * @author Thomas Down
  * @author Matthew Pocock
  */
 
 public class ViewSequence
   extends
-    Unchangeable
+        Unchangeable
   implements
-    Sequence,
-    RealizingFeatureHolder,
-    Serializable
+        Sequence,
+        RealizingFeatureHolder,
+        Serializable
 {
     private static final long serialVersionUID = 9866447;
     /**
@@ -104,33 +112,34 @@ public class ViewSequence
 	this.featureRealizer = FeatureImpl.DEFAULT;
     }
 
-    /**
-     * Construct a view onto an existing sequence and give it a new
-     * name.
-     */
-    public ViewSequence(Sequence seq, String name) {
-        this.name = name;
+  /**
+   * Construct a view onto an existing sequence and give it a new
+   * name.
+   */
+  public ViewSequence(Sequence seq, String name) {
+    this.name = name;
 
-	seqDelegate = seq;
-	addedFeatures = new ViewSeqSimpleFeatureHolder();
-	exposedFeatures = new ViewSeqMergeFeatureHolder();
-	try {
-	    exposedFeatures.addFeatureHolder(new ProjectedFeatureHolder(seqDelegate, this, 0, false));
-	    exposedFeatures.addFeatureHolder(addedFeatures);
-	} catch (ChangeVetoException cve) {
-	    throw new BioError(cve, "Modification of hidden featureholder vetoed!");
-	}
-
-	urn = seqDelegate.getURN();
-	if (urn.indexOf('?') >= 0)
-	    urn = urn + "&view=" + hashCode();
-	else
-	    urn = urn + "?view=" + hashCode();
-
-	anno = new OverlayAnnotation(seqDelegate.getAnnotation());
-	
-	featureRealizer = FeatureImpl.DEFAULT;
+    seqDelegate = seq;
+    addedFeatures = new ViewSeqSimpleFeatureHolder();
+    exposedFeatures = new ViewSeqMergeFeatureHolder();
+    try {
+      exposedFeatures.addFeatureHolder(new ProjectedFeatureHolder(
+              new ReparentContext(this, seqDelegate)));
+      exposedFeatures.addFeatureHolder(addedFeatures);
+    } catch (ChangeVetoException cve) {
+      throw new BioError("Modification of hidden featureholder vetoed!", cve);
     }
+
+    urn = seqDelegate.getURN();
+    if (urn.indexOf('?') >= 0)
+      urn = urn + "&view=" + hashCode();
+    else
+      urn = urn + "?view=" + hashCode();
+
+    anno = new OverlayAnnotation(seqDelegate.getAnnotation());
+
+    featureRealizer = FeatureImpl.DEFAULT;
+  }
 
     /**
      * Construct a view onto an existing sequence which takes on that
@@ -233,7 +242,7 @@ public class ViewSequence
      */
 
     public void removeFeature(Feature f)
-        throws ChangeVetoException 
+        throws ChangeVetoException
     {
       addedFeatures.removeFeature(f);
     }
@@ -277,19 +286,6 @@ public class ViewSequence
       Feature f = realizeFeature(this, template);
       addedFeatures.addFeature(f);
       return f;
-    }
-
-    private static boolean containsRecurse(FeatureHolder fh, Feature f) {
-	for (Iterator i = fh.features(); i.hasNext(); ) {
-	    if (i.next() == f)
-		return true;
-	}
-	
-	for (Iterator i = fh.features(); i.hasNext(); ) {
-	    if (containsRecurse((FeatureHolder) i.next(), f))
-		return true;
-	}
-	return false;
     }
 
     public FeatureHolder getAddedFeatures() {

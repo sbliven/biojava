@@ -62,13 +62,14 @@ public class SimpleAssembly
     Sequence,
     RealizingFeatureHolder
 {
-    private String name;
-    private String uri;
-    private Annotation annotation = new SimpleAnnotation();
-    private SimpleFeatureHolder features;
-    private AssembledSymbolList assembly;
+    private final String name;
+    private final String uri;
+    private final Annotation annotation = new SimpleAnnotation();
+    private final SimpleFeatureHolder features;
+    private final AssembledSymbolList assembly;
 
-    private FeatureRealizer featureRealizer = org.biojava.bio.seq.impl.FeatureImpl.DEFAULT;
+    private final FeatureRealizer featureRealizer = org.biojava.bio.seq.impl.FeatureImpl.DEFAULT;
+
     protected transient AnnotationForwarder annotationForwarder;
 
     {
@@ -234,24 +235,26 @@ public class SimpleAssembly
     //
 
     public Feature realizeFeature(FeatureHolder fh, Feature.Template temp)
-        throws BioException
-    {
-	if (temp instanceof ComponentFeature.Template) {
-	    if (fh != this) {
-		throw new BioException("ComponentFeatures can only be attached directly to SimpleAssembly objects");
-	    }
-	    ComponentFeature.Template cft = (ComponentFeature.Template) temp;
-	    return new SimpleComponentFeature(this, cft);
-	} else {
-	    FeatureHolder gopher = fh;
-	    while (gopher instanceof Feature) {
-		if (gopher instanceof ComponentFeature) {
-		    throw new BioException("Cannot [currently] realize features on components of SimpleAssemblies");
-		}
-		gopher = ((Feature) gopher).getParent();
-	    }
-	    return featureRealizer.realizeFeature(this, fh, temp);
-	}
+            throws BioException {
+      if (temp instanceof ComponentFeature.Template) {
+        if (fh != this) {
+          throw new BioException("ComponentFeatures can only be attached directly to SimpleAssembly objects");
+        }
+        ComponentFeature.Template cft = (ComponentFeature.Template) temp;
+        return new SimpleComponentFeature(this, cft);
+      } else {
+        FeatureHolder gopher = fh;
+        while (gopher instanceof Feature) {
+          if (gopher instanceof ComponentFeature) {
+            // fixme: this should delegate onto the ComponentFeature, which
+            // should in turn delegate to its ProjectedFeatureHolder and let
+            // the projection magic sort this out
+            throw new BioException("Cannot [currently] realize features on components of SimpleAssemblies");
+          }
+          gopher = ((Feature) gopher).getParent();
+        }
+        return featureRealizer.realizeFeature(this, fh, temp);
+      }
     }
 
     protected ChangeSupport getChangeSupport(ChangeType ct){

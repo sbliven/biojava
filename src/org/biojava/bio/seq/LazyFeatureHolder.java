@@ -134,7 +134,7 @@ public abstract class LazyFeatureHolder
     }
 
     public void removeFeature(Feature f) 
-        throws ChangeVetoException
+        throws ChangeVetoException, BioException
     {
         getFeatureHolder().removeFeature(f);
     }

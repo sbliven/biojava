@@ -50,6 +50,7 @@ import org.biojava.utils.cache.CacheReference;
  * Top-level SeqFeature set for a BioEntry
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.3
  */
 
@@ -149,7 +150,7 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
     }
 
     public void removeFeature(Feature f)
-        throws ChangeVetoException
+        throws ChangeVetoException, BioException
     {
 	FeatureHolder fh = overlappingFeatures;
 	for (int t = 0; t < tileLocations.length; ++t) {

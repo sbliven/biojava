@@ -33,9 +33,10 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
-import org.biojava.bio.seq.ProjectedFeatureHolder;
+import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.projection.TranslateFlipContext;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
 import org.biojava.bio.symbol.SymbolList;
@@ -251,13 +252,15 @@ class DistComponentFeature
     }
 
     protected FeatureHolder getProjectedFeatures() {
-	if (projectedFeatures == null) {
-  	    projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(),
-  							   this, 
-							   translation,
-							   getStrand() == StrandedFeature.NEGATIVE);
-  	}
-	return projectedFeatures;
+      if (projectedFeatures == null) {
+        projectedFeatures = new ProjectedFeatureHolder(
+                new TranslateFlipContext(
+                        getComponentSequence(),
+                        this,
+                        translation,
+                        getStrand() == StrandedFeature.NEGATIVE));
+      }
+      return projectedFeatures;
     }
 
     public int countFeatures() {

@@ -193,7 +193,7 @@ class FlatModel
             addAState(esw);
             inModel.put(t, flatM);
             toM.put(t, esw);
-            //toM.put(((Wrapper) t).getWrapped(), esw);
+            //toM.put(((Wrapper) t).getUnprojectedFeatures(), esw);
             //System.out.println("Added wrapped emission state " + esw.getName());
           } else { // unknown eventuality
             throw new IllegalSymbolException(s, "Don't know how to handle state: " + s.getName());

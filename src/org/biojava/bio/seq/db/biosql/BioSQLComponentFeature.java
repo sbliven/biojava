@@ -34,9 +34,10 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
-import org.biojava.bio.seq.ProjectedFeatureHolder;
+import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.projection.TranslateFlipContext;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SymbolList;
@@ -67,7 +68,7 @@ class BioSQLComponentFeature
     private String                  componentName;
     private FeatureHolder           projectedFeatures;
     private StrandedFeature.Strand  strand;
-    private int                     assemblyFragmentID;
+    private int                     assemblyFragmentID; // is this used?
     private String                  type;
     private String                  source;
     private boolean                 triedResolve = false;
@@ -150,7 +151,7 @@ class BioSQLComponentFeature
 	    } catch (IllegalIDException ex) {
 		// Didn't exist.  Don't worry.
 	    } catch (BioException ex) {
-		throw new BioRuntimeException(ex, "Error fetching component sequence");
+		throw new BioRuntimeException("Error fetching component sequence", ex);
 	    }
 	}
 	return componentSequence;
@@ -275,10 +276,12 @@ class BioSQLComponentFeature
 
 	    FeatureHolder child = getComponentSequence();
 	    if (child != null) {
-		projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(),
+		projectedFeatures = new ProjectedFeatureHolder(
+            new TranslateFlipContext(
+                    getComponentSequence(),
 							       this,
 							       translation,
-							       flip);
+							       flip));
 	    } else {
 		projectedFeatures = FeatureHolder.EMPTY_FEATURE_HOLDER;
 	    }

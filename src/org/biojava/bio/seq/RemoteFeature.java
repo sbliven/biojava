@@ -73,40 +73,37 @@ public interface RemoteFeature extends StrandedFeature {
     public List regions;
     public Resolver resolver;
 
-	public Template()
-	{
-		super();
-		location = Location.empty;
-		regions = new ArrayList();
-		resolver = null;
-	}
+    public Template() {
+      super();
+      location = Location.empty;
+      regions = new ArrayList();
+      resolver = null;
+    }
 
-	  /**
-	   * Creates a RemoteFeature.Template that has the same values as the
-	   * template passed in.  Fields that are in the template passed in but
-	   * not in RemoteFeature Templates will be silently discarded.  Regions is
-	   * set to an empty list and the resolver is set to null.
-	   *
-	   * @param theTemplate the template for this template.
-	   */
-	  public Template(Feature.Template theTemplate)
-	  {
-	    location = theTemplate.location;
-	    if(location == null)
-	    {
-	    	location = Location.empty;
-	    }
-	    type = theTemplate.type;
-	    source = theTemplate.source;
-	    annotation = theTemplate.annotation;
-	    if (theTemplate instanceof StrandedFeature.Template) {
-		strand = ((StrandedFeature.Template) theTemplate).strand;
-	    } else {
-		strand = StrandedFeature.UNKNOWN;
-	    }
-	    resolver = null;
-	    regions = null;
-  	  }
+    /**
+     * Creates a RemoteFeature.Template that has the same values as the
+     * template passed in.  Fields that are in the template passed in but
+     * not in RemoteFeature Templates will be silently discarded.  Regions is
+     * set to an empty list and the resolver is set to null.
+     *
+     * @param theTemplate the template for this template.
+     */
+    public Template(Feature.Template theTemplate) {
+      location = theTemplate.location;
+      if (location == null) {
+        location = Location.empty;
+      }
+      type = theTemplate.type;
+      source = theTemplate.source;
+      annotation = theTemplate.annotation;
+      if (theTemplate instanceof StrandedFeature.Template) {
+        strand = ((StrandedFeature.Template) theTemplate).strand;
+      } else {
+        strand = StrandedFeature.UNKNOWN;
+      }
+      resolver = null;
+      regions = null;
+    }
 
   }
 

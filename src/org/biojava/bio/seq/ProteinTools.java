@@ -33,6 +33,7 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.impl.SimpleSequenceFactory;
+import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;

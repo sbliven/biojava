@@ -23,6 +23,7 @@ package org.biojava.bio.seq;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
+import org.biojava.bio.seq.impl.ViewSequence;
 import org.biojava.bio.symbol.CircularLocation;
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.Location;

@@ -19,13 +19,16 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.impl;
 
 import java.util.Iterator;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.impl.FeatureImpl;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.projection.ReparentContext;
+import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SimpleGappedSymbolList;
 import org.biojava.utils.ChangeVetoException;
@@ -84,48 +87,8 @@ implements GappedSequence {
   }
   
   private MergeFeatureHolder makeFeatures() {
-    projectedFeatures = new ProjectedFeatureHolder(sequence, this, 0, false) {
-      public FeatureHolder getParent(Feature f) {
-        return SimpleGappedSequence.this;
-      }
-      
-      public Sequence getSequence(Feature f) {
-        return SimpleGappedSequence.this;
-      }
-      
-      public Location getLocation(Feature f) {
-        return locationToGapped(f.getLocation());
-      }
-      
-      public StrandedFeature.Strand getStrand(StrandedFeature f) {
-        return f.getStrand();
-      }
-      
-      public Annotation getAnnotation(Feature f) {
-        return f.getAnnotation();
-      }
-      
-      public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
-        return FeatureHolder.EMPTY_FEATURE_HOLDER;
-      }
-      
-      public Feature createFeature(Feature.Template templ)
-      throws ChangeVetoException, BioException
-      {
-        templ.location = gappedToLocation(templ.location);
-        return projectFeature(getWrapped().createFeature(templ));
-      }
-      
-      public void removeFeature(Feature f, Feature f2)
-      throws ChangeVetoException
-      {
-        throw new ChangeVetoException("NO");
-      }
-      
-      public FeatureFilter getSchema(Feature f) {
-        return f.getSchema();
-      }
-    };
+    projectedFeatures = new ProjectedFeatureHolder(
+            new GappedContext());
     
     localFeatures = new SimpleFeatureHolder();
     
@@ -166,7 +129,7 @@ implements GappedSequence {
   }
   
   public void removeFeature(Feature f)
-  throws ChangeVetoException
+  throws ChangeVetoException, BioException
   {
     getFeatures().removeFeature(f);
   }
@@ -181,6 +144,24 @@ implements GappedSequence {
       Feature f = FeatureImpl.DEFAULT.realizeFeature(this, this, templ);
       localFeatures.addFeature(f);
       return f;
+    }
+  }
+
+  public class GappedContext extends ReparentContext {
+    public GappedContext() {
+      super(SimpleGappedSequence.this, sequence);
+    }
+
+    public Location projectLocation(Location loc) {
+      return locationToGapped(loc);
+    }
+
+    public Location mapLocation(Location loc) {
+      return locationToGapped(loc);
+    }
+
+    public Location revertLocation(Location oldLoc) {
+      return gappedToLocation(oldLoc);
     }
   }
 }

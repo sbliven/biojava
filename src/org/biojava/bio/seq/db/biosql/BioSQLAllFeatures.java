@@ -106,7 +106,7 @@ class BioSQLAllFeatures implements FeatureHolder, RealizingFeatureHolder
     }
 
     public void removeFeature(Feature f)
-        throws ChangeVetoException
+        throws ChangeVetoException, BioException
     {
 	FeatureHolder fh = getFeatures();
         if (!fh.containsFeature(f)) {

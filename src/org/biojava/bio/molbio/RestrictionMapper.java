@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceAnnotator;
-import org.biojava.bio.seq.ViewSequence;
+import org.biojava.bio.seq.impl.ViewSequence;
 import org.biojava.utils.ThreadPool;
 
 /**

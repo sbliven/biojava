@@ -25,8 +25,7 @@ import java.util.Iterator;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.impl.RevCompSequence;
-import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.RangeLocation;
@@ -208,6 +207,25 @@ public final class SequenceTools {
   }
 
   /**
+   * Create a new Sequence that has no annotation, no features and a zero-length
+   * symbol list.
+   *
+   * @for.user
+   * Instantiate this if an API requres a sequence, but you can't be bothered
+   * or are not able to provide full sequence information.
+   * @for.powerUser
+   * It is sometimes usefull to create a dummy sequence and then wrap this in
+   * a view.
+   *
+   * @param uri  the URI to give the dummy sequence
+   * @param name the name of the dummy sequence
+   * @return a dummy Sequence
+   */
+  public static Sequence createDummy(String uri, String name) {
+    return new DummySequence(uri, name);
+  }
+
+  /**
    * Add features to a sequence that contain the same information as all
    * those in a feature holder.
    *
@@ -223,7 +241,7 @@ public final class SequenceTools {
   {
     addFeatures(seq, fh);
   }
-  
+
   private static void addFeatures(FeatureHolder toAddTo, FeatureHolder thingsToAdd)
   throws
     ChangeVetoException,

@@ -331,7 +331,7 @@ class RagbagCachedSequence implements RagbagSequenceItf
     return tempSeq.filter(ff);
   }
   public void removeFeature(Feature f) 
-    throws ChangeVetoException 
+    throws ChangeVetoException, BioException 
   {
     Sequence tempSeq = instantiateSequence();
     tempSeq.removeFeature(f);

@@ -22,6 +22,7 @@
 package org.biojava.bio.seq;
 
 import java.util.*;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.impl.*;
@@ -35,92 +36,89 @@ import junit.framework.TestCase;
  * @since 1.2
  */
 
-public class SimpleAssemblyTest extends TestCase
-{
-    protected Sequence fragment1;
-    protected Sequence fragment2;
-    protected Sequence assembly;
+public class SimpleAssemblyTest extends TestCase {
+  protected Sequence fragment1;
+  protected Sequence fragment2;
+  protected Sequence assembly;
 
-    public SimpleAssemblyTest(String name) {
-	super(name);
+  public SimpleAssemblyTest(String name) {
+    super(name);
+  }
+
+  protected void setUp() throws Exception {
+    fragment1 = new SimpleSequence(DNATools.createDNA("aacgta"),
+                                   "fragment1",
+                                   "fragment1",
+                                   Annotation.EMPTY_ANNOTATION);
+    fragment2 = new SimpleSequence(DNATools.createDNA("ttgatgc"),
+                                   "fragment2",
+                                   "fragment2",
+                                   Annotation.EMPTY_ANNOTATION);
+
+    StrandedFeature.Template sft = new StrandedFeature.Template();
+    sft.type = "project_test";
+    sft.source = "test";
+    sft.annotation = Annotation.EMPTY_ANNOTATION;
+    sft.strand = StrandedFeature.NEGATIVE;
+    sft.location = new RangeLocation(1, 3);
+    fragment2.createFeature(sft);
+
+    assembly = new SimpleAssembly(12, "test", "test");
+    ComponentFeature.Template templ = new ComponentFeature.Template();
+    templ.type = "component";
+    templ.source = "test";
+    templ.annotation = Annotation.EMPTY_ANNOTATION;
+
+    templ.strand = StrandedFeature.POSITIVE;
+    templ.location = new RangeLocation(1, 4);
+    templ.componentSequence = fragment1;
+    templ.componentLocation = new RangeLocation(2, 5);
+    assembly.createFeature(templ);
+
+    templ.strand = StrandedFeature.NEGATIVE;
+    templ.location = new RangeLocation(6, 12);
+    templ.componentSequence = fragment2;
+    templ.componentLocation = new RangeLocation(1, fragment2.length());
+    assembly.createFeature(templ);
+  }
+
+  public void testAssembledSymbols()
+          throws Exception {
+    assertTrue(compareSymbolList(assembly,
+                                 DNATools.createDNA("acgtngcatcaa")));
+    assertTrue(compareSymbolList(assembly.subList(1, 4),
+                                 DNATools.createDNA("acgt")));
+    assertTrue(compareSymbolList(assembly.subList(1, 5),
+                                 DNATools.createDNA("acgtn")));
+    assertTrue(compareSymbolList(assembly.subList(5, 5),
+                                 DNATools.createDNA("n")));
+    assertTrue(compareSymbolList(assembly.subList(11, 12),
+                                 DNATools.createDNA("aa")));
+  }
+
+  public void testProjectedFeatures()
+          throws Exception {
+    FeatureHolder f = assembly.filter(new FeatureFilter.ByType("project_test"), true);
+    assertEquals(f.countFeatures(), 1);
+    Feature pf = (Feature) f.features().next();
+    Location pfl = pf.getLocation();
+    assertEquals(pfl.getMin(), 10);
+    assertEquals(pfl.getMax(), 12);
+  }
+
+  private boolean compareSymbolList(SymbolList sl1, SymbolList sl2) {
+    if (sl1.length() != sl2.length()) {
+      return false;
     }
 
-    protected void setUp() throws Exception {
-	fragment1 = new SimpleSequence(DNATools.createDNA("aacgta"),
-				       "fragment1",
-				       "fragment1",
-				       Annotation.EMPTY_ANNOTATION);
-	fragment2 = new SimpleSequence(DNATools.createDNA("ttgatgc"),
-				       "fragment2",
-				       "fragment2",
-				       Annotation.EMPTY_ANNOTATION);
-	
-	StrandedFeature.Template sft = new StrandedFeature.Template();
-	sft.type = "project_test";
-	sft.source = "test";
-	sft.annotation = Annotation.EMPTY_ANNOTATION;
-	sft.strand = StrandedFeature.NEGATIVE;
-	sft.location = new RangeLocation(1, 3);
-	fragment2.createFeature(sft);
-
-	assembly = new SimpleAssembly(12, "test", "test");
-	ComponentFeature.Template templ = new ComponentFeature.Template();
-	templ.type = "component";
-	templ.source = "test";
-	templ.annotation = Annotation.EMPTY_ANNOTATION;
-
-	templ.strand = StrandedFeature.POSITIVE;
-	templ.location = new RangeLocation(1, 4);
-	templ.componentSequence = fragment1;
-	templ.componentLocation = new RangeLocation(2, 5);
-	assembly.createFeature(templ);
-
-	templ.strand = StrandedFeature.NEGATIVE;
-	templ.location = new RangeLocation(6, 12);
-	templ.componentSequence = fragment2;
-	templ.componentLocation = new RangeLocation(1, fragment2.length());
-	assembly.createFeature(templ);
+    Iterator si1 = sl1.iterator();
+    Iterator si2 = sl2.iterator();
+    while (si1.hasNext()) {
+      if (!(si1.next() == si2.next())) {
+        return false;
+      }
     }
 
-    public void testAssembledSymbols()
-	throws Exception
-    {
-	assertTrue(compareSymbolList(assembly,
-				     DNATools.createDNA("acgtngcatcaa")));
-	assertTrue(compareSymbolList(assembly.subList(1,4),
-				     DNATools.createDNA("acgt")));
-	assertTrue(compareSymbolList(assembly.subList(1,5),
-				     DNATools.createDNA("acgtn")));
-	assertTrue(compareSymbolList(assembly.subList(5,5),
-				     DNATools.createDNA("n")));
-	assertTrue(compareSymbolList(assembly.subList(11, 12),
-				     DNATools.createDNA("aa")));
-    }
-
-    public void testProjectedFeatures()
-        throws Exception
-    {
-	FeatureHolder f = assembly.filter(new FeatureFilter.ByType("project_test"), true);
-	assertEquals(f.countFeatures(), 1);
-	Feature pf = (Feature) f.features().next();
-	Location pfl = pf.getLocation();
-	assertEquals(pfl.getMin(), 10);
-	assertEquals(pfl.getMax(), 12);
-    }
-
-    private boolean compareSymbolList(SymbolList sl1, SymbolList sl2) {
-	if (sl1.length() != sl2.length()) {
-	    return false;
-	}
-	
-	Iterator si1 = sl1.iterator();
-	Iterator si2 = sl2.iterator();
-	while (si1.hasNext()) {
-	    if (! (si1.next() == si2.next())) {
-		return false;
-	    }
-	}
-
-	return true;
-    }
+    return true;
+  }
 }

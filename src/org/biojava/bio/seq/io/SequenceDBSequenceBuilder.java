@@ -27,7 +27,7 @@ import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.seq.DummySequence;
+import org.biojava.bio.seq.impl.DummySequence;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.db.SequenceDB;

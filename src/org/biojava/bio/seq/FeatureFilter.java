@@ -440,6 +440,10 @@ public interface FeatureFilter extends Serializable {
       return getStrand().hashCode();
     }
 
+    public String toString() {
+      return "StrandedFilter(" + strand + ")";
+    }
+
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup);
     }
@@ -890,7 +894,7 @@ public interface FeatureFilter extends Serializable {
 
         Set thisProps = this.getType().getProperties();
         Set thatProps = that.getType().getProperties();
-        for(Iterator i = that.getType().getProperties().iterator(); i.hasNext(); ) {
+        for(Iterator i = thatProps.iterator(); i.hasNext(); ) {
           Object prop = i.next();
           
           if(!thisProps.contains(prop)) {

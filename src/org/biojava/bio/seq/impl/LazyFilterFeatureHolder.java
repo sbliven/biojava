@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.BioException;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeSupport;
@@ -80,15 +81,15 @@ public class LazyFilterFeatureHolder implements FeatureHolder {
     
     
     public Feature createFeature(Feature.Template temp)
-        throws ChangeVetoException
+        throws ChangeVetoException, BioException
     {
-        throw new ChangeVetoException("Can't create features in biojava-ensembl");
+        return featureHolder.createFeature(temp);
     }
 
     public void removeFeature(Feature f)
-        throws ChangeVetoException
+        throws ChangeVetoException, BioException
     {
-        throw new ChangeVetoException("Can't delete features in biojava-ensembl");
+      featureHolder.removeFeature(f);
     }
 
 

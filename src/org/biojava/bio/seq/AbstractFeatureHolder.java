@@ -85,7 +85,7 @@ public abstract class AbstractFeatureHolder
   }
 
   public void removeFeature(Feature f)
-  throws ChangeVetoException {
+  throws ChangeVetoException, BioException {
     throw new ChangeVetoException(
       "This FeatureHolder does not support removal of Features."
     );

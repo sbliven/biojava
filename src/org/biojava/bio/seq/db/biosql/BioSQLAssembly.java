@@ -51,6 +51,7 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.AssertionFailure;
 
 /**
  * Sequence keyed off a BioSQL biosequence.
@@ -79,10 +80,6 @@ class BioSQLAssembly
     private SimpleFeatureHolder    componentFeatures;
     private MergeFeatureHolder     allFeatures;
 
-    private DBHelper getDBHelper() {
-	return seqDB.getDBHelper();
-    }
-
     public BioSQLSequenceDB getSequenceDB() {
 	return seqDB;
     }
@@ -108,7 +105,7 @@ class BioSQLAssembly
 	try {
 	    this.alphabet = AlphabetManager.alphabetForName(alphaName.toUpperCase());
 	} catch (NoSuchElementException ex) {
-	    throw new BioException(ex, "Can't load sequence with unknown alphabet " + alphaName);
+	    throw new BioException("Can't load sequence with unknown alphabet " + alphaName, ex);
 	}
 
 	features = new BioSQLAllFeatures(this, seqDB, bioentry_id);
@@ -195,7 +192,7 @@ class BioSQLAssembly
 		    int assembly_end = rs.getInt(4);
 		    int fragment_start = rs.getInt(5);
 		    int fragment_end = rs.getInt(6);
-		    int strand = rs.getInt(7);
+		    int strand = rs.getInt(7); // do we use this?
 
 		    ComponentFeature.Template temp = new ComponentFeature.Template();
 		    temp.type = "component";
@@ -208,9 +205,9 @@ class BioSQLAssembly
 
 		seqDB.getPool().putConnection(conn);
 	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "Error fetching assembly data");
+		throw new BioRuntimeException("Error fetching assembly data", ex);
 	    } catch (ChangeVetoException ex) {
-		throw new BioError("Assertion failure: Couldn't modify private featureholder");
+		throw new AssertionFailure("Assertion failure: Couldn't modify private featureholder", ex);
 	    }
 	}
 
@@ -289,7 +286,7 @@ class BioSQLAssembly
     }
 
     public void removeFeature(Feature f)
-        throws ChangeVetoException
+        throws ChangeVetoException, BioException
     {
 	getFeatures().removeFeature(f);
     }

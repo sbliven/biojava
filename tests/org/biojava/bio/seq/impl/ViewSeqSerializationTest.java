@@ -19,13 +19,17 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.impl;
 
 import java.util.*;
 import java.io.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.impl.*;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.CircularView;
 import junit.framework.TestCase;
 
 /**
@@ -65,7 +69,7 @@ public class ViewSeqSerializationTest extends TestCase
 	seq.createFeature(sft);
 
 	File f = File.createTempFile("ViewSeqSerTest",".tmp");
-	ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));        
+	ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
 	oos.writeObject(seq);
 	oos.flush();
 	oos.close();

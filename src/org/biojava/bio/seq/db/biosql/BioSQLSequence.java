@@ -74,10 +74,6 @@ class BioSQLSequence
     private SymbolList symbols;
     private int length;
 
-    private DBHelper getDBHelper() {
-	return seqDB.getDBHelper();
-    }
-
     public BioSQLSequenceDB getSequenceDB() {
 	return seqDB;
     }
@@ -265,7 +261,7 @@ class BioSQLSequence
     }
 
     public void removeFeature(Feature f)
-        throws ChangeVetoException
+        throws ChangeVetoException, BioException
     {
 	getFeatures().removeFeature(f);
     }

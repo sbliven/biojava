@@ -28,7 +28,7 @@ import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceAnnotator;
-import org.biojava.bio.seq.ViewSequence;
+import org.biojava.bio.seq.impl.ViewSequence;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.ChangeVetoException;

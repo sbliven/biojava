@@ -23,14 +23,12 @@ package org.biojava.bio.seq;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.Iterator;
 
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
-import org.biojava.bio.BioException;
 import org.biojava.bio.ontology.InvalidTermException;
 import org.biojava.bio.ontology.Term;
 import org.biojava.bio.symbol.Location;
@@ -329,13 +327,17 @@ public interface Feature extends FeatureHolder, Annotatable {
      * @author Matthew Pocock
      */
 
-    public static class Template implements Serializable {
+    public static class Template implements Serializable, Cloneable {
 	public Location location;
 	public String type;
 	public String source;
     public Term typeTerm;
     public Term sourceTerm;
 	public Annotation annotation;
+
+      public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+      }
 
 	public int hashCode() {
 	    Class templClazz = getClass();
@@ -384,46 +386,7 @@ public interface Feature extends FeatureHolder, Annotatable {
 	    return true;
 	}
         
-        /**
-         * This attempts to populate the fields of this template using
-         * the publically accessible information in a feature. It is simple
-         * to call populate() within Feature.makeTemplate() to ensure all the
-         * slots get filled.
-         *
-         * @param feat  the Feature to read info from
-         */
-        public void populate(Feature feat)
-        throws BioException {
-          Field[] fields = this.getClass().getFields();
-          Method[] methods = feat.getClass().getMethods();
-          
-          for(int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
-            String fName = field.getName();
-            String methName =
-              "get" +
-              fName.substring(0, 1).toUpperCase() +
-              fName.substring(1);
 
-            Method method = null;
-            for(int j = 0; j < methods.length; j++) {
-              Method meth = methods[j];
-              if(methods[j].getName().equals(methName)) {
-                method = meth;
-              }
-            }
-            if(method == null) {
-              throw new BioException("Expecting to find a method named: " + methName);
-            }
-              
-            try {
-              field.set(this, method.invoke(feat, new Object[] {}));
-            } catch (Exception e) {
-              throw new BioError("Couldn't access template fields", e);
-            }
-          }
-        }
-        
         public String toString() {
           StringBuffer sbuf = new StringBuffer();
           

@@ -21,7 +21,6 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.lang.reflect.*;
 import java.util.*;
 
 import org.biojava.utils.*;
@@ -42,7 +41,9 @@ import org.biojava.bio.seq.projection.*;
  * @author David Waring
  * @author Thomas Down
  */
-public class RevCompSequence extends SimpleSequence{
+public class RevCompSequence
+        extends SimpleSequence
+{
     private ProjectedFeatureHolder pfh;
     protected Sequence origSeq;
     
@@ -59,7 +60,7 @@ public class RevCompSequence extends SimpleSequence{
     
     public RevCompSequence(Sequence seq, String urn, String name, Annotation annotation)throws IllegalAlphabetException {
         super(DNATools.reverseComplement(seq),urn,name,annotation);
-        pfh = new ProjectedFeatureHolder(seq,this,seq.length()+1,true);
+        pfh = new ProjectedFeatureHolder(new TranslateFlipContext(seq,this,seq.length()+1,true));
         origSeq = seq;
     }
     
@@ -99,7 +100,8 @@ public class RevCompSequence extends SimpleSequence{
         return pfh.containsFeature(f) || origSeq.containsFeature(f);
     }
     
-    public void removeFeature(Feature f) throws ChangeVetoException{
+    public void removeFeature(Feature f)
+            throws ChangeVetoException, BioException {
         pfh.removeFeature(f);
     }
 
@@ -110,12 +112,7 @@ public class RevCompSequence extends SimpleSequence{
     *
     */
     public Feature createFeature(Feature.Template ft) throws ChangeVetoException,BioException{
-        ft.location = ProjectionUtils.transformLocation(ft.location, length() + 1, true);
-        if (ft instanceof StrandedFeature.Template){
-            ((StrandedFeature.Template)ft).strand = ProjectionUtils.flipStrand(((StrandedFeature.Template)ft).strand);
-    	 }
-    	 Feature featureOnOrig = origSeq.createFeature(ft);
-    	 return pfh.projectFeature(featureOnOrig);
+    	 return pfh.getContext().createFeature(ft);
     }
     
     /**
@@ -141,7 +138,7 @@ public class RevCompSequence extends SimpleSequence{
         } catch ( BioException e){
             throw new BioError( "Error while cloning RevCompSequenece: " + e.getMessage());
         } catch (ChangeVetoException cve) {
-            throw new BioError(cve, "Couldn't modify newly created SimpleSequence");
+            throw new BioError("Couldn't modify newly created SimpleSequence", cve);
         }
             
         return newSeq;

@@ -248,15 +248,19 @@ public class SimpleSequence
      */
 
     public void removeFeature(Feature f)
-    throws ChangeVetoException {
+    throws ChangeVetoException, BioException {
       getFeatureHolder().removeFeature(f);
     }
 
     public void edit(Edit edit) throws ChangeVetoException {
       throw new ChangeVetoException("Can't edit the underlying SymbolList");
     }
- 
-    
+
+  public String toString() {
+    return super.toString() + " name: " + getName();
+  }
+
+
     /**
      * Create a SimpleSequence with the symbols and alphabet of sym, and the
      * sequence properties listed.

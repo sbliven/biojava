@@ -35,9 +35,10 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
-import org.biojava.bio.seq.ProjectedFeatureHolder;
+import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.projection.TranslateFlipContext;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeEvent;
@@ -243,7 +244,7 @@ class DASComponentFeature
 	    try {
 		componentSequence = parent.getParentDB()._getSequence(componentID, parent.dataSourceURLs());
 	    } catch (Exception ex) {
-		throw new BioRuntimeException(ex, "Couldn't create child DAS sequence");
+		throw new BioRuntimeException("Couldn't create child DAS sequence", ex);
 	    }
 	}
 	return componentSequence;
@@ -282,7 +283,9 @@ class DASComponentFeature
 	    }
 
 
-	    projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, flip);
+	    projectedFeatures = new ProjectedFeatureHolder(
+              new TranslateFlipContext(
+                      getComponentSequence(), this, translation, flip));
 	}
 	return projectedFeatures;
     }

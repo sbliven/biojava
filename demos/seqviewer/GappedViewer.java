@@ -1,6 +1,7 @@
 package seqviewer;
 
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.gui.sequence.*;
 import org.biojava.bio.symbol.RangeLocation;
