@@ -306,33 +306,42 @@ public class SimpleGFFRecord implements GFFRecord {
   public static String stringifyAttributes(Map attMap) {
     StringBuffer sBuff = new StringBuffer();
     Iterator ki = attMap.keySet().iterator();
-    if (ki.hasNext()) {
+    while (ki.hasNext()) {
       String key = (String) ki.next();
       sBuff.append(key);
       List values = (List) attMap.get(key);
       for (Iterator vi = values.iterator(); vi.hasNext();) {
         String value = (String) vi.next();
-        if (value.indexOf(" ") != -1) {
+        if (isText(value)) {
           sBuff.append(" \"" + value + "\"");
         } else {
           sBuff.append(" " + value);
         }
       }
-    }
-    while (ki.hasNext()) {
-      String key = (String) ki.next();
-      sBuff.append("; " + key);
-      List values = (List) attMap.get(key);
-      for (Iterator vi = values.iterator(); vi.hasNext();) {
-        String value = (String) vi.next();
-        if (value.indexOf(" ") != -1) {
-          sBuff.append(" \"" + value + "\"");
-        } else {
-          sBuff.append(" " + value);
-        }
+      sBuff.append(";");
+      if (ki.hasNext()) {
+        sBuff.append(" ");
       }
     }
     return sBuff.substring(0);
+  }
+
+  /**
+   * Returns true if a string is "textual". The GFF Spec says that
+   * "textual" values must be quoted. This implementation just tests
+   * if the string contains letters or whitespace.
+   *
+   * @param value a <code>String</code> value.
+   * @return true if value is "textual".
+   */
+  private static boolean isText(String value) {
+    for (int i = 0; i < value.length(); i++) {
+      char c = value.charAt(i);
+      if (Character.isLetter(c) || Character.isWhitespace(c)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
