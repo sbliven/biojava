@@ -645,6 +645,8 @@
         <!-- test classes from build -->
         <pathelement path="${build.dest.tests}" />
         <!-- test data from build -->
+        <pathelement path="${tests.dir}/files" />
+        <!-- currently the move isn't complete -->
         <pathelement path="${tests.dir}" />
         <!-- classes specified in this file -->
         <pathelement path="${classpath}" />
