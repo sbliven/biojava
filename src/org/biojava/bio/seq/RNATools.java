@@ -37,6 +37,8 @@ import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.impl.SimpleSequenceFactory;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.AbstractReversibleTranslationTable;
+import org.biojava.bio.symbol.ManyToOneTranslationTable;
+import org.biojava.bio.symbol.SimpleManyToOneTranslationTable;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.AtomicSymbol;
@@ -364,11 +366,14 @@ public final class RNATools {
    * There are public static final fields in the TranslationTable
    * interface which contain these values. One of these should be used
    * as the argument for this method.
+   * <p>
+   * You can now get the reverse translation of the residue back to its
+   * (usually several) codons too.
    *
    * @since 1.1
    */
-  public static TranslationTable getGeneticCode(String name) {
-    return (TranslationTable) geneticCodes.get(name);
+  public static ManyToOneTranslationTable getGeneticCode(String name) {
+    return (ManyToOneTranslationTable) geneticCodes.get(name);
   }
 
   /**
@@ -429,7 +434,7 @@ public final class RNATools {
             (FiniteAlphabet) AlphabetManager.alphabetForName(target);
           SymbolTokenization sourceP = sourceA.getTokenization("name");
           SymbolTokenization targetP = targetA.getTokenization("name");
-          SimpleTranslationTable table = new SimpleTranslationTable(
+          SimpleManyToOneTranslationTable table = new SimpleManyToOneTranslationTable(
             sourceA,
             targetA
           );
