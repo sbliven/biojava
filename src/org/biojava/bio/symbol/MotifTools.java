@@ -22,6 +22,10 @@
 package org.biojava.bio.symbol;
 
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import org.biojava.bio.BioError;
@@ -70,7 +74,8 @@ public class MotifTools
 
         try
         {
-            SymbolTokenization sToke = motif.getAlphabet().getTokenization("token");
+            SymbolTokenization sToke =
+                motif.getAlphabet().getTokenization("token");
             if (sToke.getTokenType() != SymbolTokenization.CHARACTER)
                 throw new IllegalArgumentException("SymbolList alphabet did not have a character token type");
 
@@ -88,11 +93,24 @@ public class MotifTools
                 }
                 else
                 {
-                    Symbol [] ambiSyms = (Symbol [])
-                        AlphabetManager.getAllSymbols(ambiAlpha).toArray(symProto);
+                    Set rawSyms = AlphabetManager.getAllSymbols(ambiAlpha);
+                    List gapSyms = new ArrayList();
+
+                    for (Iterator si = rawSyms.iterator(); si.hasNext();)
+                    {
+                        Symbol rawSym = (Symbol) si.next();
+                        // Crude check for gap symbol
+                        if (((FiniteAlphabet) rawSym.getMatches()).size() == 0)
+                        {
+                            gapSyms.add(rawSym);
+                        }
+                    }
+
+                    rawSyms.removeAll(gapSyms);
 
                     // getAllSymbols returns a Set (i.e. unordered) so
                     // we convert to char array so we can sort tokens
+                    Symbol [] ambiSyms = (Symbol []) rawSyms.toArray(symProto);
                     char [] ambiChars = new char [ambiSyms.length];
 
                     for (int j = 0; j < ambiSyms.length; j++)
