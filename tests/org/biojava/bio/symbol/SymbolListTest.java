@@ -99,8 +99,8 @@ public class SymbolListTest extends TestCase
      * @param symListAlpha the Alphabet on which the symbolList is to be defined.
      */
     protected boolean runSymbolListTest(FiniteAlphabet arrayAlpha, FiniteAlphabet symListAlpha, int length, SymListFactory factory)
+        throws Exception
     {
-        try {
             // create a Symbol array of the kind required
             Symbol [] array = createRandomSymbolArray(arrayAlpha, length);
             assertNotNull(array);
@@ -112,10 +112,6 @@ public class SymbolListTest extends TestCase
 
             // verify and return result.
             return compareSymbolLists(symList, array);
-        }
-        catch (Exception e) {
-            return false;
-        }
     }
 
 
