@@ -26,6 +26,13 @@ import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 
+/**
+ * Handles ChangeEvents for BioSQLFeature instances.
+ *
+ * @author Thomas Down (original implementation)
+ * @author David Huen (refactoring)
+ * @since 1.3
+ */
 
 public class BioSQLFeatureChangeHub extends IndexedChangeHub
 {

@@ -27,6 +27,13 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.bio.*;
 
+/**
+ * Handles ChangeEvents for BioSQLEntryAnnotation instances.
+ *
+ * @author Thomas Down (original implementation)
+ * @author David Huen (refactoring)
+ * @since 1.3
+ */
 public class BioSQLEntryAnnotationChangeHub extends IndexedChangeHub
 {
     BioSQLSequenceDB seqDB;

@@ -38,6 +38,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author David Huen
  * @since 1.3
  */
 
