@@ -22,14 +22,17 @@ final public class LocationTools {
    * @return a Location that is the union of locA and locB
    */
   public static Location union(Location locA, Location locB) {
-  	if(isDecorated(locA) || isDecorated(locB))
-  	{
-  		handleDecorations(locA, locB);
-  		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
-  		{
-  			return BetweenLocationTools.union(locA, locB);
-  		}
-  	}
+        if(isDecorated(locA) || isDecorated(locB))
+        {
+          handleDecorations(locA, locB);
+          if(locA instanceof CircularLocation && locB instanceof CircularLocation){
+            return CircularLocationTools.union((CircularLocation)locA,(CircularLocation)locB);
+          }
+          if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+            {
+               return BetweenLocationTools.union(locA, locB);
+            }
+        }
 
     if(
       locA.isContiguous() &&
@@ -77,11 +80,11 @@ final public class LocationTools {
 
     if(isDecorated(locA) || isDecorated(locB))
     {
-		handleDecorations(locA, locB);
-		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
-		{
-			return BetweenLocationTools.intersection(locA, locB);
-		}
+                handleDecorations(locA, locB);
+                if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+                {
+                        return BetweenLocationTools.intersection(locA, locB);
+                }
     }
     if(locA.isContiguous() && locB.isContiguous()) {
       // handle easy case of solid locations
@@ -126,14 +129,14 @@ final public class LocationTools {
    * @param return true if they overlap, false otherwise
    */
   public static boolean overlaps(Location locA, Location locB) {
-  	if(isDecorated(locA) || isDecorated(locB))
-  	{
-  		handleDecorations(locA, locB);
-		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
-		{
-			return BetweenLocationTools.overlaps(locA, locB);
-		}
-  	}
+        if(isDecorated(locA) || isDecorated(locB))
+        {
+                handleDecorations(locA, locB);
+                if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+                {
+                        return BetweenLocationTools.overlaps(locA, locB);
+                }
+        }
     if(locA.isContiguous() && locB.isContiguous()) {
       // if they are both solid, return whether the extents overlap
       return !(
@@ -164,14 +167,14 @@ final public class LocationTools {
      */
 
   public static boolean contains(Location locA, Location locB) {
-  	if(isDecorated(locA) || isDecorated(locB))
-  	{
-  		handleDecorations(locA, locB);
-		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
-		{
-			return BetweenLocationTools.contains(locA, locB);
-		}
-  	}
+        if(isDecorated(locA) || isDecorated(locB))
+        {
+                handleDecorations(locA, locB);
+                if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+                {
+                        return BetweenLocationTools.contains(locA, locB);
+                }
+        }
     if(locA.isContiguous() && locB.isContiguous()) {
       // both solid - check the extents
       return
@@ -207,14 +210,14 @@ final public class LocationTools {
    * @return true if they are equivalent, false otherwise
    */
   public static boolean areEqual(Location locA, Location locB) {
-  	if(isDecorated(locA) || isDecorated(locB))
-  	{
-  		handleDecorations(locA, locB);
-		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
-		{
-			return BetweenLocationTools.areEqual(locA, locB);
-		}
-  	}
+        if(isDecorated(locA) || isDecorated(locB))
+        {
+                handleDecorations(locA, locB);
+                if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+                {
+                        return BetweenLocationTools.areEqual(locA, locB);
+                }
+        }
     // simple check - if one is broken and the other isn't, they aren't equal.
     if(locA.isContiguous() != locB.isContiguous()) {
       return false;
@@ -291,19 +294,19 @@ final public class LocationTools {
      */
 
     public static Location union(Collection locs) {
-	List locList = new ArrayList();
-	for (Iterator li = locs.iterator(); li.hasNext(); ) {
-	    Location loc = (Location) li.next();
-	    for (Iterator bi = loc.blockIterator(); bi.hasNext(); ) {
-		locList.add(bi.next());
-	    }
-	}
+        List locList = new ArrayList();
+        for (Iterator li = locs.iterator(); li.hasNext(); ) {
+            Location loc = (Location) li.next();
+            for (Iterator bi = loc.blockIterator(); bi.hasNext(); ) {
+                locList.add(bi.next());
+            }
+        }
 
-	return _union(locList);
+        return _union(locList);
     }
 
 
-    private static Location _union(List locList) {
+    protected static Location _union(List locList) {
       // sort these blocks
       Collections.sort(locList, Location.naturalOrder);
 
@@ -389,7 +392,7 @@ final public class LocationTools {
    */
   protected static boolean isDecorated(Location theLocation)
   {
-  	return (theLocation instanceof AbstractLocationDecorator);
+        return (theLocation instanceof AbstractLocationDecorator);
   }
 
   /**
@@ -414,10 +417,10 @@ final public class LocationTools {
       }
     else if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
     {
-    	// Intentionally blank
+        // Intentionally blank
     }
     else{
-	throw new ClassCastException("Decorated locations are not handled in this version");
+        throw new ClassCastException("Decorated locations are not handled in this version");
       }
   }
 }

@@ -88,6 +88,45 @@ final class CircularLocationTools {
       }
   }
 
+  protected static CircularLocation union(CircularLocation locA, CircularLocation locB){
+    int length = locA.getLength();
+    Location temp;
+    if(
+      locA.isContiguous() &&
+      locB.isContiguous() &&
+      locA.overlaps(locB)
+    ) {
+      // the simple case
+      temp =  LocationTools.buildLoc(
+        Math.min(locA.getMin(), locB.getMin()),
+        Math.max(locA.getMax(), locB.getMax())
+      );
+
+      return new CircularLocation(temp, length);
+
+    } else {
+      // either may be compound. They may not overlap. We must build the
+      // complete list of blocks, merge overlapping blocks and then create the
+      // appropriate implementation of Location for the resulting list.
+
+      // list of all blocks
+      List locList = new ArrayList();
+
+      // add all blocks in locA
+      for(Iterator i = locA.blockIterator(); i.hasNext(); ) {
+        locList.add(i.next());
+      }
+
+      // add all blocks in locB
+      for(Iterator i = locB.blockIterator(); i.hasNext(); ) {
+        locList.add(i.next());
+      }
+
+      temp = LocationTools._union(locList);
+      return new CircularLocation(temp, length);
+    }
+  }
+
   /**
    * Tests a location to see if it overlaps the origin of the circular
    * molecule to which it belongs. The origin is taken to be position
@@ -122,18 +161,18 @@ final class CircularLocationTools {
    * @return true if it is a circular location
    */
   protected static boolean isCircular(Location loc){
-	boolean toReturn = false;
+        boolean toReturn = false;
     try
     {
-	    if(loc.getDecorator(Class.forName("org.biojava.bio.symbol.CircularLocation")) != null)
-	    {
-	    	toReturn = true;
-	    }
-	}
-	catch(Exception e)
-	{
-		throw new org.biojava.bio.BioError("class org.biojava.bio.symbol.BetweenLocation could not be loaded");
-	}
+            if(loc.getDecorator(Class.forName("org.biojava.bio.symbol.CircularLocation")) != null)
+            {
+                toReturn = true;
+            }
+        }
+        catch(Exception e)
+        {
+                throw new org.biojava.bio.BioError("class org.biojava.bio.symbol.BetweenLocation could not be loaded");
+        }
     return toReturn;
   }
 

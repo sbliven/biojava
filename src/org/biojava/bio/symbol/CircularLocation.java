@@ -121,9 +121,31 @@ extends AbstractLocationDecorator {
     }
   }
 
+
+
   public String toString(){
     StringBuffer sb = new StringBuffer(getWrapped().toString());
     sb.append("  (circular)");
     return sb.toString();
+  }
+
+  public boolean isContiguous() {
+    boolean a = false;
+    boolean b = false;
+    int i = 1;
+
+    if(super.isContiguous()) return true;
+    if(getWrapped() instanceof CompoundLocation){
+      CompoundLocation l = (CompoundLocation)getWrapped();
+
+      for(Iterator iter = l.blockIterator(); iter.hasNext(); i++){
+        if(i > 2) return false;
+        Location block = (Location)iter.next();
+        if(block.getMin() == 1) a = true;
+        if(block.getMax() == this.getLength()) b = true;
+      }
+    }
+
+    return(a && b);
   }
 }
