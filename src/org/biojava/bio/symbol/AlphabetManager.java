@@ -1385,7 +1385,7 @@ public final class AlphabetManager {
         }
 
         public List getAlphabets() {
-            return alpha.getAlphabets();
+            return Collections.singletonList(this);
         }
 
         public Symbol getAmbiguity(Set s)
@@ -1515,7 +1515,7 @@ public final class AlphabetManager {
         }
 
         public List getSymbols() {
-            return symbol.getSymbols();
+            return Collections.singletonList(this);
         }
 
         public Annotation getAnnotation() {
