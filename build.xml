@@ -25,13 +25,13 @@
     javadocs-all      builds API documentation for all the above
     docbook           builds DocBook documentation
     clean             cleans up the build & dist directories
-    
+
   The 'runtests' target can be restricted to portions of the tree, e.g.:
-  
+
        ant -Dtest.subtree=org/biojava/bio/symbol runtests
        ant -Dtest.subtree=org/biojava/bio/seq/** runtests
 
-  author:  Michael Heuer, 
+  author:  Michael Heuer,
            Keith James (JUnit support, DocBook support)
            Greg Cox (fixed documentation)
            Thomas Down (clean up, remove source-copying steps
@@ -50,7 +50,7 @@
 
     <property name="build.compiler" value="modern" />
 
-    <property name="classpath" value="bytecode.jar:htmlparser.jar:commons-cli.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar" />
+    <property name="classpath" value="bytecode.jar:htmlparser.jar:commons-cli.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar" />
 
     <property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
 
@@ -82,11 +82,17 @@
                property="sableCC.support">
     </available>
 
+    <available classpath="${classpath}"
+               classname="org.hsqldb.jdbcDriver"
+               property="sqlDriver.hsqldb">
+    </available>
+
     <!-- Echo information -->
     <echo message="Building biojava-${version}" />
     <echo message="JUnit present:                   ${junit.present}" />
     <echo message="JUnit supported by Ant:          ${junit.support}" />
     <echo message="SableCC supported by Ant:        ${sableCC.support}" />
+    <echo message="HSQLDB driver presend:           ${sqlDriver.hsqldb}" />
 
     <property name="readme" value="./README" />
     <property name="license" value="./LICENSE" />
@@ -409,10 +415,10 @@
   -->
 
   <!-- Creates the biojava package (tests are left in the parallel tree) -->
-  
+
   <!-- this ought to depend on compile-grammars at well, but until conditional
         sablecc works, that's a Bad Idea -->
-  
+
   <target name="package-biojava" depends="compile-biojava"
   description="create biojava class jar file">
     <jar
@@ -669,7 +675,7 @@
       </batchtest>
     </junit>
   </target>
-  
+
   <target name="runtests-fork" depends="compile-tests"
   description="Run all tests, can be quite slow">
     <property name="test.subtree" value="**" />
