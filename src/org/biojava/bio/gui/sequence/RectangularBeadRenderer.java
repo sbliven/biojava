@@ -35,17 +35,34 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * <code>RectangularBeadRenderer</code> renders features as
- * simple rectangles. Their outline and fill <code>Paint</code>,
+ * <p><code>RectangularBeadRenderer</code> renders features as simple
+ * rectangles. Their outline and fill <code>Paint</code>,
  * <code>Stroke</code>, feature depth, Y-axis displacement are
- * configurable.
+ * configurable. The height of the rectangle will be equal to half its
+ * width, but not greater than the <code>beadDepth</code> set in the
+ * constructor.</p>
+ *
+ * <p>An alternative bead height behaviour is available where the
+ * rectangle height does not scale with its current width. The
+ * <code>setHeightScaling</code> method should be passed a boolean
+ * value to change this. The default is to use height scaling.</p>
  *
  * @author Keith James
  * @since 1.2
  */
 public class RectangularBeadRenderer extends AbstractBeadRenderer
 {
+    /**
+     * Constant <code>HEIGHTSCALING</code> indicating a change to the
+     * feature height scaling policy.
+     */
+    public static final ChangeType HEIGHTSCALING =
+	new ChangeType("The height scaling policy of the features has changed",
+		       "org.biojava.bio.gui.sequence.RectangularBeadRenderer",
+		       "HEIGHTSCALING", SequenceRenderContext.LAYOUT);
+
     protected Rectangle2D rect;
+    protected boolean scaleHeight;
 
     /**
      * Creates a new <code>RectangularBeadRenderer</code> with the
@@ -55,6 +72,7 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
     {
         super();
         rect = new Rectangle2D.Double();
+        scaleHeight = true;
     }
 
     /**
@@ -74,6 +92,7 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
     {
         super(beadDepth, beadDisplacement, beadOutline, beadFill, beadStroke);
         rect = new Rectangle2D.Double();
+        scaleHeight = true;
     }
 
     /**
@@ -93,17 +112,27 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
         int max = loc.getMax();
         int dif = max - min;
 
+        double posXW, posYN, width, height;
+
         if (context.getDirection() == context.HORIZONTAL)
         {
-            double  posXW = context.sequenceToGraphics(min);
-            double  posYN = beadDisplacement;
-            double  width = Math.max(((double) (dif + 1)) * context.getScale(), 1.0);
-            double height = Math.min(beadDepth, width / 2.0);
+            posXW  = context.sequenceToGraphics(min);
+            posYN  = beadDisplacement;
+            width  = Math.max(((double) (dif + 1)) * context.getScale(), 1.0);
 
-            // If the bead height occupies less than the full height
-            // of the renderer, move it down so that it is central
-            if (height < beadDepth)
-                posYN += ((beadDepth - height) / 2.0);
+            if (scaleHeight)
+            {
+                height = Math.min(beadDepth, width / 2.0);
+
+                // If the bead height occupies less than the full height
+                // of the renderer, move it down so that it is central
+                if (height < beadDepth)
+                    posYN += ((beadDepth - height) / 2.0);
+            }
+            else
+            {
+                height = beadDepth;
+            }
 
             rect.setRect(posXW, posYN,
                          Math.floor(width),
@@ -111,13 +140,21 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
         }
         else
         {
-            double  posXW = beadDisplacement;
-            double  posYN = context.sequenceToGraphics(min);
-            double height = Math.max(((double) dif + 1) * context.getScale(), 1.0);
-            double  width = Math.min(beadDepth, height / 2.0);
+            posXW  = beadDisplacement;
+            posYN  = context.sequenceToGraphics(min);
+            height = Math.max(((double) dif + 1) * context.getScale(), 1.0);
 
-            if (width < beadDepth)
-                posXW += ((beadDepth - width) /  2.0);
+            if (scaleHeight)
+            {
+                width = Math.min(beadDepth, height / 2.0);
+
+                if (width < beadDepth)
+                    posXW += ((beadDepth - width) /  2.0);
+            }
+            else
+            {
+                width = beadDepth;
+            }
 
             rect.setRect(posXW, posYN,
                          Math.floor(width),
@@ -145,5 +182,53 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
         // Get max depth of delegates using base class method
         double maxDepth = super.getDepth(context);
         return Math.max(maxDepth, (beadDepth + beadDisplacement));
+    }
+
+    /**
+     * <code>getHeightScaling</code> returns the state of the height
+     * scaling policy.
+     *
+     * @return a <code>boolean</code> true if height scaling is
+     * enabled.
+     */
+    public boolean getHeightScaling()
+    {
+        return scaleHeight;
+    }
+
+    /**
+     * <code>setHeightScaling</code> sets the height scaling
+     * policy. Default behaviour is for this to be enabled leading to
+     * features being drawn with a height equal to half their width,
+     * subject to a maximum height restriction equal to the
+     * <code>beadDepth</code> set in the constructor. If disabled,
+     * features will always be drawn at the maximum height allowed by
+     * the <code>beadDepth</code> parameter.
+     *
+     * @param isEnabled a <code>boolean</code>.
+     *
+     * @exception ChangeVetoException if an error occurs.
+     */
+    public void setHeightScaling(boolean isEnabled) throws ChangeVetoException
+    {
+        if (hasListeners())
+	{
+	    ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+	    synchronized(cs)
+	    {
+		ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
+						 null, null,
+						 new ChangeEvent(this, HEIGHTSCALING,
+								 new Boolean(scaleHeight),
+								 new Boolean(isEnabled)));
+		cs.firePreChangeEvent(ce);
+                scaleHeight = isEnabled;
+		cs.firePostChangeEvent(ce);
+	    }
+	}
+	else
+	{
+            scaleHeight = isEnabled;
+	}
     }
 }

@@ -39,12 +39,12 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * <code>EllipticalBeadRenderer</code> renders features as
- * simple ellipses. Their outline and fill <code>Paint</code>,
+ * <p><code>EllipticalBeadRenderer</code> renders features as simple
+ * ellipses. Their outline and fill <code>Paint</code>,
  * <code>Stroke</code>, feature depth, Y-axis displacement are
  * configurable. Also configurable is the minimum ratio of long axis
  * to short axis of the ellipse - this prevents long features also
- * becoming ever wider and obscuring neighbours.
+ * becoming ever wider and obscuring neighbours.</p>
  *
  * @author Keith James
  * @since 1.2
@@ -69,7 +69,7 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
     public EllipticalBeadRenderer()
     {
 	super();
-	dimensionRatio = 2.0f;
+	dimensionRatio = 2.0F;
     }
 
     /**
@@ -90,7 +90,7 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
 				  double dimensionRatio)
     {
 	super(beadDepth, beadDisplacement, beadOutline, beadFill, beadStroke);
-	dimensionRatio = 2.0f;
+	dimensionRatio = 2.0F;
     }
 
     /**
@@ -185,7 +185,7 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
      */
     public void setDimensionRatio(double ratio) throws ChangeVetoException
     {
-	if (ratio < 1.0f)
+	if (ratio < 1.0F)
 	    throw new ChangeVetoException("The long dimension may not be less than the short dimension (ratio >= 1.0)");
 
 	if (hasListeners())

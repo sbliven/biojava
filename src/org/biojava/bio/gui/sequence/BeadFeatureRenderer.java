@@ -27,7 +27,7 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.OptimizableFilter;
 
 /**
- * <p><code>BeadFeatureRenderer</code> use a 'string of beads'
+ * <p><code>BeadFeatureRenderer</code>s use a 'string of beads'
  * metaphor for displaying features.</p>
  *
  * <p>A concrete <code>BeadFeatureRenderer</code> may render a series

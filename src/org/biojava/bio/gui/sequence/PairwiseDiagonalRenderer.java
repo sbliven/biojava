@@ -64,6 +64,7 @@ import org.biojava.utils.*;
  * are my responsibility.</p>
  *
  * @author Keith James
+ * @author Leen Ammeraal
  * @since 1.2
  */
 public class PairwiseDiagonalRenderer extends AbstractChangeable

@@ -32,6 +32,7 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.OptimizableFilter;
 import org.biojava.bio.symbol.Location;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.net.URLFactory;
 
 /**
@@ -128,6 +129,7 @@ public class RectangularImapRenderer
 
         double        beadDepth = getBeadDepth();
         double beadDisplacement = getBeadDisplacement();
+        boolean scaleHeight     = getHeightScaling();
 
         AffineTransform t = g2.getTransform();
         double transX = t.getTranslateX();
@@ -147,22 +149,37 @@ public class RectangularImapRenderer
             posXW  = context.sequenceToGraphics(min);
             posYN  = beadDisplacement;
             width  = Math.max(((double) (dif + 1)) * context.getScale(), 1.0);
-            height = Math.min(beadDepth, width / 2.0);
 
-            // If the bead height occupies less than the full height
-            // of the renderer, move it down so that it is central
-            if (height < beadDepth)
-                posYN += ((beadDepth - height) / 2.0);
+            if (scaleHeight)
+            {
+                height = Math.min(beadDepth, width / 2.0);
+
+                // If the bead height occupies less than the full height
+                // of the renderer, move it down so that it is central
+                if (height < beadDepth)
+                    posYN += ((beadDepth - height) / 2.0);
+            }
+            else
+            {
+                height = beadDepth;
+            }
         }
         else
         {
             posXW  = beadDisplacement;
             posYN  = context.sequenceToGraphics(min);
             height = Math.max(((double) dif + 1) * context.getScale(), 1.0);
-            width  = Math.min(beadDepth, height / 2.0);
 
-            if (width < beadDepth)
-                posXW += ((beadDepth - width) /  2.0);
+            if (scaleHeight)
+            {
+                width = Math.min(beadDepth, height / 2.0);
+                if (width < beadDepth)
+                    posXW += ((beadDepth - width) /  2.0);
+            }
+            else
+            {
+                width = beadDepth;
+            }
         }
 
         // Apply translation and round
@@ -219,6 +236,36 @@ public class RectangularImapRenderer
     public double getBeadDisplacement()
     {
         return renderer.getBeadDisplacement();
+    }
+
+    /**
+     * <code>getHeightScaling</code> returns the state of the height
+     * scaling policy.
+     *
+     * @return a <code>boolean</code> true if height scaling is
+     * enabled.
+     */
+    public boolean getHeightScaling()
+    {
+        return renderer.getHeightScaling();
+    }
+
+    /**
+     * <code>setHeightScaling</code> sets the height scaling
+     * policy. Default behaviour is for this to be enabled leading to
+     * features being drawn with a height equal to half their width,
+     * subject to a maximum height restriction equal to the
+     * <code>beadDepth</code> set in the constructor. If disabled,
+     * features will always be drawn at the maximum height allowed by
+     * the <code>beadDepth</code> parameter.
+     *
+     * @param isEnabled a <code>boolean</code>.
+     *
+     * @exception ChangeVetoException if an error occurs.
+     */
+    public void setHeightScaling(boolean isEnabled) throws ChangeVetoException
+    {
+        renderer.setHeightScaling(isEnabled);
     }
 
     public FeatureHolder processMouseEvent(FeatureHolder         holder,
