@@ -51,7 +51,7 @@ public class GFFWriter implements GFFDocumentHandler {
     this.out = out;
   }
   
-  public void startDocument() {}
+  public void startDocument(String locator) {}
   
   /**
    * Flushes the <span class="type">PrintWriter</span> to make sure that everything is written.

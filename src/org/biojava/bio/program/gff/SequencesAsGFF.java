@@ -160,7 +160,7 @@ public class SequencesAsGFF {
    */
   public void processSequence(Sequence seq, GFFDocumentHandler handler) 
   throws BioException, BioException {
-    handler.startDocument();
+    handler.startDocument(seq.getURN());
     doProcessSequence(seq, handler, seq.getName());
     handler.endDocument();
   }
@@ -177,7 +177,7 @@ public class SequencesAsGFF {
    */
   public void processDB(SequenceDB seqDB, GFFDocumentHandler handler)
   throws BioException, BioException {
-    handler.startDocument();
+    handler.startDocument("unknown:SequenceDB");
     for(Iterator i = seqDB.ids().iterator(); i.hasNext(); ) {
       String id = (String) i.next();
       Sequence seq = seqDB.getSequence(id);

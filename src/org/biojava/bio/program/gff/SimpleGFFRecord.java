@@ -236,62 +236,6 @@ public class SimpleGFFRecord implements GFFRecord {
   }
   
   /**
-   * Parse <span class="arg">attValList</span> into a
-   * <span class="type">Map</span> of attributes and value lists.
-   * <P>
-   * The resulting <span class="type">Map</span> will have
-   * <span class="type">String</span> keys, with
-   * <span class="type">List</span> values. If there are no values
-   * associated with a key, then it will have an empty
-   * <span class="type">List</span>, not <span class="kw">null</span> as
-   * its value.
-   *
-   * @param attValList  the <span class="type">String</span> to parse
-   * @return a <span class="type">Map</span> of parsed attributes and value lists
-   */
-  public static Map parseAttribute(String attValList) {
-    Map attMap = new HashMap();
-    
-    StringTokenizer sTok = new StringTokenizer(attValList, ";", false);
-    while(sTok.hasMoreTokens()) {
-      String attVal = sTok.nextToken().trim();
-      String attName;
-      List valList = new ArrayList();
-      int spaceIndx = attVal.indexOf(" ");
-      if(spaceIndx == -1) {
-        attName = attVal;
-      } else {
-        attName = attVal.substring(0, spaceIndx);
-        attValList = attVal.substring(spaceIndx).trim();
-        while(attValList.length() > 0) {
-          if(attValList.startsWith("\"")) {
-	    // System.out.println("Quoted");
-            int quoteIndx = 0;
-            do {
-              quoteIndx++;
-              quoteIndx = attValList.indexOf("\"", quoteIndx);
-            } while(quoteIndx != -1 && attValList.charAt(quoteIndx-1) == '\\');
-            valList.add(attValList.substring(1, quoteIndx));
-            attValList = attValList.substring(quoteIndx+1).trim();
-          } else {
-            spaceIndx = attValList.indexOf(" ");
-            if(spaceIndx == -1) {
-              valList.add(attValList);
-              attValList = "";
-            } else {
-              valList.add(attValList.substring(0, spaceIndx));
-              attValList = attValList.substring(spaceIndx).trim();
-            }
-          }
-        }
-      }
-      attMap.put(attName, valList);
-    }
-    
-    return attMap;
-  }
-  
-  /**
    * Create a <span class="type">String</span> representation of
    * <span class="arg">attMap</span>.
    *

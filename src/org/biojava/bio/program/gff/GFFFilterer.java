@@ -63,8 +63,8 @@ public class GFFFilterer implements GFFDocumentHandler {
     this.filter = filter;
   }
   
-  public void startDocument() {
-    handler.startDocument();
+  public void startDocument(String locator) {
+    handler.startDocument(locator);
   }
   
   public void endDocument() {
@@ -82,30 +82,5 @@ public class GFFFilterer implements GFFDocumentHandler {
     if(filter.accept(record)) {
       handler.recordLine(record);
     }
-  }
-  
-  public void invalidStart(String token, NumberFormatException nfe)
-  throws BioException {
-    handler.invalidStart(token, nfe);
-  }
-  
-  public void invalidEnd(String token, NumberFormatException nfe)
-  throws BioException {
-    handler.invalidEnd(token, nfe);
-  }
-  
-  public void invalidScore(String token, NumberFormatException nfe)
-  throws BioException {
-    handler.invalidScore(token, nfe);
-  }
-  
-  public void invalidStrand(String token)
-  throws BioException {
-    handler.invalidStrand(token);
-  }
-  
-  public void invalidFrame(String token, NumberFormatException nfe)
-  throws BioException {
-    handler.invalidFrame(token, nfe);
   }
 }

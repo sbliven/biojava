@@ -178,9 +178,10 @@ public class GFFEntrySet {
    * The type of object returned by <span class="method">getAddHandler</span>.
    *
    * @author Matthew Pocock
+   * @author Thomas Down
    */
   private class EntrySetBuilder implements GFFDocumentHandler {
-    public void startDocument() {}
+    public void startDocument(String locator) {}
     public void endDocument()   {}
   
     public void commentLine(String comment) {
@@ -189,27 +190,6 @@ public class GFFEntrySet {
     
     public void recordLine(GFFRecord record) {
       lines.add(record);
-    }
-  
-    public void invalidStart(String token, NumberFormatException nfe)
-    throws BioException {
-      throw new BioException(nfe, "Invalid start: " + token);
-    }
-    public void invalidEnd(String token, NumberFormatException nfe)
-    throws BioException {
-      throw new BioException(nfe, "Invalid end: " + token);
-    }
-    public void invalidScore(String token, NumberFormatException nfe)
-    throws BioException {
-      throw new BioException(nfe, "Invalid score: " + token);
-    }
-    public void invalidStrand(String token)
-    throws BioException {
-      throw new BioException("Invalid strand: " + token);
-    }
-    public void invalidFrame(String token, NumberFormatException nfe)
-    throws BioException {
-      throw new BioException(nfe, "Invalid frame: " + token);
     }
   }
 }

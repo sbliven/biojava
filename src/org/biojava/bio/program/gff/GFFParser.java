@@ -25,60 +25,117 @@ import java.util.*;
 import java.io.*;
 
 import org.biojava.bio.*;
+import org.biojava.utils.*;
 
 /**
  * Parse a stream of GFF text into a stream of records and comments.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class GFFParser {
-  /**
-   * Informs <span class="arg">handler</span> of each line of
-   * gff read from <span class="arg">bReader</span> and any associated errors.
-   *
-   * @param bReader the <span class="type">BufferedReader</span> to parse
-   * @param handler the <span class="type">GFFDocumentHandler</span> that will
-   *                listen for 'stuff'
-   * @throws <span class="type">IOException</span> if for any reason
-   *         <span class="arg">bReader</span> throws one
-   * @throws <span class="type">BioException</span> if
-   *         <span class="arg">handler</span> can not correct a parse error
-   */
-  public void parse(BufferedReader bReader, GFFDocumentHandler handler)
-  throws IOException, BioException {
-    handler.startDocument();
-    ArrayList aList = new ArrayList();
-    for(String line = bReader.readLine(); line != null; line = bReader.readLine()) {
-      aList.clear();
-      if(line.startsWith("#")) {
-        handler.commentLine(line.substring(1));
-      } else {
-        StringTokenizer st = new StringTokenizer(line, "\t", false);
-        while(st.hasMoreTokens() && aList.size() < 8) {
-          String token = st.nextToken();
-          aList.add(token);
-        }
-        String rest = null;
-        String comment = null;
-        if(st.hasMoreTokens()) {
-          try {
-            rest = st.nextToken(((char) 0) + "");
-          } catch (NoSuchElementException nsee) {
-          }
-        }
-        if(rest != null) {
-          int ci = rest.indexOf("#");
-          if (ci != -1) {
-            comment = rest.substring(ci);
-            rest = rest.substring(0, ci);
-          }
-        }
-        GFFRecord record = createRecord(handler, aList, rest, comment);
-        handler.recordLine(record);
-      }
+    private GFFErrorHandler errors = GFFErrorHandler.ABORT_PARSING;
+
+    /**
+     * Set the error handler used by this parser.
+     */
+
+    public void setErrorHandler(GFFErrorHandler errors) {
+	this.errors = errors;
     }
-    handler.endDocument();
-  }
+
+    /**
+     * Find the error handler used by this parser.
+     */
+
+    public GFFErrorHandler getErrorHandler() {
+	return errors;
+    }
+
+    /**
+     * Informs <span class="arg">handler</span> of each line of
+     * gff read from <span class="arg">bReader</span>.  This form
+     * of the method should only be used if no locator string is
+     * available for the resource being parsed.
+     *
+     * @param bReader the <span class="type">BufferedReader</span> to parse
+     * @param handler the <span class="type">GFFDocumentHandler</span> that will
+     *                listen for 'stuff'
+     * 
+     * @throws <span class="type">IOException</span> if for any reason
+     *         <span class="arg">bReader</span> throws one
+     * @throws <span class="type">BioException</span> if
+     *         <span class="arg">handler</span> can not correct a parse error
+     */
+
+    public void parse(BufferedReader bReader, GFFDocumentHandler handler)
+	throws IOException, BioException, ParserException
+    {
+	parse(bReader, handler, "unknown:");
+    }
+
+    /**
+     * Informs <span class="arg">handler</span> of each line of
+     * gff read from <span class="arg">bReader</span>
+     *
+     * @param bReader the <span class="type">BufferedReader</span> to parse
+     * @param handler the <span class="type">GFFDocumentHandler</span> that will
+     *                listen for 'stuff'
+     * 
+     * @throws <span class="type">IOException</span> if for any reason
+     *         <span class="arg">bReader</span> throws one
+     * @throws <span class="type">BioException</span> if
+     *         <span class="arg">handler</span> can not correct a parse error
+     */
+
+    public void parse(BufferedReader bReader, GFFDocumentHandler handler, String locator)
+	throws IOException, BioException, ParserException
+    {
+	handler.startDocument(locator);
+	ArrayList aList = new ArrayList();
+	int lineNum = 0;
+	for(String line = bReader.readLine(); line != null; line = bReader.readLine()) {
+	    ++lineNum;
+
+	    try {
+		aList.clear();
+		if(line.startsWith("#")) {
+		    handler.commentLine(line.substring(1));
+		} else {
+		    StringTokenizer st = new StringTokenizer(line, "\t", false);
+		    while(st.hasMoreTokens() && aList.size() < 8) {
+			String token = st.nextToken();
+			aList.add(token);
+		    }
+		    String rest = null;
+		    String comment = null;
+		    if(st.hasMoreTokens()) {
+			try {
+			    rest = st.nextToken(((char) 0) + "");
+			} catch (NoSuchElementException nsee) {
+			}
+		    }
+		    if(rest != null) {
+			int ci = rest.indexOf("#");
+			if (ci != -1) {
+			    comment = rest.substring(ci);
+			    rest = rest.substring(0, ci);
+			}
+		    }
+		    GFFRecord record = createRecord(handler, aList, rest, comment);
+		    handler.recordLine(record);
+		}
+	    } catch (ParserException ex) {
+		throw new ParserException(ex.getMessage(),
+					  locator,
+					  lineNum,
+					  line);
+	    } catch (IgnoreRecordException ex) {
+		// Silently skip any more work on this record
+	    }
+	}
+	handler.endDocument();
+    }
   
   /**
    * Actualy turns a list of tokens, some value string and a comment into a
@@ -95,68 +152,140 @@ public class GFFParser {
    * @throws <span class="type">BioException</span> if <span class="arg">handler</span>
    *         could not correct a parse error
    */
-  protected GFFRecord createRecord(GFFDocumentHandler handler, List aList, String rest, String comment)
-  throws BioException {
-    SimpleGFFRecord record = new SimpleGFFRecord();
+    protected GFFRecord createRecord(GFFDocumentHandler handler, 
+				     List aList, 
+				     String rest,
+				     String comment)
+	throws BioException, ParserException, IgnoreRecordException
+    {
+	SimpleGFFRecord record = new SimpleGFFRecord();
     
-    record.setSeqName((String) aList.get(0));
-    record.setSource((String) aList.get(1));
-    record.setFeature((String) aList.get(2));
+	record.setSeqName((String) aList.get(0));
+	record.setSource((String) aList.get(1));
+	record.setFeature((String) aList.get(2));
     
-    try {
-      record.setStart(Integer.parseInt( (String) aList.get(3)));
-    } catch (NumberFormatException nfe) {
-      handler.invalidStart((String) aList.get(3), nfe);
+	int start = -1;
+	try {
+	    start = Integer.parseInt( (String) aList.get(3));
+	} catch (NumberFormatException nfe) {
+	    start = errors.invalidStart((String) aList.get(3));
+	}
+	record.setStart(start);
+    
+	int end = -1;
+	try {
+	    end = Integer.parseInt( (String) aList.get(4));
+	} catch (NumberFormatException nfe) {
+	    end = errors.invalidEnd((String) aList.get(3));
+	}
+	record.setEnd(end);
+    
+	String score = (String) aList.get(5);
+	if(score == null     ||
+	   score.equals("")  ||
+	   score.equals(".") ||
+	   score.equals("0")
+	   ) {
+	    record.setScore(GFFRecord.NO_SCORE);
+	} else {
+	    double sc = 0.0;
+	    try {
+		sc = Double.parseDouble(score);
+	    } catch (NumberFormatException nfe) {
+		sc = errors.invalidScore(score);
+	    }
+	    record.setScore(sc);
+	}
+    
+	String strand = (String) aList.get(6);
+	if(strand == null || strand.equals("") || strand.equals(".")) {
+	    record.setStrand(GFFRecord.NO_STRAND);
+	} else {
+	    if(strand.equals("+")) {
+		record.setStrand(GFFRecord.POSITIVE_STRAND);
+	    } else if(strand.equals("-")) {
+		record.setStrand(GFFRecord.NEGATIVE_STRAND);
+	    } else {
+		record.setStrand(errors.invalidStrand(strand));
+	    }
+	}
+    
+	String frame = (String) aList.get(7);
+	if(frame.equals(".")) {
+	    record.setFrame(GFFRecord.NO_FRAME);
+	} else {
+	    int fr = 0;
+	    try {
+		fr = Integer.parseInt(frame);
+	    } catch (NumberFormatException nfe) {
+		fr = errors.invalidFrame(frame);
+	    }
+	    record.setFrame(fr);
+	}
+    
+	if (rest != null)
+	    record.setGroupAttributes(parseAttribute(rest));
+	else
+	    record.setGroupAttributes(new HashMap());
+	record.setComment(comment);
+	
+	return record;
     }
+
+    /**
+     * Parse <span class="arg">attValList</span> into a
+     * <span class="type">Map</span> of attributes and value lists.
+     * <P>
+     * The resulting <span class="type">Map</span> will have
+     * <span class="type">String</span> keys, with
+     * <span class="type">List</span> values. If there are no values
+     * associated with a key, then it will have an empty
+     * <span class="type">List</span>, not <span class="kw">null</span> as
+     * its value.
+     *
+     * @param attValList  the <span class="type">String</span> to parse
+     * @return a <span class="type">Map</span> of parsed attributes and value lists
+     */
+
+    protected Map parseAttribute(String attValList) {
+	Map attMap = new HashMap();
+	
+	StringTokenizer sTok = new StringTokenizer(attValList, ";", false);
+	while(sTok.hasMoreTokens()) {
+	    String attVal = sTok.nextToken().trim();
+	    String attName;
+	    List valList = new ArrayList();
+	    int spaceIndx = attVal.indexOf(" ");
+	    if(spaceIndx == -1) {
+		attName = attVal;
+	    } else {
+		attName = attVal.substring(0, spaceIndx);
+		attValList = attVal.substring(spaceIndx).trim();
+		while(attValList.length() > 0) {
+		    if(attValList.startsWith("\"")) {
+			// System.out.println("Quoted");
+			int quoteIndx = 0;
+			do {
+			    quoteIndx++;
+			    quoteIndx = attValList.indexOf("\"", quoteIndx);
+			} while(quoteIndx != -1 && attValList.charAt(quoteIndx-1) == '\\');
+			valList.add(attValList.substring(1, quoteIndx));
+			attValList = attValList.substring(quoteIndx+1).trim();
+		    } else {
+			spaceIndx = attValList.indexOf(" ");
+			if(spaceIndx == -1) {
+			    valList.add(attValList);
+			    attValList = "";
+			} else {
+			    valList.add(attValList.substring(0, spaceIndx));
+			    attValList = attValList.substring(spaceIndx).trim();
+			}
+		    }
+		}
+	    }
+	    attMap.put(attName, valList);
+	}
     
-    try {
-      record.setEnd(Integer.parseInt( (String) aList.get(4)));
-    } catch (NumberFormatException nfe) {
-      handler.invalidEnd((String) aList.get(3), nfe);
+	return attMap;
     }
-    
-    String score = (String) aList.get(5);
-    if(score == null     ||
-       score.equals("")  ||
-       score.equals(".") ||
-       score.equals("0")
-    ) {
-      record.setScore(GFFRecord.NO_SCORE);
-    } else {
-      try {
-        record.setScore(Double.parseDouble(score));
-      } catch (NumberFormatException nfe) {
-        handler.invalidScore(score, nfe);
-      }
-    }
-    
-    String strand = (String) aList.get(6);
-    if(strand == null || strand.equals("") || strand.equals(".")) {
-      record.setStrand(GFFRecord.NO_STRAND);
-    } else {
-      if(strand.equals("+")) {
-        record.setStrand(GFFRecord.POSITIVE_STRAND);
-      } else if(strand.equals("-")) {
-        record.setStrand(GFFRecord.NEGATIVE_STRAND);
-      } else {
-        handler.invalidStrand(strand);
-      }
-    }
-    
-    String frame = (String) aList.get(7);
-    if(frame.equals(".")) {
-      record.setFrame(GFFRecord.NO_FRAME);
-    } else {
-      try {
-        record.setFrame(Integer.parseInt(frame));
-      } catch (NumberFormatException nfe) {
-        handler.invalidFrame((String) aList.get(7), nfe);
-      }
-    }
-    
-    record.setGroupAttributes(SimpleGFFRecord.parseAttribute(rest));
-    record.setComment(comment);
-    
-    return record;
-  }
 }
