@@ -417,13 +417,13 @@ public final class AlphabetManager {
 
   static private Symbol readFromCache(List symList)
   {
-    System.out.println("Reading symbol: " + symList + " -> " + symListToSymbol.get(symList));
+    //System.out.println("Reading symbol: " + symList + " -> " + symListToSymbol.get(symList));
     return (Symbol) symListToSymbol.get(symList);
   }
 
   static private void writeToCache(List symList, Symbol sym)
   {
-    System.out.println("Writing symbol: " + symList + " -> " + sym);
+    //System.out.println("Writing symbol: " + symList + " -> " + sym);
     symListToSymbol.put(new ArrayList(symList), sym);
   }
 
