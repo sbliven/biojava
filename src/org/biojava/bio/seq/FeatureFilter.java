@@ -865,28 +865,10 @@ public interface FeatureFilter extends Serializable {
         allProps.addAll(ourProps);
         for(Iterator i = allProps.iterator(); i.hasNext(); ) {
           Object prop = i.next();
-          Location thisC;
-          PropertyConstraint thisP;
-          if (ourProps.contains(prop)) {
-              thisC = this.getType().getCardinalityConstraint(prop);
-              thisP = this.getType().getPropertyConstraint(prop);
-          } else {
-              thisC = this.getType().getDefaultCardinalityConstraint();
-              thisP = this.getType().getDefaultPropertyConstraint();
-          }
-          Location thatC;
-          PropertyConstraint thatP;
-          if (props.contains(prop)) {
-              thatC = that.getType().getCardinalityConstraint(prop);
-              thatP = that.getType().getPropertyConstraint(prop);
-          } else {
-              thatC = that.getType().getDefaultCardinalityConstraint();
-              thatP = that.getType().getDefaultPropertyConstraint();
-          }
           
-          if(!LocationTools.overlaps(thisC, thatC)) {
-              return true;
-          } else if (!thisP.subConstraintOf(thatP) && !thatP.subConstraintOf(thisP)) {
+          CollectionConstraint thisC = this.getType().getConstraint(prop);
+          CollectionConstraint thatC = that.getType().getConstraint(prop);
+          if (AnnotationTools.intersection(thisC, thatC) == CollectionConstraint.NONE) {
               return true;
           }
         }
@@ -907,15 +889,12 @@ public interface FeatureFilter extends Serializable {
           if(!thisProps.contains(prop)) {
             return false;
           }
-          
-          Location thisC = this.getType().getCardinalityConstraint(prop);
-          Location thatC = that.getType().getCardinalityConstraint(prop);
-          PropertyConstraint thisP = this.getType().getPropertyConstraint(prop);
-          PropertyConstraint thatP = that.getType().getPropertyConstraint(prop);
+         
+          CollectionConstraint thisP = this.getType().getConstraint(prop);
+          CollectionConstraint thatP = that.getType().getConstraint(prop);
           
           if(
-            !thatP.subConstraintOf(thisP) ||
-            !LocationTools.contains(thatC, thisC)
+            !thatP.subConstraintOf(thisP)
           ) {
             return false;
           }

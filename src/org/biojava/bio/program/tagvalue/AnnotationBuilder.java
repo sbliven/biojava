@@ -89,7 +89,11 @@ public class AnnotationBuilder
       top.type = this.type;
     } else {
       Frame old = peek(annotationStack);
-      PropertyConstraint pc = old.type.getPropertyConstraint(old.tag);
+      CollectionConstraint cc = old.type.getConstraint(old.tag);
+      PropertyConstraint pc = null;
+      if (cc instanceof CollectionConstraint.AllValuesIn) {
+          pc = ((CollectionConstraint.AllValuesIn) cc).getPropertyConstraint();
+      }
       if(pc instanceof PropertyConstraint.ByAnnotationType) {
         PropertyConstraint.ByAnnotationType pcat = (PropertyConstraint.ByAnnotationType) pc;
         top.type = pcat.getAnnotationType();
