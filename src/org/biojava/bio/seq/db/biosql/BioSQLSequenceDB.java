@@ -75,7 +75,7 @@ import org.apache.commons.dbcp.BasicDataSource;
  * and can be used in a wide range of applications.
  *
  * Note: It now uses BioSQL schema version 1.0 (Post Singapore)
- * 			 All previous versions are no longer supported.
+ * All previous versions are no longer supported.
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -115,7 +115,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 /*
     BioSQLChangeHub getChangeHub() {
-	return changeHub;
+        return changeHub;
     }
 */
     BioSQLEntryChangeHub getEntryChangeHub() {
@@ -197,7 +197,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                             String biodatabase,
                             boolean create)
         throws BioException {
-			
+        
         dataSource = ds;
         this.initDb(biodatabase, create);
     }
@@ -214,7 +214,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         try {
             Connection conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-			
+            
             // DBHelper needs to be initialized before checks and ontologies are created
             helper = DBHelper.getDBHelper(conn);
             
@@ -236,7 +236,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             } catch (SQLException ex) {
                 throw new BioException("Error accessing ontologies", ex);
             }
-				
+            
             PreparedStatement getID = conn.prepareStatement("select * from biodatabase where name = ?");
             getID.setString(1, biodatabase);
             ResultSet rs = getID.executeQuery();
@@ -293,7 +293,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     public void createDummySequence(String id,
                                     Alphabet alphabet,
                                     int length)
-	throws ChangeVetoException, BioException
+        throws ChangeVetoException, BioException
     {
         synchronized (this) {
           ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
@@ -356,9 +356,9 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     public void addSequence(Sequence seq)
-	throws ChangeVetoException, BioException
+        throws ChangeVetoException, BioException
     {
-	synchronized (this) {
+        synchronized (this) {
             ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, seq);
             firePreChangeEvent(cev);
             _addSequence(seq);
@@ -608,7 +608,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     public void removeSequence(String id)
-	throws ChangeVetoException, BioException {
+        throws ChangeVetoException, BioException {
 
         synchronized (this) {
             ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
@@ -637,150 +637,150 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 throw new BioException("There are still references to sequence with ID " + id + " from this database.");
             }
         }
-
-				Connection conn = null;
+        
+        Connection conn = null;
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-						PreparedStatement get_sequence = conn.prepareStatement("select bioentry.bioentry_id " +
-								   "from bioentry where accession = ? and biodatabase_id = ?"
-                                   );
-	          get_sequence.setString(1, id);
-			      get_sequence.setInt(2, dbid);
-	          ResultSet rs = get_sequence.executeQuery();
-	          boolean exists;
-	      if ((exists = rs.next())) {
-				
-				// For MySQL4 (default is to use InnoDB tables), delete is via a CASCADE
-				// so only have to delete from bioentry to get all references to that 
-				// bioentry deleted
-				DBHelper.DeleteStyle dstyle = getDBHelper().getDeleteStyle();
-				int bioentry_id = rs.getInt(1);
-
-				if (dstyle !=  DBHelper.DELETE_MYSQL4) {
-
-            PreparedStatement delete_reference = conn.prepareStatement("delete from bioentry_reference where bioentry_id = ?");
-            delete_reference.setInt(1, bioentry_id);
-            delete_reference.executeUpdate();
-            delete_reference.close();
-
-            String commentTableName = getCommentTableName();
-            if (commentTableName != null) {
-                 PreparedStatement delete_comment = conn.prepareStatement("delete from " + commentTableName
-                                                             + " where bioentry_id = ?");
-                 delete_comment.setInt(1, bioentry_id);
-                    delete_comment.executeUpdate();
-                    delete_comment.close();
-            }
-
-            PreparedStatement delete_qv = conn.prepareStatement("delete from bioentry_qualifier_value where bioentry_id = ?");
-            delete_qv.setInt(1, bioentry_id);
-            delete_qv.executeUpdate();
-            delete_qv.close();
-
-            ArrayList generic_ids = null;  // default delete style will cache seqfeature_id's that need to be deleted
-            
-						PreparedStatement delete_locs;
-		        if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-                    delete_locs = conn.prepareStatement("delete from location" +
-                                                        " where location.seqfeature_id = seqfeature.seqfeature_id and" +
-                                                        " seqfeature.bioentry_id = ?");
-                    delete_locs.setInt(1, bioentry_id);
-                    delete_locs.executeUpdate();
-                    delete_locs.close();
-            } else {
-                    delete_locs = conn.prepareStatement("delete from location where seqfeature_id = ?");
-
-                    PreparedStatement get_seqfeats = conn.prepareStatement("select seqfeature_id"
-                                                                           + " from seqfeature"
-                                                                           + " where bioentry_id = ?"
-                                                                           );
-                    get_seqfeats.setInt(1, bioentry_id);
-                    ResultSet sfids = get_seqfeats.executeQuery();
-                    generic_ids = new ArrayList();
-                    while (sfids.next()) {
-                        int sfid = sfids.getInt(1);
-                        generic_ids.add(new Integer(sfid));
-                        delete_locs.setInt(1, sfid);
-                        delete_locs.executeUpdate();
-                    }
-                    sfids.close();
-                    get_seqfeats.close();
-            }
-            delete_locs.close();
-
-            PreparedStatement delete_fqv;
-		        if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-                    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value" +
-                                                       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id" +
-                                                       " and seqfeature.bioentry_id = ?");
-                    delete_fqv.setInt(1, bioentry_id);
-                    delete_fqv.executeUpdate();
-            } else {
-                    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value"
-                                                       + " where seqfeature_qualifier_value.seqfeature_id = ?");
-                    for (int i = 0; i < generic_ids.size(); i++) {
-                        int sfid = ((Integer) generic_ids.get(i)).intValue();
-                        delete_fqv.setInt(1, sfid);
-                        delete_fqv.executeUpdate();
-                    }
-            }
-            delete_fqv.close();
-
-            PreparedStatement delete_rel;
-		        if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-                    delete_rel = conn.prepareStatement("delete from seqfeature_relationship" +
-                                                       " where object_seqfeature_id = seqfeature.seqfeature_id" +
-                                                       " and seqfeature.bioentry_id = ?");
-                    delete_rel.setInt(1, bioentry_id);
-                    delete_rel.executeUpdate();
-            } else {
-                    delete_rel = conn.prepareStatement("delete from seqfeature_relationship"
-                                                       + " where object_seqfeature_id = ?");
-                    for (int i = 0; i < generic_ids.size(); i++) {
-                        int sfid = ((Integer) generic_ids.get(i)).intValue();
-                        delete_rel.setInt(1, sfid);
-                        delete_rel.executeUpdate();
-                    }
-            }
-            delete_rel.close();
-
-            PreparedStatement delete_features = conn.prepareStatement("delete from seqfeature " +
-                                                              " where bioentry_id = ?");
-            delete_features.setInt(1, bioentry_id);
-            delete_features.executeUpdate();
-            delete_features.close();
+            PreparedStatement get_sequence = conn.prepareStatement("select bioentry.bioentry_id " +
+                                                                   "from bioentry where accession = ? and biodatabase_id = ?"
+                                                                   );
+            get_sequence.setString(1, id);
+            get_sequence.setInt(2, dbid);
+            ResultSet rs = get_sequence.executeQuery();
+            boolean exists;
+            if ((exists = rs.next())) {
                 
-            PreparedStatement delete_biosequence = 
-						    conn.prepareStatement("delete from biosequence where bioentry_id = ?");
+                // For MySQL4 (default is to use InnoDB tables), delete is via a CASCADE
+                // so only have to delete from bioentry to get all references to that 
+                // bioentry deleted
+                DBHelper.DeleteStyle dstyle = getDBHelper().getDeleteStyle();
+                int bioentry_id = rs.getInt(1);
 
-		        delete_biosequence.setInt(1, bioentry_id);
-		        delete_biosequence.executeUpdate();
-		        delete_biosequence.close();
-		    } // End of if for non-MYSQL4 deletion
-		
-		    // All DB types must delete the bioentry via its id
-				// MySQL4 only needs to delete this, as it will cascade delete all references to it
-		    PreparedStatement delete_entry = 
-				        conn.prepareStatement("delete from bioentry where bioentry_id = ?");
-		    delete_entry.setInt(1, bioentry_id);
-		    int status = delete_entry.executeUpdate();
-				// Check that a deletion actually occurred, if not indicate so
-		    if (status < 1) {
-			      System.out.println("Bioentry (ID " + bioentry_id + ") failed to delete!!");
-		    }
-		    delete_entry.close();
-	      }
+                if (dstyle !=  DBHelper.DELETE_MYSQL4) {
 
-        rs.close();
-        get_sequence.close();
+                    PreparedStatement delete_reference = conn.prepareStatement("delete from bioentry_reference where bioentry_id = ?");
+                    delete_reference.setInt(1, bioentry_id);
+                    delete_reference.executeUpdate();
+                    delete_reference.close();
 
-        conn.commit();
-        conn.close();
+                    String commentTableName = getCommentTableName();
+                    if (commentTableName != null) {
+                        PreparedStatement delete_comment = conn.prepareStatement("delete from " + commentTableName
+                                                                                 + " where bioentry_id = ?");
+                        delete_comment.setInt(1, bioentry_id);
+                        delete_comment.executeUpdate();
+                        delete_comment.close();
+                    }
 
-        if (!exists) {
-             throw new IllegalIDException("Sequence " + id + " didn't exist");
-        }
+                    PreparedStatement delete_qv = conn.prepareStatement("delete from bioentry_qualifier_value where bioentry_id = ?");
+                    delete_qv.setInt(1, bioentry_id);
+                    delete_qv.executeUpdate();
+                    delete_qv.close();
+
+                    ArrayList generic_ids = null;  // default delete style will cache seqfeature_id's that need to be deleted
+            
+                    PreparedStatement delete_locs;
+                    if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
+                        delete_locs = conn.prepareStatement("delete from location" +
+                                                            " where location.seqfeature_id = seqfeature.seqfeature_id and" +
+                                                            " seqfeature.bioentry_id = ?");
+                        delete_locs.setInt(1, bioentry_id);
+                        delete_locs.executeUpdate();
+                        delete_locs.close();
+                    } else {
+                        delete_locs = conn.prepareStatement("delete from location where seqfeature_id = ?");
+
+                        PreparedStatement get_seqfeats = conn.prepareStatement("select seqfeature_id"
+                                                                               + " from seqfeature"
+                                                                               + " where bioentry_id = ?"
+                                                                               );
+                        get_seqfeats.setInt(1, bioentry_id);
+                        ResultSet sfids = get_seqfeats.executeQuery();
+                        generic_ids = new ArrayList();
+                        while (sfids.next()) {
+                            int sfid = sfids.getInt(1);
+                            generic_ids.add(new Integer(sfid));
+                            delete_locs.setInt(1, sfid);
+                            delete_locs.executeUpdate();
+                        }
+                        sfids.close();
+                        get_seqfeats.close();
+                    }
+                    delete_locs.close();
+
+                    PreparedStatement delete_fqv;
+                    if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
+                        delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value" +
+                                                           " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id" +
+                                                           " and seqfeature.bioentry_id = ?");
+                        delete_fqv.setInt(1, bioentry_id);
+                        delete_fqv.executeUpdate();
+                    } else {
+                        delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value"
+                                                           + " where seqfeature_qualifier_value.seqfeature_id = ?");
+                        for (int i = 0; i < generic_ids.size(); i++) {
+                            int sfid = ((Integer) generic_ids.get(i)).intValue();
+                            delete_fqv.setInt(1, sfid);
+                            delete_fqv.executeUpdate();
+                        }
+                    }
+                    delete_fqv.close();
+
+                    PreparedStatement delete_rel;
+                    if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
+                        delete_rel = conn.prepareStatement("delete from seqfeature_relationship" +
+                                                           " where object_seqfeature_id = seqfeature.seqfeature_id" +
+                                                           " and seqfeature.bioentry_id = ?");
+                        delete_rel.setInt(1, bioentry_id);
+                        delete_rel.executeUpdate();
+                    } else {
+                        delete_rel = conn.prepareStatement("delete from seqfeature_relationship"
+                                                           + " where object_seqfeature_id = ?");
+                        for (int i = 0; i < generic_ids.size(); i++) {
+                            int sfid = ((Integer) generic_ids.get(i)).intValue();
+                            delete_rel.setInt(1, sfid);
+                            delete_rel.executeUpdate();
+                        }
+                    }
+                    delete_rel.close();
+
+                    PreparedStatement delete_features = conn.prepareStatement("delete from seqfeature " +
+                                                                              " where bioentry_id = ?");
+                    delete_features.setInt(1, bioentry_id);
+                    delete_features.executeUpdate();
+                    delete_features.close();
+                
+                    PreparedStatement delete_biosequence = 
+                        conn.prepareStatement("delete from biosequence where bioentry_id = ?");
+
+                    delete_biosequence.setInt(1, bioentry_id);
+                    delete_biosequence.executeUpdate();
+                    delete_biosequence.close();
+                } // End of if for non-MYSQL4 deletion
+                
+                // All DB types must delete the bioentry via its id
+                // MySQL4 only needs to delete this, as it will cascade delete all references to it
+                PreparedStatement delete_entry = 
+                    conn.prepareStatement("delete from bioentry where bioentry_id = ?");
+                delete_entry.setInt(1, bioentry_id);
+                int status = delete_entry.executeUpdate();
+                // Check that a deletion actually occurred, if not indicate so
+                if (status < 1) {
+                    System.out.println("Bioentry (ID " + bioentry_id + ") failed to delete!!");
+                }
+                delete_entry.close();
+            }
+
+            rs.close();
+            get_sequence.close();
+
+            conn.commit();
+            conn.close();
+
+            if (!exists) {
+                throw new IllegalIDException("Sequence " + id + " didn't exist");
+            }
         } catch (SQLException ex) {
             boolean rolledback = false;
             if (conn != null) {
@@ -795,24 +795,24 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     public Set ids() {
-	try {
-	    Set _ids = new HashSet();
-	    Connection conn = dataSource.getConnection();
+        try {
+            Set _ids = new HashSet();
+            Connection conn = dataSource.getConnection();
 
-	    PreparedStatement st = conn.prepareStatement("select bioentry.accession from bioentry where bioentry.biodatabase_id = ?");
-	    st.setInt(1, dbid);
-	    ResultSet rs = st.executeQuery();
-	    while (rs.next()) {
-            _ids.add(rs.getString(1));
-	    }
+            PreparedStatement st = conn.prepareStatement("select bioentry.accession from bioentry where bioentry.biodatabase_id = ?");
+            st.setInt(1, dbid);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                _ids.add(rs.getString(1));
+            }
             rs.close();
-	    st.close();
+            st.close();
 
-	    conn.close();
-	    return Collections.unmodifiableSet(_ids);
-	} catch (SQLException ex) {
-	    throw new BioRuntimeException("Error reading from BioSQL tables", ex);
-	}
+            conn.close();
+            return Collections.unmodifiableSet(_ids);
+        } catch (SQLException ex) {
+            throw new BioRuntimeException("Error reading from BioSQL tables", ex);
+        }
     }
 
     //
@@ -926,7 +926,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             return ontologySQL.termID(legacy.getTerm(ts));
             // Same term but different case causes error when try to add it for MySQL
             // These hacks prevent it.  ex. genbank can have ORGANISM & organism keys
-						// Removed hack as if set term name to BINARY handles case correctly
+            // Removed hack as if set term name to BINARY handles case correctly
 //        } else if (legacy.containsTerm(ts.toLowerCase())) {
 //            return ontologySQL.termID(legacy.getTerm(ts.toLowerCase()));
 //        } else if (legacy.containsTerm(ts.toUpperCase())) {
