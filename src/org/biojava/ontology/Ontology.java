@@ -149,7 +149,9 @@ public interface Ontology extends Changeable {
      */
      
     
-    public final class Impl extends AbstractChangeable implements Ontology {
+    public final class Impl
+    extends AbstractChangeable
+    implements Ontology, OntologyOps {
         private Map terms;
         private Set triples;
         private Map subjectTriples;
@@ -159,6 +161,7 @@ public interface Ontology extends Changeable {
         
         private final String name;
         private final String description;
+        private final OntologyOps ops;
         
         {
             terms = new HashMap();
@@ -167,6 +170,9 @@ public interface Ontology extends Changeable {
             objectTriples = new HashMap();
             relationTriples = new HashMap();
             remoteTerms = new HashMap();
+            ops = new DefaultOps() {
+              public Ontology getOntology() { return Ontology.Impl.this; }
+            };
         }
         
         public Impl(String name, String description) {
@@ -237,7 +243,7 @@ public interface Ontology extends Changeable {
             throws AlreadyExistsException, IllegalArgumentException, ChangeVetoException
         {
             if (terms.containsKey(t.getName())) {
-                throw new AlreadyExistsException("Ontology " + getName() + " already contains " + name);
+                throw new AlreadyExistsException("Ontology " + getName() + " already contains " + t.getName());
             }
             
             if(!hasListeners()) {
@@ -430,6 +436,19 @@ public interface Ontology extends Changeable {
             if (s != null) {
                 s.remove(t);
             }
+        }
+        
+        public Ontology transitiveClosure(
+          Term subject,
+          Term object,
+          Term relation
+        ) throws OntologyException {
+          return ops.transitiveClosure(subject, object, relation);
+        }
+        
+        public boolean isa(Term subject, Term object)
+        throws OntologyException {
+          return ops.isa(subject, object);
         }
     }
 }

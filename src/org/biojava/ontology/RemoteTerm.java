@@ -80,7 +80,7 @@ public interface RemoteTerm extends Term {
         }
         
         public String getName() {
-            return remoteTerm.getName();
+            return getOntology().getName() + ":" + remoteTerm.getName();
         }
         
         public String getDescription() {

@@ -14,7 +14,6 @@ import org.biojava.bio.ontology.io.TabDelimParser;
 public final class OntoTools {
   private static final Ontology CORE_ONTOLOGY;
   private static final OntologyFactory DEFAULT_FACTORY;
-  private static final OntologyOps DEFAULT_OPS;
   
   public static final Term IS_A;
   public static final Term HAS_A;
@@ -61,8 +60,6 @@ public final class OntoTools {
     } catch (Exception e) {
       throw new BioError(e, "Could not initialize OntoTools");
     }
-    
-    DEFAULT_OPS = new DefaultOps();
   }
   
   
@@ -84,10 +81,6 @@ public final class OntoTools {
     return DEFAULT_FACTORY;
   }
   
-  public OntologyOps getDefaultOps() {
-    return DEFAULT_OPS;
-  }
-  
   /**
    * Decide if one Term is an instance of another.
    *
@@ -103,7 +96,10 @@ public final class OntoTools {
     System.err.println(_prefix + "Starting");
     
     if(subject == object) {
-      System.err.println(_prefix + "Ending true");
+      System.err.println(_prefix + "Ending true: identical");
+      return true;
+    } else if(object == ANY) {
+      System.err.println(_prefix + "Ending true: any");
       return true;
     }
     
@@ -111,23 +107,29 @@ public final class OntoTools {
     if(subject.getOntology() instanceof OntologyOps) {
       oo = (OntologyOps) subject.getOntology();
     } else {
-      oo = DEFAULT_OPS;
+      final Ontology so = subject.getOntology();
+      oo = new DefaultOps() {
+        public Ontology getOntology() {
+          return so;
+        }
+      };
     }
     
     if(subject.getOntology() == object.getOntology()) {
       System.err.println(_prefix + "Delegating to ontology tools");
       return oo.isa(subject, object);
     } else {
-      System.err.println(_prefix + "Computing transitive closure");
+      System.err.println(_prefix + "Computing transitive closure for ");
       Ontology remoteTriples = oo.transitiveClosure(
-        REMOTE_TERM, ANY, IS_A
+        subject, ANY, IS_A
       );
-      System.err.println(_prefix + "Searching closure for " + subject);
+      System.err.println(_prefix + "Searching closure for " + subject + " " + remoteTriples);
       for(
         Iterator i = remoteTriples.getTriples(null, null, null).iterator();
         i.hasNext();
       ) {
         Triple triple = (Triple) i.next();
+        System.err.println(_prefix + "Evaluating " + triple);
         RemoteTerm rt = (RemoteTerm) triple.getSubject();
         System.err.println(_prefix + "Following to " + rt.getRemoteTerm() + "," + object);
         if(!isa(
@@ -143,7 +145,24 @@ public final class OntoTools {
       return false;
     }
   }
-    
+  /**
+   * Get a Set of Triples satisfying some constraints.
+   *
+   * <p>
+   * This will find all tripples where each component of the triple inherits
+   * from those provided. You may use OntoTools.ANY to accept any Term for that
+   * component. This differs from the similar method in Ontology, as
+   * Ontology.getTriples() finds exact matches for each component not set to
+   * NULL.
+   * </p>
+   *
+   * @param ontology  the Ontology to search
+   * @param subject   a Term that the subjects must inherit from
+   * @param object    a Term that the objects must inherit from
+   * @param relation  a Term that the relations must inherit from
+   * @return  a Set of Triples satisfying the constraints
+   * @throws NullPointerException if any of the arguments are null
+   */
   public static Set getTriples(
     Ontology ontology,
     Term subject,
@@ -152,17 +171,19 @@ public final class OntoTools {
   ) throws OntologyException {
     Set res = new HashSet();
     
+    System.err.println("Searching triples");
     for(
       Iterator tripI = ontology.getTriples(null, null, null).iterator();
       tripI.hasNext();
     ) {
       Triple trip = (Triple) tripI.next();
-      
+      System.err.println("evaluating: " + trip);
       if(
         (subject == ANY || isa(trip.getSubject(), subject)) &&
         (object == ANY || isa(trip.getObject(), object)) &&
         isa(trip.getRelation(), relation)
       ) {
+        System.err.println("accepted");
         res.add(trip);
       }
     }
