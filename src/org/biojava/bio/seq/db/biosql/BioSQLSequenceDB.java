@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -82,7 +83,7 @@ import org.apache.commons.dbcp.BasicDataSource;
  */
 public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
-		private DataSource dataSource;
+    private DataSource dataSource;
     private int dbid = -1;
     private String name;
     private IDMaker idmaker = new IDMaker.ByName();
@@ -100,15 +101,15 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     private Cache tileCache = new FixedSizeCache(10);
 
     DataSource getDataSource() {
-			return dataSource;
-   }
+        return dataSource;
+    }
 
     DBHelper getDBHelper() {
-	return helper;
+        return helper;
     }
 
     FeaturesSQL getFeaturesSQL() {
-	return featuresSQL;
+        return featuresSQL;
     }
 /*
     BioSQLChangeHub getChangeHub() {
@@ -116,19 +117,19 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 */
     BioSQLEntryChangeHub getEntryChangeHub() {
-	return entryChangeHub;
+        return entryChangeHub;
     }
 
     BioSQLEntryAnnotationChangeHub getEntryAnnotationChangeHub() {
-	return entryAnnotationChangeHub;
+        return entryAnnotationChangeHub;
     }
 
     BioSQLFeatureChangeHub getFeatureChangeHub() {
-	return featureChangeHub;
+        return featureChangeHub;
     }
 
     BioSQLFeatureAnnotationChangeHub getFeatureAnnotationChangeHub() {
-	return featureAnnotationChangeHub;
+        return featureAnnotationChangeHub;
     }
 
     /**
@@ -146,94 +147,94 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
      */
 
     public BioSQLSequenceDB(String dbDriver,
-					String dbURL,
-			    String dbUser,
-			    String dbPass,
-			    String biodatabase,
-			    boolean create)
-					throws BioException {
-			
-			try {
-				dataSource = JDBCPooledDataSource.getDataSource(dbDriver, dbURL, dbUser, dbPass);
-			} catch (Exception ex) {
-				throw new BioException("Error getting datasource", ex);
-			}
-			this.initDb(biodatabase, create);
-		}
+                            String dbURL,
+                            String dbUser,
+                            String dbPass,
+                            String biodatabase,
+                            boolean create)
+        throws BioException {
+        
+        try {
+            dataSource = JDBCPooledDataSource.getDataSource(dbDriver, dbURL, dbUser, dbPass);
+        } catch (Exception ex) {
+            throw new BioException("Error getting datasource", ex);
+        }
+        this.initDb(biodatabase, create);
+    }
 
     public BioSQLSequenceDB(DataSource ds,
-			    String biodatabase,
-			    boolean create)
-					throws BioException {
+                            String biodatabase,
+                            boolean create)
+        throws BioException {
 			
-			dataSource = ds;
-			this.initDb(biodatabase, create);
-		}
-	
-	void initDb(String biodatabase, boolean create) 
-			throws BioException {
+        dataSource = ds;
+        this.initDb(biodatabase, create);
+    }
+    
+    void initDb(String biodatabase, boolean create) 
+        throws BioException {
 
-	// Create helpers
+        // Create helpers
         entryChangeHub = new BioSQLEntryChangeHub(this);
         entryAnnotationChangeHub = new BioSQLEntryAnnotationChangeHub(this, entryChangeHub);
         featureChangeHub = new BioSQLFeatureChangeHub(this, entryChangeHub);
         featureAnnotationChangeHub = new BioSQLFeatureAnnotationChangeHub(this, featureChangeHub);
 
-	try {
-	    Connection conn = dataSource.getConnection();
-      conn.setAutoCommit(false);
+        try {
+            Connection conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
 			
-			// DBHelper needs to be initialized before checks and ontologies are created
-			helper = DBHelper.getDBHelper(conn);
+            // DBHelper needs to be initialized before checks and ontologies are created
+            helper = DBHelper.getDBHelper(conn);
+            
+            // Check that BioSQL database schema is post-Singapore
+            if (! isDbSchemaSupported()) {
+                throw new BioException("This database appears to be an old (pre-Singapore) BioSQL."
+                                       + " If you need to access it, try an older BioJava snapshot (1.3pre1 or earlier)");
+            }
+            
+            if (! isBioentryPropertySupported()) {
+                throw new BioException("This database appears to be an old (pre-Cape-Town) BioSQL."
+                                       + " If you need to access it, try an older BioJava snapshot");
+            }
 
-			// Check that BioSQL database schema is post-Singapore
-			if (! isDbSchemaSupported()) {
-				throw new BioException("This database appears to be an old (pre-Singapore) BioSQL."
-					+ " If you need to access it, try an older BioJava snapshot (1.3pre1 or earlier)");
-			}
-
-			if (! isBioentryPropertySupported()) {
-				throw new BioException("This database appears to be an old (pre-Cape-Town) BioSQL."
-					+ " If you need to access it, try an older BioJava snapshot");
-			}
-
-			// Create adapters
-			featuresSQL = new FeaturesSQL(this);
-      try {
-          ontologySQL = new OntologySQL(this);
-      } catch (SQLException ex) {
-          throw new BioException("Error accessing ontologies", ex);
-      }
+            // Create adapters
+            featuresSQL = new FeaturesSQL(this);
+            try {
+                ontologySQL = new OntologySQL(this);
+            } catch (SQLException ex) {
+                throw new BioException("Error accessing ontologies", ex);
+            }
 				
-	    PreparedStatement getID = conn.prepareStatement("select * from biodatabase where name = ?");
-	    getID.setString(1, biodatabase);
-	    ResultSet rs = getID.executeQuery();
-	    if (rs.next()) {
-		dbid = rs.getInt(1);
-		name = rs.getString(2);
+            PreparedStatement getID = conn.prepareStatement("select * from biodatabase where name = ?");
+            getID.setString(1, biodatabase);
+            ResultSet rs = getID.executeQuery();
+            if (rs.next()) {
+                dbid = rs.getInt(1);
+                name = rs.getString(2);
                 rs.close();
-		getID.close();
-		conn.close();
-		return;
-	    } else {
+                getID.close();
+                conn.close();
+                return;
+            } else {
                 rs.close();
                 getID.close();
             }
-
-	    if (create) {
-		PreparedStatement createdb = conn.prepareStatement("insert into biodatabase (name) values ( ? )");
-		createdb.setString(1, biodatabase);
-		createdb.executeUpdate();
-    conn.commit();
-		createdb.close();
-
-		dbid = getDBHelper().getInsertID(conn, "biodatabase", "biodatabase_id");
-	    } else {
-		throw new BioException("Biodatabase " + biodatabase + " doesn't exist");
-	    }
-	} catch (SQLException ex) {
-	    throw new BioException("Error connecting to BioSQL database: " + ex.getMessage(), ex);
-	}
+            
+            if (create) {
+                PreparedStatement createdb = conn.prepareStatement("insert into biodatabase (name) values ( ? )");
+                createdb.setString(1, biodatabase);
+                createdb.executeUpdate();
+                conn.commit();
+                createdb.close();
+                
+                dbid = getDBHelper().getInsertID(conn, "biodatabase", "biodatabase_id");
+            } else {
+                throw new BioException("Biodatabase " + biodatabase + " doesn't exist");
+            }
+        } catch (SQLException ex) {
+            throw new BioException("Error connecting to BioSQL database: " + ex.getMessage(), ex);
+        }
     }
 
     public Ontology createOntology(String name, String description)
@@ -255,12 +256,12 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     public String getName() {
-	return name;
+        return name;
     }
 
     public void createDummySequence(String id,
-				    Alphabet alphabet,
-				    int length)
+                                    Alphabet alphabet,
+                                    int length)
 	throws ChangeVetoException, BioException
     {
         synchronized (this) {
@@ -272,87 +273,86 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     private void _createDummySequence(String id,
-				      Alphabet seqAlpha,
-				      int length)
+                                      Alphabet seqAlpha,
+                                      int length)
         throws ChangeVetoException, BioException
     {
-	int version = 1;
+        int version = 1;
+        
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            
+            PreparedStatement create_bioentry = conn.prepareStatement(
+                                                                      "insert into bioentry " +
+                                                                      "(biodatabase_id, display_id, accession, entry_version, division) " +
+                                                                      "values (?, ?, ?, ?, ?)");
+            create_bioentry.setInt(1, dbid);
+            create_bioentry.setString(2, id);
+            create_bioentry.setString(3, id);
+            create_bioentry.setInt(4, version);
+            create_bioentry.setString(5, "?");
+            create_bioentry.executeUpdate();
+            create_bioentry.close();
+            
+            int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
 
-	Connection conn = null;
-	try {
-	    conn = dataSource.getConnection();
-	    conn.setAutoCommit(false);
+            PreparedStatement create_dummy = conn.prepareStatement("insert into biosequence " +
+                                                                   "       (bioentry_id, seq_version, molecule, seq_length) " +
+                                                                   "values (?, ?, ?, ?)");
+            create_dummy.setInt(1, bioentry_id);
+            create_dummy.setInt(2, version);
+            create_dummy.setString(3, seqAlpha.getName());
+            create_dummy.setInt(4, length);
+            create_dummy.executeUpdate();
+            create_dummy.close();
+            int dummy_id = getDBHelper().getInsertID(conn, "biosequence", "biosequence_id");
 
-	    PreparedStatement create_bioentry = conn.prepareStatement(
-                    "insert into bioentry " +
-                    "(biodatabase_id, display_id, accession, entry_version, division) " +
-		    "values (?, ?, ?, ?, ?)");
-	    create_bioentry.setInt(1, dbid);
-	    create_bioentry.setString(2, id);
-	    create_bioentry.setString(3, id);
-	    create_bioentry.setInt(4, version);
-	    create_bioentry.setString(5, "?");
-	    create_bioentry.executeUpdate();
-	    create_bioentry.close();
-
-	    int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
-
-	    PreparedStatement create_dummy = conn.prepareStatement("insert into biosequence " +
-								   "       (bioentry_id, seq_version, molecule, seq_length) " +
-								   "values (?, ?, ?, ?)");
-	    create_dummy.setInt(1, bioentry_id);
-	    create_dummy.setInt(2, version);
-	    create_dummy.setString(3, seqAlpha.getName());
-	    create_dummy.setInt(4, length);
-	    create_dummy.executeUpdate();
-	    create_dummy.close();
-	    int dummy_id = getDBHelper().getInsertID(conn, "biosequence", "biosequence_id");
-
-	    conn.commit();
-	    conn.close();
-	} catch (SQLException ex) {
-	    boolean rolledback = false;
-	    if (conn != null) {
-		try {
-		    conn.rollback();
-		    rolledback = true;
-		} catch (SQLException ex2) {}
-	    }
-	    throw new BioRuntimeException("Error adding BioSQL tables" +
-					(rolledback ? " (rolled back successfully)" : ""), ex);
-	}
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            boolean rolledback = false;
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                    rolledback = true;
+                } catch (SQLException ex2) {}
+            }
+            throw new BioRuntimeException("Error adding BioSQL tables" +
+                                          (rolledback ? " (rolled back successfully)" : ""), ex);
+        }
     }
 
     public void addSequence(Sequence seq)
 	throws ChangeVetoException, BioException
     {
 	synchronized (this) {
-          ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, seq);
-          firePreChangeEvent(cev);
-          _addSequence(seq);
-          firePostChangeEvent(cev);
+            ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, seq);
+            firePreChangeEvent(cev);
+            _addSequence(seq);
+            firePostChangeEvent(cev);
         }
     }
 
     private void _addSequence(Sequence seq)
-        throws ChangeVetoException, BioException
-    {
-	String seqName = idmaker.calcID(seq);
-	int version = 1;
+        throws ChangeVetoException, BioException {
+        String seqName = idmaker.calcID(seq);
+        int version = 1;
+        
+        Alphabet seqAlpha = seq.getAlphabet();
+        SymbolTokenization seqToke;
+        try {
+            seqToke = seqAlpha.getTokenization("token");
+        } catch (Exception ex) {
+            throw new BioException("Can't store sequences in BioSQL unless they can be sensibly tokenized/detokenized", ex);
+        }
 
-	Alphabet seqAlpha = seq.getAlphabet();
-	SymbolTokenization seqToke;
-	try {
-	    seqToke = seqAlpha.getTokenization("token");
-	} catch (Exception ex) {
-	    throw new BioException("Can't store sequences in BioSQL unless they can be sensibly tokenized/detokenized", ex);
-	}
-
-	Connection conn = null;
-	try {
-	    conn = dataSource.getConnection();
-	    conn.setAutoCommit(false);
-	    ResultSet rs;
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+            ResultSet rs;
 
             //
             // we will need this annotation bundle for various things
@@ -360,248 +360,245 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
             Annotation ann = seq.getAnnotation();
 
-	    //
-	    // Magic for taxonomy.  Move this!
-	    //
+            //
+            // Magic for taxonomy.  Move this!
+            //
             int taxon_id = (ann.containsProperty(OrganismParser.PROPERTY_ORGANISM))
                 ? TaxonSQL.putTaxon(conn, getDBHelper(), (Taxon) ann.getProperty(OrganismParser.PROPERTY_ORGANISM))
                 : -1;
 
-	    PreparedStatement create_bioentry = conn.prepareStatement(
-                    "insert into bioentry " +
-                    "(biodatabase_id, name, accession, version, division" + (taxon_id == -1 ? "" : ", taxon_id") + ") " +
-		    "values (?, ?, ?, ?, ?" + (taxon_id == -1 ? "" : ", ?") + ")"
-                    );
-	    create_bioentry.setInt(1, dbid);
-	    create_bioentry.setString(2, seqName);
-	    create_bioentry.setString(3, seqName);
-	    create_bioentry.setInt(4, version);
-	    create_bioentry.setString(5, "?");
-	    if (taxon_id != -1) {
+            PreparedStatement create_bioentry = conn.prepareStatement(
+                                                                      "insert into bioentry " +
+                                                                      "(biodatabase_id, name, accession, version, division" + (taxon_id == -1 ? "" : ", taxon_id") + ") " +
+                                                                      "values (?, ?, ?, ?, ?" + (taxon_id == -1 ? "" : ", ?") + ")"
+                                                                      );
+            create_bioentry.setInt(1, dbid);
+            create_bioentry.setString(2, seqName);
+            create_bioentry.setString(3, seqName);
+            create_bioentry.setInt(4, version);
+            create_bioentry.setString(5, "?");
+            if (taxon_id != -1) {
                 create_bioentry.setInt(6, taxon_id);
             }
-	    create_bioentry.executeUpdate();
-	    create_bioentry.close();
+            create_bioentry.executeUpdate();
+            create_bioentry.close();
 
-	    // System.err.println("Created bioentry");
+            // System.err.println("Created bioentry");
 
-	    int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
+            int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
 
-	    if (isAssemblySupported() && seq.filter(new FeatureFilter.ByClass(ComponentFeature.class), false).countFeatures() > 0) {
-		PreparedStatement create_assembly = conn.prepareStatement("insert into assembly " +
-									  "       (bioentry_id, length, molecule) " +
-									  "values (?, ?, ?)");
-		create_assembly.setInt(1, bioentry_id);
-		create_assembly.setInt(2, seq.length());
-		create_assembly.setString(3, seqAlpha.getName());
-		create_assembly.executeUpdate();
-		create_assembly.close();
-		int assembly_id = getDBHelper().getInsertID(conn, "assembly", "assembly_id");
+            if (isAssemblySupported() && seq.filter(new FeatureFilter.ByClass(ComponentFeature.class), false).countFeatures() > 0) {
+                PreparedStatement create_assembly = conn.prepareStatement("insert into assembly " +
+                                                                          "       (bioentry_id, length, molecule) " +
+                                                                          "values (?, ?, ?)");
+                create_assembly.setInt(1, bioentry_id);
+                create_assembly.setInt(2, seq.length());
+                create_assembly.setString(3, seqAlpha.getName());
+                create_assembly.executeUpdate();
+                create_assembly.close();
+                int assembly_id = getDBHelper().getInsertID(conn, "assembly", "assembly_id");
 
-		FeatureHolder components = seq.filter(new FeatureFilter.ByClass(ComponentFeature.class), false);
-		PreparedStatement create_fragment = conn.prepareStatement(
-		        "insert into assembly_fragment " +
-			"       (assembly_id, fragment_name, assembly_start, assembly_end, fragment_start, fragment_end, strand) " +
-			"values (?,           ?,             ?,              ?,            ?,              ?,            ?)");
-		for (Iterator i = components.features(); i.hasNext(); ) {
-		    ComponentFeature cf = (ComponentFeature) i.next();
-		    if (cf.getType().equals("static_golden_path_clone")) {
-			System.err.println("Ensembl hack: skipping clone...");
-			continue;
-		    }
+                FeatureHolder components = seq.filter(new FeatureFilter.ByClass(ComponentFeature.class), false);
+                PreparedStatement create_fragment = conn.prepareStatement(
+                                                                          "insert into assembly_fragment " +
+                                                                          "       (assembly_id, fragment_name, assembly_start, assembly_end, fragment_start, fragment_end, strand) " +
+                                                                          "values (?,           ?,             ?,              ?,            ?,              ?,            ?)");
+                for (Iterator i = components.features(); i.hasNext(); ) {
+                    ComponentFeature cf = (ComponentFeature) i.next();
+                    if (cf.getType().equals("static_golden_path_clone")) {
+                        System.err.println("Ensembl hack: skipping clone...");
+                        continue;
+                    }
 
-		    create_fragment.setInt(1, assembly_id);
-		    create_fragment.setString(2, cf.getComponentSequenceName());
-		    create_fragment.setInt(3, cf.getLocation().getMin());
-		    create_fragment.setInt(4, cf.getLocation().getMax());
-		    create_fragment.setInt(5, cf.getComponentLocation().getMin());
-		    create_fragment.setInt(6, cf.getComponentLocation().getMax());
-		    create_fragment.setInt(7, cf.getStrand().getValue());
-		    create_fragment.executeUpdate();
-		}
-		create_fragment.close();
-	    } else {
-		PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
-									     "(bioentry_id, version, length, seq, alphabet) " +
-									     "values (?, ?, ?, ?, ?)");
-		create_biosequence.setInt(1, bioentry_id);
-		create_biosequence.setInt(2, version);
-		create_biosequence.setInt(3, seq.length());
+                    create_fragment.setInt(1, assembly_id);
+                    create_fragment.setString(2, cf.getComponentSequenceName());
+                    create_fragment.setInt(3, cf.getLocation().getMin());
+                    create_fragment.setInt(4, cf.getLocation().getMax());
+                    create_fragment.setInt(5, cf.getComponentLocation().getMin());
+                    create_fragment.setInt(6, cf.getComponentLocation().getMax());
+                    create_fragment.setInt(7, cf.getStrand().getValue());
+                    create_fragment.executeUpdate();
+                }
+                create_fragment.close();
+            } else {
+                PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
+                                                                             "(bioentry_id, version, length, seq, alphabet) " +
+                                                                             "values (?, ?, ?, ?, ?)");
+                create_biosequence.setInt(1, bioentry_id);
+                create_biosequence.setInt(2, version);
+                create_biosequence.setInt(3, seq.length());
                 String seqstr = seqToke.tokenizeSymbolList(seq);
-		create_biosequence.setCharacterStream(4, new StringReader(seqstr), seqstr.length());
-		create_biosequence.setString(5, seqAlpha.getName());
-		create_biosequence.executeUpdate();
-		create_biosequence.close();
-	    }
+                create_biosequence.setCharacterStream(4, new StringReader(seqstr), seqstr.length());
+                create_biosequence.setString(5, seqAlpha.getName());
+                create_biosequence.executeUpdate();
+                create_biosequence.close();
+            }
 
-	    // System.err.println("Stored sequence");
+            // System.err.println("Stored sequence");
 
-	    //
-	    // Store the features
-	    //
+            //
+            // Store the features
+            //
 
-	    FeatureHolder features = seq;
-	    int num = features.countFeatures();
-	    if (!isHierarchySupported()) {
-		features = features.filter(FeatureFilter.all, true);
-		if (features.countFeatures() != num) {
-		    System.err.println("*** Warning: feature hierarchy was lost when adding sequence to BioSQL");
-		}
-	    }
-	    getFeaturesSQL().persistFeatures(conn, bioentry_id, features, -1);
+            FeatureHolder features = seq;
+            int num = features.countFeatures();
+            if (!isHierarchySupported()) {
+                features = features.filter(FeatureFilter.all, true);
+                if (features.countFeatures() != num) {
+                    System.err.println("*** Warning: feature hierarchy was lost when adding sequence to BioSQL");
+                }
+            }
+            getFeaturesSQL().persistFeatures(conn, bioentry_id, features, -1);
 
-	    // System.err.println("Stored features");
+            // System.err.println("Stored features");
 
-	    //
-	    // Store generic properties
-	    //
+            //
+            // Store generic properties
+            //
 
-	    for (Iterator i = ann.asMap().entrySet().iterator(); i.hasNext(); ) {
-		Map.Entry me = (Map.Entry) i.next();
-		Object key = me.getKey();
-		Object value = me.getValue();
+            for (Iterator i = ann.asMap().entrySet().iterator(); i.hasNext(); ) {
+                Map.Entry me = (Map.Entry) i.next();
+                Object key = me.getKey();
+                Object value = me.getValue();
 
-		if (key.equals(OrganismParser.PROPERTY_ORGANISM)) {
-		    continue;
-		} else {
-		    persistBioentryProperty(conn, bioentry_id, key, value, false, true);
-		}
-	    }
+                if (key.equals(OrganismParser.PROPERTY_ORGANISM)) {
+                    continue;
+                } else {
+                    persistBioentryProperty(conn, bioentry_id, key, value, false, true);
+                }
+            }
 
-	    conn.commit();
-	    conn.close();
-	} catch (SQLException ex) {
-	    boolean rolledback = false;
-	    if (conn != null) {
-		try {
-		    conn.rollback();
-		    rolledback = true;
-		} catch (SQLException ex2) {}
-	    }
-	    throw new BioRuntimeException(
-                "Error adding sequence: " + seq.getName() +
-				(rolledback ? " (rolled back successfully)" : ""), ex);
-	}
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            boolean rolledback = false;
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                    rolledback = true;
+                } catch (SQLException ex2) {}
+            }
+            throw new BioRuntimeException(
+                                          "Error adding sequence: " + seq.getName() +
+                                          (rolledback ? " (rolled back successfully)" : ""), ex);
+        }
     }
 
 
     public Sequence getSequence(String id)
-        throws BioException
-    {
+        throws BioException {
         return getSequence(id, -1);
     }
 
     Sequence getSequence(String id, int bioentry_id)
-        throws BioException
-    {
-	Sequence seq = null;
-	if (id != null) {
-	    seq = (Sequence) sequencesByName.get(id);
-	} else if (bioentry_id >= 0) {
-	    seq = (Sequence) sequencesByID.get(new Integer(bioentry_id));
-	} else {
-	    throw new BioError("Neither a name nor an internal ID was supplied");
-	}
+        throws BioException {
+        Sequence seq = null;
+        if (id != null) {
+            seq = (Sequence) sequencesByName.get(id);
+        } else if (bioentry_id >= 0) {
+            seq = (Sequence) sequencesByID.get(new Integer(bioentry_id));
+        } else {
+            throw new BioError("Neither a name nor an internal ID was supplied");
+        }
+        
+        if (seq != null) {
+            return seq;
+        }
 
-	if (seq != null) {
-	    return seq;
-	}
+        try {
+            Connection conn = dataSource.getConnection();
 
-	try {
-	    Connection conn = dataSource.getConnection();
-
-	    if (bioentry_id < 0) {
-		PreparedStatement get_bioentry = conn.prepareStatement("select bioentry.bioentry_id " +
-								       "from bioentry " +
-								       "where bioentry.accession = ? and " +
-								       "      bioentry.biodatabase_id = ?");
-		get_bioentry.setString(1, id);
-		get_bioentry.setInt(2, dbid);
-		ResultSet rs = get_bioentry.executeQuery();
-		if (rs.next()) {
-		    bioentry_id = rs.getInt(1);
-		}
+            if (bioentry_id < 0) {
+                PreparedStatement get_bioentry = conn.prepareStatement("select bioentry.bioentry_id " +
+                                                                       "from bioentry " +
+                                                                       "where bioentry.accession = ? and " +
+                                                                       "      bioentry.biodatabase_id = ?");
+                get_bioentry.setString(1, id);
+                get_bioentry.setInt(2, dbid);
+                ResultSet rs = get_bioentry.executeQuery();
+                if (rs.next()) {
+                    bioentry_id = rs.getInt(1);
+                }
                 rs.close();
-		get_bioentry.close();
+                get_bioentry.close();
 
-		if (bioentry_id < 0) {
-		    conn.close();
-		    throw new IllegalIDException("No bioentry with accession " + id);
-		}
-	    } else {
-		PreparedStatement get_accession = conn.prepareStatement("select bioentry.accession from bioentry where bioentry.bioentry_id = ? and bioentry.biodatabase_id = ?");
-		get_accession.setInt(1, bioentry_id);
-		get_accession.setInt(2, dbid);
-		ResultSet rs = get_accession.executeQuery();
-		if (rs.next()) {
-		    id = rs.getString(1);
-		}
+                if (bioentry_id < 0) {
+                    conn.close();
+                    throw new IllegalIDException("No bioentry with accession " + id);
+                }
+            } else {
+                PreparedStatement get_accession = conn.prepareStatement("select bioentry.accession from bioentry where bioentry.bioentry_id = ? and bioentry.biodatabase_id = ?");
+                get_accession.setInt(1, bioentry_id);
+                get_accession.setInt(2, dbid);
+                ResultSet rs = get_accession.executeQuery();
+                if (rs.next()) {
+                    id = rs.getString(1);
+                }
                 rs.close();
-		get_accession.close();
+                get_accession.close();
 
-		if (id == null) {
-		    conn.close();
-		    throw new IllegalIDException("No bioentry with internal ID " + bioentry_id);
-		}
-	    }
+                if (id == null) {
+                    conn.close();
+                    throw new IllegalIDException("No bioentry with internal ID " + bioentry_id);
+                }
+            }
 
-	    if (seq == null) {
-		PreparedStatement get_biosequence = conn.prepareStatement("select alphabet, length " +
-									  "from   biosequence " +
-									  "where  bioentry_id = ?");
-		get_biosequence.setInt(1, bioentry_id);
-		ResultSet rs = get_biosequence.executeQuery();
-		if (rs.next()) {
+            if (seq == null) {
+                PreparedStatement get_biosequence = conn.prepareStatement("select alphabet, length " +
+                                                                          "from   biosequence " +
+                                                                          "where  bioentry_id = ?");
+                get_biosequence.setInt(1, bioentry_id);
+                ResultSet rs = get_biosequence.executeQuery();
+                if (rs.next()) {
                     String molecule = rs.getString(1);
                     int length = rs.getInt(2);
                     if (rs.wasNull()) {
                         length = -1;
                     }
                     seq = new BioSQLSequence(this, id, bioentry_id, molecule, length);
-		}
+                }
                 rs.close();
-		get_biosequence.close();
-	    }
+                get_biosequence.close();
+            }
 
-	    if (seq == null && isAssemblySupported()) {
-		PreparedStatement get_assembly = conn.prepareStatement("select assembly_id, length, molecule " +
-								       "from   assembly " +
-								       "where  bioentry_id = ?");
-		get_assembly.setInt(1, bioentry_id);
-		ResultSet rs = get_assembly.executeQuery();
-		if (rs.next()) {
-		    int assembly_id = rs.getInt(1);
-		    int length = rs.getInt(2);
-		    String molecule = rs.getString(3);
-		    seq = new BioSQLAssembly(this, id, bioentry_id, assembly_id, molecule, length);
-		}
+            if (seq == null && isAssemblySupported()) {
+                PreparedStatement get_assembly = conn.prepareStatement("select assembly_id, length, molecule " +
+                                                                       "from   assembly " +
+                                                                       "where  bioentry_id = ?");
+                get_assembly.setInt(1, bioentry_id);
+                ResultSet rs = get_assembly.executeQuery();
+                if (rs.next()) {
+                    int assembly_id = rs.getInt(1);
+                    int length = rs.getInt(2);
+                    String molecule = rs.getString(3);
+                    seq = new BioSQLAssembly(this, id, bioentry_id, assembly_id, molecule, length);
+                }
                 rs.close();
-		get_assembly.close();
-	    }
+                get_assembly.close();
+            }
 
-	    conn.close();
+            conn.close();
 
-	    if (seq != null) {
-		sequencesByName.put(id, seq);
-		sequencesByID.put(new Integer(bioentry_id), seq);
-		return seq;
-	    }
-	} catch (SQLException ex) {
-	    throw new BioException("Error accessing BioSQL tables", ex);
-	}
+            if (seq != null) {
+                sequencesByName.put(id, seq);
+                sequencesByID.put(new Integer(bioentry_id), seq);
+                return seq;
+            }
+        } catch (SQLException ex) {
+            throw new BioException("Error accessing BioSQL tables", ex);
+        }
 
-	throw new BioException("BioEntry " + id + " exists with unknown sequence type");
+        throw new BioException("BioEntry " + id + " exists with unknown sequence type");
     }
 
     public void removeSequence(String id)
-	throws ChangeVetoException, BioException
-    {
+	throws ChangeVetoException, BioException {
 
         synchronized (this) {
-          ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
-          firePreChangeEvent(cev);
-          _removeSequence(id);
-          firePostChangeEvent(cev);
+            ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
+            firePreChangeEvent(cev);
+            _removeSequence(id);
+            firePostChangeEvent(cev);
         }
     }
 
@@ -609,36 +606,36 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         throws BioException, ChangeVetoException
     {
 
-	Sequence seq = (Sequence) sequencesByName.get(id);
+        Sequence seq = (Sequence) sequencesByName.get(id);
 
-	if (seq != null) {
-	    seq = null;  // Don't want to be holding the reference ourselves!
-	    try {
-		Thread.sleep(100L);
-		System.gc();
-	    } catch (Exception ex) {
-		ex.printStackTrace();
-	    }
-	    seq = (Sequence) sequencesByName.get(id);
-	    if (seq != null) {
-		throw new BioException("There are still references to sequence with ID " + id + " from this database.");
-	    }
-	}
+        if (seq != null) {
+            seq = null;  // Don't want to be holding the reference ourselves!
+            try {
+                Thread.sleep(100L);
+                System.gc();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            seq = (Sequence) sequencesByName.get(id);
+            if (seq != null) {
+                throw new BioException("There are still references to sequence with ID " + id + " from this database.");
+            }
+        }
 
-	Connection conn = null;
-	try {
-	    conn = dataSource.getConnection();
-	    conn.setAutoCommit(false);
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
 
-	    PreparedStatement get_sequence = conn.prepareStatement("select bioentry.bioentry_id " +
-								   "from bioentry " +
-								   "where bioentry.accession = ?"
-                                   );
-	    get_sequence.setString(1, id);
-	    ResultSet rs = get_sequence.executeQuery();
-	    boolean exists;
-	    if ((exists = rs.next())) {
-		int bioentry_id = rs.getInt(1);
+            PreparedStatement get_sequence = conn.prepareStatement("select bioentry.bioentry_id " +
+                                                                   "from bioentry " +
+                                                                   "where bioentry.accession = ?"
+                                                                   );
+            get_sequence.setString(1, id);
+            ResultSet rs = get_sequence.executeQuery();
+            boolean exists;
+            if ((exists = rs.next())) {
+                int bioentry_id = rs.getInt(1);
 
                 PreparedStatement delete_reference = conn.prepareStatement("delete from bioentry_reference where bioentry_id = ?");
                 delete_reference.setInt(1, bioentry_id);
@@ -660,27 +657,27 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 delete_qv.executeUpdate();
                 delete_qv.close();
 
-		DBHelper.DeleteStyle dstyle = getDBHelper().getDeleteStyle();
+                DBHelper.DeleteStyle dstyle = getDBHelper().getDeleteStyle();
 
                 ArrayList generic_ids = null;  // default delete style will cache seqfeature_id's that need to be deleted
                 PreparedStatement delete_locs;
-		if (dstyle ==  DBHelper.DELETE_MYSQL4) {
-		    delete_locs = conn.prepareStatement("delete from location" +
-							" using location, seqfeature" +
-							" where location.seqfeature_id = seqfeature.seqfeature_id and" +
-							" seqfeature.bioentry_id = ?");
+                if (dstyle ==  DBHelper.DELETE_MYSQL4) {
+                    delete_locs = conn.prepareStatement("delete from location" +
+                                                        " using location, seqfeature" +
+                                                        " where location.seqfeature_id = seqfeature.seqfeature_id and" +
+                                                        " seqfeature.bioentry_id = ?");
                     delete_locs.setInt(1, bioentry_id);
                     delete_locs.executeUpdate();
                     delete_locs.close();
                 } else if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-		    delete_locs = conn.prepareStatement("delete from location" +
-							" where location.seqfeature_id = seqfeature.seqfeature_id and" +
-							" seqfeature.bioentry_id = ?");
+                    delete_locs = conn.prepareStatement("delete from location" +
+                                                        " where location.seqfeature_id = seqfeature.seqfeature_id and" +
+                                                        " seqfeature.bioentry_id = ?");
                     delete_locs.setInt(1, bioentry_id);
                     delete_locs.executeUpdate();
                     delete_locs.close();
-		} else {
-		    delete_locs = conn.prepareStatement("delete from location where seqfeature_id = ?");
+                } else {
+                    delete_locs = conn.prepareStatement("delete from location where seqfeature_id = ?");
 
                     PreparedStatement get_seqfeats = conn.prepareStatement("select seqfeature_id"
                                                                            + " from seqfeature"
@@ -697,57 +694,57 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                     }
                     sfids.close();
                     get_seqfeats.close();
-		}
+                }
                 delete_locs.close();
 
                 PreparedStatement delete_fqv;
-		if (dstyle ==  DBHelper.DELETE_MYSQL4) {
-		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value" +
-						       " using seqfeature_qualifier_value, seqfeature" +
-						       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id" +
-						       " and seqfeature.bioentry_id = ?");
+                if (dstyle ==  DBHelper.DELETE_MYSQL4) {
+                    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value" +
+                                                       " using seqfeature_qualifier_value, seqfeature" +
+                                                       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id" +
+                                                       " and seqfeature.bioentry_id = ?");
                     delete_fqv.setInt(1, bioentry_id);
                     delete_fqv.executeUpdate();
                 } else if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value" +
-						       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id" +
-						       " and seqfeature.bioentry_id = ?");
+                    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value" +
+                                                       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id" +
+                                                       " and seqfeature.bioentry_id = ?");
                     delete_fqv.setInt(1, bioentry_id);
                     delete_fqv.executeUpdate();
-		} else {
-		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value"
+                } else {
+                    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value"
                                                        + " where seqfeature_qualifier_value.seqfeature_id = ?");
                     for (int i = 0; i < generic_ids.size(); i++) {
                         int sfid = ((Integer) generic_ids.get(i)).intValue();
                         delete_fqv.setInt(1, sfid);
                         delete_fqv.executeUpdate();
                     }
-		}
+                }
                 delete_fqv.close();
 
                 PreparedStatement delete_rel;
-		if (dstyle ==  DBHelper.DELETE_MYSQL4) {
-		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship" +
-						       " using seqfeature_relationship, seqfeature" +
-						       " where object_seqfeature_id = seqfeature.seqfeature_id" +
-						       " and seqfeature.bioentry_id = ?");
+                if (dstyle ==  DBHelper.DELETE_MYSQL4) {
+                    delete_rel = conn.prepareStatement("delete from seqfeature_relationship" +
+                                                       " using seqfeature_relationship, seqfeature" +
+                                                       " where object_seqfeature_id = seqfeature.seqfeature_id" +
+                                                       " and seqfeature.bioentry_id = ?");
                     delete_rel.setInt(1, bioentry_id);
                     delete_rel.executeUpdate();
                 } else if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship" +
-						       " where object_seqfeature_id = seqfeature.seqfeature_id" +
-						       " and seqfeature.bioentry_id = ?");
+                    delete_rel = conn.prepareStatement("delete from seqfeature_relationship" +
+                                                       " where object_seqfeature_id = seqfeature.seqfeature_id" +
+                                                       " and seqfeature.bioentry_id = ?");
                     delete_rel.setInt(1, bioentry_id);
                     delete_rel.executeUpdate();
-		} else {
-		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship"
+                } else {
+                    delete_rel = conn.prepareStatement("delete from seqfeature_relationship"
                                                        + " where object_seqfeature_id = ?");
                     for (int i = 0; i < generic_ids.size(); i++) {
                         int sfid = ((Integer) generic_ids.get(i)).intValue();
                         delete_rel.setInt(1, sfid);
                         delete_rel.executeUpdate();
                     }
-		}
+                }
                 delete_rel.close();
 
                 PreparedStatement delete_features = conn.prepareStatement("delete from seqfeature " +
@@ -755,37 +752,37 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 delete_features.setInt(1, bioentry_id);
                 delete_features.executeUpdate();
                 delete_features.close();
-
+                
                 PreparedStatement delete_biosequence = conn.prepareStatement("delete from biosequence where bioentry_id = ?");
-		delete_biosequence.setInt(1, bioentry_id);
-		delete_biosequence.executeUpdate();
-		delete_biosequence.close();
+                delete_biosequence.setInt(1, bioentry_id);
+                delete_biosequence.executeUpdate();
+                delete_biosequence.close();
 
-		PreparedStatement delete_entry = conn.prepareStatement("delete from bioentry where bioentry_id = ?");
-		delete_entry.setInt(1, bioentry_id);
-		delete_entry.executeUpdate();
-		delete_entry.close();
-	    }
+                PreparedStatement delete_entry = conn.prepareStatement("delete from bioentry where bioentry_id = ?");
+                delete_entry.setInt(1, bioentry_id);
+                delete_entry.executeUpdate();
+                delete_entry.close();
+            }
             rs.close();
-	    get_sequence.close();
+            get_sequence.close();
 
-	    conn.commit();
-	    conn.close();
+            conn.commit();
+            conn.close();
 
-	    if (!exists) {
-		throw new IllegalIDException("Sequence " + id + " didn't exist");
-	    }
-	} catch (SQLException ex) {
-	    boolean rolledback = false;
-	    if (conn != null) {
-		try {
-		    conn.rollback();
-		    rolledback = true;
-		} catch (SQLException ex2) {}
-	    }
-	    throw new BioException("Error removing from BioSQL tables" +
-					(rolledback ? " (rolled back successfully)" : ""), ex);
-	}
+            if (!exists) {
+                throw new IllegalIDException("Sequence " + id + " didn't exist");
+            }
+        } catch (SQLException ex) {
+            boolean rolledback = false;
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                    rolledback = true;
+                } catch (SQLException ex2) {}
+            }
+            throw new BioException("Error removing from BioSQL tables" +
+                                   (rolledback ? " (rolled back successfully)" : ""), ex);
+        }
     }
 
     public Set ids() {
@@ -797,7 +794,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    st.setInt(1, dbid);
 	    ResultSet rs = st.executeQuery();
 	    while (rs.next()) {
-		_ids.add(rs.getString(1));
+            _ids.add(rs.getString(1));
 	    }
             rs.close();
 	    st.close();
@@ -815,83 +812,83 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 
     void persistBioentryProperty(Connection conn,
-				 int bioentry_id,
-				 Object key,
-				 Object value,
-				 boolean removeFirst,
-				 boolean silent)
+                                 int bioentry_id,
+                                 Object key,
+                                 Object value,
+                                 boolean removeFirst,
+                                 boolean silent)
         throws SQLException
     {
-	String keyString = key.toString();
+        String keyString = key.toString();
 
-	// Ought to check for special-case keys. (or just wait 'til the special case
-	// tables get nuked :-)
-	// ex. references, dbxrefs
+        // Ought to check for special-case keys. (or just wait 'til the special case
+        // tables get nuked :-)
+        // ex. references, dbxrefs
 
-	if (!isBioentryPropertySupported()) {
-	    if (silent) {
-		return;
-	    } else {
-		throw new SQLException("Can't persist this property since the bioentry_property table isn't available");
-	    }
-	}
-
-	if (removeFirst) {
-	    int id = intern_ontology_term(conn, keyString);
-	    PreparedStatement remove_old_value = conn.prepareStatement("delete from bioentry_qualifier_value " +
-								       " where bioentry_id = ? and term_id = ?");
-	    remove_old_value.setInt(1, bioentry_id);
-	    remove_old_value.setInt(2, id);
-	    remove_old_value.executeUpdate();
-	    remove_old_value.close();
-	}
-
-    if (value != null) {
-        PreparedStatement insert_new;
-        if (isSPASupported()) {
-            insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
-                                               "       (bioentry_id, term_id, value, rank) " +
-                                               "values (?, intern_ontology_term( ? ), ?, ?)");
-            if (value instanceof Collection) {
-                int cnt = 0;
-                for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-                    insert_new.setInt(1, bioentry_id);
-                    insert_new.setString(2, keyString);
-                    insert_new.setInt(4, ++cnt);
-                    insert_new.setString(3, i.next().toString());
-                    insert_new.executeUpdate();
-                }
+        if (!isBioentryPropertySupported()) {
+            if (silent) {
+                return;
             } else {
-                insert_new.setInt(1, bioentry_id);
-                insert_new.setString(2, keyString);
-                insert_new.setInt(3, 1);
-                insert_new.setString(3, value.toString());
-                insert_new.executeUpdate();
-            }
-        } else {
-            insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
-                                               "       (bioentry_id, term_id, rank, value) " +
-                                               "values (?, ?, ?, ?)");
-	        int termID = intern_ontology_term(conn, keyString);
-            if (value instanceof Collection) {
-                int cnt = 0;
-                for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-                    insert_new.setInt(1, bioentry_id);
-                    insert_new.setInt(2, termID);
-                    insert_new.setInt(3, ++cnt);
-                    insert_new.setString(4, i.next().toString());
-                    insert_new.executeUpdate();
-                }
-            } else {
-                insert_new.setInt(1, bioentry_id);
-                insert_new.setInt(2, termID);
-                insert_new.setInt(3, 1);
-                insert_new.setString(4, value.toString());
-                insert_new.executeUpdate();
+                throw new SQLException("Can't persist this property since the bioentry_property table isn't available");
             }
         }
-	insert_new.close();
-    }
+
+        if (removeFirst) {
+            int id = intern_ontology_term(conn, keyString);
+            PreparedStatement remove_old_value = conn.prepareStatement("delete from bioentry_qualifier_value " +
+                                                                       " where bioentry_id = ? and term_id = ?");
+            remove_old_value.setInt(1, bioentry_id);
+            remove_old_value.setInt(2, id);
+            remove_old_value.executeUpdate();
+            remove_old_value.close();
+        }
+
+        if (value != null) {
+            PreparedStatement insert_new;
+            if (isSPASupported()) {
+                insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
+                                                   "       (bioentry_id, term_id, value, rank) " +
+                                                   "values (?, intern_ontology_term( ? ), ?, ?)");
+                if (value instanceof Collection) {
+                    int cnt = 0;
+                    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                        insert_new.setInt(1, bioentry_id);
+                        insert_new.setString(2, keyString);
+                        insert_new.setInt(4, ++cnt);
+                        insert_new.setString(3, i.next().toString());
+                        insert_new.executeUpdate();
+                    }
+                } else {
+                    insert_new.setInt(1, bioentry_id);
+                    insert_new.setString(2, keyString);
+                    insert_new.setInt(3, 1);
+                    insert_new.setString(3, value.toString());
+                    insert_new.executeUpdate();
+                }
+            } else {
+                insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
+                                                   "       (bioentry_id, term_id, rank, value) " +
+                                                   "values (?, ?, ?, ?)");
+                int termID = intern_ontology_term(conn, keyString);
+                if (value instanceof Collection) {
+                    int cnt = 0;
+                    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                        insert_new.setInt(1, bioentry_id);
+                        insert_new.setInt(2, termID);
+                        insert_new.setInt(3, ++cnt);
+                        insert_new.setString(4, i.next().toString());
+                        insert_new.executeUpdate();
+                    }
+                } else {
+                    insert_new.setInt(1, bioentry_id);
+                    insert_new.setInt(2, termID);
+                    insert_new.setInt(3, 1);
+                    insert_new.setString(4, value.toString());
+                    insert_new.executeUpdate();
+                }
+            }
+            insert_new.close();
+        }
     }
 
     /**
@@ -934,62 +931,62 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     private boolean hierarchySupported = false;
 
     boolean isHierarchySupported() {
-	if (!hierarchyChecked) {
+        if (!hierarchyChecked) {
             hierarchySupported = getDBHelper().containsTable(dataSource, "seqfeature_relationship");
-	    hierarchyChecked = true;
-	}
+            hierarchyChecked = true;
+        }
 
-	return hierarchySupported;
+        return hierarchySupported;
     }
 
     private boolean assemblyChecked = false;
     private boolean assemblySupported = false;
 
     boolean isAssemblySupported() {
-	if (!assemblyChecked) {
+        if (!assemblyChecked) {
             assemblySupported = getDBHelper().containsTable(dataSource, "assembly");
-	    assemblyChecked = true;
-	}
+            assemblyChecked = true;
+        }
 
-	return assemblySupported;
+        return assemblySupported;
     }
 
     private boolean dummyChecked = false;
     private boolean dummySupported = false;
 
     boolean isDummySupported() {
-	if (!dummyChecked) {
+        if (!dummyChecked) {
             dummySupported = getDBHelper().containsTable(dataSource, "dummy");
-	    dummyChecked = true;
-	}
+            dummyChecked = true;
+        }
 
-	return dummySupported;
+        return dummySupported;
     }
 
     private boolean locationQualifierChecked = false;
     private boolean locationQualifierSupported = false;
 
     boolean isLocationQualifierSupported() {
-//  	if (!locationQualifierChecked) {
-//  	    locationQualifierSupported = getDBHelper().containsTable(dataSource, "location_qualifier_value");
-//  	    locationQualifierChecked = true;
-//  	}
+//      if (!locationQualifierChecked) {
+//          locationQualifierSupported = getDBHelper().containsTable(dataSource, "location_qualifier_value");
+//          locationQualifierChecked = true;
+//      }
 
-//  	return locationQualifierSupported;
+//      return locationQualifierSupported;
 
-	return false;
+        return false;
     }
 
     private boolean bioentryPropertyChecked = false;
     private boolean bioentryPropertySupported = false;
 
     boolean isBioentryPropertySupported() {
-	if (!bioentryPropertyChecked) {
+        if (!bioentryPropertyChecked) {
             bioentryPropertySupported = getDBHelper().containsTable(dataSource, "bioentry_qualifier_value");
-	    bioentryPropertyChecked = true;
-	}
+            bioentryPropertyChecked = true;
+        }
 
-	return bioentryPropertySupported;
+        return bioentryPropertySupported;
     }
 
 
@@ -997,12 +994,12 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     private boolean dbSchemaSupported = false;
 
     boolean isDbSchemaSupported() {
-	if (!dbSchemaChecked) {
+        if (!dbSchemaChecked) {
             dbSchemaSupported = getDBHelper().containsTable(dataSource, "location");
-	    dbSchemaChecked = true;
-	}
+            dbSchemaChecked = true;
+        }
 
-	return dbSchemaSupported;
+        return dbSchemaSupported;
     }
 
     private boolean commentTableNameChecked = false;
@@ -1013,15 +1010,15 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     // Hilmar has said this table will be renamed to anncomment post-1.0 BioSQLe
     // We support both "comment" and "anncomment"
     String getCommentTableName() {
-	if (!commentTableNameChecked) {
+        if (!commentTableNameChecked) {
             if (getDBHelper().containsTable(dataSource, "comment")) {
                 commentTableName = "comment";
             } else if (getDBHelper().containsTable(dataSource, "anncomment")) {
                 commentTableName = "anncomment";
             }
-	    commentTableNameChecked = true;
-	}
-	return commentTableName;
+            commentTableNameChecked = true;
+        }
+        return commentTableName;
     }
 
 
@@ -1029,228 +1026,228 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     private boolean dbxrefQualifierValueSupported = false;
 
     boolean isDbxrefQualifierValueSupported() {
-	if (!dbxrefQualifierValueChecked) {
+        if (!dbxrefQualifierValueChecked) {
             dbxrefQualifierValueSupported = getDBHelper().containsTable(dataSource, "dbxref_qualifier_value");
-	    dbxrefQualifierValueChecked = true;
-	}
+            dbxrefQualifierValueChecked = true;
+        }
 
-	return dbxrefQualifierValueSupported;
+        return dbxrefQualifierValueSupported;
     }
 
     private boolean spaChecked = false;
     private boolean spaSupported = false;
 
     boolean isSPASupported() {
-	if (!spaChecked) {
-	    try {
-		spaSupported = false;
-		Connection conn = dataSource.getConnection();
-		PreparedStatement ps = null;
-		try {
+        if (!spaChecked) {
+            try {
+                spaSupported = false;
+                Connection conn = dataSource.getConnection();
+                PreparedStatement ps = null;
+                try {
                     ps = conn.prepareStatement("select biosql_accelerators_level()");
-		    ResultSet rs = ps.executeQuery();
-		    if (rs.next()) {
-			int level = rs.getInt(1);
-			if (level >= 2) {
-			    spaSupported = true;
-			    // System.err.println("*** Accelerators present in the database: level " + level);
-			}
-		    }
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        int level = rs.getInt(1);
+                        if (level >= 2) {
+                            spaSupported = true;
+                            // System.err.println("*** Accelerators present in the database: level " + level);
+                        }
+                    }
                     rs.close();
-		} catch (SQLException ex) {
-		}
+                } catch (SQLException ex) {
+                }
                 if (ps != null) {
                     ps.close();
                 }
-		conn.close();
+                conn.close();
 
-		spaChecked = true;
-	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex);
-	    }
-	}
+                spaChecked = true;
+            } catch (SQLException ex) {
+                throw new BioRuntimeException(ex);
+            }
+        }
 
-	return spaSupported;
+        return spaSupported;
     }
 
     private class SqlizedFilter {
-	private List tables = new ArrayList();
-	private String filter;
-	private int used_ot = 0;
-	private int used_sfs = 0;
-	private int used_sqv = 0;
+        private List tables = new ArrayList();
+        private String filter;
+        private int used_ot = 0;
+        private int used_sfs = 0;
+        private int used_sqv = 0;
 
-	SqlizedFilter(FeatureFilter ff) {
-	    filter = sqlizeFilter(ff, false);
-	}
+        SqlizedFilter(FeatureFilter ff) {
+            filter = sqlizeFilter(ff, false);
+        }
 
-	private String sqlizeFilter(FeatureFilter ff, boolean negate) {
-	    if (ff instanceof FeatureFilter.ByType) {
-		String type = ((FeatureFilter.ByType) ff).getType();
-		String tableName = "ot_" + (used_ot++);
-		tables.add("term as " + tableName);
-		return tableName + ".name " + eq(negate) + qw(type) + " and seqfeature.type_term_id = " + tableName + ".term_id";
-	    } else if (ff instanceof FeatureFilter.BySource) {
-		String source = ((FeatureFilter.BySource) ff).getSource();
-		String tableName = "sfs_" + (used_sfs++);
-		tables.add("term as " + tableName);
-		return tableName + ".name " + eq(negate) + qw(source) + " and seqfeature.source_term_id = " + tableName + ".term_id";
-	    } else if (ff instanceof FeatureFilter.ByAnnotation) {
+        private String sqlizeFilter(FeatureFilter ff, boolean negate) {
+            if (ff instanceof FeatureFilter.ByType) {
+                String type = ((FeatureFilter.ByType) ff).getType();
+                String tableName = "ot_" + (used_ot++);
+                tables.add("term as " + tableName);
+                return tableName + ".name " + eq(negate) + qw(type) + " and seqfeature.type_term_id = " + tableName + ".term_id";
+            } else if (ff instanceof FeatureFilter.BySource) {
+                String source = ((FeatureFilter.BySource) ff).getSource();
+                String tableName = "sfs_" + (used_sfs++);
+                tables.add("term as " + tableName);
+                return tableName + ".name " + eq(negate) + qw(source) + " and seqfeature.source_term_id = " + tableName + ".term_id";
+            } else if (ff instanceof FeatureFilter.ByAnnotation) {
 
             return "";
 
             /* FIXME disabled until Matthew works out what he's doing with AnnotationTypes
 
-		FeatureFilter.ByAnnotation ffba = (FeatureFilter.ByAnnotation) ff;
-		Object key = ffba.getKey();
-		Object value = ffba.getValue();
-		String keyString = key.toString();
-		String valueString = value.toString();
+                FeatureFilter.ByAnnotation ffba = (FeatureFilter.ByAnnotation) ff;
+                Object key = ffba.getKey();
+                Object value = ffba.getValue();
+                String keyString = key.toString();
+                String valueString = value.toString();
 
-		String otName = "ot_" + (used_ot++);
-		tables.add("ontology_term as " + otName);
+                String otName = "ot_" + (used_ot++);
+                tables.add("ontology_term as " + otName);
 
-		String sqvName = "sqv_" + (used_sqv++);
-		tables.add("seqfeature_qualifier_value as " + sqvName);
+                String sqvName = "sqv_" + (used_sqv++);
+                tables.add("seqfeature_qualifier_value as " + sqvName);
 
         */
 
-		// FIXME this doesn't actually do negate quite right -- it doesn't
-		// match if the property isn't defined.  Should do an outer join
-		// to fix this.  But for now, we'll just punt :-(
+                // FIXME this doesn't actually do negate quite right -- it doesn't
+                // match if the property isn't defined.  Should do an outer join
+                // to fix this.  But for now, we'll just punt :-(
 
         /*
 
-		if (negate) {
-		    return "";
-		}
+                if (negate) {
+                    return "";
+                }
 
-		return sqvName + ".qualifier_value" + eq(negate) + qw(valueString) + " and " +
-		       sqvName + ".term_id = " + otName + ".term_id and " +
-		       otName + ".term_name = " + qw(keyString) + " and " +
-		       "seqfeature.seqfeature_id = " + sqvName + ".seqfeature_id";
+                return sqvName + ".qualifier_value" + eq(negate) + qw(valueString) + " and " +
+                       sqvName + ".term_id = " + otName + ".term_id and " +
+                       otName + ".term_name = " + qw(keyString) + " and " +
+                       "seqfeature.seqfeature_id = " + sqvName + ".seqfeature_id";
 
                */
 
-	    } else if (ff instanceof FeatureFilter.And) {
-		FeatureFilter.And and = (FeatureFilter.And) ff;
-		FeatureFilter ff1 = and.getChild1();
-		FeatureFilter ff2 = and.getChild2();
-		String filter1 = sqlizeFilter(ff1, negate);
-		String filter2 = sqlizeFilter(ff2, negate);
-		if (filter1.length() > 0) {
-		    if (filter2.length() > 0) {
-			return filter1 + " and " + filter2;
-		    } else {
-			return filter1;
-		    }
-		} else {
-		    if (filter2.length() > 0) {
-			return filter2;
-		    } else {
-			return "";
-		    }
-		}
-	    } else  if (ff instanceof FeatureFilter.Not) {
-		FeatureFilter child = ((FeatureFilter.Not) ff).getChild();
-		return sqlizeFilter(child, !negate);
-	    } else {
-		return "";
-	    }
-	}
+            } else if (ff instanceof FeatureFilter.And) {
+                FeatureFilter.And and = (FeatureFilter.And) ff;
+                FeatureFilter ff1 = and.getChild1();
+                FeatureFilter ff2 = and.getChild2();
+                String filter1 = sqlizeFilter(ff1, negate);
+                String filter2 = sqlizeFilter(ff2, negate);
+                if (filter1.length() > 0) {
+                    if (filter2.length() > 0) {
+                        return filter1 + " and " + filter2;
+                    } else {
+                        return filter1;
+                    }
+                } else {
+                    if (filter2.length() > 0) {
+                        return filter2;
+                    } else {
+                        return "";
+                    }
+                }
+            } else  if (ff instanceof FeatureFilter.Not) {
+                FeatureFilter child = ((FeatureFilter.Not) ff).getChild();
+                return sqlizeFilter(child, !negate);
+            } else {
+                return "";
+            }
+        }
 
-	private String eq(boolean negate) {
-	    if (negate) {
-		return " <> ";
-	    } else {
-		return "=";
-	    }
-	}
+        private String eq(boolean negate) {
+            if (negate) {
+                return " <> ";
+            } else {
+                return "=";
+            }
+        }
 
-	private String qw(String word) {
-	    return "'" + word + "'";
-	}
+        private String qw(String word) {
+            return "'" + word + "'";
+        }
 
-	public String getQuery() {
-	    StringBuffer query = new StringBuffer();
-	    query.append("select bioentry.accession, seqfeature.seqfeature_id ");
-	    query.append("  from seqfeature, bioentry");
-	    for (Iterator i = tables.iterator(); i.hasNext(); ) {
-		query.append(", ");
-		query.append((String) i.next());
-	    }
-	    query.append(" where bioentry.bioentry_id = seqfeature.bioentry_id");
-	    query.append("   and bioentry.biodatabase_id = ?");
-	    if (filter.length() > 0) {
-		query.append(" and ");
-		query.append(filter);
-	    }
-	    query.append(" order by bioentry.accession");
+        public String getQuery() {
+            StringBuffer query = new StringBuffer();
+            query.append("select bioentry.accession, seqfeature.seqfeature_id ");
+            query.append("  from seqfeature, bioentry");
+            for (Iterator i = tables.iterator(); i.hasNext(); ) {
+                query.append(", ");
+                query.append((String) i.next());
+            }
+            query.append(" where bioentry.bioentry_id = seqfeature.bioentry_id");
+            query.append("   and bioentry.biodatabase_id = ?");
+            if (filter.length() > 0) {
+                query.append(" and ");
+                query.append(filter);
+            }
+            query.append(" order by bioentry.accession");
 
-	    return query.substring(0);
-	}
+            return query.substring(0);
+        }
     }
 
     private class FilterByInternalID implements FeatureFilter {
-	private int id;
+        private int id;
 
-	public FilterByInternalID(int id) {
-	    this.id = id;
-	}
+        public FilterByInternalID(int id) {
+            this.id = id;
+        }
 
-	public boolean accept(Feature f) {
-	    if (! (f instanceof BioSQLFeature)) {
-		return false;
-	    }
+        public boolean accept(Feature f) {
+            if (! (f instanceof BioSQLFeature)) {
+                return false;
+            }
 
-	    int intID = ((BioSQLFeature) f)._getInternalID();
-	    return (intID == id);
-	}
+            int intID = ((BioSQLFeature) f)._getInternalID();
+            return (intID == id);
+        }
     }
 
     public FeatureHolder filter(FeatureFilter ff) {
-	try {
-	    SqlizedFilter sqf = new SqlizedFilter(ff);
-	    System.err.println("Doing BioSQL filter");
-	    System.err.println(sqf.getQuery());
+        try {
+            SqlizedFilter sqf = new SqlizedFilter(ff);
+            System.err.println("Doing BioSQL filter");
+            System.err.println(sqf.getQuery());
 
-	    Connection conn = dataSource.getConnection();
-	    PreparedStatement get_features = conn.prepareStatement(sqf.getQuery());
-	    get_features.setInt(1, dbid);
-	    ResultSet rs = get_features.executeQuery();
+            Connection conn = dataSource.getConnection();
+            PreparedStatement get_features = conn.prepareStatement(sqf.getQuery());
+            get_features.setInt(1, dbid);
+            ResultSet rs = get_features.executeQuery();
 
-	    String lastAcc = "";
-	    Sequence seq = null;
-	    SimpleFeatureHolder fh = new SimpleFeatureHolder();
+            String lastAcc = "";
+            Sequence seq = null;
+            SimpleFeatureHolder fh = new SimpleFeatureHolder();
 
-	    while (rs.next()) {
-		String accession = rs.getString(1);
-		int fid = rs.getInt(2);
+            while (rs.next()) {
+                String accession = rs.getString(1);
+                int fid = rs.getInt(2);
 
-		System.err.println(accession + "\t" + fid);
+                System.err.println(accession + "\t" + fid);
 
-		if (seq == null || ! lastAcc.equals(accession)) {
-		    seq = getSequence(accession);
-		}
+                if (seq == null || ! lastAcc.equals(accession)) {
+                    seq = getSequence(accession);
+                }
 
-		FeatureHolder hereFeature = seq.filter(new FilterByInternalID(fid), true);
-		Feature f = (Feature) hereFeature.features().next();
-		if (ff.accept(f)) {
-		    fh.addFeature(f);
-		}
-	    }
+                FeatureHolder hereFeature = seq.filter(new FilterByInternalID(fid), true);
+                Feature f = (Feature) hereFeature.features().next();
+                if (ff.accept(f)) {
+                    fh.addFeature(f);
+                }
+            }
             rs.close();
-	    get_features.close();
-	    conn.close();
+            get_features.close();
+            conn.close();
 
-	    return fh;
-	} catch (SQLException ex) {
-	    throw new BioRuntimeException("Error accessing BioSQL tables", ex);
-	} catch (ChangeVetoException ex) {
-	    throw new BioError("Assert failed: couldn't modify internal FeatureHolder", ex);
-	} catch (BioException ex) {
-	    throw new BioRuntimeException("Error fetching sequence", ex);
-	}
+            return fh;
+        } catch (SQLException ex) {
+            throw new BioRuntimeException("Error accessing BioSQL tables", ex);
+        } catch (ChangeVetoException ex) {
+            throw new BioError("Assert failed: couldn't modify internal FeatureHolder", ex);
+        } catch (BioException ex) {
+            throw new BioRuntimeException("Error fetching sequence", ex);
+        }
     }
 
     // SequenceIterator here, 'cos AbstractSequenceDB grandfathers in AbstractChangable :-(
@@ -1285,62 +1282,62 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     //
 
     BioSQLFeature canonicalizeFeature(BioSQLFeature f, int feature_id) {
-	// System.err.println("Canonicalizing feature at " + f.getLocation());
+        // System.err.println("Canonicalizing feature at " + f.getLocation());
 
-	Integer key = new Integer(feature_id);
-	BioSQLFeature oldFeature = (BioSQLFeature) featuresByID.get(key);
-	if (oldFeature != null) {
-	    return oldFeature;
-	} else {
-	    featuresByID.put(key, f);
-	    return f;
-	}
+        Integer key = new Integer(feature_id);
+        BioSQLFeature oldFeature = (BioSQLFeature) featuresByID.get(key);
+        if (oldFeature != null) {
+            return oldFeature;
+        } else {
+            featuresByID.put(key, f);
+            return f;
+        }
     }
 
     private class SingleFeatureReceiver extends BioSQLFeatureReceiver {
-	private Feature feature;
+        private Feature feature;
 
-	private SingleFeatureReceiver() {
-	    super(BioSQLSequenceDB.this);
-	}
+        private SingleFeatureReceiver() {
+            super(BioSQLSequenceDB.this);
+        }
 
-	protected void deliverTopLevelFeature(Feature f)
-	    throws ParseException
-	{
-	    if (feature == null) {
-		feature = f;
-	    } else {
-		throw new ParseException("Expecting only a single feature");
-	    }
-	}
+        protected void deliverTopLevelFeature(Feature f)
+            throws ParseException
+        {
+            if (feature == null) {
+                feature = f;
+            } else {
+                throw new ParseException("Expecting only a single feature");
+            }
+        }
 
-	public Feature getFeature() {
-	    return feature;
-	}
+        public Feature getFeature() {
+            return feature;
+        }
     }
 
     BioSQLFeature getFeatureByID(int feature_id)
     {
-	Integer key = new Integer(feature_id);
-	BioSQLFeature f = (BioSQLFeature) featuresByID.get(key);
-	if (f != null) {
-	    return f;
-	}
+        Integer key = new Integer(feature_id);
+        BioSQLFeature f = (BioSQLFeature) featuresByID.get(key);
+        if (f != null) {
+            return f;
+        }
 
-	try {
-	    SingleFeatureReceiver receiver = new SingleFeatureReceiver();
-	    getFeaturesSQL().retrieveFeatures(-1, receiver, null, -1, feature_id);
-	    if (receiver.getFeature() == null) {
-		throw new BioRuntimeException("Dangling internal_feature_id");
-	    } else {
-		featuresByID.put(key, (BioSQLFeature) receiver.getFeature());
-		return (BioSQLFeature) receiver.getFeature();
-	    }
-	} catch (SQLException ex) {
-	    throw new BioRuntimeException("Database error", ex);
-	} catch (BioException ex) {
-	    throw new BioRuntimeException(ex);
-	}
+        try {
+            SingleFeatureReceiver receiver = new SingleFeatureReceiver();
+            getFeaturesSQL().retrieveFeatures(-1, receiver, null, -1, feature_id);
+            if (receiver.getFeature() == null) {
+                throw new BioRuntimeException("Dangling internal_feature_id");
+            } else {
+                featuresByID.put(key, (BioSQLFeature) receiver.getFeature());
+                return (BioSQLFeature) receiver.getFeature();
+            }
+        } catch (SQLException ex) {
+            throw new BioRuntimeException("Database error", ex);
+        } catch (BioException ex) {
+            throw new BioRuntimeException(ex);
+        }
     }
 /*
     //
@@ -1360,30 +1357,30 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
     BioSQLXRef getXRefsByID(int dbxref_id)
     {
-	Integer key = new Integer(dbxref_id);
-	BioSQLFeature f = (BioSQLFeature) featuresByID.get(key);
-	if (f != null) {
-	    return f;
-	}
+        Integer key = new Integer(dbxref_id);
+        BioSQLFeature f = (BioSQLFeature) featuresByID.get(key);
+        if (f != null) {
+            return f;
+        }
 
-	try {
-	    SingleFeatureReceiver receiver = new SingleFeatureReceiver();
-	    getFeaturesSQL().retrieveFeatures(-1, receiver, null, -1, feature_id);
-	    if (receiver.getFeature() == null) {
-		throw new BioRuntimeException("Dangling internal_feature_id");
-	    } else {
-		featuresByID.put(key, (BioSQLFeature) receiver.getFeature());
-		return (BioSQLFeature) receiver.getFeature();
-	    }
-	} catch (SQLException ex) {
-	    throw new BioRuntimeException(ex, "Database error");
-	} catch (BioException ex) {
-	    throw new BioRuntimeException(ex);
-	}
+        try {
+            SingleFeatureReceiver receiver = new SingleFeatureReceiver();
+            getFeaturesSQL().retrieveFeatures(-1, receiver, null, -1, feature_id);
+            if (receiver.getFeature() == null) {
+                throw new BioRuntimeException("Dangling internal_feature_id");
+            } else {
+                featuresByID.put(key, (BioSQLFeature) receiver.getFeature());
+                return (BioSQLFeature) receiver.getFeature();
+            }
+        } catch (SQLException ex) {
+            throw new BioRuntimeException(ex, "Database error");
+        } catch (BioException ex) {
+            throw new BioRuntimeException(ex);
+        }
     }
 */
 
     Cache getTileCache() {
-	return tileCache;
+        return tileCache;
     }
 }
