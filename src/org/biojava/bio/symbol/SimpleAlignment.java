@@ -69,7 +69,11 @@ extends AbstractSymbolList implements Alignment, Serializable {
 
   public Symbol symbolAt(int index) {
     try {
-      return alphabet.getSymbol(new ColAsList(index));
+      if (labels.size() == 1) {
+          return symbolAt(labels.get(0), index);
+      } else {
+          return alphabet.getSymbol(new ColAsList(index));
+      }
     } catch (IllegalSymbolException ire) {
       throw new BioError(
 
