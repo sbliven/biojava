@@ -24,7 +24,7 @@ package org.biojava.bio.chromatogram.graphic;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
@@ -52,7 +52,7 @@ import org.biojava.bio.symbol.SymbolList;
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  */
 public class ChromatogramGraphic implements Cloneable {
-    /** A pseduo call list for use when a Chromatogram has no base calls */
+    /** A pseudo call list for use when a Chromatogram has no base calls */
     private static SymbolList SINGLE_CALL = 
         new SimpleSymbolList(new Symbol[] { DNATools.getDNA().getGapSymbol() }, 
                              1, DNATools.getDNA());
@@ -91,7 +91,7 @@ public class ChromatogramGraphic implements Cloneable {
         this(null);
     }
     
-    /** 
+    /**
      * Creates a new <code>ChromatogramGraphic</code>, initially displaying
      * the given chromatogram.
      */
@@ -111,30 +111,7 @@ public class ChromatogramGraphic implements Cloneable {
         //    setOption(Option.USE_PER_SHAPE_TRANSFORM, Boolean.TRUE);
         //}
     }
-    /*
-    protected synchronized void generatePaths() {
-        if (chromat != null && !pathsValid) {
-            int[][] samples = new int[4][];
-            samples[0] = chromat.getATraceSamples();
-            samples[1] = chromat.getCTraceSamples();
-            samples[2] = chromat.getGTraceSamples();
-            samples[3] = chromat.getTTraceSamples();
-            float max = chromat.getMax();
-            // visible coordinate system is in (0, max), so we need to rescale input from [0, max]
-            float rescale = (max - 2) / max;
-            GeneralPath tmpPath;
-            for (int i = 0 ; i < 4 ; i++) {
-                tmpPath = new GeneralPath(GeneralPath.WIND_NON_ZERO, chromat.getTraceLength());
-                tmpPath.moveTo(0, rescale * (max - samples[i][0] + 1.0f) );
-                for (int j = 0 ; j < samples[i].length ; j++) {
-                    tmpPath.lineTo(j, rescale * (max - samples[i][j] + 1.0f) );
-                }
-                paths[i] = new Area(tmpPath);
-            }
-            pathsValid = true;
-        }
-    }
-    */
+
     /**
      * Precomputes the {@link java.awt.geom.GeneralPath}s used to draw the
      * traces.
@@ -152,24 +129,34 @@ public class ChromatogramGraphic implements Cloneable {
             } catch (IllegalSymbolException ise) {
                 throw new BioError("Can't happen");
             }
+            ChromatogramNonlinearScaler horizScaler = (ChromatogramNonlinearScaler) getOption(Option.HORIZONTAL_NONLINEAR_SCALER);
             float max = chromat.getMax();
-            // visible coordinate system is in [0, max), so we need to rescale input from [0, max]
-            //float rescale = (max - 1) / max;
-            float rescale = 1.0f;
             int subpathLength = getIntOption(Option.SUBPATH_LENGTH);
-            int countSubpaths = (int)Math.ceil( ((float)samples[A].length) / subpathLength );
-            int offsetIdx;
+            int countSubpaths = (int)Math.ceil( horizScaler.scale(chromat, samples[A].length-1) / subpathLength );
+            int[] subpathTraceBounds = new int[countSubpaths+1];
+            {
+                subpathTraceBounds[0] = 0;
+                int bound = 1;
+                float scaled;
+                for (int i = 0 ; i < samples[A].length ; i++) {
+                    scaled = horizScaler.scale(chromat, i);
+                    if (scaled >= bound*subpathLength) {
+                        subpathTraceBounds[bound] = i;
+                        bound++;
+                    }
+                }
+                subpathTraceBounds[countSubpaths] = samples[A].length - 1;
+            }
+            int offsetIdx, thisPathLen;
             for (int i = 0 ; i < 4 ; i++) {
                 subpaths[i] = new GeneralPath[countSubpaths];
                 for (int j = 0 ; j < countSubpaths ; j++) {
-                    subpaths[i][j] = new GeneralPath(GeneralPath.WIND_EVEN_ODD, subpathLength);
-                    if (j == 0)
-                        offsetIdx = 0;
-                    else
-                        offsetIdx = j*subpathLength - 1;
-                    subpaths[i][j].moveTo(offsetIdx, rescale*(max - samples[i][offsetIdx]));
-                    for (int k = offsetIdx ; k < samples[i].length && k <= offsetIdx + subpathLength ; k++) {
-                        subpaths[i][j].lineTo(k, rescale*(max - samples[i][k]));
+                    thisPathLen = subpathTraceBounds[j+1] - subpathTraceBounds[j];
+                    subpaths[i][j] = new GeneralPath(GeneralPath.WIND_EVEN_ODD, thisPathLen);
+                    offsetIdx = subpathTraceBounds[j];
+                    subpaths[i][j].moveTo(horizScaler.scale(chromat, offsetIdx), max - samples[i][offsetIdx]);
+                    for (int k = offsetIdx+1 ; k < samples[i].length && k <= offsetIdx + thisPathLen ; k++) {
+                        subpaths[i][j].lineTo(horizScaler.scale(chromat, k), max - samples[i][k]);
                     }
                 }
             }
@@ -193,20 +180,29 @@ public class ChromatogramGraphic implements Cloneable {
                 int[] bcOffsets = ChromatogramTools.getTraceOffsetArray(chromat);
                 if (callboxes == null || callboxes.length != bcOffsets.length)
                     callboxes = new Rectangle2D.Float[bcOffsets.length];
+                ChromatogramNonlinearScaler horizScaler = 
+                    (ChromatogramNonlinearScaler) getOption(Option.HORIZONTAL_NONLINEAR_SCALER);
                 float max = chromat.getMax();
-                float left = 0;
-                float right = bcOffsets[0] + (bcOffsets[1] - bcOffsets[0]) / 2.0f;
-                callboxes[0] = new Rectangle2D.Float(0, 0, right - left, max);
+                int leftIdx  = 0;
+                int rightIdx = bcOffsets[0] + (int) Math.floor( ((double) (bcOffsets[1] - bcOffsets[0])) / 2) + 1;
+                float left  = horizScaler.scale(chromat, leftIdx);
+                float right = horizScaler.scale(chromat, rightIdx);
+                callboxes[0] = new Rectangle2D.Float(left, 0, right - left, max);
+                //System.out.println("[cg.gcb] cb[0] left="+leftIdx+":"+left+" center="+bcOffsets[0]+" right="+rightIdx+":"+right+" box="+callboxes[0]);
                 int i = 1;
                 while (i < bcOffsets.length - 1) {
+                    leftIdx = rightIdx;
+                    rightIdx = bcOffsets[i] + (int) Math.floor( ((double) (bcOffsets[i+1] - bcOffsets[i])) / 2) + 1;
                     left = right;
-                    right = bcOffsets[i] + (bcOffsets[i+1] - bcOffsets[i]) / 2.0f;
+                    right = horizScaler.scale(chromat, rightIdx);
                     callboxes[i] = new Rectangle2D.Float(left, 0, right - left, max);
+                    //System.out.println("[cg.gcb] cb["+i+"] left="+leftIdx+":"+left+" center="+bcOffsets[i]+" right="+rightIdx+":"+right+" box="+callboxes[i]);
                     i++;
                 }
-                left = right - 1;
-                right = (int) chromat.getTraceLength() - 1;
+                left = right;
+                right = horizScaler.scale(chromat, chromat.getTraceLength() - 1);
                 callboxes[i] = new Rectangle2D.Float(left, 0, right - left, max);
+                //System.out.println("[cg.gcb] cb["+i+"] left="+left+" center="+bcOffsets[i]+" right="+right+" box="+callboxes[i]);
             }
             callboxesValid = true;
             drawableCallboxesValid = false;
@@ -222,18 +218,20 @@ public class ChromatogramGraphic implements Cloneable {
      *        screen space.
      */
     protected synchronized void generateDrawableCallboxes(AffineTransform shapeTx) {
+        if (!callboxesValid)
+            generateCallboxes();
         if (!shapeTx.equals(drawnCallboxesTx) || !drawableCallboxesValid) {
-            //System.out.println("Regen drawableCallboxes with " + shapeTx);
+            //System.out.println("Regen drawableCallboxes with " + shapeTx + " condition: tx="+shapeTx.equals(drawnCallboxesTx)+" valid="+drawableCallboxesValid);
             if (drawableCallboxes == null || drawableCallboxes.length != callboxes.length)
                 drawableCallboxes = new Rectangle2D[callboxes.length];
             for (int i = 0 ; i < drawableCallboxes.length ; i++)
                 drawableCallboxes[i] = shapeTx.createTransformedShape(callboxes[i]).getBounds2D();
             drawnCallboxesTx = (AffineTransform) shapeTx.clone();
             drawableCallboxesValid = true;
+            //System.out.println("[cg.gdcb]");
+            //for (int i = 0 ; i < drawableCallboxes.length ; i++)
+            //    System.out.println("cb["+i+"]="+callboxes[i]+"\ndcb["+i+"]="+drawableCallboxes[i]);
         }
-        //System.out.println("[cg.gdcb]");
-        //for (int i = 0 ; i < drawableCallboxes.length ; i++)
-        //    System.out.println("dcb["+i+"]="+drawableCallboxes[i]);
     }
     
     /**
@@ -319,12 +317,12 @@ public class ChromatogramGraphic implements Cloneable {
      * @see Option#HEIGHT_IS_AUTHORITATIVE
      */
     public void setHeight(int h) {
+        if (h != height) drawableCallboxesValid = false;
         height = h;
         if (chromat != null) 
             vertScale = ( (float) height ) / chromat.getMax();
         else
             vertScale = -1.0f;
-        drawableCallboxesValid = false;
     }
     
     /**
@@ -335,12 +333,12 @@ public class ChromatogramGraphic implements Cloneable {
      * @see Option#HEIGHT_IS_AUTHORITATIVE
      */
     public void setVerticalScale(float vs) {
+        if (vs != vertScale) drawableCallboxesValid = false;
         vertScale = vs;
         if (chromat != null)
             height = (int) (vertScale * chromat.getMax());
         else
             height = -1;
-        drawableCallboxesValid = false;
     }
     
     /**
@@ -350,12 +348,14 @@ public class ChromatogramGraphic implements Cloneable {
      * @see Option#WIDTH_IS_AUTHORITATIVE
      */
     public void setWidth(int w) {
+        if (w != width) drawableCallboxesValid = false;
         width = w;
+        ChromatogramNonlinearScaler horizScaler = 
+            (ChromatogramNonlinearScaler) getOption(Option.HORIZONTAL_NONLINEAR_SCALER);
         if (chromat != null)
-            horizScale = ( (float) width ) / chromat.getTraceLength();
+            horizScale = ( (float) width ) / horizScaler.scale(chromat, chromat.getTraceLength()-1);
         else
             horizScale = -1.0f;
-        drawableCallboxesValid = false;
     }
     
     /**
@@ -366,15 +366,17 @@ public class ChromatogramGraphic implements Cloneable {
      * @see Option#WIDTH_IS_AUTHORITATIVE
      */
     public void setHorizontalScale(float hs) {
+        if (hs != horizScale) drawableCallboxesValid = false;
         horizScale = hs;
         
+        ChromatogramNonlinearScaler horizScaler = 
+            (ChromatogramNonlinearScaler) getOption(Option.HORIZONTAL_NONLINEAR_SCALER);
         if (chromat != null)
-            width = (int) (horizScale * chromat.getTraceLength());
+            width = (int) (horizScale * horizScaler.scale(chromat, chromat.getTraceLength()-1));
         else
             width = -1;
-        drawableCallboxesValid = false;
     }
-    
+
     /** 
      * Returns the color that will be used to draw the trace for the
      * given DNA symbol.
@@ -413,7 +415,10 @@ public class ChromatogramGraphic implements Cloneable {
     public int getCallboxCount() {
         if (!callboxesValid)
             generateCallboxes();
-        return callboxes.length;
+        if (callboxesValid)
+            return callboxes.length;
+        else
+            return 0;
     }
     
     /**
@@ -472,7 +477,7 @@ public class ChromatogramGraphic implements Cloneable {
             if (pointOnScreen)
                 getInvTransform().transform(point, trans);
             int i = 0;
-            // FIXME: binary search is possible since callboxes is sorted
+            // XXX: binary search is possible since callboxes is sorted
             while (i < callboxes.length && trans.getX() > callboxes[i].getMaxX())
                 i++;
             return (i < callboxes.length) ? (i) : (i-1);
@@ -509,6 +514,19 @@ public class ChromatogramGraphic implements Cloneable {
         return getCallContaining(x, true);
     }
     
+    private int getSubpathContaining(float x) {
+        // XXX: this could be a binary search
+        Rectangle2D bounds;
+        if (x < subpaths[A][0].getBounds2D().getX())
+            return 0;
+        for (int i = 0 ; i < subpaths[A].length ; i++) {
+            bounds = subpaths[A][i].getBounds2D();
+            if (bounds.getX() <= x && x <= bounds.getMaxX())
+                return i;
+        }
+        return subpaths[A].length - 1;
+    }
+    
     /**
      * Returns a new AffineTransform describing the transformation
      * from chromatogram coordinates to output coordinates.
@@ -525,9 +543,7 @@ public class ChromatogramGraphic implements Cloneable {
      */
     public void getTransformAndConcat(AffineTransform target) {
         target.scale(horizScale, vertScale);
-        // the y translation is a continuation of the rescale behavior found in 
-        // generatePaths
-        target.translate(-1.0 * getFloatOption(Option.FROM_TRACE_SAMPLE), 1.0);
+        target.translate(-1.0 * getFloatOption(Option.FROM_TRACE_SAMPLE), 0.0);
     }
     
     /** 
@@ -537,7 +553,7 @@ public class ChromatogramGraphic implements Cloneable {
      */
     public AffineTransform getInvTransform() {
         AffineTransform at = new AffineTransform();
-        at.translate(getFloatOption(Option.FROM_TRACE_SAMPLE), -1.0);
+        at.translate(getFloatOption(Option.FROM_TRACE_SAMPLE), 0.0);
         at.scale(1.0 / horizScale, 1.0 / vertScale);
         return at;
     }
@@ -552,13 +568,17 @@ public class ChromatogramGraphic implements Cloneable {
         Color origC = g2.getColor();
         Shape origClip = g2.getClip();
         //System.out.println("origClip: " + origClip);
-        Object origAA = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
         Stroke origStroke = g2.getStroke();
         
-        Rectangle2D clip = origClip.getBounds2D();
+        Rectangle2D clip;
+        if (origClip != null)
+            clip = origClip.getBounds2D();
+        else
+            clip = new Rectangle(0, 0, getWidth(), getHeight());
         //System.out.println("clipping bounds: " + clip);
 
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        // Allow user to decide whether AA should be on
+        //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         //g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
 
         boolean usePerShpTx = optionIsTrue(Option.USE_PER_SHAPE_TRANSFORM);
@@ -635,48 +655,48 @@ public class ChromatogramGraphic implements Cloneable {
             generateSubpaths();
         float toTraceSample   = getFloatOption(Option.TO_TRACE_SAMPLE  );
         float fromTraceSample = getFloatOption(Option.FROM_TRACE_SAMPLE);
+        //System.out.println("Drawing from trace sample " + fromTraceSample + " to " + toTraceSample);
         //System.out.println("Drawing traces with stroke=" + basicStrokeToString((BasicStroke)g2.getStroke()));
-        int subpathLength = getIntOption(Option.SUBPATH_LENGTH);
         int loSubpath, hiSubpath;
-        loSubpath = (int)Math.floor((clip.getX() / shapeTx.getScaleX() + fromTraceSample) / subpathLength);
-        hiSubpath = (int)Math.ceil(Math.min(clip.getMaxX() / shapeTx.getScaleX() + fromTraceSample, toTraceSample) / subpathLength);
-        //System.out.println("Drawing subpaths ["+loSubpath+","+hiSubpath+") of "+subpaths[0].length);
+        //loSubpath = (int)Math.floor((clip.getX() / shapeTx.getScaleX() + fromTraceSample) / subpathLength);
+        loSubpath = getSubpathContaining((float) (clip.getX() / shapeTx.getScaleX() + fromTraceSample));
+        //hiSubpath = (int)Math.floor(Math.min(clip.getMaxX() / shapeTx.getScaleX() + fromTraceSample, toTraceSample) / subpathLength);
+        hiSubpath = getSubpathContaining((float) Math.min(clip.getMaxX() / shapeTx.getScaleX() + fromTraceSample, toTraceSample));
+        //System.out.println("Drawing subpaths ["+loSubpath+","+hiSubpath+"] of "+subpaths[0].length+" each "+subpathLength+" long");
         if (optionIsTrue(Option.DRAW_TRACE_A)) {
             g2.setColor((Color) colors.get(DNATools.a()));
             if (usePerShpTx)
-                for (int j = loSubpath ; j < hiSubpath ; j++) {
+                for (int j = loSubpath ; j <= hiSubpath ; j++)
                     g2.draw(shapeTx.createTransformedShape(subpaths[A][j]));
-                    // g2.draw(shapeTx.createTransformedShape(subpaths[0][j]).getBounds2D());
-                }
             else
-                for (int j = loSubpath ; j < hiSubpath ; j++)
+                for (int j = loSubpath ; j <= hiSubpath ; j++)
                     g2.draw(subpaths[A][j]);
         }
         if (optionIsTrue(Option.DRAW_TRACE_C)) {
             g2.setColor((Color) colors.get(DNATools.c()));
             if (usePerShpTx)
-                for (int j = loSubpath ; j < hiSubpath ; j++)
+                for (int j = loSubpath ; j <= hiSubpath ; j++)
                     g2.draw(shapeTx.createTransformedShape(subpaths[C][j]));
             else
-                for (int j = loSubpath ; j < hiSubpath ; j++)
+                for (int j = loSubpath ; j <= hiSubpath ; j++)
                     g2.draw(subpaths[C][j]);
         }
         if (optionIsTrue(Option.DRAW_TRACE_G)) {
             g2.setColor((Color) colors.get(DNATools.g()));
             if (usePerShpTx)
-                for (int j = loSubpath ; j < hiSubpath ; j++)
+                for (int j = loSubpath ; j <= hiSubpath ; j++)
                     g2.draw(shapeTx.createTransformedShape(subpaths[G][j]));
             else
-                for (int j = loSubpath ; j < hiSubpath ; j++)
+                for (int j = loSubpath ; j <= hiSubpath ; j++)
                     g2.draw(subpaths[G][j]);
         }
         if (optionIsTrue(Option.DRAW_TRACE_T)) {
             g2.setColor((Color) colors.get(DNATools.t()));
             if (usePerShpTx)
-                for (int j = loSubpath ; j < hiSubpath ; j++)
+                for (int j = loSubpath ; j <= hiSubpath ; j++)
                     g2.draw(shapeTx.createTransformedShape(subpaths[T][j]));
             else
-                for (int j = loSubpath ; j < hiSubpath ; j++)
+                for (int j = loSubpath ; j <= hiSubpath ; j++)
                     g2.draw(subpaths[T][j]);
         }
         
@@ -684,7 +704,6 @@ public class ChromatogramGraphic implements Cloneable {
         g2.setTransform(origTx);
         g2.setColor(origC);
         g2.setClip(origClip);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, origAA);
     }
 
     /**
@@ -695,8 +714,18 @@ public class ChromatogramGraphic implements Cloneable {
      */
     public void setOption(Option opt, Object value) {
         options.put(opt, value);
-        if (opt == Option.SUBPATH_LENGTH)
+        if (opt == Option.SUBPATH_LENGTH) {
             subpathsValid = false;
+        }
+        if (opt == Option.HORIZONTAL_NONLINEAR_SCALER) {
+            subpathsValid = false;
+            callboxesValid = false;
+            drawableCallboxesValid = false;
+            if (optionIsTrue(Option.WIDTH_IS_AUTHORITATIVE))
+                setWidth(width);
+            else
+                setHorizontalScale(horizScale);
+        }
     }
     
     /**
@@ -789,7 +818,7 @@ public class ChromatogramGraphic implements Cloneable {
      */
     public static class Option {
         private String desc;
-        private static HashMap map = new HashMap();
+        private static Map map = new HashMap();
         private Option(String desc, Object def) {
             this.desc = desc;
             map.put(desc, this);
@@ -812,7 +841,7 @@ public class ChromatogramGraphic implements Cloneable {
         /**
          * Default values table
          */
-        static final HashMap DEFAULTS = new HashMap();
+        static final Map DEFAULTS = new HashMap();
         
         /**
          * Option indicating whether to fill in the callboxes for calls of
@@ -1039,8 +1068,22 @@ public class ChromatogramGraphic implements Cloneable {
          */
         public static final Option TO_TRACE_SAMPLE =
             new Option("to-trace-sample",   new Integer(Integer.MAX_VALUE));
+        
+        /**
+         * Option specifying the non-linear scaling function to apply, as
+         * embodied in a {@link ChromatogramNonlinearScaler} object.
+         * <p>
+         * Value type: {@link ChromatogramNonlinearScaler}.<br/>
+         * Default value: an instance of {@link ChromatogramNonlinearScaler.Identity}.
+         */
+        public static final Option HORIZONTAL_NONLINEAR_SCALER =
+            new Option("horiz-nonlinear-scaler", ChromatogramNonlinearScaler.Identity.getInstance());
+        
+        //public static final Option EXAGGERATE_SAMPLE_POINTS =
+        //    new Option("exaggerate-sample-points", Boolean.FALSE);
     }
     
+    /*
     private final static String basicStrokeToString(BasicStroke bs) {
         StringBuffer sb = new StringBuffer(bs.toString());
         sb.append("[width=").append(bs.getLineWidth());
@@ -1058,5 +1101,6 @@ public class ChromatogramGraphic implements Cloneable {
         }
         sb.append("; MiterLimit=").append(bs.getMiterLimit()).append(']');
         return sb.toString();
-    }        
+    }
+     */       
 }
