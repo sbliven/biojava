@@ -59,11 +59,28 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 
     /**
      * Should we ignore the symbols (SQ) part of the
-     * entry?
+     * entry?  If this property is set to <code>true</code>,
+     * the parser will never call addSymbols on the
+     * <code>SeqIOListener</code>, but parsing will be faster
+     * if you're only interested in header information.
+     *
+     * <p>
+     * This property also allows the header to be parsed for
+     * files which have invalid sequence data.
+     * </p>
      */
 
     public void setElideSymbols(boolean b) {
 	elideSymbols = b;
+    }
+
+    /**
+     * Return a flag indicating if symbol data will be skipped
+     * when parsing streams.
+     */
+
+    public boolean getElideSymbols() {
+	return elideSymbols;
     }
 
     public boolean readSequence(BufferedReader reader,

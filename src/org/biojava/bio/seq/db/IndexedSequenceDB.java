@@ -215,7 +215,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	long pos = bReader.getFilePointer();
 	boolean hasNextSequence = true;
 	while(hasNextSequence) {
-	    SequenceBuilder sb = sbFact.makeSequenceBuilder();
+	    SequenceBuilder sb = new ElideSymbolsSequenceBuilder(sbFact.makeSequenceBuilder());
 	    hasNextSequence = format.readSequence(bReader, symParser, sb);
 	    Sequence seq = sb.makeSequence();
 	    Source s = new Source(seqFile, pos);
@@ -251,6 +251,53 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	    changeSupport.firePostChangeEvent(ce);
 	}
 	commit();
+    }
+
+    private static class ElideSymbolsSequenceBuilder implements SequenceBuilder {
+	private final SequenceBuilder delegate;
+
+	public ElideSymbolsSequenceBuilder(SequenceBuilder delegate) {
+	    this.delegate = delegate;
+	}
+
+	public void startSequence() {
+	    delegate.startSequence();
+	}
+
+	public void endSequence() {
+	    delegate.endSequence();
+	}
+
+	public void setName(String name) {
+	    delegate.setName(name);
+	}
+
+	public void setURI(String uri) {
+	    delegate.setURI(uri);
+	}
+
+	public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length) {
+	}
+
+	public void addSequenceProperty(String key, Object value) {
+	    delegate.addSequenceProperty(key, value);
+	}
+
+	public void startFeature(Feature.Template templ) {
+	    delegate.startFeature(templ);
+	}
+
+	public void endFeature() {
+	    delegate.endFeature();
+	}
+
+	public void addFeatureProperty(String key, Object value) {
+	    delegate.addFeatureProperty(key, value);
+	}
+
+	public Sequence makeSequence() throws BioException {
+	    return delegate.makeSequence();
+	}
     }
 
     /**

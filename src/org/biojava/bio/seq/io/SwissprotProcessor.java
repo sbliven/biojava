@@ -29,14 +29,20 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
 
 /**
- * Simple filter which handles attribute lines from an EMBL file
+ * Simple filter which handles attribute lines from an Swissprot entry.
+ * Skeleton implementation, please add more functionality.
+ *
+ * <p>
+ * <strong>FIXME:</strong> Note that this is currently rather incomplete, 
+ * and doesn't handle the feature table at all.
+ * </p>
  *
  * @author Thomas Down
  * @since 1.1
  */
 
-public class EmblProcessor implements SequenceBuilder {
-    public static final String PROPERTY_EMBL_ACCESSIONS = "embl_accessions";
+public class SwissprotProcessor implements SequenceBuilder {
+    public static final String PROPERTY_SWISSPROT_ACCESSIONS = "swissprot.accessions";
 
     /**
      * Factory which wraps SequenceBuilders in an EmblProcessor
@@ -52,16 +58,14 @@ public class EmblProcessor implements SequenceBuilder {
 	}
 
 	public SequenceBuilder makeSequenceBuilder() {
-	    return new EmblProcessor(delegateFactory.makeSequenceBuilder());
+	    return new SwissprotProcessor(delegateFactory.makeSequenceBuilder());
 	}
     }
 
     private SequenceBuilder delegate;
-    private FeatureTableParser features;
 
-    public EmblProcessor(SequenceBuilder delegate) {
+    public SwissprotProcessor(SequenceBuilder delegate) {
 	this.delegate = delegate;
-	features = new FeatureTableParser(this);
     }
 
     public void startSequence() {
@@ -72,8 +76,8 @@ public class EmblProcessor implements SequenceBuilder {
 	if (accessions.size() > 0) {
 	    String id = (String) accessions.get(0);
 	    delegate.setName(id);
-	    delegate.setURI("urn:sequence/embl:" + id);
-	    delegate.addSequenceProperty(PROPERTY_EMBL_ACCESSIONS, accessions);
+	    delegate.setURI("urn:sequence/swissprot:" + id);
+	    delegate.addSequenceProperty(PROPERTY_SWISSPROT_ACCESSIONS, accessions);
 	}
 	delegate.endSequence();
     }
@@ -99,35 +103,13 @@ public class EmblProcessor implements SequenceBuilder {
     }
 
     public void addSequenceProperty(String key, Object value) {
-	try {
-	    // Tidy up any end-of-block jobbies
-	    
-	    if (features.inFeature() && !key.equals("FT")) {
-		features.endFeature();
-	    }
-       
-	    if (key.equals("FT")) {
-		String featureLine = value.toString();
-		if (featureLine.charAt(0) != ' ') {
-		    // This is a featuretype field
-		    if (features.inFeature())
-			features.endFeature();
-		    
-		    features.startFeature(featureLine.substring(0, 15).trim());
-		}
-		features.featureData(featureLine.substring(16));
-	    } else {
-		delegate.addSequenceProperty(key, value);
-		
-		if (key.equals("AC")) {
-		    String acc= value.toString();
-		    StringTokenizer toke = new StringTokenizer(acc, "; ");
-		    while (toke.hasMoreTokens())
-			accessions.add(toke.nextToken());
-		}
-	    }
-	} catch (BioException ex) {
-	    throw new BioError(ex, "FIXME");
+	delegate.addSequenceProperty(key, value);
+	
+	if (key.equals("AC")) {
+	    String acc= value.toString();
+	    StringTokenizer toke = new StringTokenizer(acc, "; ");
+	    while (toke.hasMoreTokens())
+		accessions.add(toke.nextToken());
 	}
     }
 

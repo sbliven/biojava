@@ -30,7 +30,7 @@ class ChunkedSymbolListBuilder {
     private final static int CHUNK_SIZE = 1<<12;
 
     private List chunkL = new ArrayList();
-    private Symbol[] headChunk = new Symbol[CHUNK_SIZE];
+    private Symbol[] headChunk = null;
     private int headChunkPos = 0;
 
     private Alphabet alpha = null;
@@ -47,6 +47,11 @@ class ChunkedSymbolListBuilder {
 	    if (this.alpha != alpha) {
 		throw new IllegalAlphabetException("Alphabet changed!");
 	    }
+	}
+
+	if (headChunk == null) {
+	    headChunk = new Symbol[CHUNK_SIZE];
+	    headChunkPos = 0;
 	}
 
 	int ipos = 0;
@@ -73,7 +78,11 @@ class ChunkedSymbolListBuilder {
 	    chunkL.add(headChunk);
 	}
 
-	if (chunkL.size() == 1) {
+	if (chunkL.size() == 0) {
+	    // Really boring case.
+
+	    return SymbolList.EMPTY_LIST;
+	} else if (chunkL.size() == 1) {
 	    // Small-sequence optimization
 	    
 	    return new SubArraySymbolList((Symbol[]) chunkL.get(0),
