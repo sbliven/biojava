@@ -762,6 +762,28 @@ public final class SeqIOTools  {
     }
 
     /**
+     * Reads a file with the specified format and alphabet
+     * @param formatName the name of the format eg genbank or swissprot (case insensitive)
+     * @param alphabetName the name of the alphabet eg dna or rna or protein (case insensitive)
+     * @param br a BufferedReader for the input
+     * @return either an Alignment object or a SequenceIterator (depending on the format read)
+     * @throws BioException if an error occurs while reading or a unrecognized format, alphabet
+     *  combination is used (eg swissprot and DNA).
+     *
+     * @since 1.3
+     */
+    public static Object fileToBiojava(String formatName,
+                                       String alphabetName,
+                                       BufferedReader br)
+        throws BioException
+    {
+
+      int fileType = identifyFormat(formatName, alphabetName);
+
+      return fileToBiojava(fileType, br);
+    }
+
+    /**
      * Reads a file and returns the corresponding Biojava object. You
      * need to cast it as an Alignment or a SequenceIterator as
      * appropriate.
