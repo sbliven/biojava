@@ -726,7 +726,9 @@ public class FilterUtils {
         transformFilter(or.getChild2(), trans)
       );
     } else if(ff instanceof FeatureFilter.Not) {
-      return not(((FeatureFilter.Not) ff).getChild());
+      return not(
+        transformFilter(((FeatureFilter.Not) ff).getChild(), trans)
+      );
     } else {
       FeatureFilter tf = trans.transform(ff);
       if(tf != null) {
