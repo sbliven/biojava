@@ -30,7 +30,10 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
+ * Sequence extracted from an ACeDB database.
+ *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 
 public class AceSequence implements Sequence {
@@ -45,7 +48,7 @@ public class AceSequence implements Sequence {
   }
   
   public String getURN() {
-    return "urn://sequence:acedb/" + getName();
+    return "urn:sequence/acedb:" + getName();
   }
   
   public Alphabet getAlphabet() {
@@ -153,7 +156,7 @@ public class AceSequence implements Sequence {
               template.location = new RangeLocation(start.toInt(), end.toInt());
               template.source = "ACeDB";
               template.type = name;
-              Feature f = new SimpleFeature(this, template);
+              Feature f = SimpleFeatureRealizer.DEFAULT.realizeFeature(this, template);
               fHolder.addFeature(f);
             }
           }
@@ -186,7 +189,7 @@ public class AceSequence implements Sequence {
               template.source = "ACeDB";
               template.type = name;
               template.annotation = fAnn;
-              Feature f = new SimpleFeature(this, template);
+              Feature f = SimpleFeatureRealizer.DEFAULT.realizeFeature(this, template);
               fHolder.addFeature(f);
             }
           }
