@@ -309,6 +309,28 @@ public interface Feature extends FeatureHolder, Annotatable {
 	    
 	    return true;
 	}
+        
+        public String toString() {
+          StringBuffer sbuf = new StringBuffer();
+          
+          Class us = getClass();
+          sbuf.append(us);
+          sbuf.append(":");
+          
+          Field[] fields = us.getFields();
+          for(int i = 0; i < fields.length; i++) {
+            try {
+              sbuf.append(" ");
+              sbuf.append(fields[i].getName());
+              sbuf.append("=");
+              sbuf.append(fields[i].get(this));
+            } catch (Exception e) {
+              throw new BioError(e, "Couldn't access template fields");
+            }
+          }
+          
+          return sbuf.toString();
+        }
     }
 
     /**

@@ -143,37 +143,39 @@ extends SequenceRendererWrapper {
       fi.hasNext();
     ) {
       Feature f = (Feature) fi.next();
-      Location fLoc = f.getLocation();
-      if(!fLoc.isContiguous()) {
-        fLoc = new RangeLocation(fLoc.getMin(), fLoc.getMax());
-      }
-      Iterator li = layerLocs.iterator();
-      Iterator fhI = layers.iterator();
-      SimpleFeatureHolder fhLayer = null;
-      List listLayer = null;
-    LAYER:
-      while(li.hasNext()) {
-        List l = (List) li.next();
-        SimpleFeatureHolder fh = (SimpleFeatureHolder) fhI.next();
-        for(Iterator locI = l.iterator(); locI.hasNext(); ) {
-          Location loc = (Location) locI.next();
-          if(loc.overlaps(fLoc)) {
-            continue LAYER;
-          }
-        }
-        listLayer = l;
-        fhLayer = fh;
-        break;
-      }
-      if(listLayer == null) {
-        layerLocs.add(listLayer = new ArrayList());
-        layers.add(fhLayer = new SimpleFeatureHolder());
-      }
-      listLayer.add(fLoc);
       try {
+        Location fLoc = f.getLocation();
+        if(!fLoc.isContiguous()) {
+          fLoc = new RangeLocation(fLoc.getMin(), fLoc.getMax());
+        }
+        Iterator li = layerLocs.iterator();
+        Iterator fhI = layers.iterator();
+        SimpleFeatureHolder fhLayer = null;
+        List listLayer = null;
+      LAYER:
+        while(li.hasNext()) {
+          List l = (List) li.next();
+          SimpleFeatureHolder fh = (SimpleFeatureHolder) fhI.next();
+          for(Iterator locI = l.iterator(); locI.hasNext(); ) {
+            Location loc = (Location) locI.next();
+            if(loc.overlaps(fLoc)) {
+              continue LAYER;
+            }
+          }
+          listLayer = l;
+          fhLayer = fh;
+          break;
+        }
+        if(listLayer == null) {
+          layerLocs.add(listLayer = new ArrayList());
+          layers.add(fhLayer = new SimpleFeatureHolder());
+        }
+        listLayer.add(fLoc);
         fhLayer.addFeature(f);
       } catch (ChangeVetoException cve) {
         throw new BioError(cve, "Pants");
+      } catch (Throwable t) {
+        throw new NestedError(t, "Could not bump feature: " + f);
       }
     }
     

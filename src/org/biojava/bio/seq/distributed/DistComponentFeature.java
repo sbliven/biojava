@@ -58,6 +58,14 @@ class DistComponentFeature
 				ComponentFeature.Template temp)
         throws BioException
     {
+      if(temp.location == null) {
+        throw new NullPointerException("Template has null location: " + temp);
+      }
+      
+      if(temp.componentLocation ==  null) {
+        throw new NullPointerException("Template has null component location: " + temp);
+      }
+      
 	if (locationContent(temp.location) != 
 	    locationContent(temp.componentLocation))
 	{

@@ -87,7 +87,7 @@ class DistProjectedFeatureHolder extends ProjectedFeatureHolder {
                     pcf = new DistComponentFeature((DistributedSequence) getParent(),
 						                           cft);
                 } catch (Exception ex) {
-                    throw new BioRuntimeException(ex, "Error instantiating DistComponentFeature");
+                    throw new BioRuntimeException(ex, "Error instantiating DistComponentFeature for: " + f);
                 }
                 componentFeatureCache.put(f, pcf);
             } 
