@@ -42,28 +42,28 @@ public class GappedSequenceTest extends TestCase
     protected GappedSequence gappedSeq;
 
     public GappedSequenceTest(String name) {
-	super(name);
+         super(name);
     }
 
     protected void setUp() throws Exception {
-	seq = new SimpleSequence(DNATools.createDNA("aacgtaggttccatgc"),
-				       "fragment1",
-				       "fragment1",
-				       Annotation.EMPTY_ANNOTATION);
+		seq = new SimpleSequence(DNATools.createDNA("aacgtaggttccatgc"),
+					       "fragment1",
+					       "fragment1",
+					       Annotation.EMPTY_ANNOTATION);
+		
+		Feature.Template sft = new Feature.Template();
+		sft.type = "normal";
+		sft.source = "test";
+		sft.annotation = Annotation.EMPTY_ANNOTATION;
+		sft.location = new RangeLocation(8, 10);
+		seq.createFeature(sft);
 	
-	Feature.Template sft = new Feature.Template();
-	sft.type = "normal";
-	sft.source = "test";
-	sft.annotation = Annotation.EMPTY_ANNOTATION;
-	sft.location = new RangeLocation(8, 10);
-	seq.createFeature(sft);
-
-	sft.type = "split";
-	sft.location = new RangeLocation(2, 10);
-	seq.createFeature(sft);
-
-	gappedSeq = new SimpleGappedSequence(seq);
-	gappedSeq.addGapsInSource(5, 2);
+		sft.type = "split";
+		sft.location = new RangeLocation(2, 10);
+		seq.createFeature(sft);
+	
+		gappedSeq = new SimpleGappedSequence(seq);
+		gappedSeq.addGapsInSource(5, 2);
     }
 
     /**
@@ -117,4 +117,50 @@ public class GappedSequenceTest extends TestCase
 	assertEquals(block.getMax(), 12);
     }
 
+    public void testRemoveRemoteFeature()
+    		throws Exception
+    	{
+		seq = new SimpleSequence(DNATools.createDNA("aacgtaggttccatgc"),
+			       "fragment1",
+			       "fragment1",
+			       Annotation.EMPTY_ANNOTATION);
+
+		Feature.Template sft = new Feature.Template();
+		sft.type = "normal";
+		sft.source = "test";
+		sft.annotation = Annotation.EMPTY_ANNOTATION;
+		sft.location = new RangeLocation(8, 10);
+		seq.createFeature(sft);
+		
+		sft.type = "split";
+		sft.location = new RangeLocation(2, 10);
+		seq.createFeature(sft);
+		
+		gappedSeq = new SimpleGappedSequence(seq);
+		gappedSeq.addGapsInSource(5, 2);
+		
+		Feature split = (Feature) gappedSeq.filter(new FeatureFilter.ByType("split")).features().next();
+		assertEquals(seq.countFeatures(), 2);
+		gappedSeq.removeFeature(split);
+		assertEquals(seq.countFeatures(), 1);
+    	}
+    
+    public void testRemoveLocalFeature()
+		throws Exception
+	{
+        gappedSeq = new SimpleGappedSequence(seq);
+        gappedSeq.addGapsInSource(5, 2);
+        
+		Feature.Template sft = new Feature.Template();
+		sft.type = "local";
+		sft.source = "test";
+		sft.annotation = Annotation.EMPTY_ANNOTATION;
+		sft.location = new RangeLocation(8, 10);
+		seq.createFeature(sft);
+		
+		Feature local = (Feature) gappedSeq.filter(new FeatureFilter.ByType("local")).features().next();
+		assertEquals(gappedSeq.countFeatures(), 3);
+		gappedSeq.removeFeature(local);
+		assertEquals(gappedSeq.countFeatures(), 2);
+	}
 }

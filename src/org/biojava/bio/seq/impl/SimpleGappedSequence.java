@@ -129,9 +129,14 @@ implements GappedSequence {
   }
 
   public void removeFeature(Feature f)
-  throws ChangeVetoException, BioException
+      throws ChangeVetoException, BioException
   {
-    getFeatures().removeFeature(f);
+      getFeatures();
+      if (localFeatures.containsFeature(f)) {
+          localFeatures.removeFeature(f);
+      } else {
+          projectedFeatures.removeFeature(f);
+      }
   }
 
   public Feature createFeature(Feature.Template templ)
