@@ -30,8 +30,16 @@ public class SimpleState extends AbstractState {
     private int[] advance = {1};
   
   public double getWeight(Residue r) throws IllegalResidueException {
+    if(r == MagicalState.MAGICAL_RESIDUE) {
+      return Double.NEGATIVE_INFINITY;
+    }
     alphabet().validate(r);
-    return ((Double) residueToProb.get(r)).doubleValue();
+    Double d = (Double) residueToProb.get(r);
+    if(d == null) {
+      return Double.NEGATIVE_INFINITY;
+    } else {
+      return d.doubleValue();
+    }
   }
 
   public void setWeight(Residue r, double val) throws IllegalResidueException {

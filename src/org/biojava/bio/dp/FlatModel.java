@@ -153,6 +153,7 @@ public class FlatModel implements MarkovModel {
   }
   
   private void addAState(State s) {
+    System.out.println("Adding state: " + s.getName());
     try {
       stateAlpha.addResidue(s);
       transFrom.put(s, new HashSet());
@@ -170,7 +171,9 @@ public class FlatModel implements MarkovModel {
     this.transTo = new HashMap();
     this.transModelTrans = new HashMap();
     
-    stateAlpha.addResidue(model.magicalState());
+    stateAlpha.setName("flat " + model.stateAlphabet().getName());
+    
+    addAState(model.magicalState());
     
     // add all the states
     System.out.println("Adding states");
@@ -271,7 +274,7 @@ public class FlatModel implements MarkovModel {
           continue;
         }
         State t = (State) toM.get(tw);
-        createTransition(s, t, sModel, sw, tw);
+        createTransition(s, t, sModel, swrapped, tw);
       }
       for(Iterator j = sModel.transitionsTo(swrapped).iterator(); j.hasNext();) {
         State tw = (State) j.next();
@@ -279,7 +282,7 @@ public class FlatModel implements MarkovModel {
           continue;
         }
         State t = (State) fromM.get(tw);
-        createTransition(t, s, sModel, tw, sw);
+        createTransition(t, s, sModel, tw, swrapped);
       }
     }
     System.out.println("Done");
@@ -328,20 +331,36 @@ public class FlatModel implements MarkovModel {
       return wrapped;
     }
     
-    public DotStateWrapper(State wrapped) {
+    public DotStateWrapper(State wrapped)
+    throws NullPointerException {
       super(wrapped.getName());
+      if(wrapped == null) {
+        throw new NullPointerException("Can't wrap null");
+      }
       this.wrapped = wrapped;
     }
   }
 
   public static class EmissionWrapper
-  extends SimpleResidue implements Wrapper, EmissionState {
+  implements Wrapper, EmissionState {
     private final EmissionState wrapped;
     
     public State getWrapped() {
       return wrapped;
     }
 
+    public char getSymbol() {
+      return wrapped.getSymbol();
+    }
+    
+    public String getName() {
+      return wrapped.getName() + "-f";
+    }
+    
+    public Annotation getAnnotation() {
+      return wrapped.getAnnotation();
+    }
+    
     public int [] getAdvance() {
       return wrapped.getAdvance();
     }
@@ -368,21 +387,31 @@ public class FlatModel implements MarkovModel {
       return wrapped.alphabet();
     }
     
-    public EmissionWrapper(EmissionState wrapped) {
-      super(wrapped.getSymbol(), wrapped.getName(), wrapped.getAnnotation());
+    public EmissionWrapper(EmissionState wrapped)
+    throws NullPointerException {
+      if(wrapped == null) {
+        throw new NullPointerException("Can't wrap null");
+      }
       this.wrapped = wrapped;
     }
   }
   
-  private class ModelTransition {
+  private static class ModelTransition {
     public final MarkovModel model;
     public final State from;
     public final State to;
     
-    public ModelTransition(MarkovModel model, State from, State to) {
+    public ModelTransition(MarkovModel model, State from, State to)
+    throws IllegalResidueException, IllegalArgumentException {
+      if(model == null) {
+        throw new IllegalArgumentException("Can't use a null model");
+      }
+      model.stateAlphabet().validate(from);
+      model.stateAlphabet().validate(to);
+
       this.model = model;
       this.from = from;
-      this.to = to;
+      this.to = to;      
     }
   }
 }

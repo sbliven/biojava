@@ -87,13 +87,13 @@ public abstract class AbstractState implements EmissionState {
       StringBuffer sb = new StringBuffer();
       for(Iterator i = alphabet().residues().iterator(); i.hasNext(); ) {
         Residue r = (Residue) i.next();
-        double w = getWeight(r);
+        double w = Math.exp(getWeight(r));
         if(w > 0.0)
           sb.append("\t" + r.getName() + " -> " + w + "\n");
       }
       throw new BioError(
         "Could not find a residue emitted from state " + this.getName() +
-        this.getName() + ". Do the probabilities sum to 1?" +
+        ". Do the probabilities sum to 1?" +
         "\np=" + p + "\n" + sb.toString()
       );
     } catch (IllegalResidueException ire) {
