@@ -78,6 +78,8 @@ class DASFeatureSet implements FeatureHolder {
 			if (temp instanceof ComponentFeature.Template) {
 			    // I'm not convinced there's an easy, safe, way to say we don't
 			    // want these server side, so we'll elide them here instead.
+			    // We push a null onto the stack so that we don't get confused
+			    // over endFeature().
 
 			    featureStack.add(null);
 			} else {

@@ -106,7 +106,6 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
      * thrown if it has problems understanding the sequences.
      *
      * @param seqFile the file containing the sequence or set of sequences
-     * @throws IOException if the IO fails
      * @throws BioException if for any reason the sequences can't be read
      *         correctly
      * @throws ChangeVetoException if there is a listener that vetoes adding
