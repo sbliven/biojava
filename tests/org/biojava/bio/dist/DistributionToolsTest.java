@@ -22,9 +22,9 @@ public class DistributionToolsTest extends TestCase {
   public DistributionToolsTest(String name) {
     super(name);
   }
-  
+
   protected void setUp() {
-    try{	  
+    try{
       String[] sa = {"CATTGGG","AATTGGC","AATTGGG","AATTGGC","AATTGGG","AATTGGC",
         "AATTGGG","AATTGGC","AATTGGG","AATTGGC"};
 
@@ -35,32 +35,49 @@ public class DistributionToolsTest extends TestCase {
 
       a = new SimpleAlignment(map);
     }catch(Exception e){
-      e.printStackTrace();    
+      e.printStackTrace();
     }
   }
-  
-  
+
+
   public void testDistOverAlignment() {
     try{
       Distribution[] d = DistributionTools.distOverAlignment(a,false);
       Distribution[] d2 = DistributionTools.distOverAlignment(a,false,10.0);
       Distribution[] d3 = DistributionTools.distOverAlignment(a,true,10.0);
-    
+
       assertTrue(d[0].getWeight(DNATools.a()) == 0.9);
       assertTrue(d[0].getWeight(DNATools.c()) == 0.1);
       assertTrue(d[0].getWeight(DNATools.g()) == 0.0);
       assertTrue(d[0].getWeight(DNATools.t()) == 0.0);
-     
+
       assertTrue(d2[1].getWeight(DNATools.a()) == 0.625);
       assertTrue(d2[1].getWeight(DNATools.c()) == 0.125);
       assertTrue(d2[1].getWeight(DNATools.g()) == 0.125);
       assertTrue(d2[1].getWeight(DNATools.t()) == 0.125);
-    
+
       for (int i = 0; i < d2.length; i++) {
         assertTrue(DistributionTools.areEmissionSpectraEqual(d2[i],d3[i]));
       }
     }catch(Exception e){
       e.printStackTrace();
+    }
+  }
+
+  /**
+   * This method tests DistributionTools.shannonEntropy(), DistributionTools.totalEntropy()
+   * and DistributionTools.bitsOfInformation().
+   */
+  public void testInformationContent(){
+    Distribution d = new UniformDistribution(DNATools.getDNA());
+    assertTrue(DistributionTools.bitsOfInformation(d) == 0.0);
+    assertTrue(DistributionTools.totalEntropy(d) == 2.0);
+
+    Map map = DistributionTools.shannonEntropy(d,2.0);
+    for(Iterator i = DNATools.getDNA().iterator(); i.hasNext();){
+      Symbol s = (Symbol)i.next();
+      double ent = ((Double)map.get(s)).doubleValue();
+      assertTrue(ent == 2.0);
     }
   }
 

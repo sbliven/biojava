@@ -258,12 +258,12 @@ public final class DistributionTools {
   }
 
   /**
-   * Calculates the total bits of information for a distribution.
-   * @param observed - the observed frequence of <code>Symbols </code>.
-   * @return the total information content of the <code>Distribution </code>.
-   * @since 1.2
+   * Calculates the total Entropy for a Distribution. Entropies for individual
+   * <code>Symbols</code> are weighted by their probability of occurence.
+   * @param observed the observed frequence of <code>Symbols </code>.
+   * @return the total entropy of the <code>Distribution </code>.
    */
-  public static final double bitsOfInformation(Distribution observed){
+  public static double totalEntropy(Distribution observed){
     HashMap ent = shannonEntropy(observed, 2.0);
     double totalEntropy = 0.0;
     try{
@@ -275,9 +275,21 @@ public final class DistributionTools {
     catch(Exception e){
       e.printStackTrace(System.err);
     }
-    //int size = ((FiniteAlphabet)observed.getAlphabet()).size();
+
     return totalEntropy;
-    //Math.log((double)size)/Math.log(2.0) - totalEntropy;
+  }
+
+  /**
+   * Calculates the total bits of information for a distribution.
+   * @param observed - the observed frequence of <code>Symbols </code>.
+   * @return the total information content of the <code>Distribution </code>.
+   * @since 1.2
+   */
+  public static final double bitsOfInformation(Distribution observed){
+    double totalEntropy = totalEntropy(observed);
+    int size = ((FiniteAlphabet)observed.getAlphabet()).size();
+
+    return Math.log((double)size)/Math.log(2.0) - totalEntropy;
   }
 
   public static Distribution[] distOverAlignment(Alignment a)
