@@ -40,32 +40,69 @@ public class DASAlignmentClient {
     String query                 ;
     String serverurl             ;
     
+    /**
+     * Constructs a DASAlignmentClient object.
+     */
     public DASAlignmentClient() {
 	query = null;
 	serverurl = "http://127.0.0.1:8080/dazzle/myalig/alignment?query=";
     }
 
+    /**
+     * Constructs a DASAlignmentClient object.
+     *
+     * @param url  a String ...
+     */
     public DASAlignmentClient(String url) {
 	serverurl = url ;
 	query = null ;
     }
 
+
+    /**
+     * Specifies the query.
+     *
+     * @param q  a String specifying the query value
+     *
+     * @see #getQuery
+     */
     public void setQuery(String q) {
 	query = q ;
 	
     }
-
+    
+    /**
+     * Returns the query.
+     *
+     * @return a String representing the query value 
+     *
+     * @see #setQuery
+     */
     public String getQuery() {
 	return query ;
     }
 
-    public  Alignment[] getAlignments(String que)
+    /**
+     * Returns the alignments.
+     *
+     * @param query_  a String
+     * @return an array of Alignment objects
+     * @throws IOException ...
+
+     */
+    public  Alignment[] getAlignments(String query_)
 	throws IOException
     {
-	query = que ;
+	query = query_ ;
 	return getAlignments() ;
     }
 
+    /**
+     * Returns the alignments.
+     *
+     * @return an array of Alignment objects
+     * @throws IOException ...
+     */
     public Alignment[] getAlignments()
 	throws IOException
     {

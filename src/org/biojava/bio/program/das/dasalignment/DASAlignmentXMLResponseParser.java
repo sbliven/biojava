@@ -32,11 +32,11 @@ import java.util.HashMap ;
 
 import org.biojava.bio.* ;
 import org.biojava.bio.program.ssbind.* ;
-/** a class to Parse the XML response of a DAS Alignment service 
- * returns an Alignment object
+/** A class to Parse the XML response of a DAS Alignment service. 
+ * returns an Alignment object.
  *
  * @author Andreas Prlic
- *
+ * @since 1.4
  */
 public class DASAlignmentXMLResponseParser  extends DefaultHandler{
     ArrayList alignments ;
@@ -59,11 +59,23 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 	segments = new ArrayList() ;
     }
 
+    /**
+     * Returns the alignments.
+     *
+     * @return an array of Alignment objects 
+
+     */
     public Alignment[] getAlignments() {
 
 	return (Alignment[])alignments.toArray(new Alignment[alignments.size()]);
     }
 
+    /**
+     * Returns Alignment at position ...
+     *
+     * @param position  an int
+     * @return an Alignment object
+     */
     public Alignment getAlignment(int position) {
 	Alignment ra = (Alignment) alignments.get(position) ; 
 	return ra ;

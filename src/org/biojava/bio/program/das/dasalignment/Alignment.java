@@ -33,7 +33,7 @@ import org.biojava.bio.PropertyConstraint;
 
 /**
  * Alignment object to contain/manage a DAS alignment.  
- * @see also DAS specification at <a href="http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html">http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html</a>
+ * see also DAS specification at <a href="http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html">http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html</a>
  *
  * @author Andreas Prlic
  * @since 1.4
@@ -66,7 +66,10 @@ public class Alignment {
 		blocks   = new ArrayList() ;
     }
 
-    /** define the alignment Score Annotation Type */
+    /** define the alignment Score Annotation Type.
+     *
+     * @return an AnnotationType object representing the score annotation type 
+     */
     public static AnnotationType getScoreAnnotationType() {
         AnnotationType annType ;
 	
@@ -81,7 +84,11 @@ public class Alignment {
 	    return annType ;
     }
 
-    /** define the alignment Block Annotation Type */
+    /** define the alignment Block Annotation Type.
+     *
+     *
+     * @return an AnnotationType object representing the block annotation type 
+     */
     public static AnnotationType getBlockAnnotationType() {
 		AnnotationType annType ;
 		
@@ -101,7 +108,12 @@ public class Alignment {
 		return annType ;
     }
 
-      /** define the alignment Segment Annotation Type */
+      /** define the alignment Segment Annotation Type.
+       *
+       *
+       * @return an AnnotationType object representing the segment annotation type
+
+       */
     public static AnnotationType getSegmentAnnotationType() {
 		AnnotationType annType ;
 		
@@ -126,7 +138,11 @@ public class Alignment {
     }
 
 
-    /** define the alignment object Annotation Type */
+    /** define the alignment object Annotation Type.
+     *
+     *
+     * @return an AnnotationType object representing the object annotation type
+     */
     public static AnnotationType getObjectAnnotationType() {
 	AnnotationType annType;
 	
@@ -174,7 +190,14 @@ public class Alignment {
 	return annType ;
     }
     
-    
+    /** add Annotation of DAS alignment "object" type.
+     *
+     @see #getObjectAnnotationType
+     *
+     * @param object  an Annotation object
+     * @throws DASException ...
+    */
+
     public void addObject(Annotation object)
 		throws DASException
     {
@@ -191,10 +214,21 @@ public class Alignment {
 		}
     }
 
+    /**
+     * Returns the Annotation of all objects in this Alignment.
+     *
+     * @return an array of Annotation objects 
+     */
     public Annotation[] getObjects(){
         return (Annotation[]) objects.toArray(new Annotation[objects.size()]) ;
     }
 
+    /** adds a "Score" Annotation. 
+     * @see #getScoreAnnotationType
+     * @param score  an Annotation object
+     *
+     * @throws DASException ...
+    */
     public void addScore(Annotation score)
 		throws DASException
     {
@@ -212,10 +246,22 @@ public class Alignment {
 
     }
     
+    /** get all "Score" Annotations.
+     *
+     * @throws DASException ...
+     *
+     * @return an array of Annotation objects representing the scores value
+     */
     public Annotation[] getScores(){
         return (Annotation[])scores.toArray(new Annotation[scores.size()]) ;
     }
 
+    /** Add a "Block" Annotation.
+     * @see #getBlockAnnotationType
+     *
+     * @param block  an Annotation object
+     * @throws DASException ...
+     */
     public void addBlock(Annotation block)
 		throws DASException
     {
@@ -234,11 +280,14 @@ public class Alignment {
 	
     }
 
-
+    /** get all Annotations of type "Block". 
+     * @return an array of Annotation objects representing the Aligmnent blocks 
+     */
     public Annotation[] getBlocks() {
         return (Annotation[])blocks.toArray(new Annotation[blocks.size()]);
     }
     
+    /** convert to String. */
     public String toString() {
 	String str = "" ;
 	for ( int i=0;i<objects.size();i++){

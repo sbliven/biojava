@@ -23,8 +23,8 @@
  */
 
 
-/** takes care of the communication with a DAS Alignment service
- */
+
+ 
 
 package org.biojava.bio.program.das.dasalignment ;
 
@@ -42,30 +42,56 @@ import javax.xml.parsers.*;
 
 import java.util.*;
 
+/** takes care of the communication with a DAS Alignment service.
+ *
+ * @author Andreas Prlic
+ * @version %I% %G%
+ * @since 1.4
+ */
 public class DASAlignmentCall {
     
     String serverurl;
 
-
+    /**
+     * Constructs a DASAlignmentCall object.
+     */
     public DASAlignmentCall() {
 	serverurl = "" ;
     }
     
-    
+    /**
+     * Constructs a DASAlignmentCall object.
+     *
+     * @param url  a String ...
+     */
     public DASAlignmentCall(String url){
 	serverurl = url;
     }
     
-    /** set url of structure service */
+    /** set url of structure service.
+     *
+     * @param s  a String specifying the serverurl value
+     *
+     * @see #getServerurl
+     */
     public void   setServerurl(String s) { serverurl = s;     }
 
-    /** get url of structure service */
+    /** get url of structure service.
+     *
+     * @return a String representing the serverurl value
+     *
+     * @see #setServerurl
+     */
     public String getServerurl(        ) { return serverurl;}
     
 
     /** connect to a DAS structure service and retreive 3D data.
-	return a biojava Structure object
-    */
+     * return a biojava Structure object.
+     *
+     * @param query  a String
+     * @return an array of Alignment objects
+     * @throws IOException ...
+     */
     
     public Alignment[] getAlignments(String query)
 	throws IOException
@@ -94,7 +120,9 @@ public class DASAlignmentCall {
     }
 
 
-    /** connect to DAS server and return result as an InputStream */    
+    /** connect to DAS server and return result as an InputStream.
+     *
+     */    
     private InputStream connectDASServer(URL url) 
 	throws IOException
     {
@@ -122,7 +150,9 @@ public class DASAlignmentCall {
     }
 
     /** parse the Response of a DAS ALignment service and return a
-     * biojava Alignment object */
+     * biojava Alignment object.
+     *
+     */
     private Alignment[] parseDASResponse(InputStream inStream) 
 	throws IOException, SAXException
     {

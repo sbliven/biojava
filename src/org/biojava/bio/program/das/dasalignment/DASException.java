@@ -30,14 +30,31 @@ import org.biojava.bio.*;
  */
 
 public class DASException extends BioException {
+    /**
+     * Constructs a DASException object.
+     *
+     * @param s  a String ...
+     */
+
     public DASException(String s) {
 	super(s);
     }
 
+    /**
+     * Constructs a DASException object.
+     *
+     * @param t  a Throwable object
+     * @param s  a String ...
+     */
     public DASException (Throwable t, String s) {
 	super(t, s);
     }
 
+    /**
+     * Constructs a DASException object.
+     *
+     * @param t  a Throwable object
+     */
     public DASException (Throwable t) {
 	super(t);
     }
