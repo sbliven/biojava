@@ -34,7 +34,7 @@ public class LifeScienceIdentifierParseException
      * Construct a new parse exception with no message.
      */
     public LifeScienceIdentifierParseException() {
-	super();
+        super();
     }
 
     /**
@@ -44,6 +44,6 @@ public class LifeScienceIdentifierParseException
      * @param message error message
      */
     public LifeScienceIdentifierParseException(String message) {
-	super(message);
+        super(message);
     }
 }
