@@ -34,8 +34,11 @@ import java.util.Set;
  * symbols in a finite source alphabet into a target alphabet.
  *
  * @author Matthew Pocock
+ * @author David Huen (refactoring)
  */
-public class SimpleTranslationTable implements TranslationTable, Serializable {
+public class SimpleTranslationTable 
+      extends AbstractTranslationTable
+      implements Serializable {
   private final Map transMap;
   private final FiniteAlphabet source;
   private final Alphabet target;
@@ -48,28 +51,8 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
     return target;
   }
 
-  public Symbol translate(final Symbol sym)
-  throws IllegalSymbolException {
-    Symbol s = (Symbol) transMap.get(sym);
-    if(s == null) {
-      if(sym instanceof AtomicSymbol) { //changed this from s to sym, since we already checked and s is null
-        getSourceAlphabet().validate(sym);
-        throw new IllegalSymbolException(
-          "Unable to map " + sym.getName()
-        );
-      } else {
-        if(sym == null) {
-          throw new NullPointerException("Can't translate null");
-        }
-        Set syms = new HashSet();
-        for(Iterator i = ((FiniteAlphabet) sym.getMatches()).iterator(); i.hasNext(); ) {
-          Symbol is = (Symbol) i.next();
-          syms.add(this.translate(is));
-        }
-        s = getTargetAlphabet().getAmbiguity(syms);
-      }
-    }
-    return s;
+  public Symbol doTranslate(Symbol sym) {
+    return (Symbol) transMap.get(sym);
   }
 
   /**
@@ -77,7 +60,7 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
    *
    * @param from source AtomicSymbol
    * @param to   target AtomicSymbol to be returned by translate(from)
-   * @throws IllefalSymbolException if either from is not in the source
+   * @throws IllegalSymbolException if either from is not in the source
    *         alphabet or to is not in the target alphabet
    */
   public void setTranslation(AtomicSymbol from, AtomicSymbol to)
