@@ -151,7 +151,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 		CodeClass baseClassC = IntrospectedCodeClass.forClass(baseClass);
 		CodeClass faceClassC = IntrospectedCodeClass.forClass(face);
 
-		GeneratedCodeClass pclass = new GeneratedCodeClass("org.biojava.bio.seq.Projection_" + faceName + "_" + (seed++),
+		GeneratedCodeClass pclass = new GeneratedCodeClass("org.biojava.bio.seq.impl.Projection_" + faceName + "_" + (seed++),
 								   baseClassC,
 								   Collections.singleton(faceClassC),
 								   CodeUtils.ACC_PUBLIC | CodeUtils.ACC_SUPER);
