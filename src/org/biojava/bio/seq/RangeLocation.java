@@ -19,8 +19,9 @@
  *
  */
 
-
 package org.biojava.bio.seq;
+
+import org.biojava.bio.symbol.*;
 
 /**
  * A simple implementation of Location that contains all points between
@@ -86,7 +87,7 @@ public class RangeLocation implements Location {
     return new RangeLocation(start, end);
   }
 
-  public ResidueList residues(ResidueList seq) {
+  public SymbolList symbols(SymbolList seq) {
     return seq.subList(getMin(), getMax());
   }
 

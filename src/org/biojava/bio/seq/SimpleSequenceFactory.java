@@ -19,8 +19,10 @@
  *
  */
 
-
 package org.biojava.bio.seq;
+
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A no-frills implementation of SequenceFactory that produces SimpleSequence
@@ -29,7 +31,7 @@ package org.biojava.bio.seq;
  * @author Matthew Pocock
  */
 public class SimpleSequenceFactory implements SequenceFactory {
-  public Sequence createSequence(ResidueList resList,
+  public Sequence createSequence(SymbolList resList,
                                  String uri, String name, Annotation annotation) {
     return new SimpleSequence(resList, uri, name, annotation);
   }

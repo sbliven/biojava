@@ -21,6 +21,8 @@
  
 package org.biojava.bio.seq;
 
+import org.biojava.bio.symbol.*;
+
 /**
  * Adds the concept of 'strand' to features.
  * <P>
@@ -41,21 +43,21 @@ public interface StrandedFeature extends Feature {
   int getStrand();
   
   /**
-   * Return a list of residues that are contained in this feature.
+   * Return a list of symbols that are contained in this feature.
    * <P>
-   * The residues may not be contiguous in the original sequence, but they
-   * will be concatinated together in the resulting ResidueList.
+   * The symbols may not be contiguous in the original sequence, but they
+   * will be concatinated together in the resulting SymbolList.
    * <P>
-   * The order of the Residues within the resulting residue list will be 
+   * The order of the Symbols within the resulting symbol list will be 
    * according to the concept of ordering within the location object.
    * <P>
-   * If the feature is on the negative strand then the ResidueList will be
+   * If the feature is on the negative strand then the SymbolList will be
    * reversecomplemented as apropreate.
    *
-   * @return  a ResidueList containing each residue of the parent sequence contained
+   * @return  a SymbolList containing each symbol of the parent sequence contained
    *          within this feature in the order they appear in the parent
    */
-  ResidueList getResidues();
+  SymbolList getSymbols();
   
   /**
    * int flag to indicate that a feature is on the positive strand.

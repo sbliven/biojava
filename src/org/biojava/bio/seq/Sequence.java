@@ -19,23 +19,25 @@
  *
  */
 
-
 package org.biojava.bio.seq;
+
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A sequence.
  * <P>
- * This interface is a residue list, so it contains residues. It is annotatable
+ * This interface is a symbol list, so it contains symbols. It is annotatable
  * so that you can add annotation to it, and it is a FeatureHolder so that you
  * can add information to regions of it.
  * <P>
  * It is expected that there may be several implementations of this interface,
- * each of which may be failry heavy-weight. It takes the ResidueList interface
+ * each of which may be failry heavy-weight. It takes the SymbolList interface
  * that is nice mathematicaly, and turns it into a biologicaly useful object.
  *
  * @author Matthew Pocock
  */
-public interface Sequence extends ResidueList, FeatureHolder, Annotatable {
+public interface Sequence extends SymbolList, FeatureHolder, Annotatable {
   /**
    * The URN for this sequence. This will be something like
    * <code>urn:sequence/embl:U32766</code> or

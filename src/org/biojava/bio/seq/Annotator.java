@@ -19,12 +19,12 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Annotates a database of annotated sequences, returning all sequences
@@ -45,7 +45,7 @@ public interface Annotator {
    * @return a database of all modified sequences
    */
   public SequenceDB annotate(SequenceDB sdb)
-  throws IllegalResidueException, SeqException;
+  throws IllegalSymbolException, SeqException;
   
   /**
    * Annotate this single sequence.
@@ -54,5 +54,5 @@ public interface Annotator {
    * annotated.
    */
   public boolean annotate(Sequence seq)
-  throws IllegalResidueException, SeqException;
+  throws IllegalSymbolException, SeqException;
 }

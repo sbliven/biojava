@@ -19,15 +19,15 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.ArrayList;
+import org.biojava.bio.symbol.*;
 
 /**
  * A biological location.
  * <P>
- * The location will contain some residues between getMin and getMax inclusive.
+ * The location will contain some symbols between getMin and getMax inclusive.
  * It is not required to contain all locations within this range. It is meant
  * to contain getMin or getMax. In the event that an operation would produce an
  * invalid or nonsensical range, empty should be returned.
@@ -103,12 +103,12 @@ public interface Location {
   Location union(Location l);
 
   /**
-   * Return the residues in a sequence that fall within this range.
+   * Return the symbols in a sequence that fall within this range.
    *
-   * @param seq	the ResidueList to process
-   * @return	the ResidueList containing the residues in seq in this range
+   * @param seq	the SymbolList to process
+   * @return	the SymbolList containing the symbols in seq in this range
    */
-  ResidueList residues(ResidueList seq);
+  SymbolList symbols(SymbolList seq);
 
   /**
    * Create a location that is a translation of this location.
@@ -123,7 +123,7 @@ public interface Location {
    * This object contains nothing. Its minimum value is Integer.MAX_VALUE.
    * Its maximum value is Integer.MIN_VALUE. It overlaps nothing. It is
    * equal to nothing. Intersection results in the empty range. Union
-   * results in the argument range. Residues returns an empty array.
+   * results in the argument range. Symbols returns an empty array.
    * <P>
    * Every day, in every way, emty becomes more and more booring.
    */
@@ -138,8 +138,8 @@ public interface Location {
     public boolean equals(Location l) { return false; }
     public Location intersection(Location l) { return empty; }
     public Location union(Location l) { return l; }
-    public ResidueList residues(ResidueList seq) {
-      return new SimpleResidueList(seq.alphabet(), new ArrayList());
+    public SymbolList symbols(SymbolList seq) {
+      return new SimpleSymbolList(seq.alphabet(), new ArrayList());
     }
     public Location translate(int dist) { return this; }
   }

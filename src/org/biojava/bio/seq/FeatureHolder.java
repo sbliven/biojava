@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;

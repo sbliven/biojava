@@ -19,25 +19,24 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;
 
 import org.biojava.bio.*;
-import org.biojava.bio.seq.tools.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A simple implementation of an Alignment.
  * <P>
  * This is a simple-stupid implementation that is made from a set of same-lengthed
- * ResidueList objects each with an associated label. It does not handle differently
+ * SymbolList objects each with an associated label. It does not handle differently
  * lengthed sequences and doesn't contain any gap-editing concepts.
  *
  * @author Matthew Pocock
  */
-public class SimpleAlignment extends AbstractResidueList implements Alignment {
-  private Map labelToResidueList;
+public class SimpleAlignment extends AbstractSymbolList implements Alignment {
+  private Map labelToSymbolList;
   private List labels;
   private CrossProductAlphabet alphabet;
   private int length;
@@ -50,10 +49,10 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     return alphabet;
   }
   
-  public Residue residueAt(int col) {
+  public Symbol symbolAt(int col) {
     try {
-      return alphabet.getResidue(new ColAsList(col));
-    } catch (IllegalResidueException ire) {
+      return alphabet.getSymbol(new ColAsList(col));
+    } catch (IllegalSymbolException ire) {
       throw new BioError(
         ire,
         "Somehow my crossproduct alphabet is incompatible with column " + col
@@ -65,8 +64,8 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     return labels;
   }
   
-  public Residue residueAt(Object label, int column) {
-    return residueListForLabel(label).residueAt(column);
+  public Symbol symbolAt(Object label, int column) {
+    return symbolListForLabel(label).symbolAt(column);
   }
   
   public Alignment subAlignment(Set labels, Location loc)
@@ -80,43 +79,43 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     }
     while(i.hasNext()) {
       Object label = i.next();
-      ResidueList res = residueListForLabel(label);
+      SymbolList res = symbolListForLabel(label);
       if(loc != null) {
-        res = loc.residues(res);
+        res = loc.symbols(res);
       }
       labelsToResList.put(label, res);
     }
     return new SimpleAlignment(labelsToResList);
   }
   
-  public ResidueList residueListForLabel(Object label)
+  public SymbolList symbolListForLabel(Object label)
   throws NoSuchElementException {
-    ResidueList rl = (ResidueList) labelToResidueList.get(label);
+    SymbolList rl = (SymbolList) labelToSymbolList.get(label);
     if(rl == null) {
-      throw new NoSuchElementException("No residue list associated with label " + label);
+      throw new NoSuchElementException("No symbol list associated with label " + label);
     }
     return rl;
   }
   
   /**
-   * Generate an alignment from a list of ResidueLists.
+   * Generate an alignment from a list of SymbolLists.
    * <P>
-   * The ResidueLists must all be of the same length.
+   * The SymbolLists must all be of the same length.
    *
-   * @param labelToResList  the label-to-residue list mapping
-   * @throws IllegalArgumentException if the ResidueLists are not the same
+   * @param labelToResList  the label-to-symbol list mapping
+   * @throws IllegalArgumentException if the SymbolLists are not the same
    *         length
    */
   public SimpleAlignment(Map labelToResList) throws IllegalArgumentException {
     this.labels = Collections.unmodifiableList(new ArrayList(labelToResList.keySet()));
-    this.labelToResidueList = labelToResList;
+    this.labelToSymbolList = labelToResList;
     
     int length = -1;
     List alphaList = new ArrayList();
     for(Iterator li = labels.iterator(); li.hasNext(); ) {
       Object label = li.next();
       try {
-        ResidueList rl = residueListForLabel(label);
+        SymbolList rl = symbolListForLabel(label);
         alphaList.add(rl.alphabet());
         if(length == -1) {
           length = rl.length();
@@ -125,17 +124,17 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
             StringBuffer sb = new StringBuffer();
             for(Iterator labI = labels.iterator(); labI.hasNext(); ) {
               Object lab = labI.next();
-              sb.append("\n\t" + lab + " (" + residueListForLabel(lab).length() + ")");
+              sb.append("\n\t" + lab + " (" + symbolListForLabel(lab).length() + ")");
             }
             throw new IllegalArgumentException(
-              "All ResidueLists must be the same length: " + sb.toString()
+              "All SymbolLists must be the same length: " + sb.toString()
             );
           }
         }
       } catch (NoSuchElementException nsee) {
-        if(labelToResidueList.containsKey(label)) {
+        if(labelToSymbolList.containsKey(label)) {
           throw new IllegalArgumentException(
-            "The residue list associated with " + label + " is null"
+            "The symbol list associated with " + label + " is null"
           );
         } else {
           throw new BioError(nsee, "Something is screwey - map is lieing about key/values");
@@ -160,7 +159,7 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     }
     
     public Object get(int indx) {
-      return residueAt(labels.get(indx), col);
+      return symbolAt(labels.get(indx), col);
     }
     
     public int size() {

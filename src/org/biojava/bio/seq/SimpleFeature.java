@@ -19,10 +19,11 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A no-frills implementation of a feature.
@@ -107,8 +108,8 @@ public class SimpleFeature implements Feature, MutableFeatureHolder {
     return annotation;
   }
   
-  public ResidueList getResidues() {
-    return getLocation().residues(getSourceSeq());
+  public SymbolList getSymbols() {
+    return getLocation().symbols(getSourceSeq());
   }
 
   public int countFeatures() {

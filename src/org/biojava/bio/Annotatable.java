@@ -19,24 +19,23 @@
  *
  */
 
-package org.biojava.bio.seq;
 
-import java.util.*;
+package org.biojava.bio;
 
 /**
- * A no-frills implementation of MutableFeatureHolder.
+ * Flags an object as having associated annotation.
+ * <P>
+ * This interface was introduced in retrospect so that UI code could interogate
+ * an object to see if it was Annotatable, and if so pop up a suitable GUI for
+ * browsing the annotation.
  *
- * @author Matthew Pocock
+ * @author  Matthew Pocock
  */
-public class SimpleMutableFeatureHolder
-extends SimpleFeatureHolder
-implements MutableFeatureHolder
-{
-  public void addFeature(Feature f) {
-    getFeatures().add(f);
-  }
-
-  public void removeFeature(Feature f) {
-    getFeatures().remove(f);
-  }
+public interface Annotatable {
+  /**
+   * Should return the associated annotation object.
+   *
+   * @return	an Annotation object, never null
+   */
+  Annotation getAnnotation();
 }

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import org.biojava.bio.BioException;

@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.seq;
+package org.biojava.bio;
 
 import java.util.*;
 

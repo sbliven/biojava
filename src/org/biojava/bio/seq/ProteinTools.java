@@ -19,18 +19,18 @@
  *
  */
 
-package org.biojava.bio.seq.tools;
+package org.biojava.bio.seq;
 
 import java.util.*;
 import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 public class ProteinTools {
   private static final FiniteAlphabet proteinAlpha;
   private static final FiniteAlphabet proteinXAlpha;
   private static final FiniteAlphabet proteinTAlpha;
-  private static final Residue x;
-  private static final Residue termination;
+  private static final Symbol x;
+  private static final Symbol termination;
   
   static {
     try {
@@ -41,17 +41,17 @@ public class ProteinTools {
       xAlpha.setName(proteinAlpha.getName() + "+X");
       tAlpha.setName(proteinAlpha.getName() + "+T");
       for(Iterator i = proteinAlpha.iterator(); i.hasNext(); ) {
-        Residue r = (Residue) i.next();
-        xAlpha.addResidue(r);
-        tAlpha.addResidue(r);
+        Symbol r = (Symbol) i.next();
+        xAlpha.addSymbol(r);
+        tAlpha.addSymbol(r);
       }
-      x = am.residueForName("X");
-      termination = am.residueForName("termination");
-      xAlpha.addResidue(x);
-      tAlpha.addResidue(termination);
+      x = am.symbolForName("X");
+      termination = am.symbolForName("termination");
+      xAlpha.addSymbol(x);
+      tAlpha.addSymbol(termination);
       proteinXAlpha = xAlpha;
       proteinTAlpha = tAlpha;
-    } catch (IllegalResidueException ire) {
+    } catch (IllegalSymbolException ire) {
       throw new BioError(ire, " Could not initialize ProteinTools");
     }
   }
@@ -64,7 +64,7 @@ public class ProteinTools {
     return proteinXAlpha;
   }
   
-  public static final Residue getXResidue() {
+  public static final Symbol getXSymbol() {
     return x;
   }
   
@@ -72,7 +72,7 @@ public class ProteinTools {
     return proteinTAlpha;
   }
   
-  public static final Residue getTResidue() {
+  public static final Symbol getTSymbol() {
     return termination;
   }
 }

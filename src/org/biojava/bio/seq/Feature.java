@@ -19,8 +19,10 @@
  *
  */
 
-
 package org.biojava.bio.seq;
+
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A feature within a sequence, or nested within another feature.
@@ -59,18 +61,18 @@ public interface Feature extends FeatureHolder, Annotatable {
   String getSource();
   
   /**
-   * Return a list of residues that are contained in this feature.
+   * Return a list of symbols that are contained in this feature.
    * <P>
-   * The residues may not be contiguous in the original sequence, but they
-   * will be concatinated together in the resulting ResidueList.
+   * The symbols may not be contiguous in the original sequence, but they
+   * will be concatinated together in the resulting SymbolList.
    * <P>
-   * The order of the Residues within the resulting residue list will be 
+   * The order of the Symbols within the resulting symbol list will be 
    * according to the concept of ordering within the location object.
    *
-   * @return  a ResidueList containing each residue of the parent sequence contained
+   * @return  a SymbolList containing each symbol of the parent sequence contained
    *          within this feature in the order they appear in the parent
    */
-  ResidueList getResidues();
+  SymbolList getSymbols();
   
   /**
    * Template class for a plain feature.

@@ -19,10 +19,10 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * An abstract implemenation of Annotator that takes care of the loop-over-db
@@ -33,7 +33,7 @@ import java.util.*;
 public abstract class AbstractAnnotator implements Annotator {
 
   public SequenceDB annotate(SequenceDB sdb)
-        throws IllegalResidueException, SeqException {
+        throws IllegalSymbolException, SeqException {
     HashSequenceDB hitDB = new HashSequenceDB(null);
 
     for(Iterator i = sdb.ids().iterator(); i.hasNext(); ) {

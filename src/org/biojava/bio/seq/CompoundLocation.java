@@ -19,10 +19,10 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A comlex location. It is made up from multiple sub-locations and is essential
@@ -127,14 +127,14 @@ public class CompoundLocation implements Location {
     return res;
   }
 
-  public ResidueList residues(ResidueList s) {
+  public SymbolList symbols(SymbolList s) {
     List res = new ArrayList();
 
     for(int p = min; p <= max; p++)
       if(this.contains(p))
-        res.add(s.residueAt(p));
+        res.add(s.symbolAt(p));
 
-    return new SimpleResidueList(s.alphabet(), res);
+    return new SimpleSymbolList(s.alphabet(), res);
   }
 
   public void addLocation(Location l) {

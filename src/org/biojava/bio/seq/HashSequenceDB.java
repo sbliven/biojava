@@ -19,12 +19,9 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;
-
-import org.biojava.bio.seq.*;
 
 /**
  * An implementation of SequenceDB that uses an underlying HashMap to stoor the

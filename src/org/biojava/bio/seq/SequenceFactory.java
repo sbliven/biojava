@@ -19,8 +19,10 @@
  *
  */
 
-
 package org.biojava.bio.seq;
+
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * The interface for objects that will manufacture sequences.
@@ -37,12 +39,12 @@ public interface SequenceFactory {
    * <P>
    * The annotation is under the same contract as in FeatureFactory.
    *
-   * @param resList the ResidueList defining the 'sequence'
+   * @param resList the SymbolList defining the 'sequence'
    * @param uri the uri
    * @param name   the name
    * @param annotation  a hint for the annotation of the resulting sequence
    * @return  a new Sequence object
    */
-  Sequence createSequence(ResidueList resList,
+  Sequence createSequence(SymbolList resList,
                           String uri, String name, Annotation annotation);
 }

@@ -19,60 +19,59 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
- * An alignment containing multiple <span class="type">ResidueList</span>s.
+ * An alignment containing multiple <span class="type">SymbolList</span>s.
  * <P>
  * The alignment can be thought of a rectangular array of
- * <span class="type">Residue</span>s. Each
+ * <span class="type">Symbol</span>s. Each
  * row is indexed by a label and each column is indexed by offset (counting from
  * 0).
  * <P>
- * Alternatively, it can be thought of as a <span class="type">ResidueList</span>
- * where each <span class="type">Residue</span> is
- * a list of <span class="type">Residue</span>s in that column.
+ * Alternatively, it can be thought of as a <span class="type">SymbolList</span>
+ * where each <span class="type">Symbol</span> is
+ * a list of <span class="type">Symbol</span>s in that column.
  * <P>
- * To create gapped alignments, use <span class="type">ResidueList</span>s with
+ * To create gapped alignments, use <span class="type">SymbolList</span>s with
  * gaps. The most flexible way to do this will be to leverage
- * <span class="type">GappedResidueList</span> objects.
+ * <span class="type">GappedSymbolList</span> objects.
  */
-public interface Alignment extends ResidueList {
+public interface Alignment extends SymbolList {
   /**
-   * The list of ResidueLists in the alignment.
+   * The list of SymbolLists in the alignment.
    * <P>
    * The index in the list is the same as the index in the alignment.
-   * Each ResidueList object will only be in the alignment once. However, a
-   * single underlying ResidueList may have more than one view within an
-   * alignment, each represented by a different GappedResidueList.
+   * Each SymbolList object will only be in the alignment once. However, a
+   * single underlying SymbolList may have more than one view within an
+   * alignment, each represented by a different GappedSymbolList.
    *
-   * @return  the List of all ResidueLists in the alignment
+   * @return  the List of all SymbolLists in the alignment
    */
   List getLabels();
   
   /**
-   * Retrieve a residue by label and column.
+   * Retrieve a symbol by label and column.
    *
-   * @param res the ResidueList to retrieve from
+   * @param res the SymbolList to retrieve from
    * @param column  the index of the column to retrieve
-   * @return  the residue in the residue list associated with the label at the given column
+   * @return  the symbol in the symbol list associated with the label at the given column
    * @throws NoSuchElementException if there is no row for 'label'
    */
-  Residue residueAt(Object label, int column)
+  Symbol symbolAt(Object label, int column)
   throws NoSuchElementException;
   
   /**
    * Retrieve a single row of the alignment by label.
    *
-   * @return  a ResidueList that contains each token in a row of the alignment
+   * @return  a SymbolList that contains each token in a row of the alignment
    * @throws NoSuchElementException if there is no row for 'label'
    */
-  ResidueList residueListForLabel(Object label)
+  SymbolList symbolListForLabel(Object label)
   throws NoSuchElementException;
   
   /**

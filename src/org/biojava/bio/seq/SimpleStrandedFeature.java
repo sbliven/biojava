@@ -19,11 +19,10 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import org.biojava.bio.*;
-import org.biojava.bio.seq.tools.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A no-frills implementation of StrandedFeature.
@@ -39,15 +38,15 @@ implements StrandedFeature {
     return strand;
   }
   
-  public ResidueList getResidues() {
-    ResidueList resList = super.getResidues();
+  public SymbolList getSymbols() {
+    SymbolList resList = super.getSymbols();
     if(getStrand() == NEGATIVE) {
       try {
-        resList = new ComplementResidueList(resList);
+        resList = new ComplementSymbolList(resList);
       } catch (IllegalAlphabetException iae) {
         throw new BioError(
           iae,
-          "Could not retrieve residues for feature as " +
+          "Could not retrieve symbols for feature as " +
           "the alphabet can not be complemented."
         );
       }
@@ -65,7 +64,7 @@ implements StrandedFeature {
       );
     }
     this.strand = template.strand;
-    if(!ComplementResidueList.isComplementable(sourceSeq.alphabet())) {
+    if(!ComplementSymbolList.isComplementable(sourceSeq.alphabet())) {
       throw new IllegalAlphabetException (
         "Can not create a stranded feature within a sequence of type " +
         sourceSeq.alphabet().getName()

@@ -19,15 +19,15 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;
+import org.biojava.bio.symbol.*;
 
 /**
- * A single residue.
+ * A single symbol.
  * <P>
- * min and max equal the location of the single residue.
+ * min and max equal the location of the single symbol.
  *
  * @author Matthew Pocock
  */
@@ -56,9 +56,9 @@ public class PointLocation implements Location {
     return cl;
   }
 
-  public ResidueList residues(ResidueList s)	{
-    final Residue res = s.residueAt(this.point);
-    return new SimpleResidueList(s.alphabet(), new AbstractList() {
+  public SymbolList symbols(SymbolList s)	{
+    final Symbol res = s.symbolAt(this.point);
+    return new SimpleSymbolList(s.alphabet(), new AbstractList() {
       public Object get(int index) throws IndexOutOfBoundsException {
         if(index == 0)
           return res;

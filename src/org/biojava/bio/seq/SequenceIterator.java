@@ -19,13 +19,10 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
 import java.util.*;
 import java.io.IOException;
-
-import org.biojava.bio.seq.*;
 
 /**
  * An iterator over a bag of sequences.

@@ -19,12 +19,11 @@
  *
  */
 
-
-package org.biojava.bio.seq.tools;
+package org.biojava.bio.seq;
 
 import java.util.*;
 import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 public class GeneticCode {
   public static final TranslationTable UNIVERSAL;
@@ -36,8 +35,8 @@ public class GeneticCode {
         Collections.nCopies(3, DNA)
       );
       FiniteAlphabet PROT = ProteinTools.getTAlphabet();
-      ResidueParser dp = DNA.getParser("symbol");
-      ResidueParser aap = PROT.getParser("name");
+      SymbolParser dp = DNA.getParser("symbol");
+      SymbolParser aap = PROT.getParser("name");
       SimpleTranslationTable univ = new SimpleTranslationTable(
         (FiniteAlphabet) codon,
         PROT
@@ -117,14 +116,14 @@ public class GeneticCode {
   }
   
   private static void process(
-    SimpleTranslationTable table, ResidueParser dp, ResidueParser aap,
+    SimpleTranslationTable table, SymbolParser dp, SymbolParser aap,
     CrossProductAlphabet codonA, String codon, String aa
-  ) throws IllegalResidueException {
-    Residue codonR = codonA.getResidue(
+  ) throws IllegalSymbolException {
+    Symbol codonR = codonA.getSymbol(
       dp.parse(codon).toList()
     );
     
-    Residue aaR = aap.parseToken(aa);
+    Symbol aaR = aap.parseToken(aa);
     
     table.setTranslation(codonR, aaR);
   }

@@ -19,8 +19,9 @@
  *
  */
 
-
 package org.biojava.bio.seq;
+
+import org.biojava.bio.*;
 
 /**
  * Factory for creating sequences.

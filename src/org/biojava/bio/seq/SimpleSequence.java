@@ -19,24 +19,25 @@
  *
  */
 
-
 package org.biojava.bio.seq;
 
-import org.biojava.bio.*;
 import java.lang.reflect.*;
 import java.util.*;
+
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A no-frills implementation of Sequence.
  * <P>
- * It implements the ResidueList portion of Sequence by extending
+ * It implements the SymbolList portion of Sequence by extending
  * SimpleResideList. This should probably be changed to delegation to allow
- * custom ResidueList implementations to be wrapped.
+ * custom SymbolList implementations to be wrapped.
  *
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public class SimpleSequence extends SimpleResidueList 
+public class SimpleSequence extends SimpleSymbolList 
                             implements Sequence, MutableFeatureHolder 
 {
   /**
@@ -184,15 +185,15 @@ public class SimpleSequence extends SimpleResidueList
     }
 
   /**
-   * Create a SimpleSequence with the residues and alphabet of res, and the
+   * Create a SimpleSequence with the symbols and alphabet of res, and the
    * sequence properties listed.
    *
-   * @param res the ResidueList to wrap as a sequence
+   * @param res the SymbolList to wrap as a sequence
    * @param urn the URN
    * @param name the name - should be unique if practical
    * @param annotation the annotation object to use or null
    */
-  public SimpleSequence(ResidueList res, String urn, String name, Annotation annotation) {
+  public SimpleSequence(SymbolList res, String urn, String name, Annotation annotation) {
     super(res);
     setURN(urn);
     setName(name);
