@@ -96,7 +96,7 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
       weight.put(i.next(), new Double(Double.NaN));
     }
     try {
-      setNullModel(UniformDistribution.createInstance(alphabet));
+      setNullModel(new UniformDistribution(alphabet));
     } catch (Exception e) {
       throw new BioError(e, "This should never fail. Something is screwed!");
     }

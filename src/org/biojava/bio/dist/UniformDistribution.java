@@ -30,20 +30,6 @@ import org.biojava.bio.symbol.*;
 
 public class UniformDistribution
 extends AbstractDistribution implements Serializable {
-  private static final Map singletons;
-  
-  static {
-    singletons = new HashMap();
-  }
-  
-  public static UniformDistribution createInstance(FiniteAlphabet alpha) {
-    UniformDistribution dist = (UniformDistribution) singletons.get(alpha);
-    if(dist == null) {
-      singletons.put(alpha, dist = new UniformDistribution(alpha));
-    }
-    return dist;
-  }
-  
   private final FiniteAlphabet alphabet;
   private final double weight;
   private Distribution nullModel;
@@ -81,7 +67,7 @@ extends AbstractDistribution implements Serializable {
     dtc.registerDistributionTrainer(this, IgnoreCountsTrainer.getInstance());
   }
   
-  private UniformDistribution(FiniteAlphabet alphabet) {
+  public UniformDistribution(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
     this.weight = 1.0 / (double) alphabet.size();
     this.nullModel = this;

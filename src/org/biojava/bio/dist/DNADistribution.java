@@ -100,7 +100,7 @@ extends AbstractDistribution implements Serializable {
   
   public DNADistribution() {
     try {
-      setNullModel(UniformDistribution.createInstance(DNATools.getDNA()));
+      setNullModel(new UniformDistribution(DNATools.getDNA()));
     } catch (IllegalAlphabetException iae) {
       throw new BioError(iae, "This should never fail. Something is screwed!");
     }
