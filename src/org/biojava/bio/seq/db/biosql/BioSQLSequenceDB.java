@@ -312,9 +312,9 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     // Sequence support
     //
 
-    void persistFeature(Connection conn,
-			int bioentry_id,
-			Feature f)
+    int persistFeature(Connection conn,
+		       int bioentry_id,
+		       Feature f)
 	throws BioException, SQLException
     {
 	int seqfeature_key = intern_seqfeature_key(conn, f.getType());
@@ -365,6 +365,8 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	// 
 	// Persist anything in the annotation bundle, too?
 	//	
+
+	return id;
     }
 			       
 
@@ -409,6 +411,28 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	insert.close();
 
 	int id = getDBHelper().getInsertID(conn, "seqfeature_source", "seqfeature_source_id");
+	return id;		      
+    }    
+
+    int intern_seqfeature_qualifier(Connection conn, String s)
+        throws SQLException
+    {
+	PreparedStatement get = conn.prepareStatement("select seqfeature_qualifier_id from seqfeature_qualifier where qualifier_name = ?");
+	get.setString(1, s);
+	ResultSet rs = get.executeQuery();
+	if (rs.next()) {
+	    int id = rs.getInt(1);
+	    get.close();
+	    return id;
+	}
+	get.close();
+
+	PreparedStatement insert = conn.prepareStatement("insert into seqfeature_qualifier (qualifier_name) values ( ? )");
+	insert.setString(1, s);
+	insert.executeUpdate();
+	insert.close();
+
+	int id = getDBHelper().getInsertID(conn, "seqfeature_qualifier", "seqfeature_qualifier_id");
 	return id;		      
     }    
 }

@@ -234,11 +234,12 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 		get_features.setInt(1, bioentry_id);
 		ResultSet rs = get_features.executeQuery();
 		while (rs.next()) {
+		    int feature_id = rs.getInt(1);
 		    StrandedFeature.Template templ = new StrandedFeature.Template();
 		    templ.type = rs.getString(2);
 		    templ.source = rs.getString(3);
-		    templ.annotation = new SmallAnnotation();
-		    fmap.put(new Integer(rs.getInt(1)), templ);
+		    templ.annotation = new BioSQLFeatureAnnotation(seqDB, feature_id);
+		    fmap.put(new Integer(feature_id), templ);
 		}
 		get_features.close();
 
@@ -305,7 +306,7 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 		    templ.location = loc;
 
 		    try {
-			features.addFeature(FeatureImpl.DEFAULT.realizeFeature(this, this, templ));
+			features.addFeature(realizeFeature(this, templ));
 		    } catch (BioException ex) {
 			throw new BioRuntimeException(ex);
 		    } catch (ChangeVetoException ex) {
@@ -331,7 +332,7 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 	    throw new BioException("BioSQL only (currently) supports top-level features");
 	}
 
-	Feature f = FeatureImpl.DEFAULT.realizeFeature(this, this, templ);
+	Feature f = new BioSQLFeature(this, this, templ);
 	return f;
     }
 
@@ -345,9 +346,12 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 	Connection conn = null;
 	try {
 	    conn = seqDB.getPool().takeConnection();
-
-	    seqDB.persistFeature(conn, bioentry_id, f);
-
+	    conn.setAutoCommit(false);
+	    int f_id = seqDB.persistFeature(conn, bioentry_id, f);
+	    if (f instanceof BioSQLFeatureI) {
+		((BioSQLFeatureI) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, f_id));
+	    }
+	    conn.commit();
 	    seqDB.getPool().putConnection(conn);
 	} catch (SQLException ex) {
 	    boolean rolledback = false;
