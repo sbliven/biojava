@@ -152,6 +152,21 @@ public final class DNATools {
     }
   }
 
+
+    /** Get a new dna as a GappedSequence */
+    public static GappedSequence createGappedDNASequence(String dna, String name) throws IllegalSymbolException{
+	String dna1 = dna.replaceAll("-", "");
+	Sequence dnaSeq = createDNASequence(dna1, name);
+	GappedSequence dnaSeq1 = new SimpleGappedSequence(dnaSeq);
+	int pos = dna.indexOf('-', 0);
+	while(pos!=-1){
+	    dnaSeq1.addGapInView(pos+1);
+	    pos = dna.indexOf('-', pos+1);
+	}
+	return dnaSeq1;
+    }
+
+
   /**
    * Return an integer index for a symbol - compatible with
    * <code>forIndex</code>.

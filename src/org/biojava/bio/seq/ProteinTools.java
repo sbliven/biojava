@@ -195,6 +195,18 @@ public class ProteinTools {
 			throw new BioError(se, "Something has gone badly wrong with Protein");
 		}
 	}
+    /** Get a new protein as a GappedSequence */
+    public static GappedSequence createGappedProteinSequence(String theProtein, String name) throws IllegalSymbolException{
+	String theProtein1 = theProtein.replaceAll("-", "");
+	Sequence protein = createProteinSequence(theProtein1, name);
+	GappedSequence protein1 = new SimpleGappedSequence(protein);
+	int pos = theProtein.indexOf('-', 0);
+	while(pos!=-1){
+	    protein1.addGapInView(pos+1);
+	    pos = theProtein.indexOf('-', pos+1);
+	}
+	return protein1;
+    }
 
   /**
    * Return a new PROTEIN <span class="type">Sequence</span> for
