@@ -36,6 +36,7 @@ import java.io.File;
 public class SimpleIndex implements Index {
   private final File file;
   private final long start;
+  private final int length;
   private final String id;
   
   /**
@@ -43,11 +44,13 @@ public class SimpleIndex implements Index {
    *
    * @param file the File this sequence is in
    * @param how many bytes to skip to reach the first byte of the sequence
+   * @param how many bytes can be pulled out of the file to grab the record
    * @param id the ID of the sequence
    */
-  public SimpleIndex(File file, long start, String id) {
+  public SimpleIndex(File file, long start, int length, String id) {
     this.file = file;
     this.start = start;
+    this.length = length;
     this.id = id;
   }
   
@@ -57,6 +60,10 @@ public class SimpleIndex implements Index {
     
   public long getStart() {
     return start;
+  }
+  
+  public int getLength() {
+    return length;
   }
 
   public String getID() {

@@ -46,6 +46,15 @@ public interface Index {
   long getStart();
   
   /**
+   * The entry can be slurped out of the file by grabbing length bytes from
+   * start. If the length can't be read from a stoore then this method should
+   * return -1.
+   * 
+   * @return the length in bytes of this indexed entry
+   */
+  int getLength();
+  
+  /**
    * The ID of the sequence at this position in this file.
    *
    * @return the ID of the indexed Sequence
