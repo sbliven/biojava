@@ -21,7 +21,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.Stack;
 
 import org.biojava.bio.BioError;
@@ -40,15 +40,17 @@ import org.biojava.bio.symbol.SymbolList;
  */
 public class MotifTools
 {
+    private static Symbol [] symProto = new Symbol [0];
+
     /**
      * <p><code>createRegex</code> creates a regular expression which
      * matches the <code>SymbolList</code>. Ambiguous
      * <code>Symbol</code>s are simply transformed into character
      * classes. For example the nucleotide sequence "AAGCTT" becomes
      * "A{2}GCT{2}" and "CTNNG" is expanded to "CT[TACG]{2}G". The
-     * ordering of the tokens in a character class is determined by
-     * the <code>AlphabetIndex</code> for the relevant
-     * <code>Alphabet</code>.</p>
+     * ordering of the tokens in a character class is by ascending
+     * numerical order of their tokens as determined by
+     * <code>Arrays.sort(char [])</code>.</p>
      *
      * <p>The <code>Alphabet</code> of the <code>SymbolList</code>
      * must be finite and must have a character token type.</p>
@@ -78,23 +80,22 @@ public class MotifTools
             {
                 Symbol sym = motif.symbolAt(i);
                 FiniteAlphabet ambiAlpha = (FiniteAlphabet) sym.getMatches();
-                int ambiSize = ambiAlpha.size();
 
-                if (ambiSize == 1)
-                {
-                    sb.append(sToke.tokenizeSymbol(sym));
-                }
-                else
-                {
-                    AlphabetIndex ambiIndex =
-                        AlphabetManager.getAlphabetIndex(ambiAlpha);
+                Symbol [] ambiSyms = (Symbol [])
+                    AlphabetManager.getAllSymbols(ambiAlpha).toArray(symProto);
 
-                    for (int j = 0; j < ambiSize; j++)
-                    {
-                        Symbol ambiSym = ambiIndex.symbolForIndex(j);
-                        sb.append(sToke.tokenizeSymbol(ambiSym));
-                    }
+                // getAllSymbols returns a Set (i.e. unordered) so
+                // we convert to char array so we can sort tokens
+                char [] ambiChars = new char [ambiSyms.length];
+
+                for (int j = 0; j < ambiSyms.length; j++)
+                {
+                    ambiChars[j] =
+                        sToke.tokenizeSymbol(ambiSyms[j]).charAt(0);
                 }
+
+                Arrays.sort(ambiChars);
+                sb.append(ambiChars);
 
                 String result = sb.substring(0);
 

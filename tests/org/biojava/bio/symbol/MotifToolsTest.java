@@ -21,8 +21,10 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.Iterator;
+import java.util.Arrays;
+
 import junit.framework.TestCase;
+
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.utils.NestedError;
@@ -38,14 +40,18 @@ public class MotifToolsTest
         sb.append("[");
         SymbolTokenization sTok = DNATools.getDNA().getTokenization("token");
         FiniteAlphabet na = (FiniteAlphabet) DNATools.n().getMatches();
-        AlphabetIndex nai = AlphabetManager.getAlphabetIndex(na);
 
-        for (int i = 0; i < na.size(); i++)
+        Symbol [] nSyms = (Symbol [])
+            AlphabetManager.getAllSymbols(na).toArray(new Symbol [0]);
+        char [] nChars = new char [nSyms.length];
+
+        for (int i = 0; i < nSyms.length; i++)
         {
-            Symbol sym = (Symbol) nai.symbolForIndex(i);
-            sb.append(sTok.tokenizeSymbol(sym));
+            nChars[i] = sTok.tokenizeSymbol(nSyms[i]).charAt(0);
         }
 
+        Arrays.sort(nChars);
+        sb.append(nChars);
         sb.append("]");
         n = sb.toString();
       } catch (Exception e) {
@@ -58,51 +64,51 @@ public class MotifToolsTest
     }
 
     public void testPlain() {
-        doTest("atcg", "atcg");
+        doTest("atcg", "[-a][-t][-c][-g]");
     }
 
     public void testTwoStart() {
-        doTest("aatcg", "a{2}tcg");
+        doTest("aatcg", "[-a]{2}[-t][-c][-g]");
     }
 
     public void testThreeStart() {
-        doTest("aaatcg", "a{3}tcg");
+        doTest("aaatcg", "[-a]{3}[-t][-c][-g]");
     }
 
     public void testTwoInternal() {
-        doTest("attcg", "at{2}cg");
+        doTest("attcg", "[-a][-t]{2}[-c][-g]");
     }
 
     public void testThreeInternal() {
-        doTest("atttcg", "at{3}cg");
+        doTest("atttcg", "[-a][-t]{3}[-c][-g]");
     }
 
     public void testTwoEnd() {
-        doTest("atcgg", "atcg{2}");
+        doTest("atcgg", "[-a][-t][-c][-g]{2}");
     }
 
     public void testThreeEnd() {
-        doTest("atcggg", "atcg{3}");
+        doTest("atcggg", "[-a][-t][-c][-g]{3}");
     }
 
     public void testTwoOnly() {
-        doTest("aa", "a{2}");
+        doTest("aa", "[-a]{2}");
     }
 
     public void testThreeOnly() {
-        doTest("aaa", "a{3}");
+        doTest("aaa", "[-a]{3}");
     }
 
     public void testAmbStart() {
-        doTest("ngct", n + "gct");
+        doTest("ngct", n + "[-g][-c][-t]");
     }
 
     public void testAmbMiddle() {
-        doTest("anct", "a" + n + "ct");
+        doTest("anct", "[-a]" + n + "[-c][-t]");
     }
 
     public void testAmbEnd() {
-        doTest("agcn", "agc" + n);
+        doTest("agcn", "[-a][-g][-c]" + n);
     }
 
     public void testTwoAmbOnly() {
