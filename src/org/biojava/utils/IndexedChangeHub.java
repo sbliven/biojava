@@ -30,6 +30,10 @@ import org.biojava.utils.*;
 /**
  * implements Changeable support with a ChangeHub that
  * stores ChangeListener by key.
+ *
+ * @author Thomas Down (original implementation)
+ * @author David Huen (refactoring)
+ * @since 1.3
  */
 public abstract class IndexedChangeHub implements ChangeHub
 {

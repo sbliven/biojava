@@ -31,15 +31,39 @@ import org.biojava.utils.*;
  * Interface implemented by ChangeHubs, i.e.
  * classes that handle behaviour for
  * multiple instances of Changeable classes.
+ * <p>
+ * Listeners are indexed with a key and when
+ * an event is fired, only listeners with the same
+ * key are invoked.  The class manages the mapping
+ * between key and listener.  It is the users responsibility
+ * to compute the key.
+ *
+ * @author Thomas Down (original implementation)
+ * @author David Huen (refactoring)
+ * @since 1.3
  */
 public interface ChangeHub
 {
+    /**
+     * add a ChangeListener associated with given key.
+     */
     public void addListener(Object key, ChangeListener listener, ChangeType ct);
 
+    /**
+     * remove a ChangeListener associated with given key.
+     */
     public void removeListener(Object key, ChangeListener listener, ChangeType ct);
 
+    /**
+     * invoke the firePreChangeEvent on all ChangeListeners associated with
+     * a specific key.
+     */
     public void firePreChange(Object key, ChangeEvent cev) throws ChangeVetoException;
 
+    /**
+     * invoke the firePostChangeEvent on all ChangeListeners associated with
+     * a specific key.
+     */
     public void firePostChange(Object key, ChangeEvent cev);
 }
 
