@@ -39,7 +39,7 @@ final public class LocationTools {
     } else {
       // either may be compound. They may not overlap. We must build the
       // complete list of blocks, merge overlapping blocks and then create the
-      // apropreate implementation of Location for the resulting list.
+      // appropriate implementation of Location for the resulting list.
 
       // list of all blocks
       List locList = new ArrayList();
