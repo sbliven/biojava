@@ -206,7 +206,7 @@ public class ProfileHMM extends SimpleMarkovModel {
         addState(dN);
       
         matchStates[i] = mN;
-        insertStates[i] = mN;
+        insertStates[i] = iN;
         deleteStates[i-1] = dN;
       
         // from a model state
