@@ -70,7 +70,7 @@ class DASXFFParser {
 		throw new BioError("DAS error (status code = " + status + ")");
 	    
 	    InputSource is = new InputSource(huc.getInputStream());
-	    DOMParser parser = new DOMParser();
+	    DOMParser parser = DASSequence.nonvalidatingParser();
 	    parser.parse(is);
 	    Element el = parser.getDocument().getDocumentElement();
 	    NodeList segl = el.getElementsByTagName("SEGMENT");
@@ -244,7 +244,7 @@ class DASXFFParser {
 	while (chld != null) {
 	    if (chld instanceof Element) {
 		Element e = (Element) chld;
-		String tagName = e.getTagName();
+		String tagName = e.getLocalName();
 		if (tagName.equals("prop")) {
 		    String key = e.getAttribute("key");
 		    String value = getChildText(e);

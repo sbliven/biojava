@@ -154,7 +154,7 @@ class FeatureRequestManager {
 		throw new BioError("DAS error (status code = " + status + ")");
 	    
 	    InputSource is = new InputSource(huc.getInputStream());
-	    DOMParser parser = new DOMParser();
+	    DOMParser parser = DASSequence.nonvalidatingParser();
 	    parser.parse(is);
 	    Element el = parser.getDocument().getDocumentElement();
 
