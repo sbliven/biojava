@@ -257,61 +257,59 @@ public final class DistributionTools {
   }
 
   /**
-   * Creates an array of distributions, one for each column of the alignment
+   * Creates a joint distribution
    * @throws IllegalAlphabetException if all sequences don't use the same alphabet
    * @param a the <code>Alignment </code>to build the <code>Distribution[]</code> over.
    * @param countGaps if true gaps will be included in the distributions
    * (NOT YET IMPLEMENTED!!, CURRENTLY EITHER OPTION WILL PRODUCE THE SAME RESULT)
    * @param nullWeight the number of pseudo counts to add to each distribution
    * @param int[] a list of positions in the alignment to include in the joint distribution
-   * @return a <code>Distribution[]</code> where each member of the array is a
-   * <code>Distribution </code>of the <code>Symbols </code>found at that position
-   * of the <code>Alignment </code>.
+   * @return a <code>Distribution</code>
    * @since 1.2
    */
   public static final Distribution jointDistOverAlignment(Alignment a,
                                                  boolean countGaps,
-                                                 double nullWeight, 
-						 int[] cols)
+                                                 double nullWeight,
+                                                 int[] cols)
   throws IllegalAlphabetException {
-	List seqs = a.getLabels();
-	FiniteAlphabet alpha = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(0))).getAlphabet();
-	for(int i = 1; i < seqs.size();i++){
-		FiniteAlphabet test = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(i))).getAlphabet();
-		if(test != alpha){
-			throw new IllegalAlphabetException("Cannot Calculate distOverAlignment() for alignments with"+
-			"mixed alphabets");
-		}
-	}
-	List a_list = new ArrayList();
-	for(int i=0; i<cols.length; i++){
-		a_list.add(alpha);
-	}
-	Distribution dist;
-	DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
-	dist = DistributionFactory.DEFAULT.createDistribution(AlphabetManager.getCrossProductAlphabet(a_list));
-	dtc.setNullModelWeight(nullWeight);
+        List seqs = a.getLabels();
+        FiniteAlphabet alpha = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(0))).getAlphabet();
+        for(int i = 1; i < seqs.size();i++){
+                FiniteAlphabet test = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(i))).getAlphabet();
+                if(test != alpha){
+                        throw new IllegalAlphabetException("Cannot Calculate distOverAlignment() for alignments with"+
+                        "mixed alphabets");
+                }
+        }
+        List a_list = new ArrayList();
+        for(int i=0; i<cols.length; i++){
+                a_list.add(alpha);
+        }
+        Distribution dist;
+        DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
+        dist = DistributionFactory.DEFAULT.createDistribution(AlphabetManager.getCrossProductAlphabet(a_list));
+        dtc.setNullModelWeight(nullWeight);
     try{
-        
+
         dtc.registerDistribution(dist);
-	Location loc= new PointLocation(cols[0]);
-	for (int j = 0; j < cols.length; j++)
+        Location loc= new PointLocation(cols[0]);
+        for (int j = 0; j < cols.length; j++)
             {
                 Location lj = new PointLocation(cols[j]);
-		loc = LocationTools.union(loc, lj);
-	    }
-	    Alignment subalign = a.subAlignment(new HashSet(seqs), loc);
-	    Iterator s_it = subalign.symbolListIterator();
-	while(s_it.hasNext()){
-	    SymbolList syml = (SymbolList) s_it.next();
-	    Symbol s= SymbolListViews.orderNSymbolList(syml,syml.length()).symbolAt(1);
-	    if(countGaps == false && syml.toList().contains(a.getAlphabet().getGapSymbol())){
-		    //do nothing, not counting gaps
-	    }else{	
+                loc = LocationTools.union(loc, lj);
+            }
+            Alignment subalign = a.subAlignment(new HashSet(seqs), loc);
+            Iterator s_it = subalign.symbolListIterator();
+        while(s_it.hasNext()){
+            SymbolList syml = (SymbolList) s_it.next();
+            Symbol s= SymbolListViews.orderNSymbolList(syml,syml.length()).symbolAt(1);
+            if(countGaps == false && syml.toList().contains(a.getAlphabet().getGapSymbol())){
+                    //do nothing, not counting gaps
+            }else{
             dtc.addCount(dist,s,1.0);// count the symbol
-	    }
-	}
-	dtc.train();
+            }
+        }
+        dtc.train();
     }catch(Exception e){
       e.printStackTrace(System.err);
     }
@@ -362,7 +360,7 @@ public final class DistributionTools {
           }
         }
       }
-      
+
       dtc.train();
     }catch(Exception e){
       e.printStackTrace(System.err);
