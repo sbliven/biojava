@@ -157,7 +157,6 @@ public abstract class AbstractSequenceDBTest extends TestCase {
         feature = (Feature) i.next();
         assertTrue(!feature.getAnnotation().containsProperty(annoTag));
         seq.removeFeature(feature);
-        System.err.println("Removed old feature: " + feature);
 
         //new org.biojava.bio.seq.io.GenbankFormat().writeSequence(seq, System.err);
 
