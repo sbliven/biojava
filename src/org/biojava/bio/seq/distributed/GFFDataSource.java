@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
@@ -35,6 +37,7 @@ import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.MergeFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.symbol.DummySymbolList;
@@ -45,6 +48,7 @@ import org.biojava.utils.ChangeVetoException;
  * Use a GFFEntrySet as a DataSource for adding annotation to sequences.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @for.user
  * Instantiate this and add it to an instance of DistributeSequenceDB. All
  * of the GFF features that have sequence fields matching sequence IDs in the
@@ -53,9 +57,13 @@ import org.biojava.utils.ChangeVetoException;
 public class GFFDataSource implements DistDataSource {
     private GFFEntrySet gffe;
     private Set ids;
+    private Map id2seq;
+    private MergeFeatureHolder delegateFH;
 
     public GFFDataSource(GFFEntrySet gffe) {
 	this.gffe = gffe;
+        this.id2seq = new HashMap();
+        delegateFH = new MergeFeatureHolder();
     }
 
     public boolean hasSequence(String id) throws BioException {
@@ -67,7 +75,7 @@ public class GFFDataSource implements DistDataSource {
     }
 
     public FeatureHolder getFeatures(FeatureFilter ff) throws BioException {
-	throw new BioException();
+	return getDelegateFH(true).filter(ff);
     }
 
     public FeatureHolder getFeatures(String id, FeatureFilter ff, boolean recurse) throws BioException {
@@ -75,19 +83,40 @@ public class GFFDataSource implements DistDataSource {
 	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
 	}
 	
-	SymbolList dummy = new DummySymbolList(DNATools.getDNA(), 1000000000);
-	Sequence seq = new SimpleSequence(dummy, id, id, Annotation.EMPTY_ANNOTATION);
-	try {
-	    seq = gffe.getAnnotator().annotate(seq);
+        Sequence seq = populateDelegateFH(id);
+        return seq.filter(ff, recurse);
+    }
+
+    private Sequence populateDelegateFH(String id) {
+      Sequence seq = (Sequence) id2seq.get(id);
+
+      if(seq == null) {
+        SymbolList dummy = new DummySymbolList(DNATools.getDNA(), 1000000000);
+        seq = new SimpleSequence(dummy, id, id, Annotation.EMPTY_ANNOTATION);
+
+        try {
+	  seq = gffe.getAnnotator().annotate(seq);
+          delegateFH.addFeatureHolder(seq);
+          id2seq.put(id, seq);
 	} catch (ChangeVetoException cve) {
-	    throw new BioError(cve);
-	}
-	
-	if (recurse == false && FilterUtils.areProperSubset(FeatureFilter.all, ff)) {
-	    return seq;
-	} else {
-	    return seq.filter(ff, recurse);
-	}
+	  throw new BioError(cve);
+	} catch (BioException be) {
+          throw new BioError(be);
+        }
+      }
+
+      return seq;
+    }
+
+    private FeatureHolder getDelegateFH(boolean populate)
+    throws BioException {
+      if(populate == true) {
+        for(Iterator i = ids(true).iterator(); i.hasNext(); ) {
+          populateDelegateFH((String) i.next());
+        }
+      }
+
+      return delegateFH;
     }
 
     public Sequence getSequence(String id) throws BioException {
