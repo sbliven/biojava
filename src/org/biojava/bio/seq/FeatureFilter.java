@@ -55,12 +55,12 @@ public interface FeatureFilter extends Serializable {
   /**
    * All features are selected in with this filter.
    */
-  static final public FeatureFilter all = new AcceptAllFilter() {};
+  static final public FeatureFilter all = new AcceptAllFilter();
 
   /**
    * No features are selected in with this filter.
    */
-  static final public FeatureFilter none = new AcceptNoneFilter() {};
+  static final public FeatureFilter none = new AcceptNoneFilter();
 
 
   /**
@@ -442,11 +442,11 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.3
    */
-  public final static class BySequeneName
+  public final static class BySequenceName
   implements OptimizableFilter {
     private String seqName;
     
-    public BySequeneName(String seqName) {
+    public BySequenceName(String seqName) {
       this.seqName = seqName;
     }
     
@@ -463,13 +463,17 @@ public interface FeatureFilter extends Serializable {
     }
     
     public boolean isDisjoint(FeatureFilter filt) {
-      return !equals(filt);
+        if (filt instanceof BySequenceName) {
+            return !equals(this);
+        } else {
+            return false;
+        }
     }
 
     public boolean equals(Object o) {
       return
-       (o instanceof BySequeneName) &&
-       ((BySequeneName) o).getSequenceName().equals(seqName);
+       (o instanceof BySequenceName) &&
+       ((BySequenceName) o).getSequenceName().equals(seqName);
     }
     
     public int hashCode() {
@@ -857,20 +861,31 @@ public interface FeatureFilter extends Serializable {
         } 
 
         public boolean isDisjoint(FeatureFilter ff) {
+            // System.err.println("Disjunction test for " + toString());
+            // System.err.println("Against " + ff.toString());
             if (ff instanceof IsTopLevel) {
                 return true;
+            } else if (ff instanceof FeatureFilter.ByParent) {
+                return FilterUtils.areDisjoint(
+                        ((FeatureFilter.ByParent) ff).getFilter(),
+                        getFilter()
+                );
+            }  else if (ff instanceof FeatureFilter.ByAncestor) {
+                return FilterUtils.areDisjoint(
+                        ((FeatureFilter.ByAncestor) ff).getFilter(),
+                        getFilter()
+                );
+            } else {
+                FeatureFilter childFilter = FilterUtils.getOnlyChildrenFilter(getFilter());
+                if (childFilter != null) {
+                    return FilterUtils.areDisjoint(
+                            childFilter,
+                            ff
+                    );
+                }
             }
             
-            FeatureFilter ancFilter = null;
-            if (ff instanceof FeatureFilter.ByParent) {
-                ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
-            }
-
-            if (ancFilter != null) {
-                return FilterUtils.areDisjoint(ancFilter, filter);
-            } else {
-                return false;
-            }
+            return false;
         }
     }
 
@@ -937,25 +952,205 @@ public interface FeatureFilter extends Serializable {
         }
 
         public boolean isDisjoint(FeatureFilter ff) {
+            // System.err.println("Disjunction test for " + toString());
+            // System.err.println("Against " + ff.toString());
             if (ff instanceof IsTopLevel) {
                 return true;
             }
             
-            FeatureFilter ancFilter = null;
             if (ff instanceof FeatureFilter.ByParent) {
-                ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
-            } else if (ff instanceof FeatureFilter.ByParent) {
-                ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
+                return FilterUtils.areDisjoint(
+                        ((FeatureFilter.ByParent) ff).getFilter(),
+                        getFilter()
+                );
+            }  else if (ff instanceof FeatureFilter.ByAncestor) {
+                return FilterUtils.areDisjoint(
+                        ((FeatureFilter.ByAncestor) ff).getFilter(),
+                        getFilter()
+                );
+            } else {
+                FeatureFilter descFilter = FilterUtils.getOnlyDescendantsFilter(getFilter());
+                if (descFilter != null) {
+                    return FilterUtils.areDisjoint(
+                            descFilter,
+                            ff
+                    );
+                }
+                
+                FeatureFilter childFilter = FilterUtils.getOnlyChildrenFilter(getFilter());
+                if (childFilter != null) {
+                    // System.err.println("Child filter is: " + childFilter.toString());
+                    if (FilterUtils.areProperSubset(childFilter, leaf)) {
+                        // System.err.println("Leaf case");
+                        return FilterUtils.areDisjoint(
+                                childFilter,
+                                ff
+                        );
+                    } else {
+                        // System.err.println("Tree case");
+                        return FilterUtils.areDisjoint(
+                                new FeatureFilter.Or(
+                                        childFilter,
+                                        new FeatureFilter.ByAncestor(childFilter)
+                                ),
+                                ff
+                        );
+                    }
+                }
+            }
+            
+            return false;
+        }
+        
+        public String toString() {
+            return "ByAncestor(" + getFilter().toString() + ")";
+        }
+    }
+
+    /**
+     * Accepts features where all immediate children meet the supplied filter.  This
+     * will be <code>true</code> in the case where no child features exist.  Mainly useful 
+     * for defining schemas of feature-trees.
+     *
+     * @author Thomas Down
+     * @since 1.3
+     */
+     
+    public static class OnlyChildren implements OptimizableFilter, ByHierarchy {
+        private FeatureFilter filter;
+        
+        public OnlyChildren(FeatureFilter ff) {
+            this.filter = ff;
+        }
+        
+        public FeatureFilter getFilter() {
+            return filter;
+        }
+        
+        public boolean accept(Feature f) {
+            for (Iterator i = f.features(); i.hasNext(); ) {
+                if (!filter.accept((Feature) i.next())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        public int hashCode() {
+            return filter.hashCode() + 762;
+        }
+        
+        public boolean equals(Object o) {
+            if (! (o instanceof FeatureFilter.OnlyChildren)) {
+                return false;
             }
 
-            if (ancFilter != null) {
-                return FilterUtils.areDisjoint(ancFilter, filter);
+            FeatureFilter.OnlyChildren ffoc = (FeatureFilter.OnlyChildren) o;
+            return ffoc.getFilter().equals(filter);
+        }
+        
+        public boolean isProperSubset(FeatureFilter ff) {
+            if (ff == FeatureFilter.all) {
+                return true;
+            } else if (ff instanceof OnlyChildren) {
+                return FilterUtils.areProperSubset(
+                    getFilter(),
+                    ((OnlyChildren) ff).getFilter()
+                ) ;
+            } else if (ff instanceof OnlyDescendants) {
+                return FilterUtils.areProperSubset(
+                    getFilter(),
+                    ((OnlyDescendants) ff).getFilter()
+                ) ;
+            } else {
+                return false;
+            }
+        }
+        
+        public boolean isDisjoint(FeatureFilter ff) {
+            if (ff instanceof ByChild) {
+                return FilterUtils.areDisjoint(
+                    getFilter(),
+                    ((ByChild) ff).getFilter()
+                );
+            } else {
+                return false;
+            }
+        }
+        
+        public String toString() {
+            return "OnlyChildren(" + filter.toString() + ")";
+        }
+    }
+    
+    /**
+     * Accepts features where all descendants meet the supplied filter.  This
+     * will be <code>true</code> in the case where no child features exist.  Mainly useful 
+     * for defining schemas of feature-trees.
+     *
+     * @author Thomas Down
+     * @since 1.3
+     */
+     
+    public static class OnlyDescendants implements OptimizableFilter, ByHierarchy {
+        private FeatureFilter filter;
+        
+        public OnlyDescendants(FeatureFilter ff) {
+            this.filter = ff;
+        }
+        
+        public FeatureFilter getFilter() {
+            return filter;
+        }
+        
+        public boolean accept(Feature f) {
+            return f.filter(FeatureFilter.all).countFeatures() == f.filter(filter).countFeatures();
+        }
+        
+        public int hashCode() {
+            return filter.hashCode() + 763;
+        }
+        
+        public boolean equals(Object o) {
+            if (! (o instanceof FeatureFilter.OnlyDescendants)) {
+                return false;
+            }
+
+            FeatureFilter.OnlyDescendants ffoc = (FeatureFilter.OnlyDescendants) o;
+            return ffoc.getFilter().equals(filter);
+        }
+        
+        
+        public boolean isProperSubset(FeatureFilter ff) {
+            if (ff == FeatureFilter.all) {
+                return true;
+            } else if (ff instanceof OnlyDescendants) {
+                return FilterUtils.areProperSubset(
+                    getFilter(),
+                    ((OnlyDescendants) ff).getFilter()
+                ) ;
+            } else {
+                return false;
+            }
+        }
+        
+        public boolean isDisjoint(FeatureFilter ff) {
+            if (ff instanceof ByChild) {
+                return FilterUtils.areDisjoint(
+                    getFilter(),
+                    ((ByChild) ff).getFilter()
+                );
+            } else if (ff instanceof ByDescendant) {
+                return FilterUtils.areDisjoint(
+                    getFilter(),
+                    ((ByDescendant) ff).getFilter()
+                );
             } else {
                 return false;
             }
         }
     }
-
+    
     /**
      * Filter by applying a nested <code>FeatureFilter</code> to the
      * child features.  Always <code>false</code> if there are no children.
@@ -1018,14 +1213,16 @@ public interface FeatureFilter extends Serializable {
             if (ff instanceof IsLeaf) {
                 return true;
             }
-            
-            FeatureFilter descFilter = null;
-            if (ff instanceof FeatureFilter.ByChild) {
-                descFilter = ((FeatureFilter.ByChild) ff).getFilter();
-            }
-
-            if (descFilter != null) {
-                return FilterUtils.areDisjoint(descFilter, filter);
+            if (ff instanceof OnlyChildren) {
+                return FilterUtils.areDisjoint(
+                    getFilter(),
+                    ((OnlyChildren) ff).getFilter()
+                );
+            } else if (ff instanceof OnlyDescendants) {
+                return FilterUtils.areDisjoint(
+                    getFilter(),
+                    ((OnlyDescendants) ff).getFilter()
+                );
             } else {
                 return false;
             }
@@ -1096,19 +1293,13 @@ public interface FeatureFilter extends Serializable {
         }
 
         public boolean isDisjoint(FeatureFilter ff) {
-            if (ff instanceof IsTopLevel) {
+            if (ff instanceof IsLeaf) {
                 return true;
-            }
-            
-            FeatureFilter descFilter = null;
-            if (ff instanceof FeatureFilter.ByChild) {
-                descFilter = ((FeatureFilter.ByChild) ff).getFilter();
-            } else if (ff instanceof FeatureFilter.ByDescendant) {
-                descFilter = ((FeatureFilter.ByDescendant) ff).getFilter();
-            }
-
-            if (descFilter != null) {
-                return FilterUtils.areDisjoint(descFilter, filter);
+            } else if (ff instanceof OnlyDescendants) {
+                return FilterUtils.areDisjoint(
+                    getFilter(),
+                    ((OnlyDescendants) ff).getFilter()
+                );
             } else {
                 return false;
             }

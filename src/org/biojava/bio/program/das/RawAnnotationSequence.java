@@ -190,7 +190,7 @@ class RawAnnotationSequence
     }
     
     public FeatureHolder filter(FeatureFilter ff) {
-        return filter(ff, !FilterUtils.areProperSubset(ff, new FeatureFilter.IsTopLevel()));
+        return filter(ff, !FilterUtils.areProperSubset(ff, FeatureFilter.top_level));
     }
     
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {

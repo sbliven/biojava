@@ -67,7 +67,7 @@ public class FilterUtils {
       
       // Body
       
-      if(sub == sup) {
+      if(sub.equals(sup)) {
         return true;
       } else if (sup == all()) {
         return true;
@@ -162,6 +162,14 @@ public class FilterUtils {
           return ((FeatureFilter.ByFeature) a).isDisjoint(b);
       } else if (b instanceof FeatureFilter.ByFeature) {
           return ((FeatureFilter.ByFeature) b).isDisjoint(a);
+      } else if (a instanceof FeatureFilter.ByAncestor) {
+        return ((OptimizableFilter) a).isDisjoint(b);
+      } else if (b instanceof FeatureFilter.ByAncestor) {
+        return ((OptimizableFilter) b).isDisjoint(a);
+      } else if (a instanceof FeatureFilter.ByParent) {
+        return ((OptimizableFilter) a).isDisjoint(b);
+      } else if (b instanceof FeatureFilter.ByParent) {
+        return ((OptimizableFilter) b).isDisjoint(a);
       } else if (a instanceof OptimizableFilter) {
         return ((OptimizableFilter) a).isDisjoint(b);
       } else if (b instanceof OptimizableFilter) {
@@ -846,4 +854,68 @@ public class FilterUtils {
       return res;
     }
   }
+  
+    static FeatureFilter getOnlyDescendantsFilter(FeatureFilter ff) {
+        if (ff instanceof FeatureFilter.OnlyDescendants) {
+            return ((FeatureFilter.OnlyDescendants) ff).getFilter();
+        } else if (ff instanceof FeatureFilter.And) {
+            FeatureFilter.And ffa = (FeatureFilter.And) ff;
+            FeatureFilter ocf1 = getOnlyDescendantsFilter(ffa.getChild1());
+            FeatureFilter ocf2 = getOnlyDescendantsFilter(ffa.getChild2());
+            if (ocf1 == null) {
+                return ocf2;
+            } else if (ocf2 == null) {
+                return ocf1;
+            } else {
+                return new FeatureFilter.And(ocf1, ocf2);
+            }
+        } else if (ff instanceof FeatureFilter.Or) {
+            FeatureFilter.Or ffa = (FeatureFilter.Or) ff;
+            FeatureFilter ocf1 = getOnlyDescendantsFilter(ffa.getChild1());
+            FeatureFilter ocf2 = getOnlyDescendantsFilter(ffa.getChild2());
+            if (ocf1 == null) {
+                return ocf2;
+            } else if (ocf2 == null) {
+                return ocf1;
+            } else {
+                return new FeatureFilter.Or(ocf1, ocf2);
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    static FeatureFilter getOnlyChildrenFilter(FeatureFilter ff) {
+        // System.err.println("In getOnlyChildrenFilter: " + ff.toString());
+        
+        if (ff instanceof FeatureFilter.OnlyChildren) {
+            return ((FeatureFilter.OnlyChildren) ff).getFilter();
+        } else if (ff instanceof FeatureFilter.OnlyDescendants) {
+            return ((FeatureFilter.OnlyDescendants) ff).getFilter();
+        } else if (ff instanceof FeatureFilter.And) {
+            FeatureFilter.And ffa = (FeatureFilter.And) ff;
+            FeatureFilter ocf1 = getOnlyChildrenFilter(ffa.getChild1());
+            FeatureFilter ocf2 = getOnlyChildrenFilter(ffa.getChild2());
+            if (ocf1 == null) {
+                return ocf2;
+            } else if (ocf2 == null) {
+                return ocf1;
+            } else {
+                return new FeatureFilter.And(ocf1, ocf2);
+            }
+        } else if (ff instanceof FeatureFilter.Or) {
+            FeatureFilter.Or ffa = (FeatureFilter.Or) ff;
+            FeatureFilter ocf1 = getOnlyChildrenFilter(ffa.getChild1());
+            FeatureFilter ocf2 = getOnlyChildrenFilter(ffa.getChild2());
+            if (ocf1 == null) {
+                return ocf2;
+            } else if (ocf2 == null) {
+                return ocf1;
+            } else {
+                return new FeatureFilter.Or(ocf1, ocf2);
+            }
+        } else {
+            return null;
+        }
+    }
 }

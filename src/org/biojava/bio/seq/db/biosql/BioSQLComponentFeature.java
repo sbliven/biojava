@@ -200,7 +200,7 @@ class BioSQLComponentFeature
     
     public FeatureHolder filter(FeatureFilter ff) {
         FeatureFilter childFilter = new FeatureFilter.And(new FeatureFilter.ByParent(new FeatureFilter.ByClass(ComponentFeature.class)),
-                                                          new FeatureFilter.Not(new FeatureFilter.IsTopLevel()));
+                                                          new FeatureFilter.Not(FeatureFilter.top_level));
                                                           
         if (FilterUtils.areDisjoint(ff, childFilter)) {
             return FeatureHolder.EMPTY_FEATURE_HOLDER;

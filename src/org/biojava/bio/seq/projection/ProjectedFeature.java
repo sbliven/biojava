@@ -151,7 +151,7 @@ public class ProjectedFeature
   }
   
   public FeatureHolder filter(FeatureFilter ff) {
-      FeatureFilter membershipFilter = new FeatureFilter.And(new FeatureFilter.Not(new FeatureFilter.IsTopLevel()),
+      FeatureFilter membershipFilter = new FeatureFilter.And(new FeatureFilter.Not(FeatureFilter.top_level),
                                                              new FeatureFilter.ContainedByLocation(getLocation()));
       if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
           return FeatureHolder.EMPTY_FEATURE_HOLDER;

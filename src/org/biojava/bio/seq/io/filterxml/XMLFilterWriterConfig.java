@@ -109,7 +109,7 @@ public class XMLFilterWriterConfig {
                 new StringFilterWriter(XML_FILTER_NS, "byComponentName", FeatureFilter.ByComponentName.class.getMethod("getComponentName", NO_ARGS))
             );
             filterWritersByClass.put(
-                FeatureFilter.IsTopLevel.class,
+                FeatureFilter.top_level,
                 new BlankFilterWriter(XML_FILTER_NS, "isTopLevel")
             );
             AnnotationTypeFilterWriter atfw = new AnnotationTypeFilterWriter(new XMLAnnotationTypeWriter());

@@ -41,7 +41,7 @@ public abstract class AbstractFeatureHolder
     FeatureHolder
 {
     public FeatureHolder filter(FeatureFilter filter) {
-        boolean recurse = FilterUtils.areProperSubset(filter, new FeatureFilter.IsTopLevel());
+        boolean recurse = FilterUtils.areProperSubset(filter, FeatureFilter.top_level);
         return filter(filter, recurse);
     }
     

@@ -248,7 +248,7 @@ implements
 
     
     public FeatureHolder filter(FeatureFilter ff) {
-        FeatureFilter childFilter = new FeatureFilter.Not(new FeatureFilter.IsTopLevel());
+        FeatureFilter childFilter = new FeatureFilter.Not(FeatureFilter.top_level);
                                                           
         if (FilterUtils.areDisjoint(ff, childFilter)) {
             return FeatureHolder.EMPTY_FEATURE_HOLDER;

@@ -253,7 +253,7 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
 
     public FeatureHolder filter(FeatureFilter ff) {
         FeatureFilter childFilter = new FeatureFilter.And(new FeatureFilter.ContainedByLocation(getLocation()),
-                                                          new FeatureFilter.Not(new FeatureFilter.IsTopLevel()));
+                                                          new FeatureFilter.Not(FeatureFilter.top_level));
                                                           
         if (FilterUtils.areDisjoint(ff, childFilter)) {
             return FeatureHolder.EMPTY_FEATURE_HOLDER;
