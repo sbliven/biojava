@@ -46,9 +46,9 @@ import org.biojava.utils.ListTools;
  * @version 1.0
  */
 public final class AlphaCTools {
-    /** MAX_ANGLE */
+    /** MAX_ANGLE . */
   public static final double MAX_ANGLE = 180.0;
-    /** MIN_ANGLE */
+    /** MIN_ANGLE . */
   public static final double MIN_ANGLE = -180.0;
 
   private static String ALPHA = "ALPHA CARBON ANGLES";
@@ -80,7 +80,8 @@ public final class AlphaCTools {
   }
 
   /**
-   * Makes a Phi - Psi Symbol from the ALPHA CARBON ANGLES alphabet
+   * Makes a Phi - Psi Symbol from the ALPHA CARBON ANGLES alphabet.
+   *
    * @param phiAngle the phi angle between -180.0 and +180.0
    * @param psiAngle the psi angle between -180.0 and +180.0
    * @return a reference to the 'fly weight' Symbol.
@@ -105,7 +106,8 @@ public final class AlphaCTools {
   }
 
   /**
-   * extracts the Phi angle from a <code>Symbol</code>
+   * extracts the Phi angle from a <code>Symbol</code>.
+   *
    * @param phiPsiSym a <code>Symbol</code> from the ALPHA CARBON ANGLES
    * <code>Alphabet</code>
    * @return a double between -180.0 and +180.0
@@ -122,7 +124,7 @@ public final class AlphaCTools {
   }
 
   /**
-   * extracts the Psi angle from a <code>Symbol</code>
+   * extracts the Psi angle from a <code>Symbol</code>.
    * @param phiPsiSym a <code>Symbol</code> from the ALPHA CARBON ANGLES
    * <code>Alphabet</code>
    * @return a double between -180.0 and +180.0

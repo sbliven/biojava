@@ -143,4 +143,10 @@ public interface Atom {
      * @see #setTempFactor
      */
     public double getTempFactor() ;
+
+    /** returns and identical copy of this  object .
+     * @return  and identical copy of this  object 
+     */
+    public Object clone();
+
 }

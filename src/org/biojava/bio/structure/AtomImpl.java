@@ -53,54 +53,86 @@ public class AtomImpl implements Atom {
 	altLoc = new Character(' ');
     }
 
-    /** trimmed version of atom name, e.g. "CA" */
+    /** trimmed version of atom name, e.g. "CA" 
+     * @see #getName
+     */
     public void   setName(String s) { name = s ;}
+
     /**
      * Gets this object's name.
+     * @return a String representing the name value
+     * @see #setName
      */
     public String getName()         { return name ;}
     
-    /** set full name of atom e.g. " CA " */
+    /** set full name of atom e.g. " CA " .
+     * @see #getFullName
+*/
     public void   setFullName( String s ) { fullName =s ; }
-    /** get full name of atom e.g. " CA " */
+
+    /** get full name of atom e.g. " CA ". 
+     * @return a String representing the full name value
+     * @see #setFullName
+     */
     public String getFullName()           { return fullName; }
 
-    /** set PDB atom number */
+    /** set PDB atom number. 
+     * @see #getPDBserial
+     */
     public void setPDBserial(int i) { pdbserial = i    ; }
-    /** get PDB atom number */
+
+    /** get PDB atom number.
+     * @see #setPDBserial
+     */
     public int  getPDBserial()      { return pdbserial ; }
 
-    /** the coordinates */    
+    /** the coordinates.
+     * @see #getCoords 
+     */    
     public void     setCoords( double[] c ) { coords = c   ; } 
-    /** get the coordinates as a double[3] array */
+
+    /** get the coordinates as a double[3] array .
+     * @return an array of doubles representing the coords value
+     * @see #setCoords     
+     */
     public double[] getCoords()            { return coords ; }
 
-    /** get the X coordinate */
+    /** get the X coordinate. */
     public double getX() { return coords[0]; }
 
-    /** get the Y coordinate */
+    /** get the Y coordinate. */
     public double getY() { return coords[1]; }
 
-    /** get the Z coordinate */
+    /** get the Z coordinate. */
     public double getZ() { return coords[2]; }
 
-    /** set alternate Location */
+    /** set alternate Location. 
+     * @see #getAltLoc
+     */
     public void setAltLoc(Character c) {
 	altLoc = c ;
     }
-    /** get alternate Location */
+    /** get alternate Location.
+     * @return a Character object representing the alt loc value
+     * @see #setAltLoc
+     */
     public Character getAltLoc() {
 	return altLoc ;
     }
 
     
-    /** store the whole line */
+    /** store the whole line. 
+     * @see #getPDBline
+     */
     public void   setPDBline(String s) { pdbline = s;}
 
-    /** get the whole line */
+    /** get the whole line .
+     * @return a String representing the PDBline value
+     * @see #setPDBline
+     */
     public String getPDBline() { return pdbline ;}
 
-    /** string representation */
+    /** string representation. */
     public String toString() {
 	String str = name +" "+ pdbserial + " " + coords[0] + " " + coords[1] + " " + coords[2];
 	return str ;
@@ -112,5 +144,19 @@ public class AtomImpl implements Atom {
     public void   setTempFactor(double temp){ tempfactor = temp ;} ;
     public double getTempFactor(){ return tempfactor; } ;
 
-    
+    /** returns and identical copy of this  object .
+     * @return  and identical copy of this  object 
+     */
+    public Object clone() {
+	AtomImpl n = new AtomImpl();
+	n.setOccupancy(getOccupancy());
+	n.setTempFactor(getTempFactor());
+	n.setAltLoc(getAltLoc());
+	double[] coords = getCoords();
+	n.setCoords(coords);
+	n.setPDBserial(getPDBserial());
+	n.setFullName(getFullName());
+	n.setName(getName());
+	return n ;
+    }
 }

@@ -34,6 +34,11 @@ import java.util.ArrayList ;
  */
 public interface Chain {
 	
+    /** returns an identical copy of this Chain. 
+     * @return  an identical copy of this Chain 
+     */
+    public Object clone();
+
     /** add a group to this chain.
      * @param group  a Group object
      */

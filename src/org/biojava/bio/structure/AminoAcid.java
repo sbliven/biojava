@@ -24,8 +24,8 @@
 package org.biojava.bio.structure;
 import  org.biojava.bio.structure.io.PDBParseException;
 
-import java.util.ArrayList ;
-import java.util.HashMap   ;
+import java.util.List ;
+import java.util.Map   ;
 
 /**
  *
@@ -36,78 +36,72 @@ import java.util.HashMap   ;
  * @version %I% %G%
  * 
  */
-public class AminoAcid extends Hetatom {
-    /** this is an Amino acid. type is "amino". */
-    public static String type = "amino";
-   
-    /* IUPAC amino acid residue names 
+public interface AminoAcid extends Group {
+    /**
+     * Specifies the secondary structure as a Map.
+     *
+     * @param secstr  a Map object specifying the sec struc 
+     * @see #getSecStruc
      */
-    Character amino_char ;
-          
-    HashMap   secstruc   ;
+    public void setSecStruc(Map secstr) ;
     
-
-    /*
-     * inherits most from Hetero and has just a few extensions
+    /** get secondary structure data .
+     *
+     * @return a Map object representing the sec struc value
+     *
+     * @see #setSecStruc
      */
-    public AminoAcid() {
-	super();
+    public Map getSecStruc() ;
 
-	amino_char = null;
-	secstruc = new HashMap();
-    }
+    /** get N atom.
+     *
+     * @return an Atom object
+     * @throws StructureException ...
+    */
+    public Atom getN()  throws StructureException ;
 
-    
-    public String getType(){ return type;}
-    
-    /** set the secondary structure data for this amino acids the data
-     * is a HashMap with the following indeces (@see Secstruc)
+    /** get CA atom.
+     * @return an Atom object
+     * @throws StructureException ...
      */
-    public void setSecStruc(HashMap secstr) {
-	secstruc = secstr ;
-    }
+    public Atom getCA() throws StructureException ;
+
+    /** get C atom.
+     * @return an Atom object
+     * @throws StructureException ...
+     */
+    public Atom getC()  throws StructureException ;
+
+    /** get O atom.
+     * @return an Atom object
+     * @throws StructureException ...
+     */
+    public Atom getO()  throws StructureException ;
+
+    /** get CB atom.
+     * @return an Atom object
+     * @throws StructureException ...
+     */
+    public Atom getCB() throws StructureException ;
+
     
-    /** get secondary structure data */
-    public HashMap getSecStruc(){
-	return secstruc ;
-    }
-
-    /** get N atom*/
-    public Atom getN()  throws StructureException {return getAtom("N");  }
-    /** get CA atom*/
-    public Atom getCA() throws StructureException {return getAtom("CA"); }
-    /** get C atom*/
-    public Atom getC()  throws StructureException {return getAtom("C");  }
-    /** get O atom*/
-    public Atom getO()  throws StructureException {return getAtom("O");  }
-    /** get CB atom*/
-    public Atom getCB() throws StructureException {return getAtom("CB"); }
-
-    
 
 
-    /** returns the name of the AA, in single letter code */
-    public  Character getAminoType() {
-	return amino_char;
-    }
+    /** returns the name of the AA, in single letter code.
+     *
+     * @return a Character object representing the amino type value
+     * @see #setAminoType
+     */
+    public  Character getAminoType() ;
 
-    /** set the name of the AA, in single letter code */
-    public void setAminoType(Character aa){
-	amino_char  = aa ;
-    }
+    /** set the name of the AA, in single letter code .
+     *
+     * @param aa  a Character object specifying the amino type value
+     * @see #getAminoType
+     */
+    public void setAminoType(Character aa) ;
 
-    /** string representation */
-    public String toString(){
-		
-	String str = "PDB: "+ pdb_name + " " + amino_char + " " + pdb_code +  " "+ pdb_flag;
-	if (pdb_flag) {
-	    str = str + "atoms: "+atoms.size();
-	}
-	return str ;
-		
-    }
-
-   
-
+    /** string representation. */
+    public String toString() ;
 
 }

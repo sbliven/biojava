@@ -49,6 +49,24 @@ public class ChainImpl implements Chain {
     }
 
 
+    /** returns an identical copy of this Chain .
+     * @return an identical copy of this Chain 
+     */
+    public Object clone() {
+	// go through all groups and add to new Chain.
+	Chain n = new ChainImpl();
+	// copy chain data:
+	
+	n.setName( getName());
+	n.setSwissprotId ( getSwissprotId());
+	for (int i=0;i<groups.size();i++){
+	    Group g = (Group)groups.get(i);
+	    n.addGroup((Group)g.clone());
+	}
+	
+	return n ;
+    }
+
     /** set the Swissprot id of this chains .
      * @param sp_id  a String specifying the swissprot id value
      * @see #getSwissprotId
@@ -73,8 +91,11 @@ public class ChainImpl implements Chain {
 	groups.add(group);
     }
 
-    /** return the amino acid at position 
+    /** return the amino acid at position .
      * 
+     *
+     * @param position  an int
+     * @return a Group object
      */
     public Group getGroup(int position) {
 	// TODO Auto-generated method stub
@@ -82,7 +103,10 @@ public class ChainImpl implements Chain {
     }
 
     /** return an array of all groups of a special type (e.g. amino,
-     * hetatm, nucleotide)
+     * hetatm, nucleotide).
+     * @param type  a String
+     * @return an List object containing the groups of type...
+
      */
     public ArrayList getGroups( String type) {
 	ArrayList tmp = new ArrayList() ;
@@ -95,7 +119,9 @@ public class ChainImpl implements Chain {
 	//Group[] g = (Group[])tmp.toArray(new Group[tmp.size()]);
 	return tmp ;
     }
-    /** return all groups of this chain */
+    /** return all groups of this chain .
+     * @return an ArrayList object representing the Groups of this Chain.
+     */
     public ArrayList getGroups(){
 	return groups ;
     }
@@ -126,7 +152,7 @@ public class ChainImpl implements Chain {
     public String getName()           {	return name;  }
 	
 
-    /** string representation */
+    /** string representation. */
     public String toString(){
 	
 	String str = "Chain >"+getName() + "< total length:" + getLength() + " residues";
@@ -142,7 +168,9 @@ public class ChainImpl implements Chain {
 			
     }
 
-    /** get amino acid sequence */
+    /** get amino acid sequence.
+     * @return a String representing the sequence.	    
+     */
     public String getSequence(){
 	String str = "" ;
 	ArrayList gr = getGroups("amino");
@@ -151,7 +179,7 @@ public class ChainImpl implements Chain {
 	    
 	    str += a.getPDBName() ;
 	}
-	    
+
 	    
 
 	return str ;

@@ -25,9 +25,10 @@ package org.biojava.bio.structure;
 import  org.biojava.bio.structure.io.PDBParseException ;
 
 
-import java.util.HashMap ;
-import java.util.ArrayList ;
+import java.util.Map ;
+import java.util.List ;
 import java.util.Iterator ;
+
 
 /**
  *  
@@ -37,70 +38,111 @@ import java.util.Iterator ;
  * "amino","hetatm","nucleotide". There are corresponding classes for
  * each of this type which implement interface Group.
  * 
- * @see Hetatom
- * @see AminoAcid
- * @see Nucleotide
+ * @see HetatomImpl
+ * @see AminoAcidImpl
+ * @see NucleotideImpl
  */
 public interface Group {
     
 
-    /* returns and identical copy of this Group 
+    /* returns and identical copy of this Group .
        public Object clone() ;
     */
 
     /**
-     * return the PDBcode of this amino acid
+     * return the PDBcode of this group.
+     * @see #setPDBCode
+     * @return a String representing the PDBCode value
      */
     public String getPDBCode(); 
     
     /**
      * Specifies the PDBCode value.
+     *
+     * @param pdbcode  a String specifying the PDBCode value
+     * @see #getPDBCode     
      */    
     public void setPDBCode(String pdbcode);
 
    
-    /** getnumber of atoms */
+    /** getnumber of atoms.
+     *  @return number of atoms of this Group
+     */
     public int size();
 
     /**
      *  returns true or false, depending if this group has 3D coordinates or not.
+     *
+     * @return true if Group has 3D coordinates
      */
     public boolean has3D ();
     
-    /** flag if group has 3D data */
+    /** flag if group has 3D data .
+     *
+     * @param flag  true to set flag that this Group has 3D coordinates
+     */
     public void setPDBFlag(boolean flag);
     
     /** 
-     * get Type of group, e.g. amino, hetatom, nucleotide
+     * get Type of group, e.g. amino, hetatom, nucleotide.
      * 
+     *
+     * @return a String representing the type value     
      */
     public String getType();
 
-    /** add an atom to this group */
+    /** add an atom to this group.
+     *
+     * @param atom  an Atom object
+     */
     public void addAtom(Atom atom);
     
-    /** get list of atoms */
-    public ArrayList getAtoms() ;
+    /** get list of atoms.
+     *
+     * @return an List object representing the atoms 
+     */
+    public List getAtoms() ;
         
-    /** get an atom throws StructureException if atom not found*/
+    /** get an atom throws StructureException if atom not found.
+     *
+     * @param name  a String
+     * @return an Atom object
+     * @throws StructureException ...     
+     */
     public Atom getAtom(String name) throws StructureException;
     
-    /** get at atom by position */
+    /** get at atom by position.
+     *
+     * @param position  an int
+     * @return an Atom object
+     * @throws StructureException ...     
+     */
     public Atom getAtom(int position) throws StructureException;
 
-    /** returns flag whether a particular atom is existing within this group */
+    /** returns flag whether a particular atom is existing within this group .
+     *
+     * @param name  a String ...
+     * @return true if Atom with name is existing within this group
+     */
     public boolean hasAtom(String name);
     
-    /** set the PDB 3 character name for this group
+    /** set the PDB 3 character name for this group.
      * 
+     * @return a String representing the PDBName value
+     * @see #setPDBName
      */
     public String getPDBName();
 
-    /** get the PDB 3 character name for this group */
+    /** get the PDB 3 character name for this group.
+     *
+     * @param s  a String specifying the PDBName value
+     * @throws PDBParseException ...     
+     * @see #getPDBName
+     */
     public void setPDBName(String s) throws PDBParseException;
 
 
-    /** calculate if a groups has all atoms required for an amino acid
+    /** calculate if a groups has all atoms required for an amino acid.
 	this allows to include chemically modified amino acids that
 	are labeled hetatoms into some computations ... the usual way
 	to identify if a group is an amino acid is getType() !
@@ -118,30 +160,60 @@ public interface Group {
 	HETATM    4  O   MSE A   1      10.198  19.156   2.985  0.00  0.00           O
 	HETATM    5  CB  MSE A   1      10.407  19.441   0.088  0.00  0.00           C
 	</pre>
+	*
+	* @return true if all Atoms required for an AminoAcid are available (N, CA, C, O, CB)	
 	@see #getType
     */
     public boolean hasAminoAtoms() ;
 
 
 
-    /** properties of this amino acid. currerntly available properties
+    /** properties of this amino acid. currerntly available properties.
      * are:
      * phi
      * psi
      * 
+     *
+     * @param properties  a Map object specifying the properties value
+     * @see #getProperties
+	  
      */
 
-    public void setProperties(HashMap properties) ;
+    public void setProperties(Map properties) ;
     
-    /** return properties. @see setProperties() */
-    public HashMap getProperties() ;
+    /** return properties. 
+     * @see #setProperties
+     *
+     * @return a HashMap object representing the properties value
+     */
+    public Map getProperties() ;
 
-    /** set a single property */
+    /** set a single property .
+     *
+     * @param key    a String
+     * @param value  an Object
+     * @see #getProperty
+	  
+     */
     public void setProperty(String key, Object value) ;
-    /** get a single property */
+    
+    /** get a single property .
+     *
+     * @param key  a String
+     * @return an Object
+     * @see #setProperty
+     */
     public Object getProperty(String key) ;
 
-    /** get an Atom Iterator */
+    /** get an Atom Iterator.
+     *
+     * @return an Iterator object
+     */
     public Iterator iterator() ;
 
+
+    /** returns and identical copy of this Group object .
+     * @return  and identical copy of this Group object 
+     */
+    public Object clone();
 }

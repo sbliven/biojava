@@ -64,26 +64,56 @@ public class StructureImpl implements Structure {
 
     }
 
-    /* returns an identical copy of this structure 
-       public Object clone() {
+
+    /** returns an identical copy of this structure .
+     * @return an identical Structure object     
+     */
+    public Object clone() {
        
-       StructureImpl n = new StructureImpl();
-       // pfuuuh go through whole substructure and clone! 
-       
-       }
-    */
+	StructureImpl n = new StructureImpl();
+       // go through whole substructure and clone ...
+	
+	// copy structure data
+	if (isNmr()) n.setNmr(true);
+	
+	n.setPDBCode(getPDBCode());
+	n.setName(getName());
+	n.setHeader(getHeader());
+	n.setConnections(getConnections());
+	
+	// go through each chain and clone chain
+	for (int i=0;i<nrModels();i++){
+	    ArrayList cloned_model = new ArrayList();
+
+	    for (int j=0;j<size(i);j++){
+		//System.out.println("getting chain "+i+" "+j); 
+		Chain current_chain = (Chain) getChain(i,j); 
+		Chain cloned_chain  = (Chain) current_chain.clone();
+		
+		cloned_model.add(cloned_chain);
+	    }
+	    n.addModel(cloned_model);
+
+	}
+	return n ;
+    }
 
 
     /**
      *
-     * set PDB code of structure 
+     * set PDB code of structure .
+     * @see #getPDBCode
+     *
      */
     public void setPDBCode (String pdb_id_) {
 	pdb_id = pdb_id_ ;
     }
     /**
      *
-     * get PDB code of structure 
+     * get PDB code of structure .
+     * 
+     * @return a String representing the PDBCode value
+     * @see #setPDBCode
      */
     public String  getPDBCode () {
 	return pdb_id ;
@@ -91,32 +121,60 @@ public class StructureImpl implements Structure {
 	
 	
   
-    /** set biological name of Structure */
+    /** set biological name of Structure.
+     *
+     * @see #getName
+     *
+     */
     public void   setName(String nam) { name = nam; }
-    /** get biological name of Structure */
+
+    /** get biological name of Structure. 
+     *
+     * @return a String representing the name 
+     * @see #setName
+     */
     public String getName()           { return name;  }
     
-    /** set the Header data */
+    /** set the Header data.
+     *
+     *
+     * @see #getHeader
+     */
     public void    setHeader(Map h){ header = (HashMap) h;    }
-    /** get Header data */
+    /** get Header data.
+     *
+     * @return a Map object representing the header of the Structure
+     *
+     * @see #setHeader
+     */
     public Map getHeader()         { return header ;}
 
-    /** @see Structure interface */
+    /** @see Structure interface.
+     *
+     *
+
+     */
     public void      setConnections(List conns) { connections = (ArrayList)conns ; }
     /** 
      * Returns the connections value.
      *
      * @return a List object representing the connections value
-     @see Structure interface */
+     * @see Structure interface 
+     * @see #setConnections
+     */
     public List getConnections()                { return connections ;}
 
-    /** add a new chain */
+    /** add a new chain.
+     *
+     */
     public void addChain(Chain chain) {
 	int modelnr = 0 ;
 	addChain(chain,modelnr);
     }
 
-    /** add a new chain, if several models are available*/
+    /** add a new chain, if several models are available.
+     *
+     */
     public void addChain(Chain chain, int modelnr) {
 	// if model has not been initialized, init it!
 	if ( models.size() == 0  ) {
@@ -130,14 +188,23 @@ public class StructureImpl implements Structure {
 	}
     }
     
-    /** retrieve a chain by it's position within the Structure */
+    /** retrieve a chain by it's position within the Structure.
+     *
+     * @param number  an int
+     * @return a Chain object
+     */
     public Chain getChain(int number) {
 	// TODO Auto-generated method stub
 	int modelnr = 0 ;
 	return getChain(modelnr,number);
     }
 
-    /** retrieve a chain by it's position within the Structure and model number*/
+    /** retrieve a chain by it's position within the Structure and model number.
+     *
+     * @param modelnr  an int
+     * @param number   an int
+     * @return a Chain object
+     */
     public Chain getChain(int modelnr,int number) {
 	// TODO Auto-generated method stub
 	//System.out.println ("in get_chain "+modelnr+" "+number);
@@ -150,12 +217,16 @@ public class StructureImpl implements Structure {
     }
 
   
-    /** add a new model */
+    /** add a new model.
+     *
+     */
     public void addModel(List model){
 	models.add((ArrayList)model);
     }
 
-    /** string representation */
+    /** string representation.
+     *
+     */
     public String toString(){
 	String str = "structure "+name+ " " + pdb_id ;
 	if ( isNmr() ) str += " models: "+nrModels()+"\n" ;
@@ -185,7 +256,7 @@ public class StructureImpl implements Structure {
 	return str ;
     }
     
-    /** return number of chains , if NMR return number of chains of first model 
+    /** return number of chains , if NMR return number of chains of first model .
      * 
      */
     public int size() {
@@ -201,17 +272,19 @@ public class StructureImpl implements Structure {
 	return model.size() ; 
     } 
     
-    /** return number of chains  of model */
+    /** return number of chains  of model.
+     *
+     */
     public int size(int modelnr) { return getChains(modelnr).size();   }
 
     // some NMR stuff : 
 
-    /** return number of models */
+    /** return number of models. */
     public int nrModels() {
 	return models.size() ;
     }
 
-    /** is this structure an nmr strucutre ? 
+    /** is this structure an nmr structure ? 
      */
     public boolean isNmr() {return nmrflag ;  }
 
@@ -219,12 +292,20 @@ public class StructureImpl implements Structure {
     public void setNmr(boolean nmr) {	nmrflag = nmr ; }
     
 
-    /** retrieve all chains of a model*/
+    /** retrieve all chains of a model.
+     *
+     * @param modelnr  an int
+     * @return a List object     
+    */
     public List getChains(int modelnr){
 	return getModel(modelnr);
     }
 
-    /** retrieve all Chains belonging to a model */
+    /** retrieve all Chains belonging to a model .
+     *
+     * @param modelnr  an int
+     * @return a List object
+     */
     public List getModel(int modelnr) {
 
 	ArrayList model = (ArrayList)models.get(modelnr);		
@@ -234,7 +315,10 @@ public class StructureImpl implements Structure {
 
    
 
-    /** create a String that contains the contents of a PDB file */
+    /** create a String that contains the contents of a PDB file. 
+     *
+     * @return a String that represents the structure as a PDB file.
+     */
     public String toPDB() {
 	FileConvert f = new FileConvert(this) ;
 	
