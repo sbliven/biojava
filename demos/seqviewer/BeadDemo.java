@@ -42,7 +42,7 @@ import org.biojava.bio.symbol.RangeLocation;
  */
 public class BeadDemo
 {
-    private static final int INITIAL_SCALE = 25;
+    private static final int INITIAL_SCALE = 30;
 
     private JFrame      frame;
     private JButton     horiz;
@@ -69,7 +69,7 @@ public class BeadDemo
         horiz      = new JButton("Horizontal");
         vert       = new JButton("Vertical");
         scaleLabel = new JLabel("Scale");
-        scale      = new JSlider(SwingConstants.HORIZONTAL, 1, 50, INITIAL_SCALE);
+        scale      = new JSlider(SwingConstants.HORIZONTAL, 1, 100, INITIAL_SCALE);
         seqScroll  = new JScrollPane(seqPanel);
 
 	controlBox.add(Box.createHorizontalGlue());
@@ -156,14 +156,14 @@ public class BeadDemo
 		OptimizableFilter  rev =
 		    new FeatureFilter.StrandFilter(StrandedFeature.NEGATIVE);
 
-		// Green ellipse, Y-displacement 30
+		// Green ellipse, Y-displacement 22
                 EllipticalBeadRenderer erGreen =
-		    new EllipticalBeadRenderer(10.0f, 20.0f,
+		    new EllipticalBeadRenderer(10.0f, 21.0f,
 					       Color.black, Color.green,
 					       new BasicStroke(), 2.0f);
-		// Red ellipse, Y-displacement 30
+		// Red ellipse, Y-displacement 22
 		EllipticalBeadRenderer erRed =
-		    new EllipticalBeadRenderer(10.0f, 20.0f,
+		    new EllipticalBeadRenderer(10.0f, 22.0f,
 					       Color.black, Color.red,
 					       new BasicStroke(), 2.0f);
 
@@ -173,15 +173,15 @@ public class BeadDemo
 						Color.black, Color.white,
 						new BasicStroke());
 
-		// Blue rectangle, Y-displacement 10
+		// Blue rectangle, Y-displacement 11
 		RectangularBeadRenderer rrBlue =
-		    new RectangularBeadRenderer(10.0f, 10.0f,
+		    new RectangularBeadRenderer(10.0f, 11.0f,
 						Color.black, Color.blue,
 						new BasicStroke());
 
-		// Yellow rectangle, Y-displacement 10
+		// Yellow rectangle, Y-displacement 11
 		RectangularBeadRenderer rrYellow =
-		    new RectangularBeadRenderer(10.0f, 10.0f,
+		    new RectangularBeadRenderer(10.0f, 11.0f,
 						Color.black, Color.yellow,
 						new BasicStroke());
 
@@ -211,7 +211,7 @@ public class BeadDemo
                 multi.addRenderer(new FilteringRenderer(fbrCDS, cds, false));
 		multi.addRenderer(new FilteringRenderer(fbrRNA, mrna, false));
 		multi.addRenderer(other);
-                multi.addRenderer(new SymbolSequenceRenderer());
+                // multi.addRenderer(new SymbolSequenceRenderer());
                 multi.addRenderer(new RulerRenderer());
                 seqPanel.setRenderer(multi);
 	    }
