@@ -64,7 +64,11 @@ public class BlastXMLParserFacade
     // this is the SAX parser
     XMLReader parser;
 
-    private static class Resolver
+    // this is a default base URI so SAX does not complain
+    // when user doesn't give an absolute URI.
+    private String baseURI;
+
+    private class Resolver
         implements EntityResolver
     {
         public InputSource resolveEntity(String publicID, String systemID)
@@ -85,10 +89,13 @@ public class BlastXMLParserFacade
                 else if (publicID.equals("-//NCBI//NCBI BlastOutput Module//EN")) {
                     resourceName = resourceName + "NCBI_BlastOutput.mod";
                 }
+                else
+                    return null;
 
-                InputStream is = ClassTools.getClassLoader(Resolver.class).getResourceAsStream(resourceName);
+                InputSource is = new InputSource(this.getClass().getClassLoader().getResourceAsStream(resourceName));
+                is.setSystemId(baseURI);
 
-                return new InputSource(is);
+                return is;
         }
     }
 
@@ -112,6 +119,9 @@ public class BlastXMLParserFacade
             // namespaces must be true if the SAX2StAX parser isn't to fubar.
             parser.setFeature("http://xml.org/sax/features/namespaces", true);
             parser.setFeature("http://xml.org/sax/features/validation", false);
+
+            // make a base URI just in case the user doesn't
+            baseURI = this.getClass().getClassLoader().getResource("org/biojava/bio/program/sax/blastxml/").toString();
         }
         catch (SAXException se) { throw new BioException (se); }
         catch (ParserConfigurationException sce) { throw new BioException(sce); }
@@ -165,6 +175,8 @@ public class BlastXMLParserFacade
     public void parse(InputSource is)
         throws IOException, SAXException
     {
+        if (is.getSystemId() == null)
+            is.setSystemId(baseURI);
         parser.parse(is);
     }
 
