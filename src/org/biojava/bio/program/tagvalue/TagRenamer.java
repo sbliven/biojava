@@ -6,24 +6,20 @@ import org.biojava.utils.ParserException;
 import org.biojava.utils.SmallMap;
 
 public class TagRenamer extends TagValueWrapper {
-  private Map tags;
+  private TagMapper mapper;
   
-  public TagRenamer(TagValueListener delegate) {
+  public TagRenamer(TagValueListener delegate, TagMapper mapper) {
     super(delegate);
-    this.tags = new SmallMap();
+    this.mapper = mapper;
   }
   
-  public void setNewTag(Object oldTag, Object newTag) {
-    tags.put(oldTag, newTag);
-  }
-  
-  public Object getNewTag(Object oldTag) {
-    return tags.get(oldTag);
+  public TagMapper getMapper() {
+    return mapper;
   }
   
   public void startTag(Object tag)
   throws ParserException {
-    Object newTag = getNewTag(tag);
+    Object newTag = mapper.getNewTag(tag);
     if(newTag != null) {
       tag = newTag;
     }

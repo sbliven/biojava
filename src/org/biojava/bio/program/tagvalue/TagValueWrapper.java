@@ -17,12 +17,12 @@ public abstract class TagValueWrapper
   }
   
   public void startRecord()
-  {
+  throws ParserException {
     delegate.startRecord();
   }
   
   public void endRecord()
-  {
+  throws ParserException {
     delegate.endRecord();
   }
   
