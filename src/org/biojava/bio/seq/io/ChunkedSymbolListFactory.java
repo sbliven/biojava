@@ -94,7 +94,7 @@ import org.biojava.utils.*;
  *
  * @author David Huen
  */
-public class ChunkedSymbolListFactory implements Serializable
+public class ChunkedSymbolListFactory
 {
     /**
      * operating mode
@@ -117,16 +117,16 @@ public class ChunkedSymbolListFactory implements Serializable
     private int threshold = 1<<20;
 
     // cached info for speedups
-    private int currentMin = Integer.MAX_VALUE;
-    private int currentMax = Integer.MIN_VALUE;
-    private SymbolList currentChunk = null;
+    private static int currentMin = Integer.MAX_VALUE;
+    private static int currentMax = Integer.MIN_VALUE;
+    private static SymbolList currentChunk = null;
 
 
     // interlocks
     // you can only use symbolAt() or make(), not both.
     private boolean canDoMake = true;
 
-    private class ChunkedSymbolList extends AbstractSymbolList implements Serializable
+    private static class ChunkedSymbolList extends AbstractSymbolList implements Serializable
     {
         private SymbolList [] chunks;
         private final int chunkSize;
