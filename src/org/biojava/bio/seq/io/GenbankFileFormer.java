@@ -49,6 +49,13 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 {
     private PrintStream stream;
 
+    // Main sequence formatting buffer
+    private StringBuffer sq = new StringBuffer();
+    // Main qualifier formatting buffer
+    private StringBuffer qb = new StringBuffer();
+    // Utility formatting buffer
+    private StringBuffer ub = new StringBuffer();
+
     static
     {
 	SeqFileFormerFactory.addFactory("Genbank", new GenbankFileFormer.Factory());
@@ -136,7 +143,8 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	// Get separator for system
 	String nl = System.getProperty("line.separator");
 
-	StringBuffer sq = new StringBuffer("BASE COUNT    ");
+	sq.delete(0, sq.length());
+	sq.append("BASE COUNT    ");
 	sq.append(aCount + " a ");
 	sq.append(aCount + " c ");
 	sq.append(aCount + " g ");
@@ -146,7 +154,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	sq.append(nl);
 
 	// Print sequence summary header
-	stream.println(sq.toString());
+	stream.println(sq);
 
 	int fullLine = syms.length / 60;
 	int partLine = syms.length % 60;
@@ -163,14 +171,18 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 
 	for (int i = 0; i < lineLens.length; i++)
 	{
+	    // Empty the primary buffer
+	    sq.delete(0, sq.length());
+	    // Empty the secondary buffer
+	    ub.delete(0, ub.length());
+
 	    // How long is this chunk?
 	    int len = lineLens[i];
 
 	    // Prepare line 80 characters wide
-	    StringBuffer sb   = new StringBuffer(80);
 	    char [] emptyLine = new char [80];
 	    Arrays.fill(emptyLine, ' ');
-	    sb.append(emptyLine);
+	    sq.append(emptyLine);
 
 	    // Prepare a Symbol array same length as chunk
 	    Symbol [] sa = new Symbol [len];
@@ -178,18 +190,16 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	    // Get symbols and format into blocks of tokens
 	    System.arraycopy(syms, (i * 60), sa, 0, len);
 
-	    String blocks = (formatTokenBlock(new StringBuffer(sa.length),
-					      sa,
-					      10)).toString();
+	    String blocks = (formatTokenBlock(ub, sa, 10)).toString();
 
-	    sb.replace(10, blocks.length() + 10, blocks);
+	    sq.replace(10, blocks.length() + 10, blocks);
 
 	    // Calculate the running residue count and add to the line
 	    String count = Integer.toString((i * 60) + 1);
-	    sb.replace((9 - count.length()), 9, count);
+	    sq.replace((9 - count.length()), 9, count);
 
 	    // Print formatted sequence line
-	    stream.println(sb);
+	    stream.println(sq);
 	}
 
 	// Print end of entry
@@ -202,12 +212,13 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     {
 	if (key.equals(GenbankProcessor.PROPERTY_GENBANK_ACCESSIONS))
 	{
-	    StringBuffer sb = new StringBuffer("ACCESSION   ");
+	    ub.delete(0, ub.length());
+	    ub.append("ACCESSION   ");
 	    for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
 	    {
-		sb.append((String) ai.next());
+		ub.append((String) ai.next());
 	    }
-	    stream.println(sb);
+	    stream.println(ub);
 	}
     }
 
@@ -221,7 +232,10 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	if (templ instanceof StrandedFeature.Template)
 	    strand = ((StrandedFeature.Template) templ).strand.getValue();
 
-	StringBuffer lb = formatLocationBlock(new StringBuffer(leader),
+	ub.delete(0, ub.length());
+	ub.append(leader);
+
+	StringBuffer lb = formatLocationBlock(ub,
 					      templ.location,
 					      strand,
 					      leader,
@@ -250,20 +264,24 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	{
 	    for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
 	    {
-		StringBuffer sb = formatQualifierBlock(new StringBuffer(),
-						       formatQualifier(key, vi.next()),
+		qb.delete(0, qb.length());
+		ub.delete(0, ub.length());
+		StringBuffer fb = formatQualifierBlock(qb,
+						       formatQualifier(ub, key, vi.next()).toString(),
 						       leader,
 						       80);
-		stream.println(sb);
+		stream.println(fb);
 	    }
 	}
 	else
 	{
-	    StringBuffer sb = formatQualifierBlock(new StringBuffer(),
-						   formatQualifier(key, value),
+	    qb.delete(0, qb.length());
+	    ub.delete(0, ub.length());
+	    StringBuffer fb = formatQualifierBlock(qb,
+						   formatQualifier(ub, key, value).toString(),
 						   leader,
 						   80);
-	    stream.println(sb);
+	    stream.println(fb);
 	}
     }
 }

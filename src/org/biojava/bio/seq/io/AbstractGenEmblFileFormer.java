@@ -101,49 +101,8 @@ class AbstractGenEmblFileFormer
     private static final int      FUZZY_POINT = 3;
     private static final int BETWEEN_LOCATION = 4;
 
-    /**
-     * <code>formatLocation</code> creates an EMBL/Genbank style
-     * representation of a <code>Location</code>. Supported location
-     * forms:
-     *     
-     * <pre>
-     *   123
-     *  <123 or >123
-     *  (123.567)
-     *  (123.567)..789
-     *   123..(567.789)
-     *  (123.345)..(567.789)
-     *   123..456
-     *  <123..567 or 123..>567 or <123..>567
-     *   123^567
-     * </pre>
-     *
-     * Specifically not supported is:
-     * <pre>
-     *   AL123465:(123..567)
-     * </pre>
-     *
-     * Use of 'order' rather than 'join' is not retained over a
-     * read/write cycle. i.e. 'order' is converted to 'join'.
-     *
-     * @param loc a <code>Location</code> to format.
-     * @param strand a <code>StrandedFeature.Strand</code> object
-     * indicating the <code>Location</code>'s strand.
-     * @return a <code>String</code> value.
-     */
-    public String formatLocation(final Location               loc,
-				 final StrandedFeature.Strand strand)
-    {
-	// Using arbitrary leader and wrapwidth wide enough to always
-	// make one line
-	StringBuffer sb = formatLocationBlock(new StringBuffer(),
-					      loc,
-					      strand.getValue(),
-					      "",
-					      Integer.MAX_VALUE);
-
-	return sb.toString();
-    }
+    // Utility formatting buffer
+    private StringBuffer ub = new StringBuffer();
 
     /**
      * <code>formatQualifierBlock</code> formats text into
@@ -255,9 +214,9 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>String</code> bounded by the correct tokens.
      */
-    String formatQualifier(final Object key, final Object value)
+    StringBuffer formatQualifier(final StringBuffer sb, final Object key, final Object value)
     {
-	StringBuffer sb = new StringBuffer("/" + key);
+	sb.append("/" + key);
 
 	// Default is to quote unknown qualifiers
 	String form = "quoted";
@@ -279,7 +238,7 @@ class AbstractGenEmblFileFormer
 	    sb.append("=" + value);
 	}
 
-        return sb.toString();
+        return sb;
     }
 
     /**
@@ -305,6 +264,75 @@ class AbstractGenEmblFileFormer
 		sb.append(' ');
 	}
 	return sb;
+    }
+
+    /**
+     * <code>formatLocation</code> creates an EMBL/Genbank style
+     * representation of a <code>Location</code>. This is a
+     * convenience method only. The version which has a
+     * <code>StringBuffer</code> parameter (and returns the
+     * <code>StringBuffer</code>) is preferred.
+     *
+     * @param loc a <code>Location</code> to format.
+     * @param strand a <code>StrandedFeature.Strand</code> object
+     * indicating the <code>Location</code>'s strand.
+     *
+     * @return a <code>StringBuffer</code> value.
+     */
+    public String formatLocation(final Location               loc,
+				 final StrandedFeature.Strand strand)
+    {
+	// Using arbitrary leader and wrapwidth wide enough to always
+	// make one line
+	StringBuffer sb = formatLocationBlock(new StringBuffer(),
+					      loc,
+					      strand.getValue(),
+					      "",
+					      Integer.MAX_VALUE);
+
+	return sb.toString();
+    }
+
+    /**
+     * <code>formatLocation</code> creates an EMBL/Genbank style
+     * representation of a <code>Location</code>. Supported location
+     * forms:
+     *     
+     * <pre>
+     *   123
+     *  <123 or >123
+     *  (123.567)
+     *  (123.567)..789
+     *   123..(567.789)
+     *  (123.345)..(567.789)
+     *   123..456
+     *  <123..567 or 123..>567 or <123..>567
+     *  123^567
+     * </pre>
+     *
+     * Specifically not supported is:
+     * <pre>
+     *   AL123465:(123..567)
+     * </pre>
+     *
+     * Use of 'order' rather than 'join' is not retained over a
+     * read/write cycle. i.e. 'order' is converted to 'join'.
+     *
+     * @param sb a <code>StringBuffer</code to which the location will
+     * be appended.
+     * @param loc a <code>Location</code> to format.
+     * @param strand a <code>StrandedFeature.Strand</code> object
+     * indicating the <code>Location</code>'s strand.
+     *
+     * @return a <code>StringBuffer</code> value.
+     */
+    public StringBuffer formatLocation(final StringBuffer           sb,
+				       final Location               loc,
+				       final StrandedFeature.Strand strand)
+    {
+	// Using arbitrary leader and wrapwidth wide enough to always
+	// make one line
+	return formatLocationBlock(sb, loc, strand.getValue(), "", Integer.MAX_VALUE);
     }
 
     /**
@@ -389,43 +417,44 @@ class AbstractGenEmblFileFormer
 	    else
 		locType = RANGE;
 
+	    ub.delete(0, ub.length());
 	    switch (locType)
 	    {
 		case POINT:
 		    PointLocation pl = (PointLocation) thisLoc;
 
-		    sb.append(complement                    ?
-			      toComplement(formatPoint(pl)) :
-			      formatPoint(pl));
+		    sb.append(complement                                   ?
+			      toComplement(formatPoint(ub, pl).toString()) :
+			      formatPoint(ub, pl).toString());
 		    break;
 
 		case FUZZY_RANGE:
 		    FuzzyLocation fl = (FuzzyLocation) thisLoc;
 
-		    sb.append(complement                         ?
-			      toComplement(formatFuzzyRange(fl)) :
-			      formatFuzzyRange(fl));
+		    sb.append(complement                                        ?
+			      toComplement(formatFuzzyRange(ub, fl).toString()) :
+			      formatFuzzyRange(ub, fl).toString());
 		    break;
 
 		case FUZZY_POINT:
 		    FuzzyPointLocation fpl = (FuzzyPointLocation) thisLoc;
 
-		    sb.append(complement                          ?
-			      toComplement(formatFuzzyPoint(fpl)) :
-			      formatFuzzyPoint(fpl));
+		    sb.append(complement                                         ?
+			      toComplement(formatFuzzyPoint(ub, fpl).toString()) :
+			      formatFuzzyPoint(ub, fpl).toString());
 		    break;
 
 		case RANGE:
 		    RangeLocation rl = (RangeLocation) thisLoc;
 
-		    sb.append(complement                    ?
-			      toComplement(formatRange(rl)) :
-			      formatRange(rl));
+		    sb.append(complement                                   ?
+			      toComplement(formatRange(ub, rl).toString()) :
+			      formatRange(ub, rl).toString());
 		    break;
 
 		case BETWEEN_LOCATION:
 		    BetweenLocation tempLocation = (BetweenLocation) thisLoc;
-		    String formattedLocation = formatBetween(tempLocation);
+		    String formattedLocation = formatBetween(ub, tempLocation).toString();
 		    if (complement)
 		    {
 			formattedLocation = toComplement(formattedLocation);
@@ -480,138 +509,137 @@ class AbstractGenEmblFileFormer
      * <code>formatFuzzyRange</code> creates an EMBL/Genbank style
      * String representation of a <code>FuzzyLocation</code>.
      *
+     * @param sb a <code>StringBuffer</code> to format the location into.
      * @param fl a <code>FuzzyLocation</code> object.
      *
      * @return a <code>String</code> representation of the location.
      */
-    private String formatFuzzyRange(final FuzzyLocation fl)
+    private StringBuffer formatFuzzyRange(final StringBuffer sb, final FuzzyLocation fl)
     {
-	StringBuffer fb = new StringBuffer();
-
 	if (! fl.hasBoundedMin())
 	{
 	    // <123
-	    fb.append("<");
-	    fb.append(fl.getMin());
+	    sb.append("<");
+	    sb.append(fl.getMin());
 	}
 	else if (fl.getOuterMin() != fl.getInnerMin())
 	{
 	    // (123.567)
-	    fb.append("(" + fl.getOuterMin());
-	    fb.append(".");
-	    fb.append(fl.getInnerMin() + ")");
+	    sb.append("(" + fl.getOuterMin());
+	    sb.append(".");
+	    sb.append(fl.getInnerMin() + ")");
 	}
 	else
 	{
 	    // 123
-	    fb.append(fl.getMin());
+	    sb.append(fl.getMin());
 	}
 
-	fb.append("..");
+	sb.append("..");
 
 	if (! fl.hasBoundedMax())
 	{
 	    // >567
-	    fb.append(">");
-	    fb.append(fl.getMax());
+	    sb.append(">");
+	    sb.append(fl.getMax());
 	}
 	else if (fl.getInnerMax() != fl.getOuterMax())
 	{
 	    // (567.789)
-	    fb.append("(" + fl.getInnerMax());
-	    fb.append(".");
-	    fb.append(fl.getOuterMax() + ")");
+	    sb.append("(" + fl.getInnerMax());
+	    sb.append(".");
+	    sb.append(fl.getOuterMax() + ")");
 	}
 	else
 	{
 	    // 567
-	    fb.append(fl.getMax());
+	    sb.append(fl.getMax());
 	}
 
-	return fb.toString();
+	return sb;
     }
 
     /**
      * <code>formatFuzzyPoint</code> creates an EMBL/Genbank style
      * String representation of a <code>FuzzyPointLocation</code>.
      *
+     * @param sb a <code>StringBuffer</code> to format the location into.
      * @param fpl a <code>FuzzyPointLocation</code> object.
      *
      * @return a <code>String</code> representation of the location.
      */
-    private String formatFuzzyPoint(final FuzzyPointLocation fpl)
+    private StringBuffer formatFuzzyPoint(final StringBuffer sb, final FuzzyPointLocation fpl)
     {
-	StringBuffer fb = new StringBuffer();
-
 	if (! fpl.hasBoundedMin())
 	{
 	    // <123
-	    fb.append("<");
-	    fb.append(fpl.getMax());
+	    sb.append("<");
+	    sb.append(fpl.getMax());
 	}
 	else if (! fpl.hasBoundedMax())
 	{
 	    // >567
-	    fb.append(">");
-	    fb.append(fpl.getMin());
+	    sb.append(">");
+	    sb.append(fpl.getMin());
 	}
 	else
 	{
 	    // (567.789)
-	    fb.append("(" + fpl.getMin());
-	    fb.append(".");
-	    fb.append(fpl.getMax() + ")");
+	    sb.append("(" + fpl.getMin());
+	    sb.append(".");
+	    sb.append(fpl.getMax() + ")");
 	}
 
-	return fb.toString();
+	return sb;
     }
 
     /**
      * <code>formatRange</code> creates an EMBL/Genbank style String
      * representation of a <code>RangeLocation</code>.
      *
+     * @param sb a <code>StringBuffer</code> to format the location into.
      * @param rl a <code>RangeLocation</code> object.
      *
      * @return a <code>String</code> representation of the location.
      */
-    private String formatRange(final RangeLocation rl)
+    private StringBuffer formatRange(final StringBuffer sb, final RangeLocation rl)
     {
-	StringBuffer fb = new StringBuffer();
-
 	// 123..567
-	fb.append(rl.getMin());
-	fb.append("..");
-	fb.append(rl.getMax());
+	sb.append(rl.getMin());
+	sb.append("..");
+	sb.append(rl.getMax());
 
-	return fb.toString();
+	return sb;
     }
 
     /**
      * <code>formatPoint</code> creates an EMBL/Genbank style String
      * representation of a <code>PointLocation</code>.
      *
+     * @param sb a <code>StringBuffer</code> to format the location into.
      * @param pl a <code>PointLocation</code> object.
      *
      * @return a <code>String</code> representation of the location.
      */
-    private String formatPoint(final PointLocation pl)
+    private StringBuffer formatPoint(final StringBuffer sb, final PointLocation pl)
     {
-	return Integer.toString(pl.getMin());
+	sb.append(Integer.toString(pl.getMin()));
+	return sb;
     }
 
     /**
      * Formats a between location x y into x^y.
      *
+     * @param sb a <code>StringBuffer</code> to format the location into.
      * @param theLocation The between location object to be formatted
      * @return A string representation of the location
      */
-    private String formatBetween(final BetweenLocation theLocation)
+    private StringBuffer formatBetween(final StringBuffer sb, final BetweenLocation theLocation)
     {
-	StringBuffer formattedLocation = new StringBuffer();
-	formattedLocation.append(theLocation.getMin());
-	formattedLocation.append('^');
-	formattedLocation.append(theLocation.getMax());
-	return formattedLocation.toString();
+	sb.append(theLocation.getMin());
+	sb.append('^');
+	sb.append(theLocation.getMax());
+	return sb;
     }
 
     /**

@@ -48,8 +48,15 @@ import org.biojava.bio.symbol.Symbol;
 public class EmblFileFormer extends AbstractGenEmblFileFormer
     implements SeqFileFormer
 {
-    private ArrayList   fStack = new ArrayList();
-    private PrintStream stream;
+    private ArrayList    fStack = new ArrayList();
+    private PrintStream  stream;
+
+    // Main sequence formatting buffer
+    private StringBuffer sq = new StringBuffer();
+    // Main qualifier formatting buffer
+    private StringBuffer qb = new StringBuffer();
+    // Utility formatting buffer
+    private StringBuffer ub = new StringBuffer();
 
     static
     {
@@ -138,7 +145,8 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 	// Get separator for system
 	String nl = System.getProperty("line.separator");
 
-        StringBuffer sq = new StringBuffer("XX");
+	sq.delete(0, sq.length());
+        sq.append("XX");
 	sq.append(nl);
 	sq.append("SQ   Sequence ");
         sq.append(length + " BP; ");
@@ -149,7 +157,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         sq.append(oCount + " other;");
 
         // Print sequence summary header
-        stream.println(sq.toString());
+        stream.println(sq);
 
         int fullLine = syms.length / 60;
         int partLine = syms.length % 60;
@@ -166,14 +174,18 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 
         for (int i = 0; i < lineLens.length; i++)
         {
+	    // Empty the primary buffer
+	    sq.delete(0, sq.length());
+	    // Empty the secondary buffer
+	    ub.delete(0, ub.length());
+	    
             // How long is this chunk?
             int len = lineLens[i];
 
             // Prepare line 80 characters wide
-            StringBuffer sb   = new StringBuffer(80);
             char [] emptyLine = new char [80];
             Arrays.fill(emptyLine, ' ');
-            sb.append(emptyLine);
+            sq.append(emptyLine);
 
             // Prepare a Symbol array same length as chunk
             Symbol [] sa = new Symbol [len];
@@ -181,18 +193,16 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
             // Get symbols and format into blocks of tokens
             System.arraycopy(syms, (i * 60), sa, 0, len);
 
-            String blocks = (formatTokenBlock(new StringBuffer(sa.length),
-					      sa,
-					      10)).toString();
+            String blocks = (formatTokenBlock(ub, sa, 10)).toString();
 
-            sb.replace(5, blocks.length() + 5, blocks);
+            sq.replace(5, blocks.length() + 5, blocks);
 
             // Calculate the running residue count and add to the line
             String count = Integer.toString((i * 60) + len);
-            sb.replace((80 - count.length()), 80, count);
+            sq.replace((80 - count.length()), 80, count);
 
             // Print formatted sequence line
-            stream.println(sb);
+            stream.println(sq);
         }
 
         // Print end of entry
@@ -204,13 +214,14 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     {
         if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
         {
-            StringBuffer sb = new StringBuffer("AC   ");
+	    ub.delete(0, ub.length());
+            ub.append("AC   ");
             for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
             {
-                sb.append((String) ai.next());
-                sb.append(";");
+                ub.append((String) ai.next());
+                ub.append(";");
             }
-            stream.println(sb);
+            stream.println(ub);
         }
     }
 
@@ -224,7 +235,10 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         if (templ instanceof StrandedFeature.Template)
             strand = ((StrandedFeature.Template) templ).strand.getValue();
 
-        StringBuffer lb = formatLocationBlock(new StringBuffer(leader),
+	ub.delete(0, ub.length());
+	ub.append(leader);
+
+        StringBuffer lb = formatLocationBlock(ub,
 					      templ.location,
 					      strand,
 					      leader,
@@ -253,21 +267,24 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         {
             for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
             {
-		StringBuffer sb = formatQualifierBlock(new StringBuffer(),
-						       formatQualifier(key, vi.next()),
+		qb.delete(0, qb.length());
+		ub.delete(0, ub.length());
+		StringBuffer fb = formatQualifierBlock(qb,
+						       formatQualifier(ub, key, vi.next()).toString(),
 						       leader,
 						       80);
-
-		stream.println(sb);
+		stream.println(fb);
             }
         }
         else
         {
-	    StringBuffer sb =formatQualifierBlock(new StringBuffer(),
-						  formatQualifier(key, value),
-						  leader,
-						  80);
-	    stream.println(sb);
+	    qb.delete(0, qb.length());
+	    ub.delete(0, ub.length());
+	    StringBuffer fb = formatQualifierBlock(qb,
+						   formatQualifier(ub, key, value).toString(),
+						   leader,
+						   80);
+	    stream.println(fb);
         }
     }
 }

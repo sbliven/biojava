@@ -64,14 +64,19 @@ public interface SeqFileFormer extends SeqIOListener
      * a <code>Location</code>. The strand may not be relevant for all
      * formats (e.g. it is relevant for Genbank and EMBL, but not for
      * SwissProt). In such cases the implementation may accept a
-     * strand of 'unknown', '0' or '.'.
+     * strand of 'unknown', '0' or '.'. A <code>StringBuffer</code> is
+     * used to allow avoidance of expensive <code>String</code>
+     * manipulations on (potentially very large numbers of) locations.
      *
+     * @param sb a <code>StringBuffer</code> to append the location
+     * to.
      * @param loc a <code>Location</code> to format.
      * @param strand a <code>StrandedFeature.Strand</code> indicating
      * any relevant strandedness.
      *
-     * @return a <code>String</code> representation.
+     * @return a <code>StringBuffer</code> with the location appended.
      */
-    public String formatLocation(final Location               loc,
-				 final StrandedFeature.Strand strand);
+    public StringBuffer formatLocation(final StringBuffer           sb,
+				       final Location               loc,
+				       final StrandedFeature.Strand strand);
 }

@@ -1,0 +1,188 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+package org.biojava.bio.gui.sequence;
+
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+
+/**
+ * <code>EllipticalBeadRenderer</code> renders features as
+ * simple ellipses. Their outline and fill <code>Paint</code>,
+ * <code>Stroke</code>, feature depth, Y-axis displacement are
+ * configurable. Also configurable is the maximum ratio of long axis
+ * to short axis of the ellipse - this prevents long features also
+ * becoming ever wider and obscuring neighbours.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @since 1.2
+ */
+public class EllipticalBeadRenderer extends AbstractBeadRenderer
+    implements FeatureRenderer
+{
+    public static final ChangeType RATIO =
+	new ChangeType("The shape of the features has changed",
+		       "org.biojava.bio.gui.sequence.EllipticalBeadRenderer",
+		       "RATIO", SequenceRenderContext.LAYOUT);
+
+    protected double dimensionRatio;
+
+    /**
+     * Creates a new <code>EllipticalBeadRenderer</code> object
+     * with the default settings.
+      */
+    public EllipticalBeadRenderer()
+    {
+	super();
+	dimensionRatio = 2.0f;
+    }
+
+    /**
+     * Creates a new <code>EllipticalBeadRenderer</code> object.
+     *
+     * @param beadDepth a <code>double</code> value.
+     * @param beadDisplacement a <code>double</code> value.
+     * @param beadOutline a <code>Paint</code> object.
+     * @param beadFill a <code>Paint</code> object.
+     * @param beadStroke a <code>Stroke</code> object.
+     * @param dimensionRatio a <code>double</code> value.
+     */
+    public EllipticalBeadRenderer(double beadDepth,
+				  double beadDisplacement,
+				  Paint  beadOutline,
+				  Paint  beadFill,
+				  Stroke beadStroke,
+				  double dimensionRatio)
+    {
+	super(beadDepth, beadDisplacement, beadOutline, beadFill, beadStroke);
+	dimensionRatio = 2.0f;
+    }
+
+    /**
+     * <code>renderBead</code> renders features as simple ellipse.
+     *
+     * @param g a <code>Graphics2D</code> context.
+     * @param f a <code>Feature</code> to render.
+     * @param context a <code>SequenceRenderContext</code> context.
+     */
+    protected void renderBead(final Graphics2D            g,
+			      final Feature               f,
+			      final SequenceRenderContext context)
+    {
+	Location loc = f.getLocation();
+
+	float min = (float) context.sequenceToGraphics(loc.getMin());
+	float max = (float) context.sequenceToGraphics(loc.getMax());
+
+	Shape shape;
+
+	if (context.getDirection() == context.HORIZONTAL)
+	{
+	    float  posXW = min;
+	    float  posYN = (float) beadDisplacement;
+	    float  width = max - posXW + 1.0f;
+	    float height = Math.min((float) beadDepth, width / 2.0f);
+
+	    // If the bead height occupies less than the full height
+	    // of the renderer, move it down so that it is central
+	    if (height < beadDepth)
+		posYN += ((beadDepth - height) / dimensionRatio);
+
+	    shape = new Ellipse2D.Float(posXW, posYN, width, height);
+	}
+	else
+	{
+	    float  posXW = (float) beadDisplacement;
+	    float  posYN = min;
+	    float height = max - posYN + 1.0f;
+	    float  width = Math.min((float) beadDepth, height / 2.0f);
+
+	    if (width < beadDepth)
+		posXW += ((beadDepth - height) /  dimensionRatio);
+
+	    shape = new Ellipse2D.Float(posXW, posYN, width, height);
+	}
+
+	g.setPaint(beadOutline);
+	g.fill(shape);
+
+	g.setStroke(beadStroke);
+	g.setPaint(beadFill);
+	g.draw(shape);
+    }
+
+    /**
+     * <code>getDimensionRatio</code> returns the maximum ratio of
+     * long dimension to short dimension of the bead. This should be
+     * equal, or greater than 1.
+     *
+     * @return a <code>double</code> value.
+     */
+    public double getDimensionRatio()
+    {
+	return dimensionRatio;
+    }
+
+    /**
+     * <code>setDimensionRatio</code> sets the maximum ratio of
+     * long dimension to short dimension of the bead. This should be
+     * equal, or greater than 1.
+     *
+     * @param depth a <code>double</code> value.
+     *
+     * @exception ChangeVetoException if an error occurs.
+     */
+    public void setDimensionRatio(final double ratio) throws ChangeVetoException
+    {
+	if (ratio < 1.0f)
+	    throw new ChangeVetoException("The long dimension may not be less than the short dimension (ratio >= 1.0)");
+
+	if (hasListeners())
+	{
+	    ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+	    synchronized(cs)
+	    {
+		ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
+						 null, null,
+						 new ChangeEvent(this, RATIO,
+								 new Double(dimensionRatio),
+								 new Double(ratio)));
+		cs.firePreChangeEvent(ce);
+		dimensionRatio= ratio;
+		cs.firePostChangeEvent(ce);
+	    }
+	}
+	else
+	{
+	    dimensionRatio = ratio;
+	}
+    }
+}

@@ -75,7 +75,7 @@ Changeable {
   private RangeLocation range;
   private int direction;
   private double scale;
-    private double pixelOffset;
+  private double pixelOffset;
   
   private SequenceRenderContext.Border leadingBorder;
   private SequenceRenderContext.Border trailingBorder;
