@@ -431,6 +431,36 @@ class AbstractGenEmblFileFormer
      * representation of a <code>Location</code> wrapped to a specific
      * width.
      *
+     * If a compound location is formatted using this method, it is returned as
+     * a join-type location rather than an order-type.
+     *
+     * To preserve the join/order distinction; and to format locations like
+     * AL123465:(123..567), use the formatLocation(Feature) method.
+	 *
+     * @param loc a <code>Location</code> to use as a template.
+     * @param strand an <code>int</code> indicating the
+     * <code>Location</code>'s strand.
+     * @param leader a <code>String</code> to append to the start of
+     * each line.
+     * @param wrapWidth an <code>int</code> indicating the number of
+     * columns per line.
+     *
+     * @return a <code>StringBuffer</code>.
+     */
+    StringBuffer formatLocationBlock(final StringBuffer sb,
+				     final Location     loc,
+				     final int          strand,
+				     final String       leader,
+				     final int          wrapWidth)
+    {
+		return this.formatLocationBlock(sb, loc, strand, leader, wrapWidth, "join");
+	}
+
+    /**
+     * <code>formatLocationBlock</code> creates an EMBL/Genbank style
+     * representation of a <code>Location</code> wrapped to a specific
+     * width.
+     *
      * @param loc a <code>Location</code> to use as a template.
      * @param strand an <code>int</code> indicating the
      * <code>Location</code>'s strand.
