@@ -20,10 +20,13 @@
  */
 
 
-package org.biojava.bio.symbol;
+package org.biojava.bio.seq.io;
 
 import java.util.*;
 import java.io.*;
+
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A parser that uses a fixed width window of characters to look up the
@@ -33,6 +36,7 @@ import java.io.*;
  * each substring will be converted into a Symbol object.
  *
  * @author Matthew Pocock
+ * @author Thomas Down (StreamParser)
  */
 public class FixedWidthParser implements SymbolParser, Serializable {
   /**
@@ -94,4 +98,84 @@ public class FixedWidthParser implements SymbolParser, Serializable {
     this.alpha = alpha;
     this.tokenLength = tokenLength;
   }
+
+    public StreamParser parseStream(SeqIOListener l) {
+	return new FWStreamParser(l);
+    }
+
+    /**
+     * Simple but (hopefully) reliable stream parser for fixed width tokens.
+     * This creates strings for each token, so there will be quite a lot of
+     * object churn.  But it's only worth optimizing this if it's receiving
+     * a lot of use.
+     *
+     * @author Thomas Down
+     */
+
+    private class FWStreamParser implements StreamParser {
+	private SeqIOListener listener;
+	private char[] leftOver;
+	private char leftOverLen;
+	private Symbol[] buffer;
+
+	{
+	    buffer = new Symbol[256];
+	}
+
+	public FWStreamParser(SeqIOListener l) {
+	    listener = l;
+	    leftOver = new char[tokenLength];
+	    leftOverLen = 0;
+	}
+
+	public void characters(char[] data, int pos, int len)
+	    throws IllegalSymbolException
+	{
+	    int i = 0;
+	    int bi = 0;
+
+	    if (leftOverLen > 0) {
+		while (leftOverLen < tokenLength && i < len) {
+		    leftOver[leftOverLen++] = data[pos + (i++)];
+		}
+		if (leftOverLen == tokenLength) {
+		    buffer[bi++] = parseToken(new String(leftOver));
+		    leftOverLen = 0;
+		}
+	    }
+
+	    while (len - i >= tokenLength && bi < buffer.length) {
+		buffer[bi++] = parseToken(new String(data, pos + i, tokenLength));
+		i += tokenLength;
+	    } 
+	    if (bi > 0) {
+		try {
+		    listener.addSymbols(getAlphabet(), buffer, 0, bi);
+		} catch (IllegalAlphabetException ex) {
+		    throw new BioError(ex);
+		}
+	    }
+
+	    if (len - i >= tokenLength) {
+		// More complete tokens -- let's go
+		characters(data, pos + i, len - i);
+		return;
+	    }
+
+	    // If there's a partial token at the end of the block, cache it
+	    // away for next time.
+
+	    while (len - i > 0) {
+		leftOver[leftOverLen++] = data[pos + (i++)];
+	    }
+	}
+
+	public void close()
+	    throws IllegalSymbolException
+	{
+	    if (leftOverLen > 0) {
+		throw new IllegalSymbolException("FixedWidth stream parser has " + leftOverLen + " orphan characters at end of stream");
+	    }
+	}
+    }
 }

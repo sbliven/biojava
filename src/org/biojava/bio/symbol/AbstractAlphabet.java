@@ -25,6 +25,7 @@ package org.biojava.bio.symbol;
 import java.util.*;
 
 import org.biojava.utils.*;
+import org.biojava.bio.seq.io.*;
 
 /**
  * An abstract implementation of Alphabet.

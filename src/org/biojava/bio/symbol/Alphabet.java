@@ -28,6 +28,7 @@ import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 
 /**
  * The set of AtomicSymbols which can be concatanated together to make a

@@ -27,6 +27,7 @@ import java.io.*;
 import java.lang.reflect.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.utils.*;
 
 /**

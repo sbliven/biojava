@@ -30,6 +30,7 @@ import org.w3c.dom.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.dist.*;
 
 public class XmlMarkovModel {

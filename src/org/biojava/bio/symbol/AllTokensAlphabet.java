@@ -27,6 +27,7 @@ import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 
 /**
  * An implementation of FiniteAlphabet that grows the alphabet to accomodate all
@@ -120,6 +121,29 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
           }
           return s;
         }
+
+	public StreamParser parseStream(SeqIOListener l) {
+	    final SeqIOListener listener = l;
+
+	    return new StreamParser() {
+		public void characters(char[] data, int start, int len) 
+		    throws IllegalSymbolException
+		{
+		    Symbol[] syms = new Symbol[len];
+		    for (int i = 0; i < len; ++i) {
+			syms[i] = parseToken("" + data[start + i]);
+		    }
+		    try {
+			listener.addSymbols(AllTokensAlphabet.this, syms, 0, len);
+		    } catch (IllegalAlphabetException ex) {
+			throw new BioError(ex);
+		    }
+		}
+
+		public void close() {
+		}
+	    } ;
+	}
       };
     } else {
       throw new NoSuchElementException("No parser for " + name +

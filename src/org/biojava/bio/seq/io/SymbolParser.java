@@ -20,11 +20,20 @@
  */
 
 
-package org.biojava.bio.symbol;
+package org.biojava.bio.seq.io;
+
+import org.biojava.bio.symbol.*;
 
 /**
  * These objects are responsible for converting strings into Symbols and SymbolLists.
+ * It is possible to parse either single tokens or block of character data.  For 1.1,
+ * there is a new method for parsing character streams, and it is recommended that
+ * this should be used instead of either the parse or parseToken methods.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
  */
+
 public interface SymbolParser {
   /**
    * The alphabet that all Symbols produced will belong to.
@@ -55,4 +64,14 @@ public interface SymbolParser {
    * @throws IllegalSymbolException if there is no Symbol for the token
    */
   Symbol parseToken(String token) throws IllegalSymbolException;
+
+    /**
+     * Return an object which can parse an arbitrary character stream into
+     * symbols.
+     *
+     * @param listener The listener which gets notified of parsed symbols.
+     * @since 1.1
+     */
+
+    public StreamParser parseStream(SeqIOListener listener);
 }

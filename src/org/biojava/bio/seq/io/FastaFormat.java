@@ -31,14 +31,14 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
-
 /**
- * Format for Fasta files.
- * <P>
- * The description lines often include complicated annotation for sequences.
- * The parsing of these is handled by a FastaDescriptionReader object.</p>
- * 
- * <p>This version included the experimental new input system by thomasd</p>
+ * Format object representing FASTA files.  These files are almost
+ * pure sequence data.  The only `sequence property' reported by
+ * this parser is PROPERTY_DESCRIPTIONLINE, which is the contents
+ * of the sequence's description line (the line starting with a
+ * '>' character).  Normally, the first word of this is a sequence
+ * ID.  If you wish it to be interpretted as such, you should
+ * use FastaDescriptionLineParser as a SeqIO filter.
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -88,8 +88,11 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	final BufferedReader in = context.getReader();
     
 	String line = in.readLine();
-	if(line == null) {
-	    throw new IOException("File ended prematurely");
+	if (line == null) {
+	    throw new IOException("Premature stream end");
+	}
+	if (!line.startsWith(">")) {
+	    throw new IOException("Stream does not appear to contain FASTA formatted data");
 	}
 
 	siol.startSequence();
@@ -97,127 +100,72 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	String description = line.substring(1).trim();
 	siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
 
-	FASymbolReader fasr = new FASymbolReader(symParser, in);
-	Symbol[] buffer = new Symbol[256];
-	while (fasr.hasMoreSymbols()) {
-	    int num = fasr.readSymbols(buffer, 0, buffer.length);
-	    try {
-		siol.addSymbols(fasr.getAlphabet(), buffer, 0, num);
-	    } catch (IllegalAlphabetException ex) {
-		throw new IOException("Fussy SeqIOListener");
-	    }
-	}
+	boolean seenEOF = readSequenceData(in, symParser, siol);
 
 	siol.endSequence();
     
-	if (fasr.hasSeenEOF()) {
+	if (seenEOF) {
 	    context.streamEmpty();
 	} 
     }
 
-    private class FASymbolReader implements SymbolReader {
-	private char[] cache;
-	private int cacheMax;
-	private int cacheMark;
+    private boolean readSequenceData(BufferedReader r, 
+				     SymbolParser parser,
+				     SeqIOListener listener)
+        throws IOException, IllegalSymbolException
+    {
+	char[] cache = new char[256];
+	boolean reachedEnd = false, seenEOF = false;
+	StreamParser sparser = parser.parseStream(listener);
 
-	private boolean theEnd;
-	private boolean seenEOF;
-
-	private SymbolParser parser;
-	private BufferedReader br;
-
-	public FASymbolReader(SymbolParser p, BufferedReader br) {
-	    parser = p;
-	    this.br = br;
-
-	    cache = new char[256];
-	    cacheMax = cacheMark = 0;
-	}
-
-	public boolean hasSeenEOF() {
-	    return seenEOF;
-	}
-
-	public Alphabet getAlphabet() {
-	    return parser.getAlphabet();
-	}
-
-	public Symbol readSymbol() throws IOException, IllegalSymbolException {
-	    if (cacheMark >= cacheMax)
-		readMoreSymbols();
-	    if (cacheMark >= cacheMax)
-		throw new IOException("Attempting to read beyond end of FASTA sequence.");
-	    Symbol s = parser.parseToken(new String(cache, cacheMark, 1));
-	    cacheMark += 1;
-	    return s;
-	}
-
-	public int readSymbols(Symbol[] buffer,
-			       int pos,
-			       int length)
-	    throws IOException, IllegalSymbolException
-	{
-	    if (cacheMark >= cacheMax)
-		readMoreSymbols();
-	    if (cacheMark >= cacheMax)
-		throw new IOException("Attempting to read beyond end of FASTA sequence.");
-	    int i = 0;
-	    int scl = cacheMax - cacheMark;
-	    while (i < length && i < scl) {
-		buffer[pos + i] = parser.parseToken(new String(cache, cacheMark + i, 1));
-		++i;
-	    }
-	    cacheMark += i;
-
-	    return i;
-	}
-
-	public boolean hasMoreSymbols() {
-	    try {
-		if (cacheMark >= cacheMax)
-		    readMoreSymbols();
-		return !(cacheMark >= cacheMax);
-	    } catch (IOException ex) {
-		return false;
-	    }
-	}
-
-	private void readMoreSymbols()
-	    throws IOException
-	{
-	    cacheMark = cacheMax = 0;
-	    if (theEnd)
-		return;
-
-	    char[] tempCache = new char[256];
-	    br.mark(cache.length);
-	    int bytesRead = br.read(tempCache, 0, tempCache.length);
+	while (!reachedEnd) {
+	    r.mark(cache.length);
+	    int bytesRead = r.read(cache, 0, cache.length);
 	    if (bytesRead < 0) {
-		theEnd = seenEOF = true;
-		cacheMax = 0;
-		return;
-	    } 
+		reachedEnd = seenEOF = true;
+	    } else {
+		int parseStart = 0;
+		int parseEnd = 0;
+		while (!reachedEnd && parseStart < bytesRead) {
+		    parseEnd = parseStart;
 
-	    for (int i = 0; i < bytesRead; ++i) {
-		char c = tempCache[i];
+		    while (parseEnd < bytesRead && 
+			   cache[parseEnd] != '\n' && 
+			   cache[parseEnd] != '\r')
+		    {
+			++parseEnd;
+		    }
+		    sparser.characters(cache, parseStart, parseEnd - parseStart);
 
-		if (c == '>') {
-		    theEnd = true;
-		    br.reset();
-		    if (br.skip(i) != i)
-			throw new IOException("Couldn't reset to start of next sequence");
-		    return;
-		} else if (c != '\n' && c != '\r') {
-		    cache[cacheMax++] = c;
+		    parseStart = parseEnd + 1;
+		    while (parseStart < bytesRead &&
+			   cache[parseStart] == '\n' &&
+			   cache[parseStart] == '\r')
+		    {
+			++parseStart;
+		    }
+
+		    if (parseStart < bytesRead && cache[parseStart] == '>') {
+			r.reset();
+			if (r.skip(parseStart) != parseStart)
+			    throw new IOException("Couldn't reset to start of next sequence");
+			reachedEnd = true;
+		    }
 		}
 	    }
-
-	    if (cacheMax == 0 && !theEnd)
-		readMoreSymbols();
 	}
+
+	sparser.close();
+	return seenEOF;
     }
 
-    protected String writeDescription(Sequence seq) {
+    /**
+     * Return a suitable description line for a Sequence.  If the sequence's
+     * annotation bundle contains PROPERTY_DESCRIPTIONLINE, this is used verbatim.
+     * Otherwise, the sequence's name is used.
+     */
+
+    protected String describeSequence(Sequence seq) {
 	String description = null;
 	try {
 	    description = seq.getAnnotation().getProperty(PROPERTY_DESCRIPTIONLINE).toString();
@@ -229,7 +177,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
 
     public void writeSequence(Sequence seq, PrintStream os) {
 	os.print(">");
-	os.println(writeDescription(seq));
+	os.println(describeSequence(seq));
 
 	int length = seq.length();
 	for(int i = 1; i <= length; i++) {

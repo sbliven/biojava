@@ -27,6 +27,7 @@ import java.util.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 
 /**
  * An alphabet that contains a single atomic symbol.

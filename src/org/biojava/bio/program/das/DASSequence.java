@@ -28,6 +28,7 @@ import java.io.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 

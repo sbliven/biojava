@@ -28,6 +28,7 @@ import java.lang.reflect.*;
 
 import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.bio.seq.io.*;
 
 /**
  * An efficient implementation of an Alphabet over the infinite set of double
@@ -59,6 +60,10 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     
     public SymbolList parse(String seq) {
       throw new BioError("Pants - haven't implemented this yet");
+    }
+
+    public StreamParser parseStream(SeqIOListener l) {
+	throw new BioError("Not implemented yet");
     }
   };
   

@@ -20,16 +20,27 @@
  */
 
 
-package org.biojava.bio.symbol;
+package org.biojava.bio.seq.io;
 
 import java.util.*;
 import java.io.*;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
+
 /**
- * This uses Symbol names to parse characters into symbols.
+ * This uses Symbol names to parse characters into symbols. 
+ *
+ * <p>
+ * <strong>FIXME:</strong> This class currently has some performance
+ * issues (especially the StreamParser), and needs a fairly fundamental
+ * rethink.
+ * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
+
 public class NameParser implements SymbolParser, Serializable {
   /**
    * The alphabet to parse names to.
@@ -98,4 +109,38 @@ public class NameParser implements SymbolParser, Serializable {
   public NameParser(Map nameToSymbol) {
     this.nameToSymbol = nameToSymbol;
   }
+
+    public StreamParser parseStream(SeqIOListener l) {
+	throw new BioError("[FIXME] not implemented");
+    }
+
+    private class NameStreamParser implements StreamParser {
+	SeqIOListener listener;
+	StringBuffer sb = new StringBuffer();
+
+	NameStreamParser(SeqIOListener l) {
+	    listener = l;
+	}
+
+	public void characters(char[] data, int start, int len) {
+	    sb.append(data, start, len);
+	}
+
+	public void close()
+	    throws IllegalSymbolException
+	{
+	    SymbolList sl = parse(sb.toString());
+	    sb = null;
+	    Symbol[] symbols = new Symbol[sl.length()];
+	    for (int i = 0; i < sl.length(); ++i)
+		symbols[i] = sl.symbolAt(i + 1);
+
+	    try {
+		listener.addSymbols(getAlphabet(), symbols, 0, symbols.length);
+	    } catch (IllegalAlphabetException ex) {
+		throw new BioError(ex);
+	    }
+	}
+    }
+
 }

@@ -27,6 +27,7 @@ import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 
 class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable {
   private final List alphas;
