@@ -79,7 +79,8 @@ class DASLinkHandler extends StAXContentHandlerBase {
 
     public void endElement(String nsURI,
 			   String localName,
-			   String qName)
+			   String qName,
+			   StAXContentHandler handler)
     {
 	--level;
     }

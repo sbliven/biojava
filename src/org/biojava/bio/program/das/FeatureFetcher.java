@@ -271,7 +271,8 @@ class FeatureFetcher {
 
 	public void endElement(String nsURI,
 			       String localName,
-			       String qName)
+			       String qName,
+			       StAXContentHandler handler)
 	    throws SAXException
 	{
 	    if (localName.equals("SEGMENT")) {
@@ -332,7 +333,8 @@ class FeatureFetcher {
 
 	public void endElement(String nsURI,
 			       String localName,
-			       String qName)
+			       String qName,
+			       StAXContentHandler handler)
 	    throws SAXException
 	{
 	    if (level == 1) {
