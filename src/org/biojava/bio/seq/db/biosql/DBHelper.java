@@ -33,6 +33,10 @@ public abstract class DBHelper {
 	if (ourURL.startsWith("jdbc:")) {
 	    ourURL = ourURL.substring(5);
 	}
+  if(!Character.isLetter(ourURL.charAt(0))) {
+    throw new IllegalArgumentException("URL must start with a letter: " + ourURL);
+  }
+  
 	int colon = ourURL.indexOf(':');
 	if (colon > 0) {
 	    String protocol = ourURL.substring(0, colon);
