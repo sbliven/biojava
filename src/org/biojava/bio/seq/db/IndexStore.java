@@ -35,10 +35,10 @@ import org.biojava.bio.symbol.*;
  * offsets.
  * <P>
  * In general, these objects should be transactional. Calls to store should add
- * the index to temporary storage. When commit is invoked, these indexes should
- * all be added to the permanent stoorage. When rollback is invoked, these
+ * the index to temporary storage. When commit is invoked, these indices should
+ * all be added to the permanent storage. When rollback is invoked, these
  * indexes should be discarded. If commit fails for any reason, it should leave
- * the permanent stoorage in the pre-commit status.
+ * the permanent storage in the pre-commit status.
  *
  * @author Matthew Pocock
  */
@@ -46,22 +46,22 @@ public interface IndexStore {
   /**
    * Add the Index to the store.
    * <P>
-   * This method should be transactional. If the stoor fails, the IndexStore
+   * This method should be transactional. If the store fails, the IndexStore
    * should be left in its original state.
    * <P>
-   * If the file of the Index is not known yet, it is the responsibility of the
-   * IndexStore to add it to the set returned by getFiles.
+   * If the file of the Index is not known yet, it is the
+   * responsibility of the IndexStore to add it to the set returned by
+   * getFiles.
    *
-   * @param indx  the Index to add
-   * @throws IllegalIDException if the index has an infalid ID field
-   * @throws BioException if the stoore failed
-   */
+   * @param indx the Index to add
+   * @throws IllegalIDException if the index has an invalid ID field
+   * @throws BioException if the store failed */
   void store(Index indx) throws IllegalIDException, BioException;
   
   /**
-   * Commit the stored indecies to permanent stoorage.
+   * Commit the stored indices to permanent storage.
    *
-   * @throws BioException  if for any reason the commit fails
+   * @throws BioException if for any reason the commit fails
    */
   void commit() throws BioException;
   
@@ -90,8 +90,8 @@ public interface IndexStore {
   /**
    * Retrieve the set of all current IDs.
    * <P>
-   * This set should either be immutable, or modifiable totaly seperately from
-   * the IndexStore.
+   * This set should either be immutable, or modifiable totally
+   * seperately from the IndexStore.
    *
    * @return a Set of all legal IDs
    */
@@ -105,8 +105,8 @@ public interface IndexStore {
   /**
    * Retrieve the format of the index file.
    * <P>
-   * This set should either be immutable, or modifiable totaly seperately from
-   * the IndexStore.
+   * This set should either be immutable, or modifiable totally
+   * seperately from the IndexStore.
    *
    * @return a Set of all indexed files
    */
@@ -120,8 +120,8 @@ public interface IndexStore {
   SequenceBuilderFactory getSBFactory();
   
   /**
-   * Retrieve the symbol parser used to turn the sequene characters into Symobl
-   * objects.
+   * Retrieve the symbol parser used to turn the sequenve characters
+   * into Symobl objects.
    *
    * @return the associated SymbolParser
    */

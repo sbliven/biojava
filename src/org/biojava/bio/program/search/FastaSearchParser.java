@@ -147,7 +147,8 @@ public class FastaSearchParser implements SearchParser
 	    // System.out.println("Parser:" + line);
 
 	    // This token indicates the end of the formatted search
-	    // data
+	    // data. Some outputs don't have any alignment consensus
+	    // tokens, so we need to check here as well as INALIGN
 	    if (line.startsWith(">>><<<"))
 	    {
 		searchStatus = NODATA;
@@ -177,15 +178,7 @@ public class FastaSearchParser implements SearchParser
 		    {
 			searchStatus = INHEADER;
 
-			try
-			{
-			    handler.setSubjectDB(parseDB(line));
-			}
-			catch (BioException bex)
-			{
-			    throw new BioException(bex, "Unable to retrieve the subject database from line:\n"
-						   + line);
-			}
+			handler.setSubjectDB(parseDB(line));
 
 			handler.startSearch();
 			// Clear the data store
@@ -222,6 +215,8 @@ public class FastaSearchParser implements SearchParser
 			// Clear the data store
 			hitData.clear();
 			hitPreAnnotation.clear();
+			querySeqTokens.setLength(0);
+			subjectSeqTokens.setLength(0);
 
 			hitData.put("id", parseID(line));
 		    }
@@ -293,11 +288,8 @@ public class FastaSearchParser implements SearchParser
 			searchStatus = INHIT;
 
 			// Pass data to handler
-			hitData.put("querySeqTokens", querySeqTokens.toString());
-			querySeqTokens.setLength(0);
-
+			hitData.put("querySeqTokens",   querySeqTokens.toString());
 			hitData.put("subjectSeqTokens", subjectSeqTokens.toString());
-			subjectSeqTokens.setLength(0);
 
 			handler.setHitData(hitData);
 			handler.setHitAnnotationData(hitPreAnnotation);
@@ -307,6 +299,8 @@ public class FastaSearchParser implements SearchParser
 			// Clear the data store
 			hitData.clear();
 			hitPreAnnotation.clear();
+			querySeqTokens.setLength(0);
+			subjectSeqTokens.setLength(0);
 
 			hitData.put("id", parseID(line));
 		    }
@@ -326,11 +320,8 @@ public class FastaSearchParser implements SearchParser
 			searchStatus = INHIT;
 
 			// Pass data to handler
-			hitData.put("querySeqTokens", querySeqTokens.toString());
-			querySeqTokens.setLength(0);
-
+			hitData.put("querySeqTokens",   querySeqTokens.toString());
 			hitData.put("subjectSeqTokens", subjectSeqTokens.toString());
-			subjectSeqTokens.setLength(0);
 
 			handler.setHitData(hitData);
 			handler.setHitAnnotationData(hitPreAnnotation);
@@ -340,8 +331,26 @@ public class FastaSearchParser implements SearchParser
 			// Clear the data store
 			hitData.clear();
 			hitPreAnnotation.clear();
+			querySeqTokens.setLength(0);
+			subjectSeqTokens.setLength(0);
 
 			hitData.put("id", parseID(line));
+		    }
+		    else if (line.startsWith(">>><<<"))
+		    {
+			searchStatus = NODATA;
+
+			// Pass final data to handler
+			hitData.put("querySeqTokens",   querySeqTokens.toString());
+			hitData.put("subjectSeqTokens", subjectSeqTokens.toString());
+
+			handler.endSubHit();
+			handler.endSearch();
+
+			searchParsed          = true;
+			moreSearchesAvailable = false;
+
+			continue LINE;
 		    }
 		    break STATUS;
 	    } // end switch

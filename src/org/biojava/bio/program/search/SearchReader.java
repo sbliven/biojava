@@ -46,9 +46,9 @@ import org.biojava.utils.*;
  */
 public class SearchReader implements Iterator
 {
-    private LineNumberReader lnReader;
-    private SearchBuilder    handler;
-    private SearchParser     parser;
+    private BufferedReader reader;
+    private SearchBuilder  handler;
+    private SearchParser   parser;
     private boolean moreSearchesAvailable = true;
 
     /**
@@ -65,9 +65,9 @@ public class SearchReader implements Iterator
 			SearchBuilder  handler,
 			SearchParser   parser)
     {
-	this.lnReader = new LineNumberReader(reader);
-	this.handler  = handler;
-	this.parser   = parser;
+	this.reader  = reader;
+	this.handler = handler;
+	this.parser  = parser;
     }
 
     /**
@@ -97,7 +97,7 @@ public class SearchReader implements Iterator
 
 	try
 	{
-	    moreSearchesAvailable = parser.parseSearch(lnReader, handler);
+	    moreSearchesAvailable = parser.parseSearch(reader, handler);
 	    return handler.makeSearchResult();
 	}
 	catch (ParserException pex)

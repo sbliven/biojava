@@ -31,20 +31,24 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
 /**
- * This class implements SequenceDB on top of a set of sequence files and
- * sequence offsets within these files.
+ * This class implements SequenceDB on top of a set of sequence files
+ * and sequence offsets within these files.
+ *
  * <P>
- * This Class is primarily responsible for managing the sequence IO, such as
- * calculating the sequence file offsets, and parsing individual sequences based
- * upon file offsets. The actual persistant stoorage of all this information is
- * delegated to an instance of IndexStore.
- * <P>
- * Note: We may be able to improve the indexing speed further by discarding all
- * feature creation & annotation requestes during index parsing.
+ *
+ * This Class is primarily responsible for managing the sequence IO,
+ * such as calculating the sequence file offsets, and parsing
+ * individual sequences based upon file offsets. The actual persistant
+ * storage of all this information is delegated to an instance of
+ * IndexStore. 
+ *
+ * <P> Note: We may be able to improve the indexing speed further by
+ * discarding all feature creation & annotation requestes during index
+ * parsing.
  *
  * @author Matthew Pocock
  * @author Thomas Down
- */
+ * @author Keith James (docs) */
 
 public final class IndexedSequenceDB extends AbstractSequenceDB
     implements SequenceDB, Serializable 
@@ -53,15 +57,16 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
     private final IndexStore indexStore;
     
     /**
-     * Create an IndexedSequenceDB by specifying both the IDMaker and IndexStore
-     * used.
+     * Create an IndexedSequenceDB by specifying both the IDMaker and
+     * IndexStore used.
+     *
      * <P>
-     * The IDMaker will be used to calculate the ID for each Sequence. It will
-     * dellegate the stoorage and retrieval of the sequence offsets to the
-     * IndexStore.
+     * The IDMaker will be used to calculate the ID for each
+     * Sequence. It will delegate the storage and retrieval of the
+     * sequence offsets to the IndexStore.
      *
      * @param idMaker  the IDMaker used to calculate Sequence IDs
-     * @param indexStore  the IndexStore delegate
+     * @param indexStore the IndexStore delegate
      */
     public IndexedSequenceDB(IDMaker idMaker, IndexStore indexStore) {
       this.idMaker = idMaker;
@@ -70,12 +75,13 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
     
     /**
      * Create an IndexedSequenceDB by specifying IndexStore used.
-     * <P>
-     * IDMaker.byName will be used to calculate the ID for each Sequence. It
-     * will dellegate the stoorage and retrieval of the sequence offsets to the
-     * IndexStore.
      *
-     * @param indexStore  the IndexStore delegate
+     * <P>
+     * IDMaker.byName will be used to calculate the ID for each
+     * Sequence. It will delegate the storage and retrieval of the
+     * sequence offsets to the IndexStore.
+     *
+     * @param indexStore the IndexStore delegate
      */
     public IndexedSequenceDB(IndexStore indexStore) {
       this(IDMaker.byName, indexStore);
@@ -91,12 +97,13 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
     }
     
     /**
-     * Add sequences from a file to the sequence database.  This method works
-     * on an "all or nothing" principle.  If it can successfully interpret the
-     * entire file, all the sequences will be read in.  However, if it
-     * encounters any problems, it will abandon the whole file; an IOException
-     * will be thrown.  A bioexception will be thrown if it has problems
-     * understanding the sequences.
+     * Add sequences from a file to the sequence database. This method
+     * works on an "all or nothing" principle. If it can successfully
+     * interpret the entire file, all the sequences will be read
+     * in. However, if it encounters any problems, it will abandon the
+     * whole file; an IOException will be thrown.  Multiple files may
+     * be indexed into a single database. A BioException will be
+     * thrown if it has problems understanding the sequences.
      *
      * @param seqFile the file containing the sequence or set of sequences
      * @throws IOException if the IO fails
@@ -168,6 +175,12 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	}
     }
   
+    /**
+     * Get the name of this sequence database. The name is retrieved
+     * from the IndexStore delegate.
+     *
+     * @return the name of the sequence database, which may be null.
+     */
     public String getName() {
 	return indexStore.getName();
     }
