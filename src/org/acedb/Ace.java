@@ -85,5 +85,18 @@ public class Ace {
 	Database db = (Database) databases.get(url);
 	return db.retrieve(url);
     }
+
+    /**
+     * Get the root URL for a database.
+     */
+
+    public static AceURL rootURL(AceURL url) {
+	String protocol = url.getProtocol();
+	String userInfo = url.getUserInfo();
+	String authorization = url.getAuthorization();
+	String host = url.getHost();
+	int port = url.getPort();
+	return new AceURL(protocol, host, port, null, null, null, userInfo, authority);
+    }
 }
 

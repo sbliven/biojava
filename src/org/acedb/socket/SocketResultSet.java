@@ -35,12 +35,14 @@ import org.acedb.*;
 public class SocketResultSet implements AceSet {
     private SocketDatabase myDB;
     private List nameList;
-    private AceType.ClassType clazz;
+    private AceSet parent;
+    private AceURL url;
 
-    public SocketResultSet(SocketDatabase db, AceType.ClassType clazz, List names) {
+    public SocketResultSet(SocketDatabase db, AceSet parent, List names, AceURL url) {
 	myDB = db;
 	nameList = names;
-	this.clazz = clazz;
+	this.parent = parent;
+	this.url = url;
     }
 
     public int size() {
@@ -93,5 +95,17 @@ public class SocketResultSet implements AceSet {
 
     public AceSet retrieve(String name) throws AceException {
 	    return myDB.getObject(clazz, name);
+    }
+
+    public AceSet filter(String pattern) {
+	throw new UnsupportedOperationException("ImplementMe");
+    }
+
+    public AceSet getParent() {
+	return parent;
+    }
+
+    public AceURL toURL() {
+	return url;
     }
 }

@@ -147,7 +147,7 @@ class SocketDatabase implements Database {
 		    if (line.charAt(0) <= 32) {
 			StringTokenizer lineToke = new StringTokenizer(line);
 			String name = lineToke.nextToken();
-			set.add(name, new SocketClassSet(dbURL, name));
+			set.add(name, new SocketClassSet(dbURL.relative(name + '/'), set));
 		    }
 		}
 		allClassesSet = set;
@@ -160,13 +160,13 @@ class SocketDatabase implements Database {
 	return allClassesSet;
     }
 
-    private AceSet select(AceType.ClassType clazz, String namePattern)
+    private AceSet select(String clazz, String namePattern)
 	                  throws AceException
     {
 	AceSocket sock = null;
 	try {
 	    sock = takeSocket();
-	    String result = sock.transact("find " + clazz.getName() + " " +
+	    String result = sock.transact("find " + clazz + " " +
 					  namePattern);
 	    int mpos = result.indexOf("// Found ");
 	    if (mpos < 0)
@@ -189,7 +189,8 @@ class SocketDatabase implements Database {
 		}
 	    }
 	    
-	    return new SocketResultSet(this, clazz, nameList);
+	    return new SocketResultSet(this, allClasses().retrieve(clazz), nameList,
+				       dbURL.relative(clazz + '?' + namePattern);
 	} finally {
 	    if (sock != null)
 		putSocket(sock);
@@ -200,7 +201,7 @@ class SocketDatabase implements Database {
 	return dbURL;
     }
 
-    public AceObject getObject(AceType.ClassType clazz, String name) 
+    public AceObject getObject(String clazz, String name) 
             throws AceException
     {
 	String cacheName = clazz.getName() + ":" + name;
@@ -212,9 +213,7 @@ class SocketDatabase implements Database {
 	AceSocket sock = null;
 	try {
 	    sock = takeSocket();
-	    // System.out.println("Class " + clazz);
-	    // System.out.println("Socket " + sock);
-	    String result = sock.transact("find " + clazz.getName() + " " +
+	    String result = sock.transact("find " + clazz + " " +
 					  name);
 	    if (result.indexOf("// Found 1 object") < 0) {
 		throw new AceException("Couldn't get object "+cacheName);
