@@ -61,7 +61,7 @@ public class GenbankFormat implements SequenceFormat, Serializable {
 		SymbolParser resParser,
 		SequenceFactory sf
   )	throws IllegalSymbolException, IOException, BioException {
-    GenbankContext ctx = new GenbankContext(resParser, sf);
+    GenbankContext ctx = new GenbankContext(resParser, sf, featureBuilder);
 
     BufferedReader in = context.getReader();
     String line;
@@ -95,88 +95,6 @@ public class GenbankFormat implements SequenceFormat, Serializable {
     throw new IOException("Premature end of stream for GENBANK");
   }
 
-    private class GenbankContext {
-	private final static int HEADER = 1;
-	private final static int FEATURES = 2;
-	private final static int SEQUENCE = 3;
-
-	private int status;
-
-	private SymbolParser resParser;
-	private SequenceFactory sf;
-
-	private List symbols;
-	private FeatureTableParser features;
-
-	private String accession;
-
-	GenbankContext(SymbolParser resParser, SequenceFactory sf) {
-	    this.resParser = resParser;
-	    this.sf = sf;
-
-	    symbols = new ArrayList();
-	    features = new FeatureTableParser(featureBuilder);
-	    status = HEADER;
-	}
-
-	void processLine(String line) throws BioException,
-	                                     IllegalSymbolException
-	{
-	    if (line.startsWith("FEATURES")) {
-		status = FEATURES;
-	    } else if (line.startsWith("ORIGIN")) {
-		if (features.inFeature())
-		    features.endFeature();
-		status = SEQUENCE;
-	    } else if (line.startsWith("ACCESSION")) {
-		accession = line.substring(12);
-	    } else if (status == FEATURES) {
-		if (line.charAt(0) != ' ') {
-		    if (features.inFeature())
-			features.endFeature();
-		    status = HEADER;
-		} else if (line.charAt(5) != ' ') {
-		    // Has a featureType field -- should be a new feature
-		    if (features.inFeature())
-			features.endFeature();
-
-		    features.startFeature(line.substring(5, 20).trim());
-		    // featureData(line.substring(21));
-		} 
-		features.featureData(line.substring(21));  
-	    } else if (status == SEQUENCE) {
-		processSeqLine(line);
-	    }
-	}
-
-	private void processSeqLine(String line)
-	    throws IllegalSymbolException 
-	{
-	    StringTokenizer st = new StringTokenizer(line);
-	    while(st.hasMoreTokens()) {
-		String token = st.nextToken();
-
-		char c = token.charAt(token.length()-1);
-		if(!Character.isDigit(c)) {
-		    symbols.addAll(resParser.parse(token).toList());
-		}
-	    }
-	}
-
-	Sequence makeSequence() throws BioException {
-	    Sequence ss;
-	    ss = sf.createSequence(new SimpleSymbolList(
-				   resParser.getAlphabet(),symbols),
-				    "urn:whatever",
-				    accession,
-				    Annotation.EMPTY_ANNOTATION);
-	    for (Iterator i = features.getFeatures().iterator(); i.hasNext(); ) {
-		ss.createFeature((Feature.Template) i.next());
-	    }
-	    return ss;
-	}
-    }
-
     /**
      * This is not implemented. It does not write anything to the stream.
      */
@@ -187,3 +105,97 @@ public class GenbankFormat implements SequenceFormat, Serializable {
     }
 }
 
+/**
+ * Encapsulate state used while reading data from a specific 
+ * Genbank file.
+ *
+ * @author Thomas Down
+ */
+
+class GenbankContext {
+    private final static int HEADER = 1;
+    private final static int FEATURES = 2;
+    private final static int SEQUENCE = 3;
+
+    private int status;
+    
+    private SymbolParser resParser;
+    private SequenceFactory sf;
+
+    private List symbols;
+    private FeatureTableParser features;
+
+    private String accession;
+
+    private FeatureBuilder featureBuilder;
+    
+    GenbankContext(SymbolParser resParser,
+		   SequenceFactory sf,
+		   FeatureBuilder fb) 
+    {
+	this.resParser = resParser;
+	this.sf = sf;
+	this.featureBuilder = fb;
+	
+	symbols = new ArrayList();
+	features = new FeatureTableParser(featureBuilder);
+	status = HEADER;
+    }
+    
+    void processLine(String line) throws BioException,
+    IllegalSymbolException
+    {
+	if (line.startsWith("FEATURES")) {
+	    status = FEATURES;
+	} else if (line.startsWith("ORIGIN")) {
+	    if (features.inFeature())
+		features.endFeature();
+	    status = SEQUENCE;
+	} else if (line.startsWith("ACCESSION")) {
+	    accession = line.substring(12);
+	} else if (status == FEATURES) {
+	    if (line.charAt(0) != ' ') {
+		if (features.inFeature())
+		    features.endFeature();
+		status = HEADER;
+	    } else if (line.charAt(5) != ' ') {
+		// Has a featureType field -- should be a new feature
+		if (features.inFeature())
+		    features.endFeature();
+		
+		features.startFeature(line.substring(5, 20).trim());
+		// featureData(line.substring(21));
+	    } 
+	    features.featureData(line.substring(21));  
+	} else if (status == SEQUENCE) {
+	    processSeqLine(line);
+	}
+    }
+    
+    private void processSeqLine(String line)
+	throws IllegalSymbolException 
+    {
+	StringTokenizer st = new StringTokenizer(line);
+	while(st.hasMoreTokens()) {
+	    String token = st.nextToken();
+	    
+	    char c = token.charAt(token.length()-1);
+	    if(!Character.isDigit(c)) {
+		symbols.addAll(resParser.parse(token).toList());
+	    }
+	}
+    }
+
+    Sequence makeSequence() throws BioException {
+	Sequence ss;
+	ss = sf.createSequence(new SimpleSymbolList(
+				   resParser.getAlphabet(),symbols),
+				    "urn:whatever",
+				    accession,
+				    Annotation.EMPTY_ANNOTATION);
+	for (Iterator i = features.getFeatures().iterator(); i.hasNext(); ) {
+	    ss.createFeature((Feature.Template) i.next());
+	}
+	return ss;
+    }
+}

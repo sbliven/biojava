@@ -61,7 +61,7 @@ public class EmblFormat implements SequenceFormat, Serializable {
 				 SequenceFactory sf)
 	throws IllegalSymbolException, IOException, BioException
     {
-	EmblContext ctx = new EmblContext(resParser, sf);
+	EmblContext ctx = new EmblContext(resParser, sf, featureBuilder);
 
 	BufferedReader in = context.getReader();
 	String line;
@@ -90,97 +90,10 @@ public class EmblFormat implements SequenceFormat, Serializable {
 	throw new IOException("Premature end of stream for EMBL");
     }
 
-    private class EmblContext {
-	private final static int WITHOUT=0;
-	private final static int WITHIN=1;
-	private final static int LOCATION=2;
-	private final static int ATTRIBUTE=3;
-
-	private SymbolParser resParser;
-	private SequenceFactory sf;
-
-	private List symbols;
-	private FeatureTableParser features;
-
-	private Annotation annotation;
-	private List accession;
-
-	EmblContext(SymbolParser resParser, SequenceFactory sf) {
-	    this.resParser = resParser;
-	    this.sf = sf;
-
-	    symbols = new ArrayList();
-	    features = new FeatureTableParser(featureBuilder);
-	    annotation = new SimpleAnnotation();
-	    accession = new ArrayList();
-	}
-
-	void processLine(String line) throws BioException {
-	    String tag = line.substring(0, 2);
-
-	    // Any tagprocessors which might need some cleaning
-	    // up if a different tag is encountered.
-
-	    if (features.inFeature() && !(tag.equals("FT")))
-		features.endFeature();
-
-	    if (tag.equals("AC")) {
-		String acc= line.substring(5, line.length()-1);
-		StringTokenizer toke = new StringTokenizer(acc, "; ");
-		while (toke.hasMoreTokens())
-		    accession.add(toke.nextToken());
-	    } else if (tag.equals("FT")) {
-		if (line.charAt(5) != ' ') {
-		    // Has a featureType field -- should be a new feature
-		    if (features.inFeature())
-			features.endFeature();
-
-		    features.startFeature(line.substring(5, 20).trim());
-		    // featureData(line.substring(21));
-		} 
-		features.featureData(line.substring(21));  
-	    }
-	}
-
-	void processSeqLine(String line) throws IllegalSymbolException {
-	    StringTokenizer st = new StringTokenizer(line);
-	    while(st.hasMoreTokens()) {
-		String token = st.nextToken();
-		if(st.hasMoreTokens()) {
-		    symbols.addAll(resParser.parse(token).toList());
-		} else {
-		    char c = token.charAt(token.length()-1);
-		    if(!Character.isDigit(c)) {
-			symbols.addAll(resParser.parse(token).toList());
-		    }
-		}
-	    }
-	}
-
-	Sequence makeSequence() throws BioException {
-	    Sequence ss;
-	    String primaryAcc = "unknown";
-
-	    if (accession.size() > 0) {
-		primaryAcc = (String) accession.get(0);
-		annotation.setProperty("embl_accessions", accession);
-	    }
-
-	    ss = sf.createSequence(new SimpleSymbolList(
-				   resParser.getAlphabet(),symbols),
-				    "urn:sequence/embl:" + primaryAcc,
-				    primaryAcc,
-				    annotation);
-	    for (Iterator i = features.getFeatures().iterator(); i.hasNext(); ) {
-		ss.createFeature((Feature.Template) i.next());
-	    }
-	    return ss;
-	}
-    }
-
     /**
      * This is not implemented. It does not write anything to the stream.
      */
+
     public void writeSequence(Sequence seq, PrintStream os)
 	throws IOException 
     {
@@ -188,4 +101,103 @@ public class EmblFormat implements SequenceFormat, Serializable {
     }
 }
 
+/**
+ * Encapsulate state used while reading data from a specific EMBL
+ * stream.
+ *
+ * @author Thomas Down
+ */
 
+class EmblContext {
+    private final static int WITHOUT=0;
+    private final static int WITHIN=1;
+    private final static int LOCATION=2;
+    private final static int ATTRIBUTE=3;
+    
+    private SymbolParser resParser;
+    private SequenceFactory sf;
+    
+    private List symbols;
+    private FeatureTableParser features;
+
+    private Annotation annotation;
+    private List accession;
+
+    private FeatureBuilder featureBuilder;
+    
+    EmblContext(SymbolParser resParser,
+		SequenceFactory sf,
+		FeatureBuilder fb) 
+    {
+	this.resParser = resParser;
+	this.sf = sf;
+	this.featureBuilder = fb;
+
+	symbols = new ArrayList();
+	features = new FeatureTableParser(featureBuilder);
+	annotation = new SimpleAnnotation();
+	accession = new ArrayList();
+    }
+
+    void processLine(String line) throws BioException {
+	String tag = line.substring(0, 2);
+	
+	// Any tagprocessors which might need some cleaning
+	// up if a different tag is encountered.
+	
+	if (features.inFeature() && !(tag.equals("FT")))
+	    features.endFeature();
+	
+	if (tag.equals("AC")) {
+	    String acc= line.substring(5, line.length()-1);
+	    StringTokenizer toke = new StringTokenizer(acc, "; ");
+	    while (toke.hasMoreTokens())
+		accession.add(toke.nextToken());
+	} else if (tag.equals("FT")) {
+	    if (line.charAt(5) != ' ') {
+		// Has a featureType field -- should be a new feature
+		if (features.inFeature())
+		    features.endFeature();
+		
+		features.startFeature(line.substring(5, 20).trim());
+		// featureData(line.substring(21));
+	    } 
+	    features.featureData(line.substring(21));  
+	}
+    }
+    
+    void processSeqLine(String line) throws IllegalSymbolException {
+	StringTokenizer st = new StringTokenizer(line);
+	while(st.hasMoreTokens()) {
+	    String token = st.nextToken();
+	    if(st.hasMoreTokens()) {
+		symbols.addAll(resParser.parse(token).toList());
+	    } else {
+		char c = token.charAt(token.length()-1);
+		if(!Character.isDigit(c)) {
+		    symbols.addAll(resParser.parse(token).toList());
+		}
+	    }
+	}
+    }
+    
+    Sequence makeSequence() throws BioException {
+	Sequence ss;
+	String primaryAcc = "unknown";
+	
+	if (accession.size() > 0) {
+	    primaryAcc = (String) accession.get(0);
+	    annotation.setProperty("embl_accessions", accession);
+	}
+	
+	ss = sf.createSequence(new SimpleSymbolList(
+				    resParser.getAlphabet(),symbols),
+				    "urn:sequence/embl:" + primaryAcc,
+				    primaryAcc,
+				    annotation);
+	for (Iterator i = features.getFeatures().iterator(); i.hasNext(); ) {
+	    ss.createFeature((Feature.Template) i.next());
+	}
+	return ss;
+    }
+}
