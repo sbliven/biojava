@@ -279,7 +279,7 @@
   </target>
 
   <!-- Compiles the tests directory -->
-  <target name="compile-tests" depends="init,prepare-src,compile">
+  <target name="compile-tests" depends="init,prepare-src,package">
     <javac
       srcdir="${build.src.tests}"
       destdir="${build.dest.tests}"
@@ -294,7 +294,7 @@
   </target>
 
   <!-- Compiles the demos directory -->
-  <target name="compile-demos" depends="init,prepare-src,compile">
+  <target name="compile-demos" depends="init,prepare-src,package">
     <javac
       srcdir="${build.src.demos}"
       destdir="${build.dest.demos}"
@@ -309,7 +309,7 @@
   </target>
 
   <!-- Compiles the apps directory -->
-  <target name="compile-apps" depends="init,prepare-src,compile">
+  <target name="compile-apps" depends="init,prepare-src,package">
     <javac
       srcdir="${build.src.apps}"
       destdir="${build.dest.apps}"
@@ -437,8 +437,8 @@
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
-          <include name="org/biojava/bio/seq/*Test.class" />
-          <include name="org/biojava/bio/seq/*TestSuite.class" />
+          <include name="org/biojava/bio/seq/**/*Test.class" />
+          <include name="org/biojava/bio/seq/**/*TestSuite.class" />
         </fileset>
       </batchtest>
     </junit>
