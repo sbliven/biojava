@@ -46,6 +46,7 @@ import java.net.URL;
  * SymbolLists over the protein alphabet.
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  */
 public class ProteinTools {
     private static final FiniteAlphabet proteinAlpha;
@@ -92,7 +93,7 @@ public class ProteinTools {
         }catch(Exception e){//err
             e.printStackTrace();
         }
-               
+
         try {
             SimpleSymbolPropertyTable simplePropertyTable = new SimpleSymbolPropertyTable(
             getAlphabet(),
@@ -100,20 +101,20 @@ public class ProteinTools {
             );
             Iterator it = getAlphabet().iterator();
             NodeList children = doc.getDocumentElement().getChildNodes();
-            
+
             while(it.hasNext()){
                 Symbol s = (Symbol)it.next();
                 //  simplePropertyTable.setDoubleProperty(s, "1202.00");
-                for(int i = 0; i < children.getLength(); i++) {                   
-                    Node cnode = (Node) children.item(i); 
+                for(int i = 0; i < children.getLength(); i++) {
+                    Node cnode = (Node) children.item(i);
                     if(! (cnode instanceof Element)) {
                         continue;
                     }
                     Element child = (Element) cnode;
                     if(child.getNodeName().equals("residue")) {
-                        
+
                         if(child.getAttribute("token").equals(s.getToken()+"")){
-                            
+
                             NodeList properyNodes = child.getChildNodes();
                             for(int j = 0; j < properyNodes.getLength(); j++)
                             {
@@ -133,7 +134,7 @@ public class ProteinTools {
                     }
                 }
             }
-            
+
             propertyTableMap.put(SymbolPropertyTable.MONO_MASS, (SymbolPropertyTable) simplePropertyTable);
 
             //Build AVG_MASS table
@@ -147,14 +148,14 @@ public class ProteinTools {
                 Symbol s = (Symbol)it.next();
                 //  simplePropertyTable.setDoubleProperty(s, "1202.00");
                 for(int i = 0; i < children.getLength(); i++) {
-                     Node cnode = (Node) children.item(i); 
+                     Node cnode = (Node) children.item(i);
                     if(! (cnode instanceof Element)) {
                         continue;
                     }
                     Element child = (Element) cnode;
-                               
+
                     if(child.getNodeName().equals("residue")) {
-                        if(child.getAttribute("token").equals(s.getToken()+"")){                           
+                        if(child.getAttribute("token").equals(s.getToken()+"")){
                             NodeList properyNodes = child.getChildNodes();
                             for(int j = 0; j < properyNodes.getLength(); j++)
                             {
@@ -164,7 +165,7 @@ public class ProteinTools {
                                 }
                                 Element el = (Element) cnode;
                                 String name = el.getAttribute("name");
-                                 
+
                                 if(name.equals(SymbolPropertyTable.AVG_MASS)) {
                                     String value = el.getAttribute("value");
                                     simplePropertyTable.setDoubleProperty(s, value);
@@ -198,4 +199,28 @@ public class ProteinTools {
     {
         return (SymbolPropertyTable)propertyTableMap.get(name);
     }
+
+	/**
+	 * Return a new Protein <span class="type">SymbolList</span> for
+	 * <span class="arg">protein</span>.
+	 *
+	 * @param theProtein a <span class="type">String</span> to parse into Protein
+	 * @return a <span class="type">SymbolList</span> created form
+	 *         <span class="arg">Protein</span>
+	 * @throws IllegalSymbolException if  <span class="arg">dna</span> contains
+	 *         any non-Amino Acid characters.
+	 */
+	public static SymbolList createProtein(String theProtein)
+		throws IllegalSymbolException
+	{
+		try
+		{
+			org.biojava.bio.seq.io.SymbolParser p = getTAlphabet().getParser("token");
+			return p.parse(theProtein);
+		}
+		catch (BioException se)
+		{
+			throw new BioError(se, "Something has gone badly wrong with Protein");
+		}
+	}
 }
