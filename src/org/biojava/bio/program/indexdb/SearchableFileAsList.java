@@ -6,7 +6,11 @@ import java.util.*;
 import org.biojava.utils.*;
 
 abstract class SearchableFileAsList
-extends FileAsList {
+extends
+  FileAsList
+implements
+  SearchableList
+{
   public SearchableFileAsList(File file, int recordLen)
   throws IOException {
     super(file, recordLen);
@@ -24,20 +28,28 @@ extends FileAsList {
     
     int min = 0;
     int max = size()-1;
-    int cnt = 0;
-    do { 
-      int mid = (min + max + (++cnt) % 2) / 2;
+    do {
+      int mid = (min + max) / 2;
       
       bytes = rawGet(mid);
       int cmp = cmp(bytes, idBytes);
+      
       if(cmp < 0) {
-        min = mid;
+        if(min != mid) {
+          min = mid;
+        } else {
+          min = mid+1;
+        }
       } else if(cmp > 0) {
-        max = mid;
-      } else {
+        if(max != mid) {
+          max = mid;
+        } else {
+          max = mid-1;
+        }
+      } else if(cmp == 0) {
         return parseRecord(bytes);
       }
-    } while(min != max);
+    } while(min <= max);
     
     throw new NoSuchElementException("No element with id: " + id);
   }
@@ -47,23 +59,40 @@ extends FileAsList {
     byte[] idBytes = id.getBytes();
     byte[] bytes;
     
-    int prev = size() / 2;
-    int jumpSize = size() / 4;
+    int min = 0;
+    int max = size()-1;
+    int mid = -1;
     do {
-      bytes = rawGet(prev);
+      mid = (min + max) / 2;
+      
+      bytes = rawGet(mid);
       int cmp = cmp(bytes, idBytes);
-      if(cmp == 0) {
+      
+      if(cmp < 0) {
+        if(min != mid) {
+          min = mid;
+        } else {
+          min = mid+1;
+        }
+      } else if(cmp > 0) {
+        if(max != mid) {
+          max = mid;
+        } else {
+          max = mid-1;
+        }
+      } else if(cmp == 0) {
         break;
       }
-      
-      prev = prev += cmp * jumpSize;
-      jumpSize /= 2;
-    } while (jumpSize > 0);
+    } while(min <= max);
+    
+    if(min > max) {
+      throw new NoSuchElementException("No element with id: " + id);
+    }
     
     ArrayList items = new ArrayList();
     
     // scan back through file for all items with the same ID
-    for(int i = prev-1; ; i--) {
+    for(int i = mid-1; i >= 0; i--) {
       bytes = rawGet(i);
       if(cmp(bytes, idBytes) != 0) {
         break;
@@ -72,9 +101,10 @@ extends FileAsList {
     }
     
     // scan forward through file for all items with the same ID
-    for(int i = prev; ; i++) {
+    for(int i = mid; i < size(); i++) {
       bytes = rawGet(i);
       if(cmp(bytes, idBytes) != 0) {
+        System.out.println("Stopped at: " + i);
         break;
       }
       items.add(parseRecord(bytes));

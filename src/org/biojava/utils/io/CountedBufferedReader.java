@@ -3,7 +3,7 @@ package org.biojava.utils.io;
 import java.io.*;
 
 /**
- * @ author Thomas Down
+ * @author Thomas Down
  */
     public class CountedBufferedReader extends BufferedReader {
 	private final static int DEFAULT_BUFFER_SIZE = 1 << 14;
@@ -173,24 +173,43 @@ import java.io.*;
 	public String readLine()
 	    throws IOException 
 	{
-	    StringBuffer sb = new StringBuffer(100);
+	    String line = null;
 	    
-	    int c = read();
-	    while (c >= 0 && c != '\n' && c != '\r') {
-		sb.append((char) c);
-		c = read();
-	    }
-
-	    if (c == '\r') {
-		c = peek();
-		if (c == '\n')
-		    read();
-	    }
-
-	    // System.out.println("Readline: " + sb.toString());
-
-	    String retVal = sb.toString();
-	    return retVal;
+      while(!reachedEOF) {
+        for(int i = buffPos; i < buffFill; i++) {
+          char c = buffer[i];
+          if(c == '\n' || c == '\r') {
+            int len = i - buffPos;
+            String bit = new String(buffer, buffPos, len);
+            position += len;
+            if(line == null) {
+              line = bit;
+            } else {
+              line += bit;
+            }
+            buffPos = i;
+            read();
+            char d = (char) peek();
+            if(c == '\r' && d == '\n') {
+              read();
+            }
+            
+            return line;
+          }
+        }
+        int len = buffFill - buffPos;
+        String bit = new String(buffer, buffPos, len);
+        position += len;
+        buffPos = buffFill;
+        if(line == null) {
+          line = bit;
+        } else {
+          line += bit;
+        }
+        fillBuffer();
+      }
+      
+      return line;
 	}
 
 	private void fillBuffer()

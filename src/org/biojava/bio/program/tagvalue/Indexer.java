@@ -76,6 +76,10 @@ implements TagValueListener {
   throws ParserException
   {
     //try {
+      if(primaryKey == null) {
+        throw new NullPointerException("No primary key");
+      }
+
       int length = (int) (reader.getFilePointer() - offset);
       indexStore.writeRecord(
         file,

@@ -14,19 +14,15 @@ public class BioStore implements IndexStore {
     }
   };
   
-  public int size() {
-    return primaryList.size();
-  }
-  
   private ConfigFile metaData;
   private File location;
   private String primaryKey;
   private Map idToList;
   private RAF[] fileIDToRAF;
-  private PrimaryIDList primaryList;
+  private SearchableList primaryList;
   private int fileCount;
 
-  public BioStore(File location)
+  public BioStore(File location, boolean cache)
   throws IOException, BioException {
     this.location = location;
     metaData = new ConfigFile(BioStoreFactory.makeConfigFile(location));
@@ -36,14 +32,22 @@ public class BioStore implements IndexStore {
     String keyList = (String) metaData.getProperty(BioStoreFactory.KEYS);
 
     File plFile = BioStoreFactory.makePrimaryKeyFile(location, primaryKey);
-    primaryList = new PrimaryIDList(plFile, this);
+    if(cache) {
+      primaryList = new CacheList(new PrimaryIDList(plFile, this));
+    } else {
+      primaryList = new PrimaryIDList(plFile, this);
+    }
     
     StringTokenizer sTok = new StringTokenizer(keyList, "\t");
     while(sTok.hasMoreTokens()) {
       String k = sTok.nextToken();
       
       File file = BioStoreFactory.makeSecondaryFile(location, k);
-      idToList.put(k, new SecondaryFileAsList(file));
+      if(cache) {
+        idToList.put(k, new CacheList(new SecondaryFileAsList(file)));
+      } else {
+        idToList.put(k, new SecondaryFileAsList(file));
+      }
     }
     
     //System.out.println("Primary key: " + plFile);
@@ -96,8 +100,10 @@ public class BioStore implements IndexStore {
     for(int i = 0; i < fileCount; i++) {
       RAF file = fileIDToRAF[i];
       long length = file.length();
-      
-      metaData.setProperty("fileid_" + i, file.getFile().toString() + "\t" + length);
+      String prop = "fileid_" + i;
+      String val = file.getFile().toString() + "\t" + length;
+      metaData.setProperty(prop, val);
+      System.out.println(prop + " -> " + val);
     }
   }
   
@@ -143,8 +149,8 @@ public class BioStore implements IndexStore {
       SecondaryFileAsList secList = (SecondaryFileAsList) idToList.get(namespace);
       List kpList = secList.searchAll(id);
       for(Iterator i = kpList.iterator(); i.hasNext(); ) {
-        KeyPair keyPair = (KeyPair) secList.search(id);
-        kpList.add(primaryList.search(keyPair.getSecondary()));
+        KeyPair keyPair = (KeyPair) i.next();
+        hits.add(primaryList.search(keyPair.getSecondary()));
       }
     }
     
@@ -163,7 +169,7 @@ public class BioStore implements IndexStore {
       for(Iterator mei = secIDs.entrySet().iterator(); mei.hasNext(); ) {
         Map.Entry me = (Map.Entry) mei.next();
         String sid = (String) me.getKey();
-        SecondaryFileAsList sfl = (SecondaryFileAsList) idToList.get(sid);
+        List sfl = (List) idToList.get(sid);
         List svals = (List) me.getValue();
         for(Iterator i = svals.iterator(); i.hasNext(); ) {
           String sval = (String) i.next();
@@ -173,12 +179,18 @@ public class BioStore implements IndexStore {
     }
   }
   
+  public List getRecordList() {
+    return primaryList;
+  }
+  
   public void commit()
-  throws BioException {
+  throws NestedException {
+    Collections.sort(primaryList, primaryList.getComparator());
     primaryList.commit();
     for(Iterator i = idToList.values().iterator(); i.hasNext(); ) {
-      FileAsList fal = (FileAsList) i.next();
-      fal.commit();
+      SearchableList fal = (SearchableList) i.next();
+      Collections.sort(fal, fal.getComparator());
+      ((SearchableList) fal).commit();
     }
 
     try {

@@ -18,6 +18,9 @@ public interface Record {
     private final int length;
     
     public Impl(String id, RAF file, long offset, int length) {
+      if(id == null) {
+        throw new NullPointerException("Can't have null id");
+      }
       this.id = id;
       this.file = file;
       this.offset = offset;

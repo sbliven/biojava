@@ -4,8 +4,13 @@ import java.io.*;
 import java.util.*;
 
 public abstract class FileAsList
-extends AbstractList
-/* implements */ /* RandomAccess, */ {
+extends
+  AbstractList
+implements
+  Commitable
+{
+  private static final int LEADER = 4;
+
   private RandomAccessFile mappedFile;
   private int commitedRecords;
   private int lastIndx = -1;
@@ -23,13 +28,13 @@ extends AbstractList
     buffer = new byte[recordLength];
     this.mappedFile.seek(0l);
     byte[] rl = String.valueOf(recordLength).getBytes();
-    if(rl.length > 4) {
+    if(rl.length > LEADER) {
       throw new IOException("Length of record too long"); // FIXME: ugg
     }
     for(int i = 0; i < rl.length; i++) {
       this.mappedFile.write(rl[i]);
     }
-    for(int i = rl.length; i < 4; i++) {
+    for(int i = rl.length; i < LEADER; i++) {
       this.mappedFile.write(' ');
     }
     
@@ -39,13 +44,13 @@ extends AbstractList
   public FileAsList(File mappedFile)
   throws IOException {
     if(!mappedFile.exists()) {
-      throw new IOException("Can't load mapped list as the file does not exist: ");
+      throw new IOException("Can't load mapped list as the file does not exist: " + mappedFile);
     }
     
     this.mappedFile = new RandomAccessFile(mappedFile, "rw");
     StringBuffer sbuff = new StringBuffer();
     this.mappedFile.seek(0l);
-    for(int i = 0; i < Math.min(4, mappedFile.length()); i++) {
+    for(int i = 0; i < Math.min(LEADER, mappedFile.length()); i++) {
       char c = (char) this.mappedFile.readByte();
       sbuff.append(c);
     }
@@ -55,7 +60,7 @@ extends AbstractList
   
   public byte[] rawGet(int indx) {
     if(indx < 0 || indx >= size()) {
-      throw new IndexOutOfBoundsException("Can't access element: " + indx + " " + size());
+      throw new IndexOutOfBoundsException("Can't access element: " + indx + " of " + size());
     }
     
     if(indx != lastIndx) {
@@ -135,9 +140,17 @@ extends AbstractList
     
     return null;
   }
+  
+  public void clear() {
+    try {
+      mappedFile.setLength(fixOffset(0));
+    } catch (IOException ioe) {
+      throw new NestedError(ioe, "Could not truncate list");
+    }
+    commitedRecords = 0;
+  }
 
   public void commit() {
-    Collections.sort(this, this.getComparator());
     commitedRecords = this.size();
   }
   
@@ -154,11 +167,11 @@ extends AbstractList
   }
   
   private long fixOffset(long offset) {
-    return offset + 4l;
+    return offset + (long) LEADER;
   }
   
   private long unFixOffset(long offset) {
-    return offset - 4l;
+    return offset - (long) LEADER;
   }
   
   protected abstract Object parseRecord(byte[] buffer);

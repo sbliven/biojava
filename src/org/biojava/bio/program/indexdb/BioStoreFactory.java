@@ -89,7 +89,7 @@ public class BioStoreFactory {
     
     ann.commit();
     
-    BioStore bStore = new BioStore(storeLoc);
+    BioStore bStore = new BioStore(storeLoc, true);
     
     return bStore;
     } catch (ChangeVetoException cve) {
@@ -99,22 +99,22 @@ public class BioStoreFactory {
     }
   }
   
-  static File makeConfigFile(File storeLoc)
+  public static File makeConfigFile(File storeLoc)
   throws IOException {
     return new File(storeLoc, "config.dat");
   }
   
-  static File makePrimaryKeyFile(File storeLoc, String key)
+  public static File makePrimaryKeyFile(File storeLoc, String key)
   throws IOException {
     return new File(storeLoc, "key_" + key + ".dat");
   }
   
-  static File makeSecondaryFile(File storeLoc, String key)
+  public static File makeSecondaryFile(File storeLoc, String key)
   throws IOException {
     return new File(storeLoc, "id_" + key + ".index");
   }
   
-  static int calculatePrimRecLen(int idLen) {
+  public static int calculatePrimRecLen(int idLen) {
     return
       idLen +                                     // space for ids
       "\t".length() +
@@ -125,7 +125,7 @@ public class BioStoreFactory {
       String.valueOf(Integer.MAX_VALUE).length(); // length
   }
   
-  static int calculateSecRecLen(int idLen, String primaryKey, Map keys) {
+  public static int calculateSecRecLen(int idLen, String primaryKey, Map keys) {
     int primLength = ((Integer) keys.get(primaryKey)).intValue();
     return
       idLen +

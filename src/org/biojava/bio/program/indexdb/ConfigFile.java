@@ -4,8 +4,12 @@ import java.util.*;
 import java.io.*;
 
 import org.biojava.bio.*;
+import org.biojava.utils.*;
 
-class ConfigFile extends AbstractAnnotation {
+class ConfigFile
+extends AbstractAnnotation
+implements Commitable
+{
   private File file;
   private Map map;
   
