@@ -52,12 +52,26 @@ public final class SequenceTools {
   throws IndexOutOfBoundsException {
     return new SubSequence(seq, start, end, name);
   }
+
+  public static Sequence subSequence(
+    Sequence seq,
+    int start,
+    int end,
+    String name,
+    StrandedFeature.Strand strand
+  ) throws IndexOutOfBoundsException, IllegalAlphabetException {
+    Sequence s = subSequence(seq, start, end, name, strand);
+    if(strand == StrandedFeature.NEGATIVE) {
+      s = reverseComplement(s);
+    }
+    return s;
+  }
   
   public static Sequence reverseComplement(Sequence seq)
   throws IllegalAlphabetException {
     return new RevCompSequence(seq);
   }
-  
+
   public static Sequence view(Sequence seq) {
     return new ViewSequence(seq);
   }

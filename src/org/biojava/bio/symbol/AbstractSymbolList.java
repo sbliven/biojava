@@ -141,6 +141,10 @@ implements SymbolList {
     return hashCode;
   }
 
+  public String toString() {
+    return super.toString() + " length: " + length();
+  }
+
   private boolean compare(SymbolList sl1, SymbolList sl2){
     if (sl1.length() != sl2.length()) {
       return false;
@@ -341,6 +345,13 @@ implements SymbolList {
         hashCode = result;
       }
       return hashCode;
+    }
+
+    public String toString() {
+      return super.toString() +
+             " start: " + start +
+             " end: " + end /*(+
+             " parent: " + AbstractSymbolList.this.toString() [causes infinite loop -- odd] */;
     }
   }
 

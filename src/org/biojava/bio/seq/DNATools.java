@@ -313,6 +313,24 @@ public final class DNATools {
   }
 
   /**
+   * Returns a SymbolList that is reverse complemented if the strand is
+   * negative, and the origninal one if it is not.
+   *
+   * @param list  the SymbolList to view
+   * @param strand the Strand to use
+   * @return the apropreate view of the SymbolList
+   * @throws IllegalAlphabetException if list is not a complementable alphabet
+   */
+  public static SymbolList flip(SymbolList list, StrandedFeature.Strand strand)
+  throws IllegalAlphabetException {
+    if(strand == StrandedFeature.NEGATIVE) {
+      return reverseComplement(list);
+    } else {
+      return list;
+    }
+  }
+
+  /**
    * Get a translation table for complementing DNA symbols.
    *
    * @since 1.1
