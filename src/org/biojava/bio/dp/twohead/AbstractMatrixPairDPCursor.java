@@ -91,7 +91,7 @@ public abstract class AbstractMatrixPairDPCursor
           symArray[1] = (j < 1 || j > seq2.length())
             ? AlphabetManager.getGapSymbol()
             : seq2.symbolAt(j);
-          ei[j] = eCache.getEmissions(symList);
+          ei[j] = eCache.getEmissions(symList, !((i < 1 && j < 1) || (i > seq1.length() && j <= seq2.length())) );
         }
       }
     }

@@ -38,6 +38,7 @@ import org.biojava.bio.symbol.SymbolList;
  * round of calcCell invocations.
  *
  * @author     Matthew Pocock 
+ * @author     David Huen (fixes for magical state)
  */
 public class LightPairDPCursor implements PairDPCursor {
   //    protected CrossProductAlphabet alpha;
@@ -75,12 +76,14 @@ public class LightPairDPCursor implements PairDPCursor {
   /**
    *  Constructor for the LightPairDPCursor object 
    *
-   * @param  seq1                        Description of Parameter 
-   * @param  seq2                        Description of Parameter 
-   * @param  depth1                      Description of Parameter 
-   * @param  depth2                      Description of Parameter 
-   * @param  numStates                   Description of Parameter 
-   * @param  eCache                      Description of Parameter 
+   * @param  seq1                        First sequence in this twohead DP.
+   * @param  seq2                        Second sequence in this twohead DP.
+   * @param  depth1                      The number of bases of context required in 
+   *                                     first sequence to compute DP matrix at a point (= max advance in first sequence + 1).
+   * @param  depth2                      The number of bases of context required in 
+   *                                     second sequence to compute DP matrix at a point (= max advance in second sequence + 1).
+   * @param  numStates                   Total number of states in model.
+   * @param  eCache                      Emission cache to be used with this run.
    * @exception  IllegalSymbolException  Description of Exception 
    */
   public LightPairDPCursor(
@@ -140,6 +143,7 @@ public class LightPairDPCursor implements PairDPCursor {
       }
     }
 
+    // compute the emissions vector at origin of matrix
     calcEmissions(emissions[0]);
   }
 
@@ -155,7 +159,7 @@ public class LightPairDPCursor implements PairDPCursor {
 
 
   /**
-   *  Description of the Method 
+   *  Are there further Cells to be computed? 
    *
    * @return    Description of the Returned Value 
    */
@@ -167,9 +171,16 @@ public class LightPairDPCursor implements PairDPCursor {
 
 
   /**
-   *  Description of the Method 
+   * Returns the minimal context of the DP matrix
+   * necessary to compute the value of a single point
+   * in that matrix.
+   * <p>
+   * The Cell [][] array has the origin as the
+   * current point to be evaluated and successive
+   * rows/columns represent rows/columns backwards
+   * within the DP matrix. 
    *
-   * @return    Description of the Returned Value 
+   * @return    An array representing the immediate context around the element to be computed. 
    */
   public Cell[][] press() {
     Cell[][] cells = new Cell[depth[0]][depth[1]];
@@ -314,8 +325,8 @@ public class LightPairDPCursor implements PairDPCursor {
         symL[1] = (j < 1 || j > seqs[1].length())
              ? AlphabetManager.getGapSymbol()
              : seqs[1].symbolAt(j);
-        em[j] = eCache.getEmissions(symList);
-        //System.out.println("symbol " + symL[0].getName() + ", " + symL[1].getName() + "->" + em[j]);
+        em[j] = eCache.getEmissions(symList, !(( i < 1 && j < 1 ) || ((i > seqs[0].length()) && (j > seqs[1].length())) ) );
+//        System.out.println("symbol " + symL[0].getName() + ", " + symL[1].getName() + "->" + em[j] + " " + (( i < 1 && j < 1 ) || ((i > seqs[0].length()) && (j > seqs[1].length())) ) );
       }
     }
     else {
@@ -330,8 +341,8 @@ public class LightPairDPCursor implements PairDPCursor {
         symL[0] = (i < 1 || i > seqs[0].length())
              ? AlphabetManager.getGapSymbol()
              : seqs[0].symbolAt(i);
-        //System.out.println("symbol " + symL[0].getName() + ", " + symL[1].getName());
-        em[i] = eCache.getEmissions(symList);
+//        System.out.println("symbol " + symL[0].getName() + ", " + symL[1].getName() + " " + (( i < 1 && j < 1 ) || ((i > seqs[0].length()) && (j > seqs[1].length())) ) );
+        em[i] = eCache.getEmissions(symList, !(( i < 1 && j < 1 ) || ((i > seqs[0].length()) && (j > seqs[1].length())) ) );
       }
     }
   }
