@@ -31,7 +31,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * A StateMachine implementation in which the
- * transitions are maintined in an array. While
+ * transitions are maintained in an array. While
  * every ArrayStateMachine is initialised with a
  * FiniteAlphabet, symbol data is provided as an
  * AlphabetIndex int value for effiiciency
@@ -54,9 +54,10 @@ class ArrayStateMachine
         private int start;
         private int end;
 
-        private Instance(int start)
+        private Instance(int start, int statePointer)
         {
             this.start = end = start;
+            this.statePointer = statePointer;
         }
 
         /**
@@ -86,15 +87,16 @@ class ArrayStateMachine
     class GreedyInstance
         implements StateMachineInstance
     {
-        private int statePointer = 0;
+        private int statePointer;
         private int start;
         private int end;
         boolean gotTerminationState = false;
         private int  lastEnd;
 
-        private GreedyInstance(int start)
+        private GreedyInstance(int start, int statePointer)
         {
             this.start = lastEnd = end = start;
+            this.statePointer = statePointer;
         }
 
         /**
@@ -213,9 +215,35 @@ class ArrayStateMachine
     StateMachineInstance getInstance(int start, boolean greedy)
     {
         if (greedy)
-            return new GreedyInstance(start);
+            return new GreedyInstance(start, 0);
         else
-            return new Instance(start);
+            return new Instance(start, 0);
+    }
+
+    /**
+     * Return a StateMachineInstance if the Symbol represented
+     * by the symbol index is valid as the initial symbol of
+     * the pattern.  This method must remain package private
+     * as it does no alphabet checks at all.
+     *
+     * @param symIdx alphabet index value for specified symbol.
+     * @param greedy should greedy regex semantics be used?
+     * @return an instance of StateMachineInstance if symbol
+     * is valid otherwise null.
+     */
+    StateMachineInstance startInstance(int symIdx, int start, boolean greedy)
+    {
+        int nextState = transitions[symIdx];
+        if (nextState != ERROR_STATE) {
+            if (greedy) {
+                return new GreedyInstance(start, nextState);
+            }
+            else {
+                return new Instance(start, nextState);
+            }
+        }
+        else
+            return null;
     }
 }
 
