@@ -542,13 +542,10 @@ extends AbstractSymbolList implements Serializable {
     } else { // removing internal gaps
       Block l = (Block) blocks.get(i);
       Block r = (Block) blocks.get(i+1);
+      
       renumber(i+1, -length);
       int gap = r.viewStart - l.viewEnd;
-      if(gap < length) {
-        throw new IllegalSymbolException(
-          "Attempted to remove some non-gap characters at (" + pos + ".." + end + ")"
-        );
-      } else if( gap == length) { // deleted an entire gapped region
+      if( gap == length) { // deleted an entire gapped region
         l.sourceEnd = r.sourceEnd;
         l.viewEnd = r.viewEnd;
         blocks.remove(i+1);

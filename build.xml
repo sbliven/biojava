@@ -236,7 +236,8 @@
   </target>
 
   <!-- Runs tests if the Ant optional JUnit support is available -->
-  <target name="runtests" depends="init,compile-tests" if="junit.support">
+  <target name="runtests" depends="init,compile-tests" >
+    <echo message="junit present ${junit.present}"/>
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>

@@ -995,6 +995,8 @@ public final class AlphabetManager {
 	    toke.bindSymbol(ambiSym, tokenChar);
 	}
 
+      toke.bindSymbol(Alphabet.EMPTY_ALPHABET.getGapSymbol(), '~');
+      toke.bindSymbol(alpha.getGapSymbol(), '-');
 	return toke;
     }
 
