@@ -19,28 +19,13 @@
  *
  */
 
-
-
-
-
 package org.biojava.bio.dist;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
+import java.io.*;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.AlphabetIndex;
-import org.biojava.bio.symbol.AlphabetManager;
-import org.biojava.bio.symbol.AtomicSymbol;
-import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.utils.ChangeAdapter;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 
 /**
  * A simple implementation of a distribution, which works with any finite alphabet.
@@ -53,16 +38,41 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class SimpleDistribution
 extends AbstractDistribution implements Serializable{
-
+    static final long serialVersionUID = 7252850540926095728L;
+    
+    
   private transient AlphabetIndex indexer;
   private transient double[] weights = null;//because indexer is transient.
   private Distribution nullModel;
   private FiniteAlphabet alpha;
-    //Change this value if you change this class substantially
-  private static final long serialVersionUID = 899744356;
+  
+  private static class SymbolWeightMemento implements Serializable {
+      static final long serialVersionUID = 5223128163879670657L;
+      
+      public final Symbol symbol;
+      public final double weight;
+      
+      public SymbolWeightMemento(Symbol s, double weight) {
+          this.symbol = s;
+          this.weight = weight;
+      }
+  }
+  
+  private void writeObject(ObjectOutputStream oos)
+      throws IOException
+  {
+      oos.defaultWriteObject();
+      
+      SymbolWeightMemento[] swm = new SymbolWeightMemento[weights.length];
+      for (int w = 0; w < swm.length; ++w) {
+          swm[w] = new SymbolWeightMemento(indexer.symbolForIndex(w), weights[w]);
+      }
+      oos.writeObject(swm);
+  }
 
   private void readObject(ObjectInputStream stream)
-    throws IOException, ClassNotFoundException{
+    throws IOException, ClassNotFoundException
+  {
     stream.defaultReadObject();
     indexer = AlphabetManager.getAlphabetIndex(alpha);
     indexer.addChangeListener(
@@ -78,18 +88,15 @@ extends AbstractDistribution implements Serializable{
       },AlphabetIndex.INDEX
     );
     weights = new double[alpha.size()];
-
-    for (int i = 0; i < weights.length; i++) {
-      String s = indexer.symbolForIndex(i).getName();
-      if(symbolIndices.get(s)!=null){
-        weights[i] = ((Double)symbolIndices.get(s)).doubleValue();
-      }else{
-        weights[i] = 0.0;
-      }
+    
+    SymbolWeightMemento[] swm = (SymbolWeightMemento[]) stream.readObject();
+    for (int m = 0; m < swm.length; ++m) {
+        try {
+            weights[indexer.indexForSymbol(swm[m].symbol)] = swm[m].weight;
+        } catch (IllegalSymbolException ex) {
+            throw new IOException("Symbol in serialized stream can't be found in the alphabet");
+        }
     }
-
-    //mark for garbage collection
-    symbolIndices = null;
   }
 
   public Alphabet getAlphabet() {

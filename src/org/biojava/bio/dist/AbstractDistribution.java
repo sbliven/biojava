@@ -67,38 +67,12 @@ public abstract class AbstractDistribution
   extends
     AbstractChangeable
   implements
-    Distribution,
-    Serializable
+    Distribution
 {
   /**
    * Forwarder for modifications to the null model.
    */
   protected transient ChangeForwarder nullModelForwarder = null;
-
-  /**
-   * Used for serialization.
-   */
-  protected Map symbolIndices = null;
-
-  /**
-   * Governs serialization behaivour.
-   *
-   * @param stream  the ObjectOutputStream to write to
-   */
-  private void writeObject(ObjectOutputStream stream)throws IOException{
-    AlphabetIndex index = AlphabetManager.getAlphabetIndex((FiniteAlphabet)getAlphabet());
-    int size = ((FiniteAlphabet)getAlphabet()).size();
-    symbolIndices = new HashMap(size);
-    for(int i = 0; i < size; i++){
-      try{
-        symbolIndices.put(index.symbolForIndex(i).getName(),
-        new Double(getWeight(index.symbolForIndex(i))));
-      }catch(IllegalSymbolException e){
-        throw new BioError(e);
-      }
-    }
-    stream.defaultWriteObject();
-  }
 
   protected ChangeSupport getChangeSupport(ChangeType ct) {
       ChangeSupport changeSupport = super.getChangeSupport(ct);

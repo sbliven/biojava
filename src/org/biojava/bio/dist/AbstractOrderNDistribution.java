@@ -47,9 +47,11 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @since 1.2
  */
-public abstract class AbstractOrderNDistribution
-extends AbstractDistribution
-implements OrderNDistribution{
+public abstract class AbstractOrderNDistribution extends AbstractDistribution
+    implements OrderNDistribution, Serializable
+{
+    static final long serialVersionUID = 1406135308618188893L;
+    
   private Alphabet alphabet;
   private Alphabet firstA;
   private Alphabet lastA;
