@@ -22,7 +22,7 @@
 package org.biojava.bio.program.search;
 
 import java.io.IOException;
-import java.io.LineNumberReader;
+import java.io.BufferedReader;
 
 import org.biojava.bio.BioException;
 import org.biojava.utils.ParserException;
@@ -41,21 +41,21 @@ public interface SearchParser
     /**
      * The <code>parseSearch</code> method parses the next complete
      * search result from the stream encapsulated by the
-     * LineNumberReader. The SearchContentHandler is informed of
+     * BufferedReader. The SearchContentHandler is informed of
      * events as they occur.
      *
-     * @param reader a <code>LineNumberReader</code> to read from.
+     * @param reader a <code>BufferedReader</code> to read from.
      * @param handler a <code>SearchContentHandler</code> to notify of
      * events.
      * @return a <code>boolean</code> value.
      * @exception IOException if an error occurs in the
-     * LineNumberReader.
+     * BufferedReader.
      * @exception BioException if an internal error occurs.
      * @exception ParserException if the parser fails to recognise a
      * line or is unable to extract the required information from a
      * known line type.
      */
-    public boolean parseSearch(LineNumberReader     reader,
+    public boolean parseSearch(BufferedReader       reader,
 			       SearchContentHandler handler)
 	throws IOException, BioException, ParserException;
 

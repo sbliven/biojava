@@ -22,7 +22,7 @@
 package org.biojava.bio.program.search;
 
 import java.io.IOException;
-import java.io.LineNumberReader;
+import java.io.BufferedReader;
 import java.lang.*;
 import java.util.*;
 
@@ -102,8 +102,9 @@ public class FastaSearchParser implements SearchParser
     private boolean          searchParsed = false;
     private boolean moreSearchesAvailable = false;
 
-    private LineNumberReader   lnReader;
-    private String             line;
+    private BufferedReader reader;
+    private String         line;
+    private int            lineNumber;
 
     Map resultPreAnnotation = new HashMap();
     Map resultSearchParm    = new HashMap();
@@ -117,30 +118,32 @@ public class FastaSearchParser implements SearchParser
      * The <code>parseSearch</code> method performs the core parsing
      * operations.
      *
-     * @param lnReader a <code>LineNumberReader</code> to read from.
+     * @param reader a <code>BufferedReader</code> to read from.
      * @param scHandler a <code>SearchContentHandler</code> to notify
      * of events.
      * @return a <code>boolean</code> value, true if a further search
      * result remains to be parsed, false if no further results were
      * detected.
-     * @exception IOException if the LineNumberReader fails.
+     * @exception IOException if the BufferedReader fails.
      * @exception BioException if the parser (via the registered
      * SearchContentHandler) fails to resolve a query sequence and
      * target database.
      * @exception ParserException if the parser fails to parse a
      * line.
      */
-    public boolean parseSearch(LineNumberReader     lnReader,
+    public boolean parseSearch(BufferedReader       reader,
 			       SearchContentHandler scHandler)
 	throws IOException, BioException, ParserException
     {
 	boolean foundQuerySeqID = false;
+	lineNumber = 0;
 
 	FastaSearchBuilder handler = (FastaSearchBuilder) scHandler;
 
     LINE:
-	while ((line = lnReader.readLine()) != null)
+	while ((line = reader.readLine()) != null)
 	{
+	    lineNumber++;
 	    // System.out.println("Parser:" + line);
 
 	    // This token indicates the end of the formatted search
@@ -228,7 +231,7 @@ public class FastaSearchParser implements SearchParser
 			    if (! parseLine(line, resultSearchParmTokens, resultSearchParm))
 				throw new ParserException("Fasta parser failed to recognise line type",
 							  null,
-							  lnReader.getLineNumber(),
+							  lineNumber,
 							  line);
 		    }
 		    break STATUS;
@@ -255,7 +258,7 @@ public class FastaSearchParser implements SearchParser
 			    if (! parseLine(line, hitDataTokens, hitData))
 				throw new ParserException("Fasta parser failed to recognise line type",
 							  null,
-							  lnReader.getLineNumber(),
+							  lineNumber,
 							  line);
 		    }
 		    break STATUS;
@@ -272,7 +275,7 @@ public class FastaSearchParser implements SearchParser
 			if (! parseSequence(line, "query", hitData))
 			    throw new ParserException("Fasta parser failed to recognise line type",
 						      null,
-						      lnReader.getLineNumber(),
+						      lineNumber,
 						      line);
 		    }
 		    break STATUS;
@@ -312,7 +315,7 @@ public class FastaSearchParser implements SearchParser
 			if (! parseSequence(line, "subject", hitData))
 			    throw new ParserException("Fasta parser failed to recognise line type",
 						      null,
-						      lnReader.getLineNumber(),
+						      lineNumber,
 						      line);
 		    }
 		    break STATUS;
@@ -381,7 +384,7 @@ public class FastaSearchParser implements SearchParser
 	else
 	    throw new ParserException("Fasta parser failed to parse a sequence ID",
 				      null,
-				      lnReader.getLineNumber(),
+				      lineNumber,
 				      line);
 	// For Hit header lines
 	if (id.startsWith(">>"))
@@ -392,7 +395,7 @@ public class FastaSearchParser implements SearchParser
 	if (id == ">")
 	    throw new ParserException("Fasta parser encountered a sequence with no ID",
 				      null,
-				      lnReader.getLineNumber(),
+				      lineNumber,
 				      line);
 	// For SubHit header lines where the sequence in the Fasta did
 	// have an ID
@@ -430,7 +433,7 @@ public class FastaSearchParser implements SearchParser
 	if (previous == null)
 	    throw new ParserException("Fasta parser failed to parse a database filename",
 				      null,
-				      lnReader.getLineNumber(),
+				      lineNumber,
 				      line);
 	return previous;
     }
@@ -490,7 +493,7 @@ public class FastaSearchParser implements SearchParser
 	    {
 		throw new ParserException("Fasta parser failed to parse a double value",
 					  null,
-					  lnReader.getLineNumber(),
+					  lineNumber,
 					  line);
 	    }
 
