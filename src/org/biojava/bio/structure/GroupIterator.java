@@ -44,7 +44,7 @@ public class GroupIterator implements Iterator {
 	structure = struct ;
 	current_model_pos = 0 ;
 	current_chain_pos = 0 ;
-	current_group_pos = 0 ;
+	current_group_pos = -1 ;
 
     } 
 
