@@ -24,6 +24,7 @@ package org.biojava.bio.program.ssbind;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,8 +65,13 @@ public class SSBindWUtblastn2_0a19Test extends SSBindCase
                         47, 214, null,
                         304, 866, StrandedFeature.POSITIVE);
 
+        String resName = "org/biojava/bio/program/ssbind/wu_tblastn_2.0a19.out.gz";
+        InputStream resStream = getClass().getClassLoader().getResourceAsStream(
+                resName);
+        assert resStream != null
+                : "Resource " + resName + " could not be located";
         searchStream =
-            new GZIPInputStream(new BufferedInputStream(getClass().getResourceAsStream("wu_tblastn_2.0a19.out.gz")));
+            new GZIPInputStream(new BufferedInputStream(resStream));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
         XMLReader reader = (XMLReader) new BlastLikeSAXParser();

@@ -24,6 +24,7 @@ package org.biojava.bio.program.ssbind;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -62,8 +63,13 @@ public class SSBindFasta3_3t08Test extends SSBindCase
                         6, 422, null,
                         12, 430, null);
 
+        String resName = "org/biojava/bio/program/ssbind/fasta_3.3t08.out.gz";
+        InputStream resStream = getClass().getClassLoader().getResourceAsStream(
+                resName);
+        assert resStream != null
+                : "Resource " + resName + " could not be located";
         searchStream =
-            new GZIPInputStream(new BufferedInputStream(getClass().getResourceAsStream("fasta_3.3t08.out.gz")));
+            new GZIPInputStream(new BufferedInputStream(resStream));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
         XMLReader reader = (XMLReader) new FastaSearchSAXParser();

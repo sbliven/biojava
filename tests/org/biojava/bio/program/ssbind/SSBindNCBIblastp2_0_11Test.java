@@ -22,6 +22,7 @@
 package org.biojava.bio.program.ssbind;
 
 import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
 import org.xml.sax.XMLReader;
@@ -59,8 +60,13 @@ public class SSBindNCBIblastp2_0_11Test extends SSBindCase
                         2, 371, null,
                         1, 91, null);
 
+        String resName = "org/biojava/bio/program/ssbind/ncbi_blastp_2.0.11.out.gz";
+        InputStream resStream = getClass().getClassLoader().getResourceAsStream(
+                resName);
+        assert resStream != null
+                : "Resource " + resName + " could not be located";
         searchStream =
-            new GZIPInputStream(new BufferedInputStream(getClass().getResourceAsStream("ncbi_blastp_2.0.11.out.gz")));
+            new GZIPInputStream(new BufferedInputStream(resStream));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
         XMLReader reader = (XMLReader) new BlastLikeSAXParser();
