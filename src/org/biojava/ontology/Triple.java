@@ -150,7 +150,7 @@ public interface Triple {
         }
         
         public String toString() {
-            return subject.toString() + "," + object.toString() + ": " + relation.toString();
+            return "subject: " + subject.toString() + ", object: " + object.toString() + ", relation: " + relation.toString();
         }
     }
 }

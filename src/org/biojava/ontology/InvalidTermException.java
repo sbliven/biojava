@@ -28,6 +28,7 @@ import org.biojava.bio.BioException;
  * appropriate in a given context
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.4
  */
 
@@ -46,7 +47,7 @@ public class InvalidTermException
     super(cause);
   }
   
-  public InvalidTermException(Throwable cause, String message) {
-    super(cause, message);
+  public InvalidTermException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

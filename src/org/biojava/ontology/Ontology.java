@@ -25,9 +25,12 @@ import java.util.*;
 import org.biojava.utils.*;
 
 /**
- * An ontology.  This is just a set of Term objects, and a set of
+ * An ontology.
+ *
+ * <p>This is just a set of Term objects, and a set of
  * Triple objects describing relationships between these terms.
- * This class does not itself contain any reasoning functionality.
+ * This class does not itself contain any reasoning functionality. Ontology is
+ * a collection of facts, or axioms.</p>
  *
  * @author Thomas Down
  * @author Matthew Pocock

@@ -31,7 +31,7 @@ import org.biojava.bio.BioException;
  */
 
 public class OntologyException
-extends BioException {
+extends Exception {
   public OntologyException() {
     super();
   }
@@ -44,7 +44,7 @@ extends BioException {
     super(cause);
   }
   
-  public OntologyException(Throwable cause, String message) {
-    super(cause, message);
+  public OntologyException(String message, Throwable cause) {
+    super(message, cause);
   }
 }
