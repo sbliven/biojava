@@ -29,8 +29,8 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
 public class SimpleWeightMatrix implements WeightMatrix, Serializable {
-  private Distribution [] columns;
-  private Alphabet alpha;
+  private final Distribution [] columns;
+  private final Alphabet alpha;
 
   public Alphabet getAlphabet() {
     return alpha;
@@ -48,9 +48,22 @@ public class SimpleWeightMatrix implements WeightMatrix, Serializable {
   throws IllegalAlphabetException {
     this.alpha = alpha;
     this.columns = new Distribution[columns];
-    int [] advance = { 1 };
     for(int i = 0; i < columns; i++) {
       this.columns[i] = dFact.createDistribution(alpha);
     }
+  }
+  
+  public SimpleWeightMatrix(Distribution[] columns)
+  throws IllegalAlphabetException {
+    this.alpha = columns[0].getAlphabet();
+    for(int c = 0; c < columns.length; c++) {
+      if(columns[c].getAlphabet() != alpha) {
+        throw new IllegalAlphabetException(
+          "All columns must emit the same alphabet. Expecting " +
+          alpha.getName() + ", but found " + columns[c].getAlphabet().getName()
+        );
+      }
+    }
+    this.columns = columns;
   }
 }

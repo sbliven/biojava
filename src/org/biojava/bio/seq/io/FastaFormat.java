@@ -121,9 +121,15 @@ public class FastaFormat implements SequenceFormat, Serializable {
     String line;
 
     // find >
-    line = in.readLine();
-    while(!line.startsWith(">")) {
-      line = in.readLine();
+    
+    for(line = in.readLine(); line != null; line = in.readLine()) {
+      if(line.startsWith(">")) {
+        break;
+      }
+    }
+    
+    if(line == null) {
+      throw new IOException("File ended prematurely");
     }
     
     String description = line.substring(1).trim();

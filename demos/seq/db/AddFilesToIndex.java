@@ -45,7 +45,9 @@ public class AddFilesToIndex {
       File indexFile = new File(indexName + ".index");
       IndexedSequenceDB seqDB = IndexedSequenceDB.openDB(indexFile);
       for(int i = 1; i < args.length; i++) {
+        System.out.print("Adding: " + args[i] + "...");
         seqDB.addFile(new File(args[i]));
+        System.out.println(" Done");
       }
     } catch (Throwable t) {
       t.printStackTrace();
