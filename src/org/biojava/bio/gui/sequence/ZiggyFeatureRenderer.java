@@ -159,6 +159,19 @@ implements FeatureRenderer, java.io.Serializable {
     }
   }
     
+    private StrandedFeature.Strand getStrand(Feature f) {
+	if (f instanceof StrandedFeature) {
+	    return ((StrandedFeature) f).getStrand();
+	} else {
+	    FeatureHolder fh = f.getParent();
+	    if (fh instanceof Feature) {
+		return getStrand((Feature) fh);
+	    } else {
+		return StrandedFeature.UNKNOWN;
+	    }
+	}
+    }
+
   private void renderLink(
     Graphics2D g, Feature f, Location source, Location dest,
     SequenceRenderContext context
@@ -169,10 +182,7 @@ implements FeatureRenderer, java.io.Serializable {
     Point2D endP;
     double half = blockDepth * 0.5;
     if(context.getDirection() == context.HORIZONTAL) {
-      if(
-        (f instanceof StrandedFeature) &&
-        (((StrandedFeature) f).getStrand() == StrandedFeature.NEGATIVE)
-      ) {
+      if(getStrand(f) == StrandedFeature.NEGATIVE) {
         double start = context.sequenceToGraphics(dest.getMin());
         double end = context.sequenceToGraphics(source.getMax()+1);
         double mid = (start + end) * 0.5;
@@ -188,10 +198,7 @@ implements FeatureRenderer, java.io.Serializable {
         endP   = new Point2D.Double(end,   half);
       }
     } else {
-      if(
-        (f instanceof StrandedFeature) &&
-        (((StrandedFeature) f).getStrand() == StrandedFeature.NEGATIVE)
-      ) {
+      if (getStrand(f) == StrandedFeature.NEGATIVE) {
         double start = context.sequenceToGraphics(dest.getMin());
         double end = context.sequenceToGraphics(source.getMax()+1);
         double mid = (start + end) * 0.5;
