@@ -1,5 +1,3 @@
-
-
 /*
  *                    BioJava development code
  *
@@ -25,6 +23,8 @@
  */
 package org.biojava.bio.structure.io;
 
+import org.biojava.bio.structure.Structure ;
+import java.io.IOException ;
 
 /**
  * interface StructureIOFile extends the StructureIO interface
@@ -42,5 +42,14 @@ public interface StructureIOFile extends StructureIO {
      * @param ext  a String ...
      */
     public void addExtension(String ext);
+
+    /** open filename and returns
+     * a Structure object.
+     * @param filename  a String
+     * @return a Structure object
+     * @throws IOException ...
+     */
+    public Structure getStructure(String filename) throws IOException ;
+
     
 }
