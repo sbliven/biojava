@@ -468,6 +468,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
     protected SymbolList getTrueSymbols() {
 	try {
+	    DAS.startedActivity(this);
+
 	    URL epURL = new URL(dataSourceURL, "dna?ref=" + seqID);
 	    HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
 	    huc.connect();
@@ -509,6 +511,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    throw new BioError(ex);
 	} catch (BioException ex) {
 	    throw new BioError(ex);
+	} finally {
+	    DAS.completedActivity(this);
 	}
     }
 

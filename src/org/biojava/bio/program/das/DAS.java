@@ -34,16 +34,50 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 public class DAS extends AbstractChangeable {
-  private Map dataSources;
+    private static List activityListeners;
+    private Map dataSources;
   
-  {
-    dataSources = new HashMap();
-  }
+    {
+	dataSources = new HashMap();
+    }
   
-  public static final ChangeType SERVERS = new ChangeType(
-    "Das Servers changed", DAS.class, "SERVERS"
-  );
+    static {
+	activityListeners = new ArrayList();
+    }
+
+    public static final ChangeType SERVERS = new ChangeType(
+		 "Das Servers changed", DAS.class, "SERVERS"
+							   );
   
+    public static synchronized void addActivityListener(ActivityListener al) {
+	activityListeners.add(al);
+    }
+
+    public static synchronized void removeActivityListener(ActivityListener al) {
+	activityListeners.remove(al);
+    }
+
+    public static synchronized void startedActivity(Object source) {
+	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
+	    ActivityListener al = (ActivityListener) i.next();
+	    al.startedActivity(source);
+	}
+    }
+
+    public static synchronized void completedActivity(Object source) {
+	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
+	    ActivityListener al = (ActivityListener) i.next();
+	    al.completedActivity(source);
+	}
+    }
+
+    public static synchronized void activityProgress(Object source, int current, int target) {
+	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
+	    ActivityListener al = (ActivityListener) i.next();
+	    al.activityProgress(source, current, target);
+	}
+    }
+
   public void addDasURL(URL dasURL)
   throws BioException, ChangeVetoException {
     if(hasListeners()) {

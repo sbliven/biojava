@@ -121,7 +121,9 @@ class FeatureRequestManager {
               return false;
             }
             
-	    System.err.println("Wheee, extended fetch of " + matchingTickets.size() + " requests (" + triggerType + "," + triggerCategory + ")");
+	    // System.err.println("Wheee, extended fetch of " + matchingTickets.size() + " requests (" + triggerType + "," + triggerCategory + ")");
+
+	    DAS.startedActivity(this);
 
 	    URL fURL = new URL(dataSourceURL, "features");
 	    HttpURLConnection huc = (HttpURLConnection) fURL.openConnection();
@@ -204,6 +206,8 @@ class FeatureRequestManager {
 	    throw new ParseException(ex);
 	} catch (SAXException ex) {
 	    throw new ParseException(ex);
+	} finally {
+	    DAS.completedActivity(this);
 	}
 
 	// Looks like this worked...
@@ -214,9 +218,10 @@ class FeatureRequestManager {
     private void fetchTicket(Ticket t) 
         throws ParseException, BioException
     {
-	System.err.println("Sigh, just fetching one featureSet (" + t.getType() + "," + t.getCategory() + ")");
+	// System.err.println("Sigh, just fetching one featureSet (" + t.getType() + "," + t.getCategory() + ")");
 
 	try {
+	    DAS.startedActivity(this);
 	    boolean useXFF = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
 							  DASCapabilities.CAPABILITY_FEATURETABLE,
 							  DASCapabilities.CAPABILITY_FEATURETABLE_XFF);
@@ -241,6 +246,8 @@ class FeatureRequestManager {
 	    t.setAsFetched();
 	} catch (IOException ex) {
 	    throw new ParseException(ex);
+	} finally {
+	    DAS.completedActivity(this);
 	}
     }
 
