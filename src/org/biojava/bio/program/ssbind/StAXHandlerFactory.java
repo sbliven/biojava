@@ -28,8 +28,8 @@ import org.biojava.utils.stax.StAXContentHandler;
  * producing <code>StAXContentHandler</code>s which are used by the
  * <code>SeqSimilarityStAXAdapter</code>.
  *
+ * @author Thomas Down
  * @author Keith James
- * @since 1.2
  */
 public interface StAXHandlerFactory
 {

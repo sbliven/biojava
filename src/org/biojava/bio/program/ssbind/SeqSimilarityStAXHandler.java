@@ -33,6 +33,13 @@ import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
 
+/**
+ * <code>SeqSimilarityStAXHandler</code> is a base class for creating
+ * modular StAX handlers which send callbacks to a
+ * <code>SeqSimilarityStAXAdapter</code>.
+ *
+ * @author Keith James
+ */
 public class SeqSimilarityStAXHandler extends StAXContentHandlerBase
 {
     // Available handler bindings

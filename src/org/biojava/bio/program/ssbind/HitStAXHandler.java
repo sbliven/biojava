@@ -32,6 +32,12 @@ import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
 import org.biojava.utils.stax.StringElementHandlerBase;
 
+/**
+ * <code>AlignmentStAXHandler</code> handles the Hit element of
+ * BioJava BlastLike XML.
+ *
+ * @author Keith James
+ */
 public class HitStAXHandler extends SeqSimilarityStAXHandler
 {
     public static final StAXHandlerFactory HIT_HANDLER_FACTORY =
@@ -43,6 +49,12 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
             }
         };
 
+    /**
+     * Creates a new instance which sends callbacks to the specified
+     * <code>SeqSimilarityStAXAdapter</code>.
+     *
+     * @param ssContext a <code>SeqSimilarityStAXAdapter</code>.
+     */
     HitStAXHandler(SeqSimilarityStAXAdapter ssContext)
     {
         super(ssContext);
@@ -111,6 +123,10 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
         ssContext.getSearchContentHandler().endHit();
     }
 
+    /**
+     * <code>HitIdStAXHandler</code> handles the hit ID.
+     *
+     */
     private class HitIdStAXHandler extends StAXContentHandlerBase
     {
         public void startElement(String            uri,
@@ -124,6 +140,10 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
         }
     }
 
+    /**
+     * <code>QueryIdStAXHandler</code> handles the query ID.
+     *
+     */
     private class QueryIdStAXHandler extends StAXContentHandlerBase
     {
         public void startElement(String            uri,
@@ -145,6 +165,10 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
         }
     }
 
+    /**
+     * <code>HitDescriptionStAXHandler</code> handles the hit
+     * description.
+     */
     private class HitDescriptionStAXHandler extends StringElementHandlerBase
     {
         protected void setStringValue(String s)
@@ -153,6 +177,10 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
         }
     }
 
+    /**
+     * <code>HSPCollectionStAXHandler</code> handles the HSPCollection
+     * element.
+     */
     private class HSPCollectionStAXHandler extends StAXContentHandlerBase
     {
         public void startElement(String            uri,

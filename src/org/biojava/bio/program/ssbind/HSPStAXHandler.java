@@ -28,6 +28,12 @@ import org.biojava.bio.program.xff.ElementRecognizer;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 
+/**
+ * <code>HSPStAXHandler</code> handles the HSP element of BioJava
+ * BlastLike XML.
+ *
+ * @author Keith James
+ */
 public class HSPStAXHandler extends SeqSimilarityStAXHandler
 {
     public static final StAXHandlerFactory HSP_HANDLER_FACTORY =
@@ -39,6 +45,12 @@ public class HSPStAXHandler extends SeqSimilarityStAXHandler
             }
         };
 
+    /**
+     * Creates a new instance which sends callbacks to the specified
+     * <code>SeqSimilarityStAXAdapter</code>.
+     *
+     * @param ssContext a <code>SeqSimilarityStAXAdapter</code>.
+     */
     HSPStAXHandler(SeqSimilarityStAXAdapter ssContext)
     {
         super(ssContext);

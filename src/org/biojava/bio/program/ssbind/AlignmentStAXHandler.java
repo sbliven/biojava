@@ -30,6 +30,12 @@ import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StringElementHandlerBase;
 
+/**
+ * <code>AlignmentStAXHandler</code> handles the BlastLikeAlignment
+ * element of BioJava BlastLike XML.
+ *
+ * @author Keith James
+ */
 public class AlignmentStAXHandler extends SeqSimilarityStAXHandler
 {
     public static final StAXHandlerFactory ALIGNMENT_HANDLER_FACTORY =
@@ -41,6 +47,12 @@ public class AlignmentStAXHandler extends SeqSimilarityStAXHandler
             }
         };
 
+    /**
+     * Creates a new instance which sends callbacks to the specified
+     * <code>SeqSimilarityStAXAdapter</code>.
+     *
+     * @param ssContext a <code>SeqSimilarityStAXAdapter</code>.
+     */
     AlignmentStAXHandler(SeqSimilarityStAXAdapter ssContext)
     {
         super(ssContext);
@@ -66,6 +78,10 @@ public class AlignmentStAXHandler extends SeqSimilarityStAXHandler
                    });
     }
 
+    /**
+     * <code>QuerySequenceStAXHandler</code> handles the query
+     * sequence.
+     */
     private class QuerySequenceStAXHandler extends StringElementHandlerBase
     {
         private SearchContentHandler sch;
@@ -93,6 +109,9 @@ public class AlignmentStAXHandler extends SeqSimilarityStAXHandler
         }
     }
 
+    /**
+     * <code>HitSequenceStAXHandler</code> handles the hit sequence.
+     */
     private class HitSequenceStAXHandler extends StringElementHandlerBase
     {
         private SearchContentHandler sch;

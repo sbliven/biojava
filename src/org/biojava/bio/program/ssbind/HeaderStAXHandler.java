@@ -34,6 +34,12 @@ import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
 import org.biojava.utils.stax.StringElementHandlerBase;
 
+/**
+ * <code>HeaderStAXHandler</code> handles the Header element of
+ * BioJava BlastLike XML.
+ *
+ * @author Keith James
+ */
 public class HeaderStAXHandler extends SeqSimilarityStAXHandler
 {
     public static final StAXHandlerFactory HEADER_HANDLER_FACTORY =
@@ -45,6 +51,12 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
             }
         };
 
+    /**
+     * Creates a new instance which sends callbacks to the specified
+     * <code>SeqSimilarityStAXAdapter</code>.
+     *
+     * @param ssContext a <code>SeqSimilarityStAXAdapter</code>.
+     */
     HeaderStAXHandler(SeqSimilarityStAXAdapter ssContext)
     {
         super(ssContext);
@@ -79,6 +91,13 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
                    });
     }
 
+    /**
+     * <code>BlastDBQueryStAXHandler</code> workaround class which
+     * parses DB and Query info from the RawOutput element. The DTD
+     * has specific elements for these data, but the current parser
+     * does not populate them. When those elements are present, the
+     * other two handlers in the enclosing class will be used.
+     */
     private class BlastDBQueryStAXHandler extends StringElementHandlerBase
     {
         private SearchContentHandler sch;
@@ -141,6 +160,9 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
         }
     }
 
+    /**
+     * <code>QueryIdStAXHandler</code> handles the query sequence ID.
+     */
     private class QueryIdStAXHandler extends StAXContentHandlerBase
     {
         public void startElement(String            uri,
@@ -162,6 +184,10 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
         }
     }
 
+    /**
+     * <code>DatabaseIdStAXHandler</code> handles the database ID.
+     *
+     */
     private class DatabaseIdStAXHandler extends StAXContentHandlerBase
     {
         public void startElement(String            uri,

@@ -29,6 +29,15 @@ import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
 
+/**
+ * <code>SeqSimilarityStAXAdapter</code> is a handler for XML
+ * conforming to the BioJava BlastLike DTD. Together with its modular
+ * delegate handlers it converts XML into calls on a
+ * <code>SearchContentHandler</code> interface. Implementations of the
+ * at interface create various types of Java object from the XML data.
+ *
+ * @author Keith James
+ */
 public class SeqSimilarityStAXAdapter extends StAXContentHandlerBase
 {
     public static final String NAMESPACE = "http://www.biojava.org";
