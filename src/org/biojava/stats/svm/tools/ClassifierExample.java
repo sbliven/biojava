@@ -1,0 +1,387 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+
+package org.biojava.stats.svm.tools;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.util.*;
+import javax.swing.*;
+
+import org.biojava.stats.svm.*;
+
+/**
+ * A simple toy example that allows you to put points on a canvas, and find a
+ * polynomeal hyperplane to seperate them.
+ */
+public class ClassifierExample {
+  /**
+   * Entry point for the application. The arguments are ignored.
+   */
+  public static void main(String args[]) {
+    JFrame f = new JFrame();
+    f.addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent we) {
+        System.exit(0);
+      }
+    });
+    f.getContentPane().setLayout(new BorderLayout());
+    final PointClassifier pc = new PointClassifier();
+    f.getContentPane().add(BorderLayout.CENTER, pc);
+    JPanel panel = new JPanel();
+    panel.setLayout(new FlowLayout());
+    ButtonGroup bGroup = new ButtonGroup();
+    final JRadioButton rbPos = new JRadioButton("postive");
+    bGroup.add(rbPos);
+    final JRadioButton rbNeg = new JRadioButton("negative");
+    bGroup.add(rbNeg);
+    ActionListener addTypeAction = new ActionListener() {
+      public void actionPerformed(ActionEvent ae) {
+        JRadioButton rb = (JRadioButton) ae.getSource();
+        pc.setAddPos(rbPos.isSelected());
+      }
+    };
+    rbPos.addActionListener(addTypeAction);
+    panel.add(rbPos);
+    rbNeg.addActionListener(addTypeAction);
+    panel.add(rbNeg);
+    ActionListener classifyAction = new ActionListener() {
+      public void actionPerformed(ActionEvent ae) {
+        pc.classify();
+      }
+    };
+    JButton classifyB = new JButton("classify");
+    classifyB.addActionListener(classifyAction);
+    panel.add(classifyB);
+    ActionListener clearAction = new ActionListener() {
+      public void actionPerformed(ActionEvent ae) {
+        pc.clear();
+      }
+    };
+    JButton clearB = new JButton("clear");
+    clearB.addActionListener(clearAction);
+    panel.add(clearB);
+    rbPos.setSelected(pc.getAddPos());
+    rbNeg.setSelected(!pc.getAddPos());
+    
+    JComboBox kernelBox = new JComboBox();
+    kernelBox.addItem("polynomeal");
+    kernelBox.addItem("rbf");
+    
+    kernelBox.addItemListener(new ItemListener() {
+      public void itemStateChanged(ItemEvent e) {
+        if(e.getStateChange() == ItemEvent.SELECTED) {
+          Object o = e.getItem();
+          if(o.equals("polynomeal")) {
+            pc.setKernel(pc.polyKernel);
+          } else if(o.equals("rbf")) {
+            pc.setKernel(pc.rbfKernel);
+          }
+        }
+      }
+    });
+    panel.add(kernelBox);
+    
+    f.getContentPane().add(BorderLayout.NORTH, panel);
+    f.setSize(400, 300);
+    f.setVisible(true);
+  }
+
+  /**
+   * An extention of JComponent that contains the points & encapsulates the
+   * classifier.
+   */
+  public static class PointClassifier extends JComponent {
+    // public kernels
+    public static SVMKernel polyKernel;
+    public static SVMKernel rbfKernel;
+    
+    static {
+      SVMKernel k = new SVMKernel() {
+        public double evaluate(Object a, Object b) {
+          Point2D pa = (Point2D) a;
+          Point2D pb = (Point2D) b;
+
+          double dot = pa.getX() * pb.getX() + pa.getY() * pb.getY();
+          return dot;
+        }
+      };
+
+      PolynomialKernel pk = new PolynomialKernel();
+      pk.setWrappedKernel(k);
+      pk.setOrder(2);
+      pk.setConstant(1.0);
+      pk.setMultiplier(0.0000001);
+      
+      RadialBaseKernel rb = new RadialBaseKernel();
+      rb.setKernel(k);
+      
+      polyKernel = pk;
+      rbfKernel = rb;
+    }
+    
+    // private variables that should only be diddled by internal methods
+    private java.util.List positivePoints;
+    private java.util.List negativePoints;
+    private SVMModel model;
+
+    {
+      positivePoints = new ArrayList();
+      negativePoints = new ArrayList();
+      model = null;
+    }
+
+    // private variables containing state that may be diddled by beany methods
+    private boolean addPos;
+    private Shape posShape;
+    private Shape negShape;
+    private Paint svPaint;
+    private Paint plainPaint;
+    private Paint posPaint;
+    private Paint negPaint;
+    private SVMKernel kernel;
+
+    /**
+     * Set the kernel used for classification.
+     *
+     * @param kernel  the SVMKernel to use
+     */
+    public void setKernel(SVMKernel kernel) {
+      firePropertyChange("kernel", this.kernel, kernel);
+      this.kernel = kernel;
+    }
+    
+    /**
+     * Retrieve the currently used kernel
+     *
+     * @return the current value of the kernel.
+     */
+    public SVMKernel getKernel() {
+      return this.kernel;
+    }
+
+    /**
+     * Set a flag so that newly added points will be in the positive class or
+     * negative class, depending on wether addPos is true or false respectively.
+     *
+     * @param addPos  boolean to flag which class to add new points to0
+     */
+    public void setAddPos(boolean addPos) {
+      firePropertyChange("addPos", this.addPos, addPos);
+      this.addPos = addPos;
+    }
+
+    /**
+     * Retrieve the current value of addPos.
+     *
+     * @return  true if new points will be added to the positive examples and
+     *          false if they will be added to the negative examples.
+     */
+    public boolean getAddPos() {
+      return addPos;
+    }
+
+    /**
+     * Set the Shape to represent the positive points.
+     * <P>
+     * The shape should be positioned so that 0, 0 is the center or focus.
+     *
+     * @param posShape the Shape to use
+     */
+    public void setPosShape(Shape posShape) {
+      firePropertyChange("posShape", this.posShape, posShape);
+      this.posShape = posShape;
+    }
+
+    /**
+     * Retrieve the shape used to represent positive points.
+     *
+     * @return the current positive Shape
+     */
+    public Shape getPosShape() {
+      return posShape;
+    }
+
+    /**
+     * Set the Shape to represent the negative points.
+     * <P>
+     * The shape should be positioned so that 0, 0 is the center or focus.
+     *
+     * @param posShape the Shape to use
+     */
+    public void setNegShape(Shape negShape) {
+      firePropertyChange("negShape", this.negShape, negShape);
+      this.negShape = negShape;
+    }
+
+    /**
+     * Retrieve the shape used to represent negative points.
+     *
+     * @return the current negative Shape
+     */
+    public Shape getNegShape() {
+      return negShape;
+    }
+
+    /**
+     * Remove all points from the canvas, and discard any model.
+     */
+    public void clear() {
+      positivePoints.clear();
+      negativePoints.clear();
+      model = null;
+      repaint();
+    }
+
+    /**
+     * Learn a model from the current points.
+     * <P>
+     * This may take some time for complicated models.
+     */
+    public void classify() {
+      int size = positivePoints.size() + negativePoints.size();
+      SVMModel model = new SVMModel(size);
+      double [] target = new double[size];
+      int i = 0;
+
+      for(Iterator it = positivePoints.iterator(); it.hasNext(); i++) {
+        model.addVector(it.next());
+        target[i] = +1;
+      }
+
+      for(Iterator it = negativePoints.iterator(); it.hasNext(); i++) {
+        model.addVector(it.next());
+        target[i] = -1;
+      }
+
+      model.setKernel(kernel);
+      model.calcKernel();
+      SMOTrainer trainer = new SMOTrainer();
+      trainer.setC(10000000.0);
+      trainer.setEpsilon(0.000000001);
+      trainer.trainModel(model, target, null);
+
+      for(i = 0; i < model.size(); i++) {
+        System.out.println(model.getVector(i) + "\t" +
+                           target[i] + "\t" +
+                           model.getAlpha(i) + "\t" +
+                           model.classify(model.getVector(i)));
+      }
+
+      this.model = model;
+      repaint();
+    }
+
+    /**
+     * Make a new PointClassifier.
+     * <P>
+     * Hooks up the mouse listener & cursor.
+     * Chooses default colors & Shapes.
+     */
+    public PointClassifier() {
+      setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+      addPos = true;
+      setPosShape(new Rectangle2D.Double(-2.0, -2.0, 5.0, 5.0));
+      setNegShape(new Ellipse2D.Double(-2.0, -2.0, 5.0, 5.0));
+      setKernel(polyKernel);
+      plainPaint = Color.black;
+      svPaint = Color.green;
+      posPaint = Color.red;
+      negPaint = Color.blue;
+
+      addMouseListener(new MouseAdapter() {
+        public void mouseReleased(MouseEvent me) {
+          Point p = me.getPoint();
+          if(getAddPos()) {
+            positivePoints.add(p);
+          } else {
+            negativePoints.add(p);
+          }
+          model = null;
+          repaint();
+        }
+      });
+    }
+  
+    /**
+     * Renders this component to display the points, and if present, the
+     * support vector machine.
+     */
+    public void paintComponent(Graphics g) {
+      Graphics2D g2 = (Graphics2D) g;
+      Shape glyph;
+      AffineTransform at = new AffineTransform();
+      int i = 0;
+      Rectangle r = g2.getClipBounds();
+      int step = 3;
+
+      if(model != null) {
+        Rectangle rr = new Rectangle(r.x, r.y, step, step);
+        Point p = new Point(r.x, r.y);
+        for(int x = r.x; x < r.x + r.width; x+=step) {
+          p.x = x;
+          rr.x = x;
+          for(int y = r.y; y < r.y + r.height; y+=step) {
+            p.y = y;
+            rr.y = y;
+            double s = model.classify(p);
+            if(s <= -1.0) {
+              g2.setPaint(negPaint);
+            } else if(s >= +1.0) {
+              g2.setPaint(posPaint);
+            } else {
+              g2.setPaint(Color.white);
+            }
+            g2.fill(rr);
+          }
+        }
+      }
+
+      glyph = getPosShape();
+      for(Iterator it = positivePoints.iterator(); it.hasNext(); i++) {
+        Point2D p = (Point2D) it.next();
+        at.setToTranslation(p.getX(), p.getY());
+        Shape s = at.createTransformedShape(glyph);
+        if(model != null && model.getAlpha(i) != 0) {
+          g2.setPaint(svPaint);
+        } else {
+          g2.setPaint(plainPaint);
+        }
+        g2.draw(s);
+      }
+
+      glyph = getNegShape();
+      for(Iterator it = negativePoints.iterator(); it.hasNext(); i++) {
+        Point2D p = (Point2D) it.next();
+        at.setToTranslation(p.getX(), p.getY());
+        Shape s = at.createTransformedShape(glyph);
+        if(model != null && model.getAlpha(i) != 0) {
+          g2.setPaint(svPaint);
+        } else {
+          g2.setPaint(plainPaint);
+        }
+        g2.draw(s);
+      }
+    }
+  }
+}

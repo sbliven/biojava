@@ -1,0 +1,81 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+
+package org.biojava.bio.seq;
+
+import java.io.Serializable;
+
+/**
+ * A filter for accepting or rejecting a feature.
+ * <P>
+ * This may implement arbitrary rules, or be based upon the feature's
+ * annotation, type, location or source.
+ * <P>
+ * If the filter is to be used in a remote process, it is expected that it would
+ * be serialized and sent over to run remotely, rather than each feature being retrieved
+ * localy.
+ */
+public interface FeatureFilter extends Serializable {
+  /**
+   * This method determines whether a fetaure is to be accepted.
+   *
+   * @param f the Feature to evaluate
+   * @return  true if this feature is to be selected in, or false if it is to be ignored
+   */
+  boolean accept(Feature f);
+
+  /**
+   * All features are selected in with this filter.
+   */
+  static final public FeatureFilter all = new AcceptAllFilter();
+  
+  /**
+   * The class that accepts all features.
+   * <P>
+   * Use the FeatureFilter.all member.
+   */
+  static class AcceptAllFilter implements FeatureFilter {
+    public boolean accept(Feature f) { return true; }
+  };
+
+  /**
+   * Construct one of these to filter features by type.
+   */
+  static class ByType implements FeatureFilter {
+    private String type;
+    public ByType(String type) {
+      this.type = type;
+    }
+    public boolean accept(Feature f) { return f.getType().equals(type); }
+  }
+
+  /**
+   * Construct one of these to filter features by source.
+   */
+  static class BySource implements FeatureFilter {
+    private String source;
+    public BySource(String source) {
+      this.source = source;
+    }
+    public boolean accept(Feature f) { return f.getSource().equals(source); }
+  }
+}

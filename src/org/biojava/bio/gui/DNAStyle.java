@@ -1,0 +1,84 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+
+package org.biojava.bio.gui;
+
+import java.awt.Paint;
+import java.awt.Color;
+import java.util.*;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.Residue;
+import org.biojava.bio.seq.IllegalResidueException;
+import org.biojava.bio.seq.tools.DNATools;
+
+/**
+ * A simple implementation of ResidueStyle optimized for DNA.
+ *
+ * @author Matthew Pocock
+ */
+public class DNAStyle implements ResidueStyle {
+  private Map outlinePaint;
+  private Map fillPaint;
+  
+  {
+    outlinePaint = new HashMap();
+    fillPaint = new HashMap();
+  }
+  
+  public Paint outlinePaint(Residue r) throws IllegalResidueException {
+    DNATools.getAlphabet().validate(r);
+    return (Paint) outlinePaint.get(r);
+  }
+  
+  public Paint fillPaint(Residue r) throws IllegalResidueException {
+    DNATools.getAlphabet().validate(r);
+    return (Paint) fillPaint.get(r);
+  }
+  
+  public void setOutlinePaint(Residue r, Paint paint)
+  throws IllegalResidueException {
+    DNATools.getAlphabet().validate(r);
+    outlinePaint.put(r, paint);
+  }
+
+  public void setFillPaint(Residue r, Paint paint)
+  throws IllegalResidueException {
+    DNATools.getAlphabet().validate(r);
+    fillPaint.put(r, paint);
+  }
+  
+  public DNAStyle() {
+    try {
+      setOutlinePaint(DNATools.t(), Color.black);
+      setFillPaint(DNATools.t(), Color.red);
+      setOutlinePaint(DNATools.a(), Color.black);
+      setFillPaint(DNATools.a(), Color.green);
+      setOutlinePaint(DNATools.g(), Color.black);
+      setFillPaint(DNATools.g(), Color.blue);
+      setOutlinePaint(DNATools.c(), Color.black);
+      setFillPaint(DNATools.c(), Color.yellow);
+    } catch (IllegalResidueException ire) {
+      throw new BioError(ire, "DNA residues dissapeared from DNA alphabet");
+    }
+  }
+}

@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE alphabetManager [
+  <!ELEMENT alphabetManager (residue|alphabet)*>
+
+  <!ELEMENT residue (short, long, description)>
+  <!ATTLIST residue
+    name	ID	#IMPLIED>
+
+  <!ELEMENT short (#PCDATA)>
+  <!ELEMENT long (#PCDATA)>
+  <!ELEMENT description (#PCDATA)>
+
+  <!ELEMENT alphabet (name, description, (residue|residueref)*, tokenizer*)>
+  <!ELEMENT name (#PCDATA)>
+  <!ELEMENT residueref EMPTY>
+  <!ATTLIST residueref
+    name	IDREF	#REQUIRED>
+
+  <!ELEMENT tokenizer (map)*>
+  <!ATTLIST tokenizer
+    name	CDATA #REQUIRED
+    tokenLength	CDATA #IMPLIED>
+
+  <!ELEMENT map EMPTY>
+  <!ATTLIST map
+    token	CDATA #REQUIRED
+    residue	IDREF #REQUIRED>
+]>
+
+<alphabetManager>
+  <residue name="adenine">
+    <short>a</short>
+    <long>adenine</long>
+    <description>pairs with T in DNA, and U in RNA</description>
+  </residue>
+  <residue name="guanine">
+    <short>g</short>
+    <long>guanine</long>
+    <description>pairs with C</description>
+  </residue>
+  <residue name="cytosine">
+    <short>c</short>
+    <long>cytosine</long>
+    <description>pairs with G</description>
+  </residue>
+  <residue name="thymine">
+    <short>t</short>
+    <long>thymine</long>
+    <description>pairs with A</description>
+  </residue>
+  <residue name="uracile">
+    <short>u</short>
+    <long>uracyl</long>
+    <description>pairs with A, replacing T in RNA</description>
+  </residue>
+  <residue name="r">
+    <short>r</short>
+    <long>ag</long>
+    <description>A or G</description>
+  </residue>
+  <residue name="y">
+    <short>y</short>
+    <long>ct</long>
+    <description>C or T</description>
+  </residue>
+  <residue name="m">
+    <short>m</short>
+    <long>ac</long>
+    <description>A or C</description>
+  </residue>
+  <residue name="k">
+    <short>k</short>
+    <long>GT</long>
+    <description>G or T</description>
+  </residue>
+  <residue name="s">
+    <short>s</short>
+    <long>gc</long>
+    <description>G or C</description>
+  </residue>
+  <residue name="w">
+    <short>w</short>
+    <long>at</long>
+    <description>A or T</description>
+  </residue>
+  <residue name="h">
+    <short>h</short>
+    <long>act</long>
+    <description>Not G</description>
+  </residue>
+  <residue name="b">
+    <short>b</short>
+    <long>gtc</long>
+    <description>Not A</description>
+  </residue>
+  <residue name="v">
+    <short>v</short>
+    <long>gac</long>
+    <description>Not T</description>
+  </residue>
+  <residue name="d">
+    <short>d</short>
+    <long>gat</long>
+    <description>Not C</description>
+  </residue>
+  <residue name="n">
+    <short>n</short>
+    <long>agct</long>
+    <description>A, G, C or T</description>
+  </residue>
+  <residue name="gap">
+    <short>-</short>
+    <long>gap</long>
+    <description>There is a gap here</description>
+  </residue>
+  
+  <alphabet>
+    <name>DNA</name>
+    <description>Deoxy-Rhybose Nucleic Acid. The stuff of life.</description>
+    <residueref name="adenine"/>
+    <residueref name="guanine"/>
+    <residueref name="cytosine"/>
+    <residueref name="thymine"/>
+  </alphabet>
+  <alphabet>
+    <name>DNA-N</name>
+    <description>Deoxy-Rhybose Nucleic Acid with N character.</description>
+    <residueref name="adenine"/>
+    <residueref name="guanine"/>
+    <residueref name="cytosine"/>
+    <residueref name="thymine"/>
+    <residueref name="n"/>
+  </alphabet>
+  <alphabet>
+    <name>DNA-AMBIGUITY</name>
+    <description>Deoxy-Rhybose Nucleic Acid with ambiguitiy codes.</description>
+    <residueref name="adenine"/>
+    <residueref name="guanine"/>
+    <residueref name="cytosine"/>
+    <residueref name="thymine"/>
+    <residueref name="r"/>
+    <residueref name="y"/>
+    <residueref name="m"/>
+    <residueref name="k"/>
+    <residueref name="s"/>
+    <residueref name="w"/>
+    <residueref name="h"/>
+    <residueref name="b"/>
+    <residueref name="v"/>
+    <residueref name="d"/>
+    <residueref name="n"/>
+    <residueref name="gap"/>
+  </alphabet>
+  <alphabet>
+    <name>RNA</name>
+    <description>Rhybose Nucleic Acid. Intermediate between genomic DNA and protein.</description>
+    <residueref name="adenine"/>
+    <residueref name="guanine"/>
+    <residueref name="cytosine"/>
+    <residueref name="uracile"/>
+  </alphabet>
+</alphabetManager>
