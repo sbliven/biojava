@@ -29,6 +29,8 @@ import org.biojava.bio.AnnotationTools;
 import org.biojava.bio.AnnotationType;
 import org.biojava.bio.CardinalityConstraint;
 import org.biojava.bio.PropertyConstraint;
+import org.biojava.bio.seq.filter.WalkerFactory;
+import org.biojava.bio.seq.filter.Visitor;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
 
@@ -827,7 +829,7 @@ public class FilterUtils {
      * @param filter  the FeatureFilter to attempt to transform
      * @return a transformed filter, or null
      */
-    public FeatureFilter transform(FeatureFilter filt);
+    public FeatureFilter transform(FeatureFilter filter);
   }
   
   /**
@@ -924,4 +926,9 @@ public class FilterUtils {
             return null;
         }
     }
+
+  public void visitFilter(FeatureFilter filter, Visitor visitor) {
+    WalkerFactory.getInstance().getWalker(visitor).walk(filter, visitor);
+  }
+
 }

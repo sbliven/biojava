@@ -164,7 +164,7 @@ public class ProjectionEngine {
     }
   }
 
-  private Class getFeatureProjectionClass(Class face, Class ctxtClass) {
+  private synchronized Class getFeatureProjectionClass(Class face, Class ctxtClass) {
     Class projection = searchForClass(face, ctxtClass);
     if (projection == null) {
       try {
