@@ -13,9 +13,9 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.dp.*;
 
-public class SearchProfile 
-{
+public class SearchProfile{
   public static Distribution nullModel;
+
   
   public static void main(String [] args) 
   {
@@ -28,19 +28,19 @@ public class SearchProfile
       
       System.out.println("Loading sequences");
       SequenceDB seqDB = readSequenceDB(seqFile, PROTEIN);
-      
+
       System.out.println("Creating profile HMM");
       ProfileHMM profile = createProfile(seqDB, PROTEIN);
 
     
       System.out.println("make dp object");
       DP dp = DPFactory.DEFAULT.createDP(profile);
-//      dumpDP(dp);
+      dumpDP(dp);
 
       Sequence [] seq1 = { seqDB.sequenceIterator().nextSequence() };
-      System.out.println("Viterbi: " + dp.viterbi(seq1, ScoreType.PROBABILITY).getScore());
-      System.out.println("Forward: " + dp.forward(seq1, ScoreType.PROBABILITY));
-      System.out.println("Backward: " + dp.backward(seq1, ScoreType.PROBABILITY));
+      System.out.println("Viterbi: " + dp.viterbi(seq1, ScoreType.ODDS).getScore());
+      System.out.println("Forward: " + dp.forward(seq1, ScoreType.ODDS));
+      System.out.println("Backward: " + dp.backward(seq1, ScoreType.ODDS));
       
       System.out.println("Training whole profile");
       TrainingAlgorithm ta = new BaumWelchTrainer(dp);
@@ -60,9 +60,9 @@ public class SearchProfile
       for(SequenceIterator si = seqDB.sequenceIterator(); si.hasNext(); ) {
         Sequence seq = si.nextSequence();
         SymbolList [] rl = { seq };
-        StatePath statePath = dp.viterbi(rl, ScoreType.PROBABILITY);
-        double fScore = dp.forward(rl, ScoreType.PROBABILITY);
-        double bScore = dp.backward(rl, ScoreType.PROBABILITY);
+        StatePath statePath = dp.viterbi(rl, ScoreType.ODDS);
+        double fScore = dp.forward(rl, ScoreType.ODDS);
+        double bScore = dp.backward(rl, ScoreType.ODDS);
       
         System.out.println(
           seq.getName() +
@@ -70,14 +70,15 @@ public class SearchProfile
           ", forwards: " + fScore +
           ", backwards: " + bScore
         );
+	SymbolTokenization token = ProteinTools.getAlphabet().getTokenization("token");
         for(int i = 0; i <= statePath.length() / 60; i++) {
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            System.out.print(statePath.symbolAt(StatePath.SEQUENCE, j+1).getName().charAt(0)); 
+            System.out.print(token.tokenizeSymbol(statePath.symbolAt(StatePath.SEQUENCE, j+1))); 
           }
           System.out.print("\n");
-          for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            System.out.print(statePath.symbolAt(StatePath.STATES, j+1).getName().charAt(0)); 
-          }
+
+          for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) 
+	      System.out.print(statePath.symbolAt(StatePath.STATES, j+1).getName().charAt(0));
           System.out.print("\n");
           System.out.print("\n");
         }
@@ -171,7 +172,7 @@ public class SearchProfile
     System.out.println("\n");
     
     int [][] forwardT = dp.getForwardTransitions();
-    double [][] forwardTS = dp.getForwardTransitionScores(ScoreType.PROBABILITY);
+    double [][] forwardTS = dp.getForwardTransitionScores(ScoreType.ODDS);
     for(int i = 0; i < states.length; i++) {
       System.out.print("Transitions from " + i + ": ");
       for(int j = 0; j < forwardT[i].length; j++) {
@@ -182,4 +183,15 @@ public class SearchProfile
       }
     }
   }
+
+    static void Print(SymbolList v){
+	Iterator  it = (v.iterator());
+	while(it.hasNext()){
+	    Symbol sym = (Symbol)it.next();
+	    System.out.print(sym.getName()+" ");
+	}
+	System.out.println();
+    }
+
+
 }
