@@ -137,7 +137,11 @@ public class SimpleFeatureRealizer implements FeatureRealizer, Serializable {
 	    try {
 		return (Feature) cons.newInstance(consArgs);
 	    } catch (Exception ex) {
-		throw new BioException(ex, "Couldn't realize feature");
+		Throwable t = ex;
+		if(ex instanceof InvocationTargetException) {
+		    t = ((InvocationTargetException) ex).getTargetException();
+		}
+                throw new BioException(t, "Couldn't realize feature");
 	    }
 	}
     }
