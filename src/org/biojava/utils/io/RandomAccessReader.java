@@ -71,6 +71,7 @@ public class RandomAccessReader extends Reader
      * @param sz an <code>int</code> buffer size.
      */
     public RandomAccessReader(RandomAccessFile raf, int sz)
+        throws IOException
     {
         super();
         this.raf = raf;
