@@ -120,7 +120,7 @@ public class Search
                 if (info.overlap)
                     begin = Math.min(start + 1, seq.length());
                 else
-                    begin = Math.min(end, seq.length());;
+                    begin = Math.min(end, seq.length());
                 if (listener != null) listener.reportMatch(seq, info.pattern, start, end);
             }
         }
