@@ -214,8 +214,15 @@ class DASGFFParser {
 			    String gtag = gel.getTagName();
 			    if (gtag.equals("TARGET")) {
 				refName = gel.getAttribute("ref");
-				refStart = Integer.parseInt(gel.getAttribute("start"));
-				refStop = Integer.parseInt(gel.getAttribute("stop"));
+				String refStartS = gel.getAttribute("start");
+				if (refStartS.length() > 0) {
+				    refStart = Integer.parseInt(refStartS);
+				}
+
+				String refStopS = gel.getAttribute("stop");
+				if (refStopS.length() > 0) {
+				    refStop = Integer.parseInt(refStopS);
+				}
 			    } else {
 				// Right now the target is all we care about.
 				// I didn't design this protocol, 'kay?
