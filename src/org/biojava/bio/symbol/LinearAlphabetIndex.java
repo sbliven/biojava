@@ -13,8 +13,13 @@ import org.biojava.bio.*;
  * @since 1.1
  */
 class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
-  private final FiniteAlphabet alpha;
+  private /*final*/ FiniteAlphabet alpha;
   private Symbol[] symbols;
+
+  // hack for bug in compaq 1.2?
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    return super.getChangeSupport(ct);
+  }
 
   public LinearAlphabetIndex(FiniteAlphabet alpha) {
     // lock the alphabet
@@ -86,7 +91,10 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
   
   protected class IndexRebuilder extends ChangeForwarder {
     public IndexRebuilder() {
-      super(LinearAlphabetIndex.this, getChangeSupport(AlphabetIndex.INDEX));
+      super(
+	    LinearAlphabetIndex.this,
+		LinearAlphabetIndex.this.getChangeSupport(AlphabetIndex.INDEX)
+      );
     }
     
     public ChangeEvent generateEvent(ChangeEvent ce)
@@ -118,7 +126,7 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
       return new ChangeEvent(
         getSource(), AlphabetIndex.INDEX,
         // fixme: buildIndex should be called using the proposed new alphabet
-        buildIndex((FiniteAlphabet) ce.getSource()),
+        LinearAlphabetIndex.this.buildIndex((FiniteAlphabet) ce.getSource()),
         symbols,
         ce
       );

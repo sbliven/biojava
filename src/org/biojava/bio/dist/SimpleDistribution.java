@@ -54,9 +54,24 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
     this.nullModel = nullModel;
   }
   
+  protected boolean hasWeights() {
+    return weights != null;
+  }
+  
+  protected double[] getWeights() {
+    if(weights == null) {
+      weights = new double[indexer.getAlphabet().size()];
+      for(int i = 0; i < weights.length; i++) {
+        weights[i] = Double.NaN;
+      }
+	}
+	
+	return weights;
+  }
+  
   public double getWeight(Symbol s)
   throws IllegalSymbolException {
-    if(weights == null) {
+    if(!hasWeights()) {
       return Double.NaN;
     } else {
       if(s instanceof AtomicSymbol) {
@@ -69,12 +84,7 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
 
   protected void setWeightImpl(Symbol s, double w)
   throws IllegalSymbolException, ChangeVetoException {
-    if(weights == null) {
-      weights = new double[indexer.getAlphabet().size()];
-      for(int i = 0; i < weights.length; i++) {
-        weights[i] = Double.NaN;
-      }
-    }
+    double[] weights = getWeights();
     if(!(s instanceof AtomicSymbol)) {
       throw new IllegalSymbolException(
         "Can't set the weight for an ambiguity symbol " + s.getName()
@@ -94,7 +104,7 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
     indexer.addChangeListener(
       new ChangeAdapter() {
         public void preChange(ChangeEvent ce) throws ChangeVetoException {
-          if(weights != null) {
+          if(hasWeights()) {
             throw new ChangeVetoException(
               ce,
               "Can't allow the index to change as we have probabilities."
@@ -171,6 +181,7 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
     protected void trainImpl(double weight) {
       try {
         Distribution nullModel = getNullModel();
+		double[] weights = getWeights();
         double []total = new double[weights.length];
         double sum = 0.0;
         for(int i = 0; i < total.length; i++) {
