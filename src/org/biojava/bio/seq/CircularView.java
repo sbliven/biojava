@@ -42,7 +42,7 @@ import java.util.*;
  * </p>
  *
  * @author Mark Schreiber
- * @version 1.1
+ * @version 1.2
  * @since 1.1
  */
 
@@ -55,50 +55,42 @@ public class CircularView extends ViewSequence{
     super(seq);
   }
 
-  /**
-   * <p>
-   * Over rides ViewSequence. Allows any integer index, positive or negative
-   * to return a symbol via the equation
-   * <CODE>index = ((index -1) % length)+1</CODE>
-   * </p>
-   *
-   * <p>
-   * Note that an index of 0 will throw an IllegalArgumentException.
-   * </p>
-   */
-  public Symbol symbolAt(int index){
-
-    if (index == 0) throw new IllegalArgumentException("Must use a non 0 integer");
-    index = ((index-1) % super.length()) + 1;
-    if(index < 0) index = super.length()+1 + index;
-    return super.symbolAt(index);
+  private int realValue(int val){
+    val = (val % length());
+    if(val < 1) val = length() + val;
+    return val;
   }
 
   /**
    * <p>
    * Over rides ViewSequence. Allows any integer index, positive or negative
    * to return a symbol via the equation
-   * <CODE>index = ((index -1) % length)+1</CODE>
+   * <CODE>val = (val % length);</CODE>
+   * Note that base zero is the base immediately before base 1 which is of course
+   * the last base of the sequence.
+   * </p>
+   */
+  public Symbol symbolAt(int index){
+    return super.symbolAt(realValue(index));
+  }
+
+  /**
+   * <p>
+   * Over rides ViewSequence. Allows any integer index, positive or negative
+   * to return a symbol via the equation
+   * <CODE>val = (val % length);</CODE>
    * </p>
    *
    * <p>
    * Will return a linear String which can, if nescessary, span the origin.
    * </p>
    *
-   * <p>
-   * Note that an index of 0 will throw an IllegalArgumentException.
-   * </p>
    */
   public String subStr(int start, int end){
-    if(start == 0 || end == 0){
-      throw new IllegalArgumentException(
-        "Must use a non 0 integer"
-      );
-    }
-    start = ((start-1) % super.length()) + 1;
-    end = ((end-1) % super.length()) + 1;
-    if(start < 0) start = super.length()+1 + start;
-    if(end < 0) end = super.length()+1 + end;
+
+    start = realValue(start);
+    end = realValue(end);
+
     if(start <= end){
       return super.subStr(start, end);
     }
@@ -115,6 +107,8 @@ public class CircularView extends ViewSequence{
    * describe locations that overlap the origin of a circular sequence).
    *
    * @since 1.2
+   * @throws BioException if a non circular location is added that exceeds the
+   * 'boundaries' of the sequence.
    */
   public Feature createFeature(Feature.Template template)
         throws ChangeVetoException, BioException
@@ -138,41 +132,25 @@ public class CircularView extends ViewSequence{
    * <p>
    * Will return a linear SymbolList which can ,if nescessary, span the origin.
    * </p>
-   *
-   * <p>
-   * Note that an index of 0 will throw an IllegalArgumentException.
-   * </p>
    */
   public SymbolList subList(int start, int end){
-    if(start == 0 || end == 0){
-      throw new IllegalArgumentException(
-        "Must use a non 0 integer"
-      );
-    }
-    start = ((start-1) % super.length()) + 1;
-    end = ((end-1) % super.length()) + 1;
 
-    if(start < 0) start = super.length()+1 + start;
-    if(end < 0) end = super.length()+1 + end;
+    start = realValue(start);
+    end = realValue(end);
 
-     if(start <= end){
+    if(start <= end){
       return super.subList(start, end);
     }
     else{
-      String toEnd = super.subStr(start,super.length());
-      String fromStart = super.subStr(1,end);
-      String s = toEnd + fromStart;
-     try{
-        Alphabet alpha = super.getAlphabet();
-        SymbolTokenization sp = alpha.getTokenization("token");
-        SymbolList seq = new SimpleSymbolList(sp, s);
-        return seq;
-     }catch(BioException be){
-        System.err.println(// This should never happen
-          "A serious error has occured during the reconstruction of " +
-          super.getName());
-          return null;
-     }
+      SymbolList toEnd = super.subList(start,super.length());
+      SymbolList fromStart = super.subList(1,end);
+      Edit edit = new Edit(toEnd.length() +1, 0, fromStart);
+      try{
+        toEnd.edit(edit);
+      }catch(Exception e){
+        throw new BioError(e, "Couldn't construct subList, this shouldn't happen");
+      }
+      return toEnd;
     }
   }
 }

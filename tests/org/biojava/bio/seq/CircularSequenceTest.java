@@ -1,0 +1,88 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+package org.biojava.bio.seq;
+
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.impl.*;
+
+/**
+ * <code>CircularSequenceTest</code> tests are to ensure that the <code>CircularView</code>
+ * class can be instantiated and that the coordinate system works
+ *
+ * @author Mark Schreiber
+ */
+public class CircularSequenceTest extends TestCase
+{
+    protected Sequence dna;
+    protected CircularView circ;
+    protected Symbol a = DNATools.a();
+    protected Symbol c = DNATools.c();
+    protected Symbol g = DNATools.g();
+    protected Symbol t = DNATools.t();
+
+    public CircularSequenceTest(String name)
+    {
+        super(name);
+    }
+
+    protected void setUp() throws Exception
+    {
+	
+        dna = DNATools.createDNASequence("atcgctcaga","");
+	circ = new CircularView(dna);
+    }
+    
+
+    public void testSubStr()
+    {
+        assertEquals("atc", circ.subStr(1,3));
+	assertEquals("aat", circ.subStr(0,2));
+	assertEquals("agaatc", circ.subStr(-2,3));
+	assertEquals("gaatc", circ.subStr(9,3));
+	assertEquals("gaatc", circ.subStr(9,13));
+    }
+    
+    public void testSymbolAt()
+    {
+	assertEquals(a, circ.symbolAt(0));
+	assertEquals(c, circ.symbolAt(13));
+	assertEquals(g, circ.symbolAt(-1));
+	assertEquals(t, circ.symbolAt(-4));
+    }
+    
+    public void testSubList()
+    {
+	assertTrue(symsEq(circ.subList(-2,2), circ.subList(8,12)));
+    }
+    
+    private boolean symsEq(SymbolList a, SymbolList b){
+	if(a.length() != b.length()) return false;
+	for(int i = 1; i <= a.length(); i++){
+	  if(a.symbolAt(i) != b.symbolAt(i)) return false;
+	}
+	return true;
+    }
+
+}

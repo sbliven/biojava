@@ -29,7 +29,7 @@ import java.io.Serializable;
  * </p>
  *
  * <p>
- * All edits can be brokend down into a series of operations that change
+ * All edits can be broken down into a series of operations that change
  * contiguous blocks of the sequence. The edit replaces getLength symbols
  * starting with that at getPos with the symbols in getReplacement. This
  * representation allows symbols to be replaced, inserted or deleted,
@@ -50,7 +50,7 @@ public final class Edit implements Serializable {
   public final int pos;
   public final int length;
   public final SymbolList replacement;
-  
+
   /**
    * Create a new Edit.
    *
