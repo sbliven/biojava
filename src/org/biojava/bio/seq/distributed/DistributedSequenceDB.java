@@ -199,24 +199,5 @@ public class DistributedSequenceDB extends AbstractSequenceDB implements Sequenc
 	}
 	return ids;
     }
-    
-    public FeatureHolder filter(FeatureFilter ff) {
-      try {
-        MergeFeatureHolder mfh =  new MergeFeatureHolder();
-        
-        for(Iterator i = datasources.iterator(); i.hasNext(); ) {
-          DistDataSource dds = (DistDataSource) i.next();
-          FeatureHolder fh = dds.getFeatures(ff);
-          if(fh.countFeatures() > 0) {
-            mfh.addFeatureHolder(fh);
-          }
-        }
-        
-        return mfh;
-      } catch (ChangeVetoException cve) {
-        throw new BioError(cve, "This should not happen");
-      } catch (BioException be) {
-        throw new BioRuntimeException(be);
-      }
-    }
+
 }

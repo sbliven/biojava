@@ -155,7 +155,7 @@ public class ProjectedFeature
   
   public SymbolList getSymbols() {
     Location loc = getLocation();
-    Sequence seq = context.getSequence(this);
+    Sequence seq = getSequence();
     if (loc.isContiguous())
       return seq.subList(loc.getMin(),loc.getMax());
       
