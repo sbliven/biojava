@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 2; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -108,53 +109,53 @@ public class SequencesAsGFF {
   protected void doProcessSequence(Sequence seq,
                                    GFFDocumentHandler handler,
                                    String id) 
-  throws BioException, BioException {
+  throws BioException {
     Iterator fi = seq.filter(getFeatureFilter(), getRecurse()).features();
       
-    while(fi.hasNext()) {
-	    Feature f = (Feature) fi.next();
-	    SimpleGFFRecord record = new SimpleGFFRecord();
-	    record.setSeqName(id);
-	    record.setSource(f.getSource());
-	    record.setFeature(f.getType());
-	    Location loc = f.getLocation();
-	    record.setStart(loc.getMin());
-	    record.setEnd(loc.getMax());
-	    record.setScore(GFFTools.NO_SCORE);
-	    record.setStrand(StrandedFeature.UNKNOWN);
-	    if(f instanceof StrandedFeature) {
+    while (fi.hasNext()) {
+      Feature f = (Feature) fi.next();
+      SimpleGFFRecord record = new SimpleGFFRecord();
+      record.setSeqName(id);
+      record.setSource(f.getSource());
+      record.setFeature(f.getType());
+      Location loc = f.getLocation();
+      record.setStart(loc.getMin());
+      record.setEnd(loc.getMax());
+      record.setScore(GFFTools.NO_SCORE);
+      record.setStrand(StrandedFeature.UNKNOWN);
+      if (f instanceof StrandedFeature) {
         StrandedFeature sf = (StrandedFeature) f;
-        if(sf.getStrand() == StrandedFeature.POSITIVE) {
+        if (sf.getStrand() == StrandedFeature.POSITIVE) {
           record.setStrand(StrandedFeature.POSITIVE);
-        } else if(sf.getStrand() == StrandedFeature.NEGATIVE) {
+        } else if (sf.getStrand() == StrandedFeature.NEGATIVE) {
           record.setStrand(StrandedFeature.NEGATIVE);
         }
-	    }
-	    record.setFrame(GFFTools.NO_FRAME);
+      }
+      record.setFrame(GFFTools.NO_FRAME);
       Map fMap = f.getAnnotation().asMap();
       Map fMap2 = new HashMap();
-      for(Iterator ki = fMap.keySet().iterator(); ki.hasNext(); ) {
+      for (Iterator ki = fMap.keySet().iterator(); ki.hasNext(); ) {
         Object key = ki.next();
         Object value = fMap.get(key);
         String keyS = key.toString();
         List valueList;
-        if(value instanceof Collection) {
-	    valueList = new ArrayList((Collection) value);
+        if (value instanceof Collection) {
+          valueList = new ArrayList((Collection) value);
         } else {
           //valueList = Collections.singletonList(value); 1.3?
           valueList = new ArrayList();
           valueList.add(value);
         }
-        for(int i = 0; i < valueList.size(); i++) {
+        for (int i = 0; i < valueList.size(); i++) {
           Object o = valueList.get(i);
           valueList.set(i, o.toString());
         }
         fMap2.put(keyS, valueList);
       }
-	    record.setGroupAttributes(fMap2);
-	    record.setComment(null);
+      record.setGroupAttributes(fMap2);
+      record.setComment(null);
         
-	    handler.recordLine(record);
+      handler.recordLine(record);
     }
   }
 
@@ -168,7 +169,7 @@ public class SequencesAsGFF {
    *                <span class="arg">seq</span>
    */
   public void processSequence(Sequence seq, GFFDocumentHandler handler) 
-  throws BioException, BioException {
+  throws BioException {
     handler.startDocument(seq.getURN());
     doProcessSequence(seq, handler, seq.getName());
     handler.endDocument();
@@ -185,7 +186,7 @@ public class SequencesAsGFF {
    *                <span class="arg">seqDB</span>
    */
   public void processDB(SequenceDB seqDB, GFFDocumentHandler handler)
-  throws BioException, BioException {
+  throws BioException {
     handler.startDocument("unknown:SequenceDB");
     for(Iterator i = seqDB.ids().iterator(); i.hasNext(); ) {
       String id = (String) i.next();
