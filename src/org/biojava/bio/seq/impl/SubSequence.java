@@ -109,7 +109,8 @@ public class SubSequence
 
   /**
    * Construct a new SubSequence of the specified sequence.
-   *
+   *   Generally you would use the SequenceTools.subSequence() methods
+   *  to get an instance of this class.
    * @param seq A sequence to view
    * @param start The start of the range to view
    * @param end The end of the range to view
@@ -130,7 +131,9 @@ public class SubSequence
   }
 
   /**
-   * Construct a new SubSequence of the specified sequence.
+   * Construct a new SubSequence of the specified sequence. Generally
+   * you would use the SequenceTools.subSequence() methods to get an
+   * instance of this class.
    *
    * @param seq A sequence to view
    * @param start The start of the range to view
