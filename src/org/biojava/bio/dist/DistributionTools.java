@@ -361,7 +361,7 @@ public class DistributionTools {
     SymbolList sl = null;
 
     List l = new ArrayList(length);
-    for (int i = 0; i < l.size(); i++) {
+    for (int i = 0; i < length; i++) {
       l.add(d.sampleSymbol());
     }
 
