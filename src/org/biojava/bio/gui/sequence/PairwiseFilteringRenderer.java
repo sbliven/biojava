@@ -46,7 +46,7 @@ import org.biojava.utils.cache.FixedSizeMap;
  * <p><code>PairwiseFilteringRenderer</code> wraps a
  * <code>PairwiseSequenceRenderer</code> and filters the
  * <code>PairwiseRenderContext</code>s passed to it. The renderer
- * recieves a new <code>PairwiseRenderContext</code> which has had
+ * receives a new <code>PairwiseRenderContext</code> which has had
  * both of its <code>FeatureHolder</code>s filtered with the
  * <code>FeatureFilter</code>.<p>
  *

@@ -29,7 +29,7 @@ import org.biojava.bio.symbol.*;
  * The interface for things that say how to paint a symbol.
  * <P>
  * Given a symbol, this allows you to get the color to outline or fill the
- * glyphs for rendering the symbol. This may be something as simple as coloring
+ * glyphs for rendering the symbol. This may be something as simple as colouring
  * dots on a scatter-plot, or labeling a key, or it may be as complicated as
  * sequence logos.
  *

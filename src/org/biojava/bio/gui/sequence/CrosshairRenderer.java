@@ -42,7 +42,7 @@ import org.biojava.utils.Changeable;
 
 /**
  * <p><code>CrosshairRenderer</code> draws a crosshair, optionally
- * with coordinates. The crosshair it set to a sequence position by a
+ * with coordinates. The crosshair is set to a sequence position by a
  * click and then stays there through scrolls/rescales until the next
  * click. See the <code>processMouseEvent</code> documentation for
  * details of responses to various mouse actions.</p>

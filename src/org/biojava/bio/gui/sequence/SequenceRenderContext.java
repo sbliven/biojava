@@ -30,7 +30,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.gui.*;
 
 /**
- * A context within sequence which information may be rendered. It
+ * A context within which sequence information may be rendered. It
  * encapsulates the rendering direction, the size of the leading and
  * trailing (header/footer, left/right areas), scale and the currently
  * rendered symbols, features and region.

@@ -32,7 +32,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
 /**
- * The gui component for rendering a DistributionLogo. By default, this uses the text
+ * The GUI component for rendering a DistributionLogo. By default, this uses the text
  * logo style - with letters stacked on top of one another, scaled by the total
  * information in the dist, and uses a PlainStyle colorer that outlines in
  * black, and fills in grey.

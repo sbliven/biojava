@@ -30,7 +30,7 @@ import java.awt.Graphics;
  * A StateLogo object claims the screen realestate for rendering, and does the
  * calculations for sizes & information and the like. The LogoPainter renders
  * this information onto a graphics context. It is given the StateLog to render,
- * so that a single LogoPainter can be shaired among many state logos.
+ * so that a single LogoPainter can be shared among many state logos.
  *
  * @author Matthew Pocock
  */

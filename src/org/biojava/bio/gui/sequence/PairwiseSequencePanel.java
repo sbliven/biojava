@@ -69,7 +69,7 @@ import org.biojava.utils.Changeable;
  * <p>The primary purpose of this component is to provide a means for
  * representing graphically comparisons between two sequences. This
  * could be anything from traditional dotplots (or variants created
- * with lines) to more complex layered plot involving superimposed
+ * with lines) to a more complex layered plot involving superimposed
  * renderers.</p>
  *
  * <p>Each sequence has a translation which is the number of

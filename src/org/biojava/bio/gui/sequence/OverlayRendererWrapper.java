@@ -35,7 +35,7 @@ import org.biojava.bio.symbol.*;
 import java.util.List;
 
 /**
- * This class wraps SequenceRenderer classes to present an
+ * This class wraps SequenceRenderer classes to present
  * an Overlay Marker interface that will indicate to 
  * LayeredRenderer that subsequent renderers should overdraw
  * the same space as the wrapped renderer.

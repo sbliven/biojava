@@ -58,7 +58,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * <p><code>AbstractBeadRenderer</code> is a an abstract base
+ * <p><code>AbstractBeadRenderer</code> is an abstract base
  * class for the creation of <code>FeatureRenderer</code>s which use a
  * 'string of beads' metaphor for displaying features. Each subclass
  * of <code>AbstractBeadRenderer</code> should override the
