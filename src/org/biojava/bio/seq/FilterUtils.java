@@ -25,12 +25,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import org.biojava.bio.AnnotationTools;
-import org.biojava.bio.AnnotationType;
-import org.biojava.bio.CardinalityConstraint;
-import org.biojava.bio.PropertyConstraint;
+import org.biojava.bio.*;
 import org.biojava.bio.seq.filter.WalkerFactory;
 import org.biojava.bio.seq.filter.Visitor;
+import org.biojava.bio.seq.filter.Walker;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
 
@@ -59,16 +57,16 @@ public class FilterUtils {
 
     public static boolean areProperSubset(FeatureFilter sub, FeatureFilter sup) {
       // Preconditions
-      
+
       if (sub == null) {
         throw new NullPointerException("Null FeatureFilter: sub");
       }
       if (sup == null) {
         throw new NullPointerException("Null FeatureFilter: sup");
       }
-      
+
       // Body
-      
+
       if(sub.equals(sup)) {
         return true;
       } else if (sup == all()) {
@@ -102,7 +100,7 @@ public class FilterUtils {
         return false;
       }
     }
-  
+
     /**
      * Determines is two queries can be proven to be disjoint.
      * <p>
@@ -118,18 +116,18 @@ public class FilterUtils {
 
     public static boolean areDisjoint(FeatureFilter a, FeatureFilter b) {
         // System.err.println("Disjunction test of " + a + " | " + b);
-        
+
       // Preconditions
-      
+
       if (a == null) {
         throw new NullPointerException("Null FeatureFilter: a");
       }
       if (b == null) {
         throw new NullPointerException("Null FeatureFilter: b");
       }
-      
+
       // Body
-      
+
       if(a.equals(b)) {
         return false;
       }
@@ -137,7 +135,7 @@ public class FilterUtils {
       if(a == none() || b == none()) {
         return true;
       }
-      
+
       if (a == all()) {
         return areProperSubset(b, FeatureFilter.none);
       } else if(b == all()) {
@@ -179,12 +177,12 @@ public class FilterUtils {
       } else if (b instanceof OptimizableFilter) {
         return ((OptimizableFilter) b).isDisjoint(a);
       }
-      
+
       // *SIGH* we don't have a proof here...
-      
+
       return false;
     }
-    
+
     /**
      * Try to determine the minimal location which all features matching a given
      * filter must overlap.
@@ -224,7 +222,7 @@ public class FilterUtils {
 	    FeatureFilter.Or ffo = (FeatureFilter.Or) ff;
 	    Location l1 = extractOverlappingLocation(ffo.getChild1());
 	    Location l2 = extractOverlappingLocation(ffo.getChild2());
-	    
+
 	    if (l1 != null && l2 != null) {
 		return LocationTools.union(l1, l2);
 	    }
@@ -232,7 +230,7 @@ public class FilterUtils {
 
 	return null;
     }
-    
+
   public final static boolean areEqual(FeatureFilter f1, FeatureFilter f2) {
     if(f1 instanceof FeatureFilter.And && f2 instanceof FeatureFilter.And) {
       List f1f = new ArrayList();
@@ -240,7 +238,7 @@ public class FilterUtils {
 
       expandAnd(f1, f1f);
       expandAnd(f2, f2f);
-      
+
       return new HashSet(f1f).equals(new HashSet(f2f));
     } else if(f1 instanceof FeatureFilter.And || f2 instanceof FeatureFilter.And) {
       return false;
@@ -250,7 +248,7 @@ public class FilterUtils {
 
       expandOr(f1, f1f);
       expandOr(f2, f2f);
-      
+
       return new HashSet(f1f).equals(new HashSet(f2f));
     } else if(f1 instanceof FeatureFilter.Or || f2 instanceof FeatureFilter.Or) {
       return false;
@@ -258,40 +256,40 @@ public class FilterUtils {
       return f1.equals(f2);
     }
   }
-  
+
   public final static FeatureFilter byType(String type) {
     return new FeatureFilter.ByType(type);
   }
-  
+
   public final static FeatureFilter bySource(String source) {
     return new FeatureFilter.BySource(source);
   }
-  
+
   public final static FeatureFilter byClass(Class clazz)
   throws ClassCastException {
     return new FeatureFilter.ByClass(clazz);
   }
-  
+
   public final static FeatureFilter containedByLocation(Location loc) {
     return new FeatureFilter.ContainedByLocation(loc);
   }
-  
+
   public final static FeatureFilter overlapsLocation(Location loc) {
     return new FeatureFilter.OverlapsLocation(loc);
   }
-  
+
   public final static FeatureFilter bySequenceName(String name) {
     return new FeatureFilter.BySequenceName(name);
   }
-  
+
   public final static FeatureFilter not(FeatureFilter filter) {
     return new FeatureFilter.Not(filter);
   }
-  
+
   public final static FeatureFilter and(FeatureFilter c1, FeatureFilter c2) {
     return new FeatureFilter.And(c1, c2);
   }
-  
+
   public final static FeatureFilter and(FeatureFilter[] filters) {
     if(filters.length == 0) {
       return all();
@@ -305,11 +303,11 @@ public class FilterUtils {
       return f;
     }
   }
-  
+
   public final static FeatureFilter or(FeatureFilter c1, FeatureFilter c2) {
     return new FeatureFilter.Or(c1, c2);
   }
-  
+
   public final static FeatureFilter or(FeatureFilter[] filters) {
     if(filters.length == 0) {
       return none();
@@ -323,73 +321,81 @@ public class FilterUtils {
       return f;
     }
   }
-  
+
   public final static FeatureFilter byAnnotationType(AnnotationType type) {
     return new FeatureFilter.ByAnnotationType(type);
   }
-  
+
   public final static FeatureFilter byAnnotation(Object key, Object value) {
     return new FeatureFilter.ByAnnotation(key, value);
   }
-  
+
   public final static FeatureFilter byAnnotationType(Object key, Class valClass) {
     AnnotationType type = new AnnotationType.Impl();
     type.setConstraints(key, new PropertyConstraint.ByClass(valClass), CardinalityConstraint.ANY);
     return byAnnotationType(type);
   }
-  
+
   public final static FeatureFilter hasAnnotation(Object key) {
     return new FeatureFilter.HasAnnotation(key);
   }
-  
+
   public final static FeatureFilter byStrand(StrandedFeature.Strand strand) {
     return new FeatureFilter.StrandFilter(strand);
   }
-  
+
   public final static FeatureFilter byParent(FeatureFilter parentFilter) {
     return new FeatureFilter.ByParent(parentFilter);
   }
-  
+
   public final static FeatureFilter byAncestor(FeatureFilter ancestorFilter) {
     return new FeatureFilter.ByAncestor(ancestorFilter);
   }
-  
+
   public final static FeatureFilter byChild(FeatureFilter childFilter) {
     return new FeatureFilter.ByChild(childFilter);
   }
-  
+
   public final static FeatureFilter byDescendant(FeatureFilter descFilter) {
     return new FeatureFilter.ByDescendant(descFilter);
   }
-  
+
+  public final static FeatureFilter onlyChildren(FeatureFilter child) {
+    return new FeatureFilter.OnlyChildren(child);
+  }
+
+  public final static FeatureFilter onlyDescendants(FeatureFilter desc) {
+    return new FeatureFilter.OnlyDescendants(desc);
+  }
+
   public final static FeatureFilter byFrame(FramedFeature.ReadingFrame frame) {
     return new FeatureFilter.FrameFilter(frame);
   }
-  
+
   public final static FeatureFilter byPairwiseScore(double minScore, double maxScore) {
     return new FeatureFilter.ByPairwiseScore(minScore, maxScore);
   }
-  
+
   public final static FeatureFilter byComponentName(String compName) {
     return new FeatureFilter.ByComponentName(compName);
   }
-  
+
   public final static FeatureFilter topLevel() {
     return FeatureFilter.top_level;
   }
-  
+
   public final static FeatureFilter leaf() {
     return FeatureFilter.leaf;
   }
-  
+
   public final static FeatureFilter all() {
     return FeatureFilter.all;
   }
-  
+
   public final static FeatureFilter none() {
     return FeatureFilter.none;
   }
-  
+
   private static int depth = 0;
 
   public final static FeatureFilter optimize(FeatureFilter filter) {
@@ -398,16 +404,16 @@ public class FilterUtils {
     try {
     if(filter instanceof FeatureFilter.And) {
       //System.out.println(depth + ":" + "is AND");
-      
+
       List filters = new ArrayList();
       expandAnd(filter, filters);
       //System.out.println(depth + ":" + "as list: " + filters);
-      
+
       // get all children of this AND, and of all AND children
       for(int i = 0; i < filters.size(); i++) {
         filters.set(i, optimize((FeatureFilter) filters.get(i)));
       }
-      
+
       // now scan this list for all OR children
       List ors = new ArrayList();
       for(int i = 0; i < filters.size(); i++) {
@@ -426,16 +432,16 @@ public class FilterUtils {
         for(int j = 0; j < i; j++) {
           //System.out.println(depth + ":" + "j: " + j);
           FeatureFilter b = (FeatureFilter) filters.get(j);
-          
+
           //System.out.println(depth + ":" + "Comparing " + a + ", " + b + " of " + filters);
-          
+
           if(areDisjoint(a, b)) {
             // a n b = E
             //System.out.println(depth + ":" + "Disjoint. Returning none()");
             return none();
           } else if(areProperSubset(a, b)) {
             //System.out.println(depth + ":" + "a < b. Removing b");
-            // if a < b then a n b = a  
+            // if a < b then a n b = a
             filters.remove(j);
             j--; i--;
           } else if(areProperSubset(b, a)) {
@@ -459,7 +465,7 @@ public class FilterUtils {
         }
       }
       //System.out.println(depth + ":" + "Reduced to: " + filters);
-      
+
       if(filters.isEmpty()) {
         if(ors.isEmpty()) {
           //System.out.println("All empty. Returning none()");
@@ -497,16 +503,16 @@ public class FilterUtils {
       }
     } else if(filter instanceof FeatureFilter.Or) {
       //System.out.println(depth + ":" + "is OR");
-      
+
       List filters = new ArrayList();
       expandOr(filter, filters);
-      
+
       //System.out.println(depth + ":" + "as list: " + filters);
-      
+
       for(int i = 0; i < filters.size(); i++) {
         filters.set(i, optimize((FeatureFilter) filters.get(i)));
       }
-      
+
       // now scan this list for all OR children
       List ands = new ArrayList();
       for(int i = 0; i < filters.size(); i++) {
@@ -526,9 +532,9 @@ public class FilterUtils {
         for(int j = 0; j < i; j++) {
           //System.out.println(depth + ":" + "j: " + j);
           FeatureFilter b = (FeatureFilter) filters.get(j);
-          
+
           //System.out.println(depth + ":" + "Comparing " + a + ", " + b + " of " + filters);
-          
+
           if(a == all() || b == all()) {
             //System.out.println(depth + ":" + "Found an all. Returning all()");
             return all();
@@ -601,7 +607,7 @@ public class FilterUtils {
       depth--;
     }
   }
-  
+
   private static FeatureFilter intersection(FeatureFilter f1, FeatureFilter f2) {
     if(
       f1 instanceof FeatureFilter.ContainedByLocation &&
@@ -627,12 +633,12 @@ public class FilterUtils {
     ) {
       FeatureFilter.ByAnnotationType f1t = (FeatureFilter.ByAnnotationType) f1;
       FeatureFilter.ByAnnotationType f2t = (FeatureFilter.ByAnnotationType) f2;
-      
+
       AnnotationType intersect = AnnotationTools.intersection(
         f1t.getType(),
         f2t.getType()
       );
-      
+
       if(intersect == AnnotationType.NONE) {
         return none();
       } else {
@@ -644,13 +650,13 @@ public class FilterUtils {
     ) {
       ByHierarchy f1h = (ByHierarchy) f1;
       ByHierarchy f2h = (ByHierarchy) f2;
-      
+
       if(f1 instanceof Up && f2 instanceof Up) {
         FeatureFilter filt = optimize(or(f1h.getFilter(), f2h.getFilter()));
         if(filt == none()) {
           return none();
         }
-        
+
         if(
           f1h instanceof FeatureFilter.ByParent ||
           f2h instanceof FeatureFilter.ByParent
@@ -677,10 +683,10 @@ public class FilterUtils {
         return none();
       }
     }
-    
+
     return null;
   }
-  
+
   private static FeatureFilter union(FeatureFilter f1, FeatureFilter f2) {
     if(
       f1 instanceof FeatureFilter.ContainedByLocation &&
@@ -704,12 +710,12 @@ public class FilterUtils {
     ) {
       FeatureFilter.ByAnnotationType f1t = (FeatureFilter.ByAnnotationType) f1;
       FeatureFilter.ByAnnotationType f2t = (FeatureFilter.ByAnnotationType) f2;
-      
+
       AnnotationType union = AnnotationTools.union(
         f1t.getType(),
         f2t.getType()
       );
-      
+
       return byAnnotationType(union);
     } else if(
       f1 instanceof ByHierarchy &&
@@ -717,13 +723,13 @@ public class FilterUtils {
     ) {
       ByHierarchy f1h = (ByHierarchy) f1;
       ByHierarchy f2h = (ByHierarchy) f2;
-      
+
       if(f1 instanceof Up && f2 instanceof Up) {
         FeatureFilter filt = optimize(or(f1h.getFilter(), f2h.getFilter()));
         if(filt == none()) {
           return none();
         }
-        
+
         if(
           f1h instanceof FeatureFilter.ByAncestor ||
           f2h instanceof FeatureFilter.ByAncestor
@@ -750,10 +756,10 @@ public class FilterUtils {
         return none();
       }
     }
-    
+
     return null;
   }
-  
+
   private static void expandAnd(FeatureFilter filt, List filters) {
     if(filt instanceof FeatureFilter.And) {
       FeatureFilter.And and = (FeatureFilter.And) filt;
@@ -763,7 +769,7 @@ public class FilterUtils {
       filters.add(filt);
     }
   }
-  
+
   private static void expandOr(FeatureFilter filt, List filters) {
     if(filt instanceof FeatureFilter.Or) {
       FeatureFilter.Or or = (FeatureFilter.Or) filt;
@@ -773,7 +779,7 @@ public class FilterUtils {
       filters.add(filt);
     }
   }
-  
+
   /**
    * <p>This is a general framework method for transforming one filter into another.
    * This method will handle the logical elements of a query (and, or, not) and delegate
@@ -790,7 +796,7 @@ public class FilterUtils {
     if(ff == null) {
       throw new NullPointerException("Can't transform null filters");
     }
-    
+
     if(ff instanceof FeatureFilter.And) {
       FeatureFilter.And and = (FeatureFilter.And) ff;
       return and(
@@ -816,7 +822,7 @@ public class FilterUtils {
       }
     }
   }
-  
+
   /**
    * An object able to transform some FeatureFilter instances sytematically into others.
    *
@@ -831,7 +837,7 @@ public class FilterUtils {
      */
     public FeatureFilter transform(FeatureFilter filter);
   }
-  
+
   /**
    * An implementation of FilterTransformer that attempts to transform by one transformer,
    * and if that fails, by another.
@@ -842,7 +848,7 @@ public class FilterUtils {
   implements FilterTransformer {
     FilterTransformer t1;
     FilterTransformer t2;
-    
+
     /**
      * Create a new DelegatingTransformer that will apply t1 and then t2 if t1 fails.
      *
@@ -853,7 +859,7 @@ public class FilterUtils {
       this.t1 = t1;
       this.t2 = t2;
     }
-    
+
     public FeatureFilter transform(FeatureFilter ff) {
       FeatureFilter res = t1.transform(ff);
       if(res == null) {
@@ -862,7 +868,7 @@ public class FilterUtils {
       return res;
     }
   }
-  
+
     static FeatureFilter getOnlyDescendantsFilter(FeatureFilter ff) {
         if (ff instanceof FeatureFilter.OnlyDescendants) {
             return ((FeatureFilter.OnlyDescendants) ff).getFilter();
@@ -892,10 +898,10 @@ public class FilterUtils {
             return null;
         }
     }
-    
+
     static FeatureFilter getOnlyChildrenFilter(FeatureFilter ff) {
         // System.err.println("In getOnlyChildrenFilter: " + ff.toString());
-        
+
         if (ff instanceof FeatureFilter.OnlyChildren) {
             return ((FeatureFilter.OnlyChildren) ff).getFilter();
         } else if (ff instanceof FeatureFilter.OnlyDescendants) {
@@ -926,9 +932,19 @@ public class FilterUtils {
             return null;
         }
     }
-/*
-  public void visitFilter(FeatureFilter filter, Visitor visitor) {
-    WalkerFactory.getInstance().getWalker(visitor).walk(filter, visitor);
+
+  /**
+   * Applies a visitor to a filter, and returns the visitor's result or null.
+   *
+   * @param filter  the filter to scan
+   * @param visitor the visitor to scan with
+   * @return  the result of the visitor or null
+   * @throws BioException   if the required walker could not be created
+   */
+  public static Object visitFilter(FeatureFilter filter, Visitor visitor)
+  throws BioException {
+    Walker walker = WalkerFactory.getInstance().getWalker(visitor);
+    walker.walk(filter, visitor);
+    return walker.getValue();
   }
-*/
 }

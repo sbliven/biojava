@@ -196,7 +196,7 @@ public class WalkerFactory {
         // find the methods that get the wrapped
         Class filtClass = (Class) fwpi.next();
         CodeClass c_ourFilter = IntrospectedCodeClass.forClass(filtClass);
-
+System.err.println(filtClass);
         Method[] filtMeth = filtClass.getMethods();
         int lvi = 0;
 
@@ -208,7 +208,7 @@ public class WalkerFactory {
                   FeatureFilter.class.isAssignableFrom(m.getReturnType()))
           {
             CodeMethod m_getFilter = IntrospectedCodeClass.forMethod(m);
-
+System.err.println("\t" + m);
             LocalVariable lv;
             if(lvi < wrappedLVs.size()) {
               lv = (LocalVariable) wrappedLVs.get(lvi);
@@ -271,7 +271,7 @@ public class WalkerFactory {
         bodyIV.add(ByteCode.make_aload(lv_filter));
         bodyIV.add(ByteCode.make_checkcast(c_thisFiltType));
         for(int ai = 1; ai < ourMeth.numParameters(); ai++) {
-          bodyIV.add(ByteCode.make_aload((LocalVariable) wrappedLVs.get(ai+1)));
+          bodyIV.add(ByteCode.make_aload((LocalVariable) wrappedLVs.get(ai-1)));
         }
         bodyIV.add(ByteCode.make_invokevirtual(ourMeth));
         bodyIV.add(ByteCode.make_return(doWalk));

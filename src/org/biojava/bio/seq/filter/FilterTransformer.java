@@ -1,0 +1,65 @@
+package org.biojava.bio.seq.filter;
+
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FilterUtils;
+
+/**
+ * Base-class for visitors that re-write a filter tree.
+ *
+ * <p>
+ * This filter transformer will just duplicate a tree, using the same leaf
+ * instances, and re-creating all logical filters, like And and ByDescendant.
+ * </p>
+ *
+ * @author Matthew Pocock
+ */
+public class FilterTransformer
+implements Visitor {
+  public FeatureFilter featureFilter(FeatureFilter filter) {
+    return filter;
+  }
+
+  public FeatureFilter and(FeatureFilter.And and,
+                           FeatureFilter c1,
+                           FeatureFilter c2)
+  {
+    return FilterUtils.and(c1, c2);
+  }
+
+  public FeatureFilter or(FeatureFilter.Or or,
+                          FeatureFilter c1,
+                          FeatureFilter c2)
+  {
+    return FilterUtils.or(c1, c2);
+  }
+
+  public FeatureFilter not(FeatureFilter.Not not, FeatureFilter c) {
+    return FilterUtils.not(c);
+  }
+
+  public FeatureFilter byParent(FeatureFilter.ByParent parent) {
+    return FilterUtils.byParent(parent);
+  }
+
+  public FeatureFilter byAncestor(FeatureFilter.ByAncestor ancestor) {
+    return FilterUtils.byAncestor(ancestor);
+  }
+
+  public FeatureFilter onlyChildren(FeatureFilter.OnlyChildren child) {
+    return FilterUtils.onlyChildren(child);
+  }
+
+  public FeatureFilter onlyDescendants(FeatureFilter.OnlyDescendants desc) {
+    return FilterUtils.onlyDescendants(desc);
+  }
+
+  public FeatureFilter byChild(FeatureFilter.ByChild child) {
+    return FilterUtils.byChild(child);
+  }
+
+  public FeatureFilter byDescendant(FeatureFilter.ByDescendant desc) {
+    return FilterUtils.byDescendant(desc);
+  }
+
+  
+}
