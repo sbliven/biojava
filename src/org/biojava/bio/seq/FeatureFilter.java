@@ -1541,8 +1541,12 @@ public interface FeatureFilter extends Serializable {
       }
     }
 
+    public int hashCode() {
+        return frame.getFrame() + 99;
+    }
+    
     public boolean equals(Object o) {
-      return (o instanceof StrandFilter);
+      return (o instanceof FrameFilter && ((FrameFilter) o).getFrame() == getFrame());
     }
 
     public boolean isProperSubset(FeatureFilter sup) {
