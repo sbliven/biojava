@@ -40,6 +40,7 @@ import org.biojava.utils.*;
  * SimpleAlignment too.</b>
  *
  * @author David Waring
+ * @author Matthew Pocock
  */
 public class FlexibleAlignment
     extends AbstractULAlignment
@@ -76,7 +77,7 @@ public class FlexibleAlignment
             SymbolList seq = ae.getSymbolList();
             alphaList.add(seq.getAlphabet());
             if (! (seq instanceof GappedSymbolList)){
-                seq = new GappedSymbolList(seq);
+                seq = new SimpleGappedSymbolList(seq);
                 ae = new SimpleAlignmentElement(label,seq,loc);
             }
             data.put(label,ae);
@@ -117,7 +118,7 @@ public class FlexibleAlignment
         // let the listeners know what we want to do
         cs.firePreChangeEvent(cevt);            
         if (! (seq instanceof GappedSymbolList)){
-            seq = new GappedSymbolList(seq);
+            seq = new SimpleGappedSymbolList(seq);
             ae = new SimpleAlignmentElement(label,seq,loc);
         }
         data.put(label,ae);

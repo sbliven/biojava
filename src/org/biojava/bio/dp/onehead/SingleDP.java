@@ -639,7 +639,7 @@ public class SingleDP extends DP implements Serializable {
     Map aMap = new HashMap();
     aMap.put(dpCursor.symList(), dpCursor.symList());
     Alignment ali = new SimpleAlignment(aMap);
-    GappedSymbolList symView = new GappedSymbolList(ali);
+    GappedSymbolList symView = new SimpleGappedSymbolList(ali);
     double [] scores = new double[len];
     List stateList = new ArrayList(len);
     for (int j = 0; j < len; j++) {

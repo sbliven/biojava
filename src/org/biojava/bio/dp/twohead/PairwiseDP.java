@@ -237,8 +237,8 @@ public class PairwiseDP extends DP implements Serializable {
     BackPointer bp = bpCol[l];
     List statel = new ArrayList();
     List scorel = new ArrayList();
-    GappedSymbolList gap0 = new GappedSymbolList(seq0);
-    GappedSymbolList gap1 = new GappedSymbolList(seq1);
+    GappedSymbolList gap0 = new SimpleGappedSymbolList(seq0);
+    GappedSymbolList gap1 = new SimpleGappedSymbolList(seq1);
     int i0 = seq0.length()+1;
     int i1 = seq1.length()+1;
     DoubleAlphabet dAlpha = DoubleAlphabet.getInstance();
@@ -287,7 +287,7 @@ public class PairwiseDP extends DP implements Serializable {
     aMap.put(seq0, gap0);
     aMap.put(seq1, gap1);
     Alignment ali = new SimpleAlignment(aMap);
-    GappedSymbolList gappedAli = new GappedSymbolList(ali);
+    GappedSymbolList gappedAli = new SimpleGappedSymbolList(ali);
 
     // parse 2
     //System.out.println("Parse 2");

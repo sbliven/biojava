@@ -37,7 +37,9 @@ import java.util.*;
  * @since 1.3
  */
 
-public class GappedSequence extends GappedSymbolList implements Sequence {
+public class GappedSequence
+extends SimpleGappedSymbolList
+implements Sequence {
     private Sequence sequence;
     private FeatureHolder features;
 
