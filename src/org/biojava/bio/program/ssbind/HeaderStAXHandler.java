@@ -39,6 +39,7 @@ import org.biojava.utils.stax.StringElementHandlerBase;
  * BioJava BlastLike XML.
  *
  * @author Keith James
+ * @author Matthew Pocock
  * @since 1.3
  */
 public class HeaderStAXHandler extends SeqSimilarityStAXHandler
@@ -130,7 +131,7 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
                 else if (t.equals("Database:"))
                 {
                     database = st.nextToken();
-                break;
+                    continue;
                 }
             }
 
