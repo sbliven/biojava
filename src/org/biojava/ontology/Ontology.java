@@ -100,6 +100,11 @@ public interface Ontology extends Changeable {
     
     public Term createTerm(String name, String description) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException;
     
+    /**
+     * Create a term which represents a set of triples
+     */
+     
+    public TripleTerm createTripleTerm(Term subject, Term object, Term relation) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException;
     
     /**
      * Create a view of a term from another ontology
@@ -222,16 +227,15 @@ public interface Ontology extends Changeable {
             return retval;
         }
         
-        public Term createTerm(String name, String description) 
+        private void addTerm(Term t)
             throws AlreadyExistsException, IllegalArgumentException, ChangeVetoException
         {
-            Term t = new Term.Impl(name, description);
-            if (terms.containsKey(name)) {
+            if (terms.containsKey(t.getName())) {
                 throw new AlreadyExistsException("Ontology " + getName() + " already contains " + name);
             }
             
             if(!hasListeners()) {
-                terms.put(name, t);
+                terms.put(t.getName(), t);
             } else {
                 ChangeEvent ce = new ChangeEvent(
                 this,
@@ -242,37 +246,51 @@ public interface Ontology extends Changeable {
                 ChangeSupport cs = getChangeSupport(Ontology.TERM);
                 synchronized(cs) {
                     cs.firePreChangeEvent(ce);
-                    terms.put(name, t);
+                    terms.put(t.getName(), t);
                     cs.firePostChangeEvent(ce);
                 }
             }
+        }
+        
+        public Term createTerm(String name, String description) 
+            throws AlreadyExistsException, IllegalArgumentException, ChangeVetoException
+        {
+            Term t = new Term.Impl(name, description);
+            addTerm(t);
             return t;
         }
+        
+        public TripleTerm createTripleTerm(Term subject, Term object, Term relation)
+            throws AlreadyExistsException, ChangeVetoException
+        {
+            TripleTerm tt = new TripleTerm.Impl(subject, object, relation);
+            if (!containsTerm(subject)) {
+                throw new IllegalArgumentException("Term " + subject.getName() + " is not contained in this ontology");
+            }
+            if (!containsTerm(object)) {
+                throw new IllegalArgumentException("Term " + object.getName() + " is not contained in this ontology");
+            }
+            if (!containsTerm(relation)) {
+                throw new IllegalArgumentException("Term " + relation.getName() + " is not contained in this ontology");
+            }
+            addTerm(tt);
+            return tt;
+        }
+        
+        public OntologyTerm createOntologyTerm(Ontology o)
+            throws AlreadyExistsException, ChangeVetoException
+        { 
+            OntologyTerm ot = new OntologyTerm.Impl(o);
+            addTerm(ot);
+            return ot;
+        }
+            
         
         public RemoteTerm importTerm(Ontology o, Term t)
             throws AlreadyExistsException, IllegalArgumentException, ChangeVetoException
         {
             RemoteTerm rt = new RemoteTerm.Impl(o, t);
-            if (terms.containsKey(rt.getName())) {
-                throw new AlreadyExistsException("Ontology " + getName() + " already contains " + rt.getName());
-            }
-            
-            if(!hasListeners()) {
-                terms.put(rt.getName(), rt);
-            } else {
-                ChangeEvent ce = new ChangeEvent(
-                this,
-                Ontology.TERM,
-                t,
-                null
-                );
-                ChangeSupport cs = getChangeSupport(Ontology.TERM);
-                synchronized(cs) {
-                    cs.firePreChangeEvent(ce);
-                    terms.put(rt.getName(), rt);
-                    cs.firePostChangeEvent(ce);
-                }
-            }
+            addTerm(rt);
             return rt;
         }
         
