@@ -21,6 +21,7 @@
 
 package org.biojava.bio.program.homologene;
 
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A simple no-frills implementation of the HomologeneBuilder interface.
@@ -190,24 +191,29 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
             System.out.println("endOrthoPair test failed"); return;
         }
 
-        if (orthologyTmpl.type == SimilarityType.CURATED) {
-            if (orthologyTmpl.ref == null) return;
+        try {
+            if (orthologyTmpl.type == SimilarityType.CURATED) {
+                if (orthologyTmpl.ref == null) return;
 
-            OrthoPair orthology = db.createOrthoPair(
-                orthologyTmpl.firstOrtho,
-                orthologyTmpl.secondOrtho,
-                orthologyTmpl.ref);
+                OrthoPair orthology = db.createOrthoPair(
+                    orthologyTmpl.firstOrtho,
+                    orthologyTmpl.secondOrtho,
+                    orthologyTmpl.ref);
 
-            group.addOrthoPair(orthology);
+                group.addOrthoPair(orthology);
+            }
+            else {
+                OrthoPair orthology = db.createOrthoPair(
+                    orthologyTmpl.firstOrtho,
+                    orthologyTmpl.secondOrtho,
+                    orthologyTmpl.type,
+                    orthologyTmpl.percentIdentity);
+
+                group.addOrthoPair(orthology);
+            }
         }
-        else {
-            OrthoPair orthology = db.createOrthoPair(
-                orthologyTmpl.firstOrtho,
-                orthologyTmpl.secondOrtho,
-                orthologyTmpl.type,
-                orthologyTmpl.percentIdentity);
-
-            group.addOrthoPair(orthology);
+        catch (ChangeVetoException cve) { 
+            // is it worth reporting? 
         }
 
     }
