@@ -360,26 +360,16 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
             Annotation ann = seq.getAnnotation();
 
-            //
-            // Magic for taxonomy.  Move this!
-            //
-            int taxon_id = (ann.containsProperty(OrganismParser.PROPERTY_ORGANISM))
-                ? TaxonSQL.putTaxon(conn, getDBHelper(), (Taxon) ann.getProperty(OrganismParser.PROPERTY_ORGANISM))
-                : -1;
-
             PreparedStatement create_bioentry = conn.prepareStatement(
                                                                       "insert into bioentry " +
-                                                                      "(biodatabase_id, name, accession, version, division" + (taxon_id == -1 ? "" : ", taxon_id") + ") " +
-                                                                      "values (?, ?, ?, ?, ?" + (taxon_id == -1 ? "" : ", ?") + ")"
+                                                                      "(biodatabase_id, name, accession, version, division) " +
+                                                                      "values (?, ?, ?, ?, ?)"
                                                                       );
             create_bioentry.setInt(1, dbid);
             create_bioentry.setString(2, seqName);
             create_bioentry.setString(3, seqName);
             create_bioentry.setInt(4, version);
             create_bioentry.setString(5, "?");
-            if (taxon_id != -1) {
-                create_bioentry.setInt(6, taxon_id);
-            }
             create_bioentry.executeUpdate();
             create_bioentry.close();
 
@@ -460,12 +450,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 Map.Entry me = (Map.Entry) i.next();
                 Object key = me.getKey();
                 Object value = me.getValue();
-
-                if (key.equals(OrganismParser.PROPERTY_ORGANISM)) {
-                    continue;
-                } else {
-                    persistBioentryProperty(conn, bioentry_id, key, value, false, true);
-                }
+                persistBioentryProperty(conn, bioentry_id, key, value, false, true);
             }
 
             conn.commit();
@@ -812,75 +797,88 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                                  boolean silent)
         throws SQLException
     {
-        String keyString = key.toString();
-
         // Ought to check for special-case keys. (or just wait 'til the special case
         // tables get nuked :-)
-        // ex. references, dbxrefs
+        // ex. taxon, references, dbxrefs
 
-        if (!isBioentryPropertySupported()) {
-            if (silent) {
-                return;
-            } else {
-                throw new SQLException("Can't persist this property since the bioentry_property table isn't available");
+        if (key.equals(OrganismParser.PROPERTY_ORGANISM)) {
+            int taxon_id = TaxonSQL.putTaxon(conn, getDBHelper(), (Taxon) value);
+            if (taxon_id != -1) {
+                PreparedStatement set_taxon = conn.prepareStatement("update bioentry set taxon_id = ? " 
+                                                                    + " where bioentry_id = ?");
+                set_taxon.setInt(1, taxon_id);
+                set_taxon.setInt(2, bioentry_id);
+                set_taxon.executeUpdate();
+                set_taxon.close();
             }
-        }
 
-        if (removeFirst) {
-            int id = intern_ontology_term(conn, keyString);
-            PreparedStatement remove_old_value = conn.prepareStatement("delete from bioentry_qualifier_value " +
-                                                                       " where bioentry_id = ? and term_id = ?");
-            remove_old_value.setInt(1, bioentry_id);
-            remove_old_value.setInt(2, id);
-            remove_old_value.executeUpdate();
-            remove_old_value.close();
-        }
+        } else {
+            String keyString = key.toString();
 
-        if (value != null) {
-            PreparedStatement insert_new;
-            if (isSPASupported()) {
-                insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
-                                                   "       (bioentry_id, term_id, value, rank) " +
-                                                   "values (?, intern_ontology_term( ? ), ?, ?)");
-                if (value instanceof Collection) {
-                    int cnt = 0;
-                    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+            if (!isBioentryPropertySupported()) {
+                if (silent) {
+                    return;
+                } else {
+                    throw new SQLException("Can't persist this property since the bioentry_property table isn't available");
+                }
+            }
+
+            if (removeFirst) {
+                int id = intern_ontology_term(conn, keyString);
+                PreparedStatement remove_old_value = conn.prepareStatement("delete from bioentry_qualifier_value " +
+                                                                           " where bioentry_id = ? and term_id = ?");
+                remove_old_value.setInt(1, bioentry_id);
+                remove_old_value.setInt(2, id);
+                remove_old_value.executeUpdate();
+                remove_old_value.close();
+            }
+
+            if (value != null) {
+                PreparedStatement insert_new;
+                if (isSPASupported()) {
+                    insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
+                                                       "       (bioentry_id, term_id, value, rank) " +
+                                                       "values (?, intern_ontology_term( ? ), ?, ?)");
+                    if (value instanceof Collection) {
+                        int cnt = 0;
+                        for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                            insert_new.setInt(1, bioentry_id);
+                            insert_new.setString(2, keyString);
+                            insert_new.setInt(4, ++cnt);
+                            insert_new.setString(3, i.next().toString());
+                            insert_new.executeUpdate();
+                        }
+                    } else {
                         insert_new.setInt(1, bioentry_id);
                         insert_new.setString(2, keyString);
-                        insert_new.setInt(4, ++cnt);
-                        insert_new.setString(3, i.next().toString());
+                        insert_new.setInt(3, 1);
+                        insert_new.setString(3, value.toString());
                         insert_new.executeUpdate();
                     }
                 } else {
-                    insert_new.setInt(1, bioentry_id);
-                    insert_new.setString(2, keyString);
-                    insert_new.setInt(3, 1);
-                    insert_new.setString(3, value.toString());
-                    insert_new.executeUpdate();
-                }
-            } else {
-                insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
-                                                   "       (bioentry_id, term_id, rank, value) " +
-                                                   "values (?, ?, ?, ?)");
-                int termID = intern_ontology_term(conn, keyString);
-                if (value instanceof Collection) {
-                    int cnt = 0;
-                    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                    insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
+                                                       "       (bioentry_id, term_id, rank, value) " +
+                                                       "values (?, ?, ?, ?)");
+                    int termID = intern_ontology_term(conn, keyString);
+                    if (value instanceof Collection) {
+                        int cnt = 0;
+                        for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                            insert_new.setInt(1, bioentry_id);
+                            insert_new.setInt(2, termID);
+                            insert_new.setInt(3, ++cnt);
+                            insert_new.setString(4, i.next().toString());
+                            insert_new.executeUpdate();
+                        }
+                    } else {
                         insert_new.setInt(1, bioentry_id);
                         insert_new.setInt(2, termID);
-                        insert_new.setInt(3, ++cnt);
-                        insert_new.setString(4, i.next().toString());
+                        insert_new.setInt(3, 1);
+                        insert_new.setString(4, value.toString());
                         insert_new.executeUpdate();
                     }
-                } else {
-                    insert_new.setInt(1, bioentry_id);
-                    insert_new.setInt(2, termID);
-                    insert_new.setInt(3, 1);
-                    insert_new.setString(4, value.toString());
-                    insert_new.executeUpdate();
                 }
+                insert_new.close();
             }
-            insert_new.close();
         }
     }
 
