@@ -38,14 +38,11 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.seq.io.OrganismParser;
-import org.biojava.bio.taxa.CircularReferenceException;
-import org.biojava.bio.taxa.EbiFormat;
 import org.biojava.bio.taxa.Taxon;
-import org.biojava.bio.taxa.TaxonFactory;
-import org.biojava.bio.taxa.WeakTaxonFactory;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
@@ -76,27 +73,6 @@ class BioSQLSequenceAnnotation implements Annotation {
 	this.bioentry_id = bioentry_id;
     }
 
-    /** Attempt to close the Statement. Continue on if there is a problem during the close. */
-    static void attemptClose(Statement statement) {
-        if (statement != null) {
-            try {
-                statement.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
-        }
-    }
-
-    /** Attempt to close the ResultSet. Continue on if there is a problem during the close. */
-    static void attemptClose(ResultSet resultset) {
-        if (resultset != null) {
-            try {
-                resultset.close();
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
-        }
-    }
 
     private void initAnnotations() {
 	try {
@@ -180,83 +156,7 @@ class BioSQLSequenceAnnotation implements Annotation {
 
             if (taxon_id != 0) {
                 // We are expected to get a taxon structure
-
-                // Constants for our wee id array
-                final int NCBI_ID = 1;
-                final int TAXON_ID = 0;
-
-                // First, get the taxon ids up to the root.
-                statement = conn.prepareStatement("select ncbi_taxon_id, parent_taxon_id " 
-                                                  + "from taxon " 
-                                                  + "where taxon_id = ? ");
-
-                ArrayList path = new ArrayList();
-                while (taxon_id != 0) {
-                    statement.setInt(1, taxon_id);
-                    rs = statement.executeQuery();
-                    if (rs.next()) {
-                        path.add(new int [] {taxon_id, rs.getInt(1)});
-                        taxon_id = rs.getInt(2);
-                        if (rs.wasNull()) {
-                            taxon_id = 0;
-                        }
-                    } else {
-                        throw new BioRuntimeException("Error fetching taxonomy structure. No taxon with taxon_id=" + taxon_id);
-                    }
-                    rs.close();
-                }
-                statement.close();
-
-                // Traverse from the root down as far has has been created previously...
-                TaxonFactory factory = WeakTaxonFactory.GLOBAL;
-                Taxon taxon = factory.getRoot();
-                int pos = path.size() - 1;
-                int []ids = (int[]) path.get(pos--);
-                Map names = getTaxonNames(conn, ids[TAXON_ID]);
-                taxon.getAnnotation().setProperty(EbiFormat.PROPERTY_NCBI_TAXON, "" + ids[NCBI_ID]);
-                taxon.getAnnotation().setProperty(EbiFormat.PROPERTY_TAXON_NAMES, names);
-                for (; pos >= 0; pos--) {
-                    // Who's the next id down the path?
-                    ids = (int[]) path.get(pos);
-                    String nextID = "" + ids[NCBI_ID];
-                    // Now look among the children for the next child.
-                    Set children = taxon.getChildren();
-                    for (Iterator it = children.iterator(); it.hasNext(); ) {
-                        Taxon child = (Taxon) it.next();
-                        Annotation anno = child.getAnnotation();
-                        if (anno.containsProperty(EbiFormat.PROPERTY_NCBI_TAXON)) {
-                            String childID = (String) anno.getProperty(EbiFormat.PROPERTY_NCBI_TAXON);
-                            if (childID.equals(nextID)) {
-                                taxon = child;
-                                continue;
-                            }
-                        } else {
-                            throw new BioRuntimeException("Taxon has not been annotated with NCBI taxon ids.");
-                        }
-                    }
-                    // No child with desired ncbi_id has been found.
-                    break;
-                }
-
-                // Now create taxa from here on down.
-                try {
-                    for (; pos >= 0; pos--) {
-                        // Now look for the next child.
-                        ids = (int[]) path.get(pos);
-                        String nextID = "" + ids[NCBI_ID];
-                        names = getTaxonNames(conn, ids[TAXON_ID]);
-                        String sciName = (String) names.get("scientific name");
-                        if (sciName == null) {
-                            throw new BioRuntimeException("No scientific name for taxon_id=" + ids[TAXON_ID]);
-                        }
-                        String commonName = (String) names.get("common name");
-                        taxon = factory.addChild(taxon, factory.createTaxon(sciName, commonName));
-                        taxon.getAnnotation().setProperty(EbiFormat.PROPERTY_NCBI_TAXON, nextID);
-                        taxon.getAnnotation().setProperty(EbiFormat.PROPERTY_TAXON_NAMES, names);
-                    }           
-                } catch (CircularReferenceException ex) {
-                    throw new BioRuntimeException("Circular references in taxon table. taxon_id=" + ids[TAXON_ID]);
-                }
+                Taxon taxon = TaxonSQL.getDBTaxon(conn, taxon_id);
                 underlyingAnnotation.setProperty(OrganismParser.PROPERTY_ORGANISM, taxon);
             }
 	} catch (ChangeVetoException ex) {
@@ -264,44 +164,8 @@ class BioSQLSequenceAnnotation implements Annotation {
 	} catch (SQLException ex) {
 	    throw new BioRuntimeException("Error fetching taxonomy annotations", ex);
         } finally {
-            attemptClose(rs);
-            attemptClose(statement);
-        }
-    }
-
-
-    /**
-     * Look up all the names associated with a taxon_id.
-     *
-     * @param conn the current <code>Connection</code>.
-     * @param taxon_id the NCBI taxon id for the taxon of interest.
-     * @return a <code>Map</code> from name_class (e.g.: "scientific
-     * name") to name.
-     */
-    private Map getTaxonNames(Connection conn, int taxon_id) {
-        PreparedStatement statement = null;
-        ResultSet rs = null;
-        try {
-            statement = conn.prepareStatement("select name_class, name " 
-                                              + "from taxon_name " 
-                                              + "where taxon_id = ? ");
-            statement.setInt(1, taxon_id);
-            rs = statement.executeQuery();
-
-            Map names = new HashMap();
-            while (rs.next()) {
-                String name_class = rs.getString(1);
-                String name = rs.getString(2);
-                //System.err.println("Got " + name_class + "=" + name + " for taxon_id=" + taxon_id); 
-                names.put(name_class, name);
-            }
-
-            return names;
-	} catch (SQLException ex) {
-	    throw new BioRuntimeException("Error fetching taxonomy annotations", ex);
-        } finally {
-            attemptClose(rs);
-            attemptClose(statement);
+            TaxonSQL.attemptClose(rs);
+            TaxonSQL.attemptClose(statement);
         }
     }
 

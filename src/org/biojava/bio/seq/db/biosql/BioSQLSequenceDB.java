@@ -341,7 +341,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    // Magic for taxonomy.  Move this!
 	    //
             int taxon_id = (ann.containsProperty(OrganismParser.PROPERTY_ORGANISM)) 
-                ? getTaxonID(conn, (Taxon) ann.getProperty(OrganismParser.PROPERTY_ORGANISM))
+                ? TaxonSQL.putTaxon(conn, getDBHelper(), (Taxon) ann.getProperty(OrganismParser.PROPERTY_ORGANISM))
                 : -1;
 
 	    PreparedStatement create_bioentry = conn.prepareStatement(
@@ -458,90 +458,6 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    throw new BioRuntimeException("Error adding BioSQL tables" + 
 					(rolledback ? " (rolled back successfully)" : ""), ex);
 	}
-    }
-
-
-    /**
-     * Gets the id by the database refers to the specified
-     * <code>Taxon</code> object. If the <code>Taxon</code> is not
-     * represented in the database, it will be added (along with its
-     * parents).
-     *
-     * @param taxon a <code>Taxon</code>. The <code>Taxon</code> must
-     * be annotated with the NCBI taxon id
-     * (<code>key=EbiFormat.PROPERTY_ORGANISM</code>).
-     * @return an <code>int</code> that corresponds to the
-     * <code>Taxon</code> in the database.
-     */
-    private int getTaxonID(Connection conn, Taxon taxon) throws SQLException {
-        // Find the NCBI taxon id annotation
-        Annotation anno = taxon.getAnnotation();
-        Object t  = anno.getProperty(EbiFormat.PROPERTY_NCBI_TAXON);
-        if (t instanceof List) {
-            t = (String) ((List) t).get(0);
-        }
-        int ncbi_taxon_id = Integer.parseInt((String) t);
-        PreparedStatement selectTaxon = conn.prepareStatement(
-                                                              "select taxon_id " 
-                                                              + "from taxon " 
-                                                              + "where ncbi_taxon_id = ? "
-                                                              );
-        selectTaxon.setInt(1, ncbi_taxon_id);
-        ResultSet trs = selectTaxon.executeQuery();
-        int taxon_id;
-        if (trs.next()) {
-            // entry exists - link to it
-            taxon_id = trs.getInt(1);
-        } else {
-            // Taxon entry does not exist - create it
-            Taxon parent = taxon.getParent();
-            PreparedStatement createTaxon = null;
-            if (parent != null) {
-                int parent_taxon_id = getTaxonID(conn, parent);
-                createTaxon = conn.prepareStatement(
-                                                    "insert into taxon " 
-                                                    + "(ncbi_taxon_id, parent_taxon_id) " 
-                                                    + "values (?, ?)"
-                                                    );
-                createTaxon.setInt(1, ncbi_taxon_id);
-                createTaxon.setInt(2, parent_taxon_id);
-            } else {
-                createTaxon = conn.prepareStatement(
-                                                    "insert into taxon " 
-                                                    + "(ncbi_taxon_id) " 
-                                                    + "values (?)"
-                                                    );
-                createTaxon.setInt(1, ncbi_taxon_id);
-            }
-            createTaxon.executeUpdate();
-            createTaxon.close();
-            taxon_id = getDBHelper().getInsertID(conn, "taxon", "taxon_id");
-            addTaxonNames(conn, taxon, taxon_id);
-        }
-        trs.close();
-        selectTaxon.close();
-        return taxon_id;
-    }
-
-    private void addTaxonNames(Connection conn, Taxon taxon, int taxon_id) throws SQLException {
-        Map names = (Map) taxon.getAnnotation().getProperty(EbiFormat.PROPERTY_TAXON_NAMES);
-        if (names != null) {
-            Iterator it = names.keySet().iterator();
-            while (it.hasNext()) {
-                String nameClass = (String) it.next();
-                String name = (String) names.get(nameClass);
-                PreparedStatement createTaxon = conn.prepareStatement(
-                                                                      "insert into taxon_name " 
-                                                                      + "(taxon_id, name, name_class) " 
-                                                                      + "values (?, ?, ?)"
-                                                                      );
-                createTaxon.setInt(1, taxon_id);
-                createTaxon.setString(2, name);
-                createTaxon.setString(3, nameClass);
-                createTaxon.executeUpdate();
-                createTaxon.close();
-            }
-        }
     }
 
 
