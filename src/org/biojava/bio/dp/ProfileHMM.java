@@ -22,6 +22,7 @@
 
 package org.biojava.bio.dp;
 
+import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
 
 public class ProfileHMM extends SimpleMarkovModel {
@@ -158,65 +159,72 @@ public class ProfileHMM extends SimpleMarkovModel {
   ) throws IllegalSymbolException, IllegalTransitionException,
   IllegalAlphabetException {
     super(1, alpha);
-    
-    this.columns = columns;
-    this.matchStates = new EmissionState[columns+2];
-    this.insertStates = new EmissionState[columns+1];
-    this.deleteStates = new DotState[columns];
-    
-    EmissionState mO = magicalState();
-    EmissionState iO = insertFactory.createState(alpha, advance, "i-0");
-    DotState dO = null;
-    
-    matchStates[0] = mO;
-    insertStates[0] = iO;
-    
-    // first column - a leading insert & the magical state
-    addState(iO);
-    createTransition(mO, iO);
-    createTransition(iO, iO);
-    
-    // 'body' columns
-    for(int i = 1; i <= columns; i++) {
-      EmissionState mN = matchFactory.createState(alpha, advance, "m-" + i);
-      EmissionState iN = insertFactory.createState(alpha, advance, "i-" + i);
-      DotState dN = new SimpleDotState("d-" + i);
-      
-      addState(mN);
-      addState(iN);
-      addState(dN);
-      
-      matchStates[i] = mN;
-      insertStates[i] = mN;
-      deleteStates[i-1] = dN;
-      
-      // from a model state
-      createTransition(mO, mN);
-      createTransition(mN, iN);
-      createTransition(mO, dN);
-      
-      // from an insert state
-      createTransition(iN, iN);
-      createTransition(iO, mN);
-      createTransition(iO, dN);
-      
-      // from a delete state
-      if(i > 1) {
-        createTransition(dO, dN);
-        createTransition(dO, mN);
-        createTransition(dN, iN);
-      }        
 
-      mO = mN;
-      iO = iN;
-      dO = dN;
+    try {    
+      this.columns = columns;
+      this.matchStates = new EmissionState[columns+2];
+      this.insertStates = new EmissionState[columns+1];
+      this.deleteStates = new DotState[columns];
+    
+      EmissionState mO = magicalState();
+      EmissionState iO = insertFactory.createState(alpha, advance, "i-0");
+      DotState dO = null;
+    
+      matchStates[0] = mO;
+      insertStates[0] = iO;
+    
+      // first column - a leading insert & the magical state
+      addState(iO);
+      createTransition(mO, iO);
+      createTransition(iO, iO);
+    
+      // 'body' columns
+      for(int i = 1; i <= columns; i++) {
+        EmissionState mN = matchFactory.createState(alpha, advance, "m-" + i);
+        EmissionState iN = insertFactory.createState(alpha, advance, "i-" + i);
+        DotState dN = new SimpleDotState("d-" + i);
+      
+        addState(mN);
+        addState(iN);
+        addState(dN);
+      
+        matchStates[i] = mN;
+        insertStates[i] = mN;
+        deleteStates[i-1] = dN;
+      
+        // from a model state
+        createTransition(mO, mN);
+        createTransition(mN, iN);
+        createTransition(mO, dN);
+      
+        // from an insert state
+        createTransition(iN, iN);
+        createTransition(iO, mN);
+        createTransition(iO, dN);
+      
+        // from a delete state
+        if(i > 1) {
+          createTransition(dO, dN);
+          createTransition(dO, mN);
+          createTransition(dN, iN);
+        }        
+
+        mO = mN;
+        iO = iN;
+        dO = dN;
+      }
+    
+      // for the transitions to end
+      createTransition(mO, magicalState());
+      createTransition(iO, magicalState());
+      createTransition(dO, magicalState());
+      
+      matchStates[columns+1] = magicalState();
+    } catch (ModelVetoException mve) {
+      throw new BioError(
+        mve,
+        "Unable to construct profile HMM"
+      );
     }
-    
-    // for the transitions to end
-    createTransition(mO, magicalState());
-    createTransition(iO, magicalState());
-    createTransition(dO, magicalState());
-    
-    matchStates[columns+1] = magicalState();
   }
 }

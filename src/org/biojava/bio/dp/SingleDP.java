@@ -58,12 +58,16 @@ class SingleDP extends DP {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
+    lockModel();
     DPCursor dpCursor = new SmallCursor(
       getStates(),
       seq[0],
       seq[0].iterator()
     );
-    return forward(dpCursor);
+    double score = forward(dpCursor);
+    unlockModel();
+
+    return score;
   }
   
   public double backward(SymbolList [] seq)
@@ -71,12 +75,16 @@ class SingleDP extends DP {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
+    lockModel();
     DPCursor dpCursor = new SmallCursor(
       getStates(),
       seq[0],
       new ReverseIterator(seq[0])
     );
-    return backward(dpCursor);
+    double score = backward(dpCursor);
+    unlockModel();
+    
+    return score;
   }
 
   public DPMatrix forwardMatrix(SymbolList [] seq)
@@ -85,9 +93,11 @@ class SingleDP extends DP {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
     
+    lockModel();
     SingleDPMatrix matrix = new SingleDPMatrix(this, seq[0]);
     DPCursor dpCursor = new MatrixCursor(matrix, seq[0].iterator(), +1);
     matrix.score = forward(dpCursor);
+    unlockModel();
     
     return matrix;
   }
@@ -98,9 +108,11 @@ class SingleDP extends DP {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
     
+    lockModel();
     SingleDPMatrix matrix = new SingleDPMatrix(this, seq[0]);
     DPCursor dpCursor = new MatrixCursor(matrix, new ReverseIterator(seq[0]), -1);
     matrix.score = backward(dpCursor);
+    unlockModel();
     
     return matrix;
   }
@@ -112,9 +124,11 @@ class SingleDP extends DP {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
     
+    lockModel();
     SingleDPMatrix sm = (SingleDPMatrix) matrix;
     DPCursor dpCursor = new MatrixCursor(sm, seq[0].iterator(), +1);
     sm.score = forward(dpCursor);
+    unlockModel();
     
     return sm;
   }
@@ -126,9 +140,11 @@ class SingleDP extends DP {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
     
+    lockModel();
     SingleDPMatrix sm = (SingleDPMatrix) matrix;
     DPCursor dpCursor = new MatrixCursor(sm, new ReverseIterator(seq[0]), -1);
     sm.score = backward(dpCursor);
+    unlockModel();
     
     return sm;
   }
@@ -357,6 +373,8 @@ class SingleDP extends DP {
 
   private StatePath viterbi(DPCursor dpCursor)
   throws IllegalSymbolException {
+    lockModel();
+    
     int seqLength = dpCursor.length();
     State [] states = getStates();
 
@@ -519,6 +537,8 @@ class SingleDP extends DP {
                        new SimpleSymbolList(getModel().stateAlphabet(), stateList));
     labelToResList.put(StatePath.SCORES,
                        DoubleAlphabet.fromArray(scores));
+
+    unlockModel();
     return new SimpleStatePath(bestScore, labelToResList);
   }
 

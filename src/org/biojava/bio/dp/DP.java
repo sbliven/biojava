@@ -28,6 +28,36 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 public abstract class DP {
+  private static final TransitionListener BLOCKER = new TransitionListener() {
+    public void preCreateTransition(TransitionEvent te)
+    throws ModelVetoException {
+      complain(te);
+    }
+  
+  public void postCreateTransition(TransitionEvent te) {}
+  
+    public void preDestroyTransition(TransitionEvent te)
+    throws ModelVetoException {
+      complain(te);
+    }
+  
+    public void postDestroyTransition(TransitionEvent te) {}
+  
+    public void preChangeTransitionScore(TransitionEvent te)
+    throws ModelVetoException {
+      complain(te);
+    }
+  
+    public void postChangeTransitionScore(TransitionEvent te) {}
+    
+    private void complain(TransitionEvent te) throws ModelVetoException {
+      throw new ModelVetoException(
+        "Can't currently alter model",
+        te
+      );
+    }    
+  };
+  
   public static MarkovModel flatView(MarkovModel model)
   throws IllegalAlphabetException, IllegalSymbolException {
     for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
@@ -268,7 +298,31 @@ public abstract class DP {
   private int [][] backwardTransitions;
   private double [][] backwardTransitionScores;
   private int dotStatesIndex;
+  private int lockCount = 0;
 
+  private final TransitionListener UPDATER = new TransitionListener() {
+    public void preCreateTransition(TransitionEvent te)
+    throws ModelVetoException {}
+  
+    public void postCreateTransition(TransitionEvent te) {
+      updateTransitions();
+    }
+      
+    public void preDestroyTransition(TransitionEvent te)
+    throws ModelVetoException {}
+  
+    public void postDestroyTransition(TransitionEvent te) {
+      updateTransitions();
+    }
+  
+    public void preChangeTransitionScore(TransitionEvent te)
+    throws ModelVetoException {}
+        
+    public void postChangeTransitionScore(TransitionEvent te) {
+      updateTransitions();
+    }
+  };
+  
   public int getDotStatesIndex() {
     return dotStatesIndex;
   }
@@ -297,41 +351,52 @@ public abstract class DP {
     return backwardTransitionScores;
   }
   
-  public DP(MarkovModel model) throws IllegalSymbolException,
-                                    IllegalTransitionException,
-                                    BioException
-  {
-      this.model = model;
-      validate();
-  }
-
-    /**
-     * Revalidate the DP object after a change in the underlying
-     * MarkovModel.  The main effect is to rebuild the DP object's
-     * internal table of transition probabilities.
-     */
-
-    public void validate() throws IllegalSymbolException,
-                                    IllegalTransitionException,
-                                    BioException
-    {
-	this.states = stateList(model);
-	this.forwardTransitions = forwardTransitions(model, states);
-	this.forwardTransitionScores = forwardTransitionScores(model, states,
-							       forwardTransitions);
-	this.backwardTransitions = backwardTransitions(model, states);
-	this.backwardTransitionScores = backwardTransitionScores(model, states,
-								 backwardTransitions);
-
-	// Find first dot state
-	
-	int i;
-	for (i = 0; i < states.length; ++i) {
-	    if (! (states[i] instanceof EmissionState))
-		break;
-	}
-	dotStatesIndex = i;
+  public void lockModel() {
+    if(lockCount++ == 0) {
+      getModel().addTransitionListener(BLOCKER);
     }
+  }
+  
+  public void unlockModel() {
+    if(--lockCount == 0) {
+      getModel().removeTransitionListener(BLOCKER);
+    }
+  }
+  
+  public void updateTransitions() {
+    try {
+      this.states = stateList(model);
+      this.forwardTransitions = forwardTransitions(model, states);
+      this.forwardTransitionScores = forwardTransitionScores(
+        model, states,
+        forwardTransitions
+      );
+      this.backwardTransitions = backwardTransitions(model, states);
+      this.backwardTransitionScores = backwardTransitionScores(
+        model, states,
+        backwardTransitions
+      );
+
+      // Find first dot state
+      int i;
+      for (i = 0; i < states.length; ++i) {
+        if (! (states[i] instanceof EmissionState)) {
+          break;
+        }
+      }
+      dotStatesIndex = i;
+    } catch (Exception e) {
+      throw new BioError(e, "Something is seriously wrong with the DP code");
+    }
+  }
+  
+  public DP(MarkovModel model)
+  throws IllegalSymbolException, IllegalTransitionException, BioException {
+    this.model = model;
+    updateTransitions();
+    
+    model.addTransitionListener(UPDATER);
+  }
 
   public abstract double forward(SymbolList [] resList)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;

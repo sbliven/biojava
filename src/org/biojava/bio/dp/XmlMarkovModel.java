@@ -152,11 +152,21 @@ public class XmlMarkovModel {
       State from = (State) nameToState.get(transitionE.getAttribute("from"));
       State to = (State) nameToState.get(transitionE.getAttribute("to"));
       double prob = Math.log(Double.parseDouble(transitionE.getAttribute("prob")));
-      model.createTransition(from, to);
       try {
+        model.createTransition(from, to);
         model.setTransitionScore(from, to, prob);
       } catch (IllegalTransitionException ite) {
-        throw new BioError(ite, "Create transition. Then couldn't set it's prob");
+        throw new BioError(
+          ite, 
+          "We should have unlimited write-access to this model. " +
+          "Something is very wrong."
+        );
+      } catch (ModelVetoException mve) {
+        throw new BioError(
+          mve, 
+          "We should have unlimited write-access to this model. " +
+          "Something is very wrong."
+        );
       }
     }
     

@@ -174,6 +174,9 @@ public class WMAsMM implements MarkovModel {
     return false;
   }
   
+  public void addTransitionListener(TransitionListener tl) {}
+  public void removeTransitionListener(TransitionListener tl) {}
+  
   public WMAsMM(WeightMatrix wm) throws IllegalSymbolException {
     this.wm = wm;
     this.stateList = new WMState[wm.columns()];

@@ -96,6 +96,9 @@ public class SimpleTransitionTrainer implements TransitionTrainer {
             throw new BioError(ite, "State " + t.getName() +
                                " listed in transitionsFrom(" + s.getName() +
                                ") but setTransition blows chunks");
+          } catch (ModelVetoException mve) {
+            throw new BioError(mve, "Change in transitioin score from " +
+                               s.getName() + " to " + t.getName() + " vetoed");
           }
         }
       }

@@ -37,8 +37,10 @@ import org.biojava.bio.symbol.*;
  * You can train the resulting flat model, and the underlying models will be altered.
  */
 class FlatModel extends ModelView {
-  private final MarkovModel source;
-  private final SimpleAlphabet stateAlpha;
+  private MarkovModel source;
+  private SimpleAlphabet stateAlpha;
+  
+  private List transitionListeners;
   
   public MarkovModel getSource() {
     return source;
@@ -70,10 +72,19 @@ class FlatModel extends ModelView {
     }
   }
   
+  public void addTransitionListener(TransitionListener tl) {
+    transitionListeners.add(tl);
+  }
+  
+  public void removeTransitionListener(TransitionListener tl) {
+    transitionListeners.remove(tl);
+  }
+  
   public FlatModel(MarkovModel model)
   throws IllegalSymbolException, IllegalAlphabetException {
     this.source = model;
     this.stateAlpha = new SimpleAlphabet();
+    this.transitionListeners = new ArrayList();
     
     stateAlpha.setName("flat " + model.stateAlphabet().getName());
     
@@ -244,6 +255,8 @@ class FlatModel extends ModelView {
         }
       }
     }
+    
+    source.addTransitionListener(new TransitionForwarder());
     //System.out.println("Done");
   }
   
@@ -348,6 +361,77 @@ class FlatModel extends ModelView {
     public EmissionWrapper(EmissionState wrapped)
     throws NullPointerException {
       super(wrapped);
+    }
+  }
+  
+  private class TransitionForwarder implements TransitionListener {
+    public void preCreateTransition(TransitionEvent te)
+    throws ModelVetoException {
+      synchronized(transitionListeners) {
+        /*TransitionEvent te = new TransitionEvent(
+          this, from, to, getTransitionScore(from, to), value
+        );*/
+        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
+          ((TransitionListener) i.next()).preCreateTransition(te);
+        }
+      }
+    }
+  
+    public void postCreateTransition(TransitionEvent te) {
+      synchronized(transitionListeners) {
+        /*TransitionEvent te = new TransitionEvent(
+          this, from, to, getTransitionScore(from, to), value
+        );*/
+        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
+          ((TransitionListener) i.next()).postCreateTransition(te);
+        }
+      }
+    }
+  
+    public void preDestroyTransition(TransitionEvent te)
+    throws ModelVetoException {
+      synchronized(transitionListeners) {
+        /*TransitionEvent te = new TransitionEvent(
+          this, from, to, getTransitionScore(from, to), value
+        );*/
+        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
+          ((TransitionListener) i.next()).preDestroyTransition(te);
+        }
+      }
+    }
+  
+    public void postDestroyTransition(TransitionEvent te) {
+      synchronized(transitionListeners) {
+        /*TransitionEvent te = new TransitionEvent(
+          this, from, to, getTransitionScore(from, to), value
+        );*/
+        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
+          ((TransitionListener) i.next()).postDestroyTransition(te);
+        }
+      }
+    }
+  
+    public void preChangeTransitionScore(TransitionEvent te)
+    throws ModelVetoException {
+      synchronized(transitionListeners) {
+        /*TransitionEvent te = new TransitionEvent(
+          this, from, to, getTransitionScore(from, to), value
+        );*/
+        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
+          ((TransitionListener) i.next()).preChangeTransitionScore(te);
+        }
+      }
+    }
+  
+    public void postChangeTransitionScore(TransitionEvent te) {
+      synchronized(transitionListeners) {
+        /*TransitionEvent te = new TransitionEvent(
+          this, from, to, getTransitionScore(from, to), value
+        );*/
+        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
+          ((TransitionListener) i.next()).postChangeTransitionScore(te);
+        }
+      }
     }
   }
 }

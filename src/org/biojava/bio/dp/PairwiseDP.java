@@ -58,14 +58,7 @@ public class PairwiseDP extends DP {
     public double backward(SymbolList[] seqs) 
         throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
-//  	if (seqs.length != 2)
-//  	    throw new IllegalArgumentException("This DP object only runs on pairs.");
-
-//  	Backward f = new Backward();
-//  	PairDPCursor cursor = new LightPairDPCursor(seqs[0], seqs[1], getStates().length, false);
-//  	return f.runBackward(seqs[0], seqs[1], cursor);
-
-	return backwardMatrix(seqs).getScore();
+      return backwardMatrix(seqs).getScore();
     }
 
     public DPMatrix backwardMatrix(SymbolList[] seqs) 
@@ -74,10 +67,12 @@ public class PairwiseDP extends DP {
 	if (seqs.length != 2)
 	    throw new IllegalArgumentException("This DP object only runs on pairs.");
 
+  lockModel();
 	Backward f = new Backward();
 	PairDPMatrix matrix = new PairDPMatrix(this, seqs[0], seqs[1]);
 	PairDPCursor cursor = new BackMatrixPairDPCursor(seqs[0], seqs[1], matrix);
 	double score = f.runBackward(seqs[0], seqs[1], cursor);
+  unlockModel();
 	matrix.setScore(score);
 	return matrix;
     }
@@ -286,9 +281,10 @@ public class PairwiseDP extends DP {
     {
 	if (seqs.length != 2)
 	    throw new IllegalArgumentException("This DP object only runs on pairs.");
-
+      lockModel();
 	Forward f = new Forward();
 	PairDPCursor cursor = new LightPairDPCursor(seqs[0], seqs[1], getStates().length, false);
+  unlockModel();
 	return f.runForward(seqs[0], seqs[1], cursor);
     }
 
@@ -297,12 +293,13 @@ public class PairwiseDP extends DP {
     {
 	if (seqs.length != 2)
 	    throw new IllegalArgumentException("This DP object only runs on pairs.");
-
+      lockModel();
 	Forward f = new Forward();
 	PairDPMatrix matrix = new PairDPMatrix(this, seqs[0], seqs[1]);
 	PairDPCursor cursor = new MatrixPairDPCursor(seqs[0], seqs[1], matrix);
 	double score = f.runForward(seqs[0], seqs[1], cursor);
 	matrix.setScore(score);
+  unlockModel();
 	return matrix;
     }
 
@@ -529,8 +526,11 @@ public class PairwiseDP extends DP {
 	if (seqs.length != 2)
 	    throw new IllegalArgumentException("This DP object only runs on pairs.");
 
+      lockModel();
 	Viterbi v = new Viterbi();
-	return v.runViterbi(seqs[0], seqs[1]);
+	StatePath sp = v.runViterbi(seqs[0], seqs[1]);
+  unlockModel();
+  return sp;
     }
 
 

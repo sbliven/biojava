@@ -34,6 +34,8 @@ public class SimpleMarkovModel implements MarkovModel {
   private final Map transFrom;
   private final Map transTo;
   private final Map transitionScores;
+  
+  private final List transitionListeners;
 
   private Transition _tran = new Transition(null, null);
   
@@ -41,6 +43,7 @@ public class SimpleMarkovModel implements MarkovModel {
     transFrom = new HashMap();
     transTo = new HashMap();
     transitionScores = new HashMap();
+    transitionListeners = new ArrayList();
   }
 
   public Alphabet emissionAlphabet() { return emissionAlpha; }
@@ -97,24 +100,53 @@ public class SimpleMarkovModel implements MarkovModel {
   }
   
   public void setTransitionScore(State from, State to, double value)
-  throws IllegalSymbolException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException, ModelVetoException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
+
+    TransitionEvent te = new TransitionEvent(
+      this, from, to, getTransitionScore(from, to), value
+    );
+    List tl;
+    synchronized(transitionListeners) {
+      tl = new ArrayList(transitionListeners);
+    }
+    
+    for(Iterator i = tl.iterator(); i.hasNext(); ) {
+      ((TransitionListener) i.next()).preChangeTransitionScore(te);
+    }
 
     _tran.from = from;
     _tran.to = to;
     if(transitionScores.containsKey(_tran)) {
       transitionScores.put(_tran, new Double(value));
     } else {
-	throw new IllegalTransitionException(from, to, "No transition from " + from.getName() +
-                                         " to " + to.getName() + " defined");
+      throw new IllegalTransitionException(
+        from, to,
+        "No transition from " + from.getName() +
+        " to " + to.getName() + " defined"
+      );
+    }
+
+    for(Iterator i = tl.iterator(); i.hasNext(); ) {
+      ((TransitionListener) i.next()).postChangeTransitionScore(te);
     }
   }
 
   public void createTransition(State from, State to)
-  throws IllegalSymbolException {
+  throws IllegalSymbolException, ModelVetoException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
+
+    TransitionEvent te = new TransitionEvent(this, from, to);
+    List tl;
+    synchronized(transitionListeners) {
+      tl = new ArrayList(transitionListeners);
+    }
+    
+    for(Iterator i = tl.iterator(); i.hasNext(); ) {
+      ((TransitionListener) i.next()).preCreateTransition(te);
+    }
     
     transitionScores.put(new Transition(from, to),
                          new Double(Double.NEGATIVE_INFINITY));
@@ -122,18 +154,36 @@ public class SimpleMarkovModel implements MarkovModel {
     Set f = transitionsFrom(from);
     f.add(to);
     t.add(from);
+
+    for(Iterator i = tl.iterator(); i.hasNext(); ) {
+      ((TransitionListener) i.next()).postCreateTransition(te);
+    }
   }
   
   public void destroyTransition(State from, State to)
-  throws IllegalSymbolException {
+  throws IllegalSymbolException, ModelVetoException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
+
+    TransitionEvent te = new TransitionEvent(this, from, to);
+    List tl;
+    synchronized(transitionListeners) {
+      tl = new ArrayList(transitionListeners);
+    }
+    
+    for(Iterator i = tl.iterator(); i.hasNext(); ) {
+      ((TransitionListener) i.next()).preDestroyTransition(te);
+    }
     
     _tran.from = from;
     _tran.to = to;
     transitionScores.remove(_tran);
     transitionsFrom(from).remove(to);
     transitionsTo(to).remove(from);
+
+    for(Iterator i = tl.iterator(); i.hasNext(); ) {
+      ((TransitionListener) i.next()).postDestroyTransition(te);
+    }
   }
   
   public boolean containsTransition(State from, State to)
@@ -249,6 +299,18 @@ public class SimpleMarkovModel implements MarkovModel {
           );
         }
       }
+    }
+  }
+  
+  public void addTransitionListener(TransitionListener tl) {
+    synchronized(transitionListeners) {
+      transitionListeners.add(tl);
+    }
+  }
+  
+  public void removeTransitionListener(TransitionListener tl) {
+    synchronized(transitionListeners) {
+      transitionListeners.remove(tl);
     }
   }
 }

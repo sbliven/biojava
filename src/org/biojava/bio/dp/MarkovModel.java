@@ -95,31 +95,50 @@ public interface MarkovModel {
 
   /**
    * Makes a transition between two states legal.
+   * <P>
+   * This should inform each TransitionListener that a transition is to be
+   * created using preCreateTransition, and if none of the listeners fire a
+   * ModelVetoException, it should create the transition, and then inform each
+   * TransitionListener with postCreateTransition.
    *
    * @param from  the State currently occupied
    * @param to  the State to move to
    * @throws IllegalSymbolException if either from or to are not legal states
    * @throws UnsupportedOperationException if an implementation does not allow
    *         transitions to be created
+   * @throws ModelVetoException if creating the transition is vetoed
    */
    void createTransition(State from, State to)
-   throws IllegalSymbolException, UnsupportedOperationException;
+   throws IllegalSymbolException, UnsupportedOperationException,
+   ModelVetoException;
    
   /**
    * Breaks a transition between two states legal.
+   * <P>
+   * This should inform each TransitionListener that a transition is to be
+   * broken using preDestroyTransition, and if none of the listeners fire a
+   * ModelVetoException, it should break the transition, and then inform each
+   * TransitionListener with postDestroyTransition.
    *
    * @param from  the State currently occupied
    * @param to  the State to move to
    * @throws IllegalSymbolException if either from or to are not legal states
    * @throws UnsupportedOperationException if an implementation does not allow
    *         transitions to be destroyed
+   * @throws ModelVetoException if breaking the transition is vetoed
    */
    void destroyTransition(State from, State to)
-   throws IllegalSymbolException, UnsupportedOperationException;
+   throws IllegalSymbolException, UnsupportedOperationException,
+   ModelVetoException;
 
    /**
    * Set the transition score associated with a transition.
    * <P>
+   * This method should inform each TransitionListener that the score is to be
+   * changed by calling preChangeTransitionScore, and if the change is not
+   * vetoed, it should update the score and then call postChangeTransitionScore
+   * on each listener.
+   *
    * @param from  the source State
    * @param to  the destination State
    * @param score the new score for the transition
@@ -129,10 +148,11 @@ public interface MarkovModel {
    *         model
    * @throws UnsupportedOperationException if an implementation does not allow
    *         transition scores to be altered
+   * @throws ModelVetoException if the new score is vetoed
    */
   void setTransitionScore(State from, State to, double score)
   throws IllegalSymbolException, IllegalTransitionException,
-  UnsupportedOperationException;
+  UnsupportedOperationException, ModelVetoException;
   
   /**
    * Sample a transition from the distribution of transitions.
@@ -170,7 +190,8 @@ public interface MarkovModel {
    * @throws IllegalSymbolException if the state is not valid or is a MagicalState
    */
   void addState(State newState)
-  throws UnsupportedOperationException, IllegalSymbolException;
+  throws UnsupportedOperationException, IllegalSymbolException,
+  ModelVetoException;
 
   /**
    * Remove a state from the model.
@@ -188,7 +209,7 @@ public interface MarkovModel {
    */
   void removeState(State toGo)
   throws UnsupportedOperationException, IllegalTransitionException,
-  IllegalSymbolException;
+  IllegalSymbolException, ModelVetoException;
   
   /**
    * Register this model with a trainer.
@@ -197,4 +218,20 @@ public interface MarkovModel {
    */
   void registerWithTrainer(ModelTrainer mt)
   throws BioException;
+  
+  /**
+   * Register a TransitionListener with the model.
+   *
+   * @param tl   a TransitionListener to notify when transitions are created,
+   *             destroyed or the probabilities changed
+   */
+  void addTransitionListener(TransitionListener tl);
+  
+  /**
+   * Unregister a TransitionListener with the model.
+   *
+   * @param tl   a TransitionListener to no longer notify when transitions are
+   *             created, destroyed or the probabilities changed
+   */
+  void removeTransitionListener(TransitionListener tl);
 }
