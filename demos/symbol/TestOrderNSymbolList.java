@@ -18,7 +18,7 @@ public class TestOrderNSymbolList {
     SymbolList res = Tools.createSymbolList(10);
     
     for(int o = 1; o < 6; o++) {
-      SymbolList view = new OrderNSymbolList(res, o);
+      SymbolList view = SymbolListViews.orderNSymbolList(res, o);
       System.out.println("Order " + o + " view:");
       for(int i = 1; i <= view.length(); i++) {
         System.out.println(i + ": " + view.symbolAt(i).getName());

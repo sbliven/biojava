@@ -18,7 +18,7 @@ public class TestWindowedSymbolList {
     SymbolList res = Tools.createSymbolList(3*4*5);
     
     for(int w = 1; w <= 6; w++) {
-      SymbolList view = new WindowedSymbolList(res, w);
+      SymbolList view = SymbolListViews.windowedSymbolList(res, w);
       System.out.println("Window " + w + " view:");
       for(int i = 1; i <= view.length(); i++) {
         System.out.println(i + ": " + view.symbolAt(i).getName());
