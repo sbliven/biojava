@@ -128,13 +128,13 @@ public class ClassifierExample {
       };
 
       PolynomialKernel pk = new PolynomialKernel();
-      pk.setWrappedKernel(k);
+      pk.setNestedKernel(k);
       pk.setOrder(2);
       pk.setConstant(1.0);
       pk.setMultiplier(0.0000001);
       
       RadialBaseKernel rb = new RadialBaseKernel();
-      rb.setKernel(k);
+      rb.setNestedKernel(k);
       
       polyKernel = pk;
       rbfKernel = rb;

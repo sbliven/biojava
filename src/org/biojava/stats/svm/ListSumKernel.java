@@ -31,19 +31,13 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class ListSumKernel implements SVMKernel {
-    private SVMKernel kernel;
-
-    public ListSumKernel() {
-      kernel = null;
-    }
-
+public class ListSumKernel extends NestedKernel {
     public double evaluate(Object a, Object b) {
       List l1 = (List) a;
       List l2 = (List) b;
       
       double dot = 0.0;
-      SVMKernel k = getWrappedKernel();
+      SVMKernel k = getNestedKernel();
       
       Iterator i1 = l1.iterator();
       Iterator i2 = l2.iterator();
@@ -59,16 +53,8 @@ public class ListSumKernel implements SVMKernel {
       return dot;
     }
 
-    public SVMKernel getWrappedKernel() {
-      return kernel;
-    }
-    
-    public void setWrappedKernel(SVMKernel kernel) {
-      this.kernel = kernel;
-    }
-    
     public String toString() {
       return "List kernel K(x, y, k) = sum_i(k(x_i, y_i))"
-        + ". k = " + getWrappedKernel().toString();
+        + "; k = " + getNestedKernel().toString();
     }
 }

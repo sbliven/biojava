@@ -25,20 +25,25 @@ package org.biojava.stats.svm;
 /**
  * This kernel computes the radial base kernel that corresponds to a gausian
  * distribution. 
+ * <P>
+ * The formula for this is <code>exp( -||a - b|| / (2* width ^ 2))</code>. The
+ * term a-b can be represented in an arbitrary feature space by using a nested
+ * kernel k, and becomes <code>k(a, a) + k(b, b) - 2 * k(a, b)</code>.
+ * <P>
+ * As k(x, x) is required repeatedly, I sudgest using a DiagonalCachingKernel as
+ * the emediately nested kernel function.
  *
  * @author Matthew Pocock
  */
-public class RadialBaseKernel implements SVMKernel {
+public class RadialBaseKernel extends NestedKernel {
     private double width;
-    private SVMKernel kernel;
 
     public RadialBaseKernel() {
       width = 1.0;
-      kernel = null;
     }
 
     public double evaluate(Object a, Object b) {
-      SVMKernel k = getKernel();
+      SVMKernel k = getNestedKernel();
       double w = getWidth();
       return Math.exp(-Math.abs(2.0 * k.evaluate(a, b) - k.evaluate(a, a) -
                                 k.evaluate(b, b)
@@ -52,18 +57,10 @@ public class RadialBaseKernel implements SVMKernel {
     public void setWidth(double w) {
       this.width = width;
     }
-
-    public SVMKernel getKernel() {
-      return kernel;
-    }
-    
-    public void setKernel(SVMKernel kernel) {
-      this.kernel = kernel;
-    }
     
     public String toString() {
       return "Radial base kernel K(x, k) = exp(-abs(k(x,x) - k(y,y)) / ("
         + getWidth() + "^2)"
-        + ". k = " + getKernel().toString();
+        + "; k = " + getNestedKernel().toString();
     }
 }

@@ -12,12 +12,7 @@ import java.util.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public class DiagonalCachingKernel implements SVMKernel {
-  /**
-   * The kernel being cached.
-   */
-  private SVMKernel parent;
-  
+public class DiagonalCachingKernel extends NestedKernel {
   /**
    * The cache of values.
    */
@@ -38,17 +33,8 @@ public class DiagonalCachingKernel implements SVMKernel {
    * @param k  the kernel to nest.
    */
   public void setNestedKernel(SVMKernel k) {
+    super.setNestedKernel(k);
     cache.clear();
-    parent = k;
-  }
-
-  /**
-   * Retrieve the currently nested kernel.
-   *
-   * @param the nested kernel
-   */
-  public SVMKernel getNestedKernel() {
-    return parent;
   }
 
   /**
@@ -62,16 +48,16 @@ public class DiagonalCachingKernel implements SVMKernel {
     if(x.equals(y)) {
       Double d = (Double) cache.get(x);
       if (d == null) {
-        d = new Double(parent.evaluate(x, x));
+        d = new Double(getNestedKernel().evaluate(x, x));
         cache.put(x, d);
       }
       return d.doubleValue();
     } else {
-      return parent.evaluate(x, y);
+      return getNestedKernel().evaluate(x, y);
     }
   }
   
   public String toString() {
-    return parent.toString();
+    return getNestedKernel().toString();
   }
 }

@@ -99,14 +99,14 @@ public class SVM_Light {
 		int order = Integer.parseInt(dParam);
 		PolynomialKernel k = new PolynomialKernel();
 		k.setOrder(order);
-		k.setWrappedKernel(SparseVector.kernel);
+		k.setNestedKernel(SparseVector.kernel);
 		model.setKernel(k);
 		break;
 	    case 2:
 		RadialBaseKernel rbk = new RadialBaseKernel();
 		double width = Double.parseDouble(gParam);
 		rbk.setWidth(width);
-		rbk.setKernel(SparseVector.kernel);
+		rbk.setNestedKernel(SparseVector.kernel);
 		model.setKernel(rbk);
 		break;
 	    default:
@@ -146,7 +146,7 @@ public class SVM_Light {
 	    kType = 0;
 	} else if (k instanceof PolynomialKernel) {
 	    kType = 1;
-	    d = ((PolynomialKernel) k).getOrder();
+	    d = (int) ((PolynomialKernel) k).getOrder();
 	} else if (k instanceof RadialBaseKernel) {
 	    kType = 2;
 	    g = ((RadialBaseKernel) k).getWidth();

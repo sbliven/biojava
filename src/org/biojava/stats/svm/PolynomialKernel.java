@@ -30,30 +30,28 @@ package org.biojava.stats.svm;
  * @author Thomas Down
  * @author Matthew Pocock
  */
-public class PolynomialKernel implements SVMKernel {
-    private int order;
+public class PolynomialKernel extends NestedKernel {
+    private double order;
     private double a;
     private double c;
-    private SVMKernel kernel;
 
     public PolynomialKernel() {
       order = 3;
       a = 1.0;
       c = 1.0;
-      kernel = null;
     }
 
     public double evaluate(Object a, Object b) {
-      return Math.pow(getMultiplier()*getWrappedKernel().evaluate(a, b)
+      return Math.pow(getMultiplier()*getNestedKernel().evaluate(a, b)
                       + getConstant(),
                       getOrder());
     }
 
-    public int getOrder() {
+    public double getOrder() {
       return order;
     }
 
-    public void setOrder(int o) {
+    public void setOrder(double o) {
       this.order = o;
     }
 
@@ -73,17 +71,9 @@ public class PolynomialKernel implements SVMKernel {
       this.a = m;
     }
 
-    public SVMKernel getWrappedKernel() {
-      return kernel;
-    }
-    
-    public void setWrappedKernel(SVMKernel kernel) {
-      this.kernel = kernel;
-    }
-    
     public String toString() {
       return "Polynomial kernel K(x, y | k) = ("
         + getMultiplier() + " * k(x, y) + " + c + ")^" + order
-        + ". k = " + getWrappedKernel().toString();
+        + ". k = " + getNestedKernel().toString();
     }
 }

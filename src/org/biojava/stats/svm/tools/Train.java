@@ -35,7 +35,7 @@ import org.biojava.stats.svm.*;
 
 public class Train {
     public static void main(String[] args) throws Throwable {
-	if (args.length < 2) {
+	if (args.length != 2) {
 	    throw new Exception("usage: stats.svm.tools.Classify <train_examples> <model_file>");
 	}
 	String trainFile = args[0];
@@ -63,7 +63,7 @@ public class Train {
 
 	PolynomialKernel k = new PolynomialKernel();
 	k.setOrder(4);
-	k.setWrappedKernel(SparseVector.kernel);
+	k.setNestedKernel(SparseVector.kernel);
 	model.setKernel(SparseVector.kernel);
 	System.out.println("Calculating kernel...");
 	model.calcKernel();

@@ -62,7 +62,7 @@ public class TrainRegression {
     }
 
     PolynomialKernel k = new PolynomialKernel();
-    k.setWrappedKernel(SparseVector.kernel);
+    k.setNestedKernel(SparseVector.kernel);
     k.setOrder(2);
     model.setKernel(k);
     System.out.println("Calculating kernel " + k);
