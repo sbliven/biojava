@@ -4,7 +4,7 @@
  * (c) Thomas Down
  */
 
-package utils.xml;
+package org.biojava.utils.xml;
 
 import org.xml.sax.*;
 import java.util.*;
@@ -12,6 +12,8 @@ import java.util.*;
 /**
  * Interface to an factory which produces Java objects which
  * reflect element in an XML document.
+ *
+ * @author Thomas Down
  */
 
 public interface XMLPeerFactory {

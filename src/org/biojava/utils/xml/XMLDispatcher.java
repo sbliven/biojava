@@ -4,7 +4,7 @@
  * (c) Thomas Down
  */
 
-package utils.xml;
+package org.biojava.utils.xml;
 
 import java.util.*;
 import org.xml.sax.*;
