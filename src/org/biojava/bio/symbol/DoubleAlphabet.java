@@ -125,6 +125,23 @@ public final class DoubleAlphabet
       }
       return sym;
   }
+  
+  /**
+   * Retrieve the symbol for a range of doubles.
+   *
+   * @param minVal  the minimum value
+   * @param maxVal  that maximum value
+   * @return a DoubleRange containing all doubles between min and max value.
+   */
+  public DoubleRange getSymbol(double minVal, double maxVal) {
+    // fixme: we should probably fly-weight these
+    return new DoubleRange(minVal, maxVal);
+  }
+  
+  public SubDoubleAlphabet getSubAlphabet(double min, double max) {
+    // fixme: we should fly-weight these a-la SubIntegerAlphabet
+    return new SubDoubleAlphabet(min, max);
+  }
 
   public Annotation getAnnotation() {
     return Annotation.EMPTY_ANNOTATION;
@@ -194,6 +211,9 @@ public final class DoubleAlphabet
   /**
    * A single double value.
    *
+   * @for.user
+   *  Get these via <code>DoubleAlphabet.getSymbol(double)</code>.
+   *
    * @author Matthew Pocock
    */
   public static class DoubleSymbol
@@ -233,9 +253,59 @@ public final class DoubleAlphabet
       return Collections.singleton(this);
     }
 
-    protected DoubleSymbol(double val) {
+    private DoubleSymbol(double val) {
       this.val = val;
       this.matches = new SingletonAlphabet(this);
+    }
+  }
+  
+  /**
+   * A range of double values.
+   *
+   * @for.user
+   *  Get these via <code>DoubleAlphabet.getSymbol(double, double)</code>.
+   *
+   * @author Matthew Pocock
+   */
+  public static class DoubleRange
+    extends
+      Unchangeable
+    implements
+      BasisSymbol,
+      Serializable
+  {
+    private final double minVal;
+    private final double maxVal;
+    private final Alphabet matches;
+    
+    public Annotation getAnnotation() {
+      return Annotation.EMPTY_ANNOTATION;
+    }
+    
+    public String getName() {
+      return "DoubleRange[" + minVal + " .. " + maxVal + "]";
+    }
+    
+    public Alphabet getMatches() {
+      return matches;
+    }
+    
+    public List getSymbols() {
+      return Arrays.asList(new Symbol[] { this });
+    }
+    
+    public double getMinValue() {
+      return minVal;
+    }
+    
+    public double getMaxValue() {
+      return maxVal;
+    }
+    
+    protected DoubleRange(double minVal, double maxVal) {
+      this.minVal = minVal;
+      this.maxVal = maxVal;
+      this.matches = getInstance().getSubAlphabet(minVal, maxVal);
     }
   }
 
@@ -270,4 +340,90 @@ public final class DoubleAlphabet
     }
   }
 
+  /**
+   * A class to represent a contiguous range of double symbols.
+   *
+   * @author Matthew Pocock
+   */
+  public static class SubDoubleAlphabet
+  extends
+    Unchangeable
+  implements
+    Alphabet
+  {
+    private final double min;
+    private final double max;
+    
+    private SubDoubleAlphabet(double min, double max) {
+      this.min = min;
+      this.max = max;
+    }
+    
+    public String getName() {
+      return "SubDoubleAlphabet[" + min + "-" + max + "]";
+    }
+    
+    public Annotation getAnnotation() {
+      return Annotation.EMPTY_ANNOTATION;
+    }
+    
+    public List getAlphabets() {
+      return Arrays.asList(new Alphabet[] { this });
+    }
+    
+    public Symbol getSymbol(List rl)
+    throws IllegalSymbolException {
+      if(rl.size() != 1) {
+        throw new IllegalSymbolException(
+          "SubDoubleAlphabet is one-dimensional: " + this.getName() +
+          " : " + rl );
+      }
+      
+      Symbol s = (Symbol) rl.get(0);
+      
+      validate(s);
+      
+      return s;
+    }
+    
+    public Symbol getAmbiguity(Set syms) {
+      throw new BioError("Operation not implemented");
+    }
+
+    public Symbol getGapSymbol() {
+      return getInstance().getGapSymbol();
+    }
+    
+    public boolean contains(Symbol s) {
+      if(s instanceof DoubleSymbol) {
+        double val = ((DoubleSymbol) s).doubleValue();
+        if(val >= min && val <= max) {
+          return true;
+        }
+      }
+      
+      if(s instanceof DoubleRange) {
+        DoubleRange dr = (DoubleRange) s;
+        if(dr.getMinValue() >= min || dr.getMaxValue() <= max) {
+          return true;
+        }
+      }
+      
+      return false;
+    }
+    
+    public void validate(Symbol sym)
+    throws IllegalSymbolException {
+      if(!contains(sym)) {
+        throw new IllegalSymbolException(
+          "This alphabet " + this.getName() +
+          " does not contain the symbol " + sym );
+      }
+    }
+    
+    public SymbolTokenization getTokenization(String name)
+    throws BioException {
+      return getInstance().getTokenization(name);
+    }
+  }
 }
