@@ -23,6 +23,7 @@ package org.biojava.directory;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -80,8 +81,14 @@ public class SystemRegistry {
                         }
                     }
 
-                    BufferedReader stream =
-                        new BufferedReader(new InputStreamReader(url.openStream()));
+                    BufferedReader stream = null;
+
+                    try {
+                        stream = new BufferedReader(new InputStreamReader(url.openStream()));
+                    }
+                    catch (IOException ioe) {
+                        // FIXME - log this
+                    }
 
                     if (stream != null) {
                         try {
@@ -90,11 +97,13 @@ public class SystemRegistry {
                                                                  locator);
                             regConfig.addBottomConfig(cfg);
                         } catch (Exception ex) {
-                            ex.printStackTrace(); // FIXME - log this
+                            // FIXME - log this
+                            ex.printStackTrace();
                         }
-                    }
+                    } 
                 } catch (Exception ex) {
-                    ex.printStackTrace(); // FIXME - log this
+                    // FIXME - log this
+                    ex.printStackTrace();
                 }
             }
 
@@ -114,7 +123,7 @@ public class SystemRegistry {
         List registryPath = new ArrayList();
         String userHome = System.getProperty("user.home");
         if (userHome != null) {
-            registryPath.add("file:///"
+            registryPath.add("file://"
                              + userHome
                              + "/.bioinformatics/"
                              + CONFIG_FILE);

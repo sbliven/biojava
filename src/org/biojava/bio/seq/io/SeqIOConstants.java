@@ -198,7 +198,7 @@ public final class SeqIOConstants
     public static final int  GENBANK_AA = GENBANK | AA;
 
     /**
-     * <code>REFSEQ_DNA</code> premade REFSEQ | RNA.
+     * <code>REFSEQ_DNA</code> premade REFSEQ | DNA.
      */
     public static final int REFSEQ_DNA = REFSEQ | DNA;
 

@@ -66,7 +66,6 @@ public class OBDARegistryParser {
         Map currentDB = null;
 	
         while ((line = in.readLine()) != null) {
-
             if (line.trim().length() > 0) {
                 // We currently don't do anything with the version
                 // number
@@ -77,6 +76,7 @@ public class OBDARegistryParser {
                 if (line.indexOf("[") > -1) {
                     dbName = line.substring(1, line.indexOf("]"));
                     currentDB = new HashMap();
+                    currentDB.put("dbname", dbName);
 
                     // Create a List of Maps through which we can fall
                     // back if the first does not work
