@@ -115,8 +115,13 @@ public class ClassifierExample {
     // public kernels
     public static SVMKernel polyKernel;
     public static SVMKernel rbfKernel;
+    public static SMOTrainer trainer;
     
     static {
+      trainer = new SMOTrainer();
+      trainer.setC(10000000.0);
+      trainer.setEpsilon(0.000000001);
+      
       SVMKernel k = new SVMKernel() {
         public double evaluate(Object a, Object b) {
           Point2D pa = (Point2D) a;
@@ -129,7 +134,7 @@ public class ClassifierExample {
 
       PolynomialKernel pk = new PolynomialKernel();
       pk.setNestedKernel(k);
-      pk.setOrder(2);
+      pk.setOrder(2.0);
       pk.setConstant(1.0);
       pk.setMultiplier(0.0000001);
       
@@ -141,13 +146,11 @@ public class ClassifierExample {
     }
     
     // private variables that should only be diddled by internal methods
-    private java.util.List positivePoints;
-    private java.util.List negativePoints;
-    private SVMModel model;
+    private SVMTarget target;
+    private SVMClassifierModel model;
 
     {
-      positivePoints = new ArrayList();
-      negativePoints = new ArrayList();
+      target = new SimpleSVMTarget();
       model = null;
     }
 
@@ -247,8 +250,7 @@ public class ClassifierExample {
      * Remove all points from the canvas, and discard any model.
      */
     public void clear() {
-      positivePoints.clear();
-      negativePoints.clear();
+      target.clear();
       model = null;
       repaint();
     }
@@ -259,33 +261,15 @@ public class ClassifierExample {
      * This may take some time for complicated models.
      */
     public void classify() {
-      int size = positivePoints.size() + negativePoints.size();
-      SVMModel model = new SVMModel(size);
-      double [] target = new double[size];
-      int i = 0;
+      model = trainer.trainModel(target, kernel, null);
 
-      for(Iterator it = positivePoints.iterator(); it.hasNext(); i++) {
-        model.addVector(it.next());
-        target[i] = +1;
-      }
-
-      for(Iterator it = negativePoints.iterator(); it.hasNext(); i++) {
-        model.addVector(it.next());
-        target[i] = -1;
-      }
-
-      model.setKernel(kernel);
-      model.calcKernel();
-      SMOTrainer trainer = new SMOTrainer();
-      trainer.setC(10000000.0);
-      trainer.setEpsilon(0.000000001);
-      trainer.trainModel(model, target, null);
-
-      for(i = 0; i < model.size(); i++) {
-        System.out.println(model.getVector(i) + "\t" +
-                           target[i] + "\t" +
-                           model.getAlpha(i) + "\t" +
-                           model.classify(model.getVector(i)));
+      for(Iterator i = target.items().iterator(); i.hasNext(); ) {
+        Object item = i.next();
+        System.out.println(item + "\t" +
+                           target.getTarget(item) + "\t" +
+                           model.getAlpha(item) + "\t" +
+                           model.classify(item)
+        );
       }
 
       this.model = model;
@@ -313,9 +297,9 @@ public class ClassifierExample {
         public void mouseReleased(MouseEvent me) {
           Point p = me.getPoint();
           if(getAddPos()) {
-            positivePoints.add(p);
+            target.addItemTarget(p, +1.0);
           } else {
-            negativePoints.add(p);
+            target.addItemTarget(p, -1.0);
           }
           model = null;
           repaint();
@@ -329,7 +313,6 @@ public class ClassifierExample {
      */
     public void paintComponent(Graphics g) {
       Graphics2D g2 = (Graphics2D) g;
-      Shape glyph;
       AffineTransform at = new AffineTransform();
       int i = 0;
       Rectangle r = g2.getClipBounds();
@@ -357,25 +340,21 @@ public class ClassifierExample {
         }
       }
 
-      glyph = getPosShape();
-      for(Iterator it = positivePoints.iterator(); it.hasNext(); i++) {
-        Point2D p = (Point2D) it.next();
-        at.setToTranslation(p.getX(), p.getY());
-        Shape s = at.createTransformedShape(glyph);
-        if(model != null && model.getAlpha(i) != 0) {
-          g2.setPaint(svPaint);
-        } else {
-          g2.setPaint(plainPaint);
-        }
-        g2.draw(s);
+      Set supportVectors = Collections.EMPTY_SET;
+      if(model != null) {
+        supportVectors = model.items();
       }
-
-      glyph = getNegShape();
-      for(Iterator it = negativePoints.iterator(); it.hasNext(); i++) {
+      for(Iterator it = target.items().iterator(); it.hasNext(); i++) {
         Point2D p = (Point2D) it.next();
         at.setToTranslation(p.getX(), p.getY());
+        Shape glyph;
+        if(target.getTarget(p) > 0) {
+          glyph = getPosShape();
+        } else {
+          glyph = getNegShape();
+        }
         Shape s = at.createTransformedShape(glyph);
-        if(model != null && model.getAlpha(i) != 0) {
+        if(supportVectors.contains(p)) {
           g2.setPaint(svPaint);
         } else {
           g2.setPaint(plainPaint);

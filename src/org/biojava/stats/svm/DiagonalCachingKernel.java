@@ -8,6 +8,11 @@ import java.util.*;
  * Several kernels need to repeatedly access k(x,x) to do things like
  * normalization, or to calculate distances. This kernel wraps k so that these
  * leading diagonal elements do not need to be calculated each time.
+ * <P>
+ * This kernel is thread-safe. However, care must be taken when setting the
+ * nested kernel that no other thread is retrieving values at the same time.
+ * This would cause a race condition in which the newly flushed cache may
+ * contain a value from the previous kernel.
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -34,7 +39,9 @@ public class DiagonalCachingKernel extends NestedKernel {
    */
   public void setNestedKernel(SVMKernel k) {
     super.setNestedKernel(k);
-    cache.clear();
+    synchronized(cache) {
+      cache.clear();
+    }
   }
 
   /**
@@ -46,10 +53,15 @@ public class DiagonalCachingKernel extends NestedKernel {
    */
   public double evaluate(Object x, Object y) {
     if(x.equals(y)) {
-      Double d = (Double) cache.get(x);
+      Double d = null;
+      synchronized(cache) {
+        d = (Double) cache.get(x);
+      }
       if (d == null) {
         d = new Double(getNestedKernel().evaluate(x, x));
-        cache.put(x, d);
+        synchronized(cache) {
+          cache.put(x, d);
+        }
       }
       return d.doubleValue();
     } else {

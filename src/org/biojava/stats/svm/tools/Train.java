@@ -34,57 +34,59 @@ import java.util.*;
 import org.biojava.stats.svm.*;
 
 public class Train {
-    public static void main(String[] args) throws Throwable {
-	if (args.length != 2) {
+  public static void main(String[] args) throws Throwable {
+    if (args.length != 2) {
 	    throw new Exception("usage: stats.svm.tools.Classify <train_examples> <model_file>");
-	}
-	String trainFile = args[0];
-	String modelFile = args[1];
+    }
+    String trainFile = args[0];
+    String modelFile = args[1];
 
-	List examples = new ArrayList();
-	BufferedReader r = new BufferedReader(new FileReader(trainFile));
-	String line;
+    BufferedReader r = new BufferedReader(new FileReader(trainFile));
+    String line;
 
-	while ((line = r.readLine()) != null) {
-	    if (line.length() == 0 || line.startsWith("#"))
-		continue;
-	    examples.add(SVM_Light.parseExample(line));
-	}
-	r.close();
+    SVMTarget target = new SimpleSVMTarget();
+    while ((line = r.readLine()) != null) {
+      if (line.length() == 0 || line.startsWith("#")) {
+        continue;
+      }
+	    SVM_Light.LabelledVector ex = SVM_Light.parseExample(line);
+      target.addItemTarget(ex.getVector(), ex.getLabel());
+    }
+    r.close();
 
-	SVMModel model = new SVMModel(examples.size());
-	double[] target = new double[examples.size()];
-	for (int i = 0; i < examples.size(); ++i) {
-	    SVM_Light.LabelledVector ex = (SVM_Light.LabelledVector) examples.get(i);
-	    model.addVector(ex.getVector());
-	    target[i] = ex.getLabel();
-	}
+    PolynomialKernel pK = new PolynomialKernel();
+    pK.setOrder(2.0);
+    pK.setNestedKernel(SparseVector.kernel);
+    DiagonalCachingKernel gcK = new DiagonalCachingKernel();
+    gcK.setNestedKernel(pK);
+    NormalizingKernel nK = new NormalizingKernel();
+    nK.setNestedKernel(gcK);
+    CachingKernel cK = new CachingKernel();
+    cK.setNestedKernel(nK);
 
-
-	PolynomialKernel k = new PolynomialKernel();
-	k.setOrder(4);
-	k.setNestedKernel(SparseVector.kernel);
-	model.setKernel(SparseVector.kernel);
-	System.out.println("Calculating kernel...");
-	model.calcKernel();
-	SMOTrainer trainer = new SMOTrainer();
-	trainer.setEpsilon(0.01);
-	TrainingListener tl = new TrainingListener() {
+    SMOTrainer trainer = new SMOTrainer();
+    trainer.setEpsilon(1.0e-9);
+    trainer.setC(1000);
+    TrainingListener tl = new TrainingListener() {
 	    public void trainingCycleComplete(TrainingEvent e) {
-		System.out.print('.');
+        System.out.print('.');
 	    }
 	    public void trainingComplete(TrainingEvent e) {
-		System.out.println("");
+        System.out.println("");
 	    }
-	} ;
-	System.out.println("Training");
-	trainer.trainModel(model, target, tl);
-	System.out.println("Done");
+    };
+    
+    System.out.println("Training");
+	  SVMClassifierModel model = trainer.trainModel(target, cK, tl);
+    System.out.println("Done");
 
-	for (int i=0; i < model.size(); ++i) {
-	    System.out.println(target[i] + "\t" + model.classify(model.getVector(i)) + "    (" + model.getAlpha(i) + ")");
-	}
-
-	SVM_Light.writeModelFile(model, modelFile);
+    for(Iterator i = target.items().iterator(); i.hasNext(); ) {
+      Object item = i.next();
+	    System.out.println(target.getTarget(item) + "\t" +
+                         model.classify(item) + "\t(" +
+                         model.getAlpha(item) + ")");
     }
+
+    SVM_Light.writeModelFile(model, modelFile);
+  }
 }

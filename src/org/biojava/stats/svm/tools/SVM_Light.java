@@ -128,64 +128,68 @@ public class SVM_Light {
 
     }
 
-    public static void writeModelFile(SVMModel model, String fileName)
+    public static void writeModelFile(SVMClassifierModel model, String fileName)
         throws IOException
     {
-	if (! (model.getVector(0) instanceof SparseVector))
-	    throw new IOException("Only SparseVector models are allowed in SVM_Light files");
-	SVMKernel k = model.getKernel();
+      SVMKernel k = model.getKernel();
 
-	int kType = 0;
-	int d = 3;
-	double g = 1;
-	double s = 1;
-	double r = 1;
-	String u = "empty";
+      int kType = 0;
+      int d = 3;
+      double g = 1;
+      double s = 1;
+      double r = 1;
+      String u = "empty";
 
-	if (k == SparseVector.kernel) {
-	    kType = 0;
-	} else if (k instanceof PolynomialKernel) {
-	    kType = 1;
-	    d = (int) ((PolynomialKernel) k).getOrder();
-	} else if (k instanceof RadialBaseKernel) {
-	    kType = 2;
-	    g = ((RadialBaseKernel) k).getWidth();
-	} else {
-	    throw new IOException("Can't write SVM_Light file with kernel type " + k.getClass().toString());
-	}
+      if (k == SparseVector.kernel) {
+        kType = 0;
+      } else if (k instanceof PolynomialKernel) {
+        kType = 1;
+        d = (int) ((PolynomialKernel) k).getOrder();
+      } else if (k instanceof RadialBaseKernel) {
+        kType = 2;
+        g = ((RadialBaseKernel) k).getWidth();
+      } else {
+        throw new IOException("Can't write SVM_Light file with kernel type " + k.getClass().toString());
+      }
 	    
 	
-	PrintWriter pw = new PrintWriter(new FileWriter(fileName));
-	pw.println("SVM-light Version V3.01");
-	pw.println("" + kType + " # kernel type");
-	pw.println("" + d + " # kernel parameter -d");
-	pw.println("" + g + " # kernel parameter -g");
-	pw.println("" + s + " # kernel parameter -s");
-	pw.println("" + r + " # kernel parameter -r");
-	pw.println(u + " # kernel parameter -u");
+    	PrintWriter pw = new PrintWriter(new FileWriter(fileName));
+      pw.println("SVM-light Version V3.01");
+      pw.println("" + kType + " # kernel type");
+      pw.println("" + d + " # kernel parameter -d");
+      pw.println("" + g + " # kernel parameter -g");
+      pw.println("" + s + " # kernel parameter -s");
+      pw.println("" + r + " # kernel parameter -r");
+      pw.println(u + " # kernel parameter -u");
 
-	int numSV = 0;
-	for (int i = 0; i < model.size(); ++i) 
-	    if (model.getAlpha(i) != 0)
-		numSV++;
-	pw.println("" + numSV + " # number of support vectors");
-	pw.println("" + model.getThreshold() + " # threshold b");
+      int numSV = 0;
+      for(Iterator i = model.items().iterator(); i.hasNext(); ) {
+        Object item = i.next();
+        if (model.getAlpha(item) != 0) {
+          numSV++;
+        }
+      }
+      
+      pw.println("" + numSV + " # number of support vectors");
+      pw.println("" + model.getThreshold() + " # threshold b");
 
-	for (int i = 0; i < model.size(); ++i) {
-	    if (model.getAlpha(i) == 0)
-		continue;
-	    pw.print(model.getAlpha(i));
+      for(Iterator i = model.items().iterator(); i.hasNext(); ) {
+        Object item = i.next();
+        if (model.getAlpha(item) == 0) {
+          continue;
+        }
+        pw.print(model.getAlpha(i));
 	    
-	    SparseVector v = (SparseVector) model.getVector(i);
-	    for (int j = 0; j <= v.maxIndex(); ++j) {
-		double x = v.get(j);
-		if (x != 0.0)
-		    pw.print(" " + j + ":" + x);
-	    }
-	    pw.println("");
-	}
+  	    SparseVector v = (SparseVector) item;
+        for (int j = 0; j <= v.maxIndex(); ++j) {
+          double x = v.get(j);
+          if (x != 0.0)
+          pw.print(" " + j + ":" + x);
+        }
+        pw.println("");
+      }
 
-	pw.close();
+      pw.close();
     }
 
     public static String firstToken(String s) {

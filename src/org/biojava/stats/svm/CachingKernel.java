@@ -11,6 +11,11 @@ import java.util.*;
 /**
  * Caches the results of a nested kernel so that k(a, b) need only be calculated
  * once.
+ * <P>
+ * This kernel is thread-safe. However, care must be taken when setting the
+ * nested kernel that no other thread is retrieving values at the same time.
+ * This would cause a race condition in which the newly flushed cache may
+ * contain a value from the previous kernel.
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -29,10 +34,15 @@ public class CachingKernel extends NestedKernel {
 
     public double evaluate(Object x, Object y) {
       ObjectPair op = new ObjectPair(x, y);
-      Double d = (Double) cache.get(op);
+      Double d = null;
+      synchronized (cache) {
+        d = (Double) cache.get(op);
+      }
       if (d == null) {
         d = new Double(getNestedKernel().evaluate(x, y));
-        cache.put(op, d);
+        synchronized (cache) {
+          cache.put(op, d);
+        }
       }
       return d.doubleValue();
     }
