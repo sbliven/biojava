@@ -33,6 +33,14 @@ import org.biojava.bio.seq.db.*;
  *
  * @author Thomas Down
  * @since 1.2
+ *
+ * @for.user
+ * Once you've made one of these and populated it with a few DistDataSource instances,
+ * you should be able to prety much forget about it and use it directly as a normal
+ * SequenceDB implementation.
+ *
+ * @for.powerUsers
+ * DataSources can be added and removed while the object is live. 
  */
 
 public class DistributedSequenceDB extends AbstractSequenceDB implements SequenceDB {
