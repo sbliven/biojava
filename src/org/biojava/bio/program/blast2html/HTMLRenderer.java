@@ -90,6 +90,11 @@ public class HTMLRenderer  {
     private Properties oOptions = null;
 
     /**
+     * Flag to detect if HTML output was empty.
+     */
+    private boolean wasEmpty = true;
+
+    /**
      * Creates an HTMLRenderer, that outputs the HTML to the specified 
      * PrintWriter. <P>
      *
@@ -176,11 +181,23 @@ public class HTMLRenderer  {
 	tAlternateSummary = false;
 	iSummaryCount =0;
 	tNeedComma = false;	
+	wasEmpty = true;
 
 	align.setLength( 0 ); 
 	alignMarkUp1.setLength( 0 ); 
 	alignMarkUp2.setLength( 0 ); 
 	pcDataBuffer.setLength( 0 ); 
+    }
+
+    /**
+     * Returns true if  no HitSummary and no Hit elements were
+     * encountered
+     *
+     * @return <code>boolean</code> - true if no summary of Hit elements
+     *          where encountered.
+     */
+    public boolean wasEmpty() {
+	return wasEmpty;
     }
 
     /**
@@ -254,6 +271,8 @@ public class HTMLRenderer  {
      * @param oHitSummary a <code>HitSummary</code> - the first Summary item.
      */
     void startSummaryTable( HitSummary oHitSummary ) {
+
+	wasEmpty = false;
 
 	out.println( "<br>" );
 	out.println( "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">" );
@@ -439,6 +458,7 @@ public class HTMLRenderer  {
      */
     void startDetailTable() {
 
+	wasEmpty = false;
 
 	out.println( "<br>" );
 	out.println( "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">" );
