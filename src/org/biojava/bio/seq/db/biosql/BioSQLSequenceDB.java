@@ -495,16 +495,16 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         } else {
             // Taxon entry does not exist - create it
             Taxon parent = taxon.getParent();
-            int parent_taxon_id = (parent != null) 
-                ? getTaxonID(conn, parent)
-                : -1;
+            int parent_taxon_id = (parent != null) ? getTaxonID(conn, parent) : -1;
             PreparedStatement createTaxon = conn.prepareStatement(
                                                                   "insert into taxon " 
                                                                   + "(ncbi_taxon_id, parent_taxon_id) " 
                                                                   + "values (?, ?)"
                                                                   );
             createTaxon.setInt(1, ncbi_taxon_id);
-            createTaxon.setInt(2, parent_taxon_id);
+            if (parent_taxon_id != -1) {
+                createTaxon.setInt(2, parent_taxon_id);
+            }
             createTaxon.executeUpdate();
             createTaxon.close();
             taxon_id = getDBHelper().getInsertID(conn, "taxon", "taxon_id");
@@ -692,19 +692,13 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    if ((exists = rs.next())) {
 		int bioentry_id = rs.getInt(1);
 
-        /*
-                PreparedStatement delete_taxa = conn.prepareStatement("delete from bioentry_taxa where bioentry_id = ?");
-                delete_taxa.setInt(1, bioentry_id);
-                delete_taxa.executeUpdate();
-                delete_taxa.close();
-                */
-
                 PreparedStatement delete_reference = conn.prepareStatement("delete from bioentry_reference where bioentry_id = ?");
                 delete_reference.setInt(1, bioentry_id);
                 delete_reference.executeUpdate();
                 delete_reference.close();
 
-                /// XXX this won't work with oracle (comment is a reserved word)
+                // XXX this won't work with oracle (where comment is a reserved word)
+                // Hilmar has said this table will be renamed to anncomment post-1.0
                 PreparedStatement delete_comment = conn.prepareStatement("delete from comment where bioentry_id = ?");
                 delete_comment.setInt(1, bioentry_id);
                 delete_comment.executeUpdate();
