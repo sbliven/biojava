@@ -95,7 +95,7 @@ public interface ChangeListener extends EventListener {
     public void preChange(ChangeEvent cev) throws ChangeVetoException {
       throw new ChangeVetoException(
         cev,
-        "This object sas been locked"
+        "This object has been locked"
       );
     }
 

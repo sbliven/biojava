@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
 
 /**
  * Uses Arrays.binarySearch to retrieve indecies for symbols. To save on CPU,
@@ -14,7 +13,8 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  * @since 1.1
  */ 
-public class HashedAlphabetIndex implements AlphabetIndex {
+public class HashedAlphabetIndex
+extends AbstractChangeable implements AlphabetIndex {
   private static final Comparator cmp = new HashComparator();
   
   private final FiniteAlphabet alpha;
@@ -30,9 +30,15 @@ public class HashedAlphabetIndex implements AlphabetIndex {
     int indx = Arrays.binarySearch(hashes, s.hashCode());
     if(indx < 0) {
       getAlphabet().validate(s);
-      throw new IllegalSymbolException(
-        "Symbol " + s.getName() + " is not an AttomicSymbol instance"
-      );
+      if(s instanceof AtomicSymbol) {
+        throw new BioError(
+          "Assertion Failure: " +
+          "Symbol " + s.getName() + " was not an indexed member of the alphabet " +
+          getAlphabet().getName() + " despite being in the alphabet."
+        );
+      } else {
+        throw new IllegalSymbolException("Symbol must be atomic to be indexed.");
+      }
     }
     return indx;
   }

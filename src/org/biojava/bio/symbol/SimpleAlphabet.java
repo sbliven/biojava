@@ -117,50 +117,9 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
     }
   }
 
-  public void addSymbol(Symbol s)
+  protected void addSymbolImpl(Symbol s)
   throws IllegalSymbolException, ChangeVetoException {
-    if(s == null) {
-      throw new IllegalSymbolException(
-        "You can not add null as a symbol to alphabet " + getName()
-      );
-    }
-    if(s instanceof AtomicSymbol) {
-      if(hasListeners()) {
-        ChangeSupport cs = getChangeSupport(null);
-        synchronized(cs) {
-          ChangeEvent ce = new ChangeEvent(this, Alphabet.SYMBOLS, s, null);
-          cs.firePreChangeEvent(ce);
-          symbols.add(s);
-          cs.firePostChangeEvent(ce);
-        }
-      } else {
-        symbols.add(s);
-      }
-    } else {
-      Alphabet sa = s.getMatches();
-      if(!(sa instanceof FiniteAlphabet)) {
-        throw new IllegalSymbolException(
-          "Can't add symbol " + s.getName() +
-          " as it matches an infinite number of symbols."
-        );
-      } else {
-        if(hasListeners()) {
-          ChangeSupport cs = getChangeSupport(null);
-          synchronized(cs) {
-            ChangeEvent ce = new ChangeEvent(this, Alphabet.SYMBOLS, s, null);
-            cs.firePreChangeEvent(ce);
-            for(Iterator i = ((FiniteAlphabet) sa).iterator(); i.hasNext(); ) {
-              symbols.add((AtomicSymbol) i.next());
-            }
-            cs.firePostChangeEvent(ce);
-          }
-        } else {
-          for(Iterator i = ((FiniteAlphabet) sa).iterator(); i.hasNext(); ) {
-            symbols.add((AtomicSymbol) i.next());
-          }
-        }
-      }
-    }
+    symbols.add(s);
   }
   
   /**

@@ -49,8 +49,10 @@ public abstract class ChangeForwarder implements ChangeListener {
    *
    * @param ce  the originating ChangeEvent
    * @return a new ChangeEvent to pass on, or null if no event should be sent
+   * @throws ChangeVetoException if for any reason this event can't be handled
    */
-  protected abstract ChangeEvent generateEvent(ChangeEvent ce);
+  protected abstract ChangeEvent generateEvent(ChangeEvent ce)
+  throws ChangeVetoException;
     
   public void preChange(ChangeEvent ce)
   throws ChangeVetoException {
@@ -61,9 +63,16 @@ public abstract class ChangeForwarder implements ChangeListener {
   }
   
   public void postChange(ChangeEvent ce) {
-    ChangeEvent nce = generateEvent(ce);
-    if(nce != null) {
-      changeSupport.firePostChangeEvent(nce);
+    try {
+      ChangeEvent nce = generateEvent(ce);
+      if(nce != null) {
+        changeSupport.firePostChangeEvent(nce);
+      }
+    } catch (ChangeVetoException cve) {
+      throw new NestedError(
+        cve,
+        "Assertion Failure: Change was vetoed after it had been accepted by preChange"
+      );
     }
   }
 }

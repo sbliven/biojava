@@ -45,7 +45,7 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   }
   
   protected boolean hasListeners() {
-    return changeSupport == null;
+    return changeSupport != null;
   }
   
   protected ChangeSupport getChangeSupport(ChangeType ct) {
@@ -56,12 +56,6 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
     return changeSupport;
   }
   
-  /**
-  *Assigns a symbol parser to a string object.  Afterwards, the parser can be retrieved using the getParser method.
-  *
-  *@param name Name of the string to associate with a parser.
-  *@param parser The parser to associate your string with.
-  */
   public void putParser(String name, SymbolParser parser) {
     parserByName.put(name, parser);
   }
@@ -83,13 +77,52 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
     }
     return parser;
   }
+  
+  protected abstract void addSymbolImpl(Symbol s)
+  throws IllegalSymbolException, ChangeVetoException;
+
+  public final void addSymbol(Symbol s)
+  throws IllegalSymbolException, ChangeVetoException {
+    if(s == null) {
+      throw new IllegalSymbolException(
+        "You can not add null as a symbol to alphabet " + getName()
+      );
+    }
+    
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(Alphabet.SYMBOLS);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this, Alphabet.SYMBOLS, s, null);
+        cs.firePreChangeEvent(ce);
+        doAddSymbol(s);
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      doAddSymbol(s);
+    }
+  }
+  
+  private void doAddSymbol(Symbol s)
+  throws IllegalSymbolException, ChangeVetoException {
+    Alphabet sa = s.getMatches();
+    if(!(sa instanceof FiniteAlphabet)) {
+      throw new IllegalSymbolException(
+        "Can't add symbol " + s.getName() +
+        " as it matches an infinite number of symbols."
+      );
+    } else {
+      for(Iterator si = ((FiniteAlphabet) sa).iterator(); si.hasNext(); ) {
+        addSymbolImpl((Symbol) si.next());
+      }
+    }
+  }
 
   public void addChangeListener(ChangeListener cl) {
     getChangeSupport(null).addChangeListener(cl);
   }
   
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    getChangeSupport(ct).addChangeListener(cl);
+    getChangeSupport(ct).addChangeListener(cl, ct);
   }
   
   public void removeChangeListener(ChangeListener cl) {
@@ -97,7 +130,7 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   }
   
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    getChangeSupport(ct).removeChangeListener(cl);
+    getChangeSupport(ct).removeChangeListener(cl, ct);
   } 
   
   protected AbstractAlphabet() {}

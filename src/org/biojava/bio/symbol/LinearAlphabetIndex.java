@@ -3,6 +3,7 @@ package org.biojava.bio.symbol;
 import java.util.*;
 
 import org.biojava.utils.*;
+import org.biojava.bio.*;
 
 /*
  * Implementatoin of AlphabetIndex that stores the symbols in an array and does
@@ -11,20 +12,46 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  * @since 1.1
  */
-class LinearAlphabetIndex implements AlphabetIndex {
+class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
   private final FiniteAlphabet alpha;
   private Symbol[] symbols;
-  
+
   public LinearAlphabetIndex(FiniteAlphabet alpha) {
+    // lock the alphabet
     alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
+    
     this.alpha = alpha;
-    symbols = new Symbol[alpha.size()];
+    
+    this.symbols = buildIndex(alpha);
+    
+    alpha.addChangeListener(
+      new IndexRebuilder(),
+      Alphabet.SYMBOLS
+    );
+    
+    this.addChangeListener(
+      new ChangeAdapter() {
+        public void postChange(ChangeEvent ce) {
+          symbols = (Symbol[] ) ce.getChange();
+        }
+      },
+      AlphabetIndex.INDEX
+    );
+    
+    // unlock the alphabet
+    alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
+  }
+  
+  private Symbol[] buildIndex(FiniteAlphabet alpha) {
+    Symbol[] symbols = new Symbol[alpha.size()];
     
     int i = 0;
     Iterator s = alpha.iterator();
     while(s.hasNext()) {
       symbols[i++] = (Symbol) s.next();
     }
+    
+    return symbols;
   }
 
   public FiniteAlphabet getAlphabet() {
@@ -32,7 +59,11 @@ class LinearAlphabetIndex implements AlphabetIndex {
   }
   
   public Symbol symbolForIndex(int i) throws IndexOutOfBoundsException {
-    return symbols[i];
+    try {
+      return symbols[i];
+    } catch (IndexOutOfBoundsException e) {
+      throw new IndexOutOfBoundsException("Can't find symbol for index " + i);
+    }
   }
   
   public int indexForSymbol(Symbol s) throws IllegalSymbolException {
@@ -42,9 +73,55 @@ class LinearAlphabetIndex implements AlphabetIndex {
       }
     }
     getAlphabet().validate(s);
-    throw new IllegalSymbolException(
-      "Symbol " + s.getName() + " was not an indexed member of the alphabet " +
-      getAlphabet().getName()
-    );
+    if(s instanceof AtomicSymbol) {
+      throw new BioError(
+        "Assertion Failure: " +
+        "Symbol " + s.getName() + " was not an indexed member of the alphabet " +
+        getAlphabet().getName() + " despite being in the alphabet."
+      );
+    } else {
+      throw new IllegalSymbolException("Symbol must be atomic to be indexed.");
+    }
+  }
+  
+  protected class IndexRebuilder extends ChangeForwarder {
+    public IndexRebuilder() {
+      super(LinearAlphabetIndex.this, getChangeSupport(AlphabetIndex.INDEX));
+    }
+    
+    public ChangeEvent generateEvent(ChangeEvent ce)
+    throws ChangeVetoException {
+      if(ce.getType() != Alphabet.SYMBOLS) {
+        return null;
+      }
+
+      /*      
+      Object change = ce.getChange();
+      Object previous = ce.getPrevious();
+      
+      if( (change == null) || (previous != null) ) {
+        throw new ChangeVetoException(
+          ce,
+          "Can not update index as either a symbol is being removed, " +
+          "or the alphabet has substantialy changed"
+        );
+      }
+      
+      if(! (change instanceof AtomicSymbol) ) {
+        throw new ChangeVetoException(
+          ce,
+          "Can not update index as the symbol being added is not atomic"
+        );
+      }
+      */
+      
+      return new ChangeEvent(
+        getSource(), AlphabetIndex.INDEX,
+        // fixme: buildIndex should be called using the proposed new alphabet
+        buildIndex((FiniteAlphabet) ce.getSource()),
+        symbols,
+        ce
+      );
+    }
   }
 }

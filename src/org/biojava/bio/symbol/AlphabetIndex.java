@@ -21,6 +21,8 @@
 
 package org.biojava.bio.symbol;
 
+import org.biojava.utils.*;
+
 /**
  * Map between Symbols and index numbers.
  * <P>
@@ -40,7 +42,20 @@ package org.biojava.bio.symbol;
  * @since 1.1
  */
 
-public interface AlphabetIndex {
+public interface AlphabetIndex extends Changeable {
+  /**
+   * Indicates that the index is changing, probably due to the underlying
+   * alphabet changing.
+   * <P>
+   * The previous & changed fields should be arrays of symbols in the order they
+   * are indexed in the unmodified and modified indecies respectively.
+   */
+  public static ChangeType INDEX = new ChangeType(
+    "The alphabet being indexed has changed.",
+    "org.biojava.bio.symbol.AlphabetIndex",
+    "INDEX"
+  );
+
   /**
    * Retrieve the alphabet that this indexes.
    *

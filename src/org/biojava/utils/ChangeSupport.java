@@ -97,9 +97,7 @@ public class ChangeSupport {
    * @param cl  the ChangeListener to add
    */
   public void addChangeListener(ChangeListener cl) {
-    growIfNecisary();
-    listeners[listenerCount] = cl;
-    listenerCount++;
+    addChangeListener(cl, null);
   }
   
   /**
@@ -161,7 +159,7 @@ public class ChangeSupport {
   
   /**
    * Inform the listeners that a change is about to take place using their
-   * preChange methods.
+   * firePreChangeEvent methods.
    * <P>
    * Listeners will be informed if they were interested in all types of event,
    * or if ce.getType() is equal to the type they are registered for.
@@ -182,7 +180,7 @@ public class ChangeSupport {
   
   /**
    * Inform the listeners that a change has taken place using their
-   * postChange methods.
+   * firePostChangeEvent methods.
    * <P>
    * Listeners will be informed if they were interested in all types of event,
    * or if ce.getType() is equal to the type they are registered for.
