@@ -76,7 +76,7 @@ public class FeatureTableParser {
         featureBuf = new StringBuffer();
         locParser  = new EmblLikeLocationParser(seqID);
     }
-    
+
     public void setSeqID(String seqID) {
       this.seqID = seqID;
     }
@@ -138,12 +138,12 @@ public class FeatureTableParser {
                 // consists of whitespace-delimited words. Therefore a
                 // space should be inserted at EOL otherwise words will
                 // get fused (unless there is a space already there)
-                if ((featureBuf.indexOf(" ") >= 0) &&
-                    featureBuf.charAt(featureBuf.length()-1) != ' ')
+                if ((featureBuf.toString().indexOf(" ") >= 0) &&
+                    featureBuf.toString().charAt(featureBuf.length()-1) != ' ')
                     featureBuf.append(" ");
                 featureBuf.append(line);
 
-                int eq = featureBuf.indexOf("=");
+                int eq = featureBuf.toString().indexOf("=");
                 if (featureBuf.charAt(eq + 1) != '"' ||
                     featureBuf.charAt(featureBuf.length() - 1) == '"'
                 ) {
