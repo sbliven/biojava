@@ -54,11 +54,9 @@ public class DASSequenceDB implements SequenceDB {
 	USE_XFF = Boolean.getBoolean("org.biojava.use_xff");
     }
 
-    private final URL dataSourceURL;
+    private URL dataSourceURL;
     private Map sequences;
     private Cache symbolsCache;
-
-    private SequenceDB allEntryPoints;
 
     {
 	sequences = new HashMap();
@@ -110,35 +108,78 @@ public class DASSequenceDB implements SequenceDB {
      * Return a SequenceDB exposing /all/ the entry points
      * in this DAS datasource.
      *
-     * <p>FIXME: For better scalability, this should return some
-     * kind of lazy implementation rather than preconstructing everything.
-     * </p>
      */
+
+    private SequenceDB allEntryPoints;
 
     public SequenceDB allEntryPointsDB() {
 	if (allEntryPoints == null) {
-	    allEntryPoints = new HashSequenceDB("All entry points from " + getURL().toString());
-	    try {
-		for (SequenceIterator si = sequenceIterator(); si.hasNext(); ) {
-		    Sequence seq = si.nextSequence();
-		    allEntryPoints.addSequence(seq);
-		    FeatureHolder allComponents = seq.filter(
-		            new FeatureFilter.ByClass(ComponentFeature.class),
-			    true);
-		    for (Iterator cfi = allComponents.features(); cfi.hasNext(); ) {
-			ComponentFeature cf = (ComponentFeature) cfi.next();
-			allEntryPoints.addSequence(cf.getComponentSequence());
-		    }
-		}
-	    } catch (BioException ex) {
-		throw new BioError(ex);
-	    } catch (ChangeVetoException ex) {
-		throw new BioError(ex, "Assertion failed: Couldn't modify our SequenceDB");
-	    }
+	    // allEntryPoints = new HashSequenceDB("All entry points from " + getURL().toString());
+	    //  try {
+//  		for (SequenceIterator si = sequenceIterator(); si.hasNext(); ) {
+//  		    Sequence seq = si.nextSequence();
+//  		    allEntryPoints.addSequence(seq);
+//  		    FeatureHolder allComponents = seq.filter(
+//  		            new FeatureFilter.ByClass(ComponentFeature.class),
+//  			    true);
+//  		    for (Iterator cfi = allComponents.features(); cfi.hasNext(); ) {
+//  			ComponentFeature cf = (ComponentFeature) cfi.next();
+//  			allEntryPoints.addSequence(cf.getComponentSequence());
+//  		    }
+//  		}
+//  	    } catch (BioException ex) {
+//  		throw new BioError(ex);
+//  	    } catch (ChangeVetoException ex) {
+//  		throw new BioError(ex, "Assertion failed: Couldn't modify our SequenceDB");
+//  	    }
+
+	    allEntryPoints = new AllEntryPoints();
 	}
 
 	return allEntryPoints;
     }
+
+    private class AllEntryPoints implements SequenceDB {
+	public Sequence getSequence(String id)
+	    throws BioException
+	{
+	    return new DASSequence(DASSequenceDB.this, dataSourceURL, id);
+	}
+
+	public Set ids() {
+	    throw new BioError("ImplementMe");
+	}
+
+	public void addSequence(Sequence seq)
+	    throws ChangeVetoException
+	{
+	    throw new ChangeVetoException("No way we're adding sequences to DAS");
+	}
+
+	public void removeSequence(String id)
+	    throws ChangeVetoException
+	{
+	    throw new ChangeVetoException("No way we're removing sequences from DAS");
+	}
+
+	public SequenceIterator sequenceIterator() {
+	    throw new BioError("ImplementMe");
+	}
+
+	public String getName() {
+	    return "All sequences in " + dataSourceURL.toString();
+	}
+
+	// 
+	// Changeable stuff (which we're not, fortunately)
+	//
+
+	public void addChangeListener(ChangeListener cl) {}
+	public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+	public void removeChangeListener(ChangeListener cl) {}
+	public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+    }
+
 
     /**
      * Return the URL of the reference server for this database.
