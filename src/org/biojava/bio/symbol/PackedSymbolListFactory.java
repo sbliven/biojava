@@ -35,23 +35,50 @@ public class PackedSymbolListFactory
 
     implements SymbolListFactory
 {
-    private boolean ambiguity;
+    private final static int AUTO_SELECT = 1;
+    private final static int USER_SELECT = 2;
 
+    private boolean ambiguity;
+    private int opMode = AUTO_SELECT;
 
     /**
      * Create a factory for PackedSymbolLists.
+     * The use of ambiguity packing is determined automatically
+     * as required.
+     */
+    public PackedSymbolListFactory()
+    {
+        opMode = AUTO_SELECT;
+        ambiguity = false; // set to avoid javac bug
+    }
+
+    /**
+     * Create a factory for PackedSymbolLists with specified packing type.
      *
      * @param is ambiguity to be supported by the encoding?
+     * @deprecated the argumentless constructor creates a SymbolListFactory
+     *   that will autoselect the packing appropriately.
      */
     public PackedSymbolListFactory(boolean ambiguity)
     {
+        opMode = USER_SELECT;
         this.ambiguity = ambiguity;
     }
 
     public SymbolList makeSymbolList(Symbol [] symbolArray, int size, Alphabet alfa)
         throws IllegalAlphabetException
     {
-        return new PackedSymbolList(PackingFactory.getPacking((FiniteAlphabet) alfa, ambiguity), symbolArray, size, alfa);
+        switch (opMode) {
+            case AUTO_SELECT:
+                // check for ambiguity symbols
+                ambiguity = false;
+                for (int i=0; i < size; i++) {
+                    if (!(symbolArray[i] instanceof AtomicSymbol)) { ambiguity = true; break; }
+                }
+            case USER_SELECT:
+            default:
+                return new PackedSymbolList(PackingFactory.getPacking((FiniteAlphabet) alfa, ambiguity), symbolArray, size, alfa);
+        }
     }
 }
 

@@ -34,7 +34,6 @@ import org.biojava.utils.*;
  * <p>
  * The advantage is that those SymbolLists can be packed
  * implementations.
- *
  * <p>
  * You can build a SequenceBuilderFactory to create a packed chunked sequence from
  * an input file without making an intermediate symbol list with:-
@@ -86,19 +85,36 @@ import org.biojava.utils.*;
  * <p>
  * Alternatively, you can input Symbols to the factory with addSymbols
  * make the sequence eventually with makeSymbolList.
+ * <p>
+ * <b>NOTE:</b> An improvement has been introduced where an internal
+ * default SymbolList factory is used for small sequences.  This
+ * implementation allows for faster SymbolList creation and access
+ * for small sequences while allowing a more space-efficient
+ * implementation to be selected for large sequences.
  *
  * @author David Huen
  */
 public class ChunkedSymbolListFactory
 {
+    /**
+     * operating mode
+     */
+    final private static int AUTO_SELECT = 1;
+    final private static int SUPPLIED_FACTORY = 2;
     private final static int CHUNK_SIZE = 1<<14;
-    private SymbolListFactory symListFactory;
+
+    private final SymbolListFactory userSymListFactory;
+    private SymbolListFactory currSymListFactory = null;
     private Alphabet alfa;
 
     // management variables for chunks
     private Symbol [] headChunk;
     private int headChunkPos = 0;
     private List chunkL = new ArrayList();
+
+    private int symCount = 0;
+    private int opMode = SUPPLIED_FACTORY;
+    private int threshold = 1<<20;
 
     // cached info for speedups
     private int currentMin = Integer.MAX_VALUE;
@@ -197,7 +213,29 @@ public class ChunkedSymbolListFactory
      */
     public ChunkedSymbolListFactory(SymbolListFactory symListFactory)
     {
-        this.symListFactory = symListFactory;
+        opMode = SUPPLIED_FACTORY;
+        this.userSymListFactory = symListFactory;
+        currSymListFactory = symListFactory;
+    }
+
+    /**
+     * @param userSymListFactory User-supplied class which produces the SymbolLists 
+     * that are used to store the chunked symbols (only used when the chunked list
+     * to be created is larger than threshold.
+     * @param threshold the size of the SymbolList beyond which the userSymListFactory
+     * is used.  Below that, the internal default SymbolList factory is used.
+     */
+    public ChunkedSymbolListFactory(SymbolListFactory userSymListFactory, int threshold)
+    {
+        opMode = AUTO_SELECT;
+
+        // set threshold to the user-specified value if that's what's requested
+        if (threshold > 0) this.threshold = threshold;
+
+        this.userSymListFactory = userSymListFactory;
+
+        // the default factory is the SimpleSymbolList
+        currSymListFactory = new SimpleSymbolListFactory();
     }
 
     /**
@@ -223,6 +261,15 @@ public class ChunkedSymbolListFactory
             }
         }
 
+        // increment count
+        symCount += len;
+
+        // if count reaches threshold, initiate conversion but do it
+        // once only and only if we are in AUTO_SELECT mode
+        if ((opMode == AUTO_SELECT) 
+            && (currSymListFactory != userSymListFactory) 
+            && (symCount > threshold)) useSuppliedSymListFactory();
+
         // see if I need to create the first chunk
         if (headChunk == null) {
             headChunk = new Symbol[CHUNK_SIZE];
@@ -244,7 +291,7 @@ public class ChunkedSymbolListFactory
                 }
 
                 // the chunk is alright, lets stash it.
-                chunkL.add(symListFactory.makeSymbolList(headChunk, CHUNK_SIZE, alfa));
+                chunkL.add(currSymListFactory.makeSymbolList(headChunk, CHUNK_SIZE, alfa));
                 headChunkPos = 0;
                 headChunk = new Symbol[CHUNK_SIZE];
             }
@@ -261,11 +308,66 @@ public class ChunkedSymbolListFactory
         this.canDoMake = true;
         headChunk = null;
         headChunkPos = 0;
+        symCount = 0;
 
         chunkL = new ArrayList();
         alfa = null;        
+
+        // if auto-select return to default symbol list factory
+        if (opMode == AUTO_SELECT) {
+            // the default factory is the SimpleSymbolList
+            currSymListFactory = new SimpleSymbolListFactory();
+        }
     }
 
+    /**
+     * Call this to convert from default SymbolList implementation
+     * to user-supplied implementation.
+     */
+    public void useSuppliedSymListFactory()
+    {
+        // set the symbolListFactory to the user-supplied one
+        currSymListFactory = userSymListFactory;
+
+        // go thru' converting all accumulated chunks to
+        // user supplied implementation
+        int size = chunkL.size();
+        ArrayList temp = new ArrayList(size);
+
+        for (int i = 0; i < size; i++) {
+            // get sequence length then transfer contents
+            // into a Symbol[] for reencoding.
+            SymbolList symList = (SymbolList) chunkL.get(i);
+            int symListLen = symList.length();
+            Symbol [] symArray;
+
+            if (symList instanceof org.biojava.bio.symbol.SimpleSymbolList) {
+                symArray = ((SimpleSymbolList) symList).getSymbolArray();
+            }
+            else {
+                symArray = new Symbol[symListLen];
+                for (int j =1; j <= symList.length(); j++) {
+                    symArray[j-1] = symList.symbolAt(j);
+                }
+            }
+
+            // reencode Symbol array: symListLen and CHUNK_SIZE should match except for final chunk.
+            // put it into new List
+            try {
+                temp.add(currSymListFactory.makeSymbolList(symArray, symListLen, alfa));
+            }
+            catch (IllegalAlphabetException iae) {
+                // this should be impossible!!!!!
+            }
+        }
+
+        // swap over to the new symbol list array
+        chunkL = temp;
+    }
+
+    /**
+     * Converts accumulated Symbols to a SymbolList
+     */
     public SymbolList makeSymbolList() 
         throws IllegalAlphabetException
     {
@@ -307,7 +409,7 @@ public class ChunkedSymbolListFactory
             // do we have an unstashed chunk?
             if (headChunkPos != 0) {
                 // yes, let's stash it
-                chunkL.add(symListFactory.makeSymbolList(headChunk, headChunkPos, alfa));
+                chunkL.add(currSymListFactory.makeSymbolList(headChunk, headChunkPos, alfa));
             }
 
             // everything we want to put away is now in chunkL
@@ -329,6 +431,9 @@ public class ChunkedSymbolListFactory
         }
     }
 
+    /**
+     * Method to create a Sequence with a SymbolReader. (does anyone use this???>
+     */
     public SymbolList make(SymbolReader sr)
         throws IOException, IllegalSymbolException, IllegalAlphabetException, BioException
     {
@@ -344,7 +449,7 @@ public class ChunkedSymbolListFactory
             // is chunk full?
             if (headChunkPos == CHUNK_SIZE) {
                 // yes.  Stash away this chunk in packed form.
-                chunkL.add(symListFactory.makeSymbolList(headChunk, CHUNK_SIZE, sr.getAlphabet()));
+                chunkL.add(currSymListFactory.makeSymbolList(headChunk, CHUNK_SIZE, sr.getAlphabet()));
                 headChunkPos = 0;
             }
 

@@ -106,7 +106,7 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getEmblBuilderFactory() {
         if (_emblBuilderFactory == null) {
-            _emblBuilderFactory = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+            _emblBuilderFactory = new EmblProcessor.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _emblBuilderFactory;
     }
@@ -147,7 +147,7 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getGenbankBuilderFactory() {
         if (_genbankBuilderFactory == null) {
-            _genbankBuilderFactory = new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+            _genbankBuilderFactory = new GenbankProcessor.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _genbankBuilderFactory;
     }
@@ -168,7 +168,7 @@ public final class SeqIOTools  {
     */
     public static SequenceBuilderFactory getGenpeptBuilderFactory() {
         if (_genpeptBuilderFactory == null) {
-            _genpeptBuilderFactory = new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+            _genpeptBuilderFactory = new GenbankProcessor.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _genpeptBuilderFactory;
     }
@@ -189,7 +189,7 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getSwissprotBuilderFactory() {
         if (_swissprotBuilderFactory == null) {
-            _swissprotBuilderFactory = new SwissprotProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+            _swissprotBuilderFactory = new SwissprotProcessor.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _swissprotBuilderFactory;
     }
@@ -210,7 +210,7 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getFastaBuilderFactory() {
         if (_fastaBuilderFactory == null) {
-            _fastaBuilderFactory = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
+            _fastaBuilderFactory = new FastaDescriptionLineParser.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _fastaBuilderFactory;
     }
@@ -256,7 +256,7 @@ public final class SeqIOTools  {
    */
   public static SequenceDB readFasta(InputStream seqFile, Alphabet alpha) throws BioException{
     HashSequenceDB db = new HashSequenceDB(IDMaker.byName);
-    SequenceBuilderFactory sbFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
+    SequenceBuilderFactory sbFact = new FastaDescriptionLineParser.Factory(SmartSequenceBuilder.FACTORY);
     FastaFormat fFormat = new FastaFormat();
     for(SequenceIterator seqI = new StreamReader(seqFile,fFormat,alpha.getTokenization("token"),sbFact);seqI.hasNext();){
       Sequence seq = seqI.nextSequence();
