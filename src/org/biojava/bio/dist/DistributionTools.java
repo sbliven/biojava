@@ -183,12 +183,11 @@ public class DistributionTools {
     }
 
     Distribution[] pos = new Distribution[a.length()];
-
+    DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
+    dtc.setNullModelWeight(nullWeight);
     try{
       for(int i = 0; i < a.length(); i++){// For each position
         pos[i] = DistributionFactory.DEFAULT.createDistribution(alpha);
-        DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
-        dtc.setNullModelWeight(nullWeight);
         dtc.registerDistribution(pos[i]);
 
         for(Iterator j = seqs.iterator(); j.hasNext();){// of each sequence
@@ -200,9 +199,8 @@ public class DistributionTools {
             dtc.addCount(pos[i],s,1.0);// count the symbol
           }
         }
-
-        dtc.train();
       }
+      dtc.train();
     }catch(Exception e){
       e.printStackTrace(System.err);
     }
