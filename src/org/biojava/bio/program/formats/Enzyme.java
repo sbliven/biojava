@@ -6,15 +6,7 @@ import org.biojava.bio.AnnotationType;
 import org.biojava.bio.CardinalityConstraint;
 import org.biojava.bio.EcNumber;
 import org.biojava.bio.PropertyConstraint;
-import org.biojava.bio.program.tagvalue.Agregator;
-import org.biojava.bio.program.tagvalue.ChangeTable;
-import org.biojava.bio.program.tagvalue.LineSplitParser;
-import org.biojava.bio.program.tagvalue.ParserListener;
-import org.biojava.bio.program.tagvalue.RegexFieldFinder;
-import org.biojava.bio.program.tagvalue.RegexSplitter;
-import org.biojava.bio.program.tagvalue.TagDelegator;
-import org.biojava.bio.program.tagvalue.TagValueListener;
-import org.biojava.bio.program.tagvalue.ValueChanger;
+import org.biojava.bio.program.tagvalue.*;
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.lsid.LifeScienceIdentifier;
 
@@ -84,9 +76,9 @@ implements Format {
 
     ValueChanger valueChanger = new ValueChanger(listener, changeTable);
 
-    Agregator dotAgre = new Agregator(
+    MultiTagger dotMultiTag = new MultiTagger(
       valueChanger,
-      new Agregator.Observer() {
+      new BoundaryFinder() {
         public boolean dropBoundaryValues() { return false; }
         public boolean isBoundaryStart(Object value) { return false; }
         public boolean isBoundaryEnd(Object value) {
@@ -95,9 +87,9 @@ implements Format {
       }
     );
 
-    Agregator commentAgre = new Agregator(
+    MultiTagger commentMultiTag = new MultiTagger(
       valueChanger,
-      new Agregator.Observer() {
+      new BoundaryFinder() {
         public boolean dropBoundaryValues() { return false; }
         public boolean isBoundaryStart(Object value) {
           return ((String) value).startsWith("-!-");
@@ -107,9 +99,9 @@ implements Format {
     );
 
     TagDelegator tagDelegator = new TagDelegator(valueChanger);
-    tagDelegator.setListener("AN", dotAgre);
-    tagDelegator.setListener("CA", dotAgre);
-    tagDelegator.setListener("CC", commentAgre);
+    tagDelegator.setListener("AN", dotMultiTag);
+    tagDelegator.setListener("CA", dotMultiTag);
+    tagDelegator.setListener("CC", commentMultiTag);
     tagDelegator.setListener("DI", new RegexFieldFinder(
       valueChanger,
       Pattern.compile("([^;]+);\\s*MIM:\\s*(\\S+)\\."),

@@ -6,16 +6,7 @@ import org.biojava.bio.AnnotationType;
 import org.biojava.bio.CardinalityConstraint;
 import org.biojava.bio.EcNumber;
 import org.biojava.bio.PropertyConstraint;
-import org.biojava.bio.program.tagvalue.Agregator;
-import org.biojava.bio.program.tagvalue.ChangeTable;
-import org.biojava.bio.program.tagvalue.LineSplitParser;
-import org.biojava.bio.program.tagvalue.ParserListener;
-import org.biojava.bio.program.tagvalue.RegexSplitter;
-import org.biojava.bio.program.tagvalue.TagDelegator;
-import org.biojava.bio.program.tagvalue.TagValueContext;
-import org.biojava.bio.program.tagvalue.TagValueListener;
-import org.biojava.bio.program.tagvalue.TagValueWrapper;
-import org.biojava.bio.program.tagvalue.ValueChanger;
+import org.biojava.bio.program.tagvalue.*;
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.ParserException;
 import org.biojava.utils.lsid.LifeScienceIdentifier;
@@ -91,8 +82,8 @@ public class Ligand {
       tagDelegator.setListener("SUBSTRATE", catter);
       tagDelegator.setListener("PRODUCT", catter);
       tagDelegator.setListener("DEFINITION", catter);
-      tagDelegator.setListener("REFERENCE", new Agregator(valueChanger,
-        new Agregator.Observer() {
+      tagDelegator.setListener("REFERENCE", new MultiTagger(valueChanger,
+        new BoundaryFinder() {
           public boolean dropBoundaryValues() { return true; }
           public boolean isBoundaryStart(Object value) {
             // we should realy extract the UI entries
@@ -184,8 +175,7 @@ public class Ligand {
       Location NONE = CardinalityConstraint.NONE;
       Location ANY = CardinalityConstraint.ANY;
       Location ONE = CardinalityConstraint.ONE;
-      Location ONE_OR_MORE = CardinalityConstraint.ONE_OR_MORE;
-
+      
       PropertyConstraint c_string =
         new PropertyConstraint.ByClass(String.class);
       PropertyConstraint c_ecNumber =

@@ -22,7 +22,7 @@ import org.biojava.utils.lsid.LifeScienceIdentifier;
 public class Swissprot
 implements Format {
   private static final AnnotationType ANNO_TYPE;
-  private static final LineSplitParser PARSER;
+  //private static final LineSplitParser PARSER;
   private static final LifeScienceIdentifier LSID;
 
   static {
@@ -33,7 +33,7 @@ implements Format {
     Location ONE = CardinalityConstraint.ONE;
     Location ONE_OR_MORE = CardinalityConstraint.ONE_OR_MORE;
 
-    PARSER = new LineSplitParser(LineSplitParser.EMBL);
+    //PARSER = new LineSplitParser(LineSplitParser.EMBL);
 
     PropertyConstraint c_string = new PropertyConstraint.ByClass(String.class);
 
