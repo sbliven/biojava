@@ -40,7 +40,7 @@ import org.biojava.bio.*;
  * getting an alphabet instance. This is where the AlphabetManager comes in
  * handy. It helps out in serialization, generating derived alphabets and
  * building CrossProductAlphabet instances. It also contains limited support for
- * parsing complex alphabet names back into the alphabets.
+ * parsing complex alphabet names back into the alphabets. 
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -69,7 +69,8 @@ public final class AlphabetManager {
   private Map nameToSymbol;
   private Map gappedAlphabets;
   private Map crossProductAlphabets;
-  private Symbol gapSymbol;
+  private Map ambiguitySymbols;
+  private AmbiguitySymbol gapSymbol;
 
   /**
    * Initialize nameToAlphabet.
@@ -78,6 +79,7 @@ public final class AlphabetManager {
     nameToAlphabet = new HashMap();
     nameToSymbol = new HashMap();
     gappedAlphabets = new HashMap();
+    ambiguitySymbols = new HashMap();
   }
 
   /**
@@ -93,8 +95,6 @@ public final class AlphabetManager {
     if(alpha == null) {
       if(name.startsWith("(") && name.endsWith(")")) {
         alpha = generateCrossProductAlphaFromName(name);
-      } else if(name.endsWith("-GAP")) {
-        alpha = generateGappedAlphaFromName(name);
       } else {
         throw new NoSuchElementException(
           "No alphabet for name " + name + " could be found"
@@ -106,11 +106,11 @@ public final class AlphabetManager {
 
   public Symbol symbolForName(String name) 
   throws NoSuchElementException {
-    Symbol r = (Symbol) nameToSymbol.get(name);
-    if(r == null) {
+    Symbol s = (Symbol) nameToSymbol.get(name);
+    if(s == null) {
       throw new NoSuchElementException("Could not find symbol under the name " + name);
     }
-    return r;
+    return s;
   }
 
   /**
@@ -137,55 +137,8 @@ public final class AlphabetManager {
    * <P>
    * @return the system-wide symbol that represents a gap
    */
-  public Symbol getGapSymbol() {
+  public AmbiguitySymbol getGapSymbol() {
     return gapSymbol;
-  }
-
-  /**
-   * Returns a gapped alphabet for the alphabet name.
-   * <P>
-   * The name should be of the form Alphabet-GAP.
-   *
-   * @param name  the name to parse
-   * @return the associated Alphabet
-   */
-  public Alphabet generateGappedAlphaFromName(String name) {
-    if(!name.endsWith("-GAP")) {
-      throw new Error(
-        "Tried to give me a name that isn't a gap alphabet: " + name
-      );
-    }
-    String prefix = name.substring(0, name.length() - 4);
-    return getGappedAlphabet(alphabetForName(prefix));
-  }
-  
-  /**
-   * Return a new alphabet which includes the gap symbol
-   * plus all other symbols from the speicified alphabet.
-   *
-   * @param a the Alphabet to gap
-   * @return  an Alphabet that contains all of the symbols in
-   *          a and the gap character
-   */
-  public Alphabet getGappedAlphabet(Alphabet a) {
-    if(a == null) {
-      throw new NullPointerException("Can't add a gap to 'null'");
-    }
-    
-    if (a.contains(gapSymbol)) {
-      return a;
-    }
-    Alphabet b = (Alphabet) gappedAlphabets.get(a);
-    if (b == null) {
-      if(a instanceof FiniteAlphabet) {
-        b = new FiniteGappedAlphabet((FiniteAlphabet) a);
-      } else {
-        b = new GappedAlphabet(a);
-      }
-      gappedAlphabets.put(a, b);
-      registerAlphabet(b.getName(), b);
-    }
-    return b;
   }
 
   /**
@@ -302,6 +255,44 @@ public final class AlphabetManager {
     return cpa;
   }
 
+  public AmbiguitySymbol getAmbiguitySymbol(Collection syms)
+  throws IllegalSymbolException {
+    return getAmbiguitySymbol('\0', "", null, syms);
+  }
+  
+  public AmbiguitySymbol getAmbiguitySymbol(
+    char token,
+    String name,
+    Annotation ann,
+    Collection syms
+  ) throws IllegalSymbolException {
+    Set symSet = new HashSet();
+    for(Iterator i = syms.iterator(); i.hasNext(); ) {
+      Symbol s = (Symbol) i.next();
+      if(s instanceof AmbiguitySymbol) {
+        AmbiguitySymbol as = (AmbiguitySymbol) s;
+        FiniteAlphabet fa = (FiniteAlphabet) as.getMatchingAlphabet();
+        Iterator j = fa.iterator();
+        while(j.hasNext()) {
+          symSet.add(j.next());
+        }
+      } else {
+        symSet.add(s);
+      }
+    }
+    AmbiguitySymbol as = (AmbiguitySymbol) ambiguitySymbols.get(symSet);
+    if(as == null) {
+      as = new SimpleAmbiguitySymbol(
+        token,
+        name,
+        ann,
+        new SimpleAlphabet(symSet)
+      );
+      ambiguitySymbols.put(symSet, as);
+    }
+    return as;
+  }
+  
   /**
    * Constructs a new Alphabetmanager instance.
    * <P>
@@ -309,7 +300,9 @@ public final class AlphabetManager {
    * <code>org/biojava/bio/seq/tools/AlphabetManager.xml</code>
    * and builds a basic set of alphabets.
    */
-  protected AlphabetManager() {
+  private AlphabetManager() {
+    gapSymbol = new SimpleAmbiguitySymbol('-', "gap", null, Alphabet.EMPTY_ALPHABET);
+    ambiguitySymbols.put(new HashSet(), gapSymbol);
     try {
       URL alphabetURL =
         getClass().getClassLoader().getResource("org/biojava/bio/symbol/AlphabetManager.xml");
@@ -324,12 +317,24 @@ public final class AlphabetManager {
           nameToSymbol.put(child.getAttribute("name"),
                             symbolFromXML(child));
         } else if(name.equals("alphabet")) {
-          FiniteAlphabet alpha = alphabetFromXML(child, nameToSymbol);
-          registerAlphabet(alpha.getName(), alpha);
+          String alphaName = child.getAttribute("name");
+          String parentName = child.getAttribute("parent");
+          try {
+            SimpleAlphabet alpha = alphabetFromXML(child, nameToSymbol);
+            if(parentName != null && parentName.length() != 0) {
+              alphaName = parentName + "-" + alphaName;
+              FiniteAlphabet pa = (FiniteAlphabet) alphabetForName(parentName);
+              for(Iterator j = pa.iterator(); j.hasNext(); ) {
+                alpha.addSymbol((Symbol) j.next());
+              }
+            }
+            alpha.setName(alphaName);
+            registerAlphabet(alphaName, alpha);
+          } catch (Exception e) {
+            throw new BioError(e, "Couldn't construct alphabet " + alphaName);
+          }
         }
       }
-
-      gapSymbol = (Symbol) nameToSymbol.get("gap");
     } catch (SAXParseException spe) {
       throw new BioError(spe,
                          spe.toString() +
@@ -347,7 +352,7 @@ public final class AlphabetManager {
    * @param resE an XML Element specifying the element
    * @return the new Symbol object
    */
-  protected Symbol symbolFromXML(Element resE) {
+  private Symbol symbolFromXML(Element resE) {
     char token = '\0';
     String name = null;
     String description = null;
@@ -372,6 +377,53 @@ public final class AlphabetManager {
   }
 
   /**
+   * Build an individual symbol.
+   *
+   * @param resE an XML Element specifying the element
+   * @return the new AmbiguitySymbol object
+   */
+  private AmbiguitySymbol ambiguityFromXML(Element resE, Map nameToSym)
+  throws IllegalSymbolException {
+    char token = '\0';
+    String name = null;
+    String description = null;
+    List syms = new ArrayList();
+    
+    NodeList children = resE.getChildNodes();
+    for(int i = 0; i < children.getLength(); i++) {
+      Element el = (Element) children.item(i);
+      String nodeName = el.getNodeName();
+      if(nodeName.equals("symbol")) {
+        NodeList symC = el.getChildNodes();
+        for(int j = 0; j < symC.getLength(); j++) {
+          Element eel = (Element) symC.item(j);
+          String eName = eel.getNodeName();
+          String content = eel.getFirstChild().getNodeValue();
+          if(eName.equals("short")) {
+            token = content.charAt(0);
+          } else if(eName.equals("long")) {
+            name = content;
+          } else if(eName.equals("description")) {
+            description = content;
+          }
+        }
+      } else if(nodeName.equals("symbolref")) {
+        String refName = el.getAttribute("name");
+        Symbol s = (Symbol) nameToSym.get(refName);
+        if(s == null) {
+          throw new IllegalSymbolException(
+            "Got symbol ref to " + refName + " but it doesn't match anythin"
+          );
+        }
+        syms.add(s);
+      }
+    }
+
+    AmbiguitySymbol res = getAmbiguitySymbol(token, name, (Annotation) null, syms);
+    return res;
+  }
+
+  /**
    * Generate an alphabet from an XML element and a map of symbol names to
    * symbol objects.
    *
@@ -380,8 +432,9 @@ public final class AlphabetManager {
    * @return a new Alphabet
    * @throws BioException if anything goes wrong
    */
-  protected FiniteAlphabet alphabetFromXML(Element alph, Map nameToRes)
+  private SimpleAlphabet alphabetFromXML(Element alph, Map nameToSym)
   throws BioException {
+    nameToSym = new HashMap(nameToSym);
     SimpleAlphabet alphabet = new WellKnownAlphabet();
 
     NodeList children = alph.getChildNodes();
@@ -389,170 +442,28 @@ public final class AlphabetManager {
       Element el = (Element) children.item(i);
       try {
         String name = el.getNodeName();
-        if(name.equals("name")) {
-          alphabet.setName(el.getFirstChild().getNodeValue());
-        } else if(name.equals("description")) {
+        if(name.equals("description")) {
           alphabet.getAnnotation().setProperty("description", el.getFirstChild().getNodeValue());
         } else if(name.equals("symbol")) {
-          alphabet.addSymbol(symbolFromXML(el));
+          Symbol sym = symbolFromXML(el);
+          String symName = el.getAttribute("name");
+          if(symName != null) {
+            nameToSym.put(symName, sym);
+          }
+          alphabet.addSymbol(sym);
         } else if(name.equals("symbolref")) {
-          alphabet.addSymbol((Symbol) nameToRes.get(el.getAttribute("name")));
-        } else if(name.equals("tokenizer")) {
-          alphabet.putParser(el.getAttribute("name"),
-                                parserFromXML(el, alphabet, nameToRes));
+          alphabet.addSymbol((Symbol) nameToSym.get(el.getAttribute("name")));
+        } else if(name.equals("ambiguity")) {
+            alphabet.addAmbiguity(ambiguityFromXML(el, nameToSym));
         }
       } catch (Exception e) {
-        throw new BioException("Couldn't parse " + alph);
+        throw new BioException(e, "Couldn't parse element " + el);
       }
     }
 
     return alphabet;
   }
 
-  /**
-   * Build a custom parser for an alphabet.
-   * 
-   * @param tok the XML token Element
-   * @param alpha the Alphabet for the parser
-   * @param nameToRes  a map of symbol name to Symbol Object
-   * @return a newly built custom parser
-   */
-  protected SymbolParser parserFromXML(Element tok, Alphabet alpha, Map nameToRes) 
-         throws IllegalSymbolException {
-    FixedWidthParser tokenizer =
-      new FixedWidthParser(alpha, Integer.parseInt(tok.getAttribute("tokenLength")));
-
-    NodeList children = tok.getElementsByTagName("map");
-    for(int i = 0; i < children.getLength(); i++) {
-      Element map = (Element) children.item(i);
-      String resName = map.getAttribute("symbol");
-      Symbol res = (Symbol) nameToRes.get(resName);
-      if(res == null)
-        throw new IllegalSymbolException("Unknown symbol: " + resName);
-      if(!alpha.contains(res))
-        throw new IllegalSymbolException(resName + " not found in " + alpha.getName());
-      tokenizer.addTokenMap(map.getAttribute("token"), res);
-    }
-
-    return tokenizer;
-  }
-
-  /**
-   * Alphabet which adds the gap symbol to an existing alphabet.
-   * AlphabetManager internal use only.
-   */
-  private class GappedAlphabet implements Alphabet, Serializable {
-    protected Alphabet child;
-
-    GappedAlphabet(Alphabet child) {
-	      this.child = child;
-    }
-
-    public boolean contains(Symbol r) {
-	    return (child.contains(r) || r == gapSymbol);
-    }
-
-    public void validate(Symbol r) throws IllegalSymbolException {
-      if(r == gapSymbol) {
-        return;
-      }
-      
-      try {
-        child.validate(r);
-      } catch (IllegalSymbolException ire) {
-        throw new IllegalSymbolException(
-          ire,
-          "Symbol not found in underlying alphabet and is not gap in " +
-          getName()
-        );
-      }
-    }
-
-    public String getName() {
-	    return child.getName() + "-GAP";
-    }
-
-    public SymbolParser getParser(String name) {
-      throw new NoSuchElementException("No parsers associated with " + getName());
-    }
-
-    public Annotation getAnnotation() {
-	    return child.getAnnotation();
-    }
-
-    private Object writeReplace() {
-	    return new GappedAlphabetOPH(child);
-    }
-  }
-
-  /**
-   * A gapped alphabet over a finite underlying alphabet.
-   */
-  private class FiniteGappedAlphabet
-  extends GappedAlphabet implements FiniteAlphabet {
-    protected FiniteAlphabet getSourceAlphabet() {
-      return (FiniteAlphabet) child;
-    }
-    
-    FiniteGappedAlphabet(FiniteAlphabet child) {
-      super(child);
-    }
-
-    public Iterator iterator() {
-      return symbols().iterator();
-    }
-    
-    public SymbolList symbols() {
-	    List l = getSourceAlphabet().symbols().toList();
-	    List nl = new ArrayList(l);
-	    nl.add(gapSymbol);
-	    return new SimpleSymbolList(this, nl);
-    }
-
-    public int size() {
-	    return getSourceAlphabet().size() + 1;
-    }
-
-    public SymbolParser getParser(String name) {
-      if(name.equals("token")) {
-        return new TokenParser(this);
-      } else if(name.equals("name")) {
-        return new NameParser(this);
-      } else {
-        throw new NoSuchElementException(
-          "Could not create parser for " + name +
-          " in alphabet " + getName()
-        );
-      }
-    }
-  }
-  
-
-    /**
-     * Placeholder for a GappedAlphabet in a serialized object
-     * stream.
-     */
-
-
-    private static class GappedAlphabetOPH implements Serializable {
-	private Alphabet child;
-
-	public GappedAlphabetOPH(Alphabet child) {
-	    this.child = child;
-	}
-
-	public GappedAlphabetOPH() {
-	}
-
-	private Object readResolve() throws ObjectStreamException {
-	    try {
-		Alphabet a = AlphabetManager.instance().getGappedAlphabet(child);
-		return a;
-	    } catch (Exception ex) {
-		throw new InvalidObjectException("Couldn't reconstruct gapped Alphabet from " + child.getName());
-	    }
-	} 
-    }
 
     /**
      * A well-known alphabet.  In principle this is just like

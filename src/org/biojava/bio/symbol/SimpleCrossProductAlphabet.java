@@ -1,4 +1,4 @@
-/*
+ /*
  *                    BioJava development code
  *
  * This code may be freely distributed and modified under the
@@ -90,8 +90,20 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     ourSymbols.put(new AlphabetManager.ListWrapper(l), rr);
   }
 
-  public boolean contains(Symbol r) {
-    return ourSymbols.values().contains(r);
+  public boolean contains(Symbol s) {
+    if(s instanceof AmbiguitySymbol) {
+      AmbiguitySymbol as = (AmbiguitySymbol) s;
+      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
+      while(i.hasNext()) {
+        Symbol sym = (Symbol) i.next();
+        if(!this.contains(sym)) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return ourSymbols.values().contains(s);
+    }
   }
 
   public String getName() {
@@ -125,9 +137,9 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     return ourSymbols.size();
   }
 
-  public void validate(Symbol r) throws IllegalSymbolException {
-    if (!contains(r)) {
-	    throw new IllegalSymbolException("Alphabet " + getName() + " does not accept " + r.getName());
+  public void validate(Symbol s) throws IllegalSymbolException {
+    if (!contains(s)) {
+	    throw new IllegalSymbolException("Alphabet " + getName() + " does not accept " + s.getName());
     }
   }
 

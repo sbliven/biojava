@@ -112,9 +112,9 @@ public class TextLogoPainter implements LogoPainter {
     return pcs.hasListeners(propertyName);
   }
   
-  public void paintLogo(Graphics g, StateLogo sl) {
+  public void paintLogo(Graphics g, DistributionLogo sl) {
     Graphics2D g2 = (Graphics2D) g;
-    EmissionState state = sl.getState();
+    Distribution dis = sl.getDistribution();
     SymbolStyle style = sl.getStyle();
     
     Rectangle bounds = sl.getBounds();
@@ -127,14 +127,14 @@ public class TextLogoPainter implements LogoPainter {
     
     try {
       for(
-        Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
+        Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
         i.hasNext();
       ) {
         Symbol r = (Symbol) i.next();
-        info.add(new ResVal(r, Math.exp(state.getWeight(r)) * scale));
+        info.add(new ResVal(r, Math.exp(dis.getWeight(r)) * scale));
       }
     } catch (IllegalSymbolException ire) {
-      throw new BioError(ire, "Symbol dissapeared from state alphabet");
+      throw new BioError(ire, "Symbol dissapeared from dis alphabet");
     }
     
     FontRenderContext frc = g2.getFontRenderContext();

@@ -41,7 +41,7 @@ public class SuffixTree implements Serializable {
   private List resList;
   private List counts;
   
-  public FiniteAlphabet alphabet() {
+  public FiniteAlphabet getAlphabet() {
     return alphabet;
   }
 
@@ -50,7 +50,7 @@ public class SuffixTree implements Serializable {
   }
   
   public SuffixNode getChild(SuffixNode node, Symbol r) {
-    if(!alphabet().contains(r)) {
+    if(!getAlphabet().contains(r)) {
       return null;
     }
     int index = indexForRes(r);
@@ -144,7 +144,7 @@ public class SuffixTree implements Serializable {
     
     private SuffixNode [] childArray(SuffixTree tree) {
       if(child == null)
-        child = new SuffixNode[tree.alphabet().size()];
+        child = new SuffixNode[tree.getAlphabet().size()];
       return child;
     }
     

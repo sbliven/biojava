@@ -136,7 +136,7 @@ public class FastaFormat implements SequenceFormat {
     }
 
     String [] urnName = fdr.parseURNName(description);
-    Sequence seq = sf.createSequence(new SimpleSymbolList(resParser.alphabet(),
+    Sequence seq = sf.createSequence(new SimpleSymbolList(resParser.getAlphabet(),
                                                            resList), 
                                      urnName[0], urnName[1], null);
     fdr.parseAnnotation(description, seq.getAnnotation());

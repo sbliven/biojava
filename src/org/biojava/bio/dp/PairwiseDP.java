@@ -39,7 +39,7 @@ import org.biojava.bio.symbol.*;
 
 public class PairwiseDP extends DP implements Serializable {
     private EmissionState magicalState;
-    private Symbol magicalSymbol;
+    //private Symbol magicalSymbol;
 
     public PairwiseDP(MarkovModel mm) throws IllegalSymbolException,
                                            IllegalTransitionException,
@@ -47,7 +47,7 @@ public class PairwiseDP extends DP implements Serializable {
     {
 	super(mm);
 	magicalState = mm.magicalState();
-	magicalSymbol = MagicalState.MAGICAL_SYMBOL;
+	//magicalSymbol = MagicalState.MAGICAL_SYMBOL;
     }
 
     private final static int[] ia00 = {0, 0};
@@ -140,43 +140,39 @@ public class PairwiseDP extends DP implements Serializable {
       return col[l];
     }
 
-    private List ress = new ArrayList();
+    private List symL = new ArrayList();
     private double[][][] matrix = new double [2][2][];
     private double[][][] emission = new double [2][2][];
-    private Symbol[][] resMatrix = new Symbol[2][2];
-    private Symbol[][] resMatrixF = new Symbol[2][2];
+    private Symbol[][] symMatrix = new Symbol[2][2];
+    private Symbol[][] symMatrixF = new Symbol[2][2];
     private int[] colId = new int[2];
 
     private void backwardPrepareCol(int i, int j)
     throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       // System.out.println("*** (" + i + "," + j + ")");
+      Symbol gap = AlphabetManager.instance().getGapSymbol();
+      symL.clear();
 
-      ress.clear();
-      ress.add(cursor.symbol(0, i+1));
-      ress.add(cursor.symbol(1, j+1));
-      resMatrix[1][1] = getResWrapper(alpha, ress);
-      ress.clear();
-      ress.add(cursor.symbol(0, i + 1));
-      ress.add(AlphabetManager.instance().getGapSymbol());
-      resMatrix[1][0] = getResWrapper(alpha, ress);
-      ress.clear();
-      ress.add(AlphabetManager.instance().getGapSymbol());
-      ress.add(cursor.symbol(1, j + 1));
-      resMatrix[0][1] = getResWrapper(alpha, ress);
+      symL.add(cursor.symbol(0, i+1));
+      symL.add(cursor.symbol(1, j+1));
+      symMatrix[1][1] = alpha.getSymbol(symL);
+      symL.set(0, cursor.symbol(0, i + 1));
+      symL.set(1, gap);
+      symMatrix[1][0] = alpha.getSymbol(symL);
+      symL.set(0, gap);
+      symL.set(1, cursor.symbol(1, j + 1));
+      symMatrix[0][1] = alpha.getSymbol(symL);
 
-      ress.clear();
-      ress.add(cursor.symbol(0, i));
-      ress.add(cursor.symbol(1, j));
-      resMatrixF[1][1] = getResWrapper(alpha, ress);
-      ress.clear();
-      ress.add(cursor.symbol(0, i));
-      ress.add(AlphabetManager.instance().getGapSymbol());
-      resMatrixF[1][0] = getResWrapper(alpha, ress);
-      ress.clear();
-      ress.add(AlphabetManager.instance().getGapSymbol());
-      ress.add(cursor.symbol(1, j));
-      resMatrixF[0][1] = getResWrapper(alpha, ress);
+      symL.set(0, cursor.symbol(0, i));
+      symL.set(1, cursor.symbol(1, j));
+      symMatrixF[1][1] = alpha.getSymbol(symL);
+      symL.add(cursor.symbol(0, i));
+      symL.add(gap);
+      symMatrixF[1][0] = alpha.getSymbol(symL);
+      symL.add(gap);
+      symL.add(cursor.symbol(1, j));
+      symMatrixF[0][1] = alpha.getSymbol(symL);
 
       colId[0] = i;
       colId[1] = j;
@@ -197,7 +193,7 @@ public class PairwiseDP extends DP implements Serializable {
       for(int l = 0; l < getDotStatesIndex(); l++) {
         EmissionState es = (EmissionState) states[l];
         int [] advance = es.getAdvance();
-        curECol[l] = es.getWeight(resMatrixF[advance[0]][advance[1]]);
+        curECol[l] = es.getDistribution().getWeight(symMatrixF[advance[0]][advance[1]]);
       }
 
       backwardCalcStepMatrix();
@@ -235,7 +231,7 @@ public class PairwiseDP extends DP implements Serializable {
           State destS = states[destI];
           if (destS instanceof EmissionState) {
             advance = ((EmissionState)destS).getAdvance();
-            Symbol res = resMatrix[advance[0]][advance[1]];
+            Symbol res = symMatrix[advance[0]][advance[1]];
             if (res == null) {
               weight = Double.NEGATIVE_INFINITY;
             } else if (! (destS instanceof EmissionState)) {
@@ -312,7 +308,7 @@ public class PairwiseDP extends DP implements Serializable {
 
     private static List gappedResList = new ArrayList();
 
-    private static Symbol getResWrapper(CrossProductAlphabet a, List l) 
+/*    private static Symbol getResWrapper(CrossProductAlphabet a, List l) 
         throws IllegalSymbolException
     {
 //      System.out.println(a.getName() + " getting:");
@@ -345,7 +341,7 @@ public class PairwiseDP extends DP implements Serializable {
         }
         return a.getSymbol(l);
     }
-
+*/
   private class Forward {
     private int[][] transitions;
     private double[][] transitionScores;
@@ -404,31 +400,27 @@ public class PairwiseDP extends DP implements Serializable {
 	return col[l];
     }
 
-    private List ress = new ArrayList();
+    private List symL = new ArrayList();
     private double[][][] matrix = new double[2][2][];
-    private Symbol[][] resMatrix = new Symbol[2][2];
+    private Symbol[][] symMatrix = new Symbol[2][2];
     private int[] colId = new int[2];
 
     private void forwardPrepareCol(int i, int j)
 	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	// System.out.println("*** (" + i + "," + j + ")");
-
-	ress.clear();
-	ress.add(cursor.symbol(0, i));
-	ress.add(cursor.symbol(1, j));
-	// resMatrix[1][1] = alpha.getSymbol(ress);
-	resMatrix[1][1] = getResWrapper(alpha, ress);
-	ress.clear();
-	ress.add(cursor.symbol(0, i));
-	ress.add(AlphabetManager.instance().getGapSymbol());
-	// resMatrix[1][0] = alpha.getSymbol(ress);
-	resMatrix[1][0] = getResWrapper(alpha, ress);
-	ress.clear();
-	ress.add(AlphabetManager.instance().getGapSymbol());
-	ress.add(cursor.symbol(1, j));
-	// resMatrix[0][1] = alpha.getSymbol(ress);
-	resMatrix[0][1] = getResWrapper(alpha, ress);
+  Symbol gap = AlphabetManager.instance().getGapSymbol();
+	symL.clear();
+  
+	symL.add(cursor.symbol(0, i));
+	symL.add(cursor.symbol(1, j));
+	symMatrix[1][1] = alpha.getSymbol(symL);;
+	symL.set(0, cursor.symbol(0, i));
+	symL.set(1, gap);
+	symMatrix[1][0] = alpha.getSymbol(symL);;
+	symL.set(0, gap);
+	symL.set(1, cursor.symbol(1, j));
+	symMatrix[0][1] = alpha.getSymbol(symL);
 
 	colId[0] = i;
 	colId[1] = j;
@@ -461,17 +453,8 @@ public class PairwiseDP extends DP implements Serializable {
 
         if (states[l] instanceof EmissionState) {
           advance = ((EmissionState) states[l]).getAdvance();
-          Symbol res = resMatrix[advance[0]][advance[1]];
-		
-      		if (res == null) {
-            weight = Double.NEGATIVE_INFINITY;
-          } else if (res == MagicalState.MAGICAL_SYMBOL) {
-            try {
-              weight = ((EmissionState) states[l]).getWeight(res);
-            } catch (Exception ex) {}
-          } else {
-            weight = ((EmissionState) states[l]).getWeight(res);
-          }
+          Symbol res = symMatrix[advance[0]][advance[1]];
+          weight = ((EmissionState) states[l]).getDistribution().getWeight(res);
         } else {
           advance = ia00;
           weight = 0.0;
@@ -619,10 +602,10 @@ private class Viterbi {
 	return new SimpleStatePath(col[l], labelToList);
     }
 
-    private List ress = new ArrayList();
+    private List symL = new ArrayList();
     private double[][][] matrix = new double[2][2][];
     private BackPointer[][][] bpMatrix = new BackPointer[2][2][];
-    private Symbol[][] resMatrix = new Symbol[2][2];
+    private Symbol[][] symMatrix = new Symbol[2][2];
     private int[] colId = new int[2];
 
     private void viterbiPrepareCol(int i, int j)
@@ -630,21 +613,17 @@ private class Viterbi {
     {
 	// System.out.println("*** (" + i + "," + j + ")");
 
-	ress.clear();
-	ress.add(cursor.symbol(0, i));
-	ress.add(cursor.symbol(1, j));
-	// resMatrix[1][1] = alpha.getSymbol(ress);
-	resMatrix[1][1] = getResWrapper(alpha, ress);
-	ress.clear();
-	ress.add(cursor.symbol(0, i));
-	ress.add(AlphabetManager.instance().getGapSymbol());
-	// resMatrix[1][0] = alpha.getSymbol(ress);
-	resMatrix[1][0] = getResWrapper(alpha, ress);
-	ress.clear();
-	ress.add(AlphabetManager.instance().getGapSymbol());
-	ress.add(cursor.symbol(1, j));
-	// resMatrix[0][1] = alpha.getSymbol(ress);
-	resMatrix[0][1] = getResWrapper(alpha, ress);
+  Symbol gap = AlphabetManager.instance().getGapSymbol();
+	symL.clear();
+	symL.add(cursor.symbol(0, i));
+	symL.add(cursor.symbol(1, j));
+	symMatrix[1][1] = alpha.getSymbol(symL);
+	symL.set(0, cursor.symbol(0, i));
+	symL.set(1, gap);
+	symMatrix[1][0] = alpha.getSymbol(symL);
+	symL.set(0, gap);
+	symL.set(1, cursor.symbol(1, j));
+	symMatrix[0][1] = alpha.getSymbol(symL);
 
 	colId[0] = i;
 	colId[1] = j;
@@ -682,18 +661,14 @@ private class Viterbi {
           advance = ia00;
         }
         
-	    Symbol res = resMatrix[advance[0]][advance[1]];
+	    Symbol res = symMatrix[advance[0]][advance[1]];
 	    double weight = Double.NEGATIVE_INFINITY;
 	    if (res == null) {
 		weight = Double.NEGATIVE_INFINITY;
 	    } else if (! (states[l] instanceof EmissionState)) {
 		weight = 0.0;
-	    } else if (res == MagicalState.MAGICAL_SYMBOL) {
-		try {
-		    weight = ((EmissionState) states[l]).getWeight(res);
-		} catch (Exception ex) {}
 	    } else {
-		weight = ((EmissionState) states[l]).getWeight(res);
+		weight = ((EmissionState) states[l]).getDistribution().getWeight(res);
 	    }
 
 	    if (weight == Double.NEGATIVE_INFINITY) {
@@ -901,7 +876,7 @@ private class Viterbi {
 
     public Symbol symbol(int dim, int poz) {
       if (poz == 0 || poz > seqs[dim].length()) {
-        return MagicalState.MAGICAL_SYMBOL;
+        return AlphabetManager.instance().getGapSymbol();
       } else {
         return seqs[dim].symbolAt(poz);
       }
@@ -1022,7 +997,7 @@ private class Viterbi {
 
     public Symbol symbol(int dim, int poz) {
       if (poz == 0 || poz > seqs[dim].length()) {
-        return MagicalState.MAGICAL_SYMBOL;
+        return AlphabetManager.instance().getGapSymbol();
       } else {
         return seqs[dim].symbolAt(poz);
       }
@@ -1108,7 +1083,7 @@ private class Viterbi {
         return null;
       }
       if (poz == 0 || poz > seqs[dim].length()) {
-        return MagicalState.MAGICAL_SYMBOL;
+        return AlphabetManager.instance().getGapSymbol();
       }
       return seqs[dim].symbolAt(poz);
     }

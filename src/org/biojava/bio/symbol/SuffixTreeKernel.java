@@ -85,7 +85,7 @@ public class SuffixTreeKernel implements SVMKernel, Serializable {
     SuffixTree.SuffixNode n1 = st1.getRoot();
     SuffixTree.SuffixNode n2 = st2.getRoot();
       
-    return dot(n1, n2, st1.alphabet().size(), 0);
+    return dot(n1, n2, st1.getAlphabet().size(), 0);
   }
   
   /**

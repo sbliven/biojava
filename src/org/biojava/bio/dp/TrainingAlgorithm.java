@@ -35,7 +35,7 @@ public interface TrainingAlgorithm {
   /**
    * Trains the sequences in db untill stopper says to finnish.
    */
-  void train(SequenceDB db, EmissionState nullModel,
+  void train(SequenceDB db, Distribution nullModel,
              double nullWeight, StoppingCriteria stopper)
   throws IllegalSymbolException, BioException;
 }

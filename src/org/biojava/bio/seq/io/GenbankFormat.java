@@ -166,7 +166,7 @@ public class GenbankFormat implements SequenceFormat {
 	Sequence makeSequence() throws BioException {
 	    Sequence ss;
 	    ss = sf.createSequence(new SimpleSymbolList(
-				   resParser.alphabet(),symbols),
+				   resParser.getAlphabet(),symbols),
 				    "urn:whatever",
 				    accession,
 				    Annotation.EMPTY_ANNOTATION);

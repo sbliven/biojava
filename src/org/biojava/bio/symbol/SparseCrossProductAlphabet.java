@@ -55,7 +55,10 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
   }
   
   public SymbolList symbols() {
-    return null;
+    throw new UnsupportedOperationException(
+      "Can't return a list of the symbols in SparseCrossProductAlphabet " +
+      getName()
+    );
   }
   
   public String getName() {
@@ -75,15 +78,35 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     return size;
   }
   
-  public boolean contains(Symbol r) {
-    if(! (r instanceof CrossProductSymbol)) {
+  public boolean contains(Symbol s) {
+    if(s instanceof AmbiguitySymbol) {
+      AmbiguitySymbol as = (AmbiguitySymbol) s;
+      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
+      while(i.hasNext()) {
+        Symbol sym = (Symbol) i.next();
+        if(!this.contains(sym)) {
+          return false;
+        }
+      }
+    }
+
+    if(! (s instanceof CrossProductSymbol)) {
       return false;
     }
-    return knownSymbols.values().contains(r);
+    
+    return knownSymbols.values().contains(s);
   }
 
-  public void validate(Symbol r)
+  public void validate(Symbol s)
   throws IllegalSymbolException {
+    if(!this.contains(s)) {
+      throw new IllegalSymbolException(
+        "CrossProductAlphabet " + this.getName() + " does not accept " +
+        s.getName() + " as it is not an instance of CrossProductSymbol " +
+        " or an AmbiguitySymbol over a subset of this alphabet"
+      );
+    }
+    /*
     if(! (r instanceof CrossProductSymbol)) {
 	    throw new IllegalSymbolException(
         "CrossProductAlphabet " + getName() + " does not accept " + r.getName() +
@@ -98,6 +121,7 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
         getName()
       );
     }
+    */
   }
   
   

@@ -41,5 +41,5 @@ public interface LogoPainter {
    * @param g the target Graphics
    * @param sl the StateLogo to render
    */
-  public void paintLogo(Graphics g, StateLogo sl);
+  public void paintLogo(Graphics g, DistributionLogo dl);
 }

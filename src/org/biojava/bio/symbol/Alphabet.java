@@ -22,7 +22,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.lang.reflect.*;
 import java.io.*;
 
@@ -32,9 +32,8 @@ import org.biojava.bio.*;
 /**
  * The set of Symbols which can be concatinated together to make a SymbolList.
  * <P>
- * The alphabet functions as the repository of objects in the fly-weight design
- * pattern. Only symbols within an alphabet should appear in object that claim
- * to use the alphabet - otherwise something is in error.
+ * The symbols may be concrete symbols (such as DNA bases), or they may be
+ * ambiguity symbols (such as the IUPAC ambiguity codes).
  * <P>
  * The alphabet concept may need to be widened to include alphabets that extend
  * others, or checks to see if two alphabets are equivalent, or other set-wise
@@ -53,6 +52,11 @@ public interface Alphabet extends Annotatable {
 
   /**
    * Returns wether or not this Alphabet contains the symbol.
+   * <P>
+   * An alphabet contains an ambiguity symbol iff the ambiguity symbol's
+   * getMemberAlphabet() returns an alphabe that is a propper sub-set of this
+   * alphabet. That means that every one of the symbols that could mach the
+   * ambiguity symbol is also a member of this alphabet.
    *
    * @param r the Symbol to check
    * @return  boolean true if the Alphabet contains the symbol and false otherwise
@@ -102,7 +106,7 @@ public interface Alphabet extends Annotatable {
   /**
    * The class that implements Alphabet and is empty.
    */
-  public class EmptyAlphabet implements Alphabet, Serializable {
+  public class EmptyAlphabet implements FiniteAlphabet, Serializable {
     public String getName() {
       return "Empty Alphabet";
     }
@@ -123,7 +127,19 @@ public interface Alphabet extends Annotatable {
     public SymbolParser getParser(String name) throws NoSuchElementException {
       throw new NoSuchElementException("There is no parser for the empty alphabet. Attempted to retrieve " + name);
     }
+
+    public int size() {
+      return 0;
+    }
     
+    public Iterator iterator() {
+      return SymbolList.EMPTY_LIST.iterator();
+    }
+    
+    public SymbolList symbols() {
+      return SymbolList.EMPTY_LIST;
+    }
+
     private Object writeReplace() throws ObjectStreamException {
       try {
         return new StaticMemberPlaceHolder(Alphabet.class.getField("EMPTY_ALPHABET"));

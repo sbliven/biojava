@@ -45,12 +45,12 @@ public class SimpleSymbolList implements SymbolList, Serializable {
     return symbols.size();
   }
 
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alphabet;
   }
 
   public SymbolList subList(int start, int end) {
-    return new SimpleSymbolList(alphabet(), symbols.subList(start-1, end));
+    return new SimpleSymbolList(getAlphabet(), symbols.subList(start-1, end));
   }
 
   /**
@@ -68,7 +68,7 @@ public class SimpleSymbolList implements SymbolList, Serializable {
   }
 
   public void addSymbol(Symbol res) throws IllegalSymbolException {
-    alphabet().validate(res);
+    getAlphabet().validate(res);
     symbols.add(res);
   }
 
@@ -94,7 +94,7 @@ public class SimpleSymbolList implements SymbolList, Serializable {
    * @param rList the SymbolList to copy
    */
   public SimpleSymbolList(SymbolList rList) {
-    this.alphabet = rList.alphabet();
+    this.alphabet = rList.getAlphabet();
     symbols = new ArrayList(rList.toList());
   }
 

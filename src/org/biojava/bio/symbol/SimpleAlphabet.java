@@ -28,7 +28,7 @@ import java.io.*;
 import org.biojava.bio.*;
 
 /**
- * A simple no-frills implementation of the Alphabet interface.
+ * A simple no-frills implementation of the FiniteAlphabet interface.
  *
  * @author Matthew Pocock
  */
@@ -44,19 +44,21 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
   private Annotation annotation;
   
   /**
-   * A set of all symbols within the alphabet.
+   * A set of the non-ambiguity symbols within the alphabet.
    */
   private Set symbols;
-
+  
   /**
-   * Initialize the symbols set.
+   * A set of well-known ambiguity symbols.
    */
-  {
-    symbols	= new HashSet();
-  }
-
+  private Set ambig;
+  
   public Iterator iterator() {
     return symbols.iterator();
+  }
+  
+  public Iterator ambiguities() {
+    return ambig.iterator();
   }
   
   public String getName() {
@@ -81,35 +83,129 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
     return new SimpleSymbolList(this, new ArrayList(symbols));
   }
 
-  public boolean contains(Symbol r) {
-    return symbols.contains(r);
+  public boolean contains(Symbol s) {
+    if(s == null) {
+      return false;
+    } else if(symbols.contains(s)) {
+      return true;
+    } else if(s instanceof AmbiguitySymbol) {
+      AmbiguitySymbol as = (AmbiguitySymbol) s;
+      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
+      while(i.hasNext()) {
+        Symbol sym = (Symbol) i.next();
+        if(!symbols.contains(sym)) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  public void addSymbol(Symbol r)
+  /**
+   * Adds a symbol to this alphabet.
+   * <P>
+   * If the symbol is an ambiguity symbol, then each symbol matching it will be
+   * added.
+   *
+   * @param s the Symbol to add
+   * @throws IllegalSymbolException if the symbol is null, or if for any reason
+   *         it can't be added
+   */
+  public void addSymbol(Symbol s)
   throws IllegalSymbolException {
-    if(r == null) {
-      throw new IllegalSymbolException("You can not add null as a symbol");
+    if(s == null) {
+      throw new IllegalSymbolException(
+        "You can not add null as a symbol to alphabet " + getName()
+      );
     }
-    symbols.add(r);
+    if(s instanceof AmbiguitySymbol) {
+      AmbiguitySymbol as = (AmbiguitySymbol) s;
+      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
+      while(i.hasNext()) {
+        Symbol sym = (Symbol) i.next();
+        symbols.add(sym);
+      }
+    } else {
+      symbols.add(s);
+    }
   }
   
-  public void removeSymbol(Symbol r)
+  /**
+   * Add a commonly recognized ambiguiy symbol to this alphabet.
+   *
+   * @param as the AmbiguitySymbol to add
+   * @throws IllegalSymbolException if as contains Symbols not contained within
+   *         this alpahbet
+   */
+  public void addAmbiguity(AmbiguitySymbol as)
   throws IllegalSymbolException {
-    validate(r);
-    symbols.remove(r);
+    validate(as);
+    ambig.add(as);
+  }
+  
+  /**
+   * Remove a symbol from this alphabet.
+   * <P>
+   * If the symbol is an ambiguity symbol, then each symbol matching it will be
+   * removed.
+   *
+   * @param s the Symbol to remove
+   * @throws IllegalSymbolException if the symbol is null, or if for any reason
+   *         it can't be removed
+   */
+  public void removeSymbol(Symbol s)
+  throws IllegalSymbolException {
+    validate(s);
+    if(s instanceof AmbiguitySymbol) {
+      AmbiguitySymbol as = (AmbiguitySymbol) s;
+      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
+      while(i.hasNext()) {
+        Symbol sym = (Symbol) i.next();
+        symbols.remove(sym);
+      }
+    } else {
+      symbols.remove(s);
+    }
   }
 
-  public void validate(Symbol r) throws IllegalSymbolException {
-    if(!contains(r)) {
-      if(r == null) {
+  public void validate(Symbol s) throws IllegalSymbolException {
+    if(!contains(s)) {
+      if(s == null) {
         throw new IllegalSymbolException("NULL is an illegal symbol");
+      } else if (s instanceof AmbiguitySymbol) {
+        try {
+          FiniteAlphabet fa = (FiniteAlphabet) ((AmbiguitySymbol) s).getMatchingAlphabet();
+          for(Iterator i = fa.iterator(); i.hasNext(); ) {
+            validate((Symbol) i.next());
+          }
+        } catch (IllegalSymbolException ise) {
+          throw new IllegalSymbolException(
+            ise,
+            "Ambiguity symbol " + s.getName() +
+            " could not be accepted as it matches an invalid symbol."
+          );
+        }
+        throw new BioError(
+          "Symbol " + s.getName() + " isn't contained within the alphabet " +
+          getName() +
+          " but I can't find which of the matching symbols is invalid"
+        );
       } else {
-        throw new IllegalSymbolException("Symbol " + r.getName() +
+        throw new IllegalSymbolException("Symbol " + s.getName() +
                                           " not found in alphabet " +
                                           getName());
       }
     }
   }
   
-  public SimpleAlphabet() {}
+  public SimpleAlphabet() {
+    symbols	= new HashSet();
+    ambig = new HashSet();
+  }
+  
+  public SimpleAlphabet(Set symbols) {
+    this.symbols = symbols;
+  }
 }

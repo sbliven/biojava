@@ -73,14 +73,14 @@ extends AbstractSymbolList implements Serializable {
       );
     }
     this.source = source;
-    Alphabet a = source.alphabet();
+    Alphabet a = source.getAlphabet();
     this.alpha = AlphabetManager.instance().getCrossProductAlphabet(
       Collections.nCopies(width, a)
     );
     this.width = width;
   }
   
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alpha;
   }
 

@@ -39,27 +39,27 @@ import org.biojava.bio.dp.*;
  * @author Matthew Pocock
  */
 public class BarLogoPainter implements LogoPainter {
-  public void paintLogo(Graphics g, StateLogo sl) {
+  public void paintLogo(Graphics g, DistributionLogo sl) {
     Graphics2D g2 = (Graphics2D) g;
-    EmissionState state = sl.getState();
+    Distribution dis = sl.getDistribution();
     SymbolStyle style = sl.getStyle();
     
     Rectangle bounds = sl.getBounds();
     double width = bounds.getWidth();
-    double stepWidth = width / (double) ((FiniteAlphabet) state.alphabet()).size();
+    double stepWidth = width / (double) ((FiniteAlphabet) dis.getAlphabet()).size();
     double height = bounds.getHeight();
     double scale = height * (sl.totalInformation() / sl.totalBits());
 
     double w = 0.0;    
     for(
-      Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
+      Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
       i.hasNext();
     ) {
       Symbol r = (Symbol) i.next();
       double rh = 0.0;
      
       try {
-        rh = Math.exp(state.getWeight(r)) * scale;
+        rh = Math.exp(dis.getWeight(r)) * scale;
       } catch (IllegalSymbolException ire) {
         throw new BioError(ire, "State alphabet has changed while painting");
       }

@@ -32,14 +32,14 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
   private Transition _tran;
   
   /**
-   * state -> Set <StateTrainer>
+   * state -> Set <DistributionTrainer>
    */
   private Map stateToTrainer;
   
   /**
-   * The set of all StateTrainers.
+   * The set of all DistributionTrainers.
    */
-  private Set allStateTrainers;
+  private Set allDistributionTrainers;
   
   /**
    * Transition -> Set <TrainerTransition>
@@ -65,15 +65,15 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
   private Map modelToTrainer;
 
   private MarkovModel model;
-  private EmissionState nullState;
-  private double nullStateWeight;
+  private Distribution nullModel;
+  private double nullModelWeight;
   private double transCounts;
   private double transCountWeight;
   
   {
     _tran = new Transition(null, null);
     stateToTrainer = new HashMap();
-    allStateTrainers = new HashSet();
+    allDistributionTrainers = new HashSet();
     transitionToTrainer = new HashMap();
     transitionToCount = new HashMap();
     allTransitionTrainers = new HashSet();
@@ -90,7 +90,7 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
       );
     }                                  
     for(Iterator i = trainerSet.iterator(); i.hasNext();) {
-      ((StateTrainer) i.next()).addCount(r, count);
+      ((DistributionTrainer) i.next()).addCount(r, count);
     }
   }
   
@@ -110,9 +110,9 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
   public void train()
   throws IllegalSymbolException, IllegalTransitionException {
     // train all states
-    for(Iterator i = getAllStateTrainers().iterator(); i.hasNext();) {
-      StateTrainer st = (StateTrainer) i.next();
-      st.train(nullState, nullStateWeight);
+    for(Iterator i = getAllDistributionTrainers().iterator(); i.hasNext();) {
+      DistributionTrainer st = (DistributionTrainer) i.next();
+      st.train(nullModel, nullModelWeight);
     }
     
     // dispurse all transition counts
@@ -141,8 +141,8 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
 
   public void clearCounts() {
     // clear all states
-    for(Iterator i = getAllStateTrainers().iterator(); i.hasNext();) {
-      ((StateTrainer) i.next()).clearCounts();
+    for(Iterator i = getAllDistributionTrainers().iterator(); i.hasNext();) {
+      ((DistributionTrainer) i.next()).clearCounts();
     }
     
     // clear all counts in transitionToCount
@@ -157,14 +157,14 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
   }
   
   public void registerTrainerForState(EmissionState state,
-                                      StateTrainer trainer) {
+                                      DistributionTrainer trainer) {
     Set trainerSet = (Set) stateToTrainer.get(state);
     if(trainerSet == null) {
       trainerSet = new HashSet();
       stateToTrainer.put(state, trainerSet);
     }
     trainerSet.add(trainer);
-    allStateTrainers.add(trainer);
+    allDistributionTrainers.add(trainer);
   }
   
   public Set trainersForState(EmissionState state) {
@@ -174,8 +174,8 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
     return trainerSet;
   }
   
-  public Set getAllStateTrainers() {
-    return allStateTrainers;
+  public Set getAllDistributionTrainers() {
+    return allDistributionTrainers;
   }
   
   public void registerTrainerForTransition(
@@ -234,20 +234,20 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
    * Create a model trainer for a particular model.
    *
    * @param model the MarkovModel to train
-   * @param nullState  the null state model - possibly null
-   * @param nullStateWeight how many times to add the null model
+   * @param nullModel  the null state model - possibly null
+   * @param nullModelWeight how many times to add the null model
    * @param transCounts the counts to add to each transition
    * @param transCountWeight how many times to add them
    * @throws BioException  if for any reason the trainer could not be built
    */
   public SimpleModelTrainer(
     MarkovModel model,
-    EmissionState nullState, double nullStateWeight,
+    Distribution nullModel, double nullModelWeight,
     double transCounts, double transCountWeight
   ) throws BioException {
     this.model = model;
-    this.nullState = nullState;
-    this.nullStateWeight = nullStateWeight;
+    this.nullModel = nullModel;
+    this.nullModelWeight = nullModelWeight;
     this.transCounts = transCounts;
     this.transCountWeight = transCountWeight;
     model.registerWithTrainer(this);

@@ -37,7 +37,7 @@ public class CrossProductSymbolNameParser implements SymbolParser, Serializable 
   private final CrossProductAlphabet alpha;
   private final SymbolParser [] parser;
   
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alpha;
   }
   

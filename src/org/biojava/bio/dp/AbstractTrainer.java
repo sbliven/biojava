@@ -56,7 +56,7 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
   /**
    * Trains the sequences in db until stopper says to finnish.
    */
-  public void train(SequenceDB db, EmissionState nullModel,
+  public void train(SequenceDB db, Distribution nullModel,
                     double nullWeight, StoppingCriteria stopper)
   throws IllegalSymbolException, BioException {
     try {

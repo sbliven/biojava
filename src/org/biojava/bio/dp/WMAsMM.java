@@ -33,13 +33,14 @@ import org.biojava.bio.symbol.*;
  */
 public class WMAsMM implements MarkovModel, Serializable {
   private static final int [] advance = {1};
-  private static final MagicalState magicalState = MagicalState.getMagicalState(1);
   
   private final WeightMatrix wm;
   private final FiniteAlphabet stateAlpha;
+  private final MagicalState magicalState;
+  private final EmissionState [] states;
   
   public Alphabet emissionAlphabet() {
-    return wm.alphabet();
+    return wm.getAlphabet();
   }
   
   public FiniteAlphabet stateAlphabet() {
@@ -75,12 +76,12 @@ public class WMAsMM implements MarkovModel, Serializable {
     sAlpha.validate(from);
     
     if(from == magicalState)
-      return wm.getColumn(0);
+      return states[0];
       
-    if(from == wm.getColumn(wm.columns()-1))
+    if(from == states[wm.columns()-1])
       return magicalState;
 
-    return wm.getColumn(index((EmissionState) from)+1);
+    return states[index(from)+1];
   }
   
   public Set transitionsFrom(State from)
@@ -89,12 +90,12 @@ public class WMAsMM implements MarkovModel, Serializable {
     sAlpha.validate(from);
 
     if(from == magicalState)
-      return Collections.singleton(wm.getColumn(0));
+      return Collections.singleton(states[0]);
       
-    if(from == wm.getColumn(wm.columns()-1))
+    if(from == states[wm.columns()-1])
       return Collections.singleton(magicalState);
     
-    return Collections.singleton(wm.getColumn(index((EmissionState) from)+1));
+    return Collections.singleton(states[index(from)+1]);
   }
     
   public Set transitionsTo(State to)
@@ -103,20 +104,20 @@ public class WMAsMM implements MarkovModel, Serializable {
     sAlpha.validate(to);
 
     if(to == magicalState)
-      return Collections.singleton(wm.getColumn(wm.columns()-1));
+      return Collections.singleton(states[wm.columns()-1]);
       
     if(to == wm.getColumn(0))
       return Collections.singleton(magicalState);
 
-    return Collections.singleton(wm.getColumn(index((EmissionState) to)-1));
+    return Collections.singleton(states[index(to)-1]);
   }
   
   public void registerWithTrainer(ModelTrainer modelTrainer)
   throws BioException {
-    for(Iterator i = stateAlphabet().iterator(); i.hasNext(); ) {
+/*    for(Iterator i = stateAlphabet().iterator(); i.hasNext(); ) {
       EmissionState s = (EmissionState) i.next();
       s.registerWithTrainer(modelTrainer);
-    }
+    }*/
   }
   
   public void createTransition(State from, State to)
@@ -157,13 +158,13 @@ public class WMAsMM implements MarkovModel, Serializable {
     sAlpha.validate(to);
     
     if((from == magicalState) &&
-       (to == wm.getColumn(0)))
+       (to == states[0]))
        return true;
-    if((from == wm.getColumn(wm.columns()-1)) &&
+    if((from == states[wm.columns()-1]) &&
        (to == magicalState))
        return true;
 
-    if(index((EmissionState) from) == index((EmissionState) to) - 1)
+    if(index(from) == index(to) - 1)
       return true;    
 
     return false;
@@ -172,9 +173,9 @@ public class WMAsMM implements MarkovModel, Serializable {
   public void addTransitionListener(TransitionListener tl) {}
   public void removeTransitionListener(TransitionListener tl) {}
   
-  protected int index(EmissionState es) {
-    for(int i = 0; i < wm.columns(); i++) {
-      if(es == wm.getColumn(i)) {
+  protected int index(State s) {
+    for(int i = 0; i < states.length; i++) {
+      if(s == states[i]) {
         return i;
       }
     }
@@ -184,11 +185,20 @@ public class WMAsMM implements MarkovModel, Serializable {
 
   public WMAsMM(WeightMatrix wm) throws IllegalSymbolException {
     this.wm = wm;
+    this.magicalState = MagicalState.getMagicalState(wm.getAlphabet(), 1);
     SimpleAlphabet sa = new SimpleAlphabet();
     sa.addSymbol(magicalState);
     this.stateAlpha = sa;
+    this.states = new EmissionState[wm.columns()];
     for(int i = 0; i < wm.columns(); i++) {
-      sa.addSymbol(wm.getColumn(i));
+      sa.addSymbol(
+        this.states[i] = new SimpleEmissionState(
+          i + "",
+          Annotation.EMPTY_ANNOTATION,
+          this.advance,
+          wm.getColumn(i)
+        )
+      );
     }
     sa.setName("Weight Matrix columns");
   }

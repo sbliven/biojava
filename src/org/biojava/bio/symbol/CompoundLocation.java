@@ -134,7 +134,7 @@ public class CompoundLocation implements Location, Serializable {
       if(this.contains(p))
         res.add(s.symbolAt(p));
 
-    return new SimpleSymbolList(s.alphabet(), res);
+    return new SimpleSymbolList(s.getAlphabet(), res);
   }
 
   public void addLocation(Location l) {

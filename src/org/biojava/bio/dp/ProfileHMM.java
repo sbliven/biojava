@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.BioError;
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 public class ProfileHMM extends SimpleMarkovModel {
@@ -155,7 +155,7 @@ public class ProfileHMM extends SimpleMarkovModel {
    */
   public ProfileHMM(
     Alphabet alpha, int columns,
-    StateFactory matchFactory, StateFactory insertFactory
+    DistributionFactory matchFactory, DistributionFactory insertFactory
   ) throws IllegalSymbolException, IllegalTransitionException,
   IllegalAlphabetException {
     super(1, alpha);
@@ -167,7 +167,12 @@ public class ProfileHMM extends SimpleMarkovModel {
       this.deleteStates = new DotState[columns];
     
       EmissionState mO = magicalState();
-      EmissionState iO = insertFactory.createState(alpha, advance, "i-0");
+      EmissionState iO = new SimpleEmissionState(
+        "i-0",
+        Annotation.EMPTY_ANNOTATION,
+        advance,
+        insertFactory.createDistribution(alpha)
+      );
       DotState dO = null;
     
       matchStates[0] = mO;
@@ -180,8 +185,18 @@ public class ProfileHMM extends SimpleMarkovModel {
     
       // 'body' columns
       for(int i = 1; i <= columns; i++) {
-        EmissionState mN = matchFactory.createState(alpha, advance, "m-" + i);
-        EmissionState iN = insertFactory.createState(alpha, advance, "i-" + i);
+        EmissionState mN = new SimpleEmissionState(
+          "m-" + i,
+          Annotation.EMPTY_ANNOTATION,
+          advance, 
+          matchFactory.createDistribution(alpha)
+        );
+        EmissionState iN = new SimpleEmissionState(
+          "i-" + i,
+          Annotation.EMPTY_ANNOTATION,
+          advance, 
+          insertFactory.createDistribution(alpha)
+        );
         DotState dN = new SimpleDotState("d-" + i);
       
         addState(mN);

@@ -76,7 +76,7 @@ public interface ModelTrainer {
   void clearCounts();
   
   /**
-   * Register a StateTrainer as being associated with a state.
+   * Register a DistributionTrainer as being associated with a state.
    * <P>
    * More than one trainer may be associated with the same state, in which
    * case any counts will be added to each trainer.
@@ -86,23 +86,23 @@ public interface ModelTrainer {
    * @param state the EmissionState to associate with a trainer
    * @param trainer the trainer to add to the list of trainers for the state
    */
-  void registerTrainerForState(EmissionState state, StateTrainer trainer);
+  void registerTrainerForState(EmissionState state, DistributionTrainer trainer);
   
   /**
-   * Retrieves a Set of StateTrainers associated with an emission state.
+   * Retrieves a Set of DistributionTrainers associated with an emission state.
    * <P>
    * Do not change the Set returned.
    *
    * @param state the state for which to retrieve trainers
-   * @return  a Set, possibly empty, of StateTrainers that will be informed of
+   * @return  a Set, possibly empty, of DistributionTrainers that will be informed of
    *          counts for the state
    */
   Set trainersForState(EmissionState state);
   
   /**
-   * Return a Set of all the StateTrainer objects used by this ModelTrainer.
+   * Return a Set of all the DistributionTrainer objects used by this ModelTrainer.
    */
-  Set getAllStateTrainers();
+  Set getAllDistributionTrainers();
   
   /**
    * Register a TransitionTrainer, a source and a destination state with a

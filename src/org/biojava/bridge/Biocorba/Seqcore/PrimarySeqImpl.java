@@ -16,23 +16,23 @@ implements _PrimarySeq_Operations {
   private String primaryID;
   private String accessionNumber;
 
-  public PrimarySeqImpl(SymbolList resList,
+  public PrimarySeqImpl(SymbolList symList,
                     String displayID, String primaryID, String accessionNumber)
   throws IllegalAlphabetException {
-    super(resList);
+    super(symList);
     this.displayID = displayID;
     this.primaryID = primaryID;
     this.accessionNumber = accessionNumber;
   }
   
-  public PrimarySeqImpl(SymbolList resList, String id)
+  public PrimarySeqImpl(SymbolList symList, String id)
   throws IllegalAlphabetException {
-    this(resList, id, id, id);
+    this(symList, id, id, id);
   }
   
-  public PrimarySeqImpl(SymbolList resList)
+  public PrimarySeqImpl(SymbolList symList)
   throws IllegalAlphabetException {
-    this(resList, resList.toString(), resList.toString(), resList.toString());
+    this(symList, symList.toString(), symList.toString(), symList.toString());
   }
   
   public String display_id(org.omg.CORBA.portable.ObjectImpl primarySeq) {

@@ -512,8 +512,8 @@ public abstract class DP {
     DoubleAlphabet dAlpha = DoubleAlphabet.getInstance();
     if (oldState instanceof EmissionState) {
       EmissionState eState = (EmissionState) oldState;
-      token = eState.sampleSymbol();
-      resScore += eState.getWeight(token);
+      token = eState.getDistribution().sampleSymbol();
+      resScore += eState.getDistribution().getWeight(token);
       states.addSymbol(oldState);
       tokens.addSymbol(token);
       scoreList.add(dAlpha.getSymbol(resScore));
@@ -540,8 +540,8 @@ public abstract class DP {
 
       if (newState instanceof EmissionState) {
         EmissionState eState = (EmissionState) newState;
-        token = eState.sampleSymbol();
-        resScore += eState.getWeight(token);
+        token = eState.getDistribution().sampleSymbol();
+        resScore += eState.getDistribution().getWeight(token);
         states.addSymbol(newState);
         tokens.addSymbol(token);
         scoreList.add(dAlpha.getSymbol(resScore));

@@ -48,6 +48,8 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
     SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll);
     double bs = bm.getScore();
 
+    Symbol gap = AlphabetManager.instance().getGapSymbol();
+    
     // state trainer
     for (int i = 1; i <= resList.length(); i++) {
       Symbol res = resList.symbolAt(i);
@@ -67,7 +69,7 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
     // transition trainer
     for (int i = 0; i <= resList.length(); i++) {
       Symbol res = (i < resList.length()) ? resList.symbolAt(i + 1) :
-                    MagicalState.MAGICAL_SYMBOL;
+                    gap;
       double [] fsc = fm.scores[i];
       double [] bsc = bm.scores[i+1];
       for (int s = 0; s < states.length; s++) {  // any -> emission transitions
@@ -76,7 +78,7 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
           double weight = (states[t] instanceof EmissionState)
-            ? ((EmissionState) states[t]).getWeight(res)
+            ? ((EmissionState) states[t]).getDistribution().getWeight(res)
             : 0.0;
           if (weight != Double.NEGATIVE_INFINITY) {
             try {

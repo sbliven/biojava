@@ -65,10 +65,10 @@ extends AbstractSymbolList implements SymbolList {
   
   public TranslatedSymbolList(SymbolList source, TranslationTable transTable)
   throws IllegalAlphabetException {
-    if(transTable.getSourceAlphabet() != source.alphabet()) {
+    if(transTable.getSourceAlphabet() != source.getAlphabet()) {
       throw new IllegalAlphabetException(
         "The source alphabet and translation table source alphabets don't match: " +
-        source.alphabet().getName() + " and " +
+        source.getAlphabet().getName() + " and " +
         transTable.getSourceAlphabet().getName()
       );
     }
@@ -93,7 +93,7 @@ extends AbstractSymbolList implements SymbolList {
     }
   }
   
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return transTable.getTargetAlphabet();
   }
 }

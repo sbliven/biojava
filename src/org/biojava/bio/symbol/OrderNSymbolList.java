@@ -67,14 +67,14 @@ extends AbstractSymbolList implements Serializable {
   public OrderNSymbolList(SymbolList source, int order)
   throws IllegalAlphabetException {
     this.source = source;
-    Alphabet a = source.alphabet();
+    Alphabet a = source.getAlphabet();
     this.alpha = AlphabetManager.instance().getCrossProductAlphabet(
       Collections.nCopies(order, a)
     );
     this.order = order;
   }
   
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alpha;
   }
 

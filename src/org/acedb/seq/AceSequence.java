@@ -48,8 +48,8 @@ public class AceSequence implements Sequence {
     return "urn://sequence:acedb/" + getName();
   }
   
-  public Alphabet alphabet() {
-    return DNATools.getAmbiguity();
+  public Alphabet getAlphabet() {
+    return DNATools.getDNA();
   }
   
   public Annotation getAnnotation() {
@@ -119,7 +119,7 @@ public class AceSequence implements Sequence {
       Connection con = Ace.getConnection(seqObj.toURL());
       String selectString = con.transact("Find Sequence " + name);
       String dnaString = con.transact("dna");
-      SymbolParser rParser = alphabet().getParser("token");
+      SymbolParser rParser = getAlphabet().getParser("token");
       List rl = new ArrayList();
       StringTokenizer st = new StringTokenizer(dnaString, "\n");
       while(st.hasMoreElements()) {
@@ -130,7 +130,7 @@ public class AceSequence implements Sequence {
           rl.addAll(rParser.parse(line).toList());
         }
       }
-      resList = new SimpleSymbolList(alphabet(), rl);
+      resList = new SimpleSymbolList(getAlphabet(), rl);
       con.dispose();
       
       // Feature template for stuff

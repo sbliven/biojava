@@ -22,7 +22,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.io.*;
 import java.lang.reflect.*;
 
@@ -94,8 +94,21 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     return Annotation.EMPTY_ANNOTATION;
   }
   
-  public boolean contains(Symbol r) {
-    return r instanceof DoubleSymbol;
+  public boolean contains(Symbol s) {
+    if(s instanceof DoubleSymbol) {
+      return true;
+    } else if(s instanceof AmbiguitySymbol) {
+      AmbiguitySymbol as = (AmbiguitySymbol) s;
+      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
+      while(i.hasNext()) {
+        Symbol sym = (Symbol) i.next();
+        if(!this.contains(sym)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
   
   public void validate(Symbol r) throws IllegalSymbolException {
@@ -154,7 +167,7 @@ public class DoubleAlphabet implements Alphabet, Serializable {
   extends AbstractSymbolList implements Serializable {
     private final double [] dArray;
     
-    public Alphabet alphabet() {
+    public Alphabet getAlphabet() {
       return INSTANCE;
     }
     

@@ -293,14 +293,10 @@ class FlatModel extends ModelView implements Serializable {
     throw new UnsupportedOperationException("removeState not supported by FlatModel");
   }
 
-  private static interface Wrapper extends State {
-    public State getWrapped();
-  }
-  
-  private static class DotStateWrapper implements Wrapper, DotState, Serializable {
+  private static class Wrapper implements State, Serializable {
     private final State wrapped;
     private final String extra;
-    
+
     public char getToken() {
       return wrapped.getToken();
     }
@@ -316,14 +312,20 @@ class FlatModel extends ModelView implements Serializable {
     public State getWrapped() {
       return wrapped;
     }
-    
-    public DotStateWrapper(State wrapped, String extra)
-    throws NullPointerException {
+
+    public Wrapper(State wrapped, String extra) {
       if(wrapped == null) {
         throw new NullPointerException("Can't wrap null");
       }
       this.wrapped = wrapped;
       this.extra = extra;
+    }
+  }
+  
+  private static class DotStateWrapper
+  extends Wrapper implements DotState {
+    public DotStateWrapper(State wrapped, String extra) {
+      super(wrapped, extra);
     }
       
     public DotStateWrapper(State wrapped)
@@ -333,35 +335,31 @@ class FlatModel extends ModelView implements Serializable {
   }
 
   private static class EmissionWrapper
-  extends StateView
-  implements Wrapper, Serializable {
-    public Symbol sourceToView(Symbol r) {
-      return r;
+  extends Wrapper implements EmissionState {
+    private EmissionState getWrappedES() {
+      return (EmissionState) getWrapped();
     }
     
-    public Symbol viewToSource(Symbol r) {
-      return r;
-    }
-    
-    public State getWrapped() {
-      return this.getSource();
-    }
-    
-    public String getName() {
-      return super.getName() + "-f";
-    }
-
     public int [] getAdvance() {
-      return this.getSource().getAdvance();
+      return getWrappedES().getAdvance();
     }
 
-    public Alphabet alphabet() {
-      return this.getSource().alphabet();
+    public Distribution getDistribution() {
+      return getWrappedES().getDistribution();
     }
     
-    public EmissionWrapper(EmissionState wrapped)
-    throws NullPointerException {
-      super(wrapped);
+    public void setDistribution(Distribution dis) {
+      getWrappedES().setDistribution(dis);
+    }
+    
+    public void registerWithTrainer(ModelTrainer trainer) {}
+    
+    public EmissionWrapper(EmissionState wrapped) {
+      this(wrapped, "-f");
+    }
+    
+    public EmissionWrapper(EmissionState wrapped, String extra) {
+      super(wrapped, extra);
     }
   }
   

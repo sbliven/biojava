@@ -8,16 +8,16 @@ import org.biojava.bridge.GNOME.*;
 public class AnonymousSeqImpl
 extends UnknownImpl
 implements _AnonymousSeq_Operations {
-  private SymbolList resList;
+  private SymbolList symList;
   
   public SymbolList getSymbolList() {
-    return resList;
+    return symList;
   }
   
   private SeqType seqType;
   
   public AnonymousSeqImpl(SymbolList resList) throws IllegalAlphabetException {
-    String alphaName = resList.alphabet().getName();
+    String alphaName = symList.getAlphabet().getName();
     seqType = null;
     if(alphaName.startsWith("DNA")) {
       seqType = SeqType.DNA;
@@ -29,7 +29,7 @@ implements _AnonymousSeq_Operations {
       throw new IllegalAlphabetException("Can only serve DNA, RNA or PROTEIN");
     }
     
-    this.resList = resList;
+    this.symList = symList;
   }
   
   public SeqType type(org.omg.CORBA.portable.ObjectImpl anonymousSeq) {

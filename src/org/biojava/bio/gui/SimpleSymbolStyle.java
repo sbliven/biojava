@@ -116,13 +116,13 @@ public class SimpleSymbolStyle implements SymbolStyle {
     dnaFill.put(DNATools.g(), Color.blue);
     dnaFill.put(DNATools.c(), Color.yellow);
     dnaFill.put(DNATools.a(), Color.green);
-    standardFillPaints.put(DNATools.getAlphabet(), dnaFill);
+    standardFillPaints.put(DNATools.getDNA(), dnaFill);
 
     Map dnaOutline = new HashMap();
     dnaOutline.put(DNATools.t(), Color.black);
     dnaOutline.put(DNATools.a(), Color.black);
     dnaOutline.put(DNATools.g(), Color.black);
     dnaOutline.put(DNATools.c(), Color.black);
-    standardOutlinePaints.put(DNATools.getAlphabet(), dnaOutline);
+    standardOutlinePaints.put(DNATools.getDNA(), dnaOutline);
   }
 }

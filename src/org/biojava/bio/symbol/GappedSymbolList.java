@@ -512,7 +512,7 @@ extends AbstractSymbolList implements Serializable {
     }
   }
   
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alpha;
   }
   
@@ -570,7 +570,7 @@ extends AbstractSymbolList implements Serializable {
    */
   public GappedSymbolList(SymbolList source) {
     this.source = source;
-    this.alpha = AlphabetManager.instance().getGappedAlphabet(source.alphabet());
+    this.alpha = source.getAlphabet();
     this.blocks = new ArrayList();
     this.length = source.length();
     Block b = new Block(1, length, 1, length);

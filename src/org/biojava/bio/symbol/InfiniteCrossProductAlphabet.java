@@ -48,25 +48,37 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
     return name.toString();
   }
 
-  public boolean contains(Symbol r) {
-    if(! (r instanceof CrossProductSymbol)) {
+  public boolean contains(Symbol s) {
+    if(s instanceof AmbiguitySymbol) {
+      AmbiguitySymbol as = (AmbiguitySymbol) s;
+      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
+      while(i.hasNext()) {
+        Symbol sym = (Symbol) i.next();
+        if(!this.contains(sym)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    
+    if(! (s instanceof CrossProductSymbol)) {
       return false;
     }
     
-    CrossProductSymbol cr = (CrossProductSymbol) r;
+    CrossProductSymbol cs = (CrossProductSymbol) s;
     
-    List rl = cr.getSymbols();
-    if(rl.size() != alphas.size()) {
+    List sl = cs.getSymbols();
+    if(sl.size() != alphas.size()) {
       return false;
     }
     
     Iterator ai = alphas.iterator();
-    Iterator ri = rl.iterator();
+    Iterator si = sl.iterator();
     
-    while(ai.hasNext() && ri.hasNext()) {
+    while(ai.hasNext() && si.hasNext()) {
       Alphabet aa = (Alphabet) ai.next();
-      Symbol rr = (Symbol) ri.next();
-      if(!aa.contains(rr)) {
+      Symbol ss = (Symbol) si.next();
+      if(!aa.contains(ss)) {
         return false;
       }
     }
@@ -75,14 +87,15 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
   }
   
   public void validate(Symbol r) throws IllegalSymbolException {
-    if(! (r instanceof CrossProductSymbol)) {
+    if(!this.contains(r)) {
 	    throw new IllegalSymbolException(
         "CrossProductAlphabet " + getName() + " does not accept " + r.getName() +
-        " as it is not an instance of CrossProductSymbol"
+        " as it is not an instance of CrossProductSymbol or " +
+        " an AmbiguitySymbol over a subset of symbols in this alphabet."
       );
     }
     
-    CrossProductSymbol cr = (CrossProductSymbol) r;
+/*    CrossProductSymbol cr = (CrossProductSymbol) r;
     List rl = cr.getSymbols();
     if(rl.size() != alphas.size()) {
       throw new IllegalSymbolException(
@@ -105,7 +118,7 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
           aa.getName()
         );
       }
-    }
+    }*/
   }
 
   public Annotation getAnnotation() {

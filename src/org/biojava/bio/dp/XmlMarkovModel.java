@@ -53,7 +53,7 @@ public class XmlMarkovModel {
       columns = Math.max(columns, indx);
     }
     
-    WeightMatrix wm = new SimpleWeightMatrix(seqAlpha, columns, StateFactory.DEFAULT);
+    WeightMatrix wm = new SimpleWeightMatrix(seqAlpha, columns, DistributionFactory.DEFAULT);
 
     colL = root.getElementsByTagName("col");
     for(int i = 0; i < colL.getLength(); i++) {
@@ -121,7 +121,11 @@ public class XmlMarkovModel {
     for(int i = 0; i < states.getLength(); i++) {
       Element stateE = (Element) states.item(i);
       String name = stateE.getAttribute("name");
-      EmissionState state = StateFactory.DEFAULT.createState(seqAlpha, advance, name);
+      Distribution dis = DistributionFactory.DEFAULT.createDistribution(seqAlpha);
+      EmissionState state = new SimpleEmissionState(
+        name, Annotation.EMPTY_ANNOTATION, advance, dis
+      );
+      
       nameToState.put(name, state);
       NodeList weights = stateE.getElementsByTagName("weight");
       for(int j = 0; j < weights.getLength(); j++) {
@@ -141,7 +145,7 @@ public class XmlMarkovModel {
             res = symbolParser.parseToken(resName);
           }
         }          
-        state.setWeight(res, Math.log(Double.parseDouble(weightE.getAttribute("prob"))));
+        dis.setWeight(res, Math.log(Double.parseDouble(weightE.getAttribute("prob"))));
       }
       model.addState(state);
     }
@@ -174,7 +178,7 @@ public class XmlMarkovModel {
   }
  
   public static void writeMatrix(WeightMatrix matrix, PrintStream out) throws Exception {
-    FiniteAlphabet resA = (FiniteAlphabet) matrix.alphabet();
+    FiniteAlphabet resA = (FiniteAlphabet) matrix.getAlphabet();
     
     out.println("<MarkovModel>\n  <alphabet name=\"" + resA.getName() + "\"/>");
     
@@ -210,10 +214,11 @@ public class XmlMarkovModel {
         out.println("  <state name=\"" + s.getName() + "\">");
         if(s instanceof EmissionState) {
           EmissionState es = (EmissionState) s;
+          Distribution dis = es.getDistribution();
           for(Iterator resI = resR.iterator(); resI.hasNext(); ) {
             Symbol r = (Symbol) resI.next();
             out.println("    <weight res=\"" + r.getName() +
-                        "\" prob=\"" + Math.exp(es.getWeight(r)) + "\"/>");
+                        "\" prob=\"" + Math.exp(dis.getWeight(r)) + "\"/>");
           }
         }
         out.println("  </state>");

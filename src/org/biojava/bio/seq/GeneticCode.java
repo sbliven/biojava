@@ -42,7 +42,7 @@ public class GeneticCode {
   
   static {
     try {
-      FiniteAlphabet DNA = DNATools.getAlphabet();
+      FiniteAlphabet DNA = DNATools.getDNA();
       CrossProductAlphabet codon = AlphabetManager.instance().getCrossProductAlphabet(
         Collections.nCopies(3, DNA)
       );

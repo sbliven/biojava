@@ -58,7 +58,7 @@ public class PointLocation implements Location, Serializable {
 
   public SymbolList symbols(SymbolList s)	{
     final Symbol res = s.symbolAt(this.point);
-    return new SimpleSymbolList(s.alphabet(), new AbstractList() {
+    return new SimpleSymbolList(s.getAlphabet(), new AbstractList() {
       public Object get(int index) throws IndexOutOfBoundsException {
         if(index == 0)
           return res;

@@ -28,10 +28,10 @@ import java.io.Serializable;
 import org.biojava.bio.symbol.*;
 
 public class SimpleWeightMatrix implements WeightMatrix, Serializable {
-  private EmissionState [] columns;
+  private Distribution [] columns;
   private Alphabet alpha;
 
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alpha;
   }
 
@@ -39,17 +39,17 @@ public class SimpleWeightMatrix implements WeightMatrix, Serializable {
     return this.columns.length;
   }
   
-  public EmissionState getColumn(int column) {
+  public Distribution getColumn(int column) {
     return columns[column];
   }
 
-  public SimpleWeightMatrix(Alphabet alpha, int columns, StateFactory sFact)
+  public SimpleWeightMatrix(Alphabet alpha, int columns, DistributionFactory dFact)
   throws IllegalAlphabetException {
     this.alpha = alpha;
-    this.columns = new EmissionState[columns];
+    this.columns = new Distribution[columns];
     int [] advance = { 1 };
     for(int i = 0; i < columns; i++) {
-      this.columns[i] = sFact.createState(alpha, advance, i + "");
+      this.columns[i] = dFact.createDistribution(alpha);
     }
   }
 }

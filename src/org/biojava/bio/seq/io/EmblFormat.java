@@ -167,7 +167,7 @@ public class EmblFormat implements SequenceFormat {
 	    }
 
 	    ss = sf.createSequence(new SimpleSymbolList(
-				   resParser.alphabet(),symbols),
+				   resParser.getAlphabet(),symbols),
 				    "urn:sequence/embl:" + primaryAcc,
 				    primaryAcc,
 				    annotation);

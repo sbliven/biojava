@@ -89,14 +89,14 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
       };
     } else if(name.equals("token")) {
       return new SymbolParser() {
-        public Alphabet alphabet() {
+        public Alphabet getAlphabet() {
           return AllTokensAlphabet.this;
         }
         public SymbolList parse(String seq) {
           List resList = new ArrayList(seq.length());
           for(int i = 0; i < seq.length(); i++)
             resList.add(parseToken(seq.substring(i, i+1)));
-          return new SimpleSymbolList(alphabet(), resList);
+          return new SimpleSymbolList(getAlphabet(), resList);
         }
         public Symbol parseToken(String token) {
           char c = token.charAt(0);

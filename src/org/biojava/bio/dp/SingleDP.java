@@ -30,9 +30,37 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 class SingleDP extends DP implements Serializable {
-  public SingleDP(MarkovModel flat)
+  private final HashMap emissions;
+
+  public SingleDP(MarkovModel model)
   throws IllegalSymbolException, IllegalTransitionException, BioException {
-    super(flat);
+    super(model);
+    emissions = new HashMap();
+  }
+
+  public void updateTransitions() {
+    super.updateTransitions();
+    // workaround for bug in vm
+    if(emissions != null) {
+      emissions.clear();
+    }
+  }
+  
+  protected double [] getEmission(Symbol sym)
+  throws IllegalSymbolException {
+    double [] em = (double []) emissions.get(sym);
+    if(em == null) {
+      int dsi = getDotStatesIndex();
+      em = new double[dsi];
+      State [] states = getStates();
+      for(int i = 0; i < dsi; i++) {
+        EmissionState es = (EmissionState) states[i];
+        Distribution dis = es.getDistribution();
+        em[i] = dis.getWeight(sym);
+      }
+      emissions.put(sym, em);
+    }
+    return em;
   }
   
   public double forward(SymbolList [] seq)
@@ -215,11 +243,12 @@ class SingleDP extends DP implements Serializable {
       // System.out.println("\n*** Index=" + _index + " ***");
       dpCursor.advance();
       Symbol res = dpCursor.currentRes();
+      double [] emissions = getEmission(res);
 //      System.out.println("Consuming " + res.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
       for (int l = 0; l < getDotStatesIndex(); l++) { //any -> emission
-        double weight = ((EmissionState) states[l]).getWeight(res);
+        double weight = emissions[l];
         if (weight == Double.NEGATIVE_INFINITY) {
           // System.out.println("*");
           currentCol[l] = Double.NEGATIVE_INFINITY;
@@ -297,10 +326,11 @@ class SingleDP extends DP implements Serializable {
     while (dpCursor.canAdvance()) {
       dpCursor.advance();
       Symbol res = dpCursor.lastRes();
+      double [] emissions = getEmission(res);
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
       for(int k = getDotStatesIndex() - 1; k >= 0; k--) {
-        prevScores[k] = ((EmissionState) states[k]).getWeight(res);
+        prevScores[k] = emissions[k];
       }
       
 //System.out.println(res.getName());
@@ -420,13 +450,14 @@ class SingleDP extends DP implements Serializable {
     while (dpCursor.canAdvance()) { // symbol i
       dpCursor.advance();
       Symbol res = dpCursor.currentRes();
+      double [] emissions = getEmission(res);
       //System.out.println(res.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
       for (int l = 0; l < states.length; l++) {
         double emission;
         if(l < getDotStatesIndex()) {
-          emission = ((EmissionState) states[l]).getWeight(res);
+          emission = emissions[l];
         } else {
           emission = 0.0;
         }

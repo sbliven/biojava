@@ -40,14 +40,14 @@ class ComplementSymbolList extends AbstractSymbolList {
     private SymbolList parent;
 
     public ComplementSymbolList(SymbolList p) throws IllegalAlphabetException {
-	Alphabet a = p.alphabet();
+	Alphabet a = p.getAlphabet();
 	if (!isComplementable(a))
 	    throw new IllegalAlphabetException("Only DNA can be complemented.");
 	parent = p;
     }
 
-    public Alphabet alphabet() {
-	return parent.alphabet();
+    public Alphabet getAlphabet() {
+	return parent.getAlphabet();
     }
 
     public int length() {
@@ -55,15 +55,14 @@ class ComplementSymbolList extends AbstractSymbolList {
     }
 
     public Symbol symbolAt(int pos) {
-	try {
-	    return DNATools.complement(parent.symbolAt(pos));
-	} catch (IllegalSymbolException ex) {
-	    throw new BioError(ex);
-	}
+      try {
+        return DNATools.complement(parent.symbolAt(pos));
+      } catch (IllegalSymbolException ex) {
+        throw new BioError(ex);
+      }
     }
     
     public static boolean isComplementable(Alphabet alpha) {
-      return alpha == DNATools.getAlphabet() ||
-             alpha == DNATools.getAmbiguity();
+      return alpha == DNATools.getDNA();
     }
 }

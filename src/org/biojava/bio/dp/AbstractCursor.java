@@ -32,6 +32,7 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 abstract class AbstractCursor implements DPCursor {
+  private static final Symbol gap = AlphabetManager.instance().getGapSymbol();
   private Iterator resIterator;
   
   private Symbol currentRes;
@@ -46,19 +47,19 @@ abstract class AbstractCursor implements DPCursor {
   }
   
   public boolean canAdvance() {
-    return resIterator.hasNext() || currentRes != MagicalState.MAGICAL_SYMBOL;
+    return resIterator.hasNext() || currentRes != gap;
   }
   
   public void advance() {
     lastRes = currentRes;
     currentRes = (resIterator.hasNext()) ? (Symbol) resIterator.next()
-                                         : MagicalState.MAGICAL_SYMBOL;
+                                         : gap;
   }
   
   public AbstractCursor(Iterator resIterator) {
     this.resIterator = resIterator;
-    this.currentRes = MagicalState.MAGICAL_SYMBOL;
-    this.lastRes = MagicalState.MAGICAL_SYMBOL;
+    this.currentRes = gap;
+    this.lastRes = gap;
   }
   
   protected AbstractCursor() {

@@ -31,84 +31,40 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  */
-public class DNATools {
-  static private FiniteAlphabet alpha;
-  static private FiniteAlphabet ambiguity;
+public final class DNATools {
+  static private FiniteAlphabet dna;
   static private Symbol a;
   static private Symbol g;
   static private Symbol c;
   static private Symbol t;
   
-  static private Map symbolToMatches;
   static private Map symbolToComplement;
 
   static {
     try {
-      alpha = (FiniteAlphabet) AlphabetManager.instance().alphabetForName("DNA");
-      ambiguity = (FiniteAlphabet) AlphabetManager.instance().alphabetForName("DNA-AMBIGUITY");
-      SymbolList res = alpha.getParser("token").parse("agct");
-      a = res.symbolAt(1);
-      g = res.symbolAt(2);
-      c = res.symbolAt(3);
-      t = res.symbolAt(4);
+      AlphabetManager aMan = AlphabetManager.instance();
+      dna = (FiniteAlphabet) aMan.alphabetForName("DNA");
+      SymbolList syms = dna.getParser("token").parse("agct");
+      a = syms.symbolAt(1);
+      g = syms.symbolAt(2);
+      c = syms.symbolAt(3);
+      t = syms.symbolAt(4);
       
-      symbolToMatches = new HashMap();
       symbolToComplement = new HashMap();
-      SymbolParser ambParser = ambiguity.getParser("token");
-      // for 1.3
-      /*
-      symbolToMatches.put(a, new HashableList(alpha,
-                           Collections.singletonList(a)));
-      symbolToMatches.put(g, new HashableList(alpha, 
-                           Collections.singletonList(g)));
-      symbolToMatches.put(c, new HashableList(alpha, 
-                           Collections.singletonList(c)));
-      symbolToMatches.put(t, new HashableList(alpha, 
-                           Collections.singletonList(t)));
-      */
-      // for 1.2
-      HashableList hl;
-      
-      hl = new HashableList(alpha, new ArrayList(Collections.singleton(a)));
-      symbolToMatches.put(a, hl);
-      symbolToComplement.put(a, complementDNA(a));
-      
-      hl = new HashableList(alpha, new ArrayList(Collections.singleton(g)));
-      symbolToMatches.put(g, hl);
-      symbolToComplement.put(g, complementDNA(g));
-
-      hl = new HashableList(alpha, new ArrayList(Collections.singleton(c)));
-      symbolToMatches.put(c, hl);
-      symbolToComplement.put(c, complementDNA(c));
-
-      hl = new HashableList(alpha, new ArrayList(Collections.singleton(t)));
-      symbolToMatches.put(t, hl);
-      symbolToComplement.put(t, complementDNA(t));
 
       // add the gap symbol
-      hl = new HashableList(alpha, Collections.EMPTY_LIST);
-      Symbol gap = ambParser.parseToken("-");
-      symbolToMatches.put(gap, hl);
+      Symbol gap = aMan.getGapSymbol();
       symbolToComplement.put(gap, gap);
       
       // add all other ambiguity symbols
-      Map matchesToSymbol = new HashMap();
-      for(Iterator i = ambiguity.iterator(); i.hasNext();) {
-        Symbol r = (Symbol) i.next();
-        if(!symbolToMatches.keySet().contains(r)) {
-          SymbolList rl = ambParser.parse(r.getName());
-          hl = new HashableList(rl.alphabet(), rl.toList());
-          symbolToMatches.put(r, hl);
-          matchesToSymbol.put(hl, r);
+      for(Iterator i = ((SimpleAlphabet) dna).ambiguities(); i.hasNext();) {
+        AmbiguitySymbol as = (AmbiguitySymbol) i.next();
+        List l = new ArrayList();
+        FiniteAlphabet fa = (FiniteAlphabet) as.getMatchingAlphabet();
+        for(Iterator j = fa.iterator(); j.hasNext(); ) {
+          l.add(complement((Symbol) j.next()));
         }
-      }
-      for(Iterator i = ambiguity.iterator(); i.hasNext();) {
-        Symbol r = (Symbol) i.next();
-        if(!symbolToComplement.keySet().contains(r)) {
-          hl = (HashableList) symbolToMatches.get(r);
-          symbolToComplement.put(r,
-                                (Symbol) matchesToSymbol.get(complement(hl)));
-        }
+        symbolToComplement.put(as, aMan.getAmbiguitySymbol(l));
       }
     } catch (Throwable t) {
       throw new BioError(t, "Unable to initialize DNATools");
@@ -125,17 +81,8 @@ public class DNATools {
    *
    * @return a flyweight version of the DNA alphabet
    */
-  public static FiniteAlphabet getAlphabet() {
-    return alpha;
-  }
-
-  /**
-   * Return the ambiguity alphabet.
-   *
-   * @return a flyweight version of the DNA ambiguity alphabet
-   */
-  public static FiniteAlphabet getAmbiguity() {
-    return ambiguity;
+  public static FiniteAlphabet getDNA() {
+    return dna;
   }
 
   /**
@@ -151,33 +98,10 @@ public class DNATools {
   public static SymbolList createDNA(String dna)
   throws IllegalSymbolException {
     try {
-      SymbolParser p = getAlphabet().getParser("token");
+      SymbolParser p = getDNA().getParser("token");
       return p.parse(dna);
     } catch (BioException se) {
       throw new BioError(se, "Something has gone badly wrong with DNA");
-    }
-  }
-  
-  /**
-   * Return a new DNA-AMBIGUITY <span class="type">SymbolList</span> for
-   * <span class="arg">amb</span>.
-   *
-   * @param amb a <span class="type">String</span> to parse into DNA-AMBIGUITY
-   * @return a <span class="type">SymbolList</span> created form
-   *         <span class="arg">amb</span>
-   * @throws IllegalSymbolException if  <span class="arg">amb</span> contains
-   *         any non-DNA-AMBIGUITY characters
-   */
-  public static SymbolList createDNAAmbiguity(String amb)
-  throws IllegalSymbolException {
-    try {
-      SymbolParser p = getAmbiguity().getParser("token");
-      return p.parse(amb);
-    } catch (BioException se) {
-      throw new BioError(
-        se,
-        "Something has gone badly wrong in the DNA ambibuity alphabet"
-      );
     }
   }
   
@@ -190,7 +114,7 @@ public class DNATools {
    * @return     the index for that symbol
    * @throws IllegalSymbolException if res is not a member of the DNA alphabet
    */
-  final public static int index(Symbol res) throws IllegalSymbolException {
+  public static int index(Symbol res) throws IllegalSymbolException {
     if(res == a) {
       return 0;
     } else if(res == g) {
@@ -200,7 +124,7 @@ public class DNATools {
     } else if(res == t) {
       return 3;
     }
-    getAlphabet().validate(res);
+    getDNA().validate(res);
     throw new IllegalSymbolException("Realy confused. Can't find index for " +
                                       res.getName());
   }
@@ -214,7 +138,7 @@ public class DNATools {
    * @return       the symbol at that index
    * @throws IndexOutOfBoundsException if index is not between 0 and 3
    */
-  final static public Symbol forIndex(int index)
+  static public Symbol forIndex(int index)
   throws IndexOutOfBoundsException {
     if(index == 0)
       return a;
@@ -230,82 +154,52 @@ public class DNATools {
   /**
    * Complement the symbol.
    *
-   * @param res  the symbol to complement
+   * @param sym  the symbol to complement
    * @return a Symbol that is the complement of res
    * @throws IllegalSymbolException if res is not a member of the DNA alphabet
    */
-  final static public Symbol complementDNA(Symbol res)
+  static public Symbol complement(Symbol sym)
   throws IllegalSymbolException {
-    if(res == a) {
+    if(sym == a) {
       return t;
-    } else if(res == g) {
+    } else if(sym == g) {
       return c;
-    } else if(res == c) {
+    } else if(sym == c) {
       return g;
-    } else if(res == t) {
+    } else if(sym == t) {
       return a;
     }
-    getAlphabet().validate(res);
-    throw new BioError("Realy confused. Can't find symbol " +
-                       res.getName());
-  }
-  
-  /**
-   * Complement symbols even if they are ambiguity codes.
-   *
-   * @param res  the symbol to complement
-   * @return a Symbol that is the complement of res
-   * @throws IllegalSymbolException if res is not a member of the DNA ambiguity
-   *         alphabet
-   */
-  final static public Symbol complement(Symbol res)
-  throws IllegalSymbolException {
-    getAmbiguity().validate(res);
-    Symbol r = (Symbol) symbolToComplement.get(res);
-    if(r == null) {
-      throw new BioError("Realy confused. Can't find complement for " +
-                          res.getName());
+    Symbol s = (Symbol) symbolToComplement.get(sym);
+    if(s != null) {
+      return s;
+    } else {
+      getDNA().validate(sym);
+      throw new BioError(
+        "Realy confused. Can't find symbol " +
+        sym.getName()
+      );
     }
-    return r;
   }
   
   /**
    * Retrieve the symbol for a symbol.
    *
-   * @param symbol  the char to look up
-   * @return        the symbol for that char
+   * @param token  the char to look up
+   * @return  the symbol for that char
    * @throws IllegalSymbolException if the char does not belong to {a, g, c, t}
    */
-  final static public Symbol forSymbol(char symbol)
+  static public Symbol forSymbol(char token)
   throws IllegalSymbolException {
-    if(symbol == 'a') {
+    if(token == 'a') {
       return a;
-    } else if(symbol == 'g') {
+    } else if(token == 'g') {
       return g;
-    } else if(symbol == 'c') {
+    } else if(token == 'c') {
       return c;
-    } else if(symbol == 't') {
+    } else if(token == 't') {
       return t;
     }
-    throw new IllegalSymbolException("Unknown symbol " + symbol);
-  }
-  
-  /**
-   * Convert an ambiguity code to a list of symbols it could match.
-   *
-   * @param res the symbol to expand
-   * @return a SymbolList containing each matching DNA symbol
-   * @throws IllegalSymbolException if res is not a member of the DNA ambiguity
-   *         alphabet
-   */
-  final static public SymbolList forAmbiguity(Symbol res)
-  throws IllegalSymbolException {
-    SymbolList resList = (SymbolList) symbolToMatches.get(res);
-    if(resList != null)
-      return resList;
-    getAmbiguity().validate(res);
-    throw new BioError("Symbol not mapped to symbol list: " +
-                       res.getName());
+    throw new IllegalSymbolException("Unable to find symbol for token " + token);
   }
   
   /**
@@ -330,41 +224,5 @@ public class DNATools {
   public static SymbolList reverseComplement(SymbolList list)
   throws IllegalAlphabetException {
     return new ComplementSymbolList(new ReverseSymbolList(list));
-  }
-  
-  /**
-   * Helps build the complement infomation.
-   */
-  static private HashableList complement(HashableList list)
-  throws IllegalSymbolException {
-    List newList = new ArrayList();
-    for(Iterator i = list.iterator(); i.hasNext();) {
-      newList.add(complementDNA((Symbol) i.next()));
-    }
-    return new HashableList(list.alphabet(), newList);
-  }
-  
-  /**
-   * Helps for building the ambiguity->resList information.
-   *
-   * @author Matthew Pocock
-   */
-  private static class HashableList extends SimpleSymbolList {
-    public int hashCode() {
-      int hc = 0;
-      for(Iterator i = iterator(); i.hasNext();) {
-        hc = hc ^ i.next().hashCode();
-      }
-      return hc;
-    }
-    
-    public HashableList(Alphabet alpha, List list) {
-      super(alpha, list);
-    }
-    
-    public boolean equals(Object o) {
-      HashableList hl = (HashableList) o;
-      return hashCode() == hl.hashCode();
-    }
   }
 }

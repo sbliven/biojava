@@ -37,7 +37,7 @@ public interface WeightMatrix {
    *
    * @return  the Alphabet
    */
-  Alphabet alphabet();
+  Alphabet getAlphabet();
   
   /**
    * The number of columns modeled by the weight matrix.
@@ -57,5 +57,5 @@ public interface WeightMatrix {
    *         columns()-1
    * @return the EmissionState that represents the individual column
    */
-  EmissionState getColumn(int column) throws IndexOutOfBoundsException;
+  Distribution getColumn(int column) throws IndexOutOfBoundsException;
 }

@@ -38,137 +38,109 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  */
-public class MagicalState implements EmissionState, Serializable {
-  /**
-   * The symbol that implicitly exists at the beginning and end of every
-   * SymbolList (index 0 and length+1).
-   */
-  public static final Symbol MAGICAL_SYMBOL;
-
-  /**
-   * The alphabet that contains only MAGICAL_STATE.
-   */
-  public static final Alphabet MAGICAL_ALPHABET;
-
+public final class MagicalState extends SimpleEmissionState {
   /**
    * A cache of magical state objects so that we avoid making the same
    * thing twice.
    */
-  protected static final Map stateCache;
-  
+  private static final Map stateCache;
+  private static final Map symbolCache;
   static {
-    MAGICAL_SYMBOL = new MagicalSymbol('!', "mMagical", null);
-    MAGICAL_ALPHABET = new MagicalAlphabet();
-
-    try {
-      ((SimpleAlphabet) MAGICAL_ALPHABET).addSymbol(MAGICAL_SYMBOL);
-      ((SimpleAlphabet) MAGICAL_ALPHABET).setName("Magical Alphabet");
-    } catch (IllegalSymbolException ire) {
-      throw new BioError(
-        ire,
-        "Could not complete static intialization of MagicalState"
-      );
-    }
-    
     stateCache = new HashMap();
+    symbolCache = new HashMap();
   }
   
-  public static MagicalState getMagicalState(int heads) {
-    Integer headsI = new Integer(heads);
-    MagicalState ms = (MagicalState) stateCache.get(headsI);
+  public static MagicalState getMagicalState(Alphabet alphabet, int heads) {
+    AlphaHeads ah = new AlphaHeads(alphabet, heads);
+    MagicalState ms = (MagicalState) stateCache.get(ah);
     if(ms == null) {
-      ms = new MagicalState(heads);
-      stateCache.put(headsI, ms);
+      ms = new MagicalState(alphabet, heads);
+      stateCache.put(ah, ms);
     }
     return ms;
   }
-  
-  private final int[] advance;
-  
-  private MagicalState(int heads) {
-    advance = new int[heads];
+
+  private MagicalState(Alphabet alpha, int heads) {
+    super(
+      "!-" + heads,
+      Annotation.EMPTY_ANNOTATION,
+      new int[heads],
+      new MagicalDistribution(alpha)
+    );
+    int [] advance = getAdvance();
     for(int i = 0; i < heads; i++) {
       advance[i] = 1;
     }
   }
 
   private Object writeReplace() throws ObjectStreamException {
-    return new PlaceHolder(advance.length);
+    return new PlaceHolder(getDistribution().getAlphabet(), getAdvance().length);
   }
   
-  public char getToken() {
-    return '!';
+  private static class AlphaHeads {
+    public Alphabet alpha;
+    public int heads;
+    
+    public AlphaHeads(Alphabet alpha, int heads) {
+      this.alpha = alpha;
+      this.heads = heads;
+    }
+    
+    public boolean equals(Object o) {
+      AlphaHeads ah = (AlphaHeads) o;
+      return this.alpha == ah.alpha && this.heads == ah.heads;
+    }
+    
+    public int hashCode() {
+      return alpha.hashCode() ^ heads;
+    }
   }
+  
+  private static class MagicalDistribution implements Distribution {
+    private final Alphabet alpha;
+    
+    public double getWeight(Symbol sym) throws IllegalSymbolException {
+      return sym == AlphabetManager.instance().getGapSymbol()
+        ? 0.0
+        : Double.NEGATIVE_INFINITY;
+    }
 
-  public String getName() {
-    return "!-" + advance.length;
-  }
+    public void setWeight(Symbol s, double w) throws IllegalSymbolException,
+    UnsupportedOperationException {
+      getAlphabet().validate(s);
+      throw new UnsupportedOperationException(
+        "The weights are immutable: " + s.getName() + " -> " + w
+      );
+    }
 
-  public Annotation getAnnotation() {
-    return Annotation.EMPTY_ANNOTATION;
-  }
+    public Alphabet getAlphabet() {
+      return alpha;
+    }
+    
+    public Symbol sampleSymbol() {
+      return AlphabetManager.instance().getGapSymbol();
+    }
 
-  public Alphabet alphabet() {
-    return MAGICAL_ALPHABET;
+    public void registerWithTrainer(ModelTrainer modelTrainer) {
+    }
+    
+    public MagicalDistribution(Alphabet alpha) {
+      this.alpha = alpha;
+    }
   }
-
-  public double getWeight(Symbol r) throws IllegalSymbolException {
-    if (r != MAGICAL_SYMBOL)
-      return Double.NEGATIVE_INFINITY;
-    return 0.0;
-  }
-
-  public void setWeight(Symbol r, double w) throws IllegalSymbolException,
-  UnsupportedOperationException {
-    alphabet().validate(r);
-    throw new UnsupportedOperationException(
-      "The weights are immutable: " + r.getName() + " -> " + w);
-  }
-
-  public Symbol sampleSymbol() {
-    return MAGICAL_SYMBOL;
-  }
-
-  public void registerWithTrainer(ModelTrainer modelTrainer) {
-  }
-
-  public int[] getAdvance() {
-    return advance;
-  }
-}  
-  class PlaceHolder implements Serializable {
+  
+  private static class PlaceHolder implements Serializable {
+    private Alphabet alpha;
     private int heads;
     
-    public PlaceHolder(int heads) {
+    public PlaceHolder(Alphabet alpha, int heads) {
+      this.alpha = alpha;
       this.heads = heads;
     }
     
     private Object readReplace() throws ObjectStreamException {
-      return MagicalState.getMagicalState(heads);
+      return MagicalState.getMagicalState(alpha, heads);
     }
   }
-
-  class MagicalSymbol extends SimpleSymbol {
-    public MagicalSymbol(char token, String name, Annotation ann) {
-      super(token, name, ann);
-    }
-    
-    private Object writeReplace() throws ObjectStreamException {
-      try {
-        return new StaticMemberPlaceHolder(MagicalState.class.getField("MAGICAL_SYMBOL"));
-      } catch (NoSuchFieldException nsfe) { 
-        throw new NotSerializableException(nsfe.getMessage());
-      }
-    }
-  }
-
-  class MagicalAlphabet extends SimpleAlphabet {
-    private Object writeReplace() throws ObjectStreamException {
-      try {
-        return new StaticMemberPlaceHolder(MagicalState.class.getField("MAGICAL_ALPHABET"));
-      } catch (NoSuchFieldException nsfe) { 
-        throw new NotSerializableException(nsfe.getMessage());
-      }
-    }
-  }
+}
 

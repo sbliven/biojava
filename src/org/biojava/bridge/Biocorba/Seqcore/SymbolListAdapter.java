@@ -10,7 +10,7 @@ import org.Biocorba.Seqcore.*;
 
 public class SymbolListAdapter implements SymbolList {
   private AnonymousSeq anonymousSeq;
-  private SymbolList resList;
+  private SymbolList symList;
   
   public AnonymousSeq getAnonymousSeq() {
     return anonymousSeq;
@@ -22,56 +22,56 @@ public class SymbolListAdapter implements SymbolList {
     Alphabet alpha = null;
     SeqType type = anonymousSeq.type();
     if(type == SeqType.DNA) {
-      alpha = am.getGappedAlphabet(DNATools.getAmbiguity());
+      alpha = DNATools.getDNA();
     } else if(type == SeqType.RNA) {
-      alpha = am.getGappedAlphabet(am.alphabetForName("RNA"));
+      alpha = am.alphabetForName("RNA");
     } else if(type == SeqType.PROTEIN) {
-      alpha = am.getGappedAlphabet(ProteinTools.getXAlphabet());
+      alpha = ProteinTools.getXAlphabet();
     } else {
       throw new IllegalAlphabetException("Could not find alphabet for " + type);
     }
     SymbolParser parser = alpha.getParser("token");
 
     try {
-      resList = parser.parse(anonymousSeq.get_seq());
+      symList = parser.parse(anonymousSeq.get_seq());
     } catch (RequestTooLarge rtl) {
       throw new BioException(rtl, "Unable to grap sequence string from CORBA object");
     }
     this.anonymousSeq = anonymousSeq;
   }
   
-  public Alphabet alphabet() {
-    return resList.alphabet();
+  public Alphabet getAlphabet() {
+    return symList.getAlphabet();
   }
   
   public Iterator iterator() {
-    return resList.iterator();
+    return symList.iterator();
   }
   
   public int length() {
-    return resList.length();
+    return symList.length();
   }
   
   public Symbol symbolAt(int index)
   throws IndexOutOfBoundsException {
-    return resList.symbolAt(index);
+    return symList.symbolAt(index);
   }
   
   public String seqString() {
-    return resList.seqString();
+    return symList.seqString();
   }
   
   public SymbolList subList(int start, int end)
   throws IndexOutOfBoundsException {
-    return resList.subList(start, end);
+    return symList.subList(start, end);
   }
   
   public String subStr(int start, int end)
   throws IndexOutOfBoundsException {
-    return resList.subStr(start, end);
+    return symList.subStr(start, end);
   }
   
   public List toList() {
-    return resList.toList();
+    return symList.toList();
   }
 }

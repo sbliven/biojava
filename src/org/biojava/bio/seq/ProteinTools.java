@@ -33,32 +33,15 @@ import org.biojava.bio.symbol.*;
  */
 public class ProteinTools {
   private static final FiniteAlphabet proteinAlpha;
-  private static final FiniteAlphabet proteinXAlpha;
   private static final FiniteAlphabet proteinTAlpha;
-  private static final Symbol x;
-  private static final Symbol termination;
   
   static {
     try {
       AlphabetManager am = AlphabetManager.instance();
       proteinAlpha = (FiniteAlphabet) am.alphabetForName("PROTEIN");
-      SimpleAlphabet xAlpha = new SimpleAlphabet();
-      SimpleAlphabet tAlpha = new SimpleAlphabet();
-      xAlpha.setName(proteinAlpha.getName() + "+X");
-      tAlpha.setName(proteinAlpha.getName() + "+T");
-      for(Iterator i = proteinAlpha.iterator(); i.hasNext(); ) {
-        Symbol r = (Symbol) i.next();
-        xAlpha.addSymbol(r);
-        tAlpha.addSymbol(r);
-      }
-      x = am.symbolForName("X");
-      termination = am.symbolForName("termination");
-      xAlpha.addSymbol(x);
-      tAlpha.addSymbol(termination);
-      proteinXAlpha = xAlpha;
-      proteinTAlpha = tAlpha;
-    } catch (IllegalSymbolException ire) {
-      throw new BioError(ire, " Could not initialize ProteinTools");
+      proteinTAlpha = (FiniteAlphabet) am.alphabetForName("PROTEIN-TERM");
+    } catch (Exception e) {
+      throw new BioError(e, " Could not initialize ProteinTools");
     }
   }
   
@@ -66,19 +49,7 @@ public class ProteinTools {
     return proteinAlpha;
   }
   
-  public static final FiniteAlphabet getXAlphabet() {
-    return proteinXAlpha;
-  }
-  
-  public static final Symbol getXSymbol() {
-    return x;
-  }
-  
   public static final FiniteAlphabet getTAlphabet() {
     return proteinTAlpha;
-  }
-  
-  public static final Symbol getTSymbol() {
-    return termination;
   }
 }

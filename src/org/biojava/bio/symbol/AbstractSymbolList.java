@@ -46,7 +46,7 @@ import org.biojava.bio.*;
  */
 
 public abstract class AbstractSymbolList implements SymbolList {
-    public abstract Alphabet alphabet();
+    public abstract Alphabet getAlphabet();
 
     public Iterator iterator() {
 	return new SymbolIterator(1, length());
@@ -129,8 +129,8 @@ public abstract class AbstractSymbolList implements SymbolList {
 	    this.end = end;
 	}
 
-	public Alphabet alphabet() {
-	    return AbstractSymbolList.this.alphabet();
+	public Alphabet getAlphabet() {
+	    return AbstractSymbolList.this.getAlphabet();
 	}
 
 	public Iterator iterator() {

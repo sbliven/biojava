@@ -36,6 +36,10 @@ import org.biojava.utils.*;
  * possibly small) number of Symbols and an Alphabet over an infinite
  * (or extreemely large) set of Symbols. Within a FiniteAlphabet, the == operator
  * should be sufficient to decide upon equality.
+ * <P>
+ * The alphabet functions as the repository of objects in the fly-weight design
+ * pattern. Only symbols within an alphabet should appear in object that claim
+ * to use the alphabet - otherwise something is in error.
  *
  * @author Matthew Pocock
  */
@@ -70,33 +74,4 @@ public interface FiniteAlphabet extends Alphabet {
   /**
    * A realy useful static alphabet that is always empty.
    */
-  static final FiniteAlphabet EMPTY_ALPHABET = new EmptyAlphabet();
-  
-  /**
-   * The class that implements EmptyAlphabet and is empty.
-   */
-  public class EmptyAlphabet
-  extends Alphabet.EmptyAlphabet implements FiniteAlphabet {
-    protected EmptyAlphabet() {}
-    
-    public int size() {
-      return 0;
-    }
-    
-    public Iterator iterator() {
-      return SymbolList.EMPTY_LIST.iterator();
-    }
-    
-    public SymbolList symbols() {
-      return SymbolList.EMPTY_LIST;
-    }
-    
-    private Object writeReplace() throws ObjectStreamException {
-      try {
-        return new StaticMemberPlaceHolder(FiniteAlphabet.class.getField("EMPTY_ALPHABET"));
-      } catch (NoSuchFieldException nsfe) {
-        throw new NotSerializableException(nsfe.getMessage());
-      }
-    }
-  }  
 }

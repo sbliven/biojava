@@ -54,8 +54,8 @@ extends AbstractSymbolList implements Serializable {
     this.source = source;
   }
 
-  public Alphabet alphabet() {
-    return source.alphabet();
+  public Alphabet getAlphabet() {
+    return source.getAlphabet();
   }
 
   public int length() {

@@ -147,7 +147,7 @@ public interface Location {
     public Location intersection(Location l) { return empty; }
     public Location union(Location l) { return l; }
     public SymbolList symbols(SymbolList seq) {
-      return new SimpleSymbolList(seq.alphabet(), new ArrayList());
+      return new SimpleSymbolList(seq.getAlphabet(), new ArrayList());
     }
     public Location translate(int dist) { return this; }
     private Object writeReplace() throws ObjectStreamException {

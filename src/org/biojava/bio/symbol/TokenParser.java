@@ -47,7 +47,7 @@ public class TokenParser implements SymbolParser, Serializable {
     tokenToSymbol = new HashMap();
   }
   
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alphabet;
   }
   
@@ -56,7 +56,7 @@ public class TokenParser implements SymbolParser, Serializable {
     for(int i = 0; i < seq.length(); i++) {
       rList.add(parseToken(seq.substring(i, i+1)));
     }
-    return new SimpleSymbolList(alphabet(), rList);
+    return new SimpleSymbolList(getAlphabet(), rList);
   }
   
   public Symbol parseToken(String token) throws IllegalSymbolException {
@@ -85,6 +85,14 @@ public class TokenParser implements SymbolParser, Serializable {
       char c = res.getToken();
       tokenToSymbol.put(Character.toLowerCase(c) + "", res);
       tokenToSymbol.put(Character.toUpperCase(c) + "", res);
+    }
+    if(alpha instanceof SimpleAlphabet) {
+      for(Iterator i = ((SimpleAlphabet) alpha).ambiguities(); i.hasNext(); ) {
+        Symbol res = (Symbol) i.next();
+        char c = res.getToken();
+        tokenToSymbol.put(Character.toLowerCase(c) + "", res);
+        tokenToSymbol.put(Character.toUpperCase(c) + "", res);
+      }
     }
   }
 }

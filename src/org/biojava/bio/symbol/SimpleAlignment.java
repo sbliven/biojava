@@ -46,7 +46,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
     return length;
   }
   
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alphabet;
   }
   
@@ -117,7 +117,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
       Object label = li.next();
       try {
         SymbolList rl = symbolListForLabel(label);
-        alphaList.add(rl.alphabet());
+        alphaList.add(rl.getAlphabet());
         if(length == -1) {
           length = rl.length();
         } else {

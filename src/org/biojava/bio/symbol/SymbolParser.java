@@ -31,7 +31,7 @@ public interface SymbolParser {
    *
    * @return  the Alphabet
    */
-  Alphabet alphabet();
+  Alphabet getAlphabet();
   
   /**
    * Parse an entire string into a SymbolList.

@@ -29,7 +29,7 @@ import org.biojava.bio.*;
  * <P>
  * The usual reason for throwing an IllegalAlphabetException is that you are
  * trying to parse a SymbolList into a method that only works for some
- * alphabets, but not for the alphabe associated with that SymbolList.
+ * alphabets, but not for the alphabet associated with that SymbolList.
  *
  * @author Matthew Pocock
  */

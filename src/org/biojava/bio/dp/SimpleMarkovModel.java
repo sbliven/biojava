@@ -291,14 +291,14 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   public SimpleMarkovModel(int heads, Alphabet emissionAlpha) {
     this.emissionAlpha = emissionAlpha;
     this.stateAlpha = new SimpleAlphabet();
-    this.magicalState = MagicalState.getMagicalState(heads);
+    this.magicalState = MagicalState.getMagicalState(emissionAlpha, heads);
     
     try {
       ((SimpleAlphabet) stateAlpha).addSymbol(magicalState);
     } catch (IllegalSymbolException ire) {
       throw new BioError(
         ire,
-        "Alphabet went screwey on me & wouldn't accept the magical symbol"
+        "Alphabet went screwey on me & wouldn't accept the magical state"
       );
     }
 

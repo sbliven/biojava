@@ -45,7 +45,7 @@ public interface SymbolList {
    *
    * @return  the alphabet
    */
-  Alphabet alphabet();
+  Alphabet getAlphabet();
   
   /**
    * The number of symbols in this SymbolList.
@@ -130,7 +130,7 @@ public interface SymbolList {
    * The empty immutable implementation.
    */
   class EmptySymbolList implements SymbolList, Serializable {
-    public Alphabet alphabet() {
+    public Alphabet getAlphabet() {
       return Alphabet.EMPTY_ALPHABET;
     }
     

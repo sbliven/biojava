@@ -57,7 +57,7 @@ public class FixedWidthParser implements SymbolParser, Serializable {
     tokenToSymbol = new HashMap();
   }
 
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alpha;
   }
 
@@ -78,7 +78,7 @@ public class FixedWidthParser implements SymbolParser, Serializable {
 
   public void addTokenMap(String token, Symbol symbol)
          throws IllegalSymbolException, IllegalArgumentException {
-    alphabet().validate(symbol);
+    getAlphabet().validate(symbol);
     if(token.length() != tokenLength)
       throw new IllegalArgumentException("token '" + token +
                                          "' must be of length " + tokenLength);

@@ -64,10 +64,10 @@ implements StrandedFeature {
       );
     }
     this.strand = template.strand;
-    if(!ComplementSymbolList.isComplementable(sourceSeq.alphabet())) {
+    if(!ComplementSymbolList.isComplementable(sourceSeq.getAlphabet())) {
       throw new IllegalAlphabetException (
         "Can not create a stranded feature within a sequence of type " +
-        sourceSeq.alphabet().getName()
+        sourceSeq.getAlphabet().getName()
       );
     }
   }

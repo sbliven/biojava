@@ -48,12 +48,12 @@ public class NameParser implements SymbolParser, Serializable {
     nameToSymbol = new HashMap();
   }
   
-  public Alphabet alphabet() {
+  public Alphabet getAlphabet() {
     return alphabet;
   }
   
   public SymbolList parse(String seq) throws IllegalSymbolException {
-    SimpleSymbolList rList = new SimpleSymbolList(alphabet());
+    SimpleSymbolList rList = new SimpleSymbolList(getAlphabet());
     String [] names = (String []) nameToSymbol.keySet().toArray(new String[0]);
     while(seq.length() > 0) {
       int chosen = -1;
@@ -81,7 +81,7 @@ public class NameParser implements SymbolParser, Serializable {
     if(res == null) {
       throw new IllegalSymbolException(
         "No symbol for token '" + token +
-         "' found in name parser for " + alphabet().getName()
+         "' found in name parser for " + getAlphabet().getName()
        );
     }
     return res;
