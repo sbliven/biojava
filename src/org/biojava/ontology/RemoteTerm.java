@@ -76,7 +76,7 @@ public interface RemoteTerm extends Term {
                 throw new NullPointerException("RemoteTerm must not be null");
             }
             if(name == null) {
-              name = "[" + remoteTerm.getOntology().getName() + ":" + remoteTerm.getName() + "]";
+              name = remoteTerm.getOntology().getName() + "." + remoteTerm.getName();
             }
 
             this.ontology = ontology;

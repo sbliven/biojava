@@ -421,6 +421,10 @@ public interface Ontology extends Changeable {
     }
 
     public boolean containsTriple(Term subject, Term object, Term relation) {
+      if(!(subject.getOntology() == this)) return false;
+      if(!(object.getOntology() == this)) return false;
+      if(!(relation.getOntology() == this)) return false;
+
       return triples.contains(new Triple.Impl(subject, object, relation));
     }
 

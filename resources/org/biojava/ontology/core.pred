@@ -44,9 +44,10 @@ equal(implies(false, false), true)
 # A touch of maths
 #
 #
-add_one { we need to work on math ops over integers etc. - where should this
-          go? It could be in the integer ontology, or could be in integer.ops
-          or somewhere completely different. It's here for now anyway. }
+#integer { integers - this should come from the integer ontology. }
+#add_one { we need to work on math ops over integers etc. - where should this
+#          go? It could be in the integer ontology, or could be in integer.ops
+#          or somewhere completely different. It's here for now anyway. }
 
 # The foundational type system
 #
@@ -62,7 +63,7 @@ none          { no type at all - therefore no instances match }
 #
 relation      { a relation }
 domain        { the set a relation is from }
-co_domain     { the set a reiation is to }
+co_domain     { the set a relation is to }
 
 # Sets and their opperations
 #
@@ -87,8 +88,8 @@ implies { boolean contains true and false only }
 # a predicate as r(bool, bool)
 predicate { A relation where both arguments are from the booleans }
 isa(predicate, relation)
-domain(predicate, boolean)
-co_domain(predicate, boolean)
+domain(boolean, predicate)
+co_domain(boolean, predicate)
 
 # logical operators
 instanceof(and, predicate)
@@ -104,53 +105,72 @@ xor(equal(_x, _y),
     not_equal(_x, _y))
 
 instanceof(type, type)
-and { isa is over types }
-   (domain(isa, type), co_domain(isa, type))
+domain(type, isa)
+co_domain(type, isa)
+
 co_domain { things are instances of a type }
-         (instanceof, type)
+         (type, instanceof)
 instanceof { relation is a type }
-          (relation, type)
+          (type, relation)
 
 isa(any, type)
 isa(none, type)
-instanceof { everything is an any }
-          (_x, any)
-equal { nothing is a none }
-     (false, instanceof(_x, none))
+#instanceof { everything is an any }
+#          (_x, any)
+#equal { nothing is a none }
+#     (false,
+#      instanceof(_x, none))
+isa { all types are an any }
+   (_x, any)
 
 # domains, co-domains and defining relations as false for invalid args
 instanceof(domain, relation)
 instanceof(co_domain, relation)
-and(domain(set, domain), co_domain(relation, domain))
-and(domain(set, co_domain), co_domain(relation, co_domain))
-implies { If _d is not a member of the domain or _c is not a member of the
-          co-domain then _r(_d, _c) is always false }
+
+implies { instance of sub type is also instance of super type }
+       (and(instanceof(_i, _subType), isa(_child, _superType)),
+        instanceof(_i, _superType))
+
+domain(type, domain)
+co_domain(relation, domain)
+
+domain(type, co_domain)
+co_domain(relation, co_domain)
+
+domain_constraint as
+implies { If _d is not a member of the domain then _r(_d, _c) is always false }
        (equal(false,
-              and(and(domain(_D, _r), contains(_D, _d)),
-                  and(co_domain(_C, _r), contains(_C, _d)))),
+              and(domain(_D, _r), instanceof(_d, _D))),
+        equal(false, _r(_d, _c)))
+
+co_domain_constraint as
+implies { If _c is not a member of the co-domain then _r(_d, _c) is always false }
+       (equal(false,
+              and(co_domain(_C, _r), instanceof(_c, _C))),
         equal(false, _r(_d, _c)))
 
 # set stuff
-instanceof(set, type)
-instanceof(universal, set)
-instanceof(empty, set)
-
-instanceof(contains, relation)
-domain(contains, set)
-
-instanceof(not_contains, relation)
-domain(not_contains, set)
-
-contains { universal contains everything }
-        (universal, _x)
-
-equal { empty contains nothing }
-     (false,
-      contains(empty, _x))
-
-instanceof(relation, sub_set)
-and(domain(sub_set, set), co_domain(sub_set, set))
-
+#instanceof(set, type)
+#instanceof(universal, set)
+#instanceof(empty, set)
+#
+#instanceof(contains, relation)
+#domain(set, contains)
+#
+#instanceof(not_contains, relation)
+#domain(set, not_contains)
+#
+#contains { universal contains everything }
+#        (universal, _x)
+#
+#equal { empty contains nothing }
+#     (false,
+#      contains(empty, _x))
+#
+#instanceof(relation, sub_set)
+#domain(set, sub_set)
+#co_domain(set, sub_set)
+#
 # The main types of relation
 #
 #
@@ -160,18 +180,21 @@ antisymmetric { anti-symmetric }
 reflexive     { reflexive }
 
 isa(transitive, relation)
+transitive_closure as
 implies { if _r is transitive and _r(_x, _y) and _r(_y, _z) then _r(_x, _z)
        (and(instanceof(_r, transitive),
             and(_r(_x, _y), _r(_y, _z))),
         _r(_x, _z))
 
 isa(symmetric, relation)
+symmetric_closure as
 implies { if _r is symmetric and _r(_x, _y) then _r(_y, _x) }
        (and(instanceof(_r, symmetric),
             _r(_x, _y)),
         _r(_y, _x))
 
 isa(antisymmetric, relation)
+antisymmetric_closure as
 implies { if _r is antisymmetric and _r(_x, _y) and _r(_y, _x)
           then _x and _y are equal }
        (and(instanceof(_r, antisymmetric),
@@ -179,6 +202,7 @@ implies { if _r is antisymmetric and _r(_x, _y) and _r(_y, _x)
         equal(_x, _y))
 
 isa(reflexive, relation)
+reflexive_closure as
 implies { if _r is reflexive then _r(_x, _x) holds }
        (instanceof(_r, reflexive),
         _r(_x, _x))
@@ -198,119 +222,131 @@ isa(isa, partial_order)
 # Lists and their opperations
 #
 #
-list   { a list of items - syntactic sugar [a, b, c, ...] produces a list a with
-         head a and tail [b, c, ...]. The end of the list has no tail }
-head   { the head of the list }
-tail   { the tail of the list - either a list or none }
-length { the length of the list - 1 if tail == none, length(tail)+1 otherwise }
-
-and { head can be any item }
-   (and(instanceof(_l, list), instanceof(_h, any)),
-    head(_h, _l))
-
-and { tail can be nothing i.e. the end of the list or can be a list }
-   (and(instanceof(_l, list), or(instanceof(_t, list), instanceof(_t, none))),
-    tail(_l, _t))
-
-and { length of none is 0 }
-   (equal(_l, none),
-    length(_l, 0))
-and { length of a list is one more than the length of its tail }
-   (and(instanceof(_list, list), tail(_tail, _list)),
-    and(and(length(_length, _list), length(_tail_length, _tail)),
-        add_one(_length, _tail_length)))
-
+#list   { a list of items - syntactic sugar [a, b, c, ...] produces a list a with
+#         head a and tail [b, c, ...]. The end of the list has no tail }
+#head   { the head of the list as in head(_h, _l) }
+#tail   { the tail of the list - either a list or none, as in tail(_h, _l) }
+#length { the length of the list - 1 if tail == none, length(tail)+1 otherwise }
+#
+#co_domain(list, head)
+#co_domain(list, tail)
+#
+#domain(integer, length)
+#co_domain(list, length)
+#
+#and { tail can be nothing i.e. the end of the list or can be a list }
+#   (and(instanceof(_l, list), or(instanceof(_t, list), instanceof(_t, none))),
+#    tail(_t, _l))
+#
+#and { length of none is 0 }
+#   (equal(_l, none),
+#    length(0, _l))
+#and { length of a list is one more than the length of its tail }
+#   (and(instanceof(_list, list), tail(_tail, _list)),
+#    and(and(length(_length, _list), length(_tail_length, _tail)),
+#        add_one(_length, _tail_length)))
+#
 # Set operation deffinitions
 #
 #
-implies(contains(_S, _x),
-        and(instanceof(_S, set),
-            instanceof(_x, any)))
-xor(contains(_S, _x), not_contains(_S, _x))
-
-union { set-wise union }
-equal { union(X, Y) = Z <=> i e Z && (i e X or i e Y) }
-     (union([_X, _Y], _Z),
-      and(and(and(instanceof(_X, set), instanceof(_Y, set)), instanceof(_Z, set)),
-          and(contains(_Z, _i),
-              or(contains(_X, _i), contains(_Y, _i)))))
-
-intersection { set-wise intersection }
-equal { intersection(X, Y) = Z <=> i e Z && (i e X and i e Y) }
-     (intersection([_X, _Y], _Z),
-      and(and(and(instanceof(_X, set), instanceof(_Y, set)), instanceof(_Z, set)),
-          and(contains(_Z, _i),
-              and(contains(_X, _i), contains(_Y, _i)))))
-
-subtraction { set-wise subtraction }
-equal { subtraction(X, Y) = Z <=> i e Z && (i e X and not i e Y) }
-     (subtraction([_X, _Y], _Z),
-      and(and(and(instanceof(_X, set), instanceof(_Y, set)), instanceof(_Z, set)),
-          and(contains(_Z, _i),
-              and(contains(_X, _i), not_contains(_Y, _i)))))
-
-disjoint { sets are disjoint if no item is a member of both }
-equal { disjoint(X, Y) = not (i e X && i e Y) }
-     (disjoint(_X, _Y),
-      equal(and(contains(_X, _i), contains(_Y, _i)), false))
-
-subset { one set is a subset of the other }
-equal { X subset Y <=> x e X => x e Y }
-     (subset(_X, _Y),
-      implies(contains(_X, _x), contains(_Y, _x)))
-
-remove { remove an item from a set }
-and(remove([_X, _x], _Z),
-    and(contains(_Z, _i),
-        and(contains(_X, _x), not_equal(_i, _x))))
-
-add { add an item to a set }
-and { adding an item means that the result contains all the originals as well as
-      the one you added }
-   (add([_X, _x], _Z),
-    and(contains(_Z, _i),
-        or(contains(_X, _i), equal(_x, _i))))
-
-equal { A set contains an item _x if adding it produces an equal set }
-     (contains(_X, _x),
-      add([_X, _x], _X))
-
-implies { sets are equal if they contain exactly the same items }
-       (and(instanceof(_S, set), and(instanceof(_T, set), equal(_S, _T))),
-        equal(contains(_S, _i), contains(_T, _i)))
-
+#implies(contains(_S, _x),
+#        and(instanceof(_S, set),
+#            instanceof(_x, any)))
+#xor(contains(_S, _x), not_contains(_S, _x))
+#
+#union { set-wise union }
+#domain(set, union)
+#co_domain(set, union)
+#equal { union(X, Y) = Z <=> i e Z && (i e X or i e Y) }
+#     (union([_X, _Y], _Z),
+#      and(and(and(instanceof(_X, set), instanceof(_Y, set)), instanceof(_Z, set)),
+#          and(contains(_Z, _i),
+#              or(contains(_X, _i), contains(_Y, _i)))))
+#
+#intersection { set-wise intersection }
+#domain(set, intersection)
+#co_domain(set, intersection)
+#equal { intersection(X, Y) = Z <=> i e Z && (i e X and i e Y) }
+#     (intersection([_X, _Y], _Z),
+#      and(and(and(instanceof(_X, set), instanceof(_Y, set)), instanceof(_Z, set)),
+#          and(contains(_Z, _i),
+#              and(contains(_X, _i), contains(_Y, _i)))))
+#
+#subtraction { set-wise subtraction }
+#co_domain(set, subtraction)
+#equal { subtraction(X, Y) = Z <=> i e Z && (i e X and not i e Y) }
+#     (subtraction([_X, _Y], _Z),
+#      and(and(and(instanceof(_X, set), instanceof(_Y, set)), instanceof(_Z, set)),
+#          and(contains(_Z, _i),
+#              and(contains(_X, _i), not_contains(_Y, _i)))))
+#
+#disjoint { sets are disjoint if no item is a member of both }
+#domain(set, disjoint)
+#co_domain(set, disjoint)
+#equal { disjoint(X, Y) = not (i e X && i e Y) }
+#     (disjoint(_X, _Y),
+#      equal(and(contains(_X, _i), contains(_Y, _i)), false))
+#
+#subset { one set is a subset of the other }
+#domain(set, subset)
+#co_domain(set, subset)
+#equal { X subset Y <=> x e X => x e Y }
+#     (subset(_X, _Y),
+#      implies(contains(_X, _x), contains(_Y, _x)))
+#
+#remove { remove an item from a set }
+#and(remove([_X, _x], _Z),
+#    and(contains(_Z, _i),
+#        and(contains(_X, _x), not_equal(_i, _x))))
+#
+#add { add an item to a set }
+#and { adding an item means that the result contains all the originals as well as
+#      the one you added }
+#   (add([_X, _x], _Z),
+#    and(contains(_Z, _i),
+#        or(contains(_X, _i), equal(_x, _i))))
+#
+#equal { A set contains an item _x if adding it produces an equal set }
+#     (contains(_X, _x),
+#      add([_X, _x], _X))
+#
+#implies { sets are equal if they contain exactly the same items }
+#       (and(instanceof(_S, set), and(instanceof(_T, set), equal(_S, _T))),
+#        equal(contains(_S, _i), contains(_T, _i)))
+#
 # Agregate functions
 #
 #
-agregate { Make a function for a set from a function for two items of the set }
-
-implies { Agregate built from a relation }
-       (agregate(_r, _agr),
-        and(instanceof(_r, relation), instanceof(_agr, relation)))
-
-implies { Agregate over r has domain equal to all sub-sets of r's domain }
-       (agregate(_r, _agr),
-        and(and(and(domain(_Dr, _r), domain(_Dagr, _agr)), contains(_Darg, _darg)),
-            subset(_darg, _Dr)))
-implies { Agregate over r has co-domain equal to r }
-       (agregate(_r, _agr),
-        and(co_domain(_C, _r), co_domain(_C, _agr)))
-implies { Value of agregate of empty set is the same as the value of the
-          relation for none }
-       (agregate(_r, _agr),
-        and(_agr(empty, _res), _r(none, _res)))
-implies { Value of agregate for non-empty set is equal to r of any one item and
-          the agregate of all all remaining items }
-       (agregate(_r, _agr),
-        and(_agr(_X, _res),
-            and(_r([_x, _next], _res),
-                and(contains(_X, _x),
-                    and(remove([_X, _x], _X_),
-                        _agr(_X_, _next))))))
-
-for_each       { for every item in a set, a predicate holds }
-there_exists   { there is an item in a set for which a predicate holds }
-exactly_one    { there is exactly one item in a set for which a predicate holds }
-agregate(and, for_each)
-agregate(or, there_exists)
-agregate(xor, exactly_one)
+#agregate { Make a function for a set from a function for two items of the set }
+#domain(relation, agregate)
+#co_domain(relation, agregate)
+#
+#implies { Agregate must be over a function with equal domain and co_domain }
+#       (agregate(_r, _agr),
+#        and(domain(_t, _r), co_domain(_t, _r)))
+#implies { Agregate over r has domain equal to all sub-sets of r's domain }
+#       (agregate(_r, _agr),
+#        and(and(and(domain(_Dr, _r), domain(_Dagr, _agr)), contains(_Darg, _darg)),
+#            subset(_darg, _Dr)))
+#implies { Agregate over r has co-domain equal to r }
+#       (agregate(_r, _agr),
+#        and(co_domain(_C, _r), co_domain(_C, _agr)))
+#implies { Value of agregate of empty set is the same as the value of the
+#          relation for none }
+#       (agregate(_r, _agr),
+#        and(_agr(empty, _res), _r(none, _res)))
+#implies { Value of agregate for non-empty set is equal to r of any one item and
+#          the agregate of all all remaining items }
+#       (agregate(_r, _agr),
+#        and(_agr(_X, _res),
+#            and(_r([_x, _next], _res),
+#                and(contains(_X, _x),
+#                    and(remove([_X, _x], _X_),
+#                        _agr(_X_, _next))))))
+#
+#for_each       { for every item in a set, a predicate holds }
+#there_exists   { there is an item in a set for which a predicate holds }
+#exactly_one    { there is exactly one item in a set for which a predicate holds }
+#agregate(and, for_each)
+#agregate(or, there_exists)
+#agregate(xor, exactly_one)

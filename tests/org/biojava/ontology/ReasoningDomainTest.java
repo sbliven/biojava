@@ -102,31 +102,31 @@ extends TestCase {
       System.err.println("\t-> " + matcher.next());
     }
 
-/*    matcher = coreD.getMatching(OntoTools.PARTIAL_ORDER, OntoTools.REFLEXIVE, OntoTools.ISA);
+    matcher = coreD.getMatching(OntoTools.PARTIAL_ORDER, OntoTools.REFLEXIVE, OntoTools.ISA);
     while(matcher.hasNext()) {
-      System.err.println(matcher.next());
+      System.err.println("\t-> " + matcher.next());
     }
 
     matcher = coreD.getMatching(OntoTools.REFLEXIVE, OntoTools.RELATION, OntoTools.ISA);
     while(matcher.hasNext()) {
-      System.err.println(matcher.next());
+      System.err.println("\t-> " + matcher.next());
     }
 
     matcher = coreD.getMatching(OntoTools.PARTIAL_ORDER, OntoTools.RELATION, OntoTools.ISA);
     while(matcher.hasNext()) {
-      System.err.println(matcher.next());
+      System.err.println("\t-> " + matcher.next());
     }
 
     matcher = coreD.getMatching(OntoTools.ISA, OntoTools.RELATION, OntoTools.ISA);
     while(matcher.hasNext()) {
-      System.err.println(matcher.next());
+      System.err.println("\t-> " + matcher.next());
     }
 
-    matcher = coreD.getMatching(OntoTools.ISA, coreD.createVariable("parent"), OntoTools.ISA);
+    matcher = coreD.getMatching(OntoTools.ISA, coreD.createVariable("_parent"), OntoTools.ISA);
     while(matcher.hasNext()) {
-      System.err.println(matcher.next());
+      System.err.println("\t-> " + matcher.next());
     }
-*/
+
 
     //assertTrue(coreD.getMatching(OntoTools.RELATION, OntoTools.ANY, OntoTools.ISA));
     //assertTrue(coreD.getMatching(OntoTools.ISA, OntoTools.ISA, OntoTools.ISA));

@@ -59,7 +59,10 @@ Productions
   import_expr = import full_name as name;
 
   expression_decl =
-    expression;
+    expression_name? expression;
+
+  expression_name =
+    name as;
 
   expression =
     {complex} [predicate]:predicate comment?

@@ -47,6 +47,8 @@ public class TriplesParser {
     private final Map anonymousNode2Term;
     private final Map anonymousName2Term;
 
+    private String exprName;
+
     public Processor(OntologyFactory oFact, ReasoningDomain domain) {
       this.oFact = oFact;
       this.domain = domain;
@@ -101,6 +103,12 @@ public class TriplesParser {
       counter++;
       depth = 0;
 
+      exprName = null;
+      if(aExpressionDecl.getExpressionName() != null) {
+        AExpressionName aExprName
+                = (AExpressionName) aExpressionDecl.getExpressionName();
+        exprName = aExprName.getName().getText();
+      }
       //System.err.println("Processing expression: " + counter + ": " + aExpressionDecl);
     }
 
@@ -153,8 +161,9 @@ public class TriplesParser {
         Term object = resolve(aComplexExpression.getObject());
         Term predicate = resolve(aComplexExpression.getPredicate());
 
+        String name = (depth == 1) ? exprName : null;
         String desc = makeDescription(aComplexExpression.getComment());
-        Triple triple = onto.createTriple(subject, object, predicate, null, desc);
+        Triple triple = onto.createTriple(subject, object, predicate, name, desc);
         register(aComplexExpression, aComplexExpression.toString(), triple);
       } catch (AlreadyExistsException e) {
         Token tok = aComplexExpression.getLeftElipse();

@@ -109,7 +109,7 @@ public interface Triple
     private final Term subject;
     private final Term object;
     private final Term relation;
-    private final String name;
+    private /*final*/ String name;
     private final String description;
 
     public Impl(Term subject, Term object, Term relation) {
@@ -134,7 +134,8 @@ public interface Triple
 
       if(
               subject.getOntology() != object.getOntology() ||
-              subject.getOntology() != relation.getOntology()) {
+              subject.getOntology() != relation.getOntology()
+      ) {
         throw new IllegalArgumentException(
                 "All terms must be from the same ontology: " +
                 subject.getOntology().getName() + ", " +
@@ -142,11 +143,6 @@ public interface Triple
                 relation.getOntology().getName());
       }
 
-      if(name == null) {
-        name = "(subject: " + subject +
-                ", object: " + object +
-                ", relation: " + relation + ")";
-      }
       if(description == null) {
         description = "";
       }
@@ -159,6 +155,9 @@ public interface Triple
     }
 
     public String getName() {
+      if(name == null) {
+        name = relation + "(" + subject + ", " + object + ")";
+      }
       return name;
     }
 
@@ -207,7 +206,7 @@ public interface Triple
     }
 
     public String toString() {
-      return name;
+      return getName();
     }
   }
 }
