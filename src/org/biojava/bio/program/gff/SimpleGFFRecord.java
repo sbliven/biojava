@@ -75,7 +75,9 @@ public class SimpleGFFRecord implements GFFRecord {
   private String comment;
 
 	/**
-	* Constructor - taking GFFRecord as an argument
+	* Create a new SimpleGFFRecord from GFFRecord object
+	* 
+	* @param rec - A GFFRecord object
 	*/
 
 	public SimpleGFFRecord(GFFRecord rec) {
@@ -93,7 +95,7 @@ public class SimpleGFFRecord implements GFFRecord {
 
 
    /**
-	 * Constructor - Setting everything to null or zero
+	 * Create a new SimpleGFFRecord with values set to null or zero
 	 */
 
 	public SimpleGFFRecord() {
