@@ -39,6 +39,10 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
     private double    score;
     private double    pValue;
     private double    eValue;
+    private int       queryStart;
+    private int       queryEnd;
+    private int       subjectStart;
+    private int       subjectEnd;
     private Alignment alignment;
 
     /**
@@ -53,15 +57,23 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
      * @param alignment an <code>Alignment</code> object containing
      * the alignemnt described by the subhit region.
      */
-    public SequenceDBSearchSubHit(final double    score,
+    public SequenceDBSearchSubHit(final int       queryStart,
+				  final int       queryEnd,
+				  final int       subjectStart,
+				  final int       subjectEnd,
+				  final double    score,
 				  final double    eValue,
 				  final double    pValue,
 				  final Alignment alignment)
     {
-	this.score     = score;
-	this.pValue    = eValue;
-	this.eValue    = pValue;
-	this.alignment = alignment;
+	this.score        = score;
+	this.pValue       = eValue;
+	this.eValue       = pValue;
+	this.queryStart   = queryStart;
+	this.queryEnd     = queryEnd;
+	this.subjectStart = subjectStart;
+	this.subjectEnd   = subjectEnd;
+	this.alignment    = alignment;
 
 	// Lock alignment by vetoing all changes
 	this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
@@ -80,6 +92,26 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
     public double getEValue()
     {
 	return eValue;
+    }
+
+    public int getQueryStart()
+    {
+	return queryStart;
+    }
+
+    public int getQueryEnd()
+    {
+	return queryEnd;
+    }
+
+    public int getSubjectStart()
+    {
+	return subjectStart;
+    }
+
+    public int getSubjectEnd()
+    {
+	return subjectEnd;
     }
 
     public Alignment getAlignment()
@@ -109,7 +141,13 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
 	    return false;
 	if (! ObjectUtil.equals(this.eValue, that.eValue))
 	    return false;
-	if (! ObjectUtil.equals(this.alignment, that.alignment))
+	if (! ObjectUtil.equals(this.queryStart, that.queryStart))
+	    return false;
+	if (! ObjectUtil.equals(this.queryEnd, that.queryEnd))
+	    return false;
+	if (! ObjectUtil.equals(this.subjectStart, that.subjectStart))
+	    return false;
+	if (! ObjectUtil.equals(this.subjectEnd, that.subjectEnd))
 	    return false;
 
 	return true;
@@ -122,7 +160,10 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
 	hCode = ObjectUtil.hashCode(hCode, score);
 	hCode = ObjectUtil.hashCode(hCode, pValue);
 	hCode = ObjectUtil.hashCode(hCode, eValue);
-	hCode = ObjectUtil.hashCode(hCode, alignment);
+	hCode = ObjectUtil.hashCode(hCode, queryStart);
+	hCode = ObjectUtil.hashCode(hCode, queryEnd);
+	hCode = ObjectUtil.hashCode(hCode, subjectStart);
+	hCode = ObjectUtil.hashCode(hCode, subjectEnd);
 
 	return hCode;
     }

@@ -78,6 +78,13 @@ public class FastaSearchBuilder implements SearchBuilder
     private Map                     searchParameters;
     private Map                     hitData;
 
+    private StringBuffer            querySeqBuf;
+    private StringBuffer            subjectSeqBuf;
+    private StringBuffer            querySeqPrep;
+    private StringBuffer            subjectSeqPrep;
+
+    private GappedSymbolListBuilder gslBuilder;
+
     // Hits are appended to this ArrayList as they are parsed from a
     // stream. The Fasta program pre-sorts the hits in order of
     // significance. This implementation currently relies of this to
@@ -104,6 +111,11 @@ public class FastaSearchBuilder implements SearchBuilder
     {
 	this.subjectDBs     = subjectDBs;
 	this.querySeqHolder = querySeqHolder;
+
+	querySeqBuf    = new StringBuffer();
+	subjectSeqBuf  = new StringBuffer();
+	querySeqPrep   = new StringBuffer();
+	subjectSeqPrep = new StringBuffer();
     }
 
     /**
@@ -244,21 +256,69 @@ public class FastaSearchBuilder implements SearchBuilder
 					     final Annotation hitAnnotation)
 	throws BioException
     {
-	String subjectSeqID  = (String) hitData.get("id");
-	Double score         = (Double) hitData.get("fa_z-score");
-	Double eValue        = (Double) hitData.get("fa_expect");
-	Double pValue        = (Double) hitData.get("fa_expect");
+	String subjectSeqID = (String) hitData.get("id");
+	Double        score = (Double) hitData.get("fa_z-score");
+	Double       eValue = (Double) hitData.get("fa_expect");
+	Double       pValue = (Double) hitData.get("fa_expect");
+
+	Integer     queryStart = (Integer) hitData.get("query_al_start");
+	Integer       queryEnd = (Integer) hitData.get("query_al_stop");
+	Integer queryDispStart = (Integer) hitData.get("query_al_display_start");
+	String  querySeqTokens = (String)  hitData.get("querySeqTokens");
+
+	Integer     subjectStart = (Integer) hitData.get("subject_al_start");
+	Integer       subjectEnd = (Integer) hitData.get("subject_al_stop");
+	Integer subjectDispStart = (Integer) hitData.get("subject_al_display_start");
+	String  subjectSeqTokens = (String)  hitData.get("subjectSeqTokens");
+
+	String           seqType = (String)  hitData.get("query_sq_type");
+
+	// What happens if Fasta is given an RNA sequence?
+	FiniteAlphabet alpha;
+
+	if (seqType.equals("DNA"))
+	    alpha = DNATools.getDNA();
+	else
+	    alpha = ProteinTools.getAlphabet();
+
+	if (gslBuilder == null)
+	    gslBuilder = new GappedSymbolListBuilder(alpha);
 
 	// There is only ever one subhit in a Fasta hit
 	List subHits = new ArrayList();
 
+	querySeqBuf.delete(0, querySeqBuf.length());
+	querySeqPrep.delete(0, querySeqPrep.length());
+	querySeqBuf.append(querySeqTokens);
+
+	subjectSeqBuf.delete(0, subjectSeqBuf.length());
+	subjectSeqPrep.delete(0, subjectSeqPrep.length());
+	subjectSeqBuf.append(subjectSeqTokens);
+
 	try
 	{
 	    // System.out.println("Making alignment with: " + hitData);
-	    Alignment alignment = createAlignment(subjectSeqID, hitData);
+	    querySeqPrep.append(prepSeqTokens(querySeqBuf,
+					      queryStart,
+					      queryEnd,
+					      queryDispStart));
+
+	    subjectSeqPrep.append(prepSeqTokens(subjectSeqBuf,
+						subjectStart,
+						subjectEnd,
+						subjectDispStart));
+
+	    Alignment alignment = createAlignment(subjectSeqID,
+						  querySeqPrep,
+						  subjectSeqPrep,
+						  gslBuilder);
 
 	    SeqSimilaritySearchSubHit subHit =
-		new SequenceDBSearchSubHit(score.doubleValue(),
+		new SequenceDBSearchSubHit(queryStart.intValue(),
+					   queryEnd.intValue(),
+					   subjectStart.intValue(),
+					   subjectEnd.intValue(),
+					   score.doubleValue(),
 					   eValue.doubleValue(),
 					   pValue.doubleValue(),
 					   alignment);
@@ -321,44 +381,30 @@ public class FastaSearchBuilder implements SearchBuilder
      * @param subjectSeqID a <code>String</code> which will be used to
      * set the label of the subject sequence. The query label is a
      * static field in the SeqSimilaritySearchSubHit interface.
-     * @param hitData a <code>Map</code> object.
+     * @param querySeqBuf a <code>StringBuffer</code> containing the
+     * sequence tokens for the query sequence.
+     * @param subjectSeqBuf a <code>StringBuffer</code> containing the
+     * sequence tokens for the subject sequence.
+     * @param gslBuilder a <code>GappedSymbolListBuilder</code>
+     * object.
      *
      * @return an <code>Alignment</code> object.
      *
      * @exception IllegalSymbolException if tokens from the sequence
      * are not recognised in the chosen alphabet.
      */
-    private Alignment createAlignment(final String subjectSeqID,
-				      final Map    hitData)
+    private Alignment createAlignment(final String                  subjectSeqID,
+				      final StringBuffer            querySeqBuf,
+				      final StringBuffer            subjectSeqBuf,
+				      final GappedSymbolListBuilder gslBuilder)
 	throws IllegalSymbolException
     {
-	String seqType = (String) hitData.get("query_sq_type");
-
-	FiniteAlphabet alpha;
-
-	// What happens if Fasta is given an RNA sequence?
-	if (seqType.equals("DNA"))
-	    alpha = DNATools.getDNA();
-	else
-	    alpha = ProteinTools.getAlphabet();
-
-	StringBuffer querySeqTokens =
-	    new StringBuffer(prepSeqTokens("query",   hitData));
-	StringBuffer subjectSeqTokens =
-	    new StringBuffer(prepSeqTokens("subject", hitData));
-
 	Map labelMap = new HashMap();
 
-	// System.out.println("Passing query: "   + querySeqTokens);
-	// System.out.println("Passing subject: " + subjectSeqTokens);
-
-	GappedSymbolListBuilder gslBuilder =
-	    new GappedSymbolListBuilder(alpha);
-
 	labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL, 
-		     gslBuilder.makeGappedSymbolList(querySeqTokens));
+		     gslBuilder.makeGappedSymbolList(querySeqBuf));
 	labelMap.put(subjectSeqID,
-		     gslBuilder.makeGappedSymbolList(subjectSeqTokens));
+		     gslBuilder.makeGappedSymbolList(subjectSeqBuf));
 
 	return new SimpleAlignment(labelMap);
     }
@@ -373,26 +419,23 @@ public class FastaSearchBuilder implements SearchBuilder
      * too. See the Fasta documentation for an explanation of the
      * format.
      *
-     * @param name a <code>String</code> value (either "query" or
-     * "subject" indicating which sequence to grab from the
-     * accompanying Map object.
-     * @param hitData a <code>Map</code> object containing the data to
-     * process.
+     * @param name a <code>StringBuffer</code> containing the
+     * unprepared sequence tokens.
+     * @param alStart an <code>Integer</code> indicating the start
+     * position of the alignment in the original sequence.
+     * @param alStop an <code>Integer</code> indicating the stop
+     * position of the alignment in the original sequence.
+     * @param alDispStart an <code>Integer</code> indicating the start
+     * of a flanking context in the original sequence.
      *
      * @return a <code>String</code> value consisting of a subsequence
-     * containing only the interesting alignment.
+     * containing only the interesting alignment.#
      */
-    private String prepSeqTokens(final String name, final Map hitData)
+    private String prepSeqTokens(final StringBuffer  seqTokens,
+				 final Integer       alStart,
+				 final Integer       alStop,
+				 final Integer       alDispStart)
     {
-	// System.out.println("hitData: " + hitData);
-
-	Integer alDispStart = (Integer) hitData.get(name + "_al_display_start");
-	Integer     alStart = (Integer) hitData.get(name + "_al_start");
-	Integer      alStop = (Integer) hitData.get(name + "_al_stop");    
-
-	StringBuffer seqTokens =
-	    new StringBuffer((String) hitData.get(name + "SeqTokens"));
-
 	// Strip leading gap characters
 	while (seqTokens.charAt(0) == '-')
 	    seqTokens.deleteCharAt(0);

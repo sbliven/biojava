@@ -69,20 +69,19 @@ class EmblLikeLocationParser
     private int           nextCharIndex;
     private Object        thisToken;
 
-    // List of sublocations
-    private List subLocations;
-
     // Stores join/order/complement instructions
-    private List instructStack;
+    private List instructStack = new ArrayList();
+    // List of sublocations
+    private List  subLocations = new ArrayList();
 
     // These hold working data for each (sub)location and are cleared
     // by calling the processCoords() function
-    private List      startCoords;
-    private List      endCoords;
-    private boolean   isPointLoc = true;
-    private boolean   fuzzyCoord = false;
-    private boolean   unboundMin = false;
-    private boolean   unboundMax = false;
+    private List   startCoords = new ArrayList();
+    private List     endCoords = new ArrayList();
+    private boolean isPointLoc = true;
+    private boolean fuzzyCoord = false;
+    private boolean unboundMin = false;
+    private boolean unboundMax = false;
 
     // Currently set per Feature; this is a deficiency in the current
     // parser
@@ -115,12 +114,10 @@ class EmblLikeLocationParser
 	    throw new BioException("Unbalanced parentheses in location: "
 				   + location);
 
-	startCoords   = new ArrayList();
-	endCoords     = new ArrayList();
-	instructStack = new ArrayList();
-	subLocations  = new ArrayList();
-
 	nextCharIndex = 0;
+
+	instructStack.clear();
+	subLocations.clear();
 
 	thisToken = lexer.getNextToken();
 	while (thisToken != null)
@@ -385,8 +382,7 @@ class EmblLikeLocationParser
 	{
 	    // This is a primary accession number
 	    // e.g. J00194:(100..202)
-  	     throw new BioException("Remote locations are not supported: "
-				    + location);
+  	     throw new BioException("Remote locations are not supported: " + location);
 	}
     }
 
@@ -509,7 +505,7 @@ class EmblLikeLocationParser
 		textString += thisChar;
 		nextCharIndex++;
 
-		if (nextCharIndex >= location.length ())
+		if (nextCharIndex >= location.length())
 		    break;
 
 		thisChar = location.charAt(nextCharIndex);

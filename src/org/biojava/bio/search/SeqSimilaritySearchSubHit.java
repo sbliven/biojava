@@ -50,6 +50,36 @@ public interface SeqSimilaritySearchSubHit
     double getEValue();
   
     /**
+     * Return the start position of the sub-hit in the query sequence.
+     *
+     * @return an <code>int</code> value.
+     */
+    int getQueryStart();
+
+    /**
+     * Return the end position of the sub-hit in the query sequence.
+     *
+     * @return an <code>int</code> value.
+     */
+    int getQueryEnd();
+
+    /**
+     * Return the start position of the sub-hit in the subject
+     * sequence.
+     *
+     * @return an <code>int</code> value.
+     */
+    int getSubjectStart();
+
+    /**
+     * Return the start position of the sub-hit in the subject
+     * sequence.
+     *
+     * @return an <code>int</code> value.
+     */
+    int getSubjectEnd();
+
+    /**
      * Return an alignment of (possibly part of) the query sequence
      * against (possibly part of) this hit sequence. In this
      * alignment, the query is identified by the label given by the

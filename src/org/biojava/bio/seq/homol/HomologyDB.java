@@ -29,7 +29,7 @@ import org.biojava.bio.seq.db.*;
 
 public interface HomologyDB {
   /**
-   * Retreive the SeqDBs that have been searched against each other.
+   * Retrieve the SeqDBs that have been searched against each other.
    *
    * @return a List of SequenceDB objects
    */

@@ -21,7 +21,6 @@ import java.util.*;
 public class SimpleSeqSimilaritySearchHit
     implements SeqSimilaritySearchHit, Cloneable
 {
-    private SeqSimilaritySearchResult searchResult;
     private double                    score;
     private double                    pValue;
     private double                    eValue;
@@ -31,8 +30,6 @@ public class SimpleSeqSimilaritySearchHit
     /**
      * Construct an immutable object from the values of all
      * properties.
-     * @param searchResult the search result of which this search hit
-     * is a part. Not null.
      * @param score the overall score of this hit. This is a mandatory
      * piece of information and may hence not be NaN.
      * @param pValue the overall P-value of this hit. May be NaN.
@@ -43,21 +40,18 @@ public class SimpleSeqSimilaritySearchHit
      * @param subHits a List of SeqSimilaritySearchSubHit objects
      * containing all sub-hits for this hit. Not null.
      */
-    public SimpleSeqSimilaritySearchHit(SeqSimilaritySearchResult searchResult,
+    public SimpleSeqSimilaritySearchHit(String                    sequenceID,
 					double                    score,
-					double                    pValue,
 					double                    eValue,
-					String                    sequenceID,
+					double                    pValue,
 					List                      subHits)
     {
-	Contract.pre(searchResult != null, "searchResult was null");
 	Contract.pre(! Double.isNaN(score), "score was NaN");
 	// pValue may be NaN
 	// eValue may be NaN
 	Contract.pre(sequenceID != null, "sequenceID was null");
 	Contract.pre(subHits != null, "subHits was null");
 
-	this.searchResult = searchResult;
 	this.score        = score;
 	this.pValue       = pValue;
 	this.eValue       = eValue;
@@ -110,8 +104,6 @@ public class SimpleSeqSimilaritySearchHit
 	SimpleSeqSimilaritySearchHit that = (SimpleSeqSimilaritySearchHit) o;
     
 	// only compare fields of this class (not of super-classes):
-	if (! ObjectUtil.equals(this.searchResult, that.searchResult))
-	    return false;
 	if (! ObjectUtil.equals(this.score, that.score))
 	    return false;
 	if (! ObjectUtil.equals(this.pValue, that.pValue))
@@ -133,7 +125,6 @@ public class SimpleSeqSimilaritySearchHit
 	int hc = 0;
 
 	// only take into account fields of this class (not of super-class):
-	hc = ObjectUtil.hashCode(hc, searchResult);
 	hc = ObjectUtil.hashCode(hc, score);
 	hc = ObjectUtil.hashCode(hc, pValue);
 	hc = ObjectUtil.hashCode(hc, eValue);

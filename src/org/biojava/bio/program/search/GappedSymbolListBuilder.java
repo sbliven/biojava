@@ -45,7 +45,7 @@ class GappedSymbolListBuilder
     /**
      * <code>INCREMENT</code> is the length that the gapIndices array
      * is extended by if it overflows its inital allocation of 128
-     * gaps
+     * gaps.
      */
     private static final int INCREMENT = 128;
 
@@ -59,7 +59,7 @@ class GappedSymbolListBuilder
      * Creates a new <code>GappedSymbolListBuilder</code> object.
      *
      * @param alpha a <code>FiniteAlphabet</code> object into which
-     * the sequence tokens will be parsed
+     * the sequence tokens will be parsed.
      */
     GappedSymbolListBuilder(final FiniteAlphabet alpha)
     {
@@ -128,12 +128,12 @@ class GappedSymbolListBuilder
 
     /**
      * The <code>recordGap</code> method records positions of
-     * individual gap characters
+     * individual gap characters.
      *
      * @param gapCount an <code>int</code> value n, indicating that
      * this is the n'th gap.
      * @param gapIndex an <code>int</code> value indicating the
-     * position of this gap within the sequence
+     * position of this gap within the sequence.
      */
     private void recordGap(final int gapCount, final int gapIndex)
     {
