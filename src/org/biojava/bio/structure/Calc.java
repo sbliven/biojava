@@ -256,6 +256,42 @@ public class Calc {
     }
 
 
+    /** rotate a structure */
+    public static void rotate(Structure structure, double[][] m)
+	throws StructureException
+    {
+	
+	if ( m.length != 3 ) {
+	    throw new StructureException ("matrix does not have size 3x3 !");
+	}
+	AtomIterator iter = new AtomIterator(structure) ;
+	while (iter.hasNext()) {
+	    Atom atom = (Atom) iter.next() ;
+	    double x = atom.getX();
+	    double y = atom.getY() ;
+	    double z = atom.getZ();
+	    
+	    double nx = m[0][0] * x + m[0][1] * y +  m[0][2] * z ;
+	    double ny = m[1][0] * x + m[1][1] * y +  m[1][2] * z ;
+	    double nz = m[2][0] * x + m[2][1] * y +  m[2][2] * z ;
+	    
+	    double[] coords = new double[3] ;
+	    coords[0] = nx ;
+	    coords[1] = ny ;
+	    coords[2] = nz ;
+	    atom.setCoords(coords);
+	}
+    }
+
+    /** shift a structure with a vector */
+    public static void shift(Structure structure, Atom a ){
+
+	AtomIterator iter = new AtomIterator(structure) ;
+	while (iter.hasNext() ) {
+	    Atom atom = (Atom) iter.next()  ;	    
+	    atom = add(atom,a);	   
+	}
+    }
     
 
 
