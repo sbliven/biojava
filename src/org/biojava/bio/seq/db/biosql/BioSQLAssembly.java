@@ -217,9 +217,7 @@ class BioSQLAssembly
 
     private AssembledSymbolList symbols;
 
-    protected synchronized SymbolList getSymbols()
-        throws BioRuntimeException
-    {
+    protected synchronized SymbolList getSymbols() {
 	if (symbols == null) {
 	    FeatureHolder components = getComponentFeatures();
 	    symbols = new AssembledSymbolList();

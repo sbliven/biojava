@@ -97,7 +97,7 @@ class BioSQLStrandedFeature extends BioSQLFeature implements StrandedFeature {
     public BioSQLStrandedFeature(Sequence sourceSeq,
                                  FeatureHolder parent,
                                  StrandedFeature.Template template)
-	throws IllegalArgumentException, IllegalAlphabetException 
+	throws IllegalAlphabetException 
     {
         super(sourceSeq, parent, template);
         this.strand = template.strand;
@@ -105,7 +105,7 @@ class BioSQLStrandedFeature extends BioSQLFeature implements StrandedFeature {
 
     public BioSQLStrandedFeature(Sequence sourceSeq,
                                  StrandedFeature.Template template)
-	throws IllegalArgumentException, IllegalAlphabetException 
+	throws IllegalAlphabetException 
     {
         super(sourceSeq, template);
         this.strand = template.strand;

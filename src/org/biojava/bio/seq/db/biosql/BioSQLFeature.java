@@ -71,7 +71,7 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
 
     BioSQLFeature(Sequence seq,
 		  Feature.Template templ)
-	throws IllegalArgumentException, IllegalAlphabetException
+	throws IllegalAlphabetException
     {
 	this.type = templ.type;
 	this.source = templ.source;
@@ -85,7 +85,7 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     BioSQLFeature(Sequence seq,
 		  FeatureHolder parent,
 		  Feature.Template templ)
-	throws IllegalArgumentException, IllegalAlphabetException
+	throws IllegalAlphabetException
     {
 	this(seq, templ);
 	if (parent instanceof BioSQLFeature) {
