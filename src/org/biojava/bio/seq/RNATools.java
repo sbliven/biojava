@@ -24,8 +24,8 @@ package org.biojava.bio.seq;
 import java.io.*;
 import java.util.*;
 
+import javax.xml.parsers.*;
 import org.w3c.dom.*;
-import org.apache.xerces.parsers.*;
 import org.xml.sax.*;
 
 import org.biojava.bio.*;
@@ -311,9 +311,8 @@ public final class RNATools {
       }
       
       InputSource is = new InputSource(tablesStream);
-      DOMParser parser = new DOMParser();
-      parser.parse(is);
-      Document doc = parser.getDocument();
+      DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      Document doc = parser.parse(is);
       
       NodeList children = doc.getDocumentElement().getChildNodes();
       for(int i = 0; i < children.getLength(); i++) {

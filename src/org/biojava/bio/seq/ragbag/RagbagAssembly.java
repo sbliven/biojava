@@ -25,9 +25,7 @@ import java.io.*;
 import java.util.*;
  
 import org.xml.sax.*;
-import org.biojava.utils.stax.*;
-import org.apache.xerces.parsers.*;
- 
+
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.BioException;

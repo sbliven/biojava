@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.xerces.parsers.DOMParser;
+import javax.xml.parsers.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -687,11 +687,10 @@ class AbstractGenEmblFileFormer
 				   + featureDataFile);
 
 	    InputSource   is = new InputSource(featureDataStream);
-	    DOMParser parser = new DOMParser();
-	    parser.parse(is);
+	    DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
 	    // Get document and then the root element
-	    Document doc          = parser.getDocument();
+	    Document doc          = parser.parse(is);
 	    NodeList featureNodes = doc.getDocumentElement().getChildNodes();
 
 	    // For nodes in root element (features)
@@ -748,6 +747,8 @@ class AbstractGenEmblFileFormer
 	catch (BioError be)
 	{
 	    be.printStackTrace();
+	} catch (ParserConfigurationException ex) {
+	    ex.printStackTrace();
 	}
     }
 }

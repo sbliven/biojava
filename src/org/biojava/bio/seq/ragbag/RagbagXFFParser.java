@@ -32,7 +32,7 @@ import org.biojava.bio.seq.io.SequenceBuilder;
 
 import org.xml.sax.*;
 import org.biojava.utils.stax.*;
-import org.apache.xerces.parsers.*;
+import javax.xml.parsers.*;
 
 /**
  * Ragbag FileParser class for handling XFF formatted files.
@@ -83,14 +83,17 @@ class RagbagXFFParser implements RagbagFileParser
     // set up XFF handler
     final XFFFeatureSetHandler xffhandler = new XFFFeatureSetHandler();
  
-    // create SAX parser for job
-    SAXParser parser = new SAXParser();
+    try {
+	// create SAX parser for job
+	SAXParserFactory spf = SAXParserFactory.newInstance();
+	spf.setNamespaceAware(true);
+	XMLReader parser = spf.newSAXParser().getXMLReader();
  
-    // link it all together
-    xffhandler.setFeatureListener(builder);
-//    parser.setContentHandler(new SAX2StAXAdaptor(handler));
-
-         parser.setContentHandler(new SAX2StAXAdaptor(new StAXContentHandlerBase() {
+	// link it all together
+	xffhandler.setFeatureListener(builder);
+	//    parser.setContentHandler(new SAX2StAXAdaptor(handler));
+	
+	parser.setContentHandler(new SAX2StAXAdaptor(new StAXContentHandlerBase() {
                 public void startElement(String nsURI,
                                          String localName,
                                          String qName,
@@ -105,7 +108,6 @@ class RagbagXFFParser implements RagbagFileParser
             }));
 
     // parse sequence file, sending events to the listener.
-    try {
       InputSource is = new InputSource(new FileReader(inputFile));
       parser.parse(is);
     }
@@ -114,6 +116,8 @@ class RagbagXFFParser implements RagbagFileParser
     }
     catch (IOException io) {
       throw new BioException(io);
+    }catch (ParserConfigurationException ex) {
+	throw new BioException(ex);
     }
   }
 }

@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.io.FileReader;
 
 import org.xml.sax.*;
-import org.apache.xerces.parsers.*; 
+import javax.xml.parsers.*;
 
 import org.biojava.utils.stax.*;
 import org.biojava.bio.symbol.RangeLocation;
@@ -105,7 +105,14 @@ public class RagbagMap extends StAXContentHandlerBase
     if (locked) throw new SAXException("Attempt to change an locked RagbagMap!");
 
     // create parser
-    SAXParser parser = new SAXParser();
+    XMLReader parser = null;
+    try {
+	SAXParserFactory spf = SAXParserFactory.newInstance();
+	spf.setNamespaceAware(true);
+	parser = spf.newSAXParser().getXMLReader();
+    } catch (ParserConfigurationException ex) {
+	throw new SAXException("Couldn't create parser");
+    }
 
     // assign self as content handler
     parser.setContentHandler(new SAX2StAXAdaptor(this));

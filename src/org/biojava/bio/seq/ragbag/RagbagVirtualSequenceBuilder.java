@@ -26,7 +26,7 @@ import java.util.*;
  
 import org.xml.sax.*;
 import org.biojava.utils.stax.*;
-import org.apache.xerces.parsers.*;
+import javax.xml.parsers.*;
  
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SimpleAnnotation;
@@ -172,23 +172,28 @@ class RagbagVirtualSequenceBuilder
     // set up GAME handler
     final GAMEHandler handler = new GAMEHandler();
  
-    // create SAX parser for job
-    SAXParser parser = new SAXParser();
- 
-    // link it all together
-    handler.setFeatureListener(sab);
-    parser.setContentHandler(new SAX2StAXAdaptor(handler));
- 
-    // parse sequence file, sending events to the listener.
     try {
-      InputSource is = new InputSource(new FileReader(featureFile));
-      parser.parse(is);
+	// create SAX parser for job
+	SAXParserFactory spf = SAXParserFactory.newInstance();
+	spf.setNamespaceAware(true);
+	XMLReader parser = spf.newSAXParser().getXMLReader();
+	
+	// link it all together
+	handler.setFeatureListener(sab);
+	parser.setContentHandler(new SAX2StAXAdaptor(handler));
+	
+	// parse sequence file, sending events to the listener.
+    
+	InputSource is = new InputSource(new FileReader(featureFile));
+	parser.parse(is);
     }
     catch (SAXException se) {
       throw new BioException(se);
     }
     catch (IOException io) {
       throw new BioException(io);
+    } catch (ParserConfigurationException ex) {
+	throw new BioException(ex);
     }
  
     // at this stage, the GAMEHandler and SAX parser will go out of scope

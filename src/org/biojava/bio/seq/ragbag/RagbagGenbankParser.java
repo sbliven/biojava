@@ -36,10 +36,6 @@ import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SymbolParser;
 
-import org.xml.sax.*;
-import org.biojava.utils.stax.*;
-import org.apache.xerces.parsers.*;
-
 /**
  * Ragbag FileParser class for handling Genbank formatted files.
  * <p>

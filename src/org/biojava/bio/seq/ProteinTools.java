@@ -24,8 +24,7 @@ package org.biojava.bio.seq;
 import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
-
-import org.apache.xerces.parsers.DOMParser;
+import javax.xml.parsers.*;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -84,10 +83,8 @@ public class ProteinTools {
           }
 
           InputSource is = new InputSource(tablesStream);
-          DOMParser parser = new DOMParser();
-          parser.parse(is);
-          doc = parser.getDocument();
-
+          DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	  doc = parser.parse(is);
         }catch (MissingResourceException mre) {
             System.err.println(mre.getMessage());
         }catch(Exception e){//err

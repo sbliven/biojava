@@ -31,7 +31,7 @@ import org.biojava.bio.seq.io.SequenceBuilder;
 
 import org.xml.sax.*;
 import org.biojava.utils.stax.*;
-import org.apache.xerces.parsers.*;
+import javax.xml.parsers.*;
 
 /**
  * Ragbag FileParser class for handling GAME formatted files.
@@ -76,23 +76,26 @@ class RagbagGAMEParser implements RagbagFileParser
     // set up GAME handler
     final GAMEHandler handler = new GAMEHandler();
  
-    // create SAX parser for job
-    SAXParser parser = new SAXParser();
- 
-    // link it all together
-    handler.setFeatureListener(builder);
-    parser.setContentHandler(new SAX2StAXAdaptor(handler));
- 
-    // parse sequence file, sending events to the listener.
     try {
-      InputSource is = new InputSource(new FileReader(inputFile));
-      parser.parse(is);
-    }
-    catch (SAXException se) {
-      throw new BioException(se);
-    }
-    catch (IOException io) {
-      throw new BioException(io);
+	// create SAX parser for job
+	SAXParserFactory spf = SAXParserFactory.newInstance();
+	spf.setNamespaceAware(true);
+	XMLReader parser = spf.newSAXParser().getXMLReader();
+	
+	// link it all together
+	handler.setFeatureListener(builder);
+	parser.setContentHandler(new SAX2StAXAdaptor(handler));
+	
+	// parse sequence file, sending events to the listener.
+	
+	InputSource is = new InputSource(new FileReader(inputFile));
+	parser.parse(is);
+    } catch (SAXException se) {
+	throw new BioException(se);
+    } catch (IOException io) {
+	throw new BioException(io);
+    } catch (ParserConfigurationException ex) {
+	throw new BioException(ex);
     }
   }
 }
