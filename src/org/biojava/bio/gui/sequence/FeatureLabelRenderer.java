@@ -49,17 +49,17 @@ implements FeatureRenderer {
     "LABEL_MAKER",
     SequenceRenderContext.REPAINT
   );
-  
+
   private static FontRenderContext FRC = new FontRenderContext(
     new AffineTransform(),
     false,
     true
   );
-  
+
   private LabelMaker labelMaker;
-  
+
   public FeatureLabelRenderer() {}
-  
+
   public FeatureLabelRenderer(LabelMaker labelMaker) {
     try {
       setLabelMaker(labelMaker);
@@ -67,11 +67,11 @@ implements FeatureRenderer {
       throw new BioError(cve, "Assertion Failure: could not set label maker");
     }
   }
-  
+
   public LabelMaker getLabelMaker() {
     return this.labelMaker;
   }
-  
+
   public void setLabelMaker(LabelMaker labelMaker)
   throws ChangeVetoException {
     if(hasListeners()) {
@@ -89,19 +89,19 @@ implements FeatureRenderer {
       this.labelMaker = labelMaker;
     }
   }
-  
+
   public double getDepth(SequenceRenderContext src) {
     return src.getFont().getMaxCharBounds(FRC).getHeight();
   }
-  
+
   public double getMinimumLeader(SequenceRenderContext src) {
     return 0.0;
   }
-  
+
   public double getMinimumTrailer(SequenceRenderContext src) {
     return 0.0;
   }
-  
+
   public void renderFeature(
     Graphics2D g,
     Feature feat,
@@ -109,7 +109,7 @@ implements FeatureRenderer {
   ) {
     Location loc = feat.getLocation();
     String label = labelMaker.makeLabel(feat);
-    
+
     System.err.println(
       "Feature: " + feat +
       " source: " + feat.getSource() +
@@ -117,14 +117,14 @@ implements FeatureRenderer {
       " loc: " + feat.getLocation() +
       " ann: " + feat.getAnnotation()
     );
-      
+
     System.err.println("range: " + src.getRange());
-    
-    g.setPaint(Color.BLACK);
+
+    g.setPaint(Color.black);
     int min = Math.max(loc.getMin(), src.getRange().getMin());
     int max = Math.min(loc.getMax(), src.getRange().getMax());
     int mid = (min + max) / 2;
-    
+
     System.err.println("min: " + min + " max: " + max + " mid: " + mid);
     g.drawString(
       label,
@@ -133,7 +133,7 @@ implements FeatureRenderer {
     );
     System.err.println("rendered: " + label);
   }
-  
+
   public FeatureHolder processMouseEvent(
     FeatureHolder hits,
     SequenceRenderContext src,
@@ -141,44 +141,44 @@ implements FeatureRenderer {
   ) {
     return hits;
   }
-  
+
   public static interface LabelMaker {
     String makeLabel(Feature f);
   }
-  
+
   public static class SourceLabelMaker
   implements LabelMaker {
     public String makeLabel(Feature f) {
       return f.getSource();
     }
   }
-  
+
   public static class TypeLabelMaker
   implements LabelMaker {
     public String makeLabel(Feature f) {
       return f.getType();
     }
   }
-  
+
   public static class AnnotationLabelMaker
   implements LabelMaker {
     private Object key;
-    
+
     public AnnotationLabelMaker() {
     }
-    
+
     public AnnotationLabelMaker(Object key) {
       setKey(key);
     }
-    
+
     public void setKey(Object key) {
       this.key = key;
     }
-    
+
     public Object getKey() {
       return key;
     }
-    
+
     public String makeLabel(Feature feat) {
       Annotation ann = feat.getAnnotation();
       if(ann.containsProperty(key)) {

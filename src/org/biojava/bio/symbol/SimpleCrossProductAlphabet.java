@@ -63,7 +63,7 @@ implements Serializable {
       Alphabet aa = (Alphabet) i.next();
       if(! (aa instanceof FiniteAlphabet) ) {
         throw new IllegalAlphabetException(
-          "Can't create a SimpleAlphabetManager over non-fininte alphabet " +
+          "Can't create a SimpleCrossProductAlphabet over non-fininte alphabet " +
           aa.getName() + " of type " + aa.getClass()
         );
       }
@@ -127,9 +127,9 @@ implements Serializable {
   public String getName() {
     StringBuffer name = new StringBuffer("(");
     for (int i = 0; i < alphas.size(); ++i) {
-	    Alphabet a = (Alphabet) alphas.get(i);
-	    name.append(a.getName());
-	    if (i < alphas.size() - 1) {
+            Alphabet a = (Alphabet) alphas.get(i);
+            name.append(a.getName());
+            if (i < alphas.size() - 1) {
         name.append(" x ");
       }
     }
@@ -139,9 +139,9 @@ implements Serializable {
 
   public SymbolList symbols() {
       try {
-	  return new SimpleSymbolList(this, new ArrayList(ourSymbols.values()));
+          return new SimpleSymbolList(this, new ArrayList(ourSymbols.values()));
       } catch (IllegalSymbolException ex) {
-	  throw new BioError(ex);
+          throw new BioError(ex);
       }
   }
 
