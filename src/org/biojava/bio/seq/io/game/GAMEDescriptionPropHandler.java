@@ -63,7 +63,7 @@ public class GAMEDescriptionPropHandler extends StringElementHandlerBase {
                                     DelegationManager dm)
                      throws SAXException
   {
-
+//    System.out.println("desc: " + localName);
     super.startElement(nsURI, localName, qName, attrs, dm);
   }
 

@@ -69,7 +69,7 @@ public class GAMEGenePropHandler
 //       System.out.println("GAMEGenePropHandler.NameSetStringValue: assoc IS. ");
       // set gene name
       try {
-//       System.out.println("GAMEGenePropHandler.NameSetStringValue: setting name. ");
+//       System.out.println("GAMEGenePropHandler setting id to " + s);
        staxenv.featureTemplate.annotation.setProperty("id", s.trim());
       }
       catch (ChangeVetoException cve) {

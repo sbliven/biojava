@@ -83,16 +83,27 @@ public class GAMEFeatureSpanHandler extends StAXFeatureHandler {
     return ft;
   }
 
-/*
+
   public void startElementHandler(
                 String nsURI,
                 String localName,
                 String qName,
                 Attributes attrs)
   {
-    System.out.println("GAMEFeatureSpanHandler.startElementHandler entered.");
+//    System.out.println("GAMEFeatureSpanHandler.startElementHandler entered.");
+
+      // pick up id and save it in annotation bundle
+      String featureId = attrs.getValue("id");
+
+      try {
+        if (featureId != null)
+          featureTemplate.annotation.setProperty("id", featureId);
+      }
+      catch (ChangeVetoException cve) {
+        System.err.println("GAMEFeatureSpanHandler. Change blocked.");
+      }
   }
-*/
+
   public void endElementHandler(
                 String nsURI,
                 String localName,
@@ -105,25 +116,23 @@ public class GAMEFeatureSpanHandler extends StAXFeatureHandler {
     // update transcript limits
     // get iterator to callbackStack of PREVIOUS FeatureHandler
     int currLevel = staxenv.getLevel();
-//    System.out.println("GAMEFeatureSpanHandler.endElementHandler entered. currlevel: " + currLevel);
  
     if (currLevel >=1) {
       // search down stack for callback handler
       ListIterator li = staxenv.getHandlerStackIterator(currLevel);
-//    System.out.println("GAMEFeatureSpanHandler.endElementHandler entered. got ListIterator");
+
       while (li.hasPrevious()) {
         Object ob = li.previous();
-//    System.out.println("GAMEFeatureSpanHandler.endElementHandler entered. got stack object");
         if (ob instanceof GAMETranscriptCallbackItf) {
           // we have a nesting handler, use it
-//    System.out.println("GAMEFeatureSpanHandler.endElementHandler calling back");
           ((GAMETranscriptCallbackItf) ob).reportExon(
               (RangeLocation) ((StrandedFeature.Template) featureTemplate).location,
               ((StrandedFeature.Template) featureTemplate).strand);
           return;
         }
       }
-    }    
+    }
+    
   }
 
 }

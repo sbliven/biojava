@@ -28,6 +28,7 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.genomic.Gene;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.program.das.*;
 
 import org.biojava.utils.*;
 import org.biojava.utils.stax.*;
@@ -103,7 +104,7 @@ public class GAMEAnnotationHandler
   public void reportStrand(StrandedFeature.Strand strand)
   {
     // obtains strand from elements that are in the know.
-    this.strand = strand;
+    ((StrandedFeature.Template) featureTemplate).strand = strand;
   }
 
   public void startElementHandler(
@@ -112,17 +113,18 @@ public class GAMEAnnotationHandler
                 String qName,
                 Attributes attrs)
   {
-    String annotationId =  attrs.getValue("id");
+/*    String annotationId =  attrs.getValue("id");
     if (annotationId != null) {
       // stuff Gadfly annotation id into our annotation bundle for info.
+      System.out.println("GAMEAnnotationHandler is setting id to " + annotationId);
       try {
          featureTemplate.annotation.setProperty(
-                          "gadfly_annotation_id", annotationId);
+                          "id", annotationId);
       }
       catch (ChangeVetoException cae) {
         System.err.println("GAMEAnnotationHandler: veto exception caught.");
       }
-    }
+    }*/
   }
 
   public void endElementHandler(
