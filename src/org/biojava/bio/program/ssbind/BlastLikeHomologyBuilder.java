@@ -267,7 +267,7 @@ public class BlastLikeHomologyBuilder extends ViewSequenceFactory
             sEnd   = swap;
         }
 
-        String subjectID = (String) subHitData.get("HitId");
+        String subjectID = (String) hitData.get("subjectId");
 
         Sequence   queryView = makeQueryViewSequence(queryID);
         Sequence subjectView = makeSubjectViewSequence(subjectID);

@@ -125,7 +125,7 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
      * thrown.
      */
     public synchronized void addSequenceDB(SequenceDBLite sequenceDB,
-                                           Set        otherIdentifiers)
+                                           Set            otherIdentifiers)
     {
         if (sequenceDB == null) {
             throw new IllegalArgumentException("SequenceDB was null");
@@ -187,7 +187,7 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
             throw new IllegalArgumentException("identifier was null");
         }
 
-        return (SequenceDB) this.sequenceDBByIdentifier.get(identifier);
+        return (SequenceDBLite) this.sequenceDBByIdentifier.get(identifier);
     }
 
     public String toString()

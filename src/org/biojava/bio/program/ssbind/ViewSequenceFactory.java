@@ -125,7 +125,8 @@ public abstract class ViewSequenceFactory
             // It shouldn't happen, but it can with some implementations
             // of SequenceDB
             if (query == null)
-                throw new BioException("Failed to retrieve query sequence from holder using ID '"
+                throw new BioException("Failed to retrieve query sequence "
+                                       + "from holder using ID '"
                                        + queryID
                                        + "' (sequence was null)");
 
@@ -140,14 +141,16 @@ public abstract class ViewSequenceFactory
         throws BioException
     {
         if (subjectDBs == null)
-            throw new BioException("Running with null subject SequenceDB installation");
+            throw new BioException("Running with null subject "
+                                   + "SequenceDB installation");
 
         SequenceDBLite subjectDB = subjectDBs.getSequenceDB(databaseID);
 
         // It shouldn't happen, but it can with some implementations
         // of SequenceDBInstallation
         if (subjectDB == null)
-            throw new BioException("Failed to retrieve database from installation using ID '"
+            throw new BioException("Failed to retrieve database "
+                                   + "from installation using ID '"
                                    + databaseID
                                    + "' (database was null)");
 
@@ -162,7 +165,8 @@ public abstract class ViewSequenceFactory
             // It shouldn't happen, but it can with some implementations
             // of SequenceDB
             if (subject == null)
-                throw new BioException("Failed to retrieve subject sequence from subjectDB using ID '"
+                throw new BioException("Failed to retrieve subject sequence "
+                                       + "from subjectDB using ID '"
                                        + subjectID
                                        + "' (sequence was null)");
 

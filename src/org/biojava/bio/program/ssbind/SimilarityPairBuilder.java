@@ -39,6 +39,7 @@ import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -267,7 +268,7 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
             sEnd   = swap;
         }
 
-        String subjectID = (String) subHitData.get("HitId");
+        String subjectID = (String) hitData.get("subjectId");
 
         Sequence   queryView = makeQueryViewSequence(queryID);
         Sequence subjectView = makeSubjectViewSequence(subjectID);
@@ -297,7 +298,8 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
                 score = Double.parseDouble((String) subHitData.get("score"));
 
             // Query sequence feature
-            SimilarityPairFeature.Template qt = new SimilarityPairFeature.Template();
+            SimilarityPairFeature.Template qt =
+                new SimilarityPairFeature.Template();
             qt.type       = SIMILARITY_PAIR_FEATURE_TYPE;
             qt.source     = source;
             qt.location   = new RangeLocation(qStart, qEnd);
@@ -306,7 +308,8 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
             qt.annotation = AnnotationFactory.makeAnnotation(subHitData);
 
             // Subject sequence feature
-            SimilarityPairFeature.Template st = new SimilarityPairFeature.Template();
+            SimilarityPairFeature.Template st =
+                new SimilarityPairFeature.Template();
             st.type       = SIMILARITY_PAIR_FEATURE_TYPE;
             st.source     = source;
             st.location   = new RangeLocation(sStart, sEnd);
@@ -327,12 +330,16 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
             sf.setSibling(qf);
             qf.setSibling(sf);
 
-            qf.addChangeListener(ChangeListener.ALWAYS_VETO);
-            sf.addChangeListener(ChangeListener.ALWAYS_VETO);
+            qf.addChangeListener(ChangeListener.ALWAYS_VETO,
+                                 ChangeType.UNKNOWN);
+            sf.addChangeListener(ChangeListener.ALWAYS_VETO,
+                                 ChangeType.UNKNOWN);
         }
         catch (ChangeVetoException cve)
         {
-            throw new BioError("Assertion failure creating SimilarityPairFeature. Template modification vetoed",cve);
+            throw new BioError("Assertion failure creating "
+                               + "SimilarityPairFeature. Template "
+                               + "modification vetoed",cve);
         }
     }
 }
