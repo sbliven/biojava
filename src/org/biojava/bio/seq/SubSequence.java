@@ -46,7 +46,7 @@ public class SubSequence implements Sequence {
     private Annotation annotation;
     private int start;
     private int end;
-    private transient FeatureHolder cachedFeatures;
+    private transient SubProjectedFeatureHolder features;
     private final FeatureFilter projectff;
     private final boolean recurse;
 
@@ -55,37 +55,36 @@ public class SubSequence implements Sequence {
     protected transient AnnotationForwarder annotationForwarder;
 
     private void allocChangeSupport() {
-	if (seqListener == null) {
-	    installSeqListener();
-	}
-	changeSupport = new ChangeSupport();
+        if (seqListener == null) {
+            installSeqListener();
+        }
+        changeSupport = new ChangeSupport();
     }
 
     private void installSeqListener() {
-	seqListener = new ChangeListener() {
-		public void preChange(ChangeEvent cev)
-		    throws ChangeVetoException
-		{
-		    if (changeSupport != null) {
-			changeSupport.firePreChangeEvent(makeChainedEvent(cev));
-		    }
-		}
+        seqListener = new ChangeListener() {
+            public void preChange(ChangeEvent cev)
+		        throws ChangeVetoException
+            {
+                if (changeSupport != null) {
+                    changeSupport.firePreChangeEvent(makeChainedEvent(cev));
+                }
+            }
 
-		public void postChange(ChangeEvent cev) {
-		    cachedFeatures = null;
-		    if (changeSupport != null) {
-			changeSupport.firePostChangeEvent(makeChainedEvent(cev));
-		    }
-		}
+            public void postChange(ChangeEvent cev) {
+                if (changeSupport != null) {
+                    changeSupport.firePostChangeEvent(makeChainedEvent(cev));
+                }
+            }
 
-		private ChangeEvent makeChainedEvent(ChangeEvent cev) {
-		    return new ChangeEvent(SubSequence.this,
-					   FeatureHolder.FEATURES,
-					   null, null,
-					   cev);
-		}
+            private ChangeEvent makeChainedEvent(ChangeEvent cev) {
+                return new ChangeEvent(SubSequence.this,
+				                	   FeatureHolder.FEATURES,
+                                       null, null,
+                                       cev);
+            }
 	    } ;
-	parent.addChangeListener(seqListener, FeatureHolder.FEATURES);
+        parent.addChangeListener(seqListener, FeatureHolder.FEATURES);
     }
 
     /**
@@ -98,8 +97,8 @@ public class SubSequence implements Sequence {
      */
 
     public SubSequence(Sequence seq,
-		       final int start,
-		       final int end)
+		               final int start,
+                       final int end)
     {
         this(seq, start, end, null, false);
     }
@@ -161,21 +160,21 @@ public class SubSequence implements Sequence {
                final String name)
     {
         this.parent = seq;
-	this.start = start;
-	this.end = end;
+        this.start = start;
+        this.end = end;
 
-	symbols = seq.subList(start, end);
-	this.name = name;
-	uri = seq.getURN() + "?start=" + start + ";end=" + end;
-	annotation = seq.getAnnotation();
+        symbols = seq.subList(start, end);
+        this.name = name;
+        uri = seq.getURN() + "?start=" + start + ";end=" + end;
+        annotation = seq.getAnnotation();
 
-	FeatureFilter locFilter = new FeatureFilter.OverlapsLocation(new RangeLocation(start, end));
-	if (ff == null) {
-	    this.projectff = locFilter;
-	} else {
-	    this.projectff = new FeatureFilter.And(ff, locFilter);
-	}
-	this.recurse = recurse;
+        FeatureFilter locFilter = new FeatureFilter.OverlapsLocation(new RangeLocation(start, end));
+        if (ff == null) {
+            this.projectff = locFilter;
+        } else {
+            this.projectff = new FeatureFilter.And(ff, locFilter);
+        }
+        this.recurse = recurse;
     }
 
     //
@@ -183,41 +182,41 @@ public class SubSequence implements Sequence {
     //
 
     public Symbol symbolAt(int pos) {
-	return symbols.symbolAt(pos);
+        return symbols.symbolAt(pos);
     }
 
     public Alphabet getAlphabet() {
-	return symbols.getAlphabet();
+        return symbols.getAlphabet();
     }
 
     public SymbolList subList(int start, int end) {
-	return symbols.subList(start, end);
+        return symbols.subList(start, end);
     }
 
     public String seqString() {
-	return symbols.seqString();
+        return symbols.seqString();
     }
 
     public String subStr(int start, int end) {
-	return symbols.subStr(start, end);
+        return symbols.subStr(start, end);
     }
 
     public List toList() {
-	return symbols.toList();
+        return symbols.toList();
     }
 
     public int length() {
-	return symbols.length();
+        return symbols.length();
     }
 
     public Iterator iterator() {
-	return symbols.iterator();
+        return symbols.iterator();
     }
 
     public void edit(Edit edit)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Can't edit SubSequences");
+        throw new ChangeVetoException("Can't edit SubSequences");
     }
 
     //
@@ -225,7 +224,7 @@ public class SubSequence implements Sequence {
     //
 
     public int countFeatures() {
-	return getFeatures().countFeatures();
+        return getFeatures().countFeatures();
     }
 
     public Iterator features() {
@@ -241,30 +240,26 @@ public class SubSequence implements Sequence {
     }
 
     public boolean containsFeature(Feature f) {
-	return getFeatures().containsFeature(f);
+        return getFeatures().containsFeature(f);
     }
 
     public Feature createFeature(Feature.Template templ)
         throws BioException, ChangeVetoException
     {
-	return createFeatureTranslated(parent, templ);
+        return createFeatureTranslated(parent, templ);
     }
 
     public void removeFeature(Feature f)
         throws ChangeVetoException
     {
-	removeProjectedFeature(parent, f);
+        removeProjectedFeature(parent, f);
     }
 
-    protected FeatureHolder getFeatures() {
-	if (seqListener == null) {
-	    installSeqListener();
-	}
-
-	if (cachedFeatures == null) {
-	    cachedFeatures = new CroppedFeatureSet(parent, this);
-	}
-	return cachedFeatures;
+    protected SubProjectedFeatureHolder getFeatures() {
+        if (features == null) {
+            features = new SubProjectedFeatureHolder(this);
+        }
+        return features;
     }
 
     //
@@ -272,11 +267,11 @@ public class SubSequence implements Sequence {
     //
 
     public String getName() {
-	return name;
+        return name;
     }
 
     public String getURN() {
-	return uri;
+        return uri;
     }
 
     //
@@ -284,148 +279,118 @@ public class SubSequence implements Sequence {
     //
 
     public Annotation getAnnotation() {
-	return annotation;
+        return annotation;
     }
 
     public Sequence getParent() {
-      return this.parent;
+        return this.parent;
     }
 
+    public int getStart() {
+        return start;
+    }
+    
+    public int getEnd() {
+        return end;
+    }
+    
     //
-    // Guts
+    // Guts (new world order)
     //
+    
+    /**
+     * This should really be an inner class, but got re-written because of silly language issues.
+     */
+    
+    private static class SubProjectedFeatureHolder extends ProjectedFeatureHolder {
+        private Location parentLocation;
+        private SubSequence ssthis;
+        private static final FeatureFilter remoteFilter = new FeatureFilter.ByClass(RemoteFeature.class);
+        
+        protected FeatureFilter transformFilter(FeatureFilter ff) {
+            return FilterUtils.transformFilter(super.transformFilter(ff),
+                new FilterUtils.FilterTransformer() {
+                    public FeatureFilter transform(FeatureFilter ff) {
+                        if (ff.equals(remoteFilter)) {
+                            return new FeatureFilter.Not(new FeatureFilter.ContainedByLocation(parentLocation));
+                        } else {
+                            return ff;
+                        }
+                    }
+                }
+            ) ;
+        }
+        
+        SubProjectedFeatureHolder(SubSequence ssthis) {
+            super(ssthis.getParent(), ssthis, 1 - ssthis.getStart(), false);
+            this.ssthis = ssthis;
+            parentLocation = new RangeLocation(ssthis.getStart(), ssthis.getEnd());
+        }
+        
+        public Feature projectFeature(final Feature f) {
+            if (parentLocation.contains(f.getLocation())) {
+                return super.projectFeature(f);
+            } else {
+                 RemoteFeature.Template rft = new RemoteFeature.Template();
+                 rft.type = f.getType();
+                 rft.source = f.getSource();
+                 rft.annotation = f.getAnnotation();
+                 rft.location = LocationTools.intersection(f.getLocation().translate(1 - ssthis.getStart()),
+								                           new RangeLocation(1, ssthis.getEnd() - ssthis.getStart() + 1));
+                 if (f instanceof StrandedFeature) {
+                     rft.strand = ((StrandedFeature) f).getStrand();
+                 } else {
+                     rft.strand = StrandedFeature.UNKNOWN;
+                 }
+                 rft.resolver = new RemoteFeature.Resolver() {
+                       public Feature resolve(RemoteFeature rFeat) {
+                           return f;
+                       }
+                 } ;
+                 rft.regions = Collections.nCopies(1, new RemoteFeature.Region(f.getLocation(), f.getSequence().getName(), true));
 
+                 return(ssthis.new SSRemoteFeature(ssthis, this, getParent(f), rft, f));
+            }
+        }
+        
+        public FeatureHolder makeProjectionSet(FeatureHolder fh) {
+            FeatureHolder toProject = new LazyFilterFeatureHolder(fh, new FeatureFilter.OverlapsLocation(new RangeLocation(ssthis.getStart(), ssthis.getEnd())));
+            return super.makeProjectionSet(toProject);
+        }
+        
+        public Feature createFeature(Feature f, Feature.Template templ) 
+            throws BioException, ChangeVetoException
+        {
+            return ssthis.createFeatureTranslated(f, templ);
+        }
+        
+        public void removeFeature(Feature f, Feature victim)
+            throws ChangeVetoException
+        {
+            ssthis.removeProjectedFeature(f, victim);
+        }
+    }
+    
     private Feature createFeatureTranslated(FeatureHolder creatrix, Feature.Template templ)
         throws BioException, ChangeVetoException
     {
-	Location oldLoc = templ.location;
-	templ.location = templ.location.translate(start - 1);
-	try {
-	    return creatrix.createFeature(templ);
-	} finally {
-	    templ.location = oldLoc;
-	}
+        Location oldLoc = templ.location;
+        templ.location = templ.location.translate(start - 1);
+        try {
+            return getFeatures().projectFeature(creatrix.createFeature(templ));
+        } finally {
+            templ.location = oldLoc;
+        }
     }
 
     private void removeProjectedFeature(FeatureHolder parentFH, Feature f)
         throws ChangeVetoException
     {
-	if (! (f instanceof Projection)) {
-	    throw new ChangeVetoException("Can't remove feature -- doesn't appear to be an appropriate projection");
-	}
+        if (! (f instanceof Projection)) {
+            throw new ChangeVetoException("Can't remove feature -- doesn't appear to be an appropriate projection");
+        }
 
-	parentFH.removeFeature(((Projection) f).getViewedFeature());
-    }
-
-    private class CroppedFeatureSet extends LazyFeatureHolder {
-	private FeatureHolder features;
-	private FeatureHolder featureParent;
-	private ChangeListener flusher;
-
-	private CroppedFeatureSet(FeatureHolder features, FeatureHolder featureParent) {
-	    this.features = features;
-	    this.featureParent = featureParent;
-	    this.flusher = new ChangeListener() {
-		    public void preChange(ChangeEvent cev)
-		        throws ChangeVetoException
-		    {
-			if (CroppedFeatureSet.this.hasListeners()) {
-			    CroppedFeatureSet.this.getChangeSupport(cev.getType()).firePreChangeEvent(cev);
-			}
-		    }
-
-		    public void postChange(ChangeEvent cev) {
-			flushFeatures();
-			if (CroppedFeatureSet.this.hasListeners()) {
-			    CroppedFeatureSet.this.getChangeSupport(cev.getType()).firePostChangeEvent(cev);
-			}
-		    }
-		} ;
-	    features.addChangeListener(flusher, FeatureHolder.FEATURES);
-	}
-
-	protected FeatureHolder createFeatureHolder() {
-	    ProjectionContext pc = new ProjectionContext() {
-		public FeatureHolder getParent(Feature f) {
-		    return featureParent;
-		}
-
-		public Sequence getSequence(Feature f) {
-		    return SubSequence.this;
-		}
-
-		public Location getLocation(Feature f) {
-		    return f.getLocation().translate(1 - start);
-		}
-
-		public StrandedFeature.Strand getStrand(StrandedFeature f) {
-		    return f.getStrand();
-		}
-
-		public Annotation getAnnotation(Feature f) {
-		    return f.getAnnotation();
-		}
-
-		public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
-		    // return ProjectedFeatureHolder.projectFeatureHolder(f, parent, 1 - start, false);
-		    return new CroppedFeatureSet(f, parent);
-		}
-
-		public Feature createFeature(Feature f, Feature.Template templ)
-		    throws ChangeVetoException, BioException
-		{
-		    return createFeatureTranslated(f, templ);
-		}
-
-		public void removeFeature(Feature f, Feature f2)
-		    throws ChangeVetoException
-		{
-		    removeProjectedFeature(f, f2);
-		}
-        
-        
-        
-    public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
-	    } ;
-
-	    try {
-		SimpleFeatureHolder results = new SimpleFeatureHolder();
-		FeatureHolder rawFeatures = features.filter(projectff, recurse);
-		for (Iterator i = rawFeatures.features(); i.hasNext(); ) {
-		    final Feature f = (Feature) i.next();
-
-		    Location l = f.getLocation();
-		    if (l.getMin() >= start && l.getMax() <= end) {
-			results.addFeature(ProjectionEngine.DEFAULT.projectFeature(f, pc));
-		    } else {
-			RemoteFeature.Template rft = new RemoteFeature.Template();
-			rft.type = f.getType();
-			rft.source = f.getSource();
-			rft.annotation = f.getAnnotation();
-			rft.location = LocationTools.intersection(l.translate(1 - start),
-								  new RangeLocation(1, end - start + 1));
-			if (f instanceof StrandedFeature) {
-			    rft.strand = ((StrandedFeature) f).getStrand();
-			} else {
-			    rft.strand = StrandedFeature.UNKNOWN;
-			}
-			rft.resolver = new RemoteFeature.Resolver() {
-				public Feature resolve(RemoteFeature rFeat) {
-				    return f;
-				}
-			    } ;
-			rft.regions = Collections.nCopies(1, new RemoteFeature.Region(f.getLocation(), f.getSequence().getName(), true));
-
-			results.addFeature(new SSRemoteFeature(SubSequence.this, featureParent, rft, f));
-		    }
-		}
-
-		return results;
-	    } catch (ChangeVetoException cve) {
-		throw new BioError("Assertion failure: can't modify newly created feature holder");
-	    }
-	}
+        parentFH.removeFeature(((Projection) f).getViewedFeature());
     }
 
     //
@@ -434,79 +399,81 @@ public class SubSequence implements Sequence {
     //
 
     private class SSRemoteFeature extends SimpleRemoteFeature implements RemoteFeature {
-	private FeatureHolder childFeatures;
+        private FeatureHolder childFeatures;
 
-	private SSRemoteFeature(Sequence seq,
-				FeatureHolder parent,
-				RemoteFeature.Template templ,
-				Feature f) {
-	    super(seq, parent, templ);
-	    childFeatures = new CroppedFeatureSet(f, this);
-	}
+        private SSRemoteFeature(Sequence seq,
+                                SubProjectedFeatureHolder spfh,
+                				FeatureHolder parent,
+                                RemoteFeature.Template templ,
+                                Feature f) 
+        {
+            super(seq, parent, templ);
+            childFeatures = spfh.makeProjectionSet(f);
+        }
 
-	public int countFeatures() {
-	    return getFeatures().countFeatures();
-	}
+        public int countFeatures() {
+            return getFeatures().countFeatures();
+        }
 
-	public Iterator features() {
-	    return getFeatures().features();
-	}
+        public Iterator features() {
+            return getFeatures().features();
+        }
 
-	public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	    return getFeatures().filter(ff, recurse);
-	}
+        public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+            return getFeatures().filter(ff, recurse);
+        }
 
-	public boolean containsFeature(Feature f) {
-	    return getFeatures().containsFeature(f);
-	}
+        public boolean containsFeature(Feature f) {
+            return getFeatures().containsFeature(f);
+        }
 
-	public Feature createFeature(Feature.Template templ)
-	    throws BioException, ChangeVetoException
-	{
-	    throw new ChangeVetoException("Can't create features on SubSequence");
-	}
+        public Feature createFeature(Feature.Template templ)
+    	    throws BioException, ChangeVetoException
+        {
+            throw new ChangeVetoException("Can't create features on SubSequence");
+        }
 
-	public void removeFeature(Feature f)
-	    throws ChangeVetoException
-	{
-	    throw new ChangeVetoException("Can't remove features from SubSequence");
-	}
+        public void removeFeature(Feature f)
+    	    throws ChangeVetoException
+	    {
+            throw new ChangeVetoException("Can't remove features from SubSequence");
+        }
 
-	protected FeatureHolder getFeatures() {
-	    return childFeatures;
-	}
+        protected FeatureHolder getFeatures() {
+            return childFeatures;
+        }
     }
 
     public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport == null) {
-	    allocChangeSupport();
-	}
+        if (changeSupport == null) {
+            allocChangeSupport();
+        }
 
-        if(annotationForwarder == null && ct == Annotatable.ANNOTATION){
+        if(annotationForwarder == null && ct == Annotatable.ANNOTATION) {
           annotationForwarder = new Annotatable.AnnotationForwarder(
               this, changeSupport);
           getAnnotation().addChangeListener(annotationForwarder,
               Annotatable.ANNOTATION);
         }
 
-	changeSupport.addChangeListener(cl, ct);
+        changeSupport.addChangeListener(cl, ct);
     }
 
     public void addChangeListener(ChangeListener cl) {
-	addChangeListener(cl, ChangeType.UNKNOWN);
+        addChangeListener(cl, ChangeType.UNKNOWN);
     }
 
     public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport != null) {
-	    changeSupport.removeChangeListener(cl, ct);
-	}
+        if (changeSupport != null) {
+            changeSupport.removeChangeListener(cl, ct);
+        }
     }
 
     public void removeChangeListener(ChangeListener cl) {
-	removeChangeListener(cl, ChangeType.UNKNOWN);
+        removeChangeListener(cl, ChangeType.UNKNOWN);
     }
 
     public boolean isUnchanging(ChangeType ct) {
-      return false;
+        return parent.isUnchanging(ct);
     }
 }
