@@ -132,6 +132,7 @@ public class PairwiseDP extends DP implements Serializable {
     PairDPMatrix matrix = new PairDPMatrix(this, seqs[0], seqs[1]);
     PairDPCursor cursor = new BackMatrixPairDPCursor(
       seqs[0], seqs[1],
+      (CrossProductAlphabet) getModel().emissionAlphabet(),
       2, 2,
       matrix
     );
@@ -171,19 +172,18 @@ public class PairwiseDP extends DP implements Serializable {
 
 
       // initialization
-      Cell currentCell = null;
       initializationHack = true;
+      Cell [][] cells = cursor.press();
       if(cursor.hasNext()) {
-        Cell [][] cells = cursor.next();
+        cursor.next(cells);
         calcCell(cells);
-        currentCell = cells[0][0];
       }
       initializationHack = false;
       while(cursor.hasNext()) {
-        Cell [][] cells = cursor.next();
+        cursor.next(cells);
         calcCell(cells);
-        currentCell = cells[0][0];
       }
+      Cell currentCell = cells[0][0];
       // Terminate!
 
       int l = 0;
@@ -201,7 +201,7 @@ public class PairwiseDP extends DP implements Serializable {
 
      STATELOOP:      
       for (int l = states.length - 1; l >= 0; --l) {
-        // System.out.println("State = " + states[l].getName());
+        //System.out.println("State = " + states[l].getName());
         if(initializationHack && (states[l] instanceof EmissionState)) {
           if(states[l] == magicalState) {
             curCol[l] = 0.0;
@@ -220,25 +220,21 @@ public class PairwiseDP extends DP implements Serializable {
   	    double[] sourceScores = new double[tr.length];
         for (int ci = 0; ci < tr.length; ++ci) {
           double[] sCol;
-          double weight = 0.0;
+          double weight;
 
           int destI = tr[ci];
           State destS = states[destI];
+          Cell targetCell;
           if (destS instanceof EmissionState) {
             int [] advance = ((EmissionState)destS).getAdvance();
-            if (! (destS instanceof EmissionState)) {
-              weight = 0.0;
-            } else {
-              weight = getEmission(
-                Arrays.asList(cells[advance[0]][advance[1]].symbols),
-                alpha
-              )[destI];
-            }
-            sCol = cells[advance[0]][advance[1]].scores;
+            targetCell = cells[advance[0]][advance[1]];
+            weight = targetCell.emissions[destI];
+            sCol = targetCell.scores;
           } else {
-            sCol = cells[0][0].scores;
+            targetCell = cells[0][0];
+            weight = 0.0;
           }
-          sourceScores[ci] = sCol[destI] + weight;
+          sourceScores[ci] = targetCell.scores[destI] + weight;
         }
 
         // Find base for addition
@@ -249,8 +245,8 @@ public class PairwiseDP extends DP implements Serializable {
         double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
 	    
   	    for (int kc = 0; kc < tr.length; ++kc) {
-          // System.out.println("In from " + states[kc].getName());
-          // System.out.println("prevScore = " + sourceScores[kc]);
+          //System.out.println("In from " + states[kc].getName());
+          //System.out.println("prevScore = " + sourceScores[kc]);
 
           int k = tr[kc];
           if (sourceScores[kc] != Double.NEGATIVE_INFINITY) {
@@ -259,7 +255,7 @@ public class PairwiseDP extends DP implements Serializable {
           }
         }
         curCol[l] = Math.log(score) + constant;
-        // System.out.println(curCol[l]);
+        //System.out.println(curCol[l]);
       }
     }
   }
@@ -278,7 +274,8 @@ public class PairwiseDP extends DP implements Serializable {
     lockModel();
     Forward f = new Forward();
     PairDPCursor cursor = new LightPairDPCursor(
-      seqs[0], seqs[1], 2, 2, getStates().length
+      seqs[0], seqs[1], (CrossProductAlphabet) getModel().emissionAlphabet(),
+      2, 2, getStates().length
     );
     unlockModel();
     return f.runForward(cursor);
@@ -296,7 +293,10 @@ public class PairwiseDP extends DP implements Serializable {
     lockModel();
     Forward f = new Forward();
     PairDPMatrix matrix = new PairDPMatrix(this, seqs[0], seqs[1]);
-    PairDPCursor cursor = new MatrixPairDPCursor(seqs[0], seqs[1], 2, 2, matrix);
+    PairDPCursor cursor = new MatrixPairDPCursor(
+      seqs[0], seqs[1], (CrossProductAlphabet) getModel().emissionAlphabet(),
+      2, 2, matrix
+    );
     double score = f.runForward(cursor);
     matrix.setScore(score);
     unlockModel();
@@ -317,7 +317,6 @@ public class PairwiseDP extends DP implements Serializable {
     private double[][] transitionScores;
     private State[] states;
     private PairDPCursor cursor;
-    private CrossProductAlphabet alpha;
     private boolean initializationHack;
 
     public double runForward(PairDPCursor curs) 
@@ -325,24 +324,22 @@ public class PairwiseDP extends DP implements Serializable {
     {
       states = getStates();
       cursor = curs;
-      alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
 
       transitions = getForwardTransitions();
       transitionScores = getForwardTransitionScores();
 
-      Cell currentCell = null;
+      Cell[][] cells = cursor.press();
       initializationHack = true;
       if(cursor.hasNext()) {
-        Cell [][] cells = cursor.next();
+        cursor.next(cells);
         calcCell(cells);
-        currentCell = cells[0][0];
       }
       initializationHack = false;
       while(cursor.hasNext()) {
-        Cell [][] cells = cursor.next();
+        cursor.next(cells);
         calcCell(cells);
-        currentCell = cells[0][0];
       }
+      Cell currentCell = cells[0][0];
 
       // Terminate!
 
@@ -360,16 +357,14 @@ public class PairwiseDP extends DP implements Serializable {
       IllegalAlphabetException,
       IllegalTransitionException
     {
-      double[] curCol = cells[0][0].scores;
-      double[] emissions = getEmission(
-        Arrays.asList(cells[0][0].symbols), alpha
-      );
+      Cell curCell = cells[0][0];
+      double[] curCol = curCell.scores;
+      double[] emissions = curCell.emissions;
 
      STATELOOP:
       for (int l = 0; l < states.length; ++l) {
-        // System.out.println("State = " + states[l].getName());
+        //System.out.println("State = " + states[l].getName());
         try {
-          //System.out.println("Trying initialization");
           if(initializationHack && (states[l] instanceof EmissionState)) {
             if(states[l] == magicalState) {
               curCol[l] = 0.0;
@@ -397,7 +392,6 @@ public class PairwiseDP extends DP implements Serializable {
           if (weight == Double.NEGATIVE_INFINITY) {
             curCol[l] = Double.NEGATIVE_INFINITY;
           } else {
-            // System.out.println("weight = " + weight);
             double score = 0.0;
             int [] tr = transitions[l];
             double[] trs = transitionScores[l];
@@ -413,8 +407,8 @@ public class PairwiseDP extends DP implements Serializable {
             double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
 
             for (int kc = 0; kc < tr.length; ++kc) {
-              // System.out.println("In from " + states[kc].getName());
-              // System.out.println("prevScore = " + sourceScores[kc]);
+              //System.out.println("In from " + states[kc].getName());
+              //System.out.println("prevScore = " + sourceScores[kc]);
 
               int k = tr[kc];
               if (sourceScores[k] != Double.NEGATIVE_INFINITY) {
@@ -423,7 +417,7 @@ public class PairwiseDP extends DP implements Serializable {
               }
             }
             curCol[l] = weight + Math.log(score) + constant;
-            // System.out.println(curCol[l]);
+            //System.out.println("Setting col score to " + curCol[l]);
           }
         } catch (Exception e) {
           throw new BioError(
@@ -466,7 +460,6 @@ public class PairwiseDP extends DP implements Serializable {
     private double[][] transitionScores;
     private State[] states;
     private PairDPCursor cursor;
-    private CrossProductAlphabet alpha;
     private boolean initializationHack = true;
     private BackPointer TERMINAL_BP;
 
@@ -479,25 +472,26 @@ public class PairwiseDP extends DP implements Serializable {
       State magic = getModel().magicalState();
       TERMINAL_BP = new BackPointer(magic);
       states = getStates();
-      cursor = new LightPairDPCursor(seq0, seq1, 2, 2, states.length);
-      alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
+      cursor = new LightPairDPCursor(
+        seq0, seq1, (CrossProductAlphabet) getModel().emissionAlphabet(),
+        2, 2, states.length
+      );
       
       transitions = getForwardTransitions();
       transitionScores = getForwardTransitionScores();
       
-      Cell currentCell = null;
       initializationHack = true;
+      Cell[][] cells = cursor.press();
       if(cursor.hasNext()) {
-        Cell [][] cells = cursor.next();
+        cursor.next(cells);
         calcCell(cells);
-        currentCell = cells[0][0];
       }
       initializationHack = false;
       while(cursor.hasNext()) {
-        Cell [][] cells = cursor.next();
+        cursor.next(cells);
         calcCell(cells);
-        currentCell = cells[0][0];
       }
+      Cell currentCell = cells[0][0];
   
       // Terminate!
 
@@ -520,7 +514,8 @@ public class PairwiseDP extends DP implements Serializable {
   
       // parse 1
       //System.out.println("Parse 1");
-      for(BackPointer bpi =	bp.back; bpi != TERMINAL_BP; bpi = bpi.back) { try {
+      for(BackPointer bpi =	bp.back; bpi != TERMINAL_BP; bpi = bpi.back) {
+        try {
         /*System.out.print(
           "Processing " + bpi.state.getName()
         );*/
@@ -588,11 +583,10 @@ public class PairwiseDP extends DP implements Serializable {
       IllegalAlphabetException,
       IllegalTransitionException
     {
-      double[] curCol = cells[0][0].scores;
-      BackPointer[] curBPs = cells[0][0].backPointers;
-      double[] emissions = getEmission(
-        Arrays.asList(cells[0][0].symbols), alpha
-      );
+      Cell curCell = cells[0][0];
+      double[] curCol = curCell.scores;
+      BackPointer[] curBPs = curCell.backPointers;
+      double[] emissions = curCell.emissions;
       /*(System.out.println(
         "Got symbols " + cells[0][0] + "->" +
         cells[0][0].symbols[0].getName() + ", " +
@@ -619,8 +613,9 @@ public class PairwiseDP extends DP implements Serializable {
           int [] advance = (states[l] instanceof EmissionState)
             ? ((EmissionState)states[l]).getAdvance()
             : ia00;
-          double[] sourceScores = cells[advance[0]][advance[1]].scores;
-          BackPointer[] oldBPs = cells[advance[0]][advance[1]].backPointers;
+          Cell oldCell = cells[advance[0]][advance[1]];
+          double[] sourceScores = oldCell.scores;
+          BackPointer[] oldBPs = oldCell.backPointers;
           //System.out.println("sourceScores = " + sourceScores);
           //System.out.println("Calculating weight");
           double weight;
@@ -736,10 +731,10 @@ public class PairwiseDP extends DP implements Serializable {
   /**
    * A single cell in the DP matrix;
    */
-  private static class Cell {
+  private final static class Cell {
     public double [] scores;
     public BackPointer [] backPointers;
-    public Symbol [] symbols;
+    public double [] emissions;
     
     public Cell() {
     }
@@ -752,31 +747,36 @@ public class PairwiseDP extends DP implements Serializable {
     /** test wether the cursor can be advanced further */
     boolean hasNext();
     /** retrieve the next block of cells */
-    Cell [][] next();
+    void next(Cell [][] cells) throws IllegalSymbolException;
+    /** press out a new correctly sized cell array */
+    Cell [][] press();
     /** retrieve the depth of this cursor */
     int [] getDepth();
   }
 
-  private static class LightPairDPCursor implements PairDPCursor {
+  private class LightPairDPCursor implements PairDPCursor {
+    protected CrossProductAlphabet alpha;
     protected int[] pos;
     protected boolean flip;
     protected SymbolList[] seqs;
     protected double[][][] columns;
+    protected double[][][] emissions;
     protected BackPointer[][][] bPointers;
     protected int numStates;
     protected double[] zeroCol;
     protected BackPointer[] emptyBP;
-    protected Symbol[] emptySymbols;
     protected int[] depth;
     
     public LightPairDPCursor(
       SymbolList seq1,
       SymbolList seq2,
+      CrossProductAlphabet alpha,
       int depth1,
       int depth2,
       int numStates
-    ) {
+    ) throws IllegalSymbolException {
       this.numStates = numStates;
+      this.alpha = alpha;
       this.zeroCol = new double[this.numStates]; // don't touch this, please...
       for (int i = 0; i < zeroCol.length; ++i) {
         this.zeroCol[i] = Double.NEGATIVE_INFINITY;
@@ -793,14 +793,19 @@ public class PairwiseDP extends DP implements Serializable {
       this.depth[1] = depth2;
       
       this.flip = this.seqs[1].length() > this.seqs[0].length();
+      //System.out.println("flip=" + this.flip);
       if(flip) {
         this.columns =
           new double[depth[0]][seqs[1].length()+2][numStates];
+        this.emissions =
+          new double[depth[0]][seqs[1].length()+2][];
         this.bPointers =
           new BackPointer[depth[0]][seqs[1].length()+2][numStates];
       } else {
         this.columns =
           new double[depth[1]][seqs[0].length()+2][numStates];
+        this.emissions =
+          new double[depth[1]][seqs[0].length()+2][];
         this.bPointers =
           new BackPointer[depth[1]][seqs[0].length()+2][numStates];
       }
@@ -814,6 +819,16 @@ public class PairwiseDP extends DP implements Serializable {
           }
         }
       }
+/*      for(int i = 1; i < emissions.length; i++) {
+        double [][] ei = emissions[i];
+        for(int j = 0; j < ei.length; j++) {
+          double [] ej = ei[j];
+          for(int k = 0; k < ej.length; k++) {
+            ej[k] = Double.NEGATIVE_INFINITY;
+          }
+        }
+      }*/
+      calcEmissions(emissions[0]);
     }
 
     public int[] getDepth() {
@@ -826,44 +841,43 @@ public class PairwiseDP extends DP implements Serializable {
         pos[i] <= seqs[i].length()+1;
     }
     
-    public Cell[][] next() {
+    public Cell[][] press() {
       Cell [][] cells = new Cell[depth[0]][depth[1]];
-      //System.out.println("Pos=" + pos[0] + ", " + pos[1] + " " + flip);
-      for(int i = 0; i < depth[0]; i++) {
-        int ii = pos[0] - i;
-        boolean outI = (ii < 0) || (ii > seqs[0].length()+1);
-        for(int j = 0; j < depth[1]; j++) {
-          int jj = pos[1] - j;
-          boolean outJ = (jj < 0) || (jj > seqs[1].length()+1);
-          Cell c = cells[i][j] = new Cell();
-          //System.out.println("at " + i + "->" + ii + ", " + j + "->" + jj);
-          if(outI || outJ) {
-            c.scores = zeroCol;
-            c.backPointers = emptyBP;
-            c.symbols = emptySymbols;
-          } else {
-            if(flip) {
-              c.scores = columns[i][jj];
-              c.backPointers = bPointers[i][jj];
-            } else {
-              c.scores = columns[j][ii];
-              c.backPointers = bPointers[j][ii];
-            }
-          }
-          c.symbols = new Symbol [] {
-            (ii < 1 || ii > seqs[0].length())
-              ? AlphabetManager.getGapSymbol()
-              : seqs[0].symbolAt(ii),
-            (jj < 1 || jj > seqs[1].length())
-              ? AlphabetManager.getGapSymbol()
-              : seqs[1].symbolAt(jj)
-          };
-          //System.out.println("Symbol " + c + "->" + c.symbols[0].getName() + ", " + c.symbols[1].getName());
-          //System.out.println("scores " + c.scores);
+      for(int i = 0; i < cells.length; i++) {
+        Cell [] ci = cells[i];
+        for(int j = 0; j < ci.length; j++) {
+          ci[j] = new Cell();
         }
       }
+      return cells;
+    }
     
+    public void next(Cell[][] cells) throws IllegalSymbolException {
+      //System.out.println("Pos=" + pos[0] + ", " + pos[1] + " " + flip);
       if(flip) {
+        for(int i = 0; i < depth[0]; i++) {
+          int ii = pos[0] - i;
+          boolean outI = (ii < 0) || (ii > seqs[0].length()+1);
+          Cell[] cellI = cells[i]; // lucky in this case - can pre-fetch cells
+          double[][] columnsI = columns[i];
+          double[][] emissionsI = emissions[i];
+          BackPointer[][] bPointersI = bPointers[i];
+          for(int j = 0; j < depth[1]; j++) {
+            int jj = pos[1] - j;
+            boolean outJ = (jj < 0) || (jj > seqs[1].length()+1);
+            //System.out.println("at " + i + "->" + ii + ", " + j + "->" + jj);
+            Cell c = cellI[j];
+            if(outI || outJ) {
+              c.scores = zeroCol;
+              c.emissions = zeroCol;
+              c.backPointers = emptyBP;
+            } else {
+              c.scores = columnsI[jj];
+              c.emissions = emissionsI[jj];
+              c.backPointers = bPointersI[jj];
+            }
+          }
+        }
         if(pos[1] <= seqs[1].length()) {
           pos[1]++;
         } else {
@@ -871,16 +885,45 @@ public class PairwiseDP extends DP implements Serializable {
           pos[0]++;
 
           // advance arrays
-          double [][] tempC = columns[0];
-          BackPointer [][] tempBP = bPointers[0];
-          for(int i = 1; i < depth[0]; i++) {
-            columns[i-1] = columns[i];
-            bPointers[i-1] = bPointers[i];
+          int depth = this.depth[0];
+          double [][] tempC = columns[depth-1];
+          double [][] tempE = emissions[depth-1];
+          BackPointer [][] tempBP = bPointers[depth-1];
+          for(int i = 1; i < depth; i++) {
+            columns[i] = columns[i-1];
+            emissions[i] = emissions[i-1];
+            bPointers[i] = bPointers[i-1];
           }
-          columns[depth[0]-1] = tempC;
-          bPointers[depth[0]-1] = tempBP;
+          columns[0] = tempC;
+          emissions[0] = tempE;
+          bPointers[0] = tempBP;
+          
+          calcEmissions(tempE);
         }
-      } else {
+      } else { // flip == false
+        for(int i = 0; i < depth[1]; i++) {
+          int ii = pos[1] - i;
+          boolean outI = (ii < 0) || (ii > seqs[1].length()+1);
+          //Cell[] cellI = cells[i]; // can't pre-fetch as loop wrong way
+          double[][] columnsI = columns[i];
+          double[][] emissionsI = emissions[i];
+          BackPointer[][] bPointersI = bPointers[i];
+          for(int j = 0; j < depth[0]; j++) {
+            int jj = pos[0] - j;
+            boolean outJ = (jj < 0) || (jj > seqs[0].length()+1);
+            //System.out.println("at " + i + "->" + ii + ", " + j + "->" + jj);
+            Cell c = cells[j][i];
+            if(outI || outJ) {
+              c.scores = zeroCol;
+              c.emissions = zeroCol;
+              c.backPointers = emptyBP;
+            } else {
+              c.scores = columnsI[jj];
+              c.emissions = emissionsI[jj];
+              c.backPointers = bPointersI[jj];
+            }
+          }
+        }
         if(pos[0] <= seqs[0].length()) {
           pos[0]++;
         } else {
@@ -888,26 +931,67 @@ public class PairwiseDP extends DP implements Serializable {
           pos[1]++;
           
           // advance arrays
-          double [][] tempC = columns[0];
-          BackPointer [][] tempBP = bPointers[0];
-          for(int i = 1; i < depth[1]; i++) {
-            columns[i-1] = columns[i];
-            bPointers[i-1] = bPointers[i];
+          int depth = this.depth[1];
+          double [][] tempC = columns[depth-1];
+          double [][] tempE = emissions[depth-1];
+          BackPointer [][] tempBP = bPointers[depth-1];
+          for(int i = 1; i < depth; i++) {
+            columns[i] = columns[i-1];
+            emissions[i] = emissions[i-1];
+            bPointers[i] = bPointers[i-1];
           }
-          columns[depth[1]-1] = tempC;
-          bPointers[depth[1]-1] = tempBP;
+          columns[0] = tempC;
+          emissions[0] = tempE;
+          bPointers[0] = tempBP;
+
+          calcEmissions(tempE);
         }
       }
-      return cells;
+    }
+    
+    private void calcEmissions(double[][] em)
+    throws IllegalSymbolException {
+      if(flip) {
+        //System.out.println("Calculating emissions at " + pos[0] + ", " + pos[1]);
+        Symbol [] symL = new Symbol[2];
+        List symList = Arrays.asList(symL);
+        int i = pos[0];
+        symL[0] = (i < 1 || i > seqs[0].length())
+          ? AlphabetManager.getGapSymbol()
+          : seqs[0].symbolAt(i);
+        for(int j = 0; j <= seqs[1].length()+1; j++) {
+          symL[1] = (j < 1 || j > seqs[1].length())
+            ? AlphabetManager.getGapSymbol()
+            : seqs[1].symbolAt(j);
+          em[j] = getEmission(symList, alpha);
+          //System.out.println("symbol " + symL[0].getName() + ", " + symL[1].getName() + "->" + em[j]);
+        }
+      } else {
+        //System.out.println("Calculating emissions at " + pos[0] + ", " + pos[1]);
+        Symbol [] symL = new Symbol[2];
+        List symList = Arrays.asList(symL);
+        int j = pos[1];
+        symL[1] = (j < 1 || j > seqs[1].length())
+          ? AlphabetManager.getGapSymbol()
+          : seqs[1].symbolAt(j);
+        for(int i = 0; i <= seqs[0].length()+1; i++) {
+          symL[0] = (i < 1 || i > seqs[0].length())
+            ? AlphabetManager.getGapSymbol()
+            : seqs[0].symbolAt(i);
+          //System.out.println("symbol " + symL[0].getName() + ", " + symL[1].getName());
+          em[i] = getEmission(symList, alpha);
+        }
+      }
     }
   }
   
-  private static abstract class AbstractMatrixPairDPCursor
+  private abstract class AbstractMatrixPairDPCursor
   implements PairDPCursor {
     protected int[] pos;
     protected SymbolList[] seqs;
     protected double[][][] columns;
     protected BackPointer[][][] bPointers;
+    protected double[][][] emissions;
     protected int numStates;
     protected double[] zeroCol;
     protected BackPointer[] emptyBP;
@@ -917,12 +1001,13 @@ public class PairwiseDP extends DP implements Serializable {
     public AbstractMatrixPairDPCursor(
       SymbolList seq1,
       SymbolList seq2,
+      CrossProductAlphabet alpha,
       int start1,
       int start2,
       int depth1,
       int depth2,
       PairDPMatrix matrix
-    ) {
+    ) throws IllegalSymbolException {
       this.numStates = matrix.states().length;
 
       this.zeroCol = new double[this.numStates]; // don't touch this, please...
@@ -943,29 +1028,57 @@ public class PairwiseDP extends DP implements Serializable {
       this.depth[0] = depth1;
       this.depth[1] = depth2;
       this.bPointers = new BackPointer[seq1.length()+2][seq2.length()+2][numStates];
+      this.emissions = new double[seq1.length()+2][seq2.length()+2][];
+      
+      Symbol [] symArray = new Symbol[2];
+      List symList = Arrays.asList(symArray);
+      for(int i = 0; i <= seq1.length()+1; i++) {
+        symArray[0] = (i < 1 || i > seq1.length())
+          ? AlphabetManager.getGapSymbol()
+          : seq1.symbolAt(i);
+        double [][] ei = emissions[i];
+        for(int j = 0; j <= seq2.length()+1; j++) {
+          symArray[1] = (j < 1 || j > seq2.length())
+            ? AlphabetManager.getGapSymbol()
+            : seq2.symbolAt(j);
+          ei[j] = getEmission(symList, alpha);
+        }
+      }
     }
     
     public int [] getDepth() {
       return depth;
     }
 
-      public boolean hasNext() {
+    public boolean hasNext() {
       return
         pos[0] <= (seqs[0].length()+1) ||
         pos[1] <= (seqs[1].length()+1);
     }
+    
+    public Cell[][] press() {
+      Cell [][] cells = new Cell[depth[0]][depth[1]];
+      for(int i = 0; i < cells.length; i++) {
+        Cell [] ci = cells[i];
+        for(int j = 0; j < ci.length; j++) {
+          ci[j] = new Cell();
+        }
+      }
+      return cells;
+    }
   }
   
-  private static class MatrixPairDPCursor
+  private class MatrixPairDPCursor
   extends AbstractMatrixPairDPCursor {
     public MatrixPairDPCursor(
       SymbolList seq1,
       SymbolList seq2,
+      CrossProductAlphabet alpha,
       int depth1,
       int depth2,
       PairDPMatrix matrix
-    ) {
-      super(seq1, seq2, 0, 0, depth1, depth2, matrix);
+    ) throws IllegalSymbolException {
+      super(seq1, seq2, alpha, 0, 0, depth1, depth2, matrix);
     }
     
     public boolean hasNext() {
@@ -973,37 +1086,44 @@ public class PairwiseDP extends DP implements Serializable {
         pos[1] <= (seqs[1].length()+1);
     }
     
-    public Cell [][] next() {
-      Cell [][] cells = new Cell[depth[0]][depth[1]];
-      
+    public void next(Cell[][] cells) {
       for(int i = 0; i < depth[0]; i++) {
+        Cell[] cellI = cells[i];
         int ii = pos[0] - i;
         boolean outI = ii < 0 || ii > seqs[0].length()+1;
-        for(int j = 0; j < depth[1]; j++) {
-          int jj = pos[1] - j;
-          boolean outJ = jj < 0 || jj > seqs[1].length()+1;
-          Cell c = cells[i][j] = new Cell();
-          c.scores = (outI || outJ) ? zeroCol : sMatrix[ii][jj];
-          c.backPointers = (outI || outJ) ? emptyBP : bPointers[ii][jj];
-          c.symbols = new Symbol [] {
-            (ii < 1 || ii > seqs[0].length())
-              ? AlphabetManager.getGapSymbol()
-              : seqs[0].symbolAt(ii),
-            (jj < 1 || jj > seqs[1].length())
-              ? AlphabetManager.getGapSymbol()
-              : seqs[1].symbolAt(jj)
-          };
+        if(outI) {
+          for(int j = 0; j < depth[1]; j++) {
+            Cell c = cellI[j];
+            c.scores = zeroCol;
+            c.emissions = zeroCol;
+            c.backPointers = emptyBP;
+          }
+        } else {
+          double[][] sMatI = this.sMatrix[ii];
+          double[][] emisI = this.emissions[ii];
+          BackPointer[][] bPI = this.bPointers[ii];
+          for(int j = 0; j < depth[1]; j++) {
+            int jj = pos[1] - j;
+            boolean outJ = jj < 0 || jj > seqs[1].length()+1;
+            Cell c = cellI[j];
+            if(outJ) {
+              c.scores = zeroCol;
+              c.emissions = zeroCol;
+              c.backPointers = emptyBP;
+            } else {
+              c.scores = sMatI[jj];
+              c.emissions = emisI[jj];
+              c.backPointers = bPI[jj];
+            }
+          }
         }
       }
-    
       if(pos[0] <= seqs[0].length()) {
         pos[0]++;
       } else {
         pos[0] = 0;
         pos[1]++;
       }
-      
-      return cells;
     }
   }
 
@@ -1012,12 +1132,13 @@ public class PairwiseDP extends DP implements Serializable {
     public BackMatrixPairDPCursor(
       SymbolList seq1,
       SymbolList seq2,
+      CrossProductAlphabet alpha,
       int depth1,
       int depth2,
       PairDPMatrix matrix
-    ) {
+    ) throws IllegalSymbolException {
       super(
-        seq1, seq2,
+        seq1, seq2, alpha,
         seq1.length()+1, seq2.length()+1,
         depth1, depth2,
         matrix
@@ -1029,39 +1150,45 @@ public class PairwiseDP extends DP implements Serializable {
         pos[1] >= 0;
     }
     
-    public Cell [][] next() {
-      //System.out.println("Pos=" + pos[0] + ", " + pos[1]);
-      Cell [][] cells = new Cell[depth[0]][depth[1]];
-      
+    
+    public void next(Cell[][] cells) {
       for(int i = 0; i < depth[0]; i++) {
+        Cell[] cellI = cells[i];
         int ii = pos[0] + i;
         boolean outI = ii < 0 || ii > seqs[0].length()+1;
-        for(int j = 0; j < depth[1]; j++) {
-          int jj = pos[1] + j;
-          boolean outJ = jj < 0 || jj > seqs[1].length()+1;
-          //System.out.println("at " + i + "->" + ii + ", " + j + "->" + jj);
-          Cell c = cells[i][j] = new Cell();
-          c.scores = (outI || outJ) ? zeroCol : sMatrix[ii][jj];
-          c.backPointers = (outI || outJ) ? emptyBP : bPointers[ii][jj];
-          c.symbols = new Symbol [] {
-            (ii < 1 || ii > seqs[0].length())
-              ? AlphabetManager.getGapSymbol()
-              : seqs[0].symbolAt(ii),
-            (jj < 1 || jj > seqs[1].length())
-              ? AlphabetManager.getGapSymbol()
-              : seqs[1].symbolAt(jj)
-          };
+        if(outI) {
+          for(int j = 0; j < depth[1]; j++) {
+            Cell c = cellI[j];
+            c.scores = zeroCol;
+            c.emissions = zeroCol;
+            c.backPointers = emptyBP;
+          }
+        } else {
+          double[][] sMatI = this.sMatrix[ii];
+          double[][] emisI = this.emissions[ii];
+          BackPointer[][] bPI = this.bPointers[ii];
+          for(int j = 0; j < depth[1]; j++) {
+            int jj = pos[1] + j;
+            boolean outJ = jj < 0 || jj > seqs[1].length()+1;
+            Cell c = cellI[j];
+            if(outJ) {
+              c.scores = zeroCol;
+              c.emissions = zeroCol;
+              c.backPointers = emptyBP;
+            } else {
+              c.scores = sMatI[jj];
+              c.emissions = emisI[jj];
+              c.backPointers = bPI[jj];
+            }
+          }
         }
       }
-    
       if(pos[0] > 0) {
         pos[0]--;
       } else {
         pos[0] = seqs[0].length()+1;
         pos[1]--;
       }
-      
-      return cells;
     }
   }
 }

@@ -22,9 +22,11 @@
 
 package org.biojava.bio.dp;
 
+import org.biojava.bio.*;
+
 public class DPFactory {
   public static DP createDP(MarkovModel model)
-  throws Exception {
+  throws IllegalArgumentException, BioException {
     int heads = model.heads();
     MarkovModel flat = DP.flatView(model);
     if(heads == 1) {
@@ -32,7 +34,7 @@ public class DPFactory {
     } else if(heads == 2) {
       return new PairwiseDP(flat);
     } else {
-      throw new UnsupportedOperationException(
+      throw new IllegalArgumentException(
         "Can't create DPFactory for models with " + heads + " heads"
       );
     }

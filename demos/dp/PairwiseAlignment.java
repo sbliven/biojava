@@ -83,10 +83,19 @@ public class PairwiseAlignment {
             "Aligning " + sourceSeq.getName() + ":" + targetSeq.getName()
           );
 
-          double forward = aligner.forward(seqs);
-          System.out.println("Forwards:  " + forward);
+          // tests minimal memory forwards
+          double forwardMin = aligner.forward(seqs);
+          System.out.println("Forwards-: " + forwardMin);
+
+          // uncomment to test explicit memory forwards
+          //double forwardMax = aligner.forwardMatrix(seqs).getScore();
+          //System.out.println("Forwards+: " + forwardMax);
+
+          // tests explicit memory backwards
           double backward = aligner.backward(seqs);
           System.out.println("Backwards: " + backward);
+          
+          // tests minimal memory viterbi
           StatePath result = aligner.viterbi(seqs);
           System.out.println("Viterbi:   " + result.getScore());
         }

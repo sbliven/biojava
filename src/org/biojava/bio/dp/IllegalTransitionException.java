@@ -22,10 +22,12 @@
 
 package org.biojava.bio.dp;
 
+import org.biojava.bio.*;
+
 /**
  * This exception indicates that there is no transition between two states.
  */
-public class IllegalTransitionException extends Exception {
+public class IllegalTransitionException extends BioException {
   private State from;
   private State to;
   
