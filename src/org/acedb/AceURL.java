@@ -119,25 +119,33 @@ public class AceURL {
 	return toString().hashCode();
     }
 
+    private boolean streq(String a, String b) {
+	if (a == b)
+	    return true;
+	if (a == null || b == null)
+	    return false;
+	return a.equals(b);
+    }
+    
     public boolean equals(Object o) {
 	if (! (o instanceof AceURL))
 	    return false;
 	AceURL ao = (AceURL) o;
-	if (! (ao.getProtocol().equals(protocol)))
+	if (! streq(ao.getProtocol(), protocol))
 	    return false;
-	if (! (ao.getHost().equals(host)))
+	if (! streq(ao.getHost(), host))
 	    return false;
 	if (ao.getPort() != port)
 	    return false;
-	if (! (ao.getFile().equals(file)))
+	if (! streq(ao.getFile(), file))
 	    return false;
-	if (! (ao.getQuery().equals(query)))
+	if (! streq(ao.getQuery(), query))
 	    return false;
-	if (! (ao.getRef().equals(ref)))
+	if (! streq(ao.getRef(), ref))
 	    return false;
-	if (! (ao.getUserInfo().equals(userInfo)))
+	if (! streq(ao.getUserInfo(), userInfo))
 	    return false;
-	if (! (ao.getAuthority().equals(authority)))
+	if (! streq(ao.getAuthority(), authority))
 	    return false;
 
 	return true;
