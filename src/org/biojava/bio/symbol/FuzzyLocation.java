@@ -39,25 +39,57 @@ import org.biojava.bio.*;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class FuzzyLocation
 extends AbstractRangeLocation
 implements Serializable {
-  private int outerMin;
-  private int innerMin;
-  private int innerMax;
-  private int outerMax;
-  private RangeResolver resolver;
+    /**
+     * Always use the `inner' values.
+     */
+
+    public final static RangeResolver RESOLVE_INNER;
+
+    /**
+     * Use the `outer' values, unless they are unbounded in which case the
+     * `inner' values are used.
+     */
+
+    public final static RangeResolver RESOLVE_OUTER;
+
+    /**
+     * Use the arithmetic mean of the `inner' and `outer' values, unless the
+     * outer value is unbounded.
+     */
+
+    public final static RangeResolver RESOLVE_AVERAGE;
+
+    static {
+	RESOLVE_INNER = new InnerRangeResolver();
+	RESOLVE_OUTER = new OuterRangeResolver();
+	RESOLVE_AVERAGE = new AverageRangeResolver();
+    }
+
+    private int outerMin;
+    private int innerMin;
+    private int innerMax;
+    private int outerMax;
+    private RangeResolver resolver;
   
   /**
    * Create a new FuzzyLocation that decorates 'parent' with a potentialy
    * fuzzy min or max value.
    *
-   * @param fuzzyMin true if getMin represents a fuzzy location, false
-   *                 otherwise
-   * @param fuzzyMax true if getMax represents a fuzzy location, false
-   *                 otherwise
+   * @param outerMin the lower bound on the location's min value.  Integer.MIN_VALUE indicates
+   *                 unbounded.
+   * @param outerMax the upper bound on the location's max value.  Integer.MAX_VALUE indicates
+   *                 unbounded.
+   * @param innerMin the upper bound on the location's min value.
+   * @param innerMax the lower bound on the location's max value.
+   * @param resolver a RangeResolver object which defines the policy used to calculate
+   *                 the location's min and max properties.
    */
+
   public FuzzyLocation(
     int outerMin, int outerMax,
     int innerMin, int innerMax,
@@ -76,6 +108,7 @@ implements Serializable {
    * @return the Location instance that stores all of the Loctaion interface
    *         data
    */
+
   public RangeResolver getResolver() {
     return resolver;
   }
@@ -118,4 +151,50 @@ implements Serializable {
     public int resolveMin(FuzzyLocation loc);
     public int resolveMax(FuzzyLocation loc);
   }
+
+    private static class InnerRangeResolver implements RangeResolver {
+	public int resolveMin(FuzzyLocation loc) {
+	    return loc.getInnerMin();
+	}
+
+	public int resolveMax(FuzzyLocation loc) {
+	    return loc.getInnerMax();
+	}
+    }
+
+    private static class OuterRangeResolver implements RangeResolver {
+	public int resolveMin(FuzzyLocation loc) {
+	    if (loc.hasBoundedMin()) {
+		return loc.getOuterMin();
+	    } else {
+		return loc.getInnerMin();
+	    }
+	}
+
+	public int resolveMax(FuzzyLocation loc) {
+	    if (loc.hasBoundedMax()) {
+		return loc.getOuterMax();
+	    } else {
+		return loc.getInnerMax();
+	    }
+	}
+    }
+
+    private static class AverageRangeResolver implements RangeResolver {
+	public int resolveMin(FuzzyLocation loc) {
+	    if (loc.hasBoundedMin()) {
+		return loc.getOuterMin() + loc.getInnerMin() / 2;
+	    } else {
+		return loc.getInnerMin();
+	    }
+	}
+
+	public int resolveMax(FuzzyLocation loc) {
+	    if (loc.hasBoundedMax()) {
+		return loc.getOuterMax() + loc.getInnerMax() / 2;
+	    } else {
+		return loc.getInnerMax();
+	    }
+	}
+    }
 }
