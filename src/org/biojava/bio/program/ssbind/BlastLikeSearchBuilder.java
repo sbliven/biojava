@@ -177,6 +177,36 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         this.subjectDBs = subjectDBs;
     }
 
+    public void setQuerySeq(final String querySeqId)
+        throws BioException
+    {
+        if (querySeqHolder == null)
+            throw new BioException("Running BlastLikeSearchBuilder with null query SequenceDB");
+
+        try
+	{
+	    querySeq = (SymbolList) querySeqHolder.getSequence(querySeqId);
+	}
+	catch (BioException be)
+	{
+	    throw new BioException(be, "Failed to retrieve query sequence from holder using ID: "
+				   + querySeqId);
+	}
+    }
+
+    public void setSubjectDB(final String subjectDBName)
+        throws BioException
+    {
+        if (subjectDBs == null)
+            throw new BioException("Running BlastLikeSearchBuilder with null subject SequenceDBInstallation");
+
+        subjectDB = subjectDBs.getSequenceDB(subjectDBName);
+
+	if (subjectDB == null)
+	    throw new BioException("Failed to retrieve database from installation using ID: "
+				   + subjectDBName);
+    }
+
     public boolean getMoreSearches()
     {
         return moreSearchesAvailable;
@@ -201,7 +231,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         }
         catch (BioException be)
         {
-            System.err.println("Failed to build SeqSimilaritySearchResult: ");
+            System.err.println("Failed to build SeqSimilaritySearchResult:");
             be.printStackTrace();
         }
     }
@@ -238,7 +268,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         }
         catch (BioException be)
         {
-            System.err.println("Failed to build SubHit: ");
+            System.err.println("Failed to build SubHit:");
             be.printStackTrace();
         }
     }
@@ -256,36 +286,6 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     public void addSubHitProperty(final Object key, final Object value)
     {
         subHitData.put(key, value);
-    }
-
-    public void setQuerySeq(final String querySeqId)
-        throws BioException
-    {
-        if (querySeqHolder == null)
-            throw new BioException("Running BlastLikeSearchBuilder with null query SequenceDB");
-
-        try
-	{
-	    querySeq = (SymbolList) querySeqHolder.getSequence(querySeqId);
-	}
-	catch (BioException be)
-	{
-	    throw new BioException(be, "Failed to retrieve query sequence from holder using ID: "
-				   + querySeqId);
-	}
-    }
-
-    public void setSubjectDB(final String subjectDBName)
-        throws BioException
-    {
-        if (subjectDBs == null)
-            throw new BioException("Running BlastLikeSearchBuilder with null subject SequenceDBInstallation");
-
-        subjectDB = subjectDBs.getSequenceDB(subjectDBName);
-
-	if (subjectDB == null)
-	    throw new BioException("Failed to retrieve database from installation using ID: "
-				   + subjectDBName);
     }
 
     /**
@@ -363,6 +363,25 @@ public class BlastLikeSearchBuilder implements SearchBuilder
      */
     private SeqSimilaritySearchSubHit makeSubHit() throws BioException
     {
+        // Try to get a valid TokenParser
+        if (tokenParser == null)
+        {
+            String identifier;
+
+            // Try explicit sequence type first
+            if (subHitData.containsKey("hitSequenceType"))
+                identifier = (String) subHitData.get("hitSequenceType");
+            // Otherwise try to resolve from the program name (only
+            // works for Blast)
+            else if (resultPreAnnotation.containsKey("program"))
+                identifier = (String) resultPreAnnotation.get("program");
+            else
+                throw new BioException("Failed to determine sequence type");
+
+            FiniteAlphabet alpha = alphaResolver.resolveAlphabet(identifier);
+            tokenParser = new TokenParser(alpha);
+        }
+
         // BLASTP output has the strands implied to be POSITIVE
         Strand qStrand = StrandedFeature.POSITIVE;
         Strand sStrand = StrandedFeature.POSITIVE;
@@ -408,7 +427,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
         if (sStrand == StrandedFeature.NEGATIVE)
         {
-            int swap = qStart;
+            int swap = sStart;
             sStart = sEnd;
             sEnd   = swap;
         }
@@ -420,39 +439,31 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
         if (subHitData.containsKey("score"))
             sc = Double.parseDouble((String) subHitData.get("score"));
+
         if (subHitData.containsKey("expectValue"))
-            ev = Double.parseDouble((String) subHitData.get("expectValue"));
+        {
+            String val = (String) subHitData.get("expectValue");
+            // Blast sometimes uses invalid formatting such as 'e-156'
+            // rather than '1e-156'
+            if (val.startsWith("e"))
+                ev = Double.parseDouble("1" + val);
+            else
+                ev = Double.parseDouble(val);
+        }
+
         if (subHitData.containsKey("pValue"))
             pv = Double.parseDouble((String) subHitData.get("pValue"));
-
-        if (tokenParser == null)
-        {
-            String identifier;
-
-            // Try explicit sequence type first
-            if (subHitData.containsKey("hitSequenceType"))
-                identifier = (String) subHitData.get("hitSequenceType");
-            // Otherwise try to resolve from the program name (only
-            // works for Blast)
-            else if (resultPreAnnotation.containsKey("program"))
-                identifier = (String) resultPreAnnotation.get("program");
-            else
-                throw new BioException("Failed to determine sequence type");
-
-            FiniteAlphabet alpha = alphaResolver.resolveAlphabet(identifier);
-            tokenParser = new TokenParser(alpha);
-        }
 
         Map labelMap = new HashMap();
 
         tokenBuffer.setLength(0);
         tokenBuffer.append((String) subHitData.get("querySequence"));
-        labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL, 
+        labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
                      tokenParser.parse(tokenBuffer.toString()));
 
         tokenBuffer.setLength(0);
         tokenBuffer.append((String) subHitData.get("subjectSequence"));
-        labelMap.put(hitData.get("HitId"), 
+        labelMap.put(hitData.get("HitId"),
                      tokenParser.parse(tokenBuffer.toString()));
 
         return new SequenceDBSearchSubHit(sc, ev, pv,
