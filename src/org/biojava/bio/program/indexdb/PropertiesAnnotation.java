@@ -31,7 +31,7 @@ import org.biojava.utils.Commitable;
  * <code>PropertiesAnnotation</code> creates an
  * <code>Annotation</code> view of a <code>Properties</code> bundle.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  */
 class PropertiesAnnotation

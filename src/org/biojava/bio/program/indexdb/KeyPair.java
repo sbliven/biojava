@@ -25,7 +25,7 @@ package org.biojava.bio.program.indexdb;
  * <code>KeyPair</code> represents a mapping of a primary identifier
  * to a secondary identifier for the same <code>Record</code>.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  */
 interface KeyPair {

@@ -30,7 +30,7 @@ import org.biojava.utils.Commitable;
  * may be searched using an algorithm consistent with the sort
  * order. For example, using a binary search.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  */
 interface SearchableList

@@ -27,7 +27,7 @@ import org.biojava.utils.io.*;
 
 /**
  * <code>Record</code> represents a record within an indexed flat file
- * databank as defined by the OBDA indexing standard.
+ * databank as defined by the OBDA standard.
  *
  * @author Matthew Pocock
  * @author Keith James

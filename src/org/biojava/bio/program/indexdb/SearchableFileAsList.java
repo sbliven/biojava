@@ -30,7 +30,7 @@ import org.biojava.utils.*;
  * <code>SearchableFileAsList</code> is an abstract base class which
  * implements binary ID searching over the backing random access file.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  */
 abstract class SearchableFileAsList
@@ -83,17 +83,17 @@ abstract class SearchableFileAsList
             int cmp = cmp(bytes, idBytes);
 
             if(cmp < 0) {
-                if(min != mid) {
-                    min = mid;
-                } else {
+                 if(min != mid) {
+                     min = mid;
+                 } else {
                     min = mid+1;
-                }
+                 }
             } else if(cmp > 0) {
-                if(max != mid) {
-                    max = mid;
-                } else {
+                 if(max != mid) {
+                     max = mid;
+                 } else {
                     max = mid-1;
-                }
+                 }
             } else if(cmp == 0) {
                 return parseRecord(bytes);
             }
