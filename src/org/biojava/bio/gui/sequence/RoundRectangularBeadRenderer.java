@@ -25,6 +25,9 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 
@@ -98,8 +101,9 @@ public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
     {
 	Location loc = f.getLocation();
 
-	double min = context.sequenceToGraphics(loc.getMin());
-	double max = context.sequenceToGraphics(loc.getMax());
+	int min = loc.getMin();
+	int max = loc.getMax();
+	int dif = max - min;
 
 	Shape shape;
 
@@ -110,12 +114,36 @@ public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
 	{
 	    double  posXW = min;
 	    double  posYN = beadDisplacement;
-	    double  width = max - posXW + 1.0f;
-	    double height = Math.min(beadDepth, width / 2.0f) - 1.0f;
+	    double  width = Math.max(((double) (dif + 1)) * context.getScale(), 1.0f);
+	    double height = Math.min(beadDepth, width / 2.0f);
 
+	    // This is an optimization for cases where the
+	    // SequenceRenderContext also extend a JComponent and can
+	    // inform us of their visible area
 	    if (JComponent.class.isInstance(context))
-		if (! ((JComponent) context).getVisibleRect().intersects(posXW, posYN, width, height))
-		    return;
+	    {
+		Rectangle visible = ((JComponent) context).getVisibleRect();
+		
+		// Hack! Compensates for offset in SequencePanel
+
+		// Remove the contribution of any scroll offset from the
+		// transform
+		AffineTransform t = g.getTransform();
+		t.translate(visible.getX(), visible.getY());
+
+		// Invert the remainder and apply to cancel out the
+		// remaining offset to visible
+		try
+		{
+		    if (! t.createInverse().createTransformedShape(visible)
+			.intersects(posXW, posYN, width, height))
+			return;
+  		}
+    		catch (NoninvertibleTransformException ni)
+    		{
+    		    ni.printStackTrace();
+    		}
+  	    }
 
 	    // If the bead height occupies less than the full height
 	    // of the renderer, move it down so that it is central
@@ -130,12 +158,27 @@ public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
 	{
 	    double  posXW = beadDisplacement;
 	    double  posYN = min;
-	    double height = max - posYN + 1.0f;
-	    double  width = Math.min(beadDepth, height / 2.0f) - 1.0f;
+	    double height = Math.max(((double) dif + 1) * context.getScale(), 1.0f);
+	    double  width = Math.min(beadDepth, height / 2.0f);
 
 	    if (JComponent.class.isInstance(context))
-		if (! ((JComponent) context).getVisibleRect().intersects(posXW, posYN, width, height))
-		    return;
+	    {
+		Rectangle visible = ((JComponent) context).getVisibleRect();
+
+		AffineTransform t = g.getTransform();
+		t.translate(visible.getX(), visible.getY());
+
+		try
+		{
+		    if (! t.createInverse().createTransformedShape(visible)
+			.intersects(posXW, posYN, width, height))
+			return;
+  		}
+    		catch (NoninvertibleTransformException ni)
+    		{
+    		    ni.printStackTrace();
+    		}
+  	    }
 
 	    if (width < beadDepth)
 		posXW += ((beadDepth - width) /  2.0f);

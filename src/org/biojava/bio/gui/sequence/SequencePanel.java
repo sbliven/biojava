@@ -493,7 +493,6 @@ Changeable {
      this.pixelOffset += displacement;
   }
 
-
   public void resizeAndValidate() {
     //System.out.println("resizeAndValidate starting");
     Dimension d = null;
