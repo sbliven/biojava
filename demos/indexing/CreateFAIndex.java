@@ -1,3 +1,5 @@
+package indexing;
+
 import java.io.*;
 import java.util.*;
 
@@ -76,10 +78,15 @@ public class CreateFAIndex {
         if(key.equals(FastaFormat.PROPERTY_DESCRIPTIONLINE)) {
           String line = (String) value;
           
+          /* 2nd word
           int a = line.indexOf(" ") + 1;
           int b = line.indexOf(" ", a);
-          
           id = line.substring(a, b);
+          */
+          
+          /* 1st word */
+          int a = line.indexOf(" ");
+          id = line.substring(0, a);
         }
       }
       
