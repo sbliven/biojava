@@ -1,24 +1,73 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.program.gff;
 
 import java.io.*;
+import java.util.*;
+
 import org.biojava.bio.*;
 
+/**
+ * Listens to a stream of GFF events and writes the lines to a PrintWriter.
+ * <P>
+ * This will ignore all exceptions. Mabey the error-handeling needs to move into
+ * an error handeling interface?
+ *
+ * @author Matthew Pocock
+ */
 public class GFFWriter implements GFFDocumentHandler {
+  /**
+   * The destination of the lines.
+   */
   private PrintWriter out;
   
+  /**
+   * Create a new GFFWriter that will write to 'out'.
+   *
+   * @param out  the PrintWriter to write to
+   */
   public GFFWriter(PrintWriter out) {
     this.out = out;
   }
   
   public void startDocument() {}
+  
+  /**
+   * Flushes the PrintWriter to make sure that everything is written.
+   */
   public void endDocument()   {
     out.flush();
   }
   
+  /**
+   * Prints the comment directly to the PrintWriter.
+   */
   public void commentLine(String comment) {
-    out.println(comment);
+    out.println("#" + comment);
   }
   
+  /**
+   * Prints the gff record to the PrintWriter.
+   */
   public void recordLine(GFFRecord record) {
     out.print(
       record.getSeqName() + "\t" +
@@ -50,7 +99,8 @@ public class GFFWriter implements GFFDocumentHandler {
       out.print(frame + "");
     }
     
-    String ga = record.getGroupAttributes();
+    Map gaMap = record.getGroupAttributes();
+    String ga = SimpleGFFRecord.stringifyAttributes(gaMap);
     if(ga != null && ga.length() > 0) {
       out.print("\t" + ga);
     }

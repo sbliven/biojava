@@ -63,16 +63,16 @@ public class SimpleAnnotation implements Annotation {
   }
 
   /**
-   * @throws IllegalArgumentException if the property 'key' does not exist
+   * @throws NoSuchElementException if the property 'key' does not exist
    */
-  public Object getProperty(Object key) throws IllegalArgumentException {
+  public Object getProperty(Object key) throws NoSuchElementException {
     if(propertiesAllocated()) {
       Map prop = getProperties();
       if(prop.containsKey(key)) {
         return prop.get(key);
       }
     }
-    throw new IllegalArgumentException("Property " + key + " unknown");
+    throw new NoSuchElementException("Property " + key + " unknown");
   }
 
   public void setProperty(Object name, Object value) {
@@ -99,6 +99,10 @@ public class SimpleAnnotation implements Annotation {
     return sb.toString();
   }
   
+  public Map asMap() {
+    return new HashMap(getProperties());
+  }
+  
   public SimpleAnnotation() {
   }
   
@@ -121,6 +125,21 @@ public class SimpleAnnotation implements Annotation {
           "Property was there and then dissapeared: " + key
         );
       }
+    }
+  }
+  
+  public SimpleAnnotation(Map annMap) {
+    if(annMap == null) {
+      throw new IllegalArgumentException(
+        "Null annotation Map not allowed. Use an empy map instead."
+      );
+    }
+    if(annMap.isEmpty()) {
+      return;
+    }
+    for(Iterator i = annMap.keySet().iterator(); i.hasNext(); ) {
+      Object key = i.next();
+      setProperty(key, annMap.get(key));
     }
   }
 }

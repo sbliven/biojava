@@ -30,6 +30,8 @@ import org.biojava.bio.alignment.*;
 
 /**
  * The results of a meme run.
+ *
+ * @author Matthew Pocock
  */
 public class Meme {
   private List motifs;

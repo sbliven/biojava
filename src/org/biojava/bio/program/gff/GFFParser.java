@@ -13,7 +13,7 @@ public class GFFParser {
     for(String line = bReader.readLine(); line != null; line = bReader.readLine()) {
       aList.clear();
       if(line.startsWith("#")) {
-        handler.commentLine(line);
+        handler.commentLine(line.substring(1));
       } else {
         StringTokenizer st = new StringTokenizer(line, "\t", false);
         while(st.hasMoreTokens() && aList.size() < 8) {
@@ -101,7 +101,7 @@ public class GFFParser {
       }
     }
     
-    record.setGroupAttributes(rest);
+    record.setGroupAttributes(SimpleGFFRecord.parseAttribute(rest));
     record.setComment(comment);
     
     return record;

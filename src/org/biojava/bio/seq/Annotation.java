@@ -77,6 +77,15 @@ public interface Annotation {
   Set keys();
   
   /**
+   * Retern a map that contains the same key/values as this Annotation.
+   * <P>
+   * If the annotation changes, the map may not reflect this.
+   *
+   * @return a Map
+   */
+  Map asMap();
+   
+  /**
    * A realy usefull empty and immutable annotation object.
    * <P>
    * Use this instead of null when you realy don't want an object or an
@@ -100,6 +109,11 @@ public interface Annotation {
     
     public Set keys() {
       return Collections.EMPTY_SET;
+    }
+    
+    public Map asMap() {
+      //return Collections.EMPTY_MAP; 1.3
+      return new HashMap();
     }
   }
 }

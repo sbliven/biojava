@@ -1,5 +1,5 @@
 #! /bin/csh -f
-set PACKAGES_CORE=org.biojava.bio.seq:org.biojava.bio.seq.io:org.biojava.bio.seq.tools:org.biojava.bio.alignment:org.biojava.bio.gui
+set PACKAGES_CORE=org.biojava.bio.seq:org.biojava.bio.seq.io:org.biojava.bio.seq.tools:org.biojava.bio.alignment:org.biojava.bio.gui:org.biojava.bio.program:org.biojava.bio.program.gff
 set PACKAGES_DEVELOPMENT=org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.utils.xml
 set PACKAGES_CORBA=GNOME:org.Biocorba.Seqcore:org.biojava.bridge.GNOME:org.biojava.bridge.Biocorba.Seqcore
 set PACKAGES_ACEDB=org.acedb:org.acedb.seq:org.acedb.staticobj:org.acedb.socket

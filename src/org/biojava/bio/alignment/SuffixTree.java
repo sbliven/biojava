@@ -20,18 +20,20 @@
  */
 
 
-/*
- * Suffix tree implementation
- * (c) 2000 By Matthew Pocock <mrp@sanger.ac.uk>
- * This code is under the GLP license.
- */
 package org.biojava.bio.alignment;
 
 import java.util.*;
 
 import org.biojava.bio.seq.*;
-import org.biojava.stats.svm.SVMKernel;
 
+/**
+ * Suffix tree implementation.
+ * <P>
+ * The interface is a bit strange, as it needed to be as space-efficient as
+ * possible. More work could be done on the space issue.
+ *
+ * @author Matthew Pocock
+ */
 public class SuffixTree {
   private Alphabet alphabet;
   private SuffixNode root;
@@ -168,33 +170,4 @@ public class SuffixTree {
       child = new SuffixNode[c];
     }
   }
-  
-  /**
-   * Computes the dot-product of two suffix-trees as the sum of the products
-   * of the counts of all nodes they have in common.
-   */
-  public static final SVMKernel kernel = new SVMKernel() {
-    public double evaluate(Object a, Object b) {
-      SuffixTree st1 = (SuffixTree) a;
-      SuffixTree st2 = (SuffixTree) b;
-      SuffixNode n1 = st1.getRoot();
-      SuffixNode n2 = st2.getRoot();
-      
-      return 1.0 + dot(n1, n2, st1.alphabet().size());
-    }
-    
-    private double dot(SuffixNode n1, SuffixNode n2, int size) {
-      double dot = n1.getNumber() * n2.getNumber();
-      for(int i = 0; i < size; i++) {
-        if(n1.hasChild(i) && n2.hasChild(i)) {
-          dot += dot(n1.getChild(i), n2.getChild(i), size);
-        }
-      }
-      return dot;
-    }
-    
-    public String toString() {
-      return new String("Suffix tree kernel");
-    }
-  };
 }

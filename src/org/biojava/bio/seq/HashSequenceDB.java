@@ -66,17 +66,48 @@ public class HashSequenceDB implements SequenceDB {
     };
   }
 
+  /**
+   * Add a sequence under a particular id.
+   *
+   * @param id  the id to use
+   * @param seq the Sequence to add
+   */
   public void addSequence(String id, Sequence seq) {
     sequenceByID.put(id, seq);
   }
 
+  /**
+   * Retrieve the IDMaker associated with this database.
+   *
+   * @return the current IDMaker object
+   */
+  public IDMaker getIDMaker() {
+    return idMaker;
+  }
+  
+  /**
+   * Add a sequence under its default id.
+   *
+   * @param seq  the Sequence to add
+   */
   public void addSequence(Sequence seq) {
     sequenceByID.put(idMaker.calcID(seq), seq);
   }
 
+  /**
+   * Generate a HashSequenceDB object that will use idMaker to generate ids for
+   * sequences.
+   *
+   * @param idMaker the object that will work out the default id for a sequence
+   */
   public HashSequenceDB(IDMaker idMaker) {
     this.idMaker = idMaker;
   }
+
+  /**
+   * No-args constructor for beany stuff.
+   */
+  protected HashSequenceDB() {}
   
   /**
    * You should make one of these to define how to make an ID for a sequence.
@@ -98,10 +129,23 @@ public class HashSequenceDB implements SequenceDB {
   
   /**
    * A simple implementation of IDMaker that hashes by URN.
+   *
+   * @author Matthew Pocock
    */
   public final static IDMaker byURN = new IDMaker() {
     public String calcID(Sequence seq) {
       return seq.getURN();
+    }
+  };
+  
+  /**
+   * A simple implementation of IDMaker that hashes by sequence name.
+   *
+   * @author Matthew Pocock
+   */
+  public final static IDMaker byName = new IDMaker() {
+    public String calcID(Sequence seq) {
+      return seq.getName();
     }
   };
 }
