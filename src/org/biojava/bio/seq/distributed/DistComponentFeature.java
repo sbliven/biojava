@@ -37,6 +37,7 @@ import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.projection.TranslateFlipContext;
+import org.biojava.bio.seq.impl.SubSequence;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
 import org.biojava.bio.symbol.SymbolList;
@@ -106,49 +107,49 @@ class DistComponentFeature
 	this.componentLocation = temp.componentLocation;
 
 	if (temp.strand == StrandedFeature.NEGATIVE) {
-	    this.translation = temp.location.getMax() + temp.componentLocation.getMin();
+	    this.translation = temp.location.getMax() + 1;
 	} else if (temp.strand == StrandedFeature.POSITIVE) {
-	    this.translation = temp.location.getMin() - temp.componentLocation.getMin();
+	    this.translation = temp.location.getMin() - 1;
 	} else {
 	    throw new BioException("Strand must be specified when creating a ComponentFeature");
 	}
     }
 
     public Feature.Template makeTemplate() {
-	ComponentFeature.Template cft = new ComponentFeature.Template();
-	cft.location = getLocation();
-	cft.type = getType();
-	cft.source = getSource();
-    cft.typeTerm = getTypeTerm();
-    cft.sourceTerm = getSourceTerm();
-	cft.annotation = getAnnotation();
-	cft.strand = getStrand();
-	cft.componentSequenceName = getComponentSequenceName();
-	cft.componentLocation = getComponentLocation();
-	return cft;
+        ComponentFeature.Template cft = new ComponentFeature.Template();
+        cft.location = getLocation();
+        cft.type = getType();
+        cft.source = getSource();
+        cft.typeTerm = getTypeTerm();
+        cft.sourceTerm = getSourceTerm();
+        cft.annotation = getAnnotation();
+        cft.strand = getStrand();
+        cft.componentSequenceName = getComponentSequenceName();
+        cft.componentLocation = getComponentLocation();
+        return cft;
     }
     
     private int locationContent(Location l) {
-	if (l.isContiguous())
-	    return l.getMax() - l.getMin() + 1;
-	int content = 0;
-	for (Iterator i = l.blockIterator(); i.hasNext(); ) {
-	    Location sl = (Location) i.next();
-	    content += (sl.getMax() - sl.getMin() + 1);
-	}
-	return content;
+        if (l.isContiguous())
+            return l.getMax() - l.getMin() + 1;
+        int content = 0;
+        for (Iterator i = l.blockIterator(); i.hasNext(); ) {
+            Location sl = (Location) i.next();
+            content += (sl.getMax() - sl.getMin() + 1);
+        }
+        return content;
     }
 
     public boolean isComponentResolvable() {
-	return true; // we hope...
+        return true; // we hope...
     }
 
     public String getComponentSequenceName() {
-	return getComponentSequence().getName();
+        return getComponentSequence().getName();
     }
 
     public StrandedFeature.Strand getStrand() {
-	return strand;
+        return strand;
     }
 
     public void setStrand(Strand strand)
@@ -256,7 +257,7 @@ class DistComponentFeature
         projectedFeatures = new ProjectedFeatureHolder(
                 new TranslateFlipContext(
                         this,
-                        getComponentSequence(),
+                        new SubSequence(getComponentSequence(), getComponentLocation().getMin(), getComponentLocation().getMax()),
                         translation,
                         getStrand() == StrandedFeature.NEGATIVE));
       }
