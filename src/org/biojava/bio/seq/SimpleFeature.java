@@ -137,7 +137,13 @@ public class SimpleFeature implements Feature, MutableFeatureHolder {
     return new SimpleFeatureHolder();
   }
 
-  public SimpleFeature(Sequence sourceSeq, Feature.Template template) {
+  public SimpleFeature(Sequence sourceSeq, Feature.Template template)
+  throws IllegalArgumentException{
+    if(template.location == null) {
+      throw new IllegalArgumentException(
+        "Location can not be null. Did you mean Location.EMPTY_LOCATION?"
+      );
+    }
     this.sourceSeq = sourceSeq;
     this.loc = template.location;
     this.type = template.type;

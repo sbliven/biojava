@@ -39,11 +39,26 @@ import java.util.*;
 public class SimpleSequence extends SimpleResidueList 
                             implements Sequence, MutableFeatureHolder 
 {
+  /**
+   * List of magic for working out what types of features to create.
+   */
   protected static List templateClassToFeatureClass;
+  
+  /**
+   * Add some magic to boot-strap in a feature impl for a template type.
+   *
+   * @param tf  the TemplateFeature describing the feature impl & template type
+   */
   public static void addFeatureImplementation(TemplateFeature tf) {
     templateClassToFeatureClass.add(0, tf);
   }
   
+  /**
+   * Create a feature of the apropreate type for a template.
+   *
+   * @param parent   the parent Sequence
+   * @param template the Feature.Template that defines what to make
+   */
   protected static Feature createFeatureFromTemplate(Sequence parent, Feature.Template template)
   throws SeqException {
     for(Iterator i = templateClassToFeatureClass.iterator(); i.hasNext(); ) {
@@ -65,7 +80,10 @@ public class SimpleSequence extends SimpleResidueList
   }
   
   /**
-   * Initialize SIMPLE_FEATURE_FACTORY.
+   * Initialize the magical feature factory stuff.
+   * <P>
+   * This is bruit-force - it knows what features to use. Later on, this should
+   * be moved out into a preference file.
    */
   static {
     templateClassToFeatureClass = new ArrayList();
@@ -144,7 +162,7 @@ public class SimpleSequence extends SimpleResidueList
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
     if(featureHolderAllocated())
       return getFeatureHolder().filter(ff, recurse);
-    return new SimpleFeatureHolder();
+    return FeatureHolder.EMPTY_FEATURE_HOLDER;
   }
 
   public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)

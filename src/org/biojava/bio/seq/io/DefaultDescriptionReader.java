@@ -75,7 +75,7 @@ public class DefaultDescriptionReader implements FastaDescriptionReader {
     String desc = null;
     try {
       desc = (String) seq.getAnnotation().getProperty("description");
-    } catch (IllegalArgumentException iae) {}
+    } catch (NoSuchElementException iae) {}
     
     if(desc == null) {
       return id;
