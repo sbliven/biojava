@@ -99,7 +99,7 @@ class AbstractGenEmblFileFormer
     private static final int            POINT = 1;
     private static final int      FUZZY_RANGE = 2;
     private static final int      FUZZY_POINT = 3;
-    private static final int BETWEEN_LOCATION = 4
+    private static final int BETWEEN_LOCATION = 4;
 
     /**
      * <code>formatQualifierBlock</code> formats text into
