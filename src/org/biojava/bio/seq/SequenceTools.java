@@ -29,6 +29,7 @@ import org.biojava.bio.seq.impl.RevCompSequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -43,16 +44,73 @@ public final class SequenceTools {
     return new SimpleSequence(syms, uri, name, ann);
   }
 
+  /**
+   * Extract a sub-sequence from a sequence.
+   *
+   * <p>
+   * The sub-sequence will be indexed from 1 through to (end-start+1). An index
+   * of i in the sub-sequence corresponds to (i+start-1) in the original.
+   * All features from the original sequence will be projected down into this
+   * co-ordinate system. All features overlapping the edges will be given fuzzy
+   * locations.
+   * </p>
+   *
+   * @param seq   the sequence to sub-sequence
+   * @param start the first index to include in the sub-sequence
+   * @param end   the last index to include in the sub-sequence
+   * @return a view Sequence for this region
+   * @throws IndexOutOfBoundsException if start or end are not in seq, or if
+   *     end < start
+   */
   public static Sequence subSequence(Sequence seq, int start, int end)
   throws IndexOutOfBoundsException {
     return new SubSequence(seq, start, end);
   }
   
+  /**
+   * Extract a sub-sequence from a sequence.
+   *
+   * <p>
+   * The sub-sequence will be indexed from 1 through to (end-start+1). An index
+   * of i in the sub-sequence corresponds to (i+start-1) in the original.
+   * All features from the original sequence will be projected down into this
+   * co-ordinate system. All features overlapping the edges will be given fuzzy
+   * locations.
+   * </p>
+   *
+   * @param seq   the sequence to sub-sequence
+   * @param start the first index to include in the sub-sequence
+   * @param end   the last index to include in the sub-sequence
+   * @param name  a new name to give to this sub-sequence
+   * @return a view Sequence for this region
+   * @throws IndexOutOfBoundsException if start or end are not in seq, or if
+   *     end < start
+   */
   public static Sequence subSequence(Sequence seq, int start, int end, String name)
   throws IndexOutOfBoundsException {
     return new SubSequence(seq, start, end, name);
   }
 
+  /**
+   * Extract a sub-sequence from a sequence.
+   *
+   * <p>
+   * The sub-sequence will be indexed from 1 through to (end-start+1). If the
+   * strand is NEGATIVE, all features will be flipped in the same manner as
+   * the reverseComplement method. If it is UNKNOWN or
+   * POSITIVE, then this is identical to the other subSequence methods.
+   * </p>
+   *
+   * @param seq   the sequence to sub-sequence
+   * @param start the first index to include in the sub-sequence
+   * @param end   the last index to include in the sub-sequence
+   * @param name  a new name to give to this sub-sequence
+   * @param strand a StrandedFeature.Strand indicating which strand the
+   *    sub-sequence should be on
+   * @return a view Sequence for this region
+   * @throws IndexOutOfBoundsException if start or end are not in seq, or if
+   *     end < start
+   */
   public static Sequence subSequence(
     Sequence seq,
     int start,
@@ -66,18 +124,87 @@ public final class SequenceTools {
     }
     return s;
   }
-  
+
+  /**
+   * Reverse-complement a sequence, and flip all of its features.
+   *
+   * @param seq  the Sequence to reverse-complement
+   * @return  the flipped Sequence
+   * @throws IllegalAlphabetException  if the symbols in the sequence can not be
+   *     complemented
+   */
   public static Sequence reverseComplement(Sequence seq)
   throws IllegalAlphabetException {
     return new RevCompSequence(seq);
   }
 
-  public static Sequence view(Sequence seq) {
+  /**
+   * Create a new sequence that has all of the data in the original, but allows
+   * new features and top-level annotations to be added independantly. Use this
+   * as a scratch-space.
+   *
+   * @param seq  the Sequence to view
+   * @return a new ViewSequence
+   */
+  public static ViewSequence view(Sequence seq) {
     return new ViewSequence(seq);
   }
-  
-  public static Sequence view(Sequence seq, String name) {
+
+  /**
+   * Create a new sequence that has all of the data in the original, but allows
+   * new features and top-level annotations to be added independantly. Use this
+   * as a scratch-space.
+   *
+   * @param seq  the Sequence to view
+   * @param name a new name for the sequence
+   * @return a new ViewSequence with the new name
+   */
+  public static ViewSequence view(Sequence seq, String name) {
     return new ViewSequence(seq, name);
+  }
+
+  /**
+   * Create a new gapped sequence for a sequence.
+   *
+   * <p>
+   * The gapped sequence can be used to insert gaps. The features on the
+   * underlying sequence will be projected onto the view taking the gaps into
+   * account.
+   * </p>
+   *
+   * @param seq
+   * @return
+   */
+  public static GappedSequence gappedView(Sequence seq) {
+    return new SimpleGappedSequence(seq);
+  }
+
+  /**
+   * Mask of a sequence.
+   *
+   * <P>
+   * This will return a view of a sequence where everything outside loc is
+   * dropped. This includes all symbols, which become gaps, and all features,
+   * which behave in a similar manner to those produced by subSequence().
+   * </p>
+   *
+   * @param seq  the Sequence to mask
+   * @param loc  the region to retain
+   * @return  a Sequence viewing just the retained portion of seq
+   * @throws IndexOutOfBoundsException  if loc is not totaly within seq
+   * @throws IllegalArgumentException  fixme: not sure where this comes from
+   */
+  public static Sequence maskSequence(Sequence seq, RangeLocation loc)
+  throws IndexOutOfBoundsException, IllegalArgumentException {
+    GappedSequence gSeq = gappedView(subSequence(
+            seq,
+            loc.getMin(),
+            loc.getMax(),
+            seq.getName() + ":" + loc.toString()));
+    gSeq.addGapsInSource(1, loc.getMin());
+    gSeq.addGapsInSource(seq.length(), gSeq.length() - gSeq.length());
+
+    return gSeq;
   }
 
   /**
