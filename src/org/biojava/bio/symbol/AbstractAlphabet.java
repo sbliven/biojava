@@ -241,6 +241,30 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   
   protected abstract boolean containsImpl(AtomicSymbol s);
   
+  public boolean equals(Object o) {
+    if(o == this) {
+      return true;
+    }
+    
+    if(!(o instanceof FiniteAlphabet)) {
+      return false;
+    }
+    
+    FiniteAlphabet that = (FiniteAlphabet) o;
+    
+    if(this.size() != that.size()) {
+      return false;
+    }
+    
+    for(Iterator i = that.iterator(); i.hasNext(); ) {
+      if(!this.contains((AtomicSymbol) i.next())) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
   public void addChangeListener(ChangeListener cl) {
     getChangeSupport(ChangeType.UNKNOWN).addChangeListener(cl);
   }

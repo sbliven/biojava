@@ -112,7 +112,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   public void setWeights(State source, Distribution dist)
   throws IllegalSymbolException, IllegalAlphabetException {
     FiniteAlphabet ta = transitionsFrom(source);
-    if(dist.getAlphabet() != ta) {
+    if(!dist.getAlphabet().equals(ta)) {
       throw new IllegalAlphabetException(
         "Can't set distribution from state " + source.getName() +
         " as the distribution alphabet is not the alphabet of transitions: " +

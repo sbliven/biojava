@@ -88,11 +88,11 @@ implements Distribution, Serializable {
     Distribution other,
     DistributionFactory distFact
   ) throws IllegalAlphabetException {
-    if(table.getTargetAlphabet() != other.getAlphabet()) {
+    if(!table.getTargetAlphabet().equals(other.getAlphabet())) {
       throw new IllegalAlphabetException(
         "Table target alphabet and distribution alphabet don't match: " +
         table.getTargetAlphabet().getName() + " and " +
-        other.getAlphabet().getName()
+        other.getAlphabet().getName() + " without symbol "
       );
     }
     this.other = other;
