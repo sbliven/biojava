@@ -57,6 +57,7 @@ extends AbstractLocationDecorator {
 
   private final int length;
   private int fivePrimeEnd;
+  private int threePrimeEnd;
   private LinkedList fivePrimeSortedBlocks;
 
   private final boolean overlaps;
@@ -128,6 +129,9 @@ extends AbstractLocationDecorator {
       Object o = fivePrimeSortedBlocks.removeFirst();
       fivePrimeSortedBlocks.addLast(o);
     }
+
+    //sort out the 3'End
+    threePrimeEnd = ((Location)fivePrimeSortedBlocks.getLast()).getMax();
 
     if(get5PrimeEnd() == 0){
       throw new IllegalArgumentException(
@@ -241,9 +245,47 @@ extends AbstractLocationDecorator {
    * @return the most 5' coordinate
    * @see #fivePrimeBlockIterator()
    * @see #getMin()
+   * @see #get3PrimeEnd()
    */
   public int get5PrimeEnd(){
     return fivePrimeEnd;
+  }
+
+  /**
+   * @return the most 3' coordinate
+   * @see #fivePrimeBlockIterator()
+   * @see #getMax()
+   * @see #get5PrimeEnd()
+   */
+  public int get3PrimeEnd(){
+    return threePrimeEnd;
+  }
+
+  /**
+   * This will give you the coordinate of the minimum point contained by this
+   * Location. Generally this will be the leftmost end however if the Location
+   * crosses the origin then it will actually be the origin that is the minimum
+   * point and the method will return 1. If you want to be guarenteed of getting
+   * the leftmost coordinate then call <code>get5PrimeEnd()</code>
+   * @return the minimum coord
+   * @see #get5PrimeEnd()
+   */
+  public int getMin(){
+    return super.getMin();
+  }
+
+  /**
+   * This will give you the coordinate of the maximum point contained by this
+   * Location. Generally this will be the rightmost end however if the Location
+   * crosses the origin then it will actually be the point before the origin that is the maximum
+   * point and the method will return <code>getLength()</code>.
+   * If you want to be guarenteed of getting
+   * the rightmost coordinate then call <code>get3PrimeEnd()</code>
+   * @return the maximum coord
+   * @see #get3PrimeEnd()
+   */
+  public int getMax(){
+    return super.getMax();
   }
 
 

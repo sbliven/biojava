@@ -405,6 +405,7 @@ public final class DistributionTools {
   throws IllegalAlphabetException {
 
     List seqs = a.getLabels();
+
     FiniteAlphabet alpha = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(0))).getAlphabet();
     for(int i = 1; i < seqs.size();i++){
         FiniteAlphabet test = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(i))).getAlphabet();
@@ -425,7 +426,16 @@ public final class DistributionTools {
         for(Iterator j = seqs.iterator(); j.hasNext();){// of each sequence
           Object seqLabel = j.next();
           Symbol s = a.symbolAt(seqLabel,i + 1);
-          if(countGaps == false && s.equals(a.getAlphabet().getGapSymbol())){
+
+          /*If this is working over a flexible alignment there is a possibility
+          that s could be null if this Sequence is not really preset in this
+          region of the Alignment. In this case it will be skipped*/
+          if(s == null)
+            continue;
+
+          Symbol gap = alpha.getGapSymbol();
+          if(countGaps == false &&
+             s.equals(gap)){
             //do nothing, not counting gaps
           }else{
             dtc.addCount(pos[i],s,1.0);// count the symbol
