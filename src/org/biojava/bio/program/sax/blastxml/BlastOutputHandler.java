@@ -32,13 +32,13 @@ import org.xml.sax.helpers.*;
  * <p>
  * WARNING: when Blast is supplied with multiple sequences in a single
  * FASTA file, it generates horribly-formed XML code.  This occurs because
- * it generates a complete XML document per sequence including <?XML> 
- * lines and concatentates all of these into one output file.  This document
- * is basically unparsable by XML parsers.
+ * it generates a complete XML document per query sequence including <?XML> 
+ * lines and concatenates all of these into one output file.  This document
+ * is not well-formed and cannot be parsed by standard XML parsers.
  * <p>
  * You have various options to solve this.  You can parse the output file
- * by other means, separate the documents and feed each individually to
- * this parser.  Or you could strip out the <?XML> lines and wrap the
+ * externally, separating the component documents and feeding each individually to
+ * this parser.  Alternatively, you could strip out the <?XML> lines and wrap the
  * entire output in a fake <blast_aggregator> element.  This can be
  * done in Linux (and other Unixen) with :-
  * <p>
@@ -126,6 +126,9 @@ public class BlastOutputHandler
                             program = s.trim();
 
                             // at this point, I can set the sequence types
+                            // note that the sequence type here is the form
+                            // in which blast DISPLAYS its output, not the
+                            // sequence type of either query or target.
                             if (program.equals("blastn")) {
                                 querySequenceType = "dna";
                                 hitSequenceType = "dna";
@@ -135,16 +138,26 @@ public class BlastOutputHandler
                                 hitSequenceType = "protein";
                             }
                             else if (program.equals("blastx")) {
-                                querySequenceType = "dna";
+                                // nucleotide query translated in all frames 
+                                // against protein database.
+                                querySequenceType = "protein";
                                 hitSequenceType = "protein";
                             }
                             else if (program.equals("tblastn")) {
+                                // protein query against dna database in all frames
+                                // hit frame is displayed only, no query frame
+                                // irrespective of frame, both sequences displayed
+                                // in increasing seq DNA coordinates (by from-to).
                                 querySequenceType = "protein";
-                                hitSequenceType = "dna";
+                                hitSequenceType = "protein";
                             }
                             else if (program.equals("tblastx")) {
-                                querySequenceType = "dna";
-                                hitSequenceType = "dna";
+                                // dna query translated in all frames against
+                                // dna database in all frames
+                                // irrespective of frame, both sequences displayed
+                                // in increasing seq DNA coordinates.
+                                querySequenceType = "protein";
+                                hitSequenceType = "protein";
                             }
                             else throw new SAXException("unknown BLAST program.");
                         }
@@ -191,8 +204,8 @@ public class BlastOutputHandler
 
                             System.out.println("program, version " + program + " " + version);
                             if ((program != null) && (version != null)) {
-                                bldsAttrs.addAttribute(biojavaUri, "program", biojavaUri + ":program", CDATA, program);
-                                bldsAttrs.addAttribute(biojavaUri, "version", biojavaUri + ":version", CDATA, version);
+                                bldsAttrs.addAttribute(biojavaUri, "program", "program", CDATA, program);
+                                bldsAttrs.addAttribute(biojavaUri, "version", "version", CDATA, version);
                             }
 
                             listener.startElement(biojavaUri, "BlastLikeDataSet", biojavaUri + ":BlastLikeDataSet", bldsAttrs);
@@ -266,8 +279,8 @@ public class BlastOutputHandler
                             if (queryId != null) {
                                 AttributesImpl queryAttrs = new AttributesImpl();
 
-                                queryAttrs.addAttribute(biojavaUri, "id", biojavaUri + ":id", CDATA, queryId);
-                                queryAttrs.addAttribute(biojavaUri, "metadata", biojavaUri + ":metadata", CDATA, "none");
+                                queryAttrs.addAttribute(biojavaUri, "id", "id", CDATA, queryId);
+                                queryAttrs.addAttribute(biojavaUri, "metadata", "metadata", CDATA, "none");
                                 listener.startElement(biojavaUri, "QueryId", biojavaUri + ":QueryId", queryAttrs);
                                 listener.endElement(biojavaUri, "QueryId", biojavaUri + ":QueryId");
                             }
@@ -275,8 +288,8 @@ public class BlastOutputHandler
                             if (databaseId != null) {
                                 AttributesImpl dbAttrs = new AttributesImpl();
 
-                                dbAttrs.addAttribute(biojavaUri, "id", biojavaUri + ":id", CDATA, queryId);
-                                dbAttrs.addAttribute(biojavaUri, "metadata", biojavaUri + ":metadata", CDATA, "none");
+                                dbAttrs.addAttribute(biojavaUri, "id", "id", CDATA, queryId);
+                                dbAttrs.addAttribute(biojavaUri, "metadata", "metadata", CDATA, "none");
                                 listener.startElement(biojavaUri, "DatabaseId", biojavaUri + ":DatabaseId", dbAttrs);
                                 listener.endElement(biojavaUri, "DatabaseId", biojavaUri + ":DatabaseId");
                             }
@@ -317,7 +330,7 @@ public class BlastOutputHandler
              throws SAXException
     {
         // generate end of <biojava:BlastLikeDataSet>
-        listener.endElement(biojavaUri, "BlastLikeDataSetCollection", biojavaUri + ":BlastLikeDataSetCollection");
+        listener.endElement(biojavaUri, "BlastLikeDataSet", biojavaUri + ":BlastLikeDataSet");
 
         if (wrap) listener.endElement(biojavaUri, "BlastLikeDataSetCollection", biojavaUri + ":BlastLikeDataSetCollection");
     }

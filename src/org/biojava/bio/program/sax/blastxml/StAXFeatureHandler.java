@@ -44,8 +44,8 @@ class StAXFeatureHandler extends StAXContentHandlerBase {
     /**
      * declare namespace
      */
-//    static final String biojavaUri = "http://www.biojava.org/";
-    static final String biojavaUri = "biojava";
+    static final String biojavaUri = "http://www.biojava.org";
+//    static final String biojavaUri = "biojava";
     static final String CDATA = "CDATA";
     static final String PCDATA = "PCDATA";
 
@@ -142,14 +142,6 @@ class StAXFeatureHandler extends StAXContentHandlerBase {
         handlers.add(new Binding(rec, handler));
     }
 
-    /** provides a standardised way of returning an
-     *  object that represents the result of parsing the
-     *  child element
-     */
-    public void returnData(Object o)
-    {
-    }
-
     /**
      * get the SeqIOListener for this parser
      */
@@ -167,7 +159,7 @@ class StAXFeatureHandler extends StAXContentHandlerBase {
      *@param  attrs             Description of the Parameter
      *@exception  SAXException  Description of the Exception
      */
-    public void startElementHandler(
+    void startElementHandler(
             String nsURI,
             String localName,
             String qName,
@@ -224,7 +216,7 @@ class StAXFeatureHandler extends StAXContentHandlerBase {
      *@param  handler           Description of the Parameter
      *@exception  SAXException  Description of the Exception
      */
-    public void endElementHandler(
+    void endElementHandler(
             String nsURI,
             String localName,
             String qName,

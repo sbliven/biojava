@@ -45,7 +45,9 @@ class HitHandler
         };
 
     // class variables
-    boolean startHitElementFired = false;
+    AttributesImpl hitAttrs = null;
+    AttributesImpl hitIdAttrs = null;
+    String sHit_def = null;
 
     // constructor
     public HitHandler(StAXFeatureHandler staxenv)
@@ -62,8 +64,6 @@ class HitHandler
                 public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
                     return new StringElementHandlerBase() {
 
-                        AttributesImpl hitIdAttrs = null;
-
                         public void startElement(
                             String nsURI,
                             String localName,
@@ -72,36 +72,15 @@ class HitHandler
                             DelegationManager dm)
                             throws SAXException
                         {
-                            // generate start of containing element if required
-                            if (!startHitElementFired) {
-                                listener.startElement(biojavaUri, "Hit", biojavaUri + ":Hit", new AttributesImpl());
-                                startHitElementFired = true;
-                            }
-
-                            // now generate my own start element
-                            super.startElement(nsURI, localName, qName, attrs, dm);
-
                             // generate start of <biojava:HitDescription>
                             hitIdAttrs = new AttributesImpl();
+
+                            // must call superclass to keep track of levels
+                            super.startElement(nsURI, localName, qName, attrs, dm);
                         }
 
                         public void setStringValue(String s) {
-                            hitIdAttrs.addAttribute(biojavaUri, "id", biojavaUri + ":id", CDATA, s.trim());
-                        }
-
-                        public void endElement(
-                            String nsURI,
-                            String localName,
-                            String qName,
-                            StAXContentHandler handler)
-                            throws SAXException
-                        {
-                            super.endElement(nsURI, localName, qName, handler);
-
-                            // create <biojava:HitId>
-                            hitIdAttrs.addAttribute(biojavaUri, "metaData", biojavaUri + ":metaData", CDATA, "none");
-                            listener.startElement(biojavaUri, "HitId", biojavaUri + ":HitId", hitIdAttrs);
-                            listener.endElement(biojavaUri, "HitId", biojavaUri + ":HitId");
+                            hitIdAttrs.addAttribute(biojavaUri, "id", "id", CDATA, s.trim());
                         }
                     };
                 }
@@ -110,6 +89,21 @@ class HitHandler
 
         // acquire value of <Hit_def> with inner class.
         super.addHandler(new ElementRecognizer.ByLocalName("Hit_def"),
+            new StAXHandlerFactory() {
+                public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
+
+                    return new StringElementHandlerBase() {
+
+                        public void setStringValue(String s)  throws SAXException {
+                            sHit_def = s.trim();
+                        }
+                    };
+                }
+            }
+        );
+
+        // acquire value of <Hit_len> with inner class.  This needs to become and attribute of Hit.
+        super.addHandler(new ElementRecognizer.ByLocalName("Hit_len"),
             new StAXHandlerFactory() {
                 public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
                     return new StringElementHandlerBase() {
@@ -121,21 +115,14 @@ class HitHandler
                             DelegationManager dm)
                             throws SAXException
                         {
-                            // generate start of containing element if required
-                            if (!startHitElementFired) {
-                                listener.startElement(biojavaUri, "Hit", biojavaUri + ":Hit", new AttributesImpl());
-                                startHitElementFired = true;
-                            }
+                            if (hitAttrs == null) hitAttrs = new AttributesImpl();
 
-                            // now generate my own start element
-                            super.startElement(nsURI, localName, qName, attrs, dm);
-
-                            // generate start of <biojava:HitDescription>
-                            listener.startElement(biojavaUri, "HitDescription", biojavaUri + ":HitDescription", new AttributesImpl());
+                            // must call superclass to keep track of levels
+                            super.startElement(nsURI, localName, qName, attrs, dm);                            
                         }
 
                         public void setStringValue(String s)  throws SAXException {
-                            listener.characters(s.toCharArray(), 0, s.trim().length());
+                            hitAttrs.addAttribute(biojavaUri, "sequenceLength", "sequenceLength", CDATA, s.trim());
                         }
 
                         public void endElement(
@@ -145,9 +132,25 @@ class HitHandler
                             StAXContentHandler handler)
                             throws SAXException
                         {
+                            // get superclass to process the PCDATA for this element
                             super.endElement(nsURI, localName, qName, handler);
 
-                            listener.endElement(biojavaUri, "HitDescription", biojavaUri + ":HitDescription");
+                            // we now generate the Hit element
+                            listener.startElement(biojavaUri, "Hit", biojavaUri + ":Hit", hitAttrs);
+
+                            // create <biojava:HitId> element
+                            if (hitIdAttrs != null) {
+                                hitIdAttrs.addAttribute(biojavaUri, "metaData", "metaData", CDATA, "none");
+                                listener.startElement(biojavaUri, "HitId", biojavaUri + ":HitId", hitIdAttrs);
+                                listener.endElement(biojavaUri, "HitId", biojavaUri + ":HitId");
+                            }
+
+                            // generate start of <biojava:HitDescription>
+                            if (sHit_def != null) {
+                                listener.startElement(biojavaUri, "HitDescription", biojavaUri + ":HitDescription", new AttributesImpl());
+                                listener.characters(sHit_def.toCharArray(), 0, sHit_def.length());
+                                listener.endElement(biojavaUri, "HitDescription", biojavaUri + ":HitDescription");
+                            }
                         }
                     };
                 }
@@ -171,12 +174,6 @@ class HitHandler
                             Attributes attrs)
                             throws SAXException
                         {
-                            // generate start of containing element if required
-                            if (!startHitElementFired) {
-                                listener.startElement(biojavaUri, "Hit", biojavaUri + ":Hit", new AttributesImpl());
-                                startHitElementFired = true;
-                            }
-
                             // now I generate my own start element
                             super.startElementHandler(nsURI, localName, qName, attrs);
                         }

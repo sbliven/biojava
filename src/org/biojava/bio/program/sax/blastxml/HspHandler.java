@@ -86,7 +86,7 @@ class HspHandler
                 public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
                     return new StringElementHandlerBase() {
                         public void setStringValue(String s) {
-                            hspAttrs.addAttribute(biojavaUri, bitScore, biojavaUri + ":" + bitScore, CDATA, s);
+                            hspAttrs.addAttribute(biojavaUri, bitScore, bitScore, CDATA, s);
                         }
                     };
                 }
@@ -99,7 +99,7 @@ class HspHandler
                 public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
                     return new StringElementHandlerBase() {
                         public void setStringValue(String s) {
-                            hspAttrs.addAttribute(biojavaUri, score, biojavaUri + ":" + score, CDATA, s);
+                            hspAttrs.addAttribute(biojavaUri, score, score, CDATA, s);
                         }
                     };
                 }
@@ -112,7 +112,7 @@ class HspHandler
                 public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
                     return new StringElementHandlerBase() {
                         public void setStringValue(String s) {
-                            hspAttrs.addAttribute(biojavaUri, expectValue, biojavaUri + ":" + expectValue, CDATA, s);
+                            hspAttrs.addAttribute(biojavaUri, expectValue, expectValue, CDATA, s);
                         }
                     };
                 }
@@ -183,14 +183,14 @@ class HspHandler
 
                             // convert the frame to the required format and return it
                             if (hitSequenceType.equals("protein")) {
-                                hspAttrs.addAttribute(biojavaUri, queryFrame, biojavaUri + ":" + queryFrame, CDATA, 
+                                hspAttrs.addAttribute(biojavaUri, queryFrame, queryFrame, CDATA, 
                                     stringifyFrame(frameNo));
                             }
                             else if (hitSequenceType.equals("dna")) {
                                 // for some peculiar reason, when Hsp_hit-frame is reversed, it is
                                 // the query frame sequence that is depicted inverted!!
                                 // I assume it works the other way too although that never happens.
-                                hspAttrs.addAttribute(biojavaUri, hitStrand, biojavaUri + ":" + hitStrand, CDATA,
+                                hspAttrs.addAttribute(biojavaUri, hitStrand, hitStrand, CDATA,
                                     stringifyStrand(frameNo));
                             }
                             else throw new SAXException("illegal sequence type");
@@ -212,13 +212,13 @@ class HspHandler
 
                             // convert the frame to the required format and return it
                             if (hitSequenceType.equals("protein")) {
-                                hspAttrs.addAttribute(biojavaUri, hitFrame, biojavaUri + ":" + hitFrame, CDATA, 
+                                hspAttrs.addAttribute(biojavaUri, hitFrame, hitFrame, CDATA, 
                                     stringifyFrame(frameNo));
                             }
                             else if (hitSequenceType.equals("dna")) {
                                 // for some peculiar reason, when Hsp_hit-frame is reversed, it is
                                 // the query frame sequence that is depicted inverted!!
-                                hspAttrs.addAttribute(biojavaUri, queryStrand, biojavaUri + ":" + queryStrand, CDATA,
+                                hspAttrs.addAttribute(biojavaUri, queryStrand, queryStrand, CDATA,
                                     stringifyStrand(frameNo));
                             }
                             else throw new SAXException("illegal sequence type");
@@ -235,7 +235,7 @@ class HspHandler
                     return new StringElementHandlerBase() {
                         public void setStringValue(String s) {
                             iNumberOfIdentities = Integer.parseInt(s.trim());
-                            hspAttrs.addAttribute(biojavaUri, numberOfIdentities, biojavaUri + ":" + numberOfIdentities, CDATA, s);
+                            hspAttrs.addAttribute(biojavaUri, numberOfIdentities, numberOfIdentities, CDATA, s);
                         }
                     };
                 }
@@ -248,7 +248,7 @@ class HspHandler
                 public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
                     return new StringElementHandlerBase() {
                         public void setStringValue(String s) {
-                            hspAttrs.addAttribute(biojavaUri, numberOfPositives, biojavaUri + ":" + numberOfPositives, CDATA, s);
+                            hspAttrs.addAttribute(biojavaUri, numberOfPositives, numberOfPositives, CDATA, s);
                         }
                     };
                 }
@@ -262,7 +262,7 @@ class HspHandler
                     return new StringElementHandlerBase() {
                         public void setStringValue(String s) {
                             iAlignmentSize = Integer.parseInt(s.trim());
-                            hspAttrs.addAttribute(biojavaUri, alignmentSize, biojavaUri + ":" + alignmentSize, CDATA, s);
+                            hspAttrs.addAttribute(biojavaUri, alignmentSize, alignmentSize, CDATA, s);
                         }
                     };
                 }
@@ -364,13 +364,13 @@ class HspHandler
         // compute percentage identity and report it
         hspAttrs.addAttribute(biojavaUri, 
             percentageIdentity, 
-            biojavaUri + ":" + percentageIdentity, 
+            percentageIdentity, 
             CDATA, 
             Float.toString( ((float) (100 * iNumberOfIdentities)) / ((float) iAlignmentSize))
             );
 
         // generate start of <biojava:Hsp>
-        listener.startElement(biojavaUri, "Hsp", biojavaUri + ":Hsp", new AttributesImpl());
+        listener.startElement(biojavaUri, "HSP", biojavaUri + ":HSP", new AttributesImpl());
 
             // generate <biojava:HSPSummary>
             listener.startElement(biojavaUri, "HSPSummary", biojavaUri + ":" + "HSPSummary", hspAttrs);
@@ -381,8 +381,8 @@ class HspHandler
 
                 // generate start of <biojava:QuerySequence>
                 AttributesImpl queryAttrs = new AttributesImpl();
-                queryAttrs.addAttribute(biojavaUri, "startPosition", biojavaUri + ":startPosition", CDATA, sHsp_query_from);
-                queryAttrs.addAttribute(biojavaUri, "stopPosition", biojavaUri + ":stopPosition", CDATA, sHsp_query_to);
+                queryAttrs.addAttribute(biojavaUri, "startPosition", "startPosition", CDATA, sHsp_query_from);
+                queryAttrs.addAttribute(biojavaUri, "stopPosition", "stopPosition", CDATA, sHsp_query_to);
                 listener.startElement(biojavaUri, "QuerySequence", biojavaUri + ":QuerySequence", queryAttrs);
 
                 // pass the sequence symbol tokens over
@@ -404,9 +404,9 @@ class HspHandler
 
                 // generate start of <biojava:HitSequence>
                 AttributesImpl hitAttrs = new AttributesImpl();
-                hitAttrs.addAttribute(biojavaUri, "startPosition", biojavaUri + ":startPosition", CDATA, sHsp_hit_from);
-                hitAttrs.addAttribute(biojavaUri, "stopPosition", biojavaUri + ":stopPosition", CDATA, sHsp_hit_to);
-                listener.startElement(biojavaUri, "HitSequence", biojavaUri + ":HitSequence", hitAttrs);
+                hitAttrs.addAttribute(biojavaUri, "startPosition", "startPosition", CDATA, sHsp_hit_from);
+                hitAttrs.addAttribute(biojavaUri, "stopPosition", "stopPosition", CDATA, sHsp_hit_to);
+                listener.startElement(biojavaUri, "HitSequence", "HitSequence", hitAttrs);
 
                 // pass the sequence symbol tokens over
                 listener.characters(sHsp_hseq.toCharArray(), 0, sHsp_hseq.length());
@@ -415,9 +415,9 @@ class HspHandler
                 listener.endElement(biojavaUri, "HitSequence", biojavaUri + ":HitSequence");
 
             // generate end of <biojava::BlastLikeAlignment>    
-            listener.startElement(biojavaUri, "BlastLikeAlignment", biojavaUri + ":BlastLikeAlignment", new AttributesImpl()); 
+            listener.endElement(biojavaUri, "BlastLikeAlignment", biojavaUri + ":BlastLikeAlignment"); 
 
         // generate end of <biojava:Hsp>
-        listener.endElement(biojavaUri, "Hsp", biojavaUri + ":Hsp");
+        listener.endElement(biojavaUri, "HSP", biojavaUri + ":HSP");
     }
 }
