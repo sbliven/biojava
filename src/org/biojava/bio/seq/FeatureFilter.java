@@ -348,6 +348,9 @@ public interface FeatureFilter extends Serializable {
 	if (filt instanceof ContainedByLocation)  {
 	    Location loc = ((ContainedByLocation) filt).getLocation();
 	    return !getLocation().overlaps(loc);
+	} else if (filt instanceof OverlapsLocation) {
+	    Location filtL = ((OverlapsLocation) filt).getLocation();
+	    return !filtL.overlaps(this.getLocation());
 	}
 	return (filt instanceof AcceptNoneFilter);
     }
