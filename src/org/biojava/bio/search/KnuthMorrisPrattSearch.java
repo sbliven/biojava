@@ -115,6 +115,7 @@ public final class KnuthMorrisPrattSearch {
   }
 
 
+
   /**
    * This will return an int[] giving the offsets of the matches in <code>text</code>
    * (ie the location of the first symbol of each match in the <code>text</code>).
@@ -140,7 +141,8 @@ public final class KnuthMorrisPrattSearch {
 
     //find the matches
     while(j < n){
-      while( i  > -1 && pattern.symbolAt(i+1) != text.symbolAt(j+1))
+      Symbol sym = text.symbolAt(j+1);
+      while( i > -1 && pattern.symbolAt(i+1) != sym)
         i = kmpNext[i];
       i++;
       j++;
