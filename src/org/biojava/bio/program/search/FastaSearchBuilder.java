@@ -33,8 +33,6 @@ import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
-import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.search.SeqSimilaritySearchHit;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.search.SeqSimilaritySearchSubHit;
@@ -43,6 +41,8 @@ import org.biojava.bio.search.SequenceDBSearchResult;
 import org.biojava.bio.search.SequenceDBSearchSubHit;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.StrandedFeature.Strand;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.TokenParser;
@@ -66,6 +66,7 @@ import org.biojava.utils.ChangeVetoException;
 public class FastaSearchBuilder implements SearchBuilder
 {
     private SearchParser            parser;
+    private boolean                 moreSearchesAvailable = false;
 
     private SequenceDBInstallation  subjectDBs;
     private SequenceDB              subjectDB;
@@ -85,7 +86,7 @@ public class FastaSearchBuilder implements SearchBuilder
     private StringBuffer            querySeqPrep;
     private StringBuffer            subjectSeqPrep;
 
-    private GappedSymbolListBuilder gslBuilder;
+    private TokenParser             tokenParser;
 
     // Hits are appended to this ArrayList as they are parsed from a
     // stream. The Fasta program pre-sorts the hits in order of
@@ -114,17 +115,18 @@ public class FastaSearchBuilder implements SearchBuilder
 	this.subjectDBs     = subjectDBs;
 	this.querySeqHolder = querySeqHolder;
 
-	querySeqBuf    = new StringBuffer();
-	subjectSeqBuf  = new StringBuffer();
-	querySeqPrep   = new StringBuffer();
-	subjectSeqPrep = new StringBuffer();
+	querySeqBuf      = new StringBuffer();
+	subjectSeqBuf    = new StringBuffer();
+	querySeqPrep     = new StringBuffer();
+	subjectSeqPrep   = new StringBuffer();
+        searchParameters = new HashMap();
     }
 
     /**
      * The <code>makeSearchResult</code> method creates a new object
      * representing a the result of a single search.
      *
-     * @return a <code>SeqSimilaritySearchResult</code> object.
+     * @return a <code>SeqSimilaritySearchResult</code>.
      *
      * @exception BioException if parsing or instantiation fails
      * internally.
@@ -140,27 +142,26 @@ public class FastaSearchBuilder implements SearchBuilder
     }
 
     /**
-     * <code>setQuerySeq</code> resolves the query sequence id parsed
+     * <code>setQuerySeq</code> resolves the query sequence ID parsed
      * from the search result to a SymbolList obtained from the
      * querySeqHolder SequenceDB.
      *
-     * @param querySeqID a <code>String</code> which should be the
+     * @param querySeqId a <code>String</code> which should be the
      * sequence ID in the querySeqHolder.
      *
      * @exception BioException if the sequence cannot be obtained.
      */
-    public void setQuerySeq(final String querySeqID)
+    public void setQuerySeq(final String querySeqId)
 	throws BioException
     {
 	try
 	{
-	    // System.out.println("Setting Query sequence with ID: " + querySeqID);
-	    querySeq = (SymbolList) querySeqHolder.getSequence(querySeqID);
+	    querySeq = (SymbolList) querySeqHolder.getSequence(querySeqId);
 	}
 	catch (BioException be)
 	{
 	    throw new BioException(be, "Failed to retrieve query sequence from holder using ID: "
-				   + querySeqID);
+				   + querySeqId);
 	}
     }
 
@@ -169,21 +170,30 @@ public class FastaSearchBuilder implements SearchBuilder
      * parsed from the search result to a SequenceDB instance using a
      * SequenceDBInstallation to perform the mapping.
      *
-     * @param subjectDBFileName a <code>String</code> which should be
+     * @param subjectDBName a <code>String</code> which should be
      * an identifier of the corresponding database in the subjectDBs
      * installation.
      *
      * @exception BioException if the database cannot be obtained.
      */
-    public void setSubjectDB(final String subjectDBFileName)
+    public void setSubjectDB(final String subjectDBName)
 	throws BioException
     {
-	// System.out.println("Setting subject DB with filename/ID: " + subjectDBFileName);
-	subjectDB = subjectDBs.getSequenceDB(subjectDBFileName);
+	subjectDB = subjectDBs.getSequenceDB(subjectDBName);
 
 	if (subjectDB == null)
 	    throw new BioException("Failed to retrieve database from installation using ID: "
-				   + subjectDBFileName);
+				   + subjectDBName);
+    }
+
+    public boolean getMoreSearches()
+    {
+        return moreSearchesAvailable;
+    }
+
+    public void setMoreSearches(final boolean value)
+    {
+        moreSearchesAvailable = value;
     }
 
     public void startSearch() { }
@@ -192,31 +202,27 @@ public class FastaSearchBuilder implements SearchBuilder
 
     public void startHeader()
     {
-	// System.out.println("startHeader called");
 	resultPreAnnotation = new HashMap();
 	searchParameters    = new HashMap();
     }
 
     public void addSearchProperty(final Object key, final Object value)
     {
-	// System.out.println("addSearchProperty called: " + key + " -> " + value);
 	resultPreAnnotation.put(key, value);
     }
 
     public void endHeader()
     {
-	resultAnnotation = createAnnotation(resultPreAnnotation);
+	resultAnnotation = makeAnnotation(resultPreAnnotation);
     }
 
     public void startHit()
     {
-	// System.out.println("startHit called");
 	hitData = new HashMap();
     }
 
     public void addHitProperty(final Object key, final Object value)
     {
-	// System.out.println("addHitProperty called: " + key + " -> " + value);
 	hitData.put(key, value);
     }
 
@@ -226,17 +232,16 @@ public class FastaSearchBuilder implements SearchBuilder
 
     public void addSubHitProperty(final Object key, final Object value)
     {
-	// System.out.println("addSubHitProperty called: " + key + " -> " + value);
 	hitData.put(key, value);
     }
 
     public void endSubHit()
     {
-	hitAnnotation = createAnnotation(hitData);
+	hitAnnotation = makeAnnotation(hitData);
 
 	try
 	{
-	    SeqSimilaritySearchHit hit = createHit(hitData, hitAnnotation);
+	    SeqSimilaritySearchHit hit = makeHit(hitData, hitAnnotation);
 	    searchHits.add(hit);
 	}
 	catch (BioException be)
@@ -246,16 +251,16 @@ public class FastaSearchBuilder implements SearchBuilder
     }
 
     /**
-     * The <code>createHit</code> method makes a new Hit object from
+     * The <code>makeHit</code> method makes a new Hit object from
      * the hit data and an annotation.
      *
      * @param dataMap a <code>Map</code> object.
-     * @param hitAnnotation an <code>Annotation</code> object.
+     * @param hitAnnotation an <code>Annotation</code>.
      *
-     * @return a <code>SeqSimilaritySearchHit</code> object.
+     * @return a <code>SeqSimilaritySearchHit</code>.
      */
-    private SeqSimilaritySearchHit createHit(final Map        hitData,
-					     final Annotation hitAnnotation)
+    private SeqSimilaritySearchHit makeHit(final Map        hitData,
+                                           final Annotation hitAnnotation)
 	throws BioException
     {
 	String      seqType = (String) hitData.get("query_sq_type");
@@ -289,18 +294,18 @@ public class FastaSearchBuilder implements SearchBuilder
 	else
 	    alpha = ProteinTools.getAlphabet();
 
-	if (gslBuilder == null)
-	    gslBuilder = new GappedSymbolListBuilder(alpha);
+        if (tokenParser == null)
+            tokenParser = new TokenParser(alpha);
 
 	// There is only ever one subhit in a Fasta hit
 	List subHits = new ArrayList();
 
-	querySeqBuf.delete(0, querySeqBuf.length());
-	querySeqPrep.delete(0, querySeqPrep.length());
+	querySeqBuf.setLength(0);
+	querySeqPrep.setLength(0);
 	querySeqBuf.append(querySeqTokens);
 
-	subjectSeqBuf.delete(0, subjectSeqBuf.length());
-	subjectSeqPrep.delete(0, subjectSeqPrep.length());
+	subjectSeqBuf.setLength(0);
+	subjectSeqPrep.setLength(0);
 	subjectSeqBuf.append(subjectSeqTokens);
 
 	try
@@ -316,10 +321,10 @@ public class FastaSearchBuilder implements SearchBuilder
 						subjectEnd,
 						subjectDispStart));
 
-	    Alignment alignment = createAlignment(subjectSeqID,
-						  querySeqPrep,
-						  subjectSeqPrep,
-						  gslBuilder);
+	    Alignment alignment = makeAlignment(subjectSeqID,
+                                                querySeqPrep,
+                                                subjectSeqPrep,
+                                                tokenParser);
 
 	    SeqSimilaritySearchSubHit subHit =
 		new SequenceDBSearchSubHit(score,
@@ -358,14 +363,14 @@ public class FastaSearchBuilder implements SearchBuilder
     }
 
     /**
-     * The <code>createAnnotation</code> method makes a new annotation
+     * The <code>makeAnnotation</code> method makes a new annotation
      * instance from the preannotation Map data.
      *
-     * @param preAnnotation a <code>Map</code> object.
+     * @param preAnnotation a <code>Map</code> containing raw data.
      *
-     * @return an <code>Annotation</code> object.
+     * @return an <code>Annotation</code>.
      */
-    private Annotation createAnnotation(final Map preAnnotation)
+    private Annotation makeAnnotation(final Map preAnnotation)
     {
 	Annotation annotation = new SimpleAnnotation();
 	Set  annotationKeySet = preAnnotation.keySet();
@@ -374,11 +379,6 @@ public class FastaSearchBuilder implements SearchBuilder
 	{
 	    Object   annotationKey = ksi.next();
 	    Object annotationValue = preAnnotation.get(annotationKey);
-
-//  	    System.out.println("Setting annotation: key -> "
-//  			       + annotationKey
-//  			       + " value -> "
-//  			       + annotationValue);
 
 	    try
 	    {
@@ -393,7 +393,7 @@ public class FastaSearchBuilder implements SearchBuilder
     }
 
     /**
-     * The <code>createAlignment</code> method creates an Alignment
+     * The <code>makeAlignment</code> method creates an Alignment
      * object from the sequence Strings parsed from the Fasta output.
      *
      * @param subjectSeqID a <code>String</code> which will be used to
@@ -403,26 +403,26 @@ public class FastaSearchBuilder implements SearchBuilder
      * sequence tokens for the query sequence.
      * @param subjectSeqBuf a <code>StringBuffer</code> containing the
      * sequence tokens for the subject sequence.
-     * @param gslBuilder a <code>GappedSymbolListBuilder</code>
-     * object.
+     * @param tokenParser a <code>TokenParser</code>.
      *
-     * @return an <code>Alignment</code> object.
+     * @return an <code>Alignment</code>.
      *
      * @exception IllegalSymbolException if tokens from the sequence
      * are not recognised in the chosen alphabet.
      */
-    private Alignment createAlignment(final String                  subjectSeqID,
-				      final StringBuffer            querySeqBuf,
-				      final StringBuffer            subjectSeqBuf,
-				      final GappedSymbolListBuilder gslBuilder)
+    private Alignment makeAlignment(final String       subjectSeqID,
+                                    final StringBuffer querySeqBuf,
+                                    final StringBuffer subjectSeqBuf,
+                                    final TokenParser  tokenParser)
 	throws IllegalSymbolException
     {
 	Map labelMap = new HashMap();
 
 	labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL, 
-		     gslBuilder.makeGappedSymbolList(querySeqBuf));
+                     tokenParser.parse(querySeqBuf.toString()));
+
 	labelMap.put(subjectSeqID,
-		     gslBuilder.makeGappedSymbolList(subjectSeqBuf));
+                     tokenParser.parse(querySeqBuf.toString()));
 
 	return new SimpleAlignment(labelMap);
     }

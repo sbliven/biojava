@@ -21,6 +21,7 @@
 
 package org.biojava.bio.search;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.biojava.bio.seq.StrandedFeature.Strand;
@@ -131,4 +132,60 @@ public interface SeqSimilaritySearchHit
      * guaranteed to contain at least 1 entry.
      */
     public List getSubHits();
+
+    /**
+     * <code>byScore</code> contains a
+     * <code>SeqSimilaritySearchHit</code> comparator which
+     * compares by their score.
+     */
+    public static final ByScoreComparator byScore = new ByScoreComparator();
+
+    /**
+     * <code>bySubHitCount</code> contains a
+     * <code>SeqSimilaritySearchHit</code> comparator which
+     * compares by their number of sub-hits.
+     */
+    public static final BySubHitCountComparator bySubHitCount =
+        new BySubHitCountComparator();
+
+    /**
+     * <code>ByScoreComparator</code> compares
+     * <code>SeqSimilaritySearchHit</code>s by their score.
+     */
+    public static final class ByScoreComparator implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            SeqSimilaritySearchHit h1 = (SeqSimilaritySearchHit) o1;
+            SeqSimilaritySearchHit h2 = (SeqSimilaritySearchHit) o2;
+
+            if (h1.getScore() > h2.getScore())
+                return 1;
+            else if (h1.getScore() < h2.getScore())
+                return -1;
+            else
+                return 0;
+        }
+    }
+
+    /**
+     * <code>BySubHitCountComparator</code> compares
+     * <code>SeqSimilaritySearchHit</code>s by their number of
+     * sub-hits.
+     */
+    public static final class BySubHitCountComparator implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            SeqSimilaritySearchHit h1 = (SeqSimilaritySearchHit) o1;
+            SeqSimilaritySearchHit h2 = (SeqSimilaritySearchHit) o2;
+
+            if (h1.getSubHits().size() > h2.getSubHits().size())
+                return 1;
+            else if (h1.getSubHits().size() < h2.getSubHits().size())
+                return -1;
+            else
+                return 0;
+        }
+    }
 }

@@ -40,7 +40,7 @@ public interface SearchBuilder extends SearchContentHandler
      * SeqSimilaritySearchResult instance created from data
      * accumulated from an associated SearchParser.
      *
-     * @return a <code>SeqSimilaritySearchResult</code> object.
+     * @return a <code>SeqSimilaritySearchResult</code>.
      *
      * @exception BioException if an error occurs.
      */

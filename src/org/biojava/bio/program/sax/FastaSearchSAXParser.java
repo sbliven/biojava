@@ -75,6 +75,9 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 
     private boolean firstHit = true;
 
+    // Set/reset by callback from main parser
+    private boolean moreSearchesAvailable = true;
+
     // For formatting rounded numbers
     private NumberFormat nFormat;
 
@@ -83,11 +86,10 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 
     // For creating character events
     private String stringOut;
-    private char []  charOut;
+    private char [] charOut;
 
     /**
      * Creates a new <code>FastaSearchSAXParser</code> instance.
-     *
      */
     public FastaSearchSAXParser()
     {
@@ -130,11 +132,9 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    startElement(new QName(this, this.prefix("BlastLikeDataSetCollection")),
 			 (Attributes) attributes);
 
-	    boolean moreSearchesAvailable = true;
-
 	    while (moreSearchesAvailable)
 	    {
-		moreSearchesAvailable = fastaParser.parseSearch(content, this);
+                fastaParser.parseSearch(content, this);
 	    }
 
 	    // End the BlastLikeDataSetCollection
@@ -148,6 +148,16 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	{
 	    throw new SAXException(pe);
 	}
+    }
+
+    public boolean getMoreSearches()
+    {
+        return moreSearchesAvailable;
+    }
+
+    public void setMoreSearches(boolean value)
+    {
+        moreSearchesAvailable = value;
     }
 
     public void setQuerySeq(String identifier)
@@ -252,6 +262,18 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 		props.append(searchPropKeys[i] + ": ");
 		props.append((String) searchProperties.get(searchPropKeys[i]) + nl);
 	    }
+
+            // Append the query sequence and database identifiers to
+            // the raw header. This may appear odd, but there is no
+            // place in the DTD for these data! We are reduced to
+            // putting them into the raw field and then parsing them
+            // out again later. I'll propose a change to the DTD to
+            // support these fields.
+            //
+            // Blast output has these fields in the RawOutput element
+            // of the Header element (using the current parser).
+            props.append("Query= "    + querySeqIdentifier  + nl);
+            props.append("Database: " + subjectDBIdentifier + nl);
 
 	    charOut = new char [props.length()];
 	    props.getChars(0, props.length(), charOut, 0);

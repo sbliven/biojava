@@ -33,12 +33,12 @@ public class TabIndexStore implements IndexStore, Serializable {
   }
   
   
-  // internal book-keeping for indecies
+  // internal book-keeping for indices
   private transient Map idToIndex;
   private transient Map commited;
   private transient Map uncommited;
 
-  // the two files for storing the store info and the actual table of indecies
+  // the two files for storing the store info and the actual table of indices
   private final File storeFile;
   private final File indexFile;
   

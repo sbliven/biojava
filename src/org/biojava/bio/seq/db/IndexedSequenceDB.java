@@ -43,12 +43,13 @@ import org.biojava.bio.seq.io.*;
  * IndexStore. 
  *
  * <P> Note: We may be able to improve the indexing speed further by
- * discarding all feature creation & annotation requestes during index
+ * discarding all feature creation & annotation requests during index
  * parsing.
  *
  * @author Matthew Pocock
  * @author Thomas Down
- * @author Keith James (docs) */
+ * @author Keith James (docs)
+ */
 
 public final class IndexedSequenceDB extends AbstractSequenceDB
     implements SequenceDB, Serializable 

@@ -56,7 +56,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
     {
 	Set validFormats = new HashSet();
 	validFormats.add("Embl");
-	// validFormats.add("SwissProt");
+	validFormats.add("SwissProt");
 
 	SequenceFormat.FORMATS.put(EmblLikeFormat.class.getName(),
 				   validFormats);

@@ -51,11 +51,11 @@ public class SearchReader implements Iterator
     /**
      * Creates a new <code>SearchReader</code> instance.
      *
-     * @param reader a <code>BufferedReader</code> object
-     * encapsulating the stream to be parsed.
-     * @param handler a <code>SearchBuilder</code> object to
+     * @param reader a <code>BufferedReader</code> encapsulating the
+     * stream to be parsed.
+     * @param handler a <code>SearchBuilder</code> to
      * coordinate data and construct the result.
-     * @param parser a <code>SearchParser</code> object to perform the
+     * @param parser a <code>SearchParser</code> to perform the
      * parsing.
      */
     public SearchReader(final BufferedReader reader,
@@ -91,7 +91,7 @@ public class SearchReader implements Iterator
      * <code>next</code> returns the next Object from the stream. It
      * is up to the client to cast this to a suitable search result.
      *
-     * @return an Object.
+     * @return an Object instance.
      *
      * @exception NoSuchElementException if there is no <i>valid</i>
      * result in the stream.
@@ -104,7 +104,9 @@ public class SearchReader implements Iterator
 
 	try
 	{
-	    moreSearchesAvailable = parser.parseSearch(reader, handler);
+	    parser.parseSearch(reader, handler);
+            moreSearchesAvailable = handler.getMoreSearches();
+
 	    return handler.makeSearchResult();
 	}
 	catch (ParserException pe)

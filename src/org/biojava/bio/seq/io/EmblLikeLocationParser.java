@@ -80,8 +80,8 @@ class EmblLikeLocationParser
     private boolean isBetweenLocation = false;
 
     // Currently set per Feature; this is a deficiency in the current
-    // parser
-    // Features are assumed to be on the positive strand until complemented
+    // parser. Features are assumed to be on the positive strand until
+    // complemented.
     // No features have a strand type of UNKNOWN
     private StrandedFeature.Strand mStrandType = StrandedFeature.POSITIVE;
 
@@ -107,107 +107,107 @@ class EmblLikeLocationParser
     StrandedLocation parseLocation(final String location)
 		throws BioException
     {
-		this.location = location;
+        this.location = location;
 
-		if ((countChar(location, '(')) != (countChar(location, ')')))
-	    	throw new BioException("Unbalanced parentheses in location: "
+        if ((countChar(location, '(')) != (countChar(location, ')')))
+            throw new BioException("Unbalanced parentheses in location: "
 				   + location);
 
-		nextCharIndex = 0;
+        nextCharIndex = 0;
 
-		instructStack.clear();
-		subLocations.clear();
+        instructStack.clear();
+        subLocations.clear();
 
-		thisToken = lexer.getNextToken();
-		while (thisToken != null)
-		{
-		    if (String.class.isInstance(thisToken))
-		    {
-				String toke = (String) thisToken;
-				if (toke.equals(".."))
-				{
+        thisToken = lexer.getNextToken();
+        while (thisToken != null)
+        {
+            if (String.class.isInstance(thisToken))
+            {
+                String toke = (String) thisToken;
+                if (toke.equals(".."))
+                {
 			    	// This token indicates that this isn't a point
-			    	isPointLoc = false;
-				}
-				else
-				{
-				    instructStack.add(thisToken);
-				}
-		    }
-		    else if (Integer.class.isInstance(thisToken))
-		    {
-				if (isPointLoc)
-			    	startCoords.add(thisToken);
-				else
-				    endCoords.add(thisToken);
-		    }
-		    else if (Character.class.isInstance(thisToken))
-		    {
-				char toke = ((Character) thisToken).charValue();
+                    isPointLoc = false;
+                }
+                else
+                {
+                    instructStack.add(thisToken);
+                }
+            }
+            else if (Integer.class.isInstance(thisToken))
+            {
+                if (isPointLoc)
+                    startCoords.add(thisToken);
+                else
+                    endCoords.add(thisToken);
+            }
+            else if (Character.class.isInstance(thisToken))
+            {
+                char toke = ((Character) thisToken).charValue();
 
-				switch (toke)
-				{
-			    	case '(': case ':':
-						break;
+                switch (toke)
+                {
+                    case '(': case ':':
+                        break;
 
-				    case '^':
-						isBetweenLocation = true;
+                    case '^':
+                        isBetweenLocation = true;
 
-				    case '<':
-						unboundMin = true;
-						break;
+                    case '<':
+                        unboundMin = true;
+                        break;
 
-				    case '>':
-						unboundMax = true;
-						break;
+                    case '>':
+                        unboundMax = true;
+                        break;
 
-				    case '.':
-						// Catch range: (123.567)
-						fuzzyCoord = true;
-						break;
+                    case '.':
+                        // Catch range: (123.567)
+                        fuzzyCoord = true;
+                        break;
 
-				    case ',':
-						processCoords();
-						break;
+                    case ',':
+                        processCoords();
+                        break;
 
-				    case ')':
-						// Catch the end of range: (123.567)
-						if (fuzzyCoord)
-						{
-						    fuzzyCoord = false;
-						}
-						else
-						{
-						    processCoords();
-						    processInstructs();
-						}
-						break;
+                    case ')':
+                        // Catch the end of range: (123.567)
+                        if (fuzzyCoord)
+                        {
+                            fuzzyCoord = false;
+                        }
+                        else
+                        {
+                            processCoords();
+                            processInstructs();
+                        }
+                        break;
 
-				    default:
-						throw new BioException("Unknown character '"
-							       + toke
-							       + "' within location: "
-							       + location);
-				}
-		    }
-		    thisToken = lexer.getNextToken();
-		}
-		processCoords();
+                    default:
+                        throw new BioException("Unknown character '"
+                                               + toke
+                                               + "' within location: "
+                                               + location);
+                }
+            }
+            thisToken = lexer.getNextToken();
+        }
+        processCoords();
 
-		StrandedLocation returnLocation;
-		if (subLocations.size() == 1)
-		{
-		    returnLocation = new StrandedLocation((Location)subLocations.get(0),
-					   mStrandType);
-		}
-		else
-		{
-		    // EMBL ordering is in reverse on the complementary strand
-		    // but LocationTools sorts them anyway
-		    returnLocation = new StrandedLocation(LocationTools.union(subLocations),
-					   mStrandType);
-		}
-		return returnLocation;
+        StrandedLocation returnLocation;
+        if (subLocations.size() == 1)
+        {
+            returnLocation = new StrandedLocation((Location)subLocations.get(0),
+                                                  mStrandType);
+        }
+        else
+        {
+            // EMBL ordering is in reverse on the complementary strand
+            // but LocationTools sorts them anyway
+            returnLocation = new StrandedLocation(LocationTools.union(subLocations),
+                                                  mStrandType);
+        }
+        return returnLocation;
     }
 
     /**
@@ -480,7 +480,7 @@ class EmblLikeLocationParser
 	private Integer followInteger()
 	{
 	    StringBuffer intString = new StringBuffer();
-	    char    thisChar = location.charAt(nextCharIndex);
+	    char thisChar = location.charAt(nextCharIndex);
 
 	    while (Character.isDigit(thisChar))
 	    {
@@ -503,7 +503,7 @@ class EmblLikeLocationParser
 	private String followText()
 	{
 	    StringBuffer textString = new StringBuffer("");
-	    char     thisChar = location.charAt(nextCharIndex);
+	    char thisChar = location.charAt(nextCharIndex);
 
 	    // First character must be a letter
 	    if (! Character.isLetter(thisChar))

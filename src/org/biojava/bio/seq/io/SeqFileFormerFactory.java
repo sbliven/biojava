@@ -90,7 +90,7 @@ public abstract class SeqFileFormerFactory
      * the name of the file format that the resultant
      * <code>SeqFileFormer</code> will generate.
      *
-     * @return a <code>SeqFileFormer</code> object.
+     * @return a <code>SeqFileFormer</code>.
      *
      * @exception BioException if a non-existent file format is
      * requested.
@@ -137,7 +137,7 @@ public abstract class SeqFileFormerFactory
      * it. These are present as static inner classes within their
      * respective SeqFileFormer implementations.
      *
-     * @return a <code>SeqFileFormer</code> value.
+     * @return a <code>SeqFileFormer</code>.
      */
     protected abstract SeqFileFormer make();
 }

@@ -44,6 +44,14 @@ import java.io.IOException;
  * least the binaries are consistent across architechtures. This class
  * carries out the necessary conversion.</p>
  *
+ * <p>The EMBL CD-ROM format stores the date in 4 bytes. One byte is
+ * unused (the first one), leaving one byte for the day, one for the
+ * month and one (!)  for the year.</p>
+ *
+ * <p>For further information see the EMBOSS documentation, or for a
+ * full description, the source code of the dbi programs and the Ajax
+ * library.</p>
+ *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
@@ -52,6 +60,10 @@ public abstract class EmblCDROMIndexReader
     protected InputStream input;
     protected StringBuffer sb;
 
+    /**
+     * <code>headerParsed</code> is a flag indicating that the 300
+     * byte header has been parsed and the contents cached.
+     */
     protected boolean headerParsed = false;
 
     // Header fields
@@ -170,13 +182,14 @@ public abstract class EmblCDROMIndexReader
 
     /**
      * <code>readDBDate</code> reads the date from the index
-     * header. This is known to be broken. It will be fixed to return
-     * a Java Date, if possible.
+     * header. The date is stored in 4 bytes: 0, unused; 1, year; 2,
+     * month; 3, day. With a 1 byte year it's not very much use and
+     * I'm not sure that the EMBOSS programs set the value correctly
+     * anyway.
      *
      * @return a <code>String</code>.
      *
-     * @exception IOException if an error occurs.
-     */
+     * @exception IOException if an error occurs.  */
     public String readDBDate() throws IOException
     
     {
@@ -194,7 +207,7 @@ public abstract class EmblCDROMIndexReader
      *
      * @return an <code>Object []</code> array.
      *
-     * @exception IOException if an error occurs
+     * @exception IOException if an error occurs.
      */
     public abstract Object [] readRecord() throws IOException;
 
@@ -256,20 +269,27 @@ public abstract class EmblCDROMIndexReader
     }
 
     /**
-     * <code>parseDate</code> is broken.
+     * <code>parseDate</code> parses a String from an array of
+     * bytes. The date is stored in 4 bytes: 0, unused; 1, year; 2,
+     * month; 3, day. With a 1 byte year it's not very much use and
+     * I'm not sure that the EMBOSS programs set the value correctly
+     * anyway.
      *
-     * @param sb a <code>StringBuffer</code> object.
-     * @param dbDate a <code>byte[]</code>.
+     * @param sb a <code>StringBuffer</code>.
+     * @param dbDate a <code>byte []</code> array.
      *
      * @return a <code>String</code>.
      */
     String parseDate(StringBuffer sb, byte [] dbDate)
     {
-        for (int i = 0; i < dbDate.length; i++)
+        // The first byte is unused
+        for (int i = dbDate.length; --i > 0;)
         {
-            sb.append(dbDate[i]);
+            sb.append(dbDate[i] + ":");
         }
 
+        // Remove the trailing ':'
+        sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
 
@@ -277,7 +297,7 @@ public abstract class EmblCDROMIndexReader
      * <code>parseString</code> parses a String from an array of
      * bytes, skipping the empties.
      *
-     * @param sb a <code>StringBuffer</code> object.
+     * @param sb a <code>StringBuffer</code>.
      * @param characters a <code>byte []</code> array.
      *
      * @return a <code>String</code>.

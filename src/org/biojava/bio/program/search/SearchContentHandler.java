@@ -40,6 +40,25 @@ import org.biojava.bio.BioException;
 public interface SearchContentHandler
 {
     /**
+     * <code>getMoreSearches</code> returns the state of the
+     * <code>SearchContentHandler</code> with respect to further
+     * searches from its data source. Used for handling streams of
+     * search results.
+     *
+     * @return a <code>boolean</code> value.
+     */
+    public boolean getMoreSearches();
+
+    /**
+     * <code>setMoreSearches</code> sets the state of the
+     * <code>SearchContentHandler</code>'s expectation of receiving
+     * more results. Used for handling streams of search results.
+     *
+     * @param value a <code>boolean</code> value.
+     */
+    public void setMoreSearches(boolean value);
+
+    /**
      * The <code>startSearch</code> method indicates the start of
      * useful search information.
      */

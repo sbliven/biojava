@@ -24,15 +24,35 @@ package org.biojava.bio.seq.db.emblcd;
 import java.io.InputStream;
 import java.io.IOException;
 
+/**
+ * <code>DivisionLkpReader</code> reads the "division.lkp" file of an
+ * EMBL CD-ROM format binary index.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @since 1.2
+ */
 public class DivisionLkpReader extends EmblCDROMIndexReader
 {
     private byte []  fNumBytes = new byte [2];
 
+    /**
+     * Creates a new <code>DivisionLkpReader</code>.
+     *
+     * @param input an <code>InputStream</code>.
+     */
     public DivisionLkpReader(InputStream input)
     {
         super(input);
     }
 
+    /**
+     * <code>readRecord</code> creates an array of Objects from the
+     * raw byte array of a single record.
+     *
+     * @return an <code>Object []</code> array.
+     *
+     * @exception IOException if an error occurs.
+     */
     public Object [] readRecord()  throws IOException
     {
         byte [] divRecord = readRawRecord();

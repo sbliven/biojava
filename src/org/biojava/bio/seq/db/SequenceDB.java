@@ -31,7 +31,7 @@ import org.biojava.bio.seq.*;
  * A database of sequences with accessible keys and iterators over all
  * sequences.
  * <P>
- * This may have several implementations with rich behaviour, but basicaly most
+ * This may have several implementations with rich behaviour, but basically most
  * of the time you will just use the interface methods to do stuff. A sequence
  * database contains a finite number of sequences stored under unique keys.
  *
@@ -41,7 +41,7 @@ import org.biojava.bio.seq.*;
  */
 public interface SequenceDB extends SequenceDBLite {
   /**
-   * Get an imutable set of all of the IDs in the database. The ids are legal
+   * Get an immutable set of all of the IDs in the database. The ids are legal
    * arguments to getSequence.
    *
    * @return  a Set of ids - at the moment, strings
@@ -49,7 +49,7 @@ public interface SequenceDB extends SequenceDBLite {
   Set ids();
   
   /**
-   * Returns a SequenceTterator over all sequences in the database. The order
+   * Returns a SequenceIterator over all sequences in the database. The order
    * of retrieval is undefined.
    *
    * @return  a SequenceIterator over all sequences

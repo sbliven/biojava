@@ -239,15 +239,15 @@ public class SequenceDBSearchHit extends AbstractChangeable
   
     public int hashCode()
     {
-	int hCode = 0;
+	int hc = 0;
 
-	hCode = ObjectUtil.hashCode(hCode, score);
-	hCode = ObjectUtil.hashCode(hCode, pValue);
-	hCode = ObjectUtil.hashCode(hCode, eValue);
-	hCode = ObjectUtil.hashCode(hCode, sequenceID);
-	hCode = ObjectUtil.hashCode(hCode, subHits);
+	hc = ObjectUtil.hashCode(hc, score);
+	hc = ObjectUtil.hashCode(hc, pValue);
+	hc = ObjectUtil.hashCode(hc, eValue);
+	hc = ObjectUtil.hashCode(hc, sequenceID);
+	hc = ObjectUtil.hashCode(hc, subHits);
 
-	return hCode;
+	return hc;
     }
 
     public String toString()

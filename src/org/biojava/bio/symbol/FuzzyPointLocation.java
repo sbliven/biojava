@@ -227,7 +227,7 @@ public class FuzzyPointLocation extends AbstractLocation
 	}
 	else
 	{
-		return "?";
+            return "?";
 	}
     }
 

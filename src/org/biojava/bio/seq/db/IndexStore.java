@@ -91,7 +91,7 @@ public interface IndexStore {
    * Retrieve the set of all current IDs.
    * <P>
    * This set should either be immutable, or modifiable totally
-   * seperately from the IndexStore.
+   * separately from the IndexStore.
    *
    * @return a Set of all legal IDs
    */
@@ -106,7 +106,7 @@ public interface IndexStore {
    * Retrieve the format of the index file.
    * <P>
    * This set should either be immutable, or modifiable totally
-   * seperately from the IndexStore.
+   * separately from the IndexStore.
    *
    * @return a Set of all indexed files
    */
@@ -120,7 +120,7 @@ public interface IndexStore {
   SequenceBuilderFactory getSBFactory();
   
   /**
-   * Retrieve the symbol parser used to turn the sequenve characters
+   * Retrieve the symbol parser used to turn the sequence characters
    * into Symobl objects.
    *
    * @return the associated SymbolParser

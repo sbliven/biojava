@@ -24,17 +24,37 @@ package org.biojava.bio.seq.db.emblcd;
 import java.io.InputStream;
 import java.io.IOException;
 
+/**
+ * <code>EntryNamIdxReader</code> reads the "entrynam.idx" file of an
+ * EMBL CD-ROM format binary index.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @since 1.2
+ */
 public class EntryNamIdxReader extends EmblCDROMIndexReader
 {
     private byte [] rPosBytes = new byte [4];
     private byte [] sPosBytes = new byte [4];
     private byte [] fNumBytes = new byte [2];
 
+    /**
+     * Creates a new <code>EntryNamIdxReader</code>.
+     *
+     * @param input an <code>InputStream</code>.
+     */
     public EntryNamIdxReader(InputStream input)
     {
         super(input);
     }
 
+    /**
+     * <code>readRecord</code> creates an array of Objects from the
+     * raw byte array of a single record.
+     *
+     * @return an <code>Object []</code> array.
+     *
+     * @exception IOException if an error occurs.
+     */
     public Object [] readRecord() throws IOException
     {
         byte [] enRecord = readRawRecord();

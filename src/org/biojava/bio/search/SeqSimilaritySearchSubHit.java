@@ -21,6 +21,8 @@
 
 package org.biojava.bio.search;
 
+import java.util.Comparator;
+
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
 
@@ -122,4 +124,61 @@ public interface SeqSimilaritySearchSubHit
      * sequence.
      */
     public Alignment getAlignment();
+
+    /**
+     * <code>byScore</code> contains a
+     * <code>SeqSimilaritySearchSubHit</code> comparator which
+     * compares by the score of the sub-hit.
+     */
+    public static final ByScoreComparator byScore = new ByScoreComparator();
+
+    /**
+     * <code>bySubjectStart</code> contains a
+     * <code>SeqSimilaritySearchSubHit</code> comparator which
+     * compares by the start position of the sub-hit on the subject
+     * sequence.
+     */
+    public static final BySubjectStartComparator bySubjectStart
+        = new BySubjectStartComparator();
+
+    /**
+     * <code>ByScoreComparator</code> compares
+     * <code>SeqSimilaritySearchSubHit</code>s by their score.
+     */
+    public static final class ByScoreComparator implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            SeqSimilaritySearchSubHit h1 = (SeqSimilaritySearchSubHit) o1;
+            SeqSimilaritySearchSubHit h2 = (SeqSimilaritySearchSubHit) o2;
+
+            if (h1.getScore() > h2.getScore())
+                return 1;
+            else if (h1.getScore() < h2.getScore())
+                return -1;
+            else
+                return 0;
+        }
+    }
+
+    /**
+     * <code>BySubjectStartComparator</code> compares
+     * <code>SeqSimilaritySearchSubHit</code>s by their start position
+     * on the subject sequence.
+     */
+    public static final class BySubjectStartComparator implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            SeqSimilaritySearchSubHit h1 = (SeqSimilaritySearchSubHit) o1;
+            SeqSimilaritySearchSubHit h2 = (SeqSimilaritySearchSubHit) o2;
+
+            if (h1.getSubjectStart() > h2.getSubjectStart())
+                return 1;
+            else if (h1.getSubjectStart() < h2.getSubjectStart())
+                return -1;
+            else
+                return 0;
+        }
+    }
 }

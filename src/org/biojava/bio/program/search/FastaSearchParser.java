@@ -80,10 +80,8 @@ public class FastaSearchParser implements SearchParser
 	(HashSet) fillSet(new String [] { "fa_expect", "fa_z-score" },
 			  new HashSet());
 
-    private int              searchStatus = NODATA;
-
-    private boolean          searchParsed = false;
-    private boolean moreSearchesAvailable = false;
+    private int     searchStatus = NODATA;
+    private boolean searchParsed = false;
 
     private SearchContentHandler handler;
     private BufferedReader       reader;
@@ -113,12 +111,12 @@ public class FastaSearchParser implements SearchParser
      * @exception ParserException if the parser fails to parse a
      * line.
      */
-    public boolean parseSearch(final BufferedReader       reader,
-			       final SearchContentHandler handler)
+    public void parseSearch(final BufferedReader       reader,
+                            final SearchContentHandler handler)
 	throws IOException, BioException, ParserException
     {
-	boolean foundQuerySeqID = false;
 	lineNumber = 0;
+        boolean parsedQueryId = false;
 
 	this.handler = handler;
 
@@ -143,8 +141,8 @@ public class FastaSearchParser implements SearchParser
 		handler.endSubHit();
 		handler.endSearch();
 
-		searchParsed          = true;
-		moreSearchesAvailable = false;
+		searchParsed = true;
+                handler.setMoreSearches(true);
 
 		continue LINE;
 	    }
@@ -153,10 +151,26 @@ public class FastaSearchParser implements SearchParser
 	    switch (searchStatus)
 	    {
 		case NODATA:
+                    // First we try to pick up the query ID from the
+                    // unformatted pre-header. This is a stop-gap
+                    // until the DTD has a place for the query
+                    // sequence id. There's a second check to get this
+                    // value from the HIT section. When we get DTD
+                    // support this block can be removed and no other
+                    // changes will be needed.
+                    if (! parsedQueryId)
+                    {
+                        if (line.startsWith(" >"))
+                        {
+                            handler.setQuerySeq(line.substring(2));
+                            parsedQueryId = true;
+                        }
+                    }
+
 		    // This token marks the line describing the query
-		    // sequence and database searched. It is followed
-		    // by header lines containing data about the
-		    // search
+		    // sequence file and database searched. It is
+		    // followed by header lines containing data about
+		    // the search
 		    if (line.startsWith(">>>"))
 		    {
 			searchStatus = INHEADER;
@@ -172,8 +186,8 @@ public class FastaSearchParser implements SearchParser
 			// that the stream is not empty
 			if (searchParsed)
 			{
-			    searchParsed          = false;
-			    moreSearchesAvailable = true;
+			    searchParsed = false;
+                            handler.setMoreSearches(true);
 			    break LINE;
 			}
 			break STATUS;
@@ -217,11 +231,8 @@ public class FastaSearchParser implements SearchParser
 		    {
 			searchStatus = INQUERY;
 
-			if (! foundQuerySeqID)
-			{
-			    handler.setQuerySeq(parseId(line));
-			    foundQuerySeqID = true;
-			}
+                        if (! parsedQueryId)
+                            handler.setQuerySeq(parseId(line));
 
 			handler.endHit();
 			handler.startSubHit();
@@ -315,8 +326,8 @@ public class FastaSearchParser implements SearchParser
 			handler.endSubHit();
 			handler.endSearch();
 
-			searchParsed          = true;
-			moreSearchesAvailable = false;
+			searchParsed = true;
+                        handler.setMoreSearches(true);
 
 			continue LINE;
 		    }
@@ -332,7 +343,7 @@ public class FastaSearchParser implements SearchParser
 	} // end while
 
 	// This is false if we reach here
-	return moreSearchesAvailable;
+        handler.setMoreSearches(false);
     }
 
     /**
@@ -340,7 +351,7 @@ public class FastaSearchParser implements SearchParser
      * elements of an Array.
      *
      * @param tokenArray a <code>String []</code> array.
-     * @param set a <code>Set</code> object.
+     * @param set a <code>Set</code> to fill.
      *
      * @return a Set object.
      */
@@ -353,14 +364,14 @@ public class FastaSearchParser implements SearchParser
     }
 
     /**
-     * The <code>parseId</code> method parses sequence Ids from lines
-     * starting with '>' and '>>'.
+     * The <code>parseId</code> method parses sequence IDs from
+     * lines starting with '>' and '>>'.
      *
      * @param line a <code>String</code> to be parsed.
      *
-     * @return a <code>String</code> containing the Id.
+     * @return a <code>String</code> containing the ID.
      *
-     * @exception ParserException if an error occurs. 
+     * @exception ParserException if an error occurs.
      */
     private String parseId(final String line)
 	throws ParserException

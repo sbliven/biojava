@@ -113,7 +113,7 @@ class AbstractGenEmblFileFormer
      * each line.
      * @param wrapWidth an <code>int</code> indicating the number of
      * columns per line.
-     * @return a <code>StringBuffer</code> value.
+     * @return a <code>StringBuffer</code>.
      */
     StringBuffer formatQualifierBlock(final StringBuffer sb,
 				      final String       text,
@@ -209,8 +209,8 @@ class AbstractGenEmblFileFormer
      * specified in the internally loaded XML feature table
      * description.
      *
-     * @param key an <code>Object</code> value (the qualifier key).
-     * @param value an <code>Object</code> value (the qualifier content).
+     * @param key an <code>Object</code> (the qualifier key).
+     * @param value an <code>Object</code> (the qualifier content).
      *
      * @return a <code>String</code> bounded by the correct tokens.
      */
@@ -274,10 +274,10 @@ class AbstractGenEmblFileFormer
      * <code>StringBuffer</code>) is preferred.
      *
      * @param loc a <code>Location</code> to format.
-     * @param strand a <code>StrandedFeature.Strand</code> object
+     * @param strand a <code>StrandedFeature.Strand</code>
      * indicating the <code>Location</code>'s strand.
      *
-     * @return a <code>StringBuffer</code> value.
+     * @return a <code>StringBuffer</code>.
      */
     public String formatLocation(final Location               loc,
 				 final StrandedFeature.Strand strand)
@@ -321,7 +321,7 @@ class AbstractGenEmblFileFormer
      * @param sb a <code>StringBuffer</code to which the location will
      * be appended.
      * @param loc a <code>Location</code> to format.
-     * @param strand a <code>StrandedFeature.Strand</code> object
+     * @param strand a <code>StrandedFeature.Strand</code>
      * indicating the <code>Location</code>'s strand.
      *
      * @return a <code>StringBuffer</code> value.
@@ -340,8 +340,8 @@ class AbstractGenEmblFileFormer
      * representation of a <code>Location</code> wrapped to a specific
      * width.
      *
-     * @param loc a <code>Location</code> object to use as a template.
-     * @param strand an <code>int</code> value indicating the
+     * @param loc a <code>Location</code> to use as a template.
+     * @param strand an <code>int</code> indicating the
      * <code>Location</code>'s strand.
      * @param leader a <code>String</code> to append to the start of
      * each line.
@@ -417,7 +417,7 @@ class AbstractGenEmblFileFormer
 	    else
 		locType = RANGE;
 
-	    ub.delete(0, ub.length());
+	    ub.setLength(0);
 	    switch (locType)
 	    {
 		case POINT:
@@ -510,7 +510,7 @@ class AbstractGenEmblFileFormer
      * String representation of a <code>FuzzyLocation</code>.
      *
      * @param sb a <code>StringBuffer</code> to format the location into.
-     * @param fl a <code>FuzzyLocation</code> object.
+     * @param fl a <code>FuzzyLocation</code>.
      *
      * @return a <code>String</code> representation of the location.
      */
@@ -564,7 +564,7 @@ class AbstractGenEmblFileFormer
      * String representation of a <code>FuzzyPointLocation</code>.
      *
      * @param sb a <code>StringBuffer</code> to format the location into.
-     * @param fpl a <code>FuzzyPointLocation</code> object.
+     * @param fpl a <code>FuzzyPointLocation</code>.
      *
      * @return a <code>String</code> representation of the location.
      */
@@ -598,7 +598,7 @@ class AbstractGenEmblFileFormer
      * representation of a <code>RangeLocation</code>.
      *
      * @param sb a <code>StringBuffer</code> to format the location into.
-     * @param rl a <code>RangeLocation</code> object.
+     * @param rl a <code>RangeLocation</code>.
      *
      * @return a <code>String</code> representation of the location.
      */
@@ -617,7 +617,7 @@ class AbstractGenEmblFileFormer
      * representation of a <code>PointLocation</code>.
      *
      * @param sb a <code>StringBuffer</code> to format the location into.
-     * @param pl a <code>PointLocation</code> object.
+     * @param pl a <code>PointLocation</code>.
      *
      * @return a <code>String</code> representation of the location.
      */
@@ -647,7 +647,7 @@ class AbstractGenEmblFileFormer
      * representation of a <code>Location</code> and returns the
      * complementary strand version.
      *
-     * @param value a <code>String</code> value.
+     * @param value a <code>String</code>.
      *
      * @return a <code>String</code> representation of the
      * complementary strand location.
@@ -668,9 +668,9 @@ class AbstractGenEmblFileFormer
      *
      * @param featureDataFile a <code>String</code> indicating the
      * name of the file.
-     * @param featureData a <code>Map</code> object to populate with
+     * @param featureData a <code>Map</code> to populate with
      * feature data.
-     * @param qualifierData a <code>Map</code> object to populate with
+     * @param qualifierData a <code>Map</code> to populate with
      * qualifier data.
      */
     static void loadFeatureData(final String featureDataFile,

@@ -30,7 +30,7 @@ import org.biojava.utils.ParserException;
 /**
  * Objects implementing the <code>SearchParser</code> interface are
  * responsible for parsing data from a stream and notifying a
- * SearchContentHandler of significant events.
+ * <code>SearchContentHandler</code> of events.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.1
@@ -47,8 +47,6 @@ public interface SearchParser
      * @param handler a <code>SearchContentHandler</code> to notify of
      * events.
      *
-     * @return a <code>boolean</code> value.
-     *
      * @exception IOException if an error occurs in the
      * BufferedReader.
      * @exception BioException if an internal error occurs.
@@ -56,8 +54,8 @@ public interface SearchParser
      * line or is unable to extract the required information from a
      * known line type.
      */
-    public boolean parseSearch(BufferedReader       reader,
-			       SearchContentHandler handler)
+    public void parseSearch(BufferedReader       reader,
+                            SearchContentHandler handler)
 	throws IOException, BioException, ParserException;
 
 }

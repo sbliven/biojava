@@ -58,8 +58,8 @@ public class SeqIOEventEmitter
      * object and sends events describing its data to the
      * <code>SeqIOListener</code>.
      *
-     * @param seq a <code>Sequence</code> object.
-     * @param listener a <code>SeqIOListener</code> object.
+     * @param seq a <code>Sequence</code>.
+     * @param listener a <code>SeqIOListener</code>.
      */
     public static void getSeqIOEvents(final Sequence      seq,
 				      final SeqIOListener listener)
@@ -150,8 +150,8 @@ public class SeqIOEventEmitter
      * a list of all <code>Feature</code>s within a
      * <code>FeatureHolder</code>.
      *
-     * @param fh a <code>FeatureHolder</code> object.
-     * @return a <code>List</code> value.
+     * @param fh a <code>FeatureHolder</code>.
+     * @return a <code>List</code>.
      */
     private static List getSubFeatures(final FeatureHolder fh)
     {

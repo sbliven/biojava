@@ -79,7 +79,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
      * Creates a new <code>GenbankFileFormer</code> object. Instances
      * are made by the <code>Factory</code>.
      *
-     * @param stream a <code>PrintStream</code> object.
+     * @param stream a <code>PrintStream</code>.
      */
     protected GenbankFileFormer(PrintStream stream)
     {
@@ -145,7 +145,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	// Get separator for system
 	String nl = System.getProperty("line.separator");
 
-	sq.delete(0, sq.length());
+	sq.setLength(0);
 	sq.append("BASE COUNT    ");
 	sq.append(aCount + " a ");
 	sq.append(aCount + " c ");
@@ -177,9 +177,9 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	for (int i = 0; i < lineLens.length; i++)
 	{
 	    // Empty the sequence buffer
-	    sq.delete(0, sq.length());
+	    sq.setLength(0);
 	    // Empty the utility buffer
-	    ub.delete(0, ub.length());
+	    ub.setLength(0);
 
 	    // How long is this chunk?
 	    int len = lineLens[i];
@@ -216,7 +216,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     {
 	if (key.equals(GenbankProcessor.PROPERTY_GENBANK_ACCESSIONS))
 	{
-	    ub.delete(0, ub.length());
+	    ub.setLength(0);
 	    ub.append("ACCESSION   ");
 	    for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
 	    {
@@ -236,7 +236,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	if (templ instanceof StrandedFeature.Template)
 	    strand = ((StrandedFeature.Template) templ).strand.getValue();
 
-	ub.delete(0, ub.length());
+	ub.setLength(0);
 	ub.append(leader);
 
 	StringBuffer lb = formatLocationBlock(ub,
@@ -268,8 +268,8 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	{
 	    for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
 	    {
-		qb.delete(0, qb.length());
-		ub.delete(0, ub.length());
+		qb.setLength(0);
+		ub.setLength(0);
 		StringBuffer fb = formatQualifierBlock(qb,
 						       formatQualifier(ub, key, vi.next()).toString(),
 						       leader,
@@ -279,8 +279,8 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	}
 	else
 	{
-	    qb.delete(0, qb.length());
-	    ub.delete(0, ub.length());
+            qb.setLength(0);
+            ub.setLength(0);
 	    StringBuffer fb = formatQualifierBlock(qb,
 						   formatQualifier(ub, key, value).toString(),
 						   leader,

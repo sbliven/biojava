@@ -30,10 +30,11 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.*;
 
 /**
- * SequenceDB implementation that returns new SequenceView instances wrapping 
- * the sequences in an underlying database. One apropreate use of this would be
- * to wrap a DB in one of these and then wrap this in an annotating db so that
- * the annotation is added to views, not the underlying sequences.
+ * SequenceDB implementation that returns new SequenceView instances
+ * wrapping the sequences in an underlying database. One appropriate
+ * use of this would be to wrap a DB in one of these and then wrap
+ * this in an annotating db so that the annotation is added to views,
+ * not the underlying sequences.
  * 
  * @author Matthew Pocock
  * @since 1.2
