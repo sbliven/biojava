@@ -337,8 +337,8 @@
 
   <!-- Cleans everything -->
   <target name="clean" depends="init">
-    <deltree dir="${build.dir}" />
-    <deltree dir="${dist.root}" />
+    <delete dir="${build.dir}" />
+    <delete dir="${dist.root}" />
     <delete file="${name}-${version}.tar.gz" />
     <delete file="${name}-${version}.tar" />
     <delete file="${name}-${version}.zip" />
