@@ -53,7 +53,7 @@ public class PackedSymbolListFactory
     /**
      * Create a factory for PackedSymbolLists with specified packing type.
      *
-     * @param is ambiguity to be supported by the encoding?
+     * @param ambiguity is ambiguity to be supported by the encoding?
      * @deprecated the argumentless constructor creates a SymbolListFactory
      *   that will autoselect the packing appropriately.
      */

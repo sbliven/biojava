@@ -71,7 +71,7 @@ public class UkkonenSuffixTree{
    * rule 4: ended up in the middle of an edge.
    * rule 5: ended up at an InternalNode
    *
-   * Rule 5 counts as rule 4 when adding a sequence, but the rules are also used to when searching the tree.
+   * Production 5 counts as rule 4 when adding a sequence, but the rules are also used to when searching the tree.
    */
   private int rule;
 
@@ -99,17 +99,17 @@ public class UkkonenSuffixTree{
   public void addSymbolList(SymbolList list, String name, boolean doNotTerminate) throws IllegalSymbolException{
     if (!doNotTerminate)
       list = new TerminatedSymbolList(list);
-    
+
     CharSequence seq =new SymbolListCharSequence(list);
     System.out.println("Adding symbol list " + seq.toString());
     //if (!doNotTerminate)
-      
+
     //if(!doNotTerminate)
     //  seq = seq+terminationChar;
     addPreppedSequence(seq);
   }
 
-  
+
 
   /**
    * Add a sequence into the tree. If there are more sequences, they should be separated by a terminationChar ($ by default). If none exist, it is assumed that there is only 1 continuous sequence to be added.
@@ -218,13 +218,13 @@ public class UkkonenSuffixTree{
           break;
 	}else
           canLinkJump=true;
-        
+
 
       }//for phase i
     }//for extension j
     finishAddition();
   }
-  
+
   /** This method is used to walk down the tree, from a given node. The
    * <code>rule</code> variable can be used to check where the walk
    *  stopped. Note that rule 3 means that the string used to walk down the
@@ -249,8 +249,8 @@ public class UkkonenSuffixTree{
     SuffixNode currentNode;
     SuffixNode arrivedAt;
     CharSequence edgeLabel;
-    
-    
+
+
     currentNode=starting;
     arrivedAt=starting;
     while (from<to){
@@ -266,7 +266,7 @@ public class UkkonenSuffixTree{
       edgeLabel = getEdgeLabel(arrivedAt);
       if (edgeLabel.length()>=to-from){
         if (edgeLabel.equals(source.substring(from,to))){
-          //rule 1 or 5, 
+          //rule 1 or 5,
           if (arrivedAt.isTerminal())
             rule=1;
           else
@@ -282,20 +282,20 @@ public class UkkonenSuffixTree{
         from+=edgeLabel.length();
         currentNode=arrivedAt;
       }
-      
+
       else{
         rule=3;
         from=to;
       }
     }
-    
+
     return arrivedAt;
-    
+
   }
-    
-  
-  
-  
+
+
+
+
   /**
    * Just like walkTo, but faster when used during tree construction, as it
    * assumes that a mismatch can only occurs with the last character of the
@@ -320,8 +320,8 @@ public class UkkonenSuffixTree{
     int original=from;
     SuffixNode originalNode=starting;
     int i=0;
-    
-    
+
+
     currentNode=starting;
     arrivedAt=starting;
 
@@ -336,7 +336,7 @@ public class UkkonenSuffixTree{
     while (canGoDown){
       //    if (source.substring(from, to).equals("CAGCG"))
       //  System.out.println(to+" here to "+source.substring(from, to)+" "+(i++));
-      
+
       if (currentNode.isTerminal()){
       	System.out.println("ARRGH! at "+source.subSequence(original, to)+
                            "("+from+","+original+","+to+
@@ -345,7 +345,7 @@ public class UkkonenSuffixTree{
         //This bug should be dead, but it it came back from the dead a couple
         //of times already.
       }
-        
+
       arrivedAt=(SuffixNode)currentNode.children.get(
                                                      new Character(source.charAt(from)));
       if (arrivedAt==null){
@@ -396,12 +396,12 @@ public class UkkonenSuffixTree{
     parentLength = getPathLength(parent);
     childLength = getPathLength(child);
     if (childLength-parentLength<=0){
-      
+
       System.out.println("negative length "+(childLength-parentLength));
 
       System.out.println(getLabel(child)+","+getLabel(parent));
     }
-    
+
     return childLength-parentLength;
   }
 
@@ -412,8 +412,8 @@ public class UkkonenSuffixTree{
                                (child.labelEnd==TO_A_LEAF)?
                                e:child.labelEnd);
   }
-  
-  
+
+
   protected int getPathLength(SuffixNode node){
     return getPathEnd(node)-node.labelStart;
   }
@@ -457,8 +457,8 @@ public class UkkonenSuffixTree{
         System.out.println("node "+i+" label "+getLabel(node)+" attached to "+getLabel(node.parent));
     }
   }
-  
-  
+
+
   public SuffixNode getRoot(){return root;}
 
   /******************************************************************
@@ -534,14 +534,14 @@ public class UkkonenSuffixTree{
    ******************************************************************/
 
   public static abstract class SuffixNode {
-    
+
     static final int A_LEAF=-1;
     SuffixNode parent;
     SuffixNode suffixLink;
     int labelStart, labelEnd;
     HashMap children;
     int[] additionalLabels;
-    
+
     /**
        * Determine is this node is terminal (has no children).
        *<p>
@@ -552,7 +552,7 @@ public class UkkonenSuffixTree{
        */
 
     abstract public boolean isTerminal();
-      
+
     /**
      * Determine if this node has a child corresponding to a given character
      *
@@ -579,12 +579,12 @@ public class UkkonenSuffixTree{
      * @return the parent of this node, null if it's the root.
      */
     abstract SuffixNode getParent();
-    
+
   }
-  
+
 
   class SimpleNode extends SuffixNode{
-    
+
     //static final int A_LEAF=-1;
     //SuffixNode parent;
     //SuffixNode suffixLink;
@@ -628,8 +628,8 @@ public class UkkonenSuffixTree{
       this.labelEnd=labelStop;
       //checkParent(this);
     }
-    
-    
+
+
     public boolean isTerminal(){return children==null;}
     public boolean hasChild(Character x){return getChild(x)!=null;}
     public SuffixNode getChild(Character x){
@@ -651,7 +651,7 @@ public class UkkonenSuffixTree{
 
     if (parentLabel.equals("root"))
         parentLabel="";
-    
+
     if (parentLabel.length()>=label.length()||!parentLabel.equals(label.subSequence(0,parentLabel.length())))
     {
       System.err.println("bad addition on rule "+rule);
@@ -684,7 +684,7 @@ public class UkkonenSuffixTree{
     final Symbol TERMINATION_SYMBOL;
     private AbstractAlphabet alpha;
     private Map translationTable = new HashMap();
-        
+
     public TerminatedSymbolList(SymbolList unterminated)
     {
       this.unterminated=unterminated;
@@ -725,7 +725,7 @@ public class UkkonenSuffixTree{
           }
           //takes first char of String, should work because we checked
           //getTokenType above
-          
+
           char c = sToke.tokenizeSymbol(oldSymbol).charAt(0);
           // System.err.println("Binding " + c);
           tokenizer.bindSymbol(newSymbol, c);
@@ -741,15 +741,15 @@ public class UkkonenSuffixTree{
           if (mathes.contains(TERMINATION_SYMBOL))
               tokenizer.bindSymbol(s,DEFAULT_TERM_CHAR);
         }
-          
+
       }catch(IllegalSymbolException ise){
         throw new AssertionFailure("Assertion Failure: This alphabet has been custom made so this doesn't happen",ise);
       }
-      
+
       alpha.putTokenization("token", tokenizer);
     }
-    
-      
+
+
       // Implementation of org.biojava.utils.Changeable
 
     public void addChangeListener(ChangeListener changeListener, ChangeType changeType) {
@@ -771,7 +771,7 @@ public class UkkonenSuffixTree{
     public boolean isUnchanging(ChangeType changeType) {
       return unterminated.isUnchanging(changeType);
     }
-    
+
     // Implementation of org.biojava.bio.symbol.SymbolList
 
     public int length() {
@@ -823,7 +823,7 @@ public class UkkonenSuffixTree{
         throw new BioRuntimeException("Couldn't tokenize sequence", ex);
       }
     }
-    
+
       public String subStr(int n, int n1) throws IndexOutOfBoundsException {
       return subList(n, n1).seqString();
     }

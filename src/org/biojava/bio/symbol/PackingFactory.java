@@ -45,18 +45,20 @@ import org.biojava.bio.seq.DNATools;
  */
 public class PackingFactory {
   private final static Map packForAlpha;
-  
+
   static {
     packForAlpha = new HashMap();
-    
+
   }
-  
+
   /**
    * Get the default packing for an alphabet.
    *
    * @param alpha  the FiniteAlphabet that will be bit-packed
    * @param ambiguity  true if the packing should store ambiguity and false
    *                   if it can discard ambiguity information
+   * @throws IllegalAlphabetException if this combination of alphabet and
+   *                   ambiguity can not be handled
    **/
   public static Packing getPacking(FiniteAlphabet alpha, boolean ambiguity)
   throws IllegalAlphabetException {
@@ -69,12 +71,17 @@ public class PackingFactory {
           pack = new DNANoAmbPack(DNATools.a());
         }
       } else {
-        throw new IllegalAlphabetException();
+        if(ambiguity) {
+          // can't handle this in the general case
+          throw new IllegalAlphabetException();
+        } else {
+          pack = new IndexedNoAmbPack(AlphabetManager.getAlphabetIndex(alpha));
+        }
       }
     }
     return pack;
   }
-  
+
   public static int primeWord(
     SymbolList symList,
     int wordLength,
@@ -87,7 +94,7 @@ public class PackingFactory {
     }
     return word;
   }
-  
+
   public static int nextWord(
     SymbolList symList,
     int word,
@@ -100,7 +107,7 @@ public class PackingFactory {
     word |= (int) p << ((int) (wordLength - 1) * packing.wordSize());
     return word;
   }
-  
+
   public static void binary(long val) {
     for(int i = 63; i >= 0; i--) {
       System.out.print( ((((val >> i) & 1) == 1) ? 1 : 0) );
