@@ -40,10 +40,11 @@ CREATE TABLE taxon (
        mito_genetic_code TINYINT,
        left_value	INT,
        right_value	INT,
-       UNIQUE (ncbi_taxon_id),
-       UNIQUE (left_value),
-       UNIQUE (right_value)
+       UNIQUE (ncbi_taxon_id)
 );
+-- HSQLDB UNIQUE BUG
+--       UNIQUE (left_value),
+--       UNIQUE (right_value)
 
 CREATE INDEX taxparent ON taxon(parent_taxon_id);
 
@@ -74,9 +75,11 @@ CREATE TABLE term (
 	identifier	   VARCHAR(40),
 	is_obsolete	   CHAR(1),
 	ontology_id	   INT NOT NULL,
-	UNIQUE (name,ontology_id),
-       	UNIQUE (identifier)
+	UNIQUE (name,ontology_id)
 );
+-- Hypersonic interprets UNIQUE constraints as not allowing null to occur more than once :-)
+-- HSQLDB UNIQUE BUG
+--	UNIQUE (identifier)
 
 CREATE INDEX term_ont ON term(ontology_id);
 
@@ -138,9 +141,10 @@ CREATE TABLE bioentry (
 	division	VARCHAR(6),
   	description  	LONGVARCHAR,
   	version 	SMALLINT NOT NULL, 
-  	UNIQUE (accession,biodatabase_id,version),
-  	UNIQUE (identifier)
+  	UNIQUE (accession,biodatabase_id,version)
 );
+-- HSQLDB UNIQUE BUG
+--  	UNIQUE (identifier)
 
 CREATE INDEX bioentry_name ON bioentry(name);
 CREATE INDEX bioentry_db   ON bioentry(biodatabase_id);
@@ -575,5 +579,4 @@ ALTER TABLE location_qualifier_value ADD CONSTRAINT FKfeatloc_locqual
 ALTER TABLE location_qualifier_value ADD CONSTRAINT FKterm_locqual
 	FOREIGN KEY (term_id) REFERENCES term(term_id)
 	ON DELETE CASCADE;
-
 

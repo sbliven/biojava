@@ -83,6 +83,7 @@ public class EmblLikeFormat
     protected static final String KEYWORDS_TAG = "KW";
     protected static final String SOURCE_TAG = "OS";
     protected static final String ORGANISM_TAG = "OC";
+    protected static final String ORGANISM_XREF_TAG = "OX";
     protected static final String REFERENCE_TAG = "RN";
     protected static final String COORDINATE_TAG = "RP";
     protected static final String REF_ACCESSION_TAG = "RX";

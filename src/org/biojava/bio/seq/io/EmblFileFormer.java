@@ -21,19 +21,21 @@
 
 package org.biojava.bio.seq.io;
 
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.taxa.EbiFormat;
+import org.biojava.bio.taxa.Taxon;
 
 /**
  * <p><code>EmblFileFormer</code> performs the detailed formatting of
@@ -248,6 +250,12 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         else if (key.equals(EmblLikeFormat.ACCESSION_TAG))
         {
             line = accLine;
+        } else if (key.equals(OrganismParser.PROPERTY_ORGANISM)) {
+            Taxon taxon = (Taxon) value;
+            addSequenceProperty(EmblLikeFormat.SOURCE_TAG, taxon);
+            addSequenceProperty(EmblLikeFormat.ORGANISM_TAG, taxon.getParent());
+            addSequenceProperty(EmblLikeFormat.ORGANISM_XREF_TAG, taxon);
+            return;
         }
 
         if (value instanceof String)
@@ -265,6 +273,14 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
             else
             {
                 line = buildPropertyLine((Collection) value, " ", false);
+            }
+        } else if (value instanceof Taxon) {
+            if (key.equals(EmblLikeFormat.ORGANISM_TAG)) {
+                line = EbiFormat.getInstance().serialize((Taxon) value);
+            } else if (key.equals(EmblLikeFormat.SOURCE_TAG)) {
+                line = EbiFormat.getInstance().serializeSource((Taxon) value);
+            } else if (key.equals(EmblLikeFormat.ORGANISM_XREF_TAG)) {
+                line = EbiFormat.getInstance().serializeXRef((Taxon) value);
             }
         }
 

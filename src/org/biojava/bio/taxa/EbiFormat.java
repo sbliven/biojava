@@ -20,14 +20,21 @@
  */
 package org.biojava.bio.taxa;
 
-import java.util.Iterator;
-import java.util.StringTokenizer;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
+import org.biojava.bio.Annotation;
 import org.biojava.utils.ChangeVetoException;
 
 /**
  * Encapsulate the 'EBI' species format used in Embl, Genbank and Swissprot
- * files.
+ * files. The Taxon objects created by this process have the following annotations: <p>
+ *
+ * <pre>
+ * key=PROPERTY_NCBI_TAXON, value=String representation of the NCBI taxon id
+ * key=PROPERTY_TAXON_NAMES, value=Map from name-class to name (see ncbi names.dmp)
+ * </pre>
  *
  * @author Matthew Pocock
  */
@@ -101,4 +108,23 @@ public class EbiFormat implements TaxonParser {
     
     return name;
   }
+
+    public String serializeSource(Taxon taxon) {
+        StringBuffer sb = new StringBuffer(taxon.getScientificName());
+        String common = taxon.getCommonName();
+        if ((common != null) && (common.length() > 0)) {
+            sb.append(" (").append(taxon.getCommonName()).append(")");
+        }
+        sb.append('.');
+        return sb.toString();
+    }
+
+    public String serializeXRef(Taxon taxon) {
+        Annotation anno = taxon.getAnnotation();
+        Object t  = anno.getProperty(EbiFormat.PROPERTY_NCBI_TAXON);
+        if (t instanceof List) {
+            t = (String) ((List) t).get(0);
+        }
+        return "NCBI_TaxID=" + t + ";";
+    }
 }
