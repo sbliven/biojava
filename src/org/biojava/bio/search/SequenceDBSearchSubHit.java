@@ -75,138 +75,138 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
      * null. 
      */
     public SequenceDBSearchSubHit(final double    score,
-				  final double    eValue,
-				  final double    pValue,
+                                  final double    eValue,
+                                  final double    pValue,
                                   final int       queryStart,
-				  final int       queryEnd,
-				  final Strand    queryStrand,
-				  final int       subjectStart,
-				  final int       subjectEnd,
-				  final Strand    subjectStrand,
-				  final Alignment alignment)
+                                  final int       queryEnd,
+                                  final Strand    queryStrand,
+                                  final int       subjectStart,
+                                  final int       subjectEnd,
+                                  final Strand    subjectStrand,
+                                  final Alignment alignment)
     {
         Contract.pre(! Double.isNaN(score), "score was NaN");
         // pValue may be NaN
-	// eValue may be NaN
-	Contract.pre(alignment     != null, "alignment was null");
+        // eValue may be NaN
+        Contract.pre(alignment     != null, "alignment was null");
 
-	this.score         = score;
-	this.pValue        = eValue;
-	this.eValue        = pValue;
-	this.queryStart    = queryStart;
-	this.queryEnd      = queryEnd;
-	this.queryStrand   = queryStrand;
-	this.subjectStart  = subjectStart;
-	this.subjectEnd    = subjectEnd;
-	this.subjectStrand = subjectStrand;
-	this.alignment     = alignment;
+        this.score         = score;
+        this.eValue        = eValue;
+        this.pValue        = pValue;
+        this.queryStart    = queryStart;
+        this.queryEnd      = queryEnd;
+        this.queryStrand   = queryStrand;
+        this.subjectStart  = subjectStart;
+        this.subjectEnd    = subjectEnd;
+        this.subjectStrand = subjectStrand;
+        this.alignment     = alignment;
 
-	// Lock alignment by vetoing all changes
-	this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
+        // Lock alignment by vetoing all changes
+        this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
     }
 
     public double getScore()
     {
-	return score;
+        return score;
     }
 
     public double getPValue()
     {
-	return pValue;
+        return pValue;
     }
 
     public double getEValue()
     {
-	return eValue;
+        return eValue;
     }
 
     public int getQueryStart()
     {
-	return queryStart;
+        return queryStart;
     }
 
     public int getQueryEnd()
     {
-	return queryEnd;
+        return queryEnd;
     }
 
     public Strand getQueryStrand()
     {
-	return queryStrand;
+        return queryStrand;
     }
 
     public int getSubjectStart()
     {
-	return subjectStart;
+        return subjectStart;
     }
 
     public int getSubjectEnd()
     {
-	return subjectEnd;
+        return subjectEnd;
     }
 
     public Strand getSubjectStrand()
     {
-	return subjectStrand;
+        return subjectStrand;
     }
 
     public Alignment getAlignment()
     {
-	return alignment;
+        return alignment;
     }
 
     public String toString()
     {
-	return "SequenceDBSearchSubHit with score " + getScore();
+        return "SequenceDBSearchSubHit with score " + getScore();
     }
   
     public boolean equals(final Object other)
     {
-	if (other == this) return true;
-	if (other == null) return false;
+        if (other == this) return true;
+        if (other == null) return false;
 
-	// Eliminate other if its class is not the same
-	if (! other.getClass().equals(this.getClass())) return false;
+        // Eliminate other if its class is not the same
+        if (! other.getClass().equals(this.getClass())) return false;
     
-	// Downcast and compare fields
-	SequenceDBSearchSubHit that = (SequenceDBSearchSubHit) other;
+        // Downcast and compare fields
+        SequenceDBSearchSubHit that = (SequenceDBSearchSubHit) other;
 
-	if (! ObjectUtil.equals(this.score, that.score))
-	    return false;
-	if (! ObjectUtil.equals(this.pValue, that.pValue))
-	    return false;
-	if (! ObjectUtil.equals(this.eValue, that.eValue))
-	    return false;
-	if (! ObjectUtil.equals(this.queryStart, that.queryStart))
-	    return false;
-	if (! ObjectUtil.equals(this.queryEnd, that.queryEnd))
-	    return false;
-	if (! ObjectUtil.equals(this.queryStrand, that.queryStrand))
-	    return false;
-	if (! ObjectUtil.equals(this.subjectStart, that.subjectStart))
-	    return false;
-	if (! ObjectUtil.equals(this.subjectEnd, that.subjectEnd))
-	    return false;
-	if (! ObjectUtil.equals(this.subjectStrand, that.subjectStrand))
-	    return false;
+        if (! ObjectUtil.equals(this.score, that.score))
+            return false;
+        if (! ObjectUtil.equals(this.pValue, that.pValue))
+            return false;
+        if (! ObjectUtil.equals(this.eValue, that.eValue))
+            return false;
+        if (! ObjectUtil.equals(this.queryStart, that.queryStart))
+            return false;
+        if (! ObjectUtil.equals(this.queryEnd, that.queryEnd))
+            return false;
+        if (! ObjectUtil.equals(this.queryStrand, that.queryStrand))
+            return false;
+        if (! ObjectUtil.equals(this.subjectStart, that.subjectStart))
+            return false;
+        if (! ObjectUtil.equals(this.subjectEnd, that.subjectEnd))
+            return false;
+        if (! ObjectUtil.equals(this.subjectStrand, that.subjectStrand))
+            return false;
 
-	return true;
+        return true;
     }
   
     public int hashCode()
     {
-	int hc = 0;
+        int hc = 0;
 
-	hc = ObjectUtil.hashCode(hc, score);
-	hc = ObjectUtil.hashCode(hc, pValue);
-	hc = ObjectUtil.hashCode(hc, eValue);
-	hc = ObjectUtil.hashCode(hc, queryStart);
-	hc = ObjectUtil.hashCode(hc, queryEnd);
-	hc = ObjectUtil.hashCode(hc, queryStrand);
-	hc = ObjectUtil.hashCode(hc, subjectStart);
-	hc = ObjectUtil.hashCode(hc, subjectEnd);
-	hc = ObjectUtil.hashCode(hc, subjectStrand);
+        hc = ObjectUtil.hashCode(hc, score);
+        hc = ObjectUtil.hashCode(hc, pValue);
+        hc = ObjectUtil.hashCode(hc, eValue);
+        hc = ObjectUtil.hashCode(hc, queryStart);
+        hc = ObjectUtil.hashCode(hc, queryEnd);
+        hc = ObjectUtil.hashCode(hc, queryStrand);
+        hc = ObjectUtil.hashCode(hc, subjectStart);
+        hc = ObjectUtil.hashCode(hc, subjectEnd);
+        hc = ObjectUtil.hashCode(hc, subjectStrand);
 
-	return hc;
+        return hc;
     }
 }
