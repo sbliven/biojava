@@ -181,15 +181,12 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     //System.out.println("Transform: " + g2.getTransform());
     
     Rectangle2D.Double boxClip = new Rectangle2D.Double();
-    switch (direction) {
-      case HORIZONTAL:
+    if (direction == HORIZONTAL) {
         boxClip.width = alongDim + leadingBorder.getSize() + trailingBorder.getSize();
         boxClip.height = acrossDim;
-        break;
-      case VERTICAL:
+    } else {
         boxClip.width = acrossDim;
         boxClip.height = alongDim + leadingBorder.getSize() + trailingBorder.getSize();
-        break;
     }
     //g2.clip(boxClip); // removed because it fucked things up.
     Rectangle2D newClip = g2.getClip().getBounds2D();
@@ -204,8 +201,7 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       trailingBorder.getSize() +
       scale * sequence.length();
     double realDepth = lineDepth + spacer;
-    switch (direction) {
-      case HORIZONTAL:
+    if (direction == HORIZONTAL) {
         clip.width = totalLength;
         seqBox.width = alongDim; 
         minLine = (int) Math.max(minLine, Math.floor(newClip.getMinY()/realDepth));
@@ -214,8 +210,7 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
           -minLine * alongDim + leadingBorder.getSize(),
           minLine * realDepth
         );
-        break;
-      case VERTICAL:
+    } else {
         clip.height = totalLength;
         seqBox.height = alongDim;
         minLine = (int) Math.max(minLine, Math.floor(newClip.getMinX()/realDepth));
@@ -224,34 +219,27 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
           minLine * realDepth,
           -minLine * alongDim + leadingBorder.getSize()
         );
-        break;
     }
 
     for(int l = minLine; l < maxLine; l++) {
-      switch(direction) {
-        case HORIZONTAL:
+      if (direction == HORIZONTAL) {
           clip.x = l * alongDim - leadingBorder.getSize();
           seqBox.x = l * alongDim;
           clip.y = 0.0;
-          break;
-	      case VERTICAL:
+      } else {
           clip.x = 0.0;
           clip.y = l * alongDim - leadingBorder.getSize();
           seqBox.y = l * alongDim;
-          break;
       }
       for (Iterator i = views.iterator(); i.hasNext(); ) {
         SequenceRenderer r = (SequenceRenderer) i.next();
         double depth = ((Double) depths.get(r)).doubleValue();
-        switch(direction) {
-          case HORIZONTAL:
+	if (direction == HORIZONTAL) {
             clip.height = depth;
             seqBox.height = depth;
-            break;
-	        case VERTICAL:
+	} else {
             clip.width = depth;
             seqBox.width = depth;
-            break;
         }
         
         Shape oldClip = g2.getClip();
@@ -259,22 +247,16 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
         r.paint(g2, this, seqBox);
         g2.setClip(oldClip);
 
-        switch (direction) {
-          case HORIZONTAL:
+	if (direction == HORIZONTAL) {
             g2.translate(0.0, depth);
-            break;
-          case VERTICAL:
+        } else {
             g2.translate(depth, 0.0);
-            break;
         }
       }
-      switch (direction) {
-        case HORIZONTAL:
+      if (direction == HORIZONTAL) {
           g2.translate(-alongDim, spacer);
-          break;
-        case VERTICAL:
+      } else {
           g2.translate(spacer, -alongDim);
-          break;
       }
     }
   }
@@ -333,13 +315,10 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
         ? getParent().getSize()
         : new Dimension();
       int width = 0;
-      switch (direction) {
-        case HORIZONTAL:
-          width = parentSize.width;
-          break;
-        case VERTICAL:
+      if (direction == HORIZONTAL) {
+	  width = parentSize.width;
+      } else {
           width = parentSize.height;
-          break;
       }
       // set width to something that takes whole numbers of 'scale'
       width = (int) Math.ceil((Math.ceil((double) width / scale)) * scale);
@@ -348,19 +327,16 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       realLines = (int) Math.ceil((double) alongDim / (double) width);
       acrossDim = acrossDim * realLines + spacer * (realLines - 1);
       alongDim = Math.ceil((double) width);
-      switch (direction) {
-        case HORIZONTAL:
+      if (direction == HORIZONTAL) {
           d = new Dimension(
             (int) Math.ceil(alongDim + insetBefore + insetAfter),
             (int) acrossDim
           );
-          break;
-        case VERTICAL:
+      } else {
           d = new Dimension(
             (int) acrossDim,
             (int) Math.ceil(alongDim + insetBefore + insetAfter)
           );
-          break;
       }
     } else {
       // fit depth to lines*acrossDim and make as wide as necisary to 
@@ -370,19 +346,16 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       // alongDim must be multiple of scale
       alongDim = Math.ceil((Math.ceil(alongDim / scale)) * scale);
       acrossDim = Math.ceil((double) lines * acrossDim + (double) (lines-1) * spacer);  
-      switch (direction) {
-        case HORIZONTAL:
+      if (direction == HORIZONTAL) {
           d = new Dimension(
             (int) Math.ceil(alongDim + insetBefore + insetAfter),
             (int) acrossDim
           );
-          break;
-        case VERTICAL:
+      } else {
           d = new Dimension(
             (int) acrossDim,
             (int) Math.ceil(alongDim + insetBefore + insetAfter)
           );
-          break;
       }
     }
     
@@ -394,6 +367,52 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
   private class RendererMonitor implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent ev) {
 	    repaint();
+    }
+  }
+  
+  public class Border
+  implements Serializable, SwingConstants {
+    protected final PropertyChangeSupport pcs;
+    private double size = 0.0;
+    private int alignment = CENTER;
+    
+    public double getSize() {
+      return size;
+    }
+    
+    private void setSize(double size) {
+      this.size = size;
+    }
+    
+    public int getAlignment() {
+      return alignment;
+    }
+    
+    public void setAlignment(int alignment)
+        throws IllegalArgumentException 
+    {
+	if (alignment == LEADING || alignment == TRAILING || alignment == CENTER) {
+	    int old = this.alignment;
+	    this.alignment = alignment;
+	    pcs.firePropertyChange("alignment", old, alignment);
+	} else {
+	    throw new IllegalArgumentException(
+		  "Alignment must be one of the constants LEADING, TRAILING or CENTER"
+            );
+	}
+    }
+    
+    private Border() {
+      alignment = CENTER;
+      pcs = new PropertyChangeSupport(this);
+    }
+    
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+      pcs.addPropertyChangeListener(listener);
+    }
+    
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+      pcs.removePropertyChangeListener(listener);
     }
   }
 }

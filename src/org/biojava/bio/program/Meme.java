@@ -63,16 +63,15 @@ public class Meme {
 
    ALPHABET:
     while( true ) {
-      switch(st.nextToken()) {
-        case st.TT_EOF:
+      int nt = st.nextToken();
+      if (nt == st.TT_EOF) {
           return;
-        case st.TT_WORD:
+      } else if (nt == st.TT_WORD) {
           if(st.sval.startsWith("ALPHABET")) {
             while(st.nextToken() != st.TT_WORD) {}
             res = resParser.parse(st.sval);
             break ALPHABET;
           }
-          break;
       }
     }
 
@@ -81,12 +80,10 @@ public class Meme {
 
    SEQLIST:
     while( true ) {
-      switch(st.nextToken()) {
-        case st.TT_WORD:
+      if(st.nextToken() == st.TT_WORD) {
           if(st.sval != null && st.sval.startsWith("*"))
             break SEQLIST;
           seqIDs.add(st.sval.intern());
-          break;
       }
     }
 
@@ -97,10 +94,10 @@ public class Meme {
 
      FINDMOTIF:
       while( true ) {
-        switch(st.nextToken()) {
-          case st.TT_EOF:
+	int nt = st.nextToken();
+	if (nt == st.TT_EOF) {
             break OUTER;
-          case st.TT_WORD:
+	} else if (nt == st.TT_WORD) {
             if(st.sval.startsWith("MOTIF")) {
               st.nextToken();			// MOTIF x
               motifNo = (int) st.nval;	// x
@@ -108,21 +105,19 @@ public class Meme {
               width = (int) st.nval;		// w
               break FINDMOTIF;
             }
-            break;
         }
       }
 
      FINDWEIGHTS:
       while( true ) {
-        switch(st.nextToken()) {
-          case st.TT_EOF:
+	int nt = st.nextToken();
+	if (nt == st.TT_EOF) {
             break OUTER;
-          case st.TT_WORD:
+	} else if (nt == st.TT_WORD) {
             if(st.sval.startsWith("log")) {
               while(st.nextToken() != st.TT_EOL) {}
               break FINDWEIGHTS;
             }
-            break;
         }
       }
 
@@ -136,19 +131,17 @@ public class Meme {
       int c = 0;
      READMOTIF:
       while( true ) {
-        switch(st.nextToken()) {
-          case st.TT_EOF:
+	int nt = st.nextToken();
+	if (nt == st.TT_EOF) {
             break OUTER;
-          case st.TT_EOL:
+        } else if (nt == st.TT_EOL) {
             r = 0;
             c++;
             if(c == width)
               break READMOTIF;
-            break;
-          case st.TT_NUMBER:
+        } else if (nt == st.TT_NUMBER) {
             matrix.getColumn(c).setWeight(res.symbolAt(r+1), st.nval);
             r++;
-            break;
         }
       }
 
