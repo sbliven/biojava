@@ -132,7 +132,7 @@ public class DASAlignmentCall {
 	SAXParserFactory spfactory =
 	    SAXParserFactory.newInstance();
 	
-	spfactory.setValidating(false);
+	spfactory.setValidating(true);
 
 	SAXParser saxParser = null ;
 
@@ -147,13 +147,13 @@ public class DASAlignmentCall {
 
 	
 	try {
-	    xmlreader.setFeature("http://xml.org/sax/features/validation", false);
+	    xmlreader.setFeature("http://xml.org/sax/features/validation", true);
 	} catch (SAXException e) {
-	    System.err.println("Cannot deactivate validation."); 
+	    System.err.println("Cannot activate validation."); 
 	}
        	
 	try {
-	    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
+	    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",true);
 	} catch (SAXNotRecognizedException e){
 	    e.printStackTrace();
 	}
@@ -166,9 +166,9 @@ public class DASAlignmentCall {
 	InputSource insource = new InputSource() ;
 	insource.setByteStream(inStream);
 
-	System.out.println("DASAlignmentCall parse XML response ...");
+	//System.out.println("DASAlignmentCall parse XML response ...");
 	xmlreader.parse(insource);
-	System.out.println("DASAlignmentCall parse XML response done.");
+	//System.out.println("DASAlignmentCall parse XML response done.");
 
 	return cont_handle.getAlignments();
 	
