@@ -58,6 +58,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Francois Pepin
  * @since 1.1
  */
 public abstract class AbstractAlphabet
@@ -120,7 +121,17 @@ public abstract class AbstractAlphabet
 		    toke = new CrossProductTokenization(this);
 		}
 		putTokenization(name, toke);
-	    } else {
+	    } else if (name.equals("default")) {
+              
+              if (tokenizationsByName.containsKey("token"))
+                toke= (SymbolTokenization)tokenizationsByName.get("token");
+              else
+                toke= (SymbolTokenization)getTokenization("name");
+              putTokenization(name, toke);
+              
+            }
+            else
+            {
 		throw new NoSuchElementException("There is no tokenization '" + name +
 						 "' defined in alphabet " + getName());
 	    }

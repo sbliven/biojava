@@ -98,7 +98,7 @@ implements SymbolList {
 
   public String seqString() {
       try {
-          SymbolTokenization toke = getAlphabet().getTokenization("token");
+          SymbolTokenization toke = getAlphabet().getTokenization("default");
           return toke.tokenizeSymbolList(this);
       } catch (BioException ex) {
           throw new BioRuntimeException("Couldn't tokenize sequence", ex);

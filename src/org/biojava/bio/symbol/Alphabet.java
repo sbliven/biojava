@@ -194,7 +194,15 @@ public interface Alphabet extends Annotatable {
    * uses the symbol token characters to translate a string into a
    * SymbolList. Likewise, there should be a SymbolTokenization under the name
    * 'name' that uses symbol names to identify symbols. Any other names may
-   * also be defined, but the behaviour of the returned SymbolTokenization is not defined here.
+   * also be defined, but the behaviour of the returned SymbolTokenization is
+   * not defined here.
+   * </p>
+   * <p>
+   * A SymbolTokenization under the name 'default' should be defined for all
+   * sequences, that determines the behavior when printing out a
+   * sequence. Standard behavior is to define the 'token' SymbolTokenization
+   * as default if it exists, else to define the 'name' SymbolTokenization as
+   * the default, but others are possible.
    * </p>
    *
    * @param name  the name of the parser
