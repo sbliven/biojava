@@ -19,8 +19,7 @@ package org.biojava.bio.symbol;
  *
  * @author Matthew Pocock
  */
-public interface Packing
-extends java.io.Serializable {
+public interface Packing {
   /**
    * The FiniteAlphabet this packing is for.
    *
