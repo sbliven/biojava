@@ -33,7 +33,7 @@ import org.biojava.bio.symbol.*;
  * <ol><li>Directly adding features to a Sequence which implements
  * MutableFeatureHolder</li>
  * <li>Creating a new Sequence object which acts as a view on an
- * underlying Sequence, and presents extra features.</li></ul>
+ * underlying Sequence, and presents extra features.</li></ol>
  *
  * At present, this interface supports both these mechanisms.  It
  * is the responsibility of the implementor to document which approach

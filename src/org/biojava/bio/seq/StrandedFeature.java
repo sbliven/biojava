@@ -49,13 +49,13 @@ public interface StrandedFeature extends Feature {
    * Return a list of symbols that are contained in this feature.
    * <P>
    * The symbols may not be contiguous in the original sequence, but they
-   * will be concatinated together in the resulting SymbolList.
+   * will be concatenated together in the resulting SymbolList.
    * <P>
    * The order of the Symbols within the resulting symbol list will be 
    * according to the concept of ordering within the location object.
    * <P>
    * If the feature is on the negative strand then the SymbolList will be
-   * reversecomplemented as apropreate.
+   * reversecomplemented as appropriate.
    *
    * @return  a SymbolList containing each symbol of the parent sequence contained
    *          within this feature in the order they appear in the parent

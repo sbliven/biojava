@@ -33,7 +33,7 @@ import org.biojava.bio.symbol.*;
  * <P>
  * It is expected that there may be several implementations of this interface,
  * each of which may be fairly heavy-weight. It takes the SymbolList interface
- * that is nice mathematicaly, and turns it into a biologicaly useful object.
+ * that is nice mathematically, and turns it into a biologically useful object.
  *
  * @author Matthew Pocock
  * @author Thomas Down

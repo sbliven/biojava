@@ -37,7 +37,7 @@ import org.biojava.bio.symbol.*;
  * Features are <em>always</em> contained by a parent <code>FeatureHolder</code>,
  * which may either be a <code>Sequence</code> or another <code>Feature</code>. 
  * Feature instances should never be constructed directly by client
- * code, and the BioJava core does not contain any publically accessible
+ * code, and the BioJava core does not contain any publicly accessible
  * implementations of the <code>Feature</code> interface.  Instead, you
  * should create a suitable <code>Feature.Template</code>, then pass this
  * to the <code>createFeature</code> method of a <code>Sequence</code>
@@ -81,7 +81,7 @@ public interface Feature extends FeatureHolder, Annotatable {
      * Return a list of symbols that are contained in this feature.
      * <P>
      * The symbols may not be contiguous in the original sequence, but they
-     * will be concatinated together in the resulting SymbolList.
+     * will be concatenated together in the resulting SymbolList.
      * <P>
      * The order of the Symbols within the resulting symbol list will be 
      * according to the concept of ordering within the location object.
