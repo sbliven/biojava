@@ -21,6 +21,7 @@
 
 package org.biojava.bio.program.ssbind;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
@@ -68,8 +69,8 @@ public class SSBindFasta3_3t08Test extends SSBindCase
             .getResource(fastaOutputFileName);
         File fastaOutputFile = new File(fastaOutputURL.getFile());
 
-        searchStream = new GZIPInputStream(new
-            FileInputStream(fastaOutputFile));
+        searchStream = new GZIPInputStream(new BufferedInputStream(new
+            FileInputStream(fastaOutputFile)));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
         XMLReader reader = (XMLReader) new FastaSearchSAXParser();

@@ -21,6 +21,7 @@
 
 package org.biojava.bio.program.ssbind;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
@@ -76,8 +77,8 @@ public class SSBindWUtblastx2_0a19Test extends SSBindCase
             .getResource(blastOutputFileName);
         File blastOutputFile = new File(blastOutputURL.getFile());
 
-        searchStream = new GZIPInputStream(new
-            FileInputStream(blastOutputFile));
+        searchStream = new GZIPInputStream(new BufferedInputStream(new
+            FileInputStream(blastOutputFile)));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
         XMLReader reader = (XMLReader) new BlastLikeSAXParser();
