@@ -15,7 +15,6 @@ implements OntologyOps {
     falseThings = new HashSet();
     
     System.err.println("Creating a DefaultOps for: " + getOntology());
-    new Error().printStackTrace(System.err);
   }
   
   public abstract Ontology getOntology();

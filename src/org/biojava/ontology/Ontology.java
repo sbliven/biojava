@@ -450,6 +450,10 @@ public interface Ontology extends Changeable {
         throws OntologyException {
           return ops.isa(subject, object);
         }
+        
+        public String toString() {
+          return "ontology: " + getName();
+        }
     }
 }
     

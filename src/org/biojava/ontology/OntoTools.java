@@ -148,10 +148,13 @@ public final class OntoTools {
         System.err.println(_prefix + "Evaluating " + triple);
         RemoteTerm rt = (RemoteTerm) triple.getObject();
         System.err.println(_prefix + "Following to " + rt.getRemoteTerm() + "," + object);
-        if(!isa(
-          rt.getRemoteTerm(),
-          object
-        )) {
+        if(
+          rt.getRemoteTerm() != subject &&
+          !isa(
+            rt.getRemoteTerm(),
+            object
+          )
+        ) {
           System.err.println(_prefix + "Ending true");
           return true;
         }
