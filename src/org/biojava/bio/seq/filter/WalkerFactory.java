@@ -208,7 +208,7 @@ public class WalkerFactory {
           if(m.getParameterTypes().length == 0 &&
                   FeatureFilter.class.isAssignableFrom(m.getReturnType()))
           {
-            CodeMethod m_getFilter = IntrospectedCodeClass.forMethod(m);
+            CodeMethod m_getFilter = null; //IntrospectedCodeClass.forMethod(m);
             LocalVariable lv = null;
 
             if (c_retClass != CodeUtils.TYPE_VOID) {
@@ -272,7 +272,7 @@ public class WalkerFactory {
         // if the return value is void, we just return
         // if it is not void, we return the Bar instance it returns
 
-        CodeMethod ourMeth = IntrospectedCodeClass.forMethod(meth);
+        CodeMethod ourMeth = null; //IntrospectedCodeClass.forMethod(meth);
         CodeClass c_thisFiltType = ourMeth.getParameterType(0);
 
         InstructionVector bodyIV = new InstructionVector();
