@@ -402,42 +402,52 @@ public class SequencePanel
    * after setting up the graphics appropriately.
    */
   public synchronized void paintComponent(Graphics g) {
-    if(!isActive()) {
-      return;
-    }
-    Graphics2D g2 = (Graphics2D) g;
-    AffineTransform oldTransform = g2.getTransform();
-    Rectangle2D currentClip = g2.getClip().getBounds2D();
-    
-    // do a transform to offset drawing to the neighbourhood of zero.
-    adjustOffset(sequenceToGraphics(range.getMin()));
+	  if(!isActive()) {
+		  return;
+	  }
 
-    double minAcross = sequenceToGraphics(range.getMin()) -
-                       renderer.getMinimumLeader(this);
-    double maxAcross = sequenceToGraphics(range.getMax()) + 1 +
-                       renderer.getMinimumTrailer(this);
-    double alongDim = maxAcross - minAcross;
-    double depth = renderer.getDepth(this);
-    Rectangle2D.Double clip = new Rectangle2D.Double();
-    if (direction == HORIZONTAL) {
-      clip.x = minAcross;
-      clip.y = 0.0;
-      clip.width = alongDim;
-      clip.height = depth;
-      g2.translate(leadingBorder.getSize() - minAcross, 0.0);
-    } else {
-      clip.x = 0.0;
-      clip.y = minAcross;
-      clip.width = depth;
-      clip.height = alongDim;
-      g2.translate(0.0, leadingBorder.getSize() - minAcross);
-    }
+	  super.paintComponent(g);
 
-    Shape oldClip = g2.getClip();
-    g2.clip(clip);
-    renderer.paint(g2, this);
-    g2.setClip(oldClip);
-    g2.setTransform(oldTransform);
+	  Graphics2D g2 = (Graphics2D) g;
+	  AffineTransform oldTransform = g2.getTransform();
+	  Rectangle2D currentClip = g2.getClip().getBounds2D();
+	  Insets insets = getInsets();
+
+	  if (isOpaque())
+	  {
+		  g2.setPaint(getBackground());
+		  g2.fillRect(0, 0, getWidth(), getHeight());
+	  }
+
+	  // do a transform to offset drawing to the neighbourhood of zero.
+	  adjustOffset(sequenceToGraphics(range.getMin()));
+
+	  double minAcross = sequenceToGraphics(range.getMin()) -
+		  renderer.getMinimumLeader(this);
+	  double maxAcross = sequenceToGraphics(range.getMax()) + 1 +
+		  renderer.getMinimumTrailer(this);
+	  double alongDim = maxAcross - minAcross;
+	  double depth = renderer.getDepth(this);
+	  Rectangle2D.Double clip = new Rectangle2D.Double();
+	  if (direction == HORIZONTAL) {
+		  clip.x = minAcross;
+		  clip.y = 0.0;
+		  clip.width = alongDim;
+		  clip.height = depth;
+		  g2.translate(leadingBorder.getSize() - minAcross + insets.left, insets.top);
+	  } else {
+		  clip.x = 0.0;
+		  clip.y = minAcross;
+		  clip.width = depth;
+		  clip.height = alongDim;
+		  g2.translate(insets.left, leadingBorder.getSize() - minAcross + insets.top);
+	  }
+
+	  Shape oldClip = g2.getClip();
+	  g2.clip(clip);
+	  renderer.paint(g2, this);
+	  g2.setClip(oldClip);
+	  g2.setTransform(oldTransform);
   }
 
   public void setRenderer(SequenceRenderer r)
