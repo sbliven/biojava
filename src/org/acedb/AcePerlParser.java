@@ -85,8 +85,12 @@ public class AcePerlParser {
 	    }
     } else if (ty.equals("tg")) {
 	    obj = new StaticAceNode(va, parent);
-    } else if (ty.equals("model")) {
+    } else if (ty.equals("model-node")) {
       obj = new StaticModelNode(va, parent);
+    } else if (ty.equals("model-reference")) {
+      obj = new StaticModelReference(va, parent);
+    } else if (ty.equals("model-type")) {
+      obj = new StaticModelType(va, parent);
     } else {
       throw new AceError("Don't know how to handle type " + ty);
     }
@@ -140,8 +144,21 @@ public class AcePerlParser {
 		    return constructNode(parent, ty, va, cl);
 		}
 	    } else {
-		ty = "model";
-		va = Ace.encode(s.trim());
+        String str = s.trim();
+        if(str.startsWith("?")) {
+          ty = "model-reference";
+          str = str.substring(1);
+        } else if(
+          s.equals("Text") ||
+          s.equals("DateType") ||
+          s.equals("Int") ||
+          s.equals("Float")
+        ) {
+          ty = "model-type";
+        } else {
+          ty = "model-node";
+        }
+        va = Ace.encode(str);
 	    }
 	}
     }
