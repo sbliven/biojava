@@ -62,6 +62,11 @@ public class GenbankProcessor extends SequenceBuilderFilter
 		{
 			return new GenbankProcessor(delegateFactory.makeSequenceBuilder());
 		}
+
+		public SequenceBuilder makeSequenceBuilder(String theSource)
+		{
+			return new GenbankProcessor(delegateFactory.makeSequenceBuilder(), theSource);
+		}
 	}
 
 	protected FeatureTableParser features;
@@ -69,6 +74,12 @@ public class GenbankProcessor extends SequenceBuilderFilter
 	private List accessions;
 	{
 		accessions = new ArrayList();
+	}
+
+	public GenbankProcessor(SequenceBuilder theDelegate, String theSource)
+	{
+		super(theDelegate);
+		features = new FeatureTableParser(this, theSource);
 	}
 
 	public GenbankProcessor(SequenceBuilder theDelegate)
