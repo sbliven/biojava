@@ -40,8 +40,8 @@ public class SimpleSimilarityPairFeature extends SimpleStrandedFeature
     implements SimilarityPairFeature
 {
     private SimilarityPairFeature sibling;
-    private Alignment alignment;
-    private double    score;
+    private Alignment             alignment;
+    private double                score;
 
     /**
      * Creates a new <code>SimpleSimilarityPairFeature</code>.
@@ -50,16 +50,16 @@ public class SimpleSimilarityPairFeature extends SimpleStrandedFeature
      * @param parent a <code>FeatureHolder</code>.
      * @param template a <code>SimilarityPairFeature.Template</code>.
      */
-    public SimpleSimilarityPairFeature(Sequence sourceSeq,
-                                       FeatureHolder parent,
+    public SimpleSimilarityPairFeature(Sequence                       sourceSeq,
+                                       FeatureHolder                  parent,
                                        SimilarityPairFeature.Template template)
         throws IllegalAlphabetException                 
     {
         super(sourceSeq, parent, template);
 
         this.sibling   = template.sibling;
-        this.alignment = alignment;
-        this.score     = score;
+        this.alignment = template.alignment;
+        this.score     = template.score;
     }
 
     /**
@@ -96,6 +96,6 @@ public class SimpleSimilarityPairFeature extends SimpleStrandedFeature
 
     public String toString()
     {
-        return super.toString() + "[score " + score + "]";
+        return super.toString() + " [score " + score + "]";
     }
 }

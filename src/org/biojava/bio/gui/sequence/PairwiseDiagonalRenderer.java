@@ -86,18 +86,10 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
                        "OUTLINE", SequenceRenderContext.REPAINT);
 
     /**
-     * Constant <code>SCORE</code> indicating a change to score filter.
+     * <code>spf</code> is a filter which excludes all features except
+     * <code>SimilarityPairFeature</code>s.
      */
-    public static final ChangeType SCORE =
-        new ChangeType("The score filter has changed",
-                       "org.biojava.bio.gui.sequence.PairwiseDiagonalRenderer",
-                       "SCORE", SequenceRenderContext.REPAINT);
-
-    /**
-     * <code>simPairOnly</code> is a filter which excludes all
-     * features except <code>SimilarityPairFeature</code>s.
-     */
-    private static FeatureFilter simCombiFilter;
+    private static FeatureFilter spf;
 
     static
     {
@@ -106,10 +98,7 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
 
         try
         {
-            FeatureFilter simPairFilter = new FeatureFilter.ByClass(Class.forName(className));
-            FeatureFilter   scoreFilter = new ScoreFilter(0.0, Double.MAX_VALUE);
-            simCombiFilter = new FeatureFilter.And(simPairFilter,
-                                                   scoreFilter);
+            spf = new FeatureFilter.ByClass(Class.forName(className));
         }
         catch (Exception e)
         {
@@ -117,7 +106,6 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
         }
     }
 
-    
     /**
      * <code>line</code> is the line to be drawn for each feature.
      */
@@ -158,17 +146,18 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
     public void paint(final Graphics2D g2, final PairwiseRenderContext context)
     {
         FeatureHolder fh;
+
         if (context.getDirection() == context.HORIZONTAL)
         {
             fh = context.getFeatures().filter(new
                 FeatureFilter.And(new FeatureFilter.OverlapsLocation(context.getRange()),
-                                  simCombiFilter), false);
+                                  spf), false);
         }
         else
         {
             fh = context.getFeatures().filter(new
                 FeatureFilter.And(new FeatureFilter.OverlapsLocation(context.getSecondaryRange()),
-                                  simCombiFilter), false);
+                                  spf), false);
         }
 
         for (Iterator fi = fh.features(); fi.hasNext();)
@@ -295,7 +284,7 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
 
         FeatureHolder fh = context.getFeatures().filter(new
             FeatureFilter.And(new FeatureFilter.OverlapsLocation(new
-                RangeLocation(priMin, priMax)), simCombiFilter), false);
+                RangeLocation(priMin, priMax)), spf), false);
 
         return new SequenceViewerEvent(this, fh, priMin, me, path);
     }
@@ -401,26 +390,5 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
             (x > xMax ? 4 : 0) |
             (y < yMin ? 2 : 0) |
             (y > yMax ? 1 : 0);
-    }
-
-    private static class ScoreFilter implements FeatureFilter
-    {
-        private double minScore;
-        private double maxScore;
-        private double score;
-
-        public ScoreFilter(double minScore, double maxScore)
-        {
-            this.minScore = minScore;
-            this.maxScore = maxScore;
-        }
-
-        public boolean accept(Feature f)
-        {
-            score = ((SimilarityPairFeature) f).getScore();
-
-            return (score >= minScore &&
-                    score <= maxScore);
-        }
     }
 }
