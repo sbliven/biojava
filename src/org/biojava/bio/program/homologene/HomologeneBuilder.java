@@ -43,22 +43,67 @@ public interface HomologeneBuilder
     public String CURATED = "curated";
 
 
+    /**
+     * indicates start of data for a HomologeneDB
+     */
     public void startDB();
 
+    /**
+     * indicates start of data for a HomoloGroup
+     */
     public void startGroup();
 
+    /**
+     * indicates start of data for an Orthology
+     */
     public void startOrthology();
+
+    /**
+     * indicates start of data for an orthologue
+     */
     public void startOrthologue();
+
+    /**
+     * add a property to the current Orthologue
+     */
     public void addOrthologueProperty(String key, String value);
+
+    /**
+     * end of data for this Orthologue
+     */
     public void endOrthologue();
+ 
+    /**
+     * add a property to the current Orthology
+     */
     public void addOrthologyProperty(String key, String value);
+
+    /**
+     * end of data for this Orthology
+     */
     public void endOrthology();
 
+    /**
+     * add title information to an Orthologue
+     * (this is not in enclosed in the Orthologue element
+     * because it comes completely separate in the Homologene
+     * data files.  Go figger.)
+     */
     public void addTitle(int taxonID, String homologeneID, String title);
 
+    /**
+     * end of data for group
+     */
     public void endGroup();
 
+    /**
+     * end of data for DB
+     */
     public void endDB();
 
+    /**
+     * retrieve the DB that has just been built
+     */
+    public HomologeneDB getDB();
 }
 
