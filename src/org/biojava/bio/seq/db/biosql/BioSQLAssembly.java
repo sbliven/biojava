@@ -178,7 +178,7 @@ class BioSQLAssembly
 	    componentFeatures = new SimpleFeatureHolder();
 
 	    try {
-		Connection conn = seqDB.getPool().takeConnection();
+		Connection conn = seqDB.getDataSource().getConnection();
 		
 		PreparedStatement get_assembly = conn.prepareStatement("select assembly_fragment_id, fragment_name, assembly_start, assembly_end, fragment_start, fragment_end, strand " +
 								       "  from assembly_fragment " +
@@ -204,7 +204,7 @@ class BioSQLAssembly
 		}
                 rs.close();
                 get_assembly.close();
-		seqDB.getPool().putConnection(conn);
+		conn.close();
 	    } catch (SQLException ex) {
 		throw new BioRuntimeException("Error fetching assembly data", ex);
 	    } catch (ChangeVetoException ex) {

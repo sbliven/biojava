@@ -76,7 +76,7 @@ class BioSQLSequenceAnnotation implements Annotation {
 
     private void initAnnotations() {
 	try {
-	    Connection conn = seqDB.getPool().takeConnection();
+	    Connection conn = seqDB.getDataSource().getConnection();
 	    underlyingAnnotation = new SmallAnnotation();
             underlyingAnnotation.setProperty("bioentry_id", new Integer(bioentry_id));
 
@@ -119,7 +119,7 @@ class BioSQLSequenceAnnotation implements Annotation {
                 get_properties.close();
 	    }
 	    
-	    seqDB.getPool().putConnection(conn);
+	    conn.close();
 	} catch (SQLException ex) {
 	    throw new BioRuntimeException("Error fetching annotations", ex);
 	} catch (ChangeVetoException ex) {
@@ -224,13 +224,13 @@ class BioSQLSequenceAnnotation implements Annotation {
     {
 	Connection conn = null;
 	try {
-	    conn = seqDB.getPool().takeConnection();
+	    conn = seqDB.getDataSource().getConnection();
 	    conn.setAutoCommit(false);
 
 	    seqDB.persistBioentryProperty(conn, bioentry_id, key, value, true, false);
 	    
 	    conn.commit();
-	    seqDB.getPool().putConnection(conn);
+	    conn.close();
 	} catch (SQLException ex) {
 	    boolean rolledback = false;
 	    if (conn != null) {

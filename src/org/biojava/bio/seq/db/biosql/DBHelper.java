@@ -1,4 +1,3 @@
-/* -*- c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -25,6 +24,7 @@ package org.biojava.bio.seq.db.biosql;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 import org.biojava.bio.BioRuntimeException;
 import org.biojava.utils.JDBCConnectionPool;
 
@@ -117,24 +117,25 @@ public abstract class DBHelper {
     /**
      * Detects whether a particular table is present in the database.
      *
-     * @param pool a <code>JDBCConnectionPool</code> that will provide a connection to the database.
+     * @param ds a <code>DataSource</code> that can provide a connection to a database 
      * @param tablename the name of the table.
      * @return true if the table exists in the database.
      * @throws NullPointerException if pool is null.
      * @throws IllegalArgumentException if tablename is null or empty.
      */
-    public boolean containsTable(JDBCConnectionPool pool, String tablename) {
-        if (pool == null) {
-            throw new NullPointerException("Require a connection pool.");
+    public boolean containsTable(DataSource ds, String tablename) {
+        if (ds == null) {
+            throw new NullPointerException("Require a datasource.");
         }
         if ((tablename == null) || (tablename.length() == 0)) {
             throw new IllegalArgumentException("Invalid table name given");
         } 
         try {
             boolean present;
-            Connection conn = pool.takeConnection();
             PreparedStatement ps = null;
+						Connection conn = null;
             try {
+							  conn = ds.getConnection();
                 ps = conn.prepareStatement("select * from " + tablename + " limit 1");
                 ps.executeQuery();
                 present = true;
@@ -144,7 +145,9 @@ public abstract class DBHelper {
             if (ps != null) {
                 ps.close();
             }
-            pool.putConnection(conn);
+						if (conn != null) {
+							conn.close();
+						}
             return present;
         } catch (SQLException ex) {
             throw new BioRuntimeException(ex);

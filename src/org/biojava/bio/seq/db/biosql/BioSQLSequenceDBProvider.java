@@ -75,7 +75,8 @@ public class BioSQLSequenceDBProvider implements SequenceDBProvider {
                                     + " a 'driver' parameter");
 	}
 
-	return new BioSQLSequenceDB(location,
+	return new BioSQLSequenceDB(driver,
+																location,
                                 userName,
                                 password,
                                 biodatabase,

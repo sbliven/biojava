@@ -172,7 +172,7 @@ class BioSQLSequence
     protected synchronized SymbolList getSymbols() {
 	if (symbols == null) {
 	    try {
-		Connection conn = seqDB.getPool().takeConnection();
+		Connection conn = seqDB.getDataSource().getConnection();
 		
 		PreparedStatement get_symbols = conn.prepareStatement("select seq " +
 								      "from   biosequence " +
@@ -189,7 +189,7 @@ class BioSQLSequence
                 rs.close();
 		get_symbols.close();
 
-		seqDB.getPool().putConnection(conn);
+		conn.close();
 
 		if (seqString != null) {
 		    try {

@@ -92,7 +92,7 @@ class FeaturesSQL {
                                  int featureID) 
         throws SQLException, BioException
     {
-        Connection conn = seqDB.getPool().takeConnection();
+        Connection conn = seqDB.getDataSource().getConnection();
         Map fmap = new HashMap();
         Map qmap = new HashMap();
         Map lmap = new HashMap();
@@ -531,7 +531,7 @@ class FeaturesSQL {
             discover_parent.close();
         }
 
-        seqDB.getPool().putConnection(conn);
+        conn.close();
         conn = null;
 
         for (Iterator tlfi = toplevelFeatures.iterator(); tlfi.hasNext(); ) {
@@ -595,7 +595,7 @@ class FeaturesSQL {
     {
 	Connection conn = null;
 	try {
-	    conn = seqDB.getPool().takeConnection();
+	    conn = seqDB.getDataSource().getConnection();
 	    conn.setAutoCommit(false);
 	    
 	    int seqfeature_key = seqDB.intern_ontology_term(conn, type);
@@ -607,7 +607,7 @@ class FeaturesSQL {
 	    update_key.executeUpdate();
             update_key.close();
 	    conn.commit();
-	    seqDB.getPool().putConnection(conn);
+	    conn.close();
 	} catch (SQLException ex) {
 	    boolean rolledback = false;
 	    if (conn != null) {
@@ -625,7 +625,7 @@ class FeaturesSQL {
     {
 	Connection conn = null;
 	try {
-	    conn = seqDB.getPool().takeConnection();
+	    conn = seqDB.getDataSource().getConnection();
 	    conn.setAutoCommit(false);
 	    
 	    int seqfeature_source = seqDB.intern_ontology_term(conn, source);
@@ -637,7 +637,7 @@ class FeaturesSQL {
 	    update_source.executeUpdate();
             update_source.close();
 	    conn.commit();
-	    seqDB.getPool().putConnection(conn);
+	    conn.close();
 	} catch (SQLException ex) {
 	    boolean rolledback = false;
 	    if (conn != null) {
@@ -655,7 +655,7 @@ class FeaturesSQL {
     {
 	Connection conn = null;
 	try {
-	    conn = seqDB.getPool().takeConnection();
+	    conn = seqDB.getDataSource().getConnection();
 	    conn.setAutoCommit(false);
 	    
 	    PreparedStatement del_oldlocation = conn.prepareStatement(
@@ -694,7 +694,7 @@ class FeaturesSQL {
 	    add_locationspan.close();
 
 	    conn.commit();
-	    seqDB.getPool().putConnection(conn);
+	    conn.close();
 	} catch (SQLException ex) {
 	    boolean rolledback = false;
 	    if (conn != null) {
@@ -905,13 +905,13 @@ class FeaturesSQL {
     {
         Connection conn = null;
         try {
-            conn = seqDB.getPool().takeConnection();
+            conn = seqDB.getDataSource().getConnection();
             conn.setAutoCommit(false);
 
             removeFeature(conn, f);
 
             conn.commit();
-            seqDB.getPool().putConnection(conn);
+            conn.close();
         } catch (SQLException ex) {
 	    boolean rolledback = false;
 	    if (conn != null) {
@@ -1041,7 +1041,7 @@ class FeaturesSQL {
     {
 	Connection conn = null;
 	try {
-	    conn = seqDB.getPool().takeConnection();
+	    conn = seqDB.getDataSource().getConnection();
 	    conn.setAutoCommit(false);
             // Set rank to -1, so will get looked up before feature added
 	    int f_id = seqDB.getFeaturesSQL().persistFeature(conn, bioentry_id, f, parent_id, -1);
@@ -1050,7 +1050,7 @@ class FeaturesSQL {
 		((BioSQLFeature) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, f_id));
 	    }
 	    conn.commit();
-	    seqDB.getPool().putConnection(conn);
+	    conn.close();
 	} catch (SQLException ex) {
 	    boolean rolledback = false;
 	    if (conn != null) {

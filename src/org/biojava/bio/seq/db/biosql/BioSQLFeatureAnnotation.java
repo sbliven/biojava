@@ -70,7 +70,7 @@ class BioSQLFeatureAnnotation
 
     private void initAnnotations() {
 	try {
-	    Connection conn = seqDB.getPool().takeConnection();
+	    Connection conn = seqDB.getDataSource().getConnection();
 
 	    PreparedStatement get_annotations = conn.prepareStatement("select term.name, seqfeature_qualifier_value.value " +
 								      "  from term, seqfeature_qualifier_value " +
@@ -91,7 +91,7 @@ class BioSQLFeatureAnnotation
 	    }
             rs.close();
 	    get_annotations.close();
-	    seqDB.getPool().putConnection(conn);
+	    conn.close();
 	} catch (SQLException ex) {
 	    throw new BioRuntimeException("Error fetching annotations", ex);
 	}
@@ -172,13 +172,13 @@ class BioSQLFeatureAnnotation
     {
 	Connection conn = null;
 	try {
-	    conn = seqDB.getPool().takeConnection();
+	    conn = seqDB.getDataSource().getConnection();
 	    conn.setAutoCommit(false);
 
 	    seqDB.getFeaturesSQL().persistProperty(conn, feature_id, key, value, true);
 
 	    conn.commit();
-	    seqDB.getPool().putConnection(conn);
+	    conn.close();
 	} catch (SQLException ex) {
 	    boolean rolledback = false;
 	    if (conn != null) {

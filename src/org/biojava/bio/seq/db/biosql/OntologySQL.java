@@ -119,7 +119,7 @@ class OntologySQL {
 
     Connection conn = null;
     try {
-      conn = seqDB.getPool().takeConnection();
+      conn = seqDB.getDataSource().getConnection();
       conn.setAutoCommit(false);
       Ontology ont = new Ontology.Impl(old.getName(), old.getDescription());
       persistOntology(conn, ont);
@@ -246,7 +246,7 @@ class OntologySQL {
   private void loadTerms(Ontology ont, int id)
           throws SQLException, OntologyException, ChangeVetoException
   {
-    Connection conn = seqDB.getPool().takeConnection();
+    Connection conn = seqDB.getDataSource().getConnection();
     PreparedStatement get_terms = conn.prepareStatement(
             "SELECT term.term_id, term.name, term.definition, " +
             "       term_relationship.term_relationship_id, " +
@@ -297,7 +297,7 @@ class OntologySQL {
     rs.close();
     get_terms.close();
 
-    seqDB.getPool().putConnection(conn);
+    conn.close();
     conn = null;
 
     if (ont.getName().equals("__core_ontology")) {
@@ -332,7 +332,7 @@ class OntologySQL {
   {
     this.seqDB = seqDB;
 
-    Connection conn = seqDB.getPool().takeConnection();
+    Connection conn = seqDB.getDataSource().getConnection();
 
     try {
       PreparedStatement get_onts = conn.prepareStatement(
@@ -378,7 +378,7 @@ class OntologySQL {
       throw new BioError("Assertion failed: couldn't modify Ontology",ex);
     }
 
-    seqDB.getPool().putConnection(conn);
+    conn.close();
     conn = null;
   }
 
@@ -461,13 +461,13 @@ class OntologySQL {
   private void persistTerm(Term term) {
     Connection conn = null;
     try {
-      conn = seqDB.getPool().takeConnection();
+      conn = seqDB.getDataSource().getConnection();
       conn.setAutoCommit(false);
 
       persistTerm(conn, term);
 
       conn.commit();
-      seqDB.getPool().putConnection(conn);
+      conn.close();
     } catch (SQLException ex) {
       boolean rolledback = false;
       if (conn != null) {
@@ -513,13 +513,13 @@ class OntologySQL {
   private void persistTriple(Ontology ont, Triple triple) {
     Connection conn = null;
     try {
-      conn = seqDB.getPool().takeConnection();
+      conn = seqDB.getDataSource().getConnection();
       conn.setAutoCommit(false);
 
       persistTriple(conn, ont, triple);
 
       conn.commit();
-      seqDB.getPool().putConnection(conn);
+      conn.close();
     } catch (SQLException ex) {
       boolean rolledback = false;
       if (conn != null) {
@@ -566,13 +566,13 @@ class OntologySQL {
   {
     Connection conn = null;
     try {
-      conn = seqDB.getPool().takeConnection();
+      conn = seqDB.getDataSource().getConnection();
       conn.setAutoCommit(false);
 
       persistOntology(conn, onto);
 
       conn.commit();
-      seqDB.getPool().putConnection(conn);
+      conn.close();
     } catch (SQLException ex) {
       boolean rolledback = false;
       if (conn != null) {
