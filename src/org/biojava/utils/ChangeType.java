@@ -35,7 +35,7 @@ import java.lang.reflect.*;
  *
  * <pre>
  * class MyClassWhichCanFireChangeEvents {
- *   public final static ChangeEvent CHANGE_COLOR = new ChangeEvent(
+ *   public final static ChangeType CHANGE_COLOR = new ChangeType(
  *              "Color change",
  *              MyClassWhichCanFireChangeEvents.class,
  *              "CHANGE_COLOR");
