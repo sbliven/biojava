@@ -35,7 +35,7 @@ implements Changeable {
   }
   
   public void addChangeListener(ChangeListener cl) {
-    getChangeSupport().addChangeListener(cl, null);
+    getChangeSupport().addChangeListener(cl);
   }
   
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
@@ -43,7 +43,7 @@ implements Changeable {
   }
 
   public void removeChangeListener(ChangeListener cl) {
-    getChangeSupport().addChangeListener(cl, null);
+    getChangeSupport().addChangeListener(cl);
   }
 
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {

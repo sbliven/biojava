@@ -94,7 +94,7 @@ implements Serializable {
   }
   
   public Iterator iterator() {
-    return knownSymbols.values().iterator();
+    return new SparseIterator(this);
   }
   
   public SymbolParser getParser(String name)
@@ -152,5 +152,65 @@ implements Serializable {
   public void addChangeListener(ChangeListener cl) {}
   public void addChangeListener(ChangeListener cl, ChangeType ct) {}
   public void removeChangeListener(ChangeListener cl) {}
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+  
+  private static class SparseIterator implements Iterator {
+    private Alphabet parent;
+    private FiniteAlphabet []alphas;
+    private Iterator []symI;
+    private AtomicSymbol []as;
+    private boolean hasNext;
+    private List symList;
+    
+    public SparseIterator(FiniteAlphabet parent) {
+      this.parent = parent;
+      this.alphas = (FiniteAlphabet []) parent.getAlphabets().toArray(new FiniteAlphabet[0]);
+      this.symI = new Iterator[this.alphas.length];
+      this.as = new AtomicSymbol[this.alphas.length];
+      this.hasNext = true;
+      
+      for(int i = 0; i < this.alphas.length; i++) {
+        this.symI[i] = alphas[i].iterator();
+        if(!symI[i].hasNext()) {
+          this.hasNext = false;
+          return;
+        }
+        this.as[i] = (AtomicSymbol) symI[i].next();
+      }
+      
+      symList = Arrays.asList(as);
+    }
+    
+    public boolean hasNext() {
+      return hasNext;
+    }
+    
+    public Object next() {
+      try {
+        Symbol sym = parent.getSymbol(symList);
+        
+        for(int i = 0; i <= alphas.length; i++) {
+          if(i == alphas.length) {
+            hasNext = false;
+          } else {
+            if(!symI[i].hasNext()) {
+              symI[i] = alphas[i].iterator();
+              as[i] = (AtomicSymbol) symI[i].next();
+            } else {
+              as[i] = (AtomicSymbol) symI[i].next();
+              break;
+            }
+          }
+        }
+        return sym;
+      } catch (IllegalSymbolException ise) {
+        throw new BioError(ise, "Assertion Failure: I should contain this symbol");
+      }
+    }
+    
+    public void remove() 
+    throws UnsupportedOperationException {
+      throw new UnsupportedOperationException();
+    }
+  }
 }
