@@ -216,7 +216,7 @@ public class Builder {
 	}
 	Process p = Runtime.getRuntime().exec(command);
 	OutputSpinner es = new OutputSpinner(p.getErrorStream(), System.err);
-	OutputSpinner os = new OutputSpinner(p.getInputStream(), System.out);
+	OutputSpinner os = new OutputSpinner(p.getInputStream(), null);
 	os.start();
 	es.start();
 	Thread.yield();
@@ -344,12 +344,14 @@ class OutputSpinner extends Thread {
 	try {
 	    int b;
 	    while ((b = in.read()) != -1)
-		out.write(b);
+		if (out != null)
+		    out.write(b);
 	} catch (IOException ex) {
 	    ex.printStackTrace();
 	}
     }
 }
+
 
 class EndsWithFilenameFilter implements FilenameFilter {
     private String fs;
