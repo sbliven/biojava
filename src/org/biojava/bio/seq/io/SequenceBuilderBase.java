@@ -50,9 +50,13 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
 
     protected String name;
     protected String uri;
+
+    // annotation on the sequence itself
     protected Annotation annotation;
 
+    // features directly attached to sequence
     private Set rootFeatures;
+
     private List featureStack;
     
     protected Sequence seq;
@@ -153,7 +157,8 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
 	featureStack.remove(featureStack.size() - 1);
     }
 
-    public Sequence makeSequence() {
+    public Sequence makeSequence() 
+    {
       //	SymbolList symbols = slBuilder.makeSymbolList();
       //	Sequence seq = new SimpleSequence(symbols, uri, name, annotation);
       try {
