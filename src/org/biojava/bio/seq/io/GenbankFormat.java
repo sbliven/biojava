@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.seq.io;
+package	org.biojava.bio.seq.io;
 
 import java.io.*;
 import java.util.*;
@@ -239,7 +239,7 @@ public class GenbankFormat
      * This method determines the behaviour when a bad line is processed.
      * Some options are to log the error, throw an exception, ignore it
      * completely, or pass the event through.
-     * <p>
+     * <P>
      * This method should be overwritten when different behavior is desired.
      *
      * @param theEvent The event that contains the bad line and token.
@@ -319,7 +319,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
      * This method determines the behaviour when a bad line is processed.
      * Some options are to log the error, throw an exception, ignore it
      * completely, or pass the event through.
-     * <p>
+     * <P>
      * This method should be overwritten when different behavior is desired.
      *
      * @param theEvent The event that contains the bad line and token.
@@ -510,16 +510,16 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     {
         if(line.startsWith(GenbankFormat.LOCUS_TAG))
         {
-          // Genbank changed the format of the Locus line for release 127.
-          // The new format is incompatible with the old.
-          if(this.isLocusLinePre127(line))
-          {
-          	this.parseLocusLinePre127(line);
-          }
-          else
-          {
-          	this.parseLocusLinePost127(line);
-          }
+        	// Genbank changed the format of the Locus line for release 127.
+        	// The new format is incompatible with the old.
+        	if(this.isLocusLinePre127(line))
+        	{
+        		this.parseLocusLinePre127(line);
+        	}
+        	else
+        	{
+        		this.parseLocusLinePost127(line);
+        	}
         }
         else if (line.startsWith(GenbankFormat.VERSION_TAG))
         {
@@ -593,6 +593,9 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 
     /**
      * Parses the locus line assuming it is in post release 127 format.
+     * Will also handle the case where the strand tag is optional.  That
+     * is the only tag that is supported as optional.  Awaiting a response from
+     * NCBI if it is or if their data is incorrectly formatted.
      *
      * @param theLine Locus line to parse.
      * @throws ParseException If the line is too short.
@@ -606,34 +609,50 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 		}
 
 		StringTokenizer locusTokens = new StringTokenizer(theLine);
-		if(locusTokens.countTokens() != 8)
+		if((locusTokens.countTokens() == 8) || (locusTokens.countTokens() == 7))
+		{
+			// While Genbank 127 documentation doesn't allow the strand tag to
+			// be optional, some files don't have it.  A key assumption here is
+			// that this is the only tag that is optional.  The parser will
+			// generate incorrect data if this assumption is violated.
+			boolean includedStrandTag = (locusTokens.countTokens() == 8);
+
+			// LOCUS tag; not stored
+			locusTokens.nextToken();
+			// Locus name
+			saveSeqAnno2(GenbankFormat.LOCUS_TAG, locusTokens.nextToken());
+			// Sequence length
+			saveSeqAnno2(GenbankFormat.SIZE_TAG, locusTokens.nextToken());
+			// "bp"; not stored
+			locusTokens.nextToken();
+			// Strand information
+			// Both the strand and type are in the same token.  The strand
+			// information is an optional part, so this is a bit hairy
+			// Some files do not have a strand token.  While this is not allowed
+			// by Genbank's documentation, we will treat this as an optional
+			// token.  It is the only optional token this parser will allow.
+			if (includedStrandTag)
+			{
+				String strandString = locusTokens.nextToken();
+				StringTokenizer strandTokens = new StringTokenizer(strandString, "-");
+				if(strandTokens.countTokens() > 1)
+				{
+					saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, strandTokens.nextToken());
+				}
+				saveSeqAnno2(GenbankFormat.TYPE_TAG, strandTokens.nextToken());
+			}
+
+			// Circularity
+			saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, locusTokens.nextToken());
+			// Division code
+			saveSeqAnno2(GenbankFormat.DIVISION_TAG, locusTokens.nextToken());
+			// Date in dd-MMM-yyyy format
+			saveSeqAnno2(GenbankFormat.DATE_TAG, locusTokens.nextToken());
+		}
+		else
 		{
 			throw new ParseException("LOCUS line incorrectly tokenized [" + theLine + "]");
 		}
-		// LOCUS tag; not stored
-		locusTokens.nextToken();
-		// Locus name
-		saveSeqAnno2(GenbankFormat.LOCUS_TAG, locusTokens.nextToken());
-		// Sequence length
-		saveSeqAnno2(GenbankFormat.SIZE_TAG, locusTokens.nextToken());
-		// "bp"; not stored
-		locusTokens.nextToken();
-		// Strand information
-		// Both the strand and type are in the same token.  The strand
-		// information is an optional part, so this is a bit hairy
-		String strandString = locusTokens.nextToken();
-		StringTokenizer strandTokens = new StringTokenizer(strandString, "-");
-		if(strandTokens.countTokens() > 1)
-		{
-			saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, strandTokens.nextToken());
-		}
-		saveSeqAnno2(GenbankFormat.TYPE_TAG, strandTokens.nextToken());
-		// Circularity
-		saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, locusTokens.nextToken());
-		// Division code
-		saveSeqAnno2(GenbankFormat.DIVISION_TAG, locusTokens.nextToken());
-		// Date in dd-MMM-yyyy format
-		saveSeqAnno2(GenbankFormat.DATE_TAG, locusTokens.nextToken());
     }
 
     /**
@@ -670,8 +689,6 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 		}
 	}
 
-
-
     /**
      * @return does the line contain a header tag.
      * Yes, if any of the leading TAG_LENGTH characters aren't a space
@@ -682,11 +699,18 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 	char[] l = line.toCharArray();
 	for (int i = 0; i < TAG_LENGTH; i++)
 	{
-	    if(l[i] != ' ')
+	    try
 	    {
-		isHeaderTag = true;
-		break;
-	    }
+	    	if(l[i] != ' ')
+		    {
+			isHeaderTag = true;
+			break;
+			}
+		}
+		catch(ArrayIndexOutOfBoundsException e)
+		{
+			isHeaderTag = false;
+		}
 	}
 	return isHeaderTag;
     }
