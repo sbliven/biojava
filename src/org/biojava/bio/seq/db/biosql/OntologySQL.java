@@ -54,10 +54,11 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Eric Haugen
+ * @author Len Trigg
  * @since 1.4
  */
-
 class OntologySQL {
+
   private BioSQLSequenceDB seqDB;
   private Map ontologiesByID;
   private Map ontologiesByName;
@@ -85,12 +86,20 @@ class OntologySQL {
     return guano;
   }
 
-  public Ontology getOntology(String name) {
-    Ontology ont = (Ontology) ontologiesByName.get(name);
+  public Ontology getOntology(String name) throws BioException {
+    Object ont = ontologiesByName.get(name);
     if (ont == null) {
       throw new NoSuchElementException("Can't find ontology named " + name);
+    } else if (ont instanceof OntologyPlaceholder) {
+      OntologyPlaceholder op = (OntologyPlaceholder) ont;
+      Ontology onto = loadOntology(op.name, op.description, op.id);
+      OntologyMonitor om = new OntologyMonitor(onto);
+      monitors.put(onto, om);
+      onto.addChangeListener(om, ChangeType.UNKNOWN);
+      return onto;
+    } else {
+      return (Ontology) ont;
     }
-    return ont;
   }
 
   public Ontology createOntology(String name, String description)
@@ -354,26 +363,15 @@ class OntologySQL {
         int id = rs.getInt(1);
         String name = rs.getString(2);
         String description = rs.getString(3);
-        Ontology ont = new Ontology.Impl(name, description);
-        try {
-          //long start = System.currentTimeMillis();
-          loadTerms(ont, id);
-          //System.err.println("Loading terms for " + name + " took " + (System.currentTimeMillis() - start) + "ms");
-        } catch (OntologyException ex) {
-          throw new BioException("Error loading ontology terms", ex);
-        }
-        ontologiesByID.put(new Integer(id), ont);
-        ontologiesByName.put(name, ont);
+
+        // Postpone loading of ontologies until they are first accessed by getOntology()
+        OntologyPlaceholder op = new OntologyPlaceholder(name, description, id);
+        ontologiesByID.put(new Integer(id), op);
+        ontologiesByName.put(name, op);
+
       }
       rs.close();
       get_onts.close();
-
-      for (Iterator i = ontologiesByID.values().iterator(); i.hasNext(); ) {
-        Ontology ont = (Ontology) i.next();
-        OntologyMonitor om = new OntologyMonitor(ont);
-        monitors.put(ont, om);
-        ont.addChangeListener(om, ChangeType.UNKNOWN);
-      }
 
       if (!ontologiesByName.containsKey("__core_ontology")) {
         addCore(conn);
@@ -386,13 +384,41 @@ class OntologySQL {
       }
     } catch (AlreadyExistsException ex) {
       throw new BioException("Duplicate term name in BioSQL",ex);
-    } catch (ChangeVetoException ex) {
-      throw new BioError("Assertion failed: couldn't modify Ontology",ex);
     }
 
     conn.close();
     conn = null;
   }
+
+  private static class OntologyPlaceholder {
+    final String name;
+    final String description;
+    final int id;
+    public OntologyPlaceholder(String name, String description, int id) {
+      this.name = name;
+      this.description = description;
+      this.id = id;
+    }
+  }
+
+  private Ontology loadOntology(String name, String description, int id) throws BioException {
+    Ontology ont = new Ontology.Impl(name, description);
+    try {
+      //long start = System.currentTimeMillis();
+      loadTerms(ont, id);
+      //System.err.println("Loading terms for " + name + " took " + (System.currentTimeMillis() - start) + "ms");
+    } catch (SQLException ex) {
+      throw new BioException("Error loading ontology terms", ex);
+    } catch (OntologyException ex) {
+      throw new BioException("Error loading ontology terms", ex);
+    } catch (ChangeVetoException ex) {
+      throw new BioError("Assertion failed: couldn't modify Ontology", ex);
+    }
+    ontologiesByID.put(new Integer(id), ont);
+    ontologiesByName.put(name, ont);
+    return ont;
+  }
+
 
   private class OntologyMonitor implements ChangeListener {
     private Ontology ontology;
