@@ -47,6 +47,9 @@
     <property name="build.compiler" value="modern" />
 
     <property name="classpath" value="bytecode.jar:htmlparser.jar:commons-cli.jar" />
+
+    <property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
+
     <property name="docbook.tools.file" value="docbook.jar" />
 
     <!-- Check the current system classpath for JUnit -->
@@ -70,7 +73,7 @@
                property="java14">
     </available>
 
-    <available classpath="${java.class.path}"
+    <available classpath="${java.class.path}:${ant-tasks.path}"
                classname="org.sablecc.ant.taskdef.Sablecc"
                property="sableCC.support">
     </available>
@@ -383,7 +386,9 @@
   <target name="compile-grammars" depends="prepare-grammars" if="sableCC.support"
   description="Compiles the grammars directory">
     <!-- Turn the grammars into java code -->
-    <taskdef name="sablecc" classname="org.sablecc.ant.taskdef.Sablecc" />
+    <taskdef name="sablecc"
+             classname="org.sablecc.ant.taskdef.Sablecc"
+             classpath="${java.class.path}:${ant-tasks.path}" />
     <sablecc src="${build.src.grammars}"
              outputdirectory="${build.src.grammars_java}"
              includes="*.grammar" />
