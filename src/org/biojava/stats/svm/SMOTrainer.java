@@ -49,9 +49,17 @@ public class SMOTrainer implements TrainingContext {
     public void setC(double C) {
 	this.C = C;
     }
+    
+    public double getC() {
+      return C;
+    }
 
     public void setEpsilon(double epsilon) {
 	this.epsilon = epsilon;
+    }
+    
+    public double getEpsilon() {
+      return epsilon;
     }
 
     private boolean takeStep(int i1, int i2) {

@@ -55,25 +55,23 @@ public class SVM_Light {
     }
 
     public static String vectorToString(SparseVector v) {
-	StringBuffer sb = new StringBuffer();
-	boolean first = true;
+      StringBuffer sb = new StringBuffer();
+      boolean first = true;
 
-	for (int i = 0; i <= v.maxIndex(); ++i) {
-	    double x = v.get(i);
-	    if (x == 0)
-		continue;
+      for (int i = 0; i <= v.size(); ++i) {
+        double x = v.getValueAtIndex(i);
 
-	    if (first)
-		first = false;
-	    else
-		sb.append(' ');
-	    
-	    sb.append(i);
-	    sb.append(':');
-	    sb.append(x);
-	}
-
-	return sb.toString();
+        if (first) {
+          first = false;
+        } else {
+          sb.append(' ');
+        }
+      
+  	    sb.append(v.getDimAtIndex(i));
+        sb.append(':');
+        sb.append(x);
+      }
+      return sb.toString();
     }
 
     public static SVMModel readModelFile(String fileName)

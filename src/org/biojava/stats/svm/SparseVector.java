@@ -75,11 +75,20 @@ public class SparseVector {
       } else { // need to create entry for dim
         indx = -(indx + 1);
 
+        System.out.println("indx  = " + indx);
+        System.out.println("dim   = " + dim);
+        System.out.println("value = " + value);
+        if(indx < size) {
+          System.out.println("current key = " + keys[indx]);
+          System.out.println("current val = " + values[indx]);
+          System.out.println("last key = " + keys[size-1]);
+          System.out.println("last val = " + values[size-1]);
+        }
         if ((size + 1) >= keys.length) { // growing arrays
           int[] nKeys = new int[keys.length * 2];
           System.arraycopy(keys, 0, nKeys, 0, indx);
           System.arraycopy(keys, indx, nKeys, indx+1, size-indx);
-          Arrays.fill(nKeys, size, nKeys.length, Integer.MAX_VALUE);
+          Arrays.fill(nKeys, size+1, nKeys.length, Integer.MAX_VALUE);
           keys = nKeys;
           
           double[] nValues = new double[values.length * 2];
@@ -90,22 +99,38 @@ public class SparseVector {
           System.arraycopy(keys, indx, keys, indx+1, size-indx);
           System.arraycopy(values, indx, values, indx+1, size-indx);
         }
-        
+
         keys[indx] = dim;
         values[indx] = value;
         ++size;
+        
+        if(indx < size) {
+          System.out.println("new key = " + keys[indx+1]);
+          System.out.println("new val = " + values[indx+1]);
+          System.out.println("last key = " + keys[size-1]);
+          System.out.println("last val = " + values[size-1]);
+        }
       }
     }
 
     public double get(int dim) {
-	int pos = Arrays.binarySearch(keys, dim);
-	if (pos >= 0)
-	    return values[pos];
-	return 0.0;
+      int pos = Arrays.binarySearch(keys, dim);
+      if (pos >= 0) {
+        return values[pos];
+      }
+      return 0.0;
     }
 
+    public int getDimAtIndex(int indx) {
+      return keys[indx];
+    }
+    
+    public double getValueAtIndex(int indx) {
+      return values[indx];
+    }
+    
     public int maxIndex() {
-	return keys[size - 1];
+      return keys[size - 1];
     }
 
     public static SparseVector normalLengthVector(SparseVector v, double length) {
@@ -140,6 +165,10 @@ public class SparseVector {
         }
         return total;
       }
+      
+      public String toString() {
+        return "SparseVector kernel K(x, y) = sum_i ( x_i * y_i ).";
+      }
     };
     
     /**
@@ -149,7 +178,40 @@ public class SparseVector {
      * @author Matthew Pocock
      */
     public static class NormalizingKernel implements SVMKernel {
+      /**
+       * The sparse vector that performes the normalization.
+       */
       private SparseVector s;
+      
+      /**
+       * Retrive the current normalizing vector.
+       *
+       * @return the normalizing vector
+       */
+      public SparseVector getNormalizingVector() {
+        return s;
+      }
+      
+      /**
+       * Set the normalizing vector.
+       *
+       * @param the new normalizing vector
+       */
+      public void setNormalizingVector(SparseVector nv) {
+        s = nv;
+      }
+      
+      /**
+       * Evaluate the kernel function between two SparseVectors.
+       * <P>
+       * This function is equivalent to:
+       * <br>
+       * <code>k(a, b) = sum_i ( a_i * b_i * nv_i )</code>
+       * <br>
+       * where nv_i is the value of the normalizing vector at index i. This can
+       * be thought of as scaling each vector at index i by
+       * <code>sqrt(nv_i)</code>.
+       */
       public double evaluate(Object o1, Object o2) {
         SparseVector a = (SparseVector) o1;
         SparseVector b = (SparseVector) o2;
@@ -171,10 +233,21 @@ public class SparseVector {
         return total;
       }
       
+      /**
+       * Generate a normalizing kernel with the normalizing vector s.
+       *
+       * @param s the SparseVector to normalize by
+       */
       public NormalizingKernel(SparseVector s) {
         this.s = s;
       }
       
+      /**
+       * Generate a normalizing kernel defined by the SparseVectors in vectors.
+       * <P>
+       * It will set up a normalizing vector that has weight that will scale
+       * each element so that the average score is 1.
+       */
       public NormalizingKernel(List vectors) {
         this.s = new SparseVector();
         
@@ -186,8 +259,15 @@ public class SparseVector {
         }
         
         for(int j = 0; j < s.size(); j++) {
-          s.values[j] = 1.0 / s.values[j];
+          s.values[j] = (double) vectors.size() / s.values[j];
+          s.values[j] *= s.values[j];
         }
       }
+
+      public String toString() {
+        return "SparseVector.NormalizingKernel K(x, y | s) = " +
+               "sum_i ( x_i * y_i * s_i ).";
+      }
+
     }
 }

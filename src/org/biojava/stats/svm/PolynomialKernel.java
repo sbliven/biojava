@@ -82,8 +82,8 @@ public class PolynomialKernel implements SVMKernel {
     }
     
     public String toString() {
-      return "Polynomial kernel K(x, k) = ("
-        + getMultiplier() + ".k(x) + " + c + ")^" + order
+      return "Polynomial kernel K(x, y | k) = ("
+        + getMultiplier() + " * k(x, y) + " + c + ")^" + order
         + ". k = " + getWrappedKernel().toString();
     }
 }

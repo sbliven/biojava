@@ -23,4 +23,10 @@ public class NormalizingKernel implements SVMKernel {
 	double kAB = k.evaluate(a, b);
 	return kAB / Math.sqrt(kAA * kBB);
     }
+    
+    public String toString() {
+      return "Normalizing Kernel K(x, y | k) = " +
+             " k(x, y) / sqrt(k(x, x) * k(y, y)). k(x,y) = " +
+             getNestedKernel().toString();
+    }
 }
