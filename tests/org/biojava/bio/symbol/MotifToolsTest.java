@@ -64,51 +64,51 @@ public class MotifToolsTest
     }
 
     public void testPlain() {
-        doTest("atcg", "[-a][-t][-c][-g]");
+        doTest("atcg", "atcg");
     }
 
     public void testTwoStart() {
-        doTest("aatcg", "[-a]{2}[-t][-c][-g]");
+        doTest("aatcg", "a{2}tcg");
     }
 
     public void testThreeStart() {
-        doTest("aaatcg", "[-a]{3}[-t][-c][-g]");
+        doTest("aaatcg", "a{3}tcg");
     }
 
     public void testTwoInternal() {
-        doTest("attcg", "[-a][-t]{2}[-c][-g]");
+        doTest("attcg", "at{2}cg");
     }
 
     public void testThreeInternal() {
-        doTest("atttcg", "[-a][-t]{3}[-c][-g]");
+        doTest("atttcg", "at{3}cg");
     }
 
     public void testTwoEnd() {
-        doTest("atcgg", "[-a][-t][-c][-g]{2}");
+        doTest("atcgg", "atcg{2}");
     }
 
     public void testThreeEnd() {
-        doTest("atcggg", "[-a][-t][-c][-g]{3}");
+        doTest("atcggg", "atcg{3}");
     }
 
     public void testTwoOnly() {
-        doTest("aa", "[-a]{2}");
+        doTest("aa", "a{2}");
     }
 
     public void testThreeOnly() {
-        doTest("aaa", "[-a]{3}");
+        doTest("aaa", "a{3}");
     }
 
     public void testAmbStart() {
-        doTest("ngct", n + "[-g][-c][-t]");
+        doTest("ngct", n + "gct");
     }
 
     public void testAmbMiddle() {
-        doTest("anct", "[-a]" + n + "[-c][-t]");
+        doTest("anct", "a" + n + "ct");
     }
 
     public void testAmbEnd() {
-        doTest("agcn", "[-a][-g][-c]" + n);
+        doTest("agcn", "agc" + n);
     }
 
     public void testTwoAmbOnly() {
