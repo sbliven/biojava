@@ -601,9 +601,7 @@ public class UkkonenSuffixTree{
       labelStart=position;
       labelEnd = A_LEAF;
       children=null;
-      checkParent(this);
-      
-
+      //checkParent(this);
     }
 
     /** creates an internal node
@@ -616,15 +614,19 @@ public class UkkonenSuffixTree{
       this.parent=parent;
       this.labelStart=labelStart;
       this.labelEnd=labelStop;
-      checkParent(this);
-      
-
+      //checkParent(this);
     }
     
     
     public boolean isTerminal(){return children==null;}
   }
 
+  /** This is simply a debugging method to check that a node was created
+   *  normally. it doesn't return anything but prints to System.err if a bad
+   * addition was made.
+   *
+   * @param child a <code>SuffixNode</code> value
+   */
   private void checkParent(SuffixNode child){
     SuffixNode parent=child.parent;
     String parentLabel=getLabel(parent);
@@ -635,10 +637,10 @@ public class UkkonenSuffixTree{
     
     if (parentLabel.length()>=label.length()||!parentLabel.equals(label.substring(0,parentLabel.length())))
     {
-      System.out.println("bad addition on rule "+rule);
-      System.out.println(parentLabel+" against "+ label);
-      System.out.println("child ("+child.labelStart+","+((child.labelEnd==-1)?e:child.labelEnd)+")");
-      System.out.println("parent ("+parent.labelStart+","+parent.labelEnd+")");
+      System.err.println("bad addition on rule "+rule);
+      System.err.println(parentLabel+" against "+ label);
+      System.err.println("child ("+child.labelStart+","+((child.labelEnd==-1)?e:child.labelEnd)+")");
+      System.err.println("parent ("+parent.labelStart+","+parent.labelEnd+")");
 
     }
   }
