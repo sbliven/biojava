@@ -642,7 +642,6 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 delete_reference.executeUpdate();
                 delete_reference.close();
 
-                boolean commentSupported = getDBHelper().containsTable(dataSource, "comment");
                 String commentTableName = getCommentTableName();
                 if (commentTableName != null) {
                     PreparedStatement delete_comment = conn.prepareStatement("delete from " + commentTableName
