@@ -6,7 +6,7 @@ import java.io.*;
 import org.biojava.bio.*;
 
 public class GFFParser {
-  public void parse(BufferedReader bReader, GFFDocumentHandler handler, GFFRecordFilter filter)
+  public void parse(BufferedReader bReader, GFFDocumentHandler handler)
   throws IOException, BioException {
     handler.startDocument();
     ArrayList aList = new ArrayList();
@@ -16,9 +16,9 @@ public class GFFParser {
         handler.commentLine(line);
       } else {
         StringTokenizer st = new StringTokenizer(line, "\t", false);
-        int i = 0;
-        while(st.hasMoreTokens() && i < 8) {
-          aList.add(st.nextToken());
+        while(st.hasMoreTokens() && aList.size() < 8) {
+          String token = st.nextToken();
+          aList.add(token);
         }
         String rest = null;
         String comment = null;
@@ -36,9 +36,7 @@ public class GFFParser {
           }
         }
         GFFRecord record = createRecord(handler, aList, rest, comment);
-        if(filter.accept(record)) {
-          handler.recordLine(record);
-        }
+        handler.recordLine(record);
       }
     }
     handler.endDocument();
@@ -65,7 +63,11 @@ public class GFFParser {
     }
     
     String score = (String) aList.get(5);
-    if(score == null || score.equals("") || score.equals(".")) {
+    if(score == null     ||
+       score.equals("")  ||
+       score.equals(".") ||
+       score.equals("0")
+    ) {
       record.setScore(GFFRecord.NO_SCORE);
     } else {
       try {

@@ -16,17 +16,6 @@ public class GFFEntrySet {
     lines = new ArrayList();
   }
   
-  public GFFEntrySet(GFFParser parser, BufferedReader bReader)
-  throws IOException, BioException {
-    this(parser, bReader, GFFRecordFilter.ACCEPT_ALL);
-  }
-  
-  public GFFEntrySet(GFFParser parser, BufferedReader bReader, GFFRecordFilter filter)
-  throws IOException, BioException {
-    this();
-    parser.parse(bReader, new DocumentHandler(), filter);
-  }
-  
   public Iterator lineIterator() {
     return lines.iterator();
   }
@@ -98,7 +87,11 @@ public class GFFEntrySet {
     return accepted;
   }
   
-  private class DocumentHandler implements GFFDocumentHandler {
+  public GFFDocumentHandler getAddHandler() {
+    return new EntrySetBuilder();
+  }
+  
+  private class EntrySetBuilder implements GFFDocumentHandler {
     public void startDocument() {}
     public void endDocument()   {}
   

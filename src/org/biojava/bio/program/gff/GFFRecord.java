@@ -18,7 +18,7 @@ public interface GFFRecord {
   public String getGroupAttributes();
   public String getComment();
   
-  public static double NO_SCORE = Double.NaN;
+  public static double NO_SCORE = Double.NEGATIVE_INFINITY;
   public static int POSITIVE_STRAND = +1;
   public static int NEGATIVE_STRAND = -1;
   public static int NO_STRAND = 0;
