@@ -51,13 +51,20 @@ public class MotifTools
      * matches the <code>SymbolList</code>. Ambiguous
      * <code>Symbol</code>s are simply transformed into character
      * classes. For example the nucleotide sequence "AAGCTT" becomes
-     * "A{2}GCT{2}" and "CTNNG" is expanded to "CT[TACG]{2}G". The
-     * ordering of the tokens in a character class is by ascending
-     * numerical order of their tokens as determined by
-     * <code>Arrays.sort(char [])</code>.</p>
+     * "A{2}GCT{2}" and "CTNNG" is expanded to
+     * "CT[ABCDGHKMNRSTVWY]{2}G". The character class is generated
+     * using the <code>getMatches</code> method of an ambiguity symbol
+     * to obtain the alphabet of <code>AtomicSymbol</code>s it
+     * matches, followed by calling <code>getAllSymbols</code> on this
+     * alphabet, removal of any gap symbols and then tokenization of
+     * the remainder. The ordering of the tokens in a character class
+     * is by ascending numerical order of their tokens as determined
+     * by <code>Arrays.sort(char [])</code>.</p>
      *
      * <p>The <code>Alphabet</code> of the <code>SymbolList</code>
-     * must be finite and must have a character token type.</p>
+     * must be finite and must have a character token type. Regular
+     * expressions may be generated for any such
+     * <code>SymbolList</code>, not just DNA, RNA and protein.</p>
      *
      * @param motif a <code>SymbolList</code>.
      *
@@ -69,7 +76,6 @@ public class MotifTools
             throw new IllegalArgumentException("SymbolList was empty");
 
         StringBuffer regex = new StringBuffer();
-        StringBuffer sb = new StringBuffer();
         Stack stack = new Stack();
 
         try
@@ -84,6 +90,7 @@ public class MotifTools
 
             for (int i = 1; i <= motifLen; i++)
             {
+                StringBuffer sb = new StringBuffer();
                 Symbol sym = motif.symbolAt(i);
                 FiniteAlphabet ambiAlpha = (FiniteAlphabet) sym.getMatches();
 
@@ -155,8 +162,6 @@ public class MotifTools
                         regex = extendRegex(stack, regex);
                     }
                 }
-
-                sb.setLength(0);
             }
         }
         catch (IllegalSymbolException ise)
