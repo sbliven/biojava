@@ -109,8 +109,24 @@ class ProjectedFeature implements Feature, Projection {
 	return context.getAnnotation(feature);
     }
 
+        
     public SymbolList getSymbols() {
-	return feature.getSymbols();
+        Location loc = getLocation();
+        Sequence seq = context.getSequence(this);
+        if (loc.isContiguous())
+	        return seq.subList(loc.getMin(),loc.getMax());
+
+        List res = new ArrayList();
+        for (Iterator i = loc.blockIterator(); i.hasNext(); ) {
+    	    Location l = (Location) i.next();
+    	    res.add(seq.subList(l.getMin(),l.getMax()));
+        }
+    
+        try {
+          return new SimpleSymbolList(seq.getAlphabet(), res);
+        } catch (IllegalSymbolException ex) {
+          throw new BioError(ex);
+        }
     }
 
     public int countFeatures() {
