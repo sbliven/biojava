@@ -32,12 +32,13 @@ import java.util.ArrayList ;
  */
 public class Nucleotide extends Hetatom {
 
+    /** this is a "nucleotide", a special occurance of a Hetatom. */
     public static String type = "nucleotide";
    
           
 
     /*
-     * inherits most from Hetero and has just a few extensions
+     * inherits most from Hetero and has just a few extensions.
      */
     public Nucleotide() {
 	super();

@@ -28,7 +28,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.ArrayList ;
 
-/** an iterator over all groups of a structure */
+/** an iterator over all groups of a structure.
+@author Andreas Prlic
+*/
 
 public class GroupIterator implements Iterator {
     
@@ -37,7 +39,11 @@ public class GroupIterator implements Iterator {
     int current_chain_pos ;
     int current_group_pos ;
     
-  
+    /**
+     * Constructs a GroupIterator object.
+     *
+     * @param struct  a Structure object
+     */
     
     public GroupIterator (Structure struct) { 
 	structure = struct     ;
@@ -77,7 +83,8 @@ public class GroupIterator implements Iterator {
     }
     
     /** recursive method to determine if there is a next group. Helper
-     * method for hasNext(). @see hasNext()
+     * method for hasNext(). 
+     * @see #hasNext
      */
     private boolean hasSubGroup(int tmp_model,int tmp_chain,int tmp_group){ 
 
@@ -103,7 +110,10 @@ public class GroupIterator implements Iterator {
     }
 
 
-
+    /** get next Group.
+     * @return next Group 
+     * @throws NoSuchElementException ... 
+     */
     public Object next()
 	throws NoSuchElementException
     {
@@ -112,7 +122,8 @@ public class GroupIterator implements Iterator {
     }
 
      /** recursive method to retrieve the next group. Helper
-     * method for gext(). @see next()
+     * method for gext(). 
+     * @see #next
      */
     private Group getNextGroup(int tmp_model,int tmp_chain,int tmp_group)
 	throws NoSuchElementException
@@ -143,7 +154,8 @@ public class GroupIterator implements Iterator {
 
     }
 
-    /** does nothing */
+    /** does nothing .
+     */
     public void remove() {
     }
 

@@ -29,6 +29,8 @@ import java.util.ArrayList ;
 /**
  * A Chain in a PDB file. It contains several groups which can be of
  * type "amino", "hetatm", "nucleotide".
+ * @author Andreas Prlic
+ * @since 1.4
  */
 public class ChainImpl implements Chain {
 
@@ -37,7 +39,7 @@ public class ChainImpl implements Chain {
     ArrayList groups;
 	
     /**
-     * 
+     *  Constructs a ChainImpl object.
      */
     public ChainImpl() {
 	super();
@@ -46,13 +48,20 @@ public class ChainImpl implements Chain {
 	groups = new ArrayList() ;
     }
 
-    /** this class also knows about the swissprot link ...
-     * 
+
+    /** set the Swissprot id of this chains .
+     * @param sp_id  a String specifying the swissprot id value
+     * @see #getSwissprotId
      */
+
     public void setSwissprotId(String sp_id){
 	swissprot_id = sp_id ;
     }
-	
+    
+    /** get the Swissprot id of this chains .
+     * @return a String representing the swissprot id value
+     * @see #setSwissprotId
+     */
     public String getSwissprotId() {
 	return swissprot_id ;
     }
@@ -101,8 +110,19 @@ public class ChainImpl implements Chain {
 	return g.size() ;
     }
 
+    
+    /** get and set the name of this chain (Chain id in PDB file ).
+     * @param nam a String specifying the name value
+     * @see #getName
+     * 
+     */
 
     public void   setName(String nam) { name = nam;   }
+
+    /** get and set the name of this chain (Chain id in PDB file ).
+     * @return a String representing the name value
+     * @see #setName
+     */
     public String getName()           {	return name;  }
 	
 

@@ -24,20 +24,34 @@ package org.biojava.bio.structure;
 import org.biojava.bio.*;
 
 /**
- * An exception during the parsing of a PDB file
+ * An exception during the parsing of a PDB file.
  *
  * @author Andreas Prlic, Thomas Down, Benjamin Schuster-Böckler
  */
 
 public class StructureException extends BioException {
+    /**
+     * Constructs a StructureException object.
+     *
+     * @param s  a String ...
+     */
     public StructureException(String s) {
 	super(s);
     }
-
+    /**
+     * Constructs a StructureException object.
+     *
+     * @param t  a Throwable object
+     * @param s  a String ...
+     */
     public StructureException (Throwable t, String s) {
 	super(t, s);
     }
-
+    /**
+     * Constructs a StructureException object.
+     *
+     * @param t  a Throwable object
+     */
     public StructureException (Throwable t) {
 	super(t);
     }

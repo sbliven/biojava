@@ -46,8 +46,9 @@ import org.biojava.utils.ListTools;
  * @version 1.0
  */
 public final class AlphaCTools {
-
+    /** MAX_ANGLE */
   public static final double MAX_ANGLE = 180.0;
+    /** MIN_ANGLE */
   public static final double MIN_ANGLE = -180.0;
 
   private static String ALPHA = "ALPHA CARBON ANGLES";

@@ -26,6 +26,9 @@ package org.biojava.bio.structure;
 /**
  * Implementation of an Atom of a PDB file.
  * currently the coordinates of an atom are represented by a doubl[3] array.
+ * @author Andreas Prlic
+ * @since 1.4
+ * @version %I% %G%
  */
 public class AtomImpl implements Atom {
 
@@ -52,6 +55,9 @@ public class AtomImpl implements Atom {
 
     /** trimmed version of atom name, e.g. "CA" */
     public void   setName(String s) { name = s ;}
+    /**
+     * Gets this object's name.
+     */
     public String getName()         { return name ;}
     
     /** set full name of atom e.g. " CA " */

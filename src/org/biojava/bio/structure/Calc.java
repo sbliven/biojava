@@ -37,8 +37,10 @@ import org.biojava.bio.structure.StructureException ;
  * simple at the moment biojava does not depend on java3d.  If the
  * structure part of biojava becomes more powerful it could be moved
  * out of the core - biojava and the dependency on java3d could be
- * introduced.
+ * introduced. 
  * @author Andreas Prlic
+ * @since 1.4
+ * @version %I% %G%
  */
 
 public class Calc {
@@ -55,7 +57,12 @@ public class Calc {
      */
 
     /**
-     * calculate distance between two atoms
+     * calculate distance between two atoms.
+     *
+     * @param a  an Atom object
+     * @param b  an Atom object
+     * @return a double
+     * @throws StructureException ...
      */
     public static double getDistance(Atom a, Atom b) 
 	throws StructureException
@@ -76,7 +83,11 @@ public class Calc {
 	}
     }
 
-    /** add two atoms ( a + b)
+    /** add two atoms ( a + b).
+     *
+     * @param a  an Atom object
+     * @param b  an Atom object
+     * @return an Atom object
      */
     public static Atom add(Atom a, Atom b){
 	double[] coords = new double[3] ;
@@ -90,7 +101,13 @@ public class Calc {
 	return c ;
     }
 
-    /** substract two atoms ( a - b)
+    /** substract two atoms ( a - b).
+     *
+     * @param a  an Atom object
+     * @param b  an Atom object
+     * @return an Atom object
+     * @throws StructureException ...
+
      */
     public static Atom substract(Atom a, Atom b) 
 	throws StructureException
@@ -110,7 +127,12 @@ public class Calc {
     }
 
     
-    /** Vector product */
+    /** Vector product .
+     *
+     * @param a  an Atom object
+     * @param b  an Atom object
+     * @return an Atom object
+     */
     public static Atom vectorProduct(Atom a , Atom b){
 	double[] coords = new double[3];
 
@@ -124,7 +146,11 @@ public class Calc {
 	
     }
 
-    /** skalar product
+    /** skalar product.
+     *
+     * @param a  an Atom object
+     * @param b  an Atom object
+     * @return a double
      */
     public static double skalarProduct(Atom a, Atom b){
 	double skalar ;
@@ -133,13 +159,20 @@ public class Calc {
     }
 
 
-    /** amount
+    /** amount.
+     *
+     * @param a  an Atom object
+     * @return a double
      */
     public static double amount(Atom a){
 	return Math.sqrt(skalarProduct(a,a));
     }
 
-    /** angle
+    /** angle.
+     *
+     * @param a  an Atom object
+     * @param b  an Atom object
+     * @return a double
      */
     public static double angle(Atom a, Atom b){
 
@@ -155,7 +188,11 @@ public class Calc {
 	return angle;
     }
 
-    /** return the unit vector of vector a */
+    /** return the unit vector of vector a .
+     *
+     * @param a  an Atom object
+     * @return an Atom object
+     */
     public static Atom unitVector(Atom a) {
 	double amount = amount(a) ;
 	Atom U = a ;
@@ -173,7 +210,14 @@ public class Calc {
     
     /** torsion angle 
      * = angle between the normal vectors of the 
-     * two plains a-b-c and b-c-d
+     * two plains a-b-c and b-c-d.
+     *
+     * @param a  an Atom object
+     * @param b  an Atom object
+     * @param c  an Atom object
+     * @param d  an Atom object
+     * @return a double
+     * @throws StructureException ...
      */
     
     public static double torsionAngle(Atom a, Atom b, Atom c, Atom d)
@@ -199,7 +243,12 @@ public class Calc {
 	return angl;
     }
 
-    /** phi angle
+    /** phi angle.
+     *
+     * @param a  an AminoAcid object
+     * @param b  an AminoAcid object
+     * @return a double
+     * @throws StructureException ...
      */
     public static double getPhi(AminoAcid a, AminoAcid b)
 	throws StructureException
@@ -218,8 +267,13 @@ public class Calc {
 	return phi ;
     }
 
-     /** psi angle
-     */
+     /** psi angle.
+      *
+      * @param a  an AminoAcid object
+      * @param b  an AminoAcid object
+      * @return a double
+      * @throws StructureException ...
+      */
     public static double getPsi(AminoAcid a, AminoAcid b)
 	throws StructureException
     {
@@ -238,7 +292,12 @@ public class Calc {
     }
 
     /** test if two amino acids are connected, i.e.
-     * if the distance from C to N < 2,5 Angstrom
+     * if the distance from C to N < 2,5 Angstrom.
+     *
+     * @param a  an AminoAcid object
+     * @param b  an AminoAcid object
+     * @return true if ...
+     * @throws StructureException ...
      */    
     public static boolean isConnected(AminoAcid a, AminoAcid b)
 	throws StructureException
@@ -256,7 +315,12 @@ public class Calc {
     }
 
 
-    /** rotate a structure */
+    /** rotate a structure .
+     *
+     * @param structure  a Structure object
+     * @param m          an array of double arrays
+     * @throws StructureException ...
+     */
     public static void rotate(Structure structure, double[][] m)
 	throws StructureException
     {
@@ -283,7 +347,11 @@ public class Calc {
 	}
     }
 
-    /** shift a structure with a vector */
+    /** shift a structure with a vector.
+     *
+     * @param structure  a Structure object
+     * @param a          an Atom object
+     */
     public static void shift(Structure structure, Atom a ){
 
 	AtomIterator iter = new AtomIterator(structure) ;

@@ -34,9 +34,13 @@ import java.util.Iterator ;
  * AminoAcid and Nucleotide are closely related classes.
  * @see AminoAcid
  * @see Nucleotide
+ * @author Andreas Prlic
+ * @version %I% %G%
+ * @since 1.4
  */
 public class Hetatom implements Group {
     
+    /** this is a "hetatm" */
     public static String type = "hetatm" ;
     
     HashMap properties ;
@@ -78,7 +82,8 @@ public class Hetatom implements Group {
 	pdb_flag = flag ;
     }
   
-    /* (non-Javadoc)
+    /**
+     * Returns the PDBCode value.
      * @see org.biojava.bio3d.AminoAcid_Map#get_PDB_code()
      */
     public String getPDBCode() {
@@ -100,6 +105,9 @@ public class Hetatom implements Group {
 	pdb_name =s ;
     }
 
+    /**
+     * Returns the PDBName.
+     */
     public String getPDBName() { return pdb_name;}
 
     /** add an atom to this group */
@@ -158,6 +166,9 @@ public class Hetatom implements Group {
 	return false ;
     }
 
+    /**
+     * Returns the type value.
+     */
     public String getType(){ return type;}
 
     public String toString(){
@@ -178,20 +189,21 @@ public class Hetatom implements Group {
 	this allows to include chemically modified amino acids that
 	are labeled hetatoms into some computations ... the usual way
 	to identify if a group is an amino acid is getType() !
-	@see getType().
 	<p>
 	amino atoms are : N, CA, C, O, CB
 	GLY does not have CB (unless we would calculate some artificially
 	</p>
 	
 	Example: 1DW9 chain A first group is a Selenomethionine, provided as HETATM, but here returns true.
-<pre>
-HETATM    1  N   MSE A   1      11.720  20.973   1.584  0.00  0.00           N
-HETATM    2  CA  MSE A   1      10.381  20.548   1.139  0.00  0.00           C
-HETATM    3  C   MSE A   1       9.637  20.037   2.398  0.00  0.00           C
-HETATM    4  O   MSE A   1      10.198  19.156   2.985  0.00  0.00           O
-HETATM    5  CB  MSE A   1      10.407  19.441   0.088  0.00  0.00           C
-</pre>
+	<pre>
+	HETATM    1  N   MSE A   1      11.720  20.973   1.584  0.00  0.00           N
+	HETATM    2  CA  MSE A   1      10.381  20.548   1.139  0.00  0.00           C
+	HETATM    3  C   MSE A   1       9.637  20.037   2.398  0.00  0.00           C
+	HETATM    4  O   MSE A   1      10.198  19.156   2.985  0.00  0.00           O
+	HETATM    5  CB  MSE A   1      10.407  19.441   0.088  0.00  0.00           C
+	</pre>
+	@see #getType
+		
     */
 
 

@@ -24,46 +24,123 @@
 package org.biojava.bio.structure;
 
 /**
- * @author andreas
- *
- * simple implementation of an Atom
- 
+ * simple interface of an Atom.
+
+ * @author Andreas Prlic
+ * @version %I% %G%
+ * @since 1.4
+ * 
  */
 public interface Atom {
     
-    /** trimmed version of atom name, e.g. "CA" */
+    /** set trimmed version of atom name, e.g. "CA". 
+     * @param s  a String specifying the name value
+     * @see #getName
+     */
     public void   setName(String s);
+
+    /** get trimmed version of atom name, e.g. "CA".
+     * @return a String representing the name value 
+     * @see #setName
+     */
     public String getName();
     
-    /** full name of atom e.g. " CA " */
+    /** set full name of atom e.g. " CA ". 
+     * @param s  a String specifying the full name value
+     * @see #getFullName
+     */
     public void   setFullName(String s) ;
+
+    /** get full name of atom e.g. " CA ".
+     * @return a String representing the full name value 
+     * @see #setFullName
+     */
     public String getFullName();
 
-    /** PDB atom number */
+    /** set PDB atom number. 
+     * @param i  an int specifying the PDBserial value 
+     * @see #getPDBserial
+     */
     public void setPDBserial(int i) ;
+
+    /** get PDB atom number.
+     * @return an int representing the PDBserial value 
+     * @see #setPDBserial
+     */
     public int  getPDBserial() ;
 
-    /** the coordinates */    
+    /** set the coordinates.  
+     * @param c  an array of doubles specifying the coords value
+     * @see #getCoords
+     */    
     public void    setCoords(double[] c);
+
+    /** get the coordinates. 
+     * @return an array of doubles representing the coords value
+     * @see #setCoords
+     */    
     public double[] getCoords() ;
     
+    /** get cordinate X. 
+     * @return a double
+     */    
     public double getX() ;
+
+    /** get cordinate Y. 
+     * @return a double
+     */    
     public double getY() ;
+
+    /** get cordinate Z. 
+     * @return a double
+     */    
     public double getZ() ;
 
-    /** get set alternate Location */
+    /** get set alternate Location.
+     * @param c  a Character object specifying the alt loc value 
+     * @see #getAltLoc
+     */
     public void setAltLoc(Character c);
+    /** get set alternate Location. 
+     * @return a Character object representing the alt loc value
+     * @see #setAltLoc
+     */
     public Character getAltLoc();
 
-    /** store the whole line */
+    /** store the whole line.  
+     * @param s  a String specifying the PDBline value
+     * @see #getPDBline
+     */
     public void   setPDBline(String s) ;
+
+    /** store the whole line.  
+     * @return a String representing the PDBline value
+     * @see #setPDBline
+     */
+
     public String getPDBline() ;
 
-    /** set occupancy */
+    /** set occupancy. 
+     * @param occupancy  a double specifying the occupancy value
+     * @see #getOccupancy
+     */
     public void setOccupancy(double occupancy) ;
-    /** get occupancy */
+    
+    /** get occupancy. 
+     * @return a double representing the occupancy value
+     * @see #setOccupancy
+     */
     public double getOccupancy();
 
+    /** get set temp factor .
+     * @param temp  a double specifying the temp factor value
+     * @see #getTempFactor
+     */
     public void   setTempFactor(double temp) ;
+
+    /** get set temp factor. 
+     * @return a double representing the temp factor value
+     * @see #setTempFactor
+     */
     public double getTempFactor() ;
 }

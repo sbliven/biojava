@@ -31,10 +31,13 @@ import java.util.HashMap   ;
  *
  *  AminoAcid inherits most from Hetatom.  Adds a few AminoAcid
  *  specific methods.
+ * @author Andreas Prlic
+ * @since 1.4
+ * @version %I% %G%
  * 
  */
 public class AminoAcid extends Hetatom {
-
+    /** this is an Amino acid. type is "amino". */
     public static String type = "amino";
    
     /* IUPAC amino acid residue names 

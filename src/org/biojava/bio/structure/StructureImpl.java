@@ -32,9 +32,12 @@ import org.biojava.bio.structure.io.FileConvert ;
 /**
  * Implementation of a PDBStructure. This class
  * provides the data contained in a PDB file.
+ * to get structure objects from different sources
+ * see io package.
  *
  * @author Andreas Prlic
  * @since 1.4
+ * @version %I% %G%
  */
 public class StructureImpl implements Structure {
    
@@ -50,7 +53,7 @@ public class StructureImpl implements Structure {
     boolean nmrflag ;
 
     /**
-     * 
+     *  Constructs a StructureImpl object.
      */
     public StructureImpl() {
 	super();
@@ -100,7 +103,11 @@ public class StructureImpl implements Structure {
 
     /** @see Structure interface */
     public void      setConnections(List conns) { connections = (ArrayList)conns ; }
-    /** @see Structure interface */
+    /** 
+     * Returns the connections value.
+     *
+     * @return a List object representing the connections value
+     @see Structure interface */
     public List getConnections()                { return connections ;}
 
     /** add a new chain */

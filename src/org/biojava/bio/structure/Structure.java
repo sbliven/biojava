@@ -33,6 +33,7 @@ import java.util.Map  ;
  *
  * @author Andreas Prlic
  * @since 1.4
+ * @version %I% %G%
  */
 public interface Structure {
 	
@@ -105,6 +106,10 @@ public interface Structure {
        
     */
     public void setConnections(List connections);
+
+    /**
+     * Returns the connections value.
+     */
     public List getConnections();
 
     /** return number of Chains in file */

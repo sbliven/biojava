@@ -28,7 +28,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.ArrayList ;
 
-/** an iterator over all atoms of a structure / group */
+/** an iterator over all atoms of a structure / group. 
+ * @author Andreas Prlic
+ * @since 1.4
+ * @version %I% %G%
+*/
 
 public class AtomIterator implements Iterator {
     Structure structure     ;
@@ -36,6 +40,11 @@ public class AtomIterator implements Iterator {
     int current_atom_pos    ;
     GroupIterator groupiter ;
 
+    /**
+     * Constructs an AtomIterator object.
+     *
+     * @param struct  a Structure object
+     */
     public AtomIterator(Structure struct) {
 	structure = struct;
 	current_atom_pos = -1 ;
@@ -48,7 +57,11 @@ public class AtomIterator implements Iterator {
 	    group = null ;
     }
 
-    
+    /**
+     * Constructs an AtomIterator object.
+     *
+     * @param g  a Group object
+     */
     public AtomIterator(Group g) {
 	structure = null;
 	group = g ;
@@ -84,7 +97,11 @@ public class AtomIterator implements Iterator {
 	return false ;
     }
 
-    /** return next atom */
+    /** return next atom.
+     *
+     * @return the next Atom
+     * @throws NoSuchElementException ...
+     */
     public Object next() 
 	throws NoSuchElementException
     {
@@ -115,7 +132,7 @@ public class AtomIterator implements Iterator {
 	
     }
 
-    /** does nothing */
+    /** does nothing. */
     public void remove() {
     }
 
