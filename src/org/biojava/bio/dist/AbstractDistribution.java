@@ -124,10 +124,14 @@ public abstract class AbstractDistribution
     if(sym instanceof AtomicSymbol) {
       setWeightImpl((AtomicSymbol) sym, weight);
     } else {
+      //need to divide the weight up amongst the atomic symbols according
+      //to the null model
       FiniteAlphabet fa = (FiniteAlphabet) sym.getMatches();
+      double totalNullWeight = this.getNullModel().getWeight(sym);
       for(Iterator si = fa.iterator(); si.hasNext(); ) {
         AtomicSymbol as = (AtomicSymbol) si.next();
-        setWeightImpl(as, weight);
+        double symNullWeight = this.getNullModel().getWeight(as);
+        setWeightImpl(as, weight * symNullWeight / totalNullWeight);
       }
     }
   }
