@@ -24,6 +24,7 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 import java.io.*;
+import java.lang.ref.*;
 import java.lang.reflect.*;
 
 import org.biojava.bio.*;
@@ -31,21 +32,28 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.utils.*;
 
 /**
+ ( <p>
  * An efficient implementation of an Alphabet over the infinite set of integer
  * values.
+ * </p>
+ *
  * <p>
  * This class can be used to represent lists of integer numbers as a
  * SymbolList with the alphabet IntegerAlphabet. These lists can then be
  * annotated with features, or fed into dynamic-programming algorithms, or
  * processed as per any other SymbolList object.
+ * </p>
+ *
  * <p>
- * Object identity can not be used to decide if two IntegerSymbol objects are
- * the same. You must use the equals method, or compare intValue manually.
+ * Object identity should be used to decide if two IntegerSymbol objects are
+ * the same. IntegerAlphabet ensures that all IntegerSymbol instances are
+ * canonicalized.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Mark Schreiber
  */
-public class IntegerAlphabet
+public final class IntegerAlphabet
   extends
     Unchangeable
   implements
@@ -55,9 +63,7 @@ public class IntegerAlphabet
   /**
    * The singleton instance of the IntegerAlphabet class.
    */
-  private static final IntegerAlphabet INSTANCE = new IntegerAlphabet();
-
-
+  private static IntegerAlphabet INSTANCE;
 
   private Object writeReplace() throws ObjectStreamException {
     try {
@@ -76,16 +82,17 @@ public class IntegerAlphabet
    * @throws IllegalArgumentException if max < min
    * @return A FiniteAlphabet from min to max <b>inclusive</b>.
    */
-  public static FiniteAlphabet getSubAlphabet(int min, int max)throws IllegalArgumentException{
+  public static SubIntegerAlphabet getSubAlphabet(int min, int max)
+  throws IllegalArgumentException {
     String name = "SubIntegerAlphabet["+min+".."+max+"]";
     try{
-      return (FiniteAlphabet)(AlphabetManager.alphabetForName(name));
+      return (SubIntegerAlphabet) (AlphabetManager.alphabetForName(name));
     }catch(Exception e){
       FiniteAlphabet a = new SubIntegerAlphabet(min, max);
       AlphabetManager.registerAlphabet(a.getName(),a);
     }
 
-    return (FiniteAlphabet)(AlphabetManager.alphabetForName(name));
+    return (SubIntegerAlphabet) (AlphabetManager.alphabetForName(name));
   }
 
   /**
@@ -103,21 +110,27 @@ public class IntegerAlphabet
   }
 
   /**
-   * Generates an IntegerSymbol for the provided int argument
-   */
-  public static IntegerSymbol fromInt(int i){
-    return new IntegerSymbol(i);
-  }
-
-  /**
    * Retrieve the single IntegerAlphabet instance.
    *
    * @return the singleton IntegerAlphabet instance
    */
   public static IntegerAlphabet getInstance() {
+    if(INSTANCE == null) {
+      INSTANCE = new IntegerAlphabet();
+    }
+    
     return INSTANCE;
   }
 
+  /**
+   * Canonicalization map for ints and references to symbols.
+   */
+  private Map intToSymRef;
+  
+  private IntegerAlphabet() {
+    intToSymRef = new HashMap();
+  }
+  
   /**
    * Retrieve the Symbol for an int.
    *
@@ -125,7 +138,17 @@ public class IntegerAlphabet
    * @return a IntegerSymbol embodying val
    */
   public IntegerSymbol getSymbol(int val) {
-    return new IntegerSymbol(val);
+    Integer i = new Integer(val);
+    Reference ref = (Reference) intToSymRef.get(i);
+    Symbol sym; // stop premature reference clearup
+    
+    if(ref == null || ref.get() == null) {
+      // how accessible do we want this? Soft or Weak?
+      ref = new SoftReference(sym = new IntegerSymbol(val));
+      intToSymRef.put(i, ref);
+    }
+    
+    return (IntegerSymbol) ref.get();
   }
 
   public Symbol getGapSymbol() {
@@ -263,28 +286,31 @@ public class IntegerAlphabet
    * @author Matthew Pocock
    * @since 1.3
    */
-  private static class SubIntegerAlphabet
-  extends SimpleAlphabet {
+  public static class SubIntegerAlphabet
+  extends AbstractAlphabet {
     private int min;
     private int max;
+    private String name; // cache this for performance
 
     /**
      * Construct a contiguous sub alphabet with the integers from min to max inclusive.
      */
-    SubIntegerAlphabet(int min, int max) throws IllegalArgumentException{
-      if(max < min) throw new IllegalArgumentException("min must be less than max: "+min+" : "+max);
+    private SubIntegerAlphabet(int min, int max) throws IllegalArgumentException{
+      if(max < min) {
+        throw new IllegalArgumentException(
+          "min must be less than max: " +
+          min + " : " + max
+        );
+      }
+      
       this.min = min;
       this.max = max;
 
-      for(int i = min; i <= max; i++){
-        try{
-          this.addSymbol(new IntegerSymbol(i));
-        }catch(Exception e){
-          throw new NestedError(e,"Could not make SubIntegerAlphabet["+min+".."+max+"]");
-        }
-      }
-
-      this.setName("SubIntegerAlphabet["+min+".."+max+"]");
+      this.name = "SubIntegerAlphabet["+min+".."+max+"]";
+    }
+    
+    public String getName() {
+      return name;
     }
     
     protected boolean containsImpl(AtomicSymbol sym) {
@@ -306,6 +332,85 @@ public class IntegerAlphabet
       }else{
         throw new NoSuchElementException(name + " parser not supported by IntegerAlphabet yet");
       }
+    }
+    
+    public Symbol getSymbol(int val)
+    throws IllegalSymbolException {
+      if(val < min || val > max) {
+        throw new IllegalSymbolException(
+          "Could not get Symbol for value " +
+          val + " as it is not in the range " +
+          min + " : " + max
+        );
+      }
+      
+      return IntegerAlphabet.getInstance().getSymbol(val);
+    }
+    
+    public int size() {
+      return max - min + 1;
+    }
+    
+    public List getAlphabets() {
+      return new SingletonList(this);
+    }
+    
+    protected AtomicSymbol getSymbolImpl(List symL)
+    throws IllegalSymbolException {
+      return (AtomicSymbol) symL.get(0);
+    }
+    
+    protected void addSymbolImpl(AtomicSymbol sym)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        "Can't add symbols to immutable alphabet " +
+        getName()
+      );
+    }
+    
+    public void removeSymbol(Symbol sym)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        "Can't remove symbols from immutable alphabet " +
+        getName()
+      );
+    }
+    
+    public SymbolList symbols()
+    throws UnsupportedOperationException {
+      throw new UnsupportedOperationException();
+    }
+    
+    public Iterator iterator() {
+      return new Iterator() {
+        int indx = min;
+        
+        public boolean hasNext() {
+          return indx <= max;
+        }
+        
+        public Object next() {
+          try {
+            Symbol sym = getSymbol(indx);
+            indx++;
+            return sym;
+          } catch (IllegalSymbolException ise) {
+            throw new BioError(
+              ise,
+              "Assertion Failure: symbol " + indx +
+              " produced by iterator but not found in " + getName()
+            );
+          }
+        }
+        
+        public void remove() {
+          throw new UnsupportedOperationException();
+        }
+      };
+    }
+    
+    public Annotation getAnnotation() {
+      return Annotation.EMPTY_ANNOTATION;
     }
   }
 }

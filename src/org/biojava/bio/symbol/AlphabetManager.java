@@ -731,6 +731,10 @@ public final class AlphabetManager {
     gapSymbol = new GapSymbol();
     gapBySize = new HashMap();
     gapBySize.put(new SizeQueen(new ArrayList()), gapSymbol);
+    
+    nameToAlphabet.put("INTEGER", IntegerAlphabet.getInstance());
+    nameToAlphabet.put("DOUBLE", DoubleAlphabet.getInstance());
+    
     try {
       gapBySize.put(
         new SizeQueen(Arrays.asList(

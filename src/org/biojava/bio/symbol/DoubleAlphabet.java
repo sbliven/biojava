@@ -24,6 +24,7 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 import java.io.*;
+import java.lang.ref.*;
 import java.lang.reflect.*;
 
 import org.biojava.bio.*;
@@ -44,20 +45,21 @@ import org.biojava.bio.seq.io.*;
  * </p>
  *
  * <p>
- * Object identity can not be used to decide if two DoubleResidue objects are
- * the same. You must use the equals method, or compare doubleValue manually.
+ * Object identity should be used to decide if two DoubleResidue objects are
+ * the same. DoubleAlpabet ensures that all DoubleAlphabet instances are
+ * canonicalized.
  * </p>
  *
  * @author Matthew Pocock
  */
-public class DoubleAlphabet
+public final class DoubleAlphabet
   extends
     Unchangeable
   implements
     Alphabet,
     Serializable
 {
-  private static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
+  private static DoubleAlphabet INSTANCE;
   
   private Object writeReplace() throws ObjectStreamException {
     try {
@@ -91,10 +93,15 @@ public class DoubleAlphabet
    * @return the singleton DoubleAlphabet instance
    */
   public static DoubleAlphabet getInstance() {
+    if(INSTANCE == null) {
+      INSTANCE = new DoubleAlphabet();
+    }
+    
     return INSTANCE;
   }
 
   private List alphabets = null;
+  private Map doubleToSymRef;
   
   /**
    * Retrieve the Symbol for a double.
@@ -103,7 +110,16 @@ public class DoubleAlphabet
    * @return a DoubleSymbol embodying val
    */
   public DoubleSymbol getSymbol(double val) {
-    return new DoubleSymbol(val);
+    Double d = new Double(val);
+    Reference ref = (Reference) doubleToSymRef.get(d);
+    Symbol sym; // stop premature reference clearup
+    
+    if(ref == null || ref.get() == null) {
+      ref = new SoftReference(sym = new DoubleSymbol(val));
+      doubleToSymRef.put(d, ref);
+    }
+    
+    return (DoubleSymbol) ref.get();
   }
  
   public Annotation getAnnotation() {
@@ -192,10 +208,6 @@ public class DoubleAlphabet
     
     public String getName() {
       return val + "";
-    }
-    
-    public char getToken() {
-      return '#';
     }
     
     /**
