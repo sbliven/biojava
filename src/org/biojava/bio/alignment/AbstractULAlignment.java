@@ -144,10 +144,28 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
         return rightMost();
     }
 
+    /**
+     * Retrieves a subalignment specified by the location.
+     * <p><b>WARNING:</b> It is assumed that the location is contiguous. If
+     * the location is non-contiguous it may be preferable to use a block iterator
+     * to retrieve each sub location independently.
+     * @see subAlignment(Set labels, int min, int max)
+     */
     public Alignment subAlignment(Set labels, Location loc) throws IndexOutOfBoundsException{
         return new SubULAlignment(labels,loc);
     }
 
+    /**
+      * Retreives a subAlignment
+      * @param labels the labels of the <code>SymbolLists</code> to be in the Alignment
+      * @param min the left most coordinate
+      * @param max the right most coordinate
+      * @return an Alignment
+      * @throws NoSuchElementException if one of the values in <code>labels</code> is not in the parent alignment
+      */
+    public Alignment subAlignment(Set labels, int min, int max) throws NoSuchElementException{
+       return subAlignment(labels, LocationTools.makeLocation(min, max));
+    }
 
     public SortedSet orderedLables(Comparator comp){
         TreeSet orderedSet = new TreeSet(comp);
@@ -269,25 +287,9 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
             return new RangeLocation(min,max);
         }
 
-        /**
-         * Retreives a subAlignment
-         * @param labels the labels of the <code>SymbolLists</code> to be in the Alignment
-         * @param min the left most coordinate
-         * @param max the right most coordinate
-         * @return an Alignment
-         * @throws NoSuchElementException if one of the values in <code>labels</code> is not in the parent alignment
-         */
-        public Alignment subAlignment(Set labels, int min, int max) throws NoSuchElementException{
-          return subAlignment(labels, LocationTools.makeLocation(min, max));
-        }
 
-        /**
-         * Retrieves a subalignment specified by the location.
-         * <p><b>WARNING:</b> It is assumed that the location is contiguous. If
-         * the location is non-contiguous it may be preferable to use a block iterator
-         * to retrieve each sub location independently.
-         * @see subAlignment(Set labels, int min, int max)
-         */
+
+
         public Alignment subAlignment(Set labels, Location loc) throws NoSuchElementException{
             int min = realPosition(loc.getMin());
             int max = realPosition(loc.getMax());
