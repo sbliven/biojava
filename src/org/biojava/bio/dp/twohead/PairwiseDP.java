@@ -295,9 +295,10 @@ public class PairwiseDP extends DP implements Serializable {
     int dj = ali.length()+1;
     for(BackPointer bpi = bp.back; bpi != TERMINAL_BP; bpi = bpi.back) {
       scoreA[di] = bpi.score;
-      if(!(bpi.state instanceof EmissionState)) {
-        gappedAli.addGapInSource(dj);
+      if(bpi.state instanceof EmissionState) {
         dj--;
+      } else {
+        gappedAli.addGapInSource(dj);
       }
       di--;
     }
