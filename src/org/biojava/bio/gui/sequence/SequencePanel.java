@@ -64,6 +64,7 @@ extends JComponent
 implements SwingConstants,
 SequenceRenderContext,
 Changeable {
+  private static final double FUDGE_OFFSET = 50.0;
   public static final ChangeType RENDERER = new ChangeType(
     "The renderer for this SequencePanel has changed",
     "org.biojava.bio.gui.sequence.SequencePanel",
@@ -92,7 +93,7 @@ Changeable {
         return;
       }
 
-      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
 
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
@@ -110,7 +111,7 @@ Changeable {
         return;
       }
 
-      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
 
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
@@ -128,7 +129,7 @@ Changeable {
         return;
       }
 
-      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
 
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
@@ -155,7 +156,7 @@ Changeable {
         return;
       }
 
-      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
 
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
@@ -173,7 +174,7 @@ Changeable {
         return;
       }
 
-      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
 
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
@@ -405,7 +406,7 @@ Changeable {
     
     // do a transform to offset drawing to the neighbourhood of zero.
     // the 50 here is pretty arbitrary.  The precise value doesn't matter
-    setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+    setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
 
     double minAcross = sequenceToGraphics(range.getMin()) -
                        renderer.getMinimumLeader(this);

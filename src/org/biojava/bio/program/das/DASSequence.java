@@ -503,7 +503,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 			// Assume that this is non-cannonical.  Maybe not a great thing to
 			// do, but...
 		    } else {
-			asl.putComponent(loc, cf);
+			asl.putComponent(cf);
 			coverage = LocationTools.union(coverage, loc);
 		    }
 		}

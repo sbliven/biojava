@@ -64,8 +64,8 @@ public class AssembledSymbolList extends AbstractSymbolList {
 	length = len;
     }
 
-    public void putComponent(Location loc, ComponentFeature f) {
-	components.put(loc, f);
+    public void putComponent(ComponentFeature f) {
+	components.put(f.getLocation(), f);
 	componentList.clear();
 	componentList.addAll(components.keySet());
     }
