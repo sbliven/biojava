@@ -151,7 +151,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
         for (Iterator fhi = featureHolders.iterator(); fhi.hasNext(); ) {
             FeatureHolder fh = (FeatureHolder) fhi.next();
             FeatureFilter mf = fh.getSchema();
-            if (recurse) {
+            if (recurse && !FilterUtils.areProperSubset(mf, FeatureFilter.leaf)) {
                 if (FilterUtils.areDisjoint(new FeatureFilter.Or(mf, new FeatureFilter.ByAncestor(mf)),
                                             ff)) 
                 {

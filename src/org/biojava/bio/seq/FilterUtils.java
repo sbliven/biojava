@@ -115,6 +115,8 @@ public class FilterUtils {
      */
 
     public static boolean areDisjoint(FeatureFilter a, FeatureFilter b) {
+        // System.err.println("Disjunction test of " + a + " | " + b);
+        
       // Preconditions
       
       if (a == null) {
