@@ -91,7 +91,7 @@ public abstract class DBHelper {
     }
 
     public static final DeleteStyle DELETE_POSTGRESQL = new DeleteStyle("Postgresql");
-    public static final DeleteStyle DELETE_MYSQL4 = new DeleteStyle("Mysql 4.02 or later");
+    public static final DeleteStyle DELETE_MYSQL4 = new DeleteStyle("Mysql 4.0.* or later");
     public static final DeleteStyle DELETE_GENERIC = new DeleteStyle("Portable SQL");
 
 

@@ -45,8 +45,11 @@ public class MySQLDBHelper extends DBHelper {
         try {
             DatabaseMetaData metadata = connection.getMetaData();
             int major = metadata.getDatabaseMajorVersion();
+						// Minor version irrelevant as returns 0 for 4.0.*
+						// Actually need subminor version which not in metadata
+						// Could parse from getDatabaseProductVersion() string if really needed
             int minor = metadata.getDatabaseMinorVersion();
-            if ((major > 4) || ((major == 4) && (minor >= 2))) {
+            if ((major > 4) || ((major == 4) && (minor >= 0))) {
                 deleteStyle = DELETE_MYSQL4;
             }
         } catch (SQLException e) {
