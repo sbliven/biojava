@@ -207,6 +207,9 @@ public class DistributionLogo extends JComponent {
    */
   public static double entropy(Distribution dist, Symbol s) throws IllegalSymbolException {
     double p = dist.getWeight(s);
+    if (p == 0.0) {
+        return 0;
+    }
     double lp = Math.log(p);
 
     return -p * lp / bits;
