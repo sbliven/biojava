@@ -145,6 +145,11 @@ final public class LocationTools {
     }
   }
 
+    /**
+     * Return <code>true</code> iff <code>locB</code> is contained
+     * entirely within <code>locA</code>.
+     */
+
   public static boolean contains(Location locA, Location locB) {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
