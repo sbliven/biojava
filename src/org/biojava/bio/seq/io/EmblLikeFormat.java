@@ -52,6 +52,16 @@ import org.biojava.bio.seq.*;
 
 public class EmblLikeFormat implements SequenceFormat, Serializable
 {
+    static
+    {
+	Set validFormats = new HashSet();
+	validFormats.add("Embl");
+	// validFormats.add("SwissProt");
+
+	SequenceFormat.FORMATS.put(EmblLikeFormat.class.getName(),
+				   validFormats);
+    }
+
     private boolean elideSymbols = false;
 
     /**
@@ -175,15 +185,46 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
     public void writeSequence(Sequence seq, PrintStream os)
 	throws IOException
     {
-	
+	try
+	{
+	    String defaultFormat = getDefaultFormat();
+	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(defaultFormat);
+	    
+	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
+	}
+	catch (BioException bex)
+	{
+	    bex.printStackTrace();
+	}
     }
 
     public void writeSequence(Sequence seq, String format, PrintStream os)
 	throws IOException
     {
+	String requestedFormat = new String(format);
+	boolean          found = false;
+
 	try
 	{
-	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(format);
+	    String [] formats = (String []) getFormats().toArray(new String[0]);
+
+	    // Allow client programmers to use whichever case they like	    
+	    for (int i = 0; i < formats.length; i++)
+	    {
+		if (formats[i].equalsIgnoreCase(format))
+		{
+		    requestedFormat = formats[i];
+		    found = true;
+		}
+	    }
+
+	    if (! found)
+		throw new BioException("An invalid file format '"
+				       + format
+				       + "' was requested");
+
+	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(requestedFormat);
+	    former.setPrintStream(os);
 
 	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
 	}
@@ -191,5 +232,15 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 	{
 	    bex.printStackTrace();
 	}
+    }
+
+    public Set getFormats()
+    {
+	return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
+    }
+
+    public String getDefaultFormat()
+    {
+	return "Embl";
     }
 }

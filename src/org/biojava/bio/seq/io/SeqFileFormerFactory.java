@@ -36,14 +36,6 @@ public abstract class SeqFileFormerFactory
 {
     private static Map factories = new HashMap();
 
-    // FIXME - Registration of valid (and default) formers for each
-    // SequenceFormat implementation needs to be done somewhere
-    // sensible.
-
-    // This is an array of any and all formats and is used to fix the
-    // case of the format name
-    private static String [] formats = { "Embl" };
-
     /**
      * <code>addFactory</code> installs the static factories
      * subclassed from <code>SeqFileFormerFactory</code> into its
@@ -74,17 +66,11 @@ public abstract class SeqFileFormerFactory
      * @return a <code>SeqFileFormer</code> object.
      *
      * @exception BioException if a non-existent file format is
-     * requested.  */
+     * requested.
+     */
     public static final SeqFileFormer makeFormer(String format)
 	throws BioException
     {
-	// Allow client programmers to use whichever case they like
-	for (int i = 0; i < formats.length; i++)
-	{
-	    if (formats[i].equalsIgnoreCase(format))
-		format = formats[i];
-	}
-
 	// If there is no Factory for this format load the class
 	// dynamically
 	if (! factories.containsKey(format))

@@ -77,7 +77,7 @@ implements Serializable {
     private RangeResolver resolver;
   
   /**
-   * Create a new FuzzyLocation that decorates 'parent' with a potentialy
+   * Create a new FuzzyLocation that decorates 'parent' with a potentially
    * fuzzy min or max value.
    *
    * @param outerMin the lower bound on the location's min value.  Integer.MIN_VALUE indicates
@@ -147,6 +147,15 @@ implements Serializable {
     return outerMax != Integer.MAX_VALUE;
   }
   
+    public String toString()
+    {
+	return "["
+	    + (hasBoundedMin() ? Integer.toString(getMin()) : "<" + Integer.toString(getMin()))
+	    + ", "
+	    + (hasBoundedMax() ? Integer.toString(getMax()) : ">" + Integer.toString(getMax()))
+	    + "]";
+    }
+
   public static interface RangeResolver {
     public int resolveMin(FuzzyLocation loc);
     public int resolveMax(FuzzyLocation loc);

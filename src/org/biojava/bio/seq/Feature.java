@@ -22,6 +22,7 @@
 package org.biojava.bio.seq;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -132,5 +133,19 @@ public interface Feature extends FeatureHolder, Annotatable {
       public String type;
       public String source;
       public Annotation annotation;
+    }
+
+    public static final ByLocationComparator byLocationOrder =
+	new ByLocationComparator();
+
+    public static final class ByLocationComparator implements Comparator
+    {
+	public int compare(Object o1, Object o2)
+	{
+	    Feature f1 = (Feature) o1;
+	    Feature f2 = (Feature) o2;
+
+	    return f1.getLocation().getMin() - f2.getLocation().getMin();
+	}
     }
 }

@@ -28,14 +28,7 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
-/**
- * <code>EmblFileFormer</code> performs the detailed formatting of
- * EMBL entries for writing to a PrintStream.
- *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @since 1.2
- */
-public class EmblFileFormer implements SeqFileFormer
+public class GenbankFileFormer implements SeqFileFormer
 {
     private static String featureDataFile =
 	"org/biojava/bio/seq/io/FeatureQualifier.xml";
@@ -47,7 +40,7 @@ public class EmblFileFormer implements SeqFileFormer
 
     static
     {
-	SeqFileFormerFactory.addFactory("Embl", new EmblFileFormer.Factory());
+	SeqFileFormerFactory.addFactory("Genbank", new GenbankFileFormer.Factory());
 
 	// This loads an xml file containing information on which
 	// qualifiers are valid (or even mandatory) for a particular
@@ -60,25 +53,13 @@ public class EmblFileFormer implements SeqFileFormer
     {
 	protected SeqFileFormer make()
 	{
-	    return new EmblFileFormer(System.out);
+	    return new GenbankFileFormer(System.out);
 	}
     }
 
-    /**
-     * Private <code>EmblFileFormer</code> constructor. Instances are
-     * made by the polymorphic factory object
-     * <code>SeqFileFormerFactory</code>.
-     */
-    private EmblFileFormer() { }
+    private GenbankFileFormer() { }
 
-    /**
-     * Creates a new <code>EmblFileFormer</code> object. Instances are
-     * made by the polymorphic factory object
-     * <code>SeqFileFormerFactory</code>.
-     *
-     * @param stream a <code>PrintStream</code> object.
-     */
-    private EmblFileFormer(PrintStream stream)
+    private GenbankFileFormer(PrintStream stream)
     {
 	this.stream = stream;
     }
@@ -153,13 +134,11 @@ public class EmblFileFormer implements SeqFileFormer
 	    }
 	}
 
-	StringBuffer sq = new StringBuffer("XX\nSQ   Sequence ");
-	sq.append(length + " BP; ");
-	sq.append(aCount + " A; ");
-	sq.append(cCount + " C; ");
-	sq.append(gCount + " G; ");
-	sq.append(tCount + " T; ");
-	sq.append(oCount + " other;");
+	StringBuffer sq = new StringBuffer("BASE COUNT    ");
+	sq.append(aCount + " a ");
+	sq.append(aCount + " c ");
+	sq.append(aCount + " g ");
+	sq.append(aCount + " t\nORIGIN\n");
 
 	// Print sequence summary header
 	stream.println(sq.toString());
@@ -195,11 +174,11 @@ public class EmblFileFormer implements SeqFileFormer
 	    System.arraycopy(syms, (i * 60), sa, 0, len);
 
 	    String blocks = (SeqFormatTools.formatTokenBlock(sa, 10)).toString();
-	    sb.replace(5, blocks.length() + 5, blocks);
+	    sb.replace(10, blocks.length() + 10, blocks);
 
 	    // Calculate the running residue count and add to the line
-	    String count = Integer.toString((i * 60) + len);
-	    sb.replace((80 - count.length()), 80, count);
+	    String count = Integer.toString((i * 60) + 1);
+	    sb.replace((9 - count.length()), 9, count);
 
 	    // Print formatted sequence line
 	    stream.println(sb);
@@ -209,19 +188,19 @@ public class EmblFileFormer implements SeqFileFormer
 	stream.println("//");
     }
 
+
     public void addSequenceProperty(Object key,
 				    Object value)
 	throws ParseException
     {
 	// stream.println("Key: " + key + " Value: " + value);
 
-	if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
+	if (key.equals(GenbankProcessor.PROPERTY_GENBANK_ACCESSIONS))
 	{
-	    StringBuffer sb = new StringBuffer("AC   ");
+	    StringBuffer sb = new StringBuffer("ACCESSION   ");
 	    for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
 	    {
 		sb.append((String) ai.next());
-		sb.append(";");
 	    }
 	    stream.println(sb);
 	}
@@ -230,8 +209,8 @@ public class EmblFileFormer implements SeqFileFormer
     public void startFeature(Feature.Template templ)
 	throws ParseException
     {
-	// There are 19 spaces in the leader
-	String leader = "FT                   ";
+	// There are 21 spaces in the leader
+	String leader = "                     ";
 	int    strand = 0;
 
 	if (templ instanceof StrandedFeature.Template)
@@ -255,8 +234,8 @@ public class EmblFileFormer implements SeqFileFormer
 				   Object value)
 	throws ParseException
     {
-	// There are 19 spaces in the leader
-	String   leader = "FT                   ";
+	// There are 21 spaces in the leader
+	String   leader = "                     ";
 	StringBuffer tb = new StringBuffer("/" + key);
 
         String form = (String) ((Map) qualifierData.get(key)).get("form");

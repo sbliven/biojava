@@ -40,7 +40,7 @@ import org.biojava.bio.seq.*;
  * don't need any knowledge of the specific implementation of Sequence
  * they are reading or writing. E.g. it should be possible to
  * parameterise readSequence to read from a Genbank stream and
- * construct ensembl corba objects, just by specifying an ensembl
+ * construct Ensembl CORBA objects, just by specifying an Ensembl
  * SequenceFactory.</p>
  *
  * @author Matthew Pocock
@@ -51,17 +51,42 @@ import org.biojava.bio.seq.*;
 public interface SequenceFormat
 {
     /**
-     * Write out a sequence to the specified printstream.
+     * <p>This is where the various SequenceFormat implementations
+     * should register the names of the formats they are able to
+     * write. The Map key should be the implementation's classname and
+     * the values a Set of Strings describing the formats.</p>
+     *
+     * <p>E.g. org.biojava.bio.seq.io.EmblLikeFormat</p>
+     *
+     * <ul>
+     * <li>Key: org.biojava.bio.seq.io.EmblLikeFormat</li>
+     * <li>Values: "Embl", "Swissprot"</li>
+     * </ul>
+     *
+     * <p>When writeSequence() is called with the format argument
+     * "EMBL" (the parameter is not case-sensitive) the
+     * <code>SeqFileFormerFactory</code> checks the values registered
+     * here against the argument. As the format "Embl" is registered,
+     * it attempts to load a class named "EmblFileFormer". If
+     * successful, the factory method returns an instance of this
+     * class and writeSequence() uses this to write formatted strings
+     * to the PrintStream.</p>
+     */
+    public static final Map FORMATS = new HashMap();
+
+    /**
+     * <code>writeSequence</code> writes a sequence to the specified
+     * PrintStream, using the default format.
      *
      * @param seq the sequence to write out.
      * @param os the printstream to write to.
      */
-    void writeSequence(Sequence seq, PrintStream os)
+    public void writeSequence(Sequence seq, PrintStream os)
 	throws IOException;
 
     /**
-     * <code>writeSequence</code> writes a sequence to a specified
-     * PrintStream in a specified format.
+     * <code>writeSequence</code> writes a sequence to the specified
+     * PrintStream, using the specified format.
      *
      * @param seq a <code>Sequence</code> to write out.
      * @param format a <code>String</code> indicating which sub-format
@@ -70,13 +95,13 @@ public interface SequenceFormat
      * writing. E.g. when writing a sequence using the EmblLikeFormat
      * implementation, choices will be 'EMBL', 'SwissProt' etc. The
      * available choices may be obtained calling the
-     * <code>getFormatNames</code> method on a
-     * <code>SequenceFormat</code> instance.
+     * <code>getFormats</code> method on a <code>SequenceFormat</code>
+     * instance.
      * @param os a <code>PrintStream</code> object.
      *
      * @exception IOException if an error occurs.
      */
-    void writeSequence(Sequence seq, String format, PrintStream os)
+    public void writeSequence(Sequence seq, String format, PrintStream os)
 	throws IOException;
     
     /**
@@ -88,8 +113,8 @@ public interface SequenceFormat
      * @param listener A listener to notify when data is extracted
      * from the stream.
      *
-     * @return a boolean indicating whether or not the stream
-     * contains any more sequences.
+     * @return a boolean indicating whether or not the stream contains
+     * any more sequences.
      *
      * @throws IOException if an error occurs while reading from the
      * stream.
@@ -103,4 +128,8 @@ public interface SequenceFormat
 				SymbolParser   symParser,
 				SeqIOListener  listener)
 	throws BioException, IllegalSymbolException, IOException;
+
+    public Set getFormats();
+
+    public String getDefaultFormat();
 }

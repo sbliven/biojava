@@ -32,19 +32,29 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
 /**
- * Format object representing FASTA files.  These files are almost
- * pure sequence data.  The only `sequence property' reported by
- * this parser is PROPERTY_DESCRIPTIONLINE, which is the contents
- * of the sequence's description line (the line starting with a
- * '>' character).  Normally, the first word of this is a sequence
- * ID.  If you wish it to be interpretted as such, you should
- * use FastaDescriptionLineParser as a SeqIO filter.
+ * Format object representing FASTA files. These files are almost pure
+ * sequence data. The only `sequence property' reported by this parser
+ * is PROPERTY_DESCRIPTIONLINE, which is the contents of the
+ * sequence's description line (the line starting with a '>'
+ * character). Normally, the first word of this is a sequence ID. If
+ * you wish it to be interpreted as such, you should use
+ * FastaDescriptionLineParser as a SeqIO filter.
  *
  * @author Thomas Down
  * @author Matthew Pocock
  */
 
 public class FastaFormat implements SequenceFormat, Serializable {
+
+    static
+    {
+	Set validFormats = new HashSet();
+	validFormats.add("Fasta");
+
+	SequenceFormat.FORMATS.put(FastaFormat.class.getName(),
+				   validFormats);
+    }
+
     /**
      * Constant string which is the property key used to notify
      * listeners of the description lines of FASTA sequences.
@@ -154,9 +164,9 @@ public class FastaFormat implements SequenceFormat, Serializable {
     }
 
     /**
-     * Return a suitable description line for a Sequence.  If the sequence's
-     * annotation bundle contains PROPERTY_DESCRIPTIONLINE, this is used verbatim.
-     * Otherwise, the sequence's name is used.
+     * Return a suitable description line for a Sequence. If the
+     * sequence's annotation bundle contains PROPERTY_DESCRIPTIONLINE,
+     * this is used verbatim.  Otherwise, the sequence's name is used.
      */
 
     protected String describeSequence(Sequence seq) {
@@ -192,5 +202,15 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	throws IOException
     {
 
+    }
+
+    public Set getFormats()
+    {
+	return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
+    }
+
+    public String getDefaultFormat()
+    {
+	return "Fasta";
     }
 }

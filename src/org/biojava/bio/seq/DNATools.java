@@ -96,7 +96,7 @@ public final class DNATools {
    * @param dna a <span class="type">String</span> to parse into DNA
    * @return a <span class="type">SymbolList</span> created form
    *         <span class="arg">dna</span>
-   * @throws IllegalSymbolException if  <span class="arg">dna</span> contains
+   * @throws IllegalSymbolException if <span class="arg">dna</span> contains
    *         any non-DNA characters
    */
   public static SymbolList createDNA(String dna)
@@ -110,13 +110,17 @@ public final class DNATools {
   }
   
   /**
-   * Return an integer index for a symbol - compatible with forIndex.
-   * <P>
-   * The index for a symbol is stable accross virtual machines & invocations.
+   * Return an integer index for a symbol - compatible with
+   * <code>forIndex</code>.
+   *
+   * <p>The index for a symbol is stable accross virtual machines &
+   * invocations.</p>
    *
    * @param sym  the Symbol to index
-   * @return     the index for that symbol
-   * @throws IllegalSymbolException if sym is not a member of the DNA alphabet
+   * @return the index for that symbol
+   *
+   * @throws IllegalSymbolException if sym is not a member of the DNA
+   * alphabet
    */
   public static int index(Symbol sym) throws IllegalSymbolException {
     if(sym == a) {
@@ -134,12 +138,14 @@ public final class DNATools {
   }
   
   /**
-   * Return the symbol for an index - compatible with index.
-   * <P>
-   * The index for a symbol is stable accross virtual machines & invocations.
+   * Return the symbol for an index - compatible with <code>index</code>.
+   *
+   * <p>The index for a symbol is stable accross virtual machines &
+   * invocations.</p>
    *
    * @param index  the index to look up
    * @return       the symbol at that index
+   *
    * @throws IndexOutOfBoundsException if index is not between 0 and 3
    */
   static public Symbol forIndex(int index)

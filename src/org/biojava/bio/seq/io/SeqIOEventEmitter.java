@@ -53,12 +53,14 @@ public class SeqIOEventEmitter
 
 	    // Recurse through sub feature tree, flattening it for
 	    // EMBL
-	    List sf = getSubFeatures(seq);
+	    List subs = getSubFeatures(seq);
+	    Collections.sort(subs, Feature.byLocationOrder);
 
-	    for (Iterator ti = sf.iterator(); ti.hasNext();)
-	    {
+	    for (Iterator fi = subs.iterator(); fi.hasNext();)
+	    {		
 		// The template is required to call startFeature
-		Feature.Template t = ((Feature) ti.next()).makeTemplate();
+		Feature.Template t =
+		    ((Feature) fi.next()).makeTemplate();
 
 		// Inform listener of feature start
 		listener.startFeature(t);
@@ -101,6 +103,7 @@ public class SeqIOEventEmitter
 	for (Iterator fi = fh.features(); fi.hasNext();)
 	{
 	    FeatureHolder sfh = (FeatureHolder) fi.next();
+
 	    subfeat.addAll((Collection) getSubFeatures(sfh));
 	    subfeat.add(sfh);
 	}
