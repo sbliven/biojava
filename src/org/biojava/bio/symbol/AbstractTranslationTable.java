@@ -43,8 +43,12 @@ abstract class AbstractTranslationTable implements TranslationTable
     public abstract Alphabet getTargetAlphabet();
     /**
      * this method is expected to translate any symbol
-     * in the source alphabet.  Failure results in returning
-     * a null.
+     * in the source alphabet.  Failure can be indicated
+     * by returning a null if, for example, your method
+     * only handles AtomicSymbols and you want BasisSymbols
+     * to be taken apart.  If you are sure the symbol is
+     * illegal, you can throw the IllegalSymbolException
+     * immediately to bypass further processing.
      * <p>
      * As an optimisation, if your method is capable of
      * immediately translating an ambiguity Symbol, just
@@ -52,7 +56,7 @@ abstract class AbstractTranslationTable implements TranslationTable
      * the translation through doing an ambiguity
      * lookup will be avoided.
      */
-    protected abstract Symbol doTranslate(Symbol sym);
+    protected abstract Symbol doTranslate(Symbol sym) throws IllegalSymbolException;
 
     public Symbol translate(final Symbol sym)
     throws IllegalSymbolException {
@@ -63,6 +67,8 @@ abstract class AbstractTranslationTable implements TranslationTable
         if(s == null) {
             if(sym instanceof AtomicSymbol) { //changed this from s to sym, since we already checked and s is null
                 getSourceAlphabet().validate(sym);
+
+                // the symbol was valid and still we can't handle it, bail out!
                 throw new IllegalSymbolException("Unable to map " + sym.getName());
             } else {
                 if(sym == null) {

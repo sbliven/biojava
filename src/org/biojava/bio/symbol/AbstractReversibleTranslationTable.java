@@ -37,16 +37,21 @@ import java.util.HashSet;
  * @author Mark Schreiber
  * @author David Huen (refactoring)
  */
-abstract class AbstractReversibleTranslationTable 
+public abstract class AbstractReversibleTranslationTable 
     extends AbstractTranslationTable 
     implements ReversibleTranslationTable
 {
     public abstract Alphabet getSourceAlphabet();
     public abstract Alphabet getTargetAlphabet();
     /**
-     * this method is expected to translate any symbol
-     * in the source alphabet.  Failure results in returning
-     * a null.
+     * this method is expected to reverse-translate any symbol
+     * in the source alphabet.  Failure can be indicated
+     * by returning a null if, for example, your method
+     * only handles AtomicSymbols and you want BasisSymbols
+     * to be taken apart.  If you are sure the symbol is
+     * illegal, you can throw the IllegalSymbolException
+     * immediately to bypass further processing.
+
      * <p>
      * As an optimisation, if your method is capable of
      * immediately translating an ambiguity Symbol, just
@@ -54,7 +59,7 @@ abstract class AbstractReversibleTranslationTable
      * the translation through doing an ambiguity
      * lookup will be avoided.
      */
-    protected abstract Symbol doUntranslate(Symbol sym);
+    protected abstract Symbol doUntranslate(Symbol sym) throws IllegalSymbolException;
 
     public Symbol untranslate(final Symbol sym)
     throws IllegalSymbolException {
@@ -65,6 +70,8 @@ abstract class AbstractReversibleTranslationTable
         if(s == null) {
             if(sym instanceof AtomicSymbol) { //changed this from s to sym, since we already checked and s is null
                 getSourceAlphabet().validate(sym);
+
+                // the symbol was valid and still we can't handle it, bail out!
                 throw new IllegalSymbolException("Unable to map " + sym.getName());
             } else {
                 if(sym == null) {
