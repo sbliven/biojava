@@ -133,9 +133,9 @@ class MappedDataStore implements DataStore {
       int word = PackingFactory.primeWord(symList, wordLength, packing);
       listener.startSearch(seqID);
       fireHits(word, 1, listener);
-      for(int j = wordLength + 2; j <= symList.length(); j++) {
+      for(int j = wordLength + 1; j <= symList.length(); j++) {
         word = PackingFactory.nextWord(symList, word, j, wordLength, packing);
-        fireHits(word, j - wordLength, listener);
+        fireHits(word, j - wordLength + 1, listener);
       }
       listener.endSearch(seqID);
     } catch (IllegalSymbolException ise) {

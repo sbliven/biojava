@@ -141,7 +141,7 @@ implements DataStoreFactory {
         int word = PackingFactory.primeWord(seq, wordLength, packing);
         //PackingFactory.binary(word);
         addCount(hashTable, word);
-        for(int j = wordLength+2; j <= seq.length(); j++) {
+        for(int j = wordLength + 1; j <= seq.length(); j++) {
           word = PackingFactory.nextWord(seq, word, j, wordLength, packing);
           //PackingFactory.binary(word);
           addCount(hashTable, word);
@@ -260,9 +260,9 @@ implements DataStoreFactory {
           // write k-mer seq,offset
           int word = PackingFactory.primeWord(seq, wordLength, packing);
           writeRecord(hashTable, hitTable, 1, seqNumber, word);
-          for(int j = wordLength+2; j <= seq.length(); j++) {
+          for(int j = wordLength+1; j <= seq.length(); j++) {
             word = PackingFactory.nextWord(seq, word, j, wordLength, packing);
-            writeRecord(hashTable, hitTable, j - wordLength, seqNumber, word);
+            writeRecord(hashTable, hitTable, j - wordLength + 1, seqNumber, word);
           }
         } catch (BufferOverflowException e) {
           System.out.println("name:\t" + seq.getName());

@@ -13,17 +13,21 @@ import org.biojava.bio.symbol.*;
  * MappedDataStoreFactory.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
-class MappedDataStore implements DataStore {
+
+class CompactedDataStore implements DataStore {
   private final Packing packing;
   private final int wordLength;
   private final IntBuffer hashTable;
   private final MappedByteBuffer hitTable;
   private final IntBuffer nameArray;
   private final MappedByteBuffer nameTable;
+  private final int numSequences;
   
-  MappedDataStore(File dataStoreFile)
-  throws IOException {
+  CompactedDataStore(File dataStoreFile)
+      throws IOException 
+  {
     FileChannel channel = new FileInputStream(dataStoreFile).getChannel();
     
     MappedByteBuffer rootBuffer = channel.map(
@@ -99,6 +103,8 @@ class MappedDataStore implements DataStore {
     );
     nameArray_MB.position(0);
     int nameArraySize = nameArray_MB.getInt();
+    numSequences = nameArraySize / 8;
+    // System.err.println("numSequences: " + numSequences);
     nameArray = channel.map(
       FileChannel.MapMode.READ_ONLY,
       nameArrayPos + 4,
@@ -133,6 +139,7 @@ class MappedDataStore implements DataStore {
       int word = PackingFactory.primeWord(symList, wordLength, packing);
       listener.startSearch(seqID);
       fireHits(word, 1, listener);
+      System.err.println("Foo");
       for(int j = wordLength + 1; j <= symList.length(); j++) {
         word = PackingFactory.nextWord(symList, word, j, wordLength, packing);
         fireHits(word, j - wordLength + 1, listener);
@@ -154,13 +161,48 @@ class MappedDataStore implements DataStore {
     return sbuff.toString();
   }
   
+    private int seqIDForPos(int pos) {
+	if (numSequences == 1) {
+	    return 0;
+	} else {
+	    int maxBound = numSequences - 1;
+	    int minBound = 0;
+
+	    while (true) {
+		int mid = (minBound + maxBound) / 2;
+		int offset = nameArray.get((mid * 2) + 1);
+		int endOffset = Integer.MAX_VALUE;
+		if (mid < (numSequences - 1)) {
+		    endOffset = nameArray.get((mid * 2) + 3);
+		}
+		if (pos > offset && pos < endOffset) {
+		    return mid * 2;
+		} else if (pos < offset) {
+		    maxBound = mid - 1;
+		} else if (pos > endOffset) {
+		    minBound = mid + 1;
+		} else {
+		    throw new Error("Ooops");
+		}
+	    }
+	}
+    }
+
+    private int offsetForID(int id) {
+	if (numSequences == 1) {
+	    return 0;
+	} else {
+	    return nameArray.get(id + 1);
+	}
+    }
+
   private void fireHits(
     int word,
     int offset,
     SearchListener listener
   ) {
     int hitOffset = hashTable.get(word);
-    if(hitOffset != -1) {
+    if(hitOffset >= 0) {
       try {
         hitTable.position(hitOffset);
       } catch (IllegalArgumentException e) {
@@ -173,13 +215,18 @@ class MappedDataStore implements DataStore {
       int hits = hitTable.getInt();
       
       for(int i = 0; i < hits; i++) {
-        listener.hit(
-        hitTable.getInt(),
-        offset,
-        hitTable.getInt(),
-        wordLength
-        );
+	  int pos = hitTable.getInt();
+	  int id = seqIDForPos(pos);
+
+	  listener.hit(
+		       id,
+		       offset,
+		       pos - offsetForID(id),
+		       wordLength
+		      );
       }
+    } else if (hitOffset == -2) {
+	System.err.println("Hit an elided word!");
     }
   }
 }

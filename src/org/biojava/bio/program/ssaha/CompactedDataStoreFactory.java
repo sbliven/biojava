@@ -40,8 +40,12 @@ import org.biojava.utils.Constants;
  *
  *  nameArray:
  *    int nameArrayLength,
- *    int[nameArrayLength] nameArray // byte offset into nameTable
+ *    int[nameArrayLength] nameRecord // byte offset into nameTable
  *
+ *  nameRecord:
+ *    int nameTableOffset
+ *    int sequenceStartOffset
+ * 
  *  nameTable:
  *    int nameTableSize, // size in bytes
  *    (short nameLength, char[nameLength] name)[nameTableSize] names
@@ -55,18 +59,19 @@ import org.biojava.utils.Constants;
  *    hitRecord[hitCount] hit
  *
  *  hit:
- *    int seqIndex, // index into nameArray
  *    int offset    // offset into the sequence
  * </pre>
  * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
-public class MappedDataStoreFactory
-implements DataStoreFactory {
+
+public class CompactedDataStoreFactory implements DataStoreFactory {
   public DataStore getDataStore(File storeFile)
-  throws IOException {
-    return new MappedDataStore(storeFile);
+      throws IOException 
+  {
+      return new CompactedDataStore(storeFile);
   }
   
   public DataStore buildDataStore(
@@ -126,6 +131,8 @@ implements DataStoreFactory {
     }
     hashTable.position(0);
     
+    // System.err.println("And so it begins...");
+
     // 1st pass
     // writes counts as ints for each k-tuple
     // count up the space required for sequence names
@@ -141,7 +148,7 @@ implements DataStoreFactory {
         int word = PackingFactory.primeWord(seq, wordLength, packing);
         //PackingFactory.binary(word);
         addCount(hashTable, word);
-        for(int j = wordLength + 1; j <= seq.length(); j++) {
+        for(int j = wordLength+1; j <= seq.length(); j++) {
           word = PackingFactory.nextWord(seq, word, j, wordLength, packing);
           //PackingFactory.binary(word);
           addCount(hashTable, word);
@@ -152,7 +159,7 @@ implements DataStoreFactory {
     // map the space for sequence index->name
     //
     nameArrayPos = hashTablePos + hashTableSize;
-    int nameArraySize = (seqCount + 1) * Constants.BYTES_IN_INT;
+    int nameArraySize = ((seqCount * 2) + 1) * Constants.BYTES_IN_INT;
     //System.out.println("seqCount:\t" + seqCount);
     //System.out.println("nameArraySize:\t" + nameArraySize);
     final MappedByteBuffer nameArray_MB = channel.map(
@@ -195,7 +202,7 @@ implements DataStoreFactory {
     hitTablePos = nameTablePos + nameTableSize;
     long hitTableSize =
       (long) Constants.BYTES_IN_INT +                            // size
-      (long) kmersUsed * (Constants.BYTES_IN_INT + Constants.BYTES_IN_INT) +  // list elements
+      (long) kmersUsed * (Constants.BYTES_IN_INT) +              // list elements
       (long) hitCount * Constants.BYTES_IN_INT;                  // size of lists
     //System.out.println("hitTableSize:\t" + hitTableSize);
     //System.out.println("hitTableSize:\t" + (int) hitTableSize);
@@ -223,32 +230,39 @@ implements DataStoreFactory {
         hitTable.putInt(hitOffset + Constants.BYTES_IN_INT, 0); // initialy we have no hits
         hitOffset +=
           Constants.BYTES_IN_INT +
-          counts * (Constants.BYTES_IN_INT + Constants.BYTES_IN_INT);
+          counts * (Constants.BYTES_IN_INT);
         } catch (IndexOutOfBoundsException e) {
           System.out.println("counts:\t" + counts);
           System.out.println("word:\t" + i);
           System.out.println("hitOffset:\t" + hitOffset);
           throw e;
         }
-      } else {
-        // too many hits - set the number of hits to the flag value -1
+      } else if (counts == 0) {
+	// nothing - set the number of hits to the flag value -1
         hashTable.put(i + 1, -1);
+      } else {
+        // too many hits - set the number of hits to the flag value -2
+        hashTable.put(i + 1, -2);
       }
     }
     
+    // System.err.println("Second pass...");
+
     // 2nd parse
     // write sequence array and names
     // write hitTable
     int seqNumber = 0;
     nameTable.position(Constants.BYTES_IN_INT);
+    int concatOffset = 0;
     for(SequenceIterator i = seqDB.sequenceIterator(); i.hasNext(); ) {
       Sequence seq = i.nextSequence();
       
       if(seq.length() > wordLength) {
         try {
           
-          // write sequence name reference into nameArray
-          nameArray.put(seqNumber + 1, nameTable.position()-Constants.BYTES_IN_INT);
+          // write sequence name reference and concatomer offset into nameArray
+	  nameArray.put((seqNumber * 2) + 1, nameTable.position()-Constants.BYTES_IN_INT);
+	  nameArray.put((seqNumber * 2) + 2, concatOffset);
           
           // write sequence name length and chars into nameTable
           String name = seq.getName();
@@ -259,10 +273,10 @@ implements DataStoreFactory {
           
           // write k-mer seq,offset
           int word = PackingFactory.primeWord(seq, wordLength, packing);
-          writeRecord(hashTable, hitTable, 1, seqNumber, word);
+          writeRecord(hashTable, hitTable, 1 + concatOffset, seqNumber, word);
           for(int j = wordLength+1; j <= seq.length(); j++) {
             word = PackingFactory.nextWord(seq, word, j, wordLength, packing);
-            writeRecord(hashTable, hitTable, j - wordLength + 1, seqNumber, word);
+            writeRecord(hashTable, hitTable, j - wordLength + 1 + concatOffset, seqNumber, word);
           }
         } catch (BufferOverflowException e) {
           System.out.println("name:\t" + seq.getName());
@@ -272,6 +286,7 @@ implements DataStoreFactory {
           throw e;
         }
         seqNumber++;
+	concatOffset += (seq.length() + 100);
       }
     }
     
@@ -315,14 +330,13 @@ implements DataStoreFactory {
     int word
   ) {
     int kmerPointer = hashTable.get(word+1);
-    if(kmerPointer != -1) {
+    if(kmerPointer >= 0) {
       kmerPointer += Constants.BYTES_IN_INT;
 
       int hitCount = hitTable.getInt(kmerPointer);
-      int pos = kmerPointer + hitCount * (Constants.BYTES_IN_INT + Constants.BYTES_IN_INT) + Constants.BYTES_IN_INT;
+      int pos = kmerPointer + hitCount * (Constants.BYTES_IN_INT) + Constants.BYTES_IN_INT;
       
       hitTable.position(pos);
-      hitTable.putInt(seqNumber);
       hitTable.putInt(offset);
       hitTable.putInt(kmerPointer, hitCount + 1);
     }
