@@ -443,7 +443,9 @@ public class FilterUtilsTest extends TestCase
       FeatureFilter exSchema = FilterUtils.and(exon, exID);
       FeatureFilter reSchema = FilterUtils.and(repeat, repeatID);
       
-      FeatureFilter dbFilter = FilterUtils.or(tsSchema, FilterUtils.or(exSchema, reSchema));
+      FeatureFilter dbFilter = FilterUtils.or(
+        new FeatureFilter[] { tsSchema, exSchema, reSchema }
+      );
       
       // pull out a feature by transcript.id
       FeatureFilter aTranscript = FilterUtils.byAnnotation("transcript.id", "ts:42");
@@ -459,6 +461,28 @@ public class FilterUtilsTest extends TestCase
       optimizeEquals(FilterUtils.and(dbFilter, aTranscript), FilterUtils.and(transcript, aTranscript));
     }
     
+    public void testAndOrMethods() {
+      checkEquals(
+        FilterUtils.and(FilterUtils.and(tf1, tf2), tf3),
+        FilterUtils.and(new FeatureFilter[] { tf1, tf2, tf3 })
+      );
+
+      checkEquals(
+        FilterUtils.and(tf1, FilterUtils.and(tf2, tf3)),
+        FilterUtils.and(new FeatureFilter[] { tf1, tf2, tf3 })
+      );
+      
+      checkEquals(
+        FilterUtils.or(FilterUtils.or(tf1, tf2), tf3),
+        FilterUtils.or(new FeatureFilter[] { tf1, tf2, tf3 })
+      );
+
+      checkEquals(
+        FilterUtils.or(tf1, FilterUtils.or(tf2, tf3)),
+        FilterUtils.or(new FeatureFilter[] { tf1, tf2, tf3 })
+      );
+    }
+    
     private void optimizeExact(FeatureFilter raw, FeatureFilter target) {
       FeatureFilter result = FilterUtils.optimize(raw);
       assertTrue("optimize: " + raw + " should be " + target + " but is " + result, result == target);
@@ -467,5 +491,9 @@ public class FilterUtilsTest extends TestCase
     private void optimizeEquals(FeatureFilter raw, FeatureFilter target) {
       FeatureFilter result = FilterUtils.optimize(raw);
       assertTrue("optimize: " + raw + " should be " + target + " but is " + result, result.equals(target));
+    }
+    
+    private void checkEquals(FeatureFilter a, FeatureFilter b) {
+      assertTrue("equal: " + a + ", " + b, a.equals(b));
     }
 }

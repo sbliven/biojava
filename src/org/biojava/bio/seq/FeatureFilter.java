@@ -442,17 +442,12 @@ public interface FeatureFilter extends Serializable {
     }
 
     public boolean equals(Object o) {
-      return
-        (o instanceof And) && ((
-          ((And) o).getChild1().equals(this.getChild1()) &&
-          ((And) o).getChild2().equals(this.getChild2())
-        ) || (
-          ((And) o).getChild1().equals(this.getChild2()) &&
-          ((And) o).getChild2().equals(this.getChild1())
-        ));
+      if(o instanceof FeatureFilter) {
+        return FilterUtils.areEqual(this, (FeatureFilter) o);
+      } else {
+        return false;
+      }
     }
-    
-    
 
     public int hashCode() {
       return getChild1().hashCode() ^ getChild2().hashCode();
@@ -534,14 +529,11 @@ public interface FeatureFilter extends Serializable {
     }
 
     public boolean equals(Object o) {
-      return
-        (o instanceof Or) && ((
-          ((Or) o).getChild1().equals(this.getChild1()) &&
-          ((Or) o).getChild2().equals(this.getChild2())
-        ) || (
-          ((Or) o).getChild1().equals(this.getChild2()) &&
-          ((Or) o).getChild2().equals(this.getChild1())
-        ));
+      if(o instanceof FeatureFilter) {
+        return FilterUtils.areEqual(this, (FeatureFilter) o);
+      } else {
+        return false;
+      }
     }
 
     public int hashCode() {
