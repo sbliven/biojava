@@ -16,11 +16,10 @@ public class Dice
 	    rolls[i-1]= new SimpleResidue((char)('0'+i),""+i,Annotation.EMPTY_ANNOTATION);
 	    diceAlphabet.addResidue(rolls[i-1]);
 	}  
-	AbstractState fair= StateFactory.createState(diceAlphabet);
-	AbstractState loaded= StateFactory.createState(diceAlphabet);
-	
-	fair.setName("fair");
-	loaded.setName("loaded");
+  
+  int [] advance = { 1 };
+	AbstractState fair   = StateFactory.createState(diceAlphabet, advance, "fair");
+	AbstractState loaded = StateFactory.createState(diceAlphabet, advance, "loaded");
 	
 	SimpleMarkovModel casino=new SimpleMarkovModel(1, diceAlphabet);
 	casino.addState(fair);
