@@ -52,6 +52,7 @@ public class SimpleCodonPref
     extends AbstractChangeable
     implements CodonPref
 {
+    String name;
     String geneticCodeName;
     Distribution codonPref;
 
@@ -61,15 +62,26 @@ public class SimpleCodonPref
     // codon wobble-based codon preference stats
     Map wobbleDistributions;
 
-    public SimpleCodonPref(String geneticCodeName, Distribution codonPref)
+    public SimpleCodonPref(String geneticCodeName, Distribution codonPref, String name)
         throws IllegalAlphabetException
     {
+        this.name = name;
         this.geneticCodeName = geneticCodeName;
         this.codonPref = codonPref;
 
         // validate the Distribution
         if (codonPref.getAlphabet() != RNATools.getCodonAlphabet())
             throw new IllegalAlphabetException("codon preferences must be over codon alphabet");
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getGeneticCodeName()
+    {
+        return geneticCodeName;
     }
 
     public ManyToOneTranslationTable getGeneticCode()

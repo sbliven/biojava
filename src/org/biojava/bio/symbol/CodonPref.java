@@ -23,6 +23,7 @@ package org.biojava.bio.symbol;
 
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 public interface CodonPref
 {
@@ -32,6 +33,16 @@ public interface CodonPref
      * ii) per residue: codon fraction over all codons (returns a Distribution)
      * iii) per residue: codon fraction per dinucleotide + wobble distribution (returns a WobbleDistribution)
      */
+
+    /**
+     * get name of object
+     */
+    public String getName();
+
+    /**
+     * get the name of the genetic code
+     */
+    public String getGeneticCodeName();
 
     /**
      * the genetic code that this codon
@@ -52,12 +63,14 @@ public interface CodonPref
      * (sums to one over the total number
      * of codons that encode that residue).
      */
-    public Distribution getFrequencyForSynonyms(Symbol residue);
+    public Distribution getFrequencyForSynonyms(Symbol residue) 
+        throws IllegalSymbolException;
 
     /**
      * returns a WobbleDistribution for
      * a specified residue.
      */
-    public WobbleDistribution getWobbleDistributionForSynonyms(Symbol residue);
+    public WobbleDistribution getWobbleDistributionForSynonyms(Symbol residue) 
+        throws IllegalSymbolException;
 }
 
