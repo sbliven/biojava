@@ -36,7 +36,7 @@ import org.biojava.utils.SmallMap;
  *
  * @since 1.2
  * @author Matthew Pocock
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
+ * @author Keith James (docs).
  */
 public class TagMapper {
     private Map tags;

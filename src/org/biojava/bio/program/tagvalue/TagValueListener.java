@@ -9,7 +9,7 @@ import org.biojava.utils.ParserException;
  *
  * <p>
  * This interface is similar in spirit to the SAX interfaces for parsing XML.
- * Many of the methods will always be called in apropreately nested pairs.
+ * Many of the methods will always be called in appropriately nested pairs.
  * Entire records will be bracketed by a startRecord and endRecord pair. Within
  * these, any number of startTag and endTag pairs may be called. Within a
  * tag pair, any number of value invocations may be called. If a value is

@@ -11,8 +11,8 @@ import org.biojava.utils.ParserException;
  * Implementations will tend to intercept the tags or values as they stream
  * through and modify them in some manner before forwarding them to the delegate
  * listener. Using classes derived from TagValueWrapper, it is possible to build
- * up complex chains of handlers that process and cohalate information as it
- * strams through.
+ * up complex chains of handlers that process and collate information as it
+ * streams through.
  * </p>
  *
  * @author Matthew Pocock

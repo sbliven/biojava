@@ -14,11 +14,11 @@ import org.biojava.utils.ParserException;
 public class TagDropper
 extends TagValueWrapper {
   private Set tags;
-  boolean propogate;
+  boolean propagate;
   
   /**
    * Create a new TagDropper that will pass on all retained tags and values to
-   * tvl. Initialy, no tags will be retained.
+   * tvl. Initially, no tags will be retained.
    *
    * @param tvl  the TagValueListener to inform of all surviving events
    */
@@ -30,7 +30,7 @@ extends TagValueWrapper {
   /**
    * Add a tag to retain.
    *
-   * @param tag  a tag that will be forarded to the delegate
+   * @param tag  a tag that will be forwarded to the delegate
    */
   public void addTag(Object tag) {
     tags.add(tag);
@@ -45,25 +45,25 @@ extends TagValueWrapper {
     tags.remove(tag);
   }
   
-  public void statTag(Object tag)
+  public void startTag(Object tag)
   throws ParserException {
-    propogate = tags.contains(tag);
+    propagate = tags.contains(tag);
     
-    if(propogate) {
+    if(propagate) {
       super.startTag(tag);
     }
   }
   
   public void endTag()
   throws ParserException {
-    if(propogate) {
+    if(propagate) {
       super.endTag();
     }
   }
   
   public void value(TagValueContext ctxt, Object value)
   throws ParserException {
-    if(propogate) {
+    if(propagate) {
       super.value(ctxt, value);
     }
   }

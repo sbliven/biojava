@@ -12,7 +12,7 @@ import org.biojava.utils.*;
  * </p>
  *
  * @since 1.2
- * @author Matthew pocock
+ * @author Matthew Pocock
  */
 public class AnnotationBuilder
   implements TagValueListener
@@ -28,12 +28,12 @@ public class AnnotationBuilder
    * </p>
    *
    * <p>
-   * The type is used to provide appropreate accessors for properties. As tag
+   * The type is used to provide appropriate accessors for properties. As tag
    * -value events stream through this TagValueListener, they will be matched
    * against the properties of the annotation type. As sub-trees of events are
-   * pushed, child annotation bundles will be pushed into the apropreate
+   * pushed, child annotation bundles will be pushed into the appropriate
    * properties. If any of the tag-value events are of a type that are not
-   * accepted by the annoataion type, a ClassCastException will be thrown.
+   * accepted by the annotation type, a ClassCastException will be thrown.
    * </p>
    *
    * @param type  the AnnotationType stating what will be built and how

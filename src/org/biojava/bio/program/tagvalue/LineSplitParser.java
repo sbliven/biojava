@@ -23,14 +23,14 @@ import org.biojava.utils.ParserException;
  * <li>trimTag - trim white-space from tags</li>
  * <li>trimValue - trim white-space from values</li>
  * <li>continueOnEmptyTag - if the tag is empty, use the previous tag e.g. this
- * is true for GENBANK files and fase for EMBL files</li>
+ * is true for GENBANK files and false for EMBL files</li>
  * <li>mergeSameTag - if two consecutive tags have the same value, consider
  * their values to be a continuation of a single value so don't fire start/end
  * tag events e.g. true for EMBL</li>
  * </ul>
- * </p>
  *
  * @author Matthew Pocock
+ * @author Keith James (enabled empty line EOR)
  * @since 1.2
  */
 public class LineSplitParser
@@ -38,12 +38,12 @@ public class LineSplitParser
     TagValueParser
 {
   /**
-   * A LineSplitParser pre-configured to process EMBL-stye flat files.
+   * A LineSplitParser pre-configured to process EMBL-style flat files.
    */
   public static final LineSplitParser EMBL;
 
   /**
-   * A LineSplitParser pre-configured to process GENBANK-stye flat files.
+   * A LineSplitParser pre-configured to process GENBANK-style flat files.
    */
   public static final LineSplitParser GENBANK;
   
@@ -118,7 +118,7 @@ public class LineSplitParser
   }
   
   /**
-   * Enable or dissable trimming of tags.
+   * Enable or disable trimming of tags.
    *
    * @param trimTag  true if tags should be trimmed, otherwise false
    */
@@ -136,7 +136,7 @@ public class LineSplitParser
   }
   
   /**
-   * Enable or dissable trimming of values.
+   * Enable or disable trimming of values.
    *
    * @param trimValue  true if values should be trimmed, otherwise false
    */
@@ -154,11 +154,11 @@ public class LineSplitParser
   }
   
   /**
-   * Chose wether to treat empty tags as a continuation of previous tags or as a
+   * Choose whether to treat empty tags as a continuation of previous tags or as a
    * new tag with the value of the empty string.
    *
    * @param continueOnEmptyTag true to enable empty tags to be treated as a
-   *        coninuation of the previous tag, false otherwise
+   *        continuation of the previous tag, false otherwise
    */
   public void setContinueOnEmptyTag(boolean continueOnEmptyTag) {
     this.continueOnEmptyTag = continueOnEmptyTag;
@@ -175,8 +175,8 @@ public class LineSplitParser
   }
   
   /**
-   * Enable or dissable treating runs of identical tags as a single tag start
-   * event with multiple values or each as a sepreate tag start, value, and tag
+   * Enable or disable treating runs of identical tags as a single tag start
+   * event with multiple values or each as a separate tag start, value, and tag
    * end.
    *
    * @param mergeSameTag true if tags should be merged, false otherwise
@@ -196,9 +196,21 @@ public class LineSplitParser
   
   public TagValue parse(Object o) {
     String line = o.toString();
-    
-    if(endOfRecord != null && line.startsWith(endOfRecord)) {
-      return null;
+
+    // Use of the special value for the EOR marker allows a blank line
+    // to be used to delimit records. Many file formats are like this.
+    if (endOfRecord != null) {
+        if (endOfRecord == TagValueParser.BLANK_LINE_EOR) {
+            if (line.equals(TagValueParser.BLANK_LINE_EOR)) {
+                return null;
+            }
+        }
+        else
+        {
+            if (line.startsWith(endOfRecord)) {
+                return null;
+            }
+        }
     }
     
     int length = line.length();

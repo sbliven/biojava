@@ -27,11 +27,11 @@ import org.biojava.bio.program.indexdb.*;
  * BioStore store = bsf.createBioStore();
  * Indexer indexer = new Indexer(fileToIndex, store);
  * indexer.setPrimaryKeyName("foo");
- * indexer.addSeccondaryKey("bar");
- * indexer.addSeccondaryKey("baz");
+ * indexer.addSecondaryKey("bar");
+ * indexer.addSecondaryKey("baz");
  *
- * TagValueParser tvParser; // make this apropreate for your format
- * TagValueListener listener; // make this appropreate for your format
+ * TagValueParser tvParser; // make this appropriate for your format
+ * TagValueListener listener; // make this appropriate for your format
  *                            // and forward all events to changer
  * 
  * Parser parser = new Parser();
@@ -122,7 +122,7 @@ implements TagValueListener {
    *
    * @param secKeyName  the name of the secondary key to add
    */
-  public void addSeccondaryKey(String secKeyName) {
+  public void addSecondaryKey(String secKeyName) {
     seccondaryKeys.put(secKeyName, new ArrayList());
   }
   
@@ -131,7 +131,7 @@ implements TagValueListener {
    *
    * @param secKeyName  the name of the secondary key to remove
    */
-  public void removeSeccondaryKey(String secKeyName) {
+  public void removeSecondaryKey(String secKeyName) {
     seccondaryKeys.remove(secKeyName);
   }
   

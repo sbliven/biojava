@@ -8,7 +8,7 @@ import org.biojava.utils.ParserException;
  * </p>
  *
  * <p>
- * TagValueParser instances may be statefull, that is they may remember
+ * TagValueParser instances may be stateful, that is they may remember
  * previous values of tags or values, and return different TagValue responses
  * accordingly.
  * </p>
@@ -17,6 +17,16 @@ import org.biojava.utils.ParserException;
  * @since 1.2
  */
 public interface TagValueParser {
-  public TagValue parse(Object record)
-  throws ParserException;
+
+    /**
+     * <code>BLANK_LINE_EOR</code> is a special value which allows an
+     * empty line to be used as a record separator. Normally this is
+     * not possible as the empty line will be swallowed by the
+     * preceding tag or value. Use this as an argument to the
+     * <code>setEndOfRecord</code> method.
+     */
+    public static final String BLANK_LINE_EOR = "";
+
+    public TagValue parse(Object record)
+        throws ParserException;
 }

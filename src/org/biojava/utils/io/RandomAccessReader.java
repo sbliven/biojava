@@ -30,7 +30,7 @@ import java.io.Reader;
  * provide a means to create buffered <code>Reader</code>s from
  * <code>RandomAccessFile</code>s.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class RandomAccessReader extends Reader
@@ -68,7 +68,7 @@ public class RandomAccessReader extends Reader
      * <code>RandomAccessFile</code> and using a buffer of the
      * specified size.
      *
-     * @param raf a <code>RandomAccessFile</code> to wrap..
+     * @param raf a <code>RandomAccessFile</code> to wrap.
 
      * @param sz an <code>int</code> buffer size.
      */
@@ -204,7 +204,7 @@ public class RandomAccessReader extends Reader
      *
      * @param pos a <code>long</code> offset.
      *
-     * @exception IOException if an error occurs
+     * @exception IOException if an error occurs.
      */
     public void seek(long pos) throws IOException
     {

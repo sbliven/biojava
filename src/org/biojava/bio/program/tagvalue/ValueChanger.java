@@ -24,8 +24,8 @@ import org.biojava.utils.SmallMap;
  * </p>
  *
  * <p>
- * For a given tag, changers take prescendence over splitters, and explicitly
- * registered changers or splitters take prescendence over the default handlers.
+ * For a given tag, changers take precendence over splitters, and explicitly
+ * registered changers or splitters take precendence over the default handlers.
  * If there is not a specific handler for a tag and there is no default set,
  * then the value is passed on unchanged. 
  * </p>

@@ -91,11 +91,11 @@ public class ChangeTable {
   public static interface Changer {
     /**
      * <p>
-     * Produce a moddified value from an old value.
+     * Produce a modified value from an old value.
      * </p>
      *
      * <p>
-     * It is strongly recomended that this method is re-enterant and does not
+     * It is strongly recommended that this method is re-entrant and does not
      * modify the state of the Changer in a way that would affect future return
      * -values.
      * </p>
@@ -121,7 +121,7 @@ public class ChangeTable {
      * </p>
      *
      * <p>
-     * It is strongly recomended that this method is re-enterant and does not
+     * It is strongly recommended that this method is re-entrant and does not
      * modify the state of the Splitter in a way that would affect future return
      * -values.
      * </p>

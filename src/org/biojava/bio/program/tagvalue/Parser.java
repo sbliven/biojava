@@ -12,9 +12,9 @@ import org.biojava.utils.ParserException;
  * </p>
  *
  * <p>
- * Scripts will usualy construct a parser object, a BufferedReader, a
+ * Scripts will usually construct a parser object, a BufferedReader, a
  * TagValueParser and TagValueListener, and then set up a loop that processes
- * each record in the reader by calling Parser.read() untill it returns false.
+ * each record in the reader by calling Parser.read() until it returns false.
  * </p>
  *
  * @since 1.2
@@ -100,7 +100,7 @@ public class Parser {
         line = tv.getValue();
       }
       
-      // process a value and handle potentialy pushing a new stack frame
+      // process a value and handle potentially pushing a new stack frame
       while(true) {
         // pass in value and see if it requests a new stack frame
         ctxt.flush();
@@ -116,12 +116,12 @@ public class Parser {
         ctxt.listener.startRecord();
         ctxt.listener.startTag(tv.getTag());
         
-        // we must loop arround incase the new frame wants to imediately push a
+        // we must loop arround in case the new frame wants to immediately push a
         // new stack frame
       }
     }
 
-    throw new IOException("Premature end of stream or missing end tag '//'");
+    throw new IOException("Premature end of stream or missing end tag");
   }
   
   private void push(List stack, Object o) {
