@@ -843,31 +843,11 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     // Utility method to turn of the awkward bits of Xerces-J
     //
 
-    private static DocumentBuilderFactory dbf;
-    private static SAXParserFactory spf;
-
-    static {
-	dbf = DocumentBuilderFactory.newInstance();
-	spf = SAXParserFactory.newInstance();
-	try {
-	    spf.setFeature("http://xml.org/sax/features/validation", false);
-	    // dp.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-	    spf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-	    spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-	    // dp.setFeature("http://xml.org/sax/features/namespaces", true);
-	} catch (SAXNotRecognizedException ex) {
-	    ex.printStackTrace();
-	} catch (SAXNotSupportedException ex) {
-	    ex.printStackTrace();
-	} catch (ParserConfigurationException ex) {
-	    ex.printStackTrace();
-	}
-    }
-	
-
     static DocumentBuilder nonvalidatingParser() {
 	try {
-	    return DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    dbf.setValidating(false);
+	    return dbf.newDocumentBuilder();
 	} catch (Exception ex) {
 	    throw new BioError(ex);
 	} 
@@ -876,12 +856,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     static XMLReader nonvalidatingSAXParser() {
 	try {
 	    SAXParserFactory spf = SAXParserFactory.newInstance();
+	    spf.setValidating(false);
 	    spf.setNamespaceAware(true);
-	    // spf.setFeature("http://xml.org/sax/features/validation", false);
-	    // dp.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-	    // spf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-	    // spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-	    // spf.setFeature("http://xml.org/sax/features/namespaces", true);
 	    return spf.newSAXParser().getXMLReader();
 	} catch (Exception ex) {
 	    throw new BioError(ex);
