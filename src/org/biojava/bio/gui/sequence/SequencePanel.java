@@ -600,5 +600,38 @@ Changeable {
       pcs.removePropertyChangeListener(listener);
     }
   }
+
+    private boolean eq(Object a, Object b) {
+	if (a == null || b == null) {
+	    return a == b;
+	} else {
+	    return a.equals(b);
+	}
+    }
+	
+
+    public boolean equals(Object o) {
+	if (! (o instanceof SequencePanel)) {
+	    return false;
+	}
+
+	SequencePanel osp = (SequencePanel) o;
+	return (eq(getSymbols(), osp.getSymbols()) && eq(getRange(), osp.getRange()));
+    }
+
+    public int hashCode() {
+	int hc = 653;
+	SymbolList sl = getSymbols();
+	if (sl != null) {
+	    hc = hc ^ sl.hashCode();
+	}
+
+	Location l = getRange();
+	if (l != null) {
+	    hc = hc ^ l.hashCode();
+	}
+
+	return hc;
+    }
 }
 

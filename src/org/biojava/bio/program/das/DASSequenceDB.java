@@ -197,6 +197,8 @@ public class DASSequenceDB implements SequenceDB {
     public Set ids() {
 	if (rootIDs == null) {
 	    try {
+		DAS.startedActivity(this);
+
 		Set ids = new HashSet();
 
 		URL epURL = new URL(dataSourceURL, "entry_points");
@@ -236,6 +238,8 @@ public class DASSequenceDB implements SequenceDB {
 		throw new BioRuntimeException(ex, "Error parsing number");
 	    } catch (BioException ex) {
 		throw new BioRuntimeException(ex);
+	    } finally {
+		DAS.completedActivity(this);
 	    }
 	}
 
