@@ -49,7 +49,7 @@ public interface FiniteAlphabet extends Alphabet {
   int size();
   
   /**
-   * Retrieve an Iterator over the Symbols in this FiniteAlphabet.
+   * Retrieve an Iterator over the AtomicSymbols in this FiniteAlphabet.
    * <p>
    * Each AtomicSymbol as for which this.contains(as) is true will be returned
    * exactly once by this iterator in no specified order.
