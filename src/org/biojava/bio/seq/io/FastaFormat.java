@@ -99,6 +99,12 @@ public class FastaFormat implements SequenceFormat,
     if (line == null) {
       throw new IOException("Premature stream end");
     }
+    while(line.length() == 0) {
+      line = reader.readLine();
+      if (line == null) {
+        throw new IOException("Premature stream end");
+      }
+    }
     if (!line.startsWith(">")) {
       throw new IOException("Stream does not appear to contain FASTA formatted data: " + line);
     }

@@ -286,6 +286,7 @@
     <javac
       srcdir="${build.src.tests}"
       destdir="${build.dest.tests}"
+      debug="true"
       deprecation="true"
       depend="yes">
       <classpath>
@@ -301,6 +302,7 @@
       srcdir="${build.src.demos}"
       destdir="${build.dest.demos}"
       deprecation="true"
+      debug="true"
       depend="yes">
       <classpath>
         <pathelement path="${classpath}" />
@@ -313,6 +315,7 @@
     <javac
       srcdir="${build.src.taglets}"
       destdir="${build.dest.taglets}"
+      debug="true"
     >
       <classpath>
         <pathelement path="${classpath}" />

@@ -103,4 +103,15 @@ public class CrossProductAlphabetIndexTest extends TestCase {
         );
       }
     }
+    
+    public static void main(String[] args)
+    throws Throwable {
+      CrossProductAlphabetIndexTest test = new CrossProductAlphabetIndexTest("test");
+      test.setUp();
+      test.testIndex2Symbol();
+      test.testSymbol2Index();
+      test.testISI();
+      test.testSIS();
+      test.tearDown();
+    }
 }
