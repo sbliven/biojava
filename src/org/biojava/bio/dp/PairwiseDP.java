@@ -36,190 +36,67 @@ import org.biojava.bio.seq.tools.*;
  * @author Thomas Down
  */
 
-public class PairwiseDP {
-    private MarkovModel mm;
+public class PairwiseDP extends DP {
     private EmissionState magicalState;
     private Residue magicalResidue;
 
-    public PairwiseDP(MarkovModel mm) {
-	this.mm = mm;
+    public PairwiseDP(FlatModel mm) throws IllegalResidueException,
+                                           IllegalTransitionException
+    {
+	super(mm);
 	magicalState = mm.magicalState();
 	magicalResidue = MagicalState.MAGICAL_RESIDUE;
     }
 
-    public State[] stateList()
-	throws IllegalResidueException, IllegalTransitionException
-    {
-	Alphabet alpha = mm.stateAlphabet();
+    private final static int[] ia00 = {0, 0};
 
-	List emissionStates = new ArrayList();
-	HMMOrderByTransition comp = new HMMOrderByTransition(mm);
-	List dotStates = new LinkedList();
-	for (Iterator addStates = alpha.residues().iterator(); addStates.hasNext(); ) {
-	    Object state = addStates.next();
-	    if (state instanceof EmissionState)
-		emissionStates.add(state);
-	    else {
-		ListIterator checkOld = dotStates.listIterator();
-		int insertPos = -1;
-		while (checkOld.hasNext() && insertPos == -1) {
-		    Object oldState = checkOld.next();
-		    if (comp.compare(state, oldState) == comp.LESS_THAN)
-			insertPos = checkOld.nextIndex() - 1;
-		}
-		if (insertPos >= 0)
-		    dotStates.add(insertPos, state);
-		else
-		    dotStates.add(0, state);
-	    }
-	}
-
-	State[] sl = new State[emissionStates.size() + dotStates.size()];
-	int i = 0;
-	for (Iterator si = emissionStates.iterator(); si.hasNext(); ) {
-	    sl[i++] = (State) si.next();
-	}
-	for (Iterator si = dotStates.iterator(); si.hasNext(); ) {
-	    sl[i++] = (State) si.next();
-	}
-	return sl;
+    public double backward(ResidueList[] seqs) {
+	throw new UnsupportedOperationException();
     }
 
-    private static class HMMOrderByTransition {
-	public final static Object GREATER_THAN = new Object();
-	public final static Object LESS_THAN = new Object();
-	public final static Object EQUAL = new Object();
-	public final static Object DISJOINT = new Object();
-
-	private MarkovModel mm;
-
-	HMMOrderByTransition(MarkovModel mm) {
-	    this.mm = mm;
-	}
-
-	public Object compare(Object o1, Object o2) 
-	    throws IllegalTransitionException,
-		   IllegalResidueException
-	{
-	    if (o1 == o2)
-		return EQUAL;
-	    State s1 = (State) o1;
-	    State s2 = (State) o2;
-
-	    if (transitionsTo(s1, s2))
-		return LESS_THAN;
-	    if (transitionsTo(s2, s1))
-		return GREATER_THAN;
-
-	    return DISJOINT;
-	}
-
-	private boolean transitionsTo(State from, State to)
-	    throws IllegalTransitionException,
-		   IllegalResidueException
-	{
-	    Set checkedSet = new HashSet();
-	    Set workingSet = mm.transitionsFrom(from);
-	    while (workingSet.size() > 0) {
-		Set newWorkingSet = new HashSet();
-		for (Iterator i = workingSet.iterator(); i.hasNext(); ) {
-		    State s = (State) i.next();
-		    if (s instanceof EmissionState)
-			continue;
-		    if (s == from)
-			throw new IllegalTransitionException(from, from, "Loop in dot states.");
-		    if (s == to)
-			return true;
-		    for (Iterator j = mm.transitionsFrom(s).iterator(); j.hasNext(); ) {
-			State s2 = (State) j.next();
-			if (!workingSet.contains(s2) && !checkedSet.contains(s2))
-			    newWorkingSet.add(s2);
-		    }
-		    checkedSet.add(s);
-		}
-		workingSet = newWorkingSet;
-	    }
-
-	    return false;
-	}
+    public DPMatrix backwardMatrix(ResidueList[] seqs) {
+	throw new UnsupportedOperationException();
     }
 
-    public int [][] forwardTransitions(State [] states) 
-	throws IllegalResidueException
-    {
-	int stateCount = states.length;
-	int [][] transitions = new int[stateCount][];
-
-	for (int i = 0; i < stateCount; i++) {
-	    int [] tmp = new int[stateCount];
-	    int len = 0;
-	    Set trans = mm.transitionsTo(states[i]);
-	    // System.out.println("trans has size " + trans.size());
-	    for (int j = 0; j < stateCount; j++) {
-		if (trans.contains(states[j])) {
-		    // System.out.println(states[j].getName() + " -> " + states[i].getName());
-		    tmp[len++] = j;
-		}
-	    }
-	    int [] tmp2 = new int[len];
-	    for (int j = 0; j < len; j++)
-		tmp2[j] = tmp[j];
-	    transitions[i] = tmp2;
-	}
-	
-	return transitions;
+    public DPMatrix backwardMatrix(ResidueList[] seqs, DPMatrix d) {
+	throw new UnsupportedOperationException();
     }
 
-    public double [][] forwardTransitionScores(State [] states,
-					       int [][] transitions) 
-	throws IllegalResidueException 
+
+    public double forward(ResidueList[] seqs) 
+        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	int stateCount = states.length;
-	double [][] scores = new double[stateCount][];
+	if (seqs.length != 2)
+	    throw new IllegalArgumentException("This DP object only runs on pairs.");
 
-	for (int i = 0; i < stateCount; i++) {
-	    State is = states[i];
-	    scores[i] = new double[transitions[i].length];
-	    for (int j = 0; j < scores[i].length; j++) {
-		try {
-		    scores[i][j] = mm.getTransitionScore(states[transitions[i][j]], is);
-		} catch (IllegalTransitionException ite) {
-		    throw new BioError(ite,
-				       "Transition listed in transitions array has dissapeared.");
-		}
-		// System.out.println(states[transitions[i][j]].getName() + " -> " + states[i].getName()
-		//                   + " = " + scores[i][j]);
-	    }
-	}
+	Forward f = new Forward();
+	return f.runForward(seqs[0], seqs[1]);
+    }
 
-	return scores;
+    public DPMatrix forwardMatrix(ResidueList[] seqs) {
+	throw new UnsupportedOperationException();
+    }
+
+    public DPMatrix forwardMatrix(ResidueList[] seqs, DPMatrix d) {
+	throw new UnsupportedOperationException();
     }
 
     private static Residue getResWrapper(CrossProductAlphabet a, List l) 
         throws IllegalAlphabetException
     {
-//  	System.out.println(a.getName() + " getting:");
-//  	for (Iterator i = l.iterator(); i.hasNext(); ) {
-//  	    Residue blah = (Residue) i.next();
-//  	    System.out.println(blah.getName());
-//  	}
+//      System.out.println(a.getName() + " getting:");
+//      for (Iterator i = l.iterator(); i.hasNext(); ) {
+//          Residue blah = (Residue) i.next();
+//          System.out.println(blah.getName());
+//      }
 
-	if (l.contains(MagicalState.MAGICAL_RESIDUE)) {
-	    for (Iterator i = l.iterator(); i.hasNext(); )
-		if (i.next() != MagicalState.MAGICAL_RESIDUE)
-		    return null;
-	    return MagicalState.MAGICAL_RESIDUE;
-	}
-	return a.getResidue(l);
-    }
-
-    private final static int[] ia00 = {0, 0};
-
-    public double forward(ResidueList seq0, ResidueList seq1) 
-        throws Exception
-    {
-	Forward f = new Forward();
-	return f.runForward(seq0, seq1);
+        if (l.contains(MagicalState.MAGICAL_RESIDUE)) {
+            for (Iterator i = l.iterator(); i.hasNext(); )
+                if (i.next() != MagicalState.MAGICAL_RESIDUE)
+                    return null;
+            return MagicalState.MAGICAL_RESIDUE;
+        }
+        return a.getResidue(l);
     }
 
 private class Forward {
@@ -230,11 +107,11 @@ private class Forward {
     private CrossProductAlphabet alpha;
 
     public double runForward(ResidueList seq0, ResidueList seq1) 
-        throws Exception
+        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	states = stateList();
+	states = getStates();
 	cursor = new PairDPCursor(seq0, seq1, states.length, false);
-	alpha = (CrossProductAlphabet) mm.emissionAlphabet();
+	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
 
 	// Forward initialization
 
@@ -245,8 +122,8 @@ private class Forward {
 
 	// Recurse
 
-	transitions = forwardTransitions(states);
-	transitionScores = forwardTransitionScores(states, transitions);
+	transitions = getForwardTransitions();
+	transitionScores = getForwardTransitionScores();
 
 	while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
 	    if (cursor.canAdvance(0)) {
@@ -283,7 +160,7 @@ private class Forward {
     private int[] colId = new int[2];
 
     private void forwardPrepareCol(int i, int j)
-	throws Exception
+	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
 	// System.out.println("*** (" + i + "," + j + ")");
 
@@ -318,7 +195,7 @@ private class Forward {
     }
 
     private void forwardCalcStepMatrix()
-	throws Exception
+	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
 	double[] curCol = (double[]) matrix[0][0];
 	int[] advance;
@@ -399,11 +276,14 @@ private class Forward {
 
     // VITERBI!
 
-    public StatePath viterbi(ResidueList s0, ResidueList s1) 
-        throws Exception
+    public StatePath viterbi(ResidueList[] seqs) 
+        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
+	if (seqs.length != 2)
+	    throw new IllegalArgumentException("This DP object only runs on pairs.");
+
 	Viterbi v = new Viterbi();
-	return v.runViterbi(s0, s1);
+	return v.runViterbi(seqs[0], seqs[1]);
     }
 
 
@@ -415,11 +295,11 @@ private class Viterbi {
     private CrossProductAlphabet alpha;
 
     public StatePath runViterbi(ResidueList seq0, ResidueList seq1) 
-        throws Exception
+        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	states = stateList();
+	states = getStates();
 	cursor = new PairDPCursor(seq0, seq1, states.length, true);
-	alpha = (CrossProductAlphabet) mm.emissionAlphabet();
+	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
 
 	// Forward initialization
 
@@ -430,8 +310,8 @@ private class Viterbi {
 
 	// Recurse
 
-	transitions = forwardTransitions(states);
-	transitionScores = forwardTransitionScores(states, transitions);
+	transitions = getForwardTransitions();
+	transitionScores = getForwardTransitionScores();
 
 	while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
 	    if (cursor.canAdvance(0)) {
@@ -479,7 +359,7 @@ private class Viterbi {
 	labelToList.put(StatePath.SEQUENCE,
 			new SimpleResidueList(alpha, resl));
 	labelToList.put(StatePath.STATES, 
-			new SimpleResidueList(mm.stateAlphabet(), statel));
+			new SimpleResidueList(getModel().stateAlphabet(), statel));
 	labelToList.put(StatePath.SCORES,
 			new SimpleResidueList(DoubleAlphabet.getInstance(),
 					      scorel));
@@ -493,7 +373,7 @@ private class Viterbi {
     private int[] colId = new int[2];
 
     private void viterbiPrepareCol(int i, int j)
-	throws Exception
+	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
 	// System.out.println("*** (" + i + "," + j + ")");
 
@@ -531,7 +411,7 @@ private class Viterbi {
     }
 
     private void viterbiCalcStepMatrix()
-	throws Exception
+	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
 	double[] curCol = (double[]) matrix[0][0];
 	int[] advance;

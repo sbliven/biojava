@@ -28,14 +28,105 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
 public abstract class DP {
-  public static EmissionState [] stateList(Alphabet alpha)
-    throws IllegalResidueException {
-    return (EmissionState [])
-      alpha.residues().toList().toArray(new EmissionState[0]);
-  }
+    public static State[] stateList(MarkovModel mm)
+	throws IllegalResidueException, IllegalTransitionException
+    {
+	Alphabet alpha = mm.stateAlphabet();
+
+	List emissionStates = new ArrayList();
+	HMMOrderByTransition comp = new HMMOrderByTransition(mm);
+	List dotStates = new LinkedList();
+	for (Iterator addStates = alpha.residues().iterator(); addStates.hasNext(); ) {
+	    Object state = addStates.next();
+	    if (state instanceof EmissionState)
+		emissionStates.add(state);
+	    else {
+		ListIterator checkOld = dotStates.listIterator();
+		int insertPos = -1;
+		while (checkOld.hasNext() && insertPos == -1) {
+		    Object oldState = checkOld.next();
+		    if (comp.compare(state, oldState) == comp.LESS_THAN)
+			insertPos = checkOld.nextIndex() - 1;
+		}
+		if (insertPos >= 0)
+		    dotStates.add(insertPos, state);
+		else
+		    dotStates.add(0, state);
+	    }
+	}
+
+	State[] sl = new State[emissionStates.size() + dotStates.size()];
+	int i = 0;
+	for (Iterator si = emissionStates.iterator(); si.hasNext(); ) {
+	    sl[i++] = (State) si.next();
+	}
+	for (Iterator si = dotStates.iterator(); si.hasNext(); ) {
+	    sl[i++] = (State) si.next();
+	}
+	return sl;
+    }
+
+    private static class HMMOrderByTransition {
+	public final static Object GREATER_THAN = new Object();
+	public final static Object LESS_THAN = new Object();
+	public final static Object EQUAL = new Object();
+	public final static Object DISJOINT = new Object();
+
+	private MarkovModel mm;
+
+	HMMOrderByTransition(MarkovModel mm) {
+	    this.mm = mm;
+	}
+
+	public Object compare(Object o1, Object o2) 
+	    throws IllegalTransitionException,
+		   IllegalResidueException
+	{
+	    if (o1 == o2)
+		return EQUAL;
+	    State s1 = (State) o1;
+	    State s2 = (State) o2;
+
+	    if (transitionsTo(s1, s2))
+		return LESS_THAN;
+	    if (transitionsTo(s2, s1))
+		return GREATER_THAN;
+
+	    return DISJOINT;
+	}
+
+	private boolean transitionsTo(State from, State to)
+	    throws IllegalTransitionException,
+		   IllegalResidueException
+	{
+	    Set checkedSet = new HashSet();
+	    Set workingSet = mm.transitionsFrom(from);
+	    while (workingSet.size() > 0) {
+		Set newWorkingSet = new HashSet();
+		for (Iterator i = workingSet.iterator(); i.hasNext(); ) {
+		    State s = (State) i.next();
+		    if (s instanceof EmissionState)
+			continue;
+		    if (s == from)
+			throw new IllegalTransitionException(from, from, "Loop in dot states.");
+		    if (s == to)
+			return true;
+		    for (Iterator j = mm.transitionsFrom(s).iterator(); j.hasNext(); ) {
+			State s2 = (State) j.next();
+			if (!workingSet.contains(s2) && !checkedSet.contains(s2))
+			    newWorkingSet.add(s2);
+		    }
+		    checkedSet.add(s);
+		}
+		workingSet = newWorkingSet;
+	    }
+
+	    return false;
+	}
+    }
 
   public static int [][] forwardTransitions(MarkovModel model,
-      EmissionState [] states) throws IllegalResidueException {
+      State [] states) throws IllegalResidueException {
     int stateCount = states.length;
     int [][] transitions = new int[stateCount][];
 
@@ -60,7 +151,7 @@ public abstract class DP {
   }
 
   public static double [][] forwardTransitionScores(MarkovModel model,
-      EmissionState [] states,
+      State [] states,
       int [][] transitions) throws IllegalResidueException {
     int stateCount = states.length;
     double [][] scores = new double[stateCount][];
@@ -84,7 +175,7 @@ public abstract class DP {
   }
 
   public static int [][] backwardTransitions(MarkovModel model,
-      EmissionState [] states) throws IllegalResidueException {
+     State [] states) throws IllegalResidueException {
     int stateCount = states.length;
     int [][] transitions = new int[stateCount][];
 
@@ -106,7 +197,7 @@ public abstract class DP {
   }
 
   public static double [][] backwardTransitionScores(MarkovModel model,
-      EmissionState [] states,
+      State [] states,
       int [][] transitions) throws IllegalResidueException {
     int stateCount = states.length;
     double [][] scores = new double[stateCount][];
@@ -128,7 +219,7 @@ public abstract class DP {
   }
 
   private FlatModel model;
-  private EmissionState [] states;
+  private State[] states;
   private int [][] forwardTransitions;
   private double [][] forwardTransitionScores;
   private int [][] backwardTransitions;
@@ -138,7 +229,7 @@ public abstract class DP {
     return model;
   }
   
-  public EmissionState [] getStates() {
+  public State[] getStates() {
     return states;
   }
   
@@ -158,9 +249,11 @@ public abstract class DP {
     return backwardTransitionScores;
   }
   
-  public DP(FlatModel model) throws IllegalResidueException {
+  public DP(FlatModel model) throws IllegalResidueException,
+                                    IllegalTransitionException
+  {
     this.model = model;
-    this.states = stateList(model.stateAlphabet());
+    this.states = stateList(model);
     this.forwardTransitions = forwardTransitions(model, states);
     this.forwardTransitionScores = forwardTransitionScores(model, states,
       forwardTransitions);
@@ -170,27 +263,27 @@ public abstract class DP {
   }
 
   public abstract double forward(ResidueList [] resList)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException;
+  throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException;
   
   public abstract double backward(ResidueList [] resList)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException;
+  throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException;
 
   public abstract DPMatrix forwardMatrix(ResidueList [] resList)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException;
+  throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException;
   
   public abstract DPMatrix backwardMatrix(ResidueList [] resList)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException;
+  throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException;
 
   public abstract DPMatrix forwardMatrix(ResidueList [] resList, DPMatrix matrix)
   throws IllegalArgumentException, IllegalResidueException,
-  IllegalAlphabetException, IllegalResidueException;
+  IllegalAlphabetException, IllegalTransitionException;
   
   public abstract DPMatrix backwardMatrix(ResidueList [] resList, DPMatrix matrix)
   throws IllegalArgumentException, IllegalResidueException,
-  IllegalAlphabetException, IllegalResidueException;
+  IllegalAlphabetException, IllegalTransitionException;
     
   public abstract StatePath viterbi(ResidueList [] resList)
-  throws IllegalResidueException, IllegalArgumentException, IllegalAlphabetException;
+  throws IllegalResidueException, IllegalArgumentException, IllegalAlphabetException, IllegalTransitionException;
 
   /**
     * Generates an alignment from a model.
