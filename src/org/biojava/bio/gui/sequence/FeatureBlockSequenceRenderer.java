@@ -213,7 +213,7 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
     }
 
   public void paint(Graphics2D g, SequenceRenderContext src) {
-    FeatureFilter filt = FilterUtils.overlapsExtent(
+    FeatureFilter filt = FilterUtils.shadowOverlapsLocation(
             GUITools.getVisibleRange(src, g) );
     FeatureHolder feats = src.getFeatures().filter(filt, false);
 
