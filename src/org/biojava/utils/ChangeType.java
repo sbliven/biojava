@@ -1,12 +1,12 @@
 /*
- * BioJava development code
+ *                  BioJava development code
  * 
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
  * be distributed with the code.  If you do not have a copy,
  * see:
  * 
- * http://www.gnu.org/copyleft/lesser.html
+ *   http://www.gnu.org/copyleft/lesser.html
  * 
  * Copyright for this code is held jointly by the individual
  * authors.  These should be listed in @author doc comments.
@@ -15,13 +15,13 @@
  * or to join the biojava-l mailing list, visit the home page
  * at:
  * 
- * http://www.biojava.org
+ *   http://www.biojava.org
  */
 
 package org.biojava.utils;
 
 import java.io.*;
-
+import java.util.*;
 import java.lang.reflect.*;
 
 /**
@@ -48,21 +48,17 @@ import java.lang.reflect.*;
  */
 
 public final class ChangeType implements Serializable {
-
   private final String name;
   private final Field ourField;
   
   /**
    * Constant ChangeType field which indicates that a change has
    * occured which can't otherwise be represented.  Please do not
-   * use this when there is another, more sensible, option.
- This
+   * use this when there is another, more sensible, option. This
    * is the fallback for when you realy don't know what else to
    * do.
    */
-
   public static final ChangeType UNKNOWN;
-
 
   /**
    *  Construct a new ChangeType. 
@@ -71,12 +67,10 @@ public final class ChangeType implements Serializable {
    * @param  ourField  The public static field which contains this 
    *      ChangeType. 
    */
-
   public ChangeType(String name, Field ourField) {
     this.name = name;
     this.ourField = ourField;
   }
-
 
   /**
    *  Construct a new ChangeType. 
@@ -88,7 +82,6 @@ public final class ChangeType implements Serializable {
    * is to contain a reference to this change.
    * @throws        BioError If the field cannot be found. 
    */
-
   public ChangeType(String name, Class clazz, String fname) {
     this.name = name;
     try {
@@ -98,7 +91,6 @@ public final class ChangeType implements Serializable {
       throw new NestedError(ex, "Couldn't find field " + fname + " in class " + clazz.getName());
     }
   }
-
 
   public ChangeType(String name, String className, String fieldName) {
     this.name = name;
@@ -118,29 +110,32 @@ public final class ChangeType implements Serializable {
    *
    * @return    The Name value 
    */
-
   public String getName() {
     return name;
   }
 
+    /**
+     * Return a Field object where this change type is declared.
+     */
+
+    public Field getField() {
+	return ourField;
+    }
 
   /**
    *  Return a string representation of this change. 
    *
    * @return    Description of the Returned Value 
    */
-
   public String toString() {
     return "ChangeType: " + name;
   }
-
 
   /**
    *  Make a placeholder for this object in a serialized stream. 
    *
    * @return    Description of the Returned Value 
    */
-
   private Object writeReplace() {
     return new StaticMemberPlaceHolder(ourField);
   }
@@ -152,4 +147,29 @@ public final class ChangeType implements Serializable {
       "UNKNOWN"
     );
   }
+
+    /**
+     * Get all ChangeType objects defined within a class.  This
+     * includes ChangeTypes defined in superclasses and interfaces.
+     * Only fields declared as public [final] static ChangeType are
+     * returned.
+     *
+     * @param clazz A class to introspect
+     */
+
+    public static Set getChangeTypes(Class clazz) 
+    {
+	Set types = new HashSet();
+	Field[] fields = clazz.getFields();
+	for (int i = 0; i < fields.length; ++i) {
+	    Field f = fields[i];
+	    if (f.getType().equals(ChangeType.class) && (f.getModifiers() & Modifier.STATIC) != 0) {
+		try {
+		    types.add(f.get(null));
+		} catch (Exception ex) {}
+	    }
+	}
+
+	return types;
+    }
 }
