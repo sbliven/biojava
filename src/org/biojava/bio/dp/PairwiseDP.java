@@ -970,7 +970,6 @@ public class PairwiseDP extends DP implements Serializable {
     
     public boolean hasNext() {
       return
-        pos[0] <= (seqs[0].length()+1) ||
         pos[1] <= (seqs[1].length()+1);
     }
     
@@ -979,16 +978,20 @@ public class PairwiseDP extends DP implements Serializable {
       
       for(int i = 0; i < depth[0]; i++) {
         int ii = pos[0] - i;
-        boolean outI = ii < 1 || ii > seqs[0].length();
+        boolean outI = ii < 0 || ii > seqs[0].length()+1;
         for(int j = 0; j < depth[1]; j++) {
           int jj = pos[1] - j;
-          boolean outJ = jj < 1 || jj > seqs[1].length();
+          boolean outJ = jj < 0 || jj > seqs[1].length()+1;
           Cell c = cells[i][j] = new Cell();
-          c.scores = (outI && outJ) ? zeroCol : sMatrix[ii][jj];
-          c.backPointers = (outI && outJ) ? emptyBP : bPointers[ii][jj];
+          c.scores = (outI || outJ) ? zeroCol : sMatrix[ii][jj];
+          c.backPointers = (outI || outJ) ? emptyBP : bPointers[ii][jj];
           c.symbols = new Symbol [] {
-            seqs[0].symbolAt(ii),
-            seqs[1].symbolAt(jj)
+            (ii < 1 || ii > seqs[0].length())
+              ? AlphabetManager.getGapSymbol()
+              : seqs[0].symbolAt(ii),
+            (jj < 1 || jj > seqs[1].length())
+              ? AlphabetManager.getGapSymbol()
+              : seqs[1].symbolAt(jj)
           };
         }
       }
