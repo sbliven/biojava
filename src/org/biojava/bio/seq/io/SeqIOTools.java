@@ -37,6 +37,7 @@ import org.apache.regexp.*;
  * @author Thomas Down
  * @author Mark Schreiber
  * @author Nimesh Singh
+ * @author Matthew Pocock
  * @since 1.1
  */
 public final class SeqIOTools  {
@@ -262,6 +263,11 @@ public final class SeqIOTools  {
       StreamWriter sw = new StreamWriter(os,new FastaFormat());
       sw.writeStream(in);
    }
+   
+   public static void writeFasta(OutputStream os, Sequence seq)
+   throws IOException {
+     writeFasta(os, new SingleSeqIterator(seq));
+   }
 
    /**
     * The following methods write sequences from a SequenceIterator to an OutputStream.
@@ -269,6 +275,10 @@ public final class SeqIOTools  {
     public static void writeEmbl(OutputStream os, SequenceIterator in) throws IOException{
         StreamWriter sw = new StreamWriter(os, new EmblLikeFormat());
         sw.writeStream(in);
+    }
+    
+    public static void writeEmbl(OutputStream os, Sequence seq) throws IOException {
+      writeEmbl(os, new SingleSeqIterator(seq));
     }
 
     public static void writeSwissprot(OutputStream os, SequenceIterator in) throws IOException, BioException {
@@ -278,6 +288,11 @@ public final class SeqIOTools  {
             former.writeSequence(in.nextSequence(), "Swissprot", ps);
         }
     }
+    
+    public static void writeSwissprot(OutputStream os, Sequence seq)
+    throws IOException, BioException {
+      writeSwissprot(os, new SingleSeqIterator(seq));
+    }
 
     public static void writeGenpept(OutputStream os, SequenceIterator in) throws IOException, BioException {
         SequenceFormat former = new GenbankFormat();
@@ -286,10 +301,20 @@ public final class SeqIOTools  {
             former.writeSequence(in.nextSequence(), "Genpept", ps);
         }
     }
+    
+    public static void writeGenpept(OutputStream os, Sequence seq)
+    throws IOException, BioException {
+      writeGenpept(os, new SingleSeqIterator(seq));
+    }
 
     public static void writeGenbank(OutputStream os, SequenceIterator in) throws IOException{
         StreamWriter sw = new StreamWriter(os, new GenbankFormat());
         sw.writeStream(in);
+    }
+    
+    public static void writeGenbank(OutputStream os, Sequence seq)
+    throws IOException {
+      writeGenbank(os, new SingleSeqIterator(seq));
     }
 
 
@@ -633,4 +658,22 @@ public final class SeqIOTools  {
                 System.out.println("seqToFile -- File type not recognized.");
         }
     }
+    
+  private static final class SingleSeqIterator
+  implements SequenceIterator {
+    private Sequence seq;
+    SingleSeqIterator(Sequence seq) {
+      this.seq = seq;
+    }
+    
+    public boolean hasNext() {
+      return seq != null;
+    }
+    
+    public Sequence nextSequence() {
+      Sequence seq = this.seq;
+      this.seq = null;
+      return seq;
+    }
+  }
 }
