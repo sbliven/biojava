@@ -197,13 +197,15 @@ public class PairwiseDP extends DP implements Serializable {
     private void calcCell(Cell [][] cells)
     throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
-      double[] curCol = cells[0][0].scores;
+      Cell curCell = cells[0][0];
+      double[] curCol = curCell.scores;
 
      STATELOOP:      
       for (int l = states.length - 1; l >= 0; --l) {
         //System.out.println("State = " + states[l].getName());
-        if(initializationHack && (states[l] instanceof EmissionState)) {
-          if(states[l] == magicalState) {
+        State curState = states[l];
+        if(initializationHack && (curState instanceof EmissionState)) {
+          if(curState == magicalState) {
             curCol[l] = 0.0;
           } else {
             curCol[l] = Double.NEGATIVE_INFINITY;
@@ -231,7 +233,7 @@ public class PairwiseDP extends DP implements Serializable {
             weight = targetCell.emissions[destI];
             sCol = targetCell.scores;
           } else {
-            targetCell = cells[0][0];
+            targetCell = curCell;
             weight = 0.0;
           }
           sourceScores[ci] = targetCell.scores[destI] + weight;
@@ -249,9 +251,10 @@ public class PairwiseDP extends DP implements Serializable {
           //System.out.println("prevScore = " + sourceScores[kc]);
 
           int k = tr[kc];
-          if (sourceScores[kc] != Double.NEGATIVE_INFINITY) {
+          double skc = sourceScores[kc];
+          if (skc != Double.NEGATIVE_INFINITY) {
             double t = trs[kc];
-            score += Math.exp(t + sourceScores[kc] - constant);
+            score += Math.exp(t + skc - constant);
           }
         }
         curCol[l] = Math.log(score) + constant;
@@ -363,10 +366,11 @@ public class PairwiseDP extends DP implements Serializable {
 
      STATELOOP:
       for (int l = 0; l < states.length; ++l) {
+        State curState = states[l];
         //System.out.println("State = " + states[l].getName());
         try {
-          if(initializationHack && (states[l] instanceof EmissionState)) {
-            if(states[l] == magicalState) {
+          if(initializationHack && (curState instanceof EmissionState)) {
+            if(curState == magicalState) {
               curCol[l] = 0.0;
             } else {
               curCol[l] = Double.NEGATIVE_INFINITY;
@@ -375,50 +379,49 @@ public class PairwiseDP extends DP implements Serializable {
             continue STATELOOP;
           }
           
-          int[] advance = (states[l] instanceof EmissionState)
-            ? ((EmissionState)states[l]).getAdvance()
-            : ia00;
-          double[] sourceScores = cells[advance[0]][advance[1]].scores;
-          
           //System.out.println("Calculating weight");
+          double[] sourceScores;
           double weight;
-          if (! (states[l] instanceof EmissionState)) {
+          if (! (curState instanceof EmissionState)) {
             weight = 0.0;
+            sourceScores = curCol;
           } else {
             weight = emissions[l];
+            if(weight == Double.NEGATIVE_INFINITY) {
+              curCol[l] = Double.NEGATIVE_INFINITY;
+              continue STATELOOP;
+            }
+            int [] advance = ((EmissionState)curState).getAdvance(); 
+            sourceScores = cells[advance[0]][advance[1]].scores;
           }
           //System.out.println("weight = " + weight);
 
-          if (weight == Double.NEGATIVE_INFINITY) {
-            curCol[l] = Double.NEGATIVE_INFINITY;
-          } else {
-            double score = 0.0;
-            int [] tr = transitions[l];
-            double[] trs = transitionScores[l];
+          double score = 0.0;
+          int [] tr = transitions[l];
+          double[] trs = transitionScores[l];
 
-            // Calculate probabilities for states with transitions
-            // here.
-		
-            // Find base for addition
-            int ci = 0;
-            while (ci < tr.length && sourceScores[ci] == Double.NEGATIVE_INFINITY) {
-              ++ci;
-            }
-            double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
-
-            for (int kc = 0; kc < tr.length; ++kc) {
-              //System.out.println("In from " + states[kc].getName());
-              //System.out.println("prevScore = " + sourceScores[kc]);
-
-              int k = tr[kc];
-              if (sourceScores[k] != Double.NEGATIVE_INFINITY) {
-                double t = trs[kc];
-                score += Math.exp(t + sourceScores[k] - constant);
-              }
-            }
-            curCol[l] = weight + Math.log(score) + constant;
-            //System.out.println("Setting col score to " + curCol[l]);
+          // Calculate probabilities for states with transitions
+          // here.
+	
+          // Find base for addition
+          int ci = 0;
+          while (ci < tr.length && sourceScores[ci] == Double.NEGATIVE_INFINITY) {
+            ++ci;
           }
+          double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
+          for (int kc = 0; kc < tr.length; ++kc) {
+            //System.out.println("In from " + states[kc].getName());
+            //System.out.println("prevScore = " + sourceScores[kc]);
+
+            int k = tr[kc];
+            double sk = sourceScores[k];
+            if (sk != Double.NEGATIVE_INFINITY) {
+              double t = trs[kc];
+              score += Math.exp(t + sk - constant);
+            }
+          }
+          curCol[l] = weight + Math.log(score) + constant;
+          //System.out.println("Setting col score to " + curCol[l]);
         } catch (Exception e) {
           throw new BioError(
             e,
@@ -595,11 +598,12 @@ public class PairwiseDP extends DP implements Serializable {
       //System.out.println("Scores " + curCol);
      STATELOOP:
       for (int l = 0; l < states.length; ++l) {
+        State curState = states[l];
   	    //System.out.println("State = " + l + "=" + states[l].getName());
         try {
           //System.out.println("trying initialization");
-          if(initializationHack && (states[l] instanceof EmissionState)) {
-            if(states[l] == magicalState) {
+          if(initializationHack && (curState instanceof EmissionState)) {
+            if(curState == magicalState) {
               curCol[l] = 0.0;
               curBPs[l] = TERMINAL_BP;
             } else {
@@ -610,75 +614,75 @@ public class PairwiseDP extends DP implements Serializable {
             continue STATELOOP;
           }
 
-          int [] advance = (states[l] instanceof EmissionState)
-            ? ((EmissionState)states[l]).getAdvance()
-            : ia00;
-          Cell oldCell = cells[advance[0]][advance[1]];
-          double[] sourceScores = oldCell.scores;
-          BackPointer[] oldBPs = oldCell.backPointers;
-          //System.out.println("sourceScores = " + sourceScores);
-          //System.out.println("Calculating weight");
           double weight;
-          if (! (states[l] instanceof EmissionState)) {
+          double[] sourceScores;
+          BackPointer[] oldBPs;
+          if(! (curState instanceof EmissionState)) {
             weight = 0.0;
+            sourceScores = curCol;
+            oldBPs = curBPs;
           } else {
             weight = emissions[l];
+            if(weight == Double.NEGATIVE_INFINITY) {
+              curCol[l] = Double.NEGATIVE_INFINITY;
+              curBPs[l] = null;
+              continue STATELOOP;
+            }
+            int [] advance = ((EmissionState)curState).getAdvance();
+            Cell oldCell = cells[advance[0]][advance[1]];
+            sourceScores = oldCell.scores;
+            oldBPs = oldCell.backPointers;
           }
           //System.out.println("weight = " + weight);
 
-          if (weight == Double.NEGATIVE_INFINITY) {
-            //System.out.println("Not reachable");
-            curCol[l] = Double.NEGATIVE_INFINITY;
-            curBPs[l] = null;
-          } else {
-            double score = Double.NEGATIVE_INFINITY;
-            int [] tr = transitions[l];
-            double[] trs = transitionScores[l];
+          double score = Double.NEGATIVE_INFINITY;
+          int [] tr = transitions[l];
+          double[] trs = transitionScores[l];
 
-            int bestK = -1; // index into states[l]
-            for (int kc = 0; kc < tr.length; ++kc) {
-              int k = tr[kc]; // actual state index
+          int bestK = -1; // index into states[l]
+          for (int kc = 0; kc < tr.length; ++kc) {
+            int k = tr[kc]; // actual state index
+            double sk = sourceScores[k];
 
-              //System.out.println("kc is " + kc);
-              //System.out.println("with from " + k + "=" + states[k].getName());
-              //System.out.println("prevScore = " + sourceScores[k]);
-              if (sourceScores[k] != Double.NEGATIVE_INFINITY) {
-                double t = trs[kc];
-                double newScore = t + sourceScores[k];
-                if (newScore > score) {
-                  score = newScore;
-                  bestK = k;
-                  //System.out.println("New best source at " + kc);
-                }
+            //System.out.println("kc is " + kc);
+            //System.out.println("with from " + k + "=" + states[k].getName());
+            //System.out.println("prevScore = " + sourceScores[k]);
+            if (sk != Double.NEGATIVE_INFINITY) {
+              double t = trs[kc];
+              double newScore = t + sk;
+              if (newScore > score) {
+                score = newScore;
+                bestK = k;
+                //System.out.println("New best source at " + kc);
               }
             }
-            if (bestK != -1) {
-              curCol[l] = weight + score;
-              /*System.out.println(
-                "Creating " + states[bestK].getName() +
-                " -> " + states[l].getName() +
-                " (" + curCol[l] + ")"
-              );*/
-              try {
-                State s = states[l];
-                curBPs[l] = new BackPointer(
-                  s,
-                  oldBPs[bestK],
-                  curCol[l]
-                );
-              } catch (Throwable t) {
-                throw new BioError(
-                  t,
-                  "Couldn't generate backpointer for " + states[l].getName() +
-                  " back to " + states[bestK].getName()
-                );
-              }
-            } else {
-              curBPs[l] = null;
-              curCol[l] = Double.NEGATIVE_INFINITY;
-            }
-            // System.out.println(curCol[l]);
           }
+          if (bestK != -1) {
+            curCol[l] = weight + score;
+            /*System.out.println(
+              "Creating " + states[bestK].getName() +
+              " -> " + states[l].getName() +
+              " (" + curCol[l] + ")"
+            );*/
+            try {
+              State s = states[l];
+              curBPs[l] = new BackPointer(
+                s,
+                oldBPs[bestK],
+                curCol[l]
+              );
+            } catch (Throwable t) {
+              throw new BioError(
+                t,
+                "Couldn't generate backpointer for " + states[l].getName() +
+                " back to " + states[bestK].getName()
+              );
+            }
+          } else {
+            curBPs[l] = null;
+            curCol[l] = Double.NEGATIVE_INFINITY;
+          }
+          // System.out.println(curCol[l]);
         } catch (Exception e) {
           throw new BioError(
             e,
