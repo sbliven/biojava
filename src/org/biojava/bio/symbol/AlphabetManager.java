@@ -729,4 +729,36 @@ public final class AlphabetManager {
       };
     }
   }
+
+
+    private static AlphabetIndex DNA_INDEX;
+    private static AlphabetIndex DNA_AMBIGUITY_INDEX;
+
+    /**
+     * Get an indexer for a specified alphabet.
+     *
+     * @param alpha The alphabet to index.
+     * @param allowAmbiguity Should the index recognise ambiguous symbols?
+     * @returns an index.
+     * @throws IllegalAlphabetException if this alphabet cannot be indexed for some reason.
+     * @since 1.1
+     */
+
+    public static AlphabetIndex getAlphabetIndex(Alphabet alpha, boolean allowAmbiguity) 
+        throws IllegalAlphabetException
+    {
+	if (alpha == org.biojava.bio.seq.DNATools.getDNA()) {
+	    if (allowAmbiguity) {
+		if (DNA_AMBIGUITY_INDEX == null)
+		    DNA_AMBIGUITY_INDEX = new DNAAmbiguityIndex();
+		return DNA_AMBIGUITY_INDEX;
+	    } else {
+		if (DNA_INDEX == null)
+		    DNA_INDEX = new DNAIndex();
+		return DNA_INDEX;
+	    }
+	}
+
+	throw new IllegalAlphabetException("[FIXME] Right now we can only index DNA");
+    }
 }

@@ -29,11 +29,10 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public class NthOrderDistribution extends AbstractDistribution implements Serializable {
+public abstract class NthOrderDistribution extends AbstractDistribution implements Serializable {
   private CrossProductAlphabet alphabet;
   private Alphabet firstA;
   private Alphabet lastA;
-  private Map dists;
   private Distribution nullModel;
   
   protected transient WeigthForwarder weightForwarder = null;
@@ -45,7 +44,7 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
       weightForwarder == null
     ) {
       weightForwarder = new WeigthForwarder(this, changeSupport);
-      for(Iterator i = dists.values().iterator(); i.hasNext(); ) {
+      for(Iterator i = distributions().iterator(); i.hasNext(); ) {
         Distribution dist = (Distribution) i.next();
         dist.addChangeListener(weightForwarder, Distribution.WEIGHTS);
       }
@@ -56,7 +55,7 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
      * Construct a new NthOrderDistribution.
      */
 
-  public NthOrderDistribution(CrossProductAlphabet alpha, DistributionFactory df)
+  protected NthOrderDistribution(CrossProductAlphabet alpha)
   throws IllegalAlphabetException  {
     this.alphabet = alpha;
     List aList = alpha.getAlphabets();
@@ -66,14 +65,8 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
     } else {
       this.firstA = AlphabetManager.getCrossProductAlphabet(aList.subList(0, lb1));
     }
-    this.lastA = (Alphabet) aList.get(lb1);
-    this.dists = new HashMap(); 
+    this.lastA = (Alphabet) aList.get(lb1); 
     this.nullModel = new UniformNullModel();
-    
-    for(Iterator i = ((FiniteAlphabet) firstA).iterator(); i.hasNext(); ) {
-      Symbol si = (Symbol) i.next();
-      dists.put(si, df.createDistribution(lastA));
-    }
   }
   
     /**
@@ -98,36 +91,13 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
 	return lastA;
     }
     
-  public void setDistribution(Symbol sym, Distribution dist)
-  throws IllegalSymbolException, IllegalAlphabetException {
-    firstA.validate(sym);
-    if(dist.getAlphabet() != lastA) {
-      throw new IllegalAlphabetException(
-        "The distribution must be over " + lastA +
-        ", not " + dist.getAlphabet()
-      );
-    }
-    
-    Distribution old = (Distribution) dists.get(sym);
-    if( (old != null) && (weightForwarder != null) ) {
-      old.removeChangeListener(weightForwarder);
-    }
-    
-    if(weightForwarder != null) {
-      dist.addChangeListener(weightForwarder);
-    }
-    
-    dists.put(sym, dist);
-  }
+    abstract Collection distributions();
+
+  public abstract void setDistribution(Symbol sym, Distribution dist)
+      throws IllegalSymbolException, IllegalAlphabetException;
   
-  public Distribution getDistribution(Symbol sym)
-  throws IllegalSymbolException {
-    Distribution d = (Distribution) dists.get(sym);
-    if(d == null) {
-      firstA.validate(sym);
-    }
-    return d;
-  }
+  public abstract Distribution getDistribution(Symbol sym)
+      throws IllegalSymbolException;
   
   public Alphabet getAlphabet() {
     return alphabet;
@@ -205,7 +175,7 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
   }
   
   public void registerWithTrainer(DistributionTrainerContext dtc) {
-    for(Iterator i = dists.values().iterator(); i.hasNext(); ) {
+    for(Iterator i = distributions().iterator(); i.hasNext(); ) {
       dtc.registerDistribution((Distribution) i.next());
     }
     dtc.registerTrainer(this, new IgnoreCountsTrainer() {
@@ -272,4 +242,15 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
       return null;
     }
   }
+
+    public static NthOrderDistribution make(CrossProductAlphabet alpha,
+					    DistributionFactory df)
+	throws IllegalAlphabetException
+    {
+	List aList = alpha.getAlphabets();
+	if (aList.size() == 2 && aList.get(0) == org.biojava.bio.seq.DNATools.getDNA())
+	    return new IndexedNthOrderDistribution(alpha, df);
+	else
+	    return new GeneralNthOrderDistribution(alpha, df);
+    }
 }
