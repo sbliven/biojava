@@ -520,7 +520,7 @@ final public class LocationTools {
       // lists and also careful to merge overlaps before adding to joinList.
       Iterator i = locList.iterator();
       Location last = Location.empty;
-      ArrayList mergeComponents = new ArrayList();
+
 
       // prime last
       if(i.hasNext()) {
@@ -531,30 +531,13 @@ final public class LocationTools {
       while(i.hasNext()) {
         Location cur = (Location) i.next();
         if(last.overlaps(cur)) {
-          //add to list of merge components
-          if(mergeComponents.isEmpty()){
-            //need to add last to the component list as well
-            mergeComponents.add(last);
+          try {
+            last = MergeLocation.mergeLocations(last,cur);
           }
-          mergeComponents.add(cur);
-
-          int min = Math.min(last.getMin(), cur.getMin());
-          int max = Math.max(last.getMax(), cur.getMax());
-          last = buildLoc(min, max);
+          catch (BioException ex) {
+            throw new BioError(ex,"Cannot make MergeLocation");
+          }
         } else {
-          if(! mergeComponents.isEmpty()){
-            //make last a MergeLocation so as to store all its components
-            try {
-              last = MergeLocation.mergeLocations(mergeComponents);
-
-              //reset merge components
-              mergeComponents.clear();
-            }
-            catch (BioException ex) {
-              //this shouldn't happen as conditions have been checked above
-              throw new BioError(ex,"Assertion Error, cannot build MergeLocation");
-            }
-          }
           joinList.add(last);
           last = cur;
         }
@@ -646,7 +629,7 @@ final public class LocationTools {
         throw new ClassCastException("Decorated locations are not handled in this version");
       }
   }
-  
+
   public static Location flip(Location loc, int len) {
       if(loc instanceof PointLocation) {
           return new PointLocation(len - loc.getMin() + 1);
