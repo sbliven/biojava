@@ -61,7 +61,7 @@ class FeatureTableParser {
 
     private String featureType;
     protected Location featureLocation;
-    private Map featureAttributes;
+    protected Map featureAttributes;
     private StrandedFeature.Strand featureStrand;
     private String featureSource;
 
