@@ -32,15 +32,21 @@ package org.biojava.bio.program.das.dasstructure ;
 import org.biojava.bio.structure.* ;
 import org.biojava.bio.structure.io.* ;
 
+// for applets ...
+//import java.security.*;
 
 import java.net.HttpURLConnection;
 import java.io.*;
 import java.net.URL;
 import java.util.Properties ;
+import java.util.zip.GZIPInputStream;
+
 
 import org.xml.sax.helpers.*;
 import org.xml.sax.*;
 import javax.xml.parsers.*;
+import java.util.Calendar;
+
 
 public class DASStructureCall {
     
@@ -55,6 +61,19 @@ public class DASStructureCall {
     public DASStructureCall(String url){
 	serverurl = url;
     }
+
+
+    protected String getTimeStamp(){
+
+	Calendar cal = Calendar.getInstance() ;
+	// Get the components of the time
+	int hour24 = cal.get(Calendar.HOUR_OF_DAY);     // 0..23
+	int min = cal.get(Calendar.MINUTE);             // 0..59
+	int sec = cal.get(Calendar.SECOND);             // 0..59
+	String s = "time: "+hour24+" "+min+" "+sec;
+	return s ;
+    }
+
     
     /** set url of structure service */
     public void   setServerurl(String s) { serverurl=s;     }
@@ -85,44 +104,67 @@ public class DASStructureCall {
 	
 
 	Structure structure = null;
+	//System.out.println(getTimeStamp());
+	//System.out.println("starting to parse DAS structure response");
 	try{
 	    structure = parseDASResponse(inStream) ;
 	} catch (Exception e) {
 	    e.printStackTrace() ;
 	}
+	//System.out.println("finished parsing DAS structure response");
+	//System.out.println(getTimeStamp());
 	return structure;
 	
     }
 
     /** connect to DAS server and return result as an InputStream */
-    
     private InputStream connectDASServer(URL url) 
 	throws IOException
     {
-	InputStream inStream = null ;
-				
 	
-	    HttpURLConnection huc = null;
-	    //huc = (HttpURLConnection) dasUrl.openConnection();
+				
+	System.out.println(getTimeStamp() );
+	System.out.println("opening connection to DAS Structure server");
+	HttpURLConnection huc = null;	
+	
+	//huc = (HttpURLConnection) dasUrl.openConnection();	    
+	//huc = proxyUrl.openConnection();	    
+	//System.out.println("opening "+url);
+	
+	huc = (HttpURLConnection) url.openConnection();
+	
+	// should make communication much faster!
+	huc.setRequestProperty("Accept-Encoding", "gzip");
+	
+	//System.out.println(huc.getResponseMessage());
+	
+	
+	String contentEncoding = huc.getContentEncoding();
+	
+	InputStream inStream = huc.getInputStream();
+	
+	if (contentEncoding != null) {
+	    if (contentEncoding.indexOf("gzip") != -1) {
+		// we have gzip encoding
+		inStream = new GZIPInputStream(inStream);
+		//System.out.println("using gzip encoding!");
+	    }
+	}
 	    
-	    //huc = proxyUrl.openConnection();
-	    
-	    //System.out.println("opening "+url);
-	    huc = (HttpURLConnection) url.openConnection();
-	    
-	    
-	    //System.out.println(huc.getResponseMessage());
-	    String contentEncoding = huc.getContentEncoding();
-	    //System.out.println("encoding: " + contentEncoding);
-	    //System.out.println("code:" + huc.getResponseCode());
-	    //System.out.println("message:" + huc.getResponseMessage());
-	    inStream = huc.getInputStream();
-	    
-
+			
+	System.out.println(getTimeStamp() );
+	System.out.println("got InputStream from  DAS Structure server");
+	//System.out.println("encoding: " + contentEncoding);
+	//System.out.println("code:" + huc.getResponseCode());
+	//System.out.println("message:" + huc.getResponseMessage());
+	//inStream = huc.getInputStream();
+	
+	
 	return inStream;
 	
     }
 
+    
     /** parse the Response of a DAS Structure service and return a
      * biojava Structure */
     private StructureImpl parseDASResponse(InputStream inStream) 
@@ -135,8 +177,8 @@ public class DASStructureCall {
 
 
 	SAXParserFactory spfactory =  SAXParserFactory.newInstance();	
-	spfactory.setValidating(false);
-	spfactory.setNamespaceAware(false);
+	//spfactory.setValidating(false);
+	//spfactory.setNamespaceAware(false);
 	
 	/*
 	  try {
@@ -162,10 +204,14 @@ public class DASStructureCall {
 	//xmlreader.setValidating(false);
 
 	// try to deactivate validation
-	
-	xmlreader.setFeature("http://xml.org/sax/features/validation", false);
-	xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false); 
-	
+	/*
+	try {
+	    xmlreader.setFeature("http://xml.org/sax/features/validation", false);
+	    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false); 
+	} catch (SAXException e) {
+	    System.err.println("Cannot deactivate validation."); 
+	}
+	*/
 	/*
 	try {
 	    //System.out.println("deactivating validation");

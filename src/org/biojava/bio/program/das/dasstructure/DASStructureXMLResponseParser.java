@@ -86,9 +86,12 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
     private void OBJECThandler(Attributes atts){
 	// mandatory attribute
 	//System.out.println("objectHandler");
-	String id = atts.getValue("id") ;
+	String id = atts.getValue("dbAccessionId") ;
+	String objectVersion = atts.getValue("objectVersion") ;
+
 	HashMap header = new HashMap() ;
 	header.put("idCode",id);
+	header.put("modDate",objectVersion);	
 	structure.setHeader(header);
 	//structure.setName(id);
 	structure.setPDBCode(id);
