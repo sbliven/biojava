@@ -24,11 +24,11 @@ package org.biojava.bio.symbol;
 import junit.framework.TestCase;
 
 /**
- * Tests IntegerAlphabet to make sure we can get it, that it is cannonical, that
- * symbols it returns are cannonical, that finite ranges are cannonical and that
- * symbols in finite ranges are cannonical.
+ * Tests IntegerAlphabet to make sure we can get it, that it is
+ * canonical, that symbols it returns are canonical, that finite
+ * ranges are canonical and that symbols in finite ranges are
+ * canonical.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
 public class IntegerAlphabetTest extends TestCase
@@ -36,9 +36,8 @@ public class IntegerAlphabetTest extends TestCase
   public IntegerAlphabetTest(String name) {
     super(name);
   }
-  
-  
-  public void testCannonicalAlphabet() {
+
+  public void testCanonicalAlphabet() {
     assertEquals(
       AlphabetManager.alphabetForName("INTEGER"),
       IntegerAlphabet.getInstance()
@@ -49,7 +48,7 @@ public class IntegerAlphabetTest extends TestCase
       IntegerAlphabet.getInstance()
     );
   }
-  
+
   public void testCanonicalSymbols() {
     Symbol[] syms = new Symbol[10];
     for(int i = 0; i < syms.length; i++) {
@@ -63,26 +62,26 @@ public class IntegerAlphabetTest extends TestCase
       );
     }
   }
-  
-  public void testCannonicalSubAlphabet() {
+
+  public void testCanonicalSubAlphabet() {
     int min = 200;
     int max = 300;
-    
+ 
     IntegerAlphabet alpha = IntegerAlphabet.getInstance();
-    
+ 
     Alphabet a1 = alpha.getSubAlphabet(min, max);
     Alphabet a2 = alpha.getSubAlphabet(min, max);
-    
+ 
     assertEquals(a1, a2);
   }
-  
-  public void testSubAlphabetSymbolsCannonical()
+
+  public void testSubAlphabetSymbolsCanonical()
   throws IllegalSymbolException {
     int min = 400;
     int max = 500;
-    
+
     IntegerAlphabet alpha = IntegerAlphabet.getInstance();
-    
+
     IntegerAlphabet.SubIntegerAlphabet a1 = alpha.getSubAlphabet(min, max);
     for(int i = min; i <= max; i++) {
       assertEquals(
