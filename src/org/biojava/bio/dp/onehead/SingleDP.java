@@ -218,8 +218,10 @@ public class SingleDP extends DP implements Serializable {
     
     for (int l = 0; l < getDotStatesIndex(); l++) {
       if(states[l] == getModel().magicalState()) {
+        //prob 1
         v[l] = 0.0;
       } else {
+        //prob 0
         v[l] = Double.NEGATIVE_INFINITY;
       }
     }
@@ -227,6 +229,7 @@ public class SingleDP extends DP implements Serializable {
     int [][] transitions = getForwardTransitions();
     double [][] transitionScore = getForwardTransitionScores(scoreType);
     double [] currentCol = dpCursor.currentCol();
+    //l over dots
     for (int l = getDotStatesIndex(); l < states.length; l++) {
       double score = 0.0;
       int [] tr = transitions[l];
@@ -234,8 +237,11 @@ public class SingleDP extends DP implements Serializable {
         
       int ci = 0;
       while(
-        ci < tr.length  &&
-        currentCol[tr[ci]] == Double.NEGATIVE_INFINITY
+        ci < tr.length  && (
+        currentCol[tr[ci]] == Double.NEGATIVE_INFINITY ||
+        currentCol[tr[ci]] == Double.NaN ||
+        currentCol[tr[ci]] == Double.POSITIVE_INFINITY
+        )
       ) {
         ci++;
       }
@@ -244,7 +250,11 @@ public class SingleDP extends DP implements Serializable {
       for(int kc = 0; kc < tr.length; kc++) {
         int k = tr[kc];
 
-        if(currentCol[k] != Double.NEGATIVE_INFINITY) {
+        if(
+          currentCol[k] != Double.NEGATIVE_INFINITY &&
+          currentCol[k] != Double.NaN &&
+          currentCol[k] != Double.POSITIVE_INFINITY
+        ) {
           double t = trs[kc];
           score += Math.exp(t + (currentCol[k] - constant));
         } else {
@@ -298,7 +308,9 @@ public class SingleDP extends DP implements Serializable {
           int ci = 0;
           while (
             ci < tr.length &&
-            lastCol[tr[ci]] == Double.NEGATIVE_INFINITY
+            (lastCol[tr[ci]] == Double.NEGATIVE_INFINITY
+            || lastCol[tr[ci]] == Double.NaN
+            || lastCol[tr[ci]] == Double.POSITIVE_INFINITY)
           ) {
             ci++;
           }
@@ -309,8 +321,12 @@ public class SingleDP extends DP implements Serializable {
             // System.out.println("k=" + states[k].getName());
             if (lastCol[k] != Double.NEGATIVE_INFINITY) {
               double t = trs[kc];
-              //System.out.println("t=" + t);
-              //System.out.println("lastCol[k]=" + lastCol[k]);
+              
+              if(states[l]== getModel().magicalState())  {
+                System.out.print("magic " + "lastCol[k]=" + lastCol[k] + " , ");
+                System.out.println("t=" + t);
+              }
+              
               score += Math.exp(t + (lastCol[k] - constant));
             } else {
               // System.out.println("-");
@@ -318,10 +334,15 @@ public class SingleDP extends DP implements Serializable {
           }
           // new_l = emission_l(sym) * sum_k(transition(k, l) * old_k)
           currentCol[l] = (weight + Math.log(score)) + constant;
-          //System.out.println("Weight " + weight);
-          //System.out.println("score " + score + " = " + Math.log(score));
-          //System.out.println("constant " + constant);
-          //System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
+          
+          System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
+
+          if(states[l] == getModel().magicalState())  {
+               System.out.print("magic\t");
+               System.out.print("Weight " + weight + "\t");
+               System.out.print(", score " + score + " = " + Math.log(score) + "\t");
+               System.out.println(", constant " + constant);             
+          }
         }
       }
       for(int l = getDotStatesIndex(); l < states.length; l++) { // all dot states from emissions
@@ -331,24 +352,29 @@ public class SingleDP extends DP implements Serializable {
         
         int ci = 0;
         while(
-          ci < tr.length  &&
+          ci < tr.length  && (
           currentCol[tr[ci]] == Double.NEGATIVE_INFINITY
+          || currentCol[tr[ci]] == Double.NaN
+          || currentCol[tr[ci]] == Double.POSITIVE_INFINITY)
         ) {
           ci++;
         }
         double constant = (ci < tr.length) ? currentCol[tr[ci]] : 0.0;
-        
+        //System.out.println("constant: " + constant);
+        //System.out.println("read from state: " + ((ci < tr.length) ? states[tr[ci]].getName() : "none"));
         for(int kc = 0; kc < tr.length; kc++) {
           int k = tr[kc];
 
-          if(currentCol[k] != Double.NEGATIVE_INFINITY) {
+          if(currentCol[k] != Double.NEGATIVE_INFINITY 
+          && currentCol[k] !=Double.NaN
+          && currentCol[k] != Double.POSITIVE_INFINITY) {
             double t = trs[kc];
             score += Math.exp(t + (currentCol[k] - constant));
           } else {
           }
         }
         currentCol[l] = Math.log(score) + constant;
-        //System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
+        System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
       }
     }
   }
