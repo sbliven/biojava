@@ -235,13 +235,17 @@ public class LabelledSequenceRenderer extends AbstractChangeable implements Sequ
         
         path.add( this );
         
-        if( mouseClickArea.contains( mE.getX(), mE.getY() ) ){
+        if( mouseClickArea.contains( mE.getX(), mE.getY() )) {
             sVE = new SequenceViewerEvent( this, this, 1, mE, path );
+        } else {
+		if (sRC.getDirection() == SequenceRenderContext.VERTICAL) {
+			mE.translatePoint(0, -(int)width);
+			sVE = seqRend.processMouseEvent( sRC, mE, path );
+		} else {
+			mE.translatePoint(-(int)width, 0);
+			sVE = seqRend.processMouseEvent( sRC, mE, path );
+		}
         }
-        else {
-            sVE = seqRend.processMouseEvent( sRC, mE, path );
-        }
-        
         return sVE;
     }
     
