@@ -3,6 +3,8 @@ package org.biojava.bio.symbol;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.SymbolTokenization;
 
 /**
  * <p>
@@ -45,9 +47,6 @@ public class UkkonenSuffixTree{
   private String sequences;
 
   private FiniteAlphabet alpha;
-  private HashMap symbolToChar;
-  private HashMap charToSymbol;
-  private short nextChar;
 
   /** Describes the rule that needs to be applied after walking down a tree. Put as a class variable because it can only return a single object (and I don't want to extend Node any further.
    * rule 1: ended up at a leaf.
@@ -69,9 +68,6 @@ public class UkkonenSuffixTree{
     e=0;
     sequences = "";
     alpha=null;
-    charToSymbol=null;
-    symbolToChar=null;
-    nextChar=DEFAULT_TERM_CHAR+1;
   }
 
   public UkkonenSuffixTree(String seqs){
@@ -82,28 +78,8 @@ public class UkkonenSuffixTree{
   public UkkonenSuffixTree(FiniteAlphabet alpha){
     this();
     this.alpha=alpha;
-    charToSymbol=new HashMap(alpha.size());
-    symbolToChar=new HashMap(alpha.size());
-    mapAplhaToChars(alpha);
   }
 
-
-  /** Creates a mapping between symbols in the alphabet and unicode characters.
-   * @param alpha a <code>FiniteAlphabet</code> value
-   */
-  private void mapAplhaToChars(FiniteAlphabet alpha){
-    Iterator iterator = alpha.iterator();
-    Symbol symbol;
-    Character letter;
-    while (iterator.hasNext()){
-      symbol = (Symbol)iterator.next();
-      if (!symbolToChar.containsKey(symbolToChar)){
-	letter= new Character((char)nextChar++);
-	symbolToChar.put(symbol, letter);
-	charToSymbol.put(letter, symbol);
-      }
-    }
-  }
 
   /** Makes a string out of a SymbolList, this string should only be used for
    * internal or testing purposes, as it will necessarily consist of visible
@@ -113,16 +89,13 @@ public class UkkonenSuffixTree{
    * @exception IllegalSymbolException if an error occurs
    */
   public String symbolListToString(SymbolList list) throws IllegalSymbolException{
-    FiniteAlphabet checkAlpha = (FiniteAlphabet)list.getAlphabet();
-    Iterator iterator = checkAlpha.iterator();
-    while (iterator.hasNext())
-      alpha.validate((Symbol)iterator.next());
-    char[] string = new char[list.length()];
-    mapAplhaToChars (checkAlpha);
-    for (int i=0;i<string.length;i++){
-      string[i]=((Character)symbolToChar.get(list.symbolAt(i+1))).charValue();
+    try {
+      FiniteAlphabet alpha = (FiniteAlphabet)list.getAlphabet();
+      SymbolTokenization tok = alpha.getTokenization("token");
+      return tok.tokenizeSymbolList(list);
+    } catch (BioException be) {
+      throw new IllegalSymbolException(be.toString());
     }
-    return new String(string);
   }
 
   /** Converts a string that came from symbolListToString back to a SymbolList.
@@ -132,14 +105,13 @@ public class UkkonenSuffixTree{
    * @return a <code>SymbolList</code> representation of the string above.
    */
   public SymbolList stringToSymbolList(String string){
-    ArrayList symbols = new ArrayList(string.length());
-    for (int i=0;i<string.length();i++){
-      symbols.add(i, charToSymbol.get(new Character(string.charAt(i))));
+    try {
+      SymbolTokenization tok = alpha.getTokenization("token");
+      return new SimpleSymbolList(tok, string);
+    } catch (BioException be) {
+      System.err.println("No alphabet known to the SuffixTree.");
+      return null;
     }
-    try{
-      return new SimpleSymbolList(alpha, symbols);
-    }catch(IllegalSymbolException e){e.printStackTrace();}
-    return null;
   }
 
   public void addSymbolList(SymbolList list, String name, boolean doNotTerminate) throws IllegalSymbolException{
@@ -575,7 +547,7 @@ public class UkkonenSuffixTree{
    ******************************************************************/
 
   class SuffixNode {
-    final static int A_LEAF=-1;
+    static final int A_LEAF=-1;
     SuffixNode parent;
     SuffixNode suffixLink;
     int labelStart, labelEnd;
