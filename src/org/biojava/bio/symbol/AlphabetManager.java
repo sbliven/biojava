@@ -382,11 +382,14 @@ public final class AlphabetManager {
         }
       }
     }
+    if(symSet.isEmpty()) {
+      return getGapSymbol();
+    }
     Symbol as = (Symbol) ambiguitySymbols.get(symSet);
     if(as == null) {
       as = new SimpleSymbol(
         token,
-        name,
+        name + "-pigs",
         new SimpleAlphabet(symSet),
         ann
       );

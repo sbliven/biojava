@@ -61,7 +61,7 @@ public abstract class AbstractDistribution implements Distribution {
       nullModelForwarder == null
     ) {
       nullModelForwarder = new Distribution.NullModelForwarder(this, changeSupport);
-      getNullModel().addChangeListener(nullModelForwarder);
+      getNullModel().addChangeListener(nullModelForwarder, Distribution.WEIGHTS);
     }
   }
   
