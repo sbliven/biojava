@@ -83,7 +83,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
     public boolean readSequence(BufferedReader reader,
 				SymbolParser symParser,
 				SeqIOListener siol)
-	throws IllegalSymbolException, IOException 
+	throws IllegalSymbolException, IOException, ParseException 
     {
 	String line = reader.readLine();
 	if (line == null) {
