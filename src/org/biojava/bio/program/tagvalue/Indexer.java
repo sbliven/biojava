@@ -9,7 +9,7 @@ import org.biojava.bio.program.indexdb.*;
 
 public class Indexer
 implements TagValueListener {
-  private final File file;
+  private final RAF file;
   private final CountedBufferedReader reader;
   private final IndexStore indexStore;
   private final Map seccondaryKeys;
@@ -20,7 +20,7 @@ implements TagValueListener {
   
   public Indexer(File file, IndexStore indexStore)
   throws FileNotFoundException {
-    this.file = file;
+    this.file = new RAF(file, "r");
     this.reader = new CountedBufferedReader(new FileReader(file));
     this.indexStore = indexStore;
     this.seccondaryKeys = new SmallMap();

@@ -2,10 +2,11 @@ package org.biojava.bio.program.indexdb;
 
 import java.util.Map;
 import java.util.List;
-import java.io.File;
+import java.io.RandomAccessFile;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
+import org.biojava.utils.io.RAF;
 
 public interface IndexStore {
   public Record get(String id)
@@ -17,7 +18,7 @@ public interface IndexStore {
   public Annotation getMetaData();
   
   public void writeRecord(
-    File file,
+    RAF file,
     long offset,
     int length,
     String id,

@@ -100,12 +100,24 @@ public class LineSplitParser
       return null;
     }
     
-    String tag = line.substring(0, splitOffset);
+    int length = line.length();
+    
+    String tag;
+    if(length > splitOffset) {
+      tag = line.substring(0, splitOffset);
+    } else {
+      tag = line;
+    }
     if(trimTag) {
       tag = tag.trim();
     }
     
-    String value = line.substring(splitOffset);
+    String value;
+    if(length > splitOffset) {
+      value = line.substring(splitOffset);
+    } else {
+      value = "";
+    }
     if(trimValue) {
       value = value.trim();
     }

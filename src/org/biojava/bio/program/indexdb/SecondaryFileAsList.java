@@ -12,7 +12,7 @@ extends SearchableFileAsList {
       String as = a.toString();
       String bs = b.toString();
       
-      return BioStore.STRING_CASE_SENSITIVE_ORDER.compare(a, b);
+      return BioStore.STRING_CASE_SENSITIVE_ORDER.compare(as, bs);
     }
   };
   
@@ -33,7 +33,7 @@ extends SearchableFileAsList {
     }
     String prim = new String(buffer, 0, tabI);
     tabI++;
-    String sec = new String(buffer, tabI, buffer.length).trim();
+    String sec = new String(buffer, tabI, buffer.length - tabI).trim();
     
     return new KeyPair.Impl(prim, sec);
   }

@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import org.biojava.utils.*;
+import org.biojava.utils.io.*;
 
 class PrimaryIDList
 extends SearchableFileAsList {
@@ -54,7 +55,7 @@ extends SearchableFileAsList {
     while(buffer[newI] != '\t') {
       newI++;
     }
-    File file = store.getFileForID(Integer.parseInt(new String(buffer, lastI, newI - lastI).trim()));
+    RAF file = store.getFileForID(Integer.parseInt(new String(buffer, lastI, newI - lastI).trim()));
     
     lastI = ++newI;
     while(buffer[newI] != '\t') {

@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.utils.io.*;
 
 public class BioStore implements IndexStore {
   static Comparator STRING_CASE_SENSITIVE_ORDER = new Comparator() {
@@ -19,13 +20,13 @@ public class BioStore implements IndexStore {
   
   private ConfigFile metaData;
   private File location;
-  private PrimaryIDList primaryList;
   private String primaryKey;
   private Map idToList;
-  private File[] fileIDToFile;
+  private RAF[] fileIDToRAF;
+  private PrimaryIDList primaryList;
   private int fileCount;
 
-  BioStore(File location)
+  public BioStore(File location)
   throws IOException, BioException {
     this.location = location;
     metaData = new ConfigFile(BioStoreFactory.makeConfigFile(location));
@@ -45,6 +46,8 @@ public class BioStore implements IndexStore {
       idToList.put(k, new SecondaryFileAsList(file));
     }
     
+    //System.out.println("Primary key: " + plFile);
+    
     readFileIDs();
   }
   
@@ -53,16 +56,17 @@ public class BioStore implements IndexStore {
     IOException,
     BioException
   {
-    fileIDToFile = new File[5];
+    fileIDToRAF = new RAF[5];
     fileCount = 0;
     
     for(Iterator i = metaData.keys().iterator(); i.hasNext(); ) {
       String key = (String) i.next();
-      if(key.startsWith("fieldid_")) {
+      if(key.startsWith("fileid_")) {
         int indx = Integer.parseInt(key.substring("fileid_".length()));
         String fileLine = (String) metaData.getProperty(key);
         int tab = fileLine.indexOf("\t");
         File file = new File(fileLine.substring(0, tab));
+        RAF raf = new RAF(file, "r");
         long length = Long.parseLong(fileLine.substring(tab+1));
         
         if(file.length() != length) {
@@ -72,59 +76,53 @@ public class BioStore implements IndexStore {
         if(indx >= fileCount) {
           // beyond end
           
-          if(indx >= fileIDToFile.length) {
+          if(indx >= fileIDToRAF.length) {
             // beyond array end
-            File[] tmp = new File[indx];
-            System.arraycopy(fileIDToFile, 0, tmp, 0, fileIDToFile.length);
+            RAF[] tmpr = new RAF[indx];
+            System.arraycopy(fileIDToRAF, 0, tmpr, 0, fileIDToRAF.length);
+            fileIDToRAF = tmpr;
           }
           
           fileCount = indx;
         }
-        fileIDToFile[indx] = file;
+        //System.out.println(indx + " "  + file);
+        fileIDToRAF[indx] = raf;
       }
     }
   }
   
   private void writeFileIDs()
-  throws BioException, ChangeVetoException {
+  throws BioException, IOException, ChangeVetoException {
     for(int i = 0; i < fileCount; i++) {
-      File file = fileIDToFile[i];
+      RAF file = fileIDToRAF[i];
       long length = file.length();
       
-      metaData.setProperty("fileid_" + i, file + "\t" + length);
+      metaData.setProperty("fileid_" + i, file.getFile().toString() + "\t" + length);
     }
   }
   
-  File getFileForID(int fileId) {
-    return fileIDToFile[fileId];
+  RAF getFileForID(int fileId) {
+    return fileIDToRAF[fileId];
   }
   
-  int getIDForFile(File file)
+  int getIDForFile(RAF file)
   throws IOException {
     // scan list
     for(int i = 0; i < fileCount; i++) {
-      if(file.equals(fileIDToFile[i])) {
+      if(file.equals(fileIDToRAF[i])) {
         return i;
       }
     }
     
-    file = file.getCanonicalFile();
-    
-    for(int i = 0; i < fileCount; i++) {
-      if(file.equals(fileIDToFile[i])) {
-        return i;
-      }
-    }
-
     // extend fileIDToFile array
-    if(fileCount >= fileIDToFile.length) {
-      File[] tmp = new File[fileIDToFile.length + 4]; // 4 is magic number
-      System.arraycopy(fileIDToFile, 0, tmp, 0, fileCount);
-      fileIDToFile = tmp;
+    if(fileCount >= fileIDToRAF.length) {
+      RAF[] tmpr = new RAF[fileIDToRAF.length + 4]; // 4 is magic number
+      System.arraycopy(fileIDToRAF, 0, tmpr, 0, fileCount);
+      fileIDToRAF = tmpr;
     }
     
     // add the unseen file to the list
-    fileIDToFile[fileCount] = file;
+    fileIDToRAF[fileCount] = file;
     return fileCount++;
   }
   
@@ -154,7 +152,7 @@ public class BioStore implements IndexStore {
   }
   
   public void writeRecord(
-    File file,
+    RAF file,
     long offset,
     int length,
     String id,
@@ -183,6 +181,8 @@ public class BioStore implements IndexStore {
       writeFileIDs();
     } catch (ChangeVetoException cve) {
       throw new BioException(cve);
+    } catch (IOException ioe) {
+      throw new BioException(ioe);
     }
     
     metaData.commit();

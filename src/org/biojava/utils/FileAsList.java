@@ -8,10 +8,10 @@ extends AbstractList
 /* implements */ /* RandomAccess, */ {
   private RandomAccessFile mappedFile;
   private int commitedRecords;
-  private int lastIndx;
+  private int lastIndx = -1;
   private Object lastRec;
   private byte[] buffer;
-  private int sizeCache;
+  private int sizeCache = -1;
   
   public FileAsList(File mappedFile, int recordLength)
   throws IOException {
@@ -34,8 +34,6 @@ extends AbstractList
     }
     
     this.mappedFile.close();
-    
-    lastIndx = -1;
   }
   
   public FileAsList(File mappedFile)
@@ -53,7 +51,6 @@ extends AbstractList
     }
     
     buffer = new byte[Integer.parseInt(sbuff.toString().trim())];
-    lastIndx = -1;
   }
   
   public byte[] rawGet(int indx) {

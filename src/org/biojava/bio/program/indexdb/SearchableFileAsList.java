@@ -22,18 +22,22 @@ extends FileAsList {
     byte[] idBytes = id.getBytes();
     byte[] bytes;
     
-    int prev = size() / 2;
-    int jumpSize = size() / 4;
-    do {
-      bytes = rawGet(prev);
+    int min = 0;
+    int max = size()-1;
+    int cnt = 0;
+    do { 
+      int mid = (min + max + (++cnt) % 2) / 2;
+      
+      bytes = rawGet(mid);
       int cmp = cmp(bytes, idBytes);
-      if(cmp == 0) {
+      if(cmp < 0) {
+        min = mid;
+      } else if(cmp > 0) {
+        max = mid;
+      } else {
         return parseRecord(bytes);
       }
-      
-      prev = prev += cmp * jumpSize;
-      jumpSize /= 2;
-    } while (jumpSize > 0);
+    } while(min != max);
     
     throw new NoSuchElementException("No element with id: " + id);
   }
