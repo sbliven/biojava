@@ -69,34 +69,48 @@ extends SequenceRendererWrapper {
   }
   
   public double getDepth(SequenceRenderContext ctx) {
-    SequenceRenderContext subctx = contextForLabel(
-      ctx, getLabel()
-    );
-    return super.getDepth(subctx);
+    if(getLabel() != null) {
+      SequenceRenderContext subctx = contextForLabel(
+        ctx, getLabel()
+      );
+      return super.getDepth(subctx);
+    } else {
+      return 0.0;
+    }
   }
   
   public double getMinimumLeader(SequenceRenderContext ctx) {
-    SequenceRenderContext subctx = contextForLabel(
-      ctx, getLabel()
-    );
-    return super.getMinimumLeader(subctx);
+    if(getLabel() != null) {
+      SequenceRenderContext subctx = contextForLabel(
+        ctx, getLabel()
+      );
+      return super.getMinimumLeader(subctx);
+    } else {
+      return 0.0;
+    }
   }
   
   public double getMinimumTrailer(SequenceRenderContext ctx) {
-    SequenceRenderContext subctx = contextForLabel(
-      ctx, getLabel()
-    );
-    return super.getMinimumTrailer(subctx);
+    if(getLabel() != null) {
+      SequenceRenderContext subctx = contextForLabel(
+        ctx, getLabel()
+      );
+      return super.getMinimumTrailer(subctx);
+    } else {
+      return 0.0;
+    }
   }
   
   public void paint(
         Graphics2D g,
         SequenceRenderContext ctx
   ) {
-    SequenceRenderContext subctx = contextForLabel(
-      ctx, getLabel()
-    );
-    super.paint(g, subctx);
+    if(getLabel() != null) {
+      SequenceRenderContext subctx = contextForLabel(
+        ctx, getLabel()
+      );
+      super.paint(g, subctx);
+    }
   }
 
   public SequenceRenderContext contextForLabel(
