@@ -146,7 +146,7 @@ public class GFFEntrySet {
                     case 2: framed.readingFrame = FramedFeature.FRAME_2;
                       break;
                 }
-
+		seq.createFeature(framed);
               }
             }
           }
