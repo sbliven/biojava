@@ -26,7 +26,8 @@
     <para>Many Java objects are mutable. That is, you can invoke
     methods that change their state. The
     <classname>Collections</classname> API supplies mutable
-    implementations of the List interface. There is also a method
+    implementations of the <classname>List</classname>
+    interface. There is also a method
     <methodname>Collections.immutableList(List l)</methodname> that
     returns a view of the underlying list where the mutators throw
     exceptions. Through this view object there is no way to edit the
@@ -208,8 +209,5 @@
     <classname>Changeable</classname>, this is a perfect base
     class. It will lazily instantiate the delegate only when listeners
     need to be registered.</para>
-
-    <para>In the next chapter, we will implement an event source and
-    add some listeners to it.</para>
   </sect1>
 </chapter>

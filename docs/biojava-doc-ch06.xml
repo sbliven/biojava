@@ -1,0 +1,129 @@
+<!--DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
+                         "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
+]-->
+
+<chapter id="bd-ch06">
+  <title>Representing Search Results</title>
+
+  <abstract id="bd-ch06-abstract">
+    <para>This chapter covers BioJava's support for processing the
+    output from common sequence similarity search programs such as
+    Blast and Fasta. The Java API referred to in this chapter is
+    located in the packages
+    <classname>org.biojava.bio.search</classname>,
+    <classname>org.biojava.bio.program.sax</classname>,
+    <classname>org.biojava.bio.program.ssbind</classname> and
+    <classname>org.biojava.bio.program.blast2html</classname>. For a
+    complete overview of the APIs provided by these packages, please
+    consult the <ulink url="javadoc/index.html">JavaDoc
+    documentation</ulink>.</para>
+  </abstract>
+
+  <sect1 id="bd-ch06-represent">
+    <title>A tour of search results</title>
+
+    <para>Sequence similarity search programs are amongst the most
+    commonly used tools in bioinformatics. Their use is often
+    characterised by the need to process and organise large amounts of
+    program output in loosely specified formats which undergo subtle
+    changes between program versions. BioJava has a common set of
+    interfaces and classes for representing sequence similarity search
+    results and also goes some way to addressing the problem of
+    disparate output formats by offering the Blast-like parsing
+    framework. This produces SAX2 events conforming to a common DTD
+    for NCBI Blast, Wu Blast, Fasta and HMMER.</para>
+
+    <para>The Java package
+    <classname>org.biojava.bio.search</classname> contains interfaces
+    and classes for purely for representing sequence similarity search
+    results, regardless of the program that supplied the original
+    data. When a query sequence is searched against a database of
+    other sequences, the entire set of database hits is known as a
+    "result". These are represented by the interface <classname>
+    SeqSimilaritySearchResult</classname>:</para>
+
+<programlisting>
+public interface SeqSimilaritySearchResult {
+    SymbolList getQuerySequence();
+    SequenceDB getSequenceDB();
+    Map getSearchParameters();
+    List getHits();
+}
+</programlisting>
+
+    <para>As you can see, the result interface also specifies that
+    instances are capable of returning the query sequence as a
+    <classname>SymbolList</classname> and the target database as a
+    <classname>SequenceDB</classname>. The search parameters may not
+    be available, so the
+    <methodname>getSearchParameters()</methodname> is permitted to
+    return null. The individual database hits are returned as a
+    <classname>List</classname> whose order should be specified by the
+    implementation. The <classname>SeqSimilaritySearchHit</classname>
+    interface defines accessors for the hit data, using the Blast
+    terminology of "query" for the sequence being searched against the
+    database and "subject" for a sequence in the database which is
+    hit.</para>
+
+<programlisting>
+public interface SeqSimilaritySearchHit {
+    public double getScore();
+    public double getPValue();
+    public double getEValue();
+    public int getQueryStart();
+    public int getQueryEnd();
+    public Strand getQueryStrand();
+    public int getSubjectStart();
+    public int getSubjectEnd();
+    public Strand getSubjectStrand();
+    public String getSequenceID();
+    public List getSubHits();
+}
+</programlisting>
+
+    <para>The exact behaviour of each method is given in the API
+    documentation (notably, that "score" is the only mandatory field
+    describing degree of similarity and that the methods returning a
+    <classname>Strand</classname> are permitted to return null for
+    protein sequences. In Blast terms, a hit represents a collection
+    of HSPs, with the list of HSPs which constitute the hit being
+    returned by the <methodname>getSubHits()</methodname> method. Each
+    sub-hit is described by the interface
+    <classname>SeqSimilaritySearchSubHit</classname>:</para>
+
+<programlisting>
+public interface SeqSimilaritySearchSubHit {
+    public double getScore();
+    public double getPValue();
+    public double getEValue();
+    public int getQueryStart();
+    public int getQueryEnd();
+    public Strand getQueryStrand();
+    public int getSubjectStart();
+    public int getSubjectEnd();
+    public Strand getSubjectStrand();
+    public Alignment getAlignment();
+}
+</programlisting>
+
+    <para>The most important additional method available on the
+    sub-hits is <methodname>getAlignment()</methodname> which returns
+    an alignment corresponding to the sub-hit region.</para>
+
+    <para>These interfaces intentionally present a rather limited view
+    of possible result data. There are simple implementations which
+    provide nothing more than the methods described above. However,
+    the preferred implementations are
+    <classname>SequenceDBSearchResult</classname>,
+    <classname>SequenceDBSearchHit</classname> and
+    <classname>SequenceDBSearchSubHit</classname>. The first two of
+    these also implement <classname>Annotatable</classname>, thus
+    allowing arbitrary additional information from the search program
+    to be stored in an <classname>Annotation</classname>
+    object.</para>
+
+    <para>The following sections describe how you can create instances
+    of these and other objects from program output and create XML
+    conforming to the BioJava BlastLikeDataSetCollection DTD.</para>
+  </sect1>
+</chapter>

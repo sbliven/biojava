@@ -81,9 +81,10 @@ public interface Symbol {
     information associated with them (for instance, information about
     the chemical properties of a DNA base) stored in a standard
     BioJava data structure called an
-    Annotation. <classname>Annotation</classname>s are just set of
-    key-value data. The final method, getMatches, is only important
-    for ambiguous symbols, which are covered at the end of this
+    <classname>Annotation</classname>. <classname>Annotation</classname>s
+    are just set of key-value data. The final method,
+    <methodname>getMatches</methodname>, is only important for
+    ambiguous symbols, which are covered at the end of this
     chapter.</para>
 
     <para>The set of <classname>Symbol</classname> objects which may
@@ -133,7 +134,8 @@ System.out.println("First symbol = " + seq.symbolAt(1).getName());
     biological sequences.</para>
 
     <para>There are several other standard methods in the
-    <classname>SymbolList</classname> interface. subList returns a new
+    <classname>SymbolList</classname>
+    interface. <methodname>subList</methodname> returns a new
     <classname>SymbolList</classname> representing part of the
     sequence, just like the substring method of the
     <classname>String</classname> class. seqString returns a normal

@@ -6,6 +6,7 @@
     <!ENTITY chapter03 SYSTEM "biojava-doc-ch03.xml">
     <!ENTITY chapter04 SYSTEM "biojava-doc-ch04.xml">
     <!ENTITY chapter05 SYSTEM "biojava-doc-ch05.xml">
+    <!ENTITY chapter06 SYSTEM "biojava-doc-ch06.xml">
 ]>
 
 <!--
@@ -135,7 +136,7 @@
 
         <itemizedlist>
           <listitem>
-            <para>--</para>
+            <para>Chapter 6: Representing Search Results</para>
           </listitem>
         </itemizedlist>
       </listitem>
@@ -186,6 +187,8 @@
   &chapter04;
 
   &chapter05;
+
+  &chapter06;
 
   <!-- This demonstrates the id convention for appendices -->
   <appendix label="A" id="bd-apdx01">

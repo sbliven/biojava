@@ -88,7 +88,7 @@
       <note>
         <para>We have seen some problems due to a bug in the Classic
         VM in Java 1.2. Hotspot for Java 1.2 works fine, as does the
-        Classic VM from later releases.</para
+        Classic VM from later releases.</para>
       </note>
 
       <para>BioJava requires the following software packages:</para>
