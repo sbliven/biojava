@@ -116,9 +116,9 @@ public abstract class AbstractTaxa
       
       return
         this == t || (
-        this.getScientificName().equals(t.getScientificName()) &&
-        this.getCommonName().equals(t.getCommonName()) &&
-        this.getChildren().equals(t.getChildren())
+        safeEq(this.getScientificName(), t.getScientificName()) &&
+        safeEq(this.getCommonName(), t.getCommonName()) &&
+        safeEq(this.getChildren(), t.getChildren())
         );
     }
     
@@ -138,6 +138,16 @@ public abstract class AbstractTaxa
   
   public int hashCode() {
     return getScientificName().hashCode();
+  }
+  
+  private boolean safeEq(Object a, Object b) {
+    if(a == null && b == null) {
+      return true;
+    } else if(a == null || b == null) {
+      return false;
+    } else {
+      return a.equals(b);
+    }
   }
 }
 
