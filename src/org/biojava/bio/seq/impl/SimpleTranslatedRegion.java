@@ -34,7 +34,7 @@ import org.biojava.bio.seq.genomic.*;
  * @since 1.1
  */
 public class SimpleTranslatedRegion
-extends SimpleFeature implements TranslatedRegion {
+extends SimpleStrandedFeature implements TranslatedRegion {
   protected Sequence translation;
   
   public Sequence getTranslation() {

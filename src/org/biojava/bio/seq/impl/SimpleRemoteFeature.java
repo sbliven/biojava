@@ -38,7 +38,7 @@ import org.biojava.bio.seq.db.*;
  * @since 1.2
  */
 public class SimpleRemoteFeature
-extends SimpleFeature
+extends SimpleStrandedFeature
 implements RemoteFeature, java.io.Serializable {
   private List regions;
   private RemoteFeature.Resolver resolver;
@@ -73,6 +73,7 @@ implements RemoteFeature, java.io.Serializable {
     RemoteFeature.Template template
   ) {
     super(sourceSeq, parent, template);
+    // System.err.println("Constructing a RemoteFeature.  Strand = " + template.strand);
     this.regions = new ArrayList(template.regions);
     this.resolver = template.resolver;
   }

@@ -356,6 +356,11 @@ public class SubSequence implements Sequence {
 			rft.annotation = f.getAnnotation();
 			rft.location = LocationTools.intersection(l.translate(1 - start), 
 								  new RangeLocation(1, end - start + 1));
+			if (f instanceof StrandedFeature) {
+			    rft.strand = ((StrandedFeature) f).getStrand();
+			} else {
+			    rft.strand = StrandedFeature.UNKNOWN;
+			}
 			rft.resolver = new RemoteFeature.Resolver() {
 				public Feature resolve(RemoteFeature rFeat) {
 				    return f;
@@ -379,7 +384,7 @@ public class SubSequence implements Sequence {
     // (this could be usefully replaced by a more specific RemoteFeature)
     //
 
-    private class SSRemoteFeature extends SimpleRemoteFeature {
+    private class SSRemoteFeature extends SimpleRemoteFeature implements RemoteFeature {
 	private FeatureHolder childFeatures;
 	
 	private SSRemoteFeature(Sequence seq,

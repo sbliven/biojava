@@ -45,7 +45,7 @@ import org.biojava.bio.seq.db.*;
  * @author Greg Cox
  * @since 1.2
  */
-public interface RemoteFeature extends Feature {
+public interface RemoteFeature extends StrandedFeature {
   /**
    * Retrieve the list of Regions that locate this feature both localy and
    * remotely. Local Regions have a null sequence ID.
@@ -69,7 +69,7 @@ public interface RemoteFeature extends Feature {
 
   Resolver getResolver();
 
-  public class Template extends Feature.Template {
+  public class Template extends StrandedFeature.Template {
     public List regions;
     public Resolver resolver;
 
@@ -98,9 +98,14 @@ public interface RemoteFeature extends Feature {
 	    }
 	    type = theTemplate.type;
 	    source = theTemplate.source;
-    	annotation = theTemplate.annotation;
+	    annotation = theTemplate.annotation;
+	    if (theTemplate instanceof StrandedFeature.Template) {
+		strand = ((StrandedFeature.Template) theTemplate).strand;
+	    } else {
+		strand = StrandedFeature.UNKNOWN;
+	    }
 	    resolver = null;
-    	regions = null;
+	    regions = null;
   	  }
 
   }
