@@ -31,7 +31,7 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
 /**
- * The set of AtomicSymbols which can be concatanated together to make a
+ * The set of AtomicSymbols which can be concatenated together to make a
  * SymbolList.
  * <P>
  * A non-atomic symbol is considered to be contained within this alphabet if
