@@ -24,19 +24,89 @@ package org.biojava.directory;
 import java.io.*;
 import java.util.*;
 
-
 /**
- * This class encapsulates all the parsing of the registry configuration 
- * file
+ * <p>The BioDirectory Registry is a simple system for specifying
+ * where to find services which provide sequence databases. A client
+ * should look at the following places in order to find this file:</p>
+ *
+ * <pre>
+ *  $HOME/.bioinformatics/seqdatabase.ini
+ *  /etc/bioinformatics/seqdatabase.ini
+ *  http://www.open-bio.org/registry/seqdatabase.ini
+ * </pre>
+ *
+ * <p>The file is a simple stanza format</p>
+ *
+ * <pre>
+ *  [database-name]
+ *  tag=value
+ *  tag=value
+ *
+ *  [database-name]
+ *  tag=value
+ *  tag=value
+ * </pre>
+ * 
+ * <p>where each stanza starts with the declaration of the database
+ * being in square brackets and following that one line tag=value tag
+ * value formats.</p>
+ *
+ * <p>Database-name stanzas can be repeated, in which case the client
+ * should try each service in turn (starting at the first one).</p>
+ *
+ * <p>The options under each stanza must have two non-optional
+ * tag=value lines being</p>
+ *
+ * <pre>
+ *  protocol=&lt;protocol-type&gt;
+ *  location=&lt;location-string&gt;
+ * </pre>
+ *
+ * <p>'protocol' currently can be one of</p>
+ *
+ * <ul>
+ *  <li>index-berkeleydb</li>
+ *  <li>index-flat</li>
+ *  <li>biofetch</li>
+ *  <li>bsane-corba</li>
+ *  <li>biosql</li>
+ *  <li>xembl</li>
+ * </ul>
+ *
+ * <p>'location' is a string specific to the protocol. Any number of
+ * additional tag values are allowed in the stanza which should be
+ * passed to the appropiate constructor of the protocol to
+ * interpret. Some protocols might insist on other mandatory tags.</p>
+ *
  * @author Brian Gilman
+ * @author Keith James
  * @version $Revision$
  */
-
-
 public interface RegistryConfiguration {
+
+    /**
+     * <code>getConfiguration</code> returns a mapping of registry
+     * database names to collections of tag-value pairs.
+     *
+     * @return a <code>Map</code>.
+     *
+     * @exception RegistryException if an error occurs.
+     */
     public Map getConfiguration() throws RegistryException;
+
+    /**
+     * <code>getConfigLocator</code> returns a locator for the
+     * configuration.
+     *
+     * @return a <code>String</code>.
+     */
     public String getConfigLocator();
 
+    /**
+     * <code>Impl</code> is the default implementation of
+     * <code>RegistryConfiguration</code> where the location is a file
+     * name.
+     */
     public static class Impl implements RegistryConfiguration {
 	private String configFileLocation = null;
 	private Map config = null;

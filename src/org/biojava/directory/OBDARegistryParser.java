@@ -21,24 +21,41 @@
 
 package org.biojava.directory;
 
-import java.io.*;
-import java.util.*;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
- * This class encapsulates all the parsing of the registry configuration 
- * file
+ * <p>This class encapsulates all the parsing of the OBDA registry
+ * configuration file.</p>
  *
  * @author Brian Gilman
  * @author Thomas Down
+ * @author Keith James
  * @version $Revision$
  */
-
 public class OBDARegistryParser {
+
+    /**
+     * <code>parseRegistry</code> parses an Open Bio Sequence Database
+     * Access (OBDA) configuration file.
+     *
+     * @param in a <code>BufferedReader</code>.
+     * @param locator a <code>String</code> a configuration file
+     * locator.
+     *
+     * @return a <code>RegistryConfiguration</code>.
+     *
+     * @exception IOException if an error reading the configuration
+     * file.
+     * @exception RegistryException if the configuration setup fails.
+     */
     public static RegistryConfiguration parseRegistry(BufferedReader in,
 						      String locator)
-        throws IOException, RegistryException
-    {
+        throws IOException, RegistryException {
 	String line = "";
 	String dbName = "";
 	String key = "";
@@ -46,31 +63,31 @@ public class OBDARegistryParser {
 	Map config = new HashMap();
 	Map currentDB = null;
 	
-	while((line = in.readLine()) != null){
+	while ((line = in.readLine()) != null) {
 	    
 	    //System.out.println(line);
-	    if(line.trim().length() > 0){
-		if(line.indexOf("[") > -1){
+	    if (line.trim().length() > 0) {
+		if (line.indexOf("[") > -1) {
 		    dbName = line.substring(1, line.indexOf("]"));
 		    currentDB = new HashMap();
-		    config.put(dbName, currentDB); //instantiate new hashtable 
-		    //for this tag
-		    
-		}else{
+                    //instantiate new hashtable for this tag
+		    config.put(dbName, currentDB); 
+		} else {
 		    StringTokenizer strTok = new StringTokenizer(line, "=");
-		    //here we assume that there are only key = value pairs in the
-		    //config file
+		    //here we assume that there are only key = value
+		    //pairs in the config file
 		    key = strTok.nextToken();
-		    if(strTok.hasMoreTokens()){
+		    if (strTok.hasMoreTokens()) {
 			value = strTok.nextToken();
-		    }else{
+                    } else {
 			value = "";
 		    }
-		    
+
 		    currentDB.put(key.trim(), value.trim());    
 		}
 	    }
 	}
+
 	return new RegistryConfiguration.Impl(locator, Collections.unmodifiableMap(config));
     }
 }

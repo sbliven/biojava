@@ -21,81 +21,102 @@
 
 package org.biojava.directory;
 
-import java.io.*;
-import java.net.URL;
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.gff.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.db.biosql.*;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.db.SequenceDBLite;
+import org.biojava.utils.Services;
 
 /**
- * SequsnceDBFactory is a factory which gets implementations
- * of the biojava SequenceDB interface
+ * <p><code>SequenceDBFactory</code> is a factory which gets
+ * implementations of the BioJava <code>SequenceDB</code>
+ * interface.</p>
  *
  * @author Brian Gilman
  * @author Thomas Down
+ * @author Keith James
+ *
  * @version $Revision$
  */
-
-
 public class Registry {
+
     /**
      * Registry Configuration instance
      */
     private RegistryConfiguration regConfig = null;
 
+    /**
+     * Creates a new OBDA <code>Registry</code> with the specified
+     * configuration.
+     *
+     * @param regConfig a <code>RegistryConfiguration</code>.
+     */
     public Registry(RegistryConfiguration regConfig) {
 	this.regConfig = regConfig;
     }
 
-    public SequenceDBLite getDatabase(String dbName) throws RegistryException, BioException{
-	
+    /**
+     * <code>getDatabase</code> retrieves a database instance known by
+     * a name <code>String</code>.
+     *
+     * @param dbName a <code>String</code> database name.
+     *
+     * @return a <code>SequenceDBLite</code>.
+     *
+     * @exception RegistryException if the registry does not contain a
+     * configuration for the specified name.
+     * @exception BioException if the provider fails.
+     */
+    public SequenceDBLite getDatabase(String dbName)
+        throws RegistryException, BioException {
+
 	Map dbConfig = null;
 	String providerName = "";
-	
-	try{
+
+        dbConfig = (Map) getRegistryConfiguration().getConfiguration().get(dbName);
 	    
-	    dbConfig = (Map) getRegistryConfiguration().getConfiguration().get(dbName);
-	    
-	    if (dbConfig == null) {
-		throw new RegistryException("Couldn't find a configuration for database: " +dbName);
-	    }
-	    
+        if (dbConfig == null) {
+            throw new RegistryException("Couldn't find a configuration for database: " + dbName);
+        }
+
+	try {
 	    providerName = (String) dbConfig.get("protocol");
-	    
-	}catch(Exception e){
+	} catch (Exception e) {
 	    throw new RegistryException("File for configuration cannot be found: " + e.toString());
 	}
-	    return getProvider(providerName).getSequenceDB(dbConfig);
-	
-	
+
+        return getProvider(providerName).getSequenceDB(dbConfig);
     }
     
-    private  SequenceDBProvider getProvider(String providerName) throws RegistryException{
-	try{
+    private SequenceDBProvider getProvider(String providerName)
+        throws RegistryException {
+	try {
 	    ClassLoader loader = getClass().getClassLoader();
 	    Iterator implNames = Services.getImplementationNames(SequenceDBProvider.class, loader).iterator();
 	    while (implNames.hasNext()) {
 		String className = (String) implNames.next();
 		Class clazz = loader.loadClass(className);
 		SequenceDBProvider seqDB = (SequenceDBProvider) clazz.newInstance();
-		if(seqDB.getName().equals(providerName)){
+		if (seqDB.getName().equals(providerName)) {
 		    return seqDB;
 		}
 	    }
-	    
+
 	    throw new ProviderNotFoundException("No such provider exists: " + providerName);
-	}catch(Exception e){
+	} catch (Exception e) {
 	    throw new RegistryException(e, "Error accessing SequenceDBProvider services");
 	}
     }
-    
-    public RegistryConfiguration getRegistryConfiguration(){
+
+    /**
+     * <code>getRegistryConfiguration</code> returns the configuration
+     * of the registry.
+     *
+     * @return a <code>RegistryConfiguration</code>.
+     */
+    public RegistryConfiguration getRegistryConfiguration() {
 	return this.regConfig;
     }
-
 }
