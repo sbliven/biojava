@@ -37,18 +37,32 @@ public class RangeLocationTest extends TestCase
     protected Location r2;
     protected Location r3;
     protected Location r4;
-
+    protected Location r5;
+    protected Location r6;
+  
     public RangeLocationTest(String name)
     {
 	super(name);
     }
 
+  
+  /**
+   * Runs the unit tests defined here.
+   */
+  public static void main(String args[])
+  {
+    junit.textui.TestRunner.run(RangeLocationTest.class);
+  }
+  
     protected void setUp() throws Exception
     {
-	r1 = new RangeLocation(1, 100);
-	r2 = new RangeLocation(90, 190);
-	r3 = new RangeLocation(200, 300);
-	r4 = new RangeLocation(210, 290);
+      r1 = new RangeLocation(1, 100);
+      r2 = new RangeLocation(90, 190);
+      r3 = new RangeLocation(200, 300);
+      r4 = new RangeLocation(210, 290);
+      r5 = new RangeLocation(200, 209);
+      r6 = new RangeLocation(210, 300);
+      
     }
 
     /**
@@ -127,6 +141,7 @@ public class RangeLocationTest extends TestCase
 	assertEquals(r1, LocationTools.union(r1, r1));
 	assertEquals(LocationTools.union(r1, r2),
 		     LocationTools.union(r2, r1));
+         assertEquals(r3, LocationTools.union(r5,r6));
     }
 
     /**

@@ -33,6 +33,7 @@ import junit.framework.TestCase;
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @author Thomas Down
+ * @author Francois Pepin
  */
 public class CompoundLocationTest extends TestCase
 {
@@ -43,7 +44,10 @@ public class CompoundLocationTest extends TestCase
     protected Location r5;
     protected Location r6;
     protected Location r7;
-
+    protected Location r8;
+    protected Location r9;
+  
+    
     private   List     locs1;
     private   List     locs2;
     private   List     locs3;
@@ -51,12 +55,24 @@ public class CompoundLocationTest extends TestCase
     private   List     locs5;
     private   List     locs6;
     private   List     locs7;
-
+    private   List     locs8;
+    private   List     locs9;
+  
+  
+  
     public CompoundLocationTest(String name)
     {
 	super(name);
     }
 
+  /**
+   * Runs the unit tests defined here.
+   */
+  public static void main(String args[])
+  {
+    junit.textui.TestRunner.run(CompoundLocationTest.class);
+  }
+  
     protected void setUp() throws Exception
     {
 	locs1 = new ArrayList();
@@ -82,7 +98,15 @@ public class CompoundLocationTest extends TestCase
 	    locs6.add(new RangeLocation(j + 5, j + 6));
 	    locs7.add(new RangeLocation(j + 10, j + 11));
 	}
+        locs8 = new ArrayList();
+        locs8.add(new RangeLocation(250, 255));
+        locs8.add(new RangeLocation(350, 400));
 
+        locs9 = new ArrayList();
+        locs9.add(new RangeLocation(256, 300));
+        locs9.add(new RangeLocation(350, 400));
+        
+        
 	r1 = LocationTools.buildLoc(locs1);
 	r2 = LocationTools.buildLoc(locs2);
 	r3 = LocationTools.buildLoc(locs3);
@@ -90,6 +114,8 @@ public class CompoundLocationTest extends TestCase
 	r5 = LocationTools.buildLoc(locs5);
 	r6 = LocationTools.buildLoc(locs6);
 	r7 = LocationTools.buildLoc(locs7);
+        r8 = LocationTools.buildLoc(locs8);
+        r9 = LocationTools.buildLoc(locs9);
     }
 
     /**
@@ -175,7 +201,9 @@ public class CompoundLocationTest extends TestCase
 	assertEquals(LocationTools.union(r1, r2),
 		     LocationTools.union(r2, r1));
 	assertEquals(LocationTools.union(r1, r3),
-		     LocationTools.union(r3, r1));
+                     LocationTools.union(r3, r1));
+        assertEquals(r3, LocationTools.union(r8,r9));
+        
     }
 
     /**

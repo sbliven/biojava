@@ -30,6 +30,7 @@ import junit.framework.*;
  * <p>Copyright: Copyright (c) 2002</p>
  * <p>Company: AgResearch</p>
  * @author Mark Schreiber
+ * @author Francois Pepin
  * @version 1.0
  */
 
@@ -39,6 +40,8 @@ public class MergeLocationTest extends TestCase {
   Location c;
   Location d;
   Location e;
+  Location f;
+  Location g;
   MergeLocation ml;
 
   List la;
@@ -48,6 +51,7 @@ public class MergeLocationTest extends TestCase {
 
   Location abc;
   Location abcd;
+  MergeLocation fg;
   Location nested;
 
 
@@ -55,6 +59,15 @@ public class MergeLocationTest extends TestCase {
   public MergeLocationTest(String name){
     super(name);
   }
+
+  /**
+   * Runs the unit tests defined here.
+   */
+  public static void main(String args[])
+  {
+    junit.textui.TestRunner.run(MergeLocationTest.class);
+  }
+  
   protected void setUp() throws java.lang.Exception {
     super.setUp();
 
@@ -63,6 +76,8 @@ public class MergeLocationTest extends TestCase {
     c = new RangeLocation(35,65);
     d = new RangeLocation(80,90);
     e = new RangeLocation(60,70);
+    f = new RangeLocation(60,64);
+    g = new RangeLocation(65,70);
 
     la = new ArrayList();
     lb = new ArrayList();
@@ -87,6 +102,7 @@ public class MergeLocationTest extends TestCase {
 
     abc = LocationTools.union(la);
     abcd = LocationTools.union(lb);
+    fg = MergeLocation.mergeLocations(f,g);
     nested = LocationTools.union(nestl);
 
   }
@@ -104,9 +120,16 @@ public class MergeLocationTest extends TestCase {
   public void testBlocks(){
     assertNotNull(ml.getComponentList(false));
 
+    assertTrue(fg.getComponentList(false).size() == 2);
     assertTrue(ml.getComponentList(false).size() == 2);
     assertTrue(ml.getComponentList(true).size() == 2);
   }
+
+  public void testTouchingMerge(){
+    assertTrue(fg.getComponentList(true).size() == 2);
+    assertTrue(fg.isContiguous());
+  }
+  
 
   public void testCompoundABC(){
     int blocks = 0;

@@ -29,22 +29,35 @@ import junit.framework.TestCase;
  * <code>LocationTools</code>.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Francois Pepin
  * @since 1.2
  */
 public class PointLocationTest extends TestCase
 {
     protected Location r1;
     protected Location r2;
-
+    protected Location r3;
+    protected Location r4;
+  
     public PointLocationTest(String name)
     {
 	super(name);
     }
 
+  /**
+   * Runs the unit tests defined here.
+   */
+  public static void main(String args[])
+  {
+    junit.textui.TestRunner.run(PointLocationTest.class);
+  }
     protected void setUp() throws Exception
     {
 	r1 = new PointLocation(1);
 	r2 = new PointLocation(10);
+         r3 = new PointLocation(11);
+         r4 = LocationTools.makeLocation(10,11);
+         
     }
 
     /**
@@ -116,8 +129,9 @@ public class PointLocationTest extends TestCase
 	assertEquals(r1, LocationTools.union(r1, r1));
 	assertEquals(LocationTools.union(r1, r2),
 		     LocationTools.union(r2, r1));
+        assertEquals(r4, LocationTools.union(r2,r3));
+   	assertTrue(LocationTools.union(r2,r3).isContiguous());     
     }
-
     /**
      * <code>testIsContiguous</code> tests contiguous.
      *

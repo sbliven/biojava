@@ -30,6 +30,7 @@ import java.util.*;
  * <code>CircularLocationTools</code>.
  *
  * @author <a href="mailto:mark.schreiber@agresearch.co.nz">Mark Schreiber</a>
+ * @author Francois Pepin
  * @since 1.3
  */
 public class CircularLocationTest extends TestCase
@@ -41,12 +42,23 @@ public class CircularLocationTest extends TestCase
     protected CircularLocation r5;
     protected CircularLocation r6;
     protected CircularLocation r7;
+    protected CircularLocation r8;
+    protected CircularLocation r9;
+  
 
     public CircularLocationTest(String name)
     {
         super(name);
     }
 
+  /**
+   * Runs the unit tests defined here.
+   */
+  public static void main(String args[])
+  {
+    junit.textui.TestRunner.run(CircularLocationTest.class);
+  }
+  
     protected void setUp() throws Exception
     {
         r1 = LocationTools.makeCircularLocation(1, 100, 200);
@@ -57,7 +69,8 @@ public class CircularLocationTest extends TestCase
 
         r6 = LocationTools.makeCircularLocation(18,24,20);
         r7 = LocationTools.makeCircularLocation(2,8,20);
-
+        r8 = LocationTools.makeCircularLocation(2,7,20);
+        r9 = LocationTools.makeCircularLocation(8,8,20);
     }
 
      /**
@@ -207,7 +220,8 @@ public class CircularLocationTest extends TestCase
         assertTrue(locC.getMax() == 20);
         //shouldn't be more
         assertTrue(blocki.hasNext() == false);
-
+        //test unions when locations are touching
+        assertEquals(r7, LocationTools.union(r8,r9));
     }
 
     /**
