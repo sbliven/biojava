@@ -63,7 +63,7 @@ public interface Count extends Changeable {
    * @return  
    * @throws IllegalSymbolException if s is not from this Count's alphabet
    */
-  double getCount(Symbol s) throws IllegalSymbolException;
+  double getCount(AtomicSymbol s) throws IllegalSymbolException;
   
   /**
    * Set the count for the Symbol s.
@@ -76,7 +76,7 @@ public interface Count extends Changeable {
    * @throws ChangeVetoException if this distribution does not allow counts
    *         to be tampered with, or if one of the listeners vetoed this change
    */
-  void setCount(Symbol s, double c)
+  void setCount(AtomicSymbol s, double c)
   throws IllegalSymbolException, ChangeVetoException;
   
   
@@ -91,7 +91,7 @@ public interface Count extends Changeable {
    * @throws ChangeVetoException if this Count does not allow counts
    *         to be tampered with, or if one of the listeners vetoed this change
    */
-  void increaseCount(Symbol s, double c)
+  void increaseCount(AtomicSymbol s, double c)
   throws IllegalSymbolException, ChangeVetoException;
   
   /**

@@ -42,7 +42,7 @@ public interface DistributionTrainer {
    * @param sym the Symbol seen
    * @param times the number of times to add
    */
-  void addCount(DistributionTrainerContext dtc, Symbol sym, double times)
+  void addCount(DistributionTrainerContext dtc, AtomicSymbol sym, double times)
   throws IllegalSymbolException;
   
   /**

@@ -130,18 +130,10 @@ implements Serializable {
       counts = new IndexedCount(indexer);
     }
     
-    public void addCount(DistributionTrainerContext dtc, Symbol sym, double times)
+    public void addCount(DistributionTrainerContext dtc, AtomicSymbol sym, double times)
     throws IllegalSymbolException {
       try {
-        if(sym instanceof AtomicSymbol) {
           counts.increaseCount(sym, times);
-        } else {
-          FiniteAlphabet fa = (FiniteAlphabet) sym.getMatches();
-          times /= ((double) fa.size());
-          for(Iterator i = fa.iterator(); i.hasNext(); ) {
-            counts.increaseCount((Symbol) i.next(), times);
-          }
-        }
       } catch (ChangeVetoException cve) {
         throw new BioError(
           cve, "Assertion Failure: Change to Count object vetoed"
@@ -186,7 +178,7 @@ implements Serializable {
         double []total = new double[weights.length];
         double sum = 0.0;
         for(int i = 0; i < total.length; i++) {
-          Symbol s = indexer.symbolForIndex(i);
+          AtomicSymbol s = (AtomicSymbol) indexer.symbolForIndex(i);
           sum += total[i] = 
             counts.getCount(s) +
             nullModel.getWeight(s) * weight;

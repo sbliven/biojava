@@ -134,7 +134,7 @@ implements OrderNDistribution, Serializable {
     dtc.registerTrainer(this, new IgnoreCountsTrainer() {
       public void addCount(
         DistributionTrainerContext dtc,
-        Symbol sym,
+        AtomicSymbol sym,
         double count
       ) throws IllegalSymbolException {
         List symL = ((BasisSymbol) sym).getSymbols();

@@ -201,7 +201,7 @@ implements Distribution, Serializable {
     dtc.registerTrainer(this, new IgnoreCountsTrainer() {
       public void addCount(
         DistributionTrainerContext dtc,
-        Symbol s,
+        AtomicSymbol s,
         double count
       ) throws IllegalSymbolException {
         dtc.addCount(other, table.translate(s), count);

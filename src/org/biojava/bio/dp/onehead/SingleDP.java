@@ -59,7 +59,13 @@ public class SingleDP extends DP implements Serializable {
     }
   }
   
-  protected double [] getEmission(Symbol sym, ScoreType scoreType)
+    /**
+     * This method is public for the benefit of training algorithms,
+     * and in the future we should look at a better way of exposing
+     * the emissions cache.
+     */
+
+  public double [] getEmission(Symbol sym, ScoreType scoreType)
   throws IllegalSymbolException {
     Map emissions;
     if(scoreType == ScoreType.PROBABILITY) {

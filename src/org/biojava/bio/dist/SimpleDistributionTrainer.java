@@ -49,7 +49,7 @@ implements DistributionTrainer, Serializable {
 
   public void addCount(
     DistributionTrainerContext dtc,
-    Symbol sym,
+    AtomicSymbol sym,
     double count
   ) throws IllegalSymbolException {
     Double d = (Double) c.get(sym);

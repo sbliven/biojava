@@ -34,7 +34,7 @@ import org.biojava.utils.*;
  */
 public class IndexedCount implements Count {
   private final AlphabetIndex indexer;
-  private final double []counts;
+  private final double[] counts;
   protected transient ChangeSupport changeSupport = null;
   
   protected void createChangeSupport(ChangeType ct) {
@@ -75,11 +75,11 @@ public class IndexedCount implements Count {
     return indexer.getAlphabet();
   }
     
-  public double getCount(Symbol s) throws IllegalSymbolException {
+  public double getCount(AtomicSymbol s) throws IllegalSymbolException {
     return counts[indexer.indexForSymbol(s)];
   }
   
-  public void setCount(Symbol s, double c)
+  public void setCount(AtomicSymbol s, double c)
   throws IllegalSymbolException, ChangeVetoException {
     if(changeSupport == null) {
       counts[indexer.indexForSymbol(s)] = c;
@@ -98,7 +98,7 @@ public class IndexedCount implements Count {
     }
   }
   
-  public void increaseCount(Symbol s, double c)
+  public void increaseCount(AtomicSymbol s, double c)
   throws IllegalSymbolException, ChangeVetoException {
     if(changeSupport == null) {
       counts[indexer.indexForSymbol(s)] += c;
@@ -131,7 +131,7 @@ public class IndexedCount implements Count {
     try {    
       if(changeSupport == null) {
         for(int i = 0; i < counts.length; i++) {
-          counts[i] = c.getCount(indexer.symbolForIndex(i));
+          counts[i] = c.getCount((AtomicSymbol) indexer.symbolForIndex(i));
         }
       } else {
         synchronized(changeSupport) {
@@ -140,7 +140,7 @@ public class IndexedCount implements Count {
           );
           changeSupport.firePreChangeEvent(ce);
           for(int i = 0; i < counts.length; i++) {
-            counts[i] = c.getCount(indexer.symbolForIndex(i));
+            counts[i] = c.getCount((AtomicSymbol) indexer.symbolForIndex(i));
           }
           changeSupport.firePostChangeEvent(ce);
         }

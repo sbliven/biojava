@@ -73,14 +73,26 @@ implements DistributionTrainerContext, Serializable {
   }
 
   public void addCount(Distribution dist, Symbol sym, double times)
-  throws IllegalSymbolException {
+      throws IllegalSymbolException 
+  {
     DistributionTrainer dt = getTrainer(dist);
     if(dt == null) {
       throw new NullPointerException(
         "No trainer associated with distribution " + dist
       );
     }
-    dt.addCount(this, sym, times);
+    if (sym instanceof AtomicSymbol) {
+	dt.addCount(this, (AtomicSymbol) sym, times);
+    } else {
+	Distribution nullModel = dist.getNullModel();
+	double totWeight = nullModel.getWeight(sym);
+	for (Iterator asi = ((FiniteAlphabet) sym.getMatches()).iterator();
+	     asi.hasNext(); )
+	{
+	    AtomicSymbol as = (AtomicSymbol) asi.next();
+	    dt.addCount(this, as, times * (nullModel.getWeight(as) / totWeight));
+	}
+    }
   }
   
   public void train()

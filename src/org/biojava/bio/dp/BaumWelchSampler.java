@@ -28,7 +28,14 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.dp.onehead.SingleDPMatrix;
+import org.biojava.bio.dp.onehead.*;
+
+/**
+ * Train a hidden markov model using a sampling algorithm.
+ * 
+ * <p>Note: this class currently only works for one-head models.
+ * </p>
+ */
 
 public class BaumWelchSampler extends AbstractTrainer implements Serializable {
   protected double singleSequenceIteration(
@@ -36,7 +43,7 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
     SymbolList symList
   ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
     ScoreType scoreType = ScoreType.PROBABILITY;
-    DP dp = getDP();
+    SingleDP dp = (SingleDP) getDP();
     State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();
     double [][] forwardTransitionScores = dp.getForwardTransitionScores(scoreType);    
@@ -46,13 +53,15 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
     
     SymbolList [] rll = { symList };
     
-    System.out.println("Forward");
+    System.out.print("Forward... ");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll, scoreType);
     double fs = fm.getScore();
+    System.out.println("Score = " + fs);
 
-    System.out.println("Backward");
+    System.out.print("Backward... ");
     SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll, scoreType);
     double bs = bm.getScore();
+    System.out.println("Score = " + bs);
 
     Symbol gap = AlphabetManager.getGapSymbol();
     
@@ -83,11 +92,16 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
         double [] tss = backwardTransitionScores[s];
         double p = Math.random();
         Distribution dist = model.getWeights(states[s]);
+	double[] weightVector = dp.getEmission(sym, scoreType);
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
-          double weight = (states[t] instanceof EmissionState)
-            ? ((EmissionState) states[t]).getDistribution().getWeight(sym)
-            : 1.0;
+          // double weight = (states[t] instanceof EmissionState)
+          //   ? ((EmissionState) states[t]).getDistribution().getWeight(sym)
+          //  : 1.0;
+	  double weight = 1.0;
+	  if (states[t] instanceof EmissionState) {
+	      weight = Math.exp(weightVector[t]);
+	  }
           if (weight != 0.0) {
             p -= Math.exp(fm.scores[i][s] + tss[tc] + bm.scores[i+1][t] - fs) * weight;
             if (p <= 0.0) {

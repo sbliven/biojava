@@ -30,8 +30,8 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 public class IgnoreCountsTrainer implements DistributionTrainer {
-  public void addCount(DistributionTrainerContext dtc, Symbol sym, double times)
-  throws IllegalSymbolException {}
+  public void addCount(DistributionTrainerContext dtc, AtomicSymbol sym, double times) 
+    throws IllegalSymbolException {}
   public void train(double weight) {}
   public void clearCounts() {}
   
