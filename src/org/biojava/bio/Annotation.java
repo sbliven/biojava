@@ -82,7 +82,15 @@ public interface Annotation extends Changeable {
    */
   void setProperty(Object key, Object value)
   throws IllegalArgumentException, ChangeVetoException;
-       
+  
+  /**
+   * Returns wether there is any property under that key in this Annotation.
+   *
+   * @param key the key Object to search for
+   * @return true if this Annotation knows about the key, false otherwise
+   */
+  boolean containsProperty(Object key);
+  
   /**
    * Get a set of key objects.
    *
@@ -126,6 +134,10 @@ public interface Annotation extends Changeable {
         "You can not add propertys to the Empy Annotaion object: " +
         key + " -> " + value
       );
+    }
+    
+    public boolean containsProperty(Object key) {
+      return false;
     }
     
     public Set keys() {
