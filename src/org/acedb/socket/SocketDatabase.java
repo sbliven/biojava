@@ -150,7 +150,7 @@ class SocketDatabase implements Database {
 	    try {
 		sock = takeSocket();
 		String result = sock.transact("classes");
-		StaticAceSet set = new StaticAceSet(null, dbURL);
+		StaticAceSet set = new StaticAceSet(null, dbURL, null);
 		for(StringTokenizer toke = new StringTokenizer(result, "\r\n"); toke.hasMoreTokens(); ) {
 		    String line = toke.nextToken();
 		    if (line.charAt(0) <= 32) {

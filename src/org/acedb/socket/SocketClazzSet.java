@@ -81,4 +81,8 @@ class SocketClazzSet implements AceSet {
     public AceURL toURL() {
 	return url;
     }
+
+    public String getName() {
+	return name;
+    }
 }
