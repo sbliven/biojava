@@ -48,7 +48,12 @@ import org.biojava.utils.stax.*;
  * @since 1.2
  */
 
-class DASRawSymbolList implements SymbolList {
+class DASRawSymbolList
+  extends
+    Unchangeable
+  implements
+    SymbolList
+{
     private DASSequence sequence;
     private Segment segment;
     private SymbolList rawSymbols;
@@ -237,14 +242,4 @@ class DASRawSymbolList implements SymbolList {
 	    }
 	}
     }
-
-
-    // 
-    // Changeable stuff (which we're not, yet)
-    //
-
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

@@ -52,8 +52,8 @@ public class Parser {
         
         // end of record. Is it the last in the file?
         if(tv == null) {
+          // scan for eof after whitespace
           boolean eof = false;
-          
           while(true) {
             reader.mark(1);
             int c = reader.read();
@@ -70,6 +70,7 @@ public class Parser {
             break;
           }
           
+          // now unwind stack
           do {
             Frame top = (Frame) pop(stack);
             top.listener.endTag();
@@ -78,8 +79,9 @@ public class Parser {
           return !eof;
         }
         
-        // not a continuation - unwrap stack
+        // not a continuation of a previous tag - unwrap stack
         if(tv.isNewTag() || !tv.getTag().equals(frame.tag)) {
+          // remove all stack frames which have been obsoleted by this tag
           Frame top;
           for(top = (Frame) pop(stack); top != frame; top = (Frame) pop(stack)) {
             top.listener.endTag();
@@ -89,7 +91,7 @@ public class Parser {
             top.listener.endTag();
           }
           
-          // handle current stack frame
+          // handle current stack frame by starting a tag
           push(stack, new Frame(top.parser, top.listener, tv.getTag()));
           top.listener.startTag(tv.getTag());
           break;
@@ -98,18 +100,24 @@ public class Parser {
         line = tv.getValue();
       }
       
+      // process a value and handle potentialy pushing a new stack frame
       while(true) {
+        // pass in value and see if it requests a new stack frame
         ctxt.flush();
         frame.listener.value(ctxt, tv.getValue());
         if(!ctxt.isDirty()) {
           break;
         }
 
+        // push a new stack frame
         tv = ctxt.parser.parse(tv.getValue());
         frame = new Frame(ctxt.parser, ctxt.listener, tv.getTag());
         push(stack, frame);
         ctxt.listener.startRecord();
         ctxt.listener.startTag(tv.getTag());
+        
+        // we must loop arround incase the new frame wants to imediately push a
+        // new stack frame
       }
     }
 

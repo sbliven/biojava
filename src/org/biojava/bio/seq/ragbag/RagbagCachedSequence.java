@@ -45,6 +45,9 @@ import org.biojava.utils.cache.*;
  * assemblies.
  * <p>
  * It functionally proxies for RagbagSequence.
+ *
+ * @author David Huen
+ * @author Matthew Pocock
  */
 class RagbagCachedSequence implements RagbagSequenceItf
 {
@@ -278,6 +281,10 @@ class RagbagCachedSequence implements RagbagSequenceItf
     Sequence tempSeq = instantiateSequence();
     tempSeq.addChangeListener(cl, ct);
   }
+  public boolean isUnchanging(ChangeType ct) {
+    Sequence tempSeq = instantiateSequence();
+    return tempSeq.isUnchanging(ct);
+}
  
   public boolean containsFeature(Feature f) 
   {

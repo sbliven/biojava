@@ -73,9 +73,13 @@ public class UploadFlat {
 		
 		while(seqI.hasNext())
 		    {
-			System.out.print(".");
-			Sequence seq = seqI.nextSequence();
-			seqDB.addSequence(seq);
+          try {
+            System.out.print(".");
+            Sequence seq = seqI.nextSequence();
+            seqDB.addSequence(seq);
+          } catch (Throwable t) {
+            t.printStackTrace(System.out);
+          }
 		    }
             }
             System.out.println();

@@ -30,7 +30,16 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
-class EmptyAlphabet implements FiniteAlphabet, Serializable {
+/**
+ * @author Matthew Pocock
+ */
+class EmptyAlphabet
+  extends
+    Unchangeable
+  implements
+    FiniteAlphabet,
+    Serializable
+{
     public String getName() {
 	return "Empty Alphabet";
     }
@@ -100,11 +109,6 @@ class EmptyAlphabet implements FiniteAlphabet, Serializable {
         " in " + getName()
       );
     }
-
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 
     private Object writeReplace() throws ObjectStreamException {
       try {

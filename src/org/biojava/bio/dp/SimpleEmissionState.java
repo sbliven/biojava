@@ -31,13 +31,17 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
 public class SimpleEmissionState
-implements EmissionState, Serializable {
+  extends
+    AbstractChangeable
+  implements
+    EmissionState,
+    Serializable
+{
   private Distribution dis;
   private String name;
   private Annotation ann;
   private int [] advance;
   private Alphabet matches;
-  private transient ChangeSupport changeSupport = null;
   
   public final Annotation getAnnotation() {
     return this.ann;
@@ -53,13 +57,14 @@ implements EmissionState, Serializable {
   
   public final void setDistribution(Distribution dis)
   throws ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       this.dis = dis;
     } else {
       ChangeEvent ce = new ChangeEvent(
         this, EmissionState.DISTRIBUTION,
         this.dis, dis
       );
+      ChangeSupport changeSupport = getChangeSupport(EmissionState.DISTRIBUTION);
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
         this.dis = dis;
@@ -74,13 +79,14 @@ implements EmissionState, Serializable {
   
   public void setAdvance(int [] advance)
   throws ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       this.advance = advance;
     } else {
       ChangeEvent ce = new ChangeEvent(
         this, EmissionState.ADVANCE,
         this.advance, advance
       );
+      ChangeSupport changeSupport = getChangeSupport(EmissionState.DISTRIBUTION);
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
         this.advance = advance;
@@ -111,42 +117,6 @@ implements EmissionState, Serializable {
 
   public List getSymbols() {
     return new SingletonList(this);
-  }
-  
-  public void addChangeListener(ChangeListener cl) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
   }
   
   public SimpleEmissionState(

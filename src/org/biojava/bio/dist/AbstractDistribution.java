@@ -49,8 +49,13 @@ import org.biojava.bio.symbol.*;
  * @author Mark Schreiber (serialization support)
  */
 
-public abstract class AbstractDistribution implements Distribution, Serializable{
-  protected transient ChangeSupport changeSupport = null;
+public abstract class AbstractDistribution
+  extends
+    AbstractChangeable
+  implements
+    Distribution,
+    Serializable
+{
   protected transient Distribution.NullModelForwarder nullModelForwarder = null;
   protected Map symbolIndices = null;//used for serialization
 
@@ -69,48 +74,18 @@ public abstract class AbstractDistribution implements Distribution, Serializable
     stream.defaultWriteObject();
   }
 
-  protected void generateChangeSupport(ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+      ChangeSupport changeSupport = super.getChangeSupport(ct);
 
     if(
-      ((ct == null) || (ct == Distribution.NULL_MODEL)) &&
+      ((ct == null) || (ct.isMatchingType(Distribution.NULL_MODEL))) &&
       nullModelForwarder == null
     ) {
       nullModelForwarder = new Distribution.NullModelForwarder(this, changeSupport);
       getNullModel().addChangeListener(nullModelForwarder, Distribution.WEIGHTS);
     }
-  }
-
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
+    
+    return changeSupport;
   }
 
   abstract protected void setWeightImpl(AtomicSymbol sym, double weight)
@@ -125,7 +100,7 @@ public abstract class AbstractDistribution implements Distribution, Serializable
    */
   final public void setWeight(Symbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       doSetWeight(sym, weight);
     } else {
       ChangeEvent ce = new ChangeEvent(
@@ -134,6 +109,7 @@ public abstract class AbstractDistribution implements Distribution, Serializable
         new Object[] {sym, new Double(weight)},
         new Object[] {sym, new Double(getWeight(sym))}
       );
+      ChangeSupport changeSupport = super.getChangeSupport(Distribution.WEIGHTS);
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
         doSetWeight(sym, weight);
@@ -174,7 +150,7 @@ public abstract class AbstractDistribution implements Distribution, Serializable
       }
       nullModel.addChangeListener(nullModelForwarder);
     }
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       // if there are no listners yet, don't g through the overhead of
       // synchronized regions or of trying to inform them.
       setNullModelImpl(nullModel);
@@ -186,6 +162,7 @@ public abstract class AbstractDistribution implements Distribution, Serializable
         nullModel,
         oldModel
       );
+      ChangeSupport changeSupport = super.getChangeSupport(Distribution.NULL_MODEL);
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
         setNullModelImpl(nullModel);

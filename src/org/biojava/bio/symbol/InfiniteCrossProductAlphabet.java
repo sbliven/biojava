@@ -29,7 +29,13 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
-class InfiniteCrossProductAlphabet implements Alphabet, Serializable {
+class InfiniteCrossProductAlphabet
+  extends
+    Unchangeable
+  implements
+    Alphabet,
+    Serializable
+{
   private final List alphas;
   private char tokenSeed = 'A';
 
@@ -150,10 +156,4 @@ class InfiniteCrossProductAlphabet implements Alphabet, Serializable {
       "No parser for " + name + " is defined for " + getName()
     );
   }
-  
-  public void addChangeListener(ChangeListener cl) {}
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-  public void removeChangeListener(ChangeListener cl) {}
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
-
 }

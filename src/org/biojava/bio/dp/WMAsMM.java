@@ -36,7 +36,13 @@ import org.biojava.bio.dist.*;
  * @author Matthew Pocock
  */
 
-public class WMAsMM implements MarkovModel, Serializable {
+public class WMAsMM
+  extends
+    AbstractChangeable
+  implements
+    MarkovModel,
+    Serializable
+{
   private static final int [] advance = {1};
   
   private final WeightMatrix wm;
@@ -48,7 +54,6 @@ public class WMAsMM implements MarkovModel, Serializable {
   private final Map transTo;
   private final Map transWeights;
   
-  private final transient ChangeSupport changeSupport;
   private final transient MarkovModel.DistributionForwarder distForwarder;
   
   public Alphabet emissionAlphabet() {
@@ -154,25 +159,9 @@ public class WMAsMM implements MarkovModel, Serializable {
     return -1;
   }
   
-  public void addChangeListener(ChangeListener cl) {
-    changeSupport.addChangeListener(cl);
-  }
-
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    changeSupport.addChangeListener(cl, ct);
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    changeSupport.removeChangeListener(cl);
-  }
-
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    changeSupport.removeChangeListener(cl, ct);
-  }
-  
   public WMAsMM(WeightMatrix wm) throws IllegalSymbolException {
     try {
-      changeSupport = new ChangeSupport();
+      ChangeSupport changeSupport = getChangeSupport(ChangeType.UNKNOWN);
       distForwarder = new MarkovModel.DistributionForwarder(this, changeSupport);
       transFrom = new HashMap();
       transTo = new HashMap();

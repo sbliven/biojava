@@ -105,36 +105,33 @@ public interface FeatureHolder extends Changeable {
     public boolean containsFeature(Feature f);
 
     public static final FeatureHolder EMPTY_FEATURE_HOLDER =
-	new EmptyFeatureHolder();
+      new EmptyFeatureHolder();
     
-    final class EmptyFeatureHolder implements FeatureHolder {
-	public int countFeatures() {
-	    return 0;
-	}
-    
-	public Iterator features() {
-	    return Collections.EMPTY_SET.iterator();
-	}
-    
-	public FeatureHolder filter(FeatureFilter fc, boolean recurse) {
-	    return this;
-	}
-
-	public Feature createFeature(Feature.Template f) {
-	    throw new UnsupportedOperationException();
-	}
-	
-	public void removeFeature(Feature f) {
-	    throw new UnsupportedOperationException();
-	}
-        
-        public boolean containsFeature(Feature f) {
-          return false;
-        }
-    
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+    final class EmptyFeatureHolder
+    extends Unchangeable
+    implements FeatureHolder {
+      public int countFeatures() {
+        return 0;
+      }
+      
+      public Iterator features() {
+        return Collections.EMPTY_SET.iterator();
+      }
+      
+      public FeatureHolder filter(FeatureFilter fc, boolean recurse) {
+        return this;
+      }
+      
+      public Feature createFeature(Feature.Template f) {
+        throw new UnsupportedOperationException();
+      }
+      
+      public void removeFeature(Feature f) {
+        throw new UnsupportedOperationException();
+      }
+      
+      public boolean containsFeature(Feature f) {
+        return false;
+      }
     }
 }

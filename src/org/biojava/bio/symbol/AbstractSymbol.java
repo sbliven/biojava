@@ -32,57 +32,28 @@ import org.biojava.bio.*;
  * @since 1.1
  */
 public abstract class AbstractSymbol
-implements Symbol {
-  protected transient ChangeSupport changeSupport = null;
+  extends
+    AbstractChangeable
+  implements
+    Symbol
+{
   protected transient Annotatable.AnnotationForwarder annotationForwarder = null;
   
-  protected void generateChangeSupport(ChangeType changeType) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-    
+  protected ChangeSupport getChangeSupport(ChangeType changeType) {
+    ChangeSupport changeSupport = super.getChangeSupport(changeType);
+
     if(
-      ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
+      ((changeType == null) || (changeType.isMatchingType(Annotation.PROPERTY))) &&
       (annotationForwarder == null)
     ) {
       annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);
       getAnnotation().addChangeListener(annotationForwarder, Annotation.PROPERTY);
     }
+    
+    return changeSupport;
   }
-  
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
 
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
+  public String toString() {
+    return getClass().getName() + ": " + getName();
   }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
-  }  
-
-    public String toString() {
-	return getClass().getName() + ": " + getName();
-    }
 }

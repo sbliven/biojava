@@ -23,14 +23,15 @@ public class CreateIndex {
     Indexer indexer = new Indexer(spFile, store);
     indexer.setPrimaryKeyName("ID");
     
-    ValueChanger changer = new ValueChanger(indexer);
-    changer.setChanger("ID", new ValueChanger.Changer() {
+    ChangeTable changeTable = new ChangeTable();
+    changeTable.setChanger("ID", new ChangeTable.Changer() {
       public Object change(Object value) {
         String s = (String) value;
         int i = s.indexOf(" ");
         return s.substring(0, i);
       }
     });
+    ValueChanger changer = new ValueChanger(indexer, changeTable);
     
     Parser parser = new Parser();
     

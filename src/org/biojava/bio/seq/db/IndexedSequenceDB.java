@@ -139,16 +139,19 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
           indexStore.store(new SimpleIndex(seqFile, oldPos, (int) (pos - oldPos), id));
         }
         
-        if(changeSupport == null) {
+        if(!hasListeners()) {
           indexStore.commit();
         } else {
             ChangeEvent ce = new ChangeEvent(
                 this,
                 SequenceDB.SEQUENCES
             );
-            changeSupport.firePreChangeEvent(ce);
-            indexStore.commit();
-            changeSupport.firePostChangeEvent(ce);
+            ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
+            synchronized(changeSupport) {
+              changeSupport.firePreChangeEvent(ce);
+              indexStore.commit();
+              changeSupport.firePostChangeEvent(ce);
+            }
         }
         completed = true; // we completed succesfuly
       } catch (IOException ioe) {

@@ -35,7 +35,12 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
  */
-public class HashSequenceDB implements SequenceDB, Serializable {
+public class HashSequenceDB
+  extends
+    AbstractSequenceDB
+  implements
+    SequenceDB,
+    Serializable {
   /**
    * The sequence-by-id map.
    */
@@ -50,21 +55,6 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    * The name of this sequence database.
    */
   private String name;
-
-  protected transient ChangeSupport changeSupport = null;
-  
-  /**
-   * Initialize sequenceByID.
-   */
-  {
-    sequenceByID = new HashMap();
-  }
-
-  protected void generateChangeSupport(ChangeType changeType) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-  }
   
   public String getName() {
     return name;
@@ -95,9 +85,10 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    */
   public void addSequence(String id, Sequence seq)
   throws ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       sequenceByID.put(id, seq);
     } else {
+      ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
       synchronized(changeSupport) {
         ChangeEvent ce = new ChangeEvent(
           this,
@@ -124,14 +115,30 @@ public class HashSequenceDB implements SequenceDB, Serializable {
   public void addSequence(Sequence seq)
   throws ChangeVetoException {
     String id = idMaker.calcID(seq);
-    addSequence(id, seq);
+    if(!hasListeners()) {
+      addSequence(id, seq);
+    } else {
+      ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
+      synchronized(changeSupport) {
+        ChangeEvent ce = new ChangeEvent(
+          this,
+          SequenceDB.SEQUENCES,
+          id,
+          null
+        );
+        changeSupport.firePreChangeEvent(ce);
+        sequenceByID.remove(id);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
   }
   
   public void removeSequence(String id)
   throws BioException, ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       sequenceByID.remove(id);
     } else {
+      ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
       synchronized(changeSupport) {
         ChangeEvent ce = new ChangeEvent(
           this,
@@ -144,24 +151,6 @@ public class HashSequenceDB implements SequenceDB, Serializable {
         changeSupport.firePostChangeEvent(ce);
       }
     }
-  }
-  
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-    changeSupport.addChangeListener(cl);
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-    changeSupport.addChangeListener(cl, ct);
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    changeSupport.removeChangeListener(cl);
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    changeSupport.removeChangeListener(cl, ct);
   }
 
   /**
@@ -202,5 +191,6 @@ public class HashSequenceDB implements SequenceDB, Serializable {
   public HashSequenceDB(org.biojava.bio.seq.db.IDMaker idMaker, String name) {
     this.idMaker = idMaker;
     this.name = name;
+    this.sequenceByID = new HashMap();
   }
 }

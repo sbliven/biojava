@@ -37,48 +37,16 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 public class TranslatedDistribution
-implements Distribution, Serializable {
+  extends
+    AbstractChangeable
+  implements
+    Distribution,
+    Serializable
+{
   private final Distribution other;
   private final Distribution delegate;
   private final ReversibleTranslationTable table;
-  protected transient ChangeSupport changeSupport = null;
-  private transient ChangeListener forwarder = new Forwarder();
-  
-  public void addChangeListener(ChangeListener cl) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-    
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
-  }
+  private transient ChangeListener forwarder;
   
   /**
    * Users should make these thigs via getDistribuiton.
@@ -186,8 +154,23 @@ implements Distribution, Serializable {
     });
   }
   
-  private class Forwarder implements ChangeListener {
-    private ChangeEvent generateChangeEvent(ChangeEvent ce) {
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    ChangeSupport cs = super.getChangeSupport(ct);
+    
+    if(forwarder == null && ct.isMatchingType(Distribution.WEIGHTS)) {
+      forwarder = new Forwarder(this, cs);
+      delegate.addChangeListener(forwarder, Distribution.WEIGHTS);
+    }
+    
+    return cs;
+  }
+  
+  private class Forwarder extends ChangeForwarder {
+    public Forwarder(Object source, ChangeSupport changeSupport) {
+      super(source, changeSupport);
+    }
+    
+    protected ChangeEvent generateChangeEvent(ChangeEvent ce) {
       ChangeType ct = ce.getType();
       Object change = ce.getChange();
       Object previous = ce.getPrevious();
@@ -220,24 +203,6 @@ implements Distribution, Serializable {
         TranslatedDistribution.this, ct,
         change, previous, ce
       ); 
-    }
-    
-    public void preChange(ChangeEvent ce) throws ChangeVetoException {
-      if(changeSupport != null) {
-        ChangeEvent nce = generateChangeEvent(ce);
-        synchronized(changeSupport) {
-          changeSupport.firePreChangeEvent(nce);
-        }
-      }
-    }
-    
-    public void postChange(ChangeEvent ce) {
-      if(changeSupport != null) {
-        ChangeEvent nce = generateChangeEvent(ce);
-        synchronized(changeSupport) {
-          changeSupport.firePostChangeEvent(nce);
-        }
-      }
     }
   }
 }

@@ -37,15 +37,20 @@ import org.biojava.bio.symbol.*;
  * Top-level SeqFeature set for a BioEntry
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.3
  */
 
-class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
+class BioEntryFeatureSet
+  extends
+    AbstractChangeable
+  implements
+    FeatureHolder,
+    RealizingFeatureHolder
+{
     private Sequence seq;
     private BioSQLSequenceDB seqDB;
     private int bioentry_id;
-    private ChangeSupport changeSupport;
-
     
     BioEntryFeatureSet(Sequence seq,
 		       BioSQLSequenceDB seqDB,
@@ -81,10 +86,11 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
         throws ChangeVetoException, BioException
     {
 	Feature f = realizeFeature(seq, ft);
-	if (changeSupport == null) {
+	if (!hasListeners()) {
 	    persistFeature(f, -1);
 	    getFeatures().addFeature(f);
 	} else {
+    ChangeSupport changeSupport = getChangeSupport(FeatureHolder.FEATURES);
 	    synchronized (changeSupport) {
 		ChangeEvent cev = new ChangeEvent(seq, FeatureHolder.FEATURES, f);
 		changeSupport.firePreChangeEvent(cev);
@@ -108,10 +114,11 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
             throw new ChangeVetoException("This isn't a normal BioSQL feature");
         }
         
-        if (changeSupport == null) {
+        if (hasListeners()) {
             seqDB.removeFeature((BioSQLFeatureI) f);
             fh.removeFeature(f);
         } else {
+          ChangeSupport changeSupport = getChangeSupport(FeatureHolder.FEATURES);
             synchronized (changeSupport) {
                 ChangeEvent cev = new ChangeEvent(seq, FeatureHolder.FEATURES, f);
                 changeSupport.firePreChangeEvent(cev);
@@ -452,37 +459,6 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
 		} catch (SQLException ex2) {}
 	    }
 	    throw new BioException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
-	}
-    }
-
-    
-    // 
-    // Changeable
-    //
-
-    private void initChangeSupport() {
-	changeSupport = new ChangeSupport();
-    }
-
-    public void addChangeListener(ChangeListener cl) {
-	addChangeListener(cl, ChangeType.UNKNOWN);
-    }
-	
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport == null) {
-	    initChangeSupport();
-	}
-
-	changeSupport.addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	removeChangeListener(cl, ChangeType.UNKNOWN);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport != null) {
-	    changeSupport.removeChangeListener(cl, ct);
 	}
     }
 }

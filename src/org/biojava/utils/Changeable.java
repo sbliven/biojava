@@ -57,4 +57,21 @@ public interface Changeable {
    * @param ct  the ChangeType that it was interested in
    */
   public void removeChangeListener(ChangeListener cl, ChangeType ct);
+  
+  /**
+   * <p>
+   * A particular ChangeType can never be raised by this Changeable.
+   * </p>
+   *
+   * <p>
+   * If this returns true, then it is guaranteed that change events of this type
+   * (and all child types) can never under any circumstances be fired by this
+   * Changeable instance. If it returns false, that does not mean that this type
+   * of event will or even can be raised, but that it is worth registering
+   * listeners incase.
+   *
+   * @param ct  the ChangeType to check
+   * @return true if ChangeEvents of this type are guaranteed to never be fired
+   */
+  public boolean isUnchanging(ChangeType ct);
 }

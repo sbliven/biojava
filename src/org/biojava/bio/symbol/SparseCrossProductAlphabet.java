@@ -138,11 +138,6 @@ implements Serializable {
     );
   }
 
-  public void addChangeListener(ChangeListener cl) {}
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-  public void removeChangeListener(ChangeListener cl) {}
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
-  
   private static class SparseIterator implements Iterator {
     private Alphabet parent;
     private FiniteAlphabet []alphas;

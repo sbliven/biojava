@@ -36,6 +36,9 @@ public class SmallMap extends AbstractMap {
 	}
     }
 
+    /**
+     * @throws NullPointerException if key is null
+     */
     public Object get(Object key) {
 	int keyHash = key.hashCode();
 	for (int i = 0; i < numMappings * 2; i += 2) {
@@ -46,6 +49,9 @@ public class SmallMap extends AbstractMap {
 	return null;
     }
 
+    /**
+     * @throws NullPointerException if key is null
+     */
     public Object put(Object key, Object value) {
 	int keyHash = key.hashCode();
 	

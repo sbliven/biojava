@@ -28,7 +28,12 @@ import org.biojava.utils.*;
 /**
  * An alignment that relabels another alignment.
  */
-public class RelabeledAlignment implements Alignment {
+public class RelabeledAlignment
+  extends
+    Unchangeable
+  implements
+    Alignment
+{
   private Alignment delegate;
   private Map labelMap = new HashMap();
   
@@ -96,18 +101,6 @@ public class RelabeledAlignment implements Alignment {
     delegate.edit(edit);
   }
   
-  public void addChangeListener(ChangeListener cl) {
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-  }
-
   protected Set map(Set labels) {
     Set set = new HashSet();
     for(Iterator i = labels.iterator(); i.hasNext(); ) {

@@ -42,15 +42,15 @@ import org.biojava.bio.taxa.*;
  * @since 1.3
  */
 
-class BioSQLSequenceAnnotation implements Annotation {
+class BioSQLSequenceAnnotation
+  extends
+    AbstractChangeable
+  implements
+    Annotation
+{
     private BioSQLSequenceDB seqDB;
     private int bioentry_id;
     private Annotation underlyingAnnotation;
-    private ChangeSupport changeSupport;
-
-    private void initChangeSupport() {
-	changeSupport = new ChangeSupport();
-    }
 
     BioSQLSequenceAnnotation(BioSQLSequenceDB seqDB,
 			     int bioentry_id)
@@ -142,16 +142,17 @@ class BioSQLSequenceAnnotation implements Annotation {
     public void setProperty(Object key, Object value)
         throws ChangeVetoException
     {
-	if (changeSupport == null) {
-	    _setProperty(key, value);
-	} else {
-	    synchronized (changeSupport) {
-		ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
-		changeSupport.firePreChangeEvent(cev);
-		_setProperty(key, value);
-		changeSupport.firePostChangeEvent(cev);
-	    }
-	}
+      if (!hasListeners()) {
+        _setProperty(key, value);
+      } else {
+        ChangeSupport changeSupport = getChangeSupport(Annotation.PROPERTY);
+        synchronized (changeSupport) {
+          ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
+          changeSupport.firePreChangeEvent(cev);
+          _setProperty(key, value);
+          changeSupport.firePostChangeEvent(cev);
+        }
+      }
     }
 
     private void _setProperty(Object key, Object value) 
@@ -209,31 +210,5 @@ class BioSQLSequenceAnnotation implements Annotation {
 	}
 
 	return Collections.unmodifiableMap(underlyingAnnotation.asMap());
-    }
-
-    // 
-    // Changeable
-    //
-
-    public void addChangeListener(ChangeListener cl) {
-	addChangeListener(cl, ChangeType.UNKNOWN);
-    }
-	
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport == null) {
-	    initChangeSupport();
-	}
-
-	changeSupport.addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	removeChangeListener(cl, ChangeType.UNKNOWN);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport != null) {
-	    changeSupport.removeChangeListener(cl, ct);
-	}
     }
 }

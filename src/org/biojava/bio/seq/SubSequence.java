@@ -34,6 +34,7 @@ import java.util.*;
  * features intersecting that region.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.2
  */
 
@@ -251,15 +252,15 @@ public class SubSequence implements Sequence {
 		    public void preChange(ChangeEvent cev)
 		        throws ChangeVetoException
 		    {
-			if (CroppedFeatureSet.this.changeSupport != null) {
-			    CroppedFeatureSet.this.changeSupport.firePreChangeEvent(cev);
+			if (CroppedFeatureSet.this.hasListeners()) {
+			    CroppedFeatureSet.this.getChangeSupport(cev.getType()).firePreChangeEvent(cev);
 			}
 		    }
 
 		    public void postChange(ChangeEvent cev) {
 			flushFeatures();
-			if (CroppedFeatureSet.this.changeSupport != null) {
-			    CroppedFeatureSet.this.changeSupport.firePostChangeEvent(cev);
+			if (CroppedFeatureSet.this.hasListeners()) {
+			    CroppedFeatureSet.this.getChangeSupport(cev.getType()).firePostChangeEvent(cev);
 			}
 		    }
 		} ;
@@ -408,5 +409,9 @@ public class SubSequence implements Sequence {
 
     public void removeChangeListener(ChangeListener cl) {
 	removeChangeListener(cl, ChangeType.UNKNOWN);
+    }
+    
+    public boolean isUnchanging(ChangeType ct) {
+      return false;
     }
 }

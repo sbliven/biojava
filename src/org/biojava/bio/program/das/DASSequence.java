@@ -59,7 +59,13 @@ import org.biojava.utils.stax.*;
  * @author David Huen
  */
 
-public class DASSequence implements DASSequenceI, DASOptimizableFeatureHolder {
+public class DASSequence
+  extends
+    AbstractChangeable
+  implements
+    DASSequenceI,
+    DASOptimizableFeatureHolder
+{
     /**
      * Change type which indicates that the set of annotation servers used
      * by this DASSequence has been changed. This extends Feature.FEATURES as
@@ -98,8 +104,6 @@ public class DASSequence implements DASSequenceI, DASOptimizableFeatureHolder {
     private Map featureSets;
     private FeatureHolder structure;
     private DASMergeFeatureHolder features;
-
-    protected transient ChangeSupport changeSupport = null;
 
     {
 	featureSets = new HashMap();
@@ -243,23 +247,24 @@ public class DASSequence implements DASSequenceI, DASOptimizableFeatureHolder {
     public void addAnnotationSource(URL dataSourceURL) 
         throws BioException, ChangeVetoException
     {
-	if(!featureSets.containsKey(dataSourceURL)) {
-	    if (changeSupport == null) {
-		_addAnnotationSource(dataSourceURL);
-	    } else {
-		synchronized (changeSupport) {
-		    ChangeEvent ce = new ChangeEvent(
-						     this,
-						     ANNOTATIONS,
-						     null,
-						     null
-						     ) ;
-		    changeSupport.firePreChangeEvent(ce);
-		    _addAnnotationSource(dataSourceURL);
-		    changeSupport.firePostChangeEvent(ce);
-		}
-	    }
-	}
+      if(!featureSets.containsKey(dataSourceURL)) {
+        if (!hasListeners()) {
+          _addAnnotationSource(dataSourceURL);
+        } else {
+          ChangeSupport changeSupport = getChangeSupport(ANNOTATIONS);
+          synchronized (changeSupport) {
+            ChangeEvent ce = new ChangeEvent(
+            this,
+            ANNOTATIONS,
+            null,
+            null
+            ) ;
+            changeSupport.firePreChangeEvent(ce);
+            _addAnnotationSource(dataSourceURL);
+            changeSupport.firePostChangeEvent(ce);
+          }
+        }
+      }
     }
 
     private void _removeAnnotationSource(URL dataSourceURL) 
@@ -284,23 +289,24 @@ public class DASSequence implements DASSequenceI, DASOptimizableFeatureHolder {
     public void removeAnnotationSource(URL dataSourceURL) 
         throws ChangeVetoException, BioException
     {
-	if (featureSets.containsKey(dataSourceURL)) {
-	    if (changeSupport == null) {
-		_removeAnnotationSource(dataSourceURL);
-	    } else {
-		synchronized (changeSupport) {
-		    ChangeEvent ce = new ChangeEvent(
+      if (featureSets.containsKey(dataSourceURL)) {
+        if (!hasListeners()) {
+          _removeAnnotationSource(dataSourceURL);
+        } else {
+          ChangeSupport changeSupport = getChangeSupport(ANNOTATIONS);
+          synchronized (changeSupport) {
+		      ChangeEvent ce = new ChangeEvent(
 						     this,
 						     ANNOTATIONS,
 						     null,
 						     null
 						     ) ;
-		    changeSupport.firePreChangeEvent(ce);
-		    _removeAnnotationSource(dataSourceURL);
-		    changeSupport.firePostChangeEvent(ce);
-		}
-	    }
-	}
+		      changeSupport.firePreChangeEvent(ce);
+          _removeAnnotationSource(dataSourceURL);
+          changeSupport.firePostChangeEvent(ce);
+          }
+        }
+      }
     }
 
     private int registerLocalFeatureFetchers(Object regKey) {
@@ -706,48 +712,6 @@ public class DASSequence implements DASSequenceI, DASOptimizableFeatureHolder {
 	    throw new BioError("Expected to be able to modify annotation");
 	}
     }
-
-    //
-    // Changeable stuff (which, unfortunately, we are.  Drat)
-    //
-
-    protected void generateChangeSupport(ChangeType changeType) {
-	if(changeSupport == null) {
-	    changeSupport = new ChangeSupport();
-	}
-    }
-  
-    public void addChangeListener(ChangeListener cl) {
-	generateChangeSupport(null);
-	
-	synchronized(changeSupport) {
-	    changeSupport.addChangeListener(cl);
-	}
-    }
-  
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	generateChangeSupport(ct);
-	
-	synchronized(changeSupport) {
-	    changeSupport.addChangeListener(cl, ct);
-	}
-    }
-  
-    public void removeChangeListener(ChangeListener cl) {
-	if(changeSupport != null) {
-	    synchronized(changeSupport) {
-		changeSupport.removeChangeListener(cl);
-	    }
-	}
-    }
-  
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	if(changeSupport != null) {
-	    synchronized(changeSupport) {
-		changeSupport.removeChangeListener(cl, ct);
-	    }
-	}
-    }  
 
     //
     // Utility method to turn of the awkward bits of Xerces-J

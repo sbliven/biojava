@@ -37,10 +37,16 @@ import org.biojava.bio.seq.io.*;
  * server
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.3
  */
 
-public class BioFetchSequenceDB implements SequenceDBLite {
+public class BioFetchSequenceDB
+  extends
+    Unchangeable
+  implements
+    SequenceDBLite
+{
     private final String prefix;
     private final String type;
     private final String db;
@@ -116,9 +122,4 @@ public class BioFetchSequenceDB implements SequenceDBLite {
 	    throw new BioException(ex, "Error reading data from BioFetch");
 	}
     }
-    
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void addChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
 }

@@ -81,8 +81,8 @@ class DistProjectedFeatureHolder extends AbstractFeatureHolder {
 	    public void preChange(ChangeEvent e)
 		throws ChangeVetoException 
 	    {
-		if (changeSupport != null) {
-		    changeSupport.firePreChangeEvent(new ChangeEvent(this,
+		if (hasListeners()) {
+		    getChangeSupport(FeatureHolder.FEATURES).firePreChangeEvent(new ChangeEvent(this,
 								     FeatureHolder.FEATURES,
 								     e.getChange(),
 								     e.getPrevious(),
@@ -94,8 +94,8 @@ class DistProjectedFeatureHolder extends AbstractFeatureHolder {
 		projectedFeatures = null; // Flush all the cached projections --
 		                          // who knows what might have changed.
 
-		if (changeSupport != null) {
-		    changeSupport.firePostChangeEvent(new ChangeEvent(this,
+		if (hasListeners()) {
+		    getChangeSupport(FeatureHolder.FEATURES).firePostChangeEvent(new ChangeEvent(this,
 								      FeatureHolder.FEATURES,
 								      e.getChange(),
 								      e.getPrevious(),

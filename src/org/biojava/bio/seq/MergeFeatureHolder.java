@@ -90,15 +90,17 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 				 FeatureFilter membershipFilter) 
 	throws ChangeVetoException
     {
-	if (changeSupport != null) {
-	    changeSupport.firePreChangeEvent(new ChangeEvent(this,
-							     FeatureHolder.FEATURES));
-	}
-	featureHolders.put(fh, membershipFilter);
-	if (changeSupport != null) {
-	    changeSupport.firePostChangeEvent(new ChangeEvent(this,
-							      FeatureHolder.FEATURES));
-	}
+       if(!hasListeners()) {
+         featureHolders.put(fh, membershipFilter);
+       } else {
+         ChangeSupport changeSupport = getChangeSupport(FeatureHolder.FEATURES);
+         synchronized(changeSupport) {
+           ChangeEvent ce = new ChangeEvent(this, FeatureHolder.FEATURES);
+           changeSupport.firePreChangeEvent(ce);
+           featureHolders.put(fh, membershipFilter);
+           changeSupport.firePostChangeEvent(ce);
+         }
+       }
     }
 
     /**
@@ -106,19 +108,21 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      * are merged.
      */
 
-    public void removeFeatureHolder(FeatureHolder fh) 
-        throws ChangeVetoException
-    {
-	if (changeSupport != null) {
-	    changeSupport.firePreChangeEvent(new ChangeEvent(this,
-							     FeatureHolder.FEATURES));
-	}
-	featureHolders.remove(fh);
-	if (changeSupport != null) {
-	    changeSupport.firePostChangeEvent(new ChangeEvent(this,
-							      FeatureHolder.FEATURES));
-	}
-    }
+     public void removeFeatureHolder(FeatureHolder fh) 
+     throws ChangeVetoException
+     {
+       if(!hasListeners()) {
+         featureHolders.remove(fh);
+       } else {
+         ChangeSupport changeSupport = getChangeSupport(FeatureHolder.FEATURES);
+         synchronized(changeSupport) {
+           ChangeEvent ce = new ChangeEvent(this, FeatureHolder.FEATURES);
+           changeSupport.firePreChangeEvent(ce);
+           featureHolders.remove(fh);
+           changeSupport.firePostChangeEvent(ce);
+         }
+       }
+     }
 
     public int countFeatures() {
 	int fc = 0;

@@ -24,7 +24,7 @@ package org.biojava.bio.seq.db.biosql;
 import java.sql.*;
 import java.util.*;
 
-class MySQLDBHelper implements DBHelper {
+public class MySQLDBHelper implements DBHelper {
     public int getInsertID(Connection conn,
 			   String table,
 			   String columnName)

@@ -60,10 +60,13 @@ import java.util.List; // useful trick to 'hide' javax.swing.List
  * @author David Huen
  */
 public class SequencePanel
-extends JComponent
-implements SwingConstants,
-SequenceRenderContext,
-Changeable {
+  extends
+    JComponent
+  implements
+    SwingConstants,
+    SequenceRenderContext,
+    Changeable
+{
   private static final double FUDGE_OFFSET = 50.0;
   public static final ChangeType RENDERER = new ChangeType(
     "The renderer for this SequencePanel has changed",
@@ -199,11 +202,21 @@ Changeable {
   }
   
   protected ChangeSupport getChangeSupport(ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
+    if(changeSupport != null) {
+      return changeSupport;
     }
     
-    return changeSupport;
+    synchronized(this) {
+      if(changeSupport == null) {
+        changeSupport = new ChangeSupport();
+      }
+    
+      return changeSupport;
+    }
+  }
+  
+  protected boolean hasListeners() {
+    return changeSupport != null;
   }
   
   public void addChangeListener(ChangeListener cl) {
@@ -212,9 +225,7 @@ Changeable {
   
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
     ChangeSupport cs = getChangeSupport(ct);
-    synchronized(cs) {
-      cs.addChangeListener(cl);
-    }
+    cs.addChangeListener(cl, ct);
   }
   
   public void removeChangeListener(ChangeListener cl) {
@@ -222,10 +233,15 @@ Changeable {
   }
   
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    ChangeSupport cs = getChangeSupport(ct);
-    synchronized(cs) {
-      cs.removeChangeListener(cl);
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(ct);
+      cs.removeChangeListener(cl, ct);
     }
+  }
+  
+  public boolean isUnchanging(ChangeType ct) {
+    ChangeSupport cs = getChangeSupport(ct);
+    return cs.isUnchanging(ct);
   }
 
   private ChangeListener layoutListener = new ChangeAdapter() {

@@ -45,7 +45,13 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  * @author Mark Schreiber
  */
-public class IntegerAlphabet implements Alphabet, Serializable {
+public class IntegerAlphabet
+  extends
+    Unchangeable
+  implements
+    Alphabet,
+    Serializable
+{
   /**
    * The singleton instance of the IntegerAlphabet class.
    */
@@ -152,17 +158,18 @@ public class IntegerAlphabet implements Alphabet, Serializable {
     }
   }
 
-  public void addChangeListener(ChangeListener cl) {}
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-  public void removeChangeListener(ChangeListener cl) {}
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
-
   /**
    * A single int value.
    * <p>
    * @author Matthew Pocock
    */
-  public static class IntegerSymbol implements AtomicSymbol, Serializable {
+  public static class IntegerSymbol
+    extends
+      Unchangeable
+    implements
+      AtomicSymbol,
+      Serializable
+  {
     private final int val;
     private final Alphabet matches;
 
@@ -172,10 +179,6 @@ public class IntegerAlphabet implements Alphabet, Serializable {
 
     public String getName() {
       return val + "";
-    }
-
-    public char getToken() {
-      return '#';
     }
 
     public int intValue() {
@@ -198,11 +201,6 @@ public class IntegerAlphabet implements Alphabet, Serializable {
       this.val = val;
       this.matches = new SingletonAlphabet(this);
     }
-
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
   }
 
   /**

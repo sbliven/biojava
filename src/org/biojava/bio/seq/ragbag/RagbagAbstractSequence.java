@@ -39,6 +39,7 @@ import org.biojava.utils.*;
  * sequence.
  *
  * @author David Huen
+ * @author Matthew Pocock
  * @since 1.2
  */
 class RagbagAbstractSequence implements Sequence
@@ -65,6 +66,7 @@ class RagbagAbstractSequence implements Sequence
   public void addChangeListener(ChangeListener cl, ChangeType ct) {sequence.addChangeListener(cl, ct);}
   public void removeChangeListener(ChangeListener cl) {sequence.addChangeListener(cl);}
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {sequence.addChangeListener(cl, ct);}
+  public boolean isUnchanging(ChangeType ct) {return sequence.isUnchanging(ct);}
  
   public boolean containsFeature(Feature f) {return sequence.containsFeature(f);}
   public int countFeatures() {return sequence.countFeatures();}

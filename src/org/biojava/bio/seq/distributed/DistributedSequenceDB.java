@@ -177,24 +177,4 @@ public class DistributedSequenceDB extends AbstractSequenceDB implements Sequenc
 	}
 	return ids;
     }
-
-    // 
-    // Changeable stuff
-    //
-
-    public void addChangeListener(ChangeListener cl) {
-	getChangeSupport().addChangeListener(cl);
-    }
-
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	getChangeSupport().addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	getChangeSupport().removeChangeListener(cl);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	getChangeSupport().removeChangeListener(cl, ct);
-    }
 }

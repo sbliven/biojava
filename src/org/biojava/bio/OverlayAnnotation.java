@@ -40,23 +40,23 @@ import org.biojava.utils.*;
  * @author Greg Cox
  */
 
-public class OverlayAnnotation implements Annotation, Serializable {
-  /**
-   * The object to do the hard work of informing others of changes.
-   */
-  protected transient ChangeSupport changeSupport = null;
+public class OverlayAnnotation
+  extends
+    AbstractChangeable
+  implements
+    Annotation,
+    Serializable
+{
   private transient ChangeListener propertyForwarder = null;
 
   private Annotation parent;
   private Map overlay = null;
 
-  protected void generateChangeSupport(ChangeType changeType) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
+  protected ChangeSupport getChangeSupport(ChangeType changeType) {
+    ChangeSupport changeSupport = super.getChangeSupport(changeType);
 
     if(
-      ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
+      ((changeType == null) || (changeType.isMatchingType(Annotation.PROPERTY))) &&
       (propertyForwarder == null)
     ) {
       propertyForwarder = new PropertyForwarder(
@@ -68,6 +68,8 @@ public class OverlayAnnotation implements Annotation, Serializable {
         Annotation.PROPERTY
       );
     }
+    
+    return changeSupport;
   }
 
     protected Map getOverlay() {
@@ -90,9 +92,8 @@ public class OverlayAnnotation implements Annotation, Serializable {
 
   public void setProperty(Object key, Object value)
   throws ChangeVetoException {
-    if(changeSupport == null) {
-      getOverlay().put(key, value);
-    } else {
+    if(hasListeners()) {
+      ChangeSupport changeSupport = getChangeSupport(Annotation.PROPERTY);
       ChangeEvent ce = new ChangeEvent(
         this,
         Annotation.PROPERTY,
@@ -104,6 +105,8 @@ public class OverlayAnnotation implements Annotation, Serializable {
         getOverlay().put(key, value);
         changeSupport.firePostChangeEvent(ce);
       }
+    } else {
+      getOverlay().put(key, value);
     }
   }
 
@@ -154,38 +157,6 @@ public class OverlayAnnotation implements Annotation, Serializable {
 
   public Map asMap() {
     return new OAMap();
-  }
-
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
   }
 
   private class OAKeySet extends AbstractSet {

@@ -41,6 +41,7 @@ import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
+import org.biojava.utils.Unchangeable;
 
 /**
  * <p><code>SimilarityPairFeature</code> describes a pairwise
@@ -139,7 +140,11 @@ public interface SimilarityPairFeature extends StrandedFeature
      * <code>EmptyPairwiseAlignment</code> empty pairwise alignment
      * which has labels to empty symbol lists.
      */
-    static final class EmptyPairwiseAlignment implements Alignment
+    static final class EmptyPairwiseAlignment
+      extends
+        Unchangeable
+      implements
+        Alignment
     {
         private List labels = new ArrayList(2);
 
@@ -228,10 +233,5 @@ public interface SimilarityPairFeature extends StrandedFeature
         {
             throw new ChangeVetoException("You can't edit the empty symbol list");
         }
-
-        public void addChangeListener(ChangeListener cl) { }
-        public void addChangeListener(ChangeListener cl, ChangeType ct) { }
-        public void removeChangeListener(ChangeListener cl) { }
-        public void removeChangeListener(ChangeListener cl, ChangeType ct) { }
     }
 }

@@ -37,13 +37,12 @@ public class ValueChanger
   extends
     TagValueWrapper
 {
-  private final Map changers;
-  private final Map splitters;
-  private Changer defaultC;
-  private Splitter defaultS;
+  private ChangeTable.Changer defaultC;
+  private ChangeTable.Splitter defaultS;
+  private ChangeTable changeTable;
   
-  private Changer changer;
-  private Splitter splitter;
+  private ChangeTable.Changer changer;
+  private ChangeTable.Splitter splitter;
   
   /** 
    * Create a new changer that will pass the modified event stream to a
@@ -51,19 +50,18 @@ public class ValueChanger
    *
    * @param delegate  the TagValueListener that will receive the events
    */
-  public ValueChanger(TagValueListener delegate) {
+  public ValueChanger(TagValueListener delegate, ChangeTable changeTable) {
     super(delegate);
-    this.changers = new SmallMap();
-    this.splitters = new SmallMap();
+    this.changeTable = changeTable;
   }
   
   /**
    * The changer that will be applied to the values of tags not registered
    * explicitly to any changer or splitter instance.
    *
-   * @param c  the default Changer
+   * @param c  the default ChangeTable.Changer
    */
-  public void setDefaultChanger(Changer c) {
+  public void setDefaultChanger(ChangeTable.Changer c) {
     this.defaultC = c;
   }
   
@@ -71,9 +69,9 @@ public class ValueChanger
    * Get the changer that will be applied to values of tags with no specific
    * handler registered.
    *
-   * @return  the default Changer, or null
+   * @return  the default ChangeTable.Changer, or null
    */
-  public Changer getDefaultChanger() {
+  public ChangeTable.Changer getDefaultChanger() {
     return defaultC;
   }
   
@@ -81,9 +79,9 @@ public class ValueChanger
    * The splitter that will be applied to the values of tags not registered
    * explicitly to any changer or splitter instance.
    *
-   * @param c  the default Splitter
+   * @param c  the default ChangeTable.Splitter
    */
-  public void setDefaultSplitter(Splitter s) {
+  public void setDefaultSplitter(ChangeTable.Splitter s) {
     this.defaultS = s;
   }
 
@@ -91,56 +89,16 @@ public class ValueChanger
    * Get the splitter that will be applied to values of tags with no specific
    * handler registered.
    *
-   * @return  the default Splitter, or null
+   * @return  the default ChangeTable.Splitter, or null
    */
-  public Splitter getDefaultSplitter() {
+  public ChangeTable.Splitter getDefaultSplitter() {
     return defaultS;
-  }
-
-  /**
-   * Set the Changer to be used for all values of a particular tag.
-   *
-   * @param tag the tag Object which will have all values changed
-   * @param changer the Changer used to change the values
-   */
-  public void setChanger(Object tag, Changer changer) {
-    changers.put(tag, changer);
-  }
-  
-  /**
-   * Set the Splitter to be used for all values of a particular tag.
-   *
-   * @param tag the tag Object which will have all values split
-   * @param changer the Splitter used to split the values
-   */
-  public void setSplitter(Object tag, Splitter splitter) {
-    splitters.put(tag, splitter);
-  }
-  
-  /**
-   * Get the Changer currently registered to handle a tag.
-   *
-   * @param tag  the tag Object for which values would be changed
-   * @return the associated Changer or null
-   */
-  public Changer getChanger(Object tag) {
-    return (Changer) changers.get(tag);
-  }
-  
-  /**
-   * Get the Splitter currently registered to handle a tag.
-   *
-   * @param tag  the tag Object for which values would be split
-   * @return the associated Splitter or null
-   */
-  public Splitter getSplitter(Object tag) {
-    return (Splitter) splitters.get(tag);
   }
   
   public void startTag(Object tag)
   throws ParserException {
-    this.changer = getChanger(tag);
-    this.splitter = getSplitter(tag);
+    this.changer = changeTable.getChanger(tag);
+    this.splitter = changeTable.getSplitter(tag);
     
     if(this.changer == null) {
       this.changer = defaultC;
@@ -167,55 +125,6 @@ public class ValueChanger
     } else {
       super.value(ctxt, value);
     }
-  }
-  
-  /**
-   * Callback used to produce a new value from an old one.
-   *
-   * @author Matthew Pocock
-   * @since 1.2
-   */
-  public static interface Changer {
-    /**
-     * <p>
-     * Produce a moddified value from an old value.
-     * </p>
-     *
-     * <p>
-     * It is strongly recomended that this method is re-enterant and does not
-     * modify the state of the Changer in a way that would affect future return
-     * -values.
-     * </p>
-     *
-     * @param value  the old value Object
-     * @return  the new value Object
-     */
-    public Object change(Object value);
-  }
-  
-  /**
-   * Callback used to produce a list of values from a single old one.
-   *
-   * @author Matthew Pocock
-   * @since 1.2
-   */
-  public static interface Splitter {
-    /**
-     * <p>
-     * Produce a list of values from an old value.
-     * </p>
-     *
-     * <p>
-     * It is strongly recomended that this method is re-enterant and does not
-     * modify the state of the Splitter in a way that would affect future return
-     * -values.
-     * </p>
-     *
-     * @param value  the old value Object
-     * @return  a List of value Objects produced by splitting the old value
-     *          Object
-     */
-    public List split(Object value);
   }
 }
 

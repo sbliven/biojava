@@ -39,7 +39,13 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  */
-public class GapDistribution implements Distribution, Serializable {
+public class GapDistribution
+  extends
+    Unchangeable
+  implements
+    Distribution,
+    Serializable
+{
   private final Alphabet alpha;
     private static final long serialVersionUID = 88622317;
     
@@ -75,11 +81,6 @@ public class GapDistribution implements Distribution, Serializable {
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }
-  
-  public void addChangeListener(ChangeListener cl) {}
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-  public void removeChangeListener(ChangeListener cl) {}
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
   
   public GapDistribution(Alphabet alpha) {
     this.alpha = alpha;

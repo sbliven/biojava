@@ -39,7 +39,14 @@ import org.biojava.bio.seq.impl.*;
  * @author Matthew Pocock
  */
 
-public class ViewSequence implements Sequence, RealizingFeatureHolder, Serializable {
+public class ViewSequence
+  extends
+    Unchangeable
+  implements
+    Sequence,
+    RealizingFeatureHolder,
+    Serializable
+{
     private static final long serialVersionUID = 9866447;
     /**
      * Delegate Sequence.
@@ -273,9 +280,4 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder, Serializa
   public void edit(Edit edit) throws ChangeVetoException {
     throw new ChangeVetoException("ViewSequence is immutable");
   }
-  
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}    
 }

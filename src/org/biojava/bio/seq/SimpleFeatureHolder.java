@@ -65,9 +65,10 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
 
   public void addFeature(Feature f)
   throws ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       features.add(f);
     } else {
+      ChangeSupport changeSupport = getChangeSupport(FeatureHolder.FEATURES);
       synchronized(changeSupport) {
         ChangeEvent ce = new ChangeEvent(
           this, FeatureHolder.FEATURES,
@@ -82,9 +83,10 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
 
   public void removeFeature(Feature f)
   throws ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       features.remove(f);
     } else {
+      ChangeSupport changeSupport = getChangeSupport(FeatureHolder.FEATURES);
       synchronized(changeSupport) {
         ChangeEvent ce = new ChangeEvent(
           this, FeatureHolder.FEATURES,

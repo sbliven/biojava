@@ -35,8 +35,11 @@ import org.biojava.bio.symbol.*;
 */
 
 public class UniformDistribution
-extends AbstractDistribution
-implements Serializable {
+  extends
+    AbstractDistribution
+  implements
+    Serializable
+{
   private final FiniteAlphabet alphabet;
   private Distribution nullModel;
   private static final long serialVersionUID = 88454038;

@@ -36,7 +36,12 @@ import org.biojava.bio.symbol.*;
  * @since 1.2
  */
 
-class DistComponentFeature implements ComponentFeature {
+class DistComponentFeature
+  extends
+    Unchangeable
+  implements
+    ComponentFeature
+{
     private DistributedSequence sequence;
     private FeatureHolder projectedFeatures;
     private Location location;
@@ -235,9 +240,4 @@ class DistComponentFeature implements ComponentFeature {
     {
 	throw new UnsupportedOperationException("Can't remove features from a ComponentFeature.");
     }
-    
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

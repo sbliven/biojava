@@ -33,8 +33,13 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-class SimpleSymbol extends AbstractSymbol
-implements Symbol, Serializable {
+class SimpleSymbol
+  extends
+    AbstractSymbol
+  implements
+    Symbol,
+    Serializable
+{
   private final char token;
   private final Annotation annotation;
   protected Alphabet matches;

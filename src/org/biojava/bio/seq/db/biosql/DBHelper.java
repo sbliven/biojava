@@ -24,7 +24,7 @@ package org.biojava.bio.seq.db.biosql;
 import java.sql.*;
 import java.util.*;
 
-interface DBHelper {
+public interface DBHelper {
     public int getInsertID(Connection conn,
 			   String table,
 			   String columnName)

@@ -32,45 +32,15 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  */
-public class IndexedCount implements Count {
+public class IndexedCount
+  extends
+    AbstractChangeable
+  implements
+    Count
+{
   private final AlphabetIndex indexer;
   private final double[] counts;
-  protected transient ChangeSupport changeSupport = null;
   
-  protected void createChangeSupport(ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl) {
-    createChangeSupport(null);
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    createChangeSupport(ct);
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    createChangeSupport(null);
-    synchronized(changeSupport) {
-      changeSupport.removeChangeListener(cl);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    createChangeSupport(ct);
-    synchronized(changeSupport) {
-      changeSupport.removeChangeListener(cl, ct);
-    }
-  }
-
   public Alphabet getAlphabet() {
     return indexer.getAlphabet();
   }
@@ -81,9 +51,10 @@ public class IndexedCount implements Count {
   
   public void setCount(AtomicSymbol s, double c)
   throws IllegalSymbolException, ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       counts[indexer.indexForSymbol(s)] = c;
     } else {
+      ChangeSupport changeSupport = getChangeSupport(COUNTS);
       synchronized(changeSupport) {
         int index = indexer.indexForSymbol(s);
         ChangeEvent ce = new ChangeEvent(
@@ -100,9 +71,10 @@ public class IndexedCount implements Count {
   
   public void increaseCount(AtomicSymbol s, double c)
   throws IllegalSymbolException, ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       counts[indexer.indexForSymbol(s)] += c;
     } else {
+      ChangeSupport changeSupport = getChangeSupport(COUNTS);
       synchronized(changeSupport) {
         int index = indexer.indexForSymbol(s);
         double oc = counts[index];
@@ -129,11 +101,12 @@ public class IndexedCount implements Count {
     }
 
     try {    
-      if(changeSupport == null) {
+      if(!hasListeners()) {
         for(int i = 0; i < counts.length; i++) {
           counts[i] = c.getCount((AtomicSymbol) indexer.symbolForIndex(i));
         }
       } else {
+        ChangeSupport changeSupport = getChangeSupport(COUNTS);
         synchronized(changeSupport) {
           ChangeEvent ce = new ChangeEvent(
             this, COUNTS
@@ -154,11 +127,12 @@ public class IndexedCount implements Count {
   
   public void zeroCounts()
   throws ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       for(int i = 0; i < counts.length; i++) {
         counts[i] = 0.0;
       }
     } else {
+        ChangeSupport changeSupport = getChangeSupport(COUNTS);
       synchronized(changeSupport) {
         ChangeEvent ce = new ChangeEvent(
           this, COUNTS

@@ -142,16 +142,17 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 				    int length)
 	throws IllegalIDException, ChangeVetoException, BioException
     {
-	if (changeSupport == null) {
-	    _createDummySequence(id, alphabet, length);
-	} else {
-	    synchronized (changeSupport) {
-		ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
-		changeSupport.firePreChangeEvent(cev);
-		_createDummySequence(id, alphabet, length);
-		changeSupport.firePostChangeEvent(cev);
-	    }
-	}
+      if (!hasListeners()) {
+        _createDummySequence(id, alphabet, length);
+      } else {
+        ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
+        synchronized (changeSupport) {
+          ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
+          changeSupport.firePreChangeEvent(cev);
+          _createDummySequence(id, alphabet, length);
+          changeSupport.firePostChangeEvent(cev);
+        }
+      }
     }
 
     private void _createDummySequence(String id,
@@ -211,16 +212,17 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     public void addSequence(Sequence seq)
 	throws IllegalIDException, ChangeVetoException, BioException
     {   
-	if (changeSupport == null) {
-	    _addSequence(seq);
-	} else {
-	    synchronized (changeSupport) {
-		ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, seq);
-		changeSupport.firePreChangeEvent(cev);
-		_addSequence(seq);
-		changeSupport.firePostChangeEvent(cev);
-	    }
-	}
+      if (!hasListeners()) {
+        _addSequence(seq);
+      } else {
+        ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
+        synchronized (changeSupport) {
+          ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, seq);
+          changeSupport.firePreChangeEvent(cev);
+          _addSequence(seq);
+          changeSupport.firePostChangeEvent(cev);
+        }
+      }
     }
 
     private void _addSequence(Sequence seq)
@@ -510,16 +512,17 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     public void removeSequence(String id)
 	throws IllegalIDException, ChangeVetoException, BioException
     {   
-	if (changeSupport == null) {
-	    _removeSequence(id);
-	} else {
-	    synchronized (changeSupport) {
-		ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
-		changeSupport.firePreChangeEvent(cev);
-		_removeSequence(id);
-		changeSupport.firePostChangeEvent(cev);
-	    }
-	}
+      if (!hasListeners()) {
+        _removeSequence(id);
+      } else {
+        ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
+        synchronized (changeSupport) {
+          ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
+          changeSupport.firePreChangeEvent(cev);
+          _removeSequence(id);
+          changeSupport.firePostChangeEvent(cev);
+        }
+      }
     }
 
     private void _removeSequence(String id) 

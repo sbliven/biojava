@@ -50,7 +50,13 @@ import org.biojava.bio.seq.io.*;
  *
  * @author Matthew Pocock
  */
-public class DoubleAlphabet implements Alphabet, Serializable {
+public class DoubleAlphabet
+  extends
+    Unchangeable
+  implements
+    Alphabet,
+    Serializable
+{
   private static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
   
   private Object writeReplace() throws ObjectStreamException {
@@ -164,18 +170,19 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     }
     return new DoubleTokenization();
   }
-
-  public void addChangeListener(ChangeListener cl) {}
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-  public void removeChangeListener(ChangeListener cl) {}
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
   
   /**
    * A single double value.
    *
    * @author Matthew Pocock
    */
-  public static class DoubleSymbol implements AtomicSymbol, Serializable {
+  public static class DoubleSymbol
+    extends
+      Unchangeable
+    implements
+      AtomicSymbol,
+      Serializable
+  {
     private final double val;
     private final Alphabet matches;
     
@@ -214,11 +221,6 @@ public class DoubleAlphabet implements Alphabet, Serializable {
       this.val = val;
       this.matches = new SingletonAlphabet(this);
     }
-
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
   }
   
   /**
@@ -228,7 +230,11 @@ public class DoubleAlphabet implements Alphabet, Serializable {
    * @author Matthew Pocock
    */
   private static class DoubleArray
-  extends AbstractSymbolList implements Serializable {
+  extends
+    AbstractSymbolList
+  implements
+    Serializable
+  {
     private final double [] dArray;
     
     public Alphabet getAlphabet() {

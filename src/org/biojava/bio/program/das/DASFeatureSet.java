@@ -42,7 +42,13 @@ import org.biojava.bio.program.xff.*;
  * @author Matthew Pocock
  */
 
-class DASFeatureSet implements FeatureHolder, DASOptimizableFeatureHolder {
+class DASFeatureSet
+  extends
+    Unchangeable
+  implements
+    FeatureHolder,
+    DASOptimizableFeatureHolder
+{
     private FeatureRequestManager.Ticket[] featureTickets;
     private Location[]                     tiles;
     private CacheReference[]               tileFeatures;
@@ -307,15 +313,6 @@ class DASFeatureSet implements FeatureHolder, DASOptimizableFeatureHolder {
 	}
     }
 
-    // 
-    // Changeable stuff (which we're not, fortunately)
-    //
-
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
-
     //
     // Listener for recieving the types document
     //
@@ -466,7 +463,12 @@ class DASFeatureSet implements FeatureHolder, DASOptimizableFeatureHolder {
 	}
     }
 
-    private class TileFeaturesWrapper implements FeatureHolder {
+    private class TileFeaturesWrapper
+      extends
+        Unchangeable
+      implements
+        FeatureHolder
+    {
 	private int tileNum;
 
 	TileFeaturesWrapper(int tileNum) {
@@ -524,18 +526,6 @@ class DASFeatureSet implements FeatureHolder, DASOptimizableFeatureHolder {
 
 	public boolean containsFeature(Feature f) {
 	    return getFeatures().containsFeature(f);
-	}
-
-	public void addChangeListener(ChangeListener cl) {
-	}
-
-	public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	}
-
-	public void removeChangeListener(ChangeListener cl) {
-	}
-
-	public void removeChangeListener(ChangeListener cl, ChangeType ct) {
 	}
     }
 }

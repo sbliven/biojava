@@ -37,15 +37,22 @@ import org.biojava.bio.symbol.*;
  * Sequence keyed off a BioSQL biosequence.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.3
  */
 
-class BioSQLAssembly implements Sequence, RealizingFeatureHolder, BioSQLSequenceI {
+class BioSQLAssembly
+  extends
+    AbstractChangeable
+  implements
+    Sequence,
+    RealizingFeatureHolder,
+    BioSQLSequenceI
+{
     private BioSQLSequenceDB      seqDB;
     private String                name;
     private int                   assembly_id;
     private int                   bioentry_id;
-    private ChangeSupport         changeSupport;
     private Annotation            annotation;
     private Alphabet              alphabet;
     private int                   length;
@@ -53,10 +60,6 @@ class BioSQLAssembly implements Sequence, RealizingFeatureHolder, BioSQLSequence
     private BioEntryFeatureSet    features;
     private SimpleFeatureHolder   componentFeatures;
     private MergeFeatureHolder    allFeatures;
-
-    private void initChangeSupport() {
-	changeSupport = new ChangeSupport();
-    }
 
     private DBHelper getDBHelper() {
 	return seqDB.getDBHelper();
@@ -270,33 +273,5 @@ class BioSQLAssembly implements Sequence, RealizingFeatureHolder, BioSQLSequence
         throws BioException
     {
 	getFeatures().persistFeature(f, parent_id);
-    }
-
-    // 
-    // Changeable
-    //
-
-    public void addChangeListener(ChangeListener cl) {
-	addChangeListener(cl, ChangeType.UNKNOWN);
-    }
-	
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport == null) {
-	    initChangeSupport();
-	}
-
-	changeSupport.addChangeListener(cl, ct);
-	features.addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	removeChangeListener(cl, ChangeType.UNKNOWN);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport != null) {
-	    changeSupport.removeChangeListener(cl, ct);
-	}
-	features.removeChangeListener(cl, ct);
     }
 }

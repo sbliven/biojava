@@ -153,7 +153,9 @@ public interface SymbolList extends Changeable {
   /**
    * The empty immutable implementation.
    */
-  class EmptySymbolList implements SymbolList, Serializable {
+  class EmptySymbolList
+  extends Unchangeable
+  implements SymbolList, Serializable {
     public Alphabet getAlphabet() {
       return Alphabet.EMPTY_ALPHABET;
     }
@@ -195,11 +197,6 @@ public interface SymbolList extends Changeable {
         "You can't edit the empty symbol list"
       );
     }
-    
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 
     private Object writeReplace() throws ObjectStreamException {
       try {

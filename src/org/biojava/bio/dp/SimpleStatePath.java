@@ -33,7 +33,12 @@ import org.biojava.bio.symbol.*;
  * A no-frills implementation of StatePath.
  */
 public class SimpleStatePath
-implements StatePath, Serializable {
+  extends
+    Unchangeable
+  implements
+    StatePath,
+    Serializable
+{
   private final double score;
   private final Alignment delegate;
   
@@ -112,9 +117,5 @@ implements StatePath, Serializable {
   throws IllegalAlphabetException, IndexOutOfBoundsException, ChangeVetoException {
     throw new ChangeVetoException("Can't edit SimpleStatePath");
   }
-  
-  public void addChangeListener(ChangeListener cl) {}
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-  public void removeChangeListener(ChangeListener cl) {}
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+
 }

@@ -140,7 +140,9 @@ public interface Annotation extends Changeable {
   /**
    * The empty and immutable implementation.
    */
-  class EmptyAnnotation implements Annotation, Serializable {
+  class EmptyAnnotation
+  extends Unchangeable
+  implements Annotation, Serializable {
     public Object getProperty(Object key) throws NoSuchElementException {
       throw new NoSuchElementException(
         "There are no keys in the Empty Annotation object: " +
@@ -168,11 +170,6 @@ public interface Annotation extends Changeable {
       //return Collections.EMPTY_MAP; 1.3
       return new HashMap();
     }
-    
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
     
     private Object writeReplace() throws ObjectStreamException {
       try {

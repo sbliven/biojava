@@ -30,9 +30,15 @@ import org.biojava.bio.seq.*;
 /**
  * a simple indexer for a full DNA alphabet including
  * ambiguities.
+ *
+ * @author David Huen
+ * @author Matthew Pocock
  */
 class FullDnaAlphabetIndex
-    implements AlphabetIndex
+  extends
+    Unchangeable
+  implements
+    AlphabetIndex
 {
     static Symbol [] symbolArray = null;
     FiniteAlphabet dna = null;
@@ -65,38 +71,6 @@ class FullDnaAlphabetIndex
         if ((index < 0) || (index > 15)) throw new IndexOutOfBoundsException();
 
         return symbolArray[index];
-    }
-
-    /**
-     * all the Changeable stuff
-     */
-
-    /**
-     * object is immutable
-     */
-    public void addChangeListener(ChangeListener cl)
-    {
-    }
-
-    /**
-     * object is immutable
-     */
-    public void addChangeListener(ChangeListener cl, ChangeType ct)
-    {
-    }
-
-    /**
-     * object is immutable
-     */
-    public void removeChangeListener(ChangeListener cl)
-    {
-    }
-
-    /**
-     * object is immutable
-     */
-    public void removeChangeListener(ChangeListener cl, ChangeType ct)
-    {
     }
 
     /**

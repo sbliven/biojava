@@ -37,7 +37,12 @@ import org.biojava.bio.symbol.*;
  * @since 1.2
  */
 
-public class CharacterTokenization implements SymbolTokenization {
+public class CharacterTokenization
+  extends
+    Unchangeable
+  implements
+    SymbolTokenization
+{
     private Alphabet alphabet;
     private Map symbolsToCharacters = new HashMap();
     private Map charactersToSymbols = new HashMap();
@@ -197,10 +202,4 @@ public class CharacterTokenization implements SymbolTokenization {
 	public void close() {
 	}
     }
-
-    
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void addChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
 }

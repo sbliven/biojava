@@ -39,36 +39,16 @@ import org.biojava.bio.dist.*;
  * <p>
  * You can train the resulting flat model, and the underlying models will be altered.
  */
-class FlatModel implements MarkovModel, Serializable {
+class FlatModel
+  extends
+    AbstractChangeable
+  implements
+    MarkovModel,
+    Serializable
+{
   private final MarkovModel source;
   private final MarkovModel delegate;
   
-  protected transient ChangeSupport changeSupport;
-  
-  protected void generateChangeSupport(ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-    changeSupport.addChangeListener(cl);
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-    changeSupport.addChangeListener(cl, ct);
-  }
-
-  public void removeChangeListener(ChangeListener cl) {
-    changeSupport.removeChangeListener(cl);
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    changeSupport.removeChangeListener(cl, ct);
-  }
-
   protected void addAState(State ourState)
   throws IllegalSymbolException {
     try {
@@ -306,7 +286,13 @@ class FlatModel implements MarkovModel, Serializable {
     modelTrainer.registerModel(delegate);
   }
     
-  private static class Wrapper implements State, Serializable {
+  private static class Wrapper
+    extends
+      AbstractChangeable
+    implements
+      State,
+      Serializable
+  {
     private final State wrapped;
     private final String extra;
     private final Alphabet matches;
@@ -335,30 +321,6 @@ class FlatModel implements MarkovModel, Serializable {
     
     public List getSymbols() {
       return new SingletonList(this);
-    }
-    
-    protected void generateChangeSupport(ChangeType ct) {
-      if(changeSupport == null) {
-        changeSupport = new ChangeSupport();
-      }
-    }
-    
-    public void addChangeListener(ChangeListener cl) {
-      generateChangeSupport(null);
-      changeSupport.addChangeListener(cl);
-    }
-    
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-      generateChangeSupport(ct);
-      changeSupport.addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-      changeSupport.removeChangeListener(cl);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-      changeSupport.removeChangeListener(cl, ct);
     }
     
     public Wrapper(State wrapped, String extra) {

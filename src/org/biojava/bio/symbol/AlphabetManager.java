@@ -1128,7 +1128,13 @@ public final class AlphabetManager {
    *
    * @author Matthew Pocock
    */
-  private static class GapSymbol implements Symbol, Serializable {
+  private static class GapSymbol
+    extends
+      Unchangeable
+    implements
+      Symbol,
+      Serializable
+  {
       public GapSymbol() {
       }
 
@@ -1146,18 +1152,6 @@ public final class AlphabetManager {
 
       public Alphabet getMatches() {
           return Alphabet.EMPTY_ALPHABET;
-      }
-
-      public void addChangeListener(ChangeListener cl) {
-      }
-
-      public void addChangeListener(ChangeListener cl, ChangeType ct) {
-      }
-
-      public void removeChangeListener(ChangeListener cl) {
-      }
-
-      public void removeChangeListener(ChangeListener cl, ChangeType ct) {
       }
   }
 

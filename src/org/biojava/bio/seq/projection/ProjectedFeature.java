@@ -37,9 +37,11 @@ import org.biojava.bio.seq.*;
  */
 
 class ProjectedFeature
-implements
-  Feature,
-  Projection
+  extends
+    AbstractChangeable
+  implements
+    Feature,
+    Projection
 {
   private transient ChangeSupport changeSupport;
   private ChangeListener propertyForwarder; 
@@ -62,12 +64,15 @@ implements
     return changeSupport;
   }
   
-  protected void instantiateChangeSupport() {
-    if (changeSupport == null) {
-      changeSupport = new ChangeSupport();
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    ChangeSupport changeSupport = super.getChangeSupport(ct);
+    
+    if(propertyForwarder == null) {
       propertyForwarder = new ChangeForwarder(this, changeSupport);
       feature.addChangeListener(propertyForwarder, ChangeType.UNKNOWN);
     }
+    
+    return changeSupport;
   }
   
   public Feature getViewedFeature() {
@@ -208,28 +213,7 @@ implements
     context.removeFeature(feature, f);
   }
   
-  public void addChangeListener(ChangeListener cl) {
-    instantiateChangeSupport();
-    getChangeSupport().addChangeListener(cl);
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    instantiateChangeSupport();
-    getChangeSupport().addChangeListener(cl, ct);
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    ChangeSupport cs = getChangeSupport();
-    if (cs != null)
-      cs.removeChangeListener(cl);
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    ChangeSupport cs = getChangeSupport();
-    if (cs != null)
-      cs.removeChangeListener(cl, ct);
-  }
-  
+
   public int hashCode() {
     return makeTemplate().hashCode();
   }

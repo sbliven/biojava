@@ -35,7 +35,12 @@ import org.biojava.bio.symbol.*;
  * @since 1.1
  */
 
-class SimpleComponentFeature implements ComponentFeature {
+class SimpleComponentFeature
+  extends
+    Unchangeable
+  implements
+    ComponentFeature
+{
     private FeatureHolder parent;
 
     private FeatureHolder projectedFeatures;
@@ -237,9 +242,4 @@ class SimpleComponentFeature implements ComponentFeature {
     {
 	throw new UnsupportedOperationException("Can't remove features from a ComponentFeature.");
     }
-    
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

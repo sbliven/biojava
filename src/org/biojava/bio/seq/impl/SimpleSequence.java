@@ -55,7 +55,13 @@ import org.biojava.bio.seq.*;
  * @author Mark Schreiber
  * @serial WARNING serialized versions of this class may not be compatable with future versions of Biojava
  */
-public class SimpleSequence implements Sequence, RealizingFeatureHolder, Serializable
+public class SimpleSequence
+  extends
+    AbstractChangeable
+  implements
+    Sequence,
+    RealizingFeatureHolder,
+    Serializable
 {
     //
     // This section is for the SymbolList implementation-by-delegation
@@ -117,7 +123,7 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, Seriali
     protected SimpleFeatureHolder getFeatureHolder() {
 	if(featureHolder == null) {
 	    featureHolder = new SimpleSequenceFeatureHolder();
-	    registerFeatureForwarder();
+// FIXME:	    registerFeatureForwarder();
 	}
 	return featureHolder;
     }
@@ -269,52 +275,29 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, Seriali
     // Changeable stuff
     //
 
-    protected transient ChangeSupport changeSupport;
     private transient ChangeListener featureForwarder;
+ 
+    protected ChangeSupport getChangeSupport(ChangeType ct) {
+      ChangeSupport changeSupport = super.getChangeSupport(ct);
       
-    public void addChangeListener(ChangeListener cl) {
-	addChangeListener(cl, ChangeType.UNKNOWN);
-    }
-
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport == null) {
-	    generateChangeSupport();
-	}
-	changeSupport.addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	removeChangeListener(cl, ChangeType.UNKNOWN);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport != null) {
-	    changeSupport.removeChangeListener(cl, ct);
-	}
-    }
-
-    protected void generateChangeSupport() {
-	changeSupport = new ChangeSupport();
-	registerFeatureForwarder();
-    }
-
-    protected void registerFeatureForwarder() {
-	if (featureForwarder == null && featureHolder != null && changeSupport != null) {
-	    featureForwarder = new FeatureForwarder();
-	    featureHolder.addChangeListener(featureForwarder, ChangeType.UNKNOWN);
-	}
+      if (featureForwarder == null && featureHolder != null) {
+        featureForwarder = new FeatureForwarder();
+        featureHolder.addChangeListener(featureForwarder, ChangeType.UNKNOWN);
+      }
+      
+      return changeSupport;
     }
 
     private class FeatureForwarder implements ChangeListener {
-	public void preChange(ChangeEvent cev)
-	    throws ChangeVetoException
-	{
-	    changeSupport.firePreChangeEvent(cev);
-	}
-
-	public void postChange(ChangeEvent cev) {
-	    changeSupport.firePostChangeEvent(cev);
-	}
+      public void preChange(ChangeEvent cev)
+      throws ChangeVetoException
+      {
+        getChangeSupport(cev.getType()).firePreChangeEvent(cev);
+      }
+      
+      public void postChange(ChangeEvent cev) {
+        getChangeSupport(cev.getType()).firePostChangeEvent(cev);
+      }
     }
     /**
      * this class is implemented for serialization purposes all methods delegate to super

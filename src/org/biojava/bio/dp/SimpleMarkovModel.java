@@ -30,7 +30,13 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
-public class SimpleMarkovModel implements MarkovModel, Serializable {
+public class SimpleMarkovModel
+  extends
+    AbstractChangeable
+  implements
+    MarkovModel,
+    Serializable
+{
   public static final long serialVersionUID = -3043028839927615753l;
   private final Alphabet emissionAlpha;
   private final FiniteAlphabet stateAlpha;
@@ -39,7 +45,6 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   private final Map transFrom;
   private final Map transTo;
   private final Map transWeights;
-  private transient ChangeSupport changeSupport;
   private transient MarkovModel.DistributionForwarder distForwarder;
   
   private Transition _tran = new Transition(null, null);
@@ -50,29 +55,29 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     transWeights = new HashMap();
   }
 
-  protected void generateChangeSupport(ChangeType ct) {
-    if(changeSupport == null) {
-	  changeSupport = new ChangeSupport();
-	}
-	
-	if(
-	  ( (ct == null) || (ct == MarkovModel.PARAMETER) ) &&
-	  (distForwarder == null)
-	) {
-	  distForwarder = new MarkovModel.DistributionForwarder(
-	    this,
-		changeSupport
-	  );
-	  for(Iterator si = stateAlpha.iterator(); si.hasNext(); ) {
-	    State s = (State) si.next();
-		if(s instanceof EmissionState) {
-		  EmissionState es = (EmissionState) s;
-		  Distribution dist = es.getDistribution();
-		  dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
-		  dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
-		}
-	  }
-	}
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    ChangeSupport changeSupport = super.getChangeSupport(ct);
+    
+  	if(
+	    ( (ct == null) || (ct == MarkovModel.PARAMETER) ) &&
+	    (distForwarder == null)
+  	) {
+	    distForwarder = new MarkovModel.DistributionForwarder(
+	      this,
+        changeSupport
+	    );
+      for(Iterator si = stateAlpha.iterator(); si.hasNext(); ) {
+        State s = (State) si.next();
+        if(s instanceof EmissionState) {
+          EmissionState es = (EmissionState) s;
+          Distribution dist = es.getDistribution();
+          dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
+          dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
+        }
+      }
+    }
+    
+    return changeSupport;
   }
 
   public Alphabet emissionAlphabet() { return emissionAlpha; }
@@ -144,10 +149,11 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       );
     }
 	
-	if (changeSupport == null) {
+	if (!hasListeners()) {
 	  f.addSymbol(to);
 	  t.addSymbol(from);
 	} else {
+    ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
       synchronized(changeSupport) {
       	changeSupport.firePreChangeEvent(ce);
       
@@ -190,10 +196,11 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       );
     }
 
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       transitionsFrom(from).removeSymbol(to);
       transitionsTo(to).removeSymbol(from);
 	} else {
+    ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
  
@@ -275,9 +282,10 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       }
     }
 
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       doAddState(toAdd);
     } else {
+      ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
       synchronized(changeSupport) {
         ChangeEvent ce = new ChangeEvent(
           this, MarkovModel.ARCHITECTURE,
@@ -332,9 +340,10 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       );
     }
 
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       doRemoveState(toGo);
     } else {
+      ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
       synchronized(changeSupport) {
         ChangeEvent ce = new ChangeEvent(
           this, MarkovModel.ARCHITECTURE,
@@ -359,24 +368,6 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
         toGo.removeChangeListener(distForwarder, Distribution.WEIGHTS);
       }
     }
-  }
-
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-    changeSupport.addChangeListener(cl);
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-    changeSupport.addChangeListener(cl, ct);
-  }
-
-  public void removeChangeListener(ChangeListener cl) {
-    changeSupport.removeChangeListener(cl);
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    changeSupport.removeChangeListener(cl, ct);
   }
 
   public SimpleMarkovModel(int heads, Alphabet emissionAlpha, String name) {

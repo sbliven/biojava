@@ -51,7 +51,12 @@ import org.w3c.dom.*;
  * @since 1.1
  */
 
-public class DASSequenceDB implements SequenceDB {
+public class DASSequenceDB
+  extends
+    Unchangeable
+  implements
+    SequenceDB
+{
     private static final int MAX_CAPACITY = 3000;
     private URL dataSourceURL;
     private Map sequences;
@@ -147,7 +152,12 @@ public class DASSequenceDB implements SequenceDB {
 	return allEntryPoints;
     }
 
-    private class AllEntryPoints implements SequenceDBLite {
+    private class AllEntryPoints
+      extends
+        Unchangeable
+      implements
+        SequenceDBLite
+    {
 	public Sequence getSequence(String id)
 	    throws BioException, IllegalIDException
 	{
@@ -169,16 +179,7 @@ public class DASSequenceDB implements SequenceDB {
 	public String getName() {
 	    return "All sequences in " + dataSourceURL.toString();
 	}
-
-	// 
-	// Changeable stuff (which we're not, fortunately)
-	//
-
-	public void addChangeListener(ChangeListener cl) {}
-	public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-	public void removeChangeListener(ChangeListener cl) {}
-	public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
-    }
+  }
 
 
     /**
@@ -297,14 +298,5 @@ public class DASSequenceDB implements SequenceDB {
 	    return 0;
 	}
     }
-
-    // 
-    // Changeable stuff (which we're not, fortunately)
-    //
-
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }
 

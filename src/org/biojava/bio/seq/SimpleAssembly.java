@@ -43,9 +43,12 @@ import org.biojava.bio.symbol.*;
  */
 
 public class SimpleAssembly
-    implements Sequence, RealizingFeatureHolder 
+  extends
+    AbstractChangeable
+  implements
+    Sequence,
+    RealizingFeatureHolder 
 {
-    protected transient ChangeSupport changeSupport = null;
     private String name;
     private String uri;
     private Annotation annotation = new SimpleAnnotation();
@@ -230,46 +233,6 @@ public class SimpleAssembly
 		gopher = ((Feature) gopher).getParent();
 	    }
 	    return featureRealizer.realizeFeature(this, fh, temp);
-	}
-    }
-
-    //
-    // Changeable
-    //
-
-    public void addChangeListener(ChangeListener cl) {
-	if(changeSupport == null) {
-	    changeSupport = new ChangeSupport();
-	}
-
-	synchronized(changeSupport) {
-	    changeSupport.addChangeListener(cl);
-	}
-    }
-
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	if(changeSupport == null) {
-	    changeSupport = new ChangeSupport();
-	}
-
-	synchronized(changeSupport) {
-	    changeSupport.addChangeListener(cl, ct);
-	}
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	if(changeSupport != null) {
-	    synchronized(changeSupport) {
-		changeSupport.removeChangeListener(cl);
-	    }
-	}
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	if(changeSupport != null) {
-	    synchronized(changeSupport) {
-		changeSupport.removeChangeListener(cl, ct);
-	    }
 	}
     }
 }

@@ -41,13 +41,18 @@ import org.biojava.bio.*;
  * </pre>
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.2
  */
 
-public abstract class LazyFeatureHolder implements FeatureHolder {
+public abstract class LazyFeatureHolder
+  extends
+    AbstractChangeable
+  implements
+    FeatureHolder
+{
     private FeatureHolder featureHolder;
     private Forwarder changeForwarder;
-    protected ChangeSupport changeSupport;
 
     protected abstract FeatureHolder createFeatureHolder();
 
@@ -59,7 +64,7 @@ public abstract class LazyFeatureHolder implements FeatureHolder {
 	if (featureHolder == null) {
 	    featureHolder = createFeatureHolder();
 
-	    if (changeSupport != null) {
+	    if (!hasListeners()) {
 		changeForwarder = new Forwarder();
 		featureHolder.addChangeListener(changeForwarder, ChangeType.UNKNOWN);
 	    }
@@ -95,52 +100,26 @@ public abstract class LazyFeatureHolder implements FeatureHolder {
 	return getFeatureHolder().containsFeature(f);
     }
 
+    protected ChangeSupport getChangeSupport(ChangeType ct) {
+      ChangeSupport changeSupport = super.getChangeSupport(ct);
 
-
-    protected void generateChangeSupport() {
-	changeSupport = new ChangeSupport();
-	if (featureHolder != null) {
-	    changeForwarder = new Forwarder();
-	    featureHolder.addChangeListener(changeForwarder, ChangeType.UNKNOWN);
-	}
+      if (featureHolder != null) {
+        changeForwarder = new Forwarder();
+        featureHolder.addChangeListener(changeForwarder, ChangeType.UNKNOWN);
+      }
+      
+      return changeSupport;
     }
 	
-
-    public void addChangeListener(ChangeListener cl) {
-	if (changeSupport == null) {
-	    generateChangeSupport();
-	}
-	changeSupport.addChangeListener(cl);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	if (changeSupport != null) {
-	    changeSupport.removeChangeListener(cl);
-	}
-    }
-
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport == null) {
-	    generateChangeSupport();
-	}
-	changeSupport.addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport != null) {
-	    changeSupport.removeChangeListener(cl, ct);
-	}
-    }
-
     private class Forwarder implements ChangeListener {
 	public void preChange(ChangeEvent cev)
 	    throws ChangeVetoException
 	{
-	    changeSupport.firePreChangeEvent(cev);
+	    getChangeSupport(cev.getType()).firePreChangeEvent(cev);
 	}
 
 	public void postChange(ChangeEvent cev) {
-	    changeSupport.firePostChangeEvent(cev);
+	    getChangeSupport(cev.getType()).firePostChangeEvent(cev);
 	}
     }
 }

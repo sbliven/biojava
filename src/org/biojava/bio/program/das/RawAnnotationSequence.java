@@ -57,7 +57,12 @@ import org.biojava.utils.stax.*;
  * @author Thomas Down
  */
 
-class RawAnnotationSequence implements DASSequenceI {
+class RawAnnotationSequence
+  extends
+    Unchangeable
+  implements
+    DASSequenceI
+{
     private URL dataSourceURL;
     private String seqID;
     private String version = null;
@@ -259,20 +264,4 @@ class RawAnnotationSequence implements DASSequenceI {
     public Annotation getAnnotation() {
 	return Annotation.EMPTY_ANNOTATION;
     }
-
-    //
-    // Changeable stuff (which we aren't.   wow :-)
-    //
-
-    public void addChangeListener(ChangeListener cl) {
-    }
-  
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    }
-  
-    public void removeChangeListener(ChangeListener cl) {
-    }
-  
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    }  
 }

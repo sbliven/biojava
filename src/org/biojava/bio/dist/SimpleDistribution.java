@@ -221,9 +221,10 @@ extends AbstractDistribution implements Serializable{
 
     public void train(DistributionTrainerContext dtc, double weight)
     throws ChangeVetoException {
-      if(changeSupport == null)  {
+      if(!hasListeners())  {
         trainImpl(dtc, weight);
       } else {
+        ChangeSupport changeSupport = getChangeSupport(Distribution.WEIGHTS);
         synchronized(changeSupport) {
           ChangeEvent ce = new ChangeEvent(
             SimpleDistribution.this,

@@ -15,6 +15,7 @@
     compile-tests compiles JUnit tests
     compile-demos compiles the demo files
     package       builds the biojava.jar file (default)
+    package-demos builds the demos.jar file
     runtests      runs JUnit tests
     javadocs
     dist
@@ -70,6 +71,7 @@
     <property name="reports.dir" value="./reports" />
     <property name="manifest.dir" value="./manifest" />
     <property name="manifest.file" value="defaultmanifest.txt" />
+    <property name="demosmanifest.file" value="demosmanifest.txt" />
     <property name="resources.dir" value="./resources" />
 
     <property name="packages" value="org.*" />
@@ -139,6 +141,13 @@
       </fileset>
     </copy>
 
+    <!-- Copies demo manifest -->
+    <copy todir="${build.src.demos}">
+      <fileset dir="${manifest.dir}">
+        <include name="${demosmanifest.file}" />
+      </fileset>
+    </copy>
+    
     <!-- Copies resources -->
     <!-- copydir src="${resources.dir}" dest="${build.src}" excludes="CVS,cvs"/ -->
     <copy todir="${build.dest.main}">
@@ -212,6 +221,16 @@
       jarfile="${build.dir}/${name}.jar"
       basedir="${build.dest.main}"
       manifest="${build.src.main}/${manifest.file}"
+      includes="**"
+    />
+  </target>
+  
+  <!-- Create the demo package -->
+  <target name="package-demos" depends="init,package,compile-demos">
+    <jar
+      jarfile="${build.dir}/demo.jar"
+      basedir="${build.dest.demos}"
+      manifest="${build.src.demos}/${demosmanifest.file}"
       includes="**"
     />
   </target>

@@ -28,38 +28,41 @@ public abstract class AbstractChangeable implements Changeable {
   }
 
   protected ChangeSupport getChangeSupport(ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
+    if(changeSupport != null) {
+      return changeSupport;
     }
-
+    
+    synchronized(this) {
+      if(changeSupport == null) {
+        changeSupport = new ChangeSupport();
+      }
+    }
+    
     return changeSupport;
   }
 
-  public void addChangeListener(ChangeListener cl) {
-    ChangeSupport cs = getChangeSupport(ChangeType.UNKNOWN);
-    synchronized(cs) {
-      cs.addChangeListener(cl);
-    }
+  public final void addChangeListener(ChangeListener cl) {
+    addChangeListener(cl, ChangeType.UNKNOWN);
   }
 
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+  public final void addChangeListener(ChangeListener cl, ChangeType ct) {
     ChangeSupport cs = getChangeSupport(ct);
-    synchronized(cs) {
-      cs.addChangeListener(cl, ct);
-    }
+    cs.addChangeListener(cl, ct);
   }
 
-  public void removeChangeListener(ChangeListener cl) {
-    ChangeSupport cs = getChangeSupport(ChangeType.UNKNOWN);
-    synchronized(cs) {
-      cs.removeChangeListener(cl);
-    }
+  public final void removeChangeListener(ChangeListener cl) {
+    removeChangeListener(cl, ChangeType.UNKNOWN);
   }
 
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    ChangeSupport cs = getChangeSupport(ct);
-    synchronized(cs) {
+  public final void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(ct);
       cs.removeChangeListener(cl, ct);
     }
+  }
+  
+  public final boolean isUnchanging(ChangeType ct) {
+    ChangeSupport cs = getChangeSupport(ct);
+    return cs.isUnchanging(ct);
   }
 }

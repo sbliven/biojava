@@ -23,10 +23,11 @@ implements OrderNDistribution{
   
   protected transient WeigthForwarder weightForwarder = null;
   
-  protected void generateChangeSupport(ChangeType ct) {
-    super.generateChangeSupport(ct);
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    ChangeSupport changeSupport = super.getChangeSupport(ct);
+    
     if(
-      ( (ct == null) || (ct == Distribution.WEIGHTS) ) &&
+      ( (ct == null) || (ct.isMatchingType(Distribution.WEIGHTS)) ) &&
       weightForwarder == null
     ) {
       weightForwarder = new WeigthForwarder(this, changeSupport);
@@ -35,6 +36,8 @@ implements OrderNDistribution{
         dist.addChangeListener(weightForwarder, Distribution.WEIGHTS);
       }
     }
+    
+    return changeSupport;
   }
   
     /**

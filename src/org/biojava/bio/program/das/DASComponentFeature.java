@@ -35,7 +35,13 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  */
 
-class DASComponentFeature implements ComponentFeature, DASOptimizableFeatureHolder {
+class DASComponentFeature
+  extends
+    Unchangeable
+  implements
+    ComponentFeature,
+    DASOptimizableFeatureHolder
+{
     private final DASSequence parent;
 
     private FeatureHolder projectedFeatures;
@@ -306,13 +312,4 @@ class DASComponentFeature implements ComponentFeature, DASOptimizableFeatureHold
 	    return fh;
 	}
     }
-
-    // 
-    // Changeable stuff (which we're not)
-    //
-
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

@@ -26,9 +26,9 @@ public class CreateSPIndex {
       indexer.setPrimaryKeyName("ID");
       indexer.addSeccondaryKey("AC");
       
-      ValueChanger changer = new ValueChanger(indexer);
+      ChangeTable changeTable = new ChangeTable();
       
-      changer.setChanger("ID", new ValueChanger.Changer() {
+      changeTable.setChanger("ID", new ChangeTable.Changer() {
         public Object change(Object value) {
           String s = (String) value;
           int i = s.indexOf(" ");
@@ -36,13 +36,15 @@ public class CreateSPIndex {
         }
       });
 
-      changer.setChanger("AC", new ValueChanger.Changer() {
+      changeTable.setChanger("AC", new ChangeTable.Changer() {
         public Object change(Object value) {
           String s = (String) value;
           int i = s.indexOf(";");
           return s.substring(0, i);
         }
       });
+      
+      ValueChanger changer = new ValueChanger(indexer, changeTable);
     
       Parser parser = new Parser();
       

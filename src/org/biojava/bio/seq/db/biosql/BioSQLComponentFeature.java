@@ -41,7 +41,12 @@ import org.biojava.bio.symbol.*;
  * @since 1.3
  */
 
-class BioSQLComponentFeature implements ComponentFeature {
+class BioSQLComponentFeature
+  extends
+    Unchangeable
+  implements
+    ComponentFeature
+{
     private BioSQLSequenceDB        seqDB;
     private Sequence                parent;
     private Sequence                componentSequence = null;
@@ -224,14 +229,4 @@ class BioSQLComponentFeature implements ComponentFeature {
 
 	return projectedFeatures;
     }
-    
-
-    // 
-    // Changeable stuff (which we're not, yet)
-    //
-
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

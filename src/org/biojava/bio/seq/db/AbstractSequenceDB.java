@@ -35,33 +35,12 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public abstract class AbstractSequenceDB implements SequenceDB {
-  protected transient ChangeSupport changeSupport = null;
-
-  protected void generateChangeSupport(ChangeType changeType) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-  }
-
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-    changeSupport.addChangeListener(cl);
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-    changeSupport.addChangeListener(cl, ct);
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    changeSupport.removeChangeListener(cl);
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    changeSupport.removeChangeListener(cl, ct);
-  }
-
+public abstract class AbstractSequenceDB
+  extends
+    AbstractChangeable
+  implements
+    SequenceDB
+{
   public SequenceIterator sequenceIterator() {
     return new SequenceIterator() {
       private Iterator pID = ids().iterator();

@@ -38,7 +38,12 @@ import org.biojava.bio.symbol.*;
  * @since 1.2
  */
 
-public abstract class WordTokenization implements SymbolTokenization {
+public abstract class WordTokenization
+  extends
+    Unchangeable
+  implements
+    SymbolTokenization
+{
     private Alphabet alphabet;
  
     public WordTokenization(Alphabet fab) {
@@ -169,9 +174,4 @@ public abstract class WordTokenization implements SymbolTokenization {
 	} while (level > 0);
 	return ptr;
     }
-
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void addChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
 }

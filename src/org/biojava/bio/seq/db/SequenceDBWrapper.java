@@ -39,13 +39,15 @@ implements java.io.Serializable{
   private final SequenceDB parent;
   private transient SequencesForwarder seqFor;
   
-  protected void generateChangeSupport(ChangeType ct) {
-    super.generateChangeSupport(ct);
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    ChangeSupport changeSupport = super.getChangeSupport(ct);
     
-    if(ct == SequenceDB.SEQUENCES) {
+    if(ct.isMatchingType(SequenceDB.SEQUENCES)) {
       seqFor = new SequencesForwarder(this, changeSupport);
-      super.addChangeListener(seqFor, SequenceDB.SEQUENCES);
+      parent.addChangeListener(seqFor, SequenceDB.SEQUENCES);
     }
+    
+    return changeSupport;
   }
   
   /**

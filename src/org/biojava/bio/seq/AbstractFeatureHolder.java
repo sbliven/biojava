@@ -34,47 +34,12 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public abstract class AbstractFeatureHolder implements FeatureHolder {
-  protected transient ChangeSupport changeSupport = null;
-  
-  protected void generateChangeSupport(ChangeType changeType) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
-  }  
-  
+public abstract class AbstractFeatureHolder
+  extends
+    AbstractChangeable
+  implements
+    FeatureHolder
+{
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
     SimpleFeatureHolder res = new SimpleFeatureHolder();
     for(Iterator f = features(); f.hasNext();) {

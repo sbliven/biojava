@@ -25,7 +25,7 @@ import java.util.regex.*;
  */
 public class RegexSplitter
   implements
-    ValueChanger.Splitter
+    ChangeTable.Splitter
 {
   private Pattern pattern;
   private int matchGroup;
@@ -45,7 +45,7 @@ public class RegexSplitter
     
     List result = new ArrayList();
     while(matcher.find()) {
-      result.add(matcher.group());
+      result.add(matcher.group(matchGroup));
     }
     
     return result;

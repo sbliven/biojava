@@ -46,10 +46,15 @@ import org.biojava.bio.seq.io.*;
  * @author Matthew Pocock
  * @since 1.1
  */
-public abstract class AbstractAlphabet implements FiniteAlphabet, Serializable {
+public abstract class AbstractAlphabet
+  extends
+    AbstractChangeable
+  implements
+    FiniteAlphabet,
+    Serializable
+{
   private final Map tokenizationsByName;
   private final Map ambCache;
-  private ChangeSupport changeSupport;
 
 
   {
@@ -74,23 +79,6 @@ public abstract class AbstractAlphabet implements FiniteAlphabet, Serializable {
       return this;
     }
 
-  }
-
-
-
-
-
-
-  protected boolean hasListeners() {
-    return changeSupport != null;
-  }
-  
-  protected ChangeSupport getChangeSupport(ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-    
-    return changeSupport;
   }
   
   /**
@@ -315,19 +303,6 @@ public abstract class AbstractAlphabet implements FiniteAlphabet, Serializable {
     
     return true;
   }
-  
-  public void addChangeListener(ChangeListener cl) {
-    getChangeSupport(ChangeType.UNKNOWN).addChangeListener(cl);
-  }
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    getChangeSupport(ct).addChangeListener(cl, ct);
-  }
-  public void removeChangeListener(ChangeListener cl) {
-    getChangeSupport(ChangeType.UNKNOWN).removeChangeListener(cl);
-  }
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    getChangeSupport(ct).removeChangeListener(cl, ct);
-  } 
   
   public String toString() {
     return getName();

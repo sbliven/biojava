@@ -33,10 +33,16 @@ import org.biojava.bio.seq.db.*;
  * Sequence from the meta-DAS system.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.2
  */
 
-class DistributedSequence implements Sequence{
+class DistributedSequence
+  extends
+    AbstractChangeable
+  implements
+    Sequence
+{
     private DistributedSequenceDB db;
     private DistDataSource seqSource;
     private Set featureSources;
@@ -46,18 +52,6 @@ class DistributedSequence implements Sequence{
     private MergeFeatureHolder mfh;
 
     private transient ChangeListener dsListener;
-    private transient ChangeSupport changeSupport;
-
-    protected boolean hasChangeSupport() {
-	return (changeSupport != null);
-    }
-
-    protected ChangeSupport getChangeSupport() {
-	if (changeSupport == null) {
-	    changeSupport = new ChangeSupport();
-	}
-	return changeSupport;
-    }
 
     DistributedSequence(String id,
 			DistributedSequenceDB db,
@@ -82,8 +76,8 @@ class DistributedSequence implements Sequence{
 			throw new ChangeVetoException(cev, "Can't remove this datasource, since it is providing sequence data");
 		    }
 
-		    if (hasChangeSupport()) {
-			getChangeSupport().firePreChangeEvent(makeChainedEvent(cev));
+		    if (hasListeners()) {
+			getChangeSupport(ChangeType.UNKNOWN).firePreChangeEvent(makeChainedEvent(cev));
 		    }
 		}
 
@@ -100,8 +94,8 @@ class DistributedSequence implements Sequence{
 
 		    mfh = null;  // C'mon, we can do better than that...
 
-		    if (hasChangeSupport()) {
-			getChangeSupport().firePostChangeEvent(makeChainedEvent(cev));
+		    if (hasListeners()) {
+			getChangeSupport(ChangeType.UNKNOWN).firePostChangeEvent(makeChainedEvent(cev));
 		    }
 		}
 
@@ -227,26 +221,5 @@ class DistributedSequence implements Sequence{
 	}
 
 	return mfh;
-    }
-	
-
-    // 
-    // Changeable stuff
-    //
-
-    public void addChangeListener(ChangeListener cl) {
-	getChangeSupport().addChangeListener(cl);
-    }
-
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	getChangeSupport().addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	getChangeSupport().removeChangeListener(cl);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	getChangeSupport().removeChangeListener(cl, ct);
     }
 }
