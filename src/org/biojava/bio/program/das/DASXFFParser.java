@@ -59,7 +59,7 @@ class DASXFFParser {
         throws BioException, ParseException, IOException
     {
 	try {
-	    System.err.println("Wheeee, using XFF parser on: " + fUrl.toString());
+	    // System.err.println("Wheeee, using XFF parser on: " + fUrl.toString());
 
 	    HttpURLConnection huc = (HttpURLConnection) fUrl.openConnection();
 	    huc.connect();
