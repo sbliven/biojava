@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * <code>EmblCDROMRandomAccess</code> is an abstract class whose
+ * <p><code>EmblCDROMRandomAccess</code> is an abstract class whose
  * concrete subclasses can perform fast lookups in EMBL CD-ROM format
  * index files. As the format of the records varies between file
  * types, subclasses should implement two methods;
@@ -35,11 +35,11 @@ import java.io.RandomAccessFile;
  * array of objects and <code>getRecordKey()</code> which should
  * retrieve the the field from the parsed record on which the records
  * were sorted in the index. This is used during the binary search in
- * the <code>findRecord()</code> method.
+ * the <code>findRecord()</code> method.</p>
  *
- * Implementing <code>readRecord()</code> is easy because it simply
+ * <p>Implementing <code>readRecord()</code> is easy because it simply
  * means delegating to the supplied <code>RecordParser</code> and
- * calling the appropriate method on it.
+ * calling the appropriate method on it.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
@@ -74,10 +74,10 @@ public abstract class EmblCDROMRandomAccess
      *
      * @exception FileNotFoundException if indexFile cannot be found.
      */
-    public EmblCDROMRandomAccess(final File indexFile,
-                                 final int  headerLength,
-                                 final int  recordLength,
-                                 final long recordCount)
+    public EmblCDROMRandomAccess(File indexFile,
+                                 int  headerLength,
+                                 int  recordLength,
+                                 long recordCount)
         throws FileNotFoundException
     {
         this.indexFile = indexFile;
@@ -164,8 +164,8 @@ public abstract class EmblCDROMRandomAccess
 
     /**
      * <code>getRecordKey</code> returns the field from the record on
-     * which the records were sorted in the index (i.e. sequence ID or
-     * accession number).
+     * which the records were sorted in the index. (i.e. sequence ID
+     * or accession number).
      *
      * @return a <code>String</code>.
      */

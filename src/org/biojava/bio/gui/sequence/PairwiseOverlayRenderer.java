@@ -50,6 +50,10 @@ import org.biojava.utils.ChangeVetoException;
 public class PairwiseOverlayRenderer extends AbstractChangeable
     implements PairwiseSequenceRenderer
 {
+    /**
+     * Constant <code>RENDERERS</code> indicating a change to the
+     * renderers handled by the overlay.
+     */
     public static final ChangeType RENDERERS =
         new ChangeType("A PairwiseSequenceRenderer has been added or removed",
                        "org.biojava.bio.gui.sequence.PairwiseOverlayRenderer",

@@ -104,7 +104,7 @@ public class CrosshairRenderer extends AbstractChangeable
      *
      * @param outline a <code>Paint</code>.
      */
-    public CrosshairRenderer(final Paint outline)
+    public CrosshairRenderer(Paint outline)
     {
         xHair = new Line2D.Double();
         yHair = new Line2D.Double();

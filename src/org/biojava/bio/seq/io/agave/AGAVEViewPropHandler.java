@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * move view attributes into annotation properties:
+ * Moves view attributes into annotation properties.
  * <p>
  * start --> view_start
  * <p>

@@ -43,31 +43,25 @@ import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SymbolTokenization;
 
 /**
- * <p>
- * <code>EmblCDROMIndexStore</code>s implement a read-only
+ * <p><code>EmblCDROMIndexStore</code>s implement a read-only
  * <code>IndexStore</code> backed by EMBL CD-ROM format binary
  * indices. The required index files are typically named
  * "division.lkp" and "entrynam.idx". As an <code>IndexStore</code>
  * performs lookups by sequence ID, the index files "acnum.trg" and
  * "acnum.hit" (which store additional accession number data) are not
- * used.
- * </p>
+ * used.</p>
  *
- * <p>
- * The sequence IDs are found using a binary search via a pointer
+ * <p>The sequence IDs are found using a binary search via a pointer
  * into the index file. The whole file is not read unless a request
  * for all the IDs is made using the getIDs() method. The set of IDs
  * is then cached after the first pass. This class also has a
  * <code>close()</code> method to free resources associated with the
- * underlying <code>RandomAccessFile</code>.
- * </p>
+ * underlying <code>RandomAccessFile</code>.</p>
  *
- * <p>
- * The binary index files may be created using the EMBOSS programs
+ * <p>The binary index files may be created using the EMBOSS programs
  * dbifasta, dbiblast, dbiflat or dbigcg. The least useful from the
  * BioJava perspective is dbigcg because we do not have a
- * <code>SequenceFormat</code> implementation for GCG format
- * files.
+ * <code>SequenceFormat</code> implementation for GCG format files.
  * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
@@ -105,7 +99,7 @@ public class EmblCDROMIndexStore implements IndexStore
     // The random access file containing ID/offset records
     private EmblCDROMRandomAccess entryRandomAccess;
 
- /**
+    /**
      * Creates a new <code>EmblCDROMIndexStore</code> backed by a
      * random access binary index.
      *
@@ -119,11 +113,11 @@ public class EmblCDROMIndexStore implements IndexStore
      *
      * @exception IOException if an error occurs.
      */
-    public EmblCDROMIndexStore(final File                   divisionLkp,
-                               final File                   entryNamIdx,
-                               final SequenceFormat         format,
-                               final SequenceBuilderFactory factory,
-                               final SymbolTokenization     parser)
+    public EmblCDROMIndexStore(File                   divisionLkp,
+                               File                   entryNamIdx,
+                               SequenceFormat         format,
+                               SequenceBuilderFactory factory,
+                               SymbolTokenization     parser)
         throws IOException
     {
         // Set to the empty abstract path
@@ -148,12 +142,12 @@ public class EmblCDROMIndexStore implements IndexStore
      *
      * @exception IOException if an error occurs.
      */
-    public EmblCDROMIndexStore(final File                   pathPrefix,
-                               final File                   divisionLkp,
-                               final File                   entryNamIdx,
-                               final SequenceFormat         format,
-                               final SequenceBuilderFactory factory,
-                               final SymbolTokenization     parser)
+    public EmblCDROMIndexStore(File                   pathPrefix,
+                               File                   divisionLkp,
+                               File                   entryNamIdx,
+                               SequenceFormat         format,
+                               SequenceBuilderFactory factory,
+                               SymbolTokenization     parser)
         throws IOException
     {
         this.divisionLkp = divisionLkp;
@@ -227,8 +221,8 @@ public class EmblCDROMIndexStore implements IndexStore
     }
 
     /**
-     * <code>commit</code> commits changes.  As EMBL CD-ROM indices
-     * are read-only, this implementation throws a
+     * <code>commit</code> commits changes. As EMBL CD-ROM indices are
+     * read-only, this implementation throws a
      * <code>BioException</code>.
      *
      * @exception BioException if an error occurs.
@@ -240,8 +234,8 @@ public class EmblCDROMIndexStore implements IndexStore
 
     /**
      * <code>rollback</code> rolls back changes made since the last
-     * <code>commit</code>.  As EMBL CD-ROM indices
-     * are read-only, this implementation does nothing.
+     * <code>commit</code>. As EMBL CD-ROM indices are read-only, this
+     * implementation does nothing.
      */
     public void rollback() { }
 

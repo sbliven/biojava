@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.homol.SimilarityPairFeature;
 
 /**
  * A filter for accepting or rejecting a feature.
@@ -1032,4 +1033,117 @@ public interface FeatureFilter extends Serializable {
       );
     }
   }
+
+    /**
+     * <code>PairwiseScoreFilter</code> is used to filter
+     * <code>SimilarityPairFeature</code>s by their score. Features
+     * are accepted if their score falls between the filter's minimum
+     * and maximum values, inclusive. Features are rejected if they
+     * are not <code>SimilarityPairFeature</code>s. The minimum value
+     * acceptedmust be less than the maximum value.
+     *
+     * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+     * @since 1.3
+     */
+    public static final class PairwiseScoreFilter implements OptimizableFilter {
+        private double minScore;
+        private double maxScore;
+        private double score;
+        private int    hashCode;
+
+        /**
+         * Creates a new <code>ScoreFilter</code>.
+         *
+         * @param minScore a <code>double</code>.
+         * @param maxScore a <code>double</code>.
+         */
+        public PairwiseScoreFilter(double minScore, double maxScore) {
+            if (minScore >= maxScore)
+                throw new IllegalArgumentException("Filter minimum score must be less than maximum score");
+
+            this.minScore = minScore;
+            this.maxScore = maxScore;
+
+            hashCode += (minScore == 0.0 ? 0L : Double.doubleToLongBits(minScore));
+            hashCode += (maxScore == 0.0 ? 0L : Double.doubleToLongBits(maxScore));
+        }
+
+        /**
+         * Accept a Feature if it is an instance of
+         * SimilarityPairFeature and its score is <= filter's minimum
+         * score and >= filter's maximum score.
+         *
+         * @param f a <code>Feature</code>.
+         * @return a <code>boolean</code>.
+         */
+        public boolean accept(Feature f) {
+            if (! (f instanceof SimilarityPairFeature)) {
+                return false;
+            }
+
+            score = ((SimilarityPairFeature) f).getScore();
+            return (score >= minScore &&
+                    score <= maxScore);
+        }
+
+        /**
+         * <code>getMinScore</code> returns the minimum score
+         * accepted.
+         *
+         * @return a <code>double</code>.
+         */
+        public double getMinScore() {
+            return minScore;
+        }
+
+        /**
+         * <code>getMaxScore</code> returns the maximum score
+         * accepted.
+         *
+         * @return a <code>double</code>.
+         */
+        public double getMaxScore() {
+            return maxScore;
+        }
+
+        public boolean equals(Object o) {
+            if (o instanceof PairwiseScoreFilter) {
+                PairwiseScoreFilter psf = (PairwiseScoreFilter) o;
+                if (psf.getMinScore() == minScore &&
+                    psf.getMaxScore() == maxScore) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public int hashCode() {
+            return hashCode;
+        }
+
+        public boolean isProperSubset(FeatureFilter sup) {
+            if (sup instanceof PairwiseScoreFilter) {
+                PairwiseScoreFilter psf = (PairwiseScoreFilter) sup;
+                return (psf.getMinScore() >= minScore &&
+                        psf.getMaxScore() <= maxScore);
+            }
+            return false;
+        }
+
+        public boolean isDisjoint(FeatureFilter filt) {
+            if (filt instanceof AcceptNoneFilter)
+                return true;
+
+            if (filt instanceof PairwiseScoreFilter) {
+                PairwiseScoreFilter psf = (PairwiseScoreFilter) filt;
+                return (psf.getMaxScore() < minScore ||
+                        psf.getMinScore() > maxScore);
+            }
+            return false;
+        }
+
+        public String toString() {
+            return minScore + " >= score <= " + maxScore;
+        }
+    }
 }

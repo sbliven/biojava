@@ -146,8 +146,7 @@ public interface SequenceRenderContext extends SwingConstants {
    * information about its size, and hints about how to align information within
    * the borders.
    *
-   * @author     mrp 
-   * @created    01 November 2000 
+   * @author Matthew Pocock
    */
   public static class Border
   implements java.io.Serializable, SwingConstants {

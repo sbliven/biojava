@@ -18,15 +18,17 @@ public class SeqEMBL {
 //  	String dbPass = "";
 //  	String bioName = "embl_rod";
 
-  	String dbURL = "jdbc:postgresql://localhost/test42";
-  	String dbUser = "thomas";
+        Class.forName("org.postgresql.Driver");
+
+  	String dbURL = "jdbc:postgresql://localhost:5432/biosql";
+  	String dbUser = "keith";
   	String dbPass = "";
-  	String bioName = "embl";
+  	String bioName = "n_meningitidis";
 	
 	SequenceDB seqDB = new BioSQLSequenceDB(dbURL, dbUser, dbPass, bioName, false);
 	Sequence seq = seqDB.getSequence(args[0]);
 
-	SequenceFormat ff = new EmblFormat();
+	SequenceFormat ff = new EmblLikeFormat();
 	ff.writeSequence(seq, "embl", System.out);
     }
 }

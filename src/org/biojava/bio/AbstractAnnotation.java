@@ -40,13 +40,12 @@ public abstract class AbstractAnnotation
    * Implement this to return the Map delegate.
    *
    * From code in the 1.2 version of AbstractAnnotation
-   *
-   * @author Matthew Pocock
    */
   protected abstract Map getProperties();
   
   /**
-   * A convenience method to see if we have allocated the properties map
+   * A convenience method to see if we have allocated the properties
+   * Map.
    *
    * @return true if the properties have been allocated, false otherwise
    */

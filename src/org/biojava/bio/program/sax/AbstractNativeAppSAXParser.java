@@ -464,8 +464,8 @@ abstract class AbstractNativeAppSAXParser
     }
 
     /**
-     * Centralise chaning of iState field to help
-     * with debugging e.g. printing out value etc.
+     * Centralise chaining of iState field to help
+     * with debugging. E.g. printing out value etc.
      * All changes to iState should be made through this method.
      *
      * @param piState an <code>int</code> value

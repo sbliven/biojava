@@ -130,8 +130,8 @@ public class Blast2HTMLHandler extends DefaultHandler  {
     // ************************************************************ //
 
     /**
-     * This is called when an element is entered. ie
-     * The parser has met the first tag of the tag pair.
+     * This is called when an element is entered. That is,
+     * the parser has met the first tag of the tag pair.
      *
      * @param poNameSpace <code>String</code> - the name space.
      * @param poElementName <code>String</code> - the local name of the tag.

@@ -40,7 +40,7 @@ public class DivisionLkpReader extends EmblCDROMIndexReader
      *
      * @exception IOException if an error occurs.
      */
-    public DivisionLkpReader(final InputStream input)
+    public DivisionLkpReader(InputStream input)
         throws IOException
     {
         super(input);

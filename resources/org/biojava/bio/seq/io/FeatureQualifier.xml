@@ -860,7 +860,7 @@
     <qualifier name="usedin" form="bare" mandatory="false"/>
   </feature>
   <feature key="tRNA">
-    <qualifier name="anticodon" form="paren" mandatory="false"/>
+    <qualifier name="anticodon" form="quoted" mandatory="false"/>
     <qualifier name="citation" form="quoted" mandatory="false"/>
     <qualifier name="db_xref" form="quoted" mandatory="false"/>
     <qualifier name="evidence" form="bare" mandatory="false"/>

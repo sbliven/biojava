@@ -242,7 +242,7 @@
       use="true"
       windowtitle="${name} API"
       doctitle="${name}"
-      maxmemory="64m"
+      maxmemory="96m"
     >
        <group title="Core Packages"
               packages="org.biojava.bio:org.biojava.bio.dist:org.biojava.bio.search:org.biojava.bio.seq:org.biojava.bio.seq.db:org.biojava.bio.seq.genomic:org.biojava.bio.seq.io:org.biojava.bio.symbol"

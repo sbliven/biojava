@@ -34,13 +34,14 @@ import org.biojava.bio.seq.*;
  * HashSequenceDB.byName, but once in a blue-moon, you will want some other
  * systematic way of retrieveing Sequences. This interface is here to allow
  * you to plug in this functionality if you need it.
+ *
+ * @author Matthew Pocock
  */
 public interface IDMaker {
   /**
    * Calculate the id for a sequence.
    * <p>
    * Each unique sequence should return a unique ID.
-   * @author Matthew Pocock
    *
    * @param seq the sequence to ID
    * @return the id for the sequence

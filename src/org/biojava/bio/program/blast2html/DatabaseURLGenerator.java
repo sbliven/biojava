@@ -58,7 +58,7 @@ public interface DatabaseURLGenerator {
      */
     String toURL( String poID, Properties poOptions );
     /**
-     * Returns a full <a href=.....>retrieve item</a> anchor
+     * Returns a full <a href=_____>retrieve item</a> anchor
      * for the given database id. Used in detail section.
      *
      * @param poID a <code>String</code> value

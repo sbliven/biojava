@@ -40,7 +40,6 @@ public class DistributionTools {
    * Compares the emission spectra of two distributions
    * @return true if alphabets and symbol weights are equal for the two distributions.
    * @throws BioException if one or both of the Distributions are over infinite alphabets.
-   * @author Mark Schreiber
    * @since 1.2
    */
   public static boolean areEmissionSpectraEqual(Distribution a, Distribution b)
@@ -139,7 +138,7 @@ public class DistributionTools {
    * Creates an array of distributions, one for each column of the alignment
    * @throws BioRuntimeException if all sequences don't use the same alphabet
    * @param countGaps if true gaps will be included in the distributions
-   * @nullWeight the number of pseudo counts to add to each distribution
+   * @param nullWeight the number of pseudo counts to add to each distribution
    * @since 1.2
    */
   public static Distribution[] distOverAlignment(Alignment a,

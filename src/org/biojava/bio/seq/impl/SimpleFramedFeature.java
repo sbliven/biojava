@@ -30,9 +30,9 @@ import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 
 /**
- * Title:        SimpleFramedFeature<p>
- * Description:  A no frills implementation of FramedFeature<p>
- * Copyright:    Copyright (c) 2001<p>
+ * Title:        SimpleFramedFeature.<p>
+ * Description:  A no frills implementation of FramedFeature.<p>
+ * Copyright:    Copyright (c) 2001.<p>
  *
  * @author Mark Schreiber
  * @version 1.0

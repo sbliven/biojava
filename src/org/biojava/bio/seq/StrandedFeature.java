@@ -63,17 +63,17 @@ public interface StrandedFeature extends Feature {
   SymbolList getSymbols();
   
   /**
-   * flag to indicate that a feature is on the positive strand.
+   * Flag to indicate that a feature is on the positive strand.
    */
   static final Strand POSITIVE = new Strand("POSITIVE", +1, '+');
 
   /**
-   * flag to indicate that a feature is on the negative strand.
+   * Flag to indicate that a feature is on the negative strand.
    */
   static final Strand NEGATIVE = new Strand("NEGATIVE", -1, '-');
   
   /**
-   * flag to indicate that a feature has an unknown strand.
+   * Flag to indicate that a feature has an unknown strand.
    */
   static final Strand UNKNOWN = new Strand("UNKNOWN", 0, '.');
   
@@ -113,18 +113,18 @@ public interface StrandedFeature extends Feature {
       return text;
     }
     
-    /**
-    *Returns the integer label for strandedness, i.e. "+1", "-1", or "0" for positive, negative, and unknown strands respectively. 
+   /**
+    * Returns the integer label for strandedness. That is, "+1", "-1",
+    * or "0" for positive, negative, and unknown strands respectively.
     */
-    
     public int getValue() {
       return value;
     }
     
-    /**
-    *Returns the token for strandedness, i.e. "+","-","." for positive, negative and unknown strands respectively.
+   /**
+    * Returns the token for strandedness. That is, "+","-","." for
+    * positive, negative and unknown strands respectively.
     */
-    
     public char getToken() {
       return token;
     }

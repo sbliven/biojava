@@ -130,26 +130,26 @@ public class PairwiseSequencePanel extends JComponent
                        "TRANSLATION", SequenceRenderContext.REPAINT);
 
     // The query sequence to be rendered
-    private Sequence         sequence;
+    private Sequence sequence;
     // The number of residues to skip before starting to render
-    private int              translation;
+    private int translation;
     // The rendering direction (HORIZONTAL or VERTICAL)
-    private int              direction;
+    private int direction;
 
     // The subject sequence to be rendered
-    private Sequence         secSequence;
+    private Sequence secSequence;
     // The number of residues to skip before starting to render
-    private int              secTranslation;
+    private int secTranslation;
     // The rendering direction (HORIZONTAL or VERTICAL)
-    private int              secDirection;
+    private int secDirection;
 
     // The rendering scale in pixels per residue
-    private double           scale;
+    private double scale;
     // The homology renderer
     private PairwiseSequenceRenderer renderer;
 
     // RenderingHints to be used by renderers
-    private RenderingHints   hints;
+    private RenderingHints hints;
 
     // The rendering context borders
     private SequenceRenderContext.Border leadingBorder;

@@ -77,17 +77,14 @@ public class EmblLikeFormat
     private Vector mListeners = new Vector();
 
     /**
-     * <p>
-     * Should we ignore the symbols (SQ) part of the entry? If this
-     * property is set to <code>true</code>, the parser will never
-     * call addSymbols on the <code>SeqIOListener</code>, but parsing
-     * will be faster if you're only interested in header information.
-     * </p>
+     * <p>Specifies whether the symbols (SQ) part of the entry should
+     * be ignored. If this property is set to <code>true</code>, the
+     * parser will never call addSymbols on the
+     * <code>SeqIOListener</code>, but parsing will be faster if
+     * you're only interested in header information.</p>
      *
-     * <p>
-     * This property also allows the header to be parsed for files
-     * which have invalid sequence data.
-     * </p>
+     * <p> This property also allows the header to be parsed for files
+     * which have invalid sequence data.</p>
      */
     public void setElideSymbols(boolean b)
     {

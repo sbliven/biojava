@@ -20,12 +20,11 @@ public class TestEmbl2 {
         new InputStreamReader(new FileInputStream(emblFile)));
       SequenceIterator seqI = SeqIOTools.readEmbl(eReader);
         
-        
+        SequenceFormat ff = new EmblLikeFormat();
+
       while(seqI.hasNext()) {
         Sequence seq = seqI.nextSequence();
-        System.out.println(seq.getName() + " has " + seq.countFeatures() + " features");
-
-	printFeatures(seq, FeatureFilter.all, System.out, "");
+        ff.writeSequence(seq, "embl", System.out);
       }
     } catch (Throwable t) {
       t.printStackTrace();

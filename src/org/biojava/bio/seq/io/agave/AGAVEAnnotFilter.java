@@ -23,14 +23,14 @@ import java.util.*;
 import org.biojava.bio.*;
 
 /**
- * this interface defines mapping from BioJava into AGAVE format
- * <pre>
- * because  data from different source stored differently in the biojava
- * it is impossible to define universal mapping from biojava to agave.
- * currently I implemented two mappings
- * ( embl  ->  )biojava -> agave
- * ( agave ->  )biojava -> agave
- * </pre>
+ * <p>This interface defines mapping from BioJava into AGAVE format.
+ * As data from different sources is stored differently in BioJava
+ * it is impossible to define universal mapping from BioJava to Agave.
+ * Currently I implemented two mappings:</p>
+ *
+ * <p>( embl  ->  )biojava -> agave</p>
+ * <p>( agave ->  )biojava -> agave</p>
+ *
  * @author Hanning Ni     Doubletwist Inc
  */
 public interface AGAVEAnnotFilter

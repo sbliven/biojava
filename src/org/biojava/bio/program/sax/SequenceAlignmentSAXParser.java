@@ -151,7 +151,7 @@ public class SequenceAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
 	/*
 	 * Parse stream with appropriate parser
-	*/
+         */
         oParser.parse(new InputSource(oContents));
 	
 	oContents.close();
@@ -159,7 +159,7 @@ public class SequenceAlignmentSAXParser extends AbstractNativeAppSAXParser {
     }
 
     /**
-     * Describe <code>interpret</code> method here.
+     * <code>interpret</code> is an empty method.
      *
      * @param poContents a <code>BufferedReader</code> value
      * @param poLine a <code>String</code> value
@@ -167,8 +167,5 @@ public class SequenceAlignmentSAXParser extends AbstractNativeAppSAXParser {
      */
     private void interpret(BufferedReader poContents, String poLine)
 	throws SAXException {
-
-
-
     }
 }

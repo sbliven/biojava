@@ -23,10 +23,10 @@
 package org.biojava.bio.seq;
 
 /**
- * Title:        Frame<p>
+ * Title:        Frame.<p>
  * Description:  An interface that can be implemented by classes that contain
- *               frame information<p>
- * Copyright:    Copyright (c) 2001<p>
+ *               frame information.<p>
+ * Copyright:    Copyright (c) 2001.<p>
  * @author Mark Schreiber
  * @since 1.2
  * @version 1.0

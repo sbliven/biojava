@@ -97,68 +97,75 @@ public class FastaSearchParse
 							 handler,
 							 parser);
 
-	    while (searchReader.hasNext())
+	    try
 	    {
-		SeqSimilaritySearchResult result =
-		    (SeqSimilaritySearchResult) searchReader.next();
-
-		System.out.println("----------------------------------------");
-		System.out.println("Start of result: " + result.toString());
-		System.out.println("----------------------------------------");
-
-		System.out.println("Result has query sequence: "
-				   + result.getQuerySequence().toString());
-
-		List hits = result.getHits();
-
-		for (Iterator hi = hits.iterator(); hi.hasNext();)
+		while (searchReader.hasNext())
 		{
-		    SeqSimilaritySearchHit hit = (SeqSimilaritySearchHit) hi.next();
+		    SeqSimilaritySearchResult result =
+			(SeqSimilaritySearchResult) searchReader.next();
 
-		    System.out.println("\n-> Hit: " + hit);
+		    System.out.println("----------------------------------------");
+		    System.out.println("Start of result: " + result.toString());
+		    System.out.println("----------------------------------------");
 
-		    List subHits = hit.getSubHits();
+		    System.out.println("Result has query sequence: "
+				       + result.getQuerySequence().toString());
 
-		    for (Iterator shi = subHits.iterator(); shi.hasNext();)
+		    List hits = result.getHits();
+
+		    for (Iterator hi = hits.iterator(); hi.hasNext();)
 		    {
-			SeqSimilaritySearchSubHit subHit = (SeqSimilaritySearchSubHit) shi.next();
-			System.out.println("--> SubHit: " + subHit);
-                        System.out.println("      Query start: " + subHit.getQueryStart());
-                        System.out.println("        Query end: " + subHit.getQueryEnd());
-                        System.out.println("     Query strand: " + subHit.getQueryStrand());
-                        System.out.println("    Subject start: " + subHit.getSubjectStart());
-                        System.out.println("      Subject end: " + subHit.getSubjectEnd());
-                        System.out.println("   Subject strand: " + subHit.getSubjectStrand());
+			SeqSimilaritySearchHit hit = (SeqSimilaritySearchHit) hi.next();
 
-			Alignment al = subHit.getAlignment();
-			List  labels = al.getLabels();
+			System.out.println("\n-> Hit: " + hit);
 
-			try
+			List subHits = hit.getSubHits();
+
+			for (Iterator shi = subHits.iterator(); shi.hasNext();)
 			{
-			    for (Iterator li = labels.iterator(); li.hasNext();)
+			    SeqSimilaritySearchSubHit subHit = (SeqSimilaritySearchSubHit) shi.next();
+			    System.out.println("--> SubHit: " + subHit);
+			    System.out.println("      Query start: " + subHit.getQueryStart());
+			    System.out.println("        Query end: " + subHit.getQueryEnd());
+			    System.out.println("     Query strand: " + subHit.getQueryStrand());
+			    System.out.println("    Subject start: " + subHit.getSubjectStart());
+			    System.out.println("      Subject end: " + subHit.getSubjectEnd());
+			    System.out.println("   Subject strand: " + subHit.getSubjectStrand());
+
+			    Alignment al = subHit.getAlignment();
+			    List  labels = al.getLabels();
+
+			    try
 			    {
-				String label = (String) li.next();
-				System.out.println(label
-						   + ": "
-						   + al.symbolListForLabel(label).seqString());
+				for (Iterator li = labels.iterator(); li.hasNext();)
+				{
+				    String label = (String) li.next();
+				    System.out.println(label
+						       + ": "
+						       + al.symbolListForLabel(label).seqString());
+				}
+			    }
+			    catch (ClassCastException cce)
+			    {
+				cce.printStackTrace();
+			    }
+			    catch (NoSuchElementException nse)
+			    {
+				nse.printStackTrace();
 			    }
 			}
-			catch (ClassCastException cce)
-			{
-			    cce.printStackTrace();
-			}
-			catch (NoSuchElementException nse)
-			{
-			    nse.printStackTrace();
-			}
 		    }
+		    System.out.println("----------------------------------------");
+		    System.out.println("End of result: " + result.toString());
+		    System.out.println("----------------------------------------");
 		}
-		System.out.println("----------------------------------------");
-		System.out.println("End of result: " + result.toString());
-		System.out.println("----------------------------------------");
+	    }
+	    catch (Exception e)
+	    {
+		e.printStackTrace();
 	    }
 	}
-	catch (IOException e)
+	catch (Exception e)
 	{
 	    e.printStackTrace();
 	}

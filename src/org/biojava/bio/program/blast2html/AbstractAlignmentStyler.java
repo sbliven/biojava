@@ -90,7 +90,7 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
 
 
     /**
-     * The number of unique colours
+     * The number of unique colours.
      */
     protected int iNumberOfColours = 0;
 
@@ -155,7 +155,7 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
     /**
      * <p>
      * Return the styles for the two aligned characters.
-     * ( in the form of predefined font classes ).
+     * (in the form of predefined font classes).
      * </p>
      *
      * <p>
@@ -171,7 +171,7 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
 
     
     /**
-     * Add a colour style to this Styler
+     * Add a colour style to this Styler.
      *
      * @param poChar the char for which this colour applies.
      * @param poColour the color in hex eg 'FFA2A2' for a nice red
@@ -186,11 +186,9 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
     }
 
     /**
-     * <p>
-     * Returns the colour class for the specified colour ( in hex )
-     * If one is not already defined for that colour then a new
-     * class is created and returned.
-     * </p>
+     * <p>Returns the colour class for the specified colour (in hex).
+     * If one is not already defined for that colour then a new class
+     * is created and returned.</p>
      *
      * <p>
      * Colour specification is R G B in hex ie

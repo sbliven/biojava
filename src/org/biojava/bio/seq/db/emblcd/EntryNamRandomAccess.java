@@ -35,10 +35,10 @@ import java.io.IOException;
  */
 public class EntryNamRandomAccess extends EmblCDROMRandomAccess
 {
-    public EntryNamRandomAccess(final File indexFile,
-                                final int  headerLength,
-                                final int  recordLength,
-                                final long recordCount)
+    public EntryNamRandomAccess(File indexFile,
+                                int  headerLength,
+                                int  recordLength,
+                                long recordCount)
         throws FileNotFoundException
     {
         super(indexFile, headerLength, recordLength, recordCount);
@@ -66,8 +66,8 @@ public class EntryNamRandomAccess extends EmblCDROMRandomAccess
 
     /**
      * <code>getRecordKey</code> returns the field from the record on
-     * which the records were sorted in the index (i.e. sequence ID or
-     * accession number).
+     * which the records were sorted in the index. (i.e. sequence ID
+     * or accession number).
      *
      * @return a <code>String</code>.
      */

@@ -25,7 +25,7 @@ import java.io.*;
 
 /**
  * Simple implementation for specifying markup styles.
- * Has 3 modes of operation: SHOW_ALL, SHOW_SAME & SHOW_DIFF<p>
+ * Has 3 modes of operation: SHOW_ALL, SHOW_SAME & SHOW_DIFF.<p>
  *
  * SHOW_ALL  - returns the default style for all given residues.
  * SHOW_SAME - only returns a markup style if the <B>styles</B> for both
@@ -111,7 +111,7 @@ public class SimpleAlignmentStyler extends AbstractAlignmentStyler {
     private int iStyle = 0;
 
     /**
-     * Creates a new <CODE>SimpleAlignmentStyler</CODE> instance<p>
+     * Creates a new <CODE>SimpleAlignmentStyler</CODE> instance.<p>
      *
      * The int flag should be one of SimpleAlignmentStyler.SHOW_ALL,
      * SimpleAlignmentStyler.SHOW_SAME or
@@ -188,8 +188,8 @@ public class SimpleAlignmentStyler extends AbstractAlignmentStyler {
     }
 
     /**
-     * Return the styles for the two aligned characters.
-     * ( in the form of predefined font classes ).<p>
+     * Returns the styles for the two aligned characters in the form
+     * of predefined font classes.<p>
      *
      * Null is acceptable value for no style.
      *

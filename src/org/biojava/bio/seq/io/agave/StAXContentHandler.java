@@ -24,7 +24,7 @@ import org.xml.sax.*;
 /**
  * Interface for StAX content handlers.  This interface is
  * very similar in spirit and design to the SAX content handler.
- * differance are:
+ * Differences are:
  *
  * <ol>
  * <li>start/endDocument methods are replaced by start/endTree.  This

@@ -136,7 +136,7 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
      *
      * @param outline a <code>Paint</code>.
      */
-    public PairwiseDiagonalRenderer(final Paint outline)
+    public PairwiseDiagonalRenderer(Paint outline)
     {
         line = new Line2D.Float();
         this.outline = outline;

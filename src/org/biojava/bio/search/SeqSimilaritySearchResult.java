@@ -38,7 +38,6 @@ import org.biojava.bio.symbol.SymbolList;
  */
 public interface SeqSimilaritySearchResult
 {
-
     /**
      * Return the query sequence which was used to perform the search.
      * @return the SymbolList object used to search the

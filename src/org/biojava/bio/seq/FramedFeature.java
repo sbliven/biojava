@@ -26,9 +26,9 @@ import java.io.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * Title:         FramedFeature<p>
- * Description:  An feature that includes the concept of frame.<p>
- * By extending stranded
+ * Title:         FramedFeature.<p>
+ * Description:  An feature that includes the concept of frame
+ * by extending stranded.<p>
  * Copyright:    Copyright (c) 2001<p>
  * @author Mark Schreiber
  * @version 1.0
@@ -39,7 +39,6 @@ public interface FramedFeature extends StrandedFeature {
   public static ReadingFrame FRAME_0 = new ReadingFrame("FRAME_0",Frame.FRAME_0);
   public static ReadingFrame FRAME_1 = new ReadingFrame("FRAME_1",Frame.FRAME_1);
   public static ReadingFrame FRAME_2 = new ReadingFrame("FRAME_2",Frame.FRAME_2);
-
 
   /**
    * return the reading frame of the feature.

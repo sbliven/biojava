@@ -29,7 +29,7 @@ import java.util.*;
  * @author     Thomas Down
  * @author     Matthew Pocock
  * @author     Keith James (docs)
- * @created    September 29, 2000 
+ * @created    September 29, 2000
  * @since      1.1 
  */
 
