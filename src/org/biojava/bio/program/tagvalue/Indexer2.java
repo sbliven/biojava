@@ -31,6 +31,8 @@ import org.biojava.bio.program.indexdb.*;
 /**
  * <p>
  * Listens to tag-value events and passes on indexing events to an IndexStore.
+ * This is an update to Indexer that understands that indexed properties may
+ * not be at the top level.
  * </p>
  *
  * <p>
@@ -42,9 +44,6 @@ import org.biojava.bio.program.indexdb.*;
  * byte-offset between calls to Parser.read(). Below is an example of how to
  * index a file.
  * </p>
- *
- * <p><em>Note:</em> It is very important to configure the BioStoreFactory
- * instance with all the right keys before hand.</p>
  *
  * <pre>
  * File fileToIndex; // get this from somewhere
@@ -69,17 +68,18 @@ import org.biojava.bio.program.indexdb.*;
  * @since 1.2
  * @author Matthew Pocock
  */
-public class Indexer
+public class Indexer2
 implements TagValueListener {
   private final RAF file;
   private final CountedBufferedReader reader;
   private final IndexStore indexStore;
-  private final Map seccondaryKeys;
+  private final Map keys;
+  private final Map keyValues;
   private String primaryKeyName;
-  private String primaryKey;
   private Object tag;
   private long offset;
   private int depth;
+  private Stack stack;
   
   /**
    * Build a new Indexer.
@@ -87,13 +87,15 @@ implements TagValueListener {
    * @param file  the file to be processed
    * @param indexStore  the IndexStore to write to
    */
-  public Indexer(File file, IndexStore indexStore)
+  public Indexer2(File file, IndexStore indexStore)
   throws FileNotFoundException {
     this.file = new RAF(file, "r");
     this.reader = new CountedBufferedReader(new FileReader(file));
     this.indexStore = indexStore;
-    this.seccondaryKeys = new SmallMap();
+    this.keys = new SmallMap();
+    this.keyValues = new SmallMap();
     this.depth = 0;
+    stack = new Stack();
   }
   
   /**
@@ -137,38 +139,64 @@ implements TagValueListener {
   
   /**
    * <p>
-   * Add a secondary key.
+   * Add a key and a path to that key in the tag-value hierachy.
    * </p>
    *
    * <p>
    * Secondary keys are potentialy non-unique properties of the entries being
    * indexed. Multiple records can use the same secondary key values, and a
-   * single record can have multiple values for a secondary key.
+   * single record can have multiple values for a secondary key. However, the
+   * primary key must be unique.
    * </p>
    *
-   * @param secKeyName  the name of the secondary key to add
+   * @param keyName  the name of the secondary key to add
+   * @param path  the names of each tag to follow to reach the value of the key
    */
-  public void addSecondaryKey(String secKeyName) {
-    seccondaryKeys.put(secKeyName, new ArrayList());
+  public void addKey(String keyName, Object[] path) {
+    keys.put(path, new KeyState(keyName));
   }
   
   /**
-   * Remove a secondary key.
+   * Remove a key.
    *
-   * @param secKeyName  the name of the secondary key to remove
+   * @param keyName  the name of the key to remove
    */
-  public void removeSecondaryKey(String secKeyName) {
-    seccondaryKeys.remove(secKeyName);
+  public void removeKey(String keyName) {
+    keys.remove(keyName);
   }
   
   public void startRecord() {
     if(depth == 0) {
       offset = reader.getFilePointer();
-      primaryKey = null;
-      for(Iterator i = seccondaryKeys.values().iterator(); i.hasNext(); ) {
-        List list = (List) i.next();
-        list.clear();
+      
+      Frame frame = new Frame();
+      
+      for(Iterator ki = keys.keySet().iterator(); ki.hasNext(); ) {
+        Object[] keyPath = (Object[]) ki.next();
+        if(keyPath.length == 1) {
+          frame.addKey(keyPath);
+        } else {
+          frame.paths.add(keyPath);
+        }
       }
+      
+      stack.push(frame);
+    } else {
+      Frame top = (Frame) stack.peek();
+      Frame frame = new Frame();
+      
+      for(Iterator ki = top.paths.iterator(); ki.hasNext(); ) {
+        Object[] keyPath = (Object[]) ki.next();
+        if(keyPath[depth].equals(tag)) {
+          if(keyPath.length == depth + 1) {
+            frame.addKey(keyPath);
+          } else {
+            frame.paths.add(keyPath);
+          }
+        }
+      }
+      
+      stack.push(frame);
     }
     
     depth++;
@@ -179,13 +207,15 @@ implements TagValueListener {
   }
   
   public void value(TagValueContext ctxt, Object value) {
-    if(tag.equals(primaryKeyName)) {
-      primaryKey = value.toString();
-    }
+    Frame frame = (Frame) stack.peek();
+    Object[] keyPath = (Object []) frame.getKeyPath(tag);
     
-    List l = (List) seccondaryKeys.get(tag);
-    if(l != null) {
-      l.add(value.toString());
+    if(keyPath != null) {
+      KeyState ks = (KeyState) keyValues.get(keyPath);
+      if(ks == null) {
+        keyValues.put(tag, ks = new KeyState(keys.get(keyPath).toString()));
+      }
+      ks.values.add(value);
     }
   }
   
@@ -196,18 +226,65 @@ implements TagValueListener {
   {
     depth--;
     if(depth == 0) {
-      if(primaryKey == null) {
+      int length = (int) (reader.getFilePointer() - offset);
+
+      String primaryKeyValue = null;
+      Map secKeys = new SmallMap();
+      for(Iterator i = keyValues.keySet().iterator(); i.hasNext(); ) {
+        Object key = i.next();
+        KeyState ks = (KeyState) keyValues.get(key);
+        if(ks.keyName.equals(primaryKeyName)) {
+          if(ks.values.size() != 1) {
+            throw new ParserException(
+              "There must be exactly one value for the primary key: " +
+              primaryKeyName + " - " + ks.values
+            );
+          }
+          primaryKeyValue = ks.values.iterator().next().toString();
+        } else {
+          secKeys.put(ks.keyName, ks.values);
+        }
+        
+        ks.values.clear();
+      }
+      
+      if(primaryKeyValue == null) {
         throw new NullPointerException("No primary key");
       }
 
-      int length = (int) (reader.getFilePointer() - offset);
       indexStore.writeRecord(
         file,
         offset,
         length,
-        primaryKey,
-        seccondaryKeys
+        primaryKeyValue,
+        secKeys
       );
+      
+      stack.clear();
+    } else {
+      stack.pop();
+    }
+  }
+  
+  private static class Frame {
+    public final Map keys = new SmallMap();
+    public final Set paths = new SmallSet();
+    
+    public void addKey(Object[] keyPath) {
+      keys.put(keyPath[keyPath.length - 1], keyPath);
+    }
+    
+    public Object[] getKeyPath(Object tag) {
+      return (Object []) keys.get(tag);
+    }
+  }
+  
+  private static class KeyState {
+    public final String keyName;
+    public final Set values = new SmallSet();
+    
+    public KeyState(String keyName) {
+      this.keyName = keyName;
     }
   }
 }
