@@ -118,10 +118,10 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
     throws ParseException {
       try {
         int stackSize = featureStack.size();
-        
+
         TemplateWithChildren top =
         (TemplateWithChildren) featureStack.get(stackSize - 1);
-        
+
         addProperty(top.template.annotation, key, value);
       } catch (IndexOutOfBoundsException ioobe) {
         throw new ParseException(
@@ -155,7 +155,7 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 	return seq;
     }
 
-    private void makeChildFeatures(Feature parent, Set children) 
+    private void makeChildFeatures(Feature parent, Set children)
         throws Exception
     {
 	for (Iterator i = children.iterator(); i.hasNext(); ) {
@@ -166,7 +166,7 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 	    }
 	}
     }
-    
+
     protected void addProperty(Annotation ann, Object key, Object value) {
 	if (value == null)
 	    return;
@@ -192,10 +192,10 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 		    newValue = nvList;
 		}
 	    }
-	} 
+	}
 
 	try {
-	    ann.setProperty(key, value);
+	    ann.setProperty(key, newValue);
 	} catch (ChangeVetoException ex) {
 	    throw new BioError(ex, "Annotation should be modifiable");
 	}
