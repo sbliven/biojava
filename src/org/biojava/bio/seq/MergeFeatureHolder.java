@@ -22,6 +22,7 @@
 package org.biojava.bio.seq;
 
 import java.util.*;
+import org.biojava.utils.*;
 
 /**
  * FeatureHolder which exposes all the features in a set
@@ -42,7 +43,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      */
 
     public MergeFeatureHolder() {
-	featureHolders = new HashMap();
+	featureHolders = new SmallMap();
     }
 
     /**
@@ -136,7 +137,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      */
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	Map results = new HashMap();
+	Map results = new SmallMap();
 	for (Iterator fhi = featureHolders.entrySet().iterator(); fhi.hasNext(); ) {
 	    Map.Entry me = (Map.Entry) fhi.next();
 	    FeatureHolder fh = (FeatureHolder) me.getKey();
