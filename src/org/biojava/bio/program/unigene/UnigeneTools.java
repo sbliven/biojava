@@ -35,13 +35,13 @@ import org.biojava.utils.ParserException;
  * provides the core APIs for finding a Unigene database as well as registering
  * your own Unigene drivers. Additionaly, it contains methods to return parsers
  * for each of the main Unigene flat-file types. If you wish to bypass the
- * biojava object model entirely, you can chose to use these parsers instead.
+ * biojava object model entirely, you can choose to use these parsers instead.
  * </p>
  *
  * <h2>Example use</h2>
  *
- * <p>Creating a unigene instance from your local unigene directory (assuming
- * that you have read/write privilages to the directory)</p>
+ * <p>Creating a Unigene instance from your local Unigene directory (assuming
+ * that you have read/write privileges to the directory)</p>
  *
  * <pre>
  * UnigeneDB unigene = UnigeneTools.createUnigene(
