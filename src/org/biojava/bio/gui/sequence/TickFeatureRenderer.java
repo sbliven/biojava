@@ -194,12 +194,16 @@ implements FeatureRenderer {
     }
 
     if(fill != null) {
+      Paint prevPaint = g.getPaint();
       g.setPaint(fill);
       g.fill(s);
+      g.setPaint(prevPaint);
     }
     if (outline != null) {
+      Paint prevPaint = g.getPaint();
       g.setPaint(outline);
       g.draw(s);
+      g.setPaint(prevPaint);
     }
   }
   
