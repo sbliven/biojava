@@ -37,7 +37,7 @@ import java.net.Socket ;
  *
 */
 
-public class PDBSRSReader extends PDBFileReader {  
+public class PDBSRSReader implements StructureIO {  
     
 
     private  BufferedReader getBufferedReader(String pdbId) 
@@ -53,6 +53,7 @@ public class PDBSRSReader extends PDBFileReader {
 	String message = "please set System properties PFETCH_machine and PFETCH_port !" ;
 
 	try {
+	    // shouldbe sent as argument ...
 	    machine     = System.getProperty("PFETCH_host");
 	    String p    = System.getProperty("PFETCH_port");
 	    port        = Integer.parseInt(p);
@@ -122,7 +123,8 @@ public class PDBSRSReader extends PDBFileReader {
 	Structure s = null ;
 	try{	    
 	    //System.out.println("Starting to parse PDB file " + getTimeStamp());
-	    s = parsePDBFile(buf) ;
+	    PDBFileParser pdbpars = new PDBFileParser();
+	    s = pdbpars.parsePDBFile(buf) ;
 	    //System.out.println("Done parsing PDB file " + getTimeStamp());
 	} catch(Exception ex){
 	    ex.printStackTrace();
