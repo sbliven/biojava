@@ -108,10 +108,10 @@ public class FlatSequenceDB extends Unchangeable implements SequenceDBLite
             int formatId = SeqIOTools.identifyFormat(format.getNamespaceId(),
                                                      format.getObjectId());
 
-            SequenceFormat sf = SeqIOTools.fileToFormat(formatId);
-            Alphabet alpha = SeqIOTools.fileToAlphabet(formatId);
+            SequenceFormat sf = SeqIOTools.getSequenceFormat(formatId);
+            Alphabet alpha = SeqIOTools.getAlphabet(formatId);
             SymbolTokenization toke = alpha.getTokenization("token");
-            SequenceBuilderFactory sbf = SeqIOTools.fileToFactory(formatId);
+            SequenceBuilderFactory sbf = SeqIOTools.getBuilderFactory(formatId);
 
             SequenceIterator si = new StreamReader(is, sf, toke, sbf);
             return si.nextSequence();
