@@ -15,117 +15,137 @@ import org.biojava.stats.svm.*;
  */
 
 public class SVM_Light {
-  public static class LabelledVector {
-    private SparseVector v;
-    private double label;
+    public static class LabelledVector {
+	private SparseVector v;
+	private double label;
+	private String comment = null;
 
-    public LabelledVector(SparseVector v, double label) {
-      this.v = v;
-      this.label = label;
-    }
+	public LabelledVector(SparseVector v, double label) {
+	    this.v = v;
+	    this.label = label;
+	}
 
-    public SparseVector getVector() {
-      return v;
-    }
+	public LabelledVector(SparseVector v, double label, String comment) {
+	    this.v = v;
+	    this.label = label;
+	    this.comment = comment;
+	}
 
-    public double getLabel() {
-      return label;
+	public SparseVector getVector() {
+	    return v;
+	}
+	
+	public double getLabel() {
+	    return label;
+	}
+
+	public String getComment() {
+	    return comment;
+	}
     }
-  }
   
-  public static LabelledVector parseExample(String ex) 
-  throws NumberFormatException {
-    StringTokenizer toke = new StringTokenizer(ex);
-    double label = Double.parseDouble(toke.nextToken());
+    public static LabelledVector parseExample(String ex) 
+	throws NumberFormatException 
+    {
+	String comment = null;
+	int hashPos = ex.indexOf('#');
+	if (hashPos >= 0) {
+	    comment = ex.substring(hashPos + 1);
+	    ex = ex.substring(0, hashPos);
+	}
+
+	StringTokenizer toke = new StringTokenizer(ex);
+	double label = Double.parseDouble(toke.nextToken());
 	
   	int size = toke.countTokens();
-    SparseVector v = new SparseVector(size);
-    while (toke.hasMoreTokens()) {
+	SparseVector v = new SparseVector(size);
+	while (toke.hasMoreTokens()) {
 	    String dim = toke.nextToken();
 	    int cut = dim.indexOf(':');
 	    if (cut < 0) {
-        throw new NumberFormatException("Bad dimension "+dim);
-      }
+		throw new NumberFormatException("Bad dimension "+dim);
+	    }
 	    int dnum = Integer.parseInt(dim.substring(0, cut));
 	    double dval = Double.parseDouble(dim.substring(cut + 1));
 	    v.put(dnum, dval);
+	}
+
+	return new LabelledVector(v, label, comment);
     }
 
-    return new LabelledVector(v, label);
-  }
+    public static String vectorToString(SparseVector v) {
+	StringBuffer sb = new StringBuffer();
+	boolean first = true;
 
-  public static String vectorToString(SparseVector v) {
-    StringBuffer sb = new StringBuffer();
-    boolean first = true;
-
-    for (int i = 0; i < v.size(); ++i) {
-      double x = v.getValueAtIndex(i);
-
-      if (first) {
-        first = false;
-      } else {
-        sb.append(' ');
-      }
+	for (int i = 0; i < v.size(); ++i) {
+	    double x = v.getValueAtIndex(i);
+	    
+	    if (first) {
+		first = false;
+	    } else {
+		sb.append(' ');
+	    }
       
-      sb.append(v.getDimAtIndex(i));
-      sb.append(':');
-      sb.append(x);
+	    sb.append(v.getDimAtIndex(i));
+	    sb.append(':');
+	    sb.append(x);
+	}
+	return sb.toString();
     }
-    return sb.toString();
-  }
 
-  public static SVMClassifierModel readModelFile(String fileName)
-  throws IOException {
-    BufferedReader r = new BufferedReader(new FileReader(fileName));
-    String format = firstToken(r.readLine());
-    String kType = firstToken(r.readLine());
-    String dParam = firstToken(r.readLine());
-    String gParam = firstToken(r.readLine());
-    String sParam = firstToken(r.readLine());
-    String rParam = firstToken(r.readLine());
-    String uParam = r.readLine();
-    String numSV = firstToken(r.readLine());
-    String threshString = firstToken(r.readLine());
+    public static SVMClassifierModel readModelFile(String fileName)
+	throws IOException 
+    {
+	BufferedReader r = new BufferedReader(new FileReader(fileName));
+	String format = firstToken(r.readLine());
+	String kType = firstToken(r.readLine());
+	String dParam = firstToken(r.readLine());
+	String gParam = firstToken(r.readLine());
+	String sParam = firstToken(r.readLine());
+	String rParam = firstToken(r.readLine());
+	String uParam = r.readLine();
+	String numSV = firstToken(r.readLine());
+	String threshString = firstToken(r.readLine());
 
-    SVMKernel kernel = null;
-    try {
+	SVMKernel kernel = null;
+	try {
 	    int size = Integer.parseInt(numSV);
 	    switch (Integer.parseInt(kType)) {
-        case 0:
-          kernel = SparseVector.kernel;
-          break;
-	      case 1:
-          int order = Integer.parseInt(dParam);
-          PolynomialKernel k = new PolynomialKernel();
-          k.setOrder(order);
-          k.setNestedKernel(SparseVector.kernel);
-          kernel = k;
-          break;
+	    case 0:
+		kernel = SparseVector.kernel;
+		break;
+	    case 1:
+		int order = Integer.parseInt(dParam);
+		PolynomialKernel k = new PolynomialKernel();
+		k.setOrder(order);
+		k.setNestedKernel(SparseVector.kernel);
+		kernel = k;
+		break;
   	    case 2:
-          RadialBaseKernel rbk = new RadialBaseKernel();
-          double width = Double.parseDouble(gParam);
-          rbk.setWidth(width);
-          rbk.setNestedKernel(SparseVector.kernel);
-          kernel = rbk;
-          break;
+		RadialBaseKernel rbk = new RadialBaseKernel();
+		double width = Double.parseDouble(gParam);
+		rbk.setWidth(width);
+		rbk.setNestedKernel(SparseVector.kernel);
+		kernel = rbk;
+		break;
   	    default:
-          throw new IOException("Couldn't create kernel");
+		throw new IOException("Couldn't create kernel");
 	    }
 
 	    SimpleSVMClassifierModel model = new SimpleSVMClassifierModel(kernel);
 	    model.setThreshold(Double.parseDouble(threshString));
 	    String line;
 	    while ((line = r.readLine()) != null) {
-        LabelledVector ex = parseExample(line);
-        model.addItemAlpha(ex.getVector(), ex.getLabel());
+		LabelledVector ex = parseExample(line);
+		model.addItemAlpha(ex.getVector(), ex.getLabel());
 	    }
 	    r.close();
 
 	    return model;
-    } catch (NumberFormatException ex) {
+	} catch (NumberFormatException ex) {
 	    throw new IOException("Couldn't parse model file");
+	}
     }
-  }
 
   public static void writeModelFile(SVMClassifierModel model, String fileName)
   throws IOException {
