@@ -55,7 +55,8 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
         HAVE_DB = haveDB;
     }
 
-    protected static String DB_URL = "jdbc:hsqldb:.";
+    protected static String DB_DRIVER = "org.hsqldb.jdbcDriver";
+		protected static String DB_URL = "jdbc:hsqldb:.";
     protected static String DB_USER = "sa";
     protected static String DB_PW = "";
     protected static String DB_BIODB = "biosql";
@@ -107,7 +108,7 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
     }
 
     protected SequenceDB getSequenceDB() throws Exception {
-        return new BioSQLSequenceDB(DB_URL, DB_USER, DB_PW, DB_BIODB, true);
+        return new BioSQLSequenceDB(DB_DRIVER,DB_URL, DB_USER, DB_PW, DB_BIODB, true);
     }
 
     public void setUp() throws Exception {
