@@ -48,7 +48,7 @@ class BioSQLFeature extends SimpleFeature implements BioSQLFeatureI {
         throws BioException, ChangeVetoException
     {
 	Feature f = realizeFeature(this, templ);
-	((BioSQLSequence) getSequence()).persistFeature(f, id);
+	((BioSQLSequenceI) getSequence()).persistFeature(f, id);
 	return f;
     }
 

@@ -44,7 +44,7 @@ class BioSQLStrandedFeature extends SimpleStrandedFeature implements BioSQLFeatu
         throws BioException, ChangeVetoException
     {
 	Feature f = realizeFeature(this, templ);
-	((BioSQLSequence) getSequence()).persistFeature(f, id);
+	((BioSQLSequenceI) getSequence()).persistFeature(f, id);
 	return f;
     }
 

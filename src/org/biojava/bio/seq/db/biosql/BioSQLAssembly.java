@@ -40,15 +40,19 @@ import org.biojava.bio.symbol.*;
  * @since 1.3
  */
 
-class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequenceI {
-    private BioSQLSequenceDB seqDB;
-    private String name;
-    private int bioentry_id;
-    private int biosequence_id;
-    private ChangeSupport changeSupport;
-    private Annotation annotation;
-    private Alphabet alphabet;
-    private BioEntryFeatureSet features;
+class BioSQLAssembly implements Sequence, RealizingFeatureHolder, BioSQLSequenceI {
+    private BioSQLSequenceDB      seqDB;
+    private String                name;
+    private int                   assembly_id;
+    private int                   bioentry_id;
+    private ChangeSupport         changeSupport;
+    private Annotation            annotation;
+    private Alphabet              alphabet;
+    private int                   length;
+
+    private BioEntryFeatureSet    features;
+    private SimpleFeatureHolder   componentFeatures;
+    private MergeFeatureHolder    allFeatures;
 
     private void initChangeSupport() {
 	changeSupport = new ChangeSupport();
@@ -58,17 +62,19 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 	return seqDB.getDBHelper();
     }
 
-    BioSQLSequence(BioSQLSequenceDB seqDB,
+    BioSQLAssembly(BioSQLSequenceDB seqDB,
 		   String name,
 		   int bioentry_id,
-		   int biosequence_id,
-		   String alphaName)
+		   int assembly_id,
+		   String alphaName,
+		   int length)
 	throws BioException
     {
 	this.seqDB = seqDB;
 	this.name = name;
 	this.bioentry_id = bioentry_id;
-	this.biosequence_id = biosequence_id;
+	this.assembly_id = assembly_id;
+	this.length = length;
 
 	try {
 	    this.alphabet = AlphabetManager.alphabetForName(alphaName.toUpperCase());
@@ -141,41 +147,59 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 	throw new ChangeVetoException("Can't edit sequence in BioSQL -- or at least not yet...");
     }    
 
-    private SymbolList symbols;
+    protected synchronized SimpleFeatureHolder getComponentFeatures() {
+	if (componentFeatures == null) {
+	    componentFeatures = new SimpleFeatureHolder();
+
+	    try {
+		Connection conn = seqDB.getPool().takeConnection();
+		
+		PreparedStatement get_assembly = conn.prepareStatement("select assembly_fragment_id, fragment_name, assembly_start, assembly_end, fragment_start, fragment_end, strand " +
+								       "  from assembly_fragment " +
+								       " where assembly_id = ?");
+		get_assembly.setInt(1, assembly_id);
+		ResultSet rs = get_assembly.executeQuery();
+		while (rs.next()) {
+		    int assembly_fragment_id = rs.getInt(1);
+		    String fragment_name = rs.getString(2);
+		    int assembly_start = rs.getInt(3);
+		    int assembly_end = rs.getInt(4);
+		    int fragment_start = rs.getInt(5);
+		    int fragment_end = rs.getInt(6);
+		    int strand = rs.getInt(7);
+
+		    ComponentFeature.Template temp = new ComponentFeature.Template();
+		    temp.type = "component";
+		    temp.source = "biosql";
+		    temp.location = new RangeLocation(assembly_start, assembly_end);
+		    temp.componentSequenceName = fragment_name;
+		    temp.componentLocation = new RangeLocation(fragment_start, fragment_end);
+		    componentFeatures.addFeature(new BioSQLComponentFeature(seqDB, this, temp, assembly_fragment_id));
+		}
+
+		seqDB.getPool().putConnection(conn);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex, "Error fetching assembly data");
+	    } catch (ChangeVetoException ex) {
+		throw new BioError("Assertion failure: Couldn't modify private featureholder");
+	    }
+	}
+
+	return componentFeatures;
+    }
+
+    private AssembledSymbolList symbols;
 
     protected synchronized SymbolList getSymbols()
         throws BioRuntimeException
     {
 	if (symbols == null) {
-	    try {
-		Connection conn = seqDB.getPool().takeConnection();
-		
-		PreparedStatement get_symbols = conn.prepareStatement("select biosequence_str " +
-								      "from biosequence " +
-								      "where biosequence_id = ?");
-		get_symbols.setInt(1, biosequence_id);
-		ResultSet rs = get_symbols.executeQuery();
-		String seqString = null;
-		if (rs.next()) {
-		    seqString = rs.getString(1);  // FIXME should do something stream-y
-		}
-		get_symbols.close();
-
-		seqDB.getPool().putConnection(conn);
-
-		if (seqString != null) {
-		    try {
-			Alphabet alpha = getAlphabet();
-			SymbolTokenization toke = alpha.getTokenization("token");
-			symbols = new SimpleSymbolList(toke, seqString);
-		    } catch (Exception ex) {
-			throw new BioRuntimeException(ex, "Couldn't parse tokenized symbols");
-		    }
-		} else {
-		    throw new BioRuntimeException("Sequence " + name + " has gone missing!");
-		}
-	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex, "Unknown error getting symbols from BioSQL.  Oh dear.");
+	    FeatureHolder components = getComponentFeatures();
+	    symbols = new AssembledSymbolList();
+	    symbols.setLength(length);
+	    for (Iterator i = components.features(); i.hasNext(); ) {
+		ComponentFeature cf = (ComponentFeature) i.next();
+		symbols.putComponent(cf);
 	    }
 	}
 
@@ -190,20 +214,34 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 	return features;
     }
 
+    private FeatureHolder getAllFeatures() {
+	if (allFeatures == null) {
+	    try {
+		allFeatures = new MergeFeatureHolder();
+		allFeatures.addFeatureHolder(getComponentFeatures());
+		allFeatures.addFeatureHolder(getFeatures());
+	    } catch (ChangeVetoException ex) {
+		throw new BioError("Assertion failure: Couldn't modify private featureholder");
+	    }
+	}
+
+	return allFeatures;
+    }
+
     public Iterator features() {
-	return getFeatures().features();
+	return getAllFeatures().features();
     }
 
     public int countFeatures() {
-	return getFeatures().countFeatures();
+	return getAllFeatures().countFeatures();
     }
 
     public boolean containsFeature(Feature f) {
-	return getFeatures().containsFeature(f);
+	return getAllFeatures().containsFeature(f);
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getFeatures().filter(ff, recurse);
+	return getAllFeatures().filter(ff, recurse);
     }
 
     public Feature createFeature(Feature.Template ft)
