@@ -172,7 +172,7 @@ public final class SequenceTools {
    * </p>
    *
    * @param seq
-   * @return
+   * @return a GappedSequence view of seq
    */
   public static GappedSequence gappedView(Sequence seq) {
     return new SimpleGappedSequence(seq);
