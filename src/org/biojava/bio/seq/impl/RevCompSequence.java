@@ -28,6 +28,8 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.projection.*;
+
 /**
  * A reverse complement view onto <code>Sequence</code> interface.
  * <p>
@@ -38,6 +40,7 @@ import org.biojava.bio.seq.*;
  * was a regular Sequence.
  *
  * @author David Waring
+ * @author Thomas Down
  */
 public class RevCompSequence extends SimpleSequence{
     private ProjectedFeatureHolder pfh;
@@ -57,15 +60,9 @@ public class RevCompSequence extends SimpleSequence{
     public RevCompSequence(Sequence seq, String urn, String name, Annotation annotation)throws IllegalAlphabetException {
         super(DNATools.reverseComplement(seq),urn,name,annotation);
         pfh = new ProjectedFeatureHolder(seq,this,seq.length()+1,true);
-        pfh.setIsCachingProjections(false);
         origSeq = seq;
     }
     
-    
-    // default is off but lets give people the opportunity to change this
-    public void setIsCachingProjections(boolean b){
-        pfh.setIsCachingProjections(b);
-    }
 
     // SymbolList stuff
     /**
@@ -84,7 +81,6 @@ public class RevCompSequence extends SimpleSequence{
         }
         
     }
-    
     
     // Sequence stuff
     public Iterator features(){
@@ -106,15 +102,6 @@ public class RevCompSequence extends SimpleSequence{
     public void removeFeature(Feature f) throws ChangeVetoException{
         pfh.removeFeature(f);
     }
-    
-//    // for testing
-//    public Feature projectFeature(Feature f){
-//        return pfh.projectFeature(f);
-//    }
-
-    public Location getRCLocation(Location l){
-        return pfh.getProjectedLocation(l);
-    }
 
     /**
     * createFeature() will call createFeature() on the underlying Sequence.
@@ -123,9 +110,9 @@ public class RevCompSequence extends SimpleSequence{
     *
     */
     public Feature createFeature(Feature.Template ft) throws ChangeVetoException,BioException{
-        ft.location = pfh.getProjectedLocation(ft.location);
+        ft.location = ProjectionUtils.transformLocation(ft.location, length() + 1, true);
         if (ft instanceof StrandedFeature.Template){
-            ((StrandedFeature.Template)ft).strand = pfh.getProjectedStrand(((StrandedFeature.Template)ft).strand);
+            ((StrandedFeature.Template)ft).strand = ProjectionUtils.flipStrand(((StrandedFeature.Template)ft).strand);
     	 }
     	 Feature featureOnOrig = origSeq.createFeature(ft);
     	 return pfh.projectFeature(featureOnOrig);
@@ -134,20 +121,11 @@ public class RevCompSequence extends SimpleSequence{
     /**
     * getFeatureFromOriginal() Since you can not create a feature on a projectedFeature at this time, I am 
     * including this method so that you can get the corresponding feature from the original sequence.
-    * (which is not projected) and do something with that such as createFeature(). 
+    * (which is not projected) and do something with that such as createFeature().
     */
     
     public Feature getFeatureFromOriginal(Feature f){
-        Feature pFeature;
-        Feature oFeature;
-        for (Iterator i = origSeq.features();i.hasNext();){
-            oFeature = (Feature)i.next();
-            pFeature = pfh.projectFeature(oFeature);
-           if (pFeature.equals(f)){
-                return oFeature;
-            }
-        }
-        return null;
+        return ((Projection) f).getViewedFeature();
     }
     
     /**
@@ -159,29 +137,14 @@ public class RevCompSequence extends SimpleSequence{
         SymbolList sl = new SimpleSymbolList(this);
         Sequence newSeq = new SimpleSequence(sl,this.getURN(),this.getName(),this.getAnnotation());
         try{
-            cloneFeatures(this,newSeq);
+            SequenceTools.addAllFeatures(newSeq, this);
         } catch ( BioException e){
             throw new BioError( "Error while cloning RevCompSequenece: " + e.getMessage());
+        } catch (ChangeVetoException cve) {
+            throw new BioError(cve, "Couldn't modify newly created SimpleSequence");
         }
             
         return newSeq;
         
-    }
-    
-    private void cloneFeatures(FeatureHolder source, FeatureHolder dest)throws BioException{
-        for (Iterator i = source.features(); i.hasNext();){
-            Feature f = (Feature)i.next();
-            try {
-                Feature newf = dest.createFeature(f.makeTemplate());
-                cloneFeatures(f,newf);
-            }catch (ChangeVetoException cve){
-                throw new BioError("Should be able to create that Feature");
-            }
-        }
-    }
-    
-    
-        
-        
-
+    }     
 }
