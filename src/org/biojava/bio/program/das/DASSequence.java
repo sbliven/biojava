@@ -91,7 +91,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	features = new MergeFeatureHolder();
     }
 
-    DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID) 
+    DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID, Set dataSources) 
         throws BioException
     {
 	this.parentdb = db;
@@ -115,12 +115,22 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	}
 
 	//
-	// Pick up the default annotation set (this should maybe be optional)
+	// Pick up some annotations
 	//
 
-	FeatureHolder refServerFeatureSet = new DASFeatureSet(this, dataSourceURL, seqID);
-	featureSets.put(dataSourceURL, refServerFeatureSet);
-	features.addFeatureHolder(refServerFeatureSet);
+	for (Iterator dsi = dataSources.iterator(); dsi.hasNext(); ) {
+	    URL annoURL = (URL) dsi.next();
+
+	    FeatureHolder newFeatureSet = new DASFeatureSet(this, annoURL, seqID);
+	    featureSets.put(annoURL, newFeatureSet);
+	    features.addFeatureHolder(newFeatureSet);
+	}
+    }
+
+    DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID) 
+        throws BioException
+    {
+	this(db, dataSourceURL, seqID, Collections.singleton(dataSourceURL));
     }
 
     private class SkeletonListener extends SeqIOAdapter {
@@ -176,13 +186,21 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
 
     private void _addAnnotationSource(URL dataSourceURL) 
-        throws BioException
+        throws BioException, ChangeVetoException
     {
-      if(!featureSets.containsKey(dataSourceURL)) {
-	FeatureHolder fs = new DASFeatureSet(this, dataSourceURL, this.seqID);
-	featureSets.put(dataSourceURL, fs);
-	features.addFeatureHolder(fs);
-      }
+	if(!featureSets.containsKey(dataSourceURL)) {
+	    for (Iterator i = structure.features(); i.hasNext(); ) {
+		DASComponentFeature dcf = (DASComponentFeature) i.next();
+		DASSequence seq = dcf.getSequenceLazy();
+		if (seq == null) {
+		    seq.addAnnotationSource(dataSourceURL);
+		}
+	    }
+
+	    FeatureHolder fs = new DASFeatureSet(this, dataSourceURL, this.seqID);
+	    featureSets.put(dataSourceURL, fs);
+	    features.addFeatureHolder(fs);
+	}
     }
     
     public Set dataSourceURLs() {
@@ -209,9 +227,19 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	}
     }
 
-    private void _removeAnnotationSource(URL dataSourceURL) {
+    private void _removeAnnotationSource(URL dataSourceURL) 
+        throws ChangeVetoException
+    {
 	FeatureHolder fh = (FeatureHolder) featureSets.get(dataSourceURL);
 	if (fh != null) {
+	    for (Iterator i = structure.features(); i.hasNext(); ) {
+		DASComponentFeature dcf = (DASComponentFeature) i.next();
+		DASSequence seq = dcf.getSequenceLazy();
+		if (seq == null) {
+		    seq.removeAnnotationSource(dataSourceURL);
+		}
+	    }
+
 	    features.removeFeatureHolder(fh);
             featureSets.remove(dataSourceURL);
         }

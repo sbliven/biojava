@@ -47,7 +47,7 @@ class DASComponentFeature implements ComponentFeature {
 
     private final String componentID;
 
-    private Sequence componentSequence;
+    private DASSequence componentSequence;
     private Location componentLocation;
 
     public DASComponentFeature(DASSequence parent,
@@ -72,7 +72,7 @@ class DASComponentFeature implements ComponentFeature {
 	this.source = temp.source;
 
 	if (temp.componentSequence != null) {
-	    componentSequence = temp.componentSequence;
+	    componentSequence = (DASSequence) temp.componentSequence;
 	    componentID = componentSequence.getName();
 	} else {
 	    try {
@@ -138,10 +138,14 @@ class DASComponentFeature implements ComponentFeature {
 	return syms;
     }
 
+    DASSequence getSequenceLazy() {
+	return componentSequence;
+    }
+
     public Sequence getComponentSequence() {
 	if (componentSequence == null) {
 	    try {
-		componentSequence = new DASSequence(parent.getParentDB(), parent.getDataSourceURL(), componentID);
+		componentSequence = new DASSequence(parent.getParentDB(), parent.getDataSourceURL(), componentID, parent.dataSourceURLs());
 	    } catch (Exception ex) {
 		throw new BioError(ex, "Couldn't create child DAS sequence");
 	    }
