@@ -58,7 +58,7 @@ import org.biojava.bio.seq.io.OrganismParser;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.taxa.EbiFormat;
+//import org.biojava.bio.taxa.EbiFormat;
 import org.biojava.bio.taxa.Taxon;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
@@ -67,7 +67,7 @@ import org.biojava.utils.JDBCPooledDataSource;
 import org.biojava.utils.cache.Cache;
 import org.biojava.utils.cache.FixedSizeCache;
 import org.biojava.utils.cache.WeakValueHashMap;
-import org.apache.commons.dbcp.BasicDataSource;
+//import org.apache.commons.dbcp.BasicDataSource;
 
 /**
  * SequenceDB keyed off a BioSQL database.  This is an almost-complete
@@ -339,7 +339,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             create_dummy.setInt(4, length);
             create_dummy.executeUpdate();
             create_dummy.close();
-            int dummy_id = getDBHelper().getInsertID(conn, "biosequence", "biosequence_id");
+            //int dummy_id = getDBHelper().getInsertID(conn, "biosequence", "biosequence_id");
 
             conn.commit();
             conn.close();
@@ -384,7 +384,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            ResultSet rs;
+            //ResultSet rs;
 
             //
             // we will need this annotation bundle for various things
@@ -987,8 +987,8 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         return dummySupported;
     }
 
-    private boolean locationQualifierChecked = false;
-    private boolean locationQualifierSupported = false;
+    //private boolean locationQualifierChecked = false;
+    //private boolean locationQualifierSupported = false;
 
     boolean isLocationQualifierSupported() {
 //      if (!locationQualifierChecked) {
@@ -1099,7 +1099,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         private String filter;
         private int used_ot = 0;
         private int used_sfs = 0;
-        private int used_sqv = 0;
+        //private int used_sqv = 0;
 
         SqlizedFilter(FeatureFilter ff) {
             filter = sqlizeFilter(ff, false);
