@@ -55,26 +55,6 @@ public interface Sequence extends ResidueList, FeatureHolder, Annotatable {
   String getName();
   
   /**
-   * Stringify this sequence.
-   * <P>
-   * It is expected that this will use the residue's symbol or name methods.
-   *
-   * @return  a string representation of the sequence
-   */
-  String seqString();
-  
-  /**
-   * Return a region of this sequence as a String.
-   * <P>
-   * This should use the same rules as seqString.
-   *
-   * @param start  the first residue to include
-   * @param end the last residue to include
-   * @return the string representation
-   */
-  String subStr(int start, int end);
-  
-  /**
    * Creates a feature within fh that refers to the location loc.
    * <P>
    * There is no guarantee that the getAnnotation method of the resulting

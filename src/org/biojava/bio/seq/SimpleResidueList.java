@@ -91,6 +91,18 @@ public class SimpleResidueList implements ResidueList {
     residues = new ArrayList(rList.toList());
   }
 
+  public String seqString() {
+    return subStr(1, length());
+  }
+
+  public String subStr(int start, int end) {
+    StringBuffer sb = new StringBuffer();
+    for(int i = start; i <= end; i++) {
+      sb.append( residueAt(i).getSymbol() );
+    }
+    return sb.toString();
+  }
+
   /**
    * Not safe - doesn't check that rList contains residues only in alpha.
    * Use carefuly.

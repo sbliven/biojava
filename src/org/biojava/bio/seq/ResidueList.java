@@ -89,10 +89,36 @@ public interface ResidueList {
    * @param end the last residue (inclusive) of the new ResidueList
    */
   ResidueList subList(int start, int end) throws IndexOutOfBoundsException;
+    
+  /**
+   * Stringify this residue list.
+   * <P>
+   * It is expected that this will use the residue's symbol to render each
+   * residue. It should be parsable back into a ResidueList using the default
+   * symbol parser for this alphabet.
+   *
+   * @return  a string representation of the residue list
+   */
+  String seqString();
+  
+  /**
+   * Return a region of this residue list as a String.
+   * <P>
+   * This should use the same rules as seqString.
+   *
+   * @param start  the first residue to include
+   * @param end the last residue to include
+   * @return the string representation
+   * @throws IndexOutOfBoundsException if either start or end are not within the
+   *         sequence
+   */
+  String subStr(int start, int end) throws IndexOutOfBoundsException;
   
   /**
    * A usefull object that represents an empty residue list, to avoid returning
    * null.
+   *
+   * @author Matthew Pocock
    */
   static final ResidueList EMPTY_LIST = new EmptyResidueList();
   
@@ -123,6 +149,16 @@ public interface ResidueList {
     public ResidueList subList(int start, int end) throws IndexOutOfBoundsException {
       Collections.EMPTY_LIST.subList(start-1, end);
       return ResidueList.EMPTY_LIST;
+    }
+    
+    public String seqString() {
+      return "";
+    }
+    
+    public String subStr(int start, int end) throws IndexOutOfBoundsException {
+      throw new IndexOutOfBoundsException(
+        "You can not retrieve part of an empty residue list"
+      );
     }
   }
 }

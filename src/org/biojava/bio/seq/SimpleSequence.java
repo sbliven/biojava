@@ -99,18 +99,6 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
     return annotation;
   }
 
-  public String seqString() {
-    return subStr(1, length());
-  }
-
-  public String subStr(int start, int end) {
-    StringBuffer sb = new StringBuffer();
-    for(int i = start; i <= end; i++) {
-      sb.append( residueAt(i).getSymbol() );
-    }
-    return sb.toString();
-  }
-
   public int countFeatures() {
     if(featureHolderAllocated())
       return getFeatureHolder().countFeatures();

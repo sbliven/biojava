@@ -39,6 +39,7 @@ import org.biojava.bio.*;
  * </P>
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public abstract class AbstractResidueList implements ResidueList {
@@ -58,6 +59,18 @@ public abstract class AbstractResidueList implements ResidueList {
 
     public List toList() {
 	return new ListView(this);
+    }
+
+    public String seqString() {
+      return subStr(1, length());
+    }
+
+    public String subStr(int start, int end) {
+      StringBuffer sb = new StringBuffer();
+      for(int i = start; i <= end; i++) {
+        sb.append( residueAt(i).getSymbol() );
+      }
+      return sb.toString();
     }
 
     /**
@@ -129,6 +142,19 @@ public abstract class AbstractResidueList implements ResidueList {
 	    return new SubList(sstart + start - 1, sstart + end - 1);
 	}
 
+  public String seqString() {
+    return subStr(1, length());
+  }
+  
+  public String subStr(int start, int end) throws IndexOutOfBoundsException {
+    if(start < 1 || start > this.end ||
+       end < 1 || end > this.end ||
+       start > end) {
+      throw new IndexOutOfBoundsException();
+    }
+    return AbstractResidueList.this.subStr(start + this.start, end + this.start);
+  }
+  
 	public List toList() {
 	    return new ListView(this);
 	}
