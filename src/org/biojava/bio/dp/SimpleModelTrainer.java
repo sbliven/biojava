@@ -38,13 +38,16 @@ implements ModelTrainer, Serializable {
     if(!models.contains(model)) {
       for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
         State s = (State) i.next();
-        Distribution dist;
         try {
-          dist = model.getWeights(s);
+          Distribution dist = model.getWeights(s);
+          registerDistribution(dist);
         } catch (IllegalSymbolException ise) {
           throw new BioError(ise, "Couldn't register states from model");
         }
-        registerDistribution(dist);
+        if(s instanceof EmissionState) {
+          Distribution dist = ((EmissionState) s).getDistribution();
+          registerDistribution(dist);
+        }
       }
     }
   }
