@@ -57,8 +57,16 @@ public class ProjectedStrandedFeatureWrapper extends ProjectedFeatureWrapper
     }
 
     public String toString() {
+        String pm;
+        if (getStrand() == POSITIVE) {
+          pm = "+";
+        } else if (getStrand() == NEGATIVE) {
+          pm = "-";
+        } else {
+          pm = " ";
+        }
         return "Feature " + getType() + " " +
-            getSource() + " " + getLocation();
+            getSource() + " " + getLocation() + " " + pm;
     }
 
 }
