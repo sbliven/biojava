@@ -25,45 +25,76 @@ package org.biojava.stats.svm;
 import java.util.*;
 
 /**
+ * An implementation of a sparse vector.
+ * <P>
+ * Memory is only allocated for dimensions that have non-zero values.
+ *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
-
 public class SparseVector {
     int size;
     int[] keys;
     double[] values;
 
     public SparseVector() {
-	this(100);
+      this(100);
     }
 
     public SparseVector(int capacity) {
-	keys = new int[capacity];
-	values = new double[capacity];
-	size = 0;
+      keys = new int[capacity];
+      values = new double[capacity];
+      Arrays.fill(keys, 0, capacity, Integer.MAX_VALUE);
+      size = 0;
     }
 
+    /**
+     * The number of used dimensions.
+     * <P>
+     * This is the total number of non-zero dimensions. It is not equal to the
+     * number of the highest indexed dimension.
+     *
+     * @return the number of non-zero dimensions
+     */
+    public int size() {
+      return size;
+    }
+    
+    /**
+     * Set the value at a particular dimension.
+     *
+     * @param dim  the dimension to alter
+     * @param value the new value
+     */
     public void put(int dim, double value) {
-	if (size > 0 && dim <= keys[size - 1]) {
-	    throw new UnsupportedOperationException();
-	}
-	
-	if ((size + 1) >= keys.length) {
-	    int[] nKeys = new int[keys.length * 2];
-	    // System.arraycopy(keys, 0, nKeys, 0, size);
-	    for (int c = 0; c < size; ++c)
-		nKeys[c] = keys[c];
-	    keys = nKeys;
-	    double[] nValues = new double[values.length * 2];
-	    for (int c = 0; c < size; ++c)
-		nValues[c] = values[c];
-	    // System.arraycopy(values, 0, nValues, 0, size);
-	    values = nValues;
-	} 
+      // find index of key nearest dim
+      int indx = Arrays.binarySearch(keys, dim);
+      
+      if(indx >= 0) { // found entry for dim
+        values[indx] = value;
+      } else { // need to create entry for dim
+        indx = -(indx + 1);
 
-	keys[size] = dim;
-	values[size] = value;
-	++size;
+        if ((size + 1) >= keys.length) { // growing arrays
+          int[] nKeys = new int[keys.length * 2];
+          System.arraycopy(keys, 0, nKeys, 0, indx);
+          System.arraycopy(keys, indx, nKeys, indx+1, size-indx);
+          Arrays.fill(nKeys, size, nKeys.length, Integer.MAX_VALUE);
+          keys = nKeys;
+          
+          double[] nValues = new double[values.length * 2];
+          System.arraycopy(values, 0, nValues, 0, indx);
+          System.arraycopy(values, indx, nValues, indx+1, size-indx);
+          values = nValues;
+        } else {
+          System.arraycopy(keys, indx, keys, indx+1, size-indx);
+          System.arraycopy(values, indx, values, indx+1, size-indx);
+        }
+        
+        keys[indx] = dim;
+        values[indx] = value;
+        ++size;
+      }
     }
 
     public double get(int dim) {
@@ -134,7 +165,7 @@ public class SparseVector {
           } else if (s.keys[si] < a.keys[ai] && s.keys[si] < b.keys[bi]) {
             ++si;
           } else {
-            total += a.values[ai++] * b.values[bi++] * s.valuse[si++];
+            total += a.values[ai++] * b.values[bi++] * s.values[si++];
           }
         }
         return total;
@@ -154,8 +185,8 @@ public class SparseVector {
           }
         }
         
-        for(int j = 0; j < s.size(); j++j) {
-          s.put(1.0 / s.values[j]);
+        for(int j = 0; j < s.size(); j++) {
+          s.values[j] = 1.0 / s.values[j];
         }
       }
     }
