@@ -15,10 +15,10 @@ public class TestEmbl {
       }
       
       File emblFile = new File(args[0]);
-      SequenceFormat eFormat = new EmblFormat();
+      SequenceFormat eFormat = new EmblLikeFormat();
       BufferedReader eReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(emblFile)));
-      SequenceFactory sFact = new SimpleSequenceFactory();
+      SequenceBuilderFactory sFact = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
       Alphabet alpha = DNATools.getDNA();
       SymbolParser rParser = alpha.getParser("token");
       SequenceIterator seqI =
