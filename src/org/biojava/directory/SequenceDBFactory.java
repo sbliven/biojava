@@ -1,7 +1,30 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.directory;
+
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
@@ -71,43 +94,21 @@ public class SequenceDBFactory {
     }
     
     private  SequenceDBProvider getProvider(String providerName) throws RegistryException{
-	
 	try{
-	    
-	    //BufferedReader to load classes
-	    BufferedReader reader = null;
-	    Class clazz = null;
-	    ClassLoader loader = this.getClass().getClassLoader();
-	    
-	    Enumeration services = getClass().getClassLoader().getResources("META-INF/services/org.biojava.directory.SequenceDBProvider");
-	    
-	    SequenceDBProvider seqDB = null;
-	    
-	    while (services.hasMoreElements()) {
-		//need to look for this implementation on the classpath and 
-		//load it with ClassLoader
-		
-		URL provider = (URL)services.nextElement();
-		
-		reader  = new BufferedReader(new InputStreamReader(provider.openStream()));
-		
-		String className = "";
-		
-		while((className= reader.readLine()) != null){
-		    System.out.println(className);
-		    clazz = loader.loadClass(className);
-		    seqDB = (SequenceDBProvider) clazz.newInstance();
-		    if(seqDB.getName().equals(providerName)){
-			return seqDB;
-		    }
+	    ClassLoader loader = getClass().getClassLoader();
+	    Iterator implNames = Services.getImplementationNames(SequenceDBProvider.class, loader).iterator();
+	    while (implNames.hasNext()) {
+		String className = (String) implNames.next();
+		Class clazz = loader.loadClass(className);
+		SequenceDBProvider seqDB = (SequenceDBProvider) clazz.newInstance();
+		if(seqDB.getName().equals(providerName)){
+		    return seqDB;
 		}
-		
 	    }
 	    
 	    throw new ProviderNotFoundException("No such provider exists: " + providerName);
-	    
 	}catch(Exception e){
-	    throw new RegistryException(e.toString());
+	    throw new RegistryException(e, "Error accessing SequenceDBProvider services");
 	}
     }
     
