@@ -35,7 +35,7 @@
 
     <para>The Java package
     <classname>org.biojava.bio.search</classname> contains interfaces
-    and classes for purely for representing sequence similarity search
+    and classes purely for representing sequence similarity search
     results, regardless of the program that supplied the original
     data. When a query sequence is searched against a database of
     other sequences, the entire set of database hits is known as a
@@ -55,15 +55,14 @@ public interface SeqSimilaritySearchResult {
     instances are capable of returning the query sequence as a
     <classname>SymbolList</classname> and the target database as a
     <classname>SequenceDB</classname>. The search parameters may not
-    be available, so the
-    <methodname>getSearchParameters()</methodname> is permitted to
-    return null. The individual database hits are returned as a
-    <classname>List</classname> whose order should be specified by the
-    implementation. The <classname>SeqSimilaritySearchHit</classname>
-    interface defines accessors for the hit data, using the Blast
-    terminology of "query" for the sequence being searched against the
-    database and "subject" for a sequence in the database which is
-    hit.</para>
+    be available, so the <methodname>getSearchParameters</methodname>
+    method is permitted to return null. The individual database hits
+    are returned as a <classname>List</classname> whose order should
+    be specified by the implementation. The
+    <classname>SeqSimilaritySearchHit</classname> interface defines
+    accessors for the hit data, using the Blast terminology of "query"
+    for the sequence being searched against the database and "subject"
+    for a sequence in the database which is hit.</para>
 
 <programlisting>
 public interface SeqSimilaritySearchHit {
@@ -85,9 +84,9 @@ public interface SeqSimilaritySearchHit {
     documentation (notably, that "score" is the only mandatory field
     describing degree of similarity and that the methods returning a
     <classname>Strand</classname> are permitted to return null for
-    protein sequences. In Blast terms, a hit represents a collection
+    protein sequences). In Blast terms, a hit represents a collection
     of HSPs, with the list of HSPs which constitute the hit being
-    returned by the <methodname>getSubHits()</methodname> method. Each
+    returned by the <methodname>getSubHits</methodname> method. Each
     sub-hit is described by the interface
     <classname>SeqSimilaritySearchSubHit</classname>:</para>
 
@@ -107,7 +106,7 @@ public interface SeqSimilaritySearchSubHit {
 </programlisting>
 
     <para>The most important additional method available on the
-    sub-hits is <methodname>getAlignment()</methodname> which returns
+    sub-hits is <methodname>getAlignment</methodname> which returns
     an alignment corresponding to the sub-hit region.</para>
 
     <para>These interfaces intentionally present a rather limited view
@@ -123,7 +122,28 @@ public interface SeqSimilaritySearchSubHit {
     object.</para>
 
     <para>The following sections describe how you can create instances
-    of these and other objects from program output and create XML
+    of these and other objects from program output and also create XML
     conforming to the BioJava BlastLikeDataSetCollection DTD.</para>
+  </sect1>
+
+  <sect1 id="bd-ch06-blastlike">
+    <title>The Blast-like parsing framework</title>
+
+    <para>The Blast-like parsing framework is a system which parses
+    the report files produced by a number of programs, including NCBI
+    Blast, WU-Blast, HMMER and Fasta, yielding a stream of SAX2 events
+    which conform to a single XML DTD. This allows you to focus on the
+    content of the reports, rather than worrying about their different
+    formats. Facade classes conceal the details of the parsing system,
+    leaving only the implementation of
+    <classname>ContentHandler</classname>s for the data you are
+    interested in and as there is a single DTD shared between several
+    analysis programs, there is potential for re-use of those
+    <classname>ContentHandler</classname>s. BioJava provides some
+    ready-made <classname>ContentHandler</classname>s in the
+    <classname>org.biojava.bio.program.ssbind</classname> package and
+    the <classname>org.biojava.utils.stax</classname> package for
+    writing modular XML handlers of your own.</para>
+
   </sect1>
 </chapter>
