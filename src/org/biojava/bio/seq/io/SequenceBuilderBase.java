@@ -205,10 +205,10 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
 	Object oldValue = null;
 	Object newValue = value;
 
-	try {
+	if(ann.containsProperty(key)) {
 	    oldValue = ann.getProperty(key);
-	} catch (NoSuchElementException ex) {}
-
+	}
+        
 	if (oldValue != null) {
 	    if (oldValue instanceof Collection) {
 		((Collection) oldValue).add(newValue);
