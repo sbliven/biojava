@@ -26,7 +26,7 @@ import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SymbolTokenization;
 
 /**
- * This class creates PatternSearch.Pattern objects from
+ * This class creates Pattern objects from
  * String description of the object.
  * @author David Huen
  * @since 1.4
@@ -126,20 +126,20 @@ public class PatternMaker
     private static class Context
     {
         private Tokenizer toke;
-        private PatternSearch.Pattern pattern;
+        private Pattern pattern;
         private SymbolTokenization symToke;
         private FiniteAlphabet alfa;
     }
 
     /**
-     * Convert String into a PatternSearch.Pattern object in the specified alphabet.
+     * Convert String into a Pattern object in the specified alphabet.
      */
-    public static PatternSearch.Pattern parsePattern(String patternTxt, FiniteAlphabet alfa)
+    public static Pattern parsePattern(String patternTxt, FiniteAlphabet alfa)
         throws BioException, IllegalSymbolException, IllegalAlphabetException, ParseException
     {
         Context ctxt = new Context();
         ctxt.toke = new Tokenizer(patternTxt);
-        ctxt.pattern = new PatternSearch.Pattern(patternTxt, alfa);
+        ctxt.pattern = new Pattern(patternTxt, alfa);
         ctxt.symToke = alfa.getTokenization("token");
         ctxt.alfa = alfa;
 
@@ -154,7 +154,7 @@ public class PatternMaker
                     Symbol sym = ctxt.symToke.parseToken(Character.toString(ctxt.toke.getToken()));
                     if (ctxt.toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
                         Range range = getIterations(ctxt);
-                        PatternSearch.Pattern thisP = new PatternSearch.Pattern(ctxt.symToke.tokenizeSymbol(sym), alfa);
+                        Pattern thisP = new Pattern(ctxt.symToke.tokenizeSymbol(sym), alfa);
                         thisP.addSymbol(sym);
                         thisP.setMin(range.getMin());
                         thisP.setMax(range.getMax());
@@ -165,7 +165,7 @@ public class PatternMaker
                     }
                     break;
                 case Tokenizer.LEFT_BRACKET:
-                    PatternSearch.Pattern thisP = parsePattern(ctxt);
+                    Pattern thisP = parsePattern(ctxt);
                     if (ctxt.toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
                         Range range = getIterations(ctxt);
                         thisP.setMin(range.getMin());
@@ -231,13 +231,13 @@ public class PatternMaker
         throw new ParseException("unexpected error.");
     }
 
-    private static PatternSearch.Pattern parsePattern(Context ctxt)
+    private static Pattern parsePattern(Context ctxt)
         throws IllegalSymbolException, IllegalAlphabetException, ParseException
     {
         // consume left bracket
         ctxt.toke.getToken();
 
-        PatternSearch.Pattern pattern = new PatternSearch.Pattern("", ctxt.alfa);
+        Pattern pattern = new Pattern("", ctxt.alfa);
         boolean hasContent = false;
 
         while (ctxt.toke.hasNext()) {
@@ -249,7 +249,7 @@ public class PatternMaker
                     hasContent = true;
                     if (ctxt.toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
                         Range range = getIterations(ctxt);
-                        PatternSearch.Pattern thisP = new PatternSearch.Pattern("", ctxt.alfa);
+                        Pattern thisP = new Pattern("", ctxt.alfa);
                         thisP.addSymbol(sym);
                         thisP.setMin(range.getMin());
                         thisP.setMax(range.getMax());
@@ -260,7 +260,7 @@ public class PatternMaker
                     }
                     break;
                 case Tokenizer.LEFT_BRACKET:
-                    PatternSearch.Pattern thisP = parsePattern(ctxt);
+                    Pattern thisP = parsePattern(ctxt);
                     hasContent = true;
                     if (ctxt.toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
                         Range range = getIterations(ctxt);
