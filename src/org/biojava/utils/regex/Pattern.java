@@ -6,7 +6,7 @@ package org.biojava.utils.regex;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SymbolList;
 
-class Pattern
+public class Pattern
 {
     private FiniteAlphabet alfa;
     private java.util.regex.Pattern pattern;

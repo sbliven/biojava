@@ -20,19 +20,19 @@ public class Matcher
         matcher = pattern.getPattern().matcher(new SymbolListCharSequence(sl));
     }
 
-    public int end() { return matcher.end(); }
+    public int end() { return matcher.end() + 1; }
     public int end(int group) throws IndexOutOfBoundsException { return matcher.end(group); }
     public boolean find() { return matcher.find(); }
-    public boolean find(int start) throws IndexOutOfBoundsException { return matcher.find(start); }
+    public boolean find(int start) throws IndexOutOfBoundsException { return matcher.find(start - 1); }
     public SymbolList group()
     {
-        return sl.subList(matcher.start(), matcher.end() - 1);
+        return sl.subList(start(), end() - 1);
     }
 
     public SymbolList group(int group)
         throws IndexOutOfBoundsException
     {
-        return sl.subList(matcher.start(group), matcher.end(group) - 1);
+        return sl.subList(start(group), end(group) - 1);
     }
 
     public int groupCount() { return matcher.groupCount(); }
@@ -56,8 +56,8 @@ public class Matcher
         return this;
     }
 
-    public int start() { return matcher.start(); }
-    public int start(int group) {return matcher.start(group); }
+    public int start() { return matcher.start() + 1; }
+    public int start(int group) {return matcher.start(group) + 1; }
 
 }
 
