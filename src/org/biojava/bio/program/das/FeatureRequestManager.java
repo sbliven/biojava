@@ -27,9 +27,12 @@ import java.io.*;
 
 import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.utils.stax.*;
+
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.program.xff.*;
 
 import org.apache.xerces.parsers.*;
 import org.xml.sax.*;
@@ -88,7 +91,7 @@ class FeatureRequestManager {
 	return a.equals(b);
     }
 
-    private boolean fetchAll(Ticket trigger) 
+    private synchronized boolean fetchAll(Ticket trigger) 
         throws ParseException, BioException
     {
 	boolean startedActivity = false;
@@ -158,53 +161,18 @@ class FeatureRequestManager {
 
 	    huc.connect();
 	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    if (status == 0)
+	    if (status == 0) {
 		throw new BioError("Not a DAS server: " + fURL.toString());
-	    else if (status != 200)
+	    } else if (status != 200) {
 		throw new BioError("DAS error (status code = " + status + ")");
-	    
-	    InputSource is = new InputSource(huc.getInputStream());
-	    DOMParser parser = DASSequence.nonvalidatingParser();
-	    parser.parse(is);
-	    Element el = parser.getDocument().getDocumentElement();
-
-	    Node chld = el.getFirstChild();
-	    while (chld != null) {
-		if (chld instanceof Element) {
-		    Element echld = (Element) chld;
-		    String tagName = echld.getTagName();
-		    if ("SEGMENT".equals(tagName)) {
-			String segID = echld.getAttribute("id");
-			Ticket t = (Ticket) ticketsById.get(segID);
-			if (t == null) {
-			    throw new ParseException("Response segment " + segID + " wasn't requested");
-			}
-
-			DASXFFParser.INSTANCE.parseSegment(echld, t.getOutputListener());
-			t.setAsFetched();
-			openTickets.remove(t);
-		    } else if ("segmentNotAnnotated".equals(tagName)) {
-			String segID = echld.getAttribute("id");
-			Ticket t = (Ticket) ticketsById.get(segID);
-			if (t == null) {
-			    throw new ParseException("Response segment " + segID + " wasn't requested");
-			}
-
-			SeqIOListener siol = t.getOutputListener();
-			siol.startSequence();
-			siol.endSequence();
-
-			t.setAsFetched();
-			openTickets.remove(t);
-		    } else if ("segmentError".equals(tagName)) {
-			String segID = echld.getAttribute("id");
-			String segError = echld.getAttribute("error");
-
-			throw new ParseException("Error " + segError + " fetching " + segID);
-		    }
-		}
-		chld = chld.getNextSibling();
 	    }
+
+	    InputSource is = new InputSource(huc.getInputStream());
+	    DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsById);
+	    SAXParser parser = new SAXParser();
+	    parser.setContentHandler(new SAX2StAXAdaptor(dfh));
+	    parser.parse(is);
+	    openTickets.removeAll(dfh.getDoneTickets());
 	} catch (IOException ex) {
 	    throw new ParseException(ex);
 	} catch (SAXException ex) {
@@ -220,7 +188,143 @@ class FeatureRequestManager {
 	return true;
     }
 
-    private void fetchTicket(Ticket t) 
+    private class DASFeaturesHandler extends StAXContentHandlerBase {
+	private boolean inDocument = false;
+	private Map ticketsById;
+	private Ticket thisTicket;
+	private List doneTickets = new ArrayList();
+
+	public List getDoneTickets() {
+	    return doneTickets;
+	}
+
+	public DASFeaturesHandler(Map ticketsById) {
+	    this.ticketsById = ticketsById;
+	}
+
+	public void startElement(String nsURI,
+				 String localName,
+				 String qName,
+				 Attributes attrs,
+				 DelegationManager dm)
+	    throws SAXException
+	{
+	    if (!inDocument) {
+		inDocument = true;
+	    } else {
+		if (localName.equals("SEGMENT")) {
+		    String segID = attrs.getValue("id");
+		    if (segID == null) {
+			throw new SAXException("Missing segment ID");
+		    }
+		    thisTicket = (Ticket) ticketsById.get(segID);
+		    if (thisTicket == null) {
+			throw new SAXException("Response segment " + segID + " wasn't requested");
+		    }
+
+		    dm.delegate(new DASSegmentHandler(thisTicket.getOutputListener()));
+		} else if (localName.equals("segmentNotAnnotated")) {
+		    String segID = attrs.getValue("id");
+		    if (segID == null) {
+			throw new SAXException("Missing segment ID");
+		    }
+		    Ticket t = (Ticket) ticketsById.get(segID);
+		    if (t == null) {
+			throw new SAXException("Response segment " + segID + " wasn't requested");
+		    }
+
+		    SeqIOListener siol = t.getOutputListener();
+		    try {
+			siol.startSequence();
+			siol.endSequence();
+		    } catch (ParseException ex) {
+			throw new SAXException(ex);
+		    }
+		    
+		    t.setAsFetched();
+		    doneTickets.add(t);
+		} else if (localName.equals("segmentError")) {
+		    String segID = attrs.getValue("id");
+		    String segError = attrs.getValue("error");
+
+		    throw new SAXException("Error " + segError + " fetching " + segID);
+		}
+	    }
+	}
+
+	public void endElement(String nsURI,
+			       String localName,
+			       String qName)
+	    throws SAXException
+	{
+	    if (localName.equals("SEGMENT")) {
+		thisTicket.setAsFetched();
+		doneTickets.add(thisTicket);
+	    }
+	}
+    }
+
+    private class DASSegmentHandler extends StAXContentHandlerBase {
+	private SeqIOListener siol;
+	private int level = 0;
+
+	public DASSegmentHandler(SeqIOListener siol) {
+	    this.siol = siol;
+	}
+
+	public void startElement(String nsURI,
+				 String localName,
+				 String qName,
+				 Attributes attrs,
+				 DelegationManager dm)
+	    throws SAXException
+	{
+	    ++level;
+	    if (level == 1) {
+		try {
+		    siol.startSequence();
+		
+		    String segStart = attrs.getValue("start");
+		    if (segStart != null) {
+			siol.addSequenceProperty("sequence.start", segStart);
+		    }
+		    String segStop = attrs.getValue("stop");
+		    if (segStop != null) {
+			siol.addSequenceProperty("sequence.stop", segStop);
+		    }
+		} catch (ParseException ex) {
+		    throw new SAXException(ex);
+		}
+	    } else {
+		if (localName.equals("featureSet")) {
+		    XFFFeatureSetHandler xffh = new XFFFeatureSetHandler();
+		    xffh.setFeatureListener(siol);
+		    xffh.addFeatureHandler(new ElementRecognizer.ByLocalName("componentFeature"),
+					   ComponentFeatureHandler.COMPONENTFEATURE_HANDLER_FACTORY);
+		    dm.delegate(xffh);
+		} else {
+		    throw new SAXException("Expecting an XFF featureSet and got " + localName);
+		}
+	    }
+	}
+
+	public void endElement(String nsURI,
+			       String localName,
+			       String qName)
+	    throws SAXException
+	{
+	    if (level == 1) {
+		try {
+		    siol.endSequence();
+		} catch (ParseException ex) {
+		    throw new SAXException(ex);
+		}
+	    }
+	    --level;
+	}
+    }
+
+    private synchronized void fetchTicket(Ticket t) 
         throws ParseException, BioException
     {
 	// System.err.println("Sigh, just fetching one featureSet (" + t.getType() + "," + t.getCategory() + ")");
@@ -241,15 +345,31 @@ class FeatureRequestManager {
 
 	    if (useXFF) {
 		URL fURL = new URL(dataSourceURL, "features?encoding=xff;ref=" + t.getID() + filter);
-		DASXFFParser.INSTANCE.parseURL(fURL, t.getOutputListener());
+		HttpURLConnection huc = (HttpURLConnection) fURL.openConnection();
+		huc.connect();
+		int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+		if (status == 0)
+		    throw new BioError("Not a DAS server: " + fURL.toString());
+		else if (status != 200)
+		    throw new BioError("DAS error (status code = " + status + ")");
+
+		Map ticketsById = new HashMap();
+		ticketsById.put(t.getID(), t);
+		InputSource is = new InputSource(huc.getInputStream());
+		DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsById);
+		SAXParser parser = new SAXParser();
+		parser.setContentHandler(new SAX2StAXAdaptor(dfh));
+		parser.parse(is);
+		openTickets.removeAll(dfh.getDoneTickets());		
 	    } else {
 		URL fURL = new URL(dataSourceURL, "features?ref=" + t.getID() + filter);
 		DASGFFParser.INSTANCE.parseURL(fURL, t.getOutputListener());
+		openTickets.remove(t);
+		t.setAsFetched();
 	    }
-
-	    openTickets.remove(t);
-	    t.setAsFetched();
 	} catch (IOException ex) {
+	    throw new ParseException(ex);
+	} catch (SAXException ex) {
 	    throw new ParseException(ex);
 	} finally {
 	    DAS.completedActivity(t);

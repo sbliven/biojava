@@ -30,6 +30,7 @@ import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.program.xff.*;
 
 import org.apache.xerces.parsers.*;
 import org.xml.sax.*;
@@ -160,6 +161,11 @@ class DASFeatureSet implements FeatureHolder {
 		    Feature f = null;
 		    if (temp.annotation == Annotation.EMPTY_ANNOTATION) {
 			temp.annotation = new SimpleAnnotation();
+		    } else {
+			if (temp.annotation.containsProperty(XFFFeatureSetHandler.PROPERTY_XFF_ID)) {
+			    temp.annotation.setProperty(DASSequence.PROPERTY_FEATUREID,
+							temp.annotation.getProperty(XFFFeatureSetHandler.PROPERTY_XFF_ID));
+			}
 		    }
 		    temp.annotation.setProperty(DASSequence.PROPERTY_ANNOTATIONSERVER, dataSource);
 		    
@@ -178,6 +184,20 @@ class DASFeatureSet implements FeatureHolder {
 	    }
 	}
 	
+	public void addFeatureProperty(Object key, Object value)
+	    throws ParseException
+	{
+	    try {
+		if (key.equals(XFFFeatureSetHandler.PROPERTY_XFF_ID)) {
+		    stackTop.getAnnotation().setProperty(DASSequence.PROPERTY_FEATUREID, value);
+		} else {
+		    stackTop.getAnnotation().setProperty(key, value);
+		}
+	    } catch (ChangeVetoException ex) {
+		throw new ParseException(ex, "Couldn't set feature property");
+	    }
+	}
+
 	public void endFeature()
 	    throws ParseException
 	{
