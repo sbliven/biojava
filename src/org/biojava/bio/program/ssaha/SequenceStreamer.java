@@ -56,6 +56,8 @@ public interface SequenceStreamer {
 	    throws BioException
 	{
 	    Sequence seq = si.nextSequence();
+	    System.err.println("Streaming " + seq.getName());
+
 	    listener.startSequence();
 	    listener.setName(seq.getName());
 	    listener.setURI(seq.getURN());

@@ -90,6 +90,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 				 new SequenceStreamer.SequenceDBStreamer(seqDB),
 				 packing,
 				 wordLength,
+				 1,
 				 threshold);
   }
 
@@ -98,6 +99,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     SequenceStreamer streamer,
     Packing packing,
     int wordLength,
+    int stepSize,
     int threshold
   ) throws
     IllegalAlphabetException,
@@ -157,7 +159,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     // count up the space required for sequence names
     //
 
-    FirstPassListener fpl = new FirstPassListener(packing, wordLength, hashTable);
+    FirstPassListener fpl = new FirstPassListener(packing, wordLength, stepSize, hashTable);
     streamer.reset();
     while (streamer.hasNext()) {
 	streamer.streamNext(fpl);
@@ -261,6 +263,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     
     SecondPassListener spl = new SecondPassListener(packing,
 						    wordLength,
+						    stepSize,
 						    hashTable,
 						    nameArray,
 						    nameTable,
@@ -299,13 +302,18 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     private abstract class PackingListener extends SeqIOAdapter {
 	private final Packing packing;
 	private final int wordLength;
+	private final int stepSize;
 	private int pos = -1;
 	private int word = 0;
 	private int lengthFromUnknown = 0;
 
-	public PackingListener(Packing packing, int wordLength) {
+	public PackingListener(Packing packing,
+			       int wordLength,
+			       int stepSize) 
+	{
 	    this.packing = packing;
 	    this.wordLength = wordLength;
+	    this.stepSize = stepSize;
 	}
 
 	public void startSequence() 
@@ -337,6 +345,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 		throw new IllegalAlphabetException("Alphabet " + alpha.getName() + " doesn't match packing");
 	    }
 
+	    int stepCounter = stepSize;
 	    for (int i = start; i < (start + length); ++i) {
 		word = word >> (int) packing.wordSize();
 		try {
@@ -352,11 +361,14 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 		}
 
 		++pos;
-		if (lengthFromUnknown >= wordLength) {
-		    try {
-			processWord(word, pos - wordLength);
-		    } catch (ParseException ex) {
-			throw new BioRuntimeException(ex);
+		if (--stepCounter == 0) {
+		    stepCounter = stepSize;
+		    if (lengthFromUnknown >= wordLength) {
+			try {
+			    processWord(word, pos - wordLength);
+			} catch (ParseException ex) {
+			    throw new BioRuntimeException(ex);
+			}
 		    }
 		}
 	    }
@@ -368,8 +380,12 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
         int seqCount = 0;
 	int nameChars = 0;
 
-	FirstPassListener(Packing packing, int wordLength, IntBuffer hashTable) {
-	    super(packing, wordLength);
+	FirstPassListener(Packing packing,
+			  int wordLength,
+			  int stepSize,
+			  IntBuffer hashTable) 
+	{
+	    super(packing, wordLength, stepSize);
 	    this.hashTable = hashTable;
 	}
 
@@ -407,12 +423,13 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 
 	SecondPassListener(Packing packing, 
 			   int wordLength, 
+			   int stepSize,
 			   IntBuffer hashTable,
 			   IntBuffer nameArray,
 			   MappedByteBuffer nameTable,
 			   MappedByteBuffer hitTable) 
 	{
-	    super(packing, wordLength);
+	    super(packing, wordLength, stepSize);
 	    this.hashTable = hashTable;
 	    this.nameArray = nameArray;
 	    this.nameTable = nameTable;
