@@ -41,9 +41,18 @@ import org.biojava.utils.ParserException;
 import org.biojava.bio.search.SearchContentHandler;
 
 /**
- * <code>FastaSearchSAXParser</code> is a SAX2 compliant parser for
+ * <p><code>FastaSearchSAXParser</code> is a SAX2 compliant parser for
  * '-m 10' format output from the the Fasta search program (see the
- * Fasta documentation for details of this format).
+ * Fasta documentation for details of this format).</p>
+ *
+ * <p>Versions of Fasta supported are as follows. Note that the compile
+ * time option -DM10_CONS should be used to allow correct reporting of
+ * the number of matches in HSPSummary elements</p>
+ *
+ * <ul>
+ *   <li>33t07</li>
+ *   <li>33t08 (current tests are against output from this version</li>
+ * </ul>
  *
  * <p>The SAX2 events produced are as if the input to the parser was
  * an XML file validating against the BioJava
