@@ -1,0 +1,3 @@
+javac.classpath=class|xerces.jar
+jar.target=biojava.jar
+jar.manifest=manifest/defaultmanifest.txt
