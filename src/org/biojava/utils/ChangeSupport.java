@@ -97,7 +97,7 @@ public class ChangeSupport {
    *               it needs to
    */
   public ChangeSupport(int initialSize, int delta) {
-    this(null, initialSize, delta);
+    this(Collections.EMPTY_SET, initialSize, delta);
   }
   
   public ChangeSupport(Set unchanging) {
