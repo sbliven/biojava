@@ -27,7 +27,6 @@ import java.util.List;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.Feature$Template;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
@@ -43,6 +42,10 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
+/**
+ * @author Thomas Downe
+ * @author David Allen
+ */
 public class DummySequence extends AbstractChangeable
     implements Sequence 
 {
