@@ -177,7 +177,7 @@ public abstract class AbstractAlphabet
     int atomic = 0;
     while(si.hasNext()) {
       Symbol s = (Symbol) si.next();
-      Alphabet a = (Alphabet) ai.next();
+      //Alphabet a = (Alphabet) ai.next();
       //a.validate(s); // very expensive for requent fetches!
       if(s instanceof AtomicSymbol) {
         atomic++;

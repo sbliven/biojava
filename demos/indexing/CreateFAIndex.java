@@ -10,23 +10,32 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.utils.*;
 import org.biojava.utils.io.*;
+import org.biojava.utils.lsid.*;
 
 public class CreateFAIndex {
+  private static final int ID_LENGTH = 40;
   public static void main(String[] args)
   throws Throwable {
+    if(args.length < 3) {
+      System.err.println("Use: indexdb.CreateFAIndex storeFile storeName [filesToINdex]");
+      System.exit(1);
+    }
+
     File storeFile = new File(args[0]);
     
     BioStoreFactory bsf = new BioStoreFactory();
     bsf.setPrimaryKey("ID");
     bsf.setStoreLocation(storeFile);
-    bsf.addKey("ID", 10);
+    bsf.addKey("ID", ID_LENGTH);
+    bsf.setStoreName(args[1]);
+    bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org", "format", "fasta"));
 
     BioStore store = bsf.createBioStore();
     
     FastaFormat format = new FastaFormat();
     SymbolTokenization tok = ProteinTools.getAlphabet().getTokenization("token");
 
-    for(int i = 1; i < args.length; i++) {
+    for(int i = 2; i < args.length; i++) {
       File faFile = new File(args[i]);
       RAF raf = new RAF(faFile, "r");
       Indexer indexer = new Indexer(raf, store);
@@ -90,6 +99,13 @@ public class CreateFAIndex {
             id = line.substring(0, a);
           } else {
             id = line;
+          }
+
+          if(id.length() > ID_LENGTH) {
+            System.err.println("ID too long: " + id.length() + " vs " + ID_LENGTH);
+            System.err.println("Got description: " + line);
+            System.err.println("ID: " + id);
+            System.err.println();
           }
         }
       }

@@ -98,17 +98,22 @@ extends SearchableFileAsList {
   
   protected void generateRecord(byte[] buffer, Object item)
   throws NestedException {
+    String id = null;
+    int fileID = -1;
+    String start = null;
+    String length = null;
+
     try {
       Record indx = (Record) item;
       
-      String id = indx.getID();
+      id = indx.getID();
       if(id == null) {
         throw new NestedException("Can't process null ID: " + indx);
       }
-      int fileID = store.getIDForFile(indx.getFile());
-      String start = String.valueOf(indx.getOffset());
-      String length = String.valueOf(indx.getLength());
-      
+      fileID = store.getIDForFile(indx.getFile());
+      start = String.valueOf(indx.getOffset());
+      length = String.valueOf(indx.getLength());
+
       int i = 0;
       byte[] str;
       
@@ -141,8 +146,28 @@ extends SearchableFileAsList {
       while(i < buffer.length) {
         buffer[i++] = ' ';
       }
-    } catch (IOException ioe) {
-      throw new NestedException("Could not build record");
+    } catch (IOException ex) {
+      String attemptedLine =
+        id + "\t" +
+        fileID + "\t" +
+        start + "\t" +
+        length;
+      throw new NestedException(
+        ex,
+        "Could not build record. Record length: " + buffer.length +
+        " Line length: " + attemptedLine.length() +
+        " " + attemptedLine );
+    } catch (ArrayIndexOutOfBoundsException ex) {
+      String attemptedLine =
+        id + "\t" +
+        fileID + "\t" +
+        start + "\t" +
+        length;
+      throw new NestedException(
+        ex,
+        "Could not build record. Record length: " + buffer.length +
+        " Line length: " + attemptedLine.length() +
+        " " + attemptedLine );
     }
   }
   

@@ -240,6 +240,14 @@ public class BioStoreFactory {
                                        + primaryKey);
             }
 
+            if(name == null) {
+              throw new BioException("Store does not have a anme set");
+            }
+
+            if(format == null) {
+              throw new BioException("Format not set");
+            }
+
             storeLoc.mkdirs();
             ConfigFile ann = new ConfigFile(makeConfigFile(storeLoc));
             ann.setProperty("index", "flat/1");
