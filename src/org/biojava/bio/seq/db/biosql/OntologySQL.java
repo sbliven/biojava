@@ -590,34 +590,45 @@ class OntologySQL {
   }
 
   private void persistTriple(Connection conn, Ontology ont, Triple triple)
-          throws SQLException
-  {
-    persistTerm(conn, triple);
-
-    PreparedStatement import_trip = conn.prepareStatement(
+    throws SQLException {
+   try {
+      // Code borrowed from termID to check for triple's existence.
+      Term t = triple;
+      while (t instanceof RemoteTerm) t = ((RemoteTerm)t).getRemoteTerm();
+      if(blessedExternalAliases.containsKey(t)) t = (Term)
+         blessedExternalAliases.get(t);
+      if (!IDsByTerm.containsKey(t)) persistTerm(conn,triple);
+                                 
+      // End of borrowed code.
+      PreparedStatement import_trip = conn.prepareStatement(
             "insert into term_relationship " +
-            "       (subject_term_id, predicate_term_id, object_term_id, ontology_id) " +
-            "values (?, ?, ?, ?)"
-    );
-    import_trip.setInt(1, termID(triple.getSubject()));
-    import_trip.setInt(2, termID(triple.getPredicate()));
-    import_trip.setInt(3, termID(triple.getObject()));
-    import_trip.setInt(4, ontologyID(ont));
-    import_trip.executeUpdate();
-    import_trip.close();
-    int tripID = dbHelper.getInsertID(conn, "term_relationship", "term_relationship_id");
-
-    PreparedStatement link_trip_to_term = conn.prepareStatement(
+            " (subject_term_id, predicate_term_id,object_term_id, ontology_id) " +
+            "values (?, ?, ?, ?)");
+	    
+      import_trip.setInt(1, termID(triple.getSubject()));
+      import_trip.setInt(2, termID(triple.getPredicate()));
+      import_trip.setInt(3, termID(triple.getObject()));
+      import_trip.setInt(4, ontologyID(ont));
+      import_trip.executeUpdate();
+      import_trip.close();
+      int tripID = dbHelper.getInsertID(conn, "term_relationship", "term_relationship_id");
+      PreparedStatement link_trip_to_term = conn.prepareStatement(
             "insert into term_relationship_term " +
-            "       (term_relationship_id, term_id) " +
+            " (term_relationship_id, term_id) " +
             "values (?, ?)" );
-    link_trip_to_term.setInt(1, tripID);
-    link_trip_to_term.setInt(2, termID(triple));
-    link_trip_to_term.executeUpdate();
-    link_trip_to_term.close();
-
-    //System.err.println("Persisted triple: " + triple);
+      link_trip_to_term.setInt(1, tripID);
+      link_trip_to_term.setInt(2, termID(triple));
+      link_trip_to_term.executeUpdate();
+      link_trip_to_term.close();
+      //System.err.println("Persisted triple: " + triple);
+    } catch (SQLException se) {
+        throw (SQLException) new SQLException(
+          "Failed to persist triple: " + triple+ " from ontology: " + 
+           triple.getOntology() + " with error: " +se.getErrorCode() + 
+	   " : " +se.getSQLState()).initCause(se);
+    }
   }
+
 
   private void persistOntology(Ontology onto)
   {
