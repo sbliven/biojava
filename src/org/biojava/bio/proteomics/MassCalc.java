@@ -21,8 +21,7 @@
 
 package org.biojava.bio.proteomics;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
@@ -36,7 +35,7 @@ import org.biojava.bio.symbol.*;
  * the mono-isotopic and average-isotopic masses identical to those
  * specified at www.micromass.co.uk
  *
- * @author M. Jones
+ * @author M. Jones sdfsd
  * @author Keith James (minor changes)
  */
 public class MassCalc {
@@ -84,6 +83,9 @@ public class MassCalc {
     //Save values here so that modifications are not global
     private HashMap mSymbolPropertyHash;
 
+
+    private HashMap mVariableModPropertyHash;
+
     /*
      * If instance methods are being used this will store the
      * isotopically and MH_PLUS correct terminal mass to be created.
@@ -116,6 +118,8 @@ public class MassCalc {
 
         SymbolPropertyTable symbolPropertyTable = 
             ProteinTools.getSymbolPropertyTable(isotopicType);
+
+	mVariableModPropertyHash = new HashMap();
         
         Iterator symbolList = ProteinTools.getAlphabet().iterator();
 
@@ -123,7 +127,6 @@ public class MassCalc {
         {
             Symbol sym = (Symbol) symbolList.next();
             try {
-                // System.out.println(sym.getName() + ":" + toke.tokenizeSymbol(sym));
                 try {
                     Double value =
                         new Double(symbolPropertyTable.getDoubleValue(sym));
@@ -170,31 +173,64 @@ public class MassCalc {
         mSymbolPropertyHash.put(sym, new Double(mass));
     }
  
-    /* May need something like this if a user wants to add a non standard
-     * amino acid to a specific location on a peptide. Not very usefull
-     * for woking with large batches of sequences. Currently this is not implemented
-     * @param residue
-     * @param mass
+    /** amino acid to a specific location on a peptide. If multiple masses are 
+     * set by this method more then one mass will be returned for a mass 
+     * calculation. For example if a peptide contains two Mets and the user sets 
+     * the native and oxidized mass for the Met then the masses returned will be
+     * of the peptide with 0, 1 and 2 modified Mets. 
+     * @param residue The one char id for this residue
+     * @param masses
      * @throws IllegalSymbolException
+     * @see #getVariableMasses(SymbolList peptide)
+     * @see #addVariableModification(Symbol residue,double[] masses) 
      */
+     public void addVariableModification(char residue, 
+                                         double[] masses) 
+ 	throws IllegalSymbolException{
+ 	Symbol sym = getSymbolForChar(residue);
+ 	addVariableModification(sym, masses);
+     }
+     
 
-    
-    /**
-     * <code>addSymbolModification</code> may be needed if a user
-     * wants to add a non standard amino acid to a specific location
-     * on a peptide. <strong>Currently this is not implemented</strong>.
-     *
-     * @param residue a <code>Symbol</code>.
-     * @param mass a <code>double</code>.
-     *
-     * @exception IllegalSymbolException if the <code>Symbol</code> is
-     * not recognised.
-     */
-    public void addSymbolModification(Symbol residue, double mass) 
-        throws IllegalSymbolException
-    {
-        //   mSymbolPropertyTable.setDoubleProperty(residue, Double.toString(mass));
-    }
+     /** Add Variable modifications. If multiple masses are 
+      * set by this method more then one mass will be returned for a mass 
+      * calculation. For example if a peptide contains two Mets and the user sets 
+      * the native and oxidized mass for the Met then the masses returned will be
+      * of the peptide with 0, 1 and 2 modified Mets. 
+      */
+     public void addVariableModification(Symbol residue, 
+                                         double[] masses) 
+ 	throws IllegalSymbolException{
+ 	
+ 	List massList = new LinkedList();
+ 	for(int i=0; i<masses.length; i++){
+ 	    massList.add(new Double(masses[i]));
+ 	}
+ 	getVariableModMap().put(residue, massList);
+     }
+
+     /**
+      * Remove all variable modifications assocaited with this residue. 
+      *
+      */
+     public boolean removeVariableModifications(char residue)
+ 	throws IllegalSymbolException{
+ 	Symbol sym = getSymbolForChar(residue);
+ 	return removeVariableModifications(sym);
+     }
+ 
+     /**
+      * Remove all variable modifications assocaited with this residue. 
+      *
+      */
+     public boolean removeVariableModifications(Symbol residue){
+ 	if(getVariableModMap().remove(residue) != null){
+ 	    return true;
+ 	}else{
+ 	    return false;
+ 	}
+     }
+
 
     /**
      * <code>getMass</code> calculates the mass of this peptide. This
@@ -275,9 +311,35 @@ public class MassCalc {
 
         return pepMass;
     }
+
+     /**
+      * Get all masses including the variable mass. 
+      * Allgorythm
+      * 
+      * 1 Get the first residue of the sequence
+      * create a list of all the standard and non-standard massses for this reidue
+      * for each residue mass goto 1 with the sequence of all residues after the current residue
+      *     add the residue mass to each mass from 1 to the list
+      *                
+      * 
+      *     @see #addVariableModification
+      */
+     public double[] getVariableMasses(SymbolList peptide) throws IllegalSymbolException {
+ 	double[] vMasses = getVMasses(peptide);
+ 	for(int i=0; i<vMasses.length; i++){
+ 	    vMasses[i] +=  getTermMass();
+ 	}
+ 
+ 	return vMasses; 
+     }
+     
+
+     private HashMap getVariableModMap() {
+ 	 return mVariableModPropertyHash;
+     }
+ 
     
-    private HashMap getSymbolPropertyMap()
-    {
+    private HashMap getSymbolPropertyMap(){
         return mSymbolPropertyHash;// = ProteinTools.getSymbolPropertyTable(name);
     }
 
@@ -290,6 +352,53 @@ public class MassCalc {
     public double getTermMass(){
         return termMass;
     }
+
+  /**
+      *
+      */
+     private double[] getVMasses(SymbolList peptide) throws IllegalSymbolException {
+ 	Set allMassList = new HashSet();
+ 	
+ 	Symbol sym = peptide.symbolAt(1);
+ 	if(!getSymbolPropertyMap().containsKey(sym)){
+ 	    String msg = "No mass Set for Symbol " + sym.getName();
+ 	    throw new IllegalSymbolException(msg);
+ 	}
+ 	
+ 	//Create a list for all masses of the current residue
+ 	List curResMasses = null;
+ 	if(getVariableModMap().containsKey(sym)){
+ 	    curResMasses = new LinkedList((List) getVariableModMap().get(sym));
+ 	}else{
+ 	    curResMasses = new LinkedList();
+ 	}
+ 	curResMasses.add(getSymbolPropertyMap().get(sym));
+ 	
+ 	//Move through all masses and calculate the masses of all of the sub peptides
+ 	Iterator it = curResMasses.iterator();
+ 	while(it.hasNext()){
+ 	    double resMass = ((Double)it.next()).doubleValue();
+ 	    if(peptide.length() == 1){
+ 		allMassList.add(new Double(resMass));
+ 	    }else{
+ 		//Get all masses of remaining peptide
+ 		double[] subMasses = getVMasses(peptide.subList(2, peptide.length()));
+ 		//Get next modified mass for symbol 
+ 		for(int i=0; i<subMasses.length; i++){
+ 		    double pepMass = resMass + subMasses[i];
+ 		    allMassList.add(new Double(pepMass));
+ 		}
+ 	    }
+ 	}
+ 	//Convert list to an array
+ 	double masses[] = new double[allMassList.size()];
+ 	int i=0;
+ 	for(Iterator mit = allMassList.iterator(); mit.hasNext(); i++){
+ 	    masses[i] = ((Double)mit.next()).doubleValue();
+ 	}
+  	return masses;
+     }
+ 
 
     private static double calcTermMass(String isotopicType, boolean MH_PLUS) {
         double termMass = 0.0;
@@ -311,4 +420,18 @@ public class MassCalc {
         }
         return termMass;
     }
+
+     private Symbol getSymbolForChar(char symbolToken) 
+	 throws IllegalSymbolException{
+ 	Iterator list = ProteinTools.getAlphabet().iterator();
+         SymbolTokenization toke;
+         try {
+             toke = ProteinTools.getAlphabet().getTokenization("token");
+         } catch (BioException ex) {
+             throw new BioError(ex, "Expected a tokenization");
+         }
+         
+         Symbol sym = toke.parseToken("" + symbolToken);	 
+ 	return sym;
+     }
 }
