@@ -213,7 +213,7 @@ class SocketDatabase implements Database {
 	try {
 	    sock = takeSocket();
 	    String _clazz = clazz;
-	    _clazz = Ace.decode(clazz);
+	    _clazz = AceUtils.decode(clazz);
 	    String result = sock.transact(
 					  "find " +
 					  _clazz +
@@ -231,7 +231,7 @@ class SocketDatabase implements Database {
 	    List nameList = new ArrayList();
 	    while (listToke.hasMoreTokens()) {
 		String l = listToke.nextToken();
-		Ace.encode(l);
+		AceUtils.encode(l);
 		if (l.startsWith("?") && l.endsWith("?")) {
 		    int indx = l.indexOf("?", 1);
 		    String itemClazz = l.substring(1, indx);
@@ -239,7 +239,7 @@ class SocketDatabase implements Database {
 		    if(itemName.startsWith("\\?")) {
 			itemName = itemName.substring(1);
 		    }
-		    itemName = Ace.encode(itemName);
+		    itemName = AceUtils.encode(itemName);
 		    nameList.add(itemName);
 		}
 	    }
@@ -293,9 +293,9 @@ class SocketDatabase implements Database {
 	    sock = takeSocket();
 	    String query =
 		"find " +
-		Ace.decode(clazz) +
+		AceUtils.decode(clazz) +
 		" " +
-		Ace.decode(name);
+		AceUtils.decode(name);
 	    String result = sock.transact(query);
 	    String tag = "// Found ";
 	    int indx = result.indexOf(tag) + tag.length();

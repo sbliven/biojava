@@ -76,13 +76,13 @@ public class AcePerlParser {
     } else if (ty.equals("tx")) {
   	  obj = new StaticStringValue(va, parent);
     } else if (ty.equals("ob")) {
-      va = Ace.encode(va);
-      cl = Ace.encode(cl);
+      va = AceUtils.encode(va);
+      cl = AceUtils.encode(cl);
 	    if (parent != null) {
         obj = new StaticReference(
           va,
           parent,
-          Ace.rootURL(parent.toURL()).relativeURL(cl)
+          AceUtils.rootURL(parent.toURL()).relativeURL(cl)
         );
 	    } else {
         obj = new StaticAceObject(
@@ -92,15 +92,15 @@ public class AcePerlParser {
         );
 	    }
     } else if (ty.equals("tg")) {
-	    obj = new StaticAceNode(Ace.encode(va), parent);
+	    obj = new StaticAceNode(AceUtils.encode(va), parent);
     } else if (ty.equals("model-node")) {
-      obj = new StaticModelNode(Ace.encode(va), parent);
+      obj = new StaticModelNode(AceUtils.encode(va), parent);
     } else if (ty.equals("model-reference")) {
-      obj = new StaticModelReference(Ace.encode(va), parent);
+      obj = new StaticModelReference(AceUtils.encode(va), parent);
     } else if (ty.equals("model-include")) {
-      obj = new StaticModelInclude(Ace.encode(va), parent);
+      obj = new StaticModelInclude(AceUtils.encode(va), parent);
     } else if (ty.equals("model-type")) {
-      obj = new StaticModelType(Ace.encode(va), parent);
+      obj = new StaticModelType(AceUtils.encode(va), parent);
     } else {
       throw new AceError("Don't know how to handle type " + ty);
     }

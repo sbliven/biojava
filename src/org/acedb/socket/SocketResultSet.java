@@ -94,7 +94,7 @@ public class SocketResultSet implements AceSet {
     }
 
     public AceSet retrieve(String name) throws AceException {
-      AceURL r = Ace.rootURL(url);
+      AceURL r = AceUtils.rootURL(url);
       String clazz = url.getFile();
       return Ace.fetch(r.relativeURL(clazz + '/' + name));
     }

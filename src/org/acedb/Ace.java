@@ -22,7 +22,6 @@
 package org.acedb;
 
 import java.util.*;
-import java.net.*;
 
 public class Ace {
     /**
@@ -66,7 +65,7 @@ public class Ace {
      */
 
     static Database getDatabase(AceURL url) throws AceException {
-      url = rootURL(url);
+      url = AceUtils.rootURL(url);
       System.out.println("Retrieving database for URL " + url);
       Database db = (Database) databases.get(url);
      
@@ -103,59 +102,6 @@ public class Ace {
     public static Connection getConnection(AceURL url) throws AceException {
 	Database db = getDatabase(url);
 	return db.getConnection();
-    }
-    
-    /**
-     * Get the root URL for a database.
-     */
-
-    public static AceURL rootURL(AceURL url) {
-	String protocol = url.getProtocol();
-	String userInfo = url.getUserInfo();
-	String authority = url.getAuthority();
-	String host = url.getHost();
-	int port = url.getPort();
-	return new AceURL(protocol, host, port, null, null, null, userInfo, authority);
-    }
-    
-    public static String encode(String s) {
-      s = URLEncoder.encode(s);
-      if(s.indexOf("%") != -1 || s.indexOf("-") != -1) {
-        StringBuffer sb = new StringBuffer(s);
-        for(int i = sb.length()-1; i >= 0; i--) {
-          if(sb.charAt(i) == '%') {
-            sb.setCharAt(i, '-');
-          } else if(sb.charAt(i) == '-') {
-            sb.insert(i, '-');
-          }
-        }
-        s = sb.toString();
-      }
-      return s;
-    }
-    
-    public static String decode(String s) throws AceException {
-//      System.out.println("decoding '" + s + "'");
-      if(s.indexOf("-") != -1) {
-        StringBuffer sb = new StringBuffer(s);
-        for(int i = 0; i < sb.length(); i++) {
-          if(sb.charAt(i) == '-') {
-            if(sb.charAt(i+1) == '-') {
-              sb.delete(i, i+1);
-            } else {
-              sb.setCharAt(i, '%');
-            }
-          }
-        }
-        s = sb.toString();
-      }
-      try {
-        s = URLDecoder.decode(s);
-      } catch (Exception e) {
-        throw new AceException(e, "Couldn't decode " + s);
-      }
-//      System.out.println("decoded as '" + s + "'");
-      return s;
     }
 }
 

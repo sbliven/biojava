@@ -68,7 +68,7 @@ public interface AceSet {
    * A URL that can be used to retrieve this set (assuming that the server will
    * still be there when you try).
    *
-   * @throws AceException if for any reason the URL can't be constructed
+   * @throws AceURLException if for any reason the URL can't be constructed
    */
   AceURL toURL() throws AceURLException;
   
