@@ -16,6 +16,7 @@ public class GenpeptSequenceDB
   private static SequenceFormat format;
   private static String DBName="Genpept";
   private boolean IOExceptionFound=false;
+  private boolean ExceptionFound=false;
   
   static 
   {
@@ -40,7 +41,7 @@ public class GenpeptSequenceDB
 	String db = seqURL.getDB();
 	String returnFormat = seqURL.getReturnFormat();
 	
-	String url = baseurl+db+"&"+returnFormat+"&id="+id;
+	String url = baseurl+db+"&id="+id;
 	
     return new URL (url);
   }
@@ -53,9 +54,9 @@ public class GenpeptSequenceDB
 	if (!(baseurl.equalsIgnoreCase("")))
 		baseurl = seqURL.getbaseURL();
 	String db = seqURL.getDB();
-	String returnFormat = seqURL.getReturnFormat();
+//	String returnFormat = seqURL.getReturnFormat();
 	
-	String url = baseurl+db+"&"+returnFormat+"&id="+id;
+	String url = baseurl+db+"&id="+id;
 	
     return new URL (url);
   }
@@ -70,6 +71,7 @@ public class GenpeptSequenceDB
     try 
 	{
 	  IOExceptionFound=false;
+	  ExceptionFound=false;
       URL queryURL = getAddress(id);//achieve URL based on ID      
    //   System.err.println("query is "+ queryURL.toString());
       SequenceFormat sFormat = getSequenceFormat();//get incoming sequence format
@@ -87,6 +89,7 @@ public class GenpeptSequenceDB
 	{
 	  System.out.println (e.toString());
 	  IOExceptionFound=true;
+	  ExceptionFound=true;
       return null;
     } 
   }
@@ -94,5 +97,10 @@ public class GenpeptSequenceDB
   public boolean checkIOException()
   {
 	return IOExceptionFound;
+  }
+  
+  public boolean checkException()
+  {
+	return ExceptionFound;  
   }
 }

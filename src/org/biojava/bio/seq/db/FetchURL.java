@@ -3,7 +3,7 @@
  * accessing web-based sequences in NCBI and Swiss-prot, pubmed articles and locuslinks.
  */
 
-package org.biojava.bio.seq.db;
+//package org.biojava.bio.seq.db;
 
 import java.net.*;
 
@@ -24,8 +24,8 @@ public class FetchURL
 			||databaseName.trim().equalsIgnoreCase("nucleotide"))
 		{
 			db = "nucleotide";	
-			rettype = format;
-			retmode = format;
+		//	rettype = format;
+		//	retmode = format;
 		}
 		if (databaseName.trim().equalsIgnoreCase("genpept")
 			||databaseName.trim().equalsIgnoreCase("protein"))

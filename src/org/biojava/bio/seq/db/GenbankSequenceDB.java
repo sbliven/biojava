@@ -17,7 +17,8 @@ public class GenbankSequenceDB
 {
   private static SequenceFormat format;//return format of the sequence
   private static String DBName="Genbank";//predefined the database name -- Genbank
-  private boolean IOExceptionFound=false;//
+  private boolean IOExceptionFound=false;//check if IOException is found
+  private boolean ExceptionFound=false;//check if any exception is found
   
   static 
   {
@@ -44,9 +45,9 @@ public class GenbankSequenceDB
 	FetchURL seqURL = new FetchURL(DBName, defaultReturnFormat);
 	String baseurl = seqURL.getbaseURL();
 	String db = seqURL.getDB();
-	String returnFormat = seqURL.getReturnFormat();
+	//String returnFormat = seqURL.getReturnFormat();
 	
-	String url = baseurl+db+"&"+returnFormat+"&id="+id;
+	String url = baseurl+db+"&id="+id;
 	
     return new URL (url);
   }
@@ -62,10 +63,9 @@ public class GenbankSequenceDB
 	if (!(baseurl.equalsIgnoreCase("")))
 		baseurl = seqURL.getbaseURL();
 	String db = seqURL.getDB();
-	String returnFormat = seqURL.getReturnFormat();
-	
-	String url = baseurl+db+"&"+returnFormat+"&id="+id;
-	
+//	String returnFormat = seqURL.getReturnFormat();
+//	String url = baseurl+db+"&"+returnFormat+"&id="+id;
+	String url = baseurl+db+"&id="+id;
     return new URL (url);
   }
   
@@ -79,6 +79,7 @@ public class GenbankSequenceDB
     try 
 	{
 	  IOExceptionFound=false;
+	  ExceptionFound=false;
       URL queryURL = getAddress(id);//get URL based on ID      
     //  System.err.println("query is "+ queryURL.toString());
       SequenceFormat sFormat = getSequenceFormat();//get incoming sequence format
@@ -94,7 +95,9 @@ public class GenbankSequenceDB
     } 
 	catch ( Exception e )
 	{
+	  System.out.println ("Exception found in GenbankSequenceDB -- getSequence");
       System.out.println (e.toString());
+	  ExceptionFound=true;
 	  IOExceptionFound=true;
 	  return null;
     } 
@@ -103,5 +106,10 @@ public class GenbankSequenceDB
   public boolean checkIOException()
   {
 	return IOExceptionFound;  
+  }
+  
+  public boolean checkException()
+  {
+	return ExceptionFound;  
   }
 }
