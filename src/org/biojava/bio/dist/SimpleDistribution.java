@@ -23,7 +23,7 @@
 package org.biojava.bio.dist;
 
 import java.util.*;
-import java.io.Serializable;
+import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
@@ -34,70 +34,72 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Mark Schreiber
  */
 
 public class SimpleDistribution
 extends AbstractDistribution
 implements Serializable {
-  private FiniteAlphabet alphabet;
   private transient AlphabetIndex indexer;
-  private transient ChangeListener indexerListener;
   private double[] weights = null;
   private Distribution nullModel;
-  
-    private AlphabetIndex getIndexer() {
-	if (indexer == null) {
-	    this.indexer = AlphabetManager.getAlphabetIndex(alphabet);
-	    this.indexerListener = new ChangeAdapter() {
-		public void preChange(ChangeEvent ce) throws ChangeVetoException {
-		    if(hasWeights()) {
-			throw new ChangeVetoException(
-						      ce,
-						      "Can't allow the index to change as we have probabilities."
-						      );
-		    }
-		}
-	    } ;
-	    indexer.addChangeListener(indexerListener, AlphabetIndex.INDEX);
-	}
+  private FiniteAlphabet alpha;
 
-	return indexer;
-    }
+  /**
+   * This method is needed so that indexer is rebuilt when this object is deserialized
+   */
+  private void readObject(ObjectInputStream stream) throws IOException,ClassNotFoundException{
+    stream.defaultReadObject();
+    this.indexer = AlphabetManager.getAlphabetIndex(alpha);
+    indexer.addChangeListener(
+      new ChangeAdapter() {
+        public void preChange(ChangeEvent ce) throws ChangeVetoException {
+          if(hasWeights()) {
+            throw new ChangeVetoException(
+              ce,
+              "Can't allow the index to change as we have probabilities."
+            );
+          }
+        }
+      },
+      AlphabetIndex.INDEX
+    );
+  }
 
-    public Alphabet getAlphabet() {
-	return alphabet;
-    }
-  
+  public Alphabet getAlphabet() {
+    return indexer.getAlphabet();
+  }
+
   public Distribution getNullModel() {
     return this.nullModel;
   }
-  
+
   protected void setNullModelImpl(Distribution nullModel)
   throws IllegalAlphabetException, ChangeVetoException {
     this.nullModel = nullModel;
   }
-  
+
   protected boolean hasWeights() {
     return weights != null;
   }
-  
+
   protected double[] getWeights() {
     if(weights == null) {
-      weights = new double[getIndexer().getAlphabet().size()];
+      weights = new double[indexer.getAlphabet().size()];
       for(int i = 0; i < weights.length; i++) {
         weights[i] = Double.NaN;
       }
-	}
-	
-	return weights;
+        }
+
+        return weights;
   }
-  
+
   public double getWeightImpl(AtomicSymbol s)
   throws IllegalSymbolException {
     if(!hasWeights()) {
       return Double.NaN;
     } else {
-      return weights[getIndexer().indexForSymbol(s)];
+      return weights[indexer.indexForSymbol(s)];
     }
   }
 
@@ -110,12 +112,26 @@ implements Serializable {
         s.getName() + " -> " + w
       );
     }
-    weights[getIndexer().indexForSymbol(s)] = w;
+    weights[indexer.indexForSymbol(s)] = w;
   }
-  
+
   public SimpleDistribution(FiniteAlphabet alphabet) {
-      this.alphabet = alphabet;
-    
+    this.alpha = alphabet;
+    this.indexer = AlphabetManager.getAlphabetIndex(alphabet);
+    indexer.addChangeListener(
+      new ChangeAdapter() {
+        public void preChange(ChangeEvent ce) throws ChangeVetoException {
+          if(hasWeights()) {
+            throw new ChangeVetoException(
+              ce,
+              "Can't allow the index to change as we have probabilities."
+            );
+          }
+        }
+      },
+      AlphabetIndex.INDEX
+    );
+
     try {
       setNullModel(new UniformDistribution(alphabet));
     } catch (Exception e) {
@@ -130,14 +146,14 @@ implements Serializable {
   public void registerWithTrainer(DistributionTrainerContext dtc) {
    dtc.registerTrainer(this, new Trainer());
   }
-  
+
   protected class Trainer implements DistributionTrainer {
     private final Count counts;
-    
+
     public Trainer() {
-      counts = new IndexedCount(getIndexer());
+      counts = new IndexedCount(indexer);
     }
-    
+
     public void addCount(DistributionTrainerContext dtc, AtomicSymbol sym, double times)
     throws IllegalSymbolException {
       try {
@@ -148,12 +164,12 @@ implements Serializable {
         );
       }
     }
-    
+
     public double getCount(DistributionTrainerContext dtc, AtomicSymbol sym)
     throws IllegalSymbolException {
       return counts.getCount(sym);
     }
-    
+
     public void clearCounts(DistributionTrainerContext dtc) {
       try {
         int size = ((FiniteAlphabet) counts.getAlphabet()).size();
@@ -166,7 +182,7 @@ implements Serializable {
         );
       }
     }
-    
+
     public void train(DistributionTrainerContext dtc, double weight)
     throws ChangeVetoException {
       if(changeSupport == null)  {
@@ -183,16 +199,16 @@ implements Serializable {
         }
       }
     }
-    
+
     protected void trainImpl(DistributionTrainerContext dtc, double weight) {
       try {
         Distribution nullModel = getNullModel();
-		double[] weights = getWeights();
+                double[] weights = getWeights();
         double []total = new double[weights.length];
         double sum = 0.0;
         for(int i = 0; i < total.length; i++) {
-          AtomicSymbol s = (AtomicSymbol) getIndexer().symbolForIndex(i);
-          sum += total[i] = 
+          AtomicSymbol s = (AtomicSymbol) indexer.symbolForIndex(i);
+          sum += total[i] =
             getCount(dtc, s) +
             nullModel.getWeight(s) * weight;
         }
