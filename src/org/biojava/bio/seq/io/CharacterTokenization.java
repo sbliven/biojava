@@ -46,6 +46,7 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Keith James
  * @since 1.2
  */
 
@@ -187,7 +188,7 @@ public class CharacterTokenization
     }
 
     public String tokenizeSymbol(Symbol s) throws IllegalSymbolException {
-	return "" + _tokenizeSymbol(s).charValue();
+        return String.valueOf(_tokenizeSymbol(s).charValue());
     }
 
     public String tokenizeSymbolList(SymbolList sl)
@@ -209,7 +210,6 @@ public class CharacterTokenization
 
 	return sb.substring(0);
     }
-
 
     public StreamParser parseStream(SeqIOListener listener) {
 	return new TPStreamParser(listener);

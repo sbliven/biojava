@@ -100,6 +100,14 @@ public interface SequenceFormat
     public static final int AA = 1 << 27;
 
     /**
+     * <code>INTEGER</code> indicates that a sequence contains integer
+     * alphabet symbols, such as used to describe sequence quality
+     * data. The fifth bit of the most significant byte of the int is
+     * set.
+     */
+    public static final int INTEGER = 1 << 28;
+
+    /**
      * <code>UNKNOWN</code> indicates that the sequence format is
      * unknown.
      */
@@ -166,7 +174,14 @@ public interface SequenceFormat
      * <code>GFF</code> indicates that the sequence format is GFF.
      */
     public static final int GFF = 20;
-    
+
+    /**
+     * <code>PHRED</code> indicates that the sequence format is
+     * PHRED. As PHRED is always DNA and contains integer quality
+     * data, the DNA and INTEGER bits are already set.
+     */
+    public static final int PHRED = 30 | DNA | INTEGER;
+
     /**
      * Read a sequence and pass data on to a SeqIOListener.
      *
@@ -187,9 +202,9 @@ public interface SequenceFormat
      * @throws BioException if there is an error in the format of the
      * stream.
      */
-    public boolean readSequence(BufferedReader      reader,
-				SymbolTokenization  symParser,
-				SeqIOListener       listener)
+    public boolean readSequence(BufferedReader     reader,
+				SymbolTokenization symParser,
+				SeqIOListener      listener)
 	throws BioException, IllegalSymbolException, IOException;
 
     /**

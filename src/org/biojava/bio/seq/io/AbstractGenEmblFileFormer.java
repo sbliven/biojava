@@ -24,14 +24,8 @@ package org.biojava.bio.seq.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.text.BreakIterator;
+import java.util.*;
 
 import javax.xml.parsers.*;
 
@@ -45,9 +39,10 @@ import org.xml.sax.InputSource;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
+import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.RemoteFeature;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -68,10 +63,11 @@ class AbstractGenEmblFileFormer
 
     static
     {
-        // This loads an XML file containing information on which
-        // qualifiers are valid (or even mandatory) for a particular
-        // feature key. It also indicates whether the value should be
-        // contained within quotes.
+        /* This loads an XML file containing information on which
+         * qualifiers are valid (or even mandatory) for a particular
+         * feature key. It also indicates whether the value should be
+         * contained within quotes.
+         */
         loadFeatureData(FEATURE_DATA_FILE, FEATURE_DATA, QUALIFIER_DATA);
     }
 
@@ -81,25 +77,90 @@ class AbstractGenEmblFileFormer
      * which is too wide, but may be wrapped without breaking tokens,
      * FIT - a line which is short enough to add without wrapping it.
      */
-    private static final int FIRST    = 0;
-    private static final int OVERWIDE = 1;
-    private static final int NOFIT    = 2;
-    private static final int FIT      = 3;
+    static final int FIRST    = 0;
+    static final int OVERWIDE = 1;
+    static final int NOFIT    = 2;
+    static final int FIT      = 3;
 
     /* Defines the various types of Location available. Each is
      * represented differently within an EMBL/Genbank flatfile.
      */
-    private static final int            RANGE = 0;
-    private static final int            POINT = 1;
-    private static final int      FUZZY_RANGE = 2;
-    private static final int      FUZZY_POINT = 3;
-    private static final int BETWEEN_LOCATION = 4;
-
-    // Utility formatting buffer
-    private StringBuffer ub = new StringBuffer();
+    static final int            RANGE = 0;
+    static final int            POINT = 1;
+    static final int      FUZZY_RANGE = 2;
+    static final int      FUZZY_POINT = 3;
+    static final int BETWEEN_LOCATION = 4;
 
     // Get separator for system
     String nl = System.getProperty("line.separator");
+
+    SymbolTokenization dnaTokenization;
+    AlphabetIndex dnaIndex;
+
+    int aCount, cCount, gCount, tCount, oCount;
+    Symbol a, c , g, t;
+
+    {
+        dnaIndex = AlphabetManager.getAlphabetIndex(DNATools.getDNA());
+        a = DNATools.a();
+        c = DNATools.c();
+        g = DNATools.g();
+        t = DNATools.t();
+
+        try
+        {
+            dnaTokenization = DNATools.getDNA().getTokenization("token");
+        }
+        catch (Exception e)
+        {
+            throw new BioError(e, "Couldn't initialize tokenizer for the DNA alphabet");
+        }
+    }
+
+    /**
+     * <code>formatSequenceProperty</code> formats text into
+     * EMBL/Genbank style header lines.
+     *
+     * @param sb a <code>StringBuffer</code>.
+     * @param text a <code>String</code> to format.
+     * @param leader a <code>String</code> to append to the start of
+     * each line.
+     * @param wrapWidth an <code>int</code> indicating the number of
+     * columns per line.
+     *
+     * @return a <code>StringBuffer</code>.
+     */
+    StringBuffer formatSequenceProperty(StringBuffer sb,
+                                        String       text,
+                                        String       leader,
+                                        int          wrapWidth)
+    {
+        BreakIterator boundary = BreakIterator.getLineInstance();
+        boundary.setText(text);
+        int start = boundary.first();
+        int end = boundary.next();
+        int lineLength = 0;
+
+        sb.append(leader);
+        while (end != BreakIterator.DONE)
+        {
+            String word = text.substring(start, end);
+            lineLength = lineLength + word.length();
+
+            if (lineLength >= wrapWidth)
+            {
+                sb.append(nl);
+                sb.append(leader);
+                lineLength = word.length();
+            }
+
+            sb.append(word);
+            start = end;
+            end = boundary.next();
+        }
+
+        return sb;
+    }
 
     /**
      * <code>formatQualifierBlock</code> formats text into
@@ -110,6 +171,7 @@ class AbstractGenEmblFileFormer
      * each line.
      * @param wrapWidth an <code>int</code> indicating the number of
      * columns per line.
+     *
      * @return a <code>StringBuffer</code>.
      */
     StringBuffer formatQualifierBlock(StringBuffer sb,
@@ -129,6 +191,7 @@ class AbstractGenEmblFileFormer
         {
             String s = t.nextToken();
             String separator = "";
+            int tokenLen = s.length();
 
             // The first token has to be treated differently. It
             // always starts immediately after the '=' character
@@ -136,9 +199,9 @@ class AbstractGenEmblFileFormer
             {
                 separator = " ";
 
-                if (s.length() + 1 > wrapWidth)
+                if (tokenLen + 1 > wrapWidth)
                     tokenType = OVERWIDE;
-                else if (position + s.length() + 1 > wrapWidth)
+                else if (position + tokenLen + 1 > wrapWidth)
                     tokenType = NOFIT;
                 else
                     tokenType = FIT;
@@ -150,7 +213,7 @@ class AbstractGenEmblFileFormer
                     // The first line always always starts immediately
                     // after the '=' character, even if it means
                     // forcing a break
-                    if (! (position + s.length() > wrapWidth))
+                    if (! (position + tokenLen > wrapWidth))
                     {
                         sb.append(s);
                         position += s.length();
@@ -162,30 +225,34 @@ class AbstractGenEmblFileFormer
                 case OVERWIDE:
                     // Force breaks in the token until the end is
                     // reached
-                    for (int i = 0; i < s.length(); i++)
+                    for (int i = 0; i < tokenLen; i++)
                     {
                         if (position == wrapWidth)
                         {
-                            sb.append(nl + leader);
+                            sb.append(nl);
+                            sb.append(leader);
                             position = leader.length();
                         }
                         sb.append(s.charAt(i));
                         position++;
                     }
 
-                    position = s.length() % wrapWidth;
+                    position = tokenLen % wrapWidth;
                     break;
 
                 case NOFIT:
                     // Token won't fit, so pass it to the next line
-                    sb.append(nl + leader + s);
-                    position = s.length() + leader.length();
+                    sb.append(nl);
+                    sb.append(leader);
+                    sb.append(s);
+                    position = tokenLen + leader.length();
                     break;
 
                 case FIT:
                     // Token fits on this line
-                    sb.append(separator + s);
-                    position += (s.length() + 1);
+                    sb.append(separator);
+                    sb.append(s);
+                    position += (tokenLen + 1);
                     break;
 
                 default:
@@ -210,7 +277,8 @@ class AbstractGenEmblFileFormer
      */
     StringBuffer formatQualifier(StringBuffer sb, Object key, Object value)
     {
-        sb.append("/" + key);
+        sb.append('/');
+        sb.append(key);
 
         // Default is to quote unknown qualifiers
         String form = "quoted";
@@ -221,15 +289,26 @@ class AbstractGenEmblFileFormer
         // qualifier which are unquoted unless they contain
         // spaces. We all love special cases, don't we?
         if (form.equals("quoted"))
-            sb.append("=\"" + value + "\"");
+        {
+            sb.append("=\"");
+            sb.append(value);
+            sb.append("\"");
+        }
         else if (form.equals("bare"))
-            sb.append("=" + value);
+        {
+            sb.append('=');
+            sb.append(value);
+        }
         else if (form.equals("paren"))
-            sb.append("(" + value + ")");
+        {
+            sb.append('(');
+            sb.append(value);
+            sb.append(')');
+        }
         else if (! form.equals("empty"))
         {
-            System.err.println("Unrecognised qualifier format: " + form);
-            sb.append("=" + value);
+            sb.append('=');
+            sb.append(value);
         }
 
         return sb;
@@ -256,20 +335,21 @@ class AbstractGenEmblFileFormer
         for (int i = 0; i < syms.length; i++)
         {
             sb.append(tokenization.tokenizeSymbol(syms[i]));
-            if ((i > 0) && ((i + 1) % blockSize == 0))
+            if ((i + 1) % blockSize == 0)
                 sb.append(' ');
         }
         return sb;
     }
 
     /**
-     * Formats the location of a feature.  This version is required when
-     * formatting remote locations, since the location field of a remote
-     * feature is the projection of that feature on the sequence.  When a
-     * distinction is made between 'order' and 'join' this method will likely
-     * be extended for that also.
+     * Formats the location of a feature.  This version is required
+     * when formatting remote locations, since the location field of a
+     * remote feature is the projection of that feature on the
+     * sequence.  When a distinction is made between 'order' and
+     * 'join' this method will likely be extended for that also.
      *
      * @param theFeature The feature with the location to format
+     *
      * @return String The formatted location
      */
     public String formatLocation(Feature theFeature)
@@ -295,19 +375,20 @@ class AbstractGenEmblFileFormer
             StringBuffer tempBuffer = new StringBuffer();
             List regionList = ((RemoteFeature)theFeature).getRegions();
 
-            if(regionList.size() > 1)
+            if (regionList.size() > 1)
             {
                 tempBuffer.append(joinType);
-                tempBuffer.append("(");
+                tempBuffer.append('(');
             }
+
             java.util.ListIterator tempIterator = regionList.listIterator();
 
-            while(tempIterator.hasNext())
+            while (tempIterator.hasNext())
             {
                 // Set up remote location
                 RemoteFeature.Region tempRegion = (RemoteFeature.Region)(tempIterator.next());
 
-                if(tempRegion.getSeqID() != null)
+                if (tempRegion.getSeqID() != null)
                 {
                     tempBuffer.append(tempRegion.getSeqID());
                     tempBuffer.append(':');
@@ -315,7 +396,7 @@ class AbstractGenEmblFileFormer
 
                 // Add the actual location
                 String tempLocation = null;
-                if(theFeature instanceof StrandedFeature)
+                if (theFeature instanceof StrandedFeature)
                 {
                     featureStrand = ((StrandedFeature)theFeature).getStrand();
                 }
@@ -323,22 +404,22 @@ class AbstractGenEmblFileFormer
                 tempBuffer.append(tempLocation);
 
                 // Only have commas between two subregions
-                if(tempIterator.hasNext())
+                if (tempIterator.hasNext())
                 {
                     tempBuffer.append(',');
                 }
             }
 
             // Close out the join block if needed
-            if(regionList.size() > 1)
+            if (regionList.size() > 1)
             {
                 tempBuffer.append(')');
             }
-            formattedLocation = tempBuffer.toString();
+            formattedLocation = tempBuffer.substring(0);
         }
         else
         {
-            if(theFeature instanceof StrandedFeature)
+            if (theFeature instanceof StrandedFeature)
             {
                 featureStrand = ((StrandedFeature)theFeature).getStrand();
             }
@@ -378,7 +459,6 @@ class AbstractGenEmblFileFormer
                                               "",
                                               Integer.MAX_VALUE,
                                               "join");
-
         return sb.substring(0);
     }
 
@@ -433,7 +513,7 @@ class AbstractGenEmblFileFormer
      *
      * To preserve the join/order distinction; and to format locations like
      * AL123465:(123..567), use the formatLocation(Feature) method.
-	 *
+     *
      * @param loc a <code>Location</code> to use as a template.
      * @param strand an <code>int</code> indicating the
      * <code>Location</code>'s strand.
@@ -475,7 +555,7 @@ class AbstractGenEmblFileFormer
                                      int          strand,
                                      String       leader,
                                      int          wrapWidth,
-                                     String	      joinType)
+                                     String       joinType)
     {
         // Indicates how many characters have been added to the
         // current line
@@ -502,7 +582,7 @@ class AbstractGenEmblFileFormer
         {
             join = true;
             sb.append(joinType);
-            sb.append("(");
+            sb.append('(');
             position += 5;
         }
 
@@ -536,44 +616,44 @@ class AbstractGenEmblFileFormer
             else
                 locType = RANGE;
 
-            ub.setLength(0);
+            StringBuffer lb = new StringBuffer();
             switch (locType)
             {
                 case POINT:
                     PointLocation pl = (PointLocation) thisLoc;
 
                     sb.append(complement                                     ?
-                              toComplement(formatPoint(ub, pl).substring(0)) :
-                              formatPoint(ub, pl).substring(0));
+                              toComplement(formatPoint(lb, pl).substring(0)) :
+                              formatPoint(lb, pl).substring(0));
                     break;
 
                 case FUZZY_RANGE:
                     FuzzyLocation fl = (FuzzyLocation) thisLoc;
 
                     sb.append(complement                                          ?
-                              toComplement(formatFuzzyRange(ub, fl).substring(0)) :
-                              formatFuzzyRange(ub, fl).substring(0));
+                              toComplement(formatFuzzyRange(lb, fl).substring(0)) :
+                              formatFuzzyRange(lb, fl).substring(0));
                     break;
 
                 case FUZZY_POINT:
                     FuzzyPointLocation fpl = (FuzzyPointLocation) thisLoc;
 
                     sb.append(complement                                           ?
-                              toComplement(formatFuzzyPoint(ub, fpl).substring(0)) :
-                              formatFuzzyPoint(ub, fpl).substring(0));
+                              toComplement(formatFuzzyPoint(lb, fpl).substring(0)) :
+                              formatFuzzyPoint(lb, fpl).substring(0));
                     break;
 
                 case RANGE:
                     RangeLocation rl = (RangeLocation) thisLoc;
 
                     sb.append(complement                                     ?
-                              toComplement(formatRange(ub, rl).substring(0)) :
-                              formatRange(ub, rl).substring(0));
+                              toComplement(formatRange(lb, rl).substring(0)) :
+                              formatRange(lb, rl).substring(0));
                     break;
 
                 case BETWEEN_LOCATION:
                     BetweenLocation tempLocation = (BetweenLocation) thisLoc;
-                    String formattedLocation = formatBetween(ub, tempLocation).toString();
+                    String formattedLocation = formatBetween(lb, tempLocation).toString();
                     if (complement)
                     {
                         formattedLocation = toComplement(formattedLocation);
@@ -588,7 +668,7 @@ class AbstractGenEmblFileFormer
 
             // If there is another location after this
             if ((locs.indexOf(thisLoc) + 1) < locs.size())
-                sb.append(",");
+                sb.append(',');
 
             post = sb.length();
 
@@ -610,7 +690,7 @@ class AbstractGenEmblFileFormer
 
         if (join)
         {
-            sb.append(")");
+            sb.append(')');
             // If adding the ")" has made the line too long, move the
             // last range to the next line
             if ((position + 1) > wrapWidth)
@@ -628,7 +708,8 @@ class AbstractGenEmblFileFormer
      * <code>formatFuzzyRange</code> creates an EMBL/Genbank style
      * String representation of a <code>FuzzyLocation</code>.
      *
-     * @param sb a <code>StringBuffer</code> to format the location into.
+     * @param sb a <code>StringBuffer</code> to format the location
+     * into.
      * @param fl a <code>FuzzyLocation</code>.
      *
      * @return a <code>String</code> representation of the location.
@@ -638,15 +719,15 @@ class AbstractGenEmblFileFormer
         if (! fl.hasBoundedMin())
         {
             // <123
-            sb.append("<");
+            sb.append('<');
             sb.append(fl.getMin());
         }
         else if (fl.getOuterMin() != fl.getInnerMin())
         {
             // (123.567)
-            sb.append("(" + fl.getOuterMin());
-            sb.append(".");
-            sb.append(fl.getInnerMin() + ")");
+            sb.append('(' + fl.getOuterMin());
+            sb.append('.');
+            sb.append(fl.getInnerMin() + ')');
         }
         else
         {
@@ -659,15 +740,15 @@ class AbstractGenEmblFileFormer
         if (! fl.hasBoundedMax())
         {
             // >567
-            sb.append(">");
+            sb.append('>');
             sb.append(fl.getMax());
         }
         else if (fl.getInnerMax() != fl.getOuterMax())
         {
             // (567.789)
-            sb.append("(" + fl.getInnerMax());
-            sb.append(".");
-            sb.append(fl.getOuterMax() + ")");
+            sb.append('(' + fl.getInnerMax());
+            sb.append('.');
+            sb.append(fl.getOuterMax() + ')');
         }
         else
         {
@@ -692,21 +773,21 @@ class AbstractGenEmblFileFormer
         if (! fpl.hasBoundedMin())
         {
             // <123
-            sb.append("<");
+            sb.append('<');
             sb.append(fpl.getMax());
         }
         else if (! fpl.hasBoundedMax())
         {
             // >567
-            sb.append(">");
+            sb.append('>');
             sb.append(fpl.getMin());
         }
         else
         {
             // (567.789)
-            sb.append("(" + fpl.getMin());
-            sb.append(".");
-            sb.append(fpl.getMax() + ")");
+            sb.append('(' + fpl.getMin());
+            sb.append('.');
+            sb.append(fpl.getMax() + ')');
         }
 
         return sb;
@@ -813,7 +894,9 @@ class AbstractGenEmblFileFormer
             NodeList featureNodes = doc.getDocumentElement().getChildNodes();
 
             // For nodes in root element (features)
-            for (int i = 0; i < featureNodes.getLength(); i++)
+            int fNodeCount = featureNodes.getLength();
+
+            for (int i = 0; i < fNodeCount; i++)
             {
                 Node featureNode = featureNodes.item(i);
                 if (! (featureNode instanceof Element))
@@ -829,7 +912,8 @@ class AbstractGenEmblFileFormer
                     NodeList qualifierNodes = feature.getChildNodes();
 
                     // For nodes in each feature (qualifiers)
-                    for (int j = 0; j < qualifierNodes.getLength(); j++)
+                    int qNodeCount = qualifierNodes.getLength();
+                    for (int j = 0; j < qNodeCount; j++)
                     {
                         Node qualifierNode = qualifierNodes.item(j);
                         if (! (qualifierNode instanceof Element))
@@ -866,7 +950,9 @@ class AbstractGenEmblFileFormer
         catch (BioError be)
         {
             be.printStackTrace();
-        } catch (ParserConfigurationException ex) {
+        }
+        catch (ParserConfigurationException ex)
+        {
             ex.printStackTrace();
         }
     }

@@ -135,7 +135,8 @@ public class EmblProcessor
                 if (value != null)
                 {
                     String featureLine = value.toString();
-                    if((key.equals("FT")) && (featureLine.charAt(0) != ' '))
+                    if((key.equals(EmblLikeFormat.FEATURE_TABLE_TAG)) &&
+                       (featureLine.charAt(0) != ' '))
                     {
                         // If the offending feature is past, start reading data again
                         mBadFeature = false;
@@ -147,12 +148,13 @@ public class EmblProcessor
             else
             {
                 // Tidy up any end-of-block jobbies
-                if (features.inFeature() && !key.equals("FT"))
+                if (features.inFeature() &&
+                    !key.equals(EmblLikeFormat.FEATURE_TABLE_TAG))
                 {
                     features.endFeature();
                 }
 
-                if (key.equals("FT"))
+                if (key.equals(EmblLikeFormat.FEATURE_TABLE_TAG))
                 {
                     String featureLine = value.toString();
                     if (featureLine.charAt(0) != ' ')
@@ -171,7 +173,7 @@ public class EmblProcessor
                 {
                     getDelegate().addSequenceProperty(key, value);
 
-                    if (key.equals("AC"))
+                    if (key.equals(EmblLikeFormat.ACCESSION_TAG))
                     {
                         String acc = value.toString();
                         StringTokenizer toke = new StringTokenizer(acc, "; ");
@@ -180,7 +182,7 @@ public class EmblProcessor
                             accessions.add(toke.nextToken());
                         }
                     }
-                    else if (key.equals("ID")) {
+                    else if (key.equals(EmblLikeFormat.ID_TAG)) {
                         StringTokenizer toke = new StringTokenizer((String) value);
                         getDelegate().setName(toke.nextToken());
                     }
@@ -191,64 +193,68 @@ public class EmblProcessor
         {
             // If an exception is thrown, read past the offending feature
             mBadFeature = true;
-            ParseErrorEvent offendingLineEvent = new ParseErrorEvent(this, "This line could not be parsed: " + value.toString());
+            ParseErrorEvent offendingLineEvent =
+                new ParseErrorEvent(this, "This line could not be parsed: "
+                                    + value.toString());
             this.notifyParseErrorEvent(offendingLineEvent);
         }
         catch (IndexOutOfBoundsException ex)
         {
             // This occurs when for some line min > max
             mBadFeature = true;
-            ParseErrorEvent offendingLineEvent = new ParseErrorEvent(this, "From must be less than To: " + value.toString());
+            ParseErrorEvent offendingLineEvent =
+                new ParseErrorEvent(this, "From must be less than To: "
+                                    + value.toString());
             this.notifyParseErrorEvent(offendingLineEvent);
         }
     }
 
-	/**
-	 * Adds a parse error listener to the list of listeners if it isn't already
-	 * included.
-	 *
-	 * @param theListener Listener to be added.
-	 */
-	public synchronized void addParseErrorListener(ParseErrorListener theListener)
-	{
-		if(mListeners.contains(theListener) == false)
-		{
-			mListeners.addElement(theListener);
-		}
-	}
+    /**
+     * Adds a parse error listener to the list of listeners if it isn't already
+     * included.
+     *
+     * @param theListener Listener to be added.
+     */
+    public synchronized void addParseErrorListener(ParseErrorListener theListener)
+    {
+        if (mListeners.contains(theListener) == false)
+        {
+            mListeners.addElement(theListener);
+        }
+    }
 
-	/**
-	 * Removes a parse error listener from the list of listeners if it is
-	 * included.
-	 *
-	 * @param theListener Listener to be removed.
-	 */
-	public synchronized void removeParseErrorListener(ParseErrorListener theListener)
-	{
-		if(mListeners.contains(theListener) == true)
-		{
-			mListeners.removeElement(theListener);
-		}
-	}
+    /**
+     * Removes a parse error listener from the list of listeners if it is
+     * included.
+     *
+     * @param theListener Listener to be removed.
+     */
+    public synchronized void removeParseErrorListener(ParseErrorListener theListener)
+    {
+        if (mListeners.contains(theListener) == true)
+        {
+            mListeners.removeElement(theListener);
+        }
+    }
 
-	// Protected methods
-	/**
-	 * Passes the event on to all the listeners registered for ParseErrorEvents.
-	 *
-	 * @param theEvent The event to be handed to the listeners.
-	 */
-	protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
-	{
-		Vector listeners;
-		synchronized(this)
-		{
-			listeners = (Vector)mListeners.clone();
-		}
+    // Protected methods
+    /**
+     * Passes the event on to all the listeners registered for ParseErrorEvents.
+     *
+     * @param theEvent The event to be handed to the listeners.
+     */
+    protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
+    {
+        Vector listeners;
+        synchronized(this)
+        {
+            listeners = (Vector)mListeners.clone();
+        }
 
-		for (int index = 0; index < listeners.size(); index++)
-		{
-			ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
-			client.BadLineParsed(theEvent);
-		}
-	}
+        for (int index = 0; index < listeners.size(); index++)
+        {
+            ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
+            client.BadLineParsed(theEvent);
+        }
+    }
 }

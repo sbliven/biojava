@@ -31,21 +31,25 @@ import java.util.StringTokenizer;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioError;
-import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.*;
 
 /**
- * <code>EmblFileFormer</code> performs the detailed formatting of
- * EMBL entries for writing to a PrintStream. There is some code
- * duplication with <code>GenbankFileFormer</code> which could be
- * factored out.
+ * <p><code>EmblFileFormer</code> performs the detailed formatting of
+ * EMBL entries for writing to a <code>PrintStream</code>. Currently
+ * the formatting of the header is not correct. This really needs to
+ * be addressed in the parser which is merging fields which should
+ * remain separate.</p>
+ *
+ * <p>The event generator used to feed events to this class should
+ * enforce ordering of those events. This class will stream data
+ * directly to the <code>PrintStream</code></p>.
+ *
+ * <p>This implementation requires that all the symbols be added in
+ * one block as is does not buffer the tokenized symbols between
+ * calls.</p>
  *
  * @author Keith James
  * @since 1.2
@@ -53,40 +57,36 @@ import org.biojava.bio.symbol.Symbol;
 public class EmblFileFormer extends AbstractGenEmblFileFormer
     implements SeqFileFormer
 {
-    private ArrayList    fStack = new ArrayList();
-    private PrintStream  stream;
+    // Tags which are special cases, not having "XX" after them
+    private static List NON_SEPARATED_TAGS = new ArrayList();
 
-    // Main sequence formatting buffer
-    private StringBuffer sq = new StringBuffer();
-    // Main qualifier formatting buffer
-    private StringBuffer qb = new StringBuffer();
-    // Utility formatting buffer
-    private StringBuffer ub = new StringBuffer();
-
-    // Buffers for each possible sequence property line
-    private StringBuffer idb = null;
-    private StringBuffer acb = null;
-    private StringBuffer dtb = null;
-    private StringBuffer deb = null;
-    private StringBuffer svb = null;
-    private StringBuffer kwb = null;
-    private StringBuffer osb = null;
-    private StringBuffer ocb = null;
-    private StringBuffer ccb = null;
-    private StringBuffer ftb = new StringBuffer();
-
-    private SymbolTokenization dnaTokenization;
-
+    static
     {
-        try
-        {
-            dnaTokenization = DNATools.getDNA().getTokenization("token");
-        }
-        catch (Exception ex)
-        {
-            throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
-        }
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.SOURCE_TAG);
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.REFERENCE_TAG);
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.COORDINATE_TAG);
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.REF_ACCESSION_TAG);
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.AUTHORS_TAG);
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.TITLE_TAG);
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.FEATURE_TAG);
     }
+
+    // 19 spaces
+    private static String FT_LEADER =
+        EmblLikeFormat.FEATURE_TABLE_TAG + "                   ";
+
+    // 3 spaces
+    private static String SQ_LEADER = "   ";
+
+    // 80 spaces 
+    private static String EMPTY_LINE =
+        "                                        " +
+        "                                        ";
+
+    private PrintStream stream;
+
+    private String idLine;
+    private String accLine;
 
     /**
      * Creates a new <code>EmblFileFormer</code> using
@@ -121,12 +121,22 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 
     public void setName(String id) throws ParseException
     {
-        idb = new StringBuffer("ID   " + id);
+        idLine = id;
     }
 
-    public void startSequence() throws ParseException { }
+    public void startSequence() throws ParseException
+    {
+       aCount = 0;
+       cCount = 0;
+       gCount = 0;
+       tCount = 0;
+       oCount = 0;
+    }
 
-    public void endSequence() throws ParseException { }
+    public void endSequence() throws ParseException
+    {
+        stream.println(EmblLikeFormat.END_SEQUENCE_TAG);
+    }
 
     public void setURI(String uri) throws ParseException { }
 
@@ -138,71 +148,36 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     {
         try
         {
-            int aCount = 0;
-            int cCount = 0;
-            int gCount = 0;
-            int tCount = 0;
-            int oCount = 0;
-
             int end = start + length - 1;
 
             for (int i = start; i <= end; i++)
             {
-                char c = dnaTokenization.tokenizeSymbol(syms[i]).charAt(0);
+                Symbol sym = syms[i];
 
-                switch (c)
-                {
-                    case 'a': case 'A':
-                        aCount++;
-                        break;
-                    case 'c': case 'C':
-                        cCount++;
-                        break;
-                    case 'g': case 'G':
-                        gCount++;
-                        break;
-                    case 't': case 'T':
-                        tCount++;
-                        break;
-
-                    default:
-                        oCount++;
-                }
+                if (sym == a)
+                    aCount++;
+                else if (sym == c)
+                    cCount++;
+                else if (sym == g)
+                    gCount++;
+                else if (sym == t)
+                    tCount++;
+                else
+                    oCount++;
             }
 
-            // FIXME: (kj) shouldn't be printing features and sequence
-            // properties in addSymbols method. If you filter out
-            // symbols you lose all features and sequence properties
-            // too.
-
-            // My Changes are here
-            if (idb != null) {stream.println(idb); stream.println("XX");}
-            if (acb != null) {stream.println(acb); stream.println("XX");}
-            if (svb != null) {stream.println(svb); stream.println("XX");}
-            if (dtb != null) {stream.println(dtb); stream.println("XX");}
-            if (deb != null) {stream.println(deb); stream.println("XX");}
-            if (kwb != null) {stream.println(kwb); stream.println("XX");}
-            if (osb != null) {stream.println(osb);}
-            if (ocb != null) {stream.println(ocb); stream.println("XX");}
-            if (ccb != null) {stream.println(ccb); stream.println("XX");}
-            if (ftb.length() != 0) {
-                ftb.insert(0, "FH   Key             Location/Qualifiers" + nl);
-                stream.print(ftb);
-            }
-
-            sq.setLength(0);
-            sq.append("XX");
-            sq.append(nl);
-            sq.append("SQ   Sequence ");
-            sq.append(length + " BP; ");
-            sq.append(aCount + " A; ");
-            sq.append(cCount + " C; ");
-            sq.append(gCount + " G; ");
-            sq.append(tCount + " T; ");
-            sq.append(oCount + " other;");
+            StringBuffer sb = new StringBuffer(EmblLikeFormat.SEPARATOR_TAG);
+            sb.append(nl);
+            sb.append("SQ   Sequence ");
+            sb.append(length + " BP; ");
+            sb.append(aCount + " A; ");
+            sb.append(cCount + " C; ");
+            sb.append(gCount + " G; ");
+            sb.append(tCount + " T; ");
+            sb.append(oCount + " other;");
 
             // Print sequence summary header
-            stream.println(sq);
+            stream.println(sb);
 
             int fullLine = length / 60;
             int partLine = length % 60;
@@ -219,31 +194,21 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
             if (partLine > 0)
                 lineLens[lineCount - 1] = partLine;
 
-            // Prepare line 80 characters wide, sequence is subset of this
-            char [] emptyLine = new char [80];
-
             for (int i = 0; i < lineLens.length; i++)
             {
-                // Empty the sequence buffer
-                sq.setLength(0);
-                // Empty the utility buffer
-                ub.setLength(0);
+                // Prep the whitespace
+                StringBuffer sq = new StringBuffer(EMPTY_LINE);
 
                 // How long is this chunk?
                 int len = lineLens[i];
-
-                // Prep the whitespace
-                Arrays.fill(emptyLine, ' ');
-                sq.append(emptyLine);
-
                 // Prepare a Symbol array same length as chunk
                 Symbol [] sa = new Symbol [len];
 
                 // Get symbols and format into blocks of tokens
                 System.arraycopy(syms, start + (i * 60), sa, 0, len);
 
-                String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).toString();
-
+                sb = new StringBuffer();
+                String blocks = (formatTokenBlock(sb, sa, 10, dnaTokenization)).toString();
                 sq.replace(5, blocks.length() + 5, blocks);
 
                 // Calculate the running residue count and add to the line
@@ -252,10 +217,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 
                 // Print formatted sequence line
                 stream.println(sq);
-            }
-
-            // Print end of entry
-            stream.println("//");
+            }           
         }
         catch (IllegalSymbolException ex)
         {
@@ -266,65 +228,77 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     public void addSequenceProperty(Object key, Object value)
         throws ParseException
     {
-        if (key.equals("ID")) {
-            idb.setLength(0);
-            idb.append("ID   " + (String) value);
-        }
-        else if (key.equals("DT") || key.equals("MDAT")) {
-            dtb = new StringBuffer(sequenceBufferCreator("DT", value));
-        }
-        else if (key.equals("DE") || key.equals("DEFINITION")) {
-            deb = new StringBuffer(sequenceBufferCreator("DE", value));
-        }
-        else if (key.equals("SV") || key.equals("VERSION")) {
-            svb = new StringBuffer(sequenceBufferCreator("SV", value));
-        }
-        else if (key.equals("KW") || key.equals("KEYWORDS")) {
-            kwb = new StringBuffer(sequenceBufferCreator("KW", value));
-        }
-        else if (key.equals("OS") || key.equals("SOURCE")) {
-            osb = new StringBuffer(sequenceBufferCreator("OS", value));
-        }
-        else if (key.equals("OC") || key.equals("ORGANISM")) {
-            ocb = new StringBuffer(sequenceBufferCreator("OC", value));
-        }
-        else if (key.equals("CC") || key.equals("COMMENT")) {
-            ccb = new StringBuffer(sequenceBufferCreator("CC", value));
-        }
-        else if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
+        StringBuffer sb = new StringBuffer();
+
+        // Ignore separators if they are sent to us. The parser should
+        // be ignoring these really
+        if (key.equals(EmblLikeFormat.SEPARATOR_TAG))
+            return;
+
+        String tag = key.toString();
+        String leader = tag + SQ_LEADER;
+        String line = "";
+        int wrapWidth = 80 - leader.length();
+
+        // Special case: accession number
+        if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
         {
-            acb = new StringBuffer();
-            acb.append("AC   ");
-            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+            accLine = buildPropertyLine((Collection) value, ";", true);
+            return;
+        }
+        else if (key.equals(EmblLikeFormat.ACCESSION_TAG))
+        {
+            line = accLine;
+        }
+
+        if (value instanceof String)
+        {
+            line = (String) value;
+        }
+        else if (value instanceof Collection)
+        {
+            // Special case: date lines
+            if (key.equals(EmblLikeFormat.DATE_TAG))
             {
-                acb.append((String) ai.next());
-                acb.append(";");
+                line = buildPropertyLine((Collection) value, nl + leader, false);
+                wrapWidth = Integer.MAX_VALUE;
+            }
+            else
+            {
+                line = buildPropertyLine((Collection) value, " ", false);
             }
         }
+
+        if (line.length() == 0)
+        {
+            stream.println(tag);
+        }
+        else
+        {
+            sb = formatSequenceProperty(sb, line, leader, wrapWidth);
+            stream.println(sb);
+        }
+
+        // Special case: those which don't get separated
+        if (! NON_SEPARATED_TAGS.contains(key))
+            stream.println(EmblLikeFormat.SEPARATOR_TAG);
+        // Special case: feature header
+        if (key.equals(EmblLikeFormat.FEATURE_TAG))
+            stream.println(EmblLikeFormat.FEATURE_TAG);
     }
 
     public void startFeature(Feature.Template templ)
         throws ParseException
     {
-        // There are 19 spaces in the leader
-        String leader = "FT                   ";
-        int    strand = 0;
+        int strand = 0;
 
         if (templ instanceof StrandedFeature.Template)
             strand = ((StrandedFeature.Template) templ).strand.getValue();
 
-        ub.setLength(0);
-        ub.append(leader);
-
-        StringBuffer lb = formatLocationBlock(ub,
-                                              templ.location,
-                                              strand,
-                                              leader,
-                                              80);
-
-        lb.replace(5, 5 + templ.type.length(), templ.type);
-
-        ftb.append(lb + nl);
+        StringBuffer sb = new StringBuffer(FT_LEADER);
+        sb = formatLocationBlock(sb, templ.location, strand, FT_LEADER, 80);
+        sb.replace(5, 5 + templ.type.length(), templ.type);
+        stream.println(sb);
     }
 
     public void endFeature() throws ParseException { }
@@ -332,95 +306,61 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     public void addFeatureProperty(Object key, Object value)
         throws ParseException
     {
-        // There are 19 spaces in the leader
-        String leader = "FT                   ";
-
         // Don't print internal data structures
         if (key.equals(Feature.PROPERTY_DATA_KEY))
             return;
 
+        StringBuffer fb;
+        StringBuffer sb;
+
         // The value may be a collection if several qualifiers of the
         // same type are present in a feature
-        if (Collection.class.isInstance(value))
+        if (value instanceof Collection)
         {
             for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
             {
-                qb.setLength(0);
-                ub.setLength(0);
-                StringBuffer fb = formatQualifierBlock(qb,
-                                                       formatQualifier(ub, key, vi.next()).substring(0),
-                                                       leader,
-                                                       80);
-                ftb.append(fb + nl);
+                fb = new StringBuffer();
+                sb = new StringBuffer();
+
+                fb = formatQualifierBlock(fb,
+                                          formatQualifier(sb, key, vi.next()).substring(0),
+                                          FT_LEADER,
+                                          80);
+                stream.println(fb);
             }
         }
         else
         {
-            qb.setLength(0);
-            ub.setLength(0);
-            StringBuffer fb = formatQualifierBlock(qb,
-                                                   formatQualifier(ub, key, value).substring(0),
-                                                   leader,
-                                                   80);
-            ftb.append(fb + nl);
+            fb = new StringBuffer();
+            sb = new StringBuffer();
+
+            fb = formatQualifierBlock(fb,
+                                      formatQualifier(sb, key, value).substring(0),
+                                      FT_LEADER,
+                                      80);
+            stream.println(fb);
         }
     }
 
-    private String sequenceBufferCreator(Object key, Object value) {
-        StringBuffer temp = new StringBuffer();
+    private String buildPropertyLine(Collection property,
+                                     String separator,
+                                     boolean terminate)
+    {
+        StringBuffer sb = new StringBuffer();
 
-        if (value == null) {
-            // FIXME: (kj) unsafe cast to String
-            temp.append((String) key);
-        }
-        else if (value instanceof ArrayList) {
-            Iterator iter = ((ArrayList) value).iterator();
-            while (iter.hasNext()) {
-                // FIXME: (kj) unsafe cast to String
-                temp.append((String) key + "   " + iter.next());
-                if (iter.hasNext())
-                    temp.append(nl);
-            }
-        }
-        else {
-            // FIXME: (kj) unsafe cast to String
-            StringTokenizer valueToke = new StringTokenizer((String) value, " ");
-            int fullline = 80;
-            int length = 0;
-            if (valueToke.hasMoreTokens()) {
-                String token = valueToke.nextToken();
-
-                while (true) {
-                    // FIXME: (kj) unsafe cast to String
-                    temp.append((String) key + "  ");
-                    length = (temp.length() % (fullline + 1)) + token.length() + 1;
-                    if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
-                    while (length <= fullline && valueToke.hasMoreTokens()) {
-                        temp.append(" " + token);
-                        token = valueToke.nextToken();
-                        length = (temp.length() % (fullline + 1)) + token.length() + 1;
-                        if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
-                    }
-                    if (valueToke.hasMoreTokens()) {
-                        for(int i = length-token.length(); i < fullline; i++) {
-                            temp.append(" ");
-                        }
-                        temp.append(nl);
-                    }
-                    else if (length <= fullline) {
-                        temp.append(" " + token);
-                        break;
-                    }
-                    else {
-                        temp.append(nl);
-                        // FIXME: (kj) unsafe cast to String
-                        temp.append((String) key + "   " + token);
-                        break;
-                    }
-                }
-            }
+        for (Iterator pi = property.iterator(); pi.hasNext();)
+        {
+            sb.append(pi.next().toString());
+            sb.append(separator);
         }
 
-        return temp.substring(0);
+        if (terminate)
+        {
+            return sb.substring(0);
+        }
+        else
+        {
+            return sb.substring(0, sb.length() - separator.length());
+        }
     }
 }

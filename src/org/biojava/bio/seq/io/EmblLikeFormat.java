@@ -65,6 +65,33 @@ public class EmblLikeFormat
 {
     public static final String DEFAULT = "EMBL";
 
+    protected static final String ID_TAG = "ID";
+    protected static final String SIZE_TAG = "SIZE";
+    protected static final String STRAND_NUMBER_TAG = "STRANDS";
+    protected static final String TYPE_TAG = "TYPE";
+    protected static final String CIRCULAR_TAG = "CIRCULAR";
+    protected static final String DIVISION_TAG = "DIVISION";
+
+    protected static final String ACCESSION_TAG = "AC";
+    protected static final String VERSION_TAG = "SV";
+    protected static final String DATE_TAG = "DT";
+    protected static final String DEFINITION_TAG = "DE";
+    protected static final String KEYWORDS_TAG = "KW";
+    protected static final String SOURCE_TAG = "OS";
+    protected static final String ORGANISM_TAG = "OC";
+    protected static final String REFERENCE_TAG = "RN";
+    protected static final String COORDINATE_TAG = "RP";
+    protected static final String REF_ACCESSION_TAG = "RX";
+    protected static final String AUTHORS_TAG = "RA";
+    protected static final String TITLE_TAG = "RT";
+    protected static final String JOURNAL_TAG = "RL";
+    protected static final String COMMENT_TAG = "CC";
+    protected static final String FEATURE_TAG = "FH";
+    protected static final String SEPARATOR_TAG = "XX";
+    protected static final String FEATURE_TABLE_TAG = "FT";
+    protected static final String START_SEQUENCE_TAG = "SQ";  
+    protected static final String END_SEQUENCE_TAG = "//";
+
     private boolean elideSymbols = false;
     private Vector mListeners = new Vector();
 
@@ -110,7 +137,7 @@ public class EmblLikeFormat
 
         while ((line = reader.readLine()) != null)
         {
-            if (line.startsWith("//"))
+            if (line.startsWith(END_SEQUENCE_TAG))
             {
                 if (sparser != null)
                 {
@@ -148,12 +175,12 @@ public class EmblLikeFormat
                 listener.endSequence();
                 return hasMoreSequence;
             }
-            else if (line.startsWith("SQ"))
+            else if (line.startsWith(START_SEQUENCE_TAG))
             {
                 // Adding a null property to flush the last feature;
                 // Needed for Swissprot files because there is no gap
                 // between the feature table and the sequence data
-                listener.addSequenceProperty("XX", "");
+                listener.addSequenceProperty(SEPARATOR_TAG, "");
 
                 sparser = symParser.parseStream(listener);
             }
@@ -255,14 +282,11 @@ public class EmblLikeFormat
                                                + "'");
         former.setPrintStream(os);
 
-        try
-        {
-            SeqIOEventEmitter.getSeqIOEvents(seq, former);
-        }
-        catch (BioException be)
-        {
-            throw new IOException(be.getMessage());
-        }
+        SeqIOEventEmitter emitter =
+            new SeqIOEventEmitter(GenEmblPropertyComparator.INSTANCE,
+                                  GenEmblFeatureComparator.INSTANCE);
+
+        emitter.getSeqIOEvents(seq, former);
     }
 
     /**
@@ -304,7 +328,7 @@ public class EmblLikeFormat
      */
     public synchronized void addParseErrorListener(ParseErrorListener theListener)
     {
-        if(mListeners.contains(theListener) == false)
+        if (mListeners.contains(theListener) == false)
         {
             mListeners.addElement(theListener);
         }
@@ -318,7 +342,7 @@ public class EmblLikeFormat
      */
     public synchronized void removeParseErrorListener(ParseErrorListener theListener)
     {
-        if(mListeners.contains(theListener) == true)
+        if (mListeners.contains(theListener) == true)
         {
             mListeners.removeElement(theListener);
         }

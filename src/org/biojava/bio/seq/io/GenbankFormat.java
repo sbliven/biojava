@@ -50,21 +50,34 @@ public class GenbankFormat
 {
     public static final String DEFAULT = "GENBANK";
 
-    protected static final String END_SEQUENCE_TAG = "//";
-    protected static final String FEATURE_TAG = "FEATURES";
-    protected static final String START_SEQUENCE_TAG = "ORIGIN";
-    protected static final String FEATURE_LINE_PREFIX = "     ";
-    protected static final String FEATURE_FLAG = "FT";
-    protected static final String ACCESSION_TAG = "ACCESSION";
     protected static final String LOCUS_TAG = "LOCUS";
     protected static final String SIZE_TAG = "SIZE";
-    protected static final String TYPE_TAG = "TYPE";
     protected static final String STRAND_NUMBER_TAG = "STRANDS";
+    protected static final String TYPE_TAG = "TYPE";
     protected static final String CIRCULAR_TAG = "CIRCULAR";
     protected static final String DIVISION_TAG = "DIVISION";
     protected static final String DATE_TAG = "MDAT";
+
+    protected static final String ACCESSION_TAG = "ACCESSION";
     protected static final String VERSION_TAG = "VERSION";
     protected static final String GI_TAG = "GI";
+    protected static final String KEYWORDS_TAG = "KW";
+    protected static final String DEFINITION_TAG = "DEFINITION";
+    protected static final String SOURCE_TAG = "SOURCE";
+    protected static final String ORGANISM_TAG = "ORGANISM";
+    protected static final String REFERENCE_TAG = "REFERENCE";
+    protected static final String COORDINATE_TAG = "COORDINATE";
+    protected static final String REF_ACCESSION_TAG = "";
+    protected static final String AUTHORS_TAG = "AUTHORS";
+    protected static final String TITLE_TAG = "TITLE";
+    protected static final String JOURNAL_TAG = "JOURNAL";
+    protected static final String COMMENT_TAG = "COMMENT";
+    protected static final String FEATURE_TAG = "FEATURES";
+    protected static final String FEATURE_FLAG = "FT";
+    protected static final String START_SEQUENCE_TAG = "ORIGIN";
+    protected static final String END_SEQUENCE_TAG = "//";
+
+    protected static final String FEATURE_LINE_PREFIX = "     ";
 
     private Vector mListeners = new Vector();
     private boolean elideSymbols = false;
@@ -171,14 +184,11 @@ public class GenbankFormat
                                                + "'");
         former.setPrintStream(os);
 
-        try
-        {
-            SeqIOEventEmitter.getSeqIOEvents(seq, former);
-        }
-        catch (BioException be)
-        {
-            throw new IOException(be.getMessage());
-        }
+        SeqIOEventEmitter emitter =
+            new SeqIOEventEmitter(GenEmblPropertyComparator.INSTANCE,
+                                  GenEmblFeatureComparator.INSTANCE);
+
+        emitter.getSeqIOEvents(seq, former);
     }
 
     /**
