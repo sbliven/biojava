@@ -461,18 +461,27 @@ public class PDBFileReader implements StructureIOFile {
 	atom.setPDBserial(pdbnumber) ;
 
 	String fullname = line.substring (12, 16);
+	// altLoc
+	String altLoc   = line.substring (16, 17);
 	atom.setFullName(fullname) ;
 	atom.setName(fullname.trim());
 
 	double x = Double.parseDouble (line.substring (30, 38).trim());
 	double y = Double.parseDouble (line.substring (38, 46).trim());
 	double z = Double.parseDouble (line.substring (46, 54).trim());
-	double[] coords = new double[3];
-	
+
+	double[] coords = new double[3];       
 	coords[0] = x ;
 	coords[1] = y ;
 	coords[2] = z ;
 	atom.setCoords(coords);
+
+
+	double occu  = Double.parseDouble (line.substring (54, 60).trim());
+	double tempf = Double.parseDouble (line.substring (60, 66).trim());
+	
+	atom.setOccupancy(  occu  );
+	atom.setTempFactor( tempf );
 
 	//System.out.println(atom);
 
