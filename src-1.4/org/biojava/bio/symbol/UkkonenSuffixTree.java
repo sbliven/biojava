@@ -1,4 +1,4 @@
-package org.biojava.bio.symbol.*;
+package org.biojava.bio.symbol;
 
 import java.util.*;
 
