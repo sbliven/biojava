@@ -1,15 +1,16 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
-                      "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
+                      "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd"
+[
+    <!ENTITY chapter01 SYSTEM "biojava-doc-ch01.xml">
+    <!ENTITY chapter02 SYSTEM "biojava-doc-ch02.xml">
+    <!ENTITY chapter03 SYSTEM "biojava-doc-ch03.xml">
+    <!ENTITY chapter04 SYSTEM "biojava-doc-ch04.xml">
+    <!ENTITY chapter05 SYSTEM "biojava-doc-ch05.xml">
 ]>
 
 <!--
-
         Aim is to keep this both SGML and XML compliant so it can be
         processed with any of Jade, Xalan etc.
-
-        Note that this file will be broken into separate entities when it
-        grows too big.
-
 -->
 
 <!--
@@ -20,7 +21,6 @@
         Add recent bootcamp material.
         Trawl mailing list and start FAQ.
         Add Ant task to build docs and link to Javadoc.
-
 -->
 
 <book id="biojava-main">
@@ -98,159 +98,94 @@
     printable formats, to be generated from a single source without
     compromising quality or portability across computing platforms. To
     find out more about DocBook see <xref linkend="bd-apdx03">.</para>
+
+    <para>The following authors/groups have contributed to this
+    document:</para>
+
+    <itemizedlist>
+      <!-- Individuals, alphabetical order -->
+      <listitem>
+        <para>Thomas Down</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Chapter 2: Symbols and SymbolLists</para>
+          </listitem>
+          <listitem>
+            <para>Chapter 3: Sequences and Features</para>
+          </listitem>
+          <listitem>
+            <para>Chapter 4: Sequence IO</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para>David Huen</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>--</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para>Keith James</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>--</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para>Matthew Pocock</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Chapter 5: Changeability, Mutability and Events</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para>Mark Schreiber</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>--</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <!-- Groups, alphabetical order -->
+      <listitem>
+        <para>Cambridge Antibody Technology</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>--</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+    </itemizedlist>
   </preface>
 
   <!-- Table of contents is automatically generated here -->
   <toc></toc>
 
-  <!-- This demonstrates the id convention for chapters -->
-  <chapter id="bd-ch01">
-    <title>Beginning BioJava</title>
+  &chapter01;
 
-    <sect1 id="bd-ch01-obtain">
-      <title>Obtaining</title>
+  &chapter02;
 
-      <sect2 id="bd-ch01-obtain-bin">
-        <title>Binary distribution</title>
+  &chapter03;
 
-        <para>Binary distributions in .jar (Java ARchive) format may
-        be obtained from the <ulink
-        url="http://biojava.org/download/binaries/">binaries
-        directory</ulink> of the web site <ulink
-        url="http://biojava.org/download/">download
-        area</ulink>.</para>
-      </sect2>
+  &chapter04;
 
-      <sect2 id="bd-ch01-obtain-src">
-        <title>Source code distribution</title>
-
-        <para>If you want to modify BioJava, you can obtain a copy of
-        the source code from the <ulink
-        url="http://biojava.org/download/source/">source
-        directory</ulink> of the web site <ulink
-        url="http://biojava.org/download/">download
-        area</ulink>. Source releases are distributed in .tar.gz
-        format for Unix machines and as ZIP archives for Windows
-        users. You can also obtain up-to-the-minute source code from
-        the <ulink url="http://cvs.biojava.org">anonymous CVS
-        server</ulink>.</para>
-      </sect2>
-
-      <sect2 id="bd-ch01-obtain-cvs">
-        <title>Anonymous CVS server</title>
-
-        <para></para>
-      </sect2>
-
-      <sect2 id="bd-ch01-depend">
-        <title>Dependencies</title>
-
-        <para>BioJava will compile and run on any computer with a Java
-        virtual machine complying to the Java 2 Standard Edition 1.2
-        (or later) specifications.</para>
-
-        <note>
-          <para>We have seen some problems due to a bug in the Classic
-          VM in Java 1.2. Hotspot for Java 1.2 works fine, as does the
-          Classic VM from later releases.</para
-        </note>
-
-        <para>BioJava requires the following software packages:</para>
-        <itemizedlist>
-          <listitem>
-            <para>A Java bytecode generation library
-            (bytecode-0.90.jar) which may be obtained from the <ulink
-            url="http://biojava.org/download/binaries/">binaries
-            directory</ulink> of the web site <ulink
-            url="http://biojava.org/download/">download
-            area</ulink>.</para>
-          </listitem>
-          <listitem>
-            <para>The <ulink url="http://xml.apache.org">Xerces-J XML
-            parser</ulink>.</para>
-          </listitem>
-        </itemizedlist>
-        
-      </sect2>
-    </sect1>
-
-    <sect1 id="bd-ch01-install">
-      <title>Installation</title>
-
-      <sect2 id="bd-ch01-install-bin">
-        <title>Binary distribution</title>
-
-        <para>To use the binary distribution add the biojava.jar,
-        bytecode.jar and xerces.jar files to your CLASSPATH
-        environment variable.</para>
-
-        <variablelist>
-          <varlistentry>
-            <term>UNIX (bourne shell)</term>
-            <listitem>
-              <para>
-                <screen>
-export CLASSPATH=/usr/local/share/java/biojava.jar:\
-/usr/local/share/java/xerces.jar:\
-/usr/local/share/java/bytecode.jar:.
-                </screen>
-              </para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term>UNIX (C shell)</term>
-            <listitem>
-              <para>
-               <screen>
-setenv CLASSPATH /usr/local/share/java/biojava.jar:\
-/usr/local/share/java/xerces.jar:\
-/usr/local/share/java/bytecode.jar:.
-               </screen>
-              </para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term>Windows from command line</term>
-            <listitem>
-              <para>
-               <screen>
-set CLASSPATH C:\biojava.jar;C:\xerces.jar;C:\bytecode.jar;.
-               </screen>
-              </para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term>Windows from autoexec.bat</term>
-            <listitem>
-              <para>
-               <screen>
-set CLASSPATH=C:\biojava.jar;C:\xerces.jar;C:\bytecode.jar;.
-               </screen>
-              </para>
-            </listitem>
-          </varlistentry>
-        </variablelist>
-      </sect2>
-
-      <sect2 id="bd-ch01-install-src">
-        <title>Source distribution</title>
-
-        <para>BioJava uses the <ulink
-        url="http://jakarta.apache.org/ant">Ant build tool</ulink>, a
-        Java equivalent of the common Make utilities. You will need to
-        obtain and install a copy of Ant.</para>
-      </sect2>
-    </sect1>
-
-    <sect1 id="bd-ch01-demos">
-      <title>Running the demo programs</title>
-
-      <para></para>
-    </sect1>
-  </chapter>
+  &chapter05;
 
   <!-- This demonstrates the id convention for appendices -->
   <appendix label="A" id="bd-apdx01">
@@ -426,4 +361,40 @@ set CLASSPATH=C:\biojava.jar;C:\xerces.jar;C:\bytecode.jar;.
       </sect2>
     </sect1>
   </appendix>
+
+  <bibliography id="bd-main-biblio">
+    <title>Bibliography</title>
+
+    <bibliodiv id="bd-main-biblio-book">
+      <title>Books</title>
+
+      <biblioentry id="bd-main-biblio-GoF98">
+        <abbrev>GoF98</abbrev>
+        <authorgroup>
+          <author>
+            <firstname>Erich</firstname>
+            <surname>Gamma</surname>
+          </author>
+          <author>
+            <firstname>Richard</firstname>
+            <surname>Helm</surname>
+          </author>
+          <author>
+            <firstname>Ralph</firstname>
+            <surname>Johnson</surname>
+          </author>
+          <author>
+            <firstname>John</firstname>
+            <surname>Vlissides</surname>
+          </author>
+        </authorgroup>
+        <copyright>
+          <year>1998</year>
+          <holder>Addison Wesley Longman, Inc.</holder>
+        </copyright>
+        <isbn>0-201-63498-8</isbn>
+        <title>Design Patterns: Elements of Reusable Object-Oriented Software</title>
+      </biblioentry>
+    </bibliodiv>
+  </bibliography>
 </book>

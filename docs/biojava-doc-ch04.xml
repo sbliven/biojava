@@ -1,0 +1,322 @@
+<!--DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
+                         "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
+]-->
+
+<chapter id="bd-ch04">
+  <title>Sequence I/O</title>
+
+  <abstract>
+    <para>This chapter covers the BioJava support for handling
+    biological sequence data available in the form of files. It covers
+    API provided by the package org.biojava.bio.seq.io. For a complete
+    overview of the API provided in this package, consult the <ulink
+    url="javadoc/index.html">JavaDoc documentation</ulink>.</para>
+  </abstract>
+
+  <sect1 id="bd-ch04-started">
+    <title>Getting started with sequence I/O</title>
+
+    <para>The BioJava sequence I/O code is designed to be flexible and
+    easy to adapt for a wide variety of purposes. However, if you
+    don't need this flexibility, there are some convenience methods
+    which set up the parsers for reading a variety of common
+    formats. All these methods take a Java
+    <classname>BufferedReader</classname>, and return an iterator
+    which allows you to scan through the sequences in a file. For
+    example:</para>
+
+<programlisting>
+BufferedReader br = new BufferedReader(new FileReader(fileName));
+SequenceIterator stream = SeqIOTools.readFastaDNA(br);
+while (stream.hasNext()) {
+    Sequence seq = stream.nextSequence();
+    // do something with the sequence.
+}
+</programlisting>
+
+    <para>For a full list of formats supported in this way, check the
+    Javadoc documentation for the SeqIOTools class.</para>
+  </sect1>
+
+  <sect1 id="bd-ch04-goals">
+    <title>Sequence input goals</title>
+
+    <para>A typical biological sequence file contains three
+    things:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Global information about the sequence (ID, species,
+        etc.)</para>
+        </listitem>
+      <listitem>
+        <para>Annotations to specific regions of the sequence.</para>
+      </listitem>
+      <listitem>
+        <para>Actual sequence data.</para>
+      </listitem>
+    </itemizedlist>
+      
+    <para>Actual file formats need not provide all of these. For
+    instance, FASTA files contain almost pure sequence data -- the
+    only other information is a single description line for each
+    sequence. At the other extreme, GFF files are simply a list of
+    features, with no sequence data in the file.</para>
+
+    <para>A BioJava <classname>Sequence</classname> object contains
+    the same kinds of information as a sequence file. The primary aim
+    of the input architecture is obviously to take a stream containing
+    sequence file data, and return one or more
+    <classname>Sequence</classname> objects. In addition, we there are
+    two other goals:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>Decoupled Sequence creation</term>
+        <listitem>
+          <para>BioJava represents sequence data using the
+          <classname>Sequence</classname> interface. We allow multiple
+          implementations of this interface, which might be optimized
+          for quite specific purposes. Some implementations will be
+          purely in-memory objects, while others might be persistant
+          objects reflecting data in some kind of database. We want to
+          allow you to create any kind of
+          <classname>Sequence</classname> object from a given data
+          stream.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Pluggable filters</term>
+        <listitem>
+          <para>Not all users will wish to exactly reflect the
+          contents of a sequence file as a
+          <classname>Sequence</classname> object. Sometimes it is
+          useful to select specific pieces of data from a file, or to
+          change it into some other format. For instance, BioJava has
+          a hierarchical model for features attached to a sequence,
+          whereas many file formats (for instance, EMBL) do not. You
+          might wish to rebuild some kind of feature hierarchy from an
+          EMBL flatfile during the parsing process.</para>
+        </listitem>
+        </varlistentry>
+    </variablelist>
+  </sect1>
+
+  <sect1 id="bd-ch04-seqbuild">
+    <title>SequenceBuilders</title>
+
+    <para>The sequence input framework is based around the
+    <classname>SequenceBuilder</classname> interface (this is actually
+    a sub-interface of <classname>SeqIOListener</classname>, but for
+    these purposes you will usually be using
+    <classname>SequenceBuilder</classname>). The role of a
+    <classname>SequenceBuilder</classname> is to accumulate
+    information discovered while parsing a sequence file, and
+    ultimately to construct a <classname>Sequence</classname>
+    object.</para>
+
+    <para>There are two kinds of
+    <classname>SequenceBuilder</classname> implementation.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>Builders</term>
+        <listitem>
+          <para>These actually construct new
+          <classname>Sequence</classname> objects. Generally, there
+          will just be one Builder implementation for each Sequence
+          implementation. The basic BioJava library provides one
+          Builder implementation,
+          <classname>SimpleSequenceBuilder</classname>, which
+          constructs simple in-memory representations for any kind of
+          sequence data.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Filters</term>
+        <listitem>
+          <para>These don't construct <classname>Sequence</classname>
+          objects themselves, but are chained to another
+          <classname>SequenceBuilder</classname>. When they are
+          notified of data, they perform some processing, then pass
+          the information on to the next
+          <classname>SequenceBuilder</classname> in the chain.
+          Whenever a <classname>SequenceBuilder</classname> is
+          required, you can either simply provide a 'Builder'
+          implementation, or you can create a chain consisting of one
+          or more 'Filters', leading ultimately to a 'Builder'.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>A <classname>SequenceBuilder</classname> object should only
+    be used once. If multiple sequences are being read from a stream,
+    a new <classname>SequenceBuilder</classname> (or chain) should be
+    constructed for each one. For convenience, we provide a
+    <classname>SequenceBuilderFactory</classname> interface, whose
+    sole purpose is to encapsulate the construction of
+    <classname>SequenceBuilder</classname>s. Each
+    <classname>SequenceBuilder</classname> implementation should
+    provide a suitable factory implementation as well.</para>
+
+    <para>For 'Builder' implementations, it is usually possible to
+    provide a factory object. For
+    <classname>SimpleSequenceBuilder</classname> this is the static
+    field <classname>SimpleSequenceBuilder.FACTORY</classname>. For
+    filters, the factory must be parameterized with another
+    <classname>SequenceBuilderFactory</classname> so that a complete
+    chain can be constructed. For instance:</para>
+
+<programlisting>
+SequenceBuilderFactory mySBF = 
+    new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+</programlisting>
+
+    <para>Authors of new <classname>SequenceBuilder</classname>
+    implementations are encouraged to consider this naming style when
+    implementing <classname>SequenceBuilderFactory</classname>.</para>
+  </sect1>
+
+  <sect1 id="bd-ch04-stream">
+    <title>Putting it together: StreamReader</title>
+
+    <para>The simplest way to use the BioJava sequence input code is
+    to construct a <classname>StreamReader</classname>. The
+    constructor takes four paramters:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>A normal Java <classname>BufferedReader</classname>,
+        encapsulating the stream of data to parse.</para>
+      </listitem>
+      <listitem>
+        <para>A <classname>SequenceFormat</classname> object, which is
+        responsible for actually parsing sequence data from the
+        stream.</para>
+      </listitem>
+      <listitem>
+        <para>A <classname>SymbolTokenization</classname>, which
+        represents a mapping from textual characters to BioJava
+        <classname>Symbol</classname> objects.</para>
+      </listitem>
+      <listitem>
+        <para>A <classname>SequenceBuilderFactory</classname> to
+        support construction of <classname>Sequence</classname>
+        objects.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>A <classname>StreamReader</classname> might be constructed
+    as follows:</para>
+
+<programlisting>
+Alphabet dna = DNATools.getDNA();
+SymbolTokenization dnaParser = dna.getTokenization("token");
+BufferedReader br = new BufferedReader(
+                        new FileReader(fileName));
+SequenceBuilderFactory sbf = new FastaDescriptionLineParser.Factory(
+                                     SimpleSequenceBuilder.FACTORY);
+StreamReader stream = new StreamReader(br,
+                                       new FastaFormat(),
+                                       dnaParser,
+                                       fact);
+</programlisting>
+
+    <para>(this is just a snippet from the example program in <xref
+    linkend="bd-ch01">, and you may like to refer back for more
+    information).</para>
+
+    <para>The <classname>StreamReader</classname> class implements the
+    <classname>SequenceIterator</classname> interface, so you can
+    easily iterate over all sequences in a stream:</para>
+
+<programlisting>
+while (stream.hasNext()) {
+    Sequence seq = stream.nextSequence();
+    // Perform some processing on seq
+}
+</programlisting>
+  </sect1>
+
+  <sect1 id="bd-ch04-indexed">
+    <title>Another application: IndexedSequenceDB</title>
+
+    <para>As biology enters the post-genomic era, it is common to need
+    to work with databases of sequence data far too large to fit in
+    available memory. One way to handle large amounts of sequence is
+    to use a dedicated database system: either a specialized solution
+    such as <ulink url="www.acedb.org">ACeDB</ulink> or a set of
+    tables in a standard database application, as used by the <ulink
+    url="www.ensembl.org">Ensembl</ulink> project. If, however, you
+    don't wish to use one of these solutions, BioJava offers a simple
+    and efficient sequence database implementation backed by one or
+    more sequence files on disk. These files can be in any format, so
+    long as a suitable <classname>SequenceFormat</classname> class
+    exists.</para>
+
+    <para>As a simple example of an
+    <classname>IndexedSequenceDB</classname> in use, the following
+    servlet retrieves sequences from a large database, and sends them
+    on to the client in FASTA format. The database could be created
+    using the CreateIndex and AddFiles programs included in the
+    BioJava demos directory.</para>
+
+<programlisting>
+import java.io.*;
+
+import javax.servlet.*;
+import javac.servlet.http.*;
+
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.db.*;
+
+public class SequenceServlet extends HttpServlet {
+    private SequenceDB indexedDB;      // Database to serve
+    private SequenceFormat seqFormat;  // Used for writing
+
+    public void init(ServletConfig config) 
+        throws ServletException
+    {
+        super.init(config);
+        String dbName = config.getInitParameter("sequence.db");
+        if (dbName == null)
+            throw new ServletException("Database not specified");
+        try {
+            TabIndexStore index = TabIndexStore.open(dbName);
+            indexedDB = new IndexedSequenceDB(index);
+        } catch (Exception ex) {
+            log("Can't open sequence database: " + dbName, ex);
+            throw new ServletException();
+        }
+
+        seqFormat = new FastaFormat();
+    }
+
+    public void doGet(HttpServletRequest req,
+                      HttpServletResponse resp)
+        throws ServletException, IOException
+    {
+        String id = req.getParameter("id");
+        if (id == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                           "No id parameter in request");
+            return;
+        }
+
+        try {
+            Sequence seq = indexedDB.getSequence(id);
+            resp.setContentType("text/plain");
+            PrintStream stream = new PrintStream(resp.getOutputStream());
+            seqFormat.writeSequence(seq, stream);
+        } catch (BioException ex) {
+            log("Can't retrieve sequence", ex);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                           "Couldn't load sequence " + id);
+        }
+    }
+}
+</programlisting>
+  </sect1>
+</chapter>
