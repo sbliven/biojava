@@ -98,6 +98,21 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     }
 
     public void addSequence(Sequence seq)
+	throws IllegalIDException, ChangeVetoException, BioException
+    {   
+	if (changeSupport == null) {
+	    _addSequence(seq);
+	} else {
+	    synchronized (changeSupport) {
+		ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, seq);
+		changeSupport.firePreChangeEvent(cev);
+		_addSequence(seq);
+		changeSupport.firePostChangeEvent(cev);
+	    }
+	}
+    }
+
+    private void _addSequence(Sequence seq)
         throws IllegalIDException, ChangeVetoException, BioException
     {
 	String seqName = idmaker.calcID(seq);
@@ -141,6 +156,15 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    create_biosequence.close();
 
 	    int biosequence_id = getDBHelper().getInsertID(conn, "biosequence", "biosequence_id");
+
+	    // 
+	    // Store the features
+	    //
+
+	    for (Iterator fi = seq.filter(FeatureFilter.all, true).features(); fi.hasNext(); ) {
+		Feature f = (Feature) fi.next();
+		persistFeature(conn, bioentry_id, f);
+	    }
 
 	    pool.putConnection(conn);
 	} catch (SQLException ex) {
@@ -186,7 +210,22 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	throw new IllegalIDException("No bioentry with accession " + id);
     }
 
-    public void removeSequence(String id) 
+    public void removeSequence(String id)
+	throws IllegalIDException, ChangeVetoException, BioException
+    {   
+	if (changeSupport == null) {
+	    _removeSequence(id);
+	} else {
+	    synchronized (changeSupport) {
+		ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
+		changeSupport.firePreChangeEvent(cev);
+		_removeSequence(id);
+		changeSupport.firePostChangeEvent(cev);
+	    }
+	}
+    }
+
+    private void _removeSequence(String id) 
         throws BioException, IllegalIDException, ChangeVetoException
     {
 	Sequence seq = (Sequence) outstandingSequences.get(id);
@@ -274,8 +313,8 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     //
 
     void persistFeature(Connection conn,
-			       int bioentry_id,
-			       Feature f)
+			int bioentry_id,
+			Feature f)
 	throws BioException, SQLException
     {
 	int seqfeature_key = intern_seqfeature_key(conn, f.getType());

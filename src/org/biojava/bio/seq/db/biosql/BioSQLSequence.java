@@ -45,6 +45,11 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     private String name;
     private int bioentry_id;
     private int biosequence_id;
+    private ChangeSupport changeSupport;
+
+    private void initChangeSupport() {
+	changeSupport = new ChangeSupport();
+    }
 
     private DBHelper getDBHelper() {
 	return seqDB.getDBHelper();
@@ -186,9 +191,18 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
         throws ChangeVetoException, BioException
     {
 	Feature f = realizeFeature(this, ft);
-	// Do changeSupport stuff.
-	persistFeature(f);
-	getFeatures().addFeature(f);
+	if (changeSupport == null) {
+	    persistFeature(f);
+	    getFeatures().addFeature(f);
+	} else {
+	    synchronized (changeSupport) {
+		ChangeEvent cev = new ChangeEvent(this, FeatureHolder.FEATURES, f);
+		changeSupport.firePreChangeEvent(cev);
+		persistFeature(f);
+		getFeatures().addFeature(f);
+		changeSupport.firePostChangeEvent(cev);
+	    }
+	}
 
 	return f;
     }
@@ -348,11 +362,28 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     }
 
     // 
-    // Changeable stuff (which we're cheating on.  Ooops.)
+    // Changeable
     //
 
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}    
+    public void addChangeListener(ChangeListener cl) {
+	addChangeListener(cl, ChangeType.UNKNOWN);
+    }
+	
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	if (changeSupport == null) {
+	    initChangeSupport();
+	}
+
+	changeSupport.addChangeListener(cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	removeChangeListener(cl, ChangeType.UNKNOWN);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	if (changeSupport != null) {
+	    changeSupport.removeChangeListener(cl, ct);
+	}
+    }
 }
