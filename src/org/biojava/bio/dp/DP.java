@@ -301,24 +301,37 @@ public abstract class DP {
                                     IllegalTransitionException,
                                     BioException
   {
-    this.model = model;
-    this.states = stateList(model);
-    this.forwardTransitions = forwardTransitions(model, states);
-    this.forwardTransitionScores = forwardTransitionScores(model, states,
-      forwardTransitions);
-    this.backwardTransitions = backwardTransitions(model, states);
-    this.backwardTransitionScores = backwardTransitionScores(model, states,
-      backwardTransitions);
-
-    // Find first dot state
-
-    int i;
-    for (i = 0; i < states.length; ++i) {
-	if (! (states[i] instanceof EmissionState))
-	    break;
-    }
-    dotStatesIndex = i;
+      this.model = model;
+      validate();
   }
+
+    /**
+     * Revalidate the DP object after a change in the underlying
+     * MarkovModel.  The main effect is to rebuild the DP object's
+     * internal table of transition probabilities.
+     */
+
+    public void validate() throws IllegalSymbolException,
+                                    IllegalTransitionException,
+                                    BioException
+    {
+	this.states = stateList(model);
+	this.forwardTransitions = forwardTransitions(model, states);
+	this.forwardTransitionScores = forwardTransitionScores(model, states,
+							       forwardTransitions);
+	this.backwardTransitions = backwardTransitions(model, states);
+	this.backwardTransitionScores = backwardTransitionScores(model, states,
+								 backwardTransitions);
+
+	// Find first dot state
+	
+	int i;
+	for (i = 0; i < states.length; ++i) {
+	    if (! (states[i] instanceof EmissionState))
+		break;
+	}
+	dotStatesIndex = i;
+    }
 
   public abstract double forward(SymbolList [] resList)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
