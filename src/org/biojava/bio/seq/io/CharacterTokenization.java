@@ -40,6 +40,7 @@ import org.biojava.bio.symbol.*;
 public class CharacterTokenization implements SymbolTokenization {
     private Alphabet alphabet;
     private Map symbolsToCharacters = new HashMap();
+    private Map charactersToSymbols = new HashMap();
     private transient Symbol[] tokenTable;
     private boolean caseSensitive;
 
@@ -61,7 +62,12 @@ public class CharacterTokenization implements SymbolTokenization {
     }
 
     public void bindSymbol(Symbol s, char c) {
-	symbolsToCharacters.put(s, new Character(c));
+	Character chr = new Character(c);
+
+	if (!symbolsToCharacters.containsKey(s)) {
+	    symbolsToCharacters.put(s, chr);
+	}
+	charactersToSymbols.put(chr, s);
 	tokenTable = null;
     }
 
@@ -77,7 +83,7 @@ public class CharacterTokenization implements SymbolTokenization {
     protected Symbol[] getTokenTable() {
 	if (tokenTable == null) {
 	    int maxChar = 0;
-	    for (Iterator i = symbolsToCharacters.values().iterator(); i.hasNext(); ) {
+	    for (Iterator i = charactersToSymbols.keySet().iterator(); i.hasNext(); ) {
 		Character c = (Character) i.next();
 		char cv = c.charValue();
 		if (caseSensitive) {
@@ -90,10 +96,10 @@ public class CharacterTokenization implements SymbolTokenization {
 
 	    tokenTable = new Symbol[maxChar + 1];
 
-	    for (Iterator i = symbolsToCharacters.entrySet().iterator(); i.hasNext(); ) {
+	    for (Iterator i = charactersToSymbols.entrySet().iterator(); i.hasNext(); ) {
 		Map.Entry me = (Map.Entry) i.next();
-		Symbol sym = (Symbol) me.getKey();
-		Character c = (Character) me.getValue();
+		Symbol sym = (Symbol) me.getValue();
+		Character c = (Character) me.getKey();
 		char cv = c.charValue();
 		if (caseSensitive) {
 		    tokenTable[cv] = sym;
