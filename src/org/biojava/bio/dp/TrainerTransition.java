@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.alignment;
+package org.biojava.bio.dp;
 
 /**
  * This is a small and ugly class for storing a trainer and a transition.

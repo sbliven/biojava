@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.alignment;
+package org.biojava.bio.dp;
 
 /**
  * A state that wraps up another state within a model so that it can appear in

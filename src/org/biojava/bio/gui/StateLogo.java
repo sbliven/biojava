@@ -29,7 +29,7 @@ import javax.swing.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.alignment.*;
+import org.biojava.bio.dp.*;
 
 /**
  * The gui component for rendering a StateLogo. By default, this uses the text

@@ -26,7 +26,7 @@ import java.util.*;
 import java.io.*;
 
 import org.biojava.bio.seq.*;
-import org.biojava.bio.alignment.*;
+import org.biojava.bio.dp.*;
 
 /**
  * The results of a meme run.

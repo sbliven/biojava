@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.alignment;
+package org.biojava.bio.dp;
 
 public interface StoppingCriteria {
   boolean isTrainingComplete(TrainingAlgorithm ta);

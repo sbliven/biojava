@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.alignment;
+package org.biojava.bio.seq.tools;
 
 import org.biojava.bio.seq.*;
 import org.biojava.stats.svm.SVMKernel;

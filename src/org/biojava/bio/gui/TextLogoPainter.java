@@ -30,7 +30,7 @@ import java.util.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.alignment.*;
+import org.biojava.bio.dp.*;
 
 /**
  * A logo painter that paints in stacked letters.

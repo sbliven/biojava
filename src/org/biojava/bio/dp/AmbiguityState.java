@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.alignment;
+package org.biojava.bio.dp;
 
 import java.util.*;
 

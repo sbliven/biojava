@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.alignment;
+package org.biojava.bio.dp;
 
 /**
  * This exception indicates that there is no transition between two states.
