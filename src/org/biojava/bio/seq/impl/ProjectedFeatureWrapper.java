@@ -136,6 +136,11 @@ public class ProjectedFeatureWrapper implements Feature {
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	FeatureFilter membershipFilter = new FeatureFilter.ContainedByLocation(newLocation);
+	if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
+	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
+	}
+
 	return getProjectedFeatures().filter(ff, recurse);
     }
 
