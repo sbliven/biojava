@@ -86,7 +86,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
     public boolean readSequence(BufferedReader reader,
 			     SymbolParser symParser,
 			     SeqIOListener listener)
-	throws IllegalSymbolException, IOException
+	throws IllegalSymbolException, IOException, ParseException
     {
 	String line;
 	StreamParser sparser = null;
@@ -137,7 +137,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
      */
 
     protected void processSequenceLine(String line, StreamParser parser) 
-        throws IllegalSymbolException
+        throws IllegalSymbolException, ParseException
     {
 	char[] cline = line.toCharArray();
 	int parseStart = 0;
