@@ -114,6 +114,7 @@
 
     <!-- Javadoc properties -->
     <property name="build.dest.docs" value="${build.dir}/docs" />
+    <property name="build.dest.doccheck" value="${build.dir}/docs/check" />
     <property name="packages" value="org.*" />
 
     <!-- Subdirectories for main source and classes -->
@@ -121,6 +122,7 @@
     <property name="Name.biojava" value="BioJava" />
     <property name="build.dest.biojava" value="${build.classes.dir}/${name.biojava}" />
     <property name="build.docs.biojava" value="${build.dest.docs}/${name.biojava}" />
+    <property name="build.doccheck.biojava" value="${build.dest.doccheck}/${name.biojava}" />
     <property name="jar.biojava" value="${build.dir}/${name.biojava}.jar" />
     <property name="manifest.file.biojava" value="${manifest.dir}/${name.biojava}.txt" />
     <!-- Subdirectories for tests source and classes -->
@@ -205,6 +207,7 @@
     <!-- Creates directories -->
     <mkdir dir="${build.dest.biojava}" />
     <mkdir dir="${build.docs.biojava}" />
+    <mkdir dir="${build.doccheck.biojava}" />
   </target>
 
   <!-- Prepares the test source code -->
@@ -702,6 +705,19 @@
     </junit>
   </target>
 
+  <target name="doccheck-biojava" depends="prepare-biojava"
+    description="Checks the API documentation">
+    <javadoc
+      doclet="com.sun.tools.doclets.doccheck.DocCheck"
+      docletpath="doccheck.jar"
+      packagenames="${packages}"
+      sourcepath="${src.dir}"
+      classpath="${classpath}:${build.dest.grammars}"
+      destdir="${build.doccheck.biojava}"
+      source="1.4"
+      maxmemory="96m">
+    </javadoc>
+  </target>
 
   <!-- Cleans everything -->
   <target name="clean" depends="init"
