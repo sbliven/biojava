@@ -28,6 +28,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
 
+import org.biojava.bio.seq.FeatureHolder;
+
 /**
  * <code>LayeredRenderer</code> handles the lane offsets for
  * <code>MultiLineRender</code>s. For each successive lane it
@@ -211,33 +213,42 @@ public class LayeredRenderer {
         Iterator srcI = srcL.iterator();
         Iterator i = renderers.iterator();
 
+        SequenceViewerEvent sve = null;
+        
         while (srcI.hasNext() && i.hasNext()) {
             SequenceRenderContext src = (SequenceRenderContext) srcI.next();
             SequenceRenderer sRend = (SequenceRenderer) i.next();
             double depth = sRend.getDepth(src);
 
-            SequenceViewerEvent sve = null;
+            SequenceViewerEvent thisSve = null;
             if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
                 if ((me.getY() >= offset) && (me.getY() < offset + depth)) {
                     me.translatePoint(0, (int) -offset);
-                    sve = sRend.processMouseEvent(src, me, path);
+                    thisSve = sRend.processMouseEvent(src, me, path);
                     me.translatePoint(0, (int) +offset);
                 }
             } else {
                 if ((me.getX() >= offset) && (me.getX() < offset + depth)) {
                     me.translatePoint((int) -offset, 0);
-                    sve = sRend.processMouseEvent(src, me, path);
+                    thisSve = sRend.processMouseEvent(src, me, path);
                     me.translatePoint((int) +offset, 0);
                 }
             }
 
-            if (sve != null) {
-                return sve;
+            if (thisSve != null) {
+                if (sve == null) {
+                    sve = thisSve;
+                } else if (thisSve.getTarget() instanceof FeatureHolder &&
+                           ((FeatureHolder) thisSve.getTarget()).countFeatures() > 0) 
+                {
+                    // features trump anything else
+                    sve = thisSve;
+                }
             }
 
             if (! (sRend instanceof OverlayMarker)) offset += depth;
         }
-        return null;
+        return sve;
     }
 }
 

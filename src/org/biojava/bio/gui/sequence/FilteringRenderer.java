@@ -162,7 +162,7 @@ extends SequenceRendererWrapper {
     );
   }
   
-  private CacheMap contextCache = new FixedSizeMap(5);
+  private CacheMap contextCache = new FixedSizeMap(500);
   private Set flushers = new HashSet();
   
   protected SequenceRenderContext getContext(
@@ -184,6 +184,7 @@ extends SequenceRendererWrapper {
       );
       contextCache.put(gopher, subSrc);
       CacheFlusher cf = new CacheFlusher(gopher);
+      // System.err.println("Adding changelistener: " + toString());
       ((Changeable) src.getSymbols()).addChangeListener(cf, FeatureHolder.FEATURES);
       flushers.add(cf);
     }
