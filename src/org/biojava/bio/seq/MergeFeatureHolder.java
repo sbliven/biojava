@@ -49,6 +49,15 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 	featureHolders.add(fh);
     }
 
+    /**
+     * Remove a FeatureHolder from the set of FeatureHolders which
+     * are merged.
+     */
+
+    public void removeFeatureHolder(FeatureHolder fh) {
+	featureHolders.remove(fh);
+    }
+
     public int countFeatures() {
 	int fc = 0;
 	for (Iterator i = featureHolders.iterator(); i.hasNext(); ) {
