@@ -25,11 +25,11 @@ public class TestDAS {
 	    System.out.println(i.next().toString());
 	}
 
-	System.out.println("All entry points:");
-	Set allIds = dasDB.allEntryPointsDB().ids();
-	for (Iterator i = allIds.iterator(); i.hasNext(); ) {
-	    System.out.println(i.next().toString());
-	}
+	//  System.out.println("All entry points:");
+//  	Set allIds = dasDB.allEntryPointsDB().ids();
+//  	for (Iterator i = allIds.iterator(); i.hasNext(); ) {
+//  	    System.out.println(i.next().toString());
+//  	}
 
 	DASSequence dasSeq = (DASSequence) dasDB.getSequence((String) ids.iterator().next());
 	// dasSeq.addAnnotationSource(annoURL);
@@ -37,5 +37,23 @@ public class TestDAS {
 	System.out.println("Length: " + dasSeq.length());
 	System.out.println("1st 10 bases: " + dasSeq.subStr(1, 10));
 	System.out.println("Feature count: " + dasSeq.countFeatures());
+
+	printFeatures(dasSeq, System.out, "");
+    }
+
+    public static void printFeatures(FeatureHolder fh, 
+				     PrintStream pw,
+				     String prefix)
+	throws Exception
+    {
+	for (Iterator i = fh.features(); i.hasNext(); ) {
+	    Feature f = (Feature) i.next();
+	    pw.print(prefix);
+	    pw.print(f.getType());
+	    pw.print(" at ");
+	    pw.print(f.getLocation().toString());
+	    pw.println();
+	    printFeatures(f, pw, prefix + "    ");
+	}
     }
 }
