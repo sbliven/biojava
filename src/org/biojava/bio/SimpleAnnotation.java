@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.biojava.bio;
 
 import java.util.*;
@@ -146,6 +145,14 @@ public class SimpleAnnotation implements Annotation, Serializable {
     }
   }
 
+  public boolean containsProperty(Object key) {  
+    if(propertiesAllocated()) {
+      return properties.containsKey(key);
+    } else {
+      return false;
+    }
+  }
+ 
   public Set keys() {
     if(propertiesAllocated()) {
       return properties.keySet();

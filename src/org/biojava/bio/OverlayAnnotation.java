@@ -160,6 +160,17 @@ public class OverlayAnnotation implements Annotation, Serializable {
       return parent.getProperty(key);
   }
 
+  public boolean containsProperty(Object key) {
+     if(
+       (overlay != null) &&
+       (overlay.containsKey(key))
+     ) {
+       return true;
+     } else {
+       return parent.containsProperty(key);
+     }
+   }
+
     private Object getPropertySilent(Object key) {
 	try {
 	    return getProperty(key);
