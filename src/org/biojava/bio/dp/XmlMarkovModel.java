@@ -84,6 +84,9 @@ public class XmlMarkovModel {
       for(int j = 0; j < weights.getLength(); j++) {
         Element weightE = (Element) weights.item(j);
         String symName = weightE.getAttribute("res");
+	if(symName == null || "".equals(symName)) {
+          symName = weightE.getAttribute("sym");
+	}	
         Symbol sym;
         if(symName.length() > 1) {
           sym = nameParser.parseToken(symName);
