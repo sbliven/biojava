@@ -3,6 +3,7 @@
 
 package org.biojava.utils.regex;
 
+import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SymbolList;
 
@@ -16,17 +17,22 @@ public class Pattern
     private FiniteAlphabet alfa;
     private java.util.regex.Pattern pattern;
     private String label;
+    private String patternTxt;
 
-    Pattern(java.util.regex.Pattern pattern, FiniteAlphabet alfa)
+    Pattern(String patternTxt, PatternChecker checker, FiniteAlphabet alfa)
+        throws IllegalAlphabetException, RegexException
     {
-        this.pattern = pattern;
+        this.pattern = java.util.regex.Pattern.compile(checker.parse(patternTxt));
+        this.patternTxt = patternTxt;
         this.alfa = alfa;
-        label = "";
+        label = patternTxt;
     }
 
-    Pattern(java.util.regex.Pattern pattern, FiniteAlphabet alfa, String label)
+    Pattern(String patternTxt, PatternChecker checker, FiniteAlphabet alfa, String label)
+        throws IllegalAlphabetException, RegexException
     {
-        this.pattern = pattern;
+        this.pattern = java.util.regex.Pattern.compile(checker.parse(patternTxt));
+        this.patternTxt = patternTxt;
         this.alfa = alfa;
         this.label = label;
     }
@@ -49,8 +55,17 @@ public class Pattern
     /**
      * returns the Pattern to be matched as a String.
      */
-    //FIXME: do something about unicode strings and conversion back to something sensible.
     public String patternAsString()
+    {
+        return patternTxt;
+    }
+
+    /**
+     * returns the actual String used to construct the regex with all
+     * ambiguities expanded.
+    //FIXME: do something about unicode strings and conversion back to something sensible.
+     */
+    public String patternExpanded()
     {
         return pattern.pattern();
     }

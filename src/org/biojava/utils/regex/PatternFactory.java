@@ -12,6 +12,7 @@ import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.AbstractAlphabet;
 import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.seq.io.SymbolTokenization;
@@ -27,6 +28,7 @@ public class PatternFactory
 {
     private FiniteAlphabet alfa;
     private SymbolTokenization toke = null;
+    private PatternChecker checker = null;
 
     PatternFactory(FiniteAlphabet alfa)
     {
@@ -78,11 +80,13 @@ public class PatternFactory
      * was defined against.
      */
     public org.biojava.utils.regex.Pattern compile(String pattern)
+        throws RegexException, IllegalAlphabetException
     {
         // validate the pattern is from this alphabet
         // we only accept RE tokens and characters from 
         // the alphabet itself.
-        return new org.biojava.utils.regex.Pattern(java.util.regex.Pattern.compile(pattern), alfa);
+        if (checker == null) checker = new PatternChecker(alfa);
+        return new org.biojava.utils.regex.Pattern(pattern, checker, alfa);
     }
 
     /**
@@ -94,11 +98,13 @@ public class PatternFactory
      * @param label A String label assigned to the Pattern object.  Can be retrieved later with getName().
      */
     public org.biojava.utils.regex.Pattern compile(String pattern, String label)
+        throws RegexException, IllegalAlphabetException
     {
         // validate the pattern is from this alphabet
         // we only accept RE tokens and characters from
         // the alphabet itself.
-        return new org.biojava.utils.regex.Pattern(java.util.regex.Pattern.compile(pattern), alfa, label);
+        if (checker == null) checker = new PatternChecker(alfa);
+        return new org.biojava.utils.regex.Pattern(pattern, checker, alfa, label);
     }
 
     /**
