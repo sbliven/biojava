@@ -105,6 +105,16 @@ public class SeqIOTools  {
                                 getDNAParser(),
                                 getGenbankBuilderFactory());
     }
+	
+	/**
+	 * Iterate over the sequences in an GenPept-format stream.
+	 */
+	public static SequenceIterator readGenpept(BufferedReader br){
+		return new StreamReader(br,
+								new GenbankFormat(),
+								getProteinParser(),
+								getGenbankBuilderFactory());
+	}
 
     private static SequenceBuilderFactory _swissprotBuilderFactory;
 
