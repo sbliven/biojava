@@ -192,13 +192,6 @@ extends AbstractDistribution implements Serializable {
       // this accesses the state of DNADistribution directly. We should be
       // protected from nasties as long as the change event stuff is being used
       // properly.
-      System.out.println("Training " + this);
-      System.out.println("Was:");
-      for(int i = 0; i < c.length; i++) {
-        Symbol s = DNATools.forIndex(i);
-        System.out.println("\t" + s.getName() + "->" + scores[i]);
-      }
-
       try {
         Distribution nullModel = getNullModel();
         double sum = 0.0;
@@ -207,16 +200,9 @@ extends AbstractDistribution implements Serializable {
           sum += c[i] + nullModel.getWeight(s)*weight;
         }
         
-        System.out.println("Sum: " + sum);
-        
         for(int i = 0; i < c.length; i++) {
           Symbol s = DNATools.forIndex(i);
           scores[i] = (c[i] + nullModel.getWeight(s)*weight) / sum;
-        }
-        System.out.println("Is:");
-        for(int i = 0; i < c.length; i++) {
-          Symbol s = DNATools.forIndex(i);
-          System.out.println("\t" + s.getName() + "->" + scores[i]);
         }
       } catch (IllegalSymbolException ise) {
         throw new BioError(ise, "Nullmodel alphabet incompatible with this distribution");
@@ -224,7 +210,6 @@ extends AbstractDistribution implements Serializable {
     }
       
     public void clearCounts() {
-      System.out.println("Clearing counts for " + this);
       for(int i = 0; i < c.length; i++) {
         c[i] = 0;
       }

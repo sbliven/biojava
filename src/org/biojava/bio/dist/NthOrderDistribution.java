@@ -39,7 +39,11 @@ public class NthOrderDistribution extends AbstractDistribution {
     this.alphabet = alpha;
     List aList = alpha.getAlphabets();
     int lb1 = aList.size() - 1;
-    this.firstA = AlphabetManager.getCrossProductAlphabet(aList.subList(0, lb1));
+    if(aList.size() == 2) {
+      this.firstA = (Alphabet) aList.get(0);
+    } else {
+      this.firstA = AlphabetManager.getCrossProductAlphabet(aList.subList(0, lb1));
+    }
     this.lastA = (Alphabet) aList.get(lb1);
     this.dists = new HashMap(); 
     this.nullModel = new UniformNullModel();
@@ -86,17 +90,21 @@ public class NthOrderDistribution extends AbstractDistribution {
   }
   
   public double getWeight(Symbol sym) throws IllegalSymbolException {
-    CrossProductSymbol cps = (CrossProductSymbol) sym;
-    List symL = cps.getSymbols();
-    int lb1 = symL.size() - 1;
-    Symbol firstS;
-    if(lb1 == 1) {
-      firstS = (Symbol) symL.get(0);
+    if(sym instanceof AtomicSymbol) {
+      CrossProductSymbol cps = (CrossProductSymbol) sym;
+      List symL = cps.getSymbols();
+      int lb1 = symL.size() - 1;
+      Symbol firstS;
+      if(symL.size() == 2) {
+        firstS = (Symbol) symL.get(0);
+      } else {
+        firstS = ((CrossProductAlphabet) firstA).getSymbol(symL.subList(0, lb1));
+      }
+      Distribution dist = getDistribution(firstS);
+      return dist.getWeight((Symbol) symL.get(lb1));
     } else {
-      firstS = ((CrossProductAlphabet) firstA).getSymbol(symL.subList(0, lb1));
+      return getAmbiguityWeight(sym);
     }
-  	Distribution dist = getDistribution(firstS);
-  	return dist.getWeight((Symbol) symL.get(lb1));
   }
   
   public void setNullModel(Distribution nullModel)

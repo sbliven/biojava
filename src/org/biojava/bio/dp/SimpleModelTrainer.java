@@ -41,14 +41,12 @@ implements ModelTrainer, Serializable {
         try {
           Distribution dist = model.getWeights(s);
           registerDistribution(dist);
-          System.out.println("Registered " + dist);
         } catch (IllegalSymbolException ise) {
           throw new BioError(ise, "Couldn't register states from model");
         }
         if(s instanceof EmissionState) {
           Distribution dist = ((EmissionState) s).getDistribution();
           registerDistribution(dist);
-          System.out.println("Registered " + dist);
         }
       }
     }
