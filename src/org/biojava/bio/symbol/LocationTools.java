@@ -646,4 +646,22 @@ final public class LocationTools {
         throw new ClassCastException("Decorated locations are not handled in this version");
       }
   }
+  
+  public static Location flip(Location loc, int len) {
+      if(loc instanceof PointLocation) {
+          return new PointLocation(len - loc.getMin() + 1);
+      } else if(loc instanceof RangeLocation) {
+          return new RangeLocation(
+            len - loc.getMax() + 1,
+            len - loc.getMin() + 1
+          );
+      } else {
+          Iterator bi = loc.blockIterator();
+          Location res = (Location) bi.next();
+          while(bi.hasNext()) {
+              res = LocationTools.union(res, (Location) bi.next());
+          }
+          return res;
+      }
+  }
 }
