@@ -66,7 +66,6 @@ public class Ace {
 
     static Database getDatabase(AceURL url) throws AceException {
       url = AceUtils.rootURL(url);
-      System.out.println("Retrieving database for URL " + url);
       Database db = (Database) databases.get(url);
      
      LOAD_DRIVER:
