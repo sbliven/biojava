@@ -65,6 +65,20 @@ import org.biojava.utils.*;
  *
  * @author  Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
+ *
+ * @for.user Check if BioJava classes and interfaces extend Annotatable. This
+ * will tell  you if you should look for associated annotation
+ *
+ * @for.powerUser If an object implements Annotatable, it may well propogate
+ * ChangeEvent notifications from the associated Annotation. You may
+ * need to track these to maintain the state of your applications.
+ *
+ * @for.developer Be careful to hook up the appropreate event forwarders.
+ *
+ * @for.developer The getAnnotation() method can be implemented lazily
+ * (instantiate the Annotation instance and event forwarders when the first
+ * request comes in). It can also be implemented by returning throw-away
+ * immutable Annotatoin instances that are built from scratch each time.
  */
 public interface Annotatable extends Changeable {
   /**
@@ -97,6 +111,9 @@ public interface Annotatable extends Changeable {
    * accordingly.</p>
    *
    * @author Matthew Pocock
+   *
+   * @for.developer This will ease the pain of letting your Annotatable tell its
+   * listeners about changes in the Annotation.
    */
   static class AnnotationForwarder extends ChangeForwarder {
     public AnnotationForwarder(Object source, ChangeSupport cs) {

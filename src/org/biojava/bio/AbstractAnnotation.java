@@ -27,11 +27,20 @@ import java.io.Serializable;
 import org.biojava.utils.*;
 
 /**
- * A utility class to ease the problem of implementing an Annotatoin to that of
- * providing an apropreate implementatin of Map.
+ * A utility class to ease the problem of implementing an Annotation to that of
+ * providing an apropreate implementation of Map.
  *
  * @author Matthew Pocock
  * @author Greg Cox
+ *
+ * @for.developer This class is only intended as a way to implement
+ * Annotation. If you are not trying to do that, then don't read on. If you
+ * are reading the documentation for an Annotation implementation that extends
+ * this, then don't read on. There is nothing to see here.
+ *
+ * @for.developer If you are still reading this, then you must be trying to
+ * implement Annotation. To do that, extend this class and implement
+ * <code>getProperties()</code> and <code>propertiesAllocated()</code>.
  */
 public abstract class AbstractAnnotation
   extends
@@ -44,6 +53,8 @@ public abstract class AbstractAnnotation
    * Implement this to return the Map delegate.
    *
    * From code in the 1.2 version of AbstractAnnotation
+   * @for.developer This is required for the implementation of an Annotation that
+   *            extends AbstractAnnotation
    */
   protected abstract Map getProperties();
 
@@ -52,6 +63,8 @@ public abstract class AbstractAnnotation
    * Map.
    *
    * @return true if the properties have been allocated, false otherwise
+   * @for.developer This is required for the implementation of an Annotation that
+   *            extends AbstractAnnotation
    */
   protected abstract boolean propertiesAllocated();
 

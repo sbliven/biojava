@@ -42,9 +42,10 @@ import org.biojava.utils.*;
  * @since 1.3
  * @author Matthew Pocock
  * @author Keith James.
- * @powerUser Instantiate PropertyConstraint classes when populating an
+ *
+ * @for.powerUser Instantiate PropertyConstraint classes when populating an
  *            AnnotationType instance
- * @developer Implement PropertyContraint to provide meta-data about a new
+ * @for.developer Implement PropertyContraint to provide meta-data about a new
  *            type of object relationship. For example, if there was a
  *            data-structure representing an inheritance hierachy, then an
  *            implementation of PropertyConstraint could be written that allowed
@@ -58,9 +59,11 @@ public interface PropertyConstraint {
      *
      * @param value an <code>Object</code> to check.
      * @return a <code>boolean</code>.
-     * @powerUser Manually compare items with the PropertyConstraint. Node: this
-     *            will ususaly be done for you in an AnnotationType instance
-     * @developer Use for implementing accept() on AnnotatoinType
+     *
+     * @for.powerUser Manually compare items with the PropertyConstraint. Node:
+     * this will ususaly be done for you in an AnnotationType instance
+     *
+     * @for.developer Use for implementing accept() on AnnotatoinType
      */
     public boolean accept(Object value);
 
@@ -85,9 +88,11 @@ public interface PropertyConstraint {
      *
      * @param subConstraint a <code>PropertyConstraint</code> to check.
      * @return a <code>boolean</code>.
-     * @developer Usefull when attempting to compare two constraints to see if
-     *            it is necisary to retain both. You may want to check the more
-     *            general or the more specific constraint only.
+     *
+     * @for.developer
+     * Usefull when attempting to compare two constraints to see
+     * if it is necisary to retain both. You may want to check the more
+     * general or the more specific constraint only.
      */
     public boolean subConstraintOf(PropertyConstraint subConstraint);
 
@@ -99,8 +104,9 @@ public interface PropertyConstraint {
      * @param property an <code>Object</code> under which to add the
      * value.
      * @param value an <code>Object</code> to add.
-     * @exception ChangeVetoException if an error occurs.
-     * @developer Use for implementing setProperty() on AnnotationType
+     * @exception ChangeVetoException if an error occurs
+     *
+     * @for.developer Use for implementing setProperty() on AnnotationType
      */
     public void setProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
@@ -111,7 +117,7 @@ public interface PropertyConstraint {
      * @param coll the Collection to modufy to include value
      * @param value  the value to add
      * @throws ChangeVetoException if the value can not be added
-     * @developer Use for implementing setProperty() on AnnotationType
+     * @for.developer Use for implementing setProperty() on AnnotationType
      */
     public void addValue(Collection coll, Object value)
         throws ChangeVetoException;
@@ -120,8 +126,8 @@ public interface PropertyConstraint {
      * <code>ANY</code> is a constraint which accepts a property for
      * addition under all conditions.
      *
-     * @user Whenever a PropertyConstraint is needed and you want to allow any
-     *       value there
+     * @for.user Whenever a PropertyConstraint is needed and you want to allow
+     * any value there
      */
     public static final PropertyConstraint ANY = new AnyPropertyConstraint();
     
@@ -129,8 +135,8 @@ public interface PropertyConstraint {
      * <code>NONE</code> is a constraint which accepts no value for a property
      * under any condition.
      *
-     * @user Whenever a PropertyConstraint is needed and you want to dissalow
-     *       all values there e.g. when marking a property as having to be unset
+     * @for.user Whenever a PropertyConstraint is needed and you want to
+     * dissalow all values there e.g. when marking a property as having to be unset
      */
     public static final PropertyConstraint NONE = new NonePropertyConstraint();
   
@@ -140,7 +146,7 @@ public interface PropertyConstraint {
      *
      * @since 1.3
      * @author Matthew Pocock
-     * @user Constrain a property to containing values of a particular class
+     * @for.user Constrain a property to containing values of a particular class
      *       e.g. <code>new ByClass(String.class)</code> or 
      *       <code>new ByClass(Double)</code> will ensure
      *       that the property is a String or a Double respecitvely.
@@ -152,7 +158,7 @@ public interface PropertyConstraint {
          * Create a new ByClass instance.
          *
          * @param cl the Class that all properties must be assignable to
-         * @user
+         * @for.user
          */
         public ByClass(Class cl) {
             this.cl = cl;
@@ -225,10 +231,11 @@ public interface PropertyConstraint {
      *
      * @since 1.3
      * @author Matthew Pocock
-     * @powerUser If you wish to build a tree of Annotations so that a property
-     *            in one is guaranteed to be itself an Annotation of a
-     *            particular type. Effectively this lets you build your own
-     *            type system using AnnotationType and PropertyConstraint.
+     *
+     * @for.powerUser If you wish to build a tree of Annotations so that a
+     * property in one is guaranteed to be itself an Annotation of a
+     * particular type. Effectively this lets you build your own
+     * type system using AnnotationType and PropertyConstraint.
      */
     public class ByAnnotationType implements PropertyConstraint {
         private AnnotationType annType;
@@ -237,7 +244,7 @@ public interface PropertyConstraint {
          * Create a new constraint by type.
          *
          * @param annType the AnnotationType to constrain to
-         * @user
+         * @for.user
          */
         public ByAnnotationType(AnnotationType annType) {
             this.annType = annType;
@@ -301,12 +308,14 @@ public interface PropertyConstraint {
      * property set to a particular value e.g. ID="01234".</p>
      *
      * @author Matthew Pocock
-     * @user If you want to declare that a property must have a single value
-     * @powerUser In conjunction with CardinalityConstraint.ZERO_OR_ONE you coud
-     *            make a property that is potional but if present must have this
-     *            value
-     * @powerUser Use with FilterUtils.byAnnotation() to search for features
-     *            with properties set to specific values
+     * @for.user If you want to declare that a property must have a single value
+     *
+     * @for.powerUser In conjunction with CardinalityConstraint.ZERO_OR_ONE you
+     * could make a property that is potional but if present must have this
+     * value
+     *
+     * @for.powerUser Use with FilterUtils.byAnnotation() to search for features
+     * with properties set to specific values
      */
     public class ExactValue implements PropertyConstraint {
       private Object value;
@@ -316,7 +325,7 @@ public interface PropertyConstraint {
        * are equal to it (by the Object.equals() method).
        *
        * @param value  the Object to match against
-       * @user
+       * @for.user
        */
       public ExactValue(Object value) {
         this.value = value;
@@ -376,10 +385,12 @@ public interface PropertyConstraint {
      *
      * @since 1.3
      * @author Matthew Pocock
-     * @user If you want to declare that a property must be within a range of
-     *       values, for example PRIMARY_COLOR is one of "RED, YELLOW, BLUE"
-     * @powerUser Use with FilterUtils.byAnnotation() to search for features
-     *            with properties set to a range of values
+     *
+     * @for.user If you want to declare that a property must be within a range
+     * of values, for example PRIMARY_COLOR is one of "RED, YELLOW, BLUE"
+     *
+     * @for.powerUser Use with FilterUtils.byAnnotation() to search for features
+     * with properties set to a range of values
      */
     public class Enumeration implements PropertyConstraint {
         private Set values;
@@ -389,7 +400,7 @@ public interface PropertyConstraint {
          * the specified set as a constraint.
          *
          * @param values a <code>Set</code> of all possible values
-         * @user
+         * @for.user
          */
         public Enumeration(Set values) {
             this.values = values;
@@ -400,7 +411,7 @@ public interface PropertyConstraint {
          * specified array as a constraint.
          *
          * @param values an <code>Array</code> of all possible values
-         * @user
+         * @for.user
          */
         public Enumeration(Object[] values) {
           this.values = new HashSet();
@@ -469,8 +480,8 @@ public interface PropertyConstraint {
      * matched by the two constraints.
      *
      * @author Matthew Pocock
-     * @powerUser Use this to combine multiple constraints. You can make one or
-     *            both of the children And instances if you need a tighter
+     * @for.powerUser Use this to combine multiple constraints. You can make one
+     *            or both of the children And instances if you need a tighter
      *            intersection.
      */
     public class And implements PropertyConstraint {
@@ -482,7 +493,7 @@ public interface PropertyConstraint {
        *
        * @param c1 the first child
        * @param c2 the seccond child
-       * @user
+       * @for.user
        */
       public And(PropertyConstraint c1, PropertyConstraint c2) {
         this.c1 = c1;
@@ -493,7 +504,8 @@ public interface PropertyConstraint {
        * Get the first child PropertyConstraint.
        *
        * @return the first child PropertyConstraint
-       * @powerUser Introspect this constraint
+       *
+       * @for.powerUser Introspect this constraint
        */
       public PropertyConstraint getChild1() {
         return c1;
@@ -503,7 +515,8 @@ public interface PropertyConstraint {
        * Get the seccond child PropertyConstraint.
        *
        * @return the seccond child PropertyConstraint
-       * @powerUser Introspect this constraint
+       *
+       * @for.powerUser Introspect this constraint
        */
       public PropertyConstraint getChild2() {
         return c2;
@@ -544,8 +557,8 @@ public interface PropertyConstraint {
      * matched by the two constraints.
      *
      * @author Matthew Pocock
-     * @powerUser Use this to combine multiple constraints. You can make one or
-     *            both of the children Or instances if you need a wider
+     * @for.powerUser Use this to combine multiple constraints. You can make one
+     *            or both of the children Or instances if you need a wider
      *            union.
      */
     public class Or implements PropertyConstraint {
@@ -557,7 +570,7 @@ public interface PropertyConstraint {
        *
        * @param c1 the first child
        * @param c2 the seccond child
-       * @user
+       * @for.user
        */
       public Or(PropertyConstraint c1, PropertyConstraint c2) {
         this.c1 = c1;
@@ -568,7 +581,7 @@ public interface PropertyConstraint {
        * Get the first child PropertyConstraint.
        *
        * @return the first child PropertyConstraint
-       * @powerUser Introspect this constraint
+       * @for.powerUser Introspect this constraint
        */
       public PropertyConstraint getChild1() {
         return c1;
@@ -578,7 +591,7 @@ public interface PropertyConstraint {
        * Get the seccond child PropertyConstraint.
        *
        * @return the seccond child PropertyConstraint
-       * @powerUser Introspect this constraint
+       * @for.powerUser Introspect this constraint
        */
       public PropertyConstraint getChild2() {
         return c2;

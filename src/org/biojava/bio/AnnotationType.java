@@ -100,18 +100,28 @@ import org.biojava.bio.symbol.LocationTools;
  * @since 1.3
  * @author Matthew Pocock
  * @author Keith James (docs)
- * @user Using AnnotationType instances that you have been provided with e.g.
- *       from UnigeneTools.LIBRARY_ANNOTATION
- * @powerUser Make AnnotationType instances that describe what should and
- *            should not appear in an Annotation bundle
- * @powerUser Constrain FeatureFilter schemas by Annotation associated with
- *            the features
- * @powerUser Provide meta-data to the tag-value parser for automatically
- *            generating object representations of flat-files
- * @developer Implementing your own AnnotationType implementations to reflect
- *            frame, schema or ontology definitions. For example, dynamically
- *            reflect an RDMBS schema or DAML/Oil deffinition as an
- *            AnnotationType.
+ *
+ * @for.user
+ * Using AnnotationType instances that you have been provided with
+ * e.g. from UnigeneTools.LIBRARY_ANNOTATION
+ *
+ * @for.powerUser
+ * Make AnnotationType instances that describe what should and
+ * should not appear in an Annotation bundle
+ *
+ * @for.powerUser
+ * Constrain FeatureFilter schemas by Annotation associated with
+ * the features
+ *
+ * @for.powerUser
+ * Provide meta-data to the tag-value parser for automatically
+ * generating object representations of flat-files
+ *
+ * @for.developer
+ * Implementing your own AnnotationType implementations to reflect
+ * frame, schema or ontology definitions. For example, dynamically
+ * reflect an RDMBS schema or DAML/Oil deffinition as an
+ * AnnotationType.
  */
 public interface AnnotationType {
     /**
@@ -119,7 +129,7 @@ public interface AnnotationType {
      * other annotations. Only an empty annotation is an exact instance of
      * this type.
      *
-     * @user Use this whenever an AnnotationType is needed by an API and you
+     * @for.user Use this whenever an AnnotationType is needed by an API and you
      *       don't want to constrain anything
      */
     public static final AnnotationType ANY = new Impl(
@@ -131,7 +141,7 @@ public interface AnnotationType {
      * The type that accepts no annotations at all and is the subtype of all
      * other annotations.
      *
-     * @user Use this whenever an AnnotationType is needed by an API and you
+     * @for.user Use this whenever an AnnotationType is needed by an API and you
      *       want to make sure that all Annotation objects get rejected
      */
     public static final AnnotationType NONE = new Impl(
@@ -142,7 +152,7 @@ public interface AnnotationType {
     /**
      * Validate an Annotation against this AnnotationType.
      *
-     * @user Any time you wish to see if an Annotation bundle conforms to a
+     * @for.user Any time you wish to see if an Annotation bundle conforms to a
      *       type
      * @param ann the Annotation to validate.
      * @return true if ann conforms to this type and false if it doesn't.
@@ -158,10 +168,11 @@ public interface AnnotationType {
      * the pure Java sense; it may include checks on the number and
      * type of members in collections or other criteria.</p>
      *
-     * @powerUser If you wish to check that one type is a more constrained
-     *            version of another
      * @param subType an AnnotationType to check.
      * @return true if subType is a sub-type of this type.
+     *
+     * @for.powerUser If you wish to check that one type is a more constrained
+     * version of another
      */
     public boolean subTypeOf(AnnotationType subType);
 
@@ -174,11 +185,12 @@ public interface AnnotationType {
      * values associated with those properties must match the
      * constraint.</p>
      *
-     * @powerUser If you want to find out exactly what constraints will be
-     *            applied to a particular propery key
      * @param key the property to be validated.
      * @return PropertyConstraint the constraint by which the values
      * must be accepted.
+     *
+     * @for.powerUser If you want to find out exactly what constraints will be
+     * applied to a particular propery key
      */
     public PropertyConstraint getPropertyConstraint(Object key);
 
@@ -189,21 +201,22 @@ public interface AnnotationType {
      * of values that matches the cardinality constraint. Common values are
      * represented by static fields of Location.</p>
      *
-     * @powerUser If you want to find out exactly what constraints will be
-     *            applied to a particular propery key
      * @param key the property to be validated
      * @return a Location giving the number of values assocated
      *         with the property
+     * @for.powerUser If you want to find out exactly what constraints will be
+     * applied to a particular propery key
      */
     public Location getCardinalityConstraint(Object key);
 
     /**
      * Set the constraints associated with a property.
      *
-     * @powerUser When you are building your own AnnotationType
      * @param key  the name of the property to constrain
      * @param con  the PropertyConstraint to enforce
      * @param card the CardinalityConstraint to enforce
+     *
+     * @for.powerUser When you are building your own AnnotationType
      */
     public void setConstraints(
       Object key,
@@ -215,9 +228,10 @@ public interface AnnotationType {
      * Set the constraints that will apply to all properties without an
      * explicitly defined set of constraints.
      *
-     * @powerUser When you are building your own AnnotationType
      * @param pc  the default PropertyConstraint
      * @param cc the default CardinalityConstraint
+     *
+     * @for.powerUser When you are building your own AnnotationType
      */
     public void setDefaultConstraints(PropertyConstraint pc, Location cc);
     
@@ -225,9 +239,10 @@ public interface AnnotationType {
      * Get the PropertyConstraint that will be applied to all properties without
      * an explicit binding. This defaults to PropertyConstraint.ALL.
      *
-     * @powerUser If you want to find out exactly what constraint will be
-     *            applied to properties with no explicitly defined constraints
      * @return the default PropertyConstraint
+     *
+     * @for.powerUser If you want to find out exactly what constraint will be
+     * applied to properties with no explicitly defined constraints
      */
     public PropertyConstraint getDefaultPropertyConstraint();
 
@@ -235,9 +250,10 @@ public interface AnnotationType {
      * Get the CardinalityConstraint that will be applied to all properties without
      * an explicit binding. This defaults to CardinalityConstraint.ALL.
      *
-     * @powerUser If you want to find out exactly what constraint will be
-     *            applied to properties with no explicitly defined constraints
      * @return the default CardinalityConstraint
+     *
+     * @for.powerUser If you want to find out exactly what constraint will be
+     * applied to properties with no explicitly defined constraints
      */
     public Location getDefaultCardinalityConstraint();
 
@@ -247,7 +263,8 @@ public interface AnnotationType {
      * <code>AnnotationType</code>.</p>
      *
      * @return the Set of properties to validate.
-     * @powerUser Discover which properties have explicit constraints
+     *
+     * @for.powerUser Discover which properties have explicit constraints
      */
     public Set getProperties();
 
@@ -262,8 +279,9 @@ public interface AnnotationType {
      * @throws ChangeVetoException  if the value could not be accepted by this
      *         annotation type for that property key, or if the Annotation could
      *         not be modified
-     * @user Edit an Annotation bundle in a way compattible with this
-     *       AnnotationType
+     *
+     * @for.user Edit an Annotation bundle in a way compattible with this
+     * AnnotationType
      */
     public void setProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
@@ -278,8 +296,9 @@ public interface AnnotationType {
      * @param property  the property key Object
      * @return a Collection of values
      * @throws ChangeVetoException  if the value could not be removed
-     * @user Edit an Annotation bundle in a way compattible with this
-     *       AnnotationType
+     *
+     * @for.user Edit an Annotation bundle in a way compattible with this
+     * AnnotationType
      */
     public Collection getProperty(Annotation ann, Object property)
         throws ChangeVetoException;
@@ -293,8 +312,9 @@ public interface AnnotationType {
      * @param value  the property value Object
      * @throws ChangeVetoException  if the Annotation could
      *         not be modified
-     * @user Edit an Annotation bundle in a way compattible with this
-     *       AnnotationType
+     *
+     * @for.user Edit an Annotation bundle in a way compattible with this
+     * AnnotationType
      */
     public void removeProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
@@ -308,9 +328,10 @@ public interface AnnotationType {
      * deleteProperty()) and toString() that you may not want to
      * write yourself. It leaves the data-related methods up to you.</p>
      *
-     * @developer  When implementing AnnotationType
      * @since 1.3
      * @author Matthew Pocock
+     *
+     * @for.developer  When implementing AnnotationType
      */
     public abstract class Abstract
     implements AnnotationType {
@@ -498,10 +519,11 @@ public interface AnnotationType {
      * setPropertyConstraint method to build the property->constraint
      * mapping.</p>
      *
-     * @powerUser A convenient class for when you need an AnnotationType
-     *            instance and don't want to write your own
      * @since 1.3
      * @author Matthew Pocock
+     *
+     * @for.powerUser A convenient class for when you need an AnnotationType
+     * instance and don't want to write your own
      */
     public class Impl extends AnnotationType.Abstract {
         private Map cons;

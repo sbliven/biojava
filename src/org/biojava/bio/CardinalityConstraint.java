@@ -27,18 +27,42 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  * @since 1.3
+ *
+ * @for.user Usefull constants for whenever you need one of the common
+ * cardinalitites. Otherwise, build a Location using the normal Location
+ * APIs.:
  */
 public final class CardinalityConstraint {
+  /**
+   * This cardinality contains no intengers, not even zero. It means that there
+   * is no way to fulfill this cardinality constraint. It's like Double.NaN
+   */
   public static final Location NONE
     = Location.empty;
+  /**
+   * The property should have zero values. This means that it should be absent.
+   */
   public static final Location ZERO
     = new RangeLocation(0, 0);
+  /**
+   * The property should have zero or one values. This means that it is optional
+   * but if present must have exactly one value.
+   */
   public static final Location ZERO_OR_ONE
     = new RangeLocation(0, 1);
+  /**
+   * The property can have any number of values, including none.
+   */
   public static final Location ANY
     = new RangeLocation(0, Integer.MAX_VALUE);
+  /**
+   * The property should have exactly one value.
+   */
   public static final Location ONE
     = new RangeLocation(1, 1);
+  /**
+   * The property should have one or more values. It can not be absent.
+   */
   public static final Location ONE_OR_MORE
     = new RangeLocation(1, Integer.MAX_VALUE);
   

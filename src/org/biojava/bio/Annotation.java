@@ -52,6 +52,9 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ *
+ * @for.user Other than when using the constructor, you should be able to
+ * interact with nearly all Annotation implementations via this API.
  */
 public interface Annotation extends Changeable {
   /**
@@ -76,6 +79,9 @@ public interface Annotation extends Changeable {
    * @param key  the key of the property to retrieve
    * @return  the object associated with that key
    * @throws NoSuchElementException if there is no property with the key
+   *
+   * @for.user Normal raw access to the property. For cleverer access, use
+   * methods in AnnotationType.
    */
   Object getProperty(Object key) throws NoSuchElementException;
   
@@ -96,6 +102,9 @@ public interface Annotation extends Changeable {
    *         legal
    * @throws ChangeVetoException if this annotation object can't be changed, or
    *         if the change was vetoed
+   *
+   * @for.user Normal raw access to the property. For cleverer access, use
+   * methods in AnnotationType.
    */
   void setProperty(Object key, Object value)
       throws IllegalArgumentException, ChangeVetoException;
@@ -107,6 +116,9 @@ public interface Annotation extends Changeable {
    * @throws NoSuchElementException if the property doesn't exist
    * @throws ChangeVetoException if the change is vetoed
    * @since 1.3
+   *
+   * @for.user Normal raw access to the property. For cleverer access, use
+   * methods in AnnotationType.
    */
    
   public void removeProperty(Object key)
@@ -117,6 +129,9 @@ public interface Annotation extends Changeable {
    *
    * @param key the key Object to search for
    * @return true if this Annotation knows about the key, false otherwise
+   *
+   * @for.user Normal raw access to the property. For cleverer access, use
+   * methods in AnnotationType.
    */
   boolean containsProperty(Object key);
   
@@ -142,74 +157,80 @@ public interface Annotation extends Changeable {
    * A really useful empty and immutable annotation object.
    * </p>
    *
-   * <p>
-   * Use this instead of null when you really don't want an object or an
-   * implementation to have annotation even though it should implement
+   * @for.developer Be careful when stooring Annotation arguments to
+   *  constructors. It is possible that you have been passed EMPTY_ANNOTATION but
+   * that code later on will access this object believing it to be
+   * mutable. For example, the SeqIO factory code clones some
+   * Annotations passed in on Feature.Template instances
+   *
+   * @for.user Use this instead of null when you really don't want an object or
+   * an implementation to have annotation even though it should implement
    * Annotatable.
-   * </p>
    */
   static final Annotation EMPTY_ANNOTATION = new EmptyAnnotation();
+}
+
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
+class EmptyAnnotation
+extends Unchangeable
+implements Annotation, Serializable {
+  public Object getProperty(Object key) throws NoSuchElementException {
+    throw new NoSuchElementException(
+      "There are no keys in the Empty Annotation object: " +
+      key
+    );
+  }
   
-  /**
-   * The empty and immutable implementation.
-   */
-  class EmptyAnnotation
-  extends Unchangeable
-  implements Annotation, Serializable {
-    public Object getProperty(Object key) throws NoSuchElementException {
-      throw new NoSuchElementException(
-        "There are no keys in the Empty Annotation object: " +
-        key
-      );
+  public void setProperty(Object key, Object value)
+  throws ChangeVetoException {
+    throw new ChangeVetoException(
+      "You can not add properties to the Empty Annotation object: " +
+      key + " -> " + value
+    );
+  }
+  
+  public void removeProperty(Object key)
+  throws ChangeVetoException 
+  {
+    throw new ChangeVetoException(
+      "You cannot remove properties from the empty annotation (!)"
+    );
+  }
+  
+  public boolean containsProperty(Object key) {
+    return false;
+  }
+  
+  public Set keys() {
+    return Collections.EMPTY_SET;
+  }
+  
+  public Map asMap() {
+    //return Collections.EMPTY_MAP; 1.3
+    return new HashMap();
+  }
+  
+  private Object writeReplace() throws ObjectStreamException {
+    try {
+      return new StaticMemberPlaceHolder(Annotation.class.getField("EMPTY_ANNOTATION"));
+    } catch (NoSuchFieldException nsfe) {
+      throw new NotSerializableException(nsfe.getMessage());
     }
-    
-    public void setProperty(Object key, Object value)
-    throws ChangeVetoException {
-      throw new ChangeVetoException(
-        "You can not add properties to the Empty Annotation object: " +
-        key + " -> " + value
-      );
-    }
-    
-    public void removeProperty(Object key)
-      throws ChangeVetoException 
-    {
-      throw new ChangeVetoException(
-        "You cannot remove properties from the empty annotation (!)"
-      );
-    }
-    
-    public boolean containsProperty(Object key) {
+  }
+  
+  public int hashCode() {
+    return asMap().hashCode();
+  }
+  
+  public boolean equals(Object o) {
+    if (! (o instanceof Annotation)) {
       return false;
     }
     
-    public Set keys() {
-      return Collections.EMPTY_SET;
-    }
-    
-    public Map asMap() {
-      //return Collections.EMPTY_MAP; 1.3
-      return new HashMap();
-    }
-    
-    private Object writeReplace() throws ObjectStreamException {
-      try {
-        return new StaticMemberPlaceHolder(Annotation.class.getField("EMPTY_ANNOTATION"));
-      } catch (NoSuchFieldException nsfe) {
-        throw new NotSerializableException(nsfe.getMessage());
-      }
-    }
-
-      public int hashCode() {
-	  return asMap().hashCode();
-      }
-      
-      public boolean equals(Object o) {
-	  if (! (o instanceof Annotation)) {
-	      return false;
-	  }
-	  
-	  return ((Annotation) o).asMap().equals(asMap());
-      }
+    return ((Annotation) o).asMap().equals(asMap());
   }
 }
+

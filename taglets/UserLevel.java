@@ -4,9 +4,9 @@ import java.util.Map;
 
 public class UserLevel implements Taglet {
   public static void register(Map tagletMap) {
-    register(tagletMap, "developer", "Developers");
-    register(tagletMap, "powerUser", "Power users");
-    register(tagletMap, "user", "Users");
+    register(tagletMap, "for.developer", "Developers");
+    register(tagletMap, "for.powerUser", "Power users");
+    register(tagletMap, "for.user", "Users");
   }
   
   private static void register(Map tagletMap, String name, String message) {
@@ -58,7 +58,7 @@ public class UserLevel implements Taglet {
   }
   
   public String toString(Tag tag) {
-    return "<DT><B>Intended for:</B>" + message + "</DT><DD>" + tag.text() + "</DD>\n";
+    return toString(new Tag[] { tag });
   }
   
   public String toString(Tag[] tags) {
@@ -67,11 +67,17 @@ public class UserLevel implements Taglet {
     } else {
       StringBuffer sb = new StringBuffer();
       
-      sb.append("<DT><B>Intended for:</B> " + message + "</DT>");
+      sb.append("<dt></dt><dd><table BORDER=\"1\" CELLPADDING=\"3\" CELLSPACING=\"0\" WIDTH=\"100%\">\n");
+      sb.append("<tr BGCOLOR=\"#EEEEFF\" CLASS=\"TableSubHeadingColor\">\n");
+      sb.append("<td><b>Intended for:</b> " + message + "</td>\n");
+      sb.append("</tr>\n");
       for(int i = 0; i < tags.length; i++) {
-        sb.append("<DD>" + tags[i].text() + "</DD>");
+        String text = tags[i].text();
+        if(text.length() > 0) {
+          sb.append("<tr BGCOLOR=\"white\" CLASS=\"TableRowColor\"><td>" + text + "</td></tr>\n");
+        }
       }
-      sb.append("\n");
+      sb.append("</table></dd>\n");
       
       return sb.toString();
     }
