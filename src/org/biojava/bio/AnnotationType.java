@@ -133,57 +133,13 @@ public interface AnnotationType {
         throws ChangeVetoException;
 
     /**
-     * <p>An implementation of <code>AnnotationType</code>.</p>
+     * <p>An abstract base class usefull fo reriving AnnotationType
+     * instances</p>
      *
-     * <p>To build an instance of <code>AnnotationType.Impl</code>,
-     * first invoke the no-args constructor, and then use the
-     * setPropertyConstraint method to build the property->constraint
-     * mapping.</p>
-     * 
-     * @since 1.3
      * @author Matthew Pocock
      */
-    public class Impl implements AnnotationType {
-        private Map cons;
-        private Map cards;
-    
-        /**
-         * Create a new Impl with no constraints.
-         */
-        public Impl() {
-            cons = new SmallMap();
-            cards = new SmallMap();
-        }
-
-        public PropertyConstraint getPropertyConstraint(Object key) {
-            PropertyConstraint pc = (PropertyConstraint) cons.get(key);
-            if (pc == null) {
-                pc = PropertyConstraint.ANY;
-            }
-            return pc;
-        }
-
-        public CardinalityConstraint getCardinalityConstraint(Object key) {
-            CardinalityConstraint card = (CardinalityConstraint) cards.get(key);
-            if (card == null) {
-                card = CardinalityConstraint.ANY;
-            }
-            return card;
-        }
-        
-        public void setConstraints(
-          Object key,
-          PropertyConstraint con,
-          CardinalityConstraint card
-        ) {
-            cons.put(key, con);
-            cards.put(key, card);
-        }
-
-        public Set getProperties() {
-            return cons.keySet();
-        }
-
+    public abstract class Abstract
+    implements AnnotationType {
         public boolean instanceOf(Annotation ann) {
           for (Iterator i = getProperties().iterator(); i.hasNext();) {
             Object key = i.next();
@@ -244,6 +200,82 @@ public interface AnnotationType {
             }
           }
         }
+
+        public final void setProperty(Annotation ann, Object property, Object value)
+        throws ChangeVetoException {
+          try {
+            PropertyConstraint prop = getPropertyConstraint(property);
+            CardinalityConstraint card = getCardinalityConstraint(property);
+            if(card.getMax() > 1) {
+              Collection vals = null;
+              if(ann.containsProperty(property)) {
+                vals = (Collection) ann.getProperty(property);
+              } else {
+                vals = new ArrayList();
+                ann.setProperty(property, vals);
+              }
+              prop.addValue(vals, value);
+            } else {
+              prop.setProperty(ann, property, value);
+            }
+          } catch (ChangeVetoException cve) {
+            throw new ChangeVetoException(cve, "Failed to change property " + property);
+          }
+        }
+    }
+
+    /**
+     * <p>An implementation of <code>AnnotationType</code>.</p>
+     *
+     * <p>To build an instance of <code>AnnotationType.Impl</code>,
+     * first invoke the no-args constructor, and then use the
+     * setPropertyConstraint method to build the property->constraint
+     * mapping.</p>
+     * 
+     * @since 1.3
+     * @author Matthew Pocock
+     */
+    public class Impl extends AnnotationType.Abstract {
+        private Map cons;
+        private Map cards;
+    
+        /**
+         * Create a new Impl with no constraints.
+         */
+        public Impl() {
+            cons = new SmallMap();
+            cards = new SmallMap();
+        }
+
+        public PropertyConstraint getPropertyConstraint(Object key) {
+            PropertyConstraint pc = (PropertyConstraint) cons.get(key);
+            if (pc == null) {
+                pc = PropertyConstraint.ANY;
+            }
+            return pc;
+        }
+
+        public CardinalityConstraint getCardinalityConstraint(Object key) {
+            CardinalityConstraint card = (CardinalityConstraint) cards.get(key);
+            if (card == null) {
+                card = CardinalityConstraint.ANY;
+            }
+            return card;
+        }
+        
+        public void setConstraints(
+          Object key,
+          PropertyConstraint con,
+          CardinalityConstraint card
+        ) {
+            cons.put(key, con);
+            cards.put(key, card);
+        }
+
+        public Set getProperties() {
+            return cons.keySet();
+        }
+
         
         public boolean exactInstanceOf(Annotation ann) {
           Set keys = new HashSet(ann.keys());
@@ -268,37 +300,16 @@ public interface AnnotationType {
 
             return true;
         }
-
-        public void setProperty(Annotation ann, Object property, Object value)
-        throws ChangeVetoException {
-          try {
-            PropertyConstraint prop = getPropertyConstraint(property);
-            CardinalityConstraint card = getCardinalityConstraint(property);
-            if(card.getMax() > 1) {
-              Collection vals = null;
-              if(ann.containsProperty(property)) {
-                vals = (Collection) ann.getProperty(property);
-              } else {
-                vals = new ArrayList();
-                ann.setProperty(property, vals);
-              }
-              prop.addValue(vals, value);
-            } else {
-              prop.setProperty(ann, property, value);
-            }
-          } catch (ChangeVetoException cve) {
-            throw new ChangeVetoException(cve, "Failed to change property " + property);
-          }
-        }
     }
+
     /**
      * This, like any, will accept empty annotations. If keys do exist, it will
      * expect all values to conform to a single type and cardinality.
      *
-     * @author Matthew Pocock`
+     * @author Matthew Pocock
      */
     public class AnyOfType
-    implements AnnotationType {
+    extends AnnotationType.Abstract {
         private PropertyConstraint constraint;
         private CardinalityConstraint cardinality;
     
@@ -355,15 +366,6 @@ public interface AnnotationType {
           }
           
           return true;
-        }
-
-        public void setProperty(Annotation ann, Object property, Object value)
-        throws ChangeVetoException {
-          try {
-            getPropertyConstraint(property).setProperty(ann, property, value);
-          } catch (ChangeVetoException cve) {
-            throw new ChangeVetoException(cve, "Failed to change property " + property);
-          }
         }
     }
 }
