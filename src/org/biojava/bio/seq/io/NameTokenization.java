@@ -40,10 +40,20 @@ import org.biojava.bio.symbol.*;
 
 public class NameTokenization extends WordTokenization {
     private transient Map nameToSymbol = null;
+    private boolean caseSensitive;
 
-    public NameTokenization(FiniteAlphabet fab) {
+    public NameTokenization(FiniteAlphabet fab, boolean caseSensitive) {
 	super(fab);
 	fab.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
+	this.caseSensitive = caseSensitive;
+    }
+
+    /**
+     * Construct a new NameTokenization, defaulting to case-insensitive.
+     */
+
+    public NameTokenization(FiniteAlphabet fab) {
+	this(fab, false);
     }
 
     protected void finalize() throws Throwable {
@@ -56,7 +66,11 @@ public class NameTokenization extends WordTokenization {
 	    nameToSymbol = new HashMap();
 	    for (Iterator i = ((FiniteAlphabet) getAlphabet()).iterator(); i.hasNext(); ) {
 		Symbol sym = (Symbol) i.next();
-		nameToSymbol.put(sym.getName(), sym);
+		if (caseSensitive) {
+		    nameToSymbol.put(sym.getName(), sym);
+		} else {
+		    nameToSymbol.put(sym.getName().toLowerCase(), sym);
+		}
 	    }
 	    nameToSymbol.put("gap", getAlphabet().getGapSymbol());
 	}
@@ -67,7 +81,13 @@ public class NameTokenization extends WordTokenization {
     public Symbol parseToken(String token)
         throws IllegalSymbolException
     {
-	Symbol sym = (Symbol) getNameToSymbol().get(token);
+	Symbol sym;
+	if (caseSensitive) {
+	    sym = (Symbol) getNameToSymbol().get(token);
+	} else {
+	    sym = (Symbol) getNameToSymbol().get(token.toLowerCase());
+	}
+
 	if (sym == null) {
 	    char c = token.charAt(0);
 	    if (c == '[') {
