@@ -28,6 +28,12 @@ package org.biojava.bio.symbol;
  * @author Matthew Pocock
  * @since 1.1
  */
+ 
+import java.util.*;
+
+import org.biojava.utils.*;
+import org.biojava.bio.*;
+import org.biojava.bio.seq.SequenceIterator;
 
 public final class SymbolListViews {
   private SymbolListViews() {}
@@ -106,5 +112,126 @@ public final class SymbolListViews {
         throws IllegalAlphabetException
     {
 	return new TranslatedSymbolList(symbols, table);
+    }
+    
+    public static Alignment alignment(Map labelToSymList)
+    throws IllegalArgumentException {
+      return new SimpleAlignment(labelToSymList);
+    }
+    
+    public static Alignment alignment(List labels, SymbolList symList)
+    throws IllegalArgumentException {
+      return new SymListAsAlignment(labels, symList);
+    }
+    
+    private static class SymListAsAlignment
+    extends Unchangeable
+    implements Alignment {
+      private final SymbolList symList;
+      private final List labels;
+      
+      public SymListAsAlignment(List labels, SymbolList symList) {
+        if(labels.size() != symList.getAlphabet().getAlphabets().size()) {
+          throw new IllegalArgumentException("There must be one label per symbol list");
+        }
+        
+        this.labels = Collections.unmodifiableList(new ArrayList(labels));
+        this.symList = symList;
+      }
+      
+      public List getLabels() {
+        return labels;
+      }
+      
+      public SequenceIterator sequenceIterator() {
+        throw new UnsupportedOperationException("This method sucks");
+      }
+      
+      public Alignment subAlignment(Set labels, Location loc) {
+        // fixme: we should implement this
+        throw new UnsupportedOperationException("This should be implemented");
+      }
+      
+      public Symbol symbolAt(Object label, int column) {
+        BasisSymbol sym = (BasisSymbol) symList.symbolAt(column);
+        return (Symbol) sym.getSymbols().get(labels.indexOf(label));
+      }
+      
+      public SymbolList symbolListForLabel(Object label) {
+        return new IndexedSymbolList(symList, labels.indexOf(label));
+      }
+      
+      public Alphabet getAlphabet() {
+        return symList.getAlphabet();
+      }
+      
+      public Iterator iterator() {
+        return symList.iterator();
+      }
+      
+      public int length() {
+        return symList.length();
+      }
+      
+      public String seqString() {
+        return symList.seqString();
+      }
+      
+      public SymbolList subList(int start, int end)
+      throws IndexOutOfBoundsException {
+        return symList.subList(start, end);
+      }
+      
+      public String subStr(int start, int end)
+      throws IndexOutOfBoundsException {
+        return symList.subStr(start, end);
+      }
+      
+      public void edit(Edit edit)
+      throws
+        IndexOutOfBoundsException,
+        IllegalAlphabetException,
+        ChangeVetoException
+      {
+        symList.edit(edit);
+      }
+      
+      public List toList() {
+        return symList.toList();
+      }
+      
+      public Symbol symbolAt(int indx)
+      throws IndexOutOfBoundsException {
+        return symList.symbolAt(indx);
+      }
+    }
+    
+    private static class IndexedSymbolList
+    extends AbstractSymbolList {
+      private final int indx;
+      private final SymbolList symList;
+      
+      public IndexedSymbolList(SymbolList symList, int indx)
+      throws IllegalArgumentException {
+        if(indx >= symList.getAlphabet().getAlphabets().size()) {
+          throw new IllegalArgumentException("index too high");
+        }
+        
+        this.indx = indx;
+        this.symList = symList;
+      }
+      
+      public Alphabet getAlphabet() {
+        return (Alphabet) symList.getAlphabet().getAlphabets().get(indx);
+      }
+      
+      public int length() {
+        return symList.length();
+      }
+      
+      public Symbol symbolAt(int indx)
+      throws IndexOutOfBoundsException {
+        return (Symbol) ((BasisSymbol) symList.symbolAt(indx)).getSymbols().get(this.indx);
+      }
     }
 }
