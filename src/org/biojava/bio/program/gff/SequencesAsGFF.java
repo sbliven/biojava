@@ -125,6 +125,7 @@ public class SequencesAsGFF {
 	    }
 	    record.setFrame(GFFRecord.NO_FRAME);
       Map fMap = f.getAnnotation().asMap();
+      Map fMap2 = new HashMap();
       for(Iterator ki = fMap.keySet().iterator(); ki.hasNext(); ) {
         Object key = ki.next();
         Object value = fMap.get(key);
@@ -141,9 +142,9 @@ public class SequencesAsGFF {
           Object o = valueList.get(i);
           valueList.set(i, o.toString());
         }
-        fMap.put(keyS, valueList);
+        fMap2.put(keyS, valueList);
       }
-	    record.setGroupAttributes(fMap);
+	    record.setGroupAttributes(fMap2);
 	    record.setComment(null);
         
 	    handler.recordLine(record);
