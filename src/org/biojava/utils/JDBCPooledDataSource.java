@@ -37,37 +37,74 @@ import org.apache.commons.dbcp.BasicDataSource;
 *
 * Uses Jakarta Commons DBCP and Pool packages.
 * See the description of the dbcp package at 
-*		http://jakarta.apache.org/commons/dbcp/api/overview-summary.html#overview_description
+* http://jakarta.apache.org/commons/dbcp/api/overview-summary.html#overview_description
 *
 * @author Simon Foote
+* @author Len Trigg
 */
 
 public class JDBCPooledDataSource {
 
-	public static DataSource getDataSource(	String driver, 
-																					String url,
-																					String user,
-																					String pass)
-			throws Exception {
-
+  public static DataSource getDataSource(final String driver, 
+                                         final String url,
+                                         final String user,
+                                         final String pass)
+    throws Exception {
+    
     BasicDataSource ds = new BasicDataSource();
     ds.setUrl(url);
     ds.setDriverClassName(driver);
-		ds.setUsername(user);
-		ds.setPassword(pass);
+    ds.setUsername(user);
+    ds.setPassword(pass);
     // Set BasicDataSource properties such as maxActive and maxIdle, as described in
     // http://jakarta.apache.org/commons/dbcp/api/org/apache/commons/dbcp/BasicDataSource.html
     ds.setMaxActive(10);
-		ds.setMaxIdle(5);
-		ds.setMaxWait(10000);
+    ds.setMaxIdle(5);
+    ds.setMaxWait(10000);
   
     // Create a PoolableDataSource as described in http://jakarta.apache.org/commons/dbcp/api/overview-summary.html#overview_description
     ObjectPool connectionPool = new GenericObjectPool(null);
     ConnectionFactory connectionFactory = new DataSourceConnectionFactory(ds);
     PoolableObjectFactory poolableConnectionFactory = new 
-				PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
-    PoolingDataSource dataSource = new PoolingDataSource(connectionPool);
+      PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
+    PoolingDataSource dataSource = new MyPoolingDataSource(connectionPool, url + user);
 
     return dataSource;
+  }
+
+
+  // Adds simple equals and hashcode methods so that we can compare if
+  // two connections are to the same database. This will fail if the
+  // DataSource is redirected to another database etc (I doubt this is
+  // ever likely to be used).
+  static class MyPoolingDataSource extends PoolingDataSource {
+    final String source;
+    public MyPoolingDataSource(ObjectPool connectionPool, String source) {
+      super(connectionPool);
+      this.source = source;
+    }
+    public boolean equals(Object o2) {
+      if ((o2 == null) || !(o2 instanceof MyPoolingDataSource)) {
+        return false;
+      }
+      MyPoolingDataSource b2 = (MyPoolingDataSource) o2;
+      return source.equals(b2.source);
+    }
+    public int hashCode() {
+      return source.hashCode();
+    }
+  }
+
+
+  public static void main(String[] args) {
+    try {
+      DataSource ds1 = getDataSource("org.hsqldb.jdbcDriver", "jdbc:hsqldb:/tmp/hsqldb/biosql", "sa", "");
+      DataSource ds2 = getDataSource("org.hsqldb.jdbcDriver", "jdbc:hsqldb:/tmp/hsqldb/biosql", "sa", "");
+      System.err.println(ds1);
+      System.err.println(ds2);
+      System.err.println(ds1.equals(ds2));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }

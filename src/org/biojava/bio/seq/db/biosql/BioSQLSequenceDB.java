@@ -232,7 +232,8 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             // Create adapters
             featuresSQL = new FeaturesSQL(this);
             try {
-                ontologySQL = new OntologySQL(this);
+                //ontologySQL = new OntologySQL(dataSource, helper);
+                ontologySQL = OntologySQL.getOntologySQL(dataSource, helper);
             } catch (SQLException ex) {
                 throw new BioException("Error accessing ontologies", ex);
             }

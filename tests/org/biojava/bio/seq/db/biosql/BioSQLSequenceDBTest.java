@@ -129,6 +129,7 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
     }
 
     public void tearDown() throws Exception {
+        OntologySQL.clearCache();
         dropSchema(mConnection);
         mConnection.close();
         mConnection = null;

@@ -23,6 +23,7 @@
 
 package org.biojava.bio.seq.db.biosql;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,7 +32,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
+import javax.sql.DataSource;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
@@ -59,7 +60,23 @@ import org.biojava.utils.ChangeVetoException;
  */
 class OntologySQL {
 
-  private BioSQLSequenceDB seqDB;
+  private static HashMap ONTOLOGIES = new HashMap();
+  
+  static synchronized OntologySQL getOntologySQL(DataSource source, DBHelper dbHelper) throws BioException, SQLException {
+    OntologySQL ontologySQL = (OntologySQL) ONTOLOGIES.get(source);
+    if (ontologySQL == null) {
+      ontologySQL = new OntologySQL(source, dbHelper);
+      ONTOLOGIES.put(source, ontologySQL);
+    }
+    return ontologySQL;
+  }
+
+  static synchronized void clearCache() {
+    ONTOLOGIES.clear();
+  }
+
+  private DataSource source;
+  private DBHelper dbHelper;
   private Map ontologiesByID;
   private Map ontologiesByName;
   private Map termsByID;
@@ -128,7 +145,7 @@ class OntologySQL {
 
     Connection conn = null;
     try {
-      conn = seqDB.getDataSource().getConnection();
+      conn = source.getConnection();
       conn.setAutoCommit(false);
       Ontology ont = new Ontology.Impl(old.getName(), old.getDescription());
       persistOntology(conn, ont);
@@ -255,14 +272,14 @@ class OntologySQL {
   private void loadTerms(Ontology ont, int id)
           throws SQLException, OntologyException, ChangeVetoException
   {
-    Connection conn = seqDB.getDataSource().getConnection();
+    Connection conn = source.getConnection();
     String query =  
         " SELECT term.term_id, term.name, term.definition, " +
         "       term_relationship.term_relationship_id, " +
         "       term_relationship.subject_term_id, " +
         "       term_relationship.object_term_id, " +
         "       term_relationship.predicate_term_id ";
-    if (seqDB.getDBHelper().getJoinStyle() == DBHelper.JOIN_ORACLE8) {
+    if (dbHelper.getJoinStyle() == DBHelper.JOIN_ORACLE8) {
       query += 
         "FROM term, term_relationship_term, term_relationship " +
         "     WHERE term.term_id = term_relationship_term.term_id (+) " +
@@ -346,12 +363,11 @@ class OntologySQL {
     }
   }
 
-  OntologySQL(BioSQLSequenceDB seqDB)
-          throws SQLException, BioException
-  {
-    this.seqDB = seqDB;
+  OntologySQL(DataSource source, DBHelper dbHelper) throws SQLException, BioException {
+    this.source = source;
+    this.dbHelper = dbHelper;
 
-    Connection conn = seqDB.getDataSource().getConnection();
+    Connection conn = source.getConnection();
 
     try {
       PreparedStatement get_onts = conn.prepareStatement(
@@ -499,7 +515,7 @@ class OntologySQL {
   private void persistTerm(Term term) {
     Connection conn = null;
     try {
-      conn = seqDB.getDataSource().getConnection();
+      conn = source.getConnection();
       conn.setAutoCommit(false);
 
       persistTerm(conn, term);
@@ -534,7 +550,7 @@ class OntologySQL {
       import_term.setInt(3, ontologyID(term.getOntology()));
       import_term.executeUpdate();
       import_term.close();
-      int id = seqDB.getDBHelper().getInsertID(conn, "term", "term_id");
+      int id = dbHelper.getInsertID(conn, "term", "term_id");
       Integer tid = new Integer(id);
       termsByID.put(tid, term);
       IDsByTerm.put(term, tid);
@@ -551,7 +567,7 @@ class OntologySQL {
   private void persistTriple(Ontology ont, Triple triple) {
     Connection conn = null;
     try {
-      conn = seqDB.getDataSource().getConnection();
+      conn = source.getConnection();
       conn.setAutoCommit(false);
 
       persistTriple(conn, ont, triple);
@@ -586,7 +602,7 @@ class OntologySQL {
     import_trip.setInt(4, ontologyID(ont));
     import_trip.executeUpdate();
     import_trip.close();
-    int tripID = seqDB.getDBHelper().getInsertID(conn, "term_relationship", "term_relationship_id");
+    int tripID = dbHelper.getInsertID(conn, "term_relationship", "term_relationship_id");
 
     PreparedStatement link_trip_to_term = conn.prepareStatement(
             "insert into term_relationship_term " +
@@ -604,7 +620,7 @@ class OntologySQL {
   {
     Connection conn = null;
     try {
-      conn = seqDB.getDataSource().getConnection();
+      conn = source.getConnection();
       conn.setAutoCommit(false);
 
       persistOntology(conn, onto);
@@ -635,7 +651,7 @@ class OntologySQL {
     insert_ontology.setString(2, ont.getDescription());
     insert_ontology.executeUpdate();
     insert_ontology.close();
-    int id = seqDB.getDBHelper().getInsertID(conn, "ontology", "ontology_id");
+    int id = dbHelper.getInsertID(conn, "ontology", "ontology_id");
     Integer tid = new Integer(id);
     ontologiesByID.put(tid, ont);
     ontologiesByName.put(ont.getName(), ont);
