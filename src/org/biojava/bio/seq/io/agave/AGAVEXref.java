@@ -85,7 +85,7 @@ public class AGAVEXref {
        Iterator it = xrefs.iterator() ;
        while( it.hasNext() )
        {
-           tmp.append( (String)it.next() ) ;
+           tmp.append( it.next().toString() ) ;
        }
        tmp.append("</xref>" + "\n" );
        return tmp.toString() ;
