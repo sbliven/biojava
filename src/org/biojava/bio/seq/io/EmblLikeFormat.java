@@ -59,12 +59,12 @@ public class EmblLikeFormat
 {
     static
     {
-	Set validFormats = new HashSet();
-	validFormats.add("Embl");
-	validFormats.add("SwissProt");
+        Set validFormats = new HashSet();
+        validFormats.add("Embl");
+        validFormats.add("SwissProt");
 
-	SequenceFormat.FORMATS.put(EmblLikeFormat.class.getName(),
-				   validFormats);
+        SequenceFormat.FORMATS.put(EmblLikeFormat.class.getName(),
+                                   validFormats);
     }
 
     private boolean elideSymbols = false;
@@ -81,7 +81,7 @@ public class EmblLikeFormat
      */
     public void setElideSymbols(boolean b)
     {
-	elideSymbols = b;
+        elideSymbols = b;
     }
 
     /**
@@ -90,101 +90,98 @@ public class EmblLikeFormat
      */
     public boolean getElideSymbols()
     {
-	return elideSymbols;
+        return elideSymbols;
     }
 
     public boolean readSequence(BufferedReader reader,
-				SymbolParser   symParser,
-				SeqIOListener  listener)
-	throws IllegalSymbolException, IOException, ParseException
+                                SymbolParser   symParser,
+                                SeqIOListener  listener)
+        throws IllegalSymbolException, IOException, ParseException
     {
-	((ParseErrorSource)(listener)).addParseErrorListener(this);
-	String            line;
-	StreamParser    sparser       = null;
-	boolean hasMoreSequence       = true;
-	boolean hasInternalWhitespace = false;
+        ((ParseErrorSource)(listener)).addParseErrorListener(this);
+        String            line;
+        StreamParser    sparser       = null;
+        boolean hasMoreSequence       = true;
+        boolean hasInternalWhitespace = false;
 
-	listener.startSequence();
+        listener.startSequence();
 
-	while ((line = reader.readLine()) != null)
-	{
-	    if (line.startsWith("//"))
-	    {
-		if (sparser != null)
-		{
-		    // End of symbol data
-		    sparser.close();
-		    sparser = null;
-		}
+        while ((line = reader.readLine()) != null)
+        {
+            if (line.startsWith("//"))
+            {
+                if (sparser != null)
+                {
+                    // End of symbol data
+                    sparser.close();
+                    sparser = null;
+                }
 
-		// Allows us to tolerate trailing whitespace without
-		// thinking that there is another Sequence to follow
-		char [] cbuf = new char [1];
+                // Allows us to tolerate trailing whitespace without
+                // thinking that there is another Sequence to follow
+                while (true)
+                {
+                    reader.mark(1);
+                    int c = reader.read();
 
-		while (true)
-		{
-		    reader.mark(1);
+                    if (c == -1)
+                    {
+                        hasMoreSequence = false;
+                        break;
+                    }
 
-		    if (reader.read() == -1)
-		    {
-			hasMoreSequence = false;
-			break;
-		    }
+                    if (Character.isWhitespace((char) c))
+                    {
+                        hasInternalWhitespace = true;
+                        continue;
+                    }
 
-		    reader.read(cbuf, 0, 1);
+                    if (hasInternalWhitespace)
+                        System.err.println("Warning: whitespace found between sequence entries");
 
-		    if (Character.isWhitespace(cbuf[0]))
-		    {
-			hasInternalWhitespace = true;
-			continue;
-		    }
-		    else
-		    {
-			if (hasInternalWhitespace)
-			    System.err.println("Warning: whitespace found between sequence entries");
-			reader.reset();
-			break;
-		    }
-		}
+                    reader.reset();
+                    break;
+                }
 
-		listener.endSequence();
-		return hasMoreSequence;
-	    }
-	    else if (line.startsWith("SQ"))
-	    {
-		// Adding a null property to flush the last feature;
-		// Needed for Swissprot files because there is no gap
-		// between the feature table and the sequence data
-		listener.addSequenceProperty("XX", "");
 
-		sparser = symParser.parseStream(listener);
-	    }
-	    else
-	    {
-		if (sparser == null)
-		{
-		    // Normal attribute line
-		    String tag  = line.substring(0, 2);
-		    String rest = null;
-		    if (line.length() > 5)
-		    {
-			rest = line.substring(5);
-		    }
-		    listener.addSequenceProperty(tag, rest);
-		}
-		else
-		{
-		    // Sequence line
-		    if (! elideSymbols)
-			processSequenceLine(line, sparser);
-		}
-	    }
-	}
+                listener.endSequence();
+                return hasMoreSequence;
+            }
+            else if (line.startsWith("SQ"))
+            {
+                // Adding a null property to flush the last feature;
+                // Needed for Swissprot files because there is no gap
+                // between the feature table and the sequence data
+                listener.addSequenceProperty("XX", "");
 
-	if (sparser != null)
-	    sparser.close();
+                sparser = symParser.parseStream(listener);
+            }
+            else
+            {
+                if (sparser == null)
+                {
+                    // Normal attribute line
+                    String tag  = line.substring(0, 2);
+                    String rest = null;
+                    if (line.length() > 5)
+                    {
+                        rest = line.substring(5);
+                    }
+                    listener.addSequenceProperty(tag, rest);
+                }
+                else
+                {
+                    // Sequence line
+                    if (! elideSymbols)
+                        processSequenceLine(line, sparser);
+                }
+            }
+        }
 
-	throw new IOException("Premature end of stream or missing end tag '//' for EMBL");
+        if (sparser != null)
+            sparser.close();
+
+        throw new IOException("Premature end of stream or missing end tag '//' for EMBL");
     }
 
     /**
@@ -193,93 +190,93 @@ public class EmblLikeFormat
     protected void processSequenceLine(String line, StreamParser parser)
         throws IllegalSymbolException, ParseException
     {
-	char[] cline = line.toCharArray();
-	int parseStart = 0;
-	int parseEnd   = 0;
+        char[] cline = line.toCharArray();
+        int parseStart = 0;
+        int parseEnd   = 0;
 
-	while (parseStart < cline.length)
-	{
-	    while (parseStart < cline.length && cline[parseStart] == ' ')
-		++parseStart;
-	    if (parseStart >= cline.length)
-		break;
+        while (parseStart < cline.length)
+        {
+            while (parseStart < cline.length && cline[parseStart] == ' ')
+                ++parseStart;
+            if (parseStart >= cline.length)
+                break;
 
-	    if (Character.isDigit(cline[parseStart]))
-		return;
+            if (Character.isDigit(cline[parseStart]))
+                return;
 
-	    parseEnd = parseStart + 1;
-	    while (parseEnd < cline.length && cline[parseEnd] != ' ')
-		++parseEnd;
+            parseEnd = parseStart + 1;
+            while (parseEnd < cline.length && cline[parseEnd] != ' ')
+                ++parseEnd;
 
-	    // Got a segment of read sequence data
-	    parser.characters(cline, parseStart, parseEnd - parseStart);
+            // Got a segment of read sequence data
+            parser.characters(cline, parseStart, parseEnd - parseStart);
 
-	    parseStart = parseEnd;
-	}
+            parseStart = parseEnd;
+        }
     }
 
     public void writeSequence(Sequence seq, PrintStream os)
-	throws IOException
+        throws IOException
     {
-	String defaultFormat = getDefaultFormat();
+        String defaultFormat = getDefaultFormat();
 
-	try
-	{
-	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(defaultFormat);
-	    former.setPrintStream(os);
+        try
+        {
+            SeqFileFormer former = SeqFileFormerFactory.makeFormer(defaultFormat);
+            former.setPrintStream(os);
 
-	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
-	}
-	catch (BioException be)
-	{
-	    throw new IOException(be.getMessage());
-	}
+            SeqIOEventEmitter.getSeqIOEvents(seq, former);
+        }
+        catch (BioException be)
+        {
+            throw new IOException(be.getMessage());
+        }
     }
 
     public void writeSequence(Sequence seq, String format, PrintStream os)
 	throws IOException
     {
-	String requestedFormat = new String(format);
-	boolean          found = false;
+        String requestedFormat = new String(format);
+        boolean          found = false;
 
-	String [] formats = (String []) getFormats().toArray(new String[0]);
+        String [] formats = (String []) getFormats().toArray(new String[0]);
 
-	// Allow client programmers to use whichever case they like
-	for (int i = 0; i < formats.length; i++)
-	{
-	    if (formats[i].equalsIgnoreCase(format))
-	    {
-		requestedFormat = formats[i];
-		found = true;
-	    }
-	}
+        // Allow client programmers to use whichever case they like
+        for (int i = 0; i < formats.length; i++)
+        {
+            if (formats[i].equalsIgnoreCase(format))
+            {
+                requestedFormat = formats[i];
+                found = true;
+            }
+        }
 
-	if (! found)
-	    throw new IOException("Failed to write: an invalid file format '"
-				  + format
-				  + "' was requested");
+        if (! found)
+            throw new IOException("Failed to write: an invalid file format '"
+                                  + format
+                                  + "' was requested");
 
-	try
-	{
-	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(requestedFormat);
-	    former.setPrintStream(os);
+        try
+        {
+            SeqFileFormer former = SeqFileFormerFactory.makeFormer(requestedFormat);
+            former.setPrintStream(os);
 
-	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
-	}
-	catch (BioException be)
-	{
-	    throw new IOException(be.getMessage());
-	}
+            SeqIOEventEmitter.getSeqIOEvents(seq, former);
+        }
+        catch (BioException be)
+        {
+            throw new IOException(be.getMessage());
+        }
     }
 
     public Set getFormats()
     {
-	return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
+        return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
     }
 
     public String getDefaultFormat()
     {
-	return "Embl";
+        return "Embl";
     }
 
 	/**
