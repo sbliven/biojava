@@ -1,4 +1,3 @@
-package game;
 
 import java.io.*;
 import org.xml.sax.*;

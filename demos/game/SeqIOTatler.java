@@ -19,11 +19,11 @@
  *
  */
 
-package game;
-
 import java.util.*;
 
 import org.biojava.bio.Annotation;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.io.SeqIOAdapter;
@@ -37,17 +37,18 @@ public class SeqIOTatler
 {
   List featureStack;
   int level = 0;
+  String offset = "";
 
   {
     featureStack = new ArrayList();
   }
 
   public void addFeatureProperty(Object key, Object value) {
-    System.out.println("addFeatureProperty: " + key + "|" + value);
+    System.out.println(offset + "addFeatureProperty: " + key + "|" + value);
   }
 
   public void addSequenceProperty(Object key, Object value) {
-    System.out.println("addFeatureProperty: " + key + "|" + value);
+    System.out.println(offset + "addFeatureProperty: " + key + "|" + value);
   }
 
   public void endFeature() {
@@ -56,18 +57,18 @@ public class SeqIOTatler
     Feature.Template feature = (Feature.Template)featureStack.get(--level);
     featureStack.remove(level);
 
-    System.out.println("endFeature: " + feature);
-    System.out.println("=========== ");
+    System.out.println(offset + "endFeature: " + feature);
+    System.out.println(offset + "=========== ");
 
     // dump its contents
-    System.out.println("location: " + feature.location);
-    System.out.println("source:   " + feature.source);
-    System.out.println("type:     " + feature.type);
+    System.out.println(offset + "location: " + feature.location);
+    System.out.println(offset + "source:   " + feature.source);
+    System.out.println(offset + "type:     " + feature.type);
     
     // handle subclass specific stuff
     if (feature instanceof StrandedFeature.Template) {
 //      System.out.println("SeqIOListener checking strand");
-      System.out.println("strand:   " + ((StrandedFeature.Template)feature).strand.getToken());
+      System.out.println(offset + "strand:   " + ((StrandedFeature.Template)feature).strand.getToken());
     }
     
     // dump annotation
@@ -77,27 +78,29 @@ public class SeqIOTatler
 //      System.out.println("SeqIOTatler.endElement dump annotation.");
       Set keys = feature.annotation.keys();
       Iterator ki = keys.iterator();
-//      System.out.println("SeqIOTatler.endElement keys,ki: " + keys + " " + ki);
+//      System.out.println(offset + "SeqIOTatler.endElement keys,ki: " + keys + " " + ki);
 
       while (ki.hasNext()) {
         Object key = ki.next();
         Object value = feature.annotation.getProperty(key);
-        System.out.println("key: " + key + "  value: " + value);
+        System.out.println(offset + "key: " + key + "  value: " + value);
       }
     }
 //    System.out.println("Leaving SeqIOTatlerIO.endFeature");
+      offset = offset.substring(2, offset.length());
   }
 
   public void endSequence() {
-    System.out.println("endSequence: ");
+    System.out.println(offset + "endSequence: ");
   }
 
   public void setName(String name) {
-    System.out.println("setName: " + name);
+    System.out.println(offset + "setName: " + name);
   }
 
   public void startFeature(Feature.Template feature) {
-    System.out.println("startFeature: ");
+    offset = offset.concat("  ");
+    System.out.println(offset + "startFeature: ");
 
     // add to stack
     featureStack.add(feature);
@@ -105,6 +108,12 @@ public class SeqIOTatler
   }
 
   public void startSequence() {
-    System.out.println("startFeature: ");
+    System.out.println(offset + "startFeature: ");
+  }
+
+  public void addSymbols(Alphabet alpha, Symbol [] syms, int start, int length)
+  {
+    // dump start and length only
+//    System.out.println("addSymbols: start, length: " + start + " " + length);
   }
 }
