@@ -100,7 +100,7 @@ public class DASSequenceDB implements SequenceDB {
 	    try {
 		dataSourceURL = new URL(s + "/");
 	    } catch (MalformedURLException ex) {
-		throw new BioRuntimeException(ex, "Assertion failure: trivial URI manipulation failed");
+		throw new BioException(ex, "Assertion failure: trivial URI manipulation failed");
 	    }
 	}
 	this.dataSourceURL = dataSourceURL;

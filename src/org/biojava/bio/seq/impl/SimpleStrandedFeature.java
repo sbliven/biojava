@@ -73,10 +73,10 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
 	super(sourceSeq, parent, template);
 	this.strand = template.strand;
 	if(sourceSeq.getAlphabet() != DNATools.getDNA()) {
-	    throw new IllegalAlphabetException (
-				"Can not create a stranded feature within a sequence of type " +
-				sourceSeq.getAlphabet().getName()
-						);
+	    // throw new IllegalAlphabetException (
+	    // "Can not create a stranded feature within a sequence of type " +
+	    //			sourceSeq.getAlphabet().getName()
+	    //					);
 	}
     }
   

@@ -37,6 +37,14 @@ import org.biojava.bio.*;
  * returned by getComponentLocation().
  * </p>
  *
+ * <p>
+ * In BioJava 1.2, two extra properties were added to <code>ComponentFeature</code>
+ * to support the use of these features in environments were it it necessary to
+ * represent an assembly built from sequences which are not currently available.
+ * Widespread use of such sequences is not encouraged, but it is recognized that
+ * they are useful as intermediate objects for data integration applications.
+ * </p>
+ *
  * @author Thomas Down
  * @since 1.1
  */
@@ -61,10 +69,39 @@ public interface ComponentFeature extends StrandedFeature {
     public Location getComponentLocation();
 
     /**
+     * Get the name of the component sequence.  In general, this
+     * should be equivalent to
+     * <code>getComponentSequence().getName()</code>.  However,
+     * it may still be defined for un-resolveable components.
+     *
+     * @since 1.2
+     */
+
+    public String getComponentSequenceName();
+
+    /**
+     * Determine if the sequence references by this ComponentFeature
+     * is available in this context.  If not, calls to getComponentSequence will
+     * fail, and getSymbols will return a non-informative 
+     * <code>SymbolList</code> (in a DNA context, a list of Ns).
+     *
+     * @since 1.2
+     */
+
+    public boolean isComponentResolvable();
+
+    /**
      * Template for constructing a new ComponentFeature.
+     *
+     * <p>
+     * In BioJava 1.2, we add the <code>componentSequenceName</code>
+     * property.  In general, it is only necessary to specify
+     * <em>either</em> componentSequenceName or componentSequence
+     * </p>
      */
 
     public static class Template extends StrandedFeature.Template {
+	public String   componentSequenceName;
 	public Sequence componentSequence;
 	public Location componentLocation;
     }

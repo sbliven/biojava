@@ -46,7 +46,7 @@ class DASComponentFeature implements ComponentFeature, DASOptimizableFeatureHold
     private final String source;
     private final Annotation annotation;
 
-    private final String componentID;
+    private String componentID;
 
     private DASSequence componentSequence;
     private Location componentLocation;
@@ -81,10 +81,13 @@ class DASComponentFeature implements ComponentFeature, DASOptimizableFeatureHold
 	    componentSequence = (DASSequence) temp.componentSequence;
 	    componentID = componentSequence.getName();
 	} else {
-	    try {
-		componentID = (String) temp.annotation.getProperty("sequence.id");
-	    } catch (NoSuchElementException ex) {
-		throw new BioRuntimeException("No sequence.id property");
+	    componentID = temp.componentSequenceName;
+	    if (componentID == null) {
+		try {
+		    componentID = (String) temp.annotation.getProperty("sequence.id");
+		} catch (NoSuchElementException ex) {
+		    throw new BioRuntimeException("No sequence.id property");
+		}
 	    }
 	}
 
@@ -102,6 +105,14 @@ class DASComponentFeature implements ComponentFeature, DASOptimizableFeatureHold
 	    content += (sl.getMax() - sl.getMin() + 1);
 	}
 	return content;
+    }
+
+    public boolean isComponentResolvable() {
+	return true;
+    }
+
+    public String getComponentSequenceName() {
+	return componentID;
     }
 
     public StrandedFeature.Strand getStrand() {
@@ -134,13 +145,13 @@ class DASComponentFeature implements ComponentFeature, DASOptimizableFeatureHold
 
     public SymbolList getSymbols() {
 	SymbolList syms = componentLocation.symbols(getComponentSequence()); 
-	if (strand == StrandedFeature.NEGATIVE) {
-	    try {
-		syms = DNATools.reverseComplement(syms);
-	    } catch (IllegalAlphabetException ex) {
-		throw new BioRuntimeException(ex);
-	    }
-	}
+//  	if (strand == StrandedFeature.NEGATIVE) {
+//  	    try {
+//  		syms = DNATools.reverseComplement(syms);
+//  	    } catch (IllegalAlphabetException ex) {
+//  		throw new BioRuntimeException(ex);
+//  	    }
+//  	}
 	return syms;
     }
 
@@ -240,7 +251,16 @@ class DASComponentFeature implements ComponentFeature, DASOptimizableFeatureHold
     }
 
     public Feature.Template makeTemplate() {
-	throw new BioRuntimeException("FIXME");
+	ComponentFeature.Template temp = new ComponentFeature.Template();
+	temp.type = getType();
+	temp.source = getSource();
+	temp.location = getLocation();
+	temp.annotation = getAnnotation();
+	temp.componentLocation = getComponentLocation();
+	temp.componentSequenceName = componentID;
+	// temp.componentSequence = getComponentSequence();
+
+	return temp;
     }
 
 

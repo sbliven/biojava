@@ -32,6 +32,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @since 1.1
  */
 
 class SimpleComponentFeature implements ComponentFeature {
@@ -54,6 +55,10 @@ class SimpleComponentFeature implements ComponentFeature {
 				  ComponentFeature.Template temp)
         throws BioException
     {
+	if (temp.componentSequence == null) {
+	    throw new BioException("This implementation of ComponentFeature requires that sequences must already be resolved");
+	}
+
 	if (locationContent(temp.location) != 
 	    locationContent(temp.componentLocation))
 	{
@@ -110,6 +115,19 @@ class SimpleComponentFeature implements ComponentFeature {
 	return content;
     }
 
+    /**
+     * SimpleComponentFeatures are always constructed with an explicit
+     * Sequence object, and are thus resolvable by definition.
+     */
+
+    public boolean isComponentResolvable() {
+	return true;
+    }
+
+    public String getComponentSequenceName() {
+	return getComponentSequence().getName();
+    }
+
     public StrandedFeature.Strand getStrand() {
 	return strand;
     }
@@ -143,13 +161,13 @@ class SimpleComponentFeature implements ComponentFeature {
 
     public SymbolList getSymbols() {
 	SymbolList syms = componentLocation.symbols(componentSequence);
-	if (strand == StrandedFeature.NEGATIVE) {
-	    try {
-		syms = DNATools.reverseComplement(syms);
-	    } catch (IllegalAlphabetException ex) {
-		throw new BioError(ex);
-	    }
-	}
+//  	if (strand == StrandedFeature.NEGATIVE) {
+//  	    try {
+//  		syms = DNATools.reverseComplement(syms);
+//  	    } catch (IllegalAlphabetException ex) {
+//  		throw new BioError(ex);
+//  	    }
+//  	}
 	return syms;
     }
 

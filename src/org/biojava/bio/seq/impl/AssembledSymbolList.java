@@ -40,22 +40,13 @@ import org.biojava.bio.symbol.*;
  */
 
 public class AssembledSymbolList extends AbstractSymbolList {
-  private boolean autoLength = true;
+    private boolean autoLength = true;
     private int length = 0;
-
     private SortedMap components;
     private List componentList;
 
-    private final static Symbol N;
-    private final static char nChar = 'n';
-
-    static {
-	try {
-	    N = DNATools.getDNA().getTokenization("token").parseToken("" + nChar);
-        } catch (BioException ex) {
-            throw new BioError(ex);
-        }
-    }
+    private final Symbol noninformativeSymbol = DNATools.n();
+    private final char noninformativeToken = 'n';
 
     {
         components = new TreeMap(Location.naturalOrder);
@@ -63,7 +54,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
     }
 
     public void setLength(int len) {
-    autoLength = false;
+	autoLength = false;
 	length = len;
     }
 
@@ -88,15 +79,23 @@ public class AssembledSymbolList extends AbstractSymbolList {
 	componentList.addAll(components.keySet());
     }
 
-  public SymbolList getComponentSymbols(Location loc) {
-    Object o = components.get(loc);
-    if (o instanceof ComponentFeature) {
-      ComponentFeature cf = (ComponentFeature) o;
-      return cf.getSymbols();
-    } else {
-      return (SymbolList) o;
+    private SymbolList getComponentSymbols(Location loc) {
+	Object o = components.get(loc);
+	if (o instanceof ComponentFeature) {
+	    ComponentFeature cf = (ComponentFeature) o;
+	    SymbolList sl = cf.getSymbols();
+	    if (cf.getStrand() == StrandedFeature.NEGATIVE) {
+		try {
+		    sl = DNATools.reverseComplement(sl);
+		} catch (IllegalAlphabetException ex) {
+		    throw new BioError("Assertion failed: couldn't reverse-complement component symbols");
+		}
+	    }
+	    return sl;
+	} else {
+	    return (SymbolList) o;
+	}
     }
-  }
 
     public Set getComponentLocationSet() {
 	return components.keySet();
@@ -109,33 +108,33 @@ public class AssembledSymbolList extends AbstractSymbolList {
 
     private Location lastLocation = Location.empty;
 
-  public Location locationOfPoint(int p) {
-    if (lastLocation.contains(p)) {
-      return lastLocation;
+    private Location locationOfPoint(int p) {
+	if (lastLocation.contains(p)) {
+	    return lastLocation;
+	}
+
+	int first = 0;
+	int last = componentList.size() - 1;
+	
+	while (first <= last) {
+	    int check = (first + last) / 2;
+	    Location checkL = (Location) componentList.get(check);
+	    if (checkL.contains(p)) {
+		lastLocation = checkL;
+		return checkL;
+	    }
+	    
+	    if (p < checkL.getMin()) {
+		last = check - 1;
+	    } else {
+		first = check + 1;
+	    }
+	}
+	
+	return null;
     }
 
-    int first = 0;
-    int last = componentList.size() - 1;
-
-    while (first <= last) {
-      int check = (first + last) / 2;
-      Location checkL = (Location) componentList.get(check);
-      if (checkL.contains(p)) {
-        lastLocation = checkL;
-        return checkL;
-      }
-
-      if (p < checkL.getMin()) {
-        last = check - 1;
-      } else {
-        first = check + 1;
-      }
-    }
-
-    return null;
-  }
-
-    public Location locationUpstreamOfPoint(int p) {
+    private Location locationUpstreamOfPoint(int p) {
 	int first = 0;
 	int last = componentList.size() - 1;
 	
@@ -187,7 +186,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
       return syms.symbolAt(pos - l.getMin() + 1);
     }
 
-    return N;
+    return noninformativeSymbol;
   }
 
   public SymbolList subList(int start, int end) {
@@ -232,7 +231,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
 		    pos = end + 1;
 		}
 		for (int i = 0; i < numNs; ++i) {
-		    sb.append(nChar);
+		    sb.append(noninformativeToken);
 		}
 	    }
 	}
