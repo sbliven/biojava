@@ -178,6 +178,10 @@ public class XMLFilterWriter {
                 atfw
             );
             filterWritersByClass.put(
+                FeatureFilter.AnnotationContains.class,
+                atfw
+            );
+            filterWritersByClass.put(
                 FeatureFilter.ByPairwiseScore.class,
                 new ByPairwiseScoreFilterWriter()
             );
