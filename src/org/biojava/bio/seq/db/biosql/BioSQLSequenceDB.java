@@ -875,9 +875,12 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 				if (legacy.containsTerm(ts)) {
 					return ontologySQL.termID(legacy.getTerm(ts));
 				// Same term but different case causes error when try to add it
-				// This hack prevents it.  ex. genbank can have ORGANISM & organism keys            
+				// These hacks prevent it.  ex. genbank can have ORGANISM & organism keys            
 				} else if (legacy.containsTerm(ts.toLowerCase())) {
 					return ontologySQL.termID(legacy.getTerm(ts.toLowerCase()));
+				} else if (legacy.containsTerm(ts.toUpperCase())) {
+					return ontologySQL.termID(legacy.getTerm(ts.toUpperCase()));
+
         } else {
             try {
                 return ontologySQL.termID(legacy.createTerm(ts, ""));

@@ -793,7 +793,22 @@ class FeaturesSQL {
 	} else {
 	    int seqfeature_key = seqDB.intern_ontology_term(conn, f.getType());
 	    int seqfeature_source = seqDB.intern_ontology_term(conn, f.getSource());
-
+			// Because of unique key constraints on seqfeature
+			// Need to select the maximum rank value for the bioentry,key,source value
+			// if rank is set to -1
+			if (typeRank < 0) {
+				PreparedStatement select_rank = conn.prepareStatement(
+					"select max(rank) from seqfeature where bioentry_id=?"
+					+ " and type_term_id=? and source_term_id=?");
+				select_rank.setInt(1, bioentry_id);
+				select_rank.setInt(2, seqfeature_key);
+				select_rank.setInt(3, seqfeature_source);
+				ResultSet rs = select_rank.executeQuery();
+				if (rs.next()) {
+					typeRank = rs.getInt(1) + 1;
+				}
+			}
+			
 	    PreparedStatement add_feature = conn.prepareStatement(
 		"insert into seqfeature "+
 		"       (bioentry_id, type_term_id, source_term_id, rank) " +
@@ -1016,8 +1031,8 @@ class FeaturesSQL {
 	try {
 	    conn = seqDB.getPool().takeConnection();
 	    conn.setAutoCommit(false);
-			// Set rank to 0, not sure if need a unique value generated here or not????
-	    int f_id = seqDB.getFeaturesSQL().persistFeature(conn, bioentry_id, f, parent_id, 0);
+			// Set rank to -1, so will get looked up before feature added
+	    int f_id = seqDB.getFeaturesSQL().persistFeature(conn, bioentry_id, f, parent_id, -1);
 	    if (f instanceof BioSQLFeature) {
 		((BioSQLFeature) f)._setInternalID(f_id);
 		((BioSQLFeature) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, f_id));
