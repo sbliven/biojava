@@ -72,6 +72,16 @@ implements Serializable {
     ourSymbols = new HashMap();
     populateSymbols(new ArrayList());
   }
+  
+  protected ChangeSupport generateChangeSupport() {
+      for (Iterator i = alphas.iterator(); i.hasNext(); ) {
+          Alphabet a = (Alphabet) i.next();
+          if (!a.isUnchanging(Alphabet.SYMBOLS)) {
+              return new ChangeSupport();
+          } 
+      }
+      return new ChangeSupport(Collections.singleton(Alphabet.SYMBOLS));
+  }
 
   public Iterator iterator() {
     return ourSymbols.values().iterator();
