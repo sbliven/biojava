@@ -65,7 +65,7 @@ public interface PropertyConstraint {
      *
      * @for.developer Use for implementing accept() on AnnotatoinType
      */
-    public boolean accept(Object value);
+    boolean accept(Object value);
 
     /**
      * <p><code>subConstraintOf</code> returns true if the constraint
@@ -94,7 +94,7 @@ public interface PropertyConstraint {
      * if it is necisary to retain both. You may want to check the more
      * general or the more specific constraint only.
      */
-    public boolean subConstraintOf(PropertyConstraint subConstraint);
+    boolean subConstraintOf(PropertyConstraint subConstraint);
         
     /**
      * <code>ANY</code> is a constraint which accepts a property for
@@ -103,7 +103,7 @@ public interface PropertyConstraint {
      * @for.user Whenever a PropertyConstraint is needed and you want to allow
      * any value there
      */
-    public static final PropertyConstraint ANY = new AnyPropertyConstraint();
+    PropertyConstraint ANY = new AnyPropertyConstraint();
     
     /**
      * <code>NONE</code> is a constraint which accepts no value for a property
@@ -112,7 +112,7 @@ public interface PropertyConstraint {
      * @for.user Whenever a PropertyConstraint is needed and you want to
      * dissalow all values there e.g. when marking a property as having to be unset
      */
-    public static final PropertyConstraint NONE = new NonePropertyConstraint();
+    PropertyConstraint NONE = new NonePropertyConstraint();
   
     /**
      * <code>ByClass</code> accepts a property value if it is an
@@ -125,7 +125,7 @@ public interface PropertyConstraint {
      *       <code>new ByClass(Double)</code> will ensure
      *       that the property is a String or a Double respecitvely.
      */
-    public class ByClass implements PropertyConstraint {
+    class ByClass implements PropertyConstraint {
         private Class cl;
 
         /**
@@ -192,7 +192,7 @@ public interface PropertyConstraint {
      * particular type. Effectively this lets you build your own
      * type system using AnnotationType and PropertyConstraint.
      */
-    public class ByAnnotationType implements PropertyConstraint {
+    class ByAnnotationType implements PropertyConstraint {
         private AnnotationType annType;
 
         /**
@@ -253,7 +253,7 @@ public interface PropertyConstraint {
      * @for.powerUser Use with FilterUtils.byAnnotation() to search for features
      * with properties set to specific values
      */
-    public class ExactValue implements PropertyConstraint {
+    class ExactValue implements PropertyConstraint {
       private Object value;
       
       /**
@@ -309,7 +309,7 @@ public interface PropertyConstraint {
      * @for.powerUser Use with FilterUtils.byAnnotation() to search for features
      * with properties set to a range of values
      */
-    public class Enumeration implements PropertyConstraint {
+    class Enumeration implements PropertyConstraint {
         private Set values;
 
         /**
@@ -377,7 +377,7 @@ public interface PropertyConstraint {
      *            or both of the children And instances if you need a tighter
      *            intersection.
      */
-    public class And implements PropertyConstraint {
+    class And implements PropertyConstraint {
       private PropertyConstraint c1;
       private PropertyConstraint c2;
       
@@ -438,7 +438,7 @@ public interface PropertyConstraint {
      *            or both of the children Or instances if you need a wider
      *            union.
      */
-    public class Or implements PropertyConstraint {
+    class Or implements PropertyConstraint {
       private PropertyConstraint c1;
       private PropertyConstraint c2;
       

@@ -161,7 +161,7 @@ public interface AnnotationType {
      * @for.user Use this whenever an AnnotationType is needed by an API and you
      *       don't want to constrain anything
      */
-    public static final AnnotationType ANY = new Impl(
+    AnnotationType ANY = new Impl(
       PropertyConstraint.ANY,
       CardinalityConstraint.ANY
     );
@@ -173,7 +173,7 @@ public interface AnnotationType {
      * @for.user Use this whenever an AnnotationType is needed by an API and you
      *       want to make sure that all Annotation objects get rejected
      */
-    public static final AnnotationType NONE = new Impl(
+    AnnotationType NONE = new Impl(
       PropertyConstraint.NONE,
       CardinalityConstraint.NONE
     );
@@ -186,7 +186,7 @@ public interface AnnotationType {
      * @param ann the Annotation to validate.
      * @return true if ann conforms to this type and false if it doesn't.
      */
-    public boolean instanceOf(Annotation ann);
+    boolean instanceOf(Annotation ann);
 
     /**
      * <p>See if an AnnotationType is a specialisation of this type.</p>
@@ -203,7 +203,7 @@ public interface AnnotationType {
      * @for.powerUser If you wish to check that one type is a more constrained
      * version of another
      */
-    public boolean subTypeOf(AnnotationType subType);
+    boolean subTypeOf(AnnotationType subType);
 
     /**
      * <p>Retrieve the constraint that will be applied to all
@@ -221,7 +221,7 @@ public interface AnnotationType {
      * @for.powerUser If you want to find out exactly what constraints will be
      * applied to a particular propery key
      */
-    public CollectionConstraint getConstraint(Object key);
+    CollectionConstraint getConstraint(Object key);
 
     /**
      * Set the constraints associated with a property.  This method constrains
@@ -236,7 +236,7 @@ public interface AnnotationType {
      *
      * @for.powerUser When you are building your own AnnotationType
      */
-    public void setConstraints(
+    void setConstraints(
       Object key,
       PropertyConstraint con,
       Location card
@@ -250,8 +250,7 @@ public interface AnnotationType {
      *
      * @for.powerUser When you are building your own AnnotationType
      */
-
-    public void setConstraint(
+    void setConstraint(
         Object key,
         CollectionConstraint con
     );
@@ -269,7 +268,7 @@ public interface AnnotationType {
      *
      * @for.powerUser When you are building your own AnnotationType
      */
-    public void setDefaultConstraints(PropertyConstraint pc, Location cc);
+    void setDefaultConstraints(PropertyConstraint pc, Location cc);
 
     /**
      * Specifies the default constraint to apply to properties where no
@@ -279,7 +278,7 @@ public interface AnnotationType {
      * @for.powerUser When you are building your own AnnotationType
      */
 
-    public void setDefaultConstraint(CollectionConstraint cc);
+    void setDefaultConstraint(CollectionConstraint cc);
 
     /**
      * Get the CollectionConstraint that will be applied to all properties without
@@ -290,7 +289,7 @@ public interface AnnotationType {
      * @for.powerUser If you want to find out exactly what constraint will be
      * applied to properties with no explicitly defined constraints
      */
-    public CollectionConstraint getDefaultConstraint();
+    CollectionConstraint getDefaultConstraint();
 
     /**
      * Retrieve the set of properties for which constraints have been explicity specified.
@@ -299,7 +298,7 @@ public interface AnnotationType {
      *
      * @for.powerUser Discover which properties have explicit constraints
      */
-    public Set getProperties();
+    Set getProperties();
 
     /**
      * Set the property in an annotation bundle according to the type we believe
@@ -316,7 +315,7 @@ public interface AnnotationType {
      * @for.user Edit an Annotation bundle in a way compattible with this
      * AnnotationType
      */
-    public void setProperty(Annotation ann, Object property, Object value)
+    void setProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
 
     /**
@@ -332,7 +331,7 @@ public interface AnnotationType {
      * @for.user Edit an Annotation bundle in a way compattible with this
      * AnnotationType
      */
-    public void addProperty(Annotation ann, Object property, Object value)
+    void addProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
 
     /**
@@ -349,7 +348,7 @@ public interface AnnotationType {
      * @for.user Edit an Annotation bundle in a way compattible with this
      * AnnotationType
      */
-    public Collection getProperty(Annotation ann, Object property)
+    Collection getProperty(Annotation ann, Object property)
         throws ChangeVetoException;
 
     /**
@@ -364,7 +363,7 @@ public interface AnnotationType {
      * @for.user Edit an Annotation bundle in a way compattible with this
      * AnnotationType
      */
-    public void removeProperty(Annotation ann, Object property, Object value)
+    void removeProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
 
     /**
@@ -373,7 +372,7 @@ public interface AnnotationType {
      *
      * @param comment  the new comment
      */
-    public void setComment(String comment);
+    void setComment(String comment);
     
     /**
      * Get the comment for the whole AnnotationType.
@@ -381,7 +380,7 @@ public interface AnnotationType {
      *
      * @return the comment
      */
-    public String getComment();
+    String getComment();
     
     /**
      * Set the comment for a particular property.
@@ -390,7 +389,7 @@ public interface AnnotationType {
      * @param property the property to comment on
      * @param comment  the comment
      */
-    public void setComment(Object property, String comment);
+    void setComment(Object property, String comment);
     
     /**
      * Get the comment for a particular property.
@@ -399,7 +398,7 @@ public interface AnnotationType {
      * @param property the property to get a comment for
      * @return the comment
      */
-    public String getComment(Object property);
+    String getComment(Object property);
     
     /**
      * <p>An abstract base class useful for implementing AnnotationType
@@ -416,8 +415,7 @@ public interface AnnotationType {
      *
      * @for.developer  When implementing AnnotationType
      */
-    public abstract class Abstract
-    implements AnnotationType {
+    abstract class Abstract implements AnnotationType {
         public void setConstraints(Object key, PropertyConstraint pc, Location cc) {
             setConstraint(key, new CollectionConstraint.AllValuesIn(pc, cc));
         }
@@ -596,8 +594,7 @@ public interface AnnotationType {
      * @for.powerUser A convenient class for when you need an AnnotationType
      * instance and don't want to write your own
      */
-
-    public class Impl extends AnnotationType.Abstract {
+    class Impl extends AnnotationType.Abstract {
         private Map cons;
         private CollectionConstraint unknown;
         private String comment;
