@@ -1,5 +1,5 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
-                      "/nfs/team81/kdj/local/lib/sgml/docbook.dtd" [
+                      "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
 ]>
 
 <!--
@@ -23,9 +23,9 @@
 
 -->
 
-<book>
+<book id="biojava-main">
   <title>The BioJava Documentation</title>
-
+  
   <bookinfo>
     <!-- Add your name as a collaborative author if you contribute -->
     <authorgroup>
@@ -91,7 +91,7 @@
     different types of output may be generated from a single source,
     including HTML and printable formats, without compromising quality
     or portability across computing platforms. To find out more about
-    DocBook see <xref linkend="bd-apdx02">.</para>
+    DocBook see <xref linkend="bd-apdx03">.</para>
   </preface>
 
   <!-- Table of contents is automatically generated here -->
@@ -101,10 +101,10 @@
   <chapter id="bd-ch01">
     <title>Beginning BioJava</title>
 
-    <sect1>
+    <sect1 id="bd-ch01-obtain">
       <title>Obtaining BioJava</title>
 
-      <sect2>
+      <sect2 id="bd-ch01-obtain-bin">
         <title>Binary distrubution</title>
 
         <para>Binary distributions in .jar (Java ARchive) format may
@@ -117,31 +117,34 @@
         <para>You will also need a Java bytecode generation library
         (bytecode-0.90.jar) which may be obtained from the same
         place.</para>
-
       </sect2>
 
-      <sect2>
+      <sect2 id="bd-ch01-obtain-src">
         <title>Source code distribution</title>
 
         <para></para>
       </sect2>
 
-      <sect2>
-        <title>BioJava dependencies</title>
+      <sect2 id="bd-ch01-obtain-cvs">
+        <title>Anonymous CVS server</title>
 
         <para></para>
       </sect2>
 
+      <sect2 id="bd-ch01-depend">
+        <title>Dependencies</title>
 
+        <para></para>
+      </sect2>
     </sect1>
 
-    <sect1>
-      <title>Installing BioJava</title>
+    <sect1 id="bd-ch01-install">
+      <title>Installation</title>
 
       <para></para>
     </sect1>
 
-    <sect1>
+    <sect1 id="bd-ch01-demos">
       <title>Running the demo programs</title>
 
       <para></para>
@@ -150,31 +153,128 @@
 
   <!-- This demonstrates the id convention for appendices -->
   <appendix label="A" id="bd-apdx01">
+    <title>BioJava API JavaDoc</title>
+
+    <itemizedlist>
+      <listitem>
+        <para><ulink url="javadoc/index.html">API overview with frames</ulink></para>
+      </listitem>
+      <listitem>
+        <para><ulink url="javadoc/overview-summary.html">API overview without frames</ulink></para>
+      </listitem>
+      <listitem>
+        <para><ulink url="javadoc/index-all.html">Full API index</ulink></para>
+      </listitem>
+    </itemizedlist>
+  </appendix>
+
+  <appendix label="B" id="bd-apdx02">
     <title>Style guide</title>
 
     <para></para>
   </appendix>
 
-  <appendix label="B" id="bd-apdx02" xreflabel="Appendix B: Using DocBook">
+  <appendix label="C" id="bd-apdx03" xreflabel="Appendix C: Using DocBook">
     <title>Using DocBook</title>
 
-    <sect1>
+    <sect1 id="bd-apdx03-whatis">
       <title>What is DocBook</title>
 
-      <para></para>
+      <para>DocBook is an document authoring system which allows the
+      structure and information content of a piece of work to be
+      separated from the presentation formatting. Once the document is
+      written there are programs which do all the work of formatting
+      it into an elegantly typeset printable document, a series of
+      HTML pages or a PDF document, all from the single source.</para>
+
+      <para>A DocBook document may be written in either Standard
+      Generalized Markup Language (SGML) or Extensible Markup Language
+      (XML). A Document Type Definition (DTD) which describes
+      acceptable structure is available for each these forms.</para>
     </sect1>
 
-    <sect1>
+    <sect1 id="bd-apdx03-why">
       <title>Why use DocBook?</title>
 
-      <para></para>
+      <para>The advantage of this approach over an "all-in-one"
+      system, such as a WYSIWYG word processor, is that the majority
+      of the writing effort can be focussed on the document's content
+      and structure. This is because layout and formatting is carried
+      out automatically, leading to a shorter development cycle and
+      greater consistency between the various presentation
+      formats.</para>
+
+      <para>Java has extensive support for XML document formats,
+      making DocBook an obvious choice for BioJava. In addition, the
+      tools available for processing SGML DocBook documents are able
+      to operate on XML DocBook documents.</para>
     </sect1>
 
-    <sect1>
+    <sect1 id="bd-apdx03-biojava">
       <title>DocBook and the BioJava Documentation</title>
 
-      <para></para>
+      <para>If all you need to do is refer to the documentation then
+      you will not need to know anything about DocBook or have any of
+      the DocBook processing tools installed. Regular builds of the
+      documentation will be available from the FTP site in HTML and
+      PostScript formats.</para>
+
+      <para>The BioJava documentation aims to conform to both the
+      DocBook SGML 4.1 and the DocBook XML 4.1.2 DTD. Currently the
+      document is being validated against the SGML DTD, so the XML may
+      not be fully compliant. This will be rectified when XML
+      validation is added to the Ant build tasks.</para>
     </sect1>
 
+    <sect1 id="bd-apdx03-resources">
+      <title>DocBook resources</title>
+
+      <para>There are many useful DocBook resources available,
+      including software, examples and tutorials, some of which are
+      listed here.</para>
+
+      <sect2 id="bd-apdx03-resources-sware">
+        <title>Software</title>
+
+        <itemizedlist>
+          <listitem>
+            <para>The <ulink
+            url="http://www.oasis-open.org/docbook/sgml/4.1">DocBook
+            SGML 4.1</ulink> DTD.</para>
+          </listitem>
+          <listitem>
+            <para>The <ulink
+            url="http://www.oasis-open.org/xml/4.1.2">DocBook XML
+            4.1.2</ulink> DTD.</para>
+          </listitem>
+          <listitem>
+            <para>The <ulink
+            url="http://openjade.sourceforge.net">OpenJade</ulink>
+            rendering program which creates HTML, RTF and
+            PostScript output from DocBook SGML and XML.</para>
+          </listitem>
+      </itemizedlist>
+      </sect2>
+
+      <sect2 id="bd-apdx03-resources-doc">
+        <title>Documentation</title>
+
+        <itemizedlist>
+          <listitem>
+            <para>The <ulink
+            url="http://www.linuxdoc.org/HOWTO/mini/DocBook-Install">
+            Linux DocBook Install mini-HOWTO</ulink>, a detailed,
+            practical guide for obtaining quick results from
+            DocBook.</para>
+          </listitem>
+          <listitem>
+            <para>The LDP Author Guide from the <ulink
+            url="http://linuxdoc.org">Linux Documentation
+            Project</ulink>, a comprehensive guide to all aspects of
+            DocBook authoring.</para>
+          </listitem>
+        </itemizedlist>
+      </sect2>
+    </sect1>
   </appendix>
 </book>
