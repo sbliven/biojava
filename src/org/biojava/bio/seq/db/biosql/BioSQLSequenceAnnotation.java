@@ -59,53 +59,55 @@ class BioSQLSequenceAnnotation implements Annotation {
 	this.bioentry_id = bioentry_id;
     }
 
-  private void initAnnotations() {
-	  try {
+    private void initAnnotations() {
+	try {
 	    Connection conn = seqDB.getPool().takeConnection();
-
+	    
 	    PreparedStatement get_annotations = conn.prepareStatement("select comment_text from comment where bioentry_id = ?");
 	    get_annotations.setInt(1, bioentry_id);
 	    ResultSet rs = get_annotations.executeQuery();
 	    
 	    underlyingAnnotation = new SmallAnnotation();
 	    while (rs.next()) {
-		    String value = rs.getString(1);
-		    String key = "comment";
-        if (value.startsWith("(")) {
-		      int closeBracket = value.indexOf(')');
-		      if (closeBracket > 0) {
-			      key = value.substring(1, closeBracket);
-			      value = value.substring(closeBracket + 1);
-		      }
+		String value = rs.getString(1);
+		String key = "comment";
+		if (value.startsWith("(")) {
+		    int closeBracket = value.indexOf(')');
+		    if (closeBracket > 0) {
+			key = value.substring(1, closeBracket);
+			value = value.substring(closeBracket + 1);
 		    }
-		    underlyingAnnotation.setProperty(key, value);
+		}
+		underlyingAnnotation.setProperty(key, value);
 	    }
 	    get_annotations.close();
       
-      PreparedStatement get_taxa = conn.prepareStatement(
-        "select taxa.full_lineage, taxa.common_name, taxa.ncbi_taxa_id " +
-        "from bioentry_taxa, taxa " +
-        "where bioentry_taxa.bioentry_id = ? and " +
-        "      bioentry_taxa.taxa_id = taxa.taxa_id "
-      );
-      get_taxa.setInt(1, bioentry_id);
-      rs = get_taxa.executeQuery();
-      Taxa taxa = EbiFormat.getInstance().parse(WeakTaxaFactory.GLOBAL, rs.getString(1));
-      taxa.setCommonName(rs.getString(2));
-      taxa.getAnnotation().setProperty(
-        EbiFormat.PROPERTY_NCBI_TAXA,
-        String.valueOf(rs.getInt(3))
-      );
-      underlyingAnnotation.setProperty(OrganismParser.PROPERTY_ORGANISM, taxa);
+	    PreparedStatement get_taxa = conn.prepareStatement(
+			"select taxa.full_lineage, taxa.common_name, taxa.ncbi_taxa_id " +
+			"from bioentry_taxa, taxa " +
+			"where bioentry_taxa.bioentry_id = ? and " +
+			"      bioentry_taxa.taxa_id = taxa.taxa_id "
+			                                      );
+	    get_taxa.setInt(1, bioentry_id);
+	    rs = get_taxa.executeQuery();
+	    if (rs.next()) {
+		Taxa taxa = EbiFormat.getInstance().parse(WeakTaxaFactory.GLOBAL, rs.getString(1));
+		taxa.setCommonName(rs.getString(2));
+		taxa.getAnnotation().setProperty(
+						 EbiFormat.PROPERTY_NCBI_TAXA,
+						 String.valueOf(rs.getInt(3))
+						 );
+		underlyingAnnotation.setProperty(OrganismParser.PROPERTY_ORGANISM, taxa);
+	    }
 	    seqDB.getPool().putConnection(conn);
-  	} catch (SQLException ex) {
+	} catch (SQLException ex) {
 	    throw new BioRuntimeException(ex, "Error fetching annotations");
-		} catch (ChangeVetoException ex) {
-		  throw new BioError(ex);
-		} catch (CircularReferenceException ex) {
-      throw new BioError(ex);
+	} catch (ChangeVetoException ex) {
+	    throw new BioError(ex);
+	} catch (CircularReferenceException ex) {
+	    throw new BioError(ex);
+	}
     }
-  }
 
         public Object getProperty(Object key)
         throws NoSuchElementException
