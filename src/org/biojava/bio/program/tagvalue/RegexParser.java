@@ -194,7 +194,8 @@ public class RegexParser
     return mergeSameTag;
   }
   
-  public TagValue parse(Object o) {
+  public TagValue parse(Object o)
+  throws ParserException {
     String line = o.toString();
     
     // Use of the special value for the EOR marker allows a blank line
@@ -214,7 +215,9 @@ public class RegexParser
     }
     
     Matcher matcher = pattern.matcher(line);
-    matcher.find();
+    if(!matcher.find()) {
+      throw new ParserException("Could not match " + pattern.pattern() + " to " + line);
+    }
     String tag = matcher.group(tagGroup);
     if(trimTag) {
       tag = tag.trim();
