@@ -23,22 +23,30 @@ package org.biojava.bio.seq.io;
 
 import junit.framework.*;
 
+import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.SeqFormatTools;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.io.SeqFileFormer;
+import org.biojava.bio.seq.io.SeqFileFormerFactory;
 
 /**
  * This test suite is built on JUnit (www.junit.org).  It tests the
- * SeqFormatTools' Location formatter against various locations.
+ * Genbank (and EMBL, as they use the same code) Location formatter
+ * against various locations. The formatting code being tested is
+ * located in AbstractGenEmblFileFormer.
  *
  * @author Greg Cox
+ * @author Keith James
  */
 public class LocationFormatterTest extends TestCase
 {
 // Static variables
-	protected static final int PLUS = 0;
-	protected static final int MINUS = -1;
+	protected static final StrandedFeature.Strand  PLUS = StrandedFeature.POSITIVE;
+	protected static final StrandedFeature.Strand MINUS = StrandedFeature.NEGATIVE;
 
 // Member variables
+        protected SeqFileFormer fileFormer;
+
 	protected Location mSimplePointLocation;
 			// 467
 	protected Location mRangedPointLocation;
@@ -107,7 +115,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "467";
 
-		String actual = SeqFormatTools.formatLocationBlock(mSimplePointLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mSimplePointLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -119,7 +127,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "(102.110)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mRangedPointLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mRangedPointLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -131,7 +139,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = ">12";
 
-		String actual = SeqFormatTools.formatLocationBlock(mBoundedPointLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mBoundedPointLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -143,7 +151,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "340..565";
 
-		String actual = SeqFormatTools.formatLocationBlock(mSimpleRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mSimpleRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -155,7 +163,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "<345..500";
 
-		String actual = SeqFormatTools.formatLocationBlock(mBoundedRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mBoundedRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -167,7 +175,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "<94..(200.250)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mBoundedPointRangedPointRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mBoundedPointRangedPointRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -179,7 +187,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "(23.45)..600";
 
-		String actual = SeqFormatTools.formatLocationBlock(mRangedPointSimplePointRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mRangedPointSimplePointRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -191,7 +199,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "(122.133)..(204.221)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mRangedPointRangedPointRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mRangedPointRangedPointRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -203,7 +211,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "340..565";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularSimpleRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularSimpleRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -215,7 +223,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "<345..500";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularBoundedRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularBoundedRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -227,7 +235,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "<94..(200.250)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularBoundedPointRangedPointRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularBoundedPointRangedPointRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -239,7 +247,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "(23.45)..600";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularRangedPointSimplePointRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularRangedPointSimplePointRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -251,7 +259,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "(122.133)..(204.221)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularRangedPointRangedPointRangedLocation, PLUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularRangedPointRangedPointRangedLocation, PLUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -263,7 +271,7 @@ public class LocationFormatterTest extends TestCase
 //	{
 //		String expected = "join(>12,(122.133)..(204.221),340..565,<345..500)";
 //
-//		String actual = SeqFormatTools.formatLocationBlock(mJoinCompoundLocation, PLUS, "", Integer.MAX_VALUE).toString();
+//		String actual = fileFormer.formatLocation(mJoinCompoundLocation, PLUS);
 //
 //		this.assertEquals(expected, actual);
 //	}
@@ -275,7 +283,7 @@ public class LocationFormatterTest extends TestCase
 //	{
 //		String expected = "order(>12,(122.133)..(204.221),340..565,<345..500)";
 //
-//		String actual = SeqFormatTools.formatLocationBlock(mOrderCompoundLocation, PLUS, "", Integer.MAX_VALUE).toString();
+//		String actual = fileFormer.formatLocation(mOrderCompoundLocation, PLUS);
 //
 //		this.assertEquals(expected, actual);
 //	}
@@ -287,7 +295,7 @@ public class LocationFormatterTest extends TestCase
 //	{
 //		String expected = "complement(join(>12,(122.133)..(204.221),340..565,<345..500))";
 //
-//		String actual = SeqFormatTools.formatLocationBlock(mJoinCompoundLocation, MINUS, "", Integer.MAX_VALUE).toString();
+//		String actual = fileFormer.formatLocation(mJoinCompoundLocation, MINUS);
 //
 //		this.assertEquals(expected, actual);
 //	}
@@ -299,7 +307,7 @@ public class LocationFormatterTest extends TestCase
 //	{
 //		String expected = "complement(order(>12,(122.133)..(204.221),340..565,<345..500))";
 //
-//		String actual = SeqFormatTools.formatLocationBlock(mOrderCompoundLocation, MINUS, "", Integer.MAX_VALUE).toString();
+//		String actual = fileFormer.formatLocation(mOrderCompoundLocation, MINUS);
 //
 //		this.assertEquals(expected, actual);
 //	}
@@ -311,7 +319,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement(467)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mSimplePointLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mSimplePointLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -323,7 +331,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement((102.110))";
 
-		String actual = SeqFormatTools.formatLocationBlock(mRangedPointLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mRangedPointLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -335,7 +343,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement(>12)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mBoundedPointLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mBoundedPointLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -347,7 +355,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement(340..565)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mSimpleRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mSimpleRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -359,7 +367,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement(<345..500)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mBoundedRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mBoundedRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -371,7 +379,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement(<94..(200.250))";
 
-		String actual = SeqFormatTools.formatLocationBlock(mBoundedPointRangedPointRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mBoundedPointRangedPointRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -383,7 +391,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement((23.45)..600)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mRangedPointSimplePointRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mRangedPointSimplePointRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -395,7 +403,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement((122.133)..(204.221))";
 
-		String actual = SeqFormatTools.formatLocationBlock(mRangedPointRangedPointRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mRangedPointRangedPointRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -407,7 +415,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement(340..565)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularSimpleRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularSimpleRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -419,7 +427,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement(<345..500)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularBoundedRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularBoundedRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -431,7 +439,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement(<94..(200.250))";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularBoundedPointRangedPointRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularBoundedPointRangedPointRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -443,7 +451,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement((23.45)..600)";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularRangedPointSimplePointRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularRangedPointSimplePointRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -455,7 +463,7 @@ public class LocationFormatterTest extends TestCase
 	{
 		String expected = "complement((122.133)..(204.221))";
 
-		String actual = SeqFormatTools.formatLocationBlock(mCircularRangedPointRangedPointRangedLocation, MINUS, "", Integer.MAX_VALUE).toString();
+		String actual = fileFormer.formatLocation(mCircularRangedPointRangedPointRangedLocation, MINUS);
 
 		this.assertEquals(expected, actual);
 	}
@@ -467,7 +475,7 @@ public class LocationFormatterTest extends TestCase
 //	{
 //		String expected = "join(complement(>12),complement((122.133)..(204.221)),complement(340..565),complement(<345..500))";
 //
-//		String actual = SeqFormatTools.formatLocationBlock(mJoinCompoundLocation, MINUS, "", Integer.MAX_VALUE).toString();
+//		String actual = fileFormer.formatLocation(mJoinCompoundLocation, MINUS);
 //
 //		this.assertEquals(expected, actual);
 //	}
@@ -479,7 +487,7 @@ public class LocationFormatterTest extends TestCase
 //	{
 //		String expected = "order(complement(>12),complement((122.133)..(204.221)),complement(340..565),complement(<345..500))";
 //
-//		String actual = SeqFormatTools.formatLocationBlock(mOrderCompoundLocation, MINUS, "", Integer.MAX_VALUE).toString();
+//		String actual = fileFormer.formatLocation(mOrderCompoundLocation, MINUS);
 //
 //		this.assertEquals(expected, actual);
 //	}
@@ -490,24 +498,33 @@ public class LocationFormatterTest extends TestCase
 	 */
 	protected void setUp()
 	{
-		mSimplePointLocation = new PointLocation(467);
-		mRangedPointLocation = new FuzzyPointLocation(102, 110, FuzzyPointLocation.RESOLVE_AVERAGE);
-		mBoundedPointLocation = new FuzzyPointLocation(12, Integer.MAX_VALUE, FuzzyPointLocation.RESOLVE_AVERAGE);
-		mSimpleRangedLocation = new RangeLocation(340, 565);
-		mBoundedRangedLocation = new FuzzyLocation(Integer.MIN_VALUE, 500, 345, 500, FuzzyLocation.RESOLVE_INNER);
-		mBoundedPointRangedPointRangedLocation = new FuzzyLocation(Integer.MIN_VALUE, 250, 94, 200, FuzzyLocation.RESOLVE_INNER);
-		mRangedPointSimplePointRangedLocation = new FuzzyLocation(23, 600, 45, 600, FuzzyLocation.RESOLVE_AVERAGE);
-		mRangedPointRangedPointRangedLocation = new FuzzyLocation(122, 221, 133, 204, FuzzyLocation.RESOLVE_AVERAGE);
+	    try
+	    {
+		fileFormer = SeqFileFormerFactory.makeFormer("Genbank");
+	    }
+	    catch (BioException be)
+	    {
+		be.printStackTrace();
+	    }
 
-		mCircularSimpleRangedLocation = new CircularLocation(mSimpleRangedLocation, 1000);
-		mCircularBoundedRangedLocation = new CircularLocation(mBoundedRangedLocation, 1000);
-		mCircularBoundedPointRangedPointRangedLocation = new CircularLocation(mBoundedPointRangedPointRangedLocation, 1000);
-		mCircularRangedPointSimplePointRangedLocation = new CircularLocation(mRangedPointSimplePointRangedLocation, 1000);
-		mCircularRangedPointRangedPointRangedLocation = new CircularLocation(mRangedPointRangedPointRangedLocation, 1000);
-		mCircularRangedPointRangedPointRangedLocation = new CircularLocation(mRangedPointRangedPointRangedLocation, 1000);
+	    mSimplePointLocation = new PointLocation(467);
+	    mRangedPointLocation = new FuzzyPointLocation(102, 110, FuzzyPointLocation.RESOLVE_AVERAGE);
+	    mBoundedPointLocation = new FuzzyPointLocation(12, Integer.MAX_VALUE, FuzzyPointLocation.RESOLVE_AVERAGE);
+	    mSimpleRangedLocation = new RangeLocation(340, 565);
+	    mBoundedRangedLocation = new FuzzyLocation(Integer.MIN_VALUE, 500, 345, 500, FuzzyLocation.RESOLVE_INNER);
+	    mBoundedPointRangedPointRangedLocation = new FuzzyLocation(Integer.MIN_VALUE, 250, 94, 200, FuzzyLocation.RESOLVE_INNER);
+	    mRangedPointSimplePointRangedLocation = new FuzzyLocation(23, 600, 45, 600, FuzzyLocation.RESOLVE_AVERAGE);
+	    mRangedPointRangedPointRangedLocation = new FuzzyLocation(122, 221, 133, 204, FuzzyLocation.RESOLVE_AVERAGE);
 
-		mAdjacentBetweenLocation = new BetweenLocation(new RangeLocation(20, 21));
-		mFuzzyBetweenLocation = new BetweenLocation(new RangeLocation(20, 30));
+	    mCircularSimpleRangedLocation = new CircularLocation(mSimpleRangedLocation, 1000);
+	    mCircularBoundedRangedLocation = new CircularLocation(mBoundedRangedLocation, 1000);
+	    mCircularBoundedPointRangedPointRangedLocation = new CircularLocation(mBoundedPointRangedPointRangedLocation, 1000);
+	    mCircularRangedPointSimplePointRangedLocation = new CircularLocation(mRangedPointSimplePointRangedLocation, 1000);
+	    mCircularRangedPointRangedPointRangedLocation = new CircularLocation(mRangedPointRangedPointRangedLocation, 1000);
+	    mCircularRangedPointRangedPointRangedLocation = new CircularLocation(mRangedPointRangedPointRangedLocation, 1000);
+
+	    mAdjacentBetweenLocation = new BetweenLocation(new RangeLocation(20, 21));
+	    mFuzzyBetweenLocation = new BetweenLocation(new RangeLocation(20, 30));
 	}
 
 // Private methods
