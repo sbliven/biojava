@@ -576,6 +576,7 @@
       author="true"
       version="true"
       use="true"
+      source="1.4"
       windowtitle="${Name.taglets} API"
       doctitle="${Name.taglets}"
       maxmemory="96m">
@@ -596,6 +597,7 @@
       author="true"
       version="true"
       use="true"
+      source="1.4"
       windowtitle="${Name.grammars} API"
       doctitle="${Name.grammars}"
       maxmemory="96m">
@@ -614,6 +616,7 @@
       author="true"
       version="true"
       use="true"
+      source="1.4"
       windowtitle="${Name.biojava} API"
       doctitle="${Name.biojava}"
       maxmemory="96m">
@@ -661,6 +664,7 @@
       author="true"
       version="true"
       use="true"
+      source="1.4"
       windowtitle="${Name.demos} API"
       doctitle="${Name.demos}"
       maxmemory="96m">
@@ -684,6 +688,7 @@
       author="true"
       version="true"
       use="true"
+      source="1.4"
       windowtitle="${Name.apps} API"
       doctitle="${Name.apps}"
       maxmemory="96m">
