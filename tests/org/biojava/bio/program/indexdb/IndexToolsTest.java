@@ -124,28 +124,28 @@ public class IndexToolsTest extends TestCase
         assertEquals(557, seq6.length());
     }
 
-    public void testIndexGenbankDNA() throws Exception
-    {
-        File [] files = getDBFiles(new String [] { "part1.gb",
-                                                   "part2.gb" });
-        IndexTools.indexGenbankDNA(new File(location), files);
+//     public void testIndexGenbankDNA() throws Exception
+//     {
+//         File [] files = getDBFiles(new String [] { "part1.gb",
+//                                                    "part2.gb" });
+//         IndexTools.indexGenbankDNA(new File(location), files);
 
-        SequenceDBLite db = new FlatSequenceDB(location, "genbank");
+//         SequenceDBLite db = new FlatSequenceDB(location, "genbank");
 
-        Sequence seq1 = db.getSequence("");
-        assertEquals(, seq1.length());
-        Sequence seq2 = db.getSequence("");
-        assertEquals(, seq2.length());
-        Sequence seq3 = db.getSequence("");
-        assertEquals(, seq3.length());
+//         Sequence seq1 = db.getSequence("");
+//         assertEquals(, seq1.length());
+//         Sequence seq2 = db.getSequence("");
+//         assertEquals(, seq2.length());
+//         Sequence seq3 = db.getSequence("");
+//         assertEquals(, seq3.length());
 
-        Sequence seq4 = db.getSequence("");
-        assertEquals(, seq4.length());
-        Sequence seq5 = db.getSequence("");
-        assertEquals(, seq5.length());
-        Sequence seq6 = db.getSequence("");
-        assertEquals(, seq6.length());
-    }
+//         Sequence seq4 = db.getSequence("");
+//         assertEquals(, seq4.length());
+//         Sequence seq5 = db.getSequence("");
+//         assertEquals(, seq5.length());
+//         Sequence seq6 = db.getSequence("");
+//         assertEquals(, seq6.length());
+//     }
 
     public void testIndexSwissprot() throws Exception
     {
