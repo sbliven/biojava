@@ -34,11 +34,6 @@ import org.biojava.utils.*;
  * underlying <code>Annotation</code> is checked.  Values
  * passed to <code>setProperty</code> are always stored
  * within the overlay.
- * <P>
- * So that multiple values may be assigned to the same key, for example,
- * multiple "/note" fields on a GenBank feature, if a value would be
- * overwritten, a list will instead be composed of the old value and the new
- * one.  Therefore, use caution when adding a list as a value.
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -95,56 +90,18 @@ public class OverlayAnnotation implements Annotation, Serializable {
 
   public void setProperty(Object key, Object value)
   throws ChangeVetoException {
-	// This mess is to handle cases where there is already a value associated
-	// with the key.
-	Object newValue;
-	Object oldValue = null;
-	try
-	{
-		if(this.getOverlay().containsKey(key))
-		{
-			oldValue = this.getProperty(key);
-			// If the old value is already a list, append the new value to it.
-			if (oldValue instanceof List)
-			{
-				newValue = oldValue;
-				((List)newValue).add(value);
-			}
-			// Otherwise, construct a new list with the old and new values.
-			else
-			{
-				newValue = new ArrayList();
-				((List)newValue).add(oldValue);
-				((List)newValue).add(value);
-			}
-		}
-		else
-		{
-			newValue = value;
-		}
-	}
-	// Catches ClassCast, Unsupported operation, and Illegal argument exceptions
-	// from newValue.add.  If this operation fails, create a new list with the
-	// new and old values.
-	catch (RuntimeException re)
-	{
-		newValue = new ArrayList();
-		((List)newValue).add(oldValue);
-		((List)newValue).add(value);
-	}
-
     if(changeSupport == null) {
-      getOverlay().put(key, newValue);
+      getOverlay().put(key, value);
     } else {
       ChangeEvent ce = new ChangeEvent(
         this,
         Annotation.PROPERTY,
-        new Object[] {key, newValue},
+        new Object[] {key, value},
         new Object[] {key, getProperty(key)}
       );
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
-        getOverlay().put(key, newValue);
+        getOverlay().put(key, value);
         changeSupport.firePostChangeEvent(ce);
       }
     }
