@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.biojava.bio.BioException;
+import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
@@ -169,7 +169,7 @@ class EmblLikeLocationParser
 
                     case ',':
                         processCoords();
-                        processInstructs();
+                        // processInstructs();
                         break;
 
                     case ')':
