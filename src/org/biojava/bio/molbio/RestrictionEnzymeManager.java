@@ -419,12 +419,8 @@ public final class RestrictionEnzymeManager
 
         private String tagState;
         private boolean unknownSite;
-        private StringBuffer sb;
 
-        RebaseEnzymeBuilder()
-        {
-            sb = new StringBuffer();
-        }
+        RebaseEnzymeBuilder() { }
 
         public void startRecord() throws ParserException
         {
@@ -516,8 +512,7 @@ public final class RestrictionEnzymeManager
 
         private void processSite(Object value) throws ParserException
         {
-            sb.setLength(0);
-            sb.append((String) value);
+            StringBuffer sb = new StringBuffer((String) value);
             int div, forIdx, revIdx;
 
             // REBASE marks enzymes whose site is not known with '?'
