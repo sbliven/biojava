@@ -1,28 +1,32 @@
 /*
- * BioJava development code This code may be freely distributed and modified under the terms of the
- * GNU Lesser General Public Licence. This should be distributed with the code. If you do not have a
- * copy, see: http://www.gnu.org/copyleft/lesser.html Copyright for this code is held jointly by the
- * individual authors. These should be listed in @author doc comments. For more information on the
- * BioJava project and its aims, or to join the biojava-l mailing list, visit the home page at:
- * http://www.biojava.org/
+ *                BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
  */
 
-package org.flymine.jUnitTests;
+package org.biojava.bio.seq;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.FeatureHolderUtils;
-import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.SimpleFeatureHolder;
-import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.ChangeVetoException;
 
