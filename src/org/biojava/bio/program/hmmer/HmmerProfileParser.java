@@ -41,6 +41,8 @@ import org.biojava.bio.*;
  */
 public class HmmerProfileParser{
 
+		protected Alphabet alph = ProteinTools.getAlphabet();
+	
     /** Returns a profile HMM representing the core HMMER hmm
       * @param inputfile the file which contains the Profile HMM data, as output by HMMER - e.g. HMM_ls
      */
@@ -64,19 +66,29 @@ public class HmmerProfileParser{
     }
 
    
-    private String domain1;
+    protected String domain1;
 
 
-    private HmmerProfileParser(String domain){
+    protected HmmerProfileParser(String domain){
 	this.domain1 = domain;
     }
     
+    protected HmmerProfileHMM initialiseProfileHMM(int len){
+	    try{
+	    DistributionFactory matchFactory = DistributionFactory.DEFAULT;
+	    DistributionFactory insertFactory = DistributionFactory.DEFAULT;
+	    return new HmmerProfileHMM(alph, len, matchFactory, insertFactory, domain1);
+	    }
+	    catch(Throwable t){
+		t.printStackTrace();
+		return null;
+	    }
+	}
 
-
-    HmmerModel hmm;
+    protected HmmerModel hmm;
     private static final double sumCheckThreshold = 0.001;
 
-    HmmerProfileHMM getModel(){
+    public HmmerProfileHMM getModel(){
 	return hmm.hmm;
     }
 
@@ -90,16 +102,16 @@ public class HmmerProfileParser{
     }
    
 
-     void setProfileHMM(){
+     public void setProfileHMM(){
 	hmm.setProfileHMM();
     }
     
-     void setFullProfileHMM(){
+     void  setFullProfileHMM(){
 	hmm.setFullProfileHMM();
     }
     
 
-    private void parseModel(File inputFile){
+     public void parseModel(File inputFile){
 	System.out.println("Parsing model "+inputFile);
 	try{
 	    BufferedReader in = new BufferedReader(new FileReader(inputFile));
@@ -198,7 +210,7 @@ public class HmmerProfileParser{
 	int[] specialTransitions;
 
 	Symbol[] alphList;
-	Alphabet alph;
+;
 	HmmerProfileHMM hmm;
 	FullHmmerProfileHMM hmm_full;
 
@@ -211,8 +223,7 @@ public class HmmerProfileParser{
 	    specialTransitions = new int[8];
 	    transitions = new int[length+1][9];
 	    alphList = new Symbol[21];
-	    alph = ProteinTools.getAlphabet();
-	    initialiseProfileHMM();
+	    hmm = initialiseProfileHMM(emissions.length);
 
 	}
 
@@ -261,16 +272,7 @@ public class HmmerProfileParser{
 
 
 
-	void initialiseProfileHMM(){
-	    try{
-	    DistributionFactory matchFactory = DistributionFactory.DEFAULT;
-	    DistributionFactory insertFactory = DistributionFactory.DEFAULT;
-	    hmm = new HmmerProfileHMM(alph, emissions.length, matchFactory, insertFactory, domain1);
-	    }
-	    catch(Throwable t){
-		t.printStackTrace();
-	    }
-	}
+	
 	
 	void initialiseFullProfileHMM(){
 	    try{
@@ -434,8 +436,9 @@ public class HmmerProfileParser{
 		double prob;
 		double null_prob;
 		if(j<alphList.length-1){
-		    prob = convertToProb(insertEmissions[j], nullEmissions[j]);
-		    null_prob = convertToProb(nullEmissions[j],0);
+	    null_prob = convertToProb(nullEmissions[j],0.05);	
+	    prob = convertToProb(insertEmissions[j], null_prob);
+	
 		}
 		else{
 		    prob  = 0.0;
@@ -455,8 +458,10 @@ public class HmmerProfileParser{
 		    hmm.getInsert(i).setDistribution(insertEmission);
 		for (int j=0; j<alphList.length; j++){
 		double prob;
-		if(j<alphList.length-1)
-		    prob = convertToProb(emissions[i-1][j],nullEmissions[j]);
+		if(j<alphList.length-1){
+			double  null_prob = convertToProb(nullEmissions[j],0.05);
+		    prob = convertToProb(emissions[i-1][j],null_prob);
+		}
 		else prob  = 0.0;
 		    matchEmission.setWeight(alphList[j],prob);
 		}
@@ -480,12 +485,12 @@ public class HmmerProfileParser{
 	    return result;
 	}
 
-	private double convertToProb(int score, int nullscore){
+	private double convertToProb(int score, double nullprob){
 	    double result=0.0;
 	    if(score!=Integer.MIN_VALUE){
-		double background = 0.05*Math.pow(2.0,((double) nullscore/1000));
+		//double background = 0.05*Math.pow(2.0,((double) nullscore/1000));
 		//result = background;
-		result = background*Math.pow(2.0,((double) score/1000));
+		result = nullprob*Math.pow(2.0,((double) score/1000));
 		//System.out.println(score+ " "+nullscore+" "+result);
 	    }
 	    return result;

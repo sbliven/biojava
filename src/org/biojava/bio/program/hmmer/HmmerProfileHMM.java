@@ -43,7 +43,7 @@ import java.io.*;
  *  @author Lachlan Coin
  */
 public class HmmerProfileHMM extends ProfileHMM {
-  HmmerProfileHMM(
+  protected HmmerProfileHMM(
     Alphabet alpha, int columns,
     DistributionFactory matchFactory, DistributionFactory insertFactory, String name
   ) throws IllegalSymbolException, IllegalTransitionException,
@@ -95,4 +95,20 @@ public class HmmerProfileHMM extends ProfileHMM {
 	createTransition(dO, magicalState());
     }
 
+    public double transScore(State from, State to, Symbol symFrom, Symbol symTo) throws IllegalSymbolException{
+	    return log2(getWeights(from).getWeight(to));
+    }
+    
+    protected static double log2(double x){
+	return Math.log(x)/Math.log(2);
+    }
+    
+    protected EmissionState makeNewInsertState(String str, Annotation ann, int[] adv, Distribution dis){
+	  return new ProfileEmissionState(str, ann,adv, dis);
+  }
+  
+   protected EmissionState makeNewMatchState(String str, Annotation ann, int[] adv, Distribution dis){
+	  return new ProfileEmissionState(str, ann,adv, dis);
+  }
+  
 }
