@@ -215,8 +215,10 @@ public class Builder {
 	    command[indx++] = (String) i.next();
 	}
 	Process p = Runtime.getRuntime().exec(command);
-	OutputSpinner os = new OutputSpinner(p.getErrorStream(), System.out);
+	OutputSpinner es = new OutputSpinner(p.getErrorStream(), System.err);
+	OutputSpinner os = new OutputSpinner(p.getInputStream(), System.out);
 	os.start();
+	es.start();
 	Thread.yield();
 	try {
 	    p.waitFor();
