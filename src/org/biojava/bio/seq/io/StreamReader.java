@@ -50,17 +50,18 @@ import org.biojava.bio.seq.*;
  * @author Thomas Down
  */
 
-public class StreamReader implements SequenceIterator {
+public class StreamReader implements SequenceIterator, org.biojava.utils.ParseErrorListener
+{
     /**
      * The symbol parser.
      */
     private SymbolParser symParser;
-  
+
     /**
      * The sequence format.
      */
     private SequenceFormat format;
-  
+
     /**
      * The sequence-builder factory.
      */
@@ -90,7 +91,7 @@ public class StreamReader implements SequenceIterator {
      */
 
     public Sequence nextSequence()
-	throws NoSuchElementException, BioException  
+	throws NoSuchElementException, BioException
     {
 	if(!moreSequenceAvailable)
 	    throw new NoSuchElementException("Stream is empty");
@@ -125,5 +126,20 @@ public class StreamReader implements SequenceIterator {
 	this.format = format;
 	this.symParser = symParser;
 	this.sf = sf;
+	((org.biojava.utils.ParseErrorSource)(this.format)).addParseErrorListener(this);
     }
+
+	/**
+	 * This method determines the behaviour when a bad line is processed.
+	 * Some options are to log the error, throw an exception, ignore it
+	 * completely, or pass the event through.
+	 * <P>
+	 * This method should be overwritten when different behavior is desired.
+	 *
+	 * @param theEvent The event that contains the bad line and token.
+	 */
+	public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent)
+	{
+		System.err.println(theEvent.getMessage());
+	}
 }
