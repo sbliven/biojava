@@ -38,6 +38,7 @@ import org.biojava.bio.BioRuntimeException;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Len Trigg
+ * @author Eric Haugen
  */
 public abstract class DBHelper {
 
@@ -67,7 +68,7 @@ public abstract class DBHelper {
                 } else if (protocol.equals("postgresql")) {
                     return new PostgreSQLDBHelper();
                 } else if (protocol.equals("oracle")) {
-                    return new OracleDBHelper();
+                    return new OracleDBHelper(conn);
                 } else if (protocol.equals("hsqldb")) {
                     return new HypersonicDBHelper();
                 }
@@ -95,6 +96,22 @@ public abstract class DBHelper {
     public static final DeleteStyle DELETE_GENERIC = new DeleteStyle("Portable SQL");
 
 
+    public static final class JoinStyle {
+        private final String name;
+
+        private JoinStyle(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return "DBHelper.JoinStyle: " + name;
+        }
+    }
+
+    public static final JoinStyle JOIN_ORACLE8 = new JoinStyle("Oracle 8i or earlier");
+    public static final JoinStyle JOIN_GENERIC = new JoinStyle("Portable SQL");
+
+
     /**
      * Returns the id value created during the last insert
      * command. This is for tables that have an auto increment column.
@@ -108,12 +125,25 @@ public abstract class DBHelper {
 
     /**
      * Returns the an object indicating the style of deletion that
-     * this database should employ.
+     * this database should employ. Unless overridden, this is
+     * DELETE_GENERIC.
      * 
      * @return the preferred deletion style.
      */
-    public abstract DeleteStyle getDeleteStyle();
+    public DeleteStyle getDeleteStyle() {
+        return DELETE_GENERIC;
+    }
 
+
+    /**
+     * Returns the an object indicating the style of table joining that
+     * this database should employ.
+     * 
+     * @return the preferred joining style.
+     */
+    public JoinStyle getJoinStyle() {
+        return JOIN_GENERIC;
+    }
 
     /**
      * Detects whether a particular table is present in the database.
