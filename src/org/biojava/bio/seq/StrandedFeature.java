@@ -68,6 +68,6 @@ public interface StrandedFeature extends Feature {
   static final int NEGATIVE = -1;
   
   public class Template extends Feature.Template {
-    int strand;
+    public int strand;
   }
 }
