@@ -62,7 +62,7 @@ public class XMLPeerBuilder implements DocumentHandler {
 
     public void characters(char[] ch, int start, int len) {
 	String child = new String(ch, start, len);
-	stacktop.objs.add(child);
+	stackTop.objs.add(child);
     }
 
     public void ignorableWhitespace(char[] ch, int start, int len) {
