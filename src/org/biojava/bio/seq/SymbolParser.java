@@ -51,10 +51,11 @@ public class SymbolParser implements ResidueParser {
   }
   
   public ResidueList parse(String seq) throws IllegalResidueException {
-    SimpleResidueList rList = new SimpleResidueList(alphabet());
-    for(int i = 0; i < seq.length(); i++)
-      rList.addResidue(parseToken(seq.substring(i, i+1)));
-    return rList;
+    List rList = new ArrayList(seq.length());
+    for(int i = 0; i < seq.length(); i++) {
+      rList.add(parseToken(seq.substring(i, i+1)));
+    }
+    return new SimpleResidueList(alphabet(), rList);
   }
   
   public Residue parseToken(String token) throws IllegalResidueException {

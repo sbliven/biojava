@@ -113,13 +113,14 @@ public class FastaFormat implements SequenceFormat {
     String description = line.substring(1).trim();
 
     // read in all the sequence up untill > or eof
-    List resList = new ArrayList();
+    ArrayList resList = new ArrayList();
     in.mark(120);
     line = in.readLine();
     while(line != null && !line.startsWith(">")) {
       StringTokenizer st = new StringTokenizer(line, " ", false);
       while(st.hasMoreTokens()) {
         String token = st.nextToken();
+        resList.ensureCapacity(resList.size() + getLineWidth());
         resList.addAll(resParser.parse(token).toList());
       }
       in.mark(120);
