@@ -265,14 +265,14 @@ public class SimpleGFFRecord implements GFFRecord {
         attValList = attVal.substring(spaceIndx).trim();
         while(attValList.length() > 0) {
           if(attValList.startsWith("\"")) {
-            System.out.println("Quoted");
+	    // System.out.println("Quoted");
             int quoteIndx = 0;
             do {
               quoteIndx++;
               quoteIndx = attValList.indexOf("\"", quoteIndx);
-            } while(quoteIndx != -1 && attValList.charAt(quoteIndx-1) != '\\');
+            } while(quoteIndx != -1 && attValList.charAt(quoteIndx-1) == '\\');
             valList.add(attValList.substring(1, quoteIndx));
-            attValList = attValList.substring(quoteIndx).trim();
+            attValList = attValList.substring(quoteIndx+1).trim();
           } else {
             spaceIndx = attValList.indexOf(" ");
             if(spaceIndx == -1) {
