@@ -605,11 +605,6 @@ public final class SeqIOTools  {
         if (alphaType == 0)
             throw new IllegalArgumentException("No alphabet was set in the identifier");
 
-        // Mask alphabet bytes
-        int formatType = identifier & (~ 0xffff0000);
-        if (formatType == 0)
-            throw new IllegalArgumentException("No format was set in the identifier");
-
         switch (alphaType) {
             case SeqIOConstants.DNA:
                 return DNATools.getDNA();
