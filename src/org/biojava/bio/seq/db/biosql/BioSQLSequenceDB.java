@@ -31,11 +31,13 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.taxa.*;
 
 /**
  * SequenceDB keyed off a BioSQL database.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.3
  */
 
@@ -171,10 +173,73 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		}
 	    }
 	    persistFeatures(conn, bioentry_id, features, -1);
+	    
+            //
+            // we will need this annotation bundle for various things
+            //
+            
+            Annotation ann = seq.getAnnotation();
+            
+	    //
+	    // Store organism
+	    //
+	    
+	    if(ann.containsProperty(OrganismParser.PROPERTY_ORGANISM)) {
+                Taxa taxa = (Taxa) ann.getProperty(OrganismParser.PROPERTY_ORGANISM);
+                Annotation ta = taxa.getAnnotation();
+                int taxaID;
+                {
+                  Object t  = ta.getProperty(EbiFormat.PROPERTY_NCBI_TAXA);
+                  if(t instanceof List) {
+                    t = (String) ((List) t).get(0);
+                  }
+                  taxaID = Integer.parseInt((String) t);
+                }
+                
+                int taxa_id;
+                PreparedStatement select_taxa = conn.prepareStatement(
+                  "select taxa_id " +
+                  "from taxa " +
+                  "where ncbi_taxa_id = ? "
+                );
+                select_taxa.setInt(1, taxaID);
+                ResultSet trs = select_taxa.executeQuery();
+                if(trs.next()) {
+                  // entry exists - link to it
+                  taxa_id = trs.getInt(1);
+                } else {
+                  // entry does not exist - create it and link to it
+                  String name = EbiFormat.getInstance().serialize(taxa);
+                  String common = taxa.getCommonName();
+                  PreparedStatement create_taxa = conn.prepareStatement(
+                    "insert into taxa " +
+                    "(full_lineage, common_name, ncbi_taxa_id) " +
+                    "values (?, ?, ?)"
+                  );
+                  create_taxa.setString(1, name);
+                  create_taxa.setString(2, common);
+                  create_taxa.setInt(3, taxaID);
+                  create_taxa.executeUpdate();
+                  create_taxa.close();
+                  taxa_id = getDBHelper().getInsertID(conn, "taxa", "taxa_id");
+                }
+                select_taxa.close();
+                
+                PreparedStatement create_bioentry_taxa = conn.prepareStatement(
+                  "insert into bioentry_taxa " +
+                  "(bioentry_id, taxa_id) " +
+                  "values (?, ?)"
+                );
+                
+                create_bioentry_taxa.setInt(1, bioentry_id);
+                create_bioentry_taxa.setInt(2, taxa_id);
+                create_bioentry_taxa.executeUpdate();
+                create_bioentry_taxa.close();
+	    }
 
 	    pool.putConnection(conn);
 	} catch (SQLException ex) {
-	    throw new BioException(ex, "Error inserting data into BioSQL tables");
+	    throw new BioException(ex, "Error inserting data into BioSQL tables: " + seq.getName());
 	}
     }
 
