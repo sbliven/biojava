@@ -66,13 +66,19 @@ public class FeatureTableParser {
     private String                 featureSource;
     private SeqIOListener          listener;
     private EmblLikeLocationParser locParser;
+    private String                 seqID;
 
     FeatureTableParser(SeqIOListener listener, String source) {
         this.listener      = listener;
         this.featureSource = source;
+        this.seqID = seqID;
 
         featureBuf = new StringBuffer();
-        locParser  = new EmblLikeLocationParser();
+        locParser  = new EmblLikeLocationParser(seqID);
+    }
+    
+    public void setSeqID(String seqID) {
+      this.seqID = seqID;
     }
 
     //

@@ -409,7 +409,7 @@ public class SubSequence implements Sequence {
 				    return f;
 				}
 			    } ;
-			rft.regions = Collections.nCopies(1, new RemoteFeature.Region(f.getLocation(), f.getSequence().getName()));
+			rft.regions = Collections.nCopies(1, new RemoteFeature.Region(f.getLocation(), f.getSequence().getName(), true));
 			
 			results.addFeature(new SSRemoteFeature(SubSequence.this, featureParent, rft, f));
 		    }

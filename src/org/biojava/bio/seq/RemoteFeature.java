@@ -153,6 +153,7 @@ public interface RemoteFeature extends StrandedFeature {
   public final static class Region {
     private final Location location;
     private final String seqID;
+    private final boolean isRemote;
 
     /**
      * Create a new Region.
@@ -161,9 +162,10 @@ public interface RemoteFeature extends StrandedFeature {
      * @param seqID the ID of the Sequence containing the Location, or null if
      *          it is a local Region
      */
-    public Region(Location location, String seqID) {
+    public Region(Location location, String seqID, boolean isRemote) {
       this.location = location;
       this.seqID = seqID;
+      this.isRemote = isRemote;
     }
 
     /**
@@ -194,7 +196,7 @@ public interface RemoteFeature extends StrandedFeature {
      * @return true if this is a remote Region, false otherwise
      */
     public boolean isRemote() {
-      return seqID != null;
+      return isRemote;
     }
   }
 }

@@ -62,6 +62,9 @@ public class EmblLikeLocationParser
     private int           nextCharIndex;
     private Object        thisToken;
 
+    // seq ID of the sequence we are parsing features for
+    private String        parentSeqID;
+
     // Stores join/order/complement instructions
     private List instructStack = new ArrayList();
 	// joinType is a hack to store if a compound location is a
@@ -97,9 +100,10 @@ public class EmblLikeLocationParser
     // No features have a strand type of UNKNOWN
     private StrandedFeature.Strand mStrandType = StrandedFeature.POSITIVE;
 
-    EmblLikeLocationParser()
+    EmblLikeLocationParser(String parentSeqID)
     {
         this.lexer = new LocationLexer();
+        this.parentSeqID = parentSeqID;
     }
 
     /**
@@ -401,11 +405,11 @@ public class EmblLikeLocationParser
         if (mRegionSeqID == null)
         {
             subLocations.add(createdLocation);
-            subRegions.add(new RemoteFeature.Region(createdLocation, null));
+            subRegions.add(new RemoteFeature.Region(createdLocation, parentSeqID, false));
         }
         else
         {
-            subRegions.add(new RemoteFeature.Region(createdLocation, mRegionSeqID));
+            subRegions.add(new RemoteFeature.Region(createdLocation, mRegionSeqID, true));
         }
 
         mRegionSeqID = null;
