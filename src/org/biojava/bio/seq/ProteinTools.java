@@ -25,15 +25,14 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
-import org.w3c.dom.*;
-import org.apache.xerces.parsers.*;
-import org.xml.sax.*;
+import org.apache.xerces.parsers.DOMParser;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
