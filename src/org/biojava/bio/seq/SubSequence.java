@@ -28,7 +28,11 @@ import org.biojava.utils.*;
 import java.util.*;
 
 /**
- * A subsection of a given sequence, with projected features.
+ * View a sub-section of a given sequence object, including all the
+ * features intersecting that region.
+ *
+ * @author Thomas Down
+ * @since 1.1
  */
 
 public class SubSequence implements Sequence {
@@ -37,6 +41,15 @@ public class SubSequence implements Sequence {
     private String name;
     private String uri;
     private Annotation annotation;
+
+    /**
+     * Construct a new SubSequence of the specified sequence.
+     *
+     * @param seq A sequence to view
+     * @param start The start of the range to view
+     * @param end The end of the range to view
+     * @throws IndexOutOfBoundsException is the start or end position is illegal.
+     */
 
     public SubSequence(Sequence seq, int start, int end) {
 	symbols = seq.subList(start, end);
