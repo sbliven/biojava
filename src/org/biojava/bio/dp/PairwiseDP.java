@@ -81,6 +81,8 @@ public class PairwiseDP extends DP {
 	throw new UnsupportedOperationException();
     }
 
+    private static List gappedResList = new ArrayList();
+
     private static Residue getResWrapper(CrossProductAlphabet a, List l) 
         throws IllegalAlphabetException
     {
@@ -91,10 +93,21 @@ public class PairwiseDP extends DP {
 //      }
 
         if (l.contains(MagicalState.MAGICAL_RESIDUE)) {
-            for (Iterator i = l.iterator(); i.hasNext(); )
-                if (i.next() != MagicalState.MAGICAL_RESIDUE)
-                    return null;
-            return MagicalState.MAGICAL_RESIDUE;
+	    gappedResList.clear();
+	    boolean gotOther = false;
+            for (Iterator i = l.iterator(); i.hasNext(); ) {
+		Object o = i.next();
+		if (i.next() == MagicalState.MAGICAL_RESIDUE) {
+		    gappedResList.add(AlphabetManager.instance().getGapResidue());
+		} else {
+		    gappedResList.add(o);
+		    gotOther = true;
+		}   
+	    }
+	    if (gotOther)
+		return a.getResidue(gappedResList);
+	    else
+		return MagicalState.MAGICAL_RESIDUE;
         }
         return a.getResidue(l);
     }
