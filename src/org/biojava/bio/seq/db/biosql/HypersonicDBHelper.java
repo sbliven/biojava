@@ -28,7 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import org.biojava.bio.BioRuntimeException;
-import org.biojava.utils.JDBCConnectionPool;
+//import org.biojava.utils.JDBCConnectionPool;
 
 /**
  * This is a <code>DBHelper</code> that provides support for the
@@ -66,17 +66,18 @@ public class HypersonicDBHelper extends DBHelper {
     }
 
     // Inherit docs
-    public boolean containsTable(JDBCConnectionPool pool, String tablename) {
+    public boolean containsTable(DataSource ds, String tablename) {
         if (pool == null) {
-            throw new NullPointerException("Require a connection pool.");
+            throw new NullPointerException("Require a datasource.");
         }
         if ((tablename == null) || (tablename.length() == 0)) {
             throw new IllegalArgumentException("Invalid table name given");
         } 
         //System.err.println("Checking for table existence: " + tablename);
+				Connection conn = null;
         try {
             boolean present;
-            Connection conn = pool.takeConnection();
+            conn = ds.getConnection();
             PreparedStatement ps = null;
             try {
                 ps = conn.prepareStatement("select top 0 * from " + tablename);
@@ -89,7 +90,9 @@ public class HypersonicDBHelper extends DBHelper {
                 if (ps != null) {
                     ps.close();
                 }
-                pool.putConnection(conn);
+                if (conn != null) {
+									conn.close();
+								}
             }
             return present;
         } catch (SQLException ex) {
