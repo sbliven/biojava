@@ -12,17 +12,18 @@
   targets:
 
     compile
-    compiletests compiles JUnit tests
-    package      builds the biojava.jar file (default)
-    runtests     runs JUnit tests
+    compile-tests compiles JUnit tests
+    package       builds the biojava.jar file (default)
+    runtests      runs JUnit tests
     javadocs
     dist
-    dist-zip    'binary' release (jar & documentation) in zip format
-    dist-tgz    'binary' release (jar & documentation) in tar.gz format
+    dist-zip     'binary' release (jar & documentation) in zip format
+    dist-tgz     'binary' release (jar & documentation) in tar.gz format
     dist-both    both dist-zip & dist-tgz
     clean        cleans up the build & dist directories
 
-  author:  Michael Heuer, modified by Keith James (JUnit support)
+  author:  Michael Heuer, modified by Keith James (JUnit support), modified
+           Greg Cox (fixed documentation)
   version: $Id$
 
   portions Copyright (c) 1999-2000 The Apache Software Foundation.
