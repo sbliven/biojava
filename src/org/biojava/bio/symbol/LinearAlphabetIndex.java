@@ -23,6 +23,7 @@ package org.biojava.bio.symbol;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.lang.ref.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
@@ -43,7 +44,7 @@ import org.biojava.utils.ChangeVetoException;
  * @since 1.1
  */
 class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
-  private /*final*/ FiniteAlphabet alpha;
+  private /*final*/ Reference alphaRef;
   private Symbol[] symbols;
   private ChangeListener indexBuilder;
   private ChangeListener adapter;
@@ -57,7 +58,7 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
     // lock the alphabet
     alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
 
-    this.alpha = alpha;
+    this.alphaRef = new WeakReference(alpha);
 
     this.symbols = buildIndex(alpha);
 
@@ -89,7 +90,8 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
       si.add(s);
     }
 
-    this.alpha = new SimpleAlphabet(si);
+    FiniteAlphabet alpha = new SimpleAlphabet(si);
+    this.alphaRef = new WeakReference(alpha);
     alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
     this.symbols = symbols;
   }
@@ -107,7 +109,7 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
   }
 
   public FiniteAlphabet getAlphabet() {
-    return alpha;
+    return (FiniteAlphabet) alphaRef.get();
   }
 
   public Symbol symbolForIndex(int i) throws IndexOutOfBoundsException {

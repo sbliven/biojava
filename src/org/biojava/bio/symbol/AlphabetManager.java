@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -167,7 +168,7 @@ public final class AlphabetManager {
   static private Map ambiguitySymbols;
   static private GapSymbol gapSymbol;
   static private Map gapBySize;
-  static private Map alphabetToIndex = new HashMap();
+  static private Map alphabetToIndex = new WeakHashMap();
 
   /**
    * Retrieve the alphabet for a specific name.

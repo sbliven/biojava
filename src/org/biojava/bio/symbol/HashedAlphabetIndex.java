@@ -23,6 +23,7 @@ package org.biojava.bio.symbol;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.lang.ref.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.utils.AbstractChangeable;
@@ -40,12 +41,12 @@ class HashedAlphabetIndex
 extends AbstractChangeable implements AlphabetIndex {
   private static final Comparator cmp = new HashComparator();
 
-  private final FiniteAlphabet alpha;
+  private final Reference alphaRef;
   private final Symbol[] symbols;
   private final int[] hashes;
 
   public FiniteAlphabet getAlphabet() {
-    return alpha;
+    return (FiniteAlphabet) alphaRef.get();
   }
 
   public int indexForSymbol(Symbol s)
@@ -107,7 +108,7 @@ extends AbstractChangeable implements AlphabetIndex {
 
   public HashedAlphabetIndex(FiniteAlphabet alpha) {
     alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
-    this.alpha = alpha;
+    this.alphaRef = new WeakReference(alpha);
     symbols = new Symbol[alpha.size()];
     hashes = new int[alpha.size()];
 
