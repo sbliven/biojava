@@ -139,15 +139,9 @@ class EmblLikeLocationParser
             else if (Integer.class.isInstance(thisToken))
             {
                 if (isPointLoc)
-                {
-                    startCoords.add(new SimplePoint((Integer)thisToken, unboundMin, unboundMax));
-                }
+                    startCoords.add(thisToken);
                 else
-               	{
-                    endCoords.add(new SimplePoint((Integer)thisToken, unboundMin, unboundMax));
-                }
-				unboundMin = false;
-                unboundMax = false;
+                    endCoords.add(thisToken);
             }
             else if (Character.class.isInstance(thisToken))
             {
@@ -266,26 +260,22 @@ class EmblLikeLocationParser
 	if (isBetweenLocation)
 	{
 		// Create a ranged location, and wrap it in a between location
-		SimplePoint startPoint = (SimplePoint)startCoords.get(0);
-		SimplePoint endPoint = (SimplePoint)startCoords.get(1);
-		int minCoord = startPoint.getLocation().intValue();
-		int maxCoord = endPoint.getLocation().intValue();
+		int minCoord = ((Integer)startCoords.get(0)).intValue();
+		int maxCoord = ((Integer)startCoords.get(1)).intValue();
 		createdLocation = new BetweenLocation(new RangeLocation(minCoord, maxCoord));
 	}
 	// Range of form: 123
 	else if (startCoords.size() == 1 && endCoords.isEmpty())
 	{
-	    SimplePoint startPoint = (SimplePoint)startCoords.get(0);
-	    innerMin = outerMin = startPoint.getLocation().intValue();
+	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
 	    innerMax = outerMax = innerMin;
 
 	    // This looks like a point, but is actually a range which
 	    // lies entirely outside the current entry
-	    if (startPoint.isUnbounded())
+	    if (unboundMin || unboundMax)
 	    {
-// Look at this.  Goddamn trinary operators
-		createdLocation = new FuzzyPointLocation(startPoint.isUnboundedMin() ? Integer.MIN_VALUE : innerMin,
-							startPoint.isUnboundedMax() ? Integer.MAX_VALUE : innerMax,
+		createdLocation = new FuzzyPointLocation(unboundMin ? Integer.MIN_VALUE : innerMin,
+							unboundMax ? Integer.MAX_VALUE : innerMax,
 							FuzzyPointLocation.RESOLVE_AVERAGE);
 	    }
 	    else if (isPointLoc)
@@ -303,10 +293,8 @@ class EmblLikeLocationParser
 	// Range of form: (123.567)
 	else if (startCoords.size() == 2 && endCoords.isEmpty())
 	{
-		SimplePoint startPoint = (SimplePoint)startCoords.get(0);
-		SimplePoint endPoint = (SimplePoint)startCoords.get(1);
-	    innerMin = outerMin = startPoint.getLocation().intValue();
-	    innerMax = outerMax = endPoint.getLocation().intValue();
+	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
+	    innerMax = outerMax = ((Integer) startCoords.get(1)).intValue();
 
 	    createdLocation = new FuzzyPointLocation(innerMin,
 						    innerMax,
@@ -315,34 +303,16 @@ class EmblLikeLocationParser
 	// Range of form: 123..567 or <123..567 or 123..>567 or <123..>567
 	else if (startCoords.size() == 1 && endCoords.size() == 1)
 	{
-		SimplePoint startPoint = (SimplePoint)startCoords.get(0);
-		SimplePoint endPoint = (SimplePoint)endCoords.get(0);
-	    innerMin = outerMin = startPoint.getLocation().intValue();
-	    innerMax = outerMax = endPoint.getLocation().intValue();
+	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
+	    innerMax = outerMax = ((Integer) endCoords.get(0)).intValue();
 
-// Look at this
-	    if (startPoint.isUnbounded() || endPoint.isUnbounded())
+	    if (unboundMin || unboundMax)
 	    {
-	    	if(startPoint.isUnboundedMin())
-	    	{
-	    		outerMin = Integer.MIN_VALUE;
-	    	}
-	    	else if(startPoint.isUnboundedMax())
-	    	{
-	    		outerMin = Integer.MAX_VALUE;
-	    	}
-
-	    	if(endPoint.isUnboundedMin())
-	    	{
-	    		outerMax = Integer.MIN_VALUE;
-	    	}
-	    	else if(endPoint.isUnboundedMax())
-	    	{
-	    		outerMax = Integer.MAX_VALUE;
-	    	}
-			createdLocation = new FuzzyLocation(outerMin, outerMax,
-					innerMin, innerMax,
-					FuzzyLocation.RESOLVE_INNER);
+		createdLocation = new FuzzyLocation(unboundMin ? Integer.MIN_VALUE : outerMin,
+						   unboundMax ? Integer.MAX_VALUE : outerMax,
+						   innerMin,
+						   innerMax,
+						   FuzzyLocation.RESOLVE_INNER);
 	    }
 	    else
 	    {
@@ -359,13 +329,9 @@ class EmblLikeLocationParser
 	// Range of form: (123.567)..789
 	else if (startCoords.size() == 2 && endCoords.size() == 1)
 	{
-		SimplePoint outerMinPoint = (SimplePoint)startCoords.get(0);
-		SimplePoint innerMinPoint = (SimplePoint)startCoords.get(1);
-		SimplePoint maxPoint = (SimplePoint)endCoords.get(0);
-
-	    outerMin = outerMinPoint.getLocation().intValue();
-	    innerMin = innerMinPoint.getLocation().intValue();
-	    innerMax = outerMax = maxPoint.getLocation().intValue();
+	    outerMin = ((Integer) startCoords.get(0)).intValue();
+	    innerMin = ((Integer) startCoords.get(1)).intValue();
+	    innerMax = outerMax = ((Integer) endCoords.get(0)).intValue();
 
 	    createdLocation = new FuzzyLocation(outerMin,
 					       outerMax,
@@ -376,13 +342,9 @@ class EmblLikeLocationParser
 	// Range of form: 123..(567.789)
 	else if (startCoords.size() == 1 && endCoords.size() == 2)
 	{
-		SimplePoint minPoint = (SimplePoint)startCoords.get(0);
-		SimplePoint innerMaxPoint = (SimplePoint)endCoords.get(0);
-		SimplePoint outerMaxPoint = (SimplePoint)endCoords.get(1);
-
-	    outerMin = innerMin = minPoint.getLocation().intValue();
-	    innerMax = innerMaxPoint.getLocation().intValue();
-	    outerMax = outerMaxPoint.getLocation().intValue();
+	    outerMin = innerMin = ((Integer) startCoords.get(0)).intValue();
+	    innerMax = ((Integer) endCoords.get(0)).intValue();
+	    outerMax = ((Integer) endCoords.get(1)).intValue();
 
 	    createdLocation = new FuzzyLocation(outerMin,
 					       outerMax,
@@ -393,15 +355,10 @@ class EmblLikeLocationParser
 	// Range of form: (123.345)..(567.789)
 	else if (startCoords.size() == 2 && endCoords.size() == 2)
 	{
-		SimplePoint outerMinPoint = (SimplePoint)startCoords.get(0);
-		SimplePoint innerMinPoint = (SimplePoint)startCoords.get(1);
-		SimplePoint innerMaxPoint = (SimplePoint)endCoords.get(0);
-		SimplePoint outerMaxPoint = (SimplePoint)endCoords.get(1);
-
-	    outerMin = outerMinPoint.getLocation().intValue();
-	    innerMin = innerMinPoint.getLocation().intValue();
-	    innerMax = innerMaxPoint.getLocation().intValue();
-	    outerMax = outerMaxPoint.getLocation().intValue();
+	    outerMin = ((Integer) startCoords.get(0)).intValue();
+	    innerMin = ((Integer) startCoords.get(1)).intValue();
+	    innerMax = ((Integer) endCoords.get(0)).intValue();
+	    outerMax = ((Integer) endCoords.get(1)).intValue();
 
 	    createdLocation = new FuzzyLocation(outerMin,
 					       outerMax,
@@ -600,87 +557,5 @@ class EmblLikeLocationParser
 	    }
 	    return textString.toString();
 	}
-	}
-
-	/**
-	 * Simple data storage class to hold the boundedness and location of a
-	 * point.  This will allow degenerate points like >5..10 to be parsed
-	 * properly.
-	 */
-	private class SimplePoint
-	{
-		private Integer mLocation;
-		private boolean mIsUnboundedMin;
-		private boolean mIsUnboundedMax;
-
-		/**
-		 * Stores the location, and assumes the point is not ambiguous.
-		 *
-		 * @param theLocation the integer value of the location
-		 */
-		SimplePoint(Integer theLocation)
-		{
-			this.initializeVariables(theLocation, false, false);
-		}
-
-		/**
-		 * Stores the location and bounding information.
-		 *
-		 * @param theLocation the integer value of the location
-		 * @param isUnboundedMin Is the location of the form <x
-		 * @param isUnboundedMax Is the location of the form >x
-		 */
-		SimplePoint(Integer theLocation, boolean isUnboundedMin, boolean isUnboundedMax)
-		{
-			this.initializeVariables(theLocation, isUnboundedMin, isUnboundedMax);
-		}
-
-		/**
-		 * Returns the value of the location
-		 */
-		Integer getLocation()
-		{
-			return this.mLocation;
-		}
-
-		/**
-		 * Returns the value of the min boundedness (<x)
-		 */
-		boolean isUnboundedMin()
-		{
-			return this.mIsUnboundedMin;
-		}
-
-		/**
-		 * Returns the value of the max boundedness (>x)
-		 */
-		boolean isUnboundedMax()
-		{
-			return this.mIsUnboundedMax;
-		}
-
-		/**
-		 * Returns true if the point is unbounded on either side.
-		 */
-		boolean isUnbounded()
-		{
-			return (this.isUnboundedMin() || this.isUnboundedMax());
-		}
-
-		/**
-		 * Refactored initialization code from the two constructors.
-		 *
-		 * @param theLocation the integer value of the location
-		 * @param isUnboundedMin Is the location of the form <x
-		 * @param isUnboundedMax Is the location of the form >x
-		 */
-		private void initializeVariables(Integer theLocation,
-				boolean isUnboundedMin,
-				boolean isUnboundedMax)
-		{
-			this.mLocation = theLocation;
-			this.mIsUnboundedMin = isUnboundedMin;
-			this.mIsUnboundedMax = isUnboundedMax;
-		}
-	}
+    }
 }
