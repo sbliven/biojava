@@ -270,7 +270,14 @@ class EmblLikeLocationParser
 	    }
 	    else
 	    {
-		subLocations.add(new RangeLocation(outerMin, outerMax));
+		try
+		{
+		    subLocations.add(new RangeLocation(outerMin, outerMax));
+		}
+		catch (IndexOutOfBoundsException ioe)
+		{
+		    throw new BioException(ioe);
+		}
 	    }
 	}
 	// Range of form: (123.567)..789
