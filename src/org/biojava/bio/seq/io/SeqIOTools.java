@@ -99,6 +99,7 @@ public class SeqIOTools  {
     /**
      * Iterate over the sequences in an GenBank-format stream.
      */
+	
     public static SequenceIterator readGenbank(BufferedReader br) {
         return new StreamReader(br,
                                 new GenbankFormat(),
