@@ -28,6 +28,17 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 
+
+/**
+ * AlphaCTools is a collection of static convenience methods for dealing with
+ * Alpha Carbon Backbone Phi / Psi angles. In BioJava Phi Psi angles are represented
+ * as Symbols from the ALPHA CARBON ANGLES alphabet. A Backbone could be represented
+ * as a SymbolList. A Ramachandran plot might be represented as a Distribution over
+ * Phi Psi Symbols.
+ *
+ * @author Mark Schreiber
+ * @version 1.0
+ */
 public final class AlphaCTools {
 
   public static final double MAX_ANGLE = 180.0;
@@ -82,6 +93,41 @@ public final class AlphaCTools {
     Symbol phi = daInstance.getSymbol(phiAngle);
     Symbol psi = daInstance.getSymbol(psiAngle);
 
-    return getAlphaCarbonAngleAlphabet().getSymbol(new ListTools.Doublet(phi, psi));
+    return
+      getAlphaCarbonAngleAlphabet().getSymbol(new ListTools.Doublet(phi, psi));
+  }
+
+  /**
+   * extracts the Phi angle from a <code>Symbol</code>
+   * @param phiPsiSym a <code>Symbol</code> from the ALPHA CARBON ANGLES
+   * <code>Alphabet</code>
+   * @return a double between -180.0 and +180.0
+   * @throws IllegalSymbolException if the <code>Symbol</code> is not from
+   *  the ALPHA CARBON ANGLES <code>Alphabet</code>
+   */
+  public static double getPhiAngle(Symbol phiPsiSym) throws IllegalSymbolException{
+    //validate the Symbol
+    getAlphaCarbonAngleAlphabet().validate(phiPsiSym);
+
+    //get the phi angle
+    List l = ((BasisSymbol)phiPsiSym).getSymbols();
+    return ((DoubleAlphabet.DoubleSymbol)l.get(0)).doubleValue();
+  }
+
+  /**
+   * extracts the Psi angle from a <code>Symbol</code>
+   * @param phiPsiSym a <code>Symbol</code> from the ALPHA CARBON ANGLES
+   * <code>Alphabet</code>
+   * @return a double between -180.0 and +180.0
+   * @throws IllegalSymbolException if the <code>Symbol</code> is not from
+   *  the ALPHA CARBON ANGLES <code>Alphabet</code>
+   */
+  public static double getPsiAngle(Symbol phiPsiSym) throws IllegalSymbolException{
+    //validate the Symbol
+    getAlphaCarbonAngleAlphabet().validate(phiPsiSym);
+
+    //get the phi angle
+    List l = ((BasisSymbol)phiPsiSym).getSymbols();
+    return ((DoubleAlphabet.DoubleSymbol)l.get(1)).doubleValue();
   }
 }
