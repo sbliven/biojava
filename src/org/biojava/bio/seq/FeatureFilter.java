@@ -720,7 +720,7 @@ public interface FeatureFilter extends Serializable {
       type.setConstraints(
         key,
         PropertyConstraint.ANY,
-        CardinalityConstraint.ANY
+        CardinalityConstraint.ONE_OR_MORE
       );
       setType(type);
     }
