@@ -91,6 +91,8 @@ class FeatureRequestManager {
     private boolean fetchAll(Ticket trigger) 
         throws ParseException, BioException
     {
+	boolean startedActivity = false;
+
 	try {
 	    boolean canFetchMulti = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
 								 DASCapabilities.CAPABILITY_EXTENDED,
@@ -124,6 +126,7 @@ class FeatureRequestManager {
 	    // System.err.println("Wheee, extended fetch of " + matchingTickets.size() + " requests (" + triggerType + "," + triggerCategory + ")");
 
 	    DAS.startedActivity(this);
+	    startedActivity = true;
 
 	    URL fURL = new URL(dataSourceURL, "features");
 	    HttpURLConnection huc = (HttpURLConnection) fURL.openConnection();
@@ -207,7 +210,9 @@ class FeatureRequestManager {
 	} catch (SAXException ex) {
 	    throw new ParseException(ex);
 	} finally {
-	    DAS.completedActivity(this);
+	    if (startedActivity) {
+		DAS.completedActivity(this);
+	    }
 	}
 
 	// Looks like this worked...
