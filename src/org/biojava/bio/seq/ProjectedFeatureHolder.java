@@ -87,7 +87,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 
 	    if (l1 != null) {
 		if (l2 != null) {
-		    return l1.intersection(l2);
+		    return LocationTools.intersection(l1,l2);
 		} else {
 		    return l1;
 		}
@@ -277,19 +277,29 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	return getProjectedFeatures().filter(ff, recurse);
     }
-
+    
+    public Feature projectFeature(Feature f){
+        return ProjectionEngine.DEFAULT.projectFeature(f, projectionContext);
+    }
+    
     public Location getProjectedLocation(Location oldLoc) {
 	if (oppositeStrand) {
 	    if (oldLoc.isContiguous()) {
-		return new RangeLocation(translate - oldLoc.getMax(),
-					 translate - oldLoc.getMin());
+            if (oldLoc instanceof PointLocation){
+                return new PointLocation(translate - oldLoc.getMin());
+            } else {
+    		    return new RangeLocation(translate - oldLoc.getMax(),
+    					 translate - oldLoc.getMin());
+    	    }
 	    } else {
 		Location compound = Location.empty;
+		Vector locList = new Vector();
 		for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
 		    Location oldBlock = (Location) i.next();
-		    compound = compound.union(new RangeLocation(translate - oldBlock.getMax(),
+		    locList.addElement(new RangeLocation(translate - oldBlock.getMax(),
 								translate - oldBlock.getMin()));
 		}
+		compound = LocationTools.union(locList);
 		return compound;
 	    }
 	} else {
@@ -308,7 +318,21 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     public FeatureHolder getParent() {
 	return parent;
     }
-
+    
+	public StrandedFeature.Strand getProjectedStrand(StrandedFeature.Strand s) {
+	    if (isOppositeStrand()) {
+		if (s == StrandedFeature.POSITIVE) {
+		    return StrandedFeature.NEGATIVE;
+		} else if (s == StrandedFeature.NEGATIVE) {
+		    return StrandedFeature.POSITIVE;
+		} else {
+		    return StrandedFeature.UNKNOWN;
+		}
+	    } else {
+		return s;
+	    }
+	}
+        
     /**
      * ProjectionContext implementation tied to a given ProjectedFeatureHolder
      */
@@ -316,12 +340,12 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     private class PFHContext implements ProjectionContext {
 	public FeatureHolder getParent(Feature f) {
 	    return parent;
-	}
+	}	    
 
 	public Sequence getSequence(Feature f) {
 	    FeatureHolder fh = parent;
 	    while (fh instanceof Feature) {
-		fh = ((Feature) fh).getParent();
+		    fh = ((Feature) fh).getParent();
 	    }
 	    return (Sequence) fh;
 	}
@@ -329,17 +353,23 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	public Location getLocation(Feature f) {
 	    Location oldLoc = f.getLocation();
 
-	    if (oppositeStrand) {
-		if (oldLoc.isContiguous()) {
-		    return new RangeLocation(translate - oldLoc.getMax(),
-					     translate - oldLoc.getMin());
-		} else {
+	if (oppositeStrand) {
+	    if (oldLoc.isContiguous()) {
+            if (oldLoc instanceof PointLocation){
+                return new PointLocation(translate - oldLoc.getMin());
+            } else {
+    		    return new RangeLocation(translate - oldLoc.getMax(),
+    					 translate - oldLoc.getMin());
+    	    }
+	    } else {
 		    Location compound = Location.empty;
-		    for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
-			Location oldBlock = (Location) i.next();
-			compound = compound.union(new RangeLocation(translate - oldBlock.getMax(),
-								    translate - oldBlock.getMin()));
-		    }
+    		Vector locList = new Vector();
+    		for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
+    		    Location oldBlock = (Location) i.next();
+    		    locList.addElement(new RangeLocation(translate - oldBlock.getMax(),
+    								translate - oldBlock.getMin()));
+    		}
+    		compound = LocationTools.union(locList);
 		    return compound;
 		}
 	    } else {
