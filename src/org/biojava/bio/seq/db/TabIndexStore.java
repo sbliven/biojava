@@ -52,6 +52,12 @@ import org.biojava.utils.OverlayMap;
  * Implements IndexStore as a serialized file for the java data and a
  * tab-delimited file of offsets.
  * </p>
+ *
+ * <p>
+ * Use the constructor to create a new index store. Use the static factory
+ * method open() to load an existing store.
+ * </p>
+ *
  * The tab-delimited file looks like:
  * <pre>
  * fileNumber \t offset \t id \n
@@ -63,6 +69,13 @@ import org.biojava.utils.OverlayMap;
  * @author David Huen
  */
 public class TabIndexStore implements IndexStore, Serializable {
+  /**
+   * Open an existing index store.
+   *
+   * @param storeFile  the File encapsulating the store
+   * @return a new TabIndexStore for that file
+   * @throws IOException if the storeFile could not be processed
+   */
   public static TabIndexStore open(File storeFile)
   throws IOException {
     try {
@@ -95,6 +108,24 @@ public class TabIndexStore implements IndexStore, Serializable {
   private final SequenceBuilderFactory sbFactory;
   private final SymbolTokenization symbolParser;
 
+  /**
+   * Create a new TabIndexStore.
+   *
+   * <p>
+   * The store file and index file must not exist. This is to prevent you from
+   * accidentally destroying an existing index.
+   * </p>
+   *
+   * @param storeFile     the file that will be used to persist this index store
+   * @param indexFile     the file that will hold the actual indecies
+   * @param name          the name that will be used by the database backed by
+   *                  this index
+   * @param format        the SequenceFormat for files being indexed
+   * @param sbFactory     the SequenceBuilderFactory used in building sequences
+   * @param symbolParser  the SymbolTokenization to use
+   * @throws IOException    if there was a problem writing the files
+   * @throws BioException   if any of the parameters were not acceptable
+   */
   public TabIndexStore(
     File storeFile,
     File indexFile,
@@ -104,7 +135,7 @@ public class TabIndexStore implements IndexStore, Serializable {
     SymbolTokenization symbolParser
   ) throws IOException, BioException {
     if(storeFile.exists() || indexFile.exists()) {
-      throw new BioException("Files already exist");
+      throw new BioException("Files already exist: " + storeFile + " " + indexFile);
     }
 
     this.storeFile = storeFile.getAbsoluteFile();

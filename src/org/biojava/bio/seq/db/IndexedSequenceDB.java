@@ -59,9 +59,28 @@ import org.biojava.utils.io.RandomAccessReader;
  * IO, such as calculating the sequence file offsets, and parsing
  * individual sequences based upon file offsets. The actual persistant
  * storage of all this information is delegated to an instance of
- * <code>IndexStore</code>.
+ * <code>IndexStore</code>, such as TabIndexStore.
  * </p>
  *
+ * <pre>
+ * // create a new index store and populate it
+ * // this may take some time
+ * TabIndexStore indexStore = new TabIndexStore(
+ *   storeFile, indexFile, dbName,
+ *   format, sbFactory, symbolParser );
+ * IndexedSequenceDB seqDB = new IndexedSequenceDB(indexStore);
+ *
+ * for(int i = 0; i < files; i++) {
+ *   seqDB.addFile(files[i]);
+ * }
+ *
+ * // load an existing index store and fetch a sequence
+ * // this should be quite quick
+ * TabIndexStore indexStore = TabIndexStore.open(storeFile);
+ * SequenceDB seqDB = new IndexedSequenceDB(indexStore);
+ * Sequence seq = seqDB.getSequence(id);
+ * </pre>
+ * 
  * <p>
  * Note: We may be able to improve the indexing speed further by
  * discarding all feature creation & annotation requests during index
@@ -71,6 +90,7 @@ import org.biojava.utils.io.RandomAccessReader;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Keith James
+ * @see org.biojava.bio.seq.db.TabIndexStore
  */
 
 public final class IndexedSequenceDB extends AbstractSequenceDB

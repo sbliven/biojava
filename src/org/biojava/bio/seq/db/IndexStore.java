@@ -32,13 +32,19 @@ import org.biojava.bio.seq.io.SymbolTokenization;
  * This defines the objects that IndexedSequenceDB uses to store all of the
  * database state, such as name, format, sequence builder and the actual file
  * offsets.
- * <p>
+ *
+ * @for.user
+ * You should only ever have to instantiate an implementation of this. Don't
+ * call any of the inerface methods directly. They are intended for
+ * IndexedSequenceDB, not you.
+ *
+ * @for.developer
  * In general, these objects should be transactional. Calls to store should add
  * the index to temporary storage. When commit is invoked, these indices should
  * all be added to the permanent storage. When rollback is invoked, these
  * indexes should be discarded. If commit fails for any reason, it should leave
  * the permanent storage in the pre-commit status.
- *
+
  * @author Matthew Pocock
  */
 public interface IndexStore {
