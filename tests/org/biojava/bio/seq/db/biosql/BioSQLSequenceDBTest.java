@@ -25,6 +25,7 @@ package org.biojava.bio.seq.db.biosql;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -48,12 +49,13 @@ import org.biojava.bio.symbol.SymbolList;
  * Really rudimentary test case for biosql sequencedb. We could make
  * this an abstract class and have a subclass for each supported
  * RDBMS.
- * 
+ *
  * @author Len Trigg
  * @author Frederik Decouttere
+ * @author Matthew Pocock
  */
 public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
-    
+
     static final boolean HAVE_DB;
     static {
         boolean haveDB = false;
@@ -89,7 +91,7 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
         "bioentry_qualifier_value",
         "bioentry_reference",
         "bioentry_relationship",
-        "biosequence", 
+        "biosequence",
         "dbxref",
         "dbxref_qualifier_value",
         "location",
@@ -109,11 +111,11 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
         "term_relationship",
         "term_synonym",
     };
-    
+
 
     private Connection mConnection = null;
-    
-    
+
+
     public BioSQLSequenceDBTest(String name) {
         super(name);
     }
@@ -135,8 +137,8 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
         mConnection = null;
         super.tearDown();
     }
-    
-    
+
+
     protected static String readAll(BufferedReader br) throws IOException {
         String line;
         StringBuffer sb = new StringBuffer();
@@ -149,10 +151,14 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
     protected Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PW);
     }
-    
+
     protected void loadSchema(Connection connection) throws IOException, SQLException {
         if (CREATE_SQL == null) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(ClassLoader.getSystemClassLoader().getResourceAsStream(DB_CREATE_RESOURCE)));
+            InputStream res = ClassLoader.getSystemClassLoader()
+                    .getResourceAsStream(DB_CREATE_RESOURCE);
+            assertNotNull("Resource must not be null: " + DB_CREATE_RESOURCE,
+                          res);
+            BufferedReader br = new BufferedReader(new InputStreamReader(res));
             CREATE_SQL = readAll(br);
             br.close();
         }
@@ -160,11 +166,16 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
         st.executeQuery(CREATE_SQL);
         st.close();
     }
-    
+
 
     protected void dropSchema(Connection connection) throws IOException, SQLException {
         if (DROP_SQL == null) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(ClassLoader.getSystemClassLoader().getResourceAsStream("files/drop-biosqldb-hsqldb.sql")));
+            String dropResource = "files/drop-biosqldb-hsqldb.sql";
+            InputStream res = ClassLoader.getSystemClassLoader()
+                    .getResourceAsStream(dropResource);
+            assertNotNull("Resource must not be null: " + dropResource,
+                          res);
+            BufferedReader br = new BufferedReader(new InputStreamReader(res));
             DROP_SQL = readAll(br);
             br.close();
         }
@@ -173,7 +184,7 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
         st.close();
     }
 
-    
+
     public void testSchemaSetup() throws Exception {
         Connection connection = getConnection();
 
@@ -196,7 +207,7 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
             }
             st.close();
         }
-    
+
         // should be able to load again
         loadSchema(connection);
         for (int i = 0; i < TABLES.length; i++) {
@@ -212,21 +223,21 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
      */
     public void testFeaturePersistence() throws Exception {
         mSequenceDB.addSequence(getSequence());
-                
+
         Sequence seq = mSequenceDB.getSequence("test_seq");
         for (Iterator iter = seq.features(); iter.hasNext();) {
             StrandedFeature f = (StrandedFeature) iter.next();
             Location loc = f.getLocation();
-                        
+
             /*
              * ERROR: Location is now a RangeLocation and not a
              * BetweenLocation !
              */
-            assertTrue("[feature] location is now an instance of: " + loc.getClass().getName(), 
+            assertTrue("[feature] location is now an instance of: " + loc.getClass().getName(),
                        loc instanceof BetweenLocation);
         }
     }
-        
+
 
     public void testOntologyPersistence() throws Exception {
         BioSQLSequenceDB db2 = new BioSQLSequenceDB(DB_DRIVER, DB_URL, DB_USER, DB_PW, "testbiosqldb_2", true);
@@ -234,14 +245,14 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
         db2.addSequence(getSequence());
     }
 
-        
+
     public static Sequence getSequence() throws Exception {
         SymbolList sl = DNATools.createDNA("ACTGGTGTACCCCAATGGGAATATC") ;
         Sequence sequence = new SimpleSequence(sl, null, "test_seq", null);
         sequence.createFeature(getFeature());
         return sequence ;
     }
-        
+
     private static StrandedFeature.Template getFeature() throws Exception {
         SimpleAnnotation annotation = new SimpleAnnotation();
         annotation.setProperty("Comment", "comment line");
@@ -251,7 +262,7 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
         templ.strand = StrandedFeature.POSITIVE;
         templ.type = "ATYPE";
         templ.source = "ASRC";
-                
+
         return templ ;
     }
 
@@ -259,8 +270,8 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
     public static Test suite() {
         return HAVE_DB ? new TestSuite(BioSQLSequenceDBTest.class) : new TestSuite();
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
-    }    
+    }
 }
