@@ -76,7 +76,16 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 		listener.endSequence();
 		return;
 	    } else if (line.startsWith("SQ")) {
-		listener.addSymbols(new EmblSymbolReader(resParser, in));
+		EmblSymbolReader esr = new EmblSymbolReader(resParser, in);
+		Symbol[] buffer = new Symbol[256];
+		while (esr.hasMoreSymbols()) {
+		    int num = esr.readSymbols(buffer, 0, buffer.length);
+		    try {
+			listener.addSymbols(esr.getAlphabet(), buffer, 0, num);
+		    } catch (IllegalAlphabetException ex) {
+			throw new IOException("Fussy SeqIOListener");
+		    }
+		}
 	    } else {
 		// Normal attribute line
 		String tag = line.substring(0, 2);

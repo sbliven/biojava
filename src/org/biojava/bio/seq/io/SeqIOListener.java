@@ -1,3 +1,24 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.seq.io;
 
 import java.io.*;
@@ -40,18 +61,23 @@ public interface SeqIOListener {
     public void setURI(String uri);
 
     /**
-     * Notify the listener of symbol data.
+     * Notify the listener of symbol data.  All symbols passed to
+     * this method are guarenteed to be contained within the
+     * specified alphabet.  Generally all calls to a given Listener
+     * should have the same alphabet -- if not, the listener implementation
+     * is likely to throw an exception
      *
-     * <p>
-     * NOTE: The SymbolReader is only guarenteed to be valid within
-     * this call.  If the listener does not fully read all the data,
-     * the parser <em>may</em> assume that it is not required, and
-     * skip it.
-     * </p>
+     * @param alpha The alphabet of the symbol data
+     * @param syms An array containing symbols
+     * @param start The start offset of valid data within the array
+     * @param length The number of valid symbols in the array
+     *
+     * @throws IllegalAlphabetException if we can't cope with this
+     *                                  alphabet.
      */
 
-    public void addSymbols(SymbolReader sr)
-        throws IOException, IllegalSymbolException;
+    public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length)
+        throws IllegalAlphabetException;
 
     /**
      * Notify the listener of a sequence-wide property.  This might

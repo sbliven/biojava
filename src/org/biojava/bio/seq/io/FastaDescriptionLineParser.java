@@ -79,10 +79,10 @@ public class FastaDescriptionLineParser implements SequenceBuilder {
 	delegate.setURI(uri);
     }
 
-    public void addSymbols(SymbolReader sr)
-        throws IOException, IllegalSymbolException
+    public void addSymbols(Alphabet a, Symbol[] syms, int pos, int len)
+        throws IllegalAlphabetException
     {
-	delegate.addSymbols(sr);
+	delegate.addSymbols(a, syms, pos, len);
     }
 
     public void addSequenceProperty(String key, Object value) {

@@ -30,7 +30,7 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 
     private String name;
     private String uri;
-    private SymbolList symbols;
+    private ChunkedSymbolListBuilder slBuilder;
     private Annotation annotation;
 
     private Set rootFeatures;
@@ -40,6 +40,7 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 	annotation = new SimpleAnnotation();
 	rootFeatures = new HashSet();
 	featureStack = new ArrayList();
+	slBuilder = new ChunkedSymbolListBuilder();
     }
 
     //
@@ -60,13 +61,10 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 	this.uri = uri;
     }
 
-    public void addSymbols(SymbolReader sr)
-        throws IOException, IllegalSymbolException
+    public void addSymbols(Alphabet alpha, Symbol[] syms, int pos, int len)
+        throws IllegalAlphabetException
     {
-	if (symbols != null)
-	    throw new IOException("We don't support multiple addSymbols calls");
-
-	symbols = ChunkedSymbolList.make(sr);
+	slBuilder.addSymbols(alpha, syms, pos, len);
     }
 
     /**
@@ -143,6 +141,7 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
     }
 
     public Sequence makeSequence() {
+	SymbolList symbols = slBuilder.makeSymbolList();
 	Sequence seq = new SimpleSequence(symbols, uri, name, annotation);
 	try {
 	    for (Iterator i = rootFeatures.iterator(); i.hasNext(); ) {

@@ -98,7 +98,15 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
 
 	FASymbolReader fasr = new FASymbolReader(resParser, in);
-	siol.addSymbols(fasr);
+	Symbol[] buffer = new Symbol[256];
+	while (fasr.hasMoreSymbols()) {
+	    int num = fasr.readSymbols(buffer, 0, buffer.length);
+	    try {
+		siol.addSymbols(fasr.getAlphabet(), buffer, 0, num);
+	    } catch (IllegalAlphabetException ex) {
+		throw new IOException("Fussy SeqIOListener");
+	    }
+	}
 
 	siol.endSequence();
     
