@@ -25,7 +25,7 @@ package org.biojava.bio.dp;
 import org.biojava.bio.seq.*;
 
 public interface TrainingAlgorithm {
-  FlatModel getModel();
+  DP getDP();
   double getLastScore();
   double getCurrentScore();
   int getCycle();

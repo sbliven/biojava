@@ -25,7 +25,7 @@ package org.biojava.bio.dp;
 import org.biojava.bio.seq.*;
 
 public abstract class AbstractTrainer implements TrainingAlgorithm {
-  private FlatModel model;
+  private DP dp;
   
   private double lastScore = -Double.NEGATIVE_INFINITY;
   private double currentScore = -Double.NEGATIVE_INFINITY;
@@ -43,11 +43,11 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
     return cycle;
   }
   
-  public FlatModel getModel() {
-    return model;
+  public DP getDP() {
+    return dp;
   }
   
-  protected abstract double singleSequenceIteration(DP dp, ModelTrainer trainer,
+  protected abstract double singleSequenceIteration(ModelTrainer trainer,
                                                     ResidueList resList)
   throws IllegalResidueException, IllegalTransitionException, IllegalAlphabetException;
   
@@ -59,15 +59,14 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
   throws IllegalResidueException, SeqException {
     try {
       ModelTrainer trainer =
-        new SimpleModelTrainer(model, nullModel, nullWeight, 0.000001, 1.0);
+        new SimpleModelTrainer(dp.getModel(), nullModel, nullWeight, 0.000001, 1.0);
       do {
         cycle++;
-        DP dp = DPFactory.createDP(model);
         lastScore = currentScore;
         currentScore = 0.0;
         for(SequenceIterator si = db.sequenceIterator(); si.hasNext(); ) {
           Sequence seq = si.nextSequence();
-          currentScore += singleSequenceIteration(dp, trainer, seq);
+          currentScore += singleSequenceIteration(trainer, seq);
         }
         trainer.train();
         trainer.clearCounts();
@@ -77,7 +76,7 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
     }
   }
   
-  public AbstractTrainer(FlatModel model) {
-    this.model = model;
+  public AbstractTrainer(DP dp) {
+    this.dp = dp;
   }
 }

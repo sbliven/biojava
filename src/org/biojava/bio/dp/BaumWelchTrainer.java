@@ -27,16 +27,19 @@ import org.biojava.bio.seq.*;
 
 public class BaumWelchTrainer extends AbstractTrainer {
   protected double singleSequenceIteration(
-    DP dp, ModelTrainer trainer,
+    ModelTrainer trainer,
     ResidueList resList
   ) throws IllegalResidueException, IllegalTransitionException, IllegalAlphabetException {
     System.out.println("Training");
+    DP dp = getDP();
     State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();
     double [][] forwardTransitionScores = dp.getForwardTransitionScores();    
     int [][] backwardTransitions = dp.getBackwardTransitions();
     double [][] backwardTransitionScores = dp.getBackwardTransitionScores();    
+    
     ResidueList [] rll = { resList };
+    
     System.out.println("Forward");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll);
     double fs = fm.getScore();
@@ -70,10 +73,9 @@ public class BaumWelchTrainer extends AbstractTrainer {
         double [] tss = backwardTransitionScores[s];
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
-          if(t >= dp.getDotStatesIndex()) {
-            break;
-          }
-          double weight = ((EmissionState) states[t]).getWeight(res);
+          double weight = (states[t] instanceof EmissionState)
+            ? ((EmissionState) states[t]).getWeight(res)
+            : 0.0;
           if (weight != Double.NEGATIVE_INFINITY) {
             try {
               trainer.addTransitionCount(
@@ -89,51 +91,13 @@ public class BaumWelchTrainer extends AbstractTrainer {
           }
         }
       }
-      double [] mo = new double[states.length - dp.getDotStatesIndex()];
-      for(int s = 0; s < mo.length; s++) {
-        int ss = s + dp.getDotStatesIndex();
-        int [] ts = backwardTransitions[s];
-        double [] tss = backwardTransitionScores[s];
-        mo[s] = fm.scores[i][ss];
-        for(int tc = 0; tc < ts.length; tc++) {
-          int t = ts[tc];
-          if(t < dp.getDotStatesIndex()) {
-            continue;
-          }
-          if(t >= ss) {
-            break;
-          }
-          mo[s] -= (fm.scores[i][ss] + tss[t]);
-        }
-      }
-      for (int s = dp.getDotStatesIndex(); s < states.length; s++) {  // emission -> emission transitions
-        int [] ts = backwardTransitions[s];
-        double [] tss = backwardTransitionScores[s];
-        for (int tc = 0; tc < ts.length; tc++) {
-          int t = ts[tc];
-          if(t >= dp.getDotStatesIndex()) {
-            break;
-          }
-          try {
-            trainer.addTransitionCount(
-              states[s], states[t],
-              Math.exp(mo[s + dp.getDotStatesIndex()] + tss[tc] + bm.scores[i][t] - fs)
-            );
-          } catch (IllegalTransitionException ite) {
-            throw new BioError(
-              ite,
-              "Transition in backwardTransitions[][] dissapeared"
-            );
-          }
-        }
-      }
     }
     
     System.out.println("Done");
     return fs;
   }
   
-  public BaumWelchTrainer(FlatModel model) {
-    super(model);
+  public BaumWelchTrainer(DP dp) {
+    super(dp);
   }
 }

@@ -26,42 +26,36 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
 public class BaumWelchSampler extends AbstractTrainer {
-  protected double singleSequenceIteration(DP dp, ModelTrainer trainer,
-                                           Sequence seq)
-  throws IllegalResidueException {
-    EmissionState [] states = dp.getStates();
+  protected double singleSequenceIteration(
+    ModelTrainer trainer,
+    ResidueList resList
+  ) throws IllegalResidueException, IllegalTransitionException, IllegalAlphabetException {
+    DP dp = getDP();
+    State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();
     double [][] forwardTransitionScores = dp.getForwardTransitionScores();    
     int [][] backwardTransitions = dp.getBackwardTransitions();
     double [][] backwardTransitionScores = dp.getBackwardTransitionScores();    
     
-    double [][] fm = new double [seq.length() + 2][states.length];
-    double [][] bm = new double [seq.length() + 2][states.length];
+    ResidueList [] rll = { resList };
+    
+    System.out.println("Forward");
+    SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll);
+    double fs = fm.getScore();
 
-    DPCursor fc = new MatrixCursor(states, seq,
-                                   seq.iterator(), fm, +1);
-    DPCursor bc = new MatrixCursor(states, seq,
-                                   new DP.ReverseIterator(seq), bm, -1);
-
-    dp.forward_initialize(fc);
-    dp.forward_recurse(fc);
-    double fs = dp.forward_termination(fc);
-
-    dp.backward_initialize(bc);
-    dp.backward_recurse(bc);
-    double bs = dp.backward_termination(bc);
+    System.out.println("Backward");
+    SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll);
+    double bs = bm.getScore();
 
     // state trainer
-    for (int i = 1; i <= seq.length(); i++) {
-      Residue res = seq.residueAt(i);
-      double [] fCol = fm[i];
-      double [] bCol = bm[i];
+    for (int i = 1; i <= resList.length(); i++) {
+      Residue res = resList.residueAt(i);
       double p = Math.random();
-      for (int s = 0; s < states.length; s++) {
+      for (int s = 0; s < dp.getDotStatesIndex(); s++) {
         if (! (states[s] instanceof MagicalState)) {
-          p -= Math.exp(fCol[s] + bCol[s] - fs);
+          p -= Math.exp(fm.scores[i][s] + bm.scores[i][s] - fs);
           if (p <= 0.0) {
-            trainer.addStateCount(states[s], res, 1.0);
+            trainer.addStateCount((EmissionState) states[s], res, 1.0);
             break;
           }
         }
@@ -69,20 +63,20 @@ public class BaumWelchSampler extends AbstractTrainer {
     }
 
     // transition trainer
-    for (int i = 0; i <= seq.length(); i++) {
-      Residue res = (i < seq.length()) ? seq.residueAt(i + 1) :
+    for (int i = 0; i <= resList.length(); i++) {
+      Residue res = (i < resList.length()) ? resList.residueAt(i + 1) :
                     MagicalState.MAGICAL_RESIDUE;
-      double [] fCol = fm[i];
-      double [] bCol = bm[i + 1];
       for (int s = 0; s < states.length; s++) {
         int [] ts = backwardTransitions[s];
         double [] tss = backwardTransitionScores[s];
         double p = Math.random();
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
-          double weight = states[t].getWeight(res);
+          double weight = (states[t] instanceof EmissionState)
+            ? ((EmissionState) states[t]).getWeight(res)
+            : 0.0;
           if (weight != Double.NEGATIVE_INFINITY) {
-            p -= Math.exp(fCol[s] + tss[tc] + weight + bCol[t] - fs);
+            p -= Math.exp(fm.scores[i][s] + tss[tc] + weight + bm.scores[i+1][t] - fs);
             if (p <= 0.0) {
               try {
                 trainer.addTransitionCount((State) states[s],
@@ -100,7 +94,7 @@ public class BaumWelchSampler extends AbstractTrainer {
     return fs;
   }
   
-  public BaumWelchSampler(FlatModel model) {
-    super(model);
+  public BaumWelchSampler(DP dp) {
+    super(dp);
   }
 }
