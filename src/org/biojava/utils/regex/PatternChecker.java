@@ -40,6 +40,7 @@ class PatternChecker
         final static int Q_MARK = 12;
         final static int CARET = 13;
         final static int DOLLAR = 14;
+        final static int DOT = 15;
         final static int UNKNOWN = 999;
 
         private Tokenizer(String target)
@@ -76,6 +77,8 @@ class PatternChecker
             if (Character.isDigit(nextCh))
                 return NUMERIC;
             // now check for specific chars
+            if (nextCh == '.')
+                return DOT;
             if (nextCh == '{')
                 return LEFT_BRACE;
             if (nextCh == '}')
@@ -180,6 +183,11 @@ class PatternChecker
                         parseSymbol();
                     }
                     catch (IllegalSymbolException ise) { throw new RegexException(ise); }
+                    parseQuantifier();
+                    break;
+                case Tokenizer.DOT:
+                    gotContent = true;
+                    output.append(toke.getToken());
                     parseQuantifier();
                     break;
                 case Tokenizer.LEFT_SQBRACKET: // pick up variant symbols
