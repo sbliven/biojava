@@ -188,7 +188,8 @@ public class GFFParser {
 	   score.equals("")  ||
 	   score.equals(".") ||
 	   score.equals("0")
-	   ) {
+	   ) 
+	{
 	    record.setScore(GFFRecord.NO_SCORE);
 	} else {
 	    double sc = 0.0;

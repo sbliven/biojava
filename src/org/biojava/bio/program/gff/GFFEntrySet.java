@@ -40,6 +40,8 @@ import org.biojava.bio.seq.*;
  * @author Keith James (docs)
  */
 public class GFFEntrySet {
+    public static final String PROPERTY_GFF_SCORE = "org.biojava.bio.program.gff.gff_feature_score";
+
   /**
    * All of the lines - comments & records
    */
@@ -124,17 +126,19 @@ public class GFFEntrySet {
           if(o instanceof GFFRecord) {
             GFFRecord rec = (GFFRecord) o;
             if(rec.getSeqName().equals(seq.getName())) {
+		Feature.Template thisTemplate;		
+
               if(rec.getStrand() == StrandedFeature.UNKNOWN) {
                 plain.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 plain.type = rec.getFeature();
                 plain.source = rec.getSource();
-                seq.createFeature(plain);
+                thisTemplate = plain;
               }else if (rec.getFrame()== GFFRecord.NO_FRAME){
                 stranded.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 stranded.type = rec.getFeature();
                 stranded.source = rec.getSource();
                 stranded.strand = rec.getStrand();
-                seq.createFeature(stranded);
+		thisTemplate = stranded;
               }else {
                 framed.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 framed.type = rec.getFeature();
@@ -148,8 +152,15 @@ public class GFFEntrySet {
                     case 2: framed.readingFrame = FramedFeature.FRAME_2;
                       break;
                 }
-		seq.createFeature(framed);
+		thisTemplate = framed;
               }
+
+	      thisTemplate.annotation = new SmallAnnotation();
+	      if (rec.getScore() != GFFRecord.NO_SCORE) {
+		  thisTemplate.annotation.setProperty(PROPERTY_GFF_SCORE, new Double(rec.getScore()));
+	      }
+
+	      seq.createFeature(thisTemplate);
             }
           }
         }
