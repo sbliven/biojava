@@ -131,7 +131,5 @@ public interface Term extends Annotatable {
             }
             return annotation;
         }
-        
-        
     }
 }

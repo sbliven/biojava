@@ -136,9 +136,9 @@ public interface Triple {
                 return false;
             }
             Triple to = (Triple) o;
-            return to.getSubject() == getSubject() &&
-                   to.getObject() == getObject() &&
-                   to.getRelation() == getRelation();
+            return to.getSubject().equals(getSubject()) &&
+                   to.getObject().equals(getObject()) &&
+                   to.getRelation().equals(getRelation());
         }
         
         public int hashCode() {

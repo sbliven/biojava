@@ -21,72 +21,154 @@
 
 package org.biojava.bio.ontology;
 
-import java.util.*;
-import org.biojava.utils.*;
-
 import junit.framework.TestCase;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Tests for Ontology.
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Moses Hohman
  * @since 1.4
  */
-public class OntologyTest
-extends TestCase {
-  public OntologyTest(String name) {
-    super(name);
-  }
-  
-  // fixme: this needs splitting into multiple tests
-  // we need a basic ontology to do tests over
-  public void testProperties()
-  throws OntologyException, AlreadyExistsException, ChangeVetoException
-  {
-    String name = "Tester";
-    String description = "Our Description";
-    
-    Ontology onto = OntoTools.getDefaultFactory().createOntology(name, description);
-    Term isa = onto.importTerm(OntoTools.IS_A);
-    Term animal = onto.createTerm("Animal", "An animal");
-    Term fish = onto.createTerm("Fish", "A swimming, cold-blooded thingy");
-    Term mamal = onto.createTerm("Mamal", "A milk-producing quadraped");
-    Term human = onto.createTerm("Human", "Us");
-    
-    Triple fish_isa_animal = onto.createTriple(fish, animal, isa);
-    Triple mamal_isa_animal = onto.createTriple(mamal, animal, isa);
-    Triple human_isa_mamal = onto.createTriple(human, mamal, isa);
-    
+public class OntologyTest extends TestCase {
+    private String name;
+    private String description;
+    private Ontology onto;
+    private Term animal;
+    private Term fish;
+    private Term mammal;
+    private Term human;
+    private Term isa;
+    private Triple fish_isa_animal;
+    private Triple mammal_isa_animal;
+    private Triple human_isa_mammal;
+
+    protected void setUp() throws Exception {
+        name = "Tester";
+        description = "Our Description";
+        onto = OntoTools.getDefaultFactory().createOntology(name, description);
+
+        isa = onto.importTerm(OntoTools.IS_A);
+        animal = onto.createTerm("Animal", "An animal");
+        fish = onto.createTerm("Fish", "A swimming, cold-blooded thingy");
+        mammal = onto.createTerm("Mammal", "A milk-producing quadraped");
+        human = onto.createTerm("Human", "Us");
+        fish_isa_animal = onto.createTriple(fish, animal, isa);
+        mammal_isa_animal = onto.createTriple(mammal, animal, isa);
+        human_isa_mammal = onto.createTriple(human, mammal, isa);
+    }
+
     // basic properties
-    assertEquals(onto.getName(), name);
-    assertEquals(onto.getDescription(), description);
-    
-    // terms
-    assertEquals(onto.getTerms().size(), 5);
-    assertTrue(onto.getTerms().contains(animal));
-    assertTrue(onto.getTerms().contains(fish));
-    assertTrue(onto.getTerms().contains(mamal));
-    assertTrue(onto.getTerms().contains(human));
-    
-    // terms by name
-    assertEquals(onto.getTerm("Animal"), animal);
-    assertEquals(onto.getTerm("Human"), human);
-    
+    public void testName() {
+        assertEquals(onto.getName(), name);
+    }
+
+    public void testDescription() {
+        assertEquals(onto.getDescription(), description);
+    }
+
+    //terms
+    public void testTermsSize() {
+        assertEquals(5, onto.getTerms().size());
+    }
+
+    public void testTermsContainAnimal() {
+        assertTrue(onto.getTerms().contains(animal));
+    }
+
+    public void testTermsContainFish() {
+        assertTrue(onto.getTerms().contains(fish));
+    }
+
+    public void testTermsContainMammal() {
+        assertTrue(onto.getTerms().contains(mammal));
+    }
+
+    public void testTermsContainHuman() {
+        assertTrue(onto.getTerms().contains(human));
+    }
+
+    //terms by name
+    public void testGetAnimalByName() {
+        assertEquals(animal, onto.getTerm("Animal"));
+    }
+
     // triples
-    assertEquals(onto.getTriples(null, null, null).size(), 3);
-    assertTrue(onto.getTriples(null, null, null).contains(fish_isa_animal));
-    assertTrue(onto.getTriples(null, null, null).contains(mamal_isa_animal));
-    assertTrue(onto.getTriples(null, null, null).contains(human_isa_mamal));
-    
+    public void testGetAllTriplesSize() {
+        assertEquals(3, onto.getTriples(null, null, null).size());
+    }
+
+    public void testGetAllTriplesContainsFishIsaAnimal() {
+        assertTrue(onto.getTriples(null, null, null).contains(fish_isa_animal));
+    }
+
+    public void testGetAllTriplesContainsMammalIsaAnimal() {
+        assertTrue(onto.getTriples(null, null, null).contains(mammal_isa_animal));
+    }
+
+    public void testGetAllTriplesContainsHumanIsaMammal() {
+        assertTrue(onto.getTriples(null, null, null).contains(human_isa_mammal));
+    }
+
     // triple searching
-    assertEquals(onto.getTriples(null, animal, null).size(), 2);
-    assertEquals(onto.getTriples(null, mamal, null).size(), 1);
-    assertEquals(onto.getTriples(null, human, null).size(), 0);
-    assertEquals(onto.getTriples(null, mamal, isa), onto.getTriples(human, null, isa));
-    assertEquals(onto.getTriples(human, mamal, isa).size(), 1);
-    assertEquals(onto.getTriples(human, animal, isa).size(), 0);
-  }
-  
+    public void testTripleSearchingByObject() {
+        assertEquals(2, onto.getTriples(null, animal, null).size());
+        assertEquals(1, onto.getTriples(null, mammal, null).size());
+        assertEquals(0, onto.getTriples(null, human, null).size());
+    }
+
+    public void testTripleSearchBySubject() {
+        assertEquals(1, onto.getTriples(onto.getTerm("Human"), null, null).size());
+    }
+
+    public void testTripleSearchingByRelation() {
+        assertEquals(3, onto.getTriples(null, null, isa).size());
+    }
+
+    public void testTripleSearchingWithAllTerms() {
+        assertEquals(1, onto.getTriples(human, mammal, isa).size());
+        assertEquals(0, onto.getTriples(human, animal, isa).size());
+    }
+
+    public void testTripleSearchForSameTermWithDifferentCriteria() {
+        assertEquals(onto.getTriples(human, null, isa), onto.getTriples(null, mammal, isa));
+    }
+
+    public void testCannotCreateDuplicateTerm() throws ChangeVetoException {
+        try {
+            onto.createTerm("Human", "Us");
+            fail("should have thrown an AlreadyExistsException");
+        } catch (AlreadyExistsException expected) {
+        }
+    }
+
+    public void testCannotCreateTripleTermWithForeignSubject() throws OntologyException, ChangeVetoException {
+        try {
+            Ontology onto2 = OntoTools.getDefaultFactory().createOntology("other", "");
+            onto.createTriple(onto2.createTerm("foreign term", ""), human, isa);
+            fail("Should have thrown an IllegalArgumentException");
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+
+    public void testCannotCreateTripleTermWithForeignObject() throws OntologyException, ChangeVetoException {
+        try {
+            Ontology onto2 = OntoTools.getDefaultFactory().createOntology("other", "");
+            onto.createTriple(fish, onto2.createTerm("foreign term", ""), isa);
+            fail("Should have thrown an IllegalArgumentException");
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+
+    public void testCannotCreateTripleTermWithForeignRelation() throws OntologyException, ChangeVetoException {
+        try {
+            Ontology onto2 = OntoTools.getDefaultFactory().createOntology("other", "");
+            onto.createTriple(human, fish, onto2.createTerm("wants a", ""));
+            fail("Should have thrown an IllegalArgumentException");
+        } catch (IllegalArgumentException expected) {
+        }
+    }
 }
 
