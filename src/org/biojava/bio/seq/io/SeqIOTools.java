@@ -22,8 +22,7 @@
 package org.biojava.bio.seq.io;
 
 import java.io.*;
-
-import org.apache.regexp.*;
+import java.util.regex.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
@@ -620,12 +619,12 @@ public final class SeqIOTools  {
         }
     }
 
-    /**
-     * The following methods provide an alternate interface for
-     * reading and writing sequences and alignments. (Nimesh Singh).
-     *
-     */
-
+    //
+    // The following methods provide an alternate interface for
+    // reading and writing sequences and alignments. (Nimesh Singh).
+    //
+    //
+     
     /**
      * Attempts to guess the filetype of a file given the name.  For
      * use with the functions below that take an int fileType as a
@@ -640,28 +639,28 @@ public final class SeqIOTools  {
         //First tries by matching an extension
         String fileName = seqFile.getName();
         try {
-            if ((new RE(".*\\u002eem.*")).match(fileName)) {
+            if (Pattern.matches(".*\\u002eem.*", fileName)) {
                 return SeqIOConstants.EMBL_DNA;
             }
-            else if ((new RE(".*\\u002edat.*")).match(fileName)) {
+            else if (Pattern.matches(".*\\u002edat.*", fileName)) {
                 return SeqIOConstants.EMBL_DNA;
             }
-            else if ((new RE(".*\\u002egb.*")).match(fileName)) {
+            else if (Pattern.matches(".*\\u002egb.*", fileName)) {
                 return SeqIOConstants.GENBANK_DNA;
             }
-            else if ((new RE(".*\\u002esp.*")).match(fileName)) {
+            else if (Pattern.matches(".*\\u002esp.*", fileName)) {
                 return SeqIOConstants.SWISSPROT;
             }
-            else if ((new RE(".*\\u002egp.*")).match(fileName)) {
+            else if (Pattern.matches(".*\\u002egp.*", fileName)) {
                 return SeqIOConstants.GENPEPT;
             }
-            else if ((new RE(".*\\u002efa.*")).match(fileName)) {
+            else if (Pattern.matches(".*\\u002efa.*", fileName)) {
                 return guessFastaType(seqFile);
             }
-            else if ((new RE(".*\\u002emsf.*")).match(fileName)) {
+            else if (Pattern.matches(".*\\u002emsf.*", fileName)) {
                 return guessMsfType(seqFile);
             }
-        } catch (RESyntaxException e) {
+        } catch (PatternSyntaxException e) {
             throw new BioError(e, "Internal error in SeqIOTools");
         }
 

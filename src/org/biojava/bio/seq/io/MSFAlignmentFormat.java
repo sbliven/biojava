@@ -27,12 +27,12 @@ import  org.biojava.bio.symbol.Alignment;
 import  org.biojava.bio.symbol.*;
 import  org.biojava.bio.BioException;
 import  java.io.BufferedReader;
-import  org.apache.regexp.*;
 import  org.biojava.bio.seq.*;
 import  org.biojava.bio.seq.io.*;
 import  java.lang.Integer;
 import  java.io.*;
 import  java.util.*;
+import  java.util.regex.*;
 
 /**
  * @author raemig
@@ -84,8 +84,8 @@ public class MSFAlignmentFormat
         int startOfData = 0;                    //the start of the sequence data in the line
         int currSeqCount = 0;                   //which sequence data you are currently trying to get
         try {
-            RE mtc = new RE("Name:\\s+(.*?)\\s+(oo|Len:)");
-            RE removewhitespace = new RE("\\s");
+            Pattern mtc = Pattern.compile("Name:\\s+(.*?)\\s+(oo|Len:)");
+            Pattern removewhitespace = Pattern.compile("\\s");
             // REMatch rem = null;
             String line = reader.readLine();
             //parse past header
@@ -95,8 +95,8 @@ public class MSFAlignmentFormat
             //read each name (between Name:   and Len:
             while ((line.indexOf("//") == -1) && ((line.trim()).length() !=
                     0)) {
-                mtc.match(line);
-                sequenceName = line.substring(mtc.getParenStart(1), mtc.getParenEnd(1)).trim();
+                Matcher matcher = mtc.matcher(line);
+                sequenceName = matcher.group(1).trim();
                 if (sequenceName == null) {
                     break;
                 }               //end of sequence names
@@ -128,7 +128,7 @@ public class MSFAlignmentFormat
                     startOfData = line.indexOf((String)sequenceNames.get(currSeqCount))
                             + ((String)sequenceNames.get(currSeqCount)).length();
                     line = (line.substring(startOfData));
-                    line = removewhitespace.subst(line, "", RE.REPLACE_ALL);
+                    line = removewhitespace.matcher(line).replaceAll("");
                     sequenceData[currSeqCount] = sequenceData[currSeqCount].concat(line);
                     line = reader.readLine();
                     if ((currSeqCount < sequenceNames.size() - 1) && (line.trim().length() == 0)) {
