@@ -28,6 +28,7 @@ import org.biojava.utils.ChangeVetoException;
  * <code>TripleImplTest</code>
  *
  * @author Moses Hohman
+ * @author Matthew Pocock
  * @since 1.4
  */
 
@@ -41,7 +42,7 @@ public class TripleImplTest extends TestCase {
         onto = OntoTools.getDefaultFactory().createOntology("test", "");
         subject = onto.createTerm("subject", "");
         object = onto.createTerm("object", "");
-        relation = onto.importTerm(OntoTools.IS_A);
+        relation = onto.importTerm(OntoTools.ISA, null);
     }
 
     public void testEqualsWhenEqual() throws ChangeVetoException, AlreadyExistsException {
@@ -64,7 +65,7 @@ public class TripleImplTest extends TestCase {
 
     public void testEqualsWhenRelationsUnequal() throws ChangeVetoException, AlreadyExistsException {
         Triple.Impl triple1 = new Triple.Impl(subject, object, relation);
-        Triple.Impl triple2 = new Triple.Impl(subject, object, onto.importTerm(OntoTools.HAS_A));
+        Triple.Impl triple2 = new Triple.Impl(subject, object, onto.importTerm(OntoTools.RELATION, null));
         assertFalse(triple1.equals(triple2));
     }
 
@@ -78,7 +79,7 @@ public class TripleImplTest extends TestCase {
         try {
             new Triple.Impl(null, object, relation);
             fail("should have thrown an IllegalArgumentException");
-        } catch (IllegalArgumentException expected) {
+        } catch (NullPointerException expected) {
         }
     }
 
@@ -86,7 +87,7 @@ public class TripleImplTest extends TestCase {
         try {
             new Triple.Impl(subject, null, relation);
             fail("should have thrown an IllegalArgumentException");
-        } catch (IllegalArgumentException expected) {
+        } catch (NullPointerException expected) {
         }
     }
 
@@ -94,7 +95,7 @@ public class TripleImplTest extends TestCase {
         try {
             new Triple.Impl(subject, object, null);
             fail("should have thrown an IllegalArgumentException");
-        } catch (IllegalArgumentException expected) {
+        } catch (NullPointerException expected) {
         }
     }
 }

@@ -53,8 +53,8 @@ public class GOParser {
     {
         try {
             Ontology onto = factory.createOntology(ontoName, ontoDescription);
-            Term isa = onto.importTerm(OntoTools.IS_A);
-            Term partof = onto.importTerm(OntoTools.PART_OF);
+            Term isa = onto.importTerm(OntoTools.ISA, null);
+            Term partof = onto.importTerm(OntoTools.PART_OF, null);
             List termStack = new ArrayList();
             String line;
             while ((line = goFile.readLine()) != null) {
@@ -105,7 +105,7 @@ public class GOParser {
         throws AlreadyExistsException, ChangeVetoException
     {
         if (!onto.containsTriple(s, o, p)) {
-            onto.createTriple(s, o, p);
+            onto.createTriple(s, o, p, null, null);
         }
     }
 

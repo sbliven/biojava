@@ -2,9 +2,10 @@ package org.biojava.ontology;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PushbackReader;
 
 import org.biojava.bio.BioError;
-import org.biojava.ontology.io.TabDelimParser;
+import org.biojava.ontology.io.TriplesParser;
 
 /**
  * Tools for manipulating ontologies.
@@ -14,23 +15,43 @@ import org.biojava.ontology.io.TabDelimParser;
 public final class OntoTools {
   private static final Ontology CORE_ONTOLOGY;
   private static final OntologyFactory DEFAULT_FACTORY;
+  private static final IntegerOntology CORE_INTEGER;
+  //private static final Ontology CORE_STRING;
 
-  public static final Term IS_A;
-  public static final Term HAS_A;
+  public static final Term BOOLEAN;
+  public static final Term TRUE;
+  public static final Term FALSE;
+  public static final Term AND;
+  public static final Term OR;
+  public static final Term XOR;
+  public static final Term EQUAL;
+  public static final Term NOT_EQUAL;
+  public static final Term IMPLIES;
+
+  public static final Term TYPE;
+  public static final Term INSTANCEOF;
+  public static final Term ISA;
   public static final Term ANY;
-  public static final Term REMOTE_TERM;
-  public static final Term TRIPLE_TERM;
-  public static final Term TRIPLE;
-  public static final Term SOURCE;
-  public static final Term OBJECT;
+  public static final Term NONE;
   public static final Term RELATION;
+  public static final Term DOMAIN;
+  public static final Term CO_COMAIN;
+
+  public static final Term SET;
+  public static final Term UNIVERSAL;
+  public static final Term EMPTY;
+  public static final Term CONTAINS;
+  public static final Term NOT_CONTAINS;
+  public static final Term SUB_SET;
+
+  public static final Term PREDICATE;
   public static final Term REFLEXIVE;
   public static final Term SYMMETRIC;
   public static final Term TRANSITIVE;
   public static final Term EQUIVALENCE;
   public static final Term PARTIAL_ORDER;
+
   public static final Term PART_OF;
-  public static final Term INVERSE;
 
   static {
     DEFAULT_FACTORY = new OntologyFactory() {
@@ -44,29 +65,55 @@ public final class OntoTools {
       BufferedReader reader = new BufferedReader(
         new InputStreamReader(
           OntoTools.class.getClassLoader().getResourceAsStream(
-            "org/biojava/bio/ontology/core.onto"
+            "org/biojava/ontology/core.pred"
           )
         )
       );
 
-      CORE_ONTOLOGY = new TabDelimParser().parse(reader, DEFAULT_FACTORY);
+      CORE_INTEGER = new IntegerOntology();
 
-      IS_A = CORE_ONTOLOGY.getTerm("is-a");
-      HAS_A = CORE_ONTOLOGY.getTerm("has-a");
+      ReasoningDomain rdom = new ReasoningDomain.Impl();
+      rdom.addOntology(CORE_INTEGER);
+      CORE_ONTOLOGY = new TriplesParser().parse(
+              new PushbackReader(reader),
+              DEFAULT_FACTORY,
+              rdom);
+
+      BOOLEAN = CORE_ONTOLOGY.getTerm("boolean");
+      TRUE = CORE_ONTOLOGY.getTerm("true");
+      FALSE = CORE_ONTOLOGY.getTerm("false");
+      AND = CORE_ONTOLOGY.getTerm("and");
+      OR = CORE_ONTOLOGY.getTerm("or");
+      XOR = CORE_ONTOLOGY.getTerm("xor");
+      EQUAL = CORE_ONTOLOGY.getTerm("equal");
+      NOT_EQUAL = CORE_ONTOLOGY.getTerm("not_equal");
+      IMPLIES = CORE_ONTOLOGY.getTerm("implies");
+
+      TYPE = CORE_ONTOLOGY.getTerm("type");
+      INSTANCEOF = CORE_ONTOLOGY.getTerm("instanceof");
+      ISA = CORE_ONTOLOGY.getTerm("isa");
       ANY = CORE_ONTOLOGY.getTerm("any");
-      REMOTE_TERM = CORE_ONTOLOGY.getTerm("remote-term");
-      TRIPLE_TERM = CORE_ONTOLOGY.getTerm("triple-term");
-      TRIPLE = CORE_ONTOLOGY.getTerm("triple");
-      SOURCE = CORE_ONTOLOGY.getTerm("source");
-      OBJECT = CORE_ONTOLOGY.getTerm("object");
+      NONE = CORE_ONTOLOGY.getTerm("none");
+
       RELATION = CORE_ONTOLOGY.getTerm("relation");
+      DOMAIN = CORE_ONTOLOGY.getTerm("domain");
+      CO_COMAIN = CORE_ONTOLOGY.getTerm("co_domain");
+
+      SET = CORE_ONTOLOGY.getTerm("set");
+      UNIVERSAL = CORE_ONTOLOGY.getTerm("universal");
+      EMPTY = CORE_ONTOLOGY.getTerm("empty");
+      CONTAINS = CORE_ONTOLOGY.getTerm("contains");
+      NOT_CONTAINS = CORE_ONTOLOGY.getTerm("not_contains");
+      SUB_SET = CORE_ONTOLOGY.getTerm("sub_set");
+
+      PREDICATE = CORE_ONTOLOGY.getTerm("predicate");
       REFLEXIVE = CORE_ONTOLOGY.getTerm("reflexive");
       EQUIVALENCE = CORE_ONTOLOGY.getTerm("equivalence");
       SYMMETRIC = CORE_ONTOLOGY.getTerm("symmetric");
       TRANSITIVE = CORE_ONTOLOGY.getTerm("transitive");
-      PARTIAL_ORDER = CORE_ONTOLOGY.getTerm("partial-order");
-      PART_OF = CORE_ONTOLOGY.getTerm("part-of");
-      INVERSE = CORE_ONTOLOGY.getTerm("inverse");
+      PARTIAL_ORDER = CORE_ONTOLOGY.getTerm("partial_order");
+
+      PART_OF = null;
     } catch (Exception e) {
       throw new BioError("Could not initialize OntoTools", e);
     }
@@ -86,6 +133,18 @@ public final class OntoTools {
    */
   public static Ontology getCoreOntology() {
     return CORE_ONTOLOGY;
+  }
+
+  /**
+   * Get the Ontology that defines integers.
+   *
+   * <p>This contains a term for each and every integer. I haven't decided yet
+   * if it contains terms for arithmatic.</p>
+   *
+   * @return the integer Ontology
+   */
+  public static IntegerOntology getIntegerOntology() {
+    return CORE_INTEGER;
   }
 
   public static OntologyFactory getDefaultFactory() {

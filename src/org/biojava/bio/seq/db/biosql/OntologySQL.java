@@ -42,7 +42,6 @@ import org.biojava.ontology.OntologyTerm;
 import org.biojava.ontology.RemoteTerm;
 import org.biojava.ontology.Term;
 import org.biojava.ontology.Triple;
-import org.biojava.ontology.TripleTerm;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
@@ -129,7 +128,7 @@ class OntologySQL {
                 Term t = (Term) i.next();
                 Term localTerm;
                 if (t instanceof RemoteTerm) {
-                    localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm());
+                    localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm(), null);
                 } else {
                     localTerm = ont.createTerm(t.getName(), t.getDescription());
                     persistTerm(conn, localTerm);
@@ -141,7 +140,8 @@ class OntologySQL {
                 Triple localT = ont.createTriple(
                     (Term) localTerms.get(t.getSubject()),
                     (Term) localTerms.get(t.getObject()),
-                    (Term) localTerms.get(t.getRelation())
+                    (Term) localTerms.get(t.getRelation()),
+                    null, null
                 );
 
                 persistTriple(conn, ont, localT);
@@ -186,7 +186,7 @@ class OntologySQL {
                 Term t = (Term) i.next();
                 Term localTerm;
                 if (t instanceof RemoteTerm) {
-                    localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm());
+                    localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm(), null);
                 } else {
                     localTerm = ont.createTerm(t.getName(), t.getDescription());
                     persistTerm(conn, localTerm);
@@ -198,7 +198,8 @@ class OntologySQL {
                 Triple localT = ont.createTriple(
                 (Term) localTerms.get(t.getSubject()),
                 (Term) localTerms.get(t.getObject()),
-                (Term) localTerms.get(t.getRelation())
+                (Term) localTerms.get(t.getRelation()),
+                null, null
                 );
 
                 persistTriple(conn, ont, localT);
@@ -262,7 +263,7 @@ class OntologySQL {
     }
 
     private Term localize(Ontology ont, Term t)
-        throws AlreadyExistsException, ChangeVetoException
+        throws ChangeVetoException
     {
         if (t.getOntology() == ont) {
             return t;
@@ -270,7 +271,7 @@ class OntologySQL {
             if (blessedExternalTerms.containsKey(t)) {
                 t = (Term) blessedExternalTerms.get(t);
             }
-            return ont.importTerm(t);
+            return ont.importTerm(t, null);
         }
     }
 
@@ -318,7 +319,8 @@ class OntologySQL {
                 ont.createTriple(
                     localize(ont, (Term) termsByID.get(new Integer(subject_id))),
                     localize(ont, (Term) termsByID.get(new Integer(object_id))),
-                    localize(ont, (Term) termsByID.get(new Integer(predicate_id)))
+                    localize(ont, (Term) termsByID.get(new Integer(predicate_id))),
+                    null, null
                 );
             }
             rs.close();
@@ -374,8 +376,6 @@ class OntologySQL {
                         }
                         Term addedTerm = (Term) cev.getChange();
                         if (addedTerm instanceof OntologyTerm) {
-                            throw new ChangeVetoException("BioSQL doesn't (currently) represent OntologyTerms");
-                        } else if (addedTerm instanceof TripleTerm) {
                             throw new ChangeVetoException("BioSQL doesn't (currently) represent OntologyTerms");
                         } else if (addedTerm instanceof RemoteTerm) {
                             Term gopher = addedTerm;

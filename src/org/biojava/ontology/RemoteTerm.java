@@ -19,10 +19,9 @@
  *
  */
 
-package org.biojava.ontology; 
- 
+package org.biojava.ontology;
+
 import org.biojava.bio.Annotation;
-import org.biojava.utils.ChangeForwarder;
 
 /**
  * A term in another ontology.
@@ -33,7 +32,8 @@ import org.biojava.utils.ChangeForwarder;
  * expected that you would not copy terms from one ontology into another. The
  * best-practice way to represent terms from another ontology in your one is to
  * use RemoteTerm instances. Ontology has a method importTerm that does this
- * for you.
+ * for you. By default, imported terms will have names composed from the source
+ * ontology and the imported term name. However, this should be over-rideable.
  * </p>
  *
  * <p>
@@ -52,54 +52,58 @@ public interface RemoteTerm extends Term {
     /**
      * Return the imported term
      */
-     
+
     public Term getRemoteTerm();
-    
+
     /**
      * Simple in-memory implementation of a remote ontology term.
      *
      * @for.developer This can be used to implement Ontology.importTerm
      */
-    
+
     public final static class Impl
     extends AbstractTerm
     implements RemoteTerm, java.io.Serializable {
         private final Ontology ontology;
         private final Term remoteTerm;
-        private transient ChangeForwarder forwarder;
-        
-        public Impl(Ontology ontology, Term remoteTerm) {
+        private final String name;
+
+        public Impl(Ontology ontology, Term remoteTerm, String name) {
             if (ontology == null) {
-                throw new IllegalArgumentException("Ontology must not be null");
+                throw new NullPointerException("Ontology must not be null");
             }
             if (remoteTerm == null) {
-                throw new IllegalArgumentException("RemoteTerm must not be null");
+                throw new NullPointerException("RemoteTerm must not be null");
             }
-            
+            if(name == null) {
+              name = "[" + remoteTerm.getOntology().getName() + ":" + remoteTerm.getName() + "]";
+            }
+
             this.ontology = ontology;
             this.remoteTerm = remoteTerm;
+            this.name = name;
         }
-        
+
         public String getName() {
             return getOntology().getName() + ":" + remoteTerm.getName();
         }
-        
+
         public String getDescription() {
             return remoteTerm.getDescription();
         }
-        
+
         public Ontology getOntology() {
             return ontology;
         }
-        
+
         public Term getRemoteTerm() {
             return remoteTerm;
         }
-        
+
         public String toString() {
-            return "[" + remoteTerm.getOntology().getName() + ":" + getName() + "]";
+            return name;
         }
-        
+
         public Annotation getAnnotation() {
             return remoteTerm.getAnnotation();
         }

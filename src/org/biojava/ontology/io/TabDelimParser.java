@@ -154,7 +154,7 @@ public class TabDelimParser {
           Term tt = resolveTerm(target, onto);
           Term rt = resolveTerm(relation, onto);
 
-          return onto.createTripleTerm(st, tt, rt);
+          return onto.createTriple(st, tt, rt, null, null);
         } else {
           return onto.createTerm(termName, "");
         }
@@ -171,7 +171,7 @@ public class TabDelimParser {
       return (Triple) onto.getTriples(sub, obj, rel).iterator().next();
     } else {
       try {
-        return onto.createTriple(sub, obj, rel);
+        return onto.createTriple(sub, obj, rel, null, null);
       } catch (AlreadyExistsException aee) {
         throw new BioError("Assertion Failure: Could not create triple",aee);
       } catch (ChangeVetoException cve) {

@@ -50,14 +50,14 @@ public class OntologyTest extends TestCase {
         description = "Our Description";
         onto = OntoTools.getDefaultFactory().createOntology(name, description);
 
-        isa = onto.importTerm(OntoTools.IS_A);
+        isa = onto.importTerm(OntoTools.ISA, null);
         animal = onto.createTerm("Animal", "An animal");
         fish = onto.createTerm("Fish", "A swimming, cold-blooded thingy");
         mammal = onto.createTerm("Mammal", "A milk-producing quadraped");
         human = onto.createTerm("Human", "Us");
-        fish_isa_animal = onto.createTriple(fish, animal, isa);
-        mammal_isa_animal = onto.createTriple(mammal, animal, isa);
-        human_isa_mammal = onto.createTriple(human, mammal, isa);
+        fish_isa_animal = onto.createTriple(fish, animal, isa, null, null);
+        mammal_isa_animal = onto.createTriple(mammal, animal, isa, null, null);
+        human_isa_mammal = onto.createTriple(human, mammal, isa, null, null);
     }
 
     // basic properties
@@ -71,7 +71,7 @@ public class OntologyTest extends TestCase {
 
     //terms
     public void testTermsSize() {
-        assertEquals(5, onto.getTerms().size());
+        assertEquals(8, onto.getTerms().size());
     }
 
     public void testTermsContainAnimal() {
@@ -147,7 +147,7 @@ public class OntologyTest extends TestCase {
     public void testCannotCreateTripleTermWithForeignSubject() throws OntologyException, ChangeVetoException {
         try {
             Ontology onto2 = OntoTools.getDefaultFactory().createOntology("other", "");
-            onto.createTriple(onto2.createTerm("foreign term", ""), human, isa);
+            onto.createTriple(onto2.createTerm("foreign term", ""), human, isa, null, null);
             fail("Should have thrown an IllegalArgumentException");
         } catch (IllegalArgumentException expected) {
         }
@@ -156,7 +156,7 @@ public class OntologyTest extends TestCase {
     public void testCannotCreateTripleTermWithForeignObject() throws OntologyException, ChangeVetoException {
         try {
             Ontology onto2 = OntoTools.getDefaultFactory().createOntology("other", "");
-            onto.createTriple(fish, onto2.createTerm("foreign term", ""), isa);
+            onto.createTriple(fish, onto2.createTerm("foreign term", ""), isa, null, null);
             fail("Should have thrown an IllegalArgumentException");
         } catch (IllegalArgumentException expected) {
         }
@@ -165,7 +165,7 @@ public class OntologyTest extends TestCase {
     public void testCannotCreateTripleTermWithForeignRelation() throws OntologyException, ChangeVetoException {
         try {
             Ontology onto2 = OntoTools.getDefaultFactory().createOntology("other", "");
-            onto.createTriple(human, fish, onto2.createTerm("wants a", ""));
+            onto.createTriple(human, fish, onto2.createTerm("wants a", ""), null, null);
             fail("Should have thrown an IllegalArgumentException");
         } catch (IllegalArgumentException expected) {
         }
