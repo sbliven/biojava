@@ -76,7 +76,13 @@ implements DistributionTrainerContext, Serializable {
 
   public void addCount(Distribution dist, Symbol sym, double times)
   throws IllegalSymbolException {
-    getDistributionTrainer(dist).addCount(this, sym, times);
+    DistributionTrainer dt = getDistributionTrainer(dist);
+    if(dt == null) {
+      throw new NullPointerException(
+        "No trainer associated with distribution " + dist
+      );
+    }
+    dt.addCount(this, sym, times);
   }
   
   public void trainDistributions()
