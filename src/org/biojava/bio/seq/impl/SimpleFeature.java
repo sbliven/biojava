@@ -28,6 +28,7 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.ontology.*;
 
 /**
  * A no-frills implementation of a feature.
@@ -78,6 +79,9 @@ implements
    * This is lazily instantiated.
    */
   private Annotation annotation;
+  
+  private Term typeTerm;
+  private Term sourceTerm;
  
   /**
    * A utility function to retrieve the feature holder delegate, creating it if
@@ -157,8 +161,16 @@ implements
     }
   }
   
+  public Term getTypeTerm() {
+      return typeTerm;
+  }
+  
   public String getType() {
-    return type;
+    if (typeTerm != OntoTools.ANY) {
+        return typeTerm.getName();
+    } else {
+        return type;
+    }
   }
   
   public void setType(String type)
@@ -176,8 +188,35 @@ implements
     }
   }
   
+    public void setTypeTerm(Term t)
+        throws ChangeVetoException 
+    {
+        if(hasListeners()) {
+            ChangeSupport cs = getChangeSupport(TYPE);
+            synchronized (cs) {
+                ChangeEvent ce_term = new ChangeEvent(this, TYPETERM, t, this.getTypeTerm());
+                ChangeEvent ce_name = new ChangeEvent(this, TYPE, t.getName(), this.getType());
+                cs.firePreChangeEvent(ce_term);
+                cs.firePreChangeEvent(ce_name);
+                this.typeTerm = typeTerm;
+                cs.firePostChangeEvent(ce_term);
+                cs.firePostChangeEvent(ce_name);
+            }
+        } else {
+            this.typeTerm = typeTerm;
+        }
+    }
+  
   public String getSource() {
-    return source;
+    if (sourceTerm != OntoTools.ANY) {
+        return sourceTerm.getName();
+    } else {
+        return source;
+    }
+  }
+  
+  public Term getSourceTerm() {
+      return sourceTerm;
   }
   
   public FeatureHolder getParent() {
@@ -198,6 +237,26 @@ implements
       this.source = source;
     }
   }
+  
+  
+    public void setSourceTerm(Term t)
+        throws ChangeVetoException 
+    {
+        if(hasListeners()) {
+            ChangeSupport cs = getChangeSupport(TYPE);
+            synchronized (cs) {
+                ChangeEvent ce_term = new ChangeEvent(this, SOURCETERM, t, this.getSourceTerm());
+                ChangeEvent ce_name = new ChangeEvent(this, SOURCE, t.getName(), this.getSource());
+                cs.firePreChangeEvent(ce_term);
+                cs.firePreChangeEvent(ce_name);
+                this.sourceTerm = t;
+                cs.firePostChangeEvent(ce_term);
+                cs.firePostChangeEvent(ce_name);
+            }
+        } else {
+            this.sourceTerm = sourceTerm;
+        }
+    }
 
     public Sequence getSequence() {
 	FeatureHolder fh = this;
@@ -308,8 +367,16 @@ implements
 
 	this.parent = parent;
 	this.loc = template.location;
-	this.type = template.type;
-	this.source = template.source;
+    this.typeTerm = template.typeTerm != null ? template.typeTerm : OntoTools.ANY;
+    this.sourceTerm = template.sourceTerm != null ? template.sourceTerm : OntoTools.ANY;
+	this.type = template.type != null ? template.type : typeTerm.getName();
+	this.source = template.source != null ? template.source : sourceTerm.getName();
+    if (this.type == null) {
+        throw new NullPointerException("Either type or typeTerm must have a non-null value");
+    }
+    if (this.source == null) {
+        throw new NullPointerException("Either source or sourceTerm must have a non-null value");
+    }
         this.annotation = (template.annotation == Annotation.EMPTY_ANNOTATION) ?
                                new SimpleAnnotation() :
                                template.annotation;

@@ -26,6 +26,7 @@ import java.util.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.ontology.*;
 
 /**
  * ComponentFeature implementation used by SimpleAssembly.
@@ -48,6 +49,8 @@ class SimpleComponentFeature
     private Location location;
     private String type;
     private String source;
+    private Term typeTerm;
+    private Term sourceTerm;
     private Annotation annotation;
 
     private StrandedFeature.Strand strand;
@@ -79,6 +82,8 @@ class SimpleComponentFeature
 	this.location = temp.location;
 	this.type = temp.type;
 	this.source = temp.source;
+    this.typeTerm = (temp.typeTerm == null) ? OntoTools.ANY : temp.typeTerm;
+    this.sourceTerm = (temp.sourceTerm == null) ? OntoTools.ANY : temp.sourceTerm;
 	this.annotation = temp.annotation;
 
 	this.strand = temp.strand;
@@ -160,26 +165,59 @@ class SimpleComponentFeature
 	return (Sequence) fh;
     }
 
-    public String getSource() {
-	return source;
+    public String getType() {
+    if (typeTerm != OntoTools.ANY) {
+        return typeTerm.getName();
+    } else {
+        return type;
+    }
     }
 
+    public Term getTypeTerm() {
+        return typeTerm;
+    }
+    
     public void setSource(String source)
     throws ChangeVetoException {
       throw new ChangeVetoException(
-        new ChangeEvent(this, TYPE, source, this.source),
+        new ChangeEvent(this, SOURCE, source, this.source),
+        "Can't change source as it is immutable"
+      );
+    }
+    
+    public void setSourceTerm(Term source)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, SOURCE, source, this.sourceTerm),
         "Can't change source as it is immutable"
       );
     }
 
-    public String getType() {
-	return type;
+    public String getSource() {
+    if (sourceTerm != OntoTools.ANY) {
+        return sourceTerm.getName();
+    } else {
+        return source;
     }
+  }
+  
+  public Term getSourceTerm() {
+      return sourceTerm;
+  }
+    
 
     public void setType(String type)
     throws ChangeVetoException {
       throw new ChangeVetoException(
         new ChangeEvent(this, TYPE, type, this.type),
+        "Can't change type as it is immutable"
+      );
+    }
+    
+    public void setTypeTerm(Term type)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, SOURCE, type, this.typeTerm),
         "Can't change type as it is immutable"
       );
     }

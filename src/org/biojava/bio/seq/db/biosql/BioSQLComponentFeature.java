@@ -32,6 +32,7 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.ontology.*;
 
 /**
  * Sequence keyed off a BioSQL biosequence.
@@ -140,6 +141,10 @@ class BioSQLComponentFeature
     public String getType() {
 	return type;
     }
+    
+    public Term getTypeTerm() {
+	return OntoTools.ANY;
+    }
 
     public void setType(String type)
     throws ChangeVetoException {
@@ -148,15 +153,33 @@ class BioSQLComponentFeature
         "Can't change type as it is immutable"
       );
     }
+    
+    public void setTypeTerm(Term type)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        "Can't change type as it is immutable"
+      );
+    }
       
     public String getSource() {
 	return source;
+    }
+    
+    public Term getSourceTerm() {
+        return OntoTools.ANY;
     }
 
     public void setSource(String source)
     throws ChangeVetoException {
       throw new ChangeVetoException(
         new ChangeEvent(this, TYPE, source, this.source),
+        "Can't change source as it is immutable"
+      );
+    }
+    
+    public void setSourceTerm(Term source)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
         "Can't change source as it is immutable"
       );
     }

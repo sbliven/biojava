@@ -27,6 +27,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.bio.ontology.*;
 
 /**
  * Component feature mapping a DAS landmark sequence onto its parent.
@@ -147,6 +148,10 @@ class DASComponentFeature
     public String getSource() {
 	return source;
     }
+    
+    public Term getSourceTerm() {
+        return OntoTools.ANY;
+    }
 
     public void setSource(String source)
     throws ChangeVetoException {
@@ -155,15 +160,33 @@ class DASComponentFeature
         "Can't change source as it is immutable"
       );
     }
+    
+    public void setSourceTerm(Term source)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        "Can't change source as it is immutable"
+      );
+    }
 
     public String getType() {
 	return type;
     }
 
+    public Term getTypeTerm() {
+        return OntoTools.ANY;
+    }
+    
     public void setType(String type)
     throws ChangeVetoException {
       throw new ChangeVetoException(
         new ChangeEvent(this, TYPE, type, this.type),
+        "Can't change type as it is immutable"
+      );
+    }
+    
+    public void setTypeTerm(Term type)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
         "Can't change type as it is immutable"
       );
     }

@@ -28,6 +28,7 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
+import org.biojava.bio.ontology.*;
 
 /**
  * A feature within a sequence, or nested within another feature.
@@ -130,6 +131,24 @@ public interface Feature extends FeatureHolder, Annotatable {
     );
     
     /**
+     * The ontological type of this feature has altered.
+     */
+    public static final ChangeType TYPETERM = new ChangeType(
+      "TypeTerm has altered",
+      Feature.class,
+      "TYPETERM"
+    );
+    
+    /**
+     * The ontological source of this feature has altered
+     */
+    public static final ChangeType SOURCETERM = new ChangeType(
+      "SourceTerm has altered",
+      Feature.class,
+      "SOURCETERM"
+    );
+    
+    /**
      * The location of this feature.
      * <p>
      * The location may be complicated, or simply a range.
@@ -169,6 +188,50 @@ public interface Feature extends FeatureHolder, Annotatable {
      */
     void setType(String type)
         throws ChangeVetoException;
+  
+    /**
+     * An ontology term defining the type of feature.  This is
+     * optional, and will default to <code>OntoTools.ANY</code>
+     * in implementations which aren't ontology aware.
+     *
+     * @since 1.4
+     */
+    
+    public Term getTypeTerm();
+    
+    /**
+     * Set the type ontology-term for this feature.  If this succeeds,
+     * it will generally also change the source name.
+     *
+     * @since 1.4
+     * @throws ChangeVetoException if changes are not allowed
+     * @throws InvalidTermException if the specified term is not an acceptable type
+     *                           for this feature.
+     */
+    
+    public void setTypeTerm(Term t) throws ChangeVetoException, InvalidTermException;
+    
+    /**
+     * An ontology term defining the source of this feature.  This is
+     * optional, and will default to <code>OntoTools.ANY</code>
+     * in implementations which aren't ontology aware.
+     *
+     * @since 1.4
+     */
+    
+    public Term getSourceTerm();
+    
+    /**
+     * Set the source ontology-term for this feature.  If this succeeds,
+     * it will generally also change the source name.
+     *
+     * @since 1.4
+     * @throws ChangeVetoException if changes are not allowed
+     * @throws InvalidTermException if the specified term is not an acceptable type
+     *                           for this feature.
+     */
+    
+    public void setSourceTerm(Term t) throws ChangeVetoException, InvalidTermException;
   
     /**
      * The source of the feature. This may be a program or process.
@@ -262,6 +325,8 @@ public interface Feature extends FeatureHolder, Annotatable {
 	public Location location;
 	public String type;
 	public String source;
+    public Term typeTerm;
+    public Term sourceTerm;
 	public Annotation annotation;
 
 	public int hashCode() {

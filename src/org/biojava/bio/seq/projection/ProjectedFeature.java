@@ -27,6 +27,7 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.ontology.*;
 
 /**
  * Internal class used by ProjectionEngine to wrap Feature objects.
@@ -102,8 +103,28 @@ public class ProjectedFeature
     feature.setType(type);
   }
   
+  public Term getTypeTerm() {
+      return feature.getTypeTerm();
+  }
+  
+  public void setTypeTerm(Term t) 
+    throws ChangeVetoException, InvalidTermException
+  {
+      feature.setTypeTerm(t);
+  }
+  
   public String getSource() {
     return feature.getSource();
+  }
+  
+  public Term getSourceTerm() {
+      return feature.getSourceTerm();
+  }
+  
+  public void setSourceTerm(Term t)
+    throws ChangeVetoException, InvalidTermException
+  {
+      feature.setSourceTerm(t);
   }
   
   public void setSource(String source)

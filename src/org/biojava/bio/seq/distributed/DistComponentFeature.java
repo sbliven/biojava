@@ -27,6 +27,7 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.ontology.*;
 
 /**
  * ComponentFeature implementation used by MetaDAS.
@@ -103,6 +104,8 @@ class DistComponentFeature
 	cft.location = getLocation();
 	cft.type = getType();
 	cft.source = getSource();
+    cft.typeTerm = getTypeTerm();
+    cft.sourceTerm = getSourceTerm();
 	cft.annotation = getAnnotation();
 	cft.strand = getStrand();
 	cft.componentSequenceName = getComponentSequenceName();
@@ -156,6 +159,10 @@ class DistComponentFeature
     public String getSource() {
 	return source;
     }
+    
+    public Term getSourceTerm() {
+        return OntoTools.ANY;
+    }
 
     public void setSource(String source)
     throws ChangeVetoException {
@@ -164,9 +171,20 @@ class DistComponentFeature
         "Can't change source as it is immutable"
       );
     }
+    
+    public void setSourceTerm(Term source)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        "Can't change source as it is immutable"
+      );
+    }
 
     public String getType() {
 	return type;
+    }
+    
+    public Term getTypeTerm() {
+        return OntoTools.ANY;
     }
 
     public void setType(String type)
@@ -176,6 +194,14 @@ class DistComponentFeature
         "Can't change type as it is immutable"
       );
     }
+    
+    public void setTypeTerm(Term type)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        "Can't change type as it is immutable"
+      );
+    }
+
 
     public Annotation getAnnotation() {
 	return annotation;

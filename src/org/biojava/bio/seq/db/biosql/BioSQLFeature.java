@@ -30,6 +30,7 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
+import org.biojava.bio.ontology.*;
 
 /**
  * @author Thomas Down
@@ -109,6 +110,16 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     public String getType() {
 	return type;
     }
+    
+    public Term getTypeTerm() {
+        return OntoTools.ANY;
+    }
+    
+    public void setTypeTerm(Term source) 
+        throws ChangeVetoException
+    {
+        throw new ChangeVetoException("FIXME");
+    }
 
     public void setSource(String s)
         throws ChangeVetoException
@@ -129,6 +140,16 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
 
     public String getSource() {
 	return source;
+    }
+    
+    public Term getSourceTerm() {
+        return OntoTools.ANY;
+    }
+    
+    public void setSourceTerm(Term source) 
+        throws ChangeVetoException
+    {
+        throw new ChangeVetoException("FIXME");
     }
 
     public void setLocation(Location l)
