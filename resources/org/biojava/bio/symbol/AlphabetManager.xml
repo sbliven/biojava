@@ -11,21 +11,17 @@
   <!ELEMENT long (#PCDATA)>
   <!ELEMENT description (#PCDATA)>
 
-  <!ELEMENT alphabet (name, description, (symbol|symbolref)*, tokenizer*)>
+  <!ELEMENT ambiguity (symbol, symbolref*)>
+
+  <!ELEMENT alphabet (description?, (symbol|symbolref)*, ambiguity*)>
+  <!ATTLIST alphabet
+    name ID #IMPLIED
+    parent IDREF #IMPLIED>
+    
   <!ELEMENT name (#PCDATA)>
   <!ELEMENT symbolref EMPTY>
   <!ATTLIST symbolref
     name	IDREF	#REQUIRED>
-
-  <!ELEMENT tokenizer (map)*>
-  <!ATTLIST tokenizer
-    name	CDATA #REQUIRED
-    tokenLength	CDATA #IMPLIED>
-
-  <!ELEMENT map EMPTY>
-  <!ATTLIST map
-    token	CDATA #REQUIRED
-    symbol	IDREF #REQUIRED>
 ]>
 
 <alphabetManager>
@@ -54,223 +50,272 @@
     <long>uracyl</long>
     <description>pairs with A, replacing T in RNA</description>
   </symbol>
-  <symbol name="r">
-    <short>r</short>
-    <long>ag</long>
-    <description>A or G</description>
-  </symbol>
-  <symbol name="y">
-    <short>y</short>
-    <long>ct</long>
-    <description>C or T</description>
-  </symbol>
-  <symbol name="m">
-    <short>m</short>
-    <long>ac</long>
-    <description>A or C</description>
-  </symbol>
-  <symbol name="k">
-    <short>k</short>
-    <long>GT</long>
-    <description>G or T</description>
-  </symbol>
-  <symbol name="s">
-    <short>s</short>
-    <long>gc</long>
-    <description>G or C</description>
-  </symbol>
-  <symbol name="w">
-    <short>w</short>
-    <long>at</long>
-    <description>A or T</description>
-  </symbol>
-  <symbol name="h">
-    <short>h</short>
-    <long>act</long>
-    <description>Not G</description>
-  </symbol>
-  <symbol name="b">
-    <short>b</short>
-    <long>gtc</long>
-    <description>Not A</description>
-  </symbol>
-  <symbol name="v">
-    <short>v</short>
-    <long>gac</long>
-    <description>Not T</description>
-  </symbol>
-  <symbol name="d">
-    <short>d</short>
-    <long>gat</long>
-    <description>Not C</description>
-  </symbol>
-  <symbol name="n">
-    <short>n</short>
-    <long>agct</long>
-    <description>A, G, C or T</description>
-  </symbol>
-  <symbol name="gap">
-    <short>-</short>
-    <long>gap</long>
-    <description>There is a gap here</description>
-  </symbol>
-  <symbol name="X">
-    <short>X</short>
-    <long>UNK</long>
-    <description>Unknown amino-acid</description>
-  </symbol>
-  <symbol name="termination">
-    <short>*</short>
-    <long>TER</long>
-    <description>Termination signal during translation</description>
-  </symbol>
-  
-  <alphabet>
-    <name>DNA</name>
+
+  <alphabet name="DNA">
     <description>Deoxy-Ribose Nucleic Acid. The stuff of life.</description>
     <symbolref name="adenine"/>
     <symbolref name="guanine"/>
     <symbolref name="cytosine"/>
     <symbolref name="thymine"/>
+    <ambiguity>
+      <symbol>
+        <short>r</short>
+        <long>ag</long>
+      </symbol>
+      <symbolref name="adenine"/>
+      <symbolref name="guanine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>y</short>
+        <long>ct</long>
+      </symbol>
+      <symbolref name="cytosine"/>
+      <symbolref name="thymine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>m</short>
+        <long>ac</long>
+      </symbol>
+      <symbolref name="adenine"/>
+      <symbolref name="cytosine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>k</short>
+        <long>GT</long>
+      </symbol>
+      <symbolref name="guanine"/>
+      <symbolref name="thymine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>s</short>
+        <long>gc</long>
+      </symbol>
+      <symbolref name="guanine"/>
+      <symbolref name="cytosine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>w</short>
+        <long>at</long>
+      </symbol>
+      <symbolref name="adenine"/>
+      <symbolref name="thymine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>h</short>
+        <long>act</long>
+      </symbol>
+      <symbolref name="adenine"/>
+      <symbolref name="cytosine"/>
+      <symbolref name="thymine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>b</short>
+        <long>gtc</long>
+      </symbol>
+      <symbolref name="guanine"/>
+      <symbolref name="cytosine"/>
+      <symbolref name="thymine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>v</short>
+        <long>gac</long>
+      </symbol>
+      <symbolref name="guanine"/>
+      <symbolref name="adenine"/>
+      <symbolref name="cytosine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>d</short>
+        <long>gat</long>
+      </symbol>
+      <symbolref name="guanine"/>
+      <symbolref name="adenine"/>
+      <symbolref name="thymine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>n</short>
+        <long>agct</long>
+      </symbol>
+      <symbolref name="guanine"/>
+      <symbolref name="adenine"/>
+      <symbolref name="cytosine"/>
+      <symbolref name="thymine"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>-</short>
+        <long>gap</long>
+      </symbol>
+    </ambiguity>
   </alphabet>
-  <alphabet>
-    <name>DNA-N</name>
-    <description>Deoxy-Ribose Nucleic Acid with N character.</description>
-    <symbolref name="adenine"/>
-    <symbolref name="guanine"/>
-    <symbolref name="cytosine"/>
-    <symbolref name="thymine"/>
-    <symbolref name="n"/>
-  </alphabet>
-  <alphabet>
-    <name>DNA-AMBIGUITY</name>
-    <description>Deoxy-Ribose Nucleic Acid with ambiguitiy codes.</description>
-    <symbolref name="adenine"/>
-    <symbolref name="guanine"/>
-    <symbolref name="cytosine"/>
-    <symbolref name="thymine"/>
-    <symbolref name="r"/>
-    <symbolref name="y"/>
-    <symbolref name="m"/>
-    <symbolref name="k"/>
-    <symbolref name="s"/>
-    <symbolref name="w"/>
-    <symbolref name="h"/>
-    <symbolref name="b"/>
-    <symbolref name="v"/>
-    <symbolref name="d"/>
-    <symbolref name="n"/>
-    <symbolref name="gap"/>
-  </alphabet>
-  <alphabet>
-    <name>RNA</name>
+  
+  <alphabet name="RNA">
     <description>Ribose Nucleic Acid. Intermediate between genomic DNA and protein.</description>
     <symbolref name="adenine"/>
     <symbolref name="guanine"/>
     <symbolref name="cytosine"/>
     <symbolref name="uracil"/>
   </alphabet>
-  <alphabet>
-    <name>PROTEIN</name>
+  <alphabet name="PROTEIN">
     <description>Unmodified Amino-acids commonly found in proteins</description>
-    <symbol>
+    <symbol name="A">
       <short>A</short>
       <long>ALA</long>
     </symbol>
   
-    <symbol>
+    <symbol name="R">
       <short>R</short>
       <long>ARG</long>
     </symbol>
   
-    <symbol>
+    <symbol name="N">
       <short>N</short>
       <long>ASN</long>
     </symbol>
   
-    <symbol>
+    <symbol name="D">
       <short>D</short>
       <long>ASP</long>
     </symbol>
   
-    <symbol>
+    <symbol name="C">
       <short>C</short>
       <long>CYS</long>
     </symbol>
   
-    <symbol>
+    <symbol name="Q">
       <short>Q</short>
       <long>GLN</long>
     </symbol>
   
-    <symbol>
+    <symbol name="E">
       <short>E</short>
       <long>GLU</long>
     </symbol>
 
-    <symbol>
+    <symbol name="G">
       <short>G</short>
       <long>GLY</long>
     </symbol>
   
-    <symbol>
+    <symbol name="H">
       <short>H</short>
       <long>HIS</long>
     </symbol>
   
-    <symbol>
+    <symbol name="I">
       <short>I</short>
       <long>ILE</long>
     </symbol>
   
-    <symbol>
+    <symbol name="L">
       <short>L</short>
       <long>LEU</long>
     </symbol>
   
-    <symbol>
+    <symbol name="K">
       <short>K</short>
       <long>LYS</long>
     </symbol>
   
-    <symbol>
+    <symbol name="M">
       <short>M</short>
       <long>MET</long>
     </symbol>
   
-    <symbol>
+    <symbol name="F">
       <short>F</short>
       <long>PHE</long>
     </symbol>
   
-    <symbol>
+    <symbol name="P">
       <short>P</short>
       <long>PRO</long>
     </symbol>
   
-    <symbol>
+    <symbol name="S">
       <short>S</short>
       <long>SER</long>
     </symbol>
   
-    <symbol>
+    <symbol name="T">
       <short>T</short>
       <long>THR</long>
     </symbol>
   
-    <symbol>
+    <symbol name="W">
       <short>W</short>
       <long>TRP</long>
     </symbol>
   
-    <symbol>
+    <symbol name="Y">
       <short>Y</short>
       <long>TYR</long>
     </symbol>
   
-    <symbol>
+    <symbol name="V">
       <short>V</short>
       <long>VAL</long>
+    </symbol>
+    
+    <ambiguity>
+      <symbol>
+        <short>X</short>
+        <long>UNK</long>
+      </symbol>
+      <symbolref name="A"/>
+      <symbolref name="R"/>
+      <symbolref name="N"/>
+      <symbolref name="D"/>
+      <symbolref name="C"/>
+      <symbolref name="Q"/>
+      <symbolref name="E"/>
+      <symbolref name="G"/>
+      <symbolref name="H"/>
+      <symbolref name="I"/>
+      <symbolref name="L"/>
+      <symbolref name="K"/>
+      <symbolref name="M"/>
+      <symbolref name="F"/>
+      <symbolref name="P"/>
+      <symbolref name="S"/>
+      <symbolref name="T"/>
+      <symbolref name="W"/>
+      <symbolref name="Y"/>
+      <symbolref name="V"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>B</short>
+        <long>ASX</long>
+      </symbol>
+      <symbolref name="D"/>
+      <symbolref name="N"/>
+    </ambiguity>
+    <ambiguity>
+      <symbol>
+        <short>Z</short>
+        <long>GLZ</long>
+      </symbol>
+      <symbolref name="E"/>
+      <symbolref name="Q"/>
+    </ambiguity>
+  </alphabet>
+  <alphabet name="TERM" parent="PROTEIN">
+    <symbol name="termination">
+    <short>*</short>
+      <long>TER</long>
+      <description>Termination signal during translation</description>
     </symbol>
   </alphabet>
 </alphabetManager>
