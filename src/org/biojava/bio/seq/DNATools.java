@@ -34,6 +34,7 @@ import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.dist.PairDistribution;
 import org.biojava.bio.dist.SimpleDistribution;
+import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.seq.impl.SimpleSequenceFactory;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.seq.io.ParseException;
@@ -441,8 +442,11 @@ public final class DNATools {
    * @param seq Sequence to be searched and subsequently annotated.
    * @param ft Feature template to use when creating features.  When null, a Small Annotation will be created.
    * @param bothStrands Are both strands to be matched?
+   * @param range Range to be searched.  If null, whole sequence will be searched.  Features that merely overlap
+   *            the range are rejected.
    */
-  public static void match(PatternSearch.Pattern pattern, Sequence seq, StrandedFeature.Template ft, boolean bothStrands)
+  public static void match(PatternSearch.Pattern pattern, Sequence seq, 
+    StrandedFeature.Template ft, RangeLocation range, boolean bothStrands)
     throws IllegalAlphabetException, ChangeVetoException, BioException
   {
     if (ft == null) {
@@ -462,10 +466,22 @@ public final class DNATools {
     ft.annotation.setProperty("patternName", pattern.getLabel());
     ft.strand = StrandedFeature.POSITIVE;
 
-    PatternSearch.match(pattern, seq, ft);
+    if (range == null) {
+      // whole sequence search
+      PatternSearch.match(pattern, seq, ft);
 
-    if (bothStrands) {
+      if (bothStrands) {
         PatternSearch.match(pattern, SequenceTools.reverseComplement(seq), ft);
+      }
+    }
+    else {
+      // partial sequence search
+      PatternSearch.match(pattern, seq, ft, range);
+
+      if (bothStrands) {
+        PatternSearch.match(pattern, SequenceTools.reverseComplement(seq), ft, 
+          new RangeLocation(seq.length() + 1 - range.getMax(), seq.length() + 1 - range.getMin()));
+      }
     }
   }
 
@@ -474,15 +490,17 @@ public final class DNATools {
    * @param patternAsString A String specifying the DNA search pattern.
    * @param seq Sequence to be searched and subsequently annotated.
    * @param bothStrands Are both strands to be matched?
+   * @param range Range to be searched.  If null, whole sequence will be searched.  Features that merely overlap
+   *            the range are rejected.
    */
-  public static void match(String patternAsString, Sequence seq, boolean bothStrands)
+  public static void match(String patternAsString, Sequence seq, boolean bothStrands, RangeLocation range)
     throws IllegalAlphabetException, ChangeVetoException, ParseException, BioException
   {
     // create a Pattern
     PatternSearch.Pattern pattern = PatternMaker.parsePattern(patternAsString, getDNA());
     pattern.setLabel(patternAsString);
 
-    match(pattern, seq, null, bothStrands);
+    match(pattern, seq, null, null, bothStrands);
   }
 }
 
