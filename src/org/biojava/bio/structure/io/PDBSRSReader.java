@@ -134,8 +134,9 @@ public class PDBSRSReader extends PDBFileReader {
 	
     }
 
-    /** open filename (does not support compressed files!) and returns
-     * a PDBStructure object 
+    /** open filename and returns
+     * a PDBStructure object. 
+     * Overrides PDBFileReader.getStructure.
      */
     public synchronized Structure getStructure(String filename) 
 	throws IOException

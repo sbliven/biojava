@@ -27,17 +27,20 @@ package org.biojava.bio.structure.io;
 
 
 /**
- * @author andreas
- *
  * interface StructureIOFile extends the StructureIO interface
  * and adds a few File specific methods.
+ * @author Andreas Prlic
  */
 public interface StructureIOFile extends StructureIO {
     
-    /* set path to file / connection string to db */
+    /** set path to file / connection string to db.
+     * @param path  a String specifying the path value
+     */
     public void setPath(String path) ;
 
-    /* add a known File extension */
+    /** add a known File extension.
+     * @param ext  a String ...
+     */
     public void addExtension(String ext);
     
 }

@@ -37,6 +37,8 @@ import java.io.*;
 /**
  * A DAS client that connects to a DAS structure service and
  * returns a Biojava structure class.
+ * @author Andreas Prlic
+ * @since 1.4
  */
 public class DASStructureClient implements StructureIO { 
 
@@ -44,10 +46,20 @@ public class DASStructureClient implements StructureIO {
     String serverurl             ;
     StructureImpl structure      ;
     
+    /**
+     * Constructs a DASStructureClient object.
+     */
+
     public DASStructureClient() {
 	pdb_code = null ;
 	serverurl = "http://127.0.0.1:8080/dazzle/mystruc/structure?query=";
     }
+
+    /**
+     * Constructs a DASStructureClient object.
+     *
+     * @param url  a String ...
+     */
     public DASStructureClient(String url) {
 	pdb_code = null ;
 	serverurl = url;
@@ -55,20 +67,33 @@ public class DASStructureClient implements StructureIO {
 
     
 
-    /* the interfaced procedures: */
+    // the interfaced procedures: //
     
-    /** set the PDB code of a structure
+    /** 
+     * set the PDB code of a structure.
+     * @see #getId
      */
-    public void setId(String id) {pdb_code = id ;   }
+    public void setId(String id) {
+	pdb_code = id ;   
+    }
 
-    /** get the PDB code of a structure
+    /** 
+     * get the PDB code of a structure.
+     *
+     * @return a String representing the id value
+     * @see #setId
      */
-    public String getId() {return pdb_code ;  }
+    public String getId() {
+	return pdb_code ;  
+    }
     
 
-    /** set the pdb_code (@see setId)
-     * connect to a DAS-structure service and retreive data
-     * return a Structure class       
+    /** 
+     * Connect to a DAS-structure service and retreive data.     
+     *
+     * @param pdb_code  a String, representing a PDB code e.g. 5pti
+     * @return a Structure object
+     * @throws IOException ...     
      */
     public Structure getStructure(String pdb_code) 
 	throws IOException
@@ -79,9 +104,11 @@ public class DASStructureClient implements StructureIO {
 
 
     /** 
-     * if pdb code is set (@see setId) 
-     * connect to a DAS-structure service and retreive data
-     * return a Structure class
+     * if pdb code is set (setId):
+     * connect to a DAS-structure service and retreive data.  
+     *
+     * @return the Structure object
+     * @throws IOException ...
      */
  
     public Structure getStructure()

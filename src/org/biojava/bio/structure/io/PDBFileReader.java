@@ -103,6 +103,13 @@ public class PDBFileReader implements StructureIOFile {
     public void setId(String id) {
 	pdb_code = id ;
     }
+
+    /**
+     * Returns the id value (PDB code).
+     * @see #setId
+     * @return a String representing the PDB code
+     */
+    
     public String getId() {
 	return pdb_code ;
     }
@@ -112,6 +119,12 @@ public class PDBFileReader implements StructureIOFile {
 	path = p ;
     }
 
+    /**
+     * Returns the path value.
+     * @return a String representing the path value
+     * @see #setPath
+     *
+     */
     public String getPath() {
 	return path ;
     }
@@ -127,7 +140,7 @@ public class PDBFileReader implements StructureIOFile {
     }
 
 
-    /* initialize the header */
+    /** initialize the header. */
     private HashMap init_header(){
 
 
@@ -145,6 +158,11 @@ public class PDBFileReader implements StructureIOFile {
 	return header ;
     }
 
+
+    /**
+     * Returns a time stamp.
+     * @return a String representing the time stamp value
+     */
     protected String getTimeStamp(){
 
 	Calendar cal = Calendar.getInstance() ;
@@ -775,6 +793,11 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 
     /** parse a PDB file and return a datastructure implementing
      * PDBStructure interface.
+     *
+     * @param inStream  an InputStream object
+     * @return a Structure object
+     * @throws IOException ...
+     * @throws PDBParseException ...
      */
     public Structure parsePDBFile(InputStream inStream) 
 	throws IOException, PDBParseException
@@ -795,7 +818,15 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 	
     }
 
-
+    /** parse a PDB file and return a datastructure implementing
+     * PDBStructure interface.
+     *
+     * @param buf  a BufferedReader object
+     * @return the Structure object
+     * @throws IOException ...
+     * @throws PDBParseException ...
+     */
+    
     public Structure parsePDBFile(BufferedReader buf) 
 	throws IOException, PDBParseException 
     {
@@ -882,6 +913,9 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 
     /** load a structure from local file system and return a PDBStructure object 
      * requires pdb_code to be set earlier...
+     *
+     * @return the Structure object
+     * @throws IOException ...
      */
     public Structure getStructure() 
 	throws IOException
@@ -903,8 +937,11 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 
     }
 
-    /** open filename (does not support compressed files!) and returns
-     * a PDBStructure object 
+    /** open filename  and returns
+     * a PDBStructure object .
+     * @param filename  a String
+     * @return the Structure object
+     * @throws IOException ...
      */
     public Structure getStructure(String filename) 
 	throws IOException

@@ -28,22 +28,38 @@ package org.biojava.bio.structure.io;
 import org.biojava.bio.structure.Structure;
 import java.io.IOException ;
 
-
+/**
+ * Defines the interface how to access Structure (- PDB file) input,output readers, writers.
+ *
+ * @author Andreas Prlic
+ * @version %I% %G%
+ */
 public interface StructureIO {
     
-    /* set PDB id */
+    /** set PDB id. 
+     * @param id  a String specifying the id value (PDB code)
+     * @see #getId
+     */
     public void setId(String id) ;
 
-    /* get PDB id */
+    /** get PDB id. 
+     * @return PDB code
+     * @see #setId
+     */
     public String getId() ;
 
-    /* parse the file/ connect to DB, etc. 
+    /** parse the file/ connect to DB, etc. 
      * requires id to be set before ...
+     * @return a Structure object
+     * @throws IOException ...
      */
     public Structure getStructure() throws IOException;
 
-    /** open filename (does not support compressed files, yet...) and returns
-     * a PDBStructure object 
+    /** open filename and returns
+     * a Structure object.
+     * @param filename  a String
+     * @return a Structure object
+     * @throws IOException ...
      */
     public Structure getStructure(String filename) throws IOException ;
     

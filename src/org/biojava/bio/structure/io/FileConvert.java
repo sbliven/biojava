@@ -31,7 +31,7 @@ import java.text.DecimalFormat;
 import org.biojava.utils.xml.*;
 import java.io.IOException ;
 
-/** methods to convert a structure object into different file formats
+/** Methods to convert a structure object into different file formats.
  * @author Andreas Prlic
  * @since 1.4
  */
@@ -39,7 +39,11 @@ public class FileConvert {
     Structure structure ;
 
     //static String DEFAULTCHAIN = "_" ;
-
+    /**
+     * Constructs a FileConvert object.
+     *
+     * @param struc  a Structure object
+     */
     public FileConvert(Structure struc) {
 	structure = struc ;
     }
@@ -65,7 +69,8 @@ public class FileConvert {
     }
 
 
-    /** convert a structure into a PDB file
+    /** Convert a structure into a PDB file.
+     * @return a String representing a PDB file.
      */
     public String toPDB() {
 	
@@ -159,6 +164,8 @@ public class FileConvert {
     }
 
     /** convert a protein Structure to a DAS Structure XML response .
+     * @param xw  a XMLWriter object
+     * @throws IOException ...
      *
      */
     public void toDASStructure(XMLWriter xw)
