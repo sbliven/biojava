@@ -31,6 +31,13 @@ import org.biojava.bio.*;
  * <code>residueAt</code> methods.  Iterators and sublists are
  * handled for you automatically.
  *
+ * <P>
+ * This class makes many custom ResidueList implementations
+ * very quick to implement.
+ * See org.biojava.bio.seq.tools.ComplementResidueList
+ * for an example of this.
+ * </P>
+ *
  * @author Thomas Down
  */
 
@@ -87,7 +94,7 @@ public abstract class AbstractResidueList implements ResidueList {
 	}
 
 	public Alphabet alphabet() {
-	    return ComplementResidueList.this.alphabet();
+	    return AbstractResidueList.this.alphabet();
 	}
 
 	public Iterator iterator() {
@@ -99,7 +106,7 @@ public abstract class AbstractResidueList implements ResidueList {
 	}
 
 	public Residue residueAt(int pos) {
-	    return ComplementResidueList.this.residueAt(pos + start - 1);
+	    return AbstractResidueList.this.residueAt(pos + start - 1);
 	}
 
 	public ResidueList subList(int sstart, int send) {
