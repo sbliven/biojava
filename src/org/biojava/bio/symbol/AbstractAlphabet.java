@@ -46,7 +46,7 @@ import org.biojava.bio.seq.io.*;
  * @author Matthew Pocock
  * @since 1.1
  */
-public abstract class AbstractAlphabet implements FiniteAlphabet {
+public abstract class AbstractAlphabet implements FiniteAlphabet, Serializable {
   private final Map tokenizationsByName;
   private final Map ambCache;
   private ChangeSupport changeSupport;

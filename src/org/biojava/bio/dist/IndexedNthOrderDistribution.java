@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.*;
 
 import org.biojava.utils.*;
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -18,6 +19,7 @@ extends AbstractOrderNDistribution implements Serializable{
   private transient Distribution[] dists;
   private transient AlphabetIndex index;
   private static final long serialVersionUID = 3847329;
+  private DistributionFactory df;
 
 
   IndexedNthOrderDistribution(Alphabet alpha, DistributionFactory df)
@@ -27,7 +29,7 @@ extends AbstractOrderNDistribution implements Serializable{
     FiniteAlphabet conditioning = (FiniteAlphabet) getConditioningAlphabet();
     index = AlphabetManager.getAlphabetIndex(conditioning);
     index.addChangeListener(ChangeListener.ALWAYS_VETO, AlphabetIndex.INDEX);
-
+    this.df = df;
     // Throws if alpha isn't indexable
     dists = new Distribution[conditioning.size()];
 
@@ -88,14 +90,20 @@ extends AbstractOrderNDistribution implements Serializable{
     return Arrays.asList(dists);
   }
 
-  private void writeObject(ObjectOutput out)
-  throws IOException {
-    for(int i = 0; i < dists.length; i++) {
-      out.writeObject(index.symbolForIndex(i));
-      out.writeObject(dists[i]);
+
+  private void writeObject(ObjectOutputStream stream)throws IOException{
+    int size = ((FiniteAlphabet)getConditioningAlphabet()).size();
+    symbolIndices = new HashMap(size);
+    for(int i = 0; i < size; i++){
+      
+        symbolIndices.put(index.symbolForIndex(i).getName(),
+        dists[i]);
+ 
     }
+    stream.defaultWriteObject();
   }
-  
+
+
   private void readObject(ObjectInputStream in)
   throws IOException, ClassNotFoundException {
 
@@ -105,13 +113,17 @@ extends AbstractOrderNDistribution implements Serializable{
     index.addChangeListener(ChangeListener.ALWAYS_VETO, AlphabetIndex.INDEX);
     int len = index.getAlphabet().size();
     dists = new Distribution[len];
-    for(int i  = 0; i < len; i++) {
-      Symbol s = (Symbol) in.readObject();
-      try {
-        dists[index.indexForSymbol(s)] = (Distribution) in.readObject();
-      } catch (IllegalSymbolException ise) {
-        throw new IOException("Found unexpected symbol: " + ise.getMessage());
+    try{
+      for(int i  = 0; i < len; i++) {
+	  Symbol s = index.symbolForIndex(i);   
+          Distribution d  = (Distribution)(symbolIndices.get(s));
+	  if(d == null) d = df.createDistribution(getConditionedAlphabet());
+	  dists[index.indexForSymbol(s)] = d;
       }
+    }catch(IllegalSymbolException ise){
+	throw new BioError(ise);
+    }catch(IllegalAlphabetException iae){
+	throw new BioError(iae);
     }
   }
 }

@@ -49,10 +49,9 @@ import org.biojava.bio.symbol.*;
  * @author Mark Schreiber (serialization support)
  */
 
-public abstract class AbstractDistribution implements Distribution{
+public abstract class AbstractDistribution implements Distribution, Serializable{
   protected transient ChangeSupport changeSupport = null;
   protected transient Distribution.NullModelForwarder nullModelForwarder = null;
-
   protected Map symbolIndices = null;//used for serialization
 
   private void writeObject(ObjectOutputStream stream)throws IOException{
@@ -69,8 +68,6 @@ public abstract class AbstractDistribution implements Distribution{
     }
     stream.defaultWriteObject();
   }
-
-
 
   protected void generateChangeSupport(ChangeType ct) {
     if(changeSupport == null) {
