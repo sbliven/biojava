@@ -3,12 +3,12 @@ package org.biojava.bio.program.tagvalue;
 import org.biojava.utils.ParserException;
 
 public interface TagValueListener {
-  public void startRecord()
+  public void startTag(Object tag)
   throws ParserException;
   
-  public void endRecord()
+  public void endTag()
   throws ParserException;
   
-  public void tagValue(Object tag, Object value)
+  public void value(TagValueContext ctxt, Object value)
   throws ParserException;
 }

@@ -2,7 +2,10 @@ package org.biojava.bio.program.tagvalue;
 
 import org.biojava.utils.ParserException;
 
-public abstract class TagValueWrapper implements TagValueListener {
+public abstract class TagValueWrapper
+  implements
+    TagValueListener
+{
   private TagValueListener delegate;
   
   public TagValueWrapper(TagValueListener delegate) {
@@ -13,19 +16,19 @@ public abstract class TagValueWrapper implements TagValueListener {
     return delegate;
   }
   
-  public void startRecord()
+  public void startTag(Object tag)
   throws ParserException {
-    delegate.startRecord();
+    delegate.startTag(tag);
   }
   
-  public void endRecord()
+  public void endTag()
   throws ParserException {
-    delegate.endRecord();
+    delegate.endTag();
   }
   
-  public void tagValue(Object tag, Object value)
+  public void value(TagValueContext ctxt, Object value)
   throws ParserException {
-    delegate.tagValue(tag, value);
+    delegate.value(ctxt, value);
   }
 }
 

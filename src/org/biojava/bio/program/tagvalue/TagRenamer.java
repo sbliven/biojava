@@ -21,14 +21,14 @@ public class TagRenamer extends TagValueWrapper {
     return tags.get(oldTag);
   }
   
-  public void tagValue(Object tag, Object value)
+  public void startTag(Object tag)
   throws ParserException {
     Object newTag = getNewTag(tag);
     if(newTag != null) {
       tag = newTag;
     }
     
-    super.tagValue(tag, value);
+    super.startTag(tag);
   }
 }
 

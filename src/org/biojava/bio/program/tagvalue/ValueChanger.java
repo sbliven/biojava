@@ -7,9 +7,15 @@ import java.util.Iterator;
 import org.biojava.utils.ParserException;
 import org.biojava.utils.SmallMap;
 
-public class ValueChanger extends TagValueWrapper {
-  private Map changers;
-  private Map splitters;
+public class ValueChanger
+  extends
+    TagValueWrapper
+{
+  private final Map changers;
+  private final Map splitters;
+  
+  private Changer changer;
+  private Splitter splitter;
   
   public ValueChanger(TagValueListener delegate) {
     super(delegate);
@@ -33,21 +39,27 @@ public class ValueChanger extends TagValueWrapper {
     return (Splitter) splitters.get(tag);
   }
   
-  public void tagValue(Object tag, Object value)
+  public void startTag(Object tag)
   throws ParserException {
-    Changer changer = getChanger(tag);
-    Splitter splitter = getSplitter(tag);
-    if(changer != null) {
+    this.changer = getChanger(tag);
+    this.splitter = getSplitter(tag);
+    
+    super.startTag(tag);
+  }
+  
+  public void value(TagValueContext ctxt, Object value)
+  throws ParserException {
+    if(this.changer != null) {
       value = changer.change(value);
-      super.tagValue(tag, value);
-    } else if(splitter != null) {
+      super.value(ctxt, value);
+    } else if(this.splitter != null) {
       List values = splitter.split(value);
       for(Iterator i = values.iterator(); i.hasNext(); ) {
         Object v = i.next();
-        super.tagValue(tag, v);
+        super.value(ctxt, v);
       }
     } else {
-      super.tagValue(tag, value);
+      super.value(ctxt, value);
     }
   }
   
