@@ -66,6 +66,7 @@ public class SimpleSeqSimilaritySearchHit extends AbstractChangeable
     implements SeqSimilaritySearchHit
 {
     protected transient AnnotationForwarder annotationForwarder;
+
     private double     score;
     private double     pValue;
     private double     eValue;
@@ -153,6 +154,9 @@ public class SimpleSeqSimilaritySearchHit extends AbstractChangeable
             throw new IllegalArgumentException("subHits was null");
         }
 
+        // Lock the annotation by vetoing all changes
+        annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+
         this.score         = score;
         this.eValue        = eValue;
         this.pValue        = pValue;
@@ -165,9 +169,6 @@ public class SimpleSeqSimilaritySearchHit extends AbstractChangeable
         this.subjectID     = subjectID;
         this.annotation    = annotation;
         this.subHits       = Collections.unmodifiableList(subHits);
-
-        // Lock the annotation by vetoing all changes
-        this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
 
         hcCalc = false;
     }

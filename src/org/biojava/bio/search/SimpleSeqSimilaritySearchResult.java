@@ -28,8 +28,8 @@ import java.util.Map;
 import org.biojava.bio.Annotatable.AnnotationForwarder;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.*;
 
 /**
@@ -55,7 +55,7 @@ public class SimpleSeqSimilaritySearchResult extends AbstractChangeable
 {
     protected transient AnnotationForwarder annotationForwarder;
 
-    private SymbolList querySequence;
+    private Sequence   querySequence;
     private SequenceDB sequenceDB;
     private Map        searchParameters;
     private Annotation annotation;
@@ -69,13 +69,13 @@ public class SimpleSeqSimilaritySearchResult extends AbstractChangeable
     /**
      * Creates a new <code>SimpleSeqSimilaritySearchResult</code>.
      *
-     * @param querySequence a <code>SymbolList</code>.
+     * @param querySequence a <code>Sequence</code>.
      * @param sequenceDB a <code>SequenceDB</code>.
      * @param searchParameters a <code>Map</code>.
      * @param annotation an <code>Annotation</code>.
      * @param hits a <code>List</code>.
      */
-    public SimpleSeqSimilaritySearchResult(SymbolList querySequence,
+    public SimpleSeqSimilaritySearchResult(Sequence   querySequence,
                                            SequenceDB sequenceDB,
                                            Map        searchParameters,
                                            List       hits,
@@ -124,7 +124,7 @@ public class SimpleSeqSimilaritySearchResult extends AbstractChangeable
         hcCalc = false;
     }
 
-    public SymbolList getQuerySequence()
+    public Sequence getQuerySequence()
     {
         return querySequence;
     }

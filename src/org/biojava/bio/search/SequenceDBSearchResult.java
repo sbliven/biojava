@@ -23,8 +23,8 @@ package org.biojava.bio.search;
 
 import java.util.*;
 
-
 import org.biojava.bio.*;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
@@ -41,6 +41,8 @@ import org.biojava.utils.*;
  *
  * @author Keith James
  * @since 1.1
+ * @deprecated SimpleSeqSimilaritySearchResult has been made
+ * Annotatable and is now functionally identical.
  * @see AbstractChangeable
  * @see SeqSimilaritySearchResult
  * @see Annotatable
@@ -50,7 +52,7 @@ public class SequenceDBSearchResult extends AbstractChangeable
 {
     protected transient AnnotationForwarder annotationForwarder;
 
-    private SymbolList querySequence;
+    private Sequence   querySequence;
     private SequenceDB sequenceDB;
     private Map        searchParameters;
     private Annotation annotation;
@@ -64,13 +66,13 @@ public class SequenceDBSearchResult extends AbstractChangeable
     /**
      * Creates a new <code>SequenceDBSearchResult</code>.
      *
-     * @param querySequence a <code>SymbolList</code>.
+     * @param querySequence a <code>Sequence</code>.
      * @param sequenceDB a <code>SequenceDB</code>.
      * @param searchParameters a <code>Map</code>.
      * @param annotation an <code>Annotation</code>.
      * @param hits a <code>List</code>.
      */
-    public SequenceDBSearchResult(SymbolList querySequence,
+    public SequenceDBSearchResult(Sequence   querySequence,
                                   SequenceDB sequenceDB,
                                   Map        searchParameters,
                                   List       hits,
@@ -119,7 +121,7 @@ public class SequenceDBSearchResult extends AbstractChangeable
         hcCalc = false;
     }
 
-    public SymbolList getQuerySequence()
+    public Sequence getQuerySequence()
     {
         return querySequence;
     }

@@ -35,6 +35,8 @@ import org.biojava.utils.*;
  *
  * @author Keith James
  * @since 1.1
+ * @deprecated SimpleSeqSimilaritySearchSubHit has been made
+ * Annotatable and is now functionally identical.
  * @see SeqSimilaritySearchSubHit
  */
 public class SequenceDBSearchSubHit  extends AbstractChangeable

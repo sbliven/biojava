@@ -116,6 +116,12 @@ public class SimpleSeqSimilaritySearchSubHit extends AbstractChangeable
             throw new IllegalArgumentException("annotation was null");
         }
 
+        // Lock alignment by vetoing all changes
+        alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+        // Lock the annotation by vetoing all changes to properties
+        annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+
         this.score         = score;
         this.eValue        = eValue;
         this.pValue        = pValue;
@@ -126,12 +132,7 @@ public class SimpleSeqSimilaritySearchSubHit extends AbstractChangeable
         this.subjectEnd    = subjectEnd;
         this.subjectStrand = subjectStrand;
         this.alignment     = alignment;
-
-        // Lock alignment by vetoing all changes
-        this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
-
-        // Lock the annotation by vetoing all changes to properties
-        annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+        this.annotation    = annotation;
 
         hcCalc = false;
     }

@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.biojava.bio.Annotatable;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Objects of this type represent one particular result of a sequence
@@ -41,10 +41,10 @@ public interface SeqSimilaritySearchResult extends Annotatable
     /**
      * Returns the query sequence which was used to perform the search.
      *
-     * @return the <code>SymbolList</code> object used to search the
+     * @return the <code>Sequence</code> object used to search the
      * <code>SequenceDB</code>. Never returns null.
      */
-    public SymbolList getQuerySequence();
+    public Sequence getQuerySequence();
 
     /**
      * Returns the sequence database against which the search was
