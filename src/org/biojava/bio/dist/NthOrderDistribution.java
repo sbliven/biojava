@@ -155,7 +155,7 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
     });
   }
   
-  private class UniformNullModel extends AbstractDistribution {
+  private class UniformNullModel extends AbstractDistribution implements Serializable {
     private Distribution nullModel = new UniformDistribution((FiniteAlphabet) lastA);
     
     public Alphabet getAlphabet() {
@@ -182,7 +182,7 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
     }
   }
   
-  private class WeigthForwarder extends ChangeAdapter {
+  private class WeigthForwarder extends ChangeAdapter implements Serializable {
     public WeigthForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }
