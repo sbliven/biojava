@@ -18,7 +18,7 @@
  *      http://www.biojava.org/
  *
  */
-
+ 
 package org.biojava.bio.seq;
 
 import java.util.*;
@@ -143,21 +143,13 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
                 throws ChangeVetoException 
             {
                 if (hasListeners()) {
-                        getChangeSupport(FeatureHolder.FEATURES).firePreChangeEvent(new ChangeEvent(this,
-								     FeatureHolder.FEATURES,
-								     e.getChange(),
-								     e.getPrevious(),
-								     e));
+                    getChangeSupport(FeatureHolder.FEATURES).firePreChangeEvent(forwardChangeEvent(e));
                 }
             }
 
             public void postChange(ChangeEvent e) {
                if (hasListeners()) {
-                   getChangeSupport(FeatureHolder.FEATURES).firePostChangeEvent(new ChangeEvent(this,
-								    FeatureHolder.FEATURES,
-								    e.getChange(),
-								    e.getPrevious(),
-                                    e));
+                   getChangeSupport(FeatureHolder.FEATURES).firePostChangeEvent(forwardChangeEvent(e));
                }
             }
         } ;
@@ -416,10 +408,80 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
 	        throw new ChangeVetoException("Can't create features in this projection");
 	    }
         
-        //
-        // Event wiring coming soon --THOMASD
-        //
+    //
+    // Event wiring stuff
+    //    
         
-    public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
+    public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {
+        if (!f.isUnchanging(ct)) {
+            PFChangeForwarder forwarder = (PFChangeForwarder) forwardersByFeature.get(f);
+            if (forwarder == null) {
+                forwarder = new PFChangeForwarder(f);
+                forwardersByFeature.put(f, forwarder);
+                f.addChangeListener(forwarder, ChangeType.UNKNOWN);
+            }
+            forwarder.addChangeListener(cl, ct);
+        }
+    }
+        
+    public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct) {
+        PFChangeForwarder forwarder = (PFChangeForwarder) forwardersByFeature.get(f);
+        if (forwarder != null) {
+            forwarder.removeChangeListener(cl, ct);
+            if (!forwarder.hasListeners()) {
+                forwardersByFeature.remove(f);
+                f.removeChangeListener(forwarder, ChangeType.UNKNOWN);
+            }
+        }
+    }
+    
+    private class PFChangeForwarder extends ChangeSupport implements ChangeListener {
+        private Feature master;
+        
+        public PFChangeForwarder(Feature master) {
+            super(1);
+            this.master = master;
+        }
+        
+        public void preChange(ChangeEvent cev)
+            throws ChangeVetoException
+        {
+            ChangeEvent cev2 = forwardFeatureChangeEvent(master, cev);
+            if (cev2 != null) {
+                firePreChangeEvent(cev2);
+            }
+        }
+        
+        public void postChange(ChangeEvent cev) {
+            ChangeEvent cev2 = forwardFeatureChangeEvent(master, cev);
+            if (cev2 != null) {
+                firePostChangeEvent(cev2);
+            }
+        }
+    }
+        
+    /**
+     * Called internally to generate a forwarded version of a ChangeEvent from a ProjectedFeature
+     */
+        
+    protected ChangeEvent forwardFeatureChangeEvent(Feature f, ChangeEvent cev) {
+        return new ChangeEvent(projectFeature(f),
+                               cev.getType(),
+                               cev.getChange(),
+                               cev.getPrevious(),
+                               cev);
+    }
+    
+    /**
+     * Called internally to generate a forwarded version of a ChangeEvent from our
+     * underlying FeatureHolder
+     */
+        
+    protected ChangeEvent forwardChangeEvent(ChangeEvent cev) {
+        return new ChangeEvent(this,
+                               cev.getType(),
+                               cev.getChange(),
+                               cev.getPrevious(),
+                               cev);
+    }
 }
