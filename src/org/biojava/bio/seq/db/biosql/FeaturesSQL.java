@@ -215,21 +215,21 @@ class FeaturesSQL {
                     " where seqfeature_qualifier_value.seqfeature_id = ?"
             );
            get_annotations.setInt(1, featureID);
-       }
-       rs = get_annotations.executeQuery();
-       while (rs.next()) {
-           Integer fid = new Integer(rs.getInt(1));
-           String key = seqDB.getOntologyTerm(rs.getInt(2));
-           String value = rs.getString(3).trim();
-           Feature.Template templ = (Feature.Template) fmap.get(fid);
-           try {
-               ((BioSQLFeatureAnnotation) templ.annotation).initProperty(key, value);
-           } catch (ChangeVetoException ex) {
-               throw new BioError("Couldn't modify hidden FeatureHolder");
-           }
-       }
-       rs.close();
-       get_annotations.close();
+        }
+        rs = get_annotations.executeQuery();
+        while (rs.next()) {
+            Integer fid = new Integer(rs.getInt(1));
+            String key = seqDB.getOntologyTerm(rs.getInt(2));
+            String value = rs.getString(3).trim();
+            Feature.Template templ = (Feature.Template) fmap.get(fid);
+            try {
+                ((BioSQLFeatureAnnotation) templ.annotation).initProperty(key, value);
+            } catch (ChangeVetoException ex) {
+                throw new BioError("Couldn't modify hidden FeatureHolder");
+            }
+        }
+        rs.close();
+        get_annotations.close();
 
 	// Fetch those crappy location qualifiers first...
 
@@ -270,8 +270,8 @@ class FeaturesSQL {
 	
 	    // Fetch locations
        
-       PreparedStatement get_locations = null;
-       if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
+        PreparedStatement get_locations = null;
+        if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
             get_locations = conn.prepareStatement(
 		            "select location.location_id, " +
                     "       location.seqfeature_id, " +
@@ -283,8 +283,8 @@ class FeaturesSQL {
                     "       seqfeature.bioentry_id = ?"
             );
             get_locations.setInt(1, bioentry_id);
-       } else if (overlappingRegion != null) {
-           get_locations = conn.prepareStatement(
+        } else if (overlappingRegion != null) {
+            get_locations = conn.prepareStatement(
 		           "select location.location_id, " +
                    "       location.seqfeature_id, " +
                    "       location.start_pos, " +
@@ -301,12 +301,12 @@ class FeaturesSQL {
                    "          location.start_pos, " +
                    "          location.end_pos, " +
                    "          location.strand"
-           );
-           get_locations.setInt(1, bioentry_id);
-           get_locations.setInt(2, overlappingRegion.getMin());
-           get_locations.setInt(3, overlappingRegion.getMax());
-       } else if (immediateChildrenOfParent >= 0) {
-           get_locations = conn.prepareStatement(
+            );
+            get_locations.setInt(1, bioentry_id);
+            get_locations.setInt(2, overlappingRegion.getMin());
+            get_locations.setInt(3, overlappingRegion.getMax());
+        } else if (immediateChildrenOfParent >= 0) {
+            get_locations = conn.prepareStatement(
 		           "select location.location_id, " +
                    "       location.seqfeature_id, " +
                    "       location.start_pos, " +
@@ -315,10 +315,10 @@ class FeaturesSQL {
                    "  from location, seqfeature_relationship " +
                    " where location.seqfeature_id = seqfeature_relationship.subject_seqfeature_id and " +
                    "       seqfeature_relationship.object_seqfeature_id = ?"
-           );
-           get_locations.setInt(1, immediateChildrenOfParent);
-       } else if (featureID >= 0) {
-           get_locations = conn.prepareStatement(
+            );
+            get_locations.setInt(1, immediateChildrenOfParent);
+        } else if (featureID >= 0) {
+            get_locations = conn.prepareStatement(
 		            "select location.location_id, " +
                     "       location.seqfeature_id, " +
                     "       location.start_pos, " +
@@ -326,19 +326,19 @@ class FeaturesSQL {
                     "       location.strand " +
                     "  from location " +
                     " where location.seqfeature_id = ?");
-           get_locations.setInt(1, featureID);
-       }
+            get_locations.setInt(1, featureID);
+        }
 
 
-       rs = get_locations.executeQuery();
-       while (rs.next()) {
-           Integer lid = new Integer(rs.getInt(1));
-           Integer fid = new Integer(rs.getInt(2));
-           int start = rs.getInt(3);
-           int end = rs.getInt(4);
-           int istrand = rs.getInt(5);
-	    
-	        StrandedFeature.Strand strand = StrandedFeature.UNKNOWN;
+        rs = get_locations.executeQuery();
+        while (rs.next()) {
+            Integer lid = new Integer(rs.getInt(1));
+            Integer fid = new Integer(rs.getInt(2));
+            int start = rs.getInt(3);
+            int end = rs.getInt(4);
+            int istrand = rs.getInt(5);
+            
+            StrandedFeature.Strand strand = StrandedFeature.UNKNOWN;
             if (istrand > 0) {
                 strand = StrandedFeature.POSITIVE;
             } else if (istrand < 0) {
@@ -352,15 +352,15 @@ class FeaturesSQL {
             } else {
                 templ.strand = strand;
             }
-	    
-	        Location bloc;
+           
+            Location bloc;
             if (start == end) {
                 bloc = new PointLocation(start);
             } else {
                 bloc = new RangeLocation(start, end);
             }
-	    
-	        List locationCrap = (List) qmap.get(lid);
+           
+            List locationCrap = (List) qmap.get(lid);
             if (locationCrap != null) {
                 int min_start = -1;
                 int min_end = -1;
@@ -372,11 +372,11 @@ class FeaturesSQL {
                 boolean unbounded_end = false;
                 boolean isFuzzy = false;
 		
-	    	    for (Iterator i = locationCrap.iterator(); i.hasNext(); ) {
+                for (Iterator i = locationCrap.iterator(); i.hasNext(); ) {
                     LocationQualifierMemento lqm = (LocationQualifierMemento) i.next();
                     String qname = lqm.qualifier_name;
 		    
-	    	        if ("min_start".equals(qname)) {
+                    if ("min_start".equals(qname)) {
                         min_start = lqm.qualifier_int;
                         isFuzzy = true;
                     } else if ("max_start".equals(qname)) {
@@ -417,7 +417,7 @@ class FeaturesSQL {
                         max_end = Integer.MAX_VALUE;
                     }
 		    
-    	    	    if (min_start == -1) {
+                    if (min_start == -1) {
                         min_start = bloc.getMin();
                     }
                     if (max_start == -1) {
@@ -430,25 +430,25 @@ class FeaturesSQL {
                         max_end = bloc.getMax();
                     }
 		    
-	        	    bloc = new FuzzyLocation(min_start,
-		                			     max_end,
-                                         max_start,
-                                         min_end,
-                                         FuzzyLocation.RESOLVE_INNER);
+                    bloc = new FuzzyLocation(min_start,
+                                             max_end,
+                                             max_start,
+                                             min_end,
+                                             FuzzyLocation.RESOLVE_INNER);
                 }
             }
 
             List ll = (List) lmap.get(fid);
             if (ll == null) {
                 ll = new ArrayList();
-               lmap.put(fid, ll);
+                lmap.put(fid, ll);
             }
             ll.add(bloc);
-       }
-       rs.close();
-       get_locations.close();
+        }
+        rs.close();
+        get_locations.close();
 	
-	   // Bind location information to features
+        // Bind location information to features
 	
     	for (Iterator i = fmap.entrySet().iterator(); i.hasNext(); ) {
             Map.Entry me = (Map.Entry) i.next();
@@ -504,7 +504,7 @@ class FeaturesSQL {
                 Integer parent = new Integer(rs.getInt(1));
                 Integer child = new Integer(rs.getInt(2));
 		
-    		    toplevelFeatures.remove(child);
+                toplevelFeatures.remove(child);
                 List cl = (List) featureHierarchy.get(parent);
                 if (cl == null) {
                     cl = new ArrayList();
@@ -544,7 +544,7 @@ class FeaturesSQL {
                 }
             }
             fireFeatureTree(listener, 
-			                fid,
+                            fid,
                             fmap,
                             featureHierarchy,
                             childrenFetched,
@@ -725,16 +725,16 @@ class FeaturesSQL {
 	for (Iterator fi = features.features(); fi.hasNext(); ) {
 	    Feature f = (Feature) fi.next();
 			
-			// Get next rank value for feature type
-			int rank = 0;
-			String fType = f.getType();
-			if (rankType.containsKey(fType)) {
-				rank = ((Integer) rankType.get(fType)).intValue() + 1;
-				rankType.put(fType, new Integer(rank));
-			} else {
-				rankType.put(fType, new Integer(0));
-			}
-			
+            // Get next rank value for feature type
+            int rank = 0;
+            String fType = f.getType();
+            if (rankType.containsKey(fType)) {
+                rank = ((Integer) rankType.get(fType)).intValue() + 1;
+                rankType.put(fType, new Integer(rank));
+            } else {
+                rankType.put(fType, new Integer(0));
+            }
+            
 	    if (! (f instanceof ComponentFeature)) {
 		int id = persistFeature(conn, bioentry_id, f, parent, rank);
 		if (seqDB.isHierarchySupported()) {
@@ -829,7 +829,7 @@ class FeaturesSQL {
 	    add_feature.setInt(1, bioentry_id);
 	    add_feature.setInt(2, seqfeature_key);
 	    add_feature.setInt(3, seqfeature_source);
-			add_feature.setInt(4, typeRank);
+            add_feature.setInt(4, typeRank);
 	    add_feature.executeUpdate();
 	    add_feature.close();
 
@@ -986,53 +986,53 @@ class FeaturesSQL {
 	    remove_old_value.close();
 	}
 
-    if (value != null) {
-        PreparedStatement insert_new;
-        if (seqDB.isSPASupported()) {
-            insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                              "       (seqfeature_id, term_id, rank, value) " +
-                    					      "values (?, intern_ontology_term( ? ), ?, ?)");
-            if (value instanceof Collection) {
-                int cnt = 0;
-                for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+        if (value != null) {
+            PreparedStatement insert_new;
+            if (seqDB.isSPASupported()) {
+                insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
+                                                   "       (seqfeature_id, term_id, rank, value) " +
+                                                   "values (?, intern_ontology_term( ? ), ?, ?)");
+                if (value instanceof Collection) {
+                    int cnt = 0;
+                    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                        insert_new.setInt(1, feature_id);
+                        insert_new.setString(2, keyString);
+                        insert_new.setInt(3, ++cnt);
+                        insert_new.setString(4, i.next().toString());
+                        insert_new.executeUpdate();
+                    }
+                } else {
                     insert_new.setInt(1, feature_id);
                     insert_new.setString(2, keyString);
-                    insert_new.setInt(3, ++cnt);
-                    insert_new.setString(4, i.next().toString());
+                    insert_new.setInt(3, 1);
+                    insert_new.setString(4, value.toString());
                     insert_new.executeUpdate();
                 }
+                insert_new.close();
             } else {
-                insert_new.setInt(1, feature_id);
-                insert_new.setString(2, keyString);
-                insert_new.setInt(3, 1);
-                insert_new.setString(4, value.toString());
-                insert_new.executeUpdate();
-            }
-            insert_new.close();
-        } else {
-            insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                               "       (seqfeature_id, term_id, rank, value) " +
-			  	 	                           "values (?, ?, ?, ?)");
+                insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
+                                                   "       (seqfeature_id, term_id, rank, value) " +
+                                                   "values (?, ?, ?, ?)");
 	        int sfq = seqDB.intern_ontology_term(conn, keyString);
-            if (value instanceof Collection) {
-                int cnt = 0;
-                for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                if (value instanceof Collection) {
+                    int cnt = 0;
+                    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                        insert_new.setInt(1, feature_id);
+                        insert_new.setInt(2, sfq);
+                        insert_new.setInt(3, ++cnt);
+                        insert_new.setString(4, i.next().toString());
+                        insert_new.executeUpdate();
+                    }
+                } else {
                     insert_new.setInt(1, feature_id);
                     insert_new.setInt(2, sfq);
-                    insert_new.setInt(3, ++cnt);
-                    insert_new.setString(4, i.next().toString());
+                    insert_new.setInt(3, 1);
+                    insert_new.setString(4, value.toString());
                     insert_new.executeUpdate();
                 }
-            } else {
-                insert_new.setInt(1, feature_id);
-                insert_new.setInt(2, sfq);
-                insert_new.setInt(3, 1);
-                insert_new.setString(4, value.toString());
-                insert_new.executeUpdate();
+                insert_new.close();
             }
-            insert_new.close();
         }
-    }
 
     }
 
@@ -1043,7 +1043,7 @@ class FeaturesSQL {
 	try {
 	    conn = seqDB.getPool().takeConnection();
 	    conn.setAutoCommit(false);
-			// Set rank to -1, so will get looked up before feature added
+            // Set rank to -1, so will get looked up before feature added
 	    int f_id = seqDB.getFeaturesSQL().persistFeature(conn, bioentry_id, f, parent_id, -1);
 	    if (f instanceof BioSQLFeature) {
 		((BioSQLFeature) f)._setInternalID(f_id);
