@@ -38,4 +38,8 @@ public class SocketDriver implements Driver {
   public Database connect(URL url) throws AceException {
     return new SocketDatabase(url);
   }
+
+  public Database connect(URL url, String user, String pass) throws AceException {
+    return new SocketDatabase(url, user, pass);
+  }
 }

@@ -45,7 +45,7 @@ public class DatabaseManager {
 
     Properties sysProp = System.getProperties();
     String pkgs = (String) sysProp.get("java.protocol.handler.pkgs");
-    String myPkg = "bio";
+    String myPkg = "org";
     if(pkgs != null)
       pkgs = pkgs + "|" + myPkg;
     else
@@ -74,6 +74,8 @@ public class DatabaseManager {
   
   /**
    * Retrieves the database associated with this url.
+   * The behaviour of this method is currectly not fully
+   * defined -- use getDatabase(URL, String, String) instead.
    */
   public static Database getDatabase(URL url) throws AceException {
     Database db = (Database) databases.get(url);
@@ -88,5 +90,23 @@ public class DatabaseManager {
       }
     }
     return db;
+  }
+
+  /**
+   * Connects to the database associated with this url.
+   */
+  public static Database getDatabase(URL url, String user, String passwd) 
+      throws AceException 
+  {
+
+      for(Iterator i = drivers.iterator(); i.hasNext(); ) {
+        Driver d = (Driver) i.next();
+        if(d.accept(url)) {
+          Database db = d.connect(url, user, passwd);
+	  return db;
+          // databases.put(url, db);
+        }
+      }
+      return null;
   }
 }

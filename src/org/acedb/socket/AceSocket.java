@@ -26,13 +26,23 @@ import org.acedb.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import java.security.*;
 
 /**
+ * Low level interface to the ACeDB sockets server.
+ *
  * @author Thomas Down
  */
 
 public class AceSocket implements Connection {
     private final static int OK_MAGIC = 0x12345678;
+    
+    private final static String MSGREQ = "ACESERV_MSGREQ";
+    private final static String MSGDATA = "ACESERV_MSGDATA";
+    private final static String MSGOK = "ACESERV_MSGOK";
+    private final static String MSGENCORE = "ACESERV_MSGENCORE";
+    private final static String MSGFAIL = "ACESERV_MSGFAIL";
+    private final static String MSGKILL = "ACESERV_MSGKILL";
 
     private Socket sock;
     private DataInputStream dis;
@@ -41,58 +51,57 @@ public class AceSocket implements Connection {
     private boolean pendingConfig = true;
     private int serverVersion = 0;
     private int clientId = 0;
-    private int aceMagic = 0;
     private int encore = 0;
     private int maxBytes = 0;
 
-    private static int byteSwap(int i) {
-	/*
-
-	return ((i & 0x000000ff) << 24) |
-	       ((i & 0x0000ff00) << 8) |
-	       ((i & 0x00ff0000) >> 8) |
-	       ((i & 0xff000000) >> 24);
-
-	*/
-
-	return i;
-    }        
-
-    public AceSocket(String host, int port) throws AceException {
+    public AceSocket(String host, int port, String user, String passwd) 
+	throws AceException 
+    {
 	try {
 	    sock = new Socket(host, port);
 	    dis = new DataInputStream(sock.getInputStream());
 	    dos = new DataOutputStream(sock.getOutputStream());
 	
 	    // System.out.println(transact("hello"));
-	    transact("hello");
+	    String pad = transact("bonjour");
+	    String userPasswd = md5Sum(user, passwd);
+	    String token = md5Sum(userPasswd, pad);
+	    transact(user + " " + token);
+	    
 	} catch (IOException ex) {
 	    throw new AceException(ex);
 	}
+    }
+
+    private int byteSwap(int i) {
+	// return ((i & 0xff) << 24) | ((i & 0xff00) << 8) | ((i & 0xff0000) >>> 8) | ((i & 0xff000000) >>> 24);
+	return i;
     }
 
     public String transact(String s) throws AceException {
+	System.err.println(">>> " + s);
 	try {
-	    writeMessage(s);
-	    return readMessage();
+	    writeMessage(MSGREQ, s);
+	    String reply = readMessage();
+	    System.err.println("<<< " + reply);
+	    return reply;
 	} catch (IOException ex) {
 	    throw new AceException(ex);
 	}
     }
 
-    private void writeMessage(String s) throws IOException {
+    private void writeMessage(String type, String s) throws IOException {
 	// System.out.println("writeMessage: " + s);
 
-	dos.writeInt(byteSwap(OK_MAGIC));
-	dos.writeInt(byteSwap(s.length() + 1));
+	dos.writeInt(OK_MAGIC);
+	dos.writeInt(s.length() + 1);
+	dos.writeInt(serverVersion); // ???Server version???
+	dos.writeInt(clientId); // clientId
+	dos.writeInt(maxBytes); // maxBytes
 
-	dos.writeInt(byteSwap(serverVersion)); // ???Server version???
-	dos.writeInt(byteSwap(clientId)); // clientId
-	dos.writeInt(byteSwap(aceMagic)); // aceMagic
-	dos.writeInt(byteSwap(encore)); // encore
-	dos.writeInt(byteSwap(maxBytes)); // maxBytes
+	dos.writeBytes(type);
 
-	byte[] padding = new byte[80 - 28];
+	byte[] padding = new byte[30 - type.length()];
 	dos.write(padding, 0, padding.length);
 
 	dos.writeBytes(s);
@@ -104,37 +113,35 @@ public class AceSocket implements Connection {
 
     private String readMessage() throws IOException {
 	int magic = dis.readInt();
-	// System.out.println("readmagic :" + magic);
-	int length = byteSwap(dis.readInt());
+	// System.out.println("readmagic = " + magic);
+	int length = dis.readInt();
 	// System.out.println("length = " + length);
 
-	int rServerVersion = dis.readInt(); // ???Server version???
+	int rServerVersion = dis.readInt(); 
 	// System.out.println("rServerVersion = " + rServerVersion);
-	int rClientId = byteSwap(dis.readInt()); // clientId
+	int rClientId = dis.readInt();
 	// System.out.println("rClientId = " + rClientId);
-	int rAceMagic = byteSwap(dis.readInt()); // aceMagic
-	// System.out.println("rAceMagic = " + rAceMagic);
-	int rEncore = byteSwap(dis.readInt()); // encore
-	// System.out.println("rEncore = " + rEncore);
-	int rMaxBytes = byteSwap(dis.readInt()); // maxBytes
+	int rMaxBytes = dis.readInt();
 	// System.out.println("rMaxBytes = " + rMaxBytes);
-
+	byte[] typeb = new byte[30];
+	dis.readFully(typeb);
+	String type = new String(typeb);
+	
 	if (pendingConfig) {
 	    serverVersion = rServerVersion;
 	    clientId = rClientId;
-	    
-	    if (rAceMagic < 0)
-		rAceMagic = -rAceMagic;
-	    aceMagic = rAceMagic;
-
 	    maxBytes = rMaxBytes;
-
 	    pendingConfig = false;
 	}
 
-	dis.skipBytes(80 - 28);
-	byte[] message = new byte[length];
+	byte[] message = new byte[length-1];
 	dis.readFully(message);
+	dis.skipBytes(1);
+
+	if (type.startsWith(MSGENCORE)) {
+	    writeMessage(MSGREQ, "encore");
+	    return (new String(message)) + readMessage();
+	}
 	return new String(message);
     }
 
@@ -144,5 +151,34 @@ public class AceSocket implements Connection {
 	} catch (IOException ex) {
 	    throw new AceException(ex);
 	}
+    }
+
+    private static String md5Sum(String a, String b) {
+	try {
+	    MessageDigest md = MessageDigest.getInstance("MD5");
+
+	    md.update(a.getBytes());
+	    byte[] digest = md.digest(b.getBytes());
+	    StringBuffer sb = new StringBuffer();
+	    for (int i = 0; i < digest.length; ++i) {
+		int bt = digest[i];
+		sb.append(hexChar((bt >>> 4) & 0xf));
+		sb.append(hexChar(bt & 0xf));
+	    }
+	    return sb.toString();
+	} catch (NoSuchAlgorithmException ex) {
+	    throw new AceError("BioJava access to ACeDB sockets require the MD5 hash algorithm.  Consult your Java Vendor.");
+	}
+    }
+
+    private static char hexChar(int i) {
+	if (i <= 9)
+	    return (char) ('0' + i);
+	else
+	    return (char) ('a' + i-10);
+    }
+
+    public static void main(String[] args) {
+	System.out.println(args[0] + " " + md5Sum(args[0], args[1]));
     }
 }

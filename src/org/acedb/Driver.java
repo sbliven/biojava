@@ -42,4 +42,9 @@ public interface Driver {
    * Return a database that is connected to this url.
    */
   Database connect(URL url) throws AceException;
+
+  /**
+   * Return a database that is connected to this url.
+   */
+  Database connect(URL url, String user, String passwd) throws AceException;
 }

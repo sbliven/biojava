@@ -36,18 +36,18 @@ import java.lang.ref.*;
 import org.acedb.*;
 import org.acedb.staticobj.*;
 
-// FIXME only public for testing purposes
-
 /**
  * @author Thomas Down
  */
 
-public class SocketDatabase implements Database {
+class SocketDatabase implements Database {
     private List socks;
 
     private URL dbURL;
     private String host;
     private int port;
+    private String user;
+    private String passwd;
 
     private AcePerlParser parser;
 
@@ -63,18 +63,35 @@ public class SocketDatabase implements Database {
 	this.dbURL = dbURL;
 	host = dbURL.getHost();
 	port = dbURL.getPort();
-
+	user = "anonymous";
+	passwd = "";
+	
 	// check we can connect...
 	AceSocket as = takeSocket();
 	putSocket(as);
     }
+
+    public SocketDatabase(URL dbURL, String user, String passwd) 
+	throws AceException 
+    {
+	this.dbURL = dbURL;
+	host = dbURL.getHost();
+	port = dbURL.getPort();
+	this.user = user;
+	this.passwd = passwd;
+	
+	// check we can connect...
+	AceSocket as = takeSocket();
+	putSocket(as);
+    }
+
 
     synchronized AceSocket takeSocket() throws AceException {
       AceSocket as = null;
       if (socks.size() > 0)
 	      as = (AceSocket) socks.remove(0);
       if(as == null)
-        as = new AceSocket(host, port);
+        as = new AceSocket(host, port, user, passwd);
       return as;
     }
 
