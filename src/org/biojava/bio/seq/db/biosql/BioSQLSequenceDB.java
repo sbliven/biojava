@@ -461,8 +461,9 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		    rolledback = true;
 		} catch (SQLException ex2) {}
 	    }
-	    throw new BioRuntimeException("Error adding BioSQL tables" +
-					(rolledback ? " (rolled back successfully)" : ""), ex);
+	    throw new BioRuntimeException(
+                "Error adding sequence: " + seq.getName() +
+				(rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }
 

@@ -69,6 +69,7 @@ import org.biojava.utils.lsid.LifeScienceIdentifierParseException;
  * </pre>
  *
  * @author Keith James
+ * @author Matthew Pocock
  */
 public class BioFlatIndex
 {
@@ -148,7 +149,7 @@ public class BioFlatIndex
                          + alphabet);
             }
 
-            doIndex(index, seqFiles, seqType);
+            doIndex(dbName, index, seqFiles, seqType);
         }
         catch (MissingOptionException moe)
         {
@@ -180,13 +181,15 @@ public class BioFlatIndex
         }
         catch (NoSuchElementException nsee)
         {
-            throw new BioException(nsee, "Malformed OBDA index "
-                                   + "does not indicate sequence format");
+            throw new BioException("Malformed OBDA index "
+                                   + "does not indicate sequence format",
+                                   nsee);
         }
         catch (LifeScienceIdentifierParseException lse)
         {
-            throw new BioException(lse, "Malformed OBDA index "
-                                   + "has a format identifier which is not a valid LSID");
+            throw new BioException("Malformed OBDA index "
+                                   + "has a format identifier which is not a valid LSID",
+                                   lse);
         }
 
         return format;
@@ -210,7 +213,7 @@ public class BioFlatIndex
         return files;
     }
 
-    private static void doIndex(File index, Set seqFiles,  int seqType)
+    private static void doIndex(String dbName, File index, Set seqFiles,  int seqType)
         throws Exception
     {
         if (index.exists())
@@ -242,19 +245,19 @@ public class BioFlatIndex
         switch (formatType)
         {
             case (SeqIOConstants.FASTA):
-                IndexTools.indexFasta(index, files, alphaType);
+                IndexTools.indexFasta(dbName, index, files, alphaType);
                 break;
 
             case (SeqIOConstants.EMBL):
-                IndexTools.indexEmbl(index, files, alphaType);
+                IndexTools.indexEmbl(dbName, index, files, alphaType);
                 break;
 
             case (SeqIOConstants.GENBANK):
-                IndexTools.indexGenbank(index, files, alphaType);
+                IndexTools.indexGenbank(dbName, index, files, alphaType);
                 break;
 
             case (SeqIOConstants.SWISSPROT):
-                IndexTools.indexSwissprot(index, files);
+                IndexTools.indexSwissprot(dbName, index, files);
                 break;
 
             default:
