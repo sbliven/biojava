@@ -64,12 +64,14 @@ public class SymbolListTest extends TestCase
     protected Symbol [] createRandomSymbolArray(FiniteAlphabet alpha, int length)
         throws Exception
     {
-        Distribution random = new UniformDistribution(alpha);
+        int alfaSize = alpha.size();
+        AlphabetIndex indx = AlphabetManager.getAlphabetIndex(alpha);
+        Random rand = new Random();
 
         Symbol [] array = new Symbol [length];
 
         for (int i=0; i < length; i++) {
-            array[i] = random.sampleSymbol();
+            array[i] = indx.symbolForIndex(rand.nextInt(alfaSize));
         }
 
         return array;
