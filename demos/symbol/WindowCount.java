@@ -19,6 +19,7 @@ library
  * Copyright:    Copyright (c) 2001
  * Company:      AgResearch
  * @author Mark Schreiber
+ * @author Matthew Pocock
  * @version 1.0
  */
 public class WindowCount {
