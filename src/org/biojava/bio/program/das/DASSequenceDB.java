@@ -51,6 +51,7 @@ public class DASSequenceDB implements SequenceDB {
     private URL dataSourceURL;
     private Map sequences;
     private Cache symbolsCache;
+    private boolean gotAllIDs = false;
 
     {
 	sequences = new HashMap();
@@ -172,7 +173,7 @@ public class DASSequenceDB implements SequenceDB {
     }
 
     public Set ids() {
-	if (sequences == null) {
+	if (!gotAllIDs) {
 	    try {
 		URL epURL = new URL(dataSourceURL, "entry_points");
 		HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
@@ -198,7 +199,9 @@ public class DASSequenceDB implements SequenceDB {
 		Element segment = null;
 		for (int i = 0; i < segl.getLength(); ++i) {
 		    el = (Element) segl.item(i);
-		    sequences.put(el.getAttribute("id"), null);
+		    String id = el.getAttribute("id");
+		    if (! sequences.containsKey(id)) 
+			sequences.put(id, null);
 		}
 	    } catch (SAXException ex) {
 		throw new BioError(ex, "Exception parsing DAS XML");
