@@ -34,15 +34,18 @@ a directory tree and editing the Map files.
 </p>
 <p>
 From a software perspective, instantiating a RagbagAssembly on the 
-root directory will instantiate the whole contig in memory.
+root directory will instantiate the whole contig in memory.  You do 
+have to pass to RagbagAssembly a RagbagSequenceFactory object to
+determine the type of sequence object it will use and the type of
+cache it will utilize to manage your resources.
 </p>
 <p><b>Current Limitations and Future Plans</b></p>
 <p>
 The EMBL, GAME, Genbank and XFF formats currently supported. GFF
 will eventually be supported but the current Biojava GFF parser
-is appears rather different from the other parsers.
-Planned features include a caching scheme to reduce RAM 
-requirements.  It should now be possible to annotate your virtual 
+is appears rather different from the other parsers.  Further
+improvements in lazy instantiation and caching may be explored.
+It should now be possible to annotate your virtual 
 contig by editing the EMBL/Genbank files within the directory 
 structure with Artemis!
 </p>
