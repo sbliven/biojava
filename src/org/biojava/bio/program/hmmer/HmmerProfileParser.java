@@ -48,7 +48,8 @@ public class HmmerProfileParser{
     }
 
     /** @param inputfile the file which contains the Profile HMM data, as output by HMMER - e.g. HMM_ls
-     */
+    
+    
     public static FullHmmerProfileHMM parseFull(File inputfile){
 	HmmerProfileParser hmmP = new HmmerProfileParser(inputfile.toString());
 	hmmP.parseModel(inputfile);
@@ -56,7 +57,7 @@ public class HmmerProfileParser{
 	hmmP.setFullProfileHMM();
 	return hmmP.getFullModel();
     }
-
+ */
    
     private String domain1;
 
@@ -74,17 +75,20 @@ public class HmmerProfileParser{
 	return hmm.hmm;
     }
 
+    /**
     FullHmmerProfileHMM getFullModel(){
 	return hmm.full_hmm;
     }
+    */
 
      void setProfileHMM(){
 	hmm.setProfileHMM();
     }
-
+    /**
      void setFullProfileHMM(){
 	hmm.setFullProfileHMM();
     }
+    */
 
     private void parseModel(File inputFile){
 	System.out.println("Parsing model "+inputFile);
@@ -257,7 +261,7 @@ public class HmmerProfileParser{
 		t.printStackTrace();
 	    }
 	}
-
+	/**
 	void initialiseFullProfileHMM(){
 	    try{
 		full_hmm = new FullHmmerProfileHMM(hmm);
@@ -266,6 +270,7 @@ public class HmmerProfileParser{
 		t.printStackTrace();
 	    }
 	}
+	*/
 
 	private void  validateDistributionSum(Distribution dist) throws Exception{
 	    Iterator iter = ((FiniteAlphabet)dist.getAlphabet()).iterator();
@@ -346,7 +351,7 @@ public class HmmerProfileParser{
 		match_dist.setWeight(hmm.magicalState(),convertToProb(transitions[i][8]));
 	    }
 	}
-
+	/**
 	void setFullProfileHMM(){
 	    try{
 		Distribution dist = hmm_full.getWeights(hmm_full.magicalState());
@@ -372,6 +377,7 @@ public class HmmerProfileParser{
 		t.printStackTrace();
 	    }
 	}
+	*/
 
 	void setProfileHMM(){
 	    try{
