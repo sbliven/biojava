@@ -493,7 +493,7 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       }
       
       acrossDim += spacer * (realLines - 1);
-      alongDim = Math.ceil((double) width);
+      alongDim = /* Math.ceil((double) width); */ symbolsPerLine * scale;
       if (direction == HORIZONTAL) {
         d = new Dimension(
           (int) Math.ceil(alongDim + insetBefore + insetAfter),

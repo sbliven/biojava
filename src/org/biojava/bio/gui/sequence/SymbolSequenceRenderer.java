@@ -75,6 +75,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
           fudgeAcross = depth * 0.5 - maxBounds.getCenterX();
           fudgeDown = scale * 0.5 - maxBounds.getCenterY();
         }
+
         for (int pos = min; pos <= max; ++pos) {
           double gPos = sp.sequenceToGraphics(pos);
           char c = seq.symbolAt(pos).getToken();
