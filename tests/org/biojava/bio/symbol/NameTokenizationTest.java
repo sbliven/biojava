@@ -55,7 +55,6 @@ public class NameTokenizationTest extends TestCase {
         throws Exception
     {
 	String tokenization = nameTokenization.tokenizeSymbolList(simple_atomicSymbols);
-	System.out.println(tokenization);
 	SymbolList reconstruction = new SimpleSymbolList(nameTokenization, tokenization);
 	assertTrue(SymbolUtils.compareSymbolLists(simple_atomicSymbols, reconstruction));
     }
@@ -64,7 +63,6 @@ public class NameTokenizationTest extends TestCase {
         throws Exception
     {
 	String tokenization = nameTokenization.tokenizeSymbolList(simple_allSymbols);
-	System.out.println(tokenization);
 	SymbolList reconstruction = new SimpleSymbolList(nameTokenization, tokenization);
 	assertTrue(SymbolUtils.compareSymbolLists(simple_allSymbols, reconstruction));
     }

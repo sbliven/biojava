@@ -60,7 +60,6 @@ public class CrossProductTokenizationTest extends TestCase {
         throws Exception
     {
 	String tokenization = nameTokenization.tokenizeSymbolList(cross_atomicSymbols);
-	System.out.println(tokenization);
 	SymbolList reconstruction = new SimpleSymbolList(nameTokenization, tokenization);
 	assertTrue(SymbolUtils.compareSymbolLists(cross_atomicSymbols, reconstruction));
     }
