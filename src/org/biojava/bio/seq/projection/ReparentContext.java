@@ -210,9 +210,9 @@ public class ReparentContext
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-      System.err.println("Filtering with: " + ff + " " + recurse);
+      // System.err.println("Filtering with: " + ff + " " + recurse);
       ff = revertFilter(ff);
-      System.err.println("Reverted filter to: " + ff);
+      // System.err.println("Reverted filter to: " + ff);
       FeatureHolder toProject = baseSet.filter(ff, recurse);
       return new ProjectionSet(toProject);
     }
