@@ -119,8 +119,8 @@ public class ClassifierExample {
     
     static {
       trainer = new SMOTrainer();
-      trainer.setC(10000000.0);
-      trainer.setEpsilon(0.000000001);
+      trainer.setC(1.0E+7);
+      trainer.setEpsilon(1.0E-9);
       
       SVMKernel k = new SVMKernel() {
         public double evaluate(Object a, Object b) {
@@ -140,6 +140,7 @@ public class ClassifierExample {
       
       RadialBaseKernel rb = new RadialBaseKernel();
       rb.setNestedKernel(k);
+      rb.setWidth(10000.0);
       
       polyKernel = pk;
       rbfKernel = rb;
@@ -261,19 +262,28 @@ public class ClassifierExample {
      * This may take some time for complicated models.
      */
     public void classify() {
-      model = trainer.trainModel(target, kernel, null);
+      new Thread() {
+        public void run() {
+          Cursor c = getCursor();
+          setCursor(new Cursor(Cursor.WAIT_CURSOR));
+          System.out.println("Training");
+          model = trainer.trainModel(target, kernel, null);
 
-      for(Iterator i = target.items().iterator(); i.hasNext(); ) {
-        Object item = i.next();
-        System.out.println(item + "\t" +
-                           target.getTarget(item) + "\t" +
-                           model.getAlpha(item) + "\t" +
-                           model.classify(item)
-        );
-      }
+          System.out.println("Threshold = " + model.getThreshold());
+          for(Iterator i = target.items().iterator(); i.hasNext(); ) {
+            Object item = i.next();
+            System.out.println(item + "\t" +
+                               target.getTarget(item) + "\t" +
+                               model.getAlpha(item) + "\t" +
+                               model.classify(item)
+            );
+          }
 
-      this.model = model;
-      repaint();
+          PointClassifier.this.model = model;
+          setCursor(c);
+          repaint();
+        }
+      }.start();
     }
 
     /**

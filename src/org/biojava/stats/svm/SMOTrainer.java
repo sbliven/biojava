@@ -52,7 +52,7 @@ public class SMOTrainer {
   }
 
   private boolean takeStep(SMOTrainingContext trainingContext, int i1, int i2) {
-    // System.out.print("+");
+    // //System.out.print("+");
 
     if (i1 == i2) {
 	    return false;
@@ -60,8 +60,8 @@ public class SMOTrainer {
     
     double y1 = trainingContext.getTarget(i1);
     double y2 = trainingContext.getTarget(i2);
-    double alpha1 = trainingContext.getAlpha(i1) / y1;
-    double alpha2 = trainingContext.getAlpha(i2) / y2;
+    double alpha1 = trainingContext.getAlpha(i1);
+    double alpha2 = trainingContext.getAlpha(i2);
     double E1 = trainingContext.getError(i1);
     double E2 = trainingContext.getError(i2);
     double s = y1 * y2;
@@ -79,13 +79,10 @@ public class SMOTrainer {
 	    H = Math.min(C, alpha1 + alpha2);
     }
     if (L == H) {
-      //System.out.print("h");
+      ////System.out.print("h");
       return false;
     }
 
-    // double k11 = kernel.evaluate(model.getVector(i1), model.getVector(i1));
-    // double k12 = kernel.evaluate(model.getVector(i1), model.getVector(i2));
-    // double k22 = kernel.evaluate(model.getVector(i2), model.getVector(i2));
     double k11 = trainingContext.getKernelValue(i1, i1);
     double k12 = trainingContext.getKernelValue(i1, i2);
     double k22 = trainingContext.getKernelValue(i2, i2);
@@ -122,13 +119,13 @@ public class SMOTrainer {
         a2 = alpha2;
       }
       */
-      //System.out.print("+");
+      ////System.out.print("+");
       return false;
     }
 	
   	a1 = alpha1 + s*(alpha2 - a2);
     if (Math.abs(a1 - alpha1) < epsilon * (a1 + alpha1+1 +epsilon)) {
-      //    System.out.print("s");
+      //    //System.out.print("s");
       return false;
     }
 
@@ -139,23 +136,23 @@ public class SMOTrainer {
 
   	if (0 < a1 && a1 < C) {
       // use "b1 formula"
-	    // System.out.println("b1");
+	    // //System.out.println("b1");
   	  b = E1 + y1*(a1 - alpha1)*k11 + y2*(a2 - alpha2)*k12 + bOLD;
   	} else if (0 < a2 && a2 < C) {
   	  // use "b2 formula"
   	  b = E2 + y1*(a1 - alpha1)*k12 + y2*(a2 - alpha2)*k22 + bOLD;
-	    // System.out.println("b2");
+	    // //System.out.println("b2");
   	} else {
 	    // Both are at bounds -- use `half way' method.
 	    double b1, b2;
 	    b1 = E1 + y1*(a1 - alpha1)*k11 + y2*(a2 - alpha2)*k12 + bOLD;
 	    b2 = E2 + y1*(a1 - alpha1)*k12 + y2*(a2 - alpha2)*k22 + bOLD;
-	    // System.out.println("hybrid");
+	    // //System.out.println("hybrid");
 	    b = (b1 + b2) / 2.0;
     }
     trainingContext.setThreshold(b);
-    trainingContext.setAlpha(i1, a1*y1);
-    trainingContext.setAlpha(i2, a2*y2);
+    trainingContext.setAlpha(i1, a1);
+    trainingContext.setAlpha(i2, a2);
 
     // Update error cache
 
@@ -167,8 +164,7 @@ public class SMOTrainer {
         continue;
       }
       if (!trainingContext.isBound(
-        trainingContext.getAlpha(l) /
-        trainingContext.getTarget(l)
+        trainingContext.getAlpha(l)
       )) {
         trainingContext.updateError(
           l,
@@ -184,19 +180,23 @@ public class SMOTrainer {
 
   private int examineExample(SMOTrainingContext trainingContext, int i2) {
     double y2 = trainingContext.getTarget(i2);
-    double alpha2 = trainingContext.getAlpha(i2) / y2;
+    double alpha2 = trainingContext.getAlpha(i2);
     double E2 = trainingContext.getError(i2);
     double r2 = E2 * y2;
     double epsilon = trainingContext.getEpsilon();
     double C = trainingContext.getC();
 
+    //System.out.println("r2 = " + r2);
+    //System.out.println("alpha2 = " + alpha2);
+    //System.out.println("epsilon = " + epsilon);
+    //System.out.println("C = " + C);
     if ((r2 < -epsilon && alpha2 < C) || (r2 > epsilon && alpha2 > 0)) {
 	    int secondChoice = -1;
 	    double step = 0.0;
+      //System.out.println("First choice heuristic");
 	    for (int l = 0; l < trainingContext.size(); ++l) {
         if (!trainingContext.isBound(
-          trainingContext.getAlpha(l) /
-          trainingContext.getTarget(l)
+          trainingContext.getAlpha(l)
         )) {
           double thisStep = Math.abs(trainingContext.getError(l) - E2);
           if (thisStep > step) {
@@ -212,12 +212,12 @@ public class SMOTrainer {
         }
 	    }
 
+      //System.out.println("Unbound");
   	  int randomStart = (int) Math.floor(Math.random() * trainingContext.size());
   	  for (int l = 0; l < trainingContext.size(); ++l) {
         int i1 = (l + randomStart) % trainingContext.size();
         if (!trainingContext.isBound(
-          trainingContext.getAlpha(i1) /
-          trainingContext.getTarget(i1)
+          trainingContext.getAlpha(i1)
         )) {
   		    if (takeStep(trainingContext, i1, i2)) {
             return 1;
@@ -226,11 +226,11 @@ public class SMOTrainer {
   	  }
 	    // The second pass should look at ALL alphas, but
 	    // we've already checked the non-bound ones.
-	    for (int l = 0; l < trainingContext.size(); ++l) {
+      //System.out.println("Bound");
+	    for (int l = 0; l < trainingContext.size(); l++) {
         int i1 = (l + randomStart) % trainingContext.size();
         if (trainingContext.isBound(
-          trainingContext.getAlpha(i1) /
-          trainingContext.getTarget(i1)
+          trainingContext.getAlpha(i1)
         )) {
           if (takeStep(trainingContext, i1, i2)) {
             return 1;
@@ -238,7 +238,7 @@ public class SMOTrainer {
         }
 	    }
     } else {
-      //System.out.print("/");
+      //System.out.print("Nothing to optimize");
     }
     return 0;
   }
@@ -251,28 +251,27 @@ public class SMOTrainer {
     boolean examineAll = true;
     
     while (numChanged > 0 || examineAll) {
-	    numChanged = 0;
+      numChanged = 0;
 	    if (examineAll) {
-        // System.out.println("Running full iteration");
+        //System.out.println("Running full iteration");
         for(int i = 0; i < trainingContext.size(); i++) {
+          //System.out.println("Item " + i);
           numChanged += examineExample(trainingContext, i);
         } 
 	    } else {
-        // System.out.println("Running non-bounds iteration");
+        //System.out.println("Running non-bounds iteration");
         for(int i = 0; i < trainingContext.size(); i++) {
-          double alpha = trainingContext.getAlpha(i) /
-                         trainingContext.getTarget(i);
+          double alpha = trainingContext.getAlpha(i);
           if (!trainingContext.isBound(alpha)) {
             numChanged += examineExample(trainingContext, i);
           }
         }
       }
-    }
-
-    if (examineAll) {
-      examineAll = false;
-    } else {
-      examineAll = (numChanged == 0);
+      if (examineAll) {
+        examineAll = false;
+      } else {
+        examineAll = (numChanged == 0);
+      }
 	    
   	  trainingContext.trainingCycleCompleted();
     }
@@ -313,14 +312,16 @@ public class SMOTrainer {
       if(listener != null) {
         listener.trainingCycleComplete(ourEvent);
       }
+      for(int i = 0; i < size(); i++) {
+        if(getAlpha(i) == 0) {
+          model.removeItem(getItem(i));
+        }
+      }
     }
 
     public void trainingCompleted() {
       if (listener != null) {
         listener.trainingComplete(ourEvent);
-        for(int i = 0; i < size(); i++) {
-          model.setAlpha(getItem(i), getAlpha(i));
-        }
       }
     }
 
@@ -334,6 +335,7 @@ public class SMOTrainer {
     
     public void setAlpha(int i, double a) {
       alphas[i] = a;
+      model.setAlpha(getItem(i), getAlpha(i) * getTarget(i));
     }
     
     public double getTarget(int i) {
@@ -366,9 +368,9 @@ public class SMOTrainer {
     
     public double getError(int i) {
       double target = getTarget(i);
-      double alpha = getAlpha(i) / target;
+      double alpha = getAlpha(i);
       if (isBound(alpha)) {
-        return E[i] = model.classify(getItem(i)) - getTarget(i);
+        return E[i] = getModel().classify(getItem(i)) - getTarget(i);
       }
       return E[i];
     }
@@ -381,11 +383,13 @@ public class SMOTrainer {
       E[i] = getModel().classify(getItem(i)) - getTarget(i);
     }
 
-    public double getKernelValue(int i2, int l) {
-      return getModel().getKernel().evaluate(getItem(i2), getItem(l));
+    public double getKernelValue(int i1, int i2) {
+      return getModel().getKernel().evaluate(getItem(i1), getItem(i2));
     }
     
     public SMOTrainingContext(SVMTarget target, SVMKernel kernel, TrainingListener l) {
+      C = SMOTrainer.this.getC();
+      epsilon = SMOTrainer.this.getEpsilon();
       model = new SimpleSVMClassifierModel(kernel, target);
       model.setThreshold(0.0);
       listener = l;
