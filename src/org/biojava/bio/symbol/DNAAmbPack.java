@@ -91,7 +91,12 @@ public class DNAAmbPack
       syms.add(DNATools.t());
     }
     try {
-      return DNATools.getDNA().getAmbiguity(syms);
+      // do incorporate the gap symbol when appropriate
+      if (b != 0)
+          return DNATools.getDNA().getAmbiguity(syms);
+      else
+          return DNATools.getDNA().getGapSymbol();
+
     } catch (IllegalSymbolException ise) {
       throw new NestedError(ise, "Assertion failure: couldn't get DNA ambiguity from DNA: " + syms);
     }
