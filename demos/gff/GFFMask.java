@@ -118,11 +118,11 @@ public class GFFMask {
     String hits = (String) options.get("hits");
     boolean negate;
     if(hits != null && hits.equals("reject")) {
-      negate = false;
-    } else if(hits == null || hits.equals("accept")) {
       negate = true;
+    } else if(hits == null || hits.equals("accept")) {
+      negate = false;
     } else {
-      throw new IllegalArgumentException("Unknown hits option: " + hits);
+      throw new IllegalArgumentException("Unknown hits option: " + hits + " try (accept|reject)");
     }
 
     String mode = (String) options.get("mode");
@@ -130,17 +130,19 @@ public class GFFMask {
     if(mode == null || mode.equals("contain")) {
       filter = new GFFRecordFilter() {
         public boolean accept(GFFRecord rec) {
-          return mask.getLocation(rec).contains(new RangeLocation(rec.getStart(), rec.getEnd()));
+          Location loc = mask.getLocation(rec);
+          return (loc != null) && loc.contains(new RangeLocation(rec.getStart(), rec.getEnd()));
         }
       };
     } else if(mode != null && mode.equals("overlap")) {
       filter = new GFFRecordFilter() {
         public boolean accept(GFFRecord rec) {
-          return mask.getLocation(rec).overlaps(new RangeLocation(rec.getStart(), rec.getEnd()));
+          Location loc = mask.getLocation(rec);
+          return (loc != null) && loc.overlaps(new RangeLocation(rec.getStart(), rec.getEnd()));
         }
       };
     } else {
-      throw new IllegalArgumentException("Unknown mode option: " + mode);
+      throw new IllegalArgumentException("Unknown mode option: " + mode + " try (contain|overlap)");
     }
 
     if(negate == true) {
