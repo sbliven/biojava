@@ -107,13 +107,15 @@ public class HitMerger implements SearchListener {
     public int compareTo(Object o) {
       Record r = (Record) o;
       
-      int relDist = queryOffset + hitOffset - (r.queryOffset + r.hitOffset);
-      
       if(hitID > r.hitID) {
         return 1;
       } else if(hitID < r.hitID) {
         return -1;
-      } else if(relDist > 0) {
+      }
+      
+      int relDist = queryOffset + hitOffset - (r.queryOffset + r.hitOffset);
+      
+      if(relDist > 0) {
         return 1;
       } else if(relDist < 0) {
         return -1;
