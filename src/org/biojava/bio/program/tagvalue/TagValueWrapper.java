@@ -16,6 +16,16 @@ public abstract class TagValueWrapper
     return delegate;
   }
   
+  public void startRecord()
+  throws ParserException {
+    delegate.startRecord();
+  }
+  
+  public void endRecord()
+  throws ParserException {
+    delegate.endRecord();
+  }
+  
   public void startTag(Object tag)
   throws ParserException {
     delegate.startTag(tag);

@@ -96,7 +96,7 @@ public class LineSplitParser
   public TagValue parse(Object o) {
     String line = o.toString();
     
-    if(line.startsWith(endOfRecord)) {
+    if(endOfRecord != null && line.startsWith(endOfRecord)) {
       return null;
     }
     

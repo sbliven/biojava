@@ -15,9 +15,11 @@ public class Parser {
     ParserException
   {
     final List stack = new ArrayList();
-    push(stack, new Frame(parser, listener, ""));
+    push(stack, new Frame(parser, listener, null));
     
     Context ctxt = new Context();
+    
+    listener.startRecord();
     
     for(
       Object line = reader.readLine();
@@ -32,9 +34,9 @@ public class Parser {
         frame = (Frame) fi.next();
         
         tv = frame.parser.parse(line);
+        
         // end of record. Is it the last in the file?
         if(tv == null) {
-          frame.listener.endTag();
           boolean eof = false;
           
           while(true) {
@@ -53,6 +55,11 @@ public class Parser {
             break;
           }
           
+          do {
+            Frame top = (Frame) pop(stack);
+            top.listener.endTag();
+            top.listener.endRecord();
+          } while(!stack.isEmpty());
           return !eof;
         }
         
@@ -61,6 +68,7 @@ public class Parser {
           Frame top;
           for(top = (Frame) pop(stack); top != frame; top = (Frame) pop(stack)) {
             top.listener.endTag();
+            top.listener.endRecord();
           }
           if(top.tag != null) {
             top.listener.endTag();
@@ -71,6 +79,8 @@ public class Parser {
           top.listener.startTag(tv.getTag());
           break;
         }
+        
+        line = tv.getValue();
       }
       
       while(true) {
@@ -79,9 +89,12 @@ public class Parser {
         if(!ctxt.isDirty()) {
           break;
         }
+
         tv = ctxt.parser.parse(tv.getValue());
         frame = new Frame(ctxt.parser, ctxt.listener, tv.getTag());
         push(stack, frame);
+        ctxt.listener.startRecord();
+        ctxt.listener.startTag(tv.getTag());
       }
     }
 

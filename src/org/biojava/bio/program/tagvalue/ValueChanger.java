@@ -13,6 +13,8 @@ public class ValueChanger
 {
   private final Map changers;
   private final Map splitters;
+  private Changer defaultC;
+  private Splitter defaultS;
   
   private Changer changer;
   private Splitter splitter;
@@ -23,6 +25,22 @@ public class ValueChanger
     this.splitters = new SmallMap();
   }
   
+  public void setDefaultChanger(Changer c) {
+    this.defaultC = c;
+  }
+  
+  public Changer getDefaultChanger() {
+    return defaultC;
+  }
+  
+  public void setDefaultSplitter(Splitter s) {
+    this.defaultS = s;
+  }
+
+  public Splitter getDefaultSplitter() {
+    return defaultS;
+  }
+
   public void setChanger(Object tag, Changer changer) {
     changers.put(tag, changer);
   }
@@ -43,6 +61,14 @@ public class ValueChanger
   throws ParserException {
     this.changer = getChanger(tag);
     this.splitter = getSplitter(tag);
+    
+    if(this.changer == null) {
+      this.changer = defaultC;
+    }
+    
+    if(this.splitter == null) {
+      this.splitter = defaultS;
+    }
     
     super.startTag(tag);
   }
