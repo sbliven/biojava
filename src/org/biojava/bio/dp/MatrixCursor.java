@@ -26,12 +26,17 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 public class MatrixCursor extends AbstractCursor {
+  private ResidueList resList;
   private double [][] matrix;
   private int index;
   private int dir;
   
   public int length() {
     return matrix[0].length - 1;
+  }
+  
+  public ResidueList resList() {
+    return resList;
   }
   
   public double [] currentCol() {
@@ -63,5 +68,6 @@ public class MatrixCursor extends AbstractCursor {
     this.index = (dir == 1) ?
                     0     :
                     resList.length() + 1;
+    this.resList = resList;
   }
 }

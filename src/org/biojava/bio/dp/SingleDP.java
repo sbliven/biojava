@@ -46,47 +46,92 @@ class SingleDP extends DP {
     return score;
   }
 
-  public double forward(ResidueList seq)
+  public SingleDP(FlatModel flat)
+  throws IllegalResidueException {
+    super(flat);
+  }
+  
+  public double forward(ResidueList [] seq)
   throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException {
-    DPCursor dpCursor = new SmallCursor(states, seq.length(),
-                                        seq.iterator());
+    if(seq.length != 1) {
+      throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
+    }
+    DPCursor dpCursor = new SmallCursor(
+      getStates(),
+      seq[0].length(),
+      seq[0],
+      seq[0].iterator()
+    );
     return forward(dpCursor);
   }
   
-  public double backward(ResidueList seq)
+  public double backward(ResidueList [] seq)
   throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException {
-    DPCursor dpCursor = new SmallCursor(states, seq.length(),
-                                        new ReverseIterator(seq));
-    return backward(dpCursor);
+    if(seq.length != 1) {
+      throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
+    }
+    DPCursor dpCursor = new SmallCursor(
+      getStates(),
+      seq[0].length(),
+      seq[0],
+      new ReverseIterator(seq[0])
+    );
   }
 
-  public DPMatrix forwardMatrix(ResidueList seq)
+  public DPMatrix forwardMatrix(ResidueList [] seq)
   throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException {
-    DPCursor dpCursor = new SmallCursor(states, seq.length(),
-                                        seq.iterator());
+    if(seq.length != 1) {
+      throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
+    }
+    DPCursor dpCursor = new SmallCursor(
+      getStates(),
+      seq[0].length(),
+      seq[0],
+      seq[0].iterator()
+    );
     return forward(dpCursor);
   }
   
-  public DPMatrix backwardMatrix(ResidueList seq)
+  public DPMatrix backwardMatrix(ResidueList [] seq)
   throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException {
-    DPCursor dpCursor = new SmallCursor(states, seq.length(),
-                                        new ReverseIterator(seq));
-    return forward(dpCursor);
+    if(seq.length != 1) {
+      throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
+    }
+    DPCursor dpCursor = new SmallCursor(
+      getStates(),
+      seq[0].length(),
+      seq[0],
+      new ReverseIterator(seq[0])
+    );
   }
   
-  public DPMatrix forwardmatrix(ResidueList seq, DPMatrix matrix)
+  public DPMatrix forwardmatrix(ResidueList [] seq, DPMatrix matrix)
   throws IllegalArgumentException, IllegalResidueException,
   IllegalAlphabetException, IllegalResidueException {
-    DPCursor dpCursor = new SmallCursor(states, seq.length(),
-                                        seq.iterator());
+    if(seq.length != 1) {
+      throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
+    }
+    DPCursor dpCursor = new SmallCursor(
+      getStates(),
+      seq[0].length(),
+      seq[0],
+      seq[0].iterator()
+    );
     return forward(dpCursor);
   }
 
-  public DPMatrix backwardmatrix(ResidueList seq, DPMatrix matrix)
+  public DPMatrix backwardmatrix(ResidueList [] seq, DPMatrix matrix)
   throws IllegalArgumentException, IllegalResidueException,
   IllegalAlphabetException, IllegalResidueException {
-    DPCursor dpCursor = new SmallCursor(states, seq.length(),
-                                        new ReverseIterator(seq));
+    if(seq.length != 1) {
+      throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
+    }
+    DPCursor dpCursor = new SmallCursor(
+      getStates(),
+      seq[0].length(),
+      seq[0],
+      new ReverseIterator(seq[0])
+    );
     return forward(dpCursor);
   }
 
@@ -107,6 +152,7 @@ class SingleDP extends DP {
   private void forward_initialize(DPCursor dpCursor)
     throws IllegalResidueException {
     double [] v = dpCursor.currentCol();
+    State [] states = getStates();
 
     // new_l = transition(start, l)
     for (int l = 0; l < states.length; l++) {
@@ -117,6 +163,7 @@ class SingleDP extends DP {
   private void backward_initialize(DPCursor dpCursor)
     throws IllegalResidueException {
     double [] v = dpCursor.currentCol();
+    State [] states = getStates();
 
     // new_l = transition(start, l)
     for (int l = 0; l < states.length; l++) {
@@ -126,9 +173,10 @@ class SingleDP extends DP {
 
   private void forward_recurse(DPCursor dpCursor)
     throws IllegalResidueException {
+    State [] states = getStates();
     int stateCount = states.length;
-    int [][] transitions = forwardTransitions;
-    double [][] transitionScore = forwardTransitionScores;
+    int [][] transitions = getForwardTransitions();
+    double [][] transitionScore = getForwardTransitionScores();
 
     // int _index = 0;
     while (dpCursor.canAdvance()) {
@@ -176,9 +224,10 @@ class SingleDP extends DP {
 
   private void backward_recurse(DPCursor dpCursor)
     throws IllegalResidueException {
+    State [] states = getStates();
     int stateCount = states.length;
-    int [][] transitions = backwardTransitions;
-    double [][] transitionScore = backwardTransitionScores;
+    int [][] transitions = getBackwardTransitions();
+    double [][] transitionScore = getBackwardTransitionScores();
 
     while (dpCursor.canAdvance()) {
       dpCursor.advance();
@@ -215,6 +264,7 @@ class SingleDP extends DP {
   private double forward_termination(DPCursor dpCursor)
     throws IllegalResidueException {
     double [] scores = dpCursor.currentCol();
+    State [] states = getStates();
 
     int l = 0;
     while (states[l] != getModel().magicalState())
@@ -226,6 +276,7 @@ class SingleDP extends DP {
   private double backward_termination(DPCursor dpCursor)
     throws IllegalResidueException {
     double [] scores = dpCursor.currentCol();
+    State [] states = getStates();
 
     int l = 0;
     while (states[l] != getModel().magicalState())
@@ -236,17 +287,18 @@ class SingleDP extends DP {
   
   public StatePath viterbi(ResidueList [] resList)
   throws IllegalResidueException {
-    DPCursor dpCursor = new SmallCursor(states, seq.length(), seq.iterator());
-    return viterbi(dpCursor, seq);
+    ResidueList r = resList[0];
+    DPCursor dpCursor = new SmallCursor(getStates(), r.length(), r, r.iterator());
+    return viterbi(dpCursor);
   }
 
   private StatePath viterbi(DPCursor dpCursor)
   throws IllegalResidueException {
     int seqLength = dpCursor.length();
-    State [] states = dpCursor.states();
+    State [] states = getStates();
 
-    int [][] transitions = forwardTransitions;
-    double [][] transitionScore = forwardTransitionScores;
+    int [][] transitions = getForwardTransitions();
+    double [][] transitionScore = getForwardTransitionScores();
     int stateCount = states.length;
 
     BackPointer [] oldPointers = new BackPointer[stateCount];
