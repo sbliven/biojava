@@ -68,6 +68,11 @@ public interface FeatureFilter extends Serializable {
    */
   static class ByType implements FeatureFilter {
     private String type;
+    
+    public String getType() {
+      return type;
+    }
+    
     /**
      * Create a ByType filter that filters in all features with type fields
      * equal to type.
@@ -91,6 +96,11 @@ public interface FeatureFilter extends Serializable {
    */
   static class BySource implements FeatureFilter {
     private String source;
+    
+    public String getSource() {
+      return source;
+    }
+    
     /**
      * Create a BySource filter that filters in all features which have sources
      * equal to source.
@@ -111,6 +121,10 @@ public interface FeatureFilter extends Serializable {
   static class ContainedByLocation implements FeatureFilter {
     private Location loc;
 
+    public Location getLocation() {
+      return loc;
+    }
+    
     /**
      * Creates a filter that returns everything contained within loc.
      *
@@ -136,6 +150,10 @@ public interface FeatureFilter extends Serializable {
   static class OverlapsLocation implements FeatureFilter {
     private Location loc;
     
+    public Location getLocation() {
+      return loc;
+    }
+    
     /**
      * Creates a filter that returns everything overlapping loc.
      *
@@ -150,6 +168,82 @@ public interface FeatureFilter extends Serializable {
      */
     public boolean accept(Feature f) {
       return loc.overlaps(f.getLocation());
+    }
+  }
+  
+  /**
+   *  A filter that returns all features not accepted by a child filter.
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   */
+  static class Not implements FeatureFilter {
+    FeatureFilter child;
+
+    public FeatureFilter getChild() {
+      return child;
+    }
+    
+    public Not(FeatureFilter child) {
+        this.child = child;
+    }
+
+    public boolean accept(Feature f) {
+        return !(child.accept(f));
+    }
+  }
+
+  /**
+   *  A filter that returns all features accepted by both child filter.
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   */
+  static class And implements FeatureFilter {
+    FeatureFilter c1, c2;
+
+    public FeatureFilter getChild1() {
+      return c1;
+    }
+    
+    public FeatureFilter getChild2() {
+      return c2;
+    }
+    
+    public And(FeatureFilter c1, FeatureFilter c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+    }
+
+    public boolean accept(Feature f) {
+        return (c1.accept(f) && c2.accept(f));
+    }
+  }
+
+  /**
+   *  A filter that returns all features accepted by at least one child filter.
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   */
+  static class Or implements FeatureFilter {
+    FeatureFilter c1, c2;
+
+    public FeatureFilter getChild1() {
+      return c1;
+    }
+    
+    public FeatureFilter getChild2() {
+      return c2;
+    }
+    
+    public Or(FeatureFilter c1, FeatureFilter c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+    }
+
+    public boolean accept(Feature f) {
+        return (c1.accept(f) || c2.accept(f));
     }
   }
 }

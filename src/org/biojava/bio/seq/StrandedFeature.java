@@ -38,9 +38,9 @@ public interface StrandedFeature extends Feature {
    * <P>
    * This will be one of StrandedFeature.POSITIVE or NEGATIVE.
    *
-   * @return an integer flag to indicate strandedness
+   * @return one of the Strand constants
    */
-  int getStrand();
+  Strand getStrand();
   
   /**
    * Return a list of symbols that are contained in this feature.
@@ -60,21 +60,60 @@ public interface StrandedFeature extends Feature {
   SymbolList getSymbols();
   
   /**
-   * int flag to indicate that a feature is on the positive strand.
+   * flag to indicate that a feature is on the positive strand.
    */
-  static final int POSITIVE = +1;
+  static final Strand POSITIVE = new Strand("POSITIVE", +1, '+');
 
   /**
-   * int flag to indicate that a feature is on the negative strand.
+   * flag to indicate that a feature is on the negative strand.
    */
-  static final int NEGATIVE = -1;
+  static final Strand NEGATIVE = new Strand("NEGATIVE", -1, '-');
+  
+  /**
+   * flag to indicate that a feature has an unknown strand.
+   */
+  static final Strand UNKNOWN = new Strand("UNKNOWN", 0, '.');
   
     /**
      * Template class for parameterizing the creation of a new
      * <code>StrandedFeature</code>.
+     *
+     * @author Matthew Pocock
      */
 
-  public class Template extends Feature.Template {
-    public int strand;
+  public static class Template extends Feature.Template {
+    public Strand strand;
+  }
+  
+  /**
+   * Class to represent the 'strandedness' of a feature.
+   * <P>
+   * Strandedness may be re-used in other situations, but basicaly what it means
+   * is whether the feature has directionality, and if it does, does it travel
+   * from its location min to max, or max to min.
+   *
+   * @author Matthew Pocock
+   */
+  public static class Strand {
+    private final String text;
+    private final int value;
+    private final char token;
+    
+    // Should be private. workaround for known javac 1.2 bug
+    // http://developer.java.sun.com/developer/bugParade/bugs/4262105.html
+    Strand(String text, int value, char token) {
+      this.text = text;
+      this.value = value;
+      this.token = token;
+    }
+    public String toString() {
+      return text;
+    }
+    public int getValue() {
+      return value;
+    }
+    public char getToken() {
+      return token;
+    }
   }
 }

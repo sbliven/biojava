@@ -22,6 +22,7 @@
 package org.biojava.bio.program.gff;
 
 import java.util.*;
+import org.biojava.bio.seq.StrandedFeature;
 
 /**
  * A no-frills implementation of a <span class="type">GFFRecord</span>.
@@ -56,7 +57,7 @@ public class SimpleGFFRecord implements GFFRecord {
   /**
    * The feature strand.
    */
-  private int strand;
+  private StrandedFeature.Strand strand;
   /**
    * The feature frame.
    */
@@ -155,26 +156,14 @@ public class SimpleGFFRecord implements GFFRecord {
   
   /**
    * Set the strand to <span class="arg">strand</source>.
-   * <P>
-   * The strand must be one of
-   * <span class="type">GFFRecord</span>.<span class="const">NO_STRAND</span>,
-   * <span class="type">GFFRecord</span>.<span class="const">POSITIVE_STRAND</span> or
-   * <span class="type">GFFRecord</span>.<span class="const">NEGATIVE_STRAND</span>.
    *
-   * @param score  the new score
-   * @throws IllegalArgumentException if strand is not a legal strand
+   * @param strand the new Strand 
    */
-  public void setStrand(int strand) throws IllegalArgumentException {
-    if(strand != GFFRecord.POSITIVE_STRAND &&
-       strand != GFFRecord.NEGATIVE_STRAND &&
-       strand != GFFRecord.NO_STRAND )
-    {
-      throw new IllegalArgumentException("Illegal strand: " + strand);
-    }
+  public void setStrand(StrandedFeature.Strand strand) {
     this.strand = strand;
   }
   
-  public int getStrand() {
+  public StrandedFeature.Strand getStrand() {
     return strand;
   }
   

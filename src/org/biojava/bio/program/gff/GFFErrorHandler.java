@@ -22,6 +22,7 @@
 package org.biojava.bio.program.gff;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.utils.*;
 
 /**
@@ -43,6 +44,7 @@ import org.biojava.utils.*;
  * </ul></p>
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public interface GFFErrorHandler {
@@ -103,7 +105,7 @@ public interface GFFErrorHandler {
      * @throws IgnoreRecordException If this record should be silently skipped.
      */
 
-    public int invalidStrand(String token) 
+    public StrandedFeature.Strand invalidStrand(String token) 
         throws ParserException, IgnoreRecordException;
 
     public static final GFFErrorHandler ABORT_PARSING = new AbortErrorHandler();
@@ -125,7 +127,7 @@ public interface GFFErrorHandler {
 	    throw new ParserException("Invalid frame token");
 	}
 
-	public int invalidStrand(String token) throws ParserException {
+	public StrandedFeature.Strand invalidStrand(String token) throws ParserException {
 	    throw new ParserException("Invalid strand token");
 	}
     }
@@ -149,7 +151,7 @@ public interface GFFErrorHandler {
 	    throw new IgnoreRecordException();
 	}
 
-	public int invalidStrand(String token) throws IgnoreRecordException {
+	public StrandedFeature.Strand invalidStrand(String token) throws IgnoreRecordException {
 	    throw new IgnoreRecordException();
 	}
     }

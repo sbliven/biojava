@@ -33,12 +33,13 @@ import org.biojava.bio.seq.*;
  * Simple FeatureBuilder implementation.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public class SimpleFeatureBuilder implements FeatureBuilder, Serializable {
     public Feature.Template buildFeatureTemplate(String type,
 						 Location loc,
-						 int strandHint,
+						 StrandedFeature.Strand strandHint,
 						 Map attrs) {
 	StrandedFeature.Template t = new StrandedFeature.Template();
 	t.annotation = new SimpleAnnotation();

@@ -62,6 +62,6 @@ public interface FeatureBuilder {
 
     public Feature.Template buildFeatureTemplate(String type,
 						 Location loc,
-						 int strandHint,
+						 StrandedFeature.Strand strandHint,
 						 Map attrs);
 }

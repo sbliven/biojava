@@ -25,6 +25,7 @@ import java.io.*;
 import java.util.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.StrandedFeature;
 
 /**
  * Listens to a stream of GFF events and writes the lines to a
@@ -86,10 +87,10 @@ public class GFFWriter implements GFFDocumentHandler {
       out.print(score + "\t");
     }
     
-    int strand = record.getStrand();
-    if(strand == GFFRecord.POSITIVE_STRAND) {
+    StrandedFeature.Strand strand = record.getStrand();
+    if(strand == StrandedFeature.POSITIVE) {
       out.print("+\t");
-    } else if(strand == GFFRecord.NEGATIVE_STRAND) {
+    } else if(strand == StrandedFeature.NEGATIVE) {
       out.print("-\t");
     } else {
       out.print(".\t");

@@ -34,6 +34,7 @@ import org.biojava.bio.seq.*;
  * the EMBL and GENBANK format readers.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 class FeatureTableParser {
@@ -49,7 +50,7 @@ class FeatureTableParser {
     private String featureType;
     private Location featureLocation;
     private Map featureAttributes;
-    private int featureStrand;
+    private StrandedFeature.Strand featureStrand;
 
     private FeatureBuilder fb;
 

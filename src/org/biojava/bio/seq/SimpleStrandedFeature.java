@@ -31,9 +31,9 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  */
 class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
-    private int strand;
+    private StrandedFeature.Strand strand;
     
-    public int getStrand() {
+    public StrandedFeature.Strand getStrand() {
 	return strand;
     }
   

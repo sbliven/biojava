@@ -36,10 +36,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.sequence.*;
 
-public class SequencePanel extends JComponent {
-    public final static int HORIZONTAL = 1;
-    public final static int VERTICAL = 2;
-
+public class SequencePanel extends JComponent implements SwingConstants {
     private Sequence sequence;
     private int direction;
     private double scale;
@@ -50,8 +47,6 @@ public class SequencePanel extends JComponent {
     private List views;
     private Map depths;
 
-    private Dimension ourSize;
-
     private RendererMonitor theMonitor;
 
     /**
@@ -59,14 +54,12 @@ public class SequencePanel extends JComponent {
      */
 
     {
-	views = new ArrayList();
-	depths = new HashMap();
-	direction = HORIZONTAL;
-	scale = 15;
+      views = new ArrayList();
+      depths = new HashMap();
+      direction = HORIZONTAL;
+      scale = 15;
 
-	ourSize = new Dimension(1, 1);
-
-	theMonitor = new RendererMonitor();
+      theMonitor = new RendererMonitor();
     }
 
     public SequencePanel() {
@@ -77,8 +70,7 @@ public class SequencePanel extends JComponent {
 	Sequence oldSequence = sequence;
 	this.sequence = s;
 	firePropertyChange("sequence", oldSequence, s);
-	invalidate();
-	repaint();
+	resizeAndValidate();
     }
 
     public Sequence getSequence() {
@@ -89,8 +81,7 @@ public class SequencePanel extends JComponent {
         int oldDirection = direction;
 	direction = dir;
 	firePropertyChange("direction", oldDirection, direction);
-	invalidate();
-	repaint();
+	resizeAndValidate();
     }
 
     public int getDirection() {
@@ -101,8 +92,7 @@ public class SequencePanel extends JComponent {
 	double oldScale = this.scale;
 	this.scale = scale;
 	firePropertyChange("scale", oldScale, scale);
-	invalidate();
-	repaint();
+	resizeAndValidate();
     }
 
     public double getScale() {
@@ -110,6 +100,7 @@ public class SequencePanel extends JComponent {
     }
 
     public void paintComponent(Graphics g) {
+      System.out.println("painting:");
 	Graphics2D g2 = (Graphics2D) g;
 	Rectangle2D oldClip = g2.getClipBounds();
 	Rectangle2D.Double clip = new Rectangle2D.Double();
@@ -128,6 +119,7 @@ public class SequencePanel extends JComponent {
 
 	for (Iterator i = views.iterator(); i.hasNext(); ) {
 	    SequenceRenderer r = (SequenceRenderer) i.next();
+    System.out.println("\t" + r);
 	    double depth = ((Double) depths.get(r)).doubleValue();
 
 	    switch(direction) {
@@ -170,58 +162,46 @@ public class SequencePanel extends JComponent {
 	}
 
 	views.add(r);
-	invalidate();
+  resizeAndValidate();
     }
 
     public double sequenceToGraphics(int seqPos) {
-	return ((seqPos-1) * scale) + insetBefore;
+      return ((seqPos-1) * scale) + insetBefore;
     }
 
     public int graphicsToSequence(double gPos) {
-	int p = (int) ((gPos - insetBefore) / scale) + 1;
-	if (p < 1)
-	    p = 1;
-	if (p > sequence.length())
-	    p = sequence.length();
-	return p;
+      return (int) ((gPos - insetBefore) / scale) + 1;
     }
 
-    public void invalidate() {
-	int alongDim = (int) (scale * sequence.length() + 
-			      insetBefore + insetAfter);
-	double acrossDim = 0.0;
-	insetBefore = 0.0;
-	insetAfter = 0.0;
-	for (Iterator i = views.iterator(); i.hasNext(); ) {
-	    SequenceRenderer r = (SequenceRenderer) i.next();
-	    double depth = r.getDepth(this);
-	    depths.put(r, new Double(depth));
-	    acrossDim += depth;
-	    insetBefore += Math.max(insetBefore, r.getMinimumLeader(this));
-	    insetAfter += Math.max(insetAfter, r.getMinimumTrailer(this));
-	}
-	switch (direction) {
-	case HORIZONTAL:
-	    ourSize.setSize(alongDim, (int) acrossDim);
-	    break;
-	case VERTICAL:
-	    ourSize.setSize((int) acrossDim, alongDim);
-	    break;
-	}
-	
-	super.invalidate();
-    }
-
-    public Dimension getMinimumSize() {
-	return ourSize;
-    }
-
-    public Dimension getMaximumSize() {
-	return ourSize;
-    }
-
-    public Dimension getPreferredSize() {
-	return ourSize;
+    public void resizeAndValidate() {
+      int alongDim = (int) (
+        scale * sequence.length() + 
+			  insetBefore + insetAfter
+      );
+      double acrossDim = 0.0;
+      insetBefore = 0.0;
+      insetAfter = 0.0;
+      for (Iterator i = views.iterator(); i.hasNext(); ) {
+        SequenceRenderer r = (SequenceRenderer) i.next();
+        double depth = r.getDepth(this);
+        depths.put(r, new Double(depth));
+        acrossDim += depth;
+        insetBefore += Math.max(insetBefore, r.getMinimumLeader(this));
+        insetAfter += Math.max(insetAfter, r.getMinimumTrailer(this));
+      }
+      Dimension d = null;
+      switch (direction) {
+        case HORIZONTAL:
+          d = new Dimension(alongDim, (int) acrossDim);
+          break;
+        case VERTICAL:
+          d = new Dimension((int) acrossDim, alongDim);
+          break;
+      }
+      
+      setMinimumSize(d);
+      setPreferredSize(d);
+      revalidate();
     }
 
     private class RendererMonitor implements PropertyChangeListener {

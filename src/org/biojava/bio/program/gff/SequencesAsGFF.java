@@ -114,13 +114,13 @@ public class SequencesAsGFF {
 	    record.setStart(loc.getMin());
 	    record.setEnd(loc.getMax());
 	    record.setScore(GFFRecord.NO_SCORE);
-	    record.setStrand(GFFRecord.NO_STRAND);
+	    record.setStrand(StrandedFeature.UNKNOWN);
 	    if(f instanceof StrandedFeature) {
         StrandedFeature sf = (StrandedFeature) f;
         if(sf.getStrand() == StrandedFeature.POSITIVE) {
-          record.setStrand(GFFRecord.POSITIVE_STRAND);
+          record.setStrand(StrandedFeature.POSITIVE);
         } else if(sf.getStrand() == StrandedFeature.NEGATIVE) {
-          record.setStrand(GFFRecord.NEGATIVE_STRAND);
+          record.setStrand(StrandedFeature.NEGATIVE);
         }
 	    }
 	    record.setFrame(GFFRecord.NO_FRAME);

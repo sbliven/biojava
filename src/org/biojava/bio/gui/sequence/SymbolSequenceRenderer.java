@@ -27,36 +27,59 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.*;
 
 import java.awt.*;
+import java.awt.geom.*;
 
 import java.util.List;
 
 public class SymbolSequenceRenderer implements SequenceRenderer {
+    private final double minWidth = 3.0;
     private double depth = 25.0;
     
     public double getDepth(SequencePanel sp) {
-	return depth;
+      /*if(sp.getScale() < minWidth) {
+        return 0.0;
+      } else {*/
+        return depth;
+      //}
     }
 
     public double getMinimumLeader(SequencePanel sp) {
-	return 0.0;
+      return 0.0;
     }
 
     public double getMinimumTrailer(SequencePanel sp) {
-	return 0.0;
+      return 0.0;
     }
 
     public void paint(Graphics2D g, SequencePanel sp) {
-	Sequence seq = sp.getSequence();
-	int direction = sp.getDirection();
-
-	g.setColor(Color.black);
-	for (int pos = 1; pos <= seq.length(); ++pos) {
-	    double gPos = sp.sequenceToGraphics(pos);
-	    char c = seq.symbolAt(pos).getToken();
-	    if (direction == SequencePanel.HORIZONTAL)
-		g.drawString("" + c, (int) gPos, 20);
-	    else
-		g.drawString("" + c, 10, (int) gPos + 10);  // FIXME!
-	}
+      Sequence seq = sp.getSequence();
+      Rectangle2D clip = g.getClipBounds();
+      int direction = sp.getDirection();
+      int minP;
+      int maxP;
+      
+      if(direction == sp.HORIZONTAL) {
+        minP = Math.max(1, sp.graphicsToSequence(clip.getMinX()));
+        maxP = Math.min(seq.length(), sp.graphicsToSequence(clip.getMaxX()));
+      } else {
+        minP = Math.max(1, sp.graphicsToSequence(clip.getMinY()));
+        maxP = Math.min(seq.length(), sp.graphicsToSequence(clip.getMaxY()));
+      }
+      
+      g.setColor(Color.black);
+      
+      if(sp.getScale() < minWidth) {
+        g.fill(clip);
+      } else {
+        for (int pos = minP; pos <= maxP; ++pos) {
+          double gPos = sp.sequenceToGraphics(pos);
+          char c = seq.symbolAt(pos).getToken();
+          if (direction == SequencePanel.HORIZONTAL) {
+            g.drawString("" + c, (int) gPos, 20);
+          } else {
+            g.drawString("" + c, 10, (int) gPos + 10);  // FIXME!
+          }
+        }
+      }
     }
 }

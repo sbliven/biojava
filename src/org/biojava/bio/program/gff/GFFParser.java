@@ -25,6 +25,7 @@ import java.util.*;
 import java.io.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.utils.*;
 
 /**
@@ -199,12 +200,12 @@ public class GFFParser {
     
 	String strand = (String) aList.get(6);
 	if(strand == null || strand.equals("") || strand.equals(".")) {
-	    record.setStrand(GFFRecord.NO_STRAND);
+	    record.setStrand(StrandedFeature.UNKNOWN);
 	} else {
 	    if(strand.equals("+")) {
-		record.setStrand(GFFRecord.POSITIVE_STRAND);
+		record.setStrand(StrandedFeature.POSITIVE);
 	    } else if(strand.equals("-")) {
-		record.setStrand(GFFRecord.NEGATIVE_STRAND);
+		record.setStrand(StrandedFeature.NEGATIVE);
 	    } else {
 		record.setStrand(errors.invalidStrand(strand));
 	    }

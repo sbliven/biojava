@@ -119,31 +119,34 @@ public class FeatureBlockSequenceRenderer implements SequenceRenderer, PropertyC
 
 
     public void paint(Graphics2D g, SequencePanel sp) {
-	for (Iterator i = sp.getSequence().filter(filter, true).features();
-	     i.hasNext(); )
-	{
-	    Rectangle2D clip = g.getClipBounds();
-	    Feature f = (Feature) i.next();
-	    Location l = f.getLocation();
-	    double min = sp.sequenceToGraphics(l.getMin());
-	    double max = sp.sequenceToGraphics(l.getMax() + 1);
+      for(
+        Iterator i = sp.getSequence().filter(filter, true).features();
+	      i.hasNext();
+      )	{
+        Rectangle2D clip = g.getClipBounds();
+        Feature f = (Feature) i.next();
+        Location l = f.getLocation();
+        double min = sp.sequenceToGraphics(l.getMin());
+        double max = sp.sequenceToGraphics(l.getMax() + 1);
 
-	    Rectangle2D box = null;
-	    if (sp.getDirection() == SequencePanel.HORIZONTAL)
-		box = new Rectangle2D.Double(min, 3, Math.max(1.0, max-min), depth - 6);
-	    else
-		box = new Rectangle2D.Double(3, min, depth - 6, Math.max(1.0, max-min));
-	    if (box.intersects(clip))
-		renderer.renderFeature(g, f, box, sp);
-	}
+        Rectangle2D box = null;
+        if (sp.getDirection() == SequencePanel.HORIZONTAL) {
+          box = new Rectangle2D.Double(min, 3, Math.max(1.0, max-min), depth - 6);
+        } else {
+          box = new Rectangle2D.Double(3, min, depth - 6, Math.max(1.0, max-min));
+        }
+        if (box.intersects(clip)) {
+          renderer.renderFeature(g, f, box, sp);
+        }
+      }
     }
 
     public void addPropertyChangeListener(PropertyChangeListener l) {
-	pcs.addPropertyChangeListener(l);
+      pcs.addPropertyChangeListener(l);
     }
 
     public void addPropertyChangeListener(String p, PropertyChangeListener l) {
-	pcs.addPropertyChangeListener(l);
+      pcs.addPropertyChangeListener(l);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener l) {

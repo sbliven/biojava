@@ -23,6 +23,8 @@ package org.biojava.bio.program.gff;
 
 import java.util.*;
 
+import org.biojava.bio.seq.StrandedFeature;
+
 /**
  * A single GFF record.
  * <P>
@@ -94,7 +96,7 @@ public interface GFFRecord {
    *
    * @return the strand field
    */
-  public int getStrand();
+  public StrandedFeature.Strand getStrand();
   
   /**
    * The frame of the feature.
@@ -127,18 +129,7 @@ public interface GFFRecord {
    * Flag to indicate that there is no score info.
    */
   public static double NO_SCORE = Double.NEGATIVE_INFINITY;
-  /**
-   * The feature is on the positive strand.
-   */
-  public static int POSITIVE_STRAND = +1;
-  /**
-   * The feature is on the negative strand.
-   */
-  public static int NEGATIVE_STRAND = -1;
-  /**
-   * Flag to indicate that there is no strand info.
-   */
-  public static int NO_STRAND = 0;
+
   /**
    * Flag to indicate that there is no frame info.
    */

@@ -26,8 +26,8 @@ import org.biojava.bio.gui.*;
 import org.biojava.bio.seq.*;
 
 public interface SequenceRenderer {
-    public void paint(Graphics2D g, SequencePanel sp);
-    public double getDepth(SequencePanel sp);
-    public double getMinimumLeader(SequencePanel sp);
-    public double getMinimumTrailer(SequencePanel sp);
+    void paint(Graphics2D g, SequencePanel sp);
+    double getDepth(SequencePanel sp);
+    double getMinimumLeader(SequencePanel sp);
+    double getMinimumTrailer(SequencePanel sp);
 }

@@ -33,22 +33,24 @@ import java.awt.geom.*;
 import java.util.List;
 
 public class BasicFeatureRenderer implements FeatureRenderer {
-    private Paint fill;
-    private Paint outline;
-    
-    protected PropertyChangeSupport pcs;
+  private Paint fill;
+  private Paint outline;
+  private float arrowSize = 15.0f;
+  private float arrowScoop = 4.0f;
 
-    public BasicFeatureRenderer() {
-	fill = Color.red;
-	outline = Color.black;
-	pcs = new PropertyChangeSupport(this);
-    }
+  protected PropertyChangeSupport pcs;
 
-    public void setFill(Paint p) {
-	Paint oldFill = fill;
-	fill = p;
-	pcs.firePropertyChange("fill", oldFill, fill);
-    }
+  public BasicFeatureRenderer() {
+    fill = Color.red;
+    outline = Color.black;
+    pcs = new PropertyChangeSupport(this);
+  }
+
+  public void setFill(Paint p) {
+    Paint oldFill = fill;
+    fill = p;
+    pcs.firePropertyChange("fill", oldFill, fill);
+  }
 
     public Paint getFill() {
 	return fill;
@@ -61,57 +63,124 @@ public class BasicFeatureRenderer implements FeatureRenderer {
     }
 
     public Paint getOutline() {
-	return outline;
+      return outline;
     }
-
-    public void renderFeature(Graphics2D g, Feature f, Rectangle2D box,
-			      SequencePanel context)
-    {
-	Shape s = box;
-	if (f instanceof StrandedFeature && box.getWidth() > 10) {
-	    int strand = ((StrandedFeature) f).getStrand();
-	    if (strand == StrandedFeature.POSITIVE) {
-		GeneralPath path = new GeneralPath();
-		path.moveTo((float) box.getMinX(), (float) (box.getMinY() + 4));
-		path.lineTo((float) (box.getMaxX() - 8),
-			    (float) (box.getMinY() + 4));
-		path.lineTo((float) (box.getMaxX() - 8),
-			    (float) (box.getMinY()));
-		path.lineTo((float) (box.getMaxX()),
-			    (float) ((box.getMaxY() + box.getMinY()) / 2));
-		path.lineTo((float) (box.getMaxX() - 8),
-			    (float) (box.getMaxY()));
-		path.lineTo((float) (box.getMaxX() - 8),
-			    (float) (box.getMaxY() - 4));
-		path.lineTo((float) box.getMinX(), (float) (box.getMaxY() - 4));
-		path.closePath();
-		s = path;
-	    } else if (strand == StrandedFeature.NEGATIVE) {		
-		GeneralPath path = new GeneralPath();
-		path.moveTo((float) box.getMaxX(), (float) (box.getMinY() + 4));
-		path.lineTo((float) (box.getMinX() + 8),
-			    (float) (box.getMinY() + 4));
-		path.lineTo((float) (box.getMinX() + 8),
-			    (float) (box.getMinY()));
-		path.lineTo((float) (box.getMinX()),
-			    (float) ((box.getMaxY() + box.getMinY()) / 2));
-		path.lineTo((float) (box.getMinX() + 8),
-			    (float) (box.getMaxY()));
-		path.lineTo((float) (box.getMinX() + 8),
-			    (float) (box.getMaxY() - 4));
-		path.lineTo((float) box.getMaxX(), (float) (box.getMaxY() - 4));
-		path.closePath();
-		s = path;
-	    }
-	}
-
-
-	g.setPaint(fill);
-	g.fill(s);
-	if (outline != fill) {
-	    g.setPaint(outline);
-	    g.draw(s);
-	}
+    
+    public void setArrowSize(float arrowSize) {
+      float oldArrowSize = this.arrowSize;
+      this.arrowSize = arrowSize;
+      pcs.firePropertyChange(
+        "arrowSize",
+        new Float(oldArrowSize),
+        new Float(arrowSize)
+      ); 
+    }
+    
+    public float getArrowSize() {
+      return arrowSize;
+    }
+    
+    public void setArrowScoop(float arrowScoop) {
+      float oldArrowScoop = this.arrowScoop;
+      this.arrowScoop = arrowScoop;
+      pcs.firePropertyChange(
+        "arrowScoop", 
+        new Float(oldArrowScoop),
+        new Float(oldArrowScoop)
+      ); 
+    }
+    
+    public float getArrowScoop() {
+      return arrowScoop;
+    }
+    
+    public void renderFeature(
+      Graphics2D g,
+      Feature f, 
+      Rectangle2D box,
+      SequencePanel context
+    ) {
+      Shape s = box;
+      if (f instanceof StrandedFeature) {
+        StrandedFeature.Strand strand = ((StrandedFeature) f).getStrand();
+        if(context.getDirection() == context.HORIZONTAL) {
+          if(box.getWidth() >= arrowSize && box.getHeight() >= arrowScoop*2.0) {
+            float minY = (float) box.getMinY();
+            float maxY = (float) box.getMaxY();
+            float minYS = minY + arrowScoop;
+            float maxYS = maxY - arrowScoop;
+            float midY = (minY + maxY) * 0.5f;
+            float minX = (float) box.getMinX();
+            float maxX = (float) box.getMaxX();
+            if(strand == StrandedFeature.POSITIVE) {
+              float midX = maxX - arrowSize;
+              GeneralPath path = new GeneralPath();
+              path.moveTo(minX, minYS);
+              path.lineTo(midX, minYS);
+              path.lineTo(midX, minY);
+              path.lineTo(maxX, midY);
+              path.lineTo(midX, maxY);
+              path.lineTo(midX, maxYS);
+              path.lineTo(minX, maxYS);
+              path.closePath();
+              s = path;
+            } else if(strand == StrandedFeature.NEGATIVE) {
+              float midX = minX + arrowSize;
+              GeneralPath path = new GeneralPath();
+              path.moveTo(maxX, minYS);
+              path.lineTo(midX, minYS);
+              path.lineTo(midX, minY);
+              path.lineTo(minX, midY);
+              path.lineTo(midX, maxY);
+              path.lineTo(midX, maxYS);
+              path.lineTo(maxX, maxYS);
+              path.closePath();
+              s = path;
+            }
+          }
+        } else { // vertical
+          if(box.getHeight() >= arrowSize && box.getWidth() >= arrowScoop*2.0) {
+            float minX = (float) box.getMinX();
+            float maxX = (float) box.getMaxX();
+            float minXS = minX + arrowScoop;
+            float maxXS = maxX - arrowScoop;
+            float midX = (minX + maxX) * 0.5f;
+            float minY = (float) box.getMinY();
+            float maxY = (float) box.getMaxY();
+            if(strand == StrandedFeature.POSITIVE) {
+              float midY = maxY - arrowSize;
+              GeneralPath path = new GeneralPath();
+              path.moveTo(minXS, minY);
+              path.lineTo(minXS, midY);
+              path.lineTo(minX, midY);
+              path.lineTo(midX, maxY);
+              path.lineTo(maxX, midY);
+              path.lineTo(maxXS, midY);
+              path.lineTo(maxXS, minY);
+              path.closePath();
+              s = path;
+            } else if(strand == StrandedFeature.NEGATIVE) {
+              float midY = maxY - arrowSize;
+              GeneralPath path = new GeneralPath();
+              path.moveTo(minXS, maxY);
+              path.lineTo(minXS, midY);
+              path.lineTo(minX, midY);
+              path.lineTo(midX, minY);
+              path.lineTo(maxX, midY);
+              path.lineTo(maxXS, midY);
+              path.lineTo(maxXS, maxY);
+              path.closePath();
+              s = path;
+            }
+          }
+        }
+      }
+      g.setPaint(fill);
+      g.fill(s);
+      if (outline != fill) {
+        g.setPaint(outline);
+        g.draw(s);
+      }
     }
 
     public void addPropertyChangeListener(PropertyChangeListener l) {
