@@ -163,8 +163,18 @@ class FeatureFetcher {
 		    categoryRequest = "category=" + category + ";";
 		}
 
-		fURL = new URL(dataSource, "features?" + encodingRequest + categoryRequest + typeRequest + segments);
+		// fURL = new URL(dataSource, "features?" + encodingRequest + categoryRequest + typeRequest + segments);
+		// huc = (HttpURLConnection) fURL.openConnection();
+
+		fURL = new URL(dataSource, "features");
 		huc = (HttpURLConnection) fURL.openConnection();
+		huc.setRequestMethod("POST");
+		huc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+		huc.setDoOutput(true);
+		OutputStream os = huc.getOutputStream();
+		PrintStream ps = new PrintStream(os);
+		ps.print(encodingRequest + categoryRequest + typeRequest + segments);
+		ps.close();
 	    }
 
 	    huc.connect();
