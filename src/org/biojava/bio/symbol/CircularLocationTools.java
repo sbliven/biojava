@@ -28,6 +28,7 @@ import java.util.*;
  * Description:  A class to hide the messiness of CircularLocs from LocationTools<p>
  * Copyright:    Copyright (c) 2001<p>
  * @author Mark Schreiber
+ * @author Greg Cox
  * @version 1.0
  *
  * <b>WARNING</b> All binary operations on CircularLocations are currently assumed to
@@ -110,7 +111,19 @@ final class CircularLocationTools {
    * Tests if the specified location is an instance of CircularLocation.
    */
   protected static boolean isCircular(Location loc){
-    return (loc instanceof CircularLocation);
+	boolean toReturn = false;
+    try
+    {
+	    if(loc.getDecorator(Class.forName("org.biojava.bio.symbol.CircularLocation")) != null)
+	    {
+	    	toReturn = true;
+	    }
+	}
+	catch(Exception e)
+	{
+		throw new org.biojava.bio.BioError("class org.biojava.bio.symbol.BetweenLocation could not be loaded");
+	}
+    return toReturn;
   }
 
 
