@@ -696,6 +696,11 @@ public class TranslatedSequencePanel extends JComponent
         g2.setTransform(prevTransform);
     }
 
+    /**
+     * <code>resizeAndValidate</code> sets the minimum, preferred and
+     * maximum sizes of the component according to the current leading
+     * and trailing borders, renderer depth and visible symbol count.
+     */
     public void resizeAndValidate()
     {
         Dimension d = null;

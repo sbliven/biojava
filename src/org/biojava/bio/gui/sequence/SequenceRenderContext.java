@@ -78,7 +78,7 @@ public interface SequenceRenderContext extends SwingConstants {
 
   /**
    *  Converts a graphical position into a sequence coordinate. You will need
-   * to have used getDirection to decide wether to use the x or y coordinate.
+   * to have used getDirection to decide whether to use the x or y coordinate.
    *
    * @param  d  A pixel position
    * @return    The corresponding sequence index 

@@ -65,7 +65,7 @@ public class SequenceViewerEvent extends EventObject {
   
   /**
    * Get the offset within the sequence - the symbol index. This is not
-   * guaranteed to be within the legal range of symbol indecies.
+   * guaranteed to be within the legal range of symbol indices.
    *
    * @return the position of the gesture in sequence coordinates
    */

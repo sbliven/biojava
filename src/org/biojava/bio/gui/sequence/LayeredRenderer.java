@@ -33,175 +33,214 @@ import org.biojava.bio.gui.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
+/**
+ * <code>LayeredRenderer</code> handles the lane offsets for
+ * <code>MultiLineRender</code>s. For each successive lane it
+ * translates the <code>Graphics2D</code> perpendicular to the
+ * sequence rendering direction by an amount equal to the value
+ * returned by the getDepth() method of that lane's renderer.
+ *
+ * @author Matthew Pocock
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @since 1.1
+ */
 public class LayeredRenderer {
-  public static final LayeredRenderer INSTANCE = new LayeredRenderer();
-  
-  public double getDepth(
-    List srcL,
-    List renderers
-  ) {
-    if(srcL.size() != renderers.size()) {
-      throw new IllegalArgumentException(
-        "srcL and renderers must be the same size: " +
-        srcL.size() + ":" + renderers.size()
-      );
-    }
-    double depth = 0.0;
-    Iterator srcI = srcL.iterator();
-    Iterator i = renderers.iterator();
-    while(srcI.hasNext() && i.hasNext()) {
-      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
-      SequenceRenderer sRend = (SequenceRenderer) i.next();
-      depth += sRend.getDepth(src);
-    }
-    return depth;
-  }
-  
-  public double getMinimumLeader(List srcL, List renderers) {
-    if(srcL.size() != renderers.size()) {
-      throw new IllegalArgumentException(
-        "srcL and renderers must be the same size: " +
-        srcL.size() + ":" + renderers.size()
-      );
-    }
-    double max = 0.0;
-    Iterator srcI = srcL.iterator();
-    Iterator i = renderers.iterator();
-    while(srcI.hasNext() && i.hasNext()) {
-      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
-      SequenceRenderer sRend = (SequenceRenderer) i.next();
-      max = Math.max(max, sRend.getMinimumLeader(src));
-    }
-    return max;
-  }
-  
-  public double getMinimumTrailer(List srcL, List renderers) {
-    if(srcL.size() != renderers.size()) {
-      throw new IllegalArgumentException(
-        "srcL and renderers must be the same size: " +
-        srcL.size() + ":" + renderers.size()
-      );
-    }
-    double max = 0.0;
-    Iterator srcI = srcL.iterator();
-    Iterator i = renderers.iterator();
-    while(srcI.hasNext() && i.hasNext()) {
-      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
-      SequenceRenderer sRend = (SequenceRenderer) i.next();
-      max = Math.max(max, sRend.getMinimumTrailer(src));
-    }
-    return max;
-  }
-  
-  public void paint(
-    Graphics2D g,
-    List srcL,
-    List renderers
-  ) {
-    if(srcL.size() != renderers.size()) {
-      throw new IllegalArgumentException(
-        "srcL and renderers must be the same size: " +
-        srcL.size() + ":" + renderers.size()
-      );
+
+    /**
+     * Static <code>LayeredRenderer</code> <code>INSTANCE</code> used
+     * by <code>MultiLineRenderer</code>s.
+     */
+    public static final LayeredRenderer INSTANCE = new LayeredRenderer();
+
+    /**
+     * <code>getDepth</code> returns the total depth of a list of
+     * <code>SequenceRenderer</code>s.
+     *
+     * @param srcL a <code>List</code> of
+     * <code>SequenceRenderContext</code>s.
+     * @param renderers a <code>List</code> of
+     * <code>SequenceRenderer</code>s.
+     *
+     * @return a <code>double</code>.
+     */
+    public double getDepth(List srcL, List renderers) {
+        if (srcL.size() != renderers.size()) {
+            throw new IllegalArgumentException("srcL and renderers must be the same size: " +
+                                               srcL.size() + ":" + renderers.size());
+        }
+
+        double depth = 0.0;
+        Iterator srcI = srcL.iterator();
+        Iterator i = renderers.iterator();
+
+        while (srcI.hasNext() && i.hasNext()) {
+            SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+            SequenceRenderer sRend = (SequenceRenderer) i.next();
+            depth += sRend.getDepth(src);
+        }
+        return depth;
     }
 
-    double offset = 0.0;
-    double allocatedOffset = 0.0;
-    
-    Iterator srcI = srcL.iterator();
-    Iterator i = renderers.iterator();
-    
-    Rectangle2D clip = new Rectangle2D.Double();
-    while(srcI.hasNext() && i.hasNext()) {
-      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
-      SequenceRenderer sRend = (SequenceRenderer) i.next();
-      int dir = src.getDirection();
-      double depth = sRend.getDepth(src);
-      double minP = src.sequenceToGraphics(src.getRange().getMin()) -
-                    sRend.getMinimumLeader(src);
-      double maxP = src.sequenceToGraphics(src.getRange().getMax()) +
-                    sRend.getMinimumTrailer(src);
-      
-      if(dir == src.HORIZONTAL) {
-        clip.setFrame(minP, 0.0, maxP - minP, depth);
-        g.translate(0.0, offset);
-      } else {
-        clip.setFrame(0.0, minP, depth, maxP - minP);
-        g.translate(offset, 0.0);
-      }
-      
-      Shape oldClip = g.getClip();
-      g.clip(clip);
-      sRend.paint(g, src);
-      g.setClip(oldClip);
-      
-      if(dir == src.HORIZONTAL) {
-	  g.translate(0.0, -offset);
-      } else {
-	  g.translate(-offset, 0.0);
-      }
-      
-      if (sRend instanceof OverlayMarker)  {
-        // overlay, just record maximum allocation
-        allocatedOffset = Math.max(allocatedOffset, sRend.getDepth(src));
-      }
-      else {
-        // non-overlaid: apply all relevant offsets
-        offset += Math.max(sRend.getDepth(src), allocatedOffset);
-        allocatedOffset = 0.0;  // clear it as it is now applied.
-      }
-    }
-  }
-  
-  public SequenceViewerEvent processMouseEvent(
-    List srcL,
-    MouseEvent me,
-    List path,
-    List renderers
-  ) {
-    if(srcL.size() != renderers.size()) {
-      throw new IllegalArgumentException(
-        "srcL and renderers must be the same size: " +
-        srcL.size() + ":" + renderers.size()
-      );
+    /**
+     * <code>getMinimumLeader</code> returns the maximum value of
+     * getMinimumLeader() for a list of <code>SequenceRenderer</code>s.
+     *
+     * @param srcL a <code>List</code> of
+     * <code>SequenceRenderContext</code>s.
+     * @param renderers a <code>List</code> of
+     * <code>SequenceRenderer</code>s.
+     *
+     * @return a <code>double</code>.
+     */
+    public double getMinimumLeader(List srcL, List renderers) {
+        if (srcL.size() != renderers.size()) {
+            throw new IllegalArgumentException("srcL and renderers must be the same size: " +
+                                               srcL.size() + ":" + renderers.size());
+        }
+
+        double max = 0.0;
+        Iterator srcI = srcL.iterator();
+        Iterator i = renderers.iterator();
+
+        while (srcI.hasNext() && i.hasNext()) {
+            SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+            SequenceRenderer sRend = (SequenceRenderer) i.next();
+            max = Math.max(max, sRend.getMinimumLeader(src));
+        }
+        return max;
     }
 
-    double offset = 0.0;
-    
-    Iterator srcI = srcL.iterator();
-    Iterator i = renderers.iterator();
-    while(srcI.hasNext() && i.hasNext()) {
-      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
-      SequenceRenderer sRend = (SequenceRenderer) i.next();
-      double depth = sRend.getDepth(src);
-      
-      SequenceViewerEvent sve = null;
-      if(src.getDirection() == src.HORIZONTAL) {
-        if( (me.getY() >= offset) && (me.getY() < offset + depth) ) {
-          me.translatePoint(0, (int) -offset);
-          sve = sRend.processMouseEvent(
-            src, me, path
-          );
-          me.translatePoint(0, (int) +offset);
+    /**
+     * <code>getMinimumTrailer</code> returns the maximum value of
+     * getMinimumTrailer() for a list of <code>SequenceRenderer</code>s.
+     *
+     * @param srcL a <code>List</code> of
+     * <code>SequenceRenderContext</code>s.
+     * @param renderers a <code>List</code> of
+     * <code>SequenceRenderer</code>s.
+     *
+     * @return a <code>double</code>.
+     */
+    public double getMinimumTrailer(List srcL, List renderers) {
+        if (srcL.size() != renderers.size()) {
+            throw new IllegalArgumentException("srcL and renderers must be the same size: " +
+                                               srcL.size() + ":" + renderers.size());
         }
-      } else {
-        if( (me.getX() >= offset) && (me.getX() < offset + depth) ) {
-          me.translatePoint((int) -offset, 0);
-          sve = sRend.processMouseEvent(
-            src, me, path
-          );
-          me.translatePoint((int) +offset, 0);
+
+        double max = 0.0;
+        Iterator srcI = srcL.iterator();
+        Iterator i = renderers.iterator();
+
+        while (srcI.hasNext() && i.hasNext()) {
+            SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+            SequenceRenderer sRend = (SequenceRenderer) i.next();
+            max = Math.max(max, sRend.getMinimumTrailer(src));
         }
-      }
-      
-      if(sve != null) {
-        return sve;
-      }
-      
-      if (!(sRend instanceof OverlayMarker)) offset += depth;
+        return max;
     }
+
+    public void paint(Graphics2D g, List srcL, List renderers) {
+        if (srcL.size() != renderers.size()) {
+            throw new IllegalArgumentException("srcL and renderers must be the same size: " +
+                                               srcL.size() + ":" + renderers.size());
+        }
+
+        // Offset perpendicular to sequence rendering direction
+        double offset = 0.0;
+
+        // Don't know what this is
+        double allocatedOffset = 0.0;
     
-    return null;
-  }
+        Iterator srcI = srcL.iterator();
+        Iterator i = renderers.iterator();
+
+        // New clipping rectangle
+        Rectangle2D clip = new Rectangle2D.Double();
+
+        while (srcI.hasNext() && i.hasNext()) {
+            SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+            SequenceRenderer sRend = (SequenceRenderer) i.next();
+            int dir = src.getDirection();
+            double depth = sRend.getDepth(src);
+
+            // Sequence range should be inclusive of the min/max
+            // coordinates for sequenceToGraphics() so we use
+            // src.getRange().getMax() + 1
+            double minP = src.sequenceToGraphics(src.getRange().getMin()) -
+                sRend.getMinimumLeader(src);
+            double maxP = src.sequenceToGraphics(src.getRange().getMax() + 1) +
+                sRend.getMinimumTrailer(src);
+      
+            if (dir == src.HORIZONTAL) {
+                clip.setFrame(minP, 0.0, maxP - minP, depth);
+                g.translate(0.0, offset);
+            } else {
+                clip.setFrame(0.0, minP, depth, maxP - minP);
+                g.translate(offset, 0.0);
+            }
+      
+            Shape oldClip = g.getClip();
+            g.clip(clip);
+            sRend.paint(g, src);
+            g.setClip(oldClip);
+      
+            if (dir == src.HORIZONTAL) {
+                g.translate(0.0, -offset);
+            } else {
+                g.translate(-offset, 0.0);
+            }
+      
+            if (sRend instanceof OverlayMarker)  {
+                // overlay, just record maximum allocation
+                allocatedOffset = Math.max(allocatedOffset, sRend.getDepth(src));
+            } else {
+                // non-overlaid: apply all relevant offsets
+                offset += Math.max(sRend.getDepth(src), allocatedOffset);
+                allocatedOffset = 0.0;  // clear it as it is now applied.
+            }
+        }
+    }
+  
+    public SequenceViewerEvent processMouseEvent(List srcL, MouseEvent me,
+                                                 List path, List renderers) {
+        if (srcL.size() != renderers.size()) {
+            throw new IllegalArgumentException("srcL and renderers must be the same size: " +
+                                               srcL.size() + ":" + renderers.size());
+        }
+
+        // Offset perpendicular to sequence rendering direction
+        double offset = 0.0;
+    
+        Iterator srcI = srcL.iterator();
+        Iterator i = renderers.iterator();
+
+        while (srcI.hasNext() && i.hasNext()) {
+            SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+            SequenceRenderer sRend = (SequenceRenderer) i.next();
+            double depth = sRend.getDepth(src);
+
+            SequenceViewerEvent sve = null;
+            if (src.getDirection() == src.HORIZONTAL) {
+                if ((me.getY() >= offset) && (me.getY() < offset + depth)) {
+                    me.translatePoint(0, (int) -offset);
+                    sve = sRend.processMouseEvent(src, me, path);
+                    me.translatePoint(0, (int) +offset);
+                }
+            } else {
+                if ((me.getX() >= offset) && (me.getX() < offset + depth)) {
+                    me.translatePoint((int) -offset, 0);
+                    sve = sRend.processMouseEvent(src, me, path);
+                    me.translatePoint((int) +offset, 0);
+                }
+            }
+
+            if (sve != null) {
+                return sve;
+            }
+
+            if (! (sRend instanceof OverlayMarker)) offset += depth;
+        }
+        return null;
+    }
 }
 
