@@ -68,6 +68,8 @@ public class CompoundLocation implements Location, Serializable {
    *        compound location
    */
   public CompoundLocation(List locations) {
+      System.out.println(locations.toString());
+
     List working = new ArrayList();
     for(Iterator i = locations.iterator(); i.hasNext(); ) {
       for(Iterator bi = ((Location) i.next()).blockIterator(); bi.hasNext(); ) {
@@ -85,13 +87,21 @@ public class CompoundLocation implements Location, Serializable {
       if(cur.overlaps(last)) {
         last = last.union(cur);
       } else {
-        this.locations.add(last);
+	if (last != Location.empty)
+	    this.locations.add(last);
         last = cur;
       }
     }
     if(last != Location.empty) {
       this.locations.add(last);
     }
+
+    if (this.locations.size() != 0) {
+	min = ((Location) this.locations.get(0)).getMin();
+	max = ((Location) this.locations.get(this.locations.size() - 1)).getMax();
+    }
+
+    System.out.println(this.locations.toString());
   }
   
   public boolean contains(int p) {
@@ -163,10 +173,8 @@ public class CompoundLocation implements Location, Serializable {
   }
 
   public Location union(Location l) {
-    List res = new ArrayList();
-
-    for(Iterator i = locations.iterator(); i.hasNext(); )
-      res.add( ((Location) i.next()).union(l) );
+    List res = new ArrayList(this.locations);
+    res.add(l);
 
     return new CompoundLocation(res);
   }
