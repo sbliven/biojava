@@ -995,6 +995,11 @@ public class BioSQLSequenceDB implements SequenceDB {
 		tables.add("seqfeature_source as " + tableName);
 		return tableName + ".source_name " + eq(negate) + qw(source) + " and seqfeature.seqfeature_source_id = " + tableName + ".seqfeature_source_id";
 	    } else if (ff instanceof FeatureFilter.ByAnnotation) {
+            
+            return "";
+            
+            /* FIXME disabled until Matthew works out what he's doing with AnnotationTypes
+            
 		FeatureFilter.ByAnnotation ffba = (FeatureFilter.ByAnnotation) ff;
 		Object key = ffba.getKey();
 		Object value = ffba.getValue();
@@ -1007,10 +1012,14 @@ public class BioSQLSequenceDB implements SequenceDB {
 		String sqvName = "sqv_" + (used_sqv++);
 		tables.add("seqfeature_qualifier_value as " + sqvName);
 
+        */
+        
 		// FIXME this doesn't actually do negate quite right -- it doesn't
 		// match if the property isn't defined.  Should do an outer join
 		// to fix this.  But for now, we'll just punt :-(
 
+        /*
+        
 		if (negate) {
 		    return "";
 		}
@@ -1019,6 +1028,9 @@ public class BioSQLSequenceDB implements SequenceDB {
 		       sqvName + ".ontology_term_id = " + otName + ".ontology_term_id and " +
 		       otName + ".term_name = " + qw(keyString) + " and " +
 		       "seqfeature.seqfeature_id = " + sqvName + ".seqfeature_id";
+               
+               */
+               
 	    } else if (ff instanceof FeatureFilter.And) {
 		FeatureFilter.And and = (FeatureFilter.And) ff;
 		FeatureFilter ff1 = and.getChild1();
