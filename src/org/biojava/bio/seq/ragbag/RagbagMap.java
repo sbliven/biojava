@@ -44,7 +44,7 @@ import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.seq.StrandedFeature;
 
 /**
- * This class is an object that encapulates all information 
+ * This class is an object that encapsulates all information 
  * present in a Map file in a Ragbag directory.
  */
 public class RagbagMap extends StAXContentHandlerBase
