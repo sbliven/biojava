@@ -1,24 +1,3 @@
-/*
- *                    BioJava development code
- *
- * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  If you do not have a copy,
- * see:
- *
- *      http://www.gnu.org/copyleft/lesser.html
- *
- * Copyright for this code is held jointly by the individual
- * authors.  These should be listed in @author doc comments.
- *
- * For more information on the BioJava project and its aims,
- * or to join the biojava-l mailing list, visit the home page
- * at:
- *
- *      http://www.biojava.org/
- *
- */
-
 package org.biojava.bio.dp;
 
 import java.io.Serializable;
@@ -43,28 +22,30 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Tanya Vavouri
  */
-public class WeightMatrixAnnotator implements SequenceAnnotator, Serializable {
-  private final WeightMatrix matrix;
-  private final double threshold;
+public class WeightMatrixAnnotator implements SequenceAnnotator,
+    Serializable {
+  private WeightMatrix matrix;
+  private double threshold;
   private final ScoreType scoreType;
+  private String wmID;
 
-  public Sequence annotate(Sequence seq)
-          throws IllegalAlphabetException, BioException, ChangeVetoException
-  {
+  public Sequence annotate(Sequence seq) throws IllegalAlphabetException,
+      BioException, ChangeVetoException {
     seq = new ViewSequence(seq);
 
     int cols = matrix.columns();
     Feature.Template template = new Feature.Template();
     template.source = "WeightMatrixAnnotator";
-    template.type = "hit";
-    for(int offset = 1;
-        offset <= seq.length() - cols + 1;
-        offset++) {
+    template.type = wmID;
+    for (int offset = 1;
+         offset <= seq.length() - cols + 1;
+         offset++) {
       double score = DP.scoreWeightMatrix(matrix, seq, scoreType, offset);
       double q = Math.exp(score);
-      if(q >= threshold) {
-        template.location = new RangeLocation(offset, offset+cols-1);
+      if (q >= threshold) {
+        template.location = new RangeLocation(offset, offset + cols - 1);
         SimpleAnnotation ann = new SimpleAnnotation();
         ann.setProperty("score", new Double(q));
         ann.setProperty("weightMatrix", matrix);
@@ -76,15 +57,29 @@ public class WeightMatrixAnnotator implements SequenceAnnotator, Serializable {
   }
 
   /**
-   * Create a new annotator that uses the PROBABILITY score type.
+   * Create a new annotator that uses the PROBABILITY score type and an ID
+   for the weight matrix.
    *
    * @param wm        the weight matrix
    * @param threshold the threshold
+   * @param wmID the weight matrix ID
    */
-  public WeightMatrixAnnotator(WeightMatrix wm, double threshold) {
+  public WeightMatrixAnnotator(WeightMatrix wm, ScoreType scoreType,
+                               double threshold, String wmID) {
     this.matrix = wm;
     this.threshold = threshold;
     this.scoreType = ScoreType.PROBABILITY;
+    this.wmID = wmID;
+  }
+
+  /**
+   * Create a new annotator that uses PROBABILITY score type.
+   *
+   * @param wm a <code>WeightMatrix</code> value
+   * @param threshold a <code>double</code> value
+   */
+  public WeightMatrixAnnotator(WeightMatrix wm, double threshold) {
+    this(wm, ScoreType.PROBABILITY, threshold, "hit");
   }
 
   /**
@@ -95,11 +90,28 @@ public class WeightMatrixAnnotator implements SequenceAnnotator, Serializable {
    * @param threshold the threshold
    * @since 1.4
    */
-  public WeightMatrixAnnotator(WeightMatrix wm, ScoreType scoreType, double threshold) {
+  public WeightMatrixAnnotator(WeightMatrix wm, ScoreType scoreType,
+                               double threshold) {
     this.matrix = wm;
     this.scoreType = scoreType;
     this.threshold = threshold;
+    this.wmID = "hit";
   }
+
+  /**
+   * Get the value of the weight matrix id.
+   * @return value of the weight matrix id.
+   */
+  public String getWeightMatrixID() {
+    return wmID;
+  }
+
+  /**
+   * Set the weight matrix id.
+   * @param id  Value to assign to the weight matrix id.
+   */
+  public void setWeightMatrixID(String id) {
+    this.wmID = id;
+  }
+
 }
-
-
