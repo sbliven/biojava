@@ -74,7 +74,12 @@ public class ProjectionEngine {
 	    throws ClassNotFoundException
 	{
 	    try {
-		InputStream is = getResourceAsStream(name.replace('.', '/') + ".class");
+                String resName = name.replace('.', '/') + ".class";
+		InputStream is = getResourceAsStream(resName);
+                if(is == null) {
+                  throw new ClassNotFoundException("Could not find class resource: " + resName);
+                }
+
 		byte[] buffer = new byte[10000];
 		int len = 0;
 		int read = 0;
@@ -90,7 +95,7 @@ public class ProjectionEngine {
 
 		return c;
 	    } catch (Exception ex) {
-		throw new ClassNotFoundException(ex.toString());
+		throw new ClassNotFoundException("Could not load class for " + name + ": " + ex.toString());
 	    }
 		    
 	}
