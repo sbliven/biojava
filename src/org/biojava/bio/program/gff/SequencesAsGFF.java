@@ -56,6 +56,29 @@ public class SequencesAsGFF {
    */
   private boolean recurse = false;
   
+  private boolean generateSequenceHeader = true;
+  
+  /**
+   * Specify whether a per-sequence header line, giving the length of the
+   * sequence, should be generated.
+   *
+   * @since 1.4
+   */
+   
+   public void setGenerateSequenceHeader(boolean b) {
+       this.generateSequenceHeader = b;
+   }
+   
+   /**
+    * Discover if per-sequence header lines will be generated.
+    *
+    * @since 1.4
+    */
+   
+   public boolean getGenerateSequenceHeader() {
+       return generateSequenceHeader;
+   }
+  
   /**
    * Return the current <span class="type">FeatureFilter</span>.
    * <p>
@@ -97,7 +120,25 @@ public class SequencesAsGFF {
     this.recurse = recurse;
   }
 
-
+  /**
+   * Emit any per-sequence header information.
+   * The default implementation emits sequence-region comment lines.
+   *
+   * @since 1.4
+   */
+  
+  protected void doPreProcessSequence(
+    Sequence seq,
+    GFFDocumentHandler handler,
+    String id
+  )
+    throws BioException
+  {
+      if (generateSequenceHeader) {
+          handler.commentLine("#sequence-region " + id + " 1 " + seq.length());
+      }
+  }
+  
   /**
    * Internal method to process an individual <span class="type">Sequence</span>.
    *
@@ -111,7 +152,8 @@ public class SequencesAsGFF {
   protected void doProcessSequence(Sequence seq,
                                    GFFDocumentHandler handler,
                                    String id) 
-  throws BioException {
+    throws BioException 
+  {
     Iterator fi = seq.filter(getFeatureFilter(), getRecurse()).features();
       
     while (fi.hasNext()) {
@@ -209,6 +251,7 @@ public class SequencesAsGFF {
   public void processSequence(Sequence seq, GFFDocumentHandler handler) 
   throws BioException {
     handler.startDocument(seq.getURN());
+    doPreProcessSequence(seq, handler, seq.getName());
     doProcessSequence(seq, handler, seq.getName());
     handler.endDocument();
   }
@@ -225,7 +268,12 @@ public class SequencesAsGFF {
    */
   public void processDB(SequenceDB seqDB, GFFDocumentHandler handler)
   throws BioException {
-    handler.startDocument("unknown:SequenceDB");
+    handler.startDocument("unknown:SequenceDB:" + seqDB.getName());
+    for(Iterator i = seqDB.ids().iterator(); i.hasNext(); ) {
+      String id = (String) i.next();
+      Sequence seq = seqDB.getSequence(id);
+      doPreProcessSequence(seq, handler, id);
+    }
     for(Iterator i = seqDB.ids().iterator(); i.hasNext(); ) {
       String id = (String) i.next();
       Sequence seq = seqDB.getSequence(id);
