@@ -80,11 +80,35 @@ public class TokenParser implements SymbolParser, Serializable {
     }
 
     public SymbolList parse(String seq) throws IllegalSymbolException {
-	List rList = new ArrayList(seq.length());
-	for(int i = 0; i < seq.length(); i++) {
-	    rList.add(parseCharToken(seq.charAt(i)));
+	int len = seq.length();
+	if (len < 100) {
+	    List rList = new ArrayList(seq.length());
+	    for(int i = 0; i < seq.length(); i++) {
+		rList.add(parseCharToken(seq.charAt(i)));
+	    }
+	    return new SimpleSymbolList(getAlphabet(), rList);
+	} else {
+	    Symbol[] buffer = new Symbol[256];
+	    ChunkedSymbolListBuilder builder = new ChunkedSymbolListBuilder();
+	    
+	    int pos = 0;
+	    while (pos < len) {
+		int bufPos = 0;
+		while (pos < len && bufPos < buffer.length) {
+		    buffer[bufPos++] = parseCharToken(seq.charAt(pos++));
+		}
+		try {
+		    builder.addSymbols(alphabet,
+				       buffer,
+				       0,
+				       bufPos);
+		} catch (IllegalAlphabetException ex) {
+		    throw new BioError(ex);
+		}
+	    }
+
+	    return builder.makeSymbolList();
 	}
-	return new SimpleSymbolList(getAlphabet(), rList);
     }
   
     Symbol parseCharToken(char token) 
