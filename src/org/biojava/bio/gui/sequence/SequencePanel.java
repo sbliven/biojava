@@ -67,7 +67,6 @@ public class SequencePanel
     SequenceRenderContext,
     Changeable
 {
-  private static final double FUDGE_OFFSET = 50.0;
   public static final ChangeType RENDERER = new ChangeType(
     "The renderer for this SequencePanel has changed",
     "org.biojava.bio.gui.sequence.SequencePanel",
@@ -96,8 +95,6 @@ public class SequencePanel
         return;
       }
 
-      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
-
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
@@ -114,8 +111,6 @@ public class SequencePanel
         return;
       }
 
-      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
-
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
@@ -131,8 +126,6 @@ public class SequencePanel
       if(!isActive()) {
         return;
       }
-
-      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
 
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
@@ -159,8 +152,6 @@ public class SequencePanel
         return;
       }
 
-      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
-
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
@@ -176,8 +167,6 @@ public class SequencePanel
       if(!isActive()) {
         return;
       }
-
-      setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
 
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
@@ -421,8 +410,7 @@ public class SequencePanel
     Rectangle2D currentClip = g2.getClip().getBounds2D();
     
     // do a transform to offset drawing to the neighbourhood of zero.
-    // the 50 here is pretty arbitrary.  The precise value doesn't matter
-    setGraphicsOrigin(FUDGE_OFFSET-sequenceToGraphics(range.getMin()));
+    adjustOffset(sequenceToGraphics(range.getMin()));
 
     double minAcross = sequenceToGraphics(range.getMin()) -
                        renderer.getMinimumLeader(this);
@@ -489,6 +477,10 @@ public class SequencePanel
     }
   }
 
+  private void adjustOffset(double newOrigin) {
+    pixelOffset -= newOrigin;
+  }
+  
   public double sequenceToGraphics(int seqPos) {
     return ((double) (seqPos-1)) * scale + pixelOffset;
   }
@@ -503,11 +495,6 @@ public class SequencePanel
     } else {
       return graphicsToSequence(point.getY());
     }
-  }
-
- public void setGraphicsOrigin(double displacement) {
-     // System.out.println("setGraphicsOrigin: " + displacement);  
-     this.pixelOffset += displacement;
   }
 
   public void resizeAndValidate() {
