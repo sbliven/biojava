@@ -30,7 +30,7 @@ import org.biojava.bio.seq.tools.DNATools;
 public class DNAWeightMatrix implements WeightMatrix {
   private double [][] weights;
 
-  public Alphabet alphabet() {
+  public FiniteAlphabet alphabet() {
     return DNATools.getAlphabet();
   }
 

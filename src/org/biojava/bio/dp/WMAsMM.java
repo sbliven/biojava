@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
 /**
@@ -33,14 +34,14 @@ public class WMAsMM implements MarkovModel {
   private static MagicalState magicalState = MagicalState.getMagicalState(1);
   
   private WeightMatrix wm;
-  private Alphabet stateAlpha;
+  private FiniteAlphabet stateAlpha;
   private WMState [] stateList;
   
   public Alphabet emissionAlphabet() {
     return wm.alphabet();
   }
   
-  public Alphabet stateAlphabet() {
+  public FiniteAlphabet stateAlphabet() {
     return stateAlpha;
   }
   
@@ -180,7 +181,7 @@ public class WMAsMM implements MarkovModel {
     sa.addResidue(magicalState);
     this.stateAlpha = sa;
     for(int i = 0; i < wm.columns(); i++) {
-      stateList[i] = new WMState(i);
+      stateList[i] = new WMState(wm.alphabet(), i);
       sa.addResidue(stateList[i]);
       stateList[i].setName( "" + (i+1) );
     }
@@ -211,12 +212,20 @@ public class WMAsMM implements MarkovModel {
     public void registerWithTrainer(ModelTrainer modelTrainer) {
       Set trainerSet = modelTrainer.trainersForState(this);
       if(trainerSet.isEmpty()) {
-        modelTrainer.registerTrainerForState(this, new SimpleStateTrainer(this));
+        try {
+          modelTrainer.registerTrainerForState(
+            this, new SimpleStateTrainer(this)
+          );
+        } catch (IllegalAlphabetException iae) {
+          throw new BioError(
+            iae, "I am sure that I am over a finite alphabet - the world is mad."
+          );
+        }
       }
     }
     
-    public WMState(int index) {
-      super(emissionAlphabet());
+    public WMState(FiniteAlphabet alpha, int index) {
+      super(alpha);
       this.index = index;
     }
   }

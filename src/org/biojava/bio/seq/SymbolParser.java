@@ -33,7 +33,7 @@ public class SymbolParser implements ResidueParser {
   /**
    * The alphabet to parse into.
    */
-  private Alphabet alphabet;
+  private FiniteAlphabet alphabet;
   /**
    * The map from symbol to residue.
    */
@@ -77,7 +77,7 @@ public class SymbolParser implements ResidueParser {
    *
    * @param alpha the Alphabet to parse symbols into
    */
-  public SymbolParser(Alphabet alpha) {
+  public SymbolParser(FiniteAlphabet alpha) {
     this.alphabet = alpha;
     for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {
       Residue res = (Residue) i.next();

@@ -126,7 +126,10 @@ public class TextLogoPainter implements LogoPainter {
     SortedSet info = new TreeSet(COMP);
     
     try {
-      for(Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
+      for(
+        Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+        i.hasNext();
+      ) {
         Residue r = (Residue) i.next();
         info.add(new ResVal(r, Math.exp(state.getWeight(r)) * scale));
       }

@@ -125,7 +125,10 @@ public class Meme {
         }
       }
 
-      SimpleWeightMatrix matrix = new SimpleWeightMatrix(resParser.alphabet(), width);
+      SimpleWeightMatrix matrix = new SimpleWeightMatrix(
+        (FiniteAlphabet) resParser.alphabet(),
+        width
+      );
 
       int r = 0;
       int c = 0;

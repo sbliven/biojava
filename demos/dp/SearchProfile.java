@@ -13,7 +13,7 @@ public class SearchProfile {
     try {
       File seqFile = new File(args[0]);
 
-      Alphabet PROTEIN = ProteinTools.getXAlphabet();
+      FiniteAlphabet PROTEIN = ProteinTools.getXAlphabet();
       nullModel = createNullModel(PROTEIN);
       
       System.out.println("Loading sequences");
@@ -128,7 +128,10 @@ public class SearchProfile {
       State s = (State) i.next();
       if(s instanceof EmissionState && !(s instanceof MagicalState) ) {
         EmissionState es = (EmissionState) s;
-        for(Iterator j = es.alphabet().residues().iterator(); j.hasNext(); ) {
+        for(
+          Iterator j = ((FiniteAlphabet) es.alphabet()).residues().iterator();
+          j.hasNext();
+        ) {
           Residue r = (Residue) j.next();
           mt.addStateCount(es, r, Math.random());
         }
@@ -143,8 +146,8 @@ public class SearchProfile {
     mt.clearCounts();
   }
   
-  private static EmissionState createNullModel(Alphabet alpha)
-  throws IllegalResidueException {
+  private static EmissionState createNullModel(FiniteAlphabet alpha)
+  throws IllegalResidueException, IllegalAlphabetException {
     EmissionState nm = StateFactory.DEFAULT.createState(
       alpha, new int[] { 1 }, "null-model"
     );

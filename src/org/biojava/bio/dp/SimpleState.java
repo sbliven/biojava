@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
 public class SimpleState extends AbstractState {
@@ -54,7 +55,7 @@ public class SimpleState extends AbstractState {
     residueToProb.put(r, new Double(val));
   }
   
-  public SimpleState(Alphabet alpha, int [] advance) {
+  public SimpleState(FiniteAlphabet alpha, int [] advance) {
     super(alpha);
     this.advance = advance;
   }
@@ -62,7 +63,14 @@ public class SimpleState extends AbstractState {
   public void registerWithTrainer(ModelTrainer modelTrainer) {
     Set trainerSet = modelTrainer.trainersForState(this);
     if(trainerSet.isEmpty()) {
-      modelTrainer.registerTrainerForState(this, new SimpleStateTrainer(this));
+      try {
+        modelTrainer.registerTrainerForState(this, new SimpleStateTrainer(this));
+      } catch (IllegalAlphabetException iae) {
+        throw new BioError(
+          iae,
+          "I was sure that I was over a finite alphabet. What is wrong with me?"
+        );
+      }
     }
   }
 }

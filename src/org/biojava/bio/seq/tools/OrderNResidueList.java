@@ -24,12 +24,21 @@ public class OrderNResidueList extends AbstractResidueList {
   /**
    * Create an order n OrderNResidueList from source.
    */
-  public OrderNResidueList(ResidueList source, int order) {
+  public OrderNResidueList(ResidueList source, int order)
+  throws IllegalAlphabetException {
     this.source = source;
-    this.alpha = new SimpleCrossProductAlphabet(
-      Collections.nCopies(order, source.alphabet())
-    );
-    this.order = order;
+    Alphabet a = source.alphabet();
+    if(a instanceof FiniteAlphabet) {
+      this.alpha = new SimpleCrossProductAlphabet(
+      Collections.nCopies(order, a)
+      );
+      this.order = order;
+    } else {
+      throw new IllegalAlphabetException(
+        "OrderNResidueList objects can only be constructed " +
+        "over finite alphabets, not " + a.getName() + " of type " + a.getClass()
+      );
+    }
   }
   
   public Alphabet alphabet() {

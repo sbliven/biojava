@@ -44,7 +44,7 @@ public class FlatModel implements MarkovModel {
   private final Map transModelTrans;
   private Transition _trans = new Transition(null, null);
   
-  public Alphabet stateAlphabet() {
+  public FiniteAlphabet stateAlphabet() {
     return stateAlpha;
   }
   

@@ -34,20 +34,37 @@ import org.biojava.bio.seq.tools.*;
  * for things like profile HMMs.
  */
 public interface StateFactory {
-  EmissionState createState(Alphabet alpha, int [] advance, String name);
+  EmissionState createState(Alphabet alpha, int [] advance, String name)
+  throws IllegalAlphabetException;
   
   static StateFactory DEFAULT = new DefaultStateFactory();
   
   class DefaultStateFactory implements StateFactory {
-    public EmissionState createState(Alphabet alpha, int [] advance, String name) {
+    public EmissionState createState(Alphabet alpha, int [] advance, String name)
+    throws IllegalAlphabetException {
       AbstractState state;
-    
-      if(alpha == DNATools.getAlphabet()) {
+      if(! (alpha instanceof FiniteAlphabet) ) {
+        throw new IllegalAlphabetException(
+          "The default StateFactory implementation can only produce states over " +
+          "finite alphabets, not " + alpha.getName()
+        );
+      }
+      FiniteAlphabet fa = (FiniteAlphabet) alpha;
+      
+      if(
+        fa == DNATools.getAlphabet() &&
+        advance.length == 1 &&
+        advance[0] == 1
+      ) {
         state = new DNAState();
-      } else if(alpha == DNATools.getAmbiguity()) {
+      } else if(
+        fa == DNATools.getAmbiguity() &&
+        advance.length == 1 &&
+        advance[0] == 1
+      ) {
         state = new AmbiguityState();
       } else {
-        state = new SimpleState(alpha, advance);
+        state = new SimpleState(fa, advance);
       }
       state.setName(name);
     

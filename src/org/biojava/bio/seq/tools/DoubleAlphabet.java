@@ -65,14 +65,6 @@ public class DoubleAlphabet implements Alphabet {
     throw new NoSuchElementException("No parsers supported by DoubleAlphabet yet");
   }
   
-  public ResidueList residues() {
-    return ResidueList.EMPTY_LIST;
-  }
-  
-  public int size() {
-    return Integer.MAX_VALUE;
-  }
-  
   private DoubleAlphabet() {
   }
   

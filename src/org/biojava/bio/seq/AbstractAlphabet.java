@@ -25,7 +25,7 @@ package org.biojava.bio.seq;
 import java.util.*;
 
 /**
- * An abstract implementation of Alphabet.
+ * An abstract implementation of FiniteAlphabet.
  * <P>
  * This provides the frame-work for maintaining the ResidueParser <-> name
  * mappings.
@@ -34,7 +34,7 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public abstract class AbstractAlphabet implements Alphabet {
+public abstract class AbstractAlphabet implements FiniteAlphabet {
   private Map parserByName;
   {
     parserByName = new HashMap();

@@ -155,7 +155,8 @@ public class ProfileHMM extends SimpleMarkovModel {
   public ProfileHMM(
     Alphabet alpha, int columns,
     StateFactory matchFactory, StateFactory insertFactory
-  ) throws IllegalResidueException, IllegalTransitionException {
+  ) throws IllegalResidueException, IllegalTransitionException,
+  IllegalAlphabetException {
     super(1, alpha);
     
     this.columns = columns;

@@ -32,7 +32,7 @@ public abstract class DP {
     public static State[] stateList(MarkovModel mm)
 	throws IllegalResidueException, IllegalTransitionException
     {
-	Alphabet alpha = mm.stateAlphabet();
+	FiniteAlphabet alpha = mm.stateAlphabet();
 
 	List emissionStates = new ArrayList();
 	HMMOrderByTransition comp = new HMMOrderByTransition(mm);

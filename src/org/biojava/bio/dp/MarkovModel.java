@@ -43,11 +43,17 @@ public interface MarkovModel {
   Alphabet emissionAlphabet();
 
   /**
-   * Alphabet of the states.
-   * <P>The MagicalState returned by getMagicalState is always contained
+   * FiniteAlphabet of the states.
+   * <P>
+   * We are modeling a finite-state-machine, so there will be a finite set of
+   * states.
+   * <P>
+   * The MagicalState returned by getMagicalState is always contained
    * within this as the start/end state.
+   *
+   * @return the alphabet over states
    */
-  Alphabet stateAlphabet();
+  FiniteAlphabet stateAlphabet();
   
   /**
    * The MagicalState for this model.

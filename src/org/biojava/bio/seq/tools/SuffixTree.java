@@ -35,12 +35,12 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  */
 public class SuffixTree {
-  private Alphabet alphabet;
+  private FiniteAlphabet alphabet;
   private SuffixNode root;
   private List resList;
   private List counts;
   
-  public Alphabet alphabet() {
+  public FiniteAlphabet alphabet() {
     return alphabet;
   }
 
@@ -105,7 +105,7 @@ public class SuffixTree {
     return ((Integer) counts.get(length - 1)).intValue();
   }
   
-  public SuffixTree(Alphabet alphabet) {
+  public SuffixTree(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
     this.resList = alphabet.residues().toList();
     this.counts = new ArrayList();

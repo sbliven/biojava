@@ -36,9 +36,9 @@ import org.biojava.bio.seq.tools.*;
  * @author Matthew Pocock
  */
 public class SimpleResidueStyle implements ResidueStyle {
-  private Map outlinePaint;
-  private Map fillPaint;
-  private Alphabet alphabet;
+  private final Map outlinePaint;
+  private final Map fillPaint;
+  private final FiniteAlphabet alphabet;
   
   {
     outlinePaint = new HashMap();
@@ -49,7 +49,7 @@ public class SimpleResidueStyle implements ResidueStyle {
     return alphabet;
   }
   
-  public SimpleResidueStyle(Alphabet alphabet) {
+  public SimpleResidueStyle(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
     Map outline = getStandardOutlinePaints(alphabet);
     Map fill = getStandardFillPaints(alphabet);

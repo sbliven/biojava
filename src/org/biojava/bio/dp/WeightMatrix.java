@@ -30,6 +30,9 @@ import org.biojava.bio.seq.*;
  * The weight matrix uses computer-coordinates. Thus, a 10 column weight matrix
  * has columns (0 - 9). I guess that if you try to access columns outside the
  * logical range, the implementation may throw an IndexOutOfBoundsException.
+ * <P>
+ * A weight matrix is always over a finite alphabet of symbols, so that you can think
+ * of each row of the matrix as being for a different residue.
  */
 public interface WeightMatrix {
   /**
@@ -37,7 +40,7 @@ public interface WeightMatrix {
    *
    * @return  the Alphabet
    */
-  Alphabet alphabet();
+  FiniteAlphabet alphabet();
   
   /**
    * Return the weight for a given residue at a given column.

@@ -25,7 +25,7 @@ package org.biojava.bio.seq;
 import java.util.*;
 
 /**
- * An implementation of Alphabet that grows the alphabet to accomodate all
+ * An implementation of FiniteAlphabet that grows the alphabet to accomodate all
  * the characters seen while parsing a file.
  * <P>
  * The contains and validate methods will still work as for other alphabets, but
@@ -36,7 +36,7 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class AllSymbolsAlphabet implements Alphabet {
+public class AllSymbolsAlphabet implements FiniteAlphabet {
   private Map symbolToResidue; // symbol->residue
   private Map nameToResidue; // name->residue
   private Set residues;

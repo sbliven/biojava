@@ -26,14 +26,14 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
 public class ProteinTools {
-  private static final Alphabet proteinAlpha;
-  private static final Alphabet proteinXAlpha;
+  private static final FiniteAlphabet proteinAlpha;
+  private static final FiniteAlphabet proteinXAlpha;
   private static final Residue x;
   
   static {
     try {
       AlphabetManager am = AlphabetManager.instance();
-      proteinAlpha = am.alphabetForName("PROTEIN");
+      proteinAlpha = (FiniteAlphabet) am.alphabetForName("PROTEIN");
       SimpleAlphabet xAlpha = new SimpleAlphabet();
       for(Iterator i = proteinAlpha.residues().iterator(); i.hasNext(); ) {
         xAlpha.addResidue((Residue) i.next());
@@ -46,11 +46,11 @@ public class ProteinTools {
     }
   }
   
-  public static final Alphabet getAlphabet() {
+  public static final FiniteAlphabet getAlphabet() {
     return proteinAlpha;
   }
   
-  public static final Alphabet getXAlphabet() {
+  public static final FiniteAlphabet getXAlphabet() {
     return proteinXAlpha;
   }
   

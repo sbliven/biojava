@@ -28,13 +28,13 @@ import org.biojava.bio.seq.*;
 public class SimpleWeightMatrix implements WeightMatrix {
   private int cols;
   private Map weights;
-  private Alphabet alpha;
+  private FiniteAlphabet alpha;
 
   {
     weights = new HashMap();
   }
 
-  public Alphabet alphabet() {
+  public FiniteAlphabet alphabet() {
     return alpha;
   }
 
@@ -56,7 +56,7 @@ public class SimpleWeightMatrix implements WeightMatrix {
     return cols;
   }
 
-  public SimpleWeightMatrix(Alphabet alpha, int cols) {
+  public SimpleWeightMatrix(FiniteAlphabet alpha, int cols) {
     this.alpha = alpha;
     this.cols = cols;
     ResidueList res = alpha.residues();

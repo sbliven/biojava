@@ -46,12 +46,15 @@ public class BarLogoPainter implements LogoPainter {
     
     Rectangle bounds = sl.getBounds();
     double width = bounds.getWidth();
-    double stepWidth = width / (double) state.alphabet().size();
+    double stepWidth = width / (double) ((FiniteAlphabet) state.alphabet()).size();
     double height = bounds.getHeight();
     double scale = height * (sl.totalInformation() / sl.totalBits());
 
     double w = 0.0;    
-    for(Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
+    for(
+      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+      i.hasNext();
+    ) {
       Residue r = (Residue) i.next();
       double rh = 0.0;
      

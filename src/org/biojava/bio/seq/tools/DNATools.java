@@ -33,8 +33,8 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  */
 public class DNATools {
-  static private Alphabet alpha;
-  static private Alphabet ambiguity;
+  static private FiniteAlphabet alpha;
+  static private FiniteAlphabet ambiguity;
   static private Residue a;
   static private Residue g;
   static private Residue c;
@@ -45,8 +45,8 @@ public class DNATools {
 
   static {
     try {
-      alpha = AlphabetManager.instance().alphabetForName("DNA");
-      ambiguity = AlphabetManager.instance().alphabetForName("DNA-AMBIGUITY");
+      alpha = (FiniteAlphabet) AlphabetManager.instance().alphabetForName("DNA");
+      ambiguity = (FiniteAlphabet) AlphabetManager.instance().alphabetForName("DNA-AMBIGUITY");
       ResidueList res = alpha.getParser("symbol").parse("agct");
       a = res.residueAt(1);
       g = res.residueAt(2);
@@ -127,7 +127,7 @@ public class DNATools {
    *
    * @return a flyweight version of the DNA alphabet
    */
-  public static Alphabet getAlphabet() {
+  public static FiniteAlphabet getAlphabet() {
     return alpha;
   }
 
@@ -136,7 +136,7 @@ public class DNATools {
    *
    * @return a flyweight version of the DNA ambiguity alphabet
    */
-  public static Alphabet getAmbiguity() {
+  public static FiniteAlphabet getAmbiguity() {
     return ambiguity;
   }
 

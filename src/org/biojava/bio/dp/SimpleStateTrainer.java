@@ -47,20 +47,31 @@ public class SimpleStateTrainer implements StateTrainer {
     c.put(res, new Double(d.doubleValue() + count));
   }
 
-  public void train(EmissionState nullModel,
-                    double weight) throws IllegalResidueException {
-    for (Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
+  public void train(
+    EmissionState nullModel,
+    double weight
+  ) throws IllegalResidueException {
+    for (
+      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+      i.hasNext();
+    ) {
       Residue r = (Residue) i.next();
       addCount(r, Math.exp(nullModel.getWeight(r) + weight));
     }
     
     double sum = 0.0;
-    for (Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
+    for(
+      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+      i.hasNext();
+    ) {
       Residue r = (Residue) i.next();
       sum += ((Double) c.get(r)).doubleValue();
     }
     //System.out.println(state.getName() + ": sum=" + sum);
-    for (Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
+    for(
+      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+      i.hasNext();
+    ) {
       Residue res = (Residue) i.next();
       Double d = (Double) c.get(res);
       /*System.out.println(
@@ -76,16 +87,27 @@ public class SimpleStateTrainer implements StateTrainer {
   }
 
   public void clearCounts() {
-    for (Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
+    for(
+      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+      i.hasNext();
+    ) {
       Residue res = (Residue) i.next();
       c.put(res, new Double(0.0));
     }
   }
 
-  public SimpleStateTrainer(EmissionState s) {
+  public SimpleStateTrainer(EmissionState s)
+  throws IllegalAlphabetException {
+    Alphabet a = s.alphabet();
+    if(! (a instanceof FiniteAlphabet)) {
+      throw new IllegalAlphabetException(
+        "Can't create a SimpleStateTrainer for non-finite alphabet " +
+        a.getName() + " of type " + a.getClass()
+      );
+    }
     this.c = new HashMap();
     this.state = s;
-    for (Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
+    for (Iterator i = ((FiniteAlphabet) a).residues().iterator(); i.hasNext();) {
       c.put(i.next(), new Double(0.0));
     }
   }

@@ -45,23 +45,6 @@ public interface Alphabet extends Annotatable {
    * @return  the name as a string.
    */
   String getName();
-  
-  /**
-   * The number of residues in the alphabet.
-   *
-   * @return the size of the alphabet
-   */
-  int size();
-  
-  /**
-   * A list of residues that make up this alphabet.
-   * <P>
-   * Subsequent calls to this method are not required to return either the same
-   * residue list, or even a residue list with the residues in the same order.
-   *
-   * @return  a ResidueList containing one Residue for each Residue in this alphabet
-   */
-  ResidueList residues();
 
   /**
    * Returns wether or not this Alphabet contains the residue.
@@ -118,14 +101,6 @@ public interface Alphabet extends Annotatable {
     
     public Annotation getAnnotation() {
       return Annotation.EMPTY_ANNOTATION;
-    }
-    
-    public int size() {
-      return 0;
-    }
-    
-    public ResidueList residues() {
-      return ResidueList.EMPTY_LIST;
     }
     
     public boolean contains(Residue r) {

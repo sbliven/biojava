@@ -33,7 +33,7 @@ public class NameParser implements ResidueParser {
   /**
    * The alphabet to parse symbols to.
    */
-  private Alphabet alphabet;
+  private FiniteAlphabet alphabet;
   
   /**
    * The map of symbols to residues.
@@ -83,7 +83,7 @@ public class NameParser implements ResidueParser {
     return res;
   }
   
-  public NameParser(Alphabet alpha) {
+  public NameParser(FiniteAlphabet alpha) {
     this.alphabet = alpha;
     for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {
       Residue res = (Residue) i.next();

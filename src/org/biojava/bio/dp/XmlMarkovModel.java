@@ -33,10 +33,17 @@ import org.biojava.bio.seq.tools.*;
 
 public class XmlMarkovModel {
   public static WeightMatrix readMatrix(Element root)
-  throws IllegalResidueException {
+  throws IllegalResidueException, IllegalAlphabetException {
     Element alphaE = (Element) root.getElementsByTagName("alphabet").item(0);
-    Alphabet seqAlpha = AlphabetManager.instance().alphabetForName(
+    Alphabet sa = AlphabetManager.instance().alphabetForName(
       alphaE.getAttribute("name"));
+    if(! (sa instanceof FiniteAlphabet)) {
+      throw new IllegalAlphabetException(
+        "Can't read WeightMatrix over infinite alphabet " +
+        sa.getName() + " of type " + sa.getClass()
+      );
+    }
+    FiniteAlphabet seqAlpha = (FiniteAlphabet) sa;
     ResidueParser symParser = seqAlpha.getParser("symbol");
     ResidueParser nameParser = seqAlpha.getParser("name");
     
@@ -132,7 +139,7 @@ public class XmlMarkovModel {
   }
  
   public static void writeMatrix(WeightMatrix matrix, PrintStream out) throws Exception {
-    Alphabet resA = matrix.alphabet();
+    FiniteAlphabet resA = matrix.alphabet();
     
     out.println("<MarkovModel>\n  <alphabet name=\"" + resA.getName() + "\"/>");
     
@@ -150,8 +157,8 @@ public class XmlMarkovModel {
   }
   
   public static void writeModel(FlatModel model, PrintStream out) throws Exception {
-    Alphabet stateA = model.stateAlphabet();
-    Alphabet resA = model.emissionAlphabet();
+    FiniteAlphabet stateA = model.stateAlphabet();
+    FiniteAlphabet resA = (FiniteAlphabet) model.emissionAlphabet();
     ResidueList stateR = stateA.residues();
     List stateL = stateR.toList();
     ResidueList resR = resA.residues();

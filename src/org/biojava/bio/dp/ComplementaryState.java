@@ -79,10 +79,19 @@ public class ComplementaryState implements EmissionState {
     return other.getAdvance();
   }
   
-  public ComplementaryState(EmissionState other) {
+  public ComplementaryState(EmissionState other)
+  throws IllegalAlphabetException {
+    Alphabet oa = other.alphabet();
+    if(! (oa instanceof FiniteAlphabet) ) {
+      throw new IllegalAlphabetException(
+        "Can't create a ComplementaryState for state " + other.getName() +
+        " as it has a non-finite alphabet " + oa.getName()
+      );
+    }
+    FiniteAlphabet foa = (FiniteAlphabet) oa;
     this.other = other;
-    this.cache = StateFactory.DEFAULT.createState(other.alphabet(), other.getAdvance(), other.getName() + "-c");
-    for(Iterator i = other.alphabet().residues().iterator(); i.hasNext();) {
+    this.cache = StateFactory.DEFAULT.createState(oa, other.getAdvance(), other.getName() + "-c");
+    for(Iterator i = foa.residues().iterator(); i.hasNext();) {
       Residue r = (Residue) i.next();
       try {
         cache.setWeight(DNATools.complement(r), other.getWeight(r));
@@ -105,7 +114,10 @@ public class ComplementaryState implements EmissionState {
     public void train(EmissionState nullModel, double weight)
     throws IllegalResidueException {
       st.train(nullModel, weight); // a hack - forces st to be trained first
-      for(Iterator i = other.alphabet().residues().iterator(); i.hasNext();) {
+      for(
+        Iterator i = ((FiniteAlphabet) other.alphabet()).residues().iterator();
+        i.hasNext();
+      ) {
         Residue r = (Residue) i.next();
         try {
           cache.setWeight(DNATools.complement(r), other.getWeight(r));

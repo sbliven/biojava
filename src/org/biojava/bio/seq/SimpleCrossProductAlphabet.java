@@ -32,17 +32,28 @@ import java.lang.reflect.*;
  * for specific tasks.
  * 
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
-  private List alphas;
-  private HashMap ourResidues;
+  private final List alphas;
+  private final HashMap ourResidues;
   private char symbolSeed = 'A';
 
   /**
    * Create a cross-product alphabet over the list of alphabets in 'a'.
    */
-  public SimpleCrossProductAlphabet(List a) {
+  public SimpleCrossProductAlphabet(List a)
+  throws IllegalAlphabetException {
+    for(Iterator i = a.iterator(); i.hasNext(); ) {
+      Alphabet aa = (Alphabet) i.next();
+      if(! (aa instanceof FiniteAlphabet) ) {
+        throw new IllegalAlphabetException(
+          "Can't create a SimpleCrossProductAlphabet over non-fininte alphabet " +
+          aa.getName() + " of type " + aa.getClass()
+        );
+      }
+    }
     alphas = Collections.unmodifiableList(a);
     ourResidues = new HashMap();
     populateResidues(new ArrayList());
@@ -53,7 +64,7 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
 	    putResidue(r);
     } else {
 	    int indx = r.size();
-	    Alphabet a = (Alphabet) alphas.get(indx);
+	    FiniteAlphabet a = (FiniteAlphabet) alphas.get(indx);
 	    Iterator i = a.residues().iterator();
 	    r.add(i.next());
 	    populateResidues(r);

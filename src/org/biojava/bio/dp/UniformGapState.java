@@ -30,6 +30,7 @@ import java.util.*;
  * Simple state for representing gaps in multiheaded HMMs.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public class UniformGapState implements EmissionState {
@@ -39,8 +40,8 @@ public class UniformGapState implements EmissionState {
 	GAP = AlphabetManager.instance().getGapResidue();
     }
 
-    private CrossProductAlphabet alpha;
-    private Alphabet subAlpha;
+    private final CrossProductAlphabet alpha;
+    private final FiniteAlphabet subAlpha;
     private int ungappedSize;
     private double gapScore;
 
@@ -51,7 +52,12 @@ public class UniformGapState implements EmissionState {
     public UniformGapState(Alphabet a, int[] advance) throws IllegalAlphabetException {
 	this.alpha = (CrossProductAlphabet) a;
 	Iterator i = alpha.getAlphabets().iterator();
-	subAlpha = (Alphabet) i.next();
+	Alphabet sa = (Alphabet) i.next();
+
+  if(! (sa instanceof FiniteAlphabet)) {
+    throw new IllegalAlphabetException("Alphabet " + sa.getName() + " is not finite");
+  }
+  subAlpha = (FiniteAlphabet) sa;
 	while (i.hasNext()) {
 	    if (i.next() != subAlpha)
 		throw new IllegalAlphabetException("Sub-alphabets of " + alpha.getName() + " don't match.");

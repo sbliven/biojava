@@ -28,7 +28,7 @@ import org.biojava.bio.seq.*;
 
 public class SimpleMarkovModel implements MarkovModel {
   private final Alphabet emissionAlpha;
-  private final Alphabet stateAlpha;
+  private final FiniteAlphabet stateAlpha;
   private final MagicalState magicalState;
 
   private final Map transFrom;
@@ -44,7 +44,7 @@ public class SimpleMarkovModel implements MarkovModel {
   }
 
   public Alphabet emissionAlphabet() { return emissionAlpha; }
-  public Alphabet stateAlphabet() { return stateAlpha; }
+  public FiniteAlphabet stateAlphabet() { return stateAlpha; }
   public int heads() { return magicalState().getAdvance().length; }
   public MagicalState magicalState() { return magicalState; }
 

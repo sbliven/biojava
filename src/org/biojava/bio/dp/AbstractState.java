@@ -38,7 +38,7 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  */
 public abstract class AbstractState implements EmissionState {
-  private final Alphabet alpha;
+  private final FiniteAlphabet alpha;
   private Annotation annotation;
   private String name;
   
@@ -57,7 +57,7 @@ public abstract class AbstractState implements EmissionState {
   }
 
 
-  public Alphabet alphabet() {
+  public final Alphabet alphabet() {
     return alpha;
   }
 
@@ -67,7 +67,7 @@ public abstract class AbstractState implements EmissionState {
 
   public abstract void setWeight(Residue res, double weight) throws IllegalResidueException;
   
-  public AbstractState(Alphabet alpha)
+  public AbstractState(FiniteAlphabet alpha)
   throws IllegalArgumentException {
     if(alpha == null)
       throw new IllegalArgumentException("alpha can not be null");
@@ -78,7 +78,7 @@ public abstract class AbstractState implements EmissionState {
   throws BioError {
     double p = Math.random();
     try {
-      for(Iterator i = alphabet().residues().iterator(); i.hasNext(); ) {
+      for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {
         Residue r = (Residue) i.next();
         p -= Math.exp(getWeight(r));
         if( p <= 0) {
@@ -87,7 +87,7 @@ public abstract class AbstractState implements EmissionState {
       }
     
       StringBuffer sb = new StringBuffer();
-      for(Iterator i = alphabet().residues().iterator(); i.hasNext(); ) {
+      for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {
         Residue r = (Residue) i.next();
         double w = Math.exp(getWeight(r));
         if(w > 0.0)

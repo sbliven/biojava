@@ -34,7 +34,7 @@ import java.util.*;
 
 public class UniformMatchState implements EmissionState {
     private CrossProductAlphabet alpha;
-    private Alphabet subAlpha;
+    private FiniteAlphabet subAlpha;
     private int ungappedSize;
 
     private double matchWeight = 0.0;
@@ -46,7 +46,14 @@ public class UniformMatchState implements EmissionState {
     public UniformMatchState(Alphabet a) throws IllegalAlphabetException {
 	this.alpha = (CrossProductAlphabet) a;
 	Iterator i = alpha.getAlphabets().iterator();
-	subAlpha = (Alphabet) i.next();
+	Alphabet sa = (Alphabet) i.next();
+  if(! (subAlpha instanceof FiniteAlphabet) ) {
+    throw new IllegalAlphabetException(
+      "Can't generate a UniformMatchState over infinite alphabet " +
+      subAlpha.getName() + " of type " + subAlpha.getClass()
+    );
+  }
+  subAlpha = (FiniteAlphabet) sa;
 	while (i.hasNext()) {
 	    if (i.next() != subAlpha)
 		throw new IllegalAlphabetException("Sub-alphabets of " + alpha.getName() + " don't match");

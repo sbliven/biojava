@@ -76,10 +76,14 @@ public class StateLogo extends JComponent {
   
   /**
    * Set the state to render.
+   * <P>
+   * The state must be over a FiniteAlphabet so that we can draw the numbers
+   * for each Residue.
    *
    * @param state the new EmissionState to render
    */
-  public void setState(EmissionState state) {
+  public void setState(EmissionState state)
+  throws IllegalAlphabetException {
     firePropertyChange("state", this.state, state);
     this.state = state;
   }
@@ -168,7 +172,7 @@ public class StateLogo extends JComponent {
    * @return maximum bits as a double
    */
   public double totalBits() {
-    return Math.log(getState().alphabet().size()) / bits;
+    return Math.log(((FiniteAlphabet) getState().alphabet()).size()) / bits;
   }
   
   /**
@@ -182,7 +186,10 @@ public class StateLogo extends JComponent {
     double inf = totalBits();
     EmissionState eState = getState();
     
-    for(Iterator i = eState.alphabet().residues().iterator(); i.hasNext();) {
+    for(
+      Iterator i = ((FiniteAlphabet) eState.alphabet()).residues().iterator();
+      i.hasNext();
+    ) {
       Residue r = (Residue) i.next();
       try {
         inf -= entropy(r);
