@@ -71,6 +71,11 @@ public class EntryNamRandomAccessTest extends TestCase
         fileNum = new int [] { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3 };
     }
 
+    protected void tearDown() throws Exception
+    {
+        rand.close();
+    }
+
     public void testFindRecord() throws IOException
     {
         for (int i = 0; i < 10; i++)

@@ -115,6 +115,7 @@ public class BlastDBQueryHandler extends DefaultHandler
 
 	if (level == 0)
 	    setStringValue(data.toString());
+
     }
 
     /**
@@ -143,10 +144,12 @@ public class BlastDBQueryHandler extends DefaultHandler
     private void setStringValue(String s) throws SAXException
     {
         // Check that we are dealing with Blast output
-        if (! (s.startsWith("BLAST") || s.startsWith("TBLAST")))
+        String program = context.getProgram().toUpperCase();
+
+        if (program.indexOf("BLAST") == -1 )
             return;
 
-        StringTokenizer st = new StringTokenizer(s);
+        StringTokenizer st = new StringTokenizer(s.trim());
 
         String    query = null;
         String database = null;

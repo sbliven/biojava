@@ -79,6 +79,7 @@ public class SubHitSummaryHandler extends DefaultHandler
                              Attributes attr)
         throws SAXException
     {
+        // Score is always present in valid XML
         context.scHandler.addSubHitProperty("score", attr.getValue("score"));
 
         if (attr.getValue("expectValue") != null)
@@ -89,8 +90,6 @@ public class SubHitSummaryHandler extends DefaultHandler
             context.scHandler.addSubHitProperty("pValue",
                                                 attr.getValue("pValue"));
 
-        // These are only really important for Fasta as the sequence
-        // types can be resolved from the program name for Blast
         if (attr.getValue("querySequenceType") != null)
             context.scHandler.addSubHitProperty("querySequenceType",
                                                 attr.getValue("querySequenceType"));
@@ -99,7 +98,13 @@ public class SubHitSummaryHandler extends DefaultHandler
             context.scHandler.addSubHitProperty("hitSequenceType",
                                                 attr.getValue("hitSequenceType"));
 
-        context.scHandler.addSubHitProperty("queryStrand", attr.getValue("queryStrand"));
-        context.scHandler.addSubHitProperty("hitStrand", attr.getValue("hitStrand"));
+        // These are not explicitly set by BLASTP
+        if (attr.getValue("queryStrand") != null)
+            context.scHandler.addSubHitProperty("queryStrand",
+                                                attr.getValue("queryStrand"));
+
+        if (attr.getValue("subjectStrand") != null)
+            context.scHandler.addSubHitProperty("hitStrand",
+                                                attr.getValue("hitStrand"));
     }
 }

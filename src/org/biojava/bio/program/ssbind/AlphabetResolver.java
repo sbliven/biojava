@@ -22,6 +22,7 @@
 package org.biojava.bio.program.ssbind;
 
 import org.biojava.bio.BioException;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.FiniteAlphabet;
@@ -36,11 +37,14 @@ import org.biojava.bio.symbol.FiniteAlphabet;
  */
 class AlphabetResolver
 {
+    static final int     DNA = 0;
+    static final int PROTEIN = 1;
+
     /**
      * <code>resolveAlphabet</code> returns an appropriate
      * <code>Alphabet</code> for an arbitrary identifier. The protein
      * alphabet returned will include the termination character as
-     * BLASTX 6-frame translations are likely to include stops.
+     * e.g.  BLASTX 6-frame translations are likely to include stops.
      *
      * @param identifier a <code>String</code> identifier.
      *
@@ -51,23 +55,39 @@ class AlphabetResolver
     FiniteAlphabet resolveAlphabet(String identifier)
         throws BioException
     {
-        // For (T)BLASTN/P/X
-        if (identifier.endsWith("blastn"))
-            return DNATools.getDNA();
-        else if (identifier.endsWith("blastp") ||
-                 identifier.endsWith("blastx"))
-            // Use T(ermination)Alphabet as BLASTX may give * in
-            // 6-frame translation
-            return ProteinTools.getTAlphabet();
-        // For Fasta
-        else if (identifier.equalsIgnoreCase("dna"))
-            return DNATools.getDNA();
-        else if (identifier.equalsIgnoreCase("protein"))
-            // Use TAlphabet for compatability with above
-            return ProteinTools.getTAlphabet();
+        int type = 0;
+
+        identifier = identifier.toUpperCase();
+
+        if (identifier.indexOf("TBLASTN") != -1)
+            type = PROTEIN;
+        else if (identifier.indexOf("TBLASTX") != -1)
+            type = PROTEIN;
+        else if (identifier.indexOf("BLASTN") != -1)
+            type = DNA;
+        else if (identifier.indexOf("BLASTP") != -1)
+            type = PROTEIN;
+        else if (identifier.indexOf("BLASTX") != -1)
+            type = PROTEIN;
+        else if (identifier.indexOf("DNA") != -1)
+            type = DNA;
+        else if (identifier.indexOf("PROTEIN") != -1)
+            type = PROTEIN;
         else
             throw new BioException("Failed to resolve sequence type from identifier '"
                                    + identifier
                                    + "'");
+
+        switch (type)
+        {
+            case DNA:
+                return DNATools.getDNA();
+
+            case PROTEIN:
+                return ProteinTools.getTAlphabet();
+
+            default:
+                throw new BioError("Internal error in AlphabetResolver: failed to resolve to either DNA or protein alphabets");
+        }
     }
 }

@@ -279,7 +279,10 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     }
 
     /**
-     * <code>makeHit</code> creates a new hit.
+     * <code>makeHit</code> creates a new hit. The hit's strand data
+     * is the same as that of the highest-scoring sub-hit. The hit's
+     * start/end data are the same as the extent of the sub-hits on
+     * that strand.
      *
      * @return a <code>SeqSimilaritySearchHit</code>.
      */
@@ -298,16 +301,45 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         ev = subs[subs.length - 1].getEValue();
         pv = subs[subs.length - 1].getPValue();
 
+        // Retain the strand of the best sub-hit for calculation of
+        // hit strand
+        Strand   bestQueryStrand = subs[subs.length - 1].getQueryStrand();
+        Strand bestSubjectStrand = subs[subs.length - 1].getSubjectStrand();
+
         // Sort to put sub-hits in order with respect to subject
         Arrays.sort(subs, SeqSimilaritySearchSubHit.bySubjectStart);
+
+        int s = 0;
+        int e = subs.length - 1;
+        // Get first sub-hit on that strand
+        for (int i = 0; i < subs.length; i++)
+        {
+            if (subs[i].getSubjectStrand().equals(bestSubjectStrand))
+            {
+                s = i;
+                break;
+            }
+        }
+
+        // Get last sub-hit on that strand
+        for (int i = subs.length; --i > 0;)
+        {
+            if (subs[i].getSubjectStrand().equals(bestSubjectStrand))
+            {
+                e = i;
+                break;
+            }
+        }
 
         String hitId = (String) hitData.get("HitId");
 
         return new SequenceDBSearchHit(sc, ev, pv,
-                                       hitQueryStart(), hitQueryEnd(),
-                                       hitQueryStrand(),
-                                       hitSubjectStart(), hitSubjectEnd(),
-                                       hitSubjectStrand(),
+                                       subs[s].getQueryStart(),
+                                       subs[e].getQueryEnd(),
+                                       bestQueryStrand,
+                                       subs[s].getSubjectStart(),
+                                       subs[e].getSubjectEnd(),
+                                       bestSubjectStrand,
                                        hitId,
                                        makeAnnotation(hitData),
                                        subHits);
@@ -322,6 +354,57 @@ public class BlastLikeSearchBuilder implements SearchBuilder
      */
     private SeqSimilaritySearchSubHit makeSubHit() throws BioException
     {
+        // BLASTP output has the strands implied to be POSITIVE
+        Strand qStrand = StrandedFeature.POSITIVE;
+        Strand sStrand = StrandedFeature.POSITIVE;
+
+        // Override where an explicit strand is given (FASTA DNA,
+        // FASTA protein, BLASTN)
+        if (subHitData.containsKey("queryStrand") &&
+            subHitData.get("queryStrand").equals("minus"))
+            qStrand = StrandedFeature.NEGATIVE;
+
+        if (subHitData.containsKey("subjectStrand") &&
+            subHitData.get("subjectStrand").equals("minus"))
+            sStrand = StrandedFeature.NEGATIVE;
+
+        // Override where a frame is given as this contains strand
+        // information (BLASTX for query, TBLASTN for hit, TBLASTX for
+        // both)
+        if (subHitData.containsKey("queryFrame") &&
+            ((String) subHitData.get("queryFrame")).startsWith("minus"))
+            qStrand = StrandedFeature.NEGATIVE;
+
+        if (subHitData.containsKey("subjectFrame") &&
+            ((String) subHitData.get("subjectFrame")).startsWith("minus"))
+            sStrand = StrandedFeature.NEGATIVE;
+
+        // Get start/end
+        int qStart = Integer.parseInt((String) subHitData.get("QuerySequenceStart"));
+        int   qEnd = Integer.parseInt((String) subHitData.get("QuerySequenceEnd"));
+        int sStart = Integer.parseInt((String) subHitData.get("HitSequenceStart"));
+        int   sEnd = Integer.parseInt((String) subHitData.get("HitSequenceEnd"));
+
+        // The start/end coordinates from BioJava XML don't follow the
+        // BioJava paradigm of start < end, with orientation given by
+        // the strand property. Rather, they present start/end as
+        // displayed in BLAST output, with the coordinates being
+        // inverted on the reverse strand. We account for this here.
+        if (qStrand == StrandedFeature.NEGATIVE)
+        {
+            int swap = qStart;
+            qStart = qEnd;
+            qEnd   = swap;
+        }
+
+        if (sStrand == StrandedFeature.NEGATIVE)
+        {
+            int swap = qStart;
+            sStart = sEnd;
+            sEnd   = swap;
+        }
+
+        // Get scores
         double sc = Double.NaN;
         double ev = Double.NaN;
         double pv = Double.NaN;
@@ -333,25 +416,13 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         if (subHitData.containsKey("pValue"))
             pv = Double.parseDouble((String) subHitData.get("pValue"));
 
-        int qStart = Integer.parseInt((String) subHitData.get("QuerySequenceStart"));
-        int   qEnd = Integer.parseInt((String) subHitData.get("QuerySequenceEnd"));
-        int sStart = Integer.parseInt((String) subHitData.get("HitSequenceStart"));
-        int   sEnd = Integer.parseInt((String) subHitData.get("HitSequenceEnd"));
-
-        Strand qStrand = subHitData.get("queryStrand").equals("plus") ?
-            StrandedFeature.POSITIVE : StrandedFeature.NEGATIVE;
-        Strand sStrand = subHitData.get("hitStrand").equals("plus") ?
-            StrandedFeature.POSITIVE : StrandedFeature.NEGATIVE;
-
         if (tokenParser == null)
         {
             String identifier;
 
             // Try explicit sequence type first
             if (subHitData.containsKey("hitSequenceType"))
-            {
                 identifier = (String) subHitData.get("hitSequenceType");
-            }
             // Otherwise try to resolve from the program name (only
             // works for Blast)
             else if (resultPreAnnotation.containsKey("program"))
@@ -408,113 +479,5 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 	    }
 	}
 	return annotation;
-    }
-
-    /**
-     * <code>hitQueryStart</code> resolves the start of the hit on the
-     * query sequence from the underlying sub-hits.
-     *
-     * @return an <code>int</code>.
-     */
-    private int hitQueryStart()
-    {
-        return subs[0].getQueryStart();
-    }
-
-    /**
-     * <code>hitQueryEnd</code> resolves the end of the hit on the
-     * query sequence from the underlying sub-hits.
-     *
-     * @return an <code>int</code>.
-     */
-    private int hitQueryEnd()
-    {
-        return subs[subs.length - 1].getQueryEnd();
-    }
-
-    /**
-     * <code>hitQueryStrand</code> resolves the strand of the hit on
-     * the query sequence from the underlying sub-hits.
-     *
-     * @return a <code>Strand</code>.
-     */
-    private Strand hitQueryStrand()
-    {
-        int posCount = 0;
-        int negCount = 0;
-
-        // The Strands are public static final, so we can check
-        // equality
-        for (int i = subs.length; --i >= 0;)
-        {
-            Strand s = subs[i].getQueryStrand();
-
-            if (s == StrandedFeature.POSITIVE)
-                posCount++;
-            else if (s == StrandedFeature.NEGATIVE)
-                negCount++;
-        }
-
-        // If not all one or the other, report unknown
-        if (posCount == subs.length)
-            return StrandedFeature.POSITIVE;
-        else if (negCount == subs.length)
-            return StrandedFeature.NEGATIVE;
-        else
-            return StrandedFeature.UNKNOWN;
-    }
-
-    /**
-     * <code>hitSubjectStart</code> resolves the start of the hit on
-     * the subject sequence from the underlying sub-hits.
-     *
-     * @return an <code>int</code>.
-     */
-    private int hitSubjectStart()
-    {
-        return subs[0].getSubjectStart();
-    }
-
-    /**
-     * <code>hitSubjectEnd</code> resolves the end of the hit on the
-     * subject sequence from the underlying sub-hits.
-     *
-     * @return an <code>int</code>.
-     */
-    private int hitSubjectEnd()
-    {
-        return subs[subs.length - 1].getSubjectEnd();
-    }
-
-    /**
-     * <code>hitSubjectStrand</code> resolves the strand of the hit on
-     * the subject sequence from the underlying sub-hits.
-     *
-     * @return a <code>Strand</code>.
-     */
-    private Strand hitSubjectStrand()
-    {
-        int posCount = 0;
-        int negCount = 0;
-
-        // The Strands are public static final, so we can check
-        // equality
-        for (int i = subs.length; --i >= 0;)
-        {
-            Strand s = subs[i].getSubjectStrand();
-
-            if (s == StrandedFeature.POSITIVE)
-                posCount++;
-            else if (s == StrandedFeature.NEGATIVE)
-                negCount++;
-        }
-
-        // If not all one or the other, report unknown
-        if (posCount == subs.length)
-            return StrandedFeature.POSITIVE;
-        else if (negCount == subs.length)
-            return StrandedFeature.NEGATIVE;
-        else
-            return StrandedFeature.UNKNOWN;
     }
 }

@@ -67,6 +67,9 @@ public class SeqSimilarityAdapter extends DefaultHandler
     // The currently operating binding
     private HandlerBinding currentBinding;
 
+    // The name of the program which generated the results
+    private String program = "unknown";
+
     static
     {
         // Associate SAX ContentHandler factories with elements
@@ -218,6 +221,30 @@ public class SeqSimilarityAdapter extends DefaultHandler
 
         currentBinding = (HandlerBinding) bStack.get(bStack.size() - 1);
         currentBinding.handler.characters(ch, start, length);
+    }
+
+    /**
+     * <code>getProgram</code> returns the program type which
+     * generated the results.
+     *
+     * @return a <code>String</code> indicating the progam
+     * name.
+     */
+    String getProgram()
+    {
+        return program;
+    }
+
+    /**
+     * <code>setProgram</code> informs the adapter which program type
+     * it is working on.
+     *
+     * @param program a <code>String</code> indicating the progam
+     * name.
+     */
+    void setProgram(String program)
+    {
+        this.program = program;
     }
 
     /**
