@@ -805,7 +805,7 @@ public interface FeatureFilter extends Serializable {
      * @since 1.2
      */
 
-    public static class ByParent implements OptimizableFilter, ByHierachy {
+    public static class ByParent implements OptimizableFilter, ByHierarchy {
         private FeatureFilter filter;
 
         public ByParent(FeatureFilter ff) {
@@ -882,7 +882,7 @@ public interface FeatureFilter extends Serializable {
      * @since 1.2
      */
 
-    public static class ByAncestor implements OptimizableFilter, ByHierachy {
+    public static class ByAncestor implements OptimizableFilter, ByHierarchy {
         private FeatureFilter filter;
 
         public ByAncestor(FeatureFilter ff) {
@@ -1223,7 +1223,7 @@ public interface FeatureFilter extends Serializable {
     }
 }
 
-interface ByHierachy extends FeatureFilter {
+interface ByHierarchy extends FeatureFilter {
   FeatureFilter getFilter();
 }
 

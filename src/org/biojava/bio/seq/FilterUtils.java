@@ -605,11 +605,11 @@ public class FilterUtils {
         return byAnnotationType(intersect);
       }
     } else if(
-      f1 instanceof ByHierachy &&
-      f2 instanceof ByHierachy
+      f1 instanceof ByHierarchy &&
+      f2 instanceof ByHierarchy
     ) {
-      ByHierachy f1h = (ByHierachy) f1;
-      ByHierachy f2h = (ByHierachy) f2;
+      ByHierarchy f1h = (ByHierarchy) f1;
+      ByHierarchy f2h = (ByHierarchy) f2;
       
       FeatureFilter filt = optimize(and(f1h.getFilter(), f2h.getFilter()));
       if(
@@ -656,11 +656,11 @@ public class FilterUtils {
       
       return byAnnotationType(union);
     } else if(
-      f1 instanceof ByHierachy &&
-      f2 instanceof ByHierachy
+      f1 instanceof ByHierarchy &&
+      f2 instanceof ByHierarchy
     ) {
-      ByHierachy f1h = (ByHierachy) f1;
-      ByHierachy f2h = (ByHierachy) f2;
+      ByHierarchy f1h = (ByHierarchy) f1;
+      ByHierarchy f2h = (ByHierarchy) f2;
       
       FeatureFilter filt = optimize(or(f1h.getFilter(), f2h.getFilter()));
       if(
