@@ -903,6 +903,31 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	return dummySupported;
     }
 
+    private boolean locationQualifierChecked = false;
+    private boolean locationQualifierSupported = false;
+
+    boolean isLocationQualifierSupported() {
+	if (!locationQualifierChecked) {
+	    try {
+		Connection conn = pool.takeConnection();
+		PreparedStatement ps = conn.prepareStatement("select * from location_qualifier_value limit 1");
+		try {
+		    ps.executeQuery();
+		    locationQualifierSupported = true;
+		} catch (SQLException ex) {
+		    locationQualifierSupported = false;
+		}
+		ps.close();
+		pool.putConnection(conn);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex);
+	    }
+	    locationQualifierChecked = true;
+	}
+
+	return locationQualifierSupported;
+    }
+
     private boolean spaChecked = false;
     private boolean spaSupported = false;
 
