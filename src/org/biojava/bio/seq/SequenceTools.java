@@ -25,7 +25,13 @@ import java.util.Iterator;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.impl.*;
+import org.biojava.bio.seq.impl.DummySequence;
+import org.biojava.bio.seq.impl.RevCompSequence;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.seq.impl.SimpleGappedSequence;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.seq.impl.SubSequence;
+import org.biojava.bio.seq.impl.ViewSequence;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.RangeLocation;
