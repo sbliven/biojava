@@ -43,7 +43,7 @@ public class Classify {
 	String examplesName = args[1];
 	String resultsName = args[2];
 
-	SVMModel model = SVM_Light.readModelFile(modelName);
+	SVMClassifierModel model = SVM_Light.readModelFile(modelName);
 
 	BufferedReader r = new BufferedReader(new FileReader(examplesName));
 	PrintWriter w = new PrintWriter(new FileWriter(resultsName));
