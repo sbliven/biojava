@@ -73,8 +73,8 @@ implements DistributionTrainer, Serializable {
       Double d = (Double) c.get(s);
       sum += d.doubleValue() +
              nullModel.getWeight(s) * weight;
+      // System.out.println(s.getName() + ": sum=" + sum);
     }
-    //System.out.println(state.getName() + ": sum=" + sum);
     for(
       Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
       i.hasNext();

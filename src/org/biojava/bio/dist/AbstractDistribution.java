@@ -29,14 +29,29 @@ import org.biojava.bio.symbol.*;
 
 /**
  * An abstract implementation of Distribution.
- * <P>
+ * <p>
  * You will need to over-ride <code>getWeight()</code> for a simple
  * implementation. You may also wish to over-ride the other methods if the
  * default implementation is not suitable.
+ * </p>
+ *
+ * <p>
+ * Note that, in this implementation, the <code>setWeight</code> implementation
+ * throws an exception.  The <code>registerWithTrainer</code> method registers
+ * an <code>IgnoreCountsTrainer</code>.  To make an <code>AbstractDistribution</code>
+ * subclass trainable, both these methods must be overridden.
+ * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
+
 public abstract class AbstractDistribution implements Distribution {
+    /**
+     * Set the weight of a given symbol in this distribution.  This implementation
+     * simply throws an exception.
+     */
+
   public void setWeight(Symbol sym, double weight)
   throws IllegalSymbolException, UnsupportedOperationException {
     throw new UnsupportedOperationException(
@@ -81,6 +96,13 @@ public abstract class AbstractDistribution implements Distribution {
     }
   }
   
+  /**
+   * Retrieve the null model Distribution that this Distribution recognizes.
+   *
+   * @return  the apropriate null model
+   */
+  public abstract Distribution getNullModel();
+  
   public Symbol sampleSymbol()
   throws BioError {
     double p = Math.random();
@@ -112,6 +134,12 @@ public abstract class AbstractDistribution implements Distribution {
     }
   }
   
+    /**
+     * Register an IgnoreCountsTrainer instance as the trainer for this
+     * distribution.  Override this if you wish to implement a trainable
+     * distribution.
+     */
+
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }

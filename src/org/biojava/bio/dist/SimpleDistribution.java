@@ -27,9 +27,13 @@ import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+
 /**
-*A simple implementation of a distribution
-*/
+ * A simple implementation of a distribution, which works with any finite alphabet.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 
 public final class SimpleDistribution extends AbstractDistribution implements Serializable {
   private final FiniteAlphabet alphabet;
@@ -84,6 +88,10 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
       }
     }
   }
+
+    /**
+     * Set the weight associated with the specified symbol in this distribution.
+     */
   
   public void setWeight(Symbol s, double w)
   throws IllegalSymbolException {
@@ -115,4 +123,16 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
       throw new BioError(e, "This should never fail. Something is screwed!");
     }
   }
+
+    /**
+     * Register a simple trainer for this distribution.
+     */
+
+    public void registerWithTrainer(DistributionTrainerContext dtc) {
+	try {
+	    dtc.registerTrainer(this, new SimpleDistributionTrainer(this));
+	} catch (IllegalAlphabetException ex) {
+	    throw new BioError("Couldn't register trainer for simple distribution");
+	}
+    }
 }
