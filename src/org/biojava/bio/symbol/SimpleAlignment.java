@@ -47,6 +47,8 @@ import org.biojava.bio.BioError;
  */
 public class SimpleAlignment
 extends AbstractSymbolList implements Alignment, Serializable {
+  private static final long serialVersionUID = -1760075176220928440L;
+    
   private LinkedHashMap labelToSymbolList;
   private List labels;
   private Alphabet alphabet;

@@ -76,6 +76,8 @@ import org.biojava.utils.ChangeVetoException;
  */
 
 public class SimpleSymbolList extends AbstractSymbolList implements ChangeListener, Serializable {
+    private static final long serialVersionUID = -9015317520644706924L;
+        
     private static int instanceCount;
 
     private static final int INCREMENT = 100;

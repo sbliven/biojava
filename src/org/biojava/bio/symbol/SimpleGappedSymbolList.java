@@ -41,6 +41,8 @@ import org.biojava.utils.AssertionFailure;
 public class SimpleGappedSymbolList
 extends AbstractSymbolList
 implements GappedSymbolList, Serializable {
+    private static final long serialVersionUID = 4258621048300499709L;
+    
   /**
    * The Alphabet - the same as source but guaranteed to include the gap character.
    */
@@ -710,6 +712,8 @@ implements GappedSymbolList, Serializable {
    * @author Matthew Pocock
    */
   protected static final class Block implements Serializable {
+    private static final long serialVersionUID = 4090888450309921439L;  
+      
     public int sourceStart;
     public int sourceEnd;
     public int viewStart;
