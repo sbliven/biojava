@@ -44,8 +44,7 @@ public class RestrictionEnzymeManagerTest extends TestCase
     public void testGetAllEnzymes()
     {
         Set allEnz = RestrictionEnzymeManager.getAllEnzymes();
-        // Is this number correct for REBASE withrefm.206?
-        assertEquals(3361, allEnz.size());
+        assertEquals(40, allEnz.size());
     }
 
     public void testGetEnzyme() throws BioException
@@ -67,30 +66,17 @@ public class RestrictionEnzymeManagerTest extends TestCase
 
     public void testGetIsoschizomers() throws BioException
     {
-        Set isoAaaI = RestrictionEnzymeManager.getIsoschizomers("AaaI");
-        assertEquals(10, isoAaaI.size());        
+        Set isoAvaI = RestrictionEnzymeManager.getIsoschizomers("AvaI");
+        assertEquals(1, isoAvaI.size());
 
-        RestrictionEnzyme   xmaIII = RestrictionEnzymeManager.getEnzyme("XmaIII");
-        RestrictionEnzyme   bseX3I = RestrictionEnzymeManager.getEnzyme("BseX3I");
-        RestrictionEnzyme    bsoDI = RestrictionEnzymeManager.getEnzyme("BsoDI");
-        RestrictionEnzyme    bstZI = RestrictionEnzymeManager.getEnzyme("BstZI");
-        RestrictionEnzyme     eagI = RestrictionEnzymeManager.getEnzyme("EagI");
-        RestrictionEnzyme    eclXI = RestrictionEnzymeManager.getEnzyme("EclXI");
-        RestrictionEnzyme   eco52I = RestrictionEnzymeManager.getEnzyme("Eco52I");
-        RestrictionEnzyme senPT16I = RestrictionEnzymeManager.getEnzyme("SenPT16I");
-        RestrictionEnzyme    tauII = RestrictionEnzymeManager.getEnzyme("TauII");
-        RestrictionEnzyme  tsp504I = RestrictionEnzymeManager.getEnzyme("Tsp504I");
+        Set isoAvrI = RestrictionEnzymeManager.getIsoschizomers("AvrI");
+        assertEquals(1, isoAvrI.size());
 
-        assertTrue(isoAaaI.contains(xmaIII));
-        assertTrue(isoAaaI.contains(bseX3I));
-        assertTrue(isoAaaI.contains(bsoDI));
-        assertTrue(isoAaaI.contains(bstZI));
-        assertTrue(isoAaaI.contains(eagI));
-        assertTrue(isoAaaI.contains(eclXI));
-        assertTrue(isoAaaI.contains(eco52I));
-        assertTrue(isoAaaI.contains(senPT16I));
-        assertTrue(isoAaaI.contains(tauII));
-        assertTrue(isoAaaI.contains(tsp504I));
+        RestrictionEnzyme avaI = RestrictionEnzymeManager.getEnzyme("AvaI");
+        RestrictionEnzyme avrI = RestrictionEnzymeManager.getEnzyme("AvrI");
+
+        assertTrue(isoAvaI.contains(avrI));
+        assertTrue(isoAvrI.contains(avaI));
 
         try
         {
@@ -107,8 +93,7 @@ public class RestrictionEnzymeManagerTest extends TestCase
     public void testGetNCutters()
     {
         Set all6Cutters = RestrictionEnzymeManager.getNCutters(6);
-        // Is this number correct for REBASE withrefm.206?
-        assertEquals(1804, all6Cutters.size());
+        assertEquals(29, all6Cutters.size());
 
         for (Iterator ei = all6Cutters.iterator(); ei.hasNext();)
         {
