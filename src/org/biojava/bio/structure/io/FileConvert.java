@@ -57,7 +57,7 @@ public class FileConvert {
     public String toPDB() {
 	
 
-	String str = "";
+	StringBuffer str = new StringBuffer();
 	int i = 0 ;
 	
 	DecimalFormat d3 = new DecimalFormat("0.000");
@@ -121,7 +121,7 @@ public class FileConvert {
 			    + resName + " " + chainID + resseq 
 			    + "    " + x+y+z 
 			    + occupancy + tempfactor;
-			str += line + "\n";
+			str.append(line + "\n");
 			//System.out.println(line);
 		    }
 		}
@@ -131,6 +131,6 @@ public class FileConvert {
     
 
 
-	return str ;
+	return str.toString() ;
     }
 }
