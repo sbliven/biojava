@@ -37,6 +37,7 @@ import org.biojava.bio.seq.db.biosql.*;
  * This SequenceBuilder has a variety of modes of operation.
  * It can take a sequence from an existing SequenceDB and
  * apply annotations to it.
+ * <p>
  * If the SequenceDB has persistence, then it can also create
  * a sequence in the sequenceDB and apply the annotation to that.
  * However, performance under those circumstances can vary depending
@@ -124,23 +125,27 @@ public class SequenceDBSequenceBuilder extends SequenceBuilderBase
 //                else return null;
 
                 // make the dummy sequence
-//                try {
-//                    db.createDummySequence(name, DNATools.getDNA(), length);
-//                    seq = db.getSequence(name);
-                      seq = new DummySequence(uri, name);
-//                }
-//                catch (ChangeVetoException cve) {
-//                    System.err.println("BioSQLSequenceDB was immutable");
-//                    return null;
-//                }
-//                catch (IllegalIDException iie) {
-//                    System.err.println("name " + name + " is illegal.");
-//                    return null;
-//                }
-//                catch (BioException be) {
-//                    System.err.println("Caught BioException");
-//                    return null;
-//                }
+                try {
+                    if (db instanceof BioSQLSequenceDB) {
+                        ((BioSQLSequenceDB) db).createDummySequence(name, DNATools.getDNA(), length);
+                        seq = db.getSequence(name);
+                    }
+                    else {
+                        seq = new DummySequence(uri, name);
+                    }
+                }
+                catch (ChangeVetoException cve) {
+                    System.err.println("BioSQLSequenceDB was immutable");
+                    return null;
+                }
+                catch (IllegalIDException iie) {
+                    System.err.println("name " + name + " is illegal.");
+                    return null;
+                }
+                catch (BioException be) {
+                    System.err.println("Caught BioException");
+                    return null;
+                }
 
                 // I must have a sequence to go on!!!
                 if (seq == null) return null;
