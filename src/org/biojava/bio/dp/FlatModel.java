@@ -237,10 +237,15 @@ class FlatModel implements MarkovModel, Serializable {
         }
       }
       
-      TranslatedDistribution dist = TranslatedDistribution.getDistribution(
-        delegate.transitionsFrom(s),
-        sModel.getWeights(sOrig)
-      );
+      //
+      // FIXME -- Matthew broked this...
+      //
+
+      TranslatedDistribution dist = null;
+      // TranslatedDistribution dist = TranslatedDistribution.getDistribution(
+      //  delegate.transitionsFrom(s),
+      //  sModel.getWeights(sOrig)
+      // );
       SimpleReversibleTranslationTable table =
         (SimpleReversibleTranslationTable) dist.getTable();
       try {
