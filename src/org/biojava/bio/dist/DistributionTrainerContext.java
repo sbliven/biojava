@@ -103,6 +103,11 @@ public interface DistributionTrainerContext {
   void addCount(Distribution dist, Symbol sym, double times)
   throws IllegalSymbolException;
   
+  /**
+   * Return the number of counts of a particular symbol which will be used
+   * to train the specified distribution.
+   */
+  
   double getCount(Distribution dist, Symbol sym)
   throws IllegalSymbolException;
   

@@ -63,7 +63,7 @@ public abstract class AbstractDistribution
   /**
    * Governs serialization behaivour.
    */
-  protected void writeObject(ObjectOutputStream stream)throws IOException{
+  private void writeObject(ObjectOutputStream stream)throws IOException{
     AlphabetIndex index = AlphabetManager.getAlphabetIndex((FiniteAlphabet)getAlphabet());
     int size = ((FiniteAlphabet)getAlphabet()).size();
     symbolIndices = new HashMap(size);
