@@ -33,15 +33,15 @@ to process the line as before, and then take the value that would have been
 handed to the listener's value method, and present it to the newly registered
 <code>TagValueParser</code> to tokenize into tag and value portions. That tag
 and value will then be passed onto the new <code>TagValueListener</code>. The
-new <code>TagValueListener</code> can itself chose to push a new pair of parser
+new <code>TagValueListener</code> can itself choose to push a new pair of parser
 and listener to start a new sub-sub-document. This can be repeated to arbitrary
 depth. As soon as a parser and listener pair are registered, the pushed listener
 receives a startRecord() message. Once the entire containing record ends (due to
-a record seperator line such as "//", or because the end of file has been
+a record separator line such as "//", or because the end of file has been
 reached), or if the tag that caused the delegation ends, the pushed listener
-will receive the aproreate endTag() message and also endRecord(). </p>
+will receive the appropriate endTag() message and also endRecord(). </p>
 
-<p><code>TagDelegator</code> is a usefull helper class that always delegates to
+<p><code>TagDelegator</code> is a useful helper class that always delegates to
 a given parser and listener pair on a given tag. </p>
 
 <h2>Rewriting the Event Stream</h2>
