@@ -83,13 +83,19 @@ public class CompoundLocation implements Location, Serializable {
 
     Collections.sort(working, Location.naturalOrder);
 
-    // System.out.println("Sorted: " + working.toString());
+    // 
+    // NB the following code assumes that all elements in
+    // `working' are contiguous blocks, and it may break
+    // if this is not true.
+    //
 
     Location last = Location.empty;
     for(int i = 0; i < working.size(); i++) {
       Location cur = (Location) working.get(i);
-      if(cur.overlaps(last)) {
-        last = last.union(cur);
+      if (cur.getMin() - last.getMax() <= 1) {
+	if (! last.contains(cur))
+	    last = new RangeLocation(Math.min(last.getMin(), cur.getMin()),
+				     Math.max(last.getMax(), cur.getMax()));
       } else {
 	if (last != Location.empty)
 	    this.locations.add(last);
