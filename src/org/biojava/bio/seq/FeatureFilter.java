@@ -1466,9 +1466,6 @@ public interface FeatureFilter extends Serializable {
         }
 
         public boolean isDisjoint(FeatureFilter ff) {
-            if (ff instanceof IsLeaf) {
-                return true;
-            }
             if (ff instanceof OnlyChildren) {
                 return FilterUtils.areDisjoint(
                     getFilter(),
@@ -1551,9 +1548,7 @@ public interface FeatureFilter extends Serializable {
         }
 
         public boolean isDisjoint(FeatureFilter ff) {
-            if (ff instanceof IsLeaf) {
-                return true;
-            } else if (ff instanceof OnlyDescendants) {
+           if (ff instanceof OnlyDescendants) {
                 return FilterUtils.areDisjoint(
                     getFilter(),
                     ((OnlyDescendants) ff).getFilter()
@@ -1814,7 +1809,8 @@ public interface FeatureFilter extends Serializable {
      * @since 1.3
      */
 
-    public static final FeatureFilter leaf = new IsLeaf();
+    // public static final FeatureFilter leaf = new IsLeaf();
+    public static final FeatureFilter leaf = new FeatureFilter.OnlyChildren(FeatureFilter.none);
 
     // Note: this implements OptimizableFilter, but cheats :-).  Consequently,
     // other optimizablefilters don't know anything about it.  The convenience
