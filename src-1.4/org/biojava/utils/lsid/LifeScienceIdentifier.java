@@ -177,6 +177,7 @@ public final class LifeScienceIdentifier
      *    is not properly formatted
      */
     public static LifeScienceIdentifier valueOf(String lsid)
+	throws LifeScienceIdentifierParseException
     {
 	try 
 	{
