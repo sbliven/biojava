@@ -225,8 +225,10 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
     private void _removeAnnotationSource(URL dataSourceURL) {
 	FeatureHolder fh = (FeatureHolder) featureSets.get(dataSourceURL);
-	if (fh != null)
+	if (fh != null) {
 	    features.removeFeatureHolder(fh);
+            featureSets.remove(dataSourceURL);
+        }
     }
 
     public void removeAnnotationSource(URL dataSourceURL) 
