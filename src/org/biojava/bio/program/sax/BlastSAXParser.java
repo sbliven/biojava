@@ -448,7 +448,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getQName(),
 				   "CDATA",(String)oMap.get(aoKeys[i]));
 
-		oAttQName.setQName("metadata");
+		oAttQName.setQName("metaData");
 		oAtts.addAttribute(oAttQName.getURI(),
 				   oAttQName.getLocalName(),
 				   oAttQName.getQName(),

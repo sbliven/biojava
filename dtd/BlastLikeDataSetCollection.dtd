@@ -1,0 +1,204 @@
+<!-- BlastLikeDataSetCollection DTD - attempts to provide a           
+     unified model for the output from the following pieces of        
+     bioinformatics sequence similarity search sofware:               
+                o BLAST                (NCBI)                         
+                o WU-BLAST             (Washington University)        
+                o HMMER                (Washington University)        
+                o DBA                  (Sanger Center)                
+                                                                      
+     NB This DTD covers output from the above software, when run      
+     in modes such that the detailed output is based around           
+     pairwise alignments.          
+
+     This is as opposed to other output formats such as ASN.1
+
+     The root element is a BlastLikeDataSetCollection.  This is
+     described towards the end of the DTD.
+     ================================================================ 
+     This DTD is Copyright 1999, 2000 Cambridge Antibody Technology   
+     Group plc (CAT). All Rights Reserved.                            
+                                                                      
+     Version 1.0
+
+     Author List:                                                     
+       Primary Author: Simon Brocklehurst (CAT)                       
+       Other Authors:  Colin H. Hardman   (CAT)                       
+                       Stuart Johnson     (CAT)                       
+                       Tim Dilks          (CAT)                       
+     ================================================================ -->
+
+<!-- PARAMETER ENTITY DECLARATIONS 
+     ============================= -->
+
+<!ENTITY % strandType    "(plus|minus)">
+
+<!ENTITY % frameNumber   "(minus3|minus2|minus1|plus1|plus2|plus3)">
+
+<!ENTITY % alignmentType "(local|global)">
+
+<!ENTITY % queryStrand   "queryStrand %strandType;">
+<!ENTITY % hitStrand     "hitStrand   %strandType;">
+
+<!ENTITY % queryFrame    "queryFrame  %frameNumber;">
+<!ENTITY % hitFrame      "hitFrame    %frameNumber;">
+
+<!-- HMMER sequence and model alignment types - i.e. local or global      -->
+
+<!ENTITY % startPositionOfSequence "startPositionOfSequence %alignmentType; ">
+<!ENTITY % endPositionOfSequence   "endPositionOfSequence   %alignmentType; ">
+<!ENTITY % startPositionOfModel    "startPositionOfModel    %alignmentType; ">
+<!ENTITY % endPositionOfModel      "endPositionOfModel      %alignmentType; ">
+
+<!-- ELEMENT DECLARATIONS
+     ==================== -->
+
+<!-- ================================================================ -->
+<!-- Elements used in more than one section of the data set.          -->
+<!-- For example, in both Summary and Detail sections                 -->
+
+<!ELEMENT biojava:HitDescription (#PCDATA)>
+<!ELEMENT biojava:HitId EMPTY>
+<!ATTLIST biojava:HitId
+                     id                  CDATA #REQUIRED
+                     metaData            CDATA #REQUIRED >
+
+<!-- The RawOutput element is used to represent sections of the
+     output from programs "as is".  This enables information from
+     software to be represented, without being parsed in detail.
+                                                                      -->
+<!ELEMENT biojava:RawOutput (#PCDATA)>
+<!ATTLIST biojava:RawOutput
+                     xml:space       (default|preserve) #IMPLIED >
+
+<!-- ================================================================ -->
+<!-- Header section related information                               -->
+
+<!ELEMENT biojava:Header (biojava:RawOutput)>
+
+<!-- ================================================================ -->
+<!-- Summary section related information                              -->
+
+<!ELEMENT biojava:HitSummary (biojava:HitId,biojava:HitDescription?)>
+<!ATTLIST biojava:HitSummary
+                score                    CDATA #REQUIRED
+                expectValue              CDATA #REQUIRED 
+                numberOfHSPs             CDATA #IMPLIED
+                readingFrame             CDATA #IMPLIED 
+                numberOfDomains          CDATA #IMPLIED  >
+
+<!-- DomainSummary and DomainHit elements are HMMER Specific -->
+
+<!ELEMENT biojava:DomainHit EMPTY>
+<!ATTLIST biojava:DomainHit
+                modelId                  CDATA #REQUIRED
+                domainPosition           CDATA #REQUIRED
+                sequenceFrom             CDATA #REQUIRED
+                sequenceTo               CDATA #REQUIRED
+                hmmFrom                  CDATA #REQUIRED
+                hmmTo                    CDATA #REQUIRED
+                %startPositionOfSequence;      #IMPLIED
+                %endPositionOfSequence;        #IMPLIED
+                %startPositionOfModel;         #IMPLIED
+                %endPositionOfModel;           #IMPLIED
+                score                    CDATA #REQUIRED 
+                expectValue              CDATA #REQUIRED >
+
+<!ELEMENT biojava:DomainSummary (biojava:DomainHit*) >
+<!ATTLIST biojava:DomainSummary
+                domainCount              CDATA #REQUIRED >
+
+<!-- End of DomainSummarySecion                                       -->
+
+<!ELEMENT biojava:Summary (biojava:HitSummary*, biojava:DomainSummary?) >
+
+<!-- ================================================================ -->
+<!-- Mainly DetailSection related information                         -->
+
+<!ELEMENT biojava:HSPSummary (biojava:RawOutput?)>
+<!ATTLIST biojava:HSPSummary
+                score               CDATA #REQUIRED
+                expectValue         CDATA #REQUIRED
+                numberOfIdentities  CDATA #REQUIRED
+                alignmentSize       CDATA #REQUIRED
+                percentageIdentity  CDATA #REQUIRED
+                numberOfPositives   CDATA #IMPLIED
+                percentagePositives CDATA #IMPLIED
+                pValue              CDATA #IMPLIED
+                sumPValues          CDATA #IMPLIED
+                numberOfGaps        CDATA #IMPLIED
+                %queryStrand;             #IMPLIED
+                %hitStrand;               #IMPLIED
+                %queryFrame;              #IMPLIED
+                %hitFrame;                #IMPLIED >
+
+<!ELEMENT biojava:QuerySequence (#PCDATA)>
+<!ATTLIST biojava:QuerySequence 
+                startPosition       CDATA #REQUIRED
+                stopPosition        CDATA #REQUIRED >
+
+
+<!-- A MatchConsensus elemenet represents the consensus information
+     present in a pairwise alignment produced by Blast-like programs
+     (i.e. the middle line of the alignment).                          -->
+
+<!ELEMENT biojava:MatchConsensus (#PCDATA)>
+<!ATTLIST biojava:MatchConsensus
+                     xml:space       (default|preserve) #IMPLIED >
+
+
+<!ELEMENT biojava:HitSequence (#PCDATA)>
+<!ATTLIST biojava:HitSequence 
+                startPosition       CDATA #REQUIRED
+                stopPosition        CDATA #REQUIRED >
+
+<!-- The BlastLikeAlignment elements represents information from the
+     pairwise alignments produced by Blast-like programs. Rather than
+     representing the alignment simply as preformatted raw text, it
+     separates out the information into a QuerySequence, a HitSequence
+     and a MatchConsensus.                                             -->
+
+<!ELEMENT biojava:BlastLikeAlignment (biojava:QuerySequence,
+                                      biojava:MatchConsensus,
+                                      biojava:HitSequence) >
+
+<!ELEMENT biojava:HSP (biojava:HSPSummary, biojava:BlastLikeAlignment)>
+
+<!-- HSPCollections model related groups of HSPs. For example, this
+     allows all plus strand HSPs to be grouped separated from all
+     minus strand HSPs                                                 -->
+
+<!ELEMENT biojava:HSPCollection (biojava:HSP+)>
+
+<!ELEMENT biojava:Hit (biojava:HitId, biojava:HitDescription?,
+                       biojava:HSPCollection+)>
+<!ATTLIST biojava:Hit
+                sequenceLength      CDATA #REQUIRED >
+
+<!ELEMENT biojava:Detail (biojava:Hit*)>
+
+<!-- ================================================================ -->
+<!-- Mainly TailSection related information                           -->
+
+<!ELEMENT biojava:Trailer (biojava:RawOutput)>
+
+<!-- ================================================================ -->
+<!-- Relating to overall results of searches                          -->
+
+<!ELEMENT biojava:BlastLikeDataSet (biojava:Header,
+                                    biojava:Summary?,
+                                    biojava:Detail?,
+                                    biojava:Trailer?)>
+<!ATTLIST biojava:BlastLikeDataSet
+                 program             CDATA #REQUIRED
+                 version             CDATA #REQUIRED>
+
+<!-- A BlastLikeDataSetCollection contains data from groups of results
+     obtained from  bioinformatics software that produces Blast-like 
+     output. For example, it can model the output from Blast run on 
+     multiple sequences. Or it could be used to group together analyses
+     on a single sequence obtained from multiple programs.             -->
+
+<!ELEMENT biojava:BlastLikeDataSetCollection (biojava:BlastLikeDataSet+) >
+<!ATTLIST biojava:BlastLikeDataSetCollection
+                 xmlns               CDATA #FIXED ""
+                 xmlns:biojava       CDATA #FIXED "http://www.biojava.org" >
