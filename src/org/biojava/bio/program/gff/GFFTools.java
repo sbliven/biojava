@@ -36,7 +36,17 @@ import org.biojava.bio.seq.db.*;
  */
 
 public class GFFTools {
+  
+  /**
+   * Flag to indicate that there is no score info.
+   */
+  public static double NO_SCORE = Double.NEGATIVE_INFINITY;
 
+  /**
+   * Flag to indicate that there is no frame info.
+   */
+  public static int NO_FRAME = -1;
+  
  /**
   * Reads a <code>GFFEntrySet</code> from a file with no filtering
   * @param fileName the file containing the GFF

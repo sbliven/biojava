@@ -128,12 +128,16 @@ public interface GFFRecord {
   
   /**
    * Flag to indicate that there is no score info.
+   *
+   * @deprecated  Use GFFTools.NO_SCORE instead
    */
-  public static double NO_SCORE = Double.NEGATIVE_INFINITY;
+  public static double NO_SCORE = GFFTools.NO_SCORE;
 
   /**
    * Flag to indicate that there is no frame info.
+   *
+   * @deprecated  Use GFFTools.NO_FRAME instead
    */
-  public static int NO_FRAME = -1;
+  public static int NO_FRAME = GFFTools.NO_FRAME;
 }
 

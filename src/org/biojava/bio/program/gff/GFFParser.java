@@ -190,7 +190,7 @@ public class GFFParser {
 	   score.equals("0")
 	   ) 
 	{
-	    record.setScore(GFFRecord.NO_SCORE);
+	    record.setScore(GFFTools.NO_SCORE);
 	} else {
 	    double sc = 0.0;
 	    try {
@@ -216,7 +216,7 @@ public class GFFParser {
 
 	String frame = (String) aList.get(7);
 	if(frame.equals(".")) {
-	    record.setFrame(GFFRecord.NO_FRAME);
+	    record.setFrame(GFFTools.NO_FRAME);
 	} else {
 	    int fr = 0;
 	    try {

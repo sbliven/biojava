@@ -29,6 +29,7 @@ import java.net.URL;
  * Utility methods for handling META-INF/services files
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.3
  */
 
