@@ -33,6 +33,13 @@ public interface FilterTest
      */
     public boolean accept(Object value);
 
+    /**
+     * Tests that the value associated with the specified
+     * key is equal to the value supplied here by whatever
+     * criterion of equality appropriate to those objects.
+     * A value of false is returned by accept() if a
+     * ClassCastException is thrown on comparing the objects.
+     */
     public static class Equals
         implements FilterTest
     {
@@ -42,7 +49,12 @@ public interface FilterTest
 
         public boolean accept(Object value)
         {
-            return this.value.equals(value);
+            try {
+                return this.value.equals(value);
+            }
+            catch (ClassCastException ce) {
+                return false;
+            }
         }
     }
 
