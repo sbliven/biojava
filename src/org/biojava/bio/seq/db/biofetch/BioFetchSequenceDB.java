@@ -52,13 +52,21 @@ public class BioFetchSequenceDB
     private final String type;
     private final String db;
 
+    /**
+     * Construct a BioFetchSequenceDB which connects to the specified BioFetch server.
+     *
+     * @param prefix The base URL of the server.
+     * @param type The type of entry to be retrieved (currently only "embl" is supported).
+     * @param db The database name to use.
+     */
+    
     public BioFetchSequenceDB(String prefix,
-			      String type,
-			      String db)
+			                  String type,
+                              String db)
     {
-	this.prefix = prefix;
-	this.type = type;
-	this.db = db;
+        this.prefix = prefix;
+        this.type = type;
+        this.db = db;
     }
 
     public String getName() {

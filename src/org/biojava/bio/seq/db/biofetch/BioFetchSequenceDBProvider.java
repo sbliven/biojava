@@ -28,8 +28,11 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.db.*;
 
 /**
- * Simple SequenceDB implementation backed by a BioFetch (HTTP)
- * server
+ * Directory-services plugin for biofetch databases.
+ *
+ * @for.developer This class is instantiated automatically by the
+ *                directory-services code, and is not of direct
+ *                interest to users.
  *
  * @author Thomas Down
  * @since 1.3
