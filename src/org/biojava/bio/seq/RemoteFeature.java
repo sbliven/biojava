@@ -42,6 +42,7 @@ import org.biojava.bio.seq.db.*;
  * portion.
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.2
  */
 public interface RemoteFeature extends Feature {
@@ -52,7 +53,7 @@ public interface RemoteFeature extends Feature {
    * @return an immutable List of Regions
    */
   List getRegions();
-  
+
   /**
    * Retrieve the Feature on some assembly Sequence that can represent this
    * RemoteFeature properly.
@@ -65,14 +66,40 @@ public interface RemoteFeature extends Feature {
    *            constructed
    */
   Feature getRemoteFeature() throws BioException;
-  
+
   Resolver getResolver();
-  
+
   public class Template extends Feature.Template {
     public List regions;
     public Resolver resolver;
+
+	public Template()
+	{
+		super();
+		regions = new ArrayList();
+		resolver = null;
+	}
+
+	  /**
+	   * Creates a RemoteFeature.Template that has the same values as the
+	   * template passed in.  Fields that are in the template passed in but
+	   * not in RemoteFeature Templates will be silently discarded.  Regions is
+	   * set to an empty list and the resolver is set to null.
+	   *
+	   * @param theTemplate the template for this template.
+	   */
+	  public Template(Feature.Template theTemplate)
+	  {
+	    location = theTemplate.location;
+	    type = theTemplate.type;
+	    source = theTemplate.source;
+    	annotation = theTemplate.annotation;
+	    resolver = null;
+    	regions = null;
+  	  }
+
   }
-  
+
   /**
    * The interface for objects that actually can take a RemoteFeature and
    * return a Sequence object with the feature resolved into a real feature.
@@ -102,7 +129,7 @@ public interface RemoteFeature extends Feature {
      */
     Feature resolve(RemoteFeature rFeat) throws IllegalIDException, BioException;
   }
-  
+
   /**
    * A tuple of Location and sequence ID.
    * <P>
@@ -116,7 +143,7 @@ public interface RemoteFeature extends Feature {
   public final static class Region {
     private final Location location;
     private final String seqID;
-    
+
     /**
      * Create a new Region.
      *
@@ -128,7 +155,7 @@ public interface RemoteFeature extends Feature {
       this.location = location;
       this.seqID = seqID;
     }
-    
+
     /**
      * Retrieve the Location of the Region.
      *
@@ -137,7 +164,7 @@ public interface RemoteFeature extends Feature {
     public Location getLocation() {
       return location;
     }
-    
+
     /**
      * Return the remote Sequence ID if this Region is on another Sequence
      * (isRemote will return true), null otherwise.
@@ -147,7 +174,7 @@ public interface RemoteFeature extends Feature {
     public String getSeqID() {
       return seqID;
     }
-    
+
     /**
      * Return whether this Region is remote or local.
      * <P>

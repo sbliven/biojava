@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -54,6 +54,7 @@ import org.biojava.bio.symbol.*;
  * cycle. i.e. 'order' is converted to 'join'
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Greg Cox
  * @since 1.2
  */
 class EmblLikeLocationParser
@@ -66,11 +67,15 @@ class EmblLikeLocationParser
 
     // Stores join/order/complement instructions
     private List instructStack = new ArrayList();
-    // List of sublocations
+    // List of sublocations.  Used for compound locations on the current
+    // sequence
     private List  subLocations = new ArrayList();
+	// List of subRegions.  Used to store remote regions
+	private List  subRegions = new ArrayList();
 
     // These hold working data for each (sub)location and are cleared
     // by calling the processCoords() function
+    private String mRegionSeqID;
     private List   startCoords = new ArrayList();
     private List     endCoords = new ArrayList();
     private boolean isPointLoc = true;
@@ -92,19 +97,15 @@ class EmblLikeLocationParser
 
     /**
      * <code>parseLocation</code> creates a <code>Location</code> from
-     * the String and returns an array of Objects. The first element
-     * is the <code>Location</code>, the second is a Boolean value
-     * indicating whether it is on the complementary strand. A true
-     * value indicates complement.
+     * the String and returns a stranded location.
      *
      * @param location a location <code>String</code>.
-     *
-     * @return a StrandedLocation with the location and strand information
-     * from the string
+     * @param theTemplate the template to be filled with the parsed out location
+     * information.
      *
      * @exception BioException if an error occurs.
      */
-    StrandedLocation parseLocation(final String location)
+    void parseLocation(String location, Feature.Template theTemplate)
 		throws BioException
     {
         this.location = location;
@@ -168,6 +169,7 @@ class EmblLikeLocationParser
 
                     case ',':
                         processCoords();
+                        processInstructs();
                         break;
 
                     case ')':
@@ -194,20 +196,40 @@ class EmblLikeLocationParser
         }
         processCoords();
 
-        StrandedLocation returnLocation;
-        if (subLocations.size() == 1)
-        {
-            returnLocation = new StrandedLocation((Location)subLocations.get(0),
-                                                  mStrandType);
-        }
-        else
-        {
-            // EMBL ordering is in reverse on the complementary strand
-            // but LocationTools sorts them anyway
-            returnLocation = new StrandedLocation(LocationTools.union(subLocations),
-                                                  mStrandType);
-        }
-        return returnLocation;
+		// The location has been processed, and now the template gets filled
+		if (subLocations.size() == 1)
+		{
+			theTemplate.location = (Location)subLocations.get(0);
+		}
+		else
+		{
+			// EMBL ordering is in reverse on the complementary strand
+			// but LocationTools sorts them anyway
+			theTemplate.location = LocationTools.union(subLocations);
+		}
+
+		if(theTemplate instanceof StrandedFeature.Template)
+		{
+			((StrandedFeature.Template)theTemplate).strand = mStrandType;
+		}
+
+		if(subRegions.size() != 0)
+		{
+			// This is a remote feature, so a new template has to be made
+			RemoteFeature.Template newTemplate = new RemoteFeature.Template(theTemplate);
+			java.util.Iterator iter = subLocations.iterator();
+			while (iter.hasNext())
+			{
+				Location loc = (Location)(iter.next());
+				subRegions.add(new RemoteFeature.Region(loc, null));
+			}
+			newTemplate.regions = subRegions;
+// FIXME:
+// I don't know how to create an appropriate resolver, so I'm leaving it
+// blank.  No doubt this will break things.
+// -- Gcox
+			newTemplate.resolver = null;
+		}
     }
 
     /**
@@ -223,6 +245,7 @@ class EmblLikeLocationParser
 	throws BioException
     {
 	int outerMin, innerMin, innerMax, outerMax;
+	Location createdLocation = null;
 
 	// This is expected where two calls to processCoords() are
 	// made sequentially e.g. where two levels of parens are
@@ -236,7 +259,7 @@ class EmblLikeLocationParser
 		// Create a ranged location, and wrap it in a between location
 		int minCoord = ((Integer)startCoords.get(0)).intValue();
 		int maxCoord = ((Integer)startCoords.get(1)).intValue();
-		subLocations.add(new BetweenLocation(new RangeLocation(minCoord, maxCoord)));
+		createdLocation = new BetweenLocation(new RangeLocation(minCoord, maxCoord));
 	}
 	// Range of form: 123
 	else if (startCoords.size() == 1 && endCoords.isEmpty())
@@ -248,13 +271,13 @@ class EmblLikeLocationParser
 	    // lies entirely outside the current entry
 	    if (unboundMin || unboundMax)
 	    {
-		subLocations.add(new FuzzyPointLocation(unboundMin ? Integer.MIN_VALUE : innerMin,
+		createdLocation = new FuzzyPointLocation(unboundMin ? Integer.MIN_VALUE : innerMin,
 							unboundMax ? Integer.MAX_VALUE : innerMax,
-							FuzzyPointLocation.RESOLVE_AVERAGE));
+							FuzzyPointLocation.RESOLVE_AVERAGE);
 	    }
 	    else if (isPointLoc)
 	    {
-		subLocations.add(new PointLocation(innerMin));
+		createdLocation = new PointLocation(innerMin);
 	    }
 	    else
 	    {
@@ -270,9 +293,9 @@ class EmblLikeLocationParser
 	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
 	    innerMax = outerMax = ((Integer) startCoords.get(1)).intValue();
 
-	    subLocations.add(new FuzzyPointLocation(innerMin,
+	    createdLocation = new FuzzyPointLocation(innerMin,
 						    innerMax,
-						    FuzzyPointLocation.RESOLVE_AVERAGE));
+						    FuzzyPointLocation.RESOLVE_AVERAGE);
 	}
 	// Range of form: 123..567 or <123..567 or 123..>567 or <123..>567
 	else if (startCoords.size() == 1 && endCoords.size() == 1)
@@ -282,17 +305,17 @@ class EmblLikeLocationParser
 
 	    if (unboundMin || unboundMax)
 	    {
-		subLocations.add(new FuzzyLocation(unboundMin ? Integer.MIN_VALUE : outerMin,
+		createdLocation = new FuzzyLocation(unboundMin ? Integer.MIN_VALUE : outerMin,
 						   unboundMax ? Integer.MAX_VALUE : outerMax,
 						   innerMin,
 						   innerMax,
-						   FuzzyLocation.RESOLVE_INNER));
+						   FuzzyLocation.RESOLVE_INNER);
 	    }
 	    else
 	    {
 		try
 		{
-		    subLocations.add(new RangeLocation(outerMin, outerMax));
+		    createdLocation = new RangeLocation(outerMin, outerMax);
 		}
 		catch (IndexOutOfBoundsException ioe)
 		{
@@ -307,11 +330,11 @@ class EmblLikeLocationParser
 	    innerMin = ((Integer) startCoords.get(1)).intValue();
 	    innerMax = outerMax = ((Integer) endCoords.get(0)).intValue();
 
-	    subLocations.add(new FuzzyLocation(outerMin,
+	    createdLocation = new FuzzyLocation(outerMin,
 					       outerMax,
 					       innerMin,
 					       innerMax,
-					       FuzzyLocation.RESOLVE_INNER));
+					       FuzzyLocation.RESOLVE_INNER);
 	}
 	// Range of form: 123..(567.789)
 	else if (startCoords.size() == 1 && endCoords.size() == 2)
@@ -320,11 +343,11 @@ class EmblLikeLocationParser
 	    innerMax = ((Integer) endCoords.get(0)).intValue();
 	    outerMax = ((Integer) endCoords.get(1)).intValue();
 
-	    subLocations.add(new FuzzyLocation(outerMin,
+	    createdLocation = new FuzzyLocation(outerMin,
 					       outerMax,
 					       innerMin,
 					       innerMax,
-					       FuzzyLocation.RESOLVE_INNER));
+					       FuzzyLocation.RESOLVE_INNER);
 	}
 	// Range of form: (123.345)..(567.789)
 	else if (startCoords.size() == 2 && endCoords.size() == 2)
@@ -334,11 +357,11 @@ class EmblLikeLocationParser
 	    innerMax = ((Integer) endCoords.get(0)).intValue();
 	    outerMax = ((Integer) endCoords.get(1)).intValue();
 
-	    subLocations.add(new FuzzyLocation(outerMin,
+	    createdLocation = new FuzzyLocation(outerMin,
 					       outerMax,
 					       innerMin,
 					       innerMax,
-					       FuzzyLocation.RESOLVE_INNER));
+					       FuzzyLocation.RESOLVE_INNER);
 	}
 	else
 	{
@@ -351,6 +374,15 @@ class EmblLikeLocationParser
 	startCoords.clear();
 	endCoords.clear();
 
+	if(mRegionSeqID == null)
+	{
+		subLocations.add(createdLocation);
+	}
+	else
+	{
+		subRegions.add(new RemoteFeature.Region(createdLocation, mRegionSeqID));
+	}
+	mRegionSeqID = null;
 	isPointLoc   = true;
 	unboundMin   = false;
 	unboundMax   = false;
@@ -369,7 +401,6 @@ class EmblLikeLocationParser
 	throws BioException
     {
 	String instruct = (String) instructStack.remove(instructStack.size() - 1);
-
 	if (instruct.equals("join") || instruct.equals("order"))
 	{
 	    // This is handled implicitly by the parseLocation()
@@ -391,7 +422,7 @@ class EmblLikeLocationParser
 	{
 	    // This is a primary accession number
 	    // e.g. J00194:(100..202)
-  	     throw new BioException("Remote locations are not supported: " + location);
+  	     mRegionSeqID = instruct;
 	}
     }
 

@@ -117,7 +117,7 @@ public class FeatureTableParser {
 					   + featureBuf);
 		}
 
-		parseLocation(featureBuf.toString(), featureTemplate);
+		locParser.parseLocation(featureBuf.toString(), featureTemplate);
 
 		listener.startFeature(featureTemplate);
 		featureStatus = WITHIN;
@@ -162,22 +162,6 @@ public class FeatureTableParser {
 
     public boolean inFeature() {
 	return (featureStatus != WITHOUT);
-    }
-
-    /**
-     * Parse an EMBL location and fill in the location and strand fields of the
-     * template. Updated to support a wider range of location types.
-     */
-    private void parseLocation(String loc, Feature.Template fillin)
-	throws BioException
-    {
-		StrandedLocation parsedLocation = locParser.parseLocation(loc);
-		fillin.location = parsedLocation.getLocation();
-
-		if(fillin instanceof StrandedFeature.Template)
-		{
-		    ((StrandedFeature.Template)fillin).strand = parsedLocation.getStrandType();
-		}
     }
 
     /**
