@@ -186,7 +186,7 @@ public class DASAlignmentCall {
      * biojava Alignment object.
      *
      */
-    private Alignment[] parseDASResponse(InputStream inStream) 
+    public Alignment[] parseDASResponse(InputStream inStream) 
 	throws IOException, SAXException
     {
 	
