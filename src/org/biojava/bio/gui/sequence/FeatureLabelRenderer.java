@@ -36,18 +36,37 @@ import java.awt.geom.*;
 
 import java.util.List;
 
+/**
+ * @author unknown
+ * @author Matthew Pocock
+ */
 public class FeatureLabelRenderer
 extends AbstractChangeable
-implements SequenceRenderer {
+implements FeatureRenderer {
   public static final ChangeType LABEL_MAKER = new ChangeType(
     "The label maker has changed",
     "org.biojava.bio.gui.sequence.FeatureLabelRenderer",
-    "FILL",
-    SequenceRenderContext.LAYOUT
+    "LABEL_MAKER",
+    SequenceRenderContext.REPAINT
   );
   
-  private final double depth = 20;
+  private static FontRenderContext FRC = new FontRenderContext(
+    new AffineTransform(),
+    false,
+    true
+  );
+  
   private LabelMaker labelMaker;
+  
+  public FeatureLabelRenderer() {}
+  
+  public FeatureLabelRenderer(LabelMaker labelMaker) {
+    try {
+      setLabelMaker(labelMaker);
+    } catch (ChangeVetoException cve) {
+      throw new BioError(cve, "Assertion Failure: could not set label maker");
+    }
+  }
   
   public LabelMaker getLabelMaker() {
     return this.labelMaker;
@@ -72,8 +91,7 @@ implements SequenceRenderer {
   }
   
   public double getDepth(SequenceRenderContext src) {
-    List layers = bumpLabels(src);
-    return layers.size() * depth + 1.0;
+    return src.getFont().getMaxCharBounds(FRC).getHeight();
   }
   
   public double getMinimumLeader(SequenceRenderContext src) {
@@ -84,91 +102,72 @@ implements SequenceRenderer {
     return 0.0;
   }
   
-  public void paint(
-    Graphics2D g, SequenceRenderContext src
+  public void renderFeature(
+    Graphics2D g,
+    Feature feat,
+    SequenceRenderContext src
   ) {
-    List layers = bumpLabels(src);
-    
+    Location loc = feat.getLocation();
+    String label = labelMaker.makeLabel(feat);
+    g.drawString(
+      label,
+      (float) (src.sequenceToGraphics((loc.getMin() + loc.getMax()) / 2)),
+      (float) (getDepth(src) + 2.0)
+    );
   }
   
-  public SequenceViewerEvent processMouseEvent(
+  public FeatureHolder processMouseEvent(
+    FeatureHolder hits,
     SequenceRenderContext src,
-    MouseEvent me,
-    List path
+    MouseEvent me
   ) {
-    path.add(this);
-    int sPos = src.graphicsToSequence(me.getPoint());
-    return new SequenceViewerEvent(this, null, sPos, me, path);
-  }
-  
-  protected List bumpLabels(SequenceRenderContext src) {
-    List lines = new ArrayList();
-    
-    for(
-      Iterator fi = ((FeatureHolder) src.getSymbols()).filter(
-        new FeatureFilter.OverlapsLocation(src.getRange()),
-        false
-      ).features();
-      fi.hasNext();
-    ) {
-      Feature f = (Feature) fi.next();
-      String label = labelMaker.makeLabel(f);
-      
-      Location fLoc = null; ///
-      FeatLocLabel featLocLabel = new FeatLocLabel(f, fLoc, label);
-      
-      Iterator lineI = lines.iterator();
-      List line = null;
-    LAYER:
-      while(lineI.hasNext()) {
-        List curLine = (List) lineI.next();
-        Iterator curLineI = curLine.iterator();
-        while(curLineI.hasNext()) {
-          Location curLoc = ((FeatLocLabel) curLineI.next()).getLocation();
-          if(curLoc.overlaps(fLoc)) {
-            continue LAYER;
-          }
-        }
-        line = curLine;
-        break;
-      }
-      if(line == null) {
-        lines.add(line = new ArrayList());
-      }
-      line.add(featLocLabel);
-    }
-    return lines;
-  }
-  
-  final static private class FeatLocLabel {
-    private final Feature f;
-    private final Location location;
-    private final String label;
-    
-    public final Feature getFeature() {
-      return f;
-    }
-    
-    public final Location getLocation() {
-      return location;
-    }
-    
-    public final String getLabel() {
-      return label;
-    }
-    
-    public FeatLocLabel(Feature f, Location loc, String label) {
-      this.f = f;
-      this.location = loc;
-      this.label = label;
-    }
-    
-    public String toString() {
-      return "feature: " + f + " location: " + location + " label: " + label;
-    }
+    return hits;
   }
   
   public static interface LabelMaker {
     String makeLabel(Feature f);
+  }
+  
+  public static class SourceLabelMaker
+  implements LabelMaker {
+    public String makeLabel(Feature f) {
+      return f.getSource();
+    }
+  }
+  
+  public static class TypeLabelMaker
+  implements LabelMaker {
+    public String makeLabel(Feature f) {
+      return f.getType();
+    }
+  }
+  
+  public static class AnnotationLabelMaker
+  implements LabelMaker {
+    private Object key;
+    
+    public AnnotationLabelMaker() {
+    }
+    
+    public AnnotationLabelMaker(Object key) {
+      setKey(key);
+    }
+    
+    public void setKey(Object key) {
+      this.key = key;
+    }
+    
+    public Object getKey() {
+      return key;
+    }
+    
+    public String makeLabel(Feature feat) {
+      Annotation ann = feat.getAnnotation();
+      if(ann.containsProperty(key)) {
+        return ann.getProperty(key).toString();
+      } else {
+        return "";
+      }
+    }
   }
 }
