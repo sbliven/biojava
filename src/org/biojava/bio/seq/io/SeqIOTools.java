@@ -33,7 +33,7 @@ import org.biojava.utils.*;
  * A set of convenience methods for handling common file formats.
  *
  * @author Thomas Down
- * @author Mark Schreiber (readFasta,writeFasta))
+ * @author Nimesh Singh
  * @since 1.1
  */
 public class SeqIOTools  {
@@ -99,23 +99,36 @@ public class SeqIOTools  {
     /**
      * Iterate over the sequences in an GenBank-format stream.
      */
-	
     public static SequenceIterator readGenbank(BufferedReader br) {
         return new StreamReader(br,
                                 new GenbankFormat(),
                                 getDNAParser(),
                                 getGenbankBuilderFactory());
     }
-	
-	/**
-	 * Iterate over the sequences in an GenPept-format stream.
-	 */
-	public static SequenceIterator readGenpept(BufferedReader br){
-		return new StreamReader(br,
-								new GenbankFormat(),
-								getProteinParser(),
-								getGenbankBuilderFactory());
-	}
+
+      private static SequenceBuilderFactory _genpeptBuilderFactory;
+
+    /**
+    * Get a default SequenceBuilderFactory for handling Genpept
+    * files.
+    */
+    public static SequenceBuilderFactory getGenpeptBuilderFactory() {
+        if (_genpeptBuilderFactory == null) {
+            _genpeptBuilderFactory = new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+        }
+        return _genpeptBuilderFactory;
+    }
+
+    /**
+    * Iterate over the sequences in an Genpept-format stream.
+    */
+    public static SequenceIterator readGenpept(BufferedReader br) {
+        return new StreamReader(br,
+                                new GenbankFormat(),
+                                getProteinParser(),
+                                getGenpeptBuilderFactory());
+    }
+
 
     private static SequenceBuilderFactory _swissprotBuilderFactory;
 
@@ -178,6 +191,7 @@ public class SeqIOTools  {
    * Note this somewhat duplicates functionality in the readFastaDNA and readFastaProtein methods but
    * uses a stream rather than a reader and returns a SequenceDB rather than a SequenceIterator. If
    * the returned DB is likely to be large then the above mentioned methods should be used.
+   * @author Mark Schreiber
    * @throws BioException if problems occur during reading of the stream.
    * @since 1.2
    */
@@ -198,6 +212,7 @@ public class SeqIOTools  {
 
   /**
    * Write a sequenceDB to an output stream in fasta format
+   * @author Mark Schreiber
    * @since 1.2
    */
   public static void writeFasta(OutputStream os, SequenceDB db) throws IOException{
@@ -208,10 +223,40 @@ public class SeqIOTools  {
    * Writes sequences from a SequenceIterator to an OutputStream in Fasta Format.
    * This makes for a useful format filter where a StreamReader can be sent to the
    * StreamWriter after formatting.
+   * @author Mark Schreiber
    * @since 1.2
    */
    public static void writeFasta(OutputStream os, SequenceIterator in) throws IOException{
       StreamWriter sw = new StreamWriter(os,new FastaFormat());
       sw.writeStream(in);
    }
+
+   /**
+    * The following methods write sequences from a SequenceIterator to an OutputStream.
+    */
+    public static void writeEmbl(OutputStream os, SequenceIterator in) throws IOException{
+        StreamWriter sw = new StreamWriter(os, new EmblLikeFormat());
+        sw.writeStream(in);
+    }
+
+    public static void writeSwissprot(OutputStream os, SequenceIterator in) throws IOException, BioException {
+        SequenceFormat former = new EmblLikeFormat();
+        PrintStream ps = new PrintStream(os);
+        while (in.hasNext()) {
+            former.writeSequence(in.nextSequence(), "Swissprot", ps);
+        }
+    }
+
+    public static void writeGenpept(OutputStream os, SequenceIterator in) throws IOException, BioException {
+        SequenceFormat former = new GenbankFormat();
+        PrintStream ps = new PrintStream(os);
+        while (in.hasNext()) {
+            former.writeSequence(in.nextSequence(), "Genpept", ps);
+        }
+    }
+
+    public static void writeGenbank(OutputStream os, SequenceIterator in) throws IOException{
+        StreamWriter sw = new StreamWriter(os, new GenbankFormat());
+        sw.writeStream(in);
+    }
 }

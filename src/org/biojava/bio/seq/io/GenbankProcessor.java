@@ -94,18 +94,14 @@ public class GenbankProcessor extends SequenceBuilderFilter
         // accession number. If accession number is vital, failure of
         // test of accessions.size() > 0 should throw a
         // ParseException.
-        String  id = "";
         String uri = "";
-        if (accessions.size() > 0)
-        {
-            id = (String) accessions.get(0);
-            uri = "urn:sequence/genbank:" + id;
-            getDelegate().addSequenceProperty(PROPERTY_GENBANK_ACCESSIONS, accessions);
-        }
+	if (accessions.size() > 0) {
+            uri = "urn:sequence/genbank:" + (String) accessions.get(0);
+	    getDelegate().addSequenceProperty(PROPERTY_GENBANK_ACCESSIONS, accessions);
+	}
 
-        getDelegate().setName(id);
         getDelegate().setURI(uri);
-        getDelegate().endSequence();
+	getDelegate().endSequence();
     }
 
 	public void addSequenceProperty(Object key, Object value) throws ParseException
@@ -152,6 +148,9 @@ public class GenbankProcessor extends SequenceBuilderFilter
 					{
 						accessions.add(value);
 					}
+                                        else if (key.equals(GenbankFormat.LOCUS_TAG)) {
+                                            getDelegate().setName((String) value);
+                                        }
 				}
 			}
 		}

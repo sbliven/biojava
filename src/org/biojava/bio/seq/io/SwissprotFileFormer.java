@@ -24,10 +24,15 @@ package org.biojava.bio.seq.io;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.BioError;
 
 import java.io.PrintStream;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
  * Formats a sequence into Swissprot/TrEMBL format.  Modeled after
@@ -36,8 +41,39 @@ import java.util.ArrayList;
  * @author Greg Cox
  * @since 1.2
  */
-public class SwissprotFileFormer implements SeqFileFormer
+public class SwissprotFileFormer extends AbstractGenEmblFileFormer implements SeqFileFormer
 {
+
+    // Main sequence formatting buffer
+    private StringBuffer sq = new StringBuffer();
+    // Main qualifier formatting buffer
+    private StringBuffer qb = new StringBuffer();
+    // Utility formatting buffer
+    private StringBuffer ub = new StringBuffer();
+
+    // Buffers for each possible sequence property line
+    private StringBuffer idb = null;
+    private StringBuffer acb = null;
+    private StringBuffer dtb = null;
+    private StringBuffer deb = null;
+    private StringBuffer svb = null;
+    private StringBuffer kwb = null;
+    private StringBuffer osb = null;
+    private StringBuffer ocb = null;
+    private StringBuffer ccb = null;
+    private StringBuffer ftb = new StringBuffer();
+
+    private SymbolTokenization proteinTokenization;
+
+    {
+	try {
+	    proteinTokenization = ProteinTools.getTAlphabet().getTokenization("token");
+	} catch (Exception ex) {
+	    throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
+	}
+    }
+
+
 // Static variables
 	static int LOCATION_WIDTH = 6;
 
@@ -61,7 +97,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 	}
 
 	/**
-	 * Creates a new <code>EmblFileFormer</code> object. Instances are
+	 * Creates a new <code>SwissprotFileFormer</code> object. Instances are
 	 * made by the <code>Factory</code>.
 	 *
 	 * @param theStream a <code>PrintStream</code> object.
@@ -91,9 +127,8 @@ public class SwissprotFileFormer implements SeqFileFormer
 	}
 
 	/**
-	 * Null implementation.  This object formats and prints a sequence.  The
-	 * name alone cannot be printed in Swissprot format.  Therefore, it's
-	 * easiest to ignore it.
+	 * The name is printed out as part of the identifier line.  It will be
+	 * replaced if an ID keyword exists in the annotations.
 	 *
 	 * @param the String that should be returned by getName for the sequence
 	 * being parsed
@@ -101,6 +136,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 
 	public void setName(String theName) throws ParseException
 	{
+            idb = new StringBuffer("ID   " + theName);
 	}
 
 	/**
@@ -115,8 +151,8 @@ public class SwissprotFileFormer implements SeqFileFormer
 	}
 
 	/**
-	 * Prints out the symbol array passed in in lines of 60, blocks of 10.
-	 * The SQ header line isn't printed out.
+	 * Prints out the sequences properties in order.
+         * Prints out the symbol array passed in in lines of 60, blocks of 10
 	 *
 	 * @param theAlphabet The alphabet of the symbol data
 	 * @param theSymbols An array containing symbols
@@ -133,36 +169,145 @@ public class SwissprotFileFormer implements SeqFileFormer
 						   int theLength)
 		throws IllegalAlphabetException
 	{
-		// Hook for when the header line is implemented.  Currently null.
-		this.printOutSequenceHeaderLine(theAlphabet, theSymbols,
-										theStart, theLength);
 
-		// Get newline character
-		String newLine = System.getProperty("line.separator");
-		List brokenLines = this.breakSymbolArray(theAlphabet, theSymbols,
-				theStart, theLength);
+            PrintStream stream = this.getPrintStream();
 
-		java.util.Iterator iterator = brokenLines.iterator();
-		String leader = "     ";
-		while(iterator.hasNext())
-		{
-			this.getPrintStream().print(leader + iterator.next() + newLine);
-		}
-		this.getPrintStream().println("//");
+            // Print out all of the sequence properties in order
+            if (idb != null) {stream.println(idb); stream.println("XX");}
+            if (acb != null) {stream.println(acb); stream.println("XX");}
+            if (svb != null) {stream.println(svb); stream.println("XX");}
+            if (dtb != null) {stream.println(dtb); stream.println("XX");}
+            if (deb != null) {stream.println(deb); stream.println("XX");}
+            if (kwb != null) {stream.println(kwb); stream.println("XX");}
+            if (osb != null) {stream.println(osb);}
+            if (ocb != null) {stream.println(ocb); stream.println("XX");}
+            if (ccb != null) {stream.println(ccb); stream.println("XX");}
+            if (ftb.length() != 0) {
+                stream.print(ftb);
+            }
+
+            this.printOutSequenceHeaderLine(theAlphabet, theSymbols, theStart, theLength);
+
+            List brokenLines = this.breakSymbolArray(theAlphabet, theSymbols,
+                                                     theStart, theLength);
+
+            java.util.Iterator iterator = brokenLines.iterator();
+            String leader = "     ";
+            while(iterator.hasNext())
+            {
+                stream.print(leader + iterator.next() + nl);
+            }
+            stream.println("//");
 	}
+
+        /**
+         * Formats sequence properties into form suitable for printing to
+         * file.
+         *
+         * @param key    The key of the sequence property
+         * @param value  The value of the sequence property
+         *
+         * @returns      Properly formated string
+         */
+
+        private String sequenceBufferCreator(Object key, Object value) {
+            StringBuffer temp = new StringBuffer();
+
+            if (value == null) {
+                temp.append((String) key);
+            }
+            else if (value instanceof ArrayList) {
+                Iterator iter = ((ArrayList) value).iterator();
+                while (iter.hasNext()) {
+                    temp.append((String) key + "   " + iter.next());
+                    if (iter.hasNext())
+                        temp.append(nl);
+                }
+            }
+            else {
+                StringTokenizer valueToke = new StringTokenizer((String) value, " ");
+                int fullline = 80;
+                int length = 0;
+                String token = valueToke.nextToken();
+
+                while (true) {
+                    temp.append((String) key + "  ");
+                    length = (temp.length() % (fullline + 1)) + token.length() + 1;
+                    if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
+                    while (length <= fullline && valueToke.hasMoreTokens()) {
+                        temp.append(" " + token);
+                        token = valueToke.nextToken();
+                        length = (temp.length() % (fullline + 1)) + token.length() + 1;
+                        if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
+                    }
+                    if (valueToke.hasMoreTokens()) {
+                        for(int i = length-token.length(); i < fullline; i++) {
+                            temp.append(" ");
+                        }
+                        temp.append(nl);
+                    }
+                    else if (length <= fullline) {
+                        temp.append(" " + token);
+                        break;
+                    }
+                    else {
+                        temp.append(nl);
+                        temp.append((String) key + "   " + token);
+                        break;
+                    }
+                }
+            }
+
+            return temp.toString();
+        }
+
 
 	/**
 	 * Notify the listener of a sequence-wide property.  This might
 	 * be stored as an entry in the sequence's annotation bundle.
-	 * Null implementation.  Pending a uniform vocabulary, this is tilting at
-	 * windmills.
+         * Checks for possible known properties to be shown in the file.
 	 *
 	 * @param theKey Key the property will be stored under
 	 * @param theValue Value stored under the key
 	 */
 
-	public void addSequenceProperty(Object theKey, Object theValue) throws ParseException
+	public void addSequenceProperty(Object key, Object value) throws ParseException
 	{
+            if (key.equals("ID")) {
+                idb.setLength(0);
+                idb.append("ID   " + (String) value);
+            }
+            else if (key.equals("DT") || key.equals("MDAT")) {
+                dtb = new StringBuffer(sequenceBufferCreator("DT", value));
+            }
+            else if (key.equals("DE") || key.equals("DEFINITION")) {
+                deb = new StringBuffer(sequenceBufferCreator("DE", value));
+            }
+            else if (key.equals("SV") || key.equals("VERSION")) {
+                svb = new StringBuffer(sequenceBufferCreator("SV", value));
+            }
+            else if (key.equals("KW") || key.equals("KEYWORDS")) {
+                kwb = new StringBuffer(sequenceBufferCreator("KW", value));
+            }
+            else if (key.equals("OS") || key.equals("SOURCE")) {
+                osb = new StringBuffer(sequenceBufferCreator("OS", value));
+            }
+            else if (key.equals("OC") || key.equals("ORGANISM")) {
+                ocb = new StringBuffer(sequenceBufferCreator("OC", value));
+            }
+            else if (key.equals("CC") || key.equals("COMMENT")) {
+                ccb = new StringBuffer(sequenceBufferCreator("CC", value));
+            }
+            else if (key.equals(SwissprotProcessor.PROPERTY_SWISSPROT_ACCESSIONS))
+            {
+                acb = new StringBuffer();
+                acb.append("AC   ");
+                for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+                {
+                    acb.append((String) ai.next());
+                    acb.append(";");
+                }
+            }
 	}
 
 	/**
@@ -171,8 +316,27 @@ public class SwissprotFileFormer implements SeqFileFormer
 	 * @param theTemplate The template for this new feature object
 	 */
 
-	public void startFeature(Feature.Template theTemplate) throws ParseException
+	public void startFeature(Feature.Template templ) throws ParseException
 	{
+            // There are 19 spaces in the leader
+            String leader = "FT                   ";
+            int    strand = 0;
+
+            if (templ instanceof StrandedFeature.Template)
+                strand = ((StrandedFeature.Template) templ).strand.getValue();
+
+	    ub.setLength(0);
+	    ub.append(leader);
+
+            StringBuffer lb = formatLocation(ub,//Block(ub,
+	    				          templ.location);//,
+//					          strand,
+//					          leader,
+//					          80);
+
+            lb.replace(5, 5 + templ.type.length(), templ.type);
+
+            ftb.append(lb + nl);
 	}
 
 	/**
@@ -189,8 +353,40 @@ public class SwissprotFileFormer implements SeqFileFormer
 	 * @param theValue Value stored under the key
 	 */
 
-	public void addFeatureProperty(Object theKey, Object theValue) throws ParseException
+	public void addFeatureProperty(Object key, Object value) throws ParseException
 	{
+            // There are 19 spaces in the leader
+            String leader = "FT                   ";
+
+	    // Don't print internal data structures
+	    if (key.equals(Feature.PROPERTY_DATA_KEY))
+	        return;
+
+            // The value may be a collection if several qualifiers of the
+            // same type are present in a feature
+            if (Collection.class.isInstance(value))
+            {
+                for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
+                {
+	    	    qb.setLength(0);
+		    ub.setLength(0);
+		    StringBuffer fb = formatQualifierBlock(qb,
+						          formatQualifier(ub, key, vi.next()).toString(),
+						          leader,
+						          80);
+                    ftb.append(fb + nl);
+                }
+            }
+            else
+            {
+                qb.setLength(0);
+                ub.setLength(0);
+	        StringBuffer fb = formatQualifierBlock(qb,
+						      formatQualifier(ub, key, value).toString(),
+						      leader,
+						      80);
+                ftb.append(fb + nl);
+            }
 	}
 
 	// SeqFileFormer methods
@@ -248,7 +444,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 	public String formatLocation(Feature theFeature)
 	{
 		StringBuffer toReturn = this.formatLocation(new StringBuffer(), theFeature.getLocation());
-		return toReturn.substring(0);
+		return toReturn.toString();
 	}
 
 // Public methods
@@ -301,12 +497,12 @@ public class SwissprotFileFormer implements SeqFileFormer
 					tempLocation.getOuterMax(), tempLocation.isMaxFuzzy());
 		}
 
-		return new StringBuffer(startPoint.substring(0) + " " + endPoint.substring(0));
+		return new StringBuffer(startPoint.toString() + " " + endPoint.toString());
 	}
 
 // Protected methods
 	/**
-	 * Null implementation.  A hook for printing out the header SQ line.
+	 * Prints out sequence header with only length data.
 	 *
 	 * @param theAlphabet The alphabet of the symbol data
 	 * @param theSymbols An array containing symbols
@@ -322,6 +518,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 											  int theLength)
 		throws IllegalAlphabetException
 	{
+            this.getPrintStream().println("SQ   SEQUENCE   " + theLength + " AA;   ");
 	}
 
 	/**
@@ -375,7 +572,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 
 			if(blockCount == 6)
 			{
-				returnList.add(tempString.substring(0));
+				returnList.add(tempString.toString());
 				tempString.setLength(0);
 				blockCount = 0;
 				blockIndex = 0;
@@ -391,7 +588,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 		// Add the last line on
 		if(tempString.length() != 0)
 		{
-			returnList.add(tempString.substring(0));
+			returnList.add(tempString.toString());
 		}
 		return returnList;
 	}

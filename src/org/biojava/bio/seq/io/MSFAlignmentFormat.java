@@ -24,11 +24,12 @@ import  java.util.*;
  * Copyright:    Copyright (c) 2000
  * Company:
  * @version 1.0
- * @author Guoneng Zhong <travelgz@yahoo.com>
  */
-public class MSFAlignmentFormat
-        implements AlignmentFormat {
+public class MSFAlignmentFormat {
+       // implements AlignmentFormat {
     private static final boolean DEBUGPRINT = false;
+    private static final int DNA = 1;
+    private static final int PROTEIN = 2;
 
     /**
      * put your documentation comment here
@@ -60,28 +61,26 @@ public class MSFAlignmentFormat
      * @param reader
      * @return Alignment
      */
-    public Alignment read (BufferedReader reader) {
+    public Alignment read (BufferedReader reader) throws Exception{
         Vector sequenceNames = new Vector();
         String sequenceName = null;
         String sequenceData[] = null;
         int startOfData = 0;                    //the start of the sequence data in the line
         int currSeqCount = 0;                   //which sequence data you are currently trying to get
         try {
-            RE mtc = new RE("Name:\\s+(.*)\\s+Len:");
+            RE mtc = new RE("Name:\\s+(.*?)\\s+(oo|Len:)");
             RE removewhitespace = new RE("\\s");
             // REMatch rem = null;
             String line = reader.readLine();
             //parse past header
-            while (line.indexOf("..") == -1) {
+            while (line.indexOf("Name:") == -1) {
                 line = reader.readLine();
             }
-            line = reader.readLine();           //read blank
             //read each name (between Name:   and Len:
-            line = reader.readLine();
             while ((line.indexOf("//") == -1) && ((line.trim()).length() !=
                     0)) {
                 mtc.match(line);
-                sequenceName = line.substring(mtc.getParenStart(1), mtc.getParenEnd(1));
+                sequenceName = line.substring(mtc.getParenStart(1), mtc.getParenEnd(1)).trim();
                 if (sequenceName == null) {
                     break;
                 }               //end of sequence names
@@ -92,14 +91,13 @@ public class MSFAlignmentFormat
                 }
                 sequenceNames.add(sequenceName);
                 line = reader.readLine();
-                //System.out.println( sequenceName);
             }
             sequenceData = new String[sequenceNames.size()];
             for (int it = 0; it < sequenceNames.size(); it++) {
                 sequenceData[it] = new String();
             }
             //until you get a line that matches the first sequence
-            while ((line.indexOf((String)sequenceNames.get(0)) == -1))          // || (   (line.trim()) .length()>0  )    )
+            while (line.indexOf((String)sequenceNames.get(0)) == -1)          // || (   (line.trim()) .length()>0  )    )
             {
                 line = reader.readLine();
             }
@@ -110,13 +108,14 @@ public class MSFAlignmentFormat
                             == -1) {
                         break;
                     }           //error
+
                     startOfData = line.indexOf((String)sequenceNames.get(currSeqCount))
                             + ((String)sequenceNames.get(currSeqCount)).length();
                     line = (line.substring(startOfData));
                     line = removewhitespace.subst(line, "", RE.REPLACE_ALL);
                     sequenceData[currSeqCount] = sequenceData[currSeqCount].concat(line);
                     line = reader.readLine();
-                    if ((line.trim()).length() == 0) {
+                    if ((currSeqCount < sequenceNames.size() - 1) && (line.trim().length() == 0)) {
                         break;
                     }           //could be an error
                 }
@@ -138,21 +137,27 @@ public class MSFAlignmentFormat
             StringBuffer testString = new StringBuffer();
             int agct = 0;
             for (currSeqCount = 0; currSeqCount < sequenceNames.size(); currSeqCount++) {
-                String seqLine = sequenceData[currSeqCount];
-                RE removeDots = new RE("(\\.|\\-|\\*)");
-                seqLine = removeDots.subst(seqLine,"",RE.REPLACE_ALL);
-                testString.append(seqLine.toUpperCase());
+                testString.append(sequenceData[currSeqCount]);
             }
-            agct += count(testString,new char[]{'A','C','T','U','G'});
+            StringTokenizer st = null;
+            st = new StringTokenizer(testString.toString().toLowerCase(), "a");
+            agct += st.countTokens();
+            st = new StringTokenizer(testString.toString().toLowerCase(), "g");
+            agct += st.countTokens();
+            st = new StringTokenizer(testString.toString().toLowerCase(), "c");
+            agct += st.countTokens();
+            st = new StringTokenizer(testString.toString().toLowerCase(), "t");
+            agct += st.countTokens();
+            st = new StringTokenizer(testString.toString().toLowerCase(), "u");
+            agct += st.countTokens();
             //now parse through them and create gapped symbol lists
             HashMap sequenceDataMap = new HashMap();
             Symbol sym = null;
             FiniteAlphabet alph = null;
-            double ratio = ((double)agct)/((double)testString.length());
-            if (ratio > 0.90) {            //if DNA alph
-                if (count(testString,'U') > count(testString,'C')) {                     //rna alph
+            /*if ((agct/testString.length()) > 0.90) {            //if DNA alph
+                if (st.countTokens() > 0) {                     //rna alph
                     //get the rna alph
-                    alph = RNATools.getRNA();
+                    alph = DNATools.getDNA();
                 }
                 else {          //get DNA alph
                     alph = DNATools.getDNA();
@@ -160,6 +165,20 @@ public class MSFAlignmentFormat
             }
             else {
                 alph = ProteinTools.getTAlphabet();
+            }*/
+            //replaced above method of protein/dna determination with method below
+            for (int i = 0; i < testString.toString().length(); i++) {
+                if (Character.toUpperCase(testString.toString().charAt(i)) == 'F' ||
+                    Character.toUpperCase(testString.toString().charAt(i)) == 'L' ||
+                    Character.toUpperCase(testString.toString().charAt(i)) == 'I' ||
+                    Character.toUpperCase(testString.toString().charAt(i)) == 'P' ||
+                    Character.toUpperCase(testString.toString().charAt(i)) == 'Q' ||
+                    Character.toUpperCase(testString.toString().charAt(i)) == 'E') {
+                        alph = ProteinTools.getTAlphabet();
+                }
+            }
+            if (alph == null) {
+                alph = DNATools.getDNA();
             }
             SymbolTokenization parse = alph.getTokenization("token");
             for (currSeqCount = 0; currSeqCount < sequenceNames.size(); currSeqCount++) {
@@ -175,44 +194,93 @@ public class MSFAlignmentFormat
             return  (new SimpleAlignment(sequenceDataMap));
         } catch (Exception e) {
             System.err.println("MSFFormatReader " + e.getMessage());
-            //  throw (e);
+             throw (e);
         }
-        return  (null);
+        //return  (null);
     }           //end read it
 
-    /**
-     * @author guoneng <travelgz@yahoo.com>
-     * returns the number of times given character appears
-     * @param line the line whose characters you are comparing against
-     * @param ch character used for the search
-     * @return int number of times ch appears
-     */
-    private static int count(StringBuffer line,char ch){
-        return count(line,new char[]{ch});
-    }
-
-    /**
-     * @author guoneng <travelgz@yahoo.com>
-     * returns the number of times the given set of characters appear in the line
-     * @param line the line whose characters you are comparing against
-     * @param ch array of characters used for the search
-     * @return int number of times ch appears
-     */
-    private static int count(StringBuffer line,char[] ch){
-        if(ch.length==0) return 0;
-
-        int count = 0;
-        for(int i=0;i<line.length();i++){
-            // is the character at i in the given char array?
-            for(int j=0;j<ch.length;j++){
-                if(line.charAt(i)==ch[j]){
-                    count++;
-                    break;
-                }
+    //This is where I am writing an alignment writer
+    public void write(OutputStream os, Alignment align, int fileType) throws Exception {
+        PrintStream out = new PrintStream(os);
+        Object labels[] = align.getLabels().toArray();
+        int numSeqs = labels.length;
+        Iterator seqIts[] = new Iterator[numSeqs];
+        int maxLabelLength = 0;
+        for (int i = 0; i < numSeqs; i++) {
+            seqIts[i] = align.symbolListForLabel(labels[i]).iterator();
+            if (((String) labels[i]).length() > maxLabelLength) {
+                maxLabelLength = ((String) labels[i]).length();
             }
         }
-        return count;
+        String nl = System.getProperty("line.separator");
+        SymbolTokenization toke = null;
+
+
+        if (fileType == DNA) {
+            out.println("!!NA_MULTIPLE_ALIGNMENT");
+            out.println();
+            out.print(" MSF: " + align.length() + "  Type: ");
+            out.print("N");
+            toke = DNATools.getDNA().getTokenization("token");
+        }
+        else if (fileType == PROTEIN) {
+            out.println("!!AA_MULTIPLE_ALIGNMENT");
+            out.println();
+            out.print(" MSF: " + align.length() + "  Type: ");
+            out.print("P");
+            toke = ProteinTools.getTAlphabet().getTokenization("token");
+        }
+        else {
+            System.out.println("MSFAlignment.write -- File type not recognized.");
+            System.exit(0);
+        }
+        out.print("  .." + nl);
+        out.println();
+
+        for (int i = 0; i < numSeqs; i++) {
+            out.print(" Name: " + labels[i]);
+            for (int j = 0; j < (maxLabelLength - ((String) labels[i]).length()); j++) {
+                out.print(" ");
+            }
+            out.print("  Len: " + align.length() + nl);
+        }
+
+        out.println("//");
+        out.println();
+
+        while (seqIts[0].hasNext()) {
+            for (int i = 0; i < numSeqs; i++) {
+                while (((String) labels[i]).length() < maxLabelLength + 1) {
+                    labels[i] = " " + labels[i];
+                }
+                out.print(labels[i] + " ");
+                theLabel:
+                for (int j = 0; j < 5; j++) {
+                    out.print(" ");
+                    for (int k = 0; k < 10; k++) {
+                        if (seqIts[i].hasNext()) {
+                            out.print(toke.tokenizeSymbol((Symbol) seqIts[i].next()));
+                        }
+                        else {
+                            break theLabel;
+                        }
+                    }
+                }
+                out.print(nl);
+            }
+            out.print(nl);
+        }
+
+    } //end write
+
+    public void writeDna(OutputStream os, Alignment align) throws Exception {
+        write(os, align, DNA);
     }
+
+    public void writeProtein(OutputStream os, Alignment align) throws Exception {
+        write(os, align, PROTEIN);
+    }
+
 }               //end class
 
 

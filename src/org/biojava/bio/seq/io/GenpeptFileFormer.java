@@ -1,3 +1,13 @@
+
+/**
+ * Title:        File2Biojava
+ * Description:  This project will take in a file of any common bioinformatics file formats and convert it to the appropriate Biojava object.  It will also convert the Biojava object back into the corresponding file format.
+ * Copyright:    Copyright (c) 2002
+ * Company:      Maxygen
+ * @author
+ * @version 1.0
+ */
+
 /*
  *                    BioJava development code
  *
@@ -34,7 +44,7 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.IllegalAlphabetException;
@@ -50,7 +60,7 @@ import org.biojava.bio.symbol.Symbol;
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
-public class GenbankFileFormer extends AbstractGenEmblFileFormer
+public class GenpeptFileFormer extends AbstractGenEmblFileFormer
     implements SeqFileFormer
 {
     private PrintStream stream;
@@ -62,7 +72,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     // Utility formatting buffer
     private StringBuffer ub = new StringBuffer();
 
-    // Buffers for each possible sequence property line
+    // I am adding an incredible number of buffers here to hold everything.
     private StringBuffer idb = null;
     private StringBuffer acb = null;
     private StringBuffer deb = null;
@@ -71,9 +81,9 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer osb = null;
     private StringBuffer ocb = null;
     private StringBuffer ccb = null;
-    private StringBuffer ftb = null;
+    private StringBuffer ftb = new StringBuffer();
 
-    // Locusline buffers
+    //locusline buffers
     private StringBuffer typeb = new StringBuffer();
     private StringBuffer strb = new StringBuffer();
     private StringBuffer sizeb = new StringBuffer();
@@ -82,42 +92,44 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer divb = new StringBuffer();
 
 
-    private SymbolTokenization dnaTokenization;
+    //End of my changes here
+
+    private SymbolTokenization proteinTokenization;
 
     {
 	try {
-	    dnaTokenization = DNATools.getDNA().getTokenization("token");
+	    proteinTokenization = ProteinTools.getTAlphabet().getTokenization("token");
 	} catch (BioException ex) {
-	    throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
+	    throw new BioError(ex, "Couldn't initialize tokenizer for the PROTEIN alphabet");
 	}
     }
 
     static
     {
-	SeqFileFormerFactory.addFactory("Genbank", new GenbankFileFormer.Factory());
+	SeqFileFormerFactory.addFactory("Genpept", new GenpeptFileFormer.Factory());
     }
 
     private static class Factory extends SeqFileFormerFactory
     {
 	protected SeqFileFormer make()
 	{
-	    return new GenbankFileFormer(System.out);
+	    return new GenpeptFileFormer(System.out);
 	}
     }
 
     /**
-     * Private <code>GenbankFileFormer</code> constructor. Instances
+     * Private <code>GenpeptFileFormer</code> constructor. Instances
      * are made by the <code>Factory</code>.
      */
-    protected GenbankFileFormer() { }
+    protected GenpeptFileFormer() { }
 
     /**
-     * Creates a new <code>GenbankFileFormer</code> object. Instances
+     * Creates a new <code>GenpeptFileFormer</code> object. Instances
      * are made by the <code>Factory</code>.
      *
      * @param stream a <code>PrintStream</code>.
      */
-    protected GenbankFileFormer(PrintStream stream)
+    protected GenpeptFileFormer(PrintStream stream)
     {
 	this.stream = stream;
     }
@@ -133,8 +145,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     }
 
     public void setName(String id) throws ParseException {
-        idb = new StringBuffer();
-	idb.append("LOCUS       " + id);
+        idb = new StringBuffer("LOCUS       " + id);
     }
 
     public void startSequence() throws ParseException { }
@@ -150,46 +161,16 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	throws IllegalAlphabetException
     {
 	try {
-	    int aCount = 0;
-	    int cCount = 0;
-	    int gCount = 0;
-	    int tCount = 0;
-	    int oCount = 0;
-
 	    int end = start + length - 1;
 
-	    for (int i = start; i <= end; i++)
-		{
-		    char c = dnaTokenization.tokenizeSymbol(syms[i]).charAt(0);
-
-		    switch (c)
-			{
-			case 'a': case 'A':
-			    aCount++;
-			    break;
-			case 'c': case 'C':
-			    cCount++;
-			    break;
-			case 'g': case 'G':
-			    gCount++;
-			    break;
-			case 't': case 'T':
-			    tCount++;
-			    break;
-
-			default:
-			    oCount++;
-			}
-		}
-
-            // Print out sequence properties in order
+	    // My Changes are here
             locusLineCreator(length);
             if (idb != null) {stream.println(idb); }
             if (acb != null) {stream.println(acb); }
             if (svb != null) {stream.println(svb); }
             if (deb != null) {stream.println(deb); }
             if (kwb != null) {stream.println(kwb); }
-            if (osb != null) {stream.println(osb); }
+            if (osb != null) {stream.println(osb);}
             if (ocb != null) {stream.println(ocb); }
             if (ccb != null) {stream.println(ccb); }
 
@@ -199,12 +180,6 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
             }
 
 	    sq.setLength(0);
-	    sq.append("BASE COUNT    ");
-	    sq.append(aCount + " a    ");
-	    sq.append(cCount + " c    ");
-	    sq.append(gCount + " g    ");
-	    sq.append(tCount + " t");
-	    sq.append(nl);
 	    sq.append("ORIGIN");
 
 	    // Print sequence summary header
@@ -246,7 +221,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 		    // Get symbols and format into blocks of tokens
 		    System.arraycopy(syms, start + (i * 60), sa, 0, len);
 
-		    String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).toString();
+		    String blocks = (formatTokenBlock(ub, sa, 10, proteinTokenization)).toString();
 
 		    sq.replace(10, blocks.length() + 10, blocks);
 
@@ -261,7 +236,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	    // Print end of entry
 	    stream.println("//");
 	} catch (IllegalSymbolException ex) {
-	    throw new IllegalAlphabetException(ex, "DNA not tokenizing");
+	    throw new IllegalAlphabetException(ex, "Protein not tokenizing");
 	}
     }
 
@@ -334,7 +309,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 
         sizeb.insert(0, size);
         while(sizeb.length() < 12) {sizeb.insert(0, " ");}
-        sizeb.append(" bp ");
+        sizeb.append(" aa ");
 
         if (strb.length() > 0) {
             strb.append("-");
@@ -350,7 +325,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
         idb.insert(64, divb);
         idb.insert(68, mdatb);
         idb.setLength(79);
-        // System.out.println("idb length: " + idb.length());
+        System.out.println("idb length: " + idb.length());
     }
 
     public void addSequenceProperty(Object key, Object value)
@@ -381,20 +356,10 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
             deb = new StringBuffer(sequenceBufferCreator("DEFINITION ", value));
         }
         else if (key.equals("SV") || key.equals("VERSION")) {
-            if (svb != null) {
-                svb.insert(11, (String) value);
-            }
-            else {
-                svb = new StringBuffer("VERSION     " + (String) value);
-            }
+            svb.insert(0, "VERSION     " + (String) value);
         }
         else if (key.equals("GI")) {
-            if (svb != null) {
-                svb.append("  GI:" + (String) value);
-            }
-            else {
-                svb = new StringBuffer("VERSION       GI:" + (String) value);
-            }
+            svb.append("  GI:" + (String) value);
         }
         else if (key.equals("KW") || key.equals("KEYWORDS")) {
             kwb = new StringBuffer(sequenceBufferCreator("KEYWORDS   ", value));
@@ -420,69 +385,17 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	}
     }
 
+    //null implementation
     public void startFeature(Feature.Template templ)
 	throws ParseException
     {
-	// There are 21 spaces in the leader
-	String leader = "                     ";
-	int    strand = 0;
-
-	if (templ instanceof StrandedFeature.Template)
-	    strand = ((StrandedFeature.Template) templ).strand.getValue();
-
-	ub.setLength(0);
-	ub.append(leader);
-
-	StringBuffer lb = formatLocationBlock(ub,
-					      templ.location,
-					      strand,
-					      leader,
-					      80);
-
-	lb.replace(5, 5 + templ.type.length(), templ.type);
-
-	if (ftb == null) {
-	    ftb = new StringBuffer();
-	}
-        ftb.append(lb + nl);
     }
 
     public void endFeature() throws ParseException { }
 
+    //null implementation
     public void addFeatureProperty(Object key, Object value)
 	throws ParseException
     {
-	// There are 21 spaces in the leader
-	String   leader = "                     ";
-
-	// Don't print internal data structures
-	if (key.equals(Feature.PROPERTY_DATA_KEY))
-	    return;
-
-	// The value may be a collection if several qualifiers of the
-	// same type are present in a feature
-	if (Collection.class.isInstance(value))
-	{
-	    for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
-	    {
-		qb.setLength(0);
-		ub.setLength(0);
-		StringBuffer fb = formatQualifierBlock(qb,
-						       formatQualifier(ub, key, vi.next()).toString(),
-						       leader,
-						       80);
-                ftb.append(fb + nl);
-	    }
-	}
-	else
-	{
-            qb.setLength(0);
-            ub.setLength(0);
-	    StringBuffer fb = formatQualifierBlock(qb,
-						   formatQualifier(ub, key, value).toString(),
-						   leader,
-						   80);
-            ftb.append(fb + nl);
-	}
     }
 }

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioError;
@@ -47,7 +48,6 @@ import org.biojava.bio.symbol.Symbol;
  * factored out.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @author Greg Cox
  * @since 1.2
  */
 public class EmblFileFormer extends AbstractGenEmblFileFormer
@@ -62,6 +62,19 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer qb = new StringBuffer();
     // Utility formatting buffer
     private StringBuffer ub = new StringBuffer();
+
+    // Buffers for each possible sequence property line
+    private StringBuffer idb = null;
+    private StringBuffer acb = null;
+    private StringBuffer dtb = null;
+    private StringBuffer deb = null;
+    private StringBuffer svb = null;
+    private StringBuffer kwb = null;
+    private StringBuffer osb = null;
+    private StringBuffer ocb = null;
+    private StringBuffer ccb = null;
+    private StringBuffer ftb = new StringBuffer();
+
 
     private SymbolTokenization dnaTokenization;
 
@@ -113,7 +126,9 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         this.stream = stream;
     }
 
-    public void setName(final String id) throws ParseException { }
+    public void setName(final String id) throws ParseException {
+        idb = new StringBuffer("ID   " + id);
+    }
 
     public void startSequence() throws ParseException { }
 
@@ -161,8 +176,20 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 			}
 		}
 
-	    // Get separator for system
-	    String nl = System.getProperty("line.separator");
+            // My Changes are here
+            if (idb != null) {stream.println(idb); stream.println("XX");}
+            if (acb != null) {stream.println(acb); stream.println("XX");}
+            if (svb != null) {stream.println(svb); stream.println("XX");}
+            if (dtb != null) {stream.println(dtb); stream.println("XX");}
+            if (deb != null) {stream.println(deb); stream.println("XX");}
+            if (kwb != null) {stream.println(kwb); stream.println("XX");}
+            if (osb != null) {stream.println(osb);}
+            if (ocb != null) {stream.println(ocb); stream.println("XX");}
+            if (ccb != null) {stream.println(ccb); stream.println("XX");}
+            if (ftb.length() != 0) {
+                ftb.insert(0, "FH   Key             Location/Qualifiers" + nl);
+                stream.print(ftb);
+            }
 
 	    sq.setLength(0);
 	    sq.append("XX");
@@ -214,7 +241,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 		    // Get symbols and format into blocks of tokens
 		    System.arraycopy(syms, start + (i * 60), sa, 0, len);
 
-		    String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).substring(0);
+		    String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).toString();
 
 		    sq.replace(5, blocks.length() + 5, blocks);
 
@@ -233,23 +260,96 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 	}
     }
 
+    private String sequenceBufferCreator(Object key, Object value) {
+        StringBuffer temp = new StringBuffer();
+
+        if (value == null) {
+            temp.append((String) key);
+        }
+        else if (value instanceof ArrayList) {
+            Iterator iter = ((ArrayList) value).iterator();
+            while (iter.hasNext()) {
+                temp.append((String) key + "   " + iter.next());
+                if (iter.hasNext())
+                    temp.append(nl);
+            }
+        }
+        else {
+            StringTokenizer valueToke = new StringTokenizer((String) value, " ");
+            int fullline = 80;
+            int length = 0;
+            if (valueToke.hasMoreTokens()) {
+                String token = valueToke.nextToken();
+
+                while (true) {
+                    temp.append((String) key + "  ");
+                    length = (temp.length() % (fullline + 1)) + token.length() + 1;
+                    if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
+                    while (length <= fullline && valueToke.hasMoreTokens()) {
+                        temp.append(" " + token);
+                        token = valueToke.nextToken();
+                        length = (temp.length() % (fullline + 1)) + token.length() + 1;
+                        if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
+                    }
+                    if (valueToke.hasMoreTokens()) {
+                        for(int i = length-token.length(); i < fullline; i++) {
+                            temp.append(" ");
+                        }
+                        temp.append(nl);
+                    }
+                    else if (length <= fullline) {
+                        temp.append(" " + token);
+                        break;
+                    }
+                    else {
+                        temp.append(nl);
+                        temp.append((String) key + "   " + token);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return temp.toString();
+    }
+
     public void addSequenceProperty(final Object key, final Object value)
         throws ParseException
     {
-        if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
+        if (key.equals("ID")) {
+            idb.setLength(0);
+            idb.append("ID   " + (String) value);
+        }
+        else if (key.equals("DT") || key.equals("MDAT")) {
+            dtb = new StringBuffer(sequenceBufferCreator("DT", value));
+        }
+        else if (key.equals("DE") || key.equals("DEFINITION")) {
+            deb = new StringBuffer(sequenceBufferCreator("DE", value));
+        }
+        else if (key.equals("SV") || key.equals("VERSION")) {
+            svb = new StringBuffer(sequenceBufferCreator("SV", value));
+        }
+        else if (key.equals("KW") || key.equals("KEYWORDS")) {
+            kwb = new StringBuffer(sequenceBufferCreator("KW", value));
+        }
+        else if (key.equals("OS") || key.equals("SOURCE")) {
+            osb = new StringBuffer(sequenceBufferCreator("OS", value));
+        }
+        else if (key.equals("OC") || key.equals("ORGANISM")) {
+            ocb = new StringBuffer(sequenceBufferCreator("OC", value));
+        }
+        else if (key.equals("CC") || key.equals("COMMENT")) {
+            ccb = new StringBuffer(sequenceBufferCreator("CC", value));
+        }
+        else if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
         {
-	    ub.setLength(0);
-            ub.append("AC   ");
-	    if (value instanceof List) {
-		for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
-		    {
-			ub.append((String) ai.next());
-			ub.append(";");
-		    }
-	    } else {
-		ub.append(value.toString());
-	    }
-            stream.println(ub);
+	    acb = new StringBuffer();
+            acb.append("AC   ");
+            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+            {
+                acb.append((String) ai.next());
+                acb.append(";");
+            }
         }
     }
 
@@ -274,7 +374,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 
         lb.replace(5, 5 + templ.type.length(), templ.type);
 
-        stream.println(lb);
+        ftb.append(lb + nl);
     }
 
     public void endFeature() throws ParseException { }
@@ -298,10 +398,10 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 		qb.setLength(0);
 		ub.setLength(0);
 		StringBuffer fb = formatQualifierBlock(qb,
-						       formatQualifier(ub, key, vi.next()).substring(0),
+						       formatQualifier(ub, key, vi.next()).toString(),
 						       leader,
 						       80);
-		stream.println(fb);
+                ftb.append(fb + nl);
             }
         }
         else
@@ -309,10 +409,10 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
             qb.setLength(0);
             ub.setLength(0);
 	    StringBuffer fb = formatQualifierBlock(qb,
-						   formatQualifier(ub, key, value).substring(0),
+						   formatQualifier(ub, key, value).toString(),
 						   leader,
 						   80);
-	    stream.println(fb);
+            ftb.append(fb + nl);
         }
     }
 }

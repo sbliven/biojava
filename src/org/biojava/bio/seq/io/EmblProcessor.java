@@ -114,15 +114,15 @@ public class EmblProcessor
         // accession number. If accession number is vital, failure of
         // test of accessions.size() > 0 should throw a
         // ParseException.
-        String  id = "";
+        //String  id = "";
         String uri = "";
 	if (accessions.size() > 0) {
-	    id = (String) accessions.get(0);
-            uri = "urn:sequence/embl:" + id;
+	    //id = (String) accessions.get(0);
+            uri = "urn:sequence/embl:" + (String) accessions.get(0);
 	    getDelegate().addSequenceProperty(PROPERTY_EMBL_ACCESSIONS, accessions);
 	}
 
-        getDelegate().setName(id);
+        //getDelegate().setName(id);
         getDelegate().setURI(uri);
 	getDelegate().endSequence();
     }
@@ -188,6 +188,10 @@ public class EmblProcessor
 			    accessions.add(toke.nextToken());
 			}
 		    }
+                    else if (key.equals("ID")) {
+                        StringTokenizer toke = new StringTokenizer((String) value);
+                        getDelegate().setName(toke.nextToken());
+                    }
 		}
 	    }
 	}

@@ -106,6 +106,9 @@ class AbstractGenEmblFileFormer
     // Utility formatting buffer
     private StringBuffer ub = new StringBuffer();
 
+    // Get separator for system
+    String nl = System.getProperty("line.separator");
+
     /**
      * <code>formatQualifierBlock</code> formats text into
      * EMBL/Genbank style qualifiers.
@@ -122,9 +125,6 @@ class AbstractGenEmblFileFormer
 				      final String       leader,
 				      final int          wrapWidth)
     {
-	// Get separator for system
-	String nl = System.getProperty("line.separator");
-
 	int tokenType = FIRST;
 	int  position = leader.length();
 
@@ -336,7 +336,7 @@ class AbstractGenEmblFileFormer
 			{
 				tempBuffer.append(')');
 			}
-			formattedLocation = tempBuffer.substring(0);
+			formattedLocation = tempBuffer.toString();
 		}
 		else
 		{
@@ -348,7 +348,7 @@ class AbstractGenEmblFileFormer
 			StringBuffer tempBuffer = new StringBuffer();
 			formattedLocation = this.formatLocationBlock(tempBuffer,
 					theFeature.getLocation(), featureStrand.getValue(), "",
-					Integer.MAX_VALUE, joinType).substring(0);
+					Integer.MAX_VALUE, joinType).toString();
 		}
 
 		return formattedLocation;
@@ -381,7 +381,7 @@ class AbstractGenEmblFileFormer
 					      Integer.MAX_VALUE,
 					      "join");
 
-	return sb.substring(0);
+	return sb.toString();
     }
 
     /**
@@ -439,7 +439,7 @@ class AbstractGenEmblFileFormer
      *
      * To preserve the join/order distinction; and to format locations like
      * AL123465:(123..567), use the formatLocation(Feature) method.
-     *
+	 *
      * @param loc a <code>Location</code> to use as a template.
      * @param strand an <code>int</code> indicating the
      * <code>Location</code>'s strand.
@@ -456,8 +456,8 @@ class AbstractGenEmblFileFormer
 				     final String       leader,
 				     final int          wrapWidth)
     {
-        return this.formatLocationBlock(sb, loc, strand, leader, wrapWidth, "join");
-    }
+		return this.formatLocationBlock(sb, loc, strand, leader, wrapWidth, "join");
+	}
 
     /**
      * <code>formatLocationBlock</code> creates an EMBL/Genbank style
@@ -481,11 +481,8 @@ class AbstractGenEmblFileFormer
 				     final int          strand,
 				     final String       leader,
 				     final int          wrapWidth,
-				     final String	joinType)
+				     final String		joinType)
     {
-	// Get separator for system
-	String nl = System.getProperty("line.separator");
-
 	// Indicates how many characters have been added to the
 	// current line
 	int       position = leader.length();
@@ -552,37 +549,37 @@ class AbstractGenEmblFileFormer
 		    PointLocation pl = (PointLocation) thisLoc;
 
 		    sb.append(complement                                   ?
-			      toComplement(formatPoint(ub, pl).substring(0)) :
-			      formatPoint(ub, pl).substring(0));
+			      toComplement(formatPoint(ub, pl).toString()) :
+			      formatPoint(ub, pl).toString());
 		    break;
 
 		case FUZZY_RANGE:
 		    FuzzyLocation fl = (FuzzyLocation) thisLoc;
 
 		    sb.append(complement                                        ?
-			      toComplement(formatFuzzyRange(ub, fl).substring(0)) :
-			      formatFuzzyRange(ub, fl).substring(0));
+			      toComplement(formatFuzzyRange(ub, fl).toString()) :
+			      formatFuzzyRange(ub, fl).toString());
 		    break;
 
 		case FUZZY_POINT:
 		    FuzzyPointLocation fpl = (FuzzyPointLocation) thisLoc;
 
 		    sb.append(complement                                         ?
-			      toComplement(formatFuzzyPoint(ub, fpl).substring(0)) :
-			      formatFuzzyPoint(ub, fpl).substring(0));
+			      toComplement(formatFuzzyPoint(ub, fpl).toString()) :
+			      formatFuzzyPoint(ub, fpl).toString());
 		    break;
 
 		case RANGE:
 		    RangeLocation rl = (RangeLocation) thisLoc;
 
 		    sb.append(complement                                   ?
-			      toComplement(formatRange(ub, rl).substring(0)) :
-			      formatRange(ub, rl).substring(0));
+			      toComplement(formatRange(ub, rl).toString()) :
+			      formatRange(ub, rl).toString());
 		    break;
 
 		case BETWEEN_LOCATION:
 		    BetweenLocation tempLocation = (BetweenLocation) thisLoc;
-		    String formattedLocation = formatBetween(ub, tempLocation).substring(0);
+		    String formattedLocation = formatBetween(ub, tempLocation).toString();
 		    if (complement)
 		    {
 			formattedLocation = toComplement(formattedLocation);
