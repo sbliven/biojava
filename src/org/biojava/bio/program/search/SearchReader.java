@@ -114,7 +114,8 @@ public class SearchReader implements Iterator
 	    throw new NoSuchElementException("No valid search result could be parsed from this stream: "
 					     + "parse failed at line "
 					     + pe.getLineNumber()
-					     + " of input");
+					     + " of input: "
+					     + pe.getMessage());
 	}
 	catch (IOException ioe)
 	{

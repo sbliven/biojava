@@ -137,11 +137,15 @@ public class FastaSearchParser implements SearchParser
 		// no hits
 		if (searchStatus == INHEADER)
 		{
+		    // Inform of end of header and search
+		    handler.endHeader();
+		    handler.endSearch();
+
+  		    searchParsed = true;
+
 		    searchStatus = NODATA;
 		    continue LINE;
 		}
-		else
-		    searchStatus = NODATA;
 
 		// Pass final data to handler
 		handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
@@ -151,17 +155,37 @@ public class FastaSearchParser implements SearchParser
 		handler.endSubHit();
 		handler.endSearch();
 
-		searchParsed = true;
-                handler.setMoreSearches(true);
+  		searchParsed = true;
+	        // handler.setMoreSearches(true);
 
-		// We have parsed one result, so return
-                return;
+		searchStatus = NODATA;
+
+		// Continue getting lines to look for start of another
+		// search. This allows setMoreSearches(boolean flag)
+		// to be called on the handler. When true it will know
+		// to expect more.
+                continue LINE;
 	    }
 
 	STATUS:
 	    switch (searchStatus)
 	    {
 		case NODATA:
+		    // Prior to the >>> line there is some information
+		    // about the query sequence ID which is normally
+		    // redundant. However, when there are no hits this
+		    // is the only place we can get this ID. I think
+		    // this is a deficiency in the format. We have to
+		    // try a parse here for this special case. We
+		    // don't set the flag saying we have parsed this
+		    // value so that later we overwrite this from the
+		    // "proper" source in the hit data, if it exists.
+
+		    if (line.startsWith(" >"))
+		    {
+			handler.setQuerySeq(line.substring(2));
+		    }
+
 		    // This token marks the line describing the query
 		    // sequence file and database searched. It is
 		    // followed by header lines containing data about
@@ -187,9 +211,16 @@ public class FastaSearchParser implements SearchParser
 			    // We have parsed one result, so return
                             return;
 			}
-			break STATUS;
+			else
+			    // We break out and setMoreSearches(false)
+			    // is called below
+			    break STATUS;
 		    }
 		    else
+			// Continue getting lines to look for start of another
+			// search. This allows setMoreSearches(boolean flag)
+			// to be called on the handler. When true it will know
+			// to expect more.
 			continue LINE;
 
 		case INHEADER:
@@ -229,7 +260,10 @@ public class FastaSearchParser implements SearchParser
 			searchStatus = INQUERY;
 
                         if (! parsedQueryId)
+			{
                             handler.setQuerySeq(parseId(line));
+			    parsedQueryId = true;
+			}
 
 			handler.endHit();
 			handler.startSubHit();

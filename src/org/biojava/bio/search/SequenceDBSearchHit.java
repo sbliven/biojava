@@ -105,8 +105,8 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * @param subHits a <code>List</code> object containing the
      * subhits, which may not be null. They should be sorted in the
      * order specified by the search program.
-     * @param annotation an <code>Annotation</code> object. If null a
-     * new SimpleAnnotation object is created internally.
+     * @param annotation an <code>Annotation</code> object, which may
+     * not be null
      */
     public SequenceDBSearchHit(final double     score,
 			       final double     eValue,
@@ -127,6 +127,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
 	Contract.pre(sequenceID    != null, "sequenceID was null");
         Contract.pre(queryStrand   != null, "query strand was null");
         Contract.pre(subjectStrand != null, "subject strand was null");
+	Contract.pre(annotation    != null, "annotation was null");
 	Contract.pre(subHits       != null, "subHits was null");
 
 	this.sequenceID    = sequenceID;
