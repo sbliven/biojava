@@ -34,6 +34,7 @@ import org.biojava.bio.*;
  * not including the residue at that coordinate.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Greg Cox
  */
 public class FuzzyPointLocation extends AbstractLocation
 {
@@ -60,10 +61,11 @@ public class FuzzyPointLocation extends AbstractLocation
     private PointResolver resolver;
 
     /**
-     * Creates a new <code>FuzzyPointLocation</code> object. Note that
-     * either the maximum or minimum may be unbounded, but not
-     * both. The minumum and maximum may not be the same coordinate as
-     * that would become an ordinary <code>PointLocation</code>.
+     * Creates a new <code>FuzzyPointLocation</code> object.  If the minimum
+     * value is equal to the maximum value, it is interperted as a swissprot
+     * point location such as "?24".  If the minimum is Integer.MIN_VALUE and
+     * the maximum is Integer.MAX_VALUE, it is interperted as a swissprot
+     * location like '?'.
      *
      * @param min an <code>int</code> value for the minimum boundary
      * of the location, Integer.MIN_VALUE if unbounded.
@@ -72,19 +74,9 @@ public class FuzzyPointLocation extends AbstractLocation
      * @param resolver a <code>PointResolver</code> which defines the
      * policy used to calculate the location's min and max
      * properties.
-     *
-     * @exception IndexOutOfBoundsException if the minimum and maximum
-     * are both unbounded or are equal.
      */
     public FuzzyPointLocation(int min, int max, PointResolver resolver)
-	throws IndexOutOfBoundsException
     {
-	if ((min == Integer.MIN_VALUE) && max == Integer.MAX_VALUE)
-	    throw new IndexOutOfBoundsException("A fuzzy point may only have an unbounded max OR min"); 
-
-	if (min == max)
-	    throw new IndexOutOfBoundsException("A fuzzy point may not have equal max and min"); 
-
 	this.min      = min;
 	this.max      = max;
 	this.resolver = resolver;
@@ -109,7 +101,7 @@ public class FuzzyPointLocation extends AbstractLocation
     {
 	return min != Integer.MIN_VALUE;
     }
-  
+
     public boolean hasBoundedMax()
     {
 	return max != Integer.MAX_VALUE;
@@ -126,7 +118,7 @@ public class FuzzyPointLocation extends AbstractLocation
 	// contains any other specific location
 	return (hasBoundedMin() && hasBoundedMax()) &&
 	    (resolver.resolve(this) == loc.getMin()) &&
-	    (resolver.resolve(this) == loc.getMax()); 
+	    (resolver.resolve(this) == loc.getMax());
     }
 
     public boolean contains(int point)
@@ -141,7 +133,7 @@ public class FuzzyPointLocation extends AbstractLocation
     {
 	return this.contains(loc) && loc.contains(this);
     }
-    
+
     public int hashCode()
     {
 	return getMin();
@@ -194,7 +186,7 @@ public class FuzzyPointLocation extends AbstractLocation
     {
 	return Collections.singleton(this).iterator();
     }
-  
+
     public Location translate(int dist)
     {
 	if (dist == 0)
@@ -209,10 +201,17 @@ public class FuzzyPointLocation extends AbstractLocation
     {
 	if (hasBoundedMin() && hasBoundedMax())
 	{
-	    return "["
-		+ Integer.toString(getMin())
-		+ "."
-		+ Integer.toString(getMax());
+	    if (getMin() == getMax())
+	    {
+	    	return("?" + getMin());
+	    }
+	    else
+	    {
+		    return "["
+			+ Integer.toString(getMin())
+			+ "."
+			+ Integer.toString(getMax());
+		}
 	}
 	else if (hasBoundedMin())
 	{
@@ -220,11 +219,15 @@ public class FuzzyPointLocation extends AbstractLocation
 		+ Integer.toString(getMin())
 		+ "]";
 	}
-	else
+	else if (hasBoundedMax())
 	{
 	    return "[<"
 		+ Integer.toString(getMax())
 		+ "]";
+	}
+	else
+	{
+		return "?";
 	}
     }
 
@@ -264,10 +267,15 @@ public class FuzzyPointLocation extends AbstractLocation
 	    {
 		return (loc.getMin() + loc.getMax()) / 2;
 	    }
+		// Swissprot range ?
+		else if((loc.hasBoundedMin() == false) &&
+				(loc.hasBoundedMax() == false))
+		{
+			return 0;
+		}
 	    // Range of form: <123 or >123
 	    else
 	    {
-		// Unbounded min/max are mutually exclusive
 		return loc.hasBoundedMin() ? Integer.MAX_VALUE : Integer.MIN_VALUE;
 	    }
 	}
