@@ -257,6 +257,11 @@ public class SimpleMarkovModel implements MarkovModel {
     transTo.remove(toGo);
   }
 
+  public SimpleMarkovModel(int heads, Alphabet emissionAlpha, String name) {
+    this(heads, emissionAlpha);
+    ((SimpleAlphabet) stateAlpha).setName(name);
+  }
+  
   public SimpleMarkovModel(int heads, Alphabet emissionAlpha) {
     this.emissionAlpha = emissionAlpha;
     this.stateAlpha = new SimpleAlphabet();
