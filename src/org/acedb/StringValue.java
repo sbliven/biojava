@@ -28,7 +28,7 @@ package org.acedb;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public interface StringValue extends AceValue {
+public interface StringValue extends AceNode {
   String toString();
 }
 

@@ -25,7 +25,7 @@ package org.acedb;
 import java.util.*;
 
 /**
- * A generalized set of named objects used within the ACeDBC
+ * A generalized set of named objects used within the ACeDB
  * system.
  *
  * @author Matthew Pocock
@@ -55,8 +55,30 @@ public interface AceSet {
   boolean contains(String name);
   
   /**
+   * The logical parent of this object or null if there is no logical parent.
+   */
+  AceSet parent();
+  
+  /**
+   * A URL that can be used to retrieve this set (assuming that the server will
+   * still be there when you try).
+   *
+   * @throws AceException if for any reason the URL can't be constructed
+   */
+  AceURL toURL() throws AceException;
+  
+  /**
    * Retrieve a memeber by name.
    */
   AceSet retrieve(String name) throws AceException;
+
+  /**
+   * Retrieve a sub-set of members by a filter string.
+   * <P>
+   * The parent of the returned filtered set should be the same as the parent
+   * of this object. If only one item matches the filter, then a set containing
+   * one member is returned.
+   */
+  AceSet filter(String pattern) throws AceException;
 }
 

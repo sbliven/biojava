@@ -37,13 +37,8 @@ public interface AceNode extends AceSet {
   String getName();
   
   /**
-   * The type of this node.
-   */
-  AceType getType();
-  
-  /**
    * A url that can be used to retrieve this node.
    */
-  URL toURL();
+  AceURL toURL();
 }
 
