@@ -9,7 +9,7 @@ This distribution contains the biojava classes and resources, along with
 scripts for building the .class files and the documentation tree. The CVS
 directories are arranged as follows:
 
-biojava
+biojava-live
  |
  |- src : java source files and package documentation
  |
