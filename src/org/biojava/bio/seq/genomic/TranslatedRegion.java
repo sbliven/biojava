@@ -28,6 +28,7 @@ import org.biojava.bio.seq.*;
  * sequence after is 3'utr.
  *
  * @author Matthew Pocock
+ * @since 1.1
  */
 public interface TranslatedRegion {
   public Sequence getTranslation();

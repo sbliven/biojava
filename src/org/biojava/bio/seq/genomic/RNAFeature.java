@@ -28,6 +28,7 @@ import org.biojava.bio.seq.*;
  * EST hit.
  *
  * @author Matthew Pocock
+ * @since 1.1
  */
 public interface RNAFeature extends StrandedFeature {
   /**

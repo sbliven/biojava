@@ -1,5 +1,4 @@
-/*
- *                    BioJava development code
+/*                    BioJava development code
  *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
@@ -19,27 +18,30 @@
  *
  */
 
-package org.biojava.bio.seq.genomic;
+package org.biojava.bio.seq.impl;
 
 import java.util.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.genomic.*;
 
 /**
- * The root of a feature tree representing a transcribed region of a genome.
+ * A no-frills implementation of Gene.
  *
- * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.1
  */
-
-public interface Gene extends StrandedFeature {
-    /**
-     * Retrieve an unmodifiable set of exons that are 'part of' this gene.
-     *
-     * @return a Set of Exon features
-     */
-    public Set getExons();
-
-    public static class Template extends StrandedFeature.Template {
-    }
+public class SimpleGene extends SimpleStrandedFeature implements Gene {
+  private Set exons;
+  
+  {
+    exons = new Set();
+  }
+  
+  public Set getExons() {
+    return Collections.unmodifiableSet(exons);
+  }
+  
+  public SimpleGene(Gene.Template template) {
+    super(template);
+  }
 }
