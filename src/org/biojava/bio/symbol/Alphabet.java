@@ -78,7 +78,7 @@ public interface Alphabet extends Annotatable {
    * compound alphabet.  The returned list should be immutable.
    *
    */
-  public List getAlphabets();
+  List getAlphabets();
 
   /**
    * Get a symbol from the Alphabet which corresponds
@@ -94,7 +94,7 @@ public interface Alphabet extends Annotatable {
    *            not Symbols over the alphabets returned from
    *            <code>getAlphabets</code>
    */
-  public Symbol getSymbol(List rl) 
+  Symbol getSymbol(List rl) 
   throws IllegalSymbolException;
 
   /**
@@ -107,8 +107,18 @@ public interface Alphabet extends Annotatable {
    *            returned symbol
    * @return a Symbol (possibly fly-weighted) for the Set of symbols in syms
    */
-  public Symbol getAmbiguity(Set syms)
+  Symbol getAmbiguity(Set syms)
   throws IllegalSymbolException;
+  
+  /**
+   * Get the 'gap' ambiguity symbol that is most apropreate for this alphabet.
+   * <P>
+   * In general, this will be a BasisSymbol that represents a list of
+   * AlphabetManager.getGapSymbol() the same length as the getAlphabets list.
+   *
+   * @return the apropreate gap Symbol instance
+   */
+  Symbol getGapSymbol();
   
   /**
    * Returns whether or not this Alphabet contains the symbol.
@@ -185,6 +195,10 @@ public interface Alphabet extends Annotatable {
     
     public SymbolParser getParser(String name) throws NoSuchElementException {
       throw new NoSuchElementException("There is no parser for the empty alphabet. Attempted to retrieve " + name);
+    }
+    
+    public Symbol getGapSymbol() {
+      return AlphabetManager.getGapSymbol();
     }
 
     public int size() {

@@ -135,6 +135,10 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     return alphabets;
   }
   
+  public Symbol getGapSymbol() {
+    return AlphabetManager.getGapSymbol(getAlphabets());
+  }
+  
   public Symbol getAmbiguity(Set syms) throws IllegalSymbolException {
     for(Iterator i = syms.iterator(); i.hasNext(); ) {
       Symbol sym = (Symbol) i.next();

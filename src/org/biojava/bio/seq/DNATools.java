@@ -56,7 +56,7 @@ public final class DNATools {
       symbolToComplement = new HashMap();
 
       // add the gap symbol
-      Symbol gap = AlphabetManager.getGapSymbol();
+      Symbol gap = dna.getGapSymbol();
       symbolToComplement.put(gap, gap);
       
       // add all other ambiguity symbols

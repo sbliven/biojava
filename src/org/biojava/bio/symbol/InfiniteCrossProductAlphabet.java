@@ -136,7 +136,11 @@ class InfiniteCrossProductAlphabet implements Alphabet, Serializable {
     
     return AlphabetManager.createSymbol('?', Annotation.EMPTY_ANNOTATION, sList, this);
   }
-
+  
+  public Symbol getGapSymbol() {
+    return AlphabetManager.getGapSymbol(getAlphabets());
+  }
+  
   public SymbolParser getParser(String name)
   throws NoSuchElementException, BioException {
     if(name == "name") {

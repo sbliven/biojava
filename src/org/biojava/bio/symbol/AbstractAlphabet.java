@@ -199,6 +199,10 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
     }
   }
   
+  public final Symbol getGapSymbol() {
+    return AlphabetManager.getGapSymbol(getAlphabets());
+  }
+  
   public final void validate(Symbol sym)
   throws IllegalSymbolException {
     if(!contains(sym)) {

@@ -42,7 +42,7 @@ public class GapDistribution implements Distribution {
   private final Alphabet alpha;
     
   public double getWeight(Symbol sym) throws IllegalSymbolException {
-    return sym == AlphabetManager.getGapSymbol()
+    return sym == getAlphabet().getGapSymbol()
       ? 1.0
       : 0.0;
   }
@@ -60,7 +60,7 @@ public class GapDistribution implements Distribution {
   }
     
   public Symbol sampleSymbol() {
-    return AlphabetManager.getGapSymbol();
+    return getAlphabet().getGapSymbol();
   }
   
   public Distribution getNullModel() {

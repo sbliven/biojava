@@ -70,6 +70,7 @@ public final class AlphabetManager {
   static private Map crossProductAlphabets;
   static private Map ambiguitySymbols;
   static private GapSymbol gapSymbol;
+  static private Map gapBySize;
   static private Map alphabetToIndex = new HashMap();
 
   /**
@@ -145,6 +146,42 @@ public final class AlphabetManager {
    */
   static public Symbol getGapSymbol() {
     return gapSymbol;
+  }
+  
+  static public Symbol getGapSymbol(List alphas) {
+    SizeQueen sq = new SizeQueen(alphas);
+    Symbol s = (Symbol) gapBySize.get(sq);
+    
+    if(s == null) {
+      if(alphas.size() == 0) { // should never be needed
+        s = gapSymbol;
+      } else if(alphas.size() == 1) { // should never happen
+        Alphabet a = (Alphabet) alphas.get(0);
+        s = getGapSymbol(a.getAlphabets());
+      } else {
+        List symList = new ArrayList(alphas.size());
+        for(Iterator i = alphas.iterator(); i.hasNext(); ) {
+          Alphabet a = (Alphabet) i.next();
+          symList.add(getGapSymbol(a.getAlphabets()));
+        }
+        try {
+          s = new SimpleBasisSymbol(
+            '-',
+            Annotation.EMPTY_ANNOTATION,
+            symList,
+            Alphabet.EMPTY_ALPHABET
+          );
+        } catch (IllegalSymbolException ise) {
+          throw new BioError(
+            ise,
+            "Assertion Failure: Should be able to make gap basis"
+          );
+        }
+      }
+      gapBySize.put(sq, s);
+    }
+    
+    return s;
   }
 
   /**
@@ -572,6 +609,27 @@ public final class AlphabetManager {
     ambiguitySymbols = new HashMap();
 
     gapSymbol = new GapSymbol();
+    gapBySize = new HashMap();
+    gapBySize.put(new SizeQueen(new ArrayList()), gapSymbol);
+    try {
+      gapBySize.put(
+        new SizeQueen(Arrays.asList(
+                new Alphabet[] { DoubleAlphabet.getInstance() }
+        )),
+        new SimpleBasisSymbol(
+                '-',
+                Annotation.EMPTY_ANNOTATION,
+                Arrays.asList(new Symbol[] { gapSymbol }),
+                Alphabet.EMPTY_ALPHABET
+        )
+      );
+    } catch (IllegalSymbolException ise) {
+      throw new BioError(
+        ise,
+        "Assertion Failure: Should be able to make gap basis"
+      );
+    }
+
     ambiguitySymbols.put(new HashSet(), gapSymbol);
     try {
       InputStream alphabetStream = AlphabetManager.class.getClassLoader().getResourceAsStream(
@@ -939,5 +997,28 @@ public final class AlphabetManager {
     Symbol[] syms
   ) throws IllegalSymbolException, BioException {
     return new LinearAlphabetIndex(syms);
+  }
+  
+  private static final class SizeQueen extends AbstractList {
+    private final List alphas;
+    
+    public SizeQueen(List alphas) {
+      this.alphas = alphas;
+    }
+    
+    public int size() {
+      return alphas.size();
+    }
+    
+    public Object get(int pos) {
+      Alphabet a = (Alphabet) alphas.get(pos);
+      List al = a.getAlphabets();
+      int size = al.size();
+      if(size > 1) {
+        return new SizeQueen(al);
+      } else {
+        return new Integer(size);
+      }
+    }
   }
 }

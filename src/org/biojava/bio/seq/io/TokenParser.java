@@ -46,7 +46,7 @@ public class TokenParser implements SymbolParser, Serializable {
   
     private void generateTable() {
 	Set tokenSymbols = new HashSet();
-	tokenSymbols.add(AlphabetManager.getGapSymbol());
+	tokenSymbols.add(alphabet.getGapSymbol());
 	for (Iterator si = alphabet.iterator(); si.hasNext(); ) {
 	    Symbol sym = (Symbol) si.next();
 	    tokenSymbols.add(sym);

@@ -533,7 +533,7 @@ extends AbstractSymbolList implements Serializable {
     }
     int i = findViewBlock(indx);
     if(i == -1) {
-      return AlphabetManager.getGapSymbol();
+      return getAlphabet().getGapSymbol();
     } else {
       Block b = (Block) blocks.get(i);
       return source.symbolAt(b.sourceStart - b.viewStart + indx);
@@ -568,6 +568,20 @@ extends AbstractSymbolList implements Serializable {
   }
   
   /**
+   * Get list of the un-gapped region of the SymbolList.
+   * <P>
+   * The gapped symbol list can be represented as a list of ungapped regions.
+   * Given a list of start-stop pairs in the ungapped coordinate system each
+   * with a corresponding pair of start-stop pairs in the gapped view, the
+   * entire gapped list can be reconstructed.
+   *
+   * @return a List of GappedSymbolList.Block instances
+   */
+  public List BlockIterator() {
+    return Collections.unmodifiableList(blocks);
+  }
+  
+  /**
    * Create a new GappedSymbolList that will view source.
    *
    * @param source  the underlying sequence
@@ -581,10 +595,9 @@ extends AbstractSymbolList implements Serializable {
     blocks.add(b);
   }
     
-  /**Debugging method  
-  *  
-  */ 
-    
+  /**
+   * Debugging method
+   */ 
   public void dumpBlocks() {
     for(Iterator i = blocks.iterator(); i.hasNext(); ) {
       Block b = (Block) i.next();
@@ -595,12 +608,13 @@ extends AbstractSymbolList implements Serializable {
   /**
    * An aligned block.
    * <P>
-   * The alignment is actualy stoored as a list of these objects. Each block is contiguous
-   * with the next in the source fields, but may be gapped in the view fields.
+   * The alignment is actualy stoored as a list of these objects. Each block is
+   * contiguous with the next in the source fields, but may be gapped in the
+   * view fields.
    *
    * @author Matthew Pocock
    */
-  private final class Block implements Serializable {
+  public final class Block implements Serializable {
     public int sourceStart, sourceEnd;
     public int viewStart, viewEnd;
     

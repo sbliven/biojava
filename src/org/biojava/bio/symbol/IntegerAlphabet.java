@@ -91,6 +91,10 @@ public class IntegerAlphabet implements Alphabet, Serializable {
     return new IntegerSymbol(val);
   }
   
+  public Symbol getGapSymbol() {
+    return AlphabetManager.getGapSymbol(getAlphabets());
+  }
+  
   public Annotation getAnnotation() {
     return Annotation.EMPTY_ANNOTATION;
   }

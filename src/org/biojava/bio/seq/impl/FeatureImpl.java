@@ -27,6 +27,7 @@ import java.io.*;
 import java.lang.reflect.*;
 import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.bio.seq.homol.*;
 
 /**
  * Wrap up default sets of Feature implementations.
@@ -63,6 +64,8 @@ public class FeatureImpl {
 				SimpleFeature.class);
 	    d.addImplementation(StrandedFeature.Template.class,
 				SimpleStrandedFeature.class);
+	    d.addImplementation(HomologyFeature.Template.class,
+				SimpleHomologyFeature.class);
 	} catch (BioException ex) {
 	    throw new BioError(ex, "Couldn't initialize default FeatureRealizer");
 	}
