@@ -91,6 +91,19 @@ extends AbstractLocationDecorator {
     this(wrapped, length, wrapped.getMin());
   }
 
+  /**
+   * Makes a CircularLocation where the 5' end of the Location is specified. The
+   * <code>fivePrimeEnd</code> parameter must match one of the minimum coordinates
+   * of the wrapped <code>Location</code>. This allows the creation of Locations
+   * whose polarity can be specified. This method is used internally by <code>LocationTools.union()</code>
+   * and by the other constructor.
+   *
+   * @param wrapped the <code>Location</code> to map to a Circle
+   * @param length the lenght of the circle
+   * @param fivePrimeEnd the 5' polar end of the sequence
+   * @throws IllegalArgumentException if the 5' end doesn't match the min coordinate
+   * of either <code>wrapped</code> or one of its blocks.
+   */
   public CircularLocation(Location wrapped, int length, int fivePrimeEnd){
     super(wrapped);
     this.length = length;
