@@ -200,8 +200,8 @@ public class RegexpParser
     // Use of the special value for the EOR marker allows a blank line
     // to be used to delimit records. Many file formats are like this.
     if (endOfRecord != null) {
-        if (endOfRecord == TagValueParser.BLANK_LINE_EOR) {
-            if (line.equals(TagValueParser.BLANK_LINE_EOR)) {
+        if (endOfRecord == TagValueParser.EMPTY_LINE_EOR) {
+            if (line.equals(TagValueParser.EMPTY_LINE_EOR)) {
                 return null;
             }
         }
