@@ -17,7 +17,7 @@ public class UploadFlat {
 	{
 	    if(args.length < 6)
 		{
-		    throw new Exception("Use: UploadSwissProt dbURL dbUser dbPass biodatabase format swissprotFile*");
+		    throw new Exception("Use: UploadFlat dbURL dbUser dbPass biodatabase format file1 [file2...]");
 		}
 		
 	    String dbURL = args[0];
@@ -47,16 +47,16 @@ public class UploadFlat {
 	    } else if ("swissprot".equalsIgnoreCase(format)) {
 		sFormat = new EmblLikeFormat();
 		sbFact = new SwissprotProcessor.Factory(
-			new OrganismParser.Factory(
-				 SimpleSequenceBuilder.FACTORY,
-				 // SimpleTaxaFactory.GLOBAL, // in-memory implementation
-				 WeakTaxaFactory.GLOBAL, // only guarantees the bits you need exist
-				 EbiFormat.getInstance(),
-				 "OC",
-				 "OS",
-				 "OX"
-				 )
-			    );
+				 SimpleSequenceBuilder.FACTORY
+				 );
+		alpha = ProteinTools.getAlphabet();
+	    } else if ("fasta".equalsIgnoreCase(format)) {
+		sFormat = new FastaFormat();
+		sbFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
+		alpha = DNATools.getDNA();
+	    } else if ("fasta-protein".equalsIgnoreCase(format)) {
+		sFormat = new FastaFormat();
+		sbFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
 		alpha = ProteinTools.getAlphabet();
 	    } else {
 		System.err.println("Unknown format: " + format);

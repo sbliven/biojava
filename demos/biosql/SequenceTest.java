@@ -1,6 +1,7 @@
 package biosql;
 
 import java.io.*;
+import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
@@ -14,10 +15,16 @@ public class SequenceTest {
     public static void main(String[] args)
         throws Exception
     {
-	String dbURL = "jdbc:postgresql://localhost/thomasd_biosql2";
-	String dbUser = "thomas";
-	String dbPass = "";
-	String bioName = "testdb";
+	if (args.length < 3) {
+	    System.err.println("usage: SequenceTest <database_url> <username> <password>");
+	    System.err.println("example: SequenceTest jdbc:postgresql://localhost/thomasd_biosql2 thomas \"\"");
+	    return;
+	}
+
+	String dbURL = args[0];
+	String dbUser = args[1];
+	String dbPass = args[2];
+	String bioName = "testdb2";
 	
 	SequenceDB seqDB = new BioSQLSequenceDB(dbURL, dbUser, dbPass, bioName, true);
 	
@@ -34,6 +41,13 @@ public class SequenceTest {
         System.out.println("Inserting sequence");
         
 	seqDB.addSequence(seq);
+
+	System.out.println("Getting ids");
+
+	Set ids = seqDB.ids();
+	for (Iterator i = ids.iterator(); i.hasNext(); ) {
+	    System.out.println(i.next().toString());
+	}
 
         System.out.println("Retrieving sequence");
         
