@@ -343,6 +343,7 @@ private class Forward {
     private State[] states;
     private PairDPCursor cursor;
     private CrossProductAlphabet alpha;
+    private boolean initializationHack = true;
 
     public double runForward(ResidueList seq0, ResidueList seq1, PairDPCursor curs) 
         throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
@@ -351,17 +352,19 @@ private class Forward {
 	cursor = curs;
 	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
 
+	transitions = getForwardTransitions();
+	transitionScores = getForwardTransitionScores();
+
 	// Forward initialization
 
 	double[] col = cursor.getColumn(ia00);
 	for (int l = 0; l < states.length; ++l)
 	    col[l] = (states[l] == magicalState) ? 0.0 :
 	                Double.NEGATIVE_INFINITY;
+	forwardPrepareCol(0, 0);
+	initializationHack = false;
 
 	// Recurse
-
-	transitions = getForwardTransitions();
-	transitionScores = getForwardTransitionScores();
 
 	while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
 	    if (cursor.canAdvance(0)) {
@@ -438,6 +441,9 @@ private class Forward {
 	double[] curCol = (double[]) matrix[0][0];
 	int[] advance;
 	for (int l = 0; l < states.length; ++l) {
+	    if (initializationHack && states[l] == magicalState)
+		continue;
+
 	    // System.out.println("State = " + states[l].getName());
 
 	    if (states[l] instanceof EmissionState)
@@ -477,14 +483,15 @@ private class Forward {
 //  		}
 
 		double[] sourceScores = new double[tr.length];
+		double[] sCol = (double[]) matrix[advance[0]][advance[1]];
 		for (int ci = 0; ci < tr.length; ++ci) {
-		    double[] sCol;
-		    if (states[tr[ci]] instanceof EmissionState) {
-			advance = ((EmissionState)states[tr[ci]]).getAdvance();
-		        sCol = (double[]) matrix[advance[0]][advance[1]];
-		    } else {
-			sCol = (double[]) matrix[0][0];
-		    }
+		    //  if (states[tr[ci]] instanceof EmissionState) {
+//  			advance = ((EmissionState)states[tr[ci]]).getAdvance();
+//  		        sCol = (double[]) matrix[advance[0]][advance[1]];
+//  		    } else {
+//  			System.out.println("Evaluating dot transition from " + tr[ci] + " to " + l);
+//  			sCol = (double[]) matrix[0][0];
+//  		    }
 		    sourceScores[ci] = sCol[tr[ci]];
 		}
 
