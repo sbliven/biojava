@@ -27,8 +27,33 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * <code>SeqIOEventEmitter</code> is a utility class which scans a
+ * <code>Sequence</code> object and sends events describing its
+ * constituent data to a <code>SeqIOListener</code>. The listener
+ * should be able to reconstruct the <code>Sequence</code> from these
+ * events.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @version 1.2
+ * @since 1.2
+ */
 public class SeqIOEventEmitter
 {
+
+    /**
+     * <code>SeqIOEventEmitter</code> can not be instantiated.
+     */
+    private SeqIOEventEmitter() { };
+
+    /**
+     * <code>getSeqIOEvents</code> scans a <code>Sequence</code>
+     * object and sends events describing its data to the
+     * <code>SeqIOListener</code>.
+     *
+     * @param seq a <code>Sequence</code> object.
+     * @param listener a <code>SeqIOListener</code> object.
+     */
     public static void getSeqIOEvents(Sequence seq, SeqIOListener listener)
     {
 	try
@@ -96,6 +121,14 @@ public class SeqIOEventEmitter
 	}
     }
 
+    /**
+     * <code>getSubFeatures</code> is a recursive method which returns
+     * a list of all <code>Feature</code>s within a
+     * <code>FeatureHolder</code>.
+     *
+     * @param fh a <code>FeatureHolder</code> object.
+     * @return a <code>List</code> value.
+     */
     private static List getSubFeatures(FeatureHolder fh)
     {
 	List subfeat = new ArrayList();

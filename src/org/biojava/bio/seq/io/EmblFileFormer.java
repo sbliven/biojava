@@ -33,6 +33,7 @@ import org.biojava.bio.symbol.*;
  * EMBL entries for writing to a PrintStream.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @version 1.2
  * @since 1.2
  */
 public class EmblFileFormer implements SeqFileFormer
@@ -49,7 +50,7 @@ public class EmblFileFormer implements SeqFileFormer
     {
 	SeqFileFormerFactory.addFactory("Embl", new EmblFileFormer.Factory());
 
-	// This loads an xml file containing information on which
+	// This loads an XML file containing information on which
 	// qualifiers are valid (or even mandatory) for a particular
 	// feature key. It also indicates whether the value should be
 	// contained within quotes.
@@ -66,15 +67,13 @@ public class EmblFileFormer implements SeqFileFormer
 
     /**
      * Private <code>EmblFileFormer</code> constructor. Instances are
-     * made by the polymorphic factory object
-     * <code>SeqFileFormerFactory</code>.
+     * made by the <code>Factory</code>.
      */
     private EmblFileFormer() { }
 
     /**
      * Creates a new <code>EmblFileFormer</code> object. Instances are
-     * made by the polymorphic factory object
-     * <code>SeqFileFormerFactory</code>.
+     * made by the <code>Factory</code>.
      *
      * @param stream a <code>PrintStream</code> object.
      */

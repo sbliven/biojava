@@ -33,7 +33,17 @@ import org.biojava.bio.seq.Sequence;
  */
 public interface SeqFileFormer extends SeqIOListener
 {
+    /**
+     * <code>getPrintStream</code>.
+     *
+     * @return a <code>PrintStream</code> value.
+     */
     public PrintStream getPrintStream();
 
+    /**
+     * <code>setPrintStream</code>.
+     *
+     * @param stream a <code>PrintStream</code> object.
+     */
     public void setPrintStream(PrintStream stream);
 }

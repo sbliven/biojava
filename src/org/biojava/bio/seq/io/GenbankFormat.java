@@ -129,7 +129,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
 	    String defaultFormat = getDefaultFormat();
 	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(defaultFormat);
 	    former.setPrintStream(os);
-	    
+
 	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
 	}
 	catch (BioException bex)
@@ -173,7 +173,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
 	}
     }
 
-     public Set getFormats()
+    public Set getFormats()
     {
 	return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
     }

@@ -33,17 +33,37 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
-
+/**
+ * <code>SeqFormatTools</code> is a utility class for common sequence
+ * formatting operations required when writing flat files.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @version 1.2
+ * @since 1.2
+ */
 public class SeqFormatTools
 {
-
     private static final int FIRST    = 0;
     private static final int OVERWIDE = 1;
     private static final int NOFIT    = 2;
     private static final int FIT      = 3;
 
+    /**
+     * <code>SeqFormatTools</code> can not be instantiated.
+     */
     private SeqFormatTools() { };
 
+    /**
+     * <code>formatQualifierBlock</code> formats text into
+     * EMBL/Genbank style qualifiers.
+     *
+     * @param text a <code>String</code> to format.
+     * @param leader a <code>String</code> to append to the start of
+     * each line.
+     * @param wrapWidth an <code>int</code> indicating the number of
+     * columns per line.
+     * @return a <code>StringBuffer</code> value.
+     */
     public static StringBuffer formatQualifierBlock(String text,
 						    String leader,
 						    int    wrapWidth)
@@ -128,6 +148,17 @@ public class SeqFormatTools
 	return output;
     }
 
+    /**
+     * <code>formatTokenBlock</code> divides up the tokens
+     * representing the <code>Symbols</code> into blocks of the
+     * specified length, with a single space delimeter.
+     *
+     * @param syms a <code>Symbol []</code> array whose tokens are to
+     * be formatted.
+     * @param blockSize an <code>int</code> indicating the size of
+     * each block.
+     * @return a <code>StringBuffer</code>.
+     */
     public static StringBuffer formatTokenBlock(Symbol [] syms,
 						int       blockSize)
     {
@@ -142,6 +173,19 @@ public class SeqFormatTools
 	return sb;
     }
 
+    /**
+     * <code>formatLocationBlock</code> creates an EMBL/Genbank style
+     * representation of a <code>Location</code>.
+     *
+     * @param loc a <code>Location</code> object to use as a template.
+     * @param strand an <code>int</code> value indicating the
+     * <code>Location</code>'s strand.
+     * @param leader a <code>String</code> to append to the start of
+     * each line.
+     * @param wrapWidth an <code>int</code> indicating the number of
+     * columns per line.
+     * @return a <code>StringBuffer</code>.
+     */
     public static StringBuffer formatLocationBlock(Location loc,
 						   int      strand,
 						   String   leader,
@@ -255,6 +299,18 @@ public class SeqFormatTools
 	return sb;
     }
 
+    /**
+     * <code>loadFeatureData</code> reads data describing EMBL/Genbank
+     * features and qualifiers from an XML file and populates two data
+     * Maps, one for features, one for qualifiers.
+     *
+     * @param featureDataFile a <code>String</code> indicating the
+     * name of the file.
+     * @param featureData a <code>Map</code> object to populate with
+     * feature data.
+     * @param qualifierData a <code>Map</code> object to populate with
+     * qualifier data.
+     */
     public static void loadFeatureData(String featureDataFile,
 				       Map    featureData,
 				       Map    qualifierData)

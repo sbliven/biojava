@@ -28,6 +28,14 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * <code>GenbankFileFormer</code> performs the detailed formatting of
+ * Genbank entries for writing to a PrintStream.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @version 1.2
+ * @since 1.2
+ */
 public class GenbankFileFormer implements SeqFileFormer
 {
     private static String featureDataFile =
@@ -42,7 +50,7 @@ public class GenbankFileFormer implements SeqFileFormer
     {
 	SeqFileFormerFactory.addFactory("Genbank", new GenbankFileFormer.Factory());
 
-	// This loads an xml file containing information on which
+	// This loads an XML file containing information on which
 	// qualifiers are valid (or even mandatory) for a particular
 	// feature key. It also indicates whether the value should be
 	// contained within quotes.
@@ -57,8 +65,18 @@ public class GenbankFileFormer implements SeqFileFormer
 	}
     }
 
+    /**
+     * Private <code>GenbankFileFormer</code> constructor. Instances
+     * are made by the <code>Factory</code>.
+     */
     private GenbankFileFormer() { }
 
+    /**
+     * Creates a new <code>GenbankFileFormer</code> object. Instances
+     * are made by the <code>Factory</code>.
+     *
+     * @param stream a <code>PrintStream</code> object.
+     */
     private GenbankFileFormer(PrintStream stream)
     {
 	this.stream = stream;

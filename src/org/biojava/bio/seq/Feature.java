@@ -135,9 +135,21 @@ public interface Feature extends FeatureHolder, Annotatable {
       public Annotation annotation;
     }
 
+    /**
+     * <code>byLocationOrder</code> contains a <code>Feature</code>
+     * comparator which compares by the minimum base position of their
+     * <code>Location</code>.
+     */
     public static final ByLocationComparator byLocationOrder =
 	new ByLocationComparator();
 
+    /**
+     * <code>ByLocationComparator</code> compares
+     * <code>Feature</code>s by the minimum base position of their
+     * <code>Location</code>.
+     *
+     * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+     */
     public static final class ByLocationComparator implements Comparator
     {
 	public int compare(Object o1, Object o2)
