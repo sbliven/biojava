@@ -23,6 +23,8 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+
+import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
 /**
@@ -31,6 +33,8 @@ import org.biojava.bio.seq.*;
  * You only need to define the methods getWeight, setWeight, getTrainer.
  * If you know a lot about the probability distribution of your residues,
  * you may wish to override sampleResidue as well.
+ *
+ * @author Matthew Pocock
  */
 public abstract class AbstractState implements EmissionState {
   private String name;
@@ -68,14 +72,16 @@ public abstract class AbstractState implements EmissionState {
     this.alpha = alpha;
   }
 
-  public Residue sampleResidue() throws SeqException {
+  public Residue sampleResidue()
+  throws BioError {
     double p = Math.random();
     try {
       for(Iterator i = alphabet().residues().iterator(); i.hasNext(); ) {
         Residue r = (Residue) i.next();
-	p -= Math.exp(getWeight(r));
-        if( p <= 0)
+        p -= Math.exp(getWeight(r));
+        if( p <= 0) {
           return r;
+        }
       }
     
       StringBuffer sb = new StringBuffer();
@@ -85,11 +91,17 @@ public abstract class AbstractState implements EmissionState {
         if(w > 0.0)
           sb.append("\t" + r.getName() + " -> " + w + "\n");
       }
-      throw new SeqException("Could not find a residue emitted from state " + this.getName() +
-                             this.getName() + ". Do the probabilities sum to 1?" +
-                             "\np=" + p + "\n" + sb.toString());
+      throw new BioError(
+        "Could not find a residue emitted from state " + this.getName() +
+        this.getName() + ". Do the probabilities sum to 1?" +
+        "\np=" + p + "\n" + sb.toString()
+      );
     } catch (IllegalResidueException ire) {
-      throw new SeqException(ire, "Unable to itterate over all residues in alphabet");
+      throw new BioError(
+        ire,
+        "Unable to itterate over all residues in alphabet - " +
+        "things changed beneath me!"
+      );
     }
   }
 }

@@ -28,406 +28,383 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
 /**
- * A model that guarantees to only contain emission states.
+ * A model that guarantees to only contain emission states and dot states.
+ * <P>
+ * A flat model is essentialy a view onto a more complicated model that makes it
+ * appear to only contain emission states and dot states. States that emit models
+ * and other exotica are expressed purely in terms of these two state types.
+ * <P>
+ * You can train the resulting flat model, and the underlying models will be altered.
  */
 public class FlatModel implements MarkovModel {
-  private Transition _tran = new Transition(null, null);
-
-  private MarkovModel flattenedModel;  
-  private Alphabet stateAlphabet;
-  private Alphabet queryAlphabet;
-  
-  /**
-   * Map (from, to) -> Set <model, f, t>
-   */
-  private Map statesToTransitions = new HashMap();
-  
-  /**
-   * Map from -> Set <to>
-   */
-  private Map transitionsFrom = new HashMap();
-  
-  /**
-   * Map to -> Set <from>
-   */
-  private Map transitionsTo = new HashMap();
-  
-  public MarkovModel getFlattenedModel() {
-    return flattenedModel;
-  }
-  
-  public Set getStateTransitions(State from, State to)
-  throws IllegalResidueException {
-    stateAlphabet().validate(from);
-    stateAlphabet().validate(to);
-    _tran.from = from;
-    _tran.to = to;
-    Set transSet = (Set) statesToTransitions.get(_tran);
-    return (transSet == null) ? Collections.EMPTY_SET : transSet;
-  }
+  private final MarkovModel source;
+  private final MarkovModel flat;
   
   public Alphabet stateAlphabet() {
-    return stateAlphabet;
+    return flat.stateAlphabet();
   }
   
-  public Alphabet queryAlphabet() {
-    return queryAlphabet;
+  public Alphabet emissionAlphabet() {
+    return flat.emissionAlphabet();
+  }
+  
+  public MagicalState magicalState() {
+    return flat.magicalState();
+  }
+  
+  public int heads() {
+    return flat.heads();
+  }
+  
+  public boolean containsTransition(State from, State to)
+  throws IllegalResidueException {
+    return flat.containsTransition(from, to);
+  }
+  
+  public void createTransition(State from, State to)
+  throws IllegalResidueException, UnsupportedOperationException {
+    Alphabet a = stateAlphabet();
+    a.validate(from);
+    a.validate(to);
+    throw new UnsupportedOperationException("createTransition not supported by FlatModel");
   }
 
-  public Set transitionsFrom(State from) {
-    Set set = (Set) transitionsFrom.get(from);
-    if(set == null)
-      return Collections.EMPTY_SET;
-    return set;
+  public void destroyTransition(State from, State to)
+  throws IllegalResidueException, UnsupportedOperationException {
+    Alphabet a = stateAlphabet();
+    a.validate(from);
+    a.validate(to);
+    throw new UnsupportedOperationException("destroyTransition not supported by FlatModel");
+  }
+
+  public void setTransitionScore(State from, State to, double score)
+  throws IllegalResidueException, IllegalTransitionException,
+  UnsupportedOperationException {
+    throw new UnsupportedOperationException("setTransitionScore not supported by FlatModel");
+  }
+
+  public State sampleTransition(State from) throws IllegalResidueException {
+    return flat.sampleTransition(from);
   }
   
-  public Set transitionsTo(State to) {
-    Set set = (Set) transitionsTo.get(to);
-    if(set == null)
-      return Collections.EMPTY_SET;
-    return set;
+  public Set transitionsFrom(State from) throws IllegalResidueException {
+    return flat.transitionsFrom(from);
   }
   
-  public void registerWithTrainer(ModelTrainer modelTrainer) {
-    getFlattenedModel().registerWithTrainer(modelTrainer);
-    for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext();) {
-      State s = (State) i.next();
-      System.out.println("Registering state " + s.getName());
-      s.registerWithTrainer(modelTrainer);
-    }
-    for(Iterator i = statesToTransitions.keySet().iterator(); i.hasNext();) {
-      Transition trans = (Transition) i.next();
-      Set transSet = (Set) statesToTransitions.get(trans);
-      for(Iterator j = transSet.iterator(); j.hasNext();) {
-        Object [] oa = (Object []) j.next();
-        MarkovModel model = (MarkovModel) oa[0];
-        TransitionTrainer tt = modelTrainer.getTrainerForModel(model);
-        try {
-          modelTrainer.registerTrainerForTransition(trans.from, trans.to, tt,
-                                                    (State) oa[1], (State) oa[2]);
-        } catch (SeqException se) {
-          throw new BioError(se,
-            "Trainer rejected even though I retrieved it myself");
-        }
-      }
-    }
+  public Set transitionsTo(State to) throws IllegalResidueException {
+    return flat.transitionsTo(to);
+  }
+
+  public void addState(State toAdd)
+  throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("addState not supported by FlatModel");
+  }
+
+  public void removeState(State toGo)
+  throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("removeState not supported by FlatModel");
   }
   
   public double getTransitionScore(State from, State to)
   throws IllegalResidueException, IllegalTransitionException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
-    _tran.from = from;
-    _tran.to = to;
-    Set transSet = (Set) statesToTransitions.get(_tran);
-    if(transSet == null) {
-      /*
-      System.out.println("Can't find transition.");
-      System.out.println(from.getName() + " -> ");
-      for(Iterator i = transitionsFrom(from).iterator(); i.hasNext();) {
-        System.out.println("\t" + ((State) i.next()).getName());
-      }
-      System.out.println(to.getName() + " <- ");
-      for(Iterator i = transitionsTo(to).iterator(); i.hasNext();) {
-        System.out.println("\t" + ((State) i.next()).getName());
-      }
-      */
-      throw new IllegalTransitionException(from, to);
+    if(!flat.containsTransition(from, to)) {
+      throw new IllegalTransitionException(from, to, "Transition does not exist");
     }
     
-    double w = 0.0;
-    for(Iterator i = transSet.iterator(); i.hasNext();) {
-      Object [] trans = (Object []) i.next();
-      MarkovModel m = (MarkovModel) trans[0];
-      State f = (State) trans[1];
-      State t = (State) trans[2];
-      w += m.getTransitionScore(f, t);
+    State from2, to2;
+    MarkovModel mod;
+    if(from instanceof StateProxy) {
+      from2 = ((StateProxy) from).getWrappedState();
+      mod = ((StateProxy) from).getSourceModel();
+      if(to instanceof StateProxy) {
+        to2 = ((StateProxy) to).getWrappedState();
+      } else {
+        to2 = ((StateWrapper) to).getModelState();
+      }
+    } else if(to instanceof StateProxy) {
+      to2 = ((StateProxy) to).getWrappedState();
+      mod = ((StateProxy) to).getSourceModel();
+      if(from instanceof StateProxy) {
+        from2 = ((StateProxy) from).getWrappedState();
+      } else {
+        from2 = ((StateWrapper) from).getModelState();
+      }
+    } else {
+      from2 = ((StateWrapper) from).getModelState();
+      to2 = ((StateWrapper) to).getModelState();
+      mod = ((ModelInState) from2).getModel();
     }
-    return w;
-  }
-  
-  public void setTransitionScore(State from, State to, double score)
-  throws UnsupportedOperationException {
-    throw new UnsupportedOperationException(
-      "setTransitionScore not supported by " + getClass()
-    );
-  }
-  
-  public State sampleTransition(State from)
-  throws IllegalResidueException {
-    stateAlphabet().validate(from);
     
-    double p = Math.random();
-    try {
-      for(Iterator i = transitionsFrom(from).iterator(); i.hasNext();) {
-        State to = (State) i.next();
-        p -= Math.exp(getTransitionScore(from, to));
-        if(p <= 0) {
-          return to;
+    return mod.getTransitionScore(from2, to2);
+  }
+
+  public void registerWithTrainer(ModelTrainer modelTrainer) {
+    if(modelTrainer.getTrainerForModel(flat) == null) {
+      TransitionTrainer tTrainer = new SimpleTransitionTrainer(flat);
+      try {
+        modelTrainer.registerTrainerForModel(flat, tTrainer);
+      } catch (SeqException se) {
+        throw new BioError(se, "Can't register trainer for model, even though " + 
+          " there is no trainer associated with the model");
+      }
+      for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext(); ) {
+        State s = (State) i.next();
+        if(s instanceof EmissionState) {
+          ((EmissionState) s).registerWithTrainer(modelTrainer);
+        }
+        if(s instanceof StateWrapper) {
+          ((StateWrapper) s).getModelState().getModel().registerWithTrainer(modelTrainer);
+        }
+        try {
+          for(Iterator j = transitionsFrom(s).iterator(); j.hasNext(); ) {
+            State t = (State) j.next();
+            modelTrainer.registerTrainerForTransition(s, t, tTrainer, s, t);
+          }
+        } catch (IllegalResidueException ire) {
+          throw new BioError(ire, "State " + s.getName() +
+                             " listed in alphabet " +
+                             stateAlphabet().getName() + " dissapeared.");
+        } catch (SeqException se) {
+          throw new BioError(se, "Somehow, my trainer is not registered.");
         }
       }
-    } catch (IllegalResidueException ire) {
-      throw new BioError(ire, "Transition involving " + from.getName() +
-                         "dissapeared");
-    } catch (IllegalTransitionException ite) {
-      throw new BioError(ite, "Transition listed in transitionsFrom(" +
-                         from.getName() + ") has dissapeared");
     }
-    
-    StringBuffer sb = new StringBuffer();
-
-    for(Iterator i = transitionsFrom(from).iterator(); i.hasNext(); ) {
-      try {
-        State s = (State) i.next();
-        double t = getTransitionScore(from, s);
-        if(t > 0.0)
-          sb.append("\t" + s.getName() + " -> " + t + "\n");
-      } catch (IllegalTransitionException ite) {
-        throw new BioError(ite, "Transition listed in transitionsFrom(" +
-                           from.getName() + ") has dissapeared");
-      }
-    }
-    throw new IllegalResidueException("Could not find transition from state " +
-                                      from.getName() + 
-                                      ". Do the probabilities sum to 1?" +
-                                      "\np=" + p + "\n" + sb.toString());
-  }
-  
-    
-  public void createTransition(State from, State to)
-  throws UnsupportedOperationException {
-    throw new UnsupportedOperationException(
-      "destroyTransition not supported by " + getClass());
-  }
-
-  public void destroyTransition(State from, State to)
-  throws UnsupportedOperationException {
-    throw new UnsupportedOperationException(
-      "destroyTransition not supported by " + getClass());
-  }
-  
-  public boolean containsTransition(State from, State to)
-  throws IllegalResidueException {
-    Alphabet sAlpha = stateAlphabet();
-    sAlpha.validate(from);
-    sAlpha.validate(to);
-    
-    return transitionsFrom(from).contains(to);
-  }
-  
-  protected void addTransition(Map stateToFlatModel, State f, State t,
-                               MarkovModel model, State rf, State rt)
-  throws IllegalResidueException {
-    // modify from listing
-    Set fromSet = (Set) transitionsFrom.get(f);
-    if(fromSet == null)
-      fromSet = new HashSet();
-    fromSet.add(t);
-    transitionsFrom.put(f, fromSet);
-    
-    // modify to listing
-    Set toSet = (Set) transitionsTo.get(t);
-    if(toSet == null)
-      toSet = new HashSet();
-    toSet.add(f);
-    transitionsTo.put(t, toSet);
-    
-    // add transition
-    _tran.from = f;
-    _tran.to = t;
-    Set transSet = (Set) statesToTransitions.get(_tran);
-    if(transSet == null) {
-      transSet = new HashSet();
-      statesToTransitions.put(new Transition(f, t), transSet);
-    }
-    Object [] transition = { model, rf, rt };
-    transSet.add(transition);
-    
-    // wrapper state for a wrapper state, add the recursive transitions
-    if(stateToFlatModel.containsKey(f) && f instanceof StateWrapper) {
-      FlatModel fm = (FlatModel) stateToFlatModel.get(f);
-      StateWrapper fStateWrapper = (StateWrapper) f;
-      State wrapped = fStateWrapper.getWrappedState();
-      Set transitions = fm.getStateTransitions(wrapped, DP.MAGICAL_STATE);
-      transSet.addAll(transitions);
-    }
-
-    if(stateToFlatModel.containsKey(t) && t instanceof StateWrapper) {
-      FlatModel tm = (FlatModel) stateToFlatModel.get(t);
-      StateWrapper tStateWrapper = (StateWrapper) t;
-      State wrapped = tStateWrapper.getWrappedState();
-      Set transitions = tm.getStateTransitions(DP.MAGICAL_STATE, wrapped);
-      transSet.addAll(transitions);
-    }
-
-  }
-  
-  public Set getWrappedStates(ModelInState modelInState) {
-    Set wrapped = new HashSet();
-    for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext();) {
-      EmissionState wrappedState = (EmissionState) i.next();
-      if(wrappedState != DP.MAGICAL_STATE) {
-        wrapped.add(new SimpleStateWrapper(wrappedState, modelInState));
-      }
-    }
-    return wrapped;
   }
   
   public FlatModel(MarkovModel model)
-  throws IllegalResidueException {
-    flattenedModel = model;
-    queryAlphabet = model.queryAlphabet();
-    SimpleAlphabet stateAlphabet = new SimpleAlphabet();
-    stateAlphabet.setName("FlatModel states");
-    stateAlphabet.addResidue(DP.MAGICAL_STATE);
+  throws IllegalResidueException, IllegalAlphabetException {
+    this.source = model;
     
-    Map stateToFlatModel = new HashMap();
-    
-    Alphabet mStates = model.stateAlphabet();
-    for(Iterator si = mStates.residues().iterator(); si.hasNext();) {
-      State s = (State) si.next();
-      if(s instanceof EmissionState) {
-        stateAlphabet.addResidue(s);
-      } else if(s instanceof ModelInState) {
+    flat = new SimpleMarkovModel(model.heads(), model.emissionAlphabet());
+
+    // add all the states    
+    Map old2from = new HashMap();
+    Map old2to = new HashMap();
+    for(Iterator i = model.stateAlphabet().residues().iterator(); i.hasNext(); ) {
+      State s = (State) i.next();
+      if(s instanceof EmissionState) {  // simple emission state in model
+        EmissionStateProxy esw = new EmissionStateProxy(
+          (EmissionState) s, model, s.getName()
+        );
+        old2from.put(s, esw);
+        old2to.put(s, esw);
+        flat.addState(esw);
+      } else if(s instanceof DotState) { // simple dot state in model
+        DotStateProxy dsw = new DotStateProxy(s, model, "." + s.getName());
+        old2from.put(s, dsw);
+        old2to.put(s, dsw);
+        flat.addState(dsw);
+      } else if(s instanceof ModelInState) { // complex model inside state
         ModelInState mis = (ModelInState) s;
         MarkovModel mism = mis.getModel();
-        FlatModel fm = new FlatModel(mism);
-        for(Iterator js = fm.getWrappedStates(mis).iterator();
-            js.hasNext();) {
-          State jState = (State) js.next();
-          stateAlphabet.addResidue(jState);
-          stateToFlatModel.put(jState, fm);
+        FlatModel flatM = new FlatModel(mism);
+        for(Iterator j = flatM.stateAlphabet().residues().iterator(); j.hasNext(); ) {
+          State t = (State) j.next();
+          if(t instanceof EmissionState) {
+            EmissionStateWrapper esw = new SimpleEmissionStateWrapper(
+              (EmissionStateWrapper) t, mis
+            );
+            old2from.put(t, esw);
+            old2to.put(t, esw);
+            flat.addState(esw);
+          } else if(t instanceof DotState) {
+            DotStateWrapper dsw = new DotStateWrapper(t, mis, "." + t.getName());
+            old2from.put(t, dsw);
+            old2to.put(t, dsw);
+            flat.addState(dsw);
+          } else if(t == mism.magicalState()) {
+            DotStateWrapper start = new DotStateWrapper(mism.magicalState(), mis, "start");
+            DotStateWrapper end = new DotStateWrapper(mism.magicalState(), mis, "end");
+            old2from.put(model.magicalState(), start);
+            old2to.put(model.magicalState(), end);
+            old2from.put(s, end);
+            old2to.put(s, start);
+            flat.addState(start);
+            flat.addState(end);
+          }
         }
+      } else if(s == model.magicalState()) { // magical state
+        old2from.put(model.magicalState(), model.magicalState());
+        old2to.put(model.magicalState(), model.magicalState());
+      } else { // unknown eventuality
+        throw new IllegalResidueException(s, "Don't know how to handle state: " + s.getName());
       }
     }
 
-    // for each of our new states s
-    for(Iterator si = stateAlphabet.residues().iterator(); si.hasNext();) {
-      State s = (State) si.next();
-      // for each of our new states t
-      for(Iterator sj = stateAlphabet.residues().iterator(); sj.hasNext();) {
-        State t = (State) sj.next();
-        if(mStates.contains(s) && mStates.contains(t)) {
-          // if they are original emission states, then chech their connectivity
-          if(model.transitionsFrom(s).contains(t)) {
-            addTransition(stateToFlatModel, s, t, model, s, t);
-          }
-        } else if(mStates.contains(s)) {
-          // s is original state. t is wrapper from contained model
-          StateWrapper twrapper = (StateWrapper) t;
-          State twrapped = twrapper.getWrappedState();
-          ModelInState tstate = twrapper.getContainingState();
-          MarkovModel tmodel = tstate.getModel();
-          if(model.transitionsFrom(s).contains(tstate) &&
-             tmodel.transitionsFrom(DP.MAGICAL_STATE).contains(twrapped)) {
-            addTransition(stateToFlatModel, s, t, model, s, tstate);
-            addTransition(stateToFlatModel, s, t, tmodel, DP.MAGICAL_STATE, twrapped);
-            FlatModel fm = (FlatModel) stateToFlatModel.get(twrapped);
-          }
-        } else if(mStates.contains(t)) {
-          // s is wrapper state, t is original.
-          StateWrapper swrapper = (StateWrapper) s;
-          State swrapped = swrapper.getWrappedState();
-          ModelInState sstate = swrapper.getContainingState();
-          MarkovModel smodel = sstate.getModel();
-          if(model.transitionsFrom(sstate).contains(t) &&
-             smodel.transitionsFrom(swrapped).contains(DP.MAGICAL_STATE)) {
-            addTransition(stateToFlatModel, s, t, model, sstate, t);
-            addTransition(stateToFlatModel, s, t, smodel, swrapped, DP.MAGICAL_STATE);
-            FlatModel fm = (FlatModel) stateToFlatModel.get(swrapped);
-          }
-        } else {
-          // both wrapped states
-          StateWrapper twrapper = (StateWrapper) t;
-          State twrapped = twrapper.getWrappedState();
-          ModelInState tstate = twrapper.getContainingState();
-          MarkovModel tmodel = tstate.getModel();
-          StateWrapper swrapper = (StateWrapper) s;
-          State swrapped = swrapper.getWrappedState();
-          ModelInState sstate = swrapper.getContainingState();
-          MarkovModel smodel = sstate.getModel();
-          // System.out.println(s.getName() + " -> " + t.getName());
-          if(sstate == tstate) {
-            // both from the same ModelInState
-            //System.out.println("Same model in state");
-            if(smodel.transitionsFrom(swrapped).contains(twrapped)) {
-              // System.out.println("Joined by sub-moddel join");
-              addTransition(stateToFlatModel, s, t, smodel, swrapped, twrapped);
-            } else if(model.transitionsFrom(sstate).contains(tstate) &&
-                      smodel.transitionsFrom(swrapped).contains(DP.MAGICAL_STATE) &&
-                      tmodel.transitionsFrom(DP.MAGICAL_STATE).contains(twrapped)
-            ){
-              // System.out.println("Joined by containing-state to self transition");
-              addTransition(stateToFlatModel, s, t, model, sstate, tstate);
-              addTransition(stateToFlatModel, s, t, smodel, swrapped, DP.MAGICAL_STATE);
-              addTransition(stateToFlatModel, s, t, tmodel, DP.MAGICAL_STATE, twrapped);
-            }
-          } else {
-            // different models
-            // System.out.println("Different model in state");
-            if(smodel.transitionsFrom(swrapped).contains(DP.MAGICAL_STATE) &&
-               model.transitionsFrom(sstate).contains(tstate) &&
-               tmodel.transitionsFrom(DP.MAGICAL_STATE).contains(twrapped)) {
-              addTransition(stateToFlatModel, s, t, smodel, swrapped, DP.MAGICAL_STATE);
-              addTransition(stateToFlatModel, s, t, model, sstate, tstate);
-              addTransition(stateToFlatModel, s, t, tmodel, DP.MAGICAL_STATE, twrapped);
-            }
-          }
+    // wire them
+    for(Iterator i = flat.stateAlphabet().residues().iterator(); i.hasNext(); ) {
+      State s = (State) i.next();
+      if(s instanceof StateWrapper) {
+        StateWrapper sw = (StateWrapper) s;
+        State swrapped = sw.getWrappedState();
+        MarkovModel wmod = sw.getModelState().getModel();
+        for(Iterator j = wmod.transitionsFrom(swrapped).iterator(); j.hasNext(); ) {
+          State twrapped = (State) j.next();
+          createTransition(s, (State) old2to.get(twrapped));
+        }
+        for(Iterator j = wmod.transitionsTo(swrapped).iterator(); j.hasNext(); ) {
+          State twrapped = (State) j.next();
+          createTransition((State) old2from.get(twrapped), s);
         }
       }
     }
-    
-    this.stateAlphabet = stateAlphabet;
   }
   
-  private class SimpleStateWrapper extends SimpleResidue implements StateWrapper {
-    private EmissionState wrappedState;
-    private ModelInState modelInState;
+  public static interface StateProxy extends State {
+    public State getWrappedState();
+    public MarkovModel getSourceModel();
+  }
+  
+  private static class DotStateProxy extends DotState implements StateProxy {
+    private final State wrappedState;
+    private final MarkovModel sourceModel;
     
-    public EmissionState getWrappedState() {
+    public State getWrappedState() {
       return wrappedState;
     }
     
-    public ModelInState getContainingState() {
-      return modelInState;
+    public MarkovModel getSourceModel() {
+      return sourceModel;
     }
     
-    public Residue sampleResidue()
-    throws SeqException {
+    public DotStateProxy(State wrappedState, MarkovModel sourceModel, String name) {
+      super(name);
+      this.wrappedState = wrappedState;
+      this.sourceModel = sourceModel;
+    }
+  }
+  
+  private static class EmissionStateProxy extends SimpleResidue implements StateProxy, EmissionState {
+    private final EmissionState wrappedState;
+    private final MarkovModel sourceModel;
+    
+    public State getWrappedState() {
+      return wrappedState;
+    }
+    
+    public MarkovModel getSourceModel() {
+      return sourceModel;
+    }
+    
+    public double getWeight(Residue r) throws IllegalResidueException {
+      return wrappedState.getWeight(r);
+    }
+    
+    public void setWeight(Residue r, double score)
+    throws IllegalResidueException {
+      wrappedState.setWeight(r, score);
+    }
+    
+    public void registerWithTrainer(ModelTrainer trainer) {
+      wrappedState.registerWithTrainer(trainer);
+    }
+    
+    public int [] getAdvance() {
+      return wrappedState.getAdvance();
+    }
+    
+    public Residue sampleResidue() {
       return wrappedState.sampleResidue();
-    }
-    
-    public double getWeight(Residue res)
-    throws IllegalResidueException {
-      return wrappedState.getWeight(res);
-    }
-    
-    public void setWeight(Residue res, double weight)
-    throws IllegalResidueException {
-      wrappedState.setWeight(res, weight);
     }
     
     public Alphabet alphabet() {
       return wrappedState.alphabet();
     }
     
+    public EmissionStateProxy(EmissionState wrappedState, MarkovModel sourceModel, String name) {
+      super(name.charAt(0), name, Annotation.EMPTY_ANNOTATION);
+      this.wrappedState = wrappedState;
+      this.sourceModel = sourceModel;
+    }
+  }
+  
+  private static class DotStateWrapper extends DotState implements StateWrapper {
+    private final State wrappedState;
+    private final ModelInState modelState;
+    
+    public State getWrappedState() {
+      return wrappedState;
+    }
+    
+    public ModelInState getModelState() {
+      return modelState;
+    }
+
+    public DotStateWrapper(State wrappedState, ModelInState modelState, String name)
+    throws IllegalArgumentException {
+      super(name);
+      if(
+        wrappedState instanceof EmissionState ||
+        wrappedState instanceof ModelInState
+      ) {
+        throw new IllegalArgumentException(
+          "DotStateWrapper must wrap a silent state, not " + wrappedState
+        );
+      }
+      this.wrappedState = wrappedState;
+      this.modelState = modelState;
+    }
+  }
+
+  private static class SimpleStateWrapper extends SimpleResidue implements StateWrapper {
+    private final State wrappedState;
+    private final ModelInState modelState;
+    
+    public State getWrappedState() {
+      return wrappedState;
+    }
+    
+    public ModelInState getModelState() {
+      return modelState;
+    }
+
+    public SimpleStateWrapper(State wrappedState, ModelInState modelState) {
+      super(modelState.getSymbol(), modelState.getName() + "-" + wrappedState.getName(), null);
+      this.wrappedState = wrappedState;
+      this.modelState = modelState;
+    }
+  }
+  
+  private static class SimpleEmissionStateWrapper extends SimpleStateWrapper implements EmissionStateWrapper {
+    public Residue sampleResidue() {
+      return ((EmissionState) getWrappedState()).sampleResidue();
+    }
+    
+    public double getWeight(Residue res)
+    throws IllegalResidueException {
+      return ((EmissionState) getWrappedState()).getWeight(res);
+    }
+    
+    public void setWeight(Residue res, double weight)
+    throws IllegalResidueException {
+      ((EmissionState) getWrappedState()).setWeight(res, weight);
+    }
+    
+    public Alphabet alphabet() {
+      return ((EmissionState) getWrappedState()).alphabet();
+    }
+    
     public void registerWithTrainer(ModelTrainer modelTrainer) {
-      System.out.println("registering wrapper " + this.getName());
-      wrappedState.registerWithTrainer(modelTrainer);
-      for(Iterator i = modelTrainer.trainersForState(wrappedState).iterator(); i.hasNext();) {
+      ((EmissionState) getWrappedState()).registerWithTrainer(modelTrainer);
+      for(
+        Iterator i = modelTrainer.trainersForState(
+          ((EmissionState) getWrappedState())
+        ).iterator();
+        i.hasNext();
+      ) {
         StateTrainer st = (StateTrainer) i.next();
         modelTrainer.registerTrainerForState(this, st);
       }
     }
     
-      public int[] getAdvance() {
-	  return wrappedState.getAdvance();
-      }
+    public int[] getAdvance() {
+      return ((EmissionState) getWrappedState()).getAdvance();
+    }
 
-    public SimpleStateWrapper(EmissionState wrappedState, ModelInState modelInState) {
-      super(modelInState.getSymbol(), modelInState.getName() + "-" + wrappedState.getName(), null);
-      this.wrappedState = wrappedState;
-      this.modelInState = modelInState;
+    public SimpleEmissionStateWrapper(EmissionState wrappedState, ModelInState modelState) {
+      super(wrappedState, modelState);
     }
   }
 }

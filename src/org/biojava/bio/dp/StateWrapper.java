@@ -26,14 +26,14 @@ package org.biojava.bio.dp;
  * A state that wraps up another state within a model so that it can appear in
  * another model.
  */
-public interface StateWrapper extends EmissionState {
+public interface StateWrapper extends State {
   /**
    * The state that is wrapped up.
    */
-  EmissionState getWrappedState();
+  State getWrappedState();
   /**
-   * The state that conained the model that contained this state
+   * The state that contained the model.
    */
-  ModelInState getContainingState();
+  ModelInState getModelState();
 }
 

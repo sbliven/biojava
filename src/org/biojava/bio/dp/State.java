@@ -27,14 +27,7 @@ import org.biojava.bio.seq.*;
 /**
  * A state in a markov process.
  * <P>
- * This signals that this object can sit inside a model. It also assures that
- * it can be picked up by a ModelTrainer instance.
+ * This signals that this object can sit inside a model.
  */
 public interface State extends Residue {
-  /**
-   * Return a StateTrainer for this particular State implementation.
-   *
-   * @return a StateTrainer
-   */
-  public void registerWithTrainer(ModelTrainer mt);
 }

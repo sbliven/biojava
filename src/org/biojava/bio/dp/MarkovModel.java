@@ -30,23 +30,40 @@ import org.biojava.bio.seq.*;
  * <P>
  * All probablities are in log space.
  * <P>
- * This interface models a subset of hidden markov models with explicit start
- * and end states. In principle, these can be combined together, so that a state
+ * This interface models a subset of hidden markov models with an explicit start
+ * and end state. In principle, these can be combined together, so that a state
  * within one model may be an entire model in its own right, wired via
  * container->start and end->container. For the sample methods to work, the log
  * scores must be probabilities (sum to 1).
  */
 public interface MarkovModel {
   /**
-   * Alphabet of the query sequences.
+   * Alphabet that is emitted by the emission states.
    */
-  Alphabet queryAlphabet();
+  Alphabet emissionAlphabet();
 
   /**
-   * Alphabet of the states. DP.MAGICAL_STATE is always contained within this.
+   * Alphabet of the states.
+   * <P>The MagicalState returned by getMagicalState is always contained
+   * within this as the start/end state.
    */
   Alphabet stateAlphabet();
-
+  
+  /**
+   * The MagicalState for this model.
+   */
+  MagicalState magicalState();
+  
+  /**
+   * The number of heads on this model.
+   * <P>
+   * Each head consumes a single ResidueList. A single-head model just consumes/
+   * emits a single sequence. A two-head model performs alignment between two
+   * sequences (e.g. smith-waterman). Models with more heads do more interesting
+   * things.
+   */
+  int heads();
+  
   /**
    * Probability of the transition between from and to.
    *
@@ -136,6 +153,35 @@ public interface MarkovModel {
    * @return  a List of State objects
    */
   Set transitionsTo(State to) throws IllegalResidueException;
+  
+  /**
+   * Adds a state to the model.
+   *
+   * @param newState  the state to add
+   * @throws UnsupportedOperationException if this MarkovModel doesn't allow
+   *         states to be added
+   * @throws IllegalResidueException if the state is not valid or is a MagicalState
+   */
+  void addState(State newState)
+  throws UnsupportedOperationException, IllegalResidueException;
+
+  /**
+   * Remove a state from the model.
+   * <P>
+   * States should not be removed untill they are involved in no transitions.
+   * This is to avoid producing corrupted models by accident.
+   *
+   * @param toGo  the state to remove
+   * @throws UnsupportedOperationException if the MarkovModel doesn't allow
+   *         states to be removed
+   * @throws IllegalResidueException if the residue is not part of this model
+   *         or a MagicalState
+   * @throws IllegalTransitionException if the state is currently involved in
+   *         any transitions
+   */
+  void removeState(State toGo)
+  throws UnsupportedOperationException, IllegalTransitionException,
+  IllegalResidueException;
   
   /**
    * Register this model with a trainer.

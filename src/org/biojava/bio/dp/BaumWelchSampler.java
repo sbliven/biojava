@@ -58,7 +58,7 @@ public class BaumWelchSampler extends AbstractTrainer {
       double [] bCol = bm[i];
       double p = Math.random();
       for (int s = 0; s < states.length; s++) {
-        if (states[s] != DP.MAGICAL_STATE) {
+        if (! (states[s] instanceof MagicalState)) {
           p -= Math.exp(fCol[s] + bCol[s] - fs);
           if (p <= 0.0) {
             trainer.addStateCount(states[s], res, 1.0);
@@ -71,7 +71,7 @@ public class BaumWelchSampler extends AbstractTrainer {
     // transition trainer
     for (int i = 0; i <= seq.length(); i++) {
       Residue res = (i < seq.length()) ? seq.residueAt(i + 1) :
-                    DP.MAGICAL_RESIDUE;
+                    MagicalState.MAGICAL_RESIDUE;
       double [] fCol = fm[i];
       double [] bCol = bm[i + 1];
       for (int s = 0; s < states.length; s++) {

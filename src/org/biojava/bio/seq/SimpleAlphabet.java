@@ -84,6 +84,14 @@ public class SimpleAlphabet extends AbstractAlphabet {
       throw new IllegalResidueException("You can not add null as a residue");
     residues.add(r);
   }
+  
+  public void removeResidue(Residue r)
+  throws IllegalResidueException {
+    if(r == null) {
+      throw new IllegalResidueException("You can not add null as a residue");
+    }
+    residues.remove(r);
+  }
 
   public void validate(Residue r) throws IllegalResidueException {
     if(!contains(r)) {

@@ -35,13 +35,28 @@ package org.biojava.bio.seq;
  * @author Matthew Pocock
  */
 public class IllegalResidueException extends Exception {
+  private final Residue res;
+  
   /**
-   * Just make the exception.
+   * Retrieve the residue that caused this exception, or null.
    */
-  public IllegalResidueException() { super(); }
+  public Residue getResidue() {
+    return res;
+  }
   
   /**
    * Make the exception with a message.
    */
-  public IllegalResidueException(String message) { super(message); }
+  public IllegalResidueException(String message) {
+    super(message);
+    this.res = null;
+  }
+  
+  /**
+   * Make the exception with a message and a residue.
+   */
+  public IllegalResidueException(Residue res, String message) {
+    super(message);
+    this.res = res;
+  }
 }

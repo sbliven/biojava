@@ -27,12 +27,13 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
 public class SimpleMarkovModel implements MarkovModel {
-  private Alphabet queryAlpha;
-  private Alphabet stateAlpha;
+  private final Alphabet emissionAlpha;
+  private final Alphabet stateAlpha;
+  private final MagicalState magicalState;
 
-  private Map transFrom;
-  private Map transTo;
-  private Map transitionScores;
+  private final Map transFrom;
+  private final Map transTo;
+  private final Map transitionScores;
 
   private Transition _tran = new Transition(null, null);
   
@@ -42,8 +43,10 @@ public class SimpleMarkovModel implements MarkovModel {
     transitionScores = new HashMap();
   }
 
-  public Alphabet queryAlphabet() { return queryAlpha; }
+  public Alphabet emissionAlphabet() { return emissionAlpha; }
   public Alphabet stateAlphabet() { return stateAlpha; }
+  public int heads() { return magicalState().getAdvance().length; }
+  public MagicalState magicalState() { return magicalState; }
 
   public double getTransitionScore(State from, State to)
   throws IllegalResidueException, IllegalTransitionException {
@@ -162,21 +165,64 @@ public class SimpleMarkovModel implements MarkovModel {
     return s;
   }
 
-  public SimpleMarkovModel(Alphabet queryAlpha, Alphabet stateAlpha)
-  throws SeqException {
-    this.queryAlpha = queryAlpha;
-    this.stateAlpha = stateAlpha;
-
-    // FIXME?  Thomas Down added quick hack for PairwiseDP.
-
-    if(!stateAlpha.contains(DP.MAGICAL_STATE) && !stateAlpha.contains(PairwiseDP.MAGICAL_STATE))
-      throw new SeqException("Use new SimpleMarkovModel(queryAlpha, stateAlpha). " +
-                             "stateAlpha did not contain DP.MAGICAL_STATE.");
-    for(Iterator i = stateAlpha.residues().iterator(); i.hasNext(); ) {
-      Object o = i.next();
-      transFrom.put(o, new HashSet());
-      transTo.put(o, new HashSet());
+  public void addState(State toAdd) throws IllegalResidueException {
+    if(toAdd instanceof MagicalState) {
+      throw new IllegalResidueException("Can not add a MagicalState");
     }
+    
+    if(stateAlphabet().contains(toAdd)) {
+      throw new IllegalResidueException("We already contain " + toAdd.getName());
+    }
+    
+    ((SimpleAlphabet) stateAlphabet()).addResidue(toAdd);
+    transFrom.put(toAdd, new HashSet());
+    transTo.put(toAdd, new HashSet());
+  }
+  
+  public void removeState(State toGo)
+  throws IllegalResidueException, IllegalTransitionException {
+    stateAlphabet().validate(toGo);
+    if(toGo instanceof MagicalState) {
+      throw new IllegalResidueException("You can not remove the MagicalState");
+    }
+    Set t;
+    if(!(t = transitionsFrom(toGo)).isEmpty()) {
+      throw new IllegalTransitionException(
+        toGo, (State) t.iterator().next(),
+        "You can not remove a state untill all transitions to and from it " +
+        "have been destroyed"
+      );
+    }
+
+    if(!(t = transitionsTo(toGo)).isEmpty()) {
+      throw new IllegalTransitionException(
+        (State) t.iterator().next(), toGo,
+        "You can not remove a state untill all transitions to and from it " +
+        "have been destroyed"
+      );
+    }
+
+    ((SimpleAlphabet) stateAlphabet()).removeResidue(toGo);
+    transFrom.remove(toGo);
+    transTo.remove(toGo);
+  }
+
+  public SimpleMarkovModel(int heads, Alphabet emissionAlpha) {
+    this.emissionAlpha = emissionAlpha;
+    this.stateAlpha = new SimpleAlphabet();
+    this.magicalState = MagicalState.getMagicalState(heads);
+    
+    try {
+      ((SimpleAlphabet) stateAlpha).addResidue(magicalState);
+    } catch (IllegalResidueException ire) {
+      throw new BioError(
+        ire,
+        "Alphabet went screwey on me & wouldn't accept the magical residue"
+      );
+    }
+
+    transFrom.put(magicalState, new HashSet());
+    transTo.put(magicalState, new HashSet());
   }
 
   public void registerWithTrainer(ModelTrainer modelTrainer) {
@@ -190,7 +236,9 @@ public class SimpleMarkovModel implements MarkovModel {
       }
       for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext(); ) {
         State s = (State) i.next();
-        s.registerWithTrainer(modelTrainer);
+        if(s instanceof EmissionState) {
+          ((EmissionState) s).registerWithTrainer(modelTrainer);
+        }
         try {
           for(Iterator j = transitionsFrom(s).iterator(); j.hasNext(); ) {
             State t = (State) j.next();

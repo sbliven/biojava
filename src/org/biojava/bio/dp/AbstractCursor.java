@@ -40,18 +40,18 @@ abstract public class AbstractCursor implements DPCursor {
   }
   
   public boolean canAdvance() {
-    return resIterator.hasNext() || currentRes != DP.MAGICAL_RESIDUE;
+    return resIterator.hasNext() || currentRes != MagicalState.MAGICAL_RESIDUE;
   }
   
   public void advance() {
     lastRes = currentRes;
     currentRes = (resIterator.hasNext()) ? (Residue) resIterator.next()
-                                         : DP.MAGICAL_RESIDUE;
+                                         : MagicalState.MAGICAL_RESIDUE;
   }
   
   public AbstractCursor(Iterator resIterator) {
     this.resIterator = resIterator;
-    this.currentRes = DP.MAGICAL_RESIDUE;
-    this.lastRes = DP.MAGICAL_RESIDUE;
+    this.currentRes = MagicalState.MAGICAL_RESIDUE;
+    this.lastRes = MagicalState.MAGICAL_RESIDUE;
   }
 }

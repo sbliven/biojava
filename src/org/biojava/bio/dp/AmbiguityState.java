@@ -43,14 +43,14 @@ public class AmbiguityState extends AbstractState {
   }
   
   public double getWeight(Residue r) throws IllegalResidueException {
-    if(r == DP.MAGICAL_RESIDUE)
+    if(r instanceof MagicalState)
       return Double.NEGATIVE_INFINITY;
     alphabet().validate(r);
     return score[calcIndex(r)];
   }
 
   public void setWeight(Residue r, double score) throws IllegalResidueException {
-    if(r == DP.MAGICAL_RESIDUE)
+    if(r instanceof MagicalState)
       return;
     alphabet().validate(r);
     this.score[calcIndex(r)] = score;
@@ -91,7 +91,7 @@ public class AmbiguityState extends AbstractState {
     double c [] =  new double[4];
       
     public void addCount(Residue res, double counts) throws IllegalResidueException {
-      if(res == DP.MAGICAL_RESIDUE)
+      if(res instanceof MagicalState)
         return;
         
       ResidueList resList = DNATools.forAmbiguity(res);

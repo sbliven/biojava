@@ -71,7 +71,13 @@ public class SimpleResidueList implements ResidueList {
     residues.add(res);
   }
 
-  public Residue residueAt(int index) {
+  public Residue residueAt(int index)
+  throws IndexOutOfBoundsException {
+    if(index < 1 || index > length()) {
+      throw new IndexOutOfBoundsException(
+        "Index must be within (1 .. " + length() + "): " + index
+      );
+    }
     return (Residue) residues.get(index-1);
   }
 

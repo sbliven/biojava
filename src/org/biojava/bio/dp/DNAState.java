@@ -42,7 +42,7 @@ public class DNAState extends AbstractState {
 
   public double getWeight(Residue r)
   throws IllegalResidueException {
-    if(r == DP.MAGICAL_RESIDUE)
+    if(r instanceof MagicalState)
       return Double.NEGATIVE_INFINITY;
     alphabet().validate(r);
     return scores[DNATools.index(r)];
@@ -50,7 +50,7 @@ public class DNAState extends AbstractState {
 
   public void setWeight(Residue r, double score)
   throws IllegalResidueException {
-    if(r == DP.MAGICAL_RESIDUE)
+    if(r instanceof MagicalState)
       return;
     alphabet().validate(r);
     scores[DNATools.index(r)] = score;
@@ -67,22 +67,24 @@ public class DNAState extends AbstractState {
     }
   }
   
-    public int[] getAdvance() {
-	return advance;
-    }
+  public int[] getAdvance() {
+    return advance;
+  }
 
   private class DNAStateTrainer implements StateTrainer {
     double c [] = new double[4];
       
-    public void addCount(Residue res, double counts) throws IllegalResidueException {
-      if(res == DP.MAGICAL_RESIDUE)
+    public void addCount(Residue res, double counts)
+    throws IllegalResidueException {
+      if(res instanceof MagicalState)
         return;
       // System.out.println("Added count " + name() + " -> " + res.getSymbol() + " = "
       //                    + counts + ", " + c[DNATools.index(res)]);
       c[DNATools.index(res)] += counts;
     }
       
-    public void train(EmissionState nullModel, double weight) throws IllegalResidueException {
+    public void train(EmissionState nullModel, double weight)
+    throws IllegalResidueException {
       double sum = 0.0;
       for(int i = 0; i < c.length; i++) {
         Residue r = DNATools.forIndex(i);

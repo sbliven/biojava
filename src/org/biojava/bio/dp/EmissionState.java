@@ -28,7 +28,8 @@ import org.biojava.bio.seq.*;
  * A state in a markov process that has an emission spectrum.
  * <P>
  * These states emit residues with a probability distribution over an alphabet.
- * They are the states that actualy make your observed sequence.
+ * They are the states that actualy make your observed sequence. They also must supply
+ * training behaviour to set the emission spectrum up.
  */
 public interface EmissionState extends State {
   /**
@@ -63,7 +64,7 @@ public interface EmissionState extends State {
    *
    * @return the residue sampled
    */
-  public Residue sampleResidue() throws SeqException;
+  public Residue sampleResidue();
 
     /**
      * Determine the number of residues this state advances along
@@ -83,4 +84,12 @@ public interface EmissionState extends State {
      */
 
     public int[] getAdvance();
+    
+  /**
+   * Return a StateTrainer for this particular State implementation.
+   *
+   * @return a StateTrainer
+   */
+  public void registerWithTrainer(ModelTrainer mt);
+
 }

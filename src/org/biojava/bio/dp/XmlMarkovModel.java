@@ -70,23 +70,26 @@ public class XmlMarkovModel {
   }
   
   public static MarkovModel readModel(Element root)
-  throws SeqException, IllegalResidueException {
-    if(root.getTagName().equals("WeightMatrix"))
+  throws SeqException, IllegalResidueException, IllegalAlphabetException {
+    if(root.getTagName().equals("WeightMatrix")) {
       return new WMAsMM(readMatrix(root));
-      
+    }
+    
+    int heads = Integer.parseInt(root.getAttribute("heads"));
     Element alphaE = (Element) root.getElementsByTagName("alphabet").item(0);
     Alphabet seqAlpha = AlphabetManager.instance().alphabetForName(
-      alphaE.getAttribute("name"));
+      alphaE.getAttribute("name")
+    );
+    SimpleMarkovModel model = new SimpleMarkovModel(heads, seqAlpha);
+      
     ResidueParser symParser = seqAlpha.getParser("symbol");
     ResidueParser nameParser = seqAlpha.getParser("name");
     
-    SimpleAlphabet stateAlpha = new SimpleAlphabet();
-    stateAlpha.addResidue(DP.MAGICAL_STATE);
     Map nameToState = new HashMap();
-    nameToState.put("_start_", DP.MAGICAL_STATE);
-    nameToState.put("_end_", DP.MAGICAL_STATE);
-    nameToState.put("_START_", DP.MAGICAL_STATE);
-    nameToState.put("_END_", DP.MAGICAL_STATE);
+    nameToState.put("_start_", model.magicalState());
+    nameToState.put("_end_", model.magicalState());
+    nameToState.put("_START_", model.magicalState());
+    nameToState.put("_END_", model.magicalState());
     NodeList states = root.getElementsByTagName("state");
     for(int i = 0; i < states.getLength(); i++) {
       Element stateE = (Element) states.item(i);
@@ -105,9 +108,9 @@ public class XmlMarkovModel {
           res = symParser.parseToken(resName);
         state.setWeight(res, Math.log(Double.parseDouble(weightE.getAttribute("prob"))));
       }
-      stateAlpha.addResidue(state);
+      model.addState(state);
     }
-    SimpleMarkovModel model = new SimpleMarkovModel(seqAlpha, stateAlpha);
+
     NodeList transitions = root.getElementsByTagName("transition");
     for(int i = 0; i < transitions.getLength(); i++) {
       Element transitionE = (Element) transitions.item(i);
@@ -145,17 +148,18 @@ public class XmlMarkovModel {
   
   public static void writeModel(FlatModel model, PrintStream out) throws Exception {
     Alphabet stateA = model.stateAlphabet();
-    Alphabet resA = model.queryAlphabet();
+    Alphabet resA = model.emissionAlphabet();
     ResidueList stateR = stateA.residues();
     List stateL = stateR.toList();
     ResidueList resR = resA.residues();
     
-    out.println("<MarkovModel>\n  <alphabet name=\"" + resA.getName() + "\"/>");
+    out.println("<MarkovModel heads=\"" + model.heads() + "\">");
+    out.println("<alphabet name=\"" + resA.getName() + "\"/>");
     
     // print out states & scores
     for(Iterator stateI = stateL.iterator(); stateI.hasNext(); ) {
       EmissionState es = (EmissionState) stateI.next();
-      if(es != DP.MAGICAL_STATE) {
+      if(! (es instanceof MagicalState)) {
         out.println("  <state name=\"" + es.getName() + "\">");
         for(Iterator resI = resR.iterator(); resI.hasNext(); ) {
           Residue r = (Residue) resI.next();
@@ -179,8 +183,8 @@ public class XmlMarkovModel {
     for(Iterator i = model.transitionsFrom(from).iterator(); i.hasNext(); ) {
       State to = (State) i.next();
       try {
-      out.println("  <transition from=\"" + ((from == DP.MAGICAL_STATE) ? "_start_" : from.getName()) +
-                             "\" to=\"" + ((to == DP.MAGICAL_STATE) ? "_end_" : to.getName()) +
+      out.println("  <transition from=\"" + ((from instanceof MagicalState) ? "_start_" : from.getName()) +
+                             "\" to=\"" + ((to instanceof MagicalState) ? "_end_" : to.getName()) +
                              "\" prob=\"" + Math.exp(model.getTransitionScore(from, to)) + "\"/>");
       } catch (IllegalTransitionException ite) {
         throw new BioError(ite, "Transition listed in transitionsFrom(" +

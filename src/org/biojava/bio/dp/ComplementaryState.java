@@ -58,11 +58,11 @@ public class ComplementaryState implements EmissionState {
     return other.getName() + "'";
   }
   
-  public Residue sampleResidue() throws SeqException {
+  public Residue sampleResidue() {
     try {
       return DNATools.complement(other.sampleResidue());
     } catch (IllegalResidueException ire) {
-      throw new SeqException(ire, "Unable to reverse-complement sample");
+      throw new BioError(ire, "Unable to reverse-complement sample. This is screwey!");
     }
   }
   

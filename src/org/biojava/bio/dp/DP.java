@@ -28,22 +28,6 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
 public class DP {
-  public static Residue MAGICAL_RESIDUE;
-  public static EmissionState MAGICAL_STATE;
-  public static Alphabet MAGICAL_ALPHABET;
-
-  static {
-    MAGICAL_RESIDUE = new SimpleResidue('!', "mMagical", null);
-    MAGICAL_STATE = new MagicalState('!', MAGICAL_RESIDUE);
-    MAGICAL_ALPHABET = new SimpleAlphabet();
-
-    try {
-      ((SimpleAlphabet) MAGICAL_ALPHABET).addResidue(MAGICAL_RESIDUE);
-      ((SimpleAlphabet) MAGICAL_ALPHABET).setName("Magical Alphabet");
-    } catch (IllegalResidueException ire) {
-    }
-  }
-
   public static EmissionState [] stateList(Alphabet alpha)
     throws IllegalResidueException {
     return (EmissionState [])
@@ -219,7 +203,7 @@ public class DP {
 
     // new_l = transition(start, l)
     for (int l = 0; l < states.length; l++) {
-      v[l] = (states[l] == DP.MAGICAL_STATE) ? 0.0 : Double.NEGATIVE_INFINITY;
+      v[l] = (states[l] == model.magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
   }
 
@@ -229,7 +213,7 @@ public class DP {
 
     // new_l = transition(start, l)
     for (int l = 0; l < states.length; l++) {
-      v[l] = (states[l] == DP.MAGICAL_STATE) ? 0.0 : Double.NEGATIVE_INFINITY;
+      v[l] = (states[l] == model.magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
   }
 
@@ -326,7 +310,7 @@ public class DP {
     double [] scores = dpCursor.currentCol();
 
     int l = 0;
-    while (states[l] != DP.MAGICAL_STATE)
+    while (states[l] != model.magicalState())
       l++;
 
     return scores[l];
@@ -337,7 +321,7 @@ public class DP {
     double [] scores = dpCursor.currentCol();
 
     int l = 0;
-    while (states[l] != DP.MAGICAL_STATE)
+    while (states[l] != model.magicalState())
       l++;
 
     return scores[l];
@@ -363,7 +347,7 @@ public class DP {
     // initialize
     for (int l = 0; l < stateCount; l++) {
       double [] v = dpCursor.currentCol();
-      v[l] = (states[l] == DP.MAGICAL_STATE) ? 0.0 : Double.NEGATIVE_INFINITY;
+      v[l] = (states[l] == model.magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
 
@@ -410,7 +394,7 @@ public class DP {
     BackPointer best = null;
     double bestScore = 0.0;
     for (int l = 0; l < stateCount; l++) {
-      if (states[l] == DP.MAGICAL_STATE) {
+      if (states[l] == model.magicalState()) {
         best = oldPointers[l].back;
         bestScore = dpCursor.currentCol()[l];
         break;
@@ -454,7 +438,7 @@ public class DP {
   public StatePath generate(int length)
   throws IllegalResidueException, SeqException {
     List scoreList = new ArrayList();
-    SimpleResidueList tokens = new SimpleResidueList(model.queryAlphabet());
+    SimpleResidueList tokens = new SimpleResidueList(model.emissionAlphabet());
     SimpleResidueList states = new SimpleResidueList(model.stateAlphabet());
 
     double totScore = 0.0;
@@ -463,9 +447,9 @@ public class DP {
     State oldState;
     Residue token;
 
-    oldState = model.sampleTransition(DP.MAGICAL_STATE);
+    oldState = model.sampleTransition(model.magicalState());
     try {
-      resScore += model.getTransitionScore(DP.MAGICAL_STATE, oldState);
+      resScore += model.getTransitionScore(model.magicalState(), oldState);
     } catch (IllegalTransitionException ite) {
       throw new BioError(ite,
         "Transition returned from sampleTransition is invalid");
@@ -486,7 +470,7 @@ public class DP {
       State newState;
       do {
         newState = model.sampleTransition(oldState);
-      } while (newState == DP.MAGICAL_STATE && i > 0);
+      } while (newState == model.magicalState() && i > 0);
       try {
         resScore += model.getTransitionScore(oldState, newState);
       } catch (IllegalTransitionException ite) {
@@ -494,8 +478,9 @@ public class DP {
           "Transition returned from sampleTransition is invalid");
       }
 
-      if (newState == DP.MAGICAL_STATE)
+      if (newState == model.magicalState()) {
         break;
+      }
 
       if (newState instanceof EmissionState) {
         EmissionState eState = (EmissionState) newState;
@@ -542,57 +527,6 @@ public class DP {
       score += matrix.getWeight(resList.residueAt(c + 1), c);
 
     return score;
-  }
-
-  private static class MagicalState implements EmissionState {
-    private char c;
-    private Residue r;
-      private int[] advance = {1};
-
-    public MagicalState(char c, Residue r) {
-      this.c = c;
-      this.r = r;
-    }
-
-    public char getSymbol() {
-      return c;
-    }
-
-    public String getName() {
-      return c + "";
-    }
-
-    public Annotation getAnnotation() {
-      return Annotation.EMPTY_ANNOTATION;
-    }
-
-    public Alphabet alphabet() {
-      return MAGICAL_ALPHABET;
-    }
-
-    public double getWeight(Residue r) throws IllegalResidueException {
-      if (r != this.r)
-        return Double.NEGATIVE_INFINITY;
-      return 0;
-    }
-
-    public void setWeight(Residue r, double w) throws IllegalResidueException,
-    UnsupportedOperationException {
-      alphabet().validate(r);
-      throw new UnsupportedOperationException(
-        "The weights are immutable: " + r.getName() + " -> " + w);
-    }
-
-    public Residue sampleResidue() {
-      return r;
-    }
-
-    public void registerWithTrainer(ModelTrainer modelTrainer) {
-    }
-
-      public int[] getAdvance() {
-	  return advance;
-      }
   }
 
   private static class BackPointer {

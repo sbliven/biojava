@@ -32,13 +32,22 @@ public class WMAsMM implements MarkovModel {
   private WeightMatrix wm;
   private Alphabet stateAlpha;
   private WMState [] stateList;
+  private MagicalState magicalState;
   
-  public Alphabet queryAlphabet() {
+  public Alphabet emissionAlphabet() {
     return wm.alphabet();
   }
   
   public Alphabet stateAlphabet() {
     return stateAlpha;
+  }
+  
+  public int heads() {
+    return 1;
+  }
+  
+  public MagicalState magicalState() {
+    return magicalState;
   }
   
   public double getTransitionScore(State from, State to)
@@ -61,11 +70,11 @@ public class WMAsMM implements MarkovModel {
     Alphabet sAlpha = stateAlphabet();
     sAlpha.validate(from);
     
-    if(from == DP.MAGICAL_STATE)
+    if(from == magicalState)
       return stateList[0];
       
     if(from == stateList[wm.columns()-1])
-      return DP.MAGICAL_STATE;
+      return magicalState;
 
     WMState fromWM = (WMState) from;
     return stateList[fromWM.index()+1];
@@ -76,12 +85,12 @@ public class WMAsMM implements MarkovModel {
     Alphabet sAlpha = stateAlphabet();
     sAlpha.validate(from);
 
-    if(from == DP.MAGICAL_STATE)
+    if(from == magicalState)
       return Collections.singleton(stateList[0]);
       
     if(from == stateList[wm.columns()-1])
-      return Collections.singleton(DP.MAGICAL_STATE);
-
+      return Collections.singleton(magicalState);
+    
     WMState fromWM = (WMState) from;
     return Collections.singleton(stateList[fromWM.index()+1]);
   }
@@ -91,11 +100,11 @@ public class WMAsMM implements MarkovModel {
     Alphabet sAlpha = stateAlphabet();
     sAlpha.validate(to);
 
-    if(to == DP.MAGICAL_STATE)
+    if(to == magicalState)
       return Collections.singleton(stateList[wm.columns()-1]);
       
     if(to == stateList[0])
-      return Collections.singleton(DP.MAGICAL_STATE);
+      return Collections.singleton(magicalState);
 
     WMState toWM = (WMState) to;
     return Collections.singleton(stateList[toWM.index()-1]);
@@ -120,17 +129,36 @@ public class WMAsMM implements MarkovModel {
       "destroyTransition not supported by " + getClass());
   }
   
+  public void addState(State toAdd)
+  throws IllegalResidueException, UnsupportedOperationException {
+    if(stateAlphabet().contains(toAdd)) {
+      throw new IllegalResidueException(
+        toAdd, 
+        "Can't add a state to a model that already contains it"
+      );
+    }
+    
+    throw new UnsupportedOperationException("addState not supported by " + getClass());
+  }
+  
+  public void removeState(State toAdd)
+  throws IllegalResidueException, UnsupportedOperationException {
+    stateAlphabet().validate(toAdd);
+    
+    throw new UnsupportedOperationException("removeState not supported by " + getClass());
+  }
+
   public boolean containsTransition(State from, State to)
   throws IllegalResidueException {
     Alphabet sAlpha = stateAlphabet();
     sAlpha.validate(from);
     sAlpha.validate(to);
     
-    if((from == DP.MAGICAL_STATE) &&
+    if((from == magicalState) &&
        (to == stateList[0]))
        return true;
     if((from == stateList[wm.columns()-1]) &&
-       (to == DP.MAGICAL_STATE))
+       (to == magicalState))
        return true;
 
     WMState fromWM = (WMState) from;
@@ -146,7 +174,7 @@ public class WMAsMM implements MarkovModel {
     this.wm = wm;
     stateList = new WMState[wm.columns()];
     SimpleAlphabet sa = new SimpleAlphabet();
-    sa.addResidue(DP.MAGICAL_STATE);
+    sa.addResidue(magicalState);
     for(int i = 0; i < wm.columns(); i++) {
       stateList[i] = new WMState(i);
       sa.addResidue(stateList[i]);
@@ -181,12 +209,12 @@ public class WMAsMM implements MarkovModel {
       }
     }
     
-      public int[] getAdvance() {
-	return advance;
-      }
+    public int[] getAdvance() {
+      return advance;
+    }
       
     public WMState(int index) {
-      super(queryAlphabet());
+      super(emissionAlphabet());
       this.index = index;
     }
   }
