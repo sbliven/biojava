@@ -58,8 +58,8 @@ public class TypedProperties extends Properties {
    * (see java.lang.Class.getResourceAsStream() and
    * java.lang.ClassLoader.getSystemResourceAsStream()).
    *
-   * @see java.lang.Class.getResourceAsStream
-   * @see java.lang.ClassLoader.getSystemResourceAsStream
+   * @see java.lang.Class
+   * @see java.lang.ClassLoader
    *
    * @param clazz the class with which the resource identified by resourceName
    *               is taken to be associated with

@@ -60,7 +60,6 @@ public interface Count extends Changeable {
    * Return the counts for a given Symbol.
    *
    * @param s the Symbol
-   * @return  
    * @throws IllegalSymbolException if s is not from this Count's alphabet
    */
   double getCount(AtomicSymbol s) throws IllegalSymbolException;

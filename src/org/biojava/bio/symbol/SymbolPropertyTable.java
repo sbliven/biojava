@@ -9,7 +9,6 @@ package org.biojava.bio.symbol;
 /**
  *
  * @author  mjones
- * @version 
  */
 public interface SymbolPropertyTable {
   
