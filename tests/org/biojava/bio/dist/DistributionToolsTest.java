@@ -19,6 +19,8 @@ public class DistributionToolsTest extends TestCase {
 
   private Alignment a;
   private Distribution random;
+  private String[] sa;
+  private Map map;
 
   public DistributionToolsTest(String name) {
     super(name);
@@ -26,10 +28,12 @@ public class DistributionToolsTest extends TestCase {
 
   protected void setUp() {
     try{
-      String[] sa = {"CATTGGG","AATTGGC","AATTGGG","AATTGGC","AATTGGG","AATTGGC",
-        "AATTGGG","AATTGGC","AATTGGG","AATTGGC"};
+      sa = new String[]{"CA-TGGG","AATTGGC","AATTGGG",
+                        "AATTGGC","AA-TGGG","AATTGGC",
+                        "AATTGGG","AATTGGC","AATTGGG",
+                        "AATTGGC"};
 
-      Map map = new HashMap(sa.length);
+      map = new HashMap(sa.length);
       for (int i = 0; i < sa.length; i++) {
          map.put(new Integer(i), DNATools.createDNA(sa[i]));
       }
@@ -44,26 +48,40 @@ public class DistributionToolsTest extends TestCase {
     }
   }
 
+  protected void tearDown(){
+    sa = null;
+    map = null;
+    a = null;
+    random = null;
+  }
+
 
   public void testDistOverAlignment() {
     try{
       Distribution[] d = DistributionTools.distOverAlignment(a,false);
       Distribution[] d2 = DistributionTools.distOverAlignment(a,false,10.0);
-      Distribution[] d3 = DistributionTools.distOverAlignment(a,true,10.0);
+      Distribution[] d3 = DistributionTools.distOverAlignment(a,true);
 
       assertTrue(d[0].getWeight(DNATools.a()) == 0.9);
       assertTrue(d[0].getWeight(DNATools.c()) == 0.1);
       assertTrue(d[0].getWeight(DNATools.g()) == 0.0);
       assertTrue(d[0].getWeight(DNATools.t()) == 0.0);
+      assertTrue(d[0].getWeight(AlphabetManager.getGapSymbol()) == 0.0);
 
       assertTrue(d2[1].getWeight(DNATools.a()) == 0.625);
       assertTrue(d2[1].getWeight(DNATools.c()) == 0.125);
       assertTrue(d2[1].getWeight(DNATools.g()) == 0.125);
       assertTrue(d2[1].getWeight(DNATools.t()) == 0.125);
+      assertTrue(d2[1].getWeight(AlphabetManager.getGapSymbol()) == 0.0);
 
-      for (int i = 0; i < d2.length; i++) {
-        assertTrue(DistributionTools.areEmissionSpectraEqual(d2[i],d3[i]));
-      }
+      assertEquals( 0.0 , d3[2].getWeight(DNATools.a()) ,0.000001);
+      assertEquals( 0.0 , d3[2].getWeight(DNATools.c()) ,0.000001);
+      assertEquals( 0.0 , d3[2].getWeight(DNATools.g()) ,0.000001);
+      assertEquals( 0.8 , d3[2].getWeight(DNATools.t()), 0.000001);
+      assertEquals( 0.2 , d3[2].getWeight(AlphabetManager.getGapSymbol()),
+                    0.000001);
+
+
     }catch(Exception e){
       e.printStackTrace();
     }

@@ -60,6 +60,7 @@ import org.biojava.bio.symbol.SimpleSymbolListFactory;
 import org.biojava.bio.symbol.PackedSymbolListFactory;
 import org.biojava.bio.seq.impl.SimpleSequenceFactory;
 import org.biojava.bio.seq.SequenceFactory;
+import java.util.*;
 
 
 /**
@@ -344,11 +345,12 @@ public final class DistributionTools {
                                                  int[] cols)
   throws IllegalAlphabetException {
         List seqs = a.getLabels();
-        FiniteAlphabet alpha = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(0))).getAlphabet();
+        FiniteAlphabet alpha =
+          (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(0))).getAlphabet();
         for(int i = 1; i < seqs.size();i++){
                 FiniteAlphabet test = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(i))).getAlphabet();
                 if(test != alpha){
-                        throw new IllegalAlphabetException("Cannot Calculate distOverAlignment() for alignments with"+
+                        throw new IllegalAlphabetException("Cannot Calculate jointDistOverAlignment() for alignments with"+
                         "mixed alphabets");
                 }
         }
@@ -358,7 +360,9 @@ public final class DistributionTools {
         }
         Distribution dist;
         DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
-        dist = DistributionFactory.DEFAULT.createDistribution(AlphabetManager.getCrossProductAlphabet(a_list));
+        dist =
+          DistributionFactory.DEFAULT.
+          createDistribution(AlphabetManager.getCrossProductAlphabet(a_list));
         dtc.setNullModelWeight(nullWeight);
     try{
 
@@ -392,8 +396,8 @@ public final class DistributionTools {
    * @throws IllegalAlphabetException if all sequences don't use the same alphabet
    * @param a the <code>Alignment </code>to build the <code>Distribution[]</code> over.
    * @param countGaps if true gaps will be included in the distributions
-   * (NOT YET IMPLEMENTED!!, CURRENTLY EITHER OPTION WILL PRODUCE THE SAME RESULT)
-   * @param nullWeight the number of pseudo counts to add to each distribution
+   * @param nullWeight the number of pseudo counts to add to each distribution,
+   * pseudo counts will not affect gaps, no gaps, no gap counts.
    * @return a <code>Distribution[]</code> where each member of the array is a
    * <code>Distribution </code>of the <code>Symbols </code>found at that position
    * of the <code>Alignment </code>.
@@ -418,8 +422,17 @@ public final class DistributionTools {
     Distribution[] pos = new Distribution[a.length()];
     DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
     dtc.setNullModelWeight(nullWeight);
+
+    double[] adjRatios = null;
+    if(countGaps){
+      adjRatios = new double[a.length()];
+    }
+
     try{
       for(int i = 0; i < a.length(); i++){// For each position
+        double gapCount = 0.0;
+        double totalCount = 0.0;
+
         pos[i] = DistributionFactory.DEFAULT.createDistribution(alpha);
         dtc.registerDistribution(pos[i]);
 
@@ -434,16 +447,33 @@ public final class DistributionTools {
             continue;
 
           Symbol gap = alpha.getGapSymbol();
-          if(countGaps == false &&
+          if(countGaps &&
              s.equals(gap)){
-            //do nothing, not counting gaps
+             gapCount++; totalCount++;
           }else{
             dtc.addCount(pos[i],s,1.0);// count the symbol
+            totalCount++;
           }
+        }
+
+        if(countGaps){
+          adjRatios[i] = 1.0 - (gapCount / totalCount);
         }
       }
 
       dtc.train();
+
+      if(countGaps){//need to adjust counts for gaps
+        for (int i = 0; i < adjRatios.length; i++) {
+          Distribution d = pos[i];
+          for (Iterator iter = ((FiniteAlphabet)d.getAlphabet()).iterator();
+                            iter.hasNext(); ) {
+            Symbol sym = (Symbol)iter.next();
+            d.setWeight(sym, (d.getWeight(sym) * adjRatios[i]));
+          }
+        }
+      }
+
     }catch(Exception e){
       e.printStackTrace(System.err);
     }

@@ -40,6 +40,7 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.*;
+import java.util.*;
 
 /**
  * An abstract implementation of Distribution.
@@ -250,9 +251,17 @@ public abstract class AbstractDistribution
       return getWeightImpl((AtomicSymbol) sym);
     } else {
       Alphabet ambA = sym.getMatches();
-      if(((FiniteAlphabet) ambA).size() == 0) {
+      if(((FiniteAlphabet) ambA).size() == 0) { // a gap
         getAlphabet().validate(sym);
-        return 0.0;
+
+        double totalWeight = 0.0;
+        for (Iterator i = ((FiniteAlphabet)getAlphabet()).iterator();
+                          i.hasNext(); ) {
+
+          Symbol s = (Symbol)i.next();
+          totalWeight += getWeight(s);
+        }
+        return 1.0 - totalWeight;
       }
       if(ambA instanceof FiniteAlphabet) {
         FiniteAlphabet fa = (FiniteAlphabet) ambA;
@@ -300,17 +309,18 @@ public abstract class AbstractDistribution
           return s;
         }
       }
+      return getAlphabet().getGapSymbol();
 
-      StringBuffer sb = new StringBuffer();
-      for(Iterator i = ((FiniteAlphabet) this.getAlphabet()).iterator(); i.hasNext(); ) {
-        AtomicSymbol s = (AtomicSymbol) i.next();
-        double w = getWeight(s);
-        sb.append("\t" + s.getName() + " -> " + w + "\n");
-      }
-      throw new BioError(
-        "Could not find a symbol to emit from alphabet " + getAlphabet() +
-        ". Do the probabilities sum to 1?" + "\np=" + p + "\n" + sb.substring(0)
-      );
+//      StringBuffer sb = new StringBuffer();
+//      for(Iterator i = ((FiniteAlphabet) this.getAlphabet()).iterator(); i.hasNext(); ) {
+//        AtomicSymbol s = (AtomicSymbol) i.next();
+//        double w = getWeight(s);
+//        sb.append("\t" + s.getName() + " -> " + w + "\n");
+//      }
+//      throw new BioError(
+//        "Could not find a symbol to emit from alphabet " + getAlphabet() +
+//        ". Do the probabilities sum to 1?" + "\np=" + p + "\n" + sb.substring(0)
+//      );
     } catch (IllegalSymbolException ire) {
       throw new BioError(
         "Unable to iterate over all symbols in alphabet - " +
