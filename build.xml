@@ -14,8 +14,10 @@
     compile
     compile-tests compiles JUnit tests
     compile-demos compiles the demo files
+    compile-apps  compiles the application files
     package       builds the biojava.jar file (default)
     package-demos builds the demos.jar file
+    package-apps  builds the apps.jar file
     runtests      runs all JUnit tests
     seqtests      runs sequence subset of JUnit tests
     symboltests   runs symbol subset of JUnit tests
@@ -44,7 +46,7 @@
 
     <property name="build.compiler" value="modern" />
 
-    <property name="classpath" value="xerces.jar:jakarta-regexp.jar:bytecode.jar:htmlparser.jar" />
+    <property name="classpath" value="xerces.jar:jakarta-regexp.jar:bytecode.jar:htmlparser.jar:commons-cli.jar" />
     <property name="docbook.tools.file" value="docbook.jar" />  
 
     <!-- Check the current system classpath for JUnit -->
@@ -80,12 +82,14 @@
     <property name="tests14.dir" value="./tests-1.4" />
     <property name="demos.dir" value="./demos" />
     <property name="demos14.dir" value="./demos-1.4" />
+    <property name="apps.dir" value="./apps" />
     <property name="docs.dir" value="./docs" />
     <property name="doc.css.file" value="biojava-doc.css" />
     <property name="reports.dir" value="./reports" />
     <property name="manifest.dir" value="./manifest" />
     <property name="manifest.file" value="defaultmanifest.txt" />
     <property name="demosmanifest.file" value="demosmanifest.txt" />
+    <property name="appsmanifest.file" value="appsmanifest.txt" />
     <property name="resources.dir" value="./resources" />
     <property name="taglets.dir" value="./taglets" />
 
@@ -101,6 +105,9 @@
     <!-- Subdirectories for demos source and classes -->
     <property name="build.src.demos" value="${build.dir}/src/demos" />
     <property name="build.dest.demos" value="${build.dir}/classes/demos" />
+    <!-- Subdirectories for apps source and classes -->
+    <property name="build.src.apps" value="${build.dir}/src/apps" />
+    <property name="build.dest.apps" value="${build.dir}/classes/apps" />
     <!-- Subdirectories for docs source -->
     <property name="build.src.docs" value="${build.dir}/src/docs" />
     <property name="build.dest.docs" value="${build.dir}/docs" />
@@ -133,6 +140,8 @@
     <mkdir dir="${reports.tests}" />
     <mkdir dir="${build.src.demos}" />
     <mkdir dir="${build.dest.demos}" />
+    <mkdir dir="${build.src.apps}" />
+    <mkdir dir="${build.dest.apps}" />
     <mkdir dir="${build.src.docs}" />
     <mkdir dir="${build.dest.docs}" />
     <mkdir dir="${build.dest.javadocs}" />
@@ -159,6 +168,13 @@
       </fileset>
     </copy>
 
+    <!-- Copies apps files -->
+    <copy todir="${build.src.apps}">
+      <fileset dir="${apps.dir}">
+        <exclude name="**/CVS/**" />
+      </fileset>
+    </copy>
+
     <!-- Copies docs files -->
     <copy todir="${build.src.docs}">
       <fileset dir="${docs.dir}">
@@ -177,6 +193,13 @@
     <copy todir="${build.src.demos}">
       <fileset dir="${manifest.dir}">
         <include name="${demosmanifest.file}" />
+      </fileset>
+    </copy>
+
+    <!-- Copies apps manifest -->
+    <copy todir="${build.src.apps}">
+      <fileset dir="${manifest.dir}">
+        <include name="${appsmanifest.file}" />
       </fileset>
     </copy>
 
@@ -310,6 +333,21 @@
       </classpath>
     </javac>
   </target>
+
+  <!-- Compiles the apps directory -->
+  <target name="compile-apps" depends="init,prepare-src,compile">
+    <javac
+      srcdir="${build.src.apps}"
+      destdir="${build.dest.apps}"
+      deprecation="true"
+      debug="true"
+      depend="yes">
+      <classpath>
+        <pathelement path="${classpath}" />
+        <pathelement path="${build.dest.main}" />
+      </classpath>
+    </javac>
+  </target>
   
   <target name="compile-14taglets" depends="init,prepare-14taglets" if="java14">
     <javac
@@ -339,6 +377,16 @@
       jarfile="${build.dir}/demo.jar"
       basedir="${build.dest.demos}"
       manifest="${build.src.demos}/${demosmanifest.file}"
+      includes="**"
+    />
+  </target>
+
+  <!-- Create the apps package -->
+  <target name="package-apps" depends="init,package,compile-apps">
+    <jar
+      jarfile="${build.dir}/apps.jar"
+      basedir="${build.dest.apps}"
+      manifest="${build.src.apps}/${appsmanifest.file}"
       includes="**"
     />
   </target>
