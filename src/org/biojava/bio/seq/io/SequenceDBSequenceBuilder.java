@@ -85,6 +85,7 @@ public class SequenceDBSequenceBuilder extends SequenceBuilderBase
      * create the sequence
      */
     public Sequence makeSequence()
+        throws BioException
     {
         if (name == null) {
             System.err.println("sequence doesn't have a name!!!!  Abandoning task.");

@@ -25,6 +25,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.symbol.Alphabet;
@@ -78,7 +79,9 @@ public class SmartSequenceBuilder extends SequenceBuilderBase {
     }
 
 
-    public Sequence makeSequence() {
+    public Sequence makeSequence() 
+        throws BioException
+    {
         SymbolList symbols;
         try {
 	    symbols = slFactory.makeSymbolList();
