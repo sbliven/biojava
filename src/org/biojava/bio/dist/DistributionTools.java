@@ -638,8 +638,8 @@ public final class DistributionTools {
          fact = new PackedSymbolListFactory();
        }
 
-       Symbol[] syms = new Symbol[ll.size()];
-       ll.toArray(syms);
+       Symbol[] syms = new Symbol[l.size()];
+       l.toArray(syms);
        sl = fact.makeSymbolList(syms, length, d.getConditionedAlphabet());
        //sl = new SimpleSymbolList(d.getConditionedAlphabet(),l);
     }
