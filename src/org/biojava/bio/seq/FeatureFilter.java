@@ -55,77 +55,12 @@ public interface FeatureFilter extends Serializable {
   /**
    * All features are selected in with this filter.
    */
-  static final public FeatureFilter all = new AcceptAllFilter();
-
-  /**
-   * The class that accepts all features.
-   * <p>
-   * Use the FeatureFilter.all member.
-   *
-   * @author Thomas Down
-   * @author Matthew Pocock
-   * @since 1.0
-   */
-  public final static class AcceptAllFilter implements FeatureFilter {
-    public boolean accept(Feature f) { return true; }
-
-    public boolean equals(Object o) {
-      return o instanceof AcceptAllFilter;
-    }
-
-    public int hashCode() {
-      return 0;
-    }
-
-    public boolean isProperSubset(FeatureFilter sup) {
-      return sup instanceof AcceptAllFilter;
-    }
-
-    public boolean isDisjoint(FeatureFilter filt) {
-      return filt instanceof AcceptNoneFilter;
-    }
-
-    public String toString() {
-      return "All";
-    }
-  }
+  static final public FeatureFilter all = new AcceptAllFilter() {};
 
   /**
    * No features are selected in with this filter.
    */
-  static final public FeatureFilter none = new AcceptNoneFilter();
-
-  /**
-   * The class that accepts no features.
-   * <p>
-   * Use the FeatureFilter.none member.
-   *
-   * @author Matthew Pocock
-   * @since 1.2
-   */
-  public final static class AcceptNoneFilter implements FeatureFilter {
-    public boolean accept(Feature f) { return false; }
-
-    public boolean equals(Object o) {
-      return o instanceof AcceptNoneFilter;
-    }
-
-    public int hashCode() {
-      return 1;
-    }
-
-    public boolean isProperSubset(FeatureFilter sup) {
-      return true;
-    }
-
-    public boolean isDisjoint(FeatureFilter filt) {
-      return true;
-    }
-
-      public String toString() {
-          return "None";
-      }
-  }
+  static final public FeatureFilter none = new AcceptNoneFilter() {};
 
   /**
    * Construct one of these to filter features by type.
@@ -1293,3 +1228,74 @@ public interface FeatureFilter extends Serializable {
 interface ByHierachy extends FeatureFilter {
   FeatureFilter getFilter();
 }
+
+
+/**
+ * The class that accepts all features.
+ * <p>
+ * Use the FeatureFilter.all member.
+ *
+ * @author Thomas Down
+ * @author Matthew Pocock
+ * @since 1.0
+ */
+class AcceptAllFilter implements OptimizableFilter {
+  protected AcceptAllFilter() {}
+  
+  public boolean accept(Feature f) { return true; }
+  
+  public boolean equals(Object o) {
+    return o instanceof AcceptAllFilter;
+  }
+  
+  public int hashCode() {
+    return 0;
+  }
+  
+  public boolean isProperSubset(FeatureFilter sup) {
+    return sup instanceof AcceptAllFilter;
+  }
+  
+  public boolean isDisjoint(FeatureFilter filt) {
+    return filt instanceof AcceptNoneFilter;
+  }
+  
+  public String toString() {
+    return "All";
+  }
+}
+
+/**
+ * The class that accepts no features.
+ * <p>
+ * Use the FeatureFilter.none member.
+ *
+ * @author Matthew Pocock
+ * @since 1.2
+ */
+class AcceptNoneFilter implements OptimizableFilter {
+  protected AcceptNoneFilter() {}
+  
+  public boolean accept(Feature f) { return false; }
+  
+  public boolean equals(Object o) {
+    return o instanceof AcceptNoneFilter;
+  }
+  
+  public int hashCode() {
+    return 1;
+  }
+  
+  public boolean isProperSubset(FeatureFilter sup) {
+    return true;
+  }
+  
+  public boolean isDisjoint(FeatureFilter filt) {
+    return true;
+  }
+  
+  public String toString() {
+    return "None";
+  }
+}
+

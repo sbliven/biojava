@@ -386,4 +386,29 @@ public class FilterUtilsTest extends TestCase
       assertTrue("not subset: " + pf5 + ", " + pf2, !FilterUtils.areProperSubset(pf5, pf2));
       assertTrue("are subset: " + pf6 + ", " + pf2, FilterUtils.areProperSubset(pf6, pf2));
     }
+    
+    public void testAndOptimizeAllNone() {
+      optimizeExact(all_and_all, FilterUtils.all());
+      optimizeExact(FilterUtils.and(all_and_all, all_and_all), FilterUtils.all());
+      
+      optimizeExact(all_and_none, FilterUtils.none());
+      optimizeExact(FilterUtils.and(all_and_none, FilterUtils.all()), FilterUtils.none());
+      
+      optimizeExact(none_and_none, FilterUtils.none());
+    }
+    
+    public void testOrOptimizeAllNone() {
+      optimizeExact(all_or_all, FilterUtils.all());
+      optimizeExact(FilterUtils.or(all_or_all, all_or_all), FilterUtils.all());
+      
+      optimizeExact(all_or_none, FilterUtils.all());
+      optimizeExact(FilterUtils.or(all_or_none, FilterUtils.none()), FilterUtils.all());
+      
+      optimizeExact(none_or_none, FilterUtils.none());
+    }
+    
+    private void optimizeExact(FeatureFilter raw, FeatureFilter target) {
+      FeatureFilter result = FilterUtils.optimize(raw);
+      assertTrue("optimize: " + raw + " should be " + target + " but is " + result, result == target);
+    }
 }

@@ -69,9 +69,9 @@ public class FilterUtils {
         return true;
       }
       
-      if (sup instanceof FeatureFilter.AcceptAllFilter) {
+      if (sup == all()) {
         return true;
-      } else if (sub instanceof FeatureFilter.AcceptNoneFilter) {
+      } else if (sub == none()) {
         return true;
       } else if (sup instanceof FeatureFilter.And) {
         FeatureFilter.And and_sup = (FeatureFilter.And) sup;
@@ -126,11 +126,11 @@ public class FilterUtils {
         return false;
       }
       
-      if (a instanceof FeatureFilter.AcceptAllFilter) {
+      if (a == all()) {
         return areProperSubset(b, FeatureFilter.none);
-      } else if(b instanceof FeatureFilter.AcceptAllFilter) {
+      } else if(b == all()) {
         return areProperSubset(a, FeatureFilter.none);
-      } else if (a instanceof FeatureFilter.AcceptNoneFilter || b instanceof FeatureFilter.AcceptNoneFilter) {
+      } else if (a == none() || b == none()) {
         return true;
       } if (a instanceof FeatureFilter.And) {
         FeatureFilter.And and_a = (FeatureFilter.And) a;
@@ -319,9 +319,14 @@ public class FilterUtils {
   }
   
   public final static FeatureFilter optimize(FeatureFilter filter) {
+    //System.out.println("Optimizing " + filter);
+    
     if(filter instanceof FeatureFilter.And) {
+      //System.out.println("is AND");
+      
       List filters = new ArrayList();
       expandAnd(filter, filters);
+      //System.out.println("as list: " + filters);
       
       int i = 0;
       int j = 0;
@@ -330,10 +335,14 @@ public class FilterUtils {
         FeatureFilter aa = (FeatureFilter) filters.get(i);
         FeatureFilter bb = (FeatureFilter) filters.get(j);
         
+        //System.out.println("Comparing " + aa + ", " + bb + " of " + filters);
+        
         if(!(aa instanceof OptimizableFilter)) {
+          //System.out.println("first one not optimizable");
           i++;
           j = i + 1;
         } else if(!(bb instanceof OptimizableFilter)) {
+          //System.out.println("seccond one not optimizable");
           j++;
           if(j == filters.size()) {
             i++;
@@ -345,21 +354,27 @@ public class FilterUtils {
 
           if(a.isDisjoint(b)) {
             // a n b = E
+            //System.out.println("Disjoint");
             return none();
           } else if(a.isProperSubset(b)) {
+            //System.out.println("a < b");
             // if a < b then a n b = a  
             filters.remove(j);
           } else if(b.isProperSubset(a)) {
+            //System.out.println("b > a");
             // if a > b then a n b = b
             filters.remove(i);
             j = i + 1;
           } else {
+            //System.out.println("Attempting to calculate intersection");
             FeatureFilter intersect = intersection(a, b);
             if(intersect != null) {
+              System.out.println("got intersection: " + intersect);
               filters.set(i, intersect);
               filters.remove(j);
               j = i + 1;
             } else {
+              //System.out.println("no luck - moving on");
               j++;
               if(j == filters.size()) {
                 i++;
@@ -369,10 +384,15 @@ public class FilterUtils {
           }
         }
       } while(i < filters.size() - 1);
-      return and((FeatureFilter[]) filters.toArray(new Feature[] {}));
+      //System.out.println("Reduced to: " + filters);
+      return and((FeatureFilter[]) filters.toArray(new FeatureFilter[] {}));
     } else if(filter instanceof FeatureFilter.Or) {
+      //System.out.println("is AND");
+      
       List filters = new ArrayList();
       expandOr(filter, filters);
+      
+      //System.out.println("as list: " + filters);
       
       int i = 0;
       int j = 0;
@@ -381,10 +401,14 @@ public class FilterUtils {
         FeatureFilter aa = (FeatureFilter) filters.get(i);
         FeatureFilter bb = (FeatureFilter) filters.get(j);
         
+        //System.out.println("Comparing " + aa + ", " + bb + " of " + filters);
+        
         if(!(aa instanceof OptimizableFilter)) {
+          //System.out.println("first not optimizable");
           i++;
           j = i + 1;
         } else if(!(bb instanceof OptimizableFilter)) {
+          //System.out.println("second not optimizable");
           j++;
           if(j == filters.size()) {
             i++;
@@ -395,15 +419,20 @@ public class FilterUtils {
           OptimizableFilter b = (OptimizableFilter) bb;
           
           if(a == all() || b == all()) {
+            //System.out.println("Found an all");
             return all();
           } else if(a.isProperSubset(b)) {
+            //System.out.println("a < b");
             filters.remove(i);
             j = i + 1;
           } else if(b.isProperSubset(a)) {
+            //System.out.println("a > b");
             filters.remove(j);
           } else {
+            //System.out.println("Trying to calculate union");
             FeatureFilter union = union(a, b);
             if(union != null) {
+              //System.out.println("Got union: " + union);
               filters.set(i, union);
               filters.remove(j);
               j = i + 1;
@@ -411,7 +440,7 @@ public class FilterUtils {
           }
         }
       } while(i < filters.size() - 1);
-      return or((FeatureFilter[] ) filters.toArray(new Feature[] {}));
+      return or((FeatureFilter[] ) filters.toArray(new FeatureFilter[] {}));
     } else if(filter instanceof FeatureFilter.Not) {
       FeatureFilter.Not not = (FeatureFilter.Not) filter;
       return not(optimize(not.getChild()));
