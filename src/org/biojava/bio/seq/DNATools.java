@@ -246,6 +246,7 @@ public final class DNATools {
    */
   static public Symbol forSymbol(char token)
   throws IllegalSymbolException {
+    token = Character.toLowerCase(token);
     if(token == 'a') {
       return a;
     } else if(token == 'g') {
