@@ -169,10 +169,26 @@ class FeatureTableParser {
 	if (level != 0)
 	    throw new SeqException("Mismatched parentheses: " + loc);
 	
+	if (ranging) {
+	    Location rl = new PointLocation(start);
+	    if (joining) {
+		((CompoundLocation) result).addLocation(rl);
+	    } else {
+		if (result != null)
+		    throw new SeqException();
+		result = rl;
+	    }
+	}
+
 	if (isComplement)
 	    featureStrand = StrandedFeature.NEGATIVE;
 	else
 	    featureStrand = StrandedFeature.POSITIVE;
+
+	if (result == null) {
+	    throw new SeqException("Location null: " + loc);
+	}
+
 	return result;
     }
 
