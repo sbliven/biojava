@@ -150,12 +150,8 @@ extends AbstractSymbolList implements Alignment, Serializable {
     this.length = length;
   }
 
-  /**
-   * Returns a SequenceIterator over the SymbolLists in this alignment.
-   *
-   */
-  public SequenceIterator sequenceIterator() {
-    return new AlignmentSequenceIterator(this);
+  public Iterator symbolListIterator() {
+    return new Alignment.SymbolListIterator(this);
   }
 
   /**

@@ -229,9 +229,9 @@ public interface SimilarityPairFeature extends StrandedFeature
         {
             throw new ChangeVetoException("You can't edit the empty symbol list");
         }
-
-        public SequenceIterator sequenceIterator() {
-            return new AlignmentSequenceIterator(this);
+      
+        public Iterator symbolListIterator() {
+          return new Alignment.SymbolListIterator(this);
         }
     }
 }

@@ -73,9 +73,9 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
         }
         return labelList;
     }
-
-    public SequenceIterator sequenceIterator() {
-        return new AlignmentSequenceIterator(this);
+  
+    public Iterator symbolListIterator() {
+      return new Alignment.SymbolListIterator(this);
     }
 
     protected void debug(String s){
@@ -342,8 +342,8 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
            return AbstractULAlignment.this.getAlphabet();
         }
 
-        public SequenceIterator sequenceIterator() {
-            return new AlignmentSequenceIterator(this);
+        public Iterator symbolListIterator() {
+          return new Alignment.SymbolListIterator(this);
         }
     }
 }

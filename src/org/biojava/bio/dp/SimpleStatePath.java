@@ -119,8 +119,7 @@ public class SimpleStatePath
     throw new ChangeVetoException("Can't edit SimpleStatePath");
   }
 
-  public SequenceIterator sequenceIterator() {
-    return delegate.sequenceIterator();
+  public Iterator symbolListIterator() {
+    return new Alignment.SymbolListIterator(this);
   }
-
 }

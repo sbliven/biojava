@@ -146,10 +146,9 @@ public final class SymbolListViews {
       public SequenceIterator sequenceIterator() {
         throw new UnsupportedOperationException("This method sucks");
       }
-      
-      public Alignment subAlignment(Set labels, Location loc) {
-        // fixme: we should implement this
-        throw new UnsupportedOperationException("This should be implemented");
+    
+      public Iterator symbolListIterator() {
+        return new Alignment.SymbolListIterator(this);
       }
       
       public Symbol symbolAt(Object label, int column) {
@@ -203,6 +202,10 @@ public final class SymbolListViews {
       public Symbol symbolAt(int indx)
       throws IndexOutOfBoundsException {
         return symList.symbolAt(indx);
+      }
+      
+      public Alignment subAlignment(Set labels, Location loc) {
+        throw new UnsupportedOperationException("Fixme: this needs to be implemented");
       }
     }
     

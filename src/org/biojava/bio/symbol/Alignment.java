@@ -43,6 +43,7 @@ import org.biojava.bio.seq.*;
  * <span class="type">GappedSymbolList</span> objects.
  *
  * @author Matthew Pocock
+ * @author Nimesh Singh
  * @since 1.1
  */
 public interface Alignment extends SymbolList {
@@ -116,11 +117,41 @@ public interface Alignment extends SymbolList {
   throws NoSuchElementException;
 
   /**
-   * Creates a SequenceIterator over the SymbolLists in the alignment.  The labels
-   * become the urns and names of the new Sequences.
+   * Creates an Iterator over the SymbolLists in the alignment. This should be
+   * similar to iterating over the labels and then fetching each SymbolList, but
+   * the order is not guaranteed to be the same.
    *
    * @return a SequenceIterator
    */
-  SequenceIterator sequenceIterator();
+  Iterator symbolListIterator();
+  
+  /**
+   * Iterator implementation looping over symbol lists in an alignment using
+   * the labels. This is intended for Alignment implementors.
+   *
+   * @author Matthew Pocock
+   */
+  public static class SymbolListIterator
+  implements Iterator {
+    private final Iterator labIt;
+    private final Alignment ali;
+    
+    public SymbolListIterator(Alignment ali) {
+      this.ali = ali;
+      this.labIt = ali.getLabels().iterator();
+    }
+    
+    public boolean hasNext() {
+      return labIt.hasNext();
+    }
+    
+    public Object next() {
+      return ali.symbolListForLabel(labIt.next());
+    }
+    
+    public void remove() {
+      labIt.remove();
+    }
+  }
 }
 

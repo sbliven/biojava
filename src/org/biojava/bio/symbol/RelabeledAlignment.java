@@ -102,10 +102,10 @@ public class RelabeledAlignment
     delegate.edit(edit);
   }
 
-  public SequenceIterator sequenceIterator() {
-    return new AlignmentSequenceIterator(this);
+  public Iterator symbolListIterator() {
+    return new Alignment.SymbolListIterator(this);
   }
-
+  
   protected Set map(Set labels) {
     Set set = new HashSet();
     for(Iterator i = labels.iterator(); i.hasNext(); ) {
