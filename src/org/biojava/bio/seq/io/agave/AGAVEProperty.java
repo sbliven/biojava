@@ -34,7 +34,9 @@ public class AGAVEProperty
    public AGAVEProperty(String property_class, String prop, String data_type, String value)
    {
        if( property_class != null && !( property_class.equals( SCI_PROPERTY) ||
-           property_class.equals( RESULT_PROPERTY) || property_class.equals( XREF_PROPERTY) ) )
+                                        property_class.equals( RESULT_PROPERTY) || 
+					property_class.equals( XREF_PROPERTY) ||
+					property_class.equals( QUALIFIER)) )
            throw new RuntimeException("unkownn parameter for AGAVEProperty constructor :" + property_class) ;
        if( property_class != null )
            this.property_class = property_class  ;

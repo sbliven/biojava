@@ -120,7 +120,11 @@ public class AGAVESeqFeatureHandler
   public void addProperty(AGAVEProperty prop)
   {
       try{
-         Object ob =  staxenv.featureTemplate.annotation.getProperty("qualifier");
+         Object ob = null;
+	 if (staxenv.featureTemplate.annotation.containsProperty("qualifier")) {
+	     ob = staxenv.featureTemplate.annotation.getProperty("qualifier");
+	 }
+
          if( ob != null )
              ((List)ob).add( prop ) ;
          else
