@@ -108,7 +108,8 @@ class SeqIOEventEmitter
 
                 // Pass feature properties (i.e. qualifiers to
                 // listener)
-                List fKeys = new ArrayList(t.annotation.keys());
+                // FIXME: this will drop all non-comparable keys
+                List fKeys = comparableList(t.annotation.keys());
                 Collections.sort(fKeys);
 
                 for (Iterator ki = fKeys.iterator(); ki.hasNext();)
@@ -163,5 +164,16 @@ class SeqIOEventEmitter
             subfeat.add(sfh);
         }
         return subfeat;
+    }
+
+    private List comparableList(Collection coll) {
+      ArrayList res = new ArrayList();
+      for(Iterator i = coll.iterator(); i.hasNext(); ) {
+        Object o = i.next();
+        if(o instanceof Comparable) {
+          res.add(o);
+        }
+      }
+      return res;
     }
 }
