@@ -56,8 +56,11 @@ public class CreateIndex {
       } else if(formatName.equals("embl")) {
 	  sFormat = new EmblLikeFormat();
 	  sFact = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+      } else if (formatName.equals("swissprot")) {
+	  sFormat = new EmblLikeFormat();
+	  sFact = new SwissprotProcessor.Factory(SimpleSequenceBuilder.FACTORY);
       } else {
-	  throw new Exception("Format must be one of {embl, fasta}");
+	  throw new Exception("Format must be one of {embl, fasta, swissprot}");
       }
       
       IndexedSequenceDB seqDB = IndexedSequenceDB.createDB(
