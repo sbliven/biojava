@@ -59,50 +59,106 @@ import org.biojava.utils.walker.WalkerFactory;
  * <p>
  * <u>Some keys used by SearchContentHandlers</u><br>
  * <u>SearchProperties</u><br>
- * <table border="1Â">
+ * <table border="1">
  * <tr>
  * <td>KEY_QUERY_ID</td>
- * <td>value from setQueryID</td>
+ * <td>String. Value from setQueryID</td>
  * </tr>
  * <tr>
  * <td>queryDescription</td>
- * <td></td>
+ * <td>String. FASTA description line</td>
  * </tr>
  * <tr>
  * <td>program</td>
- * <td>variant of BLAST used</td>
+ * <td>String. variant of BLAST used</td>
  * </tr>
  * <tr>
  * <td>version</td>
+ * <td>software version</td>
+ * </tr>
+ * </table>
+ * <u>HitProperties</u><br>
+ * <table border="1" > 
+* <tr>
+ * <td>subjectId</td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td>subjectSequenceLengt</td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td>subjectDescription</td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td></td>
  * <td></td>
  * </tr>
  * </table>
- * <u>SearchProperties</u><br>
- * <table>
+ * <u>SubHitProperties</u><br>
+ * <table border="1" >
  * <tr>
- * <td></td>
- * <td></td>
+ * <td>bitScore></td>
+ * <td>String representation of real value</td>
  * </tr>
  * <tr>
- * <td></td>
- * <td></td>
+ * <td>queryStrand</td>
+ * <td>plus/minus</td>
  * </tr>
  * <tr>
- * <td></td>
- * <td></td>
+ * <td>percentageIdentity</td>
+ * <td>String representation of real value</td>
  * </tr>
  * <tr>
- * <td></td>
- * <td></td>
+ * <td>querySequenceEnd</td>
+ * <td>String representation of integer value</td>
  * </tr>
  * <tr>
- * <td></td>
- * <td></td>
+ * <td>expectValue</td>
+ * <td>String representation of real value</td>
  * </tr>
  * <tr>
- * <td></td>
- * <td></td>
+ * <td>subjectStrand</td>
+ * <td>plus/minus</td>
  * </tr>
+ * <tr>
+ * <td>subjectSequenceEnd</td>
+ * <td>String representation of integer value</td>
+ * </tr>
+ * <tr>
+ * <td>numberOfPositives</td>
+ * <td>String representation of integer value</td>
+ * </tr>
+ * <tr>
+ * <td>score</td>
+ * <td>String representation of integer value</td>
+ * </tr>
+ * <tr>
+ * <td>subjectSequence</td>
+ * <td>String representation of sequence</td>
+ * </tr>
+ * <tr>
+ * <td>alignmentSize</td>
+ * <td>String representation of integer value</td>
+ * </tr>
+ * <tr>
+ * <td>querySequenceStart</td>
+ * <td>String representation of integer value</td>
+ * </tr>
+ * <tr>
+ * <td>subjectSequenceStart</td>
+ * <td>String representation of integer value</td>
+ * </tr>
+ * <tr>
+ * <td>numberOfIdentities</td>
+ * <td>String representation of integer value</td>
+ * </tr>
+ * <tr>
+ * <td>querySequence</td>
+ * <td>String representation of sequence</td>
+ * </tr>
+ * </table>
  *
  *
  * @author David Huen
