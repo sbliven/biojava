@@ -26,12 +26,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Vector;
+import java.util.ArrayList;
 
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.utils.ParseErrorEvent;
 import org.biojava.utils.ParseErrorListener;
 import org.biojava.utils.ParseErrorSource;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>
@@ -58,6 +60,7 @@ import org.biojava.utils.ParseErrorSource;
  * @author Greg Cox
  * @author Keith James
  * @author Len Trigg
+ * @author Lorna Morris
  * @since 1.1
  */
 
@@ -76,6 +79,7 @@ public class EmblLikeFormat
     protected static final String TYPE_TAG = "TYPE";
     protected static final String CIRCULAR_TAG = "CIRCULAR";
     protected static final String DIVISION_TAG = "DIVISION";
+    protected static final String DR_TAG = "DR"; //Lorna: new tag
 
     protected static final String ACCESSION_TAG = "AC";
     protected static final String VERSION_TAG = "SV";
@@ -95,7 +99,7 @@ public class EmblLikeFormat
     protected static final String FEATURE_TAG = "FH";
     protected static final String SEPARATOR_TAG = "XX";
     protected static final String FEATURE_TABLE_TAG = "FT";
-    protected static final String START_SEQUENCE_TAG = "SQ";  
+    protected static final String START_SEQUENCE_TAG = "SQ";
     protected static final String END_SEQUENCE_TAG = "//";
 
     private boolean elideSymbols = false;
@@ -125,14 +129,17 @@ public class EmblLikeFormat
         return elideSymbols;
     }
 
-    public boolean readSequence(BufferedReader     reader,
+        public boolean readSequence(BufferedReader     reader,
                                 SymbolTokenization symParser,
                                 SeqIOListener      listener)
         throws IllegalSymbolException, IOException, ParseException
     {
-	if (listener instanceof ParseErrorSource) {
-	    ((ParseErrorSource)(listener)).addParseErrorListener(this);
-	}
+
+    //EmblReferenceProperty reference = null; //lorna
+
+        if (listener instanceof ParseErrorSource) {
+            ((ParseErrorSource)(listener)).addParseErrorListener(this);
+        }
 
         String            line;
         StreamParser    sparser       = null;
@@ -201,7 +208,59 @@ public class EmblLikeFormat
                     {
                         rest = line.substring(5);
                     }
-                    listener.addSequenceProperty(tag, rest);
+
+                    //lorna added, tags read in order, when a complete set goes through,
+                    //spit out a single annotation event
+
+                    ReferenceAnnotation refAnnot = new ReferenceAnnotation();
+
+                    if (tag.equals(REFERENCE_TAG)) { //only 1 reference_tag!
+
+                        try {
+                            refAnnot.setProperty(tag, rest);
+                            while (!(tag.equals(SEPARATOR_TAG))) {
+                                // Normal attribute line
+
+                                line = reader.readLine();
+
+                                tag  = line.substring(0, 2);
+
+                                if (line.length() > 5)
+                                {
+                                    rest = line.substring(5);
+                                } else {
+                                    rest = null;//for XX lines
+                                }
+
+                                if (refAnnot.containsProperty(tag)) {
+
+                                    Object property = refAnnot.getProperty(tag);
+                                    ArrayList properties;
+
+                                    if (property instanceof String) {
+                                        properties = new ArrayList();
+                                        properties.add(property);
+                                        properties.add(rest);
+                                        refAnnot.setProperty(tag, properties);
+                                    }
+                                    if (property instanceof ArrayList) {
+                                        ((ArrayList)property).add(rest);
+                                    }
+                                }  else {
+                                    refAnnot.setProperty(tag, rest);
+                                }
+                            }
+                            listener.addSequenceProperty(ReferenceAnnotation.class, refAnnot);
+
+                        } catch (ChangeVetoException cve) {
+                            cve.printStackTrace();
+                        }
+
+                    }
+                    // lorna, end
+                    else { //lorna
+                        listener.addSequenceProperty(tag, rest);
+                    } //lorna
                 }
                 else
                 {
@@ -217,6 +276,7 @@ public class EmblLikeFormat
 
         throw new IOException("Premature end of stream or missing end tag '//' for EMBL");
     }
+
 
     /**
      * Dispatch symbol data from SQ-block line of an EMBL-like file.
@@ -274,7 +334,7 @@ public class EmblLikeFormat
      * @deprecated use writeSequence(Sequence seq, PrintStream os)
      */
     public void writeSequence(Sequence seq, String format, PrintStream os)
-	throws IOException
+        throws IOException
     {
         SeqFileFormer former;
 
@@ -353,7 +413,7 @@ public class EmblLikeFormat
             mListeners.removeElement(theListener);
         }
     }
- 
+
     // Protected methods
     /**
      * Passes the event on to all the listeners registered for ParseErrorEvents.

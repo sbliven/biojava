@@ -55,6 +55,7 @@ import org.biojava.bio.BioException;
  *
  * @author Keith James
  * @author Len Trigg (Taxon output)
+ * @author Lorna Morris
  * @since 1.2
  */
 public class EmblFileFormer extends AbstractGenEmblFileFormer
@@ -72,6 +73,8 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         NON_SEPARATED_TAGS.add(EmblLikeFormat.AUTHORS_TAG);
         NON_SEPARATED_TAGS.add(EmblLikeFormat.TITLE_TAG);
         NON_SEPARATED_TAGS.add(EmblLikeFormat.FEATURE_TAG);
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.JOURNAL_TAG);//Lorna: added
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.SEPARATOR_TAG);//Lorna: added
     }
 
     // 19 spaces
@@ -231,20 +234,20 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         }
     }
 
-    public void addSequenceProperty(Object key, Object value)
+        public void addSequenceProperty(Object key, Object value)
         throws ParseException
     {
         StringBuffer sb = new StringBuffer();
 
         // Ignore separators if they are sent to us. The parser should
-        // be ignoring these really
-        if (key.equals(EmblLikeFormat.SEPARATOR_TAG))
-            return;
+        // be ignoring these really (lorna: I've changed this so they are ignored in SeqIOEventEmitter)
+        //if (key.equals(EmblLikeFormat.SEPARATOR_TAG))
+            //return;
 
         String tag = key.toString();
         String leader = tag + SQ_LEADER;
         String line = "";
-        int wrapWidth = 80 - leader.length();
+        int wrapWidth = 85 - leader.length();
 
         // Special case: accession number
         if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
@@ -262,7 +265,6 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
             addSequenceProperty(EmblLikeFormat.ORGANISM_XREF_TAG, taxon);
             return;
         }
-
         if (value instanceof String)
         {
             line = (String) value;
@@ -271,6 +273,22 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         {
             // Special case: date lines
             if (key.equals(EmblLikeFormat.DATE_TAG))
+            {
+                line = buildPropertyLine((Collection) value, nl + leader, false);
+                wrapWidth = Integer.MAX_VALUE;
+            }
+            //lorna :added 21.08.03, DR lines are another special case. Each one goes onto a separate line.
+            else if (key.equals(EmblLikeFormat.DR_TAG))
+            {
+                line = buildPropertyLine((Collection) value, nl + leader, false);
+                wrapWidth = Integer.MAX_VALUE;
+            }
+            else if (key.equals(EmblLikeFormat.AUTHORS_TAG))
+            {
+                line = buildPropertyLine((Collection) value, nl + leader, false); //lorna: add space here?
+                wrapWidth = Integer.MAX_VALUE;
+            }
+            else if (key.equals(EmblLikeFormat.REF_ACCESSION_TAG))
             {
                 line = buildPropertyLine((Collection) value, nl + leader, false);
                 wrapWidth = Integer.MAX_VALUE;
@@ -298,7 +316,6 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
             sb = formatSequenceProperty(sb, line, leader, wrapWidth);
             stream.println(sb);
         }
-
         // Special case: those which don't get separated
         if (! NON_SEPARATED_TAGS.contains(key))
             stream.println(EmblLikeFormat.SEPARATOR_TAG);
@@ -306,6 +323,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         if (key.equals(EmblLikeFormat.FEATURE_TAG))
             stream.println(EmblLikeFormat.FEATURE_TAG);
     }
+
 
     public void startFeature(Feature.Template templ)
         throws ParseException
@@ -324,7 +342,6 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     public void endFeature() throws ParseException { }
 
     public void addFeatureProperty(Object key, Object value)
-        throws ParseException
     {
         // Don't print internal data structures
         if (key.equals(Feature.PROPERTY_DATA_KEY))

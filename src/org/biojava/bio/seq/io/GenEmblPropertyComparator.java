@@ -56,7 +56,14 @@ final class GenEmblPropertyComparator implements Comparator
         tagOrder.add(EmblLikeFormat.KEYWORDS_TAG);
         tagOrder.add(EmblLikeFormat.SOURCE_TAG);
         tagOrder.add(EmblLikeFormat.ORGANISM_TAG);
-        tagOrder.add(EmblLikeFormat.REFERENCE_TAG);
+        /*tagOrder.add(EmblLikeFormat.REFERENCE_TAG);
+        tagOrder.add(EmblLikeFormat.COORDINATE_TAG);
+        tagOrder.add(EmblLikeFormat.REF_ACCESSION_TAG);
+        tagOrder.add(EmblLikeFormat.AUTHORS_TAG);
+        tagOrder.add(EmblLikeFormat.TITLE_TAG);
+        tagOrder.add(EmblLikeFormat.JOURNAL_TAG);*/
+        tagOrder.add(ReferenceAnnotation.class);
+        tagOrder.add(EmblLikeFormat.DR_TAG);//lorna:added 21.08.03
         tagOrder.add(EmblLikeFormat.COORDINATE_TAG);
         tagOrder.add(EmblLikeFormat.REF_ACCESSION_TAG);
         tagOrder.add(EmblLikeFormat.AUTHORS_TAG);

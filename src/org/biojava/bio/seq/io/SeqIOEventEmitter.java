@@ -21,12 +21,7 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
@@ -51,6 +46,7 @@ class SeqIOEventEmitter
     private static Symbol [] symProto = new Symbol [0];
 
     private Comparator seqPropComparator;
+    private Comparator refPropComparator;
     private Comparator featureComparator;
 
     SeqIOEventEmitter(Comparator seqPropComparator,
@@ -60,7 +56,8 @@ class SeqIOEventEmitter
         this.featureComparator = featureComparator;
     };
 
-    /**
+
+            /**
      * <code>getSeqIOEvents</code> scans a <code>Sequence</code>
      * object and sends events describing its data to the
      * <code>SeqIOListener</code>.
@@ -89,7 +86,42 @@ class SeqIOEventEmitter
             for (Iterator ki = sKeys.iterator(); ki.hasNext();)
             {
                 Object key = ki.next();
-                listener.addSequenceProperty(key, a.getProperty(key));
+
+                if ( key.equals(ReferenceAnnotation.class)) {
+
+                    ArrayList references = null;
+
+                    if (a.getProperty(key) instanceof ArrayList) {
+                       references = ((ArrayList)a.getProperty(key));
+                    }
+
+                    if (references != null) {
+
+                        for ( int i = 0; i < references.size(); i++ ) {
+                            ReferenceAnnotation refAnnot = (ReferenceAnnotation)references.get(i);
+
+                            Map referenceLines = refAnnot.getProperties();
+                            List refKeys = new ArrayList(referenceLines.keySet());
+                            refPropComparator = EmblReferenceComparator.INSTANCE;
+                            Collections.sort(refKeys, refPropComparator);
+
+                            for (Iterator kit = refKeys.iterator(); kit.hasNext();)
+                            {
+                                Object refKey = kit.next();
+                                //adds all the R* tags and final XX tag
+                                listener.addSequenceProperty(refKey, refAnnot.getProperty(refKey));
+                            }
+                        }
+                    }
+                }
+                else {
+
+                    if (!(key.equals(EmblLikeFormat.SEPARATOR_TAG)))  {  //lorna: ignore XX
+
+                       listener.addSequenceProperty(key, a.getProperty(key));
+                    }
+
+                }
             }
 
             // Recurse through sub feature tree, flattening it for
@@ -142,6 +174,7 @@ class SeqIOEventEmitter
             throw new BioError("An internal error occurred creating SeqIO events",pe);
         }
     }
+
 
     /**
      * <code>getSubFeatures</code> is a recursive method which returns
