@@ -80,7 +80,7 @@ public abstract class AbstractReversibleTranslationTable
                 Set syms = new HashSet();
                 for (Iterator i = ((FiniteAlphabet) sym.getMatches()).iterator(); i.hasNext(); ) {
                     Symbol is = (Symbol) i.next();
-                    syms.add(this.translate(is));
+                    syms.add(this.untranslate(is));
                 }
                 s = getTargetAlphabet().getAmbiguity(syms);
             }
