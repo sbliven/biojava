@@ -50,6 +50,10 @@ public class SeqFormatTools
 
     static
     {
+	// This loads an XML file containing information on which
+        // qualifiers are valid (or even mandatory) for a particular
+        // feature key. It also indicates whether the value should be
+        // contained within quotes.
 	loadFeatureData(featureDataFile, featureData, qualifierData);
     }
 
@@ -76,6 +80,74 @@ public class SeqFormatTools
      * <code>SeqFormatTools</code> can not be instantiated.
      */
     private SeqFormatTools() { };
+
+
+    /**
+     * <code>writeFeatureAsTable</code> writes a single
+     * <code>Feature</code> as a feature table block. The leader
+     * string is set by a parameter to allow this to work for both
+     * EMBL and Genbank formats. There is some duplication of
+     * functionality from the <code>EmblFileFormer</code> and
+     * <code>GenbankFileFormer</code> classes. However, they print the
+     * data in response to SeqIO events. This convenience method dumps
+     * an entire feature ata single mehtod call.
+     *
+     * @param f a <code>Feature</code> to write.
+     * @param leader a <code>String</code> to attach to the start of
+     * each line. If this is shorter than the value returned by the
+     * <code>Feature</code>'s <code>getType()</code> method, you may
+     * get unexpected results. This is checked for.
+     * @param stream a <code>PrintStream</code> to write to.
+     */
+    public static void writeFeatureAsTable(final Feature     f,
+					   final String      leader,
+					   final PrintStream stream)
+    {
+        int strand = 0;
+	if (StrandedFeature.class.isInstance(f))
+	    strand = ((StrandedFeature) f).getStrand().getValue();
+
+	StringBuffer lb = formatLocationBlock(f.getLocation(),
+					      strand,
+					      leader,
+					      80);
+	String type = f.getType();
+
+	// Only substitute in the type name if there is room
+	if (leader.length() >= type.length())
+	    lb.replace(5, 5 + type.length(), type);
+
+	stream.println(lb);
+
+	Annotation fa = f.getAnnotation();
+
+	StringBuffer ab = new StringBuffer();
+
+	for (Iterator ai = fa.keys().iterator(); ai.hasNext();)
+	{
+	    Object key   = ai.next();
+	    Object value = fa.getProperty(key);
+
+	    if (key.equals(Feature.PROPERTY_DATA_KEY))
+		continue;
+
+	    if (Collection.class.isInstance(value))
+	    {
+		for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
+		{
+		    stream.println(formatQualifierBlock(formatQualifier(key, vi.next()),
+							leader,
+							80));
+		}
+	    }
+	    else
+	    {
+		stream.println(formatQualifierBlock(formatQualifier(key, value),
+						    leader,
+						    80));
+	    }
+	}
+    }
 
     /**
      * <code>formatQualifierBlock</code> formats text into
@@ -188,6 +260,7 @@ public class SeqFormatTools
     {
 	StringBuffer tb = new StringBuffer("/" + key);
 
+	// Default is to quote unknown qualifiers
 	String form = "quoted";
 	if (qualifierData.containsKey(key))
             form = (String) ((Map) qualifierData.get(key)).get("form");

@@ -234,16 +234,14 @@ public class EmblFileFormer implements SeqFileFormer
         {
             for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
             {
-		String qualifier = SeqFormatTools.formatQualifier(key, vi.next());
-                stream.println(SeqFormatTools.formatQualifierBlock(qualifier,
+                stream.println(SeqFormatTools.formatQualifierBlock(SeqFormatTools.formatQualifier(key, vi.next()),
                                                                    leader,
                                                                    80));
             }
         }
         else
         {
-	    String qualifier = SeqFormatTools.formatQualifier(key, value);
-            stream.println(SeqFormatTools.formatQualifierBlock(qualifier,
+            stream.println(SeqFormatTools.formatQualifierBlock(SeqFormatTools.formatQualifier(key, value),
                                                                leader,
                                                                80));
         }

@@ -209,7 +209,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	String [] formats = (String []) getFormats().toArray(new String[0]);
 
 	if (! found)
-	    throw new IOException("Unable to wrtie: an invalid file format '"
+	    throw new IOException("Unable to write: an invalid file format '"
 				  + format
 				  + "' was requested");
 
