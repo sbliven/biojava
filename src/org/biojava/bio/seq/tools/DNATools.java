@@ -27,6 +27,11 @@ import java.util.*;
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
+/**
+ * Usefull functionality, specific to DNA.
+ *
+ * @author Matthew Pocock
+ */
 public class DNATools {
   static private Alphabet alpha;
   static private Alphabet ambiguity;
@@ -119,6 +124,8 @@ public class DNATools {
 
   /**
    * Return the DNA alphabet.
+   *
+   * @return a flyweight version of the DNA alphabet
    */
   public static Alphabet getAlphabet() {
     return alpha;
@@ -126,6 +133,8 @@ public class DNATools {
 
   /**
    * Return the ambiguity alphabet.
+   *
+   * @return a flyweight version of the DNA ambiguity alphabet
    */
   public static Alphabet getAmbiguity() {
     return ambiguity;
@@ -133,6 +142,12 @@ public class DNATools {
 
   /**
    * Return an integer index for a residue - compatible with forIndex.
+   * <P>
+   * The index for a residue is stable accross virtual machines & invokations.
+   *
+   * @param res  the Residue to index
+   * @return     the index for that residue
+   * @throws IllegalResidueException if res is not a member of the DNA alphabet
    */
   final public static int index(Residue res) throws IllegalResidueException {
     if(res == a) {
@@ -151,6 +166,12 @@ public class DNATools {
   
   /**
    * Return the residue for an index - compatible with index.
+   * <P>
+   * The index for a residue is stable accross virtual machines & invokations.
+   *
+   * @param index  the index to look up
+   * @return       the residue at that index
+   * @throws IllegalResidueException if res is not a member of the DNA alphabet
    */
   final static public Residue forIndex(int index) throws IllegalResidueException {
     if(index == 0)
@@ -166,6 +187,10 @@ public class DNATools {
   
   /**
    * Complement the residue.
+   *
+   * @param res  the residue to complement
+   * @return a Residue that is the complement of res
+   * @throws IllegalResidueException if res is not a member of the DNA alphabet
    */
   final static public Residue complementDNA(Residue res)
   throws IllegalResidueException {
@@ -185,6 +210,11 @@ public class DNATools {
   
   /**
    * Complement residues even if they are ambiguity codes.
+   *
+   * @param res  the residue to complement
+   * @return a Residue that is the complement of res
+   * @throws IllegalResidueException if res is not a member of the DNA ambiguity
+   *         alphabet
    */
   final static public Residue complement(Residue res)
   throws IllegalResidueException {
@@ -199,6 +229,10 @@ public class DNATools {
   
   /**
    * Retrieve the residue for a symbol.
+   *
+   * @param symbol  the char to look up
+   * @return        the residue for that char
+   * @throws IllegalResidueException if the char does not belong to {a, g, c, t}
    */
   final static public Residue forSymbol(char symbol)
   throws IllegalResidueException {
@@ -216,6 +250,11 @@ public class DNATools {
   
   /**
    * Convert an ambiguity code to a list of residues it could match.
+   *
+   * @param res the residue to expand
+   * @return a ResidueList containing each matching DNA residue
+   * @throws IllegalResidueException if res is not a member of the DNA ambiguity
+   *         alphabet
    */
   final static public ResidueList forAmbiguity(Residue res)
   throws IllegalResidueException {
@@ -227,6 +266,9 @@ public class DNATools {
                        res.getName());
   }
  
+  /**
+   * Helps build the complement infomation.
+   */
   static private HashableList complement(HashableList list)
   throws IllegalResidueException {
     List newList = new ArrayList();
@@ -236,6 +278,11 @@ public class DNATools {
     return new HashableList(list.alphabet(), newList);
   }
   
+  /**
+   * Helps for building the ambiguity->resList information.
+   *
+   * @author Matthew Pocock
+   */
   private static class HashableList extends SimpleResidueList {
     public int hashCode() {
       int hc = 0;
