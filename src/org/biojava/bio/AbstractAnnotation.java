@@ -90,6 +90,32 @@ public abstract class AbstractAnnotation
       }
     }
   }
+  
+  public void removeProperty(Object key)
+    throws ChangeVetoException, NoSuchElementException
+  {
+    if (!getProperties().containsKey(key)) {
+        throw new NoSuchElementException("Can't remove key " + key.toString());
+    }
+    
+    if(!hasListeners()) {
+      getProperties().remove(key);
+    } else {
+      Map properties = getProperties();
+      ChangeEvent ce = new ChangeEvent(
+        this,
+        Annotation.PROPERTY,
+        new Object[] { key, null },
+        new Object[] { key, properties.get(key)}
+      );
+      ChangeSupport cs = getChangeSupport(Annotation.PROPERTY);
+      synchronized(cs) {
+        cs.firePreChangeEvent(ce);
+        properties.remove(key);
+        cs.firePostChangeEvent(ce);
+      }
+    }
+  }
 
   public boolean containsProperty(Object key) {
     if(propertiesAllocated()) {

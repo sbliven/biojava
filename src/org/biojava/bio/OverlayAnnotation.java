@@ -91,7 +91,8 @@ public class OverlayAnnotation
   }
 
   public void setProperty(Object key, Object value)
-  throws ChangeVetoException {
+    throws ChangeVetoException 
+  {
     if(hasListeners()) {
       ChangeSupport changeSupport = getChangeSupport(Annotation.PROPERTY);
       ChangeEvent ce = new ChangeEvent(
@@ -107,6 +108,35 @@ public class OverlayAnnotation
       }
     } else {
       getOverlay().put(key, value);
+    }
+  }
+  
+  public void removeProperty(Object key)
+    throws ChangeVetoException 
+  {
+      if (overlay == null || !overlay.containsKey(key)) {
+          if (parent.containsProperty(key)) {
+              throw new ChangeVetoException("Can't remove properties from the parent annotation");
+          } else {
+              throw new NoSuchElementException("Property doesn't exist: " + key);
+          }
+      }
+      
+    if(hasListeners()) {
+      ChangeSupport changeSupport = getChangeSupport(Annotation.PROPERTY);
+      ChangeEvent ce = new ChangeEvent(
+        this,
+        Annotation.PROPERTY,
+        new Object[] {key, null},
+        new Object[] {key, getProperty(key)}
+      );
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+        getOverlay().remove(key);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    } else {
+      getOverlay().remove(key);
     }
   }
 

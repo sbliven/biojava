@@ -51,6 +51,7 @@ import org.biojava.utils.*;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public interface Annotation extends Changeable {
   /**
@@ -97,7 +98,19 @@ public interface Annotation extends Changeable {
    *         if the change was vetoed
    */
   void setProperty(Object key, Object value)
-  throws IllegalArgumentException, ChangeVetoException;
+      throws IllegalArgumentException, ChangeVetoException;
+      
+  /**
+   * Delete a property
+   *
+   * @param key the key object
+   * @throws NoSuchElementException if the property doesn't exist
+   * @throws ChangeVetoException if the change is vetoed
+   * @since 1.3
+   */
+   
+  public void removeProperty(Object key)
+      throws NoSuchElementException, ChangeVetoException;
   
   /**
    * Returns whether there is any property under that key in this Annotation.
@@ -155,6 +168,14 @@ public interface Annotation extends Changeable {
       throw new ChangeVetoException(
         "You can not add properties to the Empty Annotation object: " +
         key + " -> " + value
+      );
+    }
+    
+    public void removeProperty(Object key)
+      throws ChangeVetoException 
+    {
+      throw new ChangeVetoException(
+        "You cannot remove properties from the empty annotation (!)"
       );
     }
     

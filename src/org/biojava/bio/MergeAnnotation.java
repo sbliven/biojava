@@ -83,6 +83,10 @@ public class MergeAnnotation
     throw new ChangeVetoException("MergeAnnotations don't allow property setting at the moment");
   }
   
+  public void removeProperty(Object key) throws ChangeVetoException {
+    throw new ChangeVetoException("MergeAnnotations don't allow property removal at the moment");
+  }
+  
   public Object getProperty(Object key) {
     for (Iterator i = mergeSet.iterator(); i.hasNext(); ) {
       Annotation a = (Annotation) i.next();
