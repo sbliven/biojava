@@ -128,6 +128,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
 	try {
 	    Connection conn = pool.takeConnection();
+	    conn.setAutoCommit(false);
 	    ResultSet rs;
 
 	    PreparedStatement create_bioentry = conn.prepareStatement(
@@ -161,14 +162,31 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    // Store the features
 	    //
 
-	    for (Iterator fi = seq.filter(FeatureFilter.all, true).features(); fi.hasNext(); ) {
-		Feature f = (Feature) fi.next();
-		persistFeature(conn, bioentry_id, f);
+	    FeatureHolder features = seq;
+	    int num = features.countFeatures();
+	    if (!isHierarchySupported()) {
+		features = features.filter(FeatureFilter.all, true);
+		if (features.countFeatures() != num) {
+		    System.err.println("*** Warning: feature hierarchy was lost when adding sequence to BioSQL");
+		}
 	    }
+	    persistFeatures(conn, bioentry_id, features, -1);
 
 	    pool.putConnection(conn);
 	} catch (SQLException ex) {
 	    throw new BioException(ex, "Error inserting data into BioSQL tables");
+	}
+    }
+
+    void persistFeatures(Connection conn, int bioentry_id, FeatureHolder features, int parent)
+        throws BioException, SQLException
+    {
+	for (Iterator fi = features.features(); fi.hasNext(); ) {
+	    Feature f = (Feature) fi.next();
+	    int id = persistFeature(conn, bioentry_id, f, parent);
+	    if (isHierarchySupported()) {
+		persistFeatures(conn, bioentry_id, f, id);
+	    }
 	}
     }
 
@@ -315,7 +333,8 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
     int persistFeature(Connection conn,
 		       int bioentry_id,
-		       Feature f)
+		       Feature f,
+		       int parent_id)
 	throws BioException, SQLException
     {
 	int seqfeature_key = intern_seqfeature_key(conn, f.getType());
@@ -370,6 +389,22 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	for (Iterator ai = f.getAnnotation().asMap().entrySet().iterator(); ai.hasNext(); ) {
 	    Map.Entry akv = (Map.Entry) ai.next();
 	    persistProperty(conn, id, akv.getKey(), akv.getValue(), false);
+	}
+
+	//
+	// Persist link to parent
+	//
+	
+	if (parent_id >= 0) {
+	    PreparedStatement add_hierarchy = conn.prepareStatement(
+		"insert into seqfeature_hierarchy "+
+		"       (parent, child) " +
+		"values (?, ?)"
+		);
+	    add_hierarchy.setInt(1, parent_id);
+	    add_hierarchy.setInt(2, id);
+	    add_hierarchy.executeUpdate();
+	    add_hierarchy.close();
 	}
 
 	return id;
@@ -477,4 +512,29 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	int id = getDBHelper().getInsertID(conn, "seqfeature_qualifier", "seqfeature_qualifier_id");
 	return id;		      
     }    
+
+    private boolean hierarchyChecked = false;
+    private boolean hierarchySupported = false;
+
+    boolean isHierarchySupported() {
+	if (!hierarchyChecked) {
+	    try {
+		Connection conn = pool.takeConnection();
+		PreparedStatement ps = conn.prepareStatement("select * from seqfeature_hierarchy limit 1");
+		try {
+		    ps.executeQuery();
+		    hierarchySupported = true;
+		} catch (SQLException ex) {
+		    hierarchySupported = false;
+		}
+		ps.close();
+		pool.putConnection(conn);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex);
+	    }
+	    hierarchyChecked = true;
+	}
+
+	return hierarchySupported;
+    }
 }

@@ -204,13 +204,13 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     {
 	Feature f = realizeFeature(this, ft);
 	if (changeSupport == null) {
-	    persistFeature(f);
+	    persistFeature(f, -1);
 	    getFeatures().addFeature(f);
 	} else {
 	    synchronized (changeSupport) {
 		ChangeEvent cev = new ChangeEvent(this, FeatureHolder.FEATURES, f);
 		changeSupport.firePreChangeEvent(cev);
-		persistFeature(f);
+		persistFeature(f, -1); // No parent
 		getFeatures().addFeature(f);
 		changeSupport.firePostChangeEvent(cev);
 	    }
@@ -255,6 +255,8 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 		}
 		get_features.close();
 
+		// Fetch locations
+
 		PreparedStatement get_locations = conn.prepareStatement(
 		        "select seqfeature_location.seqfeature_id, " +
 			"seqfeature_location.seq_start, " +
@@ -295,10 +297,8 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 		}
 		get_locations.close();
 
-		seqDB.getPool().putConnection(conn);
-		conn = null;
-
-		features = new SimpleFeatureHolder();
+		// Bind location information to features
+		
 		for (Iterator i = fmap.entrySet().iterator(); i.hasNext(); ) {
 		    Map.Entry me = (Map.Entry) i.next();
 		    Integer fid = (Integer) me.getKey();
@@ -316,14 +316,42 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 			loc = LocationTools.union(ll);
 		    }
 		    templ.location = loc;
+		}
 
-		    try {
-			Feature f = realizeFeature(this, templ);
-			if (f instanceof BioSQLFeatureI) {
-			    ((BioSQLFeatureI) f)._setInternalID(fid.intValue());
-			    ((BioSQLFeatureI) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, fid.intValue()));
+		// Check hierarchy
+
+		Set toplevelFeatures = new HashSet(fmap.keySet());
+		Map featureHierarchy = new HashMap();
+		if (seqDB.isHierarchySupported()) {
+		    PreparedStatement get_hierarchy = conn.prepareStatement("select parent, child from seqfeature_hierarchy, seqfeature where parent = seqfeature.seqfeature_id and seqfeature.bioentry_id = ?");
+		    get_hierarchy.setInt(1, bioentry_id);
+		    rs = get_hierarchy.executeQuery();
+		    while (rs.next()) {
+			Integer parent = new Integer(rs.getInt(1));
+			Integer child = new Integer(rs.getInt(2));
+
+			System.err.println("Got hierarchy entry: " + parent + " : " + child);
+
+			toplevelFeatures.remove(child);
+			List cl = (List) featureHierarchy.get(parent);
+			if (cl == null) {
+			    cl = new ArrayList();
+			    featureHierarchy.put(parent, cl);
 			}
-			features.addFeature(realizeFeature(this, templ));
+			cl.add(child);
+		    }
+		    get_hierarchy.close();
+		}
+
+		seqDB.getPool().putConnection(conn);
+		conn = null;
+		
+		features = new SimpleFeatureHolder();
+		for (Iterator tlfi = toplevelFeatures.iterator(); tlfi.hasNext(); ) {
+		    Integer fid = (Integer) tlfi.next();
+		    try {
+			Feature f = reRealizeFeature(fid, fmap, featureHierarchy, this);
+			features.addFeature(f);
 		    } catch (BioException ex) {
 			throw new BioRuntimeException(ex);
 		    } catch (ChangeVetoException ex) {
@@ -331,11 +359,34 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 		    }
 		}
 	    } catch (SQLException ex) {
-		throw new BioRuntimeException("Oooops, couldn't read features!");
+		throw new BioRuntimeException(ex, "Oooops, couldn't read features!");
 	    }
 	}
 
 	return features;
+    }
+
+    private Feature reRealizeFeature(Integer fid, Map fmap, Map featureHierarchy, FeatureHolder parent)
+        throws BioException, ChangeVetoException
+    {
+	System.err.println("ReRealizeFeature " + fid);
+
+	Feature.Template templ = (Feature.Template) fmap.get(fid);
+	Feature f = realizeFeature(parent, templ);
+	if (f instanceof BioSQLFeatureI) {
+	    System.err.println("Doing magical bits");
+
+	    ((BioSQLFeatureI) f)._setInternalID(fid.intValue());
+	    ((BioSQLFeatureI) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, fid.intValue()));
+	    List children = (List) featureHierarchy.get(fid);
+	    if (children != null) {
+		for (Iterator ci = children.iterator(); ci.hasNext(); ) {
+		    Integer childID = (Integer) ci.next();
+		    ((BioSQLFeatureI) f)._addFeature(reRealizeFeature(childID, fmap, featureHierarchy, f));
+		}
+	    }
+	}
+	return f;
     }
 
     //
@@ -345,26 +396,29 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     public Feature realizeFeature(FeatureHolder parent, Feature.Template templ)
         throws BioException
     {
-	if (parent != this) {
-	    throw new BioException("BioSQL only (currently) supports top-level features");
+	if (parent != this && !seqDB.isHierarchySupported()) {
+	    throw new BioException("This database doesn't support feature hierarchy.  Please create a seqfeature_hierarchy table");
 	}
 
-	Feature f = new BioSQLFeature(this, this, templ);
-	return f;
+	if (templ instanceof StrandedFeature.Template && getAlphabet() == DNATools.getDNA()) {
+	    return new BioSQLStrandedFeature(this, parent, (StrandedFeature.Template) templ);
+	} else {
+	    return new BioSQLFeature(this, parent, templ);
+	}
     }
 
     //
     // Feature persistance
     //
 
-    void persistFeature(Feature f)
+    void persistFeature(Feature f, int parent_id)
         throws BioException
     {
 	Connection conn = null;
 	try {
 	    conn = seqDB.getPool().takeConnection();
 	    conn.setAutoCommit(false);
-	    int f_id = seqDB.persistFeature(conn, bioentry_id, f);
+	    int f_id = seqDB.persistFeature(conn, bioentry_id, f, parent_id);
 	    if (f instanceof BioSQLFeatureI) {
 		((BioSQLFeatureI) f)._setInternalID(f_id);
 		((BioSQLFeatureI) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, f_id));

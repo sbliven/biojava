@@ -21,6 +21,7 @@
 
 package org.biojava.bio.seq.db.biosql;
 
+import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
@@ -43,6 +44,14 @@ class BioSQLFeature extends SimpleFeature implements BioSQLFeatureI {
 	_annotation = a;
     }
 
+    public Feature createFeature(Feature.Template templ)
+        throws BioException, ChangeVetoException
+    {
+	Feature f = realizeFeature(this, templ);
+	((BioSQLSequence) getSequence()).persistFeature(f, id);
+	return f;
+    }
+
     private static Template mungeTemplate(Template templ) {
 	Feature.Template sft = new Feature.Template();
 	sft.location = templ.location;
@@ -62,5 +71,11 @@ class BioSQLFeature extends SimpleFeature implements BioSQLFeatureI {
 
     public int _getInternalID() {
 	return id;
+    }
+
+    public void _addFeature(Feature f) 
+        throws ChangeVetoException
+    {
+	getFeatureHolder().addFeature(f);
     }
 } 

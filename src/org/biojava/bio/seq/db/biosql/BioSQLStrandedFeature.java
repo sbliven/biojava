@@ -21,12 +21,13 @@
 
 package org.biojava.bio.seq.db.biosql;
 
+import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
 
-class BioSQLStrandedFeature extends SimpleStrandedFeature {
+class BioSQLStrandedFeature extends SimpleStrandedFeature implements BioSQLFeatureI {
     private Annotation _annotation;
     private int id;
 
@@ -39,6 +40,14 @@ class BioSQLStrandedFeature extends SimpleStrandedFeature {
 	_annotation = templ.annotation;
     }
 
+    public Feature createFeature(Feature.Template templ)
+        throws BioException, ChangeVetoException
+    {
+	Feature f = realizeFeature(this, templ);
+	((BioSQLSequence) getSequence()).persistFeature(f, id);
+	return f;
+    }
+
     private static StrandedFeature.Template mungeTemplate(StrandedFeature.Template templ) {
 	StrandedFeature.Template sft = new StrandedFeature.Template();
 	sft.location = templ.location;
@@ -47,6 +56,11 @@ class BioSQLStrandedFeature extends SimpleStrandedFeature {
 	sft.strand = templ.strand;
 	sft.annotation = Annotation.EMPTY_ANNOTATION;
 	return sft;
+    }
+
+    
+    public void _setAnnotation(Annotation a) {
+	_annotation = a;
     }
 
     public Annotation getAnnotation() {
@@ -60,5 +74,11 @@ class BioSQLStrandedFeature extends SimpleStrandedFeature {
 
     public int _getInternalID() {
 	return id;
+    }
+
+    public void _addFeature(Feature f) 
+        throws ChangeVetoException
+    {
+	getFeatureHolder().addFeature(f);
     }
 } 
