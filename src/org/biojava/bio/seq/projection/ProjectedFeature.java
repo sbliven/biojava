@@ -79,6 +79,10 @@ public abstract class ProjectedFeature
   public ProjectionContext getProjectionContext() {
     return context;
   }
+  
+  public Sequence getSequence() {
+      return context.getSequence(getViewedFeature());
+  }
 
   public FeatureHolder getParent() {
     return context.getParent(feature);
