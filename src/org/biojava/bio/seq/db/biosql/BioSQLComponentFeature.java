@@ -37,6 +37,7 @@ import org.biojava.bio.symbol.*;
  * Sequence keyed off a BioSQL biosequence.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.3
  */
 
@@ -97,6 +98,14 @@ class BioSQLComponentFeature implements ComponentFeature {
     public Location getLocation() {
 	return location;
     }
+    
+    public void setLocation(Location loc)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, LOCATION, loc, this.location),
+        "Can't change location as it is immutable"
+      );
+    }
 
     public Location getComponentLocation() {
 	return componentLocation;
@@ -127,10 +136,26 @@ class BioSQLComponentFeature implements ComponentFeature {
 	return type;
     }
 
+    public void setType(String type)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, TYPE, type, this.type),
+        "Can't change type as it is immutable"
+      );
+    }
+      
     public String getSource() {
 	return source;
     }
 
+    public void setSource(String source)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, TYPE, source, this.source),
+        "Can't change source as it is immutable"
+      );
+    }
+    
     public Feature.Template makeTemplate() {
 	throw new BioError("FIXME");
     }
