@@ -667,6 +667,11 @@ public final class AlphabetManager {
               for(Iterator j = pa.iterator(); j.hasNext(); ) {
                 alpha.addSymbol((Symbol) j.next());
               }
+              if (pa instanceof SimpleAlphabet) {
+              for(Iterator j = ((SimpleAlphabet)pa).ambiguities(); j.hasNext(); ) {
+                alpha.addAmbiguity((Symbol) j.next());
+                }
+              }
             }
             alpha.setName(alphaName);
             registerAlphabet(alphaName, alpha);
