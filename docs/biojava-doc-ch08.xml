@@ -210,4 +210,4 @@
     class. It will lazily instantiate the delegate only when listeners
     need to be registered.</para>
   </sect1>
-  </chapter>
+</chapter>
