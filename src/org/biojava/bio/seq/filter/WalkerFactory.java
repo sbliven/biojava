@@ -190,13 +190,14 @@ public class WalkerFactory {
       // firstly, we should call And, Or, Not, etc., wrapped filters
       //
       // These are all listed in filtersWithParents.
+      InstructionVector wrapperIV = new InstructionVector();
       for(Iterator fwpi = filtersWithParents.iterator(); fwpi.hasNext(); ) {
         InstructionVector wfiv = new InstructionVector();
 
         // find the methods that get the wrapped
         Class filtClass = (Class) fwpi.next();
         CodeClass c_ourFilter = IntrospectedCodeClass.forClass(filtClass);
-System.err.println(filtClass);
+
         Method[] filtMeth = filtClass.getMethods();
         int lvi = 0;
 
@@ -208,13 +209,16 @@ System.err.println(filtClass);
                   FeatureFilter.class.isAssignableFrom(m.getReturnType()))
           {
             CodeMethod m_getFilter = IntrospectedCodeClass.forMethod(m);
-System.err.println("\t" + m);
-            LocalVariable lv;
-            if(lvi < wrappedLVs.size()) {
-              lv = (LocalVariable) wrappedLVs.get(lvi);
-            } else {
-              lv = new LocalVariable(c_retClass);
-              wrappedLVs.add(lv);
+            LocalVariable lv = null;
+
+            if (c_retClass != CodeUtils.TYPE_VOID) {
+              if (lvi < wrappedLVs.size()) {
+                lv = (LocalVariable) wrappedLVs.get(lvi);
+              } else {
+                lv = new LocalVariable(c_retClass);
+                wrappedLVs.add(lv);
+              }
+              lvi++;
             }
 
             // res_i = this.walk(
@@ -236,14 +240,19 @@ System.err.println("\t" + m);
         // if (filter intanceof ourFilter ) {
         //   do the above block
         // }
-        walkIV.add(ByteCode.make_aload(lv_filter));
-        walkIV.add(ByteCode.make_instanceof(c_ourFilter));
-        walkIV.add(new IfExpression(ByteCode.op_ifne,
+        wrapperIV.add(ByteCode.make_aload(lv_filter));
+        wrapperIV.add(ByteCode.make_instanceof(c_ourFilter));
+        wrapperIV.add(new IfExpression(ByteCode.op_ifne,
                                     wfiv,
                                     CodeUtils.DO_NOTHING));
       }
 
-
+      for(Iterator lvi = wrappedLVs.iterator(); lvi.hasNext(); ) {
+        LocalVariable lv = (LocalVariable) lvi.next();
+        walkIV.add(ByteCode.make_aconst_null());
+        walkIV.add(ByteCode.make_astore(lv));
+      }
+      walkIV.add(wrapperIV);
 
       // the big if/else/if/else stack goes here - switching on feature filter
       // type for each method using instanceof

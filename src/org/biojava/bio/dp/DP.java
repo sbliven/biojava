@@ -84,7 +84,7 @@ public abstract class DP {
   private static List NO_ADVANCE = new ArrayList();
   
   private int[] getNoAdvance() {
-    int heads = getModel().heads();
+    int heads = getModel().advance().length;
     int[] no_advance = (int[]) NO_ADVANCE.get(heads);
     
     if(no_advance == null) {
@@ -207,11 +207,11 @@ public abstract class DP {
     for (Iterator si = emissionStates.iterator(); si.hasNext(); ) {
       EmissionState ex = (EmissionState) si.next();
       int [] ad = ex.getAdvance();
-      if(ad.length != mm.heads()) {
+      if(ad.length != mm.advance().length) {
         throw new BioException(
           "State " + ex.getName() + " advances " + ad.length + " heads. " +
           " however, the model " + mm.stateAlphabet().getName() +
-          " advances " + mm.heads() + " heads."
+          " advances " + mm.advance().length + " heads."
         );
       }
       for(int adi = 0; ad != null && adi < ad.length; adi++) {
@@ -263,7 +263,7 @@ public abstract class DP {
     State [] states,
     int [][] transitions,
     ScoreType scoreType
-  ) throws IllegalSymbolException {
+  ) {
     int stateCount = states.length;
     double [][] scores = new double[stateCount][];
 
@@ -286,8 +286,9 @@ public abstract class DP {
             )
           );*/
         } catch (IllegalSymbolException ite) {
-          throw new BioError(ite,
-            "Transition listed in transitions array has dissapeared.");
+          throw new BioError(
+            "Transition listed in transitions array has dissapeared.",
+            ite);
         }
       }
     }
@@ -325,7 +326,7 @@ public abstract class DP {
     State [] states,
     int [][] transitions,
     ScoreType scoreType
-  ) throws IllegalSymbolException {
+  ) {
     int stateCount = states.length;
     double [][] scores = new double[stateCount][];
 
@@ -339,8 +340,9 @@ public abstract class DP {
             states[transitions[i][j]]
           ));
         } catch (IllegalSymbolException ite) {
-          throw new BioError(ite,
-            "Transition listed in transitions array has dissapeared");
+          throw new BioError(
+            "Transition listed in transitions array has dissapeared",
+            ite);
         }
       }
     }
@@ -377,13 +379,9 @@ public abstract class DP {
   public double [][] getForwardTransitionScores(ScoreType scoreType) {
     double [][] ts = (double [][]) forwardTransitionScores.get(scoreType);
     if(ts == null) {
-      try {
-        forwardTransitionScores.put(scoreType, ts = forwardTransitionScores(
-          getModel(), getStates(), forwardTransitions, scoreType
-        ));
-      } catch (IllegalSymbolException ise) {
-        throw new BioError(ise, "Inconsistency in model");
-      }
+      forwardTransitionScores.put(scoreType, ts = forwardTransitionScores(
+        getModel(), getStates(), forwardTransitions, scoreType
+      ));
     }
     return ts;
   }
@@ -395,13 +393,9 @@ public abstract class DP {
   public double [][] getBackwardTransitionScores(ScoreType scoreType) {
     double [][] ts = (double [][]) backwardTransitionScores.get(scoreType);
     if(ts == null) {
-      try {
-        backwardTransitionScores.put(scoreType, ts = backwardTransitionScores(
-          getModel(), getStates(), backwardTransitions, scoreType
-        ));
-      } catch (IllegalSymbolException ise) {
-        throw new BioError(ise, "Inconsistency in model");
-      }
+      backwardTransitionScores.put(scoreType, ts = backwardTransitionScores(
+        getModel(), getStates(), backwardTransitions, scoreType
+      ));
     }
     return ts;
   }
@@ -435,7 +429,7 @@ public abstract class DP {
       }
       dotStatesIndex = i;
     } catch (Exception e) {
-      throw new BioError(e, "Something is seriously wrong with the DP code");
+      throw new BioError("Something is seriously wrong with the DP code", e);
     }
   }
   
@@ -503,7 +497,7 @@ public abstract class DP {
         }
       };
     } catch (Exception e) {
-      throw new BioException(e, "Couldn't build forwards-backwards matrix");
+      throw new BioException("Couldn't build forwards-backwards matrix", e);
     }
   }
 
@@ -558,8 +552,9 @@ public abstract class DP {
       try {
         symScore += dist.getWeight(newState);
       } catch (IllegalSymbolException ise) {
-        throw new BioError(ise,
-          "Transition returned from sampleTransition is invalid");
+        throw new BioError(
+          "Transition returned from sampleTransition is invalid",
+          ise);
       }
 
       if (newState == model.magicalState()) {
@@ -588,7 +583,7 @@ public abstract class DP {
       totScore,
       tokens,
       states,
-      new SimpleSymbolList(dAlpha, scoreList)
+      scores
     );
   }
 

@@ -37,29 +37,27 @@ implements Visitor {
     return FilterUtils.not(c);
   }
 
-  public FeatureFilter byParent(FeatureFilter.ByParent parent) {
-    return FilterUtils.byParent(parent);
+  public FeatureFilter byParent(FeatureFilter.ByParent parent, FeatureFilter c) {
+    return FilterUtils.byParent(c);
   }
 
-  public FeatureFilter byAncestor(FeatureFilter.ByAncestor ancestor) {
-    return FilterUtils.byAncestor(ancestor);
+  public FeatureFilter byAncestor(FeatureFilter.ByAncestor ancestor, FeatureFilter c) {
+    return FilterUtils.byAncestor(c);
   }
 
-  public FeatureFilter onlyChildren(FeatureFilter.OnlyChildren child) {
-    return FilterUtils.onlyChildren(child);
+  public FeatureFilter onlyChildren(FeatureFilter.OnlyChildren child, FeatureFilter c) {
+    return FilterUtils.onlyChildren(c);
   }
 
-  public FeatureFilter onlyDescendants(FeatureFilter.OnlyDescendants desc) {
-    return FilterUtils.onlyDescendants(desc);
+  public FeatureFilter onlyDescendants(FeatureFilter.OnlyDescendants desc, FeatureFilter c) {
+    return FilterUtils.onlyDescendants(c);
   }
 
-  public FeatureFilter byChild(FeatureFilter.ByChild child) {
-    return FilterUtils.byChild(child);
+  public FeatureFilter byChild(FeatureFilter.ByChild child, FeatureFilter c) {
+    return FilterUtils.byChild(c);
   }
 
-  public FeatureFilter byDescendant(FeatureFilter.ByDescendant desc) {
-    return FilterUtils.byDescendant(desc);
+  public FeatureFilter byDescendant(FeatureFilter.ByDescendant desc, FeatureFilter c) {
+    return FilterUtils.byDescendant(c);
   }
-
-  
 }

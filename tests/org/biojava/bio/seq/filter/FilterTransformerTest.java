@@ -26,9 +26,8 @@ extends TestCase {
       FeatureFilter filt2 = (FeatureFilter) FilterUtils.visitFilter(
               filt,
               new FilterTransformer());
-      assertEquals("Non-moidfying transformer gives equal results",
-                   filt,
-                   filt2);
+      assertTrue("Non-moidfying transformer gives equal results:\n\t" + filt + "\n\t" + filt2,
+                   FilterUtils.areEqual(filt, filt2));
     } catch (BioException be) {
       throw (AssertionError) new AssertionError("Couldn't make walker").initCause(be);
     }
