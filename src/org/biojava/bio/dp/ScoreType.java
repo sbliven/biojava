@@ -28,11 +28,14 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
 /**
+ * This class computes the score that is used to be used
+ * in a DP optimisation.
+ *
  * @author Matthew Pocock
  */
 public interface ScoreType {
   /**
-   * Calculate the score associated with a distribution and a symbol.
+   * Calculates the score associated with a distribution and a symbol.
    */
   double calculateScore(Distribution dist, Symbol sym)
   throws IllegalSymbolException;
@@ -40,6 +43,9 @@ public interface ScoreType {
   public final static ScoreType PROBABILITY = new Probability();
   
   /**
+   * In this class, calculateScore returns the probability
+   * of a Symbol being emitted.
+   *
    * @author Matthew Pocock
    */
   public static class Probability implements ScoreType {
@@ -52,6 +58,11 @@ public interface ScoreType {
   public final static ScoreType ODDS = new Odds();
   
   /**
+   * In this class, calculateScore returns the odds ratio
+   * of a symbol being emitted, i.e. the ratio of the
+   * probability of a Symbol being emitted to it being
+   * emitted by the null model.
+   *
    * @author Matthew Pocock
    */
   public static class Odds implements ScoreType {
@@ -67,6 +78,9 @@ public interface ScoreType {
   public final static ScoreType NULL_MODEL = new NullModel();
   
   /**
+   * In this class, calculateScore returns the probability of
+   * a Symbol being emitted by the null model.
+   *
    * @author Matthew Pocock
    */
   public static class NullModel implements ScoreType {
