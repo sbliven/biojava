@@ -41,12 +41,10 @@ import org.biojava.utils.ThreadPool;
  * is a <code>ViewSequence</code> wrapping the original.</p>
  *
  * <p>The <code>Feature</code>s created are
- * <code>SimpleFeature</code>s which have a flyweight
+ * <code>RestrictionSite</code>s which have a flyweight
  * <code>Annotation</code> containing a single <code>String</code>
- * property "name" whose value is the name of the enzyme (e.g. EcoRI)
- * which may be used to retrieve the <code>RestrictionEnzyme</code>
- * from the <code>RestrictionEnzymeManager</code>. In future a
- * special <code>RestrictionSite</code> feature may be created.</p>
+ * property "dbxref" whose value is "REBASE:" plus name of the enzyme
+ * (e.g. EcoRI).</p>
  *
  * <p>The mapper will by default map only those sites which have both
  * their recognition sites and their cut sites within the
@@ -60,38 +58,41 @@ import org.biojava.utils.ThreadPool;
  * registered with the <code>RestrictionEnzymeManager</code>.</p>
  *
  * @author Keith James
+ * @since 1.3
  */
 public class RestrictionMapper implements SequenceAnnotator
 {
     /**
-     * <code>SITE_FEATURE_SOURCE</code> the source String used by
-     * <code>RestrictionMapper</code> when creating restriction site
-     * <code>Feature</code>s. This is the String which is returned
-     * when a <code>Feature</code>'s <code>getSource()</code> method
-     * is called.
+     * <code>SITE_FEATURE_SOURCE</code> the source <code>String</code>
+     * used by <code>RestrictionMapper</code> when creating
+     * restriction site <code>Feature</code>s. This is the
+     * <code>String</code> which is returned when a
+     * <code>Feature</code>'s <code>getSource()</code> method is
+     * called.
      */
     public static final String SITE_FEATURE_SOURCE = "regex";
 
     /**
-     * <code>SITE_FEATURE_TYPE</code> the type String used by
-     * <code>RestrictionMapper</code> when creating restriction site
-     * <code>Feature</code>s. This is the String which is returned
-     * when a <code>Feature</code>'s <code>getType()</code> method is
-     * called.
+     * <code>SITE_FEATURE_TYPE</code> the type <code>String</code>
+     * used by <code>RestrictionMapper</code> when creating
+     * restriction site <code>Feature</code>s. This is the
+     * <code>String</code> which is returned when a
+     * <code>Feature</code>'s <code>getType()</code> method is called.
      */
-    public static final String SITE_FEATURE_TYPE = "restriction";
+    public static final String SITE_FEATURE_TYPE = "misc_binding";
 
     private List restrictionEnzymes;
     private boolean mapAll;
     private ThreadPool threadPool;
 
     /**
-     * Creates a new <code>RestrictionMapper</code> which will use the
-     * specified <code>ThreadPool</code>. Do not share one pool
+     * <p>Creates a new <code>RestrictionMapper</code> which will use
+     * the specified <code>ThreadPool</code>. Do not share one pool
      * between a number of <code>RestrictionMapper</code>s because
      * <code>annotate(Sequence sequence)</code> waits for all threads
-     * in the pool to finish before returning and this will lead to a
-     * race condition between mappers.
+     * in the pool to finish work before returning and this will lead
+     * to a race condition between mappers. One mapper could end up
+     * waiting for another mapper's threads before returning.</p>
      *
      * @param threadPool a <code>ThreadPool</code>.
      */
@@ -124,6 +125,7 @@ public class RestrictionMapper implements SequenceAnnotator
                                                             mapped));
         }
 
+        // Threads will finish work and become idle
         threadPool.waitForThreads();
 
         return mapped;
@@ -135,7 +137,7 @@ public class RestrictionMapper implements SequenceAnnotator
      * sequence, but cut outside it. The default is false, indicating
      * only sites which can actually be cut are mapped.
      *
-     * @return a <code>boolean</code> value.
+     * @return a <code>boolean</code>.
      */
     public boolean getMapAll()
     {
@@ -148,7 +150,7 @@ public class RestrictionMapper implements SequenceAnnotator
      * sequence, but cut outside it. The default is false, indicating
      * only sites which can actually be cut are mapped.
      *
-     * @param on a <code>boolean</code> value.
+     * @param on a <code>boolean</code>.
      */
     public void setMapAll(boolean on)
     {
@@ -184,5 +186,14 @@ public class RestrictionMapper implements SequenceAnnotator
                                                + "'");
 
         restrictionEnzymes.remove(enzyme);
+    }
+
+    /**
+     * <code>clearEnzymes</code> removes all enzymes from those to be
+     * searched for in the <code>Sequence</code>.
+     */
+    public void clearEnzymes()
+    {
+        restrictionEnzymes.clear();
     }
 }

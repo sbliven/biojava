@@ -34,6 +34,11 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SymbolList;
 
+/**
+ * <code>RestrictionEnzymeTest</code> tests enzyme functionality.
+ *
+ * @author Keith James
+ */
 public class RestrictionEnzymeTest extends TestCase
 {
     public RestrictionEnzymeTest(String name)

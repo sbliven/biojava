@@ -41,7 +41,6 @@ import org.biojava.bio.symbol.MotifTools;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeVetoException;
-
 import org.biojava.utils.ParserException;
 import org.biojava.utils.SmallSet;
 
@@ -57,6 +56,7 @@ import org.biojava.utils.SmallSet;
  * should be named "RestrictionEnzymeManager.properties".</p>
  *
  * @author Keith James
+ * @since 1.3
  */
 public final class RestrictionEnzymeManager
 {
@@ -225,10 +225,12 @@ public final class RestrictionEnzymeManager
     }
 
     /**
-     * <code>getAnnotation</code> returns an immutable annotation
-     * describing the enzyme. This is suitable for adding to
-     * <code>Feature</code>s which represent restriction sites as a
-     * flyweight object.
+     * <code>getAnnotation</code> returns an immutable, static
+     * annotation describing the enzyme. This is suitable for adding
+     * to <code>Feature</code>s which represent restriction sites. The
+     * annotation produced currently contains one key "dbxref" in line
+     * with the GenBank/EMBL qualifier for the "misc_binding" feature
+     * key. The key has a corresponding value "REBASE:<enzyme name>".
      *
      * @param enzyme a <code>RestrictionEnzyme</code>.
      *
@@ -246,12 +248,15 @@ public final class RestrictionEnzymeManager
 
     /**
      * <code>register</code> regisiters a new
-     * <code>RestrictionEnzyme</code> with the manager.
+     * <code>RestrictionEnzyme</code> with the manager. It does not
+     * check that the isoschizomers are known to the manager. If there
+     * are custom isoschizomers in the <code>Set</code>, they should
+     * be also be registered.
      *
      * @param enzyme a <code>RestrictionEnzyme</code> to register.
      *
      * @param isoschizomers a <code>Set</code> of
-     * <code>String</code>s which are names of isoschizomers.
+     * <code>RestrictionEnzyme</code>s which are isoschizomers.
      */
     public synchronized static void register(RestrictionEnzyme enzyme,
                                              Set               isoschizomers)
@@ -260,17 +265,33 @@ public final class RestrictionEnzymeManager
         {
             Object o = ii.next();
 
-            if (! (o instanceof String))
+            if (! (o instanceof RestrictionEnzyme))
             {
-                throw new IllegalArgumentException("Isoschizomers set may contain only String names. Found '"
+                throw new IllegalArgumentException("Isoschizomers set may contain only RestrictionEnzymes. Found '"
                                                    + o
                                                    + "'");
             }
         }
 
+        registerEnzyme(enzyme);
+
+        String name = enzyme.getName();
+        nameToIsoschizomers.put(name, isoschizomers);
+    }
+
+    /**
+     * <code>registerEnzyme</code> registers an enzyme, but does not
+     * populate its isoschizomers. This is because registering the
+     * contents of a REBASE file and registering a custom enzyme
+     * handle addition of isoschizomers differently, but both use this
+     * method for all other registration functions.
+     *
+     * @param enzyme a <code>RestrictionEnzyme</code>.
+     */
+    private static void registerEnzyme(RestrictionEnzyme enzyme)
+    {
         String name = enzyme.getName();
         nameToEnzyme.put(name, enzyme);
-        nameToIsoschizomers.put(name, isoschizomers);
 
         Integer sizeKey = new Integer(enzyme.getRecognitionSite().length());
         if (sizeToCutters.containsKey(sizeKey))
@@ -292,7 +313,7 @@ public final class RestrictionEnzymeManager
         Annotation annotation = new SmallAnnotation();
         try
         {
-            annotation.setProperty("name", name);
+            annotation.setProperty("dbxref", "REBASE:" + name);
         }
         catch (ChangeVetoException cve)
         {
@@ -300,7 +321,6 @@ public final class RestrictionEnzymeManager
         }
 
         annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
-
         enzymeToAnnotation.put(enzyme, annotation);
     }
 
@@ -433,8 +453,8 @@ public final class RestrictionEnzymeManager
                 isoschizomers = new HashSet(isoBuffer);
             }
 
-            RestrictionEnzyme enzyme = createEnzyme();
-            register(enzyme, isoschizomers);
+            registerEnzyme(createEnzyme());
+            nameToIsoschizomers.put(name, isoschizomers);
         }
 
         public void startTag(Object tag) throws ParserException

@@ -33,6 +33,12 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SymbolList;
 
+/**
+ * <code>RestrictionEnzymeManagerTest</code> tests manager
+ * functionality.
+ *
+ * @author Keith James
+ */
 public class RestrictionEnzymeManagerTest extends TestCase
 {
     public RestrictionEnzymeManagerTest(String name)

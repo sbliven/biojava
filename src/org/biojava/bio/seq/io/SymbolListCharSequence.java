@@ -40,6 +40,7 @@ import org.biojava.bio.symbol.SymbolList;
  * <code>SymbolList</code>s as it avoids creating a copy.
  *
  * @author Keith James
+ * @since 1.3
  */
 public class SymbolListCharSequence implements CharSequence
 {

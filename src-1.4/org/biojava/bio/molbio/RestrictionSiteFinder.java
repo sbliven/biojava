@@ -41,6 +41,7 @@ import org.biojava.utils.ChangeVetoException;
  * searches.
  *
  * @author Keith James
+ * @since 1.3
  */
 class RestrictionSiteFinder implements Runnable
 {
@@ -95,11 +96,12 @@ class RestrictionSiteFinder implements Runnable
                 usOffset = Math.min(usCut[0], usCut[1]);
             }
 
-            StrandedFeature.Template t = new StrandedFeature.Template();
+            RestrictionSite.Template t = new RestrictionSite.Template();
             t.type       = RestrictionMapper.SITE_FEATURE_TYPE;
             t.source     = RestrictionMapper.SITE_FEATURE_SOURCE;
             t.strand     = StrandedFeature.POSITIVE;
             t.annotation = RestrictionEnzymeManager.getAnnotation(enzyme);
+            t.enzyme     = enzyme;
 
             Matcher m = patterns[0].matcher(charSeq);
             while (m.find())
