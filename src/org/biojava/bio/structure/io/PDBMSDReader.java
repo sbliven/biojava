@@ -90,7 +90,7 @@ public class PDBMSDReader
 	}
 
 	try {
-	    PreparedStatement ps = conn.prepareStatement("select residue_serial, serial, residue_id,code_3_letter, CHEM_ATOM_NAME_PDB_LS, chem_atom_name,        element_symbol,alt_code,  CHAIN_CODE_1_LETTER, chain_code, chain_pdb_code,  OCCUPANCY, PDB_CHARGE,PDB_Group, x,y,z, CHEM_COMP_CODE, CHEM_ATOM_ID,U_ISO_OR_EQUIV,  RESIDUE_PDB_SEQ from Atom_Data where accession_code = ? order by serial") ;
+	    PreparedStatement ps = conn.prepareStatement("select residue_serial, serial, residue_id,code_3_letter, CHEM_ATOM_NAME_PDB_LS, chem_atom_name,        element_symbol,alt_code,  CHAIN_CODE_1_LETTER, chain_code, chain_pdb_code,  OCCUPANCY, PDB_CHARGE,PDB_Group, x,y,z, CHEM_COMP_CODE, CHEM_ATOM_ID,U_ISO_OR_EQUIV,  RESIDUE_PDB_SEQ, RESIDUE_PDB_INSERT_CODE from Atom_Data where accession_code = ? order by serial") ;
 	    ps.setString(1,pdbId);
 	    System.out.println(ps);
 	    ResultSet row = ps.executeQuery();
@@ -122,12 +122,15 @@ public class PDBMSDReader
 		String chem_atom_id  	   = row.getString(19);
 		double U_ISO_OR_EQUIV      = row.getDouble(20);
 		int residue_pdb_seq        = row.getInt(21);
+		String insertionCode       = row.getString(22);
 		//System.out.println(U_ISO_OR_EQUIV);
 	    
 	    
 		String str = "" ;
 	    
 	    
+
+
 		if ( 
 		    ( prev_serial != residue_pdb_seq ) || 
 		    ( ! prevType.equals(pdb_Group)      )
@@ -142,20 +145,24 @@ public class PDBMSDReader
 		    }
 		}
 
-	    	if ( chain_pdb_code == null ) {
+		if ( insertionCode == null ) 
+		    insertionCode = "";
+
+	    	if ( chain_pdb_code == null ) 
 		    chain_pdb_code = " " ;
-		}
-		if (! prevChain.equals(chain_pdb_code)) {
+		
+		if (! prevChain.equals(chain_pdb_code)) 
 		    if ( prevChain != "" ) {
 			structure.addChain(current_chain) ;
 			current_chain = new ChainImpl();
 		    }
-		}
-	    
-		 
-		if ( CHEM_ATOM_NAME_LS == null) {
+		
+		
+		
+		if ( CHEM_ATOM_NAME_LS == null) 
 		    CHEM_ATOM_NAME_LS = "";
-		}
+		
+		
 		//select residue_serial, chain_code_1_letter,RESIDUE_PDB_CODE, RESIDUE_PDB_INSERT_CODE, SP_PRIMARY_ID, DSC_TYPE, SP_SERIAL from swiss_prot_mapping where accession_code = '5pti' order by ASSEMBLY_SERIAL ;
 		//str += residue_serial+" " + serial + " " +code_3_letter+" " +CHEM_ATOM_NAME_LS  + chem_atom_name +" " + chem_atom_id + " " +chain_Code_1_Letter + " " + OCCUPANCY +" " +PDB_CHARGE+" " + x+" "+ y+" "+z + " " +ligand_code ;
 		//System.out.println(str);
@@ -181,7 +188,7 @@ public class PDBMSDReader
 		g.addAtom(a);
 		g.setPDBFlag(true);
 		g.setPDBName(code_3_letter);
-		g.setPDBCode(residue_pdb_seq+"");
+		g.setPDBCode(residue_pdb_seq+insertionCode);
 		//System.out.println(a);
 		//System.out.println("chainname "+chain_pdb_code+ " " +chain_Code_1_Letter+ " " + chain_code);
 		current_chain.setName(chain_pdb_code);
