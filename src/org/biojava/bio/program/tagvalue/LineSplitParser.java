@@ -79,7 +79,7 @@ public class LineSplitParser
     EMBL.setMergeSameTag(true);
     
     GENBANK = new LineSplitParser();
-    GENBANK.setEndOfRecord("///");
+    GENBANK.setEndOfRecord("//");
     GENBANK.setSplitOffset(12);
     GENBANK.setTrimTag(true);
     GENBANK.setTrimValue(false);
