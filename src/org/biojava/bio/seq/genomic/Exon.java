@@ -25,16 +25,13 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 /**
- * The root of a feature tree representing a transcribed region of a genome.
+ * An exon within a gene.
  *
  * @author Thomas Down
- * @author Matthew Pocock
  * @since 1.1
  */
 
-public interface Gene extends StrandedFeature {
-    public Set getExons();
-
-    public static class Template extends StrandedFeature.Template {
+public interface Exon extends RNAFeature {
+    public static class Template extends RNAFeature.Template {
     }
 }
