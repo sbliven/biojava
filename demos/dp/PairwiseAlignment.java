@@ -84,20 +84,38 @@ public class PairwiseAlignment {
           );
 
           // tests minimal memory forwards
-          double forwardMin = aligner.forward(seqs);
-          System.out.println("Forwards-: " + forwardMin);
-
+          double forwardMin;
+          System.out.println("Forwards-:");
+          forwardMin = aligner.forward(seqs, DP.PROBABILITY);
+          System.out.println("\t" + forwardMin);
+          forwardMin = aligner.forward(seqs, DP.ODDS);
+          System.out.println("\t" + forwardMin);
+          forwardMin = aligner.forward(seqs, DP.NULL_MODEL);
+          System.out.println("\t" + forwardMin);
+          
           // uncomment to test explicit memory forwards
           //double forwardMax = aligner.forwardMatrix(seqs).getScore();
           //System.out.println("Forwards+: " + forwardMax);
 
           // tests explicit memory backwards
-          double backward = aligner.backward(seqs);
-          System.out.println("Backwards: " + backward);
+          double backward;
+          System.out.println("Backwards:");
+          backward = aligner.backward(seqs, DP.PROBABILITY);
+          System.out.println("\t" + backward);
+          backward = aligner.backward(seqs, DP.ODDS);
+          System.out.println("\t" + backward);
+          backward = aligner.backward(seqs, DP.NULL_MODEL);
+          System.out.println("\t" + backward);
           
           // tests minimal memory viterbi
-          StatePath result = aligner.viterbi(seqs);
-          System.out.println("Viterbi:   " + result.getScore());
+          StatePath result;
+          System.out.println("Viterbi:");
+          result = aligner.viterbi(seqs, DP.PROBABILITY);
+          System.out.println("\t" + result.getScore());
+          result = aligner.viterbi(seqs, DP.ODDS);
+          System.out.println("\t" + result.getScore());
+          result = aligner.viterbi(seqs, DP.NULL_MODEL);
+          System.out.println("\t" + result.getScore());
         }
       }
     } catch (Throwable t) {

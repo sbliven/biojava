@@ -106,10 +106,10 @@ public class ViterbiAlign {
       {
         Sequence seq = seqI.nextSequence();
         SymbolList [] rl = { seq };
-        StatePath statePath = dp.viterbi(rl);
+        StatePath statePath = dp.viterbi(rl, DP.PROBABILITY);
 		
-        double fScore = dp.forward(rl);
-        double bScore = dp.backward(rl);
+        double fScore = dp.forward(rl, DP.PROBABILITY);
+        double bScore = dp.backward(rl, DP.PROBABILITY);
       
         System.out.println(
           seq.getName() +

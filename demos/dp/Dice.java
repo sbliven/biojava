@@ -64,7 +64,7 @@ public class Dice
     Distribution loadedD = DistributionFactory.DEFAULT.createDistribution(diceAlphabet);
     EmissionState loadedS = new SimpleEmissionState("loaded", Annotation.EMPTY_ANNOTATION, advance, loadedD);
 	
-	  SimpleMarkovModel casino = new SimpleMarkovModel(1, diceAlphabet);
+	  SimpleMarkovModel casino = new SimpleMarkovModel(1, diceAlphabet, "Casino");
     casino.addState(fairS);
     casino.addState(loadedS);
 	
@@ -107,7 +107,7 @@ public class Dice
 	
 	  SymbolList roll_sequence = obs_rolls.symbolListForLabel(StatePath.SEQUENCE);
     SymbolList[] res_array = {roll_sequence};
-    StatePath v = dp.viterbi(res_array);
+    StatePath v = dp.viterbi(res_array, DP.PROBABILITY);
 	
 	  //print out obs_sequence, output, state symbols.
     for(int i = 1; i <= obs_rolls.length()/60; i++) {
