@@ -60,7 +60,7 @@ import java.util.StringTokenizer;
  * <br/>
  * For various purposes such as caching and replication, it's often desirable
  * to determine if two LSIDs are the same without resolving them. The general
- * purpose means of doing so is by testing for "lexical equivalence" as defined:.
+ * purpose means of doing so is by testing for "lexical equivalence" as defined:
  * LSIDs are lexically equivalent if the AuthorityID, NamespaceID, ObjectID, and
  * RevisionID are all identical (case-insensitive comparison).
  * </p>
