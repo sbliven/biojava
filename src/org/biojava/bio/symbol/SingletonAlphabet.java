@@ -28,7 +28,7 @@ import java.util.*;
 import org.biojava.bio.*;
 
 /**
- * A no-frills implementation of a symbol.
+ * An alphabet that contains a single atomic symbol.
  *
  * @author Matthew Pocock
  */

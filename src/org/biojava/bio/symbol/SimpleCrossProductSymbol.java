@@ -41,7 +41,7 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 
-public class SimpleCrossProductSymbol
+class SimpleCrossProductSymbol
 implements CrossProductSymbol, Serializable {
   private final List l;
   private final char token;

@@ -69,14 +69,19 @@ public class PairwiseDP extends DP implements Serializable {
     new AlphabetManager.ListWrapper();
 
 
-  protected double [] getEmission(List symList, CrossProductAlphabet alpha)
+  protected Col getEmission(List symList, CrossProductAlphabet alpha)
   throws IllegalSymbolException {
     gopher.setList(symList);
-    double [] em = (double []) emissions.get(gopher);
-    if(em == null) {
+    Col col = (Col) emissions.get(gopher);
+    if(col == null) {
+      //System.out.print(".");
       Symbol sym[][] = new Symbol[2][2];
       List ll = new ArrayList(symList);
       Symbol gap = sym[0][0] = AlphabetManager.getGapSymbol();
+      sym[1][1] = alpha.getSymbol(Arrays.asList(new Symbol [] {
+        (Symbol) symList.get(0),
+        (Symbol) symList.get(1)
+      }));
       sym[1][0] = alpha.getSymbol(Arrays.asList(new Symbol [] {
         (Symbol) symList.get(0),
         gap
@@ -86,17 +91,25 @@ public class PairwiseDP extends DP implements Serializable {
         (Symbol) symList.get(1)
       }));
       int dsi = getDotStatesIndex();
-      em = new double[dsi];
+      double [] em = new double[dsi];
       State [] states = getStates();
       for(int i = 0; i < dsi; i++) {
         EmissionState es = (EmissionState) states[i];
         int [] advance = es.getAdvance();
         Distribution dis = es.getDistribution();
-        em[i] = Math.log(dis.getWeight(sym[advance[0]][advance[1]]));
+        Symbol s = sym[advance[0]][advance[1]]; 
+        /*System.out.println(
+          "Evaluating state " + es.getName() +
+          " with advance " + advance[0] + ", " + advance[1] +
+          " and symbol " + s
+        );*/
+        em[i] = Math.log(dis.getWeight(s));
       }
-      emissions.put(ll, em);
+      emissions.put(new AlphabetManager.ListWrapper(ll), col = new Col(sym, em));
+    } else {
+      //System.out.print("-");
     }
-    return em;
+    return col;
   }
 
     public double backward(SymbolList[] seqs) 
@@ -541,7 +554,6 @@ private class Viterbi {
 	states = getStates();
 	cursor = new LightPairDPCursor(seq0, seq1, states.length, true);
 	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
-  symMatrix[0][0] = AlphabetManager.getGapSymbol();
   
 	// Forward initialization
 
@@ -615,28 +627,15 @@ private class Viterbi {
     private List symL = new ArrayList();
     private double[][][] matrix = new double[2][2][];
     private BackPointer[][][] bpMatrix = new BackPointer[2][2][];
-    private Symbol[][] symMatrix = new Symbol[2][2];
     private int[] colId = new int[2];
 
     private void viterbiPrepareCol(int i, int j)
 	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
-	// System.out.println("*** (" + i + "," + j + ")");
-
-  Symbol gap = AlphabetManager.getGapSymbol();
 	symL.clear();
 	symL.add(cursor.symbol(0, i));
 	symL.add(cursor.symbol(1, j));
-	symMatrix[1][1] = alpha.getSymbol(symL);
-  //System.out.println("Got symbol " + symMatrix[1][1].getName() + " for 1, 1");
-	symL.set(0, cursor.symbol(0, i));
-	symL.set(1, gap);
-	symMatrix[1][0] = alpha.getSymbol(symL);
-  //System.out.println("Got symbol " + symMatrix[1][0].getName() + " for 1, 0");
-	symL.set(0, gap);
-	symL.set(1, cursor.symbol(1, j));
-	symMatrix[0][1] = alpha.getSymbol(symL);
-  //System.out.println("Got symbol " + symMatrix[0][1].getName() + " for 0, 1");
+  Col col = getEmission(symL, alpha);
 
 	colId[0] = i;
 	colId[1] = j;
@@ -653,7 +652,7 @@ private class Viterbi {
 	bpMatrix[0][1] = cursor.getBackPointers(colId);
 
   try {
-	viterbiCalcStepMatrix();
+	viterbiCalcStepMatrix(col);
   } catch (Exception e) {
     throw new BioError(e, "Couldn't calculate dp cell " + i + ", " + j);
   } catch (BioError e) {
@@ -661,11 +660,12 @@ private class Viterbi {
   }
     }
 
-    private void viterbiCalcStepMatrix()
+    private void viterbiCalcStepMatrix(Col col)
     throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       double[] curCol = (double[]) matrix[0][0];
-      int[] advance;
+      double [] emissions = col.emissions;
+      Symbol [][] sym = col.sym;
       BackPointer[] curBPs = bpMatrix[0][0];
       for (int l = 0; l < states.length; ++l) {
         try {
@@ -675,24 +675,11 @@ private class Viterbi {
     
   	      // System.out.println("State = " + states[l].getName());
 
-          if (states[l] instanceof EmissionState) {
-            advance = ((EmissionState) states[l]).getAdvance();
-          } else {
-            advance = ia00;
-          }
-        
-          Symbol res = symMatrix[advance[0]][advance[1]];
-          /*System.out.println(
-            "Got symbol " + res.getName() +
-            " for state " + states[l].getName() +
-            " with advance " +
-            advance[0] + ", " + advance[1]
-          );*/
           double weight = Double.NEGATIVE_INFINITY;
           if (! (states[l] instanceof EmissionState)) {
             weight = 0.0;
           } else {
-            weight = Math.log(((EmissionState) states[l]).getDistribution().getWeight(res));
+            weight = emissions[l];
           }
 
           if (weight == Double.NEGATIVE_INFINITY) {
@@ -713,7 +700,7 @@ private class Viterbi {
               double[] sCol;
               BackPointer[] bpCol;
               if (states[tr[ci]] instanceof EmissionState) {
-                advance = ((EmissionState)states[tr[ci]]).getAdvance();
+                int [] advance = ((EmissionState)states[tr[ci]]).getAdvance();
                 sCol = matrix[advance[0]][advance[1]];
                 bpCol = bpMatrix[advance[0]][advance[1]];
               } else {
@@ -741,7 +728,16 @@ private class Viterbi {
             }
             curCol[l] = weight + score;
             if (bestKC >= 0) {
-              curBPs[l] = new BackPointer(states[l], oldBPs[bestKC], curCol[l], res);
+              State s = states[l];
+              int [] advance = (s instanceof EmissionState)
+                ? ((EmissionState) s).getAdvance()
+                : ia00;
+              curBPs[l] = new BackPointer(
+                s,
+                oldBPs[bestKC],
+                curCol[l],
+                sym[advance[0]][advance[1]]
+              );
             } else {
               curBPs[l] = null;
             }
@@ -1150,6 +1146,16 @@ private class Viterbi {
 
     public BackPointer[] getBackPointers(int[] coords) {
       throw new NoSuchElementException("This cursor isn't storing BackPointers.");
+    }
+  }
+  
+  private static class Col {
+    public final Symbol [][] sym;
+    public final double [] emissions;
+    
+    public Col(Symbol [][] sym, double [] emissions) {
+      this.sym = sym;
+      this.emissions = emissions;
     }
   }
 }

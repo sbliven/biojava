@@ -41,7 +41,7 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 
-public class AtomicCrossProductSymbol
+class AtomicCrossProductSymbol
 extends SimpleCrossProductSymbol
 implements AtomicSymbol {
   /**

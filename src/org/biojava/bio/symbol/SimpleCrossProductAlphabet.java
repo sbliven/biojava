@@ -112,6 +112,8 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
   public boolean contains(Symbol s) {
     if(ourSymbols.values().contains(s)) {// have seen it before
       return true;
+    } else if(s == null) {
+      throw new NullPointerException("Can't use null as a symbol");
     } else if(!(s instanceof AtomicSymbol)) { // ambiguity
       Alphabet sa = s.getMatches();
       if(sa instanceof FiniteAlphabet) {
