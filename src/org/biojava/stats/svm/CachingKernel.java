@@ -37,6 +37,10 @@ public class CachingKernel extends NestedKernel {
       return d.doubleValue();
     }
 
+    public String toString() {
+      return getNestedKernel().toString();
+    }
+    
     private static class ObjectPair {
       Object a;
       Object b;

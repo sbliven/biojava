@@ -62,6 +62,8 @@ public interface FeatureFilter extends Serializable {
 
   /**
    * Construct one of these to filter features by type.
+   *
+   * @author Matthew Pocock
    */
   static class ByType implements FeatureFilter {
     private String type;
@@ -74,11 +76,17 @@ public interface FeatureFilter extends Serializable {
     public ByType(String type) {
       this.type = type;
     }
+    
+    /**
+     * Returns true if the feature has a matching type property.
+     */
     public boolean accept(Feature f) { return f.getType().equals(type); }
   }
 
   /**
    * Construct one of these to filter features by source.
+   *
+   * @author Matthew Pocock
    */
   static class BySource implements FeatureFilter {
     private String source;
@@ -92,5 +100,55 @@ public interface FeatureFilter extends Serializable {
       this.source = source;
     }
     public boolean accept(Feature f) { return f.getSource().equals(source); }
+  }
+
+  /**
+   *  A filter that returns all features contained within a location.
+   *
+   * @author Matthew Pocock
+   */
+  static class ContainedByLocation implements FeatureFilter {
+    private Location loc;
+
+    /**
+     * Creates a filter that returns everything contained within loc.
+     *
+     * @param loc  the location that will contain the accepted features
+     */
+    public ContainedByLocation(Location loc) {
+      this.loc = loc;
+    }
+    
+    /**
+     * Returns true if the feature is within this filter's location.
+     */
+    public boolean accept(Feature f) {
+      return loc.contains(f.getLocation());
+    }
+  }
+  
+  /**
+   *  A filter that returns all features overlapping a location.
+   *
+   * @author Matthew Pocock
+   */
+  static class OverlapsLocation implements FeatureFilter {
+    private Location loc;
+    
+    /**
+     * Creates a filter that returns everything overlapping loc.
+     *
+     * @param loc  the location that will overlap the accepted features
+     */
+    public OverlapsLocation(Location loc) {
+      this.loc = loc;
+    }
+    
+    /**
+     * Returns true if the feature overlaps this filter's location.
+     */
+    public boolean accept(Feature f) {
+      return loc.overlaps(f.getLocation());
+    }
   }
 }

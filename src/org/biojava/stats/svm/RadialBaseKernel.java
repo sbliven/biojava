@@ -47,7 +47,7 @@ public class RadialBaseKernel extends NestedKernel {
       double w = getWidth();
       return Math.exp(-Math.abs(2.0 * k.evaluate(a, b) - k.evaluate(a, a) -
                                 k.evaluate(b, b)
-                               ) / ( w * w ));
+                               ) / ( 2.0 * w * w ));
     }
 
     public double getWidth() {
