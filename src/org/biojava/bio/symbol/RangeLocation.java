@@ -82,10 +82,11 @@ public class RangeLocation implements Location, Serializable {
   }
 
   public Location union(Location l) {
-    int start = Math.min(getMin(), l.getMin());
-    int end = Math.max(getMax(), l.getMax());
+    List al = new ArrayList(2);
+    al.add(this);
+    al.add(l);
 
-    return new RangeLocation(start, end);
+    return new CompoundLocation(al);
   }
 
   public SymbolList symbols(SymbolList seq) {
@@ -110,6 +111,6 @@ public class RangeLocation implements Location, Serializable {
   }
 
   public String toString() {
-    return getMin() + ", " + getMax();
+    return "[" + getMin() + ", " + getMax() + "]";
   }
 }
