@@ -28,7 +28,7 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * Base-class for builders that pass filtered events onto another builders.
+ * Base-class for builders that pass filtered events onto another builder.
  *
  * @author Matthew Pocock
  * @since 1.1

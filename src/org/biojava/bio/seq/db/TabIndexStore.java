@@ -32,7 +32,7 @@ import org.biojava.bio.symbol.*;
 
 /**
  * Implements IndexStore as a serialized file for the java data and a 
- * tab-delimited file of offets.
+ * tab-delimited file of offsets.
  * <P>
  * The tab-delimited file looks like:
  * <pre>
