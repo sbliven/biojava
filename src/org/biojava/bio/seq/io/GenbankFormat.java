@@ -52,6 +52,8 @@ public class GenbankFormat implements SequenceFormat, Serializable
 	protected static final String LOCUS_TAG = "LOCUS";
 	protected static final String SIZE_TAG = "SIZE";
 	protected static final String TYPE_TAG = "TYPE";
+	protected static final String STRAND_NUMBER_TAG = "STRANDS";
+	protected static final String CIRCULAR_TAG = "CIRCULAR";
 	protected static final String DIVISION_TAG = "DIVISION";
 	protected static final String DATE_TAG = "MDAT";
 	protected static final String VERSION_TAG = "VERSION";
@@ -104,7 +106,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
 				listener.endSequence();
 				return hasAnotherSequence;
 			}
-				ctx.processLine(line);
+			ctx.processLine(line);
 		}
 
 		throw new IOException("Premature end of	stream for GENBANK");
@@ -296,12 +298,31 @@ class GenbankContext
 			this.saveSeqAnno();
 			headerTag = GenbankFormat.SIZE_TAG;
 			headerTagText = new StringBuffer(lineTokens.nextToken());
+			// read past 'bp'
+			lineTokens.nextToken();
 
-			this.saveSeqAnno();
-			headerTag = GenbankFormat.TYPE_TAG; // Check this; may be under PROP
-			// Read past 'bp'
-			headerTagText = new StringBuffer(lineTokens.nextToken());
-			headerTagText = new StringBuffer(lineTokens.nextToken());
+			// At this point there are three optional fields, strand number,
+			// type, and circularity.
+			if(line.charAt(34) != ' ')
+			{
+				this.saveSeqAnno();
+				headerTag = GenbankFormat.STRAND_NUMBER_TAG;
+				headerTagText = new StringBuffer(lineTokens.nextToken());
+			}
+
+			if(line.charAt(37) != ' ')
+			{
+				this.saveSeqAnno();
+				headerTag = GenbankFormat.TYPE_TAG;// Check this; may be under PROP
+				headerTagText = new StringBuffer(lineTokens.nextToken());
+			}
+
+			if(line.charAt(43) != ' ')
+			{
+				this.saveSeqAnno();
+				headerTag = GenbankFormat.CIRCULAR_TAG;
+				headerTagText = new StringBuffer(lineTokens.nextToken());
+			}
 
 			this.saveSeqAnno();
 			headerTag = GenbankFormat.DIVISION_TAG; // May be under PROP
