@@ -271,7 +271,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
     protected StAXContentHandler getTypeHandler() {
 	return new StringElementHandlerBase() {
 		protected void setStringValue(String s) {
-		    getFeatureTemplate().type = s;
+		    getFeatureTemplate().type = s.trim();
 		}
 	    } ;
     }
@@ -279,7 +279,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
     protected StAXContentHandler getSourceHandler() {
 	return new StringElementHandlerBase() {
 		protected void setStringValue(String s) {
-		    getFeatureTemplate().source = s;
+		    getFeatureTemplate().source = s.trim();
 		}
 	    } ;
     }
@@ -290,7 +290,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
 		    throws SAXException
 		{
 		    try {
-			setFeatureProperty(XFFFeatureSetHandler.PROPERTY_XFF_ID, s);
+			setFeatureProperty(XFFFeatureSetHandler.PROPERTY_XFF_ID, s.trim());
 		    } catch (Exception ex) {
 			throw new SAXException("Couldn't set property", ex);
 		    }
