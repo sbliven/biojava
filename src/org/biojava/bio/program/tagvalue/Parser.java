@@ -15,8 +15,8 @@ public class Parser {
     ParserException
   {
     final List stack = new ArrayList();
+    push(stack, new Frame(parser, listener, ""));
     
-    listener.startTag(null);
     Context ctxt = new Context();
     
     for(
@@ -60,6 +60,9 @@ public class Parser {
         if(tv.isNewTag() || !tv.getTag().equals(frame.tag)) {
           Frame top;
           for(top = (Frame) pop(stack); top != frame; top = (Frame) pop(stack)) {
+            top.listener.endTag();
+          }
+          if(top.tag != null) {
             top.listener.endTag();
           }
           
