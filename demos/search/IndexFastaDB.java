@@ -75,7 +75,7 @@ public class IndexFastaDB
 	seqType = props.getProperty("type");
 	if (seqType == null)
 	    throw new Exception(USAGE);
-	if (! seqType.equalsIgnoreCase("aa") || ! seqType.equalsIgnoreCase("aa"))
+	if (! seqType.equalsIgnoreCase("aa") || ! seqType.equalsIgnoreCase("nt"))
 	    throw new Exception(USAGE);
 
 	// Set the appropriate alphabet
