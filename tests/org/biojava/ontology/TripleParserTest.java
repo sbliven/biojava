@@ -23,7 +23,7 @@ public class TripleParserTest extends TestCase {
     TriplesParser tp = new TriplesParser();
     Ontology onto = tp.parse(
             new PushbackReader(new BufferedReader(new FileReader(
-                    new File("C:\\devel\\biojava-live\\resources\\org\\biojava\\ontology\\core.pred")))),
+                    new File("resources\\org\\biojava\\ontology\\core.pred")))),
             OntoTools.getDefaultFactory(),
             domain);
     System.err.println("Terms: " + onto.getTerms().size());
