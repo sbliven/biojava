@@ -70,15 +70,28 @@ public class PairwiseDP extends DP {
 	    throw new IllegalArgumentException("This DP object only runs on pairs.");
 
 	Forward f = new Forward();
-	return f.runForward(seqs[0], seqs[1]);
+	PairDPCursor cursor = new LightPairDPCursor(seqs[0], seqs[1], getStates().length, false);
+	return f.runForward(seqs[0], seqs[1], cursor);
     }
 
-    public DPMatrix forwardMatrix(ResidueList[] seqs) {
-	throw new UnsupportedOperationException();
+    public DPMatrix forwardMatrix(ResidueList[] seqs) 
+	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    {
+	if (seqs.length != 2)
+	    throw new IllegalArgumentException("This DP object only runs on pairs.");
+
+	Forward f = new Forward();
+	PairDPMatrix matrix = new PairDPMatrix(this, seqs[0], seqs[1]);
+	PairDPCursor cursor = new MatrixPairDPCursor(seqs[0], seqs[1], matrix);
+	double score = f.runForward(seqs[0], seqs[1], cursor);
+	matrix.setScore(score);
+	return matrix;
     }
 
-    public DPMatrix forwardMatrix(ResidueList[] seqs, DPMatrix d) {
-	throw new UnsupportedOperationException();
+    public DPMatrix forwardMatrix(ResidueList[] seqs, DPMatrix d) 
+	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    {
+	return forwardMatrix(seqs);
     }
 
     private static List gappedResList = new ArrayList();
@@ -119,11 +132,11 @@ private class Forward {
     private PairDPCursor cursor;
     private CrossProductAlphabet alpha;
 
-    public double runForward(ResidueList seq0, ResidueList seq1) 
+    public double runForward(ResidueList seq0, ResidueList seq1, PairDPCursor curs) 
         throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
 	states = getStates();
-	cursor = new PairDPCursor(seq0, seq1, states.length, false);
+	cursor = curs;
 	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
 
 	// Forward initialization
@@ -311,7 +324,7 @@ private class Viterbi {
         throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
 	states = getStates();
-	cursor = new PairDPCursor(seq0, seq1, states.length, true);
+	cursor = new LightPairDPCursor(seq0, seq1, states.length, true);
 	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
 
 	// Forward initialization
@@ -527,7 +540,18 @@ private static class BackPointer {
     }
 }
 
-private static class PairDPCursor {
+
+private static interface PairDPCursor {
+    public int getPos(int dim);
+    public boolean canAdvance(int dim);
+    public void advance(int dim);
+    public Residue residue(int dim, int poz);
+    public double[] getColumn(int[] coords);
+    public BackPointer[] getBackPointers(int[] coords);
+}
+
+
+private static class LightPairDPCursor implements PairDPCursor {
     private Object[] s1cur;
     private Object[] s1prev;
     private Object[] s2cur;
@@ -547,7 +571,7 @@ private static class PairDPCursor {
     private boolean storeBPs;
     private BackPointer[] zeroColBP;
 
-    public PairDPCursor(ResidueList seq1,
+    public LightPairDPCursor(ResidueList seq1,
 			ResidueList seq2,
 			int states, boolean bp) {
 	this.storeBPs = bp;
@@ -695,6 +719,68 @@ private static class PairDPCursor {
     	}
 	
    	throw new NoSuchElementException();
+    }
+    
+}
+
+
+
+private static class MatrixPairDPCursor implements PairDPCursor {
+    private int[] pos;
+    private ResidueList[] seqs;
+    private int numStates;
+
+    private double[] zeroCol;
+
+    private double[][][] sMatrix;
+
+    public MatrixPairDPCursor(ResidueList seq1,
+			     ResidueList seq2,
+			     PairDPMatrix matrix) {
+	numStates = matrix.States().length;
+
+	zeroCol = new double[numStates]; // don't touch this, please...
+	for (int i = 0; i < zeroCol.length; ++i)
+	    zeroCol[i] = Double.NEGATIVE_INFINITY;
+	
+	sMatrix = matrix.getScoreArray();
+
+	pos = new int[2];
+	pos[0] = pos[1] = 0;
+	seqs = new ResidueList[2];
+	seqs[0] = seq1;
+	seqs[1] = seq2;
+    }
+
+    public int getPos(int dim) {
+	return pos[dim];
+    }
+
+    public boolean canAdvance(int dim) {
+	return (pos[dim] <= seqs[dim].length());
+    }
+
+    public void advance(int dim) {
+	pos[dim]++;
+    }
+
+    public Residue residue(int dim, int poz) {
+	if (poz == 0 || poz > seqs[dim].length())
+	    return MagicalState.MAGICAL_RESIDUE;
+	return seqs[dim].residueAt(poz);
+    }
+
+    public double[] getColumn(int[] coords) {
+//	System.out.println("!!! getting " + coords[0] + "," + coords[1]);
+
+	if (coords[0] == -1 || coords[1] == -1)
+	    return zeroCol;
+
+    	return (double[]) sMatrix[coords[0]][coords[1]];
+    }
+
+    public BackPointer[] getBackPointers(int[] coords) {
+	throw new NoSuchElementException("This cursor isn't storing BackPointers.");
     }
     
 }
