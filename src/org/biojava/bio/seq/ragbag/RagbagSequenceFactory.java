@@ -21,25 +21,16 @@
  
 package org.biojava.bio.seq.ragbag;
 
-import org.biojava.bio.seq.io.SequenceBuilder;
-import org.biojava.bio.BioException;
+import org.biojava.utils.cache.SoftReferenceCache;
 
 /**
- * Interface for classes that implement format-specific behaviour
- * for parsing input sequence/feature files.
+ * class that is passed to a RagbagAssembly to use
+ * a specified RagbagSequence object type.
  */
-interface RagbagFileParser
+public interface RagbagSequenceFactory
 {
-  // as the file was sniffed to determine the format,
-  // it would be dangerous to permit the user to change it!
 /**
- * set SeqIOListener object for this parser.
+ * return a RagbagSequence object of desired type
  */
-  public void setListener(SequenceBuilder builder);
-
-/**
- * parse specified input file to generate SeqIOListener calls
- * to the designated listener.
- */
-  public void parse() throws BioException;
+  public RagbagSequence getSequenceObject();
 }

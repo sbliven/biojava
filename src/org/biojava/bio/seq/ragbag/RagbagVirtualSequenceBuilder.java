@@ -41,23 +41,24 @@ import org.biojava.utils.*;
 /**
  * Builds a SimpleAssembly from sequence files
  */
-public class RagbagVirtualSequenceBuilder
+class RagbagVirtualSequenceBuilder
 {
 //  Sequence sequence =null;
-  SimpleAssemblyBuilder sab = null;
-  RagbagMap map = null;
-  String seqName;
-
+  private SimpleAssemblyBuilder sab = null;
+  private RagbagMap map = null;
+  private String seqName;
+  private RagbagSequenceFactory factory;
 /**
  * create a virtual sequence with mappings specified
  * @param seqName name for virtual sequence
  * @param uri     URI for virtual sequence
  * @param mapFile file containing mappings to be used
  */
-  public RagbagVirtualSequenceBuilder(String seqName, String uri, File mapFile)
+  protected RagbagVirtualSequenceBuilder(String seqName, String uri, File mapFile, RagbagSequenceFactory factory)
     throws BioException, SAXException
   {
     this.seqName = seqName;
+    this.factory = factory;
 
     // create mapping object
     map = new RagbagMap(mapFile);
@@ -98,14 +99,14 @@ public class RagbagVirtualSequenceBuilder
     // the sequence may either be in a sequence file or a virtual sequence directory
     if (seqfile.isFile()) {
       // sequence is in a file
-      currSequence = new RagbagSequence();
+      currSequence = factory.getSequenceObject();
       ((RagbagSequence) currSequence).addSequenceFile(seqfile);
       ((RagbagSequence) currSequence).makeSequence();
     }
     else if (seqfile.isDirectory()) {
       // it's a virtual sequence in a represented by a directory
       try {
-        currSequence = new RagbagDirectoryHandler(seqfile);
+        currSequence = new RagbagAssembly(seqfile, factory);
       }
       catch (FileNotFoundException fne) {
         throw new BioException("Directory " + seqfile.getName() + "could not be found.");

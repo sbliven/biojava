@@ -41,7 +41,7 @@ import org.apache.xerces.parsers.*;
  *
  * @author David Huen
  */
-public class RagbagXFFParser implements RagbagFileParser
+class RagbagXFFParser implements RagbagFileParser
 {
 
 /**

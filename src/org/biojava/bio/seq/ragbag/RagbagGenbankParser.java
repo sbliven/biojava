@@ -49,7 +49,7 @@ import org.apache.xerces.parsers.*;
  * @author David Huen
  * @author Thomas Down
  */
-public class RagbagGenbankParser implements RagbagFileParser
+class RagbagGenbankParser implements RagbagFileParser
 {
 
   // set up factory method

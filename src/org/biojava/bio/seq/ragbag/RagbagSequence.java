@@ -43,9 +43,9 @@ import org.biojava.utils.*;
  * sequence.
  *
  * @author David Huen
- * @since 1.8
+ * @since 1.2
  */
-public class RagbagSequence extends AbstractSequence
+class RagbagSequence extends RagbagAbstractSequence
 {
   // class variables
   private SequenceBuilder builder;  // this is the SeqIOListener that will build the sequence

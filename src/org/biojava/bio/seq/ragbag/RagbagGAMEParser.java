@@ -38,7 +38,7 @@ import org.apache.xerces.parsers.*;
  *
  * @author Thomas Down
  */
-public class RagbagGAMEParser implements RagbagFileParser
+class RagbagGAMEParser implements RagbagFileParser
 {
 /**
  * Factory for creating new instances of RagbagXFFParser.

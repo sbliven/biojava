@@ -31,7 +31,7 @@ import org.biojava.bio.BioException;
 /**
  * Returns an instance of the RagbagFileParser specific for an input file.
  */
-public class RagbagParserFactory
+class RagbagParserFactory
 {
   static Map parserRegistry;
   static RagbagParserFactory FACTORY = new RagbagParserFactory();

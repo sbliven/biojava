@@ -49,7 +49,7 @@ import org.apache.xerces.parsers.*;
  * @author David Huen
  * @author Thomas Down
  */
-public class RagbagEmblParser implements RagbagFileParser
+class RagbagEmblParser implements RagbagFileParser
 {
 /**
  * Factory for creating new instances of RagbagEmblParser.
