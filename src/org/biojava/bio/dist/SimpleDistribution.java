@@ -189,6 +189,9 @@ extends AbstractDistribution implements Serializable{
     }
   }
 
+  /**
+   * Register an SimpleDistribution.Trainer instance as the trainer for this distribution.
+   */
   public void registerWithTrainer(DistributionTrainerContext dtc) {
    dtc.registerTrainer(this, new Trainer());
   }
