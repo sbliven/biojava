@@ -28,7 +28,7 @@ import java.util.*;
  * Cross product of two or more alphabets.  This is provided primarily
  * to assist in the implemention of a `multi-headed' hidden markov
  * model.  For instance, in a pair HMM intended for aligning DNA
- * sequence, the emmision alphabet will be (DNA x DNA).
+ * sequence, the emmision alphabet will be (DNA, gap) x (DNA, gap).
  *
  * @author Thomas Down
  */
@@ -48,7 +48,7 @@ public interface CrossProductAlphabet extends Alphabet {
      *
      * @param rl A list of residues.
      * @throws IllegalAlphabetException if the members of rl are
-     *            not Residues over the alphabets returned fro
+     *            not Residues over the alphabets returned from
      *            <code>getAlphabets</code>
      */
 

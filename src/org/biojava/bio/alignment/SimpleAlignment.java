@@ -29,113 +29,213 @@ import org.biojava.bio.seq.*;
 /**
  * A simple implementation of an Alignment.
  */
-public class SimpleAlignment implements Alignment {
-  private int length = -1;
-  private Set sequenceSet;
-  private Annotation annotation = null;
+public class SimpleAlignment extends AbstractResidueList implements Alignment {
+  private List resList;
+  private Alphabet alphabet;
+  private int length;
+  
 
   public int length() {
     return length;
   }
   
-  public Set getSequences() {
-    return sequenceSet;
+  public Alphabet alphabet() {
+    return alphabet;
+  }
+  
+  public Residue residueAt(int col) {
+    return new ColAsResidue(col);
+  }
+  
+  public List getResidueLists() {
+    return resList;
   }
   
   public Residue getResidue(ResidueList seq, int column) {
     return seq.residueAt(column);
   }
   
-  public Map getColumn(int column) {
-    return new ColumnMap(column);
-  }
-  
-  public Alignment subAlignment(Set sequences, Location loc) {
-    Set seqs = new HashSet();
-    for(Iterator i = sequences.iterator(); i.hasNext(); ) {
-      ResidueList seq = (ResidueList) i.next();
-      seqs.add(loc.residues(seq));
+  public Alignment subAlignment(List residueLists, Location loc) {
+    List ress = new ArrayList();
+    for(Iterator i = residueLists.iterator(); i.hasNext(); ) {
+      ResidueList res = (ResidueList) i.next();
+      ress.add(loc.residues(res));
     }
-    return new SimpleAlignment(seqs);
+    return new SimpleAlignment(ress);
   }
   
-  public Annotation getAnnotation() {
-    if(annotation == null)
-      annotation = new SimpleAnnotation();
-    return annotation;
-  }
-  
-  public SimpleAlignment(Set sequences) {
-    this.sequenceSet = sequences;
-    Iterator i = sequences.iterator();
-    if(i.hasNext()) {
-      this.length = ((ResidueList) i.next()).length();
-    }
-  }
-
-  protected class ColumnMap extends AbstractMap {
-    private int column;
+  /**
+   * Generate an alignment from a list of ResidueLists.
+   * <P>
+   * The ResidueLists must all be of the same length.
+   *
+   * @param resLists  the things to put into the alignment
+   * @throws IllegalArgumentException if the ResidueLists are not the same
+   *         length
+   */
+  public SimpleAlignment(List resLists) throws IllegalArgumentException {
+    this.resList = Collections.unmodifiableList(resLists);
     
-    public int size() {
-      return getSequences().size();
-    }
-    public boolean isEmpty() {
-      return getSequences().isEmpty();
-    }
-    public boolean containsKey(Object key) {
-      return getSequences().contains(key);
-    }
-    public boolean containsValue(Object value) {
-      return values().contains(value);
-    }
-    public Object get(Object key) {
-      return getResidue((ResidueList) key, column);
-    }
-    public Set keySet() {
-      return getSequences();
-    }
-    public Set entrySet() {
-      return new AbstractSet() {
-        public int size() {
-          return getSequences().size();
+    length = 0;
+    List alphaList = new ArrayList();
+    for(Iterator ri = resLists.iterator(); ri.hasNext(); ) {
+      ResidueList rl = (ResidueList) ri.next();
+      alphaList.add(rl.alphabet());
+      if(length == -1) {
+        length = rl.length();
+      } else {
+        if(rl.length() != length) {
+          throw new IllegalArgumentException(
+            "All ResidueLists must be the same length (" + length +
+            "), not " + rl.length()
+          );
         }
-        public Iterator iterator() {
-          return new Iterator() {
-            private Iterator ki = getSequences().iterator();
-            public boolean hasNext() {
-              return ki.hasNext();
-            }
-            public Object next() {
-              final Object key = ki.next();
-              return new Map.Entry() {
-                public Object getKey() {
-                  return key;
-                }
-                public Object getValue() {
-                  return get(key);
-                }
-                public Object setValue(Object val) {
-                  throw new UnsupportedOperationException();
-                }
-                public boolean equals(Object o) {
-                  Map.Entry me = (Map.Entry) o;
-                  return me.getKey().equals(getKey()) &&
-                         me.getValue().equals(getValue());
-                }
-                public int hashCode() {
-                  return getKey().hashCode() ^ getValue().hashCode();
-                }
-              };
-            }
-            public void remove() {
-              throw new UnsupportedOperationException();
-            }
-          };
+      }
+    }
+    
+    this.alphabet = new ValidatingAlphabet(alphaList);
+  }
+  
+  private class ColAsResidue implements CrossProductResidue {
+    private int col;
+    
+    public ColAsResidue(int col) {
+      this.col = col;
+    }
+    
+    public List getResidues() {
+      return new AbstractList() {
+        public Object get(int indx) {
+          return getResidue((ResidueList) resList.get(indx), col);
+        }
+        public int size() {
+          return resList.size();
         }
       };
     }
-    public ColumnMap(int column) {
-      this.column = column;
+      
+    public String getName() {
+      StringBuffer sb = new StringBuffer("(");
+      if(resList.size() != 0) {
+        sb.append(getResidue((ResidueList) resList.get(0), col).getName());
+        for(int i = 1; i < resList.size(); i++) {
+          sb.append(" " + getResidue((ResidueList) resList.get(i), col).getName());
+        }
+      }
+      sb.append(")");
+      return sb.toString();
+    }
+      
+    public char getSymbol() {
+      return '?';
+    }
+    
+    public Annotation getAnnotation() {
+      return Annotation.EMPTY_ANNOTATION;
+    }
+  }
+  
+  private class ValidatingAlphabet implements CrossProductAlphabet {
+    private List alphabets;
+    
+    public ValidatingAlphabet(List alphabets) {
+      this.alphabets = Collections.unmodifiableList(alphabets);
+    }
+    
+    public boolean contains(Residue r) {
+      if(!(r instanceof CrossProductAlphabet)) {
+        return false;
+      }
+      CrossProductResidue cr = (CrossProductResidue) r;
+      
+      Iterator subResI = cr.getResidues().iterator();
+      Iterator alphaI = alphabets.iterator();
+      while(subResI.hasNext() && alphaI.hasNext() ) {
+        Residue res = (Residue) subResI.next();
+        Alphabet alpha = (Alphabet) alphaI.next();
+        if(!alpha.contains(res)) {
+          return false;
+        }
+      }
+      if(alphaI.hasNext() || subResI.hasNext()) {
+        return false;
+      }
+      return true;
+    }
+    
+    public String getName() {
+      return "?";
+    }
+    
+    public ResidueParser getParser(String name) {
+      throw new NoSuchElementException(
+        "No parsers associated with this alphabet"
+      );
+    }
+    
+    public ResidueList residues() {
+      return ResidueList.EMPTY_LIST;
+    }
+    
+    public int size() {
+      return -1;
+    }
+    
+    public void validate(Residue r) throws IllegalResidueException {
+      if(!(r instanceof CrossProductAlphabet)) {
+        throw new IllegalResidueException(
+          "Residue " + r + " is not a CrossProduct residue"
+        );
+      }
+      CrossProductResidue cr = (CrossProductResidue) r;
+      Iterator subResI = cr.getResidues().iterator();
+      Iterator alphaI = alphabets.iterator();
+      while( subResI.hasNext() && alphaI.hasNext() ) {
+        Residue res = (Residue) subResI.next();
+        Alphabet alpha = (Alphabet) alphaI.next();
+        alpha.validate(res);
+      }
+      if( alphaI.hasNext() || subResI.hasNext() ) {
+        throw new IllegalResidueException(
+          "Residue has a different number of dimensions to this alphabet: " + cr
+        );
+      }
+    }
+    
+    public List getAlphabets() {
+      return alphabets;
+    }
+    
+    public CrossProductResidue getResidue(List rl)
+    throws IllegalAlphabetException {
+      final List rl2 = Collections.unmodifiableList(rl);
+      return new CrossProductResidue() {
+        public List getResidues() {
+          return rl2;
+        }
+        public String getName() {
+          StringBuffer sb = new StringBuffer("(");
+          if(rl2.size() != 0) {
+            sb.append(((Residue) rl2.get(0)).getName());
+            for(int i = 1; i < size(); i++) {
+              sb.append(((Residue) rl2.get(i)).getName());
+            }
+          }
+          sb.append(")");
+          return sb.toString();
+        }
+      
+        public char getSymbol() {
+          return '?';
+        }
+        
+        public Annotation getAnnotation() {
+          return Annotation.EMPTY_ANNOTATION;
+        }
+      }; 
+    }
+    public Annotation getAnnotation() {
+      return Annotation.EMPTY_ANNOTATION;
     }
   }
 }

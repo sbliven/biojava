@@ -32,50 +32,41 @@ import org.biojava.bio.seq.*;
  * The alignment can be thought of a rectangular array of residues. Each
  * row is indexed by sequence and each column is indexed by residue offset.
  * <P>
+ * Alternatively, it can be thought of as a residue list where each residue is
+ * a list of residues in that column - modeled as a CrossProductResidue.
+ * <P>
+ * To create gapped alignments, use ResidueLists with gaps. The most flexible
+ * way to do this will be to leverage GappedResidueList objects.
+ * <P>
  * This object uses bio-numbers, that is 1-length (a-b is a and b inclusive).
  */
-public interface Alignment extends Annotatable {
+public interface Alignment extends ResidueList {
   /**
-   * The length of the alignment.
+   * The list of ResidueLists in the alignment.
+   * <P>
+   * The index in the list is the same as the index in the alignment.
+   * Each ResidueList object will only be in the alignment once. However, a
+   * single underlying ResidueList may have more than one view within an
+   * alignment, each represented by a different GappedResidueList.
    *
-   * @return the number of columns or -1 if the alignment is empty
+   * @return  the List of all ResidueLists in the alignment
    */
-  int length();
+  List getResidueLists();
   
   /**
-   * The set of sequences in the alignment. A sequence can only be in once.
+   * Retrieve a residue by ResidueList and column.
    *
-   * @return  the Set of all sequences in the alignment
-   */
-  Set getSequences();
-  
-  /**
-   * Retrieve a residue by sequence and column.
-   * <p>
-   * There is no concept of row index, only of sequence.
-   *
-   * @param seq the ResidueList to retrieve from
+   * @param res the ResidueList to retrieve from
    * @param column  the index of the column to retrieve
    */
-  Residue getResidue(ResidueList seq, int column);
-  
-  /**
-   * Retrieve a single column of the alignment.
-   * <P>
-   * The keys of the map will be the sequences. The values will be the residues
-   * at the specified column.
-   *
-   * @param column  the column index
-   * @return  a Map of sequence to residue at that column
-   */
-  Map getColumn(int column);
+  Residue getResidue(ResidueList res, int column);
   
   /**
    * Make a view onto this alignment.
    *
-   * @param sequences the set of sequences to include
+   * @param residueLists the set of sequences to include
    * @param loc the Location to include
    * @return  a sub Alignment
    */
-  Alignment subAlignment(Set sequences, Location loc);
+  Alignment subAlignment(List residueLists, Location loc);
 }
