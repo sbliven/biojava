@@ -20,33 +20,17 @@
  */
 package org.biojava.bio.seq.db;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.net.URL;
-import java.util.Iterator;
+import java.net.*;
+import java.io.*;
 import java.util.Set;
-
-import org.biojava.bio.BioException;
+import java.util.Iterator;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
-import org.biojava.bio.seq.io.GenbankFormat;
-import org.biojava.bio.seq.io.GenbankProcessor;
-import org.biojava.bio.seq.io.SeqIOTools;
-import org.biojava.bio.seq.io.SequenceBuilder;
-import org.biojava.bio.seq.io.SequenceBuilderFactory;
-import org.biojava.bio.seq.io.SequenceFormat;
-import org.biojava.bio.seq.io.SimpleSequenceBuilder;
-import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.Alphabet;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -55,6 +39,8 @@ import org.biojava.utils.ChangeVetoException;
  * @author Lei Lai
  * @author Matthew Pocock
  * @author Laurent Jourdren
+ * @author Shuvankar Mukherjee
+ * @author Mark Schreiber
  */
 public class GenbankSequenceDB
 {
@@ -86,13 +72,13 @@ public class GenbankSequenceDB
    **/
   protected URL getAddress (String id) throws MalformedURLException
   {
-	String defaultReturnFormat="text";
-	FetchURL seqURL = new FetchURL(DBName, defaultReturnFormat);
-	String baseurl = seqURL.getbaseURL();
-	String db = seqURL.getDB();
-	//String returnFormat = seqURL.getReturnFormat();
+        String defaultReturnFormat="text";
+        FetchURL seqURL = new FetchURL(DBName, defaultReturnFormat);
+        String baseurl = seqURL.getbaseURL();
+        String db = seqURL.getDB();
+        //String returnFormat = seqURL.getReturnFormat();
 
-	String url = baseurl+db+"&id="+id;
+        String url = baseurl+db+"&id="+id+"&rettype=gb";
 
     return new URL (url);
   }
@@ -103,14 +89,15 @@ public class GenbankSequenceDB
    */
   protected URL getAddress(String id, String format) throws MalformedURLException
   {
-	FetchURL seqURL = new FetchURL(DBName, format);
-	String baseurl = seqURL.getbaseURL();
-	if (!(baseurl.equalsIgnoreCase("")))
-		baseurl = seqURL.getbaseURL();
-	String db = seqURL.getDB();
+        FetchURL seqURL = new FetchURL(DBName, format);
+        String baseurl = seqURL.getbaseURL();
+        if (!(baseurl.equalsIgnoreCase("")))
+                baseurl = seqURL.getbaseURL();
+        String db = seqURL.getDB();
 //	String returnFormat = seqURL.getReturnFormat();
 //	String url = baseurl+db+"&"+returnFormat+"&id="+id;
-	String url = baseurl+db+"&id="+id;
+        String url = baseurl+db+"&id="+id+"&rettype=gb";
+
     return new URL (url);
   }
 
@@ -119,43 +106,46 @@ public class GenbankSequenceDB
     return DBName;
   }
 
-  public Sequence getSequence(String id) throws Exception
-  {
-    try
-	{
-	  IOExceptionFound=false;
-	  ExceptionFound=false;
-      URL queryURL = getAddress(id);//get URL based on ID
-    //  System.err.println("query is "+ queryURL.toString());
-      SequenceFormat sFormat = getSequenceFormat();//get incoming sequence format
-      SequenceBuilder sbuilder = new SimpleSequenceBuilder();//create a sequence builder
-	  SequenceBuilderFactory sFact=new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
-      Alphabet alpha = getAlphabet();//get alphabet
-      SymbolTokenization rParser = alpha.getTokenization("token");//get SymbolTokenization
-      System.err.println("got data from "+ queryURL);
-	  DataInputStream in=new DataInputStream(queryURL.openStream());
-	  BufferedReader reader = new BufferedReader (new InputStreamReader (in));
-	  SequenceIterator seqI= SeqIOTools.readGenbank(reader);
+  public Sequence getSequence(String id) throws Exception {
+    try {
+      IOExceptionFound = false;
+      ExceptionFound = false;
+      URL queryURL = getAddress(id); //get URL based on ID
+
+      //  System.err.println("query is "+ queryURL.toString());
+
+      SequenceFormat sFormat = getSequenceFormat(); //get incoming sequence format
+      SequenceBuilder sbuilder = new SimpleSequenceBuilder(); //create a sequence builder
+      SequenceBuilderFactory sFact = new GenbankProcessor.Factory(
+          SimpleSequenceBuilder.FACTORY);
+      Alphabet alpha = getAlphabet(); //get alphabet
+      SymbolTokenization rParser = alpha.getTokenization("token"); //get SymbolTokenization
+
+      //System.err.println("got data from " + queryURL);
+
+      DataInputStream in = new DataInputStream(queryURL.openStream());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+      SequenceIterator seqI = SeqIOTools.readGenbank(reader);
+
       return seqI.nextSequence();
-    }
-	catch ( Exception e )
-	{
-	  System.out.println ("Exception found in GenbankSequenceDB -- getSequence");
-      System.out.println (e.toString());
-	  ExceptionFound=true;
-	  IOExceptionFound=true;
-	  return null;
+
+    } catch (Exception e) {
+      System.out.println("Exception found in GenbankSequenceDB -- getSequence");
+      System.out.println(e.toString());
+      ExceptionFound = true;
+      IOExceptionFound = true;
+      return null;
     }
   }
 
   public boolean checkIOException()
   {
-	return IOExceptionFound;
+        return IOExceptionFound;
   }
 
   public boolean checkException()
   {
-	return ExceptionFound;
+        return ExceptionFound;
   }
 
   /**
@@ -170,10 +160,16 @@ public class GenbankSequenceDB
     StringBuffer params = new StringBuffer();
     params.append("db=nucleotide&rettype=gb&id=");
 
-    for (Iterator i = list.iterator(); i.hasNext();) {
+    boolean b = true;
+    for (Iterator i = list.iterator(); b;) {
       String idSequence = (String) i.next();
       params.append(idSequence);
-      params.append(",");
+      if(i.hasNext()){
+        params.append(",");
+      }else{
+        b =false;
+        //params.append("\r\n");
+      }
     }
 
     StringBuffer header = new StringBuffer();
@@ -261,13 +257,13 @@ public class GenbankSequenceDB
         database.addSequence(seqI.nextSequence());
 
     } catch (MalformedURLException e) {
-      throw new BioException("Exception found in GenbankSequenceDB -- getSequences", e);
+      throw new BioException(e,"Exception found in GenbankSequenceDB -- getSequences");
     } catch (IOException e) {
-      throw new BioException("Exception found in GenbankSequenceDB -- getSequences", e);
+      throw new BioException(e,"Exception found in GenbankSequenceDB -- getSequences");
     } catch (BioException e) {
-      throw new BioException("Exception found in GenbankSequenceDB -- getSequences", e);
+      throw new BioException(e,"Exception found in GenbankSequenceDB -- getSequences");
     } catch (ChangeVetoException e) {
-      throw new BioException("Exception found in GenbankSequenceDB -- getSequences", e);
+      throw new BioException(e,"Exception found in GenbankSequenceDB -- getSequences");
     }
 
     return database;

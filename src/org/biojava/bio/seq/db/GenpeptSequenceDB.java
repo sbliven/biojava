@@ -20,120 +20,105 @@
  */
 package org.biojava.bio.seq.db;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.biojava.bio.BioException;
-import org.biojava.bio.seq.ProteinTools;
+import java.net.*;
+import java.io.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
-import org.biojava.bio.seq.io.GenbankFormat;
-import org.biojava.bio.seq.io.GenbankProcessor;
-import org.biojava.bio.seq.io.SeqIOTools;
-import org.biojava.bio.seq.io.SequenceBuilder;
-import org.biojava.bio.seq.io.SequenceBuilderFactory;
-import org.biojava.bio.seq.io.SequenceFormat;
-import org.biojava.bio.seq.io.SimpleSequenceBuilder;
-import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.io.*;
 
 /**
  * @author Lei Lai
  * @author Matthew Pocock
- */											 
-public class GenpeptSequenceDB
-{
+ * @author Shuvankar Mukherjee
+ */
+public class GenpeptSequenceDB {
   private static SequenceFormat format;
-  private static String DBName="Genpept";
-  private boolean IOExceptionFound=false;
-  private boolean ExceptionFound=false;
-  
-  static 
-  {
+  private static String DBName = "Genpept";
+  private boolean IOExceptionFound = false;
+  private boolean ExceptionFound = false;
+
+  static {
     SequenceFormat format = new GenbankFormat();
   }
-  
-  protected SequenceFormat getSequenceFormat() 
-  {
+
+  protected SequenceFormat getSequenceFormat() {
     return format;
   }
-  
-  protected Alphabet getAlphabet() 
-  {
+
+  protected Alphabet getAlphabet() {
     return ProteinTools.getTAlphabet();
   }
-  
-  protected URL getAddress (String id) throws MalformedURLException
-  {
-	String defaultReturnFormat="text";
-	FetchURL seqURL = new FetchURL(DBName, defaultReturnFormat);
-	String baseurl = seqURL.getbaseURL();
-	String db = seqURL.getDB();
-	String returnFormat = seqURL.getReturnFormat();
-	
-	String url = baseurl+db+"&id="+id;
-	
-    return new URL (url);
+
+  protected URL getAddress(String id) throws MalformedURLException {
+    String defaultReturnFormat = "text";
+    FetchURL seqURL = new FetchURL(DBName, defaultReturnFormat);
+    String baseurl = seqURL.getbaseURL();
+    String db = seqURL.getDB();
+    String returnFormat = seqURL.getReturnFormat();
+
+    String url = baseurl + db + "&id=" + id + "&rettype=gb";
+
+    return new URL(url);
   }
-  
+
   //ask user to input id and return format
-  protected URL getAddress(String id, String format) throws MalformedURLException
-  {   
-	FetchURL seqURL = new FetchURL(DBName, format);
-	String baseurl = seqURL.getbaseURL();
-	if (!(baseurl.equalsIgnoreCase("")))
-		baseurl = seqURL.getbaseURL();
-	String db = seqURL.getDB();
+  protected URL getAddress(String id, String format) throws
+      MalformedURLException {
+    FetchURL seqURL = new FetchURL(DBName, format);
+    String baseurl = seqURL.getbaseURL();
+    if (! (baseurl.equalsIgnoreCase("")))
+      baseurl = seqURL.getbaseURL();
+    String db = seqURL.getDB();
 //	String returnFormat = seqURL.getReturnFormat();
-	
-	String url = baseurl+db+"&id="+id;
-	
-    return new URL (url);
+
+    String url = baseurl + db + "&id=" + id + "&rettype=gb";
+
+    return new URL(url);
   }
-  
-  public String getName() 
-  {
+
+  public String getName() {
     return DBName;
   }
-  
-  public Sequence getSequence(String id) throws BioException 
-  {
-    try 
-	{
-	  IOExceptionFound=false;
-	  ExceptionFound=false;
-      URL queryURL = getAddress(id);//achieve URL based on ID      
-   //   System.err.println("query is "+ queryURL.toString());
-      SequenceFormat sFormat = getSequenceFormat();//get incoming sequence format
-      SequenceBuilder sbuilder = new SimpleSequenceBuilder();//create a sequence builder
-	  SequenceBuilderFactory sFact=new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
-      Alphabet alpha = getAlphabet();//get alphabet
-      SymbolTokenization rParser = alpha.getTokenization("token");//get SymbolTokenization
-      System.err.println("got data from "+ queryURL);
-	  DataInputStream in=new DataInputStream(queryURL.openStream());
-	  BufferedReader reader = new BufferedReader (new InputStreamReader (in));
-	  SequenceIterator seqI= SeqIOTools.readGenpept(reader);
+
+  public Sequence getSequence(String id) throws BioException {
+    try {
+      IOExceptionFound = false;
+      ExceptionFound = false;
+      URL queryURL = getAddress(id); //achieve URL based on ID
+
+      //   System.err.println("query is "+ queryURL.toString());
+      SequenceFormat sFormat = getSequenceFormat(); //get incoming sequence format
+      SequenceBuilder sbuilder = new SimpleSequenceBuilder(); //create a sequence builder
+      SequenceBuilderFactory sFact = new GenbankProcessor.Factory(
+          SimpleSequenceBuilder.FACTORY);
+      Alphabet alpha = getAlphabet(); //get alphabet
+      SymbolTokenization rParser = alpha.getTokenization("token"); //get SymbolTokenization
+
+      //System.err.println("got data from " + queryURL);
+      DataInputStream in = new DataInputStream(queryURL.openStream());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+      SequenceIterator seqI = SeqIOTools.readGenpept(reader);
+
       return seqI.nextSequence();
-    } 
-	catch ( Exception e )
-	{
-	  System.out.println (e.toString());
-	  IOExceptionFound=true;
-	  ExceptionFound=true;
+
+    } catch (Exception e) {
+      System.out.println(e.toString());
+      IOExceptionFound = true;
+      ExceptionFound = true;
       return null;
-    } 
+    }
   }
-  
-  public boolean checkIOException()
-  {
-	return IOExceptionFound;
+
+  public boolean checkIOException() {
+    return IOExceptionFound;
   }
-  
-  public boolean checkException()
-  {
-	return ExceptionFound;  
+
+  public boolean checkException() {
+    return ExceptionFound;
   }
 }
