@@ -8,10 +8,12 @@ import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.io.agave.*;
 import org.biojava.directory.*;
+import org.biojava.bio.program.xff.*;
+import org.biojava.utils.xml.*;
 
 public class RFetch {
     private static void printUsage() {
-	System.err.println("usage: rfetch [-fasta | -gff | -embl | -genbank | -agave] namespace id1 id2 ...");
+	System.err.println("usage: rfetch [-fasta | -gff | -embl | -genbank | -agave | -xff] namespace id1 id2 ...");
     }
 
     public static void main(String[] args)
@@ -33,7 +35,9 @@ public class RFetch {
 		format = "genbank";
 	    } else if ("-agave".equals(sw)) {
 		format = "agave";
-	    } else if ("-list".equals(sw)) {
+	    } else if ("-xff".equals(sw)) {
+            format = "xff";
+        }else if ("-list".equals(sw)) {
 		format = "list";
 	    } else if ("-all".equals(sw)) {
 		all = true;
@@ -111,7 +115,13 @@ public class RFetch {
 	    GFFWriter gffw = new GFFWriter(pw);
 	    seqgff.processSequence(seq, gffw);
 	    pw.flush();
-	} else if ("agave".equals(format)) {
+	} else if ("xff".equals(format)) {
+        XFFWriter xffw = new XFFWriter();
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+        XMLWriter xw = new PrettyXMLWriter(pw);
+        xffw.writeFeatureSet(seq, xw);
+        pw.flush();
+    } else if ("agave".equals(format)) {
 	    new AgaveWriter().writeSequence(seq, System.out);
 	}
     }

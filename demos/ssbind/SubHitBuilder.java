@@ -92,7 +92,7 @@ extends SearchContentFilter {
         score, eValue, pValue,
         Math.min(queryStart, queryEnd), Math.max(queryStart, queryEnd), queryStrand,
         Math.min(subjectStart, subjectEnd), Math.max(subjectStart, subjectEnd), subjectStrand,
-        alignment
+        alignment, new SmallAnnotation()
       )
     );
     
