@@ -813,6 +813,7 @@ public interface FeatureFilter extends Serializable {
    * annotation type.
    *
    * @author Matthew Pocock
+   * @author Thomas Down
    * @since 1.3
    */
   public static class ByAnnotationType
@@ -859,25 +860,35 @@ public interface FeatureFilter extends Serializable {
         // check for common property names
         ByAnnotationType that = (ByAnnotationType) filter;
         Set props = that.getType().getProperties();
-        Set ourProps = new HashSet(getType().getProperties());
-        ourProps.retainAll(props);
-        if(ourProps.isEmpty()) {
-          return false; // we can't prove they are disjoint because there is nothing to check for dissagreements:
-        }
-        for(Iterator i = ourProps.iterator(); i.hasNext(); ) {
+        Set ourProps = this.getType().getProperties();
+        Set allProps = new HashSet(props);
+        allProps.addAll(ourProps);
+        for(Iterator i = allProps.iterator(); i.hasNext(); ) {
           Object prop = i.next();
-          Location thisC = this.getType().getCardinalityConstraint(prop);
-          Location thatC = that.getType().getCardinalityConstraint(prop);
-          
-          if(LocationTools.intersection(thisC, thatC) == Location.empty) {
-            return true;
+          Location thisC;
+          PropertyConstraint thisP;
+          if (ourProps.contains(prop)) {
+              thisC = this.getType().getCardinalityConstraint(prop);
+              thisP = this.getType().getPropertyConstraint(prop);
+          } else {
+              thisC = this.getType().getDefaultCardinalityConstraint();
+              thisP = this.getType().getDefaultPropertyConstraint();
+          }
+          Location thatC;
+          PropertyConstraint thatP;
+          if (props.contains(prop)) {
+              thatC = that.getType().getCardinalityConstraint(prop);
+              thatP = that.getType().getPropertyConstraint(prop);
+          } else {
+              thatC = that.getType().getDefaultCardinalityConstraint();
+              thatP = that.getType().getDefaultPropertyConstraint();
           }
           
-          PropertyConstraint thisP = this.getType().getPropertyConstraint(prop);
-          PropertyConstraint thatP = that.getType().getPropertyConstraint(prop);
-          return
-            !thisP.subConstraintOf(thatP) &&
-            !thatP.subConstraintOf(thisP);
+          if(!LocationTools.overlaps(thisC, thatC)) {
+              return true;
+          } else if (!thisP.subConstraintOf(thatP) && !thatP.subConstraintOf(thisP)) {
+              return true;
+          }
         }
       }
       
