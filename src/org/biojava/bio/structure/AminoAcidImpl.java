@@ -147,6 +147,21 @@ public class   AminoAcidImpl
 	return str ;
 		
     }
+ /** set three character name of AminoAcid. 
+     *
+     * @param s  a String specifying the PDBName value
+     * @see #getPDBName
+     * @throws PDBParseException ...
+     */
+    public void setPDBName(String s) 
+	throws PDBParseException
+    {
+	if (s.length() != 3) {
+	    throw new PDBParseException("amino acid name is not of length 3!");
+	}
+	pdb_name =s ;
+    }
+
 
     /** returns and identical copy of this Group object .
      * @return  and identical copy of this Group object 
