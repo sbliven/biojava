@@ -17,7 +17,7 @@ import org.biojava.bio.search.*;
  * </p>
  *
  * <p>
- * This will consume all the information necisary to build a
+ * This will consume all the information necessary to build a
  * SeqSimilaritySearchSubHit instance and then emit one under the key
  * SubHitBuilder.SEARCH_SUB_HIT to the next handler in the chain.
  * </p>

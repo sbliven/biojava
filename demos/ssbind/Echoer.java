@@ -8,7 +8,7 @@ import org.biojava.bio.search.*;
  * </p>
  *
  * <p>
- * This class is most usefull to check that your parsing is working. You can use
+ * This class is most useful to check that your parsing is working. You can use
  * an Echoer as the last handler in a chain of filters, or attach it directly
  * to the parser. It is an instructive way to work out what events are being
  * fired when, and with what properties attached.

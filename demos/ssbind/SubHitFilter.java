@@ -10,7 +10,7 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.search.*;
 
 /**
- * Abstract base class for things that will allow or dissalow whole sub hit
+ * Abstract base class for things that will allow or disallow whole sub hit
  * messages through to the next handler.
  *
  * @author Matthew Pocock

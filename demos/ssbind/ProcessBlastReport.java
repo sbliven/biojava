@@ -27,7 +27,7 @@ import org.biojava.bio.search.*;
  *
  * <p>
  * This command expects to be given a blast report as the first argument, a
- * SearchContentHanlder with a no-args constructor as the last argument and
+ * SearchContentHandler with a no-args constructor as the last argument and
  * any number of SearchContentFilters inbetween. It assumes that all classes
  * can be configured using beany accessors (get/setFoo methods). If you supply
  * the class name as-is, the class will be instantiated. If you give the class
@@ -88,7 +88,7 @@ public class ProcessBlastReport {
   }
   
   /**
-   * Instrospection magic to make a handler and configure its properties.
+   * Introspection magic to make a handler and configure its properties.
    */
   private static SearchContentHandler createHandler(
     String handlerClassName,
@@ -126,7 +126,7 @@ public class ProcessBlastReport {
           if(propClass == String.class) {
             consVal = propVal;
           } else if(propClass.isPrimitive()) {
-            // fixme: other primatives?
+            // fixme: other primitives?
             if(propClass == Double.TYPE) {
               consVal = new Double(propVal);
             }
