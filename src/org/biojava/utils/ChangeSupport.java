@@ -22,6 +22,7 @@ package org.biojava.utils;
 
 import java.io.Serializable;
 import java.util.*;
+import java.lang.ref.*;
 
 /**
  * A utility class to provide management for informing ChangeListeners of
@@ -49,11 +50,12 @@ import java.util.*;
  * @author Thomas Down
  * @since 1.1
  */
+
 public class ChangeSupport {
   private int listenerCount;
   private int delta;
-  private ChangeListener [] listeners;
-  private ChangeType [] types;
+  private Reference[] listeners;
+  private ChangeType[] types;
   
   /**
    * Generate a new ChangeSupport instance.
@@ -85,7 +87,7 @@ public class ChangeSupport {
    */
   public ChangeSupport(int initialSize, int delta) {
     this.listenerCount = 0;
-    this.listeners = new ChangeListener[initialSize];
+    this.listeners = new Reference[initialSize];
     this.types = new ChangeType[initialSize];
     
     this.delta = delta;
@@ -109,7 +111,7 @@ public class ChangeSupport {
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
     growIfNecisary();
     types[listenerCount] = ct;
-    listeners[listenerCount] = cl;
+    listeners[listenerCount] = new WeakReference(cl);
     listenerCount++;
   }
   
@@ -120,7 +122,7 @@ public class ChangeSupport {
   protected void growIfNecisary() {
     if(listenerCount == listeners.length) {
       int newLength = listenerCount + delta;
-      ChangeListener[] newList = new ChangeListener[newLength];
+      Reference[] newList = new Reference[newLength];
       ChangeType[] newTypes = new ChangeType[newLength];
       
       System.arraycopy(listeners, 0, newList, 0, listenerCount);
@@ -148,7 +150,7 @@ public class ChangeSupport {
    */
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
     for(int i = 0; i < listenerCount; i++) {
-      if( (listeners[i] == cl) && (types[i] == ct) ) {
+      if( (listeners[i].get() == cl) && (types[i] == ct) ) {
         listenerCount--;
         System.arraycopy(listeners, i+1, listeners, i, (listenerCount - i));
         System.arraycopy(types, i+1, types, i, (listenerCount - i));
@@ -156,6 +158,25 @@ public class ChangeSupport {
       }
     }
   }
+
+    /**
+     * Remove all references to listeners which have been cleared by the
+     * garbage collector.  This method should only be called when the
+     * object is locked.
+     */
+
+    protected void reapGarbageListeners() {
+	int pp = 0;
+	for (int p = 0; p < listenerCount; ++p) {
+	    Reference r = listeners[p];
+	    if (r.get() != null) {
+	        types[pp] = types[p];
+		listeners[pp] = r;
+		pp++;
+	    }
+	}
+	listenerCount = pp;
+    }
   
   /**
    * Inform the listeners that a change is about to take place using their
@@ -169,13 +190,23 @@ public class ChangeSupport {
    */
   public void firePreChangeEvent(ChangeEvent ce)
   throws ChangeVetoException {
+      boolean needToReap = false;
+
     ChangeType ct = ce.getType();
     for(int i = 0; i < listenerCount; i++) {
       ChangeType lt = types[i];
       if( (lt == null) || (lt == ct) ) {
-        listeners[i].preChange(ce);
+        ChangeListener cl = (ChangeListener) listeners[i].get();
+	if (cl != null) {
+	    cl.preChange(ce);
+	} else {
+	    needToReap = true;
+	}
       }
     }
+
+    if (needToReap)
+	reapGarbageListeners();
   }
   
   /**
@@ -187,13 +218,24 @@ public class ChangeSupport {
    *
    * @param ce  the ChangeEvent to pass on
    */
+
   public void firePostChangeEvent(ChangeEvent ce) {
+      boolean needToReap = false;
+
     ChangeType ct = ce.getType();
     for(int i = 0; i < listenerCount; i++) {
       ChangeType lt = types[i];
       if( (lt == null) || (lt == ct) ) {
-        listeners[i].postChange(ce);
+        ChangeListener cl = (ChangeListener) listeners[i].get();
+	if (cl != null) {
+	    cl.postChange(ce);
+	} else {
+	    needToReap = true;
+	}
       }
     }
+
+    if (needToReap)
+	reapGarbageListeners();
   }
 }
