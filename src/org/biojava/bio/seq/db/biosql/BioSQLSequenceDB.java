@@ -506,6 +506,11 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         throws BioException {
         return getSequence(id, -1);
     }
+    
+    public Sequence getSequence(int bioentry_id)
+	    throws BioException {
+      return getSequence(null, bioentry_id);
+    }
 
     Sequence getSequence(String id, int bioentry_id)
         throws BioException {
