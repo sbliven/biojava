@@ -24,7 +24,7 @@
 -->
 
 <book>
-  <title>The BioJava Documentation Project</title>
+  <title>The BioJava Documentation</title>
 
   <bookinfo>
     <!-- Add your name as a collaborative author if you contribute -->
@@ -73,9 +73,9 @@
     which both free software and commercial packages can be
     developed.</para>
 
-    <para>The BioJava Documentation Project aims to provide
-    information about all aspects of BioJava and to link into other
-    resources, such as the API documentation.</para>
+    <para>The BioJava documentation aims to provide information about
+    all aspects of BioJava and to link into other resources, such as
+    the API documentation.</para>
   </preface>
 
   <preface>
@@ -134,7 +134,7 @@
     </sect1>
 
     <sect1>
-      <title>DocBook and the BioJava Documentation Project</title>
+      <title>DocBook and the BioJava Documentation</title>
 
     </sect1>
 
