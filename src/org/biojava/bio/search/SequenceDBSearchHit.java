@@ -59,7 +59,7 @@ import org.biojava.utils.ObjectUtil;
  *     for the sequence type i.e. for protein</li>
  * </ul>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.1
  * @see AbstractChangeable
  * @see SeqSimilaritySearchHit
@@ -80,6 +80,11 @@ public class SequenceDBSearchHit extends AbstractChangeable
     private Strand     subjectStrand;
     private List       subHits;
     private Annotation annotation;
+
+    // Hashcode is cached after first calculation because the data on
+    // which is is based do not change
+    private int hc;
+    private boolean hcCalc;
 
     /**
      * Creates a new <code>SequenceDBSearchHit</code> object.
@@ -115,18 +120,18 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * @param annotation an <code>Annotation</code> object, which may
      * not be null.
      */
-    public SequenceDBSearchHit(final double     score,
-                               final double     eValue,
-                               final double     pValue,
-                               final int        queryStart,
-                               final int        queryEnd,
-                               final Strand     queryStrand,
-                               final int        subjectStart,
-                               final int        subjectEnd,
-                               final Strand     subjectStrand,
-                               final String     sequenceID,
-                               final Annotation annotation,
-                               final List       subHits)
+    public SequenceDBSearchHit(double     score,
+                               double     eValue,
+                               double     pValue,
+                               int        queryStart,
+                               int        queryEnd,
+                               Strand     queryStrand,
+                               int        subjectStart,
+                               int        subjectEnd,
+                               Strand     subjectStrand,
+                               String     sequenceID,
+                               Annotation annotation,
+                               List       subHits)
     {
         if (Double.isNaN(score))
         {
@@ -162,6 +167,8 @@ public class SequenceDBSearchHit extends AbstractChangeable
 
         // Lock the annotation by vetoing all changes
         this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+        hcCalc = false;
     }
 
     public double getScore()
@@ -257,13 +264,15 @@ public class SequenceDBSearchHit extends AbstractChangeable
   
     public int hashCode()
     {
-        int hc = 0;
-
-        hc = ObjectUtil.hashCode(hc, score);
-        hc = ObjectUtil.hashCode(hc, pValue);
-        hc = ObjectUtil.hashCode(hc, eValue);
-        hc = ObjectUtil.hashCode(hc, sequenceID);
-        hc = ObjectUtil.hashCode(hc, subHits);
+        if (! hcCalc)
+        {
+            hc = ObjectUtil.hashCode(hc, score);
+            hc = ObjectUtil.hashCode(hc, pValue);
+            hc = ObjectUtil.hashCode(hc, eValue);
+            hc = ObjectUtil.hashCode(hc, sequenceID);
+            hc = ObjectUtil.hashCode(hc, subHits);
+            hcCalc = true;
+        }
 
         return hc;
     }

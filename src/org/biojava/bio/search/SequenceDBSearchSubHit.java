@@ -27,9 +27,11 @@ import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ObjectUtil;
 
 /**
- * <code>SequenceDBSearchSubHit</code> objects.
+ * <p><code>SequenceDBSearchSubHit</code> objects represent sub-hits
+ * which make up a hit. In the case of Blast these correspond to
+ * HSPs.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.1
  * @see SeqSimilaritySearchSubHit
  */
@@ -45,6 +47,11 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
     private int       subjectEnd;
     private Strand    subjectStrand;
     private Alignment alignment;
+
+    // Hashcode is cached after first calculation because the data on
+    // which is is based do not change
+    private int hc;
+    private boolean hcCalc;
 
     /**
      * Creates a new <code>SequenceDBSearchSubHit</code> object.
@@ -73,25 +80,27 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
      * the alignment described by the subhit region, which may not be
      * null. 
      */
-    public SequenceDBSearchSubHit(final double    score,
-                                  final double    eValue,
-                                  final double    pValue,
-                                  final int       queryStart,
-                                  final int       queryEnd,
-                                  final Strand    queryStrand,
-                                  final int       subjectStart,
-                                  final int       subjectEnd,
-                                  final Strand    subjectStrand,
-                                  final Alignment alignment)
+    public SequenceDBSearchSubHit(double    score,
+                                  double    eValue,
+                                  double    pValue,
+                                  int       queryStart,
+                                  int       queryEnd,
+                                  Strand    queryStrand,
+                                  int       subjectStart,
+                                  int       subjectEnd,
+                                  Strand    subjectStrand,
+                                  Alignment alignment)
     {
-        if (Double.isNaN(score)) {
-	    throw new IllegalArgumentException("score was NaN");
-	}
+        if (Double.isNaN(score))
+        {
+            throw new IllegalArgumentException("score was NaN");
+        }
         // pValue may be NaN
         // eValue may be NaN
-        if (alignment == null) {
-	    throw new IllegalArgumentException("alignment was null");
-	}
+        if (alignment == null)
+        {
+            throw new IllegalArgumentException("alignment was null");
+        }
 
         this.score         = score;
         this.eValue        = eValue;
@@ -106,6 +115,8 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
 
         // Lock alignment by vetoing all changes
         this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+        hcCalc = false;
     }
 
     public double getScore()
@@ -198,18 +209,25 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
   
     public int hashCode()
     {
-        int hc = 0;
-
-        hc = ObjectUtil.hashCode(hc, score);
-        hc = ObjectUtil.hashCode(hc, pValue);
-        hc = ObjectUtil.hashCode(hc, eValue);
-        hc = ObjectUtil.hashCode(hc, queryStart);
-        hc = ObjectUtil.hashCode(hc, queryEnd);
-        hc = ObjectUtil.hashCode(hc, queryStrand);
-        hc = ObjectUtil.hashCode(hc, subjectStart);
-        hc = ObjectUtil.hashCode(hc, subjectEnd);
-        hc = ObjectUtil.hashCode(hc, subjectStrand);
+        if (! hcCalc)
+        {
+            hc = ObjectUtil.hashCode(hc, score);
+            hc = ObjectUtil.hashCode(hc, pValue);
+            hc = ObjectUtil.hashCode(hc, eValue);
+            hc = ObjectUtil.hashCode(hc, queryStart);
+            hc = ObjectUtil.hashCode(hc, queryEnd);
+            hc = ObjectUtil.hashCode(hc, queryStrand);
+            hc = ObjectUtil.hashCode(hc, subjectStart);
+            hc = ObjectUtil.hashCode(hc, subjectEnd);
+            hc = ObjectUtil.hashCode(hc, subjectStrand);
+            hcCalc = true;
+        }
 
         return hc;
+    }
+
+    public String toString()
+    {
+        return "SequenceDBSearchSubHit with score " + getScore();
     }
 }

@@ -66,11 +66,11 @@ public class SequenceDBSearchResult extends AbstractChangeable
      * @param annotation an <code>Annotation</code>.
      * @param hits a <code>List</code>.
      */
-    public SequenceDBSearchResult(final SequenceDB sequenceDB,
-                                  final Map        searchParameters,
-                                  final SymbolList querySeq,
-                                  final Annotation annotation,
-                                  final List       hits)
+    public SequenceDBSearchResult(SequenceDB sequenceDB,
+                                  Map        searchParameters,
+                                  SymbolList querySeq,
+                                  Annotation annotation,
+                                  List       hits)
     {
         if (querySeq  == null)
         {
@@ -137,7 +137,7 @@ public class SequenceDBSearchResult extends AbstractChangeable
         return annotation;
     }
 
-    public boolean equals(final Object other)
+    public boolean equals(Object other)
     {
         if (other == this) return true;
         if (other == null) return false;

@@ -51,14 +51,13 @@ public class FastaFormat implements SequenceFormat,
                                     org.biojava.utils.ParseErrorSource
 {
   
-  static
-  {
-    Set validFormats = new HashSet();
-    validFormats.add("Fasta");
-    
-    SequenceFormat.FORMATS.put(FastaFormat.class.getName(),
-    validFormats);
-  }
+    static {
+        Set validFormats = new HashSet();
+        validFormats.add("Fasta");
+
+        SequenceFormat.FORMATS.put(FastaFormat.class.getName(),
+                                   validFormats);
+    }
 
   /**
     * Constant string which is the property key used to notify
@@ -228,29 +227,32 @@ public class FastaFormat implements SequenceFormat,
     }
 
     public void writeSequence(Sequence seq, String format, PrintStream os)
-	throws IOException
-    {
-	String requestedFormat = new String(format);
-	boolean          found = false;
+        throws IOException {
+        String requestedFormat = new String(format);
+        boolean          found = false;
 
-	String [] formats = (String []) getFormats().toArray(new String[0]);
+        String [] formats = (String []) getFormats().toArray(new String[0]);
 
-	if (! found)
-	    throw new IOException("Failed to write: an invalid file format '"
-				  + format
-				  + "' was requested");
+        for (int i = 0; i < formats.length; i++) {
+            found = found || (formats[i].compareTo(format) == 0);
+        }
 
-	writeSequence(seq, os);
+        if (! found)
+            throw new IOException("Failed to write: an invalid file format '"
+                                  + format
+                                  + "' was requested");
+
+        writeSequence(seq, os);
     }
 
     public Set getFormats()
     {
-	return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
+        return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
     }
 
     public String getDefaultFormat()
     {
-	return "Fasta";
+        return "Fasta";
     }
 
     /**

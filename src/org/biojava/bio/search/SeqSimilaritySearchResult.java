@@ -32,9 +32,8 @@ import org.biojava.bio.symbol.SymbolList;
  * Objects of this type represent one particular result of a sequence
  * similarity search.
  *
- * @author <a href="mailto:Gerald.Loeffler@vienna.at">Gerald
- * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Gerald Loeffler
+ * @author Keith James
  */
 public interface SeqSimilaritySearchResult
 {

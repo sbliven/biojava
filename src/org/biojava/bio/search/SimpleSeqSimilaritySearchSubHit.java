@@ -30,9 +30,8 @@ import org.biojava.utils.ObjectUtil;
  * takes care of all the house-keeping. Objects of this class are
  * immutable.
  * 
- * @author <a href="mailto:Gerald.Loeffler@vienna.at">Gerald
- * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Gerald Loeffler
+ * @author Keith James
  */
 public class SimpleSeqSimilaritySearchSubHit
     implements SeqSimilaritySearchSubHit, Cloneable
@@ -47,6 +46,11 @@ public class SimpleSeqSimilaritySearchSubHit
     private int       subjectEnd;
     private Strand    subjectStrand;
     private Alignment alignment;
+
+    // Hashcode is cached after first calculation because the data on
+    // which is is based do not change
+    private int hc;
+    private boolean hcCalc;
 
     /**
      * Construct an immutable object of this class by providing all
@@ -108,6 +112,8 @@ public class SimpleSeqSimilaritySearchSubHit
         this.subjectEnd    = subjectEnd;
         this.subjectStrand = subjectStrand;
         this.alignment     = alignment;
+
+        hcCalc = false;
     }
   
     public double getScore()
@@ -201,19 +207,19 @@ public class SimpleSeqSimilaritySearchSubHit
   
     public int hashCode()
     {
-        // if this class is a direct sub-class of Object:
-        int hc = 0;
-
-        // only take into account fields of this class (not of super-class):
-        hc = ObjectUtil.hashCode(hc, score);
-        hc = ObjectUtil.hashCode(hc, pValue);
-        hc = ObjectUtil.hashCode(hc, eValue);
-        hc = ObjectUtil.hashCode(hc, queryStart);
-        hc = ObjectUtil.hashCode(hc, queryEnd);
-        hc = ObjectUtil.hashCode(hc, queryStrand);
-        hc = ObjectUtil.hashCode(hc, subjectStart);
-        hc = ObjectUtil.hashCode(hc, subjectEnd);
-        hc = ObjectUtil.hashCode(hc, subjectStrand);
+        if (! hcCalc)
+        {
+            hc = ObjectUtil.hashCode(hc, score);
+            hc = ObjectUtil.hashCode(hc, pValue);
+            hc = ObjectUtil.hashCode(hc, eValue);
+            hc = ObjectUtil.hashCode(hc, queryStart);
+            hc = ObjectUtil.hashCode(hc, queryEnd);
+            hc = ObjectUtil.hashCode(hc, queryStrand);
+            hc = ObjectUtil.hashCode(hc, subjectStart);
+            hc = ObjectUtil.hashCode(hc, subjectEnd);
+            hc = ObjectUtil.hashCode(hc, subjectStrand);
+            hcCalc = true;
+        }
 
         return hc;
     }

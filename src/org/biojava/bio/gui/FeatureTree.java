@@ -33,11 +33,14 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 
 /**
- * Title:        FeatureTree<p>
- * Description:  A GUI tree to display the features and annotations of the sequences in a <code>SequenceDB</code> Nested Features are displayed as expandable leaves.<p>
- * Copyright:    Copyright (c) 2002<p>
- * Company:      AgResearch<p>
- * @author Mark Schreiber<p>
+ * <p>FeatureTree is GUI tree to display the features and annotations
+ * of the sequences in a <code>SequenceDB</code> Nested Features are
+ * displayed as expandable leaves.<p>
+ *
+ * <p>Copyright:    Copyright (c) 2002</p>
+ * <p>Company:      AgResearch</p>
+ *
+ * @author Mark Schreiber
  * @version 1.0
  */
 

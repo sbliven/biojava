@@ -34,9 +34,8 @@ import org.biojava.utils.ObjectUtil;
  * of interface SeqSimilaritySearchResult. Objects of this class are
  * immutable.
  *
- * @author <a href="mailto:Gerald.Loeffler@vienna.at">Gerald
- * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Gerald Loeffler
+ * @author Keith James
  */
 public class SimpleSeqSimilaritySearchResult
     implements SeqSimilaritySearchResult, Cloneable
@@ -45,6 +44,11 @@ public class SimpleSeqSimilaritySearchResult
     private SequenceDB sequenceDB;
     private Map        searchParameters;
     private List       hits;
+
+    // Hashcode is cached after first calculation because the data on
+    // which is is based do not change
+    private int hc;
+    private boolean hcCalc;
 
   /** 
    * Construct an immutable object by giving all its properties.
@@ -85,6 +89,8 @@ public class SimpleSeqSimilaritySearchResult
         this.sequenceDB       = sequenceDB;
         this.searchParameters = searchParameters;
         this.hits             = hits;
+
+        hcCalc = false;
     }
 
     public SymbolList getQuerySequence()
@@ -144,14 +150,14 @@ public class SimpleSeqSimilaritySearchResult
   
     public int hashCode()
     {
-        // if this class is a direct sub-class of Object:
-        int hc = 0;
-
-        // only take into account fields of this class (not of super-class):
-        hc = ObjectUtil.hashCode(hc, querySequence);
-        hc = ObjectUtil.hashCode(hc, sequenceDB);
-        hc = ObjectUtil.hashCode(hc, searchParameters);
-        hc = ObjectUtil.hashCode(hc, hits);
+        if (! hcCalc)
+        {
+            hc = ObjectUtil.hashCode(hc, querySequence);
+            hc = ObjectUtil.hashCode(hc, sequenceDB);
+            hc = ObjectUtil.hashCode(hc, searchParameters);
+            hc = ObjectUtil.hashCode(hc, hits);
+            hcCalc = true;
+        }
 
         return hc;
     }
