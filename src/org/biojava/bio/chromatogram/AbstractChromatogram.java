@@ -51,7 +51,7 @@ import java.util.NoSuchElementException;
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  *
- * @for.general
+ * @for.user
  * Chromatograms should be created using {@link ChromatogramFactory} or a
  * parser for a particular file format.
  */

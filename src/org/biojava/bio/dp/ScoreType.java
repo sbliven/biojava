@@ -59,7 +59,7 @@ public interface ScoreType {
   
   /**
    * In this class, calculateScore returns the odds ratio
-   * of a symbol being emitted, i.e. the ratio of the
+   * of a symbol being emitted.  That is, the ratio of the
    * probability of a Symbol being emitted to it being
    * emitted by the null model.
    *

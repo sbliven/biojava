@@ -149,7 +149,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
      * <p><b>WARNING:</b> It is assumed that the location is contiguous. If
      * the location is non-contiguous it may be preferable to use a block iterator
      * to retrieve each sub location independently.
-     * @see subAlignment(Set labels, int min, int max)
+     * @see #subAlignment(Set labels, int min, int max)
      */
     public Alignment subAlignment(Set labels, Location loc) throws IndexOutOfBoundsException{
         return new SubULAlignment(labels,loc);

@@ -238,8 +238,8 @@ extends AbstractLocationDecorator {
    * coordinate will revert to <code>getMin()</code>
    *
    * @return the most 5' coordinate
-   * @see fivePrimeBlockIterator()
-   * @see getMin()
+   * @see #fivePrimeBlockIterator()
+   * @see #getMin()
    */
   public int get5PrimeEnd(){
     return fivePrimeEnd;
@@ -270,8 +270,8 @@ extends AbstractLocationDecorator {
 
   /**
    * Iterates over the location blocks in order starting with the most 5'
-   * @see blockIterator()
-   * @see get5PrimeEnd()
+   * @see #blockIterator()
+   * @see #get5PrimeEnd()
    * @return a ListIterator
    */
   public ListIterator fivePrimeBlockIterator() {
