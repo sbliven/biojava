@@ -120,9 +120,11 @@ public class AssembledSymbolList extends AbstractSymbolList {
 	int first = 0;
 	int last = componentList.size() - 1;
 	
+	int check = 0;
+	Location checkL = null;
 	while (first <= last) {
-	    int check = (first + last) / 2;
-	    Location checkL = (Location) componentList.get(check);
+	    check = (first + last) / 2;
+	    checkL = (Location) componentList.get(check);
 	    if (checkL.contains(p))
 		return checkL;
 
@@ -133,8 +135,14 @@ public class AssembledSymbolList extends AbstractSymbolList {
 	}
 	
 	try {
-	    return (Location) componentList.get(Math.max(last, first) + 1);
+	    if (p < checkL.getMin()) {
+		return checkL;
+	    } else {
+		return (Location) componentList.get(check + 1);
+	    }
 	} catch (IndexOutOfBoundsException ex) {
+	    return null;
+	} catch (NullPointerException ex) {
 	    return null;
 	}
     }
