@@ -46,7 +46,7 @@ import java.util.*;
    * used in the algorithm. This method is protected as it is unlikely it
    * will be needed except for debugging.<p>
    *
-   * The algorithm finds exact matches therefor ambiguity symbols will match
+   * The algorithm finds exact matches therefore ambiguity symbols will match
    * only themselves. The class cannot perform regular expressions. The class
    * operates on all alphabets thus if searching for a DNA pattern you should
    * compile both the pattern and its reverse complement.<p>
@@ -77,7 +77,7 @@ public final class KnuthMorrisPrattSearch {
 
     /*
      *need to perform this hack to make the kmpNext capable of dealing with
-     *overlapping patterns, unfortunately it means the behaivour of a pattern
+     *overlapping patterns, unfortunately it means the behaviour of a pattern
      *containing a gap is unspecified.
      */
     rList.add(alpha.getGapSymbol());
