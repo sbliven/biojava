@@ -31,7 +31,6 @@ import java.util.Set;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.SequenceIterator;
-import org.biojava.bio.seq.AlignmentSequenceIterator;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;

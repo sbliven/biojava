@@ -41,32 +41,35 @@ public class HitMerger implements SearchListener {
   }
   
   public void endSearch(String seqID) {
-    Collections.sort(hitList);
-    
-    Iterator i = hitList.iterator();
-    Record last = (Record) i.next();
-    while(i.hasNext()) {
-      Record current = (Record) i.next();
-      if(
-        (current.hitID == last.hitID)
-       &&
-        (current.queryOffset <= last.queryOffset + last.hitLength)
-       &&
-        (current.hitOffset <= last.hitOffset + last.hitLength)
-       &&
-        ((current.hitOffset - last.hitOffset) == (current.queryOffset - last.queryOffset))
-      ) {
-        last.hitLength = current.hitOffset + current.hitLength - last.hitOffset;
-      } else {
-        if(last.hitLength >= minLength) {
-          delegate.hit(last.hitID, last.queryOffset, last.hitOffset, last.hitLength);
+    if(!hitList.isEmpty()) {
+      Collections.sort(hitList);
+      
+      Iterator i = hitList.iterator();
+      Record last = (Record) i.next();
+      while(i.hasNext()) {
+        Record current = (Record) i.next();
+        if(
+          (current.hitID == last.hitID)
+         &&
+          (current.queryOffset <= last.queryOffset + last.hitLength)
+         &&
+          (current.hitOffset <= last.hitOffset + last.hitLength)
+         &&
+          ((current.hitOffset - last.hitOffset) == (current.queryOffset - last.queryOffset))
+        ) {
+          last.hitLength = current.hitOffset + current.hitLength - last.hitOffset;
+        } else {
+          if(last.hitLength >= minLength) {
+            delegate.hit(last.hitID, last.queryOffset, last.hitOffset, last.hitLength);
+          }
+          last = current;
         }
-        last = current;
+      }
+      if(last.hitLength >= minLength) {
+        delegate.hit(last.hitID, last.queryOffset, last.hitOffset, last.hitLength);
       }
     }
-    if(last.hitLength >= minLength) {
-      delegate.hit(last.hitID, last.queryOffset, last.hitOffset, last.hitLength);
-    }
+    
     delegate.endSearch(seqID);
   }
   

@@ -1,5 +1,6 @@
 package ssaha;
 
+import org.biojava.utils.NestedException;
 import org.biojava.bio.program.ssaha.*;
 
 public class ResultPrinter implements SearchListener {
@@ -23,7 +24,10 @@ public class ResultPrinter implements SearchListener {
     int hitOffset,
     int hitLength
   ) {
-    String hitName = dataStore.seqNameForID(hitID);
-    System.out.println(seqID + " " + hitName + " " + queryOffset + " " + hitOffset + " " + hitLength);
+    try {
+      String hitName = dataStore.seqNameForID(hitID);
+      System.out.println(seqID + " " + hitName + " " + queryOffset + " " + hitOffset + " " + hitLength);
+    } catch (NestedException ne) {
+    }
   }
 }
