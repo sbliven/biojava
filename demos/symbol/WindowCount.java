@@ -65,11 +65,8 @@ SymbolListViews.orderNSymbolList(s,order.intValue());
       //train the distribution.
       context.train();
 
-      //return the list of nmer symbols in the alphabet
-      SymbolList nOrderSymbols = nOrderAlpha.symbols();
-
       //Add each symbol and its counts to a collection so they can be sorted
-      Iterator symbols = nOrderSymbols.iterator();
+      Iterator symbols = nOrderAlpha.iterator();
       SortedMap tree = new TreeMap();
       while(symbols.hasNext()){
         AtomicSymbol s = (AtomicSymbol)symbols.next();

@@ -20,8 +20,12 @@ implements UnigeneFactory {
   private static final String UNIQUE_INDEX = "unique.index";
   private static final String ALL_INDEX = "all.index";
   
+  public boolean canAccept(URL unigeneLoc) {
+    return unigeneLoc.getProtocol().equals("file");
+  }
+
   public UnigeneDB loadUnigene(URL unigeneLoc)
-  throws IOException, BioException {
+  throws BioException {
     if(!unigeneLoc.getProtocol().equals("file")) {
       throw new BioException(
         "Can't create unigene from non-file URL: " +
@@ -39,16 +43,20 @@ implements UnigeneFactory {
     
     
     // load a pre-made unigene file set
-    return new FlatFileUnigeneDB(
-      new BioStore(new File(unigeneDir, DATA_INDEX), true),
-      new BioStore(new File(unigeneDir, LIB_INFO_INDEX), true),
-      new BioStore(new File(unigeneDir, UNIQUE_INDEX), true),
-      new BioStore(new File(unigeneDir, ALL_INDEX), true)
-    );
+    try {
+      return new FlatFileUnigeneDB(
+        new BioStore(new File(unigeneDir, DATA_INDEX), true),
+        new BioStore(new File(unigeneDir, LIB_INFO_INDEX), true),
+        new BioStore(new File(unigeneDir, UNIQUE_INDEX), true),
+        new BioStore(new File(unigeneDir, ALL_INDEX), true)
+      );
+    } catch (IOException ioe) {
+      throw new BioException(ioe, "Could not instantiate flat file unigene db");
+    }
   }
   
   public UnigeneDB createUnigene(URL unigeneLoc)
-  throws IOException, BioException {
+  throws BioException {
     if(!unigeneLoc.getProtocol().equals("file")) {
       throw new BioException(
         "Can't create unigene from non-file URL: " +
@@ -64,10 +72,14 @@ implements UnigeneFactory {
       throw new BioException("Expecting a directory at: " + unigeneDir);
     }
 
-    indexAll(unigeneDir);
-    indexUnique(unigeneDir);
-    indexData(unigeneDir);
-    indexLibInfo(unigeneDir);
+    try {
+      indexAll(unigeneDir);
+      indexUnique(unigeneDir);
+      indexData(unigeneDir);
+      indexLibInfo(unigeneDir);
+    } catch (IOException ioe) {
+      throw new BioException(ioe, "Failed to index data");
+    }
     
     return loadUnigene(unigeneLoc);
   }

@@ -5,9 +5,11 @@ import java.net.*;
 import org.biojava.bio.*;
 
 public interface UnigeneFactory {
-  public UnigeneDB loadUnigene(URL unigeneDir)
-  throws IOException, BioException;
+  public UnigeneDB loadUnigene(URL unigeneURL)
+  throws BioException;
   
-  public UnigeneDB createUnigene(URL unigeneDir)
-  throws IOException, BioException;
+  public UnigeneDB createUnigene(URL unigeneURL)
+  throws BioException;
+
+  public boolean canAccept(URL unigeneURL);
 }

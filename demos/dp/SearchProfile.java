@@ -135,7 +135,7 @@ public class SearchProfile{
     mt.registerModel(model);
     mt.setNullModelWeight(5.0);
     
-    for(Iterator i = model.stateAlphabet().symbols().iterator(); i.hasNext(); ) {
+    for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
       if(s instanceof EmissionState && !(s instanceof MagicalState) ) {
         EmissionState es = (EmissionState) s;

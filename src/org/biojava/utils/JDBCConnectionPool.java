@@ -1,4 +1,4 @@
-package org.biojava.bio.seq.db.biosql;
+package org.biojava.utils;
 
 import java.util.*;
 import java.sql.*;
@@ -12,7 +12,7 @@ import java.util.Date; // TIE-BREAK
  * @author Thomas Down
  */
 
-class JDBCConnectionPool {
+public class JDBCConnectionPool {
     private final String dbURL;
     private final String dbUser;
     private final String dbPass;

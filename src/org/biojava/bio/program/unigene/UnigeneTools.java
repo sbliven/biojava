@@ -1,6 +1,7 @@
 package org.biojava.bio.program.unigene;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -11,14 +12,14 @@ import org.biojava.bio.program.tagvalue.*;
 public class UnigeneTools {
   public static final AnnotationType UNIGENE_ANNOTATION;
   public static final AnnotationType LIBRARY_ANNOTATION;
-  
-  public static final UnigeneFactory FLAT_FILE_FACTORY =
-    new FlatFileUnigeneFactory();
-  
 
+  private static final List factories;
   private static final Map shortName2SpeciesName;
   
   static {
+    factories = new ArrayList();
+    registerFactory(new FlatFileUnigeneFactory());
+
     shortName2SpeciesName = new HashMap();
     
     shortName2SpeciesName.put("Aga", "Anophelese gambiae");
@@ -216,5 +217,35 @@ public class UnigeneTools {
       
       delegate.endRecord();
     }
+  }
+
+  public static void registerFactory(UnigeneFactory factory) {
+    factories.add(factory);
+  }
+
+  public static void unregisterFactory(UnigeneFactory factory) {
+    factories.remove(factory);
+  }
+
+  public static UnigeneDB loadUnigene(URL dbURL)
+  throws BioException {
+    return findFactory(dbURL).loadUnigene(dbURL);
+  }
+
+  public static UnigeneDB createUnigene(URL dbURL)
+  throws BioException {
+    return findFactory(dbURL).createUnigene(dbURL);
+  }
+
+  private static UnigeneFactory findFactory(URL dbURL)
+  throws BioException {
+    for(Iterator i = factories.iterator(); i.hasNext(); ) {
+      UnigeneFactory factory = (UnigeneFactory) i.next();
+      if(factory.canAccept(dbURL)) {
+        return factory;
+      }
+    }
+
+    throw new BioException("No factory for unigene url: " + dbURL);
   }
 }

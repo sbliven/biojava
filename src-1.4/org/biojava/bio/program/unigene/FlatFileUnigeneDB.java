@@ -16,6 +16,7 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.program.indexdb.IndexStore;
 
 class FlatFileUnigeneDB
+extends Unchangeable
 implements UnigeneDB {
   private final BioStore dataStore;
   private final BioStore liStore;
@@ -102,6 +103,11 @@ implements UnigeneDB {
     }
     
     return db;
+  }
+
+  public UnigeneCluster addCluster(UnigeneCluster cluster)
+  throws BioException, ChangeVetoException {
+    throw new ChangeVetoException("Can't alter a file-based unigene installation");
   }
   
   public Sequence getUnique(String clusterID)

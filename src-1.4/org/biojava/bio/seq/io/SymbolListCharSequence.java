@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
@@ -79,7 +80,7 @@ public class SymbolListCharSequence implements CharSequence
 
         try
         {
-            for (Iterator si = alphabet.iterator(); si.hasNext();)
+            for (Iterator si = AlphabetManager.getAllSymbols(alphabet).iterator(); si.hasNext();)
             {
                 Symbol s = (Symbol) si.next();
                 char symChar = sToke.tokenizeSymbol(s).charAt(0);
