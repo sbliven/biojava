@@ -113,8 +113,10 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
     private QName                   oAttQName = new QName(this);     
     private boolean                 tValidFormat  = false;
 
-    private static final int        STARTUP       = 0;
-    private static final int        INSIDE_FILE   = 1;
+    private static final int        STARTUP                   = 0;
+    private static final int        INSIDE_FILE               = 1;
+
+    private String                  oStoredLine = null;
 
     /**
      * Initialises SAXParser, and sets default namespace prefix
@@ -156,7 +158,17 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 
                 //interpret line and send messages accordingly        
                 this.interpret(oContents,oLine);
-                oLine = oContents.readLine();
+		//do extra interpretation of lines reached by subparser
+		//objects
+		if (iState == INSIDE_FILE) {
+		    oLine = oStoredLine;
+		    if (oStoredLine != null) {
+			this.interpret(oContents,oLine);
+		    }
+		} else {
+		    oLine = oContents.readLine();
+		}
+
             } // end while
         } catch (IOException x) {
             System.out.println(x.getMessage());
@@ -300,11 +312,15 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 
         this.changeState(INSIDE_FILE);
 
-        //now interpret the line the BlastSAXParser returned from
+        //now make sure to interpret the line the BlastSAXParser returned from
+	//in top-level parse method.
         if (oLine != null) {
-            this.interpret(poContents,oLine);
+	    oStoredLine = oLine;
+	    return;
+	    //           this.interpret(poContents,oLine);
         } else {
             //here if at the EOF
+	    oStoredLine = null;
             return;
         }
     }
