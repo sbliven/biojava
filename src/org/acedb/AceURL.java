@@ -130,16 +130,31 @@ public class AceURL {
     }
 
     public AceURL relativeURL(String fragment) {
-      return new AceURL(
-        protocol,
-        host,
-        port,
-        (file == null) ? fragment : file + "/" + fragment,
-        null,
-        null,
-        userInfo,
-        authority
-      );
+
+	int hash = fragment.indexOf('#');
+	String _ref = null;
+	if (hash != -1) {
+	    _ref = fragment.substring(hash + 1);
+	    fragment = fragment.substring(0, hash);
+	}
+
+	int queryq = fragment.indexOf('?');
+	String _query = null;
+	if (queryq != -1) {
+	    _query = fragment.substring(queryq + 1);
+	    fragment = fragment.substring(0, queryq);
+	}   
+
+	return new AceURL(
+			  protocol,
+			  host,
+			  port,
+			  (file == null) ? fragment : file + "/" + fragment,
+			  _query,
+			  _ref,
+			  userInfo,
+			  authority
+			);
     }
     
     public String getAuthority() {
