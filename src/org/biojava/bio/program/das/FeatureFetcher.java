@@ -121,7 +121,7 @@ class FeatureFetcher implements Fetcher {
 	    }
 	    String segments = sb.toString();
 	    // System.err.println("Fetching: " + segments);
-	    
+	   
 	    String encodingRequest = "categorize=yes;";
 	    if (fetchEncoding.equals("dasgff")) {
 		encodingRequest += "";

@@ -70,6 +70,12 @@ public class AssembledSymbolList extends AbstractSymbolList {
 	componentList.addAll(components.keySet());
     }
 
+    public void putComponent(Location l, SymbolList sl) {
+	components.put(l, sl);
+	componentList.clear();
+	componentList.addAll(components.keySet());
+    }
+
     public void removeComponent(Location loc) {
 	components.remove(loc);
 	componentList.clear();
@@ -77,8 +83,13 @@ public class AssembledSymbolList extends AbstractSymbolList {
     }
 
     public SymbolList getComponentSymbols(Location loc) {
-	ComponentFeature cf = (ComponentFeature) components.get(loc);
-	return cf.getSymbols();
+	Object o = components.get(loc);
+	if (o instanceof ComponentFeature) {
+	    ComponentFeature cf = (ComponentFeature) o;
+	    return cf.getSymbols();
+	} else {
+	    return (SymbolList) o;
+	}
     }
 
     public Set getComponentLocationSet() {

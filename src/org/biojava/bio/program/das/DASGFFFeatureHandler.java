@@ -78,11 +78,7 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 		isReferenceFeature = true;
 	    }
 	    category = attrs.getValue("category");
-	    dm.delegate(new StringElementHandlerBase() {
-		    protected void setStringValue(String s) {
-			type = s.trim();
-		    }
-		} );
+	    type = attrs.getValue("id");
 	} else if ("METHOD".equals(localName)) {
 	    dm.delegate(new StringElementHandlerBase() {
 		    protected void setStringValue(String s) {

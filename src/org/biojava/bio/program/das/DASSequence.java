@@ -80,6 +80,9 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     public static final String PROPERTY_SEQUENCEVERSION = "org.biojava.bio.program.das.sequence_version";
 
     public static final int SIZE_THRESHOLD = 500000;
+
+    private static final int SYMBOL_TILE_THRESHOLD = 100000;
+    private static final int SYMBOL_TILE_SIZE = 20000;
     
     private DASSequenceDB parentdb;
     private Alphabet alphabet = DNATools.getDNA();
@@ -117,7 +120,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
 	SeqIOListener listener = new SkeletonListener();
 	FeatureRequestManager frm = getParentDB().getFeatureRequestManager();
-	this.structureTicket = frm.requestFeatures(dataSourceURL, seqID, listener, null, "component");
+	this.structureTicket = frm.requestFeatures(getDataSourceURL(), seqID, listener, null, "component");
 
 	//
 	// Pick up some annotations
@@ -413,9 +416,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    }
 
 	    if (length < 0) {
-		// Nasty fallback
-
-		length = getSymbols().length();
+		throw new BioError("Assertion Failure: structure fetch didn't get length");
 	    }
 		
 	    return length;
@@ -483,7 +484,23 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	if (sl == null) {
             FeatureHolder structure = getStructure();
 	    if (structure.countFeatures() == 0) {
-		sl = getTrueSymbols();
+		if (length() > SYMBOL_TILE_THRESHOLD) {
+		    AssembledSymbolList asl = new AssembledSymbolList();
+		    int tileStart = 1;
+		    while (tileStart < length()) {
+			int tileEnd = Math.min(tileStart + SYMBOL_TILE_SIZE - 1, length());
+			Location l = new RangeLocation(tileStart, tileEnd);
+			SymbolList symbols = new DASRawSymbolList(this,
+								  new Segment(getName(), tileStart, tileEnd));
+			asl.putComponent(l, symbols);
+
+			tileStart = tileEnd + 1;
+		    }
+
+		    sl = asl;
+		} else {
+		    sl = new DASRawSymbolList(this, new Segment(getName()));
+		}
 	    } else {
 		//
 		// VERY, VERY, naive approach to identifying canonical components.  FIXME
@@ -513,134 +530,6 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
 	return sl;
     }
-
-    protected SymbolList getTrueSymbols() {
-            long startGet = (new Date()).getTime();
-
-	try {
-	    DAS.startedActivity(this);
-
-	    URL epURL = new URL(dataSourceURL, "dna?ref=" + seqID);
-	    HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
-            huc.setRequestProperty("Accept-Encoding", "gzip");
-
-	    huc.connect();
-	    // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
-
-	    if (status == 0)
-		throw new BioRuntimeException("Not a DAS server");
-	    else if (status != 200)
-		throw new BioRuntimeException("DAS error (status code = " + status + ")");
-
-	    SequenceBuilder sb = new SimpleSequenceBuilder();
-	    sb.setURI(epURL.toString());
-	    sb.setName(getName());
-	    SymbolParser sparser = DNATools.getDNA().getParser("token");
-	    StreamParser ssparser = sparser.parseStream(sb);
-
-	    StAXContentHandler dnaHandler = new DNAHandler(ssparser);
-
-            // determine if I'm getting a gzipped reply
-            String contentEncoding = huc.getContentEncoding();
-            InputStream inStream = huc.getInputStream();
-	     
-            if (contentEncoding != null) {
-                if (contentEncoding.indexOf("gzip") != -1) {
-		    // we have gzip encoding
-		    inStream = new GZIPInputStream(inStream);
-		    // System.out.println("gzip encoded dna!");
-                }
-            }
-
-	    InputSource is = new InputSource(inStream);
-	    is.setSystemId(epURL.toString());
-	    XMLReader parser = nonvalidatingSAXParser();
-	    parser.setContentHandler(new SAX2StAXAdaptor(dnaHandler));
-	    parser.parse(is);
-	    SymbolList sl = sb.makeSequence();
-	    return sl;
-	} catch (SAXException ex) {
-	    throw new BioRuntimeException(ex, "Exception parsing DAS XML");
-	} catch (IOException ex) {
-	    throw new BioRuntimeException(ex, "Error connecting to DAS server");
-	} catch (BioException ex) {
-	    throw new BioRuntimeException(ex);
-	} finally {
-	    DAS.completedActivity(this);
-	}
-    }
-
-    private class DNAHandler extends StAXContentHandlerBase {
-	private StreamParser ssparser;
-
-	DNAHandler(StreamParser ssparser) {
-	    this.ssparser = ssparser;
-	}
-
-	public void startElement(String nsURI,
-				 String localName,
-				 String qName,
-				 Attributes attrs,
-				 DelegationManager dm)
-	    throws SAXException
-	{
-	    if (localName.equals("DNA")) {
-		dm.delegate(new SymbolsHandler(ssparser));
-	    }
-	}
-    }
-
-    private class SymbolsHandler extends StAXContentHandlerBase {
-	private StreamParser ssparser;
-
-	SymbolsHandler(StreamParser ssparser) {
-	    this.ssparser = ssparser;
-	}
-
-	public void endElement(String nsURI,
-			   String localName,
-			   String qName,
-			   StAXContentHandler handler)
-	    throws SAXException
-	{
-	    try {
-		ssparser.close();
-	    } catch (IllegalSymbolException ex) {
-		throw new SAXException(ex);
-	    }
-	}
-
-	public void characters(char[] ch, int start, int length) 
-	    throws SAXException
-	{
-	    try {
-		int parseStart = start;
-		int parseEnd   = start;
-		int blockEnd = start + length;
-
-		while (parseStart < blockEnd) {
-		    while (parseStart < blockEnd && Character.isSpace(ch[parseStart])) {
-			++parseStart;
-		    }
-		    if (parseStart >= blockEnd) {
-			return;
-		    }
-
-		    parseEnd = parseStart + 1;
-		    while (parseEnd < blockEnd && !Character.isSpace(ch[parseEnd])) {
-			++parseEnd;
-		    }
-
-		    ssparser.characters(ch, parseStart, parseEnd - parseStart);
-
-		    parseStart = parseEnd;
-		}
-	    } catch (IllegalSymbolException ex) {
-		throw new SAXException(ex);
-	    }
-	}
-    }
     
     //
     // Identification stuff
@@ -652,7 +541,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
     public String getURN() {
 	try {
-	    return new URL(dataSourceURL, "?ref=" + seqID).toString();
+	    return new URL(getDataSourceURL(), "?ref=" + seqID).toString();
 	} catch (MalformedURLException ex) {
 	    throw new BioRuntimeException(ex);
 	}

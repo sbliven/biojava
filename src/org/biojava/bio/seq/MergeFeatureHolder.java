@@ -23,6 +23,7 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 import org.biojava.utils.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * FeatureHolder which exposes all the features in a set
@@ -131,6 +132,36 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 	return new MFHIterator();
     }
 
+    private Location extractInterestingLocation(FeatureFilter ff) {
+	if (ff instanceof FeatureFilter.OverlapsLocation) {
+	    return ((FeatureFilter.OverlapsLocation) ff).getLocation();
+	} else if (ff instanceof FeatureFilter.ContainedByLocation) {
+	    return ((FeatureFilter.ContainedByLocation) ff).getLocation();
+	} else if (ff instanceof FeatureFilter.And) {
+	    FeatureFilter.And ffa = (FeatureFilter.And) ff;
+	    Location l1 = extractInterestingLocation(ffa.getChild1());
+	    Location l2 = extractInterestingLocation(ffa.getChild2());
+
+	    if (l1 != null) {
+		if (l2 != null) {
+		    return l1.intersection(l2);
+		} else {
+		    return l1;
+		}
+	    } else {
+		if (l2 != null) {
+		    return l2;
+		} else {
+		    return null;
+		}
+	    }
+	}
+
+	// Don't know how this filter relates to location.
+
+	return null;
+    }
+
     /**
      * When applied to a MergeFeatureHolder, this filters each child
      * FeatureHolder independently.
@@ -142,10 +173,16 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 	    Map.Entry me = (Map.Entry) fhi.next();
 	    FeatureHolder fh = (FeatureHolder) me.getKey();
 	    FeatureFilter mf = (FeatureFilter) me.getValue();
-	    if (!recurse && FilterUtils.areDisjoint(mf, ff)) {
-		// Nothing interesting here...
-
-		continue;
+	    if (recurse) {
+		Location ffl = extractInterestingLocation(ff);
+		if (ffl != null && FilterUtils.areDisjoint(mf, new FeatureFilter.OverlapsLocation(ffl))) {
+		    continue;
+		}
+	    } else {
+		if (FilterUtils.areDisjoint(mf, ff)) {
+		    // Nothing interesting here...
+		    continue;
+		}
 	    }
 
 	    if (recurse) {

@@ -52,6 +52,7 @@ class TypesFetcher implements Fetcher {
     private String category;
     private String type;
     private URL dataSource;
+    private TypesListener nullSegmentHandler;
 
     {
 	ticketsBySegment = new HashMap();
@@ -77,6 +78,10 @@ class TypesFetcher implements Fetcher {
 
     public List getDoneTickets() {
 	return doneTickets;
+    }
+
+    public void setNullSegmentHandler(TypesListener tl) {
+	nullSegmentHandler = tl;
     }
 
     public void runFetch() 
@@ -129,14 +134,18 @@ class TypesFetcher implements Fetcher {
 	    
 	    fURL = new URL(dataSource, "types");
 	    huc = (HttpURLConnection) fURL.openConnection();
-	    huc.setRequestMethod("POST");
-	    huc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-	    huc.setRequestProperty("Accept-Encoding", "gzip");
-	    huc.setDoOutput(true);
-	    OutputStream os = huc.getOutputStream();
-	    PrintStream ps = new PrintStream(os);
-	    ps.print(queryString);
-	    ps.close();
+	    if (queryString.length() > 0) {
+		huc.setRequestMethod("POST");
+		huc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+		huc.setRequestProperty("Accept-Encoding", "gzip");
+		huc.setDoOutput(true);
+		OutputStream os = huc.getOutputStream();
+		PrintStream ps = new PrintStream(os);
+		ps.print(queryString);
+		ps.close();
+	    } else {
+		huc.setRequestProperty("Accept-Encoding", "gzip");
+	    }
 
 	    huc.connect();
 
@@ -157,7 +166,7 @@ class TypesFetcher implements Fetcher {
                 if (contentEncoding.indexOf("gzip") != -1) {
 		    // we have gzip encoding
 		    inStream = new GZIPInputStream(inStream);
-		    System.out.println("gzip encoding!");
+		    // System.out.println("gzip encoding!");
                 }
             }
 
@@ -211,26 +220,30 @@ class TypesFetcher implements Fetcher {
 		inDocument = true;
 	    } else {
 		if (localName.equals("SEGMENT")) {
-		    String segID = attrs.getValue("id");
-		    if (segID == null) {
-			throw new SAXException("Missing segment ID");
-		    }
-		    thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(new Segment(segID));
-		    if (thisTicket == null) {
-			int start = Integer.parseInt(attrs.getValue("start"));
-			int stop = Integer.parseInt(attrs.getValue("stop"));
-			Segment seg = new Segment(segID, start, stop);
-			thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(seg);
-			if (thisTicket == null) {
-			    throw new SAXException("Response segment " + segID + ":" + start + 
-						   "," + stop + " wasn't requested");
+		    if (nullSegmentHandler != null) {
+			dm.delegate(new DASSegmentHandler(nullSegmentHandler));
+		    } else {
+			String segID = attrs.getValue("id");
+			if (segID == null) {
+			    throw new SAXException("Missing segment ID");
 			}
-			segID = segID + ":" + start + "," + stop;
+			thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(new Segment(segID));
+			if (thisTicket == null) {
+			    int start = Integer.parseInt(attrs.getValue("start"));
+			    int stop = Integer.parseInt(attrs.getValue("stop"));
+			    Segment seg = new Segment(segID, start, stop);
+			    thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(seg);
+			    if (thisTicket == null) {
+				throw new SAXException("Response segment " + segID + ":" + start + 
+						       "," + stop + " wasn't requested");
+			    }
+			    segID = segID + ":" + start + "," + stop;
+			}
+
+			// System.err.println("Got segment: " + segID);
+
+			dm.delegate(new DASSegmentHandler(((FeatureRequestManager.TypeTicket) thisTicket).getTypesListener()));
 		    }
-
-		    // System.err.println("Got segment: " + segID);
-
-		    dm.delegate(new DASSegmentHandler(((FeatureRequestManager.TypeTicket) thisTicket).getTypesListener()));
 		} else if (localName.equals("segmentNotAnnotated")) {
 		    String segID = attrs.getValue("id");
 		    if (segID == null) {
@@ -270,10 +283,13 @@ class TypesFetcher implements Fetcher {
 	    throws SAXException
 	{
 	    if (localName.equals("SEGMENT")) {
-		thisTicket.setAsFetched();
-		doneTickets.add(thisTicket);
-                DAS.activityProgress(trigger, doneTickets.size()
-                , ticketsBySegment.size());
+		if (thisTicket != null) {
+		    thisTicket.setAsFetched();
+		    doneTickets.add(thisTicket);
+		
+		    DAS.activityProgress(trigger, doneTickets.size()
+					 , ticketsBySegment.size());
+		}
 	    }
 	}
     }

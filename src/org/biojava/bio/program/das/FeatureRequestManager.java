@@ -127,7 +127,7 @@ class FeatureRequestManager {
 	Class triggerClass = trigger.getClass();
 	Object triggerGroup = trigger.getFetchGroup();
 	Map fetchers = new HashMap();
-	   
+
 	for (Iterator i = openTickets.iterator(); i.hasNext(); ) {
 	    Ticket t = (Ticket) i.next();
 	    if (triggerClass.isInstance(t) &&

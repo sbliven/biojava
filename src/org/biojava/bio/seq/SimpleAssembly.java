@@ -195,7 +195,7 @@ public class SimpleAssembly
 	    if (loc.getMax() > assembly.length()) {
 		assembly.setLength(loc.getMax());
 	    }
-	    assembly.putComponent( cf);
+	    assembly.putComponent(cf);
 	}
 	return f;
     }

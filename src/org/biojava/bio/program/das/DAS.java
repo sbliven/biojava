@@ -32,6 +32,7 @@ import org.w3c.dom.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 
 public class DAS extends AbstractChangeable {
     private static List activityListeners;
@@ -45,6 +46,24 @@ public class DAS extends AbstractChangeable {
     static {
 	activityListeners = new ArrayList();
 	threadFetches = Boolean.getBoolean("org.biojava.bio.program.das.thread_fetches");
+    }
+
+    
+    public static Set getTypes(URL dasURL) throws BioException {
+	final Set types = new HashSet();
+	try {
+	    TypesFetcher tf = new TypesFetcher(dasURL, null, null);
+	    tf.setNullSegmentHandler(new TypesListener() {
+		    public void startSegment() {}
+		    public void endSegment() {}
+		    public void registerType(String type) { types.add(type); }
+		    public void registerType(String type, int count) { types.add(type); }
+		} );
+	    tf.runFetch();
+	} catch (ParseException ex) {
+	    throw new BioException(ex);
+	}
+	return Collections.unmodifiableSet(types);
     }
 
     public static void setThreadFetches(boolean b) {

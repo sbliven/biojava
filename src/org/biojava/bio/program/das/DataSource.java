@@ -1,6 +1,17 @@
 package org.biojava.bio.program.das;
 
 import java.net.*;
+import java.util.*;
+import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
+import org.biojava.utils.*;
+
+/**
+ * Reflect a datasource (reference or annotation) in the DAS1 network.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 
 public class DataSource {
   private URL dasURL;
@@ -43,13 +54,13 @@ public class DataSource {
 	return getURL().hashCode();
     }
 
-  public boolean equals(Object other) {
-    if(! (other instanceof DataSource) ) {
-      return false;
-    }
+    public boolean equals(Object other) {
+	if(! (other instanceof DataSource) ) {
+	    return false;
+	}
     
-    DataSource od = (DataSource) other;
-    return od.getURL().equals(this.getURL());
-  }
+	DataSource od = (DataSource) other;
+	return od.getURL().equals(this.getURL());
+    }
 }
 
