@@ -57,15 +57,15 @@ import org.biojava.bio.*;
  * In addition, it defines getMatches that returns an Alphabet over all the
  * AtomicSymbol instances that match the Symbol (N would return an Alphabet
  * containing {A, G, C, T}, and Gap would return {}). In addition, it defines
- * getBasies, which returns a Set of BasisSymbol instances. These should be a
+ * getBases, which returns a Set of BasisSymbol instances. These should be a
  * minimal set of (possibly) ambiguous Symbols that contain every Symbol in
- * getMatches. For example, in the atn case, getBasies would return a Set
+ * getMatches. For example, in the atn case, getBases would return a Set
  * containing only atn, and getMatches would return the four matching
  * Atomic Symbols. The stop-codon ambiguity symbol would return a Set like
  * {ta[ag], tga} that represents all of the matching codons as compactly as
  * possible.
  * <P>
- * Invoking getBasies for a BasisSymbol will always return a Set containing just
+ * Invoking getBases for a BasisSymbol will always return a Set containing just
  * that Symbol. BasisSymbol adds the getSymbols method that returns the List of
  * BasisSymbol instances that are concatonated together to make that Symbol.
  * For example, the getSymbols method for the BasisSymbol instance for ant would
@@ -75,7 +75,7 @@ import org.biojava.bio.*;
  * returns a set containing only that instance. That is, they are indivisable.
  * The DNA nucleotides are instances of AtomicSymbol, as are individual codons.
  * The stop codon {tag} will have a getMatches method that returns {tag},
- * a getBasies method that also returns {tag} and a getSymbols method that returns
+ * a getBases method that also returns {tag} and a getSymbols method that returns
  * the List [t, a, g].
  *
  * @author Matthew Pocock
@@ -114,5 +114,5 @@ public interface Symbol extends Annotatable {
    *
    * @return a Set of BasisSymbol instances
    */
-  Set getBasies();
+  Set getBases();
 }

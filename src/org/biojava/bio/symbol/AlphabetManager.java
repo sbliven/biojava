@@ -185,26 +185,26 @@ public final class AlphabetManager {
     } else {
       return new SimpleSymbol(
         token, name, Annotation.EMPTY_ANNOTATION,
-        expandBasies(alpha, symList, new ArrayList())
+        expandBases(alpha, symList, new ArrayList())
       );
     }
   }
   
-  private static Set expandBasies(Alphabet alpha, List symList, List built) {
+  private static Set expandBases(Alphabet alpha, List symList, List built) {
     int indx = built.size();
     if(indx < symList.size()) {
       Symbol s = (Symbol) symList.get(indx);
       if(s instanceof BasisSymbol) {
         built.add(s);
-        return expandBasies(alpha, symList, built);
+        return expandBases(alpha, symList, built);
       } else {
         Set res = new HashSet();
-        Iterator i = ((FiniteAlphabet) s.getBasies()).iterator();
+        Iterator i = ((FiniteAlphabet) s.getBases()).iterator();
         while(i.hasNext()) {
           BasisSymbol bs = (BasisSymbol) i.next();
           List built2 = new ArrayList(built);
           built2.add(bs);
-          res.add(expandBasies(alpha, symList, built2));
+          res.add(expandBases(alpha, symList, built2));
         }
         return res;
       }

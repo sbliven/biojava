@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.io.*;
 
 /**
  * This demonstrates building an alignment from a set of sequences of the same

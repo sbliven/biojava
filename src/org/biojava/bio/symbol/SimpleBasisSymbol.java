@@ -57,7 +57,7 @@ implements BasisSymbol {
   ) {
     this(token, name, annotation);
     this.symbols = new SingletonList(this);
-    this.basies = Collections.singleton(this);
+    this.bases = Collections.singleton(this);
     this.matches = new SimpleAlphabet(syms);
   }
   
@@ -72,7 +72,7 @@ implements BasisSymbol {
     throw new BioError("Assertion Failure: Symbols list is null");
   }
   
-  protected Set createBasies() {
+  protected Set createBases() {
     return Collections.singleton(this);
   }
   

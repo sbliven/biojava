@@ -56,7 +56,7 @@ implements AtomicSymbol {
     return new SingletonList(this);
   }
   
-  protected Set createBasies() {
+  protected Set createBases() {
     return Collections.singleton(this);
   }
   

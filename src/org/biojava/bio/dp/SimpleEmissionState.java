@@ -105,7 +105,7 @@ implements EmissionState, Serializable {
     return matches;
   }
   
-  public Set getBasies() {
+  public Set getBases() {
     return Collections.singleton(this);
   }
 

@@ -29,7 +29,7 @@ import java.util.List;
  * <P>
  * BasisSymbol instances can always be represented uniquely as a single List of
  * BasisSymbol instances. The symbol N is a BasisSymbol - it can be uniquely
- * represented by N. It matches {a, g, c, t}, and getBasies will return the set
+ * represented by N. It matches {a, g, c, t}, and getBases will return the set
  * {N}. Similarly, the symbol atn is a BasisSymbol, as it can be uniquely
  * represented with a single list of symbols [a, t, n]. Its getMatches will
  * return the set {ata, att, atg, atc}.

@@ -172,7 +172,7 @@ public class IntegerAlphabet implements Alphabet, Serializable {
       return new SingletonList(this);
     }
     
-    public Set getBasies() {
+    public Set getBases() {
       return Collections.singleton(this);
     }
     

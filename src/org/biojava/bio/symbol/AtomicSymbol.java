@@ -36,7 +36,7 @@ import java.util.List;
  * contains just that one symbol.
  * <P>
  * AtomicSymbol instances guarantee that getMatches returns an Alphabet
- * containing just that Symbol, getBasies returns a Set containing just that
+ * containing just that Symbol, getBases returns a Set containing just that
  * Symbol and each element of the List returned by getSymbols is also atomic.
  * 
  * @author Matthew Pocock

@@ -39,19 +39,19 @@ implements Symbol, Serializable {
   private final String name;
   private final Annotation annotation;
   protected Alphabet matches;
-  protected Set basies;
+  protected Set bases;
   
   public SimpleSymbol(
     char token, String name, Annotation annotation,
-    Set basies
+    Set bases
   ) {
     this.token = token;
     this.name = name;
     this.annotation = new SimpleAnnotation(annotation);
-    if(basies == null) {
-      this.basies = null;
+    if(bases == null) {
+      this.bases = null;
     } else {
-      this.basies = Collections.unmodifiableSet(basies);
+      this.bases = Collections.unmodifiableSet(bases);
     }
   }
   
@@ -75,9 +75,9 @@ implements Symbol, Serializable {
   }
   
   protected Alphabet createMatches() {
-    Set basies = getBasies();
+    Set bases = getBases();
     Set mat = new HashSet();
-    for(Iterator i = basies.iterator(); i.hasNext(); ) {
+    for(Iterator i = bases.iterator(); i.hasNext(); ) {
       BasisSymbol bs = (BasisSymbol) i.next();
       if(bs instanceof AtomicSymbol) {
         mat.add(bs);
@@ -91,14 +91,14 @@ implements Symbol, Serializable {
     return new SimpleAlphabet(mat);
   }
   
-  public Set getBasies() {
-    if(basies == null) {
-      basies = createBasies();
+  public Set getBases() {
+    if(bases == null) {
+      bases = createBases();
     }
-    return basies;
+    return bases;
   }
   
-  protected Set createBasies() {
-    throw new BioError("Assertion Failure: Basies set is null");
+  protected Set createBases() {
+    throw new BioError("Assertion Failure: Bases set is null");
   }
 }
