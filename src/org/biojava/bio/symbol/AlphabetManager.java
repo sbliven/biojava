@@ -924,6 +924,10 @@ public final class AlphabetManager {
                  return alphaWrapper;
              }
 
+             public void endTree() {
+                 alpha.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
+             }
+             
              public AlphabetHandler(String name, FiniteAlphabet parent) {
                  this.name = name;
                  localSymbols = new OverlayMap(nameToSymbol);
