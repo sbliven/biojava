@@ -29,6 +29,7 @@ import java.awt.image.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.AtomicSymbol;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.IllegalAlphabetException;
@@ -48,6 +49,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  *
  * Copyright (c) 2001
  * @author David H. Klatte, Ph.D.
+ * @author Matthew Pocock
  * @version 0.5alpha
  */
 public class ABITrace
@@ -146,7 +148,7 @@ public class ABITrace
   public int[] getBasecalls() { return Basecalls; }
 
 /**
- * Returns the original programatically determined (unedited) sequence as a <code>String</code>.
+ * Returns the original programatically determined (unedited) sequence as a <code>SymbolList</code>.
  */
   public SymbolList getSequence() throws BioError
   { 
@@ -165,21 +167,24 @@ public class ABITrace
  * position in the array, so that if element 4 in the array is 972, then
  * x is 4 and y is 972 for that point.
  *
- * @param base can be 'A', 'G', 'C', 'T', 'a', 'g', 'c', or 't'.
- * @throws IllegalArgumentException if the base is not valid.
+ * @param base  the DNA AttomicSymbol to retrieve the trace values for
+ * @return an array of ints giving the entire trace for that base
+ * @throws IllegalSymbolException if the base is not valid
  */
-  public int[] getTrace (Symbol base) throws IllegalAlphabetException
+  public int[] getTrace (AtomicSymbol base) throws IllegalSymbolException
   {
-    if (base == DNATools.a())
+    if (base == DNATools.a()) {
       return A;
-    else if (base == DNATools.c())
+    } else if (base == DNATools.c()) {
       return C;
-    else if (base == DNATools.g())
+    } else if (base == DNATools.g()) {
       return G;
-    else if (base == DNATools.t())
+    } else if (base == DNATools.t()) {
       return T;
-    else
-      throw new IllegalAlphabetException();
+    } else {
+      DNATools.getDNA().validate(base);
+      throw new IllegalSymbolException("Don't know symbol: " + base);
+    }
   }
 
 /**
