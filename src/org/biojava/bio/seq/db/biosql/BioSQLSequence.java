@@ -46,6 +46,7 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     private int bioentry_id;
     private int biosequence_id;
     private ChangeSupport changeSupport;
+    private Annotation annotation;
 
     private void initChangeSupport() {
 	changeSupport = new ChangeSupport();
@@ -79,7 +80,11 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     //
 
     public Annotation getAnnotation() {
-	return Annotation.EMPTY_ANNOTATION;
+	if (annotation == null) {
+	    annotation = new BioSQLSequenceAnnotation(seqDB, bioentry_id);
+	}
+
+	return annotation;
     }
 
     //
