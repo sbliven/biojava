@@ -221,7 +221,22 @@ class DASFeatureSet implements FeatureHolder {
 		if (key.equals(XFFFeatureSetHandler.PROPERTY_XFF_ID)) {
 		    stackTop.getAnnotation().setProperty(DASSequence.PROPERTY_FEATUREID, value);
 		} else {
-		    stackTop.getAnnotation().setProperty(key, value);
+		    Annotation ann = stackTop.getAnnotation();
+		    if (ann.containsProperty(key)) {
+			Object o = ann.getProperty(key);
+			Collection col;
+			if (o instanceof Collection) {
+			    col = (Collection) o;
+			} else {
+			    col = new ArrayList();
+			    col.add(o);
+			    ann.setProperty(key, col);
+			}
+			
+			col.add(value);
+		    } else {
+			stackTop.getAnnotation().setProperty(key, value);
+		    }
 		}
 	    } catch (ChangeVetoException ex) {
 		throw new ParseException(ex, "Couldn't set feature property");
