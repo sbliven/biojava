@@ -22,11 +22,6 @@
 package org.biojava.bio.program.ssbind;
 
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import org.xml.sax.XMLReader;
@@ -56,13 +51,13 @@ public class SSBindNCBIblastn2_0_11Test extends SSBindCase
     {
         super.setUp();
 
-        setTopHitValues(4129d, "U51677",
-                        1, 2575, StrandedFeature.POSITIVE,
-                        1, 2575, StrandedFeature.POSITIVE);
+        setTopHitValues(2545D, "ECGLTA01",
+                        1, 1284, StrandedFeature.POSITIVE,
+                        1091, 2374, StrandedFeature.NEGATIVE);
 
-        setBotHitValues(38.2d, "AC002556",
-                        395, 413, StrandedFeature.POSITIVE,
-                        21414, 21432, StrandedFeature.POSITIVE);
+        setBotHitValues(44.1D, "AC068733",
+                        167, 188, StrandedFeature.POSITIVE,
+                        57355, 57376, StrandedFeature.POSITIVE);
 
         searchStream =
              new GZIPInputStream(new BufferedInputStream(getClass().getResourceAsStream("ncbi_blastn_2.0.11.out.gz")));
@@ -79,6 +74,6 @@ public class SSBindNCBIblastn2_0_11Test extends SSBindCase
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
-        assertEquals(99, result.getHits().size());
+        assertEquals(127, result.getHits().size());
     }
 }

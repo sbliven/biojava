@@ -42,7 +42,7 @@ import org.biojava.bio.seq.db.SequenceDBInstallation;
  * <code>SSBindCase</code> is a base class for tests of object
  * bindings for Blast-like SAX events.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class SSBindCase extends TestCase

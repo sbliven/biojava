@@ -34,15 +34,15 @@ import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.seq.StrandedFeature;
 
 /**
- * <code>SSBindNCBIblastp2_0_11Test</code> tests object bindings for
+ * <code>SSBindNCBIblastx2_2_3Test</code> tests object bindings for
  * Blast-like SAX events.
  *
  * @author Keith James
  * @since 1.2
  */
-public class SSBindNCBIblastp2_0_11Test extends SSBindCase
+public class SSBindNCBIblastx2_2_3Test extends SSBindCase
 {
-    public SSBindNCBIblastp2_0_11Test(String name)
+    public SSBindNCBIblastx2_2_3Test(String name)
     {
         super(name);
     }
@@ -51,16 +51,16 @@ public class SSBindNCBIblastp2_0_11Test extends SSBindCase
     {
         super.setUp();
 
-        setTopHitValues(879D, "CISY_ECOLI",
-                        1, 427, null,
+        setTopHitValues(870.0D, "CISY_ECOLI",
+                        1, 1281, StrandedFeature.POSITIVE,
                         1, 427, null);
 
-        setBotHitValues(57.0D, "Q9R655",
-                        2, 371, null,
-                        1, 91, null);
+        setBotHitValues(177.0, "Q9RBA3",
+                        802, 1131, StrandedFeature.POSITIVE,
+                        1, 111, null);
 
         searchStream =
-            new GZIPInputStream(new BufferedInputStream(getClass().getResourceAsStream("ncbi_blastp_2.0.11.out.gz")));
+            new GZIPInputStream(new BufferedInputStream(getClass().getResourceAsStream("ncbi_blastx_2.2.3.out.gz")));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
         XMLReader reader = (XMLReader) new BlastLikeSAXParser();
@@ -74,6 +74,6 @@ public class SSBindNCBIblastp2_0_11Test extends SSBindCase
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
-        assertEquals(200, result.getHits().size());
+        assertEquals(250, result.getHits().size());
     }
 }

@@ -55,11 +55,11 @@ public class SSBindFasta3_3t08Test extends SSBindCase
     {
         super.setUp();
 
-        setTopHitValues(3266.4d, "CISY_ECOLI",
+        setTopHitValues(3266.4D, "CISY_ECOLI",
                         1, 427, null,
                         1, 427, null);
 
-        setBotHitValues(2032.3d, "CISY_RICCN",
+        setBotHitValues(2032.3D, "CISY_RICCN",
                         6, 422, null,
                         12, 430, null);
 
