@@ -21,12 +21,19 @@
 
 package org.biojava.bio.symbol;
 
+
+import org.biojava.bio.symbol.*;
 import junit.framework.*;
 import java.util.*;
 import org.biojava.bio.seq.*;
 
 
 public class AlphabetManagerTest extends TestCase {
+
+    // public static void main(String[] args) throws Exception{
+    //	AlphabetManagerTest amt = new AlphabetManagerTest("");
+    //	amt.testGapInCrossProductAlphabet();
+    //}
 
   public AlphabetManagerTest(String s) {
     super(s);
@@ -110,4 +117,15 @@ public class AlphabetManagerTest extends TestCase {
           assertEquals(sl_protein.symbolAt(i), sl_proteinT.symbolAt(i));
       }
   }
+
+    public void testGapInCrossProductAlphabet() throws Exception{
+	Alphabet alph = AlphabetManager.alphabetForName("(PROTEIN x PROTEIN)");	
+	List s = new ArrayList();
+	s.add(AlphabetManager.getGapSymbol());
+	s.add(ProteinTools.createProtein("V").symbolAt(1));
+	Symbol sym = alph.getSymbol(s);
+	List l  = ((BasisSymbol)sym ).getSymbols();
+	assertEquals(s.get(0), l.get(0));
+	assertEquals(s.get(1), l.get(1));
+    }
 }
