@@ -28,6 +28,7 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.utils.*;
+import org.apache.regexp.RE;
 
 import org.apache.regexp.RE;
 
@@ -271,6 +272,7 @@ public class SeqIOTools  {
      */
 
     //constants representing different filetypes
+    public static final int UNKNOWN = 0;
     public static final int FASTADNA = 1;
     public static final int FASTAPROTEIN = 2;
     public static final int EMBL = 3;
@@ -278,10 +280,11 @@ public class SeqIOTools  {
     public static final int SWISSPROT = 5;
     public static final int GENPEPT = 6;
     public static final int MSFDNA = 7;
-    public static final int FASTA = 8;
+    public static final int FASTA = 8;              //only appropriate for writing
     public static final int FASTAALIGNDNA = 9;
     public static final int MSFPROTEIN = 10;
     public static final int FASTAALIGNPROTEIN = 11;
+    public static final int MSF = 12;               //only appropriate for reading
 
     /**
      * Attempts to guess the filetype of a file given the name.  For use with
@@ -313,6 +316,7 @@ public class SeqIOTools  {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         String line1 = br.readLine();
         String line2 = br.readLine();
+        br.close();
 
         if (line1.startsWith(">")) {
             return guessFastaType(fileName);
@@ -351,7 +355,7 @@ public class SeqIOTools  {
         }
         else {
             System.out.println("guessFileType -- Could not guess file type.");
-            return 0;
+            return UNKNOWN;
         }
     }
 
@@ -362,6 +366,7 @@ public class SeqIOTools  {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         String line = br.readLine();
         line = br.readLine();
+        br.close();
         for (int i = 0; i < line.length(); i++) {
             if (Character.toUpperCase(line.charAt(i)) == 'F' ||
                 Character.toUpperCase(line.charAt(i)) == 'L' ||
@@ -391,16 +396,17 @@ public class SeqIOTools  {
             while (line.indexOf("Type: ") == -1) {
                 line = br.readLine();
             }
+            br.close();
             int typeIndex = line.indexOf("Type: ") + 6;
-            if (line.startsWith("N")) {
+            if (line.substring(typeIndex).startsWith("N")) {
                 return MSFDNA;
             }
-            else if (line.startsWith("P")) {
+            else if (line.substring(typeIndex).startsWith("P")) {
                 return MSFPROTEIN;
             }
             else {
                 System.out.println("guessFileType -- Could not guess file type.");
-                return 0;
+                return UNKNOWN;
             }
         }
     }
@@ -414,6 +420,7 @@ public class SeqIOTools  {
         while (line.indexOf("LOCUS") == -1) {
             line = br.readLine();
         }
+        br.close();
         for (int i = 0; i < line.length(); i++) {
             if (Character.toUpperCase(line.charAt(i)) == 'A' &&
                 Character.toUpperCase(line.charAt(i+1)) == 'A') {
@@ -424,10 +431,12 @@ public class SeqIOTools  {
     }
 
     /**
-     * Reads a file and returns the corresponding Biojava object.
+     * Reads a file and returns the corresponding Biojava object.  You need to cast it as
+     * an Alignment or a SequenceIterator as appropriate.
      */
     public static Object fileToBiojava(int fileType, BufferedReader br) throws Exception {
         switch (fileType) {
+            case MSF:
             case MSFDNA:
             case MSFPROTEIN:
             case FASTAALIGNDNA:
@@ -442,8 +451,7 @@ public class SeqIOTools  {
                 return fileToSeq(fileType, br);
             default:
                 System.out.println("fileToBiojava -- File type not recognized.");
-                System.exit(0);
-            return null;
+                return null;
         }
     }
 
@@ -452,6 +460,7 @@ public class SeqIOTools  {
      */
     private static Alignment fileToAlign(int fileType, BufferedReader br) throws Exception{
         switch(fileType) {
+            case MSF:
             case MSFDNA:
             case MSFPROTEIN:
                 return (new MSFAlignmentFormat()).read(br);
@@ -460,7 +469,6 @@ public class SeqIOTools  {
                 return (new FastaAlignmentFormat()).read(br);
             default:
                 System.out.println("fileToAlign -- File type not recognized.");
-                System.exit(0);
                 return null;
         }
     }
@@ -484,7 +492,6 @@ public class SeqIOTools  {
                 return SeqIOTools.readGenpept(br);
             default:
                 System.out.println("fileToSeq -- File type not recognized.");
-                System.exit(0);
                 return null;
         }
     }
@@ -511,7 +518,6 @@ public class SeqIOTools  {
                 break;
             default:
                 System.out.println("biojavaToFile -- File type not recognized.");
-                System.exit(0);
         }
     }
 
@@ -534,7 +540,6 @@ public class SeqIOTools  {
                 break;
             default:
                 System.out.println("alignToFile -- File type not recognized.");
-                System.exit(0);
         }
     }
 
@@ -562,7 +567,7 @@ public class SeqIOTools  {
                 break;
             default:
                 System.out.println("seqToFile -- File type not recognized.");
-                System.exit(0);
         }
     }
+
 }
