@@ -70,7 +70,6 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
     private static String CREATE_SQL = null;
     private static String DROP_SQL = null;
     private static String[] TABLES = new String[] {
-        "anncomment",
         "biodatabase",
         "bioentry",
         "bioentry_dbxref",
