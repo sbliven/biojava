@@ -27,6 +27,8 @@ public class TestEmbl {
       while(seqI.hasNext()) {
         Sequence seq = seqI.nextSequence();
         System.out.println(seq.getName() + " has " + seq.countFeatures() + " features");
+        eFormat.writeSequence(seq, System.out);
+        System.out.println("pigs");
       }
     } catch (Throwable t) {
       t.printStackTrace();

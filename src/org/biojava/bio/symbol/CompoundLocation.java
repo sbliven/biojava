@@ -89,11 +89,14 @@ public class CompoundLocation implements Location, Serializable {
     // if this is not true.
     //
 
+    Iterator i = working.iterator();
     Location last = Location.empty;
-    for(int i = 0; i < working.size(); i++) {
-      Location cur = (Location) working.get(i);
-      if (cur.getMin() - last.getMax() <= 1) {
-	if (last.overlaps(cur))
+    if(i.hasNext()) {
+      last = (Location) i.next();
+    }
+    while(i.hasNext()) {
+      Location cur = (Location) i.next();
+      if (last.overlaps(cur)) {
 	    last = new RangeLocation(Math.min(last.getMin(), cur.getMin()),
 				     Math.max(last.getMax(), cur.getMax()));
       } else {
