@@ -206,6 +206,16 @@ public final class SeqIOTools  {
                                 getDNAParser(),
                                 getFastaBuilderFactory());
     }
+    
+    /**
+     * Iterate over the sequences in an FASTA-format stream of RNA sequences.
+     */
+    public static SequenceIterator readFastaRNA(BufferedReader br) {
+        return new StreamReader(br,
+                                new FastaFormat(),
+                                getRNAParser(),
+                                getFastaBuilderFactory());
+    }
 
     /**
      * Iterate over the sequences in an FASTA-format stream of Protein sequences.
