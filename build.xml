@@ -37,7 +37,7 @@
     <property name="name" value="biojava" />
     <property name="version" value="pre-1.2" />
 
-    <property name="build.compiler" value="classic" />
+    <property name="build.compiler" value="modern" />
 
     <property name="classpath" value="xerces.jar:jakarta-regexp.jar:bytecode.jar" />
 
@@ -134,8 +134,8 @@
       srcdir="${build.src.main}"
       destdir="${build.dest.main}"
       classpath="${classpath}"
-      deprecation="true"
-      depend="yes"
+      deprecation="false"
+      depend="no"
     />
   </target>
 
