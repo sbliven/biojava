@@ -569,8 +569,8 @@ class OntologySQL {
             "insert into term_relationship_term " +
             "       (term_relationship_id, term_id) " +
             "values (?, ?)" );
-    link_trip_to_term.setInt(1, termID(triple));
-    link_trip_to_term.setInt(2, tripID);
+    link_trip_to_term.setInt(1, tripID);
+    link_trip_to_term.setInt(2, termID(triple));
     link_trip_to_term.executeUpdate();
     link_trip_to_term.close();
 
