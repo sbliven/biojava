@@ -67,6 +67,7 @@ import org.biojava.utils.*;
  * rendered by the current renderer.</p>
  *
  * @author Keith James
+ * @author Paul Seed
  * @since 1.2
  */
 public abstract class AbstractBeadRenderer extends AbstractChangeable

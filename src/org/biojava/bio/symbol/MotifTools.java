@@ -41,11 +41,17 @@ import org.biojava.bio.symbol.SymbolList;
 public class MotifTools
 {
     /**
-     * <code>createRegex</code> creates a regular expression which
+     * <p><code>createRegex</code> creates a regular expression which
      * matches the <code>SymbolList</code>. Ambiguous
      * <code>Symbol</code>s are simply transformed into character
      * classes. For example the nucleotide sequence "AAGCTT" becomes
-     * "A{2}GCT{2}" and "CTNNG" is expanded to "CT[ACGT]{2}G".
+     * "A{2}GCT{2}" and "CTNNG" is expanded to "CT[TACG]{2}G". The
+     * ordering of the tokens in a character class is determined by
+     * the <code>AlphabetIndex</code> for the relevant
+     * <code>Alphabet</code>.</p>
+     *
+     * <p>The <code>Alphabet</code> of the <code>SymbolList</code>
+     * must be finite and must have a character token type.</p>
      *
      * @param motif a <code>SymbolList</code>.
      *
@@ -63,16 +69,31 @@ public class MotifTools
         try
         {
             SymbolTokenization sToke = motif.getAlphabet().getTokenization("token");
+            if (sToke.getTokenType() != SymbolTokenization.CHARACTER)
+                throw new IllegalArgumentException("SymbolList alphabet did not have a character token type");
 
-            for (int i = 1; i <= motif.length(); i++)
+            int motifLen = motif.length();
+
+            for (int i = 1; i <= motifLen; i++)
             {
                 Symbol sym = motif.symbolAt(i);
                 FiniteAlphabet ambiAlpha = (FiniteAlphabet) sym.getMatches();
+                int ambiSize = ambiAlpha.size();
 
-                for (Iterator ai = ambiAlpha.iterator(); ai.hasNext();)
+                if (ambiSize == 1)
                 {
-                    Symbol ambiSym = (Symbol) ai.next();
-                    sb.append(sToke.tokenizeSymbol(ambiSym));
+                    sb.append(sToke.tokenizeSymbol(sym));
+                }
+                else
+                {
+                    AlphabetIndex ambiIndex =
+                        AlphabetManager.getAlphabetIndex(ambiAlpha);
+
+                    for (int j = 0; j < ambiSize; j++)
+                    {
+                        Symbol ambiSym = ambiIndex.symbolForIndex(j);
+                        sb.append(sToke.tokenizeSymbol(ambiSym));
+                    }
                 }
 
                 String result = sb.substring(0);
@@ -81,7 +102,7 @@ public class MotifTools
                 {
                     stack.push(result);
                 }
-                else if (i < motif.length())
+                else if (i < motifLen)
                 {
                     if (! stack.isEmpty() && stack.peek().equals(result))
                     {
@@ -132,7 +153,7 @@ public class MotifTools
             regex.append(component);
 
             if (stack.size() > 1)
-            {                                
+            {
                 regex.append("{");
                 regex.append(stack.size());
                 regex.append("}");
