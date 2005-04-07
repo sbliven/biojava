@@ -278,9 +278,12 @@ public class GFFTools {
 
     //get the list of names for each sequence
     for (Iterator i = ents.lineIterator(); i.hasNext(); ) {
-      GFFRecord record = (GFFRecord)i.next();
-      if(! names.contains(record.getSeqName())){
-        names.add(record.getSeqName());
+      Object o = i.next();
+      if(o instanceof GFFRecord){//only process GFFRecords not comments
+        GFFRecord record = (GFFRecord)o;
+        if(! names.contains(record.getSeqName())){
+          names.add(record.getSeqName());
+        }
       }
     }
 
