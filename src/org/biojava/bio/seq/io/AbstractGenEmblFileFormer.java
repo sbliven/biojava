@@ -51,7 +51,6 @@ import org.biojava.bio.symbol.FuzzyPointLocation;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.PointLocation;
-import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.Symbol;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -659,11 +658,9 @@ class AbstractGenEmblFileFormer
                     break;
 
                 case RANGE:
-                    RangeLocation rl = (RangeLocation) thisLoc;
-
                     sb.append(complement                                     ?
-                              toComplement(formatRange(lb, rl).substring(0)) :
-                              formatRange(lb, rl).substring(0));
+                              toComplement(formatRange(lb, thisLoc).substring(0)) :
+                              formatRange(lb, thisLoc).substring(0));
                     break;
 
                 case BETWEEN_LOCATION:
@@ -819,11 +816,11 @@ class AbstractGenEmblFileFormer
      * representation of a <code>RangeLocation</code>.
      *
      * @param sb a <code>StringBuffer</code> to format the location into.
-     * @param rl a <code>RangeLocation</code>.
+     * @param rl a <code>Location</code>.
      *
      * @return a <code>String</code> representation of the location.
      */
-    private StringBuffer formatRange(StringBuffer sb, RangeLocation rl)
+    private StringBuffer formatRange(StringBuffer sb, Location rl)
     {
         // 123..567
         sb.append(rl.getMin());
