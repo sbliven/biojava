@@ -158,7 +158,7 @@ public class PDBFileParser  {
      *  e.g. convert CYS to C 
      */
     
-    private Character convert_3code_1code(String code3) 
+    public Character convert_3code_1code(String code3) 
 	throws IllegalSymbolException
     {
 	Symbol sym   =  threeLetter.parseToken(code3) ;
