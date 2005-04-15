@@ -530,16 +530,38 @@ final public class LocationTools {
    * @return a new Location instance
    */
   static Location buildLoc(List locList) {
-    Collections.sort(locList, Location.naturalOrder);
-
     if(locList.size() == 0) {
       return Location.empty;
     } else if(locList.size() == 1) {
       return (Location) locList.get(0);
     } else {
+      Collections.sort(locList, Location.naturalOrder);
       return new CompoundLocation(locList);
     }
   }
+  
+  /**
+   * Create a Location instance from the sorted list of contiguous locations in
+   * locList.
+   * <p>
+   * If the list is empty then Location.empty will be produced. If it is just
+   * one element long, then this will be returned as-is. If there are multiple
+   * locations then they will be sorted and then used to construct a
+   * CompoundLocation.
+   *
+   * @param locList a List<Location>, where each element is a contiguous location.
+   * @return a new Location instance
+   */
+  
+  static Location buildLocSorted(List locList) {
+      if(locList.size() == 0) {
+        return Location.empty;
+      } else if(locList.size() == 1) {
+        return (Location) locList.get(0);
+      } else {
+        return new CompoundLocation(locList);
+      }
+    }
 
     /**
      * The n-way union of a Collection of locations.  Returns a Location
@@ -622,7 +644,7 @@ final public class LocationTools {
       }
 
       // now make the appropriate Location instance
-      return buildLoc(joinList);
+      return buildLocSorted(joinList);
     }
 
   /**
@@ -798,6 +820,26 @@ final public class LocationTools {
             return loc;
         } else {
             return new RangeLocation(loc.getMin(), loc.getMax());
+        }
+    }
+    
+    /**
+     * Return the number of contiguous blocks in a location.
+     * 
+     * @param loc a location
+     * @return the number of blocks
+     * @since 1.4
+     */
+    
+    public static int blockCount(Location loc) {
+        if (loc.isContiguous()) {
+            return 1;
+        } else {
+            int cnt = 0;
+            for (Iterator bi = loc.blockIterator(); bi.hasNext(); ) {
+                bi.next(); ++cnt;
+            }
+            return cnt;
         }
     }
 }
