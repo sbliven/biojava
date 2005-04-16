@@ -769,4 +769,3 @@ public class SequencePanel
     }
   }
 }
-
