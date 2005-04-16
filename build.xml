@@ -22,7 +22,6 @@
     javadocs-taglets  builds taglets API documentation
     javadocs-demos    builds demos API documentation
     javadocs-all      builds API documentation for all the above
-    docbook           builds DocBook documentation
     clean             cleans up the build & dist directories
 
   The 'runtests' target can be restricted to portions of the tree, e.g.:
@@ -53,7 +52,6 @@
 
     <property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
 
-    <property name="docbook.tools.file" value="docbook.jar" />
 
     <!-- Check the current system classpath for JUnit -->
     <available classpath="${java.class.path}"
@@ -171,7 +169,6 @@
     <copy todir="${build.dir}">
       <fileset dir=".">
         <include name="*.jar" />
-        <exclude name="${docbook.tools.file}" />
       </fileset>
     </copy>
 
@@ -227,40 +224,7 @@
     <mkdir dir="${build.dest.docs}" />
   </target>
 
-  <!-- Prepares DocBook environment and encloses it from older Ant versions -->
-  <target name="prepare-docs" depends="prepare" if="outputproperty.support"
-  description="Prepares DocBook environment">
-    <!-- Check the current system classpath for Trax -->
-    <available classpath="${java.class.path}"
-               classname="javax.xml.transform.Transformer"
-               property="trax.present">
-    </available>
-    <echo message="Trax API present:                ${trax.present}" />
-
-    <!-- DocBook XML DTD path -->
-    <property name="docbook.dir" value="${build.lib}/xml-dtd-4.2" />
-    <property name="docbook.dtd" value="${docbook.dir}/docbookx.dtd" />
-
-    <!-- DocBook XML stylesheet path -->
-    <property name="stylesheet.dir" value="${build.lib}/docbook-xsl-1.44" />
-    <property name="docbook.xsl" value="${stylesheet.dir}/xhtml/chunk.xsl" />
-
-    <!-- DocBook Public ID -->
-    <property name="docbook.public.id" value="-//OASIS//DTD DocBook XML V4.2//EN" />
-
-    <!-- Setup DocBook XML catalog -->
-    <xmlcatalog id="docbook.cat">
-      <dtd publicId="${docbook.public.id}" location="${docbook.dtd}" />
-    </xmlcatalog>
-
-    <!-- unjar the DTD and stylesheets for use -->
-    <unjar src="${docbook.tools.file}" dest="${build.lib}">
-      <patternset>
-        <include name="**" />
-        <exclude name="META-INF/*" />
-      </patternset>
-    </unjar>
-  </target>
+  
 
   <!--
     Compile each part of the project.
@@ -530,41 +494,11 @@
     </javadoc>
   </target>
 
-  <!-- Creates the DocBook documentation -->
-  <target name="docbook" depends="prepare-docs" if="trax.present"
-  description="Creates the DocBook documentation">
-
-    <xslt
-      in="${docs.dir}/biojava-doc-main.xml"
-      out="${build.dest.docs}/index.html"
-      style="${docbook.xsl}"
-      force="true">
-        <!-- Pass XSL parameters to transformer -->
-        <param name="html.stylesheet" expression="${doc.css.file}" />
-        <param name="html.ext" expression=".html" />
-        <param name="using.chunker" expression="1" />
-        <param name="chunk.sections" expression="0" />
-        <param name="use.id.as.filename" expression="1" />
-        <outputproperty name="method" value="xml" />
-        <outputproperty name="standalone" value="yes" />
-        <outputproperty name="encoding" value="UTF-8" />
-        <outputproperty name="indent" value="no" />
-    </xslt>
-    <!-- CSS file used by HTML output -->
-    <copy file="${docs.dir}/${doc.css.file}" todir="${build.dest.docs}" />
-    <!-- Images used by HTML output -->
-    <copy todir="${build.dest.docs}">
-      <fileset dir="${docs.dir}">
-        <include name="*/*.png" />
-        <include name="*/*.jpg" />
-        <include name="*/*.gif" />
-      </fileset>
-    </copy>
-  </target>
+  
 
   <target
     name="javadocs-all"
-    depends="javadocs-taglets,javadocs-biojava,javadocs-demos,javadocs-apps,docbook"
+    depends="javadocs-taglets,javadocs-biojava,javadocs-demos,javadocs-apps"
     description="Creates the javadocs for all components"
   />
 
