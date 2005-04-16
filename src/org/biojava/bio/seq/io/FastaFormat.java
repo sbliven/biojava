@@ -45,6 +45,7 @@ import org.biojava.utils.ParseErrorListener;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Lukas Kall
  */
 
 public class FastaFormat implements SequenceFormat,
@@ -60,12 +61,12 @@ public class FastaFormat implements SequenceFormat,
    */
   public final static String PROPERTY_DESCRIPTIONLINE = "description_line";
 
-  private Vector mListeners = new Vector();
+  protected Vector mListeners = new Vector();
 
   /**
    * The line width for output.
    */
-  private int lineWidth = 60;
+  protected int lineWidth = 60;
 
   /**
    * Retrive the current line width.

@@ -32,7 +32,7 @@ import org.biojava.bio.symbol.SymbolList;
  *
  * @author Matthew Pocock
  */
-class SmallCursor extends AbstractCursor {
+public class SmallCursor extends AbstractCursor {
   private final SymbolList symList;
   private double [] currentC;
   private double [] lastC;

@@ -34,13 +34,14 @@ import org.biojava.bio.symbol.SymbolList;
  * The dynamic programming matrix for a single sequence.
  *
  * @author Matthew Pocock
+ * @author Lukas Kall
  */
 public class SingleDPMatrix implements DPMatrix, Serializable {
-  private final State [] states;
-  private final MarkovModel model;
-  private final SymbolList [] symList;
+  protected final State [] states;
+  protected final MarkovModel model;
+  protected final SymbolList [] symList;
   public final double [][] scores; // [symbol][state]
-  private double score;
+  protected double score;
  
   public State [] states() {
     return states;
@@ -58,7 +59,7 @@ public class SingleDPMatrix implements DPMatrix, Serializable {
     return score;
   }
   
-  void setScore(double score) {
+  public void setScore(double score) {
     this.score = score;
   }
   

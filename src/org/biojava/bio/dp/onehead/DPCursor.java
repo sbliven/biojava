@@ -31,7 +31,7 @@ import org.biojava.bio.symbol.SymbolList;
  *
  * @author Matthew Pocock
  */
-interface DPCursor {
+public interface DPCursor {
   /**
    * The symbol list being looped over.
    */

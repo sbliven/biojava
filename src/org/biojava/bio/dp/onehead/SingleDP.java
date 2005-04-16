@@ -61,11 +61,12 @@ import org.biojava.bio.symbol.SymbolList;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Samiul Hasan
+ * @author Lukas Kall
  */
 public class SingleDP extends DP implements Serializable {
-  private final HashMap emissionsProb;
-  private final HashMap emissionsOdds;
-  private final HashMap emissionsNull;
+  protected final HashMap emissionsProb;
+  protected final HashMap emissionsOdds;
+  protected final HashMap emissionsNull;
 
   public SingleDP(MarkovModel model)
   throws IllegalSymbolException, IllegalTransitionException, BioException {
@@ -228,21 +229,21 @@ public class SingleDP extends DP implements Serializable {
     return sm;
   }
 
-  private double forward(DPCursor dpCursor, ScoreType scoreType)
+  protected double forward(DPCursor dpCursor, ScoreType scoreType)
   throws IllegalSymbolException {
     forward_initialize(dpCursor, scoreType);
     forward_recurse(dpCursor, scoreType);
     return forward_termination(dpCursor, scoreType);
   }
 
-  private double backward(DPCursor dpCursor, ScoreType scoreType)
+  protected double backward(DPCursor dpCursor, ScoreType scoreType)
   throws IllegalSymbolException {
     backward_initialize(dpCursor, scoreType);
     backward_recurse(dpCursor, scoreType);
     return backward_termination(dpCursor, scoreType);
   }
 
-  private void forward_initialize(DPCursor dpCursor, ScoreType scoreType)
+  protected void forward_initialize(DPCursor dpCursor, ScoreType scoreType)
     throws IllegalSymbolException {
     double [] v = dpCursor.currentCol();
     State [] states = getStates();
@@ -295,7 +296,7 @@ public class SingleDP extends DP implements Serializable {
     }
   }
 
-  private void backward_initialize(DPCursor dpCursor, ScoreType scoreType)
+  protected void backward_initialize(DPCursor dpCursor, ScoreType scoreType)
     throws IllegalSymbolException {
     double [] v = dpCursor.currentCol();
     State [] states = getStates();
@@ -410,7 +411,7 @@ public class SingleDP extends DP implements Serializable {
     }
   }
 
-  private void backward_recurse(DPCursor dpCursor, ScoreType scoreType)
+  protected void backward_recurse(DPCursor dpCursor, ScoreType scoreType)
     throws IllegalSymbolException {
     State [] states = getStates();
     int stateCount = states.length;
@@ -493,7 +494,7 @@ public class SingleDP extends DP implements Serializable {
     return scores[l];
   }
 
-  private double backward_termination(DPCursor dpCursor, ScoreType scoreType)
+  protected double backward_termination(DPCursor dpCursor, ScoreType scoreType)
     throws IllegalSymbolException {
     double [] scores = dpCursor.currentCol();
     State [] states = getStates();
