@@ -536,39 +536,6 @@
     </junit>
   </target>
 
-  <target name="runtests-fork" depends="compile-tests"
-  description="Run all tests, can be quite slow">
-    <property name="test.subtree" value="**" />
-    <echo message="Running tests:           ${test.subtree}" />
-    <junit maxmemory="128m" printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
-      <formatter type="plain" usefile="true" />
-      <classpath>
-        <!-- main classes from build -->
-        <pathelement path="${build.dest.biojava}" />
-        <!-- resources -->
-        <pathelement path="${resources.dir}" />
-        <!-- test classes from build -->
-        <pathelement path="${build.dest.tests}" />
-        <!-- test data from build -->
-        <pathelement path="${tests.dir}/files" />
-        <!-- currently the move isn't complete -->
-        <pathelement path="${tests.dir}" />
-        <!-- classes specified in this file -->
-        <pathelement path="${classpath}" />
-        <!-- classes specified in system classpath -->
-        <pathelement path="${java.class.path}" />
-      </classpath>
-      <!-- The junit task doesn't support 'if' so we test for JUnit here -->
-      <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
-        <fileset dir="${build.dest.tests}">
-          <include name="${test.subtree}/*Test.class" />
-          <include name="${test.subtree}/*TestSuite.class" />
-          <exclude name="**/Abstract*Test.class" />
-        </fileset>
-      </batchtest>
-    </junit>
-  </target>
-
   <target name="doccheck-biojava" depends="prepare-biojava"
     description="Checks the API documentation">
     <javadoc
