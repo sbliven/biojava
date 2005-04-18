@@ -81,6 +81,8 @@ import org.biojava.utils.cache.WeakValueHashMap;
  * @author Matthew Pocock
  * @author Simon Foote
  * @author Len Trigg
+ * @author Mark Schreiber
+ * @author Richard Holland
  * @since 1.3
  */
 public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
@@ -211,8 +213,9 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         featureChangeHub = new BioSQLFeatureChangeHub(this, entryChangeHub);
         featureAnnotationChangeHub = new BioSQLFeatureAnnotationChangeHub(this, featureChangeHub);
 
+	  Connection conn = null;
         try {
-            Connection conn = dataSource.getConnection();
+            conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
             // DBHelper needs to be initialized before checks and ontologies are created
@@ -220,11 +223,13 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
             // Check that BioSQL database schema is post-Singapore
             if (! isDbSchemaSupported()) {
+		    try {conn.close();} catch (SQLException ex3) {}
                 throw new BioException("This database appears to be an old (pre-Singapore) BioSQL."
                                        + " If you need to access it, try an older BioJava snapshot (1.3pre1 or earlier)");
             }
 
             if (! isBioentryPropertySupported()) {
+		    try {conn.close();} catch (SQLException ex3) {}
                 throw new BioException("This database appears to be an old (pre-Cape-Town) BioSQL."
                                        + " If you need to access it, try an older BioJava snapshot");
             }
@@ -235,6 +240,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 //ontologySQL = new OntologySQL(dataSource, helper);
                 ontologySQL = OntologySQL.getOntologySQL(dataSource, helper);
             } catch (SQLException ex) {
+		    try {conn.close();} catch (SQLException ex3) {}
                 throw new BioException("Error accessing ontologies", ex);
             }
 
@@ -259,12 +265,14 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 createdb.executeUpdate();
                 conn.commit();
                 createdb.close();
-
+		    conn.close();
                 dbid = getDBHelper().getInsertID(conn, "biodatabase", "biodatabase_id");
             } else {
+		    conn.close();
                 throw new BioException("Biodatabase " + biodatabase + " doesn't exist");
             }
         } catch (SQLException ex) {
+		if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
             throw new BioException("Error connecting to BioSQL database: " + ex.getMessage(), ex);
         }
     }
@@ -350,6 +358,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                     conn.rollback();
                     rolledback = true;
                 } catch (SQLException ex2) {}
+   		    try {conn.close();} catch (SQLException ex3) {}
             }
             throw new BioRuntimeException("Error adding BioSQL tables" +
                                           (rolledback ? " (rolled back successfully)" : ""), ex);
@@ -494,6 +503,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                     conn.rollback();
                     rolledback = true;
                 } catch (SQLException ex2) {}
+   		    try {conn.close();} catch (SQLException ex3) {}
             }
             throw new BioRuntimeException(
                                           "Error adding sequence: " + seq.getName() +
@@ -527,8 +537,9 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             return seq;
         }
 
+	  Connection conn = null;
         try {
-            Connection conn = dataSource.getConnection();
+            conn = dataSource.getConnection();
 
             if (bioentry_id < 0) {
                 PreparedStatement get_bioentry = conn.prepareStatement("select bioentry.bioentry_id " +
@@ -607,6 +618,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 return seq;
             }
         } catch (SQLException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
             throw new BioException("Error accessing BioSQL tables", ex);
         }
 
@@ -794,6 +806,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                     conn.rollback();
                     rolledback = true;
                 } catch (SQLException ex2) {}
+                try {conn.close();} catch (SQLException ex3) {}
             }
             throw new BioException("Error removing from BioSQL tables" +
                                    (rolledback ? " (rolled back successfully)" : ""), ex);
@@ -801,9 +814,10 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     public Set ids() {
+	  Connection conn = null;
         try {
             Set _ids = new HashSet();
-            Connection conn = dataSource.getConnection();
+            conn = dataSource.getConnection();
 
             PreparedStatement st = conn.prepareStatement("select bioentry.accession from bioentry where bioentry.biodatabase_id = ?");
             st.setInt(1, dbid);
@@ -817,6 +831,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             conn.close();
             return Collections.unmodifiableSet(_ids);
         } catch (SQLException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
             throw new BioRuntimeException("Error reading from BioSQL tables", ex);
         }
     }
@@ -1068,9 +1083,10 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
     boolean isSPASupported() {
         if (!spaChecked) {
+            Connection conn = null;
             try {
                 spaSupported = false;
-                Connection conn = dataSource.getConnection();
+                conn = dataSource.getConnection();
                 PreparedStatement ps = null;
                 try {
                     ps = conn.prepareStatement("select biosql_accelerators_level()");
@@ -1092,6 +1108,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
                 spaChecked = true;
             } catch (SQLException ex) {
+		    if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
                 throw new BioRuntimeException(ex);
             }
         }
@@ -1235,12 +1252,13 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
     public FeatureHolder filter(FeatureFilter ff) {
+        Connection conn = null;
         try {
             SqlizedFilter sqf = new SqlizedFilter(ff);
             System.err.println("Doing BioSQL filter");
             System.err.println(sqf.getQuery());
 
-            Connection conn = dataSource.getConnection();
+            conn = dataSource.getConnection();
             PreparedStatement get_features = conn.prepareStatement(sqf.getQuery());
             get_features.setInt(1, dbid);
             ResultSet rs = get_features.executeQuery();
@@ -1271,10 +1289,13 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
             return fh;
         } catch (SQLException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
             throw new BioRuntimeException("Error accessing BioSQL tables", ex);
         } catch (ChangeVetoException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
             throw new BioError("Assert failed: couldn't modify internal FeatureHolder", ex);
         } catch (BioException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
             throw new BioRuntimeException("Error fetching sequence", ex);
         }
     }

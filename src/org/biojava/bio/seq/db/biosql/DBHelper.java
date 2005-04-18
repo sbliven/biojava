@@ -39,6 +39,7 @@ import org.biojava.bio.BioRuntimeException;
  * @author Matthew Pocock
  * @author Len Trigg
  * @author Eric Haugen
+ * @author Richard Holland
  */
 public abstract class DBHelper {
 
@@ -161,10 +162,10 @@ public abstract class DBHelper {
         if ((tablename == null) || (tablename.length() == 0)) {
             throw new IllegalArgumentException("Invalid table name given");
         } 
+        Connection conn = null;
         try {
             boolean present;
             PreparedStatement ps = null;
-            Connection conn = null;
             try {
                 conn = ds.getConnection();
                 ps = conn.prepareStatement("select * from " + tablename + " limit 1");
@@ -181,6 +182,7 @@ public abstract class DBHelper {
             }
             return present;
         } catch (SQLException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
             throw new BioRuntimeException(ex);
         }
     }

@@ -54,6 +54,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Len Trigg
+ * @author Richard Holland
  * @since 1.3
  */
 class BioSQLSequenceAnnotation implements Annotation {
@@ -75,8 +76,9 @@ class BioSQLSequenceAnnotation implements Annotation {
 
 
     private void initAnnotations() {
+      Connection conn = null;
 	try {
-	    Connection conn = seqDB.getDataSource().getConnection();
+	    conn = seqDB.getDataSource().getConnection();
 	    underlyingAnnotation = new SmallAnnotation();
             underlyingAnnotation.setProperty("bioentry_id", new Integer(bioentry_id));
 
@@ -121,8 +123,10 @@ class BioSQLSequenceAnnotation implements Annotation {
 	    
 	    conn.close();
 	} catch (SQLException ex) {
+          if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
 	    throw new BioRuntimeException("Error fetching annotations", ex);
 	} catch (ChangeVetoException ex) {
+          if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
 	    throw new BioError(ex);
 	}
     }
@@ -238,6 +242,7 @@ class BioSQLSequenceAnnotation implements Annotation {
 		    conn.rollback();
 		    rolledback = true;
 		} catch (SQLException ex2) {}
+            try {conn.close();} catch (SQLException ex3) {}
 	    }
 	    throw new BioRuntimeException("Error adding BioSQL tables" + 
 					(rolledback ? " (rolled back successfully)" : ""), ex);

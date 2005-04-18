@@ -56,6 +56,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  * @author Eric Haugen
  * @author Len Trigg
+ * @author Richard Holland
  * @since 1.4
  */
 class OntologySQL {
@@ -191,11 +192,14 @@ class OntologySQL {
           conn.rollback();
           rolledback = true;
         } catch (SQLException ex2) {}
+        try {conn.close();} catch (SQLException ex3) {}
       }
       throw new BioRuntimeException("Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
     } catch (AlreadyExistsException ex) {
+      if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
       throw new BioError("Unexpected ontology duplication error",ex);
     } catch (ChangeVetoException ex) {
+      if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
       throw new BioError("Unexpected veto altering internal Ontology object",ex);
     }
   }
@@ -402,6 +406,7 @@ class OntologySQL {
         guano = createOntology("__biojava_guano", "Namespace for old, but still useful, shit imported from ontology-less BioJava data models");
       }
     } catch (AlreadyExistsException ex) {
+      try {conn.close();} catch (SQLException ex3) {}
       throw new BioException("Duplicate term name in BioSQL",ex);
     }
 
@@ -532,6 +537,7 @@ class OntologySQL {
           conn.rollback();
           rolledback = true;
         } catch (SQLException ex2) {}
+        try {conn.close();} catch (SQLException ex3) {}
       }
       throw new BioRuntimeException("Error commiting to BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
     }
@@ -584,6 +590,7 @@ class OntologySQL {
           conn.rollback();
           rolledback = true;
         } catch (SQLException ex2) {}
+        try {conn.close();} catch (SQLException ex3) {}
       }
       throw new BioRuntimeException("Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
     }
@@ -648,6 +655,7 @@ class OntologySQL {
           conn.rollback();
           rolledback = true;
         } catch (SQLException ex2) {}
+        try {conn.close();} catch (SQLException ex3) {}
       }
       throw new BioRuntimeException("Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
     }

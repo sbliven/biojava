@@ -56,6 +56,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Simon Foote (modifications for schema version 1.0)
+ * @author Richard Holland
  * @since 1.3
  */
 
@@ -171,8 +172,9 @@ class BioSQLSequence
 
     protected synchronized SymbolList getSymbols() {
 	if (symbols == null) {
+	    Connection conn = null;
 	    try {
-		Connection conn = seqDB.getDataSource().getConnection();
+		conn = seqDB.getDataSource().getConnection();
 		
 		PreparedStatement get_symbols = conn.prepareStatement("select seq " +
 								      "from   biosequence " +
@@ -207,6 +209,7 @@ class BioSQLSequence
 		    symbols = new DummySymbolList((FiniteAlphabet) alphabet, length);
 		}
 	    } catch (SQLException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
 		throw new BioRuntimeException("Unknown error getting symbols from BioSQL.  Oh dear.", ex);
 	    }
 	}

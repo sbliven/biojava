@@ -59,6 +59,7 @@ import org.biojava.utils.AssertionFailure;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author David Huen
+ * @author Richard Holland
  * @since 1.3
  */
 
@@ -177,8 +178,9 @@ class BioSQLAssembly
 	if (componentFeatures == null) {
 	    componentFeatures = new SimpleFeatureHolder();
 
+          Connection conn = null;
 	    try {
-		Connection conn = seqDB.getDataSource().getConnection();
+		conn = seqDB.getDataSource().getConnection();
 		
 		PreparedStatement get_assembly = conn.prepareStatement("select assembly_fragment_id, fragment_name, assembly_start, assembly_end, fragment_start, fragment_end, strand " +
 								       "  from assembly_fragment " +
@@ -206,8 +208,10 @@ class BioSQLAssembly
                 get_assembly.close();
 		conn.close();
 	    } catch (SQLException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
 		throw new BioRuntimeException("Error fetching assembly data", ex);
 	    } catch (ChangeVetoException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
 		throw new AssertionFailure("Assertion failure: Couldn't modify private featureholder", ex);
 	    }
 	}

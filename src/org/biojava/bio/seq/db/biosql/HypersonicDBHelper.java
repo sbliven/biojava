@@ -36,6 +36,7 @@ import org.biojava.bio.BioRuntimeException;
  * Hypersonic RDBMS. See the <a href="http://hsqldb.sourceforge.net/">HSQLDB home page</a>
  *
  * @author Len Trigg
+ * @author Richard Holland
  */
 public class HypersonicDBHelper extends DBHelper {
 
@@ -92,6 +93,7 @@ public class HypersonicDBHelper extends DBHelper {
             }
             return present;
         } catch (SQLException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
             throw new BioRuntimeException(ex);
         }
     }

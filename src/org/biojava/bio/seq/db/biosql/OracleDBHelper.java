@@ -38,6 +38,7 @@ import org.biojava.bio.BioRuntimeException;
  *
  * @author Len Trigg
  * @author Eric Haugen
+ * @author Richard Holland
  */
 public class OracleDBHelper extends DBHelper {
 
@@ -118,6 +119,7 @@ public class OracleDBHelper extends DBHelper {
             }
             return present;
         } catch (SQLException ex) {
+            if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
             throw new BioRuntimeException(ex);
         }
     }

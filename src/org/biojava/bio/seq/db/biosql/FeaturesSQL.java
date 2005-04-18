@@ -57,6 +57,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Simon Foote
  * @author Len Trigg
+ * @author Richard Holland
  * @since 1.3
  */
 class FeaturesSQL {
@@ -145,6 +146,7 @@ class FeaturesSQL {
 	        );
             get_features.setInt(1, featureID);
         } else {
+            conn.close();
             throw new BioException("I'm afraid you can't do that!");
         }
 
@@ -226,6 +228,7 @@ class FeaturesSQL {
             try {
                 ((BioSQLFeatureAnnotation) templ.annotation).initProperty(key, value);
             } catch (ChangeVetoException ex) {
+	          try {conn.close();} catch (SQLException ex3) {}
                 throw new BioError("Couldn't modify hidden FeatureHolder");
             }
         }
@@ -458,6 +461,7 @@ class FeaturesSQL {
 	    
     	    List ll = (List) lmap.get(fid);
             if (ll == null) {
+	          conn.close();
                 throw new BioRuntimeException("BioSQL SeqFeature doesn't have any associated location spans. seqfeature_id=" + fid);
             }
 	    
@@ -616,6 +620,7 @@ class FeaturesSQL {
 		    conn.rollback();
 		    rolledback = true;
 		} catch (SQLException ex2) {}
+	          try {conn.close();} catch (SQLException ex3) {}
 	    }
 	    throw ex;
 	}
@@ -646,6 +651,7 @@ class FeaturesSQL {
 		    conn.rollback();
 		    rolledback = true;
 		} catch (SQLException ex2) {}
+            try {conn.close();} catch (SQLException ex3) {}
 	    }
 	    throw ex;
 	}
@@ -703,6 +709,7 @@ class FeaturesSQL {
 		    conn.rollback();
 		    rolledback = true;
 		} catch (SQLException ex2) {}
+            try {conn.close();} catch (SQLException ex3) {}
 	    }
 	    throw ex;
 	}
@@ -1064,6 +1071,7 @@ class FeaturesSQL {
 		    conn.rollback();
 		    rolledback = true;
 		} catch (SQLException ex2) {}
+            try {conn.close();} catch (SQLException ex3) {}
 	    }
 	    throw new BioException("Error adding BioSQL tables" 
 					+ (rolledback ? " (rolled back successfully)" : ""), ex);
