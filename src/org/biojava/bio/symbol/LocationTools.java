@@ -833,7 +833,11 @@ final public class LocationTools {
     
     public static int blockCount(Location loc) {
         if (loc.isContiguous()) {
-            return 1;
+            if (loc instanceof EmptyLocation) {
+                return 0;
+            } else {
+                return 1;
+            }
         } else {
             int cnt = 0;
             for (Iterator bi = loc.blockIterator(); bi.hasNext(); ) {
