@@ -21,8 +21,6 @@
  */
 
 package org.biojava.bio.seq.db.biosql;
-
-
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -54,6 +52,7 @@ import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.db.IDMaker;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.db.biosql.DBHelper.BioSequenceStyle;
 import org.biojava.bio.seq.io.OrganismParser;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SymbolTokenization;
@@ -348,7 +347,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             create_dummy.executeUpdate();
             create_dummy.close();
             //int dummy_id = getDBHelper().getInsertID(conn, "biosequence", "biosequence_id");
-
+            
             conn.commit();
             conn.close();
         } catch (SQLException ex) {
@@ -452,17 +451,51 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 }
                 create_fragment.close();
             } else {
-                PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
+                
+                BioSequenceStyle bs = getDBHelper().getBioSequenceStyle();
+
+                // See if we are using CLOBs.
+                if (bs==DBHelper.BIOSEQUENCE_ORACLECLOB) {
+                    PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
+                                                                             "(bioentry_id, version, length, seq, alphabet) " +
+                                                                             "values (?, ?, ?, empty_clob(), ?)");
+                    create_biosequence.setInt(1, bioentry_id);
+                    create_biosequence.setInt(2, version);
+                    create_biosequence.setInt(3, seq.length());
+                    String seqstr = seqToke.tokenizeSymbolList(seq);
+
+                    create_biosequence.setString(4, seqAlpha.getName());
+                    create_biosequence.executeUpdate();
+                    create_biosequence.close();
+                    
+                    // Now retrieve and update
+                    PreparedStatement retrieve_biosequence = conn.prepareStatement("select seq from biosequence " +
+                                                                            "where bioentry_id = ? for update");
+                    retrieve_biosequence.setInt(1, bioentry_id);
+                    ResultSet rs = retrieve_biosequence.executeQuery();
+                    if (!rs.next()) throw new BioRuntimeException("Could not read newly inserted sequence!");
+                    
+                    OracleDBHelper odh = (OracleDBHelper)getDBHelper();
+                    odh.stringToClob(conn, rs, 1, seqstr);
+
+                    rs.close();
+                    retrieve_biosequence.close();
+                    
+                } else { // BIOSEQUENCE_GENERIC
+                    PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
                                                                              "(bioentry_id, version, length, seq, alphabet) " +
                                                                              "values (?, ?, ?, ?, ?)");
-                create_biosequence.setInt(1, bioentry_id);
-                create_biosequence.setInt(2, version);
-                create_biosequence.setInt(3, seq.length());
-                String seqstr = seqToke.tokenizeSymbolList(seq);
-                create_biosequence.setCharacterStream(4, new StringReader(seqstr), seqstr.length());
-                create_biosequence.setString(5, seqAlpha.getName());
-                create_biosequence.executeUpdate();
-                create_biosequence.close();
+                    create_biosequence.setInt(1, bioentry_id);
+                    create_biosequence.setInt(2, version);
+                    create_biosequence.setInt(3, seq.length());
+                    String seqstr = seqToke.tokenizeSymbolList(seq);
+            
+                    create_biosequence.setCharacterStream(4, new StringReader(seqstr), seqstr.length());
+
+                    create_biosequence.setString(5, seqAlpha.getName());
+                    create_biosequence.executeUpdate();
+                    create_biosequence.close();
+                }
             }
 
             // System.err.println("Stored sequence");
@@ -493,7 +526,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 Object value = me.getValue();
                 persistBioentryProperty(conn, bioentry_id, key, value, false, true);
             }
-
+                    
             conn.commit();
             conn.close();
         } catch (SQLException ex) {
@@ -583,7 +616,9 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 get_biosequence.setInt(1, bioentry_id);
                 ResultSet rs = get_biosequence.executeQuery();
                 if (rs.next()) {
-                    String molecule = rs.getString(1);
+                    // UC conversion required for lower-case alphabets from bioperl. 
+                    // This is because BioSQL accepts both UC and LC.
+                    String molecule = rs.getString(1).toUpperCase(); 
                     int length = rs.getInt(2);
                     if (rs.wasNull()) {
                         length = -1;

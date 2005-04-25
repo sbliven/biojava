@@ -113,6 +113,21 @@ public abstract class DBHelper {
     public static final JoinStyle JOIN_GENERIC = new JoinStyle("Portable SQL");
 
 
+    public static final class BioSequenceStyle {
+        private final String name;
+
+        private BioSequenceStyle(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return "DBHelper.BioSequenceStyle: " + name;
+        }
+    }
+
+    public static final BioSequenceStyle BIOSEQUENCE_GENERIC = new BioSequenceStyle("Standard schema (except for Oracle schemas using CLOBs)");
+    public static final BioSequenceStyle BIOSEQUENCE_ORACLECLOB = new BioSequenceStyle("Oracle schema using CLOBS (but not Len Trigg's schema)");
+
     /**
      * Returns the id value created during the last insert
      * command. This is for tables that have an auto increment column.
@@ -144,6 +159,21 @@ public abstract class DBHelper {
      */
     public JoinStyle getJoinStyle() {
         return JOIN_GENERIC;
+    }
+
+
+    /**
+     * Returns the an object indicating the style of biosequence storage
+     * that this database should employ. Generally, leave it at the default
+     * unless you are using the Oracle schema, in which case you need
+     * to override it to return BIOSEQUENCE_ORACLECLOB. This is because, in the
+     * Oracle schema we need to use CLOBs (except when using Len Trigg's 
+     * version which uses LONGs instead.)
+     * 
+     * @return the preferred joining style.
+     */
+    public BioSequenceStyle getBioSequenceStyle() {
+        return BIOSEQUENCE_GENERIC;
     }
 
     /**

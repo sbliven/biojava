@@ -611,7 +611,7 @@ class OntologySQL {
             "insert into term_relationship " +
             " (subject_term_id, predicate_term_id,object_term_id, ontology_id) " +
             "values (?, ?, ?, ?)");
-	    
+
       import_trip.setInt(1, termID(triple.getSubject()));
       import_trip.setInt(2, termID(triple.getPredicate()));
       import_trip.setInt(3, termID(triple.getObject()));

@@ -37,6 +37,7 @@ import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.RealizingFeatureHolder;
 import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.db.biosql.DBHelper.BioSequenceStyle;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
@@ -175,7 +176,10 @@ class BioSQLSequence
 	    Connection conn = null;
 	    try {
 		conn = seqDB.getDataSource().getConnection();
-		
+                
+                DBHelper dh = DBHelper.getDBHelper(conn);
+                BioSequenceStyle bs = dh.getBioSequenceStyle();
+		                
 		PreparedStatement get_symbols = conn.prepareStatement("select seq " +
 								      "from   biosequence " +
 								      "where  bioentry_id = ?");
@@ -183,7 +187,14 @@ class BioSQLSequence
 		ResultSet rs = get_symbols.executeQuery();
 		String seqString = null;
 		if (rs.next()) {
-		    seqString = rs.getString(1);  // FIXME should do something stream-y
+                    
+                    if (bs==DBHelper.BIOSEQUENCE_ORACLECLOB) {
+                        OracleDBHelper odh = (OracleDBHelper)dh;
+                        seqString = odh.clobToString(conn, rs, 1);
+                    } else { // BIOSEQUENCE_GENERIC
+                        seqString = rs.getString(1);  // FIXME should do something stream-y
+                    }
+                    
                     if (rs.wasNull()) {
                         seqString = null;
                     }
