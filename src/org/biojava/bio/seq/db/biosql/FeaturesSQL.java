@@ -461,17 +461,21 @@ class FeaturesSQL {
 	    
     	    List ll = (List) lmap.get(fid);
             if (ll == null) {
-	          conn.close();
-                throw new BioRuntimeException("BioSQL SeqFeature doesn't have any associated location spans. seqfeature_id=" + fid);
-            }
-	    
-    	    Location loc = null;
-            if (ll.size() == 1) {
-                loc = (Location) ll.get(0);
+                templ.location = Location.empty;
+                
+	        //  conn.close();
+                //throw new BioRuntimeException("BioSQL SeqFeature doesn't have any associated location spans. seqfeature_id=" + fid);
+
             } else {
-                loc = LocationTools.union(ll);
+	    
+    	      Location loc = null;
+              if (ll.size() == 1) {
+                  loc = (Location) ll.get(0);
+              } else {
+                  loc = LocationTools.union(ll);
+              }
+              templ.location = loc;
             }
-            templ.location = loc;
         }
 
         // Check hierarchy
