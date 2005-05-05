@@ -22,6 +22,9 @@
 package org.biojava.ontology;
 
 import org.biojava.bio.Annotation;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Arrays;
 
 /**
  * A term in another ontology.
@@ -67,8 +70,13 @@ public interface RemoteTerm extends Term {
         private final Ontology ontology;
         private final Term remoteTerm;
         private final String name;
+        private Set synonyms;
 
         public Impl(Ontology ontology, Term remoteTerm, String name) {
+            this(ontology, remoteTerm, name, null);
+        }
+         
+        public Impl(Ontology ontology, Term remoteTerm, String name, Object[] synonyms) {
             if (ontology == null) {
                 throw new NullPointerException("Ontology must not be null");
             }
@@ -82,6 +90,21 @@ public interface RemoteTerm extends Term {
             this.ontology = ontology;
             this.remoteTerm = remoteTerm;
             this.name = name;
+            
+            this.synonyms = new TreeSet();
+            if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+        }
+
+        public void addSynonym(Object synonym) {
+            this.synonyms.add(synonym);
+        }
+        
+        public void removeSynonym(Object synonym) {
+            this.synonyms.remove(synonym);
+        }
+        
+        public Object[] getSynonyms() {
+            return this.synonyms.toArray();
         }
 
         public String getName() {

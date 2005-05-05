@@ -161,7 +161,7 @@ class OntologySQL {
         if (t instanceof RemoteTerm) {
           localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm(), null);
         } else {
-          localTerm = ont.createTerm(t.getName(), t.getDescription());
+          localTerm = ont.createTerm(t.getName(), t.getDescription(), t.getSynonyms());
           persistTerm(conn, localTerm);
         }
         localTerms.put(t, localTerm);
@@ -267,7 +267,7 @@ class OntologySQL {
     } else if (t instanceof RemoteTerm) {
       localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm(), null);
     } else {
-      localTerm = ont.createTerm(t.getName(), t.getDescription());
+      localTerm = ont.createTerm(t.getName(), t.getDescription(), t.getSynonyms());
       persistTerm(conn, localTerm);
     }
 
@@ -301,6 +301,9 @@ class OntologySQL {
     }
     query += "ORDER BY term.term_id";
     PreparedStatement get_terms = conn.prepareStatement(query);
+    
+    String query2 = "SELECT name FROM term_synonym WHERE term_id = ?";
+    PreparedStatement get_synonyms = conn.prepareStatement(query2);
 
     get_terms.setInt(1, id);
     ResultSet rs = get_terms.executeQuery();
@@ -331,7 +334,12 @@ class OntologySQL {
                              (Term) termsByID.get(new Integer(predicate_term_id)),
                              name, description);
       }
-
+                
+      get_synonyms.setInt(1, term_id);
+      ResultSet rs2 = get_synonyms.executeQuery();
+      while (rs2.next()) t.addSynonym(rs2.getString(1));
+      rs2.close();
+      
       //System.err.println("Loaded term: " + tid + " -> " + t);
 
       termsByID.put(tid, t);
@@ -339,6 +347,7 @@ class OntologySQL {
     }
     rs.close();
     get_terms.close();
+    get_synonyms.close();
 
     conn.close();
     conn = null;
@@ -563,6 +572,18 @@ class OntologySQL {
       Integer tid = new Integer(id);
       termsByID.put(tid, term);
       IDsByTerm.put(term, tid);
+      
+      PreparedStatement stored_synonym = conn.prepareStatement(
+              "insert into term_synonym (term_id, name) values (?,?) "
+              );
+      Object[] synonyms = term.getSynonyms();
+      for (int i = 0; i < synonyms.length; i++) {
+          stored_synonym.setInt(1,id);
+          stored_synonym.setString(2,""+synonyms[i]);
+          stored_synonym.executeUpdate();
+      }
+      stored_synonym.close();
+      
       //System.err.println("Persisted term: " + tid + " -> " + term);
     } catch (SQLException se) {
       throw (SQLException) new SQLException(

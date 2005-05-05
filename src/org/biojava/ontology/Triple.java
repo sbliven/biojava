@@ -23,6 +23,9 @@ package org.biojava.ontology;
 
 import org.biojava.bio.Annotation;
 import org.biojava.utils.Unchangeable;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Arrays;
 
 /**
  * A triple in an ontology.  This is two terms and a relationship between
@@ -111,16 +114,30 @@ public interface Triple
     private final Term predicate;
     private /*final*/ String name;
     private final String description;
+    private Set synonyms;
 
     public Impl(Term subject, Term object, Term predicate) {
-      this(subject, object, predicate, null, null);
+      this(subject, object, predicate, null, null, null);
+    }
+    
+    public Impl(Term subject, Term object, Term predicate, Object[] synonyms) {
+      this(subject, object, predicate, null, null, synonyms);
     }
 
     public Impl(Term subject,
                 Term object,
                 Term predicate,
                 String name,
-                String description)
+                String description) {
+        this(subject,object,predicate,name,description,null);
+    }
+                
+    public Impl(Term subject,
+                Term object,
+                Term predicate,
+                String name,
+                String description,
+                Object[] synonyms)
     {
       if (subject == null) {
         throw new NullPointerException("Subject must not be null");
@@ -152,8 +169,23 @@ public interface Triple
       this.predicate = predicate;
       this.name = name;
       this.description = description;
+    
+      this.synonyms = new TreeSet();
+      if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
     }
 
+    public void addSynonym(Object synonym) {
+        this.synonyms.add(synonym);
+    }
+        
+    public void removeSynonym(Object synonym) {
+        this.synonyms.remove(synonym);
+    }
+        
+    public Object[] getSynonyms() {
+        return this.synonyms.toArray();
+    }
+    
     public String getName() {
       if(name == null) {
         name = predicate + "(" + subject + ", " + object + ")";

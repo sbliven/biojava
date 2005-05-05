@@ -14,5 +14,8 @@ extends Term {
     public Impl(Ontology ontology, String name, String description) {
       super(ontology, name, description);
     }
+    public Impl(Ontology ontology, String name, String description, Object[] synonyms) {
+      super(ontology, name, description, synonyms);
+    }
   }
 }

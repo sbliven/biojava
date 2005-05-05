@@ -27,6 +27,9 @@ import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeType;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Arrays;
 
 /**
  * A term in an ontology which identifies another ontology.
@@ -65,8 +68,13 @@ public interface OntologyTerm extends Term {
         private final Ontology ontology;
         private final Ontology target;
         private transient ChangeForwarder forwarder;
+        private Set synonyms;
         
         public Impl(Ontology ontology, Ontology target) {
+            this(ontology, target, null);
+        }
+         
+        public Impl(Ontology ontology, Ontology target, Object[] synonyms) {
             if (ontology == null) {
                 throw new NullPointerException("The ontology may not be null");
             }
@@ -75,6 +83,21 @@ public interface OntologyTerm extends Term {
             }
             this.ontology = ontology;
             this.target = target;
+            
+            this.synonyms = new TreeSet();
+            if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+        }
+
+        public void addSynonym(Object synonym) {
+            this.synonyms.add(synonym);
+        }
+        
+        public void removeSynonym(Object synonym) {
+            this.synonyms.remove(synonym);
+        }
+        
+        public Object[] getSynonyms() {
+            return this.synonyms.toArray();
         }
         
         public String getName() {

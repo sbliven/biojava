@@ -137,6 +137,25 @@ public interface Ontology extends Changeable {
           IllegalArgumentException;
 
   /**
+   * Create a new term in this ontology.
+   *
+   * @param name The name of the term (must be unique)
+   * @param description A human-readable description (may be empty)
+   * @param synonyms Some synonyms for this term.
+   * @throws IllegalArgumentException if either <code>name</code> or
+   *         <code>description</code> is <code>null</code>, or violates
+   *         some other constraint of this implementation.
+   * @throws AlreadyExistsException if a term of this name already exists
+   * @return The newly created term.
+   */
+
+  public Term createTerm(String name, String description, Object[] synonyms)
+          throws
+          AlreadyExistsException,
+          ChangeVetoException,
+          IllegalArgumentException;
+  
+  /**
    * Create a new term in this ontology that is used as a variable.
    *
    * @param name The name of the term (must be unique)
@@ -355,6 +374,14 @@ public interface Ontology extends Changeable {
             throws AlreadyExistsException, IllegalArgumentException, ChangeVetoException
     {
       Term t = new Term.Impl(this, name, description);
+      addTerm(t);
+      return t;
+    }
+    
+    public Term createTerm(String name, String description, Object[] synonyms)
+            throws AlreadyExistsException, IllegalArgumentException, ChangeVetoException
+    {
+      Term t = new Term.Impl(this, name, description, synonyms);
       addTerm(t);
       return t;
     }

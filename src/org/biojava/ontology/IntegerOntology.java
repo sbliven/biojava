@@ -85,6 +85,15 @@ public class IntegerOntology
     throw new ChangeVetoException(getName() + " is immutable");
   }
 
+  public Term createTerm(String name, String description, Object[] synonyms)
+          throws
+          AlreadyExistsException,
+          ChangeVetoException,
+          IllegalArgumentException
+  {
+    throw new ChangeVetoException(getName() + " is immutable");
+  }
+
   public Variable createVariable(String name, String description)
           throws
           AlreadyExistsException,
@@ -143,9 +152,29 @@ public class IntegerOntology
           extends Unchangeable
           implements Term {
     private final int val;
+    private Set synonyms;
 
     public IntTerm(int val) {
+        this(val, null);
+    }
+    
+    public IntTerm(int val, Object[] synonyms) {
       this.val = val;
+            
+      this.synonyms = new TreeSet();
+      if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+    }
+
+    public void addSynonym(Object synonym) {
+        this.synonyms.add(synonym);
+    }
+        
+    public void removeSynonym(Object synonym) {
+        this.synonyms.remove(synonym);
+    }
+        
+    public Object[] getSynonyms() {
+        return this.synonyms.toArray();
     }
 
     public int intValue() {

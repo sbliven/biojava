@@ -21,6 +21,9 @@
 
 package org.biojava.ontology;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SmallAnnotation;
@@ -80,6 +83,24 @@ public interface Term extends Annotatable {
     public Ontology getOntology();
 
     /**
+     * Return the synonyms for this term.
+     */
+
+    public Object[] getSynonyms();
+
+    /**
+     * Add a synonym for this term.
+     */
+
+    public void addSynonym(Object synonym);
+
+    /**
+     * Remove a synonym for this term.
+     */
+
+    public void removeSynonym(Object synonym);
+    
+    /**
      * Simple in-memory implementation of an ontology term.
      *
      * @for.developer This can be used to implement Ontology.createTerm
@@ -92,8 +113,13 @@ public interface Term extends Annotatable {
         private final String description;
         private final Ontology ontology;
         private Annotation annotation;
+        private Set synonyms;
 
         public Impl(Ontology ontology, String name, String description) {
+            this(ontology,name,description,null);
+        }
+         
+        public Impl(Ontology ontology, String name, String description, Object[] synonyms) {
             if (name == null) {
                 throw new NullPointerException("Name must not be null");
             }
@@ -107,6 +133,21 @@ public interface Term extends Annotatable {
             this.name = name;
             this.description = description;
             this.ontology = ontology;
+
+            this.synonyms = new TreeSet();
+            if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+        }
+
+        public void addSynonym(Object synonym) {
+            this.synonyms.add(synonym);
+        }
+        
+        public void removeSynonym(Object synonym) {
+            this.synonyms.remove(synonym);
+        }
+        
+        public Object[] getSynonyms() {
+            return this.synonyms.toArray();
         }
 
         public String getName() {
