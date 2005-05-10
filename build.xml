@@ -382,6 +382,7 @@
   <target name="javadocs-taglets" depends="prepare-taglets"
   description="Create taglet API documentation">
     <javadoc
+      encoding="ISO-8859-1"
       sourcepath="${taglets.dir}"
       classpath="${classpath}:${java.home}/../lib/tools.jar"
       destdir="${build.docs.taglets}"
@@ -402,6 +403,7 @@
   <target name="javadocs-biojava" depends="prepare-biojava,compile-taglets"
   description="Creates the API documentation">
     <javadoc
+      encoding="ISO-8859-1"
       packagenames="${packages}"
       sourcepath="${src.dir}"
       classpath="${classpath}"
@@ -454,6 +456,7 @@
   <target name="javadocs-demos" depends="prepare-demos,compile-biojava,compile-taglets"
   description="Create the demos API documentation">
     <javadoc
+      encoding="ISO-8859-1"
       packagenames="**"
       sourcepath="${demos.dir}"
       classpath="${classpath}:${build.dest.biojava}"
@@ -478,6 +481,7 @@
   <target name="javadocs-apps" depends="prepare-apps,compile-biojava,compile-taglets"
   description="Create the apps API documentation">
     <javadoc
+      encoding="ISO-8859-1"
       packagenames="org.*"
       sourcepath="${apps.dir}"
       classpath="${classpath}:${build.dest.biojava}"
@@ -544,6 +548,7 @@
   <target name="doccheck-biojava" depends="prepare-biojava"
     description="Checks the API documentation">
     <javadoc
+      encoding="ISO-8859-1"
       doclet="com.sun.tools.doclets.doccheck.DocCheck"
       docletpath="doccheck.jar"
       packagenames="${packages}"
