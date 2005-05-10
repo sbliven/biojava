@@ -237,6 +237,7 @@
   <target name="compile-taglets" depends="init,prepare-taglets"
   description="Compiles the taglets directory">
     <javac
+      encoding="ISO-8859-1"
       srcdir="${taglets.dir}"
       destdir="${build.dest.taglets}"
       depend="${javac.depend}"
@@ -253,6 +254,7 @@
   <target name="compile-biojava" depends="prepare-biojava"
   description="Compiles the source directory">
     <javac
+      encoding="ISO-8859-1"
       srcdir="${src.dir}"
       destdir="${build.dest.biojava}"
       depend="${javac.depend}"
@@ -269,6 +271,7 @@
   <target name="compile-tests" depends="prepare-tests,package-biojava"
   description="Compiles the tests directory">
     <javac
+      encoding="ISO-8859-1"
       srcdir="${tests.dir}"
       destdir="${build.dest.tests}"
       depend="${javac.depend}"
@@ -286,6 +289,7 @@
   <target name="compile-demos" depends="prepare-demos,package-biojava"
   description="Compiles the demos directory">
     <javac
+      encoding="ISO-8859-1"
       srcdir="${demos.dir}"
       destdir="${build.dest.demos}"
       depend="${javac.depend}"
@@ -303,6 +307,7 @@
   <target name="compile-apps" depends="prepare-apps,package-biojava"
   description="Compiles the apps directory">
     <javac
+      encoding="ISO-8859-1"
       srcdir="${apps.dir}"
       destdir="${build.dest.apps}"
       depend="${javac.depend}"
