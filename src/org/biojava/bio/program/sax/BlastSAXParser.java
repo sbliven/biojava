@@ -47,23 +47,20 @@ import org.xml.sax.helpers.AttributesImpl;
  * NB Support for HMMER is currently only partial and likely to change
  * without notice as more functionality is added.
  *
- * Primary author -
- *                 Simon Brocklehurst (CAT)
- * Other authors  -
- *                 Tim Dilks          (CAT)
- *                 Colin Hardman      (CAT)
- *                 Stuart Johnston    (CAT)
- *                 Mathieu Wiepert    (Mayo Foundation)
- *                 Keith James        (Sanger Institute)
- *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
  *
  * This code released to the biojava project, May 2000
  * under the LGPL license.
  *
- * @author Cambridge Antibody Technology Group plc
- * @version 0.1
+ * @author Simon Brocklehurst (CAT)
+ * @author Tim Dilks          (CAT)
+ * @author Colin Hardman      (CAT)
+ * @author Stuart Johnston    (CAT)
+ * @author Mathieu Wiepert    (Mayo Foundation)
+ * @author Keith James        (Sanger Institute)
+ * @author Mark Schreiber     (NITD)
+ * @version 0.2
  *
  * @see BlastLikeSAXParser
  */
@@ -98,9 +95,8 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 
     /**
      * Creates a new <code>BlastSAXParser</code> instance.
-     *
+     * @param poNamespacePrefix the namespace prefix to use
      * @param poVersion a <code>BlastLikeVersionSupport</code> value.
-     *
      * @exception SAXException if an error occurs
      */
     BlastSAXParser(BlastLikeVersionSupport poVersion, 
@@ -125,8 +121,12 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
         this.choosePartImplementations();
     }
     /**
-     * Describe 'parse' method here.
-     *
+     * Parse the blast data and emit SAX events.
+     * @param poContents The <CODE>BufferedReader</CODE> that will read the BLAST 
+     * output
+     * @param poLine The first line of the BLAST record
+     * @throws org.xml.sax.SAXException If the input is malformed
+     * @return The last line of the BLAST data
      */
     public String parse(BufferedReader poContents, String poLine)
         throws SAXException {
@@ -149,9 +149,8 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
             //takes care of the rest...
             this.onNewBlastDataSet(poLine);
         } else {
-            //should throw excpetion here
-            //message should be unexpected poLine parameter
-            return poLine;
+            throw new SAXException("unexpected poLine parameter, expecting start of BLAST like record");
+            //return poLine;
         }
         //now parse stream...
         try {
