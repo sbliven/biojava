@@ -21,22 +21,22 @@
 
 package org.biojava.bio;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * <p>A no-frills implementation of Annotation that is just a wrapper
- * around a Map.</p>
- *
+ * around a <code>LinkedHashMap</code>.</p>
+ * 
  * <p>It will allow you to set any property, but will throw exceptions
- * if you try to retrieve a property that is not set.</p>
- *
+ * if you try to retrieve a property that is not set. Because of the use of
+ * a <code>LinkedHashMap</code> properties are iterated in the order they 
+ * are entered.</p>
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Mark Schreiber
  * @since 1.0
- *
- * @for.user
- * When you need to make a new Annotation instance and will want to populate
+ * @for.user When you need to make a new Annotation instance and will want to populate
  * it with properties, use this class.
  */
 public class SimpleAnnotation extends AbstractAnnotation {
@@ -46,13 +46,22 @@ public class SimpleAnnotation extends AbstractAnnotation {
    */
   private Map properties;
 
+  /**
+   * Get the property value pairs in this annotation
+   * @return a <code>LinkedHashMap</code> of properties and values
+   */
   protected final Map getProperties() {
     if(!propertiesAllocated()) {
-      properties = new HashMap();
+      properties = new LinkedHashMap();
     }
     return properties;
   }
 
+  /**
+   * Test to see if any properties have been allocated
+   * @return true if any have (even if they have since been removed),
+   * false otherwise
+   */
   protected final boolean propertiesAllocated() {
     return properties != null;
   }
@@ -67,9 +76,8 @@ public class SimpleAnnotation extends AbstractAnnotation {
   /**
    * Create a new SimpleAnnotation by copying the properties from another
    * one. The new Annotation instance will be independant of the original.
-   *
-   * @param ann  the Annotation to copy
-   * @throws NullPointerException if ann is null
+   * 
+   * @param ann the Annotation to copy
    */
   public SimpleAnnotation(Annotation ann) {
     super(ann);
