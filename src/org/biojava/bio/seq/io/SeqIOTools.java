@@ -76,6 +76,7 @@ public final class SeqIOTools  {
     /**
      * Get a default SequenceBuilderFactory for handling EMBL
      * files.
+     * @return a <CODE>SmartSequenceBuilder.FACTORY</CODE>
      */
     public static SequenceBuilderFactory getEmblBuilderFactory() {
         if (_emblBuilderFactory == null) {
@@ -87,6 +88,9 @@ public final class SeqIOTools  {
 
     /**
      * Iterate over the sequences in an EMBL-format stream.
+     * @param br A reader for the EMBL source or file
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
      */
     public static SequenceIterator readEmbl(BufferedReader br) {
         return new StreamReader(br,
@@ -97,6 +101,9 @@ public final class SeqIOTools  {
 
     /**
      * Iterate over the sequences in an EMBL-format stream, but for RNA.
+     * @param br A reader for the EMBL source or file
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
      */
     public static SequenceIterator readEmblRNA(BufferedReader br) {
         return new StreamReader(br,
@@ -107,6 +114,9 @@ public final class SeqIOTools  {
 
     /**
      * Iterate over the sequences in an EMBL-format stream.
+     * @param br A reader for the EMBL source or file
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
      */
     public static SequenceIterator readEmblNucleotide(BufferedReader br) {
         return new StreamReader(br,
@@ -118,6 +128,7 @@ public final class SeqIOTools  {
     /**
      * Get a default SequenceBuilderFactory for handling GenBank
      * files.
+     * @return a <code>SmartSequenceBuilder.FACTORY</code>
      */
     public static SequenceBuilderFactory getGenbankBuilderFactory() {
         if (_genbankBuilderFactory == null) {
@@ -128,7 +139,10 @@ public final class SeqIOTools  {
     }
 
     /**
-     * Iterate over the sequences in an GenBank-format stream.
+     * Iterate over the sequences in an Genbank-format stream.
+     * @param br A reader for the Genbank source or file
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
      */
     public static SequenceIterator readGenbank(BufferedReader br) {
         return new StreamReader(br,
@@ -137,6 +151,12 @@ public final class SeqIOTools  {
                                 getGenbankBuilderFactory());
     }
     
+    /**
+     * Iterate over the sequences in an GenbankXML-format stream.
+     * @param br A reader for the GenbanXML source or file
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
+     */    
     public static SequenceIterator readGenbankXml( BufferedReader br )
     {
     	return new StreamReader( br,
@@ -148,6 +168,7 @@ public final class SeqIOTools  {
     /**
     * Get a default SequenceBuilderFactory for handling Genpept
     * files.
+    * @return a <code>SmartSequenceBuilder.FACTORY</code>
     */
     public static SequenceBuilderFactory getGenpeptBuilderFactory() {
         if (_genpeptBuilderFactory == null) {
@@ -159,6 +180,9 @@ public final class SeqIOTools  {
 
     /**
     * Iterate over the sequences in an Genpept-format stream.
+    * @param br A reader for the Genpept source or file
+    * @return a <CODE>SequenceIterator</CODE> that iterates over each
+    * <CODE>Sequence</CODE> in the file
     */
     public static SequenceIterator readGenpept(BufferedReader br) {
         return new StreamReader(br,
@@ -170,6 +194,7 @@ public final class SeqIOTools  {
     /**
      * Get a default SequenceBuilderFactory for handling Swissprot
      * files.
+     * @return a <code>SmartSequenceBuilder.FACTORY</code>
      */
     public static SequenceBuilderFactory getSwissprotBuilderFactory() {
         if (_swissprotBuilderFactory == null) {
@@ -181,6 +206,9 @@ public final class SeqIOTools  {
 
     /**
      * Iterate over the sequences in an Swissprot-format stream.
+    * @param br A reader for the Swissprot source or file
+    * @return a <CODE>SequenceIterator</CODE> that iterates over each
+    * <CODE>Sequence</CODE> in the file     
      */
     public static SequenceIterator readSwissprot(BufferedReader br) {
         return new StreamReader(br,
@@ -192,6 +220,7 @@ public final class SeqIOTools  {
     /**
      * Get a default SequenceBuilderFactory for handling FASTA
      * files.
+     * @return a <code>SmartSequenceBuilder.FACTORY</code>
      */
     public static SequenceBuilderFactory getFastaBuilderFactory() {
         if (_fastaBuilderFactory == null) {
@@ -222,11 +251,11 @@ public final class SeqIOTools  {
      * use SmartSequenceBuilder.FACTORY to emulate readFasta(BufferedReader,
      * SymbolTokenization) and SmartSequenceBuilder.BIT_PACKED to force all
      * symbols to be encoded using bit-packing.
-     *
-     * @param br          the BufferedReader to read data from
-     * @param sTok        a SymbolTokenization that understands the sequences
-     * @param seqFactory  a factory used to build a SymbolList
-     * @return
+     * @param br the BufferedReader to read data from
+     * @param sTok a SymbolTokenization that understands the sequences
+     * @param seqFactory a factory used to build a SymbolList
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
      */
     public static SequenceIterator readFasta(
             BufferedReader br,
@@ -242,6 +271,9 @@ public final class SeqIOTools  {
 
     /**
      * Iterate over the sequences in an FASTA-format stream of DNA sequences.
+     * @param br the BufferedReader to read data from
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
      */
     public static SequenceIterator readFastaDNA(BufferedReader br) {
         return new StreamReader(br,
@@ -252,6 +284,9 @@ public final class SeqIOTools  {
 
     /**
      * Iterate over the sequences in an FASTA-format stream of RNA sequences.
+     * @param br the BufferedReader to read data from
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
      */
     public static SequenceIterator readFastaRNA(BufferedReader br) {
         return new StreamReader(br,
@@ -262,6 +297,9 @@ public final class SeqIOTools  {
 
     /**
      * Iterate over the sequences in an FASTA-format stream of Protein sequences.
+     * @param br the BufferedReader to read data from
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
      */
     public static SequenceIterator readFastaProtein(BufferedReader br) {
         return new StreamReader(br,
@@ -277,10 +315,13 @@ public final class SeqIOTools  {
      * rather than a reader and returns a SequenceDB rather than a
      * SequenceIterator. If the returned DB is likely to be large then
      * the above mentioned methods should be used.
-     *
+     * @return a <code>SequenceDB</code> containing all the <code>Sequences</code>
+     * in the file.
+     * @since 1.2
+     * @param seqFile The file containg the fasta formatted sequences
+     * @param alpha The <code>Alphabet</code> of the sequence, ie DNA, RNA etc
      * @throws BioException if problems occur during reading of the
      * stream.
-     * @since 1.2
      */
     public static SequenceDB readFasta(InputStream seqFile, Alphabet alpha)
         throws BioException {
@@ -308,9 +349,10 @@ public final class SeqIOTools  {
 
     /**
      * Write a sequenceDB to an output stream in fasta format.
-     *
-     * @throws IOException if there was an error while writing.
      * @since 1.2
+     * @param os the stream to write the fasta formatted data to.
+     * @param db the database of <code>Sequence</code>s to write
+     * @throws IOException if there was an error while writing.
      */
     public static void writeFasta(OutputStream os, SequenceDB db)
         throws IOException {
@@ -322,9 +364,11 @@ public final class SeqIOTools  {
      * Writes sequences from a SequenceIterator to an OutputStream in
      * Fasta Format.  This makes for a useful format filter where a
      * StreamReader can be sent to the StreamWriter after formatting.
-     *
-     * @throws IOException if there was an error while writing.
+     * 
      * @since 1.2
+     * @param os The stream to write fasta formatted data to
+     * @param in The source of input <code>Sequences</code>
+     * @throws IOException if there was an error while writing.
      */
     public static void writeFasta(OutputStream os, SequenceIterator in)
         throws IOException {
@@ -371,9 +415,10 @@ public final class SeqIOTools  {
     /**
      * Writes a stream of Sequences to an OutputStream in SwissProt
      * format.
-     *
      * @param os the OutputStream.
      * @param in a SequenceIterator.
+     * @throws org.biojava.bio.BioException if the <CODE>Sequence</CODE> cannot be converted to SwissProt
+     * format
      * @exception IOException if there was an error while writing.
      */
     public static void writeSwissprot(OutputStream os, SequenceIterator in)
@@ -387,9 +432,9 @@ public final class SeqIOTools  {
 
     /**
      * Writes a single Sequence to an OutputStream in SwissProt format.
-     *
-     * @param os  the OutputStream.
-     * @param seq  the Sequence.
+     * @param os the OutputStream.
+     * @param seq the Sequence.
+     * @throws org.biojava.bio.BioException if the <CODE>Sequence</CODE> cannot be written to SwissProt format
      * @throws IOException if there was an error while writing.
      */
     public static void writeSwissprot(OutputStream os, Sequence seq)
@@ -400,9 +445,9 @@ public final class SeqIOTools  {
     /**
      * Writes a stream of Sequences to an OutputStream in Genpept
      * format.
-     *
      * @param os the OutputStream.
      * @param in a SequenceIterator.
+     * @throws org.biojava.bio.BioException if the <CODE>Sequence</CODE> cannot be written to Genpept format
      * @exception IOException if there was an error while writing.
      */
     public static void writeGenpept(OutputStream os, SequenceIterator in)
@@ -416,9 +461,9 @@ public final class SeqIOTools  {
 
     /**
      * Writes a single Sequence to an OutputStream in Genpept format.
-     *
-     * @param os  the OutputStream.
-     * @param seq  the Sequence.
+     * @param os the OutputStream.
+     * @param seq the Sequence.
+     * @throws org.biojava.bio.BioException if the <CODE>Sequence</CODE> cannot be written to Genpept format
      * @throws IOException if there was an error while writing.
      */
     public static void writeGenpept(OutputStream os, Sequence seq)
@@ -704,9 +749,12 @@ public final class SeqIOTools  {
      * use with the functions below that take an int fileType as a
      * parameter. EMBL and Genbank files are assumed to contain DNA
      * sequence.
-     *
      * @deprecated because there is no standard file naming convention
      * and guessing by file name is inherantly error prone and bad.
+     * @param seqFile the <CODE>File</CODE> to read from.
+     * @throws java.io.IOException if <CODE>seqFile</CODE> cannot be read
+     * @throws java.io.FileNotFoundException if <CODE>seqFile</CODE> cannot be found
+     * @return a value that describes the file type.
      */
     public static int guessFileType(File seqFile)
         throws IOException, FileNotFoundException {
@@ -864,6 +912,12 @@ public final class SeqIOTools  {
      * Reads a file and returns the corresponding Biojava object. You
      * need to cast it as an Alignment or a SequenceIterator as
      * appropriate.
+     * @param fileType a value that describes the file type
+     * @param br the reader for the input
+     * @throws org.biojava.bio.BioException if the file cannot be parsed
+     * @return either a <code>SequenceIterator</code> if the file type is a 
+     * sequence file, or a <code>Alignment</code> if the file is a sequence
+     * alignment.
      */
     public static Object fileToBiojava(int fileType, BufferedReader br)
         throws BioException {
@@ -920,6 +974,17 @@ public final class SeqIOTools  {
 
     /**
      * Converts a Biojava object to the given filetype.
+     * @param fileType a value that describes the type of sequence file
+     * @param os the stream to write the formatted results to
+     * @param biojava a <code>SequenceIterator</code>, <code>SequenceDB</code>, 
+     * <code>Sequence</code>, or <code>Alignment</code>
+     * @throws org.biojava.bio.BioException if <code>biojava</code> cannot be 
+     * converted to that format.
+     * @throws java.io.IOException if the output cannot be written to 
+     * <code>os</code>
+     * @throws org.biojava.bio.symbol.IllegalSymbolException if <code>biojava
+     * </code> contains a <code>Symbol</code> that cannot be understood by the
+     * parser.
      */
     public static void biojavaToFile(int fileType, OutputStream os,
                                      Object biojava)
