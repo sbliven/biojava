@@ -364,7 +364,7 @@ public final class RestrictionEnzymeManager
                 new RegexSplitter(Pattern.compile("([^,]+)"), 1);
             // Create site value splitter
             RegexSplitter site =
-                new RegexSplitter(Pattern.compile("(\\(-?\\d/-?\\d+\\)|[A-Za-z^]+)"), 1);
+                new RegexSplitter(Pattern.compile("(\\(-?\\d+/-?\\d+\\)|[A-Za-z^]+)"), 1);
 
             ChangeTable table = new ChangeTable();
             table.setSplitter(REBASE_TAG_ISZR, iso);
