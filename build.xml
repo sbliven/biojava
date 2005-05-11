@@ -81,6 +81,7 @@
 
     <!-- Echo information -->
     <echo message="Building biojava-${version}" />
+    <echo message="Java Home:                       ${java.home}"/>
     <echo message="JUnit present:                   ${junit.present}" />
     <echo message="JUnit supported by Ant:          ${junit.support}" />
     <echo message="HSQLDB driver present:           ${sqlDriver.hsqldb}" />
