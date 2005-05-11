@@ -35,7 +35,7 @@ import org.biojava.utils.ChangeVetoException;
 
 /**
  * A utility class to ease the problem of implementing an Annotation to that of
- * providing an apropreate implementation of Map.
+ * providing an apropreate implementation of Map. Where possible implementations
  *
  * @author Matthew Pocock
  * @author Greg Cox
@@ -47,7 +47,10 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @for.developer If you are still reading this, then you must be trying to
  * implement Annotation. To do that, extend this class and implement
- * <code>getProperties()</code> and <code>propertiesAllocated()</code>.
+ * <code>getProperties()</code> and <code>propertiesAllocated()</code>. 
+ * Where possible implementations should be backed with a 
+ * <code>LinkedHashMap</code> or similar so properties are iterated in the order
+ * they were added.
  *
  * @since 1.0
  */
@@ -64,7 +67,10 @@ public abstract class AbstractAnnotation
    *
    * From code in the 1.2 version of AbstractAnnotation
    * @for.developer This is required for the implementation of an Annotation that
-   *            extends AbstractAnnotation
+   *            extends AbstractAnnotation. Where possible implementations 
+   *            should be backed with a 
+   *            <code>LinkedHashMap</code> or similar so properties are iterated in the order
+   *            they were added.
    *
    * @return a Map containing all properties
    */
@@ -191,7 +197,6 @@ public abstract class AbstractAnnotation
    * </p>
    *
    * @param ann  the Annotation to copy
-   * @throws NullPointerException  if ann is null
    */
   protected AbstractAnnotation(Annotation ann) {
     if(ann == null) {
@@ -244,6 +249,9 @@ public abstract class AbstractAnnotation
   }
 
   public boolean equals(Object o) {
+    if(o == this){
+        return true;
+    }
     if (! (o instanceof Annotation)) {
       return false;
     }
