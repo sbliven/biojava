@@ -39,9 +39,9 @@ import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.db.SequenceDB;
 
 /**
- * <p>FeatureTree is GUI tree to display the features and annotations
+ * FeatureTree is GUI tree to display the features and annotations
  * of the sequences in a <code>SequenceDB</code> Nested Features are
- * displayed as expandable leaves.<p>
+ * displayed as expandable leaves.
  *
  * <p>Copyright:    Copyright (c) 2002</p>
  * <p>Company:      AgResearch</p>
@@ -54,6 +54,9 @@ public class FeatureTree extends JTree{
   private String root = "DB";
   private ArrayList seqs = new ArrayList();
 
+  /**
+   * Create a new FeatureTree
+   */
   public FeatureTree() {
     super();
     this.setModel(new FeatureModel(root));
@@ -61,6 +64,8 @@ public class FeatureTree extends JTree{
 
   /**
    * Use this method to provide the sequences for the tree to work with.
+   * @param db A database of <CODE>Sequence</CODE>s to display
+   * @throws org.biojava.bio.BioException if information cannot be retrieved from <CODE>db</CODE>
    */
   public void setSequenceDB(SequenceDB db) throws BioException{
     for(SequenceIterator i = db.sequenceIterator(); i.hasNext();){
