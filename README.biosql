@@ -42,6 +42,14 @@ it will automatically regenerate the core_ontology.
 MYSQL Note:
 The name field in the term table must have the attribute BINARY set.  This allows for case
 sensitive matching which is required within the ontology code.
+
+POSTGRESQL Note:
+For setup information specific to POSTGRESQL have a look at
+http://www.biojava.org/tutorials/biosql.html
+
+ORACLE Note:
+For setup information specific to ORACLE have a look at 
+http://www.biojava.org/docs/bj_in_anger/bj_and_bsql_oracle_howto.htm
 	
 Mail the BioJava mailing list (biojava-l@biojava.org) for more details.
 
