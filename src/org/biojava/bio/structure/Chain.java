@@ -24,6 +24,7 @@
 package org.biojava.bio.structure;
 
 import java.util.ArrayList ;
+import org.biojava.bio.Annotation;
 
 /**
  * Defines the interface for a Chain.
@@ -77,6 +78,20 @@ public interface Chain {
 
     public int getLengthAminos();
 
+    
+    /** get/set the Annotation of a Chain.
+     *  allows to annotate a protein chain, e.g. molecule description "AZURIN" for pdb 1a4a.A
+     *  @param Annotation to be provided.
+     *  
+     */
+    public void setAnnotation(Annotation anno);
+    
+    /** get/set the Annotation of a Chain.
+     *  allows to annotate a protein chain, e.g. molecule description "AZURIN" for pdb 1a4a.A
+     *  @return the Annotation of this chain
+     */
+    public Annotation getAnnotation();
+    
     /** get and set the name of this chain (Chain id in PDB file ).
      * @param name  a String specifying the name value
      * @see #getName

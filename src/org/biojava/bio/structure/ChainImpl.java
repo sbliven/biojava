@@ -28,6 +28,7 @@ import java.util.ArrayList ;
 import java.util.List;
 
 import org.biojava.bio.structure.AminoAcid;
+import org.biojava.bio.Annotation;
 
 /**
  * A Chain in a PDB file. It contains several groups which can be of
@@ -40,7 +41,7 @@ public class ChainImpl implements Chain {
     String swissprot_id ; 
     String name ; // like in PDBfile
     ArrayList groups;
-	
+	Annotation annotation ;
     /**
      *  Constructs a ChainImpl object.
      */
@@ -49,6 +50,9 @@ public class ChainImpl implements Chain {
 	// TODO Auto-generated constructor stub
 	name = "";
 	groups = new ArrayList() ;
+	
+	Annotation anno = Annotation.EMPTY_ANNOTATION;
+	
     }
 
 
@@ -68,6 +72,15 @@ public class ChainImpl implements Chain {
 	}
 	
 	return n ;
+    }
+    
+    
+    public void setAnnotation(Annotation anno){
+        annotation = anno;
+    }
+    
+    public Annotation getAnnotation(){
+        return annotation;
     }
 
     /** set the Swissprot id of this chains .
