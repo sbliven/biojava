@@ -223,7 +223,9 @@ public abstract class AbstractOrderNDistribution extends AbstractDistribution
   }
   
   private class UniformNullModel
-  extends AbstractDistribution implements Serializable {
+  extends AbstractDistribution implements Serializable 
+  {
+    private static final long serialVersionUID = -3357793043843515032L;
     private Distribution nullModel = new UniformDistribution(
       (FiniteAlphabet) lastA
     );

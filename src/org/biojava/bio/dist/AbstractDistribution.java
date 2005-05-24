@@ -22,25 +22,16 @@
 
 package org.biojava.bio.dist;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.Annotation;
 import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.AlphabetIndex;
-import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.AtomicSymbol;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.*;
-import java.util.*;
 
 /**
  * An abstract implementation of Distribution.
@@ -312,5 +303,39 @@ public abstract class AbstractDistribution
    */
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
+  }
+  
+  public int hashCode() {
+      int hc = 0;
+      try {
+          for (Iterator i = ((FiniteAlphabet) getAlphabet()).iterator(); i.hasNext(); ) {
+              Symbol s = (Symbol) i.next();
+              hc = hc ^ (int) (getWeight(s) * (1 << 30));
+          }
+      } catch (IllegalSymbolException ex) {
+          throw new BioError("Assertion failed", ex);
+      }
+      return hc;
+  }
+  
+  public boolean equals(Object o) {
+      if (o instanceof Distribution) {
+          Distribution d = (Distribution) o;
+          if (d.getAlphabet() != this.getAlphabet()) {
+              return false;
+          }
+          try {
+              for (Iterator i = ((FiniteAlphabet) getAlphabet()).iterator(); i.hasNext(); ) {
+                  Symbol s = (Symbol) i.next();
+                  if (this.getWeight(s) != d.getWeight(s)) {
+                      return false;
+                  }
+              }
+              return true;
+          } catch (IllegalSymbolException ex) {
+              throw new BioError(ex);
+          }
+      }
+      return false;
   }
 }
