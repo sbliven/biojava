@@ -91,6 +91,7 @@ public class EmblLikeFormat implements
   protected static final String COORDINATE_TAG = "RP";
   protected static final String REF_ACCESSION_TAG = "RX";
   protected static final String AUTHORS_TAG = "RA";
+  protected static final String REF_XREF_TAG = "RX";
   protected static final String TITLE_TAG = "RT";
   protected static final String JOURNAL_TAG = "RL";
   protected static final String COMMENT_TAG = "CC";

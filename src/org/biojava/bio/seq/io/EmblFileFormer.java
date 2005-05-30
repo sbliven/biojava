@@ -74,6 +74,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         NON_SEPARATED_TAGS.add(EmblLikeFormat.TITLE_TAG);
         NON_SEPARATED_TAGS.add(EmblLikeFormat.FEATURE_TAG);
         NON_SEPARATED_TAGS.add(EmblLikeFormat.JOURNAL_TAG);//Lorna: added
+        NON_SEPARATED_TAGS.add(EmblLikeFormat.REF_XREF_TAG);//RichardH: added
         NON_SEPARATED_TAGS.add(EmblLikeFormat.SEPARATOR_TAG);//Lorna: added
     }
 

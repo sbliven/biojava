@@ -42,6 +42,7 @@ public class EmblReferenceComparator implements Comparator {
         tagOrder.add(EmblLikeFormat.AUTHORS_TAG);
         tagOrder.add(EmblLikeFormat.TITLE_TAG);
         tagOrder.add(EmblLikeFormat.JOURNAL_TAG);
+        tagOrder.add(EmblLikeFormat.REF_XREF_TAG);
         tagOrder.add(EmblLikeFormat.SEPARATOR_TAG);
     }
 

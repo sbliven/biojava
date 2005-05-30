@@ -212,6 +212,12 @@ public class GenbankXmlFormat extends GenbankFormat
                 listener.addSequenceProperty( TITLE_TAG, title );
             
             listener.addSequenceProperty( JOURNAL_TAG, reference.getJournal() );
+            
+            // Added by RichardH to include Medline/Pubmed refs.
+            String pubmed = reference.getPubmed();
+            if (pubmed!=null) listener.addSequenceProperty(PUBMED_TAG, pubmed);
+            String medline = reference.getMedline();
+            if (medline!=null) listener.addSequenceProperty(MEDLINE_TAG, medline);
         }
     }
     

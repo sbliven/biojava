@@ -69,6 +69,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer osb = null;
     private StringBuffer ocb = null;
     private StringBuffer ccb = null;
+    private Object rfb = null;
     private StringBuffer ftb = new StringBuffer();
 
     // Locusline buffers
@@ -190,7 +191,15 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
             if (osb != null) {stream.println(osb); }
             if (ocb != null) {stream.println(ocb); }
             if (ccb != null) {stream.println(ccb); }
-
+            if (rfb != null) {//RichardH
+                if (rfb instanceof List) {
+                    Iterator i = ((List)rfb).iterator();
+                    while (i.hasNext()) { stream.println((StringBuffer)i.next()); } 
+                } else {
+                    stream.println(rfb); 
+                }
+            } 
+            
             if (ftb.length() != 0)
             {
                 ftb.insert(0, "FEATURES             Location/Qualifiers" + nl);
@@ -335,6 +344,124 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
                 ub.append(value);
             }
             acb = new StringBuffer(ub.substring(0));
+        }
+        // GenBank-style References by RichardH
+        // FIXME: (rh) Understand EMBL-style references and ReferenceAnnotation objects here too.
+        else if (key.equals("REFERENCE")) {
+            if (value instanceof List) {
+                List rfbs = new ArrayList();
+                List refs = (List)value;
+                Iterator i = refs.iterator();
+                int count = 1;
+                while (i.hasNext()) {
+                    String v = (String)i.next();
+                    StringBuffer rfb1 = new StringBuffer(sequenceBufferCreator("REFERENCE  ",v));
+                    rfbs.add(rfb1);
+                }
+                rfb = rfbs;
+            } else {
+                rfb = new StringBuffer(sequenceBufferCreator("REFERENCE  ",value));
+            }
+        }
+        else if (key.equals("AUTHORS")) {            
+            if (value instanceof List) {
+                List rfbs = (List)rfb;
+                List refs = (List)value;
+                Iterator i = refs.iterator();
+                Iterator j = rfbs.iterator();
+                int count = 1;
+                while (i.hasNext()) {
+                    String v = (String)i.next();
+                    StringBuffer rfb1 = (StringBuffer)j.next();
+                    rfb1.append("\n"+sequenceBufferCreator("  AUTHORS  ",v));
+                }
+            } else {                
+                if (rfb instanceof List) {
+                    ((StringBuffer)((List)rfb).get(0)).append("\n"+sequenceBufferCreator("  AUTHORS  ",value));
+                } else {                 
+                    ((StringBuffer)rfb).append("\n"+sequenceBufferCreator("  AUTHORS  ",value));
+                }
+            }
+        }
+        else if (key.equals("TITLE")) {            
+            if (value instanceof List) {
+                List rfbs = (List)rfb;
+                List refs = (List)value;
+                Iterator i = refs.iterator();
+                Iterator j = rfbs.iterator();
+                int count = 1;
+                while (i.hasNext()) {
+                    String v = (String)i.next();
+                    StringBuffer rfb1 = (StringBuffer)j.next();
+                    rfb1.append("\n"+sequenceBufferCreator("  TITLE    ",v));
+                }
+            } else {                
+                if (rfb instanceof List) {
+                    ((StringBuffer)((List)rfb).get(0)).append("\n"+sequenceBufferCreator("  TITLE    ",value));
+                } else {                 
+                    ((StringBuffer)rfb).append("\n"+sequenceBufferCreator("  TITLE    ",value));
+                }
+            }
+        }
+        else if (key.equals("JOURNAL")) {            
+            if (value instanceof List) {
+                List rfbs = (List)rfb;
+                List refs = (List)value;
+                Iterator i = refs.iterator();
+                Iterator j = rfbs.iterator();
+                int count = 1;
+                while (i.hasNext()) {
+                    String v = (String)i.next();
+                    StringBuffer rfb1 = (StringBuffer)j.next();
+                    rfb1.append("\n"+sequenceBufferCreator("  JOURNAL  ",v));
+                }
+            } else {                
+                if (rfb instanceof List) {
+                    ((StringBuffer)((List)rfb).get(0)).append("\n"+sequenceBufferCreator("  JOURNAL  ",value));
+                } else {                 
+                    ((StringBuffer)rfb).append("\n"+sequenceBufferCreator("  JOURNAL  ",value));
+                }
+            }
+        }
+        else if (key.equals("PUBMED")) {            
+            if (value instanceof List) {
+                List rfbs = (List)rfb;
+                List refs = (List)value;
+                Iterator i = refs.iterator();
+                Iterator j = rfbs.iterator();
+                int count = 1;
+                while (i.hasNext()) {
+                    String v = (String)i.next();
+                    StringBuffer rfb1 = (StringBuffer)j.next();
+                    rfb1.append("\n"+sequenceBufferCreator("  PUBMED   ",v));
+                }
+            } else {                
+                if (rfb instanceof List) {
+                    ((StringBuffer)((List)rfb).get(0)).append("\n"+sequenceBufferCreator("  PUBMED   ",value));
+                } else {                 
+                    ((StringBuffer)rfb).append("\n"+sequenceBufferCreator("  PUBMED   ",value));
+                }
+            }
+        }
+        else if (key.equals("MEDLINE")) {            
+            if (value instanceof List) {
+                List rfbs = (List)rfb;
+                List refs = (List)value;
+                Iterator i = refs.iterator();
+                Iterator j = rfbs.iterator();
+                int count = 1;
+                while (i.hasNext()) {
+                    String v = (String)i.next();
+                    StringBuffer rfb1 = (StringBuffer)j.next();
+                    rfb1.append("\n"+sequenceBufferCreator("  MEDLINE  ",v));
+                }
+            } else {                
+                if (rfb instanceof List) {
+                    ((StringBuffer)((List)rfb).get(0)).append("\n"+sequenceBufferCreator("  MEDLINE  ",value));
+                } else {                 
+                    ((StringBuffer)rfb).append("\n"+sequenceBufferCreator("  MEDLINE  ",value));
+                }
+            }
         }
     }
 

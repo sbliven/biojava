@@ -74,6 +74,8 @@ public class GenbankFormat
     protected static final String AUTHORS_TAG = "AUTHORS";
     protected static final String TITLE_TAG = "TITLE";
     protected static final String JOURNAL_TAG = "JOURNAL";
+    protected static final String PUBMED_TAG = "PUBMED";
+    protected static final String MEDLINE_TAG = "MEDLINE";
     protected static final String COMMENT_TAG = "COMMENT";
     protected static final String FEATURE_TAG = "FEATURES";
     protected static final String FEATURE_FLAG = "FT";

@@ -69,6 +69,7 @@ public final class GenEmblPropertyComparator implements Comparator
         tagOrder.add(EmblLikeFormat.AUTHORS_TAG);
         tagOrder.add(EmblLikeFormat.TITLE_TAG);
         tagOrder.add(EmblLikeFormat.JOURNAL_TAG);
+        tagOrder.add(EmblLikeFormat.REF_XREF_TAG);
         tagOrder.add(EmblLikeFormat.COMMENT_TAG);
         tagOrder.add(EmblLikeFormat.FEATURE_TAG);
 
@@ -90,6 +91,8 @@ public final class GenEmblPropertyComparator implements Comparator
         tagOrder.add(GenbankFormat.AUTHORS_TAG);
         tagOrder.add(GenbankFormat.TITLE_TAG);
         tagOrder.add(GenbankFormat.JOURNAL_TAG);
+        tagOrder.add(GenbankFormat.PUBMED_TAG);
+        tagOrder.add(GenbankFormat.MEDLINE_TAG);
         tagOrder.add(GenbankFormat.COMMENT_TAG);
         tagOrder.add(GenbankFormat.FEATURE_TAG);
     }
