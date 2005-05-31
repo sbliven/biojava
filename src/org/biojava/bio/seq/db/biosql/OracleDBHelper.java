@@ -196,7 +196,7 @@ public class OracleDBHelper extends DBHelper {
             Method putString = clob.getDeclaredMethod("putString",new Class[]{long.class,String.class});
             // Only get here if we have some data to write.
             if (value==null) value=""; // To stop null pointer exceptions. End result is the same.
-            putString.invoke(rs.getClob(column), new Object[]{Long.valueOf(1L),value});
+            putString.invoke(rs.getClob(column), new Object[]{new Long(1L),value});
         } catch (Exception ex) {
             throw new BioRuntimeException(ex);
         }
