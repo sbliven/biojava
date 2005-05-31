@@ -95,12 +95,12 @@ public class MSFAlignmentFormat
         int startOfData = 0;                    //the start of the sequence data in the line
         int currSeqCount = 0;                   //which sequence data you are currently trying to get
         try {
-            Pattern mtc = Pattern.compile("Name:\\s+(.*?)\\s+(oo|Len:)");
+            Pattern mtc = Pattern.compile("(Name:|NAME:)\\s+(.*?)\\s+(oo|OO|Len:|LEN:)");
             Pattern removewhitespace = Pattern.compile("\\s");
             // REMatch rem = null;
             String line = reader.readLine();
             //parse past header
-            while (line.indexOf("Name:") == -1) {
+            while (line.toUpperCase().indexOf("NAME:") == -1) {
                 line = reader.readLine();
             }
             //read each name (between Name:   and Len:
@@ -116,7 +116,7 @@ public class MSFAlignmentFormat
                 if ((line.trim()).length() == 0) {
                     break;
                 }
-                sequenceName = matcher.group(1).trim();
+                sequenceName = matcher.group(2).trim();
                 sequenceNames.add(sequenceName);
 
                 line = reader.readLine();
