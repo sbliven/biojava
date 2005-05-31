@@ -46,7 +46,7 @@
     <tstamp />
     <property name="version" value="live" />
 
-    <property name="build.compiler" value="modern" />
+    <property name="build.compiler" value="javac1.4" />
 
     <property name="classpath" value="bytecode.jar:commons-cli.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar" />
 
@@ -108,6 +108,7 @@
     <property name="javac.debug" value="true" />
     <property name="javac.deprecation" value="false" />
     <property name="javac.source" value="1.4" />
+    <property name="javac.target" value="1.4" />
 
     <!-- Javadoc properties -->
     <property name="build.dest.docs" value="${build.dir}/docs" />
@@ -244,6 +245,7 @@
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
       source="${javac.source}"
+      target="${javac.target}"
       debug="${javac.debug}">
       <classpath>
         <pathelement path="${classpath}" />
@@ -261,6 +263,7 @@
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
       source="${javac.source}"
+      target="${javac.target}"
       debug="${javac.debug}">
       <classpath>
         <pathelement path="${classpath}" />
@@ -278,6 +281,7 @@
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
       source="${javac.source}"
+      target="${javac.target}"
       debug="${javac.debug}">
       <classpath>
         <pathelement path="${classpath}" />
@@ -296,6 +300,7 @@
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
       source="${javac.source}"
+      target="${javac.target}"
       debug="${javac.debug}">
       <classpath>
         <pathelement path="${classpath}" />
@@ -314,6 +319,7 @@
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
       source="${javac.source}"
+      target="${javac.target}"
       debug="${javac.debug}">
       <classpath>
         <pathelement path="${classpath}" />
@@ -413,8 +419,8 @@
       version="true"
       use="true"
       source="1.4"
-      windowtitle="${Name.biojava} API"
-      doctitle="${Name.biojava}"
+      windowtitle="${Name.biojava}-${version} API"
+      doctitle="${Name.biojava}-${version}"
       maxmemory="96m">
        <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
 
