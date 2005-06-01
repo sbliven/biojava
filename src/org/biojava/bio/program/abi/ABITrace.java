@@ -86,7 +86,7 @@ public class ABITrace
 
 /**
  * The File constructor opens a local ABI file and parses the content.
- * @param <code>ABIFile</code> is a <code>java.io.File</code> on the local file system.
+ * @param ABIFile is a <code>java.io.File</code> on the local file system.
  * @throws IOException if there is a problem reading the file.
  * @throws IllegalArgumentException if the file is not a valid ABI file.
  */
@@ -108,7 +108,7 @@ public class ABITrace
 
 /**
  * The URL constructor opens an ABI file from any URL.
- * @param <code>ABIFile</code> is a <code>java.net.URL</code> for an ABI trace file.
+ * @param ABIFile is a <code>java.net.URL</code> for an ABI trace file.
  * @throws IOException if there is a problem reading from the URL.
  * @throws IllegalArgumentException if the URL does not contain a valid ABI file.
  */

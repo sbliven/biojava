@@ -227,7 +227,7 @@ public class PairwiseOverlayRenderer extends AbstractChangeable
      * they were added and the first renderer to accept the event will
      * return.
      *
-     * @param prc a <code>PairwiseRenderContext</code>.
+     * @param context a <code>PairwiseRenderContext</code>.
      * @param me a <code>MouseEvent</code> that caused the request.
      * @param path a <code>List</code> of
      * <code>PairwiseSequenceRenderer</code> instances passed through

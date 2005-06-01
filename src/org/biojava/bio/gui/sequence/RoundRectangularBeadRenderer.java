@@ -87,7 +87,7 @@ public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
      * <code>renderBead</code> renders features as a rectangle with
      * rounded corners.
      *
-     * @param g22 a <code>Graphics2D</code>.
+     * @param g2 a <code>Graphics2D</code>.
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */

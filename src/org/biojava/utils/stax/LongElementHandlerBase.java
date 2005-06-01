@@ -81,7 +81,7 @@ public abstract class LongElementHandlerBase extends StAXContentHandlerBase {
    * <p>
    * This method will be invoked by endElement with the fully parsed long.
    *
-   * @param long  the fully parsed long
+   * @param val  the fully parsed long
    * @throws SAXException if for any reason the long is not palatable
    */
   protected abstract void setLongValue(long val) throws SAXException;

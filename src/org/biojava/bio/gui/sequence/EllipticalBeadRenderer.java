@@ -92,7 +92,7 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
     /**
      * <code>renderBead</code> renders features as simple ellipse.
      *
-     * @param g a <code>Graphics2D</code> context.
+     * @param g2 a <code>Graphics2D</code> context.
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
@@ -175,7 +175,7 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
      * long dimension to short dimension of the bead. This should be
      * equal, or greater than 1.
      *
-     * @param depth a <code>double</code>.
+     * @param ratio a <code>double</code> ratio of depth.
      *
      * @exception ChangeVetoException if an error occurs.
      */

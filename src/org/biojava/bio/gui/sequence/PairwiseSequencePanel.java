@@ -687,8 +687,6 @@ public class PairwiseSequencePanel extends JComponent
     /**
      * <code>setRenderer</code> sets the current
      * <code>PairwiseSequenceRenderer</code>.
-     *
-     * @return a <code>PairwiseSequenceRenderer</code>.
      */
     public void setRenderer(PairwiseSequenceRenderer renderer)
         throws ChangeVetoException
@@ -788,7 +786,7 @@ public class PairwiseSequencePanel extends JComponent
      * <code>graphicsToSequence</code> converts a graphical position
      * to a sequence index.
      *
-     * @param graphicsPos a <code>double</code>.
+     * @param point a graphic position.
      *
      * @return an <code>int</code>.
      */

@@ -41,7 +41,7 @@ public interface SymbolStyle {
   /**
    * Return the outline paint for a symbol.
    *
-   * @param r the symbol to outline
+   * @param s the symbol to outline
    * @return the Paint to use
    * @throws IllegalSymbolException if this SymbolStyle can not handle the
    *         symbol
@@ -51,7 +51,7 @@ public interface SymbolStyle {
   /**
    * Return the fill paint for a symbol.
    *
-   * @param r the symbol to fill
+   * @param s the symbol to fill
    * @return the Paint to use
    * @throws IllegalSymbolException if this SymbolStyle can not handle the
    *         symbol

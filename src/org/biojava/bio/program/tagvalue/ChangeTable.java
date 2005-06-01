@@ -67,7 +67,7 @@ public class ChangeTable {
    * Set the Splitter to be used for all values of a particular tag.
    *
    * @param tag the tag Object which will have all values split
-   * @param changer the Splitter used to split the values
+   * @param splitter the Splitter used to split the values
    */
   public void setSplitter(Object tag, Splitter splitter) {
     splitters.put(tag, splitter);

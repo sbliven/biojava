@@ -139,11 +139,11 @@ public class GAMESeqHandler
     }
 
 
-    /**
-     *  Description of the Method
-     *
-     *@param  buffer  Description of the Parameter
-     */
+//    /**
+//     *  Description of the Method
+//     *
+//     *@param  buffer  Description of the Parameter
+//     */
 //    public void returnSequenceBuffer(byte[] buffer) {
 //        this.buffer = buffer;
 //    }

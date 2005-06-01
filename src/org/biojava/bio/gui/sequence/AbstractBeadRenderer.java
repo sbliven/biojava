@@ -181,7 +181,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * graphics context. The rendering may be delegated to another
      * <code>FeatureRenderer</code> instance.
      *
-     * @param g a <code>Graphics2D</code> context.
+     * @param g2 a <code>Graphics2D</code> context.
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
@@ -460,7 +460,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     /**
      * <code>setBeadStroke</code> sets the bead outline stroke.
      *
-     * @param outline a <code>Stroke</code>.
+     * @param stroke a <code>Stroke</code>.
      *
      * @exception ChangeVetoException if an error occurs.
      */

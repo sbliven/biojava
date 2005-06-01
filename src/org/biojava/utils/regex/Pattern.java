@@ -44,7 +44,7 @@ public class Pattern
 
     /**
      * Creates a matcher that will match the given input against this pattern.
-     * @param input SymbolList against which match is to be made.
+     * @param sl SymbolList against which match is to be made.
      * @return A new matcher for this pattern.
      */
     public org.biojava.utils.regex.Matcher matcher(SymbolList sl)

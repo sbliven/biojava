@@ -61,7 +61,7 @@ public abstract class NestedKernel implements SVMKernel, Serializable {
   /**
    * Retrieve the currently nested <span class="type">SVMKernel</span>.
    *
-   * @param the nested <span class="type">SVMKernel</span>
+   * @return the nested <span class="type">SVMKernel</span>
    */
   public SVMKernel getNestedKernel() {
     return nested;

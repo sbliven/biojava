@@ -190,7 +190,7 @@ public class EmblCDROMIndexStore implements IndexStore
      * when their getFile() method is called. This value defaults to
      * the empty abstract path.
      *
-     * @param prefix a <code>File</code> prefix specifying the
+     * @param pathPrefix a <code>File</code> prefix specifying the
      * abstract path to append.
      */
     public void setPathPrefix(File pathPrefix)

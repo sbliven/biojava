@@ -89,7 +89,7 @@ public abstract class DoubleElementHandlerBase extends StAXContentHandlerBase {
    * This method will be invoked by endElement with the fully parsed double.
    * </p>
    *
-   * @param double  the fully parsed double
+   * @param val the fully parsed double
    * @throws SAXException if for any reason the double is not palatable
    */
   protected abstract void setDoubleValue(double val) throws SAXException;

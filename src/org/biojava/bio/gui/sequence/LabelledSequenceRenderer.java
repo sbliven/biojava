@@ -51,6 +51,7 @@ import org.biojava.utils.*;
  * @author Kalle Naslund
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Andreas Prlic
  * @since 1.3
  */
 
@@ -259,24 +260,24 @@ public class LabelledSequenceRenderer extends AbstractChangeable implements Sequ
 
     
     /** Set the background color of the label area. 
-     * @author Andreas Prlic */
+     *  */
     public void setFillColor(Color c){
         fillColor = c;
     }
     /** Get the background color of the label area. 
-     * @author Andreas Prlic*/
+     * */
     public Color getFillColor(){
         return fillColor;
     }
     
     /** Set the color of the label text 
-     * @author Andreas Prlic*/
+     * */
     public void setTextColor (Color c) {
         textColor = c;
     }
     
     /** Get the color of the label text 
-     * @author Andreas Prlic*/
+     * */
     public Color getTextColor() {
         return textColor;
     }

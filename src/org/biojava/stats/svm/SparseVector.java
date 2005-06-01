@@ -243,7 +243,7 @@ public class SparseVector implements Serializable {
       /**
        * Set the normalizing vector.
        *
-       * @param the new normalizing vector
+       * @param nv the new normalizing vector
        */
       public void setNormalizingVector(SparseVector nv) {
         s = nv;

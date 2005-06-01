@@ -270,7 +270,7 @@ public class ClassifierExample {
      * <p>
      * The shape should be positioned so that 0, 0 is the center or focus.
      *
-     * @param posShape the Shape to use
+     * @param negShape the Shape to use
      */
     public void setNegShape(Shape negShape) {
       firePropertyChange("negShape", this.negShape, negShape);

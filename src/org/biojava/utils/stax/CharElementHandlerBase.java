@@ -90,7 +90,7 @@ public abstract class CharElementHandlerBase extends StAXContentHandlerBase {
    * This method will be invoked by endElement with the fully parsed char.
    * </p>
    *
-   * @param char  the fully parsed char
+   * @param val  the fully parsed char
    * @throws SAXException if for any reason the char is not palatable
    */
   protected abstract void setCharValue(char val) throws SAXException;

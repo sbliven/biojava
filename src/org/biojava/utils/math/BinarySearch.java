@@ -39,7 +39,7 @@ public class BinarySearch
      *
      * @param min lower bound of search space.
      * @param max upper bound of search space.
-     * @param minimum change in x required to continue iteration.
+     * @param tolerance change in x required to continue iteration.
      * @param obj the class of ComputeObject class representing the equation to be solved.
      */
     public static double solve(double min, double max, double tolerance, ComputeObject obj)

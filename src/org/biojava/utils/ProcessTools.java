@@ -75,7 +75,6 @@ public class ProcessTools {
      * @param input data to present to the process' standard input, or <code>null</code> if the process does not require input.
      * @param stdout a <code>Writer</code> which will be filled with data from the process' output stream, or <code>null</code> to ignore output.
      * @param stderr a <code>Writer</code> which will be filled with data from the process' error stream, or <code>null</code> to ignore output.
-     * @param timeout maximum run-time for child process.  A value of 0 indicates no limit.
      * @return the process' return code.
      */
      

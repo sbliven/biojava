@@ -61,7 +61,7 @@ public interface SequenceDBLite extends Changeable {
   /**
    * Retrieve a single sequence by its id.
    *
-   * @param the id to retrieve by
+   * @param id the id to retrieve by
    * @return  the Sequence with that id
    * @throws IllegalIDException if the database doesn't know about the id
    * @throws BioException if there was a failure in retrieving the sequence

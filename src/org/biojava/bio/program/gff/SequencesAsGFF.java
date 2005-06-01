@@ -185,8 +185,6 @@ public class SequencesAsGFF {
    * from an individual <span class="type">Feature</span>.
    *
    * @param feature  the <span class="type">Feature</span> to GFFify
-   * @param handler the <span class="type">GFFDocumentHandler</span> that will
-   *                receive the GFF for this feature
    * @param id the value of the <span class="method">seqName</span> field in any
    *           <span class="type">GFFRecord</span>s produced
    */

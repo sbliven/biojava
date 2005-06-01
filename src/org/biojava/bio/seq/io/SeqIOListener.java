@@ -53,7 +53,7 @@ public interface SeqIOListener {
      * Notify the listener that the current sequence is generally known
      * by a particular name.
      *
-     * @param the String that should be returned by getName for the sequence
+     * @param name the String that should be returned by getName for the sequence
      * being parsed
      */
 

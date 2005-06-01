@@ -202,7 +202,9 @@ public class DistributionLogo extends JComponent {
   /**
    * Calculate the information content of a symbol in bits.
    *
-   * @param r the symbol to calculate for
+   * @param s the symbol to calculate for
+   * @param dist the <code>Distribution</code> that the symbol comes from and
+   * in whose context the information content will be calculated.
    * @throws IllegalSymbolException if r is not within the dist.
    */
   public static double entropy(Distribution dist, Symbol s) throws IllegalSymbolException {

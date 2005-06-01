@@ -35,7 +35,6 @@ public interface StAXHandlerFactory {
      *  Return a suitable StAX content handler.
      *
      * @param  staxenv   Description of the Parameter
-     * @param  parentID  Description of the Parameter
      * @return           The handler value
      */
 

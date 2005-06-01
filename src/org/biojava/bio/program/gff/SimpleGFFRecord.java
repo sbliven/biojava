@@ -241,7 +241,7 @@ public class SimpleGFFRecord implements GFFRecord {
    * The score must be  one of <code>{0, 1, 2}</code> or
    * <span class="type">GFFRecord</span>.<span class="const">NO_FRAME</span>.
    *
-   * @param score  the new score
+   * @param frame the frame
    * @throws IllegalArgumentException if score is not valid.
    */
   public void setFrame(int frame) {
@@ -282,7 +282,7 @@ public class SimpleGFFRecord implements GFFRecord {
    * <p>
    * If you set it to null, then the comment for this line will be ignored.
    *
-   * @param the new comment
+   * @param comment the new comment
    */
   public void setComment(String comment) {
     this.comment = comment;

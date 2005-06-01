@@ -56,7 +56,7 @@ import org.biojava.utils.Unchangeable;
  *
  * @for.user
  * You will almost certainly want to be calling
- * @{link org.biojava.bio.seq.SequenceTools.view} instead of instantiating this
+ * {@link org.biojava.bio.seq.SequenceTools.view} instead of instantiating this
  * class directly.
  *
  * @author Thomas Down

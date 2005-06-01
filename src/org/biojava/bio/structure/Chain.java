@@ -81,7 +81,7 @@ public interface Chain {
     
     /** get/set the Annotation of a Chain.
      *  allows to annotate a protein chain, e.g. molecule description "AZURIN" for pdb 1a4a.A
-     *  @param Annotation to be provided.
+     *  @param anno the Annotation to be provided.
      *  
      */
     public void setAnnotation(Annotation anno);

@@ -777,7 +777,7 @@ public class SequencePoster
   }
   /**
    * Use this to switch on effects like Anti-aliasing etc
-   * @param hints the desired rendering properties
+   * @param renderingHints the desired rendering properties
    */
   public void setRenderingHints(RenderingHints renderingHints) {
     this.renderingHints = renderingHints;

@@ -85,7 +85,7 @@ public abstract class BooleanElementHandlerBase extends StAXContentHandlerBase {
    * This method will be invoked by endElement with the fully parsed boolean.
    * </p>
    *
-   * @param boolean  the fully parsed boolean
+   * @param val  the fully parsed boolean
    * @throws SAXException if for any reason the boolean is not palatable
    */
   protected abstract void setBooleanValue(boolean val) throws SAXException;

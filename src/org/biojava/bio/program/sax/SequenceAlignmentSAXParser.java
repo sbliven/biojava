@@ -92,7 +92,7 @@ public class SequenceAlignmentSAXParser extends AbstractNativeAppSAXParser {
     /**
      * Describe 'parse' method here.
      *
-     * @param nil	 -
+     * @param poSource	 -
      */
     public void parse(InputSource poSource ) 
 	throws IOException,SAXException {

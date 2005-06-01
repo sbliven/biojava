@@ -132,7 +132,7 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
      * The name is printed out as part of the identifier line.  It will be
      * replaced if an ID keyword exists in the annotations.
      *
-     * @param the String that should be returned by getName for the sequence
+     * @param theName the String that should be returned by getName for the sequence
      * being parsed
      */
     public void setName(String theName) throws ParseException
@@ -143,8 +143,8 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
     /**
      * Null implementation.  This object formats and prints a sequence.  The
      * URI alone cannot be printed in Swissprot format.  Therefore, it's
-     * easiest to ignore it.	 *
-     * @param the new URI of the sequence
+     * easiest to ignore it.	 
+     * @param theURI the new URI of the sequence
      */
     public void setURI(String theURI) throws ParseException
     {
@@ -264,8 +264,8 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
      * be stored as an entry in the sequence's annotation bundle.
      * Checks for possible known properties to be shown in the file.
      *
-     * @param theKey Key the property will be stored under
-     * @param theValue Value stored under the key
+     * @param key Key the property will be stored under
+     * @param value Value stored under the key
      */
     public void addSequenceProperty(Object key, Object value) throws ParseException
     {
@@ -309,7 +309,7 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
     /**
      * Null implementation.
      *
-     * @param theTemplate The template for this new feature object
+     * @param templ The template for this new feature object
      */
     public void startFeature(Feature.Template templ) throws ParseException
     {
@@ -339,8 +339,8 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
     /**
      * Null implementation
      *
-     * @param theKey Key the property will be stored under
-     * @param theValue Value stored under the key
+     * @param key Key the property will be stored under
+     * @param value Value stored under the key
      */
 
     public void addFeatureProperty(Object key, Object value) throws ParseException
@@ -396,7 +396,7 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
      * <code>setPrintStream</code> informs an instance which
      * <code>PrintStream</code> to use.
      *
-     * @param stream a <code>PrintStream</code> to write to.
+     * @param theStream a <code>PrintStream</code> to write to.
      */
     public void setPrintStream(PrintStream theStream)
     {

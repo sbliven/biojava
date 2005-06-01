@@ -43,8 +43,8 @@ public class SimpleIndex implements Index {
    * Build the index using the given file, start and id
    *
    * @param file the File this sequence is in
-   * @param how many bytes to skip to reach the first byte of the sequence
-   * @param how many bytes can be pulled out of the file to grab the record
+   * @param start how many bytes to skip to reach the first byte of the sequence
+   * @param length how many bytes can be pulled out of the file to grab the record
    * @param id the ID of the sequence
    */
   public SimpleIndex(File file, long start, int length, String id) {

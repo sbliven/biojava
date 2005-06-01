@@ -35,7 +35,6 @@ public interface Trainable {
    * or registering other Trainable objects with the ModelTrainer.
    *
    * @param mt  the ModelTrainer that encapsulates the training environment
-   * @return a StateTrainer
    */
   public void registerWithTrainer(ModelTrainer mt)
   throws BioException;

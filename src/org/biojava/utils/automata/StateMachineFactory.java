@@ -5,7 +5,7 @@ package org.biojava.utils.automata;
 /**
  * Class that produces StateMachineInstance objects.
  *
- * @athor David Huen
+ * @author David Huen
  * @since 1.4
  */
 public interface StateMachineFactory

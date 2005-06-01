@@ -243,7 +243,7 @@ public class GFFTools {
    *
    * @param seq the <code>Sequence</code> to annotate.
    * @param ents the the GFF features to annotate it with.
-   * @param matchSeqName  boolean flat, if true only annotte sequence with
+   * @param checkSeqName  boolean flat, if true only annotate sequence with
    *        features that have matching sequence names, otherwise annotate
    *        all features
    * @return a reference to a newly annotated sequence.

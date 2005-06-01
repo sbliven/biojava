@@ -191,7 +191,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
      * <code>setSubjectDB</code> identifies the database searched by a
      * name, ID or URN.
      *
-     * @param id a <code>String</code> which should be an unique
+     * @param identifier a <code>String</code> which should be an unique
      * identifier for the database searched.
      *
      * @deprecated use <code>setDatabaseID</code> instead.

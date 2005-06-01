@@ -89,7 +89,7 @@ public abstract class ByteElementHandlerBase extends StAXContentHandlerBase {
    * This method will be invoked by endElement with the fully parsed byte.
    * </p>
    *
-   * @param byte  the fully parsed byte
+   * @param val  the fully parsed byte
    * @throws SAXException if for any reason the byte is not palatable
    */
   protected abstract void setByteValue(byte val) throws SAXException;

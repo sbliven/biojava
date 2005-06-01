@@ -56,7 +56,6 @@ import org.biojava.bio.program.tagvalue.SimpleTagValueWrapper;
  * groups of States and finally one being global.
  * </p>
  * @author David Huen
- @
  */
 public class StateMachine
 	implements TagValueWrapper

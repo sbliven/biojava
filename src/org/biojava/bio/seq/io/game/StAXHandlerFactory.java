@@ -34,7 +34,7 @@ public interface StAXHandlerFactory {
     /**
      * Return a suitable StAX content handler.
      *
-     * @param xffenv An XFFFeatureSetHandler which defines the current
+     * @param staxenv An StAXFeatureHandler which defines the current
      *        XFF parsing `environment'.
      */
 

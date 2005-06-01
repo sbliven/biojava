@@ -291,7 +291,7 @@ abstract class AbstractNativeAppSAXParser
      * Utility method to centralize the sending of a SAX endElement
      * message a document handler.
      *
-     * @param name   -
+     * @param poQName   -
      * @exception SAXException thrown if
      * @exception  thrown if
      */
@@ -306,7 +306,7 @@ abstract class AbstractNativeAppSAXParser
      * Utility method to centralize the sending of a SAX characters
      * message a document handler.
      *
-     * @param []ch   -
+     * @param ch   -
      * @param start  -
      * @param length     -
      * @exception SAXException thrown if
@@ -404,7 +404,7 @@ abstract class AbstractNativeAppSAXParser
      * Create a stream from an an InputSource, picking the
      * correct stream according to order of precedance.
      *
-     * @param poInputSource an <code>InputSource</code> value
+     * @param poSource an <code>InputSource</code> value
      * @return a <code>BufferedReader</code> value
      */
     protected BufferedReader getContentStream(InputSource poSource) {

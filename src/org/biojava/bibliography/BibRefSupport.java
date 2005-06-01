@@ -251,7 +251,7 @@ public interface BibRefSupport {
      * the repository. The attributes which can be used in query
      * methods should be identified by putting this constant into
      * their vocabulary entry (somewhere in the {@link
-     * CandyEntry#description description} field).
+     * org.biojava.utils.candy.CandyEntry#description description} field).
      * </p>
      */
     static final String ROLE_ATTR_QUERYABLE   = "queryable";
@@ -267,7 +267,7 @@ public interface BibRefSupport {
      * the repository. The attributes which can be used in retrieval
      * methods should be identified by putting this constant into
      * their vocabulary entry (somewhere in the {@link
-     * CandyEntry#description description} field).
+     * org.biojava.utils.candy.CandyEntry#description description} field).
      * </p>
      */
     static final String ROLE_ATTR_RETRIEVABLE = "retrievable";

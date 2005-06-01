@@ -81,7 +81,7 @@ public abstract class FloatElementHandlerBase extends StAXContentHandlerBase {
    * <p>
    * This method will be invoked by endElement with the fully parsed float.
    *
-   * @param float  the fully parsed float
+   * @param val  the fully parsed float
    * @throws SAXException if for any reason the float is not palatable
    */
   protected abstract void setFloatValue(float val) throws SAXException;

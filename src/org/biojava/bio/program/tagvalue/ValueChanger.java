@@ -101,7 +101,7 @@ public class ValueChanger
    * The splitter that will be applied to the values of tags not registered
    * explicitly to any changer or splitter instance.
    *
-   * @param c  the default ChangeTable.Splitter
+   * @param s  the default ChangeTable.Splitter
    */
   public void setDefaultSplitter(ChangeTable.Splitter s) {
     this.defaultS = s;

@@ -119,7 +119,7 @@ public class SimpleAlignmentStyler extends AbstractAlignmentStyler {
      * SimpleAlignmentStyler.SHOW_SAME or
      * SimpleAlignmentStyler.SHOW_DIFF.
      *
-     * @param ptHighLightSimilarities - true if
+     * @param piStyle (one of SimpleAlignmentStyler.SHOW_SAME or SimpleAlignmentStyler.SHOW_DIFF).
      * @throws IllegalArgumentException - if style not one of allowed values
      */
     public SimpleAlignmentStyler( int piStyle ) {

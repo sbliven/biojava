@@ -33,7 +33,7 @@ public interface GFFRecordFilter {
   /**
    * Return whether or not to accept <span class="arg">record</span>.
    *
-   * @param entry the <span class="type">GFFRecord</span> to filter
+   * @param record the <span class="type">GFFRecord</span> to filter
    * @return <span class="kw">true</span> if <span class="arg">record</span>
    *         should be accepted or <span class="kw">false</span> otherwise
    */
@@ -175,7 +175,7 @@ public interface GFFRecordFilter {
     /**
      * Set the feature to <span class="arg">feature</span>.
      *
-     * @param source the new source to match
+     * @param feature the feature
      */
     public void setFeature(String feature) {
       this.feature = feature;

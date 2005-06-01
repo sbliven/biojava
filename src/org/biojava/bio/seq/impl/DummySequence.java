@@ -45,7 +45,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @for.user
  * You will probably want to use
- * @{link org.biojava.bio.seq.SequenceTools.createDummy} instead of using this
+ * {@link org.biojava.bio.seq.SequenceTools.createDummy} instead of using this
  * class directly
  *
  * @author Thomas Down

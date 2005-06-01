@@ -30,7 +30,7 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
  * include ambiguity Symbols.
  *
  * @author Matthew Pocock (wrote original MaxMissmatchPattern class)
- @ @author David Huen (debugging and extension to permit ambiguity symbols)
+ * @author David Huen (debugging and extension to permit ambiguity symbols)
  */
 public class MaxMismatchPattern
 implements BioPattern {

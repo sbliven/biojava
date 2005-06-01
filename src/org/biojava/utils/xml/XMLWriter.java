@@ -73,7 +73,7 @@ public interface XMLWriter {
      * Add an un-qualified attribute to an element.  This will throw an exception if it's not
      * called immediately after an <code>openTag</code> command.
      *
-     * @param name The name of the attribute to set
+     * @param qName The name of the attribute to set
      * @param value The textual value of the attribute
      */
     
@@ -95,7 +95,7 @@ public interface XMLWriter {
      * Closes an element
      *
      * @param nsURI A URI for the namespace to use
-     * @param localName The name of the tag
+     * @param qName The name of the tag
      */
     
     public void closeTag(String nsURI, String qName) throws IOException;
