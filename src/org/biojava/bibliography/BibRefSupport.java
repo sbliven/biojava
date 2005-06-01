@@ -1,9 +1,3 @@
-// BibRefSupport.java
-//
-//    senger@ebi.ac.uk
-//    April 2001
-//
-
 /*
  *                    BioJava development code
  *
