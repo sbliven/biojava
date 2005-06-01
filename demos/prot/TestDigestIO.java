@@ -22,7 +22,7 @@ import java.text.NumberFormat;
 /**
  *
  * @author  mjones
- * @version
+ * @version 1.0
  */
 public class TestDigestIO extends Object {
     
