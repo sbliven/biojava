@@ -1,13 +1,14 @@
 package xff;
 
 import java.io.*;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.*;
 import org.biojava.utils.stax.*;
-import org.apache.xerces.parsers.*;
+
 
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
 import org.biojava.bio.program.xff.*;
 
 public class TestXFFStreaming {
@@ -18,8 +19,10 @@ public class TestXFFStreaming {
 	final XFFFeatureSetHandler xffhandler = new XFFFeatureSetHandler();
 	xffhandler.setFeatureListener(siol);
 
-	SAXParser parser = new SAXParser();
-	parser.setContentHandler(new SAX2StAXAdaptor(new StAXContentHandlerBase() {
+	SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+	
+        /*
+        parser.setContentHandler(new SAX2StAXAdaptor(new StAXContentHandlerBase() {
 		public void startElement(String nsURI,
 					 String localName,
 					 String qName,
@@ -32,8 +35,22 @@ public class TestXFFStreaming {
 		    }
 		}
 	    }));
+         */
+        
 	InputSource is = new InputSource(new FileReader(args[0]));
-	parser.parse(is);
+	parser.parse(is, new SAX2StAXAdaptor(new StAXContentHandlerBase() {
+		public void startElement(String nsURI,
+					 String localName,
+					 String qName,
+					 Attributes attrs,
+					 DelegationManager dm)
+		    throws SAXException
+		{
+		    if (localName.equals("featureSet")) {
+			dm.delegate(xffhandler);
+		    }
+		}
+	    }));
     }
 
     private static class TestSIOL extends SeqIOAdapter {

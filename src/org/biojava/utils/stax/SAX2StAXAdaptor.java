@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Lightweight adaptor which translates SAX content events into
@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  * @author Thomas Down
  */
 
-public class SAX2StAXAdaptor implements ContentHandler {
+public class SAX2StAXAdaptor extends DefaultHandler {
     private List stack;
     private HandlerBinding current;
         

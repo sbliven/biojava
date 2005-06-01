@@ -1,13 +1,11 @@
 
 
 import java.io.*;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.*;
 import org.biojava.utils.stax.*;
-import org.apache.xerces.parsers.*;
-
-import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.io.game.*;
 
 public class TestGAME {
@@ -18,7 +16,7 @@ public class TestGAME {
         final GAMEHandler gamehandler = new GAMEHandler();
         gamehandler.setFeatureListener(siol);
 
-        SAXParser parser = new SAXParser();
+        SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 /*
         parser.setContentHandler(new SAX2StAXAdaptor(new StAXContentHandlerBase() {
                 public void startElement(String nsURI,
@@ -34,9 +32,9 @@ public class TestGAME {
                 }
             }));*/
 
-        parser.setContentHandler(new SAX2StAXAdaptor(gamehandler));
+        //parser.setContentHandler(new SAX2StAXAdaptor(gamehandler));
 
         InputSource is = new InputSource(new FileReader(args[0]));
-        parser.parse(is);
+        parser.parse(is, new SAX2StAXAdaptor(gamehandler));
     }
 }

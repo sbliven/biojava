@@ -20,19 +20,16 @@
  */
 package dp;
 
-import java.util.*;
 import java.net.*;
 import java.io.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.*;
 import org.xml.sax.*;
-import org.apache.xerces.parsers.*;
-
-import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.dist.*;
 import org.biojava.bio.dp.*;
 
 
@@ -83,9 +80,9 @@ public class ViterbiAlign {
 
       // load in the markov model
       InputSource is = new InputSource(modelURL.openStream());
-      DOMParser parser = new DOMParser();
-      parser.parse(is);
-      Document doc = parser.getDocument();
+      DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      
+      Document doc = builder.parse(is);
       MarkovModel model = XmlMarkovModel.readModel(doc.getDocumentElement());
 
       // make alphabets
