@@ -20,7 +20,7 @@ public class Values implements Taglet {
     if(t != null) {
       tagletMap.remove(name);
     }
-    tagletMap.put(name, instance);
+    tagletMap.put(name, new com.sun.tools.doclets.internal.toolkit.taglets.LegacyTaglet(instance));
   }
 
   public boolean inConstructor()

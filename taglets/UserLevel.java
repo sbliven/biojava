@@ -19,7 +19,8 @@ public class UserLevel implements Taglet {
     if(t != null) {
       tagletMap.remove(name);
     }
-    tagletMap.put(name, new UserLevel(name, message));
+    tagletMap.put(name, new com.sun.tools.doclets.internal.toolkit.taglets.LegacyTaglet(
+            new UserLevel(name, message)));
   }
   
   private final String name;

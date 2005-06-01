@@ -23,7 +23,7 @@ public class Option implements Taglet {
     if(t != null) {
       tagletMap.remove(instance.getName());
     }
-    tagletMap.put(instance.getName(), instance);
+    tagletMap.put(instance.getName(), new com.sun.tools.doclets.internal.toolkit.taglets.LegacyTaglet(instance));
   }
 
   private String name;

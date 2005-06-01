@@ -497,6 +497,7 @@
       version="true"
       use="true"
       source="1.4"
+      target="1.4"
       windowtitle="${Name.apps} API"
       doctitle="${Name.apps}"
       maxmemory="96m">

@@ -30,7 +30,7 @@ implements Taglet {
     if(t != null) {
       tagletMap.remove(name);
     }
-    tagletMap.put(name, new MetaData());
+    tagletMap.put(name, new com.sun.tools.doclets.internal.toolkit.taglets.LegacyTaglet(new MetaData()));
   }
 
   private final Set toStringable;
