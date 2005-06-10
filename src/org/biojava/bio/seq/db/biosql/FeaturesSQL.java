@@ -722,8 +722,14 @@ class FeaturesSQL {
     //
     // Feature persistance
     //
+    
+    void persistFeatures(Connection conn, int bioentry_id, FeatureHolder features)
+        throws BioException, SQLException
+    {
+        persistFeatures(conn, bioentry_id, features, -1);
+    }
 
-    void persistFeatures(Connection conn, int bioentry_id, FeatureHolder features, int parent)
+    private void persistFeatures(Connection conn, int bioentry_id, FeatureHolder features, int parent)
         throws BioException, SQLException
     {
 			

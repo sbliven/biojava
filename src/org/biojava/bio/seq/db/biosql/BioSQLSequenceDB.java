@@ -243,32 +243,33 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 throw new BioException("Error accessing ontologies", ex);
             }
 
-            PreparedStatement getID = conn.prepareStatement("select * from biodatabase where name = ?");
+            PreparedStatement getID = conn.prepareStatement("select biodatabase_id from biodatabase where name = ?");
             getID.setString(1, biodatabase);
             ResultSet rs = getID.executeQuery();
             if (rs.next()) {
                 dbid = rs.getInt(1);
-                name = rs.getString(2);
+                name = biodatabase;
                 rs.close();
                 getID.close();
                 conn.close();
-                return;
+                
             } else {
                 rs.close();
                 getID.close();
-            }
-
-            if (create) {
-                PreparedStatement createdb = conn.prepareStatement("insert into biodatabase (name) values ( ? )");
-                createdb.setString(1, biodatabase);
-                createdb.executeUpdate();
-                conn.commit();
-                createdb.close();
+            
+                if (create) {
+                    PreparedStatement createdb = conn.prepareStatement(
+                            "insert into biodatabase (name) values ( ? )");
+                    createdb.setString(1, biodatabase);
+                    createdb.executeUpdate();
+                    conn.commit();
+                    createdb.close();
 		    conn.close();
-                dbid = getDBHelper().getInsertID(conn, "biodatabase", "biodatabase_id");
-            } else {
+                    dbid = getDBHelper().getInsertID(conn, "biodatabase", "biodatabase_id");
+                } else {
 		    conn.close();
-                throw new BioException("Biodatabase " + biodatabase + " doesn't exist");
+                    throw new BioException("Biodatabase " + biodatabase + " doesn't exist");
+                }
             }
         } catch (SQLException ex) {
 		if (conn!=null) try {conn.close();} catch (SQLException ex3) {}
@@ -325,7 +326,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
             PreparedStatement create_bioentry = conn.prepareStatement(
                                                                       "insert into bioentry " +
-                                                                      "(biodatabase_id, display_id, accession, entry_version, division) " +
+                                                                      "(biodatabase_id, name, accession, version, division) " +
                                                                       "values (?, ?, ?, ?, ?)");
             create_bioentry.setInt(1, dbid);
             create_bioentry.setString(2, id);
@@ -338,7 +339,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
 
             PreparedStatement create_dummy = conn.prepareStatement("insert into biosequence " +
-                                                                   "       (bioentry_id, seq_version, molecule, seq_length) " +
+                                                                   "       (bioentry_id, version, alphabet, length) " +
                                                                    "values (?, ?, ?, ?)");
             create_dummy.setInt(1, bioentry_id);
             create_dummy.setInt(2, version);
@@ -359,7 +360,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 } catch (SQLException ex2) {}
    		    try {conn.close();} catch (SQLException ex3) {}
             }
-            throw new BioRuntimeException("Error adding BioSQL tables" +
+            throw new BioRuntimeException("Error adding dummy sequence" +
                                           (rolledback ? " (rolled back successfully)" : ""), ex);
         }
     }
@@ -416,87 +417,52 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             // System.err.println("Created bioentry");
 
             int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
+                            
+            BioSequenceStyle bs = getDBHelper().getBioSequenceStyle();
 
-            if (isAssemblySupported() && seq.filter(new FeatureFilter.ByClass(ComponentFeature.class), false).countFeatures() > 0) {
-                PreparedStatement create_assembly = conn.prepareStatement("insert into assembly " +
-                                                                          "       (bioentry_id, length, molecule) " +
-                                                                          "values (?, ?, ?)");
-                create_assembly.setInt(1, bioentry_id);
-                create_assembly.setInt(2, seq.length());
-                create_assembly.setString(3, seqAlpha.getName());
-                create_assembly.executeUpdate();
-                create_assembly.close();
-                int assembly_id = getDBHelper().getInsertID(conn, "assembly", "assembly_id");
+            // See if we are using CLOBs.
+            if (bs==DBHelper.BIOSEQUENCE_ORACLECLOB) {
+                PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
+                                                                         "(bioentry_id, version, length, seq, alphabet) " +
+                                                                         "values (?, ?, ?, empty_clob(), ?)");
+                create_biosequence.setInt(1, bioentry_id);
+                create_biosequence.setInt(2, version);
+                create_biosequence.setInt(3, seq.length());
+                String seqstr = seqToke.tokenizeSymbolList(seq);
 
-                FeatureHolder components = seq.filter(new FeatureFilter.ByClass(ComponentFeature.class), false);
-                PreparedStatement create_fragment = conn.prepareStatement(
-                                                                          "insert into assembly_fragment " +
-                                                                          "       (assembly_id, fragment_name, assembly_start, assembly_end, fragment_start, fragment_end, strand) " +
-                                                                          "values (?,           ?,             ?,              ?,            ?,              ?,            ?)");
-                for (Iterator i = components.features(); i.hasNext(); ) {
-                    ComponentFeature cf = (ComponentFeature) i.next();
-                    if (cf.getType().equals("static_golden_path_clone")) {
-                        System.err.println("Ensembl hack: skipping clone...");
-                        continue;
-                    }
-
-                    create_fragment.setInt(1, assembly_id);
-                    create_fragment.setString(2, cf.getComponentSequenceName());
-                    create_fragment.setInt(3, cf.getLocation().getMin());
-                    create_fragment.setInt(4, cf.getLocation().getMax());
-                    create_fragment.setInt(5, cf.getComponentLocation().getMin());
-                    create_fragment.setInt(6, cf.getComponentLocation().getMax());
-                    create_fragment.setInt(7, cf.getStrand().getValue());
-                    create_fragment.executeUpdate();
-                }
-                create_fragment.close();
-            } else {
-                
-                BioSequenceStyle bs = getDBHelper().getBioSequenceStyle();
-
-                // See if we are using CLOBs.
-                if (bs==DBHelper.BIOSEQUENCE_ORACLECLOB) {
-                    PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
-                                                                             "(bioentry_id, version, length, seq, alphabet) " +
-                                                                             "values (?, ?, ?, empty_clob(), ?)");
-                    create_biosequence.setInt(1, bioentry_id);
-                    create_biosequence.setInt(2, version);
-                    create_biosequence.setInt(3, seq.length());
-                    String seqstr = seqToke.tokenizeSymbolList(seq);
-
-                    create_biosequence.setString(4, seqAlpha.getName());
-                    create_biosequence.executeUpdate();
-                    create_biosequence.close();
+                create_biosequence.setString(4, seqAlpha.getName());
+                create_biosequence.executeUpdate();
+                create_biosequence.close();
                     
-                    // Now retrieve and update
-                    PreparedStatement retrieve_biosequence = conn.prepareStatement("select seq from biosequence " +
-                                                                            "where bioentry_id = ? for update");
-                    retrieve_biosequence.setInt(1, bioentry_id);
-                    ResultSet rs = retrieve_biosequence.executeQuery();
-                    if (!rs.next()) throw new BioRuntimeException("Could not read newly inserted sequence!");
+                // Now retrieve and update
+                PreparedStatement retrieve_biosequence = conn.prepareStatement("select seq from biosequence " +
+                                                                        "where bioentry_id = ? for update");
+                retrieve_biosequence.setInt(1, bioentry_id);
+                ResultSet rs = retrieve_biosequence.executeQuery();
+                if (!rs.next()) throw new BioRuntimeException("Could not read newly inserted sequence!");
                     
-                    OracleDBHelper odh = (OracleDBHelper)getDBHelper();
-                    odh.stringToClob(conn, rs, 1, seqstr);
+                OracleDBHelper odh = (OracleDBHelper)getDBHelper();
+                odh.stringToClob(conn, rs, 1, seqstr);
 
-                    rs.close();
-                    retrieve_biosequence.close();
+                rs.close();
+                retrieve_biosequence.close();
                     
-                } else { // BIOSEQUENCE_GENERIC
-                    PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
-                                                                             "(bioentry_id, version, length, seq, alphabet) " +
-                                                                             "values (?, ?, ?, ?, ?)");
-                    create_biosequence.setInt(1, bioentry_id);
-                    create_biosequence.setInt(2, version);
-                    create_biosequence.setInt(3, seq.length());
-                    String seqstr = seqToke.tokenizeSymbolList(seq);
+            } else { // BIOSEQUENCE_GENERIC
+                PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
+                                                                         "(bioentry_id, version, length, seq, alphabet) " +
+                                                                         "values (?, ?, ?, ?, ?)");
+                create_biosequence.setInt(1, bioentry_id);
+                create_biosequence.setInt(2, version);
+                create_biosequence.setInt(3, seq.length());
+                String seqstr = seqToke.tokenizeSymbolList(seq);
             
-                    create_biosequence.setCharacterStream(4, new StringReader(seqstr), seqstr.length());
+                create_biosequence.setCharacterStream(4, new StringReader(seqstr), seqstr.length());
 
-                    create_biosequence.setString(5, seqAlpha.getName());
-                    create_biosequence.executeUpdate();
-                    create_biosequence.close();
-                }
+                create_biosequence.setString(5, seqAlpha.getName());
+                create_biosequence.executeUpdate();
+                create_biosequence.close();
             }
+            
 
             // System.err.println("Stored sequence");
 
@@ -512,7 +478,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                     System.err.println("*** Warning: feature hierarchy was lost when adding sequence to BioSQL");
                 }
             }
-            getFeaturesSQL().persistFeatures(conn, bioentry_id, features, -1);
+            getFeaturesSQL().persistFeatures(conn, bioentry_id, features);
 
             // System.err.println("Stored features");
 
@@ -906,7 +872,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 if (silent) {
                     return;
                 } else {
-                    throw new SQLException("Can't persist this property since the bioentry_property table isn't available");
+                    throw new SQLException("Can't persist this property since the bioentry_qualifier_value table isn't available");
                 }
             }
 
@@ -1030,31 +996,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         return assemblySupported;
     }
 
-    private boolean dummyChecked = false;
-    private boolean dummySupported = false;
 
-    boolean isDummySupported() {
-        if (!dummyChecked) {
-            dummySupported = getDBHelper().containsTable(dataSource, "dummy");
-            dummyChecked = true;
-        }
-
-        return dummySupported;
-    }
-
-    //private boolean locationQualifierChecked = false;
-    //private boolean locationQualifierSupported = false;
-
-    boolean isLocationQualifierSupported() {
-//      if (!locationQualifierChecked) {
-//          locationQualifierSupported = getDBHelper().containsTable(dataSource, "location_qualifier_value");
-//          locationQualifierChecked = true;
-//      }
-
-//      return locationQualifierSupported;
-
-        return false;
-    }
 
     private boolean bioentryPropertyChecked = false;
     private boolean bioentryPropertySupported = false;
@@ -1101,17 +1043,6 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     }
 
 
-    private boolean dbxrefQualifierValueChecked = false;
-    private boolean dbxrefQualifierValueSupported = false;
-
-    boolean isDbxrefQualifierValueSupported() {
-        if (!dbxrefQualifierValueChecked) {
-            dbxrefQualifierValueSupported = getDBHelper().containsTable(dataSource, "dbxref_qualifier_value");
-            dbxrefQualifierValueChecked = true;
-        }
-
-        return dbxrefQualifierValueSupported;
-    }
 
     private boolean spaChecked = false;
     private boolean spaSupported = false;
