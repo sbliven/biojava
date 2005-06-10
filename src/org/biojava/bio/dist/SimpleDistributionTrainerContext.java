@@ -23,8 +23,8 @@
 package org.biojava.bio.dist;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -137,7 +137,7 @@ implements DistributionTrainerContext, Serializable {
    * Create a new context with no initial distributions or trainers.
    */
   public SimpleDistributionTrainerContext() {
-    this.distToTrainer = new HashMap();
+    this.distToTrainer = new IdentityHashMap();
     this.trainers = new HashSet();
   }
 }
