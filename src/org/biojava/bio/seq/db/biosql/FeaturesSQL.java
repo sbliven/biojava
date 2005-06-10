@@ -655,7 +655,7 @@ class FeaturesSQL {
 		    conn.rollback();
 		    rolledback = true;
 		} catch (SQLException ex2) {}
-            try {conn.close();} catch (SQLException ex3) {}
+                try {conn.close();} catch (SQLException ex3) {}
 	    }
 	    throw ex;
 	}
@@ -1081,9 +1081,9 @@ class FeaturesSQL {
 		    conn.rollback();
 		    rolledback = true;
 		} catch (SQLException ex2) {}
-            try {conn.close();} catch (SQLException ex3) {}
+                try {conn.close();} catch (SQLException ex3) {}
 	    }
-	    throw new BioException("Error adding BioSQL tables" 
+	    throw new BioException("Error adding to BioSQL tables" 
 					+ (rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }

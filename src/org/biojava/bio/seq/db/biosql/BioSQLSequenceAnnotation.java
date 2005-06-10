@@ -244,7 +244,7 @@ class BioSQLSequenceAnnotation implements Annotation {
 		} catch (SQLException ex2) {}
             try {conn.close();} catch (SQLException ex3) {}
 	    }
-	    throw new BioRuntimeException("Error adding BioSQL tables" + 
+	    throw new BioRuntimeException("Error adding to BioSQL tables" + 
 					(rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }

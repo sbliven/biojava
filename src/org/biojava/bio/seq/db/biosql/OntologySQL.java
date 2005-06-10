@@ -468,7 +468,7 @@ class OntologySQL {
         ChangeEvent chain = cev.getChainedEvent();
         if (chain != null) {
           // looks like it's an actual term which has been added.
-          throw new ChangeVetoException("BioSQL does not handle mutable terms");
+          throw new ChangeVetoException("Biojava does not handle mutable terms once persisted");
         } else {
           if (cev.getChange() != null && cev.getPrevious() == null) {
             // Adding
@@ -477,7 +477,7 @@ class OntologySQL {
             }
             Term addedTerm = (Term) cev.getChange();
             if (addedTerm instanceof OntologyTerm) {
-              throw new ChangeVetoException("BioSQL doesn't (currently) represent OntologyTerms");
+              throw new ChangeVetoException("BioSQL does (currently) represent OntologyTerms but Biojava wants to lie about that");
             } else if (addedTerm instanceof RemoteTerm) {
               Term gopher = addedTerm;
               while (gopher instanceof RemoteTerm) {
@@ -490,7 +490,7 @@ class OntologySQL {
               // We presume it's a term with no special semantics
             }
           } else if (cev.getChange() == null && cev.getPrevious() != null) {
-            throw new ChangeVetoException("FIXME: can't remove terms from biosql ontology");
+            throw new ChangeVetoException("FIXME: Biojava can't remove terms from biosql ontology");
           } else {
             throw new ChangeVetoException("Unknown TERM change");
           }
@@ -498,7 +498,7 @@ class OntologySQL {
       } else if (type.isMatchingType(Ontology.TRIPLE)) {
         // Any triple-changes that we can't handle?  I don't think so.
       } else {
-        throw new ChangeVetoException("BioSQL does not understand this change");
+        throw new ChangeVetoException("Biojava does not understand this change");
       }
     }
 
@@ -613,7 +613,7 @@ class OntologySQL {
         } catch (SQLException ex2) {}
         try {conn.close();} catch (SQLException ex3) {}
       }
-      throw new BioRuntimeException("Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
+      throw new BioRuntimeException("Error adding to BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
     }
   }
 
@@ -678,7 +678,7 @@ class OntologySQL {
         } catch (SQLException ex2) {}
         try {conn.close();} catch (SQLException ex3) {}
       }
-      throw new BioRuntimeException("Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
+      throw new BioRuntimeException("Error adding to BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
     }
   }
 
