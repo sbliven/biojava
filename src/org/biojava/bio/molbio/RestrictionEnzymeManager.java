@@ -68,6 +68,7 @@ import org.biojava.utils.SmallSet;
  * should be named "RestrictionEnzymeManager.properties".</p>
  *
  * @author Keith James
+ * @author George Waldon
  * @since 1.3
  */
 public final class RestrictionEnzymeManager
@@ -401,10 +402,12 @@ public final class RestrictionEnzymeManager
 
                 tempMap.put(name, tempSet);
 
-                for (Iterator ii = isoschizomers.iterator(); ii.hasNext();)
-                {
+                for (Iterator ii = isoschizomers.iterator(); ii.hasNext();) {
                     String isoName = (String) ii.next();
-                    tempSet.add(nameToEnzyme.get(isoName));
+                    Object re = nameToEnzyme.get(isoName);
+                    //bug fix suggested by George Waldon
+                    if(re!=null)
+                        tempSet.add(re);
                 }
             }
 
