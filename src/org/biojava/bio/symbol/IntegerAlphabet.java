@@ -96,7 +96,7 @@ public final class IntegerAlphabet
    */
   public static SubIntegerAlphabet getSubAlphabet(int min, int max)
   throws IllegalArgumentException {
-    String name = "SubIntegerAlphabet["+min+".."+max+"]";
+    String name = "SUBINTEGER["+min+".."+max+"]";
     if(AlphabetManager.registered(name)){
       return (SubIntegerAlphabet) (AlphabetManager.alphabetForName(name));
     }
@@ -129,6 +129,8 @@ public final class IntegerAlphabet
   public static IntegerAlphabet getInstance() {
     if(INSTANCE == null) {
       INSTANCE = new IntegerAlphabet();
+      //add an alias
+      AlphabetManager.registerAlphabet("Alphabet of all integers.", INSTANCE);
     }
 
     return INSTANCE;
@@ -200,7 +202,7 @@ public final class IntegerAlphabet
   }
 
   public String getName() {
-    return "Alphabet of all integers.";
+    return "INTEGER";
   }
 
   /**
@@ -334,7 +336,7 @@ public final class IntegerAlphabet
       this.min = min;
       this.max = max;
 
-      this.name = "SubIntegerAlphabet["+min+".."+max+"]";
+      this.name = "SUBINTEGER["+min+".."+max+"]";
     }
 
     public String getName() {

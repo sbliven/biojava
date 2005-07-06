@@ -109,6 +109,8 @@ public final class DoubleAlphabet
   public static DoubleAlphabet getInstance() {
     if(INSTANCE == null) {
       INSTANCE = new DoubleAlphabet();
+      //add an alias
+      AlphabetManager.registerAlphabet("Alphabet of all doubles.", INSTANCE);
     }
 
     return INSTANCE;
@@ -150,7 +152,7 @@ public final class DoubleAlphabet
   }
 
   public static SubDoubleAlphabet getSubAlphabet(double min, double max) {
-    String name = "SubDoubleAlphabet["+ min +".."+ max +"]";
+    String name = "SUBDOUBLE["+ min +".."+ max +"]";
     if(! AlphabetManager.registered(name)){
       AlphabetManager.registerAlphabet(name, new SubDoubleAlphabet(min, max));
     }
@@ -210,7 +212,7 @@ public final class DoubleAlphabet
   }
 
   public String getName() {
-    return "Alphabet of all doubles.";
+    return "DOUBLE";
   }
 
   public SymbolTokenization getTokenization(String name) {
@@ -372,7 +374,7 @@ public final class DoubleAlphabet
     private SubDoubleAlphabet(double min, double max) {
       this.min = min;
       this.max = max;
-      this.name = "SubDoubleAlphabet["+ min +".."+ max +"]";
+      this.name = "SUBDOUBLE["+ min +".."+ max +"]";
     }
 
     /**
