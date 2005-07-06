@@ -97,13 +97,13 @@ public final class IntegerAlphabet
   public static SubIntegerAlphabet getSubAlphabet(int min, int max)
   throws IllegalArgumentException {
     String name = "SubIntegerAlphabet["+min+".."+max+"]";
-    try{
+    if(AlphabetManager.registered(name)){
       return (SubIntegerAlphabet) (AlphabetManager.alphabetForName(name));
-    }catch(Exception e){
-      FiniteAlphabet a = new SubIntegerAlphabet(min, max);
-      AlphabetManager.registerAlphabet(a.getName(),a);
     }
-
+          
+    FiniteAlphabet a = new SubIntegerAlphabet(min, max);
+    AlphabetManager.registerAlphabet(a.getName(),a);
+  
     return (SubIntegerAlphabet) (AlphabetManager.alphabetForName(name));
   }
 
@@ -389,7 +389,7 @@ public final class IntegerAlphabet
 
       if (symL.size() != 1) {
         throw new IllegalSymbolException(
-            "SubDoubleAlphabet is one-dimensional: " + this.getName() +
+            "SubIntegerAlphabet is one-dimensional: " + this.getName() +
             " : " + symL);
       }
 
