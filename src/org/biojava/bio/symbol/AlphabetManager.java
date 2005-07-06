@@ -253,6 +253,14 @@ public final class AlphabetManager {
           registerAlphabet(names[i], alphabet);
       }
   }
+  
+  /**
+   * A set of names under which Alphabets have been registered.
+   * @return a <code>Set</code> of <code>Strings</code>
+   */
+  static public Set registrations(){
+      return new HashSet(nameToAlphabet.keySet());
+  }
 
   /**
    * Has an Alphabet been registered by that name
