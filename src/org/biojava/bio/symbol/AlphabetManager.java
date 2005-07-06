@@ -259,7 +259,7 @@ public final class AlphabetManager {
    * @return a <code>Set</code> of <code>Strings</code>
    */
   static public Set registrations(){
-      return new HashSet(nameToAlphabet.keySet());
+      return Collections.unmodifiableSet(nameToAlphabet.keySet());
   }
 
   /**
@@ -277,7 +277,7 @@ public final class AlphabetManager {
    * @return an Iterator over Alphabet objects
    */
   static public Iterator alphabets() {
-    return nameToAlphabet.values().iterator();
+    return Collections.unmodifiableCollection(nameToAlphabet.values()).iterator();
   }
 
   /**
