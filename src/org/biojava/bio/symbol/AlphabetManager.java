@@ -94,8 +94,9 @@ public final class AlphabetManager {
     /**
      * Return the ambiguity symbol which matches all symbols in
      * a given alphabet.
-     *
      * @since 1.2
+     * @param alpha The alphabet
+     * @return the ambiguity symbol
      */
 
     public static Symbol getAllAmbiguitySymbol(FiniteAlphabet alpha) {
@@ -114,8 +115,9 @@ public final class AlphabetManager {
      * Return a set containing all possible symbols which can be
      * considered members of a given alphabet, including ambiguous
      * symbols.  Warning, this method can return large sets!
-     *
      * @since 1.2
+     * @param alpha The alphabet
+     * @return The set of symbols that are members of <code>alpha</code>
      */
 
     public static Set getAllSymbols(FiniteAlphabet alpha) {
@@ -195,12 +197,12 @@ public final class AlphabetManager {
     return alpha;
   }
    /**
-    * Retrieve the symbol represented a String object
-    *
-    * @param name of the string whose symbol you want to get
-    * @throws NoSuchElementException if the string name is invalid.
-    * @deprecated use symbolForLifeScienceID() instead
-    */
+   * Retrieve the symbol represented a String object
+   * @deprecated use symbolForLifeScienceID() instead
+   * @param name of the string whose symbol you want to get
+   * @throws NoSuchElementException if the string name is invalid.
+   * @return The Symbol
+   */
   static public Symbol symbolForName(String name)
   throws NoSuchElementException {
     String ls = "urn:lsid:biojava.org:symbol:"+name;
@@ -234,6 +236,22 @@ public final class AlphabetManager {
    */
   static public void registerAlphabet(String name, Alphabet alphabet) {
     nameToAlphabet.put(name, alphabet);
+  }
+  
+  /**
+   * Register and Alphabet by more than one name. This allows aliasing
+   * of an alphabet with two or more names. It is equivalent to calling
+   * <code>registerAlphabet(String name, Alphabet alphabet)</code> several
+   * times.
+   *
+   * @since 1.4
+   * @param names  the names by which it can be retrieved
+   * @param alphabet the Alphabet to store
+   */
+  static public void registerAlphabet(String[] names, Alphabet alphabet){
+      for(int i = 0; i < names.length; i++){
+          registerAlphabet(names[i], alphabet);
+      }
   }
 
   /**
@@ -397,17 +415,18 @@ public final class AlphabetManager {
    * Generates a new Symbol instance that represents the tuple of Symbols in
    * symList.
    * </p>
-   *
+   * 
    * <p>
    * This method is most useful for writing Alphabet implementations. It should
    * not be invoked by casual users. Use alphabet.getSymbol(List) instead.
    * </p>
-   *
-   * @param token   the Symbol's token [ignored since 1.2]
-   * @param symList a list of Symbol objects
-   * @param alpha   the Alphabet that this Symbol will reside in
    * @return a Symbol that encapsulates that List
    * @deprecated use the new version, without the token argument
+   * @param annotation The annotation bundle for the symbol
+   * @param token the Symbol's token [ignored since 1.2]
+   * @param symList a list of Symbol objects
+   * @param alpha the Alphabet that this Symbol will reside in
+   * @throws org.biojava.bio.symbol.IllegalSymbolException If the Symbol cannot be made
    */
   static public Symbol createSymbol(
     char token, Annotation annotation,
@@ -433,15 +452,16 @@ public final class AlphabetManager {
    * Generates a new Symbol instance that represents the tuple of Symbols in
    * symList. This will attempt to return the same symbol for the same list.
    * </p>
-   *
+   * 
    * <p>
    * This method is most useful for writing Alphabet implementations. It should
    * not be invoked by casual users. Use alphabet.getSymbol(List) instead.
    * </p>
-   *
-   * @param symList a list of Symbol objects
-   * @param alpha   the Alphabet that this Symbol will reside in
    * @return a Symbol that encapsulates that List
+   * @param annotation The annotation bundle for the Symbol
+   * @param symList a list of Symbol objects
+   * @param alpha the Alphabet that this Symbol will reside in
+   * @throws org.biojava.bio.symbol.IllegalSymbolException If the Symbol cannot be made
    */
   static public Symbol createSymbol(
     Annotation annotation,
@@ -543,18 +563,18 @@ public final class AlphabetManager {
    * Generates a new Symbol instance that represents the tuple of Symbols in
    * symList.
    * </p>
-   *
+   * 
    * <p>
    * This method is most useful for writing Alphabet implementations. It should
    * not be invoked by users. Use alphabet.getSymbol(Set) instead.
    * </p>
-   *
-   * @param token   the Symbol's token [ignored since 1.2]
-   * @param annotation    the Symbol's Annotation
-   * @param symSet  a Set of Symbol objects
-   * @param alpha   the Alphabet that this Symbol will reside in
    * @return a Symbol that encapsulates that List
    * @deprecated use the three-arg version of this method instead.
+   * @param token the Symbol's token [ignored since 1.2]
+   * @param annotation the Symbol's Annotation
+   * @param symSet a Set of Symbol objects
+   * @param alpha the Alphabet that this Symbol will reside in
+   * @throws org.biojava.bio.symbol.IllegalSymbolException If the Symbol cannot be made
    */
   static public Symbol createSymbol(
     char token, Annotation annotation,
@@ -568,16 +588,16 @@ public final class AlphabetManager {
    * Generates a new Symbol instance that represents the tuple of Symbols in
    * symList.
    * </p>
-   *
+   * 
    * <p>
    * This method is most useful for writing Alphabet implementations. It should
    * not be invoked by users. Use alphabet.getSymbol(Set) instead.
    * </p>
-   *
-   * @param annotation the Symbol's Annotation
-   * @param symSet  a Set of Symbol objects
-   * @param alpha   the Alphabet that this Symbol will reside in
    * @return a Symbol that encapsulates that List
+   * @param annotation the Symbol's Annotation
+   * @param symSet a Set of Symbol objects
+   * @param alpha the Alphabet that this Symbol will reside in
+   * @throws org.biojava.bio.symbol.IllegalSymbolException If the Symbol cannot be made
    */
   static public Symbol createSymbol(
     Annotation annotation,
@@ -714,25 +734,24 @@ public final class AlphabetManager {
    * <p>
    * Retrieve a CrossProductAlphabet instance over the alphabets in aList.
    * </p>
-   *
+   * 
    * <p>
    * If all of the alphabets in aList implements FiniteAlphabet then the
    * method will return a FiniteAlphabet. Otherwise, it returns a non-finite
    * alphabet.
    * </p>
-   *
+   * 
    * <p>
    * If you call this method twice with a list containing the same alphabets,
    * it will return the same alphabet. This promotes the re-use of alphabets
    * and helps to maintain the 'flyweight' principal for finite alphabet
    * symbols.
    * </p>
-   *
+   * 
    * <p>
    * The resulting alphabet cpa will be retrievable via
    * AlphabetManager.alphabetForName(cpa.getName())
    * </p>
-   *
    * @param aList a list of Alphabet objects
    * @return a CrossProductAlphabet that is over the alphabets in aList
    */
@@ -740,6 +759,15 @@ public final class AlphabetManager {
     return getCrossProductAlphabet(aList, (Alphabet) null);
   }
 
+  
+  /**
+   * Attempts to create a cross product alphabet and register it under a name.
+   * @param aList A list of alphabets
+   * @param name The name which the new alphabet will be registered under.
+   * @throws org.biojava.bio.symbol.IllegalAlphabetException If the Alphabet cannot be made or a different 
+   * alphabet is already registed under this name.
+   * @return The CrossProductAlphabet
+   */
   static public Alphabet getCrossProductAlphabet(List aList, String name)
   throws IllegalAlphabetException {
     Alphabet currentAlpha = (Alphabet) nameToAlphabet.get(name);
@@ -882,15 +910,16 @@ public final class AlphabetManager {
    * instances in symSet. If the symbol can't be represented by a single list of
    * BasisSymbol instances, return null.
    * </p>
-   *
+   * 
    * <p>
    * This method is most useful for implementers of Alphabet and Symbol. It
    * probably should not be invoked by users.
    * </p>
-   *
-   * @param symSet  the Set of AtomicSymbol instances
-   * @param alpha   the Alphabet instance that the Symbols are from
    * @return a List of BasisSymbols
+   * @param symSet the Set of AtomicSymbol instances
+   * @param alpha the Alphabet instance that the Symbols are from
+   * @throws org.biojava.bio.symbol.IllegalSymbolException In practice it should not. If it does it probably
+   * indicates a subtle bug somewhere in AlphabetManager
    */
   public static List factorize(Alphabet alpha, Set symSet)
   throws IllegalSymbolException {
