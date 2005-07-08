@@ -33,7 +33,7 @@ import org.biojava.bio.seq.io.StreamParser;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
-import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.BasisSymbol;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
@@ -124,6 +124,10 @@ public final class SoftMaskedAlphabet
     return sma;
   }
 
+  /**
+   * Gets the <CODE>Alphabet</CODE> upon which masking is being applied
+   * @return A <CODE>FiniteAlphabet</CODE>
+   */
   public FiniteAlphabet getMaskedAlphabet(){
     return alpha;
   }
@@ -163,10 +167,27 @@ public final class SoftMaskedAlphabet
     return new ListTools.Doublet(alpha, binary);
   }
 
+  
+  /**
+   * Gets the compound symbol composed of the <code>Symbols</code> in the List.
+   * The <code>Symbols</code> in the <code>List</code> must be from <code>alpha</code>
+   * (defined in the constructor) and <code>SUBINTEGER[0..1]</code>
+   * @return A <code>Symbol</code> from this alphabet.
+   * @throws IllegalSymbolException if <code>l</code> is not as expected (see above)
+   * @param l a <code>List</code> of <code>Symbols</code>
+   */
   public Symbol getSymbol(List l) throws IllegalSymbolException {
     return delegateAlpha.getSymbol(l);
   }
-
+  
+  /**
+   * This is not supported. Ambiguity should be handled at the level of the 
+   * wrapped Alphabet. Use <code>getSymbol(List l)</code> instead and provide
+   * it with an ambigutiy and a masking symbol.
+   * @param s a <code>Set</code> of <code>Symbols</code>
+   * @see #getSymbol(List l)
+   * @throws UnsupportedOperationException
+   */
   public Symbol getAmbiguity(Set s) throws UnsupportedOperationException {
     throw new UnsupportedOperationException(
         "Ambiguity should be handled at the level of the wrapped Alphabet");
@@ -187,6 +208,10 @@ public final class SoftMaskedAlphabet
     }
   }
 
+  /**
+   * Getter for the <code>MaskingDetector<code>
+   * @return the <code>MaskingDetector<code>
+   */
   public MaskingDetector getMaskingDetector(){
     return maskingDetector;
   }
@@ -224,7 +249,12 @@ public final class SoftMaskedAlphabet
     throw new ChangeVetoException("SoftMaskedAlphabets cannot remove Symbols");
   }
 
-  public boolean isMasked (AtomicSymbol s) throws IllegalSymbolException {
+  /**
+   * Determines if a <code>Symbol</code> is masked.
+   * @return true if <code>s</code> is masked.
+   * @param s the <code>Symbol</code> to test.
+   */
+  public boolean isMasked (BasisSymbol s) throws IllegalSymbolException {
     validate(s);
 
     IntegerSymbol b = (IntegerSymbol)s.getSymbols().get(1);
@@ -373,10 +403,10 @@ public final class SoftMaskedAlphabet
 
     public String tokenizeSymbol (Symbol s) throws IllegalSymbolException{
       validate(s);
-      Symbol a = (Symbol) ((AtomicSymbol)s).getSymbols().get(0);
+      Symbol a = (Symbol) ((BasisSymbol)s).getSymbols().get(0);
       String token = delegate.tokenizeSymbol(a);
 
-      if(alpha.isMasked((AtomicSymbol) s)){
+      if(alpha.isMasked((BasisSymbol) s)){
         return maskingDetector.mask(token);
       }
 
