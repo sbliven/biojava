@@ -85,15 +85,6 @@ public interface BioSQLBioDB extends PersistentBioDB {
         public boolean respectsTransactions() {
             return this.respectsTransactions;
         }
-        protected void beginTransaction() throws SQLException {
-            if (!this.respectsTransactions()) this.getConnection().setAutoCommit(false);
-        }
-        protected void commitTransaction() throws SQLException {
-            if (!this.respectsTransactions()) this.getConnection().commit();
-        }
-        protected void rollbackTransaction() throws SQLException {
-            if (!this.respectsTransactions()) this.getConnection().rollback();
-        }
         public Set loadNamespaceNames() throws SQLException {
             // use SQL to locate all the names
             // return them as a set
