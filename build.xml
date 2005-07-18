@@ -451,6 +451,9 @@
        <group title="Experimental and new packages"
               packages="org.biojava.bio.proteomics:org.biojava.bio.molbio:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.utils.lsid:org.biojava.bio.program.unigene:org.biojava.bio.program.ssaha:org.biojava.bio.seq.distributed:org.biojava.bio.annodb:org.biojava.bio.ontology:org.biojava.bio.ontology.io:org.biojava.bio.program.formats:org.biojava.bio.program.gff3" />
 
+       <group title="Biojava extension (biojavax) packages"
+              packages="org.biojavax:org.biojavax.bio:org.biojavax.bio.db:org.biojavax.bio.db.biosql:org.biojavax.seq.io:org.biojavax.bio.taxa:org.biojavax.ga:org.biojavax.ga.exception:org.biojavax.ga.function:org.biojavax.ga.impl:org.biojavax.ga.util:org.biojavax.ontology" />
+
        
       <taglet name="UserLevel" path="${build.dest.taglets}" />
       <taglet name="MetaData" path="${build.dest.taglets}:${classpath}:${jar.biojava}" />
