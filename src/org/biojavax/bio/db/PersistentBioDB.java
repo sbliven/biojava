@@ -141,7 +141,7 @@ public interface PersistentBioDB {
     
     /**
      * Converts an object into its persistent equivalent, if appropriate.
-     * @param c the comparable object to convert.
+     * @param o the comparable object to convert.
      * @return The persistent equivalent.
      * @throws IllegalArgumentException if it could not understand the object.
      */

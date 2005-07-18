@@ -142,7 +142,7 @@ public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder 
      * be called 0 or 1 times per entry. If it is not called the
      * Listener should assume the version is 0. If it is called more
      * than once per entry an exception should be thrown.
-     * @param version the version of the record
+     * @param seqVersion the version of the record
      * @throws ParseException If the Listener cannot understand the event, is unable
      * to deal with the event or is not expecting the event.
      */

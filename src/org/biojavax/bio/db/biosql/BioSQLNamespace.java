@@ -77,7 +77,7 @@ public class BioSQLNamespace extends PersistentNamespace {
     } 
     /**
      * Singleton constructor.
-     * @param namespace the namespace to wrap and make persistent.
+     * @param name the namespace to wrap and make persistent.
      * @return the persistent version.
      */
     public static PersistentNamespace getInstance(PersistentBioDB db, String name) {

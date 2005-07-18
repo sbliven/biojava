@@ -101,7 +101,7 @@ public interface Persistent {
      * Setter for property status. The status will be one of the ones defined in this interface, ie.
      * UNMODIFIED, MODIFIED, and DELETED.
      * @param status Value of property status.
-     * @throw IllegalArgumentException if the status is unrecognised.
+     * @throws IllegalArgumentException if the status is unrecognised.
      */
     public void setStatus(int status) throws IllegalArgumentException;
     

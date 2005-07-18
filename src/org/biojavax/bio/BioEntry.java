@@ -497,7 +497,7 @@ public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence {
     
     /**
      * Sets he version of the associated symbol list.
-     * @param seqversion the new version
+     * @param seqVersion the new version
      * @throws ChangeVetoException if it doesn't want to change.
      */
     public void setSeqVersion(double seqVersion) throws ChangeVetoException;

@@ -1290,7 +1290,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     
     /**
      * Sets he version of the associated symbol list.
-     * @param seqversion the new version
+     * @param seqVersion the new version
      */
     public void setSeqVersion(double seqVersion) throws ChangeVetoException {
         if(!this.hasListeners(BioEntry.RELATIONSHIP)) {

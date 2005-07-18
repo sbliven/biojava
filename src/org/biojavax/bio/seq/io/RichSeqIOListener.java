@@ -92,7 +92,7 @@ public interface RichSeqIOListener extends SeqIOListener {
      * to deal with the event or is not expecting the event.
      * @see #setURI(String uri)
      * @see #setAccession(String accession)
-     * @see #setIndentifier(String identifier)
+     * @see #setIdentifier(String identifier)
      */
     public void setName(String name) throws ParseException;
 
@@ -105,7 +105,7 @@ public interface RichSeqIOListener extends SeqIOListener {
      * to deal with the event or is not expecting the event.
      * @see #setName(String name)
      * @see #setAccession(String accession)
-     * @see #setIndentifier(String identifier)
+     * @see #setIdentifier(String identifier)
      */
     public void setURI(String uri) throws ParseException;
 
@@ -203,7 +203,7 @@ public interface RichSeqIOListener extends SeqIOListener {
      *
      * @see #setName(String name)
      * @see #setURI(String uri)
-     * @see #setIndentifier(String identifier)
+     * @see #setIdentifier(String identifier)
      * 
      */
     public void setAccession(String accession) throws ParseException;
