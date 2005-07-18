@@ -63,8 +63,8 @@ public interface GAStoppingCriteria {
 
     /**
      * Stops the Algorithm if the iterations are >= <code>maxGenerations</code>
-     * @param ga
-     * @return
+     * @param ga the genetic algorithm to assess for stopping
+     * @return true if the <code>ga</code> should stop
      */
     public boolean stop(GeneticAlgorithm ga){
       return(ga.getGeneration() >= maxGenerations);

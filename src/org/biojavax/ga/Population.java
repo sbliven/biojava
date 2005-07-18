@@ -69,7 +69,7 @@ public interface Population extends Changeable{
    * @throws ChangeVetoException
    * @throws IllegalOrganismException if for some reason the organism is invalid
    */
-  public void addOrganisms(Set org)throws ChangeVetoException, IllegalOrganismException;
+  public void addOrganisms(Set orgs)throws ChangeVetoException, IllegalOrganismException;
 
   /**
    * Adds the residents of one population to this one
