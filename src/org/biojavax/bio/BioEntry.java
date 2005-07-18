@@ -33,7 +33,7 @@ import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
-import org.biojavax.Comment;
+//import org.biojavax.Comment;
 import org.biojavax.CrossRef;
 import org.biojavax.DocumentReference;
 import org.biojavax.bio.taxa.NCBITaxon;
