@@ -36,12 +36,20 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.sql.DataSource;
 import org.biojava.bio.BioRuntimeException;
+import org.biojavax.CrossRef;
+import org.biojavax.DocumentReference;
+import org.biojavax.LocatedDocumentReference;
 import org.biojavax.Namespace;
+import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.db.Persistent;
 import org.biojavax.bio.db.PersistentBioDB;
 import org.biojavax.bio.db.PersistentBioEntry;
 import org.biojavax.bio.db.PersistentComparableOntology;
 import org.biojavax.bio.db.PersistentNamespace;
+import org.biojavax.bio.taxa.NCBITaxon;
+import org.biojavax.ontology.ComparableOntology;
+import org.biojavax.ontology.ComparableTerm;
+import org.biojavax.ontology.ComparableTriple;
 
 
 
@@ -211,11 +219,10 @@ public interface BioSQLBioDB extends PersistentBioDB {
             // return them as a set
             return names;
         }
-        public PersistentComparableOntology loadOntology(String name) throws SQLException {
+        public PersistentComparableOntology loadOntology(String name) throws Exception {
             // name is all we need to identify it uniquely, so no SQL required!
-            // PersistentComparableOntology co = BioSQLComparableOntology.getInstance(this, name);
-            // return (PersistentComparableOntology)co.load(null);
-            return null;
+            PersistentComparableOntology co = BioSQLComparableOntology.getInstance(this, name);
+            return (PersistentComparableOntology)co.load(null);
         }
         public void setNamespace(Namespace ns) {
             this.readns = ns;
@@ -262,17 +269,17 @@ public interface BioSQLBioDB extends PersistentBioDB {
         }
         public Persistent convert(Object o) throws IllegalArgumentException {
             // if-else wrapper
-            //if (o instanceof BioEntry) return BioSQLBioEntry.getInstance(this,(BioEntry)o);
-            //else if (o instanceof BioEntryFeature) return BioSQLBioEntryFeature.getInstance(this,(BioEntryFeature)o);
-            //else if (o instanceof BioEntryRelationship) return BioSQLBioEntryRelationship.getInstance(this,(BioEntryRelationship)o);
-            //else if (o instanceof ComparableOntology) return BioSQLComparableOntology.getInstance(this,(ComparableOntology)o);
-            //else if (o instanceof ComparableTerm) return BioSQLComparableTerm.getInstance(this,(ComparableTerm)o);
-            //else if (o instanceof ComparableTriple) return BioSQLComparableTriple.getInstance(this,(ComparableTriple)o);
-            //else if (o instanceof CrossRef) return BioSQLCrossRef.getInstance(this,(CrossRef)o);
-            //else if (o instanceof DocumentReference) return BioSQLDocumentReference.getInstance(this,(DocumentReference)o);
-            //else if (o instanceof LocatedDocumentReference) return BioSQLLocatedDocumentReference.getInstance(this,(LocatedDocumentReference)o);
-            //else if (o instanceof NCBITaxon) return BioSQLNCBITaxon.getInstance(this,(NCBITaxon)o);
             if (o==null) return null;
+            //else if (o instanceof BioEntry) return BioSQLBioEntry.getInstance(this,(BioEntry)o);
+            //else if (o instanceof BioEntryFeature) return BioSQLBioEntryFeature.getInstance(this,(BioEntryFeature)o);
+            else if (o instanceof BioEntryRelationship) return BioSQLBioEntryRelationship.getInstance(this,(BioEntryRelationship)o);
+            else if (o instanceof ComparableOntology) return BioSQLComparableOntology.getInstance(this,(ComparableOntology)o);
+            else if (o instanceof ComparableTerm) return BioSQLComparableTerm.getInstance(this,(ComparableTerm)o);
+            else if (o instanceof ComparableTriple) return BioSQLComparableTriple.getInstance(this,(ComparableTriple)o);
+            else if (o instanceof CrossRef) return BioSQLCrossRef.getInstance(this,(CrossRef)o);
+            else if (o instanceof DocumentReference) return BioSQLDocumentReference.getInstance(this,(DocumentReference)o);
+            else if (o instanceof LocatedDocumentReference) return BioSQLLocatedDocumentReference.getInstance(this,(LocatedDocumentReference)o);
+            else if (o instanceof NCBITaxon) return BioSQLNCBITaxon.getInstance(this,(NCBITaxon)o);
             else if (o instanceof Namespace) return BioSQLNamespace.getInstance(this,(Namespace)o);
             else throw new IllegalArgumentException("Unable to convert object of type "+o.getClass());
         }

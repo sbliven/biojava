@@ -292,6 +292,7 @@ public class BioSQLNCBITaxon extends PersistentNCBITaxon {
                         this.setUid(uid);
                     }
                 }
+                success = true;
             } catch (SQLException e) {
                 success = false;
                 throw e;

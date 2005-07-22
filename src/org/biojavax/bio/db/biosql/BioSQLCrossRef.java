@@ -308,6 +308,7 @@ public class BioSQLCrossRef extends PersistentCrossRef {
                         this.setUid(uid);
                     }
                 }
+                success = true;
             } catch (SQLException e) {
                 success = false;
                 throw e;

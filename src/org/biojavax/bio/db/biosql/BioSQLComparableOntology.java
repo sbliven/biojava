@@ -296,6 +296,7 @@ public class BioSQLComparableOntology extends PersistentComparableOntology {
                         this.setUid(uid);
                     }
                 }
+                success = true;
             } catch (SQLException e) {
                 success = false;
                 throw e;

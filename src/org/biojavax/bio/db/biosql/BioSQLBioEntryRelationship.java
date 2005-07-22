@@ -325,6 +325,7 @@ public class BioSQLBioEntryRelationship extends PersistentBioEntryRelationship {
                         this.setUid(uid);
                     }
                 }
+                success = true;
             } catch (SQLException e) {
                 success = false;
                 throw e;

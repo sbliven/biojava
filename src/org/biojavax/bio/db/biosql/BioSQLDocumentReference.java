@@ -299,6 +299,7 @@ public class BioSQLDocumentReference extends PersistentDocumentReference {
                         this.setUid(uid);
                     }
                 }
+                success = true;
             } catch (SQLException e) {
                 success = false;
                 throw e;

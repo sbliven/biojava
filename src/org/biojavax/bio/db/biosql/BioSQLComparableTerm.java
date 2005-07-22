@@ -305,6 +305,7 @@ public class BioSQLComparableTerm extends PersistentComparableTerm {
                         this.setUid(uid);
                     }
                 }
+                success = true;
             } catch (SQLException e) {
                 success = false;
                 throw e;

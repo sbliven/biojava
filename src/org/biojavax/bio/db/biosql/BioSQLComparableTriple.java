@@ -329,6 +329,7 @@ public class BioSQLComparableTriple extends PersistentComparableTriple {
                         this.setUid(uid);
                     }
                 }
+                success = true;
             } catch (SQLException e) {
                 success = false;
                 throw e;
