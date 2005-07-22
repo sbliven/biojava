@@ -28,6 +28,8 @@
 package org.biojavax.ontology;
 
 import org.biojava.ontology.Term;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
@@ -35,4 +37,24 @@ import org.biojava.utils.Changeable;
  * @author Richard Holland
  */
 public interface ComparableTerm extends Term,Comparable,Changeable {
+    
+        public static final ChangeType IDENTIFIER = new ChangeType(
+            "This term's identifier has changed",
+            "org.biojavax.ontology.ComparableTerm",
+                "identifier"
+            );        
+        public static final ChangeType OBSOLETE = new ChangeType(
+            "This term's obsolescence has changed",
+            "org.biojavax.ontology.ComparableTerm",
+                "obsolete"
+            );
+        
+    public String getIdentifier();
+    
+    public void setIdentifier(String identifier) throws ChangeVetoException;
+        
+    public boolean getObsolete();
+    
+    public void setObsolete(boolean obsolete) throws ChangeVetoException;
+    
 }

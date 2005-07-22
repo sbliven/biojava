@@ -206,9 +206,9 @@ public class BioSQLBioEntryRelationship extends PersistentBioEntryRelationship {
             ps.execute();
             rs = ps.getResultSet();
             if (rs.next()) {
-                PersistentBioEntry subj = BioSQLBioEntry.getInstanceByUID(db,rs.getInt(1));
+                PersistentBioEntry subj = db.loadSequenceByUID(rs.getInt(1));
                 PersistentComparableTerm term = BioSQLComparableTerm.getInstanceByUID(db,rs.getInt(2));
-                PersistentBioEntry obj = BioSQLBioEntry.getInstanceByUID(db,rs.getInt(3));
+                PersistentBioEntry obj = db.loadSequenceByUID(rs.getInt(3));
                 xr = (PersistentBioEntryRelationship)getInstance(db, obj, subj, term);
                 xr.setUid(uid);
             } else xr= null;

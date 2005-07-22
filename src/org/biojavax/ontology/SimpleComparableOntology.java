@@ -408,6 +408,7 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     /**
      * Sets a human-readable description of this ontology.
      * @param description the description.
+     * @throws org.biojava.utils.ChangeVetoException in case of problems.
      */
     public void setDescription(String description) throws ChangeVetoException {
         if(!this.hasListeners(ComparableOntology.DESCRIPTION)) {

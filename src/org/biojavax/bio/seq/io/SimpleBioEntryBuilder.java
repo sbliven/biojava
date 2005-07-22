@@ -58,7 +58,7 @@ import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
- *
+ * Constructs BioEntry objects by listening to events.
  * @author Richard Holland
  */
 public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder {
@@ -68,6 +68,10 @@ public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder 
         this.reset();
     }
     
+    /**
+     * Sets the sequence info back to default values, ie. in order to start
+     * constructing a new sequence from scratch.
+     */
     private void reset() {
         this.version = 0;
         this.versionSeen = false;
@@ -142,7 +146,7 @@ public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder 
      * be called 0 or 1 times per entry. If it is not called the
      * Listener should assume the version is 0. If it is called more
      * than once per entry an exception should be thrown.
-     * @param seqVersion the version of the record
+     * @param seqVersion the version to set the sequence to.
      * @throws ParseException If the Listener cannot understand the event, is unable
      * to deal with the event or is not expecting the event.
      */
@@ -513,6 +517,8 @@ public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder 
      * Return the Sequence object which has been constructed
      * by this builder.  This method is only expected to succeed
      * after the endSequence() notifier has been called.
+     * @throws org.biojava.bio.BioException in case the object could not be constructed.
+     * @return the constructed object.
      */
     public Sequence makeSequence() throws BioException {
         this.endSequence(); // Check our input.
@@ -556,6 +562,12 @@ public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder 
         return be;
     }
     
+    /**
+     * Constructs features into BioEntryFeatures.
+     * @param parent the parent feature holder.
+     * @param children the set of features to add.
+     * @throws java.lang.Exception in case it couldn't add them.
+     */
     private void makeChildFeatures(Feature parent, Set children) throws Exception {
         for (Iterator i = children.iterator(); i.hasNext(); ) {
             TemplateWithChildren twc = (TemplateWithChildren) i.next();
@@ -566,6 +578,9 @@ public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder 
         }
     }
     
+    /**
+     * A template feature holder that has a hierarchy of children.
+     */
     private static class TemplateWithChildren {
         public Feature.Template template;
         public Set children;

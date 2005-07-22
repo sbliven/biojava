@@ -26,11 +26,11 @@
  */
 
 package org.biojavax.bio.db;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.biojava.ontology.Ontology;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ontology.ComparableTerm;
 import org.biojavax.ontology.SimpleComparableTerm;
 
@@ -74,30 +74,42 @@ public abstract class PersistentComparableTerm extends SimpleComparableTerm impl
         if (status!=Persistent.UNMODIFIED && status!=Persistent.MODIFIED && status!=Persistent.DELETED)
             throw new IllegalArgumentException("Invalid status code");
         this.status = status;
+        if (status==Persistent.UNMODIFIED) {
+            this.addedSynonyms.clear();
+            this.removedSynonyms.clear();
+        }
     }
     
     public void setUid(int uid) {
         this.uid = uid;
+    }    
+    
+    public void setIdentifier(String identifier) throws ChangeVetoException {
+        super.setIdentifier(identifier);
+        this.setStatus(Persistent.MODIFIED);
     }
     
-    public abstract Persistent load(Object[] vars) throws SQLException;
+    public void setObsolete(boolean obsolete) throws ChangeVetoException {
+        super.setObsolete(obsolete);
+        this.setStatus(Persistent.MODIFIED);
+    }
     
-    public abstract boolean remove(Object[] vars) throws SQLException;
+    public abstract Persistent load(Object[] vars) throws Exception;
     
-    public abstract Persistent store(Object[] vars) throws SQLException;
+    public abstract boolean remove(Object[] vars) throws Exception;
+    
+    public abstract Persistent store(Object[] vars) throws Exception;
     
     // Contains all names removed since the last commit, EXCEPT those which
     // were added AND removed since the last commit. It is up to the subclass
     // to reset this else it could get inconsistent.
     private Set removedSynonyms = new HashSet();
     protected Set getRemovedSynonyms() { return Collections.unmodifiableSet(this.removedSynonyms); }
-    protected void resetRemovedSynonyms() { this.removedSynonyms.clear(); }
     // Contains all names added since the last commit, EXCEPT those which
     // were added AND removed since the last commit. It is up to the subclass
     // to reset this else it could get inconsistent.
     private Set addedSynonyms = new HashSet();
     protected Set getAddedSynonyms() { return Collections.unmodifiableSet(this.addedSynonyms); }
-    protected void resetAddedSynonyms() { this.addedSynonyms.clear(); }
     
     public void removeSynonym(Object synonym) {
         super.removeSynonym(synonym);

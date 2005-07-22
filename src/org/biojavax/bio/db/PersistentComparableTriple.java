@@ -91,17 +91,21 @@ public abstract class PersistentComparableTriple extends SimpleComparableTriple 
         if (status!=Persistent.UNMODIFIED && status!=Persistent.MODIFIED && status!=Persistent.DELETED)
             throw new IllegalArgumentException("Invalid status code");
         this.status = status;
+        if (status==Persistent.UNMODIFIED) {
+            this.addedDescriptors.clear();
+            this.removedDescriptors.clear();
+        }
     }
     
     public void setUid(int uid) {
         this.uid = uid;
     }
     
-    public abstract Persistent load(Object[] vars) throws SQLException;
+    public abstract Persistent load(Object[] vars) throws Exception;
     
-    public abstract boolean remove(Object[] vars) throws SQLException;
+    public abstract boolean remove(Object[] vars) throws Exception;
     
-    public abstract Persistent store(Object[] vars) throws SQLException;
+    public abstract Persistent store(Object[] vars) throws Exception;
     
     public void removeSynonym(Object synonym) {
         super.removeSynonym(synonym);
@@ -118,13 +122,11 @@ public abstract class PersistentComparableTriple extends SimpleComparableTriple 
     // to reset this else it could get inconsistent.
     private Set removedDescriptors = new HashSet();
     protected Set getRemovedDescriptors() { return Collections.unmodifiableSet(this.removedDescriptors); }
-    protected void resetRemovedDescriptors() { this.removedDescriptors.clear(); }
     // Contains all names added since the last commit, EXCEPT those which
     // were added AND removed since the last commit. It is up to the subclass
     // to reset this else it could get inconsistent.
     private Set addedDescriptors = new HashSet();
     protected Set getAddedDescriptors() { return Collections.unmodifiableSet(this.addedDescriptors); }
-    protected void resetAddedDescriptors() { this.addedDescriptors.clear(); }
     
     public boolean removeDescriptor(ComparableTerm desc) throws IllegalArgumentException, ChangeVetoException {
         boolean retValue;

@@ -29,6 +29,9 @@ package org.biojavax.ontology;
 
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A Term object that can be compared and thus sorted.
@@ -39,6 +42,11 @@ import org.biojava.ontology.Term;
  */
 public class SimpleComparableTerm extends Term.Impl implements ComparableTerm {
     
+    
+    private String identifier;
+    
+    private boolean obsolete;
+    
     /**
      * Creates a new instance of SimpleComparableTerm with synonyms.
      * @param ontology The ontology to put the term in.
@@ -48,6 +56,8 @@ public class SimpleComparableTerm extends Term.Impl implements ComparableTerm {
      */
     public SimpleComparableTerm(ComparableOntology ontology, String name, String description, Object[] synonyms) {
         super((Ontology)ontology,name,description,synonyms);
+        this.identifier = null;
+        this.obsolete = false;
     }
     
     /**
@@ -62,5 +72,51 @@ public class SimpleComparableTerm extends Term.Impl implements ComparableTerm {
         ComparableTerm them = (ComparableTerm)o;
         if (this.getOntology().equals(them.getOntology())) return ((ComparableOntology)this.getOntology()).compareTo(them.getOntology());
         return this.getName().compareTo(them.getName());
+    }
+    
+    public String getIdentifier() {
+        return this.identifier;
+    }
+    
+    public void setIdentifier(String identifier) throws ChangeVetoException {
+        if(!this.hasListeners(ComparableTerm.IDENTIFIER)) {
+            this.identifier = identifier;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    ComparableTerm.IDENTIFIER,
+                    identifier,
+                    this.identifier
+                    );
+            ChangeSupport cs = this.getChangeSupport(ComparableTerm.IDENTIFIER);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.identifier = identifier;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
+    
+    public boolean getObsolete() {
+        return this.obsolete;
+    }
+    
+    public void setObsolete(boolean obsolete) throws ChangeVetoException {
+        if(!this.hasListeners(ComparableTerm.OBSOLETE)) {
+            this.obsolete = obsolete;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    ComparableTerm.OBSOLETE,
+                    Boolean.valueOf(obsolete),
+                    Boolean.valueOf(this.obsolete)
+                    );
+            ChangeSupport cs = this.getChangeSupport(ComparableTerm.OBSOLETE);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.obsolete = obsolete;
+                cs.firePostChangeEvent(ce);
+            }
+        }
     }
 }

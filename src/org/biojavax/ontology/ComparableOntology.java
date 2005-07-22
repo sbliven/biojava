@@ -64,6 +64,7 @@ public interface ComparableOntology extends Ontology,Comparable,Changeable {
     /**
      * Sets a human-readable description of this ontology.
      * @param description the description.
+     * @throws org.biojava.utils.ChangeVetoException in case of problems.
      */
     public void setDescription(String description) throws ChangeVetoException;
     
