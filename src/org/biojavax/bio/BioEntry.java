@@ -59,8 +59,6 @@ import java.util.Set;
 
 import org.biojava.bio.Annotatable;
 
-import org.biojava.bio.seq.Sequence;
-
 import org.biojava.ontology.AlreadyExistsException;
 
 import org.biojava.utils.ChangeType;
@@ -97,7 +95,7 @@ import org.biojavax.LocatedDocumentReference;
 
  */
 
-public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence,BioEntryFeatureHolder {
+public interface BioEntry extends Annotatable,Comparable,Changeable {
 
     /**
 
@@ -924,27 +922,6 @@ public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence,Bio
 
     public int countComments();
 
-    
-
-    /**
-     * Sets the version of the associated symbol list.
-     * @param seqVersion the version to set.
-     * @throws ChangeVetoException if it doesn't want to change.
-     */
-
-    public void setSeqVersion(double seqVersion) throws ChangeVetoException;
-
-    
-
-    /**
-
-     * The version of the associated symbol list.
-
-     * @return  the version
-
-     */
-
-    public double getSeqVersion();
 
 }
 

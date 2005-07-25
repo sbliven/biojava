@@ -1,14 +1,49 @@
 /*
- * RichSequence.java
+ 
+ *                    BioJava development code
+ 
  *
- * Created on July 22, 2005, 5:17 PM
+ 
+ * This code may be freely distributed and modified under the
+ 
+ * terms of the GNU Lesser General Public Licence.  This should
+ 
+ * be distributed with the code.  If you do not have a copy,
+ 
+ * see:
+ 
  *
+ 
+ *      http://www.gnu.org/copyleft/lesser.html
+ 
+ *
+ 
+ * Copyright for this code is held jointly by the individual
+ 
+ * authors.  These should be listed in @author doc comments.
+ 
+ *
+ 
+ * For more information on the BioJava project and its aims,
+ 
+ * or to join the biojava-l mailing list, visit the home page
+ 
+ * at:
+ 
+ *
+ 
+ *      http://www.biojava.org/
+ 
+ *
+ 
  */
 
 package org.biojavax.bio.seq;
 
 import org.biojava.bio.seq.Sequence;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.BioEntry;
+import org.biojavax.bio.seq.RichSequenceFeatureHolder;
 
 /**
  * A rich sequence is a combination of a <code>org.biojavax.bio.Bioentry</code>
@@ -22,4 +57,26 @@ import org.biojavax.bio.BioEntry;
  * <code>Sequence</code>
  * @author Mark Schreiber
  */
-public interface RichSequence extends Sequence, BioEntry{}
+public interface RichSequence extends BioEntry,Sequence,RichSequenceFeatureHolder {
+    
+    
+    /**
+
+     * The version of the associated symbol list.
+
+     * @return  the version
+
+     */
+
+    public double getSeqVersion();
+
+    
+
+    /**
+     * Sets the version of the associated symbol list.
+     * @param seqVersion the version to set.
+     * @throws ChangeVetoException if it doesn't want to change.
+     */
+
+    public void setSeqVersion(double seqVersion) throws ChangeVetoException;
+}

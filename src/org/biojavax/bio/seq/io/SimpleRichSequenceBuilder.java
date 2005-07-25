@@ -20,7 +20,7 @@
  */
 
 /*
- * SimpleBioEntryBuilder.java
+ * SimpleRichSequenceBuilder.java
  *
  * Created on July 11, 2005, 1:51 PM
  */
@@ -49,11 +49,12 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
 import org.biojavax.Namespace;
-import org.biojavax.bio.BioEntry;
 import org.biojavax.LocatedDocumentReference;
+import org.biojavax.bio.BioEntryComment;
 import org.biojavax.bio.BioEntryRelationship;
-import org.biojavax.bio.SimpleBioEntry;
 import org.biojavax.bio.db.Persistent;
+import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.SimpleRichSequence;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
 
@@ -61,10 +62,12 @@ import org.biojavax.ontology.ComparableTerm;
  * Constructs BioEntry objects by listening to events.
  * @author Richard Holland
  */
-public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder {
+public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuilder {
     
-    /** Creates a new instance of SimpleBioEntryBuilder */
-    public SimpleBioEntryBuilder() {
+    /**
+     * Creates a new instance of SimpleRichSequenceBuilder 
+     */
+    public SimpleRichSequenceBuilder() {
         this.reset();
     }
     
@@ -527,7 +530,7 @@ public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder 
         // deal with extra accessions by ignoring them.
         String accession = (String)this.accessions.get(0);
         // make our basic object
-        BioEntry be = new SimpleBioEntry(this.namespace,this.name,accession,this.version,syms,this.seqVersion);
+        RichSequence be = new SimpleRichSequence(this.namespace,this.name,accession,this.version,syms,this.seqVersion);
         // set misc stuff
         try {
             be.setSeqVersion(this.seqVersion);
@@ -538,7 +541,7 @@ public class SimpleBioEntryBuilder implements RichSeqIOListener,SequenceBuilder 
             for (Iterator i = this.crossRefs.iterator(); i.hasNext(); ) be.addCrossRef((CrossRef)i.next());
             for (Iterator i = this.relations.iterator(); i.hasNext(); ) be.addBioEntryRelationship((BioEntryRelationship)i.next());
             for (Iterator i = this.references.iterator(); i.hasNext(); ) be.addDocRef((LocatedDocumentReference)i.next());
-            for (Iterator i = this.comments.iterator(); i.hasNext(); ) be.addComment((String)i.next());
+            for (Iterator i = this.comments.iterator(); i.hasNext(); ) be.addComment((BioEntryComment)i.next());
             // set annotations
             for (Iterator i = this.ann.keys().iterator(); i.hasNext(); ) {
                 Object key = i.next();

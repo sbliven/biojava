@@ -42,7 +42,7 @@
 
 /*
 
- * SimpleBioEntryFeature.java
+ * SimpleRichSequenceFeature.java
 
  *
 
@@ -52,7 +52,7 @@
 
 
 
-package org.biojavax.bio;
+package org.biojavax.bio.seq;
 
 import java.util.Iterator;
 
@@ -73,6 +73,7 @@ import org.biojava.bio.seq.impl.SimpleStrandedFeature;
 import org.biojava.utils.ChangeForwarder;
 
 import org.biojava.utils.ChangeVetoException;
+import org.biojavax.bio.*;
 
 
 
@@ -80,22 +81,15 @@ import org.biojava.utils.ChangeVetoException;
 
 
 /**
-
- * A simple implementation of BioEntryFeature.
-
- *
-
+ * A simple implementation of RichSequenceFeature.
+ * 
  * Equality is inherited from SimpleStrandedFeature.
-
- *
-
+ * 
  * @author Richard Holland
-
  * @author Mark Schreiber
-
  */
 
-public class SimpleBioEntryFeature extends SimpleStrandedFeature implements BioEntryFeature {
+public class SimpleRichSequenceFeature extends SimpleStrandedFeature implements RichSequenceFeature {
 
     
 
@@ -118,18 +112,13 @@ public class SimpleBioEntryFeature extends SimpleStrandedFeature implements BioE
     
 
     /**
-
-     * Creates a new instance of SimpleBioEntryFeature
-
+     * Creates a new instance of SimpleRichSequenceFeature
      * @param sourceSeq The sequence to relate the feature to.
-
      * @param parent The parent feature holder, if any.
-
      * @param template The template to construct the feature from.
-
      */
 
-    public SimpleBioEntryFeature(Sequence sourceSeq, FeatureHolder parent, StrandedFeature.Template template) {
+    public SimpleRichSequenceFeature(Sequence sourceSeq, FeatureHolder parent, StrandedFeature.Template template) {
 
         super(sourceSeq,parent,template);
 
