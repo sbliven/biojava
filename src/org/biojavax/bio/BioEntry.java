@@ -97,7 +97,7 @@ import org.biojavax.LocatedDocumentReference;
 
  */
 
-public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence {
+public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence,BioEntryFeatureHolder {
 
     /**
 
@@ -818,7 +818,7 @@ public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence {
 
      */
 
-    public String getComment(int index) throws IndexOutOfBoundsException;
+    public BioEntryComment getComment(int index) throws IndexOutOfBoundsException;
 
     
 
@@ -838,7 +838,7 @@ public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence {
 
      */
 
-    public void setComment(String comment, int index) throws AlreadyExistsException,ChangeVetoException;
+    public void setComment(BioEntryComment comment, int index) throws AlreadyExistsException,ChangeVetoException;
 
     
 
@@ -858,7 +858,7 @@ public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence {
 
      */
 
-    public int addComment(String comment) throws AlreadyExistsException,ChangeVetoException;
+    public int addComment(BioEntryComment comment) throws AlreadyExistsException,ChangeVetoException;
 
     
 
@@ -876,7 +876,7 @@ public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence {
 
      */
 
-    public boolean removeComment(String comment) throws ChangeVetoException;
+    public boolean removeComment(BioEntryComment comment) throws ChangeVetoException;
 
     
 
@@ -910,7 +910,7 @@ public interface BioEntry extends Annotatable,Comparable,Changeable,Sequence {
 
      */
 
-    public boolean containsComment(String comment);
+    public boolean containsComment(BioEntryComment comment);
 
     
 

@@ -70,17 +70,11 @@ import org.biojava.bio.Annotation;
 
 import org.biojava.bio.BioException;
 
-import org.biojava.bio.SimpleAnnotation;
-
 import org.biojava.bio.seq.Feature;
 
 import org.biojava.bio.seq.FeatureFilter;
 
 import org.biojava.bio.seq.FeatureHolder;
-
-import org.biojava.bio.seq.SimpleFeatureHolder;
-
-import org.biojava.bio.seq.StrandedFeature;
 
 import org.biojava.bio.symbol.Alphabet;
 
@@ -111,8 +105,6 @@ import org.biojavax.Namespace;
 import org.biojavax.bio.taxa.NCBITaxon;
 
 import org.biojavax.bio.db.Persistent;
-
-import org.biojavax.ontology.ComparableTerm;
 
 import org.biojavax.LocatedDocumentReference;
 
@@ -350,19 +342,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         
         // make the ann delegate
         
-        this.ann = new SimpleAnnotation() {
-            
-            public void setProperty(Object key, Object value) throws ChangeVetoException {
-                
-                if (!(key instanceof ComparableTerm)) throw new ChangeVetoException("Can only annotate using ComparableTerm objects as keys");
-                
-                if (!(value instanceof String)) throw new ChangeVetoException("Can only annotate using single String objects as values");
-                
-                super.setProperty(key, value);
-                
-            }
-            
-        };
+        this.ann = new SimpleBioEntryAnnotation();
         
         // construct the forwarder so that it emits Annotatable.ANNOTATION ChangeEvents
         
@@ -376,67 +356,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         
         // set up features
         
-        final BioEntry yomama = this;
-        
-        this.features = new SimpleFeatureHolder() {
-            
-            public Feature createFeature(Feature.Template f) throws ChangeVetoException {
-                
-                StrandedFeature.Template sft;
-                
-                if (f instanceof StrandedFeature.Template) {
-                    
-                    sft = (StrandedFeature.Template)f;
-                    
-                } else {
-                    
-                    sft = new StrandedFeature.Template();
-                    
-                    sft.annotation = f.annotation;
-                    
-                    sft.location = f.location;
-                    
-                    sft.source = f.source;
-                    
-                    sft.sourceTerm = f.sourceTerm;
-                    
-                    sft.type = f.type;
-                    
-                    sft.typeTerm = f.typeTerm;
-                    
-                    sft.strand = StrandedFeature.UNKNOWN;
-                    
-                }
-                
-                BioEntryFeature bef = new SimpleBioEntryFeature(yomama,this,sft);
-                
-                // make the feature a singleton
-                
-                if (this.containsFeature(bef)) for (Iterator i = this.features(); i.hasNext(); ) {
-                    
-                    BioEntryFeature bef2 = (BioEntryFeature)i.next();
-                    
-                    if (bef.equals(bef2)) return bef2;
-                    
-                }
-                
-                // or create a new feature
-                
-                this.addFeature(bef);
-                
-                return bef;
-                
-            }
-            
-            public void addFeature(Feature f) throws ChangeVetoException {
-                
-                if (!(f instanceof BioEntryFeature)) throw new ChangeVetoException("Can only add BioEntryFeature objects as features");
-                
-                super.addFeature(f);
-                
-            }
-            
-        };
+        this.features = new SimpleBioEntryFeatureHolder(this);
         
         // construct the forwarder so that it emits FeatureHolder ChangeEvents
         
@@ -685,7 +605,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    public void setComment(String comment, int index) throws AlreadyExistsException,ChangeVetoException {
+    public void setComment(BioEntryComment comment, int index) throws AlreadyExistsException,ChangeVetoException {
         
         if (this.comments.contains(comment)) throw new AlreadyExistsException("Comment has already been made");
         
@@ -1012,9 +932,9 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    public String getComment(int index) throws IndexOutOfBoundsException {
+    public BioEntryComment getComment(int index) throws IndexOutOfBoundsException {
         
-        return (String)this.comments.get(index);
+        return (BioEntryComment)this.comments.get(index);
         
     }
     
@@ -1058,7 +978,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    public boolean removeComment(String comment) throws ChangeVetoException {
+    public boolean removeComment(BioEntryComment comment) throws ChangeVetoException {
         
         int index = this.comments.indexOf(comment);
         
@@ -1120,7 +1040,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    public boolean containsComment(String comment) {
+    public boolean containsComment(BioEntryComment comment) {
         
         return this.comments.contains(comment);
         
@@ -1144,7 +1064,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    public int addComment(String comment) throws AlreadyExistsException,ChangeVetoException {
+    public int addComment(BioEntryComment comment) throws AlreadyExistsException,ChangeVetoException {
         
         if (comment==null) throw new ChangeVetoException("Comment cannot be null");
         

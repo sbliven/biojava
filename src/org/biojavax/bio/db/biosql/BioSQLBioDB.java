@@ -35,21 +35,10 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 import javax.sql.DataSource;
-import org.biojava.bio.BioRuntimeException;
-import org.biojavax.CrossRef;
-import org.biojavax.DocumentReference;
-import org.biojavax.LocatedDocumentReference;
 import org.biojavax.Namespace;
-import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.db.Persistent;
 import org.biojavax.bio.db.PersistentBioDB;
-import org.biojavax.bio.db.PersistentBioEntry;
-import org.biojavax.bio.db.PersistentComparableOntology;
-import org.biojavax.bio.db.PersistentNamespace;
-import org.biojavax.bio.taxa.NCBITaxon;
-import org.biojavax.ontology.ComparableOntology;
-import org.biojavax.ontology.ComparableTerm;
-import org.biojavax.ontology.ComparableTriple;
+
 
 
 
@@ -190,11 +179,6 @@ public interface BioSQLBioDB extends PersistentBioDB {
             // return them as a set
             return names;
         }
-        public PersistentNamespace loadNamespace(String name) throws Exception {
-            // name is all we need to identify it uniquely, so no SQL required!
-            PersistentNamespace ns = BioSQLNamespace.getInstance(this, name);
-            return (PersistentNamespace)ns.load(null);
-        }
         public Set loadOntologyNames() throws SQLException {
             // use SQL to locate all the names
             Set names = new HashSet();
@@ -219,29 +203,19 @@ public interface BioSQLBioDB extends PersistentBioDB {
             // return them as a set
             return names;
         }
-        public PersistentComparableOntology loadOntology(String name) throws Exception {
-            // name is all we need to identify it uniquely, so no SQL required!
-            PersistentComparableOntology co = BioSQLComparableOntology.getInstance(this, name);
-            return (PersistentComparableOntology)co.load(null);
-        }
-        public void setNamespace(Namespace ns) {
-            this.readns = ns;
-        }
         public Set loadSequenceUIDs() throws SQLException {
-            PersistentNamespace pns = null;
-            if (this.readns!=null) pns = (PersistentNamespace)this.convert(this.readns);
             // use SQL to locate all the Integer UIDs in the current namespace
             Set suids = new HashSet();
             String sql =
                     "select    bioentry_id " +
                     "from      bioentry ";
-            if (pns!=null) sql = sql + "where biodatabase_id = ? ";
+            //if (this.readns!=null) sql = sql + "where biodatabase_id = ? ";
             Connection c = this.getConnection();
             PreparedStatement ps = null;
             ResultSet rs = null;
             try {
                 ps = c.prepareStatement(sql);
-                if (this.readns!=null) ps.setInt(1,pns.getUid());
+                //if (this.readns!=null) ps.setInt(1,this.readns.getUid());
                 ps.execute();
                 rs = ps.getResultSet();
                 while (rs.next()) suids.add(Integer.valueOf(rs.getInt(1)));
@@ -255,32 +229,29 @@ public interface BioSQLBioDB extends PersistentBioDB {
             // return them as a set
             return suids;
         }
-        public PersistentBioEntry loadSequenceByUID(int UID) throws SQLException, NullPointerException {
-            // use SQL to locate the set of details, including the UID, in the current namespace
-            // construct a SimpleBioEntry object using SimpleBioEntryBuilder
-            // wrap it in a BioSQLBioEntry object with the UID set
-            return null;
+        public boolean writebackLongStrings() {
+            return false;
         }
-        public PersistentBioEntry loadSequence(String name, String accession, int version) throws SQLException, NullPointerException {
-            // use SQL to locate the FIRST set of details, including the UID, in the current namespace
-            // construct a SimpleBioEntry object using SimpleBioEntryBuilder
-            // wrap it in a BioSQLBioEntry object with the UID set
-            return null;
+        public void writeLongString(ResultSet rs, int column, String value) throws SQLException {
+            throw new RuntimeException("You can't do that! Database doesn't support writeback strings.");
+        }
+        public String readLongString(ResultSet rs, int column) throws SQLException {
+            return rs.getString(column); // In most cases this will work, but not for Oracle.
         }
         public Persistent convert(Object o) throws IllegalArgumentException {
             // if-else wrapper
             if (o==null) return null;
             //else if (o instanceof BioEntry) return BioSQLBioEntry.getInstance(this,(BioEntry)o);
             //else if (o instanceof BioEntryFeature) return BioSQLBioEntryFeature.getInstance(this,(BioEntryFeature)o);
-            else if (o instanceof BioEntryRelationship) return BioSQLBioEntryRelationship.getInstance(this,(BioEntryRelationship)o);
-            else if (o instanceof ComparableOntology) return BioSQLComparableOntology.getInstance(this,(ComparableOntology)o);
-            else if (o instanceof ComparableTerm) return BioSQLComparableTerm.getInstance(this,(ComparableTerm)o);
-            else if (o instanceof ComparableTriple) return BioSQLComparableTriple.getInstance(this,(ComparableTriple)o);
-            else if (o instanceof CrossRef) return BioSQLCrossRef.getInstance(this,(CrossRef)o);
-            else if (o instanceof DocumentReference) return BioSQLDocumentReference.getInstance(this,(DocumentReference)o);
-            else if (o instanceof LocatedDocumentReference) return BioSQLLocatedDocumentReference.getInstance(this,(LocatedDocumentReference)o);
-            else if (o instanceof NCBITaxon) return BioSQLNCBITaxon.getInstance(this,(NCBITaxon)o);
-            else if (o instanceof Namespace) return BioSQLNamespace.getInstance(this,(Namespace)o);
+            //else if (o instanceof BioEntryRelationship) return BioSQLBioEntryRelationship.getInstance(this,(BioEntryRelationship)o);
+            //else if (o instanceof ComparableOntology) return BioSQLComparableOntology.getInstance(this,(ComparableOntology)o);
+            //else if (o instanceof ComparableTerm) return BioSQLComparableTerm.getInstance(this,(ComparableTerm)o);
+            //else if (o instanceof ComparableTriple) return BioSQLComparableTriple.getInstance(this,(ComparableTriple)o);
+            //else if (o instanceof CrossRef) return BioSQLCrossRef.getInstance(this,(CrossRef)o);
+            //else if (o instanceof DocumentReference) return BioSQLDocumentReference.getInstance(this,(DocumentReference)o);
+            //else if (o instanceof LocatedDocumentReference) return BioSQLLocatedDocumentReference.getInstance(this,(LocatedDocumentReference)o);
+            //else if (o instanceof NCBITaxon) return BioSQLNCBITaxon.getInstance(this,(NCBITaxon)o);
+            //else if (o instanceof Namespace) return BioSQLNamespace.getInstance(this,(Namespace)o);
             else throw new IllegalArgumentException("Unable to convert object of type "+o.getClass());
         }
     }
@@ -341,13 +312,16 @@ public interface BioSQLBioDB extends PersistentBioDB {
             return uid;
         }
         
+        public boolean writebackLongStrings() {
+            return false;
+        }
         /*
          * Use this to retrieve a CLOB value.
          * @param rs the ResultSet to retrieve the CLOB from.
          * @param column the number of the column in the ResultSet that the CLOB lives in.
          * @return String value of the CLOB.
          */
-        public String readClob(ResultSet rs, int column) {
+        public String readLongString(ResultSet rs, int column) {
             try {
                 Clob seqclob = rs.getClob(column);
                 StringBuffer buf = new StringBuffer();
@@ -362,7 +336,7 @@ public interface BioSQLBioDB extends PersistentBioDB {
                 }
                 return buf.toString().trim();
             } catch (Exception ex) {
-                throw new BioRuntimeException(ex);
+                throw new RuntimeException(ex);
             }
         }
         /*
@@ -371,7 +345,7 @@ public interface BioSQLBioDB extends PersistentBioDB {
          * @param column the number of the column in the ResultSet that the CLOB lives in.
          * @param the value to set to the CLOB.
          */
-        public void writeClob(ResultSet rs, int column, String value) {
+        public void writeLongString(ResultSet rs, int column, String value) throws SQLException {
             try {
                 // Can't use oracle.sql.CLOB directly as we'd need it at compile time otherwise.
                 Class clob = Class.forName("oracle.sql.CLOB");
@@ -380,7 +354,7 @@ public interface BioSQLBioDB extends PersistentBioDB {
                 if (value==null) value=""; // To stop null pointer exceptions. End result is the same.
                 putString.invoke(rs.getClob(column), new Object[]{new Long(1L),value});
             } catch (Exception ex) {
-                throw new BioRuntimeException(ex);
+                throw new RuntimeException(ex);
             }
         }
     }

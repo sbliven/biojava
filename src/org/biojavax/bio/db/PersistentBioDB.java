@@ -57,6 +57,7 @@ package org.biojavax.bio.db;
 
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 
 import java.sql.SQLException;
 
@@ -123,38 +124,6 @@ public interface PersistentBioDB {
     // public PersistentBioDB(DataSource ds);
 
     
-
-    /**
-
-     * Sets a single namespace to use for searching via this connection. When
-
-     * searching, only sequences from this namespace will be returned. 
-
-     * When null, all namespaces are used by default. Does not affect additions,
-
-     * updates, or deletions. If the namespace does not exist in the db, then you'll never
-
-     * get any results back when searching.
-
-     * @param ns the namespace to use.
-
-     */
-
-    public void setNamespace(Namespace ns);
-
-    
-
-    /**
-     * Locates and loads the namespace identified by the given name.
-     * @return The namespace, or null if not found.
-     * @param name the name of the namespace to load.
-     * @throws java.lang.Exception in case of failure.
-     */
-
-    public PersistentNamespace loadNamespace(String name) throws Exception;
-
-    
-
     /**
 
      * Locates and loads all namespace names in the current connection.
@@ -166,52 +135,7 @@ public interface PersistentBioDB {
      */
 
     public Set loadNamespaceNames() throws SQLException;
-
-    
-
-    /**
-
-     * Loads the sequence from the currently set namespace. If the namespace is not set
-
-     * you will get an exception. If the sequence name was null or was not found, it
-
-     * will return null.
-
-     * @param name the name of the sequecnce to load.
-
-     * @param accession the accession of the sequecnce to load.
-
-     * @param version the version to load.
-
-     * @return Sequence that matches, or null if none.
-
-     * @throws SQLException if the sequence could not be loaded.
-
-     * @throws NullPointerException if no namespace has been set.
-
-     */
-
-    public PersistentBioEntry loadSequence(String name, String accession, int version) throws SQLException, NullPointerException;
-
-    
-
-    /**
-
-     * Loads the sequence with the given UID.
-
-     * @param UID the UID of the sequence to load regardless of namespace.
-
-     * @return Sequence that matches, or null if none.
-
-     * @throws SQLException if the sequence could not be loaded.
-
-     * @throws NullPointerException if no namespace has been set.
-
-     */
-
-    public PersistentBioEntry loadSequenceByUID(int UID) throws SQLException, NullPointerException;
-
-    
+ 
 
     /**
 
@@ -226,20 +150,7 @@ public interface PersistentBioDB {
      */
 
     public Set loadSequenceUIDs() throws SQLException;
-
-    
-
-    /**
-     * Loads an ontology by name. If the ontology could not be found it will return
-     * null.
-     * @return The ontology, or null if it could not be found.
-     * @param name The name of the ontology to load.
-     * @throws java.lang.Exception in case of failure.
-     */
-
-    public PersistentComparableOntology loadOntology(String name) throws Exception;
-
-    
+   
 
     /**
      * Finds out all current ontology names.
@@ -298,4 +209,7 @@ public interface PersistentBioDB {
      */   
     public void releaseConnection(Connection conn) throws SQLException;
 
+    public boolean writebackLongStrings();    
+    public String readLongString(ResultSet rs, int column) throws SQLException;
+    public void writeLongString(ResultSet rs, int column, String value) throws SQLException;
 }
