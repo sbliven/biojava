@@ -73,7 +73,6 @@ import org.biojava.utils.ChangeSupport;
 
 import org.biojava.utils.ChangeVetoException;
 
-import org.biojavax.bio.db.Persistent;
 
 
 

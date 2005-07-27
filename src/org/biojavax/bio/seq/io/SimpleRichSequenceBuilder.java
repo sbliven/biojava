@@ -52,7 +52,6 @@ import org.biojavax.Namespace;
 import org.biojavax.LocatedDocumentReference;
 import org.biojavax.bio.BioEntryComment;
 import org.biojavax.bio.BioEntryRelationship;
-import org.biojavax.bio.db.Persistent;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.SimpleRichSequence;
 import org.biojavax.bio.taxa.NCBITaxon;
@@ -155,7 +154,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      */
     public void setSeqVersion(String seqVersion) throws ParseException {
         if (this.seqVersionSeen) throw new ParseException("Current BioEntry already has a sequence version");
-        if (seqVersion==null) this.seqVersion=Persistent.NULL_DOUBLE;
+        if (seqVersion==null) this.seqVersion=0.0;
         else {
             try {
                 this.seqVersion = Double.parseDouble(seqVersion);
@@ -165,7 +164,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
             }
         }
     }
-    private double seqVersion;
+    private double seqVersion = 0.0;
     private boolean seqVersionSeen;
     
     /**

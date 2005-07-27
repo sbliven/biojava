@@ -64,8 +64,6 @@ import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.BioEntryAnnotation;
 import org.biojavax.bio.SimpleBioEntryAnnotation;
-
-import org.biojavax.bio.db.Persistent;
 import org.biojavax.ontology.ComparableTerm;
 
 
