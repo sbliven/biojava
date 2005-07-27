@@ -238,10 +238,6 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      * @param version The version for this new bioentry.
      *
-     * @param symList The symbol list for this new bioentry. If null, SymbolList.EMPTY_LIST is used instead.
-     *
-     * @param seqversion The sequence version for this new bioentry.
-     *
      */
     
     public SimpleBioEntry(Namespace ns, String name, String accession, int version) {
@@ -1172,8 +1168,6 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * Adds the relationship to the end of the list of relationships, giving it the index of
      *
      * max(all other relationship index positions)+1.
-     *
-     * @return The position the relationship was added at.
      *
      * @param relationship New relationship to add.
      *

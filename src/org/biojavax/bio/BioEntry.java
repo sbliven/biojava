@@ -719,8 +719,6 @@ public interface BioEntry extends Annotatable,Comparable,Changeable {
 
      * max(all other relationship index positions)+1.
 
-     * @return The position the relationship was added at.
-
      * @param relationship New relationship to add.
 
      * @throws org.biojava.utils.ChangeVetoException in case of objections.
