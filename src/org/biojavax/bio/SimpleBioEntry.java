@@ -53,22 +53,14 @@
 
 
 package org.biojavax.bio;
-
-import java.util.Collections;
 import java.util.HashSet;
 
 import java.util.Iterator;
-
-import java.util.List;
 import java.util.Set;
-
-import java.util.Vector;
 
 import org.biojava.bio.Annotatable;
 
 import org.biojava.bio.Annotation;
-
-import org.biojava.ontology.AlreadyExistsException;
 
 import org.biojava.utils.AbstractChangeable;
 
@@ -80,15 +72,10 @@ import org.biojava.utils.ChangeSupport;
 
 import org.biojava.utils.ChangeVetoException;
 
-import org.biojavax.CrossRef;
-
 import org.biojavax.Namespace;
 
 import org.biojavax.bio.taxa.NCBITaxon;
-
-import org.biojavax.bio.db.Persistent;
-
-import org.biojavax.LocatedDocumentReference;
+import org.biojavax.ontology.ComparableTerm;
 
 
 
@@ -118,7 +105,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    private Vector comments;
+    private Set comments = new HashSet();
     
     /**
      *
@@ -126,7 +113,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    private Vector crossrefs;
+    private Set crossrefs = new HashSet();
     
     /**
      *
@@ -134,7 +121,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    private Vector docrefs;
+    private Set docrefs = new HashSet();
     
     /**
      *
@@ -142,7 +129,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    private Set relationships;
+    private Set relationships = new HashSet();
     
     /**
      *
@@ -214,7 +201,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      *
      */
     
-    private Annotation ann;
+    private BioEntryAnnotation ann = new SimpleBioEntryAnnotation();
     
     /**
      *
@@ -248,14 +235,6 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         
         if (ns==null) throw new IllegalArgumentException("Namespace cannot be null");
         
-        if (version==Persistent.NULL_INTEGER) throw new IllegalArgumentException("Version cannot be null");
-        
-        this.comments = new Vector();
-        
-        this.crossrefs = new Vector();
-        
-        this.relationships = new HashSet();
-        
         this.description = null;
         
         this.division = null;
@@ -271,10 +250,6 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         this.taxon = null;
         
         this.ns = ns;
-                
-        // make the ann delegate
-        
-        this.ann = new SimpleBioEntryAnnotation();
         
         // construct the forwarder so that it emits Annotatable.ANNOTATION ChangeEvents
         
@@ -285,9 +260,11 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         // connect the forwarder so it listens for Annotation.PROPERTY events
         
         this.ann.addChangeListener(this.annFor, Annotation.PROPERTY);
-   
+        
     }
     
+    // Hibernate requirement - not for public use.
+    protected SimpleBioEntry() {}
     
     
     /**
@@ -308,151 +285,54 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     
     
     
-    /**
-     *
-     * Searches for a crossref in the list of all crossrefs, and removes it if it was
-     *
-     * found.
-     *
-     * @return True if the crossref was found, false if the crossref was not found.
-     *
-     * @param crossref the crossref to search for and remove.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
-    
-    public boolean removeCrossRef(CrossRef crossref) throws ChangeVetoException {
-        
-        int index = this.crossrefs.indexOf(crossref);
-        
-        if (index>=0) {
-            
-            if(!this.hasListeners(BioEntry.CROSSREF)) {
-                
-                this.crossrefs.set(index,null);
-                
-            } else {
-                
-                ChangeEvent ce = new ChangeEvent(
-                        
-                        this,
-                        
-                        BioEntry.CROSSREF,
-                        
-                        null,
-                        
-                        crossref
-                        
-                        );
-                
-                ChangeSupport cs = this.getChangeSupport(BioEntry.CROSSREF);
-                
-                synchronized(cs) {
-                    
-                    cs.firePreChangeEvent(ce);
-                    
-                    this.crossrefs.set(index,null);
-                    
-                    cs.firePostChangeEvent(ce);
-                    
-                }
-                
-            }
-            
-            return true;
-            
-        } else {
-            
-            return false;
-            
+    // Hibernate requirement - not for public use.
+    private class Note {
+        private ComparableTerm term;
+        private String value;
+        private int rank;
+        private BioEntry f;
+        private Note() {}
+        private Note(ComparableTerm term, String value, int rank, BioEntry f) {
+            this.term = term;
+            this.value = value;
+            this.rank = rank;
+            this.f = f;
         }
-        
+        private void setTerm(ComparableTerm term) { this.term = term; }
+        private ComparableTerm getTerm() { return this.term; }
+        private void setValue(String value) { this.value = value; }
+        private String getValue() { return this.value; }
+        private void setRank(int rank) { this.rank = rank; }
+        private int getRank() { return this.rank; }
+        private void setBioEntry(BioEntry f) { this.f = f; }
+        private BioEntry getBioEntry() { return this.f; }
     }
-    
-    
-    
-    /**
-     *
-     *
-     *
-     * Tests for the existence of a crossref in the list.
-     *
-     * @param crossref the crossref to look for.
-     *
-     * @return True if the crossref is in the list, false if not.
-     *
-     */
-    
-    public boolean containsCrossRef(CrossRef crossref) {
-        
-        return this.crossrefs.contains(crossref);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Adds the crossref to the end of the list of crossrefs, giving it the index of
-     *
-     * max(all other crossref index positions)+1.
-     *
-     * @return The position the crossref was added at.
-     *
-     * @param crossref New crossref to add.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws AlreadyExistsException if the crossref already exists at another index.
-     *
-     */
-    
-    public int addCrossRef(CrossRef crossref) throws AlreadyExistsException,ChangeVetoException {
-        
-        if (this.crossrefs.contains(crossref)) throw new AlreadyExistsException("Cross reference has already been made");
-        
-        int index = this.crossrefs.size();
-        
-        if(!this.hasListeners(BioEntry.CROSSREF)) {
-            
-            this.crossrefs.ensureCapacity(index+1);
-            
-            this.crossrefs.add(crossref);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    BioEntry.CROSSREF,
-                    
-                    crossref,
-                    
-                    this.crossrefs.contains(crossref)?crossref:null
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(BioEntry.CROSSREF);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                this.crossrefs.ensureCapacity(index+1);
-                
-                this.crossrefs.add(crossref);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
+    // Hibernate requirement - not for public use.
+    private void setAnnotationSet(Set ann) throws ChangeVetoException {
+        this.ann.clear();
+        for (Iterator i = ann.iterator(); i.hasNext(); ) {
+            Note n = (Note)i.next();
+            this.ann.setProperty(new SimpleBioEntryAnnotation.RankedTerm(n.getTerm(),n.getRank()),n.getValue());
         }
-        
-        return index;
-        
     }
+    // Hibernate requirement - not for public use.
+    private Set getAnnotationSet() {
+        Set ns = new HashSet();
+        for (Iterator i = this.ann.keys().iterator(); i.hasNext(); ) {
+            SimpleBioEntryAnnotation.RankedTerm rt = (SimpleBioEntryAnnotation.RankedTerm)i.next();
+            ComparableTerm ct = rt.getTerm();
+            int rank = rt.getRank();
+            String v = (String)this.ann.getProperty(ct);
+            Note n = new Note(ct,v,rank,this);
+            ns.add(n);
+        }
+        return ns;
+    }
+    
+    public Set getCrossRefs() { return this.crossrefs; }
+    
+    // Hibernate requirement - not for public use.
+    private void setCrossRefs(Set crossRefs) { this.crossrefs = crossrefs; }
     
     
     /**
@@ -501,68 +381,34 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         
     }
     
+    public Set getComments() { return this.comments; }
     
+    // Hibernate requirement - not for public use.
+    private void setComments(Set comments) { this.comments = comments; }
     
-    /**
-     *
-     * Overwrites the list of comments at the given index position with the comment
-     *
-     * supplied. It will overwrite anything already at that position.
-     *
-     * @param comment New comment to write at that position.
-     *
-     * @param index Position to write comment at.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws AlreadyExistsException if the comment already exists at another index.
-     *
-     */
+    public Set getDocRefs() { return this.docrefs; }
     
-    public void setComment(BioEntryComment comment, int index) throws AlreadyExistsException,ChangeVetoException {
-        
-        if (this.comments.contains(comment)) throw new AlreadyExistsException("Comment has already been made");
-        
-        if(!this.hasListeners(BioEntry.COMMENTS)) {
-            
-            this.comments.ensureCapacity(index+1);
-            
-            this.comments.set(index,comment);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    BioEntry.COMMENTS,
-                    
-                    comment,
-                    
-                    this.comments.get(index)
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(BioEntry.COMMENTS);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                this.comments.ensureCapacity(index+1);
-                
-                this.comments.set(index,comment);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
-        }
-        
-    }
+    // Hibernate requirement - not for public use.
+    private void setDocRefs(Set docrefs) { this.docrefs = docrefs; }
     
+    public Set getBioEntryRelationships() { return this.relationships; }
     
+    // Hibernate requirement - not for public use.
+    private void setBioEntryRelationships(Set relationships) { this.relationships = relationships; }
+       
     
+    // Hibernate requirement - not for public use.
+    private void setNamespace(Namespace ns) { this.ns = ns; }
+
+    // Hibernate requirement - not for public use.
+    private void setName(String name) { this.name = name; }
+
+    // Hibernate requirement - not for public use.
+    private void setAccession(String acc) { this.accession = acc; }
+
+    // Hibernate requirement - not for public use.
+    private void setVersion(int v) { this.version = v; }
+
     /**
      *
      * Setter for property identifier.
@@ -705,544 +551,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         
     }
     
-    
-    
-    /**
-     *
-     * Removes the crossref at a given index. If the index position already had no
-     *
-     * crossref associated, it returns false. Else, it returns true.
-     *
-     * @return True if a crossref was found at that position and removed.
-     *
-     * @param index the index position to remove the crossref from.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws IndexOutOfBoundsException if the index position was invalid.
-     *
-     */
-    
-    public boolean removeCrossRef(int index) throws IndexOutOfBoundsException,ChangeVetoException {
-        
-        if (this.crossrefs.get(index)==null) return false;
-        
-        else {
-            
-            if(!this.hasListeners(BioEntry.CROSSREF)) {
-                
-                this.crossrefs.set(index,null);
-                
-            } else {
-                
-                ChangeEvent ce = new ChangeEvent(
-                        
-                        this,
-                        
-                        BioEntry.CROSSREF,
-                        
-                        null,
-                        
-                        this.crossrefs.get(index)
-                        
-                        );
-                
-                ChangeSupport cs = this.getChangeSupport(BioEntry.CROSSREF);
-                
-                synchronized(cs) {
-                    
-                    cs.firePreChangeEvent(ce);
-                    
-                    this.crossrefs.set(index,null);
-                    
-                    cs.firePostChangeEvent(ce);
-                    
-                }
-                
-            }
-            
-            return true;
-            
-        }
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Removes the comment at a given index. If the index position already had no
-     *
-     * comment associated, it returns false. Else, it returns true.
-     *
-     * @return True if a comment was found at that position and removed.
-     *
-     * @param index the index position to remove the comment from.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws IndexOutOfBoundsException if the index position was invalid.
-     *
-     */
-    
-    public boolean removeComment(int index) throws IndexOutOfBoundsException,ChangeVetoException {
-        
-        if (this.comments.get(index)==null) return false;
-        
-        else {
-            
-            if(!this.hasListeners(BioEntry.COMMENTS)) {
-                
-                this.comments.set(index,null);
-                
-            } else {
-                
-                ChangeEvent ce = new ChangeEvent(
-                        
-                        this,
-                        
-                        BioEntry.COMMENTS,
-                        
-                        null,
-                        
-                        this.comments.get(index)
-                        
-                        );
-                
-                ChangeSupport cs = this.getChangeSupport(BioEntry.COMMENTS);
-                
-                synchronized(cs) {
-                    
-                    cs.firePreChangeEvent(ce);
-                    
-                    this.comments.set(index,null);
-                    
-                    cs.firePostChangeEvent(ce);
-                    
-                }
-                
-            }
-            
-            return true;
-            
-        }
-        
-    }
-    
-    
-    /**
-     *
-     * Returns the comment at a given index. If the index is valid but no comment is
-     *
-     * found at that position, it will return null. If the index is invalid,
-     *
-     * an exception will be thrown.
-     *
-     * @param index the index of the comment to retrieve.
-     *
-     * @return The comment at that index position.
-     *
-     * @throws IndexOutOfBoundsException if an invalid index is specified.
-     *
-     */
-    
-    public BioEntryComment getComment(int index) throws IndexOutOfBoundsException {
-        
-        return (BioEntryComment)this.comments.get(index);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Returns the crossref at a given index. If the index is valid but no crossref is
-     *
-     * found at that position, it will return null. If the index is invalid,
-     *
-     * an exception will be thrown.
-     *
-     * @param index the index of the crossref to retrieve.
-     *
-     * @return The crossref at that index position.
-     *
-     * @throws IndexOutOfBoundsException if an invalid index is specified.
-     *
-     */
-    
-    public CrossRef getCrossRef(int index) throws IndexOutOfBoundsException {
-        
-        return (CrossRef)this.crossrefs.get(index);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Searches for a comment in the list of all comments, and removes it if it was
-     *
-     * found.
-     *
-     * @return True if the comment was found, false if the comment was not found.
-     *
-     * @param comment the comment to search for and remove.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
-    
-    public boolean removeComment(BioEntryComment comment) throws ChangeVetoException {
-        
-        int index = this.comments.indexOf(comment);
-        
-        if (index>=0) {
-            
-            if(!this.hasListeners(BioEntry.COMMENTS)) {
-                
-                this.comments.set(index,null);
-                
-            } else {
-                
-                ChangeEvent ce = new ChangeEvent(
-                        
-                        this,
-                        
-                        BioEntry.COMMENTS,
-                        
-                        null,
-                        
-                        comment
-                        
-                        );
-                
-                ChangeSupport cs = this.getChangeSupport(BioEntry.COMMENTS);
-                
-                synchronized(cs) {
-                    
-                    cs.firePreChangeEvent(ce);
-                    
-                    this.comments.set(index,null);
-                    
-                    cs.firePostChangeEvent(ce);
-                    
-                }
-                
-            }
-            
-            return true;
-            
-        } else {
-            
-            return false;
-            
-        }
-        
-    }
-    
-    
-    
-    /**
-     *
-     *
-     *
-     * Tests for the existence of a comment in the list.
-     *
-     * @param comment the comment to look for.
-     *
-     * @return True if the comment is in the list, false if not.
-     *
-     */
-    
-    public boolean containsComment(BioEntryComment comment) {
-        
-        return this.comments.contains(comment);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Adds the comment to the end of the list of comments, giving it the index of
-     *
-     * max(all other comment index positions)+1.
-     *
-     * @return The position the comment was added at.
-     *
-     * @param comment New comment to add.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws AlreadyExistsException if the comment already exists at another index.
-     *
-     */
-    
-    public int addComment(BioEntryComment comment) throws AlreadyExistsException,ChangeVetoException {
-        
-        if (comment==null) throw new ChangeVetoException("Comment cannot be null");
-        
-        if (this.comments.contains(comment)) throw new AlreadyExistsException("Comment has already been added");
-        
-        int index = this.comments.size();
-        
-        if(!this.hasListeners(BioEntry.COMMENTS)) {
-            
-            this.comments.ensureCapacity(index+1);
-            
-            this.comments.add(index,comment);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    BioEntry.COMMENTS,
-                    
-                    comment,
-                    
-                    null
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(BioEntry.COMMENTS);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                this.comments.ensureCapacity(index+1);
-                
-                this.comments.add(index,comment);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
-        }
-        
-        return index;
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Overwrites the list of crossrefs at the given index position with the crossref
-     *
-     * supplied. It will overwrite anything already at that position.
-     *
-     * @param crossref New crossref to write at that position.
-     *
-     * @param index Position to write crossref at.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws AlreadyExistsException if the crossref already exists at another index.
-     *
-     */
-    
-    public void setCrossRef(CrossRef crossref, int index) throws AlreadyExistsException,ChangeVetoException {
-        
-        if (this.crossrefs.contains(crossref)) throw new AlreadyExistsException("Cross-reference has already been added");
-        
-        if(!this.hasListeners(BioEntry.CROSSREF)) {
-            
-            this.crossrefs.ensureCapacity(index+1);
-            
-            this.crossrefs.set(index,crossref);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    BioEntry.CROSSREF,
-                    
-                    crossref,
-                    
-                    this.crossrefs.get(index)
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(BioEntry.CROSSREF);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                this.crossrefs.ensureCapacity(index+1);
-                
-                this.crossrefs.set(index,crossref);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
-        }
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Searches for a relationship in the list of all relationships, and removes it if it was
-     *
-     * found.
-     *
-     * @return True if the relationship was found, false if the relationship was not found.
-     *
-     * @param relationship the relationship to search for and remove.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
-    
-    public boolean removeBioEntryRelationship(BioEntryRelationship relationship) throws ChangeVetoException {
-        
-        boolean result;
-        
-        if(!this.hasListeners(BioEntry.RELATIONSHIP)) {
-            
-            result = this.relationships.remove(relationship);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    BioEntry.RELATIONSHIP,
-                    
-                    null,
-                    
-                    relationship
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(BioEntry.RELATIONSHIP);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                result = this.relationships.remove(relationship);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
-        }
-        
-        return result;
-    }
-    
-    
-    
-    /**
-     *
-     *
-     *
-     * Tests for the existence of a relationship in the list.
-     *
-     * @param relationship the relationship to look for.
-     *
-     * @return True if the relationship is in the list, false if not.
-     *
-     */
-    
-    public boolean containsBioEntryRelationship(BioEntryRelationship relationship) {
-        
-        return this.relationships.contains(relationship);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Adds the relationship to the end of the list of relationships, giving it the index of
-     *
-     * max(all other relationship index positions)+1.
-     *
-     * @param relationship New relationship to add.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws AlreadyExistsException if the relationship already exists at another index.
-     *
-     */
-    
-    public void addBioEntryRelationship(BioEntryRelationship relationship) throws AlreadyExistsException,ChangeVetoException {
-        
-        if (this.relationships.contains(relationship)) throw new AlreadyExistsException("Relationship has already been added");
-        
-        if(!this.hasListeners(BioEntry.RELATIONSHIP)) {
-            
-            this.relationships.add(relationship);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    BioEntry.RELATIONSHIP,
-                    
-                    relationship,
-                    
-                    null
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(BioEntry.RELATIONSHIP);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                this.relationships.add(relationship);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
-        }
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Returns a list of all relationships associated with this bioentry. This
-     *
-     * list is not mutable. If no relationships are associated, you will get back an
-     *
-     * empty list. If the relationships have indexes that are not consecutive, then the
-     *
-     * list will contain nulls at the indexes corresponding to the gaps between
-     *
-     * the extant relationships. eg. If there are only two relationships A and B at positions 10
-     *
-     * and 20 respectively, then the List returned will be of size 20, with nulls
-     *
-     * at index positions 0-9 and 11-19.
-     *
-     * @return Value of property relationships.
-     *
-     */
-    
-    public Set getBioEntryRelationships() {
-        
-        return Collections.unmodifiableSet(this.relationships);
-        
-    }
-    
+      
     
     
     /**
@@ -1259,64 +568,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         
     }
     
-    
-    
-    /**
-     *
-     * Returns a list of all comments associated with this bioentry. This
-     *
-     * list is not mutable. If no comments are associated, you will get back an
-     *
-     * empty list. If the comments have indexes that are not consecutive, then the
-     *
-     * list will contain nulls at the indexes corresponding to the gaps between
-     *
-     * the extant comments. eg. If there are only two comments A and B at positions 10
-     *
-     * and 20 respectively, then the List returned will be of size 20, with nulls
-     *
-     * at index positions 0-9 and 11-19.
-     *
-     * @return Value of property comments.
-     *
-     */
-    
-    public List getComments() {
         
-        return Collections.unmodifiableList(this.comments);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Returns a list of all crossrefs associated with this bioentry. This
-     *
-     * list is not mutable. If no crossrefs are associated, you will get back an
-     *
-     * empty list. If the crossrefs have indexes that are not consecutive, then the
-     *
-     * list will contain nulls at the indexes corresponding to the gaps between
-     *
-     * the extant crossrefs. eg. If there are only two crossrefs A and B at positions 10
-     *
-     * and 20 respectively, then the List returned will be of size 20, with nulls
-     *
-     * at index positions 0-9 and 11-19.
-     *
-     * @return Value of property crossrefs.
-     *
-     */
-    
-    public List getCrossRefs() {
-        
-        return Collections.unmodifiableList(this.crossrefs);
-        
-    }
-    
-    
-    
     /**
      *
      * Getter for property description.
@@ -1553,80 +805,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         
     }
     
-    
-    
-    /**
-     *
-     * Counts a list not including nulls.
-     *
-     * @return size of list
-     *
-     * @param input the list to measure.
-     *
-     */
-    
-    protected int countList(List input) {
         
-        int count = 0;
-        
-        for (Iterator i = input.iterator();i.hasNext();) {
-            
-            if (i.next()!=null) count++;
-            
-        }
-        
-        return count;
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Counts relationships, not including nulls.
-     *
-     * @return the number of relationships.
-     *
-     */
-    
-    public int countBioEntryRelationships() {
-        
-        return this.relationships.size();
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Counts cross refs, not including nulls.
-     *
-     * @return the number of cross refs.
-     *
-     */
-    
-    public int countCrossRefs() {
-        
-        return this.countList(this.crossrefs);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Counts comments, not including nulls.
-     *
-     * @return the number of comments.
-     *
-     */
-    
-    public int countComments() {
-        
-        return this.countList(this.comments);
-        
-    }
-    
     
     
     
@@ -1679,345 +858,26 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         return this.getName();
         
     }
-
+    
        
     
     
-    /**
-     *
-     * Searches for a docref in the list of all docrefs, and removes it if it was
-     *
-     * found.
-     *
-     * @return True if the docref was found, false if the docref was not found.
-     *
-     * @param docref the docref to search for and remove.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
+    // Hibernate requirement - not for public use.
+    private Long id;
     
-    public boolean removeDocRef(LocatedDocumentReference docref) throws ChangeVetoException {
+    
+    // Hibernate requirement - not for public use.
+    private Long getId() {
         
-        int index = this.docrefs.indexOf(docref);
-        
-        if (index>=0) {
-            
-            if(!this.hasListeners(BioEntry.DOCREF)) {
-                
-                this.docrefs.set(index,null);
-                
-            } else {
-                
-                ChangeEvent ce = new ChangeEvent(
-                        
-                        this,
-                        
-                        BioEntry.DOCREF,
-                        
-                        null,
-                        
-                        docrefs
-                        
-                        );
-                
-                ChangeSupport cs = this.getChangeSupport(BioEntry.DOCREF);
-                
-                synchronized(cs) {
-                    
-                    cs.firePreChangeEvent(ce);
-                    
-                    this.docrefs.set(index,null);
-                    
-                    cs.firePostChangeEvent(ce);
-                    
-                }
-                
-            }
-            
-            return true;
-            
-        } else {
-            
-            return false;
-            
-        }
-        
+        return this.id;
     }
     
     
-    
-    /**
-     *
-     * Tests for the existence of a docref in the list.
-     *
-     * @param docref the docref to look for.
-     *
-     * @return True if the docref is in the list, false if not.
-     *
-     */
-    
-    public boolean containsDocRef(LocatedDocumentReference docref) {
+    // Hibernate requirement - not for public use.
+    private void setId(Long id) {
         
-        return this.docrefs.contains(docref);
-        
+        this.id = id;
     }
-    
-    
-    
-    /**
-     *
-     * Adds the docref to the end of the list of docrefs, giving it the index of
-     *
-     * max(all other docref index positions)+1.
-     *
-     * @return The position the docref was added at.
-     *
-     * @param docref New docref to add.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws AlreadyExistsException if the docref already exists at another index.
-     *
-     */
-    
-    public int addDocRef(LocatedDocumentReference docref) throws AlreadyExistsException, ChangeVetoException {
-        
-        if (this.docrefs.contains(docref)) throw new AlreadyExistsException("Document reference has already been made");
-        
-        int index = this.docrefs.size();
-        
-        if(!this.hasListeners(BioEntry.DOCREF)) {
-            
-            this.docrefs.ensureCapacity(index+1);
-            
-            this.docrefs.add(docref);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    BioEntry.DOCREF,
-                    
-                    docref,
-                    
-                    this.docrefs.contains(docref)?docref:null
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(BioEntry.DOCREF);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                this.docrefs.ensureCapacity(index+1);
-                
-                this.docrefs.add(docref);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
-        }
-        
-        return index;
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Overwrites the list of docrefs at the given index position with the docref
-     *
-     * supplied. It will overwrite anything already at that position.
-     *
-     * @param docref New docref to write at that position.
-     *
-     * @param index Position to write docref at.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws AlreadyExistsException if the docref already exists at another index.
-     *
-     */
-    
-    public void setDocRef(LocatedDocumentReference docref, int index) throws AlreadyExistsException, ChangeVetoException {
-        
-        if (this.docrefs.contains(docref)) throw new AlreadyExistsException("Document reference has already been added");
-        
-        if(!this.hasListeners(BioEntry.CROSSREF)) {
-            
-            this.docrefs.ensureCapacity(index+1);
-            
-            this.docrefs.set(index,docref);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    BioEntry.DOCREF,
-                    
-                    docref,
-                    
-                    this.docrefs.get(index)
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(BioEntry.DOCREF);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                this.docrefs.ensureCapacity(index+1);
-                
-                this.docrefs.set(index,docref);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
-        }
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Removes the docref at a given index. If the index position already had no
-     *
-     * docref associated, it returns false. Else, it returns true.
-     *
-     * @return True if a docref was found at that position and removed.
-     *
-     * @param index the index position to remove the docref from.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws IndexOutOfBoundsException if the index position was invalid.
-     *
-     */
-    
-    public boolean removeDocRef(int index) throws IndexOutOfBoundsException, ChangeVetoException {
-        
-        if (this.docrefs.get(index)==null) return false;
-        
-        else {
-            
-            if(!this.hasListeners(BioEntry.DOCREF)) {
-                
-                this.docrefs.set(index,null);
-                
-            } else {
-                
-                ChangeEvent ce = new ChangeEvent(
-                        
-                        this,
-                        
-                        BioEntry.DOCREF,
-                        
-                        null,
-                        
-                        this.docrefs.get(index)
-                        
-                        );
-                
-                ChangeSupport cs = this.getChangeSupport(BioEntry.DOCREF);
-                
-                synchronized(cs) {
-                    
-                    cs.firePreChangeEvent(ce);
-                    
-                    this.docrefs.set(index,null);
-                    
-                    cs.firePostChangeEvent(ce);
-                    
-                }
-                
-            }
-            
-            return true;
-            
-        }
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Returns the docref at a given index. If the index is valid but no docref is
-     *
-     * found at that position, it will return null. If the index is invalid,
-     *
-     * an exception will be thrown.
-     *
-     * @param index the index of the docref to retrieve.
-     *
-     * @return The docref at that index position.
-     *
-     * @throws IndexOutOfBoundsException if an invalid index is specified.
-     *
-     */
-    
-    public LocatedDocumentReference getDocRef(int index) throws IndexOutOfBoundsException {
-        
-        return (LocatedDocumentReference)this.docrefs.get(index);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Returns a list of all docrefs associated with this bioentry. This
-     *
-     * list is not mutable. If no docrefs are associated, you will get back an
-     *
-     * empty list. If the docrefs have indexes that are not consecutive, then the
-     *
-     * list will contain nulls at the indexes corresponding to the gaps between
-     *
-     * the extant docrefs. eg. If there are only two docrefs A and B at positions 10
-     *
-     * and 20 respectively, then the List returned will be of size 20, with nulls
-     *
-     * at index positions 0-9 and 11-19.
-     *
-     * @return Value of property docrefs.
-     *
-     */
-    
-    public List getDocRefs() {
-        
-        return Collections.unmodifiableList(this.docrefs);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Counts doc refs, not including nulls.
-     *
-     * @return the number of doc refs.
-     *
-     */
-    
-    public int countDocRefs() {
-        
-        return this.countList(this.docrefs);
-        
-    }
-    
-    
     
 }
 

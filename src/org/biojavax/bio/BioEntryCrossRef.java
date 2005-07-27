@@ -41,13 +41,15 @@
 
 package org.biojavax.bio;
 
+import org.biojavax.CrossRef;
+
 /**
  *
  * @author Richard Holland
  */
-public interface BioEntryComment extends Comparable {
+public interface BioEntryCrossRef extends Comparable {
     
-    public String getComment();
+    public CrossRef getCrossRef();
     
     public int getRank();
     

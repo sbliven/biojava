@@ -39,16 +39,19 @@
  */
 
 package org.biojavax.bio.seq;
-
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeEvent;
@@ -58,7 +61,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.SimpleBioEntry;
-import org.biojavax.bio.seq.SimpleRichSequenceFeatureHolder;
+
 
 /**
  *
@@ -80,7 +83,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
      *
      */
     
-    private FeatureHolder features;
+    private SimpleRichSequenceFeatureHolder features = new SimpleRichSequenceFeatureHolder();
     
     /**
      *
@@ -120,10 +123,6 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
         this.symListVersion = seqversion;
         
         
-        // set up features
-        
-        this.features = new SimpleRichSequenceFeatureHolder(this);
-        
         // construct the forwarder so that it emits FeatureHolder ChangeEvents
         
         // for the FeatureHolder events it will listen for
@@ -139,7 +138,21 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
         this.features.addChangeListener(this.featForS, FeatureHolder.SCHEMA);
     }
     
+    // Hibernate requirement - not for public use.
+    private SimpleRichSequence() {}
     
+    // Hibernate requirement - not for public use.
+    protected Set getFeatureSet() {
+        return this.features.getFeatureSet();
+    }
+    
+    // Hibernate requirement - not for public use.
+    protected void setFeatureSet(Set features) throws ChangeVetoException {
+        this.features.getFeatureSet().clear();
+        for (Iterator i = features.iterator(); i.hasNext(); ) this.addFeature((Feature)i.next());
+    }
+    
+    public void addFeature(Feature f) throws ChangeVetoException { this.features.addFeature(f); }
     
     /**
      *
@@ -166,7 +179,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     
     public void setSeqVersion(double seqVersion) throws ChangeVetoException {
         
-        if(!this.hasListeners(BioEntry.RELATIONSHIP)) {
+        if(!this.hasListeners(RichSequence.SEQVERSION)) {
             
             this.symListVersion = seqVersion;
             
@@ -184,7 +197,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
                     
                     );
             
-            ChangeSupport cs = this.getChangeSupport(BioEntry.RELATIONSHIP);
+            ChangeSupport cs = this.getChangeSupport(RichSequence.SEQVERSION);
             
             synchronized(cs) {
                 
@@ -763,5 +776,45 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
         
         return this.symList.getAlphabet();
         
+    }
+    
+    // Hibernate requirement - not for public use.
+    private String alphaname;
+    private void setAlphabetName(String alphaname) throws IllegalSymbolException, BioException {
+        this.alphaname = alphaname;
+        this.checkMakeSequence();
+    }    
+    // Hibernate requirement - not for public use.
+    private String getAlphabetName() {
+        return this.getAlphabetName();
+    }
+    
+    // Hibernate requirement - not for public use.
+    private String seqstring;
+    private void setStringSequence(String seq) throws IllegalSymbolException, BioException {
+        this.seqstring = seq;
+        this.checkMakeSequence();
+    }
+    // Hibernate requirement - not for public use.
+    private String getStringSequence() {
+        return this.seqString();
+    }
+
+    // Hibernate requirement - not for public use.
+    private void checkMakeSequence() throws IllegalSymbolException, BioException {
+        if (this.alphaname!=null && this.seqstring!=null) {
+            // Make the symbol list and assign it.
+            Alphabet a = AlphabetManager.alphabetForName(this.alphaname);
+            this.symList = new SimpleSymbolList(a.getTokenization("token"), seqstring);
+        }
+    }
+    
+    // Hibernate requirement - not for public use.
+    private void setSequenceLength(int length) {
+        // ignore - it's calculated anyway.
+    }
+    // Hibernate requirement - not for public use.
+    private int getSequenceLength() {
+        return this.length();
     }
 }

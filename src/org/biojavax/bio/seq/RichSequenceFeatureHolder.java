@@ -39,8 +39,8 @@
  */
 
 package org.biojavax.bio.seq;
-
 import org.biojava.bio.seq.FeatureHolder;
+
 
 /**
  *

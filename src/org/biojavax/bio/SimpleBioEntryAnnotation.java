@@ -42,6 +42,7 @@ package org.biojavax.bio;
 
 import org.biojava.bio.SimpleAnnotation;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -57,7 +58,7 @@ public class SimpleBioEntryAnnotation extends SimpleAnnotation implements BioEnt
     
     public void setProperty(Object key, Object value) throws ChangeVetoException {
         
-        if (!(key instanceof ComparableTerm)) throw new ChangeVetoException("Can only annotate using ComparableTerm objects as keys");
+        if (!(key instanceof RankedTerm)) throw new ChangeVetoException("Can only annotate using RankedTerm objects as keys");
         
         if (!(value instanceof String)) throw new ChangeVetoException("Can only annotate using single String objects as values");
         
@@ -65,4 +66,18 @@ public class SimpleBioEntryAnnotation extends SimpleAnnotation implements BioEnt
         
     }
     
+    public void clear() {
+        this.getProperties().clear();
+    }
+    
+    public static class RankedTerm extends Unchangeable {
+        private ComparableTerm t;
+        private int i;
+        public RankedTerm(ComparableTerm t, int i) {
+            this.t = t;
+            this.i = i;
+        }
+        public ComparableTerm getTerm() { return this.t; }
+        public int getRank() { return this.i; }
+    }
 }

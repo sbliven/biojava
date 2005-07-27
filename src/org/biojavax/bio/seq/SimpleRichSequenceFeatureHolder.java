@@ -40,10 +40,11 @@
 
 package org.biojavax.bio.seq;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.SimpleFeatureHolder;
-import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.utils.ChangeVetoException;
 
 
@@ -52,69 +53,44 @@ import org.biojava.utils.ChangeVetoException;
  * @author Richard Holland
  */
 public class SimpleRichSequenceFeatureHolder extends SimpleFeatureHolder implements RichSequenceFeatureHolder {
-    
-    private final RichSequence yomama;
-    
-    public SimpleRichSequenceFeatureHolder(RichSequence yomama) {
+        
+    public SimpleRichSequenceFeatureHolder() {
         super();
-        this.yomama = yomama;
-    }
-        
-    public Feature createFeature(Feature.Template f) throws ChangeVetoException {
-        
-        StrandedFeature.Template sft;
-        
-        if (f instanceof StrandedFeature.Template) {
-            
-            sft = (StrandedFeature.Template)f;
-            
-        } else {
-            
-            sft = new StrandedFeature.Template();
-            
-            sft.annotation = f.annotation;
-            
-            sft.location = f.location;
-            
-            sft.source = f.source;
-            
-            sft.sourceTerm = f.sourceTerm;
-            
-            sft.type = f.type;
-            
-            sft.typeTerm = f.typeTerm;
-            
-            sft.strand = StrandedFeature.UNKNOWN;
-            
-        }
-        
-        RichSequenceFeature bef = new SimpleRichSequenceFeature(this.yomama,this,sft);
-        
-        // make the feature a singleton
-        
-        if (this.containsFeature(bef)) for (Iterator i = this.features(); i.hasNext(); ) {
-            
-            RichSequenceFeature bef2 = (RichSequenceFeature)i.next();
-            
-            if (bef.equals(bef2)) return bef2;
-            
-        }
-        
-        // or create a new feature
-        
-        this.addFeature(bef);
-        
-        return bef;
-        
     }
     
     public void addFeature(Feature f) throws ChangeVetoException {
         
-        if (!(f instanceof RichSequenceFeature)) throw new ChangeVetoException("Can only add BioEntryFeature objects as features");
+        if (!(f instanceof RichSequenceFeature)) throw new ChangeVetoException("Can only add RichSequenceFeature objects as features");
         
         super.addFeature(f);
         
     }
     
+    // Hibernate requirement - not for public use.
+    protected Set getFeatureSet() {
+        return new HashSet(this.getFeatures());
+    }
     
+    // Hibernate requirement - not for public use.
+    protected void setFeatureSet(Set features) throws ChangeVetoException {
+        this.getFeatures().clear();
+        for (Iterator i = features.iterator(); i.hasNext(); ) this.addFeature((Feature)i.next());
+    }
+    
+    // Hibernate requirement - not for public use.
+    private Long id;
+    
+    
+    // Hibernate requirement - not for public use.
+    private Long getId() {
+        
+        return this.id;
+    }
+    
+    
+    // Hibernate requirement - not for public use.
+    private void setId(Long id) {
+        
+        this.id = id;
+    }
 }

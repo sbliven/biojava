@@ -40,12 +40,17 @@
 
 package org.biojavax.bio;
 
+import java.util.NoSuchElementException;
 import org.biojava.bio.Annotation;
+import org.biojava.utils.ChangeVetoException;
+import org.biojavax.ontology.ComparableTerm;
 
 /**
  *
  * @author Richard Holland
  */
 public interface BioEntryAnnotation extends Annotation {
+    
+    public void clear();
     
 }

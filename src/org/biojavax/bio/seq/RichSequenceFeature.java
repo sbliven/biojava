@@ -57,7 +57,7 @@ import org.biojava.bio.seq.StrandedFeature;
  * @author Richard Holland
  */
 
-public interface RichSequenceFeature extends StrandedFeature {
+public interface RichSequenceFeature extends StrandedFeature,RichSequenceFeatureHolder {
 
     
 

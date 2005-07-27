@@ -115,7 +115,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      */
     public void setVersion(String version) throws ParseException {
         if (this.versionSeen) throw new ParseException("Current BioEntry already has a version");
-        if (version==null) this.version=Persistent.NULL_INTEGER;
+        if (version==null) this.version=0;
         else {
             try {
                 this.version = Integer.parseInt(version);
@@ -513,7 +513,6 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         if (this.name==null) throw new ParseException("Name has not been supplied");
         if (this.namespace==null) throw new ParseException("Namespace has not been supplied");
         if (this.accessions.isEmpty()) throw new ParseException("No accessions have been supplied");
-        if (!this.versionSeen) throw new ParseException("No version has been supplied");
     }
     
     /**
@@ -538,10 +537,10 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
             be.setDivision(this.division);
             be.setIdentifier(this.identifier);
             be.setTaxon(this.taxon);
-            for (Iterator i = this.crossRefs.iterator(); i.hasNext(); ) be.addCrossRef((CrossRef)i.next());
-            for (Iterator i = this.relations.iterator(); i.hasNext(); ) be.addBioEntryRelationship((BioEntryRelationship)i.next());
-            for (Iterator i = this.references.iterator(); i.hasNext(); ) be.addDocRef((LocatedDocumentReference)i.next());
-            for (Iterator i = this.comments.iterator(); i.hasNext(); ) be.addComment((BioEntryComment)i.next());
+            for (Iterator i = this.crossRefs.iterator(); i.hasNext(); ) be.getCrossRefs().add((CrossRef)i.next());
+            for (Iterator i = this.relations.iterator(); i.hasNext(); ) be.getBioEntryRelationships().add((BioEntryRelationship)i.next());
+            for (Iterator i = this.references.iterator(); i.hasNext(); ) be.getDocRefs().add((LocatedDocumentReference)i.next());
+            for (Iterator i = this.comments.iterator(); i.hasNext(); ) be.getComments().add((BioEntryComment)i.next());
             // set annotations
             for (Iterator i = this.ann.keys().iterator(); i.hasNext(); ) {
                 Object key = i.next();

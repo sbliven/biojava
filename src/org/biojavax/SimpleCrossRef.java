@@ -53,26 +53,21 @@
 
 
 package org.biojavax;
-
-import java.util.Collections;
-
-import java.util.List;
-
-import java.util.Vector;
-
-import org.biojava.ontology.AlreadyExistsException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
 
 import org.biojava.utils.AbstractChangeable;
-
-import org.biojava.utils.ChangeEvent;
-
-import org.biojava.utils.ChangeSupport;
-
+import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeVetoException;
+import org.biojavax.bio.BioEntryAnnotation;
+import org.biojavax.bio.SimpleBioEntryAnnotation;
 
 import org.biojavax.bio.db.Persistent;
-
 import org.biojavax.ontology.ComparableTerm;
+
 
 
 
@@ -102,8 +97,8 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
      *
      */
     
-    private Vector terms;
-    private Vector values;
+    private BioEntryAnnotation ann = new SimpleBioEntryAnnotation();
+    private ChangeForwarder annFor;
     
     /**
      *
@@ -149,352 +144,86 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
         
         if (dbname==null) throw new IllegalArgumentException("DBName cannot be null");
         
-        if (version==Persistent.NULL_INTEGER) throw new IllegalArgumentException("Version cannot be null");
-        
         this.accession = accession;
         
         this.dbname = dbname;
         
         this.version = version;
         
-        this.terms = new Vector();
+        // construct the forwarder so that it emits Annotatable.ANNOTATION ChangeEvents
         
-        this.values = new Vector();
+        // for the Annotation.PROPERTY events it will listen for
+        
+        this.annFor = new ChangeForwarder.Retyper(this, this.getChangeSupport(Annotatable.ANNOTATION), Annotatable.ANNOTATION);
+        
+        // connect the forwarder so it listens for Annotation.PROPERTY events
+        
+        this.ann.addChangeListener(this.annFor, Annotation.PROPERTY);
         
     }
     
-    
+    // Hibernate requirement - not for public use.
+    private SimpleCrossRef() {}
     
     /**
      *
-     * Returns the term at a given index. If the index is valid but no term is
+     * Should return the associated annotation object.
      *
-     * found at that position, it will return null. If the index is invalid,
      *
-     * an exception will be thrown.
      *
-     * @return The term at that index position.
-     *
-     * @param index the index of the term to retrieve.
+     * @return an Annotation object, never null
      *
      */
     
-    public ComparableTerm getTerm(int index) {
+    public Annotation getAnnotation() {
         
-        return (ComparableTerm)this.terms.get(index);
-        
-    }
-    
-    public String getTermValue(int index) {
-        
-        return (String)this.values.get(index);
+        return this.ann;
         
     }
     
-    
-    
-    /**
-     *
-     * Removes the term at a given index. If the index position already had no
-     *
-     * term associated, it returns false. Else, it returns true.
-     *
-     * @return True if a term was found at that position and removed.
-     *
-     * @param index the index position to remove the term from.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
-    
-    public boolean removeTerm(int index) throws ChangeVetoException{
-        
-        if (this.terms.get(index)==null) return false;
-        
-        else {
-            
-            if(!this.hasListeners(CrossRef.TERM)) {
-                
-                this.terms.set(index,null);
-                
-                this.values.set(index,null);
-                
-            } else {
-                
-                ChangeEvent ce = new ChangeEvent(
-                        
-                        this,
-                        
-                        CrossRef.TERM,
-                        
-                        null,
-                        
-                        this.terms.get(index)
-                        
-                        );
-                
-                ChangeSupport cs = this.getChangeSupport(CrossRef.TERM);
-                
-                synchronized(cs) {
-                    
-                    cs.firePreChangeEvent(ce);
-                    
-                    this.terms.set(index,null);
-                    
-                    this.values.set(index,null);
-                    
-                    cs.firePostChangeEvent(ce);
-                    
-                }
-                
-            }
-            
-            return true;
-            
+    // Hibernate requirement - not for public use.
+    private class Note {
+        private ComparableTerm term;
+        private String value;
+        private int rank;
+        private CrossRef crossref;
+        private Note() {}
+        private Note(ComparableTerm term, String value, int rank, CrossRef crossref) {
+            this.term = term;
+            this.value = value;
+            this.rank = rank;
+            this.crossref = crossref;            
         }
-        
+        private void setTerm(ComparableTerm term) { this.term = term; }
+        private ComparableTerm getTerm() { return this.term; }
+        private void setValue(String value) { this.value = value; }
+        private String getValue() { return this.value; }
+        private void setRank(int rank) { this.rank = rank; }
+        private int getRank() { return this.rank; }
+        private void setCrossRef(CrossRef crossref) { this.crossref = crossref; }
+        private CrossRef getCrossRef() { return this.crossref; }
     }
-    
-    
-    
-    /**
-     *
-     * Overwrites the list of terms at the given index position with the term
-     *
-     * supplied. It will overwrite anything already at that position.
-     *
-     * @param term New term to write at that position.
-     *
-     * @param index Position to write term at.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws AlreadyExistsException if the term already exists at another index.
-     *
-     * @throws IllegalArgumentException in case of missing term.
-     *
-     */
-    
-    public void setTerm(ComparableTerm term, String value, int index) throws AlreadyExistsException,IllegalArgumentException,ChangeVetoException {
-        
-        if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        
-        if (this.terms.contains(term)) throw new AlreadyExistsException("Term has already been added");
-        
-        if(!this.hasListeners(CrossRef.TERM)) {
-            
-            this.terms.ensureCapacity(index+1);
-            
-            this.terms.set(index,term);
-            
-            this.values.ensureCapacity(index+1);
-            
-            this.values.set(index,value);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    CrossRef.TERM,
-                    
-                    term,
-                    
-                    null
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(CrossRef.TERM);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                this.terms.ensureCapacity(index+1);
-                
-                this.terms.set(index,term);
-                
-                this.values.ensureCapacity(index+1);
-                
-                this.values.set(index,value);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
+    // Hibernate requirement - not for public use.
+    private void setAnnotationSet(Set ann) throws ChangeVetoException { 
+        this.ann.clear();
+        for (Iterator i = ann.iterator(); i.hasNext(); ) {
+            Note n = (Note)i.next();
+            this.ann.setProperty(new SimpleBioEntryAnnotation.RankedTerm(n.getTerm(),n.getRank()),n.getValue());
         }
-        
     }
-    
-    
-    
-    /**
-     *
-     * Adds the term to the end of the list of terms, giving it the index of
-     *
-     * max(all other term index positions)+1.
-     *
-     * @return The position the term was added at.
-     *
-     * @param term New term to add.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws AlreadyExistsException if the term already exists at another index.
-     *
-     * @throws IllegalArgumentException in case of missing term.
-     *
-     */
-    
-    public int addTerm(ComparableTerm term, String value) throws AlreadyExistsException,IllegalArgumentException,ChangeVetoException {
-        
-        if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        
-        if (this.terms.contains(term)) throw new AlreadyExistsException("Term has already been added");
-        
-        int index = this.terms.size();
-        
-        if(!this.hasListeners(CrossRef.TERM)) {
-            
-            this.terms.ensureCapacity(index+1);
-            
-            this.terms.add(index,term);
-            
-            this.values.ensureCapacity(index+1);
-            
-            this.values.set(index,value);
-            
-        } else {
-            
-            ChangeEvent ce = new ChangeEvent(
-                    
-                    this,
-                    
-                    CrossRef.TERM,
-                    
-                    term,
-                    
-                    null
-                    
-                    );
-            
-            ChangeSupport cs = this.getChangeSupport(CrossRef.TERM);
-            
-            synchronized(cs) {
-                
-                cs.firePreChangeEvent(ce);
-                
-                this.terms.ensureCapacity(index+1);
-                
-                this.terms.add(index,term);
-                
-                this.values.ensureCapacity(index+1);
-                
-                this.values.set(index,value);
-                
-                cs.firePostChangeEvent(ce);
-                
-            }
-            
+    // Hibernate requirement - not for public use.
+    private Set getAnnotationSet() { 
+        Set ns = new HashSet();
+        for (Iterator i = this.ann.keys().iterator(); i.hasNext(); ) {
+            SimpleBioEntryAnnotation.RankedTerm rt = (SimpleBioEntryAnnotation.RankedTerm)i.next();
+            ComparableTerm ct = rt.getTerm();
+            int rank = rt.getRank();
+            String v = (String)this.ann.getProperty(ct);
+            Note n = new Note(ct,v,rank,this);
+            ns.add(n);
         }
-        
-        return index;
-        
+        return ns;
     }
-    
-    
-    
-    /**
-     *
-     *
-     *
-     * Tests for the existence of a term in the list.
-     *
-     * @return True if the term is in the list, false if not.
-     *
-     * @param term the term to look for.
-     *
-     */
-    
-    public boolean containsTerm(ComparableTerm term) {
-        
-        if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        
-        return this.terms.contains(term);
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Searches for a term in the list of all terms, and removes it if it was
-     *
-     * found.
-     *
-     * @return True if the term was found, false if the term was not found.
-     *
-     * @param term the term to search for and remove.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
-    
-    public boolean removeTerm(ComparableTerm term) throws ChangeVetoException {
-        
-        if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        
-        int index = this.terms.indexOf(term);
-        
-        if (index>=0) {
-            
-            if(!this.hasListeners(CrossRef.TERM)) {
-                
-                this.terms.set(index,null);
-                
-                this.values.set(index,null);
-                
-            } else {
-                
-                ChangeEvent ce = new ChangeEvent(
-                        
-                        this,
-                        
-                        CrossRef.TERM,
-                        
-                        null,
-                        
-                        this.terms.get(index)
-                        
-                        );
-                
-                ChangeSupport cs = this.getChangeSupport(CrossRef.TERM);
-                
-                synchronized(cs) {
-                    
-                    cs.firePreChangeEvent(ce);
-                    
-                    this.terms.set(index,null);
-                    
-                    this.values.set(index,null);
-                    
-                    cs.firePostChangeEvent(ce);
-                    
-                }
-                
-            }
-            
-            return true;
-            
-        } else {
-            
-            return false;
-            
-        }
-        
-    }
-    
     
     
     /**
@@ -511,7 +240,8 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
         
     }
     
-    
+    // Hibernate requirement - not for public use.
+    private void setAccession(String accession) { this.accession = accession; }
     
     /**
      *
@@ -526,6 +256,9 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
         return this.dbname;
         
     }
+    
+    // Hibernate requirement - not for public use.
+    private void setDbname(String dbname) { this.dbname = dbname; }
     
     
     
@@ -543,34 +276,8 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
         
     }
     
-    
-    
-    /**
-     *
-     * Returns a list of all terms associated with this cross reference. This
-     *
-     * list is not mutable. If no terms are associated, you will get back an
-     *
-     * empty list. If the terms have indexes that are not consecutive, then the
-     *
-     * list will contain nulls at the indexes corresponding to the gaps between
-     *
-     * the extant terms. eg. If there are only two terms A and B at positions 10
-     *
-     * and 20 respectively, then the List returned will be of size 20, with nulls
-     *
-     * at index positions 0-9 and 11-19.
-     *
-     * @return Value of property terms.
-     *
-     */
-    
-    public List getTerms() {
-        
-        return Collections.unmodifiableList(this.terms);
-        
-    }
-    
+    // Hibernate requirement - not for public use.
+    private void setVersion(int version) { this.version = version; }
     
     
     /**
@@ -687,5 +394,22 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
         
     }
     
+    
+    // Hibernate requirement - not for public use.
+    private Long id;
+    
+    
+    // Hibernate requirement - not for public use.
+    private Long getId() {
+        
+        return this.id;
+    }
+    
+    
+    // Hibernate requirement - not for public use.
+    private void setId(Long id) {
+        
+        this.id = id;
+    }
 }
 

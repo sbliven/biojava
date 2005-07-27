@@ -68,7 +68,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     /**
      * A set of terms describing the triple.
      */
-    private Set descriptors;
+    private Set descriptors = new HashSet();
     
     /**
      * Creates a new instance of SimpleComparableTriple
@@ -86,7 +86,53 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
         this.subject = subject;
         this.object = object;
         this.predicate = predicate;
-        this.descriptors = new HashSet();
+    }
+    
+    // Hibernate requirement - not for public use.
+    private SimpleComparableTriple() {}
+    
+    /**
+     * Compares this object with the specified object for order.  Returns a
+     * negative integer, zero, or a positive integer as this object is less
+     * than, equal to, or greater than the specified object.
+     * @return a negative integer, zero, or a positive integer as this object
+     * 		is less than, equal to, or greater than the specified object.
+     * @param o the Object to be compared.
+     */
+    public int compareTo(Object o) {
+        ComparableTriple them = (ComparableTriple)o;
+        if (!this.getOntology().equals(them.getOntology())) return ((ComparableOntology)this.getOntology()).compareTo((ComparableOntology)them.getOntology());
+        if (!this.getSubject().equals(them.getSubject())) return ((ComparableTerm)this.getSubject()).compareTo((ComparableTerm)them.getSubject());
+        if (!this.getObject().equals(them.getObject())) return ((ComparableTerm)this.getObject()).compareTo((ComparableTerm)them.getObject());
+        return ((ComparableTerm)this.getPredicate()).compareTo((ComparableTerm)them.getPredicate());
+    }
+    
+    /**
+     * Two triples are equal if all their fields are identical.
+     * @param o the object to compare to.
+     * @return true if the object is a triple and its fields are all the same, false otherwise.
+     */
+    public boolean equals(Object o) {
+        if(this == o) return true;
+        if (o==null || !(o instanceof ComparableTriple)) return false;
+        ComparableTriple them = (ComparableTriple)o;
+        return (this.getOntology().equals(them.getOntology()) &&
+                this.getSubject().equals(them.getSubject()) &&
+                this.getObject().equals(them.getObject()) &&
+                this.getPredicate().equals(them.getPredicate()));
+    }
+    
+    /**
+     * Returns a hash code for this object.
+     * @return the hashcode.
+     */
+    public int hashCode() {
+        int code = 17;
+        code = 37*code + this.getOntology().hashCode();
+        code = 37*code + this.getSubject().hashCode();
+        code = 37*code + this.getObject().hashCode();
+        code = 37*code + this.getPredicate().hashCode();
+        return code;
     }
     
     /**
@@ -96,7 +142,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     public String getName() {
         return this.predicate.getName() + "(" + this.subject.getName() + ", " + this.object.getName() + ")";
     }
-    
+        
     /**
      * Returns the triple's subject.
      * @return the subject of the triple.
@@ -104,6 +150,9 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     public Term getSubject() {
         return this.subject;
     }
+    
+    // Hibernate requirement - not for public use.
+    private void setSubject(ComparableTerm subject) { this.subject = subject; }
     
     /**
      * Returns the triple's object.
@@ -113,6 +162,9 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
         return this.object;
     }
     
+    // Hibernate requirement - not for public use.
+    private void setObject(ComparableTerm object) { this.object = object; }
+    
     /**
      * Return's the triple's predicate.
      * @return the predicate of the triple.
@@ -120,6 +172,9 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     public Term getPredicate() {
         return this.predicate;
     }
+    
+    // Hibernate requirement - not for public use.
+    private void setPredicate(ComparableTerm predicate) { this.predicate = predicate; }
     
     /**
      * Adds a descriptor.
@@ -194,52 +249,11 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      * @return a set of all descriptors, possible empty.
      */
     public Set getDescriptors() {
-        return Collections.unmodifiableSet(this.descriptors);
+        return this.descriptors;
     }
     
-    /**
-     * Compares this object with the specified object for order.  Returns a
-     * negative integer, zero, or a positive integer as this object is less
-     * than, equal to, or greater than the specified object.
-     * @return a negative integer, zero, or a positive integer as this object
-     * 		is less than, equal to, or greater than the specified object.
-     * @param o the Object to be compared.
-     */
-    public int compareTo(Object o) {
-        ComparableTriple them = (ComparableTriple)o;
-        if (!this.getOntology().equals(them.getOntology())) return ((ComparableOntology)this.getOntology()).compareTo((ComparableOntology)them.getOntology());
-        if (!this.getSubject().equals(them.getSubject())) return ((ComparableTerm)this.getSubject()).compareTo((ComparableTerm)them.getSubject());
-        if (!this.getObject().equals(them.getObject())) return ((ComparableTerm)this.getObject()).compareTo((ComparableTerm)them.getObject());
-        return ((ComparableTerm)this.getPredicate()).compareTo((ComparableTerm)them.getPredicate());
-    }
-    
-    /**
-     * Two triples are equal if all their fields are identical.
-     * @param o the object to compare to.
-     * @return true if the object is a triple and its fields are all the same, false otherwise.
-     */
-    public boolean equals(Object o) {
-        if(this == o) return true;
-        if (o==null || !(o instanceof ComparableTriple)) return false;
-        ComparableTriple them = (ComparableTriple)o;
-        return (this.getOntology().equals(them.getOntology()) &&
-                this.getSubject().equals(them.getSubject()) &&
-                this.getObject().equals(them.getObject()) &&
-                this.getPredicate().equals(them.getPredicate()));
-    }
-    
-    /**
-     * Returns a hash code for this object.
-     * @return the hashcode.
-     */
-    public int hashCode() {
-        int code = 17;
-        code = 37*code + this.getOntology().hashCode();
-        code = 37*code + this.getSubject().hashCode();
-        code = 37*code + this.getObject().hashCode();
-        code = 37*code + this.getPredicate().hashCode();
-        return code;
-    }
+    // Hibernate requirement - not for public use.
+    private void setDescriptors(Set descriptors) { this.descriptors = descriptors; }
     
     /**
      * Remove a synonym for this term. NOT IMPLEMENTED.
@@ -273,6 +287,9 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
         return this.ontology;
     }
     
+    // Hibernate requirement - not for public use.
+    private void setOntology(ComparableOntology descriptors) { this.ontology = ontology; }
+    
     /**
      * Return a human-readable description of this term, or the empty string if
      * none is available.
@@ -298,5 +315,23 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      */
     public String toString() {
         return this.predicate+"("+this.subject+","+this.object+")";
+    }
+
+
+    // Hibernate requirement - not for public use.
+    private Long id;
+
+
+    // Hibernate requirement - not for public use.
+    private Long getId() {
+
+        return this.id;
+    }
+
+
+    // Hibernate requirement - not for public use.
+    private void setId(Long id) {
+
+        this.id = id;
     }
 }

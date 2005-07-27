@@ -40,31 +40,33 @@
 
 package org.biojavax.bio;
 
+import org.biojavax.CrossRef;
+
 /**
  *
  * @author Richard Holland
  */
-public class SimpleBioEntryComment implements BioEntryComment {
+public class SimpleBioEntryCrossRef implements BioEntryCrossRef {
     
 
-    private String comment;
+    private CrossRef crossref;
     private int rank;
     private BioEntry parent;
     
-    public SimpleBioEntryComment(BioEntry parent, String comment, int rank) {
+    public SimpleBioEntryCrossRef(BioEntry parent, CrossRef crossref, int rank) {
         this.parent = parent;
-        this.comment = comment;
+        this.crossref = crossref;
         this.rank = rank;
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleBioEntryComment() {}
+    private SimpleBioEntryCrossRef() {}
     
     // Hibernate requirement - not for public use.
-    private void setComment(String comment) { this.comment = comment; }
+    private void setCrossRef(CrossRef crossref) { this.crossref = crossref; }
 
-    public String getComment() {
-        return this.comment;
+    public CrossRef getCrossRef() {
+        return this.crossref;
     }
     
     // Hibernate requirement - not for public use.
@@ -85,15 +87,15 @@ public class SimpleBioEntryComment implements BioEntryComment {
 
         if (this == obj) return true;
 
-        if (obj==null || !(obj instanceof BioEntryComment)) return false;
+        if (obj==null || !(obj instanceof BioEntryCrossRef)) return false;
 
         else {
 
-            BioEntryComment them = (BioEntryComment)obj;
+            BioEntryCrossRef them = (BioEntryCrossRef)obj;
 
             return (this.getParent().equals(them.getParent()) &&
                     this.getRank()==them.getRank() &&
-                    this.getComment().equals(them.getComment()));
+                    this.getCrossRef().equals(them.getCrossRef()));
 
         }
 
@@ -119,13 +121,13 @@ public class SimpleBioEntryComment implements BioEntryComment {
 
     public int compareTo(Object o) {
 
-        BioEntryComment them = (BioEntryComment)o;
+        BioEntryCrossRef them = (BioEntryCrossRef)o;
 
         if (!this.getParent().equals(them.getParent())) return this.getParent().compareTo(them.getParent());
 
         if (this.getRank()!=them.getRank()) return this.getRank()-them.getRank();
         
-        return this.getComment().compareTo(them.getComment());
+        return this.getCrossRef().compareTo(them.getCrossRef());
     }
 
     
@@ -152,7 +154,7 @@ public class SimpleBioEntryComment implements BioEntryComment {
 
         code = 37*code + this.getParent().hashCode();
 
-        code = 37*code + this.getComment().hashCode();
+        code = 37*code + this.getCrossRef().hashCode();
         
         code = 37*code + this.getRank();
 
