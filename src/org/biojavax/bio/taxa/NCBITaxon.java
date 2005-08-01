@@ -39,57 +39,37 @@ import org.biojava.utils.Changeable;
  * @author Richard Holland
  */
 public interface NCBITaxon extends Comparable,Changeable {
-    /**
-     * A change type.
-     */
+    
     public static final ChangeType NAMES = new ChangeType(
             "This taxon's names have changed",
             "org.biojavax.bio.taxa.NCBITaxon",
             "names"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType PARENT = new ChangeType(
             "This taxon's parent has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
             "parent"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType NODERANK = new ChangeType(
             "This taxon's node rank has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
             "noderank"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType GENETICCODE = new ChangeType(
             "This taxon's genetic code has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
             "geneticcode"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType MITOGENETICCODE = new ChangeType(
             "This taxon's mito genetic code has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
             "mitogeneticcode"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType LEFTVALUE = new ChangeType(
             "This taxon's left value has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
             "leftvalue"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType RIGHTVALUE = new ChangeType(
             "This taxon's right value has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
@@ -126,7 +106,7 @@ public interface NCBITaxon extends Comparable,Changeable {
      * Adds the name to this taxon in the given name class. Neither can be null.
      * @param nameClass the class to add the name in.
      * @param name the name to add.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      * @throws IllegalArgumentException if the name is null.
      */
     public void addName(String nameClass, String name) throws IllegalArgumentException,ChangeVetoException;
@@ -136,7 +116,7 @@ public interface NCBITaxon extends Comparable,Changeable {
      * @return True if the name was found and removed, false otherwise.
      * @param nameClass the class to remove the name from.
      * @param name the name to remove.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      * @throws IllegalArgumentException if the name is null.
      */
     public boolean removeName(String nameClass, String name) throws IllegalArgumentException,ChangeVetoException;
@@ -159,7 +139,7 @@ public interface NCBITaxon extends Comparable,Changeable {
     /**
      * Setter for property parent.
      * @param parent New value of property parent.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setParentNCBITaxID(int parent) throws ChangeVetoException;
     
@@ -178,59 +158,61 @@ public interface NCBITaxon extends Comparable,Changeable {
     /**
      * Setter for property nodeRank.
      * @param nodeRank New value of property nodeRank.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setNodeRank(String nodeRank) throws ChangeVetoException;
     
     /**
-     * Getter for property geneticCode. Returns Persistent.NULL_INTEGER if null.
+     * Getter for property geneticCode.
      * @return Value of property geneticCode.
      */
     public int getGeneticCode();
     
     /**
-     * Setter for property geneticCode. Use Persistent.NULL_INTEGER for null.
+     * Setter for property geneticCode.
      * @param geneticCode New value of property geneticCode.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setGeneticCode(int geneticCode) throws ChangeVetoException;
     
     /**
-     * Getter for property mitoGeneticCode. Returns Persistent.NULL_INTEGER if null.
+     * Getter for property mitoGeneticCode.
      * @return Value of property mitoGeneticCode.
      */
     public int getMitoGeneticCode();
     
     /**
-     * Setter for property mitoGeneticCode. Use Persistent.NULL_INTEGER for null.
+     * Setter for property mitoGeneticCode.
      * @param mitoGeneticCode New value of property mitoGeneticCode.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setMitoGeneticCode(int mitoGeneticCode) throws ChangeVetoException;
     
     /**
-     * Getter for property leftValue. Returns Persistent.NULL_INTEGER if null.
+     * Getter for property leftValue.
      * @return Value of property leftValue.
      */
     public int getLeftValue();
     
     /**
-     * Setter for property leftValue. Use Persistent.NULL_INTEGER for null.
+     * Setter for property leftValue.
      * @param leftValue New value of property leftValue.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setLeftValue(int leftValue) throws ChangeVetoException;
     
     /**
-     * Getter for property rightValue. Returns Persistent.NULL_INTEGER if null.
+     * Getter for property rightValue.
      * @return Value of property rightValue.
      */
     public int getRightValue();
     
     /**
-     * Setter for property rightValue. Use Persistent.NULL_INTEGER for null.
+     * Setter for property rightValue.
      * @param rightValue New value of property rightValue.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setRightValue(int rightValue) throws ChangeVetoException;
+    
 }
+

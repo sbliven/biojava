@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.bio.SimpleBioEntry" table="BIOENTRY">
+
+        <id name="id" type="integer" unsaved-value="null">
+            <column name="BIOENTRY_ID" sql-type="integer" unique="true" not-null="true"/>
+            <generator class="sequence">
+                <param name="sequence">BIOENTRY_PK_SEQ</param>
+            </generator>
+        </id>
+
+        <property name="name">
+            <column name="NAME" sql-type="string" unique="32" not-null="true"/>
+        </property>
+        <property name="identifier">
+            <column name="IDENTIFIER" sql-type="string" unique="32" not-null="false"/>
+        </property>
+        <property name="accession">
+            <column name="ACCESSION" sql-type="string" unique="32" not-null="true"/>
+        </property>        
+        <property name="description">
+            <column name="DESCRIPTION" sql-type="string" length="512" not-null="false"/>
+        </property>       
+        <property name="version">
+            <column name="VERSION" sql-type="integer" length="2" not-null="true"/>
+        </property>      
+        <property name="division">
+            <column name="DIVISION" sql-type="string" length="6" not-null="false"/>
+        </property>    
+        <many-to-one name="taxon">
+            <column name="TAXON_ID" not-null="false"/>
+        </many-to-one>
+        <many-to-one name="namespace">
+            <column name="BIODATABASE_ID" not-null="true"/>
+        </many-to-one>
+        <set name="comments" lazy="false">
+            <key column="BIOENTRY_ID"/>
+            <one-to-many class="org.biojavax.SimpleBioEntryComment"/>
+        </set>
+        <set name="relationships" lazy="false">
+            <key column="OBJECT_BIOENTRY_ID"/>
+            <one-to-many class="org.biojavax.bio.SimpleBioEntryRelationship"/>
+        </set>
+        <set name="rankedDocRefs" table="BIOENTRY_REFERENCE" lazy="false">
+            <key column="BIOENTRY_ID"/>
+            <element class="org.biojavax.SimpleLocatedDocumentReference">
+                <many-to-one name="documentReference">
+                    <column name="REFERENCE_ID" not-null="true"/>
+                </many-to-one>   
+                <property name="rank">
+                    <column name="RANK" sql-type="integer" length="4" not-null="true"/>
+                </property>   
+                <property name="start">
+                    <column name="START_POS" sql-type="integer" length="10" not-null="false"/>
+                </property>    
+                <property name="end">
+                    <column name="END_POS" sql-type="integer" length="10" not-null="false"/>
+                </property> 
+            </element>
+        </set>
+        <set name="rankedCrossRefs" table="BIOENTRY_DBXREF" lazy="false">
+            <key column="BIOENTRY_ID"/>
+            <element class="org.biojavax.SimpleRankedCrossRef">
+                <many-to-one name="crossRef">
+                    <column name="DBXREF_ID" not-null="true"/>
+                </many-to-one>   
+                <property name="rank">
+                    <column name="RANK" sql-type="integer" length="4" not-null="true"/>
+                </property>  
+            </element>
+        </set>
+        <set name="noteSet" table="BIOENTRY_QUALIFIER_VALUE" lazy="false">
+            <key column="BIOENTRY_ID"/>
+            <element class="org.biojavax.SimpleNote">
+                <many-to-one name="term">
+                    <column name="TERM_ID" not-null="true"/>
+                </many-to-one>   
+                <property name="rank">
+                    <column name="RANK" sql-type="integer" length="5" not-null="true"/>
+                </property>   
+                <property name="value">
+                    <column name="VALUE" sql-type="string" length="4000" not-null="false"/>
+                </property>
+            </element>
+        </set>
+        
+        <joined-subclass name="org.biojavax.bio.seq.SimpleRichSequence" table="BIOSEQUENCE">
+            <key column="BIOENTRY_ID"/>
+            <property name="seqVersion">
+                <column name="VERSION" sql-type="double" scale="3" precision="1" not-null="false"/>
+            </property>   
+            <property name="sequenceLength">
+                <column name="LENGTH" sql-type="integer" length="38" not-null="false"/>
+            </property> 
+            <property name="alphabetName">
+                <column name="ALPHABET" sql-type="string" length="12" not-null="false"/>
+            </property> 
+            <property name="stringSequence">
+                <column name="SEQ" sql-type="text" not-null="false"/>
+            </property>   
+            <set name="featureSet" lazy="false">
+                <key column="BIOENTRY_ID"/>
+                <one-to-many class="org.biojavax.bio.seq.SimpleRichSequenceFeature"/>
+            </set>
+        </joined-subclass>
+                
+    </class>
+
+</hibernate-mapping>

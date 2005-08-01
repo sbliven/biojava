@@ -26,16 +26,11 @@
  */
 
 package org.biojavax.bio.seq.io;
-
-import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.Symbol;
 import org.biojavax.CrossRef;
 import org.biojavax.Namespace;
-import org.biojavax.LocatedDocumentReference;
+import org.biojavax.RankedDocRef;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.taxa.NCBITaxon;
 
@@ -51,146 +46,16 @@ import org.biojavax.bio.taxa.NCBITaxon;
  * The listener may selectively filter events and parse on others to another
  * listener. The listener may choose to modify events. The options are endless.
  * <p>
- * Although the name of the class and the name of some of the events suggest a 
- * sequence centric design the class could be used to listen to a parser of a 
+ * Although the name of the class and the name of some of the events suggest a
+ * sequence centric design the class could be used to listen to a parser of a
  * bioentry style record that doesn't actually contain any sequence. In this
  * case no <code>addSymbols()</code> methods would be called. The listener may
  * be an implementation that only builds <code>BioEntry</code> objects and
  * ignores sequence information completely.
- * 
+ *
  * @author Mark Schreiber
  */
 public interface RichSeqIOListener extends SeqIOListener {
-    /**
-     * Start the processing of a sequence or bioentry.  
-     * This method exists primarily to enforce the life-cycles of records that
-     * stream multiple sequence or bioentries in a single record eg a file
-     * with mulitple sequences in FASTA format.
-     * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
-     * to deal with the event or is not expecting the event.
-     * @see #endSequence()
-     */
-    public void startSequence() throws ParseException;
-
-    /**
-     * Notify the listener that processing of the current 
-     * sequence or bioentry is complete.
-     * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
-     * to deal with the event or is not expecting the event.
-     * @see #startSequence()
-     */
-    public void endSequence() throws ParseException;
-
-    /**
-     * Notify the listener that the current sequence is generally known
-     * by a particular name. This method should be called once per entry. An exception
-     * may be thrown if it is called more or less frequently.
-     *
-     * @param name the String that should be returned by getName for the sequence
-     * being parsed.
-     * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
-     * to deal with the event or is not expecting the event.
-     * @see #setURI(String uri)
-     * @see #setAccession(String accession)
-     * @see #setIdentifier(String identifier)
-     */
-    public void setName(String name) throws ParseException;
-
-    /**
-     * Notify the listener of a URI identifying the current sequence or record.
-     * The method is not commonly used. A typical URI might be a life science
-     * identifier (LSID).
-     * @param uri the URI of the record.
-     * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
-     * to deal with the event or is not expecting the event.
-     * @see #setName(String name)
-     * @see #setAccession(String accession)
-     * @see #setIdentifier(String identifier)
-     */
-    public void setURI(String uri) throws ParseException;
-
-    /**
-     * Notify the listener of symbol data.  All symbols passed to
-     * this method are guarenteed to be contained within the
-     * specified alphabet.  Generally all calls to a given Listener
-     * should have the same alphabet -- if not, the listener implementation
-     * is likely to throw an exception. This method may be called zero or more
-     * times for an entry. Obviously if you want to build a <code>Sequence</code>
-     * object you would need to call it at least once. If your only making a 
-     * BioEntry you probably wouldn't call it at all (or the Listener would ignore
-     * it).
-     *
-     * @param alpha The alphabet of the symbol data
-     * @param syms An array containing symbols
-     * @param start The start offset of valid data within the array
-     * @param length The number of valid symbols in the array
-     *
-     * @throws IllegalAlphabetException if we can't cope with this
-     *                                  alphabet.
-     */
-    public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length)
-        throws IllegalAlphabetException;
-
-    /**
-     * Notify the listener of a sequence-wide property.  This might
-     * be stored as an entry in the sequence's annotation bundle. If the listener
-     * wants to enforce an ontology or restricted vocabulary it may want to
-     * throw an exception if the <code>key</code> and or <code>value</code> are
-     * not <code>Term</code>s from that ontology. This method could be called
-     * zero or more times per entry.
-     * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
-     * to deal with the event or is not expecting the event.
-     * @param key the key (often an <code>org.biojava.ontology.Term</code>
-     * @param value the value associated with the key, typically a <code>String</code>
-     */
-    public void addSequenceProperty(Object key, Object value) throws ParseException;
-
-    /**
-     * Notify the listener that a new feature object is starting.
-     * Every call to startFeature should have a corresponding call
-     * to endFeature.  If the listener is concerned with a hierarchy
-     * of features, it should maintain a stack of `open' features.
-     * <p>
-     * The key difference between Features and Sequence properties is that Features
-     * are localized to a region of Sequence. Thus BioEntrys wouldn't have Features
-     * but Sequences could. This method could be called zero or more times per
-     * entry but shouldn't be called or should be ignored if the implementation
-     * is only building bioentries.
-     * @param templ The template of the feature to be created.
-     * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
-     * to deal with the event or is not expecting the event.
-     *
-     * @see #addFeatureProperty(Object key, Object value)
-     * @see #endFeature()
-     */
-    public void startFeature(Feature.Template templ) throws ParseException;
-
-    /**
-     * Mark the end of data associated with one specific feature. This should
-     * be called once per call to <code>startFeature(Feature.Template templ)</code>
-     * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
-     * to deal with the event or is not expecting the event.
-     * @see #startFeature(Feature.Template templ)
-     */
-    public void endFeature() throws ParseException;
-
-    /**
-     * Notify the listener of a feature property. A feature property is very
-     * much like a sequence property but is only relevant to the region covered
-     * by that feature. Feature properties go into the features annotation bundle.
-     * <p>
-     * If the listener wants to enforce an ontology or restricted vocabulary it 
-     * may want to throw an exception if the <code>key</code> and or 
-     * <code>value</code> are not <code>Term</code>s from that ontology. 
-     * This method could be called zero or more times per call to <code>
-     * startFeature(Feature.Template templ)</code> and should never be called
-     * unless between startFeature and endFeature events.
-     * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
-     * to deal with the event or is not expecting the event.
-     * @param key the key (often an <code>org.biojava.ontology.Term</code>
-     * @param value the value associated with the key, typically a <code>String</code>
-     */
-    public void addFeatureProperty(Object key, Object value) throws ParseException;    
     
     /**
      * Call back method so the event emitter can tell the listener
@@ -204,14 +69,14 @@ public interface RichSeqIOListener extends SeqIOListener {
      * @see #setName(String name)
      * @see #setURI(String uri)
      * @see #setIdentifier(String identifier)
-     * 
+     *
      */
     public void setAccession(String accession) throws ParseException;
     
     /**
      * Call back method so the event emitter can tell the listener
      * the identifier of the record being read. There should be
-     * zero or one identifier per bioentry. If there is more  
+     * zero or one identifier per bioentry. If there is more
      * than one the Listener should consider throwing an exception.
      * For some formats like fasta the identifier may not exist. For others
      * like GenBank the identifier best maps to the GI.
@@ -252,7 +117,7 @@ public interface RichSeqIOListener extends SeqIOListener {
     /**
      * Call back method so the event emitter can tell the listener
      * the version of the record being read. This method would typically
-     * be called 0 or 1 times per entry. If it is not called the 
+     * be called 0 or 1 times per entry. If it is not called the
      * Listener should assume the version is 0. If it is called more
      * than once per entry an exception should be thrown.
      * @param version the version of the record
@@ -264,7 +129,7 @@ public interface RichSeqIOListener extends SeqIOListener {
     /**
      * Call back method so the event emitter can tell the listener
      * the version of the sequence of the record being read. This method would typically
-     * be called 0 or 1 times per entry. If it is not called the 
+     * be called 0 or 1 times per entry. If it is not called the
      * Listener should assume the version is 0. If it is called more
      * than once per entry an exception should be thrown.
      * @param version the version of the record
@@ -293,14 +158,14 @@ public interface RichSeqIOListener extends SeqIOListener {
      * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
      * to deal with the event or is not expecting the event.
      */
-    public void setBioEntryDocRef(LocatedDocumentReference ref) throws ParseException;
+    public void setRankedDocRef(RankedDocRef ref) throws ParseException;
     
     /**
      * Call back method so the event emitter can tell the listener
      * the Taxon of the record being read. This method may be called
      * zero or one times. An exception may be thrown if it is called
      * more than once. As a design decision NCBI's taxon model was chosen as it
-     * is commonly used and is supported by the BioSQL schema. The setting of 
+     * is commonly used and is supported by the BioSQL schema. The setting of
      * an NCBI taxon should be considered entirely optional.
      *
      * @param taxon The taxon information relevant to this entry.
@@ -316,13 +181,13 @@ public interface RichSeqIOListener extends SeqIOListener {
      * may be thrown.<p>
      * The namespace is a concept from the BioSQL schema that enables
      * Bioentries to be disambiguated. It is possible in BioSQL and should be possible
-     * in other collections of BioEntries to have records that have the same 
+     * in other collections of BioEntries to have records that have the same
      * name, accession and version but different namespaces. This method would be
      * expected to be called if you are reading a sequence from a biosql database or
      * if you are implementing a listener that knows how to write to a biosql database.
      * If you give a sequence a namespace and it is persited to biosql at somepoint in it's
      * life you could expect it to be persisted to that namespace (if possible).
-     * 
+     *
      * @param namespace The namespace of the entry.
      * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
      * to deal with the event or is not expecting the event.
@@ -331,7 +196,7 @@ public interface RichSeqIOListener extends SeqIOListener {
     
     /**
      * Call back method so the event emitter can tell the listener
-     * about a relationship between the bioentry or sequence in the 
+     * about a relationship between the bioentry or sequence in the
      * record being read and another bioentry. This may be called zero
      * or more times.
      * @param relationship The relationship
@@ -347,5 +212,5 @@ public interface RichSeqIOListener extends SeqIOListener {
      * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
      * to deal with the event or is not expecting the event.
      */
-    public void setCrossReference(CrossRef crossRef) throws ParseException;
+    public void setCrossRef(CrossRef crossRef) throws ParseException;
 }

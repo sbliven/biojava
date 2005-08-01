@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.bio.SimpleBioEntryRelationship" table="BIOENTRY_RELATIONSHIP">
+
+        <id name="id" type="integer" unsaved-value="null">
+            <column name="BIOENTRY_RELATIONSHIP_ID" sql-type="integer" unique="true" not-null="true"/>
+            <generator class="sequence">
+                <param name="sequence">BIOENTRY_RELATIONSHIP_PK_SEQ</param>
+            </generator>
+        </id>
+
+        <many-to-one name="object" inverse="true">
+            <column name="OBJECT_BIOENTRY_ID" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="term" inverse="true">
+            <column name="TERM_ID" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="subject" inverse="true">
+            <column name="SUBJECT_BIOENTRY_ID" not-null="true"/>
+        </many-to-one>
+        <property name="rank">
+            <column name="RANK" sql-type="integer" length="6" not-null="false"/>
+        </property>
+        
+    </class>
+
+</hibernate-mapping>

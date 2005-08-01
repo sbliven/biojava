@@ -31,30 +31,66 @@ import org.biojava.ontology.Term;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
+import org.biojavax.RankedCrossRefable;
 
 /**
  * Makes Term objects comparable properly.
  * @author Richard Holland
  */
-public interface ComparableTerm extends Term,Comparable,Changeable {
+public interface ComparableTerm extends Term,RankedCrossRefable,Comparable,Changeable {
     
-        public static final ChangeType IDENTIFIER = new ChangeType(
+    public static final ChangeType IDENTIFIER = new ChangeType(
             "This term's identifier has changed",
             "org.biojavax.ontology.ComparableTerm",
-                "identifier"
-            );        
-        public static final ChangeType OBSOLETE = new ChangeType(
+            "identifier"
+            );
+    public static final ChangeType OBSOLETE = new ChangeType(
             "This term's obsolescence has changed",
             "org.biojavax.ontology.ComparableTerm",
-                "obsolete"
+            "obsolete"
             );
-        
+    public static final ChangeType DESCRIPTION = new ChangeType(
+            "This term's description has changed",
+            "org.biojavax.ontology.ComparableTerm",
+            "description"
+            );
+    public static final ChangeType RANKEDCROSSREF = new ChangeType(
+            "This term's ranked crossrefs have changed",
+            "org.biojavax.ontology.ComparableTerm",
+            "rankedcrossref"
+            );
+    
+    /**
+     * Returns the (optional) identifier associated with this term.
+     * @return the string identifier.
+     */
     public String getIdentifier();
     
+    /**
+     * Sets the (optional) identifier associated with this term.
+     * @param identifier the identifier to give the term.
+     * @throws ChangeVetoException if the identifier is unacceptable.
+     */
     public void setIdentifier(String identifier) throws ChangeVetoException;
-        
+    
+    /**
+     * Checks to see if this term is obsolete.
+     * @return true if it is, false if not.
+     */
     public boolean getObsolete();
     
+    /**
+     * Sets the obsolescence flag associated with this term.
+     * @param obsolete true if it is obsolete, false if not.
+     * @throws ChangeVetoException if the change is unacceptable.
+     */
     public void setObsolete(boolean obsolete) throws ChangeVetoException;
+    
+    /**
+     * Sets the description associated with this term.
+     * @param description the description to give the term.
+     * @throws ChangeVetoException if the description is unacceptable.
+     */
+    public void setDescription(String description) throws ChangeVetoException;
     
 }

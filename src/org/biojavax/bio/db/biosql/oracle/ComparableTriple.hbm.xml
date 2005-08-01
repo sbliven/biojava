@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.ontology.SimpleComparableTriple" table="TERM_RELATIONSHIP">
+
+        <id name="id" type="integer" unsaved-value="null">
+            <column name="TERM_RELATIONSHIP_ID" sql-type="integer" unique="true" not-null="true"/>
+            <generator class="sequence">
+                <param name="sequence">TERM_RELATIONSHIP_PK_SEQ</param>
+            </generator>
+        </id>
+
+        <many-to-one name="subject" inverse="true">
+            <column name="SUBJECT_ID" not-null="true"/>
+        </many-to-one>    
+        <many-to-one name="object" inverse="true">
+            <column name="OBJECT_ID" not-null="true"/>
+        </many-to-one>    
+        <many-to-one name="predicate" inverse="true">
+            <column name="PREDICATE_ID" not-null="true"/>
+        </many-to-one>       
+        <many-to-one name="ontology" inverse="true">
+            <column name="ONTOLOGY_ID" not-null="true"/>
+        </many-to-one>
+        <set name="descriptors" table="TERM_RELATIONSHIP_TERM" lazy="false">
+            <key column="TERM_RELATIONSHIP_ID"/>
+            <one-to-many class="org.biojavax.ontology.SimpleComparableTerm" lazy="false">     
+                <column name="TERM_ID" not-null="true"/>
+            </one-to-many>
+        </set>
+    </class>
+
+</hibernate-mapping>

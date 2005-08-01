@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.bio.seq.SimpleRichLocation" table="LOCATION">
+
+        <id name="id" type="integer" unsaved-value="null">
+            <column name="LOCATION_ID" sql-type="integer" unique="true" not-null="true"/>
+            <generator class="sequence">
+                <param name="sequence">LOCATION_PK_SEQ</param>
+            </generator>
+        </id>
+
+        <many-to-one name="parentFeature" inverse="true">
+            <column name="SEQFEATURE_ID" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="term" inverse="true">
+            <column name="TERM_ID" not-null="false"/>
+        </many-to-one>
+        <many-to-one name="crossRef" inverse="true">
+            <column name="DBXREF_ID" not-null="false"/>
+        </many-to-one>
+        <property name="rank">
+            <column name="RANK" sql-type="integer" length="4" not-null="true"/>
+        </property>
+        <property name="min">
+            <column name="START_POS" sql-type="integer" length="10" not-null="false"/>
+        </property>
+        <property name="max">
+            <column name="END_POS" sql-type="integer" length="10" not-null="false"/>
+        </property>
+        <property name="strandChar">
+            <column name="STRAND" sql-type="character" length="1" not-null="true"/>            
+        </property>
+        <set name="noteSet" table="LOCATION_QUALIFIER_VALUE" lazy="false">
+            <key column="LOCATION_ID"/>
+            <element class="org.biojavax.SimpleNote">
+                <many-to-one name="term">
+                    <column name="TERM_ID" not-null="true"/>
+                </many-to-one>
+                <property name="value">
+                    <column name="VALUE" sql-type="string" length="32" not-null="true"/>
+                </property>
+            </element>
+        </set>
+        
+    </class>
+
+</hibernate-mapping>

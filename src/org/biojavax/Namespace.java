@@ -39,41 +39,26 @@ import org.biojava.utils.Changeable;
  */
 public interface Namespace extends Comparable,Changeable {
     
-    /**
-     * A change type.
-     */
     public static final ChangeType NAME = new ChangeType(
             "This namespace's name has changed",
             "org.biojavax.Namespace",
             "name"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType AUTHORITY = new ChangeType(
             "This namespace's authority has changed",
             "org.biojavax.Namespace",
             "authority"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType DESCRIPTION = new ChangeType(
             "This namespace's description has changed",
             "org.biojavax.Namespace",
             "description"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType ACRONYM = new ChangeType(
             "This namespace's acronym has changed",
             "org.biojavax.Namespace",
             "acronym"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType URI = new ChangeType(
             "This namespace's URI has changed",
             "org.biojavax.Namespace",
@@ -95,7 +80,7 @@ public interface Namespace extends Comparable,Changeable {
     /**
      * Setter for property authority.
      * @param authority the name of the namespace authority.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setAuthority(String authority) throws ChangeVetoException;
     
@@ -108,7 +93,7 @@ public interface Namespace extends Comparable,Changeable {
     /**
      * Setter for property description.
      * @param description the description of the namespace.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setDescription(String description) throws ChangeVetoException;
     
@@ -121,7 +106,7 @@ public interface Namespace extends Comparable,Changeable {
     /**
      * Setter for property acronym.
      * @param acronym the acronym for the namespace.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setAcronym(String acronym) throws ChangeVetoException;
     
@@ -134,7 +119,9 @@ public interface Namespace extends Comparable,Changeable {
     /**
      * Setter for property URI.
      * @param URI the URI of the authority.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setURI(URI URI) throws ChangeVetoException;
+    
 }
+

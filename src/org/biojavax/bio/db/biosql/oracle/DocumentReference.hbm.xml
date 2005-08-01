@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.SimpleDocumentReference" table="REFERENCE">
+
+        <id name="id" type="integer" unsaved-value="null">
+            <column name="REFERENCE_ID" sql-type="integer" unique="true" not-null="true"/>
+            <generator class="sequence">
+                <param name="sequence">REFERENCE_PK_SEQ</param>
+            </generator>
+        </id>
+
+        <property name="title">
+            <column name="TITLE" sql-type="string" length="1000" not-null="false"/>
+        </property>
+        <property name="authors">
+            <column name="AUTHORS" sql-type="string" length="4000" not-null="true"/>
+        </property>
+        <property name="location">
+            <column name="LOCATION" sql-type="string" length="512" not-null="true"/>
+        </property>
+        <property name="CRC">
+            <column name="CRC" sql-type="string" length="32" not-null="false"/>
+        </property>
+        <many-to-one name="crossRef" inverse="true">
+            <column name="DBXREF_ID" not-null="false"/>
+        </many-to-one>
+        
+    </class>
+
+</hibernate-mapping>

@@ -20,7 +20,7 @@
  */
 
 /*
- * ComparableTriple.java
+ * SimpleComparableTriple.java
  *
  * Created on July 11, 2005, 10:54 AM
  */
@@ -29,9 +29,9 @@ package org.biojavax.ontology;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import org.biojava.bio.Annotation;
-import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
 import org.biojava.utils.AbstractChangeable;
@@ -49,29 +49,14 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class SimpleComparableTriple extends AbstractChangeable implements ComparableTriple {
     
-    /**
-     * The name of the ontology the triple lives in.
-     */
     private ComparableOntology ontology;
-    /**
-     * The object of the triple.
-     */
     private ComparableTerm object;
-    /**
-     * The subject of the triple.
-     */
     private ComparableTerm subject;
-    /**
-     * The predicate of the triple.
-     */
     private ComparableTerm predicate;
-    /**
-     * A set of terms describing the triple.
-     */
     private Set descriptors = new HashSet();
     
     /**
-     * Creates a new instance of SimpleComparableTriple
+     * Creates a new instance of SimpleComparableTriple.
      * @param ontology the ontology of the triple.
      * @param subject the subject of the triple.
      * @param object the object of the triple.
@@ -89,15 +74,10 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleComparableTriple() {}
+    protected SimpleComparableTriple() {}
     
     /**
-     * Compares this object with the specified object for order.  Returns a
-     * negative integer, zero, or a positive integer as this object is less
-     * than, equal to, or greater than the specified object.
-     * @return a negative integer, zero, or a positive integer as this object
-     * 		is less than, equal to, or greater than the specified object.
-     * @param o the Object to be compared.
+     * {@inheritDoc}
      */
     public int compareTo(Object o) {
         ComparableTriple them = (ComparableTriple)o;
@@ -108,9 +88,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     }
     
     /**
-     * Two triples are equal if all their fields are identical.
-     * @param o the object to compare to.
-     * @return true if the object is a triple and its fields are all the same, false otherwise.
+     * {@inheritDoc}
      */
     public boolean equals(Object o) {
         if(this == o) return true;
@@ -123,8 +101,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     }
     
     /**
-     * Returns a hash code for this object.
-     * @return the hashcode.
+     * {@inheritDoc}
      */
     public int hashCode() {
         int code = 17;
@@ -136,16 +113,14 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     }
     
     /**
-     * Returns the name of the triple. This is:  predicate(subject,object)
-     * @return the name of the triple.
+     * {@inheritDoc}
      */
     public String getName() {
         return this.predicate.getName() + "(" + this.subject.getName() + ", " + this.object.getName() + ")";
     }
-        
+    
     /**
-     * Returns the triple's subject.
-     * @return the subject of the triple.
+     * {@inheritDoc}
      */
     public Term getSubject() {
         return this.subject;
@@ -155,8 +130,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     private void setSubject(ComparableTerm subject) { this.subject = subject; }
     
     /**
-     * Returns the triple's object.
-     * @return the object of the triple.
+     * {@inheritDoc}
      */
     public Term getObject() {
         return this.object;
@@ -166,8 +140,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     private void setObject(ComparableTerm object) { this.object = object; }
     
     /**
-     * Return's the triple's predicate.
-     * @return the predicate of the triple.
+     * {@inheritDoc}
      */
     public Term getPredicate() {
         return this.predicate;
@@ -177,16 +150,11 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     private void setPredicate(ComparableTerm predicate) { this.predicate = predicate; }
     
     /**
-     * Adds a descriptor.
-     * @param desc the descriptor to add.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     * @throws AlreadyExistsException if the descriptor already exists.
-     * @throws IllegalArgumentException if the descriptor is missing.
+     * {@inheritDoc}
      */
-    public void addDescriptor(ComparableTerm desc) throws AlreadyExistsException, IllegalArgumentException,ChangeVetoException {
+    public void addDescriptor(ComparableTerm desc) throws IllegalArgumentException,ChangeVetoException {
         if (desc==null) throw new IllegalArgumentException("Cannot have null descriptor");
         if(!this.hasListeners(ComparableTriple.DESCRIPTOR)) {
-            if (this.descriptors.contains(desc)) throw new AlreadyExistsException("Descriptor has already been used");
             this.descriptors.add(desc);
         } else {
             ChangeEvent ce = new ChangeEvent(
@@ -198,7 +166,6 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
             ChangeSupport cs = this.getChangeSupport(ComparableTriple.DESCRIPTOR);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                if (this.descriptors.contains(desc)) throw new AlreadyExistsException("Descriptor has already been used");
                 this.descriptors.add(desc);
                 cs.firePostChangeEvent(ce);
             }
@@ -206,11 +173,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     }
     
     /**
-     * Removes a descriptor.
-     * @return True if it did it, false if the descriptor did not exist.
-     * @param desc the descriptor to remove.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     * @throws IllegalArgumentException if the descriptor is missing.
+     * {@inheritDoc}
      */
     public boolean removeDescriptor(ComparableTerm desc) throws IllegalArgumentException,ChangeVetoException {
         if (desc==null) throw new IllegalArgumentException("Cannot have null descriptor");
@@ -235,53 +198,48 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     }
     
     /**
-     * Tests for existence of a descriptor.
-     * @return True if it exists, false if the descriptor did not exist.
-     * @param desc the descriptor to look for.
-     * @throws IllegalArgumentException if the descriptor is missing.
+     * {@inheritDoc}
      */
-    public boolean containsDescriptor(ComparableTerm desc) throws IllegalArgumentException {
-        return this.descriptors.contains(desc);
+    public Set getDescriptors() { return Collections.unmodifiableSet(this.descriptors); }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setDescriptors(Set descriptors) throws ChangeVetoException {
+        this.descriptors.clear();
+        for (Iterator i = descriptors.iterator(); i.hasNext(); ) {
+            Object o = i.next();
+            if (!(o instanceof ComparableTerm)) throw new ChangeVetoException("Descriptors must be comparable terms");
+            this.addDescriptor((ComparableTerm)o);
+        }
     }
     
     /**
-     * Returns all descriptors.
-     * @return a set of all descriptors, possible empty.
-     */
-    public Set getDescriptors() {
-        return this.descriptors;
-    }
-    
-    // Hibernate requirement - not for public use.
-    private void setDescriptors(Set descriptors) { this.descriptors = descriptors; }
-    
-    /**
-     * Remove a synonym for this term. NOT IMPLEMENTED.
-     * @param synonym the synonym to remove.
+     * {@inheritDoc}
+     * NOT IMPLEMENTED
      */
     public void removeSynonym(Object synonym) {
-        throw new UnsupportedOperationException("BioSQL does not know about triple synonyms.");
+        throw new UnsupportedOperationException("BioJavaX does not know about triple synonyms.");
     }
     
     /**
-     * Add a synonym for this term. NOT IMPLEMENTED.
-     * @param synonym the synonym to add.
+     * {@inheritDoc}
+     * NOT IMPLEMENTED
      */
     public void addSynonym(Object synonym) {
-        throw new UnsupportedOperationException("BioSQL does not know about triple synonyms.");
+        throw new UnsupportedOperationException("BioJavaX does not know about triple synonyms.");
     }
     
     /**
-     * Return the synonyms for this term.
-     * @return the set of synonyms for this term.
+     * {@inheritDoc}
+     * ALWAYS RETURNS AN EMPTY LIST
      */
     public Object[] getSynonyms() {
         return Collections.EMPTY_LIST.toArray();
     }
     
     /**
-     * Return the ontology in which this term exists.
-     * @return the ontology for this term.
+     * {@inheritDoc}
      */
     public Ontology getOntology() {
         return this.ontology;
@@ -291,47 +249,36 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     private void setOntology(ComparableOntology descriptors) { this.ontology = ontology; }
     
     /**
-     * Return a human-readable description of this term, or the empty string if
-     * none is available.
-     * @return the description of this term.
+     * {@inheritDoc}
      */
     public String getDescription() {
         return "";
     }
     
     /**
-     * Should return the associated annotation object.
-     *
-     * @return an Annotation object, never null
+     * {@inheritDoc}
      */
     public Annotation getAnnotation() {
         return Annotation.EMPTY_ANNOTATION;
     }
     
     /**
-     * Returns a string representation of the object of the form
-     * <code>predicate(subject,object)</code>
-     * @return  a string representation of the object.
+     * {@inheritDoc}
+     * The string takes the form <code>predicate(subject,object)</code>
      */
     public String toString() {
         return this.predicate+"("+this.subject+","+this.object+")";
     }
-
-
+    
+    
     // Hibernate requirement - not for public use.
     private Long id;
-
-
+    
+    
     // Hibernate requirement - not for public use.
-    private Long getId() {
-
-        return this.id;
-    }
-
-
+    private Long getId() { return this.id; }
+    
+    
     // Hibernate requirement - not for public use.
-    private void setId(Long id) {
-
-        this.id = id;
-    }
+    private void setId(Long id) { this.id = id; }
 }

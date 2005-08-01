@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.bio.SimpleBioEntryComment" table="ANNCOMMENT">
+
+        <id name="id" type="integer" unsaved-value="null">
+            <column name="ANNCOMMENT_ID" sql-type="integer" unique="true" not-null="true"/>
+            <generator class="sequence">
+                <param name="sequence">ANNCOMMENT_PK_SEQ</param>
+            </generator>
+        </id>
+
+        <property name="rank">
+            <column name="RANK" sql-type="integer" length="2" not-null="true"/>
+        </property>
+        <property name="comment">
+            <column name="COMMENT_TEXT" sql-type="text" not-null="true"/>
+        </property>
+        <many-to-one name="parent" inverse="true">
+            <column name="BIOENTRY_ID" not-null="true"/>
+        </many-to-one>
+        
+    </class>
+
+</hibernate-mapping>

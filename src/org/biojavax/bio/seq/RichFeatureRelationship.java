@@ -20,17 +20,17 @@
  */
 
 /*
- * BioEntryRelationship.java
+ * RichFeatureRelationship.java
  *
  * Created on June 14, 2005, 5:33 PM
  */
 
-package org.biojavax.bio;
+package org.biojavax.bio.seq;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
+import org.biojavax.bio.db.BioDBUtils;
 import org.biojavax.ontology.ComparableTerm;
-
 
 /**
  * Represents the relation between two bioentries. The bioentry_relationship in
@@ -38,18 +38,23 @@ import org.biojavax.ontology.ComparableTerm;
  * @author Mark Schreiber
  * @author Richard Holland
  */
-public interface BioEntryRelationship extends Comparable,Changeable {
+public interface RichFeatureRelationship extends Comparable,Changeable {
+    
+    /**
+     * The default term used for defining the relationship between features.
+     */
+    public static final ComparableTerm DEFAULT_FEATURE_RELATIONSHIP_TERM = BioDBUtils.getOntologyTerm(BioDBUtils.DEFAULT_ONTOLOGY, "contains");
     
     public static final ChangeType RANK = new ChangeType(
-            "This bioentry relationship's rank has changed",
-            "org.biojavax.bio.BioEntryRelationship",
+            "This feature relationship's rank has changed",
+            "org.biojavax.bio.seq.RichSeqFeatRelationship",
             "rank"
             );
     
     /**
      * Setter for property rank.
      * @param rank Value of property rank.
-     * @throws ChangeVetoException if the rank rankles.
+     * @throws ChangeVetoException if the rank is untasty.
      */
     public void setRank(int rank) throws ChangeVetoException;
     
@@ -63,18 +68,18 @@ public interface BioEntryRelationship extends Comparable,Changeable {
      * Getter for property object.
      * @return Value of property object.
      */
-    public BioEntry getObject();
+    public RichFeature getObject();
     
     /**
      * Getter for property subject.
      * @return Value of property subject.
      */
-    public BioEntry getSubject();
+    public RichFeature getSubject();
     
     /**
      * Getter for property term.
      * @return Value of property term.
      */
     public ComparableTerm getTerm();
+    
 }
-

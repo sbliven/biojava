@@ -39,10 +39,7 @@ import org.biojava.utils.Changeable;
  * @author Richard Holland
  */
 public interface ComparableTriple extends Triple,Comparable,Changeable {
-    
-    /**
-     * A change type.
-     */
+
     public static final ChangeType DESCRIPTOR = new ChangeType(
             "This triple's descriptors have changed",
             "org.biojavax.ontology.ComparableTriple",
@@ -52,7 +49,7 @@ public interface ComparableTriple extends Triple,Comparable,Changeable {
     /**
      * Adds a descriptor.
      * @param desc the descriptor to add.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      * @throws AlreadyExistsException if the descriptor already exists.
      * @throws IllegalArgumentException if the descriptor is missing.
      */
@@ -62,22 +59,22 @@ public interface ComparableTriple extends Triple,Comparable,Changeable {
      * Removes a descriptor.
      * @return True if it did it, false if the descriptor did not exist.
      * @param desc the descriptor to remove.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      * @throws IllegalArgumentException if the descriptor is missing.
      */
     public boolean removeDescriptor(ComparableTerm desc) throws IllegalArgumentException,ChangeVetoException;
-    
+     
     /**
-     * Tests for existence of a descriptor.
-     * @return True if it exists, false if the descriptor did not exist.
-     * @param desc the descriptor to look for.
-     * @throws IllegalArgumentException if the descriptor is missing.
+     * Clears the current set of descriptors and replaces it with the content of 
+     * the set passed.
+     * @param descriptors the descriptors to add.
+     * @throws ChangeVetoException in case of objections.
      */
-    public boolean containsDescriptor(ComparableTerm desc) throws IllegalArgumentException;
+    public void setDescriptors(Set descriptors) throws ChangeVetoException;
     
     /**
      * Returns all descriptors.
-     * @return a set of all descriptors, possible empty.
+     * @return a set of all descriptors, possibly empty.
      */
     public Set getDescriptors();
     

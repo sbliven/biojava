@@ -1,941 +1,420 @@
 /*
- 
  *                    BioJava development code
- 
  *
- 
  * This code may be freely distributed and modified under the
- 
  * terms of the GNU Lesser General Public Licence.  This should
- 
  * be distributed with the code.  If you do not have a copy,
- 
  * see:
- 
  *
- 
  *      http://www.gnu.org/copyleft/lesser.html
- 
  *
- 
  * Copyright for this code is held jointly by the individual
- 
  * authors.  These should be listed in @author doc comments.
- 
  *
- 
  * For more information on the BioJava project and its aims,
- 
  * or to join the biojava-l mailing list, visit the home page
- 
  * at:
- 
  *
- 
  *      http://www.biojava.org/
- 
  *
- 
  */
-
-
 
 /*
- 
  * SimpleNCBITaxon.java
- 
  *
- 
  * Created on June 16, 2005, 10:01 AM
- 
  */
-
-
 
 package org.biojavax.bio.taxa;
-
-import java.util.Collections;
-
 import java.util.HashMap;
-
 import java.util.HashSet;
 import java.util.Iterator;
-
 import java.util.Map;
-
 import java.util.Set;
-
 import org.biojava.utils.AbstractChangeable;
-
 import org.biojava.utils.ChangeEvent;
-
 import org.biojava.utils.ChangeSupport;
-
 import org.biojava.utils.ChangeVetoException;
 
-
-
-
 /**
- *
  * Reference implementation of NCBITaxon.
- *
- *
- *
  * Equality is simply the NCBI taxon ID.
- *
- *
- *
  * @author Richard Holland
- *
  * @author Mark Schreiber
- *
  */
-
 public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     
-    
-    
-    /**
-     *
-     * The names for this taxon.
-     *
-     */
-    
     private Map names = new HashMap();
-    
-    /**
-     *
-     * The parent for this taxon.
-     *
-     */
-    
     private int parent;
-    
-    /**
-     *
-     * The NCBI Taxon ID for this taxon.
-     *
-     */
-    
     private int NCBITaxID;
-    
-    /**
-     *
-     * The node rank for this taxon.
-     *
-     */
-    
     private String nodeRank;
-    
-    /**
-     *
-     * The genetic code for this taxon.
-     *
-     */
-    
     private int geneticCode;
-    
-    /**
-     *
-     * The mitogenetic code for this taxon.
-     *
-     */
-    
     private int mitoGeneticCode;
-    
-    /**
-     *
-     * The left value for this taxon.
-     *
-     */
-    
     private int leftValue;
-    
-    /**
-     *
-     * The right value for this taxon.
-     *
-     */
-    
     private int rightValue;
     
-    
-    
     /**
-     *
      * Creates a new instance of SimpleNCBITaxon
-     *
      * @param NCBITaxID the underlying taxon ID from NCBI.
-     *
      */
-    
     public SimpleNCBITaxon(int NCBITaxID) {
-        
         this.parent = 0;
-        
         this.NCBITaxID = NCBITaxID;
-        
         this.nodeRank = null;
-        
         this.geneticCode = 0;
-        
         this.mitoGeneticCode = 0;
-        
         this.leftValue = 0;
-        
         this.rightValue = 0;
-        
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleNCBITaxon() {}
-    
-    
-    
+    protected SimpleNCBITaxon() {}
     
     /**
-     *
-     * Compares this object with the specified object for order.  Returns a
-     *
-     * negative integer, zero, or a positive integer as this object is less
-     *
-     * than, equal to, or greater than the specified object.<p>
-     *
-     * @return a negative integer, zero, or a positive integer as this object
-     *
-     * 		is less than, equal to, or greater than the specified object.
-     *
-     * @param o the Object to be compared.
-     *
+     * {@inheritDoc}
      */
-    
     public int compareTo(Object o) {
-        
         NCBITaxon them = (NCBITaxon)o;
-        
         return this.getNCBITaxID()-them.getNCBITaxID();
-        
     }
     
     
     /**
-     *
-     * Indicates whether some other object is "equal to" this one.
-     *
-     * @param   obj   the reference object with which to compare.
-     *
-     * @return  <code>true</code> if this object is the same as the obj
-     *
-     *          argument; <code>false</code> otherwise.
-     *
-     * @see     #hashCode()
-     *
-     * @see     java.util.Hashtable
-     *
+     * {@inheritDoc}
      */
-    
     public boolean equals(Object obj) {
-        
         if (this == obj) return true;
-        
         if (obj==null || !(obj instanceof NCBITaxon)) return false;
-        
         NCBITaxon them = (NCBITaxon)obj;
-        
         return this.getNCBITaxID()==them.getNCBITaxID();
-        
     }
     
-    
-    
     /**
-     *
-     * Returns a hash code value for the object. This method is
-     *
-     * supported for the benefit of hashtables such as those provided by
-     *
-     * <code>java.util.Hashtable</code>.
-     *
-     * @return  a hash code value for this object.
-     *
-     * @see     java.lang.Object#equals(java.lang.Object)
-     *
-     * @see     java.util.Hashtable
-     *
+     * {@inheritDoc}
      */
-    
     public int hashCode() {
-        
         int code = 17;
-        
         return 31*code + this.getNCBITaxID();
-        
     }
     
     /**
-     *
-     * Returns all the name classes available for a taxon.
-     *
-     * @return a set of name classes, or the empty set if there are none.
-     *
+     * {@inheritDoc}
      */
-    
-    public Set getNameClasses() {
-        
-        return this.names.keySet();
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Returns all the names available for a taxon in a given class.
-     *
-     * Class cannot be null.
-     *
-     * @param nameClass the name class to retrieve names from.
-     *
-     * @return a set of names, or the empty set if there are none.
-     *
-     * @throws IllegalArgumentException if the name is null.
-     *
-     */
-    
-    public Set getNames(String nameClass) throws IllegalArgumentException {
-        
-        if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
-        
-        return Collections.unmodifiableSet((Set)this.names.get(nameClass));
-        
-    }
+    public Set getNameClasses() { return this.names.keySet(); }
     
     // Hibernate requirement - not for public use.
-    private class Name {
+    private class SimpleNCBITaxonName {
         private String nameClass;
         private String name;
-        private Name() {}
-        private Name(String nameClass, String name) { this.nameClass = nameClass; this.name = name; }
-        private void setNameClass(String nameClass) { this.nameClass = nameClass; }
-        private String getNameClass() { return this.nameClass; }
-        private void setName(String name) { this.name = name; }
-        private String getName() { return this.name; }
-    }
-    
-    
-    // Hibernate requirement - not for public use.
-    private void setNameSet(Set names) throws ChangeVetoException {
-        this.names.clear();
-        for (Iterator i = names.iterator(); i.hasNext(); ) {
-            Name n = (Name)i.next();
-            this.addName(n.getNameClass(), n.getName());
+        private NCBITaxon parent;
+        public SimpleNCBITaxonName() {}
+        public SimpleNCBITaxonName(NCBITaxon parent, String nameClass, String name) {
+            this.parent = parent;
+            this.nameClass = nameClass;
+            this.name = name; }
+        public void setNameClass(String nameClass) { this.nameClass = nameClass; }
+        public String getNameClass() { return this.nameClass; }
+        public void setName(String name) { this.name = name; }
+        public String getName() { return this.name; }
+        public void setParent(NCBITaxon parent) { this.parent = parent; }
+        public NCBITaxon getParent() { return this.parent; }
+        public boolean equals(Object o) {
+            if (o==this) return true;
+            if (!(o instanceof SimpleNCBITaxonName)) return false;
+            SimpleNCBITaxonName them = (SimpleNCBITaxonName) o;
+            return them.getNameClass().equals(this.nameClass) &&
+                    them.getName().equals(this.name) &&
+                    them.getParent().equals(this.parent);
         }
     }
     
-    
-    // Hibernate requirement - not for public use.
-    private Set getNameSet() {
+    /**
+     * {@inheritDoc}
+     */
+    public Set getNames(String nameClass) throws IllegalArgumentException {
+        if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
         Set n = new HashSet();
-        for (Iterator i = this.names.keySet().iterator(); i.hasNext(); ) {
-            String nameClass = (String)i.next();
-            Set names = (Set)this.names.get(nameClass);
-            for (Iterator j = names.iterator(); j.hasNext(); ) {
-                String name = (String)j.next();
-                n.add(new Name(nameClass,name));
-            }
+        for (Iterator j = ((Set)this.names.get(nameClass)).iterator(); j.hasNext(); ) {
+            SimpleNCBITaxonName name = (SimpleNCBITaxonName)j.next();
+            n.add(name.getName());
         }
         return n;
     }
     
+    // Hibernate requirement - not for public use.
+    private Set getNameSet() {
+        Set n = new HashSet();
+        for (Iterator i = this.names.values().iterator(); i.hasNext(); ) n.addAll((Set)i.next());
+        return n;
+    }
+    
+    // Hibernate requirement - not for public use.
+    private void setNameSet(Set names) {
+        this.names.clear();
+        for (Iterator i = names.iterator(); i.hasNext(); ) {
+            SimpleNCBITaxonName n = (SimpleNCBITaxonName)i.next();
+            try {
+                this.addName(n.getNameClass(), n.getName());
+            } catch (ChangeVetoException e) {
+                throw new RuntimeException("Database contents don't add up",e);
+            }
+        }
+    }
+    
     
     /**
-     *
-     * Adds the name to this taxon in the given name class. Neither can be null.
-     *
-     * @param nameClass the class to add the name in.
-     *
-     * @param name the name to add.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws IllegalArgumentException if the name is null.
-     *
+     * {@inheritDoc}
      */
-    
     public void addName(String nameClass, String name) throws IllegalArgumentException,ChangeVetoException {
-        
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
-        
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
-        
+        SimpleNCBITaxonName n = new SimpleNCBITaxonName(this, nameClass, name);
         if(!this.hasListeners(NCBITaxon.NAMES)) {
-            
             if (!this.names.containsKey(nameClass)) this.names.put(nameClass,new HashSet());
-            
-            ((Set)this.names.get(nameClass)).add(name);
-            
+            ((Set)this.names.get(nameClass)).add(n);
         } else {
-            
             ChangeEvent ce = new ChangeEvent(
-                    
                     this,
-                    
                     NCBITaxon.NAMES,
-                    
                     name,
-                    
-                    ((Set)this.names.get(nameClass)).contains(name)?name:null
-                    
+                    ((Set)this.names.get(nameClass)).contains(n)?name:null
                     );
-            
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.NAMES);
-            
             synchronized(cs) {
-                
                 cs.firePreChangeEvent(ce);
-                
                 if (!this.names.containsKey(nameClass)) this.names.put(nameClass,new HashSet());
-                
-                ((Set)this.names.get(nameClass)).add(name);
-                
+                ((Set)this.names.get(nameClass)).add(n);
                 cs.firePostChangeEvent(ce);
-                
             }
-            
         }
-        
     }
     
-    
-    
     /**
-     *
-     * Removes the name from the given name class. Neither can be null.
-     *
-     * @return True if the name was found and removed, false otherwise.
-     *
-     * @param nameClass the class to remove the name from.
-     *
-     * @param name the name to remove.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     * @throws IllegalArgumentException if the name is null.
-     *
+     * {@inheritDoc}
      */
-    
     public boolean removeName(String nameClass, String name) throws IllegalArgumentException,ChangeVetoException {
-        
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
-        
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
-        
+        SimpleNCBITaxonName n = new SimpleNCBITaxonName(this, nameClass, name);
         if (!this.names.containsKey(nameClass)) return false;
-        
         boolean results;
-        
         if(!this.hasListeners(NCBITaxon.NAMES)) {
-            
-            results = ((Set)this.names.get(nameClass)).remove(name);
-            
+            results = ((Set)this.names.get(nameClass)).remove(n);
         } else {
-            
             ChangeEvent ce = new ChangeEvent(
-                    
                     this,
-                    
                     NCBITaxon.NAMES,
-                    
                     null,
-                    
                     name
-                    
                     );
-            
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.NAMES);
-            
             synchronized(cs) {
-                
                 cs.firePreChangeEvent(ce);
-                
-                results = ((Set)this.names.get(nameClass)).remove(name);
-                
+                results = ((Set)this.names.get(nameClass)).remove(n);
                 cs.firePostChangeEvent(ce);
-                
             }
-            
         }
-        
         return results;
-        
     }
     
-    
-    
     /**
-     *
-     * Tests for the presence of a name in a given class. Neither can be null.
-     *
-     * @param nameClass the class to look the name up in.
-     *
-     * @param name the name to text for existence of.
-     *
-     * @return True if the name exists in that class, false otherwise.
-     *
-     * @throws IllegalArgumentException if the name is null.
-     *
+     * {@inheritDoc}
      */
-    
     public boolean containsName(String nameClass, String name) throws IllegalArgumentException {
-        
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
-        
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
-        
         if (!this.names.containsKey(nameClass)) return false;
-        
-        return ((Set)this.names.get(nameClass)).contains(name);
-        
+        SimpleNCBITaxonName n = new SimpleNCBITaxonName(this, nameClass, name);
+        return ((Set)this.names.get(nameClass)).contains(n);
     }
     
-    
+    /**
+     * {@inheritDoc}
+     */
+    public int getParentNCBITaxID() { return this.parent; }
     
     /**
-     *
-     * Getter for property parent.
-     *
-     * @return Value of property parent.
-     *
+     * {@inheritDoc}
      */
-    
-    public int getParentNCBITaxID() {
-        
-        return this.parent;
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Setter for property parent.
-     *
-     * @param parent New value of property parent.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
-    
     public void setParentNCBITaxID(int parent) throws ChangeVetoException {
-        
         if(!this.hasListeners(NCBITaxon.PARENT)) {
-            
             this.parent = parent;
-            
         } else {
-            
             ChangeEvent ce = new ChangeEvent(
-                    
                     this,
-                    
                     NCBITaxon.PARENT,
-                    
                     Integer.valueOf(parent),
-                    
                     Integer.valueOf(this.parent)
-                    
                     );
-            
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.PARENT);
-            
             synchronized(cs) {
-                
                 cs.firePreChangeEvent(ce);
-                
                 this.parent = parent;
-                
                 cs.firePostChangeEvent(ce);
-                
             }
-            
         }
-        
     }
-    
-    
     
     /**
-     *
-     * Getter for property NCBITaxID.
-     *
-     * @return Value of property NCBITaxID.
-     *
+     * {@inheritDoc}
      */
-    
-    public int getNCBITaxID() {
-        
-        return this.NCBITaxID;
-        
-    }
+    public int getNCBITaxID() { return this.NCBITaxID; }
     
     // Hibernate requirement - not for public use.
     private void setNCBITaxID(int NCBITaxID) { this.NCBITaxID = NCBITaxID; }
     
-    
     /**
-     *
-     * Getter for property nodeRank.
-     *
-     * @return Value of property nodeRank.
-     *
+     * {@inheritDoc}
      */
+    public String getNodeRank() { return this.nodeRank; }
     
-    public String getNodeRank() {
-        
-        return this.nodeRank;
-        
-    }
-        
     /**
-     *
      * Setter for property nodeRank.
-     *
      * @param nodeRank New value of property nodeRank.
-     *
      * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
      */
-    
     public void setNodeRank(String nodeRank) throws ChangeVetoException {
-        
         if(!this.hasListeners(NCBITaxon.NODERANK)) {
-            
             this.nodeRank = nodeRank;
-            
         } else {
-            
             ChangeEvent ce = new ChangeEvent(
-                    
                     this,
-                    
                     NCBITaxon.NODERANK,
-                    
                     nodeRank,
-                    
                     this.nodeRank
-                    
                     );
-            
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.NODERANK);
-            
             synchronized(cs) {
-                
                 cs.firePreChangeEvent(ce);
-                
                 this.nodeRank = nodeRank;
-                
                 cs.firePostChangeEvent(ce);
-                
             }
-            
         }
-        
     }
     
-    
+    /**
+     * {@inheritDoc}
+     */
+    public int getGeneticCode() { return this.geneticCode; }
     
     /**
-     *
-     * Getter for property geneticCode. Returns Persistent.NULL_INTEGER if null.
-     *
-     * @return Value of property geneticCode.
-     *
+     * {@inheritDoc}
      */
-    
-    public int getGeneticCode() {
-        
-        return this.geneticCode;
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Setter for property geneticCode. Use Persistent.NULL_INTEGER for null.
-     *
-     * @param geneticCode New value of property geneticCode.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
-    
     public void setGeneticCode(int geneticCode) throws ChangeVetoException {
-        
         if(!this.hasListeners(NCBITaxon.GENETICCODE)) {
-            
             this.geneticCode = geneticCode;
-            
         } else {
-            
             ChangeEvent ce = new ChangeEvent(
-                    
                     this,
-                    
                     NCBITaxon.GENETICCODE,
-                    
                     new Integer(nodeRank),
-                    
                     new Integer(this.nodeRank)
-                    
                     );
-            
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.GENETICCODE);
-            
             synchronized(cs) {
-                
                 cs.firePreChangeEvent(ce);
-                
                 this.geneticCode = geneticCode;
-                
                 cs.firePostChangeEvent(ce);
-                
             }
-            
         }
-        
     }
     
-    
-    
     /**
-     *
      * Getter for property mitoGeneticCode. Returns Persistent.NULL_INTEGER if null.
-     *
      * @return Value of property mitoGeneticCode.
-     *
      */
-    
-    public int getMitoGeneticCode() {
-        
-        return this.mitoGeneticCode;
-        
-    }
-    
-    
+    public int getMitoGeneticCode() { return this.mitoGeneticCode; }
     
     /**
-     *
-     * Setter for property mitoGeneticCode. Use Persistent.NULL_INTEGER for null.
-     *
-     * @param mitoGeneticCode New value of property mitoGeneticCode.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
+     * {@inheritDoc}
      */
-    
     public void setMitoGeneticCode(int mitoGeneticCode) throws ChangeVetoException {
-        
         if(!this.hasListeners(NCBITaxon.MITOGENETICCODE)) {
-            
             this.mitoGeneticCode = mitoGeneticCode;
-            
         } else {
-            
             ChangeEvent ce = new ChangeEvent(
-                    
                     this,
-                    
                     NCBITaxon.MITOGENETICCODE,
-                    
                     new Integer(mitoGeneticCode),
-                    
                     new Integer(this.mitoGeneticCode)
-                    
                     );
-            
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.MITOGENETICCODE);
-            
             synchronized(cs) {
-                
                 cs.firePreChangeEvent(ce);
-                
                 this.mitoGeneticCode = mitoGeneticCode;
-                
                 cs.firePostChangeEvent(ce);
-                
             }
-            
         }
-        
     }
     
-    
+    /**
+     * {@inheritDoc}
+     */
+    public int getLeftValue() { return this.leftValue; }
     
     /**
-     *
-     * Getter for property leftValue. Returns Persistent.NULL_INTEGER if null.
-     *
-     * @return Value of property leftValue.
-     *
+     * {@inheritDoc}
      */
-    
-    public int getLeftValue() {
-        
-        return this.leftValue;
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Setter for property leftValue. Use Persistent.NULL_INTEGER for null.
-     *
-     * @param leftValue New value of property leftValue.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
-    
     public void setLeftValue(int leftValue) throws ChangeVetoException {
-        
         if(!this.hasListeners(NCBITaxon.LEFTVALUE)) {
-            
             this.leftValue = leftValue;
-            
         } else {
-            
             ChangeEvent ce = new ChangeEvent(
-                    
                     this,
-                    
                     NCBITaxon.LEFTVALUE,
-                    
                     new Integer(leftValue),
-                    
                     new Integer(this.leftValue)
-                    
                     );
-            
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.LEFTVALUE);
-            
             synchronized(cs) {
-                
                 cs.firePreChangeEvent(ce);
-                
                 this.leftValue = leftValue;
-                
                 cs.firePostChangeEvent(ce);
-                
             }
-            
         }
-        
     }
     
-    
+    /**
+     * {@inheritDoc}
+     */
+    public int getRightValue() { return this.rightValue; }
     
     /**
-     *
-     * Getter for property rightValue. Returns Persistent.NULL_INTEGER if null.
-     *
-     * @return Value of property rightValue.
-     *
+     * {@inheritDoc}
      */
-    
-    public int getRightValue() {
-        
-        return this.rightValue;
-        
-    }
-    
-    
-    
-    /**
-     *
-     * Setter for property rightValue. Use Persistent.NULL_INTEGER for null.
-     *
-     * @param rightValue New value of property rightValue.
-     *
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
-     *
-     */
-    
     public void setRightValue(int rightValue) throws ChangeVetoException {
-        
         if(!this.hasListeners(NCBITaxon.RIGHTVALUE)) {
-            
             this.rightValue = rightValue;
-            
         } else {
-            
             ChangeEvent ce = new ChangeEvent(
-                    
                     this,
-                    
                     NCBITaxon.RIGHTVALUE,
-                    
                     new Integer(rightValue),
-                    
                     new Integer(this.rightValue)
-                    
                     );
-            
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.RIGHTVALUE);
-            
             synchronized(cs) {
-                
                 cs.firePreChangeEvent(ce);
-                
                 this.rightValue = rightValue;
-                
                 cs.firePostChangeEvent(ce);
-                
             }
-            
         }
-        
     }
-    
-    
     
     /**
-     *
-     * Returns a string representation of the object of the form <code>
-     *
-     * "taxid:"+this.getNCBITaxID();</code>
-     *
-     * @return  a string representation of the object.
-     *
+     * {@inheritDoc}
+     * In the form <code>"taxid:"+this.getNCBITaxID();</code>
      */
-    
-    public String toString() {
-        
-        return "taxid:"+this.getNCBITaxID();
-        
-    }
-    
+    public String toString() { return "taxid:"+this.getNCBITaxID(); }
     
     // Hibernate requirement - not for public use.
     private Long id;
     
+    // Hibernate requirement - not for public use.
+    private Long getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private Long getId() {
-        
-        return this.id;
-    }
-    
-    
-    // Hibernate requirement - not for public use.
-    private void setId(Long id) {
-        
-        this.id = id;
-    }
-    
-    
+    private void setId(Long id) { this.id = id; }
     
 }
 

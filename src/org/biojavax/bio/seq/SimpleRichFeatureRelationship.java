@@ -20,12 +20,12 @@
  */
 
 /*
- * SimpleBioEntryRelationship.java
+ * SimpleRichFeatureRelationship.java
  *
  * Created on June 16, 2005, 2:07 PM
  */
 
-package org.biojavax.bio;
+package org.biojavax.bio.seq;
 
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
@@ -34,26 +34,28 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
- * Represents a relationship between two bioentries that is described by a term.
+ * Represents a relationship between two features that is described by a term.
  * Equality is the combination of unique subject, object and term.
  * @author Richard Holland
  * @author Mark Schreiber
+ *
  */
-public class SimpleBioEntryRelationship extends AbstractChangeable implements BioEntryRelationship {
+public class SimpleRichFeatureRelationship extends AbstractChangeable implements RichFeatureRelationship {
     
-    private BioEntry object;
-    private BioEntry subject;
+    private RichFeature object;
+    private RichFeature subject;
     private ComparableTerm term;
     private int rank;
     
     /**
-     * Creates a new instance of SimpleBioEntryRelationship
-     * @param object The object bioentry.
-     * @param subject The subject bioentry.
+     * Creates a new instance of SimpleRichFeatureRelationship
+     * @param object The object RichFeature.
+     * @param subject The subject RichFeature.
      * @param term The relationship term.
+     * @param rank the rank of the relationship.
      */
     
-    public SimpleBioEntryRelationship(BioEntry object, BioEntry subject, ComparableTerm term, int rank) {
+    public SimpleRichFeatureRelationship(RichFeature object, RichFeature subject, ComparableTerm term, int rank) {
         if (object==null) throw new IllegalArgumentException("Object cannot be null");
         if (subject==null) throw new IllegalArgumentException("Subject cannot be null");
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
@@ -65,22 +67,22 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleBioEntryRelationship() {}
+    protected SimpleRichFeatureRelationship() {}
     
     /**
      * {@inheritDoc}
      */
     public void setRank(int rank) throws ChangeVetoException {
-        if(!this.hasListeners(BioEntryRelationship.RANK)) {
+        if(!this.hasListeners(RichFeatureRelationship.RANK)) {
             this.rank = rank;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
-                    BioEntryRelationship.RANK,
+                    RichFeatureRelationship.RANK,
                     Integer.valueOf(rank),
                     Integer.valueOf(this.rank)
                     );
-            ChangeSupport cs = this.getChangeSupport(BioEntryRelationship.RANK);
+            ChangeSupport cs = this.getChangeSupport(RichFeatureRelationship.RANK);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
                 this.rank = rank;
@@ -95,23 +97,26 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     public int getRank() { return this.rank; }
     
     /**
-     * {@inheritDoc}
+     * Getter for property object.
+     * @return Value of property object.
      */
-    public BioEntry getObject() { return this.object; }
+    public RichFeature getObject() { return this.object; }
     
     // Hibernate requirement - not for public use.
-    private void setObject(BioEntry object) { this.object = object; }
+    private void setObject(RichFeature object) { this.object = object; }
     
     /**
-     * {@inheritDoc}
+     * Getter for property subject.
+     * @return Value of property subject.
      */
-    public BioEntry getSubject() { return this.subject; }
+    public RichFeature getSubject() { return this.subject; }
     
     // Hibernate requirement - not for public use.
-    private void setSubject(BioEntry subject) { this.subject = subject; }
+    private void setSubject(RichFeature subject) { this.subject = subject; }
     
     /**
-     * {@inheritDoc}
+     * Getter for property term.
+     * @return Value of property term.
      */
     public ComparableTerm getTerm() { return this.term; }
     
@@ -122,10 +127,10 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
      * {@inheritDoc}
      */
     public int compareTo(Object o) {
-        BioEntryRelationship them = (BioEntryRelationship)o;
-        if (!this.getObject().equals(them.getObject())) return this.getObject().compareTo(them.getObject());
-        if (!this.getSubject().equals(them.getSubject())) return this.getSubject().compareTo(them.getSubject());
-        return this.getTerm().compareTo(them.getTerm());
+        RichFeatureRelationship them = (RichFeatureRelationship)o;
+        if (!this.object.equals(them.getObject())) return -1; // Can't compare features :(
+        else if (!this.subject.equals(them.getSubject())) return 1; // Can't compare features :(
+        else return this.getTerm().compareTo(them.getTerm());
     }
     
     /**
@@ -133,12 +138,13 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj==null || !(obj instanceof BioEntryRelationship)) return false;
+        if (obj==null || !(obj instanceof RichFeatureRelationship)) return false;
         else {
-            BioEntryRelationship them = (BioEntryRelationship)obj;
+            RichFeatureRelationship them = (RichFeatureRelationship)obj;
             return (this.getObject().equals(them.getObject()) &&
                     this.getSubject().equals(them.getSubject()) &&
                     this.getTerm().equals(them.getTerm()));
+            
         }
     }
     
@@ -155,9 +161,11 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     
     /**
      * {@inheritDoc}
-     * Form is <code>this.getTerm()+"("+this.getSubject()+","+this.getObject()+")";<code>
+     * In the form <code>this.getTerm()+"("+this.getSubject()+","+this.getObject()+")";<code>
      */
-    public String toString() { return this.getTerm()+"("+this.getSubject()+","+this.getObject()+")"; }
+    public String toString() {
+        return this.getTerm()+"("+this.getSubject()+","+this.getObject()+")";
+    }
     
     // Hibernate requirement - not for public use.
     private Long id;

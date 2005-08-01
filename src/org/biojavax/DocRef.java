@@ -15,12 +15,8 @@
  * or to join the biojava-l mailing list, visit the home page
  * at:
  *
- *      http://www.biojava.org/
- *
- */
-
-/*
- * DocumentReference.java
+ *      http://www.biojava.orDocRef
+ * DocRef.java
  *
  * Created on June 14, 2005, 5:10 PM
  */
@@ -31,52 +27,37 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
+
 /**
  * Represents a documentary reference, the reference table in BioSQL.
  * @author Mark Schreiber
- * @author Richard Holland
- */
-public interface DocumentReference extends Comparable,Changeable {
+ * @author RDocRef*/
+public interface DocRef extends Comparable,Changeable {
     
-    /**
-     * A change type.
-     */
     public static final ChangeType CROSSREF = new ChangeType(
-      "This reference's crossref has changed",
-      "org.biojavax.DocumentReference",
-      "crossref"
+            "This reference's crossref has changed",
+            "org.biojavax.DocRef",
+            "crossref"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType AUTHORS = new ChangeType(
-      "This reference's authors have changed",
-      "org.biojavax.DocumentReference",
-      "authors"
+            "This reference's authors have changed",
+            "org.biojavax.DocRef",
+            "authors"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType LOCATION = new ChangeType(
-      "This reference's location has changed",
-      "org.biojavax.DocumentReference",
-      "location"
+            "This reference's location has changed",
+            "org.biojavax.DocRef",
+            "location"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType TITLE = new ChangeType(
-      "This reference's title has changed",
-      "org.biojavax.DocumentReference",
-      "title"
+            "This reference's title has changed",
+            "org.biojavax.DocRef",
+            "title"
             );
-    /**
-     * A change type.
-     */
     public static final ChangeType CRC = new ChangeType(
-      "This reference's CRC has changed",
-      "org.biojavax.DocumentReference",
-      "crc"
+            "This reference's CRC has changed",
+            "org.biojavax.DocRef",
+            "crc"
             );
     
     /**
@@ -84,49 +65,49 @@ public interface DocumentReference extends Comparable,Changeable {
      * @return Value of property crossref.
      */
     public CrossRef getCrossref();
-
+    
     /**
      * Setter for property crossref.
      * @param crossref New value of property crossref.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setCrossref(CrossRef crossref) throws ChangeVetoException;
-
+    
     /**
      * Getter for property location.
      * @return Value of property location.
      */
     public String getLocation();
-
+    
     /**
      * Getter for property title.
      * @return Value of property title.
      */
     public String getTitle();
-
+    
     /**
      * Setter for property title.
      * @param title New value of property title.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setTitle(String title) throws ChangeVetoException;
-
+    
     /**
      * Getter for property authors.
      * @return Value of property authors.
      */
     public String getAuthors();
-
+    
     /**
      * Getter for property CRC.
      * @return Value of property CRC.
      */
     public String getCRC();
-
+    
     /**
      * Setter for property CRC.
      * @param CRC New value of property CRC.
-     * @throws org.biojava.utils.ChangeVetoException in case of objections.
+     * @throws ChangeVetoException in case of objections.
      */
     public void setCRC(String CRC) throws ChangeVetoException;
     
