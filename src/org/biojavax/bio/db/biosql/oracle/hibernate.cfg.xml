@@ -5,6 +5,8 @@
 
 <hibernate-configuration>
 
+    <!-- MUST USE ORACLE 10g (OR NEWER) JDBC DRIVER vs. ORACLE 9i (OR NEWER) DATABASE -->
+
     <session-factory>
 
         <property name="connection.datasource">java:comp/env/jdbc/YOUR_JNDI_DATASOURCE_GOES_HERE</property>

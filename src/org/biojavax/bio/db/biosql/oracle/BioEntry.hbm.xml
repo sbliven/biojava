@@ -101,7 +101,7 @@
                 <column name="ALPHABET" sql-type="string" length="12" not-null="false"/>
             </property> 
             <property name="stringSequence">
-                <column name="SEQ" sql-type="clob" not-null="false"/>
+                <column name="SEQ" sql-type="text" not-null="false"/>
             </property>   
             <set name="featureSet" lazy="false" inverse="true">
                 <key column="BIOENTRY_ID"/>

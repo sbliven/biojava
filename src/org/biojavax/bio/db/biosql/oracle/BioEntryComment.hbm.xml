@@ -18,7 +18,7 @@
             <column name="RANK" sql-type="integer" length="2" not-null="true"/>
         </property>
         <property name="comment">
-            <column name="COMMENT_TEXT" sql-type="clob" not-null="true"/>
+            <column name="COMMENT_TEXT" sql-type="text" not-null="true"/>
         </property>
         <many-to-one name="parent" class="org.biojavax.bio.SimpleBioEntry">
             <column name="BIOENTRY_ID" not-null="true"/>
