@@ -7,20 +7,20 @@
 
     <class name="org.biojavax.bio.seq.SimpleRichLocation" table="LOCATION">
 
-        <id name="id" type="integer" unsaved-value="null">
-            <column name="LOCATION_ID" sql-type="integer" unique="true" not-null="true"/>
+        <id name="id" type="long" unsaved-value="null">
+            <column name="LOCATION_ID" sql-type="long" unique="true" not-null="true"/>
             <generator class="sequence">
                 <param name="sequence">LOCATION_PK_SEQ</param>
             </generator>
         </id>
 
-        <many-to-one name="parentFeature" inverse="true">
+        <many-to-one name="parentFeature" class="org.biojavax.bio.seq.SimpleRichFeature">
             <column name="SEQFEATURE_ID" not-null="true"/>
         </many-to-one>
-        <many-to-one name="term" inverse="true">
+        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm">
             <column name="TERM_ID" not-null="false"/>
         </many-to-one>
-        <many-to-one name="crossRef" inverse="true">
+        <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef">
             <column name="DBXREF_ID" not-null="false"/>
         </many-to-one>
         <property name="rank">
@@ -33,18 +33,18 @@
             <column name="END_POS" sql-type="integer" length="10" not-null="false"/>
         </property>
         <property name="strandChar">
-            <column name="STRAND" sql-type="character" length="1" not-null="true"/>            
+            <column name="STRAND" sql-type="string" length="1" not-null="true"/>            
         </property>
         <set name="noteSet" table="LOCATION_QUALIFIER_VALUE" lazy="false">
             <key column="LOCATION_ID"/>
-            <element class="org.biojavax.SimpleNote">
-                <many-to-one name="term">
+            <composite-element class="org.biojavax.SimpleNote">
+                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm">
                     <column name="TERM_ID" not-null="true"/>
                 </many-to-one>
                 <property name="value">
                     <column name="VALUE" sql-type="string" length="32" not-null="true"/>
                 </property>
-            </element>
+            </composite-element>
         </set>
         
     </class>

@@ -5,10 +5,10 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.SimpleDocumentReference" table="REFERENCE">
+    <class name="org.biojavax.SimpleDocRef" table="REFERENCE">
 
-        <id name="id" type="integer" unsaved-value="null">
-            <column name="REFERENCE_ID" sql-type="integer" unique="true" not-null="true"/>
+        <id name="id" type="long" unsaved-value="null">
+            <column name="REFERENCE_ID" sql-type="long" unique="true" not-null="true"/>
             <generator class="sequence">
                 <param name="sequence">REFERENCE_PK_SEQ</param>
             </generator>
@@ -26,7 +26,7 @@
         <property name="CRC">
             <column name="CRC" sql-type="string" length="32" not-null="false"/>
         </property>
-        <many-to-one name="crossRef" inverse="true">
+        <many-to-one name="crossref" class="org.biojavax.SimpleCrossRef">
             <column name="DBXREF_ID" not-null="false"/>
         </many-to-one>
         

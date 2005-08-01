@@ -7,24 +7,24 @@
 
     <class name="org.biojavax.ontology.SimpleComparableOntology" table="ONTOLOGY">
 
-        <id name="id" type="integer" unsaved-value="null">
-            <column name="ONTOLOGY_ID" sql-type="integer" unique="true" not-null="true"/>
+        <id name="id" type="long" unsaved-value="null">
+            <column name="ONTOLOGY_ID" sql-type="long" unique="true" not-null="true"/>
             <generator class="sequence">
                 <param name="sequence">ONTOLOGY_PK_SEQ</param>
             </generator>
         </id>
 
         <property name="name">
-            <column name="NAME" sql-type="string" unique="64" not-null="true"/>
+            <column name="NAME" sql-type="string" length="64" not-null="true"/>
         </property>
         <property name="description">
             <column name="DEFINITION" sql-type="string" length="4000" not-null="false"/>
         </property>
-        <set name="termSet" lazy="false">
+        <set name="termSet" lazy="false" inverse="true">
             <key column="ONTOLOGY_ID"/>
             <one-to-many class="org.biojavax.ontology.SimpleComparableTerm"/>
         </set>
-        <set name="tripleSet" lazy="false">
+        <set name="tripleSet" lazy="false" inverse="true">
             <key column="ONTOLOGY_ID"/>
             <one-to-many class="org.biojavax.ontology.SimpleComparableTriple"/>
         </set>

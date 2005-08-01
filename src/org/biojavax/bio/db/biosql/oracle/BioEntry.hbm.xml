@@ -7,21 +7,21 @@
 
     <class name="org.biojavax.bio.SimpleBioEntry" table="BIOENTRY">
 
-        <id name="id" type="integer" unsaved-value="null">
-            <column name="BIOENTRY_ID" sql-type="integer" unique="true" not-null="true"/>
+        <id name="id" type="long" unsaved-value="null">
+            <column name="BIOENTRY_ID" sql-type="long" unique="true" not-null="true"/>
             <generator class="sequence">
                 <param name="sequence">BIOENTRY_PK_SEQ</param>
             </generator>
         </id>
 
         <property name="name">
-            <column name="NAME" sql-type="string" unique="32" not-null="true"/>
+            <column name="NAME" sql-type="string" length="32" not-null="true"/>
         </property>
         <property name="identifier">
-            <column name="IDENTIFIER" sql-type="string" unique="32" not-null="false"/>
+            <column name="IDENTIFIER" sql-type="string" length="32" not-null="false"/>
         </property>
         <property name="accession">
-            <column name="ACCESSION" sql-type="string" unique="32" not-null="true"/>
+            <column name="ACCESSION" sql-type="string" length="32" not-null="true"/>
         </property>        
         <property name="description">
             <column name="DESCRIPTION" sql-type="string" length="512" not-null="false"/>
@@ -32,24 +32,24 @@
         <property name="division">
             <column name="DIVISION" sql-type="string" length="6" not-null="false"/>
         </property>    
-        <many-to-one name="taxon">
+        <many-to-one name="taxon" class="org.biojavax.bio.taxa.SimpleNCBITaxon">
             <column name="TAXON_ID" not-null="false"/>
         </many-to-one>
-        <many-to-one name="namespace">
+        <many-to-one name="namespace" class="org.biojavax.SimpleNamespace" >
             <column name="BIODATABASE_ID" not-null="true"/>
         </many-to-one>
-        <set name="comments" lazy="false">
+        <set name="comments" lazy="false" inverse="true">
             <key column="BIOENTRY_ID"/>
-            <one-to-many class="org.biojavax.SimpleBioEntryComment"/>
+            <one-to-many class="org.biojavax.bio.SimpleBioEntryComment"/>
         </set>
-        <set name="relationships" lazy="false">
+        <set name="relationships" lazy="false" inverse="true">
             <key column="OBJECT_BIOENTRY_ID"/>
             <one-to-many class="org.biojavax.bio.SimpleBioEntryRelationship"/>
         </set>
         <set name="rankedDocRefs" table="BIOENTRY_REFERENCE" lazy="false">
             <key column="BIOENTRY_ID"/>
-            <element class="org.biojavax.SimpleLocatedDocumentReference">
-                <many-to-one name="documentReference">
+            <composite-element class="org.biojavax.SimpleRankedDocRef">
+                <many-to-one name="documentReference" class="org.biojavax.SimpleDocRef">
                     <column name="REFERENCE_ID" not-null="true"/>
                 </many-to-one>   
                 <property name="rank">
@@ -61,23 +61,23 @@
                 <property name="end">
                     <column name="END_POS" sql-type="integer" length="10" not-null="false"/>
                 </property> 
-            </element>
+            </composite-element>
         </set>
         <set name="rankedCrossRefs" table="BIOENTRY_DBXREF" lazy="false">
             <key column="BIOENTRY_ID"/>
-            <element class="org.biojavax.SimpleRankedCrossRef">
-                <many-to-one name="crossRef">
+            <composite-element class="org.biojavax.SimpleRankedCrossRef">
+                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef">
                     <column name="DBXREF_ID" not-null="true"/>
                 </many-to-one>   
                 <property name="rank">
                     <column name="RANK" sql-type="integer" length="4" not-null="true"/>
                 </property>  
-            </element>
+            </composite-element>
         </set>
         <set name="noteSet" table="BIOENTRY_QUALIFIER_VALUE" lazy="false">
             <key column="BIOENTRY_ID"/>
-            <element class="org.biojavax.SimpleNote">
-                <many-to-one name="term">
+            <composite-element class="org.biojavax.SimpleNote">
+                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm">
                     <column name="TERM_ID" not-null="true"/>
                 </many-to-one>   
                 <property name="rank">
@@ -86,7 +86,7 @@
                 <property name="value">
                     <column name="VALUE" sql-type="string" length="4000" not-null="false"/>
                 </property>
-            </element>
+            </composite-element>
         </set>
         
         <joined-subclass name="org.biojavax.bio.seq.SimpleRichSequence" table="BIOSEQUENCE">
@@ -101,11 +101,11 @@
                 <column name="ALPHABET" sql-type="string" length="12" not-null="false"/>
             </property> 
             <property name="stringSequence">
-                <column name="SEQ" sql-type="text" not-null="false"/>
+                <column name="SEQ" sql-type="clob" not-null="false"/>
             </property>   
-            <set name="featureSet" lazy="false">
+            <set name="featureSet" lazy="false" inverse="true">
                 <key column="BIOENTRY_ID"/>
-                <one-to-many class="org.biojavax.bio.seq.SimpleRichSequenceFeature"/>
+                <one-to-many class="org.biojavax.bio.seq.SimpleRichFeature"/>
             </set>
         </joined-subclass>
                 

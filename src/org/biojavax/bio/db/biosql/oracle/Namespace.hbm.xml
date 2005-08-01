@@ -5,10 +5,10 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.bio.SimpleNamespace" table="BIODATABASE">
+    <class name="org.biojavax.SimpleNamespace" table="BIODATABASE">
 
-        <id name="id" type="integer" unsaved-value="null">
-            <column name="BIODATABASE_ID" sql-type="integer" unique="true" not-null="true"/>
+        <id name="id" type="long" unsaved-value="null">
+            <column name="BIODATABASE_ID" sql-type="long" unique="true" not-null="true"/>
             <generator class="sequence">
                 <param name="sequence">BIODATABASE_PK_SEQ</param>
             </generator>

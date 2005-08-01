@@ -204,13 +204,21 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     // Hibernate requirement - not for public use.
-    private char getStrandChar() { return this.strand.getToken(); }
+    private String getStrandChar() { return ""+this.strand.getToken(); }
     
     // Hibernate requirement - not for public use.
-    private void setStrandChar(char token) {
-        if (token=='+') this.strand = StrandedFeature.POSITIVE;
-        else if (token=='-') this.strand = StrandedFeature.NEGATIVE;
-        else this.strand = StrandedFeature.UNKNOWN;
+    private void setStrandChar(String token) {
+        char t = token.charAt(0);
+        switch (t) {
+            case '+':
+                this.strand = StrandedFeature.POSITIVE;
+                break;
+            case '-':
+                this.strand = StrandedFeature.NEGATIVE;
+                break;
+            default:
+                this.strand = StrandedFeature.UNKNOWN;
+        }
     }
     
     /**

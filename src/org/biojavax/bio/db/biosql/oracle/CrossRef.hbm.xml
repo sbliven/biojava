@@ -7,8 +7,8 @@
 
     <class name="org.biojavax.SimpleCrossRef" table="DBXREF">
 
-        <id name="id" type="integer" unsaved-value="null">
-            <column name="DBXREF_ID" sql-type="integer" unique="true" not-null="true"/>
+        <id name="id" type="long" unsaved-value="null">
+            <column name="DBXREF_ID" sql-type="long" unique="true" not-null="true"/>
             <generator class="sequence">
                 <param name="sequence">DBXREF_PK_SEQ</param>
             </generator>
@@ -25,8 +25,8 @@
         </property>
         <set name="noteSet" table="DBXREF_QUALIFIER_VALUE" lazy="false">
             <key column="DBXREF_ID"/>
-            <element class="org.biojavax.SimpleNote">
-                <many-to-one name="term">
+            <composite-element class="org.biojavax.SimpleNote">
+                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm">
                     <column name="TERM_ID" not-null="true"/>
                 </many-to-one>
                 <property name="value">
@@ -35,7 +35,7 @@
                 <property name="rank">
                     <column name="RANK" sql-type="integer" length="3" not-null="true"/>
                 </property>
-            </element>
+            </composite-element>
         </set>
         
         

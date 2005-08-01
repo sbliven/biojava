@@ -7,8 +7,8 @@
 
     <class name="org.biojavax.bio.taxa.SimpleNCBITaxon" table="TAXON">
 
-        <id name="id" type="integer" unsaved-value="null">
-            <column name="TAXON_ID" sql-type="integer" unique="true" not-null="true"/>
+        <id name="id" type="long" unsaved-value="null">
+            <column name="TAXON_ID" sql-type="long" unique="true" not-null="true"/>
             <generator class="sequence">
                 <param name="sequence">TAXON_PK_SEQ</param>
             </generator>
@@ -37,14 +37,14 @@
         </property>
         <set name="nameSet" table="TAXON_NAME" lazy="false">
             <key column="TAXON_ID"/>
-            <element class="org.biojavax.bio.tax.SimpleNCBITaxon.SimpleNCBITaxonName">
+            <composite-element class="org.biojavax.bio.taxa.SimpleNCBITaxonName">
                 <property name="name">
                     <column name="NAME" sql-type="string" length="128" not-null="true"/>
                 </property>
                 <property name="nameClass">
                     <column name="NAME_CLASS" sql-type="string" length="32" not-null="true"/>
                 </property>
-            </element>
+            </composite-element>
         </set>
     </class>
 

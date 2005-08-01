@@ -7,15 +7,15 @@
 
     <class name="org.biojavax.ontology.SimpleComparableTerm" table="TERM">
 
-        <id name="id" type="integer" unsaved-value="null">
-            <column name="TERM_ID" sql-type="integer" unique="true" not-null="true"/>
+        <id name="id" type="long" unsaved-value="null">
+            <column name="TERM_ID" sql-type="long" unique="true" not-null="true"/>
             <generator class="sequence">
                 <param name="sequence">TERM_PK_SEQ</param>
             </generator>
         </id>
 
         <property name="name">
-            <column name="NAME" sql-type="string" unique="256" not-null="true"/>
+            <column name="NAME" sql-type="string" length="256" not-null="true"/>
         </property>
         <property name="identifier">
             <column name="IDENTIFIER" sql-type="string" length="6" not-null="false"/>
@@ -26,7 +26,7 @@
         <property name="obsolete">
             <column name="IS_OBSOLETE" sql-type="boolean" not-null="false"/>
         </property>        
-        <many-to-one name="ontology" inverse="true">
+        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology">
             <column name="ONTOLOGY_ID" not-null="true"/>
         </many-to-one>
         <set name="synonymSet" table="TERM_SYNONYM" lazy="false">
@@ -37,14 +37,14 @@
         </set>
         <set name="rankedCrossRefs" table="TERM_DBXREF" lazy="false">
             <key column="TERM_ID"/>
-            <element class="org.biojavax.SimpleRankedCrossRef">
-                <many-to-one name="crossRef">
+            <composite-element class="org.biojavax.SimpleRankedCrossRef">
+                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef">
                     <column name="DBXREF_ID" not-null="true"/>
                 </many-to-one>   
                 <property name="rank">
                     <column name="RANK" sql-type="integer" length="3" not-null="false"/>
                 </property>  
-            </element>
+            </composite-element>
         </set>
         
     </class>

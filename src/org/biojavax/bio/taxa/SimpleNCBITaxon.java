@@ -101,33 +101,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
      * {@inheritDoc}
      */
     public Set getNameClasses() { return this.names.keySet(); }
-    
-    // Hibernate requirement - not for public use.
-    private class SimpleNCBITaxonName {
-        private String nameClass;
-        private String name;
-        private NCBITaxon parent;
-        public SimpleNCBITaxonName() {}
-        public SimpleNCBITaxonName(NCBITaxon parent, String nameClass, String name) {
-            this.parent = parent;
-            this.nameClass = nameClass;
-            this.name = name; }
-        public void setNameClass(String nameClass) { this.nameClass = nameClass; }
-        public String getNameClass() { return this.nameClass; }
-        public void setName(String name) { this.name = name; }
-        public String getName() { return this.name; }
-        public void setParent(NCBITaxon parent) { this.parent = parent; }
-        public NCBITaxon getParent() { return this.parent; }
-        public boolean equals(Object o) {
-            if (o==this) return true;
-            if (!(o instanceof SimpleNCBITaxonName)) return false;
-            SimpleNCBITaxonName them = (SimpleNCBITaxonName) o;
-            return them.getNameClass().equals(this.nameClass) &&
-                    them.getName().equals(this.name) &&
-                    them.getParent().equals(this.parent);
-        }
-    }
-    
+        
     /**
      * {@inheritDoc}
      */
