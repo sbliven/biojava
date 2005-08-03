@@ -48,7 +48,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     
     /**
      * Creates a new instance of SimpleRichFeatureRelationship
-     * @param object The object RichFeature.
+     * 
      * @param subject The subject RichFeature.
      * @param term The relationship term.
      * @param rank the rank of the relationship.

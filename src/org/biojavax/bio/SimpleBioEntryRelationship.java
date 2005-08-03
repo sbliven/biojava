@@ -47,7 +47,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     
     /**
      * Creates a new instance of SimpleBioEntryRelationship
-     * @param object The object bioentry.
+     * @param rank The rank of the relationship.
      * @param subject The subject bioentry.
      * @param term The relationship term.
      */

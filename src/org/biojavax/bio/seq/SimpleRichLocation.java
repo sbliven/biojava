@@ -68,7 +68,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     /**
      * Creates a new instance of SimpleRichSequenceLocation.
-     * @param parent The parent feature.
+     * 
      * @param min Min location position.
      * @param max Max location position.
      * @param rank Rank of location.

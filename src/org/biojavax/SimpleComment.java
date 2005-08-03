@@ -34,7 +34,7 @@ public class SimpleComment implements Comment {
     
     /**
      * Constructs a new, immutable comment.
-     * @param parent the entry the comment belongs to.
+     * 
      * @param comment the text of the comment.
      * @param rank the rank of the comment.
      */
