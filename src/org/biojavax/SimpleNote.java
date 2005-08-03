@@ -129,8 +129,8 @@ public class SimpleNote extends AbstractChangeable implements Note {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     Note.RANK,
-                    Integer.valueOf(rank),
-                    Integer.valueOf(this.rank)
+                    new Integer(rank),
+                    new Integer(this.rank)
                     );
             ChangeSupport cs = this.getChangeSupport(Note.RANK);
             synchronized(cs) {
