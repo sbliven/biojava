@@ -26,24 +26,25 @@
  */
 
 package org.biojavax;
-
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.utils.ChangeVetoException;
 
 
+
 /**
  * An annotation which can have ranked terms. All keys must be
  * ComparableTerm objects, and all values must be Strings.
  * @author Richard Holland
+ * @author Mark Schreiber
  */
 public interface RichAnnotation extends Annotation {
     
     /**
      * Removes all notes from this annotation object.
      */
-    public void clear();
+    public void clear() throws ChangeVetoException;
     
     /**
      * Adds a note to this annotation.
@@ -89,4 +90,8 @@ public interface RichAnnotation extends Annotation {
      * @throws ChangeVetoException if it doesn't like any of them.
      */
     public void setNoteSet(Set notes) throws ChangeVetoException;
+    
+    public static final RichAnnotation EMPTY_ANNOTATION = new EmptyRichAnnotation();
+    
+    
 }

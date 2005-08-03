@@ -56,7 +56,11 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     /**
      * {@inheritDoc}
      */
-    public void clear() { this.notes.clear(); }
+    public void clear() throws ChangeVetoException{ 
+        for(Iterator i = this.notes.iterator(); i.hasNext(); ){
+            this.removeNote((Note)i.next());
+        }
+    }
     
     /**
      * {@inheritDoc}

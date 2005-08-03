@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
@@ -83,26 +84,30 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      * constructing a new sequence from scratch.
      */
     private void reset() {
-        this.version = 0;
-        this.versionSeen = false;
-        this.seqVersion = 0;
-        this.seqVersionSeen = false;
-        this.accessions.clear();
-        this.description = null;
-        this.division = null;
-        this.identifier = null;
-        this.name = null;
-        this.crossRefs.clear();
-        this.symbols = null;
-        this.namespace = null;
-        this.taxon = null;
-        this.comments.clear();
-        this.relations.clear();
-        this.references.clear();
-        this.rootFeatures.clear();
-        this.featureStack.clear();
-        this.allFeatures.clear();
-        this.notes.clear();
+        try{
+            this.version = 0;
+            this.versionSeen = false;
+            this.seqVersion = 0;
+            this.seqVersionSeen = false;
+            this.accessions.clear();
+            this.description = null;
+            this.division = null;
+            this.identifier = null;
+            this.name = null;
+            this.crossRefs.clear();
+            this.symbols = null;
+            this.namespace = null;
+            this.taxon = null;
+            this.comments.clear();
+            this.relations.clear();
+            this.references.clear();
+            this.rootFeatures.clear();
+            this.featureStack.clear();
+            this.allFeatures.clear();
+            this.notes.clear();
+        }catch(ChangeVetoException ex){
+            throw new BioError("A ChangeListener should not have been applied", ex);
+        }
     }
     
     /**
@@ -344,7 +349,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         String accession = (String)this.accessions.get(0);
         // make our basic object
         SymbolList syms = this.symbols==null?SymbolList.EMPTY_LIST:this.symbols.makeSymbolList();
-        RichSequence rs = new SimpleRichSequence(this.namespace,this.name,accession,this.version,syms,Double.valueOf(this.seqVersion));
+        RichSequence rs = new SimpleRichSequence(this.namespace,this.name,accession,this.version,syms,new Double(this.seqVersion));
         // set misc stuff
         try {
             // set features
