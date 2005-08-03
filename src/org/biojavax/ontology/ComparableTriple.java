@@ -43,7 +43,7 @@ public interface ComparableTriple extends Triple,Comparable,Changeable {
     public static final ChangeType DESCRIPTOR = new ChangeType(
             "This triple's descriptors have changed",
             "org.biojavax.ontology.ComparableTriple",
-            "descriptors"
+            "DESCRIPTOR"
             );
     
     /**

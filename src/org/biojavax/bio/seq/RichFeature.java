@@ -41,42 +41,42 @@ public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,
     public static final ChangeType NAME = new ChangeType(
             "This feature's name has changed",
             "org.biojavax.bio.seq.RichFeature",
-            "name"
+            "NAME"
             );
     public static final ChangeType RANK = new ChangeType(
             "This feature's rank has changed",
             "org.biojavax.bio.seq.RichFeature",
-            "rank"
+            "RANK"
             );
     public static final ChangeType SOURCETERM = new ChangeType(
             "This feature's source term has changed",
             "org.biojavax.bio.seq.RichFeature",
-            "sourceterm"
+            "SOURCETERM"
             );
     public static final ChangeType TYPETERM = new ChangeType(
             "This feature's type term has changed",
             "org.biojavax.bio.seq.RichFeature",
-            "typeterm"
+            "TYPETERM"
             );
     public static final ChangeType LOCATION = new ChangeType(
             "This feature's location has changed",
             "org.biojavax.bio.seq.RichFeature",
-            "location"
+            "LOCATION"
             );
     public static final ChangeType PARENT = new ChangeType(
             "This feature's parent has changed",
             "org.biojavax.bio.seq.RichFeature",
-            "parent"
+            "PARENT"
             );
     public static final ChangeType CROSSREF = new ChangeType(
             "This feature's crossrefs have changed",
             "org.biojavax.bio.seq.RichFeature",
-            "crossref"
+            "CROSSREF"
             );
     public static final ChangeType RELATION = new ChangeType(
             "This feature's relations have changed",
             "org.biojavax.bio.seq.RichFeature",
-            "relation"
+            "RELATION"
             );
     
     /**

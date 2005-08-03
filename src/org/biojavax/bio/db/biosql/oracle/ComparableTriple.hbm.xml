@@ -15,23 +15,23 @@
         </id>
 
         <many-to-one name="subject" class="org.biojavax.ontology.SimpleComparableTerm">
-            <column name="SUBJECT_ID" not-null="true"/>
+            <column name="SUBJECT_TERM_ID" not-null="true"/>
         </many-to-one>    
         <many-to-one name="object" class="org.biojavax.ontology.SimpleComparableTerm">
-            <column name="OBJECT_ID" not-null="true"/>
+            <column name="OBJECT_TERM_ID" not-null="true"/>
         </many-to-one>    
         <many-to-one name="predicate" class="org.biojavax.ontology.SimpleComparableTerm">
-            <column name="PREDICATE_ID" not-null="true"/>
+            <column name="PREDICATE_TERM_ID" not-null="true"/>
         </many-to-one>       
         <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology">
             <column name="ONTOLOGY_ID" not-null="true"/>
         </many-to-one>   
-        <join table="TERM_RELATIONSHIP_TERM" optional="true">
+        <set name="descriptors" table="TERM_RELATIONSHIP_TERM" lazy="false">
             <key column="TERM_RELATIONSHIP_ID"/>
-            <many-to-one name="descriptors" class="org.biojavax.ontology.SimpleComparableTerm">
+            <many-to-many class="org.biojavax.ontology.SimpleComparableTerm">
                 <column name="TERM_ID" not-null="true"/>
-            </many-to-one>
-        </join>
+            </many-to-many>
+        </set>
     </class>
 
 </hibernate-mapping>

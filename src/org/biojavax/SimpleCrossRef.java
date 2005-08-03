@@ -63,22 +63,22 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     protected SimpleCrossRef() {}
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public Annotation getAnnotation() { return this.notes; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public Set getNoteSet() { return this.notes.getNoteSet(); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getAccession() { return this.accession; }
     
@@ -86,7 +86,7 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     private void setAccession(String accession) { this.accession = accession; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getDbname() { return this.dbname; }
     
@@ -94,7 +94,7 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     private void setDbname(String dbname) { this.dbname = dbname; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int getVersion() { return this.version; }
     
@@ -102,57 +102,64 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     private void setVersion(int version) { this.version = version; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.dbname==null) return -1;
+        // Normal comparison
         CrossRef them = (CrossRef)o;
-        if (!this.getDbname().equals(them.getDbname())) return this.getDbname().compareTo(them.getDbname());
-        if (!this.getAccession().equals(them.getAccession())) return this.getAccession().compareTo(them.getAccession());
-        return this.getVersion()-them.getVersion();
+        if (!this.dbname.equals(them.getDbname())) return this.dbname.compareTo(them.getDbname());
+        if (!this.accession.equals(them.getAccession())) return this.accession.compareTo(them.getAccession());
+        return this.version-them.getVersion();
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public boolean equals(Object obj) {
         if(this == obj) return true;
         if (obj==null || !(obj instanceof CrossRef)) return false;
-        else {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.dbname==null) return false;
+        // Normal comparison
             CrossRef them = (CrossRef)obj;
-            return (this.getDbname().equals(them.getDbname()) &&
-                    this.getAccession().equals(them.getAccession()) &&
-                    this.getVersion()==them.getVersion()
+            return (this.dbname.equals(them.getDbname()) &&
+                    this.accession.equals(them.getAccession()) &&
+                    this.version==them.getVersion()
                     );
-        }
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int hashCode() {
         int code = 17;
-        code = 37*code + this.getDbname().hashCode();
-        code = 37*code + this.getAccession().hashCode();
-        code = 37*code + this.getVersion();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.dbname==null) return code;
+        // Normal comparison
+        code = 37*code + this.dbname.hashCode();
+        code = 37*code + this.accession.hashCode();
+        code = 37*code + this.version;
         return code;
     }
     
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      * Form: <code>this.getDbname()+":"+this.getAccession()+", v."+this.getVersion();</code>
      */
     public String toString() {
         return this.getDbname()+":"+this.getAccession()+", v."+this.getVersion();
     }
     
-    // Hibernate requirement - not for public use.
-    private Long id;    
+// Hibernate requirement - not for public use.
+    private Long id;
     
-    // Hibernate requirement - not for public use.
+// Hibernate requirement - not for public use.
     private Long getId() { return this.id; }
     
-    // Hibernate requirement - not for public use.
+// Hibernate requirement - not for public use.
     private void setId(Long id) { this.id = id; }
 }
 

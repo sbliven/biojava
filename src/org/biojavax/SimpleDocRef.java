@@ -66,7 +66,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     protected SimpleDocRef() {}
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setCRC(String CRC) throws ChangeVetoException {
         if(!this.hasListeners(DocRef.CRC)) {
@@ -88,7 +88,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setTitle(String title) throws ChangeVetoException {
         if(!this.hasListeners(DocRef.TITLE)) {
@@ -110,7 +110,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setCrossref(CrossRef crossref) throws ChangeVetoException {
         if(!this.hasListeners(DocRef.CROSSREF)) {
@@ -138,64 +138,71 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     private void setLocation(String location) { this.location = location; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getAuthors() { return this.authors; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getCRC() { return this.crc; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public CrossRef getCrossref() { return this.crossref; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getLocation() { return this.location; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getTitle() { return this.title; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.authors==null) return -1;
+        // Normal comparison
         DocRef them = (DocRef)o;
-        if (!this.getAuthors().equals(them.getAuthors())) return this.getAuthors().compareTo(them.getAuthors());
-        return this.getLocation().compareTo(them.getLocation());
+        if (!this.authors.equals(them.getAuthors())) return this.authors.compareTo(them.getAuthors());
+        return this.location.compareTo(them.getLocation());
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public boolean equals(Object obj) {
         if(this == obj) return true;
         if (obj==null || !(obj instanceof DocRef)) return false;
-        else {
-            DocRef them = (DocRef)obj;
-            return (this.getAuthors().equals(them.getAuthors()) &&
-                    this.getLocation().equals(them.getLocation()));
-        }
+        // Hibernate comparison - we haven't been populated yet
+        if (this.authors==null) return false;
+        // Normal comparison
+        DocRef them = (DocRef)obj;
+        return (this.authors.equals(them.getAuthors()) &&
+                this.location.equals(them.getLocation()));
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int hashCode() {
         int code = 17;
-        code = 37*code + this.getAuthors().hashCode();
-        code = 37*code + this.getLocation().hashCode();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.authors==null) return code;
+        // Normal comparison
+        code = 37*code + this.authors.hashCode();
+        code = 37*code + this.location.hashCode();
         return code;
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      * Form: this.getAuthors()+"; "+this.getLocation();</code>
      */
     public String toString() { return this.getAuthors()+"; "+this.getLocation(); }
@@ -204,7 +211,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     private Long id;
     
     // Hibernate requirement - not for public use.
-    private Long getId() { return this.id; }    
+    private Long getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
     private void setId(Long id) { this.id = id; }

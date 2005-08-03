@@ -34,8 +34,8 @@ package org.biojavax;
 public class SimpleRankedDocRef implements RankedDocRef {
     
     private DocRef docref;
-    private int start;
-    private int end;
+    private Integer start;
+    private Integer end;
     private int rank;
     
     /**
@@ -44,7 +44,7 @@ public class SimpleRankedDocRef implements RankedDocRef {
      * @param start the start position of the location
      * @param end the end position of the location
      */
-    public SimpleRankedDocRef(int rank, DocRef docref, int start, int end) {
+    public SimpleRankedDocRef(DocRef docref, Integer start, Integer end, int rank) {
         if (docref==null) throw new IllegalArgumentException("Document reference cannot be null");
         this.docref = docref;
         this.start = start;
@@ -59,74 +59,75 @@ public class SimpleRankedDocRef implements RankedDocRef {
     private void setRank(int rank) { this.rank = rank; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int getRank() { return this.rank; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public DocRef getDocumentReference() { return this.docref; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
-    public int getStart() { return this.start; }
+    public Integer getStart() { return this.start; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
-    public int getEnd() { return this.end; }
+    public Integer getEnd() { return this.end; }
     
     // Hibernate requirement - not for public use.
     private void setDocumentReference(DocRef docref) { this.docref = docref; }
     
     // Hibernate requirement - not for public use.
-    private void setStart(int start) { this.start = start; }
+    private void setStart(Integer start) { this.start = start; }
     
     // Hibernate requirement - not for public use.
-    private void setEnd(int end) { this.end = end; }
+    private void setEnd(Integer end) { this.end = end; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj==null || !(obj instanceof RankedDocRef)) return false;
-        else {
-            RankedDocRef them = (RankedDocRef)obj;
-            return (this.getRank()==them.getRank() &&
-                    this.getDocumentReference().equals(them.getDocumentReference()) &&
-                    this.getStart()==them.getStart() &&
-                    this.getEnd()==them.getEnd());
-        }
+        // Hibernate comparison - we haven't been populated yet
+        if (this.docref==null) return false;
+        // Normal comparison
+        RankedDocRef them = (RankedDocRef)obj;
+        return (this.rank==them.getRank() &&
+                this.docref.equals(them.getDocumentReference()));
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.docref==null) return -1;
+        // Normal comparison
         RankedDocRef them = (RankedDocRef)o;
-        if (!this.getDocumentReference().equals(them.getDocumentReference())) return this.getDocumentReference().compareTo(them.getDocumentReference());
-        if (this.getRank()!=them.getRank()) return this.getRank()-them.getRank();
-        if (this.getStart()!=them.getStart()) return this.getStart()-them.getStart();
-        return this.getEnd()-them.getEnd();
+        if (!this.docref.equals(them.getDocumentReference())) return this.docref.compareTo(them.getDocumentReference());
+        return this.rank-them.getRank();
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int hashCode() {
         int code = 17;
-        code = 37*code + this.getDocumentReference().hashCode();
-        code = 37*code + this.getRank();
-        code = 37*code + this.getStart();
-        code = 37*code + this.getEnd();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.docref==null) return code;
+        // Normal comparison
+        code = 37*code + this.docref.hashCode();
+        code = 37*code + this.rank;
         return code;
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      * Form: <code>this.getDocumentReference()+": "+this.getStart()+"-"+this.getEnd();</code>
      */
     public String toString() { return this.getDocumentReference()+": "+this.getStart()+"-"+this.getEnd(); }

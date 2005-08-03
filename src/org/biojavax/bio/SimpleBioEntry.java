@@ -260,24 +260,28 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj==null || !(obj instanceof BioEntry)) return false;
-        else {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.ns==null) return false;
+        // Normal comparison
             BioEntry them = (BioEntry)obj;
-            return (this.getNamespace().equals(them.getNamespace()) &&
-                    this.getName().equals(them.getName()) &&
-                    this.getAccession().equals(them.getAccession()) &&
-                    this.getVersion()==them.getVersion());
-        }
+            return (this.ns.equals(them.getNamespace()) &&
+                    this.name.equals(them.getName()) &&
+                    this.accession.equals(them.getAccession()) &&
+                    this.version==them.getVersion());
     }
     
     /**
      * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.ns==null) return -1;
+        // Normal comparison
         BioEntry them = (BioEntry)o;
-        if (!this.getNamespace().equals(them.getNamespace())) return this.getNamespace().compareTo(them.getNamespace());
-        if (!this.getName().equals(them.getName())) return this.getName().compareTo(them.getName());
-        if (!this.getAccession().equals(them.getAccession())) return this.getAccession().compareTo(them.getAccession());
-        return this.getVersion()-them.getVersion();
+        if (!this.ns.equals(them.getNamespace())) return this.ns.compareTo(them.getNamespace());
+        if (!this.name.equals(them.getName())) return this.name.compareTo(them.getName());
+        if (!this.accession.equals(them.getAccession())) return this.accession.compareTo(them.getAccession());
+        return this.version-them.getVersion();
     }
     
     /**
@@ -285,10 +289,13 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      */
     public int hashCode() {
         int code = 17;
-        code = 37*code + this.getNamespace().hashCode();
-        code = 37*code + this.getName().hashCode();
-        code = 37*code + this.getAccession().hashCode();
-        code = 37*code + this.getVersion();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.ns==null) return code;
+        // Normal comparison
+        code = 37*code + this.ns.hashCode();
+        code = 37*code + this.name.hashCode();
+        code = 37*code + this.accession.hashCode();
+        code = 37*code + this.version;
         return code;
     }
     
@@ -297,16 +304,12 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * Form: <code>this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" v."+this.getVersion();</code>
      */
     public String toString() { return this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" v."+this.getVersion(); }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public String getURN() { return this.getName(); }
-    
+        
     /**
      * {@inheritDoc}
      */
     public void addRankedCrossRef(RankedCrossRef crossref) throws ChangeVetoException {
+        if (crossref==null) throw new IllegalArgumentException("Crossref cannot be null");
         if(!this.hasListeners(BioEntry.RANKEDCROSSREF)) {
             this.rankedcrossrefs.add(crossref);
         } else {
@@ -329,6 +332,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * {@inheritDoc}
      */
     public void removeRankedCrossRef(RankedCrossRef crossref) throws ChangeVetoException {
+        if (crossref==null) throw new IllegalArgumentException("Crossref cannot be null");
         if(!this.hasListeners(BioEntry.RANKEDCROSSREF)) {
             this.rankedcrossrefs.remove(crossref);
         } else {
@@ -351,6 +355,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * {@inheritDoc}
      */
     public void addRankedDocRef(RankedDocRef docref) throws ChangeVetoException {
+        if (docref==null) throw new IllegalArgumentException("Docref cannot be null");
         if(!this.hasListeners(BioEntry.RANKEDDOCREF)) {
             this.rankeddocrefs.add(docref);
         } else {
@@ -373,6 +378,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * {@inheritDoc}
      */
     public void removeRankedDocRef(RankedDocRef docref) throws ChangeVetoException {
+        if (docref==null) throw new IllegalArgumentException("Docref cannot be null");
         if(!this.hasListeners(BioEntry.RANKEDDOCREF)) {
             this.rankeddocrefs.remove(docref);
         } else {
@@ -395,6 +401,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * {@inheritDoc}
      */
     public void addComment(BioEntryComment comment) throws ChangeVetoException {
+        if (comment==null) throw new IllegalArgumentException("Comment cannot be null");
         if(!this.hasListeners(BioEntry.COMMENT)) {
             this.comments.add(comment);
         } else {
@@ -417,6 +424,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * {@inheritDoc}
      */
     public void removeComment(BioEntryComment comment) throws ChangeVetoException {
+        if (comment==null) throw new IllegalArgumentException("Comment cannot be null");
         if(!this.hasListeners(BioEntry.COMMENT)) {
             this.comments.remove(comment);
         } else {
@@ -439,6 +447,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * {@inheritDoc}
      */
     public void addRelationship(BioEntryRelationship relation) throws ChangeVetoException {
+        if (relation==null) throw new IllegalArgumentException("Relationship cannot be null");
         if(!this.hasListeners(BioEntry.RELATIONS)) {
             this.relationships.add(relation);
         } else {
@@ -461,6 +470,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * {@inheritDoc}
      */
     public void removeRelationship(BioEntryRelationship relation) throws ChangeVetoException {
+        if (relation==null) throw new IllegalArgumentException("Relationship cannot be null");
         if(!this.hasListeners(BioEntry.RELATIONS)) {
             this.relationships.remove(relation);
         } else {
@@ -480,7 +490,10 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     }
     
     // Hibernate requirement - not for public use.
-    private void setRelationships(Set relationships) { this.relationships = relationships; }
+    private void setRelationships(Set relationships) { 
+        this.relationships.clear();
+        if (relationships!=null) this.relationships.addAll(relationships); 
+    }
     
     // Hibernate requirement - not for public use.
     private void setNamespace(Namespace ns) { this.ns = ns; }
@@ -495,13 +508,22 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     private void setVersion(int v) { this.version = v; }
     
     // Hibernate requirement - not for public use.
-    private void setRankedDocRefs(Set docrefs) { this.rankeddocrefs = docrefs; }
+    private void setRankedDocRefs(Set docrefs) { 
+        this.rankeddocrefs.clear();
+        if (docrefs!=null) this.rankeddocrefs.addAll(docrefs); 
+    }
     
     // Hibernate requirement - not for public use.
-    private void setComments(Set comments) { this.comments = comments; }
+    private void setComments(Set comments) { 
+        this.comments.clear();
+        if (comments!=null) this.comments.addAll(comments); 
+    }
     
     // Hibernate requirement - not for public use.
-    public void setRankedCrossRefs(Set rankedcrossrefs) { this.rankedcrossrefs = rankedcrossrefs; }
+    public void setRankedCrossRefs(Set rankedcrossrefs) { 
+        this.rankedcrossrefs.clear();
+        if (rankedcrossrefs!=null) this.comments.addAll(rankedcrossrefs); 
+    }
     
     // Hibernate requirement - not for public use.
     private Long id;

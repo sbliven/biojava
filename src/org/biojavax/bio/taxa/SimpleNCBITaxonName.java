@@ -31,27 +31,61 @@ package org.biojavax.bio.taxa;
  * Hibernate requirement - not for public use.
  * @author Richard Holland
  */
-class SimpleNCBITaxonName {
+class SimpleNCBITaxonName implements Comparable {
     private String nameClass;
     private String name;
     private NCBITaxon parent;
     protected SimpleNCBITaxonName() {}
     public SimpleNCBITaxonName(NCBITaxon parent, String nameClass, String name) {
+        if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
+        if (name==null) throw new IllegalArgumentException("Name cannot be null");
+        if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
         this.parent = parent;
         this.nameClass = nameClass;
         this.name = name; }
-    public void setNameClass(String nameClass) { this.nameClass = nameClass; }
+    public void setNameClass(String nameClass) { 
+        if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
+        this.nameClass = nameClass; 
+    }
     public String getNameClass() { return this.nameClass; }
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {       
+        if (name==null) throw new IllegalArgumentException("Name cannot be null");
+        this.name = name; 
+    }
     public String getName() { return this.name; }
-    public void setParent(NCBITaxon parent) { this.parent = parent; }
+    public void setParent(NCBITaxon parent) {
+        if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
+        this.parent = parent;
+    }
     public NCBITaxon getParent() { return this.parent; }
     public boolean equals(Object o) {
         if (o==this) return true;
         if (!(o instanceof SimpleNCBITaxonName)) return false;
+        // Hibernate comparison - we haven't been populated yet
+        if (this.nameClass==null) return false;
+        // Normal comparison
         SimpleNCBITaxonName them = (SimpleNCBITaxonName) o;
         return them.getNameClass().equals(this.nameClass) &&
                 them.getName().equals(this.name) &&
                 them.getParent().equals(this.parent);
+    }
+    public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.nameClass==null) return -1;
+        // Normal comparison
+        SimpleNCBITaxonName them = (SimpleNCBITaxonName)o;
+        if (!them.getNameClass().equals(this.nameClass)) return this.nameClass.compareTo(them.getNameClass());
+        if (!them.getName().equals(this.name)) return this.name.compareTo(them.getName());
+        return this.parent.compareTo(them.getParent());
+    }
+    public int hashCode() {
+        int code = 17;
+        // Hibernate comparison - we haven't been populated yet
+        if (this.nameClass==null) return code;
+        // Normal comparison
+        code = 31*code + this.parent.hashCode();
+        code = 31*code + this.name.hashCode();
+        code = 31*code + this.nameClass.hashCode();
+        return code;
     }
 }

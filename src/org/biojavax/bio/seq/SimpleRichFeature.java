@@ -75,9 +75,14 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     /**
      * Creates a new instance of SimpleRichFeature
      * @param parent The parent feature holder.
-     * @param template The template to construct the feature from.
+     * @param templ The template to construct the feature from.
      */
     public SimpleRichFeature(FeatureHolder parent, Feature.Template templ) throws ChangeVetoException {
+        if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
+        if (templ==null) throw new IllegalArgumentException("Template cannot be null");
+        if (templ.typeTerm==null) throw new IllegalArgumentException("Template type term cannot be null");
+        if (templ.sourceTerm==null) throw new IllegalArgumentException("Template source term cannot be null");
+        if (templ.location==null) throw new IllegalArgumentException("Template location cannot be null");
         this.parent = parent;
         this.typeTerm = (ComparableTerm)templ.typeTerm;
         this.sourceTerm = (ComparableTerm)templ.sourceTerm;
@@ -96,12 +101,13 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
             this.location.setBlocks(((RichLocation)templ.location).getBlocks());
         } else {
             Location u = templ.location;
-            RichLocation r = new SimpleRichLocation(this, 0, 0);
+            int counter = 0;
+            RichLocation r = new SimpleRichLocation(this, 0,0,counter++);
             Set blocks = new HashSet();
             for (Iterator i = u.blockIterator(); i.hasNext(); ) {
                 Location b = (Location)i.next();
                 if (b instanceof RichLocation) blocks.add(b);
-                else blocks.add(new SimpleRichLocation(this, b.getMin(), b.getMax()));
+                else blocks.add(new SimpleRichLocation(this, b.getMin(), b.getMax(),counter++));
             }
             r.setBlocks(blocks);
             this.location = r;
@@ -156,7 +162,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void setLocationSet(Set locs) throws ChangeVetoException {
-        this.location = new SimpleRichLocation(this, 0 , 0);
+        this.location = new SimpleRichLocation(this, 0,0,0);
         this.location.setBlocks(locs);
     }
     
@@ -242,7 +248,8 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void setSourceTerm(Term t) throws ChangeVetoException, InvalidTermException {
-        if (!(t instanceof ComparableTerm)) throw new ChangeVetoException("Term must be a ComparableTerm");
+        if (t==null) throw new IllegalArgumentException("Term cannot be null");
+        if (!(t instanceof ComparableTerm)) throw new IllegalArgumentException("Term must be a ComparableTerm");
         if(!this.hasListeners(RichFeature.SOURCETERM)) {
             this.sourceTerm = (ComparableTerm)t;
         } else {
@@ -280,7 +287,8 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void setTypeTerm(Term t) throws ChangeVetoException, InvalidTermException {
-        if (!(t instanceof ComparableTerm)) throw new ChangeVetoException("Term must be a ComparableTerm");
+        if (t==null) throw new IllegalArgumentException("Term cannot be null");
+        if (!(t instanceof ComparableTerm)) throw new IllegalArgumentException("Term must be a ComparableTerm");
         if(!this.hasListeners(RichFeature.TYPETERM)) {
             this.typeTerm = (ComparableTerm)t;
         } else {
@@ -313,7 +321,8 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void setLocation(Location loc) throws ChangeVetoException {
-        if (!(loc instanceof RichLocation)) throw new ChangeVetoException("Location must be a RichLocation");
+        if (loc==null) throw new IllegalArgumentException("Location cannot be null");
+        if (!(loc instanceof RichLocation)) throw new IllegalArgumentException("Location must be a RichLocation");
         if(!this.hasListeners(RichFeature.LOCATION)) {
             this.location = (RichLocation)loc;
         } else {
@@ -341,7 +350,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void setParent(RichSequence parent) throws ChangeVetoException {
-        if (!(parent instanceof RichSequence)) throw new ChangeVetoException("Parent must be a RichSequence");
+        if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
         if(!this.hasListeners(RichFeature.PARENT)) {
             this.parent = (RichSequence)parent;
         } else {
@@ -370,6 +379,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setRankedCrossRefs(Set crossrefs) throws ChangeVetoException {
         this.crossrefs.clear();
+        if (crossrefs==null) return;
         for (Iterator i = crossrefs.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof RankedCrossRef)) throw new ChangeVetoException("Found a non-RankedCrossRef object");
@@ -381,6 +391,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void addRankedCrossRef(RankedCrossRef crossref) throws ChangeVetoException {
+        if (crossref==null) throw new IllegalArgumentException("Crossref cannot be null");
         if(!this.hasListeners(RichFeature.CROSSREF)) {
             this.crossrefs.add(crossref);
         } else {
@@ -403,6 +414,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void removeRankedCrossRef(RankedCrossRef crossref) throws ChangeVetoException {
+        if (crossref==null) throw new IllegalArgumentException("Crossref cannot be null");
         if(!this.hasListeners(RichFeature.CROSSREF)) {
             this.crossrefs.remove(crossref);
         } else {
@@ -431,6 +443,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setFeatureRelationshipSet(Set relationships) throws ChangeVetoException {
         this.relations.clear();
+        if (relationships==null) return;
         for (Iterator i = relationships.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof RichFeatureRelationship)) throw new ChangeVetoException("Found a non-RichFeatureRelationship object");
@@ -442,6 +455,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void addFeatureRelationship(RichFeatureRelationship relationship) throws ChangeVetoException {
+        if (relationship==null) throw new IllegalArgumentException("Relationship cannot be null");
         if(!this.hasListeners(RichFeature.RELATION)) {
             this.relations.add(relationship);
         } else {
@@ -464,6 +478,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void removeFeatureRelationship(RichFeatureRelationship relationship) throws ChangeVetoException {
+        if (relationship==null) throw new IllegalArgumentException("Relationship cannot be null");
         if(!this.hasListeners(RichFeature.RELATION)) {
             this.relations.remove(relationship);
         } else {
@@ -505,6 +520,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public Feature createFeature(Feature.Template ft) throws BioException, ChangeVetoException {
+        if (ft==null) throw new IllegalArgumentException("Template cannot be null");
         RichFeature f = new SimpleRichFeature(this.parent, ft);
         this.addFeatureRelationship(
                 new SimpleRichFeatureRelationship(this, f, RichFeatureRelationship.DEFAULT_FEATURE_RELATIONSHIP_TERM, 0)
@@ -562,9 +578,12 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public int hashCode() {
         int code = 17;
-        code = 31*code + this.getParent().hashCode();
-        code = 31*code + this.getSourceTerm().hashCode();
-        code = 31*code + this.getTypeTerm().hashCode();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.parent==null) return code;
+        // Normal comparison
+        code = 31*code + this.parent.hashCode();
+        code = 31*code + this.sourceTerm.hashCode();
+        code = 31*code + this.typeTerm.hashCode();
         return code;
     }
     
@@ -573,10 +592,13 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public boolean equals(Object o) {
         if (! (o instanceof RichFeature)) return false;
+        // Hibernate comparison - we haven't been populated yet
+        if (this.parent==null) return false;
+        // Normal comparison
         RichFeature fo = (RichFeature) o;
-        if (! fo.getParent().equals(this.getParent())) return false;
-        if (! fo.getTypeTerm().equals(this.getTypeTerm())) return false;
-        return this.getSourceTerm().equals(fo.getSourceTerm());
+        if (! this.parent.equals(fo.getParent())) return false;
+        if (! this.typeTerm.equals(fo.getTypeTerm())) return false;
+        return this.sourceTerm.equals(fo.getSourceTerm());
     }
     
     // Hibernate requirement - not for public use.

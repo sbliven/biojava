@@ -66,7 +66,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     protected SimpleNamespace() {}
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setAcronym(String acronym) throws ChangeVetoException {
         if(!this.hasListeners(Namespace.ACRONYM)) {
@@ -88,7 +88,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setAuthority(String authority) throws ChangeVetoException {
         if(!this.hasListeners(Namespace.AUTHORITY)) {
@@ -109,7 +109,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setDescription(String description) throws ChangeVetoException {
         if(!this.hasListeners(Namespace.DESCRIPTION)) {
@@ -131,13 +131,16 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     }
     
     // Hibernate requirement - not for public use.
-    private void setURIString(String URI) throws ChangeVetoException, URISyntaxException { this.setURI(new URI(URI)); }
+    private void setURIString(String URI) throws ChangeVetoException, URISyntaxException { 
+        if (URI!=null) this.setURI(new URI(URI)); 
+        else this.URI=null;
+    }
     
     // Hibernate requirement - not for public use.
     private String getURIString() { return this.URI.toASCIIString(); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setURI(URI URI) throws ChangeVetoException {
         if(!this.hasListeners(Namespace.URI)) {
@@ -162,60 +165,67 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     private void setName(String name) { this.name = name; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getAcronym() { return this.acronym; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getAuthority() { return this.authority; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getDescription() { return this.description; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getName() { return this.name; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public URI getURI() { return this.URI; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.name==null) return -1;
+        // Normal comparison
         Namespace them = (Namespace)o;
-        return this.getName().compareTo(them.getName());
+        return this.name.compareTo(them.getName());
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public boolean equals(Object obj) {
         if(this == obj) return true;
         if (obj==null || !(obj instanceof Namespace)) return false;
-        else {
-            Namespace them = (Namespace)obj;
-            return this.getName().equals(them.getName());
-        }
+        // Hibernate comparison - we haven't been populated yet
+        if (this.name==null) return false;
+        // Normal comparison
+        Namespace them = (Namespace)obj;
+        return this.name.equals(them.getName());
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int hashCode() {
         int hash = 17;
-        return 31*hash + this.getName().hashCode();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.name==null) return hash;
+        // Normal comparison
+        return 31*hash + this.name.hashCode();
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String toString() { return this.getName(); }
     

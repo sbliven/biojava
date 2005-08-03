@@ -245,7 +245,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
             else {
                 RichFeature parent = (RichFeature)this.featureStack.get(this.featureStack.size() - 1);
                 parent.addFeatureRelationship(
-                        new SimpleRichFeatureRelationship(parent, f, RichFeatureRelationship.DEFAULT_FEATURE_RELATIONSHIP_TERM, 0)
+                        new SimpleRichFeatureRelationship(parent, f, RichFeatureRelationship.DEFAULT_FEATURE_RELATIONSHIP_TERM, this.featureRank++)
                         );
             }
             this.featureStack.add(f);
@@ -257,6 +257,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
     private Set rootFeatures = new HashSet();
     private List allFeatures = new ArrayList();
     private List featureStack = new ArrayList();
+    private int featureRank = 0;
     
     /**
      * {@inheritDoc}
@@ -343,10 +344,9 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         String accession = (String)this.accessions.get(0);
         // make our basic object
         SymbolList syms = this.symbols==null?SymbolList.EMPTY_LIST:this.symbols.makeSymbolList();
-        RichSequence rs = new SimpleRichSequence(this.namespace,this.name,accession,this.version,syms,this.seqVersion);
+        RichSequence rs = new SimpleRichSequence(this.namespace,this.name,accession,this.version,syms,Double.valueOf(this.seqVersion));
         // set misc stuff
         try {
-            rs.setSeqVersion(this.seqVersion);
             // set features
             for (Iterator i = this.allFeatures.iterator(); i.hasNext(); ){
                 RichFeature f = (RichFeature)i.next();

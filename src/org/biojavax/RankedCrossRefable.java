@@ -1,4 +1,25 @@
 /*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+/*
  * RankedCrossRefable.java
  *
  * Created on July 29, 2005, 9:56 AM
@@ -8,33 +29,13 @@ package org.biojavax;
 
 import java.util.Set;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
- *
+ * Ranked crossrefs.
  * @author Richard Holland
  */
-public interface RankedCrossRefable {
-    
-    
-    /**
-     *
-     * Returns a list of all crossrefs associated with this bioentry. This
-     *
-     * list is not mutable. If no crossrefs are associated, you will get back an
-     *
-     * empty list. If the crossrefs have indexes that are not consecutive, then the
-     *
-     * list will contain nulls at the indexes corresponding to the gaps between
-     *
-     * the extant crossrefs. eg. If there are only two crossrefs A and B at positions 10
-     *
-     * and 20 respectively, then the List returned will be of size 20, with nulls
-     *
-     * at index positions 0-9 and 11-19.
-     *
-     * @return Value of property crossrefs.
-     *
-     */
+public interface RankedCrossRefable extends Changeable {
     
     public Set getRankedCrossRefs();
     

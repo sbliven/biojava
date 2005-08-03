@@ -43,13 +43,13 @@ public interface RankedDocRef extends Comparable {
      * The start position in the sequence that this reference refers to.
      * @return the start position.
      */
-    public int getStart();
+    public Integer getStart();
     
     /**
      * The end position in the sequence that this reference refers to.
      * @return the end position.
      */
-    public int getEnd();
+    public Integer getEnd();
     
     /**
      * The rank of this reference.

@@ -28,28 +28,29 @@
 package org.biojavax;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
  *
  * @author Richard Holland
  */
-public interface Note extends Comparable {
+public interface Note extends Comparable,Changeable {
     
     public static final ChangeType TERM = new ChangeType(
             "This note's term has changed",
             "org.biojavax.Note",
-            "term"
+            "TERM"
             );
     public static final ChangeType RANK = new ChangeType(
             "This note's rank has changed",
             "org.biojavax.Note",
-            "rank"
+            "RANK"
             );
     public static final ChangeType VALUE = new ChangeType(
             "This note's value has changed",
             "org.biojavax.Note",
-            "value"
+            "VALUE"
             );
     
     /**
@@ -86,7 +87,7 @@ public interface Note extends Comparable {
     
     /**
      * Sets the ramk for this note.
-     * @param ramk the ramk to use.
+     * @param value the rank to use.
      * @throws ChangeVetoException if it doesn't like the ramk.
      */
     public void setRank(int value) throws ChangeVetoException;

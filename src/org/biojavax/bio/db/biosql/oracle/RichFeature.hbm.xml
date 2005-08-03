@@ -14,7 +14,7 @@
             </generator>
         </id>
 
-        <many-to-one name="parent" class="org.biojavax.bio.SimpleBioEntry">
+        <many-to-one name="parent" class="org.biojavax.bio.seq.SimpleRichSequence">
             <column name="BIOENTRY_ID" not-null="true"/>
         </many-to-one>
         <many-to-one name="sourceTerm" class="org.biojavax.ontology.SimpleComparableTerm">

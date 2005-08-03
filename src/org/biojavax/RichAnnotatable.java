@@ -49,7 +49,7 @@ public interface RichAnnotatable extends Annotatable {
      * Clears the notes associated with this object and replaces them with
      * the contents of this set. Would normally delegate call to internal
      * RichAnnotation instance.
-     * @param set the set of notes to replace the existing ones with.
+     * @param notes the set of notes to replace the existing ones with.
      * @throws ChangeVetoException if it doesn't like them.
      */
     public void setNoteSet(Set notes) throws ChangeVetoException;

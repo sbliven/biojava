@@ -68,6 +68,7 @@ public class SimpleNote extends AbstractChangeable implements Note {
      * {@inheritDoc}
      */
     public void setTerm(ComparableTerm term) throws ChangeVetoException {
+        if (term==null) throw new IllegalArgumentException("Term cannot be null");
         if(!this.hasListeners(Note.TERM)) {
             this.term = term;
         } else {
@@ -144,6 +145,9 @@ public class SimpleNote extends AbstractChangeable implements Note {
      * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.term==null) return -1;
+        // Normal comparison
         Note them = (Note)o;
         if (this.term.equals(them.getTerm())) return this.rank-them.getRank();
         else return this.term.compareTo(them.getTerm());
@@ -155,6 +159,9 @@ public class SimpleNote extends AbstractChangeable implements Note {
     public boolean equals(Object o) {
         if (o==this) return true;
         if (!(o instanceof Note)) return false;
+        // Hibernate comparison - we haven't been populated yet
+        if (this.term==null) return false;
+        // Normal comparison
         Note them = (Note)o;
         return this.term.equals(them.getTerm()) && this.rank==them.getRank();
     }
@@ -164,8 +171,11 @@ public class SimpleNote extends AbstractChangeable implements Note {
      */
     public int hashCode() {
         int hash = 17;
-        hash = 31*hash + this.getTerm().hashCode();
-        hash = 31*hash + this.getRank();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.term==null) return hash;
+        // Normal comparison
+        hash = 31*hash + this.term.hashCode();
+        hash = 31*hash + this.rank;
         return hash;
     }
 }

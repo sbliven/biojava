@@ -127,6 +127,9 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
      * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.object==null) return -1;
+        // Normal comparison
         RichFeatureRelationship them = (RichFeatureRelationship)o;
         if (!this.object.equals(them.getObject())) return -1; // Can't compare features :(
         else if (!this.subject.equals(them.getSubject())) return 1; // Can't compare features :(
@@ -139,13 +142,13 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj==null || !(obj instanceof RichFeatureRelationship)) return false;
-        else {
-            RichFeatureRelationship them = (RichFeatureRelationship)obj;
-            return (this.getObject().equals(them.getObject()) &&
-                    this.getSubject().equals(them.getSubject()) &&
-                    this.getTerm().equals(them.getTerm()));
-            
-        }
+        // Hibernate comparison - we haven't been populated yet
+        if (this.object==null) return false;
+        // Normal comparison
+        RichFeatureRelationship them = (RichFeatureRelationship)obj;
+        return (this.object.equals(them.getObject()) &&
+                this.subject.equals(them.getSubject()) &&
+                this.term.equals(them.getTerm()));
     }
     
     /**
@@ -153,9 +156,12 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
      */
     public int hashCode() {
         int code = 17;
-        code = code*37 + this.getObject().hashCode();
-        code = code*37 + this.getSubject().hashCode();
-        code = code*37 + this.getTerm().hashCode();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.object==null) return code;
+        // Normal comparison
+        code = code*37 + this.object.hashCode();
+        code = code*37 + this.subject.hashCode();
+        code = code*37 + this.term.hashCode();
         return code;
     }
     

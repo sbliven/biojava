@@ -43,7 +43,7 @@ public interface BioEntryRelationship extends Comparable,Changeable {
     public static final ChangeType RANK = new ChangeType(
             "This bioentry relationship's rank has changed",
             "org.biojavax.bio.BioEntryRelationship",
-            "rank"
+            "RANK"
             );
     
     /**
@@ -51,13 +51,13 @@ public interface BioEntryRelationship extends Comparable,Changeable {
      * @param rank Value of property rank.
      * @throws ChangeVetoException if the rank rankles.
      */
-    public void setRank(int rank) throws ChangeVetoException;
+    public void setRank(Integer rank) throws ChangeVetoException;
     
     /**
      * Getter for property rank.
      * @return Value of property rank.
      */
-    public int getRank();
+    public Integer getRank();
     
     /**
      * Getter for property object.

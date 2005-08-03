@@ -45,42 +45,42 @@ public interface RichLocation extends Location,RichAnnotatable {
     public static final ChangeType CROSSREF = new ChangeType(
             "This location's crossref has changed",
             "org.biojavax.bio.seq.RichLocation",
-            "crossref"
+            "CROSSREF"
             );
     public static final ChangeType NOTE = new ChangeType(
             "This location's notes have changed",
             "org.biojavax.bio.seq.RichLocation",
-            "note"
+            "NOTE"
             );
     public static final ChangeType TERM = new ChangeType(
             "This location's term has changed",
             "org.biojavax.bio.seq.RichLocation",
-            "term"
+            "TERM"
             );
     public static final ChangeType STRAND = new ChangeType(
             "This location's strand has changed",
             "org.biojavax.bio.seq.RichLocation",
-            "strand"
+            "STRAND"
             );
     public static final ChangeType RANK = new ChangeType(
             "This location's rank has changed",
             "org.biojavax.bio.seq.RichLocation",
-            "rank"
+            "RANK"
             );
     public static final ChangeType MIN = new ChangeType(
             "This location's min has changed",
             "org.biojavax.bio.seq.RichLocation",
-            "min"
+            "MIN"
             );
     public static final ChangeType MAX = new ChangeType(
             "This location's max has changed",
             "org.biojavax.bio.seq.RichLocation",
-            "max"
+            "MAX"
             );
     public static final ChangeType PARENT = new ChangeType(
             "This location's parent has changed",
             "org.biojavax.bio.seq.RichLocation",
-            "parent"
+            "PARENT"
             );
     
     /**
@@ -157,7 +157,7 @@ public interface RichLocation extends Location,RichAnnotatable {
     
     /**
      * Sets the parent for this location.
-     * @param parent the parent this location should adopt.
+     * @param feature the parent this location should adopt.
      * @throws ChangeVetoException in case of error.
      */
     public void setParentFeature(RichFeature feature) throws ChangeVetoException;

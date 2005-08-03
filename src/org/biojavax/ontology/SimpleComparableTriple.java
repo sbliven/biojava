@@ -63,10 +63,10 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      * @param predicate the predicate of the triple.
      */
     public SimpleComparableTriple(ComparableOntology ontology, ComparableTerm subject, ComparableTerm object, ComparableTerm predicate) {
-        if (ontology == null) throw new NullPointerException("Ontology must not be null");
-        if (subject == null) throw new NullPointerException("Subject must not be null");
-        if (object == null) throw new NullPointerException("Object must not be null");
-        if (predicate == null) throw new NullPointerException("Predicate must not be null");
+        if (ontology == null) throw new IllegalArgumentException("Ontology must not be null");
+        if (subject == null) throw new IllegalArgumentException("Subject must not be null");
+        if (object == null) throw new IllegalArgumentException("Object must not be null");
+        if (predicate == null) throw new IllegalArgumentException("Predicate must not be null");
         this.ontology = ontology;
         this.subject = subject;
         this.object = object;
@@ -81,10 +81,13 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      */
     public int compareTo(Object o) {
         ComparableTriple them = (ComparableTriple)o;
-        if (!this.getOntology().equals(them.getOntology())) return ((ComparableOntology)this.getOntology()).compareTo((ComparableOntology)them.getOntology());
-        if (!this.getSubject().equals(them.getSubject())) return ((ComparableTerm)this.getSubject()).compareTo((ComparableTerm)them.getSubject());
-        if (!this.getObject().equals(them.getObject())) return ((ComparableTerm)this.getObject()).compareTo((ComparableTerm)them.getObject());
-        return ((ComparableTerm)this.getPredicate()).compareTo((ComparableTerm)them.getPredicate());
+        // Hibernate comparison - we haven't been populated yet
+        if (this.ontology==null) return -1;
+        // Normal comparison
+        if (!this.ontology.equals(them.getOntology())) return this.ontology.compareTo((ComparableOntology)them.getOntology());
+        if (!this.subject.equals(them.getSubject())) return this.subject.compareTo((ComparableTerm)them.getSubject());
+        if (!this.object.equals(them.getObject())) return this.object.compareTo((ComparableTerm)them.getObject());
+        return this.predicate.compareTo((ComparableTerm)them.getPredicate());
     }
     
     /**
@@ -93,11 +96,14 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     public boolean equals(Object o) {
         if(this == o) return true;
         if (o==null || !(o instanceof ComparableTriple)) return false;
+        // Hibernate comparison - we haven't been populated yet
+        if (this.ontology==null) return false;
+        // Normal comparison
         ComparableTriple them = (ComparableTriple)o;
-        return (this.getOntology().equals(them.getOntology()) &&
-                this.getSubject().equals(them.getSubject()) &&
-                this.getObject().equals(them.getObject()) &&
-                this.getPredicate().equals(them.getPredicate()));
+        return (this.ontology.equals(them.getOntology()) &&
+                this.subject.equals(them.getSubject()) &&
+                this.object.equals(them.getObject()) &&
+                this.predicate.equals(them.getPredicate()));
     }
     
     /**
@@ -105,10 +111,13 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      */
     public int hashCode() {
         int code = 17;
-        code = 37*code + this.getOntology().hashCode();
-        code = 37*code + this.getSubject().hashCode();
-        code = 37*code + this.getObject().hashCode();
-        code = 37*code + this.getPredicate().hashCode();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.ontology==null) return code;
+        // Normal comparison
+        code = 37*code + this.ontology.hashCode();
+        code = 37*code + this.subject.hashCode();
+        code = 37*code + this.object.hashCode();
+        code = 37*code + this.predicate.hashCode();
         return code;
     }
     
@@ -207,6 +216,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      */
     public void setDescriptors(Set descriptors) throws ChangeVetoException {
         this.descriptors.clear();
+        if (descriptors==null) return;
         for (Iterator i = descriptors.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof ComparableTerm)) throw new ChangeVetoException("Descriptors must be comparable terms");

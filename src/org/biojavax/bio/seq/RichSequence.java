@@ -44,14 +44,14 @@ public interface RichSequence extends BioEntry,Sequence {
      * The version of the associated symbol list.
      * @return  the version
      */
-    public double getSeqVersion();
+    public Double getSeqVersion();
     
     /**
      * Sets the version of the associated symbol list.
      * @param seqVersion the version to set.
      * @throws ChangeVetoException if it doesn't want to change.
      */
-    public void setSeqVersion(double seqVersion) throws ChangeVetoException;
+    public void setSeqVersion(Double seqVersion) throws ChangeVetoException;
     
     /**
      * The features for this sequence.

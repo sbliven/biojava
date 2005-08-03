@@ -1,23 +1,23 @@
 /*
  *                    BioJava development code
-  *
-  * This code may be freely distributed and modified under the
-  * terms of the GNU Lesser General Public Licence.  This should
-  * be distributed with the code.  If you do not have a copy,
-  * see:
-  *
-  *      http://www.gnu.org/copyleft/lesser.html
-  *
-  * Copyright for this code is held jointly by the individual
-  * authors.  These should be listed in @author doc comments.
-  *
-  * For more information on the BioJava project and its aims,
-  * or to join the biojava-l mailing list, visit the home page
-  * at:
-  *
-  *      http://www.biojava.org/
-  *
-  */
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
 
 package org.biojavax.bio.seq;
 import java.util.Collections;
@@ -55,10 +55,10 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     
     private SymbolList symList;
     private Set features = new HashSet();
-    private double symListVersion = 0.0;
+    private Double symListVersion;
     
     
-    /** 
+    /**
      * Creates a new instance of SimpleRichSequence.
      * @param ns the namespace for this sequence.
      * @param name the name of the sequence.
@@ -67,9 +67,10 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
      * @param symList the symbols for the sequence.
      * @param seqversion the version of the symbols for the sequence.
      */
-    public SimpleRichSequence(Namespace ns, String name, String accession, int version, SymbolList symList, double seqversion) {
+    public SimpleRichSequence(Namespace ns, String name, String accession, int version, SymbolList symList, Double seqversion) {
         super(ns,name,accession,version);
-        this.symList = symList;
+        if (symList==null) this.symList = SymbolList.EMPTY_LIST;
+        else this.symList = symList;
         this.symListVersion = seqversion;
     }
     
@@ -79,31 +80,31 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     /**
      * {@inheritDoc}
      */
-    public double getSeqVersion() { return this.symListVersion; }
+    public Double getSeqVersion() { return this.symListVersion; }
     
     /**
      * {@inheritDoc}
      */
-    public void setSeqVersion(double seqVersion) throws ChangeVetoException {        
-        if(!this.hasListeners(RichSequence.SEQVERSION)) {            
-            this.symListVersion = seqVersion;            
-        } else {            
-            ChangeEvent ce = new ChangeEvent(                    
-                    this,                    
+    public void setSeqVersion(Double seqVersion) throws ChangeVetoException {
+        if(!this.hasListeners(RichSequence.SEQVERSION)) {
+            this.symListVersion = seqVersion;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
                     BioEntry.SEQVERSION,
-                                        Double.valueOf(seqVersion),
-                                        Double.valueOf(this.symListVersion)
-                                        );
-                        ChangeSupport cs = this.getChangeSupport(RichSequence.SEQVERSION);
-                        synchronized(cs) {
-                             cs.firePreChangeEvent(ce);
-                             this.symListVersion = seqVersion;
-                              cs.firePostChangeEvent(ce);
-                          }
-                    }
+                    seqVersion,
+                    this.symListVersion
+                    );
+            ChangeSupport cs = this.getChangeSupport(RichSequence.SEQVERSION);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.symListVersion = seqVersion;
+                cs.firePostChangeEvent(ce);
             }
+        }
+    }
     
-     /**
+    /**
      * {@inheritDoc}
      */
     public void edit(Edit edit) throws IndexOutOfBoundsException, IllegalAlphabetException, ChangeVetoException {
@@ -129,14 +130,14 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
      * {@inheritDoc}
      */
     public SymbolList subList(int start, int end) throws IndexOutOfBoundsException {
-        return this.symList.subList(start, end);        
+        return this.symList.subList(start, end);
     }
     
     /**
      * {@inheritDoc}
      */
     public String seqString() { return this.symList.seqString(); }
-       
+    
     /**
      * {@inheritDoc}
      */
@@ -166,7 +167,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     
     // Hibernate requirement - not for public use.
     private String seqstring;
-        
+    
     // Hibernate requirement - not for public use.
     private void setStringSequence(String seq) throws IllegalSymbolException, BioException {
         this.seqstring = seq;
@@ -192,6 +193,11 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     
     // Hibernate requirement - not for public use.
     private int getSequenceLength() { return this.length(); }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getURN() { return this.getName(); }         
     
     /**
      * {@inheritDoc}
@@ -248,6 +254,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
      */
     public void setFeatureSet(Set features) throws ChangeVetoException {
         this.features.clear();
+        if (features==null) return;
         for (Iterator i = features.iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
             f.setParent(this);

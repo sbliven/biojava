@@ -21,11 +21,13 @@
 
 package org.biojavax;
 
+import org.biojava.utils.Unchangeable;
+
 /**
  * Simple implementation of RankedCrossRef.
  * @author Richard Holland
  */
-public class SimpleRankedCrossRef implements RankedCrossRef {
+public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef {
     
     private CrossRef crossref;
     private int rank;
@@ -48,7 +50,7 @@ public class SimpleRankedCrossRef implements RankedCrossRef {
     private void setCrossRef(CrossRef crossref) { this.crossref = crossref; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public CrossRef getCrossRef() { return this.crossref; }
     
@@ -56,39 +58,46 @@ public class SimpleRankedCrossRef implements RankedCrossRef {
     private void setRank(int rank) { this.rank = rank; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int getRank() { return this.rank; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj==null || !(obj instanceof RankedCrossRef)) return false;
-        else {
-            RankedCrossRef them = (RankedCrossRef)obj;
-            return (this.getRank()==them.getRank() &&
-                    this.getCrossRef().equals(them.getCrossRef()));
-        }
+        // Hibernate comparison - we haven't been populated yet
+        if (this.crossref==null) return false;
+        // Normal comparison
+        RankedCrossRef them = (RankedCrossRef)obj;
+        return (this.rank==them.getRank() &&
+                this.crossref.equals(them.getCrossRef()));
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.crossref==null) return -1;
+        // Normal comparison
         RankedCrossRef them = (RankedCrossRef)o;
-        if (this.getRank()!=them.getRank()) return this.getRank()-them.getRank();
-        return this.getCrossRef().compareTo(them.getCrossRef());
+        if (this.rank!=them.getRank()) return this.rank-them.getRank();
+        return this.crossref.compareTo(them.getCrossRef());
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int hashCode() {
         int code = 17;
-        code = 37*code + this.getCrossRef().hashCode();
-        code = 37*code + this.getRank();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.crossref==null) return code;
+        // Normal comparison
+        code = 37*code + this.crossref.hashCode();
+        code = 37*code + this.rank;
         return code;
     }
 }

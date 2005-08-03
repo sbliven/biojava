@@ -38,6 +38,8 @@ public class SimpleBioEntryComment implements BioEntryComment {
      * @param rank the rank of the comment.
      */
     public SimpleBioEntryComment(BioEntry parent, String comment, int rank) {
+        if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
+        if (comment==null) throw new IllegalArgumentException("Comment cannot be null");
         this.parent = parent;
         this.comment = comment;
         this.rank = rank;
@@ -50,7 +52,7 @@ public class SimpleBioEntryComment implements BioEntryComment {
     private void setComment(String comment) { this.comment = comment; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public String getComment() { return this.comment; }
     
@@ -58,7 +60,7 @@ public class SimpleBioEntryComment implements BioEntryComment {
     private void setRank(int rank) { this.rank = rank; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int getRank() { return this.rank; }
     
@@ -66,42 +68,49 @@ public class SimpleBioEntryComment implements BioEntryComment {
     private void setParent(BioEntry parent) { this.parent = parent; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public BioEntry getParent() { return this.parent; }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj==null || !(obj instanceof BioEntryComment)) return false;
-        else {
-            BioEntryComment them = (BioEntryComment)obj;
-            return (this.getParent().equals(them.getParent()) &&
-                    this.getRank()==them.getRank() &&
-                    this.getComment().equals(them.getComment()));
-        }
+        // Hibernate comparison - we haven't been populated yet
+        if (this.parent==null) return false;
+        // Normal comparison
+        BioEntryComment them = (BioEntryComment)obj;
+        return (this.parent.equals(them.getParent()) &&
+                this.rank==them.getRank() &&
+                this.comment.equals(them.getComment()));
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.parent==null) return -1;
+        // Normal comparison
         BioEntryComment them = (BioEntryComment)o;
-        if (!this.getParent().equals(them.getParent())) return this.getParent().compareTo(them.getParent());
-        if (this.getRank()!=them.getRank()) return this.getRank()-them.getRank();
-        return this.getComment().compareTo(them.getComment());
+        if (!this.parent.equals(them.getParent())) return this.parent.compareTo(them.getParent());
+        if (this.rank!=them.getRank()) return this.rank-them.getRank();
+        return this.comment.compareTo(them.getComment());
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public int hashCode() {
         int code = 17;
-        code = 37*code + this.getParent().hashCode();
-        code = 37*code + this.getComment().hashCode();
-        code = 37*code + this.getRank();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.parent==null) return code;
+        // Normal comparison
+        code = 37*code + this.parent.hashCode();
+        code = 37*code + this.comment.hashCode();
+        code = 37*code + this.rank;
         return code;
     }
     

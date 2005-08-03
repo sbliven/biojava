@@ -10,6 +10,15 @@
     <session-factory>
 
         <property name="connection.datasource">java:comp/env/jdbc/YOUR_JNDI_DATASOURCE_GOES_HERE</property>
+        
+        <!-- OR... (for testing only)...
+	<property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+	<property name="connection.url">jdbc:oracle:thin:@MYSERVER:1521:MYSID</property>
+	<property name="connection.username">MYUSER</property>
+	<property name="connection.password">MYPASSWORD</property>
+	<property name="connection.pool_size">20</property>
+        -->
+        
         <property name="show_sql">false</property>
         <property name="dialect">org.hibernate.dialect.OracleDialect</property>
 

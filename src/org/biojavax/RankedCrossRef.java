@@ -20,12 +20,13 @@
  */
 
 package org.biojavax;
+import org.biojava.utils.Changeable;
 
 /**
  * An object that contains a ranked cross references.
  * @author Richard Holland
  */
-public interface RankedCrossRef extends Comparable {
+public interface RankedCrossRef extends Comparable,Changeable {
     
     /**
      * Return the ranked cross reference associated with this object.

@@ -42,22 +42,22 @@ public interface ComparableTerm extends Term,RankedCrossRefable,Comparable,Chang
     public static final ChangeType IDENTIFIER = new ChangeType(
             "This term's identifier has changed",
             "org.biojavax.ontology.ComparableTerm",
-            "identifier"
+            "IDENTIFIER"
             );
     public static final ChangeType OBSOLETE = new ChangeType(
             "This term's obsolescence has changed",
             "org.biojavax.ontology.ComparableTerm",
-            "obsolete"
+            "OBSOLETE"
             );
     public static final ChangeType DESCRIPTION = new ChangeType(
             "This term's description has changed",
             "org.biojavax.ontology.ComparableTerm",
-            "description"
+            "DESCRIPTION"
             );
     public static final ChangeType RANKEDCROSSREF = new ChangeType(
             "This term's ranked crossrefs have changed",
             "org.biojavax.ontology.ComparableTerm",
-            "rankedcrossref"
+            "RANKEDCROSSREF"
             );
     
     /**
@@ -77,14 +77,14 @@ public interface ComparableTerm extends Term,RankedCrossRefable,Comparable,Chang
      * Checks to see if this term is obsolete.
      * @return true if it is, false if not.
      */
-    public boolean getObsolete();
+    public Boolean getObsolete();
     
     /**
      * Sets the obsolescence flag associated with this term.
      * @param obsolete true if it is obsolete, false if not.
      * @throws ChangeVetoException if the change is unacceptable.
      */
-    public void setObsolete(boolean obsolete) throws ChangeVetoException;
+    public void setObsolete(Boolean obsolete) throws ChangeVetoException;
     
     /**
      * Sets the description associated with this term.

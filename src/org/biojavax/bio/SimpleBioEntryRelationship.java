@@ -44,7 +44,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     private BioEntry object;
     private BioEntry subject;
     private ComparableTerm term;
-    private int rank;
+    private Integer rank;
     
     /**
      * Creates a new instance of SimpleBioEntryRelationship
@@ -53,7 +53,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
      * @param term The relationship term.
      */
     
-    public SimpleBioEntryRelationship(BioEntry object, BioEntry subject, ComparableTerm term, int rank) {
+    public SimpleBioEntryRelationship(BioEntry object, BioEntry subject, ComparableTerm term, Integer rank) {
         if (object==null) throw new IllegalArgumentException("Object cannot be null");
         if (subject==null) throw new IllegalArgumentException("Subject cannot be null");
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
@@ -70,15 +70,15 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     /**
      * {@inheritDoc}
      */
-    public void setRank(int rank) throws ChangeVetoException {
+    public void setRank(Integer rank) throws ChangeVetoException {
         if(!this.hasListeners(BioEntryRelationship.RANK)) {
             this.rank = rank;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     BioEntryRelationship.RANK,
-                    Integer.valueOf(rank),
-                    Integer.valueOf(this.rank)
+                    rank,
+                    this.rank
                     );
             ChangeSupport cs = this.getChangeSupport(BioEntryRelationship.RANK);
             synchronized(cs) {
@@ -92,7 +92,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     /**
      * {@inheritDoc}
      */
-    public int getRank() { return this.rank; }
+    public Integer getRank() { return this.rank; }
     
     /**
      * {@inheritDoc}
@@ -122,10 +122,13 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
      * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.object==null) return -1;
+        // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)o;
-        if (!this.getObject().equals(them.getObject())) return this.getObject().compareTo(them.getObject());
-        if (!this.getSubject().equals(them.getSubject())) return this.getSubject().compareTo(them.getSubject());
-        return this.getTerm().compareTo(them.getTerm());
+        if (!this.object.equals(them.getObject())) return this.object.compareTo(them.getObject());
+        if (!this.subject.equals(them.getSubject())) return this.subject.compareTo(them.getSubject());
+        return this.term.compareTo(them.getTerm());
     }
     
     /**
@@ -134,12 +137,13 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj==null || !(obj instanceof BioEntryRelationship)) return false;
-        else {
-            BioEntryRelationship them = (BioEntryRelationship)obj;
-            return (this.getObject().equals(them.getObject()) &&
-                    this.getSubject().equals(them.getSubject()) &&
-                    this.getTerm().equals(them.getTerm()));
-        }
+        // Hibernate comparison - we haven't been populated yet
+        if (this.object==null) return false;
+        // Normal comparison
+        BioEntryRelationship them = (BioEntryRelationship)obj;
+        return (this.object.equals(them.getObject()) &&
+                this.subject.equals(them.getSubject()) &&
+                this.term.equals(them.getTerm()));
     }
     
     /**
@@ -147,9 +151,12 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
      */
     public int hashCode() {
         int code = 17;
-        code = code*37 + this.getObject().hashCode();
-        code = code*37 + this.getSubject().hashCode();
-        code = code*37 + this.getTerm().hashCode();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.object==null) return code;
+        // Normal comparison
+        code = code*37 + this.object.hashCode();
+        code = code*37 + this.subject.hashCode();
+        code = code*37 + this.term.hashCode();
         return code;
     }
     

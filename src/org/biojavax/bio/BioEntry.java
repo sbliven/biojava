@@ -48,47 +48,47 @@ public interface BioEntry extends RichAnnotatable,RankedCrossRefable,Comparable,
     public static final ChangeType IDENTIFIER = new ChangeType(
             "This bioentry's identifier has changed",
             "org.biojavax.bio.BioEntry",
-            "identifier"
+            "IDENTIFIER"
             );
     public static final ChangeType DESCRIPTION = new ChangeType(
             "This bioentry's description has changed",
             "org.biojavax.bio.BioEntry",
-            "description"
+            "DESCRIPTION"
             );
     public static final ChangeType DIVISION = new ChangeType(
             "This bioentry's division has changed",
             "org.biojavax.bio.BioEntry",
-            "division"
+            "DIVISION"
             );
     public static final ChangeType TAXON = new ChangeType(
             "This bioentry's taxon has changed",
             "org.biojavax.bio.BioEntry",
-            "taxon"
+            "TAXON"
             );
     public static final ChangeType SEQVERSION = new ChangeType(
             "This bioentry's sequence version has changed",
             "org.biojavax.bio.BioEntry",
-            "seqversion"
+            "SEQVERSION"
             );
     public static final ChangeType RANKEDCROSSREF = new ChangeType(
             "This bioentry's ranked crossrefs changed",
             "org.biojavax.bio.BioEntry",
-            "rankedcrossref"
+            "RANKEDCROSSREF"
             );
     public static final ChangeType RANKEDDOCREF = new ChangeType(
             "This bioentry's ranked docrefs changed",
             "org.biojavax.bio.BioEntry",
-            "rankeddocref"
+            "RANKEDDOCREF"
             );
     public static final ChangeType COMMENT = new ChangeType(
             "This bioentry's comments changed",
             "org.biojavax.bio.BioEntry",
-            "comment"
+            "COMMENT"
             );
     public static final ChangeType RELATIONS = new ChangeType(
             "This bioentry's relations have changed",
             "org.biojavax.bio.BioEntry",
-            "relations"
+            "RELATIONS"
             );
     
     /**

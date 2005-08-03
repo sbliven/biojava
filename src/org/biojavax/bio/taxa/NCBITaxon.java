@@ -43,37 +43,37 @@ public interface NCBITaxon extends Comparable,Changeable {
     public static final ChangeType NAMES = new ChangeType(
             "This taxon's names have changed",
             "org.biojavax.bio.taxa.NCBITaxon",
-            "names"
+            "NAMES"
             );
     public static final ChangeType PARENT = new ChangeType(
             "This taxon's parent has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
-            "parent"
+            "PARENT"
             );
     public static final ChangeType NODERANK = new ChangeType(
             "This taxon's node rank has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
-            "noderank"
+            "NODERANK"
             );
     public static final ChangeType GENETICCODE = new ChangeType(
             "This taxon's genetic code has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
-            "geneticcode"
+            "GENETICCODE"
             );
     public static final ChangeType MITOGENETICCODE = new ChangeType(
             "This taxon's mito genetic code has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
-            "mitogeneticcode"
+            "MITOGENETICCODE"
             );
     public static final ChangeType LEFTVALUE = new ChangeType(
             "This taxon's left value has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
-            "leftvalue"
+            "LEFTVALUE"
             );
     public static final ChangeType RIGHTVALUE = new ChangeType(
             "This taxon's right value has changed",
             "org.biojavax.bio.taxa.NCBITaxon",
-            "rightvalue"
+            "RIGHTVALUE"
             );
     
     /**
@@ -134,17 +134,17 @@ public interface NCBITaxon extends Comparable,Changeable {
      * Getter for property parent.
      * @return Value of property parent.
      */
-    public int getParentNCBITaxID();
+    public Integer getParentNCBITaxID();
     
     /**
      * Setter for property parent.
      * @param parent New value of property parent.
      * @throws ChangeVetoException in case of objections.
      */
-    public void setParentNCBITaxID(int parent) throws ChangeVetoException;
+    public void setParentNCBITaxID(Integer parent) throws ChangeVetoException;
     
     /**
-     * Getter for property NCBITaxID. Returns Persistent.NULL_INTEGER if null.
+     * Getter for property NCBITaxID. 
      * @return Value of property NCBITaxID.
      */
     public int getNCBITaxID();
@@ -166,53 +166,53 @@ public interface NCBITaxon extends Comparable,Changeable {
      * Getter for property geneticCode.
      * @return Value of property geneticCode.
      */
-    public int getGeneticCode();
+    public Integer getGeneticCode();
     
     /**
      * Setter for property geneticCode.
      * @param geneticCode New value of property geneticCode.
      * @throws ChangeVetoException in case of objections.
      */
-    public void setGeneticCode(int geneticCode) throws ChangeVetoException;
+    public void setGeneticCode(Integer geneticCode) throws ChangeVetoException;
     
     /**
      * Getter for property mitoGeneticCode.
      * @return Value of property mitoGeneticCode.
      */
-    public int getMitoGeneticCode();
+    public Integer getMitoGeneticCode();
     
     /**
      * Setter for property mitoGeneticCode.
      * @param mitoGeneticCode New value of property mitoGeneticCode.
      * @throws ChangeVetoException in case of objections.
      */
-    public void setMitoGeneticCode(int mitoGeneticCode) throws ChangeVetoException;
+    public void setMitoGeneticCode(Integer mitoGeneticCode) throws ChangeVetoException;
     
     /**
      * Getter for property leftValue.
      * @return Value of property leftValue.
      */
-    public int getLeftValue();
+    public Integer getLeftValue();
     
     /**
      * Setter for property leftValue.
      * @param leftValue New value of property leftValue.
      * @throws ChangeVetoException in case of objections.
      */
-    public void setLeftValue(int leftValue) throws ChangeVetoException;
+    public void setLeftValue(Integer leftValue) throws ChangeVetoException;
     
     /**
      * Getter for property rightValue.
      * @return Value of property rightValue.
      */
-    public int getRightValue();
+    public Integer getRightValue();
     
     /**
      * Setter for property rightValue.
      * @param rightValue New value of property rightValue.
      * @throws ChangeVetoException in case of objections.
      */
-    public void setRightValue(int rightValue) throws ChangeVetoException;
+    public void setRightValue(Integer rightValue) throws ChangeVetoException;
     
 }
 

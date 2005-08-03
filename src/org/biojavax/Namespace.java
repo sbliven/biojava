@@ -42,22 +42,22 @@ public interface Namespace extends Comparable,Changeable {
     public static final ChangeType NAME = new ChangeType(
             "This namespace's name has changed",
             "org.biojavax.Namespace",
-            "name"
+            "NAME"
             );
     public static final ChangeType AUTHORITY = new ChangeType(
             "This namespace's authority has changed",
             "org.biojavax.Namespace",
-            "authority"
+            "AUTHORITY"
             );
     public static final ChangeType DESCRIPTION = new ChangeType(
             "This namespace's description has changed",
             "org.biojavax.Namespace",
-            "description"
+            "DESCRIPTION"
             );
     public static final ChangeType ACRONYM = new ChangeType(
             "This namespace's acronym has changed",
             "org.biojavax.Namespace",
-            "acronym"
+            "ACRONYM"
             );
     public static final ChangeType URI = new ChangeType(
             "This namespace's URI has changed",

@@ -54,9 +54,9 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
     
     private String name;
     private String description;
-    private Ontology ontology;
+    private ComparableOntology ontology;
     private String identifier;
-    private boolean obsolete;
+    private Boolean obsolete;
     private Set synonyms = new HashSet();
     private Set rankedcrossrefs = new HashSet();
     
@@ -64,19 +64,16 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
      * Creates a new instance of SimpleComparableTerm with synonyms.
      * @param ontology The ontology to put the term in.
      * @param name the name of the term.
-     * @param description the description for the term.
      * @param synonyms a set of synonyms for the term.
      */
-    public SimpleComparableTerm(ComparableOntology ontology, String name, String description, Object[] synonyms) {
-        if (name == null) throw new NullPointerException("Name must not be null");
-        if (description == null) throw new NullPointerException("Description must not be null");
-        if (ontology == null) throw new NullPointerException("Ontology must not be null");
+    public SimpleComparableTerm(ComparableOntology ontology, String name, Object[] synonyms) {
+        if (name == null) throw new IllegalArgumentException("Name must not be null");
+        if (ontology == null) throw new IllegalArgumentException("Ontology must not be null");
         
         this.name = name;
-        this.description = description;
+        this.description = null;
         this.ontology = ontology;
         this.identifier = null;
-        this.obsolete = false;
         
         if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
     }
@@ -89,8 +86,11 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
      */
     public int hashCode() {
         int value = 17;
-        value = 37*value + this.getName().hashCode();
-        value = 37*value + this.getOntology().hashCode();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.ontology==null) return value;
+        // Normal comparison
+        value = 37*value + this.name.hashCode();
+        value = 37*value + this.ontology.hashCode();
         return value;
     }
     
@@ -100,18 +100,24 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (!(obj instanceof ComparableTerm)) return false;
+        // Hibernate comparison - we haven't been populated yet
+        if (this.ontology==null) return false;
+        // Normal comparison
         Term that = (Term) obj;
-        return this.getOntology() == that.getOntology() &&
-                this.getName() == that.getName();
+        return this.ontology == that.getOntology() &&
+                this.name == that.getName();
     }
     
     /**
      * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.ontology==null) return -1;
+        // Normal comparison
         ComparableTerm them = (ComparableTerm)o;
-        if (this.getOntology().equals(them.getOntology())) return ((ComparableOntology)this.getOntology()).compareTo(them.getOntology());
-        return this.getName().compareTo(them.getName());
+        if (this.ontology.equals(them.getOntology())) return this.ontology.compareTo(them.getOntology());
+        return this.name.compareTo(them.getName());
     }
     
     /**
@@ -132,6 +138,7 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
     // Hibernate requirement - not for public use.
     private void setSynonymSet(Set synonyms) {
         this.synonyms.clear();
+        if (synonyms==null) return;
         for (Iterator i = synonyms.iterator(); i.hasNext(); ) {
             Object o = i.next();
             this.addSynonym(o);
@@ -148,6 +155,7 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
      */
     public void setRankedCrossRefs(Set rankedcrossrefs) throws ChangeVetoException {
         this.rankedcrossrefs.clear();
+        if (rankedcrossrefs==null) return;
         for (Iterator i = rankedcrossrefs.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof RankedCrossRef)) throw new ChangeVetoException("Can only add RankedCrossRef objects as ranked crossrefs");
@@ -159,7 +167,7 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
      * {@inheritDoc}
      */
     public void addRankedCrossRef(RankedCrossRef crossref) throws ChangeVetoException {
-        if (crossref==null) throw new ChangeVetoException("Crossref cannot be null");
+        if (crossref==null) throw new IllegalArgumentException("Crossref cannot be null");
         if(!this.hasListeners(ComparableTerm.RANKEDCROSSREF)) {
             this.rankedcrossrefs.add(crossref);
         } else {
@@ -182,7 +190,7 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
      * {@inheritDoc}
      */
     public void removeRankedCrossRef(RankedCrossRef crossref) throws ChangeVetoException {
-        if (crossref==null) throw new ChangeVetoException("Crossref cannot be null");
+        if (crossref==null) throw new IllegalArgumentException("Crossref cannot be null");
         if(!this.hasListeners(ComparableTerm.RANKEDCROSSREF)) {
             this.rankedcrossrefs.remove(crossref);
         } else {
@@ -198,7 +206,7 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
                 this.rankedcrossrefs.remove(crossref);
                 cs.firePostChangeEvent(ce);
             }
-        }        
+        }
     }
     
     /**
@@ -218,7 +226,6 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
      * {@inheritDoc}
      */
     public void setDescription(String description) throws ChangeVetoException {
-        if (description==null) throw new ChangeVetoException("Description cannot be null");
         if(!this.hasListeners(ComparableTerm.DESCRIPTION)) {
             this.description = description;
         } else {
@@ -286,20 +293,20 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
     /**
      * {@inheritDoc}
      */
-    public boolean getObsolete() { return this.obsolete; }
+    public Boolean getObsolete() { return this.obsolete; }
     
     /**
      * {@inheritDoc}
      */
-    public void setObsolete(boolean obsolete) throws ChangeVetoException {
+    public void setObsolete(Boolean obsolete) throws ChangeVetoException {
         if(!this.hasListeners(ComparableTerm.OBSOLETE)) {
             this.obsolete = obsolete;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     ComparableTerm.OBSOLETE,
-                    Boolean.valueOf(obsolete),
-                    Boolean.valueOf(this.obsolete)
+                    obsolete,
+                    this.obsolete
                     );
             ChangeSupport cs = this.getChangeSupport(ComparableTerm.OBSOLETE);
             synchronized(cs) {

@@ -37,27 +37,27 @@ public interface DocRef extends Comparable,Changeable {
     public static final ChangeType CROSSREF = new ChangeType(
             "This reference's crossref has changed",
             "org.biojavax.DocRef",
-            "crossref"
+            "CROSSREF"
             );
     public static final ChangeType AUTHORS = new ChangeType(
             "This reference's authors have changed",
             "org.biojavax.DocRef",
-            "authors"
+            "AUTHORS"
             );
     public static final ChangeType LOCATION = new ChangeType(
             "This reference's location has changed",
             "org.biojavax.DocRef",
-            "location"
+            "LOCATION"
             );
     public static final ChangeType TITLE = new ChangeType(
             "This reference's title has changed",
             "org.biojavax.DocRef",
-            "title"
+            "TITLE"
             );
     public static final ChangeType CRC = new ChangeType(
             "This reference's CRC has changed",
             "org.biojavax.DocRef",
-            "crc"
+            "CRC"
             );
     
     /**

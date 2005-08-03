@@ -45,26 +45,20 @@ import org.biojava.utils.ChangeVetoException;
 public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     
     private Map names = new HashMap();
-    private int parent;
+    private Integer parent;
     private int NCBITaxID;
     private String nodeRank;
-    private int geneticCode;
-    private int mitoGeneticCode;
-    private int leftValue;
-    private int rightValue;
+    private Integer geneticCode;
+    private Integer mitoGeneticCode;
+    private Integer leftValue;
+    private Integer rightValue;
     
     /**
      * Creates a new instance of SimpleNCBITaxon
      * @param NCBITaxID the underlying taxon ID from NCBI.
      */
     public SimpleNCBITaxon(int NCBITaxID) {
-        this.parent = 0;
         this.NCBITaxID = NCBITaxID;
-        this.nodeRank = null;
-        this.geneticCode = 0;
-        this.mitoGeneticCode = 0;
-        this.leftValue = 0;
-        this.rightValue = 0;
     }
     
     // Hibernate requirement - not for public use.
@@ -75,7 +69,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
      */
     public int compareTo(Object o) {
         NCBITaxon them = (NCBITaxon)o;
-        return this.getNCBITaxID()-them.getNCBITaxID();
+        return this.NCBITaxID-them.getNCBITaxID();
     }
     
     
@@ -86,22 +80,21 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
         if (this == obj) return true;
         if (obj==null || !(obj instanceof NCBITaxon)) return false;
         NCBITaxon them = (NCBITaxon)obj;
-        return this.getNCBITaxID()==them.getNCBITaxID();
+        return this.NCBITaxID==them.getNCBITaxID();
     }
     
     /**
      * {@inheritDoc}
      */
     public int hashCode() {
-        int code = 17;
-        return 31*code + this.getNCBITaxID();
+        return this.NCBITaxID;
     }
     
     /**
      * {@inheritDoc}
      */
     public Set getNameClasses() { return this.names.keySet(); }
-        
+    
     /**
      * {@inheritDoc}
      */
@@ -125,6 +118,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     // Hibernate requirement - not for public use.
     private void setNameSet(Set names) {
         this.names.clear();
+        if (names==null) return;
         for (Iterator i = names.iterator(); i.hasNext(); ) {
             SimpleNCBITaxonName n = (SimpleNCBITaxonName)i.next();
             try {
@@ -205,20 +199,20 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     /**
      * {@inheritDoc}
      */
-    public int getParentNCBITaxID() { return this.parent; }
+    public Integer getParentNCBITaxID() { return this.parent; }
     
     /**
      * {@inheritDoc}
      */
-    public void setParentNCBITaxID(int parent) throws ChangeVetoException {
+    public void setParentNCBITaxID(Integer parent) throws ChangeVetoException {
         if(!this.hasListeners(NCBITaxon.PARENT)) {
             this.parent = parent;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     NCBITaxon.PARENT,
-                    Integer.valueOf(parent),
-                    Integer.valueOf(this.parent)
+                    parent,
+                    this.parent
                     );
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.PARENT);
             synchronized(cs) {
@@ -269,20 +263,20 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     /**
      * {@inheritDoc}
      */
-    public int getGeneticCode() { return this.geneticCode; }
+    public Integer getGeneticCode() { return this.geneticCode; }
     
     /**
      * {@inheritDoc}
      */
-    public void setGeneticCode(int geneticCode) throws ChangeVetoException {
+    public void setGeneticCode(Integer geneticCode) throws ChangeVetoException {
         if(!this.hasListeners(NCBITaxon.GENETICCODE)) {
             this.geneticCode = geneticCode;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     NCBITaxon.GENETICCODE,
-                    new Integer(nodeRank),
-                    new Integer(this.nodeRank)
+                    nodeRank,
+                    this.nodeRank
                     );
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.GENETICCODE);
             synchronized(cs) {
@@ -297,20 +291,20 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
      * Getter for property mitoGeneticCode. Returns Persistent.NULL_INTEGER if null.
      * @return Value of property mitoGeneticCode.
      */
-    public int getMitoGeneticCode() { return this.mitoGeneticCode; }
+    public Integer getMitoGeneticCode() { return this.mitoGeneticCode; }
     
     /**
      * {@inheritDoc}
      */
-    public void setMitoGeneticCode(int mitoGeneticCode) throws ChangeVetoException {
+    public void setMitoGeneticCode(Integer mitoGeneticCode) throws ChangeVetoException {
         if(!this.hasListeners(NCBITaxon.MITOGENETICCODE)) {
             this.mitoGeneticCode = mitoGeneticCode;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     NCBITaxon.MITOGENETICCODE,
-                    new Integer(mitoGeneticCode),
-                    new Integer(this.mitoGeneticCode)
+                    mitoGeneticCode,
+                    this.mitoGeneticCode
                     );
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.MITOGENETICCODE);
             synchronized(cs) {
@@ -324,20 +318,20 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     /**
      * {@inheritDoc}
      */
-    public int getLeftValue() { return this.leftValue; }
+    public Integer getLeftValue() { return this.leftValue; }
     
     /**
      * {@inheritDoc}
      */
-    public void setLeftValue(int leftValue) throws ChangeVetoException {
+    public void setLeftValue(Integer leftValue) throws ChangeVetoException {
         if(!this.hasListeners(NCBITaxon.LEFTVALUE)) {
             this.leftValue = leftValue;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     NCBITaxon.LEFTVALUE,
-                    new Integer(leftValue),
-                    new Integer(this.leftValue)
+                    leftValue,
+                    this.leftValue
                     );
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.LEFTVALUE);
             synchronized(cs) {
@@ -351,20 +345,20 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     /**
      * {@inheritDoc}
      */
-    public int getRightValue() { return this.rightValue; }
+    public Integer getRightValue() { return this.rightValue; }
     
     /**
      * {@inheritDoc}
      */
-    public void setRightValue(int rightValue) throws ChangeVetoException {
+    public void setRightValue(Integer rightValue) throws ChangeVetoException {
         if(!this.hasListeners(NCBITaxon.RIGHTVALUE)) {
             this.rightValue = rightValue;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     NCBITaxon.RIGHTVALUE,
-                    new Integer(rightValue),
-                    new Integer(this.rightValue)
+                    rightValue,
+                    this.rightValue
                     );
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.RIGHTVALUE);
             synchronized(cs) {

@@ -54,12 +54,12 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void clear() { this.notes.clear(); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public Map asMap() {
         Map m = new HashMap();
@@ -71,9 +71,10 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void addNote(Note note) throws ChangeVetoException {
+        if (note==null) throw new IllegalArgumentException("Note cannot be null");
         if(!this.hasListeners(Annotatable.ANNOTATION)) {
             this.notes.add(note);
         } else {
@@ -92,22 +93,27 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
         }
     }
     
-    private Note dummyNote(Object key) { return new SimpleNote((ComparableTerm)key,null,0); }
+    private Note dummyNote(Object key) {
+        if (key==null) throw new IllegalArgumentException("Key cannot be null"); 
+        if (!(key instanceof ComparableTerm)) throw new IllegalArgumentException("Key has to be a ComparableTerm"); 
+        return new SimpleNote((ComparableTerm)key,null,0); 
+    }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public boolean contains(Note note) { return this.notes.contains(note); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public boolean containsProperty(Object key) { return this.contains(this.dummyNote(key)); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public Note getNote(Note note) throws NoSuchElementException {
+        if (note==null) throw new IllegalArgumentException("Note cannot be null");
         for (Iterator i = this.notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (note.equals(n)) return n;
@@ -116,19 +122,20 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public Object getProperty(Object key) throws NoSuchElementException { return this.getNote(this.dummyNote(key)).getValue(); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public Set keys() { return this.asMap().keySet(); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void removeNote(Note note) throws ChangeVetoException {
+        if (note==null) throw new IllegalArgumentException("Note cannot be null");
         if(!this.hasListeners(Annotatable.ANNOTATION)) {
             this.notes.remove(note);
         } else {
@@ -148,12 +155,12 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void removeProperty(Object key) throws NoSuchElementException, ChangeVetoException { this.removeNote(this.dummyNote(key)); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setProperty(Object key, Object value) throws IllegalArgumentException, ChangeVetoException {
         Note n = this.dummyNote(key);
@@ -162,15 +169,16 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public Set getNoteSet() { return Collections.unmodifiableSet(this.notes); }
     
     /**
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public void setNoteSet(Set notes) throws ChangeVetoException {
         this.notes.clear();
+        if (notes==null) return;
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof Note)) throw new ChangeVetoException("Cannot add non-Note objects as notes");

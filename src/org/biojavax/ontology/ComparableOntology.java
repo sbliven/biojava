@@ -42,17 +42,17 @@ public interface ComparableOntology extends Ontology,Comparable,Changeable {
     public static final ChangeType TERM = new ChangeType(
             "This ontology's terms have changed",
             "org.biojavax.ontology.ComparableOntology",
-            "terms"
+            "TERM"
             );
     public static final ChangeType TRIPLE = new ChangeType(
             "This ontology's triples have changed",
             "org.biojavax.ontology.ComparableOntology",
-            "triples"
+            "TRIPLE"
             );
     public static final ChangeType DESCRIPTION = new ChangeType(
             "This ontology's description has changed",
             "org.biojavax.ontology.ComparableOntology",
-            "description"
+            "DESCRIPTION"
             );    
         
     /**
@@ -85,7 +85,7 @@ public interface ComparableOntology extends Ontology,Comparable,Changeable {
     /** 
      * Clears out all the triples and populates the ontology with the contents
      * of the set passed.
-     * @param terms the set of triples this ontology should have.
+     * @param triples the set of triples this ontology should have.
      * @throws ChangeVetoException if any of them are unacceptable.
      */
     public void setTripleSet(Set triples) throws ChangeVetoException;

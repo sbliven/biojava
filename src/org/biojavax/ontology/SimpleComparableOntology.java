@@ -82,8 +82,11 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      * {@inheritDoc}
      */
     public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.name==null) return -1;
+        // Normal comparison
         ComparableOntology them = (ComparableOntology)o;
-        return this.getName().compareTo(them.getName());
+        return this.name.compareTo(them.getName());
     }
     
     /**
@@ -92,8 +95,11 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     public boolean equals(Object obj) {
         if(this == obj) return true;
         if (obj==null || !(obj instanceof ComparableOntology)) return false;
+        // Hibernate comparison - we haven't been populated yet
+        if (this.name==null) return false;
+        // Normal comparison
         ComparableOntology them = (ComparableOntology)obj;
-        return this.getName().equals(them.getName());
+        return this.name.equals(them.getName());
     }
     
     /**
@@ -101,7 +107,10 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      */
     public int hashCode() {
         int hash = 17;
-        return 31*hash + this.getName().hashCode();
+        // Hibernate comparison - we haven't been populated yet
+        if (this.name==null) return hash;
+        // Normal comparison
+        return 31*hash + this.name.hashCode();
     }
     
     /**
@@ -132,7 +141,8 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     public Term createTerm(String name, String description, Object[] synonyms) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException {
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
         if (this.terms.containsKey(name)) throw new AlreadyExistsException("Ontology already has term");
-        ComparableTerm ct = new SimpleComparableTerm(this,name,description,synonyms);
+        ComparableTerm ct = new SimpleComparableTerm(this,name,synonyms);
+        ct.setDescription(description);
         if(!this.hasListeners(ComparableOntology.TERM)) {
             this.terms.put(name,ct);
         } else {
@@ -163,7 +173,8 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
         if (localName==null) localName=t.getName();
         if (localName==null) throw new IllegalArgumentException("Name cannot be null");
         if (this.terms.containsKey(localName)) return (ComparableTerm)this.terms.get(localName);
-        ComparableTerm ct = new SimpleComparableTerm(this,localName,t.getDescription(),t.getSynonyms());
+        ComparableTerm ct = new SimpleComparableTerm(this,localName,t.getSynonyms());
+        ct.setDescription(t.getDescription());
         if(!this.hasListeners(ComparableOntology.TERM)) {
             this.terms.put(localName,ct);
         } else {
@@ -277,6 +288,7 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      */
     public void setTripleSet(Set triples) throws ChangeVetoException {
         this.triples.clear();
+        if (triples==null) return;
         for (Iterator i = triples.iterator(); i.hasNext();) {
             Object o = i.next();
             if (!(o instanceof ComparableTriple)) throw new ChangeVetoException("Can only add ComparableTriples to ComparableOntology");
@@ -300,6 +312,7 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      */
     public void setTermSet(Set terms) throws ChangeVetoException {
         this.terms.clear();
+        if (terms==null) return;
         for (Iterator i = terms.iterator(); i.hasNext();) {
             Object o = i.next();
             if (!(o instanceof ComparableTerm)) throw new ChangeVetoException("Can only add ComparableTerms to ComparableOntology");
