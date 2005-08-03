@@ -36,6 +36,7 @@ import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.Namespace;
 import org.biojavax.RankedDocRef;
 import org.biojavax.RichAnnotatable;
+import org.biojavax.Comment;
 
 /**
  * This class refers to the bioentry table in BioSQL.
@@ -209,14 +210,14 @@ public interface BioEntry extends RichAnnotatable,RankedCrossRefable,Comparable,
      * @param comment the item to add.
      * @throws ChangeVetoException if it doesn't want to add it.
      */
-    public void addComment(BioEntryComment comment) throws ChangeVetoException;
+    public void addComment(Comment comment) throws ChangeVetoException;
     
     /**
      * Removes a comment instance from this bioentry.
      * @param comment the item to remove.
      * @throws ChangeVetoException if it doesn't want to remove it.
      */
-    public void removeComment(BioEntryComment comment) throws ChangeVetoException;
+    public void removeComment(Comment comment) throws ChangeVetoException;
     
     /**
      * Adds a relation instance to this bioentry.

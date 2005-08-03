@@ -102,12 +102,12 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         } else {
             Location u = templ.location;
             int counter = 0;
-            RichLocation r = new SimpleRichLocation(this, 0,0,counter++);
+            RichLocation r = new SimpleRichLocation(0,0,counter++);
             Set blocks = new HashSet();
             for (Iterator i = u.blockIterator(); i.hasNext(); ) {
                 Location b = (Location)i.next();
                 if (b instanceof RichLocation) blocks.add(b);
-                else blocks.add(new SimpleRichLocation(this, b.getMin(), b.getMax(),counter++));
+                else blocks.add(new SimpleRichLocation(b.getMin(), b.getMax(),counter++));
             }
             r.setBlocks(blocks);
             this.location = r;
@@ -162,7 +162,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void setLocationSet(Set locs) throws ChangeVetoException {
-        this.location = new SimpleRichLocation(this, 0,0,0);
+        this.location = new SimpleRichLocation(0,0,0);
         this.location.setBlocks(locs);
     }
     
@@ -523,7 +523,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         if (ft==null) throw new IllegalArgumentException("Template cannot be null");
         RichFeature f = new SimpleRichFeature(this.parent, ft);
         this.addFeatureRelationship(
-                new SimpleRichFeatureRelationship(this, f, RichFeatureRelationship.DEFAULT_FEATURE_RELATIONSHIP_TERM, 0)
+                new SimpleRichFeatureRelationship(f, RichFeatureRelationship.DEFAULT_FEATURE_RELATIONSHIP_TERM, 0)
                 );
         return f;
     }

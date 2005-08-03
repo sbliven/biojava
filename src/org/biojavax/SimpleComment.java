@@ -19,17 +19,18 @@
  *
  */
 
-package org.biojavax.bio;
+package org.biojavax;
+
+import org.biojavax.bio.BioEntry;
 
 /**
- * An implementaion of BioEntryComment.
+ * An implementaion of Comment.
  * @author Richard Holland
  */
-public class SimpleBioEntryComment implements BioEntryComment {
+public class SimpleComment implements Comment {
     
     private String comment;
     private int rank;
-    private BioEntry parent;
     
     /**
      * Constructs a new, immutable comment.
@@ -37,16 +38,14 @@ public class SimpleBioEntryComment implements BioEntryComment {
      * @param comment the text of the comment.
      * @param rank the rank of the comment.
      */
-    public SimpleBioEntryComment(BioEntry parent, String comment, int rank) {
-        if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
+    public SimpleComment(String comment, int rank) {
         if (comment==null) throw new IllegalArgumentException("Comment cannot be null");
-        this.parent = parent;
         this.comment = comment;
         this.rank = rank;
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleBioEntryComment() {}
+    protected SimpleComment() {}
     
     // Hibernate requirement - not for public use.
     private void setComment(String comment) { this.comment = comment; }
@@ -64,26 +63,17 @@ public class SimpleBioEntryComment implements BioEntryComment {
      */
     public int getRank() { return this.rank; }
     
-    // Hibernate requirement - not for public use.
-    private void setParent(BioEntry parent) { this.parent = parent; }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public BioEntry getParent() { return this.parent; }
-    
     /**
      * {@inheritDoc}
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj==null || !(obj instanceof BioEntryComment)) return false;
+        if (obj==null || !(obj instanceof Comment)) return false;
         // Hibernate comparison - we haven't been populated yet
-        if (this.parent==null) return false;
+        if (this.comment==null) return false;
         // Normal comparison
-        BioEntryComment them = (BioEntryComment)obj;
-        return (this.parent.equals(them.getParent()) &&
-                this.rank==them.getRank() &&
+        Comment them = (Comment)obj;
+        return (this.rank==them.getRank() &&
                 this.comment.equals(them.getComment()));
     }
     
@@ -92,10 +82,9 @@ public class SimpleBioEntryComment implements BioEntryComment {
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
-        if (this.parent==null) return -1;
+        if (this.comment==null) return -1;
         // Normal comparison
-        BioEntryComment them = (BioEntryComment)o;
-        if (!this.parent.equals(them.getParent())) return this.parent.compareTo(them.getParent());
+        Comment them = (Comment)o;
         if (this.rank!=them.getRank()) return this.rank-them.getRank();
         return this.comment.compareTo(them.getComment());
     }
@@ -106,9 +95,8 @@ public class SimpleBioEntryComment implements BioEntryComment {
     public int hashCode() {
         int code = 17;
         // Hibernate comparison - we haven't been populated yet
-        if (this.parent==null) return code;
+        if (this.comment==null) return code;
         // Normal comparison
-        code = 37*code + this.parent.hashCode();
         code = 37*code + this.comment.hashCode();
         code = 37*code + this.rank;
         return code;

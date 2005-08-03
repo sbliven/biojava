@@ -197,7 +197,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     /**
      * {@inheritDoc}
      */
-    public String getURN() { return this.getName(); }         
+    public String getURN() { return this.getName(); }
     
     /**
      * {@inheritDoc}
@@ -220,14 +220,46 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
      */
     public Feature createFeature(Feature.Template ft) throws BioException, ChangeVetoException {
         Feature f = new SimpleRichFeature(this,ft);
-        this.features.add(f);
+        if(!this.hasListeners(RichSequence.FEATURES)) {
+            this.features.add(f);
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    RichSequence.FEATURES,
+                    f,
+                    null
+                    );
+            ChangeSupport cs = this.getChangeSupport(RichSequence.FEATURES);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.features.add(f);
+                cs.firePostChangeEvent(ce);
+            }
+        }
         return f;
     }
     
     /**
      * {@inheritDoc}
      */
-    public void removeFeature(Feature f) throws ChangeVetoException, BioException { this.features.remove((RichFeature)f); }
+    public void removeFeature(Feature f) throws ChangeVetoException, BioException {
+        if(!this.hasListeners(RichSequence.FEATURES)) {
+            this.features.remove((RichFeature)f);
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    RichSequence.FEATURES,
+                    null,
+                    f
+                    );
+            ChangeSupport cs = this.getChangeSupport(RichSequence.FEATURES);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.features.remove((RichFeature)f);
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -258,7 +290,22 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
         for (Iterator i = features.iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
             f.setParent(this);
-            this.features.add(f);
+            if(!this.hasListeners(RichSequence.FEATURES)) {
+                this.features.add(f);
+            } else {
+                ChangeEvent ce = new ChangeEvent(
+                        this,
+                        RichSequence.FEATURES,
+                        f,
+                        null
+                        );
+                ChangeSupport cs = this.getChangeSupport(RichSequence.FEATURES);
+                synchronized(cs) {
+                    cs.firePreChangeEvent(ce);
+                    this.features.add(f);
+                    cs.firePostChangeEvent(ce);
+                }
+            }
         }
     }
     

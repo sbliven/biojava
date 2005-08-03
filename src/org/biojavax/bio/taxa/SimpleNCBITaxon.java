@@ -136,7 +136,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     public void addName(String nameClass, String name) throws IllegalArgumentException,ChangeVetoException {
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
-        SimpleNCBITaxonName n = new SimpleNCBITaxonName(this, nameClass, name);
+        SimpleNCBITaxonName n = new SimpleNCBITaxonName(nameClass, name);
         if(!this.hasListeners(NCBITaxon.NAMES)) {
             if (!this.names.containsKey(nameClass)) this.names.put(nameClass,new HashSet());
             ((Set)this.names.get(nameClass)).add(n);
@@ -163,7 +163,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     public boolean removeName(String nameClass, String name) throws IllegalArgumentException,ChangeVetoException {
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
-        SimpleNCBITaxonName n = new SimpleNCBITaxonName(this, nameClass, name);
+        SimpleNCBITaxonName n = new SimpleNCBITaxonName(nameClass, name);
         if (!this.names.containsKey(nameClass)) return false;
         boolean results;
         if(!this.hasListeners(NCBITaxon.NAMES)) {
@@ -192,7 +192,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
         if (!this.names.containsKey(nameClass)) return false;
-        SimpleNCBITaxonName n = new SimpleNCBITaxonName(this, nameClass, name);
+        SimpleNCBITaxonName n = new SimpleNCBITaxonName(nameClass, name);
         return ((Set)this.names.get(nameClass)).contains(n);
     }
     

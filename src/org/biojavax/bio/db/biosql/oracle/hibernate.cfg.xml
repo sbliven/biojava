@@ -34,6 +34,7 @@
         <mapping resource="CrossRef.hbm.xml"/>
         <mapping resource="DocumentReference.hbm.xml"/>
         <mapping resource="RichFeature.hbm.xml"/>
+        <mapping resource="RichFeatureRelationship.hbm.xml"/>
         <mapping resource="RichLocation.hbm.xml"/>
 
     </session-factory>

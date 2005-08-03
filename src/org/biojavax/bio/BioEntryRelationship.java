@@ -58,13 +58,7 @@ public interface BioEntryRelationship extends Comparable,Changeable {
      * @return Value of property rank.
      */
     public Integer getRank();
-    
-    /**
-     * Getter for property object.
-     * @return Value of property object.
-     */
-    public BioEntry getObject();
-    
+        
     /**
      * Getter for property subject.
      * @return Value of property subject.

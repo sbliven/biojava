@@ -40,7 +40,7 @@
         </many-to-one>
         <set name="comments" lazy="false" inverse="true">
             <key column="BIOENTRY_ID"/>
-            <one-to-many class="org.biojavax.bio.SimpleBioEntryComment"/>
+            <one-to-many class="org.biojavax.SimpleComment"/>
         </set>
         <set name="relationships" lazy="false" inverse="true">
             <key column="OBJECT_BIOENTRY_ID"/>

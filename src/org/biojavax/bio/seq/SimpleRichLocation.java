@@ -65,7 +65,6 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private int max;
     private Strand strand;
     private int rank;
-    private RichFeature parent;
     
     /**
      * Creates a new instance of SimpleRichSequenceLocation.
@@ -74,9 +73,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * @param max Max location position.
      * @param rank Rank of location.
      */
-    public SimpleRichLocation(RichFeature parent, int min, int max, int rank) {
-        if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
-        this.parent = parent;
+    public SimpleRichLocation(int min, int max, int rank) {
         this.min = min;
         this.max = max;
         this.rank = rank;
@@ -254,35 +251,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             }
         }
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public RichFeature getParentFeature() { return this.parent; }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setParentFeature(RichFeature feature) throws ChangeVetoException {
-        if (feature==null) throw new IllegalArgumentException("Parent feature cannot be null");
-        if(!this.hasListeners(RichLocation.PARENT)) {
-            this.parent = feature;
-        } else {
-            ChangeEvent ce = new ChangeEvent(
-                    this,
-                    RichLocation.PARENT,
-                    feature,
-                    this.parent
-                    );
-            ChangeSupport cs = this.getChangeSupport(RichLocation.PARENT);
-            synchronized(cs) {
-                cs.firePreChangeEvent(ce);
-                this.parent = feature;
-                cs.firePostChangeEvent(ce);
-            }
-        }
-    }
-    
+        
     /**
      * {@inheritDoc}
      */
@@ -378,10 +347,10 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public Location translate(int dist) {
         Set blocks = new HashSet();
         int counter = 0;
-        RichLocation r = new SimpleRichLocation(this.parent, 0,0,counter++);
+        RichLocation r = new SimpleRichLocation(0,0,counter++);
         for (Iterator i = this.blocks.iterator(); i.hasNext(); ) {
             RichLocation r2 = (RichLocation)i.next();
-            blocks.add(new SimpleRichLocation(r2.getParentFeature(),
+            blocks.add(new SimpleRichLocation(
                     r2.getMin()+dist,
                     r2.getMax()+dist,
                     counter++));
@@ -401,12 +370,12 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
         Location u = LocationTools.union(this,l);
         int counter = 0;
-        RichLocation r = new SimpleRichLocation(this.parent, 0,0,counter++);
+        RichLocation r = new SimpleRichLocation(0,0,counter++);
         Set blocks = new HashSet();
         for (Iterator i = u.blockIterator(); i.hasNext(); ) {
             Location b = (Location)i.next();
             if (b instanceof RichLocation) blocks.add(b);
-            else blocks.add(new SimpleRichLocation(this.parent, b.getMin(), b.getMax(), counter++));
+            else blocks.add(new SimpleRichLocation(b.getMin(), b.getMax(), counter++));
         }
         try {
             r.setBlocks(blocks);
@@ -423,12 +392,12 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
         Location u = LocationTools.intersection(this,l);
         int counter = 0;
-        RichLocation r = new SimpleRichLocation(this.parent, 0,0,counter++);
+        RichLocation r = new SimpleRichLocation(0,0,counter++);
         Set blocks = new HashSet();
         for (Iterator i = u.blockIterator(); i.hasNext(); ) {
             Location b = (Location)i.next();
             if (b instanceof RichLocation) blocks.add(b);
-            else blocks.add(new SimpleRichLocation(this.parent, b.getMin(), b.getMax(), counter++));
+            else blocks.add(new SimpleRichLocation(b.getMin(), b.getMax(), counter++));
         }
         try {
             r.setBlocks(blocks);

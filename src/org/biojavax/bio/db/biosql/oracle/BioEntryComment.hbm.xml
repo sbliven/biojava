@@ -5,7 +5,7 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.bio.SimpleBioEntryComment" table="ANNCOMMENT">
+    <class name="org.biojavax.SimpleComment" table="ANNCOMMENT">
 
         <id name="id" type="long" unsaved-value="null">
             <column name="ANNCOMMENT_ID" sql-type="long" unique="true" not-null="true"/>
@@ -20,9 +20,6 @@
         <property name="comment">
             <column name="COMMENT_TEXT" sql-type="text" not-null="true"/>
         </property>
-        <many-to-one name="parent" class="org.biojavax.bio.SimpleBioEntry">
-            <column name="BIOENTRY_ID" not-null="true"/>
-        </many-to-one>
         
     </class>
 

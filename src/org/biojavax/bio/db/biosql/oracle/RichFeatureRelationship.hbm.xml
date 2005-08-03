@@ -5,20 +5,20 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.bio.SimpleBioEntryRelationship" table="BIOENTRY_RELATIONSHIP">
+    <class name="org.biojavax.bio.seq.SimpleRichFeatureRelationship" table="SEQFEATURE_RELATIONSHIP">
 
         <id name="id" type="long" unsaved-value="null">
-            <column name="BIOENTRY_RELATIONSHIP_ID" sql-type="long" unique="true" not-null="true"/>
+            <column name="SEQFEATURE_RELATIONSHIP_ID" sql-type="long" unique="true" not-null="true"/>
             <generator class="sequence">
-                <param name="sequence">BIOENTRY_RELATIONSHIP_PK_SEQ</param>
+                <param name="sequence">SEQFEATURE_RELATIONSHIP_PK_SEQ</param>
             </generator>
         </id>
 
         <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm">
             <column name="TERM_ID" not-null="true"/>
         </many-to-one>
-        <many-to-one name="subject" class="org.biojavax.bio.SimpleBioEntry">
-            <column name="SUBJECT_BIOENTRY_ID" not-null="true"/>
+        <many-to-one name="subject" class="org.biojavax.bio.seq.SimpleRichFeature">
+            <column name="SUBJECT_SEQFEATURE_ID" not-null="true"/>
         </many-to-one>
         <property name="rank">
             <column name="RANK" sql-type="integer" length="6" not-null="false"/>

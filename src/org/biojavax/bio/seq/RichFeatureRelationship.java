@@ -65,12 +65,6 @@ public interface RichFeatureRelationship extends Comparable,Changeable {
     public int getRank();
     
     /**
-     * Getter for property object.
-     * @return Value of property object.
-     */
-    public RichFeature getObject();
-    
-    /**
      * Getter for property subject.
      * @return Value of property subject.
      */

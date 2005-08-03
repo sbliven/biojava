@@ -42,7 +42,6 @@ import org.biojavax.ontology.ComparableTerm;
  */
 public class SimpleRichFeatureRelationship extends AbstractChangeable implements RichFeatureRelationship {
     
-    private RichFeature object;
     private RichFeature subject;
     private ComparableTerm term;
     private int rank;
@@ -55,12 +54,9 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
      * @param rank the rank of the relationship.
      */
     
-    public SimpleRichFeatureRelationship(RichFeature object, RichFeature subject, ComparableTerm term, int rank) {
-        if (object==null) throw new IllegalArgumentException("Object cannot be null");
+    public SimpleRichFeatureRelationship(RichFeature subject, ComparableTerm term, int rank) {
         if (subject==null) throw new IllegalArgumentException("Subject cannot be null");
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        if (object.equals(subject)) throw new IllegalArgumentException("Object cannot be the same as the subject");
-        this.object = object;
         this.subject = subject;
         this.term = term;
         this.rank = rank;
@@ -95,16 +91,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
      * {@inheritDoc}
      */
     public int getRank() { return this.rank; }
-    
-    /**
-     * Getter for property object.
-     * @return Value of property object.
-     */
-    public RichFeature getObject() { return this.object; }
-    
-    // Hibernate requirement - not for public use.
-    private void setObject(RichFeature object) { this.object = object; }
-    
+        
     /**
      * Getter for property subject.
      * @return Value of property subject.
@@ -128,11 +115,10 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
-        if (this.object==null) return -1;
+        if (this.subject==null) return -1;
         // Normal comparison
         RichFeatureRelationship them = (RichFeatureRelationship)o;
-        if (!this.object.equals(them.getObject())) return -1; // Can't compare features :(
-        else if (!this.subject.equals(them.getSubject())) return 1; // Can't compare features :(
+        if (!this.subject.equals(them.getSubject())) return 1; // Can't compare features :(
         else return this.getTerm().compareTo(them.getTerm());
     }
     
@@ -143,11 +129,10 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
         if (this == obj) return true;
         if (obj==null || !(obj instanceof RichFeatureRelationship)) return false;
         // Hibernate comparison - we haven't been populated yet
-        if (this.object==null) return false;
+        if (this.subject==null) return false;
         // Normal comparison
         RichFeatureRelationship them = (RichFeatureRelationship)obj;
-        return (this.object.equals(them.getObject()) &&
-                this.subject.equals(them.getSubject()) &&
+        return (this.subject.equals(them.getSubject()) &&
                 this.term.equals(them.getTerm()));
     }
     
@@ -157,9 +142,8 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     public int hashCode() {
         int code = 17;
         // Hibernate comparison - we haven't been populated yet
-        if (this.object==null) return code;
+        if (this.subject==null) return code;
         // Normal comparison
-        code = code*37 + this.object.hashCode();
         code = code*37 + this.subject.hashCode();
         code = code*37 + this.term.hashCode();
         return code;
@@ -170,7 +154,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
      * In the form <code>this.getTerm()+"("+this.getSubject()+","+this.getObject()+")";<code>
      */
     public String toString() {
-        return this.getTerm()+"("+this.getSubject()+","+this.getObject()+")";
+        return this.getTerm()+"("+this.getSubject()+")";
     }
     
     // Hibernate requirement - not for public use.

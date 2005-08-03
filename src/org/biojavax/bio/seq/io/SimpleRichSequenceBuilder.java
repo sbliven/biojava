@@ -53,7 +53,7 @@ import org.biojavax.RankedDocRef;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRichAnnotation;
-import org.biojavax.bio.BioEntryComment;
+import org.biojavax.Comment;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichFeatureRelationship;
@@ -250,7 +250,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
             else {
                 RichFeature parent = (RichFeature)this.featureStack.get(this.featureStack.size() - 1);
                 parent.addFeatureRelationship(
-                        new SimpleRichFeatureRelationship(parent, f, RichFeatureRelationship.DEFAULT_FEATURE_RELATIONSHIP_TERM, this.featureRank++)
+                        new SimpleRichFeatureRelationship(f, RichFeatureRelationship.DEFAULT_FEATURE_RELATIONSHIP_TERM, this.featureRank++)
                         );
             }
             this.featureStack.add(f);
@@ -365,7 +365,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
             for (Iterator i = this.crossRefs.iterator(); i.hasNext(); ) rs.getRankedCrossRefs().add((CrossRef)i.next());
             for (Iterator i = this.relations.iterator(); i.hasNext(); ) rs.getRelationships().add((BioEntryRelationship)i.next());
             for (Iterator i = this.references.iterator(); i.hasNext(); ) rs.getRankedDocRefs().add((RankedDocRef)i.next());
-            for (Iterator i = this.comments.iterator(); i.hasNext(); ) rs.getComments().add((BioEntryComment)i.next());
+            for (Iterator i = this.comments.iterator(); i.hasNext(); ) rs.getComments().add((Comment)i.next());
             // set annotations
             rs.setNoteSet(this.notes.getNoteSet());
         } catch (Exception e) {

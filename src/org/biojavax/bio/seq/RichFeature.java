@@ -80,8 +80,8 @@ public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,
             );
     
     /**
-     * Sets the parent of this feature, ie. the sequence it belongs to.
-     * @param parent the parent the feature should associate itself with.
+     * Sets the parent of this feature.
+     * @param parent the parent the feature should identify itself with.
      * @throws ChangeVetoException if the new value is unacceptable.
      */
     public void setParent(RichSequence parent) throws ChangeVetoException;

@@ -19,14 +19,16 @@
  *
  */
 
-package org.biojavax.bio;
+package org.biojavax;
+
+import org.biojavax.bio.BioEntry;
 
 /**
  * A simple ranked immutable comment system.
  *
  * @author Richard Holland
  */
-public interface BioEntryComment extends Comparable {
+public interface Comment extends Comparable {
     
     /**
      * Returns the comment part of this comment.
@@ -39,11 +41,5 @@ public interface BioEntryComment extends Comparable {
      * @return the rank.
      */
     public int getRank();
-    
-    /**
-     * Returns the parent of this comment.
-     * @return the parent.
-     */
-    public BioEntry getParent();
     
 }

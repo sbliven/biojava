@@ -58,6 +58,10 @@
                 </property>  
             </composite-element>
         </set>
+        <set name="featureRelationshipSet" lazy="false" inverse="true">
+            <key column="OBJECT_SEQFEATURE_ID"/>
+            <one-to-many class="org.biojavax.bio.seq.SimpleRichFeatureRelationship"/>
+        </set>
         
     </class>
 

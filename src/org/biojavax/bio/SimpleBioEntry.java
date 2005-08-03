@@ -42,6 +42,7 @@ import org.biojavax.RankedDocRef;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.taxa.NCBITaxon;
+import org.biojavax.Comment;
 
 /**
  * Reference implementation of a BioEntry object which has no features or sequence.
@@ -400,7 +401,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     /**
      * {@inheritDoc}
      */
-    public void addComment(BioEntryComment comment) throws ChangeVetoException {
+    public void addComment(Comment comment) throws ChangeVetoException {
         if (comment==null) throw new IllegalArgumentException("Comment cannot be null");
         if(!this.hasListeners(BioEntry.COMMENT)) {
             this.comments.add(comment);
@@ -423,7 +424,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     /**
      * {@inheritDoc}
      */
-    public void removeComment(BioEntryComment comment) throws ChangeVetoException {
+    public void removeComment(Comment comment) throws ChangeVetoException {
         if (comment==null) throw new IllegalArgumentException("Comment cannot be null");
         if(!this.hasListeners(BioEntry.COMMENT)) {
             this.comments.remove(comment);

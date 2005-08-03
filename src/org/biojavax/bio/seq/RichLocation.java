@@ -77,11 +77,6 @@ public interface RichLocation extends Location,RichAnnotatable {
             "org.biojavax.bio.seq.RichLocation",
             "MAX"
             );
-    public static final ChangeType PARENT = new ChangeType(
-            "This location's parent has changed",
-            "org.biojavax.bio.seq.RichLocation",
-            "PARENT"
-            );
     
     /**
      * Retrieves the crossref associated with this location.
@@ -148,20 +143,7 @@ public interface RichLocation extends Location,RichAnnotatable {
      * @throws ChangeVetoException in case of error.
      */
     public void setMax(int max) throws ChangeVetoException;
-    
-    /**
-     * Retrieves the parent associated with this location.
-     * @return the parent.
-     */
-    public RichFeature getParentFeature();
-    
-    /**
-     * Sets the parent for this location.
-     * @param feature the parent this location should adopt.
-     * @throws ChangeVetoException in case of error.
-     */
-    public void setParentFeature(RichFeature feature) throws ChangeVetoException;
-    
+        
     /**
      * Retrieves the blocks associated with this location.
      * @return the blocks.
