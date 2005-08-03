@@ -75,8 +75,8 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
             ChangeEvent ce = new ChangeEvent(
                     this,
                     RichFeatureRelationship.RANK,
-                    Integer.valueOf(rank),
-                    Integer.valueOf(this.rank)
+                    new Integer(rank),
+                    new Integer(this.rank)
                     );
             ChangeSupport cs = this.getChangeSupport(RichFeatureRelationship.RANK);
             synchronized(cs) {

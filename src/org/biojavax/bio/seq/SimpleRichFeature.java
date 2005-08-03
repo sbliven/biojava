@@ -203,8 +203,8 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
             ChangeEvent ce = new ChangeEvent(
                     this,
                     RichFeature.RANK,
-                    Integer.valueOf(rank),
-                    Integer.valueOf(this.rank)
+                    new Integer(rank),
+                    new Integer(this.rank)
                     );
             ChangeSupport cs = this.getChangeSupport(RichFeature.RANK);
             synchronized(cs) {

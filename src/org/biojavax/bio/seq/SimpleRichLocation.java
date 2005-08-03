@@ -240,8 +240,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             ChangeEvent ce = new ChangeEvent(
                     this,
                     RichLocation.RANK,
-                    Integer.valueOf(rank),
-                    Integer.valueOf(this.rank)
+                    new Integer(rank),
+                    new Integer(this.rank)
                     );
             ChangeSupport cs = this.getChangeSupport(RichLocation.RANK);
             synchronized(cs) {
@@ -267,8 +267,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             ChangeEvent ce = new ChangeEvent(
                     this,
                     RichLocation.MAX,
-                    Integer.valueOf(max),
-                    Integer.valueOf(this.max)
+                    new Integer(max),
+                    new Integer(this.max)
                     );
             ChangeSupport cs = this.getChangeSupport(RichLocation.MAX);
             synchronized(cs) {
@@ -294,8 +294,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             ChangeEvent ce = new ChangeEvent(
                     this,
                     RichLocation.MIN,
-                    Integer.valueOf(min),
-                    Integer.valueOf(this.min)
+                    new Integer(min),
+                    new Integer(this.min)
                     );
             ChangeSupport cs = this.getChangeSupport(RichLocation.MIN);
             synchronized(cs) {
