@@ -103,7 +103,7 @@
             <property name="stringSequence">
                 <column name="SEQ" sql-type="text" not-null="false"/>
             </property>   
-            <set name="featureSet" lazy="false">
+            <set name="featureSet" lazy="false" inverse="true">
                 <key column="BIOENTRY_ID"/>
                 <one-to-many class="org.biojavax.bio.seq.SimpleRichFeature"/>
             </set>
