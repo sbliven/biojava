@@ -24,10 +24,10 @@
             <column name="RANK" sql-type="integer" length="4" not-null="true"/>
         </property>
         <property name="min">
-            <column name="START_POS" sql-type="integer" length="10" not-null="false"/>
+            <column name="START_POS" sql-type="integer" length="10" not-null="true"/>
         </property>
         <property name="max">
-            <column name="END_POS" sql-type="integer" length="10" not-null="false"/>
+            <column name="END_POS" sql-type="integer" length="10" not-null="true"/>
         </property>
         <property name="strandChar">
             <column name="STRAND" sql-type="string" length="1" not-null="true"/>            

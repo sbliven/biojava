@@ -29,7 +29,7 @@
         <property name="rank">
             <column name="RANK" sql-type="integer" length="9" not-null="true"/>
         </property>
-        <set name="locationSet" lazy="false" inverse="true">
+        <set name="locationSet" lazy="false">
             <key column="SEQFEATURE_ID"/>
             <one-to-many class="org.biojavax.bio.seq.SimpleRichLocation"/>
         </set>
@@ -58,7 +58,7 @@
                 </property>  
             </composite-element>
         </set>
-        <set name="featureRelationshipSet" lazy="false" inverse="true">
+        <set name="featureRelationshipSet" lazy="false">
             <key column="OBJECT_SEQFEATURE_ID"/>
             <one-to-many class="org.biojavax.bio.seq.SimpleRichFeatureRelationship"/>
         </set>

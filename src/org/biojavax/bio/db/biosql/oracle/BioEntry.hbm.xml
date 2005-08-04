@@ -38,11 +38,11 @@
         <many-to-one name="namespace" class="org.biojavax.SimpleNamespace" >
             <column name="BIODATABASE_ID" not-null="true"/>
         </many-to-one>
-        <set name="comments" lazy="false" inverse="true">
+        <set name="comments" lazy="false">
             <key column="BIOENTRY_ID"/>
             <one-to-many class="org.biojavax.SimpleComment"/>
         </set>
-        <set name="relationships" lazy="false" inverse="true">
+        <set name="relationships" lazy="false">
             <key column="OBJECT_BIOENTRY_ID"/>
             <one-to-many class="org.biojavax.bio.SimpleBioEntryRelationship"/>
         </set>
@@ -103,7 +103,7 @@
             <property name="stringSequence">
                 <column name="SEQ" sql-type="text" not-null="false"/>
             </property>   
-            <set name="featureSet" lazy="false" inverse="true">
+            <set name="featureSet" lazy="false">
                 <key column="BIOENTRY_ID"/>
                 <one-to-many class="org.biojavax.bio.seq.SimpleRichFeature"/>
             </set>

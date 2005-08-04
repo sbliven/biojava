@@ -15,7 +15,7 @@
         </id>
 
         <property name="NCBITaxID">
-            <column name="NCBI_TAXON_ID" sql-type="integer" unique="true" not-null="false"/>
+            <column name="NCBI_TAXON_ID" sql-type="integer" unique="true" not-null="true"/>
         </property>
         <property name="nodeRank">
             <column name="NODE_RANK" sql-type="string" length="32" not-null="false"/>
