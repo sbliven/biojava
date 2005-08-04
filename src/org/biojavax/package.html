@@ -5,6 +5,29 @@
     <title></title>
   </head>
   <body>
-  <p>The Biojava extensions packages, classes that extend the core biojava functionality</p>
+  <p>The Biojava extensions packages, classes that extend the core biojava 
+     functionality</p>
+  <p>The biojavax packages contain a number of extensions to the core biojava 
+     interfaces. These extensions are designed to very closely model the 
+     OBDA BioSQL database schema. Several new classes are introduced and their
+     relationships are best explained by the BioSQL schema.</p>
+   <p>The interfaces of most interest to users will be the <code>BioEntry</code>
+      and the <code>RichSequence</code>. The <code>BioEntry</code> holds key
+      description information about a biological entity but no actual sequence.
+      This allows consistent description of biological records that may or may
+      not have sequence. The <code>RichSequence</code> interface is an extension
+      of <code>Sequence</code> and <code>BioEntry</code>. Think of it as an old
+      fashioned biojava <code>Sequence</code> with more accessors that let you
+      get at the information with some funky relationship capabilities thrown in.
+      </p>
+   <p>Where possible we have made extensive use of interfaces and multiple
+      inheritance (via interfaces). Hence, <code>RichSequence</code> can be used
+      whenever a <code>Sequence</code> is required. <code>RichAnnotation</code>
+      can often be substituted for <code>Annotation</code> etc.
+      </p>
+   <p>The basic implementations are also designed to work with Hibernate allowing
+     easy persitence to a BioSQL db.
+     </p>
+     
   </body>
 </html>
