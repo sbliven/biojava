@@ -29,6 +29,8 @@ package org.biojavax.bio.db;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.biojavax.Namespace;
+import org.biojavax.SimpleNamespace;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.ComparableTerm;
 import org.biojavax.ontology.SimpleComparableOntology;
@@ -39,12 +41,31 @@ import org.biojavax.ontology.SimpleComparableOntology;
  */
 public class BioDBUtils {
     
+    private static Map namespaces = new HashMap();
+    
+    private static Map ontologies = new HashMap();
+    
+    /**
+     * The default namespace used for internal terms.
+     */
+    public static final Namespace DEFAULT_NAMESPACE = getNamespace("lcl");
+    
+    /**
+     * Generates an namespace instance, or returns the existing one if it already exists.
+     * @param name the name of the namespace to generate
+     * @return the generated namespace
+     */
+    public static Namespace getNamespace(String name) {
+        if (!namespaces.containsKey(name)) {
+            namespaces.put(name, new SimpleNamespace(name));
+        }
+        return (Namespace)namespaces.get(name);
+    }
+    
     /**
      * The default ontology used for internal terms.
      */
     public static final ComparableOntology DEFAULT_ONTOLOGY = getOntology("biojavax");
-    
-    private static Map ontologies = new HashMap();
     
     /**
      * Generates an ontology instance, or returns the existing one if it already exists.
@@ -57,7 +78,7 @@ public class BioDBUtils {
         }
         return (ComparableOntology)ontologies.get(name);
     }
-       
+    
     /**
      * Generates a term instance, or returns the existing one if it already exists.
      * @param onto the ontology to generate the term in

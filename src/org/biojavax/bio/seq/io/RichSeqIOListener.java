@@ -32,6 +32,7 @@ import org.biojavax.CrossRef;
 import org.biojavax.Namespace;
 import org.biojavax.RankedDocRef;
 import org.biojavax.bio.BioEntryRelationship;
+import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.taxa.NCBITaxon;
 
 /**
@@ -124,7 +125,7 @@ public interface RichSeqIOListener extends SeqIOListener {
      * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
      * to deal with the event or is not expecting the event.
      */
-    public void setVersion(String version) throws ParseException;
+    public void setVersion(int version) throws ParseException;
     
     /**
      * Call back method so the event emitter can tell the listener
@@ -213,4 +214,6 @@ public interface RichSeqIOListener extends SeqIOListener {
      * to deal with the event or is not expecting the event.
      */
     public void setCrossRef(CrossRef crossRef) throws ParseException;
+    
+    public RichFeature getCurrentFeature() throws ParseException;
 }

@@ -26,9 +26,10 @@
  */
 
 package org.biojavax.bio.seq;
-import org.biojava.bio.seq.Sequence;
+import java.util.NoSuchElementException;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
-import org.biojavax.bio.seq.RichSequence;
+
 
 /**
  * Essentially the same as <code>SequenceIterator</code>. It provides a new
@@ -41,6 +42,5 @@ import org.biojavax.bio.seq.RichSequence;
  * @see org.biojava.bio.seq.SequenceIterator
  */
 public interface RichSequenceIterator extends SequenceIterator{
-    public Sequence nextSequence();
-    public RichSequence nextRichSequence();
+    public RichSequence nextRichSequence() throws NoSuchElementException, BioException;
 }

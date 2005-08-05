@@ -26,8 +26,12 @@
  */
 package org.biojavax.bio.seq;
 
+import java.util.HashSet;
 import java.util.Set;
+import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature.Strand;
+import org.biojava.bio.seq.io.EmblLikeLocationParser;
+import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
@@ -143,7 +147,7 @@ public interface RichLocation extends Location,RichAnnotatable {
      * @throws ChangeVetoException in case of error.
      */
     public void setMax(int max) throws ChangeVetoException;
-        
+    
     /**
      * Retrieves the blocks associated with this location.
      * @return the blocks.
@@ -156,4 +160,22 @@ public interface RichLocation extends Location,RichAnnotatable {
      * @throws ChangeVetoException in case of error.
      */
     public void setBlocks(Set blocks) throws ChangeVetoException;
+    
+    public static class Parser {
+        public static RichLocation parseEMBLLocation(String loc) throws ParseException {          
+            RichLocation l = new SimpleRichLocation(0,0,0);
+            Set blocks = new HashSet();
+            
+            // do parsing - populate blocks
+            // TODO
+            
+            try {
+                l.setBlocks(blocks);
+            } catch (ChangeVetoException e) {
+                throw new ParseException("Bad location: "+loc);
+            }
+            
+            return l;
+        }
+    }
 }

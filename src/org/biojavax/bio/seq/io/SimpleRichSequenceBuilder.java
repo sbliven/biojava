@@ -113,12 +113,11 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
     /**
      * {@inheritDoc}
      */
-    public void setVersion(String version) throws ParseException {
+    public void setVersion(int version) throws ParseException {
         if (this.versionSeen) throw new ParseException("Current BioEntry already has a version");
-        if (version==null) this.version=0;
         else {
             try {
-                this.version = Integer.parseInt(version);
+                this.version = version;
                 this.versionSeen = true;
             } catch (NumberFormatException e) {
                 throw new ParseException("Could not parse version as an integer");
@@ -166,7 +165,6 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      * {@inheritDoc}
      */
     public void setDescription(String description) throws ParseException {
-        if (description==null) throw new ParseException("Description cannot be null");
         if (this.description!=null) throw new ParseException("Current BioEntry already has a description");
         this.description = description;
     }
@@ -263,6 +261,12 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
     private List allFeatures = new ArrayList();
     private List featureStack = new ArrayList();
     private int featureRank = 0;
+    
+    
+    public RichFeature getCurrentFeature() throws ParseException {
+        if (this.featureStack.size()==0) throw new ParseException("Not currently within a feature");
+        else return (RichFeature)this.featureStack.get(this.featureStack.size()-1);
+    }
     
     /**
      * {@inheritDoc}

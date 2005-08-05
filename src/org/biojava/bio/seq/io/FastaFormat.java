@@ -47,10 +47,15 @@ import org.biojavax.bio.seq.io.RichSeqIOListener;
  * you wish it to be interpreted as such, you should use
  * FastaDescriptionLineParser as a SeqIO filter.
  *
+ * If you pass it a RichSeqIOListener, you'll get RichSequence objects 
+ * in return. Likewise, if you write RichSequence objects, you'll get
+ * absolutely correct FASTA formatted output.
+ *
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Lukas Kall
+ * @author Richard Holland
  */
 
 public class FastaFormat implements SequenceFormat,
