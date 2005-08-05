@@ -26,12 +26,17 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.utils.ParseErrorEvent;
 import org.biojava.utils.ParseErrorListener;
+import org.biojavax.bio.db.BioDBUtils;
+import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.io.RichSeqIOListener;
 
 /**
  * Format object representing FASTA files. These files are almost pure
@@ -49,177 +54,228 @@ import org.biojava.utils.ParseErrorListener;
  */
 
 public class FastaFormat implements SequenceFormat,
-                                    Serializable,
-                                    org.biojava.utils.ParseErrorListener,
-                                    org.biojava.utils.ParseErrorSource
-{
+        Serializable,
+        org.biojava.utils.ParseErrorListener,
+        org.biojava.utils.ParseErrorSource {
     public static final String DEFAULT = "FASTA";
-
-  /**
-   * Constant string which is the property key used to notify
-   * listeners of the description lines of FASTA sequences.
-   */
-  public final static String PROPERTY_DESCRIPTIONLINE = "description_line";
-
-  protected Vector mListeners = new Vector();
-
-  /**
-   * The line width for output.
-   */
-  protected int lineWidth = 60;
-
-  /**
-   * Retrive the current line width.
-   *
-   * @return the line width
-   */
-  public int getLineWidth() {
-      return lineWidth;
-  }
-
-  /**
-   * Set the line width.
-   * <p>
-   * When writing, the lines of sequence will never be longer than the line
-   * width.
-   *
-   * @param width the new line width
-   */
-  public void setLineWidth(int width) {
-      this.lineWidth = width;
-  }
-
-  public boolean readSequence(
-    BufferedReader reader,
-		SymbolTokenization symParser,
-		SeqIOListener siol
-  )	throws
-    IllegalSymbolException,
-    IOException,
-    ParseException
-  {
-    String line = reader.readLine();
-    if (line == null) {
-      throw new IOException("Premature stream end");
-    }
-    while(line.length() == 0) {
-      line = reader.readLine();
-      if (line == null) {
-        throw new IOException("Premature stream end");
-      }
-    }
-    if (!line.startsWith(">")) {
-      throw new IOException("Stream does not appear to contain FASTA formatted data: " + line);
+    
+    /**
+     * Constant string which is the property key used to notify
+     * listeners of the description lines of FASTA sequences.
+     */
+    public final static String PROPERTY_DESCRIPTIONLINE = "description_line";
+    
+    protected Vector mListeners = new Vector();
+    
+    /**
+     * The line width for output.
+     */
+    protected int lineWidth = 60;
+    
+    /**
+     * Retrive the current line width.
+     *
+     * @return the line width
+     */
+    public int getLineWidth() {
+        return lineWidth;
     }
     
-    siol.startSequence();
+    /**
+     * Set the line width.
+     * <p>
+     * When writing, the lines of sequence will never be longer than the line
+     * width.
+     *
+     * @param width the new line width
+     */
+    public void setLineWidth(int width) {
+        this.lineWidth = width;
+    }
     
-    String description = line.substring(1).trim();
-    siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
-    
-    String name = new java.util.StringTokenizer(description).nextToken();
-    siol.setName(name);
-    
-    boolean seenEOF = readSequenceData(reader, symParser, siol);
-    siol.endSequence();
-    
-    return !seenEOF;
-  }
-
-  private boolean readSequenceData(
-    BufferedReader r,
-    SymbolTokenization parser,
-    SeqIOListener listener
-  ) throws
-    IOException,
-    IllegalSymbolException
-  {
-    char[] cache = new char[512];
-    boolean reachedEnd = false, seenEOF = false;
-    StreamParser sparser = parser.parseStream(listener);
-    
-    while (!reachedEnd) {
-      r.mark(cache.length + 1);
-      int bytesRead = r.read(cache, 0, cache.length);
-      if (bytesRead < 0) {
-        reachedEnd = seenEOF = true;
-      } else {
-        int parseStart = 0;
-        int parseEnd = 0;
-        while (!reachedEnd && parseStart < bytesRead && cache[parseStart] != '>') {
-          parseEnd = parseStart;
-          
-          while (parseEnd < bytesRead &&
-            cache[parseEnd] != '\n' &&
-            cache[parseEnd] != '\r'
-          ) {
-            ++parseEnd;
-          }
-          
-          sparser.characters(cache, parseStart, parseEnd - parseStart);
-          
-          parseStart = parseEnd + 1;
-          while (parseStart < bytesRead &&
-            (cache[parseStart] == '\n' ||
-             cache[parseStart] == '\r') )
-            {
-              ++parseStart;
+    public boolean readSequence(
+            BufferedReader reader,
+            SymbolTokenization symParser,
+            SeqIOListener siol
+            )	throws
+            IllegalSymbolException,
+            IOException,
+            ParseException {
+        String line = reader.readLine();
+        if (line == null) {
+            throw new IOException("Premature stream end");
+        }
+        while(line.length() == 0) {
+            line = reader.readLine();
+            if (line == null) {
+                throw new IOException("Premature stream end");
             }
         }
-        if (parseStart < bytesRead && cache[parseStart] == '>') {
-          try {
-            r.reset();
-          } catch (IOException ioe) {
-            throw new IOException(
-              "Can't reset: " +
-              ioe.getMessage() +
-              " parseStart=" + parseStart +
-              " bytesRead=" + bytesRead
-            );
-          }
-          if (r.skip(parseStart) != parseStart) {
-            throw new IOException("Couldn't reset to start of next sequence");
-          }
-          reachedEnd = true;
+        if (!line.startsWith(">")) {
+            throw new IOException("Stream does not appear to contain FASTA formatted data: " + line);
         }
-      }
+        
+        siol.startSequence();
+        
+        String description = line.substring(1).trim();
+        
+        String regex = "(\\S+)(\\s+(.*))*";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(description);
+        if (!m.matches()) {
+            throw new IOException("Stream does not appear to contain FASTA formatted data: " + line);
+        }
+        
+        String name = m.group(1);
+        String desc = m.group(3);
+        
+        if (siol instanceof RichSeqIOListener) {
+            RichSeqIOListener rsiol = (RichSeqIOListener)siol;
+            
+            regex = "^gi\\|(\\d+)\\|(\\S+)\\|(\\S+)\\.(\\d+)\\|(\\S+)$";
+            p = Pattern.compile(regex);
+            m = p.matcher(name);
+            if (m.matches()) {
+                String gi = m.group(1);
+                String namespace = m.group(2);
+                String accession = m.group(3);
+                int version = Integer.parseInt(m.group(4));
+                name = m.group(5);
+                
+                rsiol.setAccession(accession);
+                rsiol.setVersion(version);
+                rsiol.setIdentifier(gi);
+                rsiol.setNamespace(BioDBUtils.getNamespace(namespace));
+            } else {
+                rsiol.setAccession(name);
+                rsiol.setNamespace(BioDBUtils.DEFAULT_NAMESPACE);
+            }
+            rsiol.setName(name);
+            rsiol.setDescription(desc);
+        } else {
+            siol.setName(name);
+            siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
+        }
+        
+        boolean seenEOF = readSequenceData(reader, symParser, siol);
+        siol.endSequence();
+        
+        return !seenEOF;
     }
     
-    sparser.close();
-    return seenEOF;
-  }
-
+    private boolean readSequenceData(
+            BufferedReader r,
+            SymbolTokenization parser,
+            SeqIOListener listener
+            ) throws
+            IOException,
+            IllegalSymbolException {
+        char[] cache = new char[512];
+        boolean reachedEnd = false, seenEOF = false;
+        StreamParser sparser = parser.parseStream(listener);
+        
+        while (!reachedEnd) {
+            r.mark(cache.length + 1);
+            int bytesRead = r.read(cache, 0, cache.length);
+            if (bytesRead < 0) {
+                reachedEnd = seenEOF = true;
+            } else {
+                int parseStart = 0;
+                int parseEnd = 0;
+                while (!reachedEnd && parseStart < bytesRead && cache[parseStart] != '>') {
+                    parseEnd = parseStart;
+                    
+                    while (parseEnd < bytesRead &&
+                            cache[parseEnd] != '\n' &&
+                            cache[parseEnd] != '\r'
+                            ) {
+                        ++parseEnd;
+                    }
+                    
+                    sparser.characters(cache, parseStart, parseEnd - parseStart);
+                    
+                    parseStart = parseEnd + 1;
+                    while (parseStart < bytesRead &&
+                            (cache[parseStart] == '\n' ||
+                            cache[parseStart] == '\r') ) {
+                        ++parseStart;
+                    }
+                }
+                if (parseStart < bytesRead && cache[parseStart] == '>') {
+                    try {
+                        r.reset();
+                    } catch (IOException ioe) {
+                        throw new IOException(
+                                "Can't reset: " +
+                                ioe.getMessage() +
+                                " parseStart=" + parseStart +
+                                " bytesRead=" + bytesRead
+                                );
+                    }
+                    if (r.skip(parseStart) != parseStart) {
+                        throw new IOException("Couldn't reset to start of next sequence");
+                    }
+                    reachedEnd = true;
+                }
+            }
+        }
+        
+        sparser.close();
+        return seenEOF;
+    }
+    
     /**
      * Return a suitable description line for a Sequence. If the
      * sequence's annotation bundle contains PROPERTY_DESCRIPTIONLINE,
      * this is used verbatim.  Otherwise, the sequence's name is used.
      */
     protected String describeSequence(Sequence seq) {
-	String description = null;
-        Annotation seqAnn = seq.getAnnotation();
-
-        if(seqAnn.containsProperty(PROPERTY_DESCRIPTIONLINE)) {
-          description = (String) seqAnn.getProperty(PROPERTY_DESCRIPTIONLINE);
+        String description = null;
+        
+        if (seq instanceof RichSequence) {
+            StringBuffer sb = new StringBuffer();
+            RichSequence rs = (RichSequence)seq;
+            String identifier = rs.getIdentifier();
+            if (identifier!=null && !"".equals(identifier)) {
+                sb.append("gi|");
+                sb.append(identifier);
+                sb.append("|");
+            }
+            sb.append(rs.getNamespace());
+            sb.append("|");
+            sb.append(rs.getAccession());
+            sb.append(".");
+            sb.append(rs.getVersion());
+            sb.append("|");
+            sb.append(rs.getName());
+            sb.append(" ");
+            sb.append(rs.getDescription());
+            description = sb.toString();
         } else {
-          description = seq.getName();
+            Annotation seqAnn = seq.getAnnotation();
+            
+            if(seqAnn.containsProperty(PROPERTY_DESCRIPTIONLINE)) {
+                description = (String) seqAnn.getProperty(PROPERTY_DESCRIPTIONLINE);
+            } else {
+                description = seq.getName();
+            }
         }
-
-	return description;
+        return description;
     }
-
+    
     public void writeSequence(Sequence seq, PrintStream os)
-	throws IOException {
-	os.print(">");
-	os.println(describeSequence(seq));
-
+    throws IOException {
+        os.print(">");
+        os.println(describeSequence(seq));
+        
         int length = seq.length();
-
-	for (int pos = 1; pos <= length; pos += lineWidth) {
-	    int end = Math.min(pos + lineWidth - 1, length);
-	    os.println(seq.subStr(pos, end));
-	}
+        
+        for (int pos = 1; pos <= length; pos += lineWidth) {
+            int end = Math.min(pos + lineWidth - 1, length);
+            os.println(seq.subStr(pos, end));
+        }
     }
-
+    
     /**
      * <code>writeSequence</code> writes a sequence to the specified
      * <code>PrintStream</code>, using the specified format.
@@ -235,15 +291,14 @@ public class FastaFormat implements SequenceFormat,
      * @deprecated use writeSequence(Sequence seq, PrintStream os)
      */
     public void writeSequence(Sequence seq, String format, PrintStream os)
-        throws IOException
-    {
+    throws IOException {
         if (! format.equalsIgnoreCase(getDefaultFormat()))
             throw new IllegalArgumentException("Unknown format '"
-                                               + format
-                                               + "'");
+                    + format
+                    + "'");
         writeSequence(seq, os);
     }
-
+    
     /**
      * <code>getDefaultFormat</code> returns the String identifier for
      * the default format.
@@ -251,11 +306,10 @@ public class FastaFormat implements SequenceFormat,
      * @return a <code>String</code>.
      * @deprecated
      */
-    public String getDefaultFormat()
-    {
+    public String getDefaultFormat() {
         return DEFAULT;
     }
-
+    
     /**
      * Adds a parse error listener to the list of listeners if it isn't already
      * included.
@@ -267,7 +321,7 @@ public class FastaFormat implements SequenceFormat,
             mListeners.addElement(theListener);
         }
     }
-
+    
     /**
      * Removes a parse error listener from the list of listeners if it is
      * included.
@@ -279,7 +333,7 @@ public class FastaFormat implements SequenceFormat,
             mListeners.removeElement(theListener);
         }
     }
-
+    
     /**
      * This method determines the behaviour when a bad line is processed.
      * Some options are to log the error, throw an exception, ignore it
@@ -292,7 +346,7 @@ public class FastaFormat implements SequenceFormat,
     public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent) {
         notifyParseErrorEvent(theEvent);
     }
-
+    
     // Protected methods
     /**
      * Passes the event on to all the listeners registered for ParseErrorEvents.
@@ -304,7 +358,7 @@ public class FastaFormat implements SequenceFormat,
         synchronized(this) {
             listeners = (Vector)mListeners.clone();
         }
-
+        
         for (int index = 0; index < listeners.size(); index++) {
             ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
             client.BadLineParsed(theEvent);
