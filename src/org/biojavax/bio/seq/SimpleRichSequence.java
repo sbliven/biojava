@@ -163,7 +163,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     }
     
     // Hibernate requirement - not for public use.
-    private String getAlphabetName() { return (this.symList==SymbolList.EMPTY_LIST?null:this.getAlphabetName()); }
+    private String getAlphabetName() { return (this.symList==SymbolList.EMPTY_LIST?null:this.symList.getAlphabet().getName()); }
     
     // Hibernate requirement - not for public use.
     private String seqstring;

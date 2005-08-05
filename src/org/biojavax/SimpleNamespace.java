@@ -137,7 +137,10 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     }
     
     // Hibernate requirement - not for public use.
-    private String getURIString() { return this.URI.toASCIIString(); }
+    private String getURIString() { 
+        if (this.URI==null) return null;
+        else return this.URI.toASCIIString(); 
+    }
     
     /**
      * {@inheritDoc}
