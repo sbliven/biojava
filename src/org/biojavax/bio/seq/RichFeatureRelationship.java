@@ -48,7 +48,7 @@ public interface RichFeatureRelationship extends Comparable,Changeable {
     
     public static final ChangeType RANK = new ChangeType(
             "This feature relationship's rank has changed",
-            "org.biojavax.bio.seq.RichSeqFeatRelationship",
+            "org.biojavax.bio.seq.RichFeatureRelationship",
             "RANK"
             );
     

@@ -55,12 +55,18 @@ public class RichObjectFactory {
         return contents.get(params);
     }
     
+    private static String defaultNamespaceName = "lcl";
+    private static String defaultOntologyName = "biojavax";
+    
+    public static void setDefaultNamespaceName(String name) { defaultNamespaceName = name; }
+    public static void setDefaultOntologyName(String name) { defaultOntologyName = name; }
+    
     public static Namespace getDefaultNamespace() {
-        return (Namespace)getObject(SimpleNamespace.class, new Object[]{"lcl"});
+        return (Namespace)getObject(SimpleNamespace.class, new Object[]{defaultNamespaceName});
     }
     
     public static ComparableOntology getDefaultOntology() {
-        return (ComparableOntology)getObject(SimpleComparableOntology.class, new Object[]{"biojavax"});
+        return (ComparableOntology)getObject(SimpleComparableOntology.class, new Object[]{defaultOntologyName});
     }
         
 }

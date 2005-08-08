@@ -33,9 +33,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import org.biojava.bio.Annotation;
-import org.biojava.ontology.AbstractTerm;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
+import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
@@ -50,7 +50,7 @@ import org.biojavax.RankedCrossRef;
  *
  * @author Richard Holland
  */
-public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm {
+public class SimpleComparableTerm extends AbstractChangeable implements ComparableTerm {
     
     private String name;
     private String description;
@@ -104,8 +104,8 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
         if (this.ontology==null) return false;
         // Normal comparison
         Term that = (Term) obj;
-        return this.ontology == that.getOntology() &&
-                this.name == that.getName();
+        return this.ontology.equals(that.getOntology()) &&
+                this.name.equals(that.getName());
     }
     
     /**
@@ -116,7 +116,7 @@ public class SimpleComparableTerm extends AbstractTerm implements ComparableTerm
         if (this.ontology==null) return -1;
         // Normal comparison
         ComparableTerm them = (ComparableTerm)o;
-        if (this.ontology.equals(them.getOntology())) return this.ontology.compareTo(them.getOntology());
+        if (!this.ontology.equals(them.getOntology())) return this.ontology.compareTo(them.getOntology());
         return this.name.compareTo(them.getName());
     }
     

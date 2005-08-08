@@ -95,7 +95,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     /**
      * {@inheritDoc}
      */
-    public Set getRankedCrossRefs() { return this.rankedcrossrefs; }
+    public Set getRankedCrossRefs() { return Collections.unmodifiableSet(this.rankedcrossrefs); }
     
     /**
      * {@inheritDoc}

@@ -28,7 +28,9 @@
 package org.biojavax.bio.db;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.biojavax.SimpleCrossRef;
 import org.biojavax.SimpleNamespace;
+import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.SimpleComparableOntology;
 
 /**
@@ -69,6 +71,10 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
             queryText = "from SimpleNamespace as ns where ns.name = ?";
         } else if (o instanceof SimpleComparableOntology) {
             queryText = "from SimpleComparableOntology as o where o.name = ?";
+        } else if (o instanceof SimpleNCBITaxon) {
+            queryText = "from SimpleNCBITaxon as o where o.NCBITaxID = ?";
+        } else if (o instanceof SimpleCrossRef) {
+            queryText = "from SimpleCrossRef as cr where cr.dbname = ? and cr.accession = ?";
         } else throw new IllegalArgumentException("Don't know how to handle objects of type "+clazz);
         try {
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});

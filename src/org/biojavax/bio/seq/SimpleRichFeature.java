@@ -98,6 +98,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         }
         
         if (templ.location instanceof RichLocation) {
+            this.location = new SimpleRichLocation(0,0,0);
             this.location.setBlocks(((RichLocation)templ.location).getBlocks());
         } else {
             Location u = templ.location;
@@ -584,6 +585,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         code = 31*code + this.parent.hashCode();
         code = 31*code + this.sourceTerm.hashCode();
         code = 31*code + this.typeTerm.hashCode();
+        code = 31*code + this.rank;
         return code;
     }
     
@@ -598,7 +600,8 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         RichFeature fo = (RichFeature) o;
         if (! this.parent.equals(fo.getParent())) return false;
         if (! this.typeTerm.equals(fo.getTypeTerm())) return false;
-        return this.sourceTerm.equals(fo.getSourceTerm());
+        if (! this.sourceTerm.equals(fo.getSourceTerm())) return false;
+        return fo.getRank()==this.getRank();
     }
     
     // Hibernate requirement - not for public use.

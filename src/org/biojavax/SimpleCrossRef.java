@@ -57,6 +57,9 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
         this.accession = accession;
         this.dbname = dbname;
         this.version = version;
+    }    
+    public SimpleCrossRef(String dbname, String accession) {
+        this(dbname,accession,0);
     }
     
     // Hibernate requirement - not for public use.
@@ -123,11 +126,11 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
         // Hibernate comparison - we haven't been populated yet
         if (this.dbname==null) return false;
         // Normal comparison
-            CrossRef them = (CrossRef)obj;
-            return (this.dbname.equals(them.getDbname()) &&
-                    this.accession.equals(them.getAccession()) &&
-                    this.version==them.getVersion()
-                    );
+        CrossRef them = (CrossRef)obj;
+        return (this.dbname.equals(them.getDbname()) &&
+                this.accession.equals(them.getAccession()) &&
+                this.version==them.getVersion()
+                );
     }
     
     /**

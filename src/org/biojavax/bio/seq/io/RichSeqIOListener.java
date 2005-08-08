@@ -28,8 +28,8 @@
 package org.biojavax.bio.seq.io;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
-import org.biojavax.CrossRef;
 import org.biojavax.Namespace;
+import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.seq.RichFeature;
@@ -213,7 +213,7 @@ public interface RichSeqIOListener extends SeqIOListener {
      * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
      * to deal with the event or is not expecting the event.
      */
-    public void setCrossRef(CrossRef crossRef) throws ParseException;
+    public void setRankedCrossRef(RankedCrossRef crossRef) throws ParseException;
     
     public RichFeature getCurrentFeature() throws ParseException;
 }

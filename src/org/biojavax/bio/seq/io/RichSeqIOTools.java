@@ -39,6 +39,7 @@ import org.biojava.bio.seq.db.IDMaker;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.io.AlignIOConstants;
 import org.biojava.bio.seq.io.FastaFormat;
+import org.biojava.bio.seq.io.GenbankFormat;
 import org.biojava.bio.seq.io.SeqIOConstants;
 import org.biojava.bio.seq.io.SeqIOTools;
 import org.biojava.bio.seq.io.StreamWriter;
@@ -198,6 +199,67 @@ public final class RichSeqIOTools {
         return db;
     }
     
+    public static RichSequenceIterator readGenbank(
+            BufferedReader br,
+            SymbolTokenization sTok,
+            RichSequenceBuilderFactory seqFactory) {
+        return new RichStreamReader(
+                br,
+                new GenbankFormat(),
+                sTok,
+                seqFactory);
+    }
+    
+    public static RichSequenceIterator readGenbankDNA(BufferedReader br) {
+        return new RichStreamReader(br,
+                new GenbankFormat(),
+                getDNAParser(),
+                getFactory());
+    }
+    
+    /**
+     * Iterate over the sequences in an FASTA-format stream of RNA sequences.
+     * @param br the BufferedReader to read data from
+     * @return a <CODE>SequenceIterator</CODE> that iterates over each
+     * <CODE>Sequence</CODE> in the file
+     */
+    public static RichSequenceIterator readGenbankRNA(BufferedReader br) {
+        return new RichStreamReader(br,
+                new GenbankFormat(),
+                getRNAParser(),
+                getFactory());
+    }
+    
+    public static RichSequenceIterator readGenbankProtein(BufferedReader br) {
+        return new RichStreamReader(br,
+                new GenbankFormat(),
+                getProteinParser(),
+                getFactory());
+    }
+    
+    public static SequenceDB readGenbank(InputStream seqFile, Alphabet alpha)
+    throws BioException {
+        HashSequenceDB db = new HashSequenceDB(IDMaker.byName);
+        RichSequenceBuilderFactory sbFact = getFactory();
+        GenbankFormat fFormat = new GenbankFormat();
+        for (RichSequenceIterator seqI = new RichStreamReader(seqFile,
+                fFormat,
+                alpha.getTokenization("token"),
+                sbFact);seqI.hasNext();) {
+            RichSequence seq = seqI.nextRichSequence();
+            try {
+                db.addSequence(seq);
+            } catch (ChangeVetoException cve) {
+                throw new AssertionFailure(
+                        "Could not successfully add sequence "
+                        + seq.getName()
+                        + " to sequence database",
+                        cve);
+            }
+        }
+        return db;
+    }
+    
     /**
      * Write a sequenceDB to an output stream in fasta format.
      * @since 1.2
@@ -237,6 +299,23 @@ public final class RichSeqIOTools {
     public static void writeFasta(OutputStream os, Sequence seq)
     throws IOException {
         writeFasta(os, new SingleSeqIterator(seq));
+    }
+    
+    public static void writeGenbank(OutputStream os, SequenceDB db)
+    throws IOException {
+        StreamWriter sw = new StreamWriter(os,new GenbankFormat());
+        sw.writeStream(db.sequenceIterator());
+    }
+    
+    public static void writeGenbank(OutputStream os, SequenceIterator in)
+    throws IOException {
+        StreamWriter sw = new StreamWriter(os,new GenbankFormat());
+        sw.writeStream(in);
+    }
+    
+    public static void writeGenbank(OutputStream os, Sequence seq)
+    throws IOException {
+        writeGenbank(os, new SingleSeqIterator(seq));
     }
     
     /**
@@ -436,6 +515,9 @@ public final class RichSeqIOTools {
                 return SeqIOTools.fileToBiojava(fileType, br);
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_AA:
+            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.GENPEPT:
+            case SeqIOConstants.REFSEQ:
                 return fileToSeq(fileType, br);
             default:
                 throw new BioException("Unknown file type '"
@@ -490,6 +572,9 @@ public final class RichSeqIOTools {
                 break;
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_AA:
+            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.GENPEPT:
+            case SeqIOConstants.REFSEQ:
                 if(biojava instanceof SequenceDB){
                     seqToFile(fileType, os, ((SequenceDB)biojava).sequenceIterator());
                 }else if(biojava instanceof Sequence){
@@ -552,6 +637,12 @@ public final class RichSeqIOTools {
                 return RichSeqIOTools.readFastaDNA(br);
             case SeqIOConstants.FASTA_AA:
                 return RichSeqIOTools.readFastaProtein(br);
+            case SeqIOConstants.GENBANK:
+                return RichSeqIOTools.readGenbankDNA(br);
+            case SeqIOConstants.GENPEPT:
+                return RichSeqIOTools.readGenbankProtein(br);
+            case SeqIOConstants.REFSEQ:
+                return RichSeqIOTools.readGenbankRNA(br);
             default:
                 throw new BioException("Unknown file type '"
                         + fileType
@@ -569,6 +660,11 @@ public final class RichSeqIOTools {
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_AA:
                 RichSeqIOTools.writeFasta(os, seq);
+                break;
+            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.GENPEPT:
+            case SeqIOConstants.REFSEQ:
+                RichSeqIOTools.writeGenbank(os, seq);
                 break;
             default:
                 throw new BioException("Unknown file type '"

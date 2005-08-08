@@ -61,6 +61,10 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
         this.NCBITaxID = NCBITaxID;
     }
     
+    public SimpleNCBITaxon(Integer NCBITaxID) {
+        this.NCBITaxID = NCBITaxID.intValue();
+    }
+    
     // Hibernate requirement - not for public use.
     protected SimpleNCBITaxon() {}
     

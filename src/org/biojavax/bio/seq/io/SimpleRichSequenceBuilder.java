@@ -47,13 +47,14 @@ import org.biojava.bio.symbol.SimpleSymbolListFactory;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
-import org.biojavax.CrossRef;
 import org.biojavax.Namespace;
 import org.biojavax.RankedDocRef;
 import org.biojavax.RichAnnotation;
-import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.Comment;
+import org.biojavax.Note;
+import org.biojavax.RankedCrossRef;
+import org.biojavax.SimpleNote;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichFeatureRelationship;
@@ -62,6 +63,7 @@ import org.biojavax.bio.seq.SimpleRichFeature;
 import org.biojavax.bio.seq.SimpleRichFeatureRelationship;
 import org.biojavax.bio.seq.SimpleRichSequence;
 import org.biojavax.bio.taxa.NCBITaxon;
+import org.biojavax.ontology.ComparableTerm;
 
 
 /**
@@ -203,9 +205,9 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
     /**
      * {@inheritDoc}
      */
-    public void setCrossRef(CrossRef crossRef) throws ParseException {
-        if (crossRef==null) throw new ParseException("Name cannot be null");
-        this.crossRefs.add(new SimpleRankedCrossRef(crossRef,0));
+    public void setRankedCrossRef(RankedCrossRef ref) throws ParseException {
+        if (ref==null) throw new ParseException("Reference cannot be null");
+        this.crossRefs.add(ref);
     }
     private Set crossRefs = new HashSet();
     
@@ -243,6 +245,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
     public void startFeature(Feature.Template templ) throws ParseException {
         try {
             RichFeature f = new SimpleRichFeature(featureHolder,templ);
+            f.setRank(this.featureRank++);
             this.allFeatures.add(f);
             if (this.featureStack.size() == 0) this.rootFeatures.add(f);
             else {
@@ -307,25 +310,33 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      * {@inheritDoc}
      */
     public void addFeatureProperty(Object key, Object value) throws ParseException {
+        if (!(key instanceof ComparableTerm)) throw new IllegalArgumentException("Key has to be a ComparableTerm");
+        if (!(value instanceof String)) throw new IllegalArgumentException("Value has to be a String");
         if (this.featureStack.size() == 0) throw new ParseException("Assertion failed: Not within a feature");
-        RichFeature top = (RichFeature) this.featureStack.get(this.featureStack.size() - 1);
+        RichFeature f = this.getCurrentFeature();
         try {
-            ((RichAnnotation)top.getAnnotation()).setProperty(key, value);
+            Note n = new SimpleNote((ComparableTerm)key,(String)value,this.featPropCount++);
+            ((RichAnnotation)f.getAnnotation()).addNote(n);
         } catch (ChangeVetoException e) {
-            throw new ParseException(e); // Simple conversion
+            throw new ParseException(e);
         }
     }
+    int featPropCount = 0;
     
     /**
      * {@inheritDoc}
      */
     public void addSequenceProperty(Object key, Object value) throws ParseException {
+        if (!(key instanceof ComparableTerm)) throw new IllegalArgumentException("Key has to be a ComparableTerm");
+        if (!(value instanceof String)) throw new IllegalArgumentException("Value has to be a String");
         try {
-            this.notes.setProperty(key,value);
+            Note n = new SimpleNote((ComparableTerm)key,(String)value,this.seqPropCount++);
+            this.notes.addNote(n);
         } catch (ChangeVetoException e) {
             throw new ParseException(e);
         }
     }
+    int seqPropCount = 0;
     
     /**
      * {@inheritDoc}
@@ -366,10 +377,10 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
             rs.setDivision(this.division);
             rs.setIdentifier(this.identifier);
             rs.setTaxon(this.taxon);
-            for (Iterator i = this.crossRefs.iterator(); i.hasNext(); ) rs.getRankedCrossRefs().add((CrossRef)i.next());
-            for (Iterator i = this.relations.iterator(); i.hasNext(); ) rs.getRelationships().add((BioEntryRelationship)i.next());
-            for (Iterator i = this.references.iterator(); i.hasNext(); ) rs.getRankedDocRefs().add((RankedDocRef)i.next());
-            for (Iterator i = this.comments.iterator(); i.hasNext(); ) rs.getComments().add((Comment)i.next());
+            for (Iterator i = this.crossRefs.iterator(); i.hasNext(); ) rs.addRankedCrossRef((RankedCrossRef)i.next());
+            for (Iterator i = this.relations.iterator(); i.hasNext(); ) rs.addRelationship((BioEntryRelationship)i.next());
+            for (Iterator i = this.references.iterator(); i.hasNext(); ) rs.addRankedDocRef((RankedDocRef)i.next());
+            for (Iterator i = this.comments.iterator(); i.hasNext(); ) rs.addComment((Comment)i.next());
             // set annotations
             rs.setNoteSet(this.notes.getNoteSet());
         } catch (Exception e) {
