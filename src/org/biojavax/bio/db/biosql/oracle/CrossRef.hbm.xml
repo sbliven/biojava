@@ -26,7 +26,7 @@
         <set name="noteSet" table="DBXREF_QUALIFIER_VALUE" lazy="false">
             <key column="DBXREF_ID"/>
             <composite-element class="org.biojavax.SimpleNote">
-                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm">
+                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
                     <column name="TERM_ID" not-null="true"/>
                 </many-to-one>
                 <property name="value">

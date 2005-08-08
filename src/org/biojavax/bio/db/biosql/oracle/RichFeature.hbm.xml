@@ -14,13 +14,13 @@
             </generator>
         </id>
 
-        <many-to-one name="parent" class="org.biojavax.bio.seq.SimpleRichSequence">
+        <many-to-one name="parent" class="org.biojavax.bio.seq.SimpleRichSequence" cascade="all">
             <column name="BIOENTRY_ID" not-null="true"/>
         </many-to-one>
-        <many-to-one name="sourceTerm" class="org.biojavax.ontology.SimpleComparableTerm">
+        <many-to-one name="sourceTerm" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
             <column name="SOURCE_TERM_ID" not-null="true"/>
         </many-to-one>
-        <many-to-one name="typeTerm" class="org.biojavax.ontology.SimpleComparableTerm">
+        <many-to-one name="typeTerm" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
             <column name="TYPE_TERM_ID" not-null="true"/>
         </many-to-one>
         <property name="name">
@@ -29,14 +29,14 @@
         <property name="rank">
             <column name="RANK" sql-type="integer" length="9" not-null="true"/>
         </property>
-        <set name="locationSet" lazy="false">
+        <set name="locationSet" lazy="false" cascade="all">
             <key column="SEQFEATURE_ID"/>
             <one-to-many class="org.biojavax.bio.seq.SimpleRichLocation"/>
         </set>
         <set name="noteSet" table="SEQFEATURE_QUALIFIER_VALUE" lazy="false">
             <key column="SEQFEATURE_ID"/>
             <composite-element class="org.biojavax.SimpleNote">
-                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm">
+                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
                     <column name="TERM_ID" not-null="true"/>
                 </many-to-one>
                 <property name="value">
@@ -50,7 +50,7 @@
         <set name="rankedCrossRefs" table="SEQFEATURE_DBXREF" lazy="false">
             <key column="SEQFEATURE_ID"/>
             <composite-element class="org.biojavax.SimpleRankedCrossRef">
-                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef">
+                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="all">
                     <column name="DBXREF_ID" not-null="true"/>
                 </many-to-one>   
                 <property name="rank">
@@ -58,7 +58,7 @@
                 </property>  
             </composite-element>
         </set>
-        <set name="featureRelationshipSet" lazy="false">
+        <set name="featureRelationshipSet" lazy="false" cascade="all">
             <key column="OBJECT_SEQFEATURE_ID"/>
             <one-to-many class="org.biojavax.bio.seq.SimpleRichFeatureRelationship"/>
         </set>

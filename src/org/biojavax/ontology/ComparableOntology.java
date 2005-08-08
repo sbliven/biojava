@@ -95,5 +95,7 @@ public interface ComparableOntology extends Ontology,Comparable,Changeable {
      * @return the set of triples.
      */
     public Set getTripleSet();
+    
+    public ComparableTerm getOrCreateTerm(String name);
 }
 

@@ -14,10 +14,10 @@
             </generator>
         </id>
         
-        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm">
+        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
             <column name="TERM_ID" not-null="false"/>
         </many-to-one>
-        <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef">
+        <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="all">
             <column name="DBXREF_ID" not-null="false"/>
         </many-to-one>
         <property name="rank">
@@ -35,7 +35,7 @@
         <set name="noteSet" table="LOCATION_QUALIFIER_VALUE" lazy="false">
             <key column="LOCATION_ID"/>
             <composite-element class="org.biojavax.SimpleNote">
-                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm">
+                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
                     <column name="TERM_ID" not-null="true"/>
                 </many-to-one>
                 <property name="value">

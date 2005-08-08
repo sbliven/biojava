@@ -25,7 +25,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
@@ -39,14 +38,9 @@ import org.biojava.bio.seq.db.HashSequenceDB;
 import org.biojava.bio.seq.db.IDMaker;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.io.AlignIOConstants;
-import org.biojava.bio.seq.io.EmblLikeFormat;
 import org.biojava.bio.seq.io.FastaFormat;
-import org.biojava.bio.seq.io.GenbankFormat;
-import org.biojava.bio.seq.io.GenbankXmlFormat;
-import org.biojava.bio.seq.io.GenpeptFormat;
 import org.biojava.bio.seq.io.SeqIOConstants;
 import org.biojava.bio.seq.io.SeqIOTools;
-import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.StreamWriter;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
@@ -83,105 +77,13 @@ public final class RichSeqIOTools {
      * files.
      * @return a <CODE>SmartSequenceBuilder.FACTORY</CODE>
      */
-    public static RichSequenceBuilderFactory getFactory() {
+    private static RichSequenceBuilderFactory getFactory() {
         if (_factory == null) {
             _factory = new SimpleRichSequenceBuilderFactory();
         }
         return _factory;
     }
     
-    /**
-     * Iterate over the sequences in an EMBL-format stream.
-     * @param br A reader for the EMBL source or file
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
-     */
-    public static RichSequenceIterator readEmbl(BufferedReader br) {
-        return new RichStreamReader(br,
-                new EmblLikeFormat(),
-                getDNAParser(),
-                getFactory());
-    }
-    
-    /**
-     * Iterate over the sequences in an EMBL-format stream, but for RNA.
-     * @param br A reader for the EMBL source or file
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
-     */
-    public static RichSequenceIterator readEmblRNA(BufferedReader br) {
-        return new RichStreamReader(br,
-                new EmblLikeFormat(),
-                getRNAParser(),
-                getFactory());
-    }
-    
-    /**
-     * Iterate over the sequences in an EMBL-format stream.
-     * @param br A reader for the EMBL source or file
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
-     */
-    public static RichSequenceIterator readEmblNucleotide(BufferedReader br) {
-        return new RichStreamReader(br,
-                new EmblLikeFormat(),
-                getNucleotideParser(),
-                getFactory());
-    }
-    
-    
-    /**
-     * Iterate over the sequences in an Genbank-format stream.
-     * @param br A reader for the Genbank source or file
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
-     */
-    public static RichSequenceIterator readGenbank(BufferedReader br) {
-        return new RichStreamReader(br,
-                new GenbankFormat(),
-                getDNAParser(),
-                getFactory());
-    }
-    
-    /**
-     * Iterate over the sequences in an GenbankXML-format stream.
-     * @param br A reader for the GenbanXML source or file
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
-     */
-    public static RichSequenceIterator readGenbankXml( BufferedReader br ) {
-        return new RichStreamReader( br,
-                new GenbankXmlFormat(),
-                getDNAParser(),
-                getFactory() );
-    }
-    
-    /**
-     * Iterate over the sequences in an Genpept-format stream.
-     * @param br A reader for the Genpept source or file
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
-     */
-    public static RichSequenceIterator readGenpept(BufferedReader br) {
-        return new RichStreamReader(br,
-                new GenbankFormat(),
-                getProteinParser(),
-                getFactory());
-    }
-    
-    /**
-     * Iterate over the sequences in an Swissprot-format stream.
-     * @param br A reader for the Swissprot source or file
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
-     */
-    public static RichSequenceIterator readSwissprot(BufferedReader br) {
-        return new RichStreamReader(br,
-                new EmblLikeFormat(),
-                getProteinParser(),
-                getFactory());
-    }
-        
     /**
      * Read a fasta file.
      *
@@ -335,115 +237,6 @@ public final class RichSeqIOTools {
     public static void writeFasta(OutputStream os, Sequence seq)
     throws IOException {
         writeFasta(os, new SingleSeqIterator(seq));
-    }
-    
-    /**
-     * Writes a stream of Sequences to an OutputStream in EMBL format.
-     *
-     * @param os the OutputStream.
-     * @param in a SequenceIterator.
-     * @exception IOException if there was an error while writing.
-     */
-    public static void writeEmbl(OutputStream os, SequenceIterator in)
-    throws IOException {
-        StreamWriter sw = new StreamWriter(os, new EmblLikeFormat());
-        sw.writeStream(in);
-    }
-    
-    /**
-     * Writes a single Sequence to an OutputStream in EMBL format.
-     *
-     * @param os  the OutputStream.
-     * @param seq  the Sequence.
-     * @throws IOException if there was an error while writing.
-     */
-    public static void writeEmbl(OutputStream os, Sequence seq) throws IOException {
-        writeEmbl(os, new SingleSeqIterator(seq));
-    }
-    
-    /**
-     * Writes a stream of Sequences to an OutputStream in SwissProt
-     * format.
-     * @param os the OutputStream.
-     * @param in a SequenceIterator.
-     * @throws org.biojava.bio.BioException if the <CODE>Sequence</CODE> cannot be converted to SwissProt
-     * format
-     * @exception IOException if there was an error while writing.
-     */
-    public static void writeSwissprot(OutputStream os, SequenceIterator in)
-    throws IOException, BioException {
-        SequenceFormat former = new EmblLikeFormat();
-        PrintStream ps = new PrintStream(os);
-        while (in.hasNext()) {
-            former.writeSequence(in.nextSequence(), ps);
-        }
-    }
-    
-    /**
-     * Writes a single Sequence to an OutputStream in SwissProt format.
-     * @param os the OutputStream.
-     * @param seq the Sequence.
-     * @throws org.biojava.bio.BioException if the <CODE>Sequence</CODE> cannot be written to SwissProt format
-     * @throws IOException if there was an error while writing.
-     */
-    public static void writeSwissprot(OutputStream os, Sequence seq)
-    throws IOException, BioException {
-        writeSwissprot(os, new SingleSeqIterator(seq));
-    }
-    
-    /**
-     * Writes a stream of Sequences to an OutputStream in Genpept
-     * format.
-     * @param os the OutputStream.
-     * @param in a SequenceIterator.
-     * @throws org.biojava.bio.BioException if the <CODE>Sequence</CODE> cannot be written to Genpept format
-     * @exception IOException if there was an error while writing.
-     */
-    public static void writeGenpept(OutputStream os, SequenceIterator in)
-    throws IOException, BioException {
-        SequenceFormat former = new GenpeptFormat();
-        PrintStream ps = new PrintStream(os);
-        while (in.hasNext()) {
-            former.writeSequence(in.nextSequence(), ps);
-        }
-    }
-    
-    /**
-     * Writes a single Sequence to an OutputStream in Genpept format.
-     * @param os the OutputStream.
-     * @param seq the Sequence.
-     * @throws org.biojava.bio.BioException if the <CODE>Sequence</CODE> cannot be written to Genpept format
-     * @throws IOException if there was an error while writing.
-     */
-    public static void writeGenpept(OutputStream os, Sequence seq)
-    throws IOException, BioException {
-        writeGenpept(os, new SingleSeqIterator(seq));
-    }
-    
-    /**
-     * Writes a stream of Sequences to an OutputStream in Genbank
-     * format.
-     *
-     * @param os the OutputStream.
-     * @param in a SequenceIterator.
-     * @exception IOException if there was an error while writing.
-     */
-    public static void writeGenbank(OutputStream os, SequenceIterator in)
-    throws IOException {
-        StreamWriter sw = new StreamWriter(os, new GenbankFormat());
-        sw.writeStream(in);
-    }
-    
-    /**
-     * Writes a single Sequence to an OutputStream in Genbank format.
-     *
-     * @param os  the OutputStream.
-     * @param seq  the Sequence.
-     * @throws IOException if there was an error while writing.
-     */
-    public static void writeGenbank(OutputStream os, Sequence seq)
-    throws IOException {
-        writeGenbank(os, new SingleSeqIterator(seq));
     }
     
     /**
@@ -643,10 +436,6 @@ public final class RichSeqIOTools {
                 return SeqIOTools.fileToBiojava(fileType, br);
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_AA:
-            case SeqIOConstants.EMBL_DNA:
-            case SeqIOConstants.GENBANK_DNA:
-            case SeqIOConstants.SWISSPROT:
-            case SeqIOConstants.GENPEPT:
                 return fileToSeq(fileType, br);
             default:
                 throw new BioException("Unknown file type '"
@@ -701,10 +490,6 @@ public final class RichSeqIOTools {
                 break;
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_AA:
-            case SeqIOConstants.EMBL_DNA:
-            case SeqIOConstants.GENBANK_DNA:
-            case SeqIOConstants.SWISSPROT:
-            case SeqIOConstants.GENPEPT:
                 if(biojava instanceof SequenceDB){
                     seqToFile(fileType, os, ((SequenceDB)biojava).sequenceIterator());
                 }else if(biojava instanceof Sequence){
@@ -767,14 +552,6 @@ public final class RichSeqIOTools {
                 return RichSeqIOTools.readFastaDNA(br);
             case SeqIOConstants.FASTA_AA:
                 return RichSeqIOTools.readFastaProtein(br);
-            case SeqIOConstants.EMBL_DNA:
-                return RichSeqIOTools.readEmbl(br);
-            case SeqIOConstants.GENBANK_DNA:
-                return RichSeqIOTools.readGenbank(br);
-            case SeqIOConstants.SWISSPROT:
-                return RichSeqIOTools.readSwissprot(br);
-            case SeqIOConstants.GENPEPT:
-                return RichSeqIOTools.readGenpept(br);
             default:
                 throw new BioException("Unknown file type '"
                         + fileType
@@ -792,18 +569,6 @@ public final class RichSeqIOTools {
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_AA:
                 RichSeqIOTools.writeFasta(os, seq);
-                break;
-            case SeqIOConstants.EMBL_DNA:
-                RichSeqIOTools.writeEmbl(os, seq);
-                break;
-            case SeqIOConstants.SWISSPROT:
-                RichSeqIOTools.writeSwissprot(os, seq);
-                break;
-            case SeqIOConstants.GENBANK_DNA:
-                RichSeqIOTools.writeGenbank(os, seq);
-                break;
-            case SeqIOConstants.GENPEPT:
-                RichSeqIOTools.writeGenpept(os, seq);
                 break;
             default:
                 throw new BioException("Unknown file type '"

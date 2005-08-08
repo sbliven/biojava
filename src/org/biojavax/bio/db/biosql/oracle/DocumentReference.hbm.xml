@@ -26,7 +26,7 @@
         <property name="CRC">
             <column name="CRC" sql-type="string" length="32" not-null="false"/>
         </property>
-        <many-to-one name="crossref" class="org.biojavax.SimpleCrossRef">
+        <many-to-one name="crossref" class="org.biojavax.SimpleCrossRef" cascade="all">
             <column name="DBXREF_ID" not-null="false"/>
         </many-to-one>
         

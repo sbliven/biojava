@@ -14,19 +14,19 @@
             </generator>
         </id>
 
-        <many-to-one name="subject" class="org.biojavax.ontology.SimpleComparableTerm">
+        <many-to-one name="subject" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
             <column name="SUBJECT_TERM_ID" not-null="true"/>
         </many-to-one>    
-        <many-to-one name="object" class="org.biojavax.ontology.SimpleComparableTerm">
+        <many-to-one name="object" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
             <column name="OBJECT_TERM_ID" not-null="true"/>
         </many-to-one>    
-        <many-to-one name="predicate" class="org.biojavax.ontology.SimpleComparableTerm">
+        <many-to-one name="predicate" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
             <column name="PREDICATE_TERM_ID" not-null="true"/>
         </many-to-one>       
-        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology">
+        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="all">
             <column name="ONTOLOGY_ID" not-null="true"/>
         </many-to-one>   
-        <set name="descriptors" table="TERM_RELATIONSHIP_TERM" lazy="false">
+        <set name="descriptors" table="TERM_RELATIONSHIP_TERM" lazy="false" cascade="all">
             <key column="TERM_RELATIONSHIP_ID"/>
             <many-to-many class="org.biojavax.ontology.SimpleComparableTerm">
                 <column name="TERM_ID" not-null="true"/>

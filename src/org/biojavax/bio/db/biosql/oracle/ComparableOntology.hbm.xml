@@ -20,11 +20,11 @@
         <property name="description">
             <column name="DEFINITION" sql-type="string" length="4000" not-null="false"/>
         </property>
-        <set name="termSet" lazy="false" inverse="true">
+        <set name="termSet" lazy="false" inverse="true" cascade="all">
             <key column="ONTOLOGY_ID"/>
             <one-to-many class="org.biojavax.ontology.SimpleComparableTerm"/>
         </set>
-        <set name="tripleSet" lazy="false" inverse="true">
+        <set name="tripleSet" lazy="false" inverse="true" cascade="all">
             <key column="ONTOLOGY_ID"/>
             <one-to-many class="org.biojavax.ontology.SimpleComparableTriple"/>
         </set>

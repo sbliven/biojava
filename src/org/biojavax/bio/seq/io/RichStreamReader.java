@@ -58,20 +58,8 @@ import org.biojavax.bio.seq.RichSequenceIterator;
 
 public class RichStreamReader extends StreamReader implements RichSequenceIterator {
     
-    /**
-     * @{inheritDoc}
-     */
-    public Sequence nextSequence()
-    throws NoSuchElementException, BioException {
-        return super.nextSequence();
-    }
-    public RichSequence nextRichSequence()
-    throws NoSuchElementException, BioException {
+    public RichSequence nextRichSequence() throws NoSuchElementException, BioException {
         return (RichSequence)this.nextSequence();
-    }
-    
-    public boolean hasNext() {
-        return super.hasNext();
     }
     
     public RichStreamReader(InputStream is,
@@ -86,12 +74,5 @@ public class RichStreamReader extends StreamReader implements RichSequenceIterat
             SymbolTokenization symParser,
             RichSequenceBuilderFactory sf)  {
         super(reader,format,symParser,sf);
-    }
-    
-    /**
-     * @{inheritDoc}
-     */
-    public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent) {
-        super.BadLineParsed(theEvent);
     }
 }

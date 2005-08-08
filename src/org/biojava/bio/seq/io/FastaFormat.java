@@ -34,7 +34,9 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.utils.ParseErrorEvent;
 import org.biojava.utils.ParseErrorListener;
-import org.biojavax.bio.db.BioDBUtils;
+import org.biojavax.Namespace;
+import org.biojavax.SimpleNamespace;
+import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.io.RichSeqIOListener;
 
@@ -105,7 +107,7 @@ public class FastaFormat implements SequenceFormat,
             )	throws
             IllegalSymbolException,
             IOException,
-            ParseException {
+            ParseException {        
         String line = reader.readLine();
         if (line == null) {
             throw new IOException("Premature stream end");
@@ -137,23 +139,24 @@ public class FastaFormat implements SequenceFormat,
         if (siol instanceof RichSeqIOListener) {
             RichSeqIOListener rsiol = (RichSeqIOListener)siol;
             
-            regex = "^gi\\|(\\d+)\\|(\\S+)\\|(\\S+)\\.(\\d+)\\|(\\S+)$";
+            boolean hasGI = name.startsWith("gi");
+            regex = "^(gi\\|(\\d+)\\|)*(\\S+)\\|(\\S+?)(\\.(\\d+))*\\|(\\S+)$";
             p = Pattern.compile(regex);
             m = p.matcher(name);
             if (m.matches()) {
-                String gi = m.group(1);
-                String namespace = m.group(2);
-                String accession = m.group(3);
-                int version = Integer.parseInt(m.group(4));
-                name = m.group(5);
+                String namespace = m.group(3);
+                String accession = m.group(4);
+                String verString = m.group(6);
+                int version = verString==null?0:Integer.parseInt(verString);
+                name = m.group(7);
                 
                 rsiol.setAccession(accession);
                 rsiol.setVersion(version);
-                rsiol.setIdentifier(gi);
-                rsiol.setNamespace(BioDBUtils.getNamespace(namespace));
+                if (hasGI) rsiol.setIdentifier(m.group(2));
+                rsiol.setNamespace((Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{namespace}));
             } else {
                 rsiol.setAccession(name);
-                rsiol.setNamespace(BioDBUtils.DEFAULT_NAMESPACE);
+                rsiol.setNamespace(RichObjectFactory.getDefaultNamespace());
             }
             rsiol.setName(name);
             rsiol.setDescription(desc);
