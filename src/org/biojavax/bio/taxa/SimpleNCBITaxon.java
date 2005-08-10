@@ -26,8 +26,8 @@
  */
 
 package org.biojavax.bio.taxa;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -44,7 +44,7 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     
-    private Map names = new HashMap();
+    private Map names = new TreeMap();
     private Integer parent;
     private int NCBITaxID;
     private String nodeRank;
@@ -104,7 +104,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
      */
     public Set getNames(String nameClass) throws IllegalArgumentException {
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
-        Set n = new HashSet();
+        Set n = new TreeSet();
         for (Iterator j = ((Set)this.names.get(nameClass)).iterator(); j.hasNext(); ) {
             SimpleNCBITaxonName name = (SimpleNCBITaxonName)j.next();
             n.add(name.getName());
@@ -114,7 +114,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     
     // Hibernate requirement - not for public use.
     private Set getNameSet() {
-        Set n = new HashSet();
+        Set n = new TreeSet();
         for (Iterator i = this.names.values().iterator(); i.hasNext(); ) n.addAll((Set)i.next());
         return n;
     }
@@ -142,7 +142,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
         SimpleNCBITaxonName n = new SimpleNCBITaxonName(nameClass, name);
         if(!this.hasListeners(NCBITaxon.NAMES)) {
-            if (!this.names.containsKey(nameClass)) this.names.put(nameClass,new HashSet());
+            if (!this.names.containsKey(nameClass)) this.names.put(nameClass,new TreeSet());
             ((Set)this.names.get(nameClass)).add(n);
         } else {
             ChangeEvent ce = new ChangeEvent(
@@ -154,7 +154,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.NAMES);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                if (!this.names.containsKey(nameClass)) this.names.put(nameClass,new HashSet());
+                if (!this.names.containsKey(nameClass)) this.names.put(nameClass,new TreeSet());
                 ((Set)this.names.get(nameClass)).add(n);
                 cs.firePostChangeEvent(ce);
             }

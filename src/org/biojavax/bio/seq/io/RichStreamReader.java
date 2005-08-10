@@ -27,8 +27,6 @@ import java.io.InputStream;
 import java.util.NoSuchElementException;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.StreamReader;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojavax.bio.seq.RichSequence;
@@ -63,14 +61,14 @@ public class RichStreamReader extends StreamReader implements RichSequenceIterat
     }
     
     public RichStreamReader(InputStream is,
-            SequenceFormat format,
+            RichSequenceFormat format,
             SymbolTokenization symParser,
             RichSequenceBuilderFactory sf)  {
         super(is,format,symParser,sf);
     }
     
     public RichStreamReader(BufferedReader reader,
-            SequenceFormat format,
+            RichSequenceFormat format,
             SymbolTokenization symParser,
             RichSequenceBuilderFactory sf)  {
         super(reader,format,symParser,sf);

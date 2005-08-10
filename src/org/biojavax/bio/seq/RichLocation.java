@@ -25,7 +25,6 @@
  * Created on July 28, 2005, 5:29 PM
  */
 package org.biojavax.bio.seq;
-import java.util.Set;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.ChangeType;
@@ -142,18 +141,5 @@ public interface RichLocation extends Location,RichAnnotatable {
      * @throws ChangeVetoException in case of error.
      */
     public void setMax(int max) throws ChangeVetoException;
-    
-    /**
-     * Retrieves the blocks associated with this location.
-     * @return the blocks.
-     */
-    public Set getBlocks();
-    
-    /**
-     * Sets the blocks for this location.
-     * @param blocks the blocks this location should adopt.
-     * @throws ChangeVetoException in case of error.
-     */
-    public void setBlocks(Set blocks) throws ChangeVetoException;
     
 }

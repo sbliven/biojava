@@ -28,9 +28,9 @@
 package org.biojavax.ontology;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 import org.biojava.bio.Annotation;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
@@ -53,7 +53,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     private ComparableTerm object;
     private ComparableTerm subject;
     private ComparableTerm predicate;
-    private Set descriptors = new HashSet();
+    private Set descriptors = new TreeSet();
     
     /**
      * Creates a new instance of SimpleComparableTriple.

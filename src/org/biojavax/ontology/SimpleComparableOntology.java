@@ -28,12 +28,12 @@
 package org.biojavax.ontology;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.ontology.DefaultOps;
 import org.biojava.ontology.OntologyOps;
@@ -55,8 +55,8 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     
     private String name;
     private String description;
-    private Map terms = new HashMap();
-    private Set triples = new HashSet();
+    private Map terms = new TreeMap();
+    private Set triples = new TreeSet();
     private OntologyOps ops;
     
     
@@ -286,7 +286,7 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      * {@inheritDoc}
      */
     public Set getTriples(Term subject, Term object, Term predicate) {
-        Set results = new HashSet();
+        Set results = new TreeSet();
         for (Iterator i = this.triples.iterator(); i.hasNext();) {
             ComparableTriple ct = (ComparableTriple)i.next();
             if ((subject==null || ct.getSubject().equals(subject)) &&
@@ -318,7 +318,7 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     /**
      * {@inheritDoc}
      */
-    public Set getTerms() { return new HashSet(this.terms.values()); }
+    public Set getTerms() { return new TreeSet(this.terms.values()); }
     
     /**
      * {@inheritDoc}

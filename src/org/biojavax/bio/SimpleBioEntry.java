@@ -28,7 +28,7 @@
 package org.biojavax.bio;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.utils.AbstractChangeable;
@@ -52,10 +52,10 @@ import org.biojavax.Comment;
  */
 public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     
-    private Set comments = new HashSet();
-    private Set rankedcrossrefs = new HashSet();
-    private Set rankeddocrefs = new HashSet();
-    private Set relationships = new HashSet();
+    private Set comments = new TreeSet();
+    private Set rankedcrossrefs = new TreeSet();
+    private Set rankeddocrefs = new TreeSet();
+    private Set relationships = new TreeSet();
     private String description;
     private String division;
     private String identifier;

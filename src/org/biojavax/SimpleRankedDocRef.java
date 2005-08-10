@@ -109,8 +109,8 @@ public class SimpleRankedDocRef implements RankedDocRef {
         if (this.docref==null) return -1;
         // Normal comparison
         RankedDocRef them = (RankedDocRef)o;
-        if (!this.docref.equals(them.getDocumentReference())) return this.docref.compareTo(them.getDocumentReference());
-        return this.rank-them.getRank();
+        if (this.rank!=them.getRank()) return this.rank - them.getRank();
+        return this.docref.compareTo(them.getDocumentReference());
     }
     
     /**

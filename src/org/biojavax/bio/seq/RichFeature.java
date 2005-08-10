@@ -111,20 +111,7 @@ public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,
      * @throws ChangeVetoException if the new value is unacceptable.
      */
     public void setRank(int rank) throws ChangeVetoException;
-    
-    /**
-     * Returns the set of locations belonging to this feature.
-     * @return the set of locations.
-     */
-    public Set getLocationSet();
-    
-    /**
-     * Sets the set of locations of this feature.
-     * @param locations the set of locations the feature should associate itself with.
-     * @throws ChangeVetoException if the new value is unacceptable.
-     */
-    public void setLocationSet(Set locations) throws ChangeVetoException;
-    
+        
     /**
      * Added-value extension including bits we're interested in.
      */

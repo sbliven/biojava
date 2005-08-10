@@ -27,7 +27,7 @@
 
 package org.biojavax;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -66,7 +66,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
      * {@inheritDoc}
      */
     public Map asMap() {
-        Map m = new HashMap();
+        Map m = new TreeMap();
         for (Iterator i = this.notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             m.put(n.getTerm(), n.getValue());

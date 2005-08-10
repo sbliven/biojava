@@ -28,9 +28,9 @@
 package org.biojavax.bio.seq;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
@@ -66,9 +66,9 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     private ComparableTerm typeTerm;
     private ComparableTerm sourceTerm;
     private FeatureHolder parent;
-    private RichLocation location;
-    private Set crossrefs = new HashSet();
-    private Set relations = new HashSet();
+    private Location location;
+    private Set crossrefs = new TreeSet();
+    private Set relations = new TreeSet();
     private String name;
     private int rank;
     
@@ -86,6 +86,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         this.parent = parent;
         this.typeTerm = (ComparableTerm)templ.typeTerm;
         this.sourceTerm = (ComparableTerm)templ.sourceTerm;
+        this.location = templ.location;
         
         if (templ.annotation instanceof RichAnnotation) {
             this.notes.setNoteSet(((RichAnnotation)templ.annotation).getNoteSet());
@@ -96,24 +97,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
                 this.notes.setProperty(i.next(), templ.annotation.getProperty(key));
             }
         }
-        
-        if (templ.location instanceof RichLocation) {
-            this.location = new SimpleRichLocation(0,0,0);
-            this.location.setBlocks(((RichLocation)templ.location).getBlocks());
-        } else {
-            Location u = templ.location;
-            int counter = 0;
-            RichLocation r = new SimpleRichLocation(0,0,counter++);
-            Set blocks = new HashSet();
-            for (Iterator i = u.blockIterator(); i.hasNext(); ) {
-                Location b = (Location)i.next();
-                if (b instanceof RichLocation) blocks.add(b);
-                else blocks.add(new SimpleRichLocation(b.getMin(), b.getMax(),counter++));
-            }
-            r.setBlocks(blocks);
-            this.location = r;
-        }
-        
+                
         if (templ instanceof RichFeature.Template) {
             this.setRankedCrossRefs(((RichFeature.Template)templ).rankedCrossRefs);
             this.setFeatureRelationshipSet(((RichFeature.Template)templ).featureRelationshipSet);
@@ -154,17 +138,21 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
     
-    /**
-     * {@inheritDoc}
-     */
-    public Set getLocationSet() { return this.location.getBlocks(); }
+    // Hibernate use only
+    private Set getLocationSet() { 
+        Set locs = new TreeSet();
+        for (Iterator i = this.location.blockIterator(); i.hasNext(); ) locs.add(i.next());
+        return locs;
+    }
     
-    /**
-     * {@inheritDoc}
-     */
-    public void setLocationSet(Set locs) throws ChangeVetoException {
-        this.location = new SimpleRichLocation(0,0,0);
-        this.location.setBlocks(locs);
+    // Hibernate use only
+    private void setLocationSet(Set locs) throws ChangeVetoException {
+        boolean first = true;
+        for (Iterator i = locs.iterator(); i.hasNext(); ) {
+            RichLocation l = (RichLocation)i.next();
+            if (first) this.location = l;
+            else this.location = this.location.union(l);
+        }
     }
     
     /**
@@ -323,9 +311,9 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setLocation(Location loc) throws ChangeVetoException {
         if (loc==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(loc instanceof RichLocation)) throw new IllegalArgumentException("Location must be a RichLocation");
+        if (!(loc instanceof RichLocation)) throw new IllegalArgumentException("We only accept RichLocation objects here");
         if(!this.hasListeners(RichFeature.LOCATION)) {
-            this.location = (RichLocation)loc;
+            this.location = loc;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
@@ -336,7 +324,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
             ChangeSupport cs = this.getChangeSupport(RichFeature.LOCATION);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                this.location = (RichLocation)loc;
+                this.location = loc;
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -499,7 +487,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     }
     
     private Set relationsToFeatureSet() {
-        Set features = new HashSet();
+        Set features = new TreeSet();
         for (Iterator i = this.relations.iterator(); i.hasNext(); ) {
             RichFeatureRelationship r = (RichFeatureRelationship)i.next();
             features.add(r.getSubject());
@@ -567,7 +555,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void removeFeature(Feature f) throws ChangeVetoException, BioException {
-        Set features = new HashSet();
+        Set features = new TreeSet();
         for (Iterator i = this.relations.iterator(); i.hasNext(); ) {
             RichFeatureRelationship r = (RichFeatureRelationship)i.next();
             if (r.getSubject().equals(f)) i.remove();

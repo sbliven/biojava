@@ -84,7 +84,7 @@ public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef
         if (this.crossref==null) return -1;
         // Normal comparison
         RankedCrossRef them = (RankedCrossRef)o;
-        if (this.rank!=them.getRank()) return this.rank-them.getRank();
+        if (this.rank!=them.getRank()) return this.rank - them.getRank();
         return this.crossref.compareTo(them.getCrossRef());
     }
     

@@ -27,9 +27,9 @@
 
 package org.biojavax.bio.seq;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.StrandedFeature.Strand;
@@ -57,8 +57,8 @@ import org.biojavax.ontology.ComparableTerm;
  */
 public class SimpleRichLocation extends AbstractChangeable implements RichLocation {
     
+    private Set blocks = new TreeSet();
     private CrossRef crossRef;
-    private Set blocks = new HashSet();
     private RichAnnotation notes = new SimpleRichAnnotation();
     private ComparableTerm term;
     private int min;
@@ -68,7 +68,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     /**
      * Creates a new instance of SimpleRichSequenceLocation.
-     * 
+     *
      * @param min Min location position.
      * @param max Max location position.
      * @param rank Rank of location.
@@ -78,6 +78,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         this.max = max;
         this.rank = rank;
         this.strand = StrandedFeature.UNKNOWN;
+        this.blocks.add(this);
     }
     
     // Hibernate requirement - not for public use.
@@ -251,7 +252,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             }
         }
     }
-        
+    
     /**
      * {@inheritDoc}
      */
@@ -309,7 +310,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public Iterator blockIterator() { return this.getBlocks().iterator(); }
+    public Iterator blockIterator() { return Collections.unmodifiableSet(this.blocks).iterator(); }
     
     /**
      * {@inheritDoc}
@@ -324,7 +325,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public boolean isContiguous() { return this.getBlocks().size()<=1; }
+    public boolean isContiguous() { return this.blocks.size()==1; }
     
     /**
      * {@inheritDoc}
@@ -345,66 +346,91 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * {@inheritDoc}
      */
     public Location translate(int dist) {
-        Set blocks = new HashSet();
-        int counter = 0;
-        RichLocation r = new SimpleRichLocation(0,0,counter++);
-        for (Iterator i = this.blocks.iterator(); i.hasNext(); ) {
-            RichLocation r2 = (RichLocation)i.next();
-            blocks.add(new SimpleRichLocation(
-                    r2.getMin()+dist,
-                    r2.getMax()+dist,
-                    counter++));
-        }
         try {
-            r.setBlocks(blocks);
+            SimpleRichLocation l = new SimpleRichLocation(this.min+dist,this.max+dist,this.rank);
+            l.setStrand(this.getStrand());
+            l.setCrossRef(this.getCrossRef());
+            l.setNoteSet(this.getNoteSet());
+            l.setTerm(this.getTerm());
+            if (!this.isContiguous()) {
+                l.blocks.clear();
+                for (Iterator i = this.blocks.iterator(); i.hasNext(); ) {
+                    Location b = (Location)i.next();
+                    l.blocks.add(b.translate(dist));
+                }
+            }
+            return l;
         } catch (ChangeVetoException e) {
-            throw new RuntimeException("Oops , our blocks aren't blocky enough");
+            throw new RuntimeException("Someone doesn't like us changing things!",e);
         }
-        return r;
     }
     
     /**
      * {@inheritDoc}
      */
     public Location union(Location l) {
-        if (l==null) throw new IllegalArgumentException("Location cannot be null");
-        Location u = LocationTools.union(this,l);
-        int counter = 0;
-        RichLocation r = new SimpleRichLocation(0,0,counter++);
-        Set blocks = new HashSet();
-        for (Iterator i = u.blockIterator(); i.hasNext(); ) {
-            Location b = (Location)i.next();
-            if (b instanceof RichLocation) blocks.add(b);
-            else blocks.add(new SimpleRichLocation(b.getMin(), b.getMax(), counter++));
-        }
         try {
-            r.setBlocks(blocks);
+            if (l==null) throw new IllegalArgumentException("Location cannot be null");
+            Location u = LocationTools.union(this,l);
+            SimpleRichLocation r = new SimpleRichLocation(u.getMin(),u.getMax(),this.rank);
+            r.setStrand(this.getStrand());
+            r.setCrossRef(this.getCrossRef());
+            r.setNoteSet(this.getNoteSet());
+            r.setTerm(this.getTerm());
+            if (!u.isContiguous()) {
+                r.blocks.clear();
+                int counter = 1;
+                for (Iterator i = u.blockIterator(); i.hasNext(); ) {
+                    Location b = (Location)i.next();
+                    RichLocation r2 = new SimpleRichLocation(b.getMin(), b.getMax(), counter++);
+                    if (b instanceof RichLocation) {
+                        RichLocation b2 = (RichLocation)b;
+                        r2.setStrand(b2.getStrand());
+                        r2.setCrossRef(b2.getCrossRef());
+                        r2.setNoteSet(b2.getNoteSet());
+                        r2.setTerm(b2.getTerm());
+                    }
+                    r.blocks.add(r2);
+                }
+            }
+            return r;
         } catch (ChangeVetoException e) {
-            throw new RuntimeException("Oops , our blocks aren't blocky enough");
+            throw new RuntimeException("Someone doesn't like us changing things!",e);
         }
-        return r;
     }
     
     /**
      * {@inheritDoc}
      */
     public Location intersection(Location l) {
-        if (l==null) throw new IllegalArgumentException("Location cannot be null");
-        Location u = LocationTools.intersection(this,l);
-        int counter = 0;
-        RichLocation r = new SimpleRichLocation(0,0,counter++);
-        Set blocks = new HashSet();
-        for (Iterator i = u.blockIterator(); i.hasNext(); ) {
-            Location b = (Location)i.next();
-            if (b instanceof RichLocation) blocks.add(b);
-            else blocks.add(new SimpleRichLocation(b.getMin(), b.getMax(), counter++));
-        }
         try {
-            r.setBlocks(blocks);
+            if (l==null) throw new IllegalArgumentException("Location cannot be null");
+            Location u = LocationTools.intersection(this,l);
+            SimpleRichLocation r = new SimpleRichLocation(u.getMin(),u.getMax(),this.rank);
+            r.setStrand(this.getStrand());
+            r.setCrossRef(this.getCrossRef());
+            r.setNoteSet(this.getNoteSet());
+            r.setTerm(this.getTerm());
+            if (!u.isContiguous()) {
+                r.blocks.clear();
+                int counter = 1;
+                for (Iterator i = u.blockIterator(); i.hasNext(); ) {
+                    Location b = (Location)i.next();
+                    RichLocation r2 = new SimpleRichLocation(b.getMin(), b.getMax(), counter++);
+                    if (b instanceof RichLocation) {
+                        RichLocation b2 = (RichLocation)b;
+                        r2.setStrand(b2.getStrand());
+                        r2.setCrossRef(b2.getCrossRef());
+                        r2.setNoteSet(b2.getNoteSet());
+                        r2.setTerm(b2.getTerm());
+                    }
+                    r.blocks.add(r2);
+                }
+            }
+            return r;
         } catch (ChangeVetoException e) {
-            throw new RuntimeException("Oops , our blocks aren't blocky enough");
+            throw new RuntimeException("Someone doesn't like us changing things!",e);
         }
-        return r;
     }
     
     /**
@@ -415,32 +441,6 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         SymbolList seq2 = seq.subList(this.getMin(),this.getMax());
         if (this.strand==StrandedFeature.NEGATIVE) return SymbolListViews.reverse(seq2);
         else return seq2;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public Set getBlocks() { return Collections.unmodifiableSet(this.blocks); }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setBlocks(Set blocks) throws ChangeVetoException {
-        this.blocks.clear();
-        if (blocks==null) return;
-        for (Iterator i = blocks.iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (!(o instanceof RichLocation)) throw new ChangeVetoException("Blocks must be RichLocation instances");
-            RichLocation l = (RichLocation)o;
-            this.blocks.add(l);
-            if (this.blocks.size()==1) {
-                this.min = l.getMin();
-                this.max = l.getMax();
-            } else {
-                this.min = Math.min(this.min, l.getMin());
-                this.max = Math.max(this.max, l.getMax());
-            }
-        }
     }
     
     /**

@@ -19,21 +19,25 @@
  *
  */
 
-package org.biojava.bio.seq.io;
+package org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.bio.seq.io.StreamParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.utils.ParseErrorEvent;
 import org.biojava.utils.ParseErrorListener;
+import org.biojavax.Namespace;
+import org.biojavax.SimpleNamespace;
+import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.bio.seq.RichSequence;
 
 
 /**
@@ -53,21 +57,11 @@ import org.biojava.utils.ParseErrorListener;
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Lukas Kall
+ * @author Richard Holland
  */
 
-public class FastaFormat implements SequenceFormat,
-        Serializable,
-        org.biojava.utils.ParseErrorListener,
-        org.biojava.utils.ParseErrorSource {
-    public static final String DEFAULT = "FASTA";
-    
-    /**
-     * Constant string which is the property key used to notify
-     * listeners of the description lines of FASTA sequences.
-     */
-    public final static String PROPERTY_DESCRIPTIONLINE = "description_line";
-    
-    protected Vector mListeners = new Vector();
+public class FastaFormat implements RichSequenceFormat {
+    public static final String DEFAULT_FORMAT = "FASTA";
     
     /**
      * The line width for output.
@@ -98,7 +92,19 @@ public class FastaFormat implements SequenceFormat,
     public boolean readSequence(
             BufferedReader reader,
             SymbolTokenization symParser,
-            SeqIOListener siol
+            SeqIOListener listener
+            )	throws
+            IllegalSymbolException,
+            IOException,
+            ParseException {
+        if (!(listener instanceof RichSeqIOListener)) throw new IllegalArgumentException("Only accepting RichSeqIOListeners today");
+        return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener);
+    }
+    
+    public boolean readRichSequence(
+            BufferedReader reader,
+            SymbolTokenization symParser,
+            RichSeqIOListener rsiol
             )	throws
             IllegalSymbolException,
             IOException,
@@ -117,13 +123,11 @@ public class FastaFormat implements SequenceFormat,
             throw new IOException("Stream does not appear to contain FASTA formatted data: " + line);
         }
         
-        siol.startSequence();
+        rsiol.startSequence();
         
-        String description = line.substring(1).trim();
-        
-        String regex = "(\\S+)(\\s+(.*))*";
+        String regex = ">(\\S+)(\\s+(.*))*";
         Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(description);
+        Matcher m = p.matcher(line);
         if (!m.matches()) {
             throw new IOException("Stream does not appear to contain FASTA formatted data: " + line);
         }
@@ -131,11 +135,31 @@ public class FastaFormat implements SequenceFormat,
         String name = m.group(1);
         String desc = m.group(3);
         
-        siol.setName(name);
-        siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
+        regex = "^(gi\\|(\\d+)\\|)*(\\S+)\\|(\\S+?)(\\.(\\d+))*\\|(\\S+)$";
+        p = Pattern.compile(regex);
+        m = p.matcher(name);
+        if (m.matches()) {
+            String gi = m.group(2);
+            String namespace = m.group(3);
+            String accession = m.group(4);
+            String verString = m.group(6);
+            int version = verString==null?0:Integer.parseInt(verString);
+            name = m.group(7);
+            
+            rsiol.setAccession(accession);
+            rsiol.setVersion(version);            
+            if (gi!=null) rsiol.setIdentifier(gi);
+            rsiol.setNamespace((Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{namespace}));
+        } else {
+            rsiol.setAccession(name);
+            rsiol.setNamespace(RichObjectFactory.getDefaultLocalNamespace());
+        }
+        rsiol.setName(name);
+        rsiol.setDescription(desc);
         
-        boolean seenEOF = readSequenceData(reader, symParser, siol);
-        siol.endSequence();
+        boolean seenEOF = this.readSequenceData(reader, symParser, rsiol);
+        
+        rsiol.endSequence();
         
         return !seenEOF;
     }
@@ -201,59 +225,53 @@ public class FastaFormat implements SequenceFormat,
         return seenEOF;
     }
     
-    /**
-     * Return a suitable description line for a Sequence. If the
-     * sequence's annotation bundle contains PROPERTY_DESCRIPTIONLINE,
-     * this is used verbatim.  Otherwise, the sequence's name is used.
-     */
-    protected String describeSequence(Sequence seq) {
-        String description = null;
-        
-        Annotation seqAnn = seq.getAnnotation();
-        
-        if(seqAnn.containsProperty(PROPERTY_DESCRIPTIONLINE)) {
-            description = (String) seqAnn.getProperty(PROPERTY_DESCRIPTIONLINE);
-        } else {
-            description = seq.getName();
-        }
-        
-        return description;
+    public void writeSequence(Sequence seq, PrintStream os)
+    throws IOException {        
+        if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
+        this.writeRichSequence((RichSequence)seq, os);
     }
     
-    public void writeSequence(Sequence seq, PrintStream os)
+    public void writeRichSequence(RichSequence rs, PrintStream os)
     throws IOException {
         os.print(">");
-        os.println(describeSequence(seq));
         
-        int length = seq.length();
-        
-        for (int pos = 1; pos <= length; pos += lineWidth) {
-            int end = Math.min(pos + lineWidth - 1, length);
-            os.println(seq.subStr(pos, end));
+        String identifier = rs.getIdentifier();
+        if (identifier!=null && !"".equals(identifier)) {
+            os.print("gi|");
+            os.print(identifier);
+            os.print("|");
         }
+        os.print(rs.getNamespace().getName());
+        os.print("|");
+        os.print(rs.getAccession());
+        os.print(".");
+        os.print(rs.getVersion());
+        os.print("|");
+        os.print(rs.getName());
+        os.print(" ");
+        os.println(rs.getDescription());
+        
+        int length = rs.length();
+        
+        for (int pos = 1; pos <= length; pos += this.lineWidth) {
+            int end = Math.min(pos + this.lineWidth - 1, length);
+            os.println(rs.subStr(pos, end));
+        }
+    }   
+    
+    public void writeSequence(Sequence seq, String format, PrintStream os)
+    throws IOException {        
+        if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
+        this.writeRichSequence((RichSequence)seq, format, os);
     }
     
-    /**
-     * <code>writeSequence</code> writes a sequence to the specified
-     * <code>PrintStream</code>, using the specified format.
-     *
-     * @param seq a <code>Sequence</code> to write out.
-     * @param format a <code>String</code> indicating which sub-format
-     * of those available from a particular
-     * <code>SequenceFormat</code> implemention to use when
-     * writing.
-     * @param os a <code>PrintStream</code> object.
-     *
-     * @exception IOException if an error occurs.
-     * @deprecated use writeSequence(Sequence seq, PrintStream os)
-     */
-    public void writeSequence(Sequence seq, String format, PrintStream os)
+    public void writeRichSequence(RichSequence seq, String format, PrintStream os)
     throws IOException {
         if (! format.equalsIgnoreCase(getDefaultFormat()))
             throw new IllegalArgumentException("Unknown format '"
                     + format
                     + "'");
-        writeSequence(seq, os);
+        this.writeSequence(seq, os);
     }
     
     /**
@@ -264,8 +282,10 @@ public class FastaFormat implements SequenceFormat,
      * @deprecated
      */
     public String getDefaultFormat() {
-        return DEFAULT;
+        return DEFAULT_FORMAT;
     }
+    
+    private Vector mListeners = new Vector();
     
     /**
      * Adds a parse error listener to the list of listeners if it isn't already
@@ -291,34 +311,4 @@ public class FastaFormat implements SequenceFormat,
         }
     }
     
-    /**
-     * This method determines the behaviour when a bad line is processed.
-     * Some options are to log the error, throw an exception, ignore it
-     * completely, or pass the event through.
-     * <p>
-     * This method should be overwritten when different behavior is desired.
-     *
-     * @param theEvent The event that contains the bad line and token.
-     */
-    public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent) {
-        notifyParseErrorEvent(theEvent);
-    }
-    
-    // Protected methods
-    /**
-     * Passes the event on to all the listeners registered for ParseErrorEvents.
-     *
-     * @param theEvent The event to be handed to the listeners.
-     */
-    protected void notifyParseErrorEvent(ParseErrorEvent theEvent) {
-        Vector listeners;
-        synchronized(this) {
-            listeners = (Vector)mListeners.clone();
-        }
-        
-        for (int index = 0; index < listeners.size(); index++) {
-            ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
-            client.BadLineParsed(theEvent);
-        }
-    }
 }

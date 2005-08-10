@@ -29,9 +29,9 @@ package org.biojavax.ontology;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 import org.biojava.bio.Annotation;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
@@ -57,8 +57,8 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     private ComparableOntology ontology;
     private String identifier;
     private Boolean obsolete;
-    private Set synonyms = new HashSet();
-    private Set rankedcrossrefs = new HashSet();
+    private Set synonyms = new TreeSet();
+    private Set rankedcrossrefs = new TreeSet();
     
     /**
      * Creates a new instance of SimpleComparableTerm with synonyms.

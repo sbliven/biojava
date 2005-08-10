@@ -29,6 +29,7 @@ package org.biojavax.bio.seq.io;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -209,7 +210,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         if (ref==null) throw new ParseException("Reference cannot be null");
         this.crossRefs.add(ref);
     }
-    private Set crossRefs = new HashSet();
+    private Set crossRefs = new TreeSet();
     
     /**
      * {@inheritDoc}
@@ -227,7 +228,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         if (comment==null) throw new ParseException("Comment cannot be null");
         this.comments.add(comment);
     }
-    private Set comments = new HashSet();
+    private Set comments = new TreeSet();
     
     /**
      * {@inheritDoc}
@@ -288,7 +289,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         if (relationship==null) throw new ParseException("Relationship cannot be null");
         this.relations.add(relationship);
     }
-    private Set relations = new HashSet();
+    private Set relations = new TreeSet();
     
     /**
      * {@inheritDoc}
@@ -297,7 +298,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         if (ref==null) throw new ParseException("Reference cannot be null");
         this.references.add(ref);
     }
-    private Set references = new HashSet();
+    private Set references = new TreeSet();
     
     /**
      * {@inheritDoc}
