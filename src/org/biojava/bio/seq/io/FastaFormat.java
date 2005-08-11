@@ -53,6 +53,8 @@ import org.biojava.utils.ParseErrorListener;
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Lukas Kall
+ * @author Richard Holland
+ * @author Mark Schreiber
  */
 
 public class FastaFormat implements SequenceFormat,
@@ -95,6 +97,20 @@ public class FastaFormat implements SequenceFormat,
         this.lineWidth = width;
     }
     
+    /**
+     * Reads information from a flatfile to a <code>SeqIOListener</code>
+     * using a <code>SymbolTokenizer</code> to convert sequence strings
+     * to <code>Symbol</code> objects.
+     * @param reader The reader that is the source of the information
+     * @param symParser converts text seqeunce to biojava objects
+     * @param siol The listener that listens for event callbacks from this class.
+     * The listener can be a <code>RichSeqIOListener</code>.
+     * @throws org.biojava.bio.symbol.IllegalSymbolException if <code>symParser</code>
+     * doesn't know how to convert the text sequence into biojava <code>Symbol</code>s 
+     * @throws java.io.IOException if there is a problem reading.
+     * @throws org.biojava.bio.seq.io.ParseException if the source cannot be parsed.
+     * @return true if there is another unread sequence in the source.
+     */
     public boolean readSequence(
             BufferedReader reader,
             SymbolTokenization symParser,
@@ -220,6 +236,16 @@ public class FastaFormat implements SequenceFormat,
         return description;
     }
     
+    /**
+     * Writes a <code>Sequence</code> or <code>RichSequence</code> to a 
+     * <code>PrintStream</code> in FASTA format. If the sequence is a 
+     * <code>RichSequence</code> the format of the header will be in line with
+     * the NCBI standard.
+     * @param seq the sequence to format
+     * @param os the stream to write the sequence to. To print to screen use
+     * <code>System.out</code>
+     * @throws java.io.IOException if data cannot be written to <code>os</code>
+     */
     public void writeSequence(Sequence seq, PrintStream os)
     throws IOException {
         os.print(">");
