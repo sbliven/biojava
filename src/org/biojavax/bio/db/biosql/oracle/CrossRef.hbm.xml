@@ -24,7 +24,7 @@
             <column name="VERSION" sql-type="integer" length="2" not-null="true"/>
         </property>
         <set name="noteSet" table="DBXREF_QUALIFIER_VALUE" lazy="false">
-            <key column="DBXREF_ID"/>
+            <key column="DBXREF_ID" not-null="true"/>
             <composite-element class="org.biojavax.SimpleNote">
                 <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
                     <column name="TERM_ID" not-null="true"/>

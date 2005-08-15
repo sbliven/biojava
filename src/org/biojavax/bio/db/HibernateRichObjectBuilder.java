@@ -29,6 +29,7 @@ package org.biojavax.bio.db;
 import java.lang.reflect.Method;
 import java.util.List;
 import org.biojavax.SimpleCrossRef;
+import org.biojavax.SimpleDocRef;
 import org.biojavax.SimpleNamespace;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.SimpleComparableOntology;
@@ -44,6 +45,7 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
     private Method createQuery;
     private Method setParameter;
     private Method list;
+    private Method persist;
     
     /** Creates a new instance of SimpleRichObjectBuilder */
     public HibernateRichObjectBuilder(Object session) {
@@ -54,6 +56,7 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
                 throw new IllegalArgumentException("Parameter must be a Hibernate session object");
             this.session = session;
             this.createQuery = hibernateSession.getMethod("createQuery", new Class[]{String.class});
+            this.persist = hibernateSession.getMethod("persist", new Class[]{Object.class});
             Class hibernateQuery = Class.forName("org.hibernate.Query");
             this.setParameter = hibernateQuery.getMethod("setParameter", new Class[]{int.class,Object.class});
             this.list = hibernateQuery.getMethod("list", new Class[]{});
@@ -75,17 +78,30 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
             queryText = "from SimpleNCBITaxon as o where o.NCBITaxID = ?";
         } else if (o instanceof SimpleCrossRef) {
             queryText = "from SimpleCrossRef as cr where cr.dbname = ? and cr.accession = ?";
+        } else if (o instanceof SimpleDocRef) {
+            queryText = "from SimpleDocRef as cr where cr.authors = ? and cr.location = ?";
         } else throw new IllegalArgumentException("Don't know how to handle objects of type "+clazz);
         try {
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             for (int i = 0; i < params.length; i++) {
                 query = this.setParameter.invoke(query, new Object[]{new Integer(i), params[i]});
             }
-            List results = (List)this.list.invoke(query, new Object[]{});
+            List results = (List)this.list.invoke(query, null);
             if (results.size()>0) return results.get(0);
-            else return o;
+            else {
+                this.persist.invoke(this.session, new Object[]{o});
+                return o;
+            }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            StringBuffer paramsstuff = new StringBuffer();
+            paramsstuff.append(clazz);
+            paramsstuff.append("(");
+            for (int i = 0; i < params.length; i++) {
+                paramsstuff.append(params[i].toString());
+                if (i<(params.length-1)) paramsstuff.append(",");
+            }
+            paramsstuff.append(")");
+            throw new RuntimeException("Error while trying to call new "+paramsstuff,e);
         }
     }
     

@@ -300,14 +300,14 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      * {@inheritDoc}
      */
     public void setTripleSet(Set triples) throws ChangeVetoException {
-        this.triples.clear();
-        if (triples==null) return;
-        for (Iterator i = triples.iterator(); i.hasNext();) {
+        Set newtrips = new TreeSet();
+        if (triples!=null) for (Iterator i = triples.iterator(); i.hasNext();) {
             Object o = i.next();
             if (!(o instanceof ComparableTriple)) throw new ChangeVetoException("Can only add ComparableTriples to ComparableOntology");
-            ComparableTriple t = (ComparableTriple)o;
-            this.triples.add(t);
+            newtrips.add(o);
         }
+        this.triples.clear();
+        this.triples.addAll(newtrips);
     }
     
     /**
@@ -324,12 +324,15 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      * {@inheritDoc}
      */
     public void setTermSet(Set terms) throws ChangeVetoException {
-        this.terms.clear();
-        if (terms==null) return;
-        for (Iterator i = terms.iterator(); i.hasNext();) {
+        Set newt = new TreeSet();
+        if (terms!=null) for (Iterator i = terms.iterator(); i.hasNext();) {
             Object o = i.next();
             if (!(o instanceof ComparableTerm)) throw new ChangeVetoException("Can only add ComparableTerms to ComparableOntology");
-            ComparableTerm t = (ComparableTerm)o;
+            newt.add(o);
+        }
+        this.terms.clear();
+        for (Iterator i = newt.iterator(); i.hasNext(); ) {
+            ComparableTerm t = (ComparableTerm)i.next();
             this.terms.put(t.getName(),t);
         }
     }

@@ -66,7 +66,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     private ComparableTerm typeTerm;
     private ComparableTerm sourceTerm;
     private FeatureHolder parent;
-    private Location location;
+    private RichLocation location = RichLocation.EMPTY_LOCATION;
     private Set crossrefs = new TreeSet();
     private Set relations = new TreeSet();
     private String name;
@@ -80,13 +80,14 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     public SimpleRichFeature(FeatureHolder parent, Feature.Template templ) throws ChangeVetoException {
         if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
         if (templ==null) throw new IllegalArgumentException("Template cannot be null");
+        if (!(templ instanceof RichFeature.Template)) throw new IllegalArgumentException("Template must be a RichFeature.Template");
         if (templ.typeTerm==null) throw new IllegalArgumentException("Template type term cannot be null");
         if (templ.sourceTerm==null) throw new IllegalArgumentException("Template source term cannot be null");
         if (templ.location==null) throw new IllegalArgumentException("Template location cannot be null");
         this.parent = parent;
         this.typeTerm = (ComparableTerm)templ.typeTerm;
         this.sourceTerm = (ComparableTerm)templ.sourceTerm;
-        this.location = templ.location;
+        this.location = (RichLocation)templ.location;
         
         if (templ.annotation instanceof RichAnnotation) {
             this.notes.setNoteSet(((RichAnnotation)templ.annotation).getNoteSet());
@@ -97,7 +98,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
                 this.notes.setProperty(i.next(), templ.annotation.getProperty(key));
             }
         }
-                
+        
         if (templ instanceof RichFeature.Template) {
             this.setRankedCrossRefs(((RichFeature.Template)templ).rankedCrossRefs);
             this.setFeatureRelationshipSet(((RichFeature.Template)templ).featureRelationshipSet);
@@ -139,20 +140,24 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
     
     // Hibernate use only
-    private Set getLocationSet() { 
-        Set locs = new TreeSet();
-        for (Iterator i = this.location.blockIterator(); i.hasNext(); ) locs.add(i.next());
-        return locs;
+    private Set getLocationSet() {
+        return this.flattenLocation(this.location);
+    }
+    
+    private Set flattenLocation(RichLocation l) {
+        if (l instanceof CompoundRichLocation) {
+            Set s = new TreeSet();
+            for (Iterator i = l.blockIterator(); i.hasNext(); ) s.addAll(this.flattenLocation((RichLocation)i.next()));
+            return s;
+        } else if (l instanceof SimpleRichLocation) return Collections.singleton(l);
+        else return Collections.EMPTY_SET;
     }
     
     // Hibernate use only
-    private void setLocationSet(Set locs) throws ChangeVetoException {
-        boolean first = true;
-        for (Iterator i = locs.iterator(); i.hasNext(); ) {
-            RichLocation l = (RichLocation)i.next();
-            if (first) this.location = l;
-            else this.location = this.location.union(l);
-        }
+    private void setLocationSet(Set locs) {
+        if (locs.size()==0) this.location = RichLocation.EMPTY_LOCATION;
+        else if (locs.size()==1) this.location = (SimpleRichLocation)locs.toArray(new SimpleRichLocation[1])[0];
+        else this.location = new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),locs);
     }
     
     /**
@@ -313,7 +318,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         if (loc==null) throw new IllegalArgumentException("Location cannot be null");
         if (!(loc instanceof RichLocation)) throw new IllegalArgumentException("We only accept RichLocation objects here");
         if(!this.hasListeners(RichFeature.LOCATION)) {
-            this.location = loc;
+            this.location = (RichLocation)loc;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
@@ -324,7 +329,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
             ChangeSupport cs = this.getChangeSupport(RichFeature.LOCATION);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                this.location = loc;
+                this.location = (RichLocation)loc;
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -367,13 +372,14 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void setRankedCrossRefs(Set crossrefs) throws ChangeVetoException {
-        this.crossrefs.clear();
-        if (crossrefs==null) return;
-        for (Iterator i = crossrefs.iterator(); i.hasNext(); ) {
+        Set newrcr = new TreeSet();
+        if (crossrefs!=null) for (Iterator i = crossrefs.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof RankedCrossRef)) throw new ChangeVetoException("Found a non-RankedCrossRef object");
-            this.addRankedCrossRef((RankedCrossRef)o);
+            newrcr.add(o);
         }
+        this.crossrefs.clear();
+        for (Iterator i = newrcr.iterator(); i.hasNext(); ) this.addRankedCrossRef((RankedCrossRef)i.next());
     }
     
     /**
@@ -431,13 +437,14 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void setFeatureRelationshipSet(Set relationships) throws ChangeVetoException {
-        this.relations.clear();
-        if (relationships==null) return;
-        for (Iterator i = relationships.iterator(); i.hasNext(); ) {
+        Set fr = new TreeSet();
+        if (relationships!=null) for (Iterator i = relationships.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof RichFeatureRelationship)) throw new ChangeVetoException("Found a non-RichFeatureRelationship object");
-            this.addFeatureRelationship((RichFeatureRelationship)o);
+            fr.add(o);
         }
+        this.relations.clear();
+        for (Iterator i = fr.iterator(); i.hasNext(); ) this.addFeatureRelationship((RichFeatureRelationship)i.next());
     }
     
     /**
@@ -512,7 +519,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         if (ft==null) throw new IllegalArgumentException("Template cannot be null");
         RichFeature f = new SimpleRichFeature(this.parent, ft);
         this.addFeatureRelationship(
-                new SimpleRichFeatureRelationship(f, RichFeatureRelationship.DEFAULT_FEATURE_RELATIONSHIP_TERM, 0)
+                new SimpleRichFeatureRelationship(f, SimpleRichFeatureRelationship.getContainsTerm(), 0)
                 );
         return f;
     }
@@ -590,6 +597,18 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         if (! this.typeTerm.equals(fo.getTypeTerm())) return false;
         if (! this.sourceTerm.equals(fo.getSourceTerm())) return false;
         return fo.getRank()==this.getRank();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.parent==null) return -1;
+        // Normal comparison
+        RichFeature them = (RichFeature)o;
+        if (this.rank!=them.getRank()) return this.rank-them.getRank();
+        else return -1; // because multiple equal items are allowed
     }
     
     // Hibernate requirement - not for public use.

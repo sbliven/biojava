@@ -23,6 +23,7 @@ package org.biojavax.bio.seq;
 
 import java.util.Set;
 import org.biojava.bio.seq.Sequence;
+import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.BioEntry;
 
@@ -39,6 +40,18 @@ import org.biojavax.bio.BioEntry;
  * @author Mark Schreiber
  */
 public interface RichSequence extends BioEntry,Sequence {
+    
+    public static final ChangeType SYMLISTVERSION = new ChangeType(
+            "This sequences's symbollist version has changed",
+            "org.biojavax.bio.seq.RichSequence",
+            "SYMLISTVERSION"
+            );
+    
+    public static final ChangeType CIRCULAR = new ChangeType(
+            "This sequences's circularity has changed",
+            "org.biojavax.bio.seq.RichSequence",
+            "CIRCULAR"
+            );
     
     /**
      * The version of the associated symbol list.
@@ -67,4 +80,8 @@ public interface RichSequence extends BioEntry,Sequence {
      * @throws ChangeVetoException if they could not be assigned.
      */
     public void setFeatureSet(Set features) throws ChangeVetoException;
+    
+    public void setCircular(boolean circular) throws ChangeVetoException;
+    
+    public boolean isCircular();
 }

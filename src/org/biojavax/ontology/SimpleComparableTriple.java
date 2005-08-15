@@ -215,13 +215,14 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      * {@inheritDoc}
      */
     public void setDescriptors(Set descriptors) throws ChangeVetoException {
-        this.descriptors.clear();
-        if (descriptors==null) return;
-        for (Iterator i = descriptors.iterator(); i.hasNext(); ) {
+        Set newdescs = new TreeSet();
+        if (descriptors!=null) for (Iterator i = descriptors.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof ComparableTerm)) throw new ChangeVetoException("Descriptors must be comparable terms");
-            this.addDescriptor((ComparableTerm)o);
+            newdescs.add(o);
         }
+        this.descriptors.clear();
+        for (Iterator i = newdescs.iterator(); i.hasNext(); ) this.addDescriptor((ComparableTerm)i.next());
     }
     
     /**

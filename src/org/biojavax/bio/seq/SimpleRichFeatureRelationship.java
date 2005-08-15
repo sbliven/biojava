@@ -31,6 +31,7 @@ import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
+import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -41,6 +42,15 @@ import org.biojavax.ontology.ComparableTerm;
  *
  */
 public class SimpleRichFeatureRelationship extends AbstractChangeable implements RichFeatureRelationship {
+    
+    /**
+     * The default term used for defining the relationship between features.
+     */
+    private static ComparableTerm CONTAINS_TERM = null;
+    public static ComparableTerm getContainsTerm() {
+        if (CONTAINS_TERM==null) CONTAINS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("contains");
+        return CONTAINS_TERM;
+    }
     
     private RichFeature subject;
     private ComparableTerm term;
@@ -118,7 +128,8 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
         if (this.subject==null) return -1;
         // Normal comparison
         RichFeatureRelationship them = (RichFeatureRelationship)o;
-        if (!this.subject.equals(them.getSubject())) return 1; // Can't compare features :(
+        if (this.rank!=them.getRank()) return this.rank-them.getRank();
+        if (!this.subject.equals(them.getSubject())) return this.subject.compareTo(them.getSubject());
         else return this.getTerm().compareTo(them.getTerm());
     }
     

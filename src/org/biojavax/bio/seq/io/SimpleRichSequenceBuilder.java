@@ -58,7 +58,6 @@ import org.biojavax.RankedCrossRef;
 import org.biojavax.SimpleNote;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.seq.RichFeature;
-import org.biojavax.bio.seq.RichFeatureRelationship;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.SimpleRichFeature;
 import org.biojavax.bio.seq.SimpleRichFeatureRelationship;
@@ -252,7 +251,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
             else {
                 RichFeature parent = (RichFeature)this.featureStack.get(this.featureStack.size() - 1);
                 parent.addFeatureRelationship(
-                        new SimpleRichFeatureRelationship(f, RichFeatureRelationship.DEFAULT_FEATURE_RELATIONSHIP_TERM, this.featureRank++)
+                        new SimpleRichFeatureRelationship(f, SimpleRichFeatureRelationship.getContainsTerm(), this.featureRank++)
                         );
             }
             this.featureStack.add(f);
@@ -356,6 +355,11 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         if (this.accessions.isEmpty()) throw new ParseException("No accessions have been supplied");
     }
     
+    public void setCircular(boolean circular) throws ParseException {
+        this.circular = circular;
+    }
+    private boolean circular = false;
+    
     /**
      * {@inheritDoc}
      */
@@ -378,6 +382,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
             rs.setDivision(this.division);
             rs.setIdentifier(this.identifier);
             rs.setTaxon(this.taxon);
+            rs.setCircular(this.circular);
             for (Iterator i = this.crossRefs.iterator(); i.hasNext(); ) rs.addRankedCrossRef((RankedCrossRef)i.next());
             for (Iterator i = this.relations.iterator(); i.hasNext(); ) rs.addRelationship((BioEntryRelationship)i.next());
             for (Iterator i = this.references.iterator(); i.hasNext(); ) rs.addRankedDocRef((RankedDocRef)i.next());

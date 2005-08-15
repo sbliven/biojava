@@ -492,8 +492,10 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     
     // Hibernate requirement - not for public use.
     private void setRelationships(Set relationships) { 
+        Set newr = new TreeSet();
+        if (relationships!=null) newr.addAll(relationships);
         this.relationships.clear();
-        if (relationships!=null) this.relationships.addAll(relationships); 
+        this.relationships.addAll(newr); 
     }
     
     // Hibernate requirement - not for public use.
@@ -516,14 +518,18 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     
     // Hibernate requirement - not for public use.
     private void setComments(Set comments) { 
+        Set newr = new TreeSet();
+        if (comments!=null) newr.addAll(comments);
         this.comments.clear();
-        if (comments!=null) this.comments.addAll(comments); 
+        this.comments.addAll(newr); 
     }
     
     // Hibernate requirement - not for public use.
     public void setRankedCrossRefs(Set rankedcrossrefs) { 
+        Set newr = new TreeSet();
+        if (rankedcrossrefs!=null) newr.addAll(rankedcrossrefs);
         this.rankedcrossrefs.clear();
-        if (rankedcrossrefs!=null) this.comments.addAll(rankedcrossrefs); 
+        this.rankedcrossrefs.addAll(newr); 
     }
     
     // Hibernate requirement - not for public use.

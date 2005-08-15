@@ -216,4 +216,6 @@ public interface RichSeqIOListener extends SeqIOListener {
     public void setRankedCrossRef(RankedCrossRef crossRef) throws ParseException;
     
     public RichFeature getCurrentFeature() throws ParseException;
+    
+    public void setCircular(boolean circular) throws ParseException;
 }

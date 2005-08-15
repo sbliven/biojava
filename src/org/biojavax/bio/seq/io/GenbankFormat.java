@@ -56,6 +56,7 @@ import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
+import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
@@ -111,18 +112,31 @@ public class GenbankFormat
     
     protected static final String FEATURE_LINE_PREFIX = "     ";
     
-    private static final ComparableTerm ACCESSION_TERM =
-            RichObjectFactory.getDefaultOntology().getOrCreateTerm("ACCESSION");
-    private static final ComparableTerm KEYWORDS_TERM =
-            RichObjectFactory.getDefaultOntology().getOrCreateTerm("KEYWORDS");
-    private static final ComparableTerm MODIFICATION_DATE_TERM =
-            RichObjectFactory.getDefaultOntology().getOrCreateTerm("MDAT");
-    private static final ComparableTerm STRANDED_TERM =
-            RichObjectFactory.getDefaultOntology().getOrCreateTerm("STRANDED");
-    private static final ComparableTerm CIRCULAR_TERM =
-            RichObjectFactory.getDefaultOntology().getOrCreateTerm("CIRCULAR");
-    private static final ComparableTerm GENBANK_SOURCE_TERM =
-            RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
+    private static ComparableTerm ACCESSION_TERM = null;
+    public static ComparableTerm getAccessionTerm() {
+        if (ACCESSION_TERM==null) ACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("ACCESSION");
+        return ACCESSION_TERM;
+    }   
+    private static ComparableTerm KERYWORDS_TERM = null;
+    private static ComparableTerm getKeywordsTerm() {
+        if (KERYWORDS_TERM==null) KERYWORDS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("KEYWORDS");
+        return KERYWORDS_TERM;
+    }   
+    private static ComparableTerm MODIFICATION_TERM = null; 
+    private static ComparableTerm getModificationTerm() {
+        if (MODIFICATION_TERM==null) MODIFICATION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("MDAT");
+        return MODIFICATION_TERM;
+    }   
+    private static ComparableTerm STRANDED_TERM = null; 
+    private static ComparableTerm getStrandedTerm() {
+        if (STRANDED_TERM==null) STRANDED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("STRANDED");
+        return STRANDED_TERM;
+    }   
+    private static ComparableTerm GENBANK_TERM = null; 
+    private static ComparableTerm getGenBankTerm() {
+        if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
+        return GENBANK_TERM;
+    }   
     
     private boolean elideSymbols = false;
     
@@ -184,6 +198,7 @@ public class GenbankFormat
         String sectionKey = null;
         NCBITaxon tax = null;
         String organism = null;
+        String accession = null;
         do {
             List section = this.readSection(reader);
             sectionKey = ((String[])section.get(0))[0];
@@ -198,12 +213,12 @@ public class GenbankFormat
                         throw new ParseException("Genbank alphabet does not match expected alphabet in parser");
                     rlistener.setName(m.group(1));
                     rlistener.setDivision(m.group(5));
-                    rlistener.addSequenceProperty(MODIFICATION_DATE_TERM,m.group(6));
+                    rlistener.addSequenceProperty(getModificationTerm(),m.group(6));
                     // Optional extras
                     String stranded = m.group(2);
                     String circular = m.group(4);
-                    if (stranded!=null) rlistener.addSequenceProperty(STRANDED_TERM,stranded);
-                    if (circular!=null) rlistener.addSequenceProperty(CIRCULAR_TERM,circular);
+                    if (stranded!=null) rlistener.addSequenceProperty(getStrandedTerm(),stranded);
+                    if (circular!=null) rlistener.setCircular(true);
                 } else {
                     throw new ParseException("Bad locus line found: "+loc);
                 }
@@ -213,9 +228,10 @@ public class GenbankFormat
                 // if multiple accessions, store only first as accession,
                 // and store rest in annotation
                 String[] accs = ((String[])section.get(0))[1].split("\\s+");
-                rlistener.setAccession(accs[0].trim());
+                accession = accs[0].trim();
+                rlistener.setAccession(accession);
                 for (int i = 1; i < accs.length; i++) {
-                    rlistener.addSequenceProperty(ACCESSION_TERM,accs[i].trim());
+                    rlistener.addSequenceProperty(getAccessionTerm(),accs[i].trim());
                 }
             } else if (sectionKey.equals(VERSION_TAG)) {
                 String ver = ((String[])section.get(0))[1];
@@ -229,7 +245,7 @@ public class GenbankFormat
                     throw new ParseException("Bad version line found: "+ver);
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
-                rlistener.addSequenceProperty(KEYWORDS_TERM, ((String[])section.get(0))[1]);
+                rlistener.addSequenceProperty(getKeywordsTerm(), ((String[])section.get(0))[1]);
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // ignore - can get all this from the first feature
             } else if (sectionKey.equals(REFERENCE_TAG)) {
@@ -307,10 +323,10 @@ public class GenbankFormat
                             Matcher m = p.matcher(val);
                             if (m.matches()) {
                                 String dbname = m.group(1);
-                                String accession = m.group(2);
+                                String raccession = m.group(2);
                                 if (dbname.equals("taxon")) {
                                     // Set the Taxon instead of a dbxref
-                                    tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(accession)});
+                                    tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
                                     rlistener.setTaxon(tax);
                                     try {
                                         if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
@@ -319,7 +335,7 @@ public class GenbankFormat
                                     }
                                 } else {
                                     try {
-                                        CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, accession});
+                                        CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession});
                                         RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
                                         rlistener.getCurrentFeature().addRankedCrossRef(rcr);
                                     } catch (ChangeVetoException e) {
@@ -349,12 +365,12 @@ public class GenbankFormat
                         if (seenAFeature) rlistener.endFeature();
                         // start next one, with lots of lovely info in it
                         RichFeature.Template templ = new RichFeature.Template();
-                        GenbankLocationParser.parseLocation(templ, val);
                         templ.annotation = new SimpleRichAnnotation();
-                        templ.sourceTerm = GENBANK_SOURCE_TERM;
+                        templ.sourceTerm = getGenBankTerm();
                         templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key);
                         templ.featureRelationshipSet = new TreeSet();
                         templ.rankedCrossRefs = new TreeSet();
+                        templ.location = GenbankLocationParser.parseLocation(RichObjectFactory.getDefaultLocalNamespace(), accession, val);
                         rlistener.startFeature(templ);
                         seenAFeature = true;
                     }
@@ -480,6 +496,7 @@ public class GenbankFormat
      * @deprecated use writeSequence(Sequence seq, PrintStream os)
      */
     public void writeRichSequence(RichSequence rs, String format, PrintStream os) throws IOException {
+        
         // Genbank only really - others are treated identically for now
         if (!(
                 format.equalsIgnoreCase("GENBANK") ||
@@ -498,14 +515,12 @@ public class GenbankFormat
         String accession = rs.getAccession();
         String accessions = accession;
         String stranded = "";
-        String circular = "";
         String mdat = "";
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
-            if (n.getTerm().equals(STRANDED_TERM)) stranded=n.getValue();
-            else if (n.getTerm().equals(CIRCULAR_TERM)) circular=n.getValue();
-            else if (n.getTerm().equals(MODIFICATION_DATE_TERM)) mdat=n.getValue();
-            else if (n.getTerm().equals(ACCESSION_TERM)) accessions = accessions+" "+n.getValue();
+            if (n.getTerm().equals(getStrandedTerm())) stranded=n.getValue();
+            else if (n.getTerm().equals(getModificationTerm())) mdat=n.getValue();
+            else if (n.getTerm().equals(getAccessionTerm())) accessions = accessions+" "+n.getValue();
         }
         
         // locus(name) + length + alpha + div + date line
@@ -515,7 +530,7 @@ public class GenbankFormat
         locusLine.append(" bp ");
         locusLine.append(RichSequenceFormat.Tools.leftPad(stranded,3));
         locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getAlphabet().getName(),6));
-        locusLine.append(RichSequenceFormat.Tools.rightPad(circular,10));
+        locusLine.append(RichSequenceFormat.Tools.rightPad(rs.isCircular()?"circular":"",10));
         locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getDivision()==null?"":rs.getDivision(),10));
         locusLine.append(mdat);
         this.writeWrappedLine(LOCUS_TAG, 12, locusLine.toString(), os);
@@ -535,7 +550,7 @@ public class GenbankFormat
         String keywords = null;
         for (Iterator n = notes.iterator(); n.hasNext(); ) {
             Note nt = (Note)n.next();
-            if (nt.getTerm().equals(KEYWORDS_TERM)) {
+            if (nt.getTerm().equals(getKeywordsTerm())) {
                 if (keywords==null) keywords = nt.getValue();
                 else keywords = keywords+" "+nt.getValue();
             }
@@ -565,12 +580,11 @@ public class GenbankFormat
             CrossRef c = d.getCrossref();
             if (c!=null) this.writeWrappedLine("  "+c.getDbname().toUpperCase(), 12, c.getAccession(), os);
         }
-        
         os.println("FEATURES             Location/Qualifiers");
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
-            this.writeWrappedLine("     "+f.getTypeTerm().getName(), 21, GenbankLocationParser.writeLocation(f), os);
+            this.writeWrappedLocationLine("     "+f.getTypeTerm().getName(), 21, GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), os);
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
                 // /key="val"
@@ -652,10 +666,18 @@ public class GenbankFormat
     }
     
     private void writeWrappedLine(String key, int indent, String text, PrintStream os) throws IOException {
+        this._writeWrappedLine(key,indent,text,os,"\\s+"," ");
+    }
+    
+    private void writeWrappedLocationLine(String key, int indent, String text, PrintStream os) throws IOException {
+        this._writeWrappedLine(key,indent,text,os,",",",");
+    }
+    
+    private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep, String printSep) throws IOException {
         text = text.trim();
         StringBuffer b = new StringBuffer();
         b.append(RichSequenceFormat.Tools.rightPad(key, indent));
-        String[] lines = RichSequenceFormat.Tools.writeWordWrap(text, "\\s+", " ", this.getLineWidth()-indent);
+        String[] lines = RichSequenceFormat.Tools.writeWordWrap(text, sep, printSep, this.getLineWidth()-indent);
         for (int i = 0; i<lines.length; i++) {
             if (i==0) b.append(lines[i]);
             else b.append(RichSequenceFormat.Tools.leftIndent(lines[i],indent));

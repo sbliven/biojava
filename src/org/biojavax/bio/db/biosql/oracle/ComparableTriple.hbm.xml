@@ -27,7 +27,7 @@
             <column name="ONTOLOGY_ID" not-null="true"/>
         </many-to-one>   
         <set name="descriptors" table="TERM_RELATIONSHIP_TERM" lazy="false" cascade="all">
-            <key column="TERM_RELATIONSHIP_ID"/>
+            <key column="TERM_RELATIONSHIP_ID" not-null="true"/>
             <many-to-many class="org.biojavax.ontology.SimpleComparableTerm">
                 <column name="TERM_ID" not-null="true"/>
             </many-to-many>

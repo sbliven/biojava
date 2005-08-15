@@ -137,12 +137,13 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     
     // Hibernate requirement - not for public use.
     private void setSynonymSet(Set synonyms) {
-        this.synonyms.clear();
-        if (synonyms==null) return;
-        for (Iterator i = synonyms.iterator(); i.hasNext(); ) {
+        Set newsyns = new TreeSet();
+        if (synonyms!=null) for (Iterator i = synonyms.iterator(); i.hasNext(); ) {
             Object o = i.next();
-            this.addSynonym(o);
+            newsyns.add(o);
         }
+        this.synonyms.clear();
+        for (Iterator i = newsyns.iterator(); i.hasNext(); ) this.addSynonym(i.next());
     }
     
     /**
@@ -154,13 +155,14 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
      * {@inheritDoc}
      */
     public void setRankedCrossRefs(Set rankedcrossrefs) throws ChangeVetoException {
-        this.rankedcrossrefs.clear();
-        if (rankedcrossrefs==null) return;
-        for (Iterator i = rankedcrossrefs.iterator(); i.hasNext(); ) {
+        Set newrc = new TreeSet();
+        if (rankedcrossrefs!=null) for (Iterator i = rankedcrossrefs.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof RankedCrossRef)) throw new ChangeVetoException("Can only add RankedCrossRef objects as ranked crossrefs");
-            this.addRankedCrossRef((RankedCrossRef)o);
+            newrc.add(o);
         }
+        this.rankedcrossrefs.clear();
+        for (Iterator i = newrc.iterator(); i.hasNext(); ) this.addRankedCrossRef((RankedCrossRef)i.next());
     }
     
     /**

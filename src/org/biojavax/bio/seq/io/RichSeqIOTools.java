@@ -345,13 +345,13 @@ public final class RichSeqIOTools {
         }
         
         public Sequence nextSequence() {
-            RichSequence seq = this.seq;
-            this.seq = null;
-            return seq;
+            return this.nextRichSequence();
         }
         
         public RichSequence nextRichSequence() {
-            return (RichSequence)this.nextSequence();
+            RichSequence seq = this.seq;
+            this.seq = null;
+            return seq;
         }
     }
 }

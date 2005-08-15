@@ -36,7 +36,7 @@ import org.biojavax.RichAnnotatable;
  *
  * @author Richard Holland
  */
-public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,RichFeatureHolder {
+public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,RichFeatureHolder,Comparable {
     
     public static final ChangeType NAME = new ChangeType(
             "This feature's name has changed",

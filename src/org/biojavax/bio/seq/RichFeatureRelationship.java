@@ -29,7 +29,6 @@ package org.biojavax.bio.seq;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
-import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -39,13 +38,7 @@ import org.biojavax.ontology.ComparableTerm;
  * @author Richard Holland
  */
 public interface RichFeatureRelationship extends Comparable,Changeable {
-    
-    /**
-     * The default term used for defining the relationship between features.
-     */
-    public static final ComparableTerm DEFAULT_FEATURE_RELATIONSHIP_TERM = 
-            RichObjectFactory.getDefaultOntology().getOrCreateTerm("contains");
-    
+        
     public static final ChangeType RANK = new ChangeType(
             "This feature relationship's rank has changed",
             "org.biojavax.bio.seq.RichFeatureRelationship",

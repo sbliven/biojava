@@ -71,12 +71,15 @@ public interface RichSequenceFormat extends SequenceFormat,ParseErrorSource {
             return b.toString();
         }
         public static String[] writeWordWrap(String input, String sepRegex, String separator, int width) {
+            width--; // because of some weird start-at-zero thingy - if you pass 60, we must work with 59.            
+            if (input.length()<=width) return new String[]{input};            
             String[] parts = input.split(sepRegex);
             StringBuffer currentLine = new StringBuffer();
             List lines = new ArrayList();
             for (int i = 0; i < parts.length; i++) {
                 String word = parts[i];
                 if (word!=null && word.length()>0) {
+                    if (i < (parts.length-1)) word = word + separator;
                     int wordLength = word.length();
                     if (wordLength+currentLine.length() > width) {
                         if (wordLength > width) {
@@ -97,7 +100,6 @@ public interface RichSequenceFormat extends SequenceFormat,ParseErrorSource {
                         }
                     }
                     currentLine.append(word);
-                    if (i<(parts.length-1)) currentLine.append(separator);
                 }
             }
             if (currentLine.length()>0) lines.add(currentLine.toString());

@@ -25,7 +25,6 @@
  * Created on July 28, 2005, 5:29 PM
  */
 package org.biojavax.bio.seq;
-import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
@@ -38,13 +37,8 @@ import org.biojavax.ontology.ComparableTerm;
  *
  * @author Richard Holland
  */
-public interface RichLocation extends Location,RichAnnotatable {
+public interface RichLocation extends Location,RichAnnotatable,Comparable {
     
-    public static final ChangeType CROSSREF = new ChangeType(
-            "This location's crossref has changed",
-            "org.biojavax.bio.seq.RichLocation",
-            "CROSSREF"
-            );
     public static final ChangeType NOTE = new ChangeType(
             "This location's notes have changed",
             "org.biojavax.bio.seq.RichLocation",
@@ -55,25 +49,10 @@ public interface RichLocation extends Location,RichAnnotatable {
             "org.biojavax.bio.seq.RichLocation",
             "TERM"
             );
-    public static final ChangeType STRAND = new ChangeType(
-            "This location's strand has changed",
-            "org.biojavax.bio.seq.RichLocation",
-            "STRAND"
-            );
     public static final ChangeType RANK = new ChangeType(
             "This location's rank has changed",
             "org.biojavax.bio.seq.RichLocation",
             "RANK"
-            );
-    public static final ChangeType MIN = new ChangeType(
-            "This location's min has changed",
-            "org.biojavax.bio.seq.RichLocation",
-            "MIN"
-            );
-    public static final ChangeType MAX = new ChangeType(
-            "This location's max has changed",
-            "org.biojavax.bio.seq.RichLocation",
-            "MAX"
             );
     
     /**
@@ -81,13 +60,6 @@ public interface RichLocation extends Location,RichAnnotatable {
      * @return the crossref.
      */
     public CrossRef getCrossRef();
-    
-    /**
-     * Sets the crossref for this location.
-     * @param crossref the crossref this location should adopt.
-     * @throws ChangeVetoException in case of error.
-     */
-    public void setCrossRef(CrossRef crossref) throws ChangeVetoException;
     
     /**
      * Retrieves the term associated with this location.
@@ -109,13 +81,6 @@ public interface RichLocation extends Location,RichAnnotatable {
     public Strand getStrand();
     
     /**
-     * Sets the strand for this location.
-     * @param strand the strand this location should adopt.
-     * @throws ChangeVetoException in case of error.
-     */
-    public void setStrand(Strand strand) throws ChangeVetoException;
-    
-    /**
      * Retrieves the rank associated with this location.
      * @return the rank.
      */
@@ -128,18 +93,21 @@ public interface RichLocation extends Location,RichAnnotatable {
      */
     public void setRank(int rank) throws ChangeVetoException;
     
-    /**
-     * Sets the min for this location.
-     * @param min the min this location should adopt.
-     * @throws ChangeVetoException in case of error.
-     */
-    public void setMin(int min) throws ChangeVetoException;
+    public Position getMinPos();
     
-    /**
-     * Sets the max for this location.
-     * @param max the max this location should adopt.
-     * @throws ChangeVetoException in case of error.
-     */
-    public void setMax(int max) throws ChangeVetoException;
+    public Position getMaxPos();
     
+    public void setPositionResolver(PositionResolver p);
+    
+    public static final RichLocation EMPTY_LOCATION = new EmptyRichLocation();
+    
+    public class Strand {
+        private String name;
+        public Strand(String name) { this.name = name; }
+        public String toString() { return this.name; }
+    }
+    
+    public static final Strand POSITIVE_STRAND = new Strand("+");
+    public static final Strand NEGATIVE_STRAND = new Strand("-");
+    public static final Strand UNKNOWN_STRAND = new Strand("?");
 }

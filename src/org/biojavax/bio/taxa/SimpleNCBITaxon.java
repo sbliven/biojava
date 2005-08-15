@@ -121,9 +121,12 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     
     // Hibernate requirement - not for public use.
     private void setNameSet(Set names) {
+        Set newn = new TreeSet();
+        if (names!=null) for (Iterator i = names.iterator(); i.hasNext(); ) {
+            newn.add(i.next());
+        }
         this.names.clear();
-        if (names==null) return;
-        for (Iterator i = names.iterator(); i.hasNext(); ) {
+        for (Iterator i = newn.iterator(); i.hasNext(); ) {
             SimpleNCBITaxonName n = (SimpleNCBITaxonName)i.next();
             try {
                 this.addName(n.getNameClass(), n.getName());

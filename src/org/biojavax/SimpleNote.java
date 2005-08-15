@@ -149,7 +149,7 @@ public class SimpleNote extends AbstractChangeable implements Note {
         if (this.term==null) return -1;
         // Normal comparison
         Note them = (Note)o;
-        if (this.term.equals(them.getTerm())) return this.rank-them.getRank();
+        if (this.rank!=them.getRank()) return this.rank-them.getRank();
         else return this.term.compareTo(them.getTerm());
     }
     

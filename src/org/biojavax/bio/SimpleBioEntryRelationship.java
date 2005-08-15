@@ -114,6 +114,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
         if (this.subject==null) return -1;
         // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)o;
+        if (!this.rank.equals(them.getRank())) return this.rank.compareTo(them.getRank());
         if (!this.subject.equals(them.getSubject())) return this.subject.compareTo(them.getSubject());
         return this.term.compareTo(them.getTerm());
     }

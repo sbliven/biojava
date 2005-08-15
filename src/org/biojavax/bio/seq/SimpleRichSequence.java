@@ -21,10 +21,10 @@
 
 package org.biojavax.bio.seq;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
@@ -43,7 +43,6 @@ import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
-import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.SimpleBioEntry;
 
 
@@ -54,8 +53,9 @@ import org.biojavax.bio.SimpleBioEntry;
 public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     
     private SymbolList symList;
-    private Set features = new HashSet();
+    private Set features = new TreeSet();
     private Double symListVersion;
+    private boolean circular;
     
     
     /**
@@ -72,6 +72,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
         if (symList==null) this.symList = SymbolList.EMPTY_LIST;
         else this.symList = symList;
         this.symListVersion = seqversion;
+        this.circular = false;
     }
     
     // Hibernate requirement - not for public use.
@@ -86,22 +87,45 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
      * {@inheritDoc}
      */
     public void setSeqVersion(Double seqVersion) throws ChangeVetoException {
-        if(!this.hasListeners(RichSequence.SEQVERSION)) {
+        if(!this.hasListeners(RichSequence.SYMLISTVERSION)) {
             this.symListVersion = seqVersion;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
-                    BioEntry.SEQVERSION,
+                    RichSequence.SYMLISTVERSION,
                     seqVersion,
                     this.symListVersion
                     );
-            ChangeSupport cs = this.getChangeSupport(RichSequence.SEQVERSION);
+            ChangeSupport cs = this.getChangeSupport(RichSequence.SYMLISTVERSION);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
                 this.symListVersion = seqVersion;
                 cs.firePostChangeEvent(ce);
             }
         }
+    }
+    
+    public void setCircular(boolean circular) throws ChangeVetoException {
+        if(!this.hasListeners(RichSequence.CIRCULAR)) {
+            this.circular = circular;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    RichSequence.CIRCULAR,
+                    new Boolean(circular),
+                    new Boolean(this.circular)
+                    );
+            ChangeSupport cs = this.getChangeSupport(RichSequence.CIRCULAR);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.circular = circular;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
+    
+    public boolean isCircular() {
+        return this.circular;
     }
     
     /**
@@ -277,21 +301,18 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     /**
      * {@inheritDoc}
      */
-    public Set getFeatureSet() {
-        return Collections.unmodifiableSet(this.features);
-    }
+    public Set getFeatureSet() { return Collections.unmodifiableSet(this.features); }
     
     /**
      * {@inheritDoc}
      */
     public void setFeatureSet(Set features) throws ChangeVetoException {
-        this.features.clear();
-        if (features==null) return;
-        for (Iterator i = features.iterator(); i.hasNext(); ) {
+        Set newfeats = new TreeSet();
+        if (features!=null) for (Iterator i = features.iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
             f.setParent(this);
             if(!this.hasListeners(RichSequence.FEATURES)) {
-                this.features.add(f);
+                newfeats.add(f);
             } else {
                 ChangeEvent ce = new ChangeEvent(
                         this,
@@ -302,11 +323,13 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
                 ChangeSupport cs = this.getChangeSupport(RichSequence.FEATURES);
                 synchronized(cs) {
                     cs.firePreChangeEvent(ce);
-                    this.features.add(f);
+                    newfeats.add(f);
                     cs.firePostChangeEvent(ce);
                 }
             }
         }
+        this.features.clear();
+        this.features.addAll(newfeats);
     }
     
     /**

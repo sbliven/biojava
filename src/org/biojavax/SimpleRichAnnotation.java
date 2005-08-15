@@ -181,12 +181,13 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
      * {@inheritDoc}
      */
     public void setNoteSet(Set notes) throws ChangeVetoException {
-        this.notes.clear();
-        if (notes==null) return;
-        for (Iterator i = notes.iterator(); i.hasNext(); ) {
+        Set nn = new TreeSet();
+        if (notes!=null) for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (!(o instanceof Note)) throw new ChangeVetoException("Cannot add non-Note objects as notes");
-            this.addNote((Note)o);
+            nn.add(o);
         }
+        this.notes.clear();
+        for (Iterator i = nn.iterator(); i.hasNext(); ) this.addNote((Note)i.next());
     }
 }

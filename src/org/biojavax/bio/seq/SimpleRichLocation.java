@@ -20,21 +20,24 @@
  */
 
 /*
- * SimpleRichLocation.java
+ * RangeRichLocation.java
  *
  * Created on June 16, 2005, 11:47 AM
  */
 
 package org.biojavax.bio.seq;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import org.biojava.bio.Annotation;
-import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.StrandedFeature.Strand;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.RNATools;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.LocationTools;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.SymbolListViews;
 import org.biojava.utils.AbstractChangeable;
@@ -42,9 +45,10 @@ import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
-import org.biojavax.Note;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRichAnnotation;
+import org.biojavax.bio.seq.Position.ExactPosition;
+import org.biojavax.bio.seq.PositionResolver.AverageResolver;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -57,12 +61,12 @@ import org.biojavax.ontology.ComparableTerm;
  */
 public class SimpleRichLocation extends AbstractChangeable implements RichLocation {
     
-    private Set blocks = new TreeSet();
     private CrossRef crossRef;
     private RichAnnotation notes = new SimpleRichAnnotation();
     private ComparableTerm term;
-    private int min;
-    private int max;
+    private Position min;
+    private Position max;
+    private PositionResolver pr = new AverageResolver();
     private Strand strand;
     private int rank;
     
@@ -73,12 +77,18 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * @param max Max location position.
      * @param rank Rank of location.
      */
-    public SimpleRichLocation(int min, int max, int rank) {
+    public SimpleRichLocation(Position min, Position max, int rank) {
+        this(min,max,rank,RichLocation.POSITIVE_STRAND);
+    }
+    public SimpleRichLocation(Position min, Position max, int rank, Strand strand) {
+        this(min,max,rank,strand,null);
+    }
+    public SimpleRichLocation(Position min, Position max, int rank, Strand strand, CrossRef crossRef) {
         this.min = min;
         this.max = max;
         this.rank = rank;
-        this.strand = StrandedFeature.UNKNOWN;
-        this.blocks.add(this);
+        this.strand = strand;
+        this.crossRef = crossRef;
     }
     
     // Hibernate requirement - not for public use.
@@ -89,27 +99,9 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      */
     public CrossRef getCrossRef() { return this.crossRef; }
     
-    /**
-     * {@inheritDoc}
-     */
-    public void setCrossRef(CrossRef crossRef) throws ChangeVetoException {
-        if(!this.hasListeners(RichLocation.CROSSREF)) {
-            this.crossRef = crossRef;
-        } else {
-            ChangeEvent ce = new ChangeEvent(
-                    this,
-                    RichLocation.CROSSREF,
-                    crossRef,
-                    this.crossRef
-                    );
-            ChangeSupport cs = this.getChangeSupport(RichLocation.CROSSREF);
-            synchronized(cs) {
-                cs.firePreChangeEvent(ce);
-                this.crossRef = crossRef;
-                cs.firePostChangeEvent(ce);
-            }
-        }
-    }
+    
+    // Hibernate requirement - not for public use.
+    private void setCrossRef(CrossRef crossRef) { this.crossRef = crossRef; }
     
     /**
      * {@inheritDoc}
@@ -124,30 +116,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public void setNoteSet(Set notes) throws ChangeVetoException {
-        this.notes.clear();
-        if (notes==null) return;
-        for (Iterator i = notes.iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (!(o instanceof Note)) throw new ChangeVetoException("Note set must only have notes in");
-            if(!this.hasListeners(RichLocation.NOTE)) {
-                this.notes.addNote((Note)o);
-            } else {
-                ChangeEvent ce = new ChangeEvent(
-                        this,
-                        RichLocation.NOTE,
-                        o,
-                        null
-                        );
-                ChangeSupport cs = this.getChangeSupport(RichLocation.NOTE);
-                synchronized(cs) {
-                    cs.firePreChangeEvent(ce);
-                    this.notes.addNote((Note)o);
-                    cs.firePostChangeEvent(ce);
-                }
-            }
-        }
-    }
+    public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
     
     /**
      * {@inheritDoc}
@@ -181,48 +150,20 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      */
     public Strand getStrand() { return this.strand; }
     
-    /**
-     * {@inheritDoc}
-     */
-    public void setStrand(Strand strand) throws ChangeVetoException {
-        if (strand==null) throw new IllegalArgumentException("Strand cannot be null");
-        if(!this.hasListeners(RichLocation.STRAND)) {
-            this.strand = strand;
-        } else {
-            ChangeEvent ce = new ChangeEvent(
-                    this,
-                    RichLocation.STRAND,
-                    term,
-                    this.term
-                    );
-            ChangeSupport cs = this.getChangeSupport(RichLocation.STRAND);
-            synchronized(cs) {
-                cs.firePreChangeEvent(ce);
-                this.strand = strand;
-                cs.firePostChangeEvent(ce);
-            }
-        }
-    }
+    // Hibernate requirement - not for public use.
+    private int getStrandNum() { return (this.strand==RichLocation.NEGATIVE_STRAND?-1:1); }
     
     // Hibernate requirement - not for public use.
-    private String getStrandChar() { return ""+this.strand.getToken(); }
-    
-    // Hibernate requirement - not for public use.
-    private void setStrandChar(String token) {
-        if (token==null) {
-            this.strand = StrandedFeature.UNKNOWN;
-            return;
-        }
-        char t = token.charAt(0);
-        switch (t) {
-            case '+':
-                this.strand = StrandedFeature.POSITIVE;
+    private void setStrandNum(int token) {
+        switch (token) {
+            case 1:
+                this.strand = RichLocation.POSITIVE_STRAND;
                 break;
-            case '-':
-                this.strand = StrandedFeature.NEGATIVE;
+            case -1:
+                this.strand = RichLocation.NEGATIVE_STRAND;
                 break;
             default:
-                this.strand = StrandedFeature.UNKNOWN;
+                this.strand = RichLocation.UNKNOWN_STRAND;
         }
     }
     
@@ -256,81 +197,68 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public int getMax() { return this.max; }
+    public int getMax() { return this.pr.getMax(this.max); }
+        
+    // Hibernate requirement - not for public use.
+    private void setMax(int max) {  this.max = new ExactPosition(false,false,max); }
     
     /**
      * {@inheritDoc}
      */
-    public void setMax(int max) throws ChangeVetoException {
-        if(!this.hasListeners(RichLocation.MAX)) {
-            this.max = max;
+    public int getMin() { return this.pr.getMin(this.min); }
+    
+    // Hibernate requirement - not for public use.
+    private void setMin(int min) {  this.min = new ExactPosition(false,false,min); }
+    
+    public Position getMinPos() { return this.min; }
+    
+    public Position getMaxPos() { return this.max; }
+            
+    public void setPositionResolver(PositionResolver p) { this.pr = p; }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Iterator blockIterator() { return Collections.singleton(this).iterator(); }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean contains(Location l) {
+        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        if (!this.overlaps(l)) return false; // check strand etc.
+        if (l instanceof CompoundRichLocation) {
+            for (Iterator i = l.blockIterator(); i.hasNext(); ) if (!this.contains((RichLocation)i.next())) return false;
+            return true;
         } else {
-            ChangeEvent ce = new ChangeEvent(
-                    this,
-                    RichLocation.MAX,
-                    new Integer(max),
-                    new Integer(this.max)
-                    );
-            ChangeSupport cs = this.getChangeSupport(RichLocation.MAX);
-            synchronized(cs) {
-                cs.firePreChangeEvent(ce);
-                this.max = max;
-                cs.firePostChangeEvent(ce);
-            }
+            return (this.getMin() <= l.getMin() && this.getMax() >=l.getMax());
         }
     }
     
     /**
      * {@inheritDoc}
      */
-    public int getMin() { return this.min; }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setMin(int min) throws ChangeVetoException {
-        if(!this.hasListeners(RichLocation.MIN)) {
-            this.min = min;
-        } else {
-            ChangeEvent ce = new ChangeEvent(
-                    this,
-                    RichLocation.MIN,
-                    new Integer(min),
-                    new Integer(this.min)
-                    );
-            ChangeSupport cs = this.getChangeSupport(RichLocation.MIN);
-            synchronized(cs) {
-                cs.firePreChangeEvent(ce);
-                this.min = min;
-                cs.firePostChangeEvent(ce);
-            }
+    public boolean overlaps(Location l) {
+        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        RichLocation rl = (RichLocation)l;
+        if (rl.getStrand()!=this.strand) return false;
+        if (rl.getCrossRef()!=null || this.crossRef!=null) {
+            if (rl.getCrossRef()!=null && this.crossRef!=null) {
+                if (!this.crossRef.equals(rl.getCrossRef())) return false;
+            } else return false;
         }
+        return (rl.getMin()<this.getMax() && rl.getMax()>this.getMin());
     }
     
     /**
      * {@inheritDoc}
      */
-    public Iterator blockIterator() { return Collections.unmodifiableSet(this.blocks).iterator(); }
+    public boolean isContiguous() { return true; }
     
     /**
      * {@inheritDoc}
      */
-    public boolean contains(Location l) { return LocationTools.contains(this,l); }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean overlaps(Location l) { return LocationTools.overlaps(this,l); }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isContiguous() { return this.blocks.size()==1; }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean contains(int p) { return this.getMin()<=p && p<=this.getMax(); }
+    public boolean contains(int p) { return (p>=this.getMin() && p<=this.getMax()); }
     
     /**
      * {@inheritDoc}
@@ -346,56 +274,23 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * {@inheritDoc}
      */
     public Location translate(int dist) {
-        try {
-            SimpleRichLocation l = new SimpleRichLocation(this.min+dist,this.max+dist,this.rank);
-            l.setStrand(this.getStrand());
-            l.setCrossRef(this.getCrossRef());
-            l.setNoteSet(this.getNoteSet());
-            l.setTerm(this.getTerm());
-            if (!this.isContiguous()) {
-                l.blocks.clear();
-                for (Iterator i = this.blocks.iterator(); i.hasNext(); ) {
-                    Location b = (Location)i.next();
-                    l.blocks.add(b.translate(dist));
-                }
-            }
-            return l;
-        } catch (ChangeVetoException e) {
-            throw new RuntimeException("Someone doesn't like us changing things!",e);
-        }
+        return new SimpleRichLocation(this.min.translate(dist),this.max.translate(dist),0,this.strand,this.crossRef);
     }
     
     /**
      * {@inheritDoc}
      */
     public Location union(Location l) {
-        try {
-            if (l==null) throw new IllegalArgumentException("Location cannot be null");
-            Location u = LocationTools.union(this,l);
-            SimpleRichLocation r = new SimpleRichLocation(u.getMin(),u.getMax(),this.rank);
-            r.setStrand(this.getStrand());
-            r.setCrossRef(this.getCrossRef());
-            r.setNoteSet(this.getNoteSet());
-            r.setTerm(this.getTerm());
-            if (!u.isContiguous()) {
-                r.blocks.clear();
-                int counter = 1;
-                for (Iterator i = u.blockIterator(); i.hasNext(); ) {
-                    Location b = (Location)i.next();
-                    RichLocation r2 = new SimpleRichLocation(b.getMin(), b.getMax(), counter++);
-                    if (b instanceof RichLocation) {
-                        RichLocation b2 = (RichLocation)b;
-                        r2.setStrand(b2.getStrand());
-                        r2.setCrossRef(b2.getCrossRef());
-                        r2.setNoteSet(b2.getNoteSet());
-                        r2.setTerm(b2.getTerm());
-                    }
-                    r.blocks.add(r2);
-                }
-            }
-            return r;
-        } catch (ChangeVetoException e) {
-            throw new RuntimeException("Someone doesn't like us changing things!",e);
+        if (l==null) throw new IllegalArgumentException("Location cannot be null");
+        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        RichLocation rl = (RichLocation)l;
+        if (this.overlaps(rl)) {
+            return new SimpleRichLocation(this.posmin(this.min,rl.getMinPos()),this.posmax(this.max,rl.getMaxPos()),0,this.strand,this.crossRef);
+        } else {
+            List s = new ArrayList();
+            s.add(this);
+            s.add(rl);
+            return new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),s);
         }
     }
     
@@ -403,34 +298,27 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * {@inheritDoc}
      */
     public Location intersection(Location l) {
-        try {
-            if (l==null) throw new IllegalArgumentException("Location cannot be null");
-            Location u = LocationTools.intersection(this,l);
-            SimpleRichLocation r = new SimpleRichLocation(u.getMin(),u.getMax(),this.rank);
-            r.setStrand(this.getStrand());
-            r.setCrossRef(this.getCrossRef());
-            r.setNoteSet(this.getNoteSet());
-            r.setTerm(this.getTerm());
-            if (!u.isContiguous()) {
-                r.blocks.clear();
-                int counter = 1;
-                for (Iterator i = u.blockIterator(); i.hasNext(); ) {
-                    Location b = (Location)i.next();
-                    RichLocation r2 = new SimpleRichLocation(b.getMin(), b.getMax(), counter++);
-                    if (b instanceof RichLocation) {
-                        RichLocation b2 = (RichLocation)b;
-                        r2.setStrand(b2.getStrand());
-                        r2.setCrossRef(b2.getCrossRef());
-                        r2.setNoteSet(b2.getNoteSet());
-                        r2.setTerm(b2.getTerm());
-                    }
-                    r.blocks.add(r2);
-                }
-            }
-            return r;
-        } catch (ChangeVetoException e) {
-            throw new RuntimeException("Someone doesn't like us changing things!",e);
-        }
+        if (l==null) throw new IllegalArgumentException("Location cannot be null");
+        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        RichLocation them = (RichLocation)l;
+        
+        if (!this.overlaps(l)) return RichLocation.EMPTY_LOCATION;
+        
+        return new SimpleRichLocation(this.posmax(this.min,them.getMinPos()),this.posmin(this.max,them.getMaxPos()),0,this.strand,this.crossRef);
+    }
+    
+    private Position posmin(Position a, Position b) {
+        int ar = this.pr.getMin(a);
+        int br = this.pr.getMin(b);
+        if (ar<=br) return a;
+        else return b;
+    }
+    
+    private Position posmax(Position a, Position b) {
+        int ar = this.pr.getMax(a);
+        int br = this.pr.getMax(b);
+        if (ar>br) return a;
+        else return b;
     }
     
     /**
@@ -438,9 +326,27 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      */
     public SymbolList symbols(SymbolList seq) {
         if (seq==null) throw new IllegalArgumentException("Sequence cannot be null");
+        
+        if ((this.getMax()-this.getMin())<1) return SymbolList.EMPTY_LIST;
+        
         SymbolList seq2 = seq.subList(this.getMin(),this.getMax());
-        if (this.strand==StrandedFeature.NEGATIVE) return SymbolListViews.reverse(seq2);
-        else return seq2;
+        
+        try {
+            if (this.strand==RichLocation.NEGATIVE_STRAND) {
+                Alphabet a = seq.getAlphabet();
+                if (a==AlphabetManager.alphabetForName("DNA")) {
+                    seq2 = DNATools.reverseComplement(seq);
+                } else if (a==AlphabetManager.alphabetForName("RNA")) {
+                    seq2 = RNATools.reverseComplement(seq);
+                } else {
+                    seq2 = SymbolListViews.reverse(seq2);// no complement as no such thing
+                }
+            }
+        } catch (IllegalAlphabetException e) {
+            throw new IllegalArgumentException("Could not understand alphabet of passed sequence", e);
+        }
+        
+        return seq2;
     }
     
     /**
@@ -449,13 +355,14 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public int hashCode() {
         int code = 17;
         // Hibernate comparison - we haven't been populated yet
-        if (this.term==null) return code;
+        if (this.strand==null) return code;
         // Normal comparison
-        code = 31*code + this.term.hashCode();
-        code = 31*code + this.min;
-        code = 31*code + this.max;
+        if (this.term!=null) code = 31*code + this.term.hashCode();
+        code = 31*code + this.getMin();
+        code = 31*code + this.getMax();
         code = 31*code + this.strand.hashCode();
         code = 31*code + this.rank;
+        if (this.crossRef!=null) code = 31*code + this.crossRef.hashCode();
         return code;
     }
     
@@ -465,14 +372,39 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public boolean equals(Object o) {
         if (! (o instanceof RichLocation)) return false;
         // Hibernate comparison - we haven't been populated yet
-        if (this.term==null) return false;
+        if (this.strand==null) return false;
         // Normal comparison
         RichLocation fo = (RichLocation) o;
         if (!this.term.equals(fo.getTerm())) return false;
-        if (this.min!=fo.getMin()) return false;
-        if (this.max!=fo.getMax()) return false;
+        if (this.getMin()!=fo.getMin()) return false;
+        if (this.getMax()!=fo.getMax()) return false;
         if (!this.strand.equals(fo.getStrand())) return false;
+        if (this.crossRef!=null || fo.getCrossRef()!=null) {
+            if (this.crossRef!=null && fo.getCrossRef()!=null) {
+                return this.crossRef.equals(fo.getCrossRef());
+            } else return false;
+        }
         return this.rank==fo.getRank();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int compareTo(Object o) {
+        // Hibernate comparison - we haven't been populated yet
+        if (this.strand==null) return -1;
+        // Normal comparison
+        RichLocation fo = (RichLocation) o;
+        if (this.rank!=fo.getRank()) return this.rank-fo.getRank();
+        if (this.crossRef!=null || fo.getCrossRef()!=null) {
+            if (this.crossRef!=null && fo.getCrossRef()!=null) {
+                return this.crossRef.compareTo(fo.getCrossRef());
+            } else return -1;
+        }
+        if (!this.strand.equals(fo.getStrand())) return this.strand==RichLocation.NEGATIVE_STRAND?-1:1;
+        if (!this.term.equals(fo.getTerm())) return this.term.compareTo(fo.getTerm());
+        if (this.getMin()!=fo.getMin()) return this.getMin()-fo.getMin();
+        return this.getMax()-fo.getMax();
     }
     
     

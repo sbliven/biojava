@@ -48,7 +48,7 @@ public class RichObjectFactory {
         builder = b;
     }
     
-    public static Object getObject(Class clazz, Object[] params) {
+    public static synchronized Object getObject(Class clazz, Object[] params) {
         if (!objects.containsKey(clazz)) objects.put(clazz,new HashMap());
         Map contents = (Map)objects.get(clazz);
         if (!contents.containsKey(params)) contents.put(params, builder.buildObject(clazz, params));

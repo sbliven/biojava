@@ -61,6 +61,9 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     public SimpleCrossRef(String dbname, String accession) {
         this(dbname,accession,0);
     }
+    public SimpleCrossRef(String dbname, String accession, Integer version) {
+        this(dbname,accession,version.intValue());
+    }
     
     // Hibernate requirement - not for public use.
     protected SimpleCrossRef() {}
