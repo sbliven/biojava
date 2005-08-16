@@ -44,7 +44,8 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     
-    private Map names = new TreeMap();
+    private Set names = new TreeSet();
+    private Map namesMap = new TreeMap();
     private Integer parent;
     private int NCBITaxID;
     private String nodeRank;
@@ -97,7 +98,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     /**
      * {@inheritDoc}
      */
-    public Set getNameClasses() { return this.names.keySet(); }
+    public Set getNameClasses() { return this.namesMap.keySet(); }
     
     /**
      * {@inheritDoc}
@@ -105,7 +106,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     public Set getNames(String nameClass) throws IllegalArgumentException {
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
         Set n = new TreeSet();
-        for (Iterator j = ((Set)this.names.get(nameClass)).iterator(); j.hasNext(); ) {
+        for (Iterator j = ((Set)this.namesMap.get(nameClass)).iterator(); j.hasNext(); ) {
             SimpleNCBITaxonName name = (SimpleNCBITaxonName)j.next();
             n.add(name.getName());
         }
@@ -113,20 +114,13 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     }
     
     // Hibernate requirement - not for public use.
-    private Set getNameSet() {
-        Set n = new TreeSet();
-        for (Iterator i = this.names.values().iterator(); i.hasNext(); ) n.addAll((Set)i.next());
-        return n;
-    }
+    private Set getNameSet() { return this.names; } // original for Hibernate
     
     // Hibernate requirement - not for public use.
     private void setNameSet(Set names) {
-        Set newn = new TreeSet();
-        if (names!=null) for (Iterator i = names.iterator(); i.hasNext(); ) {
-            newn.add(i.next());
-        }
-        this.names.clear();
-        for (Iterator i = newn.iterator(); i.hasNext(); ) {
+        this.names = names; // original for Hibernate
+        this.namesMap.clear();
+        for (Iterator i = names.iterator(); i.hasNext(); ) {
             SimpleNCBITaxonName n = (SimpleNCBITaxonName)i.next();
             try {
                 this.addName(n.getNameClass(), n.getName());
@@ -145,20 +139,22 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
         SimpleNCBITaxonName n = new SimpleNCBITaxonName(nameClass, name);
         if(!this.hasListeners(NCBITaxon.NAMES)) {
-            if (!this.names.containsKey(nameClass)) this.names.put(nameClass,new TreeSet());
-            ((Set)this.names.get(nameClass)).add(n);
+            if (!this.namesMap.containsKey(nameClass)) this.namesMap.put(nameClass,new TreeSet());
+            ((Set)this.namesMap.get(nameClass)).add(n);
+            this.names.add(n);
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     NCBITaxon.NAMES,
                     name,
-                    ((Set)this.names.get(nameClass)).contains(n)?name:null
+                    ((Set)this.namesMap.get(nameClass)).contains(n)?name:null
                     );
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.NAMES);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                if (!this.names.containsKey(nameClass)) this.names.put(nameClass,new TreeSet());
-                ((Set)this.names.get(nameClass)).add(n);
+                if (!this.namesMap.containsKey(nameClass)) this.namesMap.put(nameClass,new TreeSet());
+                ((Set)this.namesMap.get(nameClass)).add(n);
+                this.names.add(n);
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -171,10 +167,11 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
         SimpleNCBITaxonName n = new SimpleNCBITaxonName(nameClass, name);
-        if (!this.names.containsKey(nameClass)) return false;
+        if (!this.namesMap.containsKey(nameClass)) return false;
         boolean results;
         if(!this.hasListeners(NCBITaxon.NAMES)) {
-            results = ((Set)this.names.get(nameClass)).remove(n);
+            results = ((Set)this.namesMap.get(nameClass)).remove(n);
+            this.names.remove(n);
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
@@ -185,7 +182,8 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
             ChangeSupport cs = this.getChangeSupport(NCBITaxon.NAMES);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                results = ((Set)this.names.get(nameClass)).remove(n);
+                results = ((Set)this.namesMap.get(nameClass)).remove(n);
+                this.names.remove(n);
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -198,9 +196,9 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     public boolean containsName(String nameClass, String name) throws IllegalArgumentException {
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
-        if (!this.names.containsKey(nameClass)) return false;
+        if (!this.namesMap.containsKey(nameClass)) return false;
         SimpleNCBITaxonName n = new SimpleNCBITaxonName(nameClass, name);
-        return ((Set)this.names.get(nameClass)).contains(n);
+        return ((Set)this.namesMap.get(nameClass)).contains(n);
     }
     
     /**
