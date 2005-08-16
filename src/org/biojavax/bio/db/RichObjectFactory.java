@@ -61,6 +61,8 @@ public class RichObjectFactory {
     private static String defaultLocalNamespaceName = "lcl";
     private static String defaultRemoteNamespaceName = "rmt";
     private static String defaultOntologyName = "biojavax";
+    private static String genbankNamespaceName = "gb";
+    private static String emblNamespaceName = "embl";
     private static PositionResolver defaultPositionResolver = new AverageResolver();
     
     public static void setDefaultLocalNamespaceName(String name) { defaultLocalNamespaceName = name; }
@@ -75,6 +77,12 @@ public class RichObjectFactory {
         return (Namespace)getObject(SimpleNamespace.class, new Object[]{defaultRemoteNamespaceName});
     }
     
+    public static Namespace getGenbankNamespace(){
+        return (Namespace)getObject(SimpleNamespace.class, new Object[]{genbankNamespaceName});
+    }
+    public static Namespace getEMBLNamespace(){
+        return (Namespace)getObject(SimpleNamespace.class, new Object[]{emblNamespaceName});
+    }
     public static ComparableOntology getDefaultOntology() {
         return (ComparableOntology)getObject(SimpleComparableOntology.class, new Object[]{defaultOntologyName});
     }
