@@ -83,5 +83,5 @@ public interface RichSequence extends BioEntry,Sequence {
     
     public void setCircular(boolean circular) throws ChangeVetoException;
     
-    public boolean isCircular();
+    public boolean getCircular();
 }

@@ -44,7 +44,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
 import org.biojavax.RichAnnotation;
 import org.biojavax.bio.db.RichObjectFactory;
-import org.biojavax.bio.seq.Position.ExactPosition;
+import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -140,7 +140,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     /**
      * {@inheritDoc}
      */
-    public Strand getStrand() { return RichLocation.UNKNOWN_STRAND; }
+    public Strand getStrand() { return Strand.UNKNOWN_STRAND; }
     
     /**
      * {@inheritDoc}
@@ -164,11 +164,13 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      */
     public int getMin() { return 0; }
         
-    public Position getMinPos() { return new ExactPosition(false,false,0); }
+    public Position getMinPosition() { return new SimplePosition(false,false,0); }
     
-    public Position getMaxPos() { return new ExactPosition(false,false,0); }
+    public Position getMaxPosition() { return new SimplePosition(false,false,0); }
             
-    public void setPositionResolver(PositionResolver p) {} // ignore
+    public void setPositionResolver(PositionResolver p) {
+        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setPositionResolver(p);
+    }
     
     /**
      * {@inheritDoc}

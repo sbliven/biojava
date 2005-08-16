@@ -26,8 +26,6 @@
  */
 
 package org.biojavax.bio;
-
-import java.util.Collections;
 import java.util.TreeSet;
 import java.util.Set;
 import org.biojava.bio.Annotation;
@@ -95,7 +93,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     /**
      * {@inheritDoc}
      */
-    public Set getRankedCrossRefs() { return Collections.unmodifiableSet(this.rankedcrossrefs); }
+    public Set getRankedCrossRefs() { return this.rankedcrossrefs; } // original for Hibernate
     
     /**
      * {@inheritDoc}
@@ -137,17 +135,17 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     /**
      * {@inheritDoc}
      */
-    public Set getComments() { return Collections.unmodifiableSet(this.comments); }
+    public Set getComments() { return this.comments; } // must be original for Hibernate
     
     /**
      * {@inheritDoc}
      */
-    public Set getRankedDocRefs() { return Collections.unmodifiableSet(this.rankeddocrefs); }
+    public Set getRankedDocRefs() { return this.rankeddocrefs; } // must be original for Hibernate
     
     /**
      * {@inheritDoc}
      */
-    public Set getRelationships() { return Collections.unmodifiableSet(this.relationships); }
+    public Set getRelationships() { return this.relationships; }  // must be original for Hibernate
     
     /**
      * {@inheritDoc}
@@ -491,12 +489,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     }
     
     // Hibernate requirement - not for public use.
-    private void setRelationships(Set relationships) { 
-        Set newr = new TreeSet();
-        if (relationships!=null) newr.addAll(relationships);
-        this.relationships.clear();
-        this.relationships.addAll(newr); 
-    }
+    private void setRelationships(Set relationships) { this.relationships = relationships; }  // must be original for Hibernate
     
     // Hibernate requirement - not for public use.
     private void setNamespace(Namespace ns) { this.ns = ns; }
@@ -511,26 +504,13 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     private void setVersion(int v) { this.version = v; }
     
     // Hibernate requirement - not for public use.
-    private void setRankedDocRefs(Set docrefs) { 
-        this.rankeddocrefs.clear();
-        if (docrefs!=null) this.rankeddocrefs.addAll(docrefs); 
-    }
+    private void setRankedDocRefs(Set docrefs) { this.rankeddocrefs = docrefs; } // must be original for Hibernate
     
     // Hibernate requirement - not for public use.
-    private void setComments(Set comments) { 
-        Set newr = new TreeSet();
-        if (comments!=null) newr.addAll(comments);
-        this.comments.clear();
-        this.comments.addAll(newr); 
-    }
+    private void setComments(Set comments) { this.comments = comments; }  // must be original for Hibernate
     
     // Hibernate requirement - not for public use.
-    public void setRankedCrossRefs(Set rankedcrossrefs) { 
-        Set newr = new TreeSet();
-        if (rankedcrossrefs!=null) newr.addAll(rankedcrossrefs);
-        this.rankedcrossrefs.clear();
-        this.rankedcrossrefs.addAll(newr); 
-    }
+    public void setRankedCrossRefs(Set rankedcrossrefs) { this.rankedcrossrefs = rankedcrossrefs; } // original for Hibernate
     
     // Hibernate requirement - not for public use.
     private Long id;

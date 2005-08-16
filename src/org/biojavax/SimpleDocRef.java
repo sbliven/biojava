@@ -46,6 +46,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     private String title;
     private String location;
     private String crc;
+    private String remark;
     
     /**
      * Creates a new document reference.
@@ -60,10 +61,33 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         this.title = null;
         this.location = location;
         this.crc = null;
+        this.remark = null;
     }
     
     // Hibernate requirement - not for public use.
     protected SimpleDocRef() {}
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setRemark(String remark) throws ChangeVetoException {
+        if(!this.hasListeners(DocRef.REMARK)) {
+            this.remark = remark;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    DocRef.REMARK,
+                    remark,
+                    this.remark
+                    );
+            ChangeSupport cs = this.getChangeSupport(DocRef.REMARK);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.remark = remark;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -146,6 +170,11 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
      * {@inheritDoc}
      */
     public String getCRC() { return this.crc; }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getRemark() { return this.remark; }
     
     /**
      * {@inheritDoc}

@@ -36,7 +36,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Unchangeable;
 import org.biojavax.CrossRef;
 import org.biojavax.RichAnnotation;
-import org.biojavax.bio.seq.Position.ExactPosition;
+import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -83,7 +83,7 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     /**
      * {@inheritDoc}
      */
-    public Strand getStrand() { return RichLocation.UNKNOWN_STRAND; }
+    public Strand getStrand() { return Strand.UNKNOWN_STRAND; }
         
     /**
      * {@inheritDoc}
@@ -107,9 +107,9 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      */
     public int getMin() { return 0; }
         
-    public Position getMinPos() { return new ExactPosition(false,false,0); }
+    public Position getMinPosition() { return new SimplePosition(false,false,0); }
     
-    public Position getMaxPos() { return new ExactPosition(false,false,0); }
+    public Position getMaxPosition() { return new SimplePosition(false,false,0); }
     
     public void setPositionResolver(PositionResolver p) {} // ignore
     

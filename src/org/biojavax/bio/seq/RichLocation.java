@@ -93,21 +93,55 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
      */
     public void setRank(int rank) throws ChangeVetoException;
     
-    public Position getMinPos();
+    public Position getMinPosition();
     
-    public Position getMaxPos();
+    public Position getMaxPosition();
     
     public void setPositionResolver(PositionResolver p);
     
     public static final RichLocation EMPTY_LOCATION = new EmptyRichLocation();
     
-    public class Strand {
+    public static class Strand implements Comparable {
+        public static final Strand POSITIVE_STRAND = new Strand("+",1);
+        public static final Strand NEGATIVE_STRAND = new Strand("-",-1);
+        public static final Strand UNKNOWN_STRAND = new Strand("?",0);
+        public static Strand forValue(int value) {
+            switch (value) {
+                case 1: return POSITIVE_STRAND;
+                case 0: return UNKNOWN_STRAND;
+                case -1: return NEGATIVE_STRAND;
+                default: throw new IllegalArgumentException("Unknown strand type: "+value);
+            }
+        }
+        public static Strand forName(String name) {
+            if (name.equals("+")) return POSITIVE_STRAND;
+            else if (name.equals("?")) return UNKNOWN_STRAND;
+            else if (name.equals("-")) return NEGATIVE_STRAND;
+            else throw new IllegalArgumentException("Unknown strand type: "+name);
+        }
         private String name;
-        public Strand(String name) { this.name = name; }
+        private int value;
+        public Strand(String name,int value) { this.name = name; this.value = value; }
+        public int intValue() { return this.value; }
         public String toString() { return this.name; }
+        public int hashCode() {
+            int code = 17;
+            code = 31*code + this.name.hashCode();
+            code = 31*code + this.value;
+            return code;
+        }
+        public boolean equals(Object o) {
+            if (!(o instanceof Strand)) return false;
+            if (o==this) return true;
+            Strand them = (Strand)o;
+            if (!them.toString().equals(this.name)) return false;
+            if (them.intValue()!=this.value) return false;
+            return true;
+        }
+        public int compareTo(Object o) {
+            Strand fo = (Strand) o;
+            if (!this.name.equals(fo.toString())) return this.name.compareTo(fo.toString());
+            return this.value-fo.intValue();
+        }
     }
-    
-    public static final Strand POSITIVE_STRAND = new Strand("+");
-    public static final Strand NEGATIVE_STRAND = new Strand("-");
-    public static final Strand UNKNOWN_STRAND = new Strand("?");
 }

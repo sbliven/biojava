@@ -44,11 +44,13 @@ import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ParseErrorListener;
+import org.biojavax.Comment;
 import org.biojavax.CrossRef;
 import org.biojavax.DocRef;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
+import org.biojavax.SimpleComment;
 import org.biojavax.SimpleCrossRef;
 import org.biojavax.SimpleDocRef;
 import org.biojavax.SimpleRankedCrossRef;
@@ -81,36 +83,25 @@ public class GenbankFormat
         implements RichSequenceFormat {
     public static final String DEFAULT_FORMAT = "GENBANK";
     
-    protected static final String LOCUS_TAG = "LOCUS";
-    protected static final String SIZE_TAG = "SIZE";
-    protected static final String STRAND_NUMBER_TAG = "STRANDS";
-    protected static final String TYPE_TAG = "TYPE";
-    protected static final String CIRCULAR_TAG = "CIRCULAR";
-    protected static final String DIVISION_TAG = "DIVISION";
-    protected static final String DATE_TAG = "MDAT";
-    
+    protected static final String LOCUS_TAG = "LOCUS";  
     protected static final String ACCESSION_TAG = "ACCESSION";
     protected static final String VERSION_TAG = "VERSION";
-    protected static final String GI_TAG = "GI";
-    protected static final String KEYWORDS_TAG = "KW";
     protected static final String DEFINITION_TAG = "DEFINITION";
     protected static final String SOURCE_TAG = "SOURCE";
     protected static final String ORGANISM_TAG = "ORGANISM";
     protected static final String REFERENCE_TAG = "REFERENCE";
-    protected static final String COORDINATE_TAG = "COORDINATE";
-    protected static final String REF_ACCESSION_TAG = "";
+    protected static final String KEYWORDS_TAG = "KEYWORDS";
     protected static final String AUTHORS_TAG = "AUTHORS";
     protected static final String TITLE_TAG = "TITLE";
     protected static final String JOURNAL_TAG = "JOURNAL";
     protected static final String PUBMED_TAG = "PUBMED";
     protected static final String MEDLINE_TAG = "MEDLINE";
+    protected static final String REMARK_TAG = "REMARK";
     protected static final String COMMENT_TAG = "COMMENT";
     protected static final String FEATURE_TAG = "FEATURES";
     protected static final String BASE_COUNT_TAG = "BASE";
     protected static final String START_SEQUENCE_TAG = "ORIGIN";
     protected static final String END_SEQUENCE_TAG = "//";
-    
-    protected static final String FEATURE_LINE_PREFIX = "     ";
     
     private static ComparableTerm ACCESSION_TERM = null;
     public static ComparableTerm getAccessionTerm() {
@@ -270,6 +261,7 @@ public class GenbankFormat
                 String journal = null;
                 String medline = null;
                 String pubmed = null;
+                String remark = null;
                 for (int i = 1; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
@@ -278,6 +270,7 @@ public class GenbankFormat
                     if (key.equals("JOURNAL")) journal = val;
                     if (key.equals("MEDLINE")) medline = val;
                     if (key.equals("PUBMED")) pubmed = val;
+                    if (key.equals("REMARK")) authors = val;
                 }
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
@@ -300,12 +293,17 @@ public class GenbankFormat
                     // assign either the pubmed or medline to the docref
                     if (pcr!=null) dr.setCrossref(pcr);
                     else if (mcr!=null) dr.setCrossref(mcr);
+                    // assign the remarks
+                    dr.setRemark(remark);
                     // assign the docref to the bioentry
                     RankedDocRef rdr = new SimpleRankedDocRef(dr, new Integer(ref_start), new Integer(ref_end), ref_rank);
                     rlistener.setRankedDocRef(rdr);
                 } catch (ChangeVetoException e) {
                     throw new ParseException(e);
                 }
+            } else if (sectionKey.equals(COMMENT_TAG)) {
+                // Set up some comments
+                rlistener.setComment(((String[])section.get(0))[1]);
             } else if (sectionKey.equals(FEATURE_TAG)) {
                 // starting from second line of input, start a new feature whenever we come across
                 // a value that does not start with "
@@ -530,7 +528,7 @@ public class GenbankFormat
         locusLine.append(" bp ");
         locusLine.append(RichSequenceFormat.Tools.leftPad(stranded,3));
         locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getAlphabet().getName(),6));
-        locusLine.append(RichSequenceFormat.Tools.rightPad(rs.isCircular()?"circular":"",10));
+        locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getCircular()?"circular":"",10));
         locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getDivision()==null?"":rs.getDivision(),10));
         locusLine.append(mdat);
         this.writeWrappedLine(LOCUS_TAG, 12, locusLine.toString(), os);
@@ -579,7 +577,20 @@ public class GenbankFormat
             this.writeWrappedLine("  "+JOURNAL_TAG, 12, d.getLocation(), os);
             CrossRef c = d.getCrossref();
             if (c!=null) this.writeWrappedLine("  "+c.getDbname().toUpperCase(), 12, c.getAccession(), os);
+            if (d.getRemark()!=null) this.writeWrappedLine("  "+REMARK_TAG, 12, d.getRemark(), os);
         }
+        
+        // comments - if any
+        if (!rs.getComments().isEmpty()) {
+            StringBuffer sb = new StringBuffer();
+            for (Iterator i = rs.getComments().iterator(); i.hasNext(); ) {
+                Comment c = (SimpleComment)i.next();
+                sb.append(c.getComment());
+                if (i.hasNext()) sb.append("\n");
+            }
+            this.writeWrappedLine(COMMENT_TAG, 12, sb.toString(), os);
+        }
+        
         os.println("FEATURES             Location/Qualifiers");
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {

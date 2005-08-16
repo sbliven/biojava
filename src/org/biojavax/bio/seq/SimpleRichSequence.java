@@ -20,7 +20,6 @@
  */
 
 package org.biojavax.bio.seq;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -124,7 +123,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
         }
     }
     
-    public boolean isCircular() {
+    public boolean getCircular() {
         return this.circular;
     }
     
@@ -301,36 +300,12 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     /**
      * {@inheritDoc}
      */
-    public Set getFeatureSet() { return Collections.unmodifiableSet(this.features); }
+    public Set getFeatureSet() { return this.features; } // must be original for Hibernate
     
     /**
      * {@inheritDoc}
      */
-    public void setFeatureSet(Set features) throws ChangeVetoException {
-        Set newfeats = new TreeSet();
-        if (features!=null) for (Iterator i = features.iterator(); i.hasNext(); ) {
-            RichFeature f = (RichFeature)i.next();
-            f.setParent(this);
-            if(!this.hasListeners(RichSequence.FEATURES)) {
-                newfeats.add(f);
-            } else {
-                ChangeEvent ce = new ChangeEvent(
-                        this,
-                        RichSequence.FEATURES,
-                        f,
-                        null
-                        );
-                ChangeSupport cs = this.getChangeSupport(RichSequence.FEATURES);
-                synchronized(cs) {
-                    cs.firePreChangeEvent(ce);
-                    newfeats.add(f);
-                    cs.firePostChangeEvent(ce);
-                }
-            }
-        }
-        this.features.clear();
-        this.features.addAll(newfeats);
-    }
+    public void setFeatureSet(Set features) throws ChangeVetoException { this.features = features; } // must be original for Hibernate
     
     /**
      * {@inheritDoc}

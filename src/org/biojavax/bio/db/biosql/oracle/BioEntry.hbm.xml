@@ -32,24 +32,24 @@
         <property name="division">
             <column name="DIVISION" sql-type="string" length="6" not-null="false"/>
         </property>    
-        <many-to-one name="taxon" class="org.biojavax.bio.taxa.SimpleNCBITaxon" cascade="all">
+        <many-to-one name="taxon" class="org.biojavax.bio.taxa.SimpleNCBITaxon" cascade="persist,merge,save-update">
             <column name="TAXON_ID" not-null="false"/>
         </many-to-one>
-        <many-to-one name="namespace" class="org.biojavax.SimpleNamespace" cascade="all">
+        <many-to-one name="namespace" class="org.biojavax.SimpleNamespace" cascade="persist,merge,save-update">
             <column name="BIODATABASE_ID" not-null="true"/>
         </many-to-one>
-        <set name="comments" lazy="false" cascade="all">
+        <set name="comments" lazy="false" cascade="all-delete-orphan">
             <key column="BIOENTRY_ID" not-null="true"/>
             <one-to-many class="org.biojavax.SimpleComment"/>
         </set>
-        <set name="relationships" lazy="false" cascade="all">
+        <set name="relationships" lazy="false" cascade="all-delete-orphan">
             <key column="OBJECT_BIOENTRY_ID" not-null="true"/>
             <one-to-many class="org.biojavax.bio.SimpleBioEntryRelationship"/>
         </set>
         <set name="rankedDocRefs" table="BIOENTRY_REFERENCE" lazy="false">
             <key column="BIOENTRY_ID" not-null="true"/>
             <composite-element class="org.biojavax.SimpleRankedDocRef">
-                <many-to-one name="documentReference" class="org.biojavax.SimpleDocRef" cascade="all">
+                <many-to-one name="documentReference" class="org.biojavax.SimpleDocRef" cascade="persist,merge,save-update">
                     <column name="REFERENCE_ID" not-null="true"/>
                 </many-to-one>   
                 <property name="rank">
@@ -66,7 +66,7 @@
         <set name="rankedCrossRefs" table="BIOENTRY_DBXREF" lazy="false">
             <key column="BIOENTRY_ID" not-null="true"/>
             <composite-element class="org.biojavax.SimpleRankedCrossRef">
-                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="all">
+                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">
                     <column name="DBXREF_ID" not-null="true"/>
                 </many-to-one>   
                 <property name="rank">
@@ -77,7 +77,7 @@
         <set name="noteSet" table="BIOENTRY_QUALIFIER_VALUE" lazy="false">
             <key column="BIOENTRY_ID" not-null="true"/>
             <composite-element class="org.biojavax.SimpleNote">
-                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
+                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
                     <column name="TERM_ID" not-null="true"/>
                 </many-to-one>   
                 <property name="rank">
@@ -103,7 +103,7 @@
             <property name="stringSequence">
                 <column name="SEQ" sql-type="text" not-null="false"/>
             </property>   
-            <set name="featureSet" lazy="false" cascade="all">
+            <set name="featureSet" lazy="false" inverse="true" cascade="all-delete-orphan">
                 <key column="BIOENTRY_ID"/>
                 <one-to-many class="org.biojavax.bio.seq.SimpleRichFeature"/>
             </set>

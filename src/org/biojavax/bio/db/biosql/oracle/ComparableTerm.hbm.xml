@@ -26,7 +26,7 @@
         <property name="obsolete">
             <column name="IS_OBSOLETE" sql-type="boolean" not-null="false"/>
         </property>        
-        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="all">
+        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="persist,merge,save-update">
             <column name="ONTOLOGY_ID" not-null="true"/>
         </many-to-one>
         <set name="synonymSet" table="TERM_SYNONYM" lazy="false">
@@ -38,7 +38,7 @@
         <set name="rankedCrossRefs" table="TERM_DBXREF" lazy="false">
             <key column="TERM_ID"/>
             <composite-element class="org.biojavax.SimpleRankedCrossRef">
-                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="all">
+                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">
                     <column name="DBXREF_ID" not-null="true"/>
                 </many-to-one>   
                 <property name="rank">

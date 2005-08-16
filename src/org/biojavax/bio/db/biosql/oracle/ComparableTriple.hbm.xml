@@ -14,16 +14,16 @@
             </generator>
         </id>
 
-        <many-to-one name="subject" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
+        <many-to-one name="subject" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
             <column name="SUBJECT_TERM_ID" not-null="true"/>
         </many-to-one>    
-        <many-to-one name="object" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
+        <many-to-one name="object" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
             <column name="OBJECT_TERM_ID" not-null="true"/>
         </many-to-one>    
-        <many-to-one name="predicate" class="org.biojavax.ontology.SimpleComparableTerm" cascade="all">
+        <many-to-one name="predicate" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
             <column name="PREDICATE_TERM_ID" not-null="true"/>
         </many-to-one>       
-        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="all">
+        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="persist,merge,save-update">
             <column name="ONTOLOGY_ID" not-null="true"/>
         </many-to-one>   
         <set name="descriptors" table="TERM_RELATIONSHIP_TERM" lazy="false" cascade="all">

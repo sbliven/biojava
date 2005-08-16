@@ -59,6 +59,11 @@ public interface DocRef extends Comparable,Changeable {
             "org.biojavax.DocRef",
             "CRC"
             );
+    public static final ChangeType REMARK = new ChangeType(
+            "This reference's remark has changed",
+            "org.biojavax.DocRef",
+            "REMARK"
+            );
     
     /**
      * Getter for property crossref.
@@ -110,5 +115,18 @@ public interface DocRef extends Comparable,Changeable {
      * @throws ChangeVetoException in case of objections.
      */
     public void setCRC(String CRC) throws ChangeVetoException;
+    
+    /**
+     * Getter for property Remark.
+     * @return Value of property Remark.
+     */
+    public String getRemark();
+    
+    /**
+     * Setter for property Remark.
+     * @param Remark New value of property Remark.
+     * @throws ChangeVetoException in case of objections.
+     */
+    public void setRemark(String Remark) throws ChangeVetoException;
     
 }

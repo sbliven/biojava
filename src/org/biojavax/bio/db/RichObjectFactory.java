@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.biojavax.Namespace;
 import org.biojavax.SimpleNamespace;
+import org.biojavax.bio.seq.PositionResolver;
+import org.biojavax.bio.seq.PositionResolver.AverageResolver;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.SimpleComparableOntology;
 
@@ -44,7 +46,8 @@ public class RichObjectFactory {
     
     private static RichObjectBuilder builder = new SimpleRichObjectBuilder();
     
-    public static void setRichObjectBuilder(RichObjectBuilder b) {
+    public static synchronized void setRichObjectBuilder(RichObjectBuilder b) {
+        if (b!=builder) objects.clear(); // because they're from a different factory now
         builder = b;
     }
     
@@ -58,10 +61,12 @@ public class RichObjectFactory {
     private static String defaultLocalNamespaceName = "lcl";
     private static String defaultRemoteNamespaceName = "rmt";
     private static String defaultOntologyName = "biojavax";
+    private static PositionResolver defaultPositionResolver = new AverageResolver();
     
     public static void setDefaultLocalNamespaceName(String name) { defaultLocalNamespaceName = name; }
     public static void setDefaultRemoteNamespaceName(String name) { defaultRemoteNamespaceName = name; }
     public static void setDefaultOntologyName(String name) { defaultOntologyName = name; }
+    public static void setDefaultPositionResolver(PositionResolver pr) { defaultPositionResolver = pr; }
     
     public static Namespace getDefaultLocalNamespace() {
         return (Namespace)getObject(SimpleNamespace.class, new Object[]{defaultLocalNamespaceName});
@@ -73,5 +78,7 @@ public class RichObjectFactory {
     public static ComparableOntology getDefaultOntology() {
         return (ComparableOntology)getObject(SimpleComparableOntology.class, new Object[]{defaultOntologyName});
     }
+    
+    public static PositionResolver getDefaultPositionResolver() { return defaultPositionResolver; }
         
 }

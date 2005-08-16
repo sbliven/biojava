@@ -21,7 +21,7 @@
 
 package org.biojavax;
 
-import org.biojavax.bio.BioEntry;
+
 
 /**
  * An implementaion of Comment.

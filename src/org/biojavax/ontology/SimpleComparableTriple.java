@@ -28,7 +28,6 @@
 package org.biojavax.ontology;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import org.biojava.bio.Annotation;
@@ -209,20 +208,13 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     /**
      * {@inheritDoc}
      */
-    public Set getDescriptors() { return Collections.unmodifiableSet(this.descriptors); }
+    public Set getDescriptors() { return this.descriptors; } // originals for Hibernate
     
     /**
      * {@inheritDoc}
      */
     public void setDescriptors(Set descriptors) throws ChangeVetoException {
-        Set newdescs = new TreeSet();
-        if (descriptors!=null) for (Iterator i = descriptors.iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (!(o instanceof ComparableTerm)) throw new ChangeVetoException("Descriptors must be comparable terms");
-            newdescs.add(o);
-        }
-        this.descriptors.clear();
-        for (Iterator i = newdescs.iterator(); i.hasNext(); ) this.addDescriptor((ComparableTerm)i.next());
+        this.descriptors = descriptors;  // originals for Hibernate
     }
     
     /**

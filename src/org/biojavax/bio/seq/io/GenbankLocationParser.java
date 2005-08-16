@@ -32,11 +32,9 @@ import org.biojavax.SimpleCrossRef;
 import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.bio.seq.CompoundRichLocation;
 import org.biojavax.bio.seq.Position;
-import org.biojavax.bio.seq.Position.BetweenPosition;
-import org.biojavax.bio.seq.Position.ExactPosition;
-import org.biojavax.bio.seq.Position.RangePosition;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichLocation.Strand;
+import org.biojavax.bio.seq.SimplePosition;
 import org.biojavax.bio.seq.SimpleRichLocation;
 import org.biojavax.ontology.ComparableTerm;
 
@@ -112,7 +110,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                           'J00194'
          */
         rank = 1;
-        return parseLocString(featureNS, featureAccession, null, RichLocation.POSITIVE_STRAND, locationString);
+        return parseLocString(featureNS, featureAccession, null, Strand.POSITIVE_STRAND, locationString);
     }
     
     // O beautiful regex, we worship you.
@@ -152,8 +150,8 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         if (groupType!=null) {
             if (groupType.equals("complement")) {
                 // It's a complement location
-                if (parentStrand==RichLocation.NEGATIVE_STRAND) strand = RichLocation.POSITIVE_STRAND;
-                else strand = RichLocation.NEGATIVE_STRAND;
+                if (parentStrand==Strand.NEGATIVE_STRAND) strand = Strand.POSITIVE_STRAND;
+                else strand = Strand.NEGATIVE_STRAND;
                 return parseLocString(featureNS,featureAccession,crossRef,strand,subLocStr);
             } else {
                 // It's a compound location.
@@ -200,14 +198,10 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         Position startPos = null;
         if (startRangeType!=null) {
             // fuzziest
-            if (startRangeType.equals(".")) {
-                startPos = new RangePosition(startStartsFuzzy,startEndsFuzzy,Integer.parseInt(startStart),Integer.parseInt(startEnd));
-            } else if (startRangeType.equals("^")) {
-                startPos = new BetweenPosition(startStartsFuzzy,startEndsFuzzy,Integer.parseInt(startStart),Integer.parseInt(startEnd));
-            } else throw new ParseException("Should not have happened! Range type is: "+startRangeType);
+            startPos = new SimplePosition(startStartsFuzzy,startEndsFuzzy,Integer.parseInt(startStart),Integer.parseInt(startEnd),startRangeType);
         } else {
             // less fuzzy
-            startPos = new ExactPosition(startStartsFuzzy,startEndsFuzzy,Integer.parseInt(startStart));
+            startPos = new SimplePosition(startStartsFuzzy,startEndsFuzzy,Integer.parseInt(startStart));
         }
         
         if (end==null) {
@@ -225,14 +219,10 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
             Position endPos = null;
             if (endRangeType!=null) {
                 // fuzziest
-                if (endRangeType.equals(".")) {
-                    endPos = new RangePosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart),Integer.parseInt(endEnd));
-                } else if (endRangeType.equals("^")) {
-                    endPos = new BetweenPosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart),Integer.parseInt(endEnd));
-                } else throw new ParseException("Should not have happened! Range type is: "+endRangeType);
+                endPos = new SimplePosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart),Integer.parseInt(endEnd),endRangeType);
             } else {
                 // less fuzzy
-                endPos = new ExactPosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart));
+                endPos = new SimplePosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart));
             }
             return new SimpleRichLocation(startPos,endPos,rank++,strand,crossRef);
         }
@@ -249,14 +239,39 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         }
     }
     
+    private static String _writePosition(Position p) {
+        StringBuffer sb = new StringBuffer();
+        int s = p.getStart();
+        int e = p.getEnd();
+        String t = p.getType();
+        boolean fs = p.hasFuzzyStart();
+        boolean fe = p.hasFuzzyEnd(); 
+        if (t!=null) {
+            // a range - put in brackets
+            sb.append("(");
+            if (fs) sb.append("<");
+            sb.append(s);
+            sb.append(t);
+            sb.append(e);
+            if (fe) sb.append(">");
+            sb.append(")");
+        } else {
+            // not a range - no brackets
+            if (fs) sb.append("<");
+            sb.append(s);
+            if (fe) sb.append(">");
+        }
+        return sb.toString();
+    }
+    
     private static String _writeSingleLocation(RichLocation l) {
         StringBuffer loc = new StringBuffer();
-        loc.append(l.getMinPos().toString());
-        if (l.getMin()!=l.getMax()) {
+        loc.append(_writePosition(l.getMinPosition()));
+        if (!l.getMinPosition().equals(l.getMaxPosition())) {
             loc.append("..");
-            loc.append(l.getMaxPos().toString());
+            loc.append(_writePosition(l.getMaxPosition()));
         }
-        if (l.getStrand()==RichLocation.NEGATIVE_STRAND) {
+        if (l.getStrand()==Strand.NEGATIVE_STRAND) {
             loc.insert(0,"complement(");
             loc.append(")");
         }

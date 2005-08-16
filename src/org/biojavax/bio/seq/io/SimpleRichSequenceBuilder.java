@@ -377,12 +377,13 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
                 RichFeature f = (RichFeature)i.next();
                 f.setParent(rs);
             }
-            rs.setFeatureSet(this.rootFeatures);
             rs.setDescription(this.description);
             rs.setDivision(this.division);
             rs.setIdentifier(this.identifier);
             rs.setTaxon(this.taxon);
             rs.setCircular(this.circular);
+            for (Iterator i = this.rootFeatures.iterator(); i.hasNext(); ) ((RichFeature)i.next()).setParent(rs);
+            rs.setFeatureSet(this.rootFeatures);
             for (Iterator i = this.crossRefs.iterator(); i.hasNext(); ) rs.addRankedCrossRef((RankedCrossRef)i.next());
             for (Iterator i = this.relations.iterator(); i.hasNext(); ) rs.addRelationship((BioEntryRelationship)i.next());
             for (Iterator i = this.references.iterator(); i.hasNext(); ) rs.addRankedDocRef((RankedDocRef)i.next());

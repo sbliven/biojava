@@ -28,7 +28,6 @@
 package org.biojavax.ontology;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -149,20 +148,13 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     /**
      * {@inheritDoc}
      */
-    public Set getRankedCrossRefs() { return Collections.unmodifiableSet(this.rankedcrossrefs); }
+    public Set getRankedCrossRefs() { return this.rankedcrossrefs; } // original for Hibernate
     
     /**
      * {@inheritDoc}
      */
     public void setRankedCrossRefs(Set rankedcrossrefs) throws ChangeVetoException {
-        Set newrc = new TreeSet();
-        if (rankedcrossrefs!=null) for (Iterator i = rankedcrossrefs.iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (!(o instanceof RankedCrossRef)) throw new ChangeVetoException("Can only add RankedCrossRef objects as ranked crossrefs");
-            newrc.add(o);
-        }
-        this.rankedcrossrefs.clear();
-        for (Iterator i = newrc.iterator(); i.hasNext(); ) this.addRankedCrossRef((RankedCrossRef)i.next());
+        this.rankedcrossrefs = rankedcrossrefs; // original for Hibernate
     }
     
     /**

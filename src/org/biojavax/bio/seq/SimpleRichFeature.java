@@ -141,7 +141,10 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     
     // Hibernate use only
     private Set getLocationSet() {
-        return this.flattenLocation(this.location);
+        Set newlocs = this.flattenLocation(this.location);
+        this.locsSet.retainAll(newlocs); // clear out forgotten ones
+        this.locsSet.addAll(newlocs); // add in new ones
+        return this.locsSet; // original for Hibernate purposes
     }
     
     private Set flattenLocation(RichLocation l) {
@@ -154,11 +157,13 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     }
     
     // Hibernate use only
-    private void setLocationSet(Set locs) {
+    private void setLocationSet(Set locs) throws ChangeVetoException {
+        this.locsSet = locs; // original kept for Hibernate purposes
         if (locs.size()==0) this.location = RichLocation.EMPTY_LOCATION;
         else if (locs.size()==1) this.location = (SimpleRichLocation)locs.toArray(new SimpleRichLocation[1])[0];
         else this.location = new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),locs);
     }
+    private Set locsSet = new TreeSet();
     
     /**
      * {@inheritDoc}
@@ -366,20 +371,13 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     /**
      * {@inheritDoc}
      */
-    public Set getRankedCrossRefs() { return Collections.unmodifiableSet(this.crossrefs); }
+    public Set getRankedCrossRefs() { return this.crossrefs; }
     
     /**
      * {@inheritDoc}
      */
     public void setRankedCrossRefs(Set crossrefs) throws ChangeVetoException {
-        Set newrcr = new TreeSet();
-        if (crossrefs!=null) for (Iterator i = crossrefs.iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (!(o instanceof RankedCrossRef)) throw new ChangeVetoException("Found a non-RankedCrossRef object");
-            newrcr.add(o);
-        }
-        this.crossrefs.clear();
-        for (Iterator i = newrcr.iterator(); i.hasNext(); ) this.addRankedCrossRef((RankedCrossRef)i.next());
+        this.crossrefs = crossrefs; // original for Hibernate
     }
     
     /**
@@ -431,20 +429,13 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     /**
      * {@inheritDoc}
      */
-    public Set getFeatureRelationshipSet() { return Collections.unmodifiableSet(this.relations); }
+    public Set getFeatureRelationshipSet() { return this.relations; } // must be original for Hibernate
     
     /**
      * {@inheritDoc}
      */
     public void setFeatureRelationshipSet(Set relationships) throws ChangeVetoException {
-        Set fr = new TreeSet();
-        if (relationships!=null) for (Iterator i = relationships.iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (!(o instanceof RichFeatureRelationship)) throw new ChangeVetoException("Found a non-RichFeatureRelationship object");
-            fr.add(o);
-        }
-        this.relations.clear();
-        for (Iterator i = fr.iterator(); i.hasNext(); ) this.addFeatureRelationship((RichFeatureRelationship)i.next());
+        this.relations = relationships;  // must be original for Hibernate
     }
     
     /**

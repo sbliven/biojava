@@ -47,8 +47,8 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRichAnnotation;
-import org.biojavax.bio.seq.Position.ExactPosition;
-import org.biojavax.bio.seq.PositionResolver.AverageResolver;
+import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -66,7 +66,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private ComparableTerm term;
     private Position min;
     private Position max;
-    private PositionResolver pr = new AverageResolver();
+    private PositionResolver pr = RichObjectFactory.getDefaultPositionResolver();
     private Strand strand;
     private int rank;
     
@@ -77,8 +77,17 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * @param max Max location position.
      * @param rank Rank of location.
      */
+    public SimpleRichLocation(Position pos, int rank) {
+        this(pos,pos,rank,Strand.POSITIVE_STRAND);
+    }
+    public SimpleRichLocation(Position pos, int rank, Strand strand) {
+        this(pos,pos,rank,strand,null);
+    }
+    public SimpleRichLocation(Position pos, int rank, Strand strand, CrossRef crossRef) {
+        this(pos,pos,rank,strand,crossRef);
+    }
     public SimpleRichLocation(Position min, Position max, int rank) {
-        this(min,max,rank,RichLocation.POSITIVE_STRAND);
+        this(min,max,rank,Strand.POSITIVE_STRAND);
     }
     public SimpleRichLocation(Position min, Position max, int rank, Strand strand) {
         this(min,max,rank,strand,null);
@@ -151,21 +160,10 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public Strand getStrand() { return this.strand; }
     
     // Hibernate requirement - not for public use.
-    private int getStrandNum() { return (this.strand==RichLocation.NEGATIVE_STRAND?-1:1); }
+    private int getStrandNum() { return this.strand.intValue(); }
     
     // Hibernate requirement - not for public use.
-    private void setStrandNum(int token) {
-        switch (token) {
-            case 1:
-                this.strand = RichLocation.POSITIVE_STRAND;
-                break;
-            case -1:
-                this.strand = RichLocation.NEGATIVE_STRAND;
-                break;
-            default:
-                this.strand = RichLocation.UNKNOWN_STRAND;
-        }
-    }
+    private void setStrandNum(int token) { this.strand = Strand.forValue(token); }
     
     /**
      * {@inheritDoc}
@@ -197,10 +195,13 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public int getMax() { return this.pr.getMax(this.max); }
-        
+    public int getMax() {
+        if (this.max.equals(this.min)) return this.getMin(); // because resolver might resolve differently
+        else return this.pr.getMax(this.max);
+    }
+    
     // Hibernate requirement - not for public use.
-    private void setMax(int max) {  this.max = new ExactPosition(false,false,max); }
+    private void setMax(int max) {  this.max = new SimplePosition(false,false,max); }
     
     /**
      * {@inheritDoc}
@@ -208,12 +209,12 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public int getMin() { return this.pr.getMin(this.min); }
     
     // Hibernate requirement - not for public use.
-    private void setMin(int min) {  this.min = new ExactPosition(false,false,min); }
+    private void setMin(int min) {  this.min = new SimplePosition(false,false,min); }
     
-    public Position getMinPos() { return this.min; }
+    public Position getMinPosition() { return this.min; }
     
-    public Position getMaxPos() { return this.max; }
-            
+    public Position getMaxPosition() { return this.max; }
+    
     public void setPositionResolver(PositionResolver p) { this.pr = p; }
     
     /**
@@ -285,7 +286,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
         RichLocation rl = (RichLocation)l;
         if (this.overlaps(rl)) {
-            return new SimpleRichLocation(this.posmin(this.min,rl.getMinPos()),this.posmax(this.max,rl.getMaxPos()),0,this.strand,this.crossRef);
+            return new SimpleRichLocation(this.posmin(this.min,rl.getMinPosition()),this.posmax(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef);
         } else {
             List s = new ArrayList();
             s.add(this);
@@ -304,7 +305,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         
         if (!this.overlaps(l)) return RichLocation.EMPTY_LOCATION;
         
-        return new SimpleRichLocation(this.posmax(this.min,them.getMinPos()),this.posmin(this.max,them.getMaxPos()),0,this.strand,this.crossRef);
+        return new SimpleRichLocation(this.posmax(this.min,them.getMinPosition()),this.posmin(this.max,them.getMaxPosition()),0,this.strand,this.crossRef);
     }
     
     private Position posmin(Position a, Position b) {
@@ -332,7 +333,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         SymbolList seq2 = seq.subList(this.getMin(),this.getMax());
         
         try {
-            if (this.strand==RichLocation.NEGATIVE_STRAND) {
+            if (this.strand==Strand.NEGATIVE_STRAND) {
                 Alphabet a = seq.getAlphabet();
                 if (a==AlphabetManager.alphabetForName("DNA")) {
                     seq2 = DNATools.reverseComplement(seq);
@@ -375,7 +376,11 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         if (this.strand==null) return false;
         // Normal comparison
         RichLocation fo = (RichLocation) o;
-        if (!this.term.equals(fo.getTerm())) return false;
+        if (this.term!=null || fo.getTerm()!=null) {
+            if (this.term!=null && fo.getTerm()!=null) {
+                if (!this.term.equals(fo.getTerm())) return false;
+            } else return false;
+        }
         if (this.getMin()!=fo.getMin()) return false;
         if (this.getMax()!=fo.getMax()) return false;
         if (!this.strand.equals(fo.getStrand())) return false;
@@ -401,8 +406,11 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
                 return this.crossRef.compareTo(fo.getCrossRef());
             } else return -1;
         }
-        if (!this.strand.equals(fo.getStrand())) return this.strand==RichLocation.NEGATIVE_STRAND?-1:1;
-        if (!this.term.equals(fo.getTerm())) return this.term.compareTo(fo.getTerm());
+        if (!this.strand.equals(fo.getStrand())) return this.strand.compareTo(fo.getStrand());
+        if (this.term!=null || fo.getTerm()!=null) {
+            if (this.term!=null && fo.getTerm()!=null && !this.term.equals(fo.getTerm())) return this.term.compareTo(fo.getTerm());
+            else return -1;
+        }
         if (this.getMin()!=fo.getMin()) return this.getMin()-fo.getMin();
         return this.getMax()-fo.getMax();
     }

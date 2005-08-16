@@ -26,7 +26,6 @@
  */
 
 package org.biojavax;
-import java.util.Collections;
 import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -175,19 +174,12 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     /**
      * {@inheritDoc}
      */
-    public Set getNoteSet() { return Collections.unmodifiableSet(this.notes); }
+    public Set getNoteSet() { return this.notes; } // original for Hibernate
     
     /**
      * {@inheritDoc}
      */
     public void setNoteSet(Set notes) throws ChangeVetoException {
-        Set nn = new TreeSet();
-        if (notes!=null) for (Iterator i = notes.iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            if (!(o instanceof Note)) throw new ChangeVetoException("Cannot add non-Note objects as notes");
-            nn.add(o);
-        }
-        this.notes.clear();
-        for (Iterator i = nn.iterator(); i.hasNext(); ) this.addNote((Note)i.next());
+        this.notes = notes;  // original for Hibernate
     }
 }
