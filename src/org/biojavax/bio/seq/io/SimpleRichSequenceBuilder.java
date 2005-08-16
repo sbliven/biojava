@@ -28,7 +28,6 @@
 package org.biojavax.bio.seq.io;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
@@ -260,7 +259,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         }
     }
     private FeatureHolder featureHolder = new SimpleFeatureHolder();
-    private Set rootFeatures = new HashSet();
+    private Set rootFeatures = new TreeSet();
     private List allFeatures = new ArrayList();
     private List featureStack = new ArrayList();
     private int featureRank = 0;
