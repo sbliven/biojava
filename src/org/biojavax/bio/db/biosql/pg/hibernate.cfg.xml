@@ -10,15 +10,15 @@
         <property name="connection.datasource">java:comp/env/jdbc/YOUR_JNDI_DATASOURCE_GOES_HERE</property>
         
         <!-- OR... (for testing only)...
-	<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-	<property name="connection.url">jdbc:mysql://MYSERVER:MYPORT/MYDBNAME</property>
+	<property name="connection.driver_class">org.postgresql.Driver</property>
+	<property name="connection.url">jdbc:postgresql://MYSERVER:MYPORT/MYDBNAME</property>
 	<property name="connection.username">MYUSER</property>
 	<property name="connection.password">MYPASSWORD</property>
 	<property name="connection.pool_size">20</property>
         -->
         
         <property name="show_sql">false</property>
-        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
 
         <!-- Mapping files -->
         <mapping resource="Namespace.hbm.xml"/>

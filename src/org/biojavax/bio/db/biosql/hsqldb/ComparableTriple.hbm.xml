@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.ontology.SimpleComparableTriple" table="term_relationship">
+
+        <id name="id" type="long" unsaved-value="null">
+            <column name="term_relationship_id" sql-type="long" unique="true" not-null="true"/>
+            <generator class="identity"/>
+        </id>
+
+        <many-to-one name="subject" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
+            <column name="subject_term_id" not-null="true"/>
+        </many-to-one>    
+        <many-to-one name="object" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
+            <column name="object_term_id" not-null="true"/>
+        </many-to-one>    
+        <many-to-one name="predicate" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
+            <column name="predicate_term_id" not-null="true"/>
+        </many-to-one>       
+        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="persist,merge,save-update">
+            <column name="ontology_id" not-null="true"/>
+        </many-to-one>   
+        <set name="descriptors" table="term_relationship_term" lazy="false" cascade="all" sort="natural">
+            <key column="term_relationship_id" not-null="true"/>
+            <many-to-many class="org.biojavax.ontology.SimpleComparableTerm">
+                <column name="term_id" not-null="true"/>
+            </many-to-many>
+        </set>
+    </class>
+
+</hibernate-mapping>

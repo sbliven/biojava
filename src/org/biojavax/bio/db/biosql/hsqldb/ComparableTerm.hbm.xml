@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.ontology.SimpleComparableTerm" table="term">
+
+        <id name="id" type="long" unsaved-value="null">
+            <column name="term_id" sql-type="long" unique="true" not-null="true"/>
+            <generator class="identity"/>
+        </id>
+
+        <property name="name">
+            <column name="name" sql-type="string" length="256" not-null="true"/>
+        </property>
+        <property name="identifier">
+            <column name="identifier" sql-type="string" length="6" not-null="false"/>
+        </property>
+        <property name="description">
+            <column name="definition" sql-type="string" length="4000" not-null="false"/>
+        </property>
+        <property name="obsolete">
+            <column name="is_obsolete" sql-type="boolean" not-null="false"/>
+        </property>        
+        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="persist,merge,save-update">
+            <column name="ontology_id" not-null="true"/>
+        </many-to-one>
+        <set name="synonymSet" table="term_synonym" lazy="false" sort="natural">
+            <key column="term_id"/>
+            <element type="string">
+                <column name="synonym" sql-type="string" length="256" not-null="true"/>
+            </element>
+        </set>
+        <set name="rankedCrossRefs" table="term_dbxref" lazy="false" sort="natural">
+            <key column="term_id"/>
+            <composite-element class="org.biojavax.SimpleRankedCrossRef">
+                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">
+                    <column name="dbxref_id" not-null="true"/>
+                </many-to-one>   
+                <property name="rank">
+                    <column name="rank" sql-type="integer" length="3" not-null="false"/>
+                </property>  
+            </composite-element>
+        </set>
+        
+    </class>
+
+</hibernate-mapping>

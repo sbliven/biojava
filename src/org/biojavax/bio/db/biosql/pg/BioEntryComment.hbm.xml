@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.SimpleComment" table="comment">
+
+        <id name="id" type="long" unsaved-value="null">
+            <column name="comment_id" sql-type="long" unique="true" not-null="true"/>
+            <generator class="identity"/>
+        </id>
+
+        <property name="rank">
+            <column name="rank" sql-type="integer" length="2" not-null="true"/>
+        </property>
+        <property name="comment">
+            <column name="comment_text" sql-type="text" not-null="true"/>
+        </property>
+        
+    </class>
+
+</hibernate-mapping>
