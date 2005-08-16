@@ -193,6 +193,7 @@ public class GenbankFormat
         do {
             List section = this.readSection(reader);
             sectionKey = ((String[])section.get(0))[0];
+            
             // process section-by-section
             if (sectionKey.equals(LOCUS_TAG)) {
                 String loc = ((String[])section.get(0))[1];
@@ -368,7 +369,8 @@ public class GenbankFormat
                         templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key);
                         templ.featureRelationshipSet = new TreeSet();
                         templ.rankedCrossRefs = new TreeSet();
-                        templ.location = GenbankLocationParser.parseLocation(RichObjectFactory.getDefaultLocalNamespace(), accession, val);
+                        String tidyLocStr = val.replaceAll("\\s+","");
+                        templ.location = GenbankLocationParser.parseLocation(RichObjectFactory.getDefaultLocalNamespace(), accession, tidyLocStr);
                         rlistener.startFeature(templ);
                         seenAFeature = true;
                     }
@@ -427,7 +429,10 @@ public class GenbankFormat
         StringBuffer currVal = new StringBuffer();
         boolean done = false;
         int linecount = 0;
-        String regex = "^(\\s{0,8}|\\s{21})(\\S+?)(\\s{1,7}|=)(.*)$";  // <=8sp+word+1-7sp+value OR 21sp+word+=+value
+        
+        //s0-8 word s1-7 value
+        //s21 word = value
+        String regex = "^(\\s{0,8}(\\S+?)\\s{1,7}(.*)|\\s{21}(\\S+?)=(.*))$";
         Pattern p = Pattern.compile(regex);
         try {
             while (!done) {
@@ -443,15 +448,15 @@ public class GenbankFormat
                     if (m.matches()) {
                         // new key
                         if (currKey!=null) section.add(new String[]{currKey,currVal.toString()});
-                        currKey = m.group(2);
+                        currKey = m.group(2)==null?m.group(4):m.group(2);
                         currVal = new StringBuffer();
-                        currVal.append(m.group(4).trim());
+                        currVal.append((m.group(2)==null?m.group(5):m.group(3)).trim());
                     } else {
                         line = line.trim();
                         // concatted line or SEQ START/END line?
                         if (line.equals(START_SEQUENCE_TAG) || line.equals(END_SEQUENCE_TAG)) currKey = line;
                         else {
-                            currVal.append(" "); // space in between lines - can be removed later
+                            currVal.append("\n"); // newline in between lines - can be removed later
                             currVal.append(line);
                         }
                     }
@@ -677,18 +682,18 @@ public class GenbankFormat
     }
     
     private void writeWrappedLine(String key, int indent, String text, PrintStream os) throws IOException {
-        this._writeWrappedLine(key,indent,text,os,"\\s+"," ");
+        this._writeWrappedLine(key,indent,text,os,"\\s");
     }
     
     private void writeWrappedLocationLine(String key, int indent, String text, PrintStream os) throws IOException {
-        this._writeWrappedLine(key,indent,text,os,",",",");
+        this._writeWrappedLine(key,indent,text,os,",");
     }
     
-    private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep, String printSep) throws IOException {
+    private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
         text = text.trim();
         StringBuffer b = new StringBuffer();
         b.append(RichSequenceFormat.Tools.rightPad(key, indent));
-        String[] lines = RichSequenceFormat.Tools.writeWordWrap(text, sep, printSep, this.getLineWidth()-indent);
+        String[] lines = RichSequenceFormat.Tools.writeWordWrap(text, sep, this.getLineWidth()-indent);
         for (int i = 0; i<lines.length; i++) {
             if (i==0) b.append(lines[i]);
             else b.append(RichSequenceFormat.Tools.leftIndent(lines[i],indent));

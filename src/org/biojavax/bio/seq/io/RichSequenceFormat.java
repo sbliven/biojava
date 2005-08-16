@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.io.SequenceFormat;
@@ -70,39 +72,40 @@ public interface RichSequenceFormat extends SequenceFormat,ParseErrorSource {
             while(b.length()<totalWidth) b.append(" "); // yuck!
             return b.toString();
         }
-        public static String[] writeWordWrap(String input, String sepRegex, String separator, int width) {
-            width--; // because of some weird start-at-zero thingy - if you pass 60, we must work with 59.            
-            if (input.length()<=width) return new String[]{input};            
-            String[] parts = input.split(sepRegex);
-            StringBuffer currentLine = new StringBuffer();
-            List lines = new ArrayList();
-            for (int i = 0; i < parts.length; i++) {
-                String word = parts[i];
-                if (word!=null && word.length()>0) {
-                    if (i < (parts.length-1)) word = word + separator;
-                    int wordLength = word.length();
-                    if (wordLength+currentLine.length() > width) {
-                        if (wordLength > width) {
-                            // must split word
-                            do {
-                                int chunkSize = Math.min(width-currentLine.length(),wordLength);
-                                currentLine.append(word.substring(0,chunkSize));
-                                if (currentLine.length()>=width) {
-                                    lines.add(currentLine.toString());
-                                    currentLine.setLength(0);
-                                }
-                                word = word.substring(chunkSize);
-                                wordLength = word.length();
-                            } while (wordLength+currentLine.length() > width);
-                        } else {
-                            lines.add(currentLine.toString());
-                            currentLine.setLength(0);
-                        }
+        public static String[] writeWordWrap(String input, String sepRegex, int width) {
+            List lines = new ArrayList();            
+            Pattern p = Pattern.compile(sepRegex);            
+            int start = 0;
+            while (start < input.length()) {
+                if (input.charAt(start)=='\n') start++;
+                //go from start+width
+                int splitPoint = start+width;
+                // easy case
+                if (splitPoint > input.length()) splitPoint=input.length();
+                else {
+                    //if has newline before end, use it
+                    int newline = input.indexOf('\n',start);
+                    if (newline>start && newline<splitPoint) {
+                        splitPoint = newline;
                     }
-                    currentLine.append(word);
+                    //if not match sep, find splitPoint first point that does (min=start)
+                    else {
+                        while (splitPoint>start) {
+                            char c = input.charAt(splitPoint);
+                            Matcher m = p.matcher(""+c);
+                            if (m.matches()) break;
+                            splitPoint--;
+                        }
+                        //if ended up at splitPoint=start, splitPoint=start+width
+                        if (splitPoint==start) splitPoint = start+width;
+                    }
                 }
+                //output chunk from start to splitPoint
+                lines.add(input.substring(start, splitPoint).trim());
+                //start = splitPoint
+                start=splitPoint;
             }
-            if (currentLine.length()>0) lines.add(currentLine.toString());
+            
             return (String[])lines.toArray(new String[0]);
         }
     }

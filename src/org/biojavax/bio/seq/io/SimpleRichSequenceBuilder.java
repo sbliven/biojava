@@ -54,6 +54,7 @@ import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.Comment;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
+import org.biojavax.SimpleComment;
 import org.biojavax.SimpleNote;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.seq.RichFeature;
@@ -224,9 +225,10 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      */
     public void setComment(String comment) throws ParseException {
         if (comment==null) throw new ParseException("Comment cannot be null");
-        this.comments.add(comment);
+        this.comments.add(new SimpleComment(comment,commentRank++));
     }
     private Set comments = new TreeSet();
+    private int commentRank = 1;
     
     /**
      * {@inheritDoc}
