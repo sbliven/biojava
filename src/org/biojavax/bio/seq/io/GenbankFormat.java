@@ -196,7 +196,7 @@ public class GenbankFormat
             // process section-by-section
             if (sectionKey.equals(LOCUS_TAG)) {
                 String loc = ((String[])section.get(0))[1];
-                String regex = "^(\\S+)\\s+\\d+\\s+bp\\s+([dms]s-)?(\\S+)\\s+(circular)?\\s+(\\S+)\\s+(\\S+)$";
+                String regex = "^(\\S+)\\s+\\d+\\s+bp\\s+([dms]s-)?(\\S+)\\s+(circular|linear)?\\s+(\\S+)\\s+(\\S+)$";
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(loc);
                 if (m.matches()) {
@@ -209,7 +209,7 @@ public class GenbankFormat
                     String stranded = m.group(2);
                     String circular = m.group(4);
                     if (stranded!=null) rlistener.addSequenceProperty(getStrandedTerm(),stranded);
-                    if (circular!=null) rlistener.setCircular(true);
+                    if (circular!=null && circular.equals("circular")) rlistener.setCircular(true);
                 } else {
                     throw new ParseException("Bad locus line found: "+loc);
                 }
