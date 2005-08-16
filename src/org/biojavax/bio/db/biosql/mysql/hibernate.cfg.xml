@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <!-- MUST USE ORACLE 10g (OR NEWER) JDBC DRIVER vs. ORACLE 9i (OR NEWER) DATABASE -->
+
+    <session-factory>
+
+        <property name="connection.datasource">java:comp/env/jdbc/YOUR_JNDI_DATASOURCE_GOES_HERE</property>
+        
+        <!-- OR... (for testing only)...
+	<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+	<property name="connection.url">jdbc:mysql://MYSERVER:3306/MYDBNAME</property>
+	<property name="connection.username">MYUSER</property>
+	<property name="connection.password">MYPASSWORD</property>
+	<property name="connection.pool_size">20</property>
+        -->
+        
+        <property name="show_sql">false</property>
+        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <!-- Mapping files -->
+        <mapping resource="Namespace.hbm.xml"/>
+        <mapping resource="NCBITaxon.hbm.xml"/>
+        <mapping resource="ComparableOntology.hbm.xml"/>
+        <mapping resource="ComparableTerm.hbm.xml"/>
+        <mapping resource="ComparableTriple.hbm.xml"/>
+        <mapping resource="BioEntry.hbm.xml"/>
+        <mapping resource="BioEntryComment.hbm.xml"/>
+        <mapping resource="BioEntryRelationship.hbm.xml"/>
+        <mapping resource="CrossRef.hbm.xml"/>
+        <mapping resource="DocumentReference.hbm.xml"/>
+        <mapping resource="RichFeature.hbm.xml"/>
+        <mapping resource="RichFeatureRelationship.hbm.xml"/>
+        <mapping resource="RichLocation.hbm.xml"/>
+
+    </session-factory>
+
+</hibernate-configuration>

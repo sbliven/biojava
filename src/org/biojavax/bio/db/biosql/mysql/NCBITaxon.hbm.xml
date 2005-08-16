@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.bio.taxa.SimpleNCBITaxon" table="taxon">
+
+        <id name="id" type="long" unsaved-value="null">
+            <column name="taxon_id" sql-type="long" unique="true" not-null="true"/>
+            <generator class="identity"/>
+        </id>
+
+        <property name="NCBITaxID">
+            <column name="ncbi_taxon_id" sql-type="integer" unique="true" not-null="true"/>
+        </property>
+        <property name="nodeRank">
+            <column name="node_rank" sql-type="string" length="32" not-null="false"/>
+        </property>
+        <property name="geneticCode">
+            <column name="genetic_code" sql-type="integer" length="2" not-null="false"/>
+        </property>
+        <property name="mitoGeneticCode">
+            <column name="mito_genetic_code" sql-type="integer" length="2" not-null="false"/>
+        </property>
+        <property name="leftValue">
+            <column name="left_value" sql-type="integer" not-null="false"/>
+        </property>
+        <property name="rightValue">
+            <column name="right_value" sql-type="integer" not-null="false"/>
+        </property>
+        <property name="parentNCBITaxID">
+            <column name="parent_taxon_id" sql-type="integer" not-null="false"/>
+        </property>
+        <set name="nameSet" table="taxon_name" lazy="false" sort="natural">
+            <key column="taxon_id" not-null="true"/>
+            <composite-element class="org.biojavax.bio.taxa.SimpleNCBITaxonName">
+                <property name="name">
+                    <column name="name" sql-type="string" length="128" not-null="true"/>
+                </property>
+                <property name="nameClass">
+                    <column name="name_class" sql-type="string" length="32" not-null="true"/>
+                </property>
+            </composite-element>
+        </set>
+    </class>
+
+</hibernate-mapping>

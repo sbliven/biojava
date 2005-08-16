@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="org.biojavax.SimpleNamespace" table="biodatabase">
+
+        <id name="id" type="long" unsaved-value="null">
+            <column name="biodatabase_id" sql-type="long" unique="true" not-null="true"/>
+            <generator class="identity"/>
+        </id>
+
+        <property name="name">
+            <column name="name" sql-type="string" length="32" unique="true" not-null="true"/>
+        </property>
+        <property name="authority">
+            <column name="authority" sql-type="string" length="32" not-null="false"/>
+        </property>
+        <property name="description">
+            <column name="description" sql-type="string" length="256" not-null="false"/>
+        </property>
+
+    </class>
+
+</hibernate-mapping>
