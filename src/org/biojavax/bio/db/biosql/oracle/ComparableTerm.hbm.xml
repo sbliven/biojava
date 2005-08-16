@@ -29,13 +29,13 @@
         <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="persist,merge,save-update">
             <column name="ONTOLOGY_ID" not-null="true"/>
         </many-to-one>
-        <set name="synonymSet" table="TERM_SYNONYM" lazy="false">
+        <set name="synonymSet" table="TERM_SYNONYM" lazy="false" sort="natural">
             <key column="TERM_ID"/>
             <element type="string">
                 <column name="NAME" sql-type="string" length="256" not-null="true"/>
             </element>
         </set>
-        <set name="rankedCrossRefs" table="TERM_DBXREF" lazy="false">
+        <set name="rankedCrossRefs" table="TERM_DBXREF" lazy="false" sort="natural">
             <key column="TERM_ID"/>
             <composite-element class="org.biojavax.SimpleRankedCrossRef">
                 <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">

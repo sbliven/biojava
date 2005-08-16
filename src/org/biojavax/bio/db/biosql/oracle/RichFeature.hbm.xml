@@ -29,11 +29,11 @@
         <property name="rank">
             <column name="RANK" sql-type="integer" length="9" not-null="true"/>
         </property>
-        <set name="locationSet" lazy="false" cascade="all-delete-orphan">
+        <set name="locationSet" lazy="false" cascade="all-delete-orphan" sort="natural">
             <key column="SEQFEATURE_ID" not-null="true"/>
             <one-to-many class="org.biojavax.bio.seq.SimpleRichLocation"/>
         </set>
-        <set name="noteSet" table="SEQFEATURE_QUALIFIER_VALUE" lazy="false">
+        <set name="noteSet" table="SEQFEATURE_QUALIFIER_VALUE" lazy="false" sort="natural">
             <key column="SEQFEATURE_ID" not-null="true"/>
             <composite-element class="org.biojavax.SimpleNote">
                 <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
@@ -47,7 +47,7 @@
                 </property>
             </composite-element>
         </set>
-        <set name="rankedCrossRefs" table="SEQFEATURE_DBXREF" lazy="false">
+        <set name="rankedCrossRefs" table="SEQFEATURE_DBXREF" lazy="false" sort="natural">
             <key column="SEQFEATURE_ID" not-null="true"/>
             <composite-element class="org.biojavax.SimpleRankedCrossRef">
                 <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">
@@ -58,7 +58,7 @@
                 </property>  
             </composite-element>
         </set>
-        <set name="featureRelationshipSet" lazy="false" cascade="all-delete-orphan">
+        <set name="featureRelationshipSet" lazy="false" cascade="all-delete-orphan" sort="natural">
             <key column="OBJECT_SEQFEATURE_ID" not-null="true"/>
             <one-to-many class="org.biojavax.bio.seq.SimpleRichFeatureRelationship"/>
         </set>

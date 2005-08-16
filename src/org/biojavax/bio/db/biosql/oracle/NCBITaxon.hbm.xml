@@ -35,7 +35,7 @@
         <property name="parentNCBITaxID">
             <column name="PARENT_TAXON_ID" sql-type="integer" not-null="false"/>
         </property>
-        <set name="nameSet" table="TAXON_NAME" lazy="false">
+        <set name="nameSet" table="TAXON_NAME" lazy="false" sort="natural">
             <key column="TAXON_ID" not-null="true"/>
             <composite-element class="org.biojavax.bio.taxa.SimpleNCBITaxonName">
                 <property name="name">
