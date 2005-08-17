@@ -247,19 +247,20 @@ public class GenbankFormat
             } else if (sectionKey.equals(REFERENCE_TAG)) {
                 // first line of section has rank and location
                 int ref_rank;
-                int ref_start;
-                int ref_end;
+                int ref_start = -999;
+                int ref_end = -999;
                 String ref = ((String[])section.get(0))[1];
-                String regex = "^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\))?$";
+                String regex = "^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?";
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(ref);
                 if (m.matches()) {
                     ref_rank = Integer.parseInt(m.group(1));
                     if(m.group(2) != null){
-                        ref_start = Integer.parseInt(m.group(3));
+                        if (m.group(3)!= null)
+                            ref_start = Integer.parseInt(m.group(3));
+                       
+                        if(m.group(4) != null)
                         ref_end = Integer.parseInt(m.group(4));
-                    }else{
-                        ref_start = ref_end = -1;
                     }
                 } else {
                     throw new ParseException("Bad reference line found: "+ref);
@@ -306,8 +307,8 @@ public class GenbankFormat
                     dr.setRemark(remark);
                     // assign the docref to the bioentry
                     RankedDocRef rdr = new SimpleRankedDocRef(dr, 
-                            (ref_start != -1 ? new Integer(ref_start) : null),
-                            (ref_end != -1 ? new Integer(ref_end) : null),
+                            (ref_start != -999 ? new Integer(ref_start) : null),
+                            (ref_end != -999 ? new Integer(ref_end) : null),
                             ref_rank);
                     rlistener.setRankedDocRef(rdr);
                 } catch (ChangeVetoException e) {
