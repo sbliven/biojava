@@ -326,7 +326,7 @@ public class GenbankFormat
                     String val = ((String[])section.get(i))[1];
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
-                        val = val.trim().replaceAll("\"",""); // strip quotes
+                        val = val.replaceAll("\"","").trim(); // strip quotes
                         // parameter on old feature
                         if (key.equals("db_xref")) {
                             String regex = "^(\\S+?):(\\S+)$";
