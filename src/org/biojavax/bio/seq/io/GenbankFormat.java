@@ -246,13 +246,17 @@ public class GenbankFormat
                 int ref_start;
                 int ref_end;
                 String ref = ((String[])section.get(0))[1];
-                String regex = "^(\\d+)\\s+\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)$";
+                String regex = "^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\))?$";
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(ref);
                 if (m.matches()) {
                     ref_rank = Integer.parseInt(m.group(1));
-                    ref_start = Integer.parseInt(m.group(2));
-                    ref_end = Integer.parseInt(m.group(3));
+                    if(m.group(2) != null){
+                        ref_start = Integer.parseInt(m.group(3));
+                        ref_end = Integer.parseInt(m.group(4));
+                    }else{
+                        ref_start = ref_end = -1;
+                    }
                 } else {
                     throw new ParseException("Bad reference line found: "+ref);
                 }
@@ -297,7 +301,10 @@ public class GenbankFormat
                     // assign the remarks
                     dr.setRemark(remark);
                     // assign the docref to the bioentry
-                    RankedDocRef rdr = new SimpleRankedDocRef(dr, new Integer(ref_start), new Integer(ref_end), ref_rank);
+                    RankedDocRef rdr = new SimpleRankedDocRef(dr, 
+                            (ref_start != -1 ? new Integer(ref_start) : null),
+                            (ref_end != -1 ? new Integer(ref_end) : null),
+                            ref_rank);
                     rlistener.setRankedDocRef(rdr);
                 } catch (ChangeVetoException e) {
                     throw new ParseException(e);
@@ -438,7 +445,7 @@ public class GenbankFormat
             while (!done) {
                 br.mark(160);
                 line = br.readLine();
-                if (line==null || (line.charAt(0)!=' ' && linecount++>0)) {
+                if (line==null || line.equals("") || (line.charAt(0)!=' ' && linecount++>0)) {
                     // dump out last part of section
                     section.add(new String[]{currKey,currVal.toString()});
                     br.reset();
