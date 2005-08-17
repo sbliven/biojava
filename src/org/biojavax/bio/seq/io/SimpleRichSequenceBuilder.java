@@ -277,7 +277,13 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      */
     public void setTaxon(NCBITaxon taxon) throws ParseException {
         if (taxon==null) throw new ParseException("Taxon cannot be null");
-        if (this.taxon!=null) throw new ParseException("Current BioEntry already has a taxon");
+        if (this.taxon!=null){
+            if(! this.taxon.equals(taxon)){
+              throw new ParseException("Current BioEntry already has a taxon");
+            }
+            //already have that taxon don't need to set it again
+            return;
+        }
         this.taxon = taxon;
     }
     private NCBITaxon taxon;
