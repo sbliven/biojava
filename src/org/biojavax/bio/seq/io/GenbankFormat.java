@@ -118,6 +118,11 @@ public class GenbankFormat
         if (MODIFICATION_TERM==null) MODIFICATION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("MDAT");
         return MODIFICATION_TERM;
     }   
+    private static ComparableTerm MOLTYPE_TERM = null;
+    public static ComparableTerm getMolTypeTerm() {
+        if (MOLTYPE_TERM==null) MOLTYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("MOLTYPE");
+        return MOLTYPE_TERM;
+    }   
     private static ComparableTerm STRANDED_TERM = null; 
     private static ComparableTerm getStrandedTerm() {
         if (STRANDED_TERM==null) STRANDED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("STRANDED");
@@ -201,10 +206,9 @@ public class GenbankFormat
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(loc);
                 if (m.matches()) {
-//                    if (!symParser.getAlphabet().getName().equals(m.group(3)))
-//                        throw new ParseException("Genbank alphabet does not match expected alphabet in parser");
                     rlistener.setName(m.group(1));
                     rlistener.setDivision(m.group(5));
+                    rlistener.addSequenceProperty(getMolTypeTerm(),m.group(3));
                     rlistener.addSequenceProperty(getModificationTerm(),m.group(6));
                     // Optional extras
                     String stranded = m.group(2);
@@ -526,10 +530,12 @@ public class GenbankFormat
         String accessions = accession;
         String stranded = "";
         String mdat = "";
+        String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(getStrandedTerm())) stranded=n.getValue();
             else if (n.getTerm().equals(getModificationTerm())) mdat=n.getValue();
+            else if (n.getTerm().equals(getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(getAccessionTerm())) accessions = accessions+" "+n.getValue();
         }
         
@@ -539,7 +545,7 @@ public class GenbankFormat
         locusLine.append(RichSequenceFormat.Tools.leftPad(""+rs.length(),7));
         locusLine.append(" bp ");
         locusLine.append(RichSequenceFormat.Tools.leftPad(stranded,3));
-        locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getAlphabet().getName(),6));
+        locusLine.append(RichSequenceFormat.Tools.rightPad(moltype,6));
         locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getCircular()?"circular":"",10));
         locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getDivision()==null?"":rs.getDivision(),10));
         locusLine.append(mdat);

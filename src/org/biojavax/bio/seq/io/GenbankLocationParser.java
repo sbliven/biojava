@@ -117,7 +117,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
     private static Pattern gp = Pattern.compile("^([^\\(\\):]*?:)?(complement|join|order)?\\(*{0,1}(.*?)\\)*{0,1}$");
     private static Pattern rp = Pattern.compile("^\\(*(.*?)\\)*(\\.\\.\\(*(.*)\\)*)?$");
     private static Pattern xp = Pattern.compile("^(.*?)(\\.(\\d+))?:$");
-    private static Pattern pp = Pattern.compile("^\\(*(<)?(\\d+)(([\\.\\^])(\\d+))?(>)?\\)*$");
+    private static Pattern pp = Pattern.compile("^\\(*(<|>)?(\\d+)(([\\.\\^])(\\d+))?(<|>)?\\)*$");
     private static int rank;
     private static RichLocation parseLocString(Namespace featureNS, String featureAccession, CrossRef parentXref, Strand parentStrand, String locStr) throws ParseException {
         Matcher gm = gp.matcher(locStr);
@@ -188,43 +188,34 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         String start = rm.group(1);
         String end = rm.group(3);
         
-        Matcher pm = pp.matcher(start);
-        if (!pm.matches()) throw new ParseException("Could not understand start position: "+start);
-        boolean startStartsFuzzy = !(pm.group(1)==null);
-        String startStart = pm.group(2);
-        String startRangeType = pm.group(4);
-        String startEnd = pm.group(5);
-        boolean startEndsFuzzy = !(pm.group(6)==null);
-        Position startPos = null;
-        if (startRangeType!=null) {
-            // fuzziest
-            startPos = new SimplePosition(startStartsFuzzy,startEndsFuzzy,Integer.parseInt(startStart),Integer.parseInt(startEnd),startRangeType);
-        } else {
-            // less fuzzy
-            startPos = new SimplePosition(startStartsFuzzy,startEndsFuzzy,Integer.parseInt(startStart));
-        }
-        
+        Position startPos = parsePosition(start);        
         if (end==null) {
             // A point location
             return new SimpleRichLocation(startPos,startPos,rank++,strand,crossRef);
         } else {
             // A range location
-            pm = pp.matcher(end);
-            if (!pm.matches()) throw new ParseException("Could not understand end position: "+end);
-            boolean endStartsFuzzy = !(pm.group(1)==null);
-            String endStart = pm.group(2);
-            String endRangeType = pm.group(4);
-            String endEnd = pm.group(5);
-            boolean endEndsFuzzy = !(pm.group(6)==null);
-            Position endPos = null;
-            if (endRangeType!=null) {
-                // fuzziest
-                endPos = new SimplePosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart),Integer.parseInt(endEnd),endRangeType);
-            } else {
-                // less fuzzy
-                endPos = new SimplePosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart));
-            }
+            Position endPos = parsePosition(end);
             return new SimpleRichLocation(startPos,endPos,rank++,strand,crossRef);
+        }
+    }
+    
+    private static Position parsePosition(String position) throws ParseException {
+        Matcher pm = pp.matcher(position);
+        if (!pm.matches()) throw new ParseException("Could not understand position: "+position);
+        String startfuzz = pm.group(1);
+        String endfuzz = pm.group(6);
+        boolean endStartsFuzzy = ((startfuzz!=null && startfuzz.equals("<")) || (endfuzz!=null && endfuzz.equals("<")));
+        boolean endEndsFuzzy = ((endfuzz!=null && endfuzz.equals(">")) || (startfuzz!=null && startfuzz.equals(">")));
+        String endStart = pm.group(2);
+        String endRangeType = pm.group(4);
+        String endEnd = pm.group(5);
+        Position endPos = null;
+        if (endRangeType!=null) {
+            // fuzziest
+            return new SimplePosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart),Integer.parseInt(endEnd),endRangeType);
+        } else {
+            // less fuzzy
+            return new SimplePosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart));
         }
     }
     
@@ -245,7 +236,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         int e = p.getEnd();
         String t = p.getType();
         boolean fs = p.hasFuzzyStart();
-        boolean fe = p.hasFuzzyEnd(); 
+        boolean fe = p.hasFuzzyEnd();
         if (t!=null) {
             // a range - put in brackets
             sb.append("(");
