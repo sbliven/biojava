@@ -60,6 +60,17 @@ public class SimplePosition implements Position {
     
     public String getType() { return this.t; }
     
+    // Hibernate requirement - not for public use - futureproofing
+    private void setFuzzyStart(boolean fs) { this.fs = fs; }
+    // Hibernate requirement - not for public use - futureproofing
+    private void setFuzzyEnd(boolean fe) { this.fe = fe; }
+    // Hibernate requirement - not for public use - futureproofing
+    private void getStart(int s) { this.s = s; }
+    // Hibernate requirement - not for public use - futureproofing
+    private void getEnd(int e) { this.e = e; }
+    // Hibernate requirement - not for public use - futureproofing
+    private void getType(String t) { this.t = t; }
+    
     public Position translate(int distance) {
         return new SimplePosition(this.fs,this.fe,this.s+distance,this.e+distance,this.t);
     }
