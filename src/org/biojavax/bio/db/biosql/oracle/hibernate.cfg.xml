@@ -20,7 +20,7 @@
         -->
         
         <property name="show_sql">false</property>
-        <property name="dialect">org.hibernate.dialect.OracleDialect</property>
+        <property name="dialect">org.hibernate.dialect.Oracle9Dialect</property>
 
         <!-- Mapping files -->
         <mapping resource="Namespace.hbm.xml"/>
