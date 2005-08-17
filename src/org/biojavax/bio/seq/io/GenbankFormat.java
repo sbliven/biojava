@@ -183,7 +183,7 @@ public class GenbankFormat
         
         rlistener.startSequence();
         
-        rlistener.setNamespace(RichObjectFactory.getDefaultLocalNamespace());
+        rlistener.setNamespace(RichObjectFactory.getGenbankNamespace());
         
         // Get an ordered list of key->value pairs in array-tuples
         String sectionKey = null;
@@ -201,8 +201,8 @@ public class GenbankFormat
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(loc);
                 if (m.matches()) {
-                    if (!symParser.getAlphabet().getName().equals(m.group(3)))
-                        throw new ParseException("Genbank alphabet does not match expected alphabet in parser");
+//                    if (!symParser.getAlphabet().getName().equals(m.group(3)))
+//                        throw new ParseException("Genbank alphabet does not match expected alphabet in parser");
                     rlistener.setName(m.group(1));
                     rlistener.setDivision(m.group(5));
                     rlistener.addSequenceProperty(getModificationTerm(),m.group(6));
