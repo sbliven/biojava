@@ -279,7 +279,10 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         if (taxon==null) throw new ParseException("Taxon cannot be null");
         if (this.taxon!=null){
             if(! this.taxon.equals(taxon)){
-              throw new ParseException("Current BioEntry already has a taxon");
+               System.err.println(
+                       "Warning: attempted to set taxon twice with different values. Keeping first value. "+
+                       "old value (retained): "+this.taxon+" new value: "+taxon);
+              //throw new ParseException("Current BioEntry already has a taxon: "+this.taxon);
             }
             //already have that taxon don't need to set it again
             return;
