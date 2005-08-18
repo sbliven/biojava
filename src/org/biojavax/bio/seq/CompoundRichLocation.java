@@ -80,7 +80,9 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      */
     public CompoundRichLocation(ComparableTerm term, Collection members) {
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        if (members==null || members.size()<2) throw new IllegalArgumentException("Members collection must have at least 2 members");
+        if (members==null || members.size()<2) throw new IllegalArgumentException(
+                "Members collection must have at least 2 members. Term: "+term+
+                " number of members: "+members.size());
         this.members = members;
         this.term = term;
         for (Iterator i = this.members.iterator(); i.hasNext(); ) {
