@@ -319,7 +319,7 @@ public class GenbankFormat
                 rlistener.setComment(((String[])section.get(0))[1]);
             } else if (sectionKey.equals(FEATURE_TAG)) {
                 // starting from second line of input, start a new feature whenever we come across
-                // a value that does not start with "
+                // a key that does not start with /
                 boolean seenAFeature = false;
                 for (int i = 1 ; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
@@ -443,8 +443,9 @@ public class GenbankFormat
         int linecount = 0;
         
         //s0-8 word s1-7 value
-        //s21 word = value
-        String regex = "^(\\s{0,8}(\\S+?)\\s{1,7}(.*)|\\s{21}(\\S+?)=(.*))$";
+        //s21 /word = value
+        //s21 /word
+        String regex = "^(\\s{0,8}(\\S+)\\s{1,7}(.*)|\\s{21}(/\\S+?)=(.*)|\\s{21}(/\\S+))$";
         Pattern p = Pattern.compile(regex);
         try {
             while (!done) {
@@ -460,9 +461,11 @@ public class GenbankFormat
                     if (m.matches()) {
                         // new key
                         if (currKey!=null) section.add(new String[]{currKey,currVal.toString()});
-                        currKey = m.group(2)==null?m.group(4):m.group(2);
+                        // key = group(2) or group(4) or group(6) - whichever is not null
+                        currKey = m.group(2)==null?(m.group(4)==null?m.group(6):m.group(4)):m.group(2);
                         currVal = new StringBuffer();
-                        currVal.append((m.group(2)==null?m.group(5):m.group(3)).trim());
+                        // val = group(3) if group(2) not null, group(5) if group(4) not null, "" otherwise, trimmed
+                        currVal.append((m.group(2)==null?(m.group(4)==null?"":m.group(5)):m.group(3)).trim());
                     } else {
                         line = line.trim();
                         // concatted line or SEQ START/END line?
@@ -514,9 +517,7 @@ public class GenbankFormat
         
         // Genbank only really - others are treated identically for now
         if (!(
-                format.equalsIgnoreCase("GENBANK") ||
-                format.equalsIgnoreCase("GENPEPT") ||
-                format.equalsIgnoreCase("REFSEQ:PROTEIN")
+                format.equalsIgnoreCase("GENBANK")
                 ))
             throw new IllegalArgumentException("Unknown format: "+format);
         SymbolTokenization tok;
@@ -617,8 +618,9 @@ public class GenbankFormat
             this.writeWrappedLocationLine("     "+f.getTypeTerm().getName(), 21, GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), os);
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
-                // /key="val"
-                this.writeWrappedLine("",21,"/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", os);
+                // /key="val" or just /key if val==""
+                if (n.getValue()==null || n.getValue().equals("")) this.writeWrappedLine("",21,"/"+n.getTerm(),os);
+                else this.writeWrappedLine("",21,"/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", os);
             }
             // add-in to source feature only db_xref="taxon:xyz" where present
             if (f.getType().equals("source") && tax!=null) {

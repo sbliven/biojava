@@ -40,12 +40,10 @@ public interface PositionResolver {
     public static class MaximalResolver implements PositionResolver {
         // maximal range is from min(s) to max(e)
         public int getMin(Position s) {
-            if (s.hasFuzzyStart()) return Integer.MIN_VALUE;
-            else return s.getStart();
+            return s.getStart();
         }
         public int getMax(Position e) {
-            if (e.hasFuzzyEnd()) return Integer.MAX_VALUE;
-            else return e.getEnd();
+            return e.getEnd();
         }
     }
     
@@ -62,17 +60,13 @@ public interface PositionResolver {
     public static class AverageResolver implements PositionResolver {
         // average range is from avg(min(s),max(s))) to avg(min(e),max(e))
         public int getMin(Position s) {
-            int min;
-            if (s.hasFuzzyStart()) min = Integer.MIN_VALUE;
-            else min = s.getStart();
+            int min = s.getStart();
             int max = s.getEnd();
             return (min+max) / 2;
         }
         public int getMax(Position e) {
-            int max;
-            if (e.hasFuzzyEnd()) max = Integer.MAX_VALUE;
-            else max = e.getEnd();
             int min = e.getStart();
+            int max = e.getEnd();
             return (min+max) / 2;
         }
     }
