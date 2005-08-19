@@ -178,7 +178,16 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 }
                 if (sb.length()>0) members.add(parseLocString(featureNS,featureAccession,crossRef,parentStrand,sb.toString()));
                 
-                return new CompoundRichLocation(groupTypeTerm, members);
+                if (members.size()>1) {
+                    // Normal case where join() or order() wrap multiple locations.
+                    return new CompoundRichLocation(groupTypeTerm, members);
+                } else if (members.size()==1) {
+                    // Dodgy case where join() or order() only wrap a single locations.
+                    return (RichLocation)members.get(0);
+                } else {
+                    // Really dodgy case with no members at all!
+                    throw new ParseException("Group found with no members. Term: "+groupType);
+                }
             }
         }
         
