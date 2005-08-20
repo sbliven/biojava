@@ -198,7 +198,10 @@ public class GenbankFormat
         do {
             List section = this.readSection(reader);
             sectionKey = ((String[])section.get(0))[0];
-            
+            if(sectionKey == null){
+                throw new ParseException("Section key was null. Accession:"+
+                        accession == null ? "Not set" : accession);
+            }
             // process section-by-section
             if (sectionKey.equals(LOCUS_TAG)) {
                 String loc = ((String[])section.get(0))[1];
