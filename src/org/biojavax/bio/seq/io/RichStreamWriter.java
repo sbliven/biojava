@@ -43,11 +43,6 @@ import org.biojavax.bio.seq.RichSequence;
  */
 public class RichStreamWriter {
   /**
-   * The namespace to write in.
-   */
-  private Namespace ns;
-  
-  /**
    * The format to write in.
    */
   private RichSequenceFormat format;
@@ -63,7 +58,7 @@ public class RichStreamWriter {
    * @param ss  the SequenceIterator to loop over
    * @throws IOException if the stream has any problems
    */
-  public void writeStream(SequenceIterator ss)
+  public void writeStream(SequenceIterator ss, Namespace ns)
               throws IOException {
     while(ss.hasNext()) {
       try {
@@ -80,9 +75,8 @@ public class RichStreamWriter {
    * @param os  the OutputStream to write to
    * @param format the SequenceFormat to write with
    */
-  public RichStreamWriter(OutputStream os, RichSequenceFormat format, Namespace ns) {
+  public RichStreamWriter(OutputStream os, RichSequenceFormat format) {
     this.os = new PrintStream(os);
-    this.ns = ns;
     this.format = format;
   }
 }

@@ -292,8 +292,8 @@ public final class RichSeqIOTools {
      */
     public static void writeFasta(OutputStream os, SequenceDB db, Namespace ns)
     throws IOException {
-        RichStreamWriter sw = new RichStreamWriter(os,new FastaFormat(),ns);
-        sw.writeStream(db.sequenceIterator());
+        RichStreamWriter sw = new RichStreamWriter(os,new FastaFormat());
+        sw.writeStream(db.sequenceIterator(),ns);
     }
     
     /**
@@ -310,8 +310,8 @@ public final class RichSeqIOTools {
      */
     public static void writeFasta(OutputStream os, SequenceIterator in, Namespace ns)
     throws IOException {
-        RichStreamWriter sw = new RichStreamWriter(os,new FastaFormat(),ns);
-        sw.writeStream(in);
+        RichStreamWriter sw = new RichStreamWriter(os,new FastaFormat());
+        sw.writeStream(in,ns);
     }
     
     /**
@@ -330,14 +330,14 @@ public final class RichSeqIOTools {
     
     public static void writeGenbank(OutputStream os, SequenceDB db, Namespace ns)
     throws IOException {
-        RichStreamWriter sw = new RichStreamWriter(os,new GenbankFormat(),ns);
-        sw.writeStream(db.sequenceIterator());
+        RichStreamWriter sw = new RichStreamWriter(os,new GenbankFormat());
+        sw.writeStream(db.sequenceIterator(),ns);
     }
     
     public static void writeGenbank(OutputStream os, SequenceIterator in, Namespace ns)
     throws IOException {
-        RichStreamWriter sw = new RichStreamWriter(os,new GenbankFormat(),ns);
-        sw.writeStream(in);
+        RichStreamWriter sw = new RichStreamWriter(os,new GenbankFormat());
+        sw.writeStream(in,ns);
     }
     
     public static void writeGenbank(OutputStream os, RichSequence seq, Namespace ns)
