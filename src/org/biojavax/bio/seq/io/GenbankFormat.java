@@ -168,22 +168,7 @@ public class GenbankFormat
             SeqIOListener listener)
             throws IllegalSymbolException, IOException, ParseException {
         if (!(listener instanceof RichSeqIOListener)) throw new IllegalArgumentException("Only accepting RichSeqIOListeners today");
-        return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener);
-    }
-    
-    /**
-     * Reads a sequence from the specified reader using the Symbol
-     * parser and Sequence Factory provided. The sequence read in must
-     * be in Genbank format.
-     *
-     * @return boolean True if there is another sequence in the file; false
-     * otherwise
-     */
-    public boolean readRichSequence(BufferedReader reader,
-            SymbolTokenization symParser,
-            RichSeqIOListener rlistener)
-            throws IllegalSymbolException, IOException, ParseException {
-        return this.readRichSequence(reader,symParser,rlistener, null);
+        return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener,null);
     }
     
     /**
@@ -508,23 +493,16 @@ public class GenbankFormat
     public void	writeSequence(Sequence seq, PrintStream os)
     throws IOException {
         if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
-        this.writeRichSequence((RichSequence)seq, os);
+        this.writeRichSequence((RichSequence)seq, os,null);
     }  
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
         if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
-        this.writeRichSequence((RichSequence)seq, format, os);
+        this.writeRichSequence((RichSequence)seq, format, os,null);
     } 
     
-    public void	writeRichSequence(RichSequence seq, PrintStream os)
-    throws IOException {
-        this.writeRichSequence(seq, getDefaultFormat(), os);
-    }
     public void	writeRichSequence(RichSequence seq, PrintStream os, Namespace ns)
     throws IOException {
         this.writeRichSequence(seq, getDefaultFormat(), os, ns);
-    }
-    public void writeRichSequence(RichSequence rs, String format, PrintStream os) throws IOException {
-        this.writeRichSequence(rs, format, os, null);
     }
     /**
      * <code>writeSequence</code> writes a sequence to the specified

@@ -98,19 +98,8 @@ public class FastaFormat implements RichSequenceFormat {
             IOException,
             ParseException {
         if (!(listener instanceof RichSeqIOListener)) throw new IllegalArgumentException("Only accepting RichSeqIOListeners today");
-        return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener);
+        return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener,null);
     }
-    
-    public boolean readRichSequence(
-            BufferedReader reader,
-            SymbolTokenization symParser,
-            RichSeqIOListener rsiol
-            )	throws
-            IllegalSymbolException,
-            IOException,
-            ParseException {
-            return this.readRichSequence(reader,symParser,rsiol, null);
-        }
         
     // if ns==null then namespace of sequence in fasta is used
     // if ns==null and namespace of sequence==null then default namespace is used
@@ -243,18 +232,14 @@ public class FastaFormat implements RichSequenceFormat {
     public void writeSequence(Sequence seq, PrintStream os)
     throws IOException {        
         if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
-        this.writeRichSequence((RichSequence)seq, os);
+        this.writeRichSequence((RichSequence)seq, os,null);
     }
     public void writeSequence(Sequence seq, String format, PrintStream os)
     throws IOException {        
         if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
-        this.writeRichSequence((RichSequence)seq, format, os);
+        this.writeRichSequence((RichSequence)seq, format, os, null);
     }
     
-    public void writeRichSequence(RichSequence rs, PrintStream os)
-    throws IOException {
-        this.writeRichSequence(rs, os, null);
-    }    
     // if ns==null then sequence's namespace is used
     public void writeRichSequence(RichSequence rs, PrintStream os, Namespace ns)
     throws IOException {
@@ -284,10 +269,6 @@ public class FastaFormat implements RichSequenceFormat {
         }
     }   
        
-    public void writeRichSequence(RichSequence seq, String format, PrintStream os)
-    throws IOException {
-        this.writeRichSequence(seq,format,os,null);
-    }
     public void writeRichSequence(RichSequence seq, String format, PrintStream os, Namespace ns)
     throws IOException {
         if (! format.equalsIgnoreCase(getDefaultFormat()))
