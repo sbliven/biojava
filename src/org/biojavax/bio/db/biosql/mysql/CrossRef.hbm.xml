@@ -7,35 +7,21 @@
 
     <class name="org.biojavax.SimpleCrossRef" table="dbxref">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="dbxref_id" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="dbxref_id">
             <generator class="identity"/>
         </id>
 
-        <property name="dbname">
-            <column name="dbname" sql-type="string" length="32" not-null="true"/>
-        </property>
-        <property name="accession">
-            <column name="accession" sql-type="string" length="64" not-null="true"/>
-        </property>
-        <property name="version">
-            <column name="version" sql-type="integer" length="2" not-null="true"/>
-        </property>
+        <property name="dbname"/>
+        <property name="accession"/>
+        <property name="version"/>
         <set name="noteSet" table="dbxref_qualifier_value" lazy="false" sort="natural">
             <key column="dbxref_id" not-null="true"/>
             <composite-element class="org.biojavax.SimpleNote">
-                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
-                    <column name="term_id" not-null="true"/>
-                </many-to-one>
-                <property name="value">
-                    <column name="value" sql-type="text" not-null="true"/>
-                </property>
-                <property name="rank">
-                    <column name="rank" sql-type="integer" length="3" not-null="true"/>
-                </property>
+                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" column="term_id" not-null="true" cascade="persist,merge,save-update"/>
+                <property name="value"/>
+                <property name="rank"/>
             </composite-element>
-        </set>
-        
+        </set>        
         
     </class>
 

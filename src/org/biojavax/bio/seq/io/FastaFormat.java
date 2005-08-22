@@ -109,6 +109,20 @@ public class FastaFormat implements RichSequenceFormat {
             IllegalSymbolException,
             IOException,
             ParseException {
+            return this.readRichSequence(reader,symParser,rsiol, null);
+        }
+        
+    // if ns==null then namespace of sequence in fasta is used
+    // if ns==null and namespace of sequence==null then default namespace is used
+    public boolean readRichSequence(
+            BufferedReader reader,
+            SymbolTokenization symParser,
+            RichSeqIOListener rsiol,
+            Namespace ns
+            )	throws
+            IllegalSymbolException,
+            IOException,
+            ParseException {
         String line = reader.readLine();
         if (line == null) {
             throw new IOException("Premature stream end");
@@ -149,10 +163,11 @@ public class FastaFormat implements RichSequenceFormat {
             rsiol.setAccession(accession);
             rsiol.setVersion(version);            
             if (gi!=null) rsiol.setIdentifier(gi);
-            rsiol.setNamespace((Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{namespace}));
+            if (ns==null) rsiol.setNamespace((Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{namespace}));
+            else rsiol.setNamespace(ns);
         } else {
             rsiol.setAccession(name);
-            rsiol.setNamespace(RichObjectFactory.getDefaultLocalNamespace());
+            rsiol.setNamespace((ns==null?RichObjectFactory.getDefaultNamespace():ns));
         }
         rsiol.setName(name);
         rsiol.setDescription(desc);
@@ -230,8 +245,18 @@ public class FastaFormat implements RichSequenceFormat {
         if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
         this.writeRichSequence((RichSequence)seq, os);
     }
+    public void writeSequence(Sequence seq, String format, PrintStream os)
+    throws IOException {        
+        if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
+        this.writeRichSequence((RichSequence)seq, format, os);
+    }
     
     public void writeRichSequence(RichSequence rs, PrintStream os)
+    throws IOException {
+        this.writeRichSequence(rs, os, null);
+    }    
+    // if ns==null then sequence's namespace is used
+    public void writeRichSequence(RichSequence rs, PrintStream os, Namespace ns)
     throws IOException {
         os.print(">");
         
@@ -241,7 +266,7 @@ public class FastaFormat implements RichSequenceFormat {
             os.print(identifier);
             os.print("|");
         }
-        os.print(rs.getNamespace().getName());
+        os.print((ns==null?rs.getNamespace().getName():ns.getName()));
         os.print("|");
         os.print(rs.getAccession());
         os.print(".");
@@ -258,20 +283,18 @@ public class FastaFormat implements RichSequenceFormat {
             os.println(rs.subStr(pos, end));
         }
     }   
-    
-    public void writeSequence(Sequence seq, String format, PrintStream os)
-    throws IOException {        
-        if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
-        this.writeRichSequence((RichSequence)seq, format, os);
-    }
-    
+       
     public void writeRichSequence(RichSequence seq, String format, PrintStream os)
+    throws IOException {
+        this.writeRichSequence(seq,format,os,null);
+    }
+    public void writeRichSequence(RichSequence seq, String format, PrintStream os, Namespace ns)
     throws IOException {
         if (! format.equalsIgnoreCase(getDefaultFormat()))
             throw new IllegalArgumentException("Unknown format '"
                     + format
                     + "'");
-        this.writeSequence(seq, os);
+        this.writeRichSequence(seq, os, ns);
     }
     
     /**

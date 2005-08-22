@@ -7,17 +7,12 @@
 
     <class name="org.biojavax.SimpleComment" table="anncomment">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="comment_id" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="comment_id">
             <generator class="identity"/>
         </id>
 
-        <property name="rank">
-            <column name="rank" sql-type="integer" length="2" not-null="true"/>
-        </property>
-        <property name="comment">
-            <column name="comment_text" sql-type="text" not-null="true"/>
-        </property>
+        <property name="rank"/>
+        <property name="comment" column="comment_text" type="text"/>
         
     </class>
 

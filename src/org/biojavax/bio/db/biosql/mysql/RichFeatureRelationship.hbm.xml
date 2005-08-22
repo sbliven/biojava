@@ -7,20 +7,13 @@
 
     <class name="org.biojavax.bio.seq.SimpleRichFeatureRelationship" table="seqfeature_relationship">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="seqfeature_relationship_id" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="seqfeature_relationship_id">
             <generator class="identity"/>
         </id>
 
-        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
-            <column name="term_id" not-null="true"/>
-        </many-to-one>
-        <many-to-one name="subject" class="org.biojavax.bio.seq.SimpleRichFeature" cascade="persist,merge,save-update">
-            <column name="subject_seqfeature_id" not-null="true"/>
-        </many-to-one>
-        <property name="rank">
-            <column name="rank" sql-type="integer" length="6" not-null="false"/>
-        </property>
+        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" column="term_id" not-null="true" cascade="persist,merge,save-update"/>
+        <many-to-one name="subject" class="org.biojavax.bio.seq.SimpleRichFeature" column="subject_seqfeature_id" not-null="true" cascade="persist,merge,save-update"/>
+        <property name="rank"/>
         
     </class>
 

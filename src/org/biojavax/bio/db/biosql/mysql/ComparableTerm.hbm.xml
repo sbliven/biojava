@@ -7,41 +7,24 @@
 
     <class name="org.biojavax.ontology.SimpleComparableTerm" table="term">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="term_id" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="term_id">
             <generator class="identity"/>
         </id>
 
-        <property name="name">
-            <column name="name" sql-type="string" length="256" not-null="true"/>
-        </property>
-        <property name="identifier">
-            <column name="identifier" sql-type="string" length="6" not-null="false"/>
-        </property>
-        <property name="description">
-            <column name="definition" sql-type="string" length="4000" not-null="false"/>
-        </property>
-        <property name="obsolete">
-            <column name="is_obsolete" sql-type="boolean" not-null="false"/>
-        </property>        
-        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="persist,merge,save-update">
-            <column name="ontology_id" not-null="true"/>
-        </many-to-one>
+        <property name="name"/>
+        <property name="identifier"/>
+        <property name="description" column="definition"/>
+        <property name="obsolete" column="is_obsolete"/>
+        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" column="ontology_id" not-null="true" cascade="persist,merge,save-update"/>
         <set name="synonymSet" table="term_synonym" lazy="false" sort="natural">
             <key column="term_id"/>
-            <element type="string">
-                <column name="synonym" sql-type="string" length="256" not-null="true"/>
-            </element>
+            <element type="string" column="synonym"/>
         </set>
         <set name="rankedCrossRefs" table="term_dbxref" lazy="false" sort="natural">
             <key column="term_id"/>
             <composite-element class="org.biojavax.SimpleRankedCrossRef">
-                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">
-                    <column name="dbxref_id" not-null="true"/>
-                </many-to-one>   
-                <property name="rank">
-                    <column name="rank" sql-type="integer" length="3" not-null="false"/>
-                </property>  
+                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" column="dbxref_id" not-null="true" cascade="persist,merge,save-update"/>
+                <property name="rank"/>
             </composite-element>
         </set>
         

@@ -5,21 +5,16 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.SimpleComment" table="ANNCOMMENT">
+    <class name="org.biojavax.SimpleComment" table="anncomment">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="ANNCOMMENT_ID" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="anncomment_id">
             <generator class="sequence">
-                <param name="sequence">ANNCOMMENT_PK_SEQ</param>
+                <param name="sequence">anncomment_pk_seq</param>
             </generator>
         </id>
 
-        <property name="rank">
-            <column name="RANK" sql-type="integer" length="2" not-null="true"/>
-        </property>
-        <property name="comment">
-            <column name="COMMENT_TEXT" sql-type="text" not-null="true"/>
-        </property>
+        <property name="rank"/>
+        <property name="comment" column="comment_text" type="text"/>
         
     </class>
 

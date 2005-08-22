@@ -34,6 +34,7 @@ import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.utils.ParseErrorSource;
+import org.biojavax.Namespace;
 import org.biojavax.bio.seq.RichSequence;
 
 /**
@@ -49,8 +50,12 @@ public interface RichSequenceFormat extends SequenceFormat,ParseErrorSource {
     
     public void writeRichSequence(RichSequence seq, PrintStream os)
     throws IOException;
+    public void writeRichSequence(RichSequence seq, PrintStream os, Namespace ns)
+    throws IOException;
     
     public void writeRichSequence(RichSequence seq, String format, PrintStream os)
+    throws IOException;
+    public void writeRichSequence(RichSequence seq, String format, PrintStream os, Namespace ns)
     throws IOException;
     
     public static class Tools {

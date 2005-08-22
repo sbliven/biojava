@@ -7,28 +7,17 @@
 
     <class name="org.biojavax.ontology.SimpleComparableTriple" table="term_relationship">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="term_relationship_id" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="term_relationship_id">
             <generator class="identity"/>
         </id>
 
-        <many-to-one name="subject" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
-            <column name="subject_term_id" not-null="true"/>
-        </many-to-one>    
-        <many-to-one name="object" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
-            <column name="object_term_id" not-null="true"/>
-        </many-to-one>    
-        <many-to-one name="predicate" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
-            <column name="predicate_term_id" not-null="true"/>
-        </many-to-one>       
-        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="persist,merge,save-update">
-            <column name="ontology_id" not-null="true"/>
-        </many-to-one>   
+        <many-to-one name="subject" class="org.biojavax.ontology.SimpleComparableTerm" column="subject_term_id" not-null="true" cascade="persist,merge,save-update"/>
+        <many-to-one name="object" class="org.biojavax.ontology.SimpleComparableTerm" column="object_term_id" not-null="true" cascade="persist,merge,save-update"/>
+        <many-to-one name="predicate" class="org.biojavax.ontology.SimpleComparableTerm" column="predicate_term_id" not-null="true" cascade="persist,merge,save-update"/>
+        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" column="ontology_id" not-null="true" cascade="persist,merge,save-update"/>
         <set name="descriptors" table="term_relationship_term" lazy="false" cascade="all" sort="natural">
             <key column="term_relationship_id" not-null="true"/>
-            <many-to-many class="org.biojavax.ontology.SimpleComparableTerm">
-                <column name="term_id" not-null="true"/>
-            </many-to-many>
+            <many-to-many class="org.biojavax.ontology.SimpleComparableTerm" column="term_id"/>
         </set>
     </class>
 

@@ -5,30 +5,19 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.SimpleNamespace" table="BIODATABASE">
+    <class name="org.biojavax.SimpleNamespace" table="biodatabase">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="BIODATABASE_ID" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="biodatabase_id">
             <generator class="sequence">
-                <param name="sequence">BIODATABASE_PK_SEQ</param>
+                <param name="sequence">biodatabase_pk_seq</param>
             </generator>
         </id>
 
-        <property name="name">
-            <column name="NAME" sql-type="string" length="32" unique="true" not-null="true"/>
-        </property>
-        <property name="authority">
-            <column name="AUTHORITY" sql-type="string" length="32" not-null="false"/>
-        </property>
-        <property name="description">
-            <column name="DESCRIPTION" sql-type="string" length="256" not-null="false"/>
-        </property>
-        <property name="acronym">
-            <column name="ACRONYM" sql-type="string" length="12" not-null="false"/>
-        </property>
-        <property name="URIString">
-            <column name="URI" sql-type="string" length="128" not-null="false"/>
-        </property>
+        <property name="name"/>
+        <property name="authority"/>
+        <property name="description"/>
+        <property name="acronym"/>
+        <property name="URIString" column="uri"/>
 
     </class>
 

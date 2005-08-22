@@ -7,26 +7,15 @@
 
     <class name="org.biojavax.SimpleDocRef" table="reference">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="reference_id" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="reference_id">
             <generator class="identity"/>
         </id>
 
-        <property name="title">
-            <column name="title" sql-type="text" not-null="false"/>
-        </property>
-        <property name="authors">
-            <column name="authors" sql-type="text" not-null="true"/>
-        </property>
-        <property name="location">
-            <column name="location" sql-type="text" not-null="true"/>
-        </property>
-        <property name="CRC">
-            <column name="crc" sql-type="string" length="32" not-null="false"/>
-        </property>
-        <many-to-one name="crossref" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">
-            <column name="dbxref_id" not-null="false"/>
-        </many-to-one>
+        <property name="title"/>
+        <property name="authors"/>
+        <property name="location"/>
+        <property name="CRC" column="crc"/>
+        <many-to-one name="crossref" class="org.biojavax.SimpleCrossRef" column="dbxref_id" cascade="persist,merge,save-update"/>
         
     </class>
 

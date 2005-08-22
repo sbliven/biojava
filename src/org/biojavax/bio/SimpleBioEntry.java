@@ -513,13 +513,13 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     public void setRankedCrossRefs(Set rankedcrossrefs) { this.rankedcrossrefs = rankedcrossrefs; } // original for Hibernate
     
     // Hibernate requirement - not for public use.
-    private Long id;
+    private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Long getId() { return this.id; }
+    private Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Long id) { this.id = id; }
+    private void setId(Integer id) { this.id = id; }
     
 }
 

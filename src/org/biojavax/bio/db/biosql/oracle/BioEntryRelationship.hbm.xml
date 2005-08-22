@@ -5,24 +5,17 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.bio.SimpleBioEntryRelationship" table="BIOENTRY_RELATIONSHIP">
+    <class name="org.biojavax.bio.SimpleBioEntryRelationship" table="bioentry_relationship">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="BIOENTRY_RELATIONSHIP_ID" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="bioentry_relationship_id">
             <generator class="sequence">
-                <param name="sequence">BIOENTRY_RELATIONSHIP_PK_SEQ</param>
+                <param name="sequence">bioentry_relationship_pk_seq</param>
             </generator>
         </id>
 
-        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
-            <column name="TERM_ID" not-null="true"/>
-        </many-to-one>
-        <many-to-one name="subject" class="org.biojavax.bio.SimpleBioEntry" cascade="persist,merge,save-update">
-            <column name="SUBJECT_BIOENTRY_ID" not-null="true"/>
-        </many-to-one>
-        <property name="rank">
-            <column name="RANK" sql-type="integer" length="6" not-null="false"/>
-        </property>
+        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" column="term_id" not-null="true" cascade="persist,merge,save-update"/>
+        <many-to-one name="subject" class="org.biojavax.bio.SimpleBioEntry" column="subject_bioentry_id" not-null="true" cascade="persist,merge,save-update"/>
+        <property name="rank"/>
         
     </class>
 

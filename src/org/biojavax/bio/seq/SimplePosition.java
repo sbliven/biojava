@@ -92,12 +92,12 @@ public class SimplePosition implements Position {
     }
     
     // Hibernate requirement - not for public use - futureproofing
-    private Long id;
+    private Integer id;
     
     // Hibernate requirement - not for public use - futureproofing
-    private Long getId() { return this.id; }
+    private Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void setId(Long id) { this.id = id; }
+    private void setId(Integer id) { this.id = id; }
     
 }

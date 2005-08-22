@@ -5,45 +5,28 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.ontology.SimpleComparableTerm" table="TERM">
+    <class name="org.biojavax.ontology.SimpleComparableTerm" table="term">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="TERM_ID" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="term_id">
             <generator class="sequence">
-                <param name="sequence">TERM_PK_SEQ</param>
+                <param name="sequence">term_pk_seq</param>
             </generator>
         </id>
 
-        <property name="name">
-            <column name="NAME" sql-type="string" length="256" not-null="true"/>
-        </property>
-        <property name="identifier">
-            <column name="IDENTIFIER" sql-type="string" length="6" not-null="false"/>
-        </property>
-        <property name="description">
-            <column name="DEFINITION" sql-type="string" length="4000" not-null="false"/>
-        </property>
-        <property name="obsolete">
-            <column name="IS_OBSOLETE" sql-type="boolean" not-null="false"/>
-        </property>        
-        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" cascade="persist,merge,save-update">
-            <column name="ONTOLOGY_ID" not-null="true"/>
-        </many-to-one>
-        <set name="synonymSet" table="TERM_SYNONYM" lazy="false" sort="natural">
-            <key column="TERM_ID"/>
-            <element type="string">
-                <column name="NAME" sql-type="string" length="256" not-null="true"/>
-            </element>
+        <property name="name"/>
+        <property name="identifier"/>
+        <property name="description" column="definition"/>
+        <property name="obsolete" column="is_obsolete"/>
+        <many-to-one name="ontology" class="org.biojavax.ontology.SimpleComparableOntology" column="ontology_id" not-null="true" cascade="persist,merge,save-update"/>
+        <set name="synonymSet" table="term_synonym" lazy="false" sort="natural">
+            <key column="term_id"/>
+            <element type="string" column="name"/>
         </set>
-        <set name="rankedCrossRefs" table="TERM_DBXREF" lazy="false" sort="natural">
-            <key column="TERM_ID"/>
+        <set name="rankedCrossRefs" table="term_dbxref" lazy="false" sort="natural">
+            <key column="term_id"/>
             <composite-element class="org.biojavax.SimpleRankedCrossRef">
-                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">
-                    <column name="DBXREF_ID" not-null="true"/>
-                </many-to-one>   
-                <property name="rank">
-                    <column name="RANK" sql-type="integer" length="3" not-null="false"/>
-                </property>  
+                <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" column="dbxref_id" not-null="true" cascade="persist,merge,save-update"/>
+                <property name="rank"/>
             </composite-element>
         </set>
         

@@ -47,6 +47,7 @@ import org.biojava.utils.ParseErrorListener;
 import org.biojavax.Comment;
 import org.biojavax.CrossRef;
 import org.biojavax.DocRef;
+import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
@@ -182,13 +183,31 @@ public class GenbankFormat
             SymbolTokenization symParser,
             RichSeqIOListener rlistener)
             throws IllegalSymbolException, IOException, ParseException {
+        return this.readRichSequence(reader,symParser,rlistener, null);
+    }
+    
+    /**
+     * Reads a sequence from the specified reader using the Symbol
+     * parser and Sequence Factory provided. The sequence read in must
+     * be in Genbank format.
+     *
+     * @return boolean True if there is another sequence in the file; false
+     * otherwise
+     */
+    // if ns==null default namespace is used
+    public boolean readRichSequence(BufferedReader reader,
+            SymbolTokenization symParser,
+            RichSeqIOListener rlistener,
+            Namespace ns)
+            throws IllegalSymbolException, IOException, ParseException {
         String line;
         boolean hasAnotherSequence    = true;
         boolean hasInternalWhitespace = false;
         
         rlistener.startSequence();
         
-        rlistener.setNamespace(RichObjectFactory.getGenbankNamespace());
+        if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
+        rlistener.setNamespace(ns);
         
         // Get an ordered list of key->value pairs in array-tuples
         String sectionKey = null;
@@ -385,7 +404,7 @@ public class GenbankFormat
                         templ.featureRelationshipSet = new TreeSet();
                         templ.rankedCrossRefs = new TreeSet();
                         String tidyLocStr = val.replaceAll("\\s+","");
-                        templ.location = GenbankLocationParser.parseLocation(RichObjectFactory.getDefaultLocalNamespace(), accession, tidyLocStr);
+                        templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
                         rlistener.startFeature(templ);
                         seenAFeature = true;
                     }
@@ -490,18 +509,23 @@ public class GenbankFormat
     throws IOException {
         if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
         this.writeRichSequence((RichSequence)seq, os);
-    }
-    
-    public void	writeRichSequence(RichSequence seq, PrintStream os)
-    throws IOException {
-        writeRichSequence(seq, getDefaultFormat(), os);
-    }
-    
+    }  
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
         if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
         this.writeRichSequence((RichSequence)seq, format, os);
-    }
+    } 
     
+    public void	writeRichSequence(RichSequence seq, PrintStream os)
+    throws IOException {
+        this.writeRichSequence(seq, getDefaultFormat(), os);
+    }
+    public void	writeRichSequence(RichSequence seq, PrintStream os, Namespace ns)
+    throws IOException {
+        this.writeRichSequence(seq, getDefaultFormat(), os, ns);
+    }
+    public void writeRichSequence(RichSequence rs, String format, PrintStream os) throws IOException {
+        this.writeRichSequence(rs, format, os, null);
+    }
     /**
      * <code>writeSequence</code> writes a sequence to the specified
      * <code>PrintStream</code>, using the specified format.
@@ -516,7 +540,8 @@ public class GenbankFormat
      * @exception IOException if an error occurs.
      * @deprecated use writeSequence(Sequence seq, PrintStream os)
      */
-    public void writeRichSequence(RichSequence rs, String format, PrintStream os) throws IOException {
+    // ns is ignored
+    public void writeRichSequence(RichSequence rs, String format, PrintStream os, Namespace ns) throws IOException {
         
         // Genbank only really - others are treated identically for now
         if (!(

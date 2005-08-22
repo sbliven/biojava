@@ -58,35 +58,32 @@ public class RichObjectFactory {
         return contents.get(params);
     }
     
-    private static String defaultLocalNamespaceName = "lcl";
-    private static String defaultRemoteNamespaceName = "rmt";
     private static String defaultOntologyName = "biojavax";
-    private static String genbankNamespaceName = "gb";
-    private static String emblNamespaceName = "embl";
+    private static String defaultNamespaceName = "lcl";
     private static PositionResolver defaultPositionResolver = new AverageResolver();
     
-    public static void setDefaultLocalNamespaceName(String name) { defaultLocalNamespaceName = name; }
-    public static void setDefaultRemoteNamespaceName(String name) { defaultRemoteNamespaceName = name; }
+    public static void setDefaultNamespaceName(String name) { defaultNamespaceName = name; }
+    public static void setDefaultNamespace(Namespace ns) { defaultNamespaceName = ns.getName(); }
     public static void setDefaultOntologyName(String name) { defaultOntologyName = name; }
+    public static void setDefaultOntologyName(ComparableOntology onto) { defaultOntologyName = onto.getName(); }
     public static void setDefaultPositionResolver(PositionResolver pr) { defaultPositionResolver = pr; }
     
-    public static Namespace getDefaultLocalNamespace() {
-        return (Namespace)getObject(SimpleNamespace.class, new Object[]{defaultLocalNamespaceName});
+    public static Namespace getDefaultNamespace() {
+        return (Namespace)getObject(SimpleNamespace.class, new Object[]{defaultNamespaceName});
     }
-    public static Namespace getDefaultRemoteNamespace() {
-        return (Namespace)getObject(SimpleNamespace.class, new Object[]{defaultRemoteNamespaceName});
+    public static ComparableOntology getDefaultOntology() {
+        return (ComparableOntology)getObject(SimpleComparableOntology.class, new Object[]{defaultOntologyName});
     }
+    public static PositionResolver getDefaultPositionResolver() { return defaultPositionResolver; }
     
+    private static String genbankNamespaceName = "gb";
+    private static String emblNamespaceName = "embl";
     public static Namespace getGenbankNamespace(){
         return (Namespace)getObject(SimpleNamespace.class, new Object[]{genbankNamespaceName});
     }
     public static Namespace getEMBLNamespace(){
         return (Namespace)getObject(SimpleNamespace.class, new Object[]{emblNamespaceName});
     }
-    public static ComparableOntology getDefaultOntology() {
-        return (ComparableOntology)getObject(SimpleComparableOntology.class, new Object[]{defaultOntologyName});
-    }
     
-    public static PositionResolver getDefaultPositionResolver() { return defaultPositionResolver; }
         
 }

@@ -233,11 +233,11 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     public String toString() { return this.getName(); }
     
     // Hibernate requirement - not for public use.
-    private Long id;
+    private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Long getId() { return this.id; }
+    private Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Long id) { this.id = id; }
+    private void setId(Integer id) { this.id = id; }
 }

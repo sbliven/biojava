@@ -5,30 +5,19 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.SimpleDocRef" table="REFERENCE">
+    <class name="org.biojavax.SimpleDocRef" table="reference">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="REFERENCE_ID" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="reference_id">
             <generator class="sequence">
-                <param name="sequence">REFERENCE_PK_SEQ</param>
+                <param name="sequence">reference_pk_seq</param>
             </generator>
         </id>
 
-        <property name="title">
-            <column name="TITLE" sql-type="string" length="1000" not-null="false"/>
-        </property>
-        <property name="authors">
-            <column name="AUTHORS" sql-type="string" length="4000" not-null="true"/>
-        </property>
-        <property name="location">
-            <column name="LOCATION" sql-type="string" length="512" not-null="true"/>
-        </property>
-        <property name="CRC">
-            <column name="CRC" sql-type="string" length="32" not-null="false"/>
-        </property>
-        <many-to-one name="crossref" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">
-            <column name="DBXREF_ID" not-null="false"/>
-        </many-to-one>
+        <property name="title"/>
+        <property name="authors"/>
+        <property name="location"/>
+        <property name="CRC" column="crc"/>
+        <many-to-one name="crossref" class="org.biojavax.SimpleCrossRef" column="dbxref_id" cascade="persist,merge,save-update"/>
         
     </class>
 

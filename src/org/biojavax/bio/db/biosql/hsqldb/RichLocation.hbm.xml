@@ -7,38 +7,21 @@
 
     <class name="org.biojavax.bio.seq.SimpleRichLocation" table="location">
 
-        <id name="id" type="long" unsaved-value="null">
-            <column name="location_id" sql-type="long" unique="true" not-null="true"/>
+        <id name="id" type="integer" unsaved-value="null" column="location_id">
             <generator class="identity"/>
         </id>
         
-        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
-            <column name="term_id" not-null="false"/>
-        </many-to-one>
-        <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" cascade="persist,merge,save-update">
-            <column name="dbxref_id" not-null="false"/>
-        </many-to-one>
-        <property name="rank">
-            <column name="rank" sql-type="integer" length="4" not-null="true"/>
-        </property>
-        <property name="min">
-            <column name="start_pos" sql-type="integer" length="10" not-null="true"/>
-        </property>
-        <property name="max">
-            <column name="end_pos" sql-type="integer" length="10" not-null="true"/>
-        </property>
-        <property name="strandNum">
-            <column name="strand" sql-type="number" length="1" not-null="true"/>            
-        </property>
+        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" column="term_id" cascade="persist,merge,save-update"/>
+        <many-to-one name="crossRef" class="org.biojavax.SimpleCrossRef" column="dbxref_id" cascade="persist,merge,save-update"/>
+        <property name="rank"/>
+        <property name="min" column="start_pos"/>
+        <property name="max" column="end_pos"/>
+        <property name="strandNum" column="strand"/>
         <set name="noteSet" table="location_qualifier_value" lazy="false" sort="natural">
             <key column="location_id" not-null="true"/>
             <composite-element class="org.biojavax.SimpleNote">
-                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" cascade="persist,merge,save-update">
-                    <column name="term_id" not-null="true"/>
-                </many-to-one>
-                <property name="value">
-                    <column name="value" sql-type="string" length="255" not-null="true"/>
-                </property>
+                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" column="term_id" not-null="true" cascade="persist,merge,save-update"/>
+                <property name="value"/>
             </composite-element>
         </set>
         
