@@ -44,7 +44,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.RichSequenceIterator;
-import org.biojavax.bio.seq.io.RichStreamWriter;
+
 
 
 /**

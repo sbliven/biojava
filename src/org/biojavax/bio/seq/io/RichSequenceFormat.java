@@ -43,20 +43,11 @@ import org.biojavax.bio.seq.RichSequence;
  */
 
 public interface RichSequenceFormat extends SequenceFormat,ParseErrorSource {
-    public boolean readRichSequence(BufferedReader     reader,
-            SymbolTokenization symParser,
-            RichSeqIOListener      listener)
-            throws BioException, IllegalSymbolException, IOException;
     
-    public void writeRichSequence(RichSequence seq, PrintStream os)
-    throws IOException;
-    public void writeRichSequence(RichSequence seq, PrintStream os, Namespace ns)
-    throws IOException;
-    
-    public void writeRichSequence(RichSequence seq, String format, PrintStream os)
-    throws IOException;
-    public void writeRichSequence(RichSequence seq, String format, PrintStream os, Namespace ns)
-    throws IOException;
+    public boolean readRichSequence(BufferedReader reader, SymbolTokenization symParser, RichSeqIOListener listener,
+            Namespace ns) throws BioException, IllegalSymbolException, IOException;    
+    public void writeRichSequence(RichSequence seq, PrintStream os, Namespace ns) throws IOException;    
+    public void writeRichSequence(RichSequence seq, String format, PrintStream os, Namespace ns) throws IOException;
     
     public static class Tools {
         public static String leftIndent(String input, int leftIndent) {

@@ -24,11 +24,13 @@ package org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.NoSuchElementException;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.io.StreamReader;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojavax.Namespace;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.RichSequenceIterator;
 
@@ -54,23 +56,89 @@ import org.biojavax.bio.seq.RichSequenceIterator;
  * @author Richard Holland
  */
 
-public class RichStreamReader extends StreamReader implements RichSequenceIterator {
+public class RichStreamReader implements RichSequenceIterator {
+    /**
+     * The symbol parser.
+     */
+    private Namespace ns;
     
-    public RichSequence nextRichSequence() throws NoSuchElementException, BioException {
-        return (RichSequence)this.nextSequence();
+    /**
+     * The symbol parser.
+     */
+    private SymbolTokenization symParser;
+    
+    /**
+     * The sequence format.
+     */
+    private RichSequenceFormat format;
+    
+    /**
+     * The sequence-builder factory.
+     */
+    private RichSequenceBuilderFactory sf;
+    
+    /**
+     * The stream of data to parse.
+     */
+    
+    private BufferedReader reader;
+    
+    /**
+     * Flag indicating if more sequences are available.
+     */
+    
+    private boolean moreSequenceAvailable = true;
+    
+    /**
+     * Pull the next sequence out of the stream.
+     * <p>
+     * This method will delegate parsing from the stream to a SequenceFormat
+     * object, and then return the resulting sequence.
+     *
+     * @return the next Sequence
+     * @throws NoSuchElementException if the end of the stream has been hit
+     * @throws BioException if for any reason the next sequence could not be read
+     */
+    
+    public Sequence nextSequence()
+    throws NoSuchElementException, BioException {
+        return this.nextRichSequence();
+    }    
+    
+    public RichSequence nextRichSequence()
+    throws NoSuchElementException, BioException {
+        if(!moreSequenceAvailable)
+            throw new NoSuchElementException("Stream is empty");
+        try {
+            SimpleRichSequenceBuilder builder = (SimpleRichSequenceBuilder)sf.makeSequenceBuilder();
+            moreSequenceAvailable = format.readRichSequence(reader, symParser, builder, ns);
+            return (RichSequence)builder.makeSequence();
+        } catch (Exception e) {
+            throw new BioException("Could not read sequence",e);
+        }
+    }
+    
+    public boolean hasNext() {
+        return moreSequenceAvailable;
     }
     
     public RichStreamReader(InputStream is,
             RichSequenceFormat format,
             SymbolTokenization symParser,
-            RichSequenceBuilderFactory sf)  {
-        super(is,format,symParser,sf);
+            RichSequenceBuilderFactory sf,
+            Namespace ns)  {
+        this(new BufferedReader(new InputStreamReader(is)), format,symParser,sf,ns);
     }
     
     public RichStreamReader(BufferedReader reader,
             RichSequenceFormat format,
             SymbolTokenization symParser,
-            RichSequenceBuilderFactory sf)  {
-        super(reader,format,symParser,sf);
+            RichSequenceBuilderFactory sf,
+            Namespace ns)  {
+        this.reader = reader;
+        this.format = format;
+        this.symParser = symParser;
+        this.sf = sf;
+        this.ns = ns;
     }
 }
