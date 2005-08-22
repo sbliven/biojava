@@ -58,11 +58,19 @@ import org.biojavax.ontology.ComparableTerm;
 public class CompoundRichLocation extends AbstractChangeable implements RichLocation {
         
     private static ComparableTerm JOIN_TERM = null;
+    /**
+     * Getter for the "join" term
+     * @return the "join" term
+     */
     public static ComparableTerm getJoinTerm() {
         if (JOIN_TERM==null) JOIN_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("join");  
         return JOIN_TERM;
     }
     private static ComparableTerm ORDER_TERM = null;
+    /**
+     * Getter for the "order" term
+     * @return the "order" term
+     */
     public static ComparableTerm getOrderTerm() {
         if (ORDER_TERM==null) ORDER_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("order");    
         return ORDER_TERM;
@@ -73,10 +81,9 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     /**
      * Creates a new instance of SimpleRichSequenceLocation.
-     *
-     * @param min Min location position.
-     * @param max Max location position.
-     * @param rank Rank of location.
+     * @param term such as the <code>JOIN_TERM</code> or the <code>ORDER_TERM</code>
+     * @param members a collection of <code>RichLocations</code> that make up
+     * this location.
      */
     public CompoundRichLocation(ComparableTerm term, Collection members) {
         if (term==null) throw new IllegalArgumentException("Term cannot be null");

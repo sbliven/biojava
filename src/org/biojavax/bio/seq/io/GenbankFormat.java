@@ -506,7 +506,7 @@ public class GenbankFormat
      * <code>writeSequence</code> writes a sequence to the specified
      * <code>PrintStream</code>, using the specified format.
      *
-     * @param seq a <code>Sequence</code> to write out.
+     * @param rs a <code>RichSequence</code> to write out.
      * @param format a <code>String</code> indicating which sub-format
      * of those available from a particular
      * <code>SequenceFormat</code> implemention to use when

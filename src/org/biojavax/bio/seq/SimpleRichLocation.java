@@ -73,25 +73,68 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * Creates a new instance of SimpleRichSequenceLocation.
      *
-     * @param min Min location position.
-     * @param max Max location position.
+     * @param pos the location position (a point).
      * @param rank Rank of location.
      */
     public SimpleRichLocation(Position pos, int rank) {
         this(pos,pos,rank,Strand.POSITIVE_STRAND);
     }
+    /**
+     * Creates a new instance of SimpleRichSequenceLocation.
+     *
+     * @param pos the location position (a point).
+     * @param rank Rank of location.
+     * @param strand The strand of the location
+     */    
     public SimpleRichLocation(Position pos, int rank, Strand strand) {
         this(pos,pos,rank,strand,null);
     }
+    
+    /**
+     * Creates a new instance of SimpleRichSequenceLocation.
+     *
+     * @param pos the location position (a point).
+     * @param rank Rank of location.
+     * @param stand the strand of the location
+     * @param crossRef a cross reference to another object
+     */    
     public SimpleRichLocation(Position pos, int rank, Strand strand, CrossRef crossRef) {
         this(pos,pos,rank,strand,crossRef);
     }
+    
+    /**
+     * Creates a new instance of SimpleRichSequenceLocation.
+     *
+     * @param min the minimum bound of the location
+     * @param max the maximum bound of the location
+     * @param rank Rank of location.
+     * 
+     */    
     public SimpleRichLocation(Position min, Position max, int rank) {
         this(min,max,rank,Strand.POSITIVE_STRAND);
     }
+    
+    /**
+     * Creates a new instance of SimpleRichSequenceLocation.
+     *
+     * @param min the minimum bound of the location
+     * @param max the maximum bound of the location
+     * @param rank Rank of location.
+     * @param strand the strand of the location
+     */ 
     public SimpleRichLocation(Position min, Position max, int rank, Strand strand) {
         this(min,max,rank,strand,null);
     }
+    
+    /**
+     * Creates a new instance of SimpleRichSequenceLocation.
+     *
+     * @param min the minimum bound of the location
+     * @param max the maximum bound of the location
+     * @param rank Rank of location.
+     * @param strand the strand of the location
+     * @param crossRef a cross reference to another object.
+     */
     public SimpleRichLocation(Position min, Position max, int rank, Strand strand, CrossRef crossRef) {
         this.min = min;
         this.max = max;
@@ -344,7 +387,10 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
                 }
             }
         } catch (IllegalAlphabetException e) {
-            throw new IllegalArgumentException("Could not understand alphabet of passed sequence", e);
+            IllegalArgumentException ex = 
+                    new IllegalArgumentException("Could not understand alphabet of passed sequence");
+            ex.initCause(e);
+            throw ex;
         }
         
         return seq2;
