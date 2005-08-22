@@ -95,7 +95,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      *
      * @param pos the location position (a point).
      * @param rank Rank of location.
-     * @param stand the strand of the location
+     * @param strand the strand of the location
      * @param crossRef a cross reference to another object
      */    
     public SimpleRichLocation(Position pos, int rank, Strand strand, CrossRef crossRef) {
