@@ -100,7 +100,7 @@ public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation,
   
   
   /**
-   * {inheritDoc} You cannot remove properties from the Empty RichAnnotation
+   * {@inheritDoc} You cannot remove properties from the Empty RichAnnotation
    * @throws ChangeVetoException whenever you call this method.
    */
   public void removeProperty(Object key)
@@ -112,7 +112,7 @@ public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation,
   }
 
   /**
-   * {inheritDoc} You cannot remove notes from the Empty RichAnnotation
+   * {@inheritDoc} You cannot remove notes from the Empty RichAnnotation
    * @throws ChangeVetoException whenever you call this method.
    */
   public void removeNote(Note note)
@@ -124,7 +124,7 @@ public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation,
   }
   
   /**
-   * {inheritDoc}
+   * {@inheritDoc}
    * @return always false as there are no properties
    */
   public boolean containsProperty(Object key) {
@@ -132,7 +132,7 @@ public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation,
   }
   
   /**
-   * {inheritDoc}
+   * {@inheritDoc}
    * @return always false as there are no notes
    */
   public boolean contains(Note note){
@@ -140,7 +140,7 @@ public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation,
   }
   
   /**
-   * {inheritDoc}
+   * {@inheritDoc}
    * @return an empty set
    */
   public Set keys() {
@@ -148,7 +148,7 @@ public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation,
   }
   
   /**
-   * {inheritDoc}
+   * {@inheritDoc}
    * @return an empty set
    */
   public Set getNoteSet(){
@@ -156,8 +156,7 @@ public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation,
   }
   
   /**
-   * /**
-   * {inheritDoc}
+   * {@inheritDoc}
    * @return an new <code>Map</code> with no entries
    */
   public Map asMap() {
@@ -173,7 +172,7 @@ public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation,
   }
   
   /**
-   * {inheritDoc}
+   * {@inheritDoc}
    * @return the hash code of a map with no entries
    */
   public int hashCode() {
