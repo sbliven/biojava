@@ -68,9 +68,9 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     
     /**
      * Creates a new feature holding bioentry.
-     * @param ns The namespace for this new bioentry.
-     * @param name The name for this new bioentry.
-     * @param accession The accession for this new bioentry.
+     * @param ns The namespace for this new bioentry (not null).
+     * @param name The name for this new bioentry (not null).
+     * @param accession The accession for this new bioentry (not null).
      * @param version The version for this new bioentry.
      */
     public SimpleBioEntry(Namespace ns, String name, String accession, int version) {
@@ -87,11 +87,16 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         this.ns = ns;
     }
     
-    // Hibernate requirement - not for public use.
+    /**
+     * Hibernate requirement - not for public use.
+     */
     protected SimpleBioEntry() {}
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
+     * <code>Collection</code> not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaivour may be unpredictable.
+     * 
      */
     public Set getRankedCrossRefs() { return this.rankedcrossrefs; } // original for Hibernate
     
@@ -123,7 +128,10 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     public Annotation getAnnotation() { return this.notes; }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
+     * <code>Collection</code> not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaivour may be unpredictable.
+     * 
      */
     public Set getNoteSet() { return this.notes.getNoteSet(); }
     
@@ -133,17 +141,26 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
+     * <code>Collection</code> not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaivour may be unpredictable.
+     * 
      */
     public Set getComments() { return this.comments; } // must be original for Hibernate
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
+     * <code>Collection</code> not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaivour may be unpredictable.
+     * 
      */
     public Set getRankedDocRefs() { return this.rankeddocrefs; } // must be original for Hibernate
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
+     * <code>Collection</code> not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaivour may be unpredictable.
+     * 
      */
     public Set getRelationships() { return this.relationships; }  // must be original for Hibernate
     
@@ -254,7 +271,9 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     public int getVersion() { return this.version; }
     
     /**
-     * {@inheritDoc}
+     * Equality is determined by comparing the namespace, name, accession and
+     * version.
+     * @return true if and only if all are the above are equal
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -270,7 +289,12 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     }
     
     /**
-     * {@inheritDoc}
+     * Compare this object to another. The comparison is made based on namespace,
+     * name, accession, version (in that order). If any of the first three are
+     * found to be different the comparison of the first two unequal values is returned.
+     * If the first three are equal then the difference of the version numbers is returned.
+     * @return a positive int if <code>o</code> preceeds <code>this</code>, 0 if
+     *  they are equal and a negative int if <code>this</code> preceeds <code>o</code>
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -299,8 +323,9 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     }
     
     /**
-     * {@inheritDoc}
-     * Form: <code>this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" v."+this.getVersion();</code>
+     * {@inheritDoc} Form: 
+     * <code>this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" 
+     * v."+this.getVersion();</code>
      */
     public String toString() { return this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" v."+this.getVersion(); }
         
