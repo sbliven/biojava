@@ -33,6 +33,7 @@ import java.util.TreeSet;
 import org.biojava.bio.Annotation;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
+import org.biojava.ontology.Triple;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
@@ -79,7 +80,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      * {@inheritDoc}
      */
     public int compareTo(Object o) {
-        ComparableTriple them = (ComparableTriple)o;
+        Triple them = (Triple)o;
         // Hibernate comparison - we haven't been populated yet
         if (this.ontology==null) return -1;
         // Normal comparison
@@ -94,11 +95,11 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      */
     public boolean equals(Object o) {
         if(this == o) return true;
-        if (o==null || !(o instanceof ComparableTriple)) return false;
+        if (o==null || !(o instanceof Triple)) return false;
         // Hibernate comparison - we haven't been populated yet
         if (this.ontology==null) return false;
         // Normal comparison
-        ComparableTriple them = (ComparableTriple)o;
+        Triple them = (Triple)o;
         return (this.ontology.equals(them.getOntology()) &&
                 this.subject.equals(them.getSubject()) &&
                 this.object.equals(them.getObject()) &&

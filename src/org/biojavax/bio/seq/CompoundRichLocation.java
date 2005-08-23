@@ -90,10 +90,14 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
         if (members==null || members.size()<2) throw new IllegalArgumentException(
                 "Members collection must have at least 2 members. Term: "+term+
                 " number of members: "+members.size());
-        this.members = members;
         this.term = term;
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) {
-            if (!(i.next() instanceof RichLocation)) throw new IllegalArgumentException("All members must be RichLocations");
+        this.members = new ArrayList(members);
+        for (int i = 0; i < this.members.size(); i++) {
+            Object o = ((List)this.members).get(i);
+            if (!(o instanceof RichLocation)) {
+                if (o instanceof Location) ((List)this.members).set(i,RichLocation.Tools.enrich((Location)o));
+                else throw new IllegalArgumentException("All members must be Locations");
+            }
         }
     }
     
@@ -251,7 +255,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      */
     public Location union(Location l) {
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         List newmembers = new ArrayList();
         newmembers.addAll(this.members);
         newmembers.add(l);
@@ -263,7 +267,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      */
     public Location intersection(Location l) {
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         RichLocation them = (RichLocation)l;
         
         if (!this.overlaps(l)) return RichLocation.EMPTY_LOCATION;
@@ -310,20 +314,16 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      * {@inheritDoc}
      */
     public boolean equals(Object o) {
-        if (! (o instanceof CompoundRichLocation)) return false;
-        CompoundRichLocation fo = (CompoundRichLocation) o;
-        if (!this.term.equals(fo.getTerm())) return false;
-        return this.members == fo.members;
+        if (o==this) return true;
+        return false; // not much else we can do really 
     }
     
     /**
      * {@inheritDoc}
      */
     public int compareTo(Object o) {
-        CompoundRichLocation fo = (CompoundRichLocation) o;
-        if (!this.term.equals(fo.getTerm())) return this.term.compareTo(fo.getTerm());
-        if (this.members.equals(fo.members)) return 0;
-        else return -1; // not much else we can do really - you can't compare collections
+        Location fo = (Location) o;
+        return -1; // not much else we can do really 
     }
     
 }

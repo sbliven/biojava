@@ -25,7 +25,15 @@
  * Created on July 28, 2005, 5:29 PM
  */
 package org.biojavax.bio.seq;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import org.biojava.bio.symbol.FuzzyLocation;
+import org.biojava.bio.symbol.FuzzyPointLocation;
 import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.MergeLocation;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
@@ -142,6 +150,44 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
             Strand fo = (Strand) o;
             if (!this.name.equals(fo.toString())) return this.name.compareTo(fo.toString());
             return this.value-fo.intValue();
+        }
+    }
+    
+    public static class Tools {
+        private Tools() {}
+        public static RichLocation enrich(Location l) {
+            if (l instanceof RichLocation) {
+                return (RichLocation)l;
+            } else if (l instanceof MergeLocation || !l.isContiguous()) {
+                List members = new ArrayList();
+                for (Iterator i = l.blockIterator(); i.hasNext(); ) {
+                    Location member = (Location)i.next();
+                    members.add(enrich(member));
+                }
+                return new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),members);
+            } else if (l instanceof FuzzyPointLocation) {
+              FuzzyPointLocation f = (FuzzyPointLocation)l;                
+              Position pos = new SimplePosition(f.hasBoundedMin(),f.hasBoundedMax(),f.getMin(),f.getMax(),Position.IN_RANGE);
+              return new SimpleRichLocation(pos,0); // 0 for no rank
+            } else if (l instanceof FuzzyLocation) {
+              FuzzyLocation f = (FuzzyLocation)l;   
+              Position start = new SimplePosition(f.hasBoundedMin(),false,f.getMin());
+              Position end = new SimplePosition(false,f.hasBoundedMax(),f.getMax());
+              return new SimpleRichLocation(start,end,0); // 0 for no rank
+           } else if (l instanceof RangeLocation) {
+              RangeLocation r = (RangeLocation)l;   
+              Position start = new SimplePosition(false,false,r.getMin());
+              Position end = new SimplePosition(false,false,r.getMax());
+              return new SimpleRichLocation(start,end,0); // 0 for no rank
+            } else if (l instanceof PointLocation) {
+              PointLocation p = (PointLocation)l;              
+              Position pos = new SimplePosition(false,false,p.getMin());
+              return new SimpleRichLocation(pos,0); // 0 for no rank
+            } else if (l.toString().equals("{}")) {
+                return EMPTY_LOCATION;
+            } else {
+                throw new IllegalArgumentException("Unable to enrich locations of type "+l.getClass().toString());
+            }
         }
     }
 }

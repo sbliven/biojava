@@ -23,6 +23,8 @@ package org.biojavax.bio.seq;
 
 import java.util.Set;
 import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.ontology.InvalidTermException;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.RankedCrossRefable;
@@ -84,7 +86,7 @@ public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,
      * @param parent the parent the feature should identify itself with.
      * @throws ChangeVetoException if the new value is unacceptable.
      */
-    public void setParent(RichSequence parent) throws ChangeVetoException;
+    public void setParent(FeatureHolder parent) throws ChangeVetoException;
     
     /**
      * Returns the name of this feature.
@@ -111,13 +113,25 @@ public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,
      * @throws ChangeVetoException if the new value is unacceptable.
      */
     public void setRank(int rank) throws ChangeVetoException;
-        
+    
     /**
      * Added-value extension including bits we're interested in.
      */
     public static class Template extends Feature.Template {
         public Set featureRelationshipSet;
         public Set rankedCrossRefs;
+    }
+    
+    public static class Tools {
+        private Tools() {}
+        public static RichFeature enrich(Feature f) throws ChangeVetoException {
+            try {
+                if (f instanceof RichFeature) return (RichFeature)f;
+                else return new SimpleRichFeature(f.getParent(),f.makeTemplate());
+            } catch (InvalidTermException e) {
+                throw new ChangeVetoException("Unable to convert term",e);
+            }
+        }
     }
 }
 

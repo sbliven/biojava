@@ -33,10 +33,12 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 import org.biojava.bio.Annotatable;
+import org.biojava.ontology.Term;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
+import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -98,7 +100,10 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     private Note dummyNote(Object key) {
         if (key==null) throw new IllegalArgumentException("Key cannot be null"); 
-        if (!(key instanceof ComparableTerm)) throw new IllegalArgumentException("Key has to be a ComparableTerm"); 
+        if (!(key instanceof ComparableTerm)) {
+            if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
+            else key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
+        }
         return new SimpleNote((ComparableTerm)key,null,0); 
     }
     
@@ -167,7 +172,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
      */
     public void setProperty(Object key, Object value) throws IllegalArgumentException, ChangeVetoException {
         Note n = this.dummyNote(key);
-        n.setValue((String)value);
+        n.setValue(value.toString());
         this.addNote(n);
     }
     

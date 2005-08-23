@@ -29,7 +29,7 @@ import java.io.PrintStream;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojavax.Namespace;
-import org.biojavax.bio.seq.RichSequence;
+
 
 /**
  * Writes all of the sequences from a SequenceIterator to a stream with a
@@ -62,7 +62,7 @@ public class RichStreamWriter {
               throws IOException {
     while(ss.hasNext()) {
       try {
-        format.writeRichSequence((RichSequence)ss.nextSequence(), os, ns);
+        format.writeSequence(ss.nextSequence(), os, ns);
       } catch (BioException se) {
         se.printStackTrace();
       }

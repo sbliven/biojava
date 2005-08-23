@@ -269,7 +269,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * {@inheritDoc}
      */
     public boolean contains(Location l) {
-        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         if (!this.overlaps(l)) return false; // check strand etc.
         if (l instanceof CompoundRichLocation) {
             for (Iterator i = l.blockIterator(); i.hasNext(); ) if (!this.contains((RichLocation)i.next())) return false;
@@ -283,7 +283,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * {@inheritDoc}
      */
     public boolean overlaps(Location l) {
-        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         RichLocation rl = (RichLocation)l;
         if (rl.getStrand()!=this.strand) return false;
         if (rl.getCrossRef()!=null || this.crossRef!=null) {
@@ -326,7 +326,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      */
     public Location union(Location l) {
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         RichLocation rl = (RichLocation)l;
         if (this.overlaps(rl)) {
             return new SimpleRichLocation(this.posmin(this.min,rl.getMinPosition()),this.posmax(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef);
@@ -343,7 +343,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      */
     public Location intersection(Location l) {
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         RichLocation them = (RichLocation)l;
         
         if (!this.overlaps(l)) return RichLocation.EMPTY_LOCATION;
@@ -444,6 +444,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
         if (this.strand==null) return -1;
+        // Check if we can really compare at all
+        if (!(o instanceof RichLocation)) return -1;
         // Normal comparison
         RichLocation fo = (RichLocation) o;
         if (this.rank!=fo.getRank()) return this.rank-fo.getRank();

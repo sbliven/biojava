@@ -33,6 +33,7 @@ import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.StreamParser;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ParseErrorListener;
 import org.biojavax.Namespace;
 import org.biojavax.SimpleNamespace;
@@ -61,7 +62,7 @@ import org.biojavax.bio.seq.RichSequence;
  */
 
 public class FastaFormat implements RichSequenceFormat {
-    public static final String DEFAULT_FORMAT = "FASTA";
+    public static final String FASTA_FORMAT = "FASTA";
     
     /**
      * The line width for output.
@@ -100,7 +101,7 @@ public class FastaFormat implements RichSequenceFormat {
         if (!(listener instanceof RichSeqIOListener)) throw new IllegalArgumentException("Only accepting RichSeqIOListeners today");
         return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener,null);
     }
-        
+    
     // if ns==null then namespace of sequence in fasta is used
     // if ns==null and namespace of sequence==null then default namespace is used
     public boolean readRichSequence(
@@ -150,7 +151,7 @@ public class FastaFormat implements RichSequenceFormat {
             name = m.group(7);
             
             rsiol.setAccession(accession);
-            rsiol.setVersion(version);            
+            rsiol.setVersion(version);
             if (gi!=null) rsiol.setIdentifier(gi);
             if (ns==null) rsiol.setNamespace((Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{namespace}));
             else rsiol.setNamespace(ns);
@@ -230,19 +231,34 @@ public class FastaFormat implements RichSequenceFormat {
     }
     
     public void writeSequence(Sequence seq, PrintStream os)
-    throws IOException {        
-        if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
-        this.writeRichSequence((RichSequence)seq, os,null);
+    throws IOException {
+        this.writeSequence(seq, getDefaultFormat(), os, null);
     }
     public void writeSequence(Sequence seq, String format, PrintStream os)
-    throws IOException {        
-        if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
-        this.writeRichSequence((RichSequence)seq, format, os, null);
-    }
-    
-    // if ns==null then sequence's namespace is used
-    public void writeRichSequence(RichSequence rs, PrintStream os, Namespace ns)
     throws IOException {
+        this.writeSequence(seq, format, os, null);
+    }
+    public void writeSequence(Sequence seq, PrintStream os, Namespace ns)
+    throws IOException {
+        this.writeSequence(seq, getDefaultFormat(), os, ns);
+    }
+    // if ns==null then sequence's namespace is used
+    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
+        if (! format.equalsIgnoreCase(getDefaultFormat()))
+            throw new IllegalArgumentException("Unknown format '"
+                    + format
+                    + "'");
+        
+        RichSequence rs;
+        try {
+            if (seq instanceof RichSequence) rs = (RichSequence)seq;
+            else rs = RichSequence.Tools.enrich(seq);
+        } catch (ChangeVetoException e) {
+            IOException e2 = new IOException("Unable to enrich sequence");
+            e2.initCause(e);
+            throw e2;
+        }
+        
         os.print(">");
         
         String identifier = rs.getIdentifier();
@@ -267,15 +283,6 @@ public class FastaFormat implements RichSequenceFormat {
             int end = Math.min(pos + this.lineWidth - 1, length);
             os.println(rs.subStr(pos, end));
         }
-    }   
-       
-    public void writeRichSequence(RichSequence seq, String format, PrintStream os, Namespace ns)
-    throws IOException {
-        if (! format.equalsIgnoreCase(getDefaultFormat()))
-            throw new IllegalArgumentException("Unknown format '"
-                    + format
-                    + "'");
-        this.writeRichSequence(seq, os, ns);
     }
     
     /**
@@ -286,7 +293,7 @@ public class FastaFormat implements RichSequenceFormat {
      * @deprecated
      */
     public String getDefaultFormat() {
-        return DEFAULT_FORMAT;
+        return FASTA_FORMAT;
     }
     
     private Vector mListeners = new Vector();

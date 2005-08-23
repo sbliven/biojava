@@ -82,7 +82,7 @@ import org.biojavax.ontology.ComparableTerm;
  */
 public class GenbankFormat
         implements RichSequenceFormat {
-    public static final String DEFAULT_FORMAT = "GENBANK";
+    public static final String GENBANK_FORMAT = "GENBANK";
     
     protected static final String LOCUS_TAG = "LOCUS";  
     protected static final String ACCESSION_TAG = "ACCESSION";
@@ -490,19 +490,14 @@ public class GenbankFormat
         return section;
     }
     
-    public void	writeSequence(Sequence seq, PrintStream os)
-    throws IOException {
-        if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
-        this.writeRichSequence((RichSequence)seq, os,null);
+    public void	writeSequence(Sequence seq, PrintStream os) throws IOException {
+        this.writeSequence(seq, getDefaultFormat(), os, null);
     }  
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
-        if (!(seq instanceof RichSequence)) throw new IllegalArgumentException("Sorry, only RichSequence objects accepted");
-        this.writeRichSequence((RichSequence)seq, format, os,null);
+        this.writeSequence(seq, format, os, null);
     } 
-    
-    public void	writeRichSequence(RichSequence seq, PrintStream os, Namespace ns)
-    throws IOException {
-        this.writeRichSequence(seq, getDefaultFormat(), os, ns);
+    public void	writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
+        this.writeSequence(seq, getDefaultFormat(), os, null);
     }
     /**
      * <code>writeSequence</code> writes a sequence to the specified
@@ -519,13 +514,23 @@ public class GenbankFormat
      * @deprecated use writeSequence(Sequence seq, PrintStream os)
      */
     // ns is ignored
-    public void writeRichSequence(RichSequence rs, String format, PrintStream os, Namespace ns) throws IOException {
-        
+    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
         // Genbank only really - others are treated identically for now
         if (!(
-                format.equalsIgnoreCase("GENBANK")
+                format.equalsIgnoreCase(GENBANK_FORMAT)
                 ))
             throw new IllegalArgumentException("Unknown format: "+format);
+                
+        RichSequence rs;
+        try {
+            if (seq instanceof RichSequence) rs = (RichSequence)seq;
+            else rs = RichSequence.Tools.enrich(seq);
+        } catch (ChangeVetoException e) {
+            IOException e2 = new IOException("Unable to enrich sequence");
+            e2.initCause(e);
+            throw e2;
+        }
+        
         SymbolTokenization tok;
         try {
             tok = rs.getAlphabet().getTokenization("token");
@@ -733,7 +738,7 @@ public class GenbankFormat
      * @deprecated
      */
     public String getDefaultFormat() {
-        return DEFAULT_FORMAT;
+        return GENBANK_FORMAT;
     }
     
     public boolean getElideSymbols() {

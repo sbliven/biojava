@@ -38,6 +38,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.ontology.InvalidTermException;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
@@ -242,7 +243,12 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
      * {@inheritDoc}
      */
     public Feature createFeature(Feature.Template ft) throws BioException, ChangeVetoException {
-        Feature f = new SimpleRichFeature(this,ft);
+        Feature f;
+        try {
+            f = new SimpleRichFeature(this,ft);
+        } catch (InvalidTermException e) {
+            throw new ChangeVetoException("They don't like our term",e);
+        }
         if(!this.hasListeners(RichSequence.FEATURES)) {
             this.features.add(f);
         } else {
@@ -266,8 +272,9 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
      * {@inheritDoc}
      */
     public void removeFeature(Feature f) throws ChangeVetoException, BioException {
+        if (!(f instanceof RichFeature)) f = RichFeature.Tools.enrich(f);
         if(!this.hasListeners(RichSequence.FEATURES)) {
-            this.features.remove((RichFeature)f);
+            this.features.remove(f);
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
@@ -278,7 +285,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
             ChangeSupport cs = this.getChangeSupport(RichSequence.FEATURES);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                this.features.remove((RichFeature)f);
+                this.features.remove(f);
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -287,7 +294,15 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     /**
      * {@inheritDoc}
      */
-    public boolean containsFeature(Feature f) { return this.features.contains((RichFeature)f); }
+    public boolean containsFeature(Feature f) {
+        try {
+            if (!(f instanceof RichFeature)) f = RichFeature.Tools.enrich(f);
+        } catch (ChangeVetoException e) {
+            // We just can't tell!
+            return false;
+        }
+        return this.features.contains(f);
+    }
     
     /**
      * {@inheritDoc}

@@ -65,7 +65,7 @@ public class RichObjectFactory {
     public static void setDefaultNamespaceName(String name) { defaultNamespaceName = name; }
     public static void setDefaultNamespace(Namespace ns) { defaultNamespaceName = ns.getName(); }
     public static void setDefaultOntologyName(String name) { defaultOntologyName = name; }
-    public static void setDefaultOntologyName(ComparableOntology onto) { defaultOntologyName = onto.getName(); }
+    public static void setDefaultOntology(ComparableOntology onto) { defaultOntologyName = onto.getName(); }
     public static void setDefaultPositionResolver(PositionResolver pr) { defaultPositionResolver = pr; }
     
     public static Namespace getDefaultNamespace() {

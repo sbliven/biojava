@@ -158,7 +158,7 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      */
     public Location union(Location l) {
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
+        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         return l;
     }
     
@@ -167,7 +167,6 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      */
     public Location intersection(Location l) {
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(l instanceof RichLocation)) throw new IllegalArgumentException("Location cannot be a non-RichLocation");
         return this;
     }
     
@@ -188,8 +187,8 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      * {@inheritDoc}
      */
     public boolean equals(Object o) {
-        if (!(o instanceof EmptyRichLocation)) return false;
-        return true;
+        if (o instanceof EmptyRichLocation) return true;
+        return false;
     }
     
     /**

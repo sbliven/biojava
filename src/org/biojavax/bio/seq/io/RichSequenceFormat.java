@@ -30,12 +30,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.utils.ParseErrorSource;
 import org.biojavax.Namespace;
-import org.biojavax.bio.seq.RichSequence;
+
 
 /**
  *
@@ -44,10 +45,11 @@ import org.biojavax.bio.seq.RichSequence;
 
 public interface RichSequenceFormat extends SequenceFormat,ParseErrorSource {
     
-    public boolean readRichSequence(BufferedReader reader, SymbolTokenization symParser, RichSeqIOListener listener,
-            Namespace ns) throws BioException, IllegalSymbolException, IOException;    
-    public void writeRichSequence(RichSequence seq, PrintStream os, Namespace ns) throws IOException;    
-    public void writeRichSequence(RichSequence seq, String format, PrintStream os, Namespace ns) throws IOException;
+    public boolean readRichSequence(
+            BufferedReader reader, SymbolTokenization symParser, RichSeqIOListener listener,Namespace ns
+            ) throws BioException, IllegalSymbolException, IOException;
+    public void writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException;
+    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException;
     
     public static class Tools {
         public static String leftIndent(String input, int leftIndent) {
@@ -69,8 +71,8 @@ public interface RichSequenceFormat extends SequenceFormat,ParseErrorSource {
             return b.toString();
         }
         public static String[] writeWordWrap(String input, String sepRegex, int width) {
-            List lines = new ArrayList();            
-            Pattern p = Pattern.compile(sepRegex);            
+            List lines = new ArrayList();
+            Pattern p = Pattern.compile(sepRegex);
             int start = 0;
             while (start < input.length()) {
                 if (input.charAt(start)=='\n') start++;

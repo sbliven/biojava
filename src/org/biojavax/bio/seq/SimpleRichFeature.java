@@ -50,6 +50,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRichAnnotation;
+import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -77,17 +78,21 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * @param parent The parent feature holder.
      * @param templ The template to construct the feature from.
      */
-    public SimpleRichFeature(FeatureHolder parent, Feature.Template templ) throws ChangeVetoException {
+    public SimpleRichFeature(FeatureHolder parent, Feature.Template templ) throws ChangeVetoException, InvalidTermException {
         if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
         if (templ==null) throw new IllegalArgumentException("Template cannot be null");
-        if (!(templ instanceof RichFeature.Template)) throw new IllegalArgumentException("Template must be a RichFeature.Template");
-        if (templ.typeTerm==null) throw new IllegalArgumentException("Template type term cannot be null");
-        if (templ.sourceTerm==null) throw new IllegalArgumentException("Template source term cannot be null");
+        
+        if (templ.type==null && templ.typeTerm==null) throw new IllegalArgumentException("Template type cannot be null");
+        if (templ.source==null && templ.sourceTerm==null) throw new IllegalArgumentException("Template source cannot be null");
         if (templ.location==null) throw new IllegalArgumentException("Template location cannot be null");
-        this.parent = parent;
-        this.typeTerm = (ComparableTerm)templ.typeTerm;
-        this.sourceTerm = (ComparableTerm)templ.sourceTerm;
-        this.location = (RichLocation)templ.location;
+        
+        this.setParent(parent);
+        
+        if (templ.typeTerm!=null) this.setTypeTerm(templ.typeTerm);
+        else this.setType(templ.type);
+        if (templ.sourceTerm!=null) this.setSourceTerm(templ.sourceTerm);
+        else this.setSource(templ.source);
+        this.setLocation(templ.location);
         
         if (templ.annotation instanceof RichAnnotation) {
             this.notes.setNoteSet(((RichAnnotation)templ.annotation).getNoteSet());
@@ -236,7 +241,13 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     /**
      * {@inheritDoc}
      */
-    public void setSource(String source) throws ChangeVetoException { throw new ChangeVetoException("Must use term"); }
+    public void setSource(String source) throws ChangeVetoException {
+        try {
+            this.setSourceTerm(RichObjectFactory.getDefaultOntology().getOrCreateTerm(source));
+        } catch (InvalidTermException e) {
+            throw new ChangeVetoException("Something strange, they don't like our terms",e);
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -248,7 +259,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setSourceTerm(Term t) throws ChangeVetoException, InvalidTermException {
         if (t==null) throw new IllegalArgumentException("Term cannot be null");
-        if (!(t instanceof ComparableTerm)) throw new IllegalArgumentException("Term must be a ComparableTerm");
+        if (!(t instanceof ComparableTerm)) t = RichObjectFactory.getDefaultOntology().getOrImportTerm(t);
         if(!this.hasListeners(RichFeature.SOURCETERM)) {
             this.sourceTerm = (ComparableTerm)t;
         } else {
@@ -275,7 +286,13 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     /**
      * {@inheritDoc}
      */
-    public void setType(String type) throws ChangeVetoException { throw new ChangeVetoException("Must use term"); }
+    public void setType(String type) throws ChangeVetoException {
+        try {
+            this.setTypeTerm(RichObjectFactory.getDefaultOntology().getOrCreateTerm(type));
+        } catch (InvalidTermException e) {
+            throw new ChangeVetoException("Something strange, they don't like our terms",e);
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -287,7 +304,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setTypeTerm(Term t) throws ChangeVetoException, InvalidTermException {
         if (t==null) throw new IllegalArgumentException("Term cannot be null");
-        if (!(t instanceof ComparableTerm)) throw new IllegalArgumentException("Term must be a ComparableTerm");
+        if (!(t instanceof ComparableTerm)) t = RichObjectFactory.getDefaultOntology().getOrImportTerm(t);
         if(!this.hasListeners(RichFeature.TYPETERM)) {
             this.typeTerm = (ComparableTerm)t;
         } else {
@@ -321,7 +338,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setLocation(Location loc) throws ChangeVetoException {
         if (loc==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(loc instanceof RichLocation)) throw new IllegalArgumentException("We only accept RichLocation objects here");
+        if (!(loc instanceof Location)) loc = RichLocation.Tools.enrich(loc);
         if(!this.hasListeners(RichFeature.LOCATION)) {
             this.location = (RichLocation)loc;
         } else {
@@ -348,10 +365,10 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     /**
      * {@inheritDoc}
      */
-    public void setParent(RichSequence parent) throws ChangeVetoException {
+    public void setParent(FeatureHolder parent) throws ChangeVetoException {
         if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
         if(!this.hasListeners(RichFeature.PARENT)) {
-            this.parent = (RichSequence)parent;
+            this.parent = parent;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
@@ -362,7 +379,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
             ChangeSupport cs = this.getChangeSupport(RichFeature.PARENT);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                this.parent = (RichSequence)parent;
+                this.parent = parent;
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -508,7 +525,12 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public Feature createFeature(Feature.Template ft) throws BioException, ChangeVetoException {
         if (ft==null) throw new IllegalArgumentException("Template cannot be null");
-        RichFeature f = new SimpleRichFeature(this.parent, ft);
+        RichFeature f;
+        try {
+            f = new SimpleRichFeature(this.parent, ft);
+        } catch (InvalidTermException e) {
+            throw new ChangeVetoException("Term was not accepted",e);
+        }
         this.addFeatureRelationship(
                 new SimpleRichFeatureRelationship(f, SimpleRichFeatureRelationship.getContainsTerm(), 0)
                 );
@@ -579,15 +601,19 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public boolean equals(Object o) {
-        if (! (o instanceof RichFeature)) return false;
+        if (! (o instanceof Feature)) return false;
         // Hibernate comparison - we haven't been populated yet
         if (this.parent==null) return false;
         // Normal comparison
-        RichFeature fo = (RichFeature) o;
+        Feature fo = (Feature) o;
         if (! this.parent.equals(fo.getParent())) return false;
         if (! this.typeTerm.equals(fo.getTypeTerm())) return false;
         if (! this.sourceTerm.equals(fo.getSourceTerm())) return false;
-        return fo.getRank()==this.getRank();
+        if (fo instanceof RichFeature) {
+            RichFeature rfo = (RichFeature)fo;
+            return rfo.getRank()==this.getRank();
+        }
+        return false;
     }
     
     /**
@@ -597,9 +623,12 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         // Hibernate comparison - we haven't been populated yet
         if (this.parent==null) return -1;
         // Normal comparison
-        RichFeature them = (RichFeature)o;
-        if (this.rank!=them.getRank()) return this.rank-them.getRank();
-        else return -1; // because multiple equal items are allowed
+        Feature them = (Feature)o;
+        if (them instanceof RichFeature) {
+            RichFeature rfo = (RichFeature)them;
+            if (this.rank!=rfo.getRank()) return this.rank-rfo.getRank();
+        }
+        return -1; // because multiple equal items are allowed
     }
     
     // Hibernate requirement - not for public use.

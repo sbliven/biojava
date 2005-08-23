@@ -66,7 +66,7 @@ public final class RichSeqIOTools {
      */
     private RichSeqIOTools() {
     }
-        
+    
     /**
      * Read a fasta file.
      *
@@ -323,7 +323,7 @@ public final class RichSeqIOTools {
      *              use the namespace specified in the individual sequence.
      * @throws IOException if there was an error while writing.
      */
-    public static void writeFasta(OutputStream os, RichSequence seq, Namespace ns)
+    public static void writeFasta(OutputStream os, Sequence seq, Namespace ns)
     throws IOException {
         writeFasta(os, new SingleRichSeqIterator(seq),ns);
     }
@@ -340,11 +340,11 @@ public final class RichSeqIOTools {
         sw.writeStream(in,ns);
     }
     
-    public static void writeGenbank(OutputStream os, RichSequence seq, Namespace ns)
+    public static void writeGenbank(OutputStream os, Sequence seq, Namespace ns)
     throws IOException {
         writeGenbank(os, new SingleRichSeqIterator(seq),ns);
     }
-            
+    
     private static SymbolTokenization getDNAParser() {
         try {
             return DNATools.getDNA().getTokenization("token");
@@ -380,12 +380,17 @@ public final class RichSeqIOTools {
                     + " Couldn't get PROTEIN token parser",ex);
         }
     }
-            
+    
     private static final class SingleRichSeqIterator
             implements RichSequenceIterator {
         private RichSequence seq;
-        SingleRichSeqIterator(RichSequence seq) {
-            this.seq = seq;
+        SingleRichSeqIterator(Sequence seq) {
+            try {
+                if (seq instanceof RichSequence) this.seq = (RichSequence)seq;
+                else this.seq = RichSequence.Tools.enrich(seq);
+            } catch (ChangeVetoException e) {
+                throw new RuntimeException("Unable to enrich sequence",e);
+            }
         }
         
         public boolean hasNext() {

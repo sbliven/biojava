@@ -29,6 +29,7 @@ package org.biojavax.ontology;
 
 import java.util.Set;
 import org.biojava.ontology.Ontology;
+import org.biojava.ontology.Term;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
@@ -97,5 +98,6 @@ public interface ComparableOntology extends Ontology,Comparable,Changeable {
     public Set getTripleSet();
     
     public ComparableTerm getOrCreateTerm(String name);
+    public ComparableTerm getOrImportTerm(Term term);
 }
 

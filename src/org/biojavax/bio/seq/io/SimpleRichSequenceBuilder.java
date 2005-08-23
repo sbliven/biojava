@@ -46,6 +46,7 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.SimpleSymbolListFactory;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.ontology.InvalidTermException;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.RankedDocRef;
@@ -57,6 +58,7 @@ import org.biojavax.RankedCrossRef;
 import org.biojavax.SimpleComment;
 import org.biojavax.SimpleNote;
 import org.biojavax.bio.BioEntryRelationship;
+import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.SimpleRichFeature;
@@ -258,6 +260,8 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
             this.featureStack.add(f);
         } catch (ChangeVetoException e) {
             throw new ParseException(e);
+        } catch (InvalidTermException e) {
+            throw new ParseException(e);
         }
     }
     private FeatureHolder featureHolder = new SimpleFeatureHolder();
@@ -320,9 +324,9 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      * {@inheritDoc}
      */
     public void addFeatureProperty(Object key, Object value) throws ParseException {
-        if (!(key instanceof ComparableTerm)) throw new IllegalArgumentException("Key has to be a ComparableTerm");
-        if (!(value instanceof String)) throw new IllegalArgumentException("Value has to be a String");
         if (this.featureStack.size() == 0) throw new ParseException("Assertion failed: Not within a feature");
+        if (!(key instanceof ComparableTerm)) key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
+        if (!(value instanceof String)) value = value.toString();
         RichFeature f = this.getCurrentFeature();
         try {
             Note n = new SimpleNote((ComparableTerm)key,(String)value,this.featPropCount++);
@@ -337,8 +341,8 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      * {@inheritDoc}
      */
     public void addSequenceProperty(Object key, Object value) throws ParseException {
-        if (!(key instanceof ComparableTerm)) throw new IllegalArgumentException("Key has to be a ComparableTerm");
-        if (!(value instanceof String)) throw new IllegalArgumentException("Value has to be a String");
+        if (!(key instanceof ComparableTerm)) key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
+        if (!(value instanceof String)) value = value.toString();
         try {
             Note n = new SimpleNote((ComparableTerm)key,(String)value,this.seqPropCount++);
             this.notes.addNote(n);
@@ -406,4 +410,10 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         return rs;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    public RichSequence makeRichSequence() throws BioException {
+        return (RichSequence)this.makeSequence();
+    }
 }

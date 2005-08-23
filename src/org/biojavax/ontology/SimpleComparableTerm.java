@@ -98,7 +98,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
      */
     public boolean equals(Object obj) {
         if (obj == this) return true;
-        if (!(obj instanceof ComparableTerm)) return false;
+        if (!(obj instanceof Term)) return false;
         // Hibernate comparison - we haven't been populated yet
         if (this.ontology==null) return false;
         // Normal comparison
@@ -114,7 +114,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
         // Hibernate comparison - we haven't been populated yet
         if (this.ontology==null) return -1;
         // Normal comparison
-        ComparableTerm them = (ComparableTerm)o;
+        Term them = (Term)o;
         if (!this.ontology.equals(them.getOntology())) return this.ontology.compareTo(them.getOntology());
         return this.name.compareTo(them.getName());
     }
@@ -135,15 +135,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     private Set getSynonymSet() { return this.synonyms; }
     
     // Hibernate requirement - not for public use.
-    private void setSynonymSet(Set synonyms) {
-        Set newsyns = new TreeSet();
-        if (synonyms!=null) for (Iterator i = synonyms.iterator(); i.hasNext(); ) {
-            Object o = i.next();
-            newsyns.add(o);
-        }
-        this.synonyms.clear();
-        for (Iterator i = newsyns.iterator(); i.hasNext(); ) this.addSynonym(i.next());
-    }
+    private void setSynonymSet(Set synonyms) { this.synonyms = synonyms; }
     
     /**
      * {@inheritDoc}

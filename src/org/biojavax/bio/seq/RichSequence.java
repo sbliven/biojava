@@ -21,11 +21,15 @@
 
 package org.biojavax.bio.seq;
 
+import java.util.Iterator;
 import java.util.Set;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.BioEntry;
+import org.biojavax.bio.db.RichObjectFactory;
 
 /**
  * A rich sequence is a combination of a <code>org.biojavax.bio.Bioentry</code>
@@ -84,4 +88,35 @@ public interface RichSequence extends BioEntry,Sequence {
     public void setCircular(boolean circular) throws ChangeVetoException;
     
     public boolean getCircular();
+    
+    public static class Tools {
+        private Tools() {}
+        public static RichSequence enrich(Sequence s) throws ChangeVetoException {
+            if (s instanceof RichSequence) return (RichSequence)s;
+            String name = s.getName();
+            RichSequence rs = new SimpleRichSequence(
+                    RichObjectFactory.getDefaultNamespace(),
+                    name==null?"UnknownName":name,
+                    name==null?"UnknownAccession":name,
+                    0,
+                    s,
+                    new Double(0.0));
+            // Transfer features
+            for (Iterator i = s.features(); i.hasNext(); ) {
+                Feature f = (Feature)i.next();
+                try {
+                    rs.createFeature(f.makeTemplate());
+                } catch (BioException e) {
+                    throw new ChangeVetoException("They hates us!",e);
+                }
+            }
+            // Transfer annotations
+            for (Iterator i = s.getAnnotation().keys().iterator(); i.hasNext(); ) {
+                Object key = i.next();
+                Object value = s.getAnnotation().getProperty(key);
+                rs.getAnnotation().setProperty(key,value);
+            }
+            return rs;
+        }
+    }
 }

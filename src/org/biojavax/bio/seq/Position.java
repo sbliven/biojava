@@ -34,6 +34,9 @@ package org.biojavax.bio.seq;
  */
 public interface Position {
     
+    public static final String BETWEEN_BASES = "^";
+    public static final String IN_RANGE = ".";
+    
     public boolean hasFuzzyStart();
     public boolean hasFuzzyEnd();
     public int getStart();

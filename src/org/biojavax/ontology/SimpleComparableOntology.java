@@ -36,6 +36,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.ontology.DefaultOps;
+import org.biojava.ontology.Ontology;
 import org.biojava.ontology.OntologyOps;
 import org.biojava.ontology.Term;
 import org.biojava.ontology.Triple;
@@ -86,7 +87,7 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
         // Hibernate comparison - we haven't been populated yet
         if (this.name==null) return -1;
         // Normal comparison
-        ComparableOntology them = (ComparableOntology)o;
+        Ontology them = (Ontology)o;
         return this.name.compareTo(them.getName());
     }
     
@@ -95,11 +96,11 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      */
     public boolean equals(Object obj) {
         if(this == obj) return true;
-        if (obj==null || !(obj instanceof ComparableOntology)) return false;
+        if (obj==null || !(obj instanceof Ontology)) return false;
         // Hibernate comparison - we haven't been populated yet
         if (this.name==null) return false;
         // Normal comparison
-        ComparableOntology them = (ComparableOntology)obj;
+        Ontology them = (Ontology)obj;
         return this.name.equals(them.getName());
     }
     
@@ -144,6 +145,16 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
             return null;
         } catch (AlreadyExistsException e) {
             return (ComparableTerm)this.getTerm(name);
+        }
+    }    
+    
+    public ComparableTerm getOrImportTerm(Term term) {
+        if (term instanceof ComparableTerm) return (ComparableTerm)term;
+        try {
+            if (!this.termsMap.containsKey(term.getName())) return (ComparableTerm)this.importTerm(term,term.getName());
+            else return (ComparableTerm)this.getTerm(name);
+        } catch (ChangeVetoException e) {
+            return null;
         }
     }
     
@@ -214,10 +225,10 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      * {@inheritDoc}
      */
     public Triple createTriple(Term subject, Term object, Term predicate, String name, String description) throws AlreadyExistsException, ChangeVetoException {
+        if (!(subject instanceof ComparableTerm)) subject = this.getOrImportTerm(subject);
+        if (!(object instanceof ComparableTerm)) object = this.getOrImportTerm(object);
+        if (!(predicate instanceof ComparableTerm)) predicate = this.getOrImportTerm(predicate);
         if (this.containsTriple(subject,object,predicate)) throw new AlreadyExistsException("Ontology already has triple");
-        if (!(subject instanceof ComparableTerm)) throw new IllegalArgumentException("Subject must be a ComparableTerm");
-        if (!(object instanceof ComparableTerm)) throw new IllegalArgumentException("Object must be a ComparableTerm");
-        if (!(predicate instanceof ComparableTerm)) throw new IllegalArgumentException("Predicate must be a ComparableTerm");
         ComparableTriple ct = new SimpleComparableTriple(this,(ComparableTerm)subject,(ComparableTerm)object,(ComparableTerm)predicate);
         if (!this.triples.contains(ct)) {
             if(!this.hasListeners(ComparableOntology.TRIPLE)) {
