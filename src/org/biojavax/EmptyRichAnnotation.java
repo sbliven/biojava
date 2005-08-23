@@ -44,7 +44,7 @@ import org.biojava.utils.Unchangeable;
  * A place holder for a RichAnnotation that prevents null having to be used
  * @author Mark Schreiber
  */
-class EmptyRichAnnotation extends Unchangeable implements RichAnnotation, Serializable{
+public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation, Serializable{
   public Object getProperty(Object key) throws NoSuchElementException {
     throw new NoSuchElementException(
       "There are no keys in the Empty RichAnnotation object: " +
