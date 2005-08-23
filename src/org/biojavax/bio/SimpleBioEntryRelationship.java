@@ -35,7 +35,7 @@ import org.biojavax.ontology.ComparableTerm;
 
 /**
  * Represents a relationship between two bioentries that is described by a term.
- * Equality is the combination of unique subject, object and term.
+ * Equality is the combination of unique subject and term.
  * @author Richard Holland
  * @author Mark Schreiber
  */
@@ -107,7 +107,12 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     private void setTerm(ComparableTerm term) { this.term = term; }
     
     /**
-     * {@inheritDoc}
+     * Compares this object to another. The comparison is made based on the rank,
+     * subject and term (in that order). The first of these to be unequal will
+     * be used as the basis for the returned value. If all are equal the value
+     * will be 0.
+     * @return a positive int if <code>o</code> preceeds <code>this</code>, 0 if
+     *  they are equal and a negative int if <code>this</code> preceeds <code>o</code>
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -120,7 +125,10 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} Equality is defined by a comparison of the subject and
+     * term of the relationship.
+     * return true if the subject and term of this object are equal to the 
+     *   subject and term of <code>obj</code>. False in all other conditions.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -148,7 +156,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     
     /**
      * {@inheritDoc}
-     * Form is <code>this.getTerm()+"("+this.getSubject()+","+this.getObject()+")";<code>
+     * Form is <code>this.getTerm()+"("+this.getSubject()+")";<code>
      */
     public String toString() { return this.getTerm()+"("+this.getSubject()+")"; }
     

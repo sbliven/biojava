@@ -324,8 +324,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     
     /**
      * {@inheritDoc} Form: 
-     * <code>this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" 
-     * v."+this.getVersion();</code>
+     * <code>this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" v."+this.getVersion();</code>
      */
     public String toString() { return this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" v."+this.getVersion(); }
         

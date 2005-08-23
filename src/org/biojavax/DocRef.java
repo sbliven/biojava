@@ -31,7 +31,9 @@ import org.biojava.utils.Changeable;
 /**
  * Represents a documentary reference, the reference table in BioSQL.
  * @author Mark Schreiber
- * @author RDocRef*/
+ * @author Richard Holland
+ * @see RankedDocRef
+ */
 public interface DocRef extends Comparable,Changeable {
     
     public static final ChangeType CROSSREF = new ChangeType(
