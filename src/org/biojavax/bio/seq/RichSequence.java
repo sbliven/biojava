@@ -85,12 +85,38 @@ public interface RichSequence extends BioEntry,Sequence {
      */
     public void setFeatureSet(Set features) throws ChangeVetoException;
     
+    /**
+     * Circularises the sequence.
+     * @param circular set to true if you want it to be circular
+     * @throws ChangeVetoException if the change is blocked. Some implementations
+     *   may choose not to support circularisation and should throw an exception here.
+     *   Some implementations may only support this method for certain 
+     * <code>Alphabet</code>s.
+     */
     public void setCircular(boolean circular) throws ChangeVetoException;
     
+    /**
+     * Is the sequence circular? Circularity has implications for work with locations
+     * and any coordinate work eg symbolAt(int i). 
+     * Classes that allow it should test this method when working with coordinates or
+     * locations / features.
+     * @return true if the this is circular else false.
+     */
     public boolean getCircular();
     
     public static class Tools {
         private Tools() {}
+        
+        /**
+         * Boldly attempts to convert a <code>Sequence</code> into a <code>
+         * RichSequence</code>. Sequences will be assigned to the default name
+         * space. The accession will be assumed to be the name of the old sequence.
+         * The version of the sequence will be set to 0 and the seqversion set
+         * to 0.0. <code>Features</code> are converted to <code>RichFeatures</code>
+         * The old <code>Annotation</code> bundle is and converted to a <code>
+         * RichAnnotation</code>
+         * @throws ChangeVetoException if <code>s</code> is locked or the conversion fails.
+         */
         public static RichSequence enrich(Sequence s) throws ChangeVetoException {
             if (s instanceof RichSequence) return (RichSequence)s;
             String name = s.getName();

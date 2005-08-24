@@ -22,7 +22,7 @@ public interface RichSequenceBuilder extends RichSeqIOListener, SequenceBuilder{
      * Implementations of this for a <code>RichSequenceBuilder</code> should
      * call <code>makeRichSequence()</code>
      * @return a <code>RichSequence</code>
-     * @see makeRichSequence()
+     * @see #makeRichSequence()
      * @throws BioException if it is not possible to build a <code>RichSequence</code>
      */
     public Sequence makeSequence() throws BioException;
