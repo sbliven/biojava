@@ -24,10 +24,6 @@ package org.biojavax.bio.seq.io;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
@@ -49,62 +45,5 @@ public interface RichSequenceFormat extends SequenceFormat,ParseErrorSource {
             BufferedReader reader, SymbolTokenization symParser, RichSeqIOListener listener,Namespace ns
             ) throws BioException, IllegalSymbolException, IOException;
     public void writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException;
-    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException;
-    
-    public static class Tools {
-        public static String leftIndent(String input, int leftIndent) {
-            StringBuffer b = new StringBuffer();
-            for (int i = 0; i < leftIndent; i++) b.append(" "); // yuck!
-            b.append(input);
-            return b.toString();
-        }
-        public static String leftPad(String input, int totalWidth) {
-            StringBuffer b = new StringBuffer();
-            b.append(input);
-            while(b.length()<totalWidth) b.insert(0," "); // yuck!
-            return b.toString();
-        }
-        public static String rightPad(String input, int totalWidth) {
-            StringBuffer b = new StringBuffer();
-            b.append(input);
-            while(b.length()<totalWidth) b.append(" "); // yuck!
-            return b.toString();
-        }
-        public static String[] writeWordWrap(String input, String sepRegex, int width) {
-            List lines = new ArrayList();
-            Pattern p = Pattern.compile(sepRegex);
-            int start = 0;
-            while (start < input.length()) {
-                if (input.charAt(start)=='\n') start++;
-                //go from start+width
-                int splitPoint = start+width;
-                // easy case
-                if (splitPoint > input.length()) splitPoint=input.length();
-                else {
-                    //if has newline before end, use it
-                    int newline = input.indexOf('\n',start);
-                    if (newline>start && newline<splitPoint) {
-                        splitPoint = newline;
-                    }
-                    //if not match sep, find splitPoint first point that does (min=start)
-                    else {
-                        while (splitPoint>start) {
-                            char c = input.charAt(splitPoint);
-                            Matcher m = p.matcher(""+c);
-                            if (m.matches()) break;
-                            splitPoint--;
-                        }
-                        //if ended up at splitPoint=start, splitPoint=start+width
-                        if (splitPoint==start) splitPoint = start+width;
-                    }
-                }
-                //output chunk from start to splitPoint
-                lines.add(input.substring(start, splitPoint).trim());
-                //start = splitPoint
-                start=splitPoint;
-            }
-            
-            return (String[])lines.toArray(new String[0]);
-        }
-    }
+    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException;    
 }

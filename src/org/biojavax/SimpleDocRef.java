@@ -31,6 +31,7 @@ import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
+import org.biojavax.utils.CRC;
 
 /**
  * A basic DocRef implementation.
@@ -45,7 +46,6 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     private String authors;
     private String title;
     private String location;
-    private String crc;
     private String remark;
     
     /**
@@ -60,7 +60,6 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         this.authors = authors;
         this.title = null;
         this.location = location;
-        this.crc = null;
         this.remark = null;
     }
     
@@ -89,27 +88,8 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         }
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    public void setCRC(String CRC) throws ChangeVetoException {
-        if(!this.hasListeners(DocRef.CRC)) {
-            this.crc = CRC;
-        } else {
-            ChangeEvent ce = new ChangeEvent(
-                    this,
-                    DocRef.CRC,
-                    CRC,
-                    this.crc
-                    );
-            ChangeSupport cs = this.getChangeSupport(DocRef.CRC);
-            synchronized(cs) {
-                cs.firePreChangeEvent(ce);
-                this.crc = CRC;
-                cs.firePostChangeEvent(ce);
-            }
-        }
-    }
+    // Hibernate only - ignore as is calculated field
+    private void setCRC(String CRC) {}
     
     /**
      * {@inheritDoc}
@@ -169,7 +149,13 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     /**
      * {@inheritDoc}
      */
-    public String getCRC() { return this.crc; }
+    public String getCRC() { 
+        StringBuffer sb = new StringBuffer();
+        sb.append((this.authors==null || this.authors.equals(""))?"<undef>":this.authors);
+        sb.append((this.title==null || this.title.equals(""))?"<undef>":this.title);
+        sb.append((this.location==null || this.location.equals(""))?"<undef>":this.location);
+        return CRC.crc64(sb.toString());
+    }
     
     /**
      * {@inheritDoc}

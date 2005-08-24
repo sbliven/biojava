@@ -64,6 +64,7 @@ import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
+import org.biojavax.utils.StringTools;
 
 /**
  * Format reader for GenBank files. This version of Genbank format will generate
@@ -331,7 +332,7 @@ public class GenbankFormat
                     if (key.equals("JOURNAL")) journal = val;
                     if (key.equals("MEDLINE")) medline = val;
                     if (key.equals("PUBMED")) pubmed = val;
-                    if (key.equals("REMARK")) authors = val;
+                    if (key.equals("REMARK")) remark = val;
                 }
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
@@ -613,13 +614,13 @@ public class GenbankFormat
         
         // locus(name) + length + alpha + div + date line
         StringBuffer locusLine = new StringBuffer();
-        locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getName(),10));
-        locusLine.append(RichSequenceFormat.Tools.leftPad(""+rs.length(),7));
+        locusLine.append(StringTools.rightPad(rs.getName(),10));
+        locusLine.append(StringTools.leftPad(""+rs.length(),7));
         locusLine.append(" bp ");
-        locusLine.append(RichSequenceFormat.Tools.leftPad(stranded,3));
-        locusLine.append(RichSequenceFormat.Tools.rightPad(moltype,6));
-        locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getCircular()?"circular":"",10));
-        locusLine.append(RichSequenceFormat.Tools.rightPad(rs.getDivision()==null?"":rs.getDivision(),10));
+        locusLine.append(StringTools.leftPad(stranded,3));
+        locusLine.append(StringTools.rightPad(moltype,6));
+        locusLine.append(StringTools.rightPad(rs.getCircular()?"circular":"",10));
+        locusLine.append(StringTools.rightPad(rs.getDivision()==null?"":rs.getDivision(),10));
         locusLine.append(mdat);
         this.writeWrappedLine(LOCUS_TAG, 12, locusLine.toString(), os);
         
@@ -752,7 +753,7 @@ public class GenbankFormat
             if (symCount % 60 == 0) {
                 if (lines > 0) os.print("\n"); // newline from previous line
                 int lineNum = (lines*60) + 1;
-                os.print(RichSequenceFormat.Tools.leftPad(""+lineNum,9));
+                os.print(StringTools.leftPad(""+lineNum,9));
                 lines++;
             }
             if (symCount % 10 == 0) os.print(" ");
@@ -778,11 +779,11 @@ public class GenbankFormat
     private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
         text = text.trim();
         StringBuffer b = new StringBuffer();
-        b.append(RichSequenceFormat.Tools.rightPad(key, indent));
-        String[] lines = RichSequenceFormat.Tools.writeWordWrap(text, sep, this.getLineWidth()-indent);
+        b.append(StringTools.rightPad(key, indent));
+        String[] lines = StringTools.writeWordWrap(text, sep, this.getLineWidth()-indent);
         for (int i = 0; i<lines.length; i++) {
             if (i==0) b.append(lines[i]);
-            else b.append(RichSequenceFormat.Tools.leftIndent(lines[i],indent));
+            else b.append(StringTools.leftIndent(lines[i],indent));
             // print line before continuing to next one
             os.println(b.toString());
             b.setLength(0);
