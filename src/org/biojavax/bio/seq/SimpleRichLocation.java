@@ -69,6 +69,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private PositionResolver pr = RichObjectFactory.getDefaultPositionResolver();
     private Strand strand;
     private int rank;
+    private boolean circular = false;
     
     /**
      * Creates a new instance of SimpleRichSequenceLocation.
@@ -85,7 +86,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * @param pos the location position (a point).
      * @param rank Rank of location.
      * @param strand The strand of the location
-     */    
+     */
     public SimpleRichLocation(Position pos, int rank, Strand strand) {
         this(pos,pos,rank,strand,null);
     }
@@ -97,7 +98,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * @param rank Rank of location.
      * @param strand the strand of the location
      * @param crossRef a cross reference to another object
-     */    
+     */
     public SimpleRichLocation(Position pos, int rank, Strand strand, CrossRef crossRef) {
         this(pos,pos,rank,strand,crossRef);
     }
@@ -108,8 +109,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * @param min the minimum bound of the location
      * @param max the maximum bound of the location
      * @param rank Rank of location.
-     * 
-     */    
+     *
+     */
     public SimpleRichLocation(Position min, Position max, int rank) {
         this(min,max,rank,Strand.POSITIVE_STRAND);
     }
@@ -121,7 +122,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * @param max the maximum bound of the location
      * @param rank Rank of location.
      * @param strand the strand of the location
-     */ 
+     */
     public SimpleRichLocation(Position min, Position max, int rank, Strand strand) {
         this(min,max,rank,strand,null);
     }
@@ -144,7 +145,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleRichLocation() {}
+    private SimpleRichLocation() {}
     
     /**
      * {@inheritDoc}
@@ -192,6 +193,33 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
                 this.term = term;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean getCircular() { return this.circular; }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setCircular(boolean circular) throws ChangeVetoException {
+        if(!this.hasListeners(RichLocation.CIRCULAR)) {
+            this.circular = circular;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    RichLocation.CIRCULAR,
+                    new Boolean(circular),
+                    new Boolean(this.circular)
+                    );
+            ChangeSupport cs = this.getChangeSupport(RichLocation.CIRCULAR);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.circular = circular;
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -268,36 +296,29 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public boolean contains(Location l) {
-        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        if (!this.overlaps(l)) return false; // check strand etc.
-        if (l instanceof CompoundRichLocation) {
-            for (Iterator i = l.blockIterator(); i.hasNext(); ) if (!this.contains((RichLocation)i.next())) return false;
-            return true;
-        } else {
-            return (this.getMin() <= l.getMin() && this.getMax() >=l.getMax());
-        }
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean overlaps(Location l) {
-        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        RichLocation rl = (RichLocation)l;
-        if (rl.getStrand()!=this.strand) return false;
-        if (rl.getCrossRef()!=null || this.crossRef!=null) {
-            if (rl.getCrossRef()!=null && this.crossRef!=null) {
-                if (!this.crossRef.equals(rl.getCrossRef())) return false;
-            } else return false;
-        }
-        return (rl.getMin()<this.getMax() && rl.getMax()>this.getMin());
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
     public boolean isContiguous() { return true; }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isAdjacent(RichLocation loc) {
+        if (loc instanceof CompoundRichLocation || loc instanceof EmptyRichLocation) {
+            return loc.isAdjacent(this); // let them do the hard work!
+        } else {
+            // TODO - Deal with circular locations
+            // Delete from here on in this clause when above is complete.
+            // Now we just have to do Simple->Simple comparisons
+            // Adjacent is defined as being next to another sequence, but not overlapping.
+            // ie. startB=endA+1 or startA=endB+1
+            return (this.getMin()==loc.getMax()+1 || loc.getMin()==this.getMax()+1);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return true (always)
+     */
+    public boolean fromSingleSource() { return true; }
     
     /**
      * {@inheritDoc}
@@ -323,32 +344,88 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     /**
      * {@inheritDoc}
+     * A sequence contains another location if it overlaps it, and the coordinates
+     * are greater than or equal to the other location at both ends.
      */
-    public Location union(Location l) {
-        if (l==null) throw new IllegalArgumentException("Location cannot be null");
+    public boolean contains(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        RichLocation rl = (RichLocation)l;
-        if (this.overlaps(rl)) {
-            return new SimpleRichLocation(this.posmin(this.min,rl.getMinPosition()),this.posmax(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef);
+        if (l instanceof CompoundRichLocation || l instanceof EmptyRichLocation) {
+            return l.contains(this); // let them do the hard work!
         } else {
-            List s = new ArrayList();
-            s.add(this);
-            s.add(rl);
-            return new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),s);
+            if (!this.overlaps(l)) return false; // check strand etc.
+            // Simple vs. simple
+            RichLocation rl = (RichLocation)l;
+            // TODO - Deal with circular locations
+            // Delete from here on in this clause when above is complete.
+            return (this.getMin() <= rl.getMin() && this.getMax() >= rl.getMax());
         }
     }
     
     /**
      * {@inheritDoc}
+     * A sequence overlaps another location if it is on the same sequence, and
+     * the coordinates overlap.
+     */
+    public boolean overlaps(Location l) {
+        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
+        if (l instanceof CompoundRichLocation || l instanceof EmptyRichLocation) {
+            return l.overlaps(this); // let them do the hard work!
+        } else {
+            // Simple vs. simple
+            RichLocation rl = (RichLocation)l;
+            if (rl.getCrossRef()!=null || this.crossRef!=null) {
+                if (rl.getCrossRef()!=null && this.crossRef!=null) {
+                    if (!this.crossRef.equals(rl.getCrossRef())) return false;
+                } else return false;
+            }
+            // TODO - Deal with circular locations
+            // Delete from here on when above is complete.
+            return (this.getMin()<=rl.getMax() && rl.getMax()>=this.getMin());
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A merged SimpleRichLocation is returned if the two locations overlap and are on
+     * the same strand. Otherwise, a CompoundRichLocation is returned containing
+     * the two locations as members.
+     */
+    public Location union(Location l) {
+        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
+        if (l instanceof CompoundRichLocation || l instanceof EmptyRichLocation) {
+            return l.union(this); // let them do the hard work!
+        } else {
+            // Simple vs. simple
+            RichLocation rl = (RichLocation)l;
+            if (this.overlaps(rl) && this.getStrand().equals(rl.getStrand())) {
+                // TODO - Deal with circular locations
+                // Delete from here on in this clause when above is complete.
+                return new SimpleRichLocation(this.posmin(this.min,rl.getMinPosition()),this.posmax(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef);
+            } else {
+                List s = new ArrayList();
+                s.add(this);
+                s.add(rl);
+                return new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),s);
+            }
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * If the locations do not overlap, or they overlap but are on different strands,
+     * the empty sequence is returned. Else, the overlapping area is returned.
      */
     public Location intersection(Location l) {
-        if (l==null) throw new IllegalArgumentException("Location cannot be null");
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        RichLocation them = (RichLocation)l;
-        
-        if (!this.overlaps(l)) return RichLocation.EMPTY_LOCATION;
-        
-        return new SimpleRichLocation(this.posmax(this.min,them.getMinPosition()),this.posmin(this.max,them.getMaxPosition()),0,this.strand,this.crossRef);
+        if (l instanceof CompoundRichLocation || l instanceof EmptyRichLocation) {
+            return l.union(this); // let them do the hard work!
+        } else {
+            RichLocation rl = (RichLocation)l;
+            if (!(this.overlaps(l) && this.getStrand().equals(rl.getStrand()))) return RichLocation.EMPTY_LOCATION;
+            // TODO - Deal with circular locations
+            // Delete from here on when above is complete.
+            return new SimpleRichLocation(this.posmax(this.min,rl.getMinPosition()),this.posmin(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef);
+        }
     }
     
     private Position posmin(Position a, Position b) {
@@ -371,7 +448,10 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public SymbolList symbols(SymbolList seq) {
         if (seq==null) throw new IllegalArgumentException("Sequence cannot be null");
         
-        if ((this.getMax()-this.getMin())<1) return SymbolList.EMPTY_LIST;
+        if (seq instanceof RichSequence) {
+            RichSequence rs = (RichSequence)seq;
+            if (this.getCircular() && !rs.getCircular()) throw new IllegalArgumentException("Attempt to apply circular location to non-circular sequence");
+        }
         
         SymbolList seq2 = seq.subList(this.getMin(),this.getMax());
         
@@ -387,7 +467,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
                 }
             }
         } catch (IllegalAlphabetException e) {
-            IllegalArgumentException ex = 
+            IllegalArgumentException ex =
                     new IllegalArgumentException("Could not understand alphabet of passed sequence");
             ex.initCause(e);
             throw ex;
@@ -464,13 +544,13 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     
-    // Hibernate requirement - not for public use.
+// Hibernate requirement - not for public use.
     private Integer id;
     
-    // Hibernate requirement - not for public use.
+// Hibernate requirement - not for public use.
     private Integer getId() { return this.id; }
     
-    // Hibernate requirement - not for public use.
+// Hibernate requirement - not for public use.
     private void setId(Integer id) { this.id = id; }
 }
 

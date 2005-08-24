@@ -30,11 +30,13 @@ import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
 import org.biojava.bio.seq.SimpleFeatureHolder;
+import org.biojava.bio.seq.io.ChunkedSymbolListFactory;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.PackedSymbolListFactory;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
@@ -44,6 +46,7 @@ import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.bio.SimpleBioEntry;
+import org.biojavax.bio.seq.io.SimpleRichSequenceBuilder;
 
 
 /**
@@ -138,7 +141,10 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     /**
      * {@inheritDoc}
      */
-    public Symbol symbolAt(int index) throws IndexOutOfBoundsException { return this.symList.symbolAt(index); }
+    public Symbol symbolAt(int index) throws IndexOutOfBoundsException {
+        if (this.getCircular()) index = RichLocation.Tools.modulateCircularIndex(index,this.length());
+        return this.symList.symbolAt(index);
+    }
     
     /**
      * {@inheritDoc}
@@ -148,13 +154,54 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     /**
      * {@inheritDoc}
      */
-    public String subStr(int start, int end) throws IndexOutOfBoundsException { return this.symList.subStr(start, end); }
+    public String subStr(int start, int end) throws IndexOutOfBoundsException {
+        return this.symList.subList(start, end).seqString();
+    }
     
     /**
      * {@inheritDoc}
      */
     public SymbolList subList(int start, int end) throws IndexOutOfBoundsException {
-        return this.symList.subList(start, end);
+        if (this.getCircular()) {
+            try {
+                int modStart = RichLocation.Tools.modulateCircularIndex(start,this.length());
+                int modEnd = RichLocation.Tools.modulateCircularIndex(end,this.length());
+                int modLength = (Math.max(start,end)-Math.min(start,end))+1;
+                int seqLength = this.length();
+                // Use the optimal packed symbol factory
+                ChunkedSymbolListFactory symsf = new ChunkedSymbolListFactory(new PackedSymbolListFactory(),SimpleRichSequenceBuilder.DEFAULT_THRESHOLD);
+                int symPos = 0;
+                if (start > end) {
+                    // initial chunk is modStart->seqLength
+                    int chunkLength = (seqLength-modStart)+1;
+                    symsf.addSymbols(
+                            this.getAlphabet(),
+                            (Symbol[])this.symList.subList(modStart,seqLength).toList().toArray(new Symbol[0]),
+                            symPos,
+                            chunkLength);
+                    symPos += chunkLength;
+                } else {
+                    // initial chunk is empty
+                }
+                while (symPos < modLength) {
+                    int remainingLength = modLength - symPos;
+                    if (remainingLength > seqLength) symsf.addSymbols(
+                            this.getAlphabet(),
+                            (Symbol[])this.symList.toList().toArray(new Symbol[0]),
+                            0,
+                            seqLength);
+                    else symsf.addSymbols(
+                            this.getAlphabet(),
+                            (Symbol[])this.symList.toList().toArray(new Symbol[0]),
+                            0,
+                            modEnd);
+                    symPos+=seqLength;
+                }
+                return symsf.makeSymbolList();
+            } catch (IllegalAlphabetException e) {
+                throw new RuntimeException("Don't understand our own alphabet?",e);
+            }
+        } else return this.symList.subList(start, end);
     }
     
     /**

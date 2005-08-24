@@ -62,6 +62,11 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
             "org.biojavax.bio.seq.RichLocation",
             "RANK"
             );
+    public static final ChangeType CIRCULAR = new ChangeType(
+            "This location's circularity has changed",
+            "org.biojavax.bio.seq.RichLocation",
+            "CIRCULAR"
+            );
     
     /**
      * Retrieves the crossref associated with this location.
@@ -106,6 +111,14 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
     public Position getMaxPosition();
     
     public void setPositionResolver(PositionResolver p);
+    
+    public boolean getCircular();
+    
+    public void setCircular(boolean circular) throws ChangeVetoException;
+    
+    public boolean isAdjacent(RichLocation loc);
+    
+    public boolean fromSingleSource();
     
     public static final RichLocation EMPTY_LOCATION = new EmptyRichLocation();
     
@@ -155,6 +168,11 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
     
     public static class Tools {
         private Tools() {}
+        public static int modulateCircularIndex(int index, int seqLength) {
+            while (index>seqLength) index-=seqLength;
+            if (index==0) index = seqLength;
+            return index;
+        }
         public static RichLocation enrich(Location l) {
             if (l instanceof RichLocation) {
                 return (RichLocation)l;
@@ -166,23 +184,23 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
                 }
                 return new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),members);
             } else if (l instanceof FuzzyPointLocation) {
-              FuzzyPointLocation f = (FuzzyPointLocation)l;                
-              Position pos = new SimplePosition(f.hasBoundedMin(),f.hasBoundedMax(),f.getMin(),f.getMax(),Position.IN_RANGE);
-              return new SimpleRichLocation(pos,0); // 0 for no rank
+                FuzzyPointLocation f = (FuzzyPointLocation)l;
+                Position pos = new SimplePosition(f.hasBoundedMin(),f.hasBoundedMax(),f.getMin(),f.getMax(),Position.IN_RANGE);
+                return new SimpleRichLocation(pos,0); // 0 for no rank
             } else if (l instanceof FuzzyLocation) {
-              FuzzyLocation f = (FuzzyLocation)l;   
-              Position start = new SimplePosition(f.hasBoundedMin(),false,f.getMin());
-              Position end = new SimplePosition(false,f.hasBoundedMax(),f.getMax());
-              return new SimpleRichLocation(start,end,0); // 0 for no rank
-           } else if (l instanceof RangeLocation) {
-              RangeLocation r = (RangeLocation)l;   
-              Position start = new SimplePosition(false,false,r.getMin());
-              Position end = new SimplePosition(false,false,r.getMax());
-              return new SimpleRichLocation(start,end,0); // 0 for no rank
+                FuzzyLocation f = (FuzzyLocation)l;
+                Position start = new SimplePosition(f.hasBoundedMin(),false,f.getMin());
+                Position end = new SimplePosition(false,f.hasBoundedMax(),f.getMax());
+                return new SimpleRichLocation(start,end,0); // 0 for no rank
+            } else if (l instanceof RangeLocation) {
+                RangeLocation r = (RangeLocation)l;
+                Position start = new SimplePosition(false,false,r.getMin());
+                Position end = new SimplePosition(false,false,r.getMax());
+                return new SimpleRichLocation(start,end,0); // 0 for no rank
             } else if (l instanceof PointLocation) {
-              PointLocation p = (PointLocation)l;              
-              Position pos = new SimplePosition(false,false,p.getMin());
-              return new SimpleRichLocation(pos,0); // 0 for no rank
+                PointLocation p = (PointLocation)l;
+                Position pos = new SimplePosition(false,false,p.getMin());
+                return new SimpleRichLocation(pos,0); // 0 for no rank
             } else if (l.toString().equals("{}")) {
                 return EMPTY_LOCATION;
             } else {

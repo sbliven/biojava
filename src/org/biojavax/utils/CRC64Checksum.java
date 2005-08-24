@@ -20,30 +20,25 @@
  */
 
 /*
- * CRC.java
+ * CRC64Checksum.java
  *
  * Created on August 24, 2005, 1:10 PM
  */
 
 package org.biojavax.utils;
 
-import java.text.Format;
-
-
+import java.util.zip.Checksum;
 
 /**
  *
  * @author Richard Holland
  */
-public class CRC {
-    
-    /** Creates a new instance of CRC */
-    private CRC() {}
-    
+public class CRC64Checksum implements Checksum {
+        
     private final static long[] CRC64Tableh = new long[256];
     private final static long[] CRC64Tablel = new long[256];
     
-    // Construct the CRC64 lookup tables.
+    // Construct the CRC64Checksum lookup tables.
     static {
         long POLY64REVh = 0xd8000000;
         
@@ -77,46 +72,48 @@ public class CRC {
         }
     }
     
+    private long crcl;
+    private long crch;
+    
     /**
-     * Computes the CRC64 checksum of the input string.
-     * If the input is null then it is treated as the empty string.
+     * Creates a new instance of CRC64Checksum
+     */
+    public CRC64Checksum() {
+        this.reset();
+    }
+    
+    public void reset() {
+        this.crcl = 0L;
+        this.crch = 0L;
+    }
+    
+    public void update(int c) {
+        long shr = (this.crch & 0xff) << 24L;
+        long templh = (this.crch >> 8L);
+        long templl = (this.crcl >> 8L) | shr;
+        int tableindex = (int)((this.crcl ^ (long)c) & 0xff);
+        this.crch = templh ^ CRC64Tableh[tableindex];
+        this.crcl = templl ^ CRC64Tablel[tableindex];
+    }
+    
+    public void update(byte[] values, int offset, int len) {
+        for (int i = offset; i < offset+len; i++) this.update((int)values[i]);
+    }
+    
+    public long getValue() {
+        return (this.crch<<32L) | this.crcl;
+    }
+    
+    /**
+     * Displays the current CRC64Checksum checksum as a 16-digit hex string.
      * The algorithm is a copy of that found in BioPerl Swissprot parser.
      * Note that we use longs then cast them to avoid the lack of an
-     * unsigned int in Java. Longs are 64-bit but we are only using the 
+     * unsigned int in Java. Longs are 64-bit but we are only using the
      * bottom 32 bits. An int is 32-bit but encodes sign so we can get amusing
      * results if we don't allow for this.
-     * @param input  the String to encode.
-     * @return the CRC64 checksum.
+     * @return the CRC64Checksum checksum.
      */
-    public static String crc64(String input) {
-        if (input==null) input="";
-        
-        /*
-        my $crcl = 0;
-        my $crch = 0;
-        foreach (split '', $str) {
-            my $shr = ($crch & 0xFF) << 24;
-            my $temp1h = $crch >> 8;
-            my $temp1l = ($crcl >> 8) | $shr;
-            my $tableindex = ($crcl ^ (unpack "C", $_)) & 0xFF;
-            $crch = $temp1h ^ $CRCTableh[$tableindex];
-            $crcl = $temp1l ^ $CRCTablel[$tableindex];
-        }
-        my $crc64 = sprintf("%08X%08X", $crch, $crcl);
-         */
-        long crcl = 0;
-        long crch = 0;
-        char[] chars = input.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            char c = chars[i];
-            long shr = (crch & 0xff) << 24L;
-            long templh = (crch >> 8L);
-            long templl = (crcl >> 8L) | shr;
-            int tableindex = (int)((crcl ^ c) & 0xff);
-            crch = templh ^ CRC64Tableh[tableindex];
-            crcl = templl ^ CRC64Tablel[tableindex];
-        }
-
+    public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append(StringTools.leftPad(Long.toHexString(crch), '0', 8));
         sb.append(StringTools.leftPad(Long.toHexString(crcl), '0', 8));

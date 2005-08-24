@@ -91,6 +91,18 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     }
     
     /**
+     * {@inheritDoc}
+     */
+    public boolean getCircular() { return false; }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setCircular(boolean circular) throws ChangeVetoException {
+        throw new ChangeVetoException("Cannot make empty locations circular");
+    }
+    
+    /**
      * {@inheritDoc} The empty_location has no defined strand
      * @return Strand.UNKNOWN_STRAND
      */
@@ -148,21 +160,21 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     
     /**
      * {@inheritDoc}
-     * @return false (always)
+     * @return true (always)
      */
-    public boolean contains(Location l) { return false; }
+    public boolean isContiguous() { return true; }
     
     /**
      * {@inheritDoc}
-     * @return false (always)
+     * @return true if other location is also empty, false otherwise
      */
-    public boolean overlaps(Location l) { return false; }
+    public boolean isAdjacent(RichLocation loc) {  return (loc instanceof EmptyRichLocation); }
     
     /**
      * {@inheritDoc}
      * @return true (always)
      */
-    public boolean isContiguous() { return true; }
+    public boolean fromSingleSource() { return true; }
     
     /**
      * {@inheritDoc}
@@ -185,7 +197,19 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      * {@inheritDoc}
      * @return the same object, empty translated is still empty
      */
-    public Location translate(int dist) { return this; }
+    public Location translate(int dist) { return this; }  
+    
+    /**
+     * {@inheritDoc}
+     * @return false (always)
+     */
+    public boolean contains(Location l) { return false; }
+    
+    /**
+     * {@inheritDoc}
+     * @return false (always)
+     */
+    public boolean overlaps(Location l) { return false; }
     
     /**
      * {@inheritDoc} The union of an empty location and another location (l) is

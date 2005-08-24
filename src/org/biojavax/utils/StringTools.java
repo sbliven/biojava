@@ -75,28 +75,26 @@ public class StringTools {
         Pattern p = Pattern.compile(sepRegex);
         int start = 0;
         while (start < input.length()) {
-            if (input.charAt(start)=='\n') start++;
+            while (input.charAt(start)=='\n') start++;
             //go from start+width
             int splitPoint = start+width;
+            //if has newline before end, use it
+            int newline = input.indexOf('\n',start);
+            if (newline>start && newline<splitPoint) {
+                splitPoint = newline;
+            }
             // easy case
             if (splitPoint > input.length()) splitPoint=input.length();
             else {
-                //if has newline before end, use it
-                int newline = input.indexOf('\n',start);
-                if (newline>start && newline<splitPoint) {
-                    splitPoint = newline;
-                }
                 //if not match sep, find splitPoint first point that does (min=start)
-                else {
-                    while (splitPoint>start) {
-                        char c = input.charAt(splitPoint);
-                        Matcher m = p.matcher(""+c);
-                        if (m.matches()) break;
-                        splitPoint--;
-                    }
-                    //if ended up at splitPoint=start, splitPoint=start+width
-                    if (splitPoint==start) splitPoint = start+width;
+                while (splitPoint>start) {
+                    char c = input.charAt(splitPoint);
+                    Matcher m = p.matcher(""+c);
+                    if (m.matches()) break;
+                    splitPoint--;
                 }
+                //if ended up at splitPoint=start, splitPoint=start+width
+                if (splitPoint==start) splitPoint = start+width;
             }
             //output chunk from start to splitPoint
             lines.add(input.substring(start, splitPoint).trim());

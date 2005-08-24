@@ -27,11 +27,12 @@
 
 package org.biojavax;
 
+import java.util.zip.Checksum;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
-import org.biojavax.utils.CRC;
+import org.biojavax.utils.CRC64Checksum;
 
 /**
  * A basic DocRef implementation.
@@ -154,7 +155,9 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         sb.append((this.authors==null || this.authors.equals(""))?"<undef>":this.authors);
         sb.append((this.title==null || this.title.equals(""))?"<undef>":this.title);
         sb.append((this.location==null || this.location.equals(""))?"<undef>":this.location);
-        return CRC.crc64(sb.toString());
+        Checksum cs = new CRC64Checksum();
+        cs.update(sb.toString().getBytes(), 0, sb.length());
+        return cs.toString();
     }
     
     /**
