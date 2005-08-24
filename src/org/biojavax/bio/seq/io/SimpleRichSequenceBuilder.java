@@ -43,6 +43,7 @@ import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SequenceBuilder;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.PackedSymbolListFactory;
 import org.biojava.bio.symbol.SimpleSymbolListFactory;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
@@ -76,11 +77,27 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
     
     private RichAnnotation notes = new SimpleRichAnnotation();
     
+    public static final int UNPACKED = 0;
+    public static final int PACKED = 1;
+    public static final int THRESHOLD_PACKED = 2;
+    
+    public static final int DEFAULT_THRESHOLD = 500;
+    
     /**
      * Creates a new instance of SimpleRichSequenceBuilder
      */
     public SimpleRichSequenceBuilder() {
+        this(UNPACKED);
+    }
+    
+    public SimpleRichSequenceBuilder(int packMode) {
+        this(packMode, DEFAULT_THRESHOLD);
+    }
+    
+    public SimpleRichSequenceBuilder(int packMode, int threshold) {
         this.reset();
+        this.packMode = packMode;
+        this.threshold = threshold;
     }
     
     /**
@@ -217,9 +234,19 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
      * {@inheritDoc}
      */
     public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length) throws IllegalAlphabetException {
-        if (this.symbols==null) this.symbols = new ChunkedSymbolListFactory(new SimpleSymbolListFactory());
+        if (this.symbols==null) {
+            if (this.packMode == UNPACKED) {
+                this.symbols = new ChunkedSymbolListFactory(new SimpleSymbolListFactory());
+            } else if (this.packMode == PACKED) {
+                this.symbols = new ChunkedSymbolListFactory(new PackedSymbolListFactory());
+            } else {
+                this.symbols = new ChunkedSymbolListFactory(new PackedSymbolListFactory(),threshold);
+            }
+        }
         this.symbols.addSymbols(alpha, syms, start, length);
     }
+    private int packMode;
+    private int threshold;
     private ChunkedSymbolListFactory symbols;
     
     /**
@@ -283,10 +310,10 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         if (taxon==null) throw new ParseException("Taxon cannot be null");
         if (this.taxon!=null){
             if(! this.taxon.equals(taxon)){
-               System.err.println(
-                       "Warning: attempted to set taxon twice with different values. Keeping first value. "+
-                       "old value (retained): "+this.taxon+" new value: "+taxon);
-              //throw new ParseException("Current BioEntry already has a taxon: "+this.taxon);
+                System.err.println(
+                        "Warning: attempted to set taxon twice with different values. Keeping first value. "+
+                        "old value (retained): "+this.taxon+" new value: "+taxon);
+                //throw new ParseException("Current BioEntry already has a taxon: "+this.taxon);
             }
             //already have that taxon don't need to set it again
             return;

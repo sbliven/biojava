@@ -31,4 +31,7 @@ import org.biojava.bio.seq.io.SequenceBuilderFactory;
  */
 
 public interface RichSequenceBuilderFactory extends SequenceBuilderFactory {
+    public final static RichSeqIOListener FACTORY = new SimpleRichSequenceBuilder(SimpleRichSequenceBuilder.UNPACKED);
+    public final static RichSeqIOListener PACKED = new SimpleRichSequenceBuilder(SimpleRichSequenceBuilder.PACKED);
+    public final static RichSeqIOListener PACKED_OPTIMAL = new SimpleRichSequenceBuilder(SimpleRichSequenceBuilder.THRESHOLD_PACKED);
 }
