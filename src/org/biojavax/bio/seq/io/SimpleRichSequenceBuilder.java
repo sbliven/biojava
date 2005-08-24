@@ -72,15 +72,30 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  * Constructs BioEntry objects by listening to events.
  * @author Richard Holland
+ * @since 1.5
  */
-public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuilder {
+public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequenceBuilder {
     
     private RichAnnotation notes = new SimpleRichAnnotation();
     
+    /**
+     * Constant for unpacked packing mode (no packing)
+     */
     public static final int UNPACKED = 0;
+    /**
+     * Constant for packed packing mode.
+     */
     public static final int PACKED = 1;
+    /**
+     * Constant for a packing mode were sequences are packed if they 
+     * exceed a threshold value.
+     */
     public static final int THRESHOLD_PACKED = 2;
     
+    /**
+     * Default threshold value for the <code>THRESHOLD_PACKED</code>
+     * mode. This is 500 residues.
+     */
     public static final int DEFAULT_THRESHOLD = 500;
     
     /**
@@ -90,10 +105,23 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
         this(UNPACKED);
     }
     
+    /**
+     * Creates a new instance of SimpleRichSequenceBuilder
+     * with the defined packing mode
+     * @param packMode The desired packing mode
+     */
     public SimpleRichSequenceBuilder(int packMode) {
         this(packMode, DEFAULT_THRESHOLD);
     }
     
+    /**
+     * Creates a new instance of SimpleRichSequenceBuilder with the
+     * desired packing mode and threshold
+     * @param packMode the desired packing mode
+     * @param threshold the threshold at which sequences should be packed.
+     * This will be ignored if the packMode is not some
+     * type of threshold packing mode.
+     */
     public SimpleRichSequenceBuilder(int packMode, int threshold) {
         this.reset();
         this.packMode = packMode;
@@ -150,6 +178,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
     
     /**
      * {@inheritDoc}
+     * @throws ParseException always. This method is no longer supported.
      */
     public void setURI(String uri) throws ParseException {
         throw new ParseException("We don't understand URIs");
@@ -297,7 +326,9 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,SequenceBuil
     private List featureStack = new ArrayList();
     private int featureRank = 0;
     
-    
+    /**
+     * {@inheritDoc}
+     */ 
     public RichFeature getCurrentFeature() throws ParseException {
         if (this.featureStack.size()==0) throw new ParseException("Not currently within a feature");
         else return (RichFeature)this.featureStack.get(this.featureStack.size()-1);

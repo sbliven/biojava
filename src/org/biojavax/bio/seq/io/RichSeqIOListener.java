@@ -217,9 +217,31 @@ public interface RichSeqIOListener extends SeqIOListener {
      */
     public void setRankedCrossRef(RankedCrossRef crossRef) throws ParseException;
     
+    /**
+     * {@inheritDoc}
+     * @deprecated There is no clear mapping between URI and BioSQL. This
+     *  method is no longer used or supported in biojavax. Don't use it. Calling
+     *  it may result in exceptions. Use instead <code>setName(String name),
+     *  setAccession(String accession), setVersion(int version)</code> etc as
+     *  appropriate.
+     */
+    public void setURI(String uri) throws ParseException;
+    
+    /**
+     * Gets the feature currently being created.
+     * @return the feature under construction.
+     * @throws ParseException if a feature is not currently being created.
+     */ 
     public RichFeature getCurrentFeature() throws ParseException;
     
+    /**
+     * Defined this sequence being parser as circular. It is best to call this
+     * as early as possible during parsing. It should definitely be called
+     * before doing anything with locations or features.
+     * @throws org.biojava.bio.seq.io.ParseException If the Listener cannot understand the event, is unable
+     * to deal with the event or is not expecting the event.
+     * @param circular set this to true if you want it to be circular.
+     */ 
     public void setCircular(boolean circular) throws ParseException;
     
-    public RichSequence makeRichSequence() throws BioException;
 }
