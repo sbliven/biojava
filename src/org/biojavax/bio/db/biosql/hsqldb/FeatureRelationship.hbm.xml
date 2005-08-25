@@ -5,14 +5,14 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.bio.SimpleBioEntryRelationship" table="bioentry_relationship" node="sequenceRelation" entity-name="BioEntryRelationship">
+    <class name="org.biojavax.bio.seq.SimpleRichFeatureRelationship" table="seqfeature_relationship" node="featureRelation" entity-name="FeatureRelationship">
 
-        <id name="id" type="integer" unsaved-value="null" column="bioentry_relationship_id" node="@id">
+        <id name="id" type="integer" unsaved-value="null" column="seqfeature_relationship_id" node="@id">
             <generator class="identity"/>
         </id>
 
         <many-to-one name="term" class="Term" column="term_id" not-null="true" cascade="persist,merge,save-update" node="@termId" embed-xml="false"/>
-        <many-to-one name="subject" class="BioEntry" column="subject_bioentry_id" not-null="true" cascade="persist,merge,save-update" node="@subjectBioEntryId" embed-xml="false"/>
+        <many-to-one name="subject" class="Feature" column="subject_seqfeature_id" not-null="true" cascade="persist,merge,save-update" node="@subjectFeatureId" embed-xml="false"/>
         <property name="rank" node="@rank"/>
         
     </class>

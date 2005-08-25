@@ -5,15 +5,15 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.bio.SimpleBioEntryRelationship" table="bioentry_relationship">
+    <class name="org.biojavax.bio.SimpleBioEntryRelationship" table="bioentry_relationship" node="sequenceRelation" entity-name="BioEntryRelationship">
 
-        <id name="id" type="integer" unsaved-value="null" column="bioentry_relationship_id">
+        <id name="id" type="integer" unsaved-value="null" column="bioentry_relationship_id" node="@id">
             <generator class="identity"/>
         </id>
 
-        <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" column="term_id" not-null="true" cascade="persist,merge,save-update"/>
-        <many-to-one name="subject" class="org.biojavax.bio.SimpleBioEntry" column="subject_bioentry_id" not-null="true" cascade="persist,merge,save-update"/>
-        <property name="rank"/>
+        <many-to-one name="term" class="Term" column="term_id" not-null="true" cascade="persist,merge,save-update" node="@termId" embed-xml="false"/>
+        <many-to-one name="subject" class="BioEntry" column="subject_bioentry_id" not-null="true" cascade="persist,merge,save-update" node="@subjectBioEntryId" embed-xml="false"/>
+        <property name="rank" node="@rank"/>
         
     </class>
 

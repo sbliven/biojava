@@ -5,17 +5,17 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.SimpleNamespace" table="biodatabase">
+    <class name="org.biojavax.SimpleNamespace" table="biodatabase" node="namespace" entity-name="Namespace">
 
-        <id name="id" type="integer" unsaved-value="null" column="biodatabase_id">
+        <id name="id" type="integer" unsaved-value="null" column="biodatabase_id" node="@id">
             <generator class="identity"/>
         </id>
 
-        <property name="name"/>
-        <property name="authority"/>
+        <property name="name" node="@name"/>
+        <property name="authority" node="@authority"/>
         <property name="description"/>
-        <property name="acronym"/>
-        <property name="URIString" column="uri"/>
+        <property name="acronym" node="@acronym"/>
+        <property name="URIString" column="uri" node="uri"/>
 
     </class>
 

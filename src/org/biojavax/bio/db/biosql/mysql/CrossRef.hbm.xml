@@ -5,21 +5,21 @@
 
 <hibernate-mapping>
 
-    <class name="org.biojavax.SimpleCrossRef" table="dbxref">
+    <class name="org.biojavax.SimpleCrossRef" table="dbxref" node="crossref" entity-name="CrossRef">
 
-        <id name="id" type="integer" unsaved-value="null" column="dbxref_id">
+        <id name="id" type="integer" unsaved-value="null" column="dbxref_id" node="@id">
             <generator class="identity"/>
         </id>
 
-        <property name="dbname"/>
-        <property name="accession"/>
-        <property name="version"/>
+        <property name="dbname" node="@db"/>
+        <property name="accession" node="@accession"/>
+        <property name="version" node="@version"/>
         <set name="noteSet" table="dbxref_qualifier_value" lazy="false" sort="natural">
             <key column="dbxref_id" not-null="true"/>
-            <composite-element class="org.biojavax.SimpleNote">
-                <many-to-one name="term" class="org.biojavax.ontology.SimpleComparableTerm" column="term_id" not-null="true" cascade="persist,merge,save-update"/>
+            <composite-element class="org.biojavax.SimpleNote" node="note">
+                <many-to-one name="term" class="Term" column="term_id" not-null="true" cascade="persist,merge,save-update" node="@termId" embed-xml="false"/>
                 <property name="value"/>
-                <property name="rank"/>
+                <property name="rank" node="@rank"/>
             </composite-element>
         </set>        
         

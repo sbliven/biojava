@@ -71,15 +71,15 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
         Object o = super.buildObject(clazz, params);
         String queryText;
         if (o instanceof SimpleNamespace) {
-            queryText = "from SimpleNamespace as ns where ns.name = ?";
+            queryText = "from Namespace as ns where ns.name = ?";
         } else if (o instanceof SimpleComparableOntology) {
-            queryText = "from SimpleComparableOntology as o where o.name = ?";
+            queryText = "from Ontology as o where o.name = ?";
         } else if (o instanceof SimpleNCBITaxon) {
-            queryText = "from SimpleNCBITaxon as o where o.NCBITaxID = ?";
+            queryText = "from Taxon as o where o.NCBITaxID = ?";
         } else if (o instanceof SimpleCrossRef) {
-            queryText = "from SimpleCrossRef as cr where cr.dbname = ? and cr.accession = ?";
+            queryText = "from CrossRef as cr where cr.dbname = ? and cr.accession = ?";
         } else if (o instanceof SimpleDocRef) {
-            queryText = "from SimpleDocRef as cr where cr.authors = ? and cr.location = ?";
+            queryText = "from DocRef as cr where cr.authors = ? and cr.location = ?";
         } else throw new IllegalArgumentException("Don't know how to handle objects of type "+clazz);
         try {
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});

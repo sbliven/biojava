@@ -22,18 +22,18 @@
 
         <!-- Mapping files -->
         <mapping resource="Namespace.hbm.xml"/>
-        <mapping resource="NCBITaxon.hbm.xml"/>
-        <mapping resource="ComparableOntology.hbm.xml"/>
-        <mapping resource="ComparableTerm.hbm.xml"/>
-        <mapping resource="ComparableTriple.hbm.xml"/>
+        <mapping resource="Taxon.hbm.xml"/>
+        <mapping resource="Ontology.hbm.xml"/>
+        <mapping resource="Term.hbm.xml"/>
+        <mapping resource="Triple.hbm.xml"/>
         <mapping resource="BioEntry.hbm.xml"/>
-        <mapping resource="BioEntryComment.hbm.xml"/>
+        <mapping resource="Comment.hbm.xml"/>
         <mapping resource="BioEntryRelationship.hbm.xml"/>
         <mapping resource="CrossRef.hbm.xml"/>
-        <mapping resource="DocumentReference.hbm.xml"/>
-        <mapping resource="RichFeature.hbm.xml"/>
-        <mapping resource="RichFeatureRelationship.hbm.xml"/>
-        <mapping resource="RichLocation.hbm.xml"/>
+        <mapping resource="DocRef.hbm.xml"/>
+        <mapping resource="Feature.hbm.xml"/>
+        <mapping resource="FeatureRelationship.hbm.xml"/>
+        <mapping resource="Location.hbm.xml"/>
 
     </session-factory>
 
