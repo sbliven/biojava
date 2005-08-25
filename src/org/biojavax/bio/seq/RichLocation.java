@@ -116,11 +116,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
     public int getCircularLength();
     
     public void setCircularLength(int sourceSeqLength) throws ChangeVetoException;
-    
-    public boolean isAdjacent(RichLocation loc);
-    
-    public boolean fromSingleSource();
-    
+        
     public static final RichLocation EMPTY_LOCATION = new EmptyRichLocation();
     
     public static class Strand implements Comparable {
@@ -222,14 +218,39 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
         }
         
         public static int[] modulateCircularLocation(int start, int end, int seqLength) {
+            // Dummy case
+            if (seqLength==0) return new int[]{start,end};
+            // Modulate.
             while (end<start) end+=seqLength;
             int locationLength = end-start;
             while (start>=seqLength) start-=seqLength;
             end = start+locationLength;
-            return new int[]{start,end,locationLength+1};
+            return new int[]{start,end};
+        }
+        
+        public static int[] modulateCircularLocationPair(Location a, Location b, int seqLength) {
+            // Dummy case
+            if (seqLength==0) return new int[]{a.getMin(),a.getMax(),b.getMin(),b.getMax()};
+            // Modulate our start/end to shortest possible equivalent region
+            int[] aParts = modulateCircularLocation(a.getMin(), a.getMax(), seqLength);
+            int aStart = aParts[0];
+            int aEnd = aParts[1];
+            // Modulate their start/end to shortest possible equivalent region
+            int[] bParts = modulateCircularLocation(b.getMin(), b.getMax(), seqLength);
+            int bStart = bParts[0];
+            int bEnd = bParts[1];
+            // If we wrap and the point we are checking for is before our start, increment it by circularLength length
+            if (aEnd>seqLength && bStart<aStart) {
+                bStart+=seqLength;
+                bEnd+=seqLength;
+            }
+            return new int[] {aStart,aEnd,bStart,bEnd};
         }
         
         public static int modulateCircularIndex(int index, int seqLength) {
+            // Dummy case
+            if (seqLength==0) return index;
+            // Modulate
             while (index>seqLength) index-=seqLength;
             return index;
         }

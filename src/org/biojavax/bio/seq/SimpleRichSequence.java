@@ -167,7 +167,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
                 int[] modLocation = RichLocation.Tools.modulateCircularLocation(start,end,this.length());
                 int modStart = modLocation[0];
                 int modEnd = modLocation[1];
-                int modLength = modLocation[2];
+                int modLength = (modEnd - modStart)+1;
                 int seqLength = this.length();
                 if (modStart==0) modStart = seqLength;
                 if (modEnd==0) modEnd = seqLength;

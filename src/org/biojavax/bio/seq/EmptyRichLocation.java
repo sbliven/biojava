@@ -163,19 +163,7 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      * @return true (always)
      */
     public boolean isContiguous() { return true; }
-    
-    /**
-     * {@inheritDoc}
-     * @return true if other location is also empty, false otherwise
-     */
-    public boolean isAdjacent(RichLocation loc) {  return (loc instanceof EmptyRichLocation); }
-    
-    /**
-     * {@inheritDoc}
-     * @return true (always)
-     */
-    public boolean fromSingleSource() { return true; }
-    
+        
     /**
      * {@inheritDoc}
      * @return false (always)

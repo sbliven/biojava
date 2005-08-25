@@ -80,7 +80,6 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     private ComparableTerm term;
     private Collection members;
-    private boolean singleSource;
     
     CompoundRichLocation(Collection members) {
         this(getJoinTerm(), members);
@@ -99,19 +98,13 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
         this.term = term;
         this.members = new ArrayList();
         
-        Set sources = new HashSet();
         for (Iterator i = members.iterator(); i.hasNext(); ) {
             // Convert the object into a RichLocation
             Object o = i.next();
             if (!(o instanceof RichLocation)) o = RichLocation.Tools.enrich((Location)o);
             // Add in member
             this.members.add(o);
-            // Tally the source
-            CrossRef cr = ((RichLocation)o).getCrossRef();
-            if (cr!=null) sources.add(cr);
         }
-        // Count total sources
-        this.singleSource = (sources.size()<=1);
     }
     
     /**
@@ -217,25 +210,9 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     /**
      * {@inheritDoc}
+     * Always returns false, else it wouldn't be a compound location would it.
      */
-    public boolean isContiguous() { return this.members.size()==1; }
-    
-    /**
-     * {@inheritDoc}
-     * Returns true if any of the member locations is adjacent to the query location.
-     */
-    public boolean isAdjacent(RichLocation loc) {
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) {
-            RichLocation rl = (RichLocation)i.next();
-            if (rl.isAdjacent(loc)) return true;
-        }
-        return false;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean fromSingleSource() { return this.singleSource; }
+    public boolean isContiguous() { return false; }
     
     /**
      * {@inheritDoc}
@@ -338,10 +315,12 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     /**
      * {@inheritDoc}
+     * This function concatenates the symbols of all its child locations. Note that
+     * if it is made up of overlapping sections, the results may not be any use.
      */
     public SymbolList symbols(SymbolList seq) {
         if (seq==null) throw new IllegalArgumentException("Sequence cannot be null");
-        
+
         List res = new ArrayList();
         for (Iterator i = this.members.iterator(); i.hasNext(); ) {
             RichLocation l = (RichLocation) i.next();
