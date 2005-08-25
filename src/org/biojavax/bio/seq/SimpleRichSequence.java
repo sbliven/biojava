@@ -164,39 +164,52 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     public SymbolList subList(int start, int end) throws IndexOutOfBoundsException {
         if (this.getCircular()) {
             try {
-                int modStart = RichLocation.Tools.modulateCircularIndex(start,this.length());
-                int modEnd = RichLocation.Tools.modulateCircularIndex(end,this.length());
-                int modLength = (Math.max(start,end)-Math.min(start,end))+1;
+                int[] modLocation = RichLocation.Tools.modulateCircularLocation(start,end,this.length());
+                int modStart = modLocation[0];
+                int modEnd = modLocation[1];
+                int modLength = modLocation[2];
                 int seqLength = this.length();
-                // Use the optimal packed symbol factory
-                ChunkedSymbolListFactory symsf = new ChunkedSymbolListFactory(new PackedSymbolListFactory(),SimpleRichSequenceBuilder.DEFAULT_THRESHOLD);
-                int symPos = 0;
-                if (start > end) {
-                    // initial chunk is modStart->seqLength
-                    int chunkLength = (seqLength-modStart)+1;
+                if (modStart==0) modStart = seqLength;
+                if (modEnd==0) modEnd = seqLength;
+                // Use the packed symbol factory
+                ChunkedSymbolListFactory symsf = new ChunkedSymbolListFactory(new PackedSymbolListFactory());
+                
+                if (modEnd>seqLength) {
+                    int remaining = modLength;
+                    int chunkSize = (seqLength-modStart)+1;
+                    //   add modStart -> seqLength
                     symsf.addSymbols(
                             this.getAlphabet(),
                             (Symbol[])this.symList.subList(modStart,seqLength).toList().toArray(new Symbol[0]),
-                            symPos,
-                            chunkLength);
-                    symPos += chunkLength;
+                            0,
+                            chunkSize);
+                    remaining -= chunkSize;
+                    //   repeat add seqLength
+                    while (remaining > seqLength) {
+                        chunkSize = seqLength;
+                        symsf.addSymbols(
+                                this.getAlphabet(),
+                                (Symbol[])this.symList.subList(1,seqLength).toList().toArray(new Symbol[0]),
+                                0,
+                                chunkSize);
+                        remaining -= chunkSize;
+                    }
+                    //   add 0 -> remaining
+                    chunkSize = remaining;
+                    symsf.addSymbols(
+                            this.getAlphabet(),
+                            (Symbol[])this.symList.subList(1,chunkSize).toList().toArray(new Symbol[0]),
+                            0,
+                            chunkSize);
                 } else {
-                    // initial chunk is empty
-                }
-                while (symPos < modLength) {
-                    int remainingLength = modLength - symPos;
-                    if (remainingLength > seqLength) symsf.addSymbols(
+                    //   add modStart->modEnd
+                    symsf.addSymbols(
                             this.getAlphabet(),
-                            (Symbol[])this.symList.toList().toArray(new Symbol[0]),
+                            (Symbol[])this.symList.subList(modStart,modEnd).toList().toArray(new Symbol[0]),
                             0,
-                            seqLength);
-                    else symsf.addSymbols(
-                            this.getAlphabet(),
-                            (Symbol[])this.symList.toList().toArray(new Symbol[0]),
-                            0,
-                            modEnd);
-                    symPos+=seqLength;
+                            modLength);
                 }
+                
                 return symsf.makeSymbolList();
             } catch (IllegalAlphabetException e) {
                 throw new RuntimeException("Don't understand our own alphabet?",e);

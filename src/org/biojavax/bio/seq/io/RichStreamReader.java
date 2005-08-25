@@ -110,7 +110,7 @@ public class RichStreamReader implements RichSequenceIterator {
         if(!moreSequenceAvailable)
             throw new NoSuchElementException("Stream is empty");
         try {
-            RichSeqIOListener builder = (RichSeqIOListener)sf.makeSequenceBuilder();
+            RichSequenceBuilder builder = (RichSequenceBuilder)sf.makeSequenceBuilder();
             moreSequenceAvailable = format.readRichSequence(reader, symParser, builder, ns);
             return builder.makeRichSequence();
         } catch (Exception e) {

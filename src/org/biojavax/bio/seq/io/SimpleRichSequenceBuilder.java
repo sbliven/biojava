@@ -40,13 +40,12 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.io.ChunkedSymbolListFactory;
 import org.biojava.bio.seq.io.ParseException;
-import org.biojava.bio.seq.io.SequenceBuilder;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.PackedSymbolListFactory;
 import org.biojava.bio.symbol.SimpleSymbolListFactory;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolListFactory;
 import org.biojava.ontology.InvalidTermException;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
@@ -79,52 +78,33 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequence
     private RichAnnotation notes = new SimpleRichAnnotation();
     
     /**
-     * Constant for unpacked packing mode (no packing)
-     */
-    public static final int UNPACKED = 0;
-    /**
-     * Constant for packed packing mode.
-     */
-    public static final int PACKED = 1;
-    /**
-     * Constant for a packing mode were sequences are packed if they 
-     * exceed a threshold value.
-     */
-    public static final int THRESHOLD_PACKED = 2;
-    
-    /**
-     * Default threshold value for the <code>THRESHOLD_PACKED</code>
-     * mode. This is 500 residues.
-     */
-    public static final int DEFAULT_THRESHOLD = 500;
-    
-    /**
      * Creates a new instance of SimpleRichSequenceBuilder
      */
     public SimpleRichSequenceBuilder() {
-        this(UNPACKED);
+        this(new SimpleSymbolListFactory(),0);
     }
-    
+        
     /**
-     * Creates a new instance of SimpleRichSequenceBuilder
-     * with the defined packing mode
-     * @param packMode The desired packing mode
+     * Creates a new instance of SimpleRichSequenceBuilder with the
+     * desired symbollistfactory and threshold
+     * @param factory the symbollistfactory to use from the start.
      */
-    public SimpleRichSequenceBuilder(int packMode) {
-        this(packMode, DEFAULT_THRESHOLD);
+    public SimpleRichSequenceBuilder(SymbolListFactory factory) {
+        this(factory,0);
     }
     
     /**
      * Creates a new instance of SimpleRichSequenceBuilder with the
-     * desired packing mode and threshold
-     * @param packMode the desired packing mode
-     * @param threshold the threshold at which sequences should be packed.
+     * desired symbollistfactory and threshold
+     * @param factory the symbollistfactory to use.
+     * @param threshold the threshold at which the specified symbollistfactory
+     * should come into use. If <=0, it will be used from the start.
      * This will be ignored if the packMode is not some
      * type of threshold packing mode.
      */
-    public SimpleRichSequenceBuilder(int packMode, int threshold) {
+    public SimpleRichSequenceBuilder(SymbolListFactory factory, int threshold) {
         this.reset();
-        this.packMode = packMode;
+        this.factory = factory;
         this.threshold = threshold;
     }
     
@@ -264,17 +244,15 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequence
      */
     public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length) throws IllegalAlphabetException {
         if (this.symbols==null) {
-            if (this.packMode == UNPACKED) {
-                this.symbols = new ChunkedSymbolListFactory(new SimpleSymbolListFactory());
-            } else if (this.packMode == PACKED) {
-                this.symbols = new ChunkedSymbolListFactory(new PackedSymbolListFactory());
+            if (threshold<=0) {
+                this.symbols = new ChunkedSymbolListFactory(this.factory);
             } else {
-                this.symbols = new ChunkedSymbolListFactory(new PackedSymbolListFactory(),threshold);
+                this.symbols = new ChunkedSymbolListFactory(this.factory,threshold);
             }
         }
         this.symbols.addSymbols(alpha, syms, start, length);
     }
-    private int packMode;
+    private SymbolListFactory factory;
     private int threshold;
     private ChunkedSymbolListFactory symbols;
     

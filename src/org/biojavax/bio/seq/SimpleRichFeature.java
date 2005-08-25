@@ -26,8 +26,7 @@
  */
 
 package org.biojavax.bio.seq;
-
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -146,27 +145,16 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     
     // Hibernate use only
     private Set getLocationSet() {
-        Set newlocs = this.flattenLocation(this.location);
+        Collection newlocs = RichLocation.Tools.flatten(this.location);
         this.locsSet.retainAll(newlocs); // clear out forgotten ones
         this.locsSet.addAll(newlocs); // add in new ones
         return this.locsSet; // original for Hibernate purposes
     }
     
-    private Set flattenLocation(RichLocation l) {
-        if (l instanceof CompoundRichLocation) {
-            Set s = new TreeSet();
-            for (Iterator i = l.blockIterator(); i.hasNext(); ) s.addAll(this.flattenLocation((RichLocation)i.next()));
-            return s;
-        } else if (l instanceof SimpleRichLocation) return Collections.singleton(l);
-        else return Collections.EMPTY_SET;
-    }
-    
     // Hibernate use only
     private void setLocationSet(Set locs) throws ChangeVetoException {
         this.locsSet = locs; // original kept for Hibernate purposes
-        if (locs.size()==0) this.location = RichLocation.EMPTY_LOCATION;
-        else if (locs.size()==1) this.location = (SimpleRichLocation)locs.toArray(new SimpleRichLocation[1])[0];
-        else this.location = new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),locs);
+        this.location = RichLocation.Tools.construct(RichLocation.Tools.merge(locs));
     }
     private Set locsSet = new TreeSet();
     

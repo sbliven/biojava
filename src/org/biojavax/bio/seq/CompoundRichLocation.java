@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
@@ -81,59 +82,35 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     private Collection members;
     private boolean singleSource;
     
+    CompoundRichLocation(Collection members) {
+        this(getJoinTerm(), members);
+    }
+    
     /**
      * Creates a new instance of SimpleRichSequenceLocation.
      * @param term such as the <code>JOIN_TERM</code> or the <code>ORDER_TERM</code>
      * @param members a collection of <code>RichLocations</code> that make up
      * this location.
      */
-    public CompoundRichLocation(ComparableTerm term, Collection members) {
-        // TODO - when circular and unions etc. done properly, change default flag to false
-        this(term,members,true);
-    }
-    
-    public CompoundRichLocation(ComparableTerm term, Collection members, boolean doNotMerge) {
+    CompoundRichLocation(ComparableTerm term, Collection members) {
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        if (members==null) throw new IllegalArgumentException("Members cannot be null");
+        if (members==null || members.size()<2) throw new IllegalArgumentException("Must have at least two members");
         
         this.term = term;
+        this.members = new ArrayList();
         
         Set sources = new HashSet();
-        
-        if (doNotMerge) {
-            this.members = new ArrayList();
-            for (Iterator i = members.iterator(); i.hasNext(); ) {
-                // Convert the object into a RichLocation
-                Object o = i.next();
-                if (!(o instanceof RichLocation)) o = RichLocation.Tools.enrich((Location)o);
-                // Count the crossrefs
-                CrossRef cr = ((RichLocation)o).getCrossRef();
-                if (cr!=null) sources.add(cr);
-                // Add in member
-                this.members.add(o);
-            }
-        } else {
-            this.members = Collections.emptyList(); // for temporary use
-            Location mergedLocation = null;
-            for (Iterator i = members.iterator(); i.hasNext(); ) {
-                // Convert the object into a RichLocation
-                Object o = i.next();
-                if (!(o instanceof RichLocation)) o = RichLocation.Tools.enrich((Location)o);
-                // Count the crossrefs
-                CrossRef cr = ((RichLocation)o).getCrossRef();
-                if (cr!=null) sources.add(cr);
-                // Merge using the union operation
-                mergedLocation = this.union((Location)o);
-            }
-            // Assign merged members to ourselves
-            if (mergedLocation instanceof CompoundRichLocation) {
-                // steal their members!
-                this.members = new ArrayList(((CompoundRichLocation)mergedLocation).members);
-            } else {
-                this.members = Collections.singleton(mergedLocation);
-            }
+        for (Iterator i = members.iterator(); i.hasNext(); ) {
+            // Convert the object into a RichLocation
+            Object o = i.next();
+            if (!(o instanceof RichLocation)) o = RichLocation.Tools.enrich((Location)o);
+            // Add in member
+            this.members.add(o);
+            // Tally the source
+            CrossRef cr = ((RichLocation)o).getCrossRef();
+            if (cr!=null) sources.add(cr);
         }
-        // Count sources
+        // Count total sources
         this.singleSource = (sources.size()<=1);
     }
     
@@ -189,12 +166,12 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     /**
      * {@inheritDoc}
      */
-    public boolean getCircular() { return false; }
+    public int getCircularLength() { return 0; }
     
     /**
      * {@inheritDoc}
      */
-    public void setCircular(boolean circular) throws ChangeVetoException {
+    public void setCircularLength(int sourceSeqLength) throws ChangeVetoException {
         throw new ChangeVetoException("CompoundRichLocations cannot be circular");
     }
     
@@ -225,9 +202,9 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      */
     public int getMin() { return 0; }
     
-    public Position getMinPosition() { return new SimplePosition(false,false,0); }
+    public Position getMinPosition() { return Position.EMPTY_POSITION; }
     
-    public Position getMaxPosition() { return new SimplePosition(false,false,0); }
+    public Position getMaxPosition() { return Position.EMPTY_POSITION; }
     
     public void setPositionResolver(PositionResolver p) {
         for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setPositionResolver(p);
@@ -241,7 +218,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     /**
      * {@inheritDoc}
      */
-    public boolean isContiguous() { return this.members.size()<=1; }
+    public boolean isContiguous() { return this.members.size()==1; }
     
     /**
      * {@inheritDoc}
@@ -288,7 +265,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
             RichLocation rl = (RichLocation)i.next();
             newmembers.add(rl.translate(dist));
         }
-        return new CompoundRichLocation(getJoinTerm(),newmembers);
+        return new CompoundRichLocation(this.term,newmembers);
     }
     
     /**
@@ -323,27 +300,13 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      * {@inheritDoc}
      */
     public Location union(Location l) {
-        if (this.members.isEmpty()) return l; // Simple case for constructor use
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        if (l instanceof EmptyRichLocation) {
-            return l.union(this); // let them do the hard work!
-        } else {
-            if (l instanceof CompoundRichLocation) {
-                // Compound vs. Compound
-                Location result = this;
-                for (Iterator i = l.blockIterator(); i.hasNext(); ) {
-                    // Do a simple union on each member in turn!
-                    result = result.union((Location)i.next());
-                }
-                return result;
-            } else {
-                // TODO - Compound vs. simple (possibly circular)
-                // Delete from here on in this clause when above is complete.
-                List newmembers = new ArrayList();
-                newmembers.addAll(this.members);
-                newmembers.add(l);
-                return new CompoundRichLocation(getJoinTerm(),newmembers,true);
-            }
+        if (l instanceof EmptyRichLocation) return this;
+        else {
+            List members = new ArrayList();
+            members.addAll(RichLocation.Tools.flatten(this));
+            members.addAll(RichLocation.Tools.flatten((RichLocation)l));
+            return RichLocation.Tools.construct(RichLocation.Tools.merge(members));
         }
     }
     
@@ -352,23 +315,24 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      */
     public Location intersection(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        if (l instanceof EmptyRichLocation) {
-            return l.intersection(this); // let them do the hard work!
-        } else {
-            if (!this.overlaps(l)) return RichLocation.EMPTY_LOCATION;
-            if (l instanceof CompoundRichLocation) {
-                // TODO - Compound vs. compound
-            } else {
-                // TODO - Compound vs. simple (possibly circular)
-            }
-            // Delete from here on when above is complete.
-            List newmembers = new ArrayList();
+        if (l instanceof EmptyRichLocation) return l;
+        else if (l instanceof SimpleRichLocation) {
+            // Simple vs. ourselves
+            Set results = new TreeSet();
             for (Iterator i = this.members.iterator(); i.hasNext(); ) {
-                RichLocation rl = (RichLocation)i.next();
-                if (rl.overlaps(l)) newmembers.add(rl.intersection(l));
+                RichLocation member = (RichLocation)i.next();
+                results.add(member.intersection(l));
             }
-            if (newmembers.size()>1) return new CompoundRichLocation(getJoinTerm(),newmembers,true);
-            else return (RichLocation)newmembers.get(0);
+            return RichLocation.Tools.construct(RichLocation.Tools.merge(results));
+        } else {
+            Collection theirMembers = RichLocation.Tools.flatten((RichLocation)l);
+            // for each of their members, record intersection results
+            Set results = new TreeSet();
+            for (Iterator i = theirMembers.iterator(); i.hasNext(); ) {
+                RichLocation member = (RichLocation)i.next();
+                results.add(this.intersection(member));
+            }
+            return RichLocation.Tools.construct(RichLocation.Tools.merge(results));
         }
     }
     

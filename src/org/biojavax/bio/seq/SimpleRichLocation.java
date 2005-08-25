@@ -27,6 +27,7 @@
 
 package org.biojavax.bio.seq;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -69,7 +70,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private PositionResolver pr = RichObjectFactory.getDefaultPositionResolver();
     private Strand strand;
     private int rank;
-    private boolean circular = false;
+    private int circular = 0;
     
     /**
      * Creates a new instance of SimpleRichSequenceLocation.
@@ -201,20 +202,20 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public boolean getCircular() { return this.circular; }
+    public int getCircularLength() { return this.circular; }
     
     /**
      * {@inheritDoc}
      */
-    public void setCircular(boolean circular) throws ChangeVetoException {
+    public void setCircularLength(int sourceSeqLength) throws ChangeVetoException {
         if(!this.hasListeners(RichLocation.CIRCULAR)) {
             this.circular = circular;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     RichLocation.CIRCULAR,
-                    new Boolean(circular),
-                    new Boolean(this.circular)
+                    new Integer(circular),
+                    new Integer(this.circular)
                     );
             ChangeSupport cs = this.getChangeSupport(RichLocation.CIRCULAR);
             synchronized(cs) {
@@ -302,16 +303,16 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * {@inheritDoc}
      */
     public boolean isAdjacent(RichLocation loc) {
-        if (loc instanceof CompoundRichLocation || loc instanceof EmptyRichLocation) {
-            return loc.isAdjacent(this); // let them do the hard work!
-        } else {
+        if (loc instanceof EmptyRichLocation) return false;
+        else if (loc instanceof SimpleRichLocation) {
+            // Simple v. Simple - easy!
             // TODO - Deal with circular locations
             // Delete from here on in this clause when above is complete.
             // Now we just have to do Simple->Simple comparisons
             // Adjacent is defined as being next to another sequence, but not overlapping.
             // ie. startB=endA+1 or startA=endB+1
             return (this.getMin()==loc.getMax()+1 || loc.getMin()==this.getMax()+1);
-        }
+        } else return loc.isAdjacent(this); // delegate the hard work
     }
     
     /**
@@ -339,7 +340,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * {@inheritDoc}
      */
     public Location translate(int dist) {
-        return new SimpleRichLocation(this.min.translate(dist),this.max.translate(dist),0,this.strand,this.crossRef);
+        return new SimpleRichLocation(this.min.translate(dist),this.max.translate(dist),this.rank,this.strand,this.crossRef);
     }
     
     /**
@@ -349,16 +350,15 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      */
     public boolean contains(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        if (l instanceof CompoundRichLocation || l instanceof EmptyRichLocation) {
-            return l.contains(this); // let them do the hard work!
-        } else {
-            if (!this.overlaps(l)) return false; // check strand etc.
-            // Simple vs. simple
+        if (l instanceof EmptyRichLocation) return false;
+        else if (l instanceof SimpleRichLocation) {
             RichLocation rl = (RichLocation)l;
+            if (!(this.overlaps(rl) && this.getStrand().equals(rl.getStrand()))) return false; // check strand etc.
+            // Simple vs. simple
             // TODO - Deal with circular locations
             // Delete from here on in this clause when above is complete.
             return (this.getMin() <= rl.getMin() && this.getMax() >= rl.getMax());
-        }
+        } else return l.contains(this); // delegate the hard work!
     }
     
     /**
@@ -368,9 +368,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      */
     public boolean overlaps(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        if (l instanceof CompoundRichLocation || l instanceof EmptyRichLocation) {
-            return l.overlaps(this); // let them do the hard work!
-        } else {
+        if (l instanceof EmptyRichLocation) return false;
+        else if (l instanceof SimpleRichLocation) {
             // Simple vs. simple
             RichLocation rl = (RichLocation)l;
             if (rl.getCrossRef()!=null || this.crossRef!=null) {
@@ -380,8 +379,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             }
             // TODO - Deal with circular locations
             // Delete from here on when above is complete.
-            return (this.getMin()<=rl.getMax() && rl.getMax()>=this.getMin());
-        }
+            return (this.getMin()<=rl.getMax() && this.getMax()>=rl.getMin());
+        } else return l.overlaps(this); // delegate the hard work!
     }
     
     /**
@@ -392,22 +391,23 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      */
     public Location union(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        if (l instanceof CompoundRichLocation || l instanceof EmptyRichLocation) {
-            return l.union(this); // let them do the hard work!
-        } else {
+        if (l instanceof EmptyRichLocation) return this;
+        else if (l instanceof SimpleRichLocation) {
             // Simple vs. simple
             RichLocation rl = (RichLocation)l;
             if (this.overlaps(rl) && this.getStrand().equals(rl.getStrand())) {
+                // We can do the one-v-one overlapping same-strand union
                 // TODO - Deal with circular locations
                 // Delete from here on in this clause when above is complete.
                 return new SimpleRichLocation(this.posmin(this.min,rl.getMinPosition()),this.posmax(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef);
             } else {
-                List s = new ArrayList();
-                s.add(this);
-                s.add(rl);
-                return new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),s);
+                // We can do the one-v-one non-overlapping or different-strand union too
+                Collection members = new ArrayList();
+                members.add(this);
+                members.add(l);
+                return new CompoundRichLocation(members);
             }
-        }
+        } else return l.union(this); // delegate the one-v-many union job
     }
     
     /**
@@ -417,15 +417,29 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      */
     public Location intersection(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        if (l instanceof CompoundRichLocation || l instanceof EmptyRichLocation) {
-            return l.union(this); // let them do the hard work!
-        } else {
+        if (l instanceof EmptyRichLocation) return l;
+        else if (l instanceof SimpleRichLocation) {
             RichLocation rl = (RichLocation)l;
-            if (!(this.overlaps(l) && this.getStrand().equals(rl.getStrand()))) return RichLocation.EMPTY_LOCATION;
-            // TODO - Deal with circular locations
-            // Delete from here on when above is complete.
-            return new SimpleRichLocation(this.posmax(this.min,rl.getMinPosition()),this.posmin(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef);
-        }
+            if (this.overlaps(l)) {
+                if (this.getStrand().equals(rl.getStrand())) {
+                    // We can do the one-v-one same-strand overlapping intersection here
+                    // TODO - Deal with circular locations
+                    // Delete from here on when above is complete.
+                    return new SimpleRichLocation(this.posmax(this.min,rl.getMinPosition()),this.posmin(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef);
+                } else {
+                    // We can do the one-v-one different-strand overlapping intersection here
+                    // TODO - Deal with circular locations
+                    // Delete from here on when above is complete.
+                    List members = new ArrayList();
+                    members.add(new SimpleRichLocation(this.posmax(this.min,rl.getMinPosition()),this.posmin(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef));
+                    members.add(new SimpleRichLocation(this.posmax(this.min,rl.getMinPosition()),this.posmin(this.max,rl.getMaxPosition()),0,rl.getStrand(),this.crossRef));
+                    return new CompoundRichLocation(members);
+                }
+            } else {
+                // We can do the one-v-one non-overlapping intersection here
+                return RichLocation.EMPTY_LOCATION;
+            }
+        } else return l.intersection(this); // delegate the one-v-many intersection job
     }
     
     private Position posmin(Position a, Position b) {
@@ -450,7 +464,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         
         if (seq instanceof RichSequence) {
             RichSequence rs = (RichSequence)seq;
-            if (this.getCircular() && !rs.getCircular()) throw new IllegalArgumentException("Attempt to apply circular location to non-circular sequence");
+            if (this.getCircularLength()>0 && !rs.getCircular()) throw new IllegalArgumentException("Attempt to apply circular location to non-circular sequence");
         }
         
         SymbolList seq2 = seq.subList(this.getMin(),this.getMax());

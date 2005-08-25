@@ -21,6 +21,7 @@
 package org.biojavax.bio.seq.io;
 
 import org.biojava.bio.seq.io.SequenceBuilderFactory;
+import org.biojava.bio.symbol.PackedSymbolListFactory;
 
 /**
  * Simple factory for constructing new RichSequenceBuilder objects.
@@ -34,16 +35,10 @@ public interface RichSequenceBuilderFactory extends SequenceBuilderFactory {
      * Accessor for the default factory. This implementation will not 
      * do any compression of a sequence regardless of size.
      */
-    public final static RichSeqIOListener FACTORY = new SimpleRichSequenceBuilder(SimpleRichSequenceBuilder.UNPACKED);
+    public final static RichSeqIOListener FACTORY = new SimpleRichSequenceBuilder();
     /**
      * Accessor for a factory that produces builders that compress the
      * <code>SymbolList</code> of a <code>Sequence</code>
      */
-    public final static RichSeqIOListener PACKED = new SimpleRichSequenceBuilder(SimpleRichSequenceBuilder.PACKED);
-    /**
-     * Accessor for a factory that produces builders that compress the
-     * <code>SymbolList</code> of a <code>Sequence</code> when the 
-     * size of the <code>SymbolList</code> exceeds a threshold size.
-     */
-    public final static RichSeqIOListener PACKED_OPTIMAL = new SimpleRichSequenceBuilder(SimpleRichSequenceBuilder.THRESHOLD_PACKED);
+    public final static RichSeqIOListener PACKED = new SimpleRichSequenceBuilder(new PackedSymbolListFactory());
 }

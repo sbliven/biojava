@@ -26,6 +26,7 @@
  */
 package org.biojavax.bio.seq;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import org.biojava.bio.symbol.FuzzyLocation;
@@ -112,9 +113,9 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
     
     public void setPositionResolver(PositionResolver p);
     
-    public boolean getCircular();
+    public int getCircularLength();
     
-    public void setCircular(boolean circular) throws ChangeVetoException;
+    public void setCircularLength(int sourceSeqLength) throws ChangeVetoException;
     
     public boolean isAdjacent(RichLocation loc);
     
@@ -167,12 +168,72 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
     }
     
     public static class Tools {
+        
         private Tools() {}
+        
+        public static RichLocation construct(Collection members) {
+            if (members.size()==0) return RichLocation.EMPTY_LOCATION;
+            else if (members.size()==1) return ((SimpleRichLocation[])members.toArray(new SimpleRichLocation[0]))[0];
+            else return new CompoundRichLocation(members);
+        }
+        
+        public static Collection merge(Collection members) {
+            List membersList = new ArrayList(flatten(members));
+            // all members are now singles so we can use single vs single union operations
+            if (membersList.size()>1) {
+                for (int p = 0; p < (membersList.size()-1); p++) {
+                    RichLocation parent = (RichLocation)membersList.get(p);
+                    for (int c = p+1; c < membersList.size(); c++) {
+                        RichLocation child = (RichLocation)membersList.get(c);
+                        RichLocation union = (RichLocation)parent.union(child);
+                        // if parent can merge with child
+                        if (union.isContiguous()) {
+                            //      replace p with merged result
+                            membersList.set(p,union);
+                            //      remove c
+                            membersList.remove(c);
+                            //      reset c to check all children again
+                            c=p;
+                        }
+                    }
+                }
+            }
+            return membersList;
+        }
+        
+        public static Collection flatten(RichLocation location) {
+            List members = new ArrayList();
+            for (Iterator i = location.blockIterator(); i.hasNext(); ) members.add(i.next());
+            return flatten(members);
+        }
+        
+        public static Collection flatten(Collection members) {
+            List flattened = new ArrayList(members);
+            for (int i = 0; i < flattened.size(); i++) {
+                RichLocation member = (RichLocation)flattened.get(i);
+                if (!(member instanceof SimpleRichLocation)) {
+                    flattened.remove(i);
+                    int insertPos = i;
+                    for (Iterator j = member.blockIterator(); j.hasNext(); ) flattened.add(insertPos++,j.next());
+                    i--;
+                }
+            }
+            return flattened;
+        }
+        
+        public static int[] modulateCircularLocation(int start, int end, int seqLength) {
+            while (end<start) end+=seqLength;
+            int locationLength = end-start;
+            while (start>=seqLength) start-=seqLength;
+            end = start+locationLength;
+            return new int[]{start,end,locationLength+1};
+        }
+        
         public static int modulateCircularIndex(int index, int seqLength) {
             while (index>seqLength) index-=seqLength;
-            if (index==0) index = seqLength;
             return index;
         }
+        
         public static RichLocation enrich(Location l) {
             if (l instanceof RichLocation) {
                 return (RichLocation)l;
@@ -182,7 +243,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
                     Location member = (Location)i.next();
                     members.add(enrich(member));
                 }
-                return new CompoundRichLocation(CompoundRichLocation.getJoinTerm(),members);
+                return RichLocation.Tools.construct(RichLocation.Tools.merge(members));
             } else if (l instanceof FuzzyPointLocation) {
                 FuzzyPointLocation f = (FuzzyPointLocation)l;
                 Position pos = new SimplePosition(f.hasBoundedMin(),f.hasBoundedMax(),f.getMin(),f.getMax(),Position.IN_RANGE);

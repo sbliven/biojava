@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.biojava.bio.seq.io.ParseException;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
 import org.biojavax.Namespace;
 import org.biojavax.SimpleCrossRef;
@@ -178,16 +179,15 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 }
                 if (sb.length()>0) members.add(parseLocString(featureNS,featureAccession,crossRef,parentStrand,sb.toString()));
                 
-                if (members.size()>1) {
-                    // Normal case where join() or order() wrap multiple locations.
-                    return new CompoundRichLocation(groupTypeTerm, members);
-                } else if (members.size()==1) {
-                    // Dodgy case where join() or order() only wrap a single locations.
-                    return (RichLocation)members.get(0);
-                } else {
-                    // Really dodgy case with no members at all!
-                    throw new ParseException("Group found with no members. Term: "+groupType);
+                RichLocation result = RichLocation.Tools.construct(RichLocation.Tools.merge(members));
+                try {
+                    if (result instanceof CompoundRichLocation) result.setTerm(groupTypeTerm);
+                } catch (ChangeVetoException e) {
+                    ParseException e2 = new ParseException("Unable to set group term");
+                    e2.initCause(e);
+                    throw e2;
                 }
+                return result;
             }
         }
         
@@ -197,7 +197,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         String start = rm.group(1);
         String end = rm.group(3);
         
-        Position startPos = parsePosition(start);        
+        Position startPos = parsePosition(start);
         if (end==null) {
             // A point location
             return new SimpleRichLocation(startPos,startPos,rank++,strand,crossRef);

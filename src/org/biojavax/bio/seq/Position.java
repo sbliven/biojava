@@ -36,6 +36,7 @@ public interface Position {
     
     public static final String BETWEEN_BASES = "^";
     public static final String IN_RANGE = ".";
+    public static final Position EMPTY_POSITION = new SimplePosition(false,false,0);
     
     public boolean hasFuzzyStart();
     public boolean hasFuzzyEnd();

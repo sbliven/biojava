@@ -93,12 +93,12 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     /**
      * {@inheritDoc}
      */
-    public boolean getCircular() { return false; }
+    public int getCircularLength() { return 0; }
     
     /**
      * {@inheritDoc}
      */
-    public void setCircular(boolean circular) throws ChangeVetoException {
+    public void setCircularLength(int sourceSeqLength) throws ChangeVetoException {
         throw new ChangeVetoException("Cannot make empty locations circular");
     }
     
@@ -138,13 +138,13 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      * {@inheritDoc}
      * @return a <code>SimplePosition</code> based around 0
      */ 
-    public Position getMinPosition() { return new SimplePosition(false,false,0); }
+    public Position getMinPosition() { return Position.EMPTY_POSITION; }
     
     /**
      * {@inheritDoc}
      * @return a <code>SimplePosition</code> based around 0
      */ 
-    public Position getMaxPosition() { return new SimplePosition(false,false,0); }
+    public Position getMaxPosition() { return Position.EMPTY_POSITION; }
     
     /**
      * {@inheritDoc} This method is ignored in the empty location because positions
