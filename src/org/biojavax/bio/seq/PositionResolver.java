@@ -19,51 +19,95 @@
  *
  */
 
-/*
- * Position.java
- *
- * Created on July 28, 2005, 5:29 PM
- */
 package org.biojavax.bio.seq;
 
-
 /**
- * Holds enough info about positions to keep BioSQL happy if needs be.
- *
+ * Resolves a position that is fuzzy or covers a range of bases by
+ * converting it to a single base.
  * @author Richard Holland
  */
 public interface PositionResolver {
     
-    public int getMin(Position start);
+    /**
+     * Resolves the minimum possible base for this position.
+     * @param start the position to resolve
+     * @return the minimum possible base this resolver can return.
+     */
+    public int getMin(Position start);   
+    
+    /**
+     * Resolves the maximum possible base for this position. 
+     * @param end the position to resolve
+     * @return the maximum possible base this resolver can return.
+     */
     public int getMax(Position end);
     
+    /**
+     * The maximal resolver returns the base which provides the
+     * largest possible range. 
+     */
     public static class MaximalResolver implements PositionResolver {
-        // maximal range is from min(s) to max(e)
+        
+        /**
+         * {@inheritDoc}
+         * ALWAYS RETURNS s.getStart()
+         */
         public int getMin(Position s) {
             return s.getStart();
         }
+        
+        /**
+         * {@inheritDoc}
+         * ALWAYS RETURNS e.getEnd()
+         */
         public int getMax(Position e) {
             return e.getEnd();
         }
     }
-    
+        
+    /**
+     * The minimal resolver returns the base which provides the
+     * smallest possible range. 
+     */
     public static class MinimalResolver implements PositionResolver {
-        // minimal range is from max(s) to min(e)
+        
+        /**
+         * {@inheritDoc}
+         * ALWAYS RETURNS s.getEnd()
+         */
         public int getMin(Position s) {
             return s.getEnd();
         }
+        
+        /**
+         * {@inheritDoc}
+         * ALWAYS RETURNS e.getStart()
+         */
         public int getMax(Position e) {
             return e.getStart();
         }
-    }
-    
+    }    
+        
+    /**
+     * The minimal resolver returns the base which provides the
+     * average range, halfway between maximal and minimal. 
+     */
     public static class AverageResolver implements PositionResolver {
-        // average range is from avg(min(s),max(s))) to avg(min(e),max(e))
+        
+        /**
+         * {@inheritDoc}
+         * ALWAYS RETURNS s.getStart()+s.getEnd() / 2
+         */
         public int getMin(Position s) {
             int min = s.getStart();
             int max = s.getEnd();
             return (min+max) / 2;
         }
+        
+        /**
+         * {@inheritDoc}
+         * ALWAYS RETURNS e.getStart()+e.getEnd() / 2
+         */
         public int getMax(Position e) {
             int min = e.getStart();
             int max = e.getEnd();

@@ -19,34 +19,42 @@
  *
  */
 
-/*
- * SimpleRichObjectBuilder.java
- *
- * Created on August 8, 2005, 9:28 AM
- */
-
 package org.biojavax.bio.db;
 
 import java.lang.reflect.Constructor;
 
 /**
- *
+ * Creates objects and returns them.
  * @author Richard Holland
  */
 public class SimpleRichObjectBuilder implements RichObjectBuilder {
     
     /** Creates a new instance of SimpleRichObjectBuilder */
-    public SimpleRichObjectBuilder() {
-    }
+    public SimpleRichObjectBuilder() {}
     
+    /**
+     * {@inheritDoc}
+     * Instantiates and returns objects, that's all there is to it.
+     */
     public Object buildObject(Class clazz, Object[] params) {
         try {
+            // Load the class
             Class[] types = new Class[params.length];
+            // Find its constructor with given params
             for (int i = 0; i < params.length; i++) types[i] = params[i].getClass();
             Constructor c = clazz.getConstructor(types);
+            // Instantiate it with the parameters
             return c.newInstance(params);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Could not find constructor for "+clazz+"("+params+")",e);
+            StringBuffer paramsstuff = new StringBuffer();
+            paramsstuff.append(clazz);
+            paramsstuff.append("(");
+            for (int i = 0; i < params.length; i++) {
+                paramsstuff.append(params[i].toString());
+                if (i<(params.length-1)) paramsstuff.append(",");
+            }
+            paramsstuff.append(")");
+            throw new IllegalArgumentException("Could not find constructor for "+paramsstuff,e);
         }
     }
     

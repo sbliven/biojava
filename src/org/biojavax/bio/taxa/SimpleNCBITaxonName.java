@@ -19,37 +19,67 @@
  *
  */
 
-/*
- * SimpleNCBITaxonName.java
- *
- * Created on August 1, 2005, 5:08 PM
- */
-
 package org.biojavax.bio.taxa;
 
 /**
- * Hibernate requirement - not for public use.
+ * Represents a name class plus name combination for an NCBITaxon object.
  * @author Richard Holland
  */
-class SimpleNCBITaxonName implements Comparable {
+public class SimpleNCBITaxonName implements Comparable {
+    
     private String nameClass;
     private String name;
-    protected SimpleNCBITaxonName() {}
+
+    // Hibernate requirement - not for public use.
+    private SimpleNCBITaxonName() {}
+    
+    /**
+     * Creates a new taxon name based on the given class and name, both of
+     * which cannot be null.
+     * @param nameClass the class of the new name
+     * @param name the name itself
+     */
     public SimpleNCBITaxonName(String nameClass, String name) {
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
         this.nameClass = nameClass;
-        this.name = name; }
+        this.name = name; 
+    }
+    
+    /**
+     * Changes the class of this name.
+     * @param nameClass the new class for this name.
+     */
     public void setNameClass(String nameClass) { 
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
         this.nameClass = nameClass; 
     }
+    
+    /**
+     * Returns the class of this name.
+     * @return the class of this name.
+     */
     public String getNameClass() { return this.nameClass; }
+    
+    /**
+     * Changes the name.
+     * @param nameClass the new name.
+     */
     public void setName(String name) {       
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
         this.name = name; 
     }
+    
+    /**
+     * Returns this name.
+     * @return this name.
+     */
     public String getName() { return this.name; }
+    
+    /**
+     * {@inheritDoc}
+     * Two taxon names are equal if their name and class match.
+     */
     public boolean equals(Object o) {
         if (o==this) return true;
         if (!(o instanceof SimpleNCBITaxonName)) return false;
@@ -59,7 +89,12 @@ class SimpleNCBITaxonName implements Comparable {
         SimpleNCBITaxonName them = (SimpleNCBITaxonName) o;
         return them.getNameClass().equals(this.nameClass) &&
                 them.getName().equals(this.name);
-    }
+    }    
+    
+    /**
+     * {@inheritDoc}
+     * Taxon names are sorted by class first, then name.
+     */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
         if (this.nameClass==null) return -1;
@@ -68,6 +103,10 @@ class SimpleNCBITaxonName implements Comparable {
         if (!them.getNameClass().equals(this.nameClass)) return this.nameClass.compareTo(them.getNameClass());
         return this.name.compareTo(them.getName());
     }
+    
+    /**
+     * {@inheritDoc}
+     */
     public int hashCode() {
         int code = 17;
         // Hibernate comparison - we haven't been populated yet
@@ -76,5 +115,13 @@ class SimpleNCBITaxonName implements Comparable {
         code = 31*code + this.name.hashCode();
         code = 31*code + this.nameClass.hashCode();
         return code;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Form: "class:name"
+     */
+    public String toString() {
+        return this.nameClass+":"+this.name;
     }
 }

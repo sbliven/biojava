@@ -19,42 +19,40 @@
  *
  */
 
-/*
- * RichAnnotation.java
- *
- * Created on July 29, 2005, 10:18 AM
- */
-
 package org.biojavax;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.utils.ChangeVetoException;
 
-
-
 /**
- * An annotation which can have ranked terms. All keys must be
- * ComparableTerm objects, and all values must be Strings.
+ * An annotation collection which stores annotations as Note objects.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @see Note
+ * @see RichAnnotatable
  */
 public interface RichAnnotation extends Annotation {
+        
+    public static final RichAnnotation EMPTY_ANNOTATION = new EmptyRichAnnotation();
     
     /**
      * Removes all notes from this annotation object.
+     * @throws ChangeVetoException if it couldn't do it.
      */
     public void clear() throws ChangeVetoException;
     
     /**
-     * Adds a note to this annotation.
+     * Adds a note to this annotation. Must not be null.
+     * If the note is already in the annotation, nothing happens.
      * @param note note to add
      * @throws ChangeVetoException if it doesn't like this.
      */
     public void addNote(Note note) throws ChangeVetoException;
     
     /**
-     * Removes a note from this annotation.
+     * Removes a note from this annotation. Must not be null.
+     * If the note wasn't in the annotation, nothing happens.
      * @param note note to remove
      * @throws ChangeVetoException if it doesn't like this.
      */
@@ -65,7 +63,7 @@ public interface RichAnnotation extends Annotation {
      * @param note note to lookup, using term and rank.
      * @return the matching note.
      * @throws ChangeVetoException if it doesn't like this.
-     * @throws NoSuchElementException if it doesn't exist.
+     * @throws NoSuchElementException if it couldn't be found.
      */
     public Note getNote(Note note) throws NoSuchElementException;
     
@@ -80,18 +78,17 @@ public interface RichAnnotation extends Annotation {
     /**
      * Returns an immutable set of all notes in this annotation.
      * @return a set of notes.
+     * @see Note
      */
     public Set getNoteSet();
     
     /**
      * Clears the notes from this annotation and replaces them with
-     * those from the given set.
-     * @param notes notes to use from now on.
+     * those from the given set. The set cannot be null.
+     * @param notes a set of Note objects to use from now on.
      * @throws ChangeVetoException if it doesn't like any of them.
+     * @see Note
      */
-    public void setNoteSet(Set notes) throws ChangeVetoException;
-    
-    public static final RichAnnotation EMPTY_ANNOTATION = new EmptyRichAnnotation();
-    
+    public void setNoteSet(Set notes) throws ChangeVetoException;   
     
 }

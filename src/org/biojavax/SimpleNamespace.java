@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleNamespace.java
- *
- * Created on June 15, 2005, 6:04 PM
- */
-
 package org.biojavax;
 
 import java.net.URI;
@@ -36,7 +30,6 @@ import org.biojava.utils.ChangeVetoException;
 
 /**
  * A basic Namespace implemenation.
- * Equality is based on the name of the namespace.
  * @author Richard Holland
  * @author Mark Schreiber
  */
@@ -50,7 +43,8 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     private URI URI;
     
     /**
-     * Creates a new instance of SimpleNamespace
+     * Creates a new instance of SimpleNamespace with the given name,
+     * which cannot be null.
      * @param name the name of the namespace.
      */
     public SimpleNamespace(String name) {
@@ -63,7 +57,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleNamespace() {}
+    private SimpleNamespace() {}
     
     /**
      * {@inheritDoc}
@@ -131,15 +125,17 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     }
     
     // Hibernate requirement - not for public use.
-    private void setURIString(String URI) throws ChangeVetoException, URISyntaxException { 
-        if (URI!=null) this.setURI(new URI(URI)); 
+    // Converts a String object representing a URI into an actual URI object.
+    private void setURIString(String URI) throws ChangeVetoException, URISyntaxException {
+        if (URI!=null) this.setURI(new URI(URI));
         else this.URI=null;
     }
     
     // Hibernate requirement - not for public use.
-    private String getURIString() { 
+    // Converts a URI object into a String representation of that URI
+    private String getURIString() {
         if (this.URI==null) return null;
-        else return this.URI.toASCIIString(); 
+        else return this.URI.toASCIIString();
     }
     
     /**
@@ -194,6 +190,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     
     /**
      * {@inheritDoc}
+     * Namespaces are compared only by name.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -205,6 +202,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     
     /**
      * {@inheritDoc}
+     * Namespaces are equal only by name.
      */
     public boolean equals(Object obj) {
         if(this == obj) return true;
@@ -229,8 +227,11 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     
     /**
      * {@inheritDoc}
+     * Form: "name"
      */
-    public String toString() { return this.getName(); }
+    public String toString() { 
+        return this.getName(); 
+    }
     
     // Hibernate requirement - not for public use.
     private Integer id;

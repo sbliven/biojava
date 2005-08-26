@@ -34,49 +34,46 @@ import org.biojavax.Namespace;
 /**
  * Writes all of the sequences from a SequenceIterator to a stream with a
  * particular format.
- * <p>
  * This can be wired from a StreamReader to make a simple file-format conversion
  * utility, or can be used to write out the sequences in a database to disk.
- *
  * @author Matthew Pocock
  * @author Richard Holland
  */
 public class RichStreamWriter {
-  /**
-   * The format to write in.
-   */
-  private RichSequenceFormat format;
-  
-  /**
-   * The stream to write to.
-   */
-  private PrintStream os;
-
-  /**
-   * Write each of the sequences in ss to the stream in the given format.
-   *
-   * @param ss  the SequenceIterator to loop over
-   * @throws IOException if the stream has any problems
-   */
-  public void writeStream(SequenceIterator ss, Namespace ns)
-              throws IOException {
-    while(ss.hasNext()) {
-      try {
-        format.writeSequence(ss.nextSequence(), os, ns);
-      } catch (BioException se) {
-        se.printStackTrace();
-      }
+    
+    /**
+     * The format to write in.
+     */
+    private RichSequenceFormat format;
+    
+    /**
+     * The stream to write to.
+     */
+    private PrintStream os;
+    
+    /**
+     * Write each of the sequences in ss to the stream in the given format.
+     * @param ss  the SequenceIterator to loop over
+     * @throws IOException if the stream has any problems
+     */
+    public void writeStream(SequenceIterator ss, Namespace ns)
+    throws IOException {
+        while(ss.hasNext()) {
+            try {
+                format.writeSequence(ss.nextSequence(), os, ns);
+            } catch (BioException se) {
+                se.printStackTrace();
+            }
+        }
     }
-  }
-
-  /**
-   * Generate a new RichStreamWriter to the stream os and using format.
-   * 
-   * @param os  the OutputStream to write to
-   * @param format the SequenceFormat to write with
-   */
-  public RichStreamWriter(OutputStream os, RichSequenceFormat format) {
-    this.os = new PrintStream(os);
-    this.format = format;
-  }
+    
+    /**
+     * Generate a new RichStreamWriter to the stream os and using format.
+     * @param os  the OutputStream to write to
+     * @param format the SequenceFormat to write with
+     */
+    public RichStreamWriter(OutputStream os, RichSequenceFormat format) {
+        this.os = new PrintStream(os);
+        this.format = format;
+    }
 }

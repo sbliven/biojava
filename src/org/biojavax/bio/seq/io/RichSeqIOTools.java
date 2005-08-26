@@ -48,35 +48,30 @@ import org.biojavax.bio.seq.RichSequenceIterator;
 
 
 /**
- * A set of convenience methods for handling common file formats.
- *
+ * A set of convenience methods for handling common file formats. *
  * @author Thomas Down
  * @author Mark Schreiber
  * @author Nimesh Singh
  * @author Matthew Pocock
  * @author Keith James
  * @author Richard Holland
- * @since 1.1
  */
 public final class RichSeqIOTools {
+    
     private static RichSequenceBuilderFactory factory = new SimpleRichSequenceBuilderFactory();
     
-    /**
-     * This can't be instantiated.
-     */
-    private RichSeqIOTools() {
-    }
+    // This can't be instantiated.
+    private RichSeqIOTools() {}
     
     /**
      * Read a fasta file.
-     *
      * @param br    the BufferedReader to read data from
      * @param sTok  a SymbolTokenization that understands the sequences
      * @param ns    a Namespace to load the sequences into. Null implies that it should
      *              use the namespace specified in the file. If no namespace is
      *              specified in the file, then RichObjectFactory.getDefaultNamespace()
      *              is used.
-     * @return      a SequenceIterator over each sequence in the fasta file
+     * @return      a RichSequenceIterator over each sequence in the fasta file
      */
     public static RichSequenceIterator readFasta(
             BufferedReader br, SymbolTokenization sTok, Namespace ns) {
@@ -89,8 +84,8 @@ public final class RichSeqIOTools {
     
     /**
      * Read a fasta file using a custom type of SymbolList. For example,
-     * use SmartSequenceBuilder.FACTORY to emulate readFasta(BufferedReader,
-     * SymbolTokenization) and SmartSequenceBuilder.BIT_PACKED to force all
+     * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
+     * SymbolTokenization) and RichSequenceBuilderFactory.PACKED to force all
      * symbols to be encoded using bit-packing.
      * @param br the BufferedReader to read data from
      * @param sTok a SymbolTokenization that understands the sequences
@@ -99,8 +94,7 @@ public final class RichSeqIOTools {
      *              use the namespace specified in the file. If no namespace is
      *              specified in the file, then RichObjectFactory.getDefaultNamespace()
      *              is used.
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
+     * @return      a RichSequenceIterator over each sequence in the fasta file
      */
     public static RichSequenceIterator readFasta(
             BufferedReader br,
@@ -122,8 +116,7 @@ public final class RichSeqIOTools {
      *              use the namespace specified in the file. If no namespace is
      *              specified in the file, then RichObjectFactory.getDefaultNamespace()
      *              is used.
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
+     * @return      a RichSequenceIterator over each sequence in the fasta file
      */
     public static RichSequenceIterator readFastaDNA(BufferedReader br, Namespace ns) {
         return new RichStreamReader(br,
@@ -140,8 +133,7 @@ public final class RichSeqIOTools {
      *              use the namespace specified in the file. If no namespace is
      *              specified in the file, then RichObjectFactory.getDefaultNamespace()
      *              is used.
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
+     * @return      a RichSequenceIterator over each sequence in the fasta file
      */
     public static RichSequenceIterator readFastaRNA(BufferedReader br, Namespace ns) {
         return new RichStreamReader(br,
@@ -158,8 +150,7 @@ public final class RichSeqIOTools {
      *              use the namespace specified in the file. If no namespace is
      *              specified in the file, then RichObjectFactory.getDefaultNamespace()
      *              is used.
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
+     * @return      a RichSequenceIterator over each sequence in the fasta file
      */
     public static RichSequenceIterator readFastaProtein(BufferedReader br, Namespace ns) {
         return new RichStreamReader(br,
@@ -176,11 +167,10 @@ public final class RichSeqIOTools {
      * rather than a reader and returns a SequenceDB rather than a
      * SequenceIterator. If the returned DB is likely to be large then
      * the above mentioned methods should be used.
-     * @return a <code>SequenceDB</code> containing all the <code>Sequences</code>
+     * @return a SequenceDB containing all the Sequences
      * in the file.
-     * @since 1.2
      * @param seqFile The file containg the fasta formatted sequences
-     * @param alpha The <code>Alphabet</code> of the sequence, ie DNA, RNA etc
+     * @param alpha The Alphabet of the sequence, ie DNA, RNA etc
      * @param ns    a Namespace to load the sequences into. Null implies that it should
      *              use the namespace specified in the file. If no namespace is
      *              specified in the file, then RichObjectFactory.getDefaultNamespace()
@@ -210,7 +200,21 @@ public final class RichSeqIOTools {
         }
         return db;
     }
-    
+        
+    /**
+     * Read a GenBank file using a custom type of SymbolList. For example,
+     * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
+     * SymbolTokenization) and RichSequenceBuilderFactory.PACKED to force all
+     * symbols to be encoded using bit-packing.
+     * @param br the BufferedReader to read data from
+     * @param sTok a SymbolTokenization that understands the sequences
+     * @param seqFactory a factory used to build a SymbolList
+     * @param ns    a Namespace to load the sequences into. Null implies that it should
+     *              use the namespace specified in the file. If no namespace is
+     *              specified in the file, then RichObjectFactory.getDefaultNamespace()
+     *              is used.
+     * @return      a RichSequenceIterator over each sequence in the fasta file
+     */
     public static RichSequenceIterator readGenbank(
             BufferedReader br,
             SymbolTokenization sTok,
@@ -224,24 +228,32 @@ public final class RichSeqIOTools {
                 ns);
     }
     
+    /**
+     * Iterate over the sequences in an GenBank-format stream of DNA sequences.
+     * @param br the BufferedReader to read data from
+     * @param ns    a Namespace to load the sequences into. Null implies that it should
+     *              use the namespace specified in the file. If no namespace is
+     *              specified in the file, then RichObjectFactory.getDefaultNamespace()
+     *              is used.
+     * @return      a RichSequenceIterator over each sequence in the fasta file
+     */
     public static RichSequenceIterator readGenbankDNA(BufferedReader br, Namespace ns) {
         return new RichStreamReader(br,
                 new GenbankFormat(),
                 getDNAParser(),
                 factory,
                 ns);
-    }
+    }    
     
     /**
-     * Iterate over the sequences in an FASTA-format stream of RNA sequences.
+     * Iterate over the sequences in an GenBank-format stream of RNA sequences.
      * @param br the BufferedReader to read data from
      * @param ns    a Namespace to load the sequences into. Null implies that it should
      *              use the namespace specified in the file. If no namespace is
      *              specified in the file, then RichObjectFactory.getDefaultNamespace()
      *              is used.
-     * @return a <CODE>SequenceIterator</CODE> that iterates over each
-     * <CODE>Sequence</CODE> in the file
-     */
+     * @return      a RichSequenceIterator over each sequence in the fasta file
+     */  
     public static RichSequenceIterator readGenbankRNA(BufferedReader br, Namespace ns) {
         return new RichStreamReader(br,
                 new GenbankFormat(),
@@ -249,7 +261,16 @@ public final class RichSeqIOTools {
                 factory,
                 ns);
     }
-    
+        
+    /**
+     * Iterate over the sequences in an GenBank-format stream of Protein sequences.
+     * @param br the BufferedReader to read data from
+     * @param ns    a Namespace to load the sequences into. Null implies that it should
+     *              use the namespace specified in the file. If no namespace is
+     *              specified in the file, then RichObjectFactory.getDefaultNamespace()
+     *              is used.
+     * @return      a RichSequenceIterator over each sequence in the fasta file
+     */
     public static RichSequenceIterator readGenbankProtein(BufferedReader br, Namespace ns) {
         return new RichStreamReader(br,
                 new GenbankFormat(),
@@ -258,6 +279,25 @@ public final class RichSeqIOTools {
                 ns);
     }
     
+    
+    /**
+     * Create a sequence database from a GenBank file provided as an
+     * input stream.  Note this somewhat duplicates functionality in
+     * the readGenBankDNA and readGenBankProtein methods but uses a stream
+     * rather than a reader and returns a SequenceDB rather than a
+     * SequenceIterator. If the returned DB is likely to be large then
+     * the above mentioned methods should be used.
+     * @return a SequenceDB containing all the Sequences
+     * in the file.
+     * @param seqFile The file containg the GenBank formatted sequences
+     * @param alpha The Alphabet of the sequence, ie DNA, RNA etc
+     * @param ns    a Namespace to load the sequences into. Null implies that it should
+     *              use the namespace specified in the file. If no namespace is
+     *              specified in the file, then RichObjectFactory.getDefaultNamespace()
+     *              is used.
+     * @throws BioException if problems occur during reading of the
+     * stream.
+     */
     public static SequenceDB readGenbank(InputStream seqFile, Alphabet alpha, Namespace ns)
     throws BioException {
         HashSequenceDB db = new HashSequenceDB(IDMaker.byName);
@@ -283,9 +323,8 @@ public final class RichSeqIOTools {
     
     /**
      * Write a sequenceDB to an output stream in fasta format.
-     * @since 1.2
      * @param os the stream to write the fasta formatted data to.
-     * @param db the database of <code>Sequence</code>s to write
+     * @param db the database of Sequences to write
      * @param ns    a Namespace to write the sequences to. Null implies that it should
      *              use the namespace specified in the individual sequence.
      * @throws IOException if there was an error while writing.
@@ -300,10 +339,8 @@ public final class RichSeqIOTools {
      * Writes sequences from a SequenceIterator to an OutputStream in
      * Fasta Format.  This makes for a useful format filter where a
      * StreamReader can be sent to the RichStreamWriter after formatting.
-     *
-     * @since 1.2
      * @param os The stream to write fasta formatted data to
-     * @param in The source of input <code>Sequences</code>
+     * @param in The source of input Sequences
      * @param ns    a Namespace to write the sequences to. Null implies that it should
      *              use the namespace specified in the individual sequence.
      * @throws IOException if there was an error while writing.
@@ -316,7 +353,6 @@ public final class RichSeqIOTools {
     
     /**
      * Writes a single Sequence to an OutputStream in Fasta format.
-     *
      * @param os  the OutputStream.
      * @param seq  the Sequence.
      * @param ns    a Namespace to write the sequences to. Null implies that it should
@@ -328,23 +364,50 @@ public final class RichSeqIOTools {
         writeFasta(os, new SingleRichSeqIterator(seq),ns);
     }
     
+    /**
+     * Write a sequenceDB to an output stream in GenBank format.
+     * @param os the stream to write the fasta formatted data to.
+     * @param db the database of Sequences to write
+     * @param ns    a Namespace to write the sequences to. Null implies that it should
+     *              use the namespace specified in the individual sequence.
+     * @throws IOException if there was an error while writing.
+     */
     public static void writeGenbank(OutputStream os, SequenceDB db, Namespace ns)
     throws IOException {
         RichStreamWriter sw = new RichStreamWriter(os,new GenbankFormat());
         sw.writeStream(db.sequenceIterator(),ns);
     }
     
+    /**
+     * Writes sequences from a SequenceIterator to an OutputStream in
+     * GenBank Format.  This makes for a useful format filter where a
+     * StreamReader can be sent to the RichStreamWriter after formatting.
+     * @param os The stream to write fasta formatted data to
+     * @param in The source of input Sequences
+     * @param ns    a Namespace to write the sequences to. Null implies that it should
+     *              use the namespace specified in the individual sequence.
+     * @throws IOException if there was an error while writing.
+     */
     public static void writeGenbank(OutputStream os, SequenceIterator in, Namespace ns)
     throws IOException {
         RichStreamWriter sw = new RichStreamWriter(os,new GenbankFormat());
         sw.writeStream(in,ns);
     }
-    
+      
+    /**
+     * Writes a single Sequence to an OutputStream in GenBank format.
+     * @param os  the OutputStream.
+     * @param seq  the Sequence.
+     * @param ns    a Namespace to write the sequences to. Null implies that it should
+     *              use the namespace specified in the individual sequence.
+     * @throws IOException if there was an error while writing.
+     */
     public static void writeGenbank(OutputStream os, Sequence seq, Namespace ns)
     throws IOException {
         writeGenbank(os, new SingleRichSeqIterator(seq),ns);
     }
     
+    // creates a DNA symbol tokenizer
     private static SymbolTokenization getDNAParser() {
         try {
             return DNATools.getDNA().getTokenization("token");
@@ -354,6 +417,7 @@ public final class RichSeqIOTools {
         }
     }
     
+    // creates a RNA symbol tokenizer
     private static SymbolTokenization getRNAParser() {
         try {
             return RNATools.getRNA().getTokenization("token");
@@ -363,6 +427,7 @@ public final class RichSeqIOTools {
         }
     }
     
+    // creates a nucleotide symbol tokenizer
     private static SymbolTokenization getNucleotideParser() {
         try {
             return NucleotideTools.getNucleotide().getTokenization("token");
@@ -372,6 +437,7 @@ public final class RichSeqIOTools {
         }
     }
     
+    // creates a protein symbol tokenizer
     private static SymbolTokenization getProteinParser() {
         try {
             return ProteinTools.getTAlphabet().getTokenization("token");
@@ -381,10 +447,18 @@ public final class RichSeqIOTools {
         }
     }
     
-    private static final class SingleRichSeqIterator
-            implements RichSequenceIterator {
+    /**
+     * Used to iterate over a single rich sequence
+     */
+    public static final class SingleRichSeqIterator implements RichSequenceIterator {
+
         private RichSequence seq;
-        SingleRichSeqIterator(Sequence seq) {
+        
+        /**
+         * Creates an iterator over a single sequence.
+         * @param seq the sequence to iterate over.
+         */
+        public SingleRichSeqIterator(Sequence seq) {
             try {
                 if (seq instanceof RichSequence) this.seq = (RichSequence)seq;
                 else this.seq = RichSequence.Tools.enrich(seq);
@@ -393,14 +467,23 @@ public final class RichSeqIOTools {
             }
         }
         
+        /**
+         * {@inheritDoc}
+         */
         public boolean hasNext() {
             return seq != null;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         public Sequence nextSequence() {
             return this.nextRichSequence();
         }
         
+        /**
+         * {@inheritDoc}
+         */
         public RichSequence nextRichSequence() {
             RichSequence seq = this.seq;
             this.seq = null;

@@ -19,40 +19,42 @@
  *
  */
 
-/*
- * RankedDocRef.java
- *
- * Created on July 12, 2005, 8:10 AM
- */
-
 package org.biojavax;
 
 /**
- * Represents a documentary reference, the bioentryreference table in BioSQL.
+ * Represents a documentary reference. Relates to the bioentryreference table 
+ * in BioSQL.
  * @author Richard Holland
+ * @see DocRef
  */
 public interface RankedDocRef extends Comparable {
     
     /**
-     * Represents a reference to a document.
+     * Represents a reference to a document. This value is intended to be set by 
+     * the constructor of the implementing class.
      * @return the document reference.
      */
     public DocRef getDocumentReference();
     
     /**
-     * The start position in the sequence that this reference refers to.
+     * The start position in the sequence that this reference is referred to from.
+     * This value is intended to be set by the constructor of the implementing
+     * class. The position returned is from 1 to the length of the sequence.
      * @return the start position.
      */
     public Integer getStart();
     
     /**
-     * The end position in the sequence that this reference refers to.
+     * The end position in the sequence that this reference is referred to from.
+     * This value is intended to be set by the constructor of the implementing
+     * class. The position returned is from 1 to the length of the sequence.
      * @return the end position.
      */
     public Integer getEnd();
     
     /**
-     * The rank of this reference.
+     * The rank of this reference. This value is intended to be set by the constructor
+     * of the implementing class.
      * @return the rank.
      */
     public int getRank();

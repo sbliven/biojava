@@ -20,6 +20,7 @@
  */
 
 package org.biojavax.bio.seq.io;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -41,16 +42,27 @@ import org.biojavax.ontology.ComparableTerm;
 
 
 /**
- *
+ * Parses Genbank location strings into RichLocation objects.
  * @author Richard Holland
  */
 public class GenbankLocationParser {
+    
     // No instances please
     private GenbankLocationParser() {}
-    
+
+    /**
+     * Parses a location.
+     * @param featureNS the namespace of the feature this location lives on.
+     * @param featureAccession the accession of the sequence of the feature this location lives on.
+     * @param locationString the GenBank location string.
+     * @return RichLocation the equivalent RichLocation object.
+     * @throws ParseException if the parsing failed.
+     */
     public static RichLocation parseLocation(Namespace featureNS, String featureAccession, String locationString) throws ParseException {
         /*
-         *
+         
+          FROM GENBANK FEATURE TABLE DOCS
+         
 3.5.3 Location examples
 The following is a list of common location descriptors with their meanings:
 Location                  Description
@@ -109,32 +121,46 @@ complement(34..(122.126)) Start at one of the bases complementary to those
 J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                           (in this database) with primary accession number
                           'J00194'
+         
          */
+        
         rank = 1;
         return parseLocString(featureNS, featureAccession, null, Strand.POSITIVE_STRAND, locationString);
     }
     
     // O beautiful regex, we worship you.
+    // this matches grouped locations
     private static Pattern gp = Pattern.compile("^([^\\(\\):]*?:)?(complement|join|order)?\\(*{0,1}(.*?)\\)*{0,1}$");
+    // this matches range locations
     private static Pattern rp = Pattern.compile("^\\(*(.*?)\\)*(\\.\\.\\(*(.*)\\)*)?$");
+    // this matches accession/version pairs
     private static Pattern xp = Pattern.compile("^(.*?)(\\.(\\d+))?:$");
+    // this matches a single base position 
     private static Pattern pp = Pattern.compile("^\\(*(<|>)?(\\d+)(([\\.\\^])(\\d+))?(<|>)?\\)*$");
+    // used to assign an ascending rank to each location foudn
     private static int rank;
+    
+    // this function allows us to recursively parse bracketed groups
     private static RichLocation parseLocString(Namespace featureNS, String featureAccession, CrossRef parentXref, Strand parentStrand, String locStr) throws ParseException {
+        // First attempt to find the group enclosing everything we've been passed        
         Matcher gm = gp.matcher(locStr);
         if (!gm.matches()) throw new ParseException("Bad location string found: "+locStr);
         String xrefName = gm.group(1);
         String groupType = gm.group(2);
         String subLocStr = gm.group(3);
-        
+
+        // The group may have a crossref. If it doesn't, use the parent crossref instead.
         CrossRef crossRef = parentXref;
         if (xrefName!=null) {
+            
+            // Try and find an accession (crossref)
             Matcher xm = xp.matcher(xrefName);
             if (!xm.matches()) throw new ParseException("Bad location xref found: "+xrefName);
             String xrefAccession = xm.group(1);
             String xrefVersion = xm.group(3);
             if (xrefAccession.equals(featureAccession)) crossRef = null;
             else {
+                // Found an accession, but does it have a version?
                 if (xrefVersion!=null) {
                     crossRef = (SimpleCrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{
                         featureNS.getName(),xrefAccession,Integer.valueOf(xrefVersion)
@@ -147,23 +173,30 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
             }
         }
         
+        // The group may actually be a strand. If it isn't, or if it is the same strand as the parent, 
+        // use the parent strand instead. 
         Strand strand = parentStrand;
         if (groupType!=null) {
+            
+            // Is it a strand group?
             if (groupType.equals("complement")) {
                 // It's a complement location
                 if (parentStrand==Strand.NEGATIVE_STRAND) strand = Strand.POSITIVE_STRAND;
                 else strand = Strand.NEGATIVE_STRAND;
+                
+                // Return the parsed contents of the complement 'group'
                 return parseLocString(featureNS,featureAccession,crossRef,strand,subLocStr);
-            } else {
-                // It's a compound location.
+            } 
+            
+            // Otherwise, it's a compound location
+            else {
                 ComparableTerm groupTypeTerm = null;
                 if (groupType.equals("order")) groupTypeTerm = CompoundRichLocation.getOrderTerm();
                 else if (groupType.equals("join")) groupTypeTerm = CompoundRichLocation.getJoinTerm();
                 else throw new ParseException("Unknown group type "+groupType+" received");
                 
                 // recurse on each block and return the compounded result
-                List members = new ArrayList();
-                
+                List members = new ArrayList();                
                 StringBuffer sb = new StringBuffer();
                 char[] chars = subLocStr.toCharArray();
                 int bracketCount = 0;
@@ -179,7 +212,10 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 }
                 if (sb.length()>0) members.add(parseLocString(featureNS,featureAccession,crossRef,parentStrand,sb.toString()));
                 
+                // Merge the members of the group
                 RichLocation result = RichLocation.Tools.construct(RichLocation.Tools.merge(members));
+                
+                // Set the group term if the result was a group.
                 try {
                     if (result instanceof CompoundRichLocation) result.setTerm(groupTypeTerm);
                 } catch (ChangeVetoException e) {
@@ -209,6 +245,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         }
     }
     
+    // this function parses a single position - usually just half of one location
     private static Position parsePosition(String position) throws ParseException {
         Matcher pm = pp.matcher(position);
         if (!pm.matches()) throw new ParseException("Could not understand position: "+position);
@@ -228,7 +265,12 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
             return new SimplePosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart));
         }
     }
-    
+
+    /**
+     * Writes a location in Genbank format.
+     * @param l the location to write
+     * @return the formatted string representing the location.
+     */
     public static String writeLocation(RichLocation l) {
         //write out location text
         //use crossrefs to calculate remote location positions
@@ -240,14 +282,15 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         }
     }
     
+    // writes out a single position
     private static String _writePosition(Position p) {
         StringBuffer sb = new StringBuffer();
         int s = p.getStart();
         int e = p.getEnd();
         String t = p.getType();
-        boolean fs = p.hasFuzzyStart();
-        boolean fe = p.hasFuzzyEnd();
-        if (t!=null) {
+        boolean fs = p.getFuzzyStart();
+        boolean fe = p.getFuzzyEnd();
+        if (s!=e) {
             // a range - put in brackets
             sb.append("(");
             if (fs) sb.append("<");
@@ -265,6 +308,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         return sb.toString();
     }
     
+    // write out a single location
     private static String _writeSingleLocation(RichLocation l) {
         StringBuffer loc = new StringBuffer();
         loc.append(_writePosition(l.getMinPosition()));
@@ -288,6 +332,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         return loc.toString();
     }
     
+    // write out a group location
     private static String _writeGroupLocation(Iterator i, ComparableTerm parentTerm) {
         StringBuffer sb = new StringBuffer();
         sb.append(parentTerm.getName());

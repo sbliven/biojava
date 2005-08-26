@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * RichFeatureRelationship.java
- *
- * Created on June 14, 2005, 5:33 PM
- */
-
 package org.biojavax.bio.seq;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
@@ -33,7 +27,7 @@ import org.biojavax.ontology.ComparableTerm;
 
 /**
  * Represents the relation between two bioentries. The bioentry_relationship in
- * BioSQL is what this represents.
+ * BioSQL is what this is based on.
  * @author Mark Schreiber
  * @author Richard Holland
  */
@@ -46,26 +40,28 @@ public interface RichFeatureRelationship extends Comparable,Changeable {
             );
     
     /**
-     * Setter for property rank.
+     * Sets the rank of this relationship.
      * @param rank Value of property rank.
      * @throws ChangeVetoException if the rank is untasty.
      */
     public void setRank(int rank) throws ChangeVetoException;
     
     /**
-     * Getter for property rank.
+     * Gets the rank of this relationship.
      * @return Value of property rank.
      */
     public int getRank();
     
     /**
-     * Getter for property subject.
+     * Gets the feature that this relationship refers to. This is set
+     * at constructor time and is immutable.
      * @return Value of property subject.
      */
     public RichFeature getSubject();
     
     /**
-     * Getter for property term.
+     * Gets the term that describes this relationship. This is set
+     * at constructor time and is immutable.
      * @return Value of property term.
      */
     public ComparableTerm getTerm();

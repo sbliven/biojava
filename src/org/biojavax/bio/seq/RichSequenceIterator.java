@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * RichSequenceIterator.java
- *
- * Created on August 5, 2005, 1:46 PM
- */
-
 package org.biojavax.bio.seq;
 import java.util.NoSuchElementException;
 import org.biojava.bio.BioException;
@@ -32,13 +26,14 @@ import org.biojava.bio.seq.SequenceIterator;
 
 
 /**
- * Essentially the same as <code>SequenceIterator</code>. It provides a new
- * method that returns <code>RichSequence</code> objects without the need for
+ * Essentially the same as SequenceIterator. It provides a new
+ * method that returns RichSequence objects without the need for
  * explicit casting. Implementations of this interface should <b>always</b>
- * return <code>RichSequence</code> objects for both the <code>nextSequence()</code>
- * and <code>nextRichSequence</code> methods.
+ * return RichSequence objects for both the nextSequence() and 
+ * nextRichSequence() methods.
  *
  * @author Mark Schreiber
+ * @author Richard Holland
  * @see org.biojava.bio.seq.SequenceIterator
  */
 public interface RichSequenceIterator extends SequenceIterator{

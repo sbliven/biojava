@@ -19,16 +19,9 @@
  *
  */
 
-/*
- * SimpleComparableTerm.java
- *
- * Created on July 13, 2005, 10:22 AM
- */
-
 package org.biojavax.ontology;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import org.biojava.bio.Annotation;
@@ -40,13 +33,8 @@ import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.RankedCrossRef;
 
-
-
 /**
  * A Term object that can be compared and thus sorted.
- *
- * Equality is inherited from Term.Impl.
- *
  * @author Richard Holland
  */
 public class SimpleComparableTerm extends AbstractChangeable implements ComparableTerm {
@@ -61,24 +49,22 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     
     /**
      * Creates a new instance of SimpleComparableTerm with synonyms.
-     * @param ontology The ontology to put the term in.
-     * @param name the name of the term.
-     * @param synonyms a set of synonyms for the term.
+     * @param ontology The ontology to put the term in. Must not be null.
+     * @param name the name of the term. Must not be null.
+     * @param synonyms a set of synonyms for the term. Can be null.
      */
     public SimpleComparableTerm(ComparableOntology ontology, String name, Object[] synonyms) {
         if (name == null) throw new IllegalArgumentException("Name must not be null");
-        if (ontology == null) throw new IllegalArgumentException("Ontology must not be null");
-        
+        if (ontology == null) throw new IllegalArgumentException("Ontology must not be null");        
         this.name = name;
         this.description = null;
         this.ontology = ontology;
-        this.identifier = null;
-        
+        this.identifier = null;        
         if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleComparableTerm() {}
+    private SimpleComparableTerm() {}
     
     /**
      * {@inheritDoc}
@@ -95,6 +81,8 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     
     /**
      * {@inheritDoc}
+     * Two terms are equal if they are in the same ontology and
+     * share the same name.
      */
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -109,6 +97,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     
     /**
      * {@inheritDoc}
+     * Terms are sorted by ontology first, then name.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -121,6 +110,9 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     
     /**
      * {@inheritDoc}
+     * Synonyms are stored in the database as the results of a toString() operation
+     * on each synonym object. This doesn't happen until it reaches the database
+     * though, so if you are not using a database, don't worry about it.
      */
     public void addSynonym(Object synonym) { this.synonyms.add(synonym); }
     
@@ -129,6 +121,9 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
      */
     public void removeSynonym(Object synonym) { this.synonyms.remove(synonym); }
     
+    /**
+     * {@inheritDoc}
+     */
     public Object[] getSynonyms() { return this.synonyms.toArray(); }
     
     // Hibernate requirement - not for public use.
@@ -139,11 +134,17 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getRankedCrossRefs() { return this.rankedcrossrefs; } // original for Hibernate
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public void setRankedCrossRefs(Set rankedcrossrefs) throws ChangeVetoException {
         this.rankedcrossrefs = rankedcrossrefs; // original for Hibernate
@@ -240,8 +241,12 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     
     /**
      * {@inheritDoc}
+     * Form: "ontology:name [obsolete]" where [obsolete] is optional
      */
-    public String toString() { return this.name; }
+    public String toString() { 
+        boolean isobs = (this.obsolete!=null && this.obsolete.booleanValue());
+        return this.ontology+":"+this.name+(isobs?" [obsolete]":""); 
+    }
     
     /**
      * {@inheritDoc}

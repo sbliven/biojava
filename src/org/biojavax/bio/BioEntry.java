@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * BioEntry.java
- *
- * Created on June 14, 2005, 5:20 PM
- */
-
 package org.biojavax.bio;
 
 import java.util.Set;
@@ -39,10 +33,11 @@ import org.biojavax.RichAnnotatable;
 import org.biojavax.Comment;
 
 /**
- * This class refers to the bioentry table in BioSQL.
- * This also encompasses the bioentry_dbxref table.
+ * This class relates to the bioentry table in BioSQL. It holds everything you need
+ * to define a non-sequence bearing bioentry.
  * @author Mark Schreiber
  * @author Richard Holland
+ * @see BioEntryRelationship
  */
 public interface BioEntry extends RichAnnotatable,RankedCrossRefable,Comparable,Changeable {
     
@@ -93,141 +88,154 @@ public interface BioEntry extends RichAnnotatable,RankedCrossRefable,Comparable,
             );
     
     /**
-     * Getter for property namespace.
-     * @return Value of property namespace.
+     * Returns the namespace of this bioentry. The namespace is supposed
+     * to be an immutable property set by the constructor.
+     * @return the namespace of this bioentry.
      */
     public Namespace getNamespace();
     
     /**
-     * Getter for property name.
+     * Returns the name of this bioentry. The name is supposed
+     * to be an immutable property set by the constructor.
      * @return Value of property name.
      */
     public String getName();
     
     /**
-     * Getter for property accession.
+     * Returns the accession of this bioentry. The accession is supposed
+     * to be an immutable property set by the constructor.
      * @return Value of property accession.
      */
     public String getAccession();
     
     /**
-     * Getter for property identifier.
+     * Returns the identifier of this bioentry.
      * @return Value of property identifier.
      */
     public String getIdentifier();
     
     /**
-     * Setter for property identifier.
+     * Sets the identifier of this bioentry. Null is allowable.
      * @param identifier New value of property identifier.
      * @throws ChangeVetoException in case of objections.
      */
     public void setIdentifier(String identifier) throws ChangeVetoException;
     
     /**
-     * Getter for property division.
+     * Returns the division of this bioentry. Division relates to a division
+     * of the parent namespace.
      * @return Value of property division.
      */
     public String getDivision();
     
     /**
-     * Setter for property division.
+     * Sets the division of this bioentry. Null is allowable.
      * @param division New value of property division.
      * @throws ChangeVetoException in case of objections.
      */
     public void setDivision(String division) throws ChangeVetoException;
     
     /**
-     * Getter for property description.
+     * Returns a description of this sequence.
      * @return Value of property description.
      */
     public String getDescription();
     
     /**
-     * Setter for property description.
+     * Sets the description for this bioentry.
      * @param description New value of property description.
      * @throws ChangeVetoException in case of objections.
      */
     public void setDescription(String description) throws ChangeVetoException;
     
     /**
-     * Getter for property version.
+     * Gets the version of this bioentry. Bioentries with no versions return 0.
+     * The version is supposed to be immutable and set only by the constructor.
      * @return Value of property version.
      */
     public int getVersion();
     
     /**
-     * Getter for property taxon.
+     * Gets the taxon associated with this bioentry. It may be null.
      * @return Value of property taxon.
      */
     public NCBITaxon getTaxon();
     
     /**
-     * Setter for property taxon.
+     * Sets the taxon for this bioentry. It may be null, in which case the
+     * taxon is unset.
      * @param taxon New value of property taxon.
      * @throws ChangeVetoException in case of objections.
      */
     public void setTaxon(NCBITaxon taxon) throws ChangeVetoException;
     
     /**
-     * Returns a list of all bioentrydocrefs associated with this bioentry. This
-     * list is not mutable. If no docrefs are associated, you will get back an
-     * empty list.
+     * Returns a set of all bioentrydocrefs associated with this bioentry. This
+     * set is not mutable. If no docrefs are associated, you will get back an
+     * empty set.
+     * @return a set of RankedDocRef objects.
+     * @see RankedDocRef
      */
     public Set getRankedDocRefs();
     
     /**
-     * Returns a list of all comments associated with this bioentry. This
-     * list is not mutable. If no comments are associated, you will get back an
-     * empty list.
-     * @return Value of property comments.
+     * Returns a set of all comments associated with this bioentry. This
+     * set is not mutable. If no comments are associated, you will get back an
+     * empty set.
+     * @return a set of Comment objects.
+     * @see Comment
      */
     public Set getComments();
     
     /**
-     * Returns a list of all relationships associated with this bioentry. This
-     * list is not mutable. If no relationships are associated, you will get back an
-     * empty list.
-     * @return Value of property relationships.
+     * Returns a set of all relationships associated with this bioentry. This
+     * set is not mutable. If no relationships are associated, you will get back an
+     * empty set.
+     * @return a set of BioEntryRelationship objects.
+     * @see BioEntryRelationship
      */
     public Set getRelationships();
     
     /**
-     * Adds a ranked docref instance to this bioentry.
+     * Adds a ranked docref instance to this bioentry. Must not be null.
      * @param docref the item to add.
      * @throws ChangeVetoException if it doesn't want to add it.
      */
     public void addRankedDocRef(RankedDocRef docref) throws ChangeVetoException;
     
     /**
-     * Removes a ranked docref instance from this bioentry.
+     * Removes a ranked docref instance from this bioentry. If it was not found,
+     * nothing happens.
      * @param docref the item to remove.
      * @throws ChangeVetoException if it doesn't want to remove it.
      */
     public void removeRankedDocRef(RankedDocRef docref) throws ChangeVetoException;
     
     /**
-     * Adds a comment instance to this bioentry.
+     * Adds a comment instance to this bioentry. Must not be null.
      * @param comment the item to add.
      * @throws ChangeVetoException if it doesn't want to add it.
      */
     public void addComment(Comment comment) throws ChangeVetoException;
     
     /**
-     * Removes a comment instance from this bioentry.
+     * Removes a comment instance from this bioentry. If it wasn't present, it
+     * nothing will happen.
      * @param comment the item to remove.
      * @throws ChangeVetoException if it doesn't want to remove it.
      */
     public void removeComment(Comment comment) throws ChangeVetoException;
     
     /**
-     * Adds a relation instance to this bioentry.
+     * Adds a relation instance to this bioentry. It must not be null.
      * @param relation the item to add.
      * @throws ChangeVetoException if it doesn't want to add it.
      */
     public void addRelationship(BioEntryRelationship relation) throws ChangeVetoException;
     
     /**
-     * Removes a relation instance from this bioentry.
+     * Removes a relation instance from this bioentry. If it wasn't present,
+     * nothing will happen.
      * @param relation the item to remove.
      * @throws ChangeVetoException if it doesn't want to remove it.
      */

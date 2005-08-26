@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * Namespace.java
- *
- * Created on June 14, 2005, 4:31 PM
- */
-
 package org.biojavax;
 
 import java.net.URI;
@@ -33,9 +27,11 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * The namespace of an entry in a database schema
+ * The namespace of an entry in a database schema. Relates directly to the
+ * BioDatabase table in BioSQL. All BioEntry objects belong to namespaces.
  * @author Mark Schreiber
  * @author Richard Holland
+ * @see BioEntry
  */
 public interface Namespace extends Comparable,Changeable {
     
@@ -66,58 +62,61 @@ public interface Namespace extends Comparable,Changeable {
             );
     
     /**
-     * Getter for property name.
+     * The name of the namespace is immutable and must be set by the constructor
+     * of the instantiating class. The name should also be unique. This method
+     * will return the name.
      * @return The name of the namespace.
      */
     public String getName();
     
     /**
-     * Getter for property authority.
+     * This method will return the authority that governs the namespace.
      * @return the name of the namespace authority.
      */
     public String getAuthority();
     
     /**
-     * Setter for property authority.
+     * This method sets the authority that governs the namespace. Null will 
+     * unset it. 
      * @param authority the name of the namespace authority.
      * @throws ChangeVetoException in case of objections.
      */
     public void setAuthority(String authority) throws ChangeVetoException;
     
     /**
-     * Getter for property description.
+     * Returns a description of this namespace.
      * @return the description of the namespace.
      */
     public String getDescription();
     
     /**
-     * Setter for property description.
+     * This method sets a description for the namespace. Null will unset it. 
      * @param description the description of the namespace.
      * @throws ChangeVetoException in case of objections.
      */
     public void setDescription(String description) throws ChangeVetoException;
     
     /**
-     * Getter for property acronym.
+     * If the namespace has an acronym, this will return it.
      * @return the acronym for the namespace.
      */
     public String getAcronym();
     
     /**
-     * Setter for property acronym.
+     * Sets an optional acronym for the namespace. Null will unset it.
      * @param acronym the acronym for the namespace.
      * @throws ChangeVetoException in case of objections.
      */
     public void setAcronym(String acronym) throws ChangeVetoException;
     
     /**
-     * Getter for property URI.
+     * If the namespace has a URI, this will return it.
      * @return the URI of the authority.
      */
     public URI getURI();
     
     /**
-     * Setter for property URI.
+     * Sets an optional URI for the namespace. Null will unset it.
      * @param URI the URI of the authority.
      * @throws ChangeVetoException in case of objections.
      */

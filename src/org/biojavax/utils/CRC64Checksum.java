@@ -19,44 +19,28 @@
  *
  */
 
-/*
- * CRC64Checksum.java
- *
- * Created on August 24, 2005, 1:10 PM
- */
-
 package org.biojavax.utils;
 
 import java.util.zip.Checksum;
 
 /**
- *
+ * Utility class that calculates a CRC64 checksum on a stream
+ * of bytes. Code was based on some from BioPerl.
+ * Note that we use longs then cast them to avoid the lack of an
+ * unsigned int in Java. Longs are 64-bit but we are only using the
+ * bottom 32 bits. An int is 32-bit but encodes sign so we can get amusing
+ * results if we don't allow for this.
  * @author Richard Holland
+ * @author Hilmar Lapp
  */
 public class CRC64Checksum implements Checksum {
-        
+    
     private final static long[] CRC64Tableh = new long[256];
     private final static long[] CRC64Tablel = new long[256];
     
     // Construct the CRC64Checksum lookup tables.
     static {
         long POLY64REVh = 0xd8000000;
-        
-        /*
-        for (my $i=0; $i<256; $i++) {
-             my $partl = $i;
-             my $parth = 0;
-             for (my $j=0; $j<8; $j++) {
-                 my $rflag = $partl & 1;
-                 $partl >>= 1;
-                 $partl |= (1 << 31) if $parth & 1;
-                 $parth >>= 1;
-                 $parth ^= $POLY64REVh if $rflag;
-             }
-             $CRCTableh[$i] = $parth;
-             $CRCTablel[$i] = $partl;
-         }
-         */
         for (int i = 0; i < 256; i++) {
             long partl = (long)i;
             long parth = 0;
@@ -76,17 +60,23 @@ public class CRC64Checksum implements Checksum {
     private long crch;
     
     /**
-     * Creates a new instance of CRC64Checksum
+     * Creates a new instance of CRC64Checksum.
      */
     public CRC64Checksum() {
         this.reset();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public void reset() {
         this.crcl = 0L;
         this.crch = 0L;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public void update(int c) {
         long shr = (this.crch & 0xff) << 24L;
         long templh = (this.crch >> 8L);
@@ -96,22 +86,23 @@ public class CRC64Checksum implements Checksum {
         this.crcl = templl ^ CRC64Tablel[tableindex];
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public void update(byte[] values, int offset, int len) {
         for (int i = offset; i < offset+len; i++) this.update((int)values[i]);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public long getValue() {
         return (this.crch<<32L) | this.crcl;
     }
     
     /**
-     * Displays the current CRC64Checksum checksum as a 16-digit hex string.
-     * The algorithm is a copy of that found in BioPerl Swissprot parser.
-     * Note that we use longs then cast them to avoid the lack of an
-     * unsigned int in Java. Longs are 64-bit but we are only using the
-     * bottom 32 bits. An int is 32-bit but encodes sign so we can get amusing
-     * results if we don't allow for this.
-     * @return the CRC64Checksum checksum.
+     * {@inheritDoc}
+     * Form: the current CRC64Checksum checksum as a 16-digit hex string.
      */
     public String toString() {
         StringBuffer sb = new StringBuffer();

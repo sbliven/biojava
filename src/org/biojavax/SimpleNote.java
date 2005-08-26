@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleNote.java
- *
- * Created on July 28, 2005, 10:05 AM
- */
-
 package org.biojavax;
 
 import org.biojava.utils.AbstractChangeable;
@@ -44,8 +38,8 @@ public class SimpleNote extends AbstractChangeable implements Note {
     private int rank;
     
     /**
-     * Creates a new instance of SimpleNote
-     * @param term the term of the note.
+     * Creates a new instance of SimpleNote with a given term, value and rank.
+     * @param term the term of the note. Cannot be null.
      * @param value the (optional) value to give it.
      * @param rank the rank to give it.
      */
@@ -57,7 +51,7 @@ public class SimpleNote extends AbstractChangeable implements Note {
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleNote() {}
+    private SimpleNote() {}
     
     /**
      * {@inheritDoc}
@@ -143,6 +137,7 @@ public class SimpleNote extends AbstractChangeable implements Note {
     
     /**
      * {@inheritDoc}
+     * Notes are compared first by rank, then by the term.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -155,6 +150,7 @@ public class SimpleNote extends AbstractChangeable implements Note {
     
     /**
      * {@inheritDoc}
+     * Notes are equal if they have the same rank and term.
      */
     public boolean equals(Object o) {
         if (o==this) return true;
@@ -177,5 +173,13 @@ public class SimpleNote extends AbstractChangeable implements Note {
         hash = 31*hash + this.term.hashCode();
         hash = 31*hash + this.rank;
         return hash;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Form: "(#rank) term: value"
+     */
+    public String toString() {
+        return "(#"+this.rank+") "+this.term+": "+this.value;
     }
 }

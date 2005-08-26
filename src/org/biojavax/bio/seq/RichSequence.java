@@ -32,16 +32,14 @@ import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.db.RichObjectFactory;
 
 /**
- * A rich sequence is a combination of a <code>org.biojavax.bio.Bioentry</code>
- * and a <code>org.biojava.seq.Sequence</code>. It inherits and merges the methods
- * of both. The <code>RichSequence</code> is based on the BioSQL model and
- * provides a richer array of methods to access information than <code>Sequence</code>
- * does. The interface introduces no new methods of it's own. It is essentially
- * a <code>BioEntry</code> with sequence information.
- * <p>
- * Whenever possible <code>RichSequence</code> should be used in preference to
- * <code>Sequence</code>
+ * A rich sequence is a combination of a org.biojavax.bio.Bioentry
+ * and a Sequence. It inherits and merges the methods
+ * of both. The RichSequence is based on the BioSQL model and
+ * provides a richer array of methods to access information than Sequence
+ * does. Whenever possible RichSequence should be used in preference 
+ * to Sequence.
  * @author Mark Schreiber
+ * @author Richard Holland
  */
 public interface RichSequence extends BioEntry,Sequence {
     
@@ -58,13 +56,15 @@ public interface RichSequence extends BioEntry,Sequence {
             );
     
     /**
-     * The version of the associated symbol list.
+     * The version of the associated symbol list. Note the use of an object
+     * for the value means that it can be nulled.
      * @return  the version
      */
     public Double getSeqVersion();
     
     /**
-     * Sets the version of the associated symbol list.
+     * Sets the version of the associated symbol list. Note the use of an object
+     * for the value means that it can be nulled.
      * @param seqVersion the version to set.
      * @throws ChangeVetoException if it doesn't want to change.
      */
@@ -72,7 +72,7 @@ public interface RichSequence extends BioEntry,Sequence {
     
     /**
      * The features for this sequence.
-     * @return the features.
+     * @return a set of RichFeature objects.
      */
     public Set getFeatureSet();
     
@@ -81,17 +81,18 @@ public interface RichSequence extends BioEntry,Sequence {
      * the features actually belong to this sequence, you'd best check that yourself
      * and make changes using feature.setParent() if necessary.
      * @param features the features to assign to this sequence, replacing all others.
+     * Must be a set of RichFeature objects.
      * @throws ChangeVetoException if they could not be assigned.
      */
     public void setFeatureSet(Set features) throws ChangeVetoException;
     
     /**
-     * Circularises the sequence.
+     * Circularises the sequence. The circular length can then be said to be the
+     * length of the sequence itself.
      * @param circular set to true if you want it to be circular
      * @throws ChangeVetoException if the change is blocked. Some implementations
      *   may choose not to support circularisation and should throw an exception here.
-     *   Some implementations may only support this method for certain 
-     * <code>Alphabet</code>s.
+     *   Some implementations may only support this method for certain Alphabets.
      */
     public void setCircular(boolean circular) throws ChangeVetoException;
     
@@ -104,18 +105,22 @@ public interface RichSequence extends BioEntry,Sequence {
      */
     public boolean getCircular();
     
+    /**
+     * Some useful tools for working with RichSequence objects.
+     */
     public static class Tools {
+        
+        // because we are static we don't want any instances
         private Tools() {}
         
         /**
-         * Boldly attempts to convert a <code>Sequence</code> into a <code>
-         * RichSequence</code>. Sequences will be assigned to the default name
-         * space. The accession will be assumed to be the name of the old sequence.
+         * Boldly attempts to convert a Sequence into a RichSequence. Sequences 
+         * will be assigned to the default namespace. The accession will be 
+         * assumed to be the name of the old sequence.
          * The version of the sequence will be set to 0 and the seqversion set
-         * to 0.0. <code>Features</code> are converted to <code>RichFeatures</code>
-         * The old <code>Annotation</code> bundle is and converted to a <code>
-         * RichAnnotation</code>
-         * @throws ChangeVetoException if <code>s</code> is locked or the conversion fails.
+         * to 0.0. Features are converted to RichFeatures.
+         * The old Annotation bundle is converted to a RichAnnotation
+         * @throws ChangeVetoException if s is locked or the conversion fails.
          */
         public static RichSequence enrich(Sequence s) throws ChangeVetoException {
             if (s instanceof RichSequence) return (RichSequence)s;

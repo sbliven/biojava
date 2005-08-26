@@ -19,37 +19,35 @@
  *
  */
 
-/*
- * CrossRef.java
- *
- * Created on June 14, 2005, 4:53 PM
- */
-
 package org.biojavax;
 
 import org.biojava.utils.Changeable;
 
 /**
- * Represents a cross reference to another database, the dbxref table in BioSQL.
+ * Represents a cross reference to another database. Relates to the 
+ * dbxref table in BioSQL. The interface is immutable, the fields are
+ * intended to be set by the constructor.
  * @author Mark Schreiber
  * @author Richard Holland
+ * @see RankedCrossRef
  */
 public interface CrossRef extends RichAnnotatable,Comparable,Changeable {
     
    /**
-     * Getter for property dbname.
+     * Returns the name of the database the cross reference refers to. This
+     * would normally be a namespace name, eg. 'gb' for GenBank.
      * @return Value of property dbname.
      */
     public String getDbname();
 
     /**
-     * Getter for property accession.
+     * Returns the accession of the object that the crossref refers to.
      * @return Value of property accession.
      */
     public String getAccession();
 
     /**
-     * Getter for property version.
+     * Returns the version of the object that the crossref refers to.
      * @return Value of property version.
      */
     public int getVersion();

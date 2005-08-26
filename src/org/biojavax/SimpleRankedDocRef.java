@@ -19,16 +19,10 @@
  *
  */
 
-/*
- * SimpleRankedDocRef.java
- *
- * Created on July 12, 2005, 8:10 AM
- */
-
 package org.biojavax;
 
 /**
- * Represents a documentary reference, the bioentryreference table in BioSQL.
+ * Represents a documentary reference. 
  * @author Richard Holland
  */
 public class SimpleRankedDocRef implements RankedDocRef {
@@ -40,7 +34,7 @@ public class SimpleRankedDocRef implements RankedDocRef {
     
     /**
      * Constructs a new docref for a given location.
-     * @param docref the document reference
+     * @param docref the document reference. Must not be null.
      * @param start the start position of the location
      * @param end the end position of the location
      */
@@ -53,7 +47,7 @@ public class SimpleRankedDocRef implements RankedDocRef {
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleRankedDocRef() {}
+    private SimpleRankedDocRef() {}
     
     // Hibernate requirement - not for public use.
     private void setRank(int rank) { this.rank = rank; }
@@ -89,6 +83,8 @@ public class SimpleRankedDocRef implements RankedDocRef {
     
     /**
      * {@inheritDoc}
+     * Two ranked document references are equal if they have the same rank 
+     * and refer to the same document reference.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -103,6 +99,8 @@ public class SimpleRankedDocRef implements RankedDocRef {
     
     /**
      * {@inheritDoc}
+     * Ranked document references are sorted first by rank then by actual
+     * document reference.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -125,13 +123,14 @@ public class SimpleRankedDocRef implements RankedDocRef {
         code = 37*code + this.rank;
         return code;
     }
-    
+        
     /**
      * {@inheritDoc}
-     * Form: <code>this.getDocumentReference()+": "+this.getStart()+"-"+this.getEnd();</code>
+     * Form: "(#rank) docref"
      */
-    public String toString() { return this.getDocumentReference()+": "+this.getStart()+"-"+this.getEnd(); }
-    
+    public String toString() {
+        return "(#"+this.rank+") "+this.docref;
+    }
 }
 
 

@@ -34,17 +34,17 @@ public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef
     
     /**
      * Constructs a new crossref with a rank.
-     * @param crossref the crossref to rank.
+     * @param crossref the crossref to rank. Must not be null.
      * @param rank the rank to give it.
      */
     public SimpleRankedCrossRef(CrossRef crossref, int rank) {
-        if (crossref==null) throw new IllegalArgumentException("Crossref cannot be null");
+        if (crossref==null) throw new IllegalArgumentException("Cross reference cannot be null");
         this.crossref = crossref;
         this.rank = rank;
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleRankedCrossRef() {}
+    private SimpleRankedCrossRef() {}
     
     // Hibernate requirement - not for public use.
     private void setCrossRef(CrossRef crossref) { this.crossref = crossref; }
@@ -64,6 +64,8 @@ public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef
     
     /**
      * {@inheritDoc}
+     * Ranked cross references are the same if they have the same rank and
+     * refer to the same cross reference.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -78,6 +80,7 @@ public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef
     
     /**
      * {@inheritDoc}
+     * Ranked cross references are sorted first by rank, then by cross reference.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -99,5 +102,13 @@ public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef
         code = 37*code + this.crossref.hashCode();
         code = 37*code + this.rank;
         return code;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Form: "(#rank) crossref"
+     */
+    public String toString() {
+        return "(#"+this.rank+") "+this.crossref;
     }
 }

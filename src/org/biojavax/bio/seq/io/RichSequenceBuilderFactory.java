@@ -25,20 +25,19 @@ import org.biojava.bio.symbol.PackedSymbolListFactory;
 
 /**
  * Simple factory for constructing new RichSequenceBuilder objects.
- *
  * @author Richard Holland
- * @since 1.5
  */
-
 public interface RichSequenceBuilderFactory extends SequenceBuilderFactory {
+    
     /**
      * Accessor for the default factory. This implementation will not 
      * do any compression of a sequence regardless of size.
      */
     public final static RichSeqIOListener FACTORY = new SimpleRichSequenceBuilder();
+    
     /**
      * Accessor for a factory that produces builders that compress the
-     * <code>SymbolList</code> of a <code>Sequence</code>
+     * SymbolList of a Sequence
      */
     public final static RichSeqIOListener PACKED = new SimpleRichSequenceBuilder(new PackedSymbolListFactory());
 }

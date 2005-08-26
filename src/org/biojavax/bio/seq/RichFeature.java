@@ -31,11 +31,8 @@ import org.biojavax.RankedCrossRefable;
 import org.biojavax.RichAnnotatable;
 
 /**
- *
- * Represents a feature that can only be given a source which is a Term, and can only
- *
- * accept annotations which are Term->String annotations.
- *
+ * Represents a feature that can be given name and rank and be
+ * moved from one sequence to another.
  * @author Richard Holland
  */
 public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,RichFeatureHolder,Comparable {
@@ -115,21 +112,36 @@ public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,
     public void setRank(int rank) throws ChangeVetoException;
     
     /**
-     * Added-value extension including bits we're interested in.
+     * Added-value extension of Feature.Template including bits we're 
+     * interested in, eg. featureRelationshipSet for relationships with
+     * other features, and rankedCrossRefs for lookups into other databases.
      */
     public static class Template extends Feature.Template {
         public Set featureRelationshipSet;
         public Set rankedCrossRefs;
     }
     
+    /**
+     * Some useful tools for working with features.
+     */
     public static class Tools {
+        
+        // because it is a static class we don't want instances of it
         private Tools() {}
+        
+        /**
+         * Takes a normal Feature and attempts to convert it into a RichFeature.
+         * @param f the Feature to enrich.
+         * @return the RichFeature equivalent.
+         * @throws ChangeVetoException if any of the terms from the feature were
+         * not convertible.
+         */
         public static RichFeature enrich(Feature f) throws ChangeVetoException {
             try {
                 if (f instanceof RichFeature) return (RichFeature)f;
                 else return new SimpleRichFeature(f.getParent(),f.makeTemplate());
             } catch (InvalidTermException e) {
-                throw new ChangeVetoException("Unable to convert term",e);
+                throw new ChangeVetoException("Unable to convert one of the feature's terms",e);
             }
         }
     }

@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * EmptyRichAnnotation.java
- *
- * Created on August 3, 2005, 1:15 PM
- */
-
 package org.biojavax;
 
 import java.io.NotSerializableException;
@@ -43,149 +37,153 @@ import org.biojava.utils.Unchangeable;
 /**
  * A place holder for a RichAnnotation that prevents null having to be used
  * @author Mark Schreiber
+ * @author Richard Holland
  */
-class EmptyRichAnnotation extends Unchangeable implements RichAnnotation, Serializable{
-  public Object getProperty(Object key) throws NoSuchElementException {
-    throw new NoSuchElementException(
-      "There are no keys in the Empty RichAnnotation object: " +
-      key
-    );
-  }
-  
-  /**
-   * {@inheritDoc} There are no notes in the Empty RichAnnotation object.
-   * Calling this will throw a <code>NoSuchElementException</code>.
-   */
-  public Note getNote(Note note){
-    throw new NoSuchElementException(
-      "There are no notes in the Empty RichAnnotation object"
-    );  
-  }
-  
-  /**
-   * {@inheritDoc} You can not add properties to the Empty RichAnnotation object
-   * @throws ChangeVetoException whenever you call this method.
-   */
-  public void setProperty(Object key, Object value)
-  throws ChangeVetoException {
-    throw new ChangeVetoException(
-      "You can not add properties to the Empty RichAnnotation object: " +
-      key + " -> " + value
-    );
-  }
-  
-  /**
-   * {@inheritDoc} You can not add Notes to the Empty RichAnnotation object.
-   * @throws ChangeVetoException whenever you call this method.
-   */
-  public void setNoteSet(Set notes) throws ChangeVetoException{
-      throw new ChangeVetoException(
-      "You can not add Notes to the Empty RichAnnotation object");
-  }
-
-  /**
-   * {@inheritDoc} You can not add Notes to the Empty RichAnnotation object.
-   * @throws ChangeVetoException whenever you call this method.
-   */  
-  public void addNote(Note note) throws ChangeVetoException{
-      throw new ChangeVetoException(
-      "You can not add Notes to the Empty RichAnnotation object");
-  }
-
-  /**
-   * {@inheritDoc} Does nothing as it contains nothing.
-   * 
-   */
-  public void clear() throws ChangeVetoException{ }
-  
-  
-  /**
-   * {@inheritDoc} You cannot remove properties from the Empty RichAnnotation
-   * @throws ChangeVetoException whenever you call this method.
-   */
-  public void removeProperty(Object key)
-  throws ChangeVetoException 
-  {
-    throw new ChangeVetoException(
-      "You cannot remove properties from the Empty RichAnnotation (!)"
-    );
-  }
-
-  /**
-   * {@inheritDoc} You cannot remove notes from the Empty RichAnnotation
-   * @throws ChangeVetoException whenever you call this method.
-   */
-  public void removeNote(Note note)
-  throws ChangeVetoException 
-  {
-    throw new ChangeVetoException(
-      "You cannot remove notes from the Empty RichAnnotation (!)"
-    );
-  }
-  
-  /**
-   * {@inheritDoc}
-   * @return always false as there are no properties
-   */
-  public boolean containsProperty(Object key) {
-    return false;
-  }
-  
-  /**
-   * {@inheritDoc}
-   * @return always false as there are no notes
-   */
-  public boolean contains(Note note){
-      return false;
-  }
-  
-  /**
-   * {@inheritDoc}
-   * @return an empty set
-   */
-  public Set keys() {
-    return Collections.EMPTY_SET;
-  }
-  
-  /**
-   * {@inheritDoc}
-   * @return an empty set
-   */
-  public Set getNoteSet(){
-      return Collections.EMPTY_SET;
-  }
-  
-  /**
-   * {@inheritDoc}
-   * @return an new <code>Map</code> with no entries
-   */
-  public Map asMap() {
-    return new HashMap();
-  }
-  
-  private Object writeReplace() throws ObjectStreamException {
-    try {
-      return new StaticMemberPlaceHolder(RichAnnotation.class.getField("EMPTY_ANNOTATION"));
-    } catch (NoSuchFieldException nsfe) {
-      throw new NotSerializableException(nsfe.getMessage());
+public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation, Serializable {
+    
+    /**
+     * {@inheritDoc} There are no properties in the Empty RichAnnotation object.
+     * Calling this will throw a NoSuchElementException.
+     */
+    public Object getProperty(Object key) throws NoSuchElementException {
+        throw new NoSuchElementException(
+                "There are no keys in the Empty RichAnnotation object: " +
+                key
+                );
     }
-  }
-  
-  /**
-   * {@inheritDoc}
-   * @return the hash code of a map with no entries
-   */
-  public int hashCode() {
-    return asMap().hashCode();
-  }
-  
-  /**
-   * {@inheritDoc}
-   * @return true if and only if <code>o</code> is an instance of 
-   *  this class or a descendant.
-   */
-  public boolean equals(Object o) {
-    return (o instanceof EmptyRichAnnotation);
-  }    
+    
+    /**
+     * {@inheritDoc} There are no notes in the Empty RichAnnotation object.
+     * Calling this will throw a NoSuchElementException.
+     */
+    public Note getNote(Note note){
+        throw new NoSuchElementException(
+                "There are no notes in the Empty RichAnnotation object"
+                );
+    }
+    
+    /**
+     * {@inheritDoc} You can not add properties to the Empty RichAnnotation object
+     * @throws ChangeVetoException whenever you call this method.
+     */
+    public void setProperty(Object key, Object value)
+    throws ChangeVetoException {
+        throw new ChangeVetoException(
+                "You can not add properties to the Empty RichAnnotation object: " +
+                key + " -> " + value
+                );
+    }
+    
+    /**
+     * {@inheritDoc} You can not add Notes to the Empty RichAnnotation object.
+     * @throws ChangeVetoException whenever you call this method.
+     */
+    public void setNoteSet(Set notes) throws ChangeVetoException{
+        throw new ChangeVetoException(
+                "You can not add Notes to the Empty RichAnnotation object");
+    }
+    
+    /**
+     * {@inheritDoc} You can not add Notes to the Empty RichAnnotation object.
+     * @throws ChangeVetoException whenever you call this method.
+     */
+    public void addNote(Note note) throws ChangeVetoException{
+        throw new ChangeVetoException(
+                "You can not add Notes to the Empty RichAnnotation object");
+    }
+    
+    /**
+     * {@inheritDoc} Does nothing as it contains nothing.
+     */
+    public void clear() throws ChangeVetoException{ }
+    
+    
+    /**
+     * {@inheritDoc} You cannot remove properties from the Empty RichAnnotation
+     * @throws ChangeVetoException whenever you call this method.
+     */
+    public void removeProperty(Object key)
+    throws ChangeVetoException {
+        throw new ChangeVetoException(
+                "You cannot remove properties from the Empty RichAnnotation (!)"
+                );
+    }
+    
+    /**
+     * {@inheritDoc} You cannot remove notes from the Empty RichAnnotation
+     * @throws ChangeVetoException whenever you call this method.
+     */
+    public void removeNote(Note note)
+    throws ChangeVetoException {
+        throw new ChangeVetoException(
+                "You cannot remove notes from the Empty RichAnnotation (!)"
+                );
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return always false as there are no properties
+     */
+    public boolean containsProperty(Object key) {
+        return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return always false as there are no notes
+     */
+    public boolean contains(Note note){
+        return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return an empty set
+     */
+    public Set keys() {
+        return Collections.EMPTY_SET;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return an empty set
+     */
+    public Set getNoteSet(){
+        return Collections.EMPTY_SET;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return an new Map with no entries
+     */
+    public Map asMap() {
+        return new HashMap();
+    }
+    
+    // For use during serialization
+    private Object writeReplace() throws ObjectStreamException {
+        try {
+            return new StaticMemberPlaceHolder(RichAnnotation.class.getField("EMPTY_ANNOTATION"));
+        } catch (NoSuchFieldException nsfe) {
+            throw new NotSerializableException(nsfe.getMessage());
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return the hash code of a map with no entries
+     */
+    public int hashCode() {
+        return asMap().hashCode();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return true if and only if o is an instance of
+     *  this class or a descendant.
+     */
+    public boolean equals(Object o) {
+        return (o instanceof EmptyRichAnnotation);
+    }
     
 }

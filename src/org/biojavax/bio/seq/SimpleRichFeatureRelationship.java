@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleRichFeatureRelationship.java
- *
- * Created on June 16, 2005, 2:07 PM
- */
-
 package org.biojavax.bio.seq;
 
 import org.biojava.utils.AbstractChangeable;
@@ -36,34 +30,33 @@ import org.biojavax.ontology.ComparableTerm;
 
 /**
  * Represents a relationship between two features that is described by a term.
- * Equality is the combination of unique subject, object and term.
  * @author Richard Holland
  * @author Mark Schreiber
  *
  */
 public class SimpleRichFeatureRelationship extends AbstractChangeable implements RichFeatureRelationship {
+
+    private RichFeature subject;
+    private ComparableTerm term;
+    private int rank;
+    
+    private static ComparableTerm CONTAINS_TERM = null;    
     
     /**
-     * The default term used for defining the relationship between features.
+     * Gets the default CONTAINS term used for defining the relationship between features.
+     * @return the default CONTAINS term.
      */
-    private static ComparableTerm CONTAINS_TERM = null;
     public static ComparableTerm getContainsTerm() {
         if (CONTAINS_TERM==null) CONTAINS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("contains");
         return CONTAINS_TERM;
     }
     
-    private RichFeature subject;
-    private ComparableTerm term;
-    private int rank;
-    
     /**
-     * Creates a new instance of SimpleRichFeatureRelationship
-     * 
+     * Creates a new instance of SimpleRichFeatureRelationship.
      * @param subject The subject RichFeature.
      * @param term The relationship term.
      * @param rank the rank of the relationship.
-     */
-    
+     */    
     public SimpleRichFeatureRelationship(RichFeature subject, ComparableTerm term, int rank) {
         if (subject==null) throw new IllegalArgumentException("Subject cannot be null");
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
@@ -73,7 +66,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleRichFeatureRelationship() {}
+    private SimpleRichFeatureRelationship() {}
     
     /**
      * {@inheritDoc}
@@ -122,6 +115,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     
     /**
      * {@inheritDoc}
+     * Relations are compared first by rank, then subject, then finally term.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -135,6 +129,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     
     /**
      * {@inheritDoc}
+     * Relations are equal if their subjects and terms are equal.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -162,10 +157,10 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     
     /**
      * {@inheritDoc}
-     * In the form <code>this.getTerm()+"("+this.getSubject()+","+this.getObject()+")";<code>
+     * Form: "(#rank) term(subject)"
      */
     public String toString() {
-        return this.getTerm()+"("+this.getSubject()+")";
+        return "(#"+this.rank+") "+this.getTerm()+"("+this.getSubject()+")";
     }
     
     // Hibernate requirement - not for public use.

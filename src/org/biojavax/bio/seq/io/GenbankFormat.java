@@ -29,7 +29,6 @@ import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +42,6 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.ParseErrorListener;
 import org.biojavax.Comment;
 import org.biojavax.CrossRef;
 import org.biojavax.DocRef;
@@ -68,16 +66,14 @@ import org.biojavax.utils.StringTools;
 
 /**
  * Format reader for GenBank files. This version of Genbank format will generate
- * and write RichSequence objects. Based on code from the 
- * <code>org.biojava.bio.seq.io.GenbankFormat</code> object.
+ * and write RichSequence objects. Loosely Based on code from the old, deprecated,
+ * org.biojava.bio.seq.io.GenbankFormat object.
  *
  * @author Richard Holland
  * bugfixes
  * @author MarkSchreiber
  */
-public class GenbankFormat
-        implements RichSequenceFormat {
-    
+public class GenbankFormat implements RichSequenceFormat {
     
     /**
      * The name of this format
@@ -105,70 +101,70 @@ public class GenbankFormat
     protected static final String END_SEQUENCE_TAG = "//";
     
     private static ComparableTerm ACCESSION_TERM = null;
+    private static ComparableTerm KERYWORDS_TERM = null;
+    private static ComparableTerm MODIFICATION_TERM = null; 
+    private static ComparableTerm MOLTYPE_TERM = null;
+    private static ComparableTerm STRANDED_TERM = null; 
+    private static ComparableTerm GENBANK_TERM = null; 
+    
     /**
      * Getter for the accession term
-     * @return A <CODE>Term</CODE> that represents the accession tag
+     * @return A Term that represents the accession tag
      */
     public static ComparableTerm getAccessionTerm() {
         if (ACCESSION_TERM==null) ACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("ACCESSION");
         return ACCESSION_TERM;
-    }   
-    private static ComparableTerm KERYWORDS_TERM = null;
+    } 
+    
     /**
      * Getter for the keyword term
-     * @return a <code>Term</code> that represents the Keyword tag
+     * @return a Term that represents the Keyword tag
      */
     public static ComparableTerm getKeywordsTerm() {
         if (KERYWORDS_TERM==null) KERYWORDS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("KEYWORDS");
         return KERYWORDS_TERM;
-    }   
-    private static ComparableTerm MODIFICATION_TERM = null; 
+    }  
+    
     /**
      * Getter for the modification term
-     * @return a <code>Term</code>
+     * @return a Term
      */
     public static ComparableTerm getModificationTerm() {
         if (MODIFICATION_TERM==null) MODIFICATION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("MDAT");
         return MODIFICATION_TERM;
     }   
-    private static ComparableTerm MOLTYPE_TERM = null;
+    
     /**
      * getter for the MolType term
-     * @return a <code>Term</code> that represents the molecule type
+     * @return a Term that represents the molecule type
      */
     public static ComparableTerm getMolTypeTerm() {
         if (MOLTYPE_TERM==null) MOLTYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("MOLTYPE");
         return MOLTYPE_TERM;
     }   
-    private static ComparableTerm STRANDED_TERM = null; 
+    
     /**
      * Getter for the Strand term
-     * @return a <code>Term</code> that represents the Strand tag
+     * @return a Term that represents the Strand tag
      */
     public static ComparableTerm getStrandedTerm() {
         if (STRANDED_TERM==null) STRANDED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("STRANDED");
         return STRANDED_TERM;
     }   
-    private static ComparableTerm GENBANK_TERM = null; 
+    
     /**
      * Getter for the Genbank term
-     * @return The genbank <code>Term</code>
+     * @return The genbank Term
      */
     public static ComparableTerm getGenBankTerm() {
         if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
         return GENBANK_TERM;
     }   
     
-    private boolean elideSymbols = false;
+    private int lineWidth = 80;
     
     /**
-     * The line width for output.
-     */
-    protected int lineWidth = 80;
-    
-    /**
-     * Retrive the current line width.
-     *
+     * Retrive the current line width. Defaults to 80.
      * @return the line width
      */
     public int getLineWidth() {
@@ -176,28 +172,35 @@ public class GenbankFormat
     }
     
     /**
-     * Set the line width.
-     * <p>
-     * When writing, the lines of sequence will never be longer than the line
-     * width.
-     *
+     * Set the line width. When writing, the lines of sequence will never be longer than the line
+     * width. Defaults to 80.
      * @param width the new line width
      */
     public void setLineWidth(int width) {
         this.lineWidth = width;
     }
+        
+    private boolean elideSymbols = false;
     
     /**
-     * Reads a sequence. A RichSequenceObject is returned.
-     * @param reader The reader of the input source
-     * @param symParser A parser capable of reading IUPAC DNA codes.
-     * @param listener Must be a RichSeqIOListener. 
-     * Others are not currently supported. 
-     * An IllegalArgumentException will be thrown if it is not.
-     * @throws org.biojava.bio.symbol.IllegalSymbolException If the <code>symParser</code> cannot read the sequence information.
-     * @throws java.io.IOException If the <code>reader</code> cannot read from the source
-     * @throws org.biojava.bio.seq.io.ParseException If the genbank data is malformed or cannot be interpreted.
-     * @return true if another sequence is available from the reader, otherwise false.
+     * Is the format going to emit events when sequence data is read?
+     * @return true if it is (true is default) otherwise false.
+     */
+    public boolean getElideSymbols() {
+        return elideSymbols;
+    }
+    
+    /**
+     * Use this method to toggle reading of sequence data. If you're only
+     * interested in header data set to true.
+     * @param elideSymbols set to true if you don't want the sequence data.
+     */
+    public void setElideSymbols(boolean elideSymbols) {
+        this.elideSymbols = elideSymbols;
+    }
+    
+    /**
+     * {@inheritDoc}
      */
     public boolean readSequence(BufferedReader reader,
             SymbolTokenization symParser,
@@ -208,30 +211,16 @@ public class GenbankFormat
     }
     
     /**
-     * Reads a sequence from the specified reader using the Symbol
-     * parser and Sequence Factory provided. The sequence read in must
-     * be in Genbank format.
-     * 
-     * @return boolean True if there is another sequence in the file; false
-     * otherwise
-     * @param reader The reader of the input source
-     * @param symParser A parser capable of reading IUPAC DNA codes.
-     * @param rlistener The target of call-back events
-     * @param ns The namespace to read into. Leave as null for the default namespace.
-     * @throws org.biojava.bio.symbol.IllegalSymbolException 
-     *   If the <code>symParser</code> cannot read the sequence information.
-     * @throws java.io.IOException 
-     *   If data cannot be read from the <code>Reader</code>
-     * @throws org.biojava.bio.seq.io.ParseException If the genbank data is malformed or cannot be interpreted.
+     * {@inheritDoc}
      */
-    // if ns==null default namespace is used
     public boolean readRichSequence(BufferedReader reader,
             SymbolTokenization symParser,
             RichSeqIOListener rlistener,
             Namespace ns)
             throws IllegalSymbolException, IOException, ParseException {
+        
         String line;
-        boolean hasAnotherSequence    = true;
+        boolean hasAnotherSequence = true;
         boolean hasInternalWhitespace = false;
         
         rlistener.startSequence();
@@ -486,6 +475,7 @@ public class GenbankFormat
         return hasAnotherSequence;
     }
     
+    // reads an indented section, combining split lines and creating a list of key->value tuples
     private List readSection(BufferedReader br) throws ParseException {
         List section = new ArrayList();
         String line;
@@ -494,9 +484,12 @@ public class GenbankFormat
         boolean done = false;
         int linecount = 0;
         
-        //s0-8 word s1-7 value
-        //s21 /word = value
-        //s21 /word
+        //sections start at a line and continue till the first line afterwards with a
+        //non-whitespace first character
+        //we want to match any of the following as a new section within a section
+        //  \s{0,8} word \s{1,7} value
+        //  \s{21} /word = value
+        //  \s{21} /word
         String regex = "^(\\s{0,8}(\\S+)\\s{1,7}(.*)|\\s{21}(/\\S+?)=(.*)|\\s{21}(/\\S+))$";
         Pattern p = Pattern.compile(regex);
         try {
@@ -536,44 +529,31 @@ public class GenbankFormat
     }
     
     /**
-     * <code>writeSequence</code> writes a sequence to the specified
-     * <code>PrintStream</code>.
-     * @param seq the sequence to write
-     * @param os the print stream to write to.
-     * @throws IOException if an io problem prevents writing to the stream.
+     * {@inheritDoc}
      */
     public void	writeSequence(Sequence seq, PrintStream os) throws IOException {
         this.writeSequence(seq, getDefaultFormat(), os, null);
     }
     
     /**
-     * @deprecated use writeSequence(Sequence seq, PrintStream os)
+     * {@inheritDoc}
      */
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
         this.writeSequence(seq, format, os, null);
     }
     
     /**
-     * @deprecated use writeSequence(Sequence seq, PrintStream os)
+     * {@inheritDoc}
+     * Namespace is ignored as Genbank has no concept of it.
      */
     public void	writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, null);
+        this.writeSequence(seq, getDefaultFormat(), os, ns);
     }
+    
     /**
-     * <code>writeSequence</code> writes a sequence to the specified
-     * <code>PrintStream</code>, using the specified format.
-     *
-     * @param seq a <code>RichSequence</code> to write out.
-     * @param format a <code>String</code> indicating which sub-format
-     * of those available from a particular
-     * <code>SequenceFormat</code> implemention to use when
-     * writing.
-     * @param os a <code>PrintStream</code> object.
-     *
-     * @exception IOException if an error occurs.
-     * @deprecated use writeSequence(Sequence seq, PrintStream os)
+     * {@inheritDoc}
+     * Namespace is ignored as Genbank has no concept of it.
      */
-    // ns is ignored
     public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
         // Genbank only really - others are treated identically for now
         if (!(
@@ -768,14 +748,17 @@ public class GenbankFormat
         os.println(END_SEQUENCE_TAG);
     }
     
+    // writes a line wrapped over spaces
     private void writeWrappedLine(String key, int indent, String text, PrintStream os) throws IOException {
         this._writeWrappedLine(key,indent,text,os,"\\s");
     }
-    
+
+    // writes a line wrapped over commas
     private void writeWrappedLocationLine(String key, int indent, String text, PrintStream os) throws IOException {
         this._writeWrappedLine(key,indent,text,os,",");
     }
     
+    // writes a line wrapped to a certain width and indented
     private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
         text = text.trim();
         StringBuffer b = new StringBuffer();
@@ -791,58 +774,10 @@ public class GenbankFormat
     }
     
     /**
-     * <code>getDefaultFormat</code> returns the String identifier for
-     * the default format.
-     *
-     * @return a <code>String</code>.
-     * @deprecated
+     * {@inheritDoc}
      */
     public String getDefaultFormat() {
         return GENBANK_FORMAT;
-    }
-    
-    /**
-     * Is the format going to emit events when sequence data is read?
-     * @return true if it is (true is default) otherwise false.
-     */
-    public boolean getElideSymbols() {
-        return elideSymbols;
-    }
-    
-    /**
-     * Use this method to toggle reading of sequence data. If you're only
-     * interested in header data set to true.
-     * @param elideSymbols set to true if you don't want the sequence data.
-     */
-    public void setElideSymbols(boolean elideSymbols) {
-        this.elideSymbols = elideSymbols;
-    }
-    
-    
-    private Vector mListeners = new Vector();
-    
-    /**
-     * Adds a parse error listener to the list of listeners if it isn't already
-     * included.
-     *
-     * @param theListener Listener to be added.
-     */
-    public synchronized void addParseErrorListener(ParseErrorListener theListener) {
-        if (mListeners.contains(theListener) == false) {
-            mListeners.addElement(theListener);
-        }
-    }
-    
-    /**
-     * Removes a parse error listener from the list of listeners if it is
-     * included.
-     *
-     * @param theListener Listener to be removed.
-     */
-    public synchronized void removeParseErrorListener(ParseErrorListener theListener) {
-        if (mListeners.contains(theListener) == true) {
-            mListeners.removeElement(theListener);
-        }
     }
 }
 

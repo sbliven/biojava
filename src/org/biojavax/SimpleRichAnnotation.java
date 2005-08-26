@@ -42,16 +42,16 @@ import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
- * Simple annotation wrapper. All non-note annotations get a rank of zero.
- *
+ * Simple annotation wrapper. All non-Note annotations get a rank of zero.
  * @author Richard Holland
  */
 public class SimpleRichAnnotation extends AbstractChangeable implements RichAnnotation {
     
-    private Set notes = new TreeSet(); // Keeps them ordered by rank then term
+    private Set notes;
     
-    /** Creates a new instance of SimpleRichAnnotation */
+    /** Creates a new, empty instance of SimpleRichAnnotation */
     public SimpleRichAnnotation() {
+        this.notes = new TreeSet(); // Keeps them ordered by rank then term
     }
     
     /**
@@ -98,6 +98,10 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
         }
     }
     
+    // A dummy note is a Note object with the given key and no value. It is used
+    // for purposes of comparing/converting non-Note annotations. The string
+    // value of the key is created in the default ontology as a Term, unless the key
+    // is already a term, in which case the Term is imported to the default ontology.
     private Note dummyNote(Object key) {
         if (key==null) throw new IllegalArgumentException("Key cannot be null"); 
         if (!(key instanceof ComparableTerm)) {
@@ -126,7 +130,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
             Note n = (Note)i.next();
             if (note.equals(n)) return n;
         }
-        throw new NoSuchElementException("No such property: "+note.getTerm().getName()+", rank "+note.getRank());
+        throw new NoSuchElementException("No such property: "+note.getTerm()+", rank "+note.getRank());
     }
     
     /**
@@ -178,13 +182,32 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
-    public Set getNoteSet() { return this.notes; } // original for Hibernate
+    public Set getNoteSet() {  return this.notes; } // original for Hibernate
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
-    public void setNoteSet(Set notes) throws ChangeVetoException {
-        this.notes = notes;  // original for Hibernate
+    public void setNoteSet(Set notes) throws ChangeVetoException { this.notes = notes; } // original for Hibernate
+    
+    /**
+     * {@inheritDoc}
+     * Form: list of "[note]" values separated by commas
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        for (Iterator i = this.notes.iterator(); i.hasNext(); ) {
+            sb.append("[");
+            sb.append(i.next());
+            sb.append("]");
+            if (i.hasNext()) sb.append(",");
+        }
+        return sb.toString();
     }
 }

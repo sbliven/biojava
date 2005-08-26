@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleBioEntry.java
- *
- * Created on June 16, 2005, 10:29 AM
- */
-
 package org.biojavax.bio;
 import java.util.TreeSet;
 import java.util.Set;
@@ -65,9 +59,10 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     private RichAnnotation notes = new SimpleRichAnnotation();
     private ChangeForwarder annFor;
     
-    
     /**
-     * Creates a new feature holding bioentry.
+     * Creates a new bioentry representing the sequence in the given namespace
+     * with the given name, accession and version. These properties are all
+     * immutable and non-nullable.
      * @param ns The namespace for this new bioentry (not null).
      * @param name The name for this new bioentry (not null).
      * @param accession The accession for this new bioentry (not null).
@@ -87,16 +82,14 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
         this.ns = ns;
     }
     
-    /**
-     * Hibernate requirement - not for public use.
-     */
-    protected SimpleBioEntry() {}
+    // Hibernate requirement - not for public use.
+    protected SimpleBioEntry() {} // protected so SimpleRichSequence can extend us
     
     /**
-     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
-     * <code>Collection</code> not a copy. This is required by Hibernate. If you
-     * modify the object directly the behaivour may be unpredictable.
-     * 
+     * {@inheritDoc} 
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getRankedCrossRefs() { return this.rankedcrossrefs; } // original for Hibernate
     
@@ -128,39 +121,42 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     public Annotation getAnnotation() { return this.notes; }
     
     /**
-     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
-     * <code>Collection</code> not a copy. This is required by Hibernate. If you
-     * modify the object directly the behaivour may be unpredictable.
-     * 
+     * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getNoteSet() { return this.notes.getNoteSet(); }
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
     
     /**
-     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
-     * <code>Collection</code> not a copy. This is required by Hibernate. If you
-     * modify the object directly the behaivour may be unpredictable.
-     * 
+     * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getComments() { return this.comments; } // must be original for Hibernate
     
     /**
-     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
-     * <code>Collection</code> not a copy. This is required by Hibernate. If you
-     * modify the object directly the behaivour may be unpredictable.
-     * 
+     * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getRankedDocRefs() { return this.rankeddocrefs; } // must be original for Hibernate
     
     /**
-     * {@inheritDoc} <b>Warning</b> this method gives access to the original 
-     * <code>Collection</code> not a copy. This is required by Hibernate. If you
-     * modify the object directly the behaivour may be unpredictable.
-     * 
+     * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getRelationships() { return this.relationships; }  // must be original for Hibernate
     
@@ -271,9 +267,9 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     public int getVersion() { return this.version; }
     
     /**
-     * Equality is determined by comparing the namespace, name, accession and
-     * version.
-     * @return true if and only if all are the above are equal
+     * {@inheritDoc}
+     * Two bioentries are equal if they share the same namespace, name,
+     * accession and version.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -289,12 +285,9 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     }
     
     /**
-     * Compare this object to another. The comparison is made based on namespace,
-     * name, accession, version (in that order). If any of the first three are
-     * found to be different the comparison of the first two unequal values is returned.
-     * If the first three are equal then the difference of the version numbers is returned.
-     * @return a positive int if <code>o</code> preceeds <code>this</code>, 0 if
-     *  they are equal and a negative int if <code>this</code> preceeds <code>o</code>
+     * {@inheritDoc}
+     * Bioentries are ordered first by namespace, then name, accession, and
+     * finally version.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -323,10 +316,12 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     }
     
     /**
-     * {@inheritDoc} Form: 
-     * <code>this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" v."+this.getVersion();</code>
+     * {@inheritDoc} 
+     * Form: namespace:name/accession.version
      */
-    public String toString() { return this.getNamespace()+": "+this.getName()+"/"+this.getAccession()+" v."+this.getVersion(); }
+    public String toString() { 
+        return this.getNamespace()+":"+this.getName()+"/"+this.getAccession()+"."+this.getVersion(); 
+    }
         
     /**
      * {@inheritDoc}

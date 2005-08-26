@@ -19,13 +19,8 @@
  *
  */
 
-/*
- * RangeRichLocation.java
- *
- * Created on June 16, 2005, 11:47 AM
- */
-
 package org.biojavax.bio.seq;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,9 +48,6 @@ import org.biojavax.ontology.ComparableTerm;
 
 /**
  * A simple implementation of RichLocation.
- *
- * Equality is based on parent, min and max, strand, and rank.
- *
  * @author Richard Holland
  * @author Mark Schreiber
  */
@@ -72,17 +64,18 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private int circularLength = 0;
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation.
-     *
+     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * single position on the positive strand.
      * @param pos the location position (a point).
      * @param rank Rank of location.
      */
     public SimpleRichLocation(Position pos, int rank) {
         this(pos,pos,rank,Strand.POSITIVE_STRAND);
     }
+    
     /**
-     * Creates a new instance of SimpleRichSequenceLocation.
-     *
+     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * single position.
      * @param pos the location position (a point).
      * @param rank Rank of location.
      * @param strand The strand of the location
@@ -92,20 +85,20 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation.
-     *
+     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * single position on another sequence.
      * @param pos the location position (a point).
      * @param rank Rank of location.
      * @param strand the strand of the location
-     * @param crossRef a cross reference to another object
+     * @param crossRef a cross reference to another object (null for parent sequence)
      */
     public SimpleRichLocation(Position pos, int rank, Strand strand, CrossRef crossRef) {
         this(pos,pos,rank,strand,crossRef);
     }
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation.
-     *
+     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * range position on the positive strand.
      * @param min the minimum bound of the location
      * @param max the maximum bound of the location
      * @param rank Rank of location.
@@ -116,8 +109,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation.
-     *
+     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * range position.
      * @param min the minimum bound of the location
      * @param max the maximum bound of the location
      * @param rank Rank of location.
@@ -128,13 +121,13 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation.
-     *
+     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * range position on another sequence.
      * @param min the minimum bound of the location
      * @param max the maximum bound of the location
      * @param rank Rank of location.
      * @param strand the strand of the location
-     * @param crossRef a cross reference to another object.
+     * @param crossRef a cross reference to another object (null for parent sequence)
      */
     public SimpleRichLocation(Position min, Position max, int rank, Strand strand, CrossRef crossRef) {
         this.min = min;
@@ -157,17 +150,23 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private void setCrossRef(CrossRef crossRef) { this.crossRef = crossRef; }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
      */
     public Annotation getAnnotation() { return this.notes; }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getNoteSet() { return this.notes.getNoteSet(); }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
     
@@ -281,11 +280,20 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     // Hibernate requirement - not for public use.
     private void setMin(int min) {  this.min = new SimplePosition(false,false,min); }
-    
+        
+    /**
+     * {@inheritDoc}
+     */
     public Position getMinPosition() { return this.min; }
-    
+        
+    /**
+     * {@inheritDoc}
+     */
     public Position getMaxPosition() { return this.max; }
-    
+        
+    /**
+     * {@inheritDoc}
+     */
     public void setPositionResolver(PositionResolver p) { this.pr = p; }
     
     /**
@@ -409,6 +417,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             if (this.overlaps(rl) && this.getStrand().equals(rl.getStrand())) {
                 // We can do the one-v-one overlapping same-strand union
                 if (this.circularLength>0) {
+                    // Union of Overlapping circular locations
                     // Modulate our start/end to shortest possible equivalent region
                     int parts[] = RichLocation.Tools.modulateCircularLocationPair(this,rl,this.circularLength);
                     int ourModStart = parts[0];
@@ -474,6 +483,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         } else return l.intersection(this); // delegate the one-v-many intersection job
     }
     
+    // calculates the smaller of the two positions, based on their resolver output
     private Position posmin(Position a, Position b) {
         int ar = this.pr.getMin(a);
         int br = this.pr.getMin(b);
@@ -481,6 +491,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         else return b;
     }
     
+    // calculates the smaller of the two positions, based on their resolver output
     private Position posmax(Position a, Position b) {
         int ar = this.pr.getMax(a);
         int br = this.pr.getMax(b);
@@ -546,6 +557,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     /**
      * {@inheritDoc}
+     * Locations are equal if their term, min, max, strand, and crossref are
+     * the same, and if their rank is the same too.
      */
     public boolean equals(Object o) {
         if (! (o instanceof RichLocation)) return false;
@@ -571,6 +584,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     /**
      * {@inheritDoc}
+     * Locations are sorted first by rank, then crossref, then
+     * strand, then term, then min, then max.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -594,14 +609,25 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         return this.getMax()-fo.getMax();
     }
     
+    /** 
+     * {@inheritDoc}
+     * Form: "start..end" or just "point" for point locations
+     */
+    public String toString() {
+        if (this.max.equals(this.min)) {
+            return this.min.toString();
+        } else {
+            return this.min+".."+this.max;
+        }
+    }
     
-// Hibernate requirement - not for public use.
+    // Hibernate requirement - not for public use.
     private Integer id;
     
-// Hibernate requirement - not for public use.
+    // Hibernate requirement - not for public use.
     private Integer getId() { return this.id; }
     
-// Hibernate requirement - not for public use.
+    // Hibernate requirement - not for public use.
     private void setId(Integer id) { this.id = id; }
 }
 

@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleComparableTriple.java
- *
- * Created on July 11, 2005, 10:54 AM
- */
-
 package org.biojavax.ontology;
 
 import java.util.Collections;
@@ -38,13 +32,10 @@ import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
-
+import org.biojavax.RichAnnotation;
 
 /**
  * Basic comparable triple, BioSQL style.
- *
- * Equality is a unique combination of ontology, predicate, object and subject.
- *
  * @author Richard Holland
  */
 public class SimpleComparableTriple extends AbstractChangeable implements ComparableTriple {
@@ -56,7 +47,8 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     private Set descriptors = new TreeSet();
     
     /**
-     * Creates a new instance of SimpleComparableTriple.
+     * Creates a new instance of SimpleComparableTriple. All parameters are 
+     * required and immutable.
      * @param ontology the ontology of the triple.
      * @param subject the subject of the triple.
      * @param object the object of the triple.
@@ -74,10 +66,12 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleComparableTriple() {}
+    private SimpleComparableTriple() {}
     
     /**
      * {@inheritDoc}
+     * Triples are sorted in order of ontology, subject, object, and finally
+     * predicate.
      */
     public int compareTo(Object o) {
         Triple them = (Triple)o;
@@ -92,6 +86,8 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     
     /**
      * {@inheritDoc}
+     * Triples are equal only if they are from the same ontology and share the
+     * same subject, object and predicate.
      */
     public boolean equals(Object o) {
         if(this == o) return true;
@@ -123,17 +119,14 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     
     /**
      * {@inheritDoc}
+     * Returns the output of toSring()
      */
-    public String getName() {
-        return this.predicate.getName() + "(" + this.subject.getName() + ", " + this.object.getName() + ")";
-    }
+    public String getName() { return this.toString(); }
     
     /**
      * {@inheritDoc}
      */
-    public Term getSubject() {
-        return this.subject;
-    }
+    public Term getSubject() { return this.subject; }
     
     // Hibernate requirement - not for public use.
     private void setSubject(ComparableTerm subject) { this.subject = subject; }
@@ -141,9 +134,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     /**
      * {@inheritDoc}
      */
-    public Term getObject() {
-        return this.object;
-    }
+    public Term getObject() { return this.object; }
     
     // Hibernate requirement - not for public use.
     private void setObject(ComparableTerm object) { this.object = object; }
@@ -151,9 +142,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     /**
      * {@inheritDoc}
      */
-    public Term getPredicate() {
-        return this.predicate;
-    }
+    public Term getPredicate() { return this.predicate; }
     
     // Hibernate requirement - not for public use.
     private void setPredicate(ComparableTerm predicate) { this.predicate = predicate; }
@@ -208,11 +197,17 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getDescriptors() { return this.descriptors; } // originals for Hibernate
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public void setDescriptors(Set descriptors) throws ChangeVetoException {
         this.descriptors = descriptors;  // originals for Hibernate
@@ -238,50 +233,41 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      * {@inheritDoc}
      * ALWAYS RETURNS AN EMPTY LIST
      */
-    public Object[] getSynonyms() {
-        return Collections.EMPTY_LIST.toArray();
-    }
+    public Object[] getSynonyms() { return Collections.EMPTY_LIST.toArray(); }
     
     /**
      * {@inheritDoc}
      */
-    public Ontology getOntology() {
-        return this.ontology;
-    }
+    public Ontology getOntology() { return this.ontology; }
     
     // Hibernate requirement - not for public use.
     private void setOntology(ComparableOntology descriptors) { this.ontology = ontology; }
     
     /**
      * {@inheritDoc}
+     * ALWAYS RETURNS THE EMPTY STRING
      */
-    public String getDescription() {
-        return "";
-    }
+    public String getDescription() { return ""; }
     
     /**
      * {@inheritDoc}
+     * ALWAYS RETURNS THE EMPTY ANNOTATION
      */
-    public Annotation getAnnotation() {
-        return Annotation.EMPTY_ANNOTATION;
-    }
+    public Annotation getAnnotation() { return RichAnnotation.EMPTY_ANNOTATION; }
     
     /**
      * {@inheritDoc}
-     * The string takes the form <code>predicate(subject,object)</code>
+     * Form: "ontology:predicate(subject,object)"
      */
     public String toString() {
-        return this.predicate+"("+this.subject+","+this.object+")";
+        return this.ontology+":"+this.predicate+"("+this.subject+","+this.object+")";
     }
-    
     
     // Hibernate requirement - not for public use.
     private Integer id;
     
-    
     // Hibernate requirement - not for public use.
     private Integer getId() { return this.id; }
-    
     
     // Hibernate requirement - not for public use.
     private void setId(Integer id) { this.id = id; }

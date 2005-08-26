@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * BioEntryRelationship.java
- *
- * Created on June 14, 2005, 5:33 PM
- */
-
 package org.biojavax.bio;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
@@ -37,6 +31,7 @@ import org.biojavax.ontology.ComparableTerm;
  * BioSQL is what this represents.
  * @author Mark Schreiber
  * @author Richard Holland
+ * @see BioEntry
  */
 public interface BioEntryRelationship extends Comparable,Changeable {
     
@@ -47,26 +42,33 @@ public interface BioEntryRelationship extends Comparable,Changeable {
             );
     
     /**
-     * Setter for property rank.
+     * Sets the rank of this relationship. The rank may be null in
+     * the database, hence the use of an Integer object here and not
+     * an int primitive.
      * @param rank Value of property rank.
      * @throws ChangeVetoException if the rank rankles.
      */
     public void setRank(Integer rank) throws ChangeVetoException;
     
     /**
-     * Getter for property rank.
+     * Returns the rank of this relationship. The rank may be null in
+     * the database, hence the use of an Integer object here and not
+     * an int primitive.
      * @return Value of property rank.
      */
     public Integer getRank();
         
     /**
-     * Getter for property subject.
+     * Returns the subject of this relationship (ie. the BioEntry which
+     * this relationship targets). This is an immutable
+     * property set by the constructor of an instantiating class.
      * @return Value of property subject.
      */
     public BioEntry getSubject();
     
     /**
-     * Getter for property term.
+     * Returns the term describing the relationship. This is an immutable
+     * property set by the constructor of an instantiating class.
      * @return Value of property term.
      */
     public ComparableTerm getTerm();

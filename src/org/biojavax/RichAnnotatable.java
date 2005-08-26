@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * RichAnnotatable.java
- *
- * Created on July 28, 2005, 9:58 AM
- */
-
 package org.biojavax;
 
 import java.util.Set;
@@ -35,13 +29,15 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * Annotatable objects that can have rich annotations.
  * @author Richard Holland
+ * @see RichAnnotation
  */
 public interface RichAnnotatable extends Annotatable {
     
     /**
      * Returns the set of notes associated with this object. Would normally
      * delegate call to internal RichAnnotation instance.
-     * @return set the set of notes.
+     * @return set a set of Note objects.
+     * @see Note
      */
     public Set getNoteSet();
     
@@ -49,8 +45,10 @@ public interface RichAnnotatable extends Annotatable {
      * Clears the notes associated with this object and replaces them with
      * the contents of this set. Would normally delegate call to internal
      * RichAnnotation instance.
-     * @param notes the set of notes to replace the existing ones with.
-     * @throws ChangeVetoException if it doesn't like them.
+     * @param notes the set of Note objects to replace the existing ones with.
+     * @throws ChangeVetoException if the set is null or contains any objects
+     * that are not Note objects.
+     * @see Note
      */
     public void setNoteSet(Set notes) throws ChangeVetoException;
     

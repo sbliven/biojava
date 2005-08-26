@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleRichFeature.java
- *
- * Created on June 16, 2005, 11:47 AM
- */
-
 package org.biojavax.bio.seq;
 import java.util.Collection;
 import java.util.Iterator;
@@ -54,9 +48,6 @@ import org.biojavax.ontology.ComparableTerm;
 
 /**
  * A simple implementation of RichFeature.
- *
- * Equality is based on all type, source, parent and location fields.
- *
  * @author Richard Holland
  * @author Mark Schreiber
  */
@@ -73,25 +64,26 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     private int rank;
     
     /**
-     * Creates a new instance of SimpleRichFeature
+     * Creates a new instance of SimpleRichFeature based on a template.
      * @param parent The parent feature holder.
      * @param templ The template to construct the feature from.
+     * @throws ChangeVetoException if we don't want to be like the template.
+     * @throws InvalidTermException if any of the template terms are bad.
      */
     public SimpleRichFeature(FeatureHolder parent, Feature.Template templ) throws ChangeVetoException, InvalidTermException {
         if (parent==null) throw new IllegalArgumentException("Parent cannot be null");
         if (templ==null) throw new IllegalArgumentException("Template cannot be null");
-        
         if (templ.type==null && templ.typeTerm==null) throw new IllegalArgumentException("Template type cannot be null");
         if (templ.source==null && templ.sourceTerm==null) throw new IllegalArgumentException("Template source cannot be null");
         if (templ.location==null) throw new IllegalArgumentException("Template location cannot be null");
         
         this.setParent(parent);
+        this.setLocation(templ.location);
         
         if (templ.typeTerm!=null) this.setTypeTerm(templ.typeTerm);
         else this.setType(templ.type);
         if (templ.sourceTerm!=null) this.setSourceTerm(templ.sourceTerm);
         else this.setSource(templ.source);
-        this.setLocation(templ.location);
         
         if (templ.annotation instanceof RichAnnotation) {
             this.notes.setNoteSet(((RichAnnotation)templ.annotation).getNoteSet());
@@ -110,7 +102,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleRichFeature() {}
+    private SimpleRichFeature() {}
     
     /**
      * {@inheritDoc}
@@ -134,17 +126,24 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     public Annotation getAnnotation() { return this.notes; }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getNoteSet() { return this.notes.getNoteSet(); }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
     
     // Hibernate use only
     private Set getLocationSet() {
+        // Convert the location into a set of BioSQL-compatible simple locations
         Collection newlocs = RichLocation.Tools.flatten(this.location);
         this.locsSet.retainAll(newlocs); // clear out forgotten ones
         this.locsSet.addAll(newlocs); // add in new ones
@@ -154,6 +153,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     // Hibernate use only
     private void setLocationSet(Set locs) throws ChangeVetoException {
         this.locsSet = locs; // original kept for Hibernate purposes
+        // Construct a nice BioJavaX location from the set of BioSQL-compatible simple ones
         this.location = RichLocation.Tools.construct(RichLocation.Tools.merge(locs));
     }
     private Set locsSet = new TreeSet();
@@ -233,7 +233,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         try {
             this.setSourceTerm(RichObjectFactory.getDefaultOntology().getOrCreateTerm(source));
         } catch (InvalidTermException e) {
-            throw new ChangeVetoException("Something strange, they don't like our terms",e);
+            throw new ChangeVetoException("Source term was rejected by the default ontology",e);
         }
     }
     
@@ -278,7 +278,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         try {
             this.setTypeTerm(RichObjectFactory.getDefaultOntology().getOrCreateTerm(type));
         } catch (InvalidTermException e) {
-            throw new ChangeVetoException("Something strange, they don't like our terms",e);
+            throw new ChangeVetoException("Type term was rejected by the default ontology",e);
         }
     }
     
@@ -374,12 +374,18 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getRankedCrossRefs() { return this.crossrefs; }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public void setRankedCrossRefs(Set crossrefs) throws ChangeVetoException {
         this.crossrefs = crossrefs; // original for Hibernate
@@ -432,12 +438,18 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getFeatureRelationshipSet() { return this.relations; } // must be original for Hibernate
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public void setFeatureRelationshipSet(Set relationships) throws ChangeVetoException {
         this.relations = relationships;  // must be original for Hibernate
@@ -489,6 +501,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         }
     }
     
+    // Converts relations into a set of child feature objects
     private Set relationsToFeatureSet() {
         Set features = new TreeSet();
         for (Iterator i = this.relations.iterator(); i.hasNext(); ) {
@@ -587,6 +600,8 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     
     /**
      * {@inheritDoc}
+     * Features are equal when they have the same parent, type, source
+     * and rank.
      */
     public boolean equals(Object o) {
         if (! (o instanceof Feature)) return false;
@@ -606,6 +621,8 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     
     /**
      * {@inheritDoc}
+     * Features are sorted by rank only. However, equal ranks are
+     * acceptable, so -1 is returned if the ranks are equal.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -617,6 +634,14 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
             if (this.rank!=rfo.getRank()) return this.rank-rfo.getRank();
         }
         return -1; // because multiple equal items are allowed
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Form: "(#rank) parent:type,source(location)"
+     */
+    public String toString() {
+        return "(#"+this.rank+") "+this.parent+":"+this.getType()+","+this.getSource()+"("+this.location+")";
     }
     
     // Hibernate requirement - not for public use.

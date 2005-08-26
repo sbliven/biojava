@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleNCBITaxon.java
- *
- * Created on June 16, 2005, 10:01 AM
- */
-
 package org.biojavax.bio.taxa;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -38,7 +32,6 @@ import org.biojava.utils.ChangeVetoException;
 
 /**
  * Reference implementation of NCBITaxon.
- * Equality is simply the NCBI taxon ID.
  * @author Richard Holland
  * @author Mark Schreiber
  */
@@ -55,31 +48,37 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     private Integer rightValue;
     
     /**
-     * Creates a new instance of SimpleNCBITaxon
+     * Creates a new instance of SimpleNCBITaxon based on the given taxon ID.
      * @param NCBITaxID the underlying taxon ID from NCBI.
      */
     public SimpleNCBITaxon(int NCBITaxID) {
         this.NCBITaxID = NCBITaxID;
     }
     
+    /**
+     * Creates a new instance of SimpleNCBITaxon based on the given taxon ID.
+     * It may not be null, else you'll get exceptions.
+     * @param NCBITaxID the underlying taxon ID from NCBI.
+     */
     public SimpleNCBITaxon(Integer NCBITaxID) {
         this.NCBITaxID = NCBITaxID.intValue();
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleNCBITaxon() {}
+    private SimpleNCBITaxon() {}
     
     /**
      * {@inheritDoc}
+     * NCBITaxon objects are compared only by their NCBITaxID fields.
      */
     public int compareTo(Object o) {
         NCBITaxon them = (NCBITaxon)o;
         return this.NCBITaxID-them.getNCBITaxID();
     }
     
-    
     /**
      * {@inheritDoc}
+     * NCBITaxon objects are equal if their NCBITaxID fields match.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -119,6 +118,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     // Hibernate requirement - not for public use.
     private void setNameSet(Set names) {
         this.names = names; // original for Hibernate
+        // convert set to map
         this.namesMap.clear();
         for (Iterator i = names.iterator(); i.hasNext(); ) {
             SimpleNCBITaxonName n = (SimpleNCBITaxonName)i.next();
@@ -129,7 +129,6 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
             }
         }
     }
-    
     
     /**
      * {@inheritDoc}
@@ -376,9 +375,21 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     
     /**
      * {@inheritDoc}
-     * In the form <code>"taxid:"+this.getNCBITaxID();</code>
+     * Form: "taxid:[name,name...]"
      */
-    public String toString() { return "taxid:"+this.getNCBITaxID(); }
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("taxid:");
+        sb.append(this.NCBITaxID);
+        sb.append("[");
+        for (Iterator i = this.getNameSet().iterator(); i.hasNext(); ) {
+            SimpleNCBITaxonName n = (SimpleNCBITaxonName)i.next();
+            sb.append(n);
+            if (i.hasNext()) sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
     
     // Hibernate requirement - not for public use.
     private Integer id;

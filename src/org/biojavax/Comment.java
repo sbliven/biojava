@@ -24,9 +24,11 @@ package org.biojavax;
 import org.biojavax.bio.BioEntry;
 
 /**
- * A simple ranked immutable comment system.
- *
+ * A simple ranked comment designed to be used for BioEntry comments 
+ * in BioSQL. The interface is immutable, the fields are intended to 
+ * be set by the constructor.
  * @author Richard Holland
+ * @see BioEntry
  */
 public interface Comment extends Comparable {
     

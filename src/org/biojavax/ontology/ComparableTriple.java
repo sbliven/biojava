@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * ComparableTriple.java
- *
- * Created on July 11, 2005, 10:54 AM
- */
-
 package org.biojavax.ontology;
 
 import java.util.Set;
@@ -35,7 +29,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * Comparable triples, obviously. Implements descriptors
+ * Comparable triples, obviously. Allows them to have descriptors. 
  * @author Richard Holland
  */
 public interface ComparableTriple extends Triple,Comparable,Changeable {
@@ -47,7 +41,7 @@ public interface ComparableTriple extends Triple,Comparable,Changeable {
             );
     
     /**
-     * Adds a descriptor.
+     * Adds a descriptor. Must not be null.
      * @param desc the descriptor to add.
      * @throws ChangeVetoException in case of objections.
      * @throws AlreadyExistsException if the descriptor already exists.
@@ -56,7 +50,7 @@ public interface ComparableTriple extends Triple,Comparable,Changeable {
     public void addDescriptor(ComparableTerm desc) throws AlreadyExistsException, IllegalArgumentException,ChangeVetoException;
     
     /**
-     * Removes a descriptor.
+     * Removes a descriptor. Must not be null.
      * @return True if it did it, false if the descriptor did not exist.
      * @param desc the descriptor to remove.
      * @throws ChangeVetoException in case of objections.
@@ -67,14 +61,16 @@ public interface ComparableTriple extends Triple,Comparable,Changeable {
     /**
      * Clears the current set of descriptors and replaces it with the content of 
      * the set passed.
-     * @param descriptors the descriptors to add.
+     * @param descriptors the set of ComparableTerm descriptors to add.
      * @throws ChangeVetoException in case of objections.
+     * @see ComparableTerm
      */
     public void setDescriptors(Set descriptors) throws ChangeVetoException;
     
     /**
      * Returns all descriptors.
-     * @return a set of all descriptors, possibly empty.
+     * @return a set of all ComparableTerm descriptors, possibly empty.
+     * @see ComparableTerm
      */
     public Set getDescriptors();
     

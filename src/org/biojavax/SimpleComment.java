@@ -21,8 +21,6 @@
 
 package org.biojavax;
 
-
-
 /**
  * An implementaion of Comment.
  * @author Richard Holland
@@ -33,9 +31,8 @@ public class SimpleComment implements Comment {
     private int rank;
     
     /**
-     * Constructs a new, immutable comment.
-     * 
-     * @param comment the text of the comment.
+     * Constructs a new, immutable comment, given some text and a rank.
+     * @param comment the text of the comment. Cannot be null.
      * @param rank the rank of the comment.
      */
     public SimpleComment(String comment, int rank) {
@@ -45,7 +42,7 @@ public class SimpleComment implements Comment {
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleComment() {}
+    private SimpleComment() {}
     
     // Hibernate requirement - not for public use.
     private void setComment(String comment) { this.comment = comment; }
@@ -65,6 +62,8 @@ public class SimpleComment implements Comment {
     
     /**
      * {@inheritDoc}
+     * Two comments are defined as equal if their text values and
+     * rankings are identical.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -79,6 +78,8 @@ public class SimpleComment implements Comment {
     
     /**
      * {@inheritDoc}
+     * Comments are ordered first by their rank, then by a string
+     * comparison of their text values.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -100,6 +101,14 @@ public class SimpleComment implements Comment {
         code = 37*code + this.comment.hashCode();
         code = 37*code + this.rank;
         return code;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Form: "(#rank) comment"
+     */
+    public String toString() { 
+        return "(#"+this.rank+") "+this.comment; 
     }
     
     // Hibernate requirement - not for public use.

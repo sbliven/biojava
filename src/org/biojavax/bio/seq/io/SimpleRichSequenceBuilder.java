@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleRichSequenceBuilder.java
- *
- * Created on July 11, 2005, 1:51 PM
- */
-
 package org.biojavax.bio.seq.io;
 
 import java.util.ArrayList;
@@ -71,14 +65,14 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  * Constructs BioEntry objects by listening to events.
  * @author Richard Holland
- * @since 1.5
  */
 public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequenceBuilder {
     
     private RichAnnotation notes = new SimpleRichAnnotation();
     
     /**
-     * Creates a new instance of SimpleRichSequenceBuilder
+     * Creates a new instance of SimpleRichSequenceBuilder using a SimpleSymbolListFactory
+     * with a threshold of zero.
      */
     public SimpleRichSequenceBuilder() {
         this(new SimpleSymbolListFactory(),0);
@@ -86,7 +80,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequence
         
     /**
      * Creates a new instance of SimpleRichSequenceBuilder with the
-     * desired symbollistfactory and threshold
+     * desired symbollistfactory and threshold of zero.
      * @param factory the symbollistfactory to use from the start.
      */
     public SimpleRichSequenceBuilder(SymbolListFactory factory) {
@@ -95,12 +89,10 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequence
     
     /**
      * Creates a new instance of SimpleRichSequenceBuilder with the
-     * desired symbollistfactory and threshold
+     * desired symbollistfactory and threshold.
      * @param factory the symbollistfactory to use.
      * @param threshold the threshold at which the specified symbollistfactory
      * should come into use. If <=0, it will be used from the start.
-     * This will be ignored if the packMode is not some
-     * type of threshold packing mode.
      */
     public SimpleRichSequenceBuilder(SymbolListFactory factory, int threshold) {
         this.reset();
@@ -158,7 +150,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequence
     
     /**
      * {@inheritDoc}
-     * @throws ParseException always. This method is no longer supported.
+     * NOT IMPLEMENTED
      */
     public void setURI(String uri) throws ParseException {
         throw new ParseException("We don't understand URIs");
@@ -322,10 +314,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequence
                 System.err.println(
                         "Warning: attempted to set taxon twice with different values. Keeping first value. "+
                         "old value (retained): "+this.taxon+" new value: "+taxon);
-                //throw new ParseException("Current BioEntry already has a taxon: "+this.taxon);
             }
-            //already have that taxon don't need to set it again
-            return;
         }
         this.taxon = taxon;
     }
@@ -404,10 +393,11 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequence
         if (this.namespace==null) throw new ParseException("Namespace has not been supplied");
         if (this.accessions.isEmpty()) throw new ParseException("No accessions have been supplied");
     }
-    
-    public void setCircular(boolean circular) throws ParseException {
-        this.circular = circular;
-    }
+        
+    /**
+     * {@inheritDoc}
+     */
+    public void setCircular(boolean circular) throws ParseException { this.circular = circular; }
     private boolean circular = false;
     
     /**
@@ -449,7 +439,5 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequence
     /**
      * {@inheritDoc}
      */
-    public RichSequence makeRichSequence() throws BioException {
-        return (RichSequence)this.makeSequence();
-    }
+    public RichSequence makeRichSequence() throws BioException { return (RichSequence)this.makeSequence(); }
 }

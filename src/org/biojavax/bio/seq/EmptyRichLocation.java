@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * RangeRichLocation.java
- *
- * Created on June 16, 2005, 11:47 AM
- */
-
 package org.biojavax.bio.seq;
 import java.util.Collections;
 import java.util.Iterator;
@@ -43,48 +37,46 @@ import org.biojavax.ontology.ComparableTerm;
  * An Empty implementation of RichLocation. This class is intended to 
  * act as a place holder for events like the intersection of two locations
  * that do not overlap so that null need not be returned.
- *
  * @author Richard Holland
  * @author Mark Schreiber
  */
 public class EmptyRichLocation extends Unchangeable implements RichLocation {
             
     /**
-     * {@inheritDoc} An <code>EmptyRichLocation</code> does not have cross-refs.
-     * @return null
+     * {@inheritDoc} 
+     * ALWAYS RETURNS NULL
      */
     public CrossRef getCrossRef() { return null; }
     
     /**
-     * {@inheritDoc} An <code>EmptyRichLocation</code> contains only an
-     * <code>RichAnnotation.EMPTY_ANNOTATION</code>.
-     * @return <code>RichAnnotation.EMPTY_ANNOTATION</code>
+     * {@inheritDoc}
+     * ALWAYS RETURNS THE EMPTY ANNOTATION
      */
     public Annotation getAnnotation() { return RichAnnotation.EMPTY_ANNOTATION; }
     
     /**
-     * {@inheritDoc} An empty set
-     * @return <code>Collections.EMPTY_SET</code>
+     * {@inheritDoc} 
+     * ALWAYS RETURNS THE EMPTY ANNOTATION NOTE SET
      */
     public Set getNoteSet() { return RichAnnotation.EMPTY_ANNOTATION.getNoteSet(); }
     
     /**
-     * You cannot annotate the empty location.
-     * @throws ChangeVetoException everytime this method is called.
+     * {@inheritDoc} 
+     * NOT IMPLEMENTED
      */
     public void setNoteSet(Set notes) throws ChangeVetoException {
         throw new ChangeVetoException("Cannot annotate the empty location");
     }
     
     /**
-     * {@inheritDoc} The empty location has no terms
-     * @return null
+     * {@inheritDoc} 
+     * ALWAYS RETURNS NULL
      */
     public ComparableTerm getTerm() { return null; }
     
     /**
-     * Cannot give a term to the empty location.
-     * @throws ChangeVetoException everytime this method is called.
+     * {@inheritDoc} 
+     * NOT IMPLEMENTED
      */
     public void setTerm(ComparableTerm term) throws ChangeVetoException {
         throw new ChangeVetoException("Cannot give a term to the empty location");
@@ -92,31 +84,33 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     
     /**
      * {@inheritDoc}
+     * ALWAYS RETURNS ZERO
      */
     public int getCircularLength() { return 0; }
     
     /**
-     * {@inheritDoc}
+     * {@inheritDoc} 
+     * NOT IMPLEMENTED
      */
     public void setCircularLength(int sourceSeqLength) throws ChangeVetoException {
         throw new ChangeVetoException("Cannot make empty locations circular");
     }
     
     /**
-     * {@inheritDoc} The empty_location has no defined strand
-     * @return Strand.UNKNOWN_STRAND
+     * {@inheritDoc} 
+     * ALWAYS RETURNS THE UNKNOWN STRAND
      */
     public Strand getStrand() { return Strand.UNKNOWN_STRAND; }
         
     /**
-     * {@inheritDoc} The empty location  has a rank of 0
-     * @return 0
+     * {@inheritDoc} 
+     * ALWAYS RETURNS ZERO
      */
     public int getRank() { return 0; }
     
     /**
-     * Cannot give a rank to the empty location.
-     * @throws ChangeVetoException everytime this method is called.
+     * {@inheritDoc} 
+     * NOT IMPLEMENTED
      */
     public void setRank(int rank) throws ChangeVetoException {
         throw new ChangeVetoException("Cannot give a rank to the empty location");
@@ -124,25 +118,25 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     
     /**
      * {@inheritDoc}
-     * @return 0
+     * ALWAYS RETURNS ZERO
      */
     public int getMax() { return 0; }
         
     /**
      * {@inheritDoc}
-     * @return 0
+     * ALWAYS RETURNS ZERO
      */
     public int getMin() { return 0; }
     
     /**
      * {@inheritDoc}
-     * @return a <code>SimplePosition</code> based around 0
+     * ALWAYS RETURNS THE EMPTY POSITION
      */ 
     public Position getMinPosition() { return Position.EMPTY_POSITION; }
     
     /**
      * {@inheritDoc}
-     * @return a <code>SimplePosition</code> based around 0
+     * ALWAYS RETURNS THE EMPTY POSITION
      */ 
     public Position getMaxPosition() { return Position.EMPTY_POSITION; }
     
@@ -154,55 +148,55 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     
     /**
      * {@inheritDoc}
-     * @return an interator over <code>Collections.EMPTY_SET</code>
+     * ALWAYS RETURNS THE EMPTY SET ITERATOR
      */
     public Iterator blockIterator() { return Collections.EMPTY_SET.iterator(); }
     
     /**
      * {@inheritDoc}
-     * @return true (always)
+     * ALWAYS RETURNS TRUE
      */
     public boolean isContiguous() { return true; }
         
     /**
      * {@inheritDoc}
-     * @return false (always)
+     * ALWAYS RETURNS FALSE
      */
     public boolean contains(int p) { return false; }
     
     /**
      * {@inheritDoc}
-     * @return null
+     * ALWAYS RETURNS NULL
      */
     public Location getDecorator(Class decoratorClass) { return null; }
     
     /**
-     * {@inheritDoc}
+     * @{inheritDoc}
+     * ALWAYS RETURNS PASSED LOCATION
      */
     public Location newInstance(Location loc) { return loc; }
     
     /**
      * {@inheritDoc}
-     * @return the same object, empty translated is still empty
+     * ALWAYS RETURNS SELF
      */
     public Location translate(int dist) { return this; }  
     
     /**
      * {@inheritDoc}
-     * @return false (always)
+     * ALWAYS RETURNS FALSE
      */
     public boolean contains(Location l) { return false; }
     
     /**
      * {@inheritDoc}
-     * @return false (always)
+     * ALWAYS RETURNS FALSE
      */
     public boolean overlaps(Location l) { return false; }
     
     /**
-     * {@inheritDoc} The union of an empty location and another location (l) is
-     * l.
-     * @return l
+     * {@inheritDoc} 
+     * ALWAYS RETURNS PASSED LOCATION
      */
     public Location union(Location l) {
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
@@ -212,7 +206,7 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     
     /**
      * {@inheritDoc}
-     * @return an empty location
+     * ALWAYS RETURNS SELF
      */
     public Location intersection(Location l) {
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
@@ -220,8 +214,8 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     }
     
     /**
-     * {@inheritDoc} the empty location covers no symbols
-     * @return <code>SymbolList.EMPTY_LIST</code>
+     * {@inheritDoc}
+     * ALWAYS RETURNS THE EMPTY SYMBOL LIST
      */
     public SymbolList symbols(SymbolList seq) {
         if (seq==null) throw new IllegalArgumentException("Sequence cannot be null");
@@ -230,12 +224,13 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     
     /**
      * {@inheritDoc}
+     * ALWAYS RETURNS 17
      */
     public int hashCode() { return 17; }
     
     /**
      * {@inheritDoc}
-     * @return true only if <code>o</code> is an EmptyRichLocation
+     * Empty Rich Locations only match other Empty Rich Locations
      */
     public boolean equals(Object o) {
         if (o instanceof EmptyRichLocation) return true;
@@ -244,12 +239,20 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     
     /**
      * {@inheritDoc}
-     * @return 0 if <code>o</code> is an instance of <code>EmptyRichLocation</code>
-     *   otherwise -1
+     * Empty Rich Locations return 0 when compared to other Empty ones,
+     * or -1 otherwise.
      */
     public int compareTo(Object o) {
         if (o instanceof EmptyRichLocation) return 0;
         else return -1;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * ALWAYS RETURNS "empty"
+     */
+    public String toString() {
+        return "empty";
     }
 }
 

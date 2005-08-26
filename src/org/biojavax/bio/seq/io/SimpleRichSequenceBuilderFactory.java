@@ -19,30 +19,25 @@
  *
  */
 
-/*
- * SimpleRichSequenceBuilderFactory.java
- *
- * Created on August 5, 2005, 10:55 AM
- */
-
 package org.biojavax.bio.seq.io;
 
 import org.biojava.bio.seq.io.SequenceBuilder;
 
 
 /**
- *
+ * Generates RichSequenceBuilder objects.
  * @author Mark Schreiber
  * @author Richard Holland
+ * @see RichSequenceBuilder
  */
 public class SimpleRichSequenceBuilderFactory implements RichSequenceBuilderFactory {
     
     /** Creates a new instance of SimpleRichSequenceBuilderFactory */
-    public SimpleRichSequenceBuilderFactory() {
-    }
+    public SimpleRichSequenceBuilderFactory() {}
 
-    public SequenceBuilder makeSequenceBuilder() {
-        return new SimpleRichSequenceBuilder();
-    }
+    /**
+     * {@inheritDoc}
+     */
+    public SequenceBuilder makeSequenceBuilder() { return new SimpleRichSequenceBuilder(); }
     
 }

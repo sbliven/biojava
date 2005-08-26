@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * Note.java
- *
- * Created on July 28, 2005, 9:58 AM
- */
-
 package org.biojavax;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
@@ -32,8 +26,12 @@ import org.biojava.utils.Changeable;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
- *
+ * Note is a generic class intended to hold a term describing the note, 
+ * a value to associate with that term, and a rank. It is a generic representation
+ * of the various qualifier_value tables in BioSQL. It is used inside RichAnnotation
+ * objects to represent annotations.
  * @author Richard Holland
+ * @see RichAnnotation
  */
 public interface Note extends Comparable,Changeable {
     
@@ -60,7 +58,7 @@ public interface Note extends Comparable,Changeable {
     public ComparableTerm getTerm();
     
     /**
-     * Sets the term for this note.
+     * Sets the term for this note. It cannot be null.
      * @param term the term to use.
      * @throws ChangeVetoException if it doesn't like the term.
      */
@@ -73,7 +71,7 @@ public interface Note extends Comparable,Changeable {
     public String getValue();
     
     /**
-     * Sets the value for this note.
+     * Sets the value for this note, or null for no value.
      * @param value the value to use.
      * @throws ChangeVetoException if it doesn't like the value.
      */
@@ -86,9 +84,9 @@ public interface Note extends Comparable,Changeable {
     public int getRank();
     
     /**
-     * Sets the ramk for this note.
+     * Sets the rank for this note.
      * @param value the rank to use.
-     * @throws ChangeVetoException if it doesn't like the ramk.
+     * @throws ChangeVetoException if it doesn't like the rank.
      */
     public void setRank(int value) throws ChangeVetoException;
     

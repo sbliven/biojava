@@ -34,8 +34,8 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
- * Represents a relationship between two bioentries that is described by a term.
- * Equality is the combination of unique subject and term.
+ * Represents a relationship between two bioentries that is described by a term 
+ * and given a rank.
  * @author Richard Holland
  * @author Mark Schreiber
  */
@@ -46,12 +46,12 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     private Integer rank;
     
     /**
-     * Creates a new instance of SimpleBioEntryRelationship
+     * Creates a new instance of SimpleBioEntryRelationship. None of the parameters
+     * may be null, and all are immutable except the rank.
      * @param rank The rank of the relationship.
      * @param subject The subject bioentry.
      * @param term The relationship term.
      */
-    
     public SimpleBioEntryRelationship(BioEntry subject, ComparableTerm term, Integer rank) {
         if (subject==null) throw new IllegalArgumentException("Subject cannot be null");
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
@@ -61,7 +61,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleBioEntryRelationship() {}
+    private SimpleBioEntryRelationship() {}
     
     /**
      * {@inheritDoc}
@@ -107,28 +107,26 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     private void setTerm(ComparableTerm term) { this.term = term; }
     
     /**
-     * Compares this object to another. The comparison is made based on the rank,
-     * subject and term (in that order). The first of these to be unequal will
-     * be used as the basis for the returned value. If all are equal the value
-     * will be 0.
-     * @return a positive int if <code>o</code> preceeds <code>this</code>, 0 if
-     *  they are equal and a negative int if <code>this</code> preceeds <code>o</code>
+     * {@inheritDoc}
+     * A relationship is compared first by rank, then subject, then term. If
+     * ranks are null, they are treated as zero for comparison's sake.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
         if (this.subject==null) return -1;
         // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)o;
-        if (!this.rank.equals(them.getRank())) return this.rank.compareTo(them.getRank());
+        int ourRank = (this.rank==null?0:this.rank.intValue());
+        int theirRank = (them.getRank()==null?0:them.getRank().intValue());
+        if (ourRank!=theirRank) return ourRank-theirRank;
         if (!this.subject.equals(them.getSubject())) return this.subject.compareTo(them.getSubject());
         return this.term.compareTo(them.getTerm());
     }
     
     /**
-     * {@inheritDoc} Equality is defined by a comparison of the subject and
-     * term of the relationship.
-     * return true if the subject and term of this object are equal to the 
-     *   subject and term of <code>obj</code>. False in all other conditions.
+     * {@inheritDoc} 
+     * Relationships are equal if they share the same subject and term, regardless
+     * of rank.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -156,9 +154,11 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     
     /**
      * {@inheritDoc}
-     * Form is <code>this.getTerm()+"("+this.getSubject()+")";<code>
+     * Form is "(#rank) term(subject)"
      */
-    public String toString() { return this.getTerm()+"("+this.getSubject()+")"; }
+    public String toString() {
+        return "(#"+this.rank+") "+this.getTerm()+"("+this.getSubject()+")"; 
+    }
     
     // Hibernate requirement - not for public use.
     private Integer id;

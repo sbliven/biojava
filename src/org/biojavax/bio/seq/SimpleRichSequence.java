@@ -20,6 +20,7 @@
  */
 
 package org.biojavax.bio.seq;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -59,10 +60,10 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     private Set features = new TreeSet();
     private Double symListVersion;
     private boolean circular;
-    
-    
+        
     /**
-     * Creates a new instance of SimpleRichSequence.
+     * Creates a new instance of SimpleRichSequence. Note the use of Double for
+     * seqversion, which indicates that it is nullable.
      * @param ns the namespace for this sequence.
      * @param name the name of the sequence.
      * @param accession the accession of the sequence.
@@ -79,7 +80,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleRichSequence() {}
+    private SimpleRichSequence() {} 
     
     /**
      * {@inheritDoc}
@@ -107,7 +108,10 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
             }
         }
     }
-    
+        
+    /**
+     * {@inheritDoc}
+     */
     public void setCircular(boolean circular) throws ChangeVetoException {
         if(!this.hasListeners(RichSequence.CIRCULAR)) {
             this.circular = circular;
@@ -126,7 +130,10 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
             }
         }
     }
-    
+        
+    /**
+     * {@inheritDoc}
+     */
     public boolean getCircular() {
         return this.circular;
     }
@@ -172,9 +179,9 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
                 if (modStart==0) modStart = seqLength;
                 if (modEnd==0) modEnd = seqLength;
                 // Use the packed symbol factory
-                ChunkedSymbolListFactory symsf = new ChunkedSymbolListFactory(new PackedSymbolListFactory());
-                
+                ChunkedSymbolListFactory symsf = new ChunkedSymbolListFactory(new PackedSymbolListFactory());                
                 if (modEnd>seqLength) {
+                    // add it in chunks
                     int remaining = modLength;
                     int chunkSize = (seqLength-modStart)+1;
                     //   add modStart -> seqLength
@@ -208,8 +215,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
                             (Symbol[])this.symList.subList(modStart,modEnd).toList().toArray(new Symbol[0]),
                             0,
                             modLength);
-                }
-                
+                }                
                 return symsf.makeSymbolList();
             } catch (IllegalAlphabetException e) {
                 throw new RuntimeException("Don't understand our own alphabet?",e);
@@ -255,13 +261,17 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     // Hibernate requirement - not for public use.
     private void setStringSequence(String seq) throws IllegalSymbolException, BioException {
         this.seqstring = seq;
+        // convert the string into a symbollist
         this.checkMakeSequence();
     }
     
     // Hibernate requirement - not for public use.
-    private String getStringSequence() { return (this.symList==SymbolList.EMPTY_LIST?null:this.seqString()); }
+    private String getStringSequence() { 
+        // convert the symbollist into a string
+        return (this.symList==SymbolList.EMPTY_LIST?null:this.seqString()); 
+    }
     
-    // Hibernate requirement - not for public use.
+    // when both alphabet and sequence have been received, make a symbollist out of them
     private void checkMakeSequence() throws IllegalSymbolException, BioException {
         if (this.alphaname!=null && this.seqstring!=null) {
             // Make the symbol list and assign it.
@@ -271,9 +281,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     }
     
     // Hibernate requirement - not for public use.
-    private void setSequenceLength(int length) {
-        // ignore - it's calculated anyway.
-    }
+    private void setSequenceLength(int length) {} // ignore this calculated field
     
     // Hibernate requirement - not for public use.
     private int getSequenceLength() { return this.length(); }
@@ -374,11 +382,17 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Set getFeatureSet() { return this.features; } // must be original for Hibernate
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public void setFeatureSet(Set features) throws ChangeVetoException { this.features = features; } // must be original for Hibernate
     
@@ -389,6 +403,9 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     
     /**
      * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
      */
     public Iterator features() { return this.getFeatureSet().iterator(); }
     

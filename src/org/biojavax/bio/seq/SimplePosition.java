@@ -19,68 +19,112 @@
  *
  */
 
-/*
- * Position.java
- *
- * Created on July 28, 2005, 5:29 PM
- */
 package org.biojavax.bio.seq;
 
 
 /**
- * Holds enough info about positions to keep BioSQL happy if needs be.
- *
+ * A simple implementation of the Position interface.
  * @author Richard Holland
  */
 public class SimplePosition implements Position {
+    
     private boolean fs;
     private boolean fe;
     private int s;
     private int e;
     private String t;
     
+    /**
+     * Constructs a point position, with optionally fuzzy start and
+     * end. (eg. <1 or 3> or 2 or even <5>).
+     * @param fs fuzzy start?
+     * @param fe fuzzy end?
+     * @param p the point position
+     */
     public SimplePosition(boolean fs, boolean fe, int p) {
         this(fs,fe,p,p,null);
     }
+    
+    /**
+     * Constructs a range position, with optionally fuzzy start and
+     * end. (eg. <1.2 or 1^3> or 2.2 or even <5^6>). The type of the
+     * range is given, it should normally be one of the two defined
+     * in the Position interface, but its up to you.
+     * @param fs fuzzy start?
+     * @param fe fuzzy end?
+     * @param s the start of the position
+     * @param e the end of the position
+     * @param t the type of the position
+     */
     public SimplePosition(boolean fs, boolean fe, int s, int e, String t) {
         this.fs = fs;
         this.fe = fe;
         this.s = s;
         this.e = e;
         this.t = t;
-   }
-    //Hibernate only - futureproofing
-    protected SimplePosition() {}
-       
-    public boolean hasFuzzyStart() { return this.fs; }
-    public boolean hasFuzzyEnd() { return this.fe; }
+    }
     
+    //Hibernate only - futureproofing
+    private SimplePosition() {}
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean getFuzzyStart() { return this.fs; }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean getFuzzyEnd() { return this.fe; }
+    
+    /**
+     * {@inheritDoc}
+     */
     public int getStart() { return this.s; }
+    
+    /**
+     * {@inheritDoc}
+     */
     public int getEnd()  { return this.e; }
     
+    /**
+     * {@inheritDoc}
+     */
     public String getType() { return this.t; }
     
     // Hibernate requirement - not for public use - futureproofing
     private void setFuzzyStart(boolean fs) { this.fs = fs; }
+    
     // Hibernate requirement - not for public use - futureproofing
     private void setFuzzyEnd(boolean fe) { this.fe = fe; }
+    
     // Hibernate requirement - not for public use - futureproofing
     private void getStart(int s) { this.s = s; }
+    
     // Hibernate requirement - not for public use - futureproofing
     private void getEnd(int e) { this.e = e; }
+    
     // Hibernate requirement - not for public use - futureproofing
     private void getType(String t) { this.t = t; }
     
+    /** 
+     * {@inheritDoc}
+     */
     public Position translate(int distance) {
         return new SimplePosition(this.fs,this.fe,this.s+distance,this.e+distance,this.t);
     }
-    
+        
+    /** 
+     * {@inheritDoc}
+     * Two positions are equal if they share all parameters in common, 
+     * eg. fuzzy start+end, start, end, type.
+     */
     public boolean equals(Object o) {
         if (!(o instanceof Position)) return false;
         if (o==this) return true;
         Position them = (Position)o;
-        if (this.hasFuzzyStart() != them.hasFuzzyStart()) return false;
-        if (this.hasFuzzyEnd() != them.hasFuzzyEnd()) return false;
+        if (this.getFuzzyStart() != them.getFuzzyStart()) return false;
+        if (this.getFuzzyEnd() != them.getFuzzyEnd()) return false;
         if (this.getStart()!=them.getStart()) return false;
         if (this.getEnd()!=them.getEnd()) return false;
         if (this.getType()!=null || them.getType()!=null) {
@@ -89,6 +133,21 @@ public class SimplePosition implements Position {
             } else return false;
         }
         return true;
+    }  
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        if (this.getFuzzyStart()) sb.append("<");
+        sb.append(this.s);
+        if (s!=e) {
+            sb.append(this.t);
+            sb.append(this.e);
+        }
+        if (this.getFuzzyEnd()) sb.append(">");
+        return sb.toString();
     }
     
     // Hibernate requirement - not for public use - futureproofing

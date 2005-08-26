@@ -19,29 +19,68 @@
  *
  */
 
-/*
- * Position.java
- *
- * Created on July 28, 2005, 5:29 PM
- */
 package org.biojavax.bio.seq;
 
-
 /**
- * Holds enough info about positions to keep BioSQL happy if needs be.
- *
+ * Holds info about base positions.
  * @author Richard Holland
  */
 public interface Position {
-    
-    public static final String BETWEEN_BASES = "^";
-    public static final String IN_RANGE = ".";
+        
+    /**
+     * The empty position lies nowhere.
+     */
     public static final Position EMPTY_POSITION = new SimplePosition(false,false,0);
+
+    /**
+     * A symbol representing a position that falls in between two bases,
+     * eg. 2^3 falls somewhere in the gap between 2 and 3.
+     */
+    public static final String BETWEEN_BASES = "^";
     
-    public boolean hasFuzzyStart();
-    public boolean hasFuzzyEnd();
-    public int getStart();
+    /**
+     * A symbol representing a position that occupies a single base somewhere
+     * in a range, eg. 5.10 falls on some base between 5 and 10.
+     */
+    public static final String IN_RANGE = ".";
+    
+    /**
+     * Returns true if the position has a fuzzy start.
+     * @return the fuzziness of the start.
+     */
+    public boolean getFuzzyStart();    
+    
+    /**
+     * Returns true if the position has a fuzzy end.
+     * @return the fuzziness of the end.
+     */
+    public boolean getFuzzyEnd();
+    
+    /**
+     * Returns the beginning of the range of bases this base could lie in.
+     * If this position is a single position, then start=end.
+     * @return the start of this position.
+     */
+    public int getStart();  
+    
+    /**
+     * Returns the end of the range of bases this base could lie in.
+     * If this position is a single position, then start=end.
+     * @return the end of this position.
+     */
     public int getEnd();
+    
+    /**
+     * Takes this position and returns a copy translated by 'distance' bases.
+     * @param distance the distance to translate it.
+     * @return the translated position.
+     */
     public Position translate(int distance);
+    
+    /**
+     * Returns the type of this position if it is not a point/single position.
+     * Types are usually BETWEEN_BASES or IN_RANGE but could be any string value.
+     * @return the type of this position.
+     */
     public String getType();
 }

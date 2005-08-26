@@ -16,9 +16,6 @@
  * at:
  *
  *      http://www.biojava.orDocRef
- * DocRef.java
- *
- * Created on June 14, 2005, 5:10 PM
  */
 
 package org.biojavax;
@@ -29,7 +26,8 @@ import org.biojava.utils.Changeable;
 
 
 /**
- * Represents a documentary reference, the reference table in BioSQL.
+ * Represents a documentary reference. Relates to the reference table 
+ * in BioSQL.
  * @author Mark Schreiber
  * @author Richard Holland
  * @see RankedDocRef
@@ -63,57 +61,67 @@ public interface DocRef extends Comparable,Changeable {
             );
     
     /**
-     * Getter for property crossref.
+     * The document reference may refer to an object in another database. If so,
+     * this method will return that reference.
      * @return Value of property crossref.
      */
     public CrossRef getCrossref();
     
     /**
-     * Setter for property crossref.
+     * The document reference may refer to an object in another database. Use this
+     * method to set that reference. Null will unset it.
      * @param crossref New value of property crossref.
      * @throws ChangeVetoException in case of objections.
      */
     public void setCrossref(CrossRef crossref) throws ChangeVetoException;
     
     /**
-     * Getter for property location.
+     * Returns a textual description of the document reference. This field is 
+     * immutable so should be set using the constructor of the implementing class.
      * @return Value of property location.
      */
     public String getLocation();
     
     /**
-     * Getter for property title.
+     * Returns the title of the document reference.
      * @return Value of property title.
      */
     public String getTitle();
     
     /**
-     * Setter for property title.
+     * Sets the title of the document reference. Null will unset it.
      * @param title New value of property title.
      * @throws ChangeVetoException in case of objections.
      */
     public void setTitle(String title) throws ChangeVetoException;
     
     /**
-     * Getter for property authors.
+     * Returns the authors of the document reference. This field is 
+     * immutable so should be set using the constructor of the implementing class.
+     * It will usually be in the form "Jones H., Bloggs J et al" or similar -
+     * a human-readable text value.
      * @return Value of property authors.
      */
     public String getAuthors();
     
     /**
-     * Getter for property CRC.
+     * Returns a CRC64 checksum of this document reference, allowing for easy
+     * comparisons with other document references.
      * @return Value of property CRC.
      */
     public String getCRC();
     
     /**
-     * Getter for property Remark.
+     * If remarks have been made about this document reference, this method
+     * will return them.
      * @return Value of property Remark.
      */
     public String getRemark();
     
     /**
-     * Setter for property Remark.
+     * Set the remarks for this document reference using this method. Remarks
+     * can be anything, it is derived from the equivalent field in the GenBank
+     * format.
      * @param Remark New value of property Remark.
      * @throws ChangeVetoException in case of objections.
      */

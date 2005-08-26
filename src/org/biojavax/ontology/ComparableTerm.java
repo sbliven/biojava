@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * ComparableTerm.java
- *
- * Created on July 11, 2005, 10:53 AM
- */
-
 package org.biojavax.ontology;
 
 import org.biojava.ontology.Term;
@@ -34,7 +28,7 @@ import org.biojava.utils.Changeable;
 import org.biojavax.RankedCrossRefable;
 
 /**
- * Makes Term objects comparable properly.
+ * Makes Term objects comparable properly and adds some extra features to them.
  * @author Richard Holland
  */
 public interface ComparableTerm extends Term,RankedCrossRefable,Comparable,Changeable {
@@ -68,27 +62,29 @@ public interface ComparableTerm extends Term,RankedCrossRefable,Comparable,Chang
     
     /**
      * Sets the (optional) identifier associated with this term.
-     * @param identifier the identifier to give the term.
+     * @param identifier the identifier to give the term. Null will unset it.
      * @throws ChangeVetoException if the identifier is unacceptable.
      */
     public void setIdentifier(String identifier) throws ChangeVetoException;
     
     /**
-     * Checks to see if this term is obsolete.
+     * Checks to see if this term is obsolete. As the column in the database
+     * is nullable, this value is a Boolean object instead of a boolean simple
+     * type. Hence it may also be null.
      * @return true if it is, false if not.
      */
     public Boolean getObsolete();
     
     /**
      * Sets the obsolescence flag associated with this term.
-     * @param obsolete true if it is obsolete, false if not.
+     * @param obsolete true if it is obsolete, false if not. Nullable.
      * @throws ChangeVetoException if the change is unacceptable.
      */
     public void setObsolete(Boolean obsolete) throws ChangeVetoException;
     
     /**
      * Sets the description associated with this term.
-     * @param description the description to give the term.
+     * @param description the description to give the term. Nullable.
      * @throws ChangeVetoException if the description is unacceptable.
      */
     public void setDescription(String description) throws ChangeVetoException;

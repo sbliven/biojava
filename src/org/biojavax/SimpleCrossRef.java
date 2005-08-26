@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleCrossRef.java
- *
- * Created on June 15, 2005, 5:32 PM
- */
-
 package org.biojavax;
 
 import java.util.Set;
@@ -34,7 +28,6 @@ import org.biojava.utils.ChangeVetoException;
 
 /**
  * A basic CrossRef implementation.
- * Equality is the dbname, accession and version combination.
  * @author Richard Holland
  * @author Mark Schreiber
  */
@@ -46,27 +39,46 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     private int version;
     
     /**
-     * Creates a new instance of SimpleCrossRef
+     * Creates a new instance of SimpleCrossRef with the values to use for
+     * the immutable database name, accession and version.
      * @param dbname the dbname for this crossref.
      * @param accession the accession for this crossref.
      * @param version the version for this crossref.
      */
     public SimpleCrossRef(String dbname, String accession, int version) {
+        if (dbname==null) throw new IllegalArgumentException("Database name cannot be null");
         if (accession==null) throw new IllegalArgumentException("Accession cannot be null");
-        if (dbname==null) throw new IllegalArgumentException("DBName cannot be null");
         this.accession = accession;
         this.dbname = dbname;
         this.version = version;
-    }    
+    }
+    
+    /**
+     * Creates a new instance of SimpleCrossRef with the values to use for
+     * the immutable database name, accession and a default version of 0.
+     * @param dbname the dbname for this crossref.
+     * @param accession the accession for this crossref.
+     */
     public SimpleCrossRef(String dbname, String accession) {
         this(dbname,accession,0);
     }
+    
+    /**
+     * Creates a new instance of SimpleCrossRef with the values to use for
+     * the immutable database name, accession and version. Identical to other
+     * dbname/accession/version constructor except the version is specified
+     * as an Integer object rather than an int primitive. Will throw an
+     * exception if version is null.
+     * @param dbname the dbname for this crossref.
+     * @param accession the accession for this crossref.
+     * @param version the version for this crossref.
+     */
     public SimpleCrossRef(String dbname, String accession, Integer version) {
         this(dbname,accession,version.intValue());
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleCrossRef() {}
+    private SimpleCrossRef() {}
     
     /**
      * {@inheritDoc}
@@ -109,6 +121,8 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     
     /**
      * {@inheritDoc}
+     * Compares cross references first by database name, then by accession,
+     * then by version.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -122,6 +136,8 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     
     /**
      * {@inheritDoc}
+     * Equality is defined as having the same database name, accession and
+     * version.
      */
     public boolean equals(Object obj) {
         if(this == obj) return true;
@@ -150,22 +166,21 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
         return code;
     }
     
-    
     /**
      * {@inheritDoc}
-     * Form: <code>this.getDbname()+":"+this.getAccession()+", v."+this.getVersion();</code>
+     * Form: "dbname:accession.version"
      */
     public String toString() {
-        return this.getDbname()+":"+this.getAccession()+", v."+this.getVersion();
+        return this.getDbname()+":"+this.getAccession()+"."+this.getVersion();
     }
     
-// Hibernate requirement - not for public use.
+    // Hibernate requirement - not for public use.
     private Integer id;
     
-// Hibernate requirement - not for public use.
+    // Hibernate requirement - not for public use.
     private Integer getId() { return this.id; }
     
-// Hibernate requirement - not for public use.
+    // Hibernate requirement - not for public use.
     private void setId(Integer id) { this.id = id; }
 }
 

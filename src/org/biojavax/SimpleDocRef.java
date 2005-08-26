@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleDocRef.java
- *
- * Created on June 15, 2005, 5:56 PM
- */
-
 package org.biojavax;
 
 import java.util.zip.Checksum;
@@ -36,7 +30,6 @@ import org.biojavax.utils.CRC64Checksum;
 
 /**
  * A basic DocRef implementation.
- * Equality is having a unique author and location.
  * @author Richard Holland
  * @author Mark Schreiber
  */
@@ -50,7 +43,8 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     private String remark;
     
     /**
-     * Creates a new document reference.
+     * Creates a new document reference from the given immutable authors and
+     * location. Will throw exceptions if either are null.
      * @param authors The authors of the referenced document.
      * @param location The location of the document, eg. the journal name and page range.
      */
@@ -65,7 +59,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     }
     
     // Hibernate requirement - not for public use.
-    protected SimpleDocRef() {}
+    private SimpleDocRef() {}
     
     /**
      * {@inheritDoc}
@@ -89,8 +83,8 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         }
     }
     
-    // Hibernate only - ignore as is calculated field
-    private void setCRC(String CRC) {}
+    // Hibernate requirement - not for public use.
+    private void setCRC(String CRC) {} // ignore as field is a calculated value
     
     /**
      * {@inheritDoc}
@@ -149,8 +143,12 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     /**
      * {@inheritDoc}
+     * The string to be checksummed is constructed by concatenating the authors,
+     * title, and location in that order, with no space between. If any values are
+     * null they are substituted with the text "&lt;undef>".
+     * @see CRC64Checksum
      */
-    public String getCRC() { 
+    public String getCRC() {
         StringBuffer sb = new StringBuffer();
         sb.append((this.authors==null || this.authors.equals(""))?"<undef>":this.authors);
         sb.append((this.title==null || this.title.equals(""))?"<undef>":this.title);
@@ -182,6 +180,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     /**
      * {@inheritDoc}
+     * Document references are compared first by author, then by location.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -194,6 +193,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     /**
      * {@inheritDoc}
+     * Document references are equal if they have the same author and location.
      */
     public boolean equals(Object obj) {
         if(this == obj) return true;
@@ -221,9 +221,11 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     /**
      * {@inheritDoc}
-     * Form: this.getAuthors()+"; "+this.getLocation();</code>
+     * Form: "authors; location"
      */
-    public String toString() { return this.getAuthors()+"; "+this.getLocation(); }
+    public String toString() {
+        return this.getAuthors()+"; "+this.getLocation();
+    }
     
     // Hibernate requirement - not for public use.
     private Integer id;

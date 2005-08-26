@@ -19,18 +19,11 @@
  *
  */
 
-/*
- * NCBITaxon.java
- *
- * Created on June 14, 2005, 5:18 PM
- */
-
 package org.biojavax.bio.taxa;
 import java.util.Set;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
-
 
 /**
  * Represents an NCBI Taxon entry, a combination of the taxon and taxon_name
@@ -89,13 +82,14 @@ public interface NCBITaxon extends Comparable,Changeable {
     public static final String COMMON = "COMMON";
     
     /**
-     * Returns all the name classes available for a taxon.
+     * Returns all the name classes available for a taxon. These are Strings.
      * @return a set of name classes, or the empty set if there are none.
      */
     public Set getNameClasses();
     
     /**
      * Returns all the names available for a taxon in a given class.
+     * These are Strings.
      * @param nameClass the name class to retrieve names from.
      * @return a set of names, or the empty set if there are none.
      * @throws IllegalArgumentException if the name is null.
@@ -131,84 +125,88 @@ public interface NCBITaxon extends Comparable,Changeable {
     public boolean containsName(String nameClass, String name) throws IllegalArgumentException;
     
     /**
-     * Getter for property parent.
+     * Returns the parent NCBI taxon ID, if known.
      * @return Value of property parent.
      */
     public Integer getParentNCBITaxID();
     
     /**
-     * Setter for property parent.
+     * Sets the parent NCBI taxon ID. May be null if not known.
      * @param parent New value of property parent.
      * @throws ChangeVetoException in case of objections.
      */
     public void setParentNCBITaxID(Integer parent) throws ChangeVetoException;
     
     /**
-     * Getter for property NCBITaxID. 
+     * Gets the NCBI taxon ID. This is never null and is immutable, as otherwise
+     * we would have no way of distinguishing between various taxa. It should
+     * be set by the constructor of an implementation.
      * @return Value of property NCBITaxID.
      */
     public int getNCBITaxID();
     
     /**
-     * Getter for property nodeRank.
+     * Gets the node rank of this taxon. May be null.
      * @return Value of property nodeRank.
      */
     public String getNodeRank();
     
     /**
-     * Setter for property nodeRank.
+     * Sets the node rank of this taxon. May be null, in which case it is unset.
      * @param nodeRank New value of property nodeRank.
      * @throws ChangeVetoException in case of objections.
      */
     public void setNodeRank(String nodeRank) throws ChangeVetoException;
     
     /**
-     * Getter for property geneticCode.
+     * Returns the genetic code of this taxon, which may be null if not known.
      * @return Value of property geneticCode.
      */
     public Integer getGeneticCode();
     
     /**
-     * Setter for property geneticCode.
+     * Sets the genetic code of this taxon, which may be null, which will unset it.
      * @param geneticCode New value of property geneticCode.
      * @throws ChangeVetoException in case of objections.
      */
     public void setGeneticCode(Integer geneticCode) throws ChangeVetoException;
     
     /**
-     * Getter for property mitoGeneticCode.
+     * Returns the mitochondrial genetic code of this taxon, which may be null 
+     * if not known.
      * @return Value of property mitoGeneticCode.
      */
     public Integer getMitoGeneticCode();
     
     /**
-     * Setter for property mitoGeneticCode.
+     * Sets the mitochondrial genetic code of this taxon, which may be null, 
+     * which will unset it.
      * @param mitoGeneticCode New value of property mitoGeneticCode.
      * @throws ChangeVetoException in case of objections.
      */
     public void setMitoGeneticCode(Integer mitoGeneticCode) throws ChangeVetoException;
     
     /**
-     * Getter for property leftValue.
+     * Gets the left value. May be null.
      * @return Value of property leftValue.
      */
     public Integer getLeftValue();
     
     /**
-     * Setter for property leftValue.
+     * Sets the left value. May be null.
      * @param leftValue New value of property leftValue.
      * @throws ChangeVetoException in case of objections.
      */
     public void setLeftValue(Integer leftValue) throws ChangeVetoException;
     
     /**
-     * Getter for property rightValue.
+     * Gets the right value. May be null.
      * @return Value of property rightValue.
      */
     public Integer getRightValue();
     
     /**
-     * Setter for property rightValue.
+     * Sets the right value. May be null.
      * @param rightValue New value of property rightValue.
      * @throws ChangeVetoException in case of objections.
      */

@@ -43,17 +43,7 @@ import org.biojavax.bio.seq.RichSequence;
 
 /**
  * Format object representing FASTA files. These files are almost pure
- * sequence data. The only `sequence property' reported by this parser
- * is PROPERTY_DESCRIPTIONLINE, which is the contents of the
- * sequence's description line (the line starting with a '>'
- * character). Normally, the first word of this is a sequence ID. If
- * you wish it to be interpreted as such, you should use
- * FastaDescriptionLineParser as a SeqIO filter.
- *
- * If you pass it a RichSeqIOListener, you'll get RichSequence objects
- * in return. Likewise, if you write RichSequence objects, you'll get
- * absolutely correct FASTA formatted output.
- *
+ * sequence data.
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
@@ -62,16 +52,19 @@ import org.biojavax.bio.seq.RichSequence;
  */
 
 public class FastaFormat implements RichSequenceFormat {
+    
+    /**
+     * The name of this format
+     */
     public static final String FASTA_FORMAT = "FASTA";
     
     /**
      * The line width for output.
      */
-    protected int lineWidth = 60;
+    private int lineWidth = 60;
     
     /**
      * Retrive the current line width.
-     *
      * @return the line width
      */
     public int getLineWidth() {
@@ -80,16 +73,17 @@ public class FastaFormat implements RichSequenceFormat {
     
     /**
      * Set the line width.
-     * <p>
      * When writing, the lines of sequence will never be longer than the line
      * width.
-     *
      * @param width the new line width
      */
     public void setLineWidth(int width) {
         this.lineWidth = width;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public boolean readSequence(
             BufferedReader reader,
             SymbolTokenization symParser,
@@ -102,8 +96,12 @@ public class FastaFormat implements RichSequenceFormat {
         return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener,null);
     }
     
-    // if ns==null then namespace of sequence in fasta is used
-    // if ns==null and namespace of sequence==null then default namespace is used
+    /**
+     * {@inheritDoc}
+     * If namespace is null, then the namespace of the sequence in the fasta is used.
+     * If the namespace is null and so is the namespace of the sequence in the fasta,
+     * then the default namespace is used.
+     */
     public boolean readRichSequence(
             BufferedReader reader,
             SymbolTokenization symParser,
@@ -113,6 +111,7 @@ public class FastaFormat implements RichSequenceFormat {
             IllegalSymbolException,
             IOException,
             ParseException {
+        
         String line = reader.readLine();
         if (line == null) {
             throw new IOException("Premature stream end");
@@ -169,6 +168,7 @@ public class FastaFormat implements RichSequenceFormat {
         return !seenEOF;
     }
     
+    // reads sequence data from the file by concatenating the whole lot
     private boolean readSequenceData(
             BufferedReader r,
             SymbolTokenization parser,
@@ -230,19 +230,32 @@ public class FastaFormat implements RichSequenceFormat {
         return seenEOF;
     }
     
-    public void writeSequence(Sequence seq, PrintStream os)
-    throws IOException {
+    /**
+     * {@inheritDoc}
+     */
+    public void writeSequence(Sequence seq, PrintStream os) throws IOException {
         this.writeSequence(seq, getDefaultFormat(), os, null);
     }
-    public void writeSequence(Sequence seq, String format, PrintStream os)
-    throws IOException {
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
         this.writeSequence(seq, format, os, null);
     }
-    public void writeSequence(Sequence seq, PrintStream os, Namespace ns)
-    throws IOException {
+    
+    /**
+     * {@inheritDoc}
+     * If namespace is null, then the sequence's own namespace is used.
+     */
+    public void writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
         this.writeSequence(seq, getDefaultFormat(), os, ns);
     }
-    // if ns==null then sequence's namespace is used
+    
+    /**
+     * {@inheritDoc}
+     * If namespace is null, then the sequence's own namespace is used.
+     */
     public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
         if (! format.equalsIgnoreCase(getDefaultFormat()))
             throw new IllegalArgumentException("Unknown format '"
@@ -286,40 +299,9 @@ public class FastaFormat implements RichSequenceFormat {
     }
     
     /**
-     * <code>getDefaultFormat</code> returns the String identifier for
-     * the default format.
-     *
-     * @return a <code>String</code>.
-     * @deprecated
+     * {@inheritDoc}
      */
     public String getDefaultFormat() {
         return FASTA_FORMAT;
-    }
-    
-    private Vector mListeners = new Vector();
-    
-    /**
-     * Adds a parse error listener to the list of listeners if it isn't already
-     * included.
-     *
-     * @param theListener Listener to be added.
-     */
-    public synchronized void addParseErrorListener(ParseErrorListener theListener) {
-        if (mListeners.contains(theListener) == false) {
-            mListeners.addElement(theListener);
-        }
-    }
-    
-    /**
-     * Removes a parse error listener from the list of listeners if it is
-     * included.
-     *
-     * @param theListener Listener to be removed.
-     */
-    public synchronized void removeParseErrorListener(ParseErrorListener theListener) {
-        if (mListeners.contains(theListener) == true) {
-            mListeners.removeElement(theListener);
-        }
-    }
-    
+    }        
 }

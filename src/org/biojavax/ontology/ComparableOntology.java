@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * ComparableOntology.java
- *
- * Created on June 16, 2005, 2:29 PM
- */
-
 package org.biojavax.ontology;
 
 import java.util.Set;
@@ -37,9 +31,11 @@ import org.biojava.utils.Changeable;
 /**
  * An Ontology that can be compared to another.
  * @author Richard Holland
+ * @see ComparableTerm
+ * @see ComparableTriple
  */
 public interface ComparableOntology extends Ontology,Comparable,Changeable {
-
+    
     public static final ChangeType TERM = new ChangeType(
             "This ontology's terms have changed",
             "org.biojavax.ontology.ComparableOntology",
@@ -54,50 +50,67 @@ public interface ComparableOntology extends Ontology,Comparable,Changeable {
             "This ontology's description has changed",
             "org.biojavax.ontology.ComparableOntology",
             "DESCRIPTION"
-            );    
-        
+            );
+    
     /**
      * Sets a human-readable description of this ontology.
      * @param description the description.
      * @throws ChangeVetoException in case of problems.
      */
-    public void setDescription(String description) throws ChangeVetoException; 
-
+    public void setDescription(String description) throws ChangeVetoException;
+    
     /**
      * Return a human-readable description of this ontology.
      * @return the description.
      */
     public String getDescription();
-
-    /** 
+    
+    /**
      * Clears out all the terms and populates the ontology with the contents
-     * of the set passed.
-     * @param terms the set of terms this ontology should have.
+     * of the set passed. The terms should be ComparableTerms.
+     * @param terms a set of Term objects this ontology should have.
      * @throws ChangeVetoException if any of them are unacceptable.
+     * @see ComparableTerm
      */
     public void setTermSet(Set terms) throws ChangeVetoException;
-
+    
     /**
      * Returns the set of terms in this ontology.
-     * @return the set of terms.
+     * @return a set of ComparableTerm objects.
+     * @see ComparableTerm
      */
     public Set getTermSet();
-        
-    /** 
+    
+    /**
      * Clears out all the triples and populates the ontology with the contents
      * of the set passed.
-     * @param triples the set of triples this ontology should have.
+     * @param triples the set of ComparableTriple objects this ontology should have.
      * @throws ChangeVetoException if any of them are unacceptable.
+     * @see ComparableTriple
      */
     public void setTripleSet(Set triples) throws ChangeVetoException;
     
     /**
      * Returns the set of triples in this ontology.
-     * @return the set of triples.
+     * @return the set of ComparableTriple objects.
      */
     public Set getTripleSet();
     
+    /**
+     * Looks for a term with the given name and returns it. If it couldn't be found,
+     * then it creates it, adds it to the ontology, then returns it.
+     * @param name the name of the term to look for.
+     * @return the ComparableTerm representing that name.
+     */
     public ComparableTerm getOrCreateTerm(String name);
+    
+    /**
+     * Looks for a term with the same name as the given term and returns it.
+     * If it couldn't be found, then it creates it, adds it to the ontology,
+     * then returns it.
+     * @param term the term to look for.
+     * @return the ComparableTerm representing that term in this ontology.
+     */
     public ComparableTerm getOrImportTerm(Term term);
 }
 

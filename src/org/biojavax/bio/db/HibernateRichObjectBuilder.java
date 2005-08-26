@@ -19,12 +19,6 @@
  *
  */
 
-/*
- * SimpleRichObjectBuilder.java
- *
- * Created on August 8, 2005, 9:28 AM
- */
-
 package org.biojavax.bio.db;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -35,7 +29,9 @@ import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.SimpleComparableOntology;
 
 /**
- *
+ * Takes requests for RichObjects and sees if it can load them from a Hibernate
+ * database. If it can, it returns the loaded objects. Else, it creates them
+ * and persists them, then returns them.
  * @author Richard Holland
  */
 public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
@@ -47,17 +43,27 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
     private Method list;
     private Method persist;
     
-    /** Creates a new instance of SimpleRichObjectBuilder */
+    /** 
+     * Creates a new instance of SimpleRichObjectBuilder. The session parameter
+     * is a Hibernate Session object and must not be null. It is this session
+     * that database objects will be retrieved from/persisted to.
+     * @see org.hibernate.Session
+     */
     public HibernateRichObjectBuilder(Object session) {
-        super();
+        super(); // call the normal rich object builder first
         try {
+            // Lazy load the Session class from Hibernate.
             Class hibernateSession = Class.forName("org.hibernate.Session");
+            // Test to see if our parameter is really a Session
             if (!hibernateSession.isInstance(session))
-                throw new IllegalArgumentException("Parameter must be a Hibernate session object");
+                throw new IllegalArgumentException("Parameter must be a org.hibernate.Session object");
             this.session = session;
+            // Lookup the createQuery and persist methods
             this.createQuery = hibernateSession.getMethod("createQuery", new Class[]{String.class});
             this.persist = hibernateSession.getMethod("persist", new Class[]{Object.class});
+            // Lazy load the Query class from Hibernate.
             Class hibernateQuery = Class.forName("org.hibernate.Query");
+            // Lookup the setParameter and list methods
             this.setParameter = hibernateQuery.getMethod("setParameter", new Class[]{int.class,Object.class});
             this.list = hibernateQuery.getMethod("list", new Class[]{});
         } catch (ClassNotFoundException e) {
@@ -66,9 +72,17 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
             throw new RuntimeException(e);
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * Attempts to look up the details of the object in the database. If it
+     * finds them it loads the object and returns it. Else, it persists the
+     * wrapper object it made to do the search with and returns that.
+     */
     public Object buildObject(Class clazz, Object[] params) {
+        // Create a wrapper object to do the search with
         Object o = super.buildObject(clazz, params);
+        // Create the Hibernate query to look it up with
         String queryText;
         if (o instanceof SimpleNamespace) {
             queryText = "from Namespace as ns where ns.name = ?";
@@ -81,18 +95,26 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
         } else if (o instanceof SimpleDocRef) {
             queryText = "from DocRef as cr where cr.authors = ? and cr.location = ?";
         } else throw new IllegalArgumentException("Don't know how to handle objects of type "+clazz);
+        // Run the query.
         try {
+            // Build the query object
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
+            // Set the parameters
             for (int i = 0; i < params.length; i++) {
                 query = this.setParameter.invoke(query, new Object[]{new Integer(i), params[i]});
             }
+            // Get the results
             List results = (List)this.list.invoke(query, null);
+            // Return the found object, if found
             if (results.size()>0) return results.get(0);
+            // Persist and return the wrapper object otherwise
             else {
                 this.persist.invoke(this.session, new Object[]{o});
                 return o;
             }
         } catch (Exception e) {
+            // Write a useful message explaining what we were trying to do. It will
+            // be in the form "class(param,param...)".
             StringBuffer paramsstuff = new StringBuffer();
             paramsstuff.append(clazz);
             paramsstuff.append("(");
@@ -101,6 +123,7 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
                 if (i<(params.length-1)) paramsstuff.append(",");
             }
             paramsstuff.append(")");
+            // Throw the exception with our nice message
             throw new RuntimeException("Error while trying to call new "+paramsstuff,e);
         }
     }
