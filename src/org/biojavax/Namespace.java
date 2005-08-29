@@ -32,7 +32,7 @@ import org.biojava.utils.Changeable;
  * BioDatabase table in BioSQL. All BioEntry objects belong to namespaces.
  * @author Mark Schreiber
  * @author Richard Holland
- * @see BioEntry
+ * @see org.biojavax.bio.BioEntry
  */
 public interface Namespace extends Comparable,Changeable {
     

@@ -117,7 +117,7 @@ public class RichStreamReader implements RichSequenceIterator {
      * pass them to the given factory to be transformed into RichSequence objects in
      * the given namespace.
      * @param is the input stream to read from
-     * @paran format the input file format
+     * @param format the input file format
      * @param symParser the tokenizer that understands the sequence symbols in the file
      * @param sf the factory that will build the sequences
      * @param ns the namespace the sequences will be loaded into.
@@ -136,7 +136,7 @@ public class RichStreamReader implements RichSequenceIterator {
      * pass them to the given factory to be transformed into RichSequence objects in
      * the given namespace.
      * @param reader the reader to read from
-     * @paran format the input file format
+     * @param format the input file format
      * @param symParser the tokenizer that understands the sequence symbols in the file
      * @param sf the factory that will build the sequences
      * @param ns the namespace the sequences will be loaded into.

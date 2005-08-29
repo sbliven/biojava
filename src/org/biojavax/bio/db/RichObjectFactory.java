@@ -70,7 +70,7 @@ public class RichObjectFactory {
      * exist, it delegates to a RichObjectBuilder to construct the object, then 
      * adds it to the map, and returns it.
      * @param clazz the class to build 
-     * @param params[] the parameters to pass to the class' constructor
+     * @param params the parameters to pass to the class' constructor
      * @return the instantiated object
      */
     public static synchronized Object getObject(Class clazz, Object[] params) {
@@ -98,9 +98,9 @@ public class RichObjectFactory {
      * Sets the default position resolver to use when creating new rich feature locations.
      * Defaults to the AverageResolver
      * @param pr the position resolver to use.
-     * @see PositionResolver
-     * @see PositionResolver.AverageResolver
-     * @see RichLocation
+     * @see org.biojavax.bio.seq.PositionResolver
+     * @see org.biojavax.bio.seq.PositionResolver.AverageResolver
+     * @see org.biojavax.bio.seq.RichLocation
      */
     public static void setDefaultPositionResolver(PositionResolver pr) { defaultPositionResolver = pr; }
     
@@ -123,7 +123,7 @@ public class RichObjectFactory {
     /**
      * Returns the default ontology object. Defaults to PositionResolver.AverageResolver
      * @return the default ontology.
-     * @see PositionResolver.AverageResolver
+     * @see org.biojavax.bio.seq.PositionResolver.AverageResolver
      */
     public static PositionResolver getDefaultPositionResolver() { return defaultPositionResolver; }
         

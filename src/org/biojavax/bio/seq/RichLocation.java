@@ -343,7 +343,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
         /**
          * Takes a set of locations and returns the set of all members. If any members are
          * compound, it flattens them too.
-         * @param location the location to flatten
+         * @param members the locations to flatten
          * @return the flattened collection of members.
          */
         public static Collection flatten(Collection members) {

@@ -63,7 +63,7 @@ public class SimpleNCBITaxonName implements Comparable {
     
     /**
      * Changes the name.
-     * @param nameClass the new name.
+     * @param name the new name.
      */
     public void setName(String name) {       
         if (name==null) throw new IllegalArgumentException("Name cannot be null");

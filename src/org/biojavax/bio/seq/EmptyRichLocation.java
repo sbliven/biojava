@@ -185,7 +185,7 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
     public Location getDecorator(Class decoratorClass) { return null; }
     
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      * ALWAYS RETURNS PASSED LOCATION
      */
     public Location newInstance(Location loc) { return loc; }

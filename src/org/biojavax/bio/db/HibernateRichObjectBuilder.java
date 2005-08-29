@@ -47,7 +47,7 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
      * Creates a new instance of SimpleRichObjectBuilder. The session parameter
      * is a Hibernate Session object and must not be null. It is this session
      * that database objects will be retrieved from/persisted to.
-     * @see org.hibernate.Session
+     * @see <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/Session.html"> org.hibernate.Session</a>
      */
     public HibernateRichObjectBuilder(Object session) {
         super(); // call the normal rich object builder first
