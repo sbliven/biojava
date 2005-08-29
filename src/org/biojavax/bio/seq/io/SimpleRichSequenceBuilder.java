@@ -280,7 +280,7 @@ public class SimpleRichSequenceBuilder implements RichSeqIOListener,RichSequence
             else {
                 RichFeature parent = (RichFeature)this.featureStack.get(this.featureStack.size() - 1);
                 parent.addFeatureRelationship(
-                        new SimpleRichFeatureRelationship(f, SimpleRichFeatureRelationship.getContainsTerm(), this.featureRank++)
+                        new SimpleRichFeatureRelationship(parent, f, SimpleRichFeatureRelationship.getContainsTerm(), this.featureRank++)
                         );
             }
             this.featureStack.add(f);

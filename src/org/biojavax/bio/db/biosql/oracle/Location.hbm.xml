@@ -13,6 +13,7 @@
             </generator>
         </id>
         
+        <many-to-one name="feature" class="Feature" column="seqfeature_id" not-null="true" cascade="persist,merge,save-update" node="@featureId" embed-xml="false"/>
         <many-to-one name="term" class="Term" column="term_id" cascade="persist,merge,save-update" node="@termId" embed-xml="false"/>
         <many-to-one name="crossRef" class="CrossRef" column="dbxref_id" cascade="persist,merge,save-update" node="@crossRefId" embed-xml="false"/>
         <property name="rank" node="@rank"/>

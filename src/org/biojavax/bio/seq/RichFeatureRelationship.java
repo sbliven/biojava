@@ -51,6 +51,14 @@ public interface RichFeatureRelationship extends Comparable,Changeable {
      * @return Value of property rank.
      */
     public int getRank();
+        
+    /**
+     * Returns the object of this relationship (ie. the feature which
+     * this relationship starts from). This is an immutable
+     * property set by the constructor of an instantiating class.
+     * @return Value of property object.
+     */
+    public RichFeature getObject();
     
     /**
      * Gets the feature that this relationship refers to. This is set

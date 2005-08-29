@@ -59,6 +59,14 @@ public interface BioEntryRelationship extends Comparable,Changeable {
     public Integer getRank();
         
     /**
+     * Returns the object of this relationship (ie. the BioEntry which
+     * this relationship starts from). This is an immutable
+     * property set by the constructor of an instantiating class.
+     * @return Value of property object.
+     */
+    public BioEntry getObject();
+    
+    /**
      * Returns the subject of this relationship (ie. the BioEntry which
      * this relationship targets). This is an immutable
      * property set by the constructor of an instantiating class.

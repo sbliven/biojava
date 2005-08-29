@@ -41,7 +41,21 @@ import org.biojavax.ontology.ComparableTerm;
  * @author Mark Schreiber
  */
 public class EmptyRichLocation extends Unchangeable implements RichLocation {
-            
+           
+    /**
+     * {@inheritDoc} 
+     * ALWAYS RETURNS NULL
+     */
+    public RichFeature getFeature() { return null; }
+    
+    /**
+     * {@inheritDoc} 
+     * NOT IMPLEMENTED
+     */
+    public void setFeature(RichFeature feature) throws ChangeVetoException {
+        throw new ChangeVetoException("Cannot set a feature for the empty location");
+    }
+    
     /**
      * {@inheritDoc} 
      * ALWAYS RETURNS NULL

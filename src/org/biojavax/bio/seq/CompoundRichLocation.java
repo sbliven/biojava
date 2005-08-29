@@ -51,7 +51,7 @@ import org.biojavax.ontology.ComparableTerm;
 public class CompoundRichLocation extends AbstractChangeable implements RichLocation {
     
     private ComparableTerm term;
-    private Collection members;
+    private List members;
     private static ComparableTerm JOIN_TERM = null;
     private static ComparableTerm ORDER_TERM = null;
     
@@ -96,7 +96,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      * @param members the members to put into the compound location.
      * @see RichLocation.Tools
      */
-    CompoundRichLocation(ComparableTerm term, Collection members) {
+    public CompoundRichLocation(ComparableTerm term, Collection members) {
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
         if (members==null || members.size()<2) throw new IllegalArgumentException("Must have at least two members");        
         this.term = term;
@@ -108,6 +108,20 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
             // Add in member
             this.members.add(o);
         }
+    }
+                
+    /**
+     * {@inheritDoc} 
+     * This method will only return the feature from the first member of this compound location.
+     */
+    public RichFeature getFeature() { return ((RichLocation)this.members.get(0)).getFeature(); }
+    
+    /**
+     * {@inheritDoc} 
+     * Passes the call on to each of its members in turn.
+     */
+    public void setFeature(RichFeature feature) throws ChangeVetoException {
+        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setFeature(feature);
     }
     
     /**

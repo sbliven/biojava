@@ -8,9 +8,12 @@
     <class name="org.biojavax.bio.seq.SimpleRichLocation" table="location" node="location" entity-name="Location">
 
         <id name="id" type="integer" unsaved-value="null" column="location_id" node="@id">
-            <generator class="identity"/>
+            <generator class="sequence">
+                <param name="sequence">location_pk_seq</param>
+            </generator>
         </id>
         
+        <many-to-one name="feature" class="Feature" column="seqfeature_id" not-null="true" cascade="persist,merge,save-update" node="@featureId" embed-xml="false"/>
         <many-to-one name="term" class="Term" column="term_id" cascade="persist,merge,save-update" node="@termId" embed-xml="false"/>
         <many-to-one name="crossRef" class="CrossRef" column="dbxref_id" cascade="persist,merge,save-update" node="@crossRefId" embed-xml="false"/>
         <property name="rank" node="@rank"/>

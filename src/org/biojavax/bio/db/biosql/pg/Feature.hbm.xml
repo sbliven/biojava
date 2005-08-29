@@ -8,7 +8,9 @@
     <class name="org.biojavax.bio.seq.SimpleRichFeature" table="seqfeature" node="feature" entity-name="Feature">
 
         <id name="id" type="integer" unsaved-value="null" column="seqfeature_id" node="@id">
-            <generator class="identity"/>
+            <generator class="sequence">
+                <param name="sequence">seqfeature_pk_seq</param>
+            </generator>
         </id>
 
         <many-to-one name="parent" class="Sequence" column="bioentry_id" not-null="true" cascade="persist,merge,save-update" node="@parentRichSequenceId" embed-xml="false"/>
@@ -16,8 +18,8 @@
         <many-to-one name="typeTerm" class="Term" column="type_term_id" not-null="true" cascade="persist,merge,save-update" node="@typeTermId" embed-xml="false"/>
         <property name="name" column="display_name" node="@name"/>
         <property name="rank" node="@rank"/>
-        <set name="locationSet" lazy="false" cascade="all-delete-orphan" sort="natural">
-            <key column="seqfeature_id" not-null="true"/>
+        <set name="locationSet" lazy="false" cascade="all-delete-orphan" sort="natural" inverse="true">
+            <key column="seqfeature_id"/>
             <one-to-many class="Location" embed-xml="true"/>
         </set>
         <set name="noteSet" table="seqfeature_qualifier_value" lazy="false" sort="natural">
@@ -35,8 +37,8 @@
                 <property name="rank" node="@rank"/>
             </composite-element>
         </set>
-        <set name="featureRelationshipSet" lazy="false" cascade="all-delete-orphan" sort="natural">
-            <key column="object_seqfeature_id" not-null="true"/>
+        <set name="featureRelationshipSet" lazy="false" cascade="all-delete-orphan" sort="natural" inverse="true">
+            <key column="object_seqfeature_id"/>
             <one-to-many class="FeatureRelationship" embed-xml="true"/>
         </set>
         

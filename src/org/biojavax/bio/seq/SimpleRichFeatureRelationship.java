@@ -36,6 +36,7 @@ import org.biojavax.ontology.ComparableTerm;
  */
 public class SimpleRichFeatureRelationship extends AbstractChangeable implements RichFeatureRelationship {
 
+    private RichFeature object;
     private RichFeature subject;
     private ComparableTerm term;
     private int rank;
@@ -57,9 +58,11 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
      * @param term The relationship term.
      * @param rank the rank of the relationship.
      */    
-    public SimpleRichFeatureRelationship(RichFeature subject, ComparableTerm term, int rank) {
+    public SimpleRichFeatureRelationship(RichFeature object, RichFeature subject, ComparableTerm term, int rank) {
+        if (object==null) throw new IllegalArgumentException("Object cannot be null");
         if (subject==null) throw new IllegalArgumentException("Subject cannot be null");
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
+        this.object = object;
         this.subject = subject;
         this.term = term;
         this.rank = rank;
@@ -96,8 +99,15 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     public int getRank() { return this.rank; }
         
     /**
-     * Getter for property subject.
-     * @return Value of property subject.
+     * {@inheritDoc}
+     */
+    public RichFeature getObject() { return this.object; }
+    
+    // Hibernate requirement - not for public use.
+    private void setObject(RichFeature object) { this.object = object; }
+        
+    /**
+     * {@inheritDoc}
      */
     public RichFeature getSubject() { return this.subject; }
     
@@ -105,8 +115,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     private void setSubject(RichFeature subject) { this.subject = subject; }
     
     /**
-     * Getter for property term.
-     * @return Value of property term.
+     * {@inheritDoc}
      */
     public ComparableTerm getTerm() { return this.term; }
     
@@ -115,30 +124,32 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     
     /**
      * {@inheritDoc}
-     * Relations are compared first by rank, then subject, then finally term.
+     * Relations are compared first by rank, then object, subject, then finally term.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
-        if (this.subject==null) return -1;
+        if (this.object==null) return -1;
         // Normal comparison
         RichFeatureRelationship them = (RichFeatureRelationship)o;
         if (this.rank!=them.getRank()) return this.rank-them.getRank();
+        if (!this.object.equals(them.getObject())) return this.object.compareTo(them.getObject());
         if (!this.subject.equals(them.getSubject())) return this.subject.compareTo(them.getSubject());
         else return this.getTerm().compareTo(them.getTerm());
     }
     
     /**
      * {@inheritDoc}
-     * Relations are equal if their subjects and terms are equal.
+     * Relations are equal if their objects, subjects and terms are equal.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj==null || !(obj instanceof RichFeatureRelationship)) return false;
         // Hibernate comparison - we haven't been populated yet
-        if (this.subject==null) return false;
+        if (this.object==null) return false;
         // Normal comparison
         RichFeatureRelationship them = (RichFeatureRelationship)obj;
-        return (this.subject.equals(them.getSubject()) &&
+        return (this.object.equals(them.getObject()) &&
+                this.subject.equals(them.getSubject()) &&
                 this.term.equals(them.getTerm()));
     }
     
@@ -150,6 +161,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
         // Hibernate comparison - we haven't been populated yet
         if (this.subject==null) return code;
         // Normal comparison
+        code = code*37 + this.object.hashCode();
         code = code*37 + this.subject.hashCode();
         code = code*37 + this.term.hashCode();
         return code;
@@ -157,10 +169,10 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     
     /**
      * {@inheritDoc}
-     * Form: "(#rank) term(subject)"
+     * Form: "(#rank) term(object,subject)"
      */
     public String toString() {
-        return "(#"+this.rank+") "+this.getTerm()+"("+this.getSubject()+")";
+        return "(#"+this.rank+") "+this.getTerm()+"("+this.getObject()+","+this.getSubject()+")";
     }
     
     // Hibernate requirement - not for public use.

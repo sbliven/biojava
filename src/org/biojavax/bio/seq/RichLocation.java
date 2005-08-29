@@ -64,11 +64,30 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
             "org.biojavax.bio.seq.RichLocation",
             "CIRCULAR"
             );
+    public static final ChangeType FEATURE = new ChangeType(
+            "This location's parent feature has changed",
+            "org.biojavax.bio.seq.RichLocation",
+            "FEATURE"
+            );
     
     /**
      * The empty location matches nothing.
      */
     public static final RichLocation EMPTY_LOCATION = new EmptyRichLocation();
+        
+    /**
+     * Retrieves the feature this location is associated with. May be null.
+     * @return the feature.
+     */
+    public RichFeature getFeature();  
+    
+    /**
+     * Sets the feature this location is associated with. If null, that's fine,
+     * but you won't be able to persist it to the database until you give
+     * it a not-null value.
+     * @param feature the feature.
+     */
+    public void setFeature(RichFeature feature) throws ChangeVetoException;
     
     /**
      * Retrieves the crossref associated with this location.

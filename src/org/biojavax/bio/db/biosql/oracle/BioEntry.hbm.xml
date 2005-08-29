@@ -25,8 +25,8 @@
             <key column="bioentry_id" not-null="true"/>
             <one-to-many class="Comment" embed-xml="true"/>
         </set>
-        <set name="relationships" lazy="false" cascade="all-delete-orphan" sort="natural">
-            <key column="object_bioentry_id" not-null="true"/>
+        <set name="relationships" lazy="false" cascade="all-delete-orphan" sort="natural" inverse="true">
+            <key column="object_bioentry_id"/>
             <one-to-many class="BioEntryRelationship" embed-xml="true"/>
         </set>
         <set name="rankedDocRefs" table="bioentry_reference" lazy="false" sort="natural">

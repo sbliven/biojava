@@ -533,7 +533,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
             throw new ChangeVetoException("Term was not accepted",e);
         }
         this.addFeatureRelationship(
-                new SimpleRichFeatureRelationship(f, SimpleRichFeatureRelationship.getContainsTerm(), 0)
+                new SimpleRichFeatureRelationship(this, f, SimpleRichFeatureRelationship.getContainsTerm(), 0)
                 );
         return f;
     }

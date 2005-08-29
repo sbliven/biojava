@@ -41,6 +41,7 @@ import org.biojavax.ontology.ComparableTerm;
  */
 public class SimpleBioEntryRelationship extends AbstractChangeable implements BioEntryRelationship {
     
+    private BioEntry object;
     private BioEntry subject;
     private ComparableTerm term;
     private Integer rank;
@@ -52,16 +53,18 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
      * @param subject The subject bioentry.
      * @param term The relationship term.
      */
-    public SimpleBioEntryRelationship(BioEntry subject, ComparableTerm term, Integer rank) {
+    public SimpleBioEntryRelationship(BioEntry object, BioEntry subject, ComparableTerm term, Integer rank) {
+        if (object==null) throw new IllegalArgumentException("Object cannot be null");
         if (subject==null) throw new IllegalArgumentException("Subject cannot be null");
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
+        this.object = object;
         this.subject = subject;
         this.term = term;
         this.rank = rank;
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleBioEntryRelationship() {}
+    protected SimpleBioEntryRelationship() {}
     
     /**
      * {@inheritDoc}
@@ -93,6 +96,14 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     /**
      * {@inheritDoc}
      */
+    public BioEntry getObject() { return this.object; }
+    
+    // Hibernate requirement - not for public use.
+    private void setObject(BioEntry object) { this.object = object; }
+        
+    /**
+     * {@inheritDoc}
+     */
     public BioEntry getSubject() { return this.subject; }
     
     // Hibernate requirement - not for public use.
@@ -108,34 +119,36 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     
     /**
      * {@inheritDoc}
-     * A relationship is compared first by rank, then subject, then term. If
+     * A relationship is compared first by rank, then object, subject, then term. If
      * ranks are null, they are treated as zero for comparison's sake.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
-        if (this.subject==null) return -1;
+        if (this.object==null) return -1;
         // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)o;
         int ourRank = (this.rank==null?0:this.rank.intValue());
         int theirRank = (them.getRank()==null?0:them.getRank().intValue());
         if (ourRank!=theirRank) return ourRank-theirRank;
+        if (!this.object.equals(them.getObject())) return this.object.compareTo(them.getObject());
         if (!this.subject.equals(them.getSubject())) return this.subject.compareTo(them.getSubject());
         return this.term.compareTo(them.getTerm());
     }
     
     /**
      * {@inheritDoc} 
-     * Relationships are equal if they share the same subject and term, regardless
+     * Relationships are equal if they share the same object, subject and term, regardless
      * of rank.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj==null || !(obj instanceof BioEntryRelationship)) return false;
         // Hibernate comparison - we haven't been populated yet
-        if (this.subject==null) return false;
+        if (this.object==null) return false;
         // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)obj;
         return (this.subject.equals(them.getSubject()) &&
+                this.object.equals(them.getObject()) &&
                 this.term.equals(them.getTerm()));
     }
     
@@ -147,6 +160,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
         // Hibernate comparison - we haven't been populated yet
         if (this.subject==null) return code;
         // Normal comparison
+        code = code*37 + this.object.hashCode();
         code = code*37 + this.subject.hashCode();
         code = code*37 + this.term.hashCode();
         return code;
@@ -154,10 +168,10 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     
     /**
      * {@inheritDoc}
-     * Form is "(#rank) term(subject)"
+     * Form is "(#rank) term(object,subject)"
      */
     public String toString() {
-        return "(#"+this.rank+") "+this.getTerm()+"("+this.getSubject()+")"; 
+        return "(#"+this.rank+") "+this.getTerm()+"("+this.getObject()+","+this.getSubject()+")"; 
     }
     
     // Hibernate requirement - not for public use.

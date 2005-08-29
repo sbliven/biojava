@@ -62,6 +62,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private Strand strand;
     private int rank;
     private int circularLength = 0;
+    private RichFeature feature;
     
     /**
      * Creates a new instance of SimpleRichSequenceLocation that points to a 
@@ -135,10 +136,38 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         this.rank = rank;
         this.strand = strand;
         this.crossRef = crossRef;
+        this.feature = null;
     }
     
     // Hibernate requirement - not for public use.
     protected SimpleRichLocation() {}
+            
+    /**
+     * {@inheritDoc} 
+     */
+    public RichFeature getFeature() { return this.feature; }
+    
+    /**
+     * {@inheritDoc} 
+     */
+    public void setFeature(RichFeature feature) throws ChangeVetoException {
+        if(!this.hasListeners(RichLocation.FEATURE)) {
+            this.feature = feature;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    RichLocation.FEATURE,
+                    feature,
+                    this.feature
+                    );
+            ChangeSupport cs = this.getChangeSupport(RichLocation.FEATURE);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.feature = feature;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
     
     /**
      * {@inheritDoc}
