@@ -64,7 +64,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleComparableTerm() {}
+    protected SimpleComparableTerm() {}
     
     /**
      * {@inheritDoc}

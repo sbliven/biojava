@@ -42,7 +42,7 @@ public class SimpleComment implements Comment {
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleComment() {}
+    protected SimpleComment() {}
     
     // Hibernate requirement - not for public use.
     private void setComment(String comment) { this.comment = comment; }

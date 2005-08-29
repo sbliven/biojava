@@ -71,7 +71,7 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleComparableOntology() {}
+    protected SimpleComparableOntology() {}
     
     /**
      * {@inheritDoc}

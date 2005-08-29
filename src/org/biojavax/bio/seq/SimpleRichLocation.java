@@ -138,7 +138,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleRichLocation() {}
+    protected SimpleRichLocation() {}
     
     /**
      * {@inheritDoc}

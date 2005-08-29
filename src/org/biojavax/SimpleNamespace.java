@@ -23,6 +23,8 @@ package org.biojavax;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Set;
+import java.util.TreeSet;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
@@ -41,6 +43,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     private String authority;
     private String description;
     private URI URI;
+    private Set members = new TreeSet();
     
     /**
      * Creates a new instance of SimpleNamespace with the given name,
@@ -57,7 +60,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleNamespace() {}
+    protected SimpleNamespace() {}
     
     /**
      * {@inheritDoc}
@@ -187,6 +190,17 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
      * {@inheritDoc}
      */
     public URI getURI() { return this.URI; }
+    
+    /**
+     * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original 
+     * Collection not a copy. This is required by Hibernate. If you
+     * modify the object directly the behaviour may be unpredictable.
+     */
+    public Set getMembers() { return this.members; }
+    
+    // Hibernate requirement - not for public use.
+    public void setMembers(Set members) { this.members = members; }
     
     /**
      * {@inheritDoc}

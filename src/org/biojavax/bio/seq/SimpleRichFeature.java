@@ -102,7 +102,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleRichFeature() {}
+    protected SimpleRichFeature() {}
     
     /**
      * {@inheritDoc}

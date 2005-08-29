@@ -65,7 +65,7 @@ public class SimplePosition implements Position {
     }
     
     //Hibernate only - futureproofing
-    private SimplePosition() {}
+    protected SimplePosition() {}
     
     /**
      * {@inheritDoc}

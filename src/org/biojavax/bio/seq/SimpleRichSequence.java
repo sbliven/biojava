@@ -80,7 +80,7 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleRichSequence() {} 
+    protected SimpleRichSequence() {} 
     
     /**
      * {@inheritDoc}

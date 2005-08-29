@@ -47,7 +47,7 @@ public class SimpleRankedDocRef implements RankedDocRef {
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleRankedDocRef() {}
+    protected SimpleRankedDocRef() {}
     
     // Hibernate requirement - not for public use.
     private void setRank(int rank) { this.rank = rank; }

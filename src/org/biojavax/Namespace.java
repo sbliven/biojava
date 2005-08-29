@@ -22,6 +22,7 @@
 package org.biojavax;
 
 import java.net.URI;
+import java.util.Set;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
@@ -121,6 +122,13 @@ public interface Namespace extends Comparable,Changeable {
      * @throws ChangeVetoException in case of objections.
      */
     public void setURI(URI URI) throws ChangeVetoException;
+    
+    /**
+     * Returns a set of all BioEntry and RichSequence objects that
+     * declare themselves as being part of this namespace.
+     * @return a set of BioEntry or RichSequence objects.
+     */
+    public Set getMembers();
     
 }
 

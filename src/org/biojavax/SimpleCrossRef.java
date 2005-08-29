@@ -78,7 +78,7 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleCrossRef() {}
+    protected SimpleCrossRef() {}
     
     /**
      * {@inheritDoc}

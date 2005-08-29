@@ -47,12 +47,10 @@ import org.biojavax.ontology.ComparableTerm;
  */
 public class SimpleRichAnnotation extends AbstractChangeable implements RichAnnotation {
     
-    private Set notes;
+    private Set notes = new TreeSet(); // Keeps them ordered by rank then term
     
     /** Creates a new, empty instance of SimpleRichAnnotation */
-    public SimpleRichAnnotation() {
-        this.notes = new TreeSet(); // Keeps them ordered by rank then term
-    }
+    public SimpleRichAnnotation() {}
     
     /**
      * {@inheritDoc}

@@ -59,7 +59,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleDocRef() {}
+    protected SimpleDocRef() {}
     
     /**
      * {@inheritDoc}

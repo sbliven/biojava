@@ -31,7 +31,7 @@ public class SimpleNCBITaxonName implements Comparable {
     private String name;
 
     // Hibernate requirement - not for public use.
-    private SimpleNCBITaxonName() {}
+    protected SimpleNCBITaxonName() {}
     
     /**
      * Creates a new taxon name based on the given class and name, both of

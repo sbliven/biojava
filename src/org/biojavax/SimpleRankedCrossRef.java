@@ -44,7 +44,7 @@ public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleRankedCrossRef() {}
+    protected SimpleRankedCrossRef() {}
     
     // Hibernate requirement - not for public use.
     private void setCrossRef(CrossRef crossref) { this.crossref = crossref; }

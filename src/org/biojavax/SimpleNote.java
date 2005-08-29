@@ -51,7 +51,7 @@ public class SimpleNote extends AbstractChangeable implements Note {
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleNote() {}
+    protected SimpleNote() {}
     
     /**
      * {@inheritDoc}

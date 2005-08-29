@@ -66,7 +66,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleRichFeatureRelationship() {}
+    protected SimpleRichFeatureRelationship() {}
     
     /**
      * {@inheritDoc}

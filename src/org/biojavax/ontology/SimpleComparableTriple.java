@@ -66,7 +66,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleComparableTriple() {}
+    protected SimpleComparableTriple() {}
     
     /**
      * {@inheritDoc}

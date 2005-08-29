@@ -65,7 +65,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     }
     
     // Hibernate requirement - not for public use.
-    private SimpleNCBITaxon() {}
+    protected SimpleNCBITaxon() {}
     
     /**
      * {@inheritDoc}
