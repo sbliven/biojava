@@ -21,25 +21,11 @@
 
 package org.biojava.bio.program.scf;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-
-import org.biojava.bio.BioError;
 import org.biojava.bio.chromatogram.AbstractChromatogram;
 import org.biojava.bio.chromatogram.Chromatogram;
 import org.biojava.bio.chromatogram.UnsupportedChromatogramFormatException;
+
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
@@ -49,125 +35,168 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.SymbolListViews;
 import org.biojava.utils.SmallMap;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
+
+
 
 /**
- * A {@link org.biojava.bio.chromatogram.Chromatogram} as loaded from an SCF
- * v2 or v3 file.  Also loads and exposes the SCF format's "private data" and
- * "comments" sections.  The quality values from the SCF are stored as
+ * A {@link org.biojava.bio.chromatogram.Chromatogram} as loaded from an
+ * SCF v2 or v3 file.  Also loads and exposes the SCF format's "private data"
+ * and "comments" sections.  The quality values from the SCF are stored as
  * additional sequences on the base call alignment. The labels are the
  * <code>PROB_</code>* constants in this class.
- * The values are {@link org.biojava.bio.symbol.IntegerAlphabet.IntegerSymbol} objects in the range
- * 0 to 255.
+ * The values are {@link org.biojava.bio.symbol.IntegerAlphabet.IntegerSymbol}
+ * objects in the range 0 to 255.
+ *
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  */
 public class SCF extends AbstractChromatogram {
     private byte[] privateData;
     private Properties comments;
-
-    private static final IntegerAlphabet.SubIntegerAlphabet PROBABILITY_ALPHABET =
-        IntegerAlphabet.getSubAlphabet(0, 255);
-
-    /** Base call alignment sequence label for the probability that call should be A. */
+    
+    private static final IntegerAlphabet.SubIntegerAlphabet
+            PROBABILITY_ALPHABET =
+            IntegerAlphabet.getSubAlphabet(0, 255);
+    
+    /** Represents the maximum unsigned value
+     * of a byte for wrapping purposes */
+    public static final int BYTE_MAX_VALUE =
+            256;
+    
+    /** Represents the maximum unsigned value
+     * of a short for wrapping purposes */
+    public static final int SHORT_MAX_VALUE =
+            65536;
+    
+    /** Base call alignment sequence label for the probability that call
+     * should be A. */
     public static final Object PROB_NUC_A = "quality-a";
-    /** Base call alignment sequence label for the probability that call should be C. */
+    /** Base call alignment sequence label for the probability that call
+     * should be C. */
     public static final Object PROB_NUC_C = "quality-c";
-    /** Base call alignment sequence label for the probability that call should be G. */
+    /** Base call alignment sequence label for the probability that call
+     * should be G. */
     public static final Object PROB_NUC_G = "quality-g";
-    /** Base call alignment sequence label for the probability that call should be T. */
+    /** Base call alignment sequence label for the probability that call
+     * should be T. */
     public static final Object PROB_NUC_T = "quality-t";
     /**
-     * Base call alignment sequence label for the substitution probability.
-     * In versions of the SCF spec before 3.10, this is called spareQual[0].
+     * Base call alignment sequence label for the substitution
+     * probability. In versions of the SCF spec before 3.10, this is called
+     * spareQual[0].
      */
-    public static final Object PROB_SUBSTITUTION = "substitution-probability";
+    public static final Object PROB_SUBSTITUTION =
+            "substitution-probability";
     /**
      * Base call alignment sequence label for the overcall probability.
-     * In versions of the SCF spec before 3.10, this is called spareQual[1].
+     * In versions of the SCF spec before 3.10, this is called
+     * spareQual[1].
      */
     public static final Object PROB_OVERCALL     = "overcall-probability";
     /**
      * Base call alignment sequence label for the undercall probability.
-     * In versions of the SCF spec before 3.10, this is called spareQual[2].
+     * In versions of the SCF spec before 3.10, this is called
+     * spareQual[2].
      */
-    public static final Object PROB_UNDERCALL    = "undercall-probability";
-
+    public static final Object PROB_UNDERCALL    =
+            "undercall-probability";
+    
     /** Creates a new, completely empty SCF. */
     protected SCF() {
         super();
         comments = new Properties();
     }
-
+    
     public static SCF create(File f)
     throws IOException, UnsupportedChromatogramFormatException {
         SCF out = new SCF();
         out.load(f);
         return out;
     }
-
+    
     public static SCF create(InputStream in, long alreadyRead)
     throws IOException, UnsupportedChromatogramFormatException {
         SCF out = new SCF();
         out.load(in, alreadyRead);
         return out;
     }
-
-    protected void load(File f) throws IOException, UnsupportedChromatogramFormatException {
+    
+    protected void load(File f) throws IOException,
+            UnsupportedChromatogramFormatException {
         FileInputStream fin = new FileInputStream(f);
         load(fin, 0);
     }
-
+    
     protected void load(InputStream in, long initOffset)
     throws IOException, UnsupportedChromatogramFormatException {
         SCF.ParserFactory.parse(in, this, initOffset);
     }
-
+    
     /**
      * Returns the comments fields as a {@link Properties} mapping.
      */
     public Properties getComments() { return comments; }
-
-    protected AbstractChromatogram reverseComplementInstance() { return new SCF(); }
-
-    public static IntegerAlphabet.SubIntegerAlphabet getProbabilityAlphabet() { return PROBABILITY_ALPHABET; }
-
+    
+    protected AbstractChromatogram reverseComplementInstance() { return
+            new SCF(); }
+    
+    public static IntegerAlphabet.SubIntegerAlphabet
+            getProbabilityAlphabet() { return PROBABILITY_ALPHABET; }
+    
     /**
-     * Overrides {@link AbstractChromatogram#reverseComplementBaseCallList} to
+     * Overrides {@link
+     * AbstractChromatogram#reverseComplementBaseCallList} to
      * support the 7 quality values from the SCF.  These are handled thus:
      * <ul>
      *   <li><code>PROB_SUBSTITUTION</code>, <code>PROB_OVERCALL</code>, and
-     *       <code>PROB_UNDERCALL</code> are just reversed & returned.</li>
+     *       <code>PROB_UNDERCALL</code> are just reversed &returned.</li>
      *   <li><code>PROB_NUC_</code>* returns the reverse of the quality
      *       sequence for the complement base.</li>
      * </ul>
      */
     protected SymbolList reverseComplementBaseCallList(Object label) {
         if (label == PROB_SUBSTITUTION ||
-            label == PROB_OVERCALL ||
-            label == PROB_UNDERCALL) {
-            return SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(label));
-        }
-        else if (label == PROB_NUC_A) {
-            return SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(PROB_NUC_T));
-        }
-        else if (label == PROB_NUC_C) {
-            return SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(PROB_NUC_G));
-        }
-        else if (label == PROB_NUC_G) {
-            return SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(PROB_NUC_C));
-        }
-        else if (label == PROB_NUC_T) {
-            return SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(PROB_NUC_A));
-        }
-        else {
+                label == PROB_OVERCALL ||
+                label == PROB_UNDERCALL) {
+            return
+                    SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(label));
+        } else if (label == PROB_NUC_A) {
+            return
+                    SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(PROB_NUC_T));
+        } else if (label == PROB_NUC_C) {
+            return
+                    SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(PROB_NUC_G));
+        } else if (label == PROB_NUC_G) {
+            return
+                    SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(PROB_NUC_C));
+        } else if (label == PROB_NUC_T) {
+            return
+                    SymbolListViews.reverse(this.getBaseCalls().symbolListForLabel(PROB_NUC_A));
+        } else {
             return super.reverseComplementBaseCallList(label);
         }
     }
-
+    
     /*** INNER CLASSES FOR PARSER ***/
-
-    /** Factory class to create the appropriate parser for the given stream.  This
-     *  decision is based on the version field in the file's header. */
+    
+    /** Factory class to create the appropriate parser for the given
+     * stream.  This decision is based on the version field in the file's header. */
     private static class ParserFactory {
         public static void parse(InputStream in, SCF out, long initOffset)
         throws IOException, UnsupportedChromatogramFormatException {
@@ -175,12 +204,14 @@ public class SCF extends AbstractChromatogram {
             SCF.Parser parser = createParser(din, out, initOffset);
             parser.parse();
         }
-
-        public static SCF.Parser createParser(DataInputStream din, SCF out, long initOffset)
-        throws UnsupportedChromatogramFormatException, IOException {
+        
+        public static SCF.Parser createParser(DataInputStream din, SCF
+                out, long initOffset)
+                throws UnsupportedChromatogramFormatException, IOException {
             // read the header to find out the version
             long offset = initOffset;
-            SCF.Parser.HeaderStruct header = SCF.Parser.HeaderStruct.create(din, initOffset);
+            SCF.Parser.HeaderStruct header =
+                    SCF.Parser.HeaderStruct.create(din, initOffset);
             offset = SCF.Parser.HeaderStruct.HEADER_LENGTH;
             out.setBits((int)header.sample_size * 8);
             SCF.Parser parser;
@@ -189,24 +220,22 @@ public class SCF extends AbstractChromatogram {
                 version = Float.parseFloat(new String(header.version));
             } catch (NumberFormatException e) {
                 throw new UnsupportedChromatogramFormatException(
-                    "The SCF's version (" + new String(header.version) +
-                    ") is not a number");
+                        "The SCF's version (" + new String(header.version) +
+                        ") is not a number");
             }
             if (version < 3.0f && version >= 2.0f) {
                 parser = new SCF.V2Parser(din, out, header, offset);
-            }
-            else if (version >= 3.0f) {
+            } else if (version >= 3.0f) {
                 parser = new SCF.V3Parser(din, out, header, offset);
-            }
-            else {
+            } else {
                 throw new UnsupportedChromatogramFormatException(
-                    "Only version 2 and version 3 SCFs are supported (not "
-                    + new String(header.version));
+                        "Only version 2 and version 3 SCFs are supported (not "
+                        + new String(header.version));
             }
             return parser;
         }
     }
-
+    
     static interface BaseCallUncertaintyDecoder {
         /**
          * Returns an appropriate Symbol from the DNA alphabet for
@@ -214,12 +243,14 @@ public class SCF extends AbstractChromatogram {
          */
         public Symbol decode(byte call) throws IllegalSymbolException;
     }
-
+    
     /**
-     * A BaseCallUncertaintyDecoder that works for type 0 (default) and type 4 (ABI)
+     * A BaseCallUncertaintyDecoder that works for type 0 (default) and
+     * type 4 (ABI)
      * code sets.
      */
-    static class DefaultUncertaintyDecoder implements BaseCallUncertaintyDecoder {
+    static class DefaultUncertaintyDecoder implements
+            BaseCallUncertaintyDecoder {
         public DefaultUncertaintyDecoder() { }
         public Symbol decode(byte call) throws IllegalSymbolException {
             char c = (char) call;
@@ -237,11 +268,12 @@ public class SCF extends AbstractChromatogram {
                 case '-':
                     return DNATools.getDNA().getGapSymbol();
                 default:
-                    throw new IllegalSymbolException("No Symbol for " + c);
+                    throw new IllegalSymbolException("No Symbol for " +
+                            c);
             }
         }
     }
-
+    
     abstract static class Parser {
         protected long offset = 0;
         protected DataInputStream din = null;
@@ -249,50 +281,56 @@ public class SCF extends AbstractChromatogram {
         protected BaseCallUncertaintyDecoder decoder;
         protected SCF out = null;
         protected boolean parsed = false;
-
+        
         Parser(DataInputStream din, SCF out,
-               SCF.Parser.HeaderStruct header, long initOffset)
-        throws UnsupportedChromatogramFormatException {
+                SCF.Parser.HeaderStruct header, long initOffset)
+                throws UnsupportedChromatogramFormatException {
             if (din == null)
-                throw new IllegalArgumentException("Can't parse a null inputstream");
+                throw new IllegalArgumentException(
+                        "Can't parse a null inputstream");
             this.din = din;
-
+            
             if (out == null)
                 this.out = new SCF();
             else
                 this.out = out;
-
+            
             if (header.samples > Integer.MAX_VALUE)
-                throw new UnsupportedChromatogramFormatException("Can't parse an SCF with more than " + Integer.MAX_VALUE + " trace samples");
-
+                throw new UnsupportedChromatogramFormatException(
+                        "Can't parse an SCF with more than " + Integer.MAX_VALUE + " trace samples");
+            
             if (header.bases > Integer.MAX_VALUE)
-                throw new UnsupportedChromatogramFormatException("Can't parse an SCF with more than " + Integer.MAX_VALUE + " called bases");
-
+                throw new UnsupportedChromatogramFormatException(
+                        "Can't parse an SCF with more than " + Integer.MAX_VALUE + " called bases");
+            
             this.header = header;
             this.decoder = createDecoder(header.code_set);
             this.offset = initOffset;
         }
-
+        
         /**
-         * Factory method to create an approriate decoder for the code set.
-         * Currently, only a direct interpretation of the encoded byte
+         * Factory method to create an approriate decoder for the code
+         * set. Currently, only a direct interpretation of the encoded byte
          * as an ASCII character is supported (see DefaultUncertaintyDecoder).
-         * This interpretation will be used for all code sets, but a warning
-         * will be printed if the code set is not known to work with this
+         * This interpretation will be used for all code sets, but a
+         * warning will be printed if the code set is not known to work with this
          * interpretation.
          */
-        private static BaseCallUncertaintyDecoder createDecoder(long codeSet) {
+        private static BaseCallUncertaintyDecoder createDecoder(long
+                codeSet) {
             if (codeSet != 0 && codeSet != 4)
-                System.err.println("Warning: the code set (" + codeSet + ") is not specifically supported.  (It may still work, though.)");
+                System.err.println("Warning: the code set (" + codeSet +
+                        ") is not specifically supported.  (It may still work, though.)");
             return new DefaultUncertaintyDecoder();
         }
-
+        
         public SCF getParsed() {
             if (parsed) return out;
             else        return null;
         }
-
-        public void parse() throws IOException, UnsupportedChromatogramFormatException {
+        
+        public void parse() throws IOException,
+                UnsupportedChromatogramFormatException {
             parsed = false;
             // sort the sections of the file by ascending offset
             Integer SAMPLES  = new Integer(0),
@@ -304,8 +342,9 @@ public class SCF extends AbstractChromatogram {
             sectionOrder.put(new Long(header.bases_offset),    BASES);
             sectionOrder.put(new Long(header.comments_offset), COMMENTS);
             sectionOrder.put(new Long(header.private_offset),  PRIVATE);
-
-            for (Iterator it = sectionOrder.keySet().iterator() ; it.hasNext() ;) {
+            
+            for (Iterator it = sectionOrder.keySet().iterator() ;
+            it.hasNext() ;) {
                 Integer sect = (Integer) sectionOrder.get(it.next());
                 if      (sect == SAMPLES)  parseSamples();
                 else if (sect == BASES)    parseBases();
@@ -314,30 +353,37 @@ public class SCF extends AbstractChromatogram {
             }
             parsed = true;
         }
-
-        protected abstract void parseSamples()  throws IOException, UnsupportedChromatogramFormatException;
-        protected abstract void parseBases()    throws IOException, UnsupportedChromatogramFormatException;
-
+        
+        protected abstract void parseSamples()  throws IOException,
+                UnsupportedChromatogramFormatException;
+        protected abstract void parseBases()    throws IOException,
+                UnsupportedChromatogramFormatException;
+        
         protected void parseComments() throws IOException {
             skipTo(header.comments_offset);
             byte[] raw = new byte[(int)header.comments_size - 1];
             din.read(raw, 0, raw.length);
             BufferedReader r = new BufferedReader(
-                                    new InputStreamReader(
-                                        new ByteArrayInputStream(raw),
-                                        "ISO-8859-1"
-                                    )
-                               );
+                    new InputStreamReader(
+                    new ByteArrayInputStream(raw),
+                    "ISO-8859-1"
+                    )
+                    );
             String line, key, value;
             int eqIdx = -1;
             while ((line = r.readLine()) != null) {
                 eqIdx = line.indexOf('=');
+                //added line below to skip any truncated comment fields
+                if( eqIdx == -1 ) {
+                    continue;
+                    
+                }
                 key = line.substring(0, eqIdx);
                 value = line.substring(eqIdx+1);
                 out.comments.setProperty(key, value);
             }
         }
-
+        
         protected void parsePrivate() throws IOException {
             if (header.private_size == 0) return;
             skipTo(header.private_offset);
@@ -345,12 +391,13 @@ public class SCF extends AbstractChromatogram {
             int privRead = 0;
             int thisRead = 0;
             while (privRead < out.privateData.length) {
-                thisRead = din.read(out.privateData, privRead, out.privateData.length - privRead);
+                thisRead = din.read(out.privateData, privRead,
+                        out.privateData.length - privRead);
                 offset += thisRead;
                 privRead += thisRead;
             }
         }
-
+        
         protected final void skipTo(long newOffset) throws IOException {
             if (newOffset < offset)
                 throw new IllegalArgumentException("Can't skip backwards: (newOffset==" + newOffset + ") < (offset==" + offset + ")");
@@ -361,35 +408,45 @@ public class SCF extends AbstractChromatogram {
                 skip   -= actualSkip;
             }
         }
-
+        
         /**
-         * Does the grunt work of creating the base call alignment from the
-         * given lists of bases, offsets, and probabilities.
+         * Does the grunt work of creating the base call alignment from
+         * the given lists of bases, offsets, and probabilities.
          * Catches and "Can't happens" all exceptions.
          */
-        protected final void createAndSetBaseCallAlignment(List dna, List offsets, List[] probs) {
+        protected final void createAndSetBaseCallAlignment(List dna, List
+                offsets, List[] probs) {
             try {
                 Map baseCalls = new SmallMap(9);
-                baseCalls.put(Chromatogram.DNA,     out.createImmutableSymbolList(DNATools.getDNA(), dna));
-                baseCalls.put(Chromatogram.OFFSETS, out.createImmutableSymbolList(IntegerAlphabet.getInstance(), offsets));
-                baseCalls.put(PROB_NUC_A, out.createImmutableSymbolList(getProbabilityAlphabet(), probs[0]));
-                baseCalls.put(PROB_NUC_C, out.createImmutableSymbolList(getProbabilityAlphabet(), probs[1]));
-                baseCalls.put(PROB_NUC_G, out.createImmutableSymbolList(getProbabilityAlphabet(), probs[2]));
-                baseCalls.put(PROB_NUC_T, out.createImmutableSymbolList(getProbabilityAlphabet(), probs[3]));
-                baseCalls.put(PROB_SUBSTITUTION, out.createImmutableSymbolList(getProbabilityAlphabet(), probs[4]));
-                baseCalls.put(PROB_OVERCALL,     out.createImmutableSymbolList(getProbabilityAlphabet(), probs[5]));
-                baseCalls.put(PROB_UNDERCALL,    out.createImmutableSymbolList(getProbabilityAlphabet(), probs[6]));
+                baseCalls.put(Chromatogram.DNA,
+                        out.createImmutableSymbolList(DNATools.getDNA(), dna));
+                baseCalls.put(Chromatogram.OFFSETS,
+                        out.createImmutableSymbolList(IntegerAlphabet.getInstance(), offsets));
+                baseCalls.put(PROB_NUC_A,
+                        out.createImmutableSymbolList(getProbabilityAlphabet(), probs[0]));
+                baseCalls.put(PROB_NUC_C,
+                        out.createImmutableSymbolList(getProbabilityAlphabet(), probs[1]));
+                baseCalls.put(PROB_NUC_G,
+                        out.createImmutableSymbolList(getProbabilityAlphabet(), probs[2]));
+                baseCalls.put(PROB_NUC_T,
+                        out.createImmutableSymbolList(getProbabilityAlphabet(), probs[3]));
+                baseCalls.put(PROB_SUBSTITUTION,
+                        out.createImmutableSymbolList(getProbabilityAlphabet(), probs[4]));
+                baseCalls.put(PROB_OVERCALL,
+                        out.createImmutableSymbolList(getProbabilityAlphabet(), probs[5]));
+                baseCalls.put(PROB_UNDERCALL,
+                        out.createImmutableSymbolList(getProbabilityAlphabet(), probs[6]));
                 out.setBaseCallAlignment(out.createImmutableAlignment(baseCalls));
             } catch (IllegalSymbolException ise) {
-                throw new BioError("Can't happen unless the decoder is returning non-DNA symbols", ise);
+                throw new BioError(ise,"Can't happen unless the decoder is returning non-DNA symbols");
             } catch (IllegalAlphabetException iae) {
-                throw new BioError("Can't happen", iae);
+                throw new BioError(iae,"Can't happen");
             }
         }
-
+        
         private static class HeaderStruct {
             public static final int HEADER_LENGTH = 128;
-
+            
             // SCF spec uses unsigned 32-bit ints, so we'll use longs for simplicity
             public long magic_number;
             public long samples;
@@ -406,21 +463,20 @@ public class SCF extends AbstractChromatogram {
             public long private_size;
             public long private_offset;
             public long[] spare;
-
+            
             private HeaderStruct() {
                 version = new char[4];
                 spare = new long[18];
             }
-
-            public static HeaderStruct create(DataInputStream din, long initOffset) throws IOException {
+            
+            public static HeaderStruct create(DataInputStream din, long
+                    initOffset) throws IOException {
                 HeaderStruct hs = new HeaderStruct();
                 if (initOffset > 4) {
                     throw new IllegalStateException("Can't skip more than four bytes and still have enough info to read header");
-                }
-                else if (initOffset == 0) {
+                } else if (initOffset == 0) {
                     hs.magic_number = 0xFFFFFFFF & din.readInt();
-                }
-                else {
+                } else {
                     hs.magic_number = 0;
                     // skip to the four-byte boundary
                     for (int i = 0 ; i < 4 - initOffset ; i++)
@@ -449,72 +505,90 @@ public class SCF extends AbstractChromatogram {
             }
         }
     }
-
+    
     private static class V3Parser extends Parser {
         V3Parser(DataInputStream din, SCF out,
-                 SCF.Parser.HeaderStruct header, long initOffset)
-        throws IOException, UnsupportedChromatogramFormatException {
+                SCF.Parser.HeaderStruct header, long initOffset)
+                throws IOException, UnsupportedChromatogramFormatException {
             super(din, out, header, initOffset);
         }
-
-        protected void parseSamples() throws IOException, UnsupportedChromatogramFormatException {
+        
+        protected void parseSamples() throws IOException,
+                UnsupportedChromatogramFormatException {
             skipTo(header.samples_offset);
-
+            
             // load values from file
             int count = (int)header.samples;
+            int maxValAllowed = 0;
+            if(header.sample_size == 1) {
+                maxValAllowed = BYTE_MAX_VALUE;
+            } else if(header.sample_size == 2) {
+                maxValAllowed = SHORT_MAX_VALUE;
+            }
+            
             int[][] trace = new int[4][count];
-            int[] maxVal = new int[] { Integer.MIN_VALUE, Integer.MIN_VALUE,
-                                       Integer.MIN_VALUE, Integer.MIN_VALUE };
-            for (int n = 0 ; n < 4 ; n++)
-                readSamplesInto(trace[n]);
-
-            // stored values are delta-delta values; reprocess into actual values
-            // algorithm cribbed from io_lib's delta_samples function in misc_scf.c
-            int[] p_sample1 = new int[] { 0, 0, 0, 0 };
-            int[] p_sample2 = new int[] { 0, 0, 0, 0 };
-            for (int n = 0 ; n < 4 ; n++) {
-                for (int i = 1 ; i < trace[n].length ; i++) {
-                    p_sample1[n] += trace[n][i];
-                    trace[n][i] = p_sample1[n] + p_sample2[n];
-                    p_sample2[n] = trace[n][i];
-                    maxVal[n] = Math.max(maxVal[n], trace[n][i]);
-                }
-            }
-            // set into output SCF chromat object
-            try {
-                out.setTrace(DNATools.a(), trace[0], maxVal[0]);
-                out.setTrace(DNATools.c(), trace[1], maxVal[1]);
-                out.setTrace(DNATools.g(), trace[2], maxVal[2]);
-                out.setTrace(DNATools.t(), trace[3], maxVal[3]);
-            } catch (IllegalSymbolException ise) {
-                throw new BioError("Can't happen", ise);
-            }
+            int[] maxVal = new int[] { Integer.MIN_VALUE,
+                    Integer.MIN_VALUE,
+                    Integer.MIN_VALUE,
+                    Integer.MIN_VALUE };
+                    for (int n = 0 ; n < 4 ; n++)
+                        readSamplesInto(trace[n]);
+                    
+                    // stored values are delta-delta values; reprocess into actual values
+                    // algorithm cribbed from io_lib's delta_samples function in misc_scf.c
+                    int[] p_sample1 = new int[] { 0, 0, 0, 0 };
+                    int[] p_sample2 = new int[] { 0, 0, 0, 0 };
+                    for (int n = 0 ; n < 4 ; n++) {
+                        for (int i = 0 ; i < trace[n].length ; i++) {
+                            //New version of the code which takes into account what the
+                            //underlying value i.e. is it a byte or is it a short
+                            //and slightly rejigged for speed and sanity sakes
+                            p_sample1[n] += trace[n][i];
+                            if(p_sample1[n] >= maxValAllowed) p_sample1[n] = p_sample1[n] -
+                                    maxValAllowed;
+                            p_sample2[n] = p_sample1[n] + p_sample2[n];
+                            if(p_sample2[n] >= maxValAllowed) p_sample2[n] = p_sample2[n] -
+                                    maxValAllowed;
+                            trace[n][i] = p_sample2[n];
+                            
+                            maxVal[n] = Math.max(maxVal[n], trace[n][i]);
+                        }
+                    }
+                    // set into output SCF chromat object
+                    try {
+                        out.setTrace(DNATools.a(), trace[0], maxVal[0]);
+                        out.setTrace(DNATools.c(), trace[1], maxVal[1]);
+                        out.setTrace(DNATools.g(), trace[2], maxVal[2]);
+                        out.setTrace(DNATools.t(), trace[3], maxVal[3]);
+                    } catch (IllegalSymbolException ise) {
+                        throw new BioError(ise,"Can't happen");
+                    }
         }
-
+        
         protected void readSamplesInto(int[] samps) throws IOException {
             if (header.sample_size == 1) {
                 for (int i = 0 ; i < samps.length ; i++) {
                     samps[i] = din.readUnsignedByte();
                     offset += 1;
                 }
-            }
-            else if (header.sample_size == 2) {
+            } else if (header.sample_size == 2) {
                 for (int i = 0 ; i < samps.length ; i++) {
                     samps[i] = din.readUnsignedShort();
                     offset += 2;
                 }
             }
         }
-
-        protected void parseBases() throws IOException, UnsupportedChromatogramFormatException {
+        
+        protected void parseBases() throws IOException,
+                UnsupportedChromatogramFormatException {
             skipTo(header.bases_offset);
             int count = (int) header.bases;
-
+            
             List[] probs = new ArrayList[7];
             for (int i = 0 ; i < 7 ; i++) probs[i] = new ArrayList(count);
             List offsets = new ArrayList(count);
             List dna     = new ArrayList(count);
-
+            
             long tmp;
             try {
                 for (int i = 0 ; i < count ; i++) {
@@ -522,7 +596,9 @@ public class SCF extends AbstractChromatogram {
                     tmp = 0xFFFFFFFF & din.readInt();
                     offset += 4;
                     if (tmp > Integer.MAX_VALUE)
-                        throw new UnsupportedChromatogramFormatException("SCF contains a base with peak offset > " + Integer.MAX_VALUE);
+                        throw new
+                                UnsupportedChromatogramFormatException(
+                                "SCF contains a base with peak offset > " + Integer.MAX_VALUE);
                     offsets.add(IntegerAlphabet.getInstance().getSymbol((int) tmp));
                 }
                 // read sets of probs for A, C, G, T
@@ -550,61 +626,64 @@ public class SCF extends AbstractChromatogram {
                     }
                 }
             } catch (IllegalSymbolException ise) {
-                throw new BioError("Can't happen unless there's a misdefinition of getProbabilityAlphabet() or IntegerAlphabet", ise);
+                throw new BioError(ise,"Can't happen unless there's a misdefinition of getProbabilityAlphabet() or IntegerAlphabet");
             }
             // create/set base call list
             createAndSetBaseCallAlignment(dna, offsets, probs);
         }
     } // end SCFv3Parser
-
+    
     private static class V2Parser extends Parser {
         V2Parser(DataInputStream din, SCF out,
-                 SCF.Parser.HeaderStruct header, long initOffset)
-        throws IOException, UnsupportedChromatogramFormatException {
+                SCF.Parser.HeaderStruct header, long initOffset)
+                throws IOException, UnsupportedChromatogramFormatException {
             super(din, out, header, initOffset);
         }
-
+        
         protected void parseSamples() throws IOException {
             int count = (int) header.samples;
             int[][] trace = new int[4][count];
-            int[] maxVal = new int[] { Integer.MIN_VALUE, Integer.MIN_VALUE,
-                                       Integer.MIN_VALUE, Integer.MIN_VALUE };
-
-            if (header.sample_size == 1) {
-                for (int i = 0 ; i < count ; i++) {
-                    for (int n = 0 ; n < 4 ; n++) {
-                        trace[n][i] = din.readUnsignedByte();
-                        maxVal[n] = Math.max(trace[n][i], maxVal[n]);
-                        offset++;
+            int[] maxVal = new int[] { Integer.MIN_VALUE,
+                    Integer.MIN_VALUE,
+                    Integer.MIN_VALUE,
+                    Integer.MIN_VALUE };
+                    
+                    if (header.sample_size == 1) {
+                        for (int i = 0 ; i < count ; i++) {
+                            for (int n = 0 ; n < 4 ; n++) {
+                                trace[n][i] = din.readUnsignedByte();
+                                maxVal[n] = Math.max(trace[n][i], maxVal[n]);
+                                offset++;
+                            }
+                        }
+                    } else if (header.sample_size == 2) {
+                        for (int i = 0 ; i < count ; i++) {
+                            for (int n = 0 ; n < 4 ; n++) {
+                                trace[n][i] = din.readUnsignedShort();
+                                maxVal[n] = Math.max(trace[n][i], maxVal[n]);
+                                offset += 2;
+                            }
+                        }
                     }
-                }
-            }
-            else if (header.sample_size == 2) {
-                for (int i = 0 ; i < count ; i++) {
-                    for (int n = 0 ; n < 4 ; n++) {
-                        trace[n][i] = din.readUnsignedShort();
-                        maxVal[n] = Math.max(trace[n][i], maxVal[n]);
-                        offset += 2;
+                    // set into output SCF chromat object
+                    try {
+                        out.setTrace(DNATools.a(), trace[0], maxVal[0]);
+                        out.setTrace(DNATools.c(), trace[1], maxVal[1]);
+                        out.setTrace(DNATools.g(), trace[2], maxVal[2]);
+                        out.setTrace(DNATools.t(), trace[3], maxVal[3]);
+                    } catch (IllegalSymbolException ise) {
+                        throw new BioError(ise,"Can't happen");
                     }
-                }
-            }
-            // set into output SCF chromat object
-            try {
-                out.setTrace(DNATools.a(), trace[0], maxVal[0]);
-                out.setTrace(DNATools.c(), trace[1], maxVal[1]);
-                out.setTrace(DNATools.g(), trace[2], maxVal[2]);
-                out.setTrace(DNATools.t(), trace[3], maxVal[3]);
-            } catch (IllegalSymbolException ise) {
-                throw new BioError("Can't happen", ise);
-            }
         }
-
-        protected void parseBases() throws IOException, UnsupportedChromatogramFormatException {
+        
+        protected void parseBases() throws IOException,
+                UnsupportedChromatogramFormatException {
             skipTo(header.bases_offset);
-
+            
             int count = (int) header.bases;
             List[] probs = new ArrayList[7];
-            for (int i = 0 ; i < probs.length ; i++) probs[i] = new ArrayList(count);
+            for (int i = 0 ; i < probs.length ; i++) probs[i] = new
+                    ArrayList(count);
             List dna = new ArrayList(count);
             List offsets = new ArrayList(count);
             long tmp;
@@ -614,9 +693,11 @@ public class SCF extends AbstractChromatogram {
                 tmp = 0xFFFFFFFF & din.readInt();
                 offset += 4;
                 if (tmp > Integer.MAX_VALUE)
-                    throw new UnsupportedChromatogramFormatException("SCF contains a base with peak offset > " + Integer.MAX_VALUE);
-                offsets.add(IntegerAlphabet.getInstance().getSymbol((int) tmp));
-
+                    throw new UnsupportedChromatogramFormatException(
+                            "SCF contains a base with peak offset > " + Integer.MAX_VALUE);
+                offsets.add(IntegerAlphabet.getInstance().getSymbol((int)
+                tmp));
+                
                 // read the per-base probabilities
                 din.read(probTmp, 0, 4);
                 offset += 4;
@@ -626,7 +707,8 @@ public class SCF extends AbstractChromatogram {
                     offset += 1;
                 } catch (IllegalSymbolException ise) {
                     ise.printStackTrace(System.err);
-                    throw new UnsupportedChromatogramFormatException("Base call decoding failure");
+                    throw new UnsupportedChromatogramFormatException(
+                            "Base call decoding failure");
                 }
                 // read the spare probability fields
                 din.read(probTmp, 4, 3);
@@ -635,11 +717,12 @@ public class SCF extends AbstractChromatogram {
                     for (int p = 0 ; p < 7 ; p++)
                         probs[p].add(getProbabilityAlphabet().getSymbol(0xFF & probTmp[p]));
                 } catch (IllegalSymbolException ise) {
-                    throw new BioError("Can't happen unless getProbabilityAlphabet() has been misdefined.");
+                    throw new BioError(ise,"Can't happen unless getProbabilityAlphabet() has been misdefined.");
                 }
             }
             createAndSetBaseCallAlignment(dna, offsets, probs);
         }
     }
 }
+
 
