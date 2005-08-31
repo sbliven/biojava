@@ -22,6 +22,7 @@
 package org.biojavax.bio.seq.io;
 
 import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.bio.symbol.SymbolListFactory;
 
 
 /**
@@ -31,13 +32,42 @@ import org.biojava.bio.seq.io.SequenceBuilder;
  * @see RichSequenceBuilder
  */
 public class SimpleRichSequenceBuilderFactory implements RichSequenceBuilderFactory {
+    private SymbolListFactory fact = null;
+    private int threshold = 0;
     
     /** Creates a new instance of SimpleRichSequenceBuilderFactory */
-    public SimpleRichSequenceBuilderFactory() {}
+    public SimpleRichSequenceBuilderFactory() {
+      this(null, 0);
+    }
 
+    /** 
+     * Creates a new instance of SimpleRichSequenceBuilderFactory
+     * @param fact the factory to use when building the <code>SymbolList</code>.
+     */
+    public SimpleRichSequenceBuilderFactory(SymbolListFactory fact) {
+      this(fact, 0);
+    }
+    
+    /** 
+     * Creates a new instance of SimpleRichSequenceBuilderFactory that uses
+     * a specified factory for <code>SymbolLists</code> longer than a specified
+     * length. Before that a <code>SimpleSymbolListFacotry</code> is used.
+     * @param fact the factory to use when building the <code>SymbolList</code>.
+     * @param threshold the threshold to exceed before using this factory
+     */
+    public SimpleRichSequenceBuilderFactory(SymbolListFactory fact, int threshold) {
+      this.fact = fact;
+      this.threshold = threshold;
+    }
     /**
      * {@inheritDoc}
      */
-    public SequenceBuilder makeSequenceBuilder() { return new SimpleRichSequenceBuilder(); }
+    public SequenceBuilder makeSequenceBuilder() {
+        if(this.fact == null){
+            return new SimpleRichSequenceBuilder(); 
+        }else{
+            return new SimpleRichSequenceBuilder(this.fact, this.threshold);
+        }
+    }
     
 }
