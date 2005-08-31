@@ -144,6 +144,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     /**
      * {@inheritDoc}
      * NOT IMPLEMENTED
+     * @throws ChangeVetoException ALWAYS
      */
     public void setNoteSet(Set notes) throws ChangeVetoException {
         throw new ChangeVetoException("Cannot annotate compound locations.");
@@ -185,6 +186,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     /**
      * {@inheritDoc}
      * NOT IMPLEMENTED
+     * @throws ChangeVetoException ALWAYS
      */
     public void setCircularLength(int sourceSeqLength) throws ChangeVetoException {
         throw new ChangeVetoException("CompoundRichLocations cannot be circular");
@@ -276,6 +278,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     /**
      * {@inheritDoc}
+     * Recursively translates all members of this location.
      */
     public Location translate(int dist) {
         if (this.members.isEmpty()) return this;
@@ -293,6 +296,8 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      * which is not a RichLocation, it converts it first using 
      * RichLocation.Tools.enrich().
      * @see RichLocation.Tools
+     * @return true if an only if one of the members of this <code>Location</code>
+     * wholey contains <code>l</code>.
      */
     public boolean contains(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
@@ -307,6 +312,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     /**
      * {@inheritDoc}
      * Recursively applies this call to all members.
+     * @return true if and only if at least on of the members overlaps <code>l</code>
      */
     public boolean overlaps(Location l) {
         for (Iterator i = this.members.iterator(); i.hasNext(); ) {
@@ -322,7 +328,10 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      * using RichLocation.Tools.enrich().
      * The resulting location may or may not be a compound location. If it is
      * a compound location, its contents will be a set of simple locations.
+     * Regions that overlap will be merged into a single location.
      * @see RichLocation.Tools
+     * @return a <code>CompoundLocation</code> if the components of the union
+     * cannot be merged else a <code>SimpleRichLocation</code>
      */
     public Location union(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
@@ -343,6 +352,8 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      * using RichLocation.Tools.enrich().
      * The resulting location may or may not be a compound location. If it is
      * a compound location, its contents will be a set of simple locations.
+     * @return a <code>CompoundLocation</code> if there is more than one region
+     * of intersection that cannot be merged. Else a <code>SimpleRichLocation</code>.
      */
     public Location intersection(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
@@ -374,9 +385,13 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     /**
      * {@inheritDoc}
-     * This function concatenates the symbols of all its child locations. Note that
-     * if it is made up of overlapping sections, the results may not be any use, but
-     * it will not stop you from trying.
+     * This function concatenates the symbols of all its child locations. If
+     * the components of the location are from the negative strand the Symbols
+     * will be reverse complemented. If there are mixed strands the results may
+     * not be sensible but it is still possible.
+     * <p>
+     * The most obvious application of this method to a <code>CompoundRichLocation</code>
+     * is the contatenation of the components of a gene with multiple exons.
      */
     public SymbolList symbols(SymbolList seq) {
         if (seq==null) throw new IllegalArgumentException("Sequence cannot be null");
@@ -406,20 +421,46 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     /**
      * {@inheritDoc}
-     * Compound locations are only equal at the most abstract level, x==y.
+     * Compound locations are only equal to other Locations if all their
+     * components are equal.
      */
     public boolean equals(Object o) {
         if (o==this) return true;
-        return false; // not much else we can do really
+        if (! (o instanceof Location)) return false;
+        Location them = (Location) o;
+        
+        if(them.isContiguous()) return false; //because this is not!
+        
+        // ok - both compound. The blocks returned from blockIterator should each be
+        // equivalent.
+        Iterator i1 = this.blockIterator();
+        Iterator i2 = them.blockIterator();
+
+        // while there are more pairs to check...
+        while(i1.hasNext() && i2.hasNext()) {
+            // check that this pair is equivalent
+            Location l1 = (Location) i1.next();
+            Location l2 = (Location) i2.next();
+
+            if(!(l1.equals(l2))) // not equivalent blocks so not equal
+                return false;
+        }
+        if(i1.hasNext() || i2.hasNext()) {
+            // One of the locations had more blocks than the other
+            return false;
+        }
+        // Same number of blocks, all equivalent. Must be equal.
+        return true;
     }
     
     /**
      * {@inheritDoc}
-     * Compound locations cannot be compared, so this function will always return -1.
+     * 
      */
     public int compareTo(Object o) {
         Location fo = (Location) o;
-        return -1; // not much else we can do really
+        if (this.equals(fo)) return 0;
+        else return this.getMin() - fo.getMin();
     }
     
     /**
