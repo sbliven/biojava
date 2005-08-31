@@ -341,9 +341,9 @@ public class GenbankFormat implements RichSequenceFormat {
                 try {
                     DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,journal});
                     if (title!=null) dr.setTitle(title);
-                    // assign either the pubmed or medline to the docref
-                    if (pcr!=null) dr.setCrossref(pcr);
-                    else if (mcr!=null) dr.setCrossref(mcr);
+                    // assign either the pubmed or medline to the docref - medline gets priority
+                    if (mcr!=null) dr.setCrossref(mcr);
+                    else if (pcr!=null) dr.setCrossref(pcr);
                     // assign the remarks
                     dr.setRemark(remark);
                     // assign the docref to the bioentry
