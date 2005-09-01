@@ -37,6 +37,7 @@ import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
+import org.biojavax.CrossReferenceResolver;
 import org.biojavax.RichAnnotation;
 import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.bio.seq.RichLocation.Strand;
@@ -395,8 +396,8 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      * {@inheritDoc}
      * Recursively applies this call to all members.
      */
-    public void setRichLocationResolver(RichLocationResolver r) {
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setRichLocationResolver(r);
+    public void setCrossRefResolver(CrossReferenceResolver r) {
+        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setCrossRefResolver(r);
     }
     
     /**

@@ -29,6 +29,7 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Unchangeable;
 import org.biojavax.CrossRef;
+import org.biojavax.CrossReferenceResolver;
 import org.biojavax.RichAnnotation;
 import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.ontology.ComparableTerm;
@@ -232,7 +233,7 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      * {@inheritDoc} This method is ignored in the empty location because 
      * there is nothing to resolve.
      */
-    public void setRichLocationResolver(RichLocationResolver r) {}
+    public void setCrossRefResolver(CrossReferenceResolver r) {}
     
     /**
      * {@inheritDoc}

@@ -23,12 +23,12 @@ package org.biojavax.bio.db;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.biojavax.CrossReferenceResolver;
 import org.biojavax.Namespace;
+import org.biojavax.SimpleCrossReferenceResolver;
 import org.biojavax.SimpleNamespace;
 import org.biojavax.bio.seq.PositionResolver;
 import org.biojavax.bio.seq.PositionResolver.AverageResolver;
-import org.biojavax.bio.seq.RichLocationResolver;
-import org.biojavax.bio.seq.SimpleRichLocationResolver;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.SimpleComparableOntology;
 
@@ -47,7 +47,7 @@ public class RichObjectFactory {
     private static String genbankNamespaceName = "gb";
     private static String emblNamespaceName = "embl";
     private static PositionResolver defaultPositionResolver = new AverageResolver();
-    private static RichLocationResolver defaultRichLocationResolver = new SimpleRichLocationResolver();
+    private static CrossReferenceResolver defaultCrossRefResolver = new SimpleCrossReferenceResolver();
     
     // Constructor is private as this is all static.
     private RichObjectFactory() {}
@@ -108,14 +108,13 @@ public class RichObjectFactory {
     public static void setDefaultPositionResolver(PositionResolver pr) { defaultPositionResolver = pr; }
         
     /**
-     * Sets the default rich location resolver to use when resolving remote sequence locations.
-     * Defaults to the SimpleRichLocationResolver.
-     * @param pr the rich location resolver to use.
-     * @see org.biojavax.bio.seq.RichLocationResolver
-     * @see org.biojavax.bio.seq.SimpleRichLocationResolver
-     * @see org.biojavax.bio.seq.RichLocation
+     * Sets the default crossref resolver to use when resolving remote entries.
+     * Defaults to the SimpleCrossReferenceResolver.
+     * @param crr the resolver to use.
+     * @see org.biojavax.CrossReferenceResolver
+     * @see org.biojavax.SimpleCrossReferenceResolver
      */
-    public static void setDefaultRichLocationResolver(RichLocationResolver rlr) { defaultRichLocationResolver = rlr; }
+    public static void setDefaultCrossReferenceResolver(CrossReferenceResolver crr) { defaultCrossRefResolver = crr; }
     
     /**
      * Returns the default namespace object. Defaults to "lcl".
@@ -141,11 +140,11 @@ public class RichObjectFactory {
     public static PositionResolver getDefaultPositionResolver() { return defaultPositionResolver; }
     
     /**
-     * Returns the default rich location resolver object. Defaults to SimpleRichLocationResolver
-     * @return the default rich location resolver.
-     * @see org.biojavax.bio.seq.SimpleRichLocationResolver
+     * Returns the default cross ref resolver object. Defaults to SimpleCrossReferenceResolver
+     * @return the default resolver.
+     * @see org.biojavax.SimpleCrossReferenceResolver
      */
-    public static RichLocationResolver getDefaultRichLocationResolver() { return defaultRichLocationResolver; }
+    public static CrossReferenceResolver getDefaultCrossReferenceResolver() { return defaultCrossRefResolver; }
         
     /**
      * Returns the GenBank namespace object ("gb").

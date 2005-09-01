@@ -30,17 +30,17 @@ import org.biojavax.bio.seq.InifinitelyAmbiguousSymbolList;
 import org.biojavax.bio.seq.RichSequence;
 
 /**
- * {@inheritDoc}
+ * A simple implementation of CrossReferenceResolver
  * @author Richard Holland
  * @author Mark Schreiber
  * @since 1.5
  */
-public class SimpleCrossReferenceResolver implements CrossReferenceResolver {
+public class SimpleCrossReferenceResolver  implements CrossReferenceResolver {
     
     /**
      * {@inheritDoc}
      */
-    public SymbolList getRemoteSymbolList(CrossRef cr, FiniteAlphabet a) {
+    public SymbolList getRemoteSymbolList(CrossRef cr, Alphabet a) {
         Namespace ns = (Namespace)RichObjectFactory.getObject(Namespace.class, new Object[]{cr.getDbname()});
         String accession = cr.getAccession();
         for (Iterator i = ns.getMembers().iterator(); i.hasNext(); ) {

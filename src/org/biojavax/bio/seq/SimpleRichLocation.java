@@ -40,6 +40,7 @@ import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
+import org.biojavax.CrossReferenceResolver;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.db.RichObjectFactory;
@@ -59,7 +60,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private Position min;
     private Position max;
     private PositionResolver pr = RichObjectFactory.getDefaultPositionResolver();
-    private RichLocationResolver rlr = RichObjectFactory.getDefaultRichLocationResolver();
+    private CrossReferenceResolver crr = RichObjectFactory.getDefaultCrossReferenceResolver();
     private Strand strand;
     private int rank;
     private int circularLength = 0;
@@ -532,9 +533,9 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public void setRichLocationResolver(RichLocationResolver r) { 
-        if (r==null) throw new IllegalArgumentException("Rich location resolver cannot be null");
-        this.rlr = r; 
+    public void setCrossRefResolver(CrossReferenceResolver r) { 
+        if (r==null) throw new IllegalArgumentException("Resolver cannot be null");
+        this.crr = r; 
     }
     
     /**
@@ -554,7 +555,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         }
         
         // Resolve cross-references to remote sequences
-        if (this.getCrossRef()!=null) seq = this.rlr.getRemoteSymbolList(this.getCrossRef(),seq.getAlphabet());
+        if (this.getCrossRef()!=null) seq = this.crr.getRemoteSymbolList(this.getCrossRef(),seq.getAlphabet());
 
         // Carry on as before
         SymbolList seq2 = seq.subList(this.getMin(),this.getMax());

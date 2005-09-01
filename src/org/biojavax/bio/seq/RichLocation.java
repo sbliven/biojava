@@ -34,6 +34,7 @@ import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
+import org.biojavax.CrossReferenceResolver;
 import org.biojavax.RichAnnotatable;
 import org.biojavax.ontology.ComparableTerm;
 
@@ -166,12 +167,13 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
     public void setCircularLength(int sourceSeqLength) throws ChangeVetoException;
                     
     /**
-     * Sets the location resolver to use when retrieving remote symbols. If none is given,
-     * then the default from RichObjectFactory.getDefaultRichLocationResolver() is
+     * Sets the cross ref resolver to use when retrieving remote symbols. 
+     * If none is given,
+     * then the default from RichObjectFactory.getDefaultCrossRefResolver() is
      * used.
-     * @param r the RichLocationResolver to use.
+     * @param r the resolver to use.
      */
-    public void setRichLocationResolver(RichLocationResolver r);
+    public void setCrossRefResolver(CrossReferenceResolver r);
     
     /**
      * This class represents a strand on which a location may lie. Three strands
