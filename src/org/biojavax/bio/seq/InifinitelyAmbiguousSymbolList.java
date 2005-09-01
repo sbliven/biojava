@@ -20,7 +20,6 @@
  */
 
 package org.biojavax.bio.seq;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -36,9 +35,10 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * A symbol list that is only 1 long but never gives index out of
+ * A symbol list that is <code>Integer.MAX_VALUE</code>long, never gives index out of
  * bounds and always returns ambiguity symbols for everything.
  * @author Richard Holland
+ * @author MarkSchreiber
  */
 public class InifinitelyAmbiguousSymbolList implements SymbolList {
     
@@ -91,9 +91,9 @@ public class InifinitelyAmbiguousSymbolList implements SymbolList {
 
     /**
      * {@inheritDoc}
-     * ALWAYS RETURNS 1
+     * ALWAYS RETURNS <code>Integer.MAX_VALUE</code>
      */
-    public int length() { return 1; }
+    public int length() { return Integer.MAX_VALUE; }
 
     /**
      * {@inheritDoc}
