@@ -27,6 +27,8 @@ import org.biojavax.Namespace;
 import org.biojavax.SimpleNamespace;
 import org.biojavax.bio.seq.PositionResolver;
 import org.biojavax.bio.seq.PositionResolver.AverageResolver;
+import org.biojavax.bio.seq.RichLocationResolver;
+import org.biojavax.bio.seq.SimpleRichLocationResolver;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.SimpleComparableOntology;
 
@@ -45,6 +47,7 @@ public class RichObjectFactory {
     private static String genbankNamespaceName = "gb";
     private static String emblNamespaceName = "embl";
     private static PositionResolver defaultPositionResolver = new AverageResolver();
+    private static RichLocationResolver defaultRichLocationResolver = new SimpleRichLocationResolver();
     
     // Constructor is private as this is all static.
     private RichObjectFactory() {}
@@ -103,6 +106,16 @@ public class RichObjectFactory {
      * @see org.biojavax.bio.seq.RichLocation
      */
     public static void setDefaultPositionResolver(PositionResolver pr) { defaultPositionResolver = pr; }
+        
+    /**
+     * Sets the default rich location resolver to use when resolving remote sequence locations.
+     * Defaults to the SimpleRichLocationResolver.
+     * @param pr the rich location resolver to use.
+     * @see org.biojavax.bio.seq.RichLocationResolver
+     * @see org.biojavax.bio.seq.SimpleRichLocationResolver
+     * @see org.biojavax.bio.seq.RichLocation
+     */
+    public static void setDefaultRichLocationResolver(RichLocationResolver rlr) { defaultRichLocationResolver = rlr; }
     
     /**
      * Returns the default namespace object. Defaults to "lcl".
@@ -121,11 +134,18 @@ public class RichObjectFactory {
     }  
     
     /**
-     * Returns the default ontology object. Defaults to PositionResolver.AverageResolver
-     * @return the default ontology.
+     * Returns the default position resolver object. Defaults to PositionResolver.AverageResolver
+     * @return the default position resolver.
      * @see org.biojavax.bio.seq.PositionResolver.AverageResolver
      */
     public static PositionResolver getDefaultPositionResolver() { return defaultPositionResolver; }
+    
+    /**
+     * Returns the default rich location resolver object. Defaults to SimpleRichLocationResolver
+     * @return the default rich location resolver.
+     * @see org.biojavax.bio.seq.SimpleRichLocationResolver
+     */
+    public static RichLocationResolver getDefaultRichLocationResolver() { return defaultRichLocationResolver; }
         
     /**
      * Returns the GenBank namespace object ("gb").

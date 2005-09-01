@@ -59,6 +59,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private Position min;
     private Position max;
     private PositionResolver pr = RichObjectFactory.getDefaultPositionResolver();
+    private RichLocationResolver rlr = RichObjectFactory.getDefaultRichLocationResolver();
     private Strand strand;
     private int rank;
     private int circularLength = 0;
@@ -527,6 +528,14 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         if (ar>br) return a;
         else return b;
     }
+       
+    /**
+     * {@inheritDoc}
+     */
+    public void setRichLocationResolver(RichLocationResolver r) { 
+        if (r==null) throw new IllegalArgumentException("Rich location resolver cannot be null");
+        this.rlr = r; 
+    }
     
     /**
      * {@inheritDoc}
@@ -544,6 +553,10 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             }
         }
         
+        // Resolve cross-references to remote sequences
+        if (this.getCrossRef()!=null) seq = this.rlr.getRemoteSymbolList(this.getCrossRef(),seq.getAlphabet());
+
+        // Carry on as before
         SymbolList seq2 = seq.subList(this.getMin(),this.getMax());
         
         try {

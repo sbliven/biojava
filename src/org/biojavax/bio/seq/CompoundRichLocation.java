@@ -52,6 +52,8 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     private ComparableTerm term;
     private List members;
+    private Strand strand = null;
+    private int size = 0;
     private static ComparableTerm JOIN_TERM = null;
     private static ComparableTerm ORDER_TERM = null;
     
@@ -100,13 +102,20 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
         if (members==null || members.size()<2) throw new IllegalArgumentException("Must have at least two members");        
         this.term = term;
-        this.members = new ArrayList();        
+        this.members = new ArrayList();   
         for (Iterator i = members.iterator(); i.hasNext(); ) {
             // Convert each member into a RichLocation
             Object o = i.next();
             if (!(o instanceof RichLocation)) o = RichLocation.Tools.enrich((Location)o);
+            // Convert
+            RichLocation rl = (RichLocation)o;
             // Add in member
-            this.members.add(o);
+            this.members.add(rl);
+            // Update our strand
+            if (this.strand==null) this.strand = rl.getStrand();
+            else if (!this.strand.equals(rl.getStrand())) this.strand = Strand.UNKNOWN_STRAND;
+            // Update our size
+            this.size += Math.max(rl.getMin(),rl.getMax())-Math.min(rl.getMin(),rl.getMax());
         }
     }
                 
@@ -194,9 +203,8 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     /**
      * {@inheritDoc}
-     * ALWAYS RETURNS UNKNOWN_STRAND
      */
-    public Strand getStrand() { return Strand.UNKNOWN_STRAND; }
+    public Strand getStrand() { return this.strand; }
     
     /**
      * {@inheritDoc}
@@ -214,28 +222,28 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     
     /**
      * {@inheritDoc}
-     * ALWAYS RETURNS ZERO
+     * ALWAYS RETURNS ONE
      */
-    public int getMax() { return 0; }
+    public int getMax() { return 1; }
     
     /**
      * {@inheritDoc}
-     * ALWAYS RETURNS ZERO
+     * ALWAYS RETURNS COMBINED LENGTH OF MEMBERS
      */
-    public int getMin() { return 0; }
+    public int getMin() { return this.size; }
     
     /**
      * {@inheritDoc}
-     * ALWAYS RETURNS THE EMPTY POSITION
+     * ALWAYS RETURNS A POINT POSITION AT POINT 1
      */
-    public Position getMinPosition() { return Position.EMPTY_POSITION; }
+    public Position getMinPosition() { return new SimplePosition(false,false,1); }
     
     /**
      * {@inheritDoc}
-     * ALWAYS RETURNS THE EMPTY POSITION
+     * ALWAYS RETURNS A POINT POSITION AT POINT EQUIVALENT TO COMBINED LENGTH OF MEMBERS
      */
-    public Position getMaxPosition() { return Position.EMPTY_POSITION; }
-
+    public Position getMaxPosition() { return new SimplePosition(false,false,this.size); }
+    
     /**
      * {@inheritDoc}
      * Recursively applies this call to all members.
@@ -381,6 +389,14 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
             }
             return RichLocation.Tools.construct(RichLocation.Tools.merge(results));
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Recursively applies this call to all members.
+     */
+    public void setRichLocationResolver(RichLocationResolver r) {
+        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setRichLocationResolver(r);
     }
     
     /**

@@ -226,6 +226,13 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
         if (l==null) throw new IllegalArgumentException("Location cannot be null");
         return this;
     }
+       
+    
+    /**
+     * {@inheritDoc} This method is ignored in the empty location because 
+     * there is nothing to resolve.
+     */
+    public void setRichLocationResolver(RichLocationResolver r) {}
     
     /**
      * {@inheritDoc}

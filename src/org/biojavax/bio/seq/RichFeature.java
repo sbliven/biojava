@@ -24,6 +24,7 @@ package org.biojavax.bio.seq;
 import java.util.Set;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.ontology.InvalidTermException;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
@@ -35,7 +36,7 @@ import org.biojavax.RichAnnotatable;
  * moved from one sequence to another.
  * @author Richard Holland
  */
-public interface RichFeature extends Feature,RankedCrossRefable,RichAnnotatable,RichFeatureHolder,Comparable {
+public interface RichFeature extends StrandedFeature,RankedCrossRefable,RichAnnotatable,RichFeatureHolder,Comparable {
     
     public static final ChangeType NAME = new ChangeType(
             "This feature's name has changed",

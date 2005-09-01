@@ -164,6 +164,14 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
      * @throws ChangeVetoException if it doesn't want to change.
      */
     public void setCircularLength(int sourceSeqLength) throws ChangeVetoException;
+                    
+    /**
+     * Sets the location resolver to use when retrieving remote symbols. If none is given,
+     * then the default from RichObjectFactory.getDefaultRichLocationResolver() is
+     * used.
+     * @param r the RichLocationResolver to use.
+     */
+    public void setRichLocationResolver(RichLocationResolver r);
     
     /**
      * This class represents a strand on which a location may lie. Three strands

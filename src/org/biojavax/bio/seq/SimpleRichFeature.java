@@ -32,6 +32,8 @@ import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SimpleFeatureHolder;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.ontology.InvalidTermException;
@@ -585,6 +587,23 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     
     /**
      * {@inheritDoc}
+     * NOT IMPLEMENTED.
+     */
+    public void setStrand(StrandedFeature.Strand strand) throws ChangeVetoException {
+        throw new ChangeVetoException("The strand is immutable on RichFeature objects.");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public StrandedFeature.Strand getStrand() {
+        RichLocation.Strand s = this.location.getStrand();
+        if (s.equals(RichLocation.Strand.NEGATIVE_STRAND)) return StrandedFeature.NEGATIVE;
+        else return StrandedFeature.POSITIVE;
+    }
+    
+    /**
+     * {@inheritDoc}
      */
     public int hashCode() {
         int code = 17;
@@ -652,5 +671,6 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     
     // Hibernate requirement - not for public use.
     private void setId(Integer id) { this.id = id; }
+
 }
 
