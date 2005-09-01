@@ -1,7 +1,21 @@
 /*
- * CrossReferenceResolutionException.java
+ *                    BioJava development code
  *
- * Created on September 1, 2005, 3:58 PM
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
  *
  */
 
@@ -12,6 +26,7 @@ package org.biojavax;
  * has failed.
  *
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class CrossReferenceResolutionException extends Exception{
     
