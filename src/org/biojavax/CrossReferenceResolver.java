@@ -20,7 +20,7 @@
  */
 
 package org.biojavax;
-import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojavax.bio.BioEntry;
 
@@ -40,7 +40,7 @@ public interface CrossReferenceResolver {
      * @return the symbol list matching it. If none, return an
      * infintely-ambiguous symbol list rather than null.
      */
-    public SymbolList getRemoteSymbolList(CrossRef cr, FiniteAlphabet a);
+    public SymbolList getRemoteSymbolList(CrossRef cr, Alphabet a);
     
     
     /**
