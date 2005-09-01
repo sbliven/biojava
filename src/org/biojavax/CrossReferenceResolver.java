@@ -19,11 +19,10 @@
  *
  */
 
-package org.biojavax.bio.seq;
+package org.biojavax;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojavax.CrossRef;
-import org.biojavax.CrossReferenceResolutionException;
+import org.biojavax.bio.BioEntry;
 
 /**
  * This interface returns symbols or sequence for a given cross-reference.
@@ -46,11 +45,13 @@ public interface CrossReferenceResolver {
     
     /**
      * Given the <code>CrossRef</code> return the corresponding
-     * <code>RichSequence</code>
+     * <code>BioEntry</code>
      * @param cr the cross reference
-     * @throws org.biojavax.CrossReferenceResolutionException if it cannot be resolved satisfactorily
-     * @return The cross referenced sequence
+     * @throws org.biojavax.CrossReferenceResolutionException if a problem occurs
+     *         during resolution.
+     * @return The cross referenced entry (most likely a <code>RichSequence</code>
+     *         or null if it cannot be found.
      */
-    public RichSequence getRemoteSequence(CrossRef cr) 
+    public BioEntry getRemoteBioEntry(CrossRef cr) 
     throws CrossReferenceResolutionException;
 }
