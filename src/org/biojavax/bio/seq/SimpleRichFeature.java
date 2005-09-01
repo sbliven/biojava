@@ -599,7 +599,8 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     public StrandedFeature.Strand getStrand() {
         RichLocation.Strand s = this.location.getStrand();
         if (s.equals(RichLocation.Strand.NEGATIVE_STRAND)) return StrandedFeature.NEGATIVE;
-        else return StrandedFeature.POSITIVE;
+        if (s.equals(RichLocation.Strand.POSITIVE_STRAND)) return StrandedFeature.POSITIVE;
+        else return StrandedFeature.UNKNOWN;
     }
     
     /**
