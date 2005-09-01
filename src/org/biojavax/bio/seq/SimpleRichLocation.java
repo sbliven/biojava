@@ -41,6 +41,7 @@ import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
 import org.biojavax.CrossReferenceResolver;
+import org.biojavax.Namespace;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.db.RichObjectFactory;
@@ -555,7 +556,25 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         }
         
         // Resolve cross-references to remote sequences
-        if (this.getCrossRef()!=null) seq = this.crr.getRemoteSymbolList(this.getCrossRef(),seq.getAlphabet());
+         if (this.getCrossRef()!=null) {
+             CrossRef cr = this.getCrossRef();
+             if (seq instanceof RichSequence) {
+                RichSequence rs = (RichSequence)seq;
+                String accession = rs.getAccession();
+                Namespace ns = rs.getNamespace();
+                String raccession = cr.getAccession();
+                String rnamespace = cr.getDbname();
+                if (!(accession.equals(raccession) && ns.getName().equals(rnamespace))) {
+                    // It really is remote - the xref doesn't point to the sequence we just got passed
+                    seq = this.crr.getRemoteSymbolList(cr, seq.getAlphabet());
+                }
+             }
+         }
+         else {
+            // It's assumed to be remote because we can't tell what the sequence we were passed really is
+            seq = this.crr.getRemoteSymbolList(this.getCrossRef(), seq.getAlphabet());
+         }
+    
 
         // Carry on as before
         SymbolList seq2 = seq.subList(this.getMin(),this.getMax());
