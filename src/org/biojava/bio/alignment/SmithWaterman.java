@@ -24,9 +24,16 @@ import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 
 
-/**
+/** Smith and Waterman developed an efficient dynamic programing algorithm
+  * to perform local sequence alignments, which returns the most conserved
+  * region of two sequences (longes common substring with modifications).
+  * This algorithm is performed by the method <code>pairwiseAlignment</code>
+  * of this class. It uses affine gap penalties if and only if the expenses
+  * of a delete or insert operation are unequal to the expenses of gap extension.
+  * This uses significantly more memory (four times as much) and increases
+  * the runtime if swaping is performed.
+  * 
   * @author Andreas Dr&auml;ger
-  *
   */
 public class SmithWaterman extends NeedlemanWunsch
 {
