@@ -133,8 +133,8 @@ public class SubstitutionMatrix
 
     for (i=0; iter.hasNext(); i++) {
       sym[i] = (Symbol) iter.next();
-      rowSymbols.put(sym[i], Integer.valueOf(i));
-      colSymbols.put(sym[i], Integer.valueOf(i));
+      rowSymbols.put(sym[i], new Integer(i));
+      colSymbols.put(sym[i], new Integer(i));
     }   
     
     for(i=0; i<alphabet.size(); i++)
@@ -172,13 +172,13 @@ public class SubstitutionMatrix
       } else if (line.startsWith(" ")) {
         st = new StringTokenizer(line, " ");
         for (j=0; st.hasMoreElements(); j++) { 
-          colSymbols.put(symtok.parseToken(st.nextElement().toString()), Integer.valueOf(j));
+          colSymbols.put(symtok.parseToken(st.nextElement().toString()), new Integer(j));
         }
         cols = j;
       } else if (!line.startsWith("\n")) { // the matrix.
         st = new StringTokenizer(line, " ");
         if (st.hasMoreElements()) 
-          rowSymbols.put(symtok.parseToken(st.nextElement().toString()), Integer.valueOf(rows++));
+          rowSymbols.put(symtok.parseToken(st.nextElement().toString()), new Integer(rows++));
       }
     }
     
