@@ -128,7 +128,7 @@ public class NeedlemanWunsch implements SequenceAlignment
   /** Prints a String representation of the CostMatrix for the given Alignment on the screen.
     * @param queryChar
     * @param targetChar
-    * @return
+    * @return a String representation of the matrix.
     */
   public static String printCostMatrix (double[][] CostMatrix, char[] queryChar, char[] targetChar)
   {
@@ -328,7 +328,7 @@ public class NeedlemanWunsch implements SequenceAlignment
   /** Global pairwise sequence alginment of two BioJava-Sequence objects according to the
     * Needleman-Wunsch-algorithm. 
     *
-    * @see toolbox.align.SequenceAlignment#pairAlign(org.biojava.bio.seq.Sequence, org.biojava.bio.seq.Sequence)
+    * @see org.biojava.bio.alignment.SequenceAlignment#pairwiseAlignment(org.biojava.bio.seq.Sequence, org.biojava.bio.seq.Sequence)
     */
   public double pairwiseAlignment(Sequence query, Sequence subject) throws BioRuntimeException
   {
