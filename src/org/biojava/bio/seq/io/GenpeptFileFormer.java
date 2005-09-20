@@ -358,7 +358,14 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
         {
             ub.setLength(0);
             ub.append("ACCESSION   ");
-            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+            List l;
+            if(value instanceof List){
+                l = (List)value;
+            }else{
+                l = new ArrayList();
+                l.add(value);
+            }
+            for (Iterator ai = l.iterator(); ai.hasNext();)
             {
                 ub.append((String) ai.next());
             }
