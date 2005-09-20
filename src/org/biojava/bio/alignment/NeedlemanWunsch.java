@@ -52,7 +52,15 @@ import org.biojava.bio.symbol.SimpleSymbolList;
  * Created on 23.06.2005
  */
 
-/**
+/** Needleman and Wunsch definied the problem of global sequence alignments, 
+  * from the first till the last symbol of a sequence. 
+  * This class is able to perform such global sequence comparisons efficiently
+  * by dynamic programing. If inserts and deletes are equally expensive and
+  * as expensive as the extension of a gap, the alignment method of this class
+  * does not use affine gap panelties. Otherwise it does. Those costs need
+  * four times as much memory, which has significant effects on the run time,
+  * if the computer needs to swap.
+  *
   * @author Andreas Dr&auml;ger
   */
 
