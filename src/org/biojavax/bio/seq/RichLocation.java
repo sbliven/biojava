@@ -75,12 +75,12 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
      * The empty location matches nothing.
      */
     public static final RichLocation EMPTY_LOCATION = new EmptyRichLocation();
-        
+    
     /**
      * Retrieves the feature this location is associated with. May be null.
      * @return the feature.
      */
-    public RichFeature getFeature();  
+    public RichFeature getFeature();
     
     /**
      * Sets the feature this location is associated with. If null, that's fine,
@@ -127,26 +127,26 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
      * @throws ChangeVetoException in case of error.
      */
     public void setRank(int rank) throws ChangeVetoException;
-        
+    
     /**
      * Retrieves the start position of this location.
      * @return the position.
      */
     public Position getMinPosition();
-            
+    
     /**
      * Retrieves the end position of this location.
      * @return the position.
      */
     public Position getMaxPosition();
-            
+    
     /**
      * Sets the resolver to use when working out actual base
      * coordinates from fuzzy positions.
      * @param p the position resolver to use.
      */
     public void setPositionResolver(PositionResolver p);
-                
+    
     /**
      * Retrieves the circular length of this location. If it is 0, the location
      * is not circular. If it is not zero, then the number refers to the wrapping
@@ -155,7 +155,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
      * @return the position.
      */
     public int getCircularLength();
-                    
+    
     /**
      * Sets the circular length of this location. If it is 0, the location
      * is not circular. If it is not zero, then the number refers to the wrapping
@@ -165,9 +165,9 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
      * @throws ChangeVetoException if it doesn't want to change.
      */
     public void setCircularLength(int sourceSeqLength) throws ChangeVetoException;
-                    
+    
     /**
-     * Sets the cross ref resolver to use when retrieving remote symbols. 
+     * Sets the cross ref resolver to use when retrieving remote symbols.
      * If none is given,
      * then the default from RichObjectFactory.getDefaultCrossRefResolver() is
      * used.
@@ -198,7 +198,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
          * The unknown strand is represented by the symbol '?' and has the number 0.
          */
         public static final Strand UNKNOWN_STRAND = new Strand("?",0);
-
+        
         /**
          * Returns the strand object that matches the number given. Throws an exception
          * if it could not recognise the number. Number is usually 1,-1,0.
@@ -230,27 +230,27 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
         // creates a strand with the given number and value
         private Strand(String name,int value) { this.name = name; this.value = value; }
         
-        /** 
+        /**
          * Returns the numeric value of this strand.
          * @return the numeric value.
          */
-        public int intValue() { return this.value; }        
-
-        /** 
+        public int intValue() { return this.value; }
+        
+        /**
          * Returns the string symbol of this strand.
          * @return the string symbol.
          */
         public String getName() { return this.name; }
         
-        /** 
+        /**
          * {@inheritDoc}
          * Form: "symbol" (eg. +,-,?)
          */
-        public String toString() { 
-            return this.name; 
+        public String toString() {
+            return this.name;
         }
-          
-        /** 
+        
+        /**
          * {@inheritDoc}
          */
         public int hashCode() {
@@ -259,8 +259,8 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
             code = 31*code + this.value;
             return code;
         }
-          
-        /** 
+        
+        /**
          * {@inheritDoc}
          * Strands are equal if their numbers and symbols match.
          */
@@ -272,8 +272,8 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
             if (them.intValue()!=this.value) return false;
             return true;
         }
-          
-        /** 
+        
+        /**
          * {@inheritDoc}
          * Strands are compared first by symbol, then by number.
          */
@@ -294,7 +294,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
         
         /**
          * Constructs a RichLocation object based on the given collection of
-         * members. It first tries to merge them together. If the merge results in 
+         * members. It first tries to merge them together. If the merge results in
          * a single location, that is returned. If it results in multiple locations
          * it returns a CompoundRichLocation covering them all, with the default
          * term associated. Else, it returns the empty location if the set was empty.
@@ -304,7 +304,32 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
         public static RichLocation construct(Collection members) {
             if (members.size()==0) return RichLocation.EMPTY_LOCATION;
             else if (members.size()==1) return ((SimpleRichLocation[])members.toArray(new SimpleRichLocation[0]))[0];
+            else if (isMultiSource(members)) return new MultiSourceCompoundRichLocation(members);
             else return new CompoundRichLocation(members);
+        }
+        
+        /**
+         * Returns false if all the locations in the set are from the same strand of
+         * the same sequence.
+         * @param members the set of locations to check.
+         * @return true if they are from multiple sources.
+         */
+        public static boolean isMultiSource(Collection members) {
+            RichLocation previous = null;
+            for (Iterator i = members.iterator(); i.hasNext(); ) {
+                RichLocation rl = enrich((Location)i.next());
+                if (previous==null) previous = rl;
+                else {
+                    if (previous.getCircularLength()!=rl.getCircularLength()) return true;
+                    if ((previous.getCrossRef()==null && rl.getCrossRef()!=null) ||
+                            (previous.getCrossRef()!=null && rl.getCrossRef()==null) ||
+                            (previous.getCrossRef()!=rl.getCrossRef() && !previous.getCrossRef().equals(rl.getCrossRef()))) return true;
+                    if ((previous.getStrand()==null && rl.getStrand()!=null) ||
+                            (previous.getStrand()!=null && rl.getStrand()==null) ||
+                            (previous.getStrand()!=rl.getStrand() && !previous.getStrand().equals(rl.getStrand()))) return true;
+                }
+            }
+            return false;
         }
         
         /**
@@ -349,7 +374,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
             for (Iterator i = location.blockIterator(); i.hasNext(); ) members.add(i.next());
             return flatten(members);
         }
-                
+        
         /**
          * Takes a set of locations and returns the set of all members. If any members are
          * compound, it flattens them too.
@@ -374,7 +399,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
          * Takes a start and end position on a circular location of given length, and shifts
          * them left along the sequence until they sit at the earliest possible point where
          * they still would represent the same sequence.
-         * @param start the start of the circular location 
+         * @param start the start of the circular location
          * @param end the end of the circular location
          * @param seqLength the circular length of the sequence underlying the location
          * @return an integer array where [0] is the translated start and [1] the end.
@@ -393,7 +418,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
             // Return results.
             return new int[]{start,end};
         }
-                
+        
         /**
          * Takes two circular locations of given length, and shifts
          * them left along the sequence until they sit at the earliest possible point where
@@ -402,7 +427,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
          * @param a the first location to shift
          * @param b the second location to shift
          * @param seqLength the circular length of the sequence underlying the location
-         * @return an integer array where [0] is the translated start and [1] the end of 
+         * @return an integer array where [0] is the translated start and [1] the end of
          * location a, and [2] and [3] are the translated start and end of location b.
          */
         public static int[] modulateCircularLocationPair(Location a, Location b, int seqLength) {
@@ -448,7 +473,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
             // Dummy case where location is already enriched
             if (l instanceof RichLocation) {
                 return (RichLocation)l;
-            } 
+            }
             // Compound case
             else if (l instanceof MergeLocation || !l.isContiguous()) {
                 List members = new ArrayList();
@@ -457,37 +482,37 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
                     members.add(enrich(member));
                 }
                 return RichLocation.Tools.construct(RichLocation.Tools.merge(members));
-            } 
+            }
             // Fuzzy single points
             else if (l instanceof FuzzyPointLocation) {
                 FuzzyPointLocation f = (FuzzyPointLocation)l;
                 Position pos = new SimplePosition(f.hasBoundedMin(),f.hasBoundedMax(),f.getMin(),f.getMax(),Position.IN_RANGE);
                 return new SimpleRichLocation(pos,0); // 0 for no rank
-            } 
+            }
             // Fuzzy ranges
             else if (l instanceof FuzzyLocation) {
                 FuzzyLocation f = (FuzzyLocation)l;
                 Position start = new SimplePosition(f.hasBoundedMin(),false,f.getMin());
                 Position end = new SimplePosition(false,f.hasBoundedMax(),f.getMax());
                 return new SimpleRichLocation(start,end,0); // 0 for no rank
-            } 
+            }
             // Normal ranges
             else if (l instanceof RangeLocation) {
                 RangeLocation r = (RangeLocation)l;
                 Position start = new SimplePosition(false,false,r.getMin());
                 Position end = new SimplePosition(false,false,r.getMax());
                 return new SimpleRichLocation(start,end,0); // 0 for no rank
-            } 
+            }
             // Normal points
             else if (l instanceof PointLocation) {
                 PointLocation p = (PointLocation)l;
                 Position pos = new SimplePosition(false,false,p.getMin());
                 return new SimpleRichLocation(pos,0); // 0 for no rank
-            } 
+            }
             // Empty locations
             else if (l.toString().equals("{}")) {
                 return EMPTY_LOCATION;
-            } 
+            }
             // All other cases
             else {
                 throw new IllegalArgumentException("Unable to enrich locations of type "+l.getClass());

@@ -41,15 +41,8 @@ public class SimpleCrossReferenceResolver  implements CrossReferenceResolver {
      * {@inheritDoc}
      */
     public SymbolList getRemoteSymbolList(CrossRef cr, Alphabet a) {
-        Namespace ns = (Namespace)RichObjectFactory.getObject(Namespace.class, new Object[]{cr.getDbname()});
-        String accession = cr.getAccession();
-        for (Iterator i = ns.getMembers().iterator(); i.hasNext(); ) {
-            BioEntry be = (BioEntry)i.next();
-            if (be instanceof RichSequence) {
-                RichSequence rs = (RichSequence)be;
-                if (rs.getAccession().equals(accession) && rs.getVersion() == cr.getVersion()) return rs;
-            }
-        }
+        BioEntry be = this.getRemoteBioEntry(cr);
+        if (be instanceof RichSequence) return (RichSequence)be;
         // If we get here we didn't find it, so we must create a dummy sequence instead
         if (!(a instanceof FiniteAlphabet)) throw new IllegalArgumentException("Cannot construct dummy symbol list for a non-finite alphabet");
         return new InifinitelyAmbiguousSymbolList((FiniteAlphabet)a);
@@ -62,7 +55,7 @@ public class SimpleCrossReferenceResolver  implements CrossReferenceResolver {
         Namespace ns = (Namespace)RichObjectFactory.getObject(Namespace.class, new Object[]{cr.getDbname()});
         String accession = cr.getAccession();
         for (Iterator i = ns.getMembers().iterator(); i.hasNext(); ) {
-            BioEntry be = (BioEntry)i.next();  
+            BioEntry be = (BioEntry)i.next();
             if (be.getAccession().equals(accession) && be.getVersion() == cr.getVersion()) return be;
         }
         return null;

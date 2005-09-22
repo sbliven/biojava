@@ -345,6 +345,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
                 cs.firePostChangeEvent(ce);
             }
         }
+        this.location.setFeature(this);
     }
     
     /**

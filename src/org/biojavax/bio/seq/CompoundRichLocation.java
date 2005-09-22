@@ -32,29 +32,22 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
-import org.biojavax.CrossRef;
 import org.biojavax.CrossReferenceResolver;
 import org.biojavax.RichAnnotation;
 import org.biojavax.bio.db.RichObjectFactory;
-import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
- * An implementation of RichLocation which covers multiple positions, 
- * maybe even on different strands and/or on different sequences.
+ * An implementation of RichLocation which covers multiple locations, 
+ * but on the same strand of the same (optionally circular) sequence.
  * @author Richard Holland
  * @author Mark Schreiber
  */
-public class CompoundRichLocation extends AbstractChangeable implements RichLocation {
+public class CompoundRichLocation extends SimpleRichLocation implements RichLocation {
     
-    private ComparableTerm term;
-    private List members;
-    private Strand strand = null;
-    private int size = 0;
+    protected List members;
+    protected int size = 0;
     private static ComparableTerm JOIN_TERM = null;
     private static ComparableTerm ORDER_TERM = null;
     
@@ -82,7 +75,8 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      * you are unsure if your members set contains overlapping members. Use
      * RichLocation.Tools.construct() instead. The members collection
      * must only contain Location instances. Any that are not RichLocations will
-     * be converted using RichLocation.Tools.enrich().
+     * be converted using RichLocation.Tools.enrich(). All members must come from
+     * the same strand of the same sequence with the same circular length.
      * @param members the members to put into the compound location.
      * @see RichLocation.Tools
      */
@@ -101,7 +95,8 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      */
     public CompoundRichLocation(ComparableTerm term, Collection members) {
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        if (members==null || members.size()<2) throw new IllegalArgumentException("Must have at least two members");        
+        if (members==null || members.size()<2) throw new IllegalArgumentException("Must have at least two members");   
+        if (RichLocation.Tools.isMultiSource(members)) throw new IllegalArgumentException("All members must be from the same source");
         this.term = term;
         this.members = new ArrayList();   
         for (Iterator i = members.iterator(); i.hasNext(); ) {
@@ -112,33 +107,33 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
             RichLocation rl = (RichLocation)o;
             // Add in member
             this.members.add(rl);
+            // Update our cross ref
+            this.setCrossRef(rl.getCrossRef());
+            // Update our circular length
+            this.circularLength = rl.getCircularLength();
             // Update our strand
-            if (this.strand==null) this.strand = rl.getStrand();
-            else if (!this.strand.equals(rl.getStrand())) this.strand = Strand.UNKNOWN_STRAND;
-            // Update our size
-            this.size += Math.max(rl.getMin(),rl.getMax())-Math.min(rl.getMin(),rl.getMax());
+            this.setStrand(rl.getStrand());
+            // Update our size and min/max
+            this.size += rl.getMax()-rl.getMin();
+            if (this.getMinPosition()==null) this.setMinPosition(rl.getMinPosition());
+            else this.setMinPosition(this.posmin(this.getMinPosition(),rl.getMinPosition()));
+            if (this.getMaxPosition()==null) this.setMaxPosition(rl.getMaxPosition());
+            else this.setMaxPosition(this.posmax(this.getMaxPosition(),rl.getMaxPosition()));
         }
     }
-                
-    /**
-     * {@inheritDoc} 
-     * This method will only return the feature from the first member of this compound location.
-     */
-    public RichFeature getFeature() { return ((RichLocation)this.members.get(0)).getFeature(); }
+            
+    // for internal use only
+    protected CompoundRichLocation() {}
     
     /**
      * {@inheritDoc} 
      * Passes the call on to each of its members in turn.
      */
     public void setFeature(RichFeature feature) throws ChangeVetoException {
+        super.setFeature(feature);
         for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setFeature(feature);
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public CrossRef getCrossRef() { return null; }
-    
+        
     /**
      * {@inheritDoc}
      * ALWAYS RETURNS THE EMPTY ANNOTATION
@@ -159,100 +154,16 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     public void setNoteSet(Set notes) throws ChangeVetoException {
         throw new ChangeVetoException("Cannot annotate compound locations.");
     }
-    
+           
     /**
      * {@inheritDoc}
-     */
-    public ComparableTerm getTerm() { return this.term; }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setTerm(ComparableTerm term) throws ChangeVetoException {
-        if(!this.hasListeners(RichLocation.TERM)) {
-            this.term = term;
-        } else {
-            ChangeEvent ce = new ChangeEvent(
-                    this,
-                    RichLocation.TERM,
-                    term,
-                    this.term
-                    );
-            ChangeSupport cs = this.getChangeSupport(RichLocation.TERM);
-            synchronized(cs) {
-                cs.firePreChangeEvent(ce);
-                this.term = term;
-                cs.firePostChangeEvent(ce);
-            }
-        }
-    }
-    
-    /**
-     * {@inheritDoc}
-     * ALWAYS RETURNS ZERO
-     */
-    public int getCircularLength() { return 0; }
-    
-    /**
-     * {@inheritDoc}
-     * NOT IMPLEMENTED
-     * @throws ChangeVetoException ALWAYS
+     * RECURSIVELY APPLIES CALL TO ALL MEMBERS
      */
     public void setCircularLength(int sourceSeqLength) throws ChangeVetoException {
-        throw new ChangeVetoException("CompoundRichLocations cannot be circular");
+        super.setCircularLength(sourceSeqLength);
+        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setCircularLength(sourceSeqLength);
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public Strand getStrand() { return this.strand; }
-    
-    /**
-     * {@inheritDoc}
-     * ALWAYS RETURNS ZERO
-     */
-    public int getRank() { return 0; }
-    
-    /**
-     * {@inheritDoc}
-     * NOT IMPLEMENTED
-     */
-    public void setRank(int rank) throws ChangeVetoException {
-        throw new ChangeVetoException("Cannot rank compound locations.");
-    }
-    
-    /**
-     * {@inheritDoc}
-     * ALWAYS RETURNS ONE
-     */
-    public int getMax() { return 1; }
-    
-    /**
-     * {@inheritDoc}
-     * ALWAYS RETURNS COMBINED LENGTH OF MEMBERS
-     */
-    public int getMin() { return this.size; }
-    
-    /**
-     * {@inheritDoc}
-     * ALWAYS RETURNS A POINT POSITION AT POINT 1
-     */
-    public Position getMinPosition() { return new SimplePosition(false,false,1); }
-    
-    /**
-     * {@inheritDoc}
-     * ALWAYS RETURNS A POINT POSITION AT POINT EQUIVALENT TO COMBINED LENGTH OF MEMBERS
-     */
-    public Position getMaxPosition() { return new SimplePosition(false,false,this.size); }
-    
-    /**
-     * {@inheritDoc}
-     * Recursively applies this call to all members.
-     */
-    public void setPositionResolver(PositionResolver p) {
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setPositionResolver(p);
-    }
-    
+      
     /**
      * {@inheritDoc}
      */
@@ -296,7 +207,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
             RichLocation rl = (RichLocation)i.next();
             newmembers.add(rl.translate(dist));
         }
-        return new CompoundRichLocation(this.term,newmembers);
+        return new CompoundRichLocation(this.getTerm(),newmembers);
     }
     
     /**
@@ -367,18 +278,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     public Location intersection(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         if (l instanceof EmptyRichLocation) return l;
-        else if (l instanceof SimpleRichLocation) {
-            // Simple vs. ourselves
-            // For every member of ourselves, intersect with the location
-            // passed as a parameter. Then construct a new location from the
-            // results of all the intersections.
-            Set results = new TreeSet();
-            for (Iterator i = this.members.iterator(); i.hasNext(); ) {
-                RichLocation member = (RichLocation)i.next();
-                results.add(member.intersection(l));
-            }
-            return RichLocation.Tools.construct(RichLocation.Tools.merge(results));
-        } else {
+        else if (l instanceof CompoundRichLocation) {
             Collection theirMembers = RichLocation.Tools.flatten((RichLocation)l);
             // For every member of the location passed as a parameter, intersect 
             // with ourselves. Then construct a new location from the
@@ -389,7 +289,18 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
                 results.add(this.intersection(member));
             }
             return RichLocation.Tools.construct(RichLocation.Tools.merge(results));
-        }
+        } else {
+            // Simple vs. ourselves
+            // For every member of ourselves, intersect with the location
+            // passed as a parameter. Then construct a new location from the
+            // results of all the intersections.
+            Set results = new TreeSet();
+            for (Iterator i = this.members.iterator(); i.hasNext(); ) {
+                RichLocation member = (RichLocation)i.next();
+                results.add(member.intersection(l));
+            }
+            return RichLocation.Tools.construct(RichLocation.Tools.merge(results));
+        } 
     }
     
     /**
@@ -429,9 +340,17 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
     /**
      * {@inheritDoc}
      */
+    public void setTerm(ComparableTerm term) throws ChangeVetoException {
+        if (term==null) throw new ChangeVetoException("Cannot set term to null");
+        super.setTerm(term);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public int hashCode() {
         int code = 17;
-        code = 31*code + this.term.hashCode();
+        code = 31*code + this.getTerm().hashCode();
         for (Iterator i = this.members.iterator(); i.hasNext(); ) code = 31*i.next().hashCode();
         return code;
     }
@@ -486,7 +405,7 @@ public class CompoundRichLocation extends AbstractChangeable implements RichLoca
      */
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(this.term);
+        sb.append(this.getTerm());
         sb.append(":[");
         for (Iterator i = this.blockIterator(); i.hasNext(); ) {
             sb.append(i.next());

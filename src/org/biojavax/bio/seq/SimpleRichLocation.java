@@ -57,18 +57,18 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     private CrossRef crossRef;
     private RichAnnotation notes = new SimpleRichAnnotation();
-    private ComparableTerm term;
+    protected ComparableTerm term;
     private Position min;
     private Position max;
     private PositionResolver pr = RichObjectFactory.getDefaultPositionResolver();
     private CrossReferenceResolver crr = RichObjectFactory.getDefaultCrossReferenceResolver();
     private Strand strand;
     private int rank;
-    private int circularLength = 0;
+    protected int circularLength = 0;
     private RichFeature feature;
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * Creates a new instance of SimpleRichSequenceLocation that points to a
      * single position on the positive strand.
      * @param pos the location position (a point).
      * @param rank Rank of location.
@@ -78,7 +78,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * Creates a new instance of SimpleRichSequenceLocation that points to a
      * single position.
      * @param pos the location position (a point).
      * @param rank Rank of location.
@@ -89,7 +89,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * Creates a new instance of SimpleRichSequenceLocation that points to a
      * single position on another sequence.
      * @param pos the location position (a point).
      * @param rank Rank of location.
@@ -101,7 +101,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * Creates a new instance of SimpleRichSequenceLocation that points to a
      * range position on the positive strand.
      * @param min the minimum bound of the location
      * @param max the maximum bound of the location
@@ -113,7 +113,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * Creates a new instance of SimpleRichSequenceLocation that points to a
      * range position.
      * @param min the minimum bound of the location
      * @param max the maximum bound of the location
@@ -125,7 +125,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     /**
-     * Creates a new instance of SimpleRichSequenceLocation that points to a 
+     * Creates a new instance of SimpleRichSequenceLocation that points to a
      * range position on another sequence.
      * @param min the minimum bound of the location
      * @param max the maximum bound of the location
@@ -144,14 +144,14 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     // Hibernate requirement - not for public use.
     protected SimpleRichLocation() {}
-            
+    
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     public RichFeature getFeature() { return this.feature; }
     
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     public void setFeature(RichFeature feature) throws ChangeVetoException {
         if(!this.hasListeners(RichLocation.FEATURE)) {
@@ -179,24 +179,24 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     
     // Hibernate requirement - not for public use.
-    private void setCrossRef(CrossRef crossRef) { this.crossRef = crossRef; }
+    protected void setCrossRef(CrossRef crossRef) { this.crossRef = crossRef; }
     
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     public Annotation getAnnotation() { return this.notes; }
     
     /**
-     * {@inheritDoc} 
-     * <b>Warning</b> this method gives access to the original 
+     * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original
      * Collection not a copy. This is required by Hibernate. If you
      * modify the object directly the behaviour may be unpredictable.
      */
     public Set getNoteSet() { return this.notes.getNoteSet(); }
     
     /**
-     * {@inheritDoc} 
-     * <b>Warning</b> this method gives access to the original 
+     * {@inheritDoc}
+     * <b>Warning</b> this method gives access to the original
      * Collection not a copy. This is required by Hibernate. If you
      * modify the object directly the behaviour may be unpredictable.
      */
@@ -262,6 +262,9 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public Strand getStrand() { return this.strand; }
     
     // Hibernate requirement - not for public use.
+    protected void setStrand(Strand strand) { this.strand = strand; }
+    
+    // Hibernate requirement - not for public use.
     private int getStrandNum() { return this.strand.intValue(); }
     
     // Hibernate requirement - not for public use.
@@ -312,17 +315,23 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     
     // Hibernate requirement - not for public use.
     private void setMin(int min) {  this.min = new SimplePosition(false,false,min); }
-        
+    
     /**
      * {@inheritDoc}
      */
     public Position getMinPosition() { return this.min; }
-        
+    
+    // Hibernate requirement - not for public use.
+    protected void setMinPosition(Position min) {  this.min = min; }
+    
     /**
      * {@inheritDoc}
      */
     public Position getMaxPosition() { return this.max; }
-        
+    
+    // Hibernate requirement - not for public use.
+    protected void setMaxPosition(Position max) {  this.max = max; }
+    
     /**
      * {@inheritDoc}
      */
@@ -383,7 +392,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public boolean contains(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         if (l instanceof EmptyRichLocation) return false;
-        else if (l instanceof SimpleRichLocation) {
+        else if (l instanceof CompoundRichLocation) return l.contains(this);
+        else {
             RichLocation rl = (RichLocation)l;
             // Simple vs. simple
             if (!this.overlaps(rl)) return false; // No overlap = no possible contain
@@ -399,7 +409,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             } else {
                 return (this.getMin() <= rl.getMin() && this.getMax() >= rl.getMax());
             }
-        } else return l.contains(this); // delegate the hard work!
+        }
     }
     
     /**
@@ -410,7 +420,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public boolean overlaps(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         if (l instanceof EmptyRichLocation) return false;
-        else if (l instanceof SimpleRichLocation) {
+        else if (l instanceof CompoundRichLocation) return l.overlaps(this);
+        else {
             // Simple vs. simple
             RichLocation rl = (RichLocation)l;
             // Mismatch of crossref is no overlap.
@@ -431,7 +442,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             } else {
                 return (this.getMin()<=rl.getMax() && this.getMax()>=rl.getMin());
             }
-        } else return l.overlaps(this); // delegate the hard work!
+        }
     }
     
     /**
@@ -443,7 +454,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public Location union(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         if (l instanceof EmptyRichLocation) return this;
-        else if (l instanceof SimpleRichLocation) {
+        else if (l instanceof CompoundRichLocation) return l.union(this);
+        else {
             // Simple vs. simple
             RichLocation rl = (RichLocation)l;
             if (this.overlaps(rl) && this.getStrand().equals(rl.getStrand())) {
@@ -469,8 +481,9 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             Collection members = new ArrayList();
             members.add(this);
             members.add(l);
-            return new CompoundRichLocation(members);
-        } else return l.union(this); // delegate the one-v-many union job
+            if (RichLocation.Tools.isMultiSource(members)) return new MultiSourceCompoundRichLocation(members);
+            else return new CompoundRichLocation(members);
+        }
     }
     
     /**
@@ -483,7 +496,8 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public Location intersection(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         if (l instanceof EmptyRichLocation) return l;
-        else if (l instanceof SimpleRichLocation) {
+        else if (l instanceof CompoundRichLocation) return l.intersection(this);
+        else {
             RichLocation rl = (RichLocation)l;
             if (this.overlaps(l)) {
                 if (this.getStrand().equals(rl.getStrand())) {
@@ -507,16 +521,17 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
                 Collection members = new ArrayList();
                 members.add(new SimpleRichLocation(this.posmax(this.min,rl.getMinPosition()),this.posmin(this.max,rl.getMaxPosition()),0,this.strand,this.crossRef));
                 members.add(new SimpleRichLocation(this.posmax(this.min,rl.getMinPosition()),this.posmin(this.max,rl.getMaxPosition()),0,rl.getStrand(),this.crossRef));
-                return new CompoundRichLocation(members);
+                if (RichLocation.Tools.isMultiSource(members)) return new MultiSourceCompoundRichLocation(members);
+                else return new CompoundRichLocation(members);
             } else {
                 // We can do the one-v-one non-overlapping intersection here
                 return RichLocation.EMPTY_LOCATION;
             }
-        } else return l.intersection(this); // delegate the one-v-many intersection job
+        }
     }
     
     // calculates the smaller of the two positions, based on their resolver output
-    private Position posmin(Position a, Position b) {
+    protected Position posmin(Position a, Position b) {
         int ar = this.pr.getMin(a);
         int br = this.pr.getMin(b);
         if (ar<=br) return a;
@@ -524,19 +539,19 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     // calculates the smaller of the two positions, based on their resolver output
-    private Position posmax(Position a, Position b) {
+    protected Position posmax(Position a, Position b) {
         int ar = this.pr.getMax(a);
         int br = this.pr.getMax(b);
         if (ar>br) return a;
         else return b;
     }
-       
+    
     /**
      * {@inheritDoc}
      */
-    public void setCrossRefResolver(CrossReferenceResolver r) { 
+    public void setCrossRefResolver(CrossReferenceResolver r) {
         if (r==null) throw new IllegalArgumentException("Resolver cannot be null");
-        this.crr = r; 
+        this.crr = r;
     }
     
     /**
@@ -556,9 +571,9 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         }
         
         // Resolve cross-references to remote sequences
-         if (this.getCrossRef()!=null) {
-             CrossRef cr = this.getCrossRef();
-             if (seq instanceof RichSequence) {
+        if (this.getCrossRef()!=null) {
+            CrossRef cr = this.getCrossRef();
+            if (seq instanceof RichSequence) {
                 RichSequence rs = (RichSequence)seq;
                 String accession = rs.getAccession();
                 Namespace ns = rs.getNamespace();
@@ -568,14 +583,13 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
                     // It really is remote - the xref doesn't point to the sequence we just got passed
                     seq = this.crr.getRemoteSymbolList(cr, seq.getAlphabet());
                 }
-             }
-         }
-         else {
+            }
+        } else {
             // It's assumed to be remote because we can't tell what the sequence we were passed really is
             seq = this.crr.getRemoteSymbolList(this.getCrossRef(), seq.getAlphabet());
-         }
-    
-
+        }
+        
+        
         // Carry on as before
         SymbolList seq2 = seq.subList(this.getMin(),this.getMax());
         
@@ -671,7 +685,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         return this.getMax()-fo.getMax();
     }
     
-    /** 
+    /**
      * {@inheritDoc}
      * Form: "start..end" or just "point" for point locations
      */
