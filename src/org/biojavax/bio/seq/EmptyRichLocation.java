@@ -48,6 +48,12 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      * ALWAYS RETURNS NULL
      */
     public RichFeature getFeature() { return null; }
+        
+    /**
+     * {@inheritDoc} 
+     * NOT IMPLEMENTED
+     */
+    public void sort() {}
     
     /**
      * {@inheritDoc} 

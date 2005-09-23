@@ -127,6 +127,11 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
     
     /**
      * {@inheritDoc} 
+     */
+    public void sort() { Collections.sort(this.members); }
+    
+    /**
+     * {@inheritDoc} 
      * Passes the call on to each of its members in turn.
      */
     public void setFeature(RichFeature feature) throws ChangeVetoException {

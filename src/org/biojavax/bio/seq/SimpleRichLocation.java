@@ -148,6 +148,11 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
+    public void sort() {}
+    
+    /**
+     * {@inheritDoc}
+     */
     public RichFeature getFeature() { return this.feature; }
     
     /**

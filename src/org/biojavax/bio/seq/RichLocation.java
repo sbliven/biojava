@@ -75,6 +75,15 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
      * The empty location matches nothing.
      */
     public static final RichLocation EMPTY_LOCATION = new EmptyRichLocation();
+        
+    /**
+     * Sorts the member locations of a compound location. Does nothing 
+     * for non-compound locations. Sorting depends on the compareTo() method
+     * of the member locations - usually they will be sorted by their start position.
+     * This might be useful when used with the location returned by a union or intersection,
+     * or when setting the term of a compound location to ORDER_TERM.
+     */
+    public void sort();
     
     /**
      * Retrieves the feature this location is associated with. May be null.
