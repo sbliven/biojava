@@ -262,7 +262,7 @@ public class SmithWaterman extends NeedlemanWunsch
         /*
         * Construct the output with only 60 symbols in each line.
         */
-        this.alignment += formatOutput(
+        this.alignment = formatOutput(
           query.getName(), 
           subject.getName(), 
           align, 
