@@ -64,7 +64,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
   * @author Andreas Dr&auml;ger
   */
 
-public class NeedlemanWunsch implements SequenceAlignment
+public class NeedlemanWunsch extends SequenceAlignment
 {
 
   protected double[][] CostMatrix;
@@ -113,11 +113,17 @@ public class NeedlemanWunsch implements SequenceAlignment
   }
 
   /** Constructs a new Object with the given parameters based on the Needleman-Wunsch algorithm
-    * @param alpha
-    * @param insert
-    * @param delete
-    * @param gapExtend
-    * @param subMat
+    * @param alpha The alphabet of the sequences to be aligned by this class.
+    * @param insert The costs of a single insert operation.
+    * @param delete The expenses of a single delete operation.
+    * @param gapExtend The expenses of an extension of a existing gap (that is a previous insert or
+    *       delete. If the costs for insert and delete are equal and also equal to gapExtend, no
+    *       affine gap penalties will be used, which saves a significant amount of memory.
+    * @param match This gives the costs for a match operation. It is only used, if there is no entry
+    *       for a certain match of two symbols in the substitution matrix (default value).
+    * @param replace This is like the match parameter just the default, if there is no entry in the
+    *       substitution matrix object.
+    * @param subMat The substitution matrix object which gives the costs for matches and replaces.
     */
   public NeedlemanWunsch(FiniteAlphabet alpha, double insert, double delete, double gapExtend, double match, double replace, SubstitutionMatrix subMat)
   {
@@ -134,8 +140,11 @@ public class NeedlemanWunsch implements SequenceAlignment
 
   
   /** Prints a String representation of the CostMatrix for the given Alignment on the screen.
-    * @param queryChar
-    * @param targetChar
+    * This can be used to get a better understanding of the algorithm. There is no other purpose.
+    * This method also works for all extensions of this class with all kinds of matrices.
+    * @param queryChar a character representation of the query sequence 
+    *   (<code>mySequence.seqString().toCharArray()</code>).
+    * @param targetChar a character representation of the target sequence.
     * @return a String representation of the matrix.
     */
   public static String printCostMatrix (double[][] CostMatrix, char[] queryChar, char[] targetChar)
@@ -157,111 +166,9 @@ public class NeedlemanWunsch implements SequenceAlignment
     return output;
   }
 
- 
-  /** Computes the optimal alignment of the two sequences and constructs a String
-    * representing the alignment as well as a new Alignment object, which can be
-    * used in different ways by BioJava.
-    *  
-    * @param query
-    * @param target
-    * @return alignment string representation
-    */
-  private String optimalAlignment(Sequence query, Sequence target) throws BioException
-  {
-    /*StringBuffer[] align = new StringBuffer[] {new StringBuffer(CostMatrix.length), new StringBuffer(CostMatrix[0].length)};
-    StringBuffer path = new StringBuffer("");//*/
-    
-    String[] align = new String[] {"", ""};
-    String path = "";//*/ 
-    
-    String output = "";
-    int j = this.CostMatrix[CostMatrix.length - 1].length -1;
-    SymbolTokenization st = alpha.getTokenization("default");
-
-    for (int i = this.CostMatrix.length - 1; i>0; )
-    {
-      do { 
-        // From now only Insert possible.
-        if (i == 0) {
-          align[0] = '~'     + align[0]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[0]; //
-          align[1] = st.tokenizeSymbol(target.symbolAt(j--)) + align[1];
-          path = ' ' + path;//*/
-          
-        // From now only Delete possible.
-        } else if (j == 0) { 
-          align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
-          align[1] = '~'     + align[1]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[1]; //
-          path = ' ' + path;//*/
-          
-        // Match/Replace
-        } else if (CostMatrix[i-1][j-1] == min(CostMatrix[i][j-1], CostMatrix[i-1][j-1], CostMatrix[i-1][j]))  { 
-          align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
-          align[1] = st.tokenizeSymbol(target.symbolAt(j--)) + align[1];//*/
-          if (query.symbolAt(i+1) == target.symbolAt(j+1))
-            path = '|' + path;//*/ 
-          else path = ' ' + path;//*/
-          
-        // Insert
-        } else if ((CostMatrix[i][j-1] < CostMatrix[i-1][j-1]) && (CostMatrix[i][j-1] < CostMatrix[i-1][j])) {
-          align[0] = '-'     + align[0]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[0]; //
-          align[1] = st.tokenizeSymbol(target.symbolAt(j--)) + align[1];
-          path = ' ' + path;//*/
   
-        // Delete
-        } else { 
-          align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
-          align[1] = '-'     + align[1]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[1]; //
-          path = ' ' + path;//*/
-        }
-      } while (j>0);
-    }
-
-    // construct the biojava Alignment object:    
-    query = new SimpleGappedSequence(
-      new SimpleSequence(
-        new SimpleSymbolList(query.getAlphabet().getTokenization("token"), align[0]), 
-        query.getURN(), 
-        query.getName(), 
-        query.getAnnotation()));
-    target = new SimpleGappedSequence(
-      new SimpleSequence(
-        new SimpleSymbolList(target.getAlphabet().getTokenization("token"), align[1]),
-        target.getURN(),
-        target.getName(),
-        target.getAnnotation()));
-    Map m = new HashMap();
-    m.put(query.getName(), query);
-    m.put(target.getName(), target);
-    pairalign = new SimpleAlignment(m);
-        
-    output += "Length:\t"+align[0].length()+"\n";
-    output += "Score:\t\t"+(-1)*getEditDistance()+"\n\n";
-        
-    int currline = Math.min(60, align[0].length()); 
-    // counts the absoulute position in the String.
-
-    output += "\nQuery:\t"  + align[0].substring(0, currline); 
-    output += "\n\t"        + path.substring(0, currline);
-    output += "\nTarget:\t" + align[1].substring(0, currline)+"\n";
-    
-    for (; currline+60 < align[0].length(); currline+=60) {
-      output += "\nQuery:\t"  + align[0].substring(currline, currline+60);
-      output += "\n\t"        + path.substring(currline, currline+60);
-      output += "\nTarget:\t" + align[1].substring(currline, currline+60)+"\n";
-    }
-    if (currline+1 < align[0].length()) {
-      output += "\nQuery:\t"  + align[0].substring(currline, align[0].length());
-      output += "\n\t"        + path.substring(currline, path.length());
-      output += "\nTarget:\t" + align[1].substring(currline, align[1].length())+"\n";
-    }
-
-    output += "\n\n";
- 
-    return output;    
-  }
-  
-  /** prints the alignment String on the screen.
-    * @param align
+  /** prints the alignment String on the screen (standard output).
+    * @param align The parameter is typically given by the {@see getAlignmentString} method.
     */
   public static void printAlignment(String align)
   { 
@@ -269,7 +176,9 @@ public class NeedlemanWunsch implements SequenceAlignment
   }
   
   
-  /**
+  /** This method is good if one wants to reuse the alignment calculated by this class in another
+    * BioJava class. It just performs {@see pairwiseAlignment} and returns an <code>Alignment</code>
+    * instance containing the two aligned sequences.
     * @return Alignment object containing the two gapped sequences constructed from query and target.
     * @throws Exception
     */
@@ -279,7 +188,10 @@ public class NeedlemanWunsch implements SequenceAlignment
     return pairalign;  
   }
   
-  /** 
+  /** This gives the edit distance acording to the given parameters of this certain 
+    * object. It returns just the last element of the internal cost matrix (left side
+    * down). So if you extend this class, you can just do the following:
+    * <code>double myDistanceValue = foo; this.CostMatrix = new double[1][1]; this.CostMatrix[0][0] = myDistanceValue;</code>
     * @return returns the edit_distance computed with the given parameters.
     */
   public double getEditDistance()
@@ -288,7 +200,7 @@ public class NeedlemanWunsch implements SequenceAlignment
   }
 
   
-  /** 
+  /** This just computes the minimum of three double values.
     * @param x
     * @param y
     * @param z
@@ -411,22 +323,114 @@ public class NeedlemanWunsch implements SequenceAlignment
              CostMatrix[i-1][j-1] - matchReplace);
          }
     } 
-      // Everything is the same from here:
-      try {
-        //this.printCostMatrix(query.seqString().toCharArray(), target.seqString().toCharArray());
-        // generate "String" with optimal Alignment.
-        String tmp = this.optimalAlignment(query, subject) + "\n";
-        time = System.currentTimeMillis() - time;
-        this.alignment += "Time in ms:\t"+time + tmp;
-        // print the Alignment on the screen
-        //this.printAlignment(alignment);		
+    try {
+        
+      /*StringBuffer[] align = new StringBuffer[] {new StringBuffer(CostMatrix.length), new StringBuffer(CostMatrix[0].length)};
+       StringBuffer path = new StringBuffer("");//*/
+        
+      String[] align = new String[] {"", ""};
+      String path = "";//*/
+        
+      j = this.CostMatrix[CostMatrix.length - 1].length -1;
+      SymbolTokenization st = alpha.getTokenization("default");
+
+       for (i = this.CostMatrix.length - 1; i>0; )
+       {
+          do { 
+            // only Insert.
+            if (i == 0) {
+              /*align[0].insert(0, '~');
+              align[1].insert(0, st.tokenizeSymbol(target.symbolAt(j--)));
+              path.insert(0, ' ');//*/
+              align[0] = '~' + align[0]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[0]; //
+              align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+              path     = ' ' + path;//*/
+              
+            // only Delete.
+            } else if (j == 0) { 
+              /*align[0].insert(0, st.tokenizeSymbol(query.symbolAt(i--)));
+              align[1].insert(0, '~');
+              path.insert(0, ' ');//*/
+              align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
+              align[1] = '~' + align[1]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[1]; //
+              path     = ' ' + path;//*/
+              
+            // Match/Replace
+            } else if (CostMatrix[i-1][j-1] == min(CostMatrix[i][j-1], CostMatrix[i-1][j-1], CostMatrix[i-1][j]))  { 
+              if (query.symbolAt(i) == subject.symbolAt(j)) {
+                /*path.insert(0, '|');//*/
+                path = '|' + path;//*/ 
+              } else {
+                path = ' ' + path;//*/
+                /*path.insert(0, ' ');//*/
+              } /*            
+              align[0].insert(0, st.tokenizeSymbol(query.symbolAt(i--)));
+              align[1].insert(0, st.tokenizeSymbol(target.symbolAt(j--)));//*/
+              align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
+              align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];//*/
+              /* ist nicht so gut, weil sonst auch Striche zwischen ambigious Symbols kommen.
+               *if (query.symbolAt(i+1).getMatches().contains(target.symbolAt(j+1))) 
+               */
+              
+            // Insert
+            } else if ((CostMatrix[i][j-1] < CostMatrix[i-1][j-1]) && (CostMatrix[i][j-1] < CostMatrix[i-1][j])) {
+             /*align[0].insert(0, '-');
+             align[1].insert(0, st.tokenizeSymbol(target.symbolAt(j--)));
+             path.insert(0, ' ');//*/
+              align[0] = '-' + align[0]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[0]; //
+              align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+              path     = ' ' + path;//*/
+            
+            // Delete
+            } else { 
+              /*align[0].insert(0, st.tokenizeSymbol(query.symbolAt(i--)));
+              align[1].insert(0, '-');
+              path.insert(0, ' ');//*/
+              align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
+              align[1] = '-'  + align[1]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[1]; //
+              path     = ' '  + path;//*/
+            }
+          } while (j>0);
+        }
+                
+        query = new SimpleGappedSequence(
+          new SimpleSequence(
+            new SimpleSymbolList(query.getAlphabet().getTokenization("token"), align[0]), 
+            query.getURN(), 
+            query.getName(), 
+            query.getAnnotation()));
+        subject = new SimpleGappedSequence(
+          new SimpleSequence(
+            new SimpleSymbolList(subject.getAlphabet().getTokenization("token"), align[1]),
+            subject.getURN(),
+            subject.getName(),
+            subject.getAnnotation()));
+        Map m = new HashMap();
+        m.put(query.getName(),    query);
+        m.put(subject.getName(), subject);
+        pairalign = new SimpleAlignment(m);
+        
+        // this.printCostMatrix(queryChar, targetChar);	// only for tests important
+        this.alignment = formatOutput(
+            query.getName(), 
+            subject.getName(), 
+            align, 
+            path, 
+            0, 
+            CostMatrix.length-1, 
+            CostMatrix.length-1,
+            0, 
+            CostMatrix[0].length-1,
+            CostMatrix[0].length-1,
+            getEditDistance(),
+            System.currentTimeMillis() - time) + "\n";
+        
+        //System.out.println(printCostMatrix(CostMatrix, query.seqString().toCharArray(), subject.seqString().toCharArray()));   
+        return getEditDistance();
         
       } catch (BioException exc) {
-        exc.printStackTrace();
-      }    
-          
-      return getEditDistance();
-      
+        throw new BioRuntimeException(exc);
+      }
     } else throw new BioRuntimeException("Alphabet missmatch occured: sequences with different alphabet cannot be aligned.");
   }
 

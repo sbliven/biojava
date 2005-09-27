@@ -1,25 +1,4 @@
 /*
- *                    BioJava development code
- *
- * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  If you do not have a copy,
- * see:
- *
- *      http://www.gnu.org/copyleft/lesser.html
- *
- * Copyright for this code is held jointly by the individual
- * authors.  These should be listed in @author doc comments.
- *
- * For more information on the BioJava project and its aims,
- * or to join the biojava-l mailing list, visit the home page
- * at:
- *
- *      http://www.biojava.org/
- *
- */
-
-/*
  * Created on 05.09.2005
  *
  */
@@ -104,7 +83,7 @@ public class SmithWaterman extends NeedlemanWunsch
     if (query.getAlphabet().equals(subject.getAlphabet()) && query.getAlphabet().equals(alpha)) {
       
       long time = System.currentTimeMillis();
-      int i, j, maxI = 0, maxJ = 0;
+      int i, j, maxI = 0, maxJ = 0, queryStart = 0, targetStart = 0;
       double matchReplace;
       this.scoreMatrix = new double[query.length()+1][subject.length()+1];    
     
@@ -216,12 +195,14 @@ public class SmithWaterman extends NeedlemanWunsch
           do {
             // only Deletes or Inserts or Replaces possible. That's not what we want to have.
             if ((i == 0) || (j == 0) || (scoreMatrix[i][j] == 0)) {
+              queryStart  = i;
+              targetStart = j;
               i = j = 0;
             
             // Nothing is possible anymore.
-            } else if ((scoreMatrix[i][j-1] == scoreMatrix[i-1][j]) && 
-                (scoreMatrix[i-1][j-1] == scoreMatrix[i-1][j]) && 
-                (scoreMatrix[i-1][j]   == Double.NEGATIVE_INFINITY)) {
+            } else if ((scoreMatrix[i][j-1]   == scoreMatrix[i-1][j]) && 
+                       (scoreMatrix[i-1][j-1] == scoreMatrix[i-1][j]) && 
+                       (scoreMatrix[i-1][j]   == Double.NEGATIVE_INFINITY)) {
               
               if (query.symbolAt(i) == subject.symbolAt(j)) path = '|' + path;
               else path = ' ' + path;
@@ -229,6 +210,8 @@ public class SmithWaterman extends NeedlemanWunsch
               align[0] = st.tokenizeSymbol(query.symbolAt(i))   + align[0];
               align[1] = st.tokenizeSymbol(subject.symbolAt(j)) + align[1];
               
+              queryStart  = i;
+              targetStart = j;
               i = j = 0;
           
             // Insert
@@ -255,6 +238,7 @@ public class SmithWaterman extends NeedlemanWunsch
           } while ((j>0) && (scoreMatrix[i][j] != Double.NEGATIVE_INFINITY));
         }
 
+        // this is necessary to have a value for the getEditDistance method.
         this.CostMatrix = new double[1][1];
         CostMatrix[0][0] = -scoreMatrix[maxI][maxJ];
                   
@@ -278,33 +262,25 @@ public class SmithWaterman extends NeedlemanWunsch
         /*
         * Construct the output with only 60 symbols in each line.
         */
+        this.alignment += formatOutput(
+          query.getName(), 
+          subject.getName(), 
+          align, 
+          path, 
+          queryStart, 
+          maxI, 
+          scoreMatrix.length-1, 
+          targetStart, 
+          maxJ, 
+          scoreMatrix[0].length-1, 
+          getEditDistance(),
+          System.currentTimeMillis() - time);
         
-        time = System.currentTimeMillis() - time;  
-                    
-        String output = "Time in ms:\t"+ time + "\n";
-        output += "Length:  \t"+align[0].length()+"\n";
-        //output += "Distance:\t"+getEditDistance()+"\n";
-        output += "Score:\t\t"+(-1)*getEditDistance()+"\n\n";
-              
-        int currline = Math.min(60, align[0].length()); 
-
-        output += "\nQuery:\t"  + align[0].substring(0, currline); 
-        output += "\n\t"        + path.substring(0, currline);
-        output += "\nTarget:\t" + align[1].substring(0, currline)+"\n";
-        
-        for (; currline+60 < align[0].length(); currline+=60) {
-          output += "\nQuery:\t"  + align[0].substring(currline, currline+60);
-          output += "\n\t"        + path.substring(currline, currline+60);
-          output += "\nTarget:\t" + align[1].substring(currline, currline+60)+"\n";
-        }
-        if (currline+1 < align[0].length()) {
-          output += "\nQuery:\t"  + align[0].substring(currline, align[0].length());
-          output += "\n\t"        + path.substring(currline, path.length());
-          output += "\nTarget:\t" + align[1].substring(currline, align[1].length())+"\n";
-        }
-        this.alignment += output + "\n\n";
-        
-        return scoreMatrix[maxI][maxJ];
+        // Don't waste any memory.
+        double value = scoreMatrix[maxI][maxJ]; 
+        scoreMatrix = null;
+        Runtime.getRuntime().gc();
+        return value;
       
       } catch (BioException exc) {
         exc.printStackTrace();
@@ -316,7 +292,7 @@ public class SmithWaterman extends NeedlemanWunsch
   }
 
   
-  /** 
+  /** This just computes the maximum of four doubles.
     * @param w
     * @param x
     * @param y
