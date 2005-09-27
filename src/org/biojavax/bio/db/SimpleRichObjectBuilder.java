@@ -54,7 +54,7 @@ public class SimpleRichObjectBuilder implements RichObjectBuilder {
                 if (i<(params.length-1)) paramsstuff.append(",");
             }
             paramsstuff.append(")");
-            throw new IllegalArgumentException("Could not find constructor for "+paramsstuff,e);
+            throw new IllegalArgumentException("Could not find constructor for "+paramsstuff);
         }
     }
     
