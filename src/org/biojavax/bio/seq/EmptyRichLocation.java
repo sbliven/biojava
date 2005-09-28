@@ -51,7 +51,7 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
         
     /**
      * {@inheritDoc} 
-     * NOT IMPLEMENTED
+     * DOES NOTHING
      */
     public void sort() {}
     
