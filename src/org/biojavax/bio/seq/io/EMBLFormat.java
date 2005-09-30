@@ -248,7 +248,7 @@ public class EMBLFormat implements RichSequenceFormat {
             if (sectionKey.equals(LOCUS_TAG)) {
                 // entryname  dataclass; [circular] molecule; division; sequencelength BP.
                 String loc = ((String[])section.get(0))[1];
-                String regex = "^(\\S+)\\s+standard;\\s+(circular)?\\s+(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP$";
+                String regex = "^(\\S+)\\s+standard;\\s+(circular)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$";
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(loc);
                 if (m.matches()) {
@@ -305,7 +305,8 @@ public class EMBLFormat implements RichSequenceFormat {
                 }
             } else if (sectionKey.equals(REFERENCE_TAG)) {
                 // first line of section has rank and location
-                int ref_rank = Integer.parseInt(((String[])section.get(0))[1]);
+                String refrank = ((String[])section.get(0))[1];
+                int ref_rank = Integer.parseInt(refrank.substring(1,refrank.length()-1));
                 int ref_start = -999;
                 int ref_end = -999;
                 // rest can be in any order
@@ -324,7 +325,7 @@ public class EMBLFormat implements RichSequenceFormat {
                     if (key.equals(JOURNAL_TAG)) journal = val;
                     if (key.equals(REFERENCE_XREF_TAG)) {
                         // database_identifier; primary_identifier.
-                        String[] refs = ((String[])section.get(0))[1].split("\\.");
+                        String[] refs = val.split("\\.");
                         for (int j = 0 ; j < refs.length; j++) {
                             if (refs[j].trim().length()==0) continue;
                             String[] parts = refs[j].split(";");
@@ -339,17 +340,15 @@ public class EMBLFormat implements RichSequenceFormat {
                     if (key.equals(REFERENCE_POSITION_TAG)) {
                         // only the first group is taken
                         // if we have multiple lines, only the last line is taken
-                        String ref = ((String[])section.get(0))[1];
                         String regex = "^(\\d+)(-(\\d+))?$";
                         Pattern p = Pattern.compile(regex);
-                        Matcher m = p.matcher(ref);
+                        Matcher m = p.matcher(val);
                         if (m.matches()) {
-                            if (m.group(1)!= null)
-                                ref_start = Integer.parseInt(m.group(1));
+                            ref_start = Integer.parseInt(m.group(1));
                             if(m.group(2) != null)
                                 ref_end = Integer.parseInt(m.group(3));
                         } else {
-                            throw new ParseException("Bad reference line found: "+ref);
+                            throw new ParseException("Bad reference line found: "+val);
                         }
                     }
                 }
@@ -531,20 +530,18 @@ public class EMBLFormat implements RichSequenceFormat {
                 String token = line.substring(0,2);
                 // READ SEQUENCE SECTION
                 if (token.equals(START_SEQUENCE_TAG)) {
-                    //      from next line, read sequence until //
-                    StringBuffer seqbuf = new StringBuffer();
+                    //      from next line, read sequence until // - leave // on stack
+                    section.add(new String[]{START_SEQUENCE_TAG,null});
                     while (!done) {
                         br.mark(160);
                         line = br.readLine();
-                        //      leave // on stack
                         if (line.substring(0,2).equals(END_SEQUENCE_TAG)) {
                             br.reset();
                             done = true;
                         } else {
-                            seqbuf.append(line);
+                            //      create sequence tag->value pair to return, sans numbers
+                            section.add(new String[]{"",line.replaceAll("\\d","")});
                         }
-                        //      create sequence tag->value pair to return, sans numbers
-                        section.add(new String[]{START_SEQUENCE_TAG,seqbuf.toString().replaceAll("\\d","")});
                     }
                 }
                 // READ FEATURE TABLE SECTION
@@ -557,11 +554,8 @@ public class EMBLFormat implements RichSequenceFormat {
                     String currentTag = null;
                     StringBuffer currentVal = null;
                     while (!done) {
-                        br.mark(160);
                         line = br.readLine();
-                        //      leave XX on stack
                         if (line.substring(0,2).equals(DELIMITER_TAG)) {
-                            br.reset();
                             done = true;
                             // dump current tag if exists
                             if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
@@ -593,6 +587,11 @@ public class EMBLFormat implements RichSequenceFormat {
                         }
                     }
                 }
+                // READ END OF SEQUENCE
+                else if (token.equals(END_SEQUENCE_TAG)) {
+                    section.add(new String[]{END_SEQUENCE_TAG,null});
+                    done = true;
+                }
                 // READ THIRD PARTY ANNOTATION SECTION
                 else if (token.equals(TPA_TAG)) {
                     //      exception = don't know how to do TPA yet
@@ -611,11 +610,8 @@ public class EMBLFormat implements RichSequenceFormat {
                     String currentTag = null;
                     StringBuffer currentVal = null;
                     while (!done) {
-                        br.mark(160);
                         line = br.readLine();
-                        //      leave XX on stack
                         if (line.substring(0,2).equals(DELIMITER_TAG)) {
-                            br.reset();
                             done = true;
                             // dump current tag if exists
                             if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
@@ -624,7 +620,7 @@ public class EMBLFormat implements RichSequenceFormat {
                             //      return tag->value pairs
                             String tag = line.substring(0,2);
                             String value = line.substring(5);
-                            if (currentTag==null || tag.equals(currentTag)) {
+                            if (currentTag==null || !tag.equals(currentTag)) {
                                 // dump current tag if exists
                                 if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                                 // start new tag
@@ -715,28 +711,28 @@ public class EMBLFormat implements RichSequenceFormat {
         locusLine.append(moltype);
         locusLine.append("; ");
         locusLine.append(rs.getDivision()==null?"":rs.getDivision());
-        locusLine.append(";");
+        locusLine.append("; ");
         locusLine.append(rs.length());
         locusLine.append(" BP.");
         this.writeWrappedLine(LOCUS_TAG, 5, locusLine.toString(), os);
-        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        os.println("XX   ");
         
         // accession line
         this.writeWrappedLine(ACCESSION_TAG, 5, accessions, os);
-        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        os.println("XX   ");
         
         // version line
         this.writeWrappedLine(VERSION_TAG, 5, accession+"."+rs.getVersion(), os);
-        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        os.println("XX   ");
         
         // date line
         this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Created)", os);
         this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", os);
-        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        os.println("XX   ");
         
         // definition line
         this.writeWrappedLine(DEFINITION_TAG, 5, rs.getDescription(), os);
-        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        os.println("XX   ");
         
         // keywords line
         String keywords = null;
@@ -749,7 +745,7 @@ public class EMBLFormat implements RichSequenceFormat {
         }
         if (keywords==null) keywords =".";
         this.writeWrappedLine(KEYWORDS_TAG, 5, keywords, os);
-        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        os.println("XX   ");
         
         // source line (from taxon)
         //   organism line
@@ -761,14 +757,14 @@ public class EMBLFormat implements RichSequenceFormat {
                 this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0], os);
             }
         }
-        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        os.println("XX   ");
         
         // references - rank (bases x to y)
         for (Iterator r = rs.getRankedDocRefs().iterator(); r.hasNext(); ) {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
             // RN, RC, RP, RX, RG, RA, RT, RL
-            this.writeWrappedLine(REFERENCE_TAG, 5, ""+rdr.getRank(), os);
+            this.writeWrappedLine(REFERENCE_TAG, 5, "["+rdr.getRank()+"]", os);
             if (d.getRemark()!=null) this.writeWrappedLine(REMARK_TAG, 5, d.getRemark(), os);
             this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, rdr.getStart()+"-"+rdr.getEnd(), os);
             CrossRef c = d.getCrossref();
@@ -776,7 +772,7 @@ public class EMBLFormat implements RichSequenceFormat {
             if (d.getAuthors()!=null) this.writeWrappedLine(AUTHORS_TAG, 5, d.getAuthors(), os);
             this.writeWrappedLine(TITLE_TAG, 5, d.getTitle(), os);
             this.writeWrappedLine(JOURNAL_TAG, 5, d.getLocation(), os);
-            this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+            os.println("XX   ");
         }
         
         // db references - ranked
@@ -785,7 +781,7 @@ public class EMBLFormat implements RichSequenceFormat {
             CrossRef c = rcr.getCrossRef();
             this.writeWrappedLine(DATABASE_XREF_TAG, 5, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", os);
         }
-        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        os.println("XX   ");
         
         // comments - if any
         if (!rs.getComments().isEmpty()) {
@@ -796,7 +792,7 @@ public class EMBLFormat implements RichSequenceFormat {
                 if (i.hasNext()) sb.append("\n");
             }
             this.writeWrappedLine(COMMENT_TAG, 5, sb.toString(), os);
-            this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+            os.println("XX   ");
         }
         
         os.println("FH   Key             Location/Qualifiers");
@@ -822,7 +818,7 @@ public class EMBLFormat implements RichSequenceFormat {
                 this.writeWrappedLine("FT",21,"/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", os);
             }
         }
-        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        os.println("XX   ");
         
         if (rs.getAlphabet()==AlphabetManager.alphabetForName("DNA")) {
             // SQ   Sequence 1859 BP; 609 A; 314 C; 355 G; 581 T; 0 other;
@@ -863,15 +859,15 @@ public class EMBLFormat implements RichSequenceFormat {
             os.println(oCount + " other;");
         }
         
-        os.println(START_SEQUENCE_TAG);
         // sequence stuff
         Symbol[] syms = (Symbol[])rs.toList().toArray(new Symbol[0]);
         int lineLen = 0;
         int symCount = 0;
+        os.print("    ");
         for (int i = 0; i < syms.length; i++) {
             if (symCount % 60 == 0 && symCount>0) {
-                os.print(StringTools.leftPad(""+symCount+1,10));
-                os.print("\n");
+                os.print(StringTools.leftPad(""+symCount,10));
+                os.print("\n    ");
                 lineLen = 0;
             }
             if (symCount % 10 == 0) {
@@ -886,7 +882,7 @@ public class EMBLFormat implements RichSequenceFormat {
             symCount++;
             lineLen++;
         }
-        os.print(StringTools.leftPad(""+symCount+1,(65-lineLen)+10));
+        os.print(StringTools.leftPad(""+symCount,(66-lineLen)+10));
         os.print("\n");
         os.println(END_SEQUENCE_TAG);
     }
