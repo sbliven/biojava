@@ -65,39 +65,43 @@ import org.biojavax.ontology.ComparableTerm;
 import org.biojavax.utils.StringTools;
 
 /**
- * Format reader for GenBank files. This version of Genbank format will generate
+ * Format reader for EMBL files. This version of EMBL format will generate
  * and write RichSequence objects. Loosely Based on code from the old, deprecated,
- * org.biojava.bio.seq.io.GenbankFormat object.
+ * org.biojava.bio.seq.io.EmblLikeFormat object.
  *
  * @author Richard Holland
- * bugfixes
- * @author MarkSchreiber
  */
-public class GenbankFormat implements RichSequenceFormat {
+public class EMBLFormat implements RichSequenceFormat {
     
     /**
      * The name of this format
      */
-    public static final String GENBANK_FORMAT = "GENBANK";
+    public static final String EMBL_FORMAT = "EMBL";
     
-    protected static final String LOCUS_TAG = "LOCUS";
-    protected static final String ACCESSION_TAG = "ACCESSION";
-    protected static final String VERSION_TAG = "VERSION";
-    protected static final String DEFINITION_TAG = "DEFINITION";
-    protected static final String SOURCE_TAG = "SOURCE";
-    protected static final String ORGANISM_TAG = "ORGANISM";
-    protected static final String REFERENCE_TAG = "REFERENCE";
-    protected static final String KEYWORDS_TAG = "KEYWORDS";
-    protected static final String AUTHORS_TAG = "AUTHORS";
-    protected static final String TITLE_TAG = "TITLE";
-    protected static final String JOURNAL_TAG = "JOURNAL";
-    protected static final String PUBMED_TAG = "PUBMED";
-    protected static final String MEDLINE_TAG = "MEDLINE";
-    protected static final String REMARK_TAG = "REMARK";
-    protected static final String COMMENT_TAG = "COMMENT";
-    protected static final String FEATURE_TAG = "FEATURES";
-    protected static final String BASE_COUNT_TAG = "BASE";
-    protected static final String START_SEQUENCE_TAG = "ORIGIN";
+    protected static final String LOCUS_TAG = "ID";
+    protected static final String ACCESSION_TAG = "AC";
+    protected static final String VERSION_TAG = "SV";
+    protected static final String DEFINITION_TAG = "DE";
+    protected static final String DATE_TAG = "DT";
+    protected static final String DATABASE_XREF_TAG = "DR";
+    protected static final String SOURCE_TAG = "OS";
+    protected static final String ORGANISM_TAG = "OC";
+    protected static final String REFERENCE_TAG = "RN";
+    protected static final String REFERENCE_POSITION_TAG = "RP";
+    protected static final String REFERENCE_XREF_TAG = "RX";
+    protected static final String AUTHORS_TAG = "RA";
+    protected static final String TITLE_TAG = "RT";
+    protected static final String JOURNAL_TAG = "RL";
+    protected static final String REMARK_TAG = "RC";
+    protected static final String KEYWORDS_TAG = "KW";
+    protected static final String COMMENT_TAG = "CC";
+    protected static final String FEATURE_HEADER_TAG = "FH";
+    protected static final String FEATURE_TAG = "FT";
+    
+    protected static final String CONTIG_TAG = "CO";
+    protected static final String TPA_TAG = "AH";
+    protected static final String START_SEQUENCE_TAG = "SQ";
+    protected static final String DELIMITER_TAG = "XX";
     protected static final String END_SEQUENCE_TAG = "//";
     
     private static ComparableTerm ACCESSION_TERM = null;
@@ -105,7 +109,7 @@ public class GenbankFormat implements RichSequenceFormat {
     private static ComparableTerm MODIFICATION_TERM = null;
     private static ComparableTerm MOLTYPE_TERM = null;
     private static ComparableTerm STRANDED_TERM = null;
-    private static ComparableTerm GENBANK_TERM = null;
+    private static ComparableTerm EMBL_TERM = null;
     
     /**
      * Getter for the accession term
@@ -153,12 +157,12 @@ public class GenbankFormat implements RichSequenceFormat {
     }
     
     /**
-     * Getter for the Genbank term
-     * @return The genbank Term
+     * Getter for the EMBL term
+     * @return The EMBL Term
      */
-    public static ComparableTerm getGenBankTerm() {
-        if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
-        return GENBANK_TERM;
+    public static ComparableTerm getEMBLTerm() {
+        if (EMBL_TERM==null) EMBL_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBL");
+        return EMBL_TERM;
     }
     
     private int lineWidth = 80;
@@ -242,29 +246,32 @@ public class GenbankFormat implements RichSequenceFormat {
             }
             // process section-by-section
             if (sectionKey.equals(LOCUS_TAG)) {
+                // entryname  dataclass; [circular] molecule; division; sequencelength BP.
                 String loc = ((String[])section.get(0))[1];
-                String regex = "^(\\S+)\\s+\\d+\\s+bp\\s+([dms]s-)?(\\S+)\\s+(circular|linear)?\\s+(\\S+)\\s+(\\S+)$";
+                String regex = "^(\\S+)\\s+standard;\\s+(circular)?\\s+(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP$";
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(loc);
                 if (m.matches()) {
                     rlistener.setName(m.group(1));
-                    rlistener.setDivision(m.group(5));
+                    rlistener.setDivision(m.group(4));
                     rlistener.addSequenceProperty(getMolTypeTerm(),m.group(3));
-                    rlistener.addSequenceProperty(getModificationTerm(),m.group(6));
                     // Optional extras
-                    String stranded = m.group(2);
-                    String circular = m.group(4);
-                    if (stranded!=null) rlistener.addSequenceProperty(getStrandedTerm(),stranded);
-                    if (circular!=null && circular.equals("circular")) rlistener.setCircular(true);
+                    String circular = m.group(2);
+                    if (circular!=null) rlistener.setCircular(true);
                 } else {
-                    throw new ParseException("Bad locus line found: "+loc);
+                    throw new ParseException("Bad ID line found: "+loc);
                 }
             } else if (sectionKey.equals(DEFINITION_TAG)) {
                 rlistener.setDescription(((String[])section.get(0))[1]);
+            } else if (sectionKey.equals(SOURCE_TAG)) {
+                // IGNORE - can get from first feature in feature table
+            } else if (sectionKey.equals(DATE_TAG)) {
+                String date = ((String[])section.get(0))[1].trim().substring(0,11);
+                rlistener.addSequenceProperty(getModificationTerm(), date);
             } else if (sectionKey.equals(ACCESSION_TAG)) {
                 // if multiple accessions, store only first as accession,
                 // and store rest in annotation
-                String[] accs = ((String[])section.get(0))[1].split("\\s+");
+                String[] accs = ((String[])section.get(0))[1].split(";");
                 accession = accs[0].trim();
                 rlistener.setAccession(accession);
                 for (int i = 1; i < accs.length; i++) {
@@ -272,46 +279,42 @@ public class GenbankFormat implements RichSequenceFormat {
                 }
             } else if (sectionKey.equals(VERSION_TAG)) {
                 String ver = ((String[])section.get(0))[1];
-                String regex = "^(\\S+?)\\.(\\d+)\\s+GI:(\\S+)$";
+                String regex = "^(\\S+?)\\.(\\d+)$";
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(ver);
                 if (m.matches()) {
                     rlistener.setVersion(Integer.parseInt(m.group(2)));
-                    rlistener.setIdentifier(m.group(3));
                 } else {
                     throw new ParseException("Bad version line found: "+ver);
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
-                rlistener.addSequenceProperty(getKeywordsTerm(), ((String[])section.get(0))[1]);
-            } else if (sectionKey.equals(SOURCE_TAG)) {
-                // ignore - can get all this from the first feature
+                String[] kws = ((String[])section.get(0))[1].split(";");
+                for (int i = 1; i < kws.length; i++) {
+                    rlistener.addSequenceProperty(getKeywordsTerm(), kws[i].trim());
+                }
+            } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
+                // database_identifier; primary_identifier; secondary_identifier.
+                String[] refs = ((String[])section.get(0))[1].split("\\.");
+                for (int i = 0 ; i < refs.length; i++) {
+                    if (refs[i].trim().length()==0) continue;
+                    String[] parts = refs[i].split(";");
+                    // construct a DBXREF out of the dbname part[0] and accession part[1]
+                    CrossRef crossRef = new SimpleCrossRef(parts[0].trim(),parts[1].trim(),0);
+                    RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, i+1);
+                    rlistener.setRankedCrossRef(rcrossRef);
+                }
             } else if (sectionKey.equals(REFERENCE_TAG)) {
                 // first line of section has rank and location
-                int ref_rank;
+                int ref_rank = Integer.parseInt(((String[])section.get(0))[1]);
                 int ref_start = -999;
                 int ref_end = -999;
-                String ref = ((String[])section.get(0))[1];
-                String regex = "^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?";
-                Pattern p = Pattern.compile(regex);
-                Matcher m = p.matcher(ref);
-                if (m.matches()) {
-                    ref_rank = Integer.parseInt(m.group(1));
-                    if(m.group(2) != null){
-                        if (m.group(3)!= null)
-                            ref_start = Integer.parseInt(m.group(3));
-                        
-                        if(m.group(4) != null)
-                            ref_end = Integer.parseInt(m.group(4));
-                    }
-                } else {
-                    throw new ParseException("Bad reference line found: "+ref);
-                }
                 // rest can be in any order
                 String authors = null;
                 String title = null;
                 String journal = null;
-                String medline = null;
                 String pubmed = null;
+                String medline = null;
+                String doi = null;
                 String remark = null;
                 for (int i = 1; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
@@ -319,9 +322,36 @@ public class GenbankFormat implements RichSequenceFormat {
                     if (key.equals(AUTHORS_TAG)) authors = val;
                     if (key.equals(TITLE_TAG)) title = val;
                     if (key.equals(JOURNAL_TAG)) journal = val;
-                    if (key.equals(MEDLINE_TAG)) medline = val;
-                    if (key.equals(PUBMED_TAG)) pubmed = val;
+                    if (key.equals(REFERENCE_XREF_TAG)) {
+                        // database_identifier; primary_identifier.
+                        String[] refs = ((String[])section.get(0))[1].split("\\.");
+                        for (int j = 0 ; j < refs.length; j++) {
+                            if (refs[j].trim().length()==0) continue;
+                            String[] parts = refs[j].split(";");
+                            String db = parts[0].toUpperCase();
+                            String ref = parts[1];
+                            if (db.equals("PUBMED")) pubmed = ref;
+                            else if (db.equals("MEDLINE")) medline = ref;
+                            else if (db.equals("DOI")) doi = ref;
+                        }
+                    }
                     if (key.equals(REMARK_TAG)) remark = val;
+                    if (key.equals(REFERENCE_POSITION_TAG)) {
+                        // only the first group is taken
+                        // if we have multiple lines, only the last line is taken
+                        String ref = ((String[])section.get(0))[1];
+                        String regex = "^(\\d+)(-(\\d+))?$";
+                        Pattern p = Pattern.compile(regex);
+                        Matcher m = p.matcher(ref);
+                        if (m.matches()) {
+                            if (m.group(1)!= null)
+                                ref_start = Integer.parseInt(m.group(1));
+                            if(m.group(2) != null)
+                                ref_end = Integer.parseInt(m.group(3));
+                        } else {
+                            throw new ParseException("Bad reference line found: "+ref);
+                        }
+                    }
                 }
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
@@ -337,13 +367,21 @@ public class GenbankFormat implements RichSequenceFormat {
                     RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
                     rlistener.setRankedCrossRef(rmcr);
                 }
+                // create the doi crossref and assign to the bioentry
+                CrossRef dcr = null;
+                if (doi!=null) {
+                    dcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{"DOI", doi});
+                    RankedCrossRef rdcr = new SimpleRankedCrossRef(dcr, 0);
+                    rlistener.setRankedCrossRef(rdcr);
+                }
                 // create the docref object
                 try {
                     DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,journal});
                     if (title!=null) dr.setTitle(title);
-                    // assign either the pubmed or medline to the docref - medline gets priority
+                    // assign either the pubmed or medline to the docref - medline gets priority, then pubmed, then doi
                     if (mcr!=null) dr.setCrossref(mcr);
                     else if (pcr!=null) dr.setCrossref(pcr);
+                    else if (dcr!=null) dr.setCrossref(dcr);
                     // assign the remarks
                     dr.setRemark(remark);
                     // assign the docref to the bioentry
@@ -418,7 +456,7 @@ public class GenbankFormat implements RichSequenceFormat {
                         // start next one, with lots of lovely info in it
                         RichFeature.Template templ = new RichFeature.Template();
                         templ.annotation = new SimpleRichAnnotation();
-                        templ.sourceTerm = getGenBankTerm();
+                        templ.sourceTerm = getEMBLTerm();
                         templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key);
                         templ.featureRelationshipSet = new TreeSet();
                         templ.rankedCrossRefs = new TreeSet();
@@ -429,8 +467,6 @@ public class GenbankFormat implements RichSequenceFormat {
                     }
                 }
                 if (seenAFeature) rlistener.endFeature();
-            } else if (sectionKey.equals(BASE_COUNT_TAG)) {
-                // ignore - can calculate from sequence content later if needed
             } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.elideSymbols) {
                 // our first line is ignorable as it is the ORIGIN tag
                 // the second line onwards conveniently have the number as
@@ -484,40 +520,121 @@ public class GenbankFormat implements RichSequenceFormat {
         boolean done = false;
         int linecount = 0;
         
-        //sections start at a line and continue till the first line afterwards with a
-        //non-whitespace first character
-        //we want to match any of the following as a new section within a section
-        //  \s{0,8} word \s{1,7} value
-        //  \s{21} /word = value
-        //  \s{21} /word
-        String regex = "^(\\s{0,8}(\\S+)\\s{1,7}(.*)|\\s{21}(/\\S+?)=(.*)|\\s{21}(/\\S+))$";
-        Pattern p = Pattern.compile(regex);
+        // while not done
         try {
             while (!done) {
+                // mark buffer
                 br.mark(160);
+                // read token
                 line = br.readLine();
-                if (line==null || line.equals("") || (line.charAt(0)!=' ' && linecount++>0)) {
-                    // dump out last part of section
-                    section.add(new String[]{currKey,currVal.toString()});
+                if (line.length()<2) throw new ParseException("Bad line found: "+line);
+                String token = line.substring(0,2);
+                // READ SEQUENCE SECTION
+                if (token.equals(START_SEQUENCE_TAG)) {
+                    //      from next line, read sequence until //
+                    StringBuffer seqbuf = new StringBuffer();
+                    while (!done) {
+                        br.mark(160);
+                        line = br.readLine();
+                        //      leave // on stack
+                        if (line.substring(0,2).equals(END_SEQUENCE_TAG)) {
+                            br.reset();
+                            done = true;
+                        } else {
+                            seqbuf.append(line);
+                        }
+                        //      create sequence tag->value pair to return, sans numbers
+                        section.add(new String[]{START_SEQUENCE_TAG,seqbuf.toString().replaceAll("\\d","")});
+                    }
+                }
+                // READ FEATURE TABLE SECTION
+                else if (token.equals(FEATURE_HEADER_TAG)) {
+                    //      create dummy feature tag->value pair and add to return set
+                    section.add(new String[]{FEATURE_TAG,null});
+                    //      drop next FH line
+                    line = br.readLine(); // skip next line too - it is also FH
+                    //      read all FT lines until XX
+                    String currentTag = null;
+                    StringBuffer currentVal = null;
+                    while (!done) {
+                        br.mark(160);
+                        line = br.readLine();
+                        //      leave XX on stack
+                        if (line.substring(0,2).equals(DELIMITER_TAG)) {
+                            br.reset();
+                            done = true;
+                            // dump current tag if exists
+                            if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
+                        } else {
+                            //         FT lines:   FT   word            value
+                            //         or          FT                   /word
+                            //         or          FT                   /db_xref="taxon:3899....
+                            //                                          ......"
+                            line = line.substring(5); // chomp off "FT   "
+                            if (line.charAt(0)!=' ') {
+                                // case 1 : word value - splits into key-value on its own
+                                section.add(line.split("\\s+"));
+                            } else {
+                                line = line.trim();
+                                if (line.charAt(0)=='/') {
+                                    // dump current tag if exists
+                                    if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
+                                    // case 2 : /word[=.....]
+                                    String[] parts = line.split("=");
+                                    currentTag = parts[0];
+                                    currentVal = new StringBuffer();
+                                    currentVal.append(parts[1]);
+                                } else {
+                                    // case 3 : ...."
+                                    currentVal.append("\n");
+                                    currentVal.append(line);
+                                }
+                            }
+                        }
+                    }
+                }
+                // READ THIRD PARTY ANNOTATION SECTION
+                else if (token.equals(TPA_TAG)) {
+                    //      exception = don't know how to do TPA yet
+                    throw new ParseException("Unable to handle TPAs just yet");
+                }
+                // READ CONTIG SECTION
+                else if (token.equals(CONTIG_TAG)) {
+                    //      exception = don't know how to do contigs yet
+                    throw new ParseException("Unable to handle contig assemblies just yet");
+                }
+                // READ NORMAL TAG/VALUE SECTION
+                else {
+                    //      rewind buffer to mark
                     br.reset();
-                    done = true;
-                } else {
-                    Matcher m = p.matcher(line);
-                    if (m.matches()) {
-                        // new key
-                        if (currKey!=null) section.add(new String[]{currKey,currVal.toString()});
-                        // key = group(2) or group(4) or group(6) - whichever is not null
-                        currKey = m.group(2)==null?(m.group(4)==null?m.group(6):m.group(4)):m.group(2);
-                        currVal = new StringBuffer();
-                        // val = group(3) if group(2) not null, group(5) if group(4) not null, "" otherwise, trimmed
-                        currVal.append((m.group(2)==null?(m.group(4)==null?"":m.group(5)):m.group(3)).trim());
-                    } else {
-                        line = line.trim();
-                        // concatted line or SEQ START/END line?
-                        if (line.equals(START_SEQUENCE_TAG) || line.equals(END_SEQUENCE_TAG)) currKey = line;
-                        else {
-                            currVal.append("\n"); // newline in between lines - can be removed later
-                            currVal.append(line);
+                    //      read token/values until XX
+                    String currentTag = null;
+                    StringBuffer currentVal = null;
+                    while (!done) {
+                        br.mark(160);
+                        line = br.readLine();
+                        //      leave XX on stack
+                        if (line.substring(0,2).equals(DELIMITER_TAG)) {
+                            br.reset();
+                            done = true;
+                            // dump current tag if exists
+                            if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
+                        } else {
+                            //      merge neighbouring repeated tokens by concatting values
+                            //      return tag->value pairs
+                            String tag = line.substring(0,2);
+                            String value = line.substring(5);
+                            if (currentTag==null || tag.equals(currentTag)) {
+                                // dump current tag if exists
+                                if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
+                                // start new tag
+                                currentTag = tag;
+                                currentVal = new StringBuffer();
+                                currentVal.append(value);
+                            } else {
+                                currentVal.append("\n");
+                                currentVal.append(value);
+                            }
                         }
                     }
                 }
@@ -544,7 +661,7 @@ public class GenbankFormat implements RichSequenceFormat {
     
     /**
      * {@inheritDoc}
-     * Namespace is ignored as Genbank has no concept of it.
+     * Namespace is ignored as EMBL has no concept of it.
      */
     public void	writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
         this.writeSequence(seq, getDefaultFormat(), os, ns);
@@ -552,12 +669,12 @@ public class GenbankFormat implements RichSequenceFormat {
     
     /**
      * {@inheritDoc}
-     * Namespace is ignored as Genbank has no concept of it.
+     * Namespace is ignored as EMBL has no concept of it.
      */
     public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
-        // Genbank only really - others are treated identically for now
+        // EMBL only really - others are treated identically for now
         if (!(
-                format.equalsIgnoreCase(GENBANK_FORMAT)
+                format.equalsIgnoreCase(EMBL_FORMAT)
                 ))
             throw new IllegalArgumentException("Unknown format: "+format);
         
@@ -580,40 +697,46 @@ public class GenbankFormat implements RichSequenceFormat {
         
         Set notes = rs.getNoteSet();
         String accession = rs.getAccession();
-        String accessions = accession;
-        String stranded = "";
+        String accessions = accession+";";
         String mdat = "";
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
-            if (n.getTerm().equals(getStrandedTerm())) stranded=n.getValue();
-            else if (n.getTerm().equals(getModificationTerm())) mdat=n.getValue();
+            if (n.getTerm().equals(getModificationTerm())) mdat=n.getValue();
             else if (n.getTerm().equals(getMolTypeTerm())) moltype=n.getValue();
-            else if (n.getTerm().equals(getAccessionTerm())) accessions = accessions+" "+n.getValue();
+            else if (n.getTerm().equals(getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
         }
         
-        // locus(name) + length + alpha + div + date line
+        // entryname  dataclass; [circular] molecule; division; sequencelength BP.
         StringBuffer locusLine = new StringBuffer();
         locusLine.append(StringTools.rightPad(rs.getName(),10));
-        locusLine.append(StringTools.leftPad(""+rs.length(),7));
-        locusLine.append(" bp ");
-        locusLine.append(StringTools.leftPad(stranded,3));
-        locusLine.append(StringTools.rightPad(moltype,6));
-        locusLine.append(StringTools.rightPad(rs.getCircular()?"circular":"",10));
-        locusLine.append(StringTools.rightPad(rs.getDivision()==null?"":rs.getDivision(),10));
-        locusLine.append(mdat);
-        this.writeWrappedLine(LOCUS_TAG, 12, locusLine.toString(), os);
-        
-        // definition line
-        this.writeWrappedLine(DEFINITION_TAG, 12, rs.getDescription(), os);
+        locusLine.append("standard; ");
+        locusLine.append(rs.getCircular()?"circular ":"");
+        locusLine.append(moltype);
+        locusLine.append("; ");
+        locusLine.append(rs.getDivision()==null?"":rs.getDivision());
+        locusLine.append(";");
+        locusLine.append(rs.length());
+        locusLine.append(" BP.");
+        this.writeWrappedLine(LOCUS_TAG, 5, locusLine.toString(), os);
+        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
         
         // accession line
-        this.writeWrappedLine(ACCESSION_TAG, 12, accessions, os);
+        this.writeWrappedLine(ACCESSION_TAG, 5, accessions, os);
+        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
         
-        // version + gi line
-        String version = accession+"."+rs.getVersion();
-        if (rs.getIdentifier()!=null) version = version + "  GI:"+rs.getIdentifier();
-        this.writeWrappedLine(VERSION_TAG, 12, version, os);
+        // version line
+        this.writeWrappedLine(VERSION_TAG, 5, accession+"."+rs.getVersion(), os);
+        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        
+        // date line
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Created)", os);
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", os);
+        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
+        
+        // definition line
+        this.writeWrappedLine(DEFINITION_TAG, 5, rs.getDescription(), os);
+        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
         
         // keywords line
         String keywords = null;
@@ -625,7 +748,8 @@ public class GenbankFormat implements RichSequenceFormat {
             }
         }
         if (keywords==null) keywords =".";
-        this.writeWrappedLine(KEYWORDS_TAG, 12, keywords, os);
+        this.writeWrappedLine(KEYWORDS_TAG, 5, keywords, os);
+        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
         
         // source line (from taxon)
         //   organism line
@@ -633,23 +757,35 @@ public class GenbankFormat implements RichSequenceFormat {
         if (tax!=null) {
             String[] sciNames = (String[])tax.getNames(NCBITaxon.SCIENTIFIC).toArray(new String[0]);
             if (sciNames.length>0) {
-                this.writeWrappedLine(SOURCE_TAG, 12, sciNames[0], os);
-                this.writeWrappedLine("  "+ORGANISM_TAG, 12, sciNames[0], os);
+                this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0], os);
+                this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0], os);
             }
         }
+        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
         
         // references - rank (bases x to y)
         for (Iterator r = rs.getRankedDocRefs().iterator(); r.hasNext(); ) {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
-            this.writeWrappedLine(REFERENCE_TAG, 12, rdr.getRank()+"  (bases "+rdr.getStart()+" to "+rdr.getEnd()+")", os);
-            if (d.getAuthors()!=null) this.writeWrappedLine("  "+AUTHORS_TAG, 12, d.getAuthors(), os);
-            this.writeWrappedLine("  "+TITLE_TAG, 12, d.getTitle(), os);
-            this.writeWrappedLine("  "+JOURNAL_TAG, 12, d.getLocation(), os);
+            // RN, RC, RP, RX, RG, RA, RT, RL
+            this.writeWrappedLine(REFERENCE_TAG, 5, ""+rdr.getRank(), os);
+            if (d.getRemark()!=null) this.writeWrappedLine(REMARK_TAG, 5, d.getRemark(), os);
+            this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, rdr.getStart()+"-"+rdr.getEnd(), os);
             CrossRef c = d.getCrossref();
-            if (c!=null) this.writeWrappedLine("  "+c.getDbname().toUpperCase(), 12, c.getAccession(), os);
-            if (d.getRemark()!=null) this.writeWrappedLine("  "+REMARK_TAG, 12, d.getRemark(), os);
+            if (c!=null) this.writeWrappedLine(REFERENCE_XREF_TAG, 5, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", os);
+            if (d.getAuthors()!=null) this.writeWrappedLine(AUTHORS_TAG, 5, d.getAuthors(), os);
+            this.writeWrappedLine(TITLE_TAG, 5, d.getTitle(), os);
+            this.writeWrappedLine(JOURNAL_TAG, 5, d.getLocation(), os);
+            this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
         }
+        
+        // db references - ranked
+        for (Iterator r = rs.getRankedCrossRefs().iterator(); r.hasNext(); ) {
+            RankedCrossRef rcr = (RankedCrossRef)r.next();
+            CrossRef c = rcr.getCrossRef();
+            this.writeWrappedLine(DATABASE_XREF_TAG, 5, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", os);
+        }
+        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
         
         // comments - if any
         if (!rs.getComments().isEmpty()) {
@@ -659,34 +795,37 @@ public class GenbankFormat implements RichSequenceFormat {
                 sb.append(c.getComment());
                 if (i.hasNext()) sb.append("\n");
             }
-            this.writeWrappedLine(COMMENT_TAG, 12, sb.toString(), os);
+            this.writeWrappedLine(COMMENT_TAG, 5, sb.toString(), os);
+            this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
         }
         
-        os.println("FEATURES             Location/Qualifiers");
+        os.println("FH   Key             Location/Qualifiers");
+        os.println("FH   ");
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
-            this.writeWrappedLocationLine("     "+f.getTypeTerm().getName(), 21, GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), os);
+            this.writeWrappedLocationLine("FT   ", 5, StringTools.rightPad(f.getTypeTerm().getName(),16)+" "+GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), os);
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
                 // /key="val" or just /key if val==""
-                if (n.getValue()==null || n.getValue().equals("")) this.writeWrappedLine("",21,"/"+n.getTerm(),os);
-                else this.writeWrappedLine("",21,"/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", os);
+                if (n.getValue()==null || n.getValue().equals("")) this.writeWrappedLine("FT",21,"/"+n.getTerm(),os);
+                else this.writeWrappedLine("FT",21,"/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", os);
             }
             // add-in to source feature only db_xref="taxon:xyz" where present
             if (f.getType().equals("source") && tax!=null) {
-                this.writeWrappedLine("",21,"/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", os);
+                this.writeWrappedLine("FT",21,"/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", os);
             }
             // add-in other dbxrefs where present
             for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
                 RankedCrossRef rcr = (RankedCrossRef)j.next();
                 CrossRef cr = rcr.getCrossRef();
-                this.writeWrappedLine("",21,"/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", os);
+                this.writeWrappedLine("FT",21,"/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", os);
             }
         }
+        this.writeWrappedLine(DELIMITER_TAG, 5, "", os);
         
         if (rs.getAlphabet()==AlphabetManager.alphabetForName("DNA")) {
-            // BASE COUNT     1510 a   1074 c    835 g   1609 t
+            // SQ   Sequence 1859 BP; 609 A; 314 C; 355 G; 581 T; 0 other;
             int aCount = 0;
             int cCount = 0;
             int gCount = 0;
@@ -716,34 +855,38 @@ public class GenbankFormat implements RichSequenceFormat {
                         oCount++;
                 }
             }
-            os.print("BASE COUNT    ");
-            os.print(aCount + " a   ");
-            os.print(cCount + " c   ");
-            os.print(gCount + " g   ");
-            os.print(tCount + " t    ");
-            os.println(oCount + " others");
+            os.print("SQ   "+rs.length()+" BP; ");
+            os.print(aCount + " A; ");
+            os.print(cCount + " C; ");
+            os.print(gCount + " G; ");
+            os.print(tCount + " T; ");
+            os.println(oCount + " other;");
         }
         
         os.println(START_SEQUENCE_TAG);
         // sequence stuff
         Symbol[] syms = (Symbol[])rs.toList().toArray(new Symbol[0]);
-        int lines = 0;
+        int lineLen = 0;
         int symCount = 0;
         for (int i = 0; i < syms.length; i++) {
-            if (symCount % 60 == 0) {
-                if (lines > 0) os.print("\n"); // newline from previous line
-                int lineNum = (lines*60) + 1;
-                os.print(StringTools.leftPad(""+lineNum,9));
-                lines++;
+            if (symCount % 60 == 0 && symCount>0) {
+                os.print(StringTools.leftPad(""+symCount+1,10));
+                os.print("\n");
+                lineLen = 0;
             }
-            if (symCount % 10 == 0) os.print(" ");
+            if (symCount % 10 == 0) {
+                os.print(" ");
+                lineLen++;
+            }
             try {
                 os.print(tok.tokenizeSymbol(syms[i]));
             } catch (IllegalSymbolException e) {
                 throw new RuntimeException("Found illegal symbol: "+syms[i]);
             }
             symCount++;
+            lineLen++;
         }
+        os.print(StringTools.leftPad(""+symCount+1,(65-lineLen)+10));
         os.print("\n");
         os.println(END_SEQUENCE_TAG);
     }
@@ -766,7 +909,10 @@ public class GenbankFormat implements RichSequenceFormat {
         String[] lines = StringTools.writeWordWrap(text, sep, this.getLineWidth()-indent);
         for (int i = 0; i<lines.length; i++) {
             if (i==0) b.append(lines[i]);
-            else b.append(StringTools.leftIndent(lines[i],indent));
+            else {
+                b.append(StringTools.rightPad(key, indent));
+                b.append(lines[i]);
+            }
             // print line before continuing to next one
             os.println(b.toString());
             b.setLength(0);
@@ -777,7 +923,7 @@ public class GenbankFormat implements RichSequenceFormat {
      * {@inheritDoc}
      */
     public String getDefaultFormat() {
-        return GENBANK_FORMAT;
+        return EMBL_FORMAT;
     }
 }
 
