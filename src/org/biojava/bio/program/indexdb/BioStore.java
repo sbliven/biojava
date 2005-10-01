@@ -58,7 +58,7 @@ public class BioStore implements IndexStore {
      */
     static Comparator STRING_CASE_SENSITIVE_ORDER = new Comparator() {
             public int compare(Object a, Object b) {
-                return ((String) a).compareTo(b);
+                return ((Comparable) a).compareTo(b);
             }
         };
     
