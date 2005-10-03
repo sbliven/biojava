@@ -297,7 +297,7 @@ public class FastaFormat implements RichSequenceFormat {
         os.print("|");
         os.print(rs.getName());
         os.print(" ");
-        os.println(rs.getDescription());
+        os.println(rs.getDescription().replaceAll("\\n"," "));
         
         int length = rs.length();
         
