@@ -24,7 +24,6 @@ package org.biojavax.bio.seq.io;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.biojava.bio.seq.Sequence;
@@ -34,7 +33,6 @@ import org.biojava.bio.seq.io.StreamParser;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.ParseErrorListener;
 import org.biojavax.Namespace;
 import org.biojavax.SimpleNamespace;
 import org.biojavax.bio.db.RichObjectFactory;
@@ -64,21 +62,32 @@ public class FastaFormat implements RichSequenceFormat {
     private int lineWidth = 60;
     
     /**
-     * Retrive the current line width.
-     * @return the line width
+     * {@inheritDoc}
      */
     public int getLineWidth() {
         return lineWidth;
     }
     
     /**
-     * Set the line width.
-     * When writing, the lines of sequence will never be longer than the line
-     * width.
-     * @param width the new line width
+     * {@inheritDoc}
      */
     public void setLineWidth(int width) {
         this.lineWidth = width;
+    }    
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean getElideSymbols() {
+        return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setElideSymbols(boolean elideSymbols) {
+        if (elideSymbols) throw new IllegalArgumentException("Are you kidding me? Fasta is nothing but symbols!");
     }
     
     /**

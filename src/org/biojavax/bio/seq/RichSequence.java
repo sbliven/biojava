@@ -23,7 +23,6 @@ package org.biojavax.bio.seq;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Set;
@@ -36,30 +35,26 @@ import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.RNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
-import org.biojava.bio.seq.db.HashSequenceDB;
-import org.biojava.bio.seq.db.IDMaker;
-import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.utils.AssertionFailure;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.bio.seq.io.EMBLFormat;
 import org.biojavax.bio.seq.io.FastaFormat;
 import org.biojavax.bio.seq.io.GenbankFormat;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
 import org.biojavax.bio.seq.io.RichStreamReader;
 import org.biojavax.bio.seq.io.RichStreamWriter;
-import org.biojavax.bio.seq.io.SimpleRichSequenceBuilderFactory;
+import org.biojavax.bio.seq.io.UniProtFormat;
 
 /**
  * A rich sequence is a combination of a org.biojavax.bio.Bioentry
  * and a Sequence. It inherits and merges the methods
  * of both. The RichSequence is based on the BioSQL model and
  * provides a richer array of methods to access information than Sequence
- * does. Whenever possible RichSequence should be used in preference 
+ * does. Whenever possible RichSequence should be used in preference
  * to Sequence.
  * @author Mark Schreiber
  * @author Richard Holland
@@ -122,7 +117,7 @@ public interface RichSequence extends BioEntry,Sequence {
     
     /**
      * Is the sequence circular? Circularity has implications for work with locations
-     * and any coordinate work eg symbolAt(int i). 
+     * and any coordinate work eg symbolAt(int i).
      * Classes that allow it should test this method when working with coordinates or
      * locations / features.
      * @return true if the this is circular else false.
@@ -139,8 +134,8 @@ public interface RichSequence extends BioEntry,Sequence {
         private Tools() {}
         
         /**
-         * Boldly attempts to convert a Sequence into a RichSequence. Sequences 
-         * will be assigned to the default namespace. The accession will be 
+         * Boldly attempts to convert a Sequence into a RichSequence. Sequences
+         * will be assigned to the default namespace. The accession will be
          * assumed to be the name of the old sequence.
          * The version of the sequence will be set to 0 and the seqversion set
          * to 0.0. Features are converted to RichFeatures.
@@ -184,7 +179,7 @@ public interface RichSequence extends BioEntry,Sequence {
      */
     public final class IOTools {
         
-        private static RichSequenceBuilderFactory factory = 
+        private static RichSequenceBuilderFactory factory =
                 RichSequenceBuilderFactory.THRESHOLD;
         
         // This can't be instantiated.
@@ -196,10 +191,10 @@ public interface RichSequence extends BioEntry,Sequence {
          * @param sTok  a <code>SymbolTokenization</code> that understands the sequences
          * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
          *              use the namespace specified in the file. If no namespace is
-         *              specified in the file, then 
+         *              specified in the file, then
          *              <code>RichObjectFactory.getDefaultNamespace()</code>
          *              is used.
-         * @return      a <code>RichSequenceIterator</code> 
+         * @return      a <code>RichSequenceIterator</code>
          *              over each sequence in the fasta file
          */
         public static RichSequenceIterator readFasta(
@@ -290,7 +285,7 @@ public interface RichSequence extends BioEntry,Sequence {
                     ns);
         }
         
-               
+        
         /**
          * Read a GenBank file using a custom type of SymbolList. For example,
          * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
@@ -368,7 +363,132 @@ public interface RichSequence extends BioEntry,Sequence {
                     factory,
                     ns);
         }
-                     
+        
+        
+        
+        /**
+         * Read a EMBL file using a custom type of SymbolList. For example,
+         * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
+         * SymbolTokenization) and RichSequenceBuilderFactory.PACKED to force all
+         * symbols to be encoded using bit-packing.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param sTok a <code>SymbolTokenization</code> that understands the sequences
+         * @param seqFactory a factory used to build a <code>SymbolList</code>
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readEMBL(
+                BufferedReader br,
+                SymbolTokenization sTok,
+                RichSequenceBuilderFactory seqFactory,
+                Namespace ns) {
+            return new RichStreamReader(
+                    br,
+                    new EMBLFormat(),
+                    sTok,
+                    seqFactory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an EMBL-format stream of DNA sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readEMBLDNA(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new EMBLFormat(),
+                    getDNAParser(),
+                    factory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an EMBL-format stream of RNA sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readEMBLRNA(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new EMBLFormat(),
+                    getRNAParser(),
+                    factory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an EMBL-format stream of Protein sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readEMBLProtein(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new EMBLFormat(),
+                    getProteinParser(),
+                    factory,
+                    ns);
+        }
+        
+        
+        /**
+         * Read a UniProt file using a custom type of SymbolList. For example,
+         * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
+         * SymbolTokenization) and RichSequenceBuilderFactory.PACKED to force all
+         * symbols to be encoded using bit-packing.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param sTok a <code>SymbolTokenization</code> that understands the sequences
+         * @param seqFactory a factory used to build a <code>SymbolList</code>
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readUniProt(
+                BufferedReader br,
+                SymbolTokenization sTok,
+                RichSequenceBuilderFactory seqFactory,
+                Namespace ns) {
+            return new RichStreamReader(
+                    br,
+                    new UniProtFormat(),
+                    sTok,
+                    seqFactory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an UniProt-format stream of RNA sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readUniProt(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new UniProtFormat(),
+                    getProteinParser(),
+                    factory,
+                    ns);
+        }
+        
         
         /**
          * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
@@ -399,7 +519,7 @@ public interface RichSequence extends BioEntry,Sequence {
             writeFasta(os, new SingleRichSeqIterator(seq),ns);
         }
         
-                
+        
         /**
          * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
          * GenBank Format.  This makes for a useful format filter where a
@@ -428,6 +548,67 @@ public interface RichSequence extends BioEntry,Sequence {
         throws IOException {
             writeGenbank(os, new SingleRichSeqIterator(seq),ns);
         }
+        
+        
+        /**
+         * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
+         * EMBL Format.  This makes for a useful format filter where a
+         * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
+         * @param os The stream to write fasta formatted data to
+         * @param in The source of input Sequences
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeEMBL(OutputStream os, SequenceIterator in, Namespace ns)
+        throws IOException {
+            RichStreamWriter sw = new RichStreamWriter(os,new EMBLFormat());
+            sw.writeStream(in,ns);
+        }
+        
+        /**
+         * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in EMBL format.
+         * @param os  the <code>OutputStream</code>.
+         * @param seq  the <code>Sequence</code>.
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeEMBL(OutputStream os, Sequence seq, Namespace ns)
+        throws IOException {
+            writeEMBL(os, new SingleRichSeqIterator(seq),ns);
+        }
+        
+        
+        /**
+         * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
+         * UniProt Format.  This makes for a useful format filter where a
+         * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
+         * @param os The stream to write fasta formatted data to
+         * @param in The source of input Sequences
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeUniProt(OutputStream os, SequenceIterator in, Namespace ns)
+        throws IOException {
+            RichStreamWriter sw = new RichStreamWriter(os,new UniProtFormat());
+            sw.writeStream(in,ns);
+        }
+        
+        /**
+         * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in UniProt format.
+         * @param os  the <code>OutputStream</code>.
+         * @param seq  the <code>Sequence</code>.
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeUniProt(OutputStream os, Sequence seq, Namespace ns)
+        throws IOException {
+            writeUniProt(os, new SingleRichSeqIterator(seq),ns);
+        }
+        
         
         // creates a DNA symbol tokenizer
         private static SymbolTokenization getDNAParser() {

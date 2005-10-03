@@ -100,81 +100,33 @@ public class GenbankFormat implements RichSequenceFormat {
     protected static final String START_SEQUENCE_TAG = "ORIGIN";
     protected static final String END_SEQUENCE_TAG = "//";
     
-    private static ComparableTerm ACCESSION_TERM = null;
-    private static ComparableTerm KERYWORDS_TERM = null;
-    private static ComparableTerm MODIFICATION_TERM = null;
-    private static ComparableTerm MOLTYPE_TERM = null;
-    private static ComparableTerm STRANDED_TERM = null;
-    private static ComparableTerm GENBANK_TERM = null;
-    
     /**
-     * Getter for the accession term
-     * @return A Term that represents the accession tag
+     * Implements some EMBL-specific terms.
      */
-    public static ComparableTerm getAccessionTerm() {
-        if (ACCESSION_TERM==null) ACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("ACCESSION");
-        return ACCESSION_TERM;
-    }
-    
-    /**
-     * Getter for the keyword term
-     * @return a Term that represents the Keyword tag
-     */
-    public static ComparableTerm getKeywordsTerm() {
-        if (KERYWORDS_TERM==null) KERYWORDS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("KEYWORDS");
-        return KERYWORDS_TERM;
-    }
-    
-    /**
-     * Getter for the modification term
-     * @return a Term
-     */
-    public static ComparableTerm getModificationTerm() {
-        if (MODIFICATION_TERM==null) MODIFICATION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("MDAT");
-        return MODIFICATION_TERM;
-    }
-    
-    /**
-     * getter for the MolType term
-     * @return a Term that represents the molecule type
-     */
-    public static ComparableTerm getMolTypeTerm() {
-        if (MOLTYPE_TERM==null) MOLTYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("MOLTYPE");
-        return MOLTYPE_TERM;
-    }
-    
-    /**
-     * Getter for the Strand term
-     * @return a Term that represents the Strand tag
-     */
-    public static ComparableTerm getStrandedTerm() {
-        if (STRANDED_TERM==null) STRANDED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("STRANDED");
-        return STRANDED_TERM;
-    }
-    
-    /**
-     * Getter for the Genbank term
-     * @return The genbank Term
-     */
-    public static ComparableTerm getGenBankTerm() {
-        if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
-        return GENBANK_TERM;
+    public static class Terms extends RichSequenceFormat.Terms {
+        private static ComparableTerm GENBANK_TERM = null;
+        
+        /**
+         * Getter for the Genbank term
+         * @return The genbank Term
+         */
+        public static ComparableTerm getGenBankTerm() {
+            if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
+            return GENBANK_TERM;
+        }
     }
     
     private int lineWidth = 80;
     
     /**
-     * Retrive the current line width. Defaults to 80.
-     * @return the line width
+     * {@inheritDoc}
      */
     public int getLineWidth() {
         return lineWidth;
     }
     
     /**
-     * Set the line width. When writing, the lines of sequence will never be longer than the line
-     * width. Defaults to 80.
-     * @param width the new line width
+     * {@inheritDoc}
      */
     public void setLineWidth(int width) {
         this.lineWidth = width;
@@ -183,17 +135,14 @@ public class GenbankFormat implements RichSequenceFormat {
     private boolean elideSymbols = false;
     
     /**
-     * Is the format going to emit events when sequence data is read?
-     * @return true if it is (true is default) otherwise false.
+     * {@inheritDoc}
      */
     public boolean getElideSymbols() {
         return elideSymbols;
     }
     
     /**
-     * Use this method to toggle reading of sequence data. If you're only
-     * interested in header data set to true.
-     * @param elideSymbols set to true if you don't want the sequence data.
+     * {@inheritDoc}
      */
     public void setElideSymbols(boolean elideSymbols) {
         this.elideSymbols = elideSymbols;
@@ -249,12 +198,12 @@ public class GenbankFormat implements RichSequenceFormat {
                 if (m.matches()) {
                     rlistener.setName(m.group(1));
                     rlistener.setDivision(m.group(5));
-                    rlistener.addSequenceProperty(getMolTypeTerm(),m.group(3));
-                    rlistener.addSequenceProperty(getModificationTerm(),m.group(6));
+                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
+                    rlistener.addSequenceProperty(Terms.getModificationTerm(),m.group(6));
                     // Optional extras
                     String stranded = m.group(2);
                     String circular = m.group(4);
-                    if (stranded!=null) rlistener.addSequenceProperty(getStrandedTerm(),stranded);
+                    if (stranded!=null) rlistener.addSequenceProperty(Terms.getStrandedTerm(),stranded);
                     if (circular!=null && circular.equals("circular")) rlistener.setCircular(true);
                 } else {
                     throw new ParseException("Bad locus line found: "+loc);
@@ -268,7 +217,7 @@ public class GenbankFormat implements RichSequenceFormat {
                 accession = accs[0].trim();
                 rlistener.setAccession(accession);
                 for (int i = 1; i < accs.length; i++) {
-                    rlistener.addSequenceProperty(getAccessionTerm(),accs[i].trim());
+                    rlistener.addSequenceProperty(Terms.getAccessionTerm(),accs[i].trim());
                 }
             } else if (sectionKey.equals(VERSION_TAG)) {
                 String ver = ((String[])section.get(0))[1];
@@ -282,7 +231,7 @@ public class GenbankFormat implements RichSequenceFormat {
                     throw new ParseException("Bad version line found: "+ver);
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
-                rlistener.addSequenceProperty(getKeywordsTerm(), ((String[])section.get(0))[1]);
+                rlistener.addSequenceProperty(Terms.getKeywordsTerm(), ((String[])section.get(0))[1]);
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // ignore - can get all this from the first feature
             } else if (sectionKey.equals(REFERENCE_TAG)) {
@@ -326,14 +275,14 @@ public class GenbankFormat implements RichSequenceFormat {
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
                 if (pubmed!=null) {
-                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{"PUBMED", pubmed});
+                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed});
                     RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
                     rlistener.setRankedCrossRef(rpcr);
                 }
                 // create the medline crossref and assign to the bioentry
                 CrossRef mcr = null;
                 if (medline!=null) {
-                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{"MEDLINE", medline});
+                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline});
                     RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
                     rlistener.setRankedCrossRef(rmcr);
                 }
@@ -418,7 +367,7 @@ public class GenbankFormat implements RichSequenceFormat {
                         // start next one, with lots of lovely info in it
                         RichFeature.Template templ = new RichFeature.Template();
                         templ.annotation = new SimpleRichAnnotation();
-                        templ.sourceTerm = getGenBankTerm();
+                        templ.sourceTerm = Terms.getGenBankTerm();
                         templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key);
                         templ.featureRelationshipSet = new TreeSet();
                         templ.rankedCrossRefs = new TreeSet();
@@ -586,10 +535,10 @@ public class GenbankFormat implements RichSequenceFormat {
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
-            if (n.getTerm().equals(getStrandedTerm())) stranded=n.getValue();
-            else if (n.getTerm().equals(getModificationTerm())) mdat=n.getValue();
-            else if (n.getTerm().equals(getMolTypeTerm())) moltype=n.getValue();
-            else if (n.getTerm().equals(getAccessionTerm())) accessions = accessions+" "+n.getValue();
+            if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
+            else if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
+            else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
+            else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue();
         }
         
         // locus(name) + length + alpha + div + date line
@@ -619,7 +568,7 @@ public class GenbankFormat implements RichSequenceFormat {
         String keywords = null;
         for (Iterator n = notes.iterator(); n.hasNext(); ) {
             Note nt = (Note)n.next();
-            if (nt.getTerm().equals(getKeywordsTerm())) {
+            if (nt.getTerm().equals(Terms.getKeywordsTerm())) {
                 if (keywords==null) keywords = nt.getValue();
                 else keywords = keywords+" "+nt.getValue();
             }
@@ -662,7 +611,7 @@ public class GenbankFormat implements RichSequenceFormat {
             this.writeWrappedLine(COMMENT_TAG, 12, sb.toString(), os);
         }
         
-        os.println("FEATURES             Location/Qualifiers");
+        os.println(FEATURE_TAG+"             Location/Qualifiers");
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
@@ -716,7 +665,7 @@ public class GenbankFormat implements RichSequenceFormat {
                         oCount++;
                 }
             }
-            os.print("BASE COUNT    ");
+            os.print(BASE_COUNT_TAG+"    ");
             os.print(aCount + " a   ");
             os.print(cCount + " c   ");
             os.print(gCount + " g   ");

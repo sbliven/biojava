@@ -31,16 +31,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.biojava.bio.proteomics.MassCalc;
 
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolPropertyTable;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Comment;
 import org.biojavax.CrossRef;
@@ -59,35 +60,38 @@ import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.db.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
-import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.SimplePosition;
+import org.biojavax.bio.seq.SimpleRichLocation;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
+import org.biojavax.utils.CRC64Checksum;
 import org.biojavax.utils.StringTools;
 
 /**
- * Format reader for EMBL files. This version of EMBL format will generate
+ * Format reader for UniProt files. This version of UniProt format will generate
  * and write RichSequence objects. Loosely Based on code from the old, deprecated,
- * org.biojava.bio.seq.io.EmblLikeFormat object.
+ * org.biojava.bio.seq.io.EMBLLikeFormat object.
  *
  * @author Richard Holland
  */
-public class EMBLFormat implements RichSequenceFormat {
+public class UniProtFormat implements RichSequenceFormat {
     
     /**
      * The name of this format
      */
-    public static final String EMBL_FORMAT = "EMBL";
+    public static final String UniProt_FORMAT = "UniProt";
     
     protected static final String LOCUS_TAG = "ID";
     protected static final String ACCESSION_TAG = "AC";
-    protected static final String VERSION_TAG = "SV";
     protected static final String DEFINITION_TAG = "DE";
     protected static final String DATE_TAG = "DT";
-    protected static final String DATABASE_XREF_TAG = "DR";
     protected static final String SOURCE_TAG = "OS";
     protected static final String ORGANISM_TAG = "OC";
+    protected static final String TAXON_TAG = "OX";
+    protected static final String GENE_TAG = "GN";
+    protected static final String DATABASE_XREF_TAG = "DR";
     protected static final String REFERENCE_TAG = "RN";
     protected static final String REFERENCE_POSITION_TAG = "RP";
     protected static final String REFERENCE_XREF_TAG = "RX";
@@ -97,27 +101,63 @@ public class EMBLFormat implements RichSequenceFormat {
     protected static final String REMARK_TAG = "RC";
     protected static final String KEYWORDS_TAG = "KW";
     protected static final String COMMENT_TAG = "CC";
-    protected static final String FEATURE_HEADER_TAG = "FH";
     protected static final String FEATURE_TAG = "FT";
-    protected static final String CONTIG_TAG = "CO";
-    protected static final String TPA_TAG = "AH";
     protected static final String START_SEQUENCE_TAG = "SQ";
-    protected static final String DELIMITER_TAG = "XX";
     protected static final String END_SEQUENCE_TAG = "//";
     
     /**
-     * Implements some EMBL-specific terms.
+     * Implements some UniProt-specific terms.
      */
     public static class Terms extends RichSequenceFormat.Terms {
-        private static ComparableTerm EMBL_TERM = null;
+        private static ComparableTerm UNIPROT_TERM = null;
+        private static ComparableTerm DATACLASS_TERM = null;
+        private static ComparableTerm GENENAME_TERM = null;
+        private static ComparableTerm FTID_TERM = null;
+        private static ComparableTerm FEATUREDESC_TERM = null;
         
         /**
-         * Getter for the EMBL term
-         * @return The EMBL Term
+         * Getter for the UniProt term
+         * @return The UniProt Term
          */
-        public static ComparableTerm getEMBLTerm() {
-            if (EMBL_TERM==null) EMBL_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBL");
-            return EMBL_TERM;
+        public static ComparableTerm getUniProtTerm() {
+            if (UNIPROT_TERM==null) UNIPROT_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UNIPROT");
+            return UNIPROT_TERM;
+        }
+        
+        /**
+         * Getter for the DataClass term
+         * @return The DataClass Term
+         */
+        public static ComparableTerm getDataClassTerm() {
+            if (DATACLASS_TERM==null) DATACLASS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("DATACLASS");
+            return DATACLASS_TERM;
+        }
+        
+        /**
+         * Getter for the GeneName term
+         * @return The GeneName Term
+         */
+        public static ComparableTerm getGeneNameTerm() {
+            if (GENENAME_TERM==null) GENENAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GENENAME");
+            return GENENAME_TERM;
+        }
+        
+        /**
+         * Getter for the FTId term
+         * @return The FTId Term
+         */
+        public static ComparableTerm getFTIdTerm() {
+            if (FTID_TERM==null) FTID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("FTID");
+            return FTID_TERM;
+        }
+        
+        /**
+         * Getter for the FeatureDesc term
+         * @return The FeatureDesc Term
+         */
+        public static ComparableTerm getFeatureDescTerm() {
+            if (FEATUREDESC_TERM==null) FEATUREDESC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("FEATUREDESC");
+            return FEATUREDESC_TERM;
         }
     }
     
@@ -187,6 +227,7 @@ public class EMBLFormat implements RichSequenceFormat {
         NCBITaxon tax = null;
         String organism = null;
         String accession = null;
+        int xrefCount = 0;
         do {
             List section = this.readSection(reader);
             sectionKey = ((String[])section.get(0))[0];
@@ -196,25 +237,47 @@ public class EMBLFormat implements RichSequenceFormat {
             }
             // process section-by-section
             if (sectionKey.equals(LOCUS_TAG)) {
-                // entryname  dataclass; [circular] molecule; division; sequencelength BP.
+                // entryname  dataclass; moltype; sequencelength AA.
                 String loc = ((String[])section.get(0))[1];
-                String regex = "^(\\S+)\\s+standard;\\s+(circular)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$";
+                String regex = "^(\\S+)\\s+(\\S+);\\s+(\\S+);\\s+\\d+\\s+AA\\.$";
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(loc);
                 if (m.matches()) {
                     rlistener.setName(m.group(1));
+                    rlistener.addSequenceProperty(Terms.getDataClassTerm(),m.group(2));
                     rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
-                    rlistener.setDivision(m.group(4));
-                    // Optional extras
-                    String circular = m.group(2);
-                    if (circular!=null) rlistener.setCircular(true);
                 } else {
                     throw new ParseException("Bad ID line found: "+loc);
                 }
             } else if (sectionKey.equals(DEFINITION_TAG)) {
                 rlistener.setDescription(((String[])section.get(0))[1]);
             } else if (sectionKey.equals(SOURCE_TAG)) {
-                // IGNORE - can get from first feature in feature table
+                // use SOURCE_TAG and TAXON_TAG values
+                String name = null;
+                int taxid = 0;
+                for (int i = 0; i < section.size(); i++) {
+                    String tag = ((String[])section.get(i))[0];
+                    String value = ((String[])section.get(i))[1].trim();
+                    if (tag.equals(SOURCE_TAG)) name = value;
+                    else if (tag.equals(TAXON_TAG)) {
+                        String[] parts = value.split(";");
+                        for (int j = 0; j < parts.length; j++) {
+                            String[] bits = parts[j].split("=");
+                            if (bits[0].equals("NCBI_TaxID")) {
+                                String[] morebits = bits[1].split(",");
+                                taxid = Integer.parseInt(morebits[0].trim());
+                            }
+                        }
+                    }
+                }
+                // Set the Taxon
+                tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(taxid)});
+                rlistener.setTaxon(tax);
+                try {
+                    if (name!=null) tax.addName(NCBITaxon.SCIENTIFIC,name);
+                } catch (ChangeVetoException e) {
+                    throw new ParseException(e);
+                }
             } else if (sectionKey.equals(DATE_TAG)) {
                 String date = ((String[])section.get(0))[1].trim().substring(0,11);
                 rlistener.addSequenceProperty(Terms.getModificationTerm(), date);
@@ -227,49 +290,41 @@ public class EMBLFormat implements RichSequenceFormat {
                 for (int i = 1; i < accs.length; i++) {
                     rlistener.addSequenceProperty(Terms.getAccessionTerm(),accs[i].trim());
                 }
-            } else if (sectionKey.equals(VERSION_TAG)) {
-                String ver = ((String[])section.get(0))[1];
-                String regex = "^(\\S+?)\\.(\\d+)$";
-                Pattern p = Pattern.compile(regex);
-                Matcher m = p.matcher(ver);
-                if (m.matches()) {
-                    rlistener.setVersion(Integer.parseInt(m.group(2)));
-                } else {
-                    throw new ParseException("Bad version line found: "+ver);
-                }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String[] kws = ((String[])section.get(0))[1].split(";");
-                for (int i = 1; i < kws.length; i++) {
+                for (int i = 0; i < kws.length; i++) {
                     rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kws[i].trim());
                 }
-            } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
-                // database_identifier; primary_identifier; secondary_identifier.
-                String[] refs = ((String[])section.get(0))[1].split("\\.");
-                for (int i = 0 ; i < refs.length; i++) {
-                    if (refs[i].trim().length()==0) continue;
-                    String[] parts = refs[i].split(";");
-                    // construct a DBXREF out of the dbname part[0] and accession part[1]
-                    CrossRef crossRef = new SimpleCrossRef(parts[0].trim(),parts[1].trim(),0);
-                    // assign remaining bits of info as annotations
-                    for (int j = 2; j < parts.length; j++) {
-                        Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);
-                        try {
-                            ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
-                        } catch (ChangeVetoException ce) {
-                            ParseException pe = new ParseException("Could not annotate identifier terms");
-                            pe.initCause(ce);
-                            throw pe;
-                        }
-                    }
-                    RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, i+1);
-                    rlistener.setRankedCrossRef(rcrossRef);
+            } else if (sectionKey.equals(GENE_TAG)) {
+                String[] gs = ((String[])section.get(0))[1].split("\\s+and\\s+");
+                for (int i = 0; i < gs.length; i++) {
+                    rlistener.addSequenceProperty(Terms.getGeneNameTerm(), gs[i].trim());
                 }
+            } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
+                // database_identifier; primary_identifier; secondary_identifier....
+                String[] parts = ((String[])section.get(0))[1].split(";");
+                String finalPart = parts[parts.length-1];
+                finalPart = finalPart.substring(0,finalPart.length()-1); // chomp trailing dot
+                parts[parts.length-1]=finalPart;
+                // construct a DBXREF out of the dbname part[0] and accession part[1]
+                CrossRef crossRef = new SimpleCrossRef(parts[0].trim(),parts[1].trim(),0);
+                // assign remaining bits of info as annotations
+                for (int j = 2; j < parts.length; j++) {
+                    Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);
+                    try {
+                        ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
+                    } catch (ChangeVetoException ce) {
+                        ParseException pe = new ParseException("Could not annotate identifier terms");
+                        pe.initCause(ce);
+                        throw pe;
+                    }
+                }
+                RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, ++xrefCount);
+                rlistener.setRankedCrossRef(rcrossRef);
             } else if (sectionKey.equals(REFERENCE_TAG)) {
                 // first line of section has rank and location
                 String refrank = ((String[])section.get(0))[1];
                 int ref_rank = Integer.parseInt(refrank.substring(1,refrank.length()-1));
-                int ref_start = -999;
-                int ref_end = -999;
                 // rest can be in any order
                 String authors = null;
                 String title = null;
@@ -285,11 +340,11 @@ public class EMBLFormat implements RichSequenceFormat {
                     if (key.equals(TITLE_TAG)) title = val;
                     if (key.equals(JOURNAL_TAG)) journal = val;
                     if (key.equals(REFERENCE_XREF_TAG)) {
-                        // database_identifier; primary_identifier.
-                        String[] refs = val.split("\\.");
+                        // database_identifier=primary_identifier;
+                        String[] refs = val.split(";");
                         for (int j = 0 ; j < refs.length; j++) {
                             if (refs[j].trim().length()==0) continue;
-                            String[] parts = refs[j].split(";");
+                            String[] parts = refs[j].split("=");
                             String db = parts[0].toUpperCase();
                             String ref = parts[1];
                             if (db.equals("PUBMED")) pubmed = ref;
@@ -297,21 +352,8 @@ public class EMBLFormat implements RichSequenceFormat {
                             else if (db.equals("DOI")) doi = ref;
                         }
                     }
-                    if (key.equals(REMARK_TAG)) remark = val;
-                    if (key.equals(REFERENCE_POSITION_TAG)) {
-                        // only the first group is taken
-                        // if we have multiple lines, only the last line is taken
-                        String regex = "^(\\d+)(-(\\d+))?$";
-                        Pattern p = Pattern.compile(regex);
-                        Matcher m = p.matcher(val);
-                        if (m.matches()) {
-                            ref_start = Integer.parseInt(m.group(1));
-                            if(m.group(2) != null)
-                                ref_end = Integer.parseInt(m.group(3));
-                        } else {
-                            throw new ParseException("Bad reference line found: "+val);
-                        }
-                    }
+                    // NO RC TAG - BIOSQL CANNOT HANDLE
+                    if (key.equals(REFERENCE_POSITION_TAG)) remark = val;
                 }
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
@@ -345,10 +387,7 @@ public class EMBLFormat implements RichSequenceFormat {
                     // assign the remarks
                     dr.setRemark(remark);
                     // assign the docref to the bioentry
-                    RankedDocRef rdr = new SimpleRankedDocRef(dr,
-                            (ref_start != -999 ? new Integer(ref_start) : null),
-                            (ref_end != -999 ? new Integer(ref_end) : null),
-                            ref_rank);
+                    RankedDocRef rdr = new SimpleRankedDocRef(dr,null,null,ref_rank);
                     rlistener.setRankedDocRef(rdr);
                 } catch (ChangeVetoException e) {
                     throw new ParseException(e);
@@ -360,53 +399,18 @@ public class EMBLFormat implements RichSequenceFormat {
                 // starting from second line of input, start a new feature whenever we come across
                 // a key that does not start with /
                 boolean seenAFeature = false;
+                Pattern p = Pattern.compile("\\s*(\\d+)\\s+(\\d+)(\\s+(\\S.*))?");
                 for (int i = 1 ; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
                         val = val.replaceAll("\"","").trim(); // strip quotes
-                        // parameter on old feature
-                        if (key.equals("db_xref")) {
-                            String regex = "^(\\S+?):(\\S+)$";
-                            Pattern p = Pattern.compile(regex);
-                            Matcher m = p.matcher(val);
-                            if (m.matches()) {
-                                String dbname = m.group(1);
-                                String raccession = m.group(2);
-                                if (dbname.equals("taxon")) {
-                                    // Set the Taxon instead of a dbxref
-                                    tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
-                                    rlistener.setTaxon(tax);
-                                    try {
-                                        if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
-                                    } catch (ChangeVetoException e) {
-                                        throw new ParseException(e);
-                                    }
-                                } else {
-                                    try {
-                                        CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession});
-                                        RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
-                                        rlistener.getCurrentFeature().addRankedCrossRef(rcr);
-                                    } catch (ChangeVetoException e) {
-                                        throw new ParseException(e);
-                                    }
-                                }
-                            } else {
-                                throw new ParseException("Bad dbxref found: "+val);
-                            }
-                        } else if (key.equals("organism")) {
-                            try {
-                                organism = val;
-                                if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
-                            } catch (ChangeVetoException e) {
-                                throw new ParseException(e);
-                            }
+                        if (key.equals("FTId")) {
+                            // add all except trailing dot
+                            rlistener.addFeatureProperty(Terms.getFTIdTerm(),val.substring(0,val.length()-1));
                         } else {
-                            if (key.equals("translation")) {
-                                // strip spaces from sequence
-                                val = val.replaceAll("\\s+","");
-                            }
+                            // add the whole lot - should never happen anyway
                             rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
                         }
                     } else {
@@ -416,13 +420,25 @@ public class EMBLFormat implements RichSequenceFormat {
                         // start next one, with lots of lovely info in it
                         RichFeature.Template templ = new RichFeature.Template();
                         templ.annotation = new SimpleRichAnnotation();
-                        templ.sourceTerm = Terms.getEMBLTerm();
+                        templ.sourceTerm = Terms.getUniProtTerm();
                         templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key);
                         templ.featureRelationshipSet = new TreeSet();
                         templ.rankedCrossRefs = new TreeSet();
-                        String tidyLocStr = val.replaceAll("\\s+","");
-                        templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
+                        String desc = null;
+                        Matcher m = p.matcher(val);
+                        if (m.matches()) {
+                            String start = m.group(1);
+                            String end = m.group(2);
+                            desc = m.group(4);
+                            templ.location = new SimpleRichLocation(
+                                    new SimplePosition(false,false,Integer.parseInt(start)),
+                                    new SimplePosition(false,false,Integer.parseInt(end)),
+                                    1);
+                        } else {
+                            throw new ParseException("Bad feature value: "+val);
+                        }
                         rlistener.startFeature(templ);
+                        if (desc!=null) rlistener.addFeatureProperty(Terms.getFeatureDescTerm(),desc);
                         seenAFeature = true;
                     }
                 }
@@ -466,7 +482,7 @@ public class EMBLFormat implements RichSequenceFormat {
         return hasAnotherSequence;
     }
     
-    // reads an indented section, combining split lines and creating a list of key->value tuples
+// reads an indented section, combining split lines and creating a list of key->value tuples
     private List readSection(BufferedReader br) throws ParseException {
         List section = new ArrayList();
         String line;
@@ -496,47 +512,74 @@ public class EMBLFormat implements RichSequenceFormat {
                             done = true;
                         } else {
                             //      create sequence tag->value pair to return, sans numbers
-                            sb.append(line.replaceAll("\\d",""));
+                            sb.append(line);
                         }
                     }
                     section.add(new String[]{START_SEQUENCE_TAG,sb.toString()});
                 }
-                // READ FEATURE TABLE SECTION
-                else if (token.equals(FEATURE_HEADER_TAG)) {
-                    //      create dummy feature tag->value pair and add to return set
-                    section.add(new String[]{FEATURE_TAG,null});
-                    //      drop next FH line
-                    line = br.readLine(); // skip next line too - it is also FH
-                    //      read all FT lines until XX
-                    String currentTag = null;
-                    StringBuffer currentVal = null;
+                // READ COMMENT SECTION
+                else if (token.equals(COMMENT_TAG)) {
+                    // read from first line till next that begins with "CC   -!-"
+                    StringBuffer currentVal = new StringBuffer();
+                    boolean wasMisc = false;
+                    if (line.substring(0,8).equals(COMMENT_TAG+"   -!-")) currentVal.append(line.substring(9));
+                    else {
+                        wasMisc = true;
+                        currentVal.append(line.substring(5));
+                    }
                     while (!done) {
+                        br.mark(160);
                         line = br.readLine();
-                        if (line.substring(0,2).equals(DELIMITER_TAG)) {
+                        if (((!wasMisc) && line.charAt(5)!=' ') || line.charAt(0)!='C' || line.substring(0,8).equals(COMMENT_TAG+"   -!-")) {
+                            br.reset();
+                            done = true;
+                            // dump current tag if exists
+                            section.add(new String[]{COMMENT_TAG,currentVal.toString()});
+                        } else {
+                            currentVal.append("\n");
+                            currentVal.append(line.substring(5));
+                        }
+                    }
+                }
+                // READ FEATURE TABLE SECTION
+                else if (token.equals(FEATURE_TAG)) {
+                    br.reset();
+                    //      read all FT lines until first non-FT starting line
+                    String currentTag = null;
+                    StringBuffer currentVal = new StringBuffer();
+                    section.add(new String[]{FEATURE_TAG,null});
+                    while (!done) {
+                        br.mark(160);
+                        line = br.readLine();
+                        if (!line.substring(0,2).equals(FEATURE_TAG)) {
+                            br.reset();
                             done = true;
                             // dump current tag if exists
                             if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                         } else {
-                            //         FT lines:   FT   word            value
-                            //         or          FT                   /word
-                            //         or          FT                   /db_xref="taxon:3899....
-                            //                                          ......"
+                            //         FT lines:   FT   KEY_NAME     x      x        description
+                            //         or:         FT                                ....
+                            //         or          FT                                /FTId=899.
                             line = line.substring(5); // chomp off "FT   "
                             if (line.charAt(0)!=' ') {
-                                // case 1 : word value - splits into key-value on its own
-                                section.add(line.split("\\s+"));
+                                // dump current tag if exists
+                                if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
+                                // case 1 : word value - splits into key-value based on first 8 chars
+                                currentTag = line.substring(0,8).trim();
+                                currentVal = new StringBuffer();
+                                currentVal.append(line.substring(8));
                             } else {
                                 line = line.trim();
                                 if (line.charAt(0)=='/') {
                                     // dump current tag if exists
                                     if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
-                                    // case 2 : /word[=.....]
+                                    // case 3 : /word=.....
                                     String[] parts = line.split("=");
-                                    currentTag = parts[0];
+                                    currentTag = parts[0].trim();
                                     currentVal = new StringBuffer();
                                     currentVal.append(parts[1]);
                                 } else {
-                                    // case 3 : ...."
+                                    // case 2 : ...."
                                     currentVal.append("\n");
                                     currentVal.append(line);
                                 }
@@ -544,36 +587,33 @@ public class EMBLFormat implements RichSequenceFormat {
                         }
                     }
                 }
+                // READ DOCREF
+                else if (token.equals(DATABASE_XREF_TAG)) {
+                    section.add(new String[]{DATABASE_XREF_TAG,line.substring(5).trim()});
+                    done = true;
+                }
                 // READ END OF SEQUENCE
                 else if (token.equals(END_SEQUENCE_TAG)) {
                     section.add(new String[]{END_SEQUENCE_TAG,null});
                     done = true;
                 }
-                // READ DELIMITER TAG
-                else if (token.equals(DELIMITER_TAG)) {
-                    section.add(new String[]{DELIMITER_TAG,null});
-                    done = true;
-                }
-                // READ THIRD PARTY ANNOTATION SECTION
-                else if (token.equals(TPA_TAG)) {
-                    //      exception = don't know how to do TPA yet
-                    throw new ParseException("Unable to handle TPAs just yet");
-                }
-                // READ CONTIG SECTION
-                else if (token.equals(CONTIG_TAG)) {
-                    //      exception = don't know how to do contigs yet
-                    throw new ParseException("Unable to handle contig assemblies just yet");
-                }
                 // READ NORMAL TAG/VALUE SECTION
                 else {
                     //      rewind buffer to mark
                     br.reset();
-                    //      read token/values until XX
+                    //      read token/values until first with non-same first character
+                    //      exceptions: DE/DT, and RN...RN
                     String currentTag = null;
+                    char currentTagStart = '\0';
                     StringBuffer currentVal = null;
                     while (!done) {
+                        br.mark(160);
                         line = br.readLine();
-                        if (line.substring(0,2).equals(DELIMITER_TAG)) {
+                        if (currentTagStart=='\0') currentTagStart = line.charAt(0);
+                        if (line.charAt(0)!=currentTagStart ||
+                                (currentTagStart=='D' && currentTag!=null && !currentTag.equals(line.substring(0,2))) ||
+                                (currentTagStart=='R' && currentTag!=null && "RN".equals(line.substring(0,2)))) {
+                            br.reset();
                             done = true;
                             // dump current tag if exists
                             if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
@@ -619,7 +659,7 @@ public class EMBLFormat implements RichSequenceFormat {
     
     /**
      * {@inheritDoc}
-     * Namespace is ignored as EMBL has no concept of it.
+     * Namespace is ignored as UniProt has no concept of it.
      */
     public void	writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
         this.writeSequence(seq, getDefaultFormat(), os, ns);
@@ -627,12 +667,12 @@ public class EMBLFormat implements RichSequenceFormat {
     
     /**
      * {@inheritDoc}
-     * Namespace is ignored as EMBL has no concept of it.
+     * Namespace is ignored as UniProt has no concept of it.
      */
     public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
-        // EMBL only really - others are treated identically for now
+        // UniProt only really - others are treated identically for now
         if (!(
-                format.equalsIgnoreCase(EMBL_FORMAT)
+                format.equalsIgnoreCase(UniProt_FORMAT)
                 ))
             throw new IllegalArgumentException("Unknown format: "+format);
         
@@ -656,59 +696,43 @@ public class EMBLFormat implements RichSequenceFormat {
         Set notes = rs.getNoteSet();
         String accession = rs.getAccession();
         String accessions = accession+";";
+        String genenames = "";
         String mdat = "";
-        String moltype = rs.getAlphabet().getName();
+        String dataclass = "STANDARD";
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
-            else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
+            else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
+            else if (n.getTerm().equals(Terms.getGeneNameTerm())) {
+                if ("".equals(genenames)) genenames = n.getValue();
+                else genenames = genenames+"\nand\n"+n.getValue();
+            }
         }
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
         StringBuffer locusLine = new StringBuffer();
-        locusLine.append(StringTools.rightPad(rs.getName(),9));
-        locusLine.append(" standard; ");
-        locusLine.append(rs.getCircular()?"circular ":"");
-        locusLine.append(moltype);
-        locusLine.append("; ");
-        locusLine.append(rs.getDivision()==null?"":rs.getDivision());
-        locusLine.append("; ");
-        locusLine.append(rs.length());
-        locusLine.append(" BP.");
+        locusLine.append(StringTools.rightPad(rs.getName(),11));
+        locusLine.append(" ");
+        locusLine.append(StringTools.leftPad(dataclass,12));
+        locusLine.append(";      PRT; ");
+        locusLine.append(StringTools.leftPad(""+rs.length(),5));
+        locusLine.append(" AA.");
         this.writeWrappedLine(LOCUS_TAG, 5, locusLine.toString(), os);
-        os.println(DELIMITER_TAG+"   ");
         
         // accession line
         this.writeWrappedLine(ACCESSION_TAG, 5, accessions, os);
-        os.println(DELIMITER_TAG+"   ");
-        
-        // version line
-        this.writeWrappedLine(VERSION_TAG, 5, accession+"."+rs.getVersion(), os);
-        os.println(DELIMITER_TAG+"   ");
         
         // date line
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Created)", os);
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", os);
-        os.println(DELIMITER_TAG+"   ");
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Created)", os);
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last sequence update)",os);
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last annotation update)",os);
         
         // definition line
         this.writeWrappedLine(DEFINITION_TAG, 5, rs.getDescription(), os);
-        os.println(DELIMITER_TAG+"   ");
         
-        // keywords line
-        String keywords = null;
-        for (Iterator n = notes.iterator(); n.hasNext(); ) {
-            Note nt = (Note)n.next();
-            if (nt.getTerm().equals(Terms.getKeywordsTerm())) {
-                if (keywords==null) keywords = nt.getValue();
-                else keywords = keywords+"; "+nt.getValue();
-            }
-        }
-        if (keywords!=null) {
-            this.writeWrappedLine(KEYWORDS_TAG, 5, keywords, os);
-            os.println(DELIMITER_TAG+"   ");
-        }
+        // gene line
+        this.writeWrappedLine(GENE_TAG, 5, genenames, os);
         
         // source line (from taxon)
         //   organism line
@@ -719,23 +743,32 @@ public class EMBLFormat implements RichSequenceFormat {
                 this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0], os);
                 this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0], os);
             }
+            this.writeWrappedLine(TAXON_TAG, 5, "NCBI_TaxID="+tax.getNCBITaxID()+";", os);
         }
-        os.println(DELIMITER_TAG+"   ");
         
         // references - rank (bases x to y)
         for (Iterator r = rs.getRankedDocRefs().iterator(); r.hasNext(); ) {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
-            // RN, RC, RP, RX, RG, RA, RT, RL
+            // RN, RP, RC, RX, RG, RA, RT, RL
             this.writeWrappedLine(REFERENCE_TAG, 5, "["+rdr.getRank()+"]", os);
-            if (d.getRemark()!=null) this.writeWrappedLine(REMARK_TAG, 5, d.getRemark(), os);
-            this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, rdr.getStart()+"-"+rdr.getEnd(), os);
+            // NO RC TAG - CANNOT FORCE INTO BIOSQL!
+            if (d.getRemark()!=null) this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, d.getRemark(), os);
             CrossRef c = d.getCrossref();
-            if (c!=null) this.writeWrappedLine(REFERENCE_XREF_TAG, 5, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", os);
+            if (c!=null) this.writeWrappedLine(REFERENCE_XREF_TAG, 5, c.getDbname().toUpperCase()+"="+c.getAccession()+";", os);
             if (d.getAuthors()!=null) this.writeWrappedLine(AUTHORS_TAG, 5, d.getAuthors(), os);
             this.writeWrappedLine(TITLE_TAG, 5, d.getTitle(), os);
             this.writeWrappedLine(JOURNAL_TAG, 5, d.getLocation(), os);
-            os.println(DELIMITER_TAG+"   ");
+        }
+        
+        // comments - if any
+        Pattern cp = Pattern.compile("^\\S+:.*");
+        if (!rs.getComments().isEmpty()) {
+            for (Iterator i = rs.getComments().iterator(); i.hasNext(); ) {
+                Comment c = (SimpleComment)i.next();
+                if (cp.matcher(c.getComment()).matches()) this.writeWrappedCommentLine(COMMENT_TAG, 5, "-!-", 4, c.getComment(), os);
+                else this.writeWrappedCommentLine(COMMENT_TAG, 5, "-!-", 4, "MISCELLANEOUS: "+c.getComment(), os);
+            }
         }
         
         // db references - ranked
@@ -760,96 +793,62 @@ public class EMBLFormat implements RichSequenceFormat {
             sb.append(".");
             this.writeWrappedLine(DATABASE_XREF_TAG, 5, sb.toString(), os);
         }
-        os.println(DELIMITER_TAG+"   ");
         
-        // comments - if any
-        if (!rs.getComments().isEmpty()) {
-            StringBuffer sb = new StringBuffer();
-            for (Iterator i = rs.getComments().iterator(); i.hasNext(); ) {
-                Comment c = (SimpleComment)i.next();
-                sb.append(c.getComment());
-                if (i.hasNext()) sb.append("\n");
+        // keywords line
+        String keywords = null;
+        for (Iterator n = notes.iterator(); n.hasNext(); ) {
+            Note nt = (Note)n.next();
+            if (nt.getTerm().equals(Terms.getKeywordsTerm())) {
+                if (keywords==null) keywords = nt.getValue();
+                else keywords = keywords+"; "+nt.getValue();
             }
-            this.writeWrappedLine(COMMENT_TAG, 5, sb.toString(), os);
-            os.println(DELIMITER_TAG+"   ");
+        }
+        if (keywords!=null) {
+            this.writeWrappedLine(KEYWORDS_TAG, 5, keywords, os);
         }
         
-        os.println(FEATURE_HEADER_TAG+"   Key             Location/Qualifiers");
-        os.println(FEATURE_HEADER_TAG+"   ");
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
-            this.writeWrappedLocationLine(FEATURE_TAG, 5, f.getTypeTerm().getName(), 16, GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), os);
+            String desc = " ";
+            String ftid = null;
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
-                // /key="val" or just /key if val==""
-                if (n.getValue()==null || n.getValue().equals("")) this.writeWrappedLine("FT",21,"/"+n.getTerm(),os);
-                else this.writeWrappedLine(FEATURE_TAG,21,"/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", os);
+                if (n.getTerm().equals(Terms.getFTIdTerm())) ftid = n.getValue();
+                else if (n.getTerm().equals(Terms.getFeatureDescTerm())) desc = n.getValue();
             }
-            // add-in to source feature only db_xref="taxon:xyz" where present
-            if (f.getType().equals("source") && tax!=null) {
-                this.writeWrappedLine(FEATURE_TAG,21,"/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", os);
-            }
-            // add-in other dbxrefs where present
-            for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
-                RankedCrossRef rcr = (RankedCrossRef)j.next();
-                CrossRef cr = rcr.getCrossRef();
-                this.writeWrappedLine(FEATURE_TAG,21,"/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", os);
-            }
+            int start = f.getLocation().getMin();
+            int end = f.getLocation().getMax();
+            String kw = f.getTypeTerm().getName();
+            String leader = kw+" "+StringTools.leftPad(""+start,5)+" "+StringTools.leftPad(""+end,5);
+            this.writeWrappedLocationLine(FEATURE_TAG, 5, leader, 24, desc, os);
+            if (ftid!=null) this.writeWrappedLine(FEATURE_TAG,29,"/FTId="+ftid+".", os);
         }
-        os.println(DELIMITER_TAG+"   ");
         
-        // SQ   Sequence 1859 BP; 609 A; 314 C; 355 G; 581 T; 0 other;
-        int aCount = 0;
-        int cCount = 0;
-        int gCount = 0;
-        int tCount = 0;
-        int oCount = 0;
-        for (int i = 1; i <= rs.length(); i++) {
-            char c;
-            try {
-                c = tok.tokenizeSymbol(rs.symbolAt(i)).charAt(0);
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to get symbol at position "+i,e);
-            }
-            switch (c) {
-                case 'a': case 'A':
-                    aCount++;
-                    break;
-                case 'c': case 'C':
-                    cCount++;
-                    break;
-                case 'g': case 'G':
-                    gCount++;
-                    break;
-                case 't': case 'T':
-                    tCount++;
-                    break;
-                default:
-                    oCount++;
-            }
+        // sequence header
+        int mw = 0;
+        try {
+            mw = (int)MassCalc.getMass(rs, SymbolPropertyTable.AVG_MASS, false);
+        } catch (IllegalSymbolException e) {
+            throw new RuntimeException("Found illegal symbol", e);
         }
-        os.print(START_SEQUENCE_TAG+"   "+rs.length()+" BP; ");
-        os.print(aCount + " A; ");
-        os.print(cCount + " C; ");
-        os.print(gCount + " G; ");
-        os.print(tCount + " T; ");
-        os.println(oCount + " other;");
+        CRC64Checksum crc = new CRC64Checksum();
+        String seqstr = rs.seqString();
+        crc.update(seqstr.getBytes(),0,seqstr.length());
+        os.print(START_SEQUENCE_TAG+"   SEQUENCE "+StringTools.rightPad(""+rs.length(),4)+" AA; ");
+        os.print(StringTools.rightPad(""+mw,5)+" MW; ");
+        os.println(crc+" CRC64;");
         
         // sequence stuff
         Symbol[] syms = (Symbol[])rs.toList().toArray(new Symbol[0]);
-        int lineLen = 0;
         int symCount = 0;
         os.print("    ");
         for (int i = 0; i < syms.length; i++) {
             if (symCount % 60 == 0 && symCount>0) {
-                os.print(StringTools.leftPad(""+symCount,10));
                 os.print("\n    ");
-                lineLen = 0;
             }
             if (symCount % 10 == 0) {
                 os.print(" ");
-                lineLen++;
             }
             try {
                 os.print(tok.tokenizeSymbol(syms[i]));
@@ -857,24 +856,27 @@ public class EMBLFormat implements RichSequenceFormat {
                 throw new RuntimeException("Found illegal symbol: "+syms[i]);
             }
             symCount++;
-            lineLen++;
         }
-        os.print(StringTools.leftPad(""+symCount,(66-lineLen)+10));
         os.print("\n");
         os.println(END_SEQUENCE_TAG);
     }
     
-    // writes a line wrapped over spaces
+// writes a line wrapped over spaces
     private void writeWrappedLine(String key, int indent, String text, PrintStream os) throws IOException {
         this._writeWrappedLine(key,indent,text,os,"\\s");
     }
     
-    // writes a line wrapped over commas
-    private void writeWrappedLocationLine(String key, int initialIndent, String name, int secondIndent, String location, PrintStream os) {
-        this._writeDoubleWrappedLine(",", key, initialIndent, name, secondIndent, location, os);
+// writes a line wrapped over spaces
+    private void writeWrappedCommentLine(String key, int initialIndent, String name, int secondIndent, String comment, PrintStream os) {
+        this._writeDoubleWrappedLine("\\s", key, initialIndent, name, secondIndent, comment, os);
     }
     
-    // writes a line wrapped to a certain width and indented
+// writes a line wrapped over commas
+    private void writeWrappedLocationLine(String key, int initialIndent, String name, int secondIndent, String location, PrintStream os) {
+        this._writeDoubleWrappedLine("\\s", key, initialIndent, name, secondIndent, location, os);
+    }
+    
+// writes a line wrapped to a certain width and indented
     private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
         text = text.trim();
         StringBuffer b = new StringBuffer();
@@ -892,7 +894,7 @@ public class EMBLFormat implements RichSequenceFormat {
         }
     }
     
-    // writes a line wrapped over two separate indent sizes
+// writes a line wrapped over two separate indent sizes
     private void _writeDoubleWrappedLine(String sep, String key, int initialIndent, String name, int secondIndent, String location, PrintStream os) {
         int totalIndent = initialIndent+secondIndent;
         String[] lines = StringTools.writeWordWrap(location, sep, this.getLineWidth()-totalIndent);
@@ -907,7 +909,7 @@ public class EMBLFormat implements RichSequenceFormat {
      * {@inheritDoc}
      */
     public String getDefaultFormat() {
-        return EMBL_FORMAT;
+        return UniProt_FORMAT;
     }
 }
 
