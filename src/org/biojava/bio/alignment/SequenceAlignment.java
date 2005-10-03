@@ -114,9 +114,9 @@ public abstract class SequenceAlignment
      int currline = Math.min(60, align[0].length()), i, j, k, l; 
      // counts the absolute position within the String
      String space = "  ", kspace = "", jspace = "";
-     for (k=0; k<Integer.valueOf(Math.max(queryEnd, targetEnd)).toString().length(); k++) space  += " ";
-     for (k=Integer.valueOf(queryStart+1).toString().length();  k<=Integer.valueOf(Math.max(queryEnd, targetEnd)).toString().length(); k++) kspace += " ";
-     for (k=Integer.valueOf(targetStart+1).toString().length(); k<=Integer.valueOf(Math.max(queryEnd, targetEnd)).toString().length(); k++) jspace += " ";
+     for (k=0; k< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); k++) space  += " ";
+     for (k=new Integer(queryStart+1).toString().length();  k<= new Integer(Math.max(queryEnd, targetEnd)).toString().length(); k++) kspace += " ";
+     for (k= new Integer(targetStart+1).toString().length(); k<= new Integer(Math.max(queryEnd, targetEnd)).toString().length(); k++) jspace += " ";
    
      i = k = queryStart;
      j = l = targetStart;
@@ -132,8 +132,8 @@ public abstract class SequenceAlignment
      for (; currline+60 < path.length(); currline+=60) {
        l = Math.min(j+1, targetEnd);
        kspace = jspace = "";
-       for (int n=Integer.valueOf(k+1).toString().length()-1; n<Integer.valueOf(Math.max(queryEnd, targetEnd)).toString().length(); n++) kspace += " ";
-       for (int n=Integer.valueOf(j).toString().length()-1;   n<Integer.valueOf(Math.max(queryEnd, targetEnd)).toString().length(); n++) jspace += " ";
+       for (int n= new Integer(k+1).toString().length()-1; n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) kspace += " ";
+       for (int n= new Integer(j).toString().length()-1;   n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) jspace += " ";
        output += " \nQuery:\t" + kspace + Math.min(k+1, queryEnd) + " ";
        for (i=currline; i<currline+60; i++) {
          if ((align[0].charAt(i) != '-') && (align[0].charAt(i) != '~')) k++;
@@ -147,8 +147,8 @@ public abstract class SequenceAlignment
      align[1] += " " + targetEnd;
      if (currline+1 < path.length()) {
       kspace = jspace = "";
-      for (int n=Integer.valueOf(k).toString().length()-1; n<Integer.valueOf(Math.max(queryEnd, targetEnd)).toString().length(); n++) kspace += " ";
-      for (int n=Integer.valueOf(j).toString().length()-1; n<Integer.valueOf(Math.max(queryEnd, targetEnd)).toString().length(); n++) jspace += " ";
+      for (int n= new Integer(k).toString().length()-1; n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) kspace += " ";
+      for (int n= new Integer(j).toString().length()-1; n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) jspace += " ";
       output += " \nQuery:\t" + kspace + Math.min(k+1, queryEnd) + " " + align[0].substring(currline, align[0].length());
       output += " \n\t"  + space        + path.substring(currline, path.length());
       output += " \nTarget:\t"+ jspace + Math.min(j+1, targetEnd) + " " + align[1].substring(currline, align[1].length())+"\n";
