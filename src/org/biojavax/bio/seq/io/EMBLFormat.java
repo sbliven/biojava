@@ -227,6 +227,7 @@ public class EMBLFormat implements RichSequenceFormat {
             } else if (sectionKey.equals(DATE_TAG)) {
                 String value = ((String[])section.get(0))[1];
                 rlistener.addSequenceProperty(Terms.getDatesTerm(), value);
+                // we also store it as the modification date, for compatibility with single-date formats
                 String date = value.substring(0,11);
                 rlistener.addSequenceProperty(Terms.getModificationTerm(), date);
             } else if (sectionKey.equals(ACCESSION_TAG)) {

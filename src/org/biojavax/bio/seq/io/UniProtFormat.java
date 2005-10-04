@@ -298,7 +298,8 @@ public class UniProtFormat implements RichSequenceFormat {
                 }
             } else if (sectionKey.equals(DATE_TAG)) {
                 String value = ((String[])section.get(0))[1];
-                rlistener.addSequenceProperty(Terms.getDatesTerm(), value);
+                rlistener.addSequenceProperty(Terms.getDatesTerm(), value);    
+                // we also store it as the modification date, for compatibility with single-date formats
                 String date = value.substring(0,11);
                 rlistener.addSequenceProperty(Terms.getModificationTerm(), date);
             } else if (sectionKey.equals(ACCESSION_TAG)) {
@@ -313,7 +314,10 @@ public class UniProtFormat implements RichSequenceFormat {
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String[] kws = ((String[])section.get(0))[1].split(";");
                 for (int i = 0; i < kws.length; i++) {
-                    rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kws[i].trim());
+                    String kw = kws[i].trim();
+                    if (kw.length()==0) continue;
+                    if (i==kws.length-1) kw=kw.substring(0,kw.length()-1); // chomp trailing dot
+                    rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kw);
                 }
             } else if (sectionKey.equals(GENE_TAG)) {
                 String[] gs = ((String[])section.get(0))[1].split("(\\s+or\\s+|\\s+and\\s+|;)");
@@ -327,7 +331,7 @@ public class UniProtFormat implements RichSequenceFormat {
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
                 // database_identifier; primary_identifier; secondary_identifier....
                 String[] parts = ((String[])section.get(0))[1].split(";");
-                String finalPart = parts[parts.length-1];
+                String finalPart = parts[parts.length-1].trim();
                 finalPart = finalPart.substring(0,finalPart.length()-1); // chomp trailing dot
                 parts[parts.length-1]=finalPart;
                 // construct a DBXREF out of the dbname part[0] and accession part[1]
@@ -853,7 +857,7 @@ public class UniProtFormat implements RichSequenceFormat {
             }
         }
         if (keywords!=null) {
-            this.writeWrappedLine(KEYWORDS_TAG, 5, keywords, os);
+            this.writeWrappedLine(KEYWORDS_TAG, 5, keywords+".", os);
         }
         
         // feature_type     location
