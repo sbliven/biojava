@@ -36,7 +36,6 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
@@ -57,7 +56,7 @@ import org.biojavax.SimpleNote;
 import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
@@ -110,6 +109,7 @@ public class EMBLFormat implements RichSequenceFormat {
      */
     public static class Terms extends RichSequenceFormat.Terms {
         private static ComparableTerm EMBL_TERM = null;
+        private static ComparableTerm DATES_TERM = null;
         
         /**
          * Getter for the EMBL term
@@ -118,6 +118,15 @@ public class EMBLFormat implements RichSequenceFormat {
         public static ComparableTerm getEMBLTerm() {
             if (EMBL_TERM==null) EMBL_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBL");
             return EMBL_TERM;
+        }
+        
+        /**
+         * getter for the Dates term
+         * @return a Term that represents the misc date info from EMBL or UniProt files
+         */
+        public static ComparableTerm getDatesTerm() {
+            if (DATES_TERM==null) DATES_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBLDATE");
+            return DATES_TERM;
         }
     }
     
@@ -216,7 +225,9 @@ public class EMBLFormat implements RichSequenceFormat {
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // IGNORE - can get from first feature in feature table
             } else if (sectionKey.equals(DATE_TAG)) {
-                String date = ((String[])section.get(0))[1].trim().substring(0,11);
+                String value = ((String[])section.get(0))[1];
+                rlistener.addSequenceProperty(Terms.getDatesTerm(), value);
+                String date = value.substring(0,11);
                 rlistener.addSequenceProperty(Terms.getModificationTerm(), date);
             } else if (sectionKey.equals(ACCESSION_TAG)) {
                 // if multiple accessions, store only first as accession,
@@ -658,11 +669,13 @@ public class EMBLFormat implements RichSequenceFormat {
         String accessions = accession+";";
         String mdat = "";
         String moltype = rs.getAlphabet().getName();
+        List dates = new ArrayList();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
+            else if (n.getTerm().equals(Terms.getDatesTerm())) dates.add(n.getValue());
         }
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
@@ -688,8 +701,12 @@ public class EMBLFormat implements RichSequenceFormat {
         os.println(DELIMITER_TAG+"   ");
         
         // date line
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Created)", os);
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", os);
+        if (dates.size()>0) {
+            for (Iterator i = dates.iterator(); i.hasNext(); ) this.writeWrappedLine(DATE_TAG, 5, (String)i.next(), os);
+        } else {
+            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Created)", os);
+            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", os);
+        }
         os.println(DELIMITER_TAG+"   ");
         
         // definition line
@@ -715,12 +732,17 @@ public class EMBLFormat implements RichSequenceFormat {
         NCBITaxon tax = rs.getTaxon();
         if (tax!=null) {
             String[] sciNames = (String[])tax.getNames(NCBITaxon.SCIENTIFIC).toArray(new String[0]);
-            if (sciNames.length>0) {
+            String[] comNames = (String[])tax.getNames(NCBITaxon.COMMON).toArray(new String[0]);
+            if (sciNames.length>0 && comNames.length>0) {
+                this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0]+" ("+comNames[0]+")", os);
+                this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0]+" ("+comNames[0]+")", os);
+                os.println(DELIMITER_TAG+"   ");
+            } else if (sciNames.length>0) {
                 this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0], os);
                 this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0], os);
+                os.println(DELIMITER_TAG+"   ");
             }
         }
-        os.println(DELIMITER_TAG+"   ");
         
         // references - rank (bases x to y)
         for (Iterator r = rs.getRankedDocRefs().iterator(); r.hasNext(); ) {
@@ -729,7 +751,11 @@ public class EMBLFormat implements RichSequenceFormat {
             // RN, RC, RP, RX, RG, RA, RT, RL
             this.writeWrappedLine(REFERENCE_TAG, 5, "["+rdr.getRank()+"]", os);
             if (d.getRemark()!=null) this.writeWrappedLine(REMARK_TAG, 5, d.getRemark(), os);
-            this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, rdr.getStart()+"-"+rdr.getEnd(), os);
+            Integer rstart = rdr.getStart();
+            if (rstart==null) rstart = new Integer(1);
+            Integer rend = rdr.getEnd();
+            if (rend==null) rend = new Integer(rs.length());
+            this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, rstart+"-"+rend, os);
             CrossRef c = d.getCrossref();
             if (c!=null) this.writeWrappedLine(REFERENCE_XREF_TAG, 5, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", os);
             if (d.getAuthors()!=null) this.writeWrappedLine(AUTHORS_TAG, 5, d.getAuthors(), os);

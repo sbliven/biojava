@@ -44,7 +44,7 @@ import org.biojavax.CrossReferenceResolver;
 import org.biojavax.Namespace;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRichAnnotation;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.ontology.ComparableTerm;
 

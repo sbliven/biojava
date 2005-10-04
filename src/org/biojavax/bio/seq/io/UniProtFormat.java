@@ -58,11 +58,10 @@ import org.biojavax.SimpleNote;
 import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
+import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
-import org.biojavax.bio.seq.SimplePosition;
-import org.biojavax.bio.seq.SimpleRichLocation;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
@@ -81,7 +80,7 @@ public class UniProtFormat implements RichSequenceFormat {
     /**
      * The name of this format
      */
-    public static final String UniProt_FORMAT = "UniProt";
+    public static final String UNIPROT_FORMAT = "UniProt";
     
     protected static final String LOCUS_TAG = "ID";
     protected static final String ACCESSION_TAG = "AC";
@@ -114,13 +113,14 @@ public class UniProtFormat implements RichSequenceFormat {
         private static ComparableTerm GENENAME_TERM = null;
         private static ComparableTerm FTID_TERM = null;
         private static ComparableTerm FEATUREDESC_TERM = null;
+        private static ComparableTerm DATES_TERM = null;
         
         /**
          * Getter for the UniProt term
          * @return The UniProt Term
          */
         public static ComparableTerm getUniProtTerm() {
-            if (UNIPROT_TERM==null) UNIPROT_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UNIPROT");
+            if (UNIPROT_TERM==null) UNIPROT_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt");
             return UNIPROT_TERM;
         }
         
@@ -129,7 +129,7 @@ public class UniProtFormat implements RichSequenceFormat {
          * @return The DataClass Term
          */
         public static ComparableTerm getDataClassTerm() {
-            if (DATACLASS_TERM==null) DATACLASS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("DATACLASS");
+            if (DATACLASS_TERM==null) DATACLASS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataclass");
             return DATACLASS_TERM;
         }
         
@@ -138,7 +138,7 @@ public class UniProtFormat implements RichSequenceFormat {
          * @return The GeneName Term
          */
         public static ComparableTerm getGeneNameTerm() {
-            if (GENENAME_TERM==null) GENENAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GENENAME");
+            if (GENENAME_TERM==null) GENENAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene");
             return GENENAME_TERM;
         }
         
@@ -147,7 +147,7 @@ public class UniProtFormat implements RichSequenceFormat {
          * @return The FTId Term
          */
         public static ComparableTerm getFTIdTerm() {
-            if (FTID_TERM==null) FTID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("FTID");
+            if (FTID_TERM==null) FTID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("FTId");
             return FTID_TERM;
         }
         
@@ -156,8 +156,17 @@ public class UniProtFormat implements RichSequenceFormat {
          * @return The FeatureDesc Term
          */
         public static ComparableTerm getFeatureDescTerm() {
-            if (FEATUREDESC_TERM==null) FEATUREDESC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("FEATUREDESC");
+            if (FEATUREDESC_TERM==null) FEATUREDESC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("description");
             return FEATUREDESC_TERM;
+        }
+        
+        /**
+         * getter for the Dates term
+         * @return a Term that represents the misc date info from EMBL or UniProt files
+         */
+        public static ComparableTerm getDatesTerm() {
+            if (DATES_TERM==null) DATES_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UNIPROTDATE");
+            return DATES_TERM;
         }
     }
     
@@ -239,13 +248,14 @@ public class UniProtFormat implements RichSequenceFormat {
             if (sectionKey.equals(LOCUS_TAG)) {
                 // entryname  dataclass; moltype; sequencelength AA.
                 String loc = ((String[])section.get(0))[1];
-                String regex = "^(\\S+)\\s+(\\S+);\\s+(\\S+);\\s+\\d+\\s+AA\\.$";
+                String regex = "^((\\S+)_(\\S+))\\s+(\\S+);\\s+(PRT);\\s+\\d+\\s+AA\\.$";
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(loc);
                 if (m.matches()) {
-                    rlistener.setName(m.group(1));
-                    rlistener.addSequenceProperty(Terms.getDataClassTerm(),m.group(2));
-                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
+                    rlistener.setName(m.group(2));
+                    rlistener.setDivision(m.group(3));
+                    rlistener.addSequenceProperty(Terms.getDataClassTerm(),m.group(4));
+                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(5));
                 } else {
                     throw new ParseException("Bad ID line found: "+loc);
                 }
@@ -253,13 +263,20 @@ public class UniProtFormat implements RichSequenceFormat {
                 rlistener.setDescription(((String[])section.get(0))[1]);
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // use SOURCE_TAG and TAXON_TAG values
-                String name = null;
+                String sciname = null;
+                String comname = null;
                 int taxid = 0;
                 for (int i = 0; i < section.size(); i++) {
                     String tag = ((String[])section.get(i))[0];
                     String value = ((String[])section.get(i))[1].trim();
-                    if (tag.equals(SOURCE_TAG)) name = value;
-                    else if (tag.equals(TAXON_TAG)) {
+                    if (tag.equals(SOURCE_TAG)) {
+                        String[] parts = value.split("\\(");
+                        sciname = parts[0].trim();
+                        if (parts.length>1) {
+                            comname = parts[1].trim();
+                            comname = comname.substring(0,comname.length()-2); // chomp trailing bracket and dot
+                        }
+                    } else if (tag.equals(TAXON_TAG)) {
                         String[] parts = value.split(";");
                         for (int j = 0; j < parts.length; j++) {
                             String[] bits = parts[j].split("=");
@@ -274,12 +291,15 @@ public class UniProtFormat implements RichSequenceFormat {
                 tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{new Integer(taxid)});
                 rlistener.setTaxon(tax);
                 try {
-                    if (name!=null) tax.addName(NCBITaxon.SCIENTIFIC,name);
+                    if (sciname!=null) tax.addName(NCBITaxon.SCIENTIFIC,sciname);
+                    if (comname!=null) tax.addName(NCBITaxon.COMMON,comname);
                 } catch (ChangeVetoException e) {
                     throw new ParseException(e);
                 }
             } else if (sectionKey.equals(DATE_TAG)) {
-                String date = ((String[])section.get(0))[1].trim().substring(0,11);
+                String value = ((String[])section.get(0))[1];
+                rlistener.addSequenceProperty(Terms.getDatesTerm(), value);
+                String date = value.substring(0,11);
                 rlistener.addSequenceProperty(Terms.getModificationTerm(), date);
             } else if (sectionKey.equals(ACCESSION_TAG)) {
                 // if multiple accessions, store only first as accession,
@@ -296,9 +316,13 @@ public class UniProtFormat implements RichSequenceFormat {
                     rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kws[i].trim());
                 }
             } else if (sectionKey.equals(GENE_TAG)) {
-                String[] gs = ((String[])section.get(0))[1].split("\\s+and\\s+");
+                String[] gs = ((String[])section.get(0))[1].split("(\\s+or\\s+|\\s+and\\s+|;)");
                 for (int i = 0; i < gs.length; i++) {
-                    rlistener.addSequenceProperty(Terms.getGeneNameTerm(), gs[i].trim());
+                    String raw = gs[i].trim();
+                    if (raw.length()==0) continue;
+                    String[] parts = raw.split("=");
+                    String[] moreparts = parts[1].split(",");
+                    for (int j = 0; j < moreparts.length; j++) rlistener.addSequenceProperty(Terms.getGeneNameTerm(), moreparts[j].trim());
                 }
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
                 // database_identifier; primary_identifier; secondary_identifier....
@@ -322,6 +346,7 @@ public class UniProtFormat implements RichSequenceFormat {
                 RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, ++xrefCount);
                 rlistener.setRankedCrossRef(rcrossRef);
             } else if (sectionKey.equals(REFERENCE_TAG)) {
+                Pattern rppat = Pattern.compile("\\(SEQUENCE OF (\\d+)-(\\d+).*\\)");
                 // first line of section has rank and location
                 String refrank = ((String[])section.get(0))[1];
                 int ref_rank = Integer.parseInt(refrank.substring(1,refrank.length()-1));
@@ -333,6 +358,8 @@ public class UniProtFormat implements RichSequenceFormat {
                 String medline = null;
                 String doi = null;
                 String remark = null;
+                Integer rstart = null;
+                Integer rend = null;
                 for (int i = 1; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
@@ -352,8 +379,16 @@ public class UniProtFormat implements RichSequenceFormat {
                             else if (db.equals("DOI")) doi = ref;
                         }
                     }
-                    // NO RC TAG - BIOSQL CANNOT HANDLE
-                    if (key.equals(REFERENCE_POSITION_TAG)) remark = val;
+                    if (key.equals(REFERENCE_POSITION_TAG)) {
+                        // NO REFERENCE_POSITION_TAG (RP) TAG - BIOSQL CANNOT HANDLE
+                        // Just use it to find the location of the reference, if we have one.
+                        Matcher m = rppat.matcher(val);
+                        if (m.matches()) {
+                            rstart = Integer.valueOf(m.group(1));
+                            rend = Integer.valueOf(m.group(2));
+                        }
+                    }
+                    if (key.equals(REMARK_TAG)) remark = val;
                 }
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
@@ -387,7 +422,7 @@ public class UniProtFormat implements RichSequenceFormat {
                     // assign the remarks
                     dr.setRemark(remark);
                     // assign the docref to the bioentry
-                    RankedDocRef rdr = new SimpleRankedDocRef(dr,null,null,ref_rank);
+                    RankedDocRef rdr = new SimpleRankedDocRef(dr,rstart,rend,ref_rank);
                     rlistener.setRankedDocRef(rdr);
                 } catch (ChangeVetoException e) {
                     throw new ParseException(e);
@@ -399,7 +434,7 @@ public class UniProtFormat implements RichSequenceFormat {
                 // starting from second line of input, start a new feature whenever we come across
                 // a key that does not start with /
                 boolean seenAFeature = false;
-                Pattern p = Pattern.compile("\\s*(\\d+)\\s+(\\d+)(\\s+(\\S.*))?");
+                Pattern p = Pattern.compile("\\s*([\\d\\?<]+)\\s+([\\d\\?>]+)(\\s+(\\S.*))?");
                 for (int i = 1 ; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
@@ -430,10 +465,7 @@ public class UniProtFormat implements RichSequenceFormat {
                             String start = m.group(1);
                             String end = m.group(2);
                             desc = m.group(4);
-                            templ.location = new SimpleRichLocation(
-                                    new SimplePosition(false,false,Integer.parseInt(start)),
-                                    new SimplePosition(false,false,Integer.parseInt(end)),
-                                    1);
+                            templ.location = UniProtLocationParser.parseLocation(start, end);
                         } else {
                             throw new ParseException("Bad feature value: "+val);
                         }
@@ -522,11 +554,8 @@ public class UniProtFormat implements RichSequenceFormat {
                     // read from first line till next that begins with "CC   -!-"
                     StringBuffer currentVal = new StringBuffer();
                     boolean wasMisc = false;
-                    if (line.substring(0,8).equals(COMMENT_TAG+"   -!-")) currentVal.append(line.substring(9));
-                    else {
-                        wasMisc = true;
-                        currentVal.append(line.substring(5));
-                    }
+                    if (!line.substring(0,8).equals(COMMENT_TAG+"   -!-")) wasMisc = true;
+                    currentVal.append(line.substring(5));
                     while (!done) {
                         br.mark(160);
                         line = br.readLine();
@@ -672,7 +701,7 @@ public class UniProtFormat implements RichSequenceFormat {
     public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
         // UniProt only really - others are treated identically for now
         if (!(
-                format.equalsIgnoreCase(UniProt_FORMAT)
+                format.equalsIgnoreCase(UNIPROT_FORMAT)
                 ))
             throw new IllegalArgumentException("Unknown format: "+format);
         
@@ -696,7 +725,8 @@ public class UniProtFormat implements RichSequenceFormat {
         Set notes = rs.getNoteSet();
         String accession = rs.getAccession();
         String accessions = accession+";";
-        String genenames = "";
+        List genenames = new ArrayList();
+        List dates = new ArrayList();
         String mdat = "";
         String dataclass = "STANDARD";
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
@@ -704,15 +734,13 @@ public class UniProtFormat implements RichSequenceFormat {
             if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
-            else if (n.getTerm().equals(Terms.getGeneNameTerm())) {
-                if ("".equals(genenames)) genenames = n.getValue();
-                else genenames = genenames+"\nand\n"+n.getValue();
-            }
+            else if (n.getTerm().equals(Terms.getGeneNameTerm())) genenames.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getDatesTerm())) dates.add(n.getValue());
         }
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
         StringBuffer locusLine = new StringBuffer();
-        locusLine.append(StringTools.rightPad(rs.getName(),11));
+        locusLine.append(StringTools.rightPad(rs.getName()+"_"+rs.getDivision(),11));
         locusLine.append(" ");
         locusLine.append(StringTools.leftPad(dataclass,12));
         locusLine.append(";      PRT; ");
@@ -724,24 +752,43 @@ public class UniProtFormat implements RichSequenceFormat {
         this.writeWrappedLine(ACCESSION_TAG, 5, accessions, os);
         
         // date line
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Created)", os);
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last sequence update)",os);
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last annotation update)",os);
+        if (dates.size()>0) {
+            for (Iterator i = dates.iterator(); i.hasNext(); ) this.writeWrappedLine(DATE_TAG, 5, (String)i.next(), os);
+        } else {
+            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Created)", os);
+            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last sequence update)",os);
+            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last annotation update)",os);
+        }
         
         // definition line
         this.writeWrappedLine(DEFINITION_TAG, 5, rs.getDescription(), os);
         
         // gene line
-        this.writeWrappedLine(GENE_TAG, 5, genenames, os);
+        String geneline = null;
+        for (int i = 0; i < genenames.size(); i++) {
+            if (i==0) {
+                geneline="Name="+genenames.get(i)+";";
+                if (genenames.size()>1) geneline+=" Synonyms=";
+            } else {
+                geneline+=genenames.get(i);
+                if (i==genenames.size()) geneline+=".";
+                else geneline+=", ";
+            }
+        }
+        if (geneline!=null) this.writeWrappedLine(GENE_TAG, 5, geneline, os);
         
         // source line (from taxon)
         //   organism line
         NCBITaxon tax = rs.getTaxon();
         if (tax!=null) {
             String[] sciNames = (String[])tax.getNames(NCBITaxon.SCIENTIFIC).toArray(new String[0]);
-            if (sciNames.length>0) {
-                this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0], os);
-                this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0], os);
+            String[] comNames = (String[])tax.getNames(NCBITaxon.COMMON).toArray(new String[0]);
+            if (sciNames.length>0 && comNames.length>0) {
+                this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0]+" ("+comNames[0]+").", os);
+                this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0]+" ("+comNames[0]+").", os);
+            } else if (sciNames.length>0) {
+                this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0]+".", os);
+                this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0]+".", os);
             }
             this.writeWrappedLine(TAXON_TAG, 5, "NCBI_TaxID="+tax.getNCBITaxID()+";", os);
         }
@@ -752,8 +799,10 @@ public class UniProtFormat implements RichSequenceFormat {
             DocRef d = rdr.getDocumentReference();
             // RN, RP, RC, RX, RG, RA, RT, RL
             this.writeWrappedLine(REFERENCE_TAG, 5, "["+rdr.getRank()+"]", os);
-            // NO RC TAG - CANNOT FORCE INTO BIOSQL!
-            if (d.getRemark()!=null) this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, d.getRemark(), os);
+            // NO RP TAG - CANNOT FORCE INTO BIOSQL!
+            // Just print out ref position if present
+            if (rdr.getStart()!=null && rdr.getEnd()!=null) this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, "(SEQUENCE OF "+rdr.getStart()+"-"+rdr.getEnd()+")",os);
+            if (d.getRemark()!=null) this.writeWrappedLine(REMARK_TAG, 5, d.getRemark(), os);
             CrossRef c = d.getCrossref();
             if (c!=null) this.writeWrappedLine(REFERENCE_XREF_TAG, 5, c.getDbname().toUpperCase()+"="+c.getAccession()+";", os);
             if (d.getAuthors()!=null) this.writeWrappedLine(AUTHORS_TAG, 5, d.getAuthors(), os);
@@ -762,12 +811,12 @@ public class UniProtFormat implements RichSequenceFormat {
         }
         
         // comments - if any
-        Pattern cp = Pattern.compile("^\\S+:.*");
         if (!rs.getComments().isEmpty()) {
             for (Iterator i = rs.getComments().iterator(); i.hasNext(); ) {
                 Comment c = (SimpleComment)i.next();
-                if (cp.matcher(c.getComment()).matches()) this.writeWrappedCommentLine(COMMENT_TAG, 5, "-!-", 4, c.getComment(), os);
-                else this.writeWrappedCommentLine(COMMENT_TAG, 5, "-!-", 4, "MISCELLANEOUS: "+c.getComment(), os);
+                String text = c.getComment().trim();
+                if (text.length()>3 && text.substring(0,3).equals("-!-")) this.writeWrappedCommentLine(COMMENT_TAG, 5, "-!- ", 4, text.substring(4), os);
+                else this.writeWrappedLine(COMMENT_TAG, 5, text, os);
             }
         }
         
@@ -817,10 +866,8 @@ public class UniProtFormat implements RichSequenceFormat {
                 if (n.getTerm().equals(Terms.getFTIdTerm())) ftid = n.getValue();
                 else if (n.getTerm().equals(Terms.getFeatureDescTerm())) desc = n.getValue();
             }
-            int start = f.getLocation().getMin();
-            int end = f.getLocation().getMax();
             String kw = f.getTypeTerm().getName();
-            String leader = kw+" "+StringTools.leftPad(""+start,5)+" "+StringTools.leftPad(""+end,5);
+            String leader = StringTools.rightPad(kw,8)+" "+UniProtLocationParser.writeLocation((RichLocation)f.getLocation());
             this.writeWrappedLocationLine(FEATURE_TAG, 5, leader, 24, desc, os);
             if (ftid!=null) this.writeWrappedLine(FEATURE_TAG,29,"/FTId="+ftid+".", os);
         }
@@ -909,7 +956,7 @@ public class UniProtFormat implements RichSequenceFormat {
      * {@inheritDoc}
      */
     public String getDefaultFormat() {
-        return UniProt_FORMAT;
+        return UNIPROT_FORMAT;
     }
 }
 

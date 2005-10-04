@@ -35,7 +35,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.SimpleNamespace;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichSequence;
 
 

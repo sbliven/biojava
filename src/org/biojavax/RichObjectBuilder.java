@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojavax.bio.db;
+package org.biojavax;
 
 /**
  * This interface allows a class to generate Rich objects based on a class

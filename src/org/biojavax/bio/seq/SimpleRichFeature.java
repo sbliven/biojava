@@ -45,7 +45,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRichAnnotation;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.ontology.ComparableTerm;
 
 /**

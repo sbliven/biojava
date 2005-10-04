@@ -52,7 +52,7 @@ import org.biojavax.RankedCrossRef;
 import org.biojavax.SimpleComment;
 import org.biojavax.SimpleNote;
 import org.biojavax.bio.BioEntryRelationship;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.SimpleRichFeature;

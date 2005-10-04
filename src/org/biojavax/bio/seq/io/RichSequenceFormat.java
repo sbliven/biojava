@@ -30,7 +30,7 @@ import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojavax.Namespace;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.ontology.ComparableTerm;
 
 /**

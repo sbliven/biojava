@@ -31,7 +31,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
 import org.biojavax.Namespace;
 import org.biojavax.SimpleCrossRef;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.CompoundRichLocation;
 import org.biojavax.bio.seq.Position;
 import org.biojavax.bio.seq.RichLocation;

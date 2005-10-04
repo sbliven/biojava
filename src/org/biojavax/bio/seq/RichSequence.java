@@ -40,7 +40,7 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.bio.BioEntry;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.io.EMBLFormat;
 import org.biojavax.bio.seq.io.FastaFormat;
 import org.biojavax.bio.seq.io.GenbankFormat;

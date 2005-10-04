@@ -55,7 +55,7 @@ import org.biojavax.SimpleDocRef;
 import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
@@ -544,7 +544,8 @@ public class GenbankFormat implements RichSequenceFormat {
         // locus(name) + length + alpha + div + date line
         StringBuffer locusLine = new StringBuffer();
         locusLine.append(StringTools.rightPad(rs.getName(),10));
-        locusLine.append(StringTools.leftPad(""+rs.length(),7));
+        locusLine.append(" ");
+        locusLine.append(StringTools.leftPad(""+rs.length(),6));
         locusLine.append(" bp ");
         locusLine.append(StringTools.leftPad(stranded,3));
         locusLine.append(StringTools.rightPad(moltype,6));
@@ -591,7 +592,11 @@ public class GenbankFormat implements RichSequenceFormat {
         for (Iterator r = rs.getRankedDocRefs().iterator(); r.hasNext(); ) {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
-            this.writeWrappedLine(REFERENCE_TAG, 12, rdr.getRank()+"  (bases "+rdr.getStart()+" to "+rdr.getEnd()+")", os);
+            Integer rstart = rdr.getStart();
+            if (rstart==null) rstart = new Integer(1);
+            Integer rend = rdr.getEnd();
+            if (rend==null) rend = new Integer(rs.length());
+            this.writeWrappedLine(REFERENCE_TAG, 12, rdr.getRank()+"  (bases "+rstart+" to "+rend+")", os);
             if (d.getAuthors()!=null) this.writeWrappedLine("  "+AUTHORS_TAG, 12, d.getAuthors(), os);
             this.writeWrappedLine("  "+TITLE_TAG, 12, d.getTitle(), os);
             this.writeWrappedLine("  "+JOURNAL_TAG, 12, d.getLocation(), os);

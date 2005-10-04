@@ -19,18 +19,15 @@
  *
  */
 
-package org.biojavax.bio.db;
+package org.biojavax;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.biojavax.CrossReferenceResolver;
-import org.biojavax.Namespace;
-import org.biojavax.SimpleCrossReferenceResolver;
-import org.biojavax.SimpleNamespace;
 import org.biojavax.bio.seq.PositionResolver;
 import org.biojavax.bio.seq.PositionResolver.AverageResolver;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.SimpleComparableOntology;
+import org.biojavax.bio.db.*;
 
 /**
  * Maintains a singleton map of rich objects, and provides some default values
@@ -46,6 +43,7 @@ public class RichObjectFactory {
     private static String defaultNamespaceName = "lcl";
     private static String genbankNamespaceName = "gb";
     private static String emblNamespaceName = "embl";
+    private static String uniprotNamespaceName = "uniprot";
     private static PositionResolver defaultPositionResolver = new AverageResolver();
     private static CrossReferenceResolver defaultCrossRefResolver = new SimpleCrossReferenceResolver();
     
@@ -160,6 +158,14 @@ public class RichObjectFactory {
      */
     public static Namespace getEMBLNamespace(){
         return (Namespace)getObject(SimpleNamespace.class, new Object[]{emblNamespaceName});
+    }
+    
+    /**
+     * Returns the UniProt namespace object ("uniprot").
+     * @return the UniProt namespace.
+     */
+    public static Namespace getUniProtNamespace(){
+        return (Namespace)getObject(SimpleNamespace.class, new Object[]{uniprotNamespaceName});
     }
             
 }

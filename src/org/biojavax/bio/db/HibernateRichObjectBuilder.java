@@ -27,6 +27,7 @@ import org.biojavax.SimpleDocRef;
 import org.biojavax.SimpleNamespace;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.SimpleComparableOntology;
+import org.biojavax.SimpleRichObjectBuilder;
 
 /**
  * Takes requests for RichObjects and sees if it can load them from a Hibernate

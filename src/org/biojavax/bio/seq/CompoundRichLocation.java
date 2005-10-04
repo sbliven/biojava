@@ -35,7 +35,7 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossReferenceResolver;
 import org.biojavax.RichAnnotation;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.ontology.ComparableTerm;
 
 /**

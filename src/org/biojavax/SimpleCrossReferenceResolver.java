@@ -25,7 +25,7 @@ import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojavax.bio.BioEntry;
-import org.biojavax.bio.db.RichObjectFactory;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.InifinitelyAmbiguousSymbolList;
 import org.biojavax.bio.seq.RichSequence;
 

@@ -19,9 +19,10 @@
  *
  */
 
-package org.biojavax.bio.db;
+package org.biojavax;
 
 import java.lang.reflect.Constructor;
+
 
 /**
  * Creates objects and returns them.
