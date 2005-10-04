@@ -168,7 +168,7 @@ public class NeedlemanWunsch extends SequenceAlignment
 
   
   /** prints the alignment String on the screen (standard output).
-    * @param align The parameter is typically given by the {@see getAlignmentString} method.
+    * @param align The parameter is typically given by the {@link #getAlignmentString() getAlignmentString()} method.
     */
   public static void printAlignment(String align)
   { 
@@ -177,7 +177,7 @@ public class NeedlemanWunsch extends SequenceAlignment
   
   
   /** This method is good if one wants to reuse the alignment calculated by this class in another
-    * BioJava class. It just performs {@see pairwiseAlignment} and returns an <code>Alignment</code>
+    * BioJava class. It just performs {@link #pairwiseAlignment(Sequence, Sequence) pairwiseAlignment} and returns an <code>Alignment</code>
     * instance containing the two aligned sequences.
     * @return Alignment object containing the two gapped sequences constructed from query and target.
     * @throws Exception
