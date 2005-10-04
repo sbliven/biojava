@@ -331,7 +331,7 @@ public class UniProtFormat implements RichSequenceFormat {
                 finalPart = finalPart.substring(0,finalPart.length()-1); // chomp trailing dot
                 parts[parts.length-1]=finalPart;
                 // construct a DBXREF out of the dbname part[0] and accession part[1]
-                CrossRef crossRef = new SimpleCrossRef(parts[0].trim(),parts[1].trim(),0);
+                CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
                 // assign remaining bits of info as annotations
                 for (int j = 2; j < parts.length; j++) {
                     Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);

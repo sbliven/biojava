@@ -104,8 +104,9 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
      */
     public Set getNames(String nameClass) throws IllegalArgumentException {
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
+        Set items = (Set)this.namesMap.get(nameClass);
         Set n = new TreeSet();
-        for (Iterator j = ((Set)this.namesMap.get(nameClass)).iterator(); j.hasNext(); ) {
+        if (items!=null) for (Iterator j = items.iterator(); j.hasNext(); ) {
             SimpleNCBITaxonName name = (SimpleNCBITaxonName)j.next();
             n.add(name.getName());
         }

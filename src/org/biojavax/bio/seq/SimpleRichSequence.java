@@ -30,6 +30,7 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.io.ChunkedSymbolListFactory;
 import org.biojava.bio.symbol.Alphabet;
@@ -47,7 +48,7 @@ import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.bio.SimpleBioEntry;
-import org.biojavax.bio.seq.io.SimpleRichSequenceBuilder;
+
 
 
 /**
@@ -248,12 +249,18 @@ public class SimpleRichSequence extends SimpleBioEntry implements RichSequence {
     
     // Hibernate requirement - not for public use.
     private void setAlphabetName(String alphaname) throws IllegalSymbolException, BioException {
+        if (alphaname.equals("protein")) alphaname=ProteinTools.getTAlphabet().getName();
         this.alphaname = alphaname;
         this.checkMakeSequence();
     }
     
     // Hibernate requirement - not for public use.
-    private String getAlphabetName() { return (this.symList==SymbolList.EMPTY_LIST?null:this.symList.getAlphabet().getName()); }
+    private String getAlphabetName() {
+        if (this.symList==SymbolList.EMPTY_LIST) return null;
+        String name = this.symList.getAlphabet().getName();
+        if (name.equals(ProteinTools.getTAlphabet().getName())) return "protein";
+        else return name;
+    }
     
     // Hibernate requirement - not for public use.
     private String seqstring;

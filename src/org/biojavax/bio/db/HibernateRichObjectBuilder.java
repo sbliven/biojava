@@ -61,7 +61,7 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
             this.session = session;
             // Lookup the createQuery and persist methods
             this.createQuery = hibernateSession.getMethod("createQuery", new Class[]{String.class});
-            this.persist = hibernateSession.getMethod("persist", new Class[]{Object.class});
+            this.persist = hibernateSession.getMethod("persist", new Class[]{String.class,Object.class});
             // Lazy load the Query class from Hibernate.
             Class hibernateQuery = Class.forName("org.hibernate.Query");
             // Lookup the setParameter and list methods
@@ -85,16 +85,22 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
         Object o = super.buildObject(clazz, params);
         // Create the Hibernate query to look it up with
         String queryText;
+        String queryType;
         if (o instanceof SimpleNamespace) {
             queryText = "from Namespace as ns where ns.name = ?";
+            queryType = "Namespace";
         } else if (o instanceof SimpleComparableOntology) {
             queryText = "from Ontology as o where o.name = ?";
+            queryType = "Ontology";
         } else if (o instanceof SimpleNCBITaxon) {
             queryText = "from Taxon as o where o.NCBITaxID = ?";
+            queryType = "Taxon";
         } else if (o instanceof SimpleCrossRef) {
             queryText = "from CrossRef as cr where cr.dbname = ? and cr.accession = ?";
+            queryType = "CrossRef";
         } else if (o instanceof SimpleDocRef) {
             queryText = "from DocRef as cr where cr.authors = ? and cr.location = ?";
+            queryType = "DocRef";
         } else throw new IllegalArgumentException("Don't know how to handle objects of type "+clazz);
         // Run the query.
         try {
@@ -110,7 +116,7 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
             if (results.size()>0) return results.get(0);
             // Persist and return the wrapper object otherwise
             else {
-                this.persist.invoke(this.session, new Object[]{o});
+                this.persist.invoke(this.session, new Object[]{queryType,o});
                 return o;
             }
         } catch (Exception e) {
