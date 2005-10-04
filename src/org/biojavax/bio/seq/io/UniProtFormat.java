@@ -271,7 +271,7 @@ public class UniProtFormat implements RichSequenceFormat {
                     }
                 }
                 // Set the Taxon
-                tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(taxid)});
+                tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{new Integer(taxid)});
                 rlistener.setTaxon(tax);
                 try {
                     if (name!=null) tax.addName(NCBITaxon.SCIENTIFIC,name);
