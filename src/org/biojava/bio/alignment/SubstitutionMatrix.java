@@ -42,14 +42,15 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 
-/** This object is able to read a substitution matrix file and constructs an int matrix to
+/** <p>This object is able to read a substitution matrix file and constructs an int matrix to
   * store the matrix. Every single element of the matrix can be accessed by the method
   * <code>getValueAt</code> with the parameters being tow biojava symbols. This is why it is
   * not necessary to access the matrix directly. If there is no value for the two specified
-  * <code>Symbol</code>s an <code>Exception</code> is thrown.
+  * <code>Symbol</code>s an <code>Exception</code> is thrown.</p><p>
+  * Substitution matrix files, are available at <a href="ftp://ftp.ncbi.nlm.nih.gov/blast/matrices/">
+  * The NCBI FTP directory</a>.</p>
   *
   * @author Andreas Dr&auml;ger
-  *
   */
 public class SubstitutionMatrix
 {
