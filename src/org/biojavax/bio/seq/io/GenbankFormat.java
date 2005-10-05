@@ -234,7 +234,7 @@ public class GenbankFormat implements RichSequenceFormat {
                 String[] kws = ((String[])section.get(0))[1].split(";");
                 for (int i = 0; i < kws.length; i++) {
                     String kw = kws[i].trim();
-                    if (kw.length()==0) continue;
+                    if (kw.length()==0 || kw.equals(".")) continue;
                     rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kw);
                 }
             } else if (sectionKey.equals(SOURCE_TAG)) {
@@ -573,7 +573,8 @@ public class GenbankFormat implements RichSequenceFormat {
         this.writeWrappedLine(VERSION_TAG, 12, version, os);
         
         // keywords line
-        if (!keywords.equals("")) this.writeWrappedLine(KEYWORDS_TAG, 12, keywords, os);
+        if (keywords.equals("")) keywords=".";
+        this.writeWrappedLine(KEYWORDS_TAG, 12, keywords, os);
         
         // source line (from taxon)
         //   organism line

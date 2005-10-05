@@ -639,7 +639,7 @@ public class INSDseqFormat implements RichSequenceFormat {
                 
                 if (d.getAuthors()!=null) {
                     xml.openTag(AUTHORS_GROUP_TAG);
-                    String[] auths = d.getAuthors().split(",\\s+");
+                    String[] auths = d.getAuthors().split("(,\\s+|\\s+and\\s+)");
                     for (int i = 0; i < auths.length; i++) {
                         xml.openTag(AUTHOR_TAG);
                         xml.print(auths[i].trim());
