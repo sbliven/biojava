@@ -44,6 +44,7 @@ import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.io.EMBLFormat;
 import org.biojavax.bio.seq.io.FastaFormat;
 import org.biojavax.bio.seq.io.GenbankFormat;
+import org.biojavax.bio.seq.io.INSDseqFormat;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
 import org.biojavax.bio.seq.io.RichStreamReader;
 import org.biojavax.bio.seq.io.RichStreamWriter;
@@ -366,6 +367,85 @@ public interface RichSequence extends BioEntry,Sequence {
         
         
         
+        
+        /**
+         * Read a INSDseq file using a custom type of SymbolList. For example,
+         * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
+         * SymbolTokenization) and RichSequenceBuilderFactory.PACKED to force all
+         * symbols to be encoded using bit-packing.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param sTok a <code>SymbolTokenization</code> that understands the sequences
+         * @param seqFactory a factory used to build a <code>SymbolList</code>
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readINSDseq(
+                BufferedReader br,
+                SymbolTokenization sTok,
+                RichSequenceBuilderFactory seqFactory,
+                Namespace ns) {
+            return new RichStreamReader(
+                    br,
+                    new INSDseqFormat(),
+                    sTok,
+                    seqFactory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an INSDseq-format stream of DNA sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readINSDseqDNA(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new INSDseqFormat(),
+                    getDNAParser(),
+                    factory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an INSDseq-format stream of RNA sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readINSDseqRNA(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new INSDseqFormat(),
+                    getRNAParser(),
+                    factory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an INSDseq-format stream of Protein sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readINSDseqProtein(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new INSDseqFormat(),
+                    getProteinParser(),
+                    factory,
+                    ns);
+        }
+        
         /**
          * Read a EMBL file using a custom type of SymbolList. For example,
          * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
@@ -549,6 +629,35 @@ public interface RichSequence extends BioEntry,Sequence {
             writeGenbank(os, new SingleRichSeqIterator(seq),ns);
         }
         
+        
+        /**
+         * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
+         * INSDseq Format.  This makes for a useful format filter where a
+         * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
+         * @param os The stream to write fasta formatted data to
+         * @param in The source of input Sequences
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeINSDseq(OutputStream os, SequenceIterator in, Namespace ns)
+        throws IOException {
+            RichStreamWriter sw = new RichStreamWriter(os,new INSDseqFormat());
+            sw.writeStream(in,ns);
+        }
+        
+        /**
+         * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in INSDseq format.
+         * @param os  the <code>OutputStream</code>.
+         * @param seq  the <code>Sequence</code>.
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeINSDseq(OutputStream os, Sequence seq, Namespace ns)
+        throws IOException {
+            writeINSDseq(os, new SingleRichSeqIterator(seq),ns);
+        }
         
         /**
          * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in

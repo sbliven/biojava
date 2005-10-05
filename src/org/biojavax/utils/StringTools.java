@@ -120,7 +120,7 @@ public class StringTools {
                 splitPoint = newline;
             }
             //easy case where only small portion of line remains
-            if (splitPoint > input.length()) splitPoint=input.length();
+            if (splitPoint >= input.length()) splitPoint=input.length();
             //hard case, have to split it!
             else {
                 //if not match sep, find first point that does

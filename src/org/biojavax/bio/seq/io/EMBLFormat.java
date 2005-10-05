@@ -109,7 +109,6 @@ public class EMBLFormat implements RichSequenceFormat {
      */
     public static class Terms extends RichSequenceFormat.Terms {
         private static ComparableTerm EMBL_TERM = null;
-        private static ComparableTerm DATES_TERM = null;
         
         /**
          * Getter for the EMBL term
@@ -118,15 +117,6 @@ public class EMBLFormat implements RichSequenceFormat {
         public static ComparableTerm getEMBLTerm() {
             if (EMBL_TERM==null) EMBL_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBL");
             return EMBL_TERM;
-        }
-        
-        /**
-         * getter for the Dates term
-         * @return a Term that represents the misc date info from EMBL or UniProt files
-         */
-        public static ComparableTerm getDatesTerm() {
-            if (DATES_TERM==null) DATES_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBLDATE");
-            return DATES_TERM;
         }
     }
     
@@ -196,6 +186,7 @@ public class EMBLFormat implements RichSequenceFormat {
         NCBITaxon tax = null;
         String organism = null;
         String accession = null;
+        int xrefCount = 0;
         do {
             List section = this.readSection(reader);
             sectionKey = ((String[])section.get(0))[0];
@@ -225,10 +216,8 @@ public class EMBLFormat implements RichSequenceFormat {
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // IGNORE - can get from first feature in feature table
             } else if (sectionKey.equals(DATE_TAG)) {
-                String value = ((String[])section.get(0))[1];
-                rlistener.addSequenceProperty(Terms.getDatesTerm(), value);
-                // we also store it as the modification date, for compatibility with single-date formats
-                String date = value.substring(0,11);
+                // we store it as the modification date, for compatibility with single-date formats
+                String date = ((String[])section.get(0))[1].substring(0,11);
                 rlistener.addSequenceProperty(Terms.getModificationTerm(), date);
             } else if (sectionKey.equals(ACCESSION_TAG)) {
                 // if multiple accessions, store only first as accession,
@@ -255,27 +244,23 @@ public class EMBLFormat implements RichSequenceFormat {
                     rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kws[i].trim());
                 }
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
-                // database_identifier; primary_identifier; secondary_identifier.
-                String[] refs = ((String[])section.get(0))[1].split("\\.");
-                for (int i = 0 ; i < refs.length; i++) {
-                    if (refs[i].trim().length()==0) continue;
-                    String[] parts = refs[i].split(";");
-                    // construct a DBXREF out of the dbname part[0] and accession part[1]
-                    CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
-                    // assign remaining bits of info as annotations
-                    for (int j = 2; j < parts.length; j++) {
-                        Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);
-                        try {
-                            ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
-                        } catch (ChangeVetoException ce) {
-                            ParseException pe = new ParseException("Could not annotate identifier terms");
-                            pe.initCause(ce);
-                            throw pe;
-                        }
+                // database_identifier; primary_identifier; secondary_identifier....
+                String[] parts = ((String[])section.get(0))[1].split(";");
+                // construct a DBXREF out of the dbname part[0] and accession part[1]
+                CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
+                // assign remaining bits of info as annotations
+                for (int j = 2; j < parts.length; j++) {
+                    Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);
+                    try {
+                        ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
+                    } catch (ChangeVetoException ce) {
+                        ParseException pe = new ParseException("Could not annotate identifier terms");
+                        pe.initCause(ce);
+                        throw pe;
                     }
-                    RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, i+1);
-                    rlistener.setRankedCrossRef(rcrossRef);
                 }
+                RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, ++xrefCount);
+                rlistener.setRankedCrossRef(rcrossRef);
             } else if (sectionKey.equals(REFERENCE_TAG)) {
                 // first line of section has rank and location
                 String refrank = ((String[])section.get(0))[1];
@@ -576,6 +561,11 @@ public class EMBLFormat implements RichSequenceFormat {
                     //      exception = don't know how to do contigs yet
                     throw new ParseException("Unable to handle contig assemblies just yet");
                 }
+                // READ DOCREF
+                else if (token.equals(DATABASE_XREF_TAG)) {
+                    section.add(new String[]{DATABASE_XREF_TAG,line.substring(5).trim()});
+                    done = true;
+                }
                 // READ NORMAL TAG/VALUE SECTION
                 else {
                     //      rewind buffer to mark
@@ -670,13 +660,11 @@ public class EMBLFormat implements RichSequenceFormat {
         String accessions = accession+";";
         String mdat = "";
         String moltype = rs.getAlphabet().getName();
-        List dates = new ArrayList();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
-            else if (n.getTerm().equals(Terms.getDatesTerm())) dates.add(n.getValue());
         }
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
@@ -702,12 +690,8 @@ public class EMBLFormat implements RichSequenceFormat {
         os.println(DELIMITER_TAG+"   ");
         
         // date line
-        if (dates.size()>0) {
-            for (Iterator i = dates.iterator(); i.hasNext(); ) this.writeWrappedLine(DATE_TAG, 5, (String)i.next(), os);
-        } else {
-            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Created)", os);
-            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", os);
-        }
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Created)", os);
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", os);
         os.println(DELIMITER_TAG+"   ");
         
         // definition line
@@ -903,6 +887,7 @@ public class EMBLFormat implements RichSequenceFormat {
     
     // writes a line wrapped to a certain width and indented
     private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
+        if (key==null || text==null) return;
         text = text.trim();
         StringBuffer b = new StringBuffer();
         b.append(StringTools.rightPad(key, indent));
@@ -920,11 +905,12 @@ public class EMBLFormat implements RichSequenceFormat {
     }
     
     // writes a line wrapped over two separate indent sizes
-    private void _writeDoubleWrappedLine(String sep, String key, int initialIndent, String name, int secondIndent, String location, PrintStream os) {
+    private void _writeDoubleWrappedLine(String sep, String key, int initialIndent, String text, int secondIndent, String location, PrintStream os) {
+        if (key==null || text==null) return;
         int totalIndent = initialIndent+secondIndent;
         String[] lines = StringTools.writeWordWrap(location, sep, this.getLineWidth()-totalIndent);
         lines[0] = StringTools.rightPad(key,initialIndent)+
-                StringTools.rightPad(name,secondIndent)+
+                StringTools.rightPad(text,secondIndent)+
                 lines[0];
         os.println(lines[0]);
         for (int i = 1; i < lines.length; i++) os.println(StringTools.rightPad(key,totalIndent)+lines[i]);

@@ -113,7 +113,6 @@ public class UniProtFormat implements RichSequenceFormat {
         private static ComparableTerm GENENAME_TERM = null;
         private static ComparableTerm FTID_TERM = null;
         private static ComparableTerm FEATUREDESC_TERM = null;
-        private static ComparableTerm DATES_TERM = null;
         
         /**
          * Getter for the UniProt term
@@ -158,15 +157,6 @@ public class UniProtFormat implements RichSequenceFormat {
         public static ComparableTerm getFeatureDescTerm() {
             if (FEATUREDESC_TERM==null) FEATUREDESC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("description");
             return FEATUREDESC_TERM;
-        }
-        
-        /**
-         * getter for the Dates term
-         * @return a Term that represents the misc date info from EMBL or UniProt files
-         */
-        public static ComparableTerm getDatesTerm() {
-            if (DATES_TERM==null) DATES_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UNIPROTDATE");
-            return DATES_TERM;
         }
     }
     
@@ -297,10 +287,8 @@ public class UniProtFormat implements RichSequenceFormat {
                     throw new ParseException(e);
                 }
             } else if (sectionKey.equals(DATE_TAG)) {
-                String value = ((String[])section.get(0))[1];
-                rlistener.addSequenceProperty(Terms.getDatesTerm(), value);    
-                // we also store it as the modification date, for compatibility with single-date formats
-                String date = value.substring(0,11);
+                // we store it as the modification date, for compatibility with single-date formats
+                String date = ((String[])section.get(0))[1].substring(0,11);
                 rlistener.addSequenceProperty(Terms.getModificationTerm(), date);
             } else if (sectionKey.equals(ACCESSION_TAG)) {
                 // if multiple accessions, store only first as accession,
@@ -730,7 +718,6 @@ public class UniProtFormat implements RichSequenceFormat {
         String accession = rs.getAccession();
         String accessions = accession+";";
         List genenames = new ArrayList();
-        List dates = new ArrayList();
         String mdat = "";
         String dataclass = "STANDARD";
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
@@ -739,7 +726,6 @@ public class UniProtFormat implements RichSequenceFormat {
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
             else if (n.getTerm().equals(Terms.getGeneNameTerm())) genenames.add(n.getValue());
-            else if (n.getTerm().equals(Terms.getDatesTerm())) dates.add(n.getValue());
         }
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
@@ -756,13 +742,9 @@ public class UniProtFormat implements RichSequenceFormat {
         this.writeWrappedLine(ACCESSION_TAG, 5, accessions, os);
         
         // date line
-        if (dates.size()>0) {
-            for (Iterator i = dates.iterator(); i.hasNext(); ) this.writeWrappedLine(DATE_TAG, 5, (String)i.next(), os);
-        } else {
-            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Created)", os);
-            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last sequence update)",os);
-            this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last annotation update)",os);
-        }
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Created)", os);
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last sequence update)",os);
+        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last annotation update)",os);
         
         // definition line
         this.writeWrappedLine(DEFINITION_TAG, 5, rs.getDescription(), os);
@@ -929,6 +911,7 @@ public class UniProtFormat implements RichSequenceFormat {
     
 // writes a line wrapped to a certain width and indented
     private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
+        if (key==null || text==null) return;
         text = text.trim();
         StringBuffer b = new StringBuffer();
         b.append(StringTools.rightPad(key, indent));
@@ -946,11 +929,12 @@ public class UniProtFormat implements RichSequenceFormat {
     }
     
 // writes a line wrapped over two separate indent sizes
-    private void _writeDoubleWrappedLine(String sep, String key, int initialIndent, String name, int secondIndent, String location, PrintStream os) {
+    private void _writeDoubleWrappedLine(String sep, String key, int initialIndent, String text, int secondIndent, String location, PrintStream os) {
+        if (key==null || text==null) return;
         int totalIndent = initialIndent+secondIndent;
         String[] lines = StringTools.writeWordWrap(location, sep, this.getLineWidth()-totalIndent);
         lines[0] = StringTools.rightPad(key,initialIndent)+
-                StringTools.rightPad(name,secondIndent)+
+                StringTools.rightPad(text,secondIndent)+
                 lines[0];
         os.println(lines[0]);
         for (int i = 1; i < lines.length; i++) os.println(StringTools.rightPad(key,totalIndent)+lines[i]);

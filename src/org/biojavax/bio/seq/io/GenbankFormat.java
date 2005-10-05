@@ -101,7 +101,7 @@ public class GenbankFormat implements RichSequenceFormat {
     protected static final String END_SEQUENCE_TAG = "//";
     
     /**
-     * Implements some EMBL-specific terms.
+     * Implements some GenBank-specific terms.
      */
     public static class Terms extends RichSequenceFormat.Terms {
         private static ComparableTerm GENBANK_TERM = null;
@@ -231,7 +231,12 @@ public class GenbankFormat implements RichSequenceFormat {
                     throw new ParseException("Bad version line found: "+ver);
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
-                rlistener.addSequenceProperty(Terms.getKeywordsTerm(), ((String[])section.get(0))[1]);
+                String[] kws = ((String[])section.get(0))[1].split(";");
+                for (int i = 0; i < kws.length; i++) {
+                    String kw = kws[i].trim();
+                    if (kw.length()==0) continue;
+                    rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kw);
+                }
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // ignore - can get all this from the first feature
             } else if (sectionKey.equals(REFERENCE_TAG)) {
@@ -533,12 +538,14 @@ public class GenbankFormat implements RichSequenceFormat {
         String stranded = "";
         String mdat = "";
         String moltype = rs.getAlphabet().getName();
+        String keywords = "";
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
             else if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue();
+            else if (n.getTerm().equals(Terms.getKeywordsTerm())) keywords = keywords+" "+n.getValue();
         }
         
         // locus(name) + length + alpha + div + date line
@@ -566,16 +573,7 @@ public class GenbankFormat implements RichSequenceFormat {
         this.writeWrappedLine(VERSION_TAG, 12, version, os);
         
         // keywords line
-        String keywords = null;
-        for (Iterator n = notes.iterator(); n.hasNext(); ) {
-            Note nt = (Note)n.next();
-            if (nt.getTerm().equals(Terms.getKeywordsTerm())) {
-                if (keywords==null) keywords = nt.getValue();
-                else keywords = keywords+" "+nt.getValue();
-            }
-        }
-        if (keywords==null) keywords =".";
-        this.writeWrappedLine(KEYWORDS_TAG, 12, keywords, os);
+        if (!keywords.equals("")) this.writeWrappedLine(KEYWORDS_TAG, 12, keywords, os);
         
         // source line (from taxon)
         //   organism line
@@ -714,6 +712,7 @@ public class GenbankFormat implements RichSequenceFormat {
     
     // writes a line wrapped to a certain width and indented
     private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
+        if (key==null || text==null) return;
         text = text.trim();
         StringBuffer b = new StringBuffer();
         b.append(StringTools.rightPad(key, indent));
