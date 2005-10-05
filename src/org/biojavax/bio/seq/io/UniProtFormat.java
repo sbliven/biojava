@@ -366,9 +366,9 @@ public class UniProtFormat implements RichSequenceFormat {
                             String[] parts = refs[j].split("=");
                             String db = parts[0].toUpperCase();
                             String ref = parts[1];
-                            if (db.equals("PUBMED")) pubmed = ref;
-                            else if (db.equals("MEDLINE")) medline = ref;
-                            else if (db.equals("DOI")) doi = ref;
+                            if (db.equals(Terms.PUBMED_KEY)) pubmed = ref;
+                            else if (db.equals(Terms.MEDLINE_KEY)) medline = ref;
+                            else if (db.equals(Terms.DOI_KEY)) doi = ref;
                         }
                     }
                     if (key.equals(REFERENCE_POSITION_TAG)) {
