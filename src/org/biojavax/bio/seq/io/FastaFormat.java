@@ -134,7 +134,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
             rsiol.setNamespace((ns==null?RichObjectFactory.getDefaultNamespace():ns));
         }
         rsiol.setName(name);
-        rsiol.setDescription(desc);
+        if (!this.getElideComments()) rsiol.setDescription(desc);
         
         boolean seenEOF = this.readSequenceData(reader, symParser, rsiol);
         

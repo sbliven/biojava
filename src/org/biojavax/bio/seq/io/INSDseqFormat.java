@@ -177,7 +177,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             throws IllegalSymbolException, IOException, ParseException {
         
         try {
-            DefaultHandler m_handler = new INSDseqHandler(symParser,rlistener,ns);
+            DefaultHandler m_handler = new INSDseqHandler(this,symParser,rlistener,ns);
             return XMLTools.readXMLChunk(reader, m_handler, INSDSEQ_TAG);
         } catch (ParserConfigurationException e) {
             throw new ParseException(e);
@@ -533,6 +533,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     // SAX event handler for parsing http://www.ebi.ac.uk/embl/Documentation/DTD/INSDSeq_v1.3.dtd.txt
     private class INSDseqHandler extends DefaultHandler {
         
+        private RichSequenceFormat parent;
         private SymbolTokenization symParser;
         private RichSeqIOListener rlistener;
         private Namespace ns;
@@ -551,9 +552,11 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         private String currRefRemark;
         
         // construct a new handler that will populate the given list of sequences
-        private INSDseqHandler(SymbolTokenization symParser,
+        private INSDseqHandler(RichSequenceFormat parent,
+                SymbolTokenization symParser,
                 RichSeqIOListener rlistener,
                 Namespace ns) {
+            this.parent = parent;
             this.symParser = symParser;
             this.rlistener = rlistener;
             this.ns = ns;
@@ -570,7 +573,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 } catch (ParseException e) {
                     throw new SAXException(e);
                 }
-            } else if (qName.equals(REFERENCE_TAG)) {
+            } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
                 currRefLocation = null;
                 currRefAuthors = new ArrayList();
                 currRefTitle = null;
@@ -578,7 +581,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 currRefMedline = null;
                 currRefPubmed = null;
                 currRefRemark = null;
-            } else if (qName.equals(FEATURE_TAG)) {
+            } else if (qName.equals(FEATURE_TAG) && !this.parent.getElideFeatures()) {
                 templ = new RichFeature.Template();
                 templ.annotation = new SimpleRichAnnotation();
                 templ.sourceTerm = Terms.getINSDseqTerm();
@@ -618,7 +621,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     rlistener.setDescription(val);
                 } else if (qName.equals(KEYWORD_TAG)) {
                     rlistener.addSequenceProperty(Terms.getKeywordsTerm(), val);
-                } else if (qName.equals(COMMENT_TAG)) {
+                } else if (qName.equals(COMMENT_TAG) && !this.parent.getElideComments()) {
                     rlistener.setComment(val);
                 } else if (qName.equals(DATABASE_XREF_TAG)) {
                     // database_identifier; primary_identifier; secondary_identifier....
@@ -638,7 +641,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     }
                     RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, 1);
                     rlistener.setRankedCrossRef(rcrossRef);
-                } else if (qName.equals(SEQUENCE_TAG)) {
+                } else if (qName.equals(SEQUENCE_TAG) && !this.parent.getElideSymbols()) {
                     try {
                         SymbolList sl = new SimpleSymbolList(symParser,
                                 val.replaceAll("\\s+","").replaceAll("[\\.|~]","-"));
@@ -652,21 +655,21 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     throw new SAXException("Cannot handle contigs yet");
                 
                 
-                else if (qName.equals(REFERENCE_LOCATION_TAG)) {
+                else if (qName.equals(REFERENCE_LOCATION_TAG) && !this.parent.getElideReferences()) {
                     currRefLocation = val;
-                } else if (qName.equals(AUTHOR_TAG)) {
+                } else if (qName.equals(AUTHOR_TAG) && !this.parent.getElideReferences()) {
                     currRefAuthors.add(val);
-                } else if (qName.equals(TITLE_TAG)) {
+                } else if (qName.equals(TITLE_TAG) && !this.parent.getElideReferences()) {
                     currRefTitle = val;
-                } else if (qName.equals(JOURNAL_TAG)) {
+                } else if (qName.equals(JOURNAL_TAG) && !this.parent.getElideReferences()) {
                     currRefJournal = val;
-                } else if (qName.equals(MEDLINE_TAG)) {
+                } else if (qName.equals(MEDLINE_TAG) && !this.parent.getElideReferences()) {
                     currRefMedline = val;
-                } else if (qName.equals(PUBMED_TAG)) {
+                } else if (qName.equals(PUBMED_TAG) && !this.parent.getElideReferences()) {
                     currRefPubmed = val;
-                } else if (qName.equals(REMARK_TAG)) {
+                } else if (qName.equals(REMARK_TAG) && !this.parent.getElideReferences() && !this.parent.getElideComments()) {
                     currRefRemark = val;
-                } else if (qName.equals(REFERENCE_TAG)) {
+                } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
                     int ref_rank;
                     int ref_start = -999;
                     int ref_end = -999;
@@ -726,18 +729,18 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 }
                 
                 
-                else if (qName.equals(FEATURE_KEY_TAG)) {
+                else if (qName.equals(FEATURE_KEY_TAG) && !this.parent.getElideFeatures()) {
                     templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(val);
-                } else if (qName.equals(FEATURE_LOC_TAG)) {
+                } else if (qName.equals(FEATURE_LOC_TAG) && !this.parent.getElideFeatures()) {
                     String tidyLocStr = val.replaceAll("\\s+","");
                     templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
                     rlistener.startFeature(templ);
-                } else if (qName.equals(FEATUREQUAL_NAME_TAG)) {
+                } else if (qName.equals(FEATUREQUAL_NAME_TAG) && !this.parent.getElideFeatures()) {
                     if (currFeatQual!=null) {
                         rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(currFeatQual),null);
                     }
                     currFeatQual = val;
-                } else if (qName.equals(FEATUREQUAL_VALUE_TAG)) {
+                } else if (qName.equals(FEATUREQUAL_VALUE_TAG) && !this.parent.getElideFeatures()) {
                     if (currFeatQual.equals("db_xref")) {
                         String regex = "^(\\S+?):(\\S+)$";
                         Pattern p = Pattern.compile(regex);
@@ -781,7 +784,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                         rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(currFeatQual),val);
                     }
                     currFeatQual = null;
-                } else if (qName.equals(FEATURE_TAG)) {
+                } else if (qName.equals(FEATURE_TAG) && !this.parent.getElideFeatures()) {
                     rlistener.endFeature();
                 }
                 

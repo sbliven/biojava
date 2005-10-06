@@ -112,18 +112,55 @@ public interface RichSequenceFormat extends SequenceFormat {
     public void setLineWidth(int width);
     
     /**
-     * Is the format going to emit events when sequence data is read?
-     * @return true if it is (true is default) otherwise false.
-     */
-    public boolean getElideSymbols();
-    
-    /**
-     * Use this method to toggle reading of sequence data. If you're only
-     * interested in header data set to true.
+     * Use this method to toggle reading of sequence data. 
      * @param elideSymbols set to true if you don't want the sequence data.
      */
     public void setElideSymbols(boolean elideSymbols);
     
+    /**
+     * Is the format going to emit events when sequence data is read?
+     * @return true if it is (true is default) otherwise false.
+     */
+    public boolean getElideSymbols();
+        
+    /**
+     * Use this method to toggle reading of feature data. 
+     * @param elideSymbols set to true if you don't want the feature data.
+     */
+    public void setElideFeatures(boolean elideFeatures);
+    
+    /**
+     * Is the format going to emit events when feature data is read?
+     * @return true if it is (true is default) otherwise false.
+     */
+    public boolean getElideFeatures();
+    
+    /**
+     * Use this method to toggle reading of bibliographic reference data. 
+     * @param elideSymbols set to true if you don't want the bibliographic reference data.
+     */
+    public void setElideReferences(boolean elideReferences);
+    
+    /**
+     * Is the format going to emit events when bibliographic reference data is read?
+     * @return true if it is (true is default) otherwise false.
+     */
+    public boolean getElideReferences();
+    
+    /**
+     * Use this method to toggle reading of comments data. Will also ignore remarks
+     * lines in bibliographic references.
+     * @param elideSymbols set to true if you don't want the comments data.
+     */
+    public void setElideComments(boolean elideComments);
+    
+    /**
+     * Is the format going to emit events when comments data or remarks from 
+     * bibliographic references are read?
+     * @return true if it is (true is default) otherwise false.
+     */
+    public boolean getElideComments();
+        
     /**
      * Stores a number of useful terms used across many sequence formats for consistency's sake.
      */
@@ -212,6 +249,9 @@ public interface RichSequenceFormat extends SequenceFormat {
         
         private int lineWidth = 80;
         private boolean elideSymbols = false;
+        private boolean elideFeatures = false;
+        private boolean elideComments = false;
+        private boolean elideReferences = false;
         private PrintStream os;
         
         /**
@@ -236,6 +276,36 @@ public interface RichSequenceFormat extends SequenceFormat {
          * {@inheritDoc}
          */
         public void setElideSymbols(boolean elideSymbols) { this.elideSymbols = elideSymbols; }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public boolean getElideFeatures() { return this.elideFeatures; }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void setElideFeatures(boolean elideFeatures) { this.elideFeatures = elideFeatures; }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public boolean getElideReferences() { return this.elideReferences; }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void setElideReferences(boolean elideReferences) { this.elideReferences = elideReferences; }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public boolean getElideComments() { return this.elideComments; }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void setElideComments(boolean elideComments) { this.elideComments = elideComments; }
         
         /**
          * {@inheritDoc}

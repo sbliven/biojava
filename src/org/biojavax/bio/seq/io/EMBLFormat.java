@@ -229,7 +229,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, ++xrefCount);
                 rlistener.setRankedCrossRef(rcrossRef);
-            } else if (sectionKey.equals(REFERENCE_TAG)) {
+            } else if (sectionKey.equals(REFERENCE_TAG) && !this.getElideReferences()) {
                 // first line of section has rank and location
                 String refrank = ((String[])section.get(0))[1];
                 int ref_rank = Integer.parseInt(refrank.substring(1,refrank.length()-1));
@@ -308,7 +308,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     else if (pcr!=null) dr.setCrossref(pcr);
                     else if (dcr!=null) dr.setCrossref(dcr);
                     // assign the remarks
-                    dr.setRemark(remark);
+                    if (!this.getElideComments()) dr.setRemark(remark);
                     // assign the docref to the bioentry
                     RankedDocRef rdr = new SimpleRankedDocRef(dr,
                             (ref_start != -999 ? new Integer(ref_start) : null),
@@ -318,10 +318,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 } catch (ChangeVetoException e) {
                     throw new ParseException(e);
                 }
-            } else if (sectionKey.equals(COMMENT_TAG)) {
+            } else if (sectionKey.equals(COMMENT_TAG) && !this.getElideComments()) {
                 // Set up some comments
                 rlistener.setComment(((String[])section.get(0))[1]);
-            } else if (sectionKey.equals(FEATURE_TAG)) {
+            } else if (sectionKey.equals(FEATURE_TAG) && !this.getElideFeatures()) {
                 // starting from second line of input, start a new feature whenever we come across
                 // a key that does not start with /
                 boolean seenAFeature = false;

@@ -305,7 +305,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, ++xrefCount);
                 rlistener.setRankedCrossRef(rcrossRef);
-            } else if (sectionKey.equals(REFERENCE_TAG)) {
+            } else if (sectionKey.equals(REFERENCE_TAG) && !this.getElideReferences()) {
                 Pattern rppat = Pattern.compile("\\(SEQUENCE OF (\\d+)-(\\d+).*\\)");
                 // first line of section has rank and location
                 String refrank = ((String[])section.get(0))[1];
@@ -380,17 +380,17 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     else if (pcr!=null) dr.setCrossref(pcr);
                     else if (dcr!=null) dr.setCrossref(dcr);
                     // assign the remarks
-                    dr.setRemark(remark);
+                    if (!this.getElideComments()) dr.setRemark(remark);
                     // assign the docref to the bioentry
                     RankedDocRef rdr = new SimpleRankedDocRef(dr,rstart,rend,ref_rank);
                     rlistener.setRankedDocRef(rdr);
                 } catch (ChangeVetoException e) {
                     throw new ParseException(e);
                 }
-            } else if (sectionKey.equals(COMMENT_TAG)) {
+            } else if (sectionKey.equals(COMMENT_TAG) && !this.getElideComments()) {
                 // Set up some comments
                 rlistener.setComment(((String[])section.get(0))[1]);
-            } else if (sectionKey.equals(FEATURE_TAG)) {
+            } else if (sectionKey.equals(FEATURE_TAG) && !this.getElideFeatures()) {
                 // starting from second line of input, start a new feature whenever we come across
                 // a key that does not start with /
                 boolean seenAFeature = false;
