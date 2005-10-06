@@ -152,8 +152,6 @@ public class StringTools {
      * @param key the key to write on the first line only
      * @param text the text to write out
      * @param keyWidth the width to indent the text by (in which the key will be printed)
-     * @param sep the separator to split the text on if it exceeds the line width
-     * @param wrappedKey the key to print on second and subsequent lines
      * @param os the stream to write the formatted output to
      */
     public static void writeKeyValueLine(String key, String text, int keyWidth, int lineWidth, PrintStream os) {
@@ -170,7 +168,6 @@ public class StringTools {
      * @param text the text to write out
      * @param keyWidth the width to indent the text by (in which the key will be printed)
      * @param sep the separator to split the text on if it exceeds the line width
-     * @param wrappedKey the key to print on second and subsequent lines
      * @param os the stream to write the formatted output to
      */
     public static void writeKeyValueLine(String key, String text, int keyWidth, int lineWidth, String sep, PrintStream os) {

@@ -215,12 +215,12 @@ public interface RichSequenceFormat extends SequenceFormat {
         private PrintStream os;
         
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public int getLineWidth() { return this.lineWidth; }
         
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public void setLineWidth(int width) {
             if (width<1) throw new IllegalArgumentException("Width cannot be less than 1");
@@ -228,17 +228,17 @@ public interface RichSequenceFormat extends SequenceFormat {
         }
         
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public boolean getElideSymbols() { return this.elideSymbols; }
         
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public void setElideSymbols(boolean elideSymbols) { this.elideSymbols = elideSymbols; }
         
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public void setPrintStream(PrintStream os) {
             if (os==null) throw new IllegalArgumentException("Print stream cannot be null");
@@ -246,7 +246,7 @@ public interface RichSequenceFormat extends SequenceFormat {
         }
         
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public PrintStream getPrintStream() { return this.os; }
     }
@@ -256,12 +256,12 @@ public interface RichSequenceFormat extends SequenceFormat {
      */
     public abstract class HeaderlessFormat extends BasicFormat {
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public void beginWriting() throws IOException {}
         
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public void finishWriting() throws IOException {}
     }
