@@ -49,46 +49,12 @@ import org.biojavax.bio.seq.RichSequence;
  * @author Richard Holland
  */
 
-public class FastaFormat implements RichSequenceFormat {
+public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
     
     /**
      * The name of this format
      */
     public static final String FASTA_FORMAT = "FASTA";
-    
-    /**
-     * The line width for output.
-     */
-    private int lineWidth = 60;
-    
-    /**
-     * {@inheritDoc}
-     */
-    public int getLineWidth() {
-        return lineWidth;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setLineWidth(int width) {
-        this.lineWidth = width;
-    }    
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean getElideSymbols() {
-        return false;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setElideSymbols(boolean elideSymbols) {
-        if (elideSymbols) throw new IllegalArgumentException("Are you kidding me? Fasta is nothing but symbols!");
-    }
     
     /**
      * {@inheritDoc}
@@ -207,7 +173,7 @@ public class FastaFormat implements RichSequenceFormat {
                         ++parseEnd;
                     }
                     
-                    sparser.characters(cache, parseStart, parseEnd - parseStart);
+                    if (!this.getElideSymbols()) sparser.characters(cache, parseStart, parseEnd - parseStart);
                     
                     parseStart = parseEnd + 1;
                     while (parseStart < bytesRead &&
@@ -238,39 +204,29 @@ public class FastaFormat implements RichSequenceFormat {
         sparser.close();
         return seenEOF;
     }
-    
+             
     /**
      * {@inheritDoc}
      */
-    public void writeSequence(Sequence seq, PrintStream os) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, null);
+    public void	writeSequence(Sequence seq, PrintStream os) throws IOException {
+        if (this.getPrintStream()==null) this.setPrintStream(os);
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      */
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
-        this.writeSequence(seq, format, os, null);
+        if (this.getPrintStream()==null) this.setPrintStream(os);
+        if (!format.equals(this.getDefaultFormat())) throw new IllegalArgumentException("Unknown format: "+format);
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      * If namespace is null, then the sequence's own namespace is used.
      */
-    public void writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, ns);
-    }
-    
-    /**
-     * {@inheritDoc}
-     * If namespace is null, then the sequence's own namespace is used.
-     */
-    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
-        if (! format.equalsIgnoreCase(getDefaultFormat()))
-            throw new IllegalArgumentException("Unknown format '"
-                    + format
-                    + "'");
-        
+    public void writeSequence(Sequence seq, Namespace ns) throws IOException {
         RichSequence rs;
         try {
             if (seq instanceof RichSequence) rs = (RichSequence)seq;
@@ -281,29 +237,29 @@ public class FastaFormat implements RichSequenceFormat {
             throw e2;
         }
         
-        os.print(">");
+        this.getPrintStream().print(">");
         
         String identifier = rs.getIdentifier();
         if (identifier!=null && !"".equals(identifier)) {
-            os.print("gi|");
-            os.print(identifier);
-            os.print("|");
+            this.getPrintStream().print("gi|");
+            this.getPrintStream().print(identifier);
+            this.getPrintStream().print("|");
         }
-        os.print((ns==null?rs.getNamespace().getName():ns.getName()));
-        os.print("|");
-        os.print(rs.getAccession());
-        os.print(".");
-        os.print(rs.getVersion());
-        os.print("|");
-        os.print(rs.getName());
-        os.print(" ");
-        os.println(rs.getDescription().replaceAll("\\n"," "));
+        this.getPrintStream().print((ns==null?rs.getNamespace().getName():ns.getName()));
+        this.getPrintStream().print("|");
+        this.getPrintStream().print(rs.getAccession());
+        this.getPrintStream().print(".");
+        this.getPrintStream().print(rs.getVersion());
+        this.getPrintStream().print("|");
+        this.getPrintStream().print(rs.getName());
+        this.getPrintStream().print(" ");
+        this.getPrintStream().println(rs.getDescription().replaceAll("\\n"," "));
         
         int length = rs.length();
         
-        for (int pos = 1; pos <= length; pos += this.lineWidth) {
-            int end = Math.min(pos + this.lineWidth - 1, length);
-            os.println(rs.subStr(pos, end));
+        for (int pos = 1; pos <= length; pos += this.getLineWidth()) {
+            int end = Math.min(pos + this.getLineWidth() - 1, length);
+            this.getPrintStream().println(rs.subStr(pos, end));
         }
     }
     

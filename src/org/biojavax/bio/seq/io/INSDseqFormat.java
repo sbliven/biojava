@@ -68,6 +68,7 @@ import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
+import org.biojavax.utils.StringTools;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -83,7 +84,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Alan Li (code based on his work)
  * @author Richard Holland
  */
-public class INSDseqFormat implements RichSequenceFormat {
+public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     
     /**
      * The name of this format
@@ -155,36 +156,6 @@ public class INSDseqFormat implements RichSequenceFormat {
             if (INSDSEQ_TERM==null) INSDSEQ_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("INSDseq");
             return INSDSEQ_TERM;
         }
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public int getLineWidth() {
-        return 0;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setLineWidth(int width) {
-        if (width!=0) throw new IllegalArgumentException("XML files don't have widths");
-    }
-    
-    private boolean elideSymbols = false;
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean getElideSymbols() {
-        return elideSymbols;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setElideSymbols(boolean elideSymbols) {
-        this.elideSymbols = elideSymbols;
     }
     
     /**
@@ -262,7 +233,7 @@ public class INSDseqFormat implements RichSequenceFormat {
         NCBITaxon tax = null;
         String organism = null;
         String accession = null;
-                
+        
         if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
         rlistener.setNamespace(ns);
         
@@ -461,39 +432,51 @@ public class INSDseqFormat implements RichSequenceFormat {
         rlistener.endSequence();
     }
     
+    private PrintWriter pw;
+    private XMLWriter xml;
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void beginWriting() throws IOException {
+        // make an XML writer
+        pw = new PrintWriter(this.getPrintStream());
+        xml = new PrettyXMLWriter(pw);
+        xml.printRaw("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+        xml.printRaw("<!DOCTYPE INSDSeq PUBLIC \"-//EMBL-EBI//INSD INSDSeq/EN\" \"http://www.ebi.ac.uk/dtd/INSD_INSDSeq.dtd\">");
+        xml.openTag(INSDSEQS_GROUP_TAG);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void finishWriting() throws IOException {
+        xml.closeTag(INSDSEQS_GROUP_TAG);
+        pw.flush();
+    }
+    
     /**
      * {@inheritDoc}
      */
     public void	writeSequence(Sequence seq, PrintStream os) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, null);
+        if (this.getPrintStream()==null) this.setPrintStream(this.getPrintStream());
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      */
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
-        this.writeSequence(seq, format, os, null);
+        if (this.getPrintStream()==null) this.setPrintStream(this.getPrintStream());
+        if (!format.equals(this.getDefaultFormat())) throw new IllegalArgumentException("Unknown format: "+format);
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      * Namespace is ignored as INSDseq has no concept of it.
      */
-    public void	writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, ns);
-    }
-    
-    /**
-     * {@inheritDoc}
-     * Namespace is ignored as INSDseq has no concept of it.
-     */
-    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
-        // INSDseq only really - others are treated identically for now
-        if (!(
-                format.equalsIgnoreCase(INSDSEQ_FORMAT)
-                ))
-            throw new IllegalArgumentException("Unknown format: "+format);
-        
+    public void writeSequence(Sequence seq, Namespace ns) throws IOException {
         RichSequence rs;
         try {
             if (seq instanceof RichSequence) rs = (RichSequence)seq;
@@ -526,14 +509,6 @@ public class INSDseqFormat implements RichSequenceFormat {
             else if (n.getTerm().equals(Terms.getKeywordsTerm())) kws.add(n.getValue());
         }
         
-        // make an XML writer
-        PrintWriter pw = new PrintWriter(os);
-        XMLWriter xml = new PrettyXMLWriter(pw);
-        xml.printRaw("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-        xml.printRaw("<!DOCTYPE INSDSeq PUBLIC \"-//EMBL-EBI//INSD INSDSeq/EN\" \"http://www.ebi.ac.uk/dtd/INSD_INSDSeq.dtd\">");
-        
-        // send it events based on contents of sequence object
-        xml.openTag(INSDSEQS_GROUP_TAG);
         xml.openTag(INSDSEQ_TAG);
         
         xml.openTag(LOCUS_TAG);
@@ -737,7 +712,12 @@ public class INSDseqFormat implements RichSequenceFormat {
                     xml.closeTag(FEATUREQUAL_NAME_TAG);
                     
                     xml.openTag(FEATUREQUAL_VALUE_TAG);
-                    xml.print(n.getValue());
+                    if (n.getTerm().getName().equals("translation")) {
+                        String[] lines = StringTools.wordWrap(n.getValue(), "\\s+", this.getLineWidth());
+                        for (int k = 0; k < lines.length; k++) xml.println(lines[k]);
+                    } else {
+                        xml.print(n.getValue());
+                    }
                     xml.closeTag(FEATUREQUAL_VALUE_TAG);
                     
                     xml.closeTag(FEATUREQUAL_TAG);
@@ -780,11 +760,11 @@ public class INSDseqFormat implements RichSequenceFormat {
         }
         
         xml.openTag(SEQUENCE_TAG);
-        xml.print(rs.seqString());
+        String[] lines = StringTools.wordWrap(rs.seqString(), "\\s+", this.getLineWidth());
+        for (int i = 0; i < lines.length; i ++) xml.println(lines[i]);
         xml.closeTag(SEQUENCE_TAG);
         
         xml.closeTag(INSDSEQ_TAG);
-        xml.closeTag(INSDSEQS_GROUP_TAG);
         
         pw.flush();
     }

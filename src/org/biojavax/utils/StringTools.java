@@ -21,6 +21,7 @@
 
 package org.biojavax.utils;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -105,7 +106,7 @@ public class StringTools {
      * @return an array of strings, one per line, containing the wrapped output.
      * @see Pattern
      */
-    public static String[] writeWordWrap(String input, String sepRegex, int width) {
+    public static String[] wordWrap(String input, String sepRegex, int width) {
         List lines = new ArrayList();
         Pattern p = Pattern.compile(sepRegex);
         int start = 0;
@@ -140,5 +141,67 @@ public class StringTools {
             start=splitPoint;
         }
         return (String[])lines.toArray(new String[0]);
+    }
+    
+    /**
+     * Writes some text to the output stream in the following format:
+     *    key         text
+     *                continuation of text
+     * where the key/wrappedKey column is keyWidth wide, and the total line width is lineWidth,
+     * and the text is split over multiple lines at the nearest occurrence of whitespace.
+     * @param key the key to write on the first line only
+     * @param text the text to write out
+     * @param keyWidth the width to indent the text by (in which the key will be printed)
+     * @param sep the separator to split the text on if it exceeds the line width
+     * @param wrappedKey the key to print on second and subsequent lines
+     * @param os the stream to write the formatted output to
+     */
+    public static void writeKeyValueLine(String key, String text, int keyWidth, int lineWidth, PrintStream os) {
+        writeKeyValueLine(key,text,keyWidth,lineWidth,null,null,os);
+    }
+    
+    /**
+     * Writes some text to the output stream in the following format:
+     *    key         text
+     *                continuation of text
+     * where the key/wrappedKey column is keyWidth wide, and the total line width is lineWidth,
+     * and the text is split over multiple lines at the nearest occurrence of separator sep.
+     * @param key the key to write on the first line only
+     * @param text the text to write out
+     * @param keyWidth the width to indent the text by (in which the key will be printed)
+     * @param sep the separator to split the text on if it exceeds the line width
+     * @param wrappedKey the key to print on second and subsequent lines
+     * @param os the stream to write the formatted output to
+     */
+    public static void writeKeyValueLine(String key, String text, int keyWidth, int lineWidth, String sep, PrintStream os) {
+        writeKeyValueLine(key,text,keyWidth,lineWidth,sep,null,os);
+    }
+    
+    /**
+     * Writes some text to the output stream in the following format:
+     *    key         text
+     *    wrappedKey  continuation of text
+     * where the key/wrappedKey column is keyWidth wide, and the total line width is lineWidth,
+     * and the text is split over multiple lines at the nearest occurrence of separator sep.
+     * @param key the key to write on the first line only
+     * @param text the text to write out
+     * @param keyWidth the width to indent the text by (in which the key will be printed)
+     * @param sep the separator to split the text on if it exceeds the line width
+     * @param wrappedKey the key to print on second and subsequent lines
+     * @param os the stream to write the formatted output to
+     */
+    public static void writeKeyValueLine(String key, String text, int keyWidth, int lineWidth, String sep, String wrappedKey, PrintStream os) {
+        if (key==null || text==null) return; // skip blank lines
+        if (wrappedKey==null) wrappedKey=""; // stop null pointer exceptions on wrapped keys
+        if (sep==null) sep="\\s+"; // stop null pointer exceptions on the separator
+        text = text.trim(); // trim leading/trailing whitespace from text
+        String[] lines = StringTools.wordWrap(text, sep, lineWidth-keyWidth);
+        if (lines.length==0) os.println(StringTools.rightPad(key,keyWidth));
+        else {
+            lines[0] = StringTools.rightPad(key,keyWidth)+
+                    lines[0];
+            os.println(lines[0]);
+            for (int i = 1; i < lines.length; i++) os.println(StringTools.rightPad(wrappedKey,keyWidth)+lines[i]);
+        }
     }
 }

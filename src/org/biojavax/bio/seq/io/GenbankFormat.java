@@ -73,7 +73,7 @@ import org.biojavax.utils.StringTools;
  * bugfixes
  * @author MarkSchreiber
  */
-public class GenbankFormat implements RichSequenceFormat {
+public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     
     /**
      * The name of this format
@@ -114,38 +114,6 @@ public class GenbankFormat implements RichSequenceFormat {
             if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
             return GENBANK_TERM;
         }
-    }
-    
-    private int lineWidth = 80;
-    
-    /**
-     * {@inheritDoc}
-     */
-    public int getLineWidth() {
-        return lineWidth;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setLineWidth(int width) {
-        this.lineWidth = width;
-    }
-    
-    private boolean elideSymbols = false;
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean getElideSymbols() {
-        return elideSymbols;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setElideSymbols(boolean elideSymbols) {
-        this.elideSymbols = elideSymbols;
     }
     
     /**
@@ -234,6 +202,7 @@ public class GenbankFormat implements RichSequenceFormat {
                 String[] kws = ((String[])section.get(0))[1].split(";");
                 for (int i = 0; i < kws.length; i++) {
                     String kw = kws[i].trim();
+                    if (i==kws.length-1) kw = kw.substring(0,kw.length()-1); // chomp trailing dot
                     if (kw.length()==0 || kw.equals(".")) continue;
                     rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kw);
                 }
@@ -385,7 +354,7 @@ public class GenbankFormat implements RichSequenceFormat {
                 if (seenAFeature) rlistener.endFeature();
             } else if (sectionKey.equals(BASE_COUNT_TAG)) {
                 // ignore - can calculate from sequence content later if needed
-            } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.elideSymbols) {
+            } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.getElideSymbols()) {
                 // our first line is ignorable as it is the ORIGIN tag
                 // the second line onwards conveniently have the number as
                 // the [0] tuple, and sequence string as [1] so all we have
@@ -481,40 +450,29 @@ public class GenbankFormat implements RichSequenceFormat {
         }
         return section;
     }
-    
+             
     /**
      * {@inheritDoc}
      */
     public void	writeSequence(Sequence seq, PrintStream os) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, null);
+        if (this.getPrintStream()==null) this.setPrintStream(os);
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      */
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
-        this.writeSequence(seq, format, os, null);
+        if (this.getPrintStream()==null) this.setPrintStream(os);
+        if (!format.equals(this.getDefaultFormat())) throw new IllegalArgumentException("Unknown format: "+format);
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      * Namespace is ignored as Genbank has no concept of it.
      */
-    public void	writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, ns);
-    }
-    
-    /**
-     * {@inheritDoc}
-     * Namespace is ignored as Genbank has no concept of it.
-     */
-    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
-        // Genbank only really - others are treated identically for now
-        if (!(
-                format.equalsIgnoreCase(GENBANK_FORMAT)
-                ))
-            throw new IllegalArgumentException("Unknown format: "+format);
-        
+    public void writeSequence(Sequence seq, Namespace ns) throws IOException {
         RichSequence rs;
         try {
             if (seq instanceof RichSequence) rs = (RichSequence)seq;
@@ -545,7 +503,10 @@ public class GenbankFormat implements RichSequenceFormat {
             else if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue();
-            else if (n.getTerm().equals(Terms.getKeywordsTerm())) keywords = keywords+" "+n.getValue();
+            else if (n.getTerm().equals(Terms.getKeywordsTerm())) {
+                if (keywords.equals("")) keywords=n.getValue();
+                else keywords = keywords+"; "+n.getValue();
+            }
         }
         
         // locus(name) + length + alpha + div + date line
@@ -559,22 +520,21 @@ public class GenbankFormat implements RichSequenceFormat {
         locusLine.append(StringTools.rightPad(rs.getCircular()?"circular":"",10));
         locusLine.append(StringTools.rightPad(rs.getDivision()==null?"":rs.getDivision(),10));
         locusLine.append(mdat);
-        this.writeWrappedLine(LOCUS_TAG, 12, locusLine.toString(), os);
+        StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 12, this.getLineWidth(), this.getPrintStream());
         
         // definition line
-        this.writeWrappedLine(DEFINITION_TAG, 12, rs.getDescription(), os);
+        StringTools.writeKeyValueLine(DEFINITION_TAG, rs.getDescription(), 12, this.getLineWidth(), this.getPrintStream());
         
         // accession line
-        this.writeWrappedLine(ACCESSION_TAG, 12, accessions, os);
+        StringTools.writeKeyValueLine(ACCESSION_TAG, accessions, 12, this.getLineWidth(), this.getPrintStream());
         
         // version + gi line
         String version = accession+"."+rs.getVersion();
         if (rs.getIdentifier()!=null) version = version + "  GI:"+rs.getIdentifier();
-        this.writeWrappedLine(VERSION_TAG, 12, version, os);
+        StringTools.writeKeyValueLine(VERSION_TAG, version, 12, this.getLineWidth(), this.getPrintStream());
         
         // keywords line
-        if (keywords.equals("")) keywords=".";
-        this.writeWrappedLine(KEYWORDS_TAG, 12, keywords, os);
+        StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords+".", 12, this.getLineWidth(), this.getPrintStream());
         
         // source line (from taxon)
         //   organism line
@@ -582,8 +542,8 @@ public class GenbankFormat implements RichSequenceFormat {
         if (tax!=null) {
             String[] sciNames = (String[])tax.getNames(NCBITaxon.SCIENTIFIC).toArray(new String[0]);
             if (sciNames.length>0) {
-                this.writeWrappedLine(SOURCE_TAG, 12, sciNames[0], os);
-                this.writeWrappedLine("  "+ORGANISM_TAG, 12, sciNames[0], os);
+                StringTools.writeKeyValueLine(SOURCE_TAG, sciNames[0], 12, this.getLineWidth(), this.getPrintStream());
+                StringTools.writeKeyValueLine("  "+ORGANISM_TAG, sciNames[0], 12, this.getLineWidth(), this.getPrintStream());
             }
         }
         
@@ -595,13 +555,13 @@ public class GenbankFormat implements RichSequenceFormat {
             if (rstart==null) rstart = new Integer(1);
             Integer rend = rdr.getEnd();
             if (rend==null) rend = new Integer(rs.length());
-            this.writeWrappedLine(REFERENCE_TAG, 12, rdr.getRank()+"  (bases "+rstart+" to "+rend+")", os);
-            if (d.getAuthors()!=null) this.writeWrappedLine("  "+AUTHORS_TAG, 12, d.getAuthors(), os);
-            this.writeWrappedLine("  "+TITLE_TAG, 12, d.getTitle(), os);
-            this.writeWrappedLine("  "+JOURNAL_TAG, 12, d.getLocation(), os);
+            StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+"  (bases "+rstart+" to "+rend+")", 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine("  "+AUTHORS_TAG, d.getAuthors(), 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine("  "+TITLE_TAG, d.getTitle(), 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine("  "+JOURNAL_TAG, d.getLocation(), 12, this.getLineWidth(), this.getPrintStream());
             CrossRef c = d.getCrossref();
-            if (c!=null) this.writeWrappedLine("  "+c.getDbname().toUpperCase(), 12, c.getAccession(), os);
-            if (d.getRemark()!=null) this.writeWrappedLine("  "+REMARK_TAG, 12, d.getRemark(), os);
+            if (c!=null) StringTools.writeKeyValueLine("  "+c.getDbname().toUpperCase(), c.getAccession(), 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine("  "+REMARK_TAG, d.getRemark(), 12, this.getLineWidth(), this.getPrintStream());
         }
         
         // comments - if any
@@ -612,29 +572,29 @@ public class GenbankFormat implements RichSequenceFormat {
                 sb.append(c.getComment());
                 if (i.hasNext()) sb.append("\n");
             }
-            this.writeWrappedLine(COMMENT_TAG, 12, sb.toString(), os);
+            StringTools.writeKeyValueLine(COMMENT_TAG, sb.toString(), 12, this.getLineWidth(), this.getPrintStream());
         }
         
-        os.println(FEATURE_TAG+"             Location/Qualifiers");
+        this.getPrintStream().println(FEATURE_TAG+"             Location/Qualifiers");
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
-            this.writeWrappedLocationLine("     "+f.getTypeTerm().getName(), 21, GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), os);
+            StringTools.writeKeyValueLine("     "+f.getTypeTerm().getName(), GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), 21, this.getLineWidth(), ",", this.getPrintStream());
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
                 // /key="val" or just /key if val==""
-                if (n.getValue()==null || n.getValue().equals("")) this.writeWrappedLine("",21,"/"+n.getTerm(),os);
-                else this.writeWrappedLine("",21,"/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", os);
+                if (n.getValue()==null || n.getValue().equals("")) StringTools.writeKeyValueLine("", "/"+n.getTerm(), 21, this.getLineWidth(), this.getPrintStream());
+                else StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), this.getPrintStream());
             }
             // add-in to source feature only db_xref="taxon:xyz" where present
             if (f.getType().equals("source") && tax!=null) {
-                this.writeWrappedLine("",21,"/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", os);
+                StringTools.writeKeyValueLine("", "/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", 21, this.getLineWidth(), this.getPrintStream());
             }
             // add-in other dbxrefs where present
             for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
                 RankedCrossRef rcr = (RankedCrossRef)j.next();
                 CrossRef cr = rcr.getCrossRef();
-                this.writeWrappedLine("",21,"/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", os);
+                StringTools.writeKeyValueLine("", "/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", 21, this.getLineWidth(), this.getPrintStream());
             }
         }
         
@@ -669,62 +629,36 @@ public class GenbankFormat implements RichSequenceFormat {
                         oCount++;
                 }
             }
-            os.print(BASE_COUNT_TAG+"    ");
-            os.print(aCount + " a   ");
-            os.print(cCount + " c   ");
-            os.print(gCount + " g   ");
-            os.print(tCount + " t    ");
-            os.println(oCount + " others");
+            this.getPrintStream().print(BASE_COUNT_TAG+"    ");
+            this.getPrintStream().print(aCount + " a   ");
+            this.getPrintStream().print(cCount + " c   ");
+            this.getPrintStream().print(gCount + " g   ");
+            this.getPrintStream().print(tCount + " t    ");
+            this.getPrintStream().println(oCount + " others");
         }
         
-        os.println(START_SEQUENCE_TAG);
+        this.getPrintStream().println(START_SEQUENCE_TAG);
         // sequence stuff
         Symbol[] syms = (Symbol[])rs.toList().toArray(new Symbol[0]);
         int lines = 0;
         int symCount = 0;
         for (int i = 0; i < syms.length; i++) {
             if (symCount % 60 == 0) {
-                if (lines > 0) os.print("\n"); // newline from previous line
+                if (lines > 0) this.getPrintStream().print("\n"); // newline from previous line
                 int lineNum = (lines*60) + 1;
-                os.print(StringTools.leftPad(""+lineNum,9));
+                this.getPrintStream().print(StringTools.leftPad(""+lineNum,9));
                 lines++;
             }
-            if (symCount % 10 == 0) os.print(" ");
+            if (symCount % 10 == 0) this.getPrintStream().print(" ");
             try {
-                os.print(tok.tokenizeSymbol(syms[i]));
+                this.getPrintStream().print(tok.tokenizeSymbol(syms[i]));
             } catch (IllegalSymbolException e) {
                 throw new RuntimeException("Found illegal symbol: "+syms[i]);
             }
             symCount++;
         }
-        os.print("\n");
-        os.println(END_SEQUENCE_TAG);
-    }
-    
-    // writes a line wrapped over spaces
-    private void writeWrappedLine(String key, int indent, String text, PrintStream os) throws IOException {
-        this._writeWrappedLine(key,indent,text,os,"\\s");
-    }
-    
-    // writes a line wrapped over commas
-    private void writeWrappedLocationLine(String key, int indent, String text, PrintStream os) throws IOException {
-        this._writeWrappedLine(key,indent,text,os,",");
-    }
-    
-    // writes a line wrapped to a certain width and indented
-    private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
-        if (key==null || text==null) return;
-        text = text.trim();
-        StringBuffer b = new StringBuffer();
-        b.append(StringTools.rightPad(key, indent));
-        String[] lines = StringTools.writeWordWrap(text, sep, this.getLineWidth()-indent);
-        for (int i = 0; i<lines.length; i++) {
-            if (i==0) b.append(lines[i]);
-            else b.append(StringTools.leftIndent(lines[i],indent));
-            // print line before continuing to next one
-            os.println(b.toString());
-            b.setLength(0);
-        }
+        this.getPrintStream().print("\n");
+        this.getPrintStream().println(END_SEQUENCE_TAG);
     }
     
     /**

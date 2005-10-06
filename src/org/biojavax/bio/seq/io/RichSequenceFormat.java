@@ -38,6 +38,32 @@ import org.biojavax.ontology.ComparableTerm;
  * @author Richard Holland
  */
 public interface RichSequenceFormat extends SequenceFormat {
+    /**
+     * Sets the stream to write to.
+     * @param os the PrintStream to write to.
+     * @throws IOException if writing fails.
+     */
+    public void setPrintStream(PrintStream os);
+    
+    /**
+     * Gets the print stream currently being written to.
+     * @return the current print stream.
+     */
+    public PrintStream getPrintStream();
+    
+    /**
+     * Informs the writer that we want to start writing. This will do any initialisation
+     * required, such as writing the opening tags of an XML file that groups sequences together.
+     * @throws IOException if writing fails.
+     */
+    public void beginWriting() throws IOException;
+    
+    /**
+     * Informs the writer that are done writing. This will do any finalisation
+     * required, such as writing the closing tags of an XML file that groups sequences together.
+     * @throws IOException if writing fails.
+     */
+    public void finishWriting() throws IOException;
     
     /**
      * Reads a sequence from the given buffered reader using the given tokenizer to parse
@@ -59,7 +85,7 @@ public interface RichSequenceFormat extends SequenceFormat {
             RichSeqIOListener listener,Namespace ns) throws BioException, IllegalSymbolException, IOException;
     
     /**
-     * Writes a sequence out to the given outputstream using the default format of the
+     * Writes a sequence out to the outputstream given by beginWriting() using the default format of the
      * implementing class. If namespace is given, sequences will be written with that
      * namespace, otherwise they will be written with the default namespace of the
      * implementing class (which is usually the namespace of the sequence itself).
@@ -67,29 +93,11 @@ public interface RichSequenceFormat extends SequenceFormat {
      * convert it using RichSequence.Tools.enrich(). Obviously this is not going to guarantee
      * a perfect conversion, so it's better if you just use RichSequences to start with!
      * @param seq the sequence to write
-     * @param os the place to write it to
      * @param ns the namespace to write it with
      * @throws IOException in case it couldn't write something
      */
-    public void writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException;
+    public void writeSequence(Sequence seq, Namespace ns) throws IOException;
     
-    /**
-     * @deprecated - use writeSequence(seq,os,ns)
-     * Writes a sequence out to the given outputstream using the given format of the
-     * implementing class. If namespace is given, sequences will be written with that
-     * namespace, otherwise they will be written with the default namespace of the
-     * implementing class (which is usually the namespace of the sequence itself).
-     * If you pass this method a sequence which is not a RichSequence, it will attempt to
-     * convert it using RichSequence.Tools.enrich(). Obviously this is not going to guarantee
-     * a perfect conversion, so it's better if you just use RichSequences to start with!
-     * @param seq the sequence to write
-     * @param format the format to use - depends on the implementing class
-     * @param os the place to write it to
-     * @param ns the namespace to write it with
-     * @throws IOException in case it couldn't write something
-     */
-    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException;
-        
     /**
      * Retrive the current line width. Defaults to 80.
      * @return the line width
@@ -195,5 +203,66 @@ public interface RichSequenceFormat extends SequenceFormat {
             if (IDENTIFIER_TERM==null) IDENTIFIER_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("IDENTIFIER");
             return IDENTIFIER_TERM;
         }
+    }
+    
+    /**
+     * Provides a basic format with simple things like line-widths precoded.
+     */
+    public abstract class BasicFormat implements RichSequenceFormat  {
+        
+        private int lineWidth = 80;
+        private boolean elideSymbols = false;
+        private PrintStream os;
+        
+        /**
+         * @{inheritDoc}
+         */
+        public int getLineWidth() { return this.lineWidth; }
+        
+        /**
+         * @{inheritDoc}
+         */
+        public void setLineWidth(int width) {
+            if (width<1) throw new IllegalArgumentException("Width cannot be less than 1");
+            this.lineWidth = width;
+        }
+        
+        /**
+         * @{inheritDoc}
+         */
+        public boolean getElideSymbols() { return this.elideSymbols; }
+        
+        /**
+         * @{inheritDoc}
+         */
+        public void setElideSymbols(boolean elideSymbols) { this.elideSymbols = elideSymbols; }
+        
+        /**
+         * @{inheritDoc}
+         */
+        public void setPrintStream(PrintStream os) {
+            if (os==null) throw new IllegalArgumentException("Print stream cannot be null");
+            this.os = os;
+        }
+        
+        /**
+         * @{inheritDoc}
+         */
+        public PrintStream getPrintStream() { return this.os; }
+    }
+    
+    /**
+     * Provides the basic implementation required for simple header/footer-less files such as Genbank.
+     */
+    public abstract class HeaderlessFormat extends BasicFormat {
+        /**
+         * @{inheritDoc}
+         */
+        public void beginWriting() throws IOException {}
+        
+        /**
+         * @{inheritDoc}
+         */
+        public void finishWriting() throws IOException {}
     }
 }

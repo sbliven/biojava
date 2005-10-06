@@ -75,7 +75,7 @@ import org.biojavax.utils.StringTools;
  *
  * @author Richard Holland
  */
-public class UniProtFormat implements RichSequenceFormat {
+public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     
     /**
      * The name of this format
@@ -158,38 +158,6 @@ public class UniProtFormat implements RichSequenceFormat {
             if (FEATUREDESC_TERM==null) FEATUREDESC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("description");
             return FEATUREDESC_TERM;
         }
-    }
-    
-    private int lineWidth = 80;
-    
-    /**
-     * {@inheritDoc}
-     */
-    public int getLineWidth() {
-        return lineWidth;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setLineWidth(int width) {
-        this.lineWidth = width;
-    }
-    
-    private boolean elideSymbols = false;
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean getElideSymbols() {
-        return elideSymbols;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setElideSymbols(boolean elideSymbols) {
-        this.elideSymbols = elideSymbols;
     }
     
     /**
@@ -426,7 +394,7 @@ public class UniProtFormat implements RichSequenceFormat {
                 // starting from second line of input, start a new feature whenever we come across
                 // a key that does not start with /
                 boolean seenAFeature = false;
-                Pattern p = Pattern.compile("\\s*([\\d\\?<]+)\\s+([\\d\\?>]+)(\\s+(\\S.*))?");
+                Pattern p = Pattern.compile("\\s*([\\d\\?<]+\\s+[\\d\\?>]+)(\\s+(\\S.*))?");
                 for (int i = 1 ; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
@@ -454,10 +422,9 @@ public class UniProtFormat implements RichSequenceFormat {
                         String desc = null;
                         Matcher m = p.matcher(val);
                         if (m.matches()) {
-                            String start = m.group(1);
-                            String end = m.group(2);
-                            desc = m.group(4);
-                            templ.location = UniProtLocationParser.parseLocation(start, end);
+                            String loc = m.group(1);
+                            desc = m.group(3);
+                            templ.location = UniProtLocationParser.parseLocation(loc);
                         } else {
                             throw new ParseException("Bad feature value: "+val);
                         }
@@ -467,7 +434,7 @@ public class UniProtFormat implements RichSequenceFormat {
                     }
                 }
                 if (seenAFeature) rlistener.endFeature();
-            } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.elideSymbols) {
+            } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.getElideSymbols()) {
                 StringBuffer seq = new StringBuffer();
                 for (int i = 0 ; i < section.size(); i++) seq.append(((String[])section.get(i))[1]);
                 try {
@@ -663,40 +630,29 @@ public class UniProtFormat implements RichSequenceFormat {
         }
         return section;
     }
-    
+             
     /**
      * {@inheritDoc}
      */
     public void	writeSequence(Sequence seq, PrintStream os) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, null);
+        if (this.getPrintStream()==null) this.setPrintStream(os);
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      */
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
-        this.writeSequence(seq, format, os, null);
+        if (this.getPrintStream()==null) this.setPrintStream(os);
+        if (!format.equals(this.getDefaultFormat())) throw new IllegalArgumentException("Unknown format: "+format);
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      * Namespace is ignored as UniProt has no concept of it.
      */
-    public void	writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, ns);
-    }
-    
-    /**
-     * {@inheritDoc}
-     * Namespace is ignored as UniProt has no concept of it.
-     */
-    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
-        // UniProt only really - others are treated identically for now
-        if (!(
-                format.equalsIgnoreCase(UNIPROT_FORMAT)
-                ))
-            throw new IllegalArgumentException("Unknown format: "+format);
-        
+    public void writeSequence(Sequence seq, Namespace ns) throws IOException {
         RichSequence rs;
         try {
             if (seq instanceof RichSequence) rs = (RichSequence)seq;
@@ -736,18 +692,18 @@ public class UniProtFormat implements RichSequenceFormat {
         locusLine.append(";      PRT; ");
         locusLine.append(StringTools.leftPad(""+rs.length(),5));
         locusLine.append(" AA.");
-        this.writeWrappedLine(LOCUS_TAG, 5, locusLine.toString(), os);
+        StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 5, this.getLineWidth(), null, LOCUS_TAG, this.getPrintStream());
         
         // accession line
-        this.writeWrappedLine(ACCESSION_TAG, 5, accessions, os);
+        StringTools.writeKeyValueLine(ACCESSION_TAG, accessions, 5, this.getLineWidth(), null, ACCESSION_TAG, this.getPrintStream());
         
         // date line
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Created)", os);
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last sequence update)",os);
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 00, Last annotation update)",os);
+        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 00, Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 00, Last sequence update)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 00, Last annotation update)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         
         // definition line
-        this.writeWrappedLine(DEFINITION_TAG, 5, rs.getDescription(), os);
+        StringTools.writeKeyValueLine(DEFINITION_TAG, rs.getDescription(), 5, this.getLineWidth(), null, DEFINITION_TAG, this.getPrintStream());
         
         // gene line
         String geneline = null;
@@ -761,7 +717,7 @@ public class UniProtFormat implements RichSequenceFormat {
                 else geneline+=", ";
             }
         }
-        if (geneline!=null) this.writeWrappedLine(GENE_TAG, 5, geneline, os);
+        if (geneline!=null) StringTools.writeKeyValueLine(GENE_TAG, geneline, 5, this.getLineWidth(), null, GENE_TAG, this.getPrintStream());
         
         // source line (from taxon)
         //   organism line
@@ -770,13 +726,13 @@ public class UniProtFormat implements RichSequenceFormat {
             String[] sciNames = (String[])tax.getNames(NCBITaxon.SCIENTIFIC).toArray(new String[0]);
             String[] comNames = (String[])tax.getNames(NCBITaxon.COMMON).toArray(new String[0]);
             if (sciNames.length>0 && comNames.length>0) {
-                this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0]+" ("+comNames[0]+").", os);
-                this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0]+" ("+comNames[0]+").", os);
+                StringTools.writeKeyValueLine(SOURCE_TAG, sciNames[0]+" ("+comNames[0]+").", 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+                StringTools.writeKeyValueLine(ORGANISM_TAG, sciNames[0]+" ("+comNames[0]+").", 5, this.getLineWidth(), null, ORGANISM_TAG, this.getPrintStream());
             } else if (sciNames.length>0) {
-                this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0]+".", os);
-                this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0]+".", os);
+                StringTools.writeKeyValueLine(SOURCE_TAG, sciNames[0]+".", 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+                StringTools.writeKeyValueLine(ORGANISM_TAG, sciNames[0]+".", 5, this.getLineWidth(), null, ORGANISM_TAG, this.getPrintStream());
             }
-            this.writeWrappedLine(TAXON_TAG, 5, "NCBI_TaxID="+tax.getNCBITaxID()+";", os);
+            StringTools.writeKeyValueLine(TAXON_TAG, "NCBI_TaxID="+tax.getNCBITaxID()+";", 5, this.getLineWidth(), this.getPrintStream());
         }
         
         // references - rank (bases x to y)
@@ -784,16 +740,16 @@ public class UniProtFormat implements RichSequenceFormat {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
             // RN, RP, RC, RX, RG, RA, RT, RL
-            this.writeWrappedLine(REFERENCE_TAG, 5, "["+rdr.getRank()+"]", os);
+            StringTools.writeKeyValueLine(REFERENCE_TAG, "["+rdr.getRank()+"]", 5, this.getLineWidth(), null, REFERENCE_TAG, this.getPrintStream());
             // NO RP TAG - CANNOT FORCE INTO BIOSQL!
             // Just print out ref position if present
-            if (rdr.getStart()!=null && rdr.getEnd()!=null) this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, "(SEQUENCE OF "+rdr.getStart()+"-"+rdr.getEnd()+")",os);
-            if (d.getRemark()!=null) this.writeWrappedLine(REMARK_TAG, 5, d.getRemark(), os);
+            if (rdr.getStart()!=null && rdr.getEnd()!=null) StringTools.writeKeyValueLine(REFERENCE_POSITION_TAG, "(SEQUENCE OF "+rdr.getStart()+"-"+rdr.getEnd()+")", 5, this.getLineWidth(), null, REFERENCE_POSITION_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(REMARK_TAG, d.getRemark(), 5, this.getLineWidth(), null, REMARK_TAG, this.getPrintStream());
             CrossRef c = d.getCrossref();
-            if (c!=null) this.writeWrappedLine(REFERENCE_XREF_TAG, 5, c.getDbname().toUpperCase()+"="+c.getAccession()+";", os);
-            if (d.getAuthors()!=null) this.writeWrappedLine(AUTHORS_TAG, 5, d.getAuthors(), os);
-            this.writeWrappedLine(TITLE_TAG, 5, d.getTitle(), os);
-            this.writeWrappedLine(JOURNAL_TAG, 5, d.getLocation(), os);
+            if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname().toUpperCase()+"="+c.getAccession()+";", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(AUTHORS_TAG, d.getAuthors(), 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(TITLE_TAG, d.getTitle(), 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(JOURNAL_TAG, d.getLocation(), 5, this.getLineWidth(), null, JOURNAL_TAG, this.getPrintStream());
         }
         
         // comments - if any
@@ -801,8 +757,8 @@ public class UniProtFormat implements RichSequenceFormat {
             for (Iterator i = rs.getComments().iterator(); i.hasNext(); ) {
                 Comment c = (SimpleComment)i.next();
                 String text = c.getComment().trim();
-                if (text.length()>3 && text.substring(0,3).equals("-!-")) this.writeWrappedCommentLine(COMMENT_TAG, 5, "-!- ", 4, text.substring(4), os);
-                else this.writeWrappedLine(COMMENT_TAG, 5, text, os);
+                if (text.length()>3 && text.substring(0,3).equals("-!-")) StringTools.writeKeyValueLine(COMMENT_TAG+"   -!- ", text.substring(4), 9, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
+                else StringTools.writeKeyValueLine(COMMENT_TAG, text, 5, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
             }
         }
         
@@ -826,7 +782,7 @@ public class UniProtFormat implements RichSequenceFormat {
             }
             if (!hasSecondary) sb.append("; -");
             sb.append(".");
-            this.writeWrappedLine(DATABASE_XREF_TAG, 5, sb.toString(), os);
+            StringTools.writeKeyValueLine(DATABASE_XREF_TAG, sb.toString(), 5, this.getLineWidth(), null, DATABASE_XREF_TAG, this.getPrintStream());
         }
         
         // keywords line
@@ -839,7 +795,7 @@ public class UniProtFormat implements RichSequenceFormat {
             }
         }
         if (keywords!=null) {
-            this.writeWrappedLine(KEYWORDS_TAG, 5, keywords+".", os);
+            StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords+".", 5, this.getLineWidth(), null, KEYWORDS_TAG, this.getPrintStream());
         }
         
         // feature_type     location
@@ -854,8 +810,8 @@ public class UniProtFormat implements RichSequenceFormat {
             }
             String kw = f.getTypeTerm().getName();
             String leader = StringTools.rightPad(kw,8)+" "+UniProtLocationParser.writeLocation((RichLocation)f.getLocation());
-            this.writeWrappedLocationLine(FEATURE_TAG, 5, leader, 24, desc, os);
-            if (ftid!=null) this.writeWrappedLine(FEATURE_TAG,29,"/FTId="+ftid+".", os);
+            StringTools.writeKeyValueLine(FEATURE_TAG+"   "+leader, desc, 29, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
+            if (ftid!=null) StringTools.writeKeyValueLine(FEATURE_TAG, "/FTId="+ftid+".", 29, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
         }
         
         // sequence header
@@ -868,76 +824,30 @@ public class UniProtFormat implements RichSequenceFormat {
         CRC64Checksum crc = new CRC64Checksum();
         String seqstr = rs.seqString();
         crc.update(seqstr.getBytes(),0,seqstr.length());
-        os.print(START_SEQUENCE_TAG+"   SEQUENCE "+StringTools.rightPad(""+rs.length(),4)+" AA; ");
-        os.print(StringTools.rightPad(""+mw,5)+" MW; ");
-        os.println(crc+" CRC64;");
+        this.getPrintStream().print(START_SEQUENCE_TAG+"   SEQUENCE "+StringTools.rightPad(""+rs.length(),4)+" AA; ");
+        this.getPrintStream().print(StringTools.rightPad(""+mw,5)+" MW; ");
+        this.getPrintStream().println(crc+" CRC64;");
         
         // sequence stuff
         Symbol[] syms = (Symbol[])rs.toList().toArray(new Symbol[0]);
         int symCount = 0;
-        os.print("    ");
+        this.getPrintStream().print("    ");
         for (int i = 0; i < syms.length; i++) {
             if (symCount % 60 == 0 && symCount>0) {
-                os.print("\n    ");
+                this.getPrintStream().print("\n    ");
             }
             if (symCount % 10 == 0) {
-                os.print(" ");
+                this.getPrintStream().print(" ");
             }
             try {
-                os.print(tok.tokenizeSymbol(syms[i]));
+                this.getPrintStream().print(tok.tokenizeSymbol(syms[i]));
             } catch (IllegalSymbolException e) {
                 throw new RuntimeException("Found illegal symbol: "+syms[i]);
             }
             symCount++;
         }
-        os.print("\n");
-        os.println(END_SEQUENCE_TAG);
-    }
-    
-// writes a line wrapped over spaces
-    private void writeWrappedLine(String key, int indent, String text, PrintStream os) throws IOException {
-        this._writeWrappedLine(key,indent,text,os,"\\s");
-    }
-    
-// writes a line wrapped over spaces
-    private void writeWrappedCommentLine(String key, int initialIndent, String name, int secondIndent, String comment, PrintStream os) {
-        this._writeDoubleWrappedLine("\\s", key, initialIndent, name, secondIndent, comment, os);
-    }
-    
-// writes a line wrapped over commas
-    private void writeWrappedLocationLine(String key, int initialIndent, String name, int secondIndent, String location, PrintStream os) {
-        this._writeDoubleWrappedLine("\\s", key, initialIndent, name, secondIndent, location, os);
-    }
-    
-// writes a line wrapped to a certain width and indented
-    private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
-        if (key==null || text==null) return;
-        text = text.trim();
-        StringBuffer b = new StringBuffer();
-        b.append(StringTools.rightPad(key, indent));
-        String[] lines = StringTools.writeWordWrap(text, sep, this.getLineWidth()-indent);
-        for (int i = 0; i<lines.length; i++) {
-            if (i==0) b.append(lines[i]);
-            else {
-                b.append(StringTools.rightPad(key, indent));
-                b.append(lines[i]);
-            }
-            // print line before continuing to next one
-            os.println(b.toString());
-            b.setLength(0);
-        }
-    }
-    
-// writes a line wrapped over two separate indent sizes
-    private void _writeDoubleWrappedLine(String sep, String key, int initialIndent, String text, int secondIndent, String location, PrintStream os) {
-        if (key==null || text==null) return;
-        int totalIndent = initialIndent+secondIndent;
-        String[] lines = StringTools.writeWordWrap(location, sep, this.getLineWidth()-totalIndent);
-        lines[0] = StringTools.rightPad(key,initialIndent)+
-                StringTools.rightPad(text,secondIndent)+
-                lines[0];
-        os.println(lines[0]);
-        for (int i = 1; i < lines.length; i++) os.println(StringTools.rightPad(key,totalIndent)+lines[i]);
+        this.getPrintStream().print("\n");
+        this.getPrintStream().println(END_SEQUENCE_TAG);
     }
     
     /**

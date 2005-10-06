@@ -43,14 +43,14 @@ public class UniProtLocationParser {
     
     /**
      * Parses a location.
-     * @param startString the UniProt start location string.
-     * @param endString the UniProt end location string.
+     * @param loc the UniProt location string.
      * @return RichLocation the equivalent RichLocation object.
      * @throws ParseException if the parsing failed.
      */
-    public static RichLocation parseLocation(String startString, String endString) throws ParseException {
-        Position startPos = parsePosition(startString);
-        Position endPos = parsePosition(endString);
+    public static RichLocation parseLocation(String loc) throws ParseException {
+        String parts[] = loc.trim().split("\\s+");
+        Position startPos = parsePosition(parts[0].trim());
+        Position endPos = parsePosition(parts[1].trim());
         return new SimpleRichLocation(startPos,endPos,1,Strand.POSITIVE_STRAND,null);
     }
     

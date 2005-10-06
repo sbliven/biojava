@@ -72,7 +72,7 @@ import org.biojavax.utils.StringTools;
  *
  * @author Richard Holland
  */
-public class EMBLFormat implements RichSequenceFormat {
+public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     
     /**
      * The name of this format
@@ -119,39 +119,7 @@ public class EMBLFormat implements RichSequenceFormat {
             return EMBL_TERM;
         }
     }
-    
-    private int lineWidth = 80;
-    
-    /**
-     * {@inheritDoc}
-     */
-    public int getLineWidth() {
-        return lineWidth;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setLineWidth(int width) {
-        this.lineWidth = width;
-    }
-    
-    private boolean elideSymbols = false;
-    
-    /**
-     * {@inheritDoc}
-     */
-    public boolean getElideSymbols() {
-        return elideSymbols;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setElideSymbols(boolean elideSymbols) {
-        this.elideSymbols = elideSymbols;
-    }
-    
+        
     /**
      * {@inheritDoc}
      */
@@ -424,7 +392,7 @@ public class EMBLFormat implements RichSequenceFormat {
                     }
                 }
                 if (seenAFeature) rlistener.endFeature();
-            } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.elideSymbols) {
+            } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.getElideSymbols()) {
                 StringBuffer seq = new StringBuffer();
                 for (int i = 0 ; i < section.size(); i++) seq.append(((String[])section.get(i))[1]);
                 try {
@@ -604,40 +572,29 @@ public class EMBLFormat implements RichSequenceFormat {
         }
         return section;
     }
-    
+         
     /**
      * {@inheritDoc}
      */
     public void	writeSequence(Sequence seq, PrintStream os) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, null);
+        if (this.getPrintStream()==null) this.setPrintStream(os);
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      */
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
-        this.writeSequence(seq, format, os, null);
+        if (this.getPrintStream()==null) this.setPrintStream(os);
+        if (!format.equals(this.getDefaultFormat())) throw new IllegalArgumentException("Unknown format: "+format);
+        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
      * {@inheritDoc}
      * Namespace is ignored as EMBL has no concept of it.
      */
-    public void	writeSequence(Sequence seq, PrintStream os, Namespace ns) throws IOException {
-        this.writeSequence(seq, getDefaultFormat(), os, ns);
-    }
-    
-    /**
-     * {@inheritDoc}
-     * Namespace is ignored as EMBL has no concept of it.
-     */
-    public void writeSequence(Sequence seq, String format, PrintStream os, Namespace ns) throws IOException {
-        // EMBL only really - others are treated identically for now
-        if (!(
-                format.equalsIgnoreCase(EMBL_FORMAT)
-                ))
-            throw new IllegalArgumentException("Unknown format: "+format);
-        
+    public void writeSequence(Sequence seq, Namespace ns) throws IOException {
         RichSequence rs;
         try {
             if (seq instanceof RichSequence) rs = (RichSequence)seq;
@@ -678,25 +635,25 @@ public class EMBLFormat implements RichSequenceFormat {
         locusLine.append("; ");
         locusLine.append(rs.length());
         locusLine.append(" BP.");
-        this.writeWrappedLine(LOCUS_TAG, 5, locusLine.toString(), os);
-        os.println(DELIMITER_TAG+"   ");
+        StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 5, this.getLineWidth(), null, LOCUS_TAG, this.getPrintStream());
+        this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // accession line
-        this.writeWrappedLine(ACCESSION_TAG, 5, accessions, os);
-        os.println(DELIMITER_TAG+"   ");
+        StringTools.writeKeyValueLine(ACCESSION_TAG, accessions, 5, this.getLineWidth(), null, ACCESSION_TAG, this.getPrintStream());
+        this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // version line
-        this.writeWrappedLine(VERSION_TAG, 5, accession+"."+rs.getVersion(), os);
-        os.println(DELIMITER_TAG+"   ");
+        StringTools.writeKeyValueLine(VERSION_TAG, accession+"."+rs.getVersion(), 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
+        this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // date line
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Created)", os);
-        this.writeWrappedLine(DATE_TAG, 5, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", os);
-        os.println(DELIMITER_TAG+"   ");
+        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 0, Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // definition line
-        this.writeWrappedLine(DEFINITION_TAG, 5, rs.getDescription(), os);
-        os.println(DELIMITER_TAG+"   ");
+        StringTools.writeKeyValueLine(DEFINITION_TAG, rs.getDescription(), 5, this.getLineWidth(), null, DEFINITION_TAG, this.getPrintStream());
+        this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // keywords line
         String keywords = null;
@@ -708,8 +665,8 @@ public class EMBLFormat implements RichSequenceFormat {
             }
         }
         if (keywords!=null) {
-            this.writeWrappedLine(KEYWORDS_TAG, 5, keywords, os);
-            os.println(DELIMITER_TAG+"   ");
+            StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords, 5, this.getLineWidth(), null, KEYWORDS_TAG, this.getPrintStream());
+            this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         
         // source line (from taxon)
@@ -719,13 +676,13 @@ public class EMBLFormat implements RichSequenceFormat {
             String[] sciNames = (String[])tax.getNames(NCBITaxon.SCIENTIFIC).toArray(new String[0]);
             String[] comNames = (String[])tax.getNames(NCBITaxon.COMMON).toArray(new String[0]);
             if (sciNames.length>0 && comNames.length>0) {
-                this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0]+" ("+comNames[0]+")", os);
-                this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0]+" ("+comNames[0]+")", os);
-                os.println(DELIMITER_TAG+"   ");
+                StringTools.writeKeyValueLine(SOURCE_TAG, sciNames[0]+" ("+comNames[0]+")", 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+                StringTools.writeKeyValueLine(ORGANISM_TAG, sciNames[0]+" ("+comNames[0]+")", 5, this.getLineWidth(), null, ORGANISM_TAG, this.getPrintStream());
+                this.getPrintStream().println(DELIMITER_TAG+"   ");
             } else if (sciNames.length>0) {
-                this.writeWrappedLine(SOURCE_TAG, 5, sciNames[0], os);
-                this.writeWrappedLine(ORGANISM_TAG, 5, sciNames[0], os);
-                os.println(DELIMITER_TAG+"   ");
+                StringTools.writeKeyValueLine(SOURCE_TAG, sciNames[0], 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+                StringTools.writeKeyValueLine(ORGANISM_TAG, sciNames[0], 5, this.getLineWidth(), null, ORGANISM_TAG, this.getPrintStream());
+                this.getPrintStream().println(DELIMITER_TAG+"   ");
             }
         }
         
@@ -734,19 +691,19 @@ public class EMBLFormat implements RichSequenceFormat {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
             // RN, RC, RP, RX, RG, RA, RT, RL
-            this.writeWrappedLine(REFERENCE_TAG, 5, "["+rdr.getRank()+"]", os);
-            if (d.getRemark()!=null) this.writeWrappedLine(REMARK_TAG, 5, d.getRemark(), os);
+            StringTools.writeKeyValueLine(REFERENCE_TAG, "["+rdr.getRank()+"]", 5, this.getLineWidth(), null, REFERENCE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(REMARK_TAG, d.getRemark(), 5, this.getLineWidth(), null, REMARK_TAG, this.getPrintStream());
             Integer rstart = rdr.getStart();
             if (rstart==null) rstart = new Integer(1);
             Integer rend = rdr.getEnd();
             if (rend==null) rend = new Integer(rs.length());
-            this.writeWrappedLine(REFERENCE_POSITION_TAG, 5, rstart+"-"+rend, os);
+            StringTools.writeKeyValueLine(REFERENCE_POSITION_TAG, rstart+"-"+rend, 5, this.getLineWidth(), null, REFERENCE_POSITION_TAG, this.getPrintStream());
             CrossRef c = d.getCrossref();
-            if (c!=null) this.writeWrappedLine(REFERENCE_XREF_TAG, 5, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", os);
-            if (d.getAuthors()!=null) this.writeWrappedLine(AUTHORS_TAG, 5, d.getAuthors(), os);
-            this.writeWrappedLine(TITLE_TAG, 5, d.getTitle(), os);
-            this.writeWrappedLine(JOURNAL_TAG, 5, d.getLocation(), os);
-            os.println(DELIMITER_TAG+"   ");
+            if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(AUTHORS_TAG, d.getAuthors(), 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(TITLE_TAG, d.getTitle(), 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(JOURNAL_TAG, d.getLocation(), 5, this.getLineWidth(), null, JOURNAL_TAG, this.getPrintStream());
+            this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         
         // db references - ranked
@@ -769,9 +726,9 @@ public class EMBLFormat implements RichSequenceFormat {
             }
             if (!hasSecondary) sb.append("; -");
             sb.append(".");
-            this.writeWrappedLine(DATABASE_XREF_TAG, 5, sb.toString(), os);
+            StringTools.writeKeyValueLine(DATABASE_XREF_TAG, sb.toString(), 5, this.getLineWidth(), null, DATABASE_XREF_TAG, this.getPrintStream());
         }
-        os.println(DELIMITER_TAG+"   ");
+        this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // comments - if any
         if (!rs.getComments().isEmpty()) {
@@ -781,34 +738,34 @@ public class EMBLFormat implements RichSequenceFormat {
                 sb.append(c.getComment());
                 if (i.hasNext()) sb.append("\n");
             }
-            this.writeWrappedLine(COMMENT_TAG, 5, sb.toString(), os);
-            os.println(DELIMITER_TAG+"   ");
+            StringTools.writeKeyValueLine(COMMENT_TAG, sb.toString(), 5, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
+            this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         
-        os.println(FEATURE_HEADER_TAG+"   Key             Location/Qualifiers");
-        os.println(FEATURE_HEADER_TAG+"   ");
+        this.getPrintStream().println(FEATURE_HEADER_TAG+"   Key             Location/Qualifiers");
+        this.getPrintStream().println(FEATURE_HEADER_TAG+"   ");
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
-            this.writeWrappedLocationLine(FEATURE_TAG, 5, f.getTypeTerm().getName(), 16, GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), os);
+            StringTools.writeKeyValueLine(FEATURE_TAG+"   "+f.getTypeTerm().getName(), GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), 21, this.getLineWidth(), ",", FEATURE_TAG, this.getPrintStream());
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
                 // /key="val" or just /key if val==""
-                if (n.getValue()==null || n.getValue().equals("")) this.writeWrappedLine("FT",21,"/"+n.getTerm(),os);
-                else this.writeWrappedLine(FEATURE_TAG,21,"/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", os);
+                if (n.getValue()==null || n.getValue().equals("")) StringTools.writeKeyValueLine(FEATURE_TAG, "/"+n.getTerm().getName(), 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
+                else StringTools.writeKeyValueLine(FEATURE_TAG, "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
             }
             // add-in to source feature only db_xref="taxon:xyz" where present
             if (f.getType().equals("source") && tax!=null) {
-                this.writeWrappedLine(FEATURE_TAG,21,"/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", os);
+                StringTools.writeKeyValueLine(FEATURE_TAG, "/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
             }
             // add-in other dbxrefs where present
             for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
                 RankedCrossRef rcr = (RankedCrossRef)j.next();
                 CrossRef cr = rcr.getCrossRef();
-                this.writeWrappedLine(FEATURE_TAG,21,"/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", os);
+                StringTools.writeKeyValueLine(FEATURE_TAG, "/db_xref=\"taxon:"+cr.getDbname()+":"+cr.getAccession()+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
             }
         }
-        os.println(DELIMITER_TAG+"   ");
+        this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // SQ   Sequence 1859 BP; 609 A; 314 C; 355 G; 581 T; 0 other;
         int aCount = 0;
@@ -840,80 +797,39 @@ public class EMBLFormat implements RichSequenceFormat {
                     oCount++;
             }
         }
-        os.print(START_SEQUENCE_TAG+"   "+rs.length()+" BP; ");
-        os.print(aCount + " A; ");
-        os.print(cCount + " C; ");
-        os.print(gCount + " G; ");
-        os.print(tCount + " T; ");
-        os.println(oCount + " other;");
+        this.getPrintStream().print(START_SEQUENCE_TAG+"   "+rs.length()+" BP; ");
+        this.getPrintStream().print(aCount + " A; ");
+        this.getPrintStream().print(cCount + " C; ");
+        this.getPrintStream().print(gCount + " G; ");
+        this.getPrintStream().print(tCount + " T; ");
+        this.getPrintStream().println(oCount + " other;");
         
         // sequence stuff
         Symbol[] syms = (Symbol[])rs.toList().toArray(new Symbol[0]);
         int lineLen = 0;
         int symCount = 0;
-        os.print("    ");
+        this.getPrintStream().print("    ");
         for (int i = 0; i < syms.length; i++) {
             if (symCount % 60 == 0 && symCount>0) {
-                os.print(StringTools.leftPad(""+symCount,10));
-                os.print("\n    ");
+                this.getPrintStream().print(StringTools.leftPad(""+symCount,10));
+                this.getPrintStream().print("\n    ");
                 lineLen = 0;
             }
             if (symCount % 10 == 0) {
-                os.print(" ");
+                this.getPrintStream().print(" ");
                 lineLen++;
             }
             try {
-                os.print(tok.tokenizeSymbol(syms[i]));
+                this.getPrintStream().print(tok.tokenizeSymbol(syms[i]));
             } catch (IllegalSymbolException e) {
                 throw new RuntimeException("Found illegal symbol: "+syms[i]);
             }
             symCount++;
             lineLen++;
         }
-        os.print(StringTools.leftPad(""+symCount,(66-lineLen)+10));
-        os.print("\n");
-        os.println(END_SEQUENCE_TAG);
-    }
-    
-    // writes a line wrapped over spaces
-    private void writeWrappedLine(String key, int indent, String text, PrintStream os) throws IOException {
-        this._writeWrappedLine(key,indent,text,os,"\\s");
-    }
-    
-    // writes a line wrapped over commas
-    private void writeWrappedLocationLine(String key, int initialIndent, String name, int secondIndent, String location, PrintStream os) {
-        this._writeDoubleWrappedLine(",", key, initialIndent, name, secondIndent, location, os);
-    }
-    
-    // writes a line wrapped to a certain width and indented
-    private void _writeWrappedLine(String key, int indent, String text, PrintStream os, String sep) throws IOException {
-        if (key==null || text==null) return;
-        text = text.trim();
-        StringBuffer b = new StringBuffer();
-        b.append(StringTools.rightPad(key, indent));
-        String[] lines = StringTools.writeWordWrap(text, sep, this.getLineWidth()-indent);
-        for (int i = 0; i<lines.length; i++) {
-            if (i==0) b.append(lines[i]);
-            else {
-                b.append(StringTools.rightPad(key, indent));
-                b.append(lines[i]);
-            }
-            // print line before continuing to next one
-            os.println(b.toString());
-            b.setLength(0);
-        }
-    }
-    
-    // writes a line wrapped over two separate indent sizes
-    private void _writeDoubleWrappedLine(String sep, String key, int initialIndent, String text, int secondIndent, String location, PrintStream os) {
-        if (key==null || text==null) return;
-        int totalIndent = initialIndent+secondIndent;
-        String[] lines = StringTools.writeWordWrap(location, sep, this.getLineWidth()-totalIndent);
-        lines[0] = StringTools.rightPad(key,initialIndent)+
-                StringTools.rightPad(text,secondIndent)+
-                lines[0];
-        os.println(lines[0]);
-        for (int i = 1; i < lines.length; i++) os.println(StringTools.rightPad(key,totalIndent)+lines[i]);
+        this.getPrintStream().print(StringTools.leftPad(""+symCount,(66-lineLen)+10));
+        this.getPrintStream().print("\n");
+        this.getPrintStream().println(END_SEQUENCE_TAG);
     }
     
     /**

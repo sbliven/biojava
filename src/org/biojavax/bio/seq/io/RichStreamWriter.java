@@ -58,13 +58,16 @@ public class RichStreamWriter {
      */
     public void writeStream(SequenceIterator ss, Namespace ns)
     throws IOException {
+        this.format.setPrintStream(this.os);
+        this.format.beginWriting();
         while(ss.hasNext()) {
             try {
-                format.writeSequence(ss.nextSequence(), os, ns);
+                this.format.writeSequence(ss.nextSequence(), ns);
             } catch (BioException se) {
                 se.printStackTrace();
             }
         }
+        this.format.finishWriting();
     }
     
     /**
