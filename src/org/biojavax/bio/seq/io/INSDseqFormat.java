@@ -33,8 +33,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.ParseException;
@@ -69,8 +67,8 @@ import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
 import org.biojavax.utils.StringTools;
+import org.biojavax.utils.XMLTools;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -169,15 +167,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener,null);
     }
     
-    // contains all the sequences from the file
-    private List sequenceBuffer = null;
-    private Iterator seqBufferIterator = null;
-    
     /**
      * {@inheritDoc}
-     * NOTE: This reads the whole XML file and parses it into an internal
-     * buffer, from which sequences are read by subsequent calls to this
-     * method.
      */
     public boolean readRichSequence(BufferedReader reader,
             SymbolTokenization symParser,
@@ -185,251 +176,14 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             Namespace ns)
             throws IllegalSymbolException, IOException, ParseException {
         
-        if (this.sequenceBuffer==null) {
-            // load the whole lot into a buffer for now
-            this.sequenceBuffer = new ArrayList();
-            
-            SAXParser m_xmlParser;
-            INSDseqHandler m_handler;
-            
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setValidating(true);
-            try {
-                m_xmlParser = factory.newSAXParser();
-            } catch(ParserConfigurationException ex) {
-                throw new ParseException(ex);
-            } catch(SAXException ex) {
-                throw new ParseException(ex);
-            }
-            
-            InputSource source = new InputSource(reader);
-            m_handler = new INSDseqHandler(this.sequenceBuffer);
-            
-            try {
-                m_xmlParser.parse(source, m_handler);
-            } catch(SAXException ex) {
-                throw new ParseException(ex);
-            }
-            
-            this.seqBufferIterator = sequenceBuffer.iterator();
+        try {
+            DefaultHandler m_handler = new INSDseqHandler(symParser,rlistener,ns);
+            return XMLTools.readXMLChunk(reader, m_handler, INSDSEQ_TAG);
+        } catch (ParserConfigurationException e) {
+            throw new ParseException(e);
+        } catch (SAXException e) {
+            throw new ParseException(e);
         }
-        
-        // read the next sequence
-        if (this.seqBufferIterator.hasNext()) this.readRichSequence((INSDseq)seqBufferIterator.next(),symParser,rlistener,ns);
-        
-        // return true if there are more in our buffer
-        return this.seqBufferIterator.hasNext();
-    }
-    
-    // converts an INSDseq object into an actual RichSequence object
-    private void readRichSequence(INSDseq input,
-            SymbolTokenization symParser,
-            RichSeqIOListener rlistener,
-            Namespace ns) throws IllegalSymbolException, ParseException {
-        
-        if (input.getContig()!=null) throw new ParseException("Cannot handle contigs yet");
-        
-        rlistener.startSequence();
-        NCBITaxon tax = null;
-        String organism = null;
-        String accession = null;
-        
-        if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
-        rlistener.setNamespace(ns);
-        
-        // process in same order as if writing sequence to file
-        
-        rlistener.setName(input.getLocus().trim());
-        if (input.getPrimaryAccession()!=null) {
-            accession = input.getPrimaryAccession().trim();
-            rlistener.setAccession(accession);
-        }
-        if (input.getAccessionVersion()!=null) {
-            String parts[] = input.getAccessionVersion().trim().split("\\.");
-            accession = parts[0];
-            rlistener.setAccession(accession);
-            if (parts.length>1) rlistener.setVersion(Integer.parseInt(parts[1]));
-        }
-        if (!input.getSecondaryAccessions().isEmpty()) {
-            for (Iterator i = input.getSecondaryAccessions().iterator(); i.hasNext();) {
-                rlistener.addSequenceProperty(Terms.getAccessionTerm(),((String)i.next()).trim());
-            }
-        }
-        rlistener.setDivision(input.getDivision().trim());
-        rlistener.addSequenceProperty(Terms.getMolTypeTerm(),input.getMoltype().trim());
-        rlistener.addSequenceProperty(Terms.getModificationTerm(),input.getUpdateDate().trim());
-        if (input.getStrandedness()!=null) rlistener.addSequenceProperty(Terms.getStrandedTerm(),input.getStrandedness().trim());
-        if (input.getTopology()!=null && "circular".equals(input.getTopology().trim())) rlistener.setCircular(true);
-        if (input.getDefinition()!=null) rlistener.setDescription(input.getDefinition().trim());
-        if (!input.getKeywords().isEmpty()) {
-            for (Iterator i = input.getKeywords().iterator(); i.hasNext();) {
-                rlistener.addSequenceProperty(Terms.getKeywordsTerm(), ((String)i.next()).trim());
-            }
-        }
-        if (input.getComment()!=null) rlistener.setComment(input.getComment().trim());
-        if (input.getDatabaseXref()!=null) {
-            // database_identifier; primary_identifier; secondary_identifier....
-            String[] parts = input.getDatabaseXref().split(";");
-            // construct a DBXREF out of the dbname part[0] and accession part[1]
-            CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
-            // assign remaining bits of info as annotations
-            for (int j = 2; j < parts.length; j++) {
-                Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);
-                try {
-                    ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
-                } catch (ChangeVetoException ce) {
-                    ParseException pe = new ParseException("Could not annotate identifier terms");
-                    pe.initCause(ce);
-                    throw pe;
-                }
-            }
-            RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, 1);
-            rlistener.setRankedCrossRef(rcrossRef);
-        }
-        if (!input.getReferences().isEmpty()) {
-            for (Iterator i = input.getReferences().iterator(); i.hasNext();) {
-                INSDseqRef r = (INSDseqRef)i.next();
-                // first line of section has rank and location
-                int ref_rank;
-                int ref_start = -999;
-                int ref_end = -999;
-                String ref = r.getLocation();
-                String regex = "^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?";
-                Pattern p = Pattern.compile(regex);
-                Matcher m = p.matcher(ref);
-                if (m.matches()) {
-                    ref_rank = Integer.parseInt(m.group(1));
-                    if(m.group(2) != null){
-                        if (m.group(3)!= null)
-                            ref_start = Integer.parseInt(m.group(3));
-                        
-                        if(m.group(4) != null)
-                            ref_end = Integer.parseInt(m.group(4));
-                    }
-                } else {
-                    throw new ParseException("Bad reference line found: "+ref);
-                }
-                // rest can be in any order
-                String authors = "";
-                for (Iterator j = r.getAuthors().iterator(); j.hasNext();) {
-                    authors+=(String)j.next();
-                    if (j.hasNext()) authors+=", ";
-                }
-                String title = r.getTitle();
-                String journal = r.getJournal();
-                String medline = r.getMedline();
-                String pubmed = r.getPubmed();
-                String remark = r.getRemark();
-                // create the pubmed crossref and assign to the bioentry
-                CrossRef pcr = null;
-                if (pubmed!=null) {
-                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed});
-                    RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
-                    rlistener.setRankedCrossRef(rpcr);
-                }
-                // create the medline crossref and assign to the bioentry
-                CrossRef mcr = null;
-                if (medline!=null) {
-                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline});
-                    RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
-                    rlistener.setRankedCrossRef(rmcr);
-                }
-                // create the docref object
-                try {
-                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,journal});
-                    if (title!=null) dr.setTitle(title);
-                    // assign either the pubmed or medline to the docref - medline gets priority
-                    if (mcr!=null) dr.setCrossref(mcr);
-                    else if (pcr!=null) dr.setCrossref(pcr);
-                    // assign the remarks
-                    dr.setRemark(remark);
-                    // assign the docref to the bioentry
-                    RankedDocRef rdr = new SimpleRankedDocRef(dr,
-                            (ref_start != -999 ? new Integer(ref_start) : null),
-                            (ref_end != -999 ? new Integer(ref_end) : null),
-                            ref_rank);
-                    rlistener.setRankedDocRef(rdr);
-                } catch (ChangeVetoException e) {
-                    throw new ParseException(e);
-                }
-            }
-        }
-        if (!input.getFeatures().isEmpty()) {
-            for (Iterator i = input.getFeatures().iterator(); i.hasNext();) {
-                INSDseqFeat f = (INSDseqFeat)i.next();
-                // start next one, with lots of lovely info in it
-                RichFeature.Template templ = new RichFeature.Template();
-                templ.annotation = new SimpleRichAnnotation();
-                templ.sourceTerm = Terms.getINSDseqTerm();
-                templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(f.getKey());
-                templ.featureRelationshipSet = new TreeSet();
-                templ.rankedCrossRefs = new TreeSet();
-                String tidyLocStr = f.getLocation().replaceAll("\\s+","");
-                templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
-                rlistener.startFeature(templ);
-                for (Iterator j = f.getQualifiers().iterator(); j.hasNext();) {
-                    INSDseqFeatQual q = (INSDseqFeatQual)j.next();
-                    String key = q.getName();
-                    String val = q.getValue();
-                    if (key.equals("db_xref")) {
-                        String regex = "^(\\S+?):(\\S+)$";
-                        Pattern p = Pattern.compile(regex);
-                        Matcher m = p.matcher(val);
-                        if (m.matches()) {
-                            String dbname = m.group(1);
-                            String raccession = m.group(2);
-                            if (dbname.equals("taxon")) {
-                                // Set the Taxon instead of a dbxref
-                                tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
-                                rlistener.setTaxon(tax);
-                                try {
-                                    if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
-                                } catch (ChangeVetoException e) {
-                                    throw new ParseException(e);
-                                }
-                            } else {
-                                try {
-                                    CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession});
-                                    RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
-                                    rlistener.getCurrentFeature().addRankedCrossRef(rcr);
-                                } catch (ChangeVetoException e) {
-                                    throw new ParseException(e);
-                                }
-                            }
-                        } else {
-                            throw new ParseException("Bad dbxref found: "+val);
-                        }
-                    } else if (key.equals("organism")) {
-                        try {
-                            organism = val;
-                            if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
-                        } catch (ChangeVetoException e) {
-                            throw new ParseException(e);
-                        }
-                    } else {
-                        if (key.equals("translation")) {
-                            // strip spaces from sequence
-                            val = val.replaceAll("\\s+","");
-                        }
-                        rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
-                    }
-                }
-                rlistener.endFeature();
-            }
-        }
-        if (input.getSequence()!=null) {
-            try {
-                SymbolList sl = new SimpleSymbolList(symParser,
-                        input.getSequence().trim().replaceAll("\\s+","").replaceAll("[\\.|~]","-"));
-                rlistener.addSymbols(symParser.getAlphabet(),
-                        (Symbol[])(sl.toList().toArray(new Symbol[0])),
-                        0, sl.length());
-            } catch (Exception e) {
-                throw new ParseException(e);
-            }
-        }
-        
-        rlistener.endSequence();
     }
     
     private PrintWriter pw;
@@ -778,85 +532,265 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     
     // SAX event handler for parsing http://www.ebi.ac.uk/embl/Documentation/DTD/INSDSeq_v1.3.dtd.txt
     private class INSDseqHandler extends DefaultHandler {
-        private INSDseq m_currentSequence;
-        private List m_sequences;
+        
+        private SymbolTokenization symParser;
+        private RichSeqIOListener rlistener;
+        private Namespace ns;
         private StringBuffer m_currentString;
+        private NCBITaxon tax;
+        private String organism;
+        private String accession;
+        private RichFeature.Template templ;
+        private String currFeatQual;
+        private String currRefLocation;
+        private List currRefAuthors;
+        private String currRefTitle;
+        private String currRefJournal;
+        private String currRefMedline;
+        private String currRefPubmed;
+        private String currRefRemark;
         
         // construct a new handler that will populate the given list of sequences
-        private INSDseqHandler(List m_sequences) {
-            this.m_sequences = m_sequences;
+        private INSDseqHandler(SymbolTokenization symParser,
+                RichSeqIOListener rlistener,
+                Namespace ns) {
+            this.symParser = symParser;
+            this.rlistener = rlistener;
+            this.ns = ns;
             this.m_currentString = new StringBuffer();
         }
         
         // process an opening tag
-        public void startElement(String uri, String localName, String qName, Attributes attributes) {
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             if (qName.equals(INSDSEQ_TAG)) {
-                this.m_currentSequence = new INSDseq();
-                this.m_sequences.add(this.m_currentSequence);
-            } else if (qName.equals(REFERENCE_TAG))
-                this.m_currentSequence.startReference();
-            else if (qName.equals(FEATURE_TAG))
-                this.m_currentSequence.startFeature();
-            else if (qName.equals(FEATUREQUAL_TAG))
-                this.m_currentSequence.getCurrentFeature().startQualifier();
+                try {
+                    rlistener.startSequence();
+                    if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
+                    rlistener.setNamespace(ns);
+                } catch (ParseException e) {
+                    throw new SAXException(e);
+                }
+            } else if (qName.equals(REFERENCE_TAG)) {
+                currRefLocation = null;
+                currRefAuthors = new ArrayList();
+                currRefTitle = null;
+                currRefJournal = null;
+                currRefMedline = null;
+                currRefPubmed = null;
+                currRefRemark = null;
+            } else if (qName.equals(FEATURE_TAG)) {
+                templ = new RichFeature.Template();
+                templ.annotation = new SimpleRichAnnotation();
+                templ.sourceTerm = Terms.getINSDseqTerm();
+                templ.featureRelationshipSet = new TreeSet();
+                templ.rankedCrossRefs = new TreeSet();
+            }
         }
         
         // process a closing tag - we will have read the text already
         public void endElement(String uri, String localName, String qName) throws SAXException {
-            if (qName.equals(LOCUS_TAG))
-                this.m_currentSequence.setLocus(this.m_currentString.toString().trim());
-            else if (qName.equals(STRANDED_TAG))
-                this.m_currentSequence.setStrandedness(this.m_currentString.toString().trim());
-            else if (qName.equals(MOLTYPE_TAG))
-                this.m_currentSequence.setMoltype(this.m_currentString.toString().trim());
-            else if (qName.equals(TOPOLOGY_TAG))
-                this.m_currentSequence.setTopology(this.m_currentString.toString().trim());
-            else if (qName.equals(DIVISION_TAG))
-                this.m_currentSequence.setDivision(this.m_currentString.toString().trim());
-            else if (qName.equals(UPDATE_DATE_TAG))
-                this.m_currentSequence.setUpdateDate(this.m_currentString.toString().trim());
-            else if (qName.equals(DEFINITION_TAG))
-                this.m_currentSequence.setDefinition(this.m_currentString.toString().trim());
-            else if (qName.equals(ACCESSION_TAG))
-                this.m_currentSequence.setPrimaryAccession(this.m_currentString.toString().trim());
-            else if (qName.equals(ACC_VERSION_TAG))
-                this.m_currentSequence.setAccessionVersion(this.m_currentString.toString().trim());
-            else if (qName.equals(SECONDARY_ACCESSION_TAG))
-                this.m_currentSequence.addSecondaryAccession(this.m_currentString.toString().trim());
-            else if (qName.equals(KEYWORD_TAG))
-                this.m_currentSequence.addKeyword(this.m_currentString.toString().trim());
-            else if (qName.equals(COMMENT_TAG))
-                this.m_currentSequence.setComment(this.m_currentString.toString().trim());
-            else if (qName.equals(DATABASE_XREF_TAG))
-                this.m_currentSequence.setDatabaseXref(this.m_currentString.toString().trim());
-            else if (qName.equals(SEQUENCE_TAG))
-                this.m_currentSequence.setSequence(this.m_currentString.toString().trim());
-            else if (qName.equals(CONTIG_TAG))
-                this.m_currentSequence.setContig(this.m_currentString.toString().trim());
+            String val = this.m_currentString.toString().trim();
             
-            else if (qName.equals(REFERENCE_LOCATION_TAG))
-                this.m_currentSequence.getCurrentReference().setLocation(this.m_currentString.toString().trim());
-            else if (qName.equals(AUTHOR_TAG))
-                this.m_currentSequence.getCurrentReference().addAuthor(this.m_currentString.toString().trim());
-            else if (qName.equals(TITLE_TAG))
-                this.m_currentSequence.getCurrentReference().setTitle(this.m_currentString.toString().trim());
-            else if (qName.equals(JOURNAL_TAG))
-                this.m_currentSequence.getCurrentReference().setJournal(this.m_currentString.toString().trim());
-            else if (qName.equals(MEDLINE_TAG))
-                this.m_currentSequence.getCurrentReference().setMedline(this.m_currentString.toString().trim());
-            else if (qName.equals(PUBMED_TAG))
-                this.m_currentSequence.getCurrentReference().setPubmed(this.m_currentString.toString().trim());
-            else if (qName.equals(REMARK_TAG))
-                this.m_currentSequence.getCurrentReference().setRemark(this.m_currentString.toString().trim());
-            
-            else if (qName.equals(FEATURE_KEY_TAG))
-                this.m_currentSequence.getCurrentFeature().setKey(this.m_currentString.toString().trim());
-            else if (qName.equals(FEATURE_LOC_TAG))
-                this.m_currentSequence.getCurrentFeature().setLocation(this.m_currentString.toString().trim());
-            else if (qName.equals(FEATUREQUAL_NAME_TAG))
-                this.m_currentSequence.getCurrentFeature().getCurrentQualifier().setName(this.m_currentString.toString().trim());
-            else if (qName.equals(FEATUREQUAL_VALUE_TAG))
-                this.m_currentSequence.getCurrentFeature().getCurrentQualifier().setValue(this.m_currentString.toString().trim());
+            try {
+                if (qName.equals(LOCUS_TAG))
+                    rlistener.setName(val);
+                else if (qName.equals(ACCESSION_TAG)) {
+                    accession = val;
+                    rlistener.setAccession(accession);
+                } else if (qName.equals(ACC_VERSION_TAG)) {
+                    String parts[] = val.split("\\.");
+                    accession = parts[0];
+                    rlistener.setAccession(accession);
+                    if (parts.length>1) rlistener.setVersion(Integer.parseInt(parts[1]));
+                } else if (qName.equals(SECONDARY_ACCESSION_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getAccessionTerm(),val);
+                } else if (qName.equals(DIVISION_TAG)) {
+                    rlistener.setDivision(val);
+                } else if (qName.equals(MOLTYPE_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),val);
+                } else if (qName.equals(UPDATE_DATE_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getModificationTerm(),val);
+                } else if (qName.equals(STRANDED_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getStrandedTerm(),val);
+                } else if (qName.equals(TOPOLOGY_TAG)) {
+                    if ("circular".equals(val)) rlistener.setCircular(true);
+                } else if (qName.equals(DEFINITION_TAG)) {
+                    rlistener.setDescription(val);
+                } else if (qName.equals(KEYWORD_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getKeywordsTerm(), val);
+                } else if (qName.equals(COMMENT_TAG)) {
+                    rlistener.setComment(val);
+                } else if (qName.equals(DATABASE_XREF_TAG)) {
+                    // database_identifier; primary_identifier; secondary_identifier....
+                    String[] parts = val.split(";");
+                    // construct a DBXREF out of the dbname part[0] and accession part[1]
+                    CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
+                    // assign remaining bits of info as annotations
+                    for (int j = 2; j < parts.length; j++) {
+                        Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);
+                        try {
+                            ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
+                        } catch (ChangeVetoException ce) {
+                            ParseException pe = new ParseException("Could not annotate identifier terms");
+                            pe.initCause(ce);
+                            throw pe;
+                        }
+                    }
+                    RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, 1);
+                    rlistener.setRankedCrossRef(rcrossRef);
+                } else if (qName.equals(SEQUENCE_TAG)) {
+                    try {
+                        SymbolList sl = new SimpleSymbolList(symParser,
+                                val.replaceAll("\\s+","").replaceAll("[\\.|~]","-"));
+                        rlistener.addSymbols(symParser.getAlphabet(),
+                                (Symbol[])(sl.toList().toArray(new Symbol[0])),
+                                0, sl.length());
+                    } catch (Exception e) {
+                        throw new ParseException(e);
+                    }
+                } else if (qName.equals(CONTIG_TAG))
+                    throw new SAXException("Cannot handle contigs yet");
+                
+                
+                else if (qName.equals(REFERENCE_LOCATION_TAG)) {
+                    currRefLocation = val;
+                } else if (qName.equals(AUTHOR_TAG)) {
+                    currRefAuthors.add(val);
+                } else if (qName.equals(TITLE_TAG)) {
+                    currRefTitle = val;
+                } else if (qName.equals(JOURNAL_TAG)) {
+                    currRefJournal = val;
+                } else if (qName.equals(MEDLINE_TAG)) {
+                    currRefMedline = val;
+                } else if (qName.equals(PUBMED_TAG)) {
+                    currRefPubmed = val;
+                } else if (qName.equals(REMARK_TAG)) {
+                    currRefRemark = val;
+                } else if (qName.equals(REFERENCE_TAG)) {
+                    int ref_rank;
+                    int ref_start = -999;
+                    int ref_end = -999;
+                    String regex = "^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?";
+                    Pattern p = Pattern.compile(regex);
+                    Matcher m = p.matcher(currRefLocation);
+                    if (m.matches()) {
+                        ref_rank = Integer.parseInt(m.group(1));
+                        if(m.group(2) != null){
+                            if (m.group(3)!= null)
+                                ref_start = Integer.parseInt(m.group(3));
+                            
+                            if(m.group(4) != null)
+                                ref_end = Integer.parseInt(m.group(4));
+                        }
+                    } else {
+                        throw new ParseException("Bad reference line found: "+currRefLocation);
+                    }
+                    // rest can be in any order
+                    String authors = "";
+                    for (Iterator j = currRefAuthors.iterator(); j.hasNext();) {
+                        authors+=(String)j.next();
+                        if (j.hasNext()) authors+=", ";
+                    }
+                    // create the pubmed crossref and assign to the bioentry
+                    CrossRef pcr = null;
+                    if (currRefPubmed!=null) {
+                        pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, currRefPubmed});
+                        RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
+                        rlistener.setRankedCrossRef(rpcr);
+                    }
+                    // create the medline crossref and assign to the bioentry
+                    CrossRef mcr = null;
+                    if (currRefMedline!=null) {
+                        mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, currRefMedline});
+                        RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
+                        rlistener.setRankedCrossRef(rmcr);
+                    }
+                    // create the docref object
+                    try {
+                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,currRefJournal});
+                        if (currRefTitle!=null) dr.setTitle(currRefTitle);
+                        // assign either the pubmed or medline to the docref - medline gets priority
+                        if (mcr!=null) dr.setCrossref(mcr);
+                        else if (pcr!=null) dr.setCrossref(pcr);
+                        // assign the remarks
+                        dr.setRemark(currRefRemark);
+                        // assign the docref to the bioentry
+                        RankedDocRef rdr = new SimpleRankedDocRef(dr,
+                                (ref_start != -999 ? new Integer(ref_start) : null),
+                                (ref_end != -999 ? new Integer(ref_end) : null),
+                                ref_rank);
+                        rlistener.setRankedDocRef(rdr);
+                    } catch (ChangeVetoException e) {
+                        throw new ParseException(e);
+                    }
+                }
+                
+                
+                else if (qName.equals(FEATURE_KEY_TAG)) {
+                    templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(val);
+                } else if (qName.equals(FEATURE_LOC_TAG)) {
+                    String tidyLocStr = val.replaceAll("\\s+","");
+                    templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
+                    rlistener.startFeature(templ);
+                } else if (qName.equals(FEATUREQUAL_NAME_TAG)) {
+                    if (currFeatQual!=null) {
+                        rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(currFeatQual),null);
+                    }
+                    currFeatQual = val;
+                } else if (qName.equals(FEATUREQUAL_VALUE_TAG)) {
+                    if (currFeatQual.equals("db_xref")) {
+                        String regex = "^(\\S+?):(\\S+)$";
+                        Pattern p = Pattern.compile(regex);
+                        Matcher m = p.matcher(val);
+                        if (m.matches()) {
+                            String dbname = m.group(1);
+                            String raccession = m.group(2);
+                            if (dbname.equals("taxon")) {
+                                // Set the Taxon instead of a dbxref
+                                tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
+                                rlistener.setTaxon(tax);
+                                try {
+                                    if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
+                                } catch (ChangeVetoException e) {
+                                    throw new ParseException(e);
+                                }
+                            } else {
+                                try {
+                                    CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession});
+                                    RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
+                                    rlistener.getCurrentFeature().addRankedCrossRef(rcr);
+                                } catch (ChangeVetoException e) {
+                                    throw new ParseException(e);
+                                }
+                            }
+                        } else {
+                            throw new ParseException("Bad dbxref found: "+val);
+                        }
+                    } else if (currFeatQual.equals("organism")) {
+                        try {
+                            organism = val;
+                            if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
+                        } catch (ChangeVetoException e) {
+                            throw new ParseException(e);
+                        }
+                    } else {
+                        if (currFeatQual.equals("translation")) {
+                            // strip spaces from sequence
+                            val = val.replaceAll("\\s+","");
+                        }
+                        rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(currFeatQual),val);
+                    }
+                    currFeatQual = null;
+                } else if (qName.equals(FEATURE_TAG)) {
+                    rlistener.endFeature();
+                }
+                
+                
+                else if (qName.equals(INSDSEQ_TAG))
+                    rlistener.endSequence();
+            } catch (ParseException e) {
+                throw new SAXException(e);
+            }
             
             // drop old string
             this.m_currentString.setLength(0);
@@ -865,614 +799,6 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         // process text inside tags
         public void characters(char[] ch, int start, int length) {
             this.m_currentString.append(ch, start, length);
-        }
-        
-        // return the set of sequences found
-        public List getSequences() {
-            return this.m_sequences;
-        }
-    }
-    
-    // stores a sequence
-    private class INSDseq {
-        private List refs = new ArrayList();
-        private INSDseqRef ref = null;
-        private List feats = new ArrayList();
-        private INSDseqFeat feat = null;
-        public void startReference() {
-            this.ref = new INSDseqRef();
-            this.refs.add(this.ref);
-        }
-        public List getReferences() {
-            return this.refs;
-        }
-        public INSDseqRef getCurrentReference() {
-            return this.ref;
-        }
-        public void startFeature() {
-            this.feat = new INSDseqFeat();
-            this.feats.add(this.feat);
-        }
-        public List getFeatures() {
-            return this.feats;
-        }
-        public INSDseqFeat getCurrentFeature() {
-            return this.feat;
-        }
-        
-        /**
-         * Holds value of property locus.
-         */
-        private String locus;
-        
-        /**
-         * Getter for property locus.
-         * @return Value of property locus.
-         */
-        public String getLocus() {
-            
-            return this.locus;
-        }
-        
-        /**
-         * Setter for property locus.
-         * @param locus New value of property locus.
-         */
-        public void setLocus(String locus) {
-            
-            this.locus = locus;
-        }
-        
-        /**
-         * Holds value of property strandedness.
-         */
-        private String strandedness;
-        
-        /**
-         * Getter for property strandedness.
-         * @return Value of property strandedness.
-         */
-        public String getStrandedness() {
-            
-            return this.strandedness;
-        }
-        
-        /**
-         * Setter for property strandedness.
-         * @param strandedness New value of property strandedness.
-         */
-        public void setStrandedness(String strandedness) {
-            
-            this.strandedness = strandedness;
-        }
-        
-        /**
-         * Holds value of property moltype.
-         */
-        private String moltype;
-        
-        /**
-         * Getter for property moltype.
-         * @return Value of property moltype.
-         */
-        public String getMoltype() {
-            
-            return this.moltype;
-        }
-        
-        /**
-         * Setter for property moltype.
-         * @param moltype New value of property moltype.
-         */
-        public void setMoltype(String moltype) {
-            
-            this.moltype = moltype;
-        }
-        
-        /**
-         * Holds value of property topology.
-         */
-        private String topology;
-        
-        /**
-         * Getter for property topology.
-         * @return Value of property topology.
-         */
-        public String getTopology() {
-            
-            return this.topology;
-        }
-        
-        /**
-         * Setter for property topology.
-         * @param topology New value of property topology.
-         */
-        public void setTopology(String topology) {
-            
-            this.topology = topology;
-        }
-        
-        /**
-         * Holds value of property division.
-         */
-        private String division;
-        
-        /**
-         * Getter for property division.
-         * @return Value of property division.
-         */
-        public String getDivision() {
-            
-            return this.division;
-        }
-        
-        /**
-         * Setter for property division.
-         * @param division New value of property division.
-         */
-        public void setDivision(String division) {
-            
-            this.division = division;
-        }
-        
-        /**
-         * Holds value of property updateDate.
-         */
-        private String updateDate;
-        
-        /**
-         * Getter for property updateDate.
-         * @return Value of property updateDate.
-         */
-        public String getUpdateDate() {
-            
-            return this.updateDate;
-        }
-        
-        /**
-         * Setter for property updateDate.
-         * @param updateDate New value of property updateDate.
-         */
-        public void setUpdateDate(String updateDate) {
-            
-            this.updateDate = updateDate;
-        }
-        
-        /**
-         * Holds value of property definition.
-         */
-        private String definition;
-        
-        /**
-         * Getter for property definition.
-         * @return Value of property definition.
-         */
-        public String getDefinition() {
-            
-            return this.definition;
-        }
-        
-        /**
-         * Setter for property definition.
-         * @param definition New value of property definition.
-         */
-        public void setDefinition(String definition) {
-            
-            this.definition = definition;
-        }
-        
-        /**
-         * Holds value of property primaryAccession.
-         */
-        private String primaryAccession;
-        
-        /**
-         * Getter for property primaryAccession.
-         * @return Value of property primaryAccession.
-         */
-        public String getPrimaryAccession() {
-            
-            return this.primaryAccession;
-        }
-        
-        /**
-         * Setter for property primaryAccession.
-         * @param primaryAccession New value of property primaryAccession.
-         */
-        public void setPrimaryAccession(String primaryAccession) {
-            
-            this.primaryAccession = primaryAccession;
-        }
-        
-        /**
-         * Holds value of property accessionVersion.
-         */
-        private String accessionVersion;
-        
-        /**
-         * Getter for property accessionVersion.
-         * @return Value of property accessionVersion.
-         */
-        public String getAccessionVersion() {
-            
-            return this.accessionVersion;
-        }
-        
-        /**
-         * Setter for property accessionVersion.
-         * @param accessionVersion New value of property accessionVersion.
-         */
-        public void setAccessionVersion(String accessionVersion) {
-            
-            this.accessionVersion = accessionVersion;
-        }
-        
-        /**
-         * Holds value of property comment.
-         */
-        private String comment;
-        
-        /**
-         * Getter for property comment.
-         * @return Value of property comment.
-         */
-        public String getComment() {
-            
-            return this.comment;
-        }
-        
-        /**
-         * Setter for property comment.
-         * @param comment New value of property comment.
-         */
-        public void setComment(String comment) {
-            
-            this.comment = comment;
-        }
-        
-        /**
-         * Holds value of property sequence.
-         */
-        private String sequence;
-        
-        /**
-         * Getter for property sequence.
-         * @return Value of property sequence.
-         */
-        public String getSequence() {
-            
-            return this.sequence;
-        }
-        
-        /**
-         * Setter for property sequence.
-         * @param sequence New value of property sequence.
-         */
-        public void setSequence(String sequence) {
-            
-            this.sequence = sequence;
-        }
-        
-        /**
-         * Holds value of property contig.
-         */
-        private String contig;
-        
-        /**
-         * Getter for property contig.
-         * @return Value of property contig.
-         */
-        public String getContig() {
-            
-            return this.contig;
-        }
-        
-        /**
-         * Setter for property contig.
-         * @param contig New value of property contig.
-         */
-        public void setContig(String contig) {
-            
-            this.contig = contig;
-        }
-        
-        private List secAccs = new ArrayList();
-        public void addSecondaryAccession(String secAcc) {
-            this.secAccs.add(secAcc);
-        }
-        public List getSecondaryAccessions() {
-            return this.secAccs;
-        }
-        
-        private List kws = new ArrayList();
-        public void addKeyword(String kw) {
-            this.kws.add(kw);
-        }
-        public List getKeywords() {
-            return this.kws;
-        }
-        
-        /**
-         * Holds value of property databaseXref.
-         */
-        private String databaseXref;
-        
-        /**
-         * Getter for property databaseXref.
-         * @return Value of property databaseXref.
-         */
-        public String getDatabaseXref() {
-            
-            return this.databaseXref;
-        }
-        
-        /**
-         * Setter for property databaseXref.
-         * @param databaseXref New value of property databaseXref.
-         */
-        public void setDatabaseXref(String databaseXref) {
-            
-            this.databaseXref = databaseXref;
-        }
-    }
-    
-    // stores a feature
-    private class INSDseqFeat {
-        private List quals = new ArrayList();
-        private INSDseqFeatQual qual = null;
-        public void startQualifier() {
-            this.qual = new INSDseqFeatQual();
-            this.quals.add(this.qual);
-        }
-        public List getQualifiers() {
-            return this.quals;
-        }
-        public INSDseqFeatQual getCurrentQualifier() {
-            return this.qual;
-        }
-        
-        /**
-         * Holds value of property key.
-         */
-        private String key;
-        
-        /**
-         * Getter for property key.
-         * @return Value of property key.
-         */
-        public String getKey() {
-            
-            return this.key;
-        }
-        
-        /**
-         * Setter for property key.
-         * @param key New value of property key.
-         */
-        public void setKey(String key) {
-            
-            this.key = key;
-        }
-        
-        /**
-         * Holds value of property location.
-         */
-        private String location;
-        
-        /**
-         * Getter for property location.
-         * @return Value of property location.
-         */
-        public String getLocation() {
-            
-            return this.location;
-        }
-        
-        /**
-         * Setter for property location.
-         * @param location New value of property location.
-         */
-        public void setLocation(String location) {
-            
-            this.location = location;
-        }
-    }
-    
-    // stores a qualifier
-    private class INSDseqFeatQual {
-        /**
-         * Holds value of property name.
-         */
-        private String name;
-        
-        /**
-         * Getter for property name.
-         * @return Value of property name.
-         */
-        public String getName() {
-            
-            return this.name;
-        }
-        
-        /**
-         * Setter for property name.
-         * @param name New value of property name.
-         */
-        public void setName(String name) {
-            
-            this.name = name;
-        }
-        
-        /**
-         * Holds value of property value.
-         */
-        private String value;
-        
-        /**
-         * Getter for property value.
-         * @return Value of property value.
-         */
-        public String getValue() {
-            
-            return this.value;
-        }
-        
-        /**
-         * Setter for property value.
-         * @param value New value of property value.
-         */
-        public void setValue(String value) {
-            
-            this.value = value;
-        }
-    }
-    
-    // stores a reference
-    private class INSDseqRef {
-        private List auths = new ArrayList();
-        public void addAuthor(String auth) {
-            this.auths.add(auth);
-        }
-        public List getAuthors() {
-            return this.auths;
-        }
-        
-        /**
-         * Holds value of property location.
-         */
-        private String location;
-        
-        /**
-         * Getter for property location.
-         * @return Value of property location.
-         */
-        public String getLocation() {
-            
-            return this.location;
-        }
-        
-        /**
-         * Setter for property location.
-         * @param location New value of property location.
-         */
-        public void setLocation(String location) {
-            
-            this.location = location;
-        }
-        
-        /**
-         * Holds value of property title.
-         */
-        private String title;
-        
-        /**
-         * Getter for property title.
-         * @return Value of property title.
-         */
-        public String getTitle() {
-            
-            return this.title;
-        }
-        
-        /**
-         * Setter for property title.
-         * @param title New value of property title.
-         */
-        public void setTitle(String title) {
-            
-            this.title = title;
-        }
-        
-        /**
-         * Holds value of property journal.
-         */
-        private String journal;
-        
-        /**
-         * Getter for property journal.
-         * @return Value of property journal.
-         */
-        public String getJournal() {
-            
-            return this.journal;
-        }
-        
-        /**
-         * Setter for property journal.
-         * @param journal New value of property journal.
-         */
-        public void setJournal(String journal) {
-            
-            this.journal = journal;
-        }
-        
-        /**
-         * Holds value of property medline.
-         */
-        private String medline;
-        
-        /**
-         * Getter for property medline.
-         * @return Value of property medline.
-         */
-        public String getMedline() {
-            
-            return this.medline;
-        }
-        
-        /**
-         * Setter for property medline.
-         * @param medline New value of property medline.
-         */
-        public void setMedline(String medline) {
-            
-            this.medline = medline;
-        }
-        
-        /**
-         * Holds value of property pubmed.
-         */
-        private String pubmed;
-        
-        /**
-         * Getter for property pubmed.
-         * @return Value of property pubmed.
-         */
-        public String getPubmed() {
-            
-            return this.pubmed;
-        }
-        
-        /**
-         * Setter for property pubmed.
-         * @param pubmed New value of property pubmed.
-         */
-        public void setPubmed(String pubmed) {
-            
-            this.pubmed = pubmed;
-        }
-        
-        /**
-         * Holds value of property remark.
-         */
-        private String remark;
-        
-        /**
-         * Getter for property remark.
-         * @return Value of property remark.
-         */
-        public String getRemark() {
-            
-            return this.remark;
-        }
-        
-        /**
-         * Setter for property remark.
-         * @param remark New value of property remark.
-         */
-        public void setRemark(String remark) {
-            
-            this.remark = remark;
         }
     }
 }
