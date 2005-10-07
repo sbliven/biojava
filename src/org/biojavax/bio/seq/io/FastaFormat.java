@@ -29,9 +29,11 @@ import java.util.regex.Pattern;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
-import org.biojava.bio.seq.io.StreamParser;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.SimpleNamespace;
@@ -136,78 +138,40 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
         rsiol.setName(name);
         if (!this.getElideComments()) rsiol.setDescription(desc);
         
-        boolean seenEOF = this.readSequenceData(reader, symParser, rsiol);
-        
-        rsiol.endSequence();
-        
-        return !seenEOF;
-    }
-    
-    // reads sequence data from the file by concatenating the whole lot
-    private boolean readSequenceData(
-            BufferedReader r,
-            SymbolTokenization parser,
-            SeqIOListener listener
-            ) throws
-            IOException,
-            IllegalSymbolException {
-        char[] cache = new char[512];
-        boolean reachedEnd = false, seenEOF = false;
-        StreamParser sparser = null;
-        if(! this.getElideSymbols()){
-          sparser = parser.parseStream(listener);
-        }
-        
-        while (!reachedEnd) {
-            r.mark(cache.length + 1);
-            int bytesRead = r.read(cache, 0, cache.length);
-            if (bytesRead < 0) {
-                reachedEnd = seenEOF = true;
+        StringBuffer seq = new StringBuffer();
+        boolean hasMoreSeq = true;
+        while (hasMoreSeq) {
+            reader.mark(500);
+            line = reader.readLine();
+            if (line!=null) {
+                line = line.trim();
+                if (line.charAt(0)=='>') {
+                    reader.reset();
+                    hasMoreSeq = false;
+                } else {
+                    seq.append(line);
+                }
             } else {
-                int parseStart = 0;
-                int parseEnd = 0;
-                while (!reachedEnd && parseStart < bytesRead && cache[parseStart] != '>') {
-                    parseEnd = parseStart;
-                    
-                    while (parseEnd < bytesRead &&
-                            cache[parseEnd] != '\n' &&
-                            cache[parseEnd] != '\r'
-                            ) {
-                        ++parseEnd;
-                    }
-                    
-                    if (!this.getElideSymbols()) sparser.characters(cache, parseStart, parseEnd - parseStart);
-                    
-                    parseStart = parseEnd + 1;
-                    while (parseStart < bytesRead &&
-                            (cache[parseStart] == '\n' ||
-                            cache[parseStart] == '\r') ) {
-                        ++parseStart;
-                    }
-                }
-                if (parseStart < bytesRead && cache[parseStart] == '>') {
-                    try {
-                        r.reset();
-                    } catch (IOException ioe) {
-                        throw new IOException(
-                                "Can't reset: " +
-                                ioe.getMessage() +
-                                " parseStart=" + parseStart +
-                                " bytesRead=" + bytesRead
-                                );
-                    }
-                    if (r.skip(parseStart) != parseStart) {
-                        throw new IOException("Couldn't reset to start of next sequence");
-                    }
-                    reachedEnd = true;
-                }
+                hasMoreSeq = false;
+            }
+        }
+        if (!this.getElideSymbols()) {
+            try {
+                SymbolList sl = new SimpleSymbolList(symParser,
+                        seq.toString().replaceAll("\\s+","").replaceAll("[\\.|~]","-"));
+                rsiol.addSymbols(symParser.getAlphabet(),
+                        (Symbol[])(sl.toList().toArray(new Symbol[0])),
+                        0, sl.length());
+            } catch (Exception e) {
+                throw new ParseException(e);
             }
         }
         
-        if(sparser != null) sparser.close();
-        return seenEOF;
+        rsiol.endSequence();
+        
+        return line!=null;
     }
-             
+    
     /**
      * {@inheritDoc}
      */
@@ -271,5 +235,5 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public String getDefaultFormat() {
         return FASTA_FORMAT;
-    }        
+    }
 }
