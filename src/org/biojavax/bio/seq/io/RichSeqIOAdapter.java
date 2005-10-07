@@ -28,6 +28,7 @@
 package org.biojavax.bio.seq.io;
 
 import java.util.TreeSet;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.io.ParseException;
@@ -40,6 +41,7 @@ import org.biojavax.RankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.seq.RichFeature;
+import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.SimpleRichFeature;
 import org.biojavax.bio.taxa.NCBITaxon;
 
@@ -51,8 +53,13 @@ import org.biojavax.bio.taxa.NCBITaxon;
  * @author Mark Schreiber
  */
 public class RichSeqIOAdapter implements RichSeqIOListener {
-        
-    private RichFeature emptyFeature;
+    
+    /**
+     * This is a dummy feature. It is returned by the method 
+     * {@link #getCurrentFeature() getCurrentFeature()}. Access is provided so
+     * you can override it.
+     */
+    protected RichFeature emptyFeature;
     
     /** Creates a new instance of RichSeqIOAdapter */
     public RichSeqIOAdapter() {
@@ -60,7 +67,14 @@ public class RichSeqIOAdapter implements RichSeqIOListener {
         templ.annotation = new SimpleRichAnnotation();
         templ.featureRelationshipSet = new TreeSet();
         templ.rankedCrossRefs = new TreeSet();
-        this.emptyFeature = new SimpleRichFeature(new SimpleFeatureHolder(),templ);
+        templ.type = "";
+        templ.source = "";
+        templ.location = RichLocation.full;
+        try{
+          this.emptyFeature = new SimpleRichFeature(new SimpleFeatureHolder(),templ);
+        }catch(Exception ex){
+          throw new BioError(ex);
+        }//can't happen
     }
     
     public void setAccession(String accession) throws ParseException{}

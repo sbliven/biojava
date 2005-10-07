@@ -328,7 +328,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setLocation(Location loc) throws ChangeVetoException {
         if (loc==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(loc instanceof Location)) loc = RichLocation.Tools.enrich(loc);
+        if (!(loc instanceof RichLocation)) loc = RichLocation.Tools.enrich(loc);
         if(!this.hasListeners(RichFeature.LOCATION)) {
             this.location = (RichLocation)loc;
         } else {
