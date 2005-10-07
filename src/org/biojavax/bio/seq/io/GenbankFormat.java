@@ -138,7 +138,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         
         String line;
         boolean hasAnotherSequence = true;
-        boolean hasInternalWhitespace = false;
+        //boolean hasInternalWhitespace = false;
         
         rlistener.startSequence();
         
@@ -384,11 +384,11 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 break;
             }
             if (Character.isWhitespace((char) c)) {
-                hasInternalWhitespace = true;
+                //hasInternalWhitespace = true;
                 continue;
             }
-            if (hasInternalWhitespace)
-                System.err.println("Warning: whitespace found between sequence entries");
+            //if (hasInternalWhitespace)
+            //    System.err.println("Warning: whitespace found between sequence entries");
             reader.reset();
             break;
         }
