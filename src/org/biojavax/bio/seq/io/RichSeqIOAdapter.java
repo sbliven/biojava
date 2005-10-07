@@ -27,7 +27,9 @@
 
 package org.biojavax.bio.seq.io;
 
+import java.util.TreeSet;
 import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
@@ -35,8 +37,10 @@ import org.biojava.bio.symbol.Symbol;
 import org.biojavax.Namespace;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
+import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.seq.RichFeature;
+import org.biojavax.bio.seq.SimpleRichFeature;
 import org.biojavax.bio.taxa.NCBITaxon;
 
 /**
@@ -47,10 +51,17 @@ import org.biojavax.bio.taxa.NCBITaxon;
  * @author Mark Schreiber
  */
 public class RichSeqIOAdapter implements RichSeqIOListener {
+        
+    private RichFeature emptyFeature;
     
     /** Creates a new instance of RichSeqIOAdapter */
-    public RichSeqIOAdapter() {}
-    
+    public RichSeqIOAdapter() {
+        RichFeature.Template templ = new RichFeature.Template();
+        templ.annotation = new SimpleRichAnnotation();
+        templ.featureRelationshipSet = new TreeSet();
+        templ.rankedCrossRefs = new TreeSet();
+        this.emptyFeature = new SimpleRichFeature(new SimpleFeatureHolder(),templ);
+    }
     
     public void setAccession(String accession) throws ParseException{}
     public void setIdentifier(String identifier) throws ParseException{}
@@ -65,14 +76,14 @@ public class RichSeqIOAdapter implements RichSeqIOListener {
     public void setRelationship(BioEntryRelationship relationship) throws ParseException{}
     public void setRankedCrossRef(RankedCrossRef crossRef) throws ParseException{}
     public void setURI(String uri) throws ParseException{}
-    public RichFeature getCurrentFeature() throws ParseException{return null;}
+    public RichFeature getCurrentFeature() throws ParseException{return this.emptyFeature;}
     public void setCircular(boolean circular) throws ParseException{}
     public void addFeatureProperty(Object key, Object value) throws ParseException{}
     public void endFeature() throws ParseException{}
     public void startFeature(Feature.Template templ) throws ParseException{}
     public void addSequenceProperty(Object key, Object value) throws ParseException{}
     public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length)
-        throws IllegalAlphabetException{}
+    throws IllegalAlphabetException{}
     public void setName(String name) throws ParseException{}
     public void endSequence() throws ParseException{}
     public void startSequence() throws ParseException{}
