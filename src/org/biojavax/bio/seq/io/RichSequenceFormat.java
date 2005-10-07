@@ -113,51 +113,51 @@ public interface RichSequenceFormat extends SequenceFormat {
     
     /**
      * Use this method to toggle reading of sequence data. 
-     * @param elideSymbols set to true if you don't want the sequence data.
+     * @param elideSymbols set to true if you <em>don't</em> want the sequence data.
      */
     public void setElideSymbols(boolean elideSymbols);
     
     /**
      * Is the format going to emit events when sequence data is read?
-     * @return true if it is (true is default) otherwise false.
+     * @return true if it is <em>not</em> otherwise false (false is default) .
      */
     public boolean getElideSymbols();
         
     /**
      * Use this method to toggle reading of feature data. 
-     * @param elideSymbols set to true if you don't want the feature data.
+     * @param elideFeatures set to true if you <em>don't</em> want the feature data.
      */
     public void setElideFeatures(boolean elideFeatures);
     
     /**
      * Is the format going to emit events when feature data is read?
-     * @return true if it is (true is default) otherwise false.
+     * @return true if it is <em>not</em> otherwise false (false is default).
      */
     public boolean getElideFeatures();
     
     /**
      * Use this method to toggle reading of bibliographic reference data. 
-     * @param elideSymbols set to true if you don't want the bibliographic reference data.
+     * @param elideReferences set to true if you <em>don't</em> want the bibliographic reference data.
      */
     public void setElideReferences(boolean elideReferences);
     
     /**
      * Is the format going to emit events when bibliographic reference data is read?
-     * @return true if it is (true is default) otherwise false.
+     * @return true if it is <em>not</em> otherwise false (false is default) .
      */
     public boolean getElideReferences();
     
     /**
      * Use this method to toggle reading of comments data. Will also ignore remarks
      * lines in bibliographic references.
-     * @param elideSymbols set to true if you don't want the comments data.
+     * @param elideComments set to true if you <em>don't</em> want the comments data.
      */
     public void setElideComments(boolean elideComments);
     
     /**
      * Is the format going to emit events when comments data or remarks from 
      * bibliographic references are read?
-     * @return true if it is (true is default) otherwise false.
+     * @return true if it is <em>not</em> otherwise false (false is default).
      */
     public boolean getElideComments();
         
@@ -321,10 +321,10 @@ public interface RichSequenceFormat extends SequenceFormat {
         public PrintStream getPrintStream() { return this.os; }
     }
     
-    /**
-     * Provides the basic implementation required for simple header/footer-less files such as Genbank.
-     */
-    public abstract class HeaderlessFormat extends BasicFormat {
+       /**
+        * Provides the basic implementation required for simple header/footer-less files such as Genbank.
+        */
+        public abstract class HeaderlessFormat extends BasicFormat {
         /**
          * {@inheritDoc}
          */
