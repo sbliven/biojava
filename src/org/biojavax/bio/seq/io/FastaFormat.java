@@ -153,7 +153,10 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
             IllegalSymbolException {
         char[] cache = new char[512];
         boolean reachedEnd = false, seenEOF = false;
-        StreamParser sparser = parser.parseStream(listener);
+        StreamParser sparser = null;
+        if(! this.getElideSymbols()){
+          sparser = parser.parseStream(listener);
+        }
         
         while (!reachedEnd) {
             r.mark(cache.length + 1);
@@ -201,7 +204,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
             }
         }
         
-        sparser.close();
+        if(sparser != null) sparser.close();
         return seenEOF;
     }
              
