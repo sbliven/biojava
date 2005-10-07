@@ -79,7 +79,7 @@ public class XMLTools {
         boolean hasAnotherChunk = false;
         while (!hasAnotherChunk && (line=reader.readLine())!=null) {
             line = line.trim();
-            if (line.trim().equals("<"+chunkToken+">")) {
+            if (line.equals("<"+chunkToken+">")) {
                 reader.reset();
                 hasAnotherChunk = true;
             }
