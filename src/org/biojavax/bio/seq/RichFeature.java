@@ -22,14 +22,18 @@
 package org.biojavax.bio.seq;
 
 import java.util.Set;
+import java.util.TreeSet;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.ontology.InvalidTermException;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.RankedCrossRefable;
 import org.biojavax.RichAnnotatable;
+import org.biojavax.SimpleRichAnnotation;
 
 /**
  * Represents a feature that can be given name and rank and be
@@ -144,6 +148,26 @@ public interface RichFeature extends StrandedFeature,RankedCrossRefable,RichAnno
             } catch (InvalidTermException e) {
                 throw new ChangeVetoException("Unable to convert one of the feature's terms",e);
             }
+        }
+        
+        /**
+         * A way to make a dummy feature
+         */
+        public static RichFeature makeEmptyFeature(){
+            
+            RichFeature.Template templ = new RichFeature.Template();
+            templ.annotation = new SimpleRichAnnotation();
+            templ.featureRelationshipSet = new TreeSet();
+            templ.rankedCrossRefs = new TreeSet();
+            templ.type = "";
+            templ.source = "";
+            templ.location = RichLocation.full;
+            try{
+                return new SimpleRichFeature(new SimpleFeatureHolder(),templ);
+            }catch(Exception ex){
+                throw new BioError(ex);
+            }//can't happen
+            
         }
     }
 }

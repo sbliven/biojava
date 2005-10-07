@@ -63,19 +63,10 @@ public class RichSeqIOAdapter implements RichSeqIOListener {
     
     /** Creates a new instance of RichSeqIOAdapter */
     public RichSeqIOAdapter() {
-        RichFeature.Template templ = new RichFeature.Template();
-        templ.annotation = new SimpleRichAnnotation();
-        templ.featureRelationshipSet = new TreeSet();
-        templ.rankedCrossRefs = new TreeSet();
-        templ.type = "";
-        templ.source = "";
-        templ.location = RichLocation.full;
-        try{
-          this.emptyFeature = new SimpleRichFeature(new SimpleFeatureHolder(),templ);
-        }catch(Exception ex){
-          throw new BioError(ex);
-        }//can't happen
+        emptyFeature = RichFeature.Tools.makeEmptyFeature();
     }
+    
+    
     
     public void setAccession(String accession) throws ParseException{}
     public void setIdentifier(String identifier) throws ParseException{}
@@ -94,7 +85,9 @@ public class RichSeqIOAdapter implements RichSeqIOListener {
     public void setCircular(boolean circular) throws ParseException{}
     public void addFeatureProperty(Object key, Object value) throws ParseException{}
     public void endFeature() throws ParseException{}
-    public void startFeature(Feature.Template templ) throws ParseException{}
+    public void startFeature(Feature.Template templ) throws ParseException{
+        this.emptyFeature = RichFeature.Tools.makeEmptyFeature();
+    }
     public void addSequenceProperty(Object key, Object value) throws ParseException{}
     public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length)
     throws IllegalAlphabetException{}
