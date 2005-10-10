@@ -699,7 +699,7 @@ public class TaxonSQL {
       delete.executeUpdate("DELETE FROM taxon WHERE taxon_id = "+taxon_id);
       delete.close();
     } catch (SQLException exc) {
-      throw new BioRuntimeException("Nicht erfolgreich gel\u00f6scht.", exc);
+      throw new BioRuntimeException("Could not delete successfully", exc);
     }
       
     return taxon;
@@ -838,7 +838,7 @@ public class TaxonSQL {
     }
     attemptClose(rs);
     attemptClose(taxID);
-    throw new BioException("In der Datenbank ist kein Taxon "+scientificName+" enthalten.");
+    throw new BioException("The database does not contain a taxon named "+scientificName+".");
   }
 
   
@@ -858,7 +858,7 @@ public class TaxonSQL {
   public static Taxon addName(Connection conn, Taxon taxon, String nameClass, String newName) throws BioException, SQLException, BioRuntimeException
   {
     if (nameClass.equals("scientific name") || nameClass.equals("common name")) 
-      throw new BioException("Es kann nur einen "+nameClass+" geben.");  
+      throw new BioException("There can only be one "+nameClass+".");  
     
     PreparedStatement insert = conn.prepareStatement(
       "INSERT INTO taxon_name (taxon_id, name, name_class) VALUES (?, ?, ?)");
@@ -895,7 +895,7 @@ public class TaxonSQL {
   public static Taxon removeName(Connection conn, DBHelper helper, Taxon taxon, String nameClass, String oldName) throws BioException, SQLException
   {
     if (nameClass.equals("scientific name")) 
-      throw new BioException("Der scientific name kann nicht gel\u00f6scht werden.");
+      throw new BioException("You can't delete the "+nameClass);
         
     PreparedStatement delete = conn.prepareStatement(
       "DELETE FROM taxon_name " +
