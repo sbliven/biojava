@@ -603,7 +603,7 @@ public class TaxonSQL {
     Statement statement = conn.createStatement();
     ResultSet rs = statement.executeQuery("SELECT taxon_id FROM taxon");
     while (rs.next()) 
-      ids.add(Integer.valueOf(rs.getInt(1)));
+      ids.add(new Integer(rs.getInt(1)));
     attemptClose(rs);
     statement.close();
     
@@ -627,7 +627,7 @@ public class TaxonSQL {
       statement = conn.createStatement();
       rs = statement.executeQuery("SELECT ncbi_taxon_id FROM taxon");
       while (rs.next())
-        ids.add(Integer.valueOf(rs.getInt(1)));
+        ids.add(new Integer(rs.getInt(1)));
     } catch (SQLException exc) {
       throw new BioRuntimeException(exc);
     } finally {
