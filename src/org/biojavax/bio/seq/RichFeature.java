@@ -159,8 +159,8 @@ public interface RichFeature extends StrandedFeature,RankedCrossRefable,RichAnno
             templ.annotation = new SimpleRichAnnotation();
             templ.featureRelationshipSet = new TreeSet();
             templ.rankedCrossRefs = new TreeSet();
-            templ.type = "";
-            templ.source = "";
+            templ.type = "none";
+            templ.source = "none";
             templ.location = RichLocation.full;
             try{
                 return new SimpleRichFeature(new SimpleFeatureHolder(),templ);

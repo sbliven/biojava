@@ -54,7 +54,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
      * @param synonyms a set of synonyms for the term. Can be null.
      */
     public SimpleComparableTerm(ComparableOntology ontology, String name, Object[] synonyms) {
-        if (name == null) throw new IllegalArgumentException("Name must not be null");
+        if (name == null || name.equals("")) throw new IllegalArgumentException("Name must not be null or empty");
         if (ontology == null) throw new IllegalArgumentException("Ontology must not be null");        
         this.name = name;
         this.description = null;

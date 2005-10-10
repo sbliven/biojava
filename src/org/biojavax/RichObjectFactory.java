@@ -30,13 +30,12 @@ import org.biojavax.ontology.SimpleComparableOntology;
 import org.biojavax.bio.db.*;
 
 /**
- * Maintains a singleton map of rich objects, and provides some default values
+ * Runs a service that builds rich objects, and provides some default values
  * for things like default ontology, default namespace, etc.
  * @author Richard Holland
  */
 public class RichObjectFactory {
     
-    private static Map objects = new HashMap();    
     private static RichObjectBuilder builder = new SimpleRichObjectBuilder();
     
     private static String defaultOntologyName = "biojavax";
@@ -61,26 +60,17 @@ public class RichObjectFactory {
      * @see HibernateRichObjectBuilder
      */
     public static synchronized void setRichObjectBuilder(RichObjectBuilder b) {
-        if (b!=builder) objects.clear(); // because they're from a different factory now
         builder = b;
     }
     
     /**
-     * Maintains the singleton map, and returns the requested object from that map
-     * based on the class name and constructor parameters. If the object does not
-     * exist, it delegates to a RichObjectBuilder to construct the object, then 
-     * adds it to the map, and returns it.
+     * Delegates to a RichObjectBuilder to construct/retrieve the object, and returns it.
      * @param clazz the class to build 
      * @param params the parameters to pass to the class' constructor
      * @return the instantiated object
      */
     public static synchronized Object getObject(Class clazz, Object[] params) {
-        // put the class into the hashmap if not there already
-        if (!objects.containsKey(clazz)) objects.put(clazz,new HashMap());
-        Map contents = (Map)objects.get(clazz);
-        // put the constructed object into the hashmap if not there already
-        if (!contents.containsKey(params)) contents.put(params, builder.buildObject(clazz, params));
-        return contents.get(params);
+        return builder.buildObject(clazz, params);
     }
     
     /** 

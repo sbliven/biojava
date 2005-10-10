@@ -73,13 +73,13 @@ public interface NCBITaxon extends Comparable,Changeable {
      * Use this to define scientific names for things. There should
      * usually only be one scientific name for an organism.
      */
-    public static final String SCIENTIFIC = "SCIENTIFIC";
+    public static final String SCIENTIFIC = "scientific name";
     
     /**
      * Use this to define common names for things. There can be as many
      * common names as you like.
      */
-    public static final String COMMON = "COMMON";
+    public static final String COMMON = "common name";
     
     /**
      * Returns all the name classes available for a taxon. These are Strings.

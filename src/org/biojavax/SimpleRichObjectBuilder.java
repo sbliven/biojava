@@ -22,22 +22,30 @@
 package org.biojavax;
 
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
- * Creates objects and returns them.
+ * Creates objects and returns them, and stores them in an internal
+ * map of singletons for reference. Takes up a lot of memory!
  * @author Richard Holland
  */
 public class SimpleRichObjectBuilder implements RichObjectBuilder {
     
-    /** Creates a new instance of SimpleRichObjectBuilder */
-    public SimpleRichObjectBuilder() {}
+    private static Map objects = new HashMap();    
     
     /**
      * {@inheritDoc}
      * Instantiates and returns objects, that's all there is to it.
      */
     public Object buildObject(Class clazz, Object[] params) {
+        // put the class into the hashmap if not there already
+        if (!objects.containsKey(clazz)) objects.put(clazz,new HashMap());
+        Map contents = (Map)objects.get(clazz);
+        // put the constructed object into the hashmap if not there already
+        if (contents.containsKey(params)) return contents.get(params); 
+        // otherwise build it.
         try {
             // Load the class
             Class[] types = new Class[params.length];
@@ -45,7 +53,11 @@ public class SimpleRichObjectBuilder implements RichObjectBuilder {
             for (int i = 0; i < params.length; i++) types[i] = params[i].getClass();
             Constructor c = clazz.getConstructor(types);
             // Instantiate it with the parameters
-            return c.newInstance(params);
+            Object o = c.newInstance(params);
+            // store it for later in the singleton map
+            contents.put(params, o);
+            // return it
+            return o;
         } catch (Exception e) {
             StringBuffer paramsstuff = new StringBuffer();
             paramsstuff.append(clazz);

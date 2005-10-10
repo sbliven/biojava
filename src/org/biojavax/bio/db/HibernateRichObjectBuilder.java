@@ -20,22 +20,26 @@
  */
 
 package org.biojavax.bio.db;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.biojavax.RichObjectBuilder;
 import org.biojavax.SimpleCrossRef;
 import org.biojavax.SimpleDocRef;
 import org.biojavax.SimpleNamespace;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.SimpleComparableOntology;
-import org.biojavax.SimpleRichObjectBuilder;
+
 
 /**
  * Takes requests for RichObjects and sees if it can load them from a Hibernate
  * database. If it can, it returns the loaded objects. Else, it creates them
- * and persists them, then returns them.
+ * and persists them, then returns them. Doesn't retain a memory map so runs
+ * a lot of Hibernate queries if used frequently, but on the plus side this
+ * makes it memory-efficient.
  * @author Richard Holland
  */
-public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
+public class HibernateRichObjectBuilder implements RichObjectBuilder {
     
     private Object session;
     private Class query;
@@ -44,14 +48,13 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
     private Method list;
     private Method persist;
     
-    /** 
+    /**
      * Creates a new instance of SimpleRichObjectBuilder. The session parameter
      * is a Hibernate Session object and must not be null. It is this session
      * that database objects will be retrieved from/persisted to.
      * @see <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/Session.html"> org.hibernate.Session</a>
      */
     public HibernateRichObjectBuilder(Object session) {
-        super(); // call the normal rich object builder first
         try {
             // Lazy load the Session class from Hibernate.
             Class hibernateSession = Class.forName("org.hibernate.Session");
@@ -73,7 +76,7 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
             throw new RuntimeException(e);
         }
     }
-
+    
     /**
      * {@inheritDoc}
      * Attempts to look up the details of the object in the database. If it
@@ -81,24 +84,22 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
      * wrapper object it made to do the search with and returns that.
      */
     public Object buildObject(Class clazz, Object[] params) {
-        // Create a wrapper object to do the search with
-        Object o = super.buildObject(clazz, params);
         // Create the Hibernate query to look it up with
         String queryText;
         String queryType;
-        if (o instanceof SimpleNamespace) {
+        if (clazz==SimpleNamespace.class) {
             queryText = "from Namespace as ns where ns.name = ?";
             queryType = "Namespace";
-        } else if (o instanceof SimpleComparableOntology) {
+        } else if (clazz==SimpleComparableOntology.class) {
             queryText = "from Ontology as o where o.name = ?";
             queryType = "Ontology";
-        } else if (o instanceof SimpleNCBITaxon) {
+        } else if (clazz==SimpleNCBITaxon.class) {
             queryText = "from Taxon as o where o.NCBITaxID = ?";
             queryType = "Taxon";
-        } else if (o instanceof SimpleCrossRef) {
+        } else if (clazz==SimpleCrossRef.class) {
             queryText = "from CrossRef as cr where cr.dbname = ? and cr.accession = ?";
             queryType = "CrossRef";
-        } else if (o instanceof SimpleDocRef) {
+        } else if (clazz==SimpleDocRef.class) {
             queryText = "from DocRef as cr where cr.authors = ? and cr.location = ?";
             queryType = "DocRef";
         } else throw new IllegalArgumentException("Don't know how to handle objects of type "+clazz);
@@ -114,8 +115,16 @@ public class HibernateRichObjectBuilder extends SimpleRichObjectBuilder {
             List results = (List)this.list.invoke(query, null);
             // Return the found object, if found
             if (results.size()>0) return results.get(0);
-            // Persist and return the wrapper object otherwise
+            // Create, persist and return the new object otherwise
             else {
+                // Load the class
+                Class[] types = new Class[params.length];
+                // Find its constructor with given params
+                for (int i = 0; i < params.length; i++) types[i] = params[i].getClass();
+                Constructor c = clazz.getConstructor(types);
+                // Instantiate it with the parameters
+                Object o = c.newInstance(params);
+                // Persist and return it.
                 this.persist.invoke(this.session, new Object[]{queryType,o});
                 return o;
             }
