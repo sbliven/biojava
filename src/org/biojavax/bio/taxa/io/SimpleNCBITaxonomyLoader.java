@@ -82,7 +82,7 @@ public class SimpleNCBITaxonomyLoader implements NCBITaxonomyLoader {
         hidden subtree root flag (1 or 0)       -- 1 if this subtree has no sequence data yet
         comments				-- free-text comments and citations
                  */
-                String[] parts = line.split("\\t\\|\\t");
+                String[] parts = line.split("\\|");
                 Integer tax_id = Integer.valueOf(parts[0].trim());
                 String pti = parts[1].trim();
                 Integer parent_tax_id = pti.length()>0?new Integer(pti):null;
@@ -111,7 +111,7 @@ public class SimpleNCBITaxonomyLoader implements NCBITaxonomyLoader {
         unique name				-- the unique variant of this name if name not unique
         name class				-- (synonym, common name, ...)
                  */
-                String[] parts = line.split("\\t\\|\\t");
+                String[] parts = line.split("\\|");
                 Integer tax_id = Integer.valueOf(parts[0].trim());
                 String name = parts[1].trim();
                 String nameClass = parts[3].trim();
