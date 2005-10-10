@@ -29,6 +29,7 @@ import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
+import org.biojavax.RichObjectFactory;
 
 /**
  * Reference implementation of NCBITaxon.
@@ -372,6 +373,55 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
                 cs.firePostChangeEvent(ce);
             }
         }
+    }
+    
+    /**
+     * Returns the name of this taxon entry in the form:
+     *   scientific (common)
+     * or if there is no common name:
+     *   scientific
+     * or if there are no scientific names at all, the empty string.
+     * @return the display name as described above.
+     */
+    public String getDisplayName() {
+        StringBuffer sb = new StringBuffer();
+        Set sciNames = this.getNames(NCBITaxon.SCIENTIFIC);
+        Set comNames = this.getNames(NCBITaxon.COMMON);
+        if (sciNames.size()>0) {
+            sb.append((String)sciNames.iterator().next());
+            if (comNames.size()>0) {
+                sb.append(" (");
+                sb.append((String)comNames.iterator().next());
+                sb.append(")");
+            }
+        }
+        return sb.toString();
+    }
+    
+    /**
+     * Returns the taxonomy hierarchy of this taxon entry in the form:
+     *   most specific; less specific; ...; least specific.
+     * It follows the chain up the tree as far as it can, and will stop
+     * at the first one it comes to that returns null for getParentNCBITaxID().
+     * If this taxon entry has no scientific name, you will get the string ".".
+     * @return the display name as described above.
+     */
+    public String getNameHierarchy() {
+        StringBuffer sb = new StringBuffer();
+        boolean first = true;
+        Integer parent = this.getParentNCBITaxID();
+        while (parent!=null) {
+            NCBITaxon t = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{parent});
+            Set sciNames = t.getNames(NCBITaxon.SCIENTIFIC);
+            if (sciNames.size()>0) {
+                if (!first) sb.insert(0,"; ");
+                else first = false;
+                sb.insert(0,(String)sciNames.iterator().next());
+                parent = t.getParentNCBITaxID();
+            } else parent = null;
+        }
+        sb.append(".");
+        return sb.toString();
     }
     
     /**

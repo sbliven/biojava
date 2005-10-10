@@ -672,18 +672,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         // source line (from taxon)
         //   organism line
         NCBITaxon tax = rs.getTaxon();
-        if (tax!=null) {
-            String[] sciNames = (String[])tax.getNames(NCBITaxon.SCIENTIFIC).toArray(new String[0]);
-            String[] comNames = (String[])tax.getNames(NCBITaxon.COMMON).toArray(new String[0]);
-            if (sciNames.length>0 && comNames.length>0) {
-                StringTools.writeKeyValueLine(SOURCE_TAG, sciNames[0]+" ("+comNames[0]+")", 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
-                StringTools.writeKeyValueLine(ORGANISM_TAG, sciNames[0]+" ("+comNames[0]+")", 5, this.getLineWidth(), null, ORGANISM_TAG, this.getPrintStream());
-                this.getPrintStream().println(DELIMITER_TAG+"   ");
-            } else if (sciNames.length>0) {
-                StringTools.writeKeyValueLine(SOURCE_TAG, sciNames[0], 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
-                StringTools.writeKeyValueLine(ORGANISM_TAG, sciNames[0], 5, this.getLineWidth(), null, ORGANISM_TAG, this.getPrintStream());
-                this.getPrintStream().println(DELIMITER_TAG+"   ");
-            }
+        if (tax!=null) {           
+            StringTools.writeKeyValueLine(SOURCE_TAG, tax.getDisplayName(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(ORGANISM_TAG, tax.getNameHierarchy(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+            this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         
         // references - rank (bases x to y)

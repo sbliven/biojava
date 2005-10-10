@@ -211,6 +211,24 @@ public interface NCBITaxon extends Comparable,Changeable {
      * @throws ChangeVetoException in case of objections.
      */
     public void setRightValue(Integer rightValue) throws ChangeVetoException;
+
+    /**
+     * Returns the name of this taxon entry in the form:
+     *   scientific (common)
+     * or if there is no common name:
+     *   scientific
+     * @return the display name as described above.
+     */
+    public String getDisplayName();
+
+    /**
+     * Returns the taxonomy hierarchy of this taxon entry in the form:
+     *   least specific; more specific; ...; most specific.
+     * It follows the chain up the tree as far as it can, and will stop
+     * at the first one it comes to that returns null for getParentNCBITaxID()
+     * @return the display name as described above.
+     */
+    public String getNameHierarchy();
     
 }
 

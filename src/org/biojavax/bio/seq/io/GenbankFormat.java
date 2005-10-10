@@ -540,11 +540,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         //   organism line
         NCBITaxon tax = rs.getTaxon();
         if (tax!=null) {
-            String[] sciNames = (String[])tax.getNames(NCBITaxon.SCIENTIFIC).toArray(new String[0]);
-            if (sciNames.length>0) {
-                StringTools.writeKeyValueLine(SOURCE_TAG, sciNames[0], 12, this.getLineWidth(), this.getPrintStream());
-                StringTools.writeKeyValueLine("  "+ORGANISM_TAG, sciNames[0], 12, this.getLineWidth(), this.getPrintStream());
-            }
+            StringTools.writeKeyValueLine(SOURCE_TAG, tax.getDisplayName(), 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine("  "+ORGANISM_TAG, tax.getDisplayName().split("\\s+\\(")[0]+"\n"+tax.getNameHierarchy(), 12, this.getLineWidth(), this.getPrintStream());
         }
         
         // references - rank (bases x to y)

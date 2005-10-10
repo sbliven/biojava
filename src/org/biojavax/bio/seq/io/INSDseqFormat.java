@@ -338,17 +338,18 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         }
         
         NCBITaxon tax = rs.getTaxon();
-        if (tax!=null) {
-            String[] sciNames = (String[])tax.getNames(NCBITaxon.SCIENTIFIC).toArray(new String[0]);
-            if (sciNames.length>0) {
+        if (tax!=null) {            
                 xml.openTag(SOURCE_TAG);
-                xml.print(sciNames[0]);
+                xml.print(tax.getDisplayName());
                 xml.closeTag(SOURCE_TAG);
                 
                 xml.openTag(ORGANISM_TAG);
-                xml.print(sciNames[0]);
+                xml.print(tax.getDisplayName().split("\\s+\\(")[0]);
                 xml.closeTag(ORGANISM_TAG);
-            }
+                
+                xml.openTag(TAXONOMY_TAG);
+                xml.print(tax.getNameHierarchy());
+                xml.closeTag(TAXONOMY_TAG);
         }
         
         // references - rank (bases x to y)
