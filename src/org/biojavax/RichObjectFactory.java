@@ -20,14 +20,14 @@
  */
 
 package org.biojavax;
-
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.biojavax.bio.seq.PositionResolver;
 import org.biojavax.bio.seq.PositionResolver.AverageResolver;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.SimpleComparableOntology;
-import org.biojavax.bio.db.*;
+
 
 /**
  * Runs a service that builds rich objects, and provides some default values
@@ -40,11 +40,12 @@ public class RichObjectFactory {
     
     private static String defaultOntologyName = "biojavax";
     private static String defaultNamespaceName = "lcl";
-    private static String genbankNamespaceName = "gb";
-    private static String emblNamespaceName = "embl";
-    private static String uniprotNamespaceName = "uniprot";
     private static PositionResolver defaultPositionResolver = new AverageResolver();
     private static CrossReferenceResolver defaultCrossRefResolver = new SimpleCrossReferenceResolver();
+    
+    // the LRU cache - keys are classes, entries are maps of param sets to objects
+    private static int LRUcacheSize = 20;
+    private static Map cache = new HashMap();
     
     // Constructor is private as this is all static.
     private RichObjectFactory() {}
@@ -65,26 +66,51 @@ public class RichObjectFactory {
     
     /**
      * Delegates to a RichObjectBuilder to construct/retrieve the object, and returns it.
-     * @param clazz the class to build 
+     * To increase efficiency, it keeps a list of recently requested objects. If it
+     * receives further requests for the same object, it returns them from the cache. The
+     * size of the cache can be altered using setLRUCacheSize(). The default cache size is 20
+     * objects for each type of class requested.
+     * @param clazz the class to build
      * @param params the parameters to pass to the class' constructor
      * @return the instantiated object
      */
     public static synchronized Object getObject(Class clazz, Object[] params) {
-        return builder.buildObject(clazz, params);
+        if (!cache.containsKey(clazz)) {
+            cache.put(clazz, new LinkedHashMap(LRUcacheSize, 0.75f, true) {
+                protected boolean removeEldestEntry(Map.Entry eldest) {
+                    return this.size() > LRUcacheSize;
+                }
+            });
+        }
+        Map m = (Map)cache.get(clazz);
+        if (!m.containsKey(params)) {
+            m.put(params,builder.buildObject(clazz, params));
+        }
+        return m.get(params);
     }
     
-    /** 
+    /**
+     * Sets the size of the LRU cache. This is the size per class of object requested, so
+     * if you set it to 20 and request 3 different types of object, you will get 20*3=60
+     * entries in the cache. The default cache size is 20.
+     * @param size the size of the cache.
+     */
+    public static void setLRUCacheSize(int size) {
+        LRUcacheSize = size;
+    }
+    
+    /**
      * Sets the default namespace name to use when loading sequences. Defaults to "lcl".
      * @param name the namespace name to use.
      */
     public static void setDefaultNamespaceName(String name) { defaultNamespaceName = name; }
-        
-    /** 
+    
+    /**
      * Sets the default ontology name to use when loading sequences. Defaults to "biojavax".
      * @param name the ontology name to use.
      */
     public static void setDefaultOntologyName(String name) { defaultOntologyName = name; }
-        
+    
     /**
      * Sets the default position resolver to use when creating new rich feature locations.
      * Defaults to the AverageResolver
@@ -94,7 +120,7 @@ public class RichObjectFactory {
      * @see org.biojavax.bio.seq.RichLocation
      */
     public static void setDefaultPositionResolver(PositionResolver pr) { defaultPositionResolver = pr; }
-        
+    
     /**
      * Sets the default crossref resolver to use when resolving remote entries.
      * Defaults to the SimpleCrossReferenceResolver.
@@ -110,7 +136,7 @@ public class RichObjectFactory {
      */
     public static Namespace getDefaultNamespace() {
         return (Namespace)getObject(SimpleNamespace.class, new Object[]{defaultNamespaceName});
-    }  
+    }
     
     /**
      * Returns the default ontology object. Defaults to "biojavax".
@@ -118,7 +144,7 @@ public class RichObjectFactory {
      */
     public static ComparableOntology getDefaultOntology() {
         return (ComparableOntology)getObject(SimpleComparableOntology.class, new Object[]{defaultOntologyName});
-    }  
+    }
     
     /**
      * Returns the default position resolver object. Defaults to PositionResolver.AverageResolver
@@ -134,28 +160,4 @@ public class RichObjectFactory {
      */
     public static CrossReferenceResolver getDefaultCrossReferenceResolver() { return defaultCrossRefResolver; }
         
-    /**
-     * Returns the GenBank namespace object ("gb").
-     * @return the GenBank namespace.
-     */
-    public static Namespace getGenbankNamespace(){
-        return (Namespace)getObject(SimpleNamespace.class, new Object[]{genbankNamespaceName});
-    }    
-    
-    /**
-     * Returns the EMBL namespace object ("embl").
-     * @return the EMBL namespace.
-     */
-    public static Namespace getEMBLNamespace(){
-        return (Namespace)getObject(SimpleNamespace.class, new Object[]{emblNamespaceName});
-    }
-    
-    /**
-     * Returns the UniProt namespace object ("uniprot").
-     * @return the UniProt namespace.
-     */
-    public static Namespace getUniProtNamespace(){
-        return (Namespace)getObject(SimpleNamespace.class, new Object[]{uniprotNamespaceName});
-    }
-            
 }
