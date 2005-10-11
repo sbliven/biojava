@@ -42,6 +42,7 @@ import org.biojavax.Namespace;
 import org.biojavax.bio.BioEntry;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.io.EMBLFormat;
+import org.biojavax.bio.seq.io.EMBLxmlFormat;
 import org.biojavax.bio.seq.io.FastaFormat;
 import org.biojavax.bio.seq.io.GenbankFormat;
 import org.biojavax.bio.seq.io.INSDseqFormat;
@@ -446,6 +447,87 @@ public interface RichSequence extends BioEntry,Sequence {
                     ns);
         }
         
+        
+        
+        
+        /**
+         * Read a EMBLxml file using a custom type of SymbolList. For example,
+         * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
+         * SymbolTokenization) and RichSequenceBuilderFactory.PACKED to force all
+         * symbols to be encoded using bit-packing.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param sTok a <code>SymbolTokenization</code> that understands the sequences
+         * @param seqFactory a factory used to build a <code>SymbolList</code>
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readEMBLxml(
+                BufferedReader br,
+                SymbolTokenization sTok,
+                RichSequenceBuilderFactory seqFactory,
+                Namespace ns) {
+            return new RichStreamReader(
+                    br,
+                    new EMBLxmlFormat(),
+                    sTok,
+                    seqFactory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an EMBLxml-format stream of DNA sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readEMBLxmlDNA(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new EMBLxmlFormat(),
+                    getDNAParser(),
+                    factory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an EMBLxml-format stream of RNA sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readEMBLxmlRNA(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new EMBLxmlFormat(),
+                    getRNAParser(),
+                    factory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an EMBLxml-format stream of Protein sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readEMBLxmlProtein(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new EMBLxmlFormat(),
+                    getProteinParser(),
+                    factory,
+                    ns);
+        }
+        
         /**
          * Read a EMBL file using a custom type of SymbolList. For example,
          * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
@@ -657,6 +739,36 @@ public interface RichSequence extends BioEntry,Sequence {
         public static void writeINSDseq(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
             writeINSDseq(os, new SingleRichSeqIterator(seq),ns);
+        }
+        
+        
+        /**
+         * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
+         * EMBLxml Format.  This makes for a useful format filter where a
+         * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
+         * @param os The stream to write fasta formatted data to
+         * @param in The source of input Sequences
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeEMBLxml(OutputStream os, SequenceIterator in, Namespace ns)
+        throws IOException {
+            RichStreamWriter sw = new RichStreamWriter(os,new EMBLxmlFormat());
+            sw.writeStream(in,ns);
+        }
+        
+        /**
+         * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in EMBLxml format.
+         * @param os  the <code>OutputStream</code>.
+         * @param seq  the <code>Sequence</code>.
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeEMBLxml(OutputStream os, Sequence seq, Namespace ns)
+        throws IOException {
+            writeEMBLxml(os, new SingleRichSeqIterator(seq),ns);
         }
         
         /**

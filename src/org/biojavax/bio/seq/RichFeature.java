@@ -153,8 +153,7 @@ public interface RichFeature extends StrandedFeature,RankedCrossRefable,RichAnno
         /**
          * A way to make a dummy feature
          */
-        public static RichFeature makeEmptyFeature(){
-            
+        public static RichFeature makeEmptyFeature(){            
             RichFeature.Template templ = new RichFeature.Template();
             templ.annotation = new SimpleRichAnnotation();
             templ.featureRelationshipSet = new TreeSet();
@@ -166,8 +165,7 @@ public interface RichFeature extends StrandedFeature,RankedCrossRefable,RichAnno
                 return new SimpleRichFeature(new SimpleFeatureHolder(),templ);
             }catch(Exception ex){
                 throw new BioError(ex);
-            }//can't happen
-            
+            }//can't happen            
         }
     }
 }

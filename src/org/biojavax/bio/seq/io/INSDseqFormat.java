@@ -89,8 +89,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
      */
     public static final String INSDSEQ_FORMAT = "INSDseq";
     
-    public static final String INSDSEQS_GROUP_TAG = "INSDSet";
-    public static final String INSDSEQ_TAG = "INSDSeq";
+    protected static final String INSDSEQS_GROUP_TAG = "INSDSet";
+    protected static final String INSDSEQ_TAG = "INSDSeq";
     
     protected static final String LOCUS_TAG = "INSDSeq_locus";
     protected static final String LENGTH_TAG = "INSDSeq_length";
@@ -338,24 +338,26 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         }
         
         NCBITaxon tax = rs.getTaxon();
-        if (tax!=null) {            
-                xml.openTag(SOURCE_TAG);
-                xml.print(tax.getDisplayName());
-                xml.closeTag(SOURCE_TAG);
-                
-                xml.openTag(ORGANISM_TAG);
-                xml.print(tax.getDisplayName().split("\\s+\\(")[0]);
-                xml.closeTag(ORGANISM_TAG);
-                
-                xml.openTag(TAXONOMY_TAG);
-                xml.print(tax.getNameHierarchy());
-                xml.closeTag(TAXONOMY_TAG);
+        if (tax!=null) {
+            xml.openTag(SOURCE_TAG);
+            xml.print(tax.getDisplayName());
+            xml.closeTag(SOURCE_TAG);
+            
+            xml.openTag(ORGANISM_TAG);
+            xml.print(tax.getDisplayName().split("\\s+\\(")[0]);
+            xml.closeTag(ORGANISM_TAG);
+            
+            xml.openTag(TAXONOMY_TAG);
+            xml.print(tax.getNameHierarchy());
+            xml.closeTag(TAXONOMY_TAG);
         }
         
         // references - rank (bases x to y)
         if (!rs.getRankedDocRefs().isEmpty()) {
             xml.openTag(REFERENCES_GROUP_TAG);
             for (Iterator r = rs.getRankedDocRefs().iterator(); r.hasNext();) {
+                xml.openTag(REFERENCE_TAG);
+                
                 RankedDocRef rdr = (RankedDocRef)r.next();
                 DocRef d = rdr.getDocumentReference();
                 Integer rstart = rdr.getStart();
@@ -378,9 +380,11 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     xml.closeTag(AUTHORS_GROUP_TAG);
                 }
                 
-                xml.openTag(TITLE_TAG);
-                xml.print(d.getTitle());
-                xml.closeTag(TITLE_TAG);
+                if (d.getTitle()!=null) {
+                    xml.openTag(TITLE_TAG);
+                    xml.print(d.getTitle());
+                    xml.closeTag(TITLE_TAG);
+                }
                 
                 xml.openTag(JOURNAL_TAG);
                 xml.print(d.getLocation());
@@ -404,6 +408,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     xml.print(d.getRemark());
                     xml.closeTag(REMARK_TAG);
                 }
+                
+                xml.closeTag(REFERENCE_TAG);
             }
             xml.closeTag(REFERENCES_GROUP_TAG);
         }
@@ -418,7 +424,6 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         // db references - only first one is output
         if (!rs.getRankedCrossRefs().isEmpty()) {
             Iterator r = rs.getRankedCrossRefs().iterator();
-            r.next();
             RankedCrossRef rcr = (RankedCrossRef)r.next();
             CrossRef c = rcr.getCrossRef();
             Set noteset = c.getNoteSet();
@@ -539,6 +544,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         private RichSeqIOListener rlistener;
         private Namespace ns;
         private StringBuffer m_currentString;
+        
         private NCBITaxon tax;
         private String organism;
         private String accession;

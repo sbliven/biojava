@@ -23,6 +23,7 @@ package org.biojavax.utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -49,7 +50,7 @@ public class XMLTools {
      * @param reader the reader to read the XML from
      * @param m_handler the SAX parser to feed the XML to
      * @param chunkToken the token to read. The parser will locate the first instance of
-     * &lt;chunkToken> and will buffer all content, including the opening tag and up to
+     * &lt;chunkToken and will buffer all content, including the opening tag and up to
      * and including the closing &lt;/chunkToken> tag. It will not currently handle
      * &lt;chunkToken/> instances, nor instances where more than one tag appears per line,
      * or extra spaces appear between the angle brackets, slashes, and tag name of the
@@ -63,16 +64,19 @@ public class XMLTools {
         // read next chunk from <chunkToken> to <chunkToken/> inclusive into buffer
         // process buffer through XML parser
         StringBuffer buffer = new StringBuffer();
+
+        Pattern start = Pattern.compile(".*<"+chunkToken+".*");
+        Pattern end = Pattern.compile(".*</"+chunkToken+">.*");
         
         boolean begunChunk = false;
         boolean filledBuffer = false;
         String line;
         while (!filledBuffer && (line=reader.readLine())!=null) {
             line = line.trim();
-            if (!begunChunk && !line.equals("<"+chunkToken+">")) continue;
+            if (!begunChunk && !start.matcher(line).matches()) continue;
             else begunChunk = true;
             buffer.append(line+"\n");
-            if (line.equals("</"+chunkToken+">")) filledBuffer = true;
+            if (end.matcher(line).matches()) filledBuffer = true;
         }
         if (!filledBuffer) throw new SAXException("Unexpectedly reached end of file");
         reader.mark(500);

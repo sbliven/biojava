@@ -135,7 +135,8 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
             paramsstuff.append(clazz);
             paramsstuff.append("(");
             for (int i = 0; i < params.length; i++) {
-                paramsstuff.append(params[i].toString());
+                if (params[i]==null) paramsstuff.append("null");
+                else paramsstuff.append(params[i].toString());
                 if (i<(params.length-1)) paramsstuff.append(",");
             }
             paramsstuff.append(")");
