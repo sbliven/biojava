@@ -30,21 +30,21 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.SymbolPropertyTable;
 
 /**
- * Iterator over {@link org.biojava.bio.proteomics.aaindex.SymbolPropertyTable} objects.
+ * Iterator over {@link org.biojava.bio.symbol.SymbolPropertyTable} objects.
  * @author <a href="mailto:Martin.Szugat@GMX.net">Martin Szugat</a>
  * @version $Revision$
  */
 public interface SymbolPropertyTableIterator {
     /**
      * Checks if there is a further 
-     * {@link org.biojava.bio.proteomics.aaindex.SymbolPropertyTable} object.
+     * {@link org.biojava.bio.symbol.SymbolPropertyTable} object.
      * @return <code>true</code> if a call to the {@link #nextTable()} method
      * is valid, <code>false</code> otherwise.
      */
     boolean hasNext();
     
     /**
-     * Returns the next {@link org.biojava.bio.proteomics.aaindex.SymbolPropertyTable} 
+     * Returns the next {@link org.biojava.bio.symbol.SymbolPropertyTable} 
      * object.
      * @return a symbol property table
      * @throws NoSuchElementException if there is no further symbol property 

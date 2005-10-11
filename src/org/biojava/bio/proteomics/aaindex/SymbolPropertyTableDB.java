@@ -30,7 +30,7 @@ import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.symbol.SymbolPropertyTable;
 
 /**
- * Database of {@link org.biojava.bio.proteomics.aaindex.SymbolPropertyTable} objects.
+ * Database of {@link org.biojava.bio.symbol.SymbolPropertyTable} objects.
  * @author <a href="mailto:Martin.Szugat@GMX.net">Martin Szugat</a>
  * @version $Revision$
  */
@@ -38,7 +38,7 @@ public interface SymbolPropertyTableDB {
 
     /**
      * Returns an iterator over 
-     * {@link org.biojava.bio.proteomics.aaindex.SymbolPropertyTable} objects.
+     * {@link org.biojava.bio.symbol.SymbolPropertyTable} objects.
      * @return a new iterator
      */
      SymbolPropertyTableIterator tableIterator();
@@ -58,11 +58,10 @@ public interface SymbolPropertyTableDB {
     /**
      * Returns the table with the specified name.
      * @param name the 
-     * {@linkplain org.biojava.bio.proteomics.aaindex.SymbolPropertyTable#getName() name 
+     * {@linkplain org.biojava.bio.symbol.SymbolPropertyTable#getName() name 
      * of the table}
      * @return the specified table
-     * @throws IllegalIDException if no symbol property table with the specified
-     * name could be found.
+     * @throws IllegalIDException if no symbol property table with the specified name could be found.
      * @throws NullPointerException if <code>name</code> is 
      * <code>null</code>.
      */

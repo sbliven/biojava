@@ -131,7 +131,7 @@ public class AAindex extends SimpleSymbolPropertyTable {
     /**
      * Gets the accession number of the AAindex entry.
      * @return the accession number (same as 
-     * {@link org.biojava.bio.proteomics.aaindex.SymbolPropertyTable#getName()}
+     * {@link org.biojava.bio.symbol.SymbolPropertyTable#getName()}
      */
     public String accessionNumber() {
         return accessionNumber;

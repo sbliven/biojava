@@ -1034,7 +1034,6 @@ public class TaxonSQL {
     * @param conn
     * @param tdb
     * @param id
-    * @param property
     * @throws BioRuntimeException
     */
   public static void setGeneticCodeID(Connection conn, Taxon tdb, int id) throws BioRuntimeException
@@ -1109,7 +1108,6 @@ public class TaxonSQL {
   /** Deletes the so called mitochondrial genetic code annotation from the given taxon.
     * @param conn
     * @param helper
-    * @param connection
     * @param tdb
     * @throws BioRuntimeException
     */
@@ -1159,7 +1157,6 @@ public class TaxonSQL {
   /** Deletes the left value from the specified taxon in the database.
     * @param conn
     * @param helper
-    * @param connection
     * @param tdb
     * @throws BioRuntimeException
     */
@@ -1209,7 +1206,6 @@ public class TaxonSQL {
   /** Deletes the right value from the specified taxon in the database.
     * @param conn
     * @param helper
-    * @param connection
     * @param tdb
     * @throws BioRuntimeException
     */
@@ -1236,8 +1232,6 @@ public class TaxonSQL {
     * @param conn
     * @param child
     * @param parent
-    * @param tdb
-    * @param realScientificName
     * @throws BioRuntimeException
     */
   public static void setParent(Connection conn, Taxon child, Taxon parent) throws BioRuntimeException
