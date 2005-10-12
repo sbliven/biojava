@@ -189,6 +189,12 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
         rlistener.setNamespace(ns);
         
+        // the date pattern
+        // date (Rel. N, Created)
+        // date (Rel. N, Last sequence update)
+        // date (Rel. N, Last annotation update)
+        Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)]+)\\)$");
+        
         // Get an ordered list of key->value pairs in array-tuples
         String sectionKey = null;
         NCBITaxon tax = null;
@@ -255,9 +261,23 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     throw new ParseException(e);
                 }
             } else if (sectionKey.equals(DATE_TAG)) {
-                // we store it as the modification date, for compatibility with single-date formats
-                String date = ((String[])section.get(0))[1].substring(0,11);
-                rlistener.addSequenceProperty(Terms.getModificationTerm(), date);
+                String chunk = ((String[])section.get(0))[1].trim();
+                Matcher dm = dp.matcher(chunk);
+                if (dm.matches()) {
+                    String date = dm.group(1);
+                    String rel = dm.group(2);
+                    String type = dm.group(3);
+                    if (type.equals("Created")) {
+                        rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
+                        rlistener.addSequenceProperty(Terms.getRelCreatedTerm(), rel);
+                    } else if (type.equals("Last sequence update")) {
+                        rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
+                        rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
+                    } else if (type.equals("Last annotation update")) {
+                        rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), date);
+                        rlistener.addSequenceProperty(Terms.getRelAnnotatedTerm(), rel);
+                    } else throw new ParseException("Bad date type found: "+type);
+                } else throw new ParseException("Bad date line found: "+chunk);
             } else if (sectionKey.equals(ACCESSION_TAG)) {
                 // if multiple accessions, store only first as accession,
                 // and store rest in annotation
@@ -580,6 +600,11 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     section.add(new String[]{DATABASE_XREF_TAG,line.substring(5).trim()});
                     done = true;
                 }
+                // READ DATE
+                else if (token.equals(DATE_TAG)) {
+                    section.add(new String[]{DATE_TAG,line.substring(5).trim()});
+                    done = true;
+                }
                 // READ END OF SEQUENCE
                 else if (token.equals(END_SEQUENCE_TAG)) {
                     section.add(new String[]{END_SEQUENCE_TAG,null});
@@ -674,11 +699,21 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         String accession = rs.getAccession();
         String accessions = accession+";";
         List genenames = new ArrayList();
-        String mdat = "";
+        String cdat = null;
+        String udat = null;
+        String adat = null;
+        String crel = null;
+        String urel = null;
+        String arel = null;
         String dataclass = "STANDARD";
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
-            if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
+            if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
+            else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
+            else if (n.getTerm().equals(Terms.getDateAnnotatedTerm())) adat=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelAnnotatedTerm())) arel=n.getValue();
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
             else if (n.getTerm().equals(Terms.getGeneNameTerm())) genenames.add(n.getValue());
@@ -698,9 +733,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         StringTools.writeKeyValueLine(ACCESSION_TAG, accessions, 5, this.getLineWidth(), null, ACCESSION_TAG, this.getPrintStream());
         
         // date line
-        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 00, Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
-        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 00, Last sequence update)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
-        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 00, Last annotation update)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, (cdat==null?udat:cdat)+" (Rel. "+(crel==null?"0":crel)+", Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, udat+" (Rel. "+(urel==null?"0":urel)+", Last sequence update)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, (adat==null?udat:adat)+" (Rel. "+(arel==null?"0":arel)+", Last annotation update)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         
         // definition line
         StringTools.writeKeyValueLine(DEFINITION_TAG, rs.getDescription(), 5, this.getLineWidth(), null, DEFINITION_TAG, this.getPrintStream());

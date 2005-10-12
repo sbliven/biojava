@@ -289,12 +289,18 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         List accessions = new ArrayList();
         List kws = new ArrayList();
         String stranded = null;
-        String mdat = null;
+        String cdat = null;
+        String udat = null;
+        String crel = null;
+        String urel = null;
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext();) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
-            else if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
+            else if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
+            else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions.add(n.getValue());
             else if (n.getTerm().equals(Terms.getKeywordsTerm())) kws.add(n.getValue());
@@ -304,10 +310,10 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         xml.attribute(ENTRY_ACCESSION_ATTR,rs.getAccession());
         xml.attribute(ENTRY_NAME_ATTR,rs.getName());
         xml.attribute(ENTRY_DIVISION_ATTR,rs.getDivision());
-        xml.attribute(ENTRY_CREATED_ATTR,mdat);
-        xml.attribute(ENTRY_RELCREATED_ATTR,"0");
-        xml.attribute(ENTRY_UPDATED_ATTR,mdat);
-        xml.attribute(ENTRY_RELUPDATED_ATTR,"0");
+        xml.attribute(ENTRY_CREATED_ATTR,cdat==null?udat:cdat);
+        xml.attribute(ENTRY_RELCREATED_ATTR,crel==null?"0":crel);
+        xml.attribute(ENTRY_UPDATED_ATTR,udat);
+        xml.attribute(ENTRY_RELUPDATED_ATTR,urel==null?"0":urel);
         xml.attribute(ENTRY_VER_ATTR,""+rs.getVersion());
         
         for (Iterator i = accessions.iterator(); i.hasNext(); ) {
@@ -581,7 +587,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         return EMBLXML_FORMAT;
     }
     
-    // SAX event handler for parsing http://www.ebi.ac.uk/embl/Documentation/DTD/INSDSeq_v1.3.dtd.txt
+    // SAX event handler for parsing http://www.ebi.ac.uk/embl/Documentation/DTD/EMBL_dtd.txt
     private class EMBLxmlHandler extends DefaultHandler {
         
         private RichSequenceFormat parent;
@@ -641,9 +647,11 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                             rlistener.setAccession(accession);
                         } else if (name.equals(ENTRY_NAME_ATTR)) rlistener.setName(val);
                         else if (name.equals(ENTRY_DIVISION_ATTR)) rlistener.setDivision(val);
-                        else if (name.equals(ENTRY_CREATED_ATTR) || name.equals(ENTRY_UPDATED_ATTR)) {
-                            rlistener.addSequenceProperty(Terms.getModificationTerm(),val);
-                        } else if (name.equals(ENTRY_VER_ATTR)) rlistener.setVersion(Integer.parseInt(val));
+                        else if (name.equals(ENTRY_CREATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateCreatedTerm(),val);
+                        else if (name.equals(ENTRY_UPDATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),val);
+                        else if (name.equals(ENTRY_RELCREATED_ATTR)) rlistener.addSequenceProperty(Terms.getRelCreatedTerm(),val);
+                        else if (name.equals(ENTRY_RELUPDATED_ATTR)) rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(),val);
+                        else if (name.equals(ENTRY_VER_ATTR)) rlistener.setVersion(Integer.parseInt(val));
                     }
                     currNames.clear();
                     currComments.clear();

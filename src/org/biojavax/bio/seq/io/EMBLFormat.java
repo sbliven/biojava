@@ -119,7 +119,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             return EMBL_TERM;
         }
     }
-        
+    
     /**
      * {@inheritDoc}
      */
@@ -148,6 +148,11 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         
         if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
         rlistener.setNamespace(ns);
+        
+        // the date pattern
+        // date (Rel. N, Created)
+        // date (Rel. N, Last updated, Version 10)
+        Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)\\d]+)\\d*\\)$");
         
         // Get an ordered list of key->value pairs in array-tuples
         String sectionKey = null;
@@ -184,9 +189,20 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // IGNORE - can get from first feature in feature table
             } else if (sectionKey.equals(DATE_TAG)) {
-                // we store it as the modification date, for compatibility with single-date formats
-                String date = ((String[])section.get(0))[1].substring(0,11);
-                rlistener.addSequenceProperty(Terms.getModificationTerm(), date);
+                String chunk = ((String[])section.get(0))[1].trim();
+                Matcher dm = dp.matcher(chunk);
+                if (dm.matches()) {
+                    String date = dm.group(1);
+                    String rel = dm.group(2);
+                    String type = dm.group(3);
+                    if (type.equals("Created")) {
+                        rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
+                        rlistener.addSequenceProperty(Terms.getRelCreatedTerm(), rel);
+                    } else if (type.equals("Last updated, Version ")) {
+                        rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
+                        rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
+                    } else throw new ParseException("Bad date type found: "+type);
+                } else throw new ParseException("Bad date line found: "+chunk);
             } else if (sectionKey.equals(ACCESSION_TAG)) {
                 // if multiple accessions, store only first as accession,
                 // and store rest in annotation
@@ -534,6 +550,11 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     section.add(new String[]{DATABASE_XREF_TAG,line.substring(5).trim()});
                     done = true;
                 }
+                // READ DATE
+                else if (token.equals(DATE_TAG)) {
+                    section.add(new String[]{DATE_TAG,line.substring(5).trim()});
+                    done = true;
+                }
                 // READ NORMAL TAG/VALUE SECTION
                 else {
                     //      rewind buffer to mark
@@ -572,7 +593,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         }
         return section;
     }
-         
+    
     /**
      * {@inheritDoc}
      */
@@ -615,11 +636,17 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         Set notes = rs.getNoteSet();
         String accession = rs.getAccession();
         String accessions = accession+";";
-        String mdat = "";
+        String cdat = null;
+        String udat = null;
+        String crel = null;
+        String urel = null;
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
-            if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
+            if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
+            else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
         }
@@ -647,8 +674,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // date line
-        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 0, Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
-        StringTools.writeKeyValueLine(DATE_TAG, mdat+" (Rel. 0, Last Updated "+rs.getVersion()+")", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, (cdat==null?udat:cdat)+" (Rel. "+(crel==null?"0":crel)+" Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, udat+" (Rel. "+(urel==null?"0":urel)+", Last updated, Version "+rs.getVersion()+")", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // definition line
@@ -672,7 +699,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         // source line (from taxon)
         //   organism line
         NCBITaxon tax = rs.getTaxon();
-        if (tax!=null) {           
+        if (tax!=null) {
             StringTools.writeKeyValueLine(SOURCE_TAG, tax.getDisplayName(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(ORGANISM_TAG, tax.getNameHierarchy(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
             this.getPrintStream().println(DELIMITER_TAG+"   ");

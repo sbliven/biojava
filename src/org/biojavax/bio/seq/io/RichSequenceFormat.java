@@ -167,7 +167,12 @@ public interface RichSequenceFormat extends SequenceFormat {
     public static class Terms {
         private static ComparableTerm ACCESSION_TERM = null;
         private static ComparableTerm KERYWORDS_TERM = null;
-        private static ComparableTerm MODIFICATION_TERM = null;
+        private static ComparableTerm DATE_CREATED_TERM = null;
+        private static ComparableTerm DATE_UPDATED_TERM = null;
+        private static ComparableTerm DATE_ANNOTATED_TERM = null;
+        private static ComparableTerm REL_CREATED_TERM = null;
+        private static ComparableTerm REL_UPDATED_TERM = null;
+        private static ComparableTerm REL_ANNOTATED_TERM = null;
         private static ComparableTerm MOLTYPE_TERM = null;
         private static ComparableTerm STRANDED_TERM = null;
         private static ComparableTerm IDENTIFIER_TERM = null;
@@ -206,12 +211,57 @@ public interface RichSequenceFormat extends SequenceFormat {
         }
         
         /**
-         * Getter for the modification term
+         * Getter for the date created term
          * @return a Term
          */
-        public static ComparableTerm getModificationTerm() {
-            if (MODIFICATION_TERM==null) MODIFICATION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("MDAT");
-            return MODIFICATION_TERM;
+        public static ComparableTerm getDateCreatedTerm() {
+            if (DATE_CREATED_TERM==null) DATE_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("DATE_CREATED");
+            return DATE_CREATED_TERM;
+        }
+        
+        /**
+         * Getter for the date updated term
+         * @return a Term
+         */
+        public static ComparableTerm getDateUpdatedTerm() {
+            if (DATE_UPDATED_TERM==null) DATE_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("DATE_UPDATED");
+            return DATE_UPDATED_TERM;
+        }
+        
+        /**
+         * Getter for the date annotated term
+         * @return a Term
+         */
+        public static ComparableTerm getDateAnnotatedTerm() {
+            if (DATE_ANNOTATED_TERM==null) DATE_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("DATE_ANNOTATED");
+            return DATE_ANNOTATED_TERM;
+        }
+        
+        /**
+         * Getter for the release created term
+         * @return a Term
+         */
+        public static ComparableTerm getRelCreatedTerm() {
+            if (REL_CREATED_TERM==null) REL_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("REL_CREATED");
+            return REL_CREATED_TERM;
+        }
+        
+        /**
+         * Getter for the release updated term
+         * @return a Term
+         */
+        public static ComparableTerm getRelUpdatedTerm() {
+            if (REL_UPDATED_TERM==null) REL_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("REL_UPDATED");
+            return REL_UPDATED_TERM;
+        }
+        
+        /**
+         * Getter for the release annotated term
+         * @return a Term
+         */
+        public static ComparableTerm getRelAnnotatedTerm() {
+            if (REL_ANNOTATED_TERM==null) REL_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("REL_ANNOTATED");
+            return REL_ANNOTATED_TERM;
         }
         
         /**

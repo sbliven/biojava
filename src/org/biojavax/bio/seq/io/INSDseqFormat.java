@@ -100,6 +100,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     protected static final String DIVISION_TAG = "INSDSeq_division";
     protected static final String UPDATE_DATE_TAG = "INSDSeq_update-date";
     protected static final String CREATE_DATE_TAG = "INSDSeq_create-date";
+    protected static final String UPDATE_REL_TAG = "INSDSeq_update-release";
+    protected static final String CREATE_REL_TAG = "INSDSeq_create-release";
     protected static final String DEFINITION_TAG = "INSDSeq_definition";
     protected static final String DATABASE_XREF_TAG = "INSDSeq_database-reference";
     
@@ -252,12 +254,18 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         List accessions = new ArrayList();
         List kws = new ArrayList();
         String stranded = null;
-        String mdat = null;
+        String udat = null;
+        String cdat = null;
+        String urel = null;
+        String crel = null;
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext();) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
-            else if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
+            else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
+            else if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions.add(n.getValue());
             else if (n.getTerm().equals(Terms.getKeywordsTerm())) kws.add(n.getValue());
@@ -296,13 +304,24 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             xml.closeTag(DIVISION_TAG);
         }
         
-        if (mdat!=null) {
-            xml.openTag(UPDATE_DATE_TAG);
-            xml.print(mdat);
-            xml.closeTag(UPDATE_DATE_TAG);
-            xml.openTag(CREATE_DATE_TAG);
-            xml.print(mdat);
-            xml.closeTag(CREATE_DATE_TAG);
+        xml.openTag(UPDATE_DATE_TAG);
+        xml.print(udat);
+        xml.closeTag(UPDATE_DATE_TAG);
+        
+        xml.openTag(CREATE_DATE_TAG);
+        xml.print(cdat==null?udat:cdat);
+        xml.closeTag(CREATE_DATE_TAG);
+        
+        if (urel!=null) {
+            xml.openTag(UPDATE_REL_TAG);
+            xml.print(urel);
+            xml.closeTag(UPDATE_REL_TAG);
+        }
+        
+        if (crel!=null) {
+            xml.openTag(CREATE_REL_TAG);
+            xml.print(crel);
+            xml.closeTag(CREATE_REL_TAG);
         }
         
         if (rs.getDescription()!=null) {
@@ -619,7 +638,13 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 } else if (qName.equals(MOLTYPE_TAG)) {
                     rlistener.addSequenceProperty(Terms.getMolTypeTerm(),val);
                 } else if (qName.equals(UPDATE_DATE_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getModificationTerm(),val);
+                    rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),val);
+                } else if (qName.equals(UPDATE_REL_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(),val);
+                } else if (qName.equals(CREATE_DATE_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getDateCreatedTerm(),val);
+                } else if (qName.equals(CREATE_REL_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getRelCreatedTerm(),val);
                 } else if (qName.equals(STRANDED_TAG)) {
                     rlistener.addSequenceProperty(Terms.getStrandedTerm(),val);
                 } else if (qName.equals(TOPOLOGY_TAG)) {

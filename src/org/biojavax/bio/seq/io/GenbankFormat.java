@@ -167,7 +167,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     rlistener.setName(m.group(1));
                     rlistener.setDivision(m.group(5));
                     rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
-                    rlistener.addSequenceProperty(Terms.getModificationTerm(),m.group(6));
+                    rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),m.group(6));
                     // Optional extras
                     String stranded = m.group(2);
                     String circular = m.group(4);
@@ -494,13 +494,13 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         String accession = rs.getAccession();
         String accessions = accession;
         String stranded = "";
-        String mdat = "";
+        String udat = "";
         String moltype = rs.getAlphabet().getName();
         String keywords = "";
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
-            else if (n.getTerm().equals(Terms.getModificationTerm())) mdat=n.getValue();
+            else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue();
             else if (n.getTerm().equals(Terms.getKeywordsTerm())) {
@@ -519,7 +519,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         locusLine.append(StringTools.rightPad(moltype,6));
         locusLine.append(StringTools.rightPad(rs.getCircular()?"circular":"",10));
         locusLine.append(StringTools.rightPad(rs.getDivision()==null?"":rs.getDivision(),10));
-        locusLine.append(mdat);
+        locusLine.append(udat);
         StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 12, this.getLineWidth(), this.getPrintStream());
         
         // definition line
