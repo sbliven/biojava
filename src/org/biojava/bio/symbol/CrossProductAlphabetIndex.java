@@ -35,7 +35,7 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * Implementation of AlphabetIndex that handles CrossProductAlphabets
  *
- * @author Kalle Näslund
+ * @author Kalle Nï¿½slund
  * @author Matthew Pocock
  * @author David Huen
  *
@@ -88,7 +88,7 @@ implements AlphabetIndex, ChangeListener, Serializable
 			AlphabetIndex currInd = AlphabetManager.getAlphabetIndex( currAlpha );
 			retList.add( currInd );
 		}
-		System.out.println( retList );
+		//System.out.println( retList );
 		return retList; 
 	}
 	
