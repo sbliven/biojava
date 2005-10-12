@@ -22,6 +22,7 @@
 package org.biojavax;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,8 @@ public class RichObjectFactory {
     private static CrossReferenceResolver defaultCrossRefResolver = new SimpleCrossReferenceResolver();
     
     // the LRU cache - keys are classes, entries are maps of param sets to objects
-    private static int LRUcacheSize = 20;
+    private static int defaultLRUcacheSize = 20;
+    private static Map LRUcacheSizes = new HashMap();
     private static Map cache = new HashMap();
     
     // Constructor is private as this is all static.
@@ -76,12 +78,15 @@ public class RichObjectFactory {
      * @param params the parameters to pass to the class' constructor
      * @return the instantiated object
      */
-    public static synchronized Object getObject(Class clazz, Object[] params) {
+    public static synchronized Object getObject(final Class clazz, Object[] params) {
         List paramsList = Arrays.asList(params);
         if (!cache.containsKey(clazz)) {
+            int LRUcacheSize = defaultLRUcacheSize;
+            if (LRUcacheSizes.containsKey(clazz)) LRUcacheSize = ((Integer)LRUcacheSizes.get(clazz)).intValue();
+            else LRUcacheSizes.put(clazz,new Integer(LRUcacheSize));
             cache.put(clazz, new LinkedHashMap(LRUcacheSize, 0.75f, true) {
                 protected boolean removeEldestEntry(Map.Entry eldest) {
-                    return this.size() > LRUcacheSize;
+                    return this.size() > ((Integer)LRUcacheSizes.get(clazz)).intValue();
                 }
             });
         }
@@ -95,11 +100,25 @@ public class RichObjectFactory {
     /**
      * Sets the size of the LRU cache. This is the size per class of object requested, so
      * if you set it to 20 and request 3 different types of object, you will get 20*3=60
-     * entries in the cache. The default cache size is 20.
+     * entries in the cache. The default cache size is 20. Setting this value will undo 
+     * any previous changes made using the setLRUCacheSize(Class,int) method below, but will not
+     * override future ones.
      * @param size the size of the cache.
      */
     public static void setLRUCacheSize(int size) {
-        LRUcacheSize = size;
+        defaultLRUcacheSize = size;
+        for (Iterator i = LRUcacheSizes.keySet().iterator(); i.hasNext(); ) LRUcacheSizes.put(i.next(), new Integer(size));
+    }
+    
+    /**
+     * Sets the size of the LRU cache. This is the size for the specific class of object 
+     * requested, so does not affect the size of caches of other objects.
+     * If this method is not called, then the cache size defaults to 20, or whatever value
+     * was passed to setLRUCacheSize(int) above.
+     * @param size the size of the cache.
+     */
+    public static void setLRUCacheSize(Class clazz, int size) {
+        LRUcacheSizes.put(clazz,new Integer(size));
     }
     
     /**
