@@ -23,6 +23,7 @@ package org.biojavax;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -39,33 +40,33 @@ public class SimpleRichObjectBuilder implements RichObjectBuilder {
      * {@inheritDoc}
      * Instantiates and returns objects, that's all there is to it.
      */
-    public Object buildObject(Class clazz, Object[] params) {
+    public Object buildObject(Class clazz, List paramsList) {
         // put the class into the hashmap if not there already
         if (!objects.containsKey(clazz)) objects.put(clazz,new HashMap());
         Map contents = (Map)objects.get(clazz);
         // put the constructed object into the hashmap if not there already
-        if (contents.containsKey(params)) return contents.get(params); 
+        if (contents.containsKey(paramsList)) return contents.get(paramsList); 
         // otherwise build it.
         try {
             // Load the class
-            Class[] types = new Class[params.length];
+            Class[] types = new Class[paramsList.size()];
             // Find its constructor with given params
-            for (int i = 0; i < params.length; i++) types[i] = params[i].getClass();
+            for (int i = 0; i < paramsList.size(); i++) types[i] = paramsList.get(i).getClass();
             Constructor c = clazz.getConstructor(types);
             // Instantiate it with the parameters
-            Object o = c.newInstance(params);
+            Object o = c.newInstance(paramsList.toArray());
             // store it for later in the singleton map
-            contents.put(params, o);
+            contents.put(paramsList, o);
             // return it
             return o;
         } catch (Exception e) {
             StringBuffer paramsstuff = new StringBuffer();
             paramsstuff.append(clazz);
             paramsstuff.append("(");
-            for (int i = 0; i < params.length; i++) {
-                if (params[i]==null) paramsstuff.append("null");
-                else paramsstuff.append(params[i].toString());
-                if (i<(params.length-1)) paramsstuff.append(",");
+            for (int i = 0; i < paramsList.size(); i++) {
+                if (paramsList.get(i)==null) paramsstuff.append("null");
+                else paramsstuff.append(paramsList.get(i).toString());
+                if (i<(paramsList.size()-1)) paramsstuff.append(",");
             }
             paramsstuff.append(")");
             throw new IllegalArgumentException("Could not find constructor for "+paramsstuff);

@@ -21,6 +21,8 @@
 
 package org.biojavax;
 
+import java.util.List;
+
 /**
  * This interface allows a class to generate Rich objects based on a class
  * name and some parameters. The idea is to allow maintenance of a singleton
@@ -41,6 +43,6 @@ public interface RichObjectBuilder {
      * may not be a singleton, but usually will be given as that is the 
      * purpose of this class.
      */
-    public Object buildObject(Class clazz, Object[] params);
+    public Object buildObject(Class clazz, List paramsList);
     
 }

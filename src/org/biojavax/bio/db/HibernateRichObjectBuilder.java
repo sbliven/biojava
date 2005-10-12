@@ -83,7 +83,7 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
      * finds them it loads the object and returns it. Else, it persists the
      * wrapper object it made to do the search with and returns that.
      */
-    public Object buildObject(Class clazz, Object[] params) {
+    public Object buildObject(Class clazz, List paramsList) {
         // Create the Hibernate query to look it up with
         String queryText;
         String queryType;
@@ -108,8 +108,8 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
             // Build the query object
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             // Set the parameters
-            for (int i = 0; i < params.length; i++) {
-                query = this.setParameter.invoke(query, new Object[]{new Integer(i), params[i]});
+            for (int i = 0; i < paramsList.size(); i++) {
+                query = this.setParameter.invoke(query, new Object[]{new Integer(i), paramsList.get(i)});
             }
             // Get the results
             List results = (List)this.list.invoke(query, null);
@@ -118,12 +118,12 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
             // Create, persist and return the new object otherwise
             else {
                 // Load the class
-                Class[] types = new Class[params.length];
+                Class[] types = new Class[paramsList.size()];
                 // Find its constructor with given params
-                for (int i = 0; i < params.length; i++) types[i] = params[i].getClass();
+                for (int i = 0; i < paramsList.size(); i++) types[i] = paramsList.get(i).getClass();
                 Constructor c = clazz.getConstructor(types);
                 // Instantiate it with the parameters
-                Object o = c.newInstance(params);
+                Object o = c.newInstance(paramsList.toArray());
                 // Persist and return it.
                 this.persist.invoke(this.session, new Object[]{queryType,o});
                 return o;
@@ -134,10 +134,10 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
             StringBuffer paramsstuff = new StringBuffer();
             paramsstuff.append(clazz);
             paramsstuff.append("(");
-            for (int i = 0; i < params.length; i++) {
-                if (params[i]==null) paramsstuff.append("null");
-                else paramsstuff.append(params[i].toString());
-                if (i<(params.length-1)) paramsstuff.append(",");
+            for (int i = 0; i < paramsList.size(); i++) {
+                if (paramsList.get(i)==null) paramsstuff.append("null");
+                else paramsstuff.append(paramsList.get(i).toString());
+                if (i<(paramsList.size()-1)) paramsstuff.append(",");
             }
             paramsstuff.append(")");
             // Throw the exception with our nice message

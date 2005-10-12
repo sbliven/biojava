@@ -20,8 +20,10 @@
  */
 
 package org.biojavax;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.biojavax.bio.seq.PositionResolver;
 import org.biojavax.bio.seq.PositionResolver.AverageResolver;
@@ -75,6 +77,7 @@ public class RichObjectFactory {
      * @return the instantiated object
      */
     public static synchronized Object getObject(Class clazz, Object[] params) {
+        List paramsList = Arrays.asList(params);
         if (!cache.containsKey(clazz)) {
             cache.put(clazz, new LinkedHashMap(LRUcacheSize, 0.75f, true) {
                 protected boolean removeEldestEntry(Map.Entry eldest) {
@@ -83,10 +86,10 @@ public class RichObjectFactory {
             });
         }
         Map m = (Map)cache.get(clazz);
-        if (!m.containsKey(params)) {
-            m.put(params,builder.buildObject(clazz, params));
+        if (!m.containsKey(paramsList)) {
+            m.put(paramsList,builder.buildObject(clazz, paramsList));
         }
-        return m.get(params);
+        return m.get(paramsList);
     }
     
     /**

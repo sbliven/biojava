@@ -21,9 +21,10 @@
 
 package org.biojavax.bio.taxa.io;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Set;
 import org.biojava.bio.seq.io.ParseException;
+import org.biojavax.bio.taxa.NCBITaxon;
 
 /**
  * Implementors are able to load taxonomy files and generate sets of NCBITaxon objects
@@ -33,16 +34,26 @@ import org.biojava.bio.seq.io.ParseException;
 public interface NCBITaxonomyLoader {
     
     /**
-     * Runs the parser. It is intended that the constructor for the
-     * implementation of this interface should be passed any necessary
-     * parameters to enable the parsing to take place, as it could consist
-     * of several files. Results should be loaded via RichObjectFactory to make
-     * them available across the board.
-     * NOTE: You better have a whole load of memory available, unless you are
-     * using a memory-efficient RichObjectBuilder with RichObjectFactory.
-     * @throws IOException in case of IO problems.
-     * @throws ParseException if the files were unparseable.
+     * Reads the next entry from the nodes.dmp file and returns the corresponding 
+     * NCBITaxon object.
+     * @param BufferedReader nodes
+     * @return the next NCBITaxon object in the file, or null if the file has ended.
      */
-    public void parseTaxonomyFile() throws IOException, ParseException;
-   
+    public NCBITaxon readNode(BufferedReader nodes) throws IOException, ParseException;
+    
+    /**
+     * Reads the next entry from the names.dmp file and returns the corresponding 
+     * NCBITaxon object with the name added in already. Note that this does not clear
+     * out existing names from the taxon, it only adds them. Use the code snippet
+     * below if you want to clear out the names first:
+     * <code>
+     * for (Iterator i = taxon.getNameClasses().iterator(); i.hasNext(); ) {
+     *      taxon.getNames((String)i.next()).clear();
+     * }
+     * </code>
+     * @param BufferedReader names
+     * @return the NCBITaxon object corresponding to the next entry in the file, 
+     * or null if the file has ended.
+     */
+    public NCBITaxon readName(BufferedReader names) throws IOException, ParseException;
 }

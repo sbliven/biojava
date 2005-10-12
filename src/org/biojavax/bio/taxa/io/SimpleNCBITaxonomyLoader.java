@@ -41,32 +41,14 @@ import org.biojavax.bio.taxa.SimpleNCBITaxon;
  */
 public class SimpleNCBITaxonomyLoader implements NCBITaxonomyLoader {
     
-    private BufferedReader nodes;
-    private BufferedReader names;
-    private boolean parsed;
-    
-    /**
-     * Constructs a new parser, based around two files.
-     * @param nodes the nodes.dmp file
-     * @param names the names.dmp file
-     * @throws IllegalArgumentException if either parameter is null
-     */
-    public SimpleNCBITaxonomyLoader(BufferedReader nodes, BufferedReader names) {
-        if (nodes==null) throw new IllegalArgumentException("Nodes file cannot be null");
-        if (names==null) throw new IllegalArgumentException("Names file cannot be null");
-        this.nodes = nodes;
-        this.names = names;
-    }
-    
     /**
      * {@inheritDoc}
      */
-    public void parseTaxonomyFile() throws IOException, ParseException {
-        if (this.parsed) return;
-        else {
-            String line;
-            // parse nodes first
-            while ((line=nodes.readLine())!=null) {
+    public NCBITaxon readNode(BufferedReader nodes) throws IOException, ParseException {
+        if (nodes==null) throw new IllegalArgumentException("Nodes file cannot be null");
+        String line;
+        // parse nodes first
+        if ((line=nodes.readLine())!=null) {
                 /* separated by '\t|\t'
         tax_id					-- node id in GenBank taxonomy database
         parent tax_id				-- parent node id in GenBank taxonomy database
@@ -82,50 +64,55 @@ public class SimpleNCBITaxonomyLoader implements NCBITaxonomyLoader {
         hidden subtree root flag (1 or 0)       -- 1 if this subtree has no sequence data yet
         comments				-- free-text comments and citations
                  */
-                String[] parts = line.split("\\|");
-                Integer tax_id = Integer.valueOf(parts[0].trim());
-                String pti = parts[1].trim();
-                Integer parent_tax_id = pti.length()>0?new Integer(pti):null;
-                String rank = parts[2].trim();
-                Integer genetic_code = new Integer(parts[6].trim());
-                Integer mito_code = new Integer(parts[8].trim());
-                // by getting it from the factory, it auto-creates. If the user is using the
-                // HibernateRichObjectFactory, then it even auto-persists. Magic!
-                NCBITaxon t = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class,new Object[]{tax_id});
-                try {
-                    t.setParentNCBITaxID(parent_tax_id);
-                    t.setNodeRank(rank);
-                    t.setGeneticCode(genetic_code);
-                    t.setMitoGeneticCode(mito_code);
-                    // clear out the existing names (to be repopulated from file later)
-                    for (Iterator i = t.getNameClasses().iterator(); i.hasNext(); ) t.getNames((String)i.next()).clear();
-                } catch (ChangeVetoException e) {
-                    throw new ParseException(e);
-                }
+            String[] parts = line.split("\\|");
+            Integer tax_id = Integer.valueOf(parts[0].trim());
+            String pti = parts[1].trim();
+            Integer parent_tax_id = pti.length()>0?new Integer(pti):null;
+            String rank = parts[2].trim();
+            Integer genetic_code = new Integer(parts[6].trim());
+            Integer mito_code = new Integer(parts[8].trim());
+            // by getting it from the factory, it auto-creates. If the user is using the
+            // HibernateRichObjectFactory, then it even auto-persists. Magic!
+            NCBITaxon t = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class,new Object[]{tax_id});
+            try {
+                t.setParentNCBITaxID(parent_tax_id);
+                t.setNodeRank(rank);
+                t.setGeneticCode(genetic_code);
+                t.setMitoGeneticCode(mito_code);
+            } catch (ChangeVetoException e) {
+                throw new ParseException(e);
             }
-            // now parse names
-            while ((line=names.readLine())!=null) {
+            // return the node
+            return t;
+        } else return null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public NCBITaxon readName(BufferedReader names) throws IOException, ParseException {
+        if (names==null) throw new IllegalArgumentException("Names file cannot be null");
+        String line;
+        if ((line=names.readLine())!=null) {
                 /* separated by '\t|\t'
         tax_id					-- the id of node associated with this name
         name_txt				-- name itself
         unique name				-- the unique variant of this name if name not unique
         name class				-- (synonym, common name, ...)
                  */
-                String[] parts = line.split("\\|");
-                Integer tax_id = Integer.valueOf(parts[0].trim());
-                String name = parts[1].trim();
-                String nameClass = parts[3].trim();
-                // look up the taxon from the factory
-                NCBITaxon t = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class,new Object[]{tax_id});
-                // add the name
-                try {
-                    t.addName(nameClass,name);
-                } catch (ChangeVetoException e) {
-                    throw new ParseException(e);
-                }
+            String[] parts = line.split("\\|");
+            Integer tax_id = Integer.valueOf(parts[0].trim());
+            String name = parts[1].trim();
+            String nameClass = parts[3].trim();
+            // look up the taxon from the factory
+            NCBITaxon t = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class,new Object[]{tax_id});
+            // add the name
+            try {
+                t.addName(nameClass,name);
+            } catch (ChangeVetoException e) {
+                throw new ParseException(e);
             }
-            // all done!
-            this.parsed = true;
-        }
+            return t;
+        } else return null;
     }
 }
