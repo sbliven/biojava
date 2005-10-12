@@ -302,8 +302,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
-            else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions.add(n.getValue());
-            else if (n.getTerm().equals(Terms.getKeywordsTerm())) kws.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getKeywordTerm())) kws.add(n.getValue());
         }
         
         xml.openTag(ENTRY_TAG);
@@ -350,7 +350,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 if (!cr.getNoteSet().isEmpty()) {
                     for (Iterator j = cr.getNoteSet().iterator(); j.hasNext(); ) {
                         Note n = (Note)j.next();
-                        if (n.getTerm().equals(Terms.getIdentifierTerm())) {
+                        if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                             xml.attribute(DBREF_SEC_ATTR,n.getValue());
                             break;
                         }
@@ -403,7 +403,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             if (!cr.getNoteSet().isEmpty()) {
                 for (Iterator j = cr.getNoteSet().iterator(); j.hasNext(); ) {
                     Note n = (Note)j.next();
-                    if (n.getTerm().equals(Terms.getIdentifierTerm())) {
+                    if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                         xml.attribute(DBREF_SEC_ATTR,n.getValue());
                         break;
                     }
@@ -474,7 +474,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 if (!cr.getNoteSet().isEmpty()) {
                     for (Iterator k = cr.getNoteSet().iterator(); k.hasNext(); ) {
                         Note n = (Note)k.next();
-                        if (n.getTerm().equals(Terms.getIdentifierTerm())) {
+                        if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                             xml.attribute(DBREF_SEC_ATTR,n.getValue());
                             break;
                         }
@@ -710,7 +710,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 }
                 CrossRef dbx = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{db, primary});
                 if (secondary!=null) {
-                    Note note = new SimpleNote(Terms.getIdentifierTerm(),secondary,0);
+                    Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),secondary,0);
                     try {
                         ((RichAnnotation)dbx.getAnnotation()).addNote(note);
                     } catch (ChangeVetoException ce) {
@@ -826,11 +826,11 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             
             try {
                 if (qName.equals(SEC_ACC_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getAccessionTerm(),val);
+                    rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),val);
                 } else if (qName.equals(DESC_TAG)) {
                     rlistener.setDescription(val);
                 } else if (qName.equals(KEYWORD_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getKeywordsTerm(), val);
+                    rlistener.addSequenceProperty(Terms.getKeywordTerm(), val);
                 } else if (qName.equals(COMMENT_TAG)) {
                     currComments.add(val);
                 }

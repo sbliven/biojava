@@ -267,8 +267,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
-            else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions.add(n.getValue());
-            else if (n.getTerm().equals(Terms.getKeywordsTerm())) kws.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getKeywordTerm())) kws.add(n.getValue());
         }
         
         xml.openTag(INSDSEQ_TAG);
@@ -453,7 +453,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             boolean hasSecondary = false;
             for (Iterator i = noteset.iterator(); i.hasNext(); ) {
                 Note n = (Note)i.next();
-                if (n.getTerm().equals(Terms.getIdentifierTerm())) {
+                if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                     sb.append("; ");
                     sb.append(n.getValue());
                     hasSecondary = true;
@@ -632,7 +632,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     rlistener.setAccession(accession);
                     if (parts.length>1) rlistener.setVersion(Integer.parseInt(parts[1]));
                 } else if (qName.equals(SECONDARY_ACCESSION_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getAccessionTerm(),val);
+                    rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),val);
                 } else if (qName.equals(DIVISION_TAG)) {
                     rlistener.setDivision(val);
                 } else if (qName.equals(MOLTYPE_TAG)) {
@@ -652,7 +652,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 } else if (qName.equals(DEFINITION_TAG)) {
                     rlistener.setDescription(val);
                 } else if (qName.equals(KEYWORD_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getKeywordsTerm(), val);
+                    rlistener.addSequenceProperty(Terms.getKeywordTerm(), val);
                 } else if (qName.equals(COMMENT_TAG) && !this.parent.getElideComments()) {
                     rlistener.setComment(val);
                 } else if (qName.equals(DATABASE_XREF_TAG)) {
@@ -662,7 +662,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
                     // assign remaining bits of info as annotations
                     for (int j = 2; j < parts.length; j++) {
-                        Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);
+                        Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j);
                         try {
                             ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
                         } catch (ChangeVetoException ce) {

@@ -165,8 +165,8 @@ public interface RichSequenceFormat extends SequenceFormat {
      * Stores a number of useful terms used across many sequence formats for consistency's sake.
      */
     public static class Terms {
-        private static ComparableTerm ACCESSION_TERM = null;
-        private static ComparableTerm KERYWORDS_TERM = null;
+        private static ComparableTerm SEC_ACCESSION_TERM = null;
+        private static ComparableTerm KEYWORDS_TERM = null;
         private static ComparableTerm DATE_CREATED_TERM = null;
         private static ComparableTerm DATE_UPDATED_TERM = null;
         private static ComparableTerm DATE_ANNOTATED_TERM = null;
@@ -175,7 +175,6 @@ public interface RichSequenceFormat extends SequenceFormat {
         private static ComparableTerm REL_ANNOTATED_TERM = null;
         private static ComparableTerm MOLTYPE_TERM = null;
         private static ComparableTerm STRANDED_TERM = null;
-        private static ComparableTerm IDENTIFIER_TERM = null;
         
         /**
          * Holds a reference to the key that must be used to store PubMed references.
@@ -193,21 +192,21 @@ public interface RichSequenceFormat extends SequenceFormat {
         public static final String DOI_KEY = "DOI";
         
         /**
-         * Getter for the accession term
-         * @return A Term that represents the accession tag
+         * Getter for the secondary/tertiary/additional accession term
+         * @return A Term that represents the secondary accession tag
          */
-        public static ComparableTerm getAccessionTerm() {
-            if (ACCESSION_TERM==null) ACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("ACCESSION");
-            return ACCESSION_TERM;
+        public static ComparableTerm getAdditionalAccessionTerm() {
+            if (SEC_ACCESSION_TERM==null) SEC_ACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("acc");
+            return SEC_ACCESSION_TERM;
         }
         
         /**
          * Getter for the keyword term
          * @return a Term that represents the Keyword tag
          */
-        public static ComparableTerm getKeywordsTerm() {
-            if (KERYWORDS_TERM==null) KERYWORDS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("KEYWORDS");
-            return KERYWORDS_TERM;
+        public static ComparableTerm getKeywordTerm() {
+            if (KEYWORDS_TERM==null) KEYWORDS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("kw");
+            return KEYWORDS_TERM;
         }
         
         /**
@@ -215,7 +214,7 @@ public interface RichSequenceFormat extends SequenceFormat {
          * @return a Term
          */
         public static ComparableTerm getDateCreatedTerm() {
-            if (DATE_CREATED_TERM==null) DATE_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("DATE_CREATED");
+            if (DATE_CREATED_TERM==null) DATE_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("cdat");
             return DATE_CREATED_TERM;
         }
         
@@ -224,7 +223,7 @@ public interface RichSequenceFormat extends SequenceFormat {
          * @return a Term
          */
         public static ComparableTerm getDateUpdatedTerm() {
-            if (DATE_UPDATED_TERM==null) DATE_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("DATE_UPDATED");
+            if (DATE_UPDATED_TERM==null) DATE_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("udat");
             return DATE_UPDATED_TERM;
         }
         
@@ -233,7 +232,7 @@ public interface RichSequenceFormat extends SequenceFormat {
          * @return a Term
          */
         public static ComparableTerm getDateAnnotatedTerm() {
-            if (DATE_ANNOTATED_TERM==null) DATE_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("DATE_ANNOTATED");
+            if (DATE_ANNOTATED_TERM==null) DATE_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("adat");
             return DATE_ANNOTATED_TERM;
         }
         
@@ -242,7 +241,7 @@ public interface RichSequenceFormat extends SequenceFormat {
          * @return a Term
          */
         public static ComparableTerm getRelCreatedTerm() {
-            if (REL_CREATED_TERM==null) REL_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("REL_CREATED");
+            if (REL_CREATED_TERM==null) REL_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("crel");
             return REL_CREATED_TERM;
         }
         
@@ -251,7 +250,7 @@ public interface RichSequenceFormat extends SequenceFormat {
          * @return a Term
          */
         public static ComparableTerm getRelUpdatedTerm() {
-            if (REL_UPDATED_TERM==null) REL_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("REL_UPDATED");
+            if (REL_UPDATED_TERM==null) REL_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("urel");
             return REL_UPDATED_TERM;
         }
         
@@ -260,7 +259,7 @@ public interface RichSequenceFormat extends SequenceFormat {
          * @return a Term
          */
         public static ComparableTerm getRelAnnotatedTerm() {
-            if (REL_ANNOTATED_TERM==null) REL_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("REL_ANNOTATED");
+            if (REL_ANNOTATED_TERM==null) REL_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("arel");
             return REL_ANNOTATED_TERM;
         }
         
@@ -269,7 +268,7 @@ public interface RichSequenceFormat extends SequenceFormat {
          * @return a Term that represents the molecule type
          */
         public static ComparableTerm getMolTypeTerm() {
-            if (MOLTYPE_TERM==null) MOLTYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("MOLTYPE");
+            if (MOLTYPE_TERM==null) MOLTYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("moltype");
             return MOLTYPE_TERM;
         }
         
@@ -278,17 +277,8 @@ public interface RichSequenceFormat extends SequenceFormat {
          * @return a Term that represents the Strand tag
          */
         public static ComparableTerm getStrandedTerm() {
-            if (STRANDED_TERM==null) STRANDED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("STRANDED");
+            if (STRANDED_TERM==null) STRANDED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("stranded");
             return STRANDED_TERM;
-        }
-        
-        /**
-         * getter for the Identifier term
-         * @return a Term that represents the secondary/tertiary identifiers of a dbxref (use rank to determine n-ary-ness).
-         */
-        public static ComparableTerm getIdentifierTerm() {
-            if (IDENTIFIER_TERM==null) IDENTIFIER_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("IDENTIFIER");
-            return IDENTIFIER_TERM;
         }
     }
     

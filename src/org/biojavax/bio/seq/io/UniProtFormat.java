@@ -90,6 +90,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String ORGANISM_TAG = "OC";
     protected static final String TAXON_TAG = "OX";
     protected static final String GENE_TAG = "GN";
+    protected static final String GENE_LOCATION_TAG = "OG";
     protected static final String DATABASE_XREF_TAG = "DR";
     protected static final String REFERENCE_TAG = "RN";
     protected static final String REFERENCE_POSITION_TAG = "RP";
@@ -229,16 +230,25 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 // use SOURCE_TAG and TAXON_TAG values
                 String sciname = null;
                 String comname = null;
+                List synonym = new ArrayList();
                 int taxid = 0;
                 for (int i = 0; i < section.size(); i++) {
                     String tag = ((String[])section.get(i))[0];
                     String value = ((String[])section.get(i))[1].trim();
                     if (tag.equals(SOURCE_TAG)) {
+                        value = value.substring(0,value.length()-1); // chomp trailing dot
                         String[] parts = value.split("\\(");
                         sciname = parts[0].trim();
                         if (parts.length>1) {
                             comname = parts[1].trim();
-                            comname = comname.substring(0,comname.length()-2); // chomp trailing bracket and dot
+                            comname = comname.substring(0,comname.length()-1); // chomp trailing bracket
+                            if (parts.length>2) {
+                                // synonyms
+                                for (int j = 2 ; j < parts.length; j++) {
+                                    String syn = parts[j].trim();
+                                    synonym.add(syn.substring(0,syn.length()-1)); // chomp trailing bracket
+                                }
+                            }
                         }
                     } else if (tag.equals(TAXON_TAG)) {
                         String[] parts = value.split(";");
@@ -257,6 +267,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 try {
                     if (sciname!=null) tax.addName(NCBITaxon.SCIENTIFIC,sciname);
                     if (comname!=null) tax.addName(NCBITaxon.COMMON,comname);
+                    for (Iterator j = synonym.iterator(); j.hasNext(); ) tax.addName(NCBITaxon.SYNONYM, (String)j.next());
                 } catch (ChangeVetoException e) {
                     throw new ParseException(e);
                 }
@@ -285,7 +296,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 accession = accs[0].trim();
                 rlistener.setAccession(accession);
                 for (int i = 1; i < accs.length; i++) {
-                    rlistener.addSequenceProperty(Terms.getAccessionTerm(),accs[i].trim());
+                    rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accs[i].trim());
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String[] kws = ((String[])section.get(0))[1].split(";");
@@ -293,7 +304,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     String kw = kws[i].trim();
                     if (kw.length()==0) continue;
                     if (i==kws.length-1) kw=kw.substring(0,kw.length()-1); // chomp trailing dot
-                    rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kw);
+                    rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
                 }
             } else if (sectionKey.equals(GENE_TAG)) {
                 String[] gs = ((String[])section.get(0))[1].split("(\\s+or\\s+|\\s+and\\s+|;)");
@@ -314,7 +325,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
                 // assign remaining bits of info as annotations
                 for (int j = 2; j < parts.length; j++) {
-                    Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);
+                    Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j);
                     try {
                         ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
                     } catch (ChangeVetoException ce) {
@@ -483,7 +494,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 continue;
             }
             //if (hasInternalWhitespace)
-                //System.err.println("Warning: whitespace found between sequence entries");
+            //System.err.println("Warning: whitespace found between sequence entries");
             reader.reset();
             break;
         }
@@ -655,7 +666,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         }
         return section;
     }
-             
+    
     /**
      * {@inheritDoc}
      */
@@ -715,7 +726,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelAnnotatedTerm())) arel=n.getValue();
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
-            else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
+            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
             else if (n.getTerm().equals(Terms.getGeneNameTerm())) genenames.add(n.getValue());
         }
         
@@ -758,7 +769,15 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         //   organism line
         NCBITaxon tax = rs.getTaxon();
         if (tax!=null) {
-            StringTools.writeKeyValueLine(SOURCE_TAG, tax.getDisplayName()+".", 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+            StringBuffer source = new StringBuffer();
+            source.append(tax.getDisplayName());
+            for (Iterator j = tax.getNames(NCBITaxon.SYNONYM).iterator(); j.hasNext(); ) {
+                source.append(" (");
+                source.append((String)j.next());
+                source.append(")");
+            }
+            source.append(".");
+            StringTools.writeKeyValueLine(SOURCE_TAG, source.toString(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(ORGANISM_TAG, tax.getNameHierarchy(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(TAXON_TAG, "NCBI_TaxID="+tax.getNCBITaxID()+";", 5, this.getLineWidth(), this.getPrintStream());
         }
@@ -802,7 +821,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             boolean hasSecondary = false;
             for (Iterator i = noteset.iterator(); i.hasNext(); ) {
                 Note n = (Note)i.next();
-                if (n.getTerm().equals(Terms.getIdentifierTerm())) {
+                if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                     sb.append("; ");
                     sb.append(n.getValue());
                     hasSecondary = true;
@@ -817,7 +836,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         String keywords = null;
         for (Iterator n = notes.iterator(); n.hasNext(); ) {
             Note nt = (Note)n.next();
-            if (nt.getTerm().equals(Terms.getKeywordsTerm())) {
+            if (nt.getTerm().equals(Terms.getKeywordTerm())) {
                 if (keywords==null) keywords = nt.getValue();
                 else keywords = keywords+"; "+nt.getValue();
             }

@@ -185,7 +185,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 accession = accs[0].trim();
                 rlistener.setAccession(accession);
                 for (int i = 1; i < accs.length; i++) {
-                    rlistener.addSequenceProperty(Terms.getAccessionTerm(),accs[i].trim());
+                    rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accs[i].trim());
                 }
             } else if (sectionKey.equals(VERSION_TAG)) {
                 String ver = ((String[])section.get(0))[1];
@@ -204,7 +204,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     String kw = kws[i].trim();
                     if (i==kws.length-1) kw = kw.substring(0,kw.length()-1); // chomp trailing dot
                     if (kw.length()==0 || kw.equals(".")) continue;
-                    rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kw);
+                    rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
                 }
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // ignore - can get all this from the first feature
@@ -502,8 +502,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
-            else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue();
-            else if (n.getTerm().equals(Terms.getKeywordsTerm())) {
+            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions = accessions+" "+n.getValue();
+            else if (n.getTerm().equals(Terms.getKeywordTerm())) {
                 if (keywords.equals("")) keywords=n.getValue();
                 else keywords = keywords+"; "+n.getValue();
             }

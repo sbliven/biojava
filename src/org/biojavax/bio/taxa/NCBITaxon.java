@@ -82,6 +82,12 @@ public interface NCBITaxon extends Comparable,Changeable {
     public static final String COMMON = "common name";
     
     /**
+     * Use this to define common names for things. There can be as many
+     * synonyms as you like.
+     */
+    public static final String SYNONYM = "synonym";
+    
+    /**
      * Returns all the name classes available for a taxon. These are Strings.
      * @return a set of name classes, or the empty set if there are none.
      */

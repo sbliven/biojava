@@ -210,7 +210,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 accession = accs[0].trim();
                 rlistener.setAccession(accession);
                 for (int i = 1; i < accs.length; i++) {
-                    rlistener.addSequenceProperty(Terms.getAccessionTerm(),accs[i].trim());
+                    rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accs[i].trim());
                 }
             } else if (sectionKey.equals(VERSION_TAG)) {
                 String ver = ((String[])section.get(0))[1];
@@ -225,7 +225,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String[] kws = ((String[])section.get(0))[1].split(";");
                 for (int i = 1; i < kws.length; i++) {
-                    rlistener.addSequenceProperty(Terms.getKeywordsTerm(), kws[i].trim());
+                    rlistener.addSequenceProperty(Terms.getKeywordTerm(), kws[i].trim());
                 }
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
                 // database_identifier; primary_identifier; secondary_identifier....
@@ -234,7 +234,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
                 // assign remaining bits of info as annotations
                 for (int j = 2; j < parts.length; j++) {
-                    Note note = new SimpleNote(Terms.getIdentifierTerm(),parts[j].trim(),j);
+                    Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j);
                     try {
                         ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
                     } catch (ChangeVetoException ce) {
@@ -648,7 +648,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
-            else if (n.getTerm().equals(Terms.getAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
+            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
         }
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
@@ -686,7 +686,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         String keywords = null;
         for (Iterator n = notes.iterator(); n.hasNext(); ) {
             Note nt = (Note)n.next();
-            if (nt.getTerm().equals(Terms.getKeywordsTerm())) {
+            if (nt.getTerm().equals(Terms.getKeywordTerm())) {
                 if (keywords==null) keywords = nt.getValue();
                 else keywords = keywords+"; "+nt.getValue();
             }
@@ -737,7 +737,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             boolean hasSecondary = false;
             for (Iterator i = noteset.iterator(); i.hasNext(); ) {
                 Note n = (Note)i.next();
-                if (n.getTerm().equals(Terms.getIdentifierTerm())) {
+                if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                     sb.append("; ");
                     sb.append(n.getValue());
                     hasSecondary = true;
