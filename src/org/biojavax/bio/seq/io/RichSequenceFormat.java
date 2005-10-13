@@ -175,6 +175,7 @@ public interface RichSequenceFormat extends SequenceFormat {
         private static ComparableTerm REL_ANNOTATED_TERM = null;
         private static ComparableTerm MOLTYPE_TERM = null;
         private static ComparableTerm STRANDED_TERM = null;
+        private static ComparableTerm ORGANELLE_TERM = null;
         
         /**
          * Holds a reference to the key that must be used to store PubMed references.
@@ -279,6 +280,15 @@ public interface RichSequenceFormat extends SequenceFormat {
         public static ComparableTerm getStrandedTerm() {
             if (STRANDED_TERM==null) STRANDED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("stranded");
             return STRANDED_TERM;
+        }
+        
+        /**
+         * Getter for the Organelle term
+         * @return a Term that represents the Organelle tag
+         */
+        public static ComparableTerm getOrganelleTerm() {
+            if (ORGANELLE_TERM==null) ORGANELLE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("organelle");
+            return ORGANELLE_TERM;
         }
     }
     

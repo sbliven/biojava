@@ -498,9 +498,10 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             }
             
             // make it easy for ourselves by flattening into a single compound location
-            Collection locElements = RichLocation.Tools.flatten((RichLocation)f.getLocation());
+            RichLocation rle = (RichLocation)f.getLocation();
+            Collection locElements = RichLocation.Tools.flatten(rle);
             xml.openTag(LOCATION_TAG);
-            xml.attribute(LOCATION_TYPE_ATTR,"join");
+            xml.attribute(LOCATION_TYPE_ATTR,(locElements.size()>1?rle.getTerm().getName():"single"));
             xml.attribute(LOCATION_COMPL_ATTR,"false");
             for (Iterator j = locElements.iterator(); j.hasNext(); ) {
                 RichLocation rl = (RichLocation)j.next();

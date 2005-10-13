@@ -87,6 +87,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String DATABASE_XREF_TAG = "DR";
     protected static final String SOURCE_TAG = "OS";
     protected static final String ORGANISM_TAG = "OC";
+    protected static final String ORGANELLE_TAG = "OG";
     protected static final String REFERENCE_TAG = "RN";
     protected static final String REFERENCE_POSITION_TAG = "RP";
     protected static final String REFERENCE_XREF_TAG = "RX";
@@ -187,7 +188,14 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             } else if (sectionKey.equals(DEFINITION_TAG)) {
                 rlistener.setDescription(((String[])section.get(0))[1]);
             } else if (sectionKey.equals(SOURCE_TAG)) {
-                // IGNORE - can get from first feature in feature table
+                // only interested in organelle sub-tag
+                for (int i = 1; i < section.size(); i++) {
+                    sectionKey = ((String[])section.get(i))[0];
+                    if (sectionKey.equals(ORGANELLE_TAG)) {
+                        rlistener.addSequenceProperty(Terms.getOrganelleTerm(), ((String[])section.get(i))[1].trim());
+                        break; // skip out of for loop once found
+                    }
+                }
             } else if (sectionKey.equals(DATE_TAG)) {
                 String chunk = ((String[])section.get(0))[1].trim();
                 Matcher dm = dp.matcher(chunk);
@@ -640,6 +648,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         String udat = null;
         String crel = null;
         String urel = null;
+        String organelle = null;
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
@@ -649,6 +658,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
+            else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle=n.getValue();
         }
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
@@ -702,6 +712,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         if (tax!=null) {
             StringTools.writeKeyValueLine(SOURCE_TAG, tax.getDisplayName(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(ORGANISM_TAG, tax.getNameHierarchy(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+            if (organelle!=null) StringTools.writeKeyValueLine(ORGANELLE_TAG, organelle, 5, this.getLineWidth(), null, ORGANELLE_TAG, this.getPrintStream());
             this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         

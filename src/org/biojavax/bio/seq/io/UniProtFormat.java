@@ -25,9 +25,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +44,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.SymbolPropertyTable;
+import org.biojava.ontology.Term;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Comment;
 import org.biojavax.CrossRef;
@@ -87,23 +90,25 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String DEFINITION_TAG = "DE";
     protected static final String DATE_TAG = "DT";
     protected static final String SOURCE_TAG = "OS";
+    protected static final String ORGANELLE_TAG = "OG";
     protected static final String ORGANISM_TAG = "OC";
     protected static final String TAXON_TAG = "OX";
     protected static final String GENE_TAG = "GN";
-    protected static final String GENE_LOCATION_TAG = "OG";
     protected static final String DATABASE_XREF_TAG = "DR";
     protected static final String REFERENCE_TAG = "RN";
-    protected static final String REFERENCE_POSITION_TAG = "RP";
+    protected static final String RP_LINE_TAG = "RP";
     protected static final String REFERENCE_XREF_TAG = "RX";
     protected static final String AUTHORS_TAG = "RA";
     protected static final String TITLE_TAG = "RT";
     protected static final String JOURNAL_TAG = "RL";
-    protected static final String REMARK_TAG = "RC";
+    protected static final String RC_LINE_TAG = "RC";
     protected static final String KEYWORDS_TAG = "KW";
     protected static final String COMMENT_TAG = "CC";
     protected static final String FEATURE_TAG = "FT";
     protected static final String START_SEQUENCE_TAG = "SQ";
     protected static final String END_SEQUENCE_TAG = "//";
+    
+    protected static final Pattern rppat = Pattern.compile("SEQUENCE OF (\\d+)-(\\d+)");
     
     /**
      * Implements some UniProt-specific terms.
@@ -111,9 +116,28 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     public static class Terms extends RichSequenceFormat.Terms {
         private static ComparableTerm UNIPROT_TERM = null;
         private static ComparableTerm DATACLASS_TERM = null;
-        private static ComparableTerm GENENAME_TERM = null;
         private static ComparableTerm FTID_TERM = null;
         private static ComparableTerm FEATUREDESC_TERM = null;
+        private static ComparableTerm SPECIES_TERM = null;
+        private static ComparableTerm STRAIN_TERM = null;
+        private static ComparableTerm TISSUE_TERM = null;
+        private static ComparableTerm TRANSPOSON_TERM = null;
+        private static ComparableTerm PLASMID_TERM = null;
+        private static ComparableTerm GENENAME_TERM = null;
+        private static ComparableTerm GENESYNONYM_TERM = null;
+        private static ComparableTerm ORDLOCNAME_TERM = null;
+        private static ComparableTerm ORFNAME_TERM = null;
+        
+        private static String SPECIES_KEY = "SPECIES";
+        private static String STRAIN_KEY = "STRAIN";
+        private static String TISSUE_KEY = "TISSUE";
+        private static String TRANSPOSON_KEY = "TRANSPOSON";
+        private static String PLASMID_KEY = "PLASMID";
+        
+        private static String GENENAME_KEY = "Name";
+        private static String GENESYNONYM_KEY = "Synonyms";
+        private static String ORDLOCNAME_KEY = "OrderedLocusNames";
+        private static String ORFNAME_KEY = "ORFNames";
         
         /**
          * Getter for the UniProt term
@@ -134,15 +158,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         }
         
         /**
-         * Getter for the GeneName term
-         * @return The GeneName Term
-         */
-        public static ComparableTerm getGeneNameTerm() {
-            if (GENENAME_TERM==null) GENENAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene");
-            return GENENAME_TERM;
-        }
-        
-        /**
          * Getter for the FTId term
          * @return The FTId Term
          */
@@ -158,6 +173,87 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         public static ComparableTerm getFeatureDescTerm() {
             if (FEATUREDESC_TERM==null) FEATUREDESC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("description");
             return FEATUREDESC_TERM;
+        }
+        
+        /**
+         * Getter for the Strain term
+         * @return The Strain Term
+         */
+        public static ComparableTerm getStrainTerm() {
+            if (STRAIN_TERM==null) STRAIN_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("strain");
+            return STRAIN_TERM;
+        }
+        
+        /**
+         * Getter for the Species term
+         * @return The Species Term
+         */
+        public static ComparableTerm getSpeciesTerm() {
+            if (SPECIES_TERM==null) SPECIES_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("species");
+            return SPECIES_TERM;
+        }
+        
+        /**
+         * Getter for the Tissue term
+         * @return The Tissue Term
+         */
+        public static ComparableTerm getTissueTerm() {
+            if (TISSUE_TERM==null) TISSUE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("tissue");
+            return TISSUE_TERM;
+        }
+        
+        /**
+         * Getter for the Transposon term
+         * @return The Transposon Term
+         */
+        public static ComparableTerm getTransposonTerm() {
+            if (TRANSPOSON_TERM==null) TRANSPOSON_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("transposon");
+            return TRANSPOSON_TERM;
+        }
+        
+        /**
+         * Getter for the Plasmid term
+         * @return The plasmid Term
+         */
+        public static ComparableTerm getPlasmidTerm() {
+            if (PLASMID_TERM==null) PLASMID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("plasmid");
+            return PLASMID_TERM;
+        }
+        
+        /**
+         * Getter for the GeneName term
+         * @return The GeneName Term
+         */
+        public static ComparableTerm getGeneNameTerm() {
+            if (GENENAME_TERM==null) GENENAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_name");
+            return GENENAME_TERM;
+        }
+        
+        /**
+         * Getter for the GeneSynonym term
+         * @return The GeneSynonym Term
+         */
+        public static ComparableTerm getGeneSynonymTerm() {
+            if (GENESYNONYM_TERM==null) GENESYNONYM_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_synonym");
+            return GENESYNONYM_TERM;
+        }
+        
+        /**
+         * Getter for the OrderedLocusName term
+         * @return The OrderedLocusName Term
+         */
+        public static ComparableTerm getOrderedLocusNameTerm() {
+            if (ORDLOCNAME_TERM==null) ORDLOCNAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_ordloc");
+            return ORDLOCNAME_TERM;
+        }
+        
+        /**
+         * Getter for the ORFName term
+         * @return The ORFName Term
+         */
+        public static ComparableTerm getORFNameTerm() {
+            if (ORFNAME_TERM==null) ORFNAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_orf");
+            return ORFNAME_TERM;
         }
     }
     
@@ -259,6 +355,13 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                                 taxid = Integer.parseInt(morebits[0].trim());
                             }
                         }
+                    } else if (tag.equals(ORGANELLE_TAG)) {
+                        String[] parts = value.split(";");
+                        for (int j = 0; j < parts.length; j++) {
+                            parts[j]=parts[j].trim();
+                            if (j==parts.length-1) parts[j]=parts[j].substring(0,parts[j].length()-1); // chomp last dot
+                            rlistener.addSequenceProperty(Terms.getOrganelleTerm(),parts[j]);
+                        }
                     }
                 }
                 // Set the Taxon
@@ -307,13 +410,22 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
                 }
             } else if (sectionKey.equals(GENE_TAG)) {
-                String[] gs = ((String[])section.get(0))[1].split("(\\s+or\\s+|\\s+and\\s+|;)");
-                for (int i = 0; i < gs.length; i++) {
-                    String raw = gs[i].trim();
-                    if (raw.length()==0) continue;
-                    String[] parts = raw.split("=");
-                    String[] moreparts = parts[1].split(",");
-                    for (int j = 0; j < moreparts.length; j++) rlistener.addSequenceProperty(Terms.getGeneNameTerm(), moreparts[j].trim());
+                String[] genes = ((String[])section.get(0))[1].split("\\s+(or|and)\\s+");
+                for (int geneID = 0; geneID < genes.length; geneID++) {
+                    String[] parts = genes[geneID].split(";");
+                    for (int j = 0; j < parts.length; j++) {
+                        String[] moreparts = parts[j].split("=");
+                        String[] values = moreparts[1].split(",");
+                        // nasty hack - we really should have notes on the gene object itself... if such a thing existed...
+                        if (moreparts[0].trim().equals(Terms.GENENAME_KEY)) rlistener.addSequenceProperty(Terms.getGeneNameTerm(),geneID+":"+values[0].trim());
+                        else if (moreparts[0].trim().equals(Terms.GENESYNONYM_KEY)) {
+                            for (int k = 0; k < values.length; k++) rlistener.addSequenceProperty(Terms.getGeneSynonymTerm(),geneID+":"+values[k].trim());
+                        } else if (moreparts[0].trim().equals(Terms.ORDLOCNAME_KEY)) {
+                            for (int k = 0; k < values.length; k++) rlistener.addSequenceProperty(Terms.getOrderedLocusNameTerm(),geneID+":"+values[k].trim());
+                        } else if (moreparts[0].trim().equals(Terms.ORFNAME_KEY)) {
+                            for (int k = 0; k < values.length; k++) rlistener.addSequenceProperty(Terms.getORFNameTerm(),geneID+":"+values[k].trim());
+                        }
+                    }
                 }
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
                 // database_identifier; primary_identifier; secondary_identifier....
@@ -337,7 +449,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, ++xrefCount);
                 rlistener.setRankedCrossRef(rcrossRef);
             } else if (sectionKey.equals(REFERENCE_TAG) && !this.getElideReferences()) {
-                Pattern rppat = Pattern.compile("\\(SEQUENCE OF (\\d+)-(\\d+).*\\)");
                 // first line of section has rank and location
                 String refrank = ((String[])section.get(0))[1];
                 int ref_rank = Integer.parseInt(refrank.substring(1,refrank.length()-1));
@@ -370,16 +481,34 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             else if (db.equals(Terms.DOI_KEY)) doi = ref;
                         }
                     }
-                    if (key.equals(REFERENCE_POSITION_TAG)) {
-                        // NO REFERENCE_POSITION_TAG (RP) TAG - BIOSQL CANNOT HANDLE
-                        // Just use it to find the location of the reference, if we have one.
+                    if (key.equals(RP_LINE_TAG)) {
+                        remark = val;
+                        // Try to use it to find the location of the reference, if we have one.
                         Matcher m = rppat.matcher(val);
                         if (m.matches()) {
                             rstart = Integer.valueOf(m.group(1));
                             rend = Integer.valueOf(m.group(2));
                         }
                     }
-                    if (key.equals(REMARK_TAG)) remark = val;
+                    if (key.equals(RC_LINE_TAG)) {
+                        // Split into key=value pairs separated by semicolons and terminated with semicolon.
+                        String[] parts = val.split(";");
+                        for (int j = 0; j < parts.length; j++) {
+                            String[] subparts = parts[j].split("=");
+                            // get term for first section
+                            String termName = subparts[0].trim();
+                            Term t;
+                            if (termName.equals(Terms.SPECIES_KEY)) t = Terms.getSpeciesTerm();
+                            else if (termName.equals(Terms.STRAIN_KEY)) t = Terms.getStrainTerm();
+                            else if (termName.equals(Terms.TISSUE_KEY)) t = Terms.getTissueTerm();
+                            else if (termName.equals(Terms.TRANSPOSON_KEY)) t = Terms.getTransposonTerm();
+                            else if (termName.equals(Terms.PLASMID_KEY)) t = Terms.getPlasmidTerm();
+                            else throw new ParseException("Invalid RC term found: "+termName);
+                            // assign notes using term and rank:second section as value
+                            // nasty hack - we really should have notes on the reference itself.
+                            rlistener.addSequenceProperty(t, ref_rank+":"+subparts[1].trim());
+                        }
+                    }
                 }
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
@@ -709,14 +838,23 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         Set notes = rs.getNoteSet();
         String accession = rs.getAccession();
         String accessions = accession+";";
-        List genenames = new ArrayList();
         String cdat = null;
         String udat = null;
         String adat = null;
         String crel = null;
         String urel = null;
         String arel = null;
+        String organelle = null;
         String dataclass = "STANDARD";
+        Map speciesRecs = new HashMap();
+        Map strainRecs = new HashMap();
+        Map tissueRecs = new HashMap();
+        Map transpRecs = new HashMap();
+        Map plasmidRecs = new HashMap();
+        Map genenames = new HashMap();
+        Map genesynonyms = new HashMap();
+        Map orfnames = new HashMap();
+        Map ordlocnames = new HashMap();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
@@ -727,7 +865,75 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getRelAnnotatedTerm())) arel=n.getValue();
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
-            else if (n.getTerm().equals(Terms.getGeneNameTerm())) genenames.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle = (organelle==null?"":organelle+"; ")+n.getValue();
+            // use the nasty hack to split the reference rank away from the actual value in this field
+            // we'll end up with a bunch in key 0 for those which did not come from us. We ignore these for now.
+            else if (n.getTerm().equals(Terms.getGeneNameTerm()))  {
+                String ref = n.getValue();
+                int colon = ref.indexOf(':');
+                Integer refID = new Integer(0);
+                if (colon>=1) refID = new Integer(ref.substring(0,colon));
+                genenames.put(refID, ref.substring(colon+1)); // map of id -> string as only one name per gene
+            } else if (n.getTerm().equals(Terms.getGeneSynonymTerm())) {
+                String ref = n.getValue();
+                int colon = ref.indexOf(':');
+                Integer refID = new Integer(0);
+                if (colon>=1) refID = new Integer(ref.substring(0,colon));
+                if (genesynonyms.get(refID)==null) genesynonyms.put(refID, new ArrayList());
+                ((List)genesynonyms.get(refID)).add(ref.substring(colon+1));
+            } else if (n.getTerm().equals(Terms.getOrderedLocusNameTerm())) {
+                String ref = n.getValue();
+                int colon = ref.indexOf(':');
+                Integer refID = new Integer(0);
+                if (colon>=1) refID = new Integer(ref.substring(0,colon));
+                if (ordlocnames.get(refID)==null) ordlocnames.put(refID, new ArrayList());
+                ((List)ordlocnames.get(refID)).add(ref.substring(colon+1));
+            } else if (n.getTerm().equals(Terms.getORFNameTerm())) {
+                String ref = n.getValue();
+                int colon = ref.indexOf(':');
+                Integer refID = new Integer(0);
+                if (colon>=1) refID = new Integer(ref.substring(0,colon));
+                if (orfnames.get(refID)==null) orfnames.put(refID, new ArrayList());
+                ((List)orfnames.get(refID)).add(ref.substring(colon+1));
+            }
+            // use the nasty hack to split the reference rank away from the actual value in this field
+            // we'll end up with a bunch in key 0 for those which did not come from us. We ignore these for now.
+            else if (n.getTerm().equals(Terms.getSpeciesTerm())) {
+                String ref = n.getValue();
+                int colon = ref.indexOf(':');
+                Integer refID = new Integer(0);
+                if (colon>=1) refID = new Integer(ref.substring(0,colon));
+                if (speciesRecs.get(refID)==null) speciesRecs.put(refID, new ArrayList());
+                ((List)speciesRecs.get(refID)).add(ref.substring(colon+1));
+            } else if (n.getTerm().equals(Terms.getStrainTerm()))  {
+                String ref = n.getValue();
+                int colon = ref.indexOf(':');
+                Integer refID = new Integer(0);
+                if (colon>=1) refID = new Integer(ref.substring(0,colon));
+                if (strainRecs.get(refID)==null) strainRecs.put(refID, new ArrayList());
+                ((List)strainRecs.get(refID)).add(ref.substring(colon+1));
+            } else if (n.getTerm().equals(Terms.getTissueTerm()))  {
+                String ref = n.getValue();
+                int colon = ref.indexOf(':');
+                Integer refID = new Integer(0);
+                if (colon>=1) refID = new Integer(ref.substring(0,colon));
+                if (tissueRecs.get(refID)==null) tissueRecs.put(refID, new ArrayList());
+                ((List)tissueRecs.get(refID)).add(ref.substring(colon+1));
+            } else if (n.getTerm().equals(Terms.getTransposonTerm()))  {
+                String ref = n.getValue();
+                int colon = ref.indexOf(':');
+                Integer refID = new Integer(0);
+                if (colon>=1) refID = new Integer(ref.substring(0,colon));
+                if (transpRecs.get(refID)==null) transpRecs.put(refID, new ArrayList());
+                ((List)transpRecs.get(refID)).add(ref.substring(colon+1));
+            } else if (n.getTerm().equals(Terms.getPlasmidTerm()))  {
+                String ref = n.getValue();
+                int colon = ref.indexOf(':');
+                Integer refID = new Integer(0);
+                if (colon>=1) refID = new Integer(ref.substring(0,colon));
+                if (plasmidRecs.get(refID)==null) plasmidRecs.put(refID, new ArrayList());
+                ((List)plasmidRecs.get(refID)).add(ref.substring(colon+1));
+            }
         }
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
@@ -752,18 +958,51 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         StringTools.writeKeyValueLine(DEFINITION_TAG, rs.getDescription(), 5, this.getLineWidth(), null, DEFINITION_TAG, this.getPrintStream());
         
         // gene line
-        String geneline = null;
-        for (int i = 0; i < genenames.size(); i++) {
-            if (i==0) {
-                geneline="Name="+genenames.get(i)+";";
-                if (genenames.size()>1) geneline+=" Synonyms=";
-            } else {
-                geneline+=genenames.get(i);
-                if (i==genenames.size()) geneline+=".";
-                else geneline+=", ";
+        for (Iterator i = genenames.keySet().iterator(); i.hasNext(); ) {
+            Integer geneid = (Integer)i.next();
+            String genename = (String)genenames.get(geneid);
+            List synonyms = (List)genesynonyms.get(geneid);
+            List orfs = (List)orfnames.get(geneid);
+            List ordlocs = (List)ordlocnames.get(geneid);
+            
+            StringBuffer gnline = new StringBuffer();
+            gnline.append(Terms.GENENAME_KEY);
+            gnline.append("=");
+            gnline.append(genename);
+            gnline.append("; ");
+            
+            if (synonyms!=null) {
+                gnline.append(Terms.GENESYNONYM_KEY);
+                gnline.append("=");
+                for (Iterator j = synonyms.iterator(); j.hasNext(); ) {
+                    gnline.append((String)j.next());
+                    if (j.hasNext()) gnline.append(", ");
+                }
+                gnline.append("; ");
             }
+            if (ordlocs!=null) {
+                gnline.append(Terms.ORDLOCNAME_KEY);
+                gnline.append("=");
+                for (Iterator j = ordlocs.iterator(); j.hasNext(); ) {
+                    gnline.append((String)j.next());
+                    if (j.hasNext()) gnline.append(", ");
+                }
+                gnline.append("; ");
+            }
+            if (orfs!=null) {
+                gnline.append(Terms.ORFNAME_KEY);
+                gnline.append("=");
+                for (Iterator j = orfs.iterator(); j.hasNext(); ) {
+                    gnline.append((String)j.next());
+                    if (j.hasNext()) gnline.append(", ");
+                }
+                gnline.append("; ");
+            }
+            
+            StringTools.writeKeyValueLine(GENE_TAG, gnline.toString(), 5, this.getLineWidth(), null, GENE_TAG, this.getPrintStream());
+            
+            if (i.hasNext()) StringTools.writeKeyValueLine(GENE_TAG, "and", 5, this.getLineWidth(), null, GENE_TAG, this.getPrintStream());
         }
-        if (geneline!=null) StringTools.writeKeyValueLine(GENE_TAG, geneline, 5, this.getLineWidth(), null, GENE_TAG, this.getPrintStream());
         
         // source line (from taxon)
         //   organism line
@@ -778,6 +1017,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             }
             source.append(".");
             StringTools.writeKeyValueLine(SOURCE_TAG, source.toString(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+            if (organelle!=null) StringTools.writeKeyValueLine(ORGANELLE_TAG, organelle+".", 5, this.getLineWidth(), null, ORGANELLE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(ORGANISM_TAG, tax.getNameHierarchy(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(TAXON_TAG, "NCBI_TaxID="+tax.getNCBITaxID()+";", 5, this.getLineWidth(), this.getPrintStream());
         }
@@ -788,10 +1028,60 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             DocRef d = rdr.getDocumentReference();
             // RN, RP, RC, RX, RG, RA, RT, RL
             StringTools.writeKeyValueLine(REFERENCE_TAG, "["+rdr.getRank()+"]", 5, this.getLineWidth(), null, REFERENCE_TAG, this.getPrintStream());
-            // NO RP TAG - CANNOT FORCE INTO BIOSQL!
-            // Just print out ref position if present
-            if (rdr.getStart()!=null && rdr.getEnd()!=null) StringTools.writeKeyValueLine(REFERENCE_POSITION_TAG, "(SEQUENCE OF "+rdr.getStart()+"-"+rdr.getEnd()+")", 5, this.getLineWidth(), null, REFERENCE_POSITION_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(REMARK_TAG, d.getRemark(), 5, this.getLineWidth(), null, REMARK_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(RP_LINE_TAG, d.getRemark(), 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
+            // Print out ref position if present
+            if (rdr.getStart()!=null && rdr.getEnd()!=null && !rppat.matcher(d.getRemark()).matches()) StringTools.writeKeyValueLine(RP_LINE_TAG, "SEQUENCE OF "+rdr.getStart()+"-"+rdr.getEnd()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
+            // RC lines
+            StringBuffer rcline = new StringBuffer();
+            Integer rank = new Integer(rdr.getRank());
+            if (speciesRecs.get(rank)!=null) {
+                rcline.append(Terms.SPECIES_KEY);
+                rcline.append("=");
+                for (Iterator i = ((List)speciesRecs.get(rank)).iterator(); i.hasNext(); ) {
+                    rcline.append((String)i.next());
+                    if (i.hasNext()) rcline.append(", ");
+                }
+                rcline.append("; ");
+            }
+            if (strainRecs.get(rank)!=null) {
+                rcline.append(Terms.STRAIN_KEY);
+                rcline.append("=");
+                for (Iterator i = ((List)strainRecs.get(rank)).iterator(); i.hasNext(); ) {
+                    rcline.append((String)i.next());
+                    if (i.hasNext()) rcline.append(", ");
+                }
+                rcline.append("; ");
+            }
+            if (tissueRecs.get(rank)!=null) {
+                rcline.append(Terms.TISSUE_KEY);
+                rcline.append("=");
+                for (Iterator i = ((List)tissueRecs.get(rank)).iterator(); i.hasNext(); ) {
+                    rcline.append((String)i.next());
+                    if (i.hasNext()) rcline.append(", ");
+                }
+                rcline.append("; ");
+            }
+            if (transpRecs.get(rank)!=null) {
+                rcline.append(Terms.TRANSPOSON_KEY);
+                rcline.append("=");
+                for (Iterator i = ((List)transpRecs.get(rank)).iterator(); i.hasNext(); ) {
+                    rcline.append((String)i.next());
+                    if (i.hasNext()) rcline.append(", ");
+                }
+                rcline.append("; ");
+            }
+            if (plasmidRecs.get(rank)!=null) {
+                rcline.append(Terms.PLASMID_KEY);
+                rcline.append("=");
+                for (Iterator i = ((List)plasmidRecs.get(rank)).iterator(); i.hasNext(); ) {
+                    rcline.append((String)i.next());
+                    if (i.hasNext()) rcline.append(", ");
+                }
+                rcline.append("; ");
+            }
+            // print the rcline
+            if (rcline.length()>0) StringTools.writeKeyValueLine(RC_LINE_TAG, rcline.toString(), 5, this.getLineWidth(), null, RC_LINE_TAG, this.getPrintStream());
+            // Deal with RX and rest
             CrossRef c = d.getCrossref();
             if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname().toUpperCase()+"="+c.getAccession()+";", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(AUTHORS_TAG, d.getAuthors(), 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
