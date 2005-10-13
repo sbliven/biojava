@@ -656,8 +656,8 @@ public class TaxonSQL {
     */
   public static Taxon removeTaxon(Connection conn, DBHelper helper, String name) throws SQLException, BioException
   {    
-    if (name.contains("'"))  name = name.replace("\'", "\\\'");
-    if (name.contains("\"")) name = name.replace("\"", "\\\"");
+    //if (name.contains("'"))  name = name.replace("\'", "\\\'");
+    //if (name.contains("\"")) name = name.replace("\"", "\\\"");
 
     return removeTaxon(conn, helper, getTaxonID(conn, name));
   }
@@ -931,8 +931,8 @@ public class TaxonSQL {
         "       taxon_name.name_class LIKE 'scientific%' AND" +
         "       parent_taxon_id = ? " +
         "ORDER BY taxon_name.name DESC");
-      if (scientificName.contains("'"))  scientificName = scientificName.replace("\'", "\\\'");
-      if (scientificName.contains("\"")) scientificName = scientificName.replace("\"", "\\\"");
+      //if (scientificName.contains("'"))  scientificName = scientificName.replace("\'", "\\\'");
+      //if (scientificName.contains("\"")) scientificName = scientificName.replace("\"", "\\\"");
       ps.setInt(1, getTaxonID(conn, scientificName));
       rs = ps.executeQuery();
       while (rs.next()) {
