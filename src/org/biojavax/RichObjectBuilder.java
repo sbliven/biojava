@@ -38,7 +38,7 @@ public interface RichObjectBuilder {
      * Note that it only works with classes whose constructors take only
      * Objects, and not primitives. It should return singletons.
      * @param clazz the class to instantiate and build
-     * @param params the parameters to pass to the constructor
+     * @param paramsList the parameters to pass to the constructor
      * @return an instance of the requested class/params combination. May or
      * may not be a singleton, but usually will be given as that is the 
      * purpose of this class.

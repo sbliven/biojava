@@ -36,7 +36,7 @@ public interface NCBITaxonomyLoader {
     /**
      * Reads the next entry from the nodes.dmp file and returns the corresponding 
      * NCBITaxon object.
-     * @param BufferedReader nodes
+     * @param nodes something that reads the nodes.dmp file
      * @return the next NCBITaxon object in the file, or null if the file has ended.
      */
     public NCBITaxon readNode(BufferedReader nodes) throws IOException, ParseException;
@@ -51,7 +51,7 @@ public interface NCBITaxonomyLoader {
      *      taxon.getNames((String)i.next()).clear();
      * }
      * </code>
-     * @param BufferedReader names
+     * @param names something that reads the names.dmp file
      * @return the NCBITaxon object corresponding to the next entry in the file, 
      * or null if the file has ended.
      */
