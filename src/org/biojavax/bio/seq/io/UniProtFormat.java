@@ -25,12 +25,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.biojava.bio.proteomics.MassCalc;
@@ -49,6 +49,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Comment;
 import org.biojavax.CrossRef;
 import org.biojavax.DocRef;
+import org.biojavax.DocRefAuthor;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
@@ -62,6 +63,7 @@ import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.SimpleDocRefAuthor;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
@@ -99,8 +101,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String RP_LINE_TAG = "RP";
     protected static final String REFERENCE_XREF_TAG = "RX";
     protected static final String AUTHORS_TAG = "RA";
+    protected static final String CONSORTIUM_TAG = "RG";
     protected static final String TITLE_TAG = "RT";
-    protected static final String JOURNAL_TAG = "RL";
+    protected static final String LOCATION_TAG = "RL";
     protected static final String RC_LINE_TAG = "RC";
     protected static final String KEYWORDS_TAG = "KW";
     protected static final String COMMENT_TAG = "CC";
@@ -108,31 +111,24 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String START_SEQUENCE_TAG = "SQ";
     protected static final String END_SEQUENCE_TAG = "//";
     
+    // locus line
+    protected static final Pattern lp = Pattern.compile("^((\\S+)_(\\S+))\\s+(\\S+);\\s+(PRT);\\s+\\d+\\s+AA\\.$");
+    // RP line parser
     protected static final Pattern rppat = Pattern.compile("SEQUENCE OF (\\d+)-(\\d+)");
+    // date line
+    // date (Rel. N, Created)
+    // date (Rel. N, Last sequence update)
+    // date (Rel. N, Last annotation update)
+    protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)]+)\\)$");
+    // feature line
+    protected static final Pattern fp = Pattern.compile("^\\s*([\\d\\?<]+\\s+[\\d\\?>]+)(\\s+(\\S.*)\\.)?$");
+    
     
     /**
      * Implements some UniProt-specific terms.
      */
-    public static class Terms extends RichSequenceFormat.Terms {
+    public static class Terms extends RichSequence.Terms {
         private static ComparableTerm UNIPROT_TERM = null;
-        private static ComparableTerm DATACLASS_TERM = null;
-        private static ComparableTerm FTID_TERM = null;
-        private static ComparableTerm FEATUREDESC_TERM = null;
-        private static ComparableTerm SPECIES_TERM = null;
-        private static ComparableTerm STRAIN_TERM = null;
-        private static ComparableTerm TISSUE_TERM = null;
-        private static ComparableTerm TRANSPOSON_TERM = null;
-        private static ComparableTerm PLASMID_TERM = null;
-        private static ComparableTerm GENENAME_TERM = null;
-        private static ComparableTerm GENESYNONYM_TERM = null;
-        private static ComparableTerm ORDLOCNAME_TERM = null;
-        private static ComparableTerm ORFNAME_TERM = null;
-        
-        private static String SPECIES_KEY = "SPECIES";
-        private static String STRAIN_KEY = "STRAIN";
-        private static String TISSUE_KEY = "TISSUE";
-        private static String TRANSPOSON_KEY = "TRANSPOSON";
-        private static String PLASMID_KEY = "PLASMID";
         
         private static String GENENAME_KEY = "Name";
         private static String GENESYNONYM_KEY = "Synonyms";
@@ -146,114 +142,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         public static ComparableTerm getUniProtTerm() {
             if (UNIPROT_TERM==null) UNIPROT_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt");
             return UNIPROT_TERM;
-        }
-        
-        /**
-         * Getter for the DataClass term
-         * @return The DataClass Term
-         */
-        public static ComparableTerm getDataClassTerm() {
-            if (DATACLASS_TERM==null) DATACLASS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataclass");
-            return DATACLASS_TERM;
-        }
-        
-        /**
-         * Getter for the FTId term
-         * @return The FTId Term
-         */
-        public static ComparableTerm getFTIdTerm() {
-            if (FTID_TERM==null) FTID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("FTId");
-            return FTID_TERM;
-        }
-        
-        /**
-         * Getter for the FeatureDesc term
-         * @return The FeatureDesc Term
-         */
-        public static ComparableTerm getFeatureDescTerm() {
-            if (FEATUREDESC_TERM==null) FEATUREDESC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("description");
-            return FEATUREDESC_TERM;
-        }
-        
-        /**
-         * Getter for the Strain term
-         * @return The Strain Term
-         */
-        public static ComparableTerm getStrainTerm() {
-            if (STRAIN_TERM==null) STRAIN_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("strain");
-            return STRAIN_TERM;
-        }
-        
-        /**
-         * Getter for the Species term
-         * @return The Species Term
-         */
-        public static ComparableTerm getSpeciesTerm() {
-            if (SPECIES_TERM==null) SPECIES_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("species");
-            return SPECIES_TERM;
-        }
-        
-        /**
-         * Getter for the Tissue term
-         * @return The Tissue Term
-         */
-        public static ComparableTerm getTissueTerm() {
-            if (TISSUE_TERM==null) TISSUE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("tissue");
-            return TISSUE_TERM;
-        }
-        
-        /**
-         * Getter for the Transposon term
-         * @return The Transposon Term
-         */
-        public static ComparableTerm getTransposonTerm() {
-            if (TRANSPOSON_TERM==null) TRANSPOSON_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("transposon");
-            return TRANSPOSON_TERM;
-        }
-        
-        /**
-         * Getter for the Plasmid term
-         * @return The plasmid Term
-         */
-        public static ComparableTerm getPlasmidTerm() {
-            if (PLASMID_TERM==null) PLASMID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("plasmid");
-            return PLASMID_TERM;
-        }
-        
-        /**
-         * Getter for the GeneName term
-         * @return The GeneName Term
-         */
-        public static ComparableTerm getGeneNameTerm() {
-            if (GENENAME_TERM==null) GENENAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_name");
-            return GENENAME_TERM;
-        }
-        
-        /**
-         * Getter for the GeneSynonym term
-         * @return The GeneSynonym Term
-         */
-        public static ComparableTerm getGeneSynonymTerm() {
-            if (GENESYNONYM_TERM==null) GENESYNONYM_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_synonym");
-            return GENESYNONYM_TERM;
-        }
-        
-        /**
-         * Getter for the OrderedLocusName term
-         * @return The OrderedLocusName Term
-         */
-        public static ComparableTerm getOrderedLocusNameTerm() {
-            if (ORDLOCNAME_TERM==null) ORDLOCNAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_ordloc");
-            return ORDLOCNAME_TERM;
-        }
-        
-        /**
-         * Getter for the ORFName term
-         * @return The ORFName Term
-         */
-        public static ComparableTerm getORFNameTerm() {
-            if (ORFNAME_TERM==null) ORFNAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_orf");
-            return ORFNAME_TERM;
         }
     }
     
@@ -286,12 +174,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
         rlistener.setNamespace(ns);
         
-        // the date pattern
-        // date (Rel. N, Created)
-        // date (Rel. N, Last sequence update)
-        // date (Rel. N, Last annotation update)
-        Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)]+)\\)$");
-        
         // Get an ordered list of key->value pairs in array-tuples
         String sectionKey = null;
         NCBITaxon tax = null;
@@ -309,9 +191,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             if (sectionKey.equals(LOCUS_TAG)) {
                 // entryname  dataclass; moltype; sequencelength AA.
                 String loc = ((String[])section.get(0))[1];
-                String regex = "^((\\S+)_(\\S+))\\s+(\\S+);\\s+(PRT);\\s+\\d+\\s+AA\\.$";
-                Pattern p = Pattern.compile(regex);
-                Matcher m = p.matcher(loc);
+                Matcher m = lp.matcher(loc);
                 if (m.matches()) {
                     rlistener.setName(m.group(2));
                     rlistener.setDivision(m.group(3));
@@ -321,7 +201,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     throw new ParseException("Bad ID line found: "+loc);
                 }
             } else if (sectionKey.equals(DEFINITION_TAG)) {
-                rlistener.setDescription(((String[])section.get(0))[1]);
+                String val = ((String[])section.get(0))[1];
+                val = val.substring(0, val.length()-1); // chomp dot
+                rlistener.setDescription(val);
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // use SOURCE_TAG and TAXON_TAG values
                 String sciname = null;
@@ -356,10 +238,10 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             }
                         }
                     } else if (tag.equals(ORGANELLE_TAG)) {
+                        value = value.substring(0,value.length()-1); // chomp trailing dot
                         String[] parts = value.split(";");
                         for (int j = 0; j < parts.length; j++) {
                             parts[j]=parts[j].trim();
-                            if (j==parts.length-1) parts[j]=parts[j].substring(0,parts[j].length()-1); // chomp last dot
                             rlistener.addSequenceProperty(Terms.getOrganelleTerm(),parts[j]);
                         }
                     }
@@ -402,11 +284,12 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accs[i].trim());
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
-                String[] kws = ((String[])section.get(0))[1].split(";");
+                String val = ((String[])section.get(0))[1];
+                val = val.substring(0, val.length()-1); // chomp dot
+                String[] kws = val.split(";");
                 for (int i = 0; i < kws.length; i++) {
                     String kw = kws[i].trim();
                     if (kw.length()==0) continue;
-                    if (i==kws.length-1) kw=kw.substring(0,kw.length()-1); // chomp trailing dot
                     rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
                 }
             } else if (sectionKey.equals(GENE_TAG)) {
@@ -429,12 +312,11 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
                 // database_identifier; primary_identifier; secondary_identifier....
-                String[] parts = ((String[])section.get(0))[1].split(";");
-                String finalPart = parts[parts.length-1].trim();
-                finalPart = finalPart.substring(0,finalPart.length()-1); // chomp trailing dot
-                parts[parts.length-1]=finalPart;
+                String val = ((String[])section.get(0))[1];
+                val = val.substring(0, val.length()-1); // chomp dot
+                String[] parts = val.split(";");
                 // construct a DBXREF out of the dbname part[0] and accession part[1]
-                CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
+                CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim(), new Integer(0)});
                 // assign remaining bits of info as annotations
                 for (int j = 2; j < parts.length; j++) {
                     Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j);
@@ -454,8 +336,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 int ref_rank = Integer.parseInt(refrank.substring(1,refrank.length()-1));
                 // rest can be in any order
                 String authors = null;
+                String consortium = null;
                 String title = null;
-                String journal = null;
+                String locator = null;
                 String pubmed = null;
                 String medline = null;
                 String doi = null;
@@ -465,9 +348,22 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 for (int i = 1; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
-                    if (key.equals(AUTHORS_TAG)) authors = val;
-                    if (key.equals(TITLE_TAG)) title = val;
-                    if (key.equals(JOURNAL_TAG)) journal = val;
+                    if (key.equals(AUTHORS_TAG)) {
+                        val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                        authors = val;
+                    }
+                    if (key.equals(CONSORTIUM_TAG)) {
+                        val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                        consortium = val;
+                    }
+                    if (key.equals(TITLE_TAG)) {
+                        val = val.trim().substring(1, val.length()-3); // chomp quotes+semicolon
+                        title = val;
+                    }
+                    if (key.equals(LOCATION_TAG)) {
+                        val = val.trim().substring(0, val.length()-1); // chomp dot
+                        locator = val;
+                    }
                     if (key.equals(REFERENCE_XREF_TAG)) {
                         // database_identifier=primary_identifier;
                         String[] refs = val.split(";");
@@ -483,6 +379,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     }
                     if (key.equals(RP_LINE_TAG)) {
                         remark = val;
+                        val = val.substring(0, val.length()-1); // chomp dot
                         // Try to use it to find the location of the reference, if we have one.
                         Matcher m = rppat.matcher(val);
                         if (m.matches()) {
@@ -513,27 +410,29 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
                 if (pubmed!=null) {
-                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed});
+                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed, new Integer(0)});
                     RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
                     rlistener.setRankedCrossRef(rpcr);
                 }
                 // create the medline crossref and assign to the bioentry
                 CrossRef mcr = null;
                 if (medline!=null) {
-                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline});
+                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline, new Integer(0)});
                     RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
                     rlistener.setRankedCrossRef(rmcr);
                 }
                 // create the doi crossref and assign to the bioentry
                 CrossRef dcr = null;
                 if (doi!=null) {
-                    dcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.DOI_KEY, doi});
+                    dcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.DOI_KEY, doi, new Integer(0)});
                     RankedCrossRef rdcr = new SimpleRankedCrossRef(dcr, 0);
                     rlistener.setRankedCrossRef(rdcr);
                 }
                 // create the docref object
                 try {
-                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,journal});
+                    Set auths = DocRefAuthor.Tools.parseAuthorString(authors);
+                    if (consortium!=null) auths.add(new SimpleDocRefAuthor(consortium,true,false));
+                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{auths,locator});
                     if (title!=null) dr.setTitle(title);
                     // assign either the pubmed or medline to the docref - medline gets priority, then pubmed, then doi
                     if (mcr!=null) dr.setCrossref(mcr);
@@ -549,23 +448,25 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             } else if (sectionKey.equals(COMMENT_TAG) && !this.getElideComments()) {
                 // Set up some comments
-                rlistener.setComment(((String[])section.get(0))[1]);
+                String val = ((String[])section.get(0))[1];
+                if (UniProtCommentParser.isParseable(val)) rlistener.setComment(val);
+                else {
+                    // copyright message
+                    rlistener.addSequenceProperty(Terms.getCopyrightTerm(), val);
+                }
             } else if (sectionKey.equals(FEATURE_TAG) && !this.getElideFeatures()) {
                 // starting from second line of input, start a new feature whenever we come across
                 // a key that does not start with /
                 boolean seenAFeature = false;
-                Pattern p = Pattern.compile("\\s*([\\d\\?<]+\\s+[\\d\\?>]+)(\\s+(\\S.*))?");
                 for (int i = 1 ; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
+                    val = val.trim().substring(0,val.length()-1); // chomp dot
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
-                        val = val.replaceAll("\"","").trim(); // strip quotes
-                        if (key.equals("FTId")) {
-                            // add all except trailing dot
-                            rlistener.addFeatureProperty(Terms.getFTIdTerm(),val.substring(0,val.length()-1));
-                        } else {
-                            // add the whole lot - should never happen anyway
+                        if (key.equals("FTId")) rlistener.addFeatureProperty(Terms.getFTIdTerm(),val);
+                        else {
+                            // should never happen - but here just in case
                             rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
                         }
                     } else {
@@ -580,7 +481,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         templ.featureRelationshipSet = new TreeSet();
                         templ.rankedCrossRefs = new TreeSet();
                         String desc = null;
-                        Matcher m = p.matcher(val);
+                        String status = null;
+                        Matcher m = fp.matcher(val);
                         if (m.matches()) {
                             String loc = m.group(1);
                             desc = m.group(3);
@@ -846,15 +748,15 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         String arel = null;
         String organelle = null;
         String dataclass = "STANDARD";
-        Map speciesRecs = new HashMap();
-        Map strainRecs = new HashMap();
-        Map tissueRecs = new HashMap();
-        Map transpRecs = new HashMap();
-        Map plasmidRecs = new HashMap();
-        Map genenames = new HashMap();
-        Map genesynonyms = new HashMap();
-        Map orfnames = new HashMap();
-        Map ordlocnames = new HashMap();
+        Map speciesRecs = new TreeMap();
+        Map strainRecs = new TreeMap();
+        Map tissueRecs = new TreeMap();
+        Map transpRecs = new TreeMap();
+        Map plasmidRecs = new TreeMap();
+        Map genenames = new TreeMap();
+        Map genesynonyms = new TreeMap();
+        Map orfnames = new TreeMap();
+        Map ordlocnames = new TreeMap();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
@@ -867,7 +769,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
             else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle = (organelle==null?"":organelle+"; ")+n.getValue();
             // use the nasty hack to split the reference rank away from the actual value in this field
-            // we'll end up with a bunch in key 0 for those which did not come from us. We ignore these for now.
             else if (n.getTerm().equals(Terms.getGeneNameTerm()))  {
                 String ref = n.getValue();
                 int colon = ref.indexOf(':');
@@ -955,7 +856,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         StringTools.writeKeyValueLine(DATE_TAG, (adat==null?udat:adat)+" (Rel. "+(arel==null?"0":arel)+", Last annotation update)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         
         // definition line
-        StringTools.writeKeyValueLine(DEFINITION_TAG, rs.getDescription(), 5, this.getLineWidth(), null, DEFINITION_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DEFINITION_TAG, rs.getDescription()+".", 5, this.getLineWidth(), null, DEFINITION_TAG, this.getPrintStream());
         
         // gene line
         for (Iterator i = genenames.keySet().iterator(); i.hasNext(); ) {
@@ -1028,7 +929,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             DocRef d = rdr.getDocumentReference();
             // RN, RP, RC, RX, RG, RA, RT, RL
             StringTools.writeKeyValueLine(REFERENCE_TAG, "["+rdr.getRank()+"]", 5, this.getLineWidth(), null, REFERENCE_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(RP_LINE_TAG, d.getRemark(), 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(RP_LINE_TAG, d.getRemark()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
             // Print out ref position if present
             if (rdr.getStart()!=null && rdr.getEnd()!=null && !rppat.matcher(d.getRemark()).matches()) StringTools.writeKeyValueLine(RP_LINE_TAG, "SEQUENCE OF "+rdr.getStart()+"-"+rdr.getEnd()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
             // RC lines
@@ -1084,9 +985,17 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             // Deal with RX and rest
             CrossRef c = d.getCrossref();
             if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname().toUpperCase()+"="+c.getAccession()+";", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(AUTHORS_TAG, d.getAuthors(), 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(TITLE_TAG, d.getTitle(), 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(JOURNAL_TAG, d.getLocation(), 5, this.getLineWidth(), null, JOURNAL_TAG, this.getPrintStream());
+            Set auths = d.getAuthorSet();
+            for (Iterator j = auths.iterator(); j.hasNext(); ) {
+                DocRefAuthor a = (DocRefAuthor)j.next();
+                if (a.isConsortium()) {
+                    StringTools.writeKeyValueLine(CONSORTIUM_TAG, a.getName()+";", 5, this.getLineWidth(), null, CONSORTIUM_TAG, this.getPrintStream());
+                    j.remove();
+                }
+            }
+            if (!auths.isEmpty()) StringTools.writeKeyValueLine(AUTHORS_TAG, DocRefAuthor.Tools.generateAuthorString(auths)+";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
+            if (d.getTitle()!=null && !d.getTitle().equals("")) StringTools.writeKeyValueLine(TITLE_TAG, "\""+d.getTitle()+"\";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(LOCATION_TAG, d.getLocation()+".", 5, this.getLineWidth(), null, LOCATION_TAG, this.getPrintStream());
         }
         
         // comments - if any
@@ -1147,7 +1056,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             }
             String kw = f.getTypeTerm().getName();
             String leader = StringTools.rightPad(kw,8)+" "+UniProtLocationParser.writeLocation((RichLocation)f.getLocation());
-            StringTools.writeKeyValueLine(FEATURE_TAG+"   "+leader, desc, 29, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(FEATURE_TAG+"   "+leader, desc+".", 29, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
             if (ftid!=null) StringTools.writeKeyValueLine(FEATURE_TAG, "/FTId="+ftid+".", 29, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
         }
         

@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -44,7 +45,7 @@ public class SimpleRichObjectBuilder implements RichObjectBuilder {
         // put the class into the hashmap if not there already
         if (!objects.containsKey(clazz)) objects.put(clazz,new HashMap());
         Map contents = (Map)objects.get(clazz);
-        // put the constructed object into the hashmap if not there already
+        // return the constructed object from the hashmap if there already
         if (contents.containsKey(paramsList)) return contents.get(paramsList); 
         // otherwise build it.
         try {

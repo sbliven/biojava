@@ -30,8 +30,7 @@ import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojavax.Namespace;
-import org.biojavax.RichObjectFactory;
-import org.biojavax.ontology.ComparableTerm;
+
 
 /**
  * Allows a file format to be read/written as RichSequences.
@@ -160,137 +159,6 @@ public interface RichSequenceFormat extends SequenceFormat {
      * @return true if it is <em>not</em> otherwise false (false is default).
      */
     public boolean getElideComments();
-        
-    /**
-     * Stores a number of useful terms used across many sequence formats for consistency's sake.
-     */
-    public static class Terms {
-        private static ComparableTerm SEC_ACCESSION_TERM = null;
-        private static ComparableTerm KEYWORDS_TERM = null;
-        private static ComparableTerm DATE_CREATED_TERM = null;
-        private static ComparableTerm DATE_UPDATED_TERM = null;
-        private static ComparableTerm DATE_ANNOTATED_TERM = null;
-        private static ComparableTerm REL_CREATED_TERM = null;
-        private static ComparableTerm REL_UPDATED_TERM = null;
-        private static ComparableTerm REL_ANNOTATED_TERM = null;
-        private static ComparableTerm MOLTYPE_TERM = null;
-        private static ComparableTerm STRANDED_TERM = null;
-        private static ComparableTerm ORGANELLE_TERM = null;
-        
-        /**
-         * Holds a reference to the key that must be used to store PubMed references.
-         */
-        public static final String PUBMED_KEY = "PUBMED";
-        
-        /**
-         * Holds a reference to the key that must be used to store Medline references.
-         */
-        public static final String MEDLINE_KEY = "MEDLINE";
-        
-        /**
-         * Holds a reference to the key that must be used to store DOI references.
-         */
-        public static final String DOI_KEY = "DOI";
-        
-        /**
-         * Getter for the secondary/tertiary/additional accession term
-         * @return A Term that represents the secondary accession tag
-         */
-        public static ComparableTerm getAdditionalAccessionTerm() {
-            if (SEC_ACCESSION_TERM==null) SEC_ACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("acc");
-            return SEC_ACCESSION_TERM;
-        }
-        
-        /**
-         * Getter for the keyword term
-         * @return a Term that represents the Keyword tag
-         */
-        public static ComparableTerm getKeywordTerm() {
-            if (KEYWORDS_TERM==null) KEYWORDS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("kw");
-            return KEYWORDS_TERM;
-        }
-        
-        /**
-         * Getter for the date created term
-         * @return a Term
-         */
-        public static ComparableTerm getDateCreatedTerm() {
-            if (DATE_CREATED_TERM==null) DATE_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("cdat");
-            return DATE_CREATED_TERM;
-        }
-        
-        /**
-         * Getter for the date updated term
-         * @return a Term
-         */
-        public static ComparableTerm getDateUpdatedTerm() {
-            if (DATE_UPDATED_TERM==null) DATE_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("udat");
-            return DATE_UPDATED_TERM;
-        }
-        
-        /**
-         * Getter for the date annotated term
-         * @return a Term
-         */
-        public static ComparableTerm getDateAnnotatedTerm() {
-            if (DATE_ANNOTATED_TERM==null) DATE_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("adat");
-            return DATE_ANNOTATED_TERM;
-        }
-        
-        /**
-         * Getter for the release created term
-         * @return a Term
-         */
-        public static ComparableTerm getRelCreatedTerm() {
-            if (REL_CREATED_TERM==null) REL_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("crel");
-            return REL_CREATED_TERM;
-        }
-        
-        /**
-         * Getter for the release updated term
-         * @return a Term
-         */
-        public static ComparableTerm getRelUpdatedTerm() {
-            if (REL_UPDATED_TERM==null) REL_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("urel");
-            return REL_UPDATED_TERM;
-        }
-        
-        /**
-         * Getter for the release annotated term
-         * @return a Term
-         */
-        public static ComparableTerm getRelAnnotatedTerm() {
-            if (REL_ANNOTATED_TERM==null) REL_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("arel");
-            return REL_ANNOTATED_TERM;
-        }
-        
-        /**
-         * getter for the MolType term
-         * @return a Term that represents the molecule type
-         */
-        public static ComparableTerm getMolTypeTerm() {
-            if (MOLTYPE_TERM==null) MOLTYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("moltype");
-            return MOLTYPE_TERM;
-        }
-        
-        /**
-         * Getter for the Strand term
-         * @return a Term that represents the Strand tag
-         */
-        public static ComparableTerm getStrandedTerm() {
-            if (STRANDED_TERM==null) STRANDED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("stranded");
-            return STRANDED_TERM;
-        }
-        
-        /**
-         * Getter for the Organelle term
-         * @return a Term that represents the Organelle tag
-         */
-        public static ComparableTerm getOrganelleTerm() {
-            if (ORGANELLE_TERM==null) ORGANELLE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("organelle");
-            return ORGANELLE_TERM;
-        }
-    }
     
     /**
      * Provides a basic format with simple things like line-widths precoded.

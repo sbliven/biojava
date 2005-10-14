@@ -20,7 +20,8 @@
  */
 
 package org.biojavax;
-
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.Checksum;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
@@ -37,7 +38,7 @@ import org.biojavax.utils.CRC64Checksum;
 public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     private CrossRef crossref;
-    private String authors;
+    private Set authors;
     private String title;
     private String location;
     private String remark;
@@ -45,14 +46,15 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     /**
      * Creates a new document reference from the given immutable authors and
      * location. Will throw exceptions if either are null.
-     * @param authors The authors of the referenced document.
+     * @param authors The authors of the referenced document, as a set of DocRefAuthor instances.
      * @param location The location of the document, eg. the journal name and page range.
      */
-    public SimpleDocRef(String authors, String location) {
-        if (authors==null) throw new IllegalArgumentException("Authors cannot be null");
+    public SimpleDocRef(Set authors, String location) {
+        if (authors==null || authors.isEmpty()) throw new IllegalArgumentException("Authors cannot be null or empty");
         if (location==null) throw new IllegalArgumentException("Location cannot be null");
         this.crossref = null;
-        this.authors = authors;
+        this.authors = new HashSet();
+        this.authors.addAll(authors);
         this.title = null;
         this.location = location;
         this.remark = null;
@@ -131,7 +133,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     }
     
     // Hibernate requirement - not for public use.
-    private void setAuthors(String authors) { this.authors = authors; }
+    private void setAuthors(String authors) { this.authors = DocRefAuthor.Tools.parseAuthorString(authors); }
     
     // Hibernate requirement - not for public use.
     private void setLocation(String location) { this.location = location; }
@@ -139,7 +141,12 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     /**
      * {@inheritDoc}
      */
-    public String getAuthors() { return this.authors; }
+    public String getAuthors() { return DocRefAuthor.Tools.generateAuthorString(this.authors); }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Set getAuthorSet() { return new HashSet(this.authors); }
     
     /**
      * {@inheritDoc}
@@ -150,7 +157,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
      */
     public String getCRC() {
         StringBuffer sb = new StringBuffer();
-        sb.append((this.authors==null || this.authors.equals(""))?"<undef>":this.authors);
+        sb.append(this.getAuthors());
         sb.append((this.title==null || this.title.equals(""))?"<undef>":this.title);
         sb.append((this.location==null || this.location.equals(""))?"<undef>":this.location);
         Checksum cs = new CRC64Checksum();
@@ -187,7 +194,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         if (this.authors==null) return -1;
         // Normal comparison
         DocRef them = (DocRef)o;
-        if (!this.authors.equals(them.getAuthors())) return this.authors.compareTo(them.getAuthors());
+        if (!this.getAuthors().equals(them.getAuthors())) return this.getAuthors().compareTo(them.getAuthors());
         return this.location.compareTo(them.getLocation());
     }
     
@@ -202,8 +209,8 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         if (this.authors==null) return false;
         // Normal comparison
         DocRef them = (DocRef)obj;
-        return (this.authors.equals(them.getAuthors()) &&
-                this.location.equals(them.getLocation()));
+        return (this.getAuthors().equals(them.getAuthors()) &&
+                this.getAuthors().equals(them.getLocation()));
     }
     
     /**
@@ -214,7 +221,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         // Hibernate comparison - we haven't been populated yet
         if (this.authors==null) return code;
         // Normal comparison
-        code = 37*code + this.authors.hashCode();
+        code = 37*code + this.getAuthors().hashCode();
         code = 37*code + this.location.hashCode();
         return code;
     }

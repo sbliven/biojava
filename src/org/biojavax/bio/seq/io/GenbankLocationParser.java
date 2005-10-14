@@ -167,7 +167,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                     });
                 } else {
                     crossRef = (SimpleCrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{
-                        featureNS.getName(),xrefAccession
+                        featureNS.getName(),xrefAccession,new Integer(0)
                     });
                 }
             }

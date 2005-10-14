@@ -23,6 +23,8 @@ package org.biojavax.bio.db;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
+import org.biojavax.DocRefAuthor;
 import org.biojavax.RichObjectBuilder;
 import org.biojavax.SimpleCrossRef;
 import org.biojavax.SimpleDocRef;
@@ -87,6 +89,7 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
         // Create the Hibernate query to look it up with
         String queryText;
         String queryType;
+        List queryParamsList = paramsList;
         if (clazz==SimpleNamespace.class) {
             queryText = "from Namespace as ns where ns.name = ?";
             queryType = "Namespace";
@@ -97,19 +100,21 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
             queryText = "from Taxon as o where o.NCBITaxID = ?";
             queryType = "Taxon";
         } else if (clazz==SimpleCrossRef.class) {
-            queryText = "from CrossRef as cr where cr.dbname = ? and cr.accession = ?";
+            queryText = "from CrossRef as cr where cr.dbname = ? and cr.accession = ? and cr.version = ?";
             queryType = "CrossRef";
         } else if (clazz==SimpleDocRef.class) {
             queryText = "from DocRef as cr where cr.authors = ? and cr.location = ?";
             queryType = "DocRef";
+            // convert Set constructor to String representation for query
+            if (queryParamsList.get(0) instanceof Set) queryParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((Set)queryParamsList.get(0)));
         } else throw new IllegalArgumentException("Don't know how to handle objects of type "+clazz);
         // Run the query.
         try {
             // Build the query object
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             // Set the parameters
-            for (int i = 0; i < paramsList.size(); i++) {
-                query = this.setParameter.invoke(query, new Object[]{new Integer(i), paramsList.get(i)});
+            for (int i = 0; i < queryParamsList.size(); i++) {
+                query = this.setParameter.invoke(query, new Object[]{new Integer(i), queryParamsList.get(i)});
             }
             // Get the results
             List results = (List)this.list.invoke(query, null);

@@ -50,6 +50,7 @@ import org.biojava.utils.xml.XMLWriter;
 import org.biojavax.Comment;
 import org.biojavax.CrossRef;
 import org.biojavax.DocRef;
+import org.biojavax.DocRefAuthor;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
@@ -60,6 +61,7 @@ import org.biojavax.SimpleDocRef;
 import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.SimpleDocRefAuthor;
 import org.biojavax.SimpleNote;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.seq.Position;
@@ -178,7 +180,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
     /**
      * Implements some EMBLxml-specific terms.
      */
-    public static class Terms extends RichSequenceFormat.Terms {
+    public static class Terms extends RichSequence.Terms {
         private static ComparableTerm EMBLXML_TERM = null;
         
         /**
@@ -359,20 +361,37 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 xml.closeTag(DBREFERENCE_TAG);
             }
             
+            Set auths = dr.getAuthorSet();
+            
+            for (Iterator j = auths.iterator(); j.hasNext(); ) {
+                DocRefAuthor a = (DocRefAuthor)j.next();
+                if (a.isConsortium()) {
+                    xml.openTag(CONSORTIUM_TAG);
+                    xml.print(a.getName());
+                    xml.closeTag(CONSORTIUM_TAG);
+                    j.remove();
+                }
+            }
+            
             if (dr.getTitle()!=null) {
                 xml.openTag(TITLE_TAG);
                 xml.print(dr.getTitle());
                 xml.closeTag(TITLE_TAG);
             }
-            
-            String[] auths = dr.getAuthors().split(",\\s+");
-            for (int j = 0; j < auths.length; j++) {
-                String auth = auths[j].trim();
-                xml.openTag(AUTHOR_TAG);
-                xml.print(auth);
-                xml.closeTag(AUTHOR_TAG);
+                        
+            for (Iterator j = auths.iterator(); j.hasNext(); ) {
+                DocRefAuthor a = (DocRefAuthor)j.next();
+                if (a.isEditor()) {
+                    xml.openTag(EDITOR_TAG);
+                    xml.print(a.getName());
+                    xml.closeTag(EDITOR_TAG);
+                } else {
+                    xml.openTag(AUTHOR_TAG);
+                    xml.print(a.getName());
+                    xml.closeTag(AUTHOR_TAG);
+                }
             }
-            
+                        
             xml.openTag(LOCATOR_TAG);
             xml.print(dr.getLocation());
             xml.closeTag(LOCATOR_TAG);
@@ -452,9 +471,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     xml.openTag(LINEAGE_TAG);
                     for (int j = 0; j < parts.length; j++) {
                         xml.openTag(TAXON_TAG);
-                        parts[j] = parts[j].trim();
-                        if (j==parts.length-1) parts[j] = parts[j].substring(0,parts[j].length()-1); // chomp "."
-                        xml.print(parts[j]);
+                        xml.print(parts[j].trim());
                         xml.closeTag(TAXON_TAG);
                     }
                     xml.closeTag(LINEAGE_TAG);
@@ -709,7 +726,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     else if (name.equals(DBREF_PRIMARY_ATTR)) primary = val;
                     else if (name.equals(DBREF_SEC_ATTR)) secondary = val;
                 }
-                CrossRef dbx = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{db, primary});
+                CrossRef dbx = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{db, primary, new Integer(0)});
                 if (secondary!=null) {
                     Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),secondary,0);
                     try {
@@ -839,16 +856,14 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 else if (qName.equals(TITLE_TAG)) {
                     currRefTitle = val;
                 } else if (qName.equals(AUTHOR_TAG)) {
-                    currRefAuthors.add(val);
+                    currRefAuthors.add(new SimpleDocRefAuthor(val,false,false));
+                } else if (qName.equals(EDITOR_TAG)) {
+                    currRefAuthors.add(new SimpleDocRefAuthor(val,false,true));
+                } else if (qName.equals(CONSORTIUM_TAG)) {
+                    currRefAuthors.add(new SimpleDocRefAuthor(val,true,false));
                 } else if (qName.equals(LOCATOR_TAG)) {
                     currRefLocation = val;
                 } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
-                    // authors
-                    String authors = "";
-                    for (Iterator j = currRefAuthors.iterator(); j.hasNext();) {
-                        authors+=(String)j.next();
-                        if (j.hasNext()) authors+=", ";
-                    }
                     // do the crossrefs
                     int k = 0;
                     CrossRef useForDocRef = null;
@@ -869,7 +884,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     if (currComments.size()>0) currRefRemark = (String)currComments.iterator().next();
                     // create the docref object
                     try {
-                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,currRefLocation});
+                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefLocation});
                         if (currRefTitle!=null) dr.setTitle(currRefTitle);
                         // assign the pubmed or medline to the docref - medline gets priority
                         if (useForDocRef!=null) dr.setCrossref(useForDocRef);

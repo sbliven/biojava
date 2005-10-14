@@ -45,7 +45,7 @@ public class XMLTools {
      * As each chunk is read into memory in a buffer, you need to ensure that each chunk
      * is small enough to fit into available memory. Only one chunk is held in memory
      * at any one time, and then only long enough for it to be parsed.
-     * When checking for the presence of further chunks, it'll only read up to 500 chars
+     * When checking for the presence of further chunks, it'll only read up to 1000 chars
      * further into the file, after which results will be unpredictable.
      * @param reader the reader to read the XML from
      * @param m_handler the SAX parser to feed the XML to
@@ -79,11 +79,11 @@ public class XMLTools {
             if (end.matcher(line).matches()) filledBuffer = true;
         }
         if (!filledBuffer) throw new SAXException("Unexpectedly reached end of file");
-        reader.mark(500);
+        reader.mark(1000);
         boolean hasAnotherChunk = false;
         while (!hasAnotherChunk && (line=reader.readLine())!=null) {
             line = line.trim();
-            if (line.equals("<"+chunkToken+">")) {
+            if (start.matcher(line).matches()) {
                 reader.reset();
                 hasAnotherChunk = true;
             }

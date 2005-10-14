@@ -55,7 +55,7 @@ public class UniProtLocationParser {
     }
     
     // O beautiful regex, we worship you.
-    // this matches both the start and end locations
+    // this matches both the point and end locations
     private static Pattern sp = Pattern.compile("^(<|>)?(\\d+)(<|>)?$");
     
     // this function parses a single position - usually just half of one location
@@ -64,14 +64,14 @@ public class UniProtLocationParser {
         Matcher sm = sp.matcher(position);
         if (!sm.matches()) throw new ParseException("Could not understand position: "+position);
         String startfuzz = sm.group(1);
-        String start = sm.group(2);
+        String point = sm.group(2);
         String endfuzz = sm.group(3);
         
         boolean startsFuzzy = ((startfuzz!=null && startfuzz.equals("<")) || (endfuzz!=null && endfuzz.equals("<")));
         boolean endsFuzzy = ((endfuzz!=null && endfuzz.equals(">")) || (startfuzz!=null && startfuzz.equals(">")));
         
         Position endPos = null;
-        return new SimplePosition(startsFuzzy,endsFuzzy,Integer.parseInt(start));
+        return new SimplePosition(startsFuzzy,endsFuzzy,Integer.parseInt(point));
     }
     
     /**

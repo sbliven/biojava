@@ -58,6 +58,11 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public static final String FASTA_FORMAT = "FASTA";
     
+    // header line
+    protected static final Pattern hp = Pattern.compile(">(\\S+)(\\s+(.*))*");
+    // description chunk
+    protected static final Pattern dp = Pattern.compile( "^(gi\\|(\\d+)\\|)*(\\S+)\\|(\\S+?)(\\.(\\d+))*\\|(\\S+)$");
+    
     /**
      * {@inheritDoc}
      */
@@ -105,9 +110,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
         
         rsiol.startSequence();
         
-        String regex = ">(\\S+)(\\s+(.*))*";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(line);
+        Matcher m = hp.matcher(line);
         if (!m.matches()) {
             throw new IOException("Stream does not appear to contain FASTA formatted data: " + line);
         }
@@ -115,9 +118,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
         String name = m.group(1);
         String desc = m.group(3);
         
-        regex = "^(gi\\|(\\d+)\\|)*(\\S+)\\|(\\S+?)(\\.(\\d+))*\\|(\\S+)$";
-        p = Pattern.compile(regex);
-        m = p.matcher(name);
+        m = dp.matcher(name);
         if (m.matches()) {
             String gi = m.group(2);
             String namespace = m.group(3);

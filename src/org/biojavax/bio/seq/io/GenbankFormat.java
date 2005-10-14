@@ -45,6 +45,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Comment;
 import org.biojavax.CrossRef;
 import org.biojavax.DocRef;
+import org.biojavax.DocRefAuthor;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
@@ -100,10 +101,26 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String START_SEQUENCE_TAG = "ORIGIN";
     protected static final String END_SEQUENCE_TAG = "//";
     
+    // locus line
+    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+bp\\s+([dms]s-)?(\\S+)\\s+(circular|linear)?\\s+(\\S+)\\s+(\\S+)$");
+    // version line
+    protected static final Pattern vp = Pattern.compile("^(\\S+?)\\.(\\d+)\\s+GI:(\\S+)$");
+    // reference line
+    protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
+    // dbxref line
+    protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
+    //sections start at a line and continue till the first line afterwards with a
+    //non-whitespace first character
+    //we want to match any of the following as a new section within a section
+    //  \s{0,8} word \s{1,7} value
+    //  \s{21} /word = value
+    //  \s{21} /word
+    protected static final Pattern sectp = Pattern.compile("^(\\s{0,8}(\\S+)\\s{1,7}(.*)|\\s{21}(/\\S+?)=(.*)|\\s{21}(/\\S+))$");
+    
     /**
      * Implements some GenBank-specific terms.
      */
-    public static class Terms extends RichSequenceFormat.Terms {
+    public static class Terms extends RichSequence.Terms {
         private static ComparableTerm GENBANK_TERM = null;
         
         /**
@@ -160,9 +177,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             // process section-by-section
             if (sectionKey.equals(LOCUS_TAG)) {
                 String loc = ((String[])section.get(0))[1];
-                String regex = "^(\\S+)\\s+\\d+\\s+bp\\s+([dms]s-)?(\\S+)\\s+(circular|linear)?\\s+(\\S+)\\s+(\\S+)$";
-                Pattern p = Pattern.compile(regex);
-                Matcher m = p.matcher(loc);
+                Matcher m = lp.matcher(loc);
                 if (m.matches()) {
                     rlistener.setName(m.group(1));
                     rlistener.setDivision(m.group(5));
@@ -189,9 +204,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             } else if (sectionKey.equals(VERSION_TAG)) {
                 String ver = ((String[])section.get(0))[1];
-                String regex = "^(\\S+?)\\.(\\d+)\\s+GI:(\\S+)$";
-                Pattern p = Pattern.compile(regex);
-                Matcher m = p.matcher(ver);
+                Matcher m = vp.matcher(ver);
                 if (m.matches()) {
                     rlistener.setVersion(Integer.parseInt(m.group(2)));
                     rlistener.setIdentifier(m.group(3));
@@ -199,11 +212,11 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     throw new ParseException("Bad version line found: "+ver);
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
-                String[] kws = ((String[])section.get(0))[1].split(";");
+                String val = ((String[])section.get(0))[1];
+                val = val.substring(0, val.length()-1); // chomp dot
+                String[] kws = val.split(";");
                 for (int i = 0; i < kws.length; i++) {
                     String kw = kws[i].trim();
-                    if (i==kws.length-1) kw = kw.substring(0,kw.length()-1); // chomp trailing dot
-                    if (kw.length()==0 || kw.equals(".")) continue;
                     rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
                 }
             } else if (sectionKey.equals(SOURCE_TAG)) {
@@ -214,9 +227,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 int ref_start = -999;
                 int ref_end = -999;
                 String ref = ((String[])section.get(0))[1];
-                String regex = "^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?";
-                Pattern p = Pattern.compile(regex);
-                Matcher m = p.matcher(ref);
+                Matcher m = refp.matcher(ref);
                 if (m.matches()) {
                     ref_rank = Integer.parseInt(m.group(1));
                     if(m.group(2) != null){
@@ -239,8 +250,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 for (int i = 1; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
-                    if (key.equals(AUTHORS_TAG)) authors = val;
-                    if (key.equals(TITLE_TAG)) title = val;
+                    if (key.equals(AUTHORS_TAG)) authors = val.trim();
+                    if (key.equals(TITLE_TAG)) title = val.trim();
                     if (key.equals(JOURNAL_TAG)) journal = val;
                     if (key.equals(MEDLINE_TAG)) medline = val;
                     if (key.equals(PUBMED_TAG)) pubmed = val;
@@ -249,20 +260,20 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
                 if (pubmed!=null) {
-                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed});
+                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed, new Integer(0)});
                     RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
                     rlistener.setRankedCrossRef(rpcr);
                 }
                 // create the medline crossref and assign to the bioentry
                 CrossRef mcr = null;
                 if (medline!=null) {
-                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline});
+                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline, new Integer(0)});
                     RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
                     rlistener.setRankedCrossRef(rmcr);
                 }
                 // create the docref object
                 try {
-                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,journal});
+                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{DocRefAuthor.Tools.parseAuthorString(authors),journal});
                     if (title!=null) dr.setTitle(title);
                     // assign either the pubmed or medline to the docref - medline gets priority
                     if (mcr!=null) dr.setCrossref(mcr);
@@ -293,9 +304,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         val = val.replaceAll("\"","").trim(); // strip quotes
                         // parameter on old feature
                         if (key.equals("db_xref")) {
-                            String regex = "^(\\S+?):(\\S+)$";
-                            Pattern p = Pattern.compile(regex);
-                            Matcher m = p.matcher(val);
+                            Matcher m = dbxp.matcher(val);
                             if (m.matches()) {
                                 String dbname = m.group(1);
                                 String raccession = m.group(2);
@@ -310,7 +319,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                                     }
                                 } else {
                                     try {
-                                        CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession});
+                                        CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession, new Integer(0)});
                                         RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
                                         rlistener.getCurrentFeature().addRankedCrossRef(rcr);
                                     } catch (ChangeVetoException e) {
@@ -407,14 +416,6 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         boolean done = false;
         int linecount = 0;
         
-        //sections start at a line and continue till the first line afterwards with a
-        //non-whitespace first character
-        //we want to match any of the following as a new section within a section
-        //  \s{0,8} word \s{1,7} value
-        //  \s{21} /word = value
-        //  \s{21} /word
-        String regex = "^(\\s{0,8}(\\S+)\\s{1,7}(.*)|\\s{21}(/\\S+?)=(.*)|\\s{21}(/\\S+))$";
-        Pattern p = Pattern.compile(regex);
         try {
             while (!done) {
                 br.mark(160);
@@ -425,7 +426,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     br.reset();
                     done = true;
                 } else {
-                    Matcher m = p.matcher(line);
+                    Matcher m = sectp.matcher(line);
                     if (m.matches()) {
                         // new key
                         if (currKey!=null) section.add(new String[]{currKey,currVal.toString()});
@@ -450,7 +451,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         }
         return section;
     }
-             
+    
     /**
      * {@inheritDoc}
      */

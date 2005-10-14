@@ -45,7 +45,7 @@ public class SimpleComment implements Comment {
     protected SimpleComment() {}
     
     // Hibernate requirement - not for public use.
-    private void setComment(String comment) { this.comment = comment; }
+    protected void setComment(String comment) { this.comment = comment; }
     
     /**
      * {@inheritDoc}

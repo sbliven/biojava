@@ -55,16 +55,6 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     
     /**
      * Creates a new instance of SimpleCrossRef with the values to use for
-     * the immutable database name, accession and a default version of 0.
-     * @param dbname the dbname for this crossref.
-     * @param accession the accession for this crossref.
-     */
-    public SimpleCrossRef(String dbname, String accession) {
-        this(dbname,accession,0);
-    }
-    
-    /**
-     * Creates a new instance of SimpleCrossRef with the values to use for
      * the immutable database name, accession and version. Identical to other
      * dbname/accession/version constructor except the version is specified
      * as an Integer object rather than an int primitive. Will throw an

@@ -48,6 +48,7 @@ import org.biojava.utils.xml.XMLWriter;
 import org.biojavax.Comment;
 import org.biojavax.CrossRef;
 import org.biojavax.DocRef;
+import org.biojavax.DocRefAuthor;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
@@ -59,6 +60,7 @@ import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.SimpleDocRefAuthor;
 import org.biojavax.SimpleNote;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
@@ -127,6 +129,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     protected static final String REMARK_TAG = "INSDReference_remark";
     protected static final String AUTHORS_GROUP_TAG = "INSDReference_authors";
     protected static final String AUTHOR_TAG = "INSDAuthor";
+    protected static final String CONSORTIUM_TAG = "INSDReference_consortium";
     
     protected static final String COMMENT_TAG = "INSDSeq_comment";
     
@@ -142,10 +145,15 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     protected static final String SEQUENCE_TAG = "INSDSeq_sequence";
     protected static final String CONTIG_TAG = "INSDSeq_contig";
     
+    // reference line
+    protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
+    // dbxref line
+    protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
+    
     /**
      * Implements some INSDseq-specific terms.
      */
-    public static class Terms extends RichSequenceFormat.Terms {
+    public static class Terms extends RichSequence.Terms {
         private static ComparableTerm INSDSEQ_TERM = null;
         
         /**
@@ -363,11 +371,12 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             xml.closeTag(SOURCE_TAG);
             
             xml.openTag(ORGANISM_TAG);
-            xml.print(tax.getDisplayName().split("\\s+\\(")[0]);
+            xml.print(tax.getDisplayName().split("\\(")[0].trim());
             xml.closeTag(ORGANISM_TAG);
             
             xml.openTag(TAXONOMY_TAG);
-            xml.print(tax.getNameHierarchy());
+            String h = tax.getNameHierarchy();
+            xml.print(h.substring(0, h.length()-1)); // chomp dot
             xml.closeTag(TAXONOMY_TAG);
         }
         
@@ -388,15 +397,23 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 xml.print(rdr.getRank()+"  (bases "+rstart+" to "+rend+")");
                 xml.closeTag(REFERENCE_LOCATION_TAG);
                 
-                if (d.getAuthors()!=null) {
-                    xml.openTag(AUTHORS_GROUP_TAG);
-                    String[] auths = d.getAuthors().split("(,\\s+|\\s+and\\s+)");
-                    for (int i = 0; i < auths.length; i++) {
+                xml.openTag(AUTHORS_GROUP_TAG);
+                Set auths = d.getAuthorSet();
+                for (Iterator i = auths.iterator(); i.hasNext(); ) {
+                    DocRefAuthor a = (DocRefAuthor)i.next();
+                    if (!a.isConsortium()) {
                         xml.openTag(AUTHOR_TAG);
-                        xml.print(auths[i].trim());
+                        xml.print(a.getName());
                         xml.closeTag(AUTHOR_TAG);
+                        i.remove();
                     }
-                    xml.closeTag(AUTHORS_GROUP_TAG);
+                }
+                xml.closeTag(AUTHORS_GROUP_TAG);
+                if (!auths.isEmpty()) { // only consortia left in the set now
+                    DocRefAuthor a = (DocRefAuthor)auths.iterator().next(); // take the first one only
+                    xml.openTag(CONSORTIUM_TAG);
+                    xml.print(a.getName());
+                    xml.closeTag(CONSORTIUM_TAG);
                 }
                 
                 if (d.getTitle()!=null) {
@@ -659,7 +676,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     // database_identifier; primary_identifier; secondary_identifier....
                     String[] parts = val.split(";");
                     // construct a DBXREF out of the dbname part[0] and accession part[1]
-                    CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
+                    CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim(), new Integer(0)});
                     // assign remaining bits of info as annotations
                     for (int j = 2; j < parts.length; j++) {
                         Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j);
@@ -690,7 +707,9 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 else if (qName.equals(REFERENCE_LOCATION_TAG) && !this.parent.getElideReferences()) {
                     currRefLocation = val;
                 } else if (qName.equals(AUTHOR_TAG) && !this.parent.getElideReferences()) {
-                    currRefAuthors.add(val);
+                    currRefAuthors.add(new SimpleDocRefAuthor(val,false,false));
+                } else if (qName.equals(CONSORTIUM_TAG) && !this.parent.getElideReferences()) {
+                    currRefAuthors.add(new SimpleDocRefAuthor(val,true,false));
                 } else if (qName.equals(TITLE_TAG) && !this.parent.getElideReferences()) {
                     currRefTitle = val;
                 } else if (qName.equals(JOURNAL_TAG) && !this.parent.getElideReferences()) {
@@ -705,9 +724,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     int ref_rank;
                     int ref_start = -999;
                     int ref_end = -999;
-                    String regex = "^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?";
-                    Pattern p = Pattern.compile(regex);
-                    Matcher m = p.matcher(currRefLocation);
+                    Matcher m = refp.matcher(currRefLocation);
                     if (m.matches()) {
                         ref_rank = Integer.parseInt(m.group(1));
                         if(m.group(2) != null){
@@ -720,29 +737,23 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     } else {
                         throw new ParseException("Bad reference line found: "+currRefLocation);
                     }
-                    // rest can be in any order
-                    String authors = "";
-                    for (Iterator j = currRefAuthors.iterator(); j.hasNext();) {
-                        authors+=(String)j.next();
-                        if (j.hasNext()) authors+=", ";
-                    }
                     // create the pubmed crossref and assign to the bioentry
                     CrossRef pcr = null;
                     if (currRefPubmed!=null) {
-                        pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, currRefPubmed});
+                        pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, currRefPubmed, new Integer(0)});
                         RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
                         rlistener.setRankedCrossRef(rpcr);
                     }
                     // create the medline crossref and assign to the bioentry
                     CrossRef mcr = null;
                     if (currRefMedline!=null) {
-                        mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, currRefMedline});
+                        mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, currRefMedline, new Integer(0)});
                         RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
                         rlistener.setRankedCrossRef(rmcr);
                     }
                     // create the docref object
                     try {
-                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,currRefJournal});
+                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefJournal, new Integer(0)});
                         if (currRefTitle!=null) dr.setTitle(currRefTitle);
                         // assign either the pubmed or medline to the docref - medline gets priority
                         if (mcr!=null) dr.setCrossref(mcr);
@@ -774,9 +785,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     currFeatQual = val;
                 } else if (qName.equals(FEATUREQUAL_VALUE_TAG) && !this.parent.getElideFeatures()) {
                     if (currFeatQual.equals("db_xref")) {
-                        String regex = "^(\\S+?):(\\S+)$";
-                        Pattern p = Pattern.compile(regex);
-                        Matcher m = p.matcher(val);
+                        Matcher m = dbxp.matcher(val);
                         if (m.matches()) {
                             String dbname = m.group(1);
                             String raccession = m.group(2);
@@ -791,7 +800,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                                 }
                             } else {
                                 try {
-                                    CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession});
+                                    CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession, new Integer(0)});
                                     RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
                                     rlistener.getCurrentFeature().addRankedCrossRef(rcr);
                                 } catch (ChangeVetoException e) {

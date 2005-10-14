@@ -44,6 +44,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Comment;
 import org.biojavax.CrossRef;
 import org.biojavax.DocRef;
+import org.biojavax.DocRefAuthor;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
@@ -57,6 +58,7 @@ import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.SimpleDocRefAuthor;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
@@ -92,8 +94,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String REFERENCE_POSITION_TAG = "RP";
     protected static final String REFERENCE_XREF_TAG = "RX";
     protected static final String AUTHORS_TAG = "RA";
+    protected static final String CONSORTIUM_TAG = "RG";
     protected static final String TITLE_TAG = "RT";
-    protected static final String JOURNAL_TAG = "RL";
+    protected static final String LOCATOR_TAG = "RL";
     protected static final String REMARK_TAG = "RC";
     protected static final String KEYWORDS_TAG = "KW";
     protected static final String COMMENT_TAG = "CC";
@@ -105,10 +108,23 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String DELIMITER_TAG = "XX";
     protected static final String END_SEQUENCE_TAG = "//";
     
+    // the date pattern
+    // date (Rel. N, Created)
+    // date (Rel. N, Last updated, Version 10)
+    protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)\\d]+)\\d*\\)$");
+    // locus line
+    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+standard;\\s+(circular)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$");
+    // version line
+    protected static final Pattern vp = Pattern.compile("^(\\S+?)\\.(\\d+)$");
+    // reference position line
+    protected static final Pattern rpp = Pattern.compile("^(\\d+)(-(\\d+))?$");
+    // dbxref line
+    protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
+    
     /**
      * Implements some EMBL-specific terms.
      */
-    public static class Terms extends RichSequenceFormat.Terms {
+    public static class Terms extends RichSequence.Terms {
         private static ComparableTerm EMBL_TERM = null;
         
         /**
@@ -150,11 +166,6 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
         rlistener.setNamespace(ns);
         
-        // the date pattern
-        // date (Rel. N, Created)
-        // date (Rel. N, Last updated, Version 10)
-        Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)\\d]+)\\d*\\)$");
-        
         // Get an ordered list of key->value pairs in array-tuples
         String sectionKey = null;
         NCBITaxon tax = null;
@@ -172,9 +183,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             if (sectionKey.equals(LOCUS_TAG)) {
                 // entryname  dataclass; [circular] molecule; division; sequencelength BP.
                 String loc = ((String[])section.get(0))[1];
-                String regex = "^(\\S+)\\s+standard;\\s+(circular)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$";
-                Pattern p = Pattern.compile(regex);
-                Matcher m = p.matcher(loc);
+                Matcher m = lp.matcher(loc);
                 if (m.matches()) {
                     rlistener.setName(m.group(1));
                     rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
@@ -222,24 +231,26 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             } else if (sectionKey.equals(VERSION_TAG)) {
                 String ver = ((String[])section.get(0))[1];
-                String regex = "^(\\S+?)\\.(\\d+)$";
-                Pattern p = Pattern.compile(regex);
-                Matcher m = p.matcher(ver);
+                Matcher m = vp.matcher(ver);
                 if (m.matches()) {
                     rlistener.setVersion(Integer.parseInt(m.group(2)));
                 } else {
                     throw new ParseException("Bad version line found: "+ver);
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
-                String[] kws = ((String[])section.get(0))[1].split(";");
+                String val = ((String[])section.get(0))[1];
+                val = val.substring(0,val.length()-1); // chomp dot
+                String[] kws = val.split(";");
                 for (int i = 1; i < kws.length; i++) {
                     rlistener.addSequenceProperty(Terms.getKeywordTerm(), kws[i].trim());
                 }
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
+                String val = ((String[])section.get(0))[1];
+                val = val.substring(0,val.length()-1); // chomp dot
                 // database_identifier; primary_identifier; secondary_identifier....
-                String[] parts = ((String[])section.get(0))[1].split(";");
+                String[] parts = val.split(";");
                 // construct a DBXREF out of the dbname part[0] and accession part[1]
-                CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim()});
+                CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim(), new Integer(0)});
                 // assign remaining bits of info as annotations
                 for (int j = 2; j < parts.length; j++) {
                     Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j);
@@ -260,9 +271,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 int ref_start = -999;
                 int ref_end = -999;
                 // rest can be in any order
+                String consortium = null;
                 String authors = null;
                 String title = null;
-                String journal = null;
+                String locator = null;
                 String pubmed = null;
                 String medline = null;
                 String doi = null;
@@ -270,9 +282,24 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 for (int i = 1; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
-                    if (key.equals(AUTHORS_TAG)) authors = val;
-                    if (key.equals(TITLE_TAG)) title = val;
-                    if (key.equals(JOURNAL_TAG)) journal = val;
+                    if (key.equals(AUTHORS_TAG)) {
+                        val = val.substring(0,val.length()-1); // chomp semicolon
+                        authors = val;
+                    }
+                    if (key.equals(CONSORTIUM_TAG)) {
+                        val = val.substring(0,val.length()-1); // chomp semicolon
+                        consortium = val;
+                    }
+                    if (key.equals(TITLE_TAG)) {
+                        if (title.length()>1) {
+                            val = val.substring(1,val.length()-3); // chomp semicolon + quotes
+                            title = val;
+                        } else title=null; // single semi-colon indicates no title
+                    }
+                    if (key.equals(LOCATOR_TAG)) {
+                        val = val.substring(0,val.length()-1); // chomp dot
+                        locator = val;
+                    }
                     if (key.equals(REFERENCE_XREF_TAG)) {
                         // database_identifier; primary_identifier.
                         String[] refs = val.split("\\.");
@@ -290,9 +317,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     if (key.equals(REFERENCE_POSITION_TAG)) {
                         // only the first group is taken
                         // if we have multiple lines, only the last line is taken
-                        String regex = "^(\\d+)(-(\\d+))?$";
-                        Pattern p = Pattern.compile(regex);
-                        Matcher m = p.matcher(val);
+                        Matcher m = rpp.matcher(val);
                         if (m.matches()) {
                             ref_start = Integer.parseInt(m.group(1));
                             if(m.group(2) != null)
@@ -305,27 +330,29 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 // create the pubmed crossref and assign to the bioentry
                 CrossRef pcr = null;
                 if (pubmed!=null) {
-                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed});
+                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed, new Integer(0)});
                     RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
                     rlistener.setRankedCrossRef(rpcr);
                 }
                 // create the medline crossref and assign to the bioentry
                 CrossRef mcr = null;
                 if (medline!=null) {
-                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline});
+                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline, new Integer(0)});
                     RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
                     rlistener.setRankedCrossRef(rmcr);
                 }
                 // create the doi crossref and assign to the bioentry
                 CrossRef dcr = null;
                 if (doi!=null) {
-                    dcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.DOI_KEY, doi});
+                    dcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.DOI_KEY, doi, new Integer(0)});
                     RankedCrossRef rdcr = new SimpleRankedCrossRef(dcr, 0);
                     rlistener.setRankedCrossRef(rdcr);
                 }
                 // create the docref object
                 try {
-                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,journal});
+                    Set authSet = DocRefAuthor.Tools.parseAuthorString(authors);
+                    if (consortium!=null) authSet.add(new SimpleDocRefAuthor(consortium, true, false));
+                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authSet,locator});
                     if (title!=null) dr.setTitle(title);
                     // assign either the pubmed or medline to the docref - medline gets priority, then pubmed, then doi
                     if (mcr!=null) dr.setCrossref(mcr);
@@ -357,9 +384,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                         val = val.replaceAll("\"","").trim(); // strip quotes
                         // parameter on old feature
                         if (key.equals("db_xref")) {
-                            String regex = "^(\\S+?):(\\S+)$";
-                            Pattern p = Pattern.compile(regex);
-                            Matcher m = p.matcher(val);
+                            Matcher m = dbxp.matcher(val);
                             if (m.matches()) {
                                 String dbname = m.group(1);
                                 String raccession = m.group(2);
@@ -374,7 +399,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                                     }
                                 } else {
                                     try {
-                                        CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession});
+                                        CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession, new Integer(0)});
                                         RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
                                         rlistener.getCurrentFeature().addRankedCrossRef(rcr);
                                     } catch (ChangeVetoException e) {
@@ -702,7 +727,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             }
         }
         if (keywords!=null) {
-            StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords, 5, this.getLineWidth(), null, KEYWORDS_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords+".", 5, this.getLineWidth(), null, KEYWORDS_TAG, this.getPrintStream());
             this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         
@@ -730,9 +755,16 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             StringTools.writeKeyValueLine(REFERENCE_POSITION_TAG, rstart+"-"+rend, 5, this.getLineWidth(), null, REFERENCE_POSITION_TAG, this.getPrintStream());
             CrossRef c = d.getCrossref();
             if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(AUTHORS_TAG, d.getAuthors(), 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(TITLE_TAG, d.getTitle(), 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(JOURNAL_TAG, d.getLocation(), 5, this.getLineWidth(), null, JOURNAL_TAG, this.getPrintStream());
+            Set auths = d.getAuthorSet();
+            for (Iterator j = auths.iterator(); j.hasNext(); ) {
+                DocRefAuthor a = (DocRefAuthor)j.next();
+                if (a.isConsortium()) StringTools.writeKeyValueLine(CONSORTIUM_TAG, a+";", 5, this.getLineWidth(), null, CONSORTIUM_TAG, this.getPrintStream());
+                else j.remove();
+            }
+            if (!auths.isEmpty()) StringTools.writeKeyValueLine(AUTHORS_TAG, DocRefAuthor.Tools.generateAuthorString(auths)+";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
+            if (d.getTitle()!=null && !d.getTitle().equals("")) StringTools.writeKeyValueLine(TITLE_TAG, "\""+d.getTitle()+"\";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
+            else StringTools.writeKeyValueLine(TITLE_TAG, ";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(LOCATOR_TAG, d.getLocation()+".", 5, this.getLineWidth(), null, LOCATOR_TAG, this.getPrintStream());
             this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         

@@ -20,6 +20,7 @@
 
 package org.biojavax;
 
+import java.util.Set;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
@@ -96,13 +97,21 @@ public interface DocRef extends Comparable,Changeable {
     public void setTitle(String title) throws ChangeVetoException;
     
     /**
-     * Returns the authors of the document reference. This field is 
-     * immutable so should be set using the constructor of the implementing class.
+     * Returns the authors of the document reference. 
      * It will usually be in the form "Jones H., Bloggs J et al" or similar -
-     * a human-readable text value.
+     * a human-readable text value. Editors will have (ed.) appended, 
+     * consortiums will have (consortium) appended.
      * @return Value of property authors.
      */
     public String getAuthors();
+    
+    /**
+     * Returns the authors of the document reference as a set of DocRefAuthor
+     * implementation instances. This field is immutable so should be set using 
+     * the constructor of the implementing class.
+     * @return The set of authors.
+     */
+    public Set getAuthorSet();
     
     /**
      * Returns a CRC64 checksum of this document reference, allowing for easy
