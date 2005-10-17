@@ -99,12 +99,12 @@ public class SmithWaterman extends NeedlemanWunsch
         G[0][0] = scoreMatrix[0][0] = 0;
         E[0][0] = F[0][0]   = Double.NEGATIVE_INFINITY;
         for (i=1; i<=query.length();   i++) {
-          scoreMatrix[i][0]  = scoreMatrix[i-1][0] + delete;
+          scoreMatrix[i][0] = scoreMatrix[i-1][0] + delete;
           G[i][0] = E[i][0] = Double.NEGATIVE_INFINITY;
           F[i][0] = delete;
         }
         for (j=1; j<=subject.length(); j++) {
-          scoreMatrix[0][j]  = scoreMatrix[0][j-1] + insert;
+          scoreMatrix[0][j] = scoreMatrix[0][j-1] + insert;
           G[0][j] = F[0][j] = Double.NEGATIVE_INFINITY;
           E[0][j] = insert;
         }
@@ -125,13 +125,6 @@ public class SmithWaterman extends NeedlemanWunsch
             F[i][j] = Math.max(F[i-1][j], scoreMatrix[i-1][j] + delete) + gapExt;
             scoreMatrix[i][j] = max(0, E[i][j], F[i][j], G[i][j]);
             
-            if (scoreMatrix[i-1][j] < Math.min(scoreMatrix[i][j-1], scoreMatrix[i-1][j-1]))
-              scoreMatrix[i-1][j] = Double.NEGATIVE_INFINITY;
-            if (scoreMatrix[i][j-1] < Math.min(scoreMatrix[i-1][j], scoreMatrix[i-1][j-1]))
-              scoreMatrix[i][j-1] = Double.NEGATIVE_INFINITY;
-            if (scoreMatrix[i-1][j-1] < Math.max(scoreMatrix[i-1][j], scoreMatrix[i][j-1]))
-              scoreMatrix[i-1][j-1] = Double.NEGATIVE_INFINITY;
-            
             if (scoreMatrix[i][j] > scoreMatrix[maxI][maxJ]) {
               maxI = i;
               maxJ = j;
@@ -140,8 +133,8 @@ public class SmithWaterman extends NeedlemanWunsch
         //System.out.println(printCostMatrix(G, query.seqString().toCharArray(), subject.seqString().toCharArray()));
       
       /*
-      * No affine gap penalties to save memory.
-      */
+       * No affine gap penalties to save memory.
+       */
       } else {
               
         for (i=0; i<=query.length();   i++) scoreMatrix[i][0] = 0;
@@ -164,13 +157,6 @@ public class SmithWaterman extends NeedlemanWunsch
               scoreMatrix[i-1][j-1] + matchReplace
             );
                         
-            if (scoreMatrix[i-1][j] < Math.min(scoreMatrix[i][j-1], scoreMatrix[i-1][j-1]))
-              scoreMatrix[i-1][j] = Double.NEGATIVE_INFINITY;
-            if (scoreMatrix[i][j-1] < Math.min(scoreMatrix[i-1][j], scoreMatrix[i-1][j-1]))
-              scoreMatrix[i][j-1] = Double.NEGATIVE_INFINITY;
-            if (scoreMatrix[i-1][j-1] < Math.max(scoreMatrix[i-1][j], scoreMatrix[i][j-1]))
-              scoreMatrix[i-1][j-1] = Double.NEGATIVE_INFINITY;
-        
             if (scoreMatrix[i][j] > scoreMatrix[maxI][maxJ]) {
               maxI = i;
               maxJ = j;
@@ -191,7 +177,7 @@ public class SmithWaterman extends NeedlemanWunsch
         SymbolTokenization st = query.getAlphabet().getTokenization("default");
     
         j = maxJ;
-        for (i=maxI; (i>0) && (scoreMatrix[i][j] != Double.NEGATIVE_INFINITY); ) {
+        for (i=maxI; i>0; ) {
           do {
             // only Deletes or Inserts or Replaces possible. That's not what we want to have.
             if ((i == 0) || (j == 0) || (scoreMatrix[i][j] == 0)) {
@@ -199,21 +185,6 @@ public class SmithWaterman extends NeedlemanWunsch
               targetStart = j;
               i = j = 0;
             
-            // Nothing is possible anymore.
-            } else if ((scoreMatrix[i][j-1]   == scoreMatrix[i-1][j]) && 
-                       (scoreMatrix[i-1][j-1] == scoreMatrix[i-1][j]) && 
-                       (scoreMatrix[i-1][j]   == Double.NEGATIVE_INFINITY)) {
-              
-              if (query.symbolAt(i) == subject.symbolAt(j)) path = '|' + path;
-              else path = ' ' + path;
-              
-              align[0] = st.tokenizeSymbol(query.symbolAt(i))   + align[0];
-              align[1] = st.tokenizeSymbol(subject.symbolAt(j)) + align[1];
-              
-              queryStart  = i;
-              targetStart = j;
-              i = j = 0;
-          
             // Insert
             } else if (scoreMatrix[i][j-1] > Math.max(scoreMatrix[i-1][j-1], scoreMatrix[i-1][j])) {
               align[0] = '-' + align[0];
@@ -235,7 +206,7 @@ public class SmithWaterman extends NeedlemanWunsch
               align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
             }
 
-          } while ((j>0) && (scoreMatrix[i][j] != Double.NEGATIVE_INFINITY));
+          } while (j>0);
         }
 
         // this is necessary to have a value for the getEditDistance method.
@@ -260,8 +231,8 @@ public class SmithWaterman extends NeedlemanWunsch
         pairalign = new SimpleAlignment(m);
 
         /*
-        * Construct the output with only 60 symbols in each line.
-        */
+         * Construct the output with only 60 symbols in each line.
+         */
         this.alignment = formatOutput(
           query.getName(), 
           subject.getName(), 
