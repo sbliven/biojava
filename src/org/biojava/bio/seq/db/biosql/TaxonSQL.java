@@ -104,7 +104,7 @@ public class TaxonSQL {
      * @return the corresponding Taxon (which may have already been
      * present in memory after an earlier retrieval).
      */
-    private static Taxon getDBTaxon(Connection conn, int taxon_id) throws SQLException, ChangeVetoException 
+    public static Taxon getDBTaxon(Connection conn, int taxon_id) throws SQLException, ChangeVetoException 
     {
       PreparedStatement statement = null;
       ResultSet rs = null;
@@ -412,7 +412,7 @@ public class TaxonSQL {
 
 
     /** Attempt to close the Statement. Continue on if there is a problem during the close. */
-    private static void attemptClose(Statement statement) 
+    public static void attemptClose(Statement statement) 
     {
       if (statement != null) try {
         statement.close();
@@ -423,7 +423,7 @@ public class TaxonSQL {
 
 
     /** Attempt to close the ResultSet. Continue on if there is a problem during the close. */
-    private static void attemptClose(ResultSet resultset) 
+    public static void attemptClose(ResultSet resultset) 
     {
       if (resultset != null) try {
         resultset.close();
