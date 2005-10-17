@@ -59,6 +59,9 @@ import org.biojavax.bio.seq.Position;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.io.UniProtCommentParser.Event;
+import org.biojavax.bio.seq.io.UniProtCommentParser.Interaction;
+import org.biojavax.bio.seq.io.UniProtCommentParser.Isoform;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.ComparableTerm;
@@ -153,11 +156,14 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     protected static final String COMMENT_LINK_TAG = "link";
     protected static final String COMMENT_LINK_URI_ATTR = "uri";
     protected static final String COMMENT_EVENT_TAG = "event";
-    protected static final String COMMENT_EVENT_ISOFORMS_TAG = "namedIsoforms";
+    protected static final String COMMENT_EVENT_ISOFORMS_ATTR = "namedIsoforms";
     protected static final String COMMENT_ISOFORM_TAG = "isoform";
+    protected static final String COMMENT_ISOFORM_ID_TAG = "id";
+    protected static final String COMMENT_ISOFORM_NAME_TAG = "name";
     protected static final String COMMENT_INTERACTANT_TAG = "interactant";
     protected static final String COMMENT_INTERACT_INTACT_ATTR = "intactId";
-    protected static final String COMMENT_INTERACT_LABEL_ATTR = "label";
+    protected static final String COMMENT_INTERACT_ID_TAG = "id";
+    protected static final String COMMENT_INTERACT_LABEL_TAG = "label";
     protected static final String COMMENT_ORGANISMS_TAG = "organismsDiffer";
     protected static final String COMMENT_EXPERIMENTS_TAG = "experiments";
     protected static final String COMMENT_TEXT_TAG = "text";
@@ -745,7 +751,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 xml.closeTag(TITLE_TAG);
             }
             
-            Set auths = dr.getAuthorSet();
+            List auths = dr.getAuthorList();
             xml.openTag(EDITOR_LIST_TAG);
             for (Iterator j = auths.iterator(); j.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)j.next();
@@ -901,6 +907,126 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     xml.closeTag(LOCATION_END_TAG);
                     xml.closeTag(LOCATION_TAG);
                 }
+                // interaction
+                else if (type.equals(UniProtCommentParser.INTERACTION)) {
+                    // UniProt flat allows for multiple interactions per comment, but
+                    // UniProtXML only allows for a single one. So, we have to open/close
+                    // and write additional comments as necessary.
+                    for (Iterator j = ucp.getInteractions().iterator(); j.hasNext(); ) {
+                        // process comment
+                        Interaction interact = (Interaction)j.next();
+                        
+                        xml.openTag(COMMENT_INTERACTANT_TAG);
+                        xml.attribute(COMMENT_INTERACT_INTACT_ATTR,interact.getFirstIntActID());
+                        xml.closeTag(COMMENT_INTERACTANT_TAG);
+                        
+                        xml.openTag(COMMENT_INTERACTANT_TAG);
+                        xml.attribute(COMMENT_INTERACT_INTACT_ATTR,interact.getSecondIntActID());
+                        xml.openTag(COMMENT_INTERACT_ID_TAG);
+                        xml.print(interact.getID());
+                        xml.closeTag(COMMENT_INTERACT_ID_TAG);
+                        if (interact.getLabel()!=null) {
+                            xml.openTag(COMMENT_INTERACT_LABEL_TAG);
+                            xml.print(interact.getLabel());
+                            xml.closeTag(COMMENT_INTERACT_LABEL_TAG);
+                        }
+                        xml.closeTag(COMMENT_INTERACTANT_TAG);
+                        
+                        xml.openTag(COMMENT_ORGANISMS_TAG);
+                        xml.print(interact.isOrganismsDiffer()?"true":"false");
+                        xml.closeTag(COMMENT_ORGANISMS_TAG);
+                        
+                        xml.openTag(COMMENT_EXPERIMENTS_TAG);
+                        xml.print(""+interact.getNumberExperiments());
+                        xml.closeTag(COMMENT_EXPERIMENTS_TAG);
+                        
+                        // if has next, close and open next comment tag
+                        if (j.hasNext()) {
+                            xml.closeTag(COMMENT_TAG);
+                            xml.openTag(COMMENT_TAG);
+                            xml.attribute(TYPE_ATTR,xtype);
+                        }
+                    }
+                }
+                // alternative products
+                else if (type.equals(UniProtCommentParser.ALTERNATIVE_PRODUCTS)) {
+                    for (Iterator j = ucp.getEvents().iterator(); j.hasNext(); ) {
+                        Event event = (Event)j.next();
+                        xml.openTag(COMMENT_EVENT_TAG);
+                        xml.attribute(TYPE_ATTR,event.getType().toLowerCase());
+                        if (event.getType().equals("Alternative splicing")) xml.attribute(COMMENT_EVENT_ISOFORMS_ATTR,""+event.getNamedIsoforms());
+                        xml.print(event.getComment());
+                        xml.closeTag(COMMENT_EVENT_TAG);
+                    }
+                    for (Iterator j = ucp.getIsoforms().iterator(); j.hasNext(); ) {
+                        Isoform isoform = (Isoform)j.next();
+                        xml.openTag(COMMENT_ISOFORM_TAG);
+                        for (Iterator k = isoform.getIsoIDs().iterator(); k.hasNext(); ) {
+                            xml.openTag(COMMENT_ISOFORM_ID_TAG);
+                            xml.print((String)k.next());
+                            xml.closeTag(COMMENT_ISOFORM_ID_TAG);
+                        }
+                        for (Iterator k = isoform.getNames().iterator(); k.hasNext(); ) {
+                            xml.openTag(COMMENT_ISOFORM_NAME_TAG);
+                            xml.print((String)k.next());
+                            xml.closeTag(COMMENT_ISOFORM_NAME_TAG);
+                        }
+                        xml.openTag(SEQUENCE_TAG);
+                        xml.attribute(TYPE_ATTR,isoform.getSequenceType().toLowerCase());
+                        if (isoform.getSequenceType().equals("Described")) {
+                            xml.attribute(REF_ATTR,isoform.getSequenceRef());
+                        }
+                        xml.closeTag(SEQUENCE_TAG);
+                        xml.openTag(NOTE_TAG);
+                        xml.print(isoform.getNote());
+                        xml.closeTag(NOTE_TAG);
+                    }
+                }
+                // biophysicoblahblah stuff
+                else if (type.equals(UniProtCommentParser.BIOPHYSICOCHEMICAL_PROPERTIES)) {
+                    if (ucp.getAbsorptionNote()!=null) {
+                        xml.openTag(COMMENT_ABSORPTION_TAG);
+                        xml.openTag(COMMENT_ABS_MAX_TAG);
+                        xml.print(ucp.getAbsorptionMax());
+                        xml.closeTag(COMMENT_ABS_MAX_TAG);
+                        xml.openTag(COMMENT_TEXT_TAG);
+                        xml.print(ucp.getAbsorptionNote());
+                        xml.closeTag(COMMENT_TEXT_TAG);
+                        xml.closeTag(COMMENT_ABSORPTION_TAG);
+                    }
+                    if (ucp.getKineticsNote()!=null) {
+                        xml.openTag(COMMENT_KINETICS_TAG);
+                        for (Iterator j = ucp.getKMs().iterator(); j.hasNext(); ) {
+                            xml.openTag(COMMENT_KIN_KM_TAG);
+                            xml.print((String)j.next());
+                            xml.closeTag(COMMENT_KIN_KM_TAG);
+                        }
+                        for (Iterator j = ucp.getVMaxes().iterator(); j.hasNext(); ) {
+                            xml.openTag(COMMENT_KIN_VMAX_TAG);
+                            xml.print((String)j.next());
+                            xml.closeTag(COMMENT_KIN_VMAX_TAG);
+                        }
+                        xml.openTag(COMMENT_TEXT_TAG);
+                        xml.print(ucp.getKineticsNote());
+                        xml.closeTag(COMMENT_TEXT_TAG);
+                        xml.closeTag(COMMENT_KINETICS_TAG);
+                    }
+                    if (ucp.getPHDependence()!=null) {
+                        xml.openTag(COMMENT_PH_TAG);
+                        xml.print(ucp.getPHDependence());
+                        xml.closeTag(COMMENT_PH_TAG);
+                    }
+                    if (ucp.getRedoxPotential()!=null) {
+                        xml.openTag(COMMENT_REDOX_TAG);
+                        xml.print(ucp.getRedoxPotential());
+                        xml.closeTag(COMMENT_REDOX_TAG);
+                    }
+                    if (ucp.getTemperatureDependence()!=null) {
+                        xml.openTag(COMMENT_TEMPERATURE_TAG);
+                        xml.print(ucp.getTemperatureDependence());
+                        xml.closeTag(COMMENT_TEMPERATURE_TAG);
+                    }
+                }
                 // all other comments
                 else {
                     
@@ -928,16 +1054,164 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             CrossRef cr = rcr.getCrossRef();
             
             xml.openTag(DBXREF_TAG);
-            xml.attribute(TYPE_ATTR,cr.getDbname());
+            String dbname = cr.getDbname();
+            xml.attribute(TYPE_ATTR,dbname);
+            dbname = dbname.toUpperCase(); // for comparison's sake
             xml.attribute(ID_ATTR,cr.getAccession());
             xml.attribute(KEY_ATTR,""+(key++));
             if (!cr.getNoteSet().isEmpty()) {
+                int acccount = 2;
                 for (Iterator j = cr.getNoteSet().iterator(); j.hasNext(); ) {
                     Note n = (Note)j.next();
-                    xml.openTag(PROPERTY_TAG);
-                    xml.attribute(TYPE_ATTR,n.getTerm().getName());
-                    xml.attribute(VALUE_ATTR,n.getValue());
-                    xml.closeTag(PROPERTY_TAG);
+                    if (!n.getValue().equals("-") && n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
+                        xml.openTag(PROPERTY_TAG);
+                        String name = n.getTerm().getName();
+                        if (acccount==2) {
+                            // SECONDARY IDENTIFIER
+                            if (dbname.equals("HIV") ||
+                                    dbname.equals("INTERPRO") ||
+                                    dbname.equals("PANTHER") ||
+                                    dbname.equals("PFAM") ||
+                                    dbname.equals("PIR") ||
+                                    dbname.equals("PRINTS") ||
+                                    dbname.equals("PRODOM") ||
+                                    dbname.equals("REBASE") ||
+                                    dbname.equals("SMART") ||
+                                    dbname.equals("TIGRFAMS")) {
+                                // the secondary identifier is the entry name.
+                                name = "entry name";
+                            } else if (dbname.equals("PDB")) {
+                                // the secondary identifier is the structure determination method, which is controlled vocabulary that currently includes: X-ray(for X-ray crystallography), NMR(for NMR spectroscopy), EM(for electron microscopy and cryo-electron diffraction), Fiber(for fiber diffraction), IR(for infrared spectroscopy), Model(for predicted models) and Neutron(for neutron diffraction).
+                                name = "structure determination method";
+                            } else if (dbname.equals("DICTYBASE") ||
+                                    dbname.equals("ECOGENE") ||
+                                    dbname.equals("FLYBASE") ||
+                                    dbname.equals("HGNC") ||
+                                    dbname.equals("MGI") ||
+                                    dbname.equals("RGD") ||
+                                    dbname.equals("SGD") ||
+                                    dbname.equals("STYGENE") ||
+                                    dbname.equals("SUBTILIST") ||
+                                    dbname.equals("WORMBASE") ||
+                                    dbname.equals("ZFIN")) {
+                                // the secondary identifier is the gene designation. If the gene designation is not available, a dash('-') is used.
+                                name = "gene designation";
+                            } else if (dbname.equals("GO")) {
+                                // the second identifier is a 1-letter abbreviation for one of the 3 ontology aspects, separated from the GO term by a column. If the term is longer than 46 characters, the first 43 characters are indicated followed by 3 dots('...'). The abbreviations for the 3 distinct aspects of the ontology are P(biological Process), F(molecular Function), and C(cellular Component).
+                                name = "term";
+                            } else if (dbname.equals("HAMAP")) {
+                                // the secondary identifier indicates if a domain is 'atypical' and/or 'fused', otherwise the field is empty('-').
+                                name = "domain";
+                            } else if (dbname.equals("ECO2DBASE")) {
+                                // the secondary identifier is the latest release number or edition of the database that has been used to derive the cross-reference.
+                                name = "release number";
+                            } else if (dbname.equals("SWISS-2DPAGE") ||
+                                    dbname.equals("HSC-2DPAGE")) {
+                                // the secondary identifier is the species or tissue of origin.
+                                name = "organism name";
+                            } else if (dbname.equals("ENSEMBL")) {
+                                // the secondary identifier is the species of origin.
+                                name = "organism name";
+                            } else if (dbname.equals("PIRSF")) {
+                                // the secondary identifier is the protein family name.
+                                name = "protein family name";
+                            } else if (dbname.equals("AARHUS") ||
+                                    dbname.equals("GHENT-2DPAGE")) {
+                                // the secondary identifier is either 'IEF' (for isoelectric focusing) or 'NEPHGE' (for non-equilibrium pH gradient electrophoresis).
+                                name = "secondary identifier";
+                            } else if (dbname.equals("WORMPEP")) {
+                                // the secondary identifier is a number attributed by the C.elegans genome-sequencing project to that protein.
+                                name = "C.elegans number";
+                            } else if (dbname.equals("AGD") ||
+                                    dbname.equals("ANU-2DPAGE") ||
+                                    dbname.equals("COMPLUYEAST-2DPAGE") ||
+                                    dbname.equals("ECHOBASE") ||
+                                    dbname.equals("GENEDB_SPOMBE") ||
+                                    dbname.equals("GERMONLINE") ||
+                                    dbname.equals("GLYCOSUITEDB") ||
+                                    dbname.equals("GRAMENE") ||
+                                    dbname.equals("H-INVDB") ||
+                                    dbname.equals("INTACT") ||
+                                    dbname.equals("LEGIOLIST") ||
+                                    dbname.equals("LEPROMA") ||
+                                    dbname.equals("LISTILIST") ||
+                                    dbname.equals("MAIZEDB") ||
+                                    dbname.equals("MEROPS") ||
+                                    dbname.equals("MIM") ||
+                                    dbname.equals("MYPULIST") ||
+                                    dbname.equals("OGP") ||
+                                    dbname.equals("PHCI-2DPAGE") ||
+                                    dbname.equals("PHOSSITE") ||
+                                    dbname.equals("PHOTOLIST") ||
+                                    dbname.equals("PMMA-2DPAGE") ||
+                                    dbname.equals("RAT-HEART-2DPAGE") ||
+                                    dbname.equals("REACTOME") ||
+                                    dbname.equals("SAGALIST") ||
+                                    dbname.equals("SIENA-2DPAGE") ||
+                                    dbname.equals("TAIR") ||
+                                    dbname.equals("TIGR") ||
+                                    dbname.equals("TRANSFAC") ||
+                                    dbname.equals("TUBERCULIST")) {
+                                // the secondary identifier is not used and a dash('-') is stored in that field.
+                                // should never get here - I hope!
+                            } else if (dbname.equals("HSSP")) {
+                                // the secondary identifier is the entry name of the PDB structure related to that of the entry in which the HSSP cross-reference is present.
+                                name = "entry name";
+                            } else if (dbname.equals("GENEFARM")) {
+                                // the secondary identifier is the gene family identifier. If the gene family identifier is not available, a dash('-') is used.
+                                name = "gene family";
+                            } else if (dbname.equals("SMR")) {
+                                // the secondary identifier indicates the range(s) relevant to the structure model(s).
+                                name = "range";
+                            } else if (dbname.equals("EMBL") ||
+                                    dbname.equals("DDBJ") ||
+                                    dbname.equals("GENBANK")) {
+                                // PROTEIN_ID; STATUS_IDENTIFIER; MOLECULE_TYPE
+                                name = "protein id";
+                            } else if (dbname.equals("PROSITE")) {
+                                // ENTRY_NAME; STATUS.
+                                name = "entry name";
+                            }
+                        } else if (acccount==3) {
+                            // TERTIARY IDENTIFIER
+                            if (dbname.equals("HAMAP") ||
+                                    dbname.equals("PANTHER") ||
+                                    dbname.equals("PFAM") ||
+                                    dbname.equals("PIRSF") ||
+                                    dbname.equals("PRODOM") ||
+                                    dbname.equals("SMART") ||
+                                    dbname.equals("TIGRFAMS")) {
+                                // the tertiary identifier is the number of hits found in the sequence.
+                                name = "number of hits";
+                            } else if (dbname.equals("GO")) {
+                                // the tertiary identifier is a 3-character GO evidence code. The meaning of the evidence codes is: IDA=inferred from direct assay, IMP=inferred from mutant phenotype, IGI=inferred from genetic interaction, IPI=inferred from physical interaction, IEP=inferred from expression pattern, TAS=traceable author statement, NAS=non-traceable author statement, IC=inferred by curator, ISS=inferred from sequence or structural similarity.
+                                name = "evidence";
+                            } else if (dbname.equals("PDB")) {
+                                // the tertiary identifier indicates the chain(s) and the corresponding range, of which the structure has been determined. If the range is unknown, a dash is given rather than the range positions(e.g. 'A/B=-.'), if the chains and the range is unknown, a dash is used.
+                                name = "chains";
+                            } else if (dbname.equals("EMBL") ||
+                                    dbname.equals("DDBJ") ||
+                                    dbname.equals("GENBANK")) {
+                                // PROTEIN_ID; STATUS_IDENTIFIER; MOLECULE_TYPE
+                                name = "status identifier";
+                            } else if (dbname.equals("PROSITE")) {
+                                // ENTRY_NAME; STATUS.
+                                name = "status";
+                            }          
+                        } else {
+                            // QUATERNARY AND ADDITIONAL 
+                            if (dbname.equals("EMBL") ||
+                                    dbname.equals("DDBJ") ||
+                                    dbname.equals("GENBANK")) {
+                                // PROTEIN_ID; STATUS_IDENTIFIER; MOLECULE_TYPE
+                                name = "molecule type";
+                            }   
+                        }
+                        xml.attribute(TYPE_ATTR,name);
+                        xml.attribute(VALUE_ATTR,n.getValue());
+                        xml.closeTag(PROPERTY_TAG);
+                        acccount++;
+                    }
                 }
             }
             xml.closeTag(DBXREF_TAG);
@@ -1075,7 +1349,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         return UNIPROTXML_FORMAT;
     }
     
-    // SAX event handler for parsing http://www.ebi.uniprot.org/support/docs/uniprot.xsd
+// SAX event handler for parsing http://www.ebi.uniprot.org/support/docs/uniprot.xsd
     private class UniProtXMLHandler extends DefaultHandler {
         
         private RichSequenceFormat parent;

@@ -121,7 +121,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     // date (Rel. N, Last annotation update)
     protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)]+)\\)$");
     // feature line
-    protected static final Pattern fp = Pattern.compile("^\\s*([\\d\\?<]+\\s+[\\d\\?>]+)(\\s+(\\S.*)\\.)?$");
+    protected static final Pattern fp = Pattern.compile("^\\s*([\\d?<]+\\s+[\\d?>]+)(\\s+(\\S.*)\\.*)?$");
     
     
     /**
@@ -316,14 +316,17 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 val = val.substring(0, val.length()-1); // chomp dot
                 String[] parts = val.split(";");
                 // construct a DBXREF out of the dbname part[0] and accession part[1]
-                CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim(), new Integer(0)});
-                // assign remaining bits of info as annotations
+                String dbname = parts[0].trim();
+                String acc = parts[1].trim();
+                CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname,acc,new Integer(0)});
+                // assign remaining bits of info as additional accession annotations
                 for (int j = 2; j < parts.length; j++) {
-                    Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j);
+                    ComparableTerm t = (ComparableTerm)Terms.getAdditionalAccessionTerm();
+                    Note note = new SimpleNote(t,parts[j].trim(),j);
                     try {
                         ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
                     } catch (ChangeVetoException ce) {
-                        ParseException pe = new ParseException("Could not annotate identifier terms");
+                        ParseException pe = new ParseException("Could not annotate additional accession terms");
                         pe.initCause(ce);
                         throw pe;
                     }
@@ -430,7 +433,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 // create the docref object
                 try {
-                    Set auths = DocRefAuthor.Tools.parseAuthorString(authors);
+                    List auths = DocRefAuthor.Tools.parseAuthorString(authors);
                     if (consortium!=null) auths.add(new SimpleDocRefAuthor(consortium,true,false));
                     DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{auths,locator});
                     if (title!=null) dr.setTitle(title);
@@ -461,7 +464,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 for (int i = 1 ; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
-                    val = val.trim().substring(0,val.length()-1); // chomp dot
+                    val = val.trim();
+                    val = val.substring(0,val.length()-1); // chomp dot
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
                         if (key.equals("FTId")) rlistener.addFeatureProperty(Terms.getFTIdTerm(),val);
@@ -985,7 +989,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             // Deal with RX and rest
             CrossRef c = d.getCrossref();
             if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname().toUpperCase()+"="+c.getAccession()+";", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
-            Set auths = d.getAuthorSet();
+            List auths = d.getAuthorList();
             for (Iterator j = auths.iterator(); j.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)j.next();
                 if (a.isConsortium()) {

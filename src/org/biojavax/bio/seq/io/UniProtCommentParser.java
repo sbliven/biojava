@@ -21,6 +21,9 @@
 
 package org.biojavax.bio.seq.io;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojavax.Comment;
 
@@ -118,6 +121,50 @@ CC         free_text;
 CC       Temperature dependence:
 CC         free_text;
              */
+            do {
+                String[] parts = c.split(";");
+                if (parts.length==1) {
+                    // we are one of the last three options on the list
+                    int firstColon = parts[0].indexOf(':');
+                    String key = parts[0].substring(0,firstColon).trim();
+                    String value = parts[0].substring(firstColon+1).trim();
+                    if (key.equals("pH dependence")) this.setPHDependence(value);
+                    else if (key.equals("Redox potential")) this.setRedoxPotential(value);
+                    else if (key.equals("Temperature dependence")) this.setTemperatureDependence(value);
+                    // skip to next chunk
+                    c = c.substring(c.indexOf(";")+1);
+                } else {
+                    // we are one of the first two options on the list
+                    int skippos = -1;
+                    String key = parts[0].split(":")[0].trim();
+                    if (key.equals("Absorption")) {
+                        String[] subparts = parts[0].split(":")[1].split("=");
+                        this.setAbsorptionMax(subparts[1].trim());
+                        subparts = parts[1].split("=");
+                        this.setAbsorptionNote(subparts[1].trim());
+                        skippos = 2;
+                    } else if (key.equals("Kinetic parameters")) {
+                        this.setKMs(new ArrayList());
+                        this.setVMaxes(new ArrayList());
+                        int partCount = 0;
+                        String[] subparts = parts[partCount].split(":")[1].split("=");
+                        key = subparts[0].trim();
+                        String value = subparts[1].trim();
+                        while (!key.equals("Note")) {
+                            if (key.equals("KM")) this.getKMs().add(value);
+                            else if (key.equals("VMax")) this.getVMaxes().add(value);
+                            subparts = parts[++partCount].split("=");
+                            key = subparts[0].trim();
+                            value = subparts[1].trim();
+                        }
+                        this.setKineticsNote(value);
+                    }
+                    // skip to next chunk
+                    int chunkpos = c.indexOf(parts[skippos]);
+                    c = c.substring(chunkpos);
+                }
+                c = c.trim();
+            } while (c.length()>0);
         } else if (this.getCommentType().equals(DATABASE)) {
             /*
 CC   -!- DATABASE: NAME=Text[; NOTE=Text][; WWW="Address"][; FTP="Address"].
@@ -125,13 +172,13 @@ CC   -!- DATABASE: NAME=Text[; NOTE=Text][; WWW="Address"][; FTP="Address"].
             c = c.substring(0,c.length()-1); // chomp trailing dot
             String[] parts = c.split(";");
             for (int i = 0; i < parts.length; i++) {
-                String key = parts[0].trim();
-                String value = parts[1].trim();
+                String[] subparts = parts[i].split("=");
+                String key = subparts[0].trim();
+                String value = subparts[1].trim();
                 if (key.equals("NAME")) this.setDatabaseName(value);
                 else if (key.equals("NOTE")) this.setNote(value);
                 else if (key.equals("WWW") || key.equals("FTP")) this.setUri(value);
             }
-            if (this.getDatabaseName()==null) throw new ParseException("Database name is missing");
         } else if (this.getCommentType().equals(MASS_SPECTROMETRY)) {
             /*
 CC   -!- MASS SPECTROMETRY: MW=XXX[; MW_ERR=XX]; METHOD=XX; RANGE=XX-XX[ (Name)]; NOTE={Free text (Ref.n)|Ref.n}.
@@ -139,8 +186,9 @@ CC   -!- MASS SPECTROMETRY: MW=XXX[; MW_ERR=XX]; METHOD=XX; RANGE=XX-XX[ (Name)]
             c = c.substring(0,c.length()-1); // chomp trailing dot
             String[] parts = c.split(";");
             for (int i = 0; i < parts.length; i++) {
-                String key = parts[0].trim();
-                String value = parts[1].trim();
+                String[] subparts = parts[i].split("=");
+                String key = subparts[0].trim();
+                String value = subparts[1].trim();
                 if (key.equals("MW")) this.setMolecularWeight(Integer.parseInt(value));
                 else if (key.equals("MW_ERR")) this.setMolWeightError(new Integer(value));
                 else if (key.equals("METHOD")) this.setMolWeightMethod(value);
@@ -151,13 +199,48 @@ CC   -!- MASS SPECTROMETRY: MW=XXX[; MW_ERR=XX]; METHOD=XX; RANGE=XX-XX[ (Name)]
                     this.setMolWeightRangeEnd(Integer.parseInt(locs[1]));
                 } else if (key.equals("NOTE")) this.setNote(value);
             }
-            if (this.getMolWeightMethod()==null) throw new ParseException("Method is missing");
-            if (this.getNote()==null) throw new ParseException("Note is missing");
         } else if (this.getCommentType().equals(INTERACTION)) {
             /*
 CC   -!- INTERACTION:
 CC       {{SP_Ac:identifier[ (xeno)]}|Self}; NbExp=n; IntAct=IntAct_Protein_Ac, IntAct_Protein_Ac;
              */
+            this.setInteractions(new ArrayList());
+            String[] parts = c.split(";");
+            Interaction interact = null;
+            for (int i = 0; i < parts.length; i++) {
+                String[] subparts = parts[i].split("=");
+                String key = subparts[0].trim();
+                String value = null;
+                if (key.equals("Self")) {
+                    // start new self-self interaction
+                    interact = new Interaction();
+                    interact.setID("Self");
+                    interact.setOrganismsDiffer(false);
+                    this.getInteractions().add(interact);
+                } else if (subparts.length==1) {
+                    // start new protein-protein interaction
+                    subparts = key.split(":");
+                    boolean differ = false;
+                    if (subparts[1].indexOf("(xeno)")>-1) {
+                        differ = true;
+                        subparts[1] = subparts[1].substring(0,subparts[1].indexOf("(xeno)"));
+                    }
+                    interact = new Interaction();
+                    interact.setID(subparts[0].trim());
+                    interact.setLabel(subparts[1].trim());
+                    interact.setOrganismsDiffer(differ);
+                    this.getInteractions().add(interact);
+                } else {
+                    value = subparts[1].trim();
+                    // continue existing interaction
+                    if (key.equals("NbExp")) interact.setNumberExperiments(Integer.parseInt(value));
+                    else if (key.equals("IntAct")) {
+                        subparts = value.split(",");
+                        interact.setFirstIntActID(subparts[0].trim());
+                        interact.setSecondIntActID(subparts[1].trim());
+                    }
+                }
+            }
         } else if (this.getCommentType().equals(ALTERNATIVE_PRODUCTS)) {
             /*
 CC   -!- ALTERNATIVE PRODUCTS:
@@ -174,9 +257,53 @@ CC         Note=Free text;
 CC       Event=Alternative initiation;
 CC         Comment=Free text;
              */
+            this.setEvents(new ArrayList());
+            this.setIsoforms(new ArrayList());
+            Event event = null;
+            Isoform isoform = null;
+            String[] parts = c.split(";");
+            Interaction interact = null;
+            for (int i = 0; i < parts.length; i++) {
+                String[] subparts = parts[i].split("=");
+                String key = subparts[0].trim();
+                String value = subparts[1].trim();
+                if (key.equals("Event")) {
+                    // new event
+                    event = new Event();
+                    this.getEvents().add(event);
+                    event.setType(value);
+                } else if (key.equals("Name")) {
+                    // new isoform
+                    isoform = new Isoform();
+                    this.getIsoforms().add(isoform);
+                    isoform.setNames(new ArrayList());
+                    isoform.setIsoIDs(new ArrayList());
+                    isoform.getNames().add(value);
+                } else if (key.equals("Synonyms")) {
+                    subparts = value.split(",");
+                    for (int j = 0; j < subparts.length; j++) isoform.getNames().add(subparts[j].trim());
+                } else if (key.equals("IsoId")) {
+                    subparts = value.split(",");
+                    for (int j = 0; j < subparts.length; j++) isoform.getIsoIDs().add(subparts[j].trim());
+                } else if (key.equals("Sequence")) {
+                    if (value.equals("Displayed")) isoform.setSequenceType("Displayed");
+                    else if (value.equals("Not described")) isoform.setSequenceType("Not described");
+                    else if (value.equals("External")) isoform.setSequenceType("External");
+                    else {
+                        isoform.setSequenceType("Described");
+                        isoform.setSequenceRef(value);
+                    }
+                } else if (key.equals("Note")) {
+                    isoform.setNote(value);
+                } else if (key.equals("Named isoforms")) {
+                    event.setNamedIsoforms(Integer.parseInt(value));
+                } else if (key.equals("Comment")) {
+                    event.setComment(value);
+                }
+            }
         } else {
             // all others are just free text.
-            this.setText(c);
+            this.setText(c.trim());
         }
         
         // all done
@@ -232,6 +359,46 @@ CC         free_text;
 CC       Temperature dependence:
 CC         free_text;
              */
+            if (this.getAbsorptionNote()!=null) {
+                // we have an absorption line!
+                sb.append("\nAbsorption:\n  Abs(max)=");
+                sb.append(this.getAbsorptionMax());
+                sb.append(";\n  Note=");
+                sb.append(this.getAbsorptionNote());
+                sb.append(";");
+            }
+            if (this.getKineticsNote()!=null) {
+                // we have a kinetics note!
+                sb.append("\nKinetic parameters:\n");
+                for (Iterator j = this.getKMs().iterator(); j.hasNext(); ) {
+                    sb.append("  KM=");
+                    sb.append((String)j.next());
+                    sb.append(";\n");
+                }
+                for (Iterator j = this.getVMaxes().iterator(); j.hasNext(); ) {
+                    sb.append("  VMax=");
+                    sb.append((String)j.next());
+                    sb.append(";\n");
+                }
+                sb.append("  Note=");
+                sb.append(this.getKineticsNote());
+                sb.append(";");
+            }
+            if (this.getPHDependence()!=null) {
+                sb.append("\npH dependence:\n  ");
+                sb.append(this.getPHDependence());
+                sb.append(";");
+            }
+            if (this.getRedoxPotential()!=null) {
+                sb.append("\nRedox potential:\n  ");
+                sb.append(this.getRedoxPotential());
+                sb.append(";");
+            }
+            if (this.getTemperatureDependence()!=null) {
+                sb.append("\nTemperature dependence:\n  ");
+                sb.append(this.getTemperatureDependence());
+                sb.append(";");
+            }
         } else if (this.getCommentType().equals(DATABASE)) {
             if (this.getDatabaseName()==null) throw new ParseException("Database name is missing");
             /*
@@ -274,6 +441,27 @@ CC   -!- MASS SPECTROMETRY: MW=XXX[; MW_ERR=XX]; METHOD=XX; RANGE=XX-XX[ (Name)]
 CC   -!- INTERACTION:
 CC       {{SP_Ac:identifier[ (xeno)]}|Self}; NbExp=n; IntAct=IntAct_Protein_Ac, IntAct_Protein_Ac;
              */
+            for (Iterator i = this.getInteractions().iterator(); i.hasNext(); ) {
+                Interaction interact = (Interaction)i.next();
+                sb.append("\n"); // each interaction starts on a new line
+                if (interact.getID().equals("Self")) {
+                    sb.append("Self; ");
+                } else {
+                    sb.append(interact.getID());
+                    sb.append(":");
+                    sb.append(interact.getLabel());
+                    if (interact.isOrganismsDiffer()) sb.append(" (xeno)");
+                    sb.append("; ");
+                }
+                sb.append("NbExp=");
+                sb.append(""+interact.getNumberExperiments());
+                sb.append("; ");
+                sb.append("IntAct=");
+                sb.append(interact.getFirstIntActID());
+                sb.append(", ");
+                sb.append(interact.getSecondIntActID());
+                sb.append(";");
+            }
         } else if (this.getCommentType().equals(ALTERNATIVE_PRODUCTS)) {
             /*
 CC   -!- ALTERNATIVE PRODUCTS:
@@ -290,6 +478,43 @@ CC         Note=Free text;
 CC       Event=Alternative initiation;
 CC         Comment=Free text;
              */
+            for (Iterator i = this.getEvents().iterator(); i.hasNext(); ) {
+                Event event = (Event)i.next();
+                sb.append("\n"); // each one starts on a new line
+                sb.append("Event=");
+                sb.append(event.getType());
+                if (event.getType().equals("Alternative splicing")) {
+                    sb.append("; Named isoforms=");
+                    sb.append(""+event.getNamedIsoforms());
+                }
+                sb.append(";\n  Comment="); // comment is indented two on next line
+                sb.append(event.getComment());
+                sb.append(";");
+                if (event.getType().equals("Alternative splicing")) {
+                    for (Iterator j = this.getIsoforms().iterator(); j.hasNext(); ) {
+                        Isoform isoform = (Isoform)j.next();
+                        sb.append("\nName="); // each isoform on a new line
+                        sb.append(isoform.getNames().get(0));
+                        sb.append("; Synonyms=");
+                        for (int k =1 ; k < isoform.getNames().size(); k++) {
+                            sb.append(isoform.getNames().get(k));
+                            if (k<isoform.getNames().size()-1) sb.append(", ");
+                        }
+                        sb.append(";\n  IsoId="); // isoid on new line indented by two
+                        sb.append(isoform.getIsoIDs().get(0));
+                        for (int k =1 ; k < isoform.getIsoIDs().size(); k++) {
+                            sb.append(isoform.getIsoIDs().get(k));
+                            if (k<isoform.getIsoIDs().size()-1) sb.append(", ");
+                        }
+                        sb.append("; Sequence=");
+                        if (isoform.getSequenceRef()!=null) sb.append(isoform.getSequenceRef());
+                        else sb.append(isoform.getSequenceType());
+                        sb.append(";\n  Note="); // note is indented by two as well
+                        sb.append(isoform.getNote());
+                        sb.append(";");
+                    }
+                }
+            }
         } else {
             // just append free text for all others.
             sb.append(this.getText());
@@ -527,5 +752,597 @@ CC         Comment=Free text;
     public void setMolWeightMethod(String molWeightMethod) {
         
         this.molWeightMethod = molWeightMethod;
+    }
+    
+    /**
+     * Holds value of property interactions.
+     */
+    private List interactions;
+    
+    /**
+     * Getter for property interactions.
+     * @return Value of property interactions.
+     */
+    public List getInteractions() {
+        
+        return this.interactions;
+    }
+    
+    /**
+     * Setter for property interactions.
+     * @param interactions New value of property interactions.
+     */
+    public void setInteractions(List interactions) {
+        
+        this.interactions = interactions;
+    }
+    
+    /**
+     * Holds value of property events.
+     */
+    private List events;
+    
+    /**
+     * Getter for property events.
+     * @return Value of property events.
+     */
+    public List getEvents() {
+        
+        return this.events;
+    }
+    
+    /**
+     * Setter for property events.
+     * @param events New value of property events.
+     */
+    public void setEvents(List events) {
+        
+        this.events = events;
+    }
+    
+    /**
+     * Holds value of property isoforms.
+     */
+    private List isoforms;
+    
+    /**
+     * Getter for property isoforms.
+     * @return Value of property isoforms.
+     */
+    public List getIsoforms() {
+        
+        return this.isoforms;
+    }
+    
+    /**
+     * Setter for property isoforms.
+     * @param isoforms New value of property isoforms.
+     */
+    public void setIsoforms(List isoforms) {
+        
+        this.isoforms = isoforms;
+    }
+    
+    /**
+     * Holds value of property absorptionMax.
+     */
+    private String absorptionMax;
+    
+    /**
+     * Getter for property absorptionMax.
+     * @return Value of property absorptionMax.
+     */
+    public String getAbsorptionMax() {
+        
+        return this.absorptionMax;
+    }
+    
+    /**
+     * Setter for property absorptionMax.
+     * @param absorptionMax New value of property absorptionMax.
+     */
+    public void setAbsorptionMax(String absorptionMax) {
+        
+        this.absorptionMax = absorptionMax;
+    }
+    
+    /**
+     * Holds value of property absorptionNote.
+     */
+    private String absorptionNote;
+    
+    /**
+     * Getter for property absorptionNote.
+     * @return Value of property absorptionNote.
+     */
+    public String getAbsorptionNote() {
+        
+        return this.absorptionNote;
+    }
+    
+    /**
+     * Setter for property absorptionNote.
+     * @param absorptionNote New value of property absorptionNote.
+     */
+    public void setAbsorptionNote(String absorptionNote) {
+        
+        this.absorptionNote = absorptionNote;
+    }
+    
+    /**
+     * Holds value of property KMs.
+     */
+    private List KMs;
+    
+    /**
+     * Getter for property KMs.
+     * @return Value of property KMs.
+     */
+    public List getKMs() {
+        
+        return this.KMs;
+    }
+    
+    /**
+     * Setter for property KMs.
+     * @param KMs New value of property KMs.
+     */
+    public void setKMs(List KMs) {
+        
+        this.KMs = KMs;
+    }
+    
+    /**
+     * Holds value of property VMaxes.
+     */
+    private List VMaxes;
+    
+    /**
+     * Getter for property VMaxes.
+     * @return Value of property VMaxes.
+     */
+    public List getVMaxes() {
+        
+        return this.VMaxes;
+    }
+    
+    /**
+     * Setter for property VMaxes.
+     * @param VMaxes New value of property VMaxes.
+     */
+    public void setVMaxes(List VMaxes) {
+        
+        this.VMaxes = VMaxes;
+    }
+    
+    /**
+     * Holds value of property kineticsNote.
+     */
+    private String kineticsNote;
+    
+    /**
+     * Getter for property kineticsNote.
+     * @return Value of property kineticsNote.
+     */
+    public String getKineticsNote() {
+        
+        return this.kineticsNote;
+    }
+    
+    /**
+     * Setter for property kineticsNote.
+     * @param kineticsNote New value of property kineticsNote.
+     */
+    public void setKineticsNote(String kineticsNote) {
+        
+        this.kineticsNote = kineticsNote;
+    }
+    
+    /**
+     * Holds value of property PHDependence.
+     */
+    private String PHDependence;
+    
+    /**
+     * Getter for property PHDependence.
+     * @return Value of property PHDependence.
+     */
+    public String getPHDependence() {
+        
+        return this.PHDependence;
+    }
+    
+    /**
+     * Setter for property PHDependence.
+     * @param PHDependence New value of property PHDependence.
+     */
+    public void setPHDependence(String PHDependence) {
+        
+        this.PHDependence = PHDependence;
+    }
+    
+    /**
+     * Holds value of property redoxPotential.
+     */
+    private String redoxPotential;
+    
+    /**
+     * Getter for property redoxPotential.
+     * @return Value of property redoxPotential.
+     */
+    public String getRedoxPotential() {
+        
+        return this.redoxPotential;
+    }
+    
+    /**
+     * Setter for property redoxPotential.
+     * @param redoxPotential New value of property redoxPotential.
+     */
+    public void setRedoxPotential(String redoxPotential) {
+        
+        this.redoxPotential = redoxPotential;
+    }
+    
+    /**
+     * Holds value of property temperatureDependence.
+     */
+    private String temperatureDependence;
+    
+    /**
+     * Getter for property temperatureDependence.
+     * @return Value of property temperatureDependence.
+     */
+    public String getTemperatureDependence() {
+        
+        return this.temperatureDependence;
+    }
+    
+    /**
+     * Setter for property temperatureDependence.
+     * @param temperatureDependence New value of property temperatureDependence.
+     */
+    public void setTemperatureDependence(String temperatureDependence) {
+        
+        this.temperatureDependence = temperatureDependence;
+    }
+    
+    /**
+     * A class to describe protein-protein interactions.
+     */
+    public class Interaction {
+        /**
+         * Holds value of property ID.
+         */
+        private String ID;
+        
+        /**
+         * Getter for property ID.
+         * @return Value of property ID.
+         */
+        public String getID() {
+            
+            return this.ID;
+        }
+        
+        /**
+         * Setter for property ID.
+         * @param ID New value of property ID.
+         */
+        public void setID(String ID) {
+            
+            this.ID = ID;
+        }
+        
+        /**
+         * Holds value of property label.
+         */
+        private String label;
+        
+        /**
+         * Getter for property label.
+         * @return Value of property label.
+         */
+        public String getLabel() {
+            
+            return this.label;
+        }
+        
+        /**
+         * Setter for property label.
+         * @param label New value of property label.
+         */
+        public void setLabel(String label) {
+            
+            this.label = label;
+        }
+        
+        /**
+         * Holds value of property organismsDiffer.
+         */
+        private boolean organismsDiffer;
+        
+        /**
+         * Getter for property organismsDiffer.
+         * @return Value of property organismsDiffer.
+         */
+        public boolean isOrganismsDiffer() {
+            
+            return this.organismsDiffer;
+        }
+        
+        /**
+         * Setter for property organismsDiffer.
+         * @param organismsDiffer New value of property organismsDiffer.
+         */
+        public void setOrganismsDiffer(boolean organismsDiffer) {
+            
+            this.organismsDiffer = organismsDiffer;
+        }
+        
+        /**
+         * Holds value of property firstIntActID.
+         */
+        private String firstIntActID;
+        
+        /**
+         * Getter for property firstIntActID.
+         * @return Value of property firstIntActID.
+         */
+        public String getFirstIntActID() {
+            
+            return this.firstIntActID;
+        }
+        
+        /**
+         * Setter for property firstIntActID.
+         * @param firstIntActID New value of property firstIntActID.
+         */
+        public void setFirstIntActID(String firstIntActID) {
+            
+            this.firstIntActID = firstIntActID;
+        }
+        
+        /**
+         * Holds value of property secondIntActID.
+         */
+        private String secondIntActID;
+        
+        /**
+         * Getter for property secondIntActID.
+         * @return Value of property secondIntActID.
+         */
+        public String getSecondIntActID() {
+            
+            return this.secondIntActID;
+        }
+        
+        /**
+         * Setter for property secondIntActID.
+         * @param secondIntActID New value of property secondIntActID.
+         */
+        public void setSecondIntActID(String secondIntActID) {
+            
+            this.secondIntActID = secondIntActID;
+        }
+        
+        /**
+         * Holds value of property numberExperiments.
+         */
+        private int numberExperiments;
+        
+        /**
+         * Getter for property numberExperiments.
+         * @return Value of property numberExperiments.
+         */
+        public int getNumberExperiments() {
+            
+            return this.numberExperiments;
+        }
+        
+        /**
+         * Setter for property numberExperiments.
+         * @param numberExperiments New value of property numberExperiments.
+         */
+        public void setNumberExperiments(int numberExperiments) {
+            
+            this.numberExperiments = numberExperiments;
+        }
+    }
+    
+    /**
+     * A class to describe events for alternative product comments.
+     */
+    public class Event {
+        /**
+         * Holds value of property type.
+         */
+        private String type;
+        
+        /**
+         * Getter for property type.
+         * @return Value of property type.
+         */
+        public String getType() {
+            
+            return this.type;
+        }
+        
+        /**
+         * Setter for property type.
+         * @param type New value of property type.
+         */
+        public void setType(String type) {
+            
+            this.type = type;
+        }
+        
+        /**
+         * Holds value of property comment.
+         */
+        private String comment;
+        
+        /**
+         * Getter for property comment.
+         * @return Value of property comment.
+         */
+        public String getComment() {
+            
+            return this.comment;
+        }
+        
+        /**
+         * Setter for property comment.
+         * @param comment New value of property comment.
+         */
+        public void setComment(String comment) {
+            
+            this.comment = comment;
+        }
+        
+        /**
+         * Holds value of property namedIsoforms.
+         */
+        private int namedIsoforms;
+        
+        /**
+         * Getter for property namedIsoforms.
+         * @return Value of property namedIsoforms.
+         */
+        public int getNamedIsoforms() {
+            
+            return this.namedIsoforms;
+        }
+        
+        /**
+         * Setter for property namedIsoforms.
+         * @param namedIsoforms New value of property namedIsoforms.
+         */
+        public void setNamedIsoforms(int namedIsoforms) {
+            
+            this.namedIsoforms = namedIsoforms;
+        }
+        
+    }
+    
+    /**
+     * A class to describe isoforms for alternative product comments.
+     */
+    public class Isoform {
+        /**
+         * Holds value of property names.
+         */
+        private List names;
+        
+        /**
+         * Getter for property names.
+         * @return Value of property names.
+         */
+        public List getNames() {
+            
+            return this.names;
+        }
+        
+        /**
+         * Setter for property names.
+         * @param names New value of property names.
+         */
+        public void setNames(List names) {
+            
+            this.names = names;
+        }
+        
+        /**
+         * Holds value of property isoIDs.
+         */
+        private List isoIDs;
+        
+        /**
+         * Getter for property isoIDs.
+         * @return Value of property isoIDs.
+         */
+        public List getIsoIDs() {
+            
+            return this.isoIDs;
+        }
+        
+        /**
+         * Setter for property isoIDs.
+         * @param isoIDs New value of property isoIDs.
+         */
+        public void setIsoIDs(List isoIDs) {
+            
+            this.isoIDs = isoIDs;
+        }
+        
+        /**
+         * Holds value of property sequenceType.
+         */
+        private String sequenceType;
+        
+        /**
+         * Getter for property sequenceType.
+         * @return Value of property sequenceType.
+         */
+        public String getSequenceType() {
+            
+            return this.sequenceType;
+        }
+        
+        /**
+         * Setter for property sequenceType.
+         * @param sequenceType New value of property sequenceType.
+         */
+        public void setSequenceType(String sequenceType) {
+            
+            this.sequenceType = sequenceType;
+        }
+        
+        /**
+         * Holds value of property sequenceRef.
+         */
+        private String sequenceRef;
+        
+        /**
+         * Getter for property sequenceRef.
+         * @return Value of property sequenceRef.
+         */
+        public String getSequenceRef() {
+            
+            return this.sequenceRef;
+        }
+        
+        /**
+         * Setter for property sequenceRef.
+         * @param sequenceRef New value of property sequenceRef.
+         */
+        public void setSequenceRef(String sequenceRef) {
+            
+            this.sequenceRef = sequenceRef;
+        }
+        
+        /**
+         * Holds value of property note.
+         */
+        private String note;
+        
+        /**
+         * Getter for property note.
+         * @return Value of property note.
+         */
+        public String getNote() {
+            
+            return this.note;
+        }
+        
+        /**
+         * Setter for property note.
+         * @param note New value of property note.
+         */
+        public void setNote(String note) {
+            
+            this.note = note;
+        }
+        
     }
 }

@@ -19,8 +19,7 @@
  */
 
 package org.biojavax;
-
-import java.util.Set;
+import java.util.List;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
@@ -111,7 +110,7 @@ public interface DocRef extends Comparable,Changeable {
      * the constructor of the implementing class.
      * @return The set of authors.
      */
-    public Set getAuthorSet();
+    public List getAuthorList();
     
     /**
      * Returns a CRC64 checksum of this document reference, allowing for easy

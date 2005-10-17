@@ -22,6 +22,7 @@
 package org.biojavax.bio.db;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.biojavax.DocRefAuthor;
@@ -89,7 +90,7 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
         // Create the Hibernate query to look it up with
         String queryText;
         String queryType;
-        List queryParamsList = paramsList;
+        List queryParamsList = new ArrayList(paramsList);
         if (clazz==SimpleNamespace.class) {
             queryText = "from Namespace as ns where ns.name = ?";
             queryType = "Namespace";
@@ -105,8 +106,8 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
         } else if (clazz==SimpleDocRef.class) {
             queryText = "from DocRef as cr where cr.authors = ? and cr.location = ?";
             queryType = "DocRef";
-            // convert Set constructor to String representation for query
-            if (queryParamsList.get(0) instanceof Set) queryParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((Set)queryParamsList.get(0)));
+            // convert List constructor to String representation for query
+            queryParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((List)queryParamsList.get(0)));
         } else throw new IllegalArgumentException("Don't know how to handle objects of type "+clazz);
         // Run the query.
         try {
@@ -125,7 +126,11 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
                 // Load the class
                 Class[] types = new Class[paramsList.size()];
                 // Find its constructor with given params
-                for (int i = 0; i < paramsList.size(); i++) types[i] = paramsList.get(i).getClass();
+                for (int i = 0; i < paramsList.size(); i++) {
+                    if (paramsList.get(i) instanceof Set) types[i] = Set.class;
+                    else if (paramsList.get(i) instanceof List) types[i] = List.class;
+                    else types[i] = paramsList.get(i).getClass();
+                }
                 Constructor c = clazz.getConstructor(types);
                 // Instantiate it with the parameters
                 Object o = c.newInstance(paramsList.toArray());
@@ -141,7 +146,7 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
             paramsstuff.append("(");
             for (int i = 0; i < paramsList.size(); i++) {
                 if (paramsList.get(i)==null) paramsstuff.append("null");
-                else paramsstuff.append(paramsList.get(i).toString());
+                else paramsstuff.append(paramsList.get(i).getClass());
                 if (i<(paramsList.size()-1)) paramsstuff.append(",");
             }
             paramsstuff.append(")");

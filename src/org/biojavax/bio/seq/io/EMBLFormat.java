@@ -291,13 +291,13 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                         consortium = val;
                     }
                     if (key.equals(TITLE_TAG)) {
-                        if (title.length()>1) {
+                        if (val.length()>1) {
                             val = val.substring(1,val.length()-3); // chomp semicolon + quotes
                             title = val;
                         } else title=null; // single semi-colon indicates no title
                     }
                     if (key.equals(LOCATOR_TAG)) {
-                        val = val.substring(0,val.length()-1); // chomp dot
+                        if (val.charAt(val.length()-1)=='.') val = val.substring(0,val.length()-1); // chomp dot
                         locator = val;
                     }
                     if (key.equals(REFERENCE_XREF_TAG)) {
@@ -350,7 +350,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 // create the docref object
                 try {
-                    Set authSet = DocRefAuthor.Tools.parseAuthorString(authors);
+                    List authSet = DocRefAuthor.Tools.parseAuthorString(authors);
                     if (consortium!=null) authSet.add(new SimpleDocRefAuthor(consortium, true, false));
                     DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authSet,locator});
                     if (title!=null) dr.setTitle(title);
@@ -755,7 +755,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             StringTools.writeKeyValueLine(REFERENCE_POSITION_TAG, rstart+"-"+rend, 5, this.getLineWidth(), null, REFERENCE_POSITION_TAG, this.getPrintStream());
             CrossRef c = d.getCrossref();
             if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
-            Set auths = d.getAuthorSet();
+            List auths = d.getAuthorList();
             for (Iterator j = auths.iterator(); j.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)j.next();
                 if (a.isConsortium()) StringTools.writeKeyValueLine(CONSORTIUM_TAG, a+";", 5, this.getLineWidth(), null, CONSORTIUM_TAG, this.getPrintStream());

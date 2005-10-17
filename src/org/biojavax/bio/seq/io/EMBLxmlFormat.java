@@ -361,7 +361,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 xml.closeTag(DBREFERENCE_TAG);
             }
             
-            Set auths = dr.getAuthorSet();
+            List auths = dr.getAuthorList();
             
             for (Iterator j = auths.iterator(); j.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)j.next();

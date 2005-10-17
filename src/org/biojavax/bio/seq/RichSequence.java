@@ -50,6 +50,7 @@ import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
 import org.biojavax.bio.seq.io.RichStreamReader;
 import org.biojavax.bio.seq.io.RichStreamWriter;
 import org.biojavax.bio.seq.io.UniProtFormat;
+import org.biojavax.bio.seq.io.UniProtXMLFormat;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -921,6 +922,51 @@ public interface RichSequence extends BioEntry,Sequence {
         
         
         /**
+         * Read a UniProt XML file using a custom type of SymbolList. For example,
+         * use RichSequenceBuilderFactory.FACTORY to emulate readFasta(BufferedReader,
+         * SymbolTokenization) and RichSequenceBuilderFactory.PACKED to force all
+         * symbols to be encoded using bit-packing.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param sTok a <code>SymbolTokenization</code> that understands the sequences
+         * @param seqFactory a factory used to build a <code>SymbolList</code>
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readUniProtXML(
+                BufferedReader br,
+                SymbolTokenization sTok,
+                RichSequenceBuilderFactory seqFactory,
+                Namespace ns) {
+            return new RichStreamReader(
+                    br,
+                    new UniProtXMLFormat(),
+                    sTok,
+                    seqFactory,
+                    ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an UniProt XML-format stream of RNA sequences.
+         * @param br the <code>BufferedReader</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         */
+        public static RichSequenceIterator readUniProtXML(BufferedReader br, Namespace ns) {
+            return new RichStreamReader(br,
+                    new UniProtXMLFormat(),
+                    getProteinParser(),
+                    factory,
+                    ns);
+        }
+        
+        
+        /**
          * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
          * Fasta Format.  This makes for a useful format filter where a
          * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
@@ -1096,6 +1142,36 @@ public interface RichSequence extends BioEntry,Sequence {
         public static void writeUniProt(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
             writeUniProt(os, new SingleRichSeqIterator(seq),ns);
+        }
+        
+        
+        /**
+         * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
+         * UniProt XML Format.  This makes for a useful format filter where a
+         * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
+         * @param os The stream to write fasta formatted data to
+         * @param in The source of input Sequences
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeUniProtXML(OutputStream os, SequenceIterator in, Namespace ns)
+        throws IOException {
+            RichStreamWriter sw = new RichStreamWriter(os,new UniProtXMLFormat());
+            sw.writeStream(in,ns);
+        }
+        
+        /**
+         * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in UniProt XML format.
+         * @param os  the <code>OutputStream</code>.
+         * @param seq  the <code>Sequence</code>.
+         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @throws <code>IOException</code> if there was an error while writing.
+         */
+        public static void writeUniProtXML(OutputStream os, Sequence seq, Namespace ns)
+        throws IOException {
+            writeUniProtXML(os, new SingleRichSeqIterator(seq),ns);
         }
         
         

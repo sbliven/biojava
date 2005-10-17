@@ -20,8 +20,8 @@
  */
 
 package org.biojavax;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.Checksum;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
@@ -38,7 +38,7 @@ import org.biojavax.utils.CRC64Checksum;
 public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     private CrossRef crossref;
-    private Set authors;
+    private List authors;
     private String title;
     private String location;
     private String remark;
@@ -49,11 +49,11 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
      * @param authors The authors of the referenced document, as a set of DocRefAuthor instances.
      * @param location The location of the document, eg. the journal name and page range.
      */
-    public SimpleDocRef(Set authors, String location) {
+    public SimpleDocRef(List authors, String location) {
         if (authors==null || authors.isEmpty()) throw new IllegalArgumentException("Authors cannot be null or empty");
         if (location==null) throw new IllegalArgumentException("Location cannot be null");
         this.crossref = null;
-        this.authors = new HashSet();
+        this.authors = new ArrayList();
         this.authors.addAll(authors);
         this.title = null;
         this.location = location;
@@ -146,7 +146,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     /**
      * {@inheritDoc}
      */
-    public Set getAuthorSet() { return new HashSet(this.authors); }
+    public List getAuthorList() { return new ArrayList(this.authors); }
     
     /**
      * {@inheritDoc}

@@ -19,9 +19,9 @@
  */
 
 package org.biojavax;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 import org.biojava.utils.Changeable;
 
 
@@ -71,10 +71,10 @@ public interface DocRefAuthor extends Comparable,Changeable {
          * @param authors a comma-separated list of authors
          * @return set of DocRefAuthor objects.
          */
-        public static Set parseAuthorString(String authors) {
+        public static List parseAuthorString(String authors) {
             if (authors==null) throw new IllegalArgumentException("Authors string cannot be null");
             String[] parts = authors.split(",");
-            Set authSet = new HashSet();
+            List authSet = new ArrayList();
             for (int i = 0; i < parts.length; i++) authSet.add(new SimpleDocRefAuthor(parts[i]));
             return authSet;
         }
@@ -84,7 +84,7 @@ public interface DocRefAuthor extends Comparable,Changeable {
          * @param a set of authors
          * @return a comma-separated string
          */
-        public static String generateAuthorString(Set authors) {
+        public static String generateAuthorString(List authors) {
             StringBuffer sb = new StringBuffer();
             for (Iterator i = authors.iterator(); i.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)i.next();

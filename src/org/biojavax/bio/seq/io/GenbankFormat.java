@@ -581,7 +581,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
                 // /key="val" or just /key if val==""
-                if (n.getValue()==null || n.getValue().equals("")) StringTools.writeKeyValueLine("", "/"+n.getTerm(), 21, this.getLineWidth(), this.getPrintStream());
+                if (n.getValue()==null || n.getValue().equals("")) StringTools.writeKeyValueLine("", "/"+n.getTerm().getName(), 21, this.getLineWidth(), this.getPrintStream());
                 else StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), this.getPrintStream());
             }
             // add-in to source feature only db_xref="taxon:xyz" where present

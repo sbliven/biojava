@@ -35,7 +35,7 @@ import java.util.Set;
  */
 public class SimpleRichObjectBuilder implements RichObjectBuilder {
     
-    private static Map objects = new HashMap();    
+    private static Map objects = new HashMap();
     
     /**
      * {@inheritDoc}
@@ -46,13 +46,17 @@ public class SimpleRichObjectBuilder implements RichObjectBuilder {
         if (!objects.containsKey(clazz)) objects.put(clazz,new HashMap());
         Map contents = (Map)objects.get(clazz);
         // return the constructed object from the hashmap if there already
-        if (contents.containsKey(paramsList)) return contents.get(paramsList); 
+        if (contents.containsKey(paramsList)) return contents.get(paramsList);
         // otherwise build it.
         try {
             // Load the class
             Class[] types = new Class[paramsList.size()];
             // Find its constructor with given params
-            for (int i = 0; i < paramsList.size(); i++) types[i] = paramsList.get(i).getClass();
+            for (int i = 0; i < paramsList.size(); i++) {
+                if (paramsList.get(i) instanceof Set) types[i] = Set.class;
+                else if (paramsList.get(i) instanceof List) types[i] = List.class;
+                else types[i] = paramsList.get(i).getClass();
+            }
             Constructor c = clazz.getConstructor(types);
             // Instantiate it with the parameters
             Object o = c.newInstance(paramsList.toArray());
@@ -66,7 +70,7 @@ public class SimpleRichObjectBuilder implements RichObjectBuilder {
             paramsstuff.append("(");
             for (int i = 0; i < paramsList.size(); i++) {
                 if (paramsList.get(i)==null) paramsstuff.append("null");
-                else paramsstuff.append(paramsList.get(i).toString());
+                else paramsstuff.append(paramsList.get(i).getClass());
                 if (i<(paramsList.size()-1)) paramsstuff.append(",");
             }
             paramsstuff.append(")");

@@ -398,7 +398,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 xml.closeTag(REFERENCE_LOCATION_TAG);
                 
                 xml.openTag(AUTHORS_GROUP_TAG);
-                Set auths = d.getAuthorSet();
+                List auths = d.getAuthorList();
                 for (Iterator i = auths.iterator(); i.hasNext(); ) {
                     DocRefAuthor a = (DocRefAuthor)i.next();
                     if (!a.isConsortium()) {
@@ -753,7 +753,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     }
                     // create the docref object
                     try {
-                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefJournal, new Integer(0)});
+                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefJournal});
                         if (currRefTitle!=null) dr.setTitle(currRefTitle);
                         // assign either the pubmed or medline to the docref - medline gets priority
                         if (mcr!=null) dr.setCrossref(mcr);
