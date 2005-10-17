@@ -70,7 +70,7 @@ public class XMLTools {
         
         boolean begunChunk = false;
         boolean filledBuffer = false;
-        String line;
+        String line = null;
         while (!filledBuffer && (line=reader.readLine())!=null) {
             line = line.trim();
             if (!begunChunk && !start.matcher(line).matches()) continue;
@@ -79,15 +79,13 @@ public class XMLTools {
             if (end.matcher(line).matches()) filledBuffer = true;
         }
         if (!filledBuffer) throw new SAXException("Unexpectedly reached end of file");
-        reader.mark(1000);
+        reader.mark(10000);
         boolean hasAnotherChunk = false;
         while (!hasAnotherChunk && (line=reader.readLine())!=null) {
             line = line.trim();
-            if (start.matcher(line).matches()) {
-                reader.reset();
-                hasAnotherChunk = true;
-            }
+            if (start.matcher(line).matches()) hasAnotherChunk = true;
         }
+        reader.reset();
         
         SAXParser m_xmlParser;
         SAXParserFactory factory = SAXParserFactory.newInstance();
