@@ -33,11 +33,16 @@ import org.biojavax.Comment;
  * @author Richard Holland
  */
 public class UniProtCommentParser {
-    
+        
     /**
      * Creates a new instance of UniProtCommentParser.
      */
     public UniProtCommentParser() {
+        this.interactions = new ArrayList();
+        this.isoforms = new ArrayList();
+        this.events = new ArrayList();
+        this.KMs = new ArrayList();
+        this.VMaxes = new ArrayList();
     }
     
     // the prefix for comments
@@ -96,7 +101,7 @@ public class UniProtCommentParser {
     public void parseComment(String c) throws ParseException {
         if (!isParseable(c)) throw new ParseException("Comment is not a UniProt structured comment");
         // do the parsing here.
-        c = c.trim().replaceAll("\\s+", " "); // replace all multi-spaces and newlines with single spaces
+        c = c.replaceAll("\\s+", " ").trim(); // replace all multi-spaces and newlines with single spaces
         // our comment is now one long string, -!- TYPE: [prefix: key=value; | key=value; | text]
         c = c.substring(PREFIX.length()+1); // chomp "-!- "
         String type = c.substring(0,c.indexOf(':')); // find type
@@ -104,7 +109,7 @@ public class UniProtCommentParser {
         c = c.substring(c.indexOf(':')+1); // chomp type and colon
         
         // what we have left is the [prefix: key=value; | key=value; | text.] section
-        if (this.getCommentType().equals(BIOPHYSICOCHEMICAL_PROPERTIES)) {
+        if (this.getCommentType().equalsIgnoreCase(BIOPHYSICOCHEMICAL_PROPERTIES)) {
             /*
 CC   -!- BIOPHYSICOCHEMICAL PROPERTIES:
 CC       Absorption:
@@ -128,31 +133,29 @@ CC         free_text;
                     int firstColon = parts[0].indexOf(':');
                     String key = parts[0].substring(0,firstColon).trim();
                     String value = parts[0].substring(firstColon+1).trim();
-                    if (key.equals("pH dependence")) this.setPHDependence(value);
-                    else if (key.equals("Redox potential")) this.setRedoxPotential(value);
-                    else if (key.equals("Temperature dependence")) this.setTemperatureDependence(value);
+                    if (key.equalsIgnoreCase("pH dependence")) this.setPHDependence(value);
+                    else if (key.equalsIgnoreCase("Redox potential")) this.setRedoxPotential(value);
+                    else if (key.equalsIgnoreCase("Temperature dependence")) this.setTemperatureDependence(value);
                     // skip to next chunk
                     c = c.substring(c.indexOf(";")+1);
                 } else {
                     // we are one of the first two options on the list
                     int skippos = -1;
                     String key = parts[0].split(":")[0].trim();
-                    if (key.equals("Absorption")) {
+                    if (key.equalsIgnoreCase("Absorption")) {
                         String[] subparts = parts[0].split(":")[1].split("=");
                         this.setAbsorptionMax(subparts[1].trim());
                         subparts = parts[1].split("=");
                         this.setAbsorptionNote(subparts[1].trim());
                         skippos = 2;
-                    } else if (key.equals("Kinetic parameters")) {
-                        this.setKMs(new ArrayList());
-                        this.setVMaxes(new ArrayList());
+                    } else if (key.equalsIgnoreCase("Kinetic parameters")) {
                         int partCount = 0;
                         String[] subparts = parts[partCount].split(":")[1].split("=");
                         key = subparts[0].trim();
                         String value = subparts[1].trim();
-                        while (!key.equals("Note")) {
-                            if (key.equals("KM")) this.getKMs().add(value);
-                            else if (key.equals("VMax")) this.getVMaxes().add(value);
+                        while (!key.equalsIgnoreCase("Note")) {
+                            if (key.equalsIgnoreCase("KM")) this.getKMs().add(value);
+                            else if (key.equalsIgnoreCase("VMax")) this.getVMaxes().add(value);
                             subparts = parts[++partCount].split("=");
                             key = subparts[0].trim();
                             value = subparts[1].trim();
@@ -165,7 +168,7 @@ CC         free_text;
                 }
                 c = c.trim();
             } while (c.length()>0);
-        } else if (this.getCommentType().equals(DATABASE)) {
+        } else if (this.getCommentType().equalsIgnoreCase(DATABASE)) {
             /*
 CC   -!- DATABASE: NAME=Text[; NOTE=Text][; WWW="Address"][; FTP="Address"].
              */
@@ -175,11 +178,11 @@ CC   -!- DATABASE: NAME=Text[; NOTE=Text][; WWW="Address"][; FTP="Address"].
                 String[] subparts = parts[i].split("=");
                 String key = subparts[0].trim();
                 String value = subparts[1].trim();
-                if (key.equals("NAME")) this.setDatabaseName(value);
-                else if (key.equals("NOTE")) this.setNote(value);
-                else if (key.equals("WWW") || key.equals("FTP")) this.setUri(value);
+                if (key.equalsIgnoreCase("NAME")) this.setDatabaseName(value);
+                else if (key.equalsIgnoreCase("NOTE")) this.setNote(value);
+                else if (key.equalsIgnoreCase("WWW") || key.equalsIgnoreCase("FTP")) this.setUri(value);
             }
-        } else if (this.getCommentType().equals(MASS_SPECTROMETRY)) {
+        } else if (this.getCommentType().equalsIgnoreCase(MASS_SPECTROMETRY)) {
             /*
 CC   -!- MASS SPECTROMETRY: MW=XXX[; MW_ERR=XX]; METHOD=XX; RANGE=XX-XX[ (Name)]; NOTE={Free text (Ref.n)|Ref.n}.
              */
@@ -189,29 +192,28 @@ CC   -!- MASS SPECTROMETRY: MW=XXX[; MW_ERR=XX]; METHOD=XX; RANGE=XX-XX[ (Name)]
                 String[] subparts = parts[i].split("=");
                 String key = subparts[0].trim();
                 String value = subparts[1].trim();
-                if (key.equals("MW")) this.setMolecularWeight(Integer.parseInt(value));
-                else if (key.equals("MW_ERR")) this.setMolWeightError(new Integer(value));
-                else if (key.equals("METHOD")) this.setMolWeightMethod(value);
-                else if (key.equals("RANGE")) {
+                if (key.equalsIgnoreCase("MW")) this.setMolecularWeight(Integer.parseInt(value));
+                else if (key.equalsIgnoreCase("MW_ERR")) this.setMolWeightError(new Integer(value));
+                else if (key.equalsIgnoreCase("METHOD")) this.setMolWeightMethod(value);
+                else if (key.equalsIgnoreCase("RANGE")) {
                     if (value.indexOf(' ')>-1) value = value.substring(0, value.indexOf(' ')); // drop name
                     String[] locs = value.split("-");
                     this.setMolWeightRangeStart(Integer.parseInt(locs[0]));
                     this.setMolWeightRangeEnd(Integer.parseInt(locs[1]));
-                } else if (key.equals("NOTE")) this.setNote(value);
+                } else if (key.equalsIgnoreCase("NOTE")) this.setNote(value);
             }
-        } else if (this.getCommentType().equals(INTERACTION)) {
+        } else if (this.getCommentType().equalsIgnoreCase(INTERACTION)) {
             /*
 CC   -!- INTERACTION:
 CC       {{SP_Ac:identifier[ (xeno)]}|Self}; NbExp=n; IntAct=IntAct_Protein_Ac, IntAct_Protein_Ac;
              */
-            this.setInteractions(new ArrayList());
             String[] parts = c.split(";");
             Interaction interact = null;
             for (int i = 0; i < parts.length; i++) {
                 String[] subparts = parts[i].split("=");
                 String key = subparts[0].trim();
                 String value = null;
-                if (key.equals("Self")) {
+                if (key.equalsIgnoreCase("Self")) {
                     // start new self-self interaction
                     interact = new Interaction();
                     interact.setID("Self");
@@ -233,15 +235,15 @@ CC       {{SP_Ac:identifier[ (xeno)]}|Self}; NbExp=n; IntAct=IntAct_Protein_Ac, 
                 } else {
                     value = subparts[1].trim();
                     // continue existing interaction
-                    if (key.equals("NbExp")) interact.setNumberExperiments(Integer.parseInt(value));
-                    else if (key.equals("IntAct")) {
+                    if (key.equalsIgnoreCase("NbExp")) interact.setNumberExperiments(Integer.parseInt(value));
+                    else if (key.equalsIgnoreCase("IntAct")) {
                         subparts = value.split(",");
                         interact.setFirstIntActID(subparts[0].trim());
                         interact.setSecondIntActID(subparts[1].trim());
                     }
                 }
             }
-        } else if (this.getCommentType().equals(ALTERNATIVE_PRODUCTS)) {
+        } else if (this.getCommentType().equalsIgnoreCase(ALTERNATIVE_PRODUCTS)) {
             /*
 CC   -!- ALTERNATIVE PRODUCTS:
 CC       Event=Alternative promoter;
@@ -257,8 +259,6 @@ CC         Note=Free text;
 CC       Event=Alternative initiation;
 CC         Comment=Free text;
              */
-            this.setEvents(new ArrayList());
-            this.setIsoforms(new ArrayList());
             Event event = null;
             Isoform isoform = null;
             String[] parts = c.split(";");
@@ -267,43 +267,41 @@ CC         Comment=Free text;
                 String[] subparts = parts[i].split("=");
                 String key = subparts[0].trim();
                 String value = subparts[1].trim();
-                if (key.equals("Event")) {
+                if (key.equalsIgnoreCase("Event")) {
                     // new event
                     event = new Event();
                     this.getEvents().add(event);
                     event.setType(value);
-                } else if (key.equals("Name")) {
+                } else if (key.equalsIgnoreCase("Name")) {
                     // new isoform
                     isoform = new Isoform();
                     this.getIsoforms().add(isoform);
-                    isoform.setNames(new ArrayList());
-                    isoform.setIsoIDs(new ArrayList());
                     isoform.getNames().add(value);
-                } else if (key.equals("Synonyms")) {
+                } else if (key.equalsIgnoreCase("Synonyms")) {
                     subparts = value.split(",");
                     for (int j = 0; j < subparts.length; j++) isoform.getNames().add(subparts[j].trim());
-                } else if (key.equals("IsoId")) {
+                } else if (key.equalsIgnoreCase("IsoId")) {
                     subparts = value.split(",");
                     for (int j = 0; j < subparts.length; j++) isoform.getIsoIDs().add(subparts[j].trim());
-                } else if (key.equals("Sequence")) {
-                    if (value.equals("Displayed")) isoform.setSequenceType("Displayed");
-                    else if (value.equals("Not described")) isoform.setSequenceType("Not described");
-                    else if (value.equals("External")) isoform.setSequenceType("External");
+                } else if (key.equalsIgnoreCase("Sequence")) {
+                    if (value.equalsIgnoreCase("Displayed")) isoform.setSequenceType("Displayed");
+                    else if (value.equalsIgnoreCase("Not described")) isoform.setSequenceType("Not described");
+                    else if (value.equalsIgnoreCase("External")) isoform.setSequenceType("External");
                     else {
                         isoform.setSequenceType("Described");
                         isoform.setSequenceRef(value);
                     }
-                } else if (key.equals("Note")) {
+                } else if (key.equalsIgnoreCase("Note")) {
                     isoform.setNote(value);
-                } else if (key.equals("Named isoforms")) {
+                } else if (key.equalsIgnoreCase("Named isoforms")) {
                     event.setNamedIsoforms(Integer.parseInt(value));
-                } else if (key.equals("Comment")) {
+                } else if (key.equalsIgnoreCase("Comment")) {
                     event.setComment(value);
                 }
             }
         } else {
             // all others are just free text.
-            this.setText(c.trim());
+            this.setText(c);
         }
         
         // all done
@@ -342,7 +340,7 @@ CC         Comment=Free text;
         sb.append(": ");
         
         // output the specifics
-        if (this.getCommentType().equals(BIOPHYSICOCHEMICAL_PROPERTIES)) {
+        if (this.getCommentType().equalsIgnoreCase(BIOPHYSICOCHEMICAL_PROPERTIES)) {
             /*
 CC   -!- BIOPHYSICOCHEMICAL PROPERTIES:
 CC       Absorption:
@@ -399,7 +397,8 @@ CC         free_text;
                 sb.append(this.getTemperatureDependence());
                 sb.append(";");
             }
-        } else if (this.getCommentType().equals(DATABASE)) {
+            
+        } else if (this.getCommentType().equalsIgnoreCase(DATABASE)) {
             if (this.getDatabaseName()==null) throw new ParseException("Database name is missing");
             /*
 CC   -!- DATABASE: NAME=Text[; NOTE=Text][; WWW="Address"][; FTP="Address"].
@@ -417,7 +416,8 @@ CC   -!- DATABASE: NAME=Text[; NOTE=Text][; WWW="Address"][; FTP="Address"].
                 sb.append(this.getUri());
             }
             sb.append(".");
-        } else if (this.getCommentType().equals(MASS_SPECTROMETRY)) {
+            
+        } else if (this.getCommentType().equalsIgnoreCase(MASS_SPECTROMETRY)) {
             /*
 CC   -!- MASS SPECTROMETRY: MW=XXX[; MW_ERR=XX]; METHOD=XX; RANGE=XX-XX[ (Name)]; NOTE={Free text (Ref.n)|Ref.n}.
              */
@@ -436,7 +436,8 @@ CC   -!- MASS SPECTROMETRY: MW=XXX[; MW_ERR=XX]; METHOD=XX; RANGE=XX-XX[ (Name)]
             sb.append("; NOTE=");
             sb.append(this.getNote());
             sb.append(".");
-        } else if (this.getCommentType().equals(INTERACTION)) {
+            
+        } else if (this.getCommentType().equalsIgnoreCase(INTERACTION)) {
             /*
 CC   -!- INTERACTION:
 CC       {{SP_Ac:identifier[ (xeno)]}|Self}; NbExp=n; IntAct=IntAct_Protein_Ac, IntAct_Protein_Ac;
@@ -462,7 +463,8 @@ CC       {{SP_Ac:identifier[ (xeno)]}|Self}; NbExp=n; IntAct=IntAct_Protein_Ac, 
                 sb.append(interact.getSecondIntActID());
                 sb.append(";");
             }
-        } else if (this.getCommentType().equals(ALTERNATIVE_PRODUCTS)) {
+            
+        } else if (this.getCommentType().equalsIgnoreCase(ALTERNATIVE_PRODUCTS)) {
             /*
 CC   -!- ALTERNATIVE PRODUCTS:
 CC       Event=Alternative promoter;
@@ -1229,6 +1231,15 @@ CC         Comment=Free text;
      * A class to describe isoforms for alternative product comments.
      */
     public static class Isoform {
+        
+        /**
+         * Creates a new instance.
+         */
+        public Isoform() {
+            this.names = new ArrayList();
+            this.isoIDs = new ArrayList();
+        }
+        
         /**
          * Holds value of property names.
          */

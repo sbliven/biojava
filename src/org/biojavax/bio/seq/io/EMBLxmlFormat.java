@@ -378,7 +378,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 xml.print(dr.getTitle());
                 xml.closeTag(TITLE_TAG);
             }
-                        
+            
             for (Iterator j = auths.iterator(); j.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)j.next();
                 if (a.isEditor()) {
@@ -391,7 +391,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     xml.closeTag(AUTHOR_TAG);
                 }
             }
-                        
+            
             xml.openTag(LOCATOR_TAG);
             xml.print(dr.getLocation());
             xml.closeTag(LOCATOR_TAG);
@@ -505,7 +505,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 Note n = (Note)j.next();
                 xml.openTag(QUALIFIER_TAG);
                 xml.attribute(QUALIFIER_NAME_ATTR,n.getTerm().getName());
-                if (n.getTerm().getName().equals("translation")) {
+                if (n.getTerm().getName().equalsIgnoreCase("translation")) {
                     String[] lines = StringTools.wordWrap(n.getValue(), "\\s+", this.getLineWidth());
                     for (int k = 0; k < lines.length; k++) xml.println(lines[k]);
                 } else {
@@ -657,9 +657,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
                     rlistener.setNamespace(ns);
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
-                        if (val.equals("")) continue;
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
                         if (name.equals(ENTRY_ACCESSION_ATTR)) {
                             accession = val;
                             rlistener.setAccession(accession);
@@ -690,24 +689,20 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 currComments.clear();
             } else if (qName.equals(REFERENCE_POSITION_TAG) && !this.parent.getElideReferences()) {
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(REF_POS_BEGIN_ATTR)) currRefStart = Integer.parseInt(val);
                     else if (name.equals(REF_POS_END_ATTR)) currRefEnd = Integer.parseInt(val);
                 }
             } else if (qName.equals(CITATION_TAG) && !this.parent.getElideReferences()) {
                 StringBuffer currRef = new StringBuffer();
-                int attrCount = 0;
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(CITATION_ID_ATTR)) currRefRank = Integer.parseInt(val);
                     // combine everything else into a fake reference to use if locator is a no-show
                     else if (!name.equals(CITATION_TYPE_ATTR)) {
-                        if (attrCount!=0) currRef.append(" ");
-                        else attrCount = 1;
+                        if (currRef.length()>0) currRef.append(" ");
                         currRef.append(val);
                     }
                 }
@@ -719,9 +714,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 String primary = null;
                 String secondary = null;
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(DBREF_DB_ATTR)) db = val;
                     else if (name.equals(DBREF_PRIMARY_ATTR)) primary = val;
                     else if (name.equals(DBREF_SEC_ATTR)) secondary = val;
@@ -747,35 +741,30 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 templ.featureRelationshipSet = new TreeSet();
                 templ.rankedCrossRefs = new TreeSet();
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(FEATURE_NAME_ATTR)) {
-                        templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(val);
-                    }
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
+                    if (name.equals(FEATURE_NAME_ATTR)) templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(val);
                 }
                 currLocStr = new StringBuffer();
                 currDBXrefs.clear();
                 currQuals.clear();
             } else if (qName.equals(QUALIFIER_TAG) && !this.parent.getElideFeatures()) {
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(QUALIFIER_NAME_ATTR)) currFeatQual = val;
                 }
             } else if (qName.equals(LOCATION_TAG) && !this.parent.getElideFeatures()) {
                 currLocBrackets = 0;
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(LOCATION_TYPE_ATTR) && !val.equals("single")) {
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
+                    if (name.equals(LOCATION_TYPE_ATTR) && !val.equalsIgnoreCase("single")) {
                         // open a bracket just in case
                         currLocStr.append(val);
                         currLocStr.append("(");
                         currLocBrackets++;
-                    } else if (name.equals(LOCATION_COMPL_ATTR) && val.equals("true")) {
+                    } else if (name.equals(LOCATION_COMPL_ATTR) && val.equalsIgnoreCase("true")) {
                         currLocStr.append("complement");
                         currLocStr.append("(");
                         currLocBrackets++;
@@ -787,10 +776,9 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 String currVer = null;
                 if (!firstLocationElement) currLocStr.append(",");
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(LOCATION_COMPL_ATTR) && val.equals("true")) {
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
+                    if (name.equals(LOCATION_COMPL_ATTR) && val.equalsIgnoreCase("true")) {
                         currLocStr.append("complement");
                         currLocStr.append("(");
                         currLocElemBrackets++;
@@ -808,9 +796,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 firstBase = true;
             } else if (qName.equals(BASEPOSITION_TAG) && !this.parent.getElideFeatures()) {
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(BASEPOSITION_TYPE_ATTR)) currBaseType = val;
                     else if (name.equals(BASEPOSITION_EXTENT_ATTR)) currBaseExtent = val;
                 }
@@ -819,16 +806,11 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             else if (qName.equals(SEQUENCE_TAG)) {
                 try {
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
-                        if (val.equals("")) continue;
-                        if (name.equals(SEQUENCE_TYPE_ATTR)) {
-                            rlistener.addSequenceProperty(Terms.getMolTypeTerm(),val);
-                        } else if (name.equals(SEQUENCE_VER_ATTR)) {
-                            rlistener.setSeqVersion(val);
-                        } else if (name.equals(SEQUENCE_TOPOLOGY_ATTR) && val.equals("circular")) {
-                            rlistener.setCircular(true);
-                        }
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
+                        if (name.equals(SEQUENCE_TYPE_ATTR)) rlistener.addSequenceProperty(Terms.getMolTypeTerm(),val);
+                        else if (name.equals(SEQUENCE_VER_ATTR)) rlistener.setSeqVersion(val);
+                        else if (name.equals(SEQUENCE_TOPOLOGY_ATTR) && val.equalsIgnoreCase("circular")) rlistener.setCircular(true);
                     }
                 } catch (ParseException e) {
                     SAXException pe = new SAXException("Could not set sequence properties");
@@ -865,16 +847,18 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     currRefLocation = val;
                 } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
                     // do the crossrefs
-                    int k = 0;
+                    int rank = 0;
                     CrossRef useForDocRef = null;
                     for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
                         CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, k++);
+                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, rank++);
                         rlistener.setRankedCrossRef(rdbx);
                         if (useForDocRef==null) useForDocRef = dbx;
                         else {
                             // medline gets priority, then pubmed - if multiple, use last
-                            if (dbx.getDbname().equals(Terms.MEDLINE_KEY) || (dbx.getDbname().equals(Terms.PUBMED_KEY) && !useForDocRef.getDbname().equals(Terms.MEDLINE_KEY))) {
+                            if (dbx.getDbname().equalsIgnoreCase(Terms.MEDLINE_KEY) ||
+                                    (dbx.getDbname().equalsIgnoreCase(Terms.PUBMED_KEY) &&
+                                    !useForDocRef.getDbname().equalsIgnoreCase(Terms.MEDLINE_KEY))) {
                                 useForDocRef = dbx;
                             }
                         }
@@ -919,9 +903,9 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     } else if (currBaseType.equals(">")) {
                         currLocStr.append(val);
                         currLocStr.append(">");
-                    } else if (currBaseType.equals("simple")) {
+                    } else if (currBaseType.equalsIgnoreCase("simple")) {
                         currLocStr.append(val);
-                    } else if (currBaseType.equals("fuzzy")) {
+                    } else if (currBaseType.equalsIgnoreCase("fuzzy")) {
                         int refVal = Integer.parseInt(val);
                         int extentVal = Integer.parseInt(currBaseExtent);
                         if (refVal + extentVal < refVal) {
@@ -948,7 +932,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     for (Iterator j = currQuals.keySet().iterator(); j.hasNext(); ) {
                         String qualName = (String)j.next();
                         String qualVal = (String)currQuals.get(qualName);
-                        if (qualName.equals("translation")) {
+                        if (qualName.equalsIgnoreCase("translation")) {
                             // strip spaces from sequence
                             qualVal = qualVal.replaceAll("\\s+","");
                         }
@@ -1028,19 +1012,11 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                         rlistener.setComment((String)j.next());
                     }
                     // do the crossrefs
-                    int k = 0;
-                    CrossRef useForDocRef = null;
+                    int rank = 0;
                     for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
                         CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, k++);
+                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, rank++);
                         rlistener.setRankedCrossRef(rdbx);
-                        if (useForDocRef==null) useForDocRef = dbx;
-                        else {
-                            // medline gets priority, then pubmed - if multiple, use last
-                            if (dbx.getDbname().equals(Terms.MEDLINE_KEY) || (dbx.getDbname().equals(Terms.PUBMED_KEY) && !useForDocRef.getDbname().equals(Terms.MEDLINE_KEY))) {
-                                useForDocRef = dbx;
-                            }
-                        }
                     }
                     // end the sequence
                     rlistener.endSequence();

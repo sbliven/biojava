@@ -187,7 +187,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     String stranded = m.group(2);
                     String circular = m.group(4);
                     if (stranded!=null) rlistener.addSequenceProperty(Terms.getStrandedTerm(),stranded);
-                    if (circular!=null && circular.equals("circular")) rlistener.setCircular(true);
+                    if (circular!=null && circular.equalsIgnoreCase("circular")) rlistener.setCircular(true);
                 } else {
                     throw new ParseException("Bad locus line found: "+loc);
                 }
@@ -213,7 +213,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String val = ((String[])section.get(0))[1];
-                val = val.substring(0, val.length()-1); // chomp dot
+                if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
                 String[] kws = val.split(";");
                 for (int i = 0; i < kws.length; i++) {
                     String kw = kws[i].trim();
@@ -250,8 +250,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 for (int i = 1; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
-                    if (key.equals(AUTHORS_TAG)) authors = val.trim();
-                    if (key.equals(TITLE_TAG)) title = val.trim();
+                    if (key.equals(AUTHORS_TAG)) authors = val;
+                    if (key.equals(TITLE_TAG)) title = val;
                     if (key.equals(JOURNAL_TAG)) journal = val;
                     if (key.equals(MEDLINE_TAG)) medline = val;
                     if (key.equals(PUBMED_TAG)) pubmed = val;
@@ -301,14 +301,15 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     String val = ((String[])section.get(i))[1];
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
-                        val = val.replaceAll("\"","").trim(); // strip quotes
+                        val = val.trim();
+                        if (val.endsWith("\"")) val = val.substring(1,val.length()-1); // strip quotes
                         // parameter on old feature
                         if (key.equals("db_xref")) {
                             Matcher m = dbxp.matcher(val);
                             if (m.matches()) {
                                 String dbname = m.group(1);
                                 String raccession = m.group(2);
-                                if (dbname.equals("taxon")) {
+                                if (dbname.equalsIgnoreCase("taxon")) {
                                     // Set the Taxon instead of a dbxref
                                     tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
                                     rlistener.setTaxon(tax);
@@ -329,7 +330,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                             } else {
                                 throw new ParseException("Bad dbxref found: "+val);
                             }
-                        } else if (key.equals("organism")) {
+                        } else if (key.equalsIgnoreCase("organism")) {
                             try {
                                 organism = val;
                                 if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
@@ -337,7 +338,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                                 throw new ParseException(e);
                             }
                         } else {
-                            if (key.equals("translation")) {
+                            if (key.equalsIgnoreCase("translation")) {
                                 // strip spaces from sequence
                                 val = val.replaceAll("\\s+","");
                             }
@@ -420,7 +421,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             while (!done) {
                 br.mark(160);
                 line = br.readLine();
-                if (line==null || line.equals("") || (line.charAt(0)!=' ' && linecount++>0)) {
+                if (line==null || line.length()==0 || (!line.startsWith(" ") && linecount++>0)) {
                     // dump out last part of section
                     section.add(new String[]{currKey,currVal.toString()});
                     br.reset();
@@ -436,12 +437,11 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         // val = group(3) if group(2) not null, group(5) if group(4) not null, "" otherwise, trimmed
                         currVal.append((m.group(2)==null?(m.group(4)==null?"":m.group(5)):m.group(3)).trim());
                     } else {
-                        line = line.trim();
                         // concatted line or SEQ START/END line?
-                        if (line.equals(START_SEQUENCE_TAG) || line.equals(END_SEQUENCE_TAG)) currKey = line;
+                        if (line.startsWith(START_SEQUENCE_TAG) || line.startsWith(END_SEQUENCE_TAG)) currKey = line;
                         else {
                             currVal.append("\n"); // newline in between lines - can be removed later
-                            currVal.append(line);
+                            currVal.append(line.trim());
                         }
                     }
                 }
@@ -493,20 +493,24 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         
         Set notes = rs.getNoteSet();
         String accession = rs.getAccession();
-        String accessions = accession;
+        StringBuffer accessions = new StringBuffer();
+        accessions.append(accession);
         String stranded = "";
         String udat = "";
         String moltype = rs.getAlphabet().getName();
-        String keywords = "";
+        StringBuffer keywords = new StringBuffer();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
-            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions = accessions+" "+n.getValue();
+            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
+                accessions.append(" ");
+                accessions.append(n.getValue());
+            }
             else if (n.getTerm().equals(Terms.getKeywordTerm())) {
-                if (keywords.equals("")) keywords=n.getValue();
-                else keywords = keywords+"; "+n.getValue();
+                if (keywords.length()>0) keywords.append("; ");
+                keywords.append(n.getValue());
             }
         }
         
@@ -527,7 +531,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         StringTools.writeKeyValueLine(DEFINITION_TAG, rs.getDescription(), 12, this.getLineWidth(), this.getPrintStream());
         
         // accession line
-        StringTools.writeKeyValueLine(ACCESSION_TAG, accessions, 12, this.getLineWidth(), this.getPrintStream());
+        StringTools.writeKeyValueLine(ACCESSION_TAG, accessions.toString(), 12, this.getLineWidth(), this.getPrintStream());
         
         // version + gi line
         String version = accession+"."+rs.getVersion();
@@ -535,7 +539,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         StringTools.writeKeyValueLine(VERSION_TAG, version, 12, this.getLineWidth(), this.getPrintStream());
         
         // keywords line
-        StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords+".", 12, this.getLineWidth(), this.getPrintStream());
+        keywords.append(".");
+        StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords.toString(), 12, this.getLineWidth(), this.getPrintStream());
         
         // source line (from taxon)
         //   organism line
@@ -558,7 +563,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             StringTools.writeKeyValueLine("  "+TITLE_TAG, d.getTitle(), 12, this.getLineWidth(), this.getPrintStream());
             StringTools.writeKeyValueLine("  "+JOURNAL_TAG, d.getLocation(), 12, this.getLineWidth(), this.getPrintStream());
             CrossRef c = d.getCrossref();
-            if (c!=null) StringTools.writeKeyValueLine("  "+c.getDbname().toUpperCase(), c.getAccession(), 12, this.getLineWidth(), this.getPrintStream());
+            if (c!=null) StringTools.writeKeyValueLine("  "+c.getDbname(), c.getAccession(), 12, this.getLineWidth(), this.getPrintStream());
             StringTools.writeKeyValueLine("  "+REMARK_TAG, d.getRemark(), 12, this.getLineWidth(), this.getPrintStream());
         }
         
@@ -581,7 +586,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
                 // /key="val" or just /key if val==""
-                if (n.getValue()==null || n.getValue().equals("")) StringTools.writeKeyValueLine("", "/"+n.getTerm().getName(), 21, this.getLineWidth(), this.getPrintStream());
+                if (n.getValue()==null || n.getValue().length()==0) StringTools.writeKeyValueLine("", "/"+n.getTerm().getName(), 21, this.getLineWidth(), this.getPrintStream());
                 else StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), this.getPrintStream());
             }
             // add-in to source feature only db_xref="taxon:xyz" where present

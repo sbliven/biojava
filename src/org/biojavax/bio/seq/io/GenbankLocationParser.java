@@ -179,7 +179,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         if (groupType!=null) {
             
             // Is it a strand group?
-            if (groupType.equals("complement")) {
+            if (groupType.equalsIgnoreCase("complement")) {
                 // It's a complement location
                 if (parentStrand==Strand.NEGATIVE_STRAND) strand = Strand.POSITIVE_STRAND;
                 else strand = Strand.NEGATIVE_STRAND;
@@ -191,8 +191,8 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
             // Otherwise, it's a compound location
             else {
                 ComparableTerm groupTypeTerm = null;
-                if (groupType.equals("order")) groupTypeTerm = CompoundRichLocation.getOrderTerm();
-                else if (groupType.equals("join")) groupTypeTerm = CompoundRichLocation.getJoinTerm();
+                if (groupType.equalsIgnoreCase("order")) groupTypeTerm = CompoundRichLocation.getOrderTerm();
+                else if (groupType.equalsIgnoreCase("join")) groupTypeTerm = CompoundRichLocation.getJoinTerm();
                 else throw new ParseException("Unknown group type "+groupType+" received");
                 
                 // recurse on each block and return the compounded result

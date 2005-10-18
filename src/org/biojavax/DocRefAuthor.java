@@ -73,7 +73,7 @@ public interface DocRefAuthor extends Comparable,Changeable {
          */
         public static List parseAuthorString(String authors) {
             if (authors==null) throw new IllegalArgumentException("Authors string cannot be null");
-            String[] parts = authors.split(",");
+            String[] parts = authors.split("(,|\\sand)\\s+");
             List authSet = new ArrayList();
             for (int i = 0; i < parts.length; i++) authSet.add(new SimpleDocRefAuthor(parts[i]));
             return authSet;
@@ -81,19 +81,24 @@ public interface DocRefAuthor extends Comparable,Changeable {
         
         /**
          * Takes a set of authors and creates a comma-separated string.
+         * For the final comma, it replaces it with the word "and".
          * @param a set of authors
-         * @return a comma-separated string
+         * @return a comma-separated string with the word "and" in 
+         * place of the final comma.
          */
         public static String generateAuthorString(List authors) {
             StringBuffer sb = new StringBuffer();
+            int authCount = 1;
             for (Iterator i = authors.iterator(); i.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)i.next();
                 sb.append(a.getExtendedName());
-                if (i.hasNext()) sb.append(", ");
+                if (i.hasNext()) {
+                    if (authCount++==authors.size()-1) sb.append(" and ");
+                    else sb.append(", ");
+                }
             }
             return sb.toString();
-        }
-        
+        }        
     }
     
 }

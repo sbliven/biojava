@@ -155,7 +155,6 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     protected static final String RC_PLASMID_TAG = "plasmid";
     
     protected static final String COMMENT_TAG = "comment";
-    protected static final String COMMENT_NAME_ATTR = "name";
     protected static final String COMMENT_MASS_ATTR = "mass";
     protected static final String COMMENT_ERROR_ATTR = "error";
     protected static final String COMMENT_METHOD_ATTR = "method";
@@ -174,13 +173,11 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     protected static final String COMMENT_EVENT_TAG = "event";
     protected static final String COMMENT_EVENT_ISOFORMS_ATTR = "namedIsoforms";
     protected static final String COMMENT_ISOFORM_TAG = "isoform";
-    protected static final String COMMENT_ISOFORM_NAME_TAG = "name";
     protected static final String COMMENT_INTERACTANT_TAG = "interactant";
     protected static final String COMMENT_INTERACT_INTACT_ATTR = "intactId";
     protected static final String COMMENT_INTERACT_LABEL_TAG = "label";
     protected static final String COMMENT_ORGANISMS_TAG = "organismsDiffer";
     protected static final String COMMENT_EXPERIMENTS_TAG = "experiments";
-    protected static final String COMMENT_TEXT_TAG = "text";
     
     protected static final String NOTE_TAG = "note";
     protected static final String KEYWORD_TAG = "keyword";
@@ -371,6 +368,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     
     /**
      * {@inheritDoc}
+     * If namespace is null, then the namespace of the sequence in the fasta is used.
+     * If the namespace is null and so is the namespace of the sequence in the fasta,
+     * then the default namespace is used.
      */
     public boolean readRichSequence(BufferedReader reader,
             SymbolTokenization symParser,
@@ -441,7 +441,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     
     /**
      * {@inheritDoc}
-     * Namespace is ignored as UniProtXML has no concept of it.
+     * If namespace is null, then the sequence's own namespace is used.
      */
     public void writeSequence(Sequence seq, Namespace ns) throws IOException {
         RichSequence rs;
@@ -500,7 +500,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             else if (n.getTerm().equals(Terms.getKeywordTerm())) {
                 ComparableTerm t = Terms.getUniprotKWOnto().getOrCreateTerm(n.getValue());
                 try {
-                    if (t.getIdentifier()==null || t.getIdentifier().equals("")) t.setIdentifier("UNKNOWN");
+                    if (t.getIdentifier()==null || t.getIdentifier().length()==0) t.setIdentifier("UNKNOWN");
                 } catch (ChangeVetoException ce) {
                     IOException e = new IOException("Failed to assign keyword identifier");
                     e.initCause(ce);
@@ -609,7 +609,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         }
         
         xml.openTag(ENTRY_TAG);
-        xml.attribute(ENTRY_NAMESPACE_ATTR,ns.getName());
+        xml.attribute(ENTRY_NAMESPACE_ATTR,(ns==null?rs.getNamespace().getName():ns.getName()));
         xml.attribute(ENTRY_CREATED_ATTR,cdat);
         xml.attribute(ENTRY_UPDATED_ATTR,(adat==null?cdat:adat)); // annotation update
         
@@ -624,20 +624,20 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         xml.openTag(PROTEIN_TAG);
         if (proteinType!=null) xml.attribute(TYPE_ATTR,proteinType);
         String desc = rs.getDescription().trim(); // this is only going to make sense if it was a UniProt seq to start with
-        desc = desc.substring(0, desc.length()-1); // chomp trailing dot
+        if (desc.endsWith(".")) desc = desc.substring(0, desc.length()-1); // chomp trailing dot
         String[] parts = desc.split("\\[");
         for (int j = 0 ; j < parts.length; j++) {
             if (parts[j].startsWith(Terms.CONTAINS_PREFIX)) {
                 // contains section
                 String chunk = parts[j].substring(Terms.CONTAINS_PREFIX.length()+1).trim();
-                chunk = chunk.substring(0, chunk.length()-1); // chomp trailing ]
+                if (chunk.endsWith("]")) chunk = chunk.substring(0, chunk.length()-1); // chomp trailing ]
                 String[] moreparts = chunk.split(";");
                 for (int k = 0; k < moreparts.length; k++) {
                     xml.openTag(DOMAIN_TAG);
                     String[] names = moreparts[k].split("\\(");
                     for (int l = 0; l < names.length; l++) {
                         String name = names[l].trim();
-                        if (l>0) name = name.substring(0,name.length()-1); // chomp trailing )
+                        if (name.endsWith(")")) name = name.substring(0,name.length()-1); // chomp trailing )
                         xml.openTag(NAME_TAG);
                         xml.print(name);
                         xml.closeTag(NAME_TAG);
@@ -647,14 +647,14 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             } else if (parts[j].startsWith(Terms.INCLUDES_PREFIX)) {
                 // includes section
                 String chunk = parts[j].substring(Terms.INCLUDES_PREFIX.length()+1).trim();
-                chunk = chunk.substring(0, chunk.length()-1); // chomp trailing ]
+                if (chunk.endsWith("]")) chunk = chunk.substring(0, chunk.length()-1); // chomp trailing ]
                 String[] moreparts = chunk.split(";");
                 for (int k = 0; k < moreparts.length; k++) {
                     xml.openTag(COMPONENT_TAG);
                     String[] names = moreparts[k].split("\\(");
                     for (int l = 0; l < names.length; l++) {
                         String name = names[l].trim();
-                        if (l>0) name = name.substring(0,name.length()-1); // chomp trailing )
+                        if (name.endsWith(")")) name = name.substring(0,name.length()-1); // chomp trailing )
                         xml.openTag(NAME_TAG);
                         xml.print(name);
                         xml.closeTag(NAME_TAG);
@@ -666,7 +666,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 String[] names = parts[j].split("\\(");
                 for (int l = 0; l < names.length; l++) {
                     String name = names[l].trim();
-                    if (l>0) name = name.substring(0,name.length()-1); // chomp trailing )
+                    if (name.endsWith(")")) name = name.substring(0,name.length()-1); // chomp trailing )
                     xml.openTag(NAME_TAG);
                     xml.print(name);
                     xml.closeTag(NAME_TAG);
@@ -728,10 +728,10 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             for (Iterator i = tax.getNameClasses().iterator(); i.hasNext(); ) {
                 String nameclass = (String)i.next();
                 String ournameclass = Terms.COMMON_NAME_KEY;
-                if (nameclass.equals(Terms.FULL_NAME_KEY)) ournameclass = NCBITaxon.EQUIVALENT;
-                else if (nameclass.equals(Terms.SCIENTIFIC_NAME_KEY)) ournameclass = NCBITaxon.SCIENTIFIC;
-                else if (nameclass.equals(Terms.SYNONYM_NAME_KEY)) ournameclass = NCBITaxon.SYNONYM;
-                else if (nameclass.equals(Terms.ABBREV_NAME_KEY)) ournameclass = NCBITaxon.ACRONYM;
+                if (nameclass.equalsIgnoreCase(Terms.FULL_NAME_KEY)) ournameclass = NCBITaxon.EQUIVALENT;
+                else if (nameclass.equalsIgnoreCase(Terms.SCIENTIFIC_NAME_KEY)) ournameclass = NCBITaxon.SCIENTIFIC;
+                else if (nameclass.equalsIgnoreCase(Terms.SYNONYM_NAME_KEY)) ournameclass = NCBITaxon.SYNONYM;
+                else if (nameclass.equalsIgnoreCase(Terms.ABBREV_NAME_KEY)) ournameclass = NCBITaxon.ACRONYM;
                 for (Iterator j = tax.getNames(nameclass).iterator(); j.hasNext(); ) {
                     xml.openTag(NAME_TAG);
                     xml.attribute(TYPE_ATTR,ournameclass);
@@ -777,7 +777,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     xml.closeTag(GENELOCATION_NAME_TAG);
                 }
             } else {
-                xml.attribute(TYPE_ATTR,org.toLowerCase());
+                xml.attribute(TYPE_ATTR,org.toLowerCase()); // uniprotxml must have lower case
             }
             xml.closeTag(GENELOCATION_TAG);
         }
@@ -791,7 +791,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             xml.attribute(KEY_ATTR,""+(key++));
             
             xml.openTag(CITATION_TAG);
-            xml.attribute(TYPE_ATTR,"journal article");
+            xml.attribute(TYPE_ATTR,"journal article"); // faking it i know
             
             if (dr.getTitle()!=null) {
                 xml.openTag(TITLE_TAG);
@@ -925,23 +925,23 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     throw e;
                 }
                 String type = ucp.getCommentType();
-                String xtype = type.toLowerCase();
-                if (type.equals(UniProtCommentParser.PTM)) xtype = "posttranslational modification";
-                else if (type.equals(UniProtCommentParser.DATABASE)) xtype = "online information";
+                String xtype = type.toLowerCase(); // uniprotxml requires lower case
+                if (type.equalsIgnoreCase(UniProtCommentParser.PTM)) xtype = "posttranslational modification";
+                else if (type.equalsIgnoreCase(UniProtCommentParser.DATABASE)) xtype = "online information";
                 
                 xml.openTag(COMMENT_TAG);
                 xml.attribute(TYPE_ATTR,xtype);
                 
                 // database comment
-                if (type.equals(UniProtCommentParser.DATABASE)) {
-                    xml.attribute(COMMENT_NAME_ATTR,ucp.getDatabaseName());
+                if (type.equalsIgnoreCase(UniProtCommentParser.DATABASE)) {
+                    xml.attribute(NAME_ATTR,ucp.getDatabaseName());
                     
                     xml.openTag(COMMENT_LINK_TAG);
                     xml.attribute(COMMENT_LINK_URI_ATTR,ucp.getUri());
                     xml.closeTag(COMMENT_LINK_TAG);
                 }
                 // mass spec
-                else if (type.equals(UniProtCommentParser.MASS_SPECTROMETRY)) {
+                else if (type.equalsIgnoreCase(UniProtCommentParser.MASS_SPECTROMETRY)) {
                     xml.attribute(COMMENT_MASS_ATTR,""+ucp.getMolecularWeight());
                     if (ucp.getMolWeightError()!=null) xml.attribute(COMMENT_ERROR_ATTR,""+ucp.getMolWeightError());
                     xml.attribute(COMMENT_METHOD_ATTR,""+ucp.getMolWeightMethod());
@@ -956,7 +956,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     xml.closeTag(LOCATION_TAG);
                 }
                 // interaction
-                else if (type.equals(UniProtCommentParser.INTERACTION)) {
+                else if (type.equalsIgnoreCase(UniProtCommentParser.INTERACTION)) {
                     // UniProt flat allows for multiple interactions per comment, but
                     // UniProtXML only allows for a single one. So, we have to open/close
                     // and write additional comments as necessary.
@@ -997,11 +997,11 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     }
                 }
                 // alternative products
-                else if (type.equals(UniProtCommentParser.ALTERNATIVE_PRODUCTS)) {
+                else if (type.equalsIgnoreCase(UniProtCommentParser.ALTERNATIVE_PRODUCTS)) {
                     for (Iterator j = ucp.getEvents().iterator(); j.hasNext(); ) {
                         Event event = (Event)j.next();
                         xml.openTag(COMMENT_EVENT_TAG);
-                        xml.attribute(TYPE_ATTR,event.getType().toLowerCase());
+                        xml.attribute(TYPE_ATTR,event.getType().toLowerCase()); // uniprotxml requires lowercase
                         if (event.getType().equals("Alternative splicing")) xml.attribute(COMMENT_EVENT_ISOFORMS_ATTR,""+event.getNamedIsoforms());
                         xml.print(event.getComment());
                         xml.closeTag(COMMENT_EVENT_TAG);
@@ -1015,13 +1015,13 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                             xml.closeTag(ID_TAG);
                         }
                         for (Iterator k = isoform.getNames().iterator(); k.hasNext(); ) {
-                            xml.openTag(COMMENT_ISOFORM_NAME_TAG);
+                            xml.openTag(NAME_TAG);
                             xml.print((String)k.next());
-                            xml.closeTag(COMMENT_ISOFORM_NAME_TAG);
+                            xml.closeTag(NAME_TAG);
                         }
                         xml.openTag(SEQUENCE_TAG);
                         xml.attribute(TYPE_ATTR,isoform.getSequenceType().toLowerCase());
-                        if (isoform.getSequenceType().equals("Described")) {
+                        if (isoform.getSequenceType().equalsIgnoreCase("Described")) {
                             xml.attribute(REF_ATTR,isoform.getSequenceRef());
                         }
                         xml.closeTag(SEQUENCE_TAG);
@@ -1031,15 +1031,15 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     }
                 }
                 // biophysicoblahblah stuff
-                else if (type.equals(UniProtCommentParser.BIOPHYSICOCHEMICAL_PROPERTIES)) {
+                else if (type.equalsIgnoreCase(UniProtCommentParser.BIOPHYSICOCHEMICAL_PROPERTIES)) {
                     if (ucp.getAbsorptionNote()!=null) {
                         xml.openTag(COMMENT_ABSORPTION_TAG);
                         xml.openTag(COMMENT_ABS_MAX_TAG);
                         xml.print(ucp.getAbsorptionMax());
                         xml.closeTag(COMMENT_ABS_MAX_TAG);
-                        xml.openTag(COMMENT_TEXT_TAG);
+                        xml.openTag(TEXT_TAG);
                         xml.print(ucp.getAbsorptionNote());
-                        xml.closeTag(COMMENT_TEXT_TAG);
+                        xml.closeTag(TEXT_TAG);
                         xml.closeTag(COMMENT_ABSORPTION_TAG);
                     }
                     if (ucp.getKineticsNote()!=null) {
@@ -1054,9 +1054,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                             xml.print((String)j.next());
                             xml.closeTag(COMMENT_KIN_VMAX_TAG);
                         }
-                        xml.openTag(COMMENT_TEXT_TAG);
+                        xml.openTag(TEXT_TAG);
                         xml.print(ucp.getKineticsNote());
-                        xml.closeTag(COMMENT_TEXT_TAG);
+                        xml.closeTag(TEXT_TAG);
                         xml.closeTag(COMMENT_KINETICS_TAG);
                     }
                     if (ucp.getPHDependence()!=null) {
@@ -1077,9 +1077,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 }
                 // all other comments
                 else {
-                    xml.openTag(COMMENT_TEXT_TAG);
+                    xml.openTag(TEXT_TAG);
                     xml.print(ucp.getText());
-                    xml.closeTag(COMMENT_TEXT_TAG);
+                    xml.closeTag(TEXT_TAG);
                 }
                 
                 // finish comment up
@@ -1101,153 +1101,152 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             xml.openTag(DBXREF_TAG);
             String dbname = cr.getDbname();
             xml.attribute(TYPE_ATTR,dbname);
-            dbname = dbname.toUpperCase(); // for comparison's sake
             xml.attribute(ID_ATTR,cr.getAccession());
             xml.attribute(KEY_ATTR,""+(key++));
             if (!cr.getNoteSet().isEmpty()) {
                 int acccount = 2;
                 for (Iterator j = cr.getNoteSet().iterator(); j.hasNext(); ) {
                     Note n = (Note)j.next();
-                    if (!n.getValue().equals("-") && n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
+                    if (n.getTerm().equals(Terms.getAdditionalAccessionTerm()) && !n.getValue().equals("-")) {
                         xml.openTag(PROPERTY_TAG);
                         String name = n.getTerm().getName();
                         if (acccount==2) {
                             // SECONDARY IDENTIFIER
-                            if (dbname.equals("HIV") ||
-                                    dbname.equals("INTERPRO") ||
-                                    dbname.equals("PANTHER") ||
-                                    dbname.equals("PFAM") ||
-                                    dbname.equals("PIR") ||
-                                    dbname.equals("PRINTS") ||
-                                    dbname.equals("PRODOM") ||
-                                    dbname.equals("REBASE") ||
-                                    dbname.equals("SMART") ||
-                                    dbname.equals("TIGRFAMS")) {
+                            if (dbname.equalsIgnoreCase("HIV") ||
+                                    dbname.equalsIgnoreCase("INTERPRO") ||
+                                    dbname.equalsIgnoreCase("PANTHER") ||
+                                    dbname.equalsIgnoreCase("PFAM") ||
+                                    dbname.equalsIgnoreCase("PIR") ||
+                                    dbname.equalsIgnoreCase("PRINTS") ||
+                                    dbname.equalsIgnoreCase("PRODOM") ||
+                                    dbname.equalsIgnoreCase("REBASE") ||
+                                    dbname.equalsIgnoreCase("SMART") ||
+                                    dbname.equalsIgnoreCase("TIGRFAMS")) {
                                 // the secondary identifier is the entry name.
                                 name = "entry name";
-                            } else if (dbname.equals("PDB")) {
+                            } else if (dbname.equalsIgnoreCase("PDB")) {
                                 // the secondary identifier is the structure determination method, which is controlled vocabulary that currently includes: X-ray(for X-ray crystallography), NMR(for NMR spectroscopy), EM(for electron microscopy and cryo-electron diffraction), Fiber(for fiber diffraction), IR(for infrared spectroscopy), Model(for predicted models) and Neutron(for neutron diffraction).
                                 name = "structure determination method";
-                            } else if (dbname.equals("DICTYBASE") ||
-                                    dbname.equals("ECOGENE") ||
-                                    dbname.equals("FLYBASE") ||
-                                    dbname.equals("HGNC") ||
-                                    dbname.equals("MGI") ||
-                                    dbname.equals("RGD") ||
-                                    dbname.equals("SGD") ||
-                                    dbname.equals("STYGENE") ||
-                                    dbname.equals("SUBTILIST") ||
-                                    dbname.equals("WORMBASE") ||
-                                    dbname.equals("ZFIN")) {
+                            } else if (dbname.equalsIgnoreCase("DICTYBASE") ||
+                                    dbname.equalsIgnoreCase("ECOGENE") ||
+                                    dbname.equalsIgnoreCase("FLYBASE") ||
+                                    dbname.equalsIgnoreCase("HGNC") ||
+                                    dbname.equalsIgnoreCase("MGI") ||
+                                    dbname.equalsIgnoreCase("RGD") ||
+                                    dbname.equalsIgnoreCase("SGD") ||
+                                    dbname.equalsIgnoreCase("STYGENE") ||
+                                    dbname.equalsIgnoreCase("SUBTILIST") ||
+                                    dbname.equalsIgnoreCase("WORMBASE") ||
+                                    dbname.equalsIgnoreCase("ZFIN")) {
                                 // the secondary identifier is the gene designation. If the gene designation is not available, a dash('-') is used.
                                 name = "gene designation";
-                            } else if (dbname.equals("GO")) {
+                            } else if (dbname.equalsIgnoreCase("GO")) {
                                 // the second identifier is a 1-letter abbreviation for one of the 3 ontology aspects, separated from the GO term by a column. If the term is longer than 46 characters, the first 43 characters are indicated followed by 3 dots('...'). The abbreviations for the 3 distinct aspects of the ontology are P(biological Process), F(molecular Function), and C(cellular Component).
                                 name = "term";
-                            } else if (dbname.equals("HAMAP")) {
+                            } else if (dbname.equalsIgnoreCase("HAMAP")) {
                                 // the secondary identifier indicates if a domain is 'atypical' and/or 'fused', otherwise the field is empty('-').
                                 name = "domain";
-                            } else if (dbname.equals("ECO2DBASE")) {
+                            } else if (dbname.equalsIgnoreCase("ECO2DBASE")) {
                                 // the secondary identifier is the latest release number or edition of the database that has been used to derive the cross-reference.
                                 name = "release number";
-                            } else if (dbname.equals("SWISS-2DPAGE") ||
-                                    dbname.equals("HSC-2DPAGE")) {
+                            } else if (dbname.equalsIgnoreCase("SWISS-2DPAGE") ||
+                                    dbname.equalsIgnoreCase("HSC-2DPAGE")) {
                                 // the secondary identifier is the species or tissue of origin.
                                 name = "organism name";
-                            } else if (dbname.equals("ENSEMBL")) {
+                            } else if (dbname.equalsIgnoreCase("ENSEMBL")) {
                                 // the secondary identifier is the species of origin.
                                 name = "organism name";
-                            } else if (dbname.equals("PIRSF")) {
+                            } else if (dbname.equalsIgnoreCase("PIRSF")) {
                                 // the secondary identifier is the protein family name.
                                 name = "protein family name";
-                            } else if (dbname.equals("AARHUS") ||
-                                    dbname.equals("GHENT-2DPAGE")) {
+                            } else if (dbname.equalsIgnoreCase("AARHUS") ||
+                                    dbname.equalsIgnoreCase("GHENT-2DPAGE")) {
                                 // the secondary identifier is either 'IEF' (for isoelectric focusing) or 'NEPHGE' (for non-equilibrium pH gradient electrophoresis).
                                 name = "secondary identifier";
-                            } else if (dbname.equals("WORMPEP")) {
+                            } else if (dbname.equalsIgnoreCase("WORMPEP")) {
                                 // the secondary identifier is a number attributed by the C.elegans genome-sequencing project to that protein.
                                 name = "C.elegans number";
-                            } else if (dbname.equals("AGD") ||
-                                    dbname.equals("ANU-2DPAGE") ||
-                                    dbname.equals("COMPLUYEAST-2DPAGE") ||
-                                    dbname.equals("ECHOBASE") ||
-                                    dbname.equals("GENEDB_SPOMBE") ||
-                                    dbname.equals("GERMONLINE") ||
-                                    dbname.equals("GLYCOSUITEDB") ||
-                                    dbname.equals("GRAMENE") ||
-                                    dbname.equals("H-INVDB") ||
-                                    dbname.equals("INTACT") ||
-                                    dbname.equals("LEGIOLIST") ||
-                                    dbname.equals("LEPROMA") ||
-                                    dbname.equals("LISTILIST") ||
-                                    dbname.equals("MAIZEDB") ||
-                                    dbname.equals("MEROPS") ||
-                                    dbname.equals("MIM") ||
-                                    dbname.equals("MYPULIST") ||
-                                    dbname.equals("OGP") ||
-                                    dbname.equals("PHCI-2DPAGE") ||
-                                    dbname.equals("PHOSSITE") ||
-                                    dbname.equals("PHOTOLIST") ||
-                                    dbname.equals("PMMA-2DPAGE") ||
-                                    dbname.equals("RAT-HEART-2DPAGE") ||
-                                    dbname.equals("REACTOME") ||
-                                    dbname.equals("SAGALIST") ||
-                                    dbname.equals("SIENA-2DPAGE") ||
-                                    dbname.equals("TAIR") ||
-                                    dbname.equals("TIGR") ||
-                                    dbname.equals("TRANSFAC") ||
-                                    dbname.equals("TUBERCULIST")) {
+                            } else if (dbname.equalsIgnoreCase("AGD") ||
+                                    dbname.equalsIgnoreCase("ANU-2DPAGE") ||
+                                    dbname.equalsIgnoreCase("COMPLUYEAST-2DPAGE") ||
+                                    dbname.equalsIgnoreCase("ECHOBASE") ||
+                                    dbname.equalsIgnoreCase("GENEDB_SPOMBE") ||
+                                    dbname.equalsIgnoreCase("GERMONLINE") ||
+                                    dbname.equalsIgnoreCase("GLYCOSUITEDB") ||
+                                    dbname.equalsIgnoreCase("GRAMENE") ||
+                                    dbname.equalsIgnoreCase("H-INVDB") ||
+                                    dbname.equalsIgnoreCase("INTACT") ||
+                                    dbname.equalsIgnoreCase("LEGIOLIST") ||
+                                    dbname.equalsIgnoreCase("LEPROMA") ||
+                                    dbname.equalsIgnoreCase("LISTILIST") ||
+                                    dbname.equalsIgnoreCase("MAIZEDB") ||
+                                    dbname.equalsIgnoreCase("MEROPS") ||
+                                    dbname.equalsIgnoreCase("MIM") ||
+                                    dbname.equalsIgnoreCase("MYPULIST") ||
+                                    dbname.equalsIgnoreCase("OGP") ||
+                                    dbname.equalsIgnoreCase("PHCI-2DPAGE") ||
+                                    dbname.equalsIgnoreCase("PHOSSITE") ||
+                                    dbname.equalsIgnoreCase("PHOTOLIST") ||
+                                    dbname.equalsIgnoreCase("PMMA-2DPAGE") ||
+                                    dbname.equalsIgnoreCase("RAT-HEART-2DPAGE") ||
+                                    dbname.equalsIgnoreCase("REACTOME") ||
+                                    dbname.equalsIgnoreCase("SAGALIST") ||
+                                    dbname.equalsIgnoreCase("SIENA-2DPAGE") ||
+                                    dbname.equalsIgnoreCase("TAIR") ||
+                                    dbname.equalsIgnoreCase("TIGR") ||
+                                    dbname.equalsIgnoreCase("TRANSFAC") ||
+                                    dbname.equalsIgnoreCase("TUBERCULIST")) {
                                 // the secondary identifier is not used and a dash('-') is stored in that field.
                                 // should never get here - I hope!
-                            } else if (dbname.equals("HSSP")) {
+                            } else if (dbname.equalsIgnoreCase("HSSP")) {
                                 // the secondary identifier is the entry name of the PDB structure related to that of the entry in which the HSSP cross-reference is present.
                                 name = "entry name";
-                            } else if (dbname.equals("GENEFARM")) {
+                            } else if (dbname.equalsIgnoreCase("GENEFARM")) {
                                 // the secondary identifier is the gene family identifier. If the gene family identifier is not available, a dash('-') is used.
                                 name = "gene family";
-                            } else if (dbname.equals("SMR")) {
+                            } else if (dbname.equalsIgnoreCase("SMR")) {
                                 // the secondary identifier indicates the range(s) relevant to the structure model(s).
                                 name = "range";
-                            } else if (dbname.equals("EMBL") ||
-                                    dbname.equals("DDBJ") ||
-                                    dbname.equals("GENBANK")) {
+                            } else if (dbname.equalsIgnoreCase("EMBL") ||
+                                    dbname.equalsIgnoreCase("DDBJ") ||
+                                    dbname.equalsIgnoreCase("GENBANK")) {
                                 // PROTEIN_ID; STATUS_IDENTIFIER; MOLECULE_TYPE
                                 name = "protein id";
-                            } else if (dbname.equals("PROSITE")) {
+                            } else if (dbname.equalsIgnoreCase("PROSITE")) {
                                 // ENTRY_NAME; STATUS.
                                 name = "entry name";
                             }
                         } else if (acccount==3) {
                             // TERTIARY IDENTIFIER
-                            if (dbname.equals("HAMAP") ||
-                                    dbname.equals("PANTHER") ||
-                                    dbname.equals("PFAM") ||
-                                    dbname.equals("PIRSF") ||
-                                    dbname.equals("PRODOM") ||
-                                    dbname.equals("SMART") ||
-                                    dbname.equals("TIGRFAMS")) {
+                            if (dbname.equalsIgnoreCase("HAMAP") ||
+                                    dbname.equalsIgnoreCase("PANTHER") ||
+                                    dbname.equalsIgnoreCase("PFAM") ||
+                                    dbname.equalsIgnoreCase("PIRSF") ||
+                                    dbname.equalsIgnoreCase("PRODOM") ||
+                                    dbname.equalsIgnoreCase("SMART") ||
+                                    dbname.equalsIgnoreCase("TIGRFAMS")) {
                                 // the tertiary identifier is the number of hits found in the sequence.
                                 name = "number of hits";
-                            } else if (dbname.equals("GO")) {
+                            } else if (dbname.equalsIgnoreCase("GO")) {
                                 // the tertiary identifier is a 3-character GO evidence code. The meaning of the evidence codes is: IDA=inferred from direct assay, IMP=inferred from mutant phenotype, IGI=inferred from genetic interaction, IPI=inferred from physical interaction, IEP=inferred from expression pattern, TAS=traceable author statement, NAS=non-traceable author statement, IC=inferred by curator, ISS=inferred from sequence or structural similarity.
                                 name = "evidence";
-                            } else if (dbname.equals("PDB")) {
+                            } else if (dbname.equalsIgnoreCase("PDB")) {
                                 // the tertiary identifier indicates the chain(s) and the corresponding range, of which the structure has been determined. If the range is unknown, a dash is given rather than the range positions(e.g. 'A/B=-.'), if the chains and the range is unknown, a dash is used.
                                 name = "chains";
-                            } else if (dbname.equals("EMBL") ||
-                                    dbname.equals("DDBJ") ||
-                                    dbname.equals("GENBANK")) {
+                            } else if (dbname.equalsIgnoreCase("EMBL") ||
+                                    dbname.equalsIgnoreCase("DDBJ") ||
+                                    dbname.equalsIgnoreCase("GENBANK")) {
                                 // PROTEIN_ID; STATUS_IDENTIFIER; MOLECULE_TYPE
                                 name = "status identifier";
-                            } else if (dbname.equals("PROSITE")) {
+                            } else if (dbname.equalsIgnoreCase("PROSITE")) {
                                 // ENTRY_NAME; STATUS.
                                 name = "status";
                             }
                         } else {
                             // QUATERNARY AND ADDITIONAL
-                            if (dbname.equals("EMBL") ||
-                                    dbname.equals("DDBJ") ||
-                                    dbname.equals("GENBANK")) {
+                            if (dbname.equalsIgnoreCase("EMBL") ||
+                                    dbname.equalsIgnoreCase("DDBJ") ||
+                                    dbname.equalsIgnoreCase("GENBANK")) {
                                 // PROTEIN_ID; STATUS_IDENTIFIER; MOLECULE_TYPE
                                 name = "molecule type";
                             }
@@ -1398,7 +1397,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         return UNIPROTXML_FORMAT;
     }
     
-// SAX event handler for parsing http://www.ebi.uniprot.org/support/docs/uniprot.xsd
+    // SAX event handler for parsing http://www.ebi.uniprot.org/support/docs/uniprot.xsd
     private class UniProtXMLHandler extends DefaultHandler {
         
         private RichSequenceFormat parent;
@@ -1412,7 +1411,6 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         private String accession;
         private RichFeature.Template templ;
         private StringBuffer proteinDesc;
-        private String nameIsFor;
         private boolean firstNameInProteinGroup;
         private boolean firstDomainInProteinGroup;
         private boolean firstComponentInProteinGroup;
@@ -1442,6 +1440,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         private String currNoteIsFor;
         private String currSeqIsFor;
         private String currIDIsFor;
+        private String currNameIsFor;
         private int interactantCount;
         private StringBuffer currLocStr;
         private boolean firstLocationElement;
@@ -1465,26 +1464,25 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             
             if (qName.equals(ENTRY_TAG)) {
                 try {
-                    ns=RichObjectFactory.getDefaultNamespace();
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
-                        if (name.equals(ENTRY_NAMESPACE_ATTR)) ns=(Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{val});
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
+                        if (name.equals(ENTRY_NAMESPACE_ATTR) && this.ns!=null) ns=(Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{val});
                         else if (name.equals(ENTRY_CREATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), val);
                         else if (name.equals(ENTRY_UPDATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), val);
                     }
+                    if (this.ns==null) ns=RichObjectFactory.getDefaultNamespace();
                     rlistener.setNamespace(ns);
                 } catch (ParseException e) {
                     throw new SAXException(e);
                 }
-                this.nameIsFor = "ENTRY";
+                this.currNameIsFor = "ENTRY";
                 this.currSeqIsFor = "ENTRY";
                 this.currGene = 0;
                 this.currNames.clear();
                 this.currRefRank = 0;
-                currRCID = 0;
-                currEvID = 0;
-                interactantCount = 0;
+                this.currRCID = 0;
+                this.currEvID = 0;
             }
             
             else if (qName.equals(PROTEIN_TAG)) {
@@ -1498,7 +1496,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     }
                 }
                 this.proteinDesc = new StringBuffer();
-                this.nameIsFor = "PROTEIN";
+                this.currNameIsFor = "PROTEIN";
                 this.firstNameInProteinGroup = true;
                 this.firstDomainInProteinGroup = true;
                 this.firstComponentInProteinGroup = true;
@@ -1518,37 +1516,37 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             
             else if (qName.equals(GENE_TAG)) {
                 this.currGene++;
-                this.nameIsFor="GENE";
+                this.currNameIsFor="GENE";
             }
             
             else if (qName.equals(NAME_TAG)) {
-                if (this.nameIsFor.equals("GENE")) {
+                if (this.currNameIsFor.equals("GENE")) {
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
                         if (name.equals(TYPE_ATTR)) this.geneNameClass=val;
                     }
                 }
                 
-                else if (this.nameIsFor.equals("ORGANISM")) {
+                else if (this.currNameIsFor.equals("ORGANISM")) {
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
                         if (name.equals(TYPE_ATTR)) this.organismNameClass=val;
                     }
                 }
             }
             
             else if (qName.equals(ORGANISM_TAG)) {
-                this.nameIsFor="ORGANISM";
+                this.currNameIsFor="ORGANISM";
             }
             
             else if (qName.equals(DBXREF_TAG)) {
-                if (this.nameIsFor.equals("ORGANISM")) {
+                if (this.currNameIsFor.equals("ORGANISM")) {
                     Integer taxID = null;
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
                         if (name.equals(ID_ATTR)) taxID = Integer.valueOf(val);
                     }
                     try {
@@ -1556,7 +1554,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         rlistener.setTaxon(tax);
                         for (Iterator j = currNames.keySet().iterator(); j.hasNext(); ) {
                             String nameClass = (String)j.next();
-                            Set nameSet = (Set)currNames.get(nameClass);
+                            Set nameSet = (Set)this.currNames.get(nameClass);
                             try {
                                 for (Iterator k = nameSet.iterator(); k.hasNext(); ) {
                                     String name = (String)k.next();
@@ -1569,32 +1567,32 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     } catch (ParseException e) {
                         throw new SAXException(e);
                     }
-                    currNames.clear();
+                    this.currNames.clear();
                 }
                 
                 else {
                     String type = null;
                     String id = null;
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
                         if (name.equals(ID_ATTR)) id = val;
                         else if (name.equals(TYPE_ATTR)) type = val;
                     }
                     CrossRef dbx = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{type, id, new Integer(0)});
-                    currDBXrefs.add(dbx);
+                    this.currDBXrefs.add(dbx);
                 }
             } else if (qName.equals(PROPERTY_TAG)) {
                 String id = null;
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(VALUE_ATTR)) id = val;
                 }
                 Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),id,0);
                 try {
-                    int last = currDBXrefs.size();
-                    ((RichAnnotation)((CrossRef)currDBXrefs.get(last-1)).getAnnotation()).addNote(note);
+                    int last = this.currDBXrefs.size();
+                    ((RichAnnotation)((CrossRef)this.currDBXrefs.get(last-1)).getAnnotation()).addNote(note);
                 } catch (ChangeVetoException ce) {
                     SAXException pe = new SAXException("Could not annotate identifier terms");
                     pe.initCause(ce);
@@ -1603,50 +1601,47 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             }
             
             else if (qName.equals(GENELOCATION_TAG)) {
-                this.nameIsFor = "ORGANELLE";
+                this.currNameIsFor = "ORGANELLE";
                 this.organelleDesc = new StringBuffer();
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(TYPE_ATTR)) {
-                        val = val.toUpperCase().charAt(0)+val.substring(1); // init caps
+                        val = val.toUpperCase().charAt(0)+val.substring(1); // init caps for flat format
                         if (!val.equals("Plasmid")) this.organelleDesc.append(val);
                     }
                 }
             }
             
             else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
-                currRefLocation = null;
-                currRefAuthors = new ArrayList();
-                currRefTitle = null;
-                currDBXrefs.clear();
-                currComments.clear();
-                currRefRank++;
-                currRefStart = -999;
-                currRefEnd = -999;
+                this.currRefLocation = null;
+                this.currRefAuthors = new ArrayList();
+                this.currRefTitle = null;
+                this.currDBXrefs.clear();
+                this.currComments.clear();
+                this.currRefRank++;
+                this.currRefStart = -999;
+                this.currRefEnd = -999;
             } else if (qName.equals(CITATION_TAG) && !this.parent.getElideReferences()) {
                 StringBuffer currRef = new StringBuffer();
-                int attrCount = 0;
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     // combine everything except type into a fake reference to use if locator is a no-show
                     if (!name.equals(TYPE_ATTR)) {
-                        if (attrCount!=0) currRef.append(" ");
-                        else attrCount = 1;
+                        if (currRef.length()>0) currRef.append(" ");
                         currRef.append(val);
                     }
                 }
-                currRefLocation = currRef.toString();
+                this.currRefLocation = currRef.toString();
             } else if (qName.equals(EDITOR_LIST_TAG)) {
-                currPersonIs = "EDITOR";
+                this.currPersonIs = "EDITOR";
             } else if (qName.equals(AUTHOR_LIST_TAG)) {
-                currPersonIs = "AUTHOR";
+                this.currPersonIs = "AUTHOR";
             }  else if (qName.equals(PERSON_TAG)) {
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(NAME_ATTR)) {
                         if (this.currPersonIs.equals("AUTHOR")) currRefAuthors.add(new SimpleDocRefAuthor(val, false, false));
                         else if (this.currPersonIs.equals("EDITOR")) currRefAuthors.add(new SimpleDocRefAuthor(val, false, true));
@@ -1654,31 +1649,31 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 }
             } else if (qName.equals(CONSORTIUM_TAG)) {
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(NAME_ATTR)) {
                         if (this.currPersonIs.equals("AUTHOR")) currRefAuthors.add(new SimpleDocRefAuthor(val, true, false));
                         else if (this.currPersonIs.equals("EDITOR")) currRefAuthors.add(new SimpleDocRefAuthor(val, true, true));
                     }
                 }
             }  else if (qName.equals(RC_LINE_TAG)) {
-                currRCID++;
+                this.currRCID++;
             }
             
             else if (qName.equals(KEYWORD_TAG)) {
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (name.equals(ID_ATTR)) currKWID = val;
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
+                    if (name.equals(ID_ATTR)) this.currKWID = val;
                 }
             }
             
             else if (qName.equals(EVIDENCE_TAG)) {
-                currEvID++;
+                this.currEvID++;
                 try {
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
                         if (name.equals(EVIDENCE_CATEGORY_ATTR)) rlistener.addSequenceProperty(Terms.getEvidenceCategoryTerm(),val);
                         else if (name.equals(EVIDENCE_DATE_ATTR)) rlistener.addSequenceProperty(Terms.getEvidenceDateTerm(),val);
                         else if (name.equals(TYPE_ATTR)) rlistener.addSequenceProperty(Terms.getEvidenceTypeTerm(),val);
@@ -1692,14 +1687,14 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             }
             
             else if (qName.equals(LOCATION_TAG)) {
-                currLocStr = new StringBuffer();
-                if (currLocIsFor.equals("FEATURE")) {
+                this.currLocStr = new StringBuffer();
+                if (this.currLocIsFor.equals("FEATURE")) {
                     try {
                         for (int i = 0; i < attributes.getLength(); i++) {
-                            String name = attributes.getQName(i).trim();
-                            String val = attributes.getValue(i).trim();
+                            String name = attributes.getQName(i);
+                            String val = attributes.getValue(i);
                             if (name.equals(LOCATION_SEQ_ATTR)) {
-                                Note note = new SimpleNote(Terms.getLocationSequenceTerm(), val, featNoteRank++);
+                                Note note = new SimpleNote(Terms.getLocationSequenceTerm(), val, this.featNoteRank++);
                                 ((RichAnnotation)templ.annotation).addNote(note);
                             }
                         }
@@ -1713,8 +1708,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 StringBuffer pos = new StringBuffer();
                 pos.append(" "); // space between start and end
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(STATUS_ATTR)) {
                         if (val.equals("less than")) pos.append("<");
                         else if (val.equals("greater than")) pos.append(">");
@@ -1722,12 +1717,12 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         pos.append(val);
                     }
                 }
-                currLocStr.append(pos.toString());
+                this.currLocStr.append(pos.toString());
                 if (qName.equals(LOCATION_POSITION_TAG)) currLocStr.append(pos.toString()); // fake it as begin=end
             }
             
             else if (qName.equals(FEATURE_TAG) && !this.parent.getElideFeatures()) {
-                featNoteRank = 1;
+                this.featNoteRank = 1;
                 templ = new RichFeature.Template();
                 templ.annotation = new SimpleRichAnnotation();
                 templ.sourceTerm = Terms.getUniProtXMLTerm();
@@ -1735,22 +1730,21 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 templ.rankedCrossRefs = new TreeSet();
                 try {
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
-                        if (val.equals("")) continue;
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
                         if (name.equals(TYPE_ATTR)) {
                             templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(val);
                         } else if (name.equals(ID_ATTR)) {
-                            Note note = new SimpleNote(Terms.getFTIdTerm(), val, featNoteRank++);
+                            Note note = new SimpleNote(Terms.getFTIdTerm(), val, this.featNoteRank++);
                             ((RichAnnotation)templ.annotation).addNote(note);
                         } else if (name.equals(FEATURE_DESC_ATTR)) {
-                            Note note = new SimpleNote(Terms.getFeatureDescTerm(), val, featNoteRank++);
+                            Note note = new SimpleNote(Terms.getFeatureDescTerm(), val, this.featNoteRank++);
                             ((RichAnnotation)templ.annotation).addNote(note);
                         } else if (name.equals(STATUS_ATTR)) {
-                            Note note = new SimpleNote(Terms.getFeatureStatusTerm(), val, featNoteRank++);
+                            Note note = new SimpleNote(Terms.getFeatureStatusTerm(), val, this.featNoteRank++);
                             ((RichAnnotation)templ.annotation).addNote(note);
                         } else if (name.equals(REF_ATTR)) {
-                            Note note = new SimpleNote(Terms.getFeatureRefTerm(), val, featNoteRank++);
+                            Note note = new SimpleNote(Terms.getFeatureRefTerm(), val, this.featNoteRank++);
                             ((RichAnnotation)templ.annotation).addNote(note);
                         }
                     }
@@ -1759,34 +1753,34 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     pe.initCause(e);
                     throw pe;
                 }
-                currLocStr = new StringBuffer();
-                currLocIsFor = "FEATURE";
+                this.currLocStr = new StringBuffer();
+                this.currLocIsFor = "FEATURE";
             }
             
             else if (qName.equals(COMMENT_TAG)) {
-                currUCParser = new UniProtCommentParser();
-                currUCParser.setInteractions(new ArrayList());
-                currUCParser.setEvents(new ArrayList());
-                currUCParser.setIsoforms(new ArrayList());
-                currUCParser.setKMs(new ArrayList());
-                currUCParser.setVMaxes(new ArrayList());
+                this.currUCParser = new UniProtCommentParser();
+                this.currUCParser.setInteractions(new ArrayList());
+                this.currUCParser.setEvents(new ArrayList());
+                this.currUCParser.setIsoforms(new ArrayList());
+                this.currUCParser.setKMs(new ArrayList());
+                this.currUCParser.setVMaxes(new ArrayList());
                 for (int i = 0; i < attributes.getLength(); i++) {
                     String name = attributes.getQName(i).trim();
                     String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
                     if (name.equals(TYPE_ATTR)) {
-                        String type = val.toUpperCase();
+                        String type = val.toUpperCase(); // easier to check this way, plus flat uniprot requires it
                         if (type.equals("POSTTRANSLATIONAL MODIFICATION")) type="PTM";
                         else if (type.equals("ONLINE INFORMATION")) type="DATABASE";
                         currUCParser.setCommentType(type);
-                    } else if (name.equals(COMMENT_MASS_ATTR)) currUCParser.setMolecularWeight(Integer.parseInt(val));
-                    else if (name.equals(COMMENT_ERROR_ATTR)) currUCParser.setMolWeightError(Integer.valueOf(val));
-                    else if (name.equals(COMMENT_METHOD_ATTR)) currUCParser.setMolWeightMethod(val);
-                    else if (name.equals(NAME_ATTR)) currUCParser.setDatabaseName(val);
+                    } else if (name.equals(COMMENT_MASS_ATTR)) this.currUCParser.setMolecularWeight(Integer.parseInt(val));
+                    else if (name.equals(COMMENT_ERROR_ATTR)) this.currUCParser.setMolWeightError(Integer.valueOf(val));
+                    else if (name.equals(COMMENT_METHOD_ATTR)) this.currUCParser.setMolWeightMethod(val);
+                    else if (name.equals(NAME_ATTR)) this.currUCParser.setDatabaseName(val);
                 }
                 this.currLocIsFor="COMMENT";
                 this.currTextIsFor="COMMENT";
                 this.currNoteIsFor="COMMENT";
+                this.interactantCount = 0;
             } else if (qName.equals(COMMENT_ABSORPTION_TAG)) {
                 this.currTextIsFor="ABSORPTION";
             } else if (qName.equals(COMMENT_KINETICS_TAG)) {
@@ -1794,43 +1788,41 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             } else if (qName.equals(COMMENT_LINK_TAG)) {
                 this.currTextIsFor="KINETICS";
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (name.equals(COMMENT_LINK_URI_ATTR)) currUCParser.setUri(val);
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
+                    if (name.equals(COMMENT_LINK_URI_ATTR)) this.currUCParser.setUri(val);
                 }
             } else if (qName.equals(COMMENT_EVENT_TAG)) {
-                currUCParserEvent = new Event();
+                this.currUCParserEvent = new Event();
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(TYPE_ATTR)) {
-                        val = val.toUpperCase().charAt(0)+val.substring(1); // make first letter upper case
-                        currUCParserEvent.setType(val);
-                    } else if (name.equals(COMMENT_EVENT_ISOFORMS_ATTR)) currUCParserEvent.setNamedIsoforms(Integer.parseInt(val));
+                        val = val.toUpperCase().charAt(0)+val.substring(1); // make first letter upper case for flat uniprot
+                        this.currUCParserEvent.setType(val);
+                    } else if (name.equals(COMMENT_EVENT_ISOFORMS_ATTR)) this.currUCParserEvent.setNamedIsoforms(Integer.parseInt(val));
                 }
                 currUCParser.getEvents().add(currUCParserEvent);
             } else if (qName.equals(COMMENT_ISOFORM_TAG)) {
-                currUCParserIsoform = new Isoform();
-                currUCParserIsoform.setIsoIDs(new ArrayList());
-                currUCParserIsoform.setNames(new ArrayList());
-                currUCParser.getIsoforms().add(currUCParserIsoform);
-                this.nameIsFor="ISOFORM";
+                this.currUCParserIsoform = new Isoform();
+                this.currUCParser.getIsoforms().add(currUCParserIsoform);
+                this.currNameIsFor="ISOFORM";
                 this.currNoteIsFor="ISOFORM";
                 this.currSeqIsFor="ISOFORM";
                 this.currIDIsFor="ISOFORM";
             } else if (qName.equals(COMMENT_INTERACTANT_TAG)) {
                 this.currIDIsFor="INTERACTION";
-                interactantCount++;
+                this.interactantCount++;
                 for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
+                    String name = attributes.getQName(i);
+                    String val = attributes.getValue(i);
                     if (name.equals(COMMENT_INTERACT_INTACT_ATTR)) {
-                        if (interactantCount%2==1) {
-                            currUCParserInteract = new Interaction();
-                            currUCParserInteract.setFirstIntActID(val);
-                            currUCParser.getInteractions().add(currUCParserInteract);
+                        if (this.interactantCount%2==1) {
+                            this.currUCParserInteract = new Interaction();
+                            this.currUCParserInteract.setFirstIntActID(val);
+                            this.currUCParser.getInteractions().add(this.currUCParserInteract);
                         }
-                        else currUCParserInteract.setSecondIntActID(val);
+                        else this.currUCParserInteract.setSecondIntActID(val);
                     }
                 }
             }
@@ -1839,9 +1831,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 if (this.currSeqIsFor.equals("ENTRY")) {
                     try {
                         for (int i = 0; i < attributes.getLength(); i++) {
-                            String name = attributes.getQName(i).trim();
-                            String val = attributes.getValue(i).trim();
-                            if (val.equals("")) continue;
+                            String name = attributes.getQName(i);
+                            String val = attributes.getValue(i);
                             if (name.equals(SEQUENCE_MODIFIED_ATTR)) {
                                 rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),val);
                             }
@@ -1855,203 +1846,17 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 
                 else if (this.currSeqIsFor.equals("ISOFORM")) {
                     for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
                         if (name.equals(TYPE_ATTR)) {
-                            val = val.toUpperCase().charAt(0)+val.substring(1); // init caps
-                            currUCParserIsoform.setSequenceType(val);
+                            val = val.toUpperCase().charAt(0)+val.substring(1); // init caps for flat uniprot
+                            this.currUCParserIsoform.setSequenceType(val);
                         } else if (name.equals(REF_ATTR)) {
-                            currUCParserIsoform.setSequenceRef(val);
+                            this.currUCParserIsoform.setSequenceRef(val);
                         }
                     }
                 }
             }
-            /*
-            if (qName.equals(ENTRY_TAG)) {
-                try {
-                    if (ns==null) ns=RichObjectFactory.getDefaultNamespace();
-                    rlistener.setNamespace(ns);
-                    for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
-                        if (val.equals("")) continue;
-                        if (name.equals(ENTRY_ACCESSION_ATTR)) {
-                            accession = val;
-                            rlistener.setAccession(accession);
-                        } else if (name.equals(ENTRY_NAME_ATTR)) rlistener.setName(val);
-                        else if (name.equals(ENTRY_DIVISION_ATTR)) rlistener.setDivision(val);
-                        else if (name.equals(ENTRY_CREATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateCreatedTerm(),val);
-                        else if (name.equals(ENTRY_UPDATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),val);
-                        else if (name.equals(ENTRY_RELCREATED_ATTR)) rlistener.addSequenceProperty(Terms.getRelCreatedTerm(),val);
-                        else if (name.equals(ENTRY_RELUPDATED_ATTR)) rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(),val);
-                        else if (name.equals(ENTRY_VER_ATTR)) rlistener.setVersion(Integer.parseInt(val));
-                    }
-                    currNames.clear();
-                    currComments.clear();
-                    currDBXrefs.clear();
-                } catch (ParseException e) {
-                    throw new SAXException(e);
-                }
-            }
-             
-            else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
-                currRefLocation = null;
-                currRefAuthors = new ArrayList();
-                currRefTitle = null;
-                currRefStart = -999;
-                currRefEnd = -999;
-                currRefRank = 0;
-                currDBXrefs.clear();
-                currComments.clear();
-            } else if (qName.equals(REFERENCE_POSITION_TAG) && !this.parent.getElideReferences()) {
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(REF_POS_BEGIN_ATTR)) currRefStart = Integer.parseInt(val);
-                    else if (name.equals(REF_POS_END_ATTR)) currRefEnd = Integer.parseInt(val);
-                }
-            } else if (qName.equals(CITATION_TAG) && !this.parent.getElideReferences()) {
-                StringBuffer currRef = new StringBuffer();
-                int attrCount = 0;
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(CITATION_ID_ATTR)) currRefRank = Integer.parseInt(val);
-                    // combine everything else into a fake reference to use if locator is a no-show
-                    else if (!name.equals(CITATION_TYPE_ATTR)) {
-                        if (attrCount!=0) currRef.append(" ");
-                        else attrCount = 1;
-                        currRef.append(val);
-                    }
-                }
-                currRefLocation = currRef.toString();
-            }
-             
-            else if (qName.equals(DBREFERENCE_TAG)) {
-                String db = null;
-                String primary = null;
-                String secondary = null;
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(DBREF_DB_ATTR)) db = val;
-                    else if (name.equals(DBREF_PRIMARY_ATTR)) primary = val;
-                    else if (name.equals(DBREF_SEC_ATTR)) secondary = val;
-                }
-                CrossRef dbx = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{db, primary, new Integer(0)});
-                if (secondary!=null) {
-                    Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),secondary,0);
-                    try {
-                        ((RichAnnotation)dbx.getAnnotation()).addNote(note);
-                    } catch (ChangeVetoException ce) {
-                        SAXException pe = new SAXException("Could not annotate identifier terms");
-                        pe.initCause(ce);
-                        throw pe;
-                    }
-                }
-                currDBXrefs.add(dbx);
-            }
-             
-            else if (qName.equals(FEATURE_TAG) && !this.parent.getElideFeatures()) {
-                templ = new RichFeature.Template();
-                templ.annotation = new SimpleRichAnnotation();
-                templ.sourceTerm = Terms.getUniProtXMLTerm();
-                templ.featureRelationshipSet = new TreeSet();
-                templ.rankedCrossRefs = new TreeSet();
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(FEATURE_NAME_ATTR)) {
-                        templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(val);
-                    }
-                }
-                currLocStr = new StringBuffer();
-                currDBXrefs.clear();
-                currQuals.clear();
-            } else if (qName.equals(QUALIFIER_TAG) && !this.parent.getElideFeatures()) {
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(QUALIFIER_NAME_ATTR)) currFeatQual = val;
-                }
-            } else if (qName.equals(LOCATION_TAG) && !this.parent.getElideFeatures()) {
-                currLocBrackets = 0;
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(LOCATION_TYPE_ATTR) && !val.equals("single")) {
-                        // open a bracket just in case
-                        currLocStr.append(val);
-                        currLocStr.append("(");
-                        currLocBrackets++;
-                    } else if (name.equals(LOCATION_COMPL_ATTR) && val.equals("true")) {
-                        currLocStr.append("complement");
-                        currLocStr.append("(");
-                        currLocBrackets++;
-                    }
-                }
-                firstLocationElement = true;
-            } else if (qName.equals(LOCATION_ELEMENT_TAG) && !this.parent.getElideFeatures()) {
-                String currAcc = null;
-                String currVer = null;
-                if (!firstLocationElement) currLocStr.append(",");
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(LOCATION_COMPL_ATTR) && val.equals("true")) {
-                        currLocStr.append("complement");
-                        currLocStr.append("(");
-                        currLocElemBrackets++;
-                    } else if (name.equals(LOC_ELEMENT_ACC_ATTR)) currAcc = val;
-                    else if (name.equals(LOC_ELEMENT_VER_ATTR)) currVer = val;
-                }
-                if (currAcc!=null) {
-                    currLocStr.append(currAcc);
-                    if (currVer!=null) {
-                        currLocStr.append(".");
-                        currLocStr.append(currVer);
-                    }
-                    currLocStr.append(":");
-                }
-                firstBase = true;
-            } else if (qName.equals(BASEPOSITION_TAG) && !this.parent.getElideFeatures()) {
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    String name = attributes.getQName(i).trim();
-                    String val = attributes.getValue(i).trim();
-                    if (val.equals("")) continue;
-                    if (name.equals(BASEPOSITION_TYPE_ATTR)) currBaseType = val;
-                    else if (name.equals(BASEPOSITION_EXTENT_ATTR)) currBaseExtent = val;
-                }
-            }
-             
-            else if (qName.equals(SEQUENCE_TAG)) {
-                try {
-                    for (int i = 0; i < attributes.getLength(); i++) {
-                        String name = attributes.getQName(i).trim();
-                        String val = attributes.getValue(i).trim();
-                        if (val.equals("")) continue;
-                        if (name.equals(SEQUENCE_TYPE_ATTR)) {
-                            rlistener.addSequenceProperty(Terms.getMolTypeTerm(),val);
-                        } else if (name.equals(SEQUENCE_VER_ATTR)) {
-                            rlistener.setSeqVersion(val);
-                        } else if (name.equals(SEQUENCE_TOPOLOGY_ATTR) && val.equals("circular")) {
-                            rlistener.setCircular(true);
-                        }
-                    }
-                } catch (ParseException e) {
-                    SAXException pe = new SAXException("Could not set sequence properties");
-                    pe.initCause(e);
-                    throw pe;
-                }
-            }
-             */
         }
         
         // process a closing tag - we will have read the text already
@@ -2066,9 +1871,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 else if (qName.equals(ACCESSION_TAG)) {
                     rlistener.setAccession(val);
                 } else if (qName.equals(NAME_TAG)) {
-                    if (this.nameIsFor.equals("ENTRY")) rlistener.setName(val);
+                    if (this.currNameIsFor.equals("ENTRY")) rlistener.setName(val);
                     
-                    else if (this.nameIsFor.equals("PROTEIN")) {
+                    else if (this.currNameIsFor.equals("PROTEIN")) {
                         if (this.firstNameInProteinGroup) {
                             proteinDesc.append(" ");
                             proteinDesc.append(val);
@@ -2080,14 +1885,14 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         this.firstNameInProteinGroup = false;
                     }
                     
-                    else if (this.nameIsFor.equals("GENE")) {
+                    else if (this.currNameIsFor.equals("GENE")) {
                         if (this.geneNameClass.equals(Terms.GENENAME_KEY)) rlistener.addSequenceProperty(Terms.getGeneNameTerm(), this.currGene+":"+val);
                         else if (this.geneNameClass.equals(Terms.GENESYNONYM_KEY)) rlistener.addSequenceProperty(Terms.getGeneSynonymTerm(), this.currGene+":"+val);
                         else if (this.geneNameClass.equals(Terms.ORDLOCNAME_KEY)) rlistener.addSequenceProperty(Terms.getOrderedLocusNameTerm(), this.currGene+":"+val);
                         else if (this.geneNameClass.equals(Terms.ORFNAME_KEY)) rlistener.addSequenceProperty(Terms.getORFNameTerm(), this.currGene+":"+val);
                     }
                     
-                    else if (this.nameIsFor.equals("ORGANISM")) {
+                    else if (this.currNameIsFor.equals("ORGANISM")) {
                         String ournameclass = NCBITaxon.COMMON;
                         if (this.organismNameClass.equals(Terms.ABBREV_NAME_KEY)) ournameclass = NCBITaxon.ACRONYM;
                         else if (this.organismNameClass.equals(Terms.FULL_NAME_KEY)) ournameclass = NCBITaxon.EQUIVALENT;
@@ -2097,29 +1902,28 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         ((Set)this.currNames.get(ournameclass)).add(val);
                     }
                     
-                    else if (this.nameIsFor.equals("ORGANELLE")) {
+                    else if (this.currNameIsFor.equals("ORGANELLE")) {
                         this.organelleDesc.append(", Plasmid ");
                         this.organelleDesc.append(val);
                     }
                     
-                    else if (this.nameIsFor.equals("ISOFORM")) {
-                        currUCParserIsoform.getNames().add(val);
+                    else if (this.currNameIsFor.equals("ISOFORM")) {
+                        this.currUCParserIsoform.getNames().add(val);
                     }
                 }
                 
                 else if (qName.equals(PROTEIN_TAG)) {
-                    if (!this.firstDomainInProteinGroup || !this.firstComponentInProteinGroup) proteinDesc.append("]");
-                    proteinDesc.append(".");
-                    rlistener.setDescription(proteinDesc.toString());
+                    if (!this.firstDomainInProteinGroup || !this.firstComponentInProteinGroup) this.proteinDesc.append("]");
+                    this.proteinDesc.append(".");
+                    rlistener.setDescription(this.proteinDesc.toString());
                 }
                 
                 else if (qName.equals(ORGANISM_TAG)) {
-                    this.nameIsFor="";
+                    this.currNameIsFor="";
                 }
                 
                 else if (qName.equals(GENELOCATION_TAG)) {
-                    this.organelleDesc.delete(0,2); // chomp leading ", "
-                    String total = this.organelleDesc.toString();
+                    String total = this.organelleDesc.toString().substring(3); // chomp leading ", "
                     int lastComma = total.lastIndexOf(',');
                     if (lastComma>-1) {
                         this.organelleDesc.insert(lastComma+1," and");
@@ -2129,39 +1933,41 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 }
                 
                 else if (qName.equals(RC_SPECIES_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getSpeciesTerm(), currRCID+":"+val);
+                    rlistener.addSequenceProperty(Terms.getSpeciesTerm(), this.currRCID+":"+val);
                 } else if (qName.equals(RC_TISSUE_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getTissueTerm(), currRCID+":"+val);
+                    rlistener.addSequenceProperty(Terms.getTissueTerm(), this.currRCID+":"+val);
                 } else if (qName.equals(RC_TRANSP_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getTransposonTerm(), currRCID+":"+val);
+                    rlistener.addSequenceProperty(Terms.getTransposonTerm(), this.currRCID+":"+val);
                 } else if (qName.equals(RC_PLASMID_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getPlasmidTerm(), currRCID+":"+val);
+                    rlistener.addSequenceProperty(Terms.getPlasmidTerm(), this.currRCID+":"+val);
                 }
                 
                 else if (qName.equals(TITLE_TAG)) {
-                    currRefTitle = val;
+                    this.currRefTitle = val;
                 } else if (qName.equals(LOCATOR_TAG)) {
-                    currRefLocation = val;
+                    this.currRefLocation = val;
                 } else if (qName.equals(RP_LINE_TAG)) {
-                    currComments.add(val);
+                    this.currComments.add(val);
                     // Try to use it to find the location of the reference, if we have one.
                     Matcher m = rppat.matcher(val);
                     if (m.matches()) {
-                        currRefStart = Integer.parseInt(m.group(1));
-                        currRefEnd = Integer.parseInt(m.group(2));
+                        this.currRefStart = Integer.parseInt(m.group(1));
+                        this.currRefEnd = Integer.parseInt(m.group(2));
                     }
                 } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
                     // do the crossrefs
-                    int k = 0;
+                    int rank = 0;
                     CrossRef useForDocRef = null;
-                    for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
+                    for (Iterator j = this.currDBXrefs.iterator(); j.hasNext();) {
                         CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, k++);
+                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, rank++);
                         rlistener.setRankedCrossRef(rdbx);
                         if (useForDocRef==null) useForDocRef = dbx;
                         else {
                             // medline gets priority, then pubmed - if multiple, use last
-                            if (dbx.getDbname().equals(Terms.MEDLINE_KEY) || (dbx.getDbname().equals(Terms.PUBMED_KEY) && !useForDocRef.getDbname().equals(Terms.MEDLINE_KEY))) {
+                            if (dbx.getDbname().equalsIgnoreCase(Terms.MEDLINE_KEY) || 
+                                    (dbx.getDbname().equalsIgnoreCase(Terms.PUBMED_KEY) && 
+                                    !useForDocRef.getDbname().equalsIgnoreCase(Terms.MEDLINE_KEY))) {
                                 useForDocRef = dbx;
                             }
                         }
@@ -2207,8 +2013,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         templ.location = UniProtLocationParser.parseLocation(currLocStr.toString());
                     } else if (currLocIsFor.equals("COMMENT")) {
                         Location l = UniProtLocationParser.parseLocation(currLocStr.toString());
-                        currUCParser.setMolWeightRangeStart(l.getMin());
-                        currUCParser.setMolWeightRangeEnd(l.getMax());
+                        this.currUCParser.setMolWeightRangeStart(l.getMin());
+                        this.currUCParser.setMolWeightRangeEnd(l.getMax());
                     }
                 }
                 
@@ -2217,7 +2023,6 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     rlistener.startFeature(templ);
                     // end the feature
                     rlistener.endFeature();
-                    currDBXrefs.clear();
                 } else if (qName.equals(FEATURE_ORIGINAL_TAG)) {
                     try {
                         Note note = new SimpleNote(Terms.getFeatureOriginalTerm(), val, featNoteRank++);
@@ -2240,7 +2045,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 
                 else if (qName.equals(COMMENT_TAG)) {
                     rlistener.setComment(currUCParser.generate());
-                } else if (qName.equals(COMMENT_TEXT_TAG)) {
+                } else if (qName.equals(TEXT_TAG)) {
                     if (this.currTextIsFor.equals("COMMENT")) currUCParser.setText(val);
                     else if (this.currTextIsFor.equals("ABSORPTION")) currUCParser.setAbsorptionNote(val);
                     else if (this.currTextIsFor.equals("KINETICS")) currUCParser.setKineticsNote(val);
@@ -2257,7 +2062,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 } else if (qName.equals(COMMENT_TEMPERATURE_TAG)) {
                     currUCParser.setTemperatureDependence(val);
                 } else if (qName.equals(COMMENT_ORGANISMS_TAG)) {
-                    if (val.equals("true")) currUCParserInteract.setOrganismsDiffer(true);
+                    if (val.equalsIgnoreCase("true")) currUCParserInteract.setOrganismsDiffer(true);
                     else currUCParserInteract.setOrganismsDiffer(false);
                 } else if (qName.equals(COMMENT_EXPERIMENTS_TAG)) {
                     currUCParserInteract.setNumberExperiments(Integer.parseInt(val));
@@ -2296,233 +2101,16 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         rlistener.setComment((String)j.next());
                     }
                     // do the crossrefs
-                    int k = 0;
-                    CrossRef useForDocRef = null;
+                    int rank = 0;
                     for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
                         CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, k++);
+                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, rank++);
                         rlistener.setRankedCrossRef(rdbx);
-                        if (useForDocRef==null) useForDocRef = dbx;
-                        else {
-                            // medline gets priority, then pubmed - if multiple, use last
-                            if (dbx.getDbname().equals(Terms.MEDLINE_KEY) || (dbx.getDbname().equals(Terms.PUBMED_KEY) && !useForDocRef.getDbname().equals(Terms.MEDLINE_KEY))) {
-                                useForDocRef = dbx;
-                            }
-                        }
                     }
                     // end the sequence
                     currComments.clear();
                     currDBXrefs.clear();
                 }
-                
-                
-                /*
-                if (qName.equals(SEC_ACC_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),val);
-                } else if (qName.equals(DESC_TAG)) {
-                    rlistener.setDescription(val);
-                } else if (qName.equals(KEYWORD_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getKeywordTerm(), val);
-                } else if (qName.equals(COMMENT_TAG)) {
-                    currComments.add(val);
-                }
-                 
-                else if (qName.equals(TITLE_TAG)) {
-                    currRefTitle = val;
-                } else if (qName.equals(AUTHOR_TAG)) {
-                    currRefAuthors.add(val);
-                } else if (qName.equals(LOCATOR_TAG)) {
-                    currRefLocation = val;
-                } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
-                    // authors
-                    String authors = "";
-                    for (Iterator j = currRefAuthors.iterator(); j.hasNext();) {
-                        authors+=(String)j.next();
-                        if (j.hasNext()) authors+=", ";
-                    }
-                    // do the crossrefs
-                    int k = 0;
-                    CrossRef useForDocRef = null;
-                    for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
-                        CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, k++);
-                        rlistener.setRankedCrossRef(rdbx);
-                        if (useForDocRef==null) useForDocRef = dbx;
-                        else {
-                            // medline gets priority, then pubmed - if multiple, use last
-                            if (dbx.getDbname().equals(Terms.MEDLINE_KEY) || (dbx.getDbname().equals(Terms.PUBMED_KEY) && !useForDocRef.getDbname().equals(Terms.MEDLINE_KEY))) {
-                                useForDocRef = dbx;
-                            }
-                        }
-                    }
-                    // do the comment - will only be one, if any
-                    String currRefRemark = null;
-                    if (currComments.size()>0) currRefRemark = (String)currComments.iterator().next();
-                    // create the docref object
-                    try {
-                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authors,currRefLocation});
-                        if (currRefTitle!=null) dr.setTitle(currRefTitle);
-                        // assign the pubmed or medline to the docref - medline gets priority
-                        if (useForDocRef!=null) dr.setCrossref(useForDocRef);
-                        // assign the remarks
-                        dr.setRemark(currRefRemark);
-                        // assign the docref to the bioentry
-                        RankedDocRef rdr = new SimpleRankedDocRef(dr,
-                                (currRefStart != -999 ? new Integer(currRefStart) : null),
-                                (currRefEnd != -999 ? new Integer(currRefEnd) : null),
-                                currRefRank);
-                        rlistener.setRankedDocRef(rdr);
-                    } catch (ChangeVetoException e) {
-                        throw new ParseException(e);
-                    }
-                    currDBXrefs.clear();
-                    currComments.clear();
-                }
-                 
-                else if (qName.equals(LOCATION_TAG) && !this.parent.getElideFeatures()) {
-                    while (currLocBrackets-->0) currLocStr.append(")"); // close the location groups
-                    String tidyLocStr = currLocStr.toString().replaceAll("\\s+","");
-                    templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
-                } else if (qName.equals(LOCATION_ELEMENT_TAG) && !this.parent.getElideFeatures()) {
-                    while (currLocElemBrackets-->0) currLocStr.append(")"); // close the location groups
-                    firstLocationElement = false;
-                } else if (qName.equals(BASEPOSITION_TAG) && !this.parent.getElideFeatures()) {
-                    if (!firstBase) currLocStr.append("..");
-                    // left angle bracket, right angle bracket, simple, fuzzy
-                    if (currBaseType.equals("<")) {
-                        currLocStr.append("<");
-                        currLocStr.append(val);
-                    } else if (currBaseType.equals(">")) {
-                        currLocStr.append(val);
-                        currLocStr.append(">");
-                    } else if (currBaseType.equals("simple")) {
-                        currLocStr.append(val);
-                    } else if (currBaseType.equals("fuzzy")) {
-                        int refVal = Integer.parseInt(val);
-                        int extentVal = Integer.parseInt(currBaseExtent);
-                        if (refVal + extentVal < refVal) {
-                            currLocStr.append("(");
-                            currLocStr.append(""+extentVal);
-                            currLocStr.append(".");
-                            currLocStr.append(""+refVal);
-                            currLocStr.append(")");
-                        } else {
-                            currLocStr.append("(");
-                            currLocStr.append(""+refVal);
-                            currLocStr.append(".");
-                            currLocStr.append(""+extentVal);
-                            currLocStr.append(")");
-                        }
-                    }
-                    firstBase = false;
-                } else if (qName.equals(QUALIFIER_TAG) && !this.parent.getElideFeatures()) {
-                    currQuals.put(currFeatQual,val);
-                } else if (qName.equals(FEATURE_TAG) && !this.parent.getElideFeatures()) {
-                    // start the feature
-                    rlistener.startFeature(templ);
-                    // assign qualifiers
-                    for (Iterator j = currQuals.keySet().iterator(); j.hasNext(); ) {
-                        String qualName = (String)j.next();
-                        String qualVal = (String)currQuals.get(qualName);
-                        if (qualName.equals("translation")) {
-                            // strip spaces from sequence
-                            qualVal = qualVal.replaceAll("\\s+","");
-                        }
-                        rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(qualName),qualVal);
-                    }
-                    // do the crossrefs
-                    int k = 0;
-                    for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
-                        CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, k++);
-                        try {
-                            rlistener.getCurrentFeature().addRankedCrossRef(rdbx);
-                        } catch (ChangeVetoException ce) {
-                            throw new ParseException(ce);
-                        }
-                    }
-                    // end the feature
-                    rlistener.endFeature();
-                    currDBXrefs.clear();
-                }
-                 
-                else if (qName.equals(TAID_TAG)) {
-                    tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(val)});
-                    rlistener.setTaxon(tax);
-                    for (Iterator j = currNames.keySet().iterator(); j.hasNext(); ) {
-                        String nameClass = (String)j.next();
-                        Set nameSet = (Set)currNames.get(nameClass);
-                        try {
-                            for (Iterator k = nameSet.iterator(); k.hasNext(); ) {
-                                String name = (String)k.next();
-                                tax.addName(nameClass,name);
-                            }
-                        } catch (ChangeVetoException ce) {
-                            throw new ParseException(ce);
-                        }
-                    }
-                    currNames.clear();
-                } else if (qName.equals(SCINAME_TAG)) {
-                    try {
-                        if (tax==null) {
-                            if (!currNames.containsKey(NCBITaxon.SCIENTIFIC)) currNames.put(NCBITaxon.SCIENTIFIC,new TreeSet());
-                            ((Set)currNames.get(NCBITaxon.SCIENTIFIC)).add(val);
-                        } else {
-                            tax.addName(NCBITaxon.SCIENTIFIC,val);
-                        }
-                    } catch (ChangeVetoException ce) {
-                        throw new ParseException(ce);
-                    }
-                } else if (qName.equals(COMNAME_TAG)) {
-                    try {
-                        if (tax==null) {
-                            if (!currNames.containsKey(NCBITaxon.COMMON)) currNames.put(NCBITaxon.COMMON,new TreeSet());
-                            ((Set)currNames.get(NCBITaxon.COMMON)).add(val);
-                        } else {
-                            tax.addName(NCBITaxon.COMMON,val);
-                        }
-                    } catch (ChangeVetoException ce) {
-                        throw new ParseException(ce);
-                    }
-                }
-                 
-                else if (qName.equals(SEQUENCE_TAG) && !this.parent.getElideSymbols()) {
-                    try {
-                        SymbolList sl = new SimpleSymbolList(symParser,
-                                val.replaceAll("\\s+","").replaceAll("[\\.|~]","-"));
-                        rlistener.addSymbols(symParser.getAlphabet(),
-                                (Symbol[])(sl.toList().toArray(new Symbol[0])),
-                                0, sl.length());
-                    } catch (Exception e) {
-                        throw new ParseException(e);
-                    }
-                }
-                 
-                else if (qName.equals(ENTRY_TAG)) {
-                    // do the comments
-                    for (Iterator j = currComments.iterator(); j.hasNext();) {
-                        rlistener.setComment((String)j.next());
-                    }
-                    // do the crossrefs
-                    int k = 0;
-                    CrossRef useForDocRef = null;
-                    for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
-                        CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, k++);
-                        rlistener.setRankedCrossRef(rdbx);
-                        if (useForDocRef==null) useForDocRef = dbx;
-                        else {
-                            // medline gets priority, then pubmed - if multiple, use last
-                            if (dbx.getDbname().equals(Terms.MEDLINE_KEY) || (dbx.getDbname().equals(Terms.PUBMED_KEY) && !useForDocRef.getDbname().equals(Terms.MEDLINE_KEY))) {
-                                useForDocRef = dbx;
-                            }
-                        }
-                    }
-                    // end the sequence
-                    currComments.clear();
-                    currDBXrefs.clear();
-                }
-                 */
                 
             } catch (ParseException e) {
                 throw new SAXException(e);

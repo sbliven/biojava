@@ -283,21 +283,22 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
                     if (key.equals(AUTHORS_TAG)) {
-                        val = val.substring(0,val.length()-1); // chomp semicolon
+                        if (val.endsWith(";")) val = val.substring(0,val.length()-1); // chomp semicolon
                         authors = val;
                     }
                     if (key.equals(CONSORTIUM_TAG)) {
-                        val = val.substring(0,val.length()-1); // chomp semicolon
+                        if (val.endsWith(";")) val = val.substring(0,val.length()-1); // chomp semicolon
                         consortium = val;
                     }
                     if (key.equals(TITLE_TAG)) {
                         if (val.length()>1) {
-                            val = val.substring(1,val.length()-3); // chomp semicolon + quotes
+                            if (val.endsWith(";")) val = val.substring(0,val.length()-1); // chomp semicolon
+                            if (val.endsWith("\"")) val = val.substring(1,val.length()-2); // chomp quotes
                             title = val;
                         } else title=null; // single semi-colon indicates no title
                     }
                     if (key.equals(LOCATOR_TAG)) {
-                        if (val.charAt(val.length()-1)=='.') val = val.substring(0,val.length()-1); // chomp dot
+                        if (val.endsWith(".")) val = val.substring(0,val.length()-1); // chomp dot
                         locator = val;
                     }
                     if (key.equals(REFERENCE_XREF_TAG)) {
@@ -306,11 +307,11 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                         for (int j = 0 ; j < refs.length; j++) {
                             if (refs[j].trim().length()==0) continue;
                             String[] parts = refs[j].split(";");
-                            String db = parts[0].toUpperCase();
+                            String db = parts[0];
                             String ref = parts[1];
-                            if (db.equals(Terms.PUBMED_KEY)) pubmed = ref;
-                            else if (db.equals(Terms.MEDLINE_KEY)) medline = ref;
-                            else if (db.equals(Terms.DOI_KEY)) doi = ref;
+                            if (db.equalsIgnoreCase(Terms.PUBMED_KEY)) pubmed = ref;
+                            else if (db.equalsIgnoreCase(Terms.MEDLINE_KEY)) medline = ref;
+                            else if (db.equalsIgnoreCase(Terms.DOI_KEY)) doi = ref;
                         }
                     }
                     if (key.equals(REMARK_TAG)) remark = val;
@@ -381,14 +382,15 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     String val = ((String[])section.get(i))[1];
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
-                        val = val.replaceAll("\"","").trim(); // strip quotes
+                        val = val.trim();
+                        if (val.startsWith("\"")) val = val.substring(1,val.length()-1); // strip quotes
                         // parameter on old feature
-                        if (key.equals("db_xref")) {
+                        if (key.equalsIgnoreCase("db_xref")) {
                             Matcher m = dbxp.matcher(val);
                             if (m.matches()) {
                                 String dbname = m.group(1);
                                 String raccession = m.group(2);
-                                if (dbname.equals("taxon")) {
+                                if (dbname.equalsIgnoreCase("taxon")) {
                                     // Set the Taxon instead of a dbxref
                                     tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
                                     rlistener.setTaxon(tax);
@@ -409,7 +411,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             } else {
                                 throw new ParseException("Bad dbxref found: "+val);
                             }
-                        } else if (key.equals("organism")) {
+                        } else if (key.equalsIgnoreCase("organism")) {
                             try {
                                 organism = val;
                                 if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
@@ -417,7 +419,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                                 throw new ParseException(e);
                             }
                         } else {
-                            if (key.equals("translation")) {
+                            if (key.equalsIgnoreCase("translation")) {
                                 // strip spaces from sequence
                                 val = val.replaceAll("\\s+","");
                             }
@@ -505,7 +507,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     while (!done) {
                         br.mark(160);
                         line = br.readLine();
-                        if (line.substring(0,2).equals(END_SEQUENCE_TAG)) {
+                        if (line.startsWith(END_SEQUENCE_TAG)) {
                             br.reset();
                             done = true;
                         } else {
@@ -526,7 +528,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     StringBuffer currentVal = null;
                     while (!done) {
                         line = br.readLine();
-                        if (line.substring(0,2).equals(DELIMITER_TAG)) {
+                        if (line.startsWith(DELIMITER_TAG)) {
                             done = true;
                             // dump current tag if exists
                             if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
@@ -536,12 +538,12 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             //         or          FT                   /db_xref="taxon:3899....
                             //                                          ......"
                             line = line.substring(5); // chomp off "FT   "
-                            if (line.charAt(0)!=' ') {
+                            if (!line.startsWith(" ")) {
                                 // case 1 : word value - splits into key-value on its own
                                 section.add(line.split("\\s+"));
                             } else {
                                 line = line.trim();
-                                if (line.charAt(0)=='/') {
+                                if (line.startsWith("/")) {
                                     // dump current tag if exists
                                     if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                                     // case 2 : /word[=.....]
@@ -597,7 +599,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     StringBuffer currentVal = null;
                     while (!done) {
                         line = br.readLine();
-                        if (line.substring(0,2).equals(DELIMITER_TAG)) {
+                        if (line.startsWith(DELIMITER_TAG)) {
                             done = true;
                             // dump current tag if exists
                             if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
@@ -668,7 +670,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         
         Set notes = rs.getNoteSet();
         String accession = rs.getAccession();
-        String accessions = accession+";";
+        StringBuffer accessions = new StringBuffer();
+        accessions.append(accession);
+        accessions.append(";");
         String cdat = null;
         String udat = null;
         String crel = null;
@@ -682,7 +686,11 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
-            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
+            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
+                accessions.append(" ");
+                accessions.append(n.getValue());
+                accessions.append(";");
+            }
             else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle=n.getValue();
         }
         
@@ -701,7 +709,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // accession line
-        StringTools.writeKeyValueLine(ACCESSION_TAG, accessions, 5, this.getLineWidth(), null, ACCESSION_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(ACCESSION_TAG, accessions.toString(), 5, this.getLineWidth(), null, ACCESSION_TAG, this.getPrintStream());
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // version line
@@ -718,16 +726,17 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // keywords line
-        String keywords = null;
+        StringBuffer keywords = new StringBuffer();
         for (Iterator n = notes.iterator(); n.hasNext(); ) {
             Note nt = (Note)n.next();
             if (nt.getTerm().equals(Terms.getKeywordTerm())) {
-                if (keywords==null) keywords = nt.getValue();
-                else keywords = keywords+"; "+nt.getValue();
+                if (keywords.length()>0) keywords.append("; ");
+                keywords.append(nt.getValue());
             }
         }
-        if (keywords!=null) {
-            StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords+".", 5, this.getLineWidth(), null, KEYWORDS_TAG, this.getPrintStream());
+        if (keywords.length()>0) {
+            keywords.append(".");
+            StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords.toString(), 5, this.getLineWidth(), null, KEYWORDS_TAG, this.getPrintStream());
             this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         
@@ -754,7 +763,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             if (rend==null) rend = new Integer(rs.length());
             StringTools.writeKeyValueLine(REFERENCE_POSITION_TAG, rstart+"-"+rend, 5, this.getLineWidth(), null, REFERENCE_POSITION_TAG, this.getPrintStream());
             CrossRef c = d.getCrossref();
-            if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname().toUpperCase()+"; "+c.getAccession()+".", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
+            if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname()+"; "+c.getAccession()+".", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
             List auths = d.getAuthorList();
             for (Iterator j = auths.iterator(); j.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)j.next();
@@ -764,7 +773,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             }
             if (!auths.isEmpty()) StringTools.writeKeyValueLine(AUTHORS_TAG, DocRefAuthor.Tools.generateAuthorString(auths)+";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
-            if (d.getTitle()!=null && !d.getTitle().equals("")) StringTools.writeKeyValueLine(TITLE_TAG, "\""+d.getTitle()+"\";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
+            if (d.getTitle()!=null && d.getTitle().length()!=0) StringTools.writeKeyValueLine(TITLE_TAG, "\""+d.getTitle()+"\";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
             else StringTools.writeKeyValueLine(TITLE_TAG, ";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(LOCATOR_TAG, d.getLocation()+".", 5, this.getLineWidth(), null, LOCATOR_TAG, this.getPrintStream());
             this.getPrintStream().println(DELIMITER_TAG+"   ");
@@ -776,7 +785,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             CrossRef c = rcr.getCrossRef();
             Set noteset = c.getNoteSet();
             StringBuffer sb = new StringBuffer();
-            sb.append(c.getDbname().toUpperCase());
+            sb.append(c.getDbname()); 
             sb.append("; ");
             sb.append(c.getAccession());
             boolean hasSecondary = false;
@@ -815,7 +824,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
                 // /key="val" or just /key if val==""
-                if (n.getValue()==null || n.getValue().equals("")) StringTools.writeKeyValueLine(FEATURE_TAG, "/"+n.getTerm().getName(), 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
+                if (n.getValue()==null || n.getValue().length()==0) StringTools.writeKeyValueLine(FEATURE_TAG, "/"+n.getTerm().getName(), 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
                 else StringTools.writeKeyValueLine(FEATURE_TAG, "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
             }
             // add-in to source feature only db_xref="taxon:xyz" where present

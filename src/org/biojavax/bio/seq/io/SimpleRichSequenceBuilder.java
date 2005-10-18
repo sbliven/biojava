@@ -416,7 +416,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
             for (Iterator i = this.allFeatures.iterator(); i.hasNext(); ){
                 RichFeature f = (RichFeature)i.next();
                 f.setParent(rs);
-                if (f.getName()==null || f.getName().equals("")) f.setName(rs.getAccession()+"#"+f.getRank()); // dummy feature name for use in GBrowse
+                if (f.getName()==null || f.getName().length()==0) f.setName(rs.getAccession()+"#"+f.getRank()); // dummy feature name for use in GBrowse
             }
             rs.setDescription(this.description);
             rs.setDivision(this.division);

@@ -202,7 +202,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             } else if (sectionKey.equals(DEFINITION_TAG)) {
                 String val = ((String[])section.get(0))[1];
-                val = val.substring(0, val.length()-1); // chomp dot
+                if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
                 rlistener.setDescription(val);
             } else if (sectionKey.equals(SOURCE_TAG)) {
                 // use SOURCE_TAG and TAXON_TAG values
@@ -214,17 +214,18 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     String tag = ((String[])section.get(i))[0];
                     String value = ((String[])section.get(i))[1].trim();
                     if (tag.equals(SOURCE_TAG)) {
-                        value = value.substring(0,value.length()-1); // chomp trailing dot
+                        if (value.endsWith(".")) value = value.substring(0,value.length()-1); // chomp trailing dot
                         String[] parts = value.split("\\(");
                         sciname = parts[0].trim();
                         if (parts.length>1) {
                             comname = parts[1].trim();
-                            comname = comname.substring(0,comname.length()-1); // chomp trailing bracket
+                            if (comname.endsWith(")")) comname = comname.substring(0,comname.length()-1); // chomp trailing bracket
                             if (parts.length>2) {
                                 // synonyms
                                 for (int j = 2 ; j < parts.length; j++) {
                                     String syn = parts[j].trim();
-                                    synonym.add(syn.substring(0,syn.length()-1)); // chomp trailing bracket
+                                    if (syn.endsWith(")")) syn = syn.substring(0,syn.length()-1); // chomp trailing bracket
+                                    synonym.add(syn); 
                                 }
                             }
                         }
@@ -238,7 +239,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             }
                         }
                     } else if (tag.equals(ORGANELLE_TAG)) {
-                        value = value.substring(0,value.length()-1); // chomp trailing dot
+                        if (value.endsWith(".")) value = value.substring(0,value.length()-1); // chomp trailing dot
                         String[] parts = value.split(";");
                         for (int j = 0; j < parts.length; j++) {
                             parts[j]=parts[j].trim();
@@ -257,19 +258,19 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     throw new ParseException(e);
                 }
             } else if (sectionKey.equals(DATE_TAG)) {
-                String chunk = ((String[])section.get(0))[1].trim();
+                String chunk = ((String[])section.get(0))[1];
                 Matcher dm = dp.matcher(chunk);
                 if (dm.matches()) {
                     String date = dm.group(1);
                     String rel = dm.group(2);
                     String type = dm.group(3);
-                    if (type.equals("Created")) {
+                    if (type.equalsIgnoreCase("Created")) {
                         rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelCreatedTerm(), rel);
-                    } else if (type.equals("Last sequence update")) {
+                    } else if (type.equalsIgnoreCase("Last sequence update")) {
                         rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
-                    } else if (type.equals("Last annotation update")) {
+                    } else if (type.equalsIgnoreCase("Last annotation update")) {
                         rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelAnnotatedTerm(), rel);
                     } else throw new ParseException("Bad date type found: "+type);
@@ -285,7 +286,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String val = ((String[])section.get(0))[1];
-                val = val.substring(0, val.length()-1); // chomp dot
+                if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
                 String[] kws = val.split(";");
                 for (int i = 0; i < kws.length; i++) {
                     String kw = kws[i].trim();
@@ -313,7 +314,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
                 // database_identifier; primary_identifier; secondary_identifier....
                 String val = ((String[])section.get(0))[1];
-                val = val.substring(0, val.length()-1); // chomp dot
+                if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
                 String[] parts = val.split(";");
                 // construct a DBXREF out of the dbname part[0] and accession part[1]
                 String dbname = parts[0].trim();
@@ -352,19 +353,20 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
                     if (key.equals(AUTHORS_TAG)) {
-                        val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                        if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
                         authors = val;
                     }
                     if (key.equals(CONSORTIUM_TAG)) {
-                        val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                        if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
                         consortium = val;
                     }
                     if (key.equals(TITLE_TAG)) {
-                        val = val.trim().substring(1, val.length()-3); // chomp quotes+semicolon
+                        if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                        if (val.endsWith("\"")) val = val.trim().substring(1, val.length()-2); // chomp quotes
                         title = val;
                     }
                     if (key.equals(LOCATION_TAG)) {
-                        val = val.trim().substring(0, val.length()-1); // chomp dot
+                        if (val.endsWith(".")) val = val.trim().substring(0, val.length()-1); // chomp dot
                         locator = val;
                     }
                     if (key.equals(REFERENCE_XREF_TAG)) {
@@ -373,16 +375,16 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         for (int j = 0 ; j < refs.length; j++) {
                             if (refs[j].trim().length()==0) continue;
                             String[] parts = refs[j].split("=");
-                            String db = parts[0].toUpperCase();
+                            String db = parts[0];
                             String ref = parts[1];
-                            if (db.equals(Terms.PUBMED_KEY)) pubmed = ref;
-                            else if (db.equals(Terms.MEDLINE_KEY)) medline = ref;
-                            else if (db.equals(Terms.DOI_KEY)) doi = ref;
+                            if (db.equalsIgnoreCase(Terms.PUBMED_KEY)) pubmed = ref;
+                            else if (db.equalsIgnoreCase(Terms.MEDLINE_KEY)) medline = ref;
+                            else if (db.equalsIgnoreCase(Terms.DOI_KEY)) doi = ref;
                         }
                     }
                     if (key.equals(RP_LINE_TAG)) {
                         remark = val;
-                        val = val.substring(0, val.length()-1); // chomp dot
+                        if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
                         // Try to use it to find the location of the reference, if we have one.
                         Matcher m = rppat.matcher(val);
                         if (m.matches()) {
@@ -398,11 +400,11 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             // get term for first section
                             String termName = subparts[0].trim();
                             Term t;
-                            if (termName.equals(Terms.SPECIES_KEY)) t = Terms.getSpeciesTerm();
-                            else if (termName.equals(Terms.STRAIN_KEY)) t = Terms.getStrainTerm();
-                            else if (termName.equals(Terms.TISSUE_KEY)) t = Terms.getTissueTerm();
-                            else if (termName.equals(Terms.TRANSPOSON_KEY)) t = Terms.getTransposonTerm();
-                            else if (termName.equals(Terms.PLASMID_KEY)) t = Terms.getPlasmidTerm();
+                            if (termName.equalsIgnoreCase(Terms.SPECIES_KEY)) t = Terms.getSpeciesTerm();
+                            else if (termName.equalsIgnoreCase(Terms.STRAIN_KEY)) t = Terms.getStrainTerm();
+                            else if (termName.equalsIgnoreCase(Terms.TISSUE_KEY)) t = Terms.getTissueTerm();
+                            else if (termName.equalsIgnoreCase(Terms.TRANSPOSON_KEY)) t = Terms.getTransposonTerm();
+                            else if (termName.equalsIgnoreCase(Terms.PLASMID_KEY)) t = Terms.getPlasmidTerm();
                             else throw new ParseException("Invalid RC term found: "+termName);
                             // assign notes using term and rank:second section as value
                             // nasty hack - we really should have notes on the reference itself.
@@ -465,7 +467,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
                     val = val.trim();
-                    val = val.substring(0,val.length()-1); // chomp dot
+                    if (val.endsWith(".")) val = val.substring(0,val.length()-1); // chomp dot
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
                         if (key.equals("FTId")) rlistener.addFeatureProperty(Terms.getFTIdTerm(),val);
@@ -564,7 +566,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     while (!done) {
                         br.mark(160);
                         line = br.readLine();
-                        if (line.substring(0,2).equals(END_SEQUENCE_TAG)) {
+                        if (line.startsWith(END_SEQUENCE_TAG)) {
                             br.reset();
                             done = true;
                         } else {
@@ -579,12 +581,12 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     // read from first line till next that begins with "CC   -!-"
                     StringBuffer currentVal = new StringBuffer();
                     boolean wasMisc = false;
-                    if (!line.substring(0,8).equals(COMMENT_TAG+"   -!-")) wasMisc = true;
+                    if (!line.startsWith(COMMENT_TAG+"   -!-")) wasMisc = true;
                     currentVal.append(line.substring(5));
                     while (!done) {
                         br.mark(160);
                         line = br.readLine();
-                        if (((!wasMisc) && line.charAt(5)!=' ') || line.charAt(0)!='C' || line.substring(0,8).equals(COMMENT_TAG+"   -!-")) {
+                        if (((!wasMisc) && line.charAt(5)!=' ') || !line.startsWith("C") || line.startsWith(COMMENT_TAG+"   -!-")) {
                             br.reset();
                             done = true;
                             // dump current tag if exists
@@ -605,7 +607,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     while (!done) {
                         br.mark(160);
                         line = br.readLine();
-                        if (!line.substring(0,2).equals(FEATURE_TAG)) {
+                        if (!line.startsWith(FEATURE_TAG)) {
                             br.reset();
                             done = true;
                             // dump current tag if exists
@@ -615,7 +617,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             //         or:         FT                                ....
                             //         or          FT                                /FTId=899.
                             line = line.substring(5); // chomp off "FT   "
-                            if (line.charAt(0)!=' ') {
+                            if (!line.startsWith(" ")) {
                                 // dump current tag if exists
                                 if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                                 // case 1 : word value - splits into key-value based on first 8 chars
@@ -624,7 +626,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                                 currentVal.append(line.substring(8));
                             } else {
                                 line = line.trim();
-                                if (line.charAt(0)=='/') {
+                                if (line.startsWith("/")) {
                                     // dump current tag if exists
                                     if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                                     // case 3 : /word=.....
@@ -669,9 +671,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         br.mark(160);
                         line = br.readLine();
                         if (currentTagStart=='\0') currentTagStart = line.charAt(0);
-                        if (line.charAt(0)!=currentTagStart ||
-                                (currentTagStart=='D' && currentTag!=null && !currentTag.equals(line.substring(0,2))) ||
-                                (currentTagStart=='R' && currentTag!=null && "RN".equals(line.substring(0,2)))) {
+                        if (!line.startsWith(""+currentTagStart) ||
+                                (currentTagStart=='D' && currentTag!=null && !line.startsWith(""+currentTag)) ||
+                                (currentTagStart=='R' && currentTag!=null && line.startsWith("RN"))) {
                             br.reset();
                             done = true;
                             // dump current tag if exists
@@ -743,7 +745,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         
         Set notes = rs.getNoteSet();
         String accession = rs.getAccession();
-        String accessions = accession+";";
+        StringBuffer accessions = new StringBuffer();
+        accessions.append(accession);
+        accessions.append(";");
         String cdat = null;
         String udat = null;
         String adat = null;
@@ -770,7 +774,11 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelAnnotatedTerm())) arel=n.getValue();
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
-            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions = accessions+" "+n.getValue()+";";
+            else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
+                accessions.append(" ");
+                accessions.append(n.getValue());
+                accessions.append(";");
+            }
             else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle = (organelle==null?"":organelle+"; ")+n.getValue();
             // use the nasty hack to split the reference rank away from the actual value in this field
             else if (n.getTerm().equals(Terms.getGeneNameTerm()))  {
@@ -852,7 +860,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 5, this.getLineWidth(), null, LOCUS_TAG, this.getPrintStream());
         
         // accession line
-        StringTools.writeKeyValueLine(ACCESSION_TAG, accessions, 5, this.getLineWidth(), null, ACCESSION_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(ACCESSION_TAG, accessions.toString(), 5, this.getLineWidth(), null, ACCESSION_TAG, this.getPrintStream());
         
         // date line
         StringTools.writeKeyValueLine(DATE_TAG, (cdat==null?udat:cdat)+" (Rel. "+(crel==null?"0":crel)+", Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
@@ -988,7 +996,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             if (rcline.length()>0) StringTools.writeKeyValueLine(RC_LINE_TAG, rcline.toString(), 5, this.getLineWidth(), null, RC_LINE_TAG, this.getPrintStream());
             // Deal with RX and rest
             CrossRef c = d.getCrossref();
-            if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname().toUpperCase()+"="+c.getAccession()+";", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
+            if (c!=null) StringTools.writeKeyValueLine(REFERENCE_XREF_TAG, c.getDbname()+"="+c.getAccession()+";", 5, this.getLineWidth(), null, REFERENCE_XREF_TAG, this.getPrintStream());
             List auths = d.getAuthorList();
             for (Iterator j = auths.iterator(); j.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)j.next();
@@ -998,7 +1006,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             }
             if (!auths.isEmpty()) StringTools.writeKeyValueLine(AUTHORS_TAG, DocRefAuthor.Tools.generateAuthorString(auths)+";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
-            if (d.getTitle()!=null && !d.getTitle().equals("")) StringTools.writeKeyValueLine(TITLE_TAG, "\""+d.getTitle()+"\";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
+            if (d.getTitle()!=null && d.getTitle().length()!=0) StringTools.writeKeyValueLine(TITLE_TAG, "\""+d.getTitle()+"\";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(LOCATION_TAG, d.getLocation()+".", 5, this.getLineWidth(), null, LOCATION_TAG, this.getPrintStream());
         }
         
@@ -1018,7 +1026,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             CrossRef c = rcr.getCrossRef();
             Set noteset = c.getNoteSet();
             StringBuffer sb = new StringBuffer();
-            sb.append(c.getDbname().toUpperCase());
+            sb.append(c.getDbname());
             sb.append("; ");
             sb.append(c.getAccession());
             boolean hasSecondary = false;
@@ -1051,7 +1059,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
-            String desc = " ";
+            String desc = "";
             String ftid = null;
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();

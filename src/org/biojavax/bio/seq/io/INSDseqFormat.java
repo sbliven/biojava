@@ -508,7 +508,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     xml.closeTag(FEATUREQUAL_NAME_TAG);
                     
                     xml.openTag(FEATUREQUAL_VALUE_TAG);
-                    if (n.getTerm().getName().equals("translation")) {
+                    if (n.getTerm().getName().equalsIgnoreCase("translation")) {
                         String[] lines = StringTools.wordWrap(n.getValue(), "\\s+", this.getLineWidth());
                         for (int k = 0; k < lines.length; k++) xml.println(lines[k]);
                     } else {
@@ -519,7 +519,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     xml.closeTag(FEATUREQUAL_TAG);
                 }
                 // add-in to source feature only db_xref="taxon:xyz" where present
-                if (f.getType().equals("source") && tax!=null) {
+                if (f.getType().equalsIgnoreCase("source") && tax!=null) {
                     xml.openTag(FEATUREQUAL_TAG);
                     
                     xml.openTag(FEATUREQUAL_NAME_TAG);
@@ -784,12 +784,12 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     }
                     currFeatQual = val;
                 } else if (qName.equals(FEATUREQUAL_VALUE_TAG) && !this.parent.getElideFeatures()) {
-                    if (currFeatQual.equals("db_xref")) {
+                    if (currFeatQual.equalsIgnoreCase("db_xref")) {
                         Matcher m = dbxp.matcher(val);
                         if (m.matches()) {
                             String dbname = m.group(1);
                             String raccession = m.group(2);
-                            if (dbname.equals("taxon")) {
+                            if (dbname.equalsIgnoreCase("taxon")) {
                                 // Set the Taxon instead of a dbxref
                                 tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
                                 rlistener.setTaxon(tax);
@@ -810,7 +810,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                         } else {
                             throw new ParseException("Bad dbxref found: "+val);
                         }
-                    } else if (currFeatQual.equals("organism")) {
+                    } else if (currFeatQual.equalsIgnoreCase("organism")) {
                         try {
                             organism = val;
                             if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
@@ -818,7 +818,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                             throw new ParseException(e);
                         }
                     } else {
-                        if (currFeatQual.equals("translation")) {
+                        if (currFeatQual.equalsIgnoreCase("translation")) {
                             // strip spaces from sequence
                             val = val.replaceAll("\\s+","");
                         }
