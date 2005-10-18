@@ -104,7 +104,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+bp\\s+([dms]s-)?(\\S+)\\s+(circular|linear)?\\s+(\\S+)\\s+(\\S+)$");
     // version line
-    protected static final Pattern vp = Pattern.compile("^(\\S+)\\.(\\d+)\\s+GI:(\\S+)$");
+    protected static final Pattern vp = Pattern.compile("^(\\S+)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
     protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
     // dbxref line
@@ -215,8 +215,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         accession = verAcc;
                         rlistener.setAccession(accession);
                     }
-                    rlistener.setVersion(Integer.parseInt(m.group(2)));
-                    rlistener.setIdentifier(m.group(3));
+                    if (m.group(3)!=null) rlistener.setVersion(Integer.parseInt(m.group(3)));
+                    if (m.group(5)!=null) rlistener.setIdentifier(m.group(5));
                 } else {
                     throw new ParseException("Bad version line found: "+ver);
                 }
