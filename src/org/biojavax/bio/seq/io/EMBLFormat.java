@@ -836,8 +836,11 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 if (n.getValue()==null || n.getValue().length()==0) StringTools.writeKeyValueLine(FEATURE_TAG, "/"+n.getTerm().getName(), 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
                 else StringTools.writeKeyValueLine(FEATURE_TAG, "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
             }
-            // add-in to source feature only db_xref="taxon:xyz" where present
+            // add-in to source feature only organism and db_xref="taxon:xyz" where present
             if (f.getType().equals("source") && tax!=null) {
+                String displayName = tax.getDisplayName();
+                if (displayName.indexOf('(')>-1) displayName = displayName.substring(0, displayName.indexOf('(')).trim();
+                StringTools.writeKeyValueLine(FEATURE_TAG, "/organism=\""+displayName+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
                 StringTools.writeKeyValueLine(FEATURE_TAG, "/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
             }
             // add-in other dbxrefs where present

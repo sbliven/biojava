@@ -518,7 +518,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     
                     xml.closeTag(FEATUREQUAL_TAG);
                 }
-                // add-in to source feature only db_xref="taxon:xyz" where present
+                // add-in to source feature only organism and db_xref="taxon:xyz" where present
                 if (f.getType().equalsIgnoreCase("source") && tax!=null) {
                     xml.openTag(FEATUREQUAL_TAG);
                     
@@ -530,7 +530,22 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     xml.print("taxon:"+tax.getNCBITaxID());
                     xml.closeTag(FEATUREQUAL_VALUE_TAG);
                     
-                    xml.closeTag(FEATUREQUAL_TAG);
+                    xml.closeTag(FEATUREQUAL_TAG);               
+                    
+                    String displayName = tax.getDisplayName();           
+                    if (displayName.indexOf('(')>-1) displayName = displayName.substring(0, displayName.indexOf('(')).trim();
+
+                    xml.openTag(FEATUREQUAL_TAG);
+                    
+                    xml.openTag(FEATUREQUAL_NAME_TAG);
+                    xml.print("organism");
+                    xml.closeTag(FEATUREQUAL_NAME_TAG);
+                    
+                    xml.openTag(FEATUREQUAL_VALUE_TAG);
+                    xml.print(displayName);
+                    xml.closeTag(FEATUREQUAL_VALUE_TAG);
+                    
+                    xml.closeTag(FEATUREQUAL_TAG);        
                 }
                 // add-in other dbxrefs where present
                 for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext();) {
