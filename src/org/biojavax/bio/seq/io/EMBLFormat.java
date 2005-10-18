@@ -115,7 +115,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+standard;\\s+(circular)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$");
     // version line
-    protected static final Pattern vp = Pattern.compile("^(\\S+?)\\.(\\d+)$");
+    protected static final Pattern vp = Pattern.compile("^(\\S+)\\.(\\d+)$");
     // reference position line
     protected static final Pattern rpp = Pattern.compile("^(\\d+)(-(\\d+))?$");
     // dbxref line
@@ -232,7 +232,16 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             } else if (sectionKey.equals(VERSION_TAG)) {
                 String ver = ((String[])section.get(0))[1];
                 Matcher m = vp.matcher(ver);
-                if (m.matches()) {
+                if (m.matches()) {                   
+                    String verAcc = m.group(1);
+                    if (!accession.equals(verAcc)) {
+                        // the version refers to a different accession!
+                        // believe the version line, and store the original
+                        // accession away in the additional accession set
+                        rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accession);
+                        accession = verAcc;
+                        rlistener.setAccession(accession);
+                    }
                     rlistener.setVersion(Integer.parseInt(m.group(2)));
                 } else {
                     throw new ParseException("Bad version line found: "+ver);

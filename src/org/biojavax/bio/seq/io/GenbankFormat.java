@@ -104,7 +104,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+bp\\s+([dms]s-)?(\\S+)\\s+(circular|linear)?\\s+(\\S+)\\s+(\\S+)$");
     // version line
-    protected static final Pattern vp = Pattern.compile("^(\\S+?)\\.(\\d+)\\s+GI:(\\S+)$");
+    protected static final Pattern vp = Pattern.compile("^(\\S+)\\.(\\d+)\\s+GI:(\\S+)$");
     // reference line
     protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
     // dbxref line
@@ -206,6 +206,15 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 String ver = ((String[])section.get(0))[1];
                 Matcher m = vp.matcher(ver);
                 if (m.matches()) {
+                    String verAcc = m.group(1);
+                    if (!accession.equals(verAcc)) {
+                        // the version refers to a different accession!
+                        // believe the version line, and store the original
+                        // accession away in the additional accession set
+                        rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accession);
+                        accession = verAcc;
+                        rlistener.setAccession(accession);
+                    }
                     rlistener.setVersion(Integer.parseInt(m.group(2)));
                     rlistener.setIdentifier(m.group(3));
                 } else {

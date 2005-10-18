@@ -110,7 +110,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
             this.versionSeen = false;
             this.seqVersion = 0;
             this.seqVersionSeen = false;
-            this.accessions.clear();
+            this.accession = null;
             this.description = null;
             this.division = null;
             this.identifier = null;
@@ -176,12 +176,13 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
     
     /**
      * {@inheritDoc}
+     * The last accession passed to this routine will always be the one used.
      */
     public void setAccession(String accession) throws ParseException {
         if (accession==null) throw new ParseException("Accession cannot be null");
-        if (!this.accessions.contains(accession)) this.accessions.add(accession);
+        this.accession = accession;
     }
-    private List accessions = new ArrayList();
+    private String accession;
     
     /**
      * {@inheritDoc}
@@ -391,7 +392,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
     public void endSequence() throws ParseException {
         if (this.name==null) throw new ParseException("Name has not been supplied");
         if (this.namespace==null) throw new ParseException("Namespace has not been supplied");
-        if (this.accessions.isEmpty()) throw new ParseException("No accessions have been supplied");
+        if (this.accession==null) throw new ParseException("No accessions have been supplied");
     }
         
     /**
@@ -405,11 +406,9 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
      */
     public Sequence makeSequence() throws BioException {
         this.endSequence(); // Check our input.
-        // deal with extra accessions by ignoring them.
-        String accession = (String)this.accessions.get(0);
         // make our basic object
         SymbolList syms = this.symbols==null?SymbolList.EMPTY_LIST:this.symbols.makeSymbolList();
-        RichSequence rs = new SimpleRichSequence(this.namespace,this.name,accession,this.version,syms,new Double(this.seqVersion));
+        RichSequence rs = new SimpleRichSequence(this.namespace,this.name,this.accession,this.version,syms,new Double(this.seqVersion));
         // set misc stuff
         try {
             // set features
