@@ -27,7 +27,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +42,7 @@ import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
@@ -67,6 +67,7 @@ import org.biojavax.SimpleNamespace;
 import org.biojavax.SimpleNote;
 import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
+import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.seq.Position;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
@@ -173,11 +174,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     protected static final String COMMENT_EVENT_TAG = "event";
     protected static final String COMMENT_EVENT_ISOFORMS_ATTR = "namedIsoforms";
     protected static final String COMMENT_ISOFORM_TAG = "isoform";
-    protected static final String COMMENT_ISOFORM_ID_TAG = "id";
     protected static final String COMMENT_ISOFORM_NAME_TAG = "name";
     protected static final String COMMENT_INTERACTANT_TAG = "interactant";
     protected static final String COMMENT_INTERACT_INTACT_ATTR = "intactId";
-    protected static final String COMMENT_INTERACT_ID_TAG = "id";
     protected static final String COMMENT_INTERACT_LABEL_TAG = "label";
     protected static final String COMMENT_ORGANISMS_TAG = "organismsDiffer";
     protected static final String COMMENT_EXPERIMENTS_TAG = "experiments";
@@ -185,6 +184,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     
     protected static final String NOTE_TAG = "note";
     protected static final String KEYWORD_TAG = "keyword";
+    protected static final String ID_TAG = "id";
     
     protected static final String FEATURE_TAG = "feature";
     protected static final String FEATURE_DESC_ATTR = "description";
@@ -201,6 +201,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     protected static final String LOCATION_BEGIN_TAG = "begin";
     protected static final String LOCATION_END_TAG = "end";
     protected static final String LOCATION_POSITION_ATTR = "position";
+    protected static final String LOCATION_POSITION_TAG = "position";
     
     protected static final String SEQUENCE_TAG = "sequence";
     protected static final String SEQUENCE_LENGTH_ATTR = "length";
@@ -969,9 +970,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         
                         xml.openTag(COMMENT_INTERACTANT_TAG);
                         xml.attribute(COMMENT_INTERACT_INTACT_ATTR,interact.getSecondIntActID());
-                        xml.openTag(COMMENT_INTERACT_ID_TAG);
+                        xml.openTag(ID_TAG);
                         xml.print(interact.getID());
-                        xml.closeTag(COMMENT_INTERACT_ID_TAG);
+                        xml.closeTag(ID_TAG);
                         if (interact.getLabel()!=null) {
                             xml.openTag(COMMENT_INTERACT_LABEL_TAG);
                             xml.print(interact.getLabel());
@@ -1009,9 +1010,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         Isoform isoform = (Isoform)j.next();
                         xml.openTag(COMMENT_ISOFORM_TAG);
                         for (Iterator k = isoform.getIsoIDs().iterator(); k.hasNext(); ) {
-                            xml.openTag(COMMENT_ISOFORM_ID_TAG);
+                            xml.openTag(ID_TAG);
                             xml.print((String)k.next());
-                            xml.closeTag(COMMENT_ISOFORM_ID_TAG);
+                            xml.closeTag(ID_TAG);
                         }
                         for (Iterator k = isoform.getNames().iterator(); k.hasNext(); ) {
                             xml.openTag(COMMENT_ISOFORM_NAME_TAG);
@@ -1314,7 +1315,11 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             RichLocation rl = (RichLocation)f.getLocation();
             if (rl.getMinPosition().equals(rl.getMaxPosition())) {
                 // point position
+                xml.openTag(LOCATION_POSITION_TAG);
+                if (rl.getMinPosition().getFuzzyStart() || rl.getMaxPosition().getFuzzyStart()) xml.attribute(STATUS_ATTR,"less than");
+                else if (rl.getMinPosition().getFuzzyEnd() || rl.getMaxPosition().getFuzzyEnd()) xml.attribute(STATUS_ATTR,"greater than");
                 xml.attribute(LOCATION_POSITION_ATTR,""+rl.getMin());
+                xml.closeTag(LOCATION_POSITION_TAG);
             } else {
                 // range position
                 // begin
@@ -1428,16 +1433,19 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         private int currRCID;
         private int currEvID;
         private String currKWID;
-        
-        private String currFeatQual;
-        private int currLocBrackets;
-        private int currLocElemBrackets;
+        private UniProtCommentParser currUCParser;
+        private Interaction currUCParserInteract;
+        private Event currUCParserEvent;
+        private Isoform currUCParserIsoform;
+        private String currLocIsFor;
+        private String currTextIsFor;
+        private String currNoteIsFor;
+        private String currSeqIsFor;
+        private String currIDIsFor;
+        private int interactantCount;
         private StringBuffer currLocStr;
-        private String currBaseType;
-        private String currBaseExtent;
-        private boolean firstBase; // oooh err!
         private boolean firstLocationElement;
-        private Map currQuals = new LinkedHashMap();
+        private int featNoteRank;
         
         // construct a new handler that will populate the given list of sequences
         private UniProtXMLHandler(RichSequenceFormat parent,
@@ -1470,12 +1478,13 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     throw new SAXException(e);
                 }
                 this.nameIsFor = "ENTRY";
+                this.currSeqIsFor = "ENTRY";
                 this.currGene = 0;
                 this.currNames.clear();
                 this.currRefRank = 0;
                 currRCID = 0;
                 currEvID = 0;
-                
+                interactantCount = 0;
             }
             
             else if (qName.equals(PROTEIN_TAG)) {
@@ -1682,23 +1691,179 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 }
             }
             
-            // features
-            // comments
+            else if (qName.equals(LOCATION_TAG)) {
+                currLocStr = new StringBuffer();
+                if (currLocIsFor.equals("FEATURE")) {
+                    try {
+                        for (int i = 0; i < attributes.getLength(); i++) {
+                            String name = attributes.getQName(i).trim();
+                            String val = attributes.getValue(i).trim();
+                            if (name.equals(LOCATION_SEQ_ATTR)) {
+                                Note note = new SimpleNote(Terms.getLocationSequenceTerm(), val, featNoteRank++);
+                                ((RichAnnotation)templ.annotation).addNote(note);
+                            }
+                        }
+                    } catch (ChangeVetoException e) {
+                        SAXException pe = new SAXException("Could not create location terms");
+                        pe.initCause(e);
+                        throw pe;
+                    }
+                }
+            } else if (qName.equals(LOCATION_BEGIN_TAG) || qName.equals(LOCATION_END_TAG) || qName.equals(LOCATION_POSITION_TAG)) {
+                StringBuffer pos = new StringBuffer();
+                pos.append(" "); // space between start and end
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    String name = attributes.getQName(i).trim();
+                    String val = attributes.getValue(i).trim();
+                    if (name.equals(STATUS_ATTR)) {
+                        if (val.equals("less than")) pos.append("<");
+                        else if (val.equals("greater than")) pos.append(">");
+                    } else if (name.equals(LOCATION_POSITION_ATTR)) {
+                        pos.append(val);
+                    }
+                }
+                currLocStr.append(pos.toString());
+                if (qName.equals(LOCATION_POSITION_TAG)) currLocStr.append(pos.toString()); // fake it as begin=end
+            }
             
-            else if (qName.equals(SEQUENCE_TAG)) {
+            else if (qName.equals(FEATURE_TAG) && !this.parent.getElideFeatures()) {
+                featNoteRank = 1;
+                templ = new RichFeature.Template();
+                templ.annotation = new SimpleRichAnnotation();
+                templ.sourceTerm = Terms.getUniProtXMLTerm();
+                templ.featureRelationshipSet = new TreeSet();
+                templ.rankedCrossRefs = new TreeSet();
                 try {
                     for (int i = 0; i < attributes.getLength(); i++) {
                         String name = attributes.getQName(i).trim();
                         String val = attributes.getValue(i).trim();
                         if (val.equals("")) continue;
-                        if (name.equals(SEQUENCE_MODIFIED_ATTR)) {
-                            rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),val);
+                        if (name.equals(TYPE_ATTR)) {
+                            templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(val);
+                        } else if (name.equals(ID_ATTR)) {
+                            Note note = new SimpleNote(Terms.getFTIdTerm(), val, featNoteRank++);
+                            ((RichAnnotation)templ.annotation).addNote(note);
+                        } else if (name.equals(FEATURE_DESC_ATTR)) {
+                            Note note = new SimpleNote(Terms.getFeatureDescTerm(), val, featNoteRank++);
+                            ((RichAnnotation)templ.annotation).addNote(note);
+                        } else if (name.equals(STATUS_ATTR)) {
+                            Note note = new SimpleNote(Terms.getFeatureStatusTerm(), val, featNoteRank++);
+                            ((RichAnnotation)templ.annotation).addNote(note);
+                        } else if (name.equals(REF_ATTR)) {
+                            Note note = new SimpleNote(Terms.getFeatureRefTerm(), val, featNoteRank++);
+                            ((RichAnnotation)templ.annotation).addNote(note);
                         }
                     }
-                } catch (ParseException e) {
-                    SAXException pe = new SAXException("Could not set sequence properties");
+                } catch (ChangeVetoException e) {
+                    SAXException pe = new SAXException("Could not create location terms");
                     pe.initCause(e);
                     throw pe;
+                }
+                currLocStr = new StringBuffer();
+                currLocIsFor = "FEATURE";
+            }
+            
+            else if (qName.equals(COMMENT_TAG)) {
+                currUCParser = new UniProtCommentParser();
+                currUCParser.setInteractions(new ArrayList());
+                currUCParser.setEvents(new ArrayList());
+                currUCParser.setIsoforms(new ArrayList());
+                currUCParser.setKMs(new ArrayList());
+                currUCParser.setVMaxes(new ArrayList());
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    String name = attributes.getQName(i).trim();
+                    String val = attributes.getValue(i).trim();
+                    if (val.equals("")) continue;
+                    if (name.equals(TYPE_ATTR)) {
+                        String type = val.toUpperCase();
+                        if (type.equals("POSTTRANSLATIONAL MODIFICATION")) type="PTM";
+                        else if (type.equals("ONLINE INFORMATION")) type="DATABASE";
+                        currUCParser.setCommentType(type);
+                    } else if (name.equals(COMMENT_MASS_ATTR)) currUCParser.setMolecularWeight(Integer.parseInt(val));
+                    else if (name.equals(COMMENT_ERROR_ATTR)) currUCParser.setMolWeightError(Integer.valueOf(val));
+                    else if (name.equals(COMMENT_METHOD_ATTR)) currUCParser.setMolWeightMethod(val);
+                    else if (name.equals(NAME_ATTR)) currUCParser.setDatabaseName(val);
+                }
+                this.currLocIsFor="COMMENT";
+                this.currTextIsFor="COMMENT";
+                this.currNoteIsFor="COMMENT";
+            } else if (qName.equals(COMMENT_ABSORPTION_TAG)) {
+                this.currTextIsFor="ABSORPTION";
+            } else if (qName.equals(COMMENT_KINETICS_TAG)) {
+                this.currTextIsFor="KINETICS";
+            } else if (qName.equals(COMMENT_LINK_TAG)) {
+                this.currTextIsFor="KINETICS";
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    String name = attributes.getQName(i).trim();
+                    String val = attributes.getValue(i).trim();
+                    if (name.equals(COMMENT_LINK_URI_ATTR)) currUCParser.setUri(val);
+                }
+            } else if (qName.equals(COMMENT_EVENT_TAG)) {
+                currUCParserEvent = new Event();
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    String name = attributes.getQName(i).trim();
+                    String val = attributes.getValue(i).trim();
+                    if (name.equals(TYPE_ATTR)) {
+                        val = val.toUpperCase().charAt(0)+val.substring(1); // make first letter upper case
+                        currUCParserEvent.setType(val);
+                    } else if (name.equals(COMMENT_EVENT_ISOFORMS_ATTR)) currUCParserEvent.setNamedIsoforms(Integer.parseInt(val));
+                }
+                currUCParser.getEvents().add(currUCParserEvent);
+            } else if (qName.equals(COMMENT_ISOFORM_TAG)) {
+                currUCParserIsoform = new Isoform();
+                currUCParserIsoform.setIsoIDs(new ArrayList());
+                currUCParserIsoform.setNames(new ArrayList());
+                currUCParser.getIsoforms().add(currUCParserIsoform);
+                this.nameIsFor="ISOFORM";
+                this.currNoteIsFor="ISOFORM";
+                this.currSeqIsFor="ISOFORM";
+                this.currIDIsFor="ISOFORM";
+            } else if (qName.equals(COMMENT_INTERACTANT_TAG)) {
+                this.currIDIsFor="INTERACTION";
+                interactantCount++;
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    String name = attributes.getQName(i).trim();
+                    String val = attributes.getValue(i).trim();
+                    if (name.equals(COMMENT_INTERACT_INTACT_ATTR)) {
+                        if (interactantCount%2==1) {
+                            currUCParserInteract = new Interaction();
+                            currUCParserInteract.setFirstIntActID(val);
+                            currUCParser.getInteractions().add(currUCParserInteract);
+                        }
+                        else currUCParserInteract.setSecondIntActID(val);
+                    }
+                }
+            }
+            
+            else if (qName.equals(SEQUENCE_TAG)) {
+                if (this.currSeqIsFor.equals("ENTRY")) {
+                    try {
+                        for (int i = 0; i < attributes.getLength(); i++) {
+                            String name = attributes.getQName(i).trim();
+                            String val = attributes.getValue(i).trim();
+                            if (val.equals("")) continue;
+                            if (name.equals(SEQUENCE_MODIFIED_ATTR)) {
+                                rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),val);
+                            }
+                        }
+                    } catch (ParseException e) {
+                        SAXException pe = new SAXException("Could not set sequence properties");
+                        pe.initCause(e);
+                        throw pe;
+                    }
+                }
+                
+                else if (this.currSeqIsFor.equals("ISOFORM")) {
+                    for (int i = 0; i < attributes.getLength(); i++) {
+                        String name = attributes.getQName(i).trim();
+                        String val = attributes.getValue(i).trim();
+                        if (name.equals(TYPE_ATTR)) {
+                            val = val.toUpperCase().charAt(0)+val.substring(1); // init caps
+                            currUCParserIsoform.setSequenceType(val);
+                        } else if (name.equals(REF_ATTR)) {
+                            currUCParserIsoform.setSequenceRef(val);
+                        }
+                    }
                 }
             }
             /*
@@ -1936,6 +2101,10 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         this.organelleDesc.append(", Plasmid ");
                         this.organelleDesc.append(val);
                     }
+                    
+                    else if (this.nameIsFor.equals("ISOFORM")) {
+                        currUCParserIsoform.getNames().add(val);
+                    }
                 }
                 
                 else if (qName.equals(PROTEIN_TAG)) {
@@ -2033,18 +2202,91 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     rlistener.addSequenceProperty(Terms.getKeywordTerm(), val);
                 }
                 
-                // features
-                // comments
+                else if (qName.equals(LOCATION_TAG)) {
+                    if (currLocIsFor.equals("FEATURE")) {
+                        templ.location = UniProtLocationParser.parseLocation(currLocStr.toString());
+                    } else if (currLocIsFor.equals("COMMENT")) {
+                        Location l = UniProtLocationParser.parseLocation(currLocStr.toString());
+                        currUCParser.setMolWeightRangeStart(l.getMin());
+                        currUCParser.setMolWeightRangeEnd(l.getMax());
+                    }
+                }
                 
-                else if (qName.equals(SEQUENCE_TAG) && !this.parent.getElideSymbols()) {
+                else if (qName.equals(FEATURE_TAG)) {
+                    // start the feature from the template we built
+                    rlistener.startFeature(templ);
+                    // end the feature
+                    rlistener.endFeature();
+                    currDBXrefs.clear();
+                } else if (qName.equals(FEATURE_ORIGINAL_TAG)) {
                     try {
-                        SymbolList sl = new SimpleSymbolList(symParser,
-                                val.replaceAll("\\s+","").replaceAll("[\\.|~]","-"));
-                        rlistener.addSymbols(symParser.getAlphabet(),
-                                (Symbol[])(sl.toList().toArray(new Symbol[0])),
-                                0, sl.length());
-                    } catch (Exception e) {
-                        throw new ParseException(e);
+                        Note note = new SimpleNote(Terms.getFeatureOriginalTerm(), val, featNoteRank++);
+                        ((RichAnnotation)templ.annotation).addNote(note);
+                    } catch (ChangeVetoException e) {
+                        SAXException pe = new SAXException("Could not create location terms");
+                        pe.initCause(e);
+                        throw pe;
+                    }
+                } else if (qName.equals(FEATURE_VARIATION_TAG)) {
+                    try {
+                        Note note = new SimpleNote(Terms.getFeatureVariationTerm(), val, featNoteRank++);
+                        ((RichAnnotation)templ.annotation).addNote(note);
+                    } catch (ChangeVetoException e) {
+                        SAXException pe = new SAXException("Could not create location terms");
+                        pe.initCause(e);
+                        throw pe;
+                    }
+                }
+                
+                else if (qName.equals(COMMENT_TAG)) {
+                    rlistener.setComment(currUCParser.generate());
+                } else if (qName.equals(COMMENT_TEXT_TAG)) {
+                    if (this.currTextIsFor.equals("COMMENT")) currUCParser.setText(val);
+                    else if (this.currTextIsFor.equals("ABSORPTION")) currUCParser.setAbsorptionNote(val);
+                    else if (this.currTextIsFor.equals("KINETICS")) currUCParser.setKineticsNote(val);
+                } else if (qName.equals(COMMENT_ABS_MAX_TAG)) {
+                    currUCParser.setAbsorptionMax(val);
+                } else if (qName.equals(COMMENT_KIN_KM_TAG)) {
+                    currUCParser.getKMs().add(val);
+                } else if (qName.equals(COMMENT_KIN_VMAX_TAG)) {
+                    currUCParser.getVMaxes().add(val);
+                } else if (qName.equals(COMMENT_PH_TAG)) {
+                    currUCParser.setPHDependence(val);
+                } else if (qName.equals(COMMENT_REDOX_TAG)) {
+                    currUCParser.setRedoxPotential(val);
+                } else if (qName.equals(COMMENT_TEMPERATURE_TAG)) {
+                    currUCParser.setTemperatureDependence(val);
+                } else if (qName.equals(COMMENT_ORGANISMS_TAG)) {
+                    if (val.equals("true")) currUCParserInteract.setOrganismsDiffer(true);
+                    else currUCParserInteract.setOrganismsDiffer(false);
+                } else if (qName.equals(COMMENT_EXPERIMENTS_TAG)) {
+                    currUCParserInteract.setNumberExperiments(Integer.parseInt(val));
+                } else if (qName.equals(NOTE_TAG)) {
+                    if (currNoteIsFor.equals("COMMENT")) currUCParser.setNote(val);
+                    else if (currNoteIsFor.equals("ISOFORM")) currUCParser.setNote(val);
+                } else if (qName.equals(COMMENT_EVENT_TAG)) {
+                    currUCParserEvent.setComment(val);
+                } else if (qName.equals(COMMENT_ISOFORM_TAG)) {
+                    this.currSeqIsFor = "ENTRY";
+                    this.currNoteIsFor = "COMMENT";
+                } else if (qName.equals(ID_TAG)) {
+                    if (currIDIsFor.equals("ISOFORM")) currUCParserIsoform.getIsoIDs().add(val);
+                    else if (currIDIsFor.equals("INTERACTION")) currUCParserInteract.setID(val);
+                } else if (qName.equals(COMMENT_INTERACT_LABEL_TAG)) {
+                    currUCParserInteract.setLabel(val);
+                }
+                
+                else if (qName.equals(SEQUENCE_TAG)) {
+                    if (this.currSeqIsFor.equals("ENTRY") && !this.parent.getElideSymbols()) {
+                        try {
+                            SymbolList sl = new SimpleSymbolList(symParser,
+                                    val.replaceAll("\\s+","").replaceAll("[\\.|~]","-"));
+                            rlistener.addSymbols(symParser.getAlphabet(),
+                                    (Symbol[])(sl.toList().toArray(new Symbol[0])),
+                                    0, sl.length());
+                        } catch (Exception e) {
+                            throw new ParseException(e);
+                        }
                     }
                 }
                 
@@ -2204,7 +2446,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     currDBXrefs.clear();
                 }
                  
-                else if (qName.equals(TAXID_TAG)) {
+                else if (qName.equals(TAID_TAG)) {
                     tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(val)});
                     rlistener.setTaxon(tax);
                     for (Iterator j = currNames.keySet().iterator(); j.hasNext(); ) {

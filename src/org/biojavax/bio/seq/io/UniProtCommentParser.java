@@ -334,7 +334,7 @@ CC         Comment=Free text;
      * @throws ParseException if the current settings do not allow the
      * creation of a correct comment string.
      */
-    public String getCommentText() throws ParseException {
+    public String generate() throws ParseException {
         StringBuffer sb = new StringBuffer();
         sb.append(PREFIX);
         sb.append(" ");
@@ -1010,7 +1010,7 @@ CC         Comment=Free text;
     /**
      * A class to describe protein-protein interactions.
      */
-    public class Interaction {
+    public static class Interaction {
         /**
          * Holds value of property ID.
          */
@@ -1153,7 +1153,7 @@ CC         Comment=Free text;
     /**
      * A class to describe events for alternative product comments.
      */
-    public class Event {
+    public static class Event {
         /**
          * Holds value of property type.
          */
@@ -1228,7 +1228,7 @@ CC         Comment=Free text;
     /**
      * A class to describe isoforms for alternative product comments.
      */
-    public class Isoform {
+    public static class Isoform {
         /**
          * Holds value of property names.
          */
