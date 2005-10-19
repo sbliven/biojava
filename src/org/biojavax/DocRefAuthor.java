@@ -82,7 +82,7 @@ public interface DocRefAuthor extends Comparable,Changeable {
         /**
          * Takes a set of authors and creates a comma-separated string.
          * For the final comma, it replaces it with the word "and".
-         * @param a set of authors
+         * @param authors set of authors
          * @return a comma-separated string with the word "and" in 
          * place of the final comma.
          */
