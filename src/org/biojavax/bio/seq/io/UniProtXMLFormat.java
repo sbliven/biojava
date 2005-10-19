@@ -1867,7 +1867,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             
             try {
                 if (qName.equals(COPYRIGHT_TAG)) {
-                    rlistener.setComment(val);
+                    rlistener.addSequenceProperty(Terms.getCopyrightTerm(),val);
                 }
                 
                 else if (qName.equals(ACCESSION_TAG)) {

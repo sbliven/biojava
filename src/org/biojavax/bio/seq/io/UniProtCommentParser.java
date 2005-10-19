@@ -107,6 +107,7 @@ public class UniProtCommentParser {
         String type = c.substring(0,c.indexOf(':')); // find type
         this.setCommentType(type); // remember type
         c = c.substring(c.indexOf(':')+1); // chomp type and colon
+        if (c.endsWith(".")) c=c.substring(0,c.length()-1); // chomp trailing full stop
         
         // what we have left is the [prefix: key=value; | key=value; | text.] section
         if (this.getCommentType().equalsIgnoreCase(BIOPHYSICOCHEMICAL_PROPERTIES)) {
@@ -520,6 +521,7 @@ CC         Comment=Free text;
         } else {
             // just append free text for all others.
             sb.append(this.getText());
+            if (!this.getText().endsWith(".")) sb.append(".");
         }
         
         // return it
