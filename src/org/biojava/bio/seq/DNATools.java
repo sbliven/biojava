@@ -189,6 +189,10 @@ public final class DNATools {
    */
   public static Sequence createDNASequence(String dna, String name)
   throws IllegalSymbolException {
+    //should I be calling createGappedDNASequence?
+    if(dna.indexOf('-') != -1 || dna.indexOf('~') != -1){//there is a gap
+        return createGappedDNASequence(dna, name);
+    }
     try {
       return new SimpleSequenceFactory().createSequence(
         createDNA(dna),
