@@ -378,6 +378,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             Namespace ns)
             throws IllegalSymbolException, IOException, ParseException {
         
+        Pattern copyright = Pattern.compile(".*<"+COPYRIGHT_TAG+".*");
+        
         try {
             rlistener.startSequence();
             DefaultHandler m_handler = new UniProtXMLHandler(this,symParser,rlistener,ns);
@@ -386,7 +388,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             reader.mark(10000);
             String line = reader.readLine();
             reader.reset();
-            if (line.contains("<"+COPYRIGHT_TAG)) XMLTools.readXMLChunk(reader, m_handler, COPYRIGHT_TAG);
+            if (copyright.matcher(line).matches()) XMLTools.readXMLChunk(reader, m_handler, COPYRIGHT_TAG);
             // all done!
             rlistener.endSequence();
             return hasMore;
