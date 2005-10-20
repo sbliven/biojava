@@ -35,6 +35,15 @@ public class SimplePosition implements Position {
     private String t;
     
     /**
+     * Constructs a point position, with no fuzzy start or
+     * end. (eg. 1, 2, or 3).
+     * @param p the point position
+     */
+    public SimplePosition(int p) {
+        this(false,false,p);
+    }
+    
+    /**
      * Constructs a point position, with optionally fuzzy start and
      * end. (eg. <1 or 3> or 2 or even <5>).
      * @param fs fuzzy start?
@@ -99,13 +108,13 @@ public class SimplePosition implements Position {
     private void setFuzzyEnd(boolean fe) { this.fe = fe; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void getStart(int s) { this.s = s; }
+    private void setStart(int s) { this.s = s; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void getEnd(int e) { this.e = e; }
+    private void setEnd(int e) { this.e = e; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void getType(String t) { this.t = t; }
+    private void setType(String t) { this.t = t; }
     
     /** 
      * {@inheritDoc}

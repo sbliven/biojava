@@ -563,6 +563,12 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * {@inheritDoc}
      * If the location is circular but the sequence is not, or they are both
      * circular but of different circular lengths, an exception is thrown.
+     * The symbol list passed in is the sequence used to obtain symbols
+     * if the cross reference for this location has not been set. If the cross
+     * reference has been set, then the symbol list passed in is only used
+     * if it has the same accession, namespace and version as the cross
+     * reference on this location. Otherwise, the cross referenced symbol list
+     * is looked up and used instead.
      */
     public SymbolList symbols(SymbolList seq) {
         if (seq==null) throw new IllegalArgumentException("Sequence cannot be null");
@@ -588,25 +594,25 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
                     // It really is remote - the xref doesn't point to the sequence we just got passed
                     seq = this.crr.getRemoteSymbolList(cr, seq.getAlphabet());
                 }
+            } else {
+                // It's assumed to be remote because we can't tell what the sequence we were passed really is
+                seq = this.crr.getRemoteSymbolList(this.getCrossRef(), seq.getAlphabet());
             }
-        } else {
-            // It's assumed to be remote because we can't tell what the sequence we were passed really is
-            seq = this.crr.getRemoteSymbolList(this.getCrossRef(), seq.getAlphabet());
         }
         
         
         // Carry on as before
-        SymbolList seq2 = seq.subList(this.getMin(),this.getMax());
+        seq = seq.subList(this.getMin(),this.getMax());
         
         try {
             if (this.strand==Strand.NEGATIVE_STRAND) {
                 Alphabet a = seq.getAlphabet();
                 if (a==AlphabetManager.alphabetForName("DNA")) {
-                    seq2 = DNATools.reverseComplement(seq);
+                    seq = DNATools.reverseComplement(seq);
                 } else if (a==AlphabetManager.alphabetForName("RNA")) {
-                    seq2 = RNATools.reverseComplement(seq);
+                    seq = RNATools.reverseComplement(seq);
                 } else {
-                    seq2 = SymbolListViews.reverse(seq2);// no complement as no such thing
+                    seq = SymbolListViews.reverse(seq);// no complement as no such thing
                 }
             }
         } catch (IllegalAlphabetException e) {
@@ -616,7 +622,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
             throw ex;
         }
         
-        return seq2;
+        return seq;
     }
     
     /**
