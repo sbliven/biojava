@@ -191,6 +191,10 @@ public class ChangeSupport {
    * full.
    */
   protected void growIfNecessary() {
+    //try cleaning up first
+    synchronized(this){
+        reapGarbageListeners();
+    }  
     if(listenerCount == listeners.length) {
       int newLength = listenerCount + delta;
       Reference[] newList = new Reference[newLength];
@@ -246,7 +250,9 @@ public class ChangeSupport {
 	        types[pp] = types[p];
 		listeners[pp] = r;
 		pp++;
-	    }
+	    }else{ //if it is null release the reference
+                r = null;
+            }
 	}
 	listenerCount = pp;
     }
