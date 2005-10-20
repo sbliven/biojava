@@ -22,6 +22,7 @@
 package org.biojavax.bio.seq.io;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -184,8 +185,11 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 if (parentStrand==Strand.NEGATIVE_STRAND) strand = Strand.POSITIVE_STRAND;
                 else strand = Strand.NEGATIVE_STRAND;
                 
-                // Return the parsed contents of the complement 'group'
-                return parseLocString(featureNS,featureAccession,crossRef,strand,subLocStr);
+                // Get the parsed contents of the complement 'group'
+                List resultBlocks = new ArrayList(RichLocation.Tools.flatten(parseLocString(featureNS,featureAccession,crossRef,strand,subLocStr)));
+                // Reverse the order of its members c(j(x,y)) = j(cy,cx)
+                Collections.reverse(resultBlocks);
+                return RichLocation.Tools.construct(resultBlocks);
             } 
             
             // Otherwise, it's a compound location

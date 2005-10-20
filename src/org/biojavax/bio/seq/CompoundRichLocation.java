@@ -318,10 +318,7 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
     
     /**
      * {@inheritDoc}
-     * This function concatenates the symbols of all its child locations. If
-     * the components of the location are from the negative strand the Symbols
-     * will be reverse complemented. If there are mixed strands the results may
-     * not be sensible but it is still possible.
+     * This function concatenates the symbols of all its child locations.
      * <p>
      * The most obvious application of this method to a <code>CompoundRichLocation</code>
      * is the contatenation of the components of a gene with multiple exons.
