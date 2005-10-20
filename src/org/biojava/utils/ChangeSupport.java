@@ -91,7 +91,7 @@ public class ChangeSupport {
   {
   	for(int i = 0; i < listenerCount ; i++ ) {
   	  ChangeType type = (ChangeType) types[i];
-  	  if(type.isMatchingType(ct)) {
+  	  if(ct.isMatchingType(type)) {
   	  	return true;
   	  }
   	}
