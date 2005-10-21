@@ -88,8 +88,8 @@ public class SmithWaterman extends NeedlemanWunsch
       this.scoreMatrix = new double[query.length()+1][subject.length()+1];    
     
       /*
-      * Use affine gap panalties.
-      */
+       * Use affine gap panalties.
+       */
       if ((gapExt != delete) || (gapExt != insert)) {
         
         double[][] E = new double[query.length()+1][subject.length()+1];	// Inserts
@@ -190,12 +190,14 @@ public class SmithWaterman extends NeedlemanWunsch
               align[0] = '-' + align[0];
               align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
               path     = ' ' + path;
+              targetStart--;
              
             // Delete
             } else if (scoreMatrix[i-1][j] > Math.max(scoreMatrix[i-1][j-1], scoreMatrix[i][j-1])) {
               align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
               align[1] = '-' + align[1];
               path     = ' ' + path;
+              queryStart--;
            
             // Match/Replace
             } else {
@@ -204,6 +206,8 @@ public class SmithWaterman extends NeedlemanWunsch
               
               align[0] = st.tokenizeSymbol(query.symbolAt(i--))   + align[0];
               align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+              queryStart--;
+              targetStart--;
             }
 
           } while (j>0);
