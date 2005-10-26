@@ -242,7 +242,7 @@ RichSequence rs = RichSequence.Tools.enrich(s);</programlisting>
     </section>
 
     <section>
-      <title>BioSQL persistence with Hibernate.</title>
+      <title>BioSQL persistence.</title>
 
       <para>BioJavaX introduces a whole new way of working with BioSQL
       databases.</para>
@@ -575,22 +575,23 @@ DocRef dr = (DocRef)RichObjectFactory.getObject(
 RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from now on</programlisting>
 
       <para>If you change the default <code>RichObjectBuilder</code> to a
-      different one, you must do so at the very beginning of your program
-      before any call to the <code>RichObjectFactory</code> has been made.
-      This is because when the builder is changed, existing singletons or
-      default instances are not removed. If you do not follow this guideline,
-      you will end up with a mix of objects in the cache created by two
-      different builders, which could lead to interesting situations.</para>
+      different one, you <emphasis>must</emphasis> do so at the very beginning
+      of your program before any call to the <code>RichObjectFactory</code>
+      has been made. This is because when the builder is changed, existing
+      singletons or default instances are not removed. If you do not follow
+      this guideline, you will end up with a mix of objects in the cache
+      created by two different builders, which could lead to interesting
+      situations.</para>
     </section>
 
     <section>
       <title>Hibernate singletons.</title>
 
-      <para>When working with Hibernate, you must instantiate the
-      <code>HibernateRichObjectBuilder</code>. When using this, instances are
-      looked up in the underlying BioSQL database first to see if they exist.
-      If they do, they are loaded and returned. If not, they are created, then
-      returned.</para>
+      <para>When working with Hibernate, you <emphasis>must</emphasis>
+      instantiate the <code>HibernateRichObjectBuilder</code>. When using
+      this, instances are looked up in the underlying BioSQL database first to
+      see if they exist. If they do, they are loaded and returned. If not,
+      they are created, then returned.</para>
 
       <para>The instances returned by <code>RichObjectFactory</code> when
       using the <code>HibernateRichObjectBuilder</code> are guaranteed true
@@ -758,48 +759,95 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
   </chapter>
 
   <chapter>
-    <title><code>BioEntry</code> vs. <code>RichSequence</code>.</title>
+    <title>Working with sequences.</title>
 
     <section>
-      <title>Two-tier definition.</title>
+      <title>Creating sequences.</title>
 
       <para>BioJavaX has a two-tier definition of sequence data.</para>
 
-      <para>BioEntry objects correspond to the bioentry table in BioSQL. They
-      do not have any sequence information, and neither do they have any
-      features. They can, however, be annotated, commented, and put into
-      relationships with each other. They can also have cross-references to
-      publications and other databases associated with them.</para>
+      <para><code>BioEntry</code> objects correspond to the
+      <code>bioentry</code> table in BioSQL. They do not have any sequence
+      information, and neither do they have any features. They can, however,
+      be annotated, commented, and put into relationships with each other.
+      They can also have cross-references to publications and other databases
+      associated with them.</para>
 
-      <para>RichSequence objects extend BioEntry objects by adding in sequence
-      data and a feature table.</para>
+      <para><code>RichSequence</code> objects extend <code>BioEntry</code>
+      objects by adding in sequence data and a feature table.</para>
 
       <para>So, when to use them?</para>
 
       <itemizedlist>
         <listitem>
-          <para>BioEntry objects are most useful when performing simple
-          operations such as counting sequences, checking taxonomy data,
-          looking up accessions, or finding out things like which objects
-          refer to a particular PUBMED entry.</para>
+          <para><code>BioEntry</code> objects are most useful when performing
+          simple operations such as counting sequences, checking taxonomy
+          data, looking up accessions, or finding out things like which
+          objects refer to a particular PUBMED entry.</para>
         </listitem>
 
         <listitem>
-          <para>RichSequence objects are useful only when you need access to
-          the sequence data itself, or to the sequence feature table.</para>
+          <para><code>RichSequence</code> objects are useful only when you
+          need access to the sequence data itself, or to the sequence feature
+          table.</para>
         </listitem>
 
         <listitem>
-          <para>RichSequence objects must be used whenever you wish to pass
-          objects to legacy code that is expecting Sequence objects, as only
-          RichSequence objects implement the Sequence interface. BioEntry
-          objects do not.</para>
+          <para><code>RichSequence</code> objects must be used whenever you
+          wish to pass objects to legacy code that is expecting
+          <code>Sequence</code> objects, as only <code>RichSequence</code>
+          objects implement the <code>Sequence</code> interface.
+          <code>BioEntry</code> objects do not.</para>
         </listitem>
       </itemizedlist>
 
-      <para>Throughout the rest of this document, both BioEntry and
-      RichSequence objects will be referred to interchangeably as sequence
-      objects.</para>
+      <para>Throughout the rest of this document, both <code>BioEntry</code>
+      and <code>RichSequence</code> objects will be referred to
+      interchangeably as sequence objects.</para>
+
+      <para>To create a <code>BioEntry</code> object, you need to have at
+      least the following information:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>a <code>Namespace</code> instance to associate the sequence
+          with (use <code>RichObjectFactory.getDefaultNamespace()</code> for
+          an easy way out)</para>
+        </listitem>
+      </itemizedlist>
+
+      <itemizedlist>
+        <listitem>
+          <para>a name for the sequence</para>
+        </listitem>
+      </itemizedlist>
+
+      <itemizedlist>
+        <listitem>
+          <para>an accession for the sequence</para>
+        </listitem>
+      </itemizedlist>
+
+      <itemizedlist>
+        <listitem>
+          <para>a version for the sequence (use 0 if you don't want to bother
+          with versions)</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>To create a <code>RichSequence</code> object, you need to have all
+      the above plus:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>a <code>SymbolList</code> containing the sequence data</para>
+        </listitem>
+
+        <listitem>
+          <para>a version for the sequence data (this is separate from the
+          version of the sequence object)</para>
+        </listitem>
+      </itemizedlist>
     </section>
 
     <section>
@@ -823,6 +871,65 @@ be.getNoteSet().add(annotation2); </programlisting>
 
       <para>See later in this document for more information on how to annotate
       and comment on sequences.</para>
+    </section>
+
+    <section>
+      <title>Circular sequences.</title>
+
+      <para>BioJavaX can flag sequences as being circular. However, as this
+      information is not part of BioSQL, it will be lost when the sequence is
+      persisted to a BioSQL database. Use with care.</para>
+
+      <para>Note that only circular sequences can have circular features
+      associated with them.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Relationships between sequences.</title>
+
+    <section>
+      <title>Relating two sequences.</title>
+
+      <para>Two sequences can be related to each other by using a
+      <code>BioEntryRelationship</code> object to construct the link. </para>
+
+      <para>Relationships are optionally ranked. If you don't want to rank the
+      relationship, use null in the constructor.</para>
+
+      <para>The following code snippet defines a new term "contains" in the
+      default ontology, then creates a relationship that states that sequence
+      A (the parent) contains sequence B (the child):</para>
+
+      <programlisting>ComparableTerm contains = RichObjectFactory.getDefaultOntology().getOrCreateTerm("contains");
+...
+RichSequence parent = ...; // get sequence A from somewhere 
+RichSequence child = ...; // get sequence B from somewhere
+BioEntryRelationship relationship = new SimpleBioEntryRelationship(parent,child,contains,null);
+parent.addRelationship(relationship); // add the relationship to the parent
+...
+parent.removeRelationship(relationship); // you can always take it away again later</programlisting>
+    </section>
+
+    <section>
+      <title>Querying the relationship.</title>
+
+      <para>Sequences are only aware of relationships in which they are the
+      parent sequence. A child sequence cannot find out which parent sequences
+      it is related to.</para>
+
+      <para>The following code snippet prints out all the relationships a
+      sequence has with child sequences:</para>
+
+      <programlisting>RichSequence rs = ...; // get a rich sequence from somewhere
+for (Iterator i = rs.getRelationships().iterator(); i.hasNext(); ) {
+     BioEntryRelationship br = (BioEntryRelationship)i.next();
+     BioEntry parent = br.getObject(); // parent == rs
+     BioEntry child = br.getSubject(); 
+     ComparableTerm relationship = br.getTerm();
+     // print out the relationship (eg. "A contains B");
+     System.out.println(parent.getName()+" "+relationship.getName()+" "+child.getName());
+}</programlisting>
     </section>
   </chapter>
 
@@ -929,18 +1036,6 @@ be.getNoteSet().add(annotation2); </programlisting>
   </chapter>
 
   <chapter>
-    <title>Relationships between features.</title>
-
-    <para></para>
-  </chapter>
-
-  <chapter>
-    <title>Relationships between sequences.</title>
-
-    <para></para>
-  </chapter>
-
-  <chapter>
     <title>Working with <code>RichLocation</code> objects.</title>
 
     <section>
@@ -1028,7 +1123,7 @@ be.getNoteSet().add(annotation2); </programlisting>
     </section>
 
     <section>
-      <title>Symbols.</title>
+      <title>Obtaining the symbols for a location.</title>
 
       <para></para>
     </section>
@@ -1044,9 +1139,63 @@ be.getNoteSet().add(annotation2); </programlisting>
     </section>
 
     <section>
-      <title>Qualifiers are annotations.</title>
+      <title>Qualifiers as annotations.</title>
 
       <para></para>
+    </section>
+
+    <section>
+      <title>Obtaining the symbols for a feature.</title>
+
+      <para></para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Relationships between features.</title>
+
+    <section>
+      <title>Relating two features.</title>
+
+      <para>Two features can be related to each other by using a
+      <code>RichFeatureRelationship</code> object to construct the
+      link.</para>
+
+      <para>Relationships have compulsory ranks. Use 0 if you don't want to
+      bother with this.</para>
+
+      <para>The following code snippet defines a new term "contains" in the
+      default ontology, then creates a relationship that states that feature A
+      (the parent) contains feature B (the child):</para>
+
+      <programlisting>ComparableTerm contains = RichObjectFactory.getDefaultOntology().getOrCreateTerm("contains");
+...
+RichFeature parent = ...; // get feature A from somewhere 
+RichFeature child = ...; // get feature B from somewhere
+RichFeatureRelationship relationship = new RichFeatureRelationship(parent,child,contains,0);
+parent.addFeatureRelationship(relationship); // add the relationship to the parent
+...
+parent.removeFeatureRelationship(relationship); // you can always take it away again later</programlisting>
+    </section>
+
+    <section>
+      <title>Querying the relationship.</title>
+
+      <para>Features are aware of all relationships in which they are the
+      parent feature. </para>
+
+      <para>The following code snippet prints out all the relationships to
+      child features within a parent feature:</para>
+
+      <programlisting>RichFeature feature = ...; // get a feature from somewhere
+for (Iterator i = feature.getFeatureRelationshipSet().iterator(); i.hasNext(); ) {
+     RichFeatureRelationship fr = (RichFeatureRelationship)i.next();
+     RichFeature parent = fr.getObject(); // parent == feature
+     RichFeature child = fr.getSubject(); 
+     ComparableTerm relationship = fr.getTerm();
+     // print out the relationship (eg. "A contains B");
+     System.out.println(parent.getName()+" "+relationship.getName()+" "+child.getName());
+}</programlisting>
     </section>
   </chapter>
 
@@ -1076,7 +1225,7 @@ be.getNoteSet().add(annotation2); </programlisting>
     <title>Namespaces.</title>
 
     <section>
-      <title>Obtaining namespace instances.</title>
+      <title>Obtaining <code>Namespace</code> instances.</title>
 
       <para>All sequences in BioJavaX must belong to a namespace, by being
       associated with an instance of the <code>Namespace</code> interface.
@@ -1094,13 +1243,13 @@ Namespace customNS = (Namespace)RichObjectFactory.getObject(SimpleNamespace.clas
 // load a namespace from BioSQL, or create it if it doesn't exist yet
 Namespace biosqlNS = (Namespace)HibernateRichObjectFactory.getObject(SimpleNamespace.class, new Object[]{"myBioSQLNameSpace"});
 ...
-// change the default namespace to "bloggsNS"
-RichObjectFactory.setDefaultNamespace("bloggsNS");</programlisting>
+// change the default namespace to "bloggs"
+RichObjectFactory.setDefaultNamespace("bloggs");</programlisting>
     </section>
   </chapter>
 
   <chapter>
-    <title>BioSQL.</title>
+    <title>BioSQL and Hibernate.</title>
 
     <section>
       <title>Introduction to Hibernate.</title>
@@ -1146,6 +1295,12 @@ RichObjectFactory.setDefaultNamespace("bloggsNS");</programlisting>
 
     <section>
       <title>Loading individual values from objects.</title>
+
+      <para></para>
+    </section>
+
+    <section>
+      <title>Some useful queries.</title>
 
       <para></para>
     </section>
