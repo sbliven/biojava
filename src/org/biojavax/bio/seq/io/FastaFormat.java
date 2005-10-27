@@ -59,7 +59,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
     public static final String FASTA_FORMAT = "FASTA";
     
     // header line
-    protected static final Pattern hp = Pattern.compile(">(\\S+)(\\s+(.*))*");
+    protected static final Pattern hp = Pattern.compile(">(\\S+)(\\s+(.*))?");
     // description chunk
     protected static final Pattern dp = Pattern.compile( "^(gi\\|(\\d+)\\|)*(\\S+)\\|(\\S+?)(\\.(\\d+))*\\|(\\S+)$");
     
@@ -221,7 +221,9 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
         this.getPrintStream().print("|");
         this.getPrintStream().print(rs.getName());
         this.getPrintStream().print(" ");
-        this.getPrintStream().println(rs.getDescription().replaceAll("\\n"," "));
+        String desc = rs.getDescription();
+        if (desc!=null && !"".equals(desc)) this.getPrintStream().print(desc.replaceAll("\\n"," "));
+        this.getPrintStream().println();
         
         int length = rs.length();
         
