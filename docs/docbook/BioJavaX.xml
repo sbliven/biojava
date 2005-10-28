@@ -1507,37 +1507,43 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
               <row>
                 <entry>identifier</entry>
 
-                <entry><code>setIdentifier</code></entry>
+                <entry><code>setIdentifier()</code></entry>
               </row>
 
               <row>
                 <entry>namespace</entry>
 
-                <entry><code>setNamespace</code></entry>
+                <entry><code>setNamespace()</code></entry>
               </row>
 
               <row>
                 <entry>accession</entry>
 
-                <entry><code>setAccession</code></entry>
+                <entry><code>setAccession()</code></entry>
               </row>
 
               <row>
                 <entry>version</entry>
 
-                <entry><code>setVersion</code></entry>
+                <entry><code>setVersion()</code></entry>
               </row>
 
               <row>
                 <entry>name</entry>
 
-                <entry><code>setName</code></entry>
+                <entry><code>setName()</code></entry>
               </row>
 
               <row>
                 <entry>description</entry>
 
-                <entry><code>setDescription</code></entry>
+                <entry><code>setDescription()</code></entry>
+              </row>
+
+              <row>
+                <entry>&lt;sequence data&gt;</entry>
+
+                <entry><code>addSymbols()</code></entry>
               </row>
             </tbody>
           </tgroup>
@@ -1567,37 +1573,44 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
               <row>
                 <entry>identifier</entry>
 
-                <entry><code>getIdentifier</code></entry>
+                <entry><code>getIdentifier()</code></entry>
               </row>
 
               <row>
                 <entry>namespace</entry>
 
-                <entry><code>getNamespace</code></entry>
+                <entry><code>getNamespace()</code></entry>
               </row>
 
               <row>
                 <entry>accession</entry>
 
-                <entry><code>getAccession</code></entry>
+                <entry><code>getAccession()</code></entry>
               </row>
 
               <row>
                 <entry>version</entry>
 
-                <entry><code>getVersion</code></entry>
+                <entry><code>getVersion()</code></entry>
               </row>
 
               <row>
                 <entry>name</entry>
 
-                <entry><code>getName</code></entry>
+                <entry><code>getName()</code></entry>
               </row>
 
               <row>
                 <entry>description</entry>
 
-                <entry><code>getDescription</code></entry>
+                <entry><code>getDescription()</code></entry>
+              </row>
+
+              <row>
+                <entry>&lt;sequence data&gt;</entry>
+
+                <entry><code>RichSequence</code> is a
+                <code>SymbolList</code>.</entry>
               </row>
             </tbody>
           </tgroup>
@@ -1608,7 +1621,347 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
     <section>
       <title>GenBank.</title>
 
-      <para><code>GenbankFormat</code> documentation coming soon.</para>
+      <para><code>GenbankFormat</code> reads and writes GenBank files, and
+      understands almost all permutations of the location descriptors found in
+      the feature tables.</para>
+
+      <section>
+        <title>Reading.</title>
+
+        <para>The fields are passed into the <code>RichSeqIOListener</code> as
+        follows:</para>
+
+        <table>
+          <title><code>GenBankFormat</code> input field destinations.</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>LOCUS</entry>
+
+                <entry>This line is split up into its component parts. The
+                first word after the LOCUS keyword is passed to
+                <code>setName()</code>. The strand, if present, is passed to
+                <code>addSequenceProperty(Terms.getStrandedTerm())</code>. If
+                it is circular, <code>setCircular()</code> is called. The
+                molecule type is passed to
+                <code>addSequenceProperty(Terms.getMolTypeTerm())</code>,
+                whereas the modification date is passed to
+                <code>addSequenceProperty(Terms.getDateUpdatedTerm())</code>.
+                The database division is passed to
+                <code>setDivision()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>DEFINITION</entry>
+
+                <entry><code>setDescription()</code></entry>
+              </row>
+
+              <row>
+                <entry>ACCESSION</entry>
+
+                <entry>The first one is passed to <code>setAccession()</code>.
+                Subsequent entries are passed to
+                <code>addSequenceProperty(Terms.getAdditionalAccessionTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>VERSION</entry>
+
+                <entry>The section before the full stop "." is passed to
+                <code>setAccession()</code>. If it differs from the first
+                accession on the ACCESSION line, then the first accession on
+                the ACCESSION line becomes an additional accession, whilst the
+                accession from the VERSION line becomes the primary accession.
+                The section after the full stop is passed to
+                <code>setVersion()</code>. The GI number is passed to
+                <code>setIdentifier()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>KEYWORDS</entry>
+
+                <entry>The line is split up into individual keywords, each of
+                which is passed to
+                <code>addSequenceProperty(Terms.getKeywordTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>SOURCE</entry>
+
+                <entry>Ignored.</entry>
+              </row>
+
+              <row>
+                <entry>ORGANISM</entry>
+
+                <entry>Ignored.</entry>
+              </row>
+
+              <row>
+                <entry>REFERENCE</entry>
+
+                <entry>The coordinates of the reference end up as start and
+                end coordinates of a <code>SimpleRankedDocRef</code> object
+                which is attached to the sequence by calling
+                <code>setRankedDocRef()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>AUTHORS</entry>
+
+                <entry>The value is parsed into a set of
+                <code>DocRefAuthor</code> objects using
+                <code>DocRefAuthor.Tools</code>. The resulting set becomes
+                part of the <code>DocRef</code> object which is wrapped using
+                a <code>SimpleRankedDocRef</code> and attached to the
+                sequence.</entry>
+              </row>
+
+              <row>
+                <entry>TITLE</entry>
+
+                <entry>The title is passed to the current <code>DocRef</code>
+                object using <code>setTitle()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>JOURNAL</entry>
+
+                <entry>The journal is passed to the current <code>DocRef
+                </code>object using <code>setLocation()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>PUBMED</entry>
+
+                <entry>A <code>RankedCrossRef</code> object is created
+                pointing to <code>Terms.PUBMED_KEY</code> as the database, and
+                using this value as the accession with a version of 0. It is
+                attached to the sequence using
+                <code>setRankedCrossRef()</code>. If no MEDLINE line is found,
+                this is also associated with the current reference by using
+                <code>setCrossRef()</code> on the <code>DocRef</code>
+                object.</entry>
+              </row>
+
+              <row>
+                <entry>MEDLINE</entry>
+
+                <entry>Behaves similarly to PUBMED, but with a database name
+                of <code>Terms.MEDLINE_KEY</code>. It takes precedence over
+                PUBMED and will always be used for the <code>DocRef</code>
+                cross-reference.</entry>
+              </row>
+
+              <row>
+                <entry>REMARK</entry>
+
+                <entry>Added to the current reference by calling
+                <code>setRemark()</code> on the <code>DocRef</code>
+                object.</entry>
+              </row>
+
+              <row>
+                <entry>COMMENT</entry>
+
+                <entry><code>setComment()</code></entry>
+              </row>
+
+              <row>
+                <entry>FEATURES</entry>
+
+                <entry>Each feature is started by calling
+                <code>startFeature()</code>. The source is
+                <code>Terms.getGenBankTerm()</code> whereas the type is
+                obtained from
+                <code>RichObjectFactory.getDefaultOntology().getOrCreateTerm()</code>
+                using the feature name. Qualifiers are added by using
+                <code>addFeatureProperty()</code> with the term key created by
+                <code>RichObjectFactory.getDefaultOntology().getOrCreateTerm()</code>
+                using the qualifier name. There are two special cases of
+                qualifier: <code>db_xref</code>, and <code>organism</code>.
+                Neither end up being stored as qualifiers. A database
+                cross-reference is created for <code>db_xref</code> qualifiers
+                and added to the feature using
+                <code>addRankedCrossRef()</code>, except when the feature type
+                is <code>source</code> and the database name (before the
+                colon) is <code>taxon</code>, in which case the taxon ID is
+                used in conjunction with the <code>organism</code> qualifier
+                to determine the <code>NCBITaxon</code> for this sequence, and
+                passed to the sequence using <code>setTaxon()</code>. Location
+                strings are run through <code>GenBankLocationParser</code> to
+                generate <code>RichLocation</code> instances to attach to the
+                feature.</entry>
+              </row>
+
+              <row>
+                <entry>BASE</entry>
+
+                <entry>Ignored.</entry>
+              </row>
+
+              <row>
+                <entry>ORIGIN</entry>
+
+                <entry>The sequence is read and passed to
+                <code>addSymbols()</code>.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </section>
+
+      <section>
+        <title>Writing.</title>
+
+        <para>The fields are read from the <code>RichSequence</code> object as
+        follows:</para>
+
+        <table>
+          <title><code>GenBankFormat</code> output field sources.</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>LOCUS</entry>
+
+                <entry><code>getName()</code>, <code>length()</code>,
+                <code>getNoteSet(Terms.getStrandedTerm())</code>,
+                <code>getNoteSet(Terms.getMolTypeTerm())</code>,
+                <code>getCircular()</code>, <code>getDivision()</code>, and
+                <code>getNoteSet(Terms.getDateUpdatedTerm())</code></entry>
+              </row>
+
+              <row>
+                <entry>DEFINITION</entry>
+
+                <entry><code>getDescription()</code></entry>
+              </row>
+
+              <row>
+                <entry>ACCESSION</entry>
+
+                <entry><code>getAccession()</code>, and
+                <code>getNoteSet(Terms.getAdditionalAccessionTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>VERSION</entry>
+
+                <entry><code>getAccession()</code>,
+                <code>getIdentifier()</code> and
+                <code>getVersion()</code></entry>
+              </row>
+
+              <row>
+                <entry>KEYWORDS</entry>
+
+                <entry><code>getNoteSet(Terms.getKeywordTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>SOURCE</entry>
+
+                <entry><code>getNCBITaxon()getDisplayName()</code></entry>
+              </row>
+
+              <row>
+                <entry>ORGANISM</entry>
+
+                <entry><code>getNCBITaxon()getDisplayName()</code> and
+                <code>getNCBITaxon().getNameHierarchy()</code></entry>
+              </row>
+
+              <row>
+                <entry>REFERENCE</entry>
+
+                <entry>Each reference is obtained from
+                <code>getRankedDocRefs()</code>. The coordinates of the
+                reference are from the reference's <code>getStart()</code> and
+                <code>getEnd()</code> methods.</entry>
+              </row>
+
+              <row>
+                <entry>AUTHORS</entry>
+
+                <entry>The author string is from the reference's
+                <code>getAuthors()</code> method.</entry>
+              </row>
+
+              <row>
+                <entry>TITLE</entry>
+
+                <entry>The title is from the reference's
+                <code>getTitle()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>JOURNAL</entry>
+
+                <entry>The journal information is from the reference's
+                <code>getLocation()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>PUBMED / MEDLINE</entry>
+
+                <entry>The cross reference returned by
+                <code>getCrossRef()</code> on the reference provides the
+                database name and accession used here. </entry>
+              </row>
+
+              <row>
+                <entry>REMARK</entry>
+
+                <entry><code>getRemark()</code> on the current reference
+                object.</entry>
+              </row>
+
+              <row>
+                <entry>COMMENT</entry>
+
+                <entry>All the comments returned by <code>getComments()</code>
+                are joined together, separated by newlines.</entry>
+              </row>
+
+              <row>
+                <entry>FEATURES</entry>
+
+                <entry>Each feature is output in turn by iterating through
+                <code>getFeatureSet()</code>. For the <code>source
+                </code>feature, the <code>db_xref</code> and
+                <code>organism</code> fields are added to the output by
+                calling <code>getNCBITaxon().getNCBITaxID()</code> and
+                <code>getNCBITaxon().getDisplayName()</code> on the sequence
+                (the latter is trimmed to the first opening bracket if
+                necessary). For all features, extra <code>db_xref</code>
+                qualifiers are output for each cross-reference returned by
+                calling <code>getRankedCrossRefs()</code> on the feature. The
+                other qualifiers for the features are the contents of the
+                feature's annotation, provided by <code>getNoteSet()</code> on
+                the feature. <code>GenBankLocationParser</code> is used to
+                convert the feature's <code>getLocation()</code> output into
+                the correct text format.</entry>
+              </row>
+
+              <row>
+                <entry>BASE</entry>
+
+                <entry>Calculated from the sequence data.</entry>
+              </row>
+
+              <row>
+                <entry>ORIGIN</entry>
+
+                <entry>The sequence is read directly as it is a
+                <code>SymbolList</code>..</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </section>
     </section>
 
     <section>
