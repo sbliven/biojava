@@ -322,8 +322,8 @@ RichSequence rs = RichSequence.Tools.enrich(s);</programlisting>
     <section>
       <title>Singletons.</title>
 
-      <para>As you may have noticed from the namespace example code above,
-      BioJavaX tries to use singletons as far as possible. This is:</para>
+      <para>BioJavaX tries to use singletons as far as possible. This
+      is:</para>
 
       <itemizedlist>
         <listitem>
@@ -883,8 +883,8 @@ rs.getNoteSet().add(accession2); // annotate the rich sequence with the second a
 ...
 // you can annotate bioentry objects in exactly the same way
 BioEntry be = ...; // get a bioentry from somewhere
-be.getNoteSet().add(annotation1); 
-be.getNoteSet().add(annotation2); </programlisting>
+be.getNoteSet().add(accession1); 
+be.getNoteSet().add(accession2); </programlisting>
 
       <para>See later in this document for more information on how to annotate
       and comment on sequences.</para>
@@ -894,11 +894,10 @@ be.getNoteSet().add(annotation2); </programlisting>
       <title>Circular sequences.</title>
 
       <para>BioJavaX can flag sequences as being circular, using the
-      <code>setCircular(boolean circular)</code> and
-      <code>getCircular()</code> methods on <code>RichSequence</code>
-      instances. However, as this information is not part of BioSQL, it will
-      be lost when the sequence is persisted to a BioSQL database. Use with
-      care.</para>
+      <code>setCircular()</code> and <code>getCircular()</code> methods on
+      <code>RichSequence</code> instances. However, as this information is not
+      part of BioSQL, it will be lost when the sequence is persisted to a
+      BioSQL database. Use with care.</para>
 
       <para>Note that only circular sequences can have features with circular
       locations associated with them.</para>
@@ -1148,7 +1147,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
           <tgroup cols="2">
             <tbody>
               <row>
-                <entry>get/setLineWidth()</entry>
+                <entry><code>get/setLineWidth()</code></entry>
 
                 <entry>Sets the line width for output. Any lines longer than
                 this will be wrapped. The default for most formats is
@@ -1156,7 +1155,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
               </row>
 
               <row>
-                <entry>get/setElideSymbols();</entry>
+                <entry><code>get/setElideSymbols()</code></entry>
 
                 <entry>When set to true, this will skip the sequence data (ie.
                 the addSymbols() method of the RichSeqIOListener will never be
@@ -1164,21 +1163,21 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
               </row>
 
               <row>
-                <entry>get/setElideFeatures();</entry>
+                <entry><code>get/setElideFeatures()</code></entry>
 
                 <entry>When set to true, this will skip the feature tables in
                 the file.</entry>
               </row>
 
               <row>
-                <entry>get/setElideComments();</entry>
+                <entry><code>get/setElideComments()</code></entry>
 
                 <entry>When set to true, this will skip all comments in the
                 file.</entry>
               </row>
 
               <row>
-                <entry>get/setElideReferences();</entry>
+                <entry><code>get/setElideReferences()</code></entry>
 
                 <entry>When set to true, this will skip all publication
                 cross-references in the file.</entry>
@@ -3192,7 +3191,7 @@ Namespace customNS = (Namespace)RichObjectFactory.getObject(SimpleNamespace.clas
 Namespace biosqlNS = (Namespace)HibernateRichObjectFactory.getObject(SimpleNamespace.class, new Object[]{"myBioSQLNameSpace"});
 ...
 // change the default namespace to "bloggs"
-RichObjectFactory.setDefaultNamespace("bloggs");</programlisting>
+RichObjectFactory.setDefaultNamespaceName("bloggs");</programlisting>
     </section>
   </chapter>
 
