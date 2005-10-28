@@ -193,7 +193,11 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 int newRank = 0;
                 for (Iterator i = resultBlocks.iterator(); i.hasNext(); ) {
                     RichLocation rl = (RichLocation)i.next();
-                    rl.setRank(newRank++);
+		    try {
+			rl.setRank(newRank++);
+		    } catch (ChangeVetoException e) {
+			throw new ParseException(e);
+		    }
                 }
                 return RichLocation.Tools.construct(resultBlocks);
             } 
