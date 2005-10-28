@@ -5,7 +5,7 @@
   <title>BioJavaX</title>
 
   <bookinfo>
-    <date>27th October 2005</date>
+    <date>28th October 2005</date>
 
     <author>
       <firstname>Richard</firstname>
@@ -18,6 +18,8 @@
 
       <surname>Schreiber</surname>
     </author>
+
+    <edition>0.1</edition>
   </bookinfo>
 
   <chapter>
@@ -271,8 +273,8 @@ RichSequence rs = RichSequence.Tools.enrich(s);</programlisting>
       Hibernate query language, HQL, is simple to learn and easy to
       use.</para>
 
-      <para>You can find out more about Hibernate project at their website:
-      <ulink
+      <para>You can find out more about the Hibernate project at their
+      website: <ulink
       url="http://www.hibernate.org/">http://www.hibernate.org/</ulink></para>
     </section>
 
@@ -1606,37 +1608,80 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
     <section>
       <title>GenBank.</title>
 
-      <para></para>
+      <para><code>GenbankFormat</code> documentation coming soon.</para>
     </section>
 
     <section>
       <title>EMBL.</title>
 
-      <para></para>
+      <para><code>EMBLFormat</code> documentation coming soon.</para>
     </section>
 
     <section>
       <title>UniProt.</title>
 
-      <para></para>
+      <para><code>UniProtFormat</code> documentation coming soon.</para>
     </section>
 
     <section>
       <title>INSDSeq (XML).</title>
 
-      <para></para>
+      <para>For parsing files that conform to
+      <code>http://www.ebi.ac.uk/embl/Documentation/DTD/INSDSeq_v1.3.dtd.txt</code>.</para>
+
+      <para><code>INSDSeqFormat</code> documentation coming soon.</para>
     </section>
 
     <section>
       <title>EMBLxml (XML).</title>
 
-      <para></para>
+      <para>For parsing files that conform to
+      <code>http://www.ebi.ac.uk/embl/Documentation/DTD/EMBL_dtd.txt</code>.</para>
+
+      <para><code>EMBLxmlFormat</code> documentation coming soon.</para>
     </section>
 
     <section>
       <title>UniProtXML (XML).</title>
 
-      <para></para>
+      <para>For parsing files that conform to
+      <code>http://www.ebi.uniprot.org/support/docs/uniprot.xsd</code>.</para>
+
+      <para><code>UniProtXMLFormat</code> documentation coming soon.</para>
+    </section>
+
+    <section>
+      <title>NCBI Taxonomy data.</title>
+
+      <para>The NCBI taxonomy loader operates outside the standed file parsing
+      framework, as it is not dealing with a single file and does not generate
+      sequence objects. Instead, it provides separate functions for reading
+      the <code>nodes.dmp</code> and <code>names.dmp</code> files
+      line-by-line, and returning the corresponding <code>NCBITaxon</code>
+      object for each line of the file. An example to load the taxonomy data
+      follows:</para>
+
+      <programlisting>NCBITaxonomyLoader l = new SimpleNCBITaxonomyLoader();
+BufferedReader nodes = new BufferedReader(new FileReader("nodes.dmp"));
+BufferedReader names = new BufferedReader(new FileReader("names.dmp"));
+        
+NCBITaxon t;
+while ((t=l.readNode(nodes))!=null);  // read all the nodes first
+while ((t=l.readName(names))!=null);  // then read all the names 
+
+// if your LRU cache is big enough, it'll now hold fully-populated instances 
+// of all the taxon objects. Not much use unless you're using a database!</programlisting>
+
+      <para>Note that this is most effective when using BioJavaX with
+      Hibernate to persist data to the database. You do not need to do
+      anything apart from wrap the above code in a transaction, and it will be
+      persisted for you.</para>
+
+      <para>Note that you may have trouble with duplicate
+      <code>NCBITaxon</code> objects or names going missing if you have an LRU
+      cache in <code>RichObjectFactory</code> that is too small. This issue is
+      avoided altogether when using the
+      <code>HibernateRichObjectFactory</code>. </para>
     </section>
   </chapter>
 
@@ -1644,7 +1689,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
     <title>Creative file parsing with <code>RichSeqIOListener</code>.</title>
 
     <section>
-      <title>Using RichSeqIOListeners directly.</title>
+      <title>Using <code>RichSeqIOListener</code>s directly.</title>
 
       <para>In order to do creative file parsing, you need to start using very
       low level BioJava APIs. This involves setting up a RichSeqIOListener and
@@ -1848,39 +1893,46 @@ while (moreSeqsAvailable) {
       in itself (eg. "&lt;" or "&gt;" from GenBank-style locations), then
       flags can be set on the object to indicate this.</para>
 
-      <para>Locations have ranks which are used to define the iteration order
-      of multiple locations when combined in a set.</para>
+      <para>Locations have ranks which are used to sort them. If persisted to
+      a database, the complex location that results when retrieving them from
+      the database will be ordered by rank.</para>
 
       <para>The simplest kind of location describes a single point or range
       between two points on a sequence, with optional fuzziness at either end.
       This is implemented by the SimpleRichLocation class. </para>
 
       <para>This example describes the GenBank-style location string
+      "56":</para>
+
+      <programlisting>Position pos = new SimplePosition(56);  
+RichLocation loc = new SimpleRichLocation(pos,0);   // the 0 is an arbitrary value for the rank of this location</programlisting>
+
+      <para>This example describes the GenBank-style location string
       "(23^34)..57&gt;":</para>
 
-      <programlisting>Position min = new SimplePosition(true,false,23,34,"^");  // true = fuzzy start, false = non-fuzzy end
-Position max = new SimplePosition(57);
+      <programlisting>Position min = new SimplePosition(false,false,23,34,"^"); // two falses = not fuzzy at all
+Position max = new SimplePosition(false,true,57);         // false = non-fuzzy start, true = fuzzy end
 RichLocation loc = new SimpleRichLocation(min,max,0);     // the 0 is an arbitrary value for the rank of this location</programlisting>
 
       <para>This example describes the GenBank-style location string
       "complement((23^34)..57&gt;)":</para>
 
-      <programlisting>Position min = new SimplePosition(23,34,"^",true,false);
-Position max = new SimplePosition(57);
+      <programlisting>Position min = new SimplePosition(false,false,23,34,"^"); // two falses = not fuzzy at all
+Position max = new SimplePosition(false,true,57);         // false = non-fuzzy start, true = fuzzy end
 RichLocation loc = new SimpleRichLocation(min,max,0,Strand.NEGATIVE_STRAND); </programlisting>
 
       <para>This example describes the GenBank-style location string
       "A12345.3:complement((23^34)..57&gt;)":</para>
 
-      <programlisting>CrossRef cr = new SimpleCrossRef("GenBank","A12345",3);
-Position min = new SimplePosition(23,34,"^",true,false);
-Position max = new SimplePosition(57);
+      <programlisting>CrossRef cr = new SimpleCrossRef("GenBank","A12345",3);   // version 3 of accession A12345 in the GenBank database
+Position min = new SimplePosition(false,false,23,34,"^"); // two falses = not fuzzy at all
+Position max = new SimplePosition(false,true,57);         // false = non-fuzzy start, true = fuzzy end
 RichLocation loc = new SimpleRichLocation(min,max,Strand.NEGATIVE_STRAND,cr);</programlisting>
 
       <para>If you require locations that cover more than one range, you
       <emphasis>must</emphasis> use the <code>RichLocation.Tools</code>
       methods to help you. If you don't, you run a serious risk of making
-      nonsense locations that will give unpredictable results!</para>
+      nonsense locations that will give unpredictable results.</para>
 
       <para>A complex location is constructed from a collection of
       <code>RichLocation</code> instances. Any member of the collection which
@@ -1937,7 +1989,9 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
               <code>SimpleRichLocation</code> per merged region. All the
               members are guaranteed to be on the same strand of the same
               sequence. The strand and cross-ref of the location returned will
-              be consistent with its members.</entry>
+              be consistent with its members. The min and max of the location
+              will correspond to the min and max of all the members
+              combined.</entry>
             </row>
 
             <row>
@@ -1945,10 +1999,10 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
 
               <entry>As per <code>CompoundRichLocation</code>, but members may
               appear on different strands or even different (remote)
-              sequences. The strand and cross-ref of the location returned are
-              meaningless, and should not be used. You should instead
-              interrogate each member location (block) for this information as
-              required.</entry>
+              sequences. The min, max, strand and cross-ref of the location
+              returned are meaningless, and should not be used. You should
+              instead interrogate each member location (block) for this
+              information as required.</entry>
             </row>
           </tbody>
         </tgroup>
@@ -2021,6 +2075,16 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
     </section>
 
     <section>
+      <title>Translation.</title>
+
+      <para>Locations can be moved left or right by a fixed number of bases by
+      using the <code>translate()</code> method. This method returns a new
+      location with all members offset by the value specified. A negative
+      offset will move locations towards the 5' end of the positive strand,
+      whilst a positive offset will move them towards the 3' end.</para>
+    </section>
+
+    <section>
       <title>Empty locations.</title>
 
       <para>The empty location is represented by a singleton instance of
@@ -2042,30 +2106,118 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
       Neither can it be applied to a circular sequence with a length that is
       not the same as the one returned by the <code>getCircularLength()</code>
       method of the location.</para>
+
+      <para>The concept of circularity is not understood by BioSQL, so this
+      information will be lost if you persist it to a database.</para>
     </section>
 
     <section>
       <title>Union.</title>
 
-      <para></para>
+      <para>The union of any two locations X and Y that do not overlap (see
+      section on overlapping locations), or that overlap but on different
+      strands, is simply a complex location with X and Y as members.</para>
+
+      <para>The union of two linear locations X and Y that overlap on the same
+      strand is a single simple location that covers the entire area from
+      X.min to Y.max.</para>
+
+      <para>The union of circular location X with any other location Y that
+      overlaps on the same strand is a single simple location that covers the
+      region from the 5' most of X.min and Y.min to the 3' most of X.max and
+      Y.max w.r.t. the positive strand.</para>
+
+      <para>Complex locations will perform the above steps on each pair of
+      member locations in turn, and the union will be the combination set of
+      all unique locations that these pair-wise intersections produce. Any
+      overlapping locations on the same strand within this set will be merged
+      into single, larger locations.</para>
     </section>
 
     <section>
       <title>Intersection.</title>
 
-      <para></para>
+      <para>Locations never intersect if they do not overlap (see section on
+      overlapping locations). The intersection operation will return the empty
+      location.</para>
+
+      <para>If two linear locations X and Y overlap each other on the same
+      strand, then the intersection is a single simple location covering the
+      overlapping region.</para>
+
+      <para>If any two locations X and Y overlap each other on different
+      strands, then the intersection is a complex location containing only the
+      portions of X and Y that overlap each other.</para>
+
+      <para>If a circular location X overlaps any other location Y on the same
+      strand, then the resulting single simple circular location will cover
+      the region from the 3' most of X.min and Y.min to the 5' most of X.max
+      and Y.max w.r.t. the positive strand.</para>
+
+      <para>Complex locations will perform the above steps on each pair of
+      member locations in turn, and the intersection will be the set of all
+      unique locations that these pair-wise intersections produce. Any
+      overlapping locations on the same strand within this set will be merged
+      into single, larger locations.</para>
     </section>
 
     <section>
       <title>Overlaps.</title>
 
-      <para></para>
+      <para>Locations never overlap locations which are on a different remote
+      sequence. However, locations on opposite strands may overlap each
+      other.</para>
+
+      <para>Circular locations of different circular lengths never overlap
+      each other. Circular locations never overlap linear locations.</para>
+
+      <para>Complex locations test each individual member in turn for overlap.
+      The empty location never overlaps anything.</para>
+
+      <para>Linear locations X and Y overlap iff X.min &lt;= Y.max and X.max
+      &gt;= Y.min.</para>
+
+      <para>Circular locations (of the same circular length) X and Y overlap
+      iff X.min &lt;= Y.max-N and X.max &gt;= Y.min-N where N is some multiple
+      of the circular length of either location.</para>
     </section>
 
     <section>
       <title>Contains.</title>
 
-      <para></para>
+      <para>There are two types of contains operation - one tests the presence
+      of a particular point coordinate, the other tests whether this location
+      entirely encompasses another location. </para>
+
+      <para>Complex locations make the test against each member in turn. The
+      empty location never will never contain anything.</para>
+
+      <section>
+        <title>Point coordinates.</title>
+
+        <para>For linear locations, a location contains a point if that point
+        falls on or between the min and max of this location. If the min or
+        max of this location is fuzzy, it is resolved into a single point
+        first before the test is made.</para>
+
+        <para>For circular locations, the point is defined to be contained by
+        a location if the point +/- some multiple of the circular length of
+        the location lies between the min and max of the location.</para>
+      </section>
+
+      <section>
+        <title>Other locations.</title>
+
+        <para>Locations never contain locations which are on a different
+        strand or remote sequence.</para>
+
+        <para>A linear location X contains another linear location Y iff X.min
+        &lt;= Y.min and X.max &gt;= Y.max.</para>
+
+        <para>A circular location X contains any other location Y iff X.min
+        &lt;= Y.min-N and X.max &gt;= Y.max-N where N is some multiple of the
+        circular length of the location X.</para>
+      </section>
     </section>
 
     <section>
@@ -2079,8 +2231,12 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
 
       <para>The location will iterate through each of its members (or just
       itself if it is a <code>SimpleRichLocation</code>) and concatenate the
-      results of calling <code>symbols()</code> on each of them. The
-      concatenated sequence is then returned. </para>
+      results of calling <code>symbols()</code> on each of them in turn. The
+      concatenated sequence is then returned. This means that the order of the
+      members is important. It will always be the same as the order in which
+      the members were specified to
+      <code>RichLocation.Tools.construct()</code>, if that was the way you put
+      this location together.</para>
 
       <para>Where it comes across a remote location that refers to a sequence
       other than the one passed in for reference, the
@@ -2296,72 +2452,777 @@ RichObjectFactory.setDefaultNamespace("bloggs");</programlisting>
   </chapter>
 
   <chapter>
+    <title>NCBI Taxonomy.</title>
+
+    <section>
+      <title>Traversing from child to parent.</title>
+
+      <programlisting>NCBITaxon child = ...;  // some taxon object you want the parent of
+Integer parentNCBITaxID = new Integer(child.getParentNCBITaxID());
+NCBITaxon parent = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class,new Object[]{parentNCBITaxID});</programlisting>
+    </section>
+
+    <section>
+      <title>Traversing from parent to child.</title>
+
+      <para>This cannot be done using the BioJavaX API. </para>
+
+      <para>But, you can do it using HQL if you are reading your taxonomy
+      information from a database. See the section on BioSQL and Hibernate for
+      details about setting BioJavaX for use with a database. The query you
+      are looking for is this:</para>
+
+      <programlisting>NCBITaxon parent = ...;    // some taxon object you want to get the immediate children of
+Query q = session.createQuery("from Taxon where parentNCBITaxID = :parentNCBITaxID");
+q.setInteger("parentNCBITaxID",parent.getNCBITaxID());
+List children = q.list();  // children will now contain all the child taxon objects</programlisting>
+    </section>
+
+    <section>
+      <title>Finding taxons by name.</title>
+
+      <para>This also cannot be done using the BioJavaX API.</para>
+
+      <para>Again, you can do it using HQL if you are reading your taxonomy
+      information from a database. The query you are looking for is
+      this:</para>
+
+      <programlisting>Query q = session.createQuery("from Taxon as taxon join taxon.nameSet as taxonName "+
+                                 "where taxonName.nameClass=:nameClass and taxonName.name=:name");
+q.setString("nameClass",NCBITaxon.SCIENTIFIC);
+q.setString("name","Homo sapiens");
+List taxons = q.list();  // taxons will now contain all matching taxon objects</programlisting>
+    </section>
+  </chapter>
+
+  <chapter>
     <title>BioSQL and Hibernate.</title>
 
     <section>
       <title>Introduction to Hibernate.</title>
 
-      <para></para>
+      <para>BioJavaX uses Hibernate to manage persistence of BioJavaX objects
+      to/from a database. </para>
+
+      <para>Hibernate works by parsing a set of mapping files that tell it how
+      to translate between objects/fields and tables/columns. It tracks
+      changes, writes and executes all the SQL required, and does its best to
+      keep everything consistent and efficient so that your application never
+      needs to talk directly to the database. It also enforces all
+      primary/foreign-key relations between objects.</para>
+
+      <para>Hibernate revolves around the use of JavaBeans. A single JavaBean
+      usually represents a single table. This is the case in BioJavaX. Each
+      column of the table is represented by a field with a standard
+      getter/setter pair of methods within the bean. Hibernate uses these
+      get/set methods to load and save the values to and from the database.
+      Foreign-keys are represented by defining the field as an instance of the
+      bean representing the foreign table. One-to-many relationships are made
+      by defining the field as an instance of a <code>Collection</code>, where
+      each member of the collection is the bean representing the foreign
+      table.</para>
+
+      <para>BioJavaX contains virtually no query code, and provides no API for
+      querying the database. This is because the API <emphasis>is</emphasis>
+      the object model. You do not need to have anything more than a Hibernate
+      session to be able to read and write BioJavaX objects directly to the
+      database.</para>
+
+      <para>Mapping files are provided only for BioSQL, as this is the
+      database schema that BioJavaX was designed to imitate, but there is no
+      reason why mapping files could not be created for other database
+      schemas. Please feel free to contribute them if you do so.</para>
+
+      <para>The BioSQL mapping files use lazy-loading extensively. This means
+      that data usually will not get loaded until you try to access it using
+      the appropriate getter/setter method of the object. You can change this
+      behaviour by editing the mapping files.</para>
+
+      <para>Queries are constructed not using SQL but using the Hibernate
+      Query Language, or HQL. You can find out more about HQL and the
+      Hibernate project at their website: <ulink
+      url="http://www.hibernate.org/">http://www.hibernate.org/</ulink></para>
+    </section>
+
+    <section>
+      <title>Hibernate object-relational mappings.</title>
+
+      <para>The following table describes which object in BioJavaX ends up in
+      which table in BioSQL. The first column is the name of the BioSQL table,
+      the second is the mapping name to be used in HQL to query the table, and
+      the third column is the class of object you will get when the query
+      returns results:</para>
+
+      <table>
+        <title>Hibernate object-relational mappings.</title>
+
+        <tgroup cols="3">
+          <tbody>
+            <row>
+              <entry>biodatabase</entry>
+
+              <entry>Namespace</entry>
+
+              <entry><code>SimpleNamespace</code></entry>
+            </row>
+
+            <row>
+              <entry>taxon</entry>
+
+              <entry>Taxon</entry>
+
+              <entry><code>SimpleNCBITaxon</code></entry>
+            </row>
+
+            <row>
+              <entry>bioentry</entry>
+
+              <entry>BioEntry</entry>
+
+              <entry><code>SimpleBioEntry</code></entry>
+            </row>
+
+            <row>
+              <entry>taxon_name</entry>
+
+              <entry>(use properties of NCBITaxon)</entry>
+
+              <entry><code>SimpleNCBITaxonName</code></entry>
+            </row>
+
+            <row>
+              <entry>biosequence</entry>
+
+              <entry>Sequence</entry>
+
+              <entry><code>SimpleRichSequence</code></entry>
+            </row>
+
+            <row>
+              <entry>bioentry_relationship</entry>
+
+              <entry>BioEntryRelationship</entry>
+
+              <entry><code>SimpleBioEntryRelationship</code></entry>
+            </row>
+
+            <row>
+              <entry>comment</entry>
+
+              <entry>Comment</entry>
+
+              <entry><code>SimpleComment</code></entry>
+            </row>
+
+            <row>
+              <entry>dbxref</entry>
+
+              <entry>CrossRef</entry>
+
+              <entry><code>SimpleCrossRef</code></entry>
+            </row>
+
+            <row>
+              <entry>bioentry_dbxref</entry>
+
+              <entry>(use properties of BioEntry)</entry>
+
+              <entry><code>SimpleRankedCrossRef</code></entry>
+            </row>
+
+            <row>
+              <entry>reference</entry>
+
+              <entry>DocRef</entry>
+
+              <entry><code>SimpleDocRef</code></entry>
+            </row>
+
+            <row>
+              <entry>bioentry_reference</entry>
+
+              <entry>(use properties of BioEntry)</entry>
+
+              <entry><code>SimpleRankedDocRef</code></entry>
+            </row>
+
+            <row>
+              <entry>dbxref_qualifer_value</entry>
+
+              <entry>(use properties of CrossRef)</entry>
+
+              <entry><code>SimpleNote</code></entry>
+            </row>
+
+            <row>
+              <entry>bioentry_qualifier_value</entry>
+
+              <entry>(use properties of BioEntry)</entry>
+
+              <entry><code>SimpleNote</code></entry>
+            </row>
+
+            <row>
+              <entry>ontology</entry>
+
+              <entry>Ontology</entry>
+
+              <entry><code>ComparableOntology</code></entry>
+            </row>
+
+            <row>
+              <entry>term</entry>
+
+              <entry>Term</entry>
+
+              <entry><code>ComparableTerm</code></entry>
+            </row>
+
+            <row>
+              <entry>term_relationship</entry>
+
+              <entry>Triple</entry>
+
+              <entry><code>ComparableTriple</code></entry>
+            </row>
+
+            <row>
+              <entry>term_synonym</entry>
+
+              <entry>(use properties of Term)</entry>
+
+              <entry><code>String</code></entry>
+            </row>
+
+            <row>
+              <entry>term_dbxref</entry>
+
+              <entry>(use properties of Term)</entry>
+
+              <entry><code>SimpleRankedCrossRef</code></entry>
+            </row>
+
+            <row>
+              <entry>seqfeature</entry>
+
+              <entry>Feature</entry>
+
+              <entry><code>SimpleRichFeature</code></entry>
+            </row>
+
+            <row>
+              <entry>seqfeature_qualifier_value</entry>
+
+              <entry>(use properties of Feature)</entry>
+
+              <entry><code>SimpleNote</code></entry>
+            </row>
+
+            <row>
+              <entry>seqfeature_dbxref</entry>
+
+              <entry>(use properties of Feature)</entry>
+
+              <entry><code>SimpleRankedCrossRef</code></entry>
+            </row>
+
+            <row>
+              <entry>seqfeature_relationship</entry>
+
+              <entry>FeatureRelationship</entry>
+
+              <entry><code>SimpleRichFeatureRelationship</code></entry>
+            </row>
+
+            <row>
+              <entry>location</entry>
+
+              <entry>Location</entry>
+
+              <entry><code>SimpleRichLocation</code>,
+              <code>CompoundRichLocation</code>, or
+              <code>EmptyRichLocation</code></entry>
+            </row>
+
+            <row>
+              <entry>location_qualifier_value</entry>
+
+              <entry>(use properties of Location)</entry>
+
+              <entry><code>SimpleNote</code></entry>
+            </row>
+
+            <row>
+              <entry>seqfeature_path</entry>
+
+              <entry>-</entry>
+
+              <entry>-</entry>
+            </row>
+
+            <row>
+              <entry>bioentry_path</entry>
+
+              <entry>-</entry>
+
+              <entry>-</entry>
+            </row>
+
+            <row>
+              <entry>term_path</entry>
+
+              <entry>-</entry>
+
+              <entry>-</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
     </section>
 
     <section>
       <title>Configuring your application to use Hibernate and BioSQL.</title>
 
-      <para></para>
-    </section>
+      <para>To use Hibernate with your application, you need to do five
+      things:</para>
 
-    <section>
-      <title>The <code>HibernateRichObjectBuilder</code>.</title>
+      <orderedlist>
+        <listitem>
+          <para>Install Hibernate.</para>
+        </listitem>
 
-      <para></para>
-    </section>
+        <listitem>
+          <para>Copy and configure the Hibernate mapping files for your
+          database. </para>
+        </listitem>
 
-    <section>
-      <title>Transactions.</title>
+        <listitem>
+          <para>Create a Hibernate session and connect it to BioJavaX.</para>
+        </listitem>
 
-      <para></para>
+        <listitem>
+          <para>Open a transaction.</para>
+        </listitem>
+
+        <listitem>
+          <para>Read/write objects from the database.</para>
+        </listitem>
+
+        <listitem>
+          <para>End the transaction.</para>
+        </listitem>
+
+        <listitem>
+          <para>Close the Hibernate session.</para>
+        </listitem>
+      </orderedlist>
+
+      <section>
+        <title>Installing Hibernate.</title>
+
+        <para>Hibernate consists of a number of JAR files, downloadable from
+        their website at <ulink
+        url="http://www.hibernate.org/">http://www.hibernate.org/</ulink>. You
+        should add these JAR files to your classpath. You will also need to
+        download the JAR file for your database's JDBC driver, and add that to
+        your classpath too.</para>
+
+        <para><remark>Note for Oracle users:</remark> the mapping files
+        supplied for Oracle BioSQL are designed to work only with Oracle 9i or
+        better database and Oracle 9i or better JDBC drivers.</para>
+      </section>
+
+      <section>
+        <title>Copying and configuring the mapping files.</title>
+
+        <para>BioJavaX is supplied with four sets of mapping files, all of
+        which define the mapping between BioJavaX objects and a BioSQL
+        database. The four sets are for Oracle, PostGreSQL, MySQL, and
+        HSQLDB.</para>
+
+        <para>You will find the mapping files in the source package
+        <code>org.biojavax.bio.seq.db.biosql.*</code>. Choose the set you want
+        and copy them to one of the following places:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>The root of your <code>.jar</code> file if your application
+            is compiled as a JAR.</para>
+          </listitem>
+
+          <listitem>
+            <para>The current working directory of your application.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>To configure Hibernate, you must edit the copy you made of the
+        <code>hibernate.cfg.xml</code> file. Near the top is a section that
+        looks like this:</para>
+
+        <programlisting>&lt;property name="connection.datasource"&gt;java:comp/env/jdbc/YOUR_JNDI_DATASOURCE_GOES_HERE&lt;/property&gt;
+        
+&lt;!-- OR... (for testing only)...
+&lt;property name="connection.driver_class"&gt;oracle.jdbc.driver.OracleDriver&lt;/property&gt;
+&lt;property name="connection.url"&gt;jdbc:oracle:thin:@MYSERVER:MYPORT:MYSID&lt;/property&gt;
+&lt;property name="connection.username"&gt;MYUSER&lt;/property&gt;
+&lt;property name="connection.password"&gt;MYPASSWORD&lt;/property&gt;
+&lt;property name="connection.pool_size"&gt;20&lt;/property&gt;
+--&gt;</programlisting>
+
+        <para>The exact details will vary according to which database you are
+        using.</para>
+
+        <para>You will see that the default way of using Hibernate is through
+        a JNDI datasource, usually supplied by a servlet container such as
+        Tomcat. In this case, you should modify the
+        <code>connection.datasource</code> parameter to reflect the name of
+        your JNDI datasource.</para>
+
+        <para>If you are not using JNDI, then comment that line out and
+        uncomment the section marked 'testing only'. This section allows you
+        to configure Hibernate to use a JDBC connection to talk to your
+        database. Please read more about this at <ulink
+        url="http://www.hibernate.org/">http://www.hibernate.org/</ulink> if
+        you intend to use JDBC directly, as there are several caveats
+        regarding connection pooling that must be taken into consideration.
+        The configuration shown above is recommended only for development, and
+        is not suitable either for production code or for performance
+        testing.</para>
+      </section>
+
+      <section>
+        <title>Opening and closing sessions.</title>
+
+        <para>Hibernate deals in sessions, which must be opened before a
+        database can be used, and closed again at the end in order to bring
+        the database back into a consistent state. Hibernate will attempt to
+        clean-up automatically if you forget to close the session, but it is
+        better to be safe than sorry and close it explicitly.</para>
+
+        <para>BioJavaX <emphasis>must</emphasis> be told about the session in
+        order to be able to use it to manage database singleton objects such
+        as namespaces or taxon definitions. If you fail to connect the session
+        to BioJavaX, you will almost certainly end up with 'unique constraint
+        violation' exceptions being thrown left, right and centre. So be
+        careful!</para>
+
+        <para>You <emphasis>must</emphasis> connect the session to BioJavaX
+        <emphasis>before</emphasis> doing any operations with it at all. It
+        should usually be the first or very nearly the first line in your
+        code.</para>
+
+        <para>To open a Hibernate session and connect it to BioJavaX:</para>
+
+        <programlisting>SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();  // load Hibernate config
+Session session = sessionFactory.openSession();                                         // open the session
+RichObjectFactory.setRichObjectBuilder(new HibernateRichObjectBuilder(session));        // connect it to BioJavaX</programlisting>
+
+        <para>To close the Hibernate session:</para>
+
+        <programlisting>session.close();</programlisting>
+
+        <para>Note that the line that loads the Hibernate configuration only
+        needs to be done once, regardless of how many sessions you open, as
+        long as you keep a reference to your <code>sessionFactory</code>
+        somewhere handy.</para>
+      </section>
+
+      <section>
+        <title>Transactions.</title>
+
+        <para>If you are going to be writing objects to the database, you must
+        use transactions. If you are only reading from the database, then
+        transactions are recommended but not compulsory. It's probably safest
+        to use them anyway then you needn't worry about it.</para>
+
+        <para>A transaction defines a unit of work. BioJavaX never commits or
+        rolls back anything, so this is left entirely up to the user to decide
+        when to do so. Transactions are opened with a single line of code, and
+        rolled back or committed with another single line of code. You'd
+        usually use them in a construct such as this:</para>
+
+        <programlisting>Transaction tx = session.beginTransaction();  // begin the transaction
+try {
+    // do some stuff with BioJavaX objects here.
+    ...
+    tx.commit();          // commit the transaction if all went well
+} catch (Exception e) {
+    tx.rollback();        // roll back the transaction if something went wrong
+    e.printStackTrace();  // tell the user what went wrong
+}</programlisting>
+
+        <para>Once a transaction object has been committed or rolled back you
+        cannot use it any more and must open a new one.</para>
+      </section>
+
+      <section>
+        <title>Complete example.</title>
+
+        <para>This example iterates through every namespace it can find in the
+        database, and prints the names out. It also prints out the names of
+        all the sequences in each namespace, whether they be
+        <code>BioEntry</code> or <code>RichSequence</code> instances. If it
+        finds any sequences where the name is equal to 'bloggs', it changes
+        their version to 99. It then commits any changes it has made and
+        exits.</para>
+
+        <para>This example shows just how easy it is to read and write to the
+        database. No SQL required!</para>
+
+        <programlisting>SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();  
+Session session = sessionFactory.openSession();                                                             
+RichObjectFactory.setRichObjectBuilder(new HibernateRichObjectBuilder(session)); 
+
+Transaction tx = session.beginTransaction();
+try {
+
+    // print out all the namespaces in the database
+
+    Query q = session.createQuery("from Namespace");
+    List namespaces = q.list();               // retrieve all the namespaces from the db
+    for (Iterator i = namespaces.iterator(); i.hasNext(); ) {
+        Namespace ns = (Namespace)i.next();
+        System.out.println(ns.getName());     // print out the name of the namespace
+
+        // print out all the sequences in the namespace
+
+        for (Iterator j = ns.getMembers().iterator(); j.hasNext(); ) {
+            BioEntry be = (BioEntry)j.next();        // RichSequences are BioEntrys too
+            System.out.println("   "+be.getName());  // print out the name of the sequence
+
+            // if the sequence is called bloggs, change its version to 99
+
+            if (be.getName().equals("bloggs")) {
+                be.setVersion(99);
+            }
+        }
+
+    }
+
+    // commit and tidy up
+    tx.commit();         
+    System.out.println("Changes committed.");
+
+    // all sequences called bloggs now have a version of 99 in the database
+
+} catch (Exception e) {
+    tx.rollback();       
+    System.out.println("Changes rolled back.");
+    e.printStackTrace(); 
+}
+
+session.close();</programlisting>
+      </section>
     </section>
 
     <section>
       <title>Flattened locations.</title>
 
-      <para></para>
+      <para>BioSQL does not have a concept of hierarchical locations. It
+      allows multiple locations per feature, but it does not allow locations
+      to have sub-locations or references to other locations. This means that
+      the hierarchical location model allowed in BioJavaX must be flattened
+      out into a one-level collection of simple locations before it can be
+      persisted. </para>
+
+      <para>This flattening is done by
+      <code>RichLocation.Tools.flatten()</code>. It only takes place at the
+      point the user tries to save the location to the database, at which
+      point not only does the database copy get flattened, but the in-memory
+      one does too. The flattened location will logically represent the exact
+      same area as the hierarchical original, but it will be constructed
+      differently. The symbols returned by both the original and the flattened
+      locations should be identical, as would the results of any union,
+      intersection, contains, or overlaps operation.</para>
+
+      <para>The circularity of locations will be lost altogether when
+      persisted to BioSQL.</para>
     </section>
 
     <section>
       <title>Persisting objects.</title>
 
-      <para></para>
+      <para>Any object created by using methods from RichObjectFactory will
+      automatically attach itself to the database and persist when the
+      transaction is committed.</para>
+
+      <para>Any object you create directly yourself must be explicitly
+      attached to the database using the appropriate Hibernate mapping name
+      from the table earlier in this chapter. If the object you persist has
+      properties that are other mappable objects, they will be persisted too
+      in a cascading fashion.</para>
+
+      <para>For example, to persist a RichSequence object that you have just
+      created, do this (inside a transaction):</para>
+
+      <programlisting>RichSequence rs = ...;                    // some sequence you've made
+session.saveOrUpdate("RichSequence",rs);  // persist the sequence</programlisting>
+
+      <para>Nothing will actually get saved to the database until you commit
+      the transaction. If you rollback the transaction or exit without
+      committing first, all changes will be lost.</para>
     </section>
 
     <section>
       <title>Loading objects.</title>
 
-      <para></para>
+      <para>Loading objects involves having to learn some HQL. The simplest
+      cases are very easy, however it can get quite complex quite quickly. The
+      thing you have to remember is that you are querying objects,
+      <emphasis>not</emphasis> the database. As such, your results may include
+      objects that have been persisted but not committed.</para>
+
+      <para>The simplest HQL query is the equivalent of a SQL <code>select *
+      from sometable</code>. This is how you use it to select all namespaces
+      from the database:</para>
+
+      <programlisting>Query q = session.createQuery("from Namespace");
+List namespaces = q.list();  // namespaces now contains all the Namespace objects in the database</programlisting>
+
+      <para>To set constraints your query should refer to object parameters,
+      not table columns. The following query selects the namespace that is
+      called 'bloggs':</para>
+
+      <programlisting>Query q = session.createQuery("from Namespace where name=:name");
+q.setString("name","bloggs");
+List namespaces = q.list();                  // should only contain one Namespace object. Empty if none found.
+Namespace ns = (Namespace)q.uniqueObject();  // alternative notation for queries with single-row results</programlisting>
+
+      <para>You don't have to worry about foreign keys, and can just join
+      objects directly without specifying which field to use. This query
+      returns all RichSequence objects that have a comment that contains the
+      word "rubbish" with a rank of 0:</para>
+
+      <programlisting>Query q = session.createQuery("select rs from RichSequence as rs join Comment as c where c.comment like :comment and rank=:rank");
+q.setString("comment","%rubbish%");  // % symbol means match any string
+q.setInteger("rank",0);
+List sequences = q.list();           // a list of all matching RichSequence objects.</programlisting>
+
+      <para>This query demonstrates the (unique) case of <code>BioEntry</code>
+      and <code>RichSequence</code> being represented as a single Hibernate
+      mapping, hence no join required to access fields from either
+      table:</para>
+
+      <programlisting>Query q = session.createQuery("from RichSequence where length&gt;:length and name=:name");
+q.setInteger("length",200);
+q.setString("name","joe");
+List sequences = q.list();</programlisting>
+
+      <para>This query demonstrates how you can use other BioJavaX objects in
+      the where clause without having to do any work at all. It returns all
+      sequences that belong in a particular namespace:</para>
+
+      <programlisting>Namespace ns = ...;   // get a namespace from somewhere, eg. RichObjectFactory.getDefaultNamespace()
+Query q = session.createQuery("from RichSequence where namespace=:namespace");
+q.setParameter("namespace",ns);   // plug the namespace object right in!
+List sequences = q.list();</programlisting>
+
+      <para>There's no way this tutorial could ever hope to teach you all
+      about HQL! The best thing to do is go to the Hibernate website and read
+      up on it there: <ulink
+      url="http://www.hibernate.org/">http://www.hibernate.org/</ulink>.</para>
     </section>
 
     <section>
       <title>Loading individual values from objects.</title>
 
-      <para></para>
+      <para>You might not always want to retrieve lists of objects from the
+      database. This query retrieves the names of sequences:</para>
+
+      <programlisting>Query q = session.createQuery("select name from RichSequence");
+List names = q.list();  // list will contain String instances containing the names</programlisting>
+
+      <para>This one returns all the lengths of sequences, which are integers.
+      Note the use of <code>sequenceLength</code>, which is the object
+      parameter, and not <code>length</code> which is the database table
+      column name:</para>
+
+      <programlisting>Query q = session.createQuery("select sequenceLength from RichSequence");
+List lengths = q.list();  // list will contain Integer instances containing the lengths</programlisting>
     </section>
 
     <section>
-      <title>Some useful queries.</title>
+      <title>Deleting objects.</title>
 
-      <para></para>
+      <para>Objects can be removed from the database by calling:</para>
+
+      <programlisting>session.delete(obj); // where obj is some persistent object</programlisting>
+
+      <para>Only when the transaction is committed will they actually be
+      deleted. If the transaction is rolled back, the objects will come back
+      to life.</para>
     </section>
 
     <section>
       <title>Auto-generating the BioSQL schema.</title>
 
-      <para></para>
+      <para>One nice side-effect of the Hibernate mappings is that they are
+      able to completely regenerate the database schema required to support
+      their functionality. Whilst this does not usually create a schema that
+      is identical to the one you started with, it will function in the same
+      way and produce the same results, and can be handy for development or
+      testing purposes only. </para>
+
+      <para>It is not recommended that the generated scripts be used for
+      production databases without some manual checking and fine-tuning, and
+      it is most certainly not recommended to use the generated scripts in
+      place of any 'official' schema generation scripts such as those that are
+      provided by the BioSQL project. </para>
+
+      <para>Here is the code to generate the DDL from the Hibernate mappings.
+      It will be printed to standard output (usually the screen)</para>
+
+      <programlisting>Configuration cfg = new Configuration().configure();
+new SchemaExport(cfg).create(true, false);</programlisting>
     </section>
 
     <section>
-      <title>Dumping objects as XML.</title>
+      <title>Reading/writing objects as XML.</title>
 
-      <para></para>
+      <para>There is a bug in Hibernate which prevents this function from
+      working 100% correctly (bug details <ulink
+      url="http://opensource2.atlassian.com/projects/hibernate/browse/HHH-796">here</ulink>),
+      however the code is supplied as an example for when the bug is fixed.
+      </para>
+
+      <para>The snippet below will query the database for all DocRef objects,
+      then output an XML representation of them to standard out:</para>
+
+      <programlisting>Document doc = DocumentHelper.createDocument();        
+Element root = doc.addElement("myRootNode");    // some arbitrary name for the XML root node
+
+Session dom4jSession = session.getSession(EntityMode.DOM4J);
+       
+Query q = dom4jSession.createQuery("from DocRef");
+List results = q.list();
+for (Iterator i = results.iterator(); i.hasNext(); ) {
+    Element rs = (Element)i.next();
+    root.add(rs)
+}
+
+session.close();
+        
+// Pretty print the document to System.out
+OutputFormat format = OutputFormat.createPrettyPrint();
+XMLWriter writer = new XMLWriter(System.out, format);
+writer.write(doc);</programlisting>
+
+      <para>Reading them back and saving them to the database is
+      similar:</para>
+
+      <programlisting>Document doc = ...;                          // open an XML document with some kind of org.dom4j.io.SAXReader
+List results = doc.selectNodes("//docref");  // use the node-name from the class tag of DocRef.hbm.xml mapping file
+        
+Transaction tx = session.beginTransaction();
+Session dom4jSession = session.getSession(EntityMode.DOM4J);
+       
+for (Iterator i = results.iterator(); i.hasNext(); ) {
+    Object rs = (Object)i.next();
+    dom4jSession.saveOrUpdate("DocRef",rs);
+}
+        
+tx.commit();
+session.close();</programlisting>
     </section>
   </chapter>
 

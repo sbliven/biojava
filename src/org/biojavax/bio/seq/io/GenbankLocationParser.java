@@ -189,6 +189,12 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 List resultBlocks = new ArrayList(RichLocation.Tools.flatten(parseLocString(featureNS,featureAccession,crossRef,strand,subLocStr)));
                 // Reverse the order of its members c(j(x,y)) = j(cy,cx)
                 Collections.reverse(resultBlocks);
+                // Construct new ranks so that it persists and retrieves to BioSQL in the correct order.
+                int newRank = 0;
+                for (Iterator i = resultBlocks.iterator(); i.hasNext(); ) {
+                    RichLocation rl = (RichLocation)i.next();
+                    rl.setRank(newRank++);
+                }
                 return RichLocation.Tools.construct(resultBlocks);
             } 
             
