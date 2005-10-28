@@ -1864,13 +1864,14 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
               <row>
                 <entry>SOURCE</entry>
 
-                <entry><code>getNCBITaxon()getDisplayName()</code></entry>
+                <entry><code>getNCBITaxon().getDisplayName()</code></entry>
               </row>
 
               <row>
                 <entry>ORGANISM</entry>
 
-                <entry><code>getNCBITaxon()getDisplayName()</code> and
+                <entry><code>getNCBITaxon()getDisplayName()</code>, chopped
+                before the first bracket, and
                 <code>getNCBITaxon().getNameHierarchy()</code></entry>
               </row>
 
@@ -1935,15 +1936,15 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 <code>organism</code> fields are added to the output by
                 calling <code>getNCBITaxon().getNCBITaxID()</code> and
                 <code>getNCBITaxon().getDisplayName()</code> on the sequence
-                (the latter is trimmed to the first opening bracket if
-                necessary). For all features, extra <code>db_xref</code>
-                qualifiers are output for each cross-reference returned by
-                calling <code>getRankedCrossRefs()</code> on the feature. The
-                other qualifiers for the features are the contents of the
-                feature's annotation, provided by <code>getNoteSet()</code> on
-                the feature. <code>GenBankLocationParser</code> is used to
-                convert the feature's <code>getLocation()</code> output into
-                the correct text format.</entry>
+                (the latter is chopped before the first bracket if necessary).
+                For all features, extra <code>db_xref</code> qualifiers are
+                output for each cross-reference returned by calling
+                <code>getRankedCrossRefs()</code> on the feature. The other
+                qualifiers for the features are the contents of the feature's
+                annotation, provided by <code>getNoteSet()</code> on the
+                feature. <code>GenBankLocationParser</code> is used to convert
+                the feature's <code>getLocation()</code> output into the
+                correct text format.</entry>
               </row>
 
               <row>
@@ -1967,7 +1968,398 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
     <section>
       <title>EMBL.</title>
 
-      <para><code>EMBLFormat</code> documentation coming soon.</para>
+      <para><code>EMBLFormat</code> reads and writes GenBank files, and
+      understands almost all permutations of the location descriptors found in
+      the feature tables. </para>
+
+      <section>
+        <title>Reading.</title>
+
+        <para>The fields are passed into the <code>RichSeqIOListener</code> as
+        follows: </para>
+
+        <table>
+          <title><code>EMBLFormat</code> input field destinations.</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>ID</entry>
+
+                <entry><code>setName()</code>,
+                <code>addSequenceProperty(Terms.getMolTypeTerm())</code>,
+                <code>setDivision()</code>, <code>setCircular()</code></entry>
+              </row>
+
+              <row>
+                <entry>AC</entry>
+
+                <entry>First accession goes to <code>setAccession()</code>,
+                all others to
+                <code>addSequenceProperty(Terms.getAdditionalAccessionTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>SV</entry>
+
+                <entry>If the accession (before the full stop ".") is
+                different from the first accession on the AC line, then this
+                accession becomes the primary accession, and the first
+                accession on the AC line becomes an additional accession.
+                Everything after the full stop goes to
+                <code>setVersion()</code>. </entry>
+              </row>
+
+              <row>
+                <entry>DE</entry>
+
+                <entry><code>setDescription()</code></entry>
+              </row>
+
+              <row>
+                <entry>DT</entry>
+
+                <entry>For creation date:
+                <code>addSequenceProperty(Terms.getDateCreatedTerm())</code>
+                and
+                <code>addSequenceProperty(Terms.getRelCreatedTerm())</code>.
+                For last updated date:
+                <code>addSequenceProperty(Terms.getDateUpdatedTerm())</code>
+                and
+                <code>addSequenceProperty(Terms.getRelUpdatedTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>DR</entry>
+
+                <entry>Each record is split into a database name, primary
+                accession, and additional accessions. A <code>CrossRef</code>
+                object is constructed from these first two pieces, and
+                annotated with additional accessions using
+                <code>Terms.getAdditionalAccessionTerm()</code>. The whole
+                thing is then given a rank and sent to
+                <code>setRankedCrossRef()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>OS</entry>
+
+                <entry>Ignored.</entry>
+              </row>
+
+              <row>
+                <entry>OC</entry>
+
+                <entry>Ignored.</entry>
+              </row>
+
+              <row>
+                <entry>OG</entry>
+
+                <entry><code>addSequenceProperty(Terms.getOrganelleTerm())</code></entry>
+              </row>
+
+              <row>
+                <entry>RN</entry>
+
+                <entry>The number of the reference becomes the rank of the
+                <code>RankedDocRef</code> object later.</entry>
+              </row>
+
+              <row>
+                <entry>RP</entry>
+
+                <entry>The values on this line become the start and end of the
+                <code>RankedDocRef</code> object later.</entry>
+              </row>
+
+              <row>
+                <entry>RX</entry>
+
+                <entry>Each of these is parsed and the database name and
+                primary accession are used to construct a
+                <code>CrossRef</code> object. All <code>CrossRef</code>
+                objects are ranked and added to the sequence
+                <code>setRankedCrossRef()</code>, and one of them will be
+                added to the current reference using
+                <code>setCrossRef()</code>. The one that is chosen will be
+                MEDLINE, or PUBMED if not present, or DOI if PUBMED not
+                present either.</entry>
+              </row>
+
+              <row>
+                <entry>RA</entry>
+
+                <entry>Parsed using <code>DocRefAuthor.Tools.parse()</code>
+                and becomes the set of authors for the <code>DocRef</code>
+                object.</entry>
+              </row>
+
+              <row>
+                <entry>RG</entry>
+
+                <entry>Parsed using <code>DocRefAuthor.Tools.parse()</code>,
+                and each consortium is flagged using the
+                <code>setConsortium()</code> method before being added to the
+                set of authors for the <code>DocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>RT</entry>
+
+                <entry>The title for <code>setTitle()</code> on the
+                <code>DocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>RL</entry>
+
+                <entry>The location for the <code>setLocation()</code> method
+                on the <code>DocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>RC</entry>
+
+                <entry>Used for <code>setRemark()</code> on the
+                <code>DocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>KW</entry>
+
+                <entry>Each keyword is sent individually to
+                <code>addSequenceProperty(Terms.getKeywordTerm())</code></entry>
+              </row>
+
+              <row>
+                <entry>CC</entry>
+
+                <entry><code>setComment()</code></entry>
+              </row>
+
+              <row>
+                <entry>FH</entry>
+
+                <entry>Ignored.</entry>
+              </row>
+
+              <row>
+                <entry>FT</entry>
+
+                <entry>As per the GenBankFormat - please see the section on
+                GenBank parsing.</entry>
+              </row>
+
+              <row>
+                <entry>CO</entry>
+
+                <entry>Causes an exception as contigs are not
+                supported.</entry>
+              </row>
+
+              <row>
+                <entry>AH</entry>
+
+                <entry>Causes an exception as TPAs are not supported.</entry>
+              </row>
+
+              <row>
+                <entry>SQ</entry>
+
+                <entry>Sequence data is passed to
+                <code>addSymbols()</code>.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </section>
+
+      <section>
+        <title>Writing.</title>
+
+        <para>The fields are read from the <code>RichSequence</code> object as
+        follows:</para>
+
+        <table>
+          <title><code>EMBLFormat</code> output field sources.</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>ID</entry>
+
+                <entry><code>getName()</code>,
+                <code>getNoteSet(Terms.getMolTypeTerm())</code>,
+                <code>getDivision()</code>, <code>getCircular()</code></entry>
+              </row>
+
+              <row>
+                <entry>AC</entry>
+
+                <entry><code>getAccession()</code>, and
+                <code>getNoteSet(Terms.getAdditionalAccessionTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>SV</entry>
+
+                <entry><code>getAccession()</code> and
+                <code>getVersion()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>DE</entry>
+
+                <entry><code>getDescription()</code></entry>
+              </row>
+
+              <row>
+                <entry>DT</entry>
+
+                <entry>For creation date:
+                <code>getNoteSet(Terms.getDateCreatedTerm())</code> and
+                <code>getNoteSet(Terms.getRelCreatedTerm())</code>. For last
+                updated date:
+                <code>getNoteSet(Terms.getDateUpdatedTerm())</code> and
+                <code>getNoteSetTerms.getRelUpdatedTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>DR</entry>
+
+                <entry><code>getRankedCrossRef()</code>, using
+                <code>getNoteSet(Terms.getAdditionalAccessionTerm())</code> to
+                generate additional accessions.</entry>
+              </row>
+
+              <row>
+                <entry>OS</entry>
+
+                <entry><code>getNCBITaxon().getDisplayName()</code></entry>
+              </row>
+
+              <row>
+                <entry>OC</entry>
+
+                <entry><code>getNCBITaxon()getDisplayName()</code>, chopped
+                before the first bracket, and
+                <code>getNCBITaxon().getNameHierarchy()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>OG</entry>
+
+                <entry><code>getNoteSet(Terms.getOrganelleTerm())</code></entry>
+              </row>
+
+              <row>
+                <entry>RN</entry>
+
+                <entry>Each reference returned by
+                <code>getRankedDocRefs()</code> is iterated over. The rank of
+                the <code>RankedDocRef</code> object is output here.</entry>
+              </row>
+
+              <row>
+                <entry>RP</entry>
+
+                <entry>The start and end coordinates of the
+                <code>RankedDocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>RX</entry>
+
+                <entry>The <code>getCrossRef()</code> output from the
+                <code>DocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>RA</entry>
+
+                <entry>The <code>getAuthors()</code> output from the
+                <code>DocRef</code> object, with the consortiums
+                removed.</entry>
+              </row>
+
+              <row>
+                <entry>RG</entry>
+
+                <entry>The <code>getAuthors()</code> output from the
+                <code>DocRef</code> object, with all except consortiums
+                removed.</entry>
+              </row>
+
+              <row>
+                <entry>RT</entry>
+
+                <entry>The <code>getTitle()</code> from the
+                <code>DocRef</code>.</entry>
+              </row>
+
+              <row>
+                <entry>RL</entry>
+
+                <entry>The <code>getLocation()</code> from the
+                <code>DocRef</code>.</entry>
+              </row>
+
+              <row>
+                <entry>RC</entry>
+
+                <entry>The <code>getRemark()</code> from the
+                <code>DocRef</code>.</entry>
+              </row>
+
+              <row>
+                <entry>KW</entry>
+
+                <entry><code>getNoteSet(Terms.getKeywordTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>CC</entry>
+
+                <entry>One comment section per entry in
+                <code>getComments()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>FH</entry>
+
+                <entry>No fields necessary here.</entry>
+              </row>
+
+              <row>
+                <entry>FT</entry>
+
+                <entry>As per the GenBankFormat - please see the section on
+                GenBank parsing.</entry>
+              </row>
+
+              <row>
+                <entry>CO</entry>
+
+                <entry>Never generated.</entry>
+              </row>
+
+              <row>
+                <entry>AH</entry>
+
+                <entry>Never generated.</entry>
+              </row>
+
+              <row>
+                <entry>SQ</entry>
+
+                <entry>Sequence counts are generated, then sequence is read
+                directly as it is a <code>SymbolList</code>.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </section>
     </section>
 
     <section>
