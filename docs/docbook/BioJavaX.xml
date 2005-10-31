@@ -961,7 +961,7 @@ for (Iterator i = rs.getRelationships().iterator(); i.hasNext(); ) {
       <para>BioJavaX provides a replacement set of tools for working with
       files. This is necessary because the new file parsers must work with the
       new <code>RichSeqIOListener</code> in order to preserve all the
-      information from the file correctly. </para>
+      information from the file correctly.</para>
 
       <para>The tools can all be found in <code>RichSequence.IOTools</code>, a
       subclass of the <code>RichSequence</code> interface. For each file
@@ -1188,7 +1188,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
 
         <para>Finer control is available when you go even deeper and write
         your own <code>RichSeqIOListener</code> objects. See later in this
-        document for information on that subject. </para>
+        document for information on that subject.</para>
       </section>
 
       <section>
@@ -1217,7 +1217,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 </row>
 
                 <row>
-                  <entry><code>addSequenceProperty</code> </entry>
+                  <entry><code>addSequenceProperty</code></entry>
 
                   <entry>Assumes that both the key and the value of the
                   property are strings. It uses the key to look up a term with
@@ -1329,7 +1329,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 </row>
 
                 <row>
-                  <entry><code>startFeature</code> </entry>
+                  <entry><code>startFeature</code></entry>
 
                   <entry>Tells the builder to start a new feature on this
                   sequence. If the current feature has not yet been ended,
@@ -1345,7 +1345,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 </row>
 
                 <row>
-                  <entry><code>getCurrentFeature</code> </entry>
+                  <entry><code>getCurrentFeature</code></entry>
 
                   <entry>Returns the current feature, if one has been started.
                   If there is no current feature (eg. it has already ended, or
@@ -1353,7 +1353,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 </row>
 
                 <row>
-                  <entry><code>addFeatureProperty</code> </entry>
+                  <entry><code>addFeatureProperty</code></entry>
 
                   <entry>Assumes that both the key and the value of the
                   property are strings. It uses the key to look up a term with
@@ -1368,14 +1368,14 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 </row>
 
                 <row>
-                  <entry><code>endFeature</code> </entry>
+                  <entry><code>endFeature</code></entry>
 
                   <entry>Ends the current feature. If there is no current
                   feature, an exception is thrown.</entry>
                 </row>
 
                 <row>
-                  <entry><code>setRankedDocRef</code> </entry>
+                  <entry><code>setRankedDocRef</code></entry>
 
                   <entry>Adds the given <code>RankedDocRef</code> to the set
                   of publication cross-references which the sequence being
@@ -1397,7 +1397,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 </row>
 
                 <row>
-                  <entry><code>setRelationship</code> </entry>
+                  <entry><code>setRelationship</code></entry>
 
                   <entry>Adds the given <code>BioEntryRelationship</code> to
                   the set of relationships in which the sequence being built
@@ -1409,7 +1409,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 </row>
 
                 <row>
-                  <entry><code>setCircular</code> </entry>
+                  <entry><code>setCircular</code></entry>
 
                   <entry>You can call this as many times as you like. Each
                   call will override the value provided by the previous call.
@@ -1431,7 +1431,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 </row>
 
                 <row>
-                  <entry><code>endSequence</code> </entry>
+                  <entry><code>endSequence</code></entry>
 
                   <entry>Tells the builder that we have provided all the
                   information we know. If at this point the name, namespace,
@@ -1440,7 +1440,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 </row>
 
                 <row>
-                  <entry><code>makeSequence</code> </entry>
+                  <entry><code>makeSequence</code></entry>
 
                   <entry>Constructs a <code>RichSequence</code> object from
                   the information provided, following the rules laid out in
@@ -1489,7 +1489,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
         to 0 if not provided.</para>
 
         <para>If a non-null <code>Namespace</code> is provided, then the
-        namespace in the file is ignored. </para>
+        namespace in the file is ignored.</para>
 
         <para>If a null <code>Namespace</code> is provided, then the namespace
         from the file is used. If no namespace is specified in the file, then
@@ -1608,7 +1608,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
               <row>
                 <entry>&lt;sequence data&gt;</entry>
 
-                <entry><code>RichSequence</code> is a
+                <entry>Sequence is read directly as it is a
                 <code>SymbolList</code>.</entry>
               </row>
             </tbody>
@@ -1638,17 +1638,12 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
               <row>
                 <entry>LOCUS</entry>
 
-                <entry>This line is split up into its component parts. The
-                first word after the LOCUS keyword is passed to
-                <code>setName()</code>. The strand, if present, is passed to
-                <code>addSequenceProperty(Terms.getStrandedTerm())</code>. If
-                it is circular, <code>setCircular()</code> is called. The
-                molecule type is passed to
+                <entry><code>setName()</code>,
+                <code>addSequenceProperty(Terms.getStrandedTerm())</code>,
+                <code>setCircular()</code>,
                 <code>addSequenceProperty(Terms.getMolTypeTerm())</code>,
-                whereas the modification date is passed to
-                <code>addSequenceProperty(Terms.getDateUpdatedTerm())</code>.
-                The database division is passed to
-                <code>setDivision()</code>.</entry>
+                <code>addSequenceProperty(Terms.getDateUpdatedTerm())</code>,
+                and <code>setDivision()</code>.</entry>
               </row>
 
               <row>
@@ -1909,7 +1904,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
 
                 <entry>The cross reference returned by
                 <code>getCrossRef()</code> on the reference provides the
-                database name and accession used here. </entry>
+                database name and accession used here.</entry>
               </row>
 
               <row>
@@ -1967,15 +1962,15 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
     <section>
       <title>EMBL.</title>
 
-      <para><code>EMBLFormat</code> reads and writes GenBank files, and
+      <para><code>EMBLFormat</code> reads and writes EMBL files, and
       understands almost all permutations of the location descriptors found in
-      the feature tables. </para>
+      the feature tables.</para>
 
       <section>
         <title>Reading.</title>
 
         <para>The fields are passed into the <code>RichSeqIOListener</code> as
-        follows: </para>
+        follows:</para>
 
         <table>
           <title><code>EMBLFormat</code> input field destinations.</title>
@@ -2006,7 +2001,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 accession becomes the primary accession, and the first
                 accession on the AC line becomes an additional accession.
                 Everything after the full stop goes to
-                <code>setVersion()</code>. </entry>
+                <code>setVersion()</code>.</entry>
               </row>
 
               <row>
@@ -2221,7 +2216,9 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 <code>getNoteSet(Terms.getRelCreatedTerm())</code>. For last
                 updated date:
                 <code>getNoteSet(Terms.getDateUpdatedTerm())</code> and
-                <code>getNoteSetTerms.getRelUpdatedTerm())</code>.</entry>
+                <code>getNoteSetTerms.getRelUpdatedTerm())</code>. If date
+                created is null, then the update date is duplicated and used
+                here as well.</entry>
               </row>
 
               <row>
@@ -2364,7 +2361,454 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
     <section>
       <title>UniProt.</title>
 
-      <para><code>UniProtFormat</code> documentation coming soon.</para>
+      <para><code>UniProtFormat</code> reads and writes UniProt files.</para>
+
+      <section>
+        <title>Reading.</title>
+
+        <para>The fields are passed into the <code>RichSeqIOListener</code> as
+        follows: </para>
+
+        <table>
+          <title><code>UniProtFormat</code> input field destinations.</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>ID</entry>
+
+                <entry><code>setName()</code>,
+                <code>addSequenceProperty(Terms.getMolTypeTerm())</code>,
+                <code>addSequenceProperty(Terms.getDataClassTerm())</code>,
+                <code>setDivision()</code></entry>
+              </row>
+
+              <row>
+                <entry>AC</entry>
+
+                <entry>First accession goes to <code>setAccession()</code>,
+                all others to
+                <code>addSequenceProperty(Terms.getAdditionalAccessionTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>DE</entry>
+
+                <entry><code>setDescription()</code></entry>
+              </row>
+
+              <row>
+                <entry>DT</entry>
+
+                <entry>For creation date:
+                <code>addSequenceProperty(Terms.getDateCreatedTerm())</code>
+                and
+                <code>addSequenceProperty(Terms.getRelCreatedTerm())</code>.
+                For last sequence updated date:
+                <code>addSequenceProperty(Terms.getDateUpdatedTerm())</code>
+                and
+                <code>addSequenceProperty(Terms.getRelUpdatedTerm())</code>.
+                For last annotation updated date:
+                <code>addSequenceProperty(Terms.getDateAnnotatedTerm())</code>
+                and
+                <code>addSequenceProperty(Terms.getRelAnnotatedTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>DR</entry>
+
+                <entry>Each record is split into a database name, primary
+                accession, and additional accessions. A <code>CrossRef</code>
+                object is constructed from these first two pieces, and
+                annotated with additional accessions using
+                <code>Terms.getAdditionalAccessionTerm()</code>. The whole
+                thing is then given a rank and sent to
+                <code>setRankedCrossRef()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>OS</entry>
+
+                <entry>First named species is used as the scientific name to
+                construct an <code>NCBITaxon</code> object, along with the tax
+                ID from the OX line, and passed to <code>setTaxon()</code>.
+                The second name, if present, is the common name. Subsequent
+                names are synonyms.</entry>
+              </row>
+
+              <row>
+                <entry>OC</entry>
+
+                <entry>Ignored.</entry>
+              </row>
+
+              <row>
+                <entry>OX</entry>
+
+                <entry>See details for the OS line.</entry>
+              </row>
+
+              <row>
+                <entry>OG</entry>
+
+                <entry><code>addSequenceProperty(Terms.getOrganelleTerm())</code></entry>
+              </row>
+
+              <row>
+                <entry>GN</entry>
+
+                <entry>Gene names are passed to
+                <code>addSequenceProperty(Terms.getGeneNameTerm())</code>.
+                Gene synonyms are passed to
+                <code>addSequenceProperty(Terms.getGeneSynonymTerm())</code>.
+                Ordered locus names are passed to
+                <code>addSequenceProperty(Terms.getOrderedLocusNameTerm())</code>.
+                ORF names are passed to
+                <code>addSequenceProperty(Terms.getORFNameTerm())</code>. The
+                values have a number and a colon prefixed, where the number
+                refers to the sequence order of the current gene.</entry>
+              </row>
+
+              <row>
+                <entry>RN</entry>
+
+                <entry>The number of the reference becomes the rank of the
+                <code>RankedDocRef</code> object later.</entry>
+              </row>
+
+              <row>
+                <entry>RP</entry>
+
+                <entry>The whole value is passed to <code>setRemark()</code>.
+                If it contains the words 'SEQUENCE OF', then the sequence
+                position is parsed out and becomes the start and end of the
+                <code>RankedDocRef</code> object later.</entry>
+              </row>
+
+              <row>
+                <entry>RX</entry>
+
+                <entry>Each of these is parsed and the database name and
+                primary accession are used to construct a
+                <code>CrossRef</code> object. All <code>CrossRef</code>
+                objects are ranked and added to the sequence
+                <code>setRankedCrossRef()</code>, and one of them will be
+                added to the current reference using
+                <code>setCrossRef()</code>. The one that is chosen will be
+                MEDLINE, or PUBMED if not present, or DOI if PUBMED not
+                present either.</entry>
+              </row>
+
+              <row>
+                <entry>RA</entry>
+
+                <entry>Parsed using <code>DocRefAuthor.Tools.parse()</code>
+                and becomes the set of authors for the <code>DocRef</code>
+                object.</entry>
+              </row>
+
+              <row>
+                <entry>RG</entry>
+
+                <entry>Parsed using <code>DocRefAuthor.Tools.parse()</code>,
+                and each consortium is flagged using the
+                <code>setConsortium()</code> method before being added to the
+                set of authors for the <code>DocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>RT</entry>
+
+                <entry>The title for <code>setTitle()</code> on the
+                <code>DocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>RL</entry>
+
+                <entry>The location for the <code>setLocation()</code> method
+                on the <code>DocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>RC</entry>
+
+                <entry>Comments are key-value pairs. Species comments are
+                passed to
+                <code>addSequenceProperty(Terms.getSpeciesTerm())</code>.
+                Strain comments are passed to
+                <code>addSequenceProperty(Terms.getStrainTerm())</code>.
+                Tissue comments are passed to
+                <code>addSequenceProperty(Terms.getTissueTerm())</code>.
+                Transposon comments are passed to
+                <code>addSequenceProperty(Terms.getTransposonTerm())</code>.
+                Plasmid comments are passed to
+                <code>addSequenceProperty(Terms.getPlasmidTerm())</code>. The
+                values have a number and a colon prefixed, where the number
+                refers to the rank of the current
+                <code>RankedDocRef</code>.</entry>
+              </row>
+
+              <row>
+                <entry>KW</entry>
+
+                <entry>Each keyword is sent individually to
+                <code>addSequenceProperty(Terms.getKeywordTerm())</code></entry>
+              </row>
+
+              <row>
+                <entry>CC</entry>
+
+                <entry>If the comment is parseable using
+                <code>UniProtCommentParser</code> then the value is passed to
+                <code>setComment()</code>. Otherwise, it is assumed to be the
+                copyright message that comes with UniProt records, and is
+                passed to
+                <code>addSequenceProperty(Terms.getCopyrightTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>FT</entry>
+
+                <entry>Each feature encountered triggers a call to
+                <code>startFeature()</code>, and calls
+                <code>endFeature()</code> on completion. The location is
+                parsed out using <code>UniProtLocationParser</code>. The
+                source term is <code>Terms.getUniProtTerm()</code>, whereas
+                the type term is a term from
+                <code>RichObjectFactory.getDefaultOntology().getOrCreateTerm()</code>
+                equivalent to the name of the feature. The feature description
+                is stored using
+                <code>addFeatureProperty(Terms.getFeatureDescTerm())</code>.
+                Subsequent lines beginning with '/' are added as qualifiers.
+                The only qualifier with a predefined term is 'FTId', which is
+                represented by <code>Terms.getFTIdTerm()</code>. All others
+                encountered have terms generated from
+                <code>RichObjectFactory.getDefaultOntology().getOrCreateTerm()</code>
+                with names equivalent to the name of the qualifier. Qualifiers
+                are added using <code>addFeatureProperty()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>SQ</entry>
+
+                <entry>Sequence data is passed to
+                <code>addSymbols()</code>.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </section>
+
+      <section>
+        <title>Writing.</title>
+
+        <para>The fields are read from the <code>RichSequence</code> object as
+        follows:</para>
+
+        <table>
+          <title><code>UniProtFormat</code> output field sources.</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>ID</entry>
+
+                <entry><code>getName()</code>,
+                <code>getNoteSet(Terms.getMolTypeTerm())</code>,
+                <code>getNoteSet(Terms.getDataClassTerm())</code>,
+                <code>getDivision()</code></entry>
+              </row>
+
+              <row>
+                <entry>AC</entry>
+
+                <entry><code>getAccession()</code>, and
+                <code>getNoteSet(Terms.getAdditionalAccessionTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>DE</entry>
+
+                <entry><code>getDescription()</code></entry>
+              </row>
+
+              <row>
+                <entry>DT</entry>
+
+                <entry>For creation date:
+                <code>getNoteSet(Terms.getDateCreatedTerm())</code> and
+                <code>getNoteSet(Terms.getRelCreatedTerm())</code>. For last
+                updated date:
+                <code>getNoteSet(Terms.getDateUpdatedTerm())</code> and
+                <code>getNoteSetTerms.getRelUpdatedTerm())</code>. For last
+                annotation date:
+                <code>getNoteSet(Terms.getDateAnnotatedTerm())</code> and
+                <code>getNoteSetTerms.getRelAnnotatedTerm())</code>. If date
+                created or date annotated is null, then the update date is
+                duplicated and used here as well.</entry>
+              </row>
+
+              <row>
+                <entry>DR</entry>
+
+                <entry><code>getRankedCrossRef()</code>, using
+                <code>getNoteSet(Terms.getAdditionalAccessionTerm())</code> to
+                generate additional accessions.</entry>
+              </row>
+
+              <row>
+                <entry>OS</entry>
+
+                <entry><code>getNCBITaxon().getDisplayName()</code> followed
+                by all synonyms from <code>getNames(NCBITaxon.SYNONYM)</code>
+                in brackets.</entry>
+              </row>
+
+              <row>
+                <entry>OC</entry>
+
+                <entry><code>getNCBITaxon().getNameHierarchy()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>OG</entry>
+
+                <entry><code>getNoteSet(Terms.getOrganelleTerm())</code></entry>
+              </row>
+
+              <row>
+                <entry>OX</entry>
+
+                <entry><code>getNCBITaxon().getNCBITaxID()</code></entry>
+              </row>
+
+              <row>
+                <entry>GN</entry>
+
+                <entry>Gene names are written from
+                <code>getNoteSet(Terms.getGeneNameTerm())</code>. Gene
+                synonyms are written from
+                <code>getNoteSet(Terms.getGeneSynonymTerm())</code>. Ordered
+                locus names are written from
+                <code>getNoteSet(Terms.getOrderedLocusNameTerm())</code>. ORF
+                names are written from
+                <code>getNoteSet(Terms.getORFNameTerm())</code>. As the values
+                have a number and a colon prefixed, where the number refers to
+                the sequence order of the current gene, these values are used
+                to keep the correct names grouped together. This prefix is not
+                included in the output.</entry>
+              </row>
+
+              <row>
+                <entry>RN</entry>
+
+                <entry>Each reference returned by
+                <code>getRankedDocRefs()</code> is iterated over. The rank of
+                the <code>RankedDocRef</code> object is output here.</entry>
+              </row>
+
+              <row>
+                <entry>RP</entry>
+
+                <entry>The <code>getRemark()</code> from the
+                <code>DocRef</code>.</entry>
+              </row>
+
+              <row>
+                <entry>RX</entry>
+
+                <entry>The <code>getCrossRef()</code> output from the
+                <code>DocRef</code> object.</entry>
+              </row>
+
+              <row>
+                <entry>RA</entry>
+
+                <entry>The <code>getAuthors()</code> output from the
+                <code>DocRef</code> object, with the consortiums
+                removed.</entry>
+              </row>
+
+              <row>
+                <entry>RG</entry>
+
+                <entry>The <code>getAuthors()</code> output from the
+                <code>DocRef</code> object, with all except consortiums
+                removed.</entry>
+              </row>
+
+              <row>
+                <entry>RT</entry>
+
+                <entry>The <code>getTitle()</code> from the
+                <code>DocRef</code>.</entry>
+              </row>
+
+              <row>
+                <entry>RL</entry>
+
+                <entry>The <code>getLocation()</code> from the
+                <code>DocRef</code>.</entry>
+              </row>
+
+              <row>
+                <entry>RC</entry>
+
+                <entry>Comments are key-value pairs. Species comments are from
+                <code>getNoteSet(Terms.getSpeciesTerm())</code>. Strain
+                comments are from
+                <code>getNoteSet(Terms.getStrainTerm())</code>. Tissue
+                comments are from
+                <code>getNoteSet(Terms.getTissueTerm())</code>. Transposon
+                comments are from
+                <code>getNoteSet(Terms.getTransposonTerm())</code>. Plasmid
+                comments are from
+                <code>getNoteSet(Terms.getPlasmidTerm())</code>. As the values
+                have a number and a colon prefixed, where the number refers to
+                the rank of the current <code>RankedDocRef</code>, this is
+                used to match the appropriate comments with each reference.
+                This prefix is not included in the output.</entry>
+              </row>
+
+              <row>
+                <entry>KW</entry>
+
+                <entry><code>getNoteSet(Terms.getKeywordTerm())</code>.</entry>
+              </row>
+
+              <row>
+                <entry>CC</entry>
+
+                <entry>One comment section per entry in
+                <code>getComments()</code>.</entry>
+              </row>
+
+              <row>
+                <entry>FT</entry>
+
+                <entry>Each feature is written out using
+                <code>UniProtLocationParser</code> to construct the location
+                string from the feature's <code>getLocation()</code> output,
+                with the feature name being the <code>getType()</code> of the
+                feature and the description being
+                <code>getNoteSet(Terms.getFeatureDescTerm())</code> on the
+                feature. The FTId, if present in the feature from
+                <code>getNoteSet(Terms.<code>getFTIdTerm()</code>)</code>, is
+                written out underneath. No other qualifiers are written
+                out.</entry>
+              </row>
+
+              <row>
+                <entry>SQ</entry>
+
+                <entry>Sequence counts are generated, then sequence is read
+                directly as it is a <code>SymbolList</code>.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </section>
     </section>
 
     <section>
@@ -2425,7 +2869,7 @@ while ((t=l.readName(names))!=null);  // then read all the names
       <code>NCBITaxon</code> objects or names going missing if you have an LRU
       cache in <code>RichObjectFactory</code> that is too small. This issue is
       avoided altogether when using the
-      <code>HibernateRichObjectFactory</code>. </para>
+      <code>HibernateRichObjectFactory</code>.</para>
     </section>
   </chapter>
 
@@ -2440,7 +2884,7 @@ while ((t=l.readName(names))!=null);  // then read all the names
       allowing it to communicate directly with the RichSequenceFormat
       instances that parse files. You have to choose whether you want just to
       listen to data as it is read from the file, or whether you want to use
-      these events to construct a RichSequence object. </para>
+      these events to construct a RichSequence object.</para>
 
       <section>
         <title>Listening to events only.</title>
@@ -2535,7 +2979,7 @@ while (moreSeqsAvailable) {
 
       <para>As journal articles are the most common type of publication
       cross-reference, everything is assumed by BioJavaX to be a journal
-      article. </para>
+      article.</para>
 
       <para>BioJavaX makes no attempt to parse information out from textual
       publication location descriptions (eg. the LOCATION line in GenBank
@@ -2589,7 +3033,7 @@ while (moreSeqsAvailable) {
       <para>Database names are case-sensitive. When using cross-references, be
       very aware of this. The various file parsers do not make much effort to
       convert the database names they find to a single case policy, as several
-      of the formats insist on different ones. </para>
+      of the formats insist on different ones.</para>
 
       <para>If you will be persisting lots of new data regularly to your
       datbase, keep an eye on this. Some kind of SQL script to do a periodic
@@ -2627,7 +3071,7 @@ while (moreSeqsAvailable) {
 
       <para>In BioJavaX, all locations are instances of classes which
       implement the RichLocation interface. These are very complex objects, so
-      need to be used with care. </para>
+      need to be used with care.</para>
 
       <para>All locations use Position objects to define their end points.
       Position objects have a start coordinate, and for fuzzy ones an end
@@ -2638,12 +3082,18 @@ while (moreSeqsAvailable) {
       flags can be set on the object to indicate this.</para>
 
       <para>Locations have ranks which are used to sort them. If persisted to
-      a database, the complex location that results when retrieving them from
-      the database will be ordered by rank.</para>
+      a database, the location will be flattened out into a set of simple
+      locations, ordered by their rank in ascending order. The complex
+      location constructed from these when retrieving them from the database
+      will have its members in the same order. It is important then to monitor
+      the ranks in your locations and make sure they are in the correct order
+      before persisting them. Note that the locations produced by the
+      <code>GenbankLocationParser</code> will always be correctly ranked ready
+      for persisting to a database.</para>
 
       <para>The simplest kind of location describes a single point or range
       between two points on a sequence, with optional fuzziness at either end.
-      This is implemented by the SimpleRichLocation class. </para>
+      This is implemented by the SimpleRichLocation class.</para>
 
       <para>This example describes the GenBank-style location string
       "56":</para>
@@ -2931,7 +3381,7 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
 
       <para>There are two types of contains operation - one tests the presence
       of a particular point coordinate, the other tests whether this location
-      entirely encompasses another location. </para>
+      entirely encompasses another location.</para>
 
       <para>Complex locations make the test against each member in turn. The
       empty location never will never contain anything.</para>
@@ -2988,7 +3438,7 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
       the remote sequence. The default <code>CrossReferenceResolver</code>,
       <code>SimpleCrossReferenceResolver</code>, will return a number of
       ambiguity symbols equivalent to the length of the remote location if the
-      remote sequence cannot be found. </para>
+      remote sequence cannot be found.</para>
 
       <para>The sequences of locations on the negative strand will be reverse
       complemented before concatenation to the results. Hence it is important
@@ -3129,7 +3579,7 @@ for (Iterator i = feature.getFeatureRelationshipSet().iterator(); i.hasNext(); )
       <code>RichFeature</code>, etc.) will implement
       <code>RichAnnotatable</code>. You can then use
       <code>getAnnotation()</code> to obtain the <code>RichAnnotation</code>
-      object and start annotating with it. </para>
+      object and start annotating with it.</para>
 
       <para>To obtain the <code>ComparableTerm</code> objects to use as keys,
       the simplest method is to call
@@ -3143,7 +3593,7 @@ for (Iterator i = feature.getFeatureRelationshipSet().iterator(); i.hasNext(); )
       <code>String</code> instance wrapped in a <code>Comment</code> instance)
       associated with them. Each comment is ranked. Duplicate comments with
       identical text and rank will be ignored. The number of comments allowed
-      is unlimited. </para>
+      is unlimited.</para>
 
       <para>To add a comment, call <code>addComment()</code> on the sequence
       object.</para>
@@ -3209,7 +3659,7 @@ NCBITaxon parent = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class,
     <section>
       <title>Traversing from parent to child.</title>
 
-      <para>This cannot be done using the BioJavaX API. </para>
+      <para>This cannot be done using the BioJavaX API.</para>
 
       <para>But, you can do it using HQL if you are reading your taxonomy
       information from a database. See the section on BioSQL and Hibernate for
@@ -3246,7 +3696,7 @@ List taxons = q.list();  // taxons will now contain all matching taxon objects</
       <title>Introduction to Hibernate.</title>
 
       <para>BioJavaX uses Hibernate to manage persistence of BioJavaX objects
-      to/from a database. </para>
+      to/from a database.</para>
 
       <para>Hibernate works by parsing a set of mapping files that tell it how
       to translate between objects/fields and tables/columns. It tracks
@@ -3537,7 +3987,7 @@ List taxons = q.list();  // taxons will now contain all matching taxon objects</
 
         <listitem>
           <para>Copy and configure the Hibernate mapping files for your
-          database. </para>
+          database.</para>
         </listitem>
 
         <listitem>
@@ -3767,7 +4217,7 @@ session.close();</programlisting>
       to have sub-locations or references to other locations. This means that
       the hierarchical location model allowed in BioJavaX must be flattened
       out into a one-level collection of simple locations before it can be
-      persisted. </para>
+      persisted.</para>
 
       <para>This flattening is done by
       <code>RichLocation.Tools.flatten()</code>. It only takes place at the
@@ -3905,13 +4355,13 @@ List lengths = q.list();  // list will contain Integer instances containing the 
       their functionality. Whilst this does not usually create a schema that
       is identical to the one you started with, it will function in the same
       way and produce the same results, and can be handy for development or
-      testing purposes only. </para>
+      testing purposes only.</para>
 
       <para>It is not recommended that the generated scripts be used for
       production databases without some manual checking and fine-tuning, and
       it is most certainly not recommended to use the generated scripts in
       place of any 'official' schema generation scripts such as those that are
-      provided by the BioSQL project. </para>
+      provided by the BioSQL project.</para>
 
       <para>Here is the code to generate the DDL from the Hibernate mappings.
       It will be printed to standard output (usually the screen)</para>
@@ -3926,8 +4376,8 @@ new SchemaExport(cfg).create(true, false);</programlisting>
       <para>There is a bug in Hibernate which prevents this function from
       working 100% correctly (bug details <ulink
       url="http://opensource2.atlassian.com/projects/hibernate/browse/HHH-796">here</ulink>),
-      however the code is supplied as an example for when the bug is fixed.
-      </para>
+      however the code is supplied as an example for when the bug is
+      fixed.</para>
 
       <para>The snippet below will query the database for all DocRef objects,
       then output an XML representation of them to standard out:</para>
@@ -3977,7 +4427,7 @@ session.close();</programlisting>
       <title>Overview.</title>
 
       <para>With the introduction of the <code>org.biojavax.ga</code> package
-      it is now possible to generate Genetic Algorithms using BioJava. </para>
+      it is now possible to generate Genetic Algorithms using BioJava.</para>
 
       <para>Genetic Algorithms are a class of simulation, optimization or
       problem solving algorithms that attempt to evolve a solution to a
@@ -4007,7 +4457,7 @@ session.close();</programlisting>
 
       <para>The example below demonstrates a very simple genetic algorithm
       constructed using the GA framework. The framework is designed to be very
-      flexible and uses an interchangeable parts philosophy. </para>
+      flexible and uses an interchangeable parts philosophy.</para>
 
       <para>The core interface is the <code>GeneticAlgorithm</code> with its
       default implementation, <code>SimpleGeneticAlgorithm</code>. The
@@ -4015,7 +4465,7 @@ session.close();</programlisting>
       <code>Organism</code>s and iterates through the generations. At each
       step a <code>MutationFunction</code> and a
       <code>CrossOverFunction</code> are responsible for introducing
-      variation. </para>
+      variation.</para>
 
       <para>A <code>FitnessFunction</code> is responsible for determining the
       fitness of each <code>Organism</code> in the context of it's parent
@@ -4023,8 +4473,8 @@ session.close();</programlisting>
       context of a <code>Population</code> it is possible to model competition
       within a <code>Population</code>. The <code>Organism</code>s to be
       selected for replication are nominated by the
-      <code>SelectionFunction</code> usually on the basis of their fitness.
-      </para>
+      <code>SelectionFunction</code> usually on the basis of their
+      fitness.</para>
 
       <para>The <code>GeneticAlgorithm</code> will stop iterating when the
       <code>GAStoppingCriteria</code> tells it to. This may be when a suitable
