@@ -138,7 +138,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
     private static Pattern xp = Pattern.compile("^(.*?)(\\.(\\d+))?:$");
     // this matches a single base position 
     private static Pattern pp = Pattern.compile("^\\(*(<|>)?(\\d+)(([\\.\\^])(\\d+))?(<|>)?\\)*$");
-    // used to assign an ascending rank to each location foudn
+    // used to assign an ascending rank to each location found
     private static int rank;
     
     // this function allows us to recursively parse bracketed groups
@@ -194,7 +194,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 for (Iterator i = resultBlocks.iterator(); i.hasNext(); ) {
                     RichLocation rl = (RichLocation)i.next();
 		    try {
-			rl.setRank(newRank++);
+                        rl.setRank(++newRank);
 		    } catch (ChangeVetoException e) {
 			throw new ParseException(e);
 		    }
@@ -251,11 +251,11 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         Position startPos = parsePosition(start);
         if (end==null) {
             // A point location
-            return new SimpleRichLocation(startPos,startPos,rank++,strand,crossRef);
+            return new SimpleRichLocation(startPos,startPos,++rank,strand,crossRef);
         } else {
             // A range location
             Position endPos = parsePosition(end);
-            return new SimpleRichLocation(startPos,endPos,rank++,strand,crossRef);
+            return new SimpleRichLocation(startPos,endPos,++rank,strand,crossRef);
         }
     }
     
