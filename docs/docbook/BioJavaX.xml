@@ -2586,7 +2586,9 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 encountered have terms generated from
                 <code>RichObjectFactory.getDefaultOntology().getOrCreateTerm()</code>
                 with names equivalent to the name of the qualifier. Qualifiers
-                are added using <code>addFeatureProperty()</code>.</entry>
+                are added using <code>addFeatureProperty()</code>. UniProt
+                uses its own unique set of feature names. No attempt is made
+                to translate other feature names to/from this set.</entry>
               </row>
 
               <row>
@@ -2795,8 +2797,10 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
                 <code>getNoteSet(Terms.getFeatureDescTerm())</code> on the
                 feature. The FTId, if present in the feature from
                 <code>getNoteSet(Terms.<code>getFTIdTerm()</code>)</code>, is
-                written out underneath. No other qualifiers are written
-                out.</entry>
+                written out underneath. No other qualifiers are written out.
+                UniProt uses its own unique set of feature names. No attempt
+                is made to translate other feature names to/from this
+                set.</entry>
               </row>
 
               <row>
@@ -2817,7 +2821,11 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
       <para>For parsing files that conform to
       <code>http://www.ebi.ac.uk/embl/Documentation/DTD/INSDSeq_v1.3.dtd.txt</code>.</para>
 
-      <para><code>INSDSeqFormat</code> documentation coming soon.</para>
+      <para><code>INSDSeqFormat</code> is similar to the GenBank flat-file
+      format in the way it organises information. Data will end up in the same
+      places and using the same annotation terms. There are no additional
+      annotation terms involved which are not also present in the GenBank
+      flat-file format.</para>
     </section>
 
     <section>
@@ -2826,7 +2834,18 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
       <para>For parsing files that conform to
       <code>http://www.ebi.ac.uk/embl/Documentation/DTD/EMBL_dtd.txt</code>.</para>
 
-      <para><code>EMBLxmlFormat</code> documentation coming soon.</para>
+      <para><code>EMBLxmlFormat</code> is very similar to the EMBL flat-file
+      format. Data will be parsed in much the same way and end up in the same
+      locations. There are no additional annotation terms involved which are
+      not also present in the EMBL flat-file format.</para>
+
+      <para>The only major difference between EMBL flat-file and EMBL XML is
+      the location tags. In XML, they are highly structured. The parser gets
+      round this complexity by constructing Genbank-style location strings out
+      of the XML hierarchies. These strings are then passed to
+      <code>GenbankLocationParser</code> for parsing into
+      <code>RichLocation</code> objects. On output, the location tags are
+      constructed directly from the <code>RichLocation</code> objects.</para>
     </section>
 
     <section>
@@ -2835,7 +2854,141 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
       <para>For parsing files that conform to
       <code>http://www.ebi.uniprot.org/support/docs/uniprot.xsd</code>.</para>
 
-      <para><code>UniProtXMLFormat</code> documentation coming soon.</para>
+      <para><code>UniProtXMLFormat</code> is very complex. The parser attempts
+      to treat it in the same way as normal UniProt data, and information will
+      end up in the same locations. </para>
+
+      <para>Throughout the format, evidence <emphasis>attributes</emphasis>
+      (not tags) are ignored. There is simply no way to fit them into the
+      BioJavaX object model.</para>
+
+      <para>Like the UniProt flat-file format, locations are passed through
+      the <code>UniProtLocationParser</code>. Fuzziness may not be correctly
+      interpreted as frequently not enough information is supplied to be able
+      to construct the mininum requirements of a <code>Position</code> object.
+      You may see exceptions being thrown on files which attempt to specify
+      fuzziness without relation to a specific base or range of bases.</para>
+
+      <para>Comments are parsed and converted into flat-file UniProt comments
+      using the <code>UniProtCommentParser</code>, and converted back again
+      when outputting in this format. This allows for greater interoperability
+      between the two formats, and also allows the UniProt XML comment data to
+      be stored in the plain-text format expected by databases such as BioSQL.
+      Some comments have been renamed in UniProt XML as opposed to the
+      flat-file format. These comments will be parsed and converted to use the
+      flat-file naming convention inside BioJavaX, but when they are output
+      again, they will go back to their correct UniProt XML names. This is to
+      increase interoperability between the two UniProt formats.</para>
+
+      <para>UniProt XML uses its own unique set of feature names, different
+      even from the flat-file UniProt format. No attempt is made to translate
+      other feature names to/from this set.</para>
+
+      <para>The UniProt XML format has no concept of a sequence description.
+      However, it does have a protein tag which describes the structure of the
+      sequence. This is parsed into a single protein description string and
+      used as the value for <code>setDescription()</code>. Each part of the
+      protein description is enclosed in square brackets and prefixed by the
+      word 'Contains' for domains, and 'Includes' for components. Attempting
+      to write a sequence that has a description which does not conform to
+      this standard may produce interesting results.</para>
+
+      <para>Keywords in UniProt XML have identifier numbers associated with
+      them. A special ontology, <code>Terms.getUniprotKWOnto()</code>, is used
+      to store these keywords and their identifiers as they are encountered
+      over time. If a keyword is encountered with an unknown identifier during
+      output, then the word 'UNKNOWN' is output in place of the
+      identifier.</para>
+
+      <para>The secondary/tertiary/additional accessions for database
+      cross-references in UniProt XML have hard-coded names which depend on
+      the position of the accession and the name of the database. If the
+      database name does not match one of the known ones, or an unexpected
+      accession is found, then the name used will be
+      <code>Terms.getAdditionalAccessionTerm()</code>.</para>
+
+      <para>A number of additional annotation terms are used by UniProt XML.
+      These are:</para>
+
+      <table>
+        <title>Additional <code>UniProtXMLFormat</code> annotation
+        terms.</title>
+
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry><code>Terms.getProteinTypeTerm()</code></entry>
+
+              <entry>Used to store the <code>type</code> attribute from the
+              <code>protein</code> tag. </entry>
+            </row>
+
+            <row>
+              <entry><code>Terms.getEvidenceCategoryTerm()</code></entry>
+
+              <entry>Used to store the <code>category</code> attribute of the
+              <code>evidence</code> tag.</entry>
+            </row>
+
+            <row>
+              <entry><code>Terms.getEvidenceTypeTerm()</code></entry>
+
+              <entry>Used to store the <code>type</code> attribute of the
+              <code>evidence</code> tag.</entry>
+            </row>
+
+            <row>
+              <entry><code>Terms.getEvidenceDateTerm()</code></entry>
+
+              <entry>Used to store the <code>date</code> attribute of the
+              <code>evidence</code> tag.</entry>
+            </row>
+
+            <row>
+              <entry><code>Terms.getEvidenceAttrTerm()</code></entry>
+
+              <entry>Used to store the <code>attribute</code> attribute of the
+              <code>evidence</code> tag.</entry>
+            </row>
+
+            <row>
+              <entry><code>Terms.getFeatureRefTerm()</code></entry>
+
+              <entry>Used to store the <code>ref</code> attribute of the
+              <code>feature</code> tag.</entry>
+            </row>
+
+            <row>
+              <entry><code>Terms.getFeatureOriginalTerm()</code></entry>
+
+              <entry>Used to store the value of the <code>original</code>
+              sub-tag of the <code>feature</code> tag.</entry>
+            </row>
+
+            <row>
+              <entry><code>Terms.getFeatureVariationTerm()</code></entry>
+
+              <entry>Used to store the value of the <code>variation</code>
+              sub-tag of the <code>feature</code> tag.</entry>
+            </row>
+
+            <row>
+              <entry><code>Terms.getFeatureStatusTerm()</code></entry>
+
+              <entry>Used to store the <code>status</code> attribute of the
+              <code>feature</code> tag.</entry>
+            </row>
+
+            <row>
+              <entry><code>Terms.getLocationSequenceTerm()</code></entry>
+
+              <entry>Used to store the <code>seq</code> attribute of the
+              <code>location</code> sub-tag of the <code>feature</code>
+              tag.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
     </section>
 
     <section>
