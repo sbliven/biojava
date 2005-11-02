@@ -967,7 +967,30 @@ for (Iterator i = rs.getRelationships().iterator(); i.hasNext(); ) {
       subclass of the <code>RichSequence</code> interface. For each file
       format there are a number of utility methods in this class for reading a
       variety of sequence types, and writing them out again. See later
-      sections of this chapter for details on individual formats.</para>
+      sections of this chapter for details on individual formats. </para>
+
+      <para>Here is an example of using the <code>RichSequence.IOTools</code>
+      methods. The example reads a file in Genbank format containing some DNA
+      sequences, then prints them out to standard out (the screen) in EMBL
+      format:</para>
+
+      <programlisting>BufferedReader br = new BufferedReader(new FileReader("myGenbank.gbk"));  // an input GenBank file
+Namespace ns = RichObjectFactory.getDefaultNamespace();                   // a namespace to override that in the file
+RichSequenceIterator seqs = RichSequence.IOTools.readGenbankDNA(br,ns);   // we are reading DNA sequences
+while (seqs.hasNext()) {
+    RichSequence rs = seqs.nextRichSequence();
+    RichSequence.IOTools.writeEMBL(System.out, rs, ns);                   // write it in EMBL format to standard out
+}</programlisting>
+
+      <para>If you wish to output a number of sequences in one of the XML
+      formats, you have to pass a <code>RichSequenceIterator</code> over your
+      collection of sequences in order for the XML format to group them
+      together into a single file with the correct headers:</para>
+
+      <programlisting>BufferedReader br = new BufferedReader(new FileReader("myGenbank.gbk"));  // an input GenBank file
+Namespace ns = RichObjectFactory.getDefaultNamespace();                   // a namespace to override that in the file
+RichSequenceIterator seqs = RichSequence.IOTools.readGenbankDNA(br,ns);   // we are reading DNA sequences
+RichSequence.IOTools.writeEMBLxml(System.out, seqs, ns);                  // write the whole lot in EMBLxml format to standard out</programlisting>
 
       <para>For those who like to do things the hard way, reading and writing
       by directly using the <code>RichStreamReader</code> and
@@ -2367,7 +2390,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
         <title>Reading.</title>
 
         <para>The fields are passed into the <code>RichSeqIOListener</code> as
-        follows: </para>
+        follows:</para>
 
         <table>
           <title><code>UniProtFormat</code> input field destinations.</title>
@@ -2856,7 +2879,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
 
       <para><code>UniProtXMLFormat</code> is very complex. The parser attempts
       to treat it in the same way as normal UniProt data, and information will
-      end up in the same locations. </para>
+      end up in the same locations.</para>
 
       <para>Throughout the format, evidence <emphasis>attributes</emphasis>
       (not tags) are ignored. There is simply no way to fit them into the
@@ -2920,7 +2943,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
               <entry><code>Terms.getProteinTypeTerm()</code></entry>
 
               <entry>Used to store the <code>type</code> attribute from the
-              <code>protein</code> tag. </entry>
+              <code>protein</code> tag.</entry>
             </row>
 
             <row>
