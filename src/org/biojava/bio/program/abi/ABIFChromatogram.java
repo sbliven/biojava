@@ -24,6 +24,8 @@ package org.biojava.bio.program.abi;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,7 @@ import org.biojava.utils.SmallMap;
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  * @see ABIFParser
  */
-public class ABIFChromatogram extends AbstractChromatogram {
+public class ABIFChromatogram extends AbstractChromatogram implements Serializable {
     public ABIFChromatogram() {
         super();
     }
@@ -136,6 +138,7 @@ public class ABIFChromatogram extends AbstractChromatogram {
             Symbol sym;
             clearTraces();
             for (int i = 0 ; i < 4 ; i++) {
+                
                 try {
                     sym = ABIFParser.decodeDNAToken(fwo_[i]);
                 } catch (IllegalSymbolException ise) {
@@ -146,8 +149,8 @@ public class ABIFChromatogram extends AbstractChromatogram {
                 }
                 parseTrace((AtomicSymbol) sym, i+9);
             }
-
             parseBaseCalls();
+            ((RandomAccessFile)getDataAccess()).close();
         }
 
         private void parseTrace(AtomicSymbol sym, int whichData) throws IOException, UnsupportedChromatogramFormatException {
@@ -159,23 +162,27 @@ public class ABIFChromatogram extends AbstractChromatogram {
             int[] trace = new int[count];
             int max = -1;
             setBits(8*dataPtr.elementLength);
-
             if (dataPtr.elementLength == 2) {
-                for (int i = 0 ; i < count ; i++) {
-                    trace[i] = getDataAccess().readShort() & 0xffff;
-                    max = Math.max(trace[i], max);
+                byte[] shortArray = new byte[2 * count];
+                getDataAccess().readFully(shortArray);
+                int i = 0;
+                for (int s = 0; s < shortArray.length; s += 2) {
+                    trace[i] =  ((short)((shortArray[s] << 8) | (shortArray[s + 1] & 0xff))) & 0xffff;
+                    max = Math.max(trace[i++], max);
                 }
             }
             else if (dataPtr.elementLength == 1) {
-                for (int i = 0 ; i < count ; i++) {
-                    trace[i] = getDataAccess().readByte() & 0xff;
+                byte[] byteArray = new byte[count];
+                getDataAccess().readFully(byteArray);
+                for (int i = 0; i < byteArray.length; i++) {
+                    trace[i] = byteArray[i] & 0xff;
                     max = Math.max(trace[i], max);
                 }
             }
             else {
                 throw new UnsupportedChromatogramFormatException("Only 8- and 16-bit trace samples are supported");
             }
-
+            
             try {
                 setTrace(sym, trace, max);
             } catch (IllegalSymbolException ise) {
@@ -202,13 +209,19 @@ public class ABIFChromatogram extends AbstractChromatogram {
             // start reading offsets, creating SimpleBaseCalls along the way
             getDataAccess().seek(offsetsPtr.dataRecord);
             if (offsetsPtr.elementLength == 2) {
-                for (int i = 0 ; i < offsetsPtr.numberOfElements ; i++) {
-                    offsets.add(IntegerAlphabet.getInstance().getSymbol(getDataAccess().readShort() & 0xffff));
+                byte[] shortArray = new byte[2 * count];
+                getDataAccess().readFully(shortArray);
+                IntegerAlphabet integerAlphabet = IntegerAlphabet.getInstance();
+                for (int s = 0; s < shortArray.length; s += 2) {
+                    offsets.add(integerAlphabet.getSymbol(((short)((shortArray[s] << 8) | (shortArray[s + 1] & 0xff))) & 0xffff));
                 }
             }
             else if (offsetsPtr.elementLength == 1) {
-                for (int i = 0 ; i < offsetsPtr.numberOfElements ; i++) {
-                    offsets.add(IntegerAlphabet.getInstance().getSymbol(getDataAccess().readByte() & 0xff));
+                byte[] byteArray = new byte[count];
+                getDataAccess().readFully(byteArray);
+                IntegerAlphabet integerAlphabet = IntegerAlphabet.getInstance();
+                for (int i = 0 ; i < byteArray.length; i++) {
+                    offsets.add(integerAlphabet.getSymbol(byteArray[i] & 0xff));
                 }
             }
             else {
@@ -218,10 +231,10 @@ public class ABIFChromatogram extends AbstractChromatogram {
             // then read the base calls
             try {
                 getDataAccess().seek(basesPtr.dataRecord);
-                char token;
-                for (int i = 0 ; i < basesPtr.numberOfElements ; i++) {
-                    token = (char) getDataAccess().readByte();
-                    dna.add(ABIFParser.decodeDNAToken(token));
+                byte[] byteArray = new byte[(int) basesPtr.numberOfElements];
+                getDataAccess().readFully(byteArray);
+                for (int i = 0; i < byteArray.length; i++) {
+                    dna.add(ABIFParser.decodeDNAToken((char) byteArray[i]));
                 }
             } catch (IllegalSymbolException ise) {
                 throw new BioError("Can't happen", ise);
