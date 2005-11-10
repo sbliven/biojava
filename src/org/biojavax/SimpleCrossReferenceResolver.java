@@ -52,7 +52,7 @@ public class SimpleCrossReferenceResolver  implements CrossReferenceResolver {
      * {@inheritDoc}
      */
     public BioEntry getRemoteBioEntry(CrossRef cr){
-        Namespace ns = (Namespace)RichObjectFactory.getObject(Namespace.class, new Object[]{cr.getDbname()});
+        Namespace ns = (Namespace)RichObjectFactory.getObject(SimpleNamespace.class, new Object[]{cr.getDbname()});
         String accession = cr.getAccession();
         for (Iterator i = ns.getMembers().iterator(); i.hasNext(); ) {
             BioEntry be = (BioEntry)i.next();
