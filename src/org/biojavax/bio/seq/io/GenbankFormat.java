@@ -104,7 +104,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+bp\\s+([dms]s-)?(\\S+)\\s+(circular|linear)?\\s+(\\S+)\\s+(\\S+)$");
     // version line
-    protected static final Pattern vp = Pattern.compile("^(\\S+)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
+    protected static final Pattern vp = Pattern.compile("^(\\S+?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
     protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
     // dbxref line

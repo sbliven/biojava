@@ -26,6 +26,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.biojavax.bio.db.HibernateCrossReferenceResolver;
+import org.biojavax.bio.db.HibernateRichObjectBuilder;
 import org.biojavax.bio.seq.PositionResolver;
 import org.biojavax.bio.seq.PositionResolver.AverageResolver;
 import org.biojavax.ontology.ComparableOntology;
@@ -182,4 +184,12 @@ public class RichObjectFactory {
      */
     public static CrossReferenceResolver getDefaultCrossReferenceResolver() { return defaultCrossRefResolver; }
         
+    /** 
+     * A utility method that configures the RichObjectFactory for use with a Hibernate session.
+     * @param session an object containing a Hibernate session.
+     */
+    public static void connectToHibernate(Object session) {
+        RichObjectFactory.setRichObjectBuilder(new HibernateRichObjectBuilder(session));
+        RichObjectFactory.setDefaultCrossReferenceResolver(new HibernateCrossReferenceResolver(session));       
+    }
 }

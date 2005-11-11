@@ -115,7 +115,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+standard;\\s+(circular)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$");
     // version line
-    protected static final Pattern vp = Pattern.compile("^(\\S+)\\.(\\d+)$");
+    protected static final Pattern vp = Pattern.compile("^(\\S+?)\\.(\\d+)$");
     // reference position line
     protected static final Pattern rpp = Pattern.compile("^(\\d+)(-(\\d+))?$");
     // dbxref line
