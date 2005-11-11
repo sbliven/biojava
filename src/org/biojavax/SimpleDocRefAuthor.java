@@ -54,7 +54,7 @@ public class SimpleDocRefAuthor extends Unchangeable implements DocRefAuthor  {
         if (s==null) throw new IllegalArgumentException("Name cannot be null");
         String[] parts = s.split("\\(");
         this.name = parts[0].trim();
-        if (parts.length>=3) {
+        if (parts.length ==3) {
             parts[1] = parts[1].trim();
             parts[2] = parts[2].trim();
             parts[1] = parts[1].substring(0,parts[1].length()-1); // chomp bracket
@@ -63,8 +63,9 @@ public class SimpleDocRefAuthor extends Unchangeable implements DocRefAuthor  {
             else this.editor = false;
             if (parts[1].equals("consortium") || parts[2].equals("consortium")) this.consortium = true;
             else this.consortium = false;
-        } else if (parts.length>=2) {
+        } else if (parts.length ==2) {
             parts[1] = parts[1].trim();
+            parts[1] = parts[1].substring(0,parts[1].length()-1); // chomp bracket
             if (parts[1].equals("ed.")) this.editor=true;
             else this.editor = false;
             if (parts[1].equals("consortium")) this.consortium = true;
