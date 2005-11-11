@@ -43,23 +43,18 @@ public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation,
     
     /**
      * {@inheritDoc} There are no properties in the Empty RichAnnotation object.
-     * Calling this will throw a NoSuchElementException.
+     * Calling this will return null.
      */
     public Object getProperty(Object key) throws NoSuchElementException {
-        throw new NoSuchElementException(
-                "There are no keys in the Empty RichAnnotation object: " +
-                key
-                );
+        return null;
     }
     
     /**
      * {@inheritDoc} There are no notes in the Empty RichAnnotation object.
-     * Calling this will throw a NoSuchElementException.
+     * Calling this will return null.
      */
     public Note getNote(Note note){
-        throw new NoSuchElementException(
-                "There are no notes in the Empty RichAnnotation object"
-                );
+        return null;
     }
     
     /**
