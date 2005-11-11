@@ -193,17 +193,6 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     
     /**
      * {@inheritDoc}
-     * <b>Warning</b> this method gives access to the original 
-     * Collection not a copy. This is required by Hibernate. If you
-     * modify the object directly the behaviour may be unpredictable.
-     */
-    public Set getMembers() { return this.members; }
-    
-    // Hibernate requirement - not for public use.
-    public void setMembers(Set members) { this.members = members; }
-    
-    /**
-     * {@inheritDoc}
      * Namespaces are compared only by name.
      */
     public int compareTo(Object o) {

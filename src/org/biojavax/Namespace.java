@@ -123,12 +123,5 @@ public interface Namespace extends Comparable,Changeable {
      */
     public void setURI(URI URI) throws ChangeVetoException;
     
-    /**
-     * Returns a set of all BioEntry and RichSequence objects that
-     * declare themselves as being part of this namespace.
-     * @return a set of BioEntry or RichSequence objects.
-     */
-    public Set getMembers();
-    
 }
 

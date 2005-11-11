@@ -18,11 +18,6 @@
         <property name="description"/>
         <property name="acronym" node="@acronym"/>
         <property name="URIString" column="uri" node="uri"/>
-
-        <set name="members" cascade="none" sort="natural">
-            <key column="biodatabase_id"/>
-            <one-to-many class="BioEntry" embed-xml="true"/>
-        </set>
         
     </class>
 
