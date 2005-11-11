@@ -610,16 +610,23 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
     <section>
       <title>Hibernate singletons.</title>
 
-      <para>When working with Hibernate, you <emphasis>must</emphasis>
-      instantiate the <code>HibernateRichObjectBuilder</code>. When using
-      this, instances are looked up in the underlying BioSQL database first to
-      see if they exist. If they do, they are loaded and returned. If not,
-      they are created, then returned.</para>
+      <para>When working with Hibernate, you <emphasis>must</emphasis> connect
+      BioJavaX to Hibernate by calling
+      <code>RichObjectFactory.connectToHibernate(session)</code> and passing
+      it your session object. When using this, instances are looked up in the
+      underlying BioSQL database first to see if they exist. If they do, they
+      are loaded and returned. If not, they are created, then returned.</para>
 
       <para>The instances returned by <code>RichObjectFactory</code> when
-      using the <code>HibernateRichObjectBuilder</code> are guaranteed true
-      singletons and will never be duplicated even if you fill up the LRU
-      cache several times between requests.</para>
+      connected to Hibernate are guaranteed true singletons and will never be
+      duplicated even if you fill up the LRU cache several times between
+      requests.</para>
+
+      <para>You can replicate the behaviour of
+      <code>RichObjectFactory.connectToHibernate(session)</code> by
+      instantiating <code>HibernateRichObjectBuilder</code> and
+      <code>HibernateCrossReferenceResolver</code> objects and passing these
+      to the appropriate methods in <code>RichObjectFactory</code>.</para>
 
       <para>See the section on BioSQL and Hibernate later in this document for
       more details.</para>
@@ -748,9 +755,14 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
               symbols (sequence) for that location, it must first retrieve the
               remote sequence object. The <code>CrossReferenceResolver</code>
               object specified using this method is used to carry this out.
-              The only implementation of this interface at present is
-              <code>SimpleCrossReferenceResolver</code>, which is the one used
-              by default.</entry>
+              The default implementation of this interface
+              <code>DummyCrossReferenceResolver</code>, which always returns
+              inifinitely ambiguous symbol lists and cannot look up any remote
+              sequence objects. Use
+              <code>HibernateCrossReferenceResolver</code> instead (or use
+              <code>RichObjectFactory.connectToHibernate(session)</code>) if
+              you are using Hibernate, which is able to actually look up the
+              sequences (if they exist in your database).</entry>
             </row>
 
             <row>
@@ -758,6 +770,19 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
               getDefaultCrossReferenceResolver();</code></entry>
 
               <entry>Returns the default cross reference resolver.</entry>
+            </row>
+
+            <row>
+              <entry><code>void connectToHibernate(Object
+              session);</code></entry>
+
+              <entry>Instantiates <code>HibernateCrossReferenceResolver</code>
+              and <code>HibernateRichObjectBuilder</code> using the Hibernate
+              session object provided, and sets these two objects as the
+              default <code>RichObjectBuilder</code> and
+              <code>CrossReferenceResolver</code> instances. After this call,
+              the factory will try to look up all object requests in the
+              underlying database first.</entry>
             </row>
           </tbody>
         </tgroup>
@@ -967,7 +992,7 @@ for (Iterator i = rs.getRelationships().iterator(); i.hasNext(); ) {
       subclass of the <code>RichSequence</code> interface. For each file
       format there are a number of utility methods in this class for reading a
       variety of sequence types, and writing them out again. See later
-      sections of this chapter for details on individual formats. </para>
+      sections of this chapter for details on individual formats.</para>
 
       <para>Here is an example of using the <code>RichSequence.IOTools</code>
       methods. The example reads a file in Genbank format containing some DNA
@@ -3411,7 +3436,12 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
       can override the use of this default either by changing the default in
       the <code>RichObjectFactory</code>, or calling
       <code>setCrossReferenceResolver()</code> directly on the location
-      object.</para>
+      object. The default one does not look up remote sequences at all, and
+      always returns null for sequence objects, and
+      <code>InfinitelyAmbiguousSymbolList</code> instances for symbol list
+      requests. The one supplied for use with Hibernate does attempt to look
+      sequences up in the underlying database, but if it cannot find them it
+      will exhibit similar behaviour.</para>
 
       <para>The job of this resolver is to obtain sequence data for the remote
       sequence. If the resolver cannot locate the sequence, the location may
@@ -3612,9 +3642,11 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
       other than the one passed in for reference, the
       <code>CrossReferenceResolver</code> of that location is used to obtain
       the remote sequence. The default <code>CrossReferenceResolver</code>,
-      <code>SimpleCrossReferenceResolver</code>, will return a number of
-      ambiguity symbols equivalent to the length of the remote location if the
-      remote sequence cannot be found.</para>
+      <code>DummyCrossReferenceResolver</code>, will return a number of
+      ambiguity symbols equivalent to the length of the remote location. The
+      Hibernate version, <code>HibernateCrossReferenceResolver</code>, will
+      return the actual sequence from the database, but otherwise will behave
+      the same way if the remote sequence cannot be found.</para>
 
       <para>The sequences of locations on the negative strand will be reverse
       complemented before concatenation to the results. Hence it is important
@@ -4285,7 +4317,7 @@ List taxons = q.list();  // taxons will now contain all matching taxon objects</
 
         <programlisting>SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();  // load Hibernate config
 Session session = sessionFactory.openSession();                                         // open the session
-RichObjectFactory.setRichObjectBuilder(new HibernateRichObjectBuilder(session));        // connect it to BioJavaX</programlisting>
+RichObjectFactory.connectToHibernate(session);                                          // connect it to BioJavaX</programlisting>
 
         <para>To close the Hibernate session:</para>
 
@@ -4340,8 +4372,8 @@ try {
         database. No SQL required!</para>
 
         <programlisting>SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();  
-Session session = sessionFactory.openSession();                                                             
-RichObjectFactory.setRichObjectBuilder(new HibernateRichObjectBuilder(session)); 
+Session session = sessionFactory.openSession();                                     
+RichObjectFactory.connectToHibernate(session);
 
 Transaction tx = session.beginTransaction();
 try {

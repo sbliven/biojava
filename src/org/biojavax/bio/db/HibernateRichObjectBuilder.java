@@ -48,7 +48,7 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
     private Class query;
     private Method createQuery;
     private Method setParameter;
-    private Method list;
+    private Method uniqueResult;
     private Method persist;
     
     /**
@@ -70,9 +70,9 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
             this.persist = hibernateSession.getMethod("persist", new Class[]{String.class,Object.class});
             // Lazy load the Query class from Hibernate.
             Class hibernateQuery = Class.forName("org.hibernate.Query");
-            // Lookup the setParameter and list methods
+            // Lookup the setParameter and uniqueQuery methods
             this.setParameter = hibernateQuery.getMethod("setParameter", new Class[]{int.class,Object.class});
-            this.list = hibernateQuery.getMethod("list", new Class[]{});
+            this.uniqueResult = hibernateQuery.getMethod("uniqueResult", new Class[]{});
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {
@@ -118,9 +118,9 @@ public class HibernateRichObjectBuilder implements RichObjectBuilder {
                 query = this.setParameter.invoke(query, new Object[]{new Integer(i), queryParamsList.get(i)});
             }
             // Get the results
-            List results = (List)this.list.invoke(query, null);
+            Object result = this.uniqueResult.invoke(query, null);
             // Return the found object, if found
-            if (results.size()>0) return results.get(0);
+            if (result!=null) return result;
             // Create, persist and return the new object otherwise
             else {
                 // Load the class

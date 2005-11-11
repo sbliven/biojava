@@ -44,7 +44,7 @@ public class RichObjectFactory {
     private static String defaultOntologyName = "biojavax";
     private static String defaultNamespaceName = "lcl";
     private static PositionResolver defaultPositionResolver = new AverageResolver();
-    private static CrossReferenceResolver defaultCrossRefResolver = new SimpleCrossReferenceResolver();
+    private static CrossReferenceResolver defaultCrossRefResolver = new DummyCrossReferenceResolver();
     
     // the LRU cache - keys are classes, entries are maps of param sets to objects
     private static int defaultLRUcacheSize = 20;
@@ -145,10 +145,10 @@ public class RichObjectFactory {
     
     /**
      * Sets the default crossref resolver to use when resolving remote entries.
-     * Defaults to the SimpleCrossReferenceResolver.
+     * Defaults to the DummyCrossReferenceResolver.
      * @param crr the resolver to use.
      * @see org.biojavax.CrossReferenceResolver
-     * @see org.biojavax.SimpleCrossReferenceResolver
+     * @see org.biojavax.DummyCrossReferenceResolver
      */
     public static void setDefaultCrossReferenceResolver(CrossReferenceResolver crr) { defaultCrossRefResolver = crr; }
     
@@ -176,9 +176,9 @@ public class RichObjectFactory {
     public static PositionResolver getDefaultPositionResolver() { return defaultPositionResolver; }
     
     /**
-     * Returns the default cross ref resolver object. Defaults to SimpleCrossReferenceResolver
+     * Returns the default cross ref resolver object. Defaults to DummyCrossReferenceResolver
      * @return the default resolver.
-     * @see org.biojavax.SimpleCrossReferenceResolver
+     * @see org.biojavax.DummyCrossReferenceResolver
      */
     public static CrossReferenceResolver getDefaultCrossReferenceResolver() { return defaultCrossRefResolver; }
         
