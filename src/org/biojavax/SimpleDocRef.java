@@ -190,6 +190,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
      * Document references are compared first by author, then by location.
      */
     public int compareTo(Object o) {
+        if(o == this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.authors==null) return -1;
         // Normal comparison
