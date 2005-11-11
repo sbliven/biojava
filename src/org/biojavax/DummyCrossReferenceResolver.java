@@ -24,7 +24,7 @@ import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojavax.bio.BioEntry;
-import org.biojavax.bio.seq.InifinitelyAmbiguousSymbolList;
+import org.biojavax.bio.seq.InfinitelyAmbiguousSymbolList;
 
 
 /**
@@ -41,7 +41,7 @@ public class DummyCrossReferenceResolver implements CrossReferenceResolver {
      */
     public SymbolList getRemoteSymbolList(CrossRef cr, Alphabet a) {
         if (!(a instanceof FiniteAlphabet)) throw new IllegalArgumentException("Cannot construct dummy symbol list for a non-finite alphabet");
-        return new InifinitelyAmbiguousSymbolList((FiniteAlphabet)a);
+        return new InfinitelyAmbiguousSymbolList((FiniteAlphabet)a);
     }
     
     /**

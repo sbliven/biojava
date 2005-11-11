@@ -40,16 +40,17 @@ import org.biojava.utils.ChangeVetoException;
  * @author Richard Holland
  * @author MarkSchreiber
  */
-public class InifinitelyAmbiguousSymbolList implements SymbolList {
+public class InfinitelyAmbiguousSymbolList implements SymbolList {
     
     private FiniteAlphabet fa;
     private Symbol sym;
     
-    /** 
-     * Creates a new instance of InifinitelyAmbiguousSymbolList 
+    /**
+     * 
+     * Creates a new instance of InfinitelyAmbiguousSymbolList 
      * @param fa the finite alphabet to return ambiguous symbols from.
      */
-    public InifinitelyAmbiguousSymbolList(FiniteAlphabet fa) {
+    public InfinitelyAmbiguousSymbolList(FiniteAlphabet fa) {
         this.fa = fa;
         this.sym = AlphabetManager.getAllAmbiguitySymbol(fa);
     }

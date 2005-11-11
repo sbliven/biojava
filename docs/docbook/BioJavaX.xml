@@ -757,7 +757,7 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
               object specified using this method is used to carry this out.
               The default implementation of this interface
               <code>DummyCrossReferenceResolver</code>, which always returns
-              inifinitely ambiguous symbol lists and cannot look up any remote
+              infinitely ambiguous symbol lists and cannot look up any remote
               sequence objects. Use
               <code>HibernateCrossReferenceResolver</code> instead (or use
               <code>RichObjectFactory.connectToHibernate(session)</code>) if

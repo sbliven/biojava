@@ -31,7 +31,7 @@ import org.biojavax.Namespace;
 import org.biojavax.bio.BioEntry;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.SimpleNamespace;
-import org.biojavax.bio.seq.InifinitelyAmbiguousSymbolList;
+import org.biojavax.bio.seq.InfinitelyAmbiguousSymbolList;
 import org.biojavax.bio.seq.RichSequence;
 
 /**
@@ -84,7 +84,7 @@ public class HibernateCrossReferenceResolver implements CrossReferenceResolver {
         if (be instanceof RichSequence) return (RichSequence)be;
         // If we get here we didn't find it, so we must create a dummy sequence instead
         if (!(a instanceof FiniteAlphabet)) throw new IllegalArgumentException("Cannot construct dummy symbol list for a non-finite alphabet");
-        return new InifinitelyAmbiguousSymbolList((FiniteAlphabet)a);
+        return new InfinitelyAmbiguousSymbolList((FiniteAlphabet)a);
     }
     
     /**
