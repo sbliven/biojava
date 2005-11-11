@@ -9,7 +9,7 @@ package org.biojavax;
 
 import junit.framework.*;
 import org.biojava.bio.seq.DNATools;
-import org.biojavax.bio.seq.InifinitelyAmbiguousSymbolList;
+import org.biojavax.bio.seq.InfinitelyAmbiguousSymbolList;
 
 /**
  *
@@ -44,7 +44,7 @@ public class DummyCrossReferenceResolverTest extends TestCase {
     public void testGetRemoteSymbolList() {
         System.out.println("testGetRemoteSymbolList");
         assertTrue(res.getRemoteSymbolList(xref, DNATools.getDNA()) 
-            instanceof InifinitelyAmbiguousSymbolList);
+            instanceof InfinitelyAmbiguousSymbolList);
     }
 
     /**
