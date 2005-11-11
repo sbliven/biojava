@@ -211,7 +211,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         // Normal comparison
         DocRef them = (DocRef)obj;
         return (this.getAuthors().equals(them.getAuthors()) &&
-                this.getAuthors().equals(them.getLocation()));
+                this.getLocation().equals(them.getLocation()));
     }
     
     /**
