@@ -65,7 +65,7 @@ public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef
     /**
      * {@inheritDoc}
      * Ranked cross references are the same if they have the same rank and
-     * refer to the same cross reference.
+     * refer to the same cross reference (cross references are equal).
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
