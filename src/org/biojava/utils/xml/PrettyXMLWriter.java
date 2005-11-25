@@ -123,6 +123,10 @@ public class PrettyXMLWriter implements XMLWriter {
     public void openTag(String nsURI, String localName)
         throws IOException
     {
+    	if (nsURI == null || nsURI.length() == 0)
+    	{
+    		throw new IOException("Invalid namespace URI: "+nsURI);
+    	}
         _openTag();
         boolean alloced = false;
         String prefix = (String) namespacePrefixes.get(nsURI);

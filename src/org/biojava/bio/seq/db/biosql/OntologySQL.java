@@ -302,7 +302,7 @@ class OntologySQL {
     query += "ORDER BY term.term_id";
     PreparedStatement get_terms = conn.prepareStatement(query);
     
-    String query2 = "SELECT name FROM term_synonym WHERE term_id = ?";
+    String query2 = "SELECT synonym FROM term_synonym WHERE term_id = ?";
     PreparedStatement get_synonyms = conn.prepareStatement(query2);
 
     get_terms.setInt(1, id);

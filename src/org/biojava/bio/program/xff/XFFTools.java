@@ -77,6 +77,10 @@ import org.biojava.bio.seq.impl.*;
  */
 
 public class XFFTools {
+	
+	public static final String XFF_NS = "http://www.bioxml.org/2000/xff";
+	
+	public static final String XFF_BIOJAVA_NS = "http://www.biojava.org/2001/xff-biojava";
 
     public static void annotateXFF(File xffFile, final Sequence sequence)
 

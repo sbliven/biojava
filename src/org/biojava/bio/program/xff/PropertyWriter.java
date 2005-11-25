@@ -43,10 +43,10 @@ public class PropertyWriter extends BasicXFFHelper {
                 continue;
             }
             
-            xw.openTag("biojava:prop");
+            xw.openTag(XFFTools.XFF_BIOJAVA_NS, "prop");
             xw.attribute("key", (String) key);
             xw.print((String) value);
-            xw.closeTag("biojava:prop");
+            xw.closeTag(XFFTools.XFF_BIOJAVA_NS, "prop");
         }
     }
 }

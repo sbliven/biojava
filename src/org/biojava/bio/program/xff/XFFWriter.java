@@ -157,9 +157,10 @@ public class XFFWriter {
     {
 	xw.openTag("featureSet");
 	if (explicitNamespace) {
-	    xw.attribute("xmlns", "http://www.bioxml.org/2000/xff");
-	    xw.attribute("xmlns:biojava", "http://www.biojava.org/2001/xff-biojava");
+		xw.declareNamespace(XFFTools.XFF_NS, "");
+		xw.declareNamespace(XFFTools.XFF_BIOJAVA_NS, "biojava");
 	}
+	
 	for (Iterator fi = fh.features(); fi.hasNext(); ) {
 	    Feature f = (Feature) fi.next();
 	    emitFeature_xff(f, xw);
