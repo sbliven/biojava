@@ -60,7 +60,8 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
         this.description = null;
         this.ontology = ontology;
         this.identifier = null;        
-        if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+        if (synonyms!=null 
+                && synonyms.length != 0) this.synonyms.addAll(Arrays.asList(synonyms));
     }
     
     // Hibernate requirement - not for public use.

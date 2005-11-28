@@ -63,6 +63,9 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     /**
      * {@inheritDoc}
+     * The map is a copy of the internal structure. It is a map of 
+     * <code>ComparableTerm</code>s to <code>String</code>s corresponding
+     * to the Term and Value of the <code>Note</code>s in the annotation.
      */
     public Map asMap() {
         Map m = new TreeMap();
