@@ -131,6 +131,12 @@ public class SimpleNamespaceTest extends TestCase {
         System.out.println("testGetDescription");
         
         //should be null until set
+        assertNull(ns.getDescription());
+        try{
+            ns.setDescription(desc);
+        }catch(Exception ex){
+            fail("Was not expecting "+ex.getClass().getName());
+        }
         assertEquals(desc, ns.getDescription());
     }
 
