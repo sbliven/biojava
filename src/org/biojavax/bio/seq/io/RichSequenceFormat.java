@@ -22,6 +22,7 @@
 package org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import org.biojava.bio.BioException;
@@ -30,6 +31,7 @@ import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojavax.Namespace;
+import org.biojavax.bio.seq.RichSequence;
 
 
 /**
@@ -37,6 +39,28 @@ import org.biojavax.Namespace;
  * @author Richard Holland
  */
 public interface RichSequenceFormat extends SequenceFormat {
+    /**
+     * Check to see if a given file is in our format. Some formats may be
+     * able to determine this by filename, whilst others may have to open the
+     * file and read it to see what format it is in.
+     * @param file  the <code>File</code> to check.
+     * @return true if the file is readable by this format, false if not.
+     * @throws IOException in case the file is inaccessible.
+     */
+    public boolean canRead(File file) throws IOException;
+
+    /**
+     * On the assumption that the file is readable by this format (not checked),
+     * attempt to guess which symbol tokenization we should use to read it.
+     * For formats that only accept one tokenization, just return it without 
+     * checking the file. For formats that accept multiple tokenizations, its 
+     * up to you how you do it.
+     * @param file  the <code>File</code> object to guess the format of.
+     * @return a <code>SymbolTokenization</code> to read the file with.
+     * @throws IOException if the file is unrecognisable or inaccessible.
+     */
+    public SymbolTokenization guessSymbolTokenization(File file) throws IOException;
+    
     /**
      * Sets the stream to write to.
      * @param os the PrintStream to write to.
@@ -81,7 +105,7 @@ public interface RichSequenceFormat extends SequenceFormat {
      * @throws IOException if there was a read error.
      */
     public boolean readRichSequence(BufferedReader reader, SymbolTokenization symParser,
-            RichSeqIOListener listener,Namespace ns) throws BioException, IllegalSymbolException, IOException;
+            RichSeqIOListener listener, Namespace ns) throws BioException, IllegalSymbolException, IOException;
     
     /**
      * Writes a sequence out to the outputstream given by beginWriting() using the default format of the
@@ -161,7 +185,7 @@ public interface RichSequenceFormat extends SequenceFormat {
     public boolean getElideComments();
     
     /**
-     * Provides a basic format with simple things like line-widths precoded.
+     * Provides a basic format with simple things like line-widths precoded. 
      */
     public abstract class BasicFormat implements RichSequenceFormat  {
         
@@ -171,6 +195,20 @@ public interface RichSequenceFormat extends SequenceFormat {
         private boolean elideComments = false;
         private boolean elideReferences = false;
         private PrintStream os;
+        
+        /**
+         * {@inheritDoc}
+         */
+        public boolean canRead(File file) throws IOException {
+            return false;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+            return RichSequence.IOTools.getDNAParser();
+        }
         
         /**
          * {@inheritDoc}

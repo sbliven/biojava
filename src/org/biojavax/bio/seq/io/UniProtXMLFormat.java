@@ -22,6 +22,8 @@
 package	org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -98,6 +100,11 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Richard Holland
  */
 public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
+                        
+    // Register this format with the format auto-guesser.
+    static {
+        RichSequence.IOTools.registerFormat(UniProtXMLFormat.class);
+    }
     
     /**
      * The name of this format
@@ -208,6 +215,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     
     // RP line parser
     protected static final Pattern rppat = Pattern.compile("SEQUENCE OF (\\d+)-(\\d+)");
+    
+    protected static final Pattern xmlSchema = Pattern.compile(".*http://www\\.uniprot\\.org/support/docs/uniprot\\.xsd.*");
     
     /**
      * Implements some UniProtXML-specific terms.
@@ -353,6 +362,26 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             if (LOCATION_SEQUENCE_TERM==null) LOCATION_SEQUENCE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("locseq");
             return LOCATION_SEQUENCE_TERM;
         }
+    }    
+    
+    /**
+     * {@inheritDoc}
+     * A file is in UniProtXML format if the second XML line contains the phrase "http://www.uniprot.org/support/docs/uniprot.xsd".
+     */
+    public boolean canRead(File file) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        br.readLine(); // skip first line
+        boolean readable = xmlSchema.matcher(br.readLine()).matches(); // check on second line
+        br.close();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Always returns a protein tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        return RichSequence.IOTools.getProteinParser();
     }
     
     /**

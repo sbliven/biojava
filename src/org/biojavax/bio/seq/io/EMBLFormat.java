@@ -22,6 +22,8 @@
 package	org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -76,6 +78,11 @@ import org.biojavax.utils.StringTools;
  */
 public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     
+    // Register this format with the format auto-guesser.
+    static {
+        RichSequence.IOTools.registerFormat(EMBLFormat.class);
+    }
+    
     /**
      * The name of this format
      */
@@ -120,6 +127,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final Pattern rpp = Pattern.compile("^(\\d+)(-(\\d+))?$");
     // dbxref line
     protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
+
+    protected static final Pattern readableFileNames = Pattern.compile(".*\\u002e(em|dat).*");
+    protected static final Pattern headerLine = Pattern.compile("^ID.*");
     
     /**
      * Implements some EMBL-specific terms.
@@ -135,6 +145,28 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             if (EMBL_TERM==null) EMBL_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBL");
             return EMBL_TERM;
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A file is in EMBL format if its name contains the word eem or edat, or the first line matches
+     * the EMBL format for the ID line.
+     */
+    public boolean canRead(File file) throws IOException {
+        if (readableFileNames.matcher(file.getName()).matches()) return true;        
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String firstLine = br.readLine();
+        boolean readable = headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
+        br.close();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Always returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        return RichSequence.IOTools.getDNAParser();
     }
     
     /**
@@ -232,7 +264,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             } else if (sectionKey.equals(VERSION_TAG)) {
                 String ver = ((String[])section.get(0))[1];
                 Matcher m = vp.matcher(ver);
-                if (m.matches()) {                   
+                if (m.matches()) {
                     String verAcc = m.group(1);
                     if (!accession.equals(verAcc)) {
                         // the version refers to a different accession!
@@ -699,8 +731,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 accessions.append(" ");
                 accessions.append(n.getValue());
                 accessions.append(";");
-            }
-            else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle=n.getValue();
+            } else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle=n.getValue();
         }
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
@@ -794,7 +825,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             CrossRef c = rcr.getCrossRef();
             Set noteset = c.getNoteSet();
             StringBuffer sb = new StringBuffer();
-            sb.append(c.getDbname()); 
+            sb.append(c.getDbname());
             sb.append("; ");
             sb.append(c.getAccession());
             boolean hasSecondary = false;

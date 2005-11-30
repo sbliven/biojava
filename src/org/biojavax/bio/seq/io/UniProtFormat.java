@@ -22,6 +22,8 @@
 package	org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -82,6 +84,11 @@ import org.biojavax.utils.StringTools;
  */
 public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     
+    // Register this format with the format auto-guesser.
+    static {
+        RichSequence.IOTools.registerFormat(UniProtFormat.class);
+    }
+    
     /**
      * The name of this format
      */
@@ -123,6 +130,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     // feature line
     protected static final Pattern fp = Pattern.compile("^\\s*([\\d?<]+\\s+[\\d?>]+)(\\s+(\\S.*)\\.*)?$");
     
+    protected static final Pattern headerLine = Pattern.compile("^ID.*");
     
     /**
      * Implements some UniProt-specific terms.
@@ -143,6 +151,26 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             if (UNIPROT_TERM==null) UNIPROT_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt");
             return UNIPROT_TERM;
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A file is in UniProt format if the first line matches the UniProt format for the ID line.
+     */
+    public boolean canRead(File file) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String firstLine = br.readLine();
+        boolean readable = headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
+        br.close();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Always returns a protein tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        return RichSequence.IOTools.getProteinParser();
     }
     
     /**
@@ -225,7 +253,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                                 for (int j = 2 ; j < parts.length; j++) {
                                     String syn = parts[j].trim();
                                     if (syn.endsWith(")")) syn = syn.substring(0,syn.length()-1); // chomp trailing bracket
-                                    synonym.add(syn); 
+                                    synonym.add(syn);
                                 }
                             }
                         }
@@ -778,8 +806,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 accessions.append(" ");
                 accessions.append(n.getValue());
                 accessions.append(";");
-            }
-            else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle = (organelle==null?"":organelle+"; ")+n.getValue();
+            } else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle = (organelle==null?"":organelle+"; ")+n.getValue();
             // use the nasty hack to split the reference rank away from the actual value in this field
             else if (n.getTerm().equals(Terms.getGeneNameTerm()))  {
                 String ref = n.getValue();

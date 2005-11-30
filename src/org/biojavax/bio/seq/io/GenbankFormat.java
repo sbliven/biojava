@@ -22,6 +22,8 @@
 package	org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -75,6 +77,11 @@ import org.biojavax.utils.StringTools;
  * @author MarkSchreiber
  */
 public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
+                
+    // Register this format with the format auto-guesser.
+    static {
+        RichSequence.IOTools.registerFormat(GenbankFormat.class);
+    }
     
     /**
      * The name of this format
@@ -117,6 +124,9 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     //  \s{21} /word
     protected static final Pattern sectp = Pattern.compile("^(\\s{0,8}(\\S+)\\s{1,7}(.*)|\\s{21}(/\\S+?)=(.*)|\\s{21}(/\\S+))$");
     
+    protected static final Pattern readableFiles = Pattern.compile(".*(gbk$|\\u002egb.*)");
+    protected static final Pattern headerLine = Pattern.compile("^LOCUS.*");
+    
     /**
      * Implements some GenBank-specific terms.
      */
@@ -131,6 +141,32 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
             return GENBANK_TERM;
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A file is in GenBank format if the name ends with gbk, contains the letters egb, or the first line of
+     * the file starts with the word LOCUS
+     */
+    public boolean canRead(File file) throws IOException {
+        if (readableFiles.matcher(file.getName()).matches()) return true;
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        boolean readable = headerLine.matcher(br.readLine()).matches();
+        br.close();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Returns an protein parser if the letter A appears in the first line of the file.
+     * Otherwise returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        boolean aa = br.readLine().indexOf('A')>0;
+        br.close();
+        if (aa) return RichSequence.IOTools.getProteinParser();
+        else return RichSequence.IOTools.getDNAParser();
     }
     
     /**

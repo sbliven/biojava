@@ -20,11 +20,14 @@
  */
 
 package org.biojavax.bio.seq;
-
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
@@ -47,6 +50,7 @@ import org.biojavax.bio.seq.io.FastaFormat;
 import org.biojavax.bio.seq.io.GenbankFormat;
 import org.biojavax.bio.seq.io.INSDseqFormat;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
+import org.biojavax.bio.seq.io.RichSequenceFormat;
 import org.biojavax.bio.seq.io.RichStreamReader;
 import org.biojavax.bio.seq.io.RichStreamWriter;
 import org.biojavax.bio.seq.io.UniProtFormat;
@@ -127,7 +131,7 @@ public interface RichSequence extends BioEntry,Sequence {
      * @return true if the this is circular else false.
      */
     public boolean getCircular();
-            
+    
     /**
      * Stores a number of useful terms used across many sequence formats for consistency's sake.
      */
@@ -392,7 +396,7 @@ public interface RichSequence extends BioEntry,Sequence {
         public static ComparableTerm getCopyrightTerm() {
             if (COPYRIGHT_TERM==null) COPYRIGHT_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("copyright");
             return COPYRIGHT_TERM;
-        }        
+        }
     }
     
     /**
@@ -455,6 +459,70 @@ public interface RichSequence extends BioEntry,Sequence {
         
         // This can't be instantiated.
         private IOTools() {}
+        
+        /**
+         * Register a new format with IOTools for auto-guessing.
+         * @param formatClass   the <code>RichSequenceFormat</code> object to register.
+         */
+        public static void registerFormat(Class formatClass) {
+            Object o;
+            try {
+                o = formatClass.newInstance();
+            } catch (Exception e) {
+                throw new BioError(e);
+            }
+            if (!(o instanceof RichSequenceFormat)) throw new BioError("Class "+formatClass+" is not an implementation of RichSequenceFormat!");
+            formatClasses.add(formatClass);
+        }
+        // Private reference to the formats we know about.
+        private static List formatClasses = new ArrayList();
+        
+        /**
+         * Guess which format a file is then attempt to read it.
+         * @param file  the <code>File</code> to attempt to read.
+         * @param seqFactory a factory used to build a <code>RichSequence</code>
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then
+         *              <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code>
+         *              over each sequence in the file
+         * @throws IOException in case the file is unrecognisable or problems occur in reading it.
+         */
+        public static RichSequenceIterator readFile(File file, RichSequenceBuilderFactory seqFactory,
+                Namespace ns) throws IOException {
+            for (Iterator i = formatClasses.iterator(); i.hasNext(); ) {
+                Class formatClass = (Class)i.next();
+                RichSequenceFormat format;
+                try {
+                    format = (RichSequenceFormat)formatClass.newInstance();
+                } catch (Exception e) {
+                    throw new BioError(e);
+                }
+                if (format.canRead(file)) {
+                    SymbolTokenization sTok = format.guessSymbolTokenization(file);
+                    BufferedReader br = new BufferedReader(new FileReader(file));
+                    return new RichStreamReader(br, format, sTok, seqFactory, ns);
+                }
+            }
+            throw new IOException("Could not recognise format of file: "+file.getName());
+        }
+        
+        /**
+         * Guess which format a file is then attempt to read it.
+         * @param file  the <code>File</code> to attempt to read.
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then
+         *              <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code>
+         *              over each sequence in the file
+         */
+        public static RichSequenceIterator readFile(File file, Namespace ns) throws IOException {
+            return readFile(file, factory, ns);
+        }
         
         /**
          * Read a fasta file.
@@ -1175,8 +1243,11 @@ public interface RichSequence extends BioEntry,Sequence {
         }
         
         
-        // creates a DNA symbol tokenizer
-        private static SymbolTokenization getDNAParser() {
+        /**
+         * Creates a DNA symbol tokenizer.
+         * @return a <code>SymbolTokenization</code> for parsing DNA.
+         */
+        public static SymbolTokenization getDNAParser() {
             try {
                 return DNATools.getDNA().getTokenization("token");
             } catch (BioException ex) {
@@ -1185,8 +1256,11 @@ public interface RichSequence extends BioEntry,Sequence {
             }
         }
         
-        // creates a RNA symbol tokenizer
-        private static SymbolTokenization getRNAParser() {
+        /**
+         * Creates a RNA symbol tokenizer.
+         * @return a <code>SymbolTokenization</code> for parsing RNA.
+         */
+        public static SymbolTokenization getRNAParser() {
             try {
                 return RNATools.getRNA().getTokenization("token");
             } catch (BioException ex) {
@@ -1195,8 +1269,11 @@ public interface RichSequence extends BioEntry,Sequence {
             }
         }
         
-        // creates a nucleotide symbol tokenizer
-        private static SymbolTokenization getNucleotideParser() {
+        /**
+         * Creates a nucleotide symbol tokenizer.
+         * @return a <code>SymbolTokenization</code> for parsing nucleotides.
+         */
+        public static SymbolTokenization getNucleotideParser() {
             try {
                 return NucleotideTools.getNucleotide().getTokenization("token");
             } catch (BioException ex) {
@@ -1205,8 +1282,11 @@ public interface RichSequence extends BioEntry,Sequence {
             }
         }
         
-        // creates a protein symbol tokenizer
-        private static SymbolTokenization getProteinParser() {
+        /**
+         * Creates a protein symbol tokenizer.
+         * @return a <code>SymbolTokenization</code> for parsing protein.
+         */
+        public static SymbolTokenization getProteinParser() {
             try {
                 return ProteinTools.getTAlphabet().getTokenization("token");
             } catch (BioException ex) {

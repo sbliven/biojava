@@ -22,6 +22,8 @@
 package	org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -85,6 +87,11 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Richard Holland
  */
 public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
+                    
+    // Register this format with the format auto-guesser.
+    static {
+        RichSequence.IOTools.registerFormat(INSDseqFormat.class);
+    }
     
     /**
      * The name of this format
@@ -150,6 +157,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     // dbxref line
     protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
     
+    protected static final Pattern xmlSchema = Pattern.compile(".*http://www\\.ebi\\.ac\\.uk/dtd/INSD_INSDSeq\\.dtd.*");
+    
     /**
      * Implements some INSDseq-specific terms.
      */
@@ -164,6 +173,26 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             if (INSDSEQ_TERM==null) INSDSEQ_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("INSDseq");
             return INSDSEQ_TERM;
         }
+    }    
+    
+    /**
+     * {@inheritDoc}
+     * A file is in INSDseq format if the second XML line contains the phrase "http://www.ebi.ac.uk/dtd/INSD_INSDSeq.dtd".
+     */
+    public boolean canRead(File file) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        br.readLine(); // skip first line
+        boolean readable = xmlSchema.matcher(br.readLine()).matches(); // check on second line
+        br.close();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Always returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        return RichSequence.IOTools.getDNAParser();
     }
     
     /**

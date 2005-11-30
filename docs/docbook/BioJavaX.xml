@@ -1017,6 +1017,18 @@ Namespace ns = RichObjectFactory.getDefaultNamespace();                   // a n
 RichSequenceIterator seqs = RichSequence.IOTools.readGenbankDNA(br,ns);   // we are reading DNA sequences
 RichSequence.IOTools.writeEMBLxml(System.out, seqs, ns);                  // write the whole lot in EMBLxml format to standard out</programlisting>
 
+      <para>If you don't know what format your input file is in, but know it
+      could be one of a fixed set of acceptable formats, then you can use
+      BioJavaX's format-guessing routine to attempt to read it:</para>
+
+      <programlisting>// Not sure if your input is EMBL or Genbank? Load them both here.
+Class.forName("org.biojavax.bio.seq.io.EMBLFormat");
+Class.forName("org.biojavax.bio.seq.io.GenbankFormat");
+
+// Now let BioJavaX guess which format you actually should use (using the default namespace)
+Namespace ns = RichObjectFactory.getDefaultNamespace();         
+RichSequenceIterator seqs = RichSequence.IOTools.readFile(new File("myfile.seq"),ns);</programlisting>
+
       <para>For those who like to do things the hard way, reading and writing
       by directly using the <code>RichStreamReader</code> and
       <code>RichStreamWriter</code> interfaces is described below.</para>
@@ -3037,6 +3049,25 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
           </tbody>
         </tgroup>
       </table>
+    </section>
+
+    <section>
+      <title>New formats</title>
+
+      <para>If you want to add a new format, the best thing to do is to extend
+      <code>RIchSequenceFormat.BasicFormat</code> and go from there. In order
+      to make your class work with the automatic format-guesser
+      (<code>RichSequence.IOTools.readFile()</code>) you'll need to implement
+      <code>canRead()</code> and <code>guessSymbolTokenization()</code>, and
+      add a static initializer block to your class, similar to this:</para>
+
+      <programlisting>public class MyFormat extends RichSequenceFormat.BasicFormat {
+    static {
+        RichSequence.IOTools.registerFormat(MyFormat.class);
+    }
+
+    // implement the rest of the class here ...
+}</programlisting>
     </section>
 
     <section>

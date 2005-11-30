@@ -22,6 +22,8 @@
 package org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.regex.Matcher;
@@ -52,6 +54,11 @@ import org.biojavax.bio.seq.RichSequence;
  */
 
 public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
+            
+    // Register this format with the format auto-guesser.
+    static {
+        RichSequence.IOTools.registerFormat(FastaFormat.class);
+    }
     
     /**
      * The name of this format
@@ -62,6 +69,35 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final Pattern hp = Pattern.compile(">(\\S+)(\\s+(.*))?");
     // description chunk
     protected static final Pattern dp = Pattern.compile( "^(gi\\|(\\d+)\\|)*(\\S+)\\|(\\S+?)(\\.(\\d+))*\\|(\\S+)$");
+    
+    protected static final Pattern readableFiles = Pattern.compile(".*(fa|fas)$");
+    protected static final Pattern aminoAcids = Pattern.compile(".*[FLIPQE].*");
+    
+    /**
+     * {@inheritDoc}
+     * A file is in FASTA format if the name ends with fa or fas, or the file starts with ">".
+     */
+    public boolean canRead(File file) throws IOException {
+        if (readableFiles.matcher(file.getName()).matches()) return true;
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        boolean readable = br.readLine().startsWith(">");
+        br.close();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Returns an protein parser if the first line of sequence contains any of F/L/I/P/Q/E, 
+     * otherwise returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        br.readLine(); // discard first line
+        boolean aa = aminoAcids.matcher(br.readLine()).matches();
+        br.close();
+        if (aa) return RichSequence.IOTools.getProteinParser();
+        else return RichSequence.IOTools.getDNAParser();
+    }
     
     /**
      * {@inheritDoc}

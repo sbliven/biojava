@@ -22,6 +22,8 @@
 package	org.biojavax.bio.seq.io;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -34,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.biojava.bio.seq.Sequence;
@@ -89,6 +92,11 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Richard Holland
  */
 public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
+        
+    // Register this format with the format auto-guesser.
+    static {
+        RichSequence.IOTools.registerFormat(EMBLxmlFormat.class);
+    }
     
     /**
      * The name of this format
@@ -177,6 +185,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
     protected static final String SEQUENCE_TOPOLOGY_ATTR = "topology";
     protected static final String SEQUENCE_VER_ATTR = "version";
     
+    protected static final Pattern xmlSchema = Pattern.compile(".*http://www\\.ebi\\.ac\\.uk/schema/EMBL_schema\\.xsd.*");
+    
     /**
      * Implements some EMBLxml-specific terms.
      */
@@ -191,6 +201,26 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             if (EMBLXML_TERM==null) EMBLXML_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBLxml");
             return EMBLXML_TERM;
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A file is in EMBLxml format if the second XML line contains the phrase "http://www.ebi.ac.uk/schema/EMBL_schema.xsd".
+     */
+    public boolean canRead(File file) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        br.readLine(); // skip first line
+        boolean readable = xmlSchema.matcher(br.readLine()).matches(); // check on second line
+        br.close();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Always returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        return RichSequence.IOTools.getDNAParser();
     }
     
     /**
