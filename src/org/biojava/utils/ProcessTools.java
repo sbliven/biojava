@@ -47,6 +47,8 @@ import java.util.*;
  * @author Thomas Down
  * @author Francois Pepin
  * @since 1.4
+ * @deprecated preferable to use org.biojava.utils.ExecRunner 
+ * or the org.biojava.utils.process package.
  */
 
 public class ProcessTools {
