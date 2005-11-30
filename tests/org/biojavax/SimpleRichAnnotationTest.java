@@ -155,6 +155,35 @@ public class SimpleRichAnnotationTest extends TestCase {
     }
 
     /**
+     * Test of getPropertys method, of class org.biojavax.SimpleRichAnnotation.
+     */
+    public void testGetPropertys() {
+        System.out.println("testGetPropertys");
+        
+        //add a note with the same term but different rank
+        Note note2 = new SimpleNote(note.getTerm(), "bar1", 1);
+        
+        try{
+            anno1.addNote(note2);
+        }catch(Exception ex){
+            fail("Not expecting "+ex.getClass().getName());
+        }
+        
+        //should be two notes whichever way you do it
+        assertEquals(2, anno1.getProperties(note2.getTerm()).length);
+        assertEquals(2, anno1.getProperties(note.getTerm()).length);
+        assertEquals(2, anno1.getProperties("foo").length);
+        
+        Note[] notes = anno1.getProperties(note.getTerm());
+        assertEquals(note.getValue(), notes[0].getValue());
+        assertEquals(note2.getValue(), notes[1].getValue());
+        
+        //should be an empty array not null;
+        assertNotNull(anno1.getProperties("not_here"));
+        assertEquals(0, anno1.getProperties("not_here").length);
+    }
+    
+    /**
      * Test of keys method, of class org.biojavax.SimpleRichAnnotation.
      */
     public void testKeys() {

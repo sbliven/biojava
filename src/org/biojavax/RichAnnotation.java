@@ -89,6 +89,18 @@ public interface RichAnnotation extends Annotation {
      * @throws ChangeVetoException if it doesn't like any of them.
      * @see Note
      */
-    public void setNoteSet(Set notes) throws ChangeVetoException;   
+    public void setNoteSet(Set notes) throws ChangeVetoException;
+    
+    /**
+     * Find all the <code>Note</code>s with any rank that match the key.
+     * @param key either a <code>String</code> identifier of a term from the
+     * default onltology or a <code>ComparableTerm</code>
+     * @return an array of matching <code>Notes</code> in order of rank or an
+     * empty array if there are no matches. No implementation should ever 
+     * return null!
+     * @see Note
+     * @see org.biojavax.ontology.ComparableTerm
+     */
+    public Note[] getProperties(Object key);
     
 }

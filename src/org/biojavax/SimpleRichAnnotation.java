@@ -26,8 +26,11 @@
  */
 
 package org.biojavax;
+import java.util.Collections;
 import java.util.TreeMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -38,7 +41,6 @@ import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
-import org.biojavax.RichObjectFactory;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -136,8 +138,30 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     /**
      * {@inheritDoc}
+     * Strictly it will return the <code>Note</code> which matches the 
+     * <code>key</code> (or a <code>Term</code> made with a <code>String</code> key)
+     * with a rank of 0.
+     * @see #getProperties(Object key)
      */
     public Object getProperty(Object key) throws NoSuchElementException { return this.getNote(this.dummyNote(key)).getValue(); }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Note[] getProperties(Object key){
+        ComparableTerm term = dummyNote(key).getTerm();
+        List l = new LinkedList();
+        for(Iterator i = notes.iterator(); i.hasNext();){
+            Note n = (Note)i.next();
+            if(n.getTerm().equals(term)){
+                l.add(n);
+            }
+        }
+        Collections.sort(l);
+        Note[] na = new Note[l.size()];
+        l.toArray(na);
+        return na;
+    }
     
     /**
      * {@inheritDoc}
