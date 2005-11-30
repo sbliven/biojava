@@ -133,12 +133,11 @@ public interface ChangeListener extends EventListener {
   public class ChangeEventRecorder extends ChangeAdapter{
       private ChangeEvent event;
       
-      public ChangeType getEvent(){return this.event;}
+      public ChangeEvent getEvent(){return this.event;}
       
       public void preChange(ChangeEvent cev) throws ChangeVetoException {
           event = cev;
       }
-    }
   }
   
   /**
