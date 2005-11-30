@@ -124,6 +124,24 @@ public interface ChangeListener extends EventListener {
   }
   
   /**
+   * A listener that remembers the ChangeEvent of the last change. Mostly for
+   * debugging.
+   * @author Mark Schreiber
+   * @since 1.5
+   */
+   
+  public class ChangeEventRecorder extends ChangeAdapter{
+      private ChangeEvent event;
+      
+      public ChangeType getEvent(){return this.event;}
+      
+      public void preChange(ChangeEvent cev) throws ChangeVetoException {
+          event = cev;
+      }
+    }
+  }
+  
+  /**
    * A listener that writes information about the event stream to a PrintStream.
    * 
    * @author Matthew Pocock
