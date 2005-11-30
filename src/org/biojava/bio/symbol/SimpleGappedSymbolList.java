@@ -33,7 +33,10 @@ import org.biojava.utils.AssertionFailure;
 
 /**
  * This implementation of GappedSymbolList wraps a SymbolList, allowing you to
- * insert gaps.
+ * insert gaps. Please note that this is a view onto another SymbolList. Gaps
+ * created and removed are only in the view not the underlying original. This
+ * means that any gaps present in the original cannot be manipulated in this
+ * view. To manipulate the original you would need to use Edit objects.
  *
  * @author Matthew Pocock
  * @since 1.3

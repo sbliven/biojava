@@ -35,7 +35,10 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.AssertionFailure;
 
 /**
- * Simple implementation of GappedSequence.
+ * Simple implementation of GappedSequence. Please note that this is a view onto 
+ * another Sequence. Gaps created and removed are only in the view not the underlying original. This
+ * means that any gaps present in the original cannot be manipulated in this
+ * view. To manipulate the original you would need to use Edit objects.
  *
  * @author Thomas Down
  * @author Matthew Pocock
