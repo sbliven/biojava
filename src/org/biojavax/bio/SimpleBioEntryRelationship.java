@@ -125,9 +125,11 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
         if (this.object==null) return -1;
+        //simple
+        if (this == o) return 0;
         // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)o;
-        int ourRank = (this.rank==null?0:this.rank.intValue());
+        int ourRank = (this.getRank()==null?0:this.rank.intValue());
         int theirRank = (them.getRank()==null?0:them.getRank().intValue());
         if (ourRank!=theirRank) return ourRank-theirRank;
         if (!this.object.equals(them.getObject())) return this.object.compareTo(them.getObject());
@@ -137,8 +139,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     
     /**
      * {@inheritDoc} 
-     * Relationships are equal if they share the same object, subject and term, regardless
-     * of rank.
+     * Relationships are equal if they share the same object, subject, rank and term.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -147,9 +148,18 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
         if (this.object==null) return false;
         // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)obj;
-        return (this.subject.equals(them.getSubject()) &&
+        if(this.getRank() == null && them.getRank() == null){
+           return (this.subject.equals(them.getSubject()) &&
                 this.object.equals(them.getObject()) &&
-                this.term.equals(them.getTerm()));
+                this.term.equals(them.getTerm())); 
+        }
+        if(this.getRank() != null && them.getRank() != null){
+            return (this.subject.equals(them.getSubject()) &&
+                    this.object.equals(them.getObject()) &&
+                    this.term.equals(them.getTerm()) &&
+                    this.rank.equals(them.getRank()));
+        }
+        return false;
     }
     
     /**
@@ -163,6 +173,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
         code = code*37 + this.object.hashCode();
         code = code*37 + this.subject.hashCode();
         code = code*37 + this.term.hashCode();
+        code = code*37 + (this.getRank() == null ? 0 : this.rank.hashCode());
         return code;
     }
     
