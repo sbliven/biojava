@@ -38,6 +38,8 @@ import org.biojava.bio.Annotation;
  */
 public class ChainImpl implements Chain {
 
+    public static String DEFAULT_CHAIN_ID = " ";
+    
     String swissprot_id ; 
     String name ; // like in PDBfile
     ArrayList groups;
@@ -47,8 +49,8 @@ public class ChainImpl implements Chain {
      */
     public ChainImpl() {
 	super();
-	// TODO Auto-generated constructor stub
-	name = "";
+	
+	name = DEFAULT_CHAIN_ID;
 	groups = new ArrayList() ;
 	
 	Annotation anno = Annotation.EMPTY_ANNOTATION;
