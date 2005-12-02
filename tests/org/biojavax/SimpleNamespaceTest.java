@@ -110,7 +110,7 @@ public class SimpleNamespaceTest extends TestCase {
      */
     public void testGetAcronym() {
         System.out.println("testGetAcronym");
-        System.out.println(ns.getAcronym());
+        //System.out.println(ns.getAcronym());
         //should be set because of retreival from the LRU cache
         assertEquals(acronym, ns.getAcronym());
     }
@@ -130,8 +130,8 @@ public class SimpleNamespaceTest extends TestCase {
     public void testGetDescription() {
         System.out.println("testGetDescription");
         
-        //should be null until set
-        assertNull(ns.getDescription());
+        //should be set because of LRU cache
+        assertEquals(desc, ns.getDescription());
         try{
             ns.setDescription(desc);
         }catch(Exception ex){
