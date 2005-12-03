@@ -100,6 +100,14 @@ public class RichObjectFactory {
     }
     
     /**
+     * Removes all objects of the specified class from the LRU cache.
+     * @param clazz The class of the objects to remove.
+     */
+    public static synchronized void clearLRUCache(Class clazz){
+        cache.remove(clazz);
+    }
+    
+    /**
      * Sets the size of the LRU cache. This is the size per class of object requested, so
      * if you set it to 20 and request 3 different types of object, you will get 20*3=60
      * entries in the cache. The default cache size is 20. Setting this value will undo 
