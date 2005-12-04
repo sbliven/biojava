@@ -32,6 +32,7 @@ import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.RankedCrossRef;
+import org.biojavax.RichAnnotation;
 
 /**
  * A Term object that can be compared and thus sorted.
@@ -254,7 +255,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
      * {@inheritDoc}
      * ALWAYS RETURNS AN EMPTY ANNOTATION OBJECT
      */
-    public Annotation getAnnotation() { return Annotation.EMPTY_ANNOTATION; }
+    public Annotation getAnnotation() { return RichAnnotation.EMPTY_ANNOTATION; }
     
     /**
      * {@inheritDoc}
