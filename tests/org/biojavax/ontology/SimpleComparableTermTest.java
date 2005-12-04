@@ -11,11 +11,11 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 import junit.framework.*;
-import org.biojava.bio.Annotation;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeListener.ChangeEventRecorder;
 import org.biojavax.RankedCrossRef;
+import org.biojavax.RichAnnotation;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.SimpleCrossRef;
 import org.biojavax.SimpleRankedCrossRef;
@@ -314,7 +314,7 @@ public class SimpleComparableTermTest extends TestCase {
         System.out.println("testGetAnnotation");
         
         // always Empty
-        assertEquals(Annotation.EMPTY_ANNOTATION, t1.getAnnotation());
+        assertEquals(RichAnnotation.EMPTY_ANNOTATION, t1.getAnnotation());
     }
 
     /**
