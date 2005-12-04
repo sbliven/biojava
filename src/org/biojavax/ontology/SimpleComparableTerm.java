@@ -59,7 +59,8 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
         this.name = name;
         this.description = null;
         this.ontology = ontology;
-        this.identifier = null;        
+        this.identifier = null;
+        this.obsolete = Boolean.FALSE;
         if (synonyms!=null 
                 && synonyms.length != 0) this.synonyms.addAll(Arrays.asList(synonyms));
     }
