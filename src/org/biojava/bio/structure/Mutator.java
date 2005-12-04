@@ -90,6 +90,9 @@ public class Mutator{
     /** creates a new structure which is identical with the original one. 
      * only one amino acid will be different.
      * 
+     * 
+     * 
+     * 
      * @param struc
      * @param chainId
      * @param pdbResnum
@@ -157,7 +160,6 @@ public class Mutator{
     
     /** create a new residue which is of the new type. 
      * Only the atoms N, Ca, C, O, Cb will be considered.
-     * prolines are not mutated...
      * @param oldAmino
      * @param newType
      * @return
