@@ -147,6 +147,15 @@ public class HetatomImpl implements Group {
 	}
     };
 
+    
+    /** remove all atoms 
+     * 
+     */
+    public void clearAtoms() {
+        atoms.clear(); 
+        setPDBFlag(false);
+    }
+    
     /** getnumber of atoms. 
      *  @return number of atoms
      */
@@ -328,6 +337,7 @@ public class HetatomImpl implements Group {
      * @return  and identical copy of this Group object 
      */
     public Object clone(){
+        
 	HetatomImpl n = new HetatomImpl();
 	n.setPDBFlag(has3D());
 	n.setPDBCode(getPDBCode());

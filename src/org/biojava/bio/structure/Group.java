@@ -103,6 +103,12 @@ public interface Group {
      */
     public List getAtoms() ;
         
+    /** remove all atoms from this group
+     * 
+     *
+     */
+    public void clearAtoms();
+    
     /** get an atom throws StructureException if atom not found.
      *
      * @param name  a String

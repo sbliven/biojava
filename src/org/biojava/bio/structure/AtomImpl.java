@@ -31,33 +31,33 @@ package org.biojava.bio.structure;
  * @version %I% %G%
  */
 public class AtomImpl implements Atom {
-
+    
     String name     ;
     String fullName ;
     double[] coords ;
     String pdbline  ;
     int pdbserial   ;
-
+    
     double occupancy ;
     double tempfactor;
-
+    
     Character altLoc ;
-
+    
     public AtomImpl () {
-	name     = null        ;
-	fullName = null        ;
-	coords   = new double[3];
-	pdbline  = ""          ;  
-	occupancy  = 0.0       ;
-	tempfactor = 0.0       ;
-	altLoc = new Character(' ');
+        name     = null        ;
+        fullName = null        ;
+        coords   = new double[3];
+        pdbline  = ""          ;  
+        occupancy  = 0.0       ;
+        tempfactor = 0.0       ;
+        altLoc = new Character(' ');
     }
-
+    
     /** trimmed version of atom name, e.g. "CA" 
      * @see #getName
      */
     public void   setName(String s) { name = s ;}
-
+    
     /**
      * Gets this object's name.
      * @return a String representing the name value
@@ -67,106 +67,108 @@ public class AtomImpl implements Atom {
     
     /** set full name of atom e.g. " CA " .
      * @see #getFullName
-*/
+     */
     public void   setFullName( String s ) { fullName =s ; }
-
+    
     /** get full name of atom e.g. " CA ". 
      * @return a String representing the full name value
      * @see #setFullName
      */
     public String getFullName()           { return fullName; }
-
+    
     /** set PDB atom number. 
      * @see #getPDBserial
      */
     public void setPDBserial(int i) { pdbserial = i    ; }
-
+    
     /** get PDB atom number.
      * @see #setPDBserial
      */
     public int  getPDBserial()      { return pdbserial ; }
-
+    
     /** the coordinates.
      * @see #getCoords 
      */    
     public void     setCoords( double[] c ) { coords = c   ; } 
-
+    
     /** get the coordinates as a double[3] array .
      * @return an array of doubles representing the coords value
      * @see #setCoords     
      */
     public double[] getCoords()            { return coords ; }
-
+    
     public void setX(double x) {
-	coords[0] = x ;
+        coords[0] = x ;
     }
     public void setY(double y) {
-	coords[1] = y ;
+        coords[1] = y ;
     }
     public void setZ(double z) {
-	coords[2] = z ;
+        coords[2] = z ;
     }
     
     /** get the X coordinate. */
     public double getX() { return coords[0]; }
-
+    
     /** get the Y coordinate. */
     public double getY() { return coords[1]; }
-
+    
     /** get the Z coordinate. */
     public double getZ() { return coords[2]; }
-
+    
     /** set alternate Location. 
      * @see #getAltLoc
      */
     public void setAltLoc(Character c) {
-	altLoc = c ;
+        altLoc = c ;
     }
     /** get alternate Location.
      * @return a Character object representing the alt loc value
      * @see #setAltLoc
      */
     public Character getAltLoc() {
-	return altLoc ;
+        return altLoc ;
     }
-
+    
     
     /** store the whole line. 
      * @see #getPDBline
      */
     public void   setPDBline(String s) { pdbline = s;}
-
+    
     /** get the whole line .
      * @return a String representing the PDBline value
      * @see #setPDBline
      */
     public String getPDBline() { return pdbline ;}
-
+    
     /** string representation. */
     public String toString() {
-	String str = name +" "+ pdbserial + " " + coords[0] + " " + coords[1] + " " + coords[2];
-	return str ;
+        String str = name +" "+ pdbserial + " " + coords[0] + " " + coords[1] + " " + coords[2];
+        return str ;
     }
-
+    
     public void   setOccupancy(double occu){ occupancy = occu ;} ;
     public double getOccupancy(){ return occupancy; } ;
-
+    
     public void   setTempFactor(double temp){ tempfactor = temp ;} ;
     public double getTempFactor(){ return tempfactor; } ;
-
+    
     /** returns and identical copy of this  object .
      * @return  and identical copy of this  object 
      */
     public Object clone() {
-	AtomImpl n = new AtomImpl();
-	n.setOccupancy(getOccupancy());
-	n.setTempFactor(getTempFactor());
-	n.setAltLoc(getAltLoc());
-	double[] coords = getCoords();
-	n.setCoords(coords);
-	n.setPDBserial(getPDBserial());
-	n.setFullName(getFullName());
-	n.setName(getName());
-	return n ;
+        AtomImpl n = new AtomImpl();
+        n.setOccupancy(getOccupancy());
+        n.setTempFactor(getTempFactor());
+        n.setAltLoc(getAltLoc());
+        double[] coords = getCoords();     
+        n.setX(coords[0]);
+        n.setY(coords[1]);
+        n.setZ(coords[2]);
+        n.setPDBserial(getPDBserial());
+        n.setFullName(getFullName());
+        n.setName(getName());
+        return n ;
     }
 }

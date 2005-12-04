@@ -58,14 +58,36 @@ public class StructureImpl implements Structure {
     public StructureImpl() {
 	super();
 
-	models 		= new ArrayList() ;
-	name 		= ""              ;
-	nmrflag 	= false ;
-	header          = new HashMap();
-	connections     = new ArrayList() ;
+	models         = new ArrayList();
+	name           = "";
+	nmrflag        = false;
+	header         = new HashMap();
+	connections    = new ArrayList();
     }
 
 
+    /** construct a Structure object that only contains a single group
+     * 
+     * @param g
+     */
+    public StructureImpl(Group g){
+        this();
+        
+        Chain c = new ChainImpl();
+        c.addGroup(g);
+        
+        addChain(c);
+    }
+    
+    /** construct a Structure object that contains a particular chain
+     * 
+     * @param c
+     */
+    public StructureImpl(Chain c){
+        this();
+        addChain(c);
+    }
+    
     /** returns an identical copy of this structure .
      * @return an identical Structure object     
      */

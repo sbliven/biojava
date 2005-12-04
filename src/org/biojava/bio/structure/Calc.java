@@ -25,7 +25,11 @@
 package org.biojava.bio.structure ;
 
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.biojava.bio.structure.StructureException ;
+import org.biojava.bio.structure.jama.Matrix;
 
 
 
@@ -43,18 +47,18 @@ import org.biojava.bio.structure.StructureException ;
  */
 
 public class Calc {
-
+    
     public Calc(){
     }
-
+    
     // 180 / pi
     static double RADIAN = 57.29577951 ;
-
-    /**
     
+    /**
+     
      *    
      */
-
+    
     /**
      * calculate distance between two atoms.
      *
@@ -64,24 +68,24 @@ public class Calc {
      * @throws StructureException ...
      */
     public static double getDistance(Atom a, Atom b) 
-	throws StructureException
+    throws StructureException
     {
-
-	Atom   c    = substract(b,a);
-	double dist = amount(c)     ;
+        
+        Atom   c    = substract(b,a);
+        double dist = amount(c)     ;
+        
+        return dist ;
+    }
     
-	return dist ;
-    }
-
-
+    
     private static void nullCheck(Atom a) 
-	throws StructureException
+    throws StructureException
     {
-	if  (a == null) {
-	    throw new StructureException("Atom is null!");
-	}
+        if  (a == null) {
+            throw new StructureException("Atom is null!");
+        }
     }
-
+    
     /** add two atoms ( a + b).
      *
      * @param a  an Atom object
@@ -89,42 +93,42 @@ public class Calc {
      * @return an Atom object
      */
     public static Atom add(Atom a, Atom b){
-	double[] coords = new double[3] ;
-    
-	coords[0] = a.getX() + b.getX();
-	coords[1] = a.getY() + b.getY();
-	coords[2] = a.getZ() + b.getZ();
-   
-	Atom c = new AtomImpl();
-	c.setCoords(coords);
-	return c ;
+        double[] coords = new double[3] ;
+        
+        coords[0] = a.getX() + b.getX();
+        coords[1] = a.getY() + b.getY();
+        coords[2] = a.getZ() + b.getZ();
+        
+        Atom c = new AtomImpl();
+        c.setCoords(coords);
+        return c ;
     }
-
+    
     /** substract two atoms ( a - b).
      *
      * @param a  an Atom object
      * @param b  an Atom object
      * @return an Atom object
      * @throws StructureException ...
-
+     
      */
     public static Atom substract(Atom a, Atom b) 
-	throws StructureException
+    throws StructureException
     {
-	nullCheck(a) ;
-	nullCheck(b) ;
-
-	double[] coords = new double[3] ;
-	
-	coords[0] = a.getX() - b.getX();
-	coords[1] = a.getY() - b.getY();
-	coords[2] = a.getZ() - b.getZ();
-   
-	Atom c = new AtomImpl();
-	c.setCoords(coords);
-	return c ;
+        nullCheck(a) ;
+        nullCheck(b) ;
+        
+        double[] coords = new double[3] ;
+        
+        coords[0] = a.getX() - b.getX();
+        coords[1] = a.getY() - b.getY();
+        coords[2] = a.getZ() - b.getZ();
+        
+        Atom c = new AtomImpl();
+        c.setCoords(coords);
+        return c ;
     }
-
+    
     
     /** Vector product .
      *
@@ -133,18 +137,18 @@ public class Calc {
      * @return an Atom object
      */
     public static Atom vectorProduct(Atom a , Atom b){
-	double[] coords = new double[3];
-
-	coords[0] = a.getY() * b.getZ() - a.getZ() * b.getY();
-	coords[1] = a.getZ() * b.getX() - a.getX() * b.getZ();
-	coords[2] = a.getX() * b.getY() - a.getY() * b.getX();
-
-	Atom c = new AtomImpl();
-	c.setCoords(coords);
-	return c ;
-	
+        double[] coords = new double[3];
+        
+        coords[0] = a.getY() * b.getZ() - a.getZ() * b.getY();
+        coords[1] = a.getZ() * b.getX() - a.getX() * b.getZ();
+        coords[2] = a.getX() * b.getY() - a.getY() * b.getX();
+        
+        Atom c = new AtomImpl();
+        c.setCoords(coords);
+        return c ;
+        
     }
-
+    
     /** skalar product.
      *
      * @param a  an Atom object
@@ -152,21 +156,21 @@ public class Calc {
      * @return a double
      */
     public static double skalarProduct(Atom a, Atom b){
-	double skalar ;
-	skalar = a.getX() * b.getX() + a.getY()* b.getY() + a.getZ() * b.getZ();
-	return skalar ;
+        double skalar ;
+        skalar = a.getX() * b.getX() + a.getY()* b.getY() + a.getZ() * b.getZ();
+        return skalar ;
     }
-
-
+    
+    
     /** amount.
      *
      * @param a  an Atom object
      * @return a double
      */
     public static double amount(Atom a){
-	return Math.sqrt(skalarProduct(a,a));
+        return Math.sqrt(skalarProduct(a,a));
     }
-
+    
     /** angle.
      *
      * @param a  an Atom object
@@ -174,37 +178,37 @@ public class Calc {
      * @return a double
      */
     public static double angle(Atom a, Atom b){
-
-	double skalar;
-	double angle;
-    
-	skalar = skalarProduct(a,b);
-	
-	angle = skalar/( amount(a) * amount (b) );
-	angle = Math.acos(angle);
-	angle = angle * RADIAN ; 
-    
-	return angle;
+        
+        double skalar;
+        double angle;
+        
+        skalar = skalarProduct(a,b);
+        
+        angle = skalar/( amount(a) * amount (b) );
+        angle = Math.acos(angle);
+        angle = angle * RADIAN ; 
+        
+        return angle;
     }
-
+    
     /** return the unit vector of vector a .
      *
      * @param a  an Atom object
      * @return an Atom object
      */
     public static Atom unitVector(Atom a) {
-	double amount = amount(a) ;
-	Atom U = a ;
-	
-	double[] coords = new double[3];
-
-	coords[0] = a.getX() / amount ;
-	coords[1] = a.getY() / amount ;
-	coords[2] = a.getZ() / amount ;
-	
-	U.setCoords(coords);
-	return U ;
-	
+        double amount = amount(a) ;
+        Atom U = a ;
+        
+        double[] coords = new double[3];
+        
+        coords[0] = a.getX() / amount ;
+        coords[1] = a.getY() / amount ;
+        coords[2] = a.getZ() / amount ;
+        
+        U.setCoords(coords);
+        return U ;
+        
     }
     
     /** torsion angle 
@@ -220,28 +224,28 @@ public class Calc {
      */
     
     public static double torsionAngle(Atom a, Atom b, Atom c, Atom d)
-	throws StructureException
+    throws StructureException
     {
-	
-	Atom ab = substract(a,b);
-	Atom cb = substract(c,b);
-	Atom bc = substract(b,c);
-	Atom dc = substract(d,c);
-
-	Atom abc = vectorProduct(ab,cb);	
-	Atom bcd = vectorProduct(bc,dc);
-
-
-	double angl = angle(abc,bcd) ;
-
-	/* calc the sign: */
-	Atom vecprod = vectorProduct(abc,bcd);	
-	double val = skalarProduct(cb,vecprod);
-	if (val<0.0) angl = -angl ;
-
-	return angl;
+        
+        Atom ab = substract(a,b);
+        Atom cb = substract(c,b);
+        Atom bc = substract(b,c);
+        Atom dc = substract(d,c);
+        
+        Atom abc = vectorProduct(ab,cb);	
+        Atom bcd = vectorProduct(bc,dc);
+        
+        
+        double angl = angle(abc,bcd) ;
+        
+        /* calc the sign: */
+        Atom vecprod = vectorProduct(abc,bcd);	
+        double val = skalarProduct(cb,vecprod);
+        if (val<0.0) angl = -angl ;
+        
+        return angl;
     }
-
+    
     /** phi angle.
      *
      * @param a  an AminoAcid object
@@ -250,46 +254,46 @@ public class Calc {
      * @throws StructureException ...
      */
     public static double getPhi(AminoAcid a, AminoAcid b)
-	throws StructureException
+    throws StructureException
     {
-
-	if ( ! isConnected(a,b)){
-	    throw new StructureException("can not calc Phi - AminoAcids are not connected!") ;
-} 
-
-	Atom a_C  = a.getC();
-	Atom b_N  = b.getN();
-	Atom b_CA = b.getCA();
-	Atom b_C  = b.getC();
-	
-	double phi = torsionAngle(a_C,b_N,b_CA,b_C);
-	return phi ;
+        
+        if ( ! isConnected(a,b)){
+            throw new StructureException("can not calc Phi - AminoAcids are not connected!") ;
+        } 
+        
+        Atom a_C  = a.getC();
+        Atom b_N  = b.getN();
+        Atom b_CA = b.getCA();
+        Atom b_C  = b.getC();
+        
+        double phi = torsionAngle(a_C,b_N,b_CA,b_C);
+        return phi ;
     }
-
-     /** psi angle.
-      *
-      * @param a  an AminoAcid object
-      * @param b  an AminoAcid object
-      * @return a double
-      * @throws StructureException ...
-      */
+    
+    /** psi angle.
+     *
+     * @param a  an AminoAcid object
+     * @param b  an AminoAcid object
+     * @return a double
+     * @throws StructureException ...
+     */
     public static double getPsi(AminoAcid a, AminoAcid b)
-	throws StructureException
+    throws StructureException
     {
-	if ( ! isConnected(a,b)) {
-	    throw new StructureException("can not calc Psi - AminoAcids are not connected!") ;
-	}
-
-	Atom a_N   = a.getN();
-	Atom a_CA  = a.getCA();
-	Atom a_C   = a.getC();
-	Atom b_N   = b.getN();
-
-	double psi = torsionAngle(a_N,a_CA,a_C,b_N);
-	return psi ;
-	   
+        if ( ! isConnected(a,b)) {
+            throw new StructureException("can not calc Psi - AminoAcids are not connected!") ;
+        }
+        
+        Atom a_N   = a.getN();
+        Atom a_CA  = a.getCA();
+        Atom a_C   = a.getC();
+        Atom b_N   = b.getN();
+        
+        double psi = torsionAngle(a_N,a_CA,a_C,b_N);
+        return psi ;
+        
     }
-
+    
     /** test if two amino acids are connected, i.e.
      * if the distance from C to N < 2,5 Angstrom.
      *
@@ -299,82 +303,257 @@ public class Calc {
      * @throws StructureException ...
      */    
     public static boolean isConnected(AminoAcid a, AminoAcid b)
-	throws StructureException
+    throws StructureException
     {
-	Atom C = a.getC();
-	Atom N = b.getN();
-
-	// one could also check if the CA atoms are < 4 A...
-	double distance = getDistance(C,N);
-	if ( distance < 2.5) { 
-	    return true ;
-	} else {
-	    return false ;
-	}
+        Atom C = a.getC();
+        Atom N = b.getN();
+        
+        // one could also check if the CA atoms are < 4 A...
+        double distance = getDistance(C,N);
+        if ( distance < 2.5) { 
+            return true ;
+        } else {
+            return false ;
+        }
     }
-
-
+    
+    
     /** rotate a structure .
      *
      * @param structure  a Structure object
      * @param m          an array of double arrays
      * @throws StructureException ...
      */
-    public static void rotate(Structure structure, double[][] m)
-	throws StructureException
+    public static void rotate(Structure structure, double[][] rotationmatrix)
+    throws StructureException
     {
-	
-	if ( m.length != 3 ) {
-	    throw new StructureException ("matrix does not have size 3x3 !");
-	}
-	AtomIterator iter = new AtomIterator(structure) ;
-	while (iter.hasNext()) {
-	    Atom atom = null ;
-	    
-	    atom = (Atom) iter.next() ;
-	  
-	    double x = atom.getX();
-	    double y = atom.getY() ;
-	    double z = atom.getZ();
-	    
-	    double nx = m[0][0] * x + m[0][1] * y +  m[0][2] * z ;
-	    double ny = m[1][0] * x + m[1][1] * y +  m[1][2] * z ;
-	    double nz = m[2][0] * x + m[2][1] * y +  m[2][2] * z ;
-	    
-	    double[] coords = new double[3] ;
-	    coords[0] = nx ;
-	    coords[1] = ny ;
-	    coords[2] = nz ;
-	    atom.setCoords(coords);
-	}
+        double[][]m = rotationmatrix;
+        if ( m.length != 3 ) {
+            throw new StructureException ("matrix does not have size 3x3 !");
+        }
+        AtomIterator iter = new AtomIterator(structure) ;
+        while (iter.hasNext()) {
+            Atom atom = null ;
+            
+            atom = (Atom) iter.next() ;
+            
+            double x = atom.getX();
+            double y = atom.getY() ;
+            double z = atom.getZ();
+            
+            double nx = m[0][0] * x + m[0][1] * y +  m[0][2] * z ;
+            double ny = m[1][0] * x + m[1][1] * y +  m[1][2] * z ;
+            double nz = m[2][0] * x + m[2][1] * y +  m[2][2] * z ;
+            
+            double[] coords = new double[3] ;
+            coords[0] = nx ;
+            coords[1] = ny ;
+            coords[2] = nz ;
+            atom.setCoords(coords);
+        }
     }
-
+    
+    /** rotate a structure object
+     * 
+     * @param structure
+     * @param m
+     */
+    public static void rotate(Structure structure, Matrix m){
+        
+        AtomIterator iter = new AtomIterator(structure) ;
+      
+        while (iter.hasNext()) {
+            Atom atom = null ;
+            
+            atom = (Atom) iter.next() ;
+            double x = atom.getX();
+            double y = atom.getY() ;
+            double z = atom.getZ();
+            double[][] ad = new double[][]{{x,y,z}};
+            
+            Matrix am = new Matrix(ad);
+            Matrix na = am.times(m);
+            
+            double[] coords = new double[3] ;
+            coords[0] = na.get(0,0);
+            coords[1] = na.get(0,1);
+            coords[2] = na.get(0,2);
+            atom.setCoords(coords);
+        
+        }
+        /*
+        List chains = structure.getChains(0);
+        Iterator iter = chains.iterator();
+        while (iter.hasNext()){
+            Chain c = (Chain) iter.next();
+            Chain newChain = new ChainImpl();
+            
+            List groups = c.getGroups();
+            Iterator giter = groups.iterator();
+            while (giter.hasNext()){
+                Group g = (Group) giter.next();
+                Group newGroup = (Group) g.clone();
+                newGroup.clearAtoms();
+                
+                AtomIterator aiter = new AtomIterator(g) ;
+                while (aiter.hasNext()) {
+                    
+                    Atom atom = (Atom) aiter.next() ;
+                    
+                    double x = atom.getX();
+                    double y = atom.getY() ;
+                    double z = atom.getZ();
+                    double[][] ad = new double[][]{{x,y,z}};
+                    
+                    Matrix am = new Matrix(ad);
+                    am.times(m);
+                    
+                    double[] coords = new double[3] ;
+                    coords[0] = am.get(0,0);
+                    coords[1] = am.get(0,1);
+                    coords[2] = am.get(0,2);
+                    atom.setCoords(coords);
+                    newGroup.addAtom(atom);
+                }
+                newChain.addGroup(newGroup);
+            }
+            newStruc.addChain(newChain);
+        }
+        return newStruc;
+        */
+        
+    }
+    
+    /** calculate structure + Matrix coodinates ... 
+     * 
+     * @param s
+     * @param matrix
+     */
+    public static void plus(Structure s, Matrix matrix){
+        AtomIterator iter = new AtomIterator(s) ;
+        Atom oldAtom = null;
+        Atom rotOldAtom = null;
+        while (iter.hasNext()) {
+            Atom atom = null ;
+            
+            atom = (Atom) iter.next() ;
+            try {
+            if ( oldAtom != null){
+                //System.out.println("before " +getDistance(oldAtom,atom));
+            }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            oldAtom = (Atom)atom.clone();
+            
+            double x = atom.getX();
+            double y = atom.getY() ;
+            double z = atom.getZ();
+            double[][] ad = new double[][]{{x,y,z}};
+            
+            Matrix am = new Matrix(ad);
+            Matrix na = am.plus(matrix);
+            
+            double[] coords = new double[3] ;
+            coords[0] = na.get(0,0);
+            coords[1] = na.get(0,1);
+            coords[2] = na.get(0,2);
+            atom.setCoords(coords);
+            try {
+                if ( rotOldAtom != null){
+                    //System.out.println("after " + getDistance(rotOldAtom,atom));
+                }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            rotOldAtom  = (Atom) atom.clone();
+        }
+        
+    }
+    
+    
+    
     /** shift a structure with a vector.
      *
      * @param structure  a Structure object
-     * @param a          an Atom object
+     * @param a          an Atom object representing a shift vector
      */
     public static void shift(Structure structure, Atom a ){
-
-	AtomIterator iter = new AtomIterator(structure) ;
-	while (iter.hasNext() ) {
-	    Atom atom = null ;
-	   
-	    atom = (Atom) iter.next()  ;	    
-	    //System.out.print("atom before: " + atom);
-	    Atom natom = add(atom,a);	   
-	    double x = natom.getX();
-	    double y = natom.getY() ;
-	    double z = natom.getZ();
-	    atom.setX(x);
-	    atom.setY(y);
-	    atom.setZ(z);
-	    //	    System.out.println(" after : " + atom);
-	}
+        
+        AtomIterator iter = new AtomIterator(structure) ;
+        while (iter.hasNext() ) {
+            Atom atom = null ;
+            
+            atom = (Atom) iter.next()  ;	    
+            //System.out.print("atom before: " + atom);
+            Atom natom = add(atom,a);	   
+            double x = natom.getX();
+            double y = natom.getY() ;
+            double z = natom.getZ();
+            atom.setX(x);
+            atom.setY(y);
+            atom.setZ(z);
+            //	    System.out.println(" after : " + atom);
+        }
     }
     
-
-
+    /** returns the center  of mass of the set of atoms
+     * 
+     */
+    public static Atom getCentroid(Atom[] atomSet){
+        
+        double[] coords = new double[3];
+        
+        coords[0] = 0;
+        coords[1] = 0;
+        coords[2] = 0 ;
+        
+        for (int i =0 ; i < atomSet.length; i++){
+            Atom a = atomSet[i];
+            coords[0] += a.getX();
+            coords[1] += a.getY();
+            coords[2] += a.getZ();
+        }
+        
+        int n = atomSet.length;
+        coords[0] = coords[0] / n;
+        coords[1] = coords[1] / n;
+        coords[2] = coords[2] / n;
+        
+        Atom vec = new AtomImpl();
+        vec.setCoords(coords);
+        return vec;
+        
+    }
+    
+    public static Atom getCenterVector(Atom[] atomSet){
+        Atom centroid = getCentroid(atomSet);
+        
+        double[] coords = new double[3];
+        coords[0] = 0 - centroid.getX();
+        coords[1] = 0 - centroid.getY();
+        coords[2] = 0 - centroid.getZ();
+        
+        Atom shiftVec = new AtomImpl();
+        shiftVec.setCoords(coords);
+        return shiftVec;
+        
+    }
+    
+    /** center the atoms at the Centroid 
+     * */
+    public static Atom[] centerAtoms(Atom[] atomSet) throws StructureException {
+        Atom shiftVector = getCentroid(atomSet); 
+        
+        Atom[] newAtoms = new AtomImpl[atomSet.length];
+        
+        for (int i =0 ; i < atomSet.length; i++){
+            Atom a = atomSet[i];
+            Atom n = substract(a,shiftVector);
+            newAtoms[i] = n ;
+        }
+        return newAtoms;
+    }
 }
 
 
