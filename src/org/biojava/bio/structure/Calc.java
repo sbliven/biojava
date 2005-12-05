@@ -24,10 +24,6 @@
 
 package org.biojava.bio.structure ;
 
-
-import java.util.Iterator;
-import java.util.List;
-
 import org.biojava.bio.structure.StructureException ;
 import org.biojava.bio.structure.jama.Matrix;
 
@@ -318,6 +314,30 @@ public class Calc {
     }
     
     
+    
+    /** rotate a single atom aroud a rotation matrix.
+     * matrix must be a 3x3 matrix.
+     * @param atom
+     * @param m
+     */
+    public static void rotate(Atom atom, double[][] m){
+
+        double x = atom.getX();
+        double y = atom.getY() ;
+        double z = atom.getZ();
+        
+        double nx = m[0][0] * x + m[0][1] * y +  m[0][2] * z ;
+        double ny = m[1][0] * x + m[1][1] * y +  m[1][2] * z ;
+        double nz = m[2][0] * x + m[2][1] * y +  m[2][2] * z ;
+        
+        double[] coords = new double[3] ;
+        coords[0] = nx ;
+        coords[1] = ny ;
+        coords[2] = nz ;
+        
+        atom.setCoords(coords);
+    }
+    
     /** rotate a structure .
      *
      * @param structure  a Structure object
@@ -333,26 +353,74 @@ public class Calc {
         }
         AtomIterator iter = new AtomIterator(structure) ;
         while (iter.hasNext()) {
-            Atom atom = null ;
-            
-            atom = (Atom) iter.next() ;
-            
-            double x = atom.getX();
-            double y = atom.getY() ;
-            double z = atom.getZ();
-            
-            double nx = m[0][0] * x + m[0][1] * y +  m[0][2] * z ;
-            double ny = m[1][0] * x + m[1][1] * y +  m[1][2] * z ;
-            double nz = m[2][0] * x + m[2][1] * y +  m[2][2] * z ;
-            
-            double[] coords = new double[3] ;
-            coords[0] = nx ;
-            coords[1] = ny ;
-            coords[2] = nz ;
-            atom.setCoords(coords);
+            Atom atom = (Atom) iter.next() ;
+            Calc.rotate(atom,rotationmatrix);
         }
     }
     
+    /** rotate a structure .
+    *
+    * @param structure  a Structure object
+    * @param m          an array of double arrays
+    * @throws StructureException ...
+    */
+   public static void rotate(Group group, double[][] rotationmatrix)
+   throws StructureException
+   {
+       double[][]m = rotationmatrix;
+       if ( m.length != 3 ) {
+           throw new StructureException ("matrix does not have size 3x3 !");
+       }
+       AtomIterator iter = new AtomIterator(group) ;
+       while (iter.hasNext()) {
+           Atom atom = null ;
+           
+           atom = (Atom) iter.next() ;
+           rotate(atom,rotationmatrix);
+         
+       }
+   }
+    
+   /** rotate an atom around a Matrix object
+    * 
+    * @param atom
+    * @param m
+    */
+   public static void rotate(Atom atom, Matrix m){
+
+       double x = atom.getX();
+       double y = atom.getY() ;
+       double z = atom.getZ();
+       double[][] ad = new double[][]{{x,y,z}};
+       
+       Matrix am = new Matrix(ad);
+       Matrix na = am.times(m);
+       
+       double[] coords = new double[3] ;
+       coords[0] = na.get(0,0);
+       coords[1] = na.get(0,1);
+       coords[2] = na.get(0,2);
+       atom.setCoords(coords);
+   
+   }
+   
+   /** rotate a group object
+    * 
+    * @param structure
+    * @param m
+    */
+   public static void rotate(Group group, Matrix m){
+       
+       AtomIterator iter = new AtomIterator(group) ;
+     
+       while (iter.hasNext()) {
+           Atom atom = (Atom) iter.next() ;
+           rotate(atom,m);
+           
+       }
+      
+   }
+   
     /** rotate a structure object
      * 
      * @param structure
@@ -363,65 +431,11 @@ public class Calc {
         AtomIterator iter = new AtomIterator(structure) ;
       
         while (iter.hasNext()) {
-            Atom atom = null ;
+            Atom atom = (Atom) iter.next() ;
+            rotate(atom,m);
             
-            atom = (Atom) iter.next() ;
-            double x = atom.getX();
-            double y = atom.getY() ;
-            double z = atom.getZ();
-            double[][] ad = new double[][]{{x,y,z}};
-            
-            Matrix am = new Matrix(ad);
-            Matrix na = am.times(m);
-            
-            double[] coords = new double[3] ;
-            coords[0] = na.get(0,0);
-            coords[1] = na.get(0,1);
-            coords[2] = na.get(0,2);
-            atom.setCoords(coords);
-        
         }
-        /*
-        List chains = structure.getChains(0);
-        Iterator iter = chains.iterator();
-        while (iter.hasNext()){
-            Chain c = (Chain) iter.next();
-            Chain newChain = new ChainImpl();
-            
-            List groups = c.getGroups();
-            Iterator giter = groups.iterator();
-            while (giter.hasNext()){
-                Group g = (Group) giter.next();
-                Group newGroup = (Group) g.clone();
-                newGroup.clearAtoms();
-                
-                AtomIterator aiter = new AtomIterator(g) ;
-                while (aiter.hasNext()) {
-                    
-                    Atom atom = (Atom) aiter.next() ;
-                    
-                    double x = atom.getX();
-                    double y = atom.getY() ;
-                    double z = atom.getZ();
-                    double[][] ad = new double[][]{{x,y,z}};
-                    
-                    Matrix am = new Matrix(ad);
-                    am.times(m);
-                    
-                    double[] coords = new double[3] ;
-                    coords[0] = am.get(0,0);
-                    coords[1] = am.get(0,1);
-                    coords[2] = am.get(0,2);
-                    atom.setCoords(coords);
-                    newGroup.addAtom(atom);
-                }
-                newChain.addGroup(newGroup);
-            }
-            newStruc.addChain(newChain);
-        }
-        return newStruc;
-        */
-        
+       
     }
     
     /** calculate structure + Matrix coodinates ... 
@@ -543,17 +557,76 @@ public class Calc {
     /** center the atoms at the Centroid 
      * */
     public static Atom[] centerAtoms(Atom[] atomSet) throws StructureException {
-        Atom shiftVector = getCentroid(atomSet); 
+       
+        Atom shiftVector = getCenterVector(atomSet);
         
         Atom[] newAtoms = new AtomImpl[atomSet.length];
         
         for (int i =0 ; i < atomSet.length; i++){
             Atom a = atomSet[i];
-            Atom n = substract(a,shiftVector);
+            Atom n = add(a,shiftVector);
             newAtoms[i] = n ;
         }
         return newAtoms;
     }
+    
+    
+    /** creates a virtual C-beta atom. this might be needed when working with GLY
+     * 
+     * thanks to Peter Lackner for a python template of this method.
+     * @param amino
+     * @return a "virtual" CB atom
+     */
+    public static Atom createVirtualCBAtom(AminoAcid amino) 
+    throws StructureException{
+        
+        // define a standard ALA:
+        // O is just for completeness.
+        
+        double[] ala_N  =  new double[] { -0.525,  1.373,  0.000};
+        double[] ala_CA =  new double[] {  0.000,  0.000,  0.000};
+        double[] ala_C  =  new double[] {  1.530,  0.000,  0.000};
+        //double[] ala_O  =  new double[] {  2.152, -1.073,  0.000};
+        double[] ala_CB =  new double[] { -0.523, -0.769, -1.215};
+        
+        Atom aN = new AtomImpl();
+        aN.setCoords(ala_N);
+        
+        Atom aCA = new AtomImpl();
+        aCA.setCoords(ala_CA);
+        
+        Atom aC = new AtomImpl();
+        aC.setCoords(ala_C);
+        
+        Atom aCB = new AtomImpl();
+        aCB.setCoords(ala_CB);
+        
+        
+        Atom[] arr1 = new Atom[3];
+        arr1[0] = aN;
+        arr1[1] = aCA;
+        arr1[2] = aC;
+        
+        Atom[] arr2 = new Atom[3];
+        arr2[0] = amino.getN();
+        arr2[1] = amino.getCA();
+        arr2[2] = amino.getC();
+        
+        // ok now we got the two arrays, do a SVD:
+        
+        SVDSuperimposer svd = new SVDSuperimposer(arr2,arr1);
+        
+        Matrix rotMatrix = svd.getRotation();
+        Atom tranMatrix = svd.getTranslation();
+                    
+        Calc.rotate(aCB,rotMatrix);
+
+        Atom virtualCB = Calc.add(aCB,tranMatrix);
+        virtualCB.setName("CB");
+        virtualCB.setFullName(" CB ");
+        
+        return virtualCB;
+    }    
 }
 
 
