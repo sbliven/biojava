@@ -188,29 +188,23 @@ public class SVDSuperimposer {
         
         
 //      # correlation matrix
-        //reference_coords = a;
-        // coords = b
-        //corr=matrixmultiply(transpose(coords), reference_coords)
-        
+      
         Matrix b_trans = b.transpose();               
         Matrix corr = b_trans.times(a);
        
-       //u, d, vt=singular_value_decomposition(corr)
-       
+        
         SingularValueDecomposition svd = corr.svd();
         
         // A = U*S*V'.
         
-        //self.rot=transpose(matrixmultiply(transpose(vt), transpose(u)))
-         
+          
         Matrix u = svd.getU();
         // v is alreaady transposed ! difference to numermic python ...
         Matrix vt =svd.getV();
         
         Matrix vt_orig = (Matrix) vt.clone();
         Matrix u_transp = u.transpose();
-        //Matrix v_transp = v.transpose();
-        
+      
         Matrix rot_nottrans = vt.times(u_transp);
         rot = rot_nottrans.transpose();
       
@@ -221,11 +215,7 @@ public class SVDSuperimposer {
         double det = rot.det();
         //System.out.println(det);
        
-        //if determinant(self.rot)<0:
-        //  vt[2]=-vt[2]
-        //  self.rot=transpose(matrixmultiply(transpose(vt), transpose(u))) 
-        if (det<0) {
-            //System.out.println("reflection");
+         if (det<0) {
             vt = vt_orig.transpose();
             vt.set(2,0,(0 - vt.get(2,0)));
             vt.set(2,1,(0 - vt.get(2,1)));
@@ -236,10 +226,10 @@ public class SVDSuperimposer {
             rot = rot_nottrans.transpose();
             
         }
-        // self.tran=av2-matrixmultiply(av1, self.rot)
+     
         Matrix cb_tmp = centroidB.times(rot);
         tran = centroidA.minus(cb_tmp);
-        //printMatrix(tran);
+      
        
     }
     
