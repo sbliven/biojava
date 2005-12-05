@@ -103,7 +103,6 @@ public class HetatomImpl implements Group {
      * @return a String representing the PDBCode value
      */
     public String getPDBCode() {
-	// TODO Auto-generated method stub
 	return pdb_code;
     }
   

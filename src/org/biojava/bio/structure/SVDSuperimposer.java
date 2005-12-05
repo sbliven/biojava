@@ -22,14 +22,115 @@
  */
 package org.biojava.bio.structure;
 
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
+import org.biojava.bio.structure.io.PDBFileReader;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.bio.structure.jama.SingularValueDecomposition;
 
 
 /** a class that calculates the superimposition between two sets of atoms
- * heavily influenced by the biopython SVDSuperimposer class...
+ * inspired by the biopython SVDSuperimposer class...
  * 
  * @author Andreas Prlic
+ *
+ * example usage:
+ * <pre>
+ * try{
+           
+            // get some arbitrary amino acids from somewhere
+            String filename   =  "/Users/ap3/WORK/PDB/5pti.pdb" ;
+            
+            PDBFileReader pdbreader = new PDBFileReader();
+            Structure struc = pdbreader.getStructure(filename);
+            Group g1 = (Group)struc.getChain(0).getGroup(21).clone();
+            Group g2 = (Group)struc.getChain(0).getGroup(53).clone();
+           
+            if ( g1.getPDBName().equals("GLY")){
+                if ( g1 instanceof AminoAcid){ 
+                    Atom cb = Calc.createVirtualCBAtom((AminoAcid)g1);
+                    g1.addAtom(cb);
+                }
+            }
+            
+            if ( g2.getPDBName().equals("GLY")){
+                if ( g2 instanceof AminoAcid){ 
+                    Atom cb = Calc.createVirtualCBAtom((AminoAcid)g2);
+                    g2.addAtom(cb);
+                }
+            }
+            
+            Structure struc2 = new StructureImpl((Group)g2.clone());
+            
+            System.out.println(g1);
+            System.out.println(g2);
+                    
+            
+            Atom[] atoms1 = new Atom[3];
+            Atom[] atoms2 = new Atom[3];
+            
+            atoms1[0] = g1.getAtom("N");
+            atoms1[1] = g1.getAtom("CA");
+            atoms1[2] = g1.getAtom("CB");
+            
+            
+            atoms2[0] = g2.getAtom("N");
+            atoms2[1] = g2.getAtom("CA");
+            atoms2[2] = g2.getAtom("CB");
+           
+                       
+            SVDSuperimposer svds = new SVDSuperimposer(atoms1,atoms2);
+            
+                     
+            Matrix rotMatrix = svds.getRotation();
+            Atom tranMatrix = svds.getTranslation();
+            
+                        
+            // now we have all the info to perform the rotations ...
+            
+            Calc.rotate(struc2,rotMatrix);
+
+            //          shift structure 2 onto structure one ...
+            Calc.shift(struc2,tranMatrix);            
+           
+            //
+            // write the whole thing to a file to view in a viewer
+              
+            String outputfile = "/Users/ap3/WORK/PDB/rotated.pdb";
+            
+            FileOutputStream out= new FileOutputStream(outputfile); 
+            PrintStream p =  new PrintStream( out );
+            
+            Structure newstruc = new StructureImpl();
+            
+            Chain c1 = new ChainImpl();
+            c1.setName("A");
+            c1.addGroup(g1);
+            newstruc.addChain(c1);
+            
+            Chain c2 = struc2.getChain(0);
+            c2.setName("B");
+            newstruc.addChain(c2);
+            
+            // show where the group was originally ...
+            Chain c3 = new ChainImpl();
+            c3.setName("C");
+            //c3.addGroup(g1);
+            c3.addGroup(g2);
+            
+            newstruc.addChain(c3);
+            p.println(newstruc.toPDB());
+            
+            p.close();
+            
+            System.out.println("wrote to file " + outputfile);
+            
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        </pre>
+ *
  *
  */
 public class SVDSuperimposer {
@@ -57,21 +158,21 @@ public class SVDSuperimposer {
         centroidB = new Matrix(centBcoords);
         
         
+        
         //      center at centroid
         
         Atom[] ats1 = Calc.centerAtoms(atomSet1);
         Atom[] ats2 = Calc.centerAtoms(atomSet2);
         
-        double[][] coordSet1 = new double[atomSet1.length][3];
-        double[][] coordSet2 = new double[atomSet2.length][3];
+        double[][] coordSet1 = new double[ats1.length][3];
+        double[][] coordSet2 = new double[ats2.length][3];
         
         // copy the atoms into the internal coords;
-        for (int i =0 ; i< atomSet1.length;i++) {
+        for (int i =0 ; i< ats1.length;i++) {
             coordSet1[i] = ats1[i].getCoords();
             coordSet2[i] = ats2[i].getCoords();
         }
         
-                
         calculate(coordSet1,coordSet2);
     }
     
@@ -85,41 +186,60 @@ public class SVDSuperimposer {
         Matrix a = new Matrix(coordSet1);
         Matrix b = new Matrix(coordSet2);
         
-        Matrix b_trans = b.transpose();
-                
-        Matrix corr = b_trans.times(a);
         
+//      # correlation matrix
+        //reference_coords = a;
+        // coords = b
+        //corr=matrixmultiply(transpose(coords), reference_coords)
+        
+        Matrix b_trans = b.transpose();               
+        Matrix corr = b_trans.times(a);
+       
+       //u, d, vt=singular_value_decomposition(corr)
+       
         SingularValueDecomposition svd = corr.svd();
         
         // A = U*S*V'.
-
-
+        
+        //self.rot=transpose(matrixmultiply(transpose(vt), transpose(u)))
+         
         Matrix u = svd.getU();
-        Matrix v =svd.getV();
+        // v is alreaady transposed ! difference to numermic python ...
+        Matrix vt =svd.getV();
         
-        
+        Matrix vt_orig = (Matrix) vt.clone();
         Matrix u_transp = u.transpose();
-        Matrix v_transp = v.transpose();
+        //Matrix v_transp = v.transpose();
         
-        rot = v_transp.times(u_transp);
-        rot = rot.transpose();
+        Matrix rot_nottrans = vt.times(u_transp);
+        rot = rot_nottrans.transpose();
       
         // check if we have found a reflection
+               
+        //printMatrix(rot);
+        
         double det = rot.det();
         //System.out.println(det);
-        
+       
+        //if determinant(self.rot)<0:
+        //  vt[2]=-vt[2]
+        //  self.rot=transpose(matrixmultiply(transpose(vt), transpose(u))) 
         if (det<0) {
+            //System.out.println("reflection");
+            vt = vt_orig.transpose();
+            vt.set(2,0,(0 - vt.get(2,0)));
+            vt.set(2,1,(0 - vt.get(2,1)));
+            vt.set(2,2,(0 - vt.get(2,2)));
             
-            v_transp.set(2,0,(0 - v_transp.get(2,0)));
-            v_transp.set(2,1,(0 - v_transp.get(2,1)));
-            v_transp.set(2,2,(0 - v_transp.get(2,2)));
+            Matrix nv_transp = vt.transpose();
+            rot_nottrans = nv_transp.times(u_transp);
+            rot = rot_nottrans.transpose();
             
-            rot = v_transp.times(u_transp).transpose();
-                    
         }
-       
-        tran = centroidA.minus(centroidB.times(rot));
-       
+        // self.tran=av2-matrixmultiply(av1, self.rot)
+        Matrix cb_tmp = centroidB.times(rot);
+        tran = centroidA.minus(cb_tmp);
+        //printMatrix(tran);
        
     }
     
@@ -128,7 +248,7 @@ public class SVDSuperimposer {
     }
     
     public Atom getTranslation(){
-       // printMatrix(tran);
+      
         Atom a = new AtomImpl();
         a.setX(tran.get(0,0));
         a.setY(tran.get(0,1));
