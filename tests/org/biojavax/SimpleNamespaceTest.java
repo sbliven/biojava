@@ -38,6 +38,8 @@ public class SimpleNamespaceTest extends TestCase {
     protected void tearDown() throws Exception {
         ns = null;
         ns2 = null;
+        //clear the buffer
+        RichObjectFactory.clearLRUCache(SimpleNamespace.class);
     }
 
     public static Test suite() {
@@ -130,8 +132,8 @@ public class SimpleNamespaceTest extends TestCase {
     public void testGetDescription() {
         System.out.println("testGetDescription");
         
-        //should be set because of LRU cache
-        assertEquals(desc, ns.getDescription());
+        //should be null at startup
+        assertNull(ns.getDescription());
         try{
             ns.setDescription(desc);
         }catch(Exception ex){
