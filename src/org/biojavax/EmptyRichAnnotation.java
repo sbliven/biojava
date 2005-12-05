@@ -41,12 +41,22 @@ import org.biojava.utils.Unchangeable;
  */
 public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation, Serializable {
     
+    private Note[] emptyNotes = new Note[]{};
+    
     /**
      * {@inheritDoc} There are no properties in the Empty RichAnnotation object.
      * Calling this will return null.
      */
     public Object getProperty(Object key) throws NoSuchElementException {
         return null;
+    }
+    
+    /**
+     * {@inheritDoc} There are no properties in the Empty RichAnnotation object.
+     * Calling this will return an empty array.
+     */
+    public Note[] getProperties(Object key) {
+        return this.emptyNotes;
     }
     
     /**
