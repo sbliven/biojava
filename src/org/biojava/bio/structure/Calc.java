@@ -499,7 +499,7 @@ public class Calc {
             Atom atom = null ;
             
             atom = (Atom) iter.next()  ;	    
-            //System.out.print("atom before: " + atom);
+           
             Atom natom = add(atom,a);	   
             double x = natom.getX();
             double y = natom.getY() ;
@@ -507,9 +507,35 @@ public class Calc {
             atom.setX(x);
             atom.setY(y);
             atom.setZ(z);
-            //	    System.out.println(" after : " + atom);
+      
         }
     }
+    
+    /** shift a Group with a vector.
+    *
+    * @param structure  a Structure object
+    * @param a          an Atom object representing a shift vector
+    */
+   public static void shift(Group group , Atom a ){
+       
+       AtomIterator iter = new AtomIterator(group) ;
+       while (iter.hasNext() ) {
+           Atom atom = null ;
+           
+           atom = (Atom) iter.next()  ;     
+          
+           Atom natom = add(atom,a);       
+           double x = natom.getX();
+           double y = natom.getY() ;
+           double z = natom.getZ();
+           atom.setX(x);
+           atom.setY(y);
+           atom.setZ(z);
+           
+       }
+   }
+    
+    
     
     /** returns the center  of mass of the set of atoms
      * 
