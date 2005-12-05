@@ -30,6 +30,8 @@ import org.biojava.bio.*;
  */
 
 public class StructureException extends BioException {
+    
+    
     /**
      * Constructs a StructureException object.
      *

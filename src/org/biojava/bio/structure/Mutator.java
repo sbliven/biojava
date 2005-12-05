@@ -20,8 +20,6 @@
 
 package org.biojava.bio.structure;
 
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +33,6 @@ import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureImpl;
-import org.biojava.bio.structure.io.PDBFileReader;
 import org.biojava.bio.structure.io.PDBParseException;
 
 

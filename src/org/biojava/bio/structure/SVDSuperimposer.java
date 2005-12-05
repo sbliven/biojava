@@ -22,10 +22,6 @@
  */
 package org.biojava.bio.structure;
 
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-
-import org.biojava.bio.structure.io.PDBFileReader;
 import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.bio.structure.jama.SingularValueDecomposition;
 

@@ -26,7 +26,7 @@ package org.biojava.bio.structure;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.ArrayList ;
+
 
 /** an iterator over all atoms of a structure / group. 
  * @author Andreas Prlic

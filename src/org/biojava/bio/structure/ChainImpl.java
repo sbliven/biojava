@@ -53,7 +53,7 @@ public class ChainImpl implements Chain {
 	name = DEFAULT_CHAIN_ID;
 	groups = new ArrayList() ;
 	
-	Annotation anno = Annotation.EMPTY_ANNOTATION;
+	annotation = Annotation.EMPTY_ANNOTATION;
 	
     }
 
@@ -104,7 +104,7 @@ public class ChainImpl implements Chain {
 	
 
     public void addGroup(Group group) {
-	// TODO Auto-generated method stub
+	
 
 	groups.add(group);
     }
@@ -116,7 +116,7 @@ public class ChainImpl implements Chain {
      * @return a Group object
      */
     public Group getGroup(int position) {
-	// TODO Auto-generated method stub
+
 	return (Group)groups.get(position);
     }
 

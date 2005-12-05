@@ -22,9 +22,7 @@
  *
  */
 package org.biojava.bio.structure;
-import  org.biojava.bio.structure.io.PDBParseException;
 
-import java.util.List ;
 import java.util.Map   ;
 
 /**

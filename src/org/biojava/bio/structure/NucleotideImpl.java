@@ -24,7 +24,7 @@
 package org.biojava.bio.structure;
 import  org.biojava.bio.structure.io.PDBParseException;
 
-import java.util.ArrayList ;
+
 /**
  *
  *  A nucleotide group is almost the same as a Hetatm group. 
