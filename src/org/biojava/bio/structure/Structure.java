@@ -300,6 +300,23 @@ public interface Structure {
     public Chain getChain(int pos, int modelnr);
 
 
+    
+
+
+    /** request a particular group from a structure.
+    * by default considers only the first model in the structure.
+    * 
+    */
+    public  Group findGroup(String chainName, String pdbResnum)
+    throws StructureException;
+    
+    /** request a particular group from a structure.
+     * considers only model nr X. count starts with 0.
+     */
+     public  Group findGroup(String chainName, String pdbResnum, int modelnr)
+     throws StructureException;
+     
+    
     /** create a String that contains the contents of a PDB file .
      *
      * @return a String that looks like a PDB file

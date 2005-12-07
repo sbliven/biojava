@@ -25,6 +25,7 @@ package org.biojava.bio.structure;
 
 import java.util.ArrayList ;
 import java.util.HashMap   ;
+import java.util.Iterator;
 import java.util.Map       ;
 import java.util.List      ;
 
@@ -119,6 +120,62 @@ public class StructureImpl implements Structure {
 
 	}
 	return n ;
+    }
+
+
+    public Group findGroup(String chainId, String pdbResnum, int modelnr)
+        throws StructureException {
+      
+
+        // if structure is xray there will be only one "model".
+        if ( modelnr > models.size())
+            throw new StructureException(" no model nr " + modelnr + 
+                    " in this structure. (contains "+models.size()+")");
+        
+        List chains = getChains(modelnr);
+        
+        // iterate over all chains.
+        Iterator iter = chains.iterator();
+        while (iter.hasNext()){
+            Chain c = (Chain)iter.next();
+            boolean foundChain = false;
+            if (c.getName().equals(chainId)) {
+                // here is our chain!
+                foundChain = true;
+                Chain newchain = new ChainImpl();
+                newchain.setName(c.getName());
+                
+                List groups = c.getGroups();
+                
+                // now iterate over all groups in this chain.
+                // in order to find the amino acid that has this pdbRenum.               
+               
+                Iterator giter = groups.iterator();
+                while (giter.hasNext()){
+                    Group g = (Group) giter.next();
+                    String rnum = g.getPDBCode();
+                    
+                    // we only mutate amino acids
+                    // and ignore hetatoms and nucleotides in this case                   
+                    if (rnum.equals(pdbResnum)) 
+                               return g;       
+                }
+                throw new StructureException("could not find group " + pdbResnum +
+                        " in chain " + chainId);
+            }
+            if ( ! foundChain)
+                throw new StructureException("could not find chain " + chainId);
+        }
+        throw new StructureException("could not find group " + pdbResnum +
+                " in chain " + chainId);
+     
+    }
+
+
+    public Group findGroup(String chainName, String pdbResnum) throws StructureException 
+    {
+        return findGroup(chainName, pdbResnum, 0);
+        
     }
 
 
