@@ -132,50 +132,59 @@ public class StructureImpl implements Structure {
             throw new StructureException(" no model nr " + modelnr + 
                     " in this structure. (contains "+models.size()+")");
         
+        
+        Chain c = findChain(chainId,modelnr);
+                
+        List groups = c.getGroups();
+                
+        // now iterate over all groups in this chain.
+        // in order to find the amino acid that has this pdbRenum.               
+           
+        Iterator giter = groups.iterator();
+        while (giter.hasNext()){
+            Group g = (Group) giter.next();
+            String rnum = g.getPDBCode();
+               
+            // we only mutate amino acids
+            // and ignore hetatoms and nucleotides in this case                   
+            if (rnum.equals(pdbResnum)) 
+                return g;       
+        } 
+       
+        throw new StructureException("could not find group " + pdbResnum +
+                " in chain " + chainId);
+    }
+            
+    
+    public Group findGroup(String chainName, String pdbResnum) throws StructureException 
+    {
+        return findGroup(chainName, pdbResnum, 0);
+        
+    }
+
+    
+    
+
+    public Chain findChain(String chainId, int modelnr) throws StructureException {
+        
         List chains = getChains(modelnr);
         
         // iterate over all chains.
         Iterator iter = chains.iterator();
         while (iter.hasNext()){
             Chain c = (Chain)iter.next();
-            boolean foundChain = false;
+           
             if (c.getName().equals(chainId)) {
-                // here is our chain!
-                foundChain = true;
-                Chain newchain = new ChainImpl();
-                newchain.setName(c.getName());
-                
-                List groups = c.getGroups();
-                
-                // now iterate over all groups in this chain.
-                // in order to find the amino acid that has this pdbRenum.               
-               
-                Iterator giter = groups.iterator();
-                while (giter.hasNext()){
-                    Group g = (Group) giter.next();
-                    String rnum = g.getPDBCode();
-                    
-                    // we only mutate amino acids
-                    // and ignore hetatoms and nucleotides in this case                   
-                    if (rnum.equals(pdbResnum)) 
-                               return g;       
-                }
-                throw new StructureException("could not find group " + pdbResnum +
-                        " in chain " + chainId);
+                return c;
             }
-            if ( ! foundChain)
-                throw new StructureException("could not find chain " + chainId);
         }
-        throw new StructureException("could not find group " + pdbResnum +
-                " in chain " + chainId);
-     
+        throw new StructureException("could not find chain " + chainId);
     }
 
 
-    public Group findGroup(String chainName, String pdbResnum) throws StructureException 
-    {
-        return findGroup(chainName, pdbResnum, 0);
-        
+    public Chain findChain(String chainId) throws StructureException {
+       
+        return findChain(chainId,0);
     }
 
 
