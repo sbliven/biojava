@@ -169,10 +169,10 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
      * {@inheritDoc}
      */
     public ComparableTerm getOrImportTerm(Term term) {
-        if (term instanceof ComparableTerm) return (ComparableTerm)term;
+        //if (term instanceof ComparableTerm) return (ComparableTerm)term;
         try {
             if (!this.termsMap.containsKey(term.getName())) return (ComparableTerm)this.importTerm(term,term.getName());
-            else return (ComparableTerm)this.getTerm(name);
+            else return (ComparableTerm)this.getTerm(term.getName());
         } catch (ChangeVetoException e) {
             return null;
         }
