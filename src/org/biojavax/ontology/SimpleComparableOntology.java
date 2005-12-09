@@ -146,6 +146,25 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
         }
     }
     
+    
+    /**
+     *{@inheritDoc}
+     */
+    public ComparableTriple getOrCreateTriple(Term subject, Term object, Term predicate){
+        
+        try {
+            if (this.getTriples(subject, object, predicate).size() == 0) {
+                return (ComparableTriple)this.createTriple(subject, object, predicate, 
+                    predicate.getName()+"("+subject.getName()+", "+object.getName()+")",
+                        null);
+            }
+            else return (ComparableTriple)this.getTriples(subject, object, predicate).iterator().next();
+        } catch (ChangeVetoException e) {
+            return null;
+        } catch (AlreadyExistsException e) {
+            return (ComparableTriple)this.getTriples(subject, object, predicate).iterator().next();
+        }
+    }
     /**
      * {@inheritDoc}
      */

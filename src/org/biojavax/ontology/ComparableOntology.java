@@ -105,6 +105,16 @@ public interface ComparableOntology extends Ontology,Comparable,Changeable {
     public ComparableTerm getOrCreateTerm(String name);
     
     /**
+     * Looks for a triple with the given subject object and predicate and returns it. 
+     * If it couldn't be found, then it creates it, adds it to the ontology,
+     * then returns it.
+     * @param subject the subject of the triple eg apple
+     * @param object the object of the triple eg fruit
+     * @param predicate the relationship of the triple eg is_a
+     * @return the ComparableTriple representing the object subject and predicate.
+     */
+    public ComparableTriple getOrCreateTriple(Term subject, Term object, Term predicate);
+    /**
      * Looks for a term with the same name as the given term and returns it.
      * If it couldn't be found, then it creates it, adds it to the ontology,
      * then returns it.
