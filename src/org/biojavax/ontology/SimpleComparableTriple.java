@@ -54,7 +54,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      * @param object the object of the triple.
      * @param predicate the predicate of the triple.
      */
-    public SimpleComparableTriple(ComparableOntology ontology, ComparableTerm subject, ComparableTerm object, ComparableTerm predicate) {
+    SimpleComparableTriple(ComparableOntology ontology, ComparableTerm subject, ComparableTerm object, ComparableTerm predicate) {
         if (ontology == null) throw new IllegalArgumentException("Ontology must not be null");
         if (subject == null) throw new IllegalArgumentException("Subject must not be null");
         if (object == null) throw new IllegalArgumentException("Object must not be null");
