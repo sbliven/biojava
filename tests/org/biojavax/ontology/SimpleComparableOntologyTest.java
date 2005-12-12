@@ -14,6 +14,7 @@ import junit.framework.*;
 import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.ontology.Term;
 import org.biojava.ontology.Triple;
+import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.RichObjectFactory;
@@ -197,6 +198,12 @@ public class SimpleComparableOntologyTest extends TestCase {
             Term term = ont.createTerm("bar","");
             assertEquals(term, ont.getTerm("bar"));
             
+            assertNotNull(cr.getEvent());
+            ChangeEvent ce = cr.getEvent();
+            assertEquals(ont.TERM, ce.getType());
+            assertEquals(term, ce.getChange());
+            assertNull(ce.getPrevious());
+            
             try{
                 ont.createTerm("bar", "");
                 fail("Expected AlreadyExistsException");
@@ -251,6 +258,14 @@ public class SimpleComparableOntologyTest extends TestCase {
             assertTrue(ont.containsTriple(subj, obj, pred));
             assertEquals(size+1, ont.getTriples(null, null, null).size());
             
+            
+            assertNotNull(cr.getEvent());
+            ChangeEvent ce = cr.getEvent();
+            assertEquals(ont.TRIPLE, ce.getType());
+            assertEquals(trip, ce.getChange());
+            assertNull(ce.getPrevious());
+            
+            
             //can't add it twice
             try{
                 trip = ont.createTriple(subj, obj, pred, "Triple", "");
@@ -277,6 +292,12 @@ public class SimpleComparableOntologyTest extends TestCase {
             assertEquals(termSize -1, ont.getTerms().size());
             //should have lost the triple too.
             assertEquals(tripleSize -1, ont.getTriples(null, null, null).size());
+            
+            assertNotNull(cr.getEvent());
+            ChangeEvent ce = cr.getEvent();
+            assertEquals(ont.TERM, ce.getType());
+            assertEquals(term, ce.getPrevious());
+            assertNull(ce.getChange());
             
         }catch(Exception ex){
            fail("Not expecting "+ex.getClass().getName()); 
@@ -416,6 +437,13 @@ public class SimpleComparableOntologyTest extends TestCase {
         try{
             ont.setDescription(desc);
             assertEquals(desc, ont.getDescription());
+            
+            assertNotNull(cr.getEvent());
+            ChangeEvent ce = cr.getEvent();
+            assertEquals(ont.DESCRIPTION, ce.getType());
+            assertEquals(desc, ce.getChange());
+            assertNull(ce.getPrevious());
+            
         }catch(ChangeVetoException ex){
             fail("Not expecting "+ex.getClass().getName()); 
         }
