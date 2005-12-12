@@ -36,7 +36,8 @@ public class SimpleNCBITaxonName implements Comparable {
     /**
      * Creates a new taxon name based on the given class and name, both of
      * which cannot be null.
-     * @param nameClass the class of the new name
+     * @param nameClass the class of the new name. Use one of the constants from
+     * {@link org.biojavax.bio.taxa.NCBITaxon} (for example {@link org.biojavax.bio.taxa.NCBITaxon#SCIENTIFIC}).
      * @param name the name itself
      */
     public SimpleNCBITaxonName(String nameClass, String name) {
