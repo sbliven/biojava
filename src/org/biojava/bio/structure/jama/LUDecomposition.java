@@ -40,9 +40,8 @@ public class LUDecomposition implements java.io.Serializable {
    Constructor
  * ------------------------ */
 
-   /** LU Decomposition
-   @param  A   Rectangular matrix
-   @return     Structure to access L, U and piv.
+   /** LU Decomposition provides a data structure  to access L, U and piv.
+   @param  A   Rectangular matrix  
    */
 
    public LUDecomposition (Matrix A) {

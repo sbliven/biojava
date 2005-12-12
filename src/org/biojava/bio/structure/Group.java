@@ -41,6 +41,9 @@ import java.util.Iterator ;
  * @see HetatomImpl
  * @see AminoAcidImpl
  * @see NucleotideImpl
+ * @author Andreas Prlic
+ * @since 1.4
+ * @version %I% %G%
  */
 public interface Group {
     

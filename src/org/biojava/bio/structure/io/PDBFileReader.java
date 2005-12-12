@@ -81,7 +81,7 @@ public class PDBFileReader implements StructureIOFile {
 
     }
 
-
+    /** directory where to find PDB files */
     public void setPath(String p){
 	path = p ;
     }
@@ -131,7 +131,7 @@ public class PDBFileReader implements StructureIOFile {
 	String fpath = path+"/"+pdbId;
 	for (int i=0 ; i<extensions.size();i++){
 	    String ex = (String)extensions.get(i) ;
-	    //System.out.println("testing: "+fpath+ex);
+	    System.out.println("PDBFileReader testing: "+fpath+ex);
 	    f = new File(fpath+ex) ;
 
 	    if ( f.exists()) {

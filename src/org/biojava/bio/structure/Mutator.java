@@ -71,6 +71,9 @@ import org.biojava.bio.structure.io.PDBParseException;
       e.printStackTrace();
   } 
   </pre>
+  * @author Andreas Prlic
+  * @since 1.5
+  * @version %I% %G%
   */       
 public class Mutator{
     List supportedAtoms;
@@ -90,11 +93,11 @@ public class Mutator{
      * 
      * 
      * 
-     * @param struc
-     * @param chainId
-     * @param pdbResnum
-     * @param newType
-     * @return
+     * @param struc the structure object that is the container for the residue to be mutated
+     * @param chainId the id (name) of the chain to be mutated. @see Chain.getName()
+     * @param pdbResnum the PDB residue number of the residue
+     * @param newType the new residue type (3 characters)
+     * @return a structure object where one residue has been modified
      * @throws PDBParseException
      */
     public Structure  mutate(Structure struc, String chainId, String pdbResnum, String newType) 
@@ -159,7 +162,7 @@ public class Mutator{
      * Only the atoms N, Ca, C, O, Cb will be considered.
      * @param oldAmino
      * @param newType
-     * @return
+     * @return a new, mutated, residue 
      */
     public AminoAcid mutateResidue(AminoAcid oldAmino, String newType)
     throws PDBParseException {

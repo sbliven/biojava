@@ -30,6 +30,9 @@ import  org.biojava.bio.structure.io.PDBParseException;
  *  A nucleotide group is almost the same as a Hetatm group. 
  *  @see HetatomImpl
  *  @see AminoAcidImpl
+ * @author Andreas Prlic
+ * @since 1.4
+ * @version %I% %G%
  */
 public class NucleotideImpl 
     extends HetatomImpl 

@@ -28,12 +28,14 @@ package org.biojava.bio.structure.io;
 import org.biojava.bio.structure.Structure;
 import java.io.IOException ;
 
+
 /**
  * Defines the interface how to access Structure (- PDB file) input,output readers, writers.
  *
  * @author Andreas Prlic
  * @version %I% %G%
  */
+
 public interface StructureIO {
     
     /** Get a structure by providing a PDB code.

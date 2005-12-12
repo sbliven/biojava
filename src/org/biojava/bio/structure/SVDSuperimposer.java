@@ -29,7 +29,6 @@ import org.biojava.bio.structure.jama.SingularValueDecomposition;
 /** a class that calculates the superimposition between two sets of atoms
  * inspired by the biopython SVDSuperimposer class...
  * 
- * @author Andreas Prlic
  *
  * example usage:
  * <pre>
@@ -128,6 +127,10 @@ import org.biojava.bio.structure.jama.SingularValueDecomposition;
         </pre>
  *
  *
+ * @author Andreas Prlic
+ * @since 1.5
+ * @version %I% %G%
+
  */
 public class SVDSuperimposer {
 

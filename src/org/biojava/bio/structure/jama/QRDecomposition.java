@@ -40,9 +40,10 @@ public class QRDecomposition implements java.io.Serializable {
    Constructor
  * ------------------------ */
 
-   /** QR Decomposition, computed by Householder reflections.
+   /** QR Decomposition, computed by Householder reflections. provides
+   a data structure to access R and the Householder vectors and
+   compute Q.
    @param A    Rectangular matrix
-   @return     Structure to access R and the Householder vectors and compute Q.
    */
 
    public QRDecomposition (Matrix A) {

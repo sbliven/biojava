@@ -341,7 +341,7 @@ public class Calc {
     /** rotate a structure .
      *
      * @param structure  a Structure object
-     * @param m          an array of double arrays
+     * @param rotationmatrix an array (3x3) of double representing the rotation matrix. 
      * @throws StructureException ...
      */
     public static void rotate(Structure structure, double[][] rotationmatrix)
@@ -360,8 +360,8 @@ public class Calc {
     
     /** rotate a structure .
     *
-    * @param structure  a Structure object
-    * @param m          an array of double arrays
+    * @param group a group object
+    * @param rotationmatrix an array (3x3) of double representing the rotation matrix. 
     * @throws StructureException ...
     */
    public static void rotate(Group group, double[][] rotationmatrix)
@@ -406,8 +406,8 @@ public class Calc {
    
    /** rotate a group object
     * 
-    * @param structure
-    * @param m
+    * @param group  a group to be rotated
+    * @param m a Matrix object representing the translation matrix
     */
    public static void rotate(Group group, Matrix m){
        
@@ -513,7 +513,7 @@ public class Calc {
     
     /** shift a Group with a vector.
     *
-    * @param structure  a Structure object
+    * @param group   a group object
     * @param a          an Atom object representing a shift vector
     */
    public static void shift(Group group , Atom a ){

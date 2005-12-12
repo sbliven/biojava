@@ -29,7 +29,9 @@ import java.util.NoSuchElementException;
 import java.util.ArrayList ;
 
 /** an iterator over all groups of a structure.
-@author Andreas Prlic
+ * @author Andreas Prlic
+ * @since 1.4
+ * @version %I% %G%
 */
 
 public class GroupIterator implements Iterator {
