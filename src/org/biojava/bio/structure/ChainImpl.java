@@ -26,7 +26,7 @@ package org.biojava.bio.structure;
 
 import java.util.ArrayList ;
 import java.util.List;
-
+import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.Annotation;
 
@@ -37,43 +37,42 @@ import org.biojava.bio.Annotation;
  * @since 1.4
  */
 public class ChainImpl implements Chain {
-
+    
     public static String DEFAULT_CHAIN_ID = " ";
     
     String swissprot_id ; 
     String name ; // like in PDBfile
-    ArrayList groups;
-	Annotation annotation ;
+    List groups;
+    Annotation annotation ;
     /**
      *  Constructs a ChainImpl object.
      */
     public ChainImpl() {
-	super();
-	
-	name = DEFAULT_CHAIN_ID;
-	groups = new ArrayList() ;
-	
-	annotation = Annotation.EMPTY_ANNOTATION;
-	
+        super();
+        
+        name = DEFAULT_CHAIN_ID;
+        groups = new ArrayList() ;
+        annotation = Annotation.EMPTY_ANNOTATION;
+        
     }
-
-
+    
+    
     /** returns an identical copy of this Chain .
      * @return an identical copy of this Chain 
      */
     public Object clone() {
-	// go through all groups and add to new Chain.
-	Chain n = new ChainImpl();
-	// copy chain data:
-	
-	n.setName( getName());
-	n.setSwissprotId ( getSwissprotId());
-	for (int i=0;i<groups.size();i++){
-	    Group g = (Group)groups.get(i);
-	    n.addGroup((Group)g.clone());
-	}
-	
-	return n ;
+        // go through all groups and add to new Chain.
+        Chain n = new ChainImpl();
+        // copy chain data:
+        
+        n.setName( getName());
+        n.setSwissprotId ( getSwissprotId());
+        for (int i=0;i<groups.size();i++){
+            Group g = (Group)groups.get(i);
+            n.addGroup((Group)g.clone());
+        }
+        
+        return n ;
     }
     
     
@@ -84,14 +83,14 @@ public class ChainImpl implements Chain {
     public Annotation getAnnotation(){
         return annotation;
     }
-
+    
     /** set the Swissprot id of this chains .
      * @param sp_id  a String specifying the swissprot id value
      * @see #getSwissprotId
      */
-
+    
     public void setSwissprotId(String sp_id){
-	swissprot_id = sp_id ;
+        swissprot_id = sp_id ;
     }
     
     /** get the Swissprot id of this chains .
@@ -99,16 +98,16 @@ public class ChainImpl implements Chain {
      * @see #setSwissprotId
      */
     public String getSwissprotId() {
-	return swissprot_id ;
+        return swissprot_id ;
     }
-	
-
+    
+    
     public void addGroup(Group group) {
-	
-
-	groups.add(group);
+        
+        
+        groups.add(group);
     }
-
+    
     /** return the amino acid at position .
      * 
      *
@@ -116,92 +115,91 @@ public class ChainImpl implements Chain {
      * @return a Group object
      */
     public Group getGroup(int position) {
-
-	return (Group)groups.get(position);
+        
+        return (Group)groups.get(position);
     }
-
+    
     /** return an array of all groups of a special type (e.g. amino,
      * hetatm, nucleotide).
      * @param type  a String
      * @return an List object containing the groups of type...
-
+     
      */
-    public ArrayList getGroups( String type) {
-	ArrayList tmp = new ArrayList() ;
-	for (int i=0;i<groups.size();i++){
-	    Group g = (Group)groups.get(i);
-	    if (g.getType().equals(type)){
-		tmp.add(g);
-	    }
-	}
-	//Group[] g = (Group[])tmp.toArray(new Group[tmp.size()]);
-	return tmp ;
+    public List getGroups( String type) {
+        List tmp = new ArrayList() ;
+        for (int i=0;i<groups.size();i++){
+            Group g = (Group)groups.get(i);
+            if (g.getType().equals(type)){
+                tmp.add(g);
+            }
+        }
+        //Group[] g = (Group[])tmp.toArray(new Group[tmp.size()]);
+        return tmp ;
     }
+    
     /** return all groups of this chain .
      * @return an ArrayList object representing the Groups of this Chain.
      */
-    public ArrayList getGroups(){
-	return groups ;
+    public List getGroups(){
+        return groups ;
     }
-
     
-
+    
+    
     public int getLength() {return groups.size();  }
     
+    
     public int getLengthAminos() {
-
-	ArrayList g = getGroups("amino");
-	return g.size() ;
+        
+        List g = getGroups("amino");
+        return g.size() ;
     }
-
+    
     
     /** get and set the name of this chain (Chain id in PDB file ).
      * @param nam a String specifying the name value
      * @see #getName
      * 
      */
-
+    
     public void   setName(String nam) { name = nam;   }
-
+    
     /** get and set the name of this chain (Chain id in PDB file ).
      * @return a String representing the name value
      * @see #setName
      */
     public String getName()           {	return name;  }
-	
-
+    
+    
     /** string representation. */
     public String toString(){
-	
-	String str = "Chain >"+getName() + "< total length:" + getLength() + " residues";
-	// loop over the residues
-	int i = 0 ;
-	do {
-	    Group gr = (Group)groups.get(i);
-	    str += gr.toString() + "\n" ;
-	    i++ ;
-	} while ( i< groups.size()) ;
-	    
-	
-	return str ;
-			
-    }
+        
+        String str = "Chain >"+getName() + "< total length:" + getLength() + " residues";
+        // loop over the residues
+        
+        for ( int i = 0 ; i < groups.size();i++){
+            Group gr = (Group) groups.get(i);
+            str += gr.toString() + "\n" ;
+    } 
+    return str ;
+    
+}
 
-    /** get amino acid sequence.
-     * @return a String representing the sequence.	    
-     */
-    public String getSequence(){
-        
-        List aminos = getGroups("amino");
-        StringBuffer sequence = new StringBuffer() ;
-        for ( int i=0 ; i< aminos.size(); i++){
-            AminoAcid a = (AminoAcid)aminos.get(i);
-            sequence.append( a.getAminoType());
-        }
-        
-        String s = sequence.toString();
-                
-        return s ;
+/** get amino acid sequence.
+ * @return a String representing the sequence.	    
+ */
+public String getSequence(){
+    
+    List aminos = getGroups("amino");
+    StringBuffer sequence = new StringBuffer() ;
+    for ( int i=0 ; i< aminos.size(); i++){
+        AminoAcid a = (AminoAcid)aminos.get(i);
+        sequence.append( a.getAminoType());
     }
-	
+    
+    String s = sequence.toString();
+    
+    return s ;
+}
+
 }

@@ -329,9 +329,9 @@ public class StructureImpl implements Structure {
 	    for (int j=0;j<size(i);j++){
 		//System.out.println("getting chain "+i+" "+j); 
 		Chain cha = (Chain)getChain(i,j); 
-		ArrayList agr = cha.getGroups("amino");
-		ArrayList hgr = cha.getGroups("hetatm");
-		ArrayList ngr = cha.getGroups("nucleotide");
+		List agr = cha.getGroups("amino");
+		List hgr = cha.getGroups("hetatm");
+		List ngr = cha.getGroups("nucleotide");
 		    
 		str += "chain: >"+cha.getName()+"<"+
 		    " length: " +cha.getLength()+

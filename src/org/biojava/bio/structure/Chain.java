@@ -23,7 +23,7 @@
  */
 package org.biojava.bio.structure;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import org.biojava.bio.Annotation;
 
 /**
@@ -56,13 +56,13 @@ public interface Chain {
      * @param type  a String
      * @return an ArrayList object
      */
-    public ArrayList getGroups (String type);
+    public List getGroups (String type);
 
     /** return all groups of this chain.
      * @return an ArrayList of all Group objects of this chain
 
      */
-    public ArrayList getGroups ();
+    public List getGroups ();
 
     /** get total length of chain, including HETATMs..
      * @return an int representing the length of the whole chain including HETATMs
