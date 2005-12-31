@@ -8,7 +8,7 @@
     <class name="org.biojavax.ontology.SimpleComparableTriple" table="term_relationship" node="triple" entity-name="Triple">
 
         <id name="id" type="integer" unsaved-value="null" column="term_relationship_id" node="@id">
-            <generator class="identity"/>
+            <generator class="native"/>
         </id>
 
         <many-to-one name="subject" class="Term" column="subject_term_id" not-null="true" cascade="persist,merge,save-update" node="@subjectTermId" embed-xml="false"/>

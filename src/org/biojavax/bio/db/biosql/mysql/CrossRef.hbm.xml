@@ -8,7 +8,7 @@
     <class name="org.biojavax.SimpleCrossRef" table="dbxref" node="crossref" entity-name="CrossRef">
 
         <id name="id" type="integer" unsaved-value="null" column="dbxref_id" node="@id">
-            <generator class="identity"/>
+            <generator class="native"/>
         </id>
 
         <property name="dbname" node="@db"/>

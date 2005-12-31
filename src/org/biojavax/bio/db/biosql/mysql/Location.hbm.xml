@@ -8,9 +8,7 @@
     <class name="org.biojavax.bio.seq.SimpleRichLocation" table="location" node="location" entity-name="Location">
 
         <id name="id" type="integer" unsaved-value="null" column="location_id" node="@id">
-            <generator class="sequence">
-                <param name="sequence">location_pk_seq</param>
-            </generator>
+            <generator class="native"/>
         </id>
         
         <many-to-one name="feature" class="Feature" column="seqfeature_id" not-null="true" cascade="persist,merge,save-update" node="@featureId" embed-xml="false"/>
