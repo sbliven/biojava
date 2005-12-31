@@ -4489,7 +4489,7 @@ session.close();</programlisting>
       created, do this (inside a transaction):</para>
 
       <programlisting>RichSequence rs = ...;                    // some sequence you've made
-session.saveOrUpdate("RichSequence",rs);  // persist the sequence</programlisting>
+session.saveOrUpdate("BioEntry",rs);  // persist the sequence (RichSequence is a BioEntry)</programlisting>
 
       <para>Nothing will actually get saved to the database until you commit
       the transaction. If you rollback the transaction or exit without
