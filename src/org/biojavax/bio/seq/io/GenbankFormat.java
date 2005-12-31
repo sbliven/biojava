@@ -158,15 +158,16 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     
     /**
      * {@inheritDoc}
-     * Returns an protein parser if the letter A appears in the first line of the file.
+     * Returns an dna parser if the letters DNA or RNA appear in the first line of the file.
      * Otherwise returns a DNA tokenizer.
      */
     public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
-        boolean aa = br.readLine().indexOf('A')>0;
+        String firstLine = br.readLine();
+        boolean dna = (firstLine.indexOf("DNA") >0 || firstLine.indexOf("RNA") > 0);
         br.close();
-        if (aa) return RichSequence.IOTools.getProteinParser();
-        else return RichSequence.IOTools.getDNAParser();
+        if (dna) return RichSequence.IOTools.getDNAParser();
+        else return RichSequence.IOTools.getProteinParser();
     }
     
     /**
