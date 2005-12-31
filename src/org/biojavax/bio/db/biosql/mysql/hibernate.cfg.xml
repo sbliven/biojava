@@ -18,7 +18,7 @@
         -->
         
         <property name="show_sql">false</property>
-        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="dialect">org.hibernate.dialect.MySQLInnoDBDialect</property>
 
         <!-- Mapping files -->
         <mapping resource="Namespace.hbm.xml"/>
