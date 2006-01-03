@@ -16,8 +16,10 @@
         <property name="name" node="@name"/>
         <property name="authority" node="@authority"/>
         <property name="description"/>
+        <!-- only supported in Oracle schema as of BioSQL 1.0
         <property name="acronym" node="@acronym"/>
         <property name="URIString" column="uri" node="uri"/>
+        -->
         
     </class>
 
