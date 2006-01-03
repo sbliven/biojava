@@ -104,7 +104,9 @@ public interface Namespace extends Comparable,Changeable {
     public String getAcronym();
     
     /**
-     * Sets an optional acronym for the namespace. Null will unset it.
+     * Sets an optional acronym for the namespace. Null will unset it. Note that
+     * in BioSQL 1.0 Acronym is only part of the Oracle schema therefore it will
+     * only be persisted in that schema.
      * @param acronym the acronym for the namespace.
      * @throws ChangeVetoException in case of objections.
      */
@@ -117,7 +119,9 @@ public interface Namespace extends Comparable,Changeable {
     public URI getURI();
     
     /**
-     * Sets an optional URI for the namespace. Null will unset it.
+     * Sets an optional URI for the namespace. Null will unset it. Note that in
+     * BioSQL 1.0 URI is not persisted into the database unless the 
+     * extended Oracle schema is used.
      * @param URI the URI of the authority.
      * @throws ChangeVetoException in case of objections.
      */
