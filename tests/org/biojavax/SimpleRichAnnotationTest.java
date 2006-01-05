@@ -88,7 +88,7 @@ public class SimpleRichAnnotationTest extends TestCase {
         assertTrue(anno1.getNoteSet().size() == 1);
         
         ComparableOntology ont = RichObjectFactory.getDefaultOntology();
-        ComparableTerm term = ont.getOrCreateTerm("foo"); 
+        ComparableTerm term = ont.getOrCreateTerm("foo2"); 
         Note note2 = new SimpleNote(term, "bar", 0);
         try{
             anno1.addNote(note2);
@@ -97,7 +97,7 @@ public class SimpleRichAnnotationTest extends TestCase {
         }
         assertTrue(anno1.contains(note));
         assertTrue(anno1.contains(note2));
-        assertTrue(anno1.getNoteSet().size() == 2);
+        assertEquals(2, anno1.getNoteSet().size());
         assertTrue(anno1.keys().size() == 2);
         assertTrue(anno1.containsProperty("foo"));
         assertTrue(anno1.containsProperty(note.getTerm()));
