@@ -96,8 +96,6 @@ public class PDBFileParser  {
         
         Alphabet alpha_prot = ProteinTools.getAlphabet();
         
-        
-        
         try {
             threeLetter = alpha_prot.getTokenization("name");
             oneLetter  = alpha_prot.getTokenization("token");
@@ -420,7 +418,8 @@ public class PDBFileParser  {
         
         String fullname = line.substring (12, 16);
         // altLoc
-        String altLoc   = line.substring (16, 17);
+        // TODO: store the altLoc somewhere...
+        //String altLoc   = line.substring (16, 17);
         atom.setFullName(fullname) ;
         atom.setName(fullname.trim());
         
@@ -754,8 +753,7 @@ public class PDBFileParser  {
                 throw new IOException ("could not parse PDB File, BufferedReader returns null!");
             }
             
-            //System.out.println ("starting to parse:");
-            //System.out.println (line); 
+       
             
             while (line != null) {
 //              System.out.println (">"+line+"<");
