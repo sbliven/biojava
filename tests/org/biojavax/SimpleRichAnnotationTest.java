@@ -88,7 +88,7 @@ public class SimpleRichAnnotationTest extends TestCase {
         assertTrue(anno1.getNoteSet().size() == 1);
         
         ComparableOntology ont = RichObjectFactory.getDefaultOntology();
-        ComparableTerm term = new SimpleComparableTerm(ont, "foo2", null);
+        ComparableTerm term = ont.getOrCreateTerm("foo"); 
         Note note2 = new SimpleNote(term, "bar", 0);
         try{
             anno1.addNote(note2);
