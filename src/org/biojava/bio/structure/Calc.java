@@ -606,26 +606,11 @@ public class Calc {
     public static Atom createVirtualCBAtom(AminoAcid amino) 
     throws StructureException{
         
-        // define a standard ALA:
-        // O is just for completeness.
-        
-        double[] ala_N  =  new double[] { -0.525,  1.373,  0.000};
-        double[] ala_CA =  new double[] {  0.000,  0.000,  0.000};
-        double[] ala_C  =  new double[] {  1.530,  0.000,  0.000};
-        //double[] ala_O  =  new double[] {  2.152, -1.073,  0.000};
-        double[] ala_CB =  new double[] { -0.523, -0.769, -1.215};
-        
-        Atom aN = new AtomImpl();
-        aN.setCoords(ala_N);
-        
-        Atom aCA = new AtomImpl();
-        aCA.setCoords(ala_CA);
-        
-        Atom aC = new AtomImpl();
-        aC.setCoords(ala_C);
-        
-        Atom aCB = new AtomImpl();
-        aCB.setCoords(ala_CB);
+        AminoAcid  ala = StandardAminoAcid.getAminoAcid("ALA");
+        Atom aN  = ala.getN();
+        Atom aCA = ala.getCA();
+        Atom aC  = ala.getC();
+        Atom aCB = ala.getCB();
         
         
         Atom[] arr1 = new Atom[3];
