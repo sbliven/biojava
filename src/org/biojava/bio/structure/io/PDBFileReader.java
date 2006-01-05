@@ -23,24 +23,15 @@
  *
  * some interesting PDB files ...
  * /nfs/disk100/pdb/pdbent/pdb1dw9.ent
-  * chain a first group -> selenomethionine
+ * chain a first group -> selenomethionine
  */
 package org.biojava.bio.structure.io;
 
 import org.biojava.bio.structure.*;
-
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.SymbolTokenization ;
-
+import org.biojava.utils.io.InputStreamProvider;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.zip.*;
-import java.util.Arrays ;
-import java.util.Enumeration ;
-import java.util.zip.* ;
-import java.util.Calendar;
+
 
 
 
@@ -55,37 +46,37 @@ import java.util.Calendar;
  * A:
  * <pre>
  String filename =  "path/to/pdbfile.ent" ;
-
+ 
  PDBFileReader pdbreader = new PDBFileReader();
-
+ 
  try{
-      	Structure struc = pdbreader.getStructure(filename);
-	System.out.println(struc);
+     Structure struc = pdbreader.getStructure(filename);
+     System.out.println(struc);
  } catch (Exception e) {
- 	e.printStackTrace();
+     e.printStackTrace();
  }
  </pre>
  *
  *
  */
 public class PDBFileReader implements StructureIOFile {
-
+    
     String path                     ;
     ArrayList extensions            ;
-
-  
-
+    
+    
+    
     public PDBFileReader() {
-	extensions    = new ArrayList();
-	path = "" ;
-
+        extensions    = new ArrayList();
+        path = "" ;
+        
     }
-
+    
     /** directory where to find PDB files */
     public void setPath(String p){
-	path = p ;
+        path = p ;
     }
-
+    
     /**
      * Returns the path value.
      * @return a String representing the path value
@@ -93,22 +84,22 @@ public class PDBFileReader implements StructureIOFile {
      *
      */
     public String getPath() {
-	return path ;
+        return path ;
     }
-
+    
     /** define supported file extensions 
      * compressed extensions .Z,.gz do not need to be specified
      * they are dealt with automatically.
-       
+     
      */
     public void addExtension(String s){
-	//System.out.println("add Extension "+s);
-	extensions.add(s);
+        //System.out.println("add Extension "+s);
+        extensions.add(s);
     }
-
-
-   
-
+    
+    
+    
+    
     /** try to find the file in the filesystem and return a filestream in order to parse it 
      * rules how to find file
      * - first check: if file is in path specified by PDBpath
@@ -116,97 +107,64 @@ public class PDBFileReader implements StructureIOFile {
      */
     
     private FileInputStream getInputStream(String pdbId) 
-	throws IOException
+    throws IOException
     {
-	//System.out.println("checking file");
-
-	// compression formats supported
-	String[] str = {".gz",".zip",".Z"};
-	ArrayList  compressions = new ArrayList( Arrays.asList( str ) ); 
- 
-	FileInputStream inputStream =null;
-	
-	String pdbFile = null ;
-	File f = null ;
-	String fpath = path+"/"+pdbId;
-	for (int i=0 ; i<extensions.size();i++){
-	    String ex = (String)extensions.get(i) ;
-	    System.out.println("PDBFileReader testing: "+fpath+ex);
-	    f = new File(fpath+ex) ;
-
-	    if ( f.exists()) {
-		//System.out.println("found!");
-		pdbFile = fpath+ex ;
-		inputStream = new FileInputStream(pdbFile);
-		break;
-	    }
-	    
-	    /*
-	    for (int j =0; j< compressions.size();j++){
-		String compression = (String)compressions.get(j);
-		System.out.println("testing: "+fpath+ex+compression);
-		f = new File(fpath+ex+compression) ;
-		if ( f.exists()) {
-		    System.out.println("found!");
-		    pdbFile = fpath+ex+compression ;
-		    
-		    if (compression.equals(".gz")) {
-			FileInputStream is = new FileInputStream(pdbFile);
-			inputStream = (FileInputStream)new GZIPInputStream(is);
-		    } else if (compression.equals(".zip")){
-			// only stream to first entry is returned ...
-			ZipEntry entry;
-			Enumeration e = zipfile.entries();
-			if ( e.hasMoreElements()){
-			    entry = (ZipEntry) e.nextElement();
-			    ZipFile zipfile = new ZipFile(pdbFile);
-			    inputStream = zipfile.getInputStream(entry);
-			} else {
-			    throw new IOErrorEception ("Zip file has no entries");
-			}
-			
-
-		    }
-			
- 
-
-			break;
-		}
-	    }
-	    */
-	    if ( pdbFile != null) break; 	    
-	}
-	
-	if ( pdbFile == null ) {
-	    String message = "no structure with PDB code " + pdbId + " found!" ;
-	    throw new IOException (message);
-	}
-	
-	return inputStream ;
+        //System.out.println("checking file");
+        
+        // compression formats supported
+        String[] str = {".gz",".zip",".Z"};
+        //ArrayList  compressions = new ArrayList( Arrays.asList( str ) ); 
+        
+        FileInputStream inputStream =null;
+        
+        String pdbFile = null ;
+        File f = null ;
+        String fpath = path+"/"+pdbId;
+        for (int i=0 ; i<extensions.size();i++){
+            String ex = (String)extensions.get(i) ;
+            System.out.println("PDBFileReader testing: "+fpath+ex);
+            f = new File(fpath+ex) ;
+            
+            if ( f.exists()) {
+                //System.out.println("found!");
+                pdbFile = fpath+ex ;
+                inputStream = new FileInputStream(pdbFile);
+                break;
+            }
+            
+            if ( pdbFile != null) break; 	    
+        }
+        
+        if ( pdbFile == null ) {
+            String message = "no structure with PDB code " + pdbId + " found!" ;
+            throw new IOException (message);
+        }
+        
+        return inputStream ;
     }
-
-
- 
-
+    
+    
+    
+    
     /** load a structure from local file system and return a PDBStructure object 
-
+     
      * @param pdbId  a String specifying the id value (PDB code)
      * @return the Structure object
      * @throws IOException ...
      */
     public Structure getStructureById(String pdbId) 
-	throws IOException
+    throws IOException
     {
-	
-
-	FileInputStream inStream = getInputStream(pdbId);
-
-	//System.out.println("Starting to parse PDB file " + getTimeStamp());
-	PDBFileParser pdbpars = new PDBFileParser();
-	Structure struc = pdbpars.parsePDBFile(inStream) ;
-	return struc ;
+        
+        
+        FileInputStream inStream = getInputStream(pdbId);
+        
+        //System.out.println("Starting to parse PDB file " + getTimeStamp());
+        PDBFileParser pdbpars = new PDBFileParser();
+        Structure struc = pdbpars.parsePDBFile(inStream) ;
+        return struc ;
     }
-
+    
     /** open filename  and returns
      * a PDBStructure object .
      * @param filename  a String
@@ -214,14 +172,16 @@ public class PDBFileReader implements StructureIOFile {
      * @throws IOException ...
      */
     public Structure getStructure(String filename) 
-	throws IOException
+    throws IOException
     {
-	
-	FileInputStream inStream = new FileInputStream(filename);
-	PDBFileParser pdbpars = new PDBFileParser();
-	Structure struc = pdbpars.parsePDBFile(inStream) ;
-	return struc ;
+        InputStreamProvider isp = new InputStreamProvider();
+        
+        InputStream inStream = isp.getInputStream(filename);
 
+        PDBFileParser pdbpars = new PDBFileParser();
+        Structure struc = pdbpars.parsePDBFile(inStream) ;
+        return struc ;
+        
     }
-
+    
 }
