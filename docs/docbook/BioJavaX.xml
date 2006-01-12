@@ -3055,7 +3055,7 @@ seqsOut.writeStream(seqsIn,bloggsNS);                                       // o
       <title>New formats</title>
 
       <para>If you want to add a new format, the best thing to do is to extend
-      <code>RIchSequenceFormat.BasicFormat</code> and go from there. In order
+      <code>RichSequenceFormat.BasicFormat</code> and go from there. In order
       to make your class work with the automatic format-guesser
       (<code>RichSequence.IOTools.readFile()</code>) you'll need to implement
       <code>canRead()</code> and <code>guessSymbolTokenization()</code>, and
@@ -3302,30 +3302,31 @@ while (moreSeqsAvailable) {
       <title>Working with locations.</title>
 
       <para>In BioJavaX, all locations are instances of classes which
-      implement the RichLocation interface. These are very complex objects, so
-      need to be used with care.</para>
+      implement the <code>RichLocation</code> interface. These are very
+      complex objects, so need to be used with care.</para>
 
-      <para>All locations use Position objects to define their end points.
-      Position objects have a start coordinate, and for fuzzy ones an end
-      coordinate too along with a symbol indicating what kind of range the two
-      points encompass (eg. the "." or "^" symbols from GenBank-style
-      locations). If the start or end coordinate of a fuzzy position is fuzzy
-      in itself (eg. "&lt;" or "&gt;" from GenBank-style locations), then
-      flags can be set on the object to indicate this.</para>
+      <para>All locations use <code>Position</code> objects to define their
+      end points. <code>Position</code> objects have a start coordinate, and
+      for fuzzy ones an end coordinate too along with a symbol indicating what
+      kind of range the two points encompass (eg. the "." or "^" symbols from
+      GenBank-style locations). If the start or end coordinate of a fuzzy
+      position is fuzzy in itself (eg. "&lt;" or "&gt;" from GenBank-style
+      locations), then flags can be set on the object to indicate this.</para>
 
-      <para>Locations have ranks which are used to sort them. If persisted to
-      a database, the location will be flattened out into a set of simple
-      locations, ordered by their rank in ascending order. The complex
-      location constructed from these when retrieving them from the database
-      will have its members in the same order. It is important then to monitor
-      the ranks in your locations and make sure they are in the correct order
-      before persisting them. Note that the locations produced by the
+      <para><code>Location</code>s have ranks which are used to sort them. If
+      persisted to a database, the location will be flattened out into a set
+      of simple locations, ordered by their rank in ascending order. The
+      complex location constructed from these when retrieving them from the
+      database will have its members in the same order. It is important then
+      to monitor the ranks in your locations and make sure they are in the
+      correct order before persisting them. Note that the locations produced
+      by the <code>UniProtLocationParser</code> and
       <code>GenbankLocationParser</code> will always be correctly ranked ready
       for persisting to a database.</para>
 
       <para>The simplest kind of location describes a single point or range
       between two points on a sequence, with optional fuzziness at either end.
-      This is implemented by the SimpleRichLocation class.</para>
+      This is implemented by the <code>SimpleRichLocation</code> class.</para>
 
       <para>This example describes the GenBank-style location string
       "56":</para>
@@ -4418,8 +4419,10 @@ try {
         System.out.println(ns.getName());     // print out the name of the namespace
 
         // print out all the sequences in the namespace
+        Query sq = session.createQuery("from BioEntry where namespace=?",ns);
+        List sequences = sq.list();
 
-        for (Iterator j = ns.getMembers().iterator(); j.hasNext(); ) {
+        for (Iterator j = sequences.iterator(); j.hasNext(); ) {
             BioEntry be = (BioEntry)j.next();        // RichSequences are BioEntrys too
             System.out.println("   "+be.getName());  // print out the name of the sequence
 
@@ -4475,9 +4478,9 @@ session.close();</programlisting>
     <section>
       <title>Persisting objects.</title>
 
-      <para>Any object created by using methods from RichObjectFactory will
-      automatically attach itself to the database and persist when the
-      transaction is committed.</para>
+      <para>Any object created by using methods from
+      <code>RichObjectFactory</code> will automatically attach itself to the
+      database and persist when the transaction is committed.</para>
 
       <para>Any object you create directly yourself must be explicitly
       attached to the database using the appropriate Hibernate mapping name
@@ -4485,11 +4488,11 @@ session.close();</programlisting>
       properties that are other mappable objects, they will be persisted too
       in a cascading fashion.</para>
 
-      <para>For example, to persist a RichSequence object that you have just
-      created, do this (inside a transaction):</para>
+      <para>For example, to persist a <code>RichSequence</code> object that
+      you have just created, do this (inside a transaction):</para>
 
-      <programlisting>RichSequence rs = ...;                    // some sequence you've made
-session.saveOrUpdate("BioEntry",rs);  // persist the sequence (RichSequence is a BioEntry)</programlisting>
+      <programlisting>RichSequence rs = ...;                // some sequence you've made
+session.saveOrUpdate("Sequence",rs);  // persist the sequence</programlisting>
 
       <para>Nothing will actually get saved to the database until you commit
       the transaction. If you rollback the transaction or exit without
@@ -4523,10 +4526,10 @@ Namespace ns = (Namespace)q.uniqueObject();  // alternative notation for queries
 
       <para>You don't have to worry about foreign keys, and can just join
       objects directly without specifying which field to use. This query
-      returns all RichSequence objects that have a comment that contains the
-      word "rubbish" with a rank of 0:</para>
+      returns all <code>RichSequence</code> objects that have a comment that
+      contains the word "rubbish" with a rank of 0:</para>
 
-      <programlisting>Query q = session.createQuery("select rs from RichSequence as rs join Comment as c where c.comment like :comment and rank=:rank");
+      <programlisting>Query q = session.createQuery("select rs from Sequence as rs join Comment as c where c.comment like :comment and rank=:rank");
 q.setString("comment","%rubbish%");  // % symbol means match any string
 q.setInteger("rank",0);
 List sequences = q.list();           // a list of all matching RichSequence objects.</programlisting>
@@ -4536,7 +4539,7 @@ List sequences = q.list();           // a list of all matching RichSequence obje
       mapping, hence no join required to access fields from either
       table:</para>
 
-      <programlisting>Query q = session.createQuery("from RichSequence where length&gt;:length and name=:name");
+      <programlisting>Query q = session.createQuery("from Sequence where length&gt;:length and name=:name");
 q.setInteger("length",200);
 q.setString("name","joe");
 List sequences = q.list();</programlisting>
@@ -4546,7 +4549,7 @@ List sequences = q.list();</programlisting>
       sequences that belong in a particular namespace:</para>
 
       <programlisting>Namespace ns = ...;   // get a namespace from somewhere, eg. RichObjectFactory.getDefaultNamespace()
-Query q = session.createQuery("from RichSequence where namespace=:namespace");
+Query q = session.createQuery("from Sequence where namespace=:namespace");
 q.setParameter("namespace",ns);   // plug the namespace object right in!
 List sequences = q.list();</programlisting>
 
@@ -4562,7 +4565,7 @@ List sequences = q.list();</programlisting>
       <para>You might not always want to retrieve lists of objects from the
       database. This query retrieves the names of sequences:</para>
 
-      <programlisting>Query q = session.createQuery("select name from RichSequence");
+      <programlisting>Query q = session.createQuery("select name from Sequence");
 List names = q.list();  // list will contain String instances containing the names</programlisting>
 
       <para>This one returns all the lengths of sequences, which are integers.
@@ -4570,7 +4573,7 @@ List names = q.list();  // list will contain String instances containing the nam
       parameter, and not <code>length</code> which is the database table
       column name:</para>
 
-      <programlisting>Query q = session.createQuery("select sequenceLength from RichSequence");
+      <programlisting>Query q = session.createQuery("select sequenceLength from Sequence");
 List lengths = q.list();  // list will contain Integer instances containing the lengths</programlisting>
     </section>
 
