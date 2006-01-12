@@ -42,7 +42,8 @@ import java.util.Calendar;
 /**
  * A PDB file parser.
  * @author Andreas Prlic
- *
+ * @since 1.4
+ * 
  * <p>
  * Q: How can I get a Structure object from a PDB file?
  * </p>
@@ -54,10 +55,10 @@ import java.util.Calendar;
  PDBFileReader pdbreader = new PDBFileReader();
  
  try{
- Structure struc = pdbreader.getStructure(filename);
- System.out.println(struc);
+     Structure struc = pdbreader.getStructure(filename);
+     System.out.println(struc);
  } catch (Exception e) {
- e.printStackTrace();
+     e.printStackTrace();
  }
  </pre>
  *
@@ -417,9 +418,10 @@ public class PDBFileParser  {
         atom.setPDBserial(pdbnumber) ;
         
         String fullname = line.substring (12, 16);
-        // altLoc
-        // TODO: store the altLoc somewhere...
-        //String altLoc   = line.substring (16, 17);
+       
+        Character altLoc   = new Character(line.substring (16, 17).charAt(0));
+        
+        atom.setAltLoc(altLoc);
         atom.setFullName(fullname) ;
         atom.setName(fullname.trim());
         
