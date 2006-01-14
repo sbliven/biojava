@@ -64,6 +64,15 @@ public interface Chain {
      */
     public List getGroups ();
 
+    /** get a group by its PDB residue numbering. if the PDB residue number is not know,
+     * throws a StructureException.
+     * 
+     * @param pdbresnum the PDB residue number of the group
+     * @return the matching group
+     */
+    public Group getGroupByPDB(String pdbresnum) throws StructureException;
+    
+    
     /** get total length of chain, including HETATMs..
      * @return an int representing the length of the whole chain including HETATMs
      */
