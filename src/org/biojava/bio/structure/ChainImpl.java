@@ -25,6 +25,7 @@ package org.biojava.bio.structure;
 
 
 import java.util.ArrayList ;
+import java.util.HashMap;
 import java.util.List;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.AminoAcid;
@@ -44,6 +45,8 @@ public class ChainImpl implements Chain {
     String name ; // like in PDBfile
     List groups;
     Annotation annotation ;
+    
+    HashMap pdbResnumMap;
     /**
      *  Constructs a ChainImpl object.
      */
@@ -53,6 +56,8 @@ public class ChainImpl implements Chain {
         name = DEFAULT_CHAIN_ID;
         groups = new ArrayList() ;
         annotation = Annotation.EMPTY_ANNOTATION;
+        
+        pdbResnumMap = new HashMap();
         
     }
     
@@ -106,6 +111,14 @@ public class ChainImpl implements Chain {
         
         
         groups.add(group);
+    
+        // store the positioninternally for quick retrieval of this group
+        String pdbResnum = group.getPDBCode();
+        if ( pdbResnum != null) {
+            Integer pos = new Integer(groups.size()-1);
+            pdbResnumMap.put(pdbResnum,pos);
+        }
+        
     }
     
     /** return the amino acid at position .
@@ -146,6 +159,19 @@ public class ChainImpl implements Chain {
     
     
     
+    
+    
+    public Group getGroupByPDB(String pdbresnum) throws StructureException {
+      if ( pdbResnumMap.containsKey(pdbresnum)) {
+          Integer pos = (Integer) pdbResnumMap.get(pdbresnum);
+          return (Group) groups.get(pos.intValue());
+      } else {
+          throw new StructureException("unknown PDB residue number " + pdbresnum + " in chain " + name);
+      }
+        
+    }
+
+
     public int getLength() {return groups.size();  }
     
     
