@@ -23,6 +23,8 @@
  */
 package org.biojava.bio.structure;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Implementation of an Atom of a PDB file.
  * currently the coordinates of an atom are represented by a doubl[3] array.
@@ -42,6 +44,7 @@ public class AtomImpl implements Atom {
     double tempfactor;
     
     Character altLoc ;
+    WeakReference parent;
     
     public AtomImpl () {
         name     = null        ;
@@ -51,6 +54,7 @@ public class AtomImpl implements Atom {
         occupancy  = 0.0       ;
         tempfactor = 0.0       ;
         altLoc = new Character(' ');
+        parent = new WeakReference(null);
     }
     
     /** trimmed version of atom name, e.g. "CA" 
@@ -171,4 +175,15 @@ public class AtomImpl implements Atom {
         n.setName(getName());
         return n ;
     }
+    
+    public void setParent(Group parent) {
+        this.parent = new WeakReference(parent);
+    }
+  
+    public Group getParent() {
+        if (parent.get() instanceof Group) return (Group) parent.get();
+        else return null;
+    }   
+    
+    
 }

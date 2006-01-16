@@ -25,7 +25,7 @@ package org.biojava.bio.structure;
 
 /**
  * simple interface of an Atom.
-
+ 
  * @author Andreas Prlic
  * @version %I% %G%
  * @since 1.4
@@ -38,7 +38,7 @@ public interface Atom {
      * @see #getName
      */
     public void   setName(String s);
-
+    
     /** get trimmed version of atom name, e.g. "CA".
      * @return a String representing the name value 
      * @see #setName
@@ -50,31 +50,31 @@ public interface Atom {
      * @see #getFullName
      */
     public void   setFullName(String s) ;
-
+    
     /** get full name of atom e.g. " CA ".
      * @return a String representing the full name value 
      * @see #setFullName
      */
     public String getFullName();
-
+    
     /** set PDB atom number. 
      * @param i  an int specifying the PDBserial value 
      * @see #getPDBserial
      */
     public void setPDBserial(int i) ;
-
+    
     /** get PDB atom number.
      * @return an int representing the PDBserial value 
      * @see #setPDBserial
      */
     public int  getPDBserial() ;
-
+    
     /** set the coordinates.  
      * @param c  an array of doubles specifying the coords value
      * @see #getCoords
      */    
     public void    setCoords(double[] c);
-
+    
     /** get the coordinates. 
      * @return an array of doubles representing the coords value
      * @see #setCoords
@@ -85,57 +85,58 @@ public interface Atom {
      * @param x  a double
      */
     public void setX(double x);
-
+    
     /** set the Y coordinate
      * @param y  a double
      */
     public void setY(double y);
-
+    
     /** set the Z coordinate
      * @param z  a double
      
      */
     public void setZ(double z);
-
+    
     /** get cordinate X. 
      * @return a double
      */    
     public double getX() ;
-
+    
     /** get cordinate Y. 
      * @return a double
      */    
     public double getY() ;
-
+    
     /** get cordinate Z. 
      * @return a double
      */    
     public double getZ() ;
-
+    
     /** get set alternate Location.
      * @param c  a Character object specifying the alt loc value 
      * @see #getAltLoc
      */
     public void setAltLoc(Character c);
+    
     /** get set alternate Location. 
      * @return a Character object representing the alt loc value
      * @see #setAltLoc
      */
     public Character getAltLoc();
-
+    
     /** store the whole line.  
      * @param s  a String specifying the PDBline value
      * @see #getPDBline
      */
     public void   setPDBline(String s) ;
-
+    
     /** store the whole line.  
      * @return a String representing the PDBline value
      * @see #setPDBline
      */
-
+    
     public String getPDBline() ;
-
+    
     /** set occupancy. 
      * @param occupancy  a double specifying the occupancy value
      * @see #getOccupancy
@@ -147,22 +148,40 @@ public interface Atom {
      * @see #setOccupancy
      */
     public double getOccupancy();
-
+    
     /** get set temp factor .
      * @param temp  a double specifying the temp factor value
      * @see #getTempFactor
      */
     public void   setTempFactor(double temp) ;
-
+    
     /** get set temp factor. 
      * @return a double representing the temp factor value
      * @see #setTempFactor
      */
     public double getTempFactor() ;
-
+    
     /** returns and identical copy of this  object .
      * @return  and identical copy of this  object 
      */
     public Object clone();
+    
+    /** Sets the back-reference to its parent Group
+     * @param parent the parent Group
+     * @return void
+     * 
+     * @author Horvath Tamas
+     */
+    public void setParent(Group parent) ; 
 
+     /** Returns the parent Group of the Atom
+     * 
+     * @return Group the parent Group of the Atom 
+     * @return null  if the referenced object is not Group
+     * @author Horvath Tamas 
+     */
+    public Group getParent();
+    
+    
+    
 }
