@@ -109,10 +109,11 @@ public class ChainImpl implements Chain {
     
     public void addGroup(Group group) {
         
+        group.setParent(this);
         
         groups.add(group);
     
-        // store the positioninternally for quick retrieval of this group
+        // store the position internally for quick access of this group
         String pdbResnum = group.getPDBCode();
         if ( pdbResnum != null) {
             Integer pos = new Integer(groups.size()-1);
