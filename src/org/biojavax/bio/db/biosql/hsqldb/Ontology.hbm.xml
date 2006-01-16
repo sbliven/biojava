@@ -8,7 +8,7 @@
     <class name="org.biojavax.ontology.SimpleComparableOntology" table="ontology" node="ontology" entity-name="Ontology">
 
         <id name="id" type="integer" unsaved-value="null" column="ontology_id" node="@id">
-            <generator class="identity"/>
+            <generator class="native"/>
         </id>
 
         <property name="name" node="@name"/>

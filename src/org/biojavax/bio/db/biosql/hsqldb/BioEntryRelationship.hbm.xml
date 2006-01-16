@@ -8,9 +8,7 @@
     <class name="org.biojavax.bio.SimpleBioEntryRelationship" table="bioentry_relationship" node="sequenceRelation" entity-name="BioEntryRelationship">
 
         <id name="id" type="integer" unsaved-value="null" column="bioentry_relationship_id" node="@id">
-            <generator class="sequence">
-                <param name="sequence">bioentry_relationship_pk_seq</param>
-            </generator>
+            <generator class="native"/>
         </id>
 
         <many-to-one name="term" class="Term" column="term_id" not-null="true" cascade="persist,merge,save-update" node="@termId" embed-xml="false"/>

@@ -8,9 +8,7 @@
     <class name="org.biojavax.bio.seq.SimpleRichFeature" table="seqfeature" node="feature" entity-name="Feature">
 
         <id name="id" type="integer" unsaved-value="null" column="seqfeature_id" node="@id">
-            <generator class="sequence">
-                <param name="sequence">seqfeature_pk_seq</param>
-            </generator>
+            <generator class="native"/>
         </id>
 
         <many-to-one name="parent" class="Sequence" column="bioentry_id" not-null="true" cascade="persist,merge,save-update" node="@parentRichSequenceId" embed-xml="false"/>

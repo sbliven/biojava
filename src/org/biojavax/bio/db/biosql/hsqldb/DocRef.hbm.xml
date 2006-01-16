@@ -8,7 +8,7 @@
     <class name="org.biojavax.SimpleDocRef" table="reference" node="docref" entity-name="DocRef">
 
         <id name="id" type="integer" unsaved-value="null" column="reference_id" node="@id">
-            <generator class="identity"/>
+            <generator class="native"/>
         </id>
 
         <property name="title"/>

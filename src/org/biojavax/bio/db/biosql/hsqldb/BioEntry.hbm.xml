@@ -8,9 +8,7 @@
     <class name="org.biojavax.bio.SimpleBioEntry" table="bioentry" node="bioentry" entity-name="BioEntry">
 
         <id name="id" type="integer" unsaved-value="null" column="bioentry_id" node="@id">
-            <generator class="sequence">
-                <param name="sequence">bioentry_pk_seq</param>
-            </generator>
+            <generator class="native"/>
         </id>
 
         <property name="name" node="@name"/>

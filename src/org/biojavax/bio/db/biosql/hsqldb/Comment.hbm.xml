@@ -8,7 +8,7 @@
     <class name="org.biojavax.SimpleComment" table="anncomment" node="comment" entity-name="Comment">
 
         <id name="id" type="integer" unsaved-value="null" column="comment_id" node="@id">
-            <generator class="identity"/>
+            <generator class="native"/>
         </id>
 
         <property name="rank" node="@rank"/>

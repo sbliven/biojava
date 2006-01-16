@@ -8,15 +8,13 @@
     <class name="org.biojavax.SimpleNamespace" table="biodatabase" node="namespace" entity-name="Namespace">
 
         <id name="id" type="integer" unsaved-value="null" column="biodatabase_id" node="@id">
-            <generator class="sequence">
-                <param name="sequence">biodatabase_pk_seq</param>
-            </generator>
+            <generator class="native"/>
         </id>
 
         <property name="name" node="@name"/>
         <property name="authority" node="@authority"/>
         <property name="description"/>
-        <!-- Only supported in Oracle in BioSQL 1.0
+        <!-- Not officially supported in BioSQL 1.0
         <property name="acronym" node="@acronym"/>
         <property name="URIString" column="uri" node="uri"/>
         -->
