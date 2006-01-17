@@ -404,6 +404,27 @@ public class StructureImpl implements Structure {
 
    
 
+    public Chain getChainByPDB(String chainId, int modelnr) 
+        throws StructureException{
+        
+        List chains = getChains(modelnr);
+        Iterator iter = chains.iterator();
+        while ( iter.hasNext()){
+            Chain c = (Chain) iter.next();
+            if ( c.getName().equals(chainId))
+                return c;
+        }
+        throw new StructureException("did not find chain with chainId >" + chainId+"<");
+        
+    }
+
+
+    public Chain getChainByPDB(String chainId) 
+        throws StructureException{
+      return getChainByPDB(chainId,0);
+    }
+
+
     /** create a String that contains the contents of a PDB file. 
      *
      * @return a String that represents the structure as a PDB file.

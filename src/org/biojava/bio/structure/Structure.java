@@ -327,6 +327,26 @@ public interface Structure {
      throws StructureException;
      
     
+     /** request a chain by it's PDB code
+      * by default takes only the first model
+      * 
+      * @param chainId the chain identifier 
+      * @return
+      */
+     public Chain getChainByPDB(String chainId)
+         throws StructureException;
+     
+     /** request a chain by it's PDB code
+      * by default takes only the first model
+      * 
+      * @param chainId the chain identifier
+      * @param modelnr request a particular model; 
+      * @return
+      */
+     public Chain getChainByPDB(String chainId, int modelnr)
+         throws StructureException;
+     
+     
     /** create a String that contains the contents of a PDB file .
      *
      * @return a String that looks like a PDB file
