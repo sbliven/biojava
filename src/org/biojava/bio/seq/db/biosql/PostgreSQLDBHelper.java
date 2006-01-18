@@ -22,6 +22,7 @@
 /**
  * @author Primary aauthor unknown
  * @author Greg Cox
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 
 package org.biojava.bio.seq.db.biosql;

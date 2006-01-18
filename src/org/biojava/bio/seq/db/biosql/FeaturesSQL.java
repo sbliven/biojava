@@ -58,6 +58,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Simon Foote
  * @author Len Trigg
  * @author Richard Holland
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 class FeaturesSQL {

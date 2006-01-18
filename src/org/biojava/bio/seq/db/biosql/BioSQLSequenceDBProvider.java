@@ -30,6 +30,7 @@ import org.biojava.directory.SequenceDBProvider;
 
 /**
  * @author Thomas Down
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 public class BioSQLSequenceDBProvider implements SequenceDBProvider {
     public String getName() {

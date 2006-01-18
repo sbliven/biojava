@@ -41,6 +41,7 @@ import org.biojava.bio.seq.db.biosql.DBHelper.JoinStyle;
  * @author Len Trigg
  * @author Eric Haugen
  * @author Richard Holland
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 public class OracleDBHelper extends DBHelper {
     

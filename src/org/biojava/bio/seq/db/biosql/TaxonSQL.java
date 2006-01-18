@@ -57,6 +57,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Len Trigg
  * @author Andreas Dr&auml;ger
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 public class TaxonSQL {
 

@@ -35,6 +35,7 @@ import java.sql.Statement;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Len Trigg
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 public class MySQLDBHelper extends DBHelper {
 

@@ -51,6 +51,7 @@ import org.biojava.utils.cache.CacheReference;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 

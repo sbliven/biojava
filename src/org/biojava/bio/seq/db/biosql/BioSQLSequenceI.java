@@ -30,6 +30,7 @@ import org.biojava.bio.seq.Sequence;
  * Sequence keyed off a BioSQL biosequence.
  *
  * @author Thomas Down
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 

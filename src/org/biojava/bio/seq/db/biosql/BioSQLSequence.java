@@ -58,6 +58,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  * @author Simon Foote (modifications for schema version 1.0)
  * @author Richard Holland
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 

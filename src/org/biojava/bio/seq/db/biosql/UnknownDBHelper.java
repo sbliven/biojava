@@ -27,6 +27,7 @@ import java.sql.SQLException;
 /**
  * @author Thomas Down
  * @author Matthew Pocock
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 public class UnknownDBHelper extends DBHelper {
     public int getInsertID(Connection conn,

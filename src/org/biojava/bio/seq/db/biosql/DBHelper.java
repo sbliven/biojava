@@ -40,6 +40,7 @@ import org.biojava.bio.BioRuntimeException;
  * @author Len Trigg
  * @author Eric Haugen
  * @author Richard Holland
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 public abstract class DBHelper {
 

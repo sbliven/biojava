@@ -57,6 +57,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Eric Haugen
  * @author Len Trigg
  * @author Richard Holland
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.4
  */
 class OntologySQL {

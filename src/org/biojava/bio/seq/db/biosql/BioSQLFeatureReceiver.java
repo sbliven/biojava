@@ -38,6 +38,7 @@ import org.biojava.utils.ChangeVetoException;
  * Class for instantiating BioSQL features.
  *
  * @author Thomas Down
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 

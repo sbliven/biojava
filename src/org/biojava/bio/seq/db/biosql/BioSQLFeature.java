@@ -49,6 +49,7 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * @author Thomas Down
  * @author Simon Foote (modifications for schema version 1.0)
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 class BioSQLFeature implements Feature, RealizingFeatureHolder {
     private Annotation _annotation;

@@ -37,6 +37,7 @@ import org.biojava.utils.ChangeVetoException;
 
 /**
  * @author Thomas Down
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 class BioSQLStrandedFeature extends BioSQLFeature implements StrandedFeature {
     private StrandedFeature.Strand strand;

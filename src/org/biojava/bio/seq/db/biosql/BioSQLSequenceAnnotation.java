@@ -55,6 +55,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  * @author Len Trigg
  * @author Richard Holland
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 class BioSQLSequenceAnnotation implements Annotation {

@@ -82,6 +82,7 @@ import org.biojava.utils.cache.WeakValueHashMap;
  * @author Len Trigg
  * @author Mark Schreiber
  * @author Richard Holland
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {

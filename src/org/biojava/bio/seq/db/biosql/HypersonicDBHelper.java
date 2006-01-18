@@ -37,6 +37,7 @@ import org.biojava.bio.BioRuntimeException;
  *
  * @author Len Trigg
  * @author Richard Holland
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  */
 public class HypersonicDBHelper extends DBHelper {
 

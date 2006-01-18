@@ -50,6 +50,7 @@ import org.biojava.utils.Unchangeable;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 

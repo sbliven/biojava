@@ -36,6 +36,7 @@ import org.biojava.utils.IndexedChangeHub;
  *
  * @author Thomas Down (original implementation)
  * @author David Huen (refactoring)
+ * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 class BioSQLEntryAnnotationChangeHub extends IndexedChangeHub

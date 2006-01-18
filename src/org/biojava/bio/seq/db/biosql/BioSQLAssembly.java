@@ -60,6 +60,7 @@ import org.biojava.utils.AssertionFailure;
  * @author Matthew Pocock
  * @author David Huen
  * @author Richard Holland
+  * @deprecated Use hibernate and org.biojavax.bio.db.*
  * @since 1.3
  */
 
