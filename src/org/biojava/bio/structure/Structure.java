@@ -331,7 +331,7 @@ public interface Structure {
       * by default takes only the first model
       * 
       * @param chainId the chain identifier 
-      * @return
+      * @return the Chain that matches the chainID
       */
      public Chain getChainByPDB(String chainId)
          throws StructureException;
@@ -341,7 +341,7 @@ public interface Structure {
       * 
       * @param chainId the chain identifier
       * @param modelnr request a particular model; 
-      * @return
+      * @return the Chain that matches the chainID in the model
       */
      public Chain getChainByPDB(String chainId, int modelnr)
          throws StructureException;

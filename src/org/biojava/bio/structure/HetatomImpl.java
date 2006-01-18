@@ -38,6 +38,7 @@ import java.util.Iterator ;
  * @see AminoAcidImpl
  * @see NucleotideImpl
  * @author Andreas Prlic
+ * @author Horvath Tamas
  * @version %I% %G%
  * @since 1.4
  */
@@ -358,10 +359,7 @@ public class HetatomImpl implements Group {
     }
     
     /** Set the back-reference (to its parent Chain)
-     * @param ref  a WeakReference to the parent Chain 
-     * @return void
-     * 
-     * @author Horvath Tamas
+     * @param parent a WeakReference to the parent Chain 
      */
     
     public void setParent(Chain parent) {
@@ -372,7 +370,7 @@ public class HetatomImpl implements Group {
      * 
      * @return Chain the Chain object that contains the Group
      * 
-     * @author Horvath Tamas
+     * 
      */
     
     public Chain getParent() {

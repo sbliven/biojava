@@ -42,6 +42,7 @@ import java.util.Iterator ;
  * @see AminoAcidImpl
  * @see NucleotideImpl
  * @author Andreas Prlic
+ * @author Horvath Tamas
  * @since 1.4
  * @version %I% %G%
  */
@@ -228,18 +229,14 @@ public interface Group {
     
     
     /** Set the back-reference (to its parent Chain)
-     * @param ref  a WeakReference to the parent Chain
-     * @return void
+     * @param parent a WeakReference to the parent Chain
      * 
-     * @author Horvath Tamas
      */
     public void setParent(Chain parent) ; 
     
     /** Returns the parent Chain of the Group
      * 
      * @return Chain the Chain object that contains the Group
-     * 
-     * @author Horvath Tamas
      */
     
     public Chain getParent() ;

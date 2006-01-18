@@ -27,6 +27,7 @@ package org.biojava.bio.structure;
  * simple interface of an Atom.
  
  * @author Andreas Prlic
+ * @author Horvath Tamas
  * @version %I% %G%
  * @since 1.4
  * 
@@ -168,17 +169,13 @@ public interface Atom {
     
     /** Sets the back-reference to its parent Group
      * @param parent the parent Group
-     * @return void
-     * 
-     * @author Horvath Tamas
      */
     public void setParent(Group parent) ; 
 
      /** Returns the parent Group of the Atom
      * 
      * @return Group the parent Group of the Atom 
-     * @return null  if the referenced object is not Group
-     * @author Horvath Tamas 
+     * @return null if the referenced object is not Group 
      */
     public Group getParent();
     
