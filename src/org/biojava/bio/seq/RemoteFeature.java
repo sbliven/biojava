@@ -41,6 +41,7 @@ import org.biojava.bio.symbol.Location;
  * Sequence is projected but some Feature overlaps the boundary of the projected
  * portion.
  *
+ * @see org.biojavax.bio.seq.RichFeature
  * @author Matthew Pocock
  * @author Greg Cox
  * @since 1.2

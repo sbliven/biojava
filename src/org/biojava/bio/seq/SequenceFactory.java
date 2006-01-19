@@ -32,6 +32,8 @@ import org.biojava.bio.symbol.SymbolList;
  * to make them.
  *
  * @author Matthew Pocock
+ * @deprecated use org.biojavax.bio.seq.io.RichSequenceBuilder or 
+ * use org.biojavax.bio.seq.io.SequenceBuilder
  */
 public interface SequenceFactory {
   /**

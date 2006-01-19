@@ -36,6 +36,7 @@ import org.biojava.bio.symbol.Location;
  *
  * @author Keith James
  * @since 1.2
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 public interface SeqFileFormer extends SeqIOListener
 {

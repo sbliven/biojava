@@ -40,6 +40,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Format reader for GenBank XML files.
  * 
  * @author Alan Li - alanli[at]xyworks.com
+ * @deprecated Use org.biojavax.bio.seq.io.INSDseqFormat
  */
 
 public class GenbankXmlFormat extends GenbankFormat

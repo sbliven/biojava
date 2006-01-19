@@ -27,6 +27,7 @@ import java.io.Serializable;
  * Class description
  *
  * @author Greg Cox
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 public class ProteinRefSeqProcessor extends GenbankProcessor
 {

@@ -30,7 +30,7 @@ import org.biojava.bio.seq.Feature;
  * <code>Feature</code>s by the minimum base position of their
  * <code>Location</code>, but places <code>Feature</code>s with
  * type "source" first.
- *
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  * @author Keith James
  * @since 1.2
  */

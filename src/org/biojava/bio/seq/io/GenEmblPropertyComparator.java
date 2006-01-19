@@ -38,6 +38,7 @@ import java.util.List;
  * else.<p>
  *
  * @author Keith James
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 public final class GenEmblPropertyComparator implements Comparator
 {

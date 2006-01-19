@@ -57,6 +57,7 @@ import org.biojava.bio.BioException;
  * @author Len Trigg (Taxon output)
  * @author Lorna Morris
  * @since 1.2
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 public class EmblFileFormer extends AbstractGenEmblFileFormer
     implements SeqFileFormer

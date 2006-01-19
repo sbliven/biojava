@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
  *
  * @author Thomas Down
  * @since 1.1
+ * @deprecated Use org.biojavax.bio.seq.io.FastaFormat
  */
 
 public class FastaDescriptionLineParser extends SequenceBuilderFilter {

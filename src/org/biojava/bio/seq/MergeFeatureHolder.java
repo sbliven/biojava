@@ -41,6 +41,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @see org.biojavax.bio.seq.RichFeatureHolder
  */
 
 public class MergeFeatureHolder extends AbstractFeatureHolder

@@ -45,6 +45,7 @@ import org.biojava.utils.ParseErrorListener;
  * @author Keith James
  * @author Matthew Pocock
  * @author Ron Kuhn
+ * @deprecated Use org.biojavax.bio.seq.io.GenbankFormat
  */
 public class GenbankFormat
         implements SequenceFormat,

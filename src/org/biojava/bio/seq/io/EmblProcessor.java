@@ -62,6 +62,7 @@ import org.biojava.utils.ParseErrorSource;
  * @author Greg Cox
  * @author Keith James
  * @since 1.1
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 
 public class EmblProcessor

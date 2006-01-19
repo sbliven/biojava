@@ -62,6 +62,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Len Trigg
  * @author Lorna Morris
  * @since 1.1
+ * @deprecated Use org.biojavax.bio.seq.io.EMBLFormat instead
  */
 
 public class EmblLikeFormat implements

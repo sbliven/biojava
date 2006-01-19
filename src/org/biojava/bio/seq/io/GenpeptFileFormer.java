@@ -41,6 +41,7 @@ import org.biojava.bio.symbol.Symbol;
  * <code>GenpeptFileFormer</code> performs the detailed formatting of
  * Genpept entries for writing to a <code>PrintStream</code>. It is based
  * on GenbankFileFormer.
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  *
  * @author Nimesh Singh
  */

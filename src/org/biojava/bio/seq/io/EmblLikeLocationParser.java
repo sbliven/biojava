@@ -60,6 +60,7 @@ import org.biojava.utils.SmallMap;
  * @author Keith James
  * @author Greg Cox
  * @since 1.2
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 public class EmblLikeLocationParser
 {

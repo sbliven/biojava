@@ -41,9 +41,13 @@ import org.biojava.utils.ChangeVetoException;
  * notified information.  Subclass this to implement specific
  * Sequence implementations.
  *
+ * More functionality is offered by the 
+ * {@link org.biojavax.bio.seq.io.SimpleRichSequenceBuilder SimpleRichSequenceBuilder}.
+ *
  * @author Thomas Down
  * @author David Huen (modified SimpleSequence to make this)
  * @version 1.2 [newio proposal]
+ * 
  */
 
 public abstract class SequenceBuilderBase implements SequenceBuilder {

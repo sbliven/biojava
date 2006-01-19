@@ -92,6 +92,7 @@ import org.biojava.utils.ChangeVetoException;
  * We may need some standardisation for what the fields mean. In particular, we
  * should be compliant where sensible with GFF.
  * </p>
+ * @see org.biojavax.bio.seq.RichFeature
  *
  * @author Matthew Pocock
  * @author Thomas Down

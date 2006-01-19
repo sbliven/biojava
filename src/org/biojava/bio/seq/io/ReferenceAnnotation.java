@@ -29,6 +29,7 @@ import java.util.HashMap;
 /**
  * @author Lorna Morris
  * @since 1.3.1
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 public class ReferenceAnnotation extends AbstractAnnotation {
 

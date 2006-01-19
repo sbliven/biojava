@@ -59,6 +59,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  * @author Keith James
  * @since 1.1
+ * @deprecated use org.biojavax.bio.seq.RichSequence.IOTools
  */
 public final class SeqIOTools  {
     private static SequenceBuilderFactory _emblBuilderFactory;

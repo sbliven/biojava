@@ -25,6 +25,7 @@ package org.biojava.bio.seq.io;
  *
  * @author Thomas Down
  * @since 1.1 [newio proposal]
+ * @see org.biojavax.bio.seq.io.RichSequenceBuilderFactory
  */
 
 public interface SequenceBuilderFactory {

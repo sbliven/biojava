@@ -36,7 +36,11 @@ import org.biojava.utils.StaticMemberPlaceHolder;
  * implementation should blow chunks to avoid being added to a sequence for
  * which strand is a foreign concept.
  *
+ * Strand is intrinsicly part of all {@link org.biojavax.bio.seq.RichFeature RichFeatures}
+ * We strongly recommend using this interface.
+ *
  * @author Matthew Pocock
+ *@see org.biojavax.bio.seq.RichFeature
  */
 public interface StrandedFeature extends Feature {
 

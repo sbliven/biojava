@@ -37,6 +37,7 @@ import org.biojava.utils.ChangeVetoException;
  * builder event streams.
  *
  * @author Matthew Pocock
+ * @deprecated Use org.biojavax.bio.taxa framework instead
  */
 public class OrganismParser
   extends

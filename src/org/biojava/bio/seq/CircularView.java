@@ -39,11 +39,15 @@ import org.biojava.utils.ChangeVetoException;
  * overlapping of the origin. The origin is assumed to be the first symbol.
  * Future versions may support changing the origin.
  * </p>
+ * In biojavax {@link org.biojavax.bio.seq.RichSequence RichSequences} intrinsicly know about
+ * circularity. No view is required. We strongly recommend using RichSequence
+ * if possible.
  *
  *
  * @author Mark Schreiber
  * @version 1.2
  * @since 1.1
+ * @see org.biojavax.bio.seq.RichSequence 
  */
 
 public class CircularView extends ViewSequence{

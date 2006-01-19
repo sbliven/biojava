@@ -29,10 +29,12 @@ import org.biojava.bio.symbol.Symbol;
 /**
  * Notification interface for objects which listen to a sequence stream
  * parser.
- *
+ * More functionality is offered by the 
+ * {@link org.biojavax.bio.seq.io.RichSeqIOListener RichSeqIOListener}.
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.1
+ * @see org.biojavax.bio.seq.io.RichSeqIOListener
  */
 
 public interface SeqIOListener {

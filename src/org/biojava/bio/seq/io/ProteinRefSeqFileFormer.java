@@ -39,6 +39,7 @@ import org.biojava.bio.symbol.Symbol;
  * SimpleFeatures are created intead of StrandedFeatures
  *
  * @author Greg Cox
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 public class ProteinRefSeqFileFormer extends GenbankFileFormer
 {

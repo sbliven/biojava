@@ -31,6 +31,7 @@ import org.biojava.bio.BioException;
  * add new features.  However, this method exposes the feature
  * realization infrastructure to child features.  </p>
  *
+ * @see org.biojavax.bio.seq.RichFeatureHolder
  * @author Thomas Down
  */
 

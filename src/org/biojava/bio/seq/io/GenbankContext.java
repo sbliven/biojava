@@ -35,6 +35,7 @@ import org.biojava.bio.seq.*;
  *
  * @author Thomas Down
  * @author Greg Cox
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojava.utils.ParseErrorSource
 {

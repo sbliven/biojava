@@ -36,6 +36,7 @@ import org.biojava.utils.ParseErrorSource;
  * Simple filter which handles attribute lines from a Genbank file
  *
  * @author Greg Cox
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 
 public class GenbankProcessor extends SequenceBuilderFilter

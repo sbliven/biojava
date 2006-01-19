@@ -34,8 +34,10 @@ import org.biojava.utils.ListTools;
 /**
  * A no-frills implementation of FeatureHolder.
  *
+ * @see org.biojavax.bio.seq.SimpleRichFeatureHolder
  * @author Matthew Pocock
  * @author Thomas Down
+ *
  */
 public class SimpleFeatureHolder extends AbstractFeatureHolder implements Serializable{
   /**

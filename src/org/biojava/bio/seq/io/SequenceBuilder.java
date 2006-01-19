@@ -40,8 +40,11 @@ import org.biojava.bio.seq.Sequence;
  * one sequence. After that, they should be discarded. The usual way to get a
  * supply of these is via a SequenceBuilderFactory.
  *
+ * More functionality is offered by the 
+ * {@link org.biojavax.bio.seq.io.RichSequenceBuilder RichSequenceBuilder}.
  * @author Thomas Down
  * @since 1.1 [newio proposal]
+ * @see org.biojavax.bio.seq.io.RichSequenceBuilder
  */
 
 public interface SequenceBuilder extends SeqIOListener {

@@ -28,6 +28,7 @@ package org.biojava.bio.seq.io;
  * associated to the format it is handling.
  * 
  * @author David Huen
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 public class GenpeptFormat
     extends GenbankFormat

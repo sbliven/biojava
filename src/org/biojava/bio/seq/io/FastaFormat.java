@@ -55,6 +55,7 @@ import org.biojava.utils.ParseErrorListener;
  * @author Lukas Kall
  * @author Richard Holland
  * @author Mark Schreiber
+ * @deprecated Use org.biojavax.bio.seq.io.FastaFormat
  */
 
 public class FastaFormat implements SequenceFormat,

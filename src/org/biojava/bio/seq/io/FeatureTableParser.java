@@ -34,6 +34,7 @@ import org.biojava.bio.seq.StrandedFeature;
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Keith James
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 
 /*
