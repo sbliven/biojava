@@ -49,6 +49,7 @@ import org.biojava.utils.Changeable;
  * @author Matthew Pocock
  *
  * @since 1.4
+ * @see org.biojavax.ontology.ComparableOntology
  */
 
 public interface Ontology extends Changeable {

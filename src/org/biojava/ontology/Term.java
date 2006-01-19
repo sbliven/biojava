@@ -49,6 +49,7 @@ import org.biojava.utils.ChangeType;
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.4
+ * @see org.biojavax.ontology.ComparableTerm
  */
 
 public interface Term extends Annotatable {
@@ -102,7 +103,7 @@ public interface Term extends Annotatable {
     
     /**
      * Simple in-memory implementation of an ontology term.
-     *
+     * @see org.biojavax.ontology.SimpleComparableTerm
      * @for.developer This can be used to implement Ontology.createTerm
      */
 

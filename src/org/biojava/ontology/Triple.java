@@ -40,6 +40,7 @@ import java.util.Arrays;
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.4
+ * @see org.biojavax.ontology.ComparableTriple
  */
 
 public interface Triple
@@ -104,6 +105,7 @@ public interface Triple
    * Basic in-memory implementation of a Triple in an ontology
    *
    * @for.developer This can be used to implement Ontology.createTriple
+   * @see org.biojavax.ontology.SimpleComparableTriple
    */
 
   public static final class Impl
