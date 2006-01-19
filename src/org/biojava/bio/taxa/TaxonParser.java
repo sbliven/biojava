@@ -27,6 +27,7 @@ import org.biojava.utils.ChangeVetoException;
  * representations of taxa.
  *
  * @author Matthew Pocock
+ * @deprecated replaced by classes in {@link org.biojavax.bio.taxa org.biojavax.bio.taxa}
  */
 public interface TaxonParser {
   /**

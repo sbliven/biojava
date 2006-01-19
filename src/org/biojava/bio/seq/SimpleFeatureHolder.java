@@ -34,7 +34,7 @@ import org.biojava.utils.ListTools;
 /**
  * A no-frills implementation of FeatureHolder.
  *
- * @see org.biojavax.bio.seq.SimpleRichFeatureHolder
+ * @see org.biojavax.bio.seq.RichFeatureHolder
  * @author Matthew Pocock
  * @author Thomas Down
  *

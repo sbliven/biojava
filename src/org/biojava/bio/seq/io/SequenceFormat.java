@@ -42,7 +42,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  * readSequence to read from a Genbank stream and construct Ensembl
  * CORBA objects, just by specifying an Ensembl SequenceFactory.</p>
  * 
- * <p>More functionality is offered by {@link org.biojavax.seq.io.RichSequenceFormat RichSequenceFormat},
+ * <p>More functionality is offered by {@link org.biojavax.bio.seq.io.RichSequenceFormat RichSequenceFormat},
  * Use of this interface is prefered.</p>
  *
  * @author Matthew Pocock

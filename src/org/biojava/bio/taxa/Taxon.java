@@ -33,6 +33,7 @@ import org.biojava.utils.ChangeVetoException;
  * specifying kingdoms and the like.</p>
  *
  * @author Matthew Pocock
+ * @deprecated replaced by classes in {@link org.biojavax.bio.taxa org.biojavax.bio.taxa}
  */
 public interface Taxon extends Annotatable {
   /**

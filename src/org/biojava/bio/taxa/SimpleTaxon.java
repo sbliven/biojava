@@ -31,6 +31,7 @@ import java.util.Set;
  * fields as well as a pacakge-private constructor.</p>
  *
  * @author Matthew Pocock
+ * @deprecated replaced by classes in {@link org.biojavax.bio.taxa org.biojavax.bio.taxa}
  */
 public class SimpleTaxon extends AbstractTaxon {
   protected Taxon parent;

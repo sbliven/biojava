@@ -36,11 +36,11 @@ import org.biojava.bio.seq.SequenceIterator;
  * This can be wired from a StreamReader to make a simple file-format conversion
  * utility, or can be used to write out the sequences in a database to disk.
  *
- * <p>More functionality is offered by {@link org.biojavax.seq.io.RichStreamWriter RichStreamWriter},
+ * <p>More functionality is offered by {@link org.biojavax.bio.seq.io.RichStreamWriter RichStreamWriter},
  * Use of this interface is prefered.</p>
  *
  * @author Matthew Pocock
- * @see org.biojavax.seq.io.RichStreamWriter
+ * @see org.biojavax.bio.seq.io.RichStreamWriter
  */
 public class StreamWriter {
   /**

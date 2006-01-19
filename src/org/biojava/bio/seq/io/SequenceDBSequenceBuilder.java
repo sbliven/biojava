@@ -47,7 +47,7 @@ import org.biojava.utils.ChangeVetoException;
  * on how well the persistent SequenceDB handles this.
  *
  * <p>Following the introduction of biojavax persistence is handled by
- * {@link http://www.hibernate.org/ Hibernate} refer to 
+ * Hibernate refer to 
  * {@link org.biojavax.bio.db.HibernateRichObjectBuilder HibernateRichObjectBuilder}</p>
  *
  * @author David Huen

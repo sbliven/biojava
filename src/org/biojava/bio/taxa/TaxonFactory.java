@@ -26,6 +26,7 @@ import org.biojava.utils.ChangeVetoException;
  * Factory for handling a particular implementation of a Taxon.
  *
  * @author Matthew Pocock
+ * @deprecated replaced by classes in {@link org.biojavax.bio.taxa org.biojavax.bio.taxa}
  */
 
 public interface TaxonFactory {

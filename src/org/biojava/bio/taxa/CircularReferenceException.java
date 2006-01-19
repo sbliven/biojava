@@ -22,6 +22,9 @@ package org.biojava.bio.taxa;
 
 import org.biojava.bio.BioException;
 
+/**
+ *@deprecated replaced by classes in {@link org.biojavax.bio.taxa org.biojavax.bio.taxa}
+ */
 public class CircularReferenceException extends BioException {
   public CircularReferenceException() {
     super();

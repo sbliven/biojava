@@ -47,6 +47,7 @@ import java.util.Set;
  * </p>
  *
  * @author Matthew Pocock
+ * @deprecated replaced by classes in {@link org.biojavax.bio.taxa org.biojavax.bio.taxa}
  */
 public class WeakTaxon extends AbstractTaxon {
   protected Taxon parent;

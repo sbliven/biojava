@@ -56,7 +56,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Kalle N�slund
  * @author Paul Seed
  * @author Len Trigg
- * @see org.biojavax.bio.SimpleRichFeature
+ * @see org.biojavax.bio.seq.SimpleRichFeature
  */
 
 public class SimpleFeature

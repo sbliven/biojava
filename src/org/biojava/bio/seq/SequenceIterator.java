@@ -32,7 +32,7 @@ import org.biojava.bio.BioException;
  * to be thrown, and as much type-safety as possible. However, we have made it
  * as compliant with Iterator as we could so that there is a minimal learning
  * curve.
- * @see org.biojavax.seq.RichSequenceIterator
+ * @see org.biojavax.bio.seq.RichSequenceIterator
  * @author Matthew Pocock
  */
 public interface SequenceIterator {

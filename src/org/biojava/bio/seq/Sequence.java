@@ -70,7 +70,7 @@ import org.biojava.bio.symbol.SymbolList;
  * each of which may be fairly heavy-weight. It takes the SymbolList interface
  * that is nice mathematically, and turns it into a biologically useful object.
  * </p>
- * The {@link @see org.biojavax.bio.seq.RichSequence RichSequence} interface
+ * The {@link org.biojavax.bio.seq.RichSequence RichSequence} interface
  * offers considerably more functionality and better persitence to BioSQL than
  * it's super interface Sequence. We would recommend using it wherever possible.
  * 

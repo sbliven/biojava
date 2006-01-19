@@ -47,7 +47,7 @@ import org.biojava.bio.seq.SequenceIterator;
  * do sequence-by-sequence processing, while being guaranteed that StreamReader
  * will not require you to keep any of the sequences in memory.
  * 
- * <p>More functionality is offered by {@link org.biojavax.seq.io.RichStreamReader RichStreamReader},
+ * <p>More functionality is offered by {@link org.biojavax.bio.seq.io.RichStreamReader RichStreamReader},
  * Use of this interface is prefered.</p>
  *
  * @author Matthew Pocock

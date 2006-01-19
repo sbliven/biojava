@@ -30,6 +30,7 @@ import org.biojava.utils.SmallSet;
  * A no-frills implementation of TaxaFactory that builds an in-memory Taxa tree.
  *
  * @author Matthew Pocock
+ * @deprecated replaced by classes in {@link org.biojavax.bio.taxa org.biojavax.bio.taxa}
  */
 public class SimpleTaxonFactory implements TaxonFactory {
   /**

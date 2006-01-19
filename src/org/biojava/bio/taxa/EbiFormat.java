@@ -38,6 +38,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Matthew Pocock
  * @author Len Trigg
+ * @deprecated replaced by classes in {@link org.biojavax.bio.taxa org.biojavax.bio.taxa}
  */
 public class EbiFormat implements TaxonParser {
   public static final String PROPERTY_NCBI_TAXON = EbiFormat.class + ":NCBI_TAXON";

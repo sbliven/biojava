@@ -36,6 +36,7 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  * @author Keith James
  * @since 1.3
+ * @deprecated replaced by classes in {@link org.biojavax.bio.taxa org.biojavax.bio.taxa}
  */
 public abstract class AbstractTaxon
   extends
