@@ -54,6 +54,7 @@ import org.biojava.utils.Changeable;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @see org.biojavax.RichAnnotation
  *
  * @for.user Other than when using the constructor, you should be able to
  * interact with nearly all Annotation implementations via this API.

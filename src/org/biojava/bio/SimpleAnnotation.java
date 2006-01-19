@@ -38,6 +38,7 @@ import java.util.Map;
  * @since 1.0
  * @for.user When you need to make a new Annotation instance and will want to populate
  * it with properties, use this class.
+ * @see org.biojavax.SimpleRichAnnotation
  */
 public class SimpleAnnotation extends AbstractAnnotation {
   /**

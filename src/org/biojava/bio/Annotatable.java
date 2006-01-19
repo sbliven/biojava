@@ -66,7 +66,8 @@ import org.biojava.utils.Changeable;
  *
  * @author  Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
- * @author  Kalle Näslund (docs)
+ * @author  Kalle Nï¿½slund (docs)
+ * @see org.biojavax.RichAnnotatable
  *
  * @for.user Check if BioJava classes and interfaces extend Annotatable. This
  * will tell  you if you should look for associated annotation.
