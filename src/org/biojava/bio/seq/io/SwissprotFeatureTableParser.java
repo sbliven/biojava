@@ -40,6 +40,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Greg Cox
  * @author Thomas Down
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 
 /*

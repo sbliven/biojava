@@ -47,6 +47,7 @@ import org.biojava.bio.symbol.Symbol;
  *
  * @author Greg Cox
  * @since 1.2
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 public class SwissprotFileFormer extends AbstractGenEmblFileFormer
     implements SeqFileFormer

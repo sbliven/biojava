@@ -33,6 +33,7 @@ import org.biojava.bio.symbol.Symbol;
  *
  * @author Matthew Pocock
  * @since 1.1
+ * @see org.biojavax.bio.seq.io.RichSequenceAdapter
  */
 public class SequenceBuilderFilter implements SequenceBuilder {
   /**

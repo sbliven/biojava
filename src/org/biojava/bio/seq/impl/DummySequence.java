@@ -48,6 +48,9 @@ import org.biojava.utils.ChangeVetoException;
  * {@link org.biojava.bio.seq.SequenceTools.createDummy} instead of using this
  * class directly
  *
+ * A better alternative may be a {@link org.biojavax.bio.seq.RichSequence RichSequence}
+ * with an {@link org.biojavax.bio.seq.InfinitelyAmbiguousSymbolList InfinitelyAmbiguousSymbolList}
+ *
  * @author Thomas Down
  * @author David Allen
  * @author Matthew Pocock

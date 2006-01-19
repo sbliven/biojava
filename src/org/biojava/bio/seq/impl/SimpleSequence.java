@@ -68,6 +68,8 @@ import org.biojava.utils.ChangeVetoException;
  * <code>FeatureRealizer</code> implementation may be
  * supplied at construction-time.
  * </p>
+ * More functionality and better persistence to biosql is offered by 
+ * {@link org.biojavax.bio.seq.SimpleRichSequence SimpleRichSequence}
  *
  * @author Matthew Pocock
  * @author Thomas Down

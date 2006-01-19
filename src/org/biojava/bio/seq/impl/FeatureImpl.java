@@ -41,6 +41,7 @@ import org.biojava.utils.StaticMemberPlaceHolder;
  * @author Greg Cox
  * @author Keith James
  * @since 1.1
+ * @see org.biojavax.bio.SimpleRichFeature
  */
 
 public class FeatureImpl {

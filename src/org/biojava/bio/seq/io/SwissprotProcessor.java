@@ -47,6 +47,7 @@ import org.biojava.utils.ParseErrorSource;
  * @author Matthew Pocock
  * @author Greg Cox
  * @since 1.1
+ * @deprecated Use org.biojavax.bio.seq.io framework instead
  */
 
 public class SwissprotProcessor

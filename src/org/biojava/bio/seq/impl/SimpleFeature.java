@@ -50,12 +50,13 @@ import org.biojava.utils.ChangeVetoException;
 
 /**
  * A no-frills implementation of a feature.
- *
+ * 
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Kalle N�slund
  * @author Paul Seed
  * @author Len Trigg
+ * @see org.biojavax.bio.SimpleRichFeature
  */
 
 public class SimpleFeature

@@ -42,6 +42,9 @@ import org.biojava.utils.StaticMemberPlaceHolder;
  * the symbols (using PackedSymbolList), and may or may not store the
  * symbols in multiple fixed-length chunks (using ChunkedSymbolList).
  *
+ * <p>More functionality is offered by {@link org.biojavax.seq.io.SimpleRichSequenceBuilder SimpleRichSequenceBuilder},
+ * Use of this class is prefered.</p>
+ *
  * @author David Huen
  * @author Matthew Pocock
  */

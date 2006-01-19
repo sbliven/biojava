@@ -46,9 +46,13 @@ import org.biojava.bio.seq.SequenceIterator;
  * before, so it is safe to use this object to parse a gigabyte fasta file, and
  * do sequence-by-sequence processing, while being guaranteed that StreamReader
  * will not require you to keep any of the sequences in memory.
+ * 
+ * <p>More functionality is offered by {@link org.biojavax.seq.io.RichStreamReader RichStreamReader},
+ * Use of this interface is prefered.</p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @see org.biojavax.bio.seq.io.RichStreamReader
  */
 
 public class StreamReader implements SequenceIterator, org.biojava.utils.ParseErrorListener

@@ -35,9 +35,13 @@ import org.biojava.utils.StaticMemberPlaceHolder;
  * Basic SequenceBuilder implementation which accumulates all
  * notified information and creates a SimpleSequence.
  *
+ * <p>More functionality is offered by {@link org.biojavax.seq.io.SimpleRichSequenceBuilder SimpleRichSequenceBuilder},
+ * Use of this class is prefered.</p>
+ *
  * @author Thomas Down
  * @author David Huen (modified to derive from SequenceBuilderBase)
  * @version 1.1 [newio proposal]
+ * @see org.biojavax.bio.seq.io.SimpleRichSequenceBuilder
  */
 
 public class SimpleSequenceBuilder extends SequenceBuilderBase {
