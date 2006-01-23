@@ -26,15 +26,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.IDMaker;
 import org.biojava.bio.seq.db.IllegalIDException;
-import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
-import org.biojavax.bio.seq.RichSequence;
-import org.biojavax.bio.seq.RichSequenceIterator;
+import org.biojavax.bio.BioEntry;
+import org.biojavax.bio.BioEntryIterator;
 
 /**
  * An implementation of RichSequenceDB that uses an underlying HashMap to store the
@@ -44,18 +42,13 @@ import org.biojavax.bio.seq.RichSequenceIterator;
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
  * @author Richard Holland
  */
-public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSequenceDB {
+public class HashBioEntryDB extends AbstractBioEntryDB implements BioEntryDB {
     
     /**
      * The sequence-by-id map.
      */
     final private Map sequenceByID;
-    
-    /**
-     * An object to extract an ID for a sequence.
-     */
-    final private IDMaker idMaker;
-    
+        
     /**
      * The name of this sequence database.
      */
@@ -65,18 +58,8 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
      * Generate a HashRichSequenceDB object that will use byName to generate ids for
      * sequences and have a null name.
      */
-    public HashRichSequenceDB() {
-        this(IDMaker.byName, null);
-    }
-    
-    /**
-     * Generate a HashRichSequenceDB object that will use idMaker to generate ids for
-     * sequences and have a null name.
-     *
-     * @param idMaker the object that will work out the default id for a sequence
-     */
-    public HashRichSequenceDB(IDMaker idMaker) {
-        this(idMaker, null);
+    public HashBioEntryDB() {
+        this(null);
     }
     
     /**
@@ -85,19 +68,7 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
      *
      * @param name the name for this database
      */
-    public HashRichSequenceDB(String name) {
-        this(IDMaker.byName, name);
-    }
-    
-    /**
-     * Generate a HashRichSequenceDB object that will use idMaker to generate ids for
-     * sequences and have the requested name.
-     *
-     * @param idMaker the object that will work out the default id for a sequence
-     * @param name the name for this database
-     */
-    public HashRichSequenceDB(IDMaker idMaker, String name) {
-        this.idMaker = idMaker;
+    public HashBioEntryDB(String name) {
         this.name = name;
         this.sequenceByID = new HashMap();
     }
@@ -106,35 +77,26 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
         return name;
     }
     
-    /**
-     * Retrieve the IDMaker associated with this database.
-     *
-     * @return the current IDMaker object
-     */
-    public IDMaker getIDMaker() {
-        return idMaker;
-    }
-    
-    public RichSequence getRichSequence(String id) throws BioException, IllegalIDException {
-        RichSequence seq = (RichSequence)sequenceByID.get(id);
-        if (seq == null) throw new IllegalIDException("Sequence with ID " + id + " could not be found");
+    public BioEntry getBioEntry(String id) throws BioException, IllegalIDException {
+        BioEntry seq = (BioEntry)sequenceByID.get(id);
+        if (seq == null) throw new IllegalIDException("BioEntry with ID " + id + " could not be found");
         return seq;
     }
     
-    public RichSequenceDB getRichSequences(Set ids) throws BioException, IllegalIDException {
-        return this.getRichSequences(ids,null);
+    public BioEntryDB getBioEntrys(Set ids) throws BioException, IllegalIDException {
+        return this.getBioEntrys(ids,null);
     }
     
-    public RichSequenceDB getRichSequences(Set ids, RichSequenceDB db) throws BioException, IllegalIDException {
-        if (db==null) db = new HashRichSequenceDB();
+    public BioEntryDB getBioEntrys(Set ids, BioEntryDB db) throws BioException, IllegalIDException {
+        if (db==null) db = new HashBioEntryDB();
         for (Iterator i = ids.iterator(); i.hasNext(); ) {
             String id = (String)i.next();
-            if (!sequenceByID.containsKey(id)) throw new IllegalIDException("Sequence with ID " + id + " could not be found");
+            if (!sequenceByID.containsKey(id)) throw new IllegalIDException("BioEntry with ID " + id + " could not be found");
             else {
                 try {
-                    db.addSequence((RichSequence)sequenceByID.get(id));
+                    db.addBioEntry((BioEntry)sequenceByID.get(id));
                 } catch (ChangeVetoException ce) {
-                    throw new BioException("Unexpectedly couldn't add to a HashRichSequenceDB", ce);
+                    throw new BioException("Unexpectedly couldn't add to a HashBioEntryDB", ce);
                 }
             }
         }
@@ -146,25 +108,25 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
     }
     
     /**
-     * Add a sequence under a particular id.
+     * Add a BioEntry under a particular id.
      *
      * @param id  the id to use
-     * @param seq the RichSequence to add
+     * @param seq the BioEntry to add
      * @throws ChangeVetoException if this addition was vetoed
      */
-    public void addSequence(Sequence seq) throws IllegalIDException, BioException, ChangeVetoException {
-        addSequence(idMaker.calcID(seq), RichSequence.Tools.enrich(seq));
+    public void addBioEntry(BioEntry seq) throws IllegalIDException, BioException, ChangeVetoException {
+        this.addBioEntry(seq.getName(), seq);
     }
     
-    protected void addSequence(String id, RichSequence seq) throws IllegalIDException, BioException, ChangeVetoException {
+    protected void addBioEntry(String id, BioEntry seq) throws IllegalIDException, BioException, ChangeVetoException {
         if(!hasListeners()) {
             sequenceByID.put(id, seq);
         } else {
-            ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
+            ChangeSupport changeSupport = getChangeSupport(BioEntryDBLite.BIOENTRYS);
             synchronized(changeSupport) {
                 ChangeEvent ce = new ChangeEvent(
                         this,
-                        SequenceDB.SEQUENCES,
+                        BioEntryDBLite.BIOENTRYS,
                         new Object[] { id, seq },
                         null);
                         changeSupport.firePreChangeEvent(ce);
@@ -174,16 +136,16 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
         }
     }
     
-    public void removeSequence(String id) throws IllegalIDException, BioException, ChangeVetoException {
-        if (!sequenceByID.containsKey(id)) throw new IllegalIDException("Sequence with ID " + id + " could not be found");
+    public void removeBioEntry(String id) throws IllegalIDException, BioException, ChangeVetoException {
+        if (!sequenceByID.containsKey(id)) throw new IllegalIDException("BioEntry with ID " + id + " could not be found");
         if(!hasListeners()) {
             sequenceByID.remove(id);
         } else {
-            ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
+            ChangeSupport changeSupport = getChangeSupport(BioEntryDBLite.BIOENTRYS);
             synchronized(changeSupport) {
                 ChangeEvent ce = new ChangeEvent(
                         this,
-                        SequenceDB.SEQUENCES,
+                        BioEntryDBLite.BIOENTRYS,
                         null,
                         id
                         );

@@ -22,11 +22,19 @@
 package org.biojavax.bio.db;
 
 import java.util.Iterator;
+import java.util.Set;
+import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.MergeFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
-import org.biojava.bio.seq.db.AbstractSequenceDB;
 import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.utils.ChangeVetoException;
+import org.biojavax.bio.BioEntry;
+import org.biojavax.bio.BioEntryIterator;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.RichSequenceIterator;
 
@@ -38,14 +46,55 @@ import org.biojavax.bio.seq.RichSequenceIterator;
  * @author Thomas Down
  * @author Richard Holland
  */
-public abstract class AbstractRichSequenceDB extends AbstractSequenceDB implements RichSequenceDB {
+public abstract class AbstractRichSequenceDB extends AbstractBioEntryDB implements RichSequenceDB {
+    
+    public Sequence getSequence(String id) throws BioException, IllegalIDException {
+        return this.getRichSequence(id);
+    }
+    
+    public BioEntry getBioEntry(String id) throws BioException, IllegalIDException {
+        return this.getRichSequence(id);
+    }
+    
+    public BioEntryDB getBioEntrys(Set ids) throws BioException, IllegalIDException {
+        return this.getRichSequences(ids);
+    }
+    
+    public BioEntryDB getBioEntrys(Set ids, BioEntryDB db) throws BioException, IllegalIDException {
+        RichSequenceDB db2 = this.getRichSequences(ids);
+        for (BioEntryIterator i = db2.getBioEntryIterator(); i.hasNext(); ) {
+            BioEntry be = i.nextBioEntry();
+            try {
+                db.addBioEntry(be);
+            } catch (ChangeVetoException ce) {
+                throw new BioException("Unexpectedly unable to add to a BioEntryDB", ce);
+            }
+        }
+        return db;
+    }
+    
+    public void addSequence(Sequence seq) throws IllegalIDException, BioException, ChangeVetoException {
+        throw new ChangeVetoException("Cannot add Sequences to an AbstractRichSequenceDB");
+    }
+    
+    public void removeSequence(String id) throws IllegalIDException, BioException, ChangeVetoException {
+        throw new ChangeVetoException("Cannot remove Sequences from an AbstractRichSequenceDB");
+    }
+    
+    public void addBioEntry(BioEntry seq) throws IllegalIDException, BioException, ChangeVetoException {
+        throw new ChangeVetoException("Cannot add BioEntrys to a AbstractRichSequenceDB");
+    }
+    
+    public void removeBioEntry(String id) throws IllegalIDException, BioException, ChangeVetoException {
+        throw new ChangeVetoException("Cannot remove BioEntrys from a AbstractRichSequenceDB");
+    }
     
     public SequenceIterator sequenceIterator() {
         return this.getRichSequenceIterator();
     }
     
-    public Sequence getSequence(String id) throws BioException, IllegalIDException {
-        return this.getRichSequence(id);
+    public BioEntryIterator getBioEntryIterator() {
+        return this.getRichSequenceIterator();
     }
     
     public RichSequenceIterator getRichSequenceIterator() {
@@ -60,9 +109,31 @@ public abstract class AbstractRichSequenceDB extends AbstractSequenceDB implemen
                 return nextRichSequence();
             }
             
+            public BioEntry nextBioEntry() throws BioException {
+                return nextRichSequence();
+            }
+            
             public RichSequence nextRichSequence() throws BioException {
                 return getRichSequence((String)pID.next());
             }
         };
+    }
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+        MergeFeatureHolder results = new MergeFeatureHolder();
+        try {
+            for (RichSequenceIterator si = getRichSequenceIterator(); si.hasNext(); ) {
+                RichSequence seq = si.nextRichSequence();
+                FeatureHolder fh = seq.filter(ff);
+                if (fh != FeatureHolder.EMPTY_FEATURE_HOLDER) {
+                    results.addFeatureHolder(fh);
+                }
+            }
+        } catch (BioException ex) {
+            throw new BioRuntimeException(ex);
+        } catch (ChangeVetoException cve) {
+            throw new BioError("Assertion failed: couldn't modify newly created MergeFeatureHolder",cve);
+        }
+        return results;
     }
 }

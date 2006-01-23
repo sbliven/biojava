@@ -39,7 +39,7 @@ import org.biojavax.bio.seq.RichSequence;
  * @author Thomas Down
  * @author Richard Holland
  */
-public interface RichSequenceDBLite extends SequenceDBLite {
+public interface RichSequenceDBLite extends BioEntryDBLite,SequenceDBLite {
     /**
      * {@inheritDoc}
      * Will always return RichSequence instances.

@@ -1332,6 +1332,13 @@ public interface RichSequence extends BioEntry,Sequence {
             /**
              * {@inheritDoc}
              */
+            public BioEntry nextBioEntry() {
+                return this.nextRichSequence();
+            }
+            
+            /**
+             * {@inheritDoc}
+             */
             public RichSequence nextRichSequence() {
                 RichSequence seq = this.seq;
                 this.seq = null;

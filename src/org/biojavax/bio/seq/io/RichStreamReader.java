@@ -29,6 +29,7 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojavax.Namespace;
+import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.RichSequenceIterator;
 
@@ -87,6 +88,13 @@ public class RichStreamReader implements RichSequenceIterator {
      */
     public Sequence nextSequence() throws NoSuchElementException, BioException {
         return this.nextRichSequence();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public BioEntry nextBioEntry() throws NoSuchElementException, BioException {
+        return this.nextBioEntry();
     }
     
     /**

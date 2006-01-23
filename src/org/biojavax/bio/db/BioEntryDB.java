@@ -20,11 +20,10 @@
  */
 
 package org.biojavax.bio.db;
-import org.biojava.bio.seq.SequenceIterator;
-import org.biojava.bio.seq.db.SequenceDB;
-import org.biojavax.bio.seq.RichSequenceIterator;
+import java.util.Set;
+import org.biojavax.bio.BioEntryIterator;
 
-/**
+/**.
  * A database of RichSequences with accessible keys and iterators over all
  * sequences.
  * <p>
@@ -37,17 +36,19 @@ import org.biojavax.bio.seq.RichSequenceIterator;
  * @author Thomas Down
  * @author Richard Holland
  */
-public interface RichSequenceDB extends SequenceDB,BioEntryDB,RichSequenceDBLite {
+public interface BioEntryDB extends BioEntryDBLite {
     /**
-     * {@inheritDoc}
-     * Will always return an instance of RichSequenceIterator.
+     * Get an immutable set of all of the IDs in the database. The ids are legal
+     * arguments to getBioEntry.
+     *
+     * @return  a Set of ids - at the moment, strings
      */
-    public SequenceIterator sequenceIterator();
+    public Set ids();
     
     /**
-     * Returns a RichSequenceIterator over all sequences in the database. The order
+     * Returns a BioEntryIterator over all BioEntrys in the database. The order
      * of retrieval is undefined.
-     * @return a RichSequenceIterator over all sequences
+     * @return a BioEntryIterator over all BioEntrys
      */
-    public RichSequenceIterator getRichSequenceIterator();
+    public BioEntryIterator getBioEntryIterator();
 }

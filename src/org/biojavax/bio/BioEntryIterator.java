@@ -19,24 +19,30 @@
  *
  */
 
-package org.biojavax.bio.seq;
+package org.biojavax.bio;
 import java.util.NoSuchElementException;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.SequenceIterator;
-import org.biojavax.bio.BioEntryIterator;
+
 
 
 /**
  * Essentially the same as SequenceIterator. It provides a new
  * method that returns RichSequence objects without the need for
  * explicit casting. Implementations of this interface should <b>always</b>
- * return RichSequence objects for both the nextSequence() and 
+ * return RichSequence objects for both the nextSequence() and
  * nextRichSequence() methods.
  *
  * @author Mark Schreiber
  * @author Richard Holland
  * @see org.biojava.bio.seq.SequenceIterator
  */
-public interface RichSequenceIterator extends BioEntryIterator,SequenceIterator {
-    public RichSequence nextRichSequence() throws NoSuchElementException, BioException;
+public interface BioEntryIterator {
+    /**
+     * Returns whether there are more sequences to iterate over.
+     *
+     * @return  true if there are more sequences to get and false otherwise
+     */
+    boolean hasNext();
+    
+    public BioEntry nextBioEntry() throws NoSuchElementException, BioException;
 }
