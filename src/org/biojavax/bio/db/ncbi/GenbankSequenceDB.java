@@ -31,14 +31,20 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Set;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.db.HashSequenceDB;
-import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.db.FetchURL;
+import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.bio.db.AbstractRichSequenceDB;
+import org.biojavax.bio.db.HashRichSequenceDB;
+import org.biojavax.bio.db.RichSequenceDB;
+import org.biojavax.bio.db.RichSequenceDBLite;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.RichSequenceIterator;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
@@ -55,7 +61,9 @@ import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
  * @author Mark Schreiber
  * @author Richard Holland
  */
-public class GenbankSequenceDB extends org.biojava.bio.seq.db.GenbankSequenceDB {
+public class GenbankSequenceDB extends AbstractRichSequenceDB implements RichSequenceDBLite {
+    
+    protected static final String urlBatchSequences = "http://www.ncbi.nlm.nih.gov:80/entrez/eutils/efetch.fcgi";
     
     /**
      * The default constructor delegates to the parent class. The constructor refers
@@ -70,19 +78,70 @@ public class GenbankSequenceDB extends org.biojava.bio.seq.db.GenbankSequenceDB 
     }
     
     /**
+     * Get the URL object for locating sequence object using eutils.
+     * The default value of the return format of the sequence object is text.
+     **/
+    protected URL getAddress(String id) throws MalformedURLException {
+        FetchURL seqURL = new FetchURL("Genbank", "text");
+        String baseurl = seqURL.getbaseURL();
+        String db = seqURL.getDB();
+        String url = baseurl+db+"&id="+id+"&rettype=gb";
+        return new URL(url);
+    }
+    
+    /**
+     * Create the Http Post Request to fetch (in batch mode) a list of sequence
+     * with Genbank.
+     * @param url URL of the request
+     * @param list List of sequence identifier
+     * @return The Post request.
+     */
+    protected String makeBatchRequest(URL url, Set list) {
+        StringBuffer params = new StringBuffer();
+        params.append("db=nucleotide&rettype=gb&id=");
+        
+        for (Iterator i = list.iterator(); i.hasNext();) {
+            String idSequence = (String)i.next();
+            params.append(idSequence);
+            if(i.hasNext()) params.append(",");
+        }
+        
+        StringBuffer header = new StringBuffer();
+        header.append("POST ");
+        header.append(url.getPath());
+        header.append(
+                " HTTP/1.0\r\n"
+                + "Connection: close\r\n"
+                + "Accept: text/html, text/plain\r\n"
+                + "Host: ");
+        header.append(url.getHost());
+        header.append(
+                "\r\n"
+                + "User-Agent: Biojava/GenbankSequenceDB\r\n"
+                + "Content-Type: application/x-www-form-urlencoded\r\n"
+                + "Content-Length: ");
+        header.append(params.length());
+        header.append("\r\n\r\n");
+        
+        StringBuffer request = new StringBuffer();
+        request.append(header);
+        request.append(params);
+        
+        return request.toString();
+    }
+    
+    /**
      * Given the appropriate Genbank ID, return the matching RichSequence object.
      * @param id the Genbank ID to retrieve.
      * @return the matching RichSequence object, or null if not found.
      * @throws Exception if the sequence could not be retrieved for reasons other
      * than the identifier not being found.
      */
-    public RichSequence getRichSequence(String id) throws Exception {
+    public RichSequence getRichSequence(String id) throws BioException, IllegalIDException {
         try {
-            IOExceptionFound = false;
-            ExceptionFound = false;
             URL queryURL = getAddress(id); //get URL based on ID
             
-            SymbolTokenization rParser = getAlphabet().getTokenization("token"); //get SymbolTokenization
+            SymbolTokenization rParser = DNATools.getDNA().getTokenization("token"); //get SymbolTokenization
             RichSequenceBuilderFactory seqFactory = this.getFactory();
             Namespace ns = this.getNamespace();
             
@@ -91,12 +150,12 @@ public class GenbankSequenceDB extends org.biojava.bio.seq.db.GenbankSequenceDB 
             RichSequenceIterator seqI = RichSequence.IOTools.readGenbank(reader, rParser, seqFactory, ns);
             
             return seqI.nextRichSequence();
-        } catch (Exception e) {
-            System.out.println("Exception found in GenbankSequenceDB -- getRichSequence");
-            System.out.println(e.toString());
-            ExceptionFound = true;
-            IOExceptionFound = true;
-            return null;
+        } catch (MalformedURLException e) {
+            throw new BioException("Failed to create Genbank URL",e);
+        } catch (BioException e) {
+            throw new BioException("Failed to read Genbank sequence",e);
+        } catch (IOException e) {
+            throw new BioException("IO failure whilst reading from Genbank",e);
         }
     }
     
@@ -109,7 +168,7 @@ public class GenbankSequenceDB extends org.biojava.bio.seq.db.GenbankSequenceDB 
      * You will need to cast the sequences you get from this database object into
      * RichSequence objects if you want to access their full features.
      */
-    public SequenceDB getRichSequences(Set list) throws BioException {
+    public RichSequenceDB getRichSequences(Set list) throws BioException, IllegalIDException {
         
         return getRichSequences(list, null);
     }
@@ -125,13 +184,9 @@ public class GenbankSequenceDB extends org.biojava.bio.seq.db.GenbankSequenceDB 
      * You will need to cast the sequences you get from this database object into
      * RichSequence objects if you want to access their full features.
      */
-    public SequenceDB getRichSequences(Set list, SequenceDB database)
-    throws BioException {
-        
-        if (database == null)
-            database = new HashSequenceDB();
-        
+    public RichSequenceDB getRichSequences(Set list, RichSequenceDB database) throws BioException, IllegalIDException {
         try {
+            if (database == null) database = new HashRichSequenceDB();
             
             URL url = new URL(urlBatchSequences);
             int port = url.getPort();
@@ -141,8 +196,7 @@ public class GenbankSequenceDB extends org.biojava.bio.seq.db.GenbankSequenceDB 
             Socket s = new Socket(hostname, port);
             
             InputStream sin = s.getInputStream();
-            BufferedReader fromServer =
-                    new BufferedReader(new InputStreamReader(sin));
+            BufferedReader fromServer = new BufferedReader(new InputStreamReader(sin));
             OutputStream sout = s.getOutputStream();
             PrintWriter toServer = new PrintWriter(new OutputStreamWriter(sout));
             
@@ -152,32 +206,40 @@ public class GenbankSequenceDB extends org.biojava.bio.seq.db.GenbankSequenceDB 
             
             // Delete response headers
             boolean finEntete = false;
-            for (String l = null;
-            ((l = fromServer.readLine()) != null) && (!finEntete);
-            )
-                if (l.equals(""))
-                    finEntete = true;
-                        
-            SymbolTokenization rParser = getAlphabet().getTokenization("token"); //get SymbolTokenization
+            for (String l = null; ((l = fromServer.readLine()) != null) && (!finEntete);) {
+                if (l.equals("")) finEntete = true;
+            }
+            
+            SymbolTokenization rParser = DNATools.getDNA().getTokenization("token"); //get SymbolTokenization
             RichSequenceBuilderFactory seqFactory = this.getFactory();
             Namespace ns = this.getNamespace();
             
             RichSequenceIterator seqI = RichSequence.IOTools.readGenbank(fromServer, rParser, seqFactory, ns);
             
-            while (seqI.hasNext())
-                database.addSequence(seqI.nextRichSequence());
+            while (seqI.hasNext()) {
+                try {
+                    database.addSequence(seqI.nextRichSequence());
+                } catch (ChangeVetoException ce) {
+                    throw new BioException("Unexpectedly couldn't add to the supplied RichSequenceDB", ce);
+                }
+            }
             
+            return database;
         } catch (MalformedURLException e) {
-            throw new BioException(e,"Exception found in GenbankSequenceDB -- getRichSequences");
-        } catch (IOException e) {
-            throw new BioException(e,"Exception found in GenbankSequenceDB -- getRichSequences");
+            throw new BioException("Failed to create Genbank URL",e);
         } catch (BioException e) {
-            throw new BioException(e,"Exception found in GenbankSequenceDB -- getRichSequences");
-        } catch (ChangeVetoException e) {
-            throw new BioException(e,"Exception found in GenbankSequenceDB -- getRichSequences");
+            throw new BioException("Failed to read Genbank sequence",e);
+        } catch (IOException e) {
+            throw new BioException("IO failure whilst reading from Genbank",e);
         }
-        
-        return database;
+    }
+    
+    public String getName() {
+        return "Genbank";
+    }
+    
+    public Set ids() {
+        throw new RuntimeException("Complete set of Genbank ids is unavailable.");
     }
     
     /**
