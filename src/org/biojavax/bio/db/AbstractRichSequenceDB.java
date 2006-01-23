@@ -74,19 +74,11 @@ public abstract class AbstractRichSequenceDB extends AbstractBioEntryDB implemen
     }
     
     public void addSequence(Sequence seq) throws IllegalIDException, BioException, ChangeVetoException {
-        throw new ChangeVetoException("Cannot add Sequences to an AbstractRichSequenceDB");
+        throw new ChangeVetoException("Cannot add Sequences to a read-only database");
     }
     
     public void removeSequence(String id) throws IllegalIDException, BioException, ChangeVetoException {
-        throw new ChangeVetoException("Cannot remove Sequences from an AbstractRichSequenceDB");
-    }
-    
-    public void addBioEntry(BioEntry seq) throws IllegalIDException, BioException, ChangeVetoException {
-        throw new ChangeVetoException("Cannot add BioEntrys to a AbstractRichSequenceDB");
-    }
-    
-    public void removeBioEntry(String id) throws IllegalIDException, BioException, ChangeVetoException {
-        throw new ChangeVetoException("Cannot remove BioEntrys from a AbstractRichSequenceDB");
+        throw new ChangeVetoException("Cannot remove Sequences from a read-only database");
     }
     
     public SequenceIterator sequenceIterator() {

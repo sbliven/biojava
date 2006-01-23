@@ -23,7 +23,9 @@ package org.biojavax.bio.db;
 
 import java.util.Iterator;
 import org.biojava.bio.BioException;
+import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.BioEntryIterator;
 
@@ -36,6 +38,14 @@ import org.biojavax.bio.BioEntryIterator;
  * @author Richard Holland
  */
 public abstract class AbstractBioEntryDB extends AbstractChangeable implements BioEntryDB {
+    
+    public void addBioEntry(BioEntry seq) throws IllegalIDException, BioException, ChangeVetoException {
+        throw new ChangeVetoException("Cannot add BioEntrys to a read-only database");
+    }
+    
+    public void removeBioEntry(String id) throws IllegalIDException, BioException, ChangeVetoException {
+        throw new ChangeVetoException("Cannot remove BioEntrys from a read-only database");
+    }
            
     public BioEntryIterator getBioEntryIterator() {
         return new BioEntryIterator() {
