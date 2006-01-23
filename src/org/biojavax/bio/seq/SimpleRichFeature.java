@@ -93,7 +93,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
             this.notes = new SimpleRichAnnotation();
             for (Iterator i = templ.annotation.keys().iterator(); i.hasNext(); ) {
                 Object key = i.next();
-                this.notes.setProperty(i.next(), templ.annotation.getProperty(key));
+                this.notes.setProperty(key, templ.annotation.getProperty(key));
             }
         }
         

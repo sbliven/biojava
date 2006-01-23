@@ -27,7 +27,6 @@ import java.util.Iterator;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
@@ -41,19 +40,19 @@ import org.biojava.utils.ChangeVetoException;
  * @author Laurent Jourdren
  * @author Shuvankar Mukherjee
  * @author Mark Schreiber
+ * @author Richard Holland
  */
 public class GenbankSequenceDB
 {
   private static SequenceFormat format;//return format of the sequence
   private static String DBName="Genbank";//predefined the database name -- Genbank
-  private boolean IOExceptionFound=false;//check if IOException is found
-  private boolean ExceptionFound=false;//check if any exception is found
-  private static final String urlBatchSequences =
+  protected boolean IOExceptionFound=false;//check if IOException is found
+  protected boolean ExceptionFound=false;//check if any exception is found
+  protected static final String urlBatchSequences =
     "http://www.ncbi.nlm.nih.gov:80/entrez/eutils/efetch.fcgi";
 
-  static
-  {
-    SequenceFormat format = new GenbankFormat();
+  public GenbankSequenceDB() {
+      this.format = new GenbankFormat();
   }
 
   protected SequenceFormat getSequenceFormat()
@@ -155,7 +154,7 @@ public class GenbankSequenceDB
    * @param list List of sequence identifier
    * @return The Post request.
    */
-  private String makeBatchRequest(URL url, Set list) {
+  protected String makeBatchRequest(URL url, Set list) {
 
     StringBuffer params = new StringBuffer();
     params.append("db=nucleotide&rettype=gb&id=");
