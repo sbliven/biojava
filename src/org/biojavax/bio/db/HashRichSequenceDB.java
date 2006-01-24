@@ -29,12 +29,11 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.IDMaker;
 import org.biojava.bio.seq.db.IllegalIDException;
-import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.seq.RichSequence;
-import org.biojavax.bio.seq.RichSequenceIterator;
+
 
 /**
  * An implementation of RichSequenceDB that uses an underlying HashMap to store the
@@ -152,19 +151,19 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
      * @param seq the RichSequence to add
      * @throws ChangeVetoException if this addition was vetoed
      */
-    public void addSequence(Sequence seq) throws IllegalIDException, BioException, ChangeVetoException {
-        addSequence(idMaker.calcID(seq), RichSequence.Tools.enrich(seq));
+    public void addRichSequence(RichSequence seq) throws IllegalIDException, BioException, ChangeVetoException {
+        this.addRichSequence(idMaker.calcID(seq), seq);
     }
     
-    protected void addSequence(String id, RichSequence seq) throws IllegalIDException, BioException, ChangeVetoException {
+    protected void addRichSequence(String id, RichSequence seq) throws IllegalIDException, BioException, ChangeVetoException {
         if(!hasListeners()) {
             sequenceByID.put(id, seq);
         } else {
-            ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
+            ChangeSupport changeSupport = getChangeSupport(RichSequenceDB.SEQUENCES);
             synchronized(changeSupport) {
                 ChangeEvent ce = new ChangeEvent(
                         this,
-                        SequenceDB.SEQUENCES,
+                        RichSequenceDB.SEQUENCES,
                         new Object[] { id, seq },
                         null);
                         changeSupport.firePreChangeEvent(ce);
@@ -179,11 +178,11 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
         if(!hasListeners()) {
             sequenceByID.remove(id);
         } else {
-            ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
+            ChangeSupport changeSupport = getChangeSupport(RichSequenceDB.SEQUENCES);
             synchronized(changeSupport) {
                 ChangeEvent ce = new ChangeEvent(
                         this,
-                        SequenceDB.SEQUENCES,
+                        RichSequenceDB.SEQUENCES,
                         null,
                         id
                         );

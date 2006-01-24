@@ -23,9 +23,10 @@ package org.biojavax.bio.db;
 
 import java.util.Set;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.db.SequenceDBLite;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.seq.RichSequence;
 
 /**
@@ -39,13 +40,7 @@ import org.biojavax.bio.seq.RichSequence;
  * @author Thomas Down
  * @author Richard Holland
  */
-public interface RichSequenceDBLite extends BioEntryDBLite,SequenceDBLite {
-    /**
-     * {@inheritDoc}
-     * Will always return RichSequence instances.
-     */
-    public Sequence getSequence(String id) throws IllegalIDException, BioException;
-    
+public interface RichSequenceDBLite extends BioEntryDBLite,SequenceDBLite {      
     /**
      * Retrieve a single RichSequence by its id.
      *
@@ -74,4 +69,27 @@ public interface RichSequenceDBLite extends BioEntryDBLite,SequenceDBLite {
      * @throws IllegalIDException if the database doesn't know about the id
      */
     public RichSequenceDB getRichSequences(Set ids, RichSequenceDB db) throws BioException,IllegalIDException;
+    
+    /**
+     * Adds a sequence to the database.
+     *
+     * @param seq the RichSequence to add
+     * @throws IllegalIDException if a uniqe ID could not be generated for RichSequence
+     * @throws BioException if something goes wrong with adding the RichSequence
+     * @throws ChangeVetoException  if either the database does not allow
+     *         RichSequences to be added or the modification was vetoed
+     */
+    public void addRichSequence(RichSequence seq) throws IllegalIDException, BioException, ChangeVetoException;
+    
+    /**
+     * Remove the RichSequence associated with an ID from the database.
+     *
+     * @param id  the ID of the RichSequence to remove
+     * @throws  IllegalIDException if there is no RichSequence for the ID
+     * @throws  BioException if something failed while removing the RichSequence for
+     *          that ID
+     * @throws  ChangeVetoException  if either the database does not allow
+     *          RichSequences to be removed or the modification was vetoed
+     */
+    public void removeRichSequence(String id) throws IllegalIDException, BioException, ChangeVetoException;
 }

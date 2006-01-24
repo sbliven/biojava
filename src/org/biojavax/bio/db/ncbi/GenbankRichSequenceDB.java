@@ -61,7 +61,7 @@ import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
  * @author Mark Schreiber
  * @author Richard Holland
  */
-public class GenbankSequenceDB extends AbstractRichSequenceDB implements RichSequenceDBLite {
+public class GenbankRichSequenceDB extends AbstractRichSequenceDB implements RichSequenceDBLite {
     
     protected static final String urlBatchSequences = "http://www.ncbi.nlm.nih.gov:80/entrez/eutils/efetch.fcgi";
     
@@ -71,7 +71,7 @@ public class GenbankSequenceDB extends AbstractRichSequenceDB implements RichSeq
      * before calling this constructor.
      * Sets the default factory to THRESHOLD.
      */
-    public GenbankSequenceDB() {
+    public GenbankRichSequenceDB() {
         super();
         this.setFactory(RichSequenceBuilderFactory.THRESHOLD); // threshold factory is efficient
         this.setNamespace(RichObjectFactory.getDefaultNamespace()); // default namespace

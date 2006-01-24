@@ -26,13 +26,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.db.IDMaker;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.BioEntry;
-import org.biojavax.bio.BioEntryIterator;
+
 
 /**
  * An implementation of RichSequenceDB that uses an underlying HashMap to store the
@@ -122,11 +121,11 @@ public class HashBioEntryDB extends AbstractBioEntryDB implements BioEntryDB {
         if(!hasListeners()) {
             sequenceByID.put(id, seq);
         } else {
-            ChangeSupport changeSupport = getChangeSupport(BioEntryDBLite.BIOENTRYS);
+            ChangeSupport changeSupport = getChangeSupport(BioEntryDB.BIOENTRYS);
             synchronized(changeSupport) {
                 ChangeEvent ce = new ChangeEvent(
                         this,
-                        BioEntryDBLite.BIOENTRYS,
+                        BioEntryDB.BIOENTRYS,
                         new Object[] { id, seq },
                         null);
                         changeSupport.firePreChangeEvent(ce);
@@ -141,11 +140,11 @@ public class HashBioEntryDB extends AbstractBioEntryDB implements BioEntryDB {
         if(!hasListeners()) {
             sequenceByID.remove(id);
         } else {
-            ChangeSupport changeSupport = getChangeSupport(BioEntryDBLite.BIOENTRYS);
+            ChangeSupport changeSupport = getChangeSupport(BioEntryDB.BIOENTRYS);
             synchronized(changeSupport) {
                 ChangeEvent ce = new ChangeEvent(
                         this,
-                        BioEntryDBLite.BIOENTRYS,
+                        BioEntryDB.BIOENTRYS,
                         null,
                         id
                         );
