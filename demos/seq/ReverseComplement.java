@@ -1,15 +1,49 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package seq;
 
 import java.io.*;
+import org.biojava.bio.seq.SequenceTools;
+import org.biojavax.Namespace;
+import org.biojavax.RichObjectFactory;
+import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.RichSequenceIterator;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
 
+/**
+ * Demo of reverse complementing a fasta DNA file
+ * @author Matthew Pocock
+ * @author Mark Schreiber
+ */
 public class ReverseComplement {
+  
+   /**
+    * Run the program
+    * @param args a dna fasta file
+    */
   public static void main(String[] args)
   throws Exception {
-    if(args.length < 2) {
-      System.err.println("Use: seq.ReverseComplement inFile, outFile");
+    if(args.length < 1) {
+      System.err.println("Use: seq.ReverseComplement inFile");
       System.exit(1);
     }
 
@@ -19,15 +53,15 @@ public class ReverseComplement {
       )
     );
 
-    OutputStream seqOut = new FileOutputStream(new File(args[1]));
+    OutputStream seqOut = System.out;
+    Namespace ns = RichObjectFactory.getDefaultNamespace();
 
-    for(SequenceIterator si = SeqIOTools.readFastaDNA(seqIn); si.hasNext(); ) {
-      Sequence seq = si.nextSequence();
-      Sequence rev = SequenceTools.reverseComplement(seq);
-      SeqIOTools.writeFasta(seqOut, rev);
+    for(RichSequenceIterator si = RichSequence.IOTools.readFastaDNA(seqIn, ns);
+        si.hasNext(); ) {
+        
+      RichSequence seq = si.nextRichSequence();
+      RichSequence rev = RichSequence.Tools.enrich(SequenceTools.reverseComplement(seq));
+      RichSequence.IOTools.writeFasta(seqOut, rev, ns);
     }
-
-    seqOut.flush();
-    seqOut.close();
   }
 }
