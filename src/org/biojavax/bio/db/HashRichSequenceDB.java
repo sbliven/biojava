@@ -145,9 +145,7 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
     }
     
     /**
-     * Add a sequence under a particular id.
-     *
-     * @param id  the id to use
+     * Add a sequence.
      * @param seq the RichSequence to add
      * @throws ChangeVetoException if this addition was vetoed
      */

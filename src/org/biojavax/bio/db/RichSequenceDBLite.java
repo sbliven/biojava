@@ -53,7 +53,7 @@ public interface RichSequenceDBLite extends BioEntryDBLite,SequenceDBLite {
     /**
      * Retrieve multiple RichSequence by its id.
      *
-     * @param id a set of ids to retrieve by
+     * @param ids a set of ids to retrieve by
      * @return  the RichSequences with that id
      * @throws IllegalIDException if the database doesn't know about the id
      */
@@ -63,7 +63,7 @@ public interface RichSequenceDBLite extends BioEntryDBLite,SequenceDBLite {
      * Retrieve multiple RichSequence into a specific sequence database. If
      * that database is null, a new HashRichSequenceDB is used.
      *
-     * @param id a set of ids to retrieve by
+     * @param ids a set of ids to retrieve by
      * @param db a database to load the seqs into
      * @return  the RichSequences with that id
      * @throws IllegalIDException if the database doesn't know about the id

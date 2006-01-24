@@ -70,10 +70,10 @@ public interface BioEntryDBLite {
     public BioEntry getBioEntry(String id) throws IllegalIDException, BioException;
     
     /**
-     * Retrieve multiple BioEntry by its id.
+     * Retrieve multiple BioEntry by their ids.
      *
-     * @param id a set of ids to retrieve by
-     * @return  the BioEntrys with that id
+     * @param ids a set of ids to retrieve by
+     * @return  the BioEntrys with those ids
      * @throws IllegalIDException if the database doesn't know about the id
      */
     public BioEntryDB getBioEntrys(Set ids) throws BioException,IllegalIDException;
@@ -82,7 +82,7 @@ public interface BioEntryDBLite {
      * Retrieve multiple BioEntry into a specific sequence database. If
      * that database is null, a new HashBioEntryDB is used.
      *
-     * @param id a set of ids to retrieve by
+     * @param ids a set of ids to retrieve by
      * @param db a database to load the seqs into
      * @return  the BioEntrys with that id
      * @throws IllegalIDException if the database doesn't know about the id

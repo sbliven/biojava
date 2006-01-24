@@ -107,9 +107,7 @@ public class HashBioEntryDB extends AbstractBioEntryDB implements BioEntryDB {
     }
     
     /**
-     * Add a BioEntry under a particular id.
-     *
-     * @param id  the id to use
+     * Add a BioEntry, the name of the BioEntry will be used as the ID
      * @param seq the BioEntry to add
      * @throws ChangeVetoException if this addition was vetoed
      */
