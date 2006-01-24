@@ -182,7 +182,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
             line = reader.readLine();
             if (line!=null) {
                 line = line.trim();
-                if (line.charAt(0)=='>') {
+                if (line.length() > 0 && line.charAt(0)=='>') {
                     reader.reset();
                     hasMoreSeq = false;
                 } else {
