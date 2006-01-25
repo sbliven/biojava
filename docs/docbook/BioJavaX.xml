@@ -520,7 +520,7 @@ RichSequence rs = RichSequence.Tools.enrich(s);</programlisting>
               <entry>[name (<code>String</code>)]</entry>
 
               <entry><programlisting>Namespace ns = (Namespace)RichObjectFactory.getObject(
-                             Namespace.class, 
+                             SimpleNamespace.class, 
                              new Object[]{"myNamespace"}
                           );</programlisting></entry>
             </row>
