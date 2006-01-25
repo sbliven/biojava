@@ -109,11 +109,11 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String END_SEQUENCE_TAG = "//";
     
     // locus line
-    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+bp\\s+([dms]s-)?(\\S+)\\s+(circular|linear)?\\s+(\\S+)\\s+(\\S+)$");
+    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(?:bp|aa)\\s+([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s+(\\S+)\\s+(\\S+)$");
     // version line
     protected static final Pattern vp = Pattern.compile("^(\\S+?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
-    protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
+    protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\((?:bases|residues)\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
     // dbxref line
     protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
     //sections start at a line and continue till the first line afterwards with a
@@ -261,6 +261,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 String val = ((String[])section.get(0))[1];
                 if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
                 String[] kws = val.split(";");
+                
                 for (int i = 0; i < kws.length; i++) {
                     String kw = kws[i].trim();
                     rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
