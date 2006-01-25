@@ -1,28 +1,65 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package seq;
 
 import java.io.*;
 import java.util.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojavax.Namespace;
+import org.biojavax.RichObjectFactory;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
+import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.RichSequenceIterator;
 
+/**
+ * Another EMBL demo
+ * @author Matthew Pocock
+ * @author Mark Schreiber
+ */
 public class TestEmbl2 {
+    
+  /**
+   * @param args an EMBL dna file
+   */
   public static void main(String [] args) {
     try {
       if(args.length != 1) {
-        throw new Exception("Use: TestEmbl2 emblFile");
+        throw new Exception("Use: seq.TestEmbl2 emblFile");
       }
+      
+      Namespace ns = RichObjectFactory.getDefaultNamespace();
       
       File emblFile = new File(args[0]);
       BufferedReader eReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(emblFile)));
-      SequenceIterator seqI = SeqIOTools.readEmbl(eReader);
+      
+      RichSequenceIterator seqI = 
+              RichSequence.IOTools.readEMBLDNA(eReader, ns);
         
         
       while(seqI.hasNext()) {
-        Sequence seq = seqI.nextSequence();
+        RichSequence seq = seqI.nextRichSequence();
         System.out.println(seq.getName() + " has " + seq.countFeatures() + " features");
 
 	printFeatures(seq, FeatureFilter.all, System.out, "");
