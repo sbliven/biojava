@@ -3930,6 +3930,39 @@ List taxons = q.list();  // taxons will now contain all matching taxon objects</
   </chapter>
 
   <chapter>
+    <title>BioEntry and RichSequence Databases</title>
+
+    <para><code>BioJavaX</code> allows both <code>BioEntry</code> and
+    <code>RichSequence</code> objects to be collected together in a single
+    group. <code>BioEntry</code> objects can be collected together inside
+    implementations of <code>BioEntryDB</code>, whilst
+    <code>RichSequence</code> objects can be collected inside implementations
+    of <code>RichSequenceDB</code> (which extends <code>BioEntryDB</code>).
+    These are both very similar to the existing <code>SequenceDB</code>
+    interface in BioJava, and in fact <code>RichSequenceDB</code> extends
+    <code>SequenceDB</code> and therefore can be used as a drop-in
+    replacement. </para>
+
+    <para>An abstract implementation of each of these interfaces is provided,
+    along with a simple hash-based implementation.</para>
+
+    <para>The idea of a collection such as this is to provide a wrapper to
+    some kind of behind-the-scenes database. The hash-based implementations,
+    <code>HashBioEntryDB</code> and <code>HashRichSequenceDB</code>, simply
+    provide an in-memory database where sequences are stored in a
+    <code>HashMap</code>, whereas the <code>GenbankRichSequenceDB</code>
+    implementation is a read-only implementation which downloads and parses
+    Genbank records on-demand from the NCBI website. </para>
+
+    <para>There is also a pair of convenience implementations called
+    <code>BioSQLBioEntryDB</code> and <code>BioSQLRichSequenceDB</code> which
+    wrap a Hibernate session connected to a BioSQL database and allow
+    <code>BioEntry</code> and <code>RichSequence</code> objects to be read
+    from, added to and deleted from BioSQL. See the relevant section in the
+    chapter on BioSQL and Hibernate for details.</para>
+  </chapter>
+
+  <chapter>
     <title>BioSQL and Hibernate.</title>
 
     <section>
@@ -4640,7 +4673,7 @@ session.close();
         
 // Pretty print the document to System.out
 OutputFormat format = OutputFormat.createPrettyPrint();
-XMLWriter writer = new XMLWriter(System.out, format);
+XMLWriter writer = new XMLWriter(System.out, format);// 
 writer.write(doc);</programlisting>
 
       <para>Reading them back and saving them to the database is
@@ -4659,6 +4692,72 @@ for (Iterator i = results.iterator(); i.hasNext(); ) {
         
 tx.commit();
 session.close();</programlisting>
+    </section>
+
+    <section>
+      <title>BioEntryDB and RichSequenceDB convenience wrappers</title>
+
+      <para>BioJavaX supplies two convenience wrappers for the
+      Hibernate+BioSQL combination which allow simple read/write access of
+      <code>BioEntry</code> and <code>RichSequence</code> objects directly
+      to/from a BioSQL database. They are designed for convenience not
+      flexibility, so it is always best to use the full method outlined in the
+      rest of this chapter, but if you are in a hurry then these should work
+      just fine.</para>
+
+      <para>These two wrappers depend on your database having unique values in
+      the <code>name</code> column of the <code>BioEntry</code> table. If this
+      is not the case, then they will not work for you and you should use the
+      full method instead.</para>
+
+      <para>If you use <code>BioSQLBioEntryDB</code> then the objects you get
+      from the database are <code>BioEntry</code> objects and will not have
+      the sequence data attached to them. This may increase performance if you
+      are dealing with large sequences and do not need the sequence data.
+      <code>BioSQLRichSequenceDB</code> loads <code>RichSequence</code>
+      objects which means that sequence data comes along for the ride.</para>
+
+      <para>The wrappers allow sequences to be read from, added to and deleted
+      from the database in a single command. The easiest way to demonstrate
+      this is by a code example in which a sequence is read from the database,
+      another sequence is added, and a third is deleted:</para>
+
+      <programlisting>Session sess = ...;    // connect to BioSQL using Hibernate and establish a session
+RichObjectFactory.connectToHibernate(sess);    // bind BioJavaX to the Hibernate session
+
+RichSequenceDB db = new BioSQLRichSequenceDB(sess);   // create the RichSequenceDB wrapper around the Hibernate session
+
+RichSequence seq1 = db.getRichSequence("joe");    // load the sequence where name='joe'
+
+RichSequence seq2 = ...;     // create a sequence somehow
+db.addRichSequence(seq2);    // add it to the database
+
+db.removeRichSequence("bloggs");    // delete the sequence where name='bloggs'
+
+sess.close();    // disconnect from the database</programlisting>
+
+      <para>The code above is non-transactional, but it can be made to be
+      transactional by doing something like this (based on the example in the
+      JavaDocs for the <code>Session</code> object in Hibernate):</para>
+
+      <programlisting>Session sess = ...;    // connect to BioSQL using Hibernate and establish a session
+RichObjectFactory.connectToHibernate(sess);    // bind BioJavaX to the Hibernate session
+
+RichSequenceDB db = new BioSQLRichSequenceDB(sess);    // create the RichSequenceDB wrapper around the Hibernate session
+
+Transaction tx;
+try {
+   tx = sess.beginTransaction();    // begin the transaction
+
+   // do some work inside the transaction, eg. db.addRichSequence(seq)
+
+   tx.commit();    // commit the transaction
+} catch (Exception e) {
+   if (tx!=null) tx.rollback();    // rollback in case of error
+   throw e;
+} finally {
+   sess.close();    // disconnect from the database
+}</programlisting>
     </section>
   </chapter>
 
