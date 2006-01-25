@@ -34,7 +34,7 @@ import org.biojavax.bio.seq.RichSequenceIterator;
 
 /**
  * Another EMBL demo
- * @author Matthew Pocock
+ * @author Thomas Down
  * @author Mark Schreiber
  */
 public class TestEmbl2 {
