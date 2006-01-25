@@ -434,7 +434,7 @@
               packages="org.biojava.bio.gui:org.biojava.bio.gui.sequence" />
 
        <group title="Sequence databases and formats"
-              packages="org.biojava.bio.seq.io.agave:org.biojava.bio.seq.io.game:org.biojava.bio.program.das:org.biojava.bio.seq.ragbag:org.biojava.bio.seq.db.emblcd:org.biojava.bio.program.xff:org.biojava.bio.seq.dist:org.biojava.bio.seq.io.game12:org.biojava.bio.seq.db.biofetch:org.biojava.bio.seq.db.flat:org.biojava.bio.seq.db.biosql:org.biojava.bio.program.indexdb:org.biojava.bio.program.das.dasalignment:org.biojava.bio.program.homologene" />
+              packages="org.biojava.bio.seq.io.agave:org.biojava.bio.program.das:org.biojava.bio.seq.ragbag:org.biojava.bio.seq.db.emblcd:org.biojava.bio.program.xff:org.biojava.bio.seq.dist:org.biojava.bio.seq.io.game:org.biojava.bio.seq.io.game12:org.biojava.bio.seq.db.biofetch:org.biojava.bio.seq.db.flat:org.biojava.bio.seq.db.biosql:org.biojava.bio.program.indexdb:org.biojava.bio.program.das.dasalignment:org.biojava.bio.program.homologene" />
 
        <group title="Handling output from external tools"
               packages="org.biojava.bio.program:org.biojava.bio.program.gff:org.biojava.bio.program.gff3:org.biojava.bio.program.sax:org.biojava.bio.program.xml:org.biojava.bio.program.blast2html:org.biojava.bio.program.search:org.biojava.bio.program.ssbind:org.biojava.bio.program.phred:org.biojava.bio.program.hmmer:org.biojava.bio.program.sax.blastxml" />
@@ -528,7 +528,7 @@
 
   <target
     name="javadocs-all"
-    depends="javadocs-taglets,javadocs-biojava,javadocs-demos,javadocs-apps"
+    depends="javadocs-taglets,javadocs-biojava,javadocs-demos,javadocs-apps,docbook"
     description="Creates the javadocs for all components"
   />
 
