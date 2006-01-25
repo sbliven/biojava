@@ -35,7 +35,7 @@ import org.biojavax.bio.seq.RichSequenceIterator;
 public class TestEmbl {
     
   /**
-   * @param an EMBL file
+   * @param args an EMBL dna file
    */ 
   public static void main(String [] args) {
     try {
