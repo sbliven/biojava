@@ -24,6 +24,7 @@ package	seq;
 import java.io.*;
 import java.util.*;
 import org.biojavax.Namespace;
+import org.biojavax.Note;
 import org.biojavax.RichAnnotation;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
@@ -37,6 +38,7 @@ import org.biojavax.bio.seq.RichSequenceIterator;
  * Demo GenBank reading
  * @author Matthew Pocock
  * @author Mark Schreiber
+ * @author Richard Holland
  */ 
 public class TestGenbank {
     public static void main(String [] args) {
@@ -71,17 +73,15 @@ public class TestGenbank {
                 
                 
                 // Annotation testing
-		RichAnnotation theAnnotation = (RichAnnotation)seq.getAnnotation();
-		java.util.Set theKeys = theAnnotation.keys();
-		java.util.Iterator theOtherIterator = theKeys.iterator();
-		while(theOtherIterator.hasNext())
-		{
-		    System.out.println();
-		    Object note = theOtherIterator.next();
-		    System.out.println(note);
-		}
+               RichAnnotation theAnnotation = (RichAnnotation)seq.getAnnotation();
+               Iterator notesIterator = theAnnotation.getNoteSet().iterator();
+               while (notesIterator.hasNext()) {
+                   System.out.println();
+                   Note note = (Note)notesIterator.next();
+                   System.out.println(note);
+               }
                 
-                System.out.println("\n\nRE-GENERATING GENPEPT");
+                System.out.println("\n\nRE-GENERATING GENBANK");
                 RichSequence.IOTools.writeGenbank(System.out, seq, ns);
             }
             
