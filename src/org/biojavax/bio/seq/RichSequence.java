@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
@@ -39,6 +40,7 @@ import org.biojava.bio.seq.RNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
@@ -443,6 +445,66 @@ public interface RichSequence extends BioEntry,Sequence {
                 rs.getAnnotation().setProperty(key,value);
             }
             return rs;
+        }
+        
+        public static RichSequence subSequence(RichSequence s,
+                                              Namespace newNamespace,
+                                              int from, int to,
+                                              String newName,
+                                              String newAccession,
+                                              String newIdentifier,
+                                              int newVersion,
+                                              Double seqVersion)
+        throws IndexOutOfBoundsException {
+            SymbolList symList = s.subList(from, to);
+            SimpleRichSequence seq = new SimpleRichSequence(
+                    newNamespace, 
+                    newName, 
+                    newAccession, 
+                    newVersion, 
+                    symList, 
+                    seqVersion);
+            Set features = new TreeSet();
+            RichLocation subLoc = new SimpleRichLocation(
+                    new SimplePosition(from), new SimplePosition(to), 0);
+            try{
+                //copy features if appropriate
+                for(Iterator i = s.features(); i.hasNext();){
+                    RichFeature f = (RichFeature)i.next();
+                    
+                    if(subLoc.contains(f.getLocation())){
+                        RichFeature.Template templ = 
+                                (RichFeature.Template)f.makeTemplate();
+                        
+                        //change the location
+                        Position min = new SimplePosition(
+                                templ.location.getMin() -from +1);
+                        Position max = new SimplePosition(
+                                templ.location.getMax() -from +1);
+                        templ.location = new SimpleRichLocation(
+                                min, max, 0);
+                        
+                        seq.createFeature(templ);
+                    }
+                    
+                }
+                
+                //other cruft
+                if(s.getNoteSet() != null) seq.setNoteSet(s.getNoteSet());
+                if(s.getTaxon() !=null) seq.setTaxon(s.getTaxon());
+                if(s.getDescription() != null){
+                    seq.setDescription("subsequence ("+from+":"+to+") of "+s.getDescription());
+                }
+                if(s.getDivision() != null){
+                  seq.setDivision(s.getDivision());
+                }
+            }catch(ChangeVetoException ex){
+                throw new BioError(ex); //something is rotten in Denmark!
+            }catch(BioException ex){
+                throw new BioError(ex); //something is rotten in Denmark!
+            }
+            
+            return seq;
         }
     }
     
