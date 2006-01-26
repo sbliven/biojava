@@ -124,7 +124,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     //  \s{21} /word
     protected static final Pattern sectp = Pattern.compile("^(\\s{0,8}(\\S+)\\s{1,7}(.*)|\\s{21}(/\\S+?)=(.*)|\\s{21}(/\\S+))$");
     
-    protected static final Pattern readableFiles = Pattern.compile(".*(gbk$|\\u002egb.*)");
+    protected static final Pattern readableFiles = Pattern.compile(".*(g[bp]k*$|\\u002eg[bp].*)");
     protected static final Pattern headerLine = Pattern.compile("^LOCUS.*");
     
     /**
