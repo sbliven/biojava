@@ -411,13 +411,15 @@ public interface RichSequence extends BioEntry,Sequence {
         private Tools() {}
         
         /**
-         * Boldly attempts to convert a Sequence into a RichSequence. Sequences
+         * Boldly attempts to convert a <CODE>Sequence</CODE> into a <CODE>RichSequence</CODE>. <CODE>Sequence</CODE>s
          * will be assigned to the default namespace. The accession will be
          * assumed to be the name of the old sequence.
          * The version of the sequence will be set to 0 and the seqversion set
-         * to 0.0. Features are converted to RichFeatures.
-         * The old Annotation bundle is converted to a RichAnnotation
-         * @throws ChangeVetoException if s is locked or the conversion fails.
+         * to 0.0. <CODE>Feature</CODE>s are converted to <CODE>RichFeature</CODE>s.
+         * The old <CODE>Annotation</CODE> bundle is converted to a <CODE>RichAnnotation</CODE>
+         * @param s The <CODE>Sequence</CODE> to enrich
+         * @throws ChangeVetoException if <CODE>s</CODE> is locked or the conversion fails.
+         * @return a new <CODE>RichSequence</CODE>
          */
         public static RichSequence enrich(Sequence s) throws ChangeVetoException {
             if (s instanceof RichSequence) return (RichSequence)s;
@@ -447,14 +449,40 @@ public interface RichSequence extends BioEntry,Sequence {
             return rs;
         }
         
+        /**
+         * <p>Creates a new sequence from a subregion of another sequence. The sequence is not a view.
+         * The sequence can be given a new Namespace, Accession, Name, Identifier etc. or you can
+         * copy over the old values. For unique identification in databases we recommend you change
+         * at least the name and identifier.</p>
+         * <p>The new sequence will retain all features that are fully contained by the new
+         *  subsequence, the note set (annotation), Taxon, and
+         * description, modified to reflect the subsequence as follows:
+         * <pre>
+         *      seq.setDescription("subsequence ("+from+":"+to+") of "+s.getDescription());
+         * </pre>
+         * No other properties are copied.
+         * @param newVersion the new version number
+         * @param seqVersion the new sequence version
+         * @param s the original <code>RichSequence</code>.
+         * @param from the 1st subsequence coordinate (inclusive)
+         * @param to the last subsequence coordinate (inclusive)
+         * @param newNamespace the new <code>Namespace</code>
+         * @param newName the new name
+         * @param newAccession the new accession number
+         * @param newIdentifier the new identifier
+         * @throws java.lang.IndexOutOfBoundsException if <CODE>from</CODE> or <CODE>to</CODE> lie outside of the 
+         * bounds of <CODE>s</CODE>.
+         * @return A new <CODE>RichSequence</CODE>
+         */
         public static RichSequence subSequence(RichSequence s,
-                                              Namespace newNamespace,
-                                              int from, int to,
-                                              String newName,
-                                              String newAccession,
-                                              String newIdentifier,
-                                              int newVersion,
-                                              Double seqVersion)
+                                               int from, 
+                                               int to, 
+                                               Namespace newNamespace,
+                                               String newName,
+                                               String newAccession,
+                                               String newIdentifier,
+                                               int newVersion,
+                                               Double seqVersion)
         throws IndexOutOfBoundsException {
             SymbolList symList = s.subList(from, to);
             SimpleRichSequence seq = new SimpleRichSequence(
@@ -489,7 +517,7 @@ public interface RichSequence extends BioEntry,Sequence {
                     
                 }
                 
-                //other cruft
+                //copy other cruft
                 if(s.getNoteSet() != null) seq.setNoteSet(s.getNoteSet());
                 if(s.getTaxon() !=null) seq.setTaxon(s.getTaxon());
                 if(s.getDescription() != null){
@@ -573,14 +601,15 @@ public interface RichSequence extends BioEntry,Sequence {
         
         /**
          * Guess which format a file is then attempt to read it.
-         * @param file  the <code>File</code> to attempt to read.
-         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         * @return a <code>RichSequenceIterator</code>
+         *              over each sequence in the file
+         * @param file the <code>File</code> to attempt to read.
+         * @param ns a <code>Namespace</code> to load the sequences into. Null implies that it should
          *              use the namespace specified in the file. If no namespace is
          *              specified in the file, then
          *              <code>RichObjectFactory.getDefaultNamespace()</code>
          *              is used.
-         * @return      a <code>RichSequenceIterator</code>
-         *              over each sequence in the file
+         * @throws java.io.IOException If the file cannot be read.
          */
         public static RichSequenceIterator readFile(File file, Namespace ns) throws IOException {
             return readFile(file, factory, ns);
@@ -1097,14 +1126,14 @@ public interface RichSequence extends BioEntry,Sequence {
         
         
         /**
-         * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
+         * Writes <CODE>Sequence</CODE>s from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
          * Fasta Format.  This makes for a useful format filter where a
          * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
          * @param os The stream to write fasta formatted data to
-         * @param in The source of input Sequences
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
-         *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @param in The source of input <CODE>RichSequence</CODE>s
+         * @param ns a <code>Namespace</code> to write the <CODE>RichSequence</CODE>s to. <CODE>Null</CODE> implies that it should
+         * use the namespace specified in the individual sequence.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeFasta(OutputStream os, SequenceIterator in, Namespace ns)
         throws IOException {
@@ -1114,11 +1143,11 @@ public interface RichSequence extends BioEntry,Sequence {
         
         /**
          * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in Fasta format.
-         * @param os  the <code>OutputStream</code>.
-         * @param seq  the <code>Sequence</code>.
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param os the <code>OutputStream</code>.
+         * @param seq the <code>Sequence</code>.
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeFasta(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
@@ -1132,9 +1161,9 @@ public interface RichSequence extends BioEntry,Sequence {
          * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
          * @param os The stream to write fasta formatted data to
          * @param in The source of input Sequences
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeGenbank(OutputStream os, SequenceIterator in, Namespace ns)
         throws IOException {
@@ -1144,11 +1173,11 @@ public interface RichSequence extends BioEntry,Sequence {
         
         /**
          * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in GenBank format.
-         * @param os  the <code>OutputStream</code>.
-         * @param seq  the <code>Sequence</code>.
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param os the <code>OutputStream</code>.
+         * @param seq the <code>Sequence</code>.
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeGenbank(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
@@ -1162,9 +1191,9 @@ public interface RichSequence extends BioEntry,Sequence {
          * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
          * @param os The stream to write fasta formatted data to
          * @param in The source of input Sequences
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeINSDseq(OutputStream os, SequenceIterator in, Namespace ns)
         throws IOException {
@@ -1174,11 +1203,11 @@ public interface RichSequence extends BioEntry,Sequence {
         
         /**
          * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in INSDseq format.
-         * @param os  the <code>OutputStream</code>.
-         * @param seq  the <code>Sequence</code>.
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param os the <code>OutputStream</code>.
+         * @param seq the <code>Sequence</code>.
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeINSDseq(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
@@ -1192,9 +1221,9 @@ public interface RichSequence extends BioEntry,Sequence {
          * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
          * @param os The stream to write fasta formatted data to
          * @param in The source of input Sequences
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeEMBLxml(OutputStream os, SequenceIterator in, Namespace ns)
         throws IOException {
@@ -1204,11 +1233,11 @@ public interface RichSequence extends BioEntry,Sequence {
         
         /**
          * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in EMBLxml format.
-         * @param os  the <code>OutputStream</code>.
-         * @param seq  the <code>Sequence</code>.
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param os the <code>OutputStream</code>.
+         * @param seq the <code>Sequence</code>.
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeEMBLxml(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
@@ -1221,9 +1250,9 @@ public interface RichSequence extends BioEntry,Sequence {
          * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
          * @param os The stream to write fasta formatted data to
          * @param in The source of input Sequences
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeEMBL(OutputStream os, SequenceIterator in, Namespace ns)
         throws IOException {
@@ -1233,11 +1262,11 @@ public interface RichSequence extends BioEntry,Sequence {
         
         /**
          * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in EMBL format.
-         * @param os  the <code>OutputStream</code>.
-         * @param seq  the <code>Sequence</code>.
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param os the <code>OutputStream</code>.
+         * @param seq the <code>Sequence</code>.
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeEMBL(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
@@ -1251,9 +1280,9 @@ public interface RichSequence extends BioEntry,Sequence {
          * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
          * @param os The stream to write fasta formatted data to
          * @param in The source of input Sequences
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeUniProt(OutputStream os, SequenceIterator in, Namespace ns)
         throws IOException {
@@ -1263,11 +1292,11 @@ public interface RichSequence extends BioEntry,Sequence {
         
         /**
          * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in UniProt format.
-         * @param os  the <code>OutputStream</code>.
-         * @param seq  the <code>Sequence</code>.
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param os the <code>OutputStream</code>.
+         * @param seq the <code>Sequence</code>.
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeUniProt(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
@@ -1281,9 +1310,9 @@ public interface RichSequence extends BioEntry,Sequence {
          * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
          * @param os The stream to write fasta formatted data to
          * @param in The source of input Sequences
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeUniProtXML(OutputStream os, SequenceIterator in, Namespace ns)
         throws IOException {
@@ -1293,11 +1322,11 @@ public interface RichSequence extends BioEntry,Sequence {
         
         /**
          * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in UniProt XML format.
-         * @param os  the <code>OutputStream</code>.
-         * @param seq  the <code>Sequence</code>.
-         * @param ns    a <code>Namespace</code> to write the sequences to. Null implies that it should
+         * @param os the <code>OutputStream</code>.
+         * @param seq the <code>Sequence</code>.
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
          *              use the namespace specified in the individual sequence.
-         * @throws <code>IOException</code> if there was an error while writing.
+         * @throws java.io.IOException if there is an IO problem
          */
         public static void writeUniProtXML(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
@@ -1379,6 +1408,7 @@ public interface RichSequence extends BioEntry,Sequence {
             
             /**
              * {@inheritDoc}
+             * @return true if another <CODE>RichSequence</CODE> is available
              */
             public boolean hasNext() {
                 return seq != null;
@@ -1386,6 +1416,7 @@ public interface RichSequence extends BioEntry,Sequence {
             
             /**
              * {@inheritDoc}
+             * @return a <CODE>RichSequence</CODE>
              */
             public Sequence nextSequence() {
                 return this.nextRichSequence();
@@ -1393,6 +1424,7 @@ public interface RichSequence extends BioEntry,Sequence {
             
             /**
              * {@inheritDoc}
+             * @return a <CODE>RichSequence</CODE>
              */
             public BioEntry nextBioEntry() {
                 return this.nextRichSequence();
@@ -1400,6 +1432,7 @@ public interface RichSequence extends BioEntry,Sequence {
             
             /**
              * {@inheritDoc}
+             * @return a <CODE>RichSequence</CODE>
              */
             public RichSequence nextRichSequence() {
                 RichSequence seq = this.seq;
