@@ -128,7 +128,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     // date (Rel. N, Last annotation update)
     protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)]+)\\)$");
     // feature line
-    protected static final Pattern fp = Pattern.compile("^\\s*([\\d?<]+\\s+[\\d?>]+)(\\s+(\\S.*)\\.*)?$");
+    protected static final Pattern fp = Pattern.compile("^\\s*([\\d?<]+\\s+[\\d?>]+)(\\s+(\\S.*)\\.*(\\s+\\S*)?)?$");
     
     protected static final Pattern headerLine = Pattern.compile("^ID.*");
     
@@ -380,6 +380,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 for (int i = 1; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
+                    //System.err.println(key+": "+val);
                     if (key.equals(AUTHORS_TAG)) {
                         if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
                         authors = val;
@@ -463,8 +464,12 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 // create the docref object
                 try {
-                    List auths = DocRefAuthor.Tools.parseAuthorString(authors);
-                    if (consortium!=null) auths.add(new SimpleDocRefAuthor(consortium,true,false));
+                    List auths = null;
+                    if(authors != null) auths = DocRefAuthor.Tools.parseAuthorString(authors);
+                    if (consortium!=null){
+                        if(auths == null) auths = new ArrayList();
+                        auths.add(new SimpleDocRefAuthor(consortium,true,false));
+                    }
                     DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{auths,locator});
                     if (title!=null) dr.setTitle(title);
                     // assign either the pubmed or medline to the docref - medline gets priority, then pubmed, then doi
@@ -502,7 +507,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         else {
                             // should never happen - but here just in case
                             rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
-                        }
+                        }    
                     } else {
                         // new feature!
                         // end previous feature
@@ -519,7 +524,11 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         Matcher m = fp.matcher(val);
                         if (m.matches()) {
                             String loc = m.group(1);
-                            desc = m.group(3);
+                            if(m.group(4) != null){
+                                desc = m.group(3)+m.group(4);
+                            }else{
+                                desc = m.group(3);
+                            }
                             templ.location = UniProtLocationParser.parseLocation(loc);
                         } else {
                             throw new ParseException("Bad feature value: "+val);
