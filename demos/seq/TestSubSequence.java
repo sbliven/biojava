@@ -1,34 +1,69 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package seq;
 
 import java.io.*;
 import java.util.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojavax.RichObjectFactory;
+import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.RichSequenceIterator;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.SubSequence;
-import org.biojava.bio.seq.io.*;
 
+/**
+ * Demo the use of SubSequence
+ * @author Thomas Down
+ * @author Mark Schreiber
+ */
 public class TestSubSequence {
   public static void main(String [] args) {
     try {
-      if(args.length != 1) {
-        throw new Exception("Use: TestEmbl emblFile");
+      if(args.length != 3) {
+        throw new Exception("Use: seq.TestSubSequence seqFile from to");
       }
       
-      File emblFile = new File(args[0]);
-      SequenceFormat eFormat = new EmblLikeFormat();
-      BufferedReader eReader = new BufferedReader(
-        new InputStreamReader(new FileInputStream(emblFile)));
-      SequenceBuilderFactory sFact = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
-      Alphabet alpha = DNATools.getDNA();
-      SymbolTokenization rParser = alpha.getTokenization("token");
-      SequenceIterator seqI =
-        new StreamReader(eReader, eFormat, rParser, sFact);
+      File file = new File(args[0]);
+      
+      int from = Integer.parseInt(args[1]);
+      int to = Integer.parseInt(args[2]);
+      
+      //set up auto recognition, by loading the classes they can be used
+      // for auto recognition
+      Class.forName("org.biojavax.bio.seq.io.EMBLFormat");
+      Class.forName("org.biojavax.bio.seq.io.GenbankFormat");
+      Class.forName("org.biojavax.bio.seq.io.FastaFormat");
+      
+      RichSequenceIterator seqI =
+        RichSequence.IOTools.readFile(file, RichObjectFactory.getDefaultNamespace());
         
       while(seqI.hasNext()) {
-        Sequence seq = seqI.nextSequence();
-	Sequence subSeq = new SubSequence(seq, 1000, 3000);
+        RichSequence seq = seqI.nextRichSequence();
+        
+	RichSequence subSeq = RichSequence.Tools.subSequence(
+                seq, from, to, seq.getNamespace(), 
+                seq.getName()+" from: "+from+" to: "+to, 
+                "", "", 1, new Double(1.0));
+        
         System.out.println(subSeq.getName() + " has " + subSeq.countFeatures() + " features");
 	printFeatures(subSeq, System.out, "");
       }
