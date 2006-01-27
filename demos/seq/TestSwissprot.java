@@ -7,6 +7,11 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
+/**
+ * SwissProt format has been replaced by Uniprot format. You should refer to
+ * the UniProt demo
+ * @see UniProtDemo
+ */
 public class TestSwissprot
 {
 	public static void main(String [] args)
