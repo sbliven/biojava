@@ -56,7 +56,38 @@ public class SequencesAsGFF {
    */
   private boolean recurse = false;
   
+  /**
+   * Whether or not non-contiguous features should be broken into blocks
+   * 
+   * @since 1.4
+   */
+  
+  private boolean shatter = false;
+  
   private boolean generateSequenceHeader = true;
+  
+  /**
+   * Specify whether features with non-contiguous locations should be broken
+   * up such that a GFF feature line is emitted for each contiguous block.
+   * 
+   * @param b
+   * @since 1.4
+   */
+  
+  public void setShatter(boolean b) {
+      this.shatter = b;
+  }
+  
+  /**
+   * Determine if features with non-contiguous locations will be broken into
+   * multiple GFF records.
+   * 
+   * @since 1.4
+   */
+  
+  public boolean getShatter() {
+      return shatter;
+  }
   
   /**
    * Specify whether a per-sequence header line, giving the length of the
@@ -174,9 +205,19 @@ public class SequencesAsGFF {
   protected void doProcessFeature(Feature feature,
                                   GFFDocumentHandler handler,
                                   String id) 
-    throws BioException {
-    GFFRecord record = createGFFRecord(feature, id);
-    handler.recordLine(record);
+    throws BioException 
+  {
+    SimpleGFFRecord record = createGFFRecord(feature, id);
+    if (shatter && !feature.getLocation().isContiguous()) {
+        for (Iterator si = feature.getLocation().blockIterator(); si.hasNext(); ) {
+            Location shatterBloc = (Location) si.next();
+            record.setStart(shatterBloc.getMin());
+            record.setEnd(shatterBloc.getMax());
+            handler.recordLine(record);
+        }
+    } else {
+        handler.recordLine(record);
+    }
   }
 
 
