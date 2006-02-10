@@ -110,7 +110,7 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
         return this.session;
     }
     
-    public FeatureHolder preprocessFeatureFilter(FeatureFilter ff) {
+    public FeatureHolder processFeatureFilter(FeatureFilter ff) {
         BioSQLFeatureFilter bff = BioSQLFeatureFilter.Tools.convert(ff);
         SimpleFeatureHolder results = new SimpleFeatureHolder();
         // Apply the filter to the db.
@@ -136,10 +136,22 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
     }
     
     public FeatureHolder filter(FeatureFilter ff) {
-        // Skip the post-processing if it's a pure filter, as we don't need to do it.
-        if (ff instanceof BioSQLFeatureFilter) return this.preprocessFeatureFilter(ff);
-        // Else, just let the default behaviour take place.
-        else return super.filter(ff);
+        FeatureHolder fh = this.processFeatureFilter(ff);
+        // Post-process only if original filter was not a BioSQLFeatureFilter.
+        if (!(ff instanceof BioSQLFeatureFilter)) {
+            // Iterate through returned features and remove any that are not accepted.
+            SimpleFeatureHolder sfh = new SimpleFeatureHolder();
+            for (Iterator i = fh.features(); i.hasNext(); ) {
+                Feature f = (Feature)i.next();
+                try {
+                    if (ff.accept(f)) sfh.addFeature(f);
+                } catch (ChangeVetoException cve) {
+                    throw new BioError("Assertion failed: couldn't modify newly created SimpleFeatureHolder",cve);
+                }
+            }
+            fh = sfh;
+        }
+        return fh;
     }
     
     public Set ids() {

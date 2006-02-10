@@ -26,12 +26,11 @@ import java.util.Set;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
-import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.MergeFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
-import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.BioEntry;
@@ -128,38 +127,19 @@ public abstract class AbstractRichSequenceDB extends AbstractBioEntryDB implemen
         };
     }
     
-    public FeatureHolder preprocessFeatureFilter(FeatureFilter ff) {
+    public FeatureHolder filter(FeatureFilter ff) {
         // Default behaviour is accept-all.
-        SimpleFeatureHolder results = new SimpleFeatureHolder();
+        MergeFeatureHolder results = new MergeFeatureHolder();
         try {
             for (RichSequenceIterator si = getRichSequenceIterator(); si.hasNext(); ) {
                 RichSequence seq = si.nextRichSequence();
-                for (Iterator i = seq.features(); i.hasNext(); ) {
-                    Feature f = (Feature)i.next();
-                    results.addFeature(f);
-                }
+                results.addFeatureHolder(seq.filter(ff));
             }
         } catch (BioException ex) {
             throw new BioRuntimeException(ex);
         } catch (ChangeVetoException cve) {
-            throw new BioError("Assertion failed: couldn't modify newly created SimpleFeatureHolder",cve);
+            throw new BioError("Assertion failed: couldn't modify newly created MergeFeatureHolder",cve);
         }
         return results;
-    }
-    
-    public FeatureHolder filter(FeatureFilter ff) {
-        // pre-process any db-specific methods
-        FeatureHolder results = this.preprocessFeatureFilter(ff);
-        // post-process by testing accept() on every feature returned
-        SimpleFeatureHolder realResults = new SimpleFeatureHolder();
-        for (Iterator i = results.features(); i.hasNext(); ) {
-            Feature f = (Feature)i.next();
-            try {
-                if (ff.accept(f)) realResults.addFeature(f);
-            }catch (ChangeVetoException cve) {
-                throw new BioError("Assertion failed: couldn't modify newly created SimpleFeatureHolder",cve);
-            }
-        }
-        return realResults;
     }
 }
