@@ -135,6 +135,13 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
         return results;
     }
     
+    public FeatureHolder filter(FeatureFilter ff) {
+        // Skip the post-processing if it's a pure filter, as we don't need to do it.
+        if (ff instanceof BioSQLFeatureFilter) return this.preprocessFeatureFilter(ff);
+        // Else, just let the default behaviour take place.
+        else return super.filter(ff);
+    }
+    
     public Set ids() {
         try {
             // Build the query object

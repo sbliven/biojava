@@ -23,6 +23,8 @@ package org.biojavax.bio.db.biosql;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Map;
 import org.biojava.bio.seq.Feature;
 
 /**
@@ -62,11 +64,9 @@ public class BioSQLAcceptNoneFilter implements BioSQLFeatureFilter {
         }
     }
     
-    public boolean criterionRefersToParent() { return false; }
-    
-    public boolean criterionRefersToLocation() { return false; }
-    
-    public boolean criterionRefersToAnnotation() { return false; }
+    public Map criterionAliasMap() {
+        return Collections.EMPTY_MAP;
+    }
     
     public boolean equals(Object o) {
         return o instanceof BioSQLAcceptNoneFilter;
