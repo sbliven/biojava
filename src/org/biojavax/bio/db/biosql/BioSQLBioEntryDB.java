@@ -20,17 +20,12 @@
  */
 
 package org.biojavax.bio.db.biosql;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
@@ -40,7 +35,7 @@ import org.biojavax.bio.db.AbstractBioEntryDB;
 import org.biojavax.bio.db.BioEntryDB;
 import org.biojavax.bio.db.BioEntryDBLite;
 import org.biojavax.bio.db.HashBioEntryDB;
-import org.biojavax.bio.seq.RichFeature;
+
 
 /**
  *
@@ -51,10 +46,6 @@ public class BioSQLBioEntryDB extends AbstractBioEntryDB {
     private Object session;
     private String name;
     
-    private Method createCriteria;
-    private Method addCriteria;
-    private Method listCriteria;
-    private Method createAlias;
     private Method createQuery;
     private Method setParameter;
     private Method list;
@@ -86,13 +77,6 @@ public class BioSQLBioEntryDB extends AbstractBioEntryDB {
             // Lookup the setParameter and uniqueQuery methods
             this.setParameter = hibernateQuery.getMethod("setParameter", new Class[]{int.class,Object.class});
             this.list = hibernateQuery.getMethod("list", new Class[]{});
-            // Lazy load the Criteria class.
-            Class criteria = Class.forName("org.hibernate.Criteria");
-            // Lookup the critera methods
-            this.createCriteria = hibernateSession.getMethod("createCriteria", new Class[]{Class.class});
-            this.addCriteria = criteria.getMethod("add", new Class[]{Class.class});
-            this.listCriteria = criteria.getMethod("list", new Class[]{Class.class});
-            this.createAlias = criteria.getMethod("createAlias", new Class[]{String.class,String.class});
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {
@@ -106,31 +90,6 @@ public class BioSQLBioEntryDB extends AbstractBioEntryDB {
     
     public Object getHibernateSession() {
         return this.session;
-    }
-    
-    public FeatureHolder filter(BioSQLFeatureFilter ff) {
-        try {
-            // The new, cool way.
-            BioSQLFeatureFilter bff = (BioSQLFeatureFilter)ff;
-            SimpleFeatureHolder results = new SimpleFeatureHolder();
-            Object criteria = this.createCriteria.invoke(this.session, new Object[]{RichFeature.class});
-            this.addCriteria.invoke(criteria, new Object[]{bff.asCriterion()});
-            if (bff.criterionRefersToAnnotation()) this.createAlias.invoke(criteria,new Object[]{"noteSet","n"});
-            if (bff.criterionRefersToParent()) this.createAlias.invoke(criteria,new Object[]{"parent","p"});
-            if (bff.criterionRefersToLocation()) this.createAlias.invoke(criteria,new Object[]{"locationSet","l"});
-            List cats = (List)this.listCriteria.invoke(criteria, null);
-            try {
-                for (Iterator i = cats.iterator(); i.hasNext(); ) results.addFeature((Feature)i.next());
-            } catch (ChangeVetoException cve) {
-                throw new BioError("Assertion failed: couldn't modify newly created SimpleFeatureHolder",cve);
-            }
-            return results;
-            
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
     
     public Set ids() {

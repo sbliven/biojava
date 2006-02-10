@@ -26,11 +26,12 @@ import java.util.Set;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.MergeFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.BioEntry;
@@ -79,7 +80,7 @@ public abstract class AbstractRichSequenceDB extends AbstractBioEntryDB implemen
     
     public void removeSequence(String id) throws IllegalIDException, BioException, ChangeVetoException {
         this.removeRichSequence(id);
-    }    
+    }
     
     public void addBioEntry(BioEntry seq) throws IllegalIDException, BioException, ChangeVetoException {
         throw new ChangeVetoException("Cannot add BioEntrys to a RichSequence database - use addRichSequence");
@@ -95,7 +96,7 @@ public abstract class AbstractRichSequenceDB extends AbstractBioEntryDB implemen
     
     public void removeRichSequence(String id) throws IllegalIDException, BioException, ChangeVetoException {
         throw new ChangeVetoException("Cannot remove RichSequences from a read-only database");
-    }  
+    }
     
     public SequenceIterator sequenceIterator() {
         return this.getRichSequenceIterator();
@@ -127,21 +128,38 @@ public abstract class AbstractRichSequenceDB extends AbstractBioEntryDB implemen
         };
     }
     
-    public FeatureHolder filter(FeatureFilter ff) {
-        MergeFeatureHolder results = new MergeFeatureHolder();
+    public FeatureHolder preprocessFeatureFilter(FeatureFilter ff) {
+        // Default behaviour is accept-all.
+        SimpleFeatureHolder results = new SimpleFeatureHolder();
         try {
             for (RichSequenceIterator si = getRichSequenceIterator(); si.hasNext(); ) {
                 RichSequence seq = si.nextRichSequence();
-                FeatureHolder fh = seq.filter(ff);
-                if (fh != FeatureHolder.EMPTY_FEATURE_HOLDER) {
-                    results.addFeatureHolder(fh);
+                for (Iterator i = seq.features(); i.hasNext(); ) {
+                    Feature f = (Feature)i.next();
+                    results.addFeature(f);
                 }
             }
         } catch (BioException ex) {
             throw new BioRuntimeException(ex);
         } catch (ChangeVetoException cve) {
-            throw new BioError("Assertion failed: couldn't modify newly created MergeFeatureHolder",cve);
+            throw new BioError("Assertion failed: couldn't modify newly created SimpleFeatureHolder",cve);
         }
         return results;
+    }
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+        // pre-process any db-specific methods
+        FeatureHolder results = this.preprocessFeatureFilter(ff);
+        // post-process by testing accept() on every feature returned
+        SimpleFeatureHolder realResults = new SimpleFeatureHolder();
+        for (Iterator i = results.features(); i.hasNext(); ) {
+            Feature f = (Feature)i.next();
+            try {
+                if (ff.accept(f)) realResults.addFeature(f);
+            }catch (ChangeVetoException cve) {
+                throw new BioError("Assertion failed: couldn't modify newly created SimpleFeatureHolder",cve);
+            }
+        }
+        return realResults;
     }
 }

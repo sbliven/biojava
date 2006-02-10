@@ -20,6 +20,8 @@
  */
 
 package org.biojavax.bio.db;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojavax.bio.seq.RichSequenceIterator;
@@ -50,4 +52,18 @@ public interface RichSequenceDB extends SequenceDB,BioEntryDB,RichSequenceDBLite
      * @return a RichSequenceIterator over all sequences
      */
     public RichSequenceIterator getRichSequenceIterator();
+    
+    /**
+     * <p>Attempt to pre-process a FeatureFilter using database-specific methods, 
+     * returning a FeatureHolder containing the results. Any FeatureFilter passed
+     * which this method cannot pre-process should be treated as FeatureFilter.all.</p>
+     * <p>The filter() method will post-process results returned by this method</p>
+     * using the standard accept() technique. This two-pass approach guarantees that
+     * all FeatureFilters will work correctly regardless of underlying database type,
+     * and any optimisations that can take place at the database level will be done.</p>
+     *
+     * @param ff the FeatureFilter to attempt to pre-process
+     * @return a FeatureHolder containing the pre-processed matching features.
+     */
+    public FeatureHolder preprocessFeatureFilter(FeatureFilter ff);
 }

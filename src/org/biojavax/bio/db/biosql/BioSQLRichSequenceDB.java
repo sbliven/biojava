@@ -20,12 +20,12 @@
  */
 
 package org.biojavax.bio.db.biosql;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
@@ -110,33 +110,29 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
         return this.session;
     }
     
-    public FeatureHolder filter(FeatureFilter ff) {
+    public FeatureHolder preprocessFeatureFilter(FeatureFilter ff) {
+        BioSQLFeatureFilter bff = BioSQLFeatureFilter.Tools.convert(ff);
+        SimpleFeatureHolder results = new SimpleFeatureHolder();
+        // Apply the filter to the db.
         try {
-            if (ff instanceof BioSQLFeatureFilter) {
-                // The new, cool way.
-                BioSQLFeatureFilter bff = (BioSQLFeatureFilter)ff;
-                SimpleFeatureHolder results = new SimpleFeatureHolder();
-                Object criteria = this.createCriteria.invoke(this.session, new Object[]{RichFeature.class});
-                this.addCriteria.invoke(criteria, new Object[]{bff.asCriterion()});
-                if (bff.criterionRefersToAnnotation()) this.createAlias.invoke(criteria,new Object[]{"noteSet","n"});
-                if (bff.criterionRefersToParent()) this.createAlias.invoke(criteria,new Object[]{"parent","p"});
-                if (bff.criterionRefersToLocation()) this.createAlias.invoke(criteria,new Object[]{"locationSet","l"});
-                List cats = (List)this.listCriteria.invoke(criteria, null);
-                try {
-                    for (Iterator i = cats.iterator(); i.hasNext(); ) results.addFeature((Feature)i.next());
-                } catch (ChangeVetoException cve) {
-                    throw new BioError("Assertion failed: couldn't modify newly created SimpleFeatureHolder",cve);
-                }
-                return results;
-            } else {
-                // The old, slow way.
-                return super.filter(ff);
+            Object criteria = this.createCriteria.invoke(this.session, new Object[]{RichFeature.class});
+            this.addCriteria.invoke(criteria, new Object[]{bff.asCriterion()});
+            Map aliases = bff.criterionAliasMap();
+            for (Iterator i = aliases.keySet().iterator(); i.hasNext(); ) {
+                String property = (String)i.next();
+                String alias = (String)aliases.get(property);
+                this.createAlias.invoke(criteria,new Object[]{property,alias});
             }
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
+            List cats = (List)this.listCriteria.invoke(criteria, null);
+            for (Iterator i = cats.iterator(); i.hasNext(); ) results.addFeature((Feature)i.next());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (ChangeVetoException cve) {
+            throw new BioError("Assertion failed: couldn't modify newly created SimpleFeatureHolder",cve);
         }
+        return results;
     }
     
     public Set ids() {

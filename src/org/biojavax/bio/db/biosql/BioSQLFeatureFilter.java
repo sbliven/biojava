@@ -23,7 +23,10 @@ package org.biojavax.bio.db.biosql;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.seq.Feature;
@@ -32,9 +35,13 @@ import org.biojava.bio.seq.FilterUtils;
 import org.biojava.utils.walker.WalkerFactory;
 import org.biojavax.Note;
 import org.biojavax.RichAnnotation;
+import org.biojavax.RichObjectFactory;
+import org.biojavax.SimpleNote;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
-import org.biojavax.bio.seq.RichLocation.Tools;
+import org.biojavax.bio.seq.RichLocation.Strand;
+import org.biojavax.ontology.ComparableTerm;
+
 
 
 /**
@@ -72,26 +79,177 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
     /**
      * This method returns a Hibernate Criterion object that can be used to
      * query the database.
+     * @return a Hibernate Criterion object representing this filter.
      */
     public Object asCriterion();
     
     /**
-     * Returns true if the criterion returned by asCriterion refers to the parent
-     * sequence of this feature.
+     * Returns a map of property names (keys) to aliases (values), if the criterion
+     * returned by asCriterion() uses aliases at all. If not, then it must at least
+     * return the empty map else you'll get NullPointerExceptions thrown elsewhere.
+     * @return Map a map of property names to aliases used in the criterion.
      */
-    public boolean criterionRefersToParent();
+    public Map criterionAliasMap();
     
     /**
-     * Returns true if the criterion returned by asCriterion refers to the
-     * location of this feature.
+     * A class representing some useful stuff you can do with BioSQLFeatureFilters,
+     * for instance converting plain FeatureFilters into a their BioSQLFeatureFilter
+     * equivalents (where possible).
      */
-    public boolean criterionRefersToLocation();
+    public static class Tools {
+        /**
+         * Convert a non-BioSQL FeatureFilter into a BioSQL one. We do this
+         * by walking through it, converting any ones we recognise into their
+         * BioSQLFeatureFilter equivalents. If we don't recognise them, we take
+         * special action. For the child of an And, we can just ignore the missing
+         * side and replace the And itself with the remaining side. For everything else,
+         * the entire FeatureFilter is replaced by BioSQLFeatureFilter.all else we
+         * run the risk of missing out potential candidates.
+         * The end result is a filter that can be applied to the
+         * database to filter out potential candidates for more rigorous selection
+         * in-memory by the default filter() method in AbstractRichSequenceDB. Whether or
+         * not the filter picks out everything correctly depends entirely on whether it
+         * is made up of BioSQLFeatureFilter elements, or can be converted into them.
+         */
+        public static BioSQLFeatureFilter convert(FeatureFilter ff) {
+            // The easy case first.
+            if (ff instanceof BioSQLFeatureFilter) return (BioSQLFeatureFilter)ff;
+            else {
+                BioSQLFeatureFilter bff = attemptConversion(ff);
+                if (bff!=null) return bff;
+                else return BioSQLFeatureFilter.all; // catch-all case.
+            }
+        }
+        
+        private static BioSQLFeatureFilter attemptConversion(FeatureFilter ff) {
+            // AND - convert both children. If both are convertible, return the And
+            // of them. If only one is, return just that child. If neither are,
+            // return null.
+            if (ff instanceof FeatureFilter.And) {
+                FeatureFilter.And ffand = (FeatureFilter.And)ff;
+                BioSQLFeatureFilter child1 = attemptConversion(ffand.getChild1());
+                BioSQLFeatureFilter child2 = attemptConversion(ffand.getChild2());
+                if (child1==null && child2==null) return null;
+                else if (child1==null && child2!=null) return child2;
+                else if (child1!=null && child2==null) return child1;
+                else return new BioSQLFeatureFilter.And(child1,child2);
+            }
+            // OR - convert both children. If both are convertible, return the Or
+            // of them. Otherwise, return null.
+            else if (ff instanceof FeatureFilter.Or) {
+                FeatureFilter.Or ffor = (FeatureFilter.Or)ff;
+                BioSQLFeatureFilter child1 = attemptConversion(ffor.getChild1());
+                BioSQLFeatureFilter child2 = attemptConversion(ffor.getChild2());
+                if (child1==null || child2==null) return null;
+                else return new BioSQLFeatureFilter.Or(child1,child2);
+            }
+            // NOT - convert the child. If convertible, return the Not of it. Else,
+            // return null.
+            else if (ff instanceof FeatureFilter.Not) {
+                FeatureFilter.Not ffnot = (FeatureFilter.Not)ff;
+                BioSQLFeatureFilter child = attemptConversion(ffnot.getChild());
+                if (child==null) return null;
+                else return new BioSQLFeatureFilter.Not(child);
+            }
+            // BySource - convert the term to a Term from the default ontology then
+            // try BySourceTerm.
+            else if (ff instanceof FeatureFilter.BySource) {
+                FeatureFilter.BySource ffsrc = (FeatureFilter.BySource)ff;
+                String name = ffsrc.getSource();
+                ComparableTerm t = RichObjectFactory.getDefaultOntology().getOrCreateTerm(name);
+                return new BioSQLFeatureFilter.BySourceTerm(t);
+            }
+            // ByType - convert the term to a Term from the default ontology then
+            // try ByTypeTerm.
+            else if (ff instanceof FeatureFilter.ByType) {
+                FeatureFilter.ByType ffsrc = (FeatureFilter.ByType)ff;
+                String name = ffsrc.getType();
+                ComparableTerm t = RichObjectFactory.getDefaultOntology().getOrCreateTerm(name);
+                return new BioSQLFeatureFilter.ByTypeTerm(t);
+            }
+            // ContainedByLocation - simple pass-through
+            else if (ff instanceof FeatureFilter.ContainedByLocation) {
+                FeatureFilter.ContainedByLocation ffloc = (FeatureFilter.ContainedByLocation)ff;
+                return new BioSQLFeatureFilter.ContainedByRichLocation(RichLocation.Tools.enrich(ffloc.getLocation()));
+            }
+            // BySequenceName - simple pass-through
+            else if (ff instanceof FeatureFilter.BySequenceName) {
+                FeatureFilter.BySequenceName ffsn = (FeatureFilter.BySequenceName)ff;
+                return new BioSQLFeatureFilter.BySequenceName(ffsn.getSequenceName());
+            }
+            // ShadowOverlapsLocation - simple pass-through to OverlapsRichLocation, as we have no concept
+            // of shadows within BioSQL so they are effectively the same thing.
+            else if (ff instanceof FeatureFilter.ShadowOverlapsLocation) {
+                FeatureFilter.ShadowOverlapsLocation ffloc = (FeatureFilter.ShadowOverlapsLocation)ff;
+                return new BioSQLFeatureFilter.OverlapsRichLocation(RichLocation.Tools.enrich(ffloc.getLocation()));
+            }
+            // AnnotationContains - attempt to convert the key to a ComparableTerm, and the value to a string (retrieve the
+            // sole member if it is a collection), then wrap the whole thing in a Note with rank 0 and try using
+            // ByNoteWithValue to retrieve.
+            else if (ff instanceof FeatureFilter.AnnotationContains) {
+                FeatureFilter.AnnotationContains ffann = (FeatureFilter.AnnotationContains)ff;
+                if (!(ffann.getValue() instanceof String)) return null;
+                String noteValue = (String)ffann.getValue();
+                ComparableTerm noteTerm;
+                Object key = ffann.getKey();
+                if (key instanceof Collection) {
+                    Collection coll = (Collection)key;
+                    if (coll.size()<1) return null;
+                    else key = coll.toArray()[0];
+                }
+                if (key instanceof ComparableTerm) noteTerm = (ComparableTerm)key;
+                else if (key instanceof String) noteTerm =  RichObjectFactory.getDefaultOntology().getOrCreateTerm((String)key);
+                else return null;
+                return new BioSQLFeatureFilter.ByNote(new SimpleNote(noteTerm,noteValue,0));
+            }
+            // StrandFilter - attempt to convert the StrandedFeature.Strand to a RichLocation.Strand then pass through
+            // to ByStrand.
+            else if (ff instanceof FeatureFilter.StrandFilter) {
+                FeatureFilter.StrandFilter ffstr = (FeatureFilter.StrandFilter)ff;
+                Strand strand = RichLocation.Strand.forName(""+ffstr.getStrand().getToken());
+                return new BioSQLFeatureFilter.ByStrand(strand);
+            }
+            // HasAnnotation - attempt to convert the term into a ComparableTerm, then use ByNoteTermOnly.
+            else if (ff instanceof FeatureFilter.HasAnnotation) {
+                FeatureFilter.HasAnnotation ffann = (FeatureFilter.HasAnnotation)ff;
+                ComparableTerm noteTerm;
+                if (ffann.getKey() instanceof ComparableTerm) noteTerm = (ComparableTerm)ffann.getKey();
+                else if (ffann.getKey() instanceof String) noteTerm =  RichObjectFactory.getDefaultOntology().getOrCreateTerm((String)ffann.getKey());
+                else return null;
+                return new BioSQLFeatureFilter.ByNoteTermOnly(noteTerm);
+            }
+            // ByAnnotation - attempt to convert the key to a ComparableTerm, and the value to a string, then wrap the
+            // whole thing in a Note with rank 0 and try using ByNoteWithValue to retrieve.
+            else if (ff instanceof FeatureFilter.ByAnnotation) {
+                FeatureFilter.ByAnnotation ffann = (FeatureFilter.ByAnnotation)ff;
+                if (!(ffann.getValue() instanceof String)) return null;
+                String noteValue = (String)ffann.getValue();
+                ComparableTerm noteTerm;
+                Object key = ffann.getKey();
+                if (key instanceof ComparableTerm) noteTerm = (ComparableTerm)key;
+                else if (key instanceof String) noteTerm =  RichObjectFactory.getDefaultOntology().getOrCreateTerm((String)key);
+                else return null;
+                return new BioSQLFeatureFilter.ByNote(new SimpleNote(noteTerm,noteValue,0));
+            }
+            // OverlapsLocation - simple pass-through to OverlapsRichLocation.
+            else if (ff instanceof FeatureFilter.OverlapsLocation) {
+                FeatureFilter.OverlapsLocation ffloc = (FeatureFilter.OverlapsLocation)ff;
+                return new BioSQLFeatureFilter.OverlapsRichLocation(RichLocation.Tools.enrich(ffloc.getLocation()));
+            }
+            // ShadowContainedByLocation - simple pass-through to ContainedByRichLocation, as we have no concept
+            // of shadows within BioSQL so they are effectively the same thing.
+            else if (ff instanceof FeatureFilter.ShadowContainedByLocation) {
+                FeatureFilter.ShadowContainedByLocation ffloc = (FeatureFilter.ShadowContainedByLocation)ff;
+                return new BioSQLFeatureFilter.ContainedByRichLocation(RichLocation.Tools.enrich(ffloc.getLocation()));
+            }
+            // Anything else we don't recognise? Return null!
+            else {
+                return null;
+            }
+        }
+    }
     
-    /**
-     * Returns true if the criterion returned by asCriterion refers to the
-     * annotations of this feature.
-     */
-    public boolean criterionRefersToAnnotation();
+    // Now for some useful filters.
     
     /**
      * All features are selected by this filter.
@@ -104,6 +262,54 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
     static final public BioSQLFeatureFilter none = new BioSQLAcceptNoneFilter();
     
     /**
+     * A filter for Hibernate-BioSQL filters to extend.
+     */
+    public abstract static class HibernateFeatureFilter implements BioSQLFeatureFilter {
+        protected Method not;
+        protected Method and;
+        protected Method or;
+        protected Method eq;
+        protected Method le;
+        protected Method ge;
+        protected Method conjunction;
+        protected Method disjunction;
+        protected Method conjunctAdd;
+        protected Method disjunctAdd;
+        
+        public HibernateFeatureFilter() {
+            try {
+                // Lazy load the Restrictions class from Hibernate.
+                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
+                // Lazy load the Criterion class from Hibernate.
+                Class criterion = Class.forName("org.hibernate.criterion.Criterion");
+                // Lookup the methods
+                this.not = restrictions.getMethod("not", new Class[]{criterion});
+                this.and = restrictions.getMethod("and", new Class[]{criterion,criterion});
+                this.or = restrictions.getMethod("or", new Class[]{criterion,criterion});
+                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
+                this.le = restrictions.getMethod("le", new Class[]{String.class,Object.class});
+                this.ge = restrictions.getMethod("ge", new Class[]{String.class,Object.class});
+                this.conjunction = restrictions.getMethod("conjunction", new Class[]{});
+                this.disjunction = restrictions.getMethod("disjunction", new Class[]{});
+                // Lazy load the Conjunction(Or)+Disjunction(And) class from Hibernate.
+                Class conjunctClass = Class.forName("org.hibernate.criterion.Conjunction");
+                Class disjunctClass = Class.forName("org.hibernate.criterion.Disjunction");
+                // Lookup the methods
+                this.conjunctAdd = conjunctClass.getMethod("add", new Class[]{criterion});
+                this.disjunctAdd = disjunctClass.getMethod("add", new Class[]{criterion});
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        public Map criterionAliasMap() {
+            return Collections.EMPTY_MAP;
+        }
+    }
+    
+    /**
      *  A filter that returns all features not accepted by a child filter.
      *
      * @author Thomas Down
@@ -111,32 +317,20 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    public final static class Not implements BioSQLFeatureFilter {
+    public final static class Not extends HibernateFeatureFilter {
         static { WalkerFactory.getInstance().addTypeWithParent(Not.class); }
         
         BioSQLFeatureFilter child;
-        private Method not;
         
         public BioSQLFeatureFilter getChild() {
             return child;
         }
         
         public Not(BioSQLFeatureFilter child) {
+            super();
             if (!(child instanceof BioSQLFeatureFilter))
                 throw new BioRuntimeException("Cannot use non-BioSQLFeatureFilter instances with this class");
             this.child = child;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lazy load the Criterion class from Hibernate.
-                Class criterion = Class.forName("org.hibernate.Criterion");
-                // Lookup the methods
-                this.not = restrictions.getMethod("not", new Class[]{criterion});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         public boolean accept(Feature f) {
@@ -153,11 +347,9 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
             }
         }
         
-        public boolean criterionRefersToParent() { return child.criterionRefersToParent(); }
-        
-        public boolean criterionRefersToLocation() { return child.criterionRefersToLocation(); }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
+        public Map criterionAliasMap() {
+            return child.criterionAliasMap();
+        }
         
         public boolean equals(Object o) {
             return
@@ -183,11 +375,10 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    public final static class And implements BioSQLFeatureFilter {
+    public final static class And extends HibernateFeatureFilter {
         static { WalkerFactory.getInstance().addTypeWithParent(And.class); }
         
         BioSQLFeatureFilter c1, c2;
-        private Method and;
         
         public BioSQLFeatureFilter getChild1() {
             return c1;
@@ -198,22 +389,11 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         }
         
         public And(BioSQLFeatureFilter c1, BioSQLFeatureFilter c2) {
+            super();
             if (!(c1 instanceof BioSQLFeatureFilter) || !(c2 instanceof BioSQLFeatureFilter))
                 throw new BioRuntimeException("Cannot use non-BioSQLFeatureFilter instances with this class");
             this.c1 = c1;
             this.c2 = c2;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lazy load the Criterion class from Hibernate.
-                Class criterion = Class.forName("org.hibernate.Criterion");
-                // Lookup the methods
-                this.and = restrictions.getMethod("and", new Class[]{criterion,criterion});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         public boolean accept(Feature f) {
@@ -230,11 +410,12 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
             }
         }
         
-        public boolean criterionRefersToParent() { return c1.criterionRefersToParent() || c2.criterionRefersToParent(); }
-        
-        public boolean criterionRefersToLocation() { return c1.criterionRefersToLocation() || c2.criterionRefersToLocation(); }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.putAll(c1.criterionAliasMap());
+            results.putAll(c2.criterionAliasMap());
+            return results;
+        }
         
         public boolean equals(Object o) {
             if(o instanceof BioSQLFeatureFilter) {
@@ -261,11 +442,10 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    public final static class Or implements BioSQLFeatureFilter {
+    public final static class Or extends HibernateFeatureFilter {
         static { WalkerFactory.getInstance().addTypeWithParent(Or.class); }
         
         BioSQLFeatureFilter c1, c2;
-        private Method or;
         
         public BioSQLFeatureFilter getChild1() {
             return c1;
@@ -276,22 +456,11 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         }
         
         public Or(BioSQLFeatureFilter c1, BioSQLFeatureFilter c2) {
+            super();
             if (!(c1 instanceof BioSQLFeatureFilter) || !(c2 instanceof BioSQLFeatureFilter))
                 throw new BioRuntimeException("Cannot use non-BioSQLFeatureFilter instances with this class");
             this.c1 = c1;
             this.c2 = c2;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lazy load the Criterion class from Hibernate.
-                Class criterion = Class.forName("org.hibernate.Criterion");
-                // Lookup the methods
-                this.or = restrictions.getMethod("or", new Class[]{criterion,criterion});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         public boolean accept(Feature f) {
@@ -308,11 +477,12 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
             }
         }
         
-        public boolean criterionRefersToParent() { return c1.criterionRefersToParent() || c2.criterionRefersToParent(); }
-        
-        public boolean criterionRefersToLocation() { return c1.criterionRefersToLocation() || c2.criterionRefersToLocation(); }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.putAll(c1.criterionAliasMap());
+            results.putAll(c2.criterionAliasMap());
+            return results;
+        }
         
         public boolean equals(Object o) {
             if(o instanceof BioSQLFeatureFilter) {
@@ -337,9 +507,8 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    final public static class ByName implements BioSQLFeatureFilter {
+    final public static class ByName extends HibernateFeatureFilter {
         private String name;
-        private Method eq;
         
         public String getName() {
             return name;
@@ -352,28 +521,21 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
          * @param type  the String to match type fields against
          */
         public ByName(String name) {
+            super();
             if (name == null) {
                 throw new NullPointerException("Name may not be null");
             }
             this.name = name;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lookup the methods
-                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         /**
          * Returns true if the feature has a matching type property.
          */
         public boolean accept(Feature f) {
-            if (!(f instanceof RichFeature)) throw new BioRuntimeException("Cannot use ByName on non-RichFeature instances");
-            return name.equals(((RichFeature)f).getName());
+            if (f instanceof RichFeature) {
+                return name.equals(((RichFeature)f).getName());
+            }
+            return false;
         }
         
         public Object asCriterion() {
@@ -385,12 +547,6 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
                 throw new RuntimeException(e);
             }
         }
-        
-        public boolean criterionRefersToParent() { return false; }
-        
-        public boolean criterionRefersToLocation() { return false; }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
         
         public boolean equals(Object o) {
             return
@@ -413,9 +569,8 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    final public static class ByRank implements BioSQLFeatureFilter {
+    final public static class ByRank extends HibernateFeatureFilter {
         private int rank;
-        private Method eq;
         
         public int getRank() {
             return rank;
@@ -428,25 +583,18 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
          * @param type  the String to match type fields against
          */
         public ByRank(int rank) {
+            super();
             this.rank = rank;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lookup the methods
-                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         /**
          * Returns true if the feature has a matching type property.
          */
         public boolean accept(Feature f) {
-            if (!(f instanceof RichFeature)) throw new BioRuntimeException("Cannot use ByName on non-RichFeature instances");
-            return rank==((RichFeature)f).getRank();
+            if (f instanceof RichFeature) {
+                return rank==((RichFeature)f).getRank();
+            }
+            return false;
         }
         
         public Object asCriterion() {
@@ -458,12 +606,6 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
                 throw new RuntimeException(e);
             }
         }
-        
-        public boolean criterionRefersToParent() { return false; }
-        
-        public boolean criterionRefersToLocation() { return false; }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
         
         public boolean equals(Object o) {
             return
@@ -487,11 +629,10 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    final public static class ByTypeTerm implements BioSQLFeatureFilter {
-        private String typeTerm;
-        private Method eq;
+    final public static class ByTypeTerm extends HibernateFeatureFilter {
+        private ComparableTerm typeTerm;
         
-        public String getTypeTerm() {
+        public ComparableTerm getTypeTerm() {
             return typeTerm;
         }
         
@@ -501,21 +642,12 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
          *
          * @param type  the String to match type fields against
          */
-        public ByTypeTerm(String typeTerm) {
+        public ByTypeTerm(ComparableTerm typeTerm) {
+            super();
             if (typeTerm == null) {
                 throw new NullPointerException("Type may not be null");
             }
             this.typeTerm = typeTerm;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lookup the methods
-                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         /**
@@ -534,12 +666,6 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
                 throw new RuntimeException(e);
             }
         }
-        
-        public boolean criterionRefersToParent() { return false; }
-        
-        public boolean criterionRefersToLocation() { return false; }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
         
         public boolean equals(Object o) {
             return
@@ -564,11 +690,10 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    final public static class BySourceTerm implements BioSQLFeatureFilter {
-        private String sourceTerm;
-        private Method eq;
+    final public static class BySourceTerm extends HibernateFeatureFilter {
+        private ComparableTerm sourceTerm;
         
-        public String getSourceTerm() {
+        public ComparableTerm getSourceTerm() {
             return sourceTerm;
         }
         
@@ -578,21 +703,12 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
          *
          * @param type  the String to match type fields against
          */
-        public BySourceTerm(String typeTerm) {
+        public BySourceTerm(ComparableTerm typeTerm) {
+            super();
             if (sourceTerm == null) {
                 throw new NullPointerException("Source may not be null");
             }
             this.sourceTerm = sourceTerm;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lookup the methods
-                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         /**
@@ -611,12 +727,6 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
                 throw new RuntimeException(e);
             }
         }
-        
-        public boolean criterionRefersToParent() { return false; }
-        
-        public boolean criterionRefersToLocation() { return false; }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
         
         public boolean equals(Object o) {
             return
@@ -640,23 +750,12 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    public final static class BySequenceName
-            implements BioSQLFeatureFilter {
+    public final static class BySequenceName extends HibernateFeatureFilter {
         private String seqName;
-        private Method eq;
         
         public BySequenceName(String seqName) {
+            super();
             this.seqName = seqName;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lookup the methods
-                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         public String getSequenceName() {
@@ -677,11 +776,11 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
             }
         }
         
-        public boolean criterionRefersToParent() { return true; }
-        
-        public boolean criterionRefersToLocation() { return false; }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.put("parent","p");
+            return results;
+        }
         
         public boolean equals(Object o) {
             return
@@ -703,15 +802,8 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    public final static class ContainedByRichLocation implements BioSQLFeatureFilter {
+    public final static class ContainedByRichLocation extends HibernateFeatureFilter {
         private RichLocation loc;
-        private Method eq;
-        private Method le;
-        private Method ge;
-        private Method conjunction;
-        private Method disjunction;
-        private Method conjunctAdd;
-        private Method disjunctAdd;
         
         public RichLocation getRichLocation() {
             return loc;
@@ -723,32 +815,11 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
          * @param loc  the location that will contain the accepted features
          */
         public ContainedByRichLocation(RichLocation loc) {
+            super();
             if (loc == null) {
                 throw new NullPointerException("Loc may not be null");
             }
             this.loc = loc;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lookup the methods
-                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
-                this.le = restrictions.getMethod("le", new Class[]{String.class,Object.class});
-                this.ge = restrictions.getMethod("ge", new Class[]{String.class,Object.class});
-                this.conjunction = restrictions.getMethod("conjunction", new Class[]{});
-                this.disjunction = restrictions.getMethod("disjunction", new Class[]{});
-                // Lazy load the Restrictions class from Hibernate.
-                Class criterion = Class.forName("org.hibernate.criterion.Criterion");
-                // Lazy load the Restrictions class from Hibernate.
-                Class conjunctClass = Class.forName("org.hibernate.criterion.Conjunction");
-                Class disjunctClass = Class.forName("org.hibernate.criterion.Disjunction");
-                // Lookup the methods
-                this.conjunctAdd = conjunctClass.getMethod("add", new Class[]{criterion});
-                this.disjunctAdd = disjunctClass.getMethod("add", new Class[]{criterion});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         /**
@@ -761,7 +832,7 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         public Object asCriterion() {
             try {
                 // Conjunction of criteria for each member of the query location.
-                Collection members = Tools.flatten(loc);
+                Collection members = RichLocation.Tools.flatten(loc);
                 // some combo of Tools.flatten(loc), min(loc.start,feat.start) and min(loc.end,feat.end)
                 Object parentConjunct = this.conjunction.invoke(null,null);
                 for (Iterator i = members.iterator(); i.hasNext(); ) {
@@ -784,11 +855,11 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
             }
         }
         
-        public boolean criterionRefersToParent() { return false; }
-        
-        public boolean criterionRefersToLocation() { return true; }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.put("locationSet","l");
+            return results;
+        }
         
         public boolean equals(Object o) {
             return
@@ -806,6 +877,79 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
     }
     
     /**
+     * A filter that returns all features having locations on a given strand. They
+     * may actually have features on other strands too, of course.
+     *
+     * @author Richard Holland
+     * @since 1.5
+     */
+    public final static class ByStrand extends HibernateFeatureFilter {
+        private Strand str;
+        
+        public Strand getStrand() {
+            return str;
+        }
+        
+        /**
+         * Creates a filter that returns everything on strand str.
+         *
+         * @param str  the strand that will contain the accepted features
+         */
+        public ByStrand(Strand str) {
+            super();
+            if (str == null) {
+                throw new NullPointerException("Strand may not be null");
+            }
+            this.str = str;
+        }
+        
+        /**
+         * Returns true if the feature overlaps this filter's location.
+         */
+        public boolean accept(Feature f) {
+            if (f instanceof RichFeature) {
+                RichFeature rf = (RichFeature)f;
+                for (Iterator i = rf.getLocation().blockIterator(); i.hasNext(); ) {
+                    RichLocation l = (RichLocation)i.next();
+                    if (l.getStrand().equals(str)) return true;
+                }
+            }
+            return false;
+        }
+        
+        public Object asCriterion() {
+            try {
+                // any location on the feature with a matching strand?
+                return this.eq.invoke(null,new Object[]{"l.strandNum",new Integer(str.intValue())});
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.put("locationSet","l");
+            return results;
+        }
+        
+        public boolean equals(Object o) {
+            return
+                    (o instanceof ByStrand) &&
+                    (((ByStrand) o).getStrand().equals(this.getStrand()));
+        }
+        
+        public int hashCode() {
+            return getStrand().hashCode();
+        }
+        
+        public String toString() {
+            return "ByStrand(" + str + ")";
+        }
+    }
+    
+    /**
      * A filter that returns all features overlapping a location. Overlaps means
      * that a feature includes part of, on the same strand and on the same sequence
      * any single member of the flattened query location.
@@ -814,15 +958,8 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    public final static class OverlapsRichLocation implements BioSQLFeatureFilter {
+    public final static class OverlapsRichLocation extends HibernateFeatureFilter {
         private RichLocation loc;
-        private Method eq;
-        private Method le;
-        private Method ge;
-        private Method conjunction;
-        private Method disjunction;
-        private Method conjunctAdd;
-        private Method disjunctAdd;
         
         public RichLocation getRichLocation() {
             return loc;
@@ -834,32 +971,11 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
          * @param loc  the location that will overlap the accepted features
          */
         public OverlapsRichLocation(RichLocation loc) {
+            super();
             if (loc == null) {
                 throw new NullPointerException("Loc may not be null");
             }
             this.loc = loc;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lookup the methods
-                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
-                this.le = restrictions.getMethod("le", new Class[]{String.class,Object.class});
-                this.ge = restrictions.getMethod("ge", new Class[]{String.class,Object.class});
-                this.conjunction = restrictions.getMethod("conjunction", new Class[]{});
-                this.disjunction = restrictions.getMethod("disjunction", new Class[]{});
-                // Lazy load the Restrictions class from Hibernate.
-                Class criterion = Class.forName("org.hibernate.criterion.Criterion");
-                // Lazy load the Restrictions class from Hibernate.
-                Class conjunctClass = Class.forName("org.hibernate.criterion.Conjunction");
-                Class disjunctClass = Class.forName("org.hibernate.criterion.Disjunction");
-                // Lookup the methods
-                this.conjunctAdd = conjunctClass.getMethod("add", new Class[]{criterion});
-                this.disjunctAdd = disjunctClass.getMethod("add", new Class[]{criterion});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         /**
@@ -872,7 +988,7 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         public Object asCriterion() {
             try {
                 // Conjunction of criteria for each member of the query location.
-                Collection members = Tools.flatten(loc);
+                Collection members = RichLocation.Tools.flatten(loc);
                 // some combo of Tools.flatten(loc), min(loc.start,feat.start) and min(loc.end,feat.end)
                 Object parentConjunct = this.conjunction.invoke(null,null);
                 for (Iterator i = members.iterator(); i.hasNext(); ) {
@@ -895,11 +1011,11 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
             }
         }
         
-        public boolean criterionRefersToParent() { return false; }
-        
-        public boolean criterionRefersToLocation() { return true; }
-        
-        public boolean criterionRefersToAnnotation() { return false; }
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.put("locationSet","l");
+            return results;
+        }
         
         public boolean equals(Object o) {
             return
@@ -923,32 +1039,12 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * @author Richard Holland
      * @since 1.5
      */
-    public final static class ByNote
-            implements BioSQLFeatureFilter {
+    public final static class ByNote extends HibernateFeatureFilter {
         private Note note;
-        private Method eq;
-        private Method conjunction;
-        private Method conjunctAdd;
         
         public ByNote(Note note) {
+            super();
             this.note = note;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lookup the methods
-                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
-                this.conjunction = restrictions.getMethod("conjunction", new Class[]{});
-                // Lazy load the Restrictions class from Hibernate.
-                Class criterion = Class.forName("org.hibernate.criterion.Criterion");
-                // Lazy load the Restrictions class from Hibernate.
-                Class conjunctClass = Class.forName("org.hibernate.criterion.Conjunction");
-                // Lookup the methods
-                this.conjunctAdd = conjunctClass.getMethod("add", new Class[]{criterion});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
         }
         
         public Note getNote() {
@@ -964,9 +1060,8 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
                 } catch (NoSuchElementException e) {
                     return false;
                 }
-            } else {
-                return false;
             }
+            return false;
         }
         
         public Object asCriterion() {
@@ -983,11 +1078,11 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
             }
         }
         
-        public boolean criterionRefersToParent() { return false; }
-        
-        public boolean criterionRefersToLocation() { return false; }
-        
-        public boolean criterionRefersToAnnotation() { return true; }
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.put("noteSet","n");
+            return results;
+        }
         
         public boolean equals(Object o) {
             if(o instanceof ByNote) {
@@ -1008,46 +1103,39 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
     }
     
     /**
-     * A filter that returns all features that have the given note. The value
-     * is not checked.
+     * A filter that returns all features that have a note with the given term. The value
+     * and rank is not checked.
      *
      * @author Richard Holland
      * @since 1.5
      */
-    public final static class ByNoteTermOnly
-            implements BioSQLFeatureFilter {
-        private Note note;
-        private Method eq;
+    public final static class ByNoteTermOnly extends HibernateFeatureFilter {
+        private ComparableTerm term;
         
-        public ByNoteTermOnly(Note note) {
-            this.note = note;
-            try {
-                // Lazy load the Restrictions class from Hibernate.
-                Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
-                // Lookup the methods
-                this.eq = restrictions.getMethod("eq", new Class[]{String.class,Object.class});
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
+        public ByNoteTermOnly(ComparableTerm term) {
+            super();
+            this.term = term;
         }
         
-        public Note getNote() {
-            return note;
+        public ComparableTerm getTerm() {
+            return term;
         }
         
         public boolean accept(Feature f) {
             if (f instanceof RichFeature) {
-                return ((RichFeature)f).getNoteSet().contains(note);
-            } else {
-                return false;
+                RichAnnotation ra = (RichAnnotation)((RichFeature)f).getAnnotation();
+                try {
+                    for (Iterator i = ra.getNoteSet().iterator(); i.hasNext(); ) if (((Note)i.next()).getTerm().equals(term)) return true;
+                } catch (NoSuchElementException e) {
+                    return false;
+                }
             }
+            return false;
         }
         
         public Object asCriterion() {
             try {
-                return this.eq.invoke(null, new Object[]{"n.term",note.getTerm()});
+                return this.eq.invoke(null, new Object[]{"n.term",term});
             } catch (InvocationTargetException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
@@ -1055,27 +1143,27 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
             }
         }
         
-        public boolean criterionRefersToParent() { return false; }
-        
-        public boolean criterionRefersToLocation() { return false; }
-        
-        public boolean criterionRefersToAnnotation() { return true; }
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.put("noteSet","n");
+            return results;
+        }
         
         public boolean equals(Object o) {
             if(o instanceof ByNoteTermOnly) {
                 ByNoteTermOnly that = (ByNoteTermOnly) o;
-                return this.getNote() == that.getNote();
+                return this.getTerm() == that.getTerm();
             }
             
             return false;
         }
         
         public int hashCode() {
-            return getNote().hashCode();
+            return getTerm().hashCode();
         }
         
         public String toString() {
-            return "ByNoteTermOnly {" + note + "}";
+            return "ByNoteTermOnly {" + term + "}";
         }
     }
 }

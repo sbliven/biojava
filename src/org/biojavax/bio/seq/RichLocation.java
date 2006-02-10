@@ -232,6 +232,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
         public static Strand forName(String name) {
             if (name.equals("+")) return POSITIVE_STRAND;
             else if (name.equals("?")) return UNKNOWN_STRAND;
+            else if (name.equals(".")) return UNKNOWN_STRAND;
             else if (name.equals("-")) return NEGATIVE_STRAND;
             else throw new IllegalArgumentException("Unknown strand type: "+name);
         }
