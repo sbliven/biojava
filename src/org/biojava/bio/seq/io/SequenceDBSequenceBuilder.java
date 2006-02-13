@@ -48,7 +48,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * <p>Following the introduction of biojavax persistence is handled by
  * Hibernate refer to 
- * {@link org.biojavax.bio.db.HibernateRichObjectBuilder HibernateRichObjectBuilder}</p>
+ * {@link org.biojavax.bio.db.biosql.BioSQLRichObjectBuilder BioSQLRichObjectBuilder}</p>
  *
  * @author David Huen
  */

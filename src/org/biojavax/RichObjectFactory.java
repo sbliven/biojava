@@ -64,7 +64,7 @@ public class RichObjectFactory {
      * Hibernate as it will not work without it.
      * @param b the builder to use.
      * @see SimpleRichObjectBuilder
-     * @see org.biojavax.bio.db.BioSQLRichObjectBuilder
+     * @see org.biojavax.bio.db.biosql.BioSQLRichObjectBuilder
      */
     public static synchronized void setRichObjectBuilder(RichObjectBuilder b) {
         builder = b;

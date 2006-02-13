@@ -518,7 +518,7 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
          * Create a ByType filter that filters in all features with type fields
          * equal to type.
          *
-         * @param type  the String to match type fields against
+         * @param name  the String to match type fields against
          */
         public ByName(String name) {
             super();
@@ -577,10 +577,10 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         }
         
         /**
-         * Create a ByType filter that filters in all features with type fields
-         * equal to type.
+         * Create a Rank filter that filters in all features with rank fields
+         * equal to rank.
          *
-         * @param type  the String to match type fields against
+         * @param rank  the rank to match type fields against
          */
         public ByRank(int rank) {
             super();
@@ -637,10 +637,10 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         }
         
         /**
-         * Create a ByType filter that filters in all features with type fields
-         * equal to type.
+         * Create a ByTypeTerm filter that filters in all features with typeTerm fields
+         * equal to typeTerm.
          *
-         * @param type  the String to match type fields against
+         * @param typeTerm  the Term to match typeTerm fields against
          */
         public ByTypeTerm(ComparableTerm typeTerm) {
             super();
@@ -698,12 +698,12 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         }
         
         /**
-         * Create a ByType filter that filters in all features with type fields
-         * equal to type.
+         * Create a BySourceTerm filter that filters in all features with sourceTerm fields
+         * equal to source.
          *
-         * @param type  the String to match type fields against
+         * @param sourceTerm  the Term to match sourceTerm fields against
          */
-        public BySourceTerm(ComparableTerm typeTerm) {
+        public BySourceTerm(ComparableTerm sourceTerm) {
             super();
             if (sourceTerm == null) {
                 throw new NullPointerException("Source may not be null");
