@@ -163,6 +163,16 @@
           <para><code>RichAnnotation</code> (extends
           <code>Annotation</code>)</para>
         </listitem>
+
+        <listitem>
+          <para><code>BioSQLFeatureFilter</code> (extends
+          <code>FeatureFilter</code>)</para>
+        </listitem>
+
+        <listitem>
+          <para><code>RichSequenceDB</code> (extends
+          <code>SequenceDB</code>)</para>
+        </listitem>
       </itemizedlist>
 
       <para>Wherever possible in BioJavaX, conversions are attempted if a
@@ -253,6 +263,10 @@ RichSequence rs = RichSequence.Tools.enrich(s);</programlisting>
 
         <listitem>
           <para><code>RichFeatureRelationship</code></para>
+        </listitem>
+
+        <listitem>
+          <para><code>BioEntryDB</code></para>
         </listitem>
       </itemizedlist>
     </section>
@@ -612,8 +626,8 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
 
       <para>When working with Hibernate, you <emphasis>must</emphasis> connect
       BioJavaX to Hibernate by calling
-      <code>RichObjectFactory.connectToHibernate(session)</code> and passing
-      it your session object. When using this, instances are looked up in the
+      <code>RichObjectFactory.connectToBioSQL(session)</code> and passing it
+      your session object. When using this, instances are looked up in the
       underlying BioSQL database first to see if they exist. If they do, they
       are loaded and returned. If not, they are created, then returned.</para>
 
@@ -623,10 +637,10 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
       requests.</para>
 
       <para>You can replicate the behaviour of
-      <code>RichObjectFactory.connectToHibernate(session)</code> by
-      instantiating <code>HibernateRichObjectBuilder</code> and
-      <code>HibernateCrossReferenceResolver</code> objects and passing these
-      to the appropriate methods in <code>RichObjectFactory</code>.</para>
+      <code>RichObjectFactory.connectToBioSQL(session)</code> by instantiating
+      <code>BioSQLRichObjectBuilder</code> and
+      <code>BioSQLCrossReferenceResolver</code> objects and passing these to
+      the appropriate methods in <code>RichObjectFactory</code>.</para>
 
       <para>See the section on BioSQL and Hibernate later in this document for
       more details.</para>
@@ -758,10 +772,10 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
               The default implementation of this interface
               <code>DummyCrossReferenceResolver</code>, which always returns
               infinitely ambiguous symbol lists and cannot look up any remote
-              sequence objects. Use
-              <code>HibernateCrossReferenceResolver</code> instead (or use
-              <code>RichObjectFactory.connectToHibernate(session)</code>) if
-              you are using Hibernate, which is able to actually look up the
+              sequence objects. Use <code>BioSQLCrossReferenceResolver</code>
+              instead (or use
+              <code>RichObjectFactory.connectToBioSQL(session)</code>) if you
+              are using Hibernate, which is able to actually look up the
               sequences (if they exist in your database).</entry>
             </row>
 
@@ -773,11 +787,11 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
             </row>
 
             <row>
-              <entry><code>void connectToHibernate(Object
+              <entry><code>void connectToBioSQL(Object
               session);</code></entry>
 
-              <entry>Instantiates <code>HibernateCrossReferenceResolver</code>
-              and <code>HibernateRichObjectBuilder</code> using the Hibernate
+              <entry>Instantiates <code>BioSQLCrossReferenceResolver</code>
+              and <code>BioSQLRichObjectBuilder</code> using the Hibernate
               session object provided, and sets these two objects as the
               default <code>RichObjectBuilder</code> and
               <code>CrossReferenceResolver</code> instances. After this call,
@@ -3101,7 +3115,7 @@ while ((t=l.readName(names))!=null);  // then read all the names
       <code>NCBITaxon</code> objects or names going missing if you have an LRU
       cache in <code>RichObjectFactory</code> that is too small. This issue is
       avoided altogether when using the
-      <code>HibernateRichObjectFactory</code>.</para>
+      <code>BioSQLRichObjectFactory</code>.</para>
     </section>
   </chapter>
 
@@ -3676,7 +3690,7 @@ RichLocation combined = RichLocation.Tools.construct(members);</programlisting>
       the remote sequence. The default <code>CrossReferenceResolver</code>,
       <code>DummyCrossReferenceResolver</code>, will return a number of
       ambiguity symbols equivalent to the length of the remote location. The
-      Hibernate version, <code>HibernateCrossReferenceResolver</code>, will
+      Hibernate version, <code>BioSQLCrossReferenceResolver</code>, will
       return the actual sequence from the database, but otherwise will behave
       the same way if the remote sequence cannot be found.</para>
 
@@ -3878,7 +3892,7 @@ Namespace defaultNS = RichObjectFactory.getDefaultNamespace();
 Namespace customNS = (Namespace)RichObjectFactory.getObject(SimpleNamespace.class, new Object[]{"myNameSpace"}); 
 ...
 // load a namespace from BioSQL, or create it if it doesn't exist yet
-Namespace biosqlNS = (Namespace)HibernateRichObjectFactory.getObject(SimpleNamespace.class, new Object[]{"myBioSQLNameSpace"});
+Namespace biosqlNS = (Namespace)BioSQLRichObjectFactory.getObject(SimpleNamespace.class, new Object[]{"myBioSQLNameSpace"});
 ...
 // change the default namespace to "bloggs"
 RichObjectFactory.setDefaultNamespaceName("bloggs");</programlisting>
@@ -3941,7 +3955,7 @@ List taxons = q.list();  // taxons will now contain all matching taxon objects</
     These are both very similar to the existing <code>SequenceDB</code>
     interface in BioJava, and in fact <code>RichSequenceDB</code> extends
     <code>SequenceDB</code> and therefore can be used as a drop-in
-    replacement. </para>
+    replacement.</para>
 
     <para>An abstract implementation of each of these interfaces is provided,
     along with a simple hash-based implementation.</para>
@@ -3952,7 +3966,7 @@ List taxons = q.list();  // taxons will now contain all matching taxon objects</
     provide an in-memory database where sequences are stored in a
     <code>HashMap</code>, whereas the <code>GenbankRichSequenceDB</code>
     implementation is a read-only implementation which downloads and parses
-    Genbank records on-demand from the NCBI website. </para>
+    Genbank records on-demand from the NCBI website.</para>
 
     <para>There is also a pair of convenience implementations called
     <code>BioSQLBioEntryDB</code> and <code>BioSQLRichSequenceDB</code> which
@@ -4382,7 +4396,7 @@ List taxons = q.list();  // taxons will now contain all matching taxon objects</
 
         <programlisting>SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();  // load Hibernate config
 Session session = sessionFactory.openSession();                                         // open the session
-RichObjectFactory.connectToHibernate(session);                                          // connect it to BioJavaX</programlisting>
+RichObjectFactory.connectToBioSQL(session);                                          // connect it to BioJavaX</programlisting>
 
         <para>To close the Hibernate session:</para>
 
@@ -4438,7 +4452,7 @@ try {
 
         <programlisting>SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();  
 Session session = sessionFactory.openSession();                                     
-RichObjectFactory.connectToHibernate(session);
+RichObjectFactory.connectToBioSQL(session);
 
 Transaction tx = session.beginTransaction();
 try {
@@ -4723,7 +4737,7 @@ session.close();</programlisting>
       another sequence is added, and a third is deleted:</para>
 
       <programlisting>Session sess = ...;    // connect to BioSQL using Hibernate and establish a session
-RichObjectFactory.connectToHibernate(sess);    // bind BioJavaX to the Hibernate session
+RichObjectFactory.connectToBioSQL(sess);    // bind BioJavaX to the Hibernate session
 
 RichSequenceDB db = new BioSQLRichSequenceDB(sess);   // create the RichSequenceDB wrapper around the Hibernate session
 
@@ -4741,7 +4755,7 @@ sess.close();    // disconnect from the database</programlisting>
       JavaDocs for the <code>Session</code> object in Hibernate):</para>
 
       <programlisting>Session sess = ...;    // connect to BioSQL using Hibernate and establish a session
-RichObjectFactory.connectToHibernate(sess);    // bind BioJavaX to the Hibernate session
+RichObjectFactory.connectToBioSQL(sess);    // bind BioJavaX to the Hibernate session
 
 RichSequenceDB db = new BioSQLRichSequenceDB(sess);    // create the RichSequenceDB wrapper around the Hibernate session
 
@@ -4758,6 +4772,42 @@ try {
 } finally {
    sess.close();    // disconnect from the database
 }</programlisting>
+    </section>
+
+    <section>
+      <title>BioSQLFeatureFilter</title>
+
+      <para>You can apply any <code>FeatureFilter</code> to a
+      <code>BioSQLRichSequenceDB</code> instance using the
+      <code>filter()</code> method, just like you could in the existing
+      <code>SequenceDB</code> classes. However,
+      <code>BioSQLRichSequenceDB</code> handles it slightly
+      differently.</para>
+
+      <para>First, it attempts to convert every member of the
+      <code>FeatureFilter</code> into an equivalent
+      <code>BioSQLFeatureFilter</code> (if it isn't already one), which knows
+      how to apply that filter directly to the database. The
+      <code>BioSQLFeatureFilter</code> interface provides two methods in order
+      to allow this - one returns a Hibernate <code>Criterion</code> instance
+      which represents the query required to select features of that kind, and
+      the other returns a Map containing any table aliases the
+      <code>Criterion</code> uses.</para>
+
+      <para>After having run a database query on any convertible
+      <code>FeatureFilter</code>s, it then passes all the results through the
+      <code>accept()</code> method of the original <code>FeatureFilter</code>
+      to see if those features should be returned as results. This is because
+      not all <code>FeatureFilter</code>s can be converted into
+      <code>BioSQLFeatureFilter</code>s, and so it cannot be guaranteed that
+      the <code>Criterion</code> from the first step will have removed all
+      ineligible candidates.</para>
+
+      <para>If you wish to write your own <code>FeatureFilter</code>
+      implementations, you should use <code>BioSQLFeatureFilter</code>
+      wherever possible in order to optimise the first (faster) step of this
+      process and remove as much work as possible from the second (slower)
+      step. </para>
     </section>
   </chapter>
 

@@ -26,8 +26,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.biojavax.bio.db.HibernateCrossReferenceResolver;
-import org.biojavax.bio.db.HibernateRichObjectBuilder;
+import org.biojavax.bio.db.biosql.BioSQLCrossReferenceResolver;
+import org.biojavax.bio.db.biosql.BioSQLRichObjectBuilder;
 import org.biojavax.bio.seq.PositionResolver;
 import org.biojavax.bio.seq.PositionResolver.AverageResolver;
 import org.biojavax.ontology.ComparableOntology;
@@ -59,12 +59,12 @@ public class RichObjectFactory {
     /**
      * Sets the builder to use when instantiating new Rich objects. The basic,
      * default, one is a SimpleRichObjectBuilder, which just calls the constructor.
-     * Another useful one is HibernateRichObjectBuilder, which attempts to load
+     * Another useful one is BioSQLRichObjectBuilder, which attempts to load
      * objects from the database. The latter is required if you are working with
      * Hibernate as it will not work without it.
      * @param b the builder to use.
      * @see SimpleRichObjectBuilder
-     * @see org.biojavax.bio.db.HibernateRichObjectBuilder
+     * @see org.biojavax.bio.db.BioSQLRichObjectBuilder
      */
     public static synchronized void setRichObjectBuilder(RichObjectBuilder b) {
         builder = b;
@@ -196,8 +196,8 @@ public class RichObjectFactory {
      * A utility method that configures the RichObjectFactory for use with a Hibernate session.
      * @param session an object containing a Hibernate session.
      */
-    public static void connectToHibernate(Object session) {
-        RichObjectFactory.setRichObjectBuilder(new HibernateRichObjectBuilder(session));
-        RichObjectFactory.setDefaultCrossReferenceResolver(new HibernateCrossReferenceResolver(session));       
+    public static void connectToBioSQL(Object session) {
+        RichObjectFactory.setRichObjectBuilder(new BioSQLRichObjectBuilder(session));
+        RichObjectFactory.setDefaultCrossReferenceResolver(new BioSQLCrossReferenceResolver(session));       
     }
 }
