@@ -40,12 +40,15 @@ import org.biojava.bio.seq.RNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
 import org.biojavax.bio.BioEntry;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.SimpleNamespace;
 import org.biojavax.bio.seq.io.EMBLFormat;
 import org.biojavax.bio.seq.io.EMBLxmlFormat;
 import org.biojavax.bio.seq.io.FastaFormat;
@@ -409,6 +412,82 @@ public interface RichSequence extends BioEntry,Sequence {
         
         // because we are static we don't want any instances
         private Tools() {}
+        
+        /**
+         * Create a new RichSequence in the default namespace.
+         * @param name The name for the sequence. Will also be used 
+         * for the accession.
+         * @param seqString The sequence string
+         * @param alpha The <CODE>Alphabet</CODE> for the sequence
+         * @throws org.biojava.bio.BioException If the symbols in <CODE>seqString</CODE> are
+         * not valid in <CODE>alpha</CODE>
+         * @return A new <CODE>RichSequence</CODE>. All versions are 1 or 1.0 
+         */
+        public static RichSequence createRichSequence(String name, String seqString, Alphabet alpha) throws BioException{
+            SymbolList syms = new SimpleSymbolList(alpha.getTokenization("token"), seqString);
+            return createRichSequence(name, syms);
+        }
+        
+        /**
+         * Create a new RichSequence in the specified namespace.
+         * @return A new <CODE>RichSequence</CODE>. All versions are 1 or 1.0
+         * @param namespace the namespace to create the sequence in. A singleton
+         * <CODE>Namespace</CODE> will be created or retrieved as appropriate.
+         * @param name The name for the sequence. Will also be used 
+         * for the accession.
+         * @param seqString The sequence string
+         * @param alpha The <CODE>Alphabet</CODE> for the sequence
+         * @throws org.biojava.bio.BioException If the symbols in <CODE>seqString</CODE> are
+         * not valid in <CODE>alpha</CODE>
+         */
+        public static RichSequence createRichSequence(String namespace, String name, String seqString, Alphabet alpha) throws BioException{
+            SymbolList syms = new SimpleSymbolList(alpha.getTokenization("token"), seqString);
+            Namespace ns = (Namespace)RichObjectFactory.getObject(
+                             SimpleNamespace.class, 
+                             new Object[]{namespace}
+                          );
+            return createRichSequence(ns, name, syms);
+        }
+        
+        /**
+         * Create a new RichSequence in the specified namespace.
+         * @return A new <CODE>RichSequence</CODE>. All versions are 1 or 1.0
+         * @param ns The namespace to create the sequence in.
+         * @param name The name for the sequence. Will also be used 
+         * for the accession.
+         * @param seqString The sequence string
+         * @param alpha The <CODE>Alphabet</CODE> for the sequence
+         * @throws org.biojava.bio.BioException If the symbols in <CODE>seqString</CODE> are
+         * not valid in <CODE>alpha</CODE>
+         */
+        public static RichSequence createRichSequence(Namespace ns, String name, String seqString, Alphabet alpha) throws BioException{
+            SymbolList syms = new SimpleSymbolList(alpha.getTokenization("token"), seqString);
+            return createRichSequence(ns, name, syms);
+        }
+        
+        /**
+         * Create a new RichSequence in the default namespace.
+         * @return A new <CODE>RichSequence</CODE>. All versions are 1 or 1.0
+         * @param syms The symbols to add to the sequence.
+         * @param name The name for the sequence. Will also be used 
+         * for the accession.
+         */
+        public static RichSequence createRichSequence(String name, SymbolList syms){
+            Namespace ns = RichObjectFactory.getDefaultNamespace();
+            return createRichSequence(ns, name, syms);
+        }
+        
+        /**
+         * Create a new RichSequence in the specified namespace.
+         * @return A new <CODE>RichSequence</CODE>. All versions are 1 or 1.0
+         * @param ns the namespace to create the sequence in.
+         * @param syms The symbols to add to the sequence.
+         * @param name The name for the sequence. Will also be used 
+         * for the accession.
+         */
+        public static RichSequence createRichSequence(Namespace ns, String name, SymbolList syms){
+            return new SimpleRichSequence(ns, name, name, 1, syms, new Double(1.0));
+        }
         
         /**
          * Boldly attempts to convert a <CODE>Sequence</CODE> into a <CODE>RichSequence</CODE>. <CODE>Sequence</CODE>s
