@@ -156,16 +156,14 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
             else if (ff instanceof FeatureFilter.BySource) {
                 FeatureFilter.BySource ffsrc = (FeatureFilter.BySource)ff;
                 String name = ffsrc.getSource();
-                ComparableTerm t = RichObjectFactory.getDefaultOntology().getOrCreateTerm(name);
-                return new BioSQLFeatureFilter.BySourceTerm(t);
+                return new BioSQLFeatureFilter.BySourceTermName(name);
             }
             // ByType - convert the term to a Term from the default ontology then
             // try ByTypeTerm.
             else if (ff instanceof FeatureFilter.ByType) {
                 FeatureFilter.ByType ffsrc = (FeatureFilter.ByType)ff;
                 String name = ffsrc.getType();
-                ComparableTerm t = RichObjectFactory.getDefaultOntology().getOrCreateTerm(name);
-                return new BioSQLFeatureFilter.ByTypeTerm(t);
+                return new BioSQLFeatureFilter.ByTypeTermName(name);
             }
             // ContainedByLocation - simple pass-through
             else if (ff instanceof FeatureFilter.ContainedByLocation) {
@@ -740,6 +738,139 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         
         public String toString() {
             return "BySourceTerm(" + sourceTerm + ")";
+        }
+    }
+    
+    /**
+     * Construct one of these to filter features by type (name only - parent ontology
+     * is ignored).
+     *
+     * @author Richard Holland
+     * @since 1.5
+     */
+    final public static class ByTypeTermName extends HibernateFeatureFilter {
+        private String typeTermName;
+        
+        public String getTypeTermName() {
+            return typeTermName;
+        }
+        
+        /**
+         * Create a ByTypeTermName filter that filters in all features with typeTerm fields
+         * having name equal to typeTermName.
+         *
+         * @param typeTermName  the Term to match typeTermName fields against
+         */
+        public ByTypeTermName(String typeTermName) {
+            super();
+            if (typeTermName == null) {
+                throw new NullPointerException("Type name may not be null");
+            }
+            this.typeTermName = typeTermName;
+        }
+        
+        /**
+         * Returns true if the feature has a matching type property.
+         */
+        public boolean accept(Feature f) {
+            return typeTermName.equals(f.getTypeTerm().getName());
+        }
+        
+        public Object asCriterion() {
+            try {
+                return this.eq.invoke(null,new Object[]{"tt.name",typeTermName});
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.put("typeTerm","tt");
+            return results;
+        }
+        
+        public boolean equals(Object o) {
+            return
+                    (o instanceof ByTypeTermName) &&
+                    (((ByTypeTermName) o).getTypeTermName().equals(this.getTypeTermName()));
+        }
+        
+        public int hashCode() {
+            return getTypeTermName().hashCode();
+        }
+        
+        public String toString() {
+            return "ByTypeTermName(" + typeTermName + ")";
+        }
+    }
+    
+    
+    /**
+     * Construct one of these to filter features by source (name only - parent ontology
+     * is ignored).
+     *
+     * @author Richard Holland
+     * @since 1.5
+     */
+    final public static class BySourceTermName extends HibernateFeatureFilter {
+        private String sourceTermName;
+        
+        public String getSourceTermName() {
+            return sourceTermName;
+        }
+        
+        /**
+         * Create a BySourceTerm filter that filters in all features with sourceTerm fields
+         * having name equal to sourceTermName.
+         *
+         * @param sourceTerm  the Term to match sourceTerm fields against
+         */
+        public BySourceTermName(String sourceTermName) {
+            super();
+            if (sourceTermName == null) {
+                throw new NullPointerException("Source name may not be null");
+            }
+            this.sourceTermName = sourceTermName;
+        }
+        
+        /**
+         * Returns true if the feature has a matching source property.
+         */
+        public boolean accept(Feature f) {
+            return sourceTermName.equals(f.getSourceTerm().getName());
+        }
+        
+        public Object asCriterion() {
+            try {
+                return this.eq.invoke(null,new Object[]{"st.name",sourceTermName});
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        public Map criterionAliasMap() {
+            Map results = new HashMap();
+            results.put("sourceTerm","st");
+            return results;
+        }
+        
+        public boolean equals(Object o) {
+            return
+                    (o instanceof BySourceTermName) &&
+                    (((BySourceTermName) o).getSourceTermName().equals(this.getSourceTermName()));
+        }
+        
+        public int hashCode() {
+            return getSourceTermName().hashCode();
+        }
+        
+        public String toString() {
+            return "BySourceTermName(" + sourceTermName + ")";
         }
     }
     
