@@ -92,8 +92,8 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
             Class criteria = Class.forName("org.hibernate.Criteria");
             // Lookup the critera methods
             this.createCriteria = hibernateSession.getMethod("createCriteria", new Class[]{Class.class});
-            this.addCriteria = criteria.getMethod("add", new Class[]{Class.class});
-            this.listCriteria = criteria.getMethod("list", new Class[]{Class.class});
+            this.addCriteria = criteria.getMethod("add", new Class[]{Class.forName("org.hibernate.Criteria")});
+            this.listCriteria = criteria.getMethod("list", new Class[]{Class.forName("org.hibernate.Criteria")});
             this.createAlias = criteria.getMethod("createAlias", new Class[]{String.class,String.class});
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
