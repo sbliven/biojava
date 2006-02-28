@@ -4444,7 +4444,7 @@ try {
         all the sequences in each namespace, whether they be
         <code>BioEntry</code> or <code>RichSequence</code> instances. If it
         finds any sequences where the name is equal to 'bloggs', it changes
-        their version to 99. It then commits any changes it has made and
+        their description to "XYZ". It then commits any changes it has made and
         exits.</para>
 
         <para>This example shows just how easy it is to read and write to the
@@ -4466,7 +4466,9 @@ try {
         System.out.println(ns.getName());     // print out the name of the namespace
 
         // print out all the sequences in the namespace
-        Query sq = session.createQuery("from BioEntry where namespace=?",ns);
+        Query sq = session.createQuery("from BioEntry where namespace= :nsp");
+        // set the named parameter "nsp" to ns
+        sq.setParameter("nsp",ns);
         List sequences = sq.list();
 
         for (Iterator j = sequences.iterator(); j.hasNext(); ) {
@@ -4476,7 +4478,7 @@ try {
             // if the sequence is called bloggs, change its version to 99
 
             if (be.getName().equals("bloggs")) {
-                be.setVersion(99);
+                be.setDescription("XYZ");
             }
         }
 
