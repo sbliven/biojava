@@ -357,7 +357,7 @@ public final class IntegerAlphabet
      * @return an IntegerParser.
      */
     public SymbolTokenization getTokenization(String name) {
-      if(name.equals("token")){
+      if(name.equals("token") || name.equals("default")){
         return new IntegerTokenization();
       }else{
         throw new NoSuchElementException(name + " parser not supported by IntegerAlphabet yet");
