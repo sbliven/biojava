@@ -34,6 +34,7 @@ import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.io.IntegerTokenization;
+import org.biojava.bio.seq.io.SubIntegerTokenization;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.SingletonList;
@@ -358,7 +359,7 @@ public final class IntegerAlphabet
      */
     public SymbolTokenization getTokenization(String name) {
       if(name.equals("token") || name.equals("default")){
-        return new IntegerTokenization();
+        return new SubIntegerTokenization(this);
       }else{
         throw new NoSuchElementException(name + " parser not supported by IntegerAlphabet yet");
       }
