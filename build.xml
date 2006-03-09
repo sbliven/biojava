@@ -424,7 +424,7 @@
       source="1.4"
       windowtitle="${Name.biojava}-${version} API"
       doctitle="${Name.biojava}-${version}"
-      maxmemory="96m">
+      maxmemory="192m">
        <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
 
        <group title="Core biological packages"
