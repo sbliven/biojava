@@ -4475,7 +4475,7 @@ try {
             BioEntry be = (BioEntry)j.next();        // RichSequences are BioEntrys too
             System.out.println("   "+be.getName());  // print out the name of the sequence
 
-            // if the sequence is called bloggs, change its version to 99
+            // if the sequence is called bloggs, change its description to XYZ
 
             if (be.getName().equals("bloggs")) {
                 be.setDescription("XYZ");
@@ -4488,7 +4488,7 @@ try {
     tx.commit();         
     System.out.println("Changes committed.");
 
-    // all sequences called bloggs now have a version of 99 in the database
+    // all sequences called bloggs now have a description "XYZ" in the database
 
 } catch (Exception e) {
     tx.rollback();       
