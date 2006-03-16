@@ -28,8 +28,11 @@ import java.util.List;
 import java.util.Map;
 import org.biojavax.bio.db.biosql.BioSQLCrossReferenceResolver;
 import org.biojavax.bio.db.biosql.BioSQLRichObjectBuilder;
+import org.biojavax.bio.db.biosql.BioSQLRichSequenceHandler;
+import org.biojavax.bio.seq.DummyRichSequenceHandler;
 import org.biojavax.bio.seq.PositionResolver;
 import org.biojavax.bio.seq.PositionResolver.AverageResolver;
+import org.biojavax.bio.seq.RichSequenceHandler;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.SimpleComparableOntology;
 
@@ -47,6 +50,7 @@ public class RichObjectFactory {
     private static String defaultNamespaceName = "lcl";
     private static PositionResolver defaultPositionResolver = new AverageResolver();
     private static CrossReferenceResolver defaultCrossRefResolver = new DummyCrossReferenceResolver();
+    private static RichSequenceHandler defaultRichSequenceHandler = new DummyRichSequenceHandler();
     
     // the LRU cache - keys are classes, entries are maps of param sets to objects
     private static int defaultLRUcacheSize = 20;
@@ -163,6 +167,15 @@ public class RichObjectFactory {
     public static void setDefaultCrossReferenceResolver(CrossReferenceResolver crr) { defaultCrossRefResolver = crr; }
     
     /**
+     * Sets the default sequence resolver to use when resolving sequence data.
+     * Defaults to the DummyRichSequenceHandler.
+     * @param crr the resolver to use.
+     * @see org.biojavax.bio.seq.RichSequenceHandler
+     * @see org.biojavax.bio.seq.DummyRichSequenceHandler
+     */
+    public static void setDefaultRichSequenceHandler(RichSequenceHandler rsh) { defaultRichSequenceHandler = rsh; }
+    
+    /**
      * Returns the default namespace object. Defaults to "lcl".
      * @return the default namespace.
      */
@@ -191,6 +204,13 @@ public class RichObjectFactory {
      * @see org.biojavax.DummyCrossReferenceResolver
      */
     public static CrossReferenceResolver getDefaultCrossReferenceResolver() { return defaultCrossRefResolver; }
+    
+    /**
+     * Returns the default sequence resolver object. Defaults to DummyRichSequenceHandler.
+     * @return the default resolver.
+     * @see org.biojavax.bio.seq.DummyRichSequenceHandler
+     */
+    public static RichSequenceHandler getDefaultRichSequenceHandler() { return defaultRichSequenceHandler; }
         
     /** 
      * A utility method that configures the RichObjectFactory for use with a Hibernate session.
@@ -198,6 +218,7 @@ public class RichObjectFactory {
      */
     public static void connectToBioSQL(Object session) {
         RichObjectFactory.setRichObjectBuilder(new BioSQLRichObjectBuilder(session));
-        RichObjectFactory.setDefaultCrossReferenceResolver(new BioSQLCrossReferenceResolver(session));       
+        RichObjectFactory.setDefaultCrossReferenceResolver(new BioSQLCrossReferenceResolver(session));      
+        RichObjectFactory.setDefaultRichSequenceHandler(new BioSQLRichSequenceHandler(session));        
     }
 }

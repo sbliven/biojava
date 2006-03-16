@@ -138,6 +138,14 @@ public interface RichSequence extends BioEntry,Sequence {
     public boolean getCircular();
     
     /**
+     * A special function that returns the SymbolList that this RichSequence is based around.
+     * This should _not_ be the RichSequence object itself, as this function is used to perform
+     * actions on the symbol list without referring to the RichSequence object directly.
+     * @return the internal SymbolList of the RichSequence, NOT the RichSequence object itself.
+     */
+    public SymbolList getInternalSymbolList();
+    
+    /**
      * Stores a number of useful terms used across many sequence formats for consistency's sake.
      */
     public static class Terms {

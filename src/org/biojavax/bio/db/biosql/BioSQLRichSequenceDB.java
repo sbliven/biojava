@@ -169,6 +169,26 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
         }
     }
     
+    public RichSequence getRichSequence(Integer id) throws IllegalIDException, BioException {
+        try {
+            // Build the query object
+            String queryText = "from Sequence where id = ?";
+            Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
+            // Set the parameters
+            query = this.setParameter.invoke(query, new Object[]{new Integer(0), id});
+            // Get the results
+            List result = (List)this.list.invoke(query, null);
+            // If the result doesn't just have a single entry, throw an exception
+            if (result.size()==0) throw new IllegalIDException("Id not found: "+id);
+            else if (result.size()>1) throw new IllegalIDException("Multiple records found with that id - use getRichSequences: "+id);
+            // Return the found object, if found - null if not.
+            return (RichSequence)result.get(0);
+        } catch (Exception e) {
+            // Throw the exception with our nice message
+            throw new RuntimeException("Error while trying to load by id: "+id,e);
+        }
+    }
+    
     public RichSequence getRichSequence(String id) throws IllegalIDException, BioException {
         try {
             // Build the query object
@@ -267,7 +287,7 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
         }
     }
     
-    public void _addRichSequence(RichSequence seq) throws IllegalIDException, BioException, ChangeVetoException {
+    private void _addRichSequence(RichSequence seq) throws IllegalIDException, BioException, ChangeVetoException {
         try {
             // Get the results
             this.saveOrUpdate.invoke(this.session, new Object[]{"Sequence",seq});

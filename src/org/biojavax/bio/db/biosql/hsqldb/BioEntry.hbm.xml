@@ -52,6 +52,17 @@
             </composite-element>
         </set>
         
+        <joined-subclass name="org.biojavax.bio.seq.ThinRichSequence" table="biosequence" node="richSequence" entity-name="ThinSequence">
+            <key column="bioentry_id" not-null="true"/>
+            <property name="seqVersion" column="version" node="@seqVersion"/>
+            <property name="sequenceLength" column="length" node="@seqLength"/>
+            <property name="alphabetName" column="alphabet" node="@alphabet"/>
+            <set name="featureSet" lazy="false" inverse="true" cascade="all-delete-orphan" sort="natural">
+                <key column="bioentry_id"/>
+                <one-to-many class="Feature" embed-xml="true"/>
+            </set>
+        </joined-subclass>
+        
         <joined-subclass name="org.biojavax.bio.seq.SimpleRichSequence" table="biosequence" node="richSequence" entity-name="Sequence">
             <key column="bioentry_id" not-null="true"/>
             <property name="seqVersion" column="version" node="@seqVersion"/>

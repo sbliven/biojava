@@ -94,7 +94,7 @@ public class BioSQLCrossReferenceResolver implements CrossReferenceResolver {
         Namespace ns = (Namespace)RichObjectFactory.getObject(SimpleNamespace.class, new Object[]{cr.getDbname()});
         try {
             // Build the query object
-            String queryText = "from Sequence where namespace = ? and accession = ? and version = ?";
+            String queryText = "from BioEntry where namespace = ? and accession = ? and version = ?";
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             // Set the parameters
             query = this.setParameter.invoke(query, new Object[]{new Integer(0), ns}); 

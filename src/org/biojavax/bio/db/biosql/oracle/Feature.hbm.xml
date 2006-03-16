@@ -13,7 +13,7 @@
             </generator>
         </id>
 
-        <many-to-one name="parent" class="Sequence" column="bioentry_id" not-null="true" cascade="persist,merge,save-update" node="@parentRichSequenceId" embed-xml="false"/>
+        <many-to-one name="parent" class="ThinSequence" column="bioentry_id" not-null="true" cascade="persist,merge,save-update" node="@parentRichSequenceId" embed-xml="false"/>
         <many-to-one name="sourceTerm" class="Term" column="source_term_id" not-null="true" cascade="persist,merge,save-update" node="@sourceTermId" embed-xml="false"/>
         <many-to-one name="typeTerm" class="Term" column="type_term_id" not-null="true" cascade="persist,merge,save-update" node="@typeTermId" embed-xml="false"/>
         <property name="name" column="display_name" node="@name"/>
