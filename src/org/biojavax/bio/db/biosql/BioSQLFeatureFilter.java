@@ -826,7 +826,7 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
          * Create a BySourceTerm filter that filters in all features with sourceTerm fields
          * having name equal to sourceTermName.
          *
-         * @param sourceTerm  the Term to match sourceTerm fields against
+         * @param sourceTermName  the name of the Term to match sourceTerm fields against
          */
         public BySourceTermName(String sourceTermName) {
             super();
