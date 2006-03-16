@@ -42,6 +42,7 @@ import org.biojavax.bio.db.HashRichSequenceDB;
 import org.biojavax.bio.db.RichSequenceDB;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.SimpleRichSequence;
 
 
 /**
@@ -169,10 +170,11 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
         }
     }
     
-    public RichSequence getRichSequence(Integer id) throws IllegalIDException, BioException {
+    public RichSequence fullyLoadRichSequence(RichSequence id) throws IllegalIDException, BioException {
+        if (id instanceof SimpleRichSequence) return id;
         try {
             // Build the query object
-            String queryText = "from Sequence where id = ?";
+            String queryText = "from Sequence as s where s = ?";
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             // Set the parameters
             query = this.setParameter.invoke(query, new Object[]{new Integer(0), id});
