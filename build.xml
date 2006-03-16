@@ -431,7 +431,7 @@
               packages="org.biojava.bio:org.biojava.bio.dist:org.biojava.bio.search:org.biojava.bio.seq:org.biojava.bio.seq.db:org.biojava.bio.seq.genomic:org.biojava.bio.seq.io:org.biojava.bio.symbol:org.biojava.bio.alignment:org.biojava.directory:org.biojava.bibliography:org.biojava.bio.taxa:org.biojava.bio.seq.filter" />
 
        <group title="User interface components"
-              packages="org.biojava.bio.gui:org.biojava.bio.gui.sequence" />
+              packages="org.biojava.bio.gui:org.biojava.bio.gui.glyph:org.biojava.bio.gui.sequence" />
 
        <group title="Sequence databases and formats"
               packages="org.biojava.bio.seq.io.agave:org.biojava.bio.program.das:org.biojava.bio.seq.ragbag:org.biojava.bio.seq.db.emblcd:org.biojava.bio.program.xff:org.biojava.bio.seq.dist:org.biojava.bio.seq.io.game:org.biojava.bio.seq.io.game12:org.biojava.bio.seq.db.biofetch:org.biojava.bio.seq.db.flat:org.biojava.bio.seq.db.biosql:org.biojava.bio.program.indexdb:org.biojava.bio.program.das.dasalignment:org.biojava.bio.program.homologene" />
