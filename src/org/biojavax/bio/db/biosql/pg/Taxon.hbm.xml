@@ -8,7 +8,9 @@
     <class name="org.biojavax.bio.taxa.SimpleNCBITaxon" table="taxon" node="taxon" entity-name="Taxon">
 
         <id name="id" type="integer" unsaved-value="null" column="taxon_id" node="@id">
-            <generator class="identity"/>
+            <generator class="sequence">
+                    <param name="sequence">taxon_pk_seq</param>
+            </generator>
         </id>
 
         <property name="NCBITaxID" column="ncbi_taxon_id" node="@NCBITaxId"/>

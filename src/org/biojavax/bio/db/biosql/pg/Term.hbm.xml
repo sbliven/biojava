@@ -8,7 +8,9 @@
     <class name="org.biojavax.ontology.SimpleComparableTerm" table="term" node="term" entity-name="Term">
 
         <id name="id" type="integer" unsaved-value="null" column="term_id" node="@id">
-            <generator class="identity"/>
+            <generator class="sequence">
+                <param name="sequence">term_pk_seq</param>
+            </generator>
         </id>
 
         <property name="name" node="@name"/>
