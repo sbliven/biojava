@@ -159,6 +159,37 @@ public class GenbankRichSequenceDB extends AbstractRichSequenceDB implements Ric
         }
     }
     
+     /**
+     * Given the appropriate Genbank ID, return the matching RichSequence object. Additionally
+     * define a new Namespace for the received RichSequence object.
+     * @param id the Genbank ID to retrieve.
+     * @param nsp the Namespace to define.
+     * @return the matching RichSequence object, or null if not found.
+     * @throws Exception if the sequence could not be retrieved for reasons other
+     * than the identifier not being found.
+     */
+    public RichSequence getRichSequence(String id, Namespace nsp) throws BioException, IllegalIDException {
+        try {
+            URL queryURL = getAddress(id); //get URL based on ID
+            
+            SymbolTokenization rParser = DNATools.getDNA().getTokenization("token"); //get SymbolTokenization
+            RichSequenceBuilderFactory seqFactory = this.getFactory();
+            
+            DataInputStream in = new DataInputStream(queryURL.openStream());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            RichSequenceIterator seqI = RichSequence.IOTools.readGenbank(reader, rParser, seqFactory, nsp);
+            
+            return seqI.nextRichSequence();
+        } catch (MalformedURLException e) {
+            throw new BioException("Failed to create Genbank URL",e);
+        } catch (BioException e) {
+            throw new BioException("Failed to read Genbank sequence",e);
+        } catch (IOException e) {
+            throw new BioException("IO failure whilst reading from Genbank",e);
+        }
+    }
+    
+    
     /**
      * Retrieve rich sequences from a Genbank
      *
