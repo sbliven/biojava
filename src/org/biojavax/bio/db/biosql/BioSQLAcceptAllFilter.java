@@ -37,7 +37,7 @@ import org.biojava.bio.seq.Feature;
  * @since 1.5
  */
 public class BioSQLAcceptAllFilter implements BioSQLFeatureFilter {
-    private Method isNull;
+    private Method isNotNull;
     
     protected BioSQLAcceptAllFilter() {
         super();
@@ -45,7 +45,7 @@ public class BioSQLAcceptAllFilter implements BioSQLFeatureFilter {
             // Lazy load the Restrictions class.
             Class restrictions = Class.forName("org.hibernate.criterion.Restrictions");
             // Lookup the isNull method
-            this.isNull = restrictions.getMethod("isNull", new Class[]{String.class});
+            this.isNotNull = restrictions.getMethod("isNotNull", new Class[]{String.class});
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {
@@ -56,7 +56,7 @@ public class BioSQLAcceptAllFilter implements BioSQLFeatureFilter {
     public Object asCriterion() {
         try {
             // All feature have parents, so checking for not-null means all will be returned.
-            return this.isNull.invoke(null,new Object[]{"parent"});
+            return this.isNotNull.invoke(null,new Object[]{"parent"});
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {

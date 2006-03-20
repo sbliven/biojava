@@ -49,7 +49,7 @@ public class SimpleRichSequence extends ThinRichSequence {
      * @param seqversion the version of the symbols for the sequence.
      */
     public SimpleRichSequence(Namespace ns, String name, String accession, int version, SymbolList symList, Double seqversion) {
-        super(ns,name,accession,version,seqversion);
+        super(ns,name,accession,version,symList.getAlphabet(),seqversion);
         if (symList==null) this.symList = SymbolList.EMPTY_LIST;
         else this.symList = symList;
     }
@@ -85,7 +85,12 @@ public class SimpleRichSequence extends ThinRichSequence {
             // Make the symbol list and assign it.
             this.symList = new SimpleSymbolList(this.getAlphabet().getTokenization("token"), seqstring);
         }
-    }
+    }    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int length() { return this.symList.length(); }
         
     // Hibernate requirement - not for public use.
     protected void setSequenceLength(int length) {} // ignore this calculated field

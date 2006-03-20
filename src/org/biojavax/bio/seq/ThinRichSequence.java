@@ -70,10 +70,11 @@ public class ThinRichSequence extends SimpleBioEntry implements RichSequence {
      * @param symList the symbols for the sequence.
      * @param seqversion the version of the symbols for the sequence.
      */
-    public ThinRichSequence(Namespace ns, String name, String accession, int version, Double seqversion) {
+    public ThinRichSequence(Namespace ns, String name, String accession, int version, Alphabet alpha, Double seqversion) {
         super(ns,name,accession,version);
         this.symListVersion = seqversion;
         this.circular = false;
+        this.alphabet = alpha;
     }
     
     // Hibernate requirement - not for public use.
@@ -176,7 +177,7 @@ public class ThinRichSequence extends SimpleBioEntry implements RichSequence {
     /**
      * {@inheritDoc}
      */
-    public int length() { return this.getInternalSymbolList().length(); }
+    public int length() { return this.length; }
     
     /**
      * {@inheritDoc}

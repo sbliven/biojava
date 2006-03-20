@@ -21,10 +21,11 @@ import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.seq.RichSequence;
-import org.biojavax.bio.seq.RichSequenceHandler;
 import org.biojavax.bio.seq.RichLocation.Tools;
 import org.biojava.bio.seq.io.ChunkedSymbolListFactory;
 import org.biojava.bio.symbol.PackedSymbolListFactory;
+import org.biojavax.bio.seq.DummyRichSequenceHandler;
+import org.biojavax.bio.seq.SimpleRichSequence;
 
 /**
  * A handler which loads sequence data from a BioSQL database, caching it where possible.
@@ -33,7 +34,7 @@ import org.biojava.bio.symbol.PackedSymbolListFactory;
  * SimpleRichSequence.
  * @author Richard Holland
  */
-public class BioSQLRichSequenceHandler implements RichSequenceHandler {
+public class BioSQLRichSequenceHandler extends DummyRichSequenceHandler {
     
     // the Hibernate session.
     private Object session;
@@ -49,6 +50,7 @@ public class BioSQLRichSequenceHandler implements RichSequenceHandler {
      * @see <a href="http://www.hibernate.org/hib_docs/v3/api/org/hibernate/Session.html"> org.hibernate.Session</a>
      */
     public BioSQLRichSequenceHandler(Object session) {
+        super();
         try {
             // Lazy load the Session class from Hibernate.
             Class hibernateSession = Class.forName("org.hibernate.Session");
@@ -74,6 +76,7 @@ public class BioSQLRichSequenceHandler implements RichSequenceHandler {
      * {@inheritDoc}
      */
     public void edit(RichSequence seq, Edit edit) throws IndexOutOfBoundsException, IllegalAlphabetException, ChangeVetoException {
+        if (seq instanceof SimpleRichSequence) super.edit(seq,edit);
         throw new ChangeVetoException("Cannot modify this sequence. Convert to a SimpleRichSequence first.");
     }
     
@@ -81,6 +84,7 @@ public class BioSQLRichSequenceHandler implements RichSequenceHandler {
      * {@inheritDoc}
      */
     public Symbol symbolAt(RichSequence seq, int index) throws IndexOutOfBoundsException {
+        if (seq instanceof SimpleRichSequence) return super.symbolAt(seq,index);
         return this.subList(seq, index, index).symbolAt(1);
     }
     
@@ -88,6 +92,7 @@ public class BioSQLRichSequenceHandler implements RichSequenceHandler {
      * {@inheritDoc}
      */
     public List toList(RichSequence seq) {
+        if (seq instanceof SimpleRichSequence) return super.toList(seq);
         if (seq.length()==0) return new ArrayList(); // empty list for empty seq
         else return this.subList(seq,1,seq.length()).toList();
     }
@@ -96,6 +101,7 @@ public class BioSQLRichSequenceHandler implements RichSequenceHandler {
      * {@inheritDoc}
      */
     public String subStr(RichSequence seq, int start, int end) throws IndexOutOfBoundsException {
+        if (seq instanceof SimpleRichSequence) return super.subStr(seq,start,end);
         if (seq.length()==0) return ""; // empty seq
         else if (seq.getCircular()) {
             StringBuffer result = new StringBuffer(); // place to store the resulting substring
@@ -139,6 +145,7 @@ public class BioSQLRichSequenceHandler implements RichSequenceHandler {
      * {@inheritDoc}
      */
     public SymbolList subList(RichSequence seq, int start, int end) throws IndexOutOfBoundsException {
+        if (seq instanceof SimpleRichSequence) return super.subList(seq,start,end);
         return this.convertToSymbolList(this.subStr(seq,start,end),seq.getAlphabet());
     }
     
@@ -146,13 +153,15 @@ public class BioSQLRichSequenceHandler implements RichSequenceHandler {
      * {@inheritDoc}
      */
     public String seqString(RichSequence seq) {
+        if (seq instanceof SimpleRichSequence) return super.seqString(seq);
         // load whole stringSequence property from Sequence
         try {
             // Build the query object
-            String queryText = "select s.stringSequence from Sequence as s where s = ?";
+            String queryText = "select s.stringSequence from Sequence as s where s.namespace = ? and s.name = ?";
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             // Set the parameters
-            query = this.setParameter.invoke(query, new Object[]{new Integer(0), seq});
+            query = this.setParameter.invoke(query, new Object[]{new Integer(0), seq.getNamespace()});
+            query = this.setParameter.invoke(query, new Object[]{new Integer(1), seq.getName()});
             // Get the results
             Object result = this.uniqueResult.invoke(query, null);
             // Return the found object, if found - null if not.
@@ -167,12 +176,13 @@ public class BioSQLRichSequenceHandler implements RichSequenceHandler {
         // load whole stringSequence property from Sequence
         try {
             // Build the query object
-            String queryText = "select substring(s.stringSequence,?,?) from Sequence as s where s = ?";
+            String queryText = "select substring(s.stringSequence,?,?) from Sequence as s where s.namespace = ? and s.name = ?";
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             // Set the parameters
-            query = this.setParameter.invoke(query, new Object[]{new Integer(0), new Integer(start-1)});
+            query = this.setParameter.invoke(query, new Object[]{new Integer(0), new Integer(start)});
             query = this.setParameter.invoke(query, new Object[]{new Integer(1), new Integer((end-start)+1)});
-            query = this.setParameter.invoke(query, new Object[]{new Integer(2), seq});
+            query = this.setParameter.invoke(query, new Object[]{new Integer(2), seq.getNamespace()});
+            query = this.setParameter.invoke(query, new Object[]{new Integer(3), seq.getName()});
             // Get the results
             Object result = this.uniqueResult.invoke(query, null);
             // Return the found object, if found - null if not.
@@ -187,6 +197,7 @@ public class BioSQLRichSequenceHandler implements RichSequenceHandler {
      * {@inheritDoc}
      */
     public Iterator iterator(RichSequence seq) {
+        if (seq instanceof SimpleRichSequence) return super.iterator(seq);
         return this.toList(seq).iterator();
     }
     
