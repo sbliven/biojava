@@ -210,6 +210,10 @@ RichSequence rs = RichSequence.Tools.enrich(s);</programlisting>
         </listitem>
 
         <listitem>
+          <para>RichSequenceHandler</para>
+        </listitem>
+
+        <listitem>
           <para><code>Comment</code></para>
         </listitem>
 
@@ -787,16 +791,37 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
             </row>
 
             <row>
+              <entry>void setDefaultRichSequenceHandler(RichSequenceHandler
+              rh);</entry>
+
+              <entry>Calls to <code>RichSequence</code> methods which
+              reference sequence data will delegate to this handler to carry
+              the requests out. The default implementation is a
+              <code>DummyRichSequenceHandler</code>, which just uses the
+              internal <code>SymbolList</code> of the
+              <code>RichSequence</code> to look up the data. When this is set
+              to a <code>BioSQLRichSequenceHandler</code>, the handler will go
+              to the database to look up the information instead of keeping an
+              in-memory copy of it.</entry>
+            </row>
+
+            <row>
+              <entry>RichSequenceHandler
+              getDefaultRichSequenceHandler();</entry>
+
+              <entry>Returns the default rich sequence handler.</entry>
+            </row>
+
+            <row>
               <entry><code>void connectToBioSQL(Object
               session);</code></entry>
 
-              <entry>Instantiates <code>BioSQLCrossReferenceResolver</code>
-              and <code>BioSQLRichObjectBuilder</code> using the Hibernate
-              session object provided, and sets these two objects as the
-              default <code>RichObjectBuilder</code> and
-              <code>CrossReferenceResolver</code> instances. After this call,
-              the factory will try to look up all object requests in the
-              underlying database first.</entry>
+              <entry>Instantiates <code>BioSQLCrossReferenceResolver</code>,
+              <code>BioSQLRichObjectBuilder</code> and
+              <code>BioSQLRichSequenceHandler</code> using the Hibernate
+              session object provided, and sets these objects as the default
+              instances. After this call, the factory will try to look up all
+              object requests in the underlying database first.</entry>
             </row>
           </tbody>
         </tgroup>
@@ -816,7 +841,10 @@ RichObjectFactory.setRichObjectBuilder(builder); // make the factory use it from
       <code>AveragePositionResolver</code>.</para>
 
       <para>The default cross reference resolver is
-      <code>SimpleCrossReferenceResolver</code>.</para>
+      <code>DummyCrossReferenceResolver</code>.</para>
+
+      <para>The default rich sequence handler is
+      <code>DummyRichSequenceHandler</code>.</para>
     </section>
   </chapter>
 
@@ -4072,11 +4100,19 @@ List taxons = q.list();  // taxons will now contain all matching taxon objects</
             </row>
 
             <row>
-              <entry>biosequence</entry>
+              <entry>biosequence (including the sequence data)</entry>
 
               <entry>Sequence</entry>
 
               <entry><code>SimpleRichSequence</code></entry>
+            </row>
+
+            <row>
+              <entry>biosequence (excluding the sequence data)</entry>
+
+              <entry>ThinSequence</entry>
+
+              <entry>ThinRichSequence</entry>
             </row>
 
             <row>
@@ -4444,8 +4480,8 @@ try {
         all the sequences in each namespace, whether they be
         <code>BioEntry</code> or <code>RichSequence</code> instances. If it
         finds any sequences where the name is equal to 'bloggs', it changes
-        their description to "XYZ". It then commits any changes it has made and
-        exits.</para>
+        their description to "XYZ". It then commits any changes it has made
+        and exits.</para>
 
         <para>This example shows just how easy it is to read and write to the
         database. No SQL required!</para>
@@ -4809,7 +4845,41 @@ try {
       implementations, you should use <code>BioSQLFeatureFilter</code>
       wherever possible in order to optimise the first (faster) step of this
       process and remove as much work as possible from the second (slower)
-      step. </para>
+      step.</para>
+    </section>
+
+    <section>
+      <title><code>ThinSequence</code>s and <code>Feature</code>s</title>
+
+      <para>Usually when you access <code>Feature</code> objects, you aren't
+      interested in the entire sequence data for the sequence the feature
+      belongs to. BioJavaX will therefore only load a
+      <code>ThinRichSequence</code> to represent the <code>Feature</code>'s
+      parent sequence if you load the <code>Feature</code> separately (eg.
+      through the <code>FeatureFilter</code> mechanism). The
+      <code>ThinSequence</code> loads sequence data direct from the database
+      every time it is asked for it, and only loads the portion that was
+      requested. Sequence data is not cached, so they are very
+      memory-efficient if not a little slower to work with. If you wish to
+      edit the parent sequence of a <code>Feature</code>, you must first
+      directly load from the database yourself the true
+      <code>SimpleRichSequence</code> object and edit that instead.</para>
+
+      <para>To load the full <code>SimpleRichSequence</code> version of a
+      <code>ThinRichSequence</code>, the following simple call will
+      work:</para>
+
+      <para><programlisting>RichSequence simpleSeq = db.fullyLoadRichSequence(thinSeq); // where db is an instance of BioSQLRichSequenceDB</programlisting></para>
+
+      <para>This two-level sequence loading is made possible by the
+      <code>RichSequenceHandler</code>, which is used by
+      <code>RichSequence</code> implementations to load sequence data on
+      demand. The default implementation is the
+      <code>DummyRichSequenceHandler</code>, which simply passes all calls on
+      to the internal <code>SymbolList</code> inside each
+      <code>RichSequence</code> object. By changing this to a
+      <code>BioSQLRichSequenceHandler</code>, calls are converted into HQL
+      statements and executed against the database instead.</para>
     </section>
   </chapter>
 
