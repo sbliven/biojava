@@ -157,9 +157,9 @@ public class GenbankRichSequenceDB extends AbstractRichSequenceDB implements Ric
         } catch (IOException e) {
             throw new BioException("IO failure whilst reading from Genbank",e);
         }
-    }
+    }    
     
-     /**
+    /**     
      * Given the appropriate Genbank ID, return the matching RichSequence object. Additionally
      * define a new Namespace for the received RichSequence object.
      * @param id the Genbank ID to retrieve.

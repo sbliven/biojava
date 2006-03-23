@@ -75,6 +75,7 @@ import org.biojavax.utils.StringTools;
  * org.biojava.bio.seq.io.EmblLikeFormat object.
  *
  * @author Richard Holland
+ * @author Jolyon Holdstock
  */
 public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     
@@ -118,16 +119,16 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     // the date pattern
     // date (Rel. N, Created)
     // date (Rel. N, Last updated, Version 10)
-    protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)\\d]+)\\d*\\)$");
+    protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s*(\\(Rel\\.\\s+(\\d+), ([^\\)\\d]+)\\d*\\))?$");
     // locus line
-    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+standard;\\s+(circular)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$");
+    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+standard;\\s+(circular)?\\s*(genomic)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$");
     // version line
     protected static final Pattern vp = Pattern.compile("^(\\S+?)\\.(\\d+)$");
     // reference position line
-    protected static final Pattern rpp = Pattern.compile("^(\\d+)(-(\\d+))?$");
+    protected static final Pattern rpp = Pattern.compile("^(\\d+)(-(\\d+))?,?(\\s\\d+-\\d+,?)*$");
     // dbxref line
     protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
-
+    
     protected static final Pattern readableFileNames = Pattern.compile(".*\\u002e(em|dat).*");
     protected static final Pattern headerLine = Pattern.compile("^ID.*");
     
@@ -136,6 +137,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public static class Terms extends RichSequence.Terms {
         private static ComparableTerm EMBL_TERM = null;
+        private static ComparableTerm GENOMIC_TERM = null;
+        private static ComparableTerm VERSION_LINE_TERM = null;
         
         /**
          * Getter for the EMBL term
@@ -145,6 +148,24 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             if (EMBL_TERM==null) EMBL_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBL");
             return EMBL_TERM;
         }
+        
+        /**
+         * Getter for the Ensembl-specific 'genomic' term
+         * @return The genomic Term
+         */
+        public static ComparableTerm getGenomicTerm() {
+            if (GENOMIC_TERM==null) GENOMIC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("genomic");
+            return GENOMIC_TERM;
+        }
+        
+        /**
+         * Getter for the Ensembl-specific 'versionLine' term
+         * @return The version line Term
+         */
+        public static ComparableTerm getVersionLineTerm() {
+            if (VERSION_LINE_TERM==null) VERSION_LINE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("versionLine");
+            return VERSION_LINE_TERM;
+        }
     }
     
     /**
@@ -153,7 +174,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      * the EMBL format for the ID line.
      */
     public boolean canRead(File file) throws IOException {
-        if (readableFileNames.matcher(file.getName()).matches()) return true;        
+        if (readableFileNames.matcher(file.getName()).matches()) return true;
         BufferedReader br = new BufferedReader(new FileReader(file));
         String firstLine = br.readLine();
         boolean readable = headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
@@ -218,8 +239,12 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 Matcher m = lp.matcher(loc);
                 if (m.matches()) {
                     rlistener.setName(m.group(1));
-                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
-                    rlistener.setDivision(m.group(4));
+                    if (m.group(3)!=null) {
+                        // add annotation for 'genomic' (Ensembl-specific term)
+                        rlistener.addSequenceProperty(Terms.getGenomicTerm(),null);
+                    }
+                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(4));
+                    rlistener.setDivision(m.group(5));
                     // Optional extras
                     String circular = m.group(2);
                     if (circular!=null) rlistener.setCircular(true);
@@ -276,7 +301,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     }
                     rlistener.setVersion(Integer.parseInt(m.group(2)));
                 } else {
-                    throw new ParseException("Bad version line found: "+ver);
+                    rlistener.addSequenceProperty(Terms.getVersionLineTerm(),ver);
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String val = ((String[])section.get(0))[1];
@@ -344,7 +369,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     }
                     if (key.equals(REFERENCE_XREF_TAG)) {
                         // database_identifier; primary_identifier.
-                        String[] refs = val.split("\\.");
+                        String[] refs = val.split("\\.(\\s+|$)");
                         for (int j = 0 ; j < refs.length; j++) {
                             if (refs[j].trim().length()==0) continue;
                             String[] parts = refs[j].split(";");
@@ -591,7 +616,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                                     String[] parts = line.split("=");
                                     currentTag = parts[0];
                                     currentVal = new StringBuffer();
-                                    currentVal.append(parts[1]);
+                                    if (parts.length>1) currentVal.append(parts[1]);
                                 } else {
                                     // case 3 : ...."
                                     currentVal.append("\n");
@@ -719,6 +744,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         String crel = null;
         String urel = null;
         String organelle = null;
+        String versionLine = null;
+        boolean genomic = false;
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
@@ -727,6 +754,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
+            else if (n.getTerm().equals(Terms.getVersionLineTerm())) versionLine=n.getValue();
+            else if (n.getTerm().equals(Terms.getGenomicTerm())) genomic = true;
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                 accessions.append(" ");
                 accessions.append(n.getValue());
@@ -739,6 +768,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         locusLine.append(StringTools.rightPad(rs.getName(),9));
         locusLine.append(" standard; ");
         locusLine.append(rs.getCircular()?"circular ":"");
+        // if it is Ensembl genomic, add that in too
+        if (genomic==true) locusLine.append("genomic ");
         locusLine.append(moltype);
         locusLine.append("; ");
         locusLine.append(rs.getDivision()==null?"":rs.getDivision());
@@ -753,7 +784,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // version line
-        StringTools.writeKeyValueLine(VERSION_TAG, accession+"."+rs.getVersion(), 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
+        if (versionLine!=null) StringTools.writeKeyValueLine(VERSION_TAG, versionLine, 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
+        else StringTools.writeKeyValueLine(VERSION_TAG, accession+"."+rs.getVersion(), 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // date line

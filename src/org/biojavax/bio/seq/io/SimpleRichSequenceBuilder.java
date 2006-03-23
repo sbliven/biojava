@@ -368,9 +368,11 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
      */
     public void addSequenceProperty(Object key, Object value) throws ParseException {
         if (!(key instanceof ComparableTerm)) key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
-        if (!(value instanceof String)) value = value.toString();
+        if (value!=null && !(value instanceof String)) value = value.toString();
         try {
-            Note n = new SimpleNote((ComparableTerm)key,(String)value,this.seqPropCount++);
+            Note n;
+            if (value==null) n = new SimpleNote((ComparableTerm)key,null,this.seqPropCount++);
+            else n = new SimpleNote((ComparableTerm)key,(String)value,this.seqPropCount++);
             this.notes.addNote(n);
         } catch (ChangeVetoException e) {
             throw new ParseException(e);
