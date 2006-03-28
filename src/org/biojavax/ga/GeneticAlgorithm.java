@@ -22,12 +22,14 @@
 
 package org.biojavax.ga;
 
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 import org.biojavax.ga.functions.CrossOverFunction;
-import org.biojavax.ga.functions.SelectionFunction;
 import org.biojavax.ga.functions.MutationFunction;
+import org.biojavax.ga.functions.SelectionFunction;
 
 /**
  * The class that runs the cycles of reproduction, evolution and

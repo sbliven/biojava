@@ -20,12 +20,6 @@
  */
 package org.biojava.bio.alignment;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,16 +28,13 @@ import java.util.NoSuchElementException;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
-import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
-import org.biojava.bio.seq.io.SeqIOTools;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
@@ -62,6 +53,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
   * if the computer needs to swap.
   *
   * @author Andreas Dr&auml;ger
+  * @since 1.5
   */
 
 public class NeedlemanWunsch extends SequenceAlignment
@@ -73,44 +65,6 @@ public class NeedlemanWunsch extends SequenceAlignment
   protected Alignment pairalign;
   protected String alignment;
   private double insert, delete, gapExt, match, replace;
-
-  
-  /** Just for some tests.
-    * @param args
-    */
-  public static void main (String args[])
-  {
-    if (args.length < 3)
-      throw new Error("Usage: NeedlemanWunsch sourceSeqFile targetSeqFile substitutionMatrixFile");
-    try {
-      FiniteAlphabet alphabet = (FiniteAlphabet) AlphabetManager.alphabetForName("DNA");
-      SubstitutionMatrix matrix = new SubstitutionMatrix(alphabet, new File(args[2]));
-      SequenceAlignment aligner = new NeedlemanWunsch( 
-			alphabet, 
-			2,  	// insert
-			2,	// delete
-			1, 	// gapExtend
-			0, 	// match
-			3,	// replace
-			matrix 	// SubstitutionMatrix
-		);
-      aligner.alignAll(
-        // sources
-	SeqIOTools.readFastaDNA(new BufferedReader(new FileReader(args[0]))),
-	// sequenceDB
-	SeqIOTools.readFasta(new FileInputStream(new File(args[1])), DNATools.getDNA()));
-    } catch (NoSuchElementException exc) {
-      exc.printStackTrace();
-    } catch (FileNotFoundException exc) {
-      exc.printStackTrace();
-    } catch (BioException exc) {
-      exc.printStackTrace();
-    } catch (IOException exc) {
-      exc.printStackTrace();
-    } catch (Exception exc) {
-      exc.printStackTrace();
-    }
-  }
 
   /** Constructs a new Object with the given parameters based on the Needleman-Wunsch algorithm
     * @param alpha The alphabet of the sequences to be aligned by this class.

@@ -277,7 +277,7 @@ public class ChangeSupport {
    */
   public void firePreChangeEvent(ChangeEvent ce)
   throws ChangeVetoException {
-    assert Thread.holdsLock(this)
+     assert Thread.holdsLock(this)
             : "firePreChangeEvent must be called in a synchronized block locking the ChangeSupport";
     boolean needToReap = false;
 

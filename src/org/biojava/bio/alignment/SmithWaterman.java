@@ -1,5 +1,21 @@
 /*
- * Created on 05.09.2005
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
  *
  */
 package org.biojava.bio.alignment;
@@ -7,7 +23,6 @@ package org.biojava.bio.alignment;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -23,6 +38,10 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 
+/*
+ * Created on 05.09.2005
+ *
+ */
 
 /** Smith and Waterman developed an efficient dynamic programing algorithm
   * to perform local sequence alignments, which returns the most conserved
@@ -34,6 +53,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
   * the runtime if swaping is performed.
   * 
   * @author Andreas Dr&auml;ger
+  * @since 1.5
   */
 public class SmithWaterman extends NeedlemanWunsch
 {
