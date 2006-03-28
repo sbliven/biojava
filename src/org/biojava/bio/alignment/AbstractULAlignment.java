@@ -115,7 +115,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
             if (leftMost == null){
                 leftMost = label;
                 leftLoc= loc;
-                loc = loc;
+                //loc = loc;
             }
             if (loc.getMin() < leftLoc.getMin()){
                 leftMost = label;
@@ -144,7 +144,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
             if (rightMost == null){
                 rightMost = label;
                 rightLoc= loc;
-                loc= loc;
+                //loc= loc;
             }
             if (loc.getMin() > rightLoc.getMin()){
                 rightMost = label;
