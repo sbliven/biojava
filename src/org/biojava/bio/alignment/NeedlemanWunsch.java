@@ -81,17 +81,88 @@ public class NeedlemanWunsch extends SequenceAlignment
     */
   public NeedlemanWunsch(FiniteAlphabet alpha, double insert, double delete, double gapExtend, double match, double replace, SubstitutionMatrix subMat)
   {
-    this.alpha = alpha;
+    this.alpha     = alpha;
     this.subMatrix = subMat;
-    this.alpha = subMatrix.getAlphabet();
-    this.insert = insert;
-    this.delete = delete;
-    this.gapExt = gapExtend;  
-    this.match  = match;
-    this.replace = replace;
+    this.alpha     = subMatrix.getAlphabet();
+    this.insert    = insert;
+    this.delete    = delete;
+    this.gapExt    = gapExtend;  
+    this.match     = match;
+    this.replace   = replace;
     this.alignment = "";
   }
 
+  
+  /** Sets the penalty for an insert operation to the specified value.
+    * @param ins costs for a single insert operation
+    */
+  public void setInsert(double ins) {
+  	this.insert = ins;
+  }
+  
+  /** Sets the penalty for a delete operation to the specified value. 
+    * @param del costs for a single deletion operation
+    */
+  public void setDelete(double del) {
+  	this.delete = del;
+  }
+  
+  /** Sets the penalty for an extension of any gap (insert or delete) to the 
+    * specified value. 
+    * @param del costs for any gap extension
+    */
+  public void setGapExt(double ge) {
+  	this.gapExt = ge;
+  }
+  
+  /** Sets the penalty for a match operation to the specified value. 
+    * @param del costs for a single match operation
+    */
+  public void setMatch(double ma) {
+  	this.match = ma;
+  }
+  
+  /** Sets the penalty for a replace operation to the specified value. 
+    * @param del costs for a single replace operation
+    */
+  public void setReplace(double rep) {
+  	this.replace = rep;
+  }
+  
+  /** Returns the current expenses of a single insert operation. 
+    * @return insert
+    */
+  public double getInsert() {
+  	return insert;
+  }
+  
+  /** Returns the current expenses of a single delete operation. 
+    * @return delete
+    */
+  public double getDelete() {
+  	return delete;
+  }
+  
+  /** Returns the current expenses of any extension of a gap operation. 
+    * @return gapExt
+    */
+  public double getGapExt() {
+  	return gapExt;
+  }
+  
+  /** Returns the current expenses of a single match operation. 
+    * @return match
+    */
+  public double getMatch() {
+  	return match;
+  }
+  
+  /** Returns the current expenses of a single replace operation. 
+    * @return replace
+    */
+  public double getReplace() {
+  	return replace;
+  }
   
   /** Prints a String representation of the CostMatrix for the given Alignment on the screen.
     * This can be used to get a better understanding of the algorithm. There is no other purpose.
@@ -122,7 +193,8 @@ public class NeedlemanWunsch extends SequenceAlignment
 
   
   /** prints the alignment String on the screen (standard output).
-    * @param align The parameter is typically given by the {@link #getAlignmentString() getAlignmentString()} method.
+    * @param align The parameter is typically given by the 
+    *   {@link #getAlignmentString() getAlignmentString()} method.
     */
   public static void printAlignment(String align)
   { 
