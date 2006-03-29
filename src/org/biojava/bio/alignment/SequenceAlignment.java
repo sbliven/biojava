@@ -20,7 +20,7 @@
  */
 
 /*
- * Created on 03.08.2005
+ * Created on 2005-08-03
  *
  */
 package org.biojava.bio.alignment;
@@ -123,7 +123,7 @@ public abstract class SequenceAlignment
        if ((align[1].charAt(i) != '-') && (align[1].charAt(i) != '~')) j++;
      }
      output +=                                         align[0].substring(0, currline) + " " + k; 
-     output += " \n\t"        + space                + path.substring(0, currline);
+     output += " \n        "  + space                + path.substring(0, currline);
      output += " \nTarget:\t" + jspace + (l+1) + " " + align[1].substring(0, currline) + " " + j + " \n";
    
      for (; currline+60 < path.length(); currline+=60) {
@@ -137,7 +137,7 @@ public abstract class SequenceAlignment
          if ((align[1].charAt(i) != '-') && (align[1].charAt(i) != '~')) j++;
        }
        output +=                                     align[0].substring(currline, currline+60) + " " + k;
-       output += " \n\t"        + space            + path.substring(currline, currline+60);
+       output += " \n        "  + space            + path.substring(currline, currline+60);
        output += " \nTarget:\t" + jspace + l + " " + align[1].substring(currline, currline+60) + " " + j + " \n";
      }
      align[0] += " " + queryEnd;
@@ -147,7 +147,7 @@ public abstract class SequenceAlignment
       for (int n= new Integer(k).toString().length()-1; n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) kspace += " ";
       for (int n= new Integer(j).toString().length()-1; n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) jspace += " ";
       output += " \nQuery:\t" + kspace + Math.min(k+1, queryEnd) + " " + align[0].substring(currline, align[0].length());
-      output += " \n\t"  + space        + path.substring(currline, path.length());
+      output += " \n        " + space  + path.substring(currline, path.length());
       output += " \nTarget:\t"+ jspace + Math.min(j+1, targetEnd) + " " + align[1].substring(currline, align[1].length())+"\n";
     }
 
