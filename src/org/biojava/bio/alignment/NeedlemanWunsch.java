@@ -78,8 +78,16 @@ public class NeedlemanWunsch extends SequenceAlignment
     * @param replace This is like the match parameter just the default, if there is no entry in the
     *       substitution matrix object.
     * @param subMat The substitution matrix object which gives the costs for matches and replaces.
+    * @deprecated Use the other constructor.
     */
-  public NeedlemanWunsch(FiniteAlphabet alpha, double insert, double delete, double gapExtend, double match, double replace, SubstitutionMatrix subMat)
+  public NeedlemanWunsch(
+    FiniteAlphabet alpha, 
+    double insert, 
+	double delete, 
+	double gapExtend, 
+	double match, 
+	double replace, 
+	SubstitutionMatrix subMat)
   {
     this.alpha     = alpha;
     this.subMatrix = subMat;
@@ -91,7 +99,51 @@ public class NeedlemanWunsch extends SequenceAlignment
     this.replace   = replace;
     this.alignment = "";
   }
+  
+  
+  /** Constructs a new Object with the given parameters based on the Needleman-Wunsch algorithm
+   * The alphabet of sequences to be aligned will be taken from the given substitution matrix.
+   * @param match This gives the costs for a match operation. It is only used, if there is no entry
+   *       for a certain match of two symbols in the substitution matrix (default value).
+   * @param replace This is like the match parameter just the default, if there is no entry in the
+   *       substitution matrix object.
+   * @param insert The costs of a single insert operation.
+   * @param delete The expenses of a single delete operation.
+   * @param gapExtend The expenses of an extension of a existing gap (that is a previous insert or
+   *       delete. If the costs for insert and delete are equal and also equal to gapExtend, no
+   *       affine gap penalties will be used, which saves a significant amount of memory.
+   * @param subMat The substitution matrix object which gives the costs for matches and replaces.
+   */
+  public NeedlemanWunsch( 
+    double match, 
+	double replace, 
+	double insert, 
+	double delete, 
+	double gapExtend, 
+	SubstitutionMatrix subMat)
+  {
+    this.subMatrix = subMat;
+    this.alpha     = subMatrix.getAlphabet();
+    this.insert    = insert;
+    this.delete    = delete;
+    this.gapExt    = gapExtend;  
+    this.match     = match;
+    this.replace   = replace;
+    this.alignment = "";
+  }
+  
 
+  /** Sets the substitution matrix to be used to the specified one. The 
+    * alphabet will be also changed to that of the substitution matrix 
+    * so that afterwards it is only possible to align sequences of this 
+    * alphabet. 
+    *  
+    * @param matrix an instance of a substitution matrix.
+    */
+  public void setSubstitutionMatrix(SubstitutionMatrix matrix) {
+    this.subMatrix = matrix;
+    this.alpha = subMatrix.getAlphabet();
+  }
   
   /** Sets the penalty for an insert operation to the specified value.
     * @param ins costs for a single insert operation

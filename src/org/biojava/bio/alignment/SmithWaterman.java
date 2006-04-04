@@ -80,7 +80,7 @@ public class SmithWaterman extends NeedlemanWunsch
     */
   public SmithWaterman(double match, double replace, double insert, double delete, double gapExtend, SubstitutionMatrix matrix)
   {
-    super(matrix.getAlphabet(), insert, delete, gapExtend, match, replace, matrix);
+    super(insert, delete, gapExtend, match, replace, matrix);
     this.match      = -match;
     this.replace    = -replace;
     this.insert     = -insert;
@@ -90,76 +90,56 @@ public class SmithWaterman extends NeedlemanWunsch
     this.alignment  = "";
   }
   
-  /** Sets the penalty for an insert operation to the specified value.
+  /** Overrides the method inherited from the NeedlemanWunsch and 
+    * sets the penalty for an insert operation to the specified value.
+    * Reason: internaly scores are used instead of penalties so that 
+    * the value is muliplied with -1.
     * @param ins costs for a single insert operation
     */
   public void setInsert(double ins) {
   	this.insert = -ins;
   }
   
-  /** Sets the penalty for a delete operation to the specified value. 
+  /** Overrides the method inherited from the NeedlemanWunsch and 
+    * sets the penalty for a delete operation to the specified value. 
+    * Reason: internaly scores are used instead of penalties so that 
+    * the value is muliplied with -1.
     * @param del costs for a single deletion operation
     */
   public void setDelete(double del) {
   	this.delete = -del;
   }
   
-  /** Sets the penalty for an extension of any gap (insert or delete) to the 
-    * specified value. 
+  /** Overrides the method inherited from the NeedlemanWunsch and 
+    * sets the penalty for an extension of any gap (insert or delete) to the 
+    * specified value.
+    * Reason: internaly scores are used instead of penalties so that 
+    * the value is muliplied with -1. 
     * @param del costs for any gap extension
     */
   public void setGapExt(double ge) {
   	this.gapExt = -ge;
   }
   
-  /** Sets the penalty for a match operation to the specified value. 
+  /** Overrides the method inherited from the NeedlemanWunsch and 
+    * sets the penalty for a match operation to the specified value. 
+    * Reason: internaly scores are used instead of penalties so that 
+    * the value is muliplied with -1.
     * @param del costs for a single match operation
     */
   public void setMatch(double ma) {
   	this.match = -ma;
   }
   
-  /** Sets the penalty for a replace operation to the specified value. 
+  /** Overrides the method inherited from the NeedlemanWunsch and 
+    * sets the penalty for a replace operation to the specified value. 
+    * Reason: internaly scores are used instead of penalties so that 
+    * the value is muliplied with -1.
     * @param del costs for a single replace operation
     */
   public void setReplace(double rep) {
   	this.replace = -rep;
-  }
-  
-  /** Returns the current scores of a single insert operation. 
-    * @return insert
-    */
-  public double getInsert() {
-  	return insert;
-  }
-  
-  /** Returns the current scores of a single delete operation. 
-    * @return delete
-    */
-  public double getDelete() {
-  	return delete;
-  }
-  
-  /** Returns the current scores of any extension of a gap operation. 
-    * @return gapExt
-    */
-  public double getGapExt() {
-  	return gapExt;
-  }
-  
-  /** Returns the current scores of a single match operation. 
-    * @return match
-    */
-  public double getMatch() {
-  	return match;
-  }
-  
-  /** Returns the current scores of a single replace operation. 
-    * @return replace
-    */
-  public double getReplace() {
-  	return replace;
-  }
+  }  
   
 
   /** Overrides the method inherited from the NeedlemanWunsch and performs only a local alignment.
