@@ -20,21 +20,15 @@
  */
 package org.biojava.bio.alignment;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
-import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.AlphabetManager;
-import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 
@@ -151,7 +145,8 @@ public class SmithWaterman extends NeedlemanWunsch
     */
   public double pairwiseAlignment(Sequence query, Sequence subject) throws BioRuntimeException
   {    
-    if (query.getAlphabet().equals(subject.getAlphabet()) && query.getAlphabet().equals(alpha)) {
+    if (query.getAlphabet().equals(subject.getAlphabet()) && 
+        query.getAlphabet().equals(subMatrix.getAlphabet())) {
       
       long time = System.currentTimeMillis();
       int i, j, maxI = 0, maxJ = 0, queryStart = 0, targetStart = 0;
@@ -352,42 +347,5 @@ public class SmithWaterman extends NeedlemanWunsch
     if ((y > z)) return y;
     return z;
   }
-
   
-  
-  /** This is to perform some tests. The folowing parameters are used for the 
-    * alignment: match = -2, replace = 5, insert = 3, delete = 3, gap extension = 0.
-    * Only DNA alignments are performed by this method. If you wish to change anything,
-    * just write your own class to use this object.
-    * 
-    * @param args you need to specify the substitution matrix file, a query and a target sequence.
-    */
-  public static void main(String args[])
-  {
-    if (args.length < 3) 
-      throw new Error("Usage: SmithWaterman <SubstitutionMatrix> <Query-String> <Target-String>");
-    try {
-      SubstitutionMatrix m = new SubstitutionMatrix(
-        (FiniteAlphabet) AlphabetManager.alphabetForName("DNA"), 
-        new File(args[0]));
-      SmithWaterman sw = new SmithWaterman(-2, 5, 3, 3, 0, m);
-      sw.pairwiseAlignment(
-        new SimpleSequence(
-          new SimpleSymbolList(
-              m.getAlphabet().getTokenization("token"), 
-              args[1]), "", "", Annotation.EMPTY_ANNOTATION), 
-        new SimpleSequence(
-          new SimpleSymbolList(m.getAlphabet().getTokenization("token"), 
-              args[2]), "", "", Annotation.EMPTY_ANNOTATION));
-      System.out.println(sw.alignment);
-    } catch (NoSuchElementException exc) {
-      exc.printStackTrace();
-    } catch (IOException exc) {
-      exc.printStackTrace();
-    } catch (BioException exc) {
-      exc.printStackTrace();
-    } catch (Exception exc) {
-      exc.printStackTrace();
-    }
-  }
 }

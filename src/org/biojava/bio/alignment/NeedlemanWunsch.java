@@ -35,7 +35,6 @@ import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 
@@ -60,45 +59,10 @@ public class NeedlemanWunsch extends SequenceAlignment
 {
 
   protected double[][] CostMatrix;
-  protected FiniteAlphabet alpha;
   protected SubstitutionMatrix subMatrix;
   protected Alignment pairalign;
   protected String alignment;
   private double insert, delete, gapExt, match, replace;
-
-  /** Constructs a new Object with the given parameters based on the Needleman-Wunsch algorithm
-    * @param alpha The alphabet of the sequences to be aligned by this class.
-    * @param insert The costs of a single insert operation.
-    * @param delete The expenses of a single delete operation.
-    * @param gapExtend The expenses of an extension of a existing gap (that is a previous insert or
-    *       delete. If the costs for insert and delete are equal and also equal to gapExtend, no
-    *       affine gap penalties will be used, which saves a significant amount of memory.
-    * @param match This gives the costs for a match operation. It is only used, if there is no entry
-    *       for a certain match of two symbols in the substitution matrix (default value).
-    * @param replace This is like the match parameter just the default, if there is no entry in the
-    *       substitution matrix object.
-    * @param subMat The substitution matrix object which gives the costs for matches and replaces.
-    * @deprecated Use the other constructor.
-    */
-  public NeedlemanWunsch(
-    FiniteAlphabet alpha, 
-    double insert, 
-	double delete, 
-	double gapExtend, 
-	double match, 
-	double replace, 
-	SubstitutionMatrix subMat)
-  {
-    this.alpha     = alpha;
-    this.subMatrix = subMat;
-    this.alpha     = subMatrix.getAlphabet();
-    this.insert    = insert;
-    this.delete    = delete;
-    this.gapExt    = gapExtend;  
-    this.match     = match;
-    this.replace   = replace;
-    this.alignment = "";
-  }
   
   
   /** Constructs a new Object with the given parameters based on the Needleman-Wunsch algorithm
@@ -123,7 +87,6 @@ public class NeedlemanWunsch extends SequenceAlignment
 	SubstitutionMatrix subMat)
   {
     this.subMatrix = subMat;
-    this.alpha     = subMatrix.getAlphabet();
     this.insert    = insert;
     this.delete    = delete;
     this.gapExt    = gapExtend;  
@@ -133,16 +96,14 @@ public class NeedlemanWunsch extends SequenceAlignment
   }
   
 
-  /** Sets the substitution matrix to be used to the specified one. The 
-    * alphabet will be also changed to that of the substitution matrix 
-    * so that afterwards it is only possible to align sequences of this 
-    * alphabet. 
+  /** Sets the substitution matrix to be used to the specified one. 
+    * Afterwards it is only possible to align sequences of the alphabet
+    * of this substitution matrix. 
     *  
     * @param matrix an instance of a substitution matrix.
     */
   public void setSubstitutionMatrix(SubstitutionMatrix matrix) {
     this.subMatrix = matrix;
-    this.alpha = subMatrix.getAlphabet();
   }
   
   /** Sets the penalty for an insert operation to the specified value.
@@ -330,7 +291,7 @@ public class NeedlemanWunsch extends SequenceAlignment
     */
   public double pairwiseAlignment(Sequence query, Sequence subject) throws BioRuntimeException
   {
-    if (query.getAlphabet().equals(subject.getAlphabet()) && query.getAlphabet().equals(alpha)) {
+    if (query.getAlphabet().equals(subject.getAlphabet()) && query.getAlphabet().equals(subMatrix.getAlphabet())) {
     
       long time = System.currentTimeMillis();
       int   i, j;
@@ -410,7 +371,7 @@ public class NeedlemanWunsch extends SequenceAlignment
       String path = "";//*/
         
       j = this.CostMatrix[CostMatrix.length - 1].length -1;
-      SymbolTokenization st = alpha.getTokenization("default");
+      SymbolTokenization st = subMatrix.getAlphabet().getTokenization("default");
 
        for (i = this.CostMatrix.length - 1; i>0; )
        {
