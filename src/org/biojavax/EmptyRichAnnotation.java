@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import org.biojava.bio.Annotation;
+
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.StaticMemberPlaceHolder;
 import org.biojava.utils.Unchangeable;

@@ -21,7 +21,6 @@
 
 package org.biojavax;
 
-import org.biojavax.bio.BioEntry;
 
 /**
  * A simple ranked comment designed to be used for BioEntry comments 
