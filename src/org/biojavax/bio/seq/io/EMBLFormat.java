@@ -267,8 +267,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 Matcher dm = dp.matcher(chunk);
                 if (dm.matches()) {
                     String date = dm.group(1);
-                    String rel = dm.group(4);
-                    String type = dm.group(5);
+                    String rel = dm.group(3);
+                    String type = dm.group(4);
                     if (type.equals("Created")) {
                         rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelCreatedTerm(), rel);
