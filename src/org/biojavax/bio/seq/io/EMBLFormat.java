@@ -118,7 +118,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     
     // the date pattern
     // date (Rel. N, Created)
-    // date (Rel. N, Last updated, Version 10)
+    // date (Rel. N, Last updated, Version M)
     protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s*(\\(Rel\\.\\s+(\\d+), ([^\\)\\d]+)\\d*\\))?$");
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+standard;\\s+(circular)?\\s*(genomic)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$");
@@ -267,8 +267,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 Matcher dm = dp.matcher(chunk);
                 if (dm.matches()) {
                     String date = dm.group(1);
-                    String rel = dm.group(2);
-                    String type = dm.group(3);
+                    String rel = dm.group(4);
+                    String type = dm.group(5);
                     if (type.equals("Created")) {
                         rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelCreatedTerm(), rel);
