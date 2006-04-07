@@ -92,11 +92,7 @@ public class StringTools {
         StringBuffer b = new StringBuffer();
         b.append(input);
         while(b.length()<totalWidth)
-          try {
             b.append(padChar); // yuck!
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
         return b.toString();
     }
     
