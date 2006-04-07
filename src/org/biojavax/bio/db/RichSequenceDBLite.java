@@ -22,10 +22,10 @@
 package org.biojavax.bio.db;
 
 import java.util.Set;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.db.SequenceDBLite;
-import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.seq.RichSequence;
 

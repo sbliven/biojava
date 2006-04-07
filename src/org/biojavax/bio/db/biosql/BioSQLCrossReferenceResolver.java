@@ -21,16 +21,16 @@
 
 package org.biojavax.bio.db.biosql;
 import java.lang.reflect.Method;
-import java.util.Iterator;
+
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojavax.CrossRef;
 import org.biojavax.CrossReferenceResolver;
 import org.biojavax.Namespace;
-import org.biojavax.bio.BioEntry;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.SimpleNamespace;
+import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.seq.InfinitelyAmbiguousSymbolList;
 import org.biojavax.bio.seq.RichSequence;
 

@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.IDMaker;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.utils.ChangeEvent;

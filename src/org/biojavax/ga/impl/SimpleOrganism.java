@@ -20,9 +20,9 @@
  */
 
 package org.biojavax.ga.impl;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ga.Organism;
 
 /**

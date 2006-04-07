@@ -23,7 +23,7 @@ package org.biojavax.bio.taxa.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Iterator;
+
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.RichObjectFactory;

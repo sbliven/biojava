@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.RNATools;
@@ -43,9 +44,8 @@ import org.biojavax.CrossRef;
 import org.biojavax.CrossReferenceResolver;
 import org.biojavax.Namespace;
 import org.biojavax.RichAnnotation;
-import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.RichObjectFactory;
-import org.biojavax.bio.seq.RichLocation.Strand;
+import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.ontology.ComparableTerm;
 
 /**

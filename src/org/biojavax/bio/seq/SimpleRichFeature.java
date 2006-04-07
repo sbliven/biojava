@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
@@ -33,7 +34,6 @@ import org.biojava.bio.seq.FilterUtils;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.ontology.InvalidTermException;
@@ -44,8 +44,8 @@ import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RichAnnotation;
-import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.ontology.ComparableTerm;
 
 /**

@@ -21,6 +21,7 @@
 
 package org.biojavax.utils;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +91,12 @@ public class StringTools {
     public static String rightPad(String input, char padChar, int totalWidth) {
         StringBuffer b = new StringBuffer();
         b.append(input);
-        while(b.length()<totalWidth) b.append(padChar); // yuck!
+        while(b.length()<totalWidth)
+          try {
+            b.append(padChar); // yuck!
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         return b.toString();
     }
     

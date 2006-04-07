@@ -20,8 +20,7 @@
  */
 
 package org.biojavax.bio.db;
-import org.biojava.bio.seq.FeatureFilter;
-import org.biojava.bio.seq.FeatureHolder;
+
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojavax.bio.seq.RichSequenceIterator;

@@ -23,6 +23,7 @@ package org.biojavax.bio.seq;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.biojava.bio.Annotation;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SymbolList;
@@ -31,7 +32,6 @@ import org.biojava.utils.Unchangeable;
 import org.biojavax.CrossRef;
 import org.biojavax.CrossReferenceResolver;
 import org.biojavax.RichAnnotation;
-import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.ontology.ComparableTerm;
 
 /**

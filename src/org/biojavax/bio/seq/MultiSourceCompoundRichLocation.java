@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
-import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
