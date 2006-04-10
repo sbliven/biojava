@@ -241,7 +241,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     public Ontology getOntology() { return this.ontology; }
     
     // Hibernate requirement - not for public use.
-    private void setOntology(ComparableOntology descriptors) { this.ontology = ontology; }
+    private void setOntology(ComparableOntology ontology) { this.ontology = ontology; }
     
     /**
      * {@inheritDoc}
