@@ -19,13 +19,9 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.io.*;
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.*;
+import java.io.FilterWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Write XML PCDATA using entity substitutions.

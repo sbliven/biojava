@@ -21,17 +21,11 @@
 
 package org.biojava.bio.seq.distributed;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
-import org.biojava.bio.BioRuntimeException;
-import org.biojava.bio.seq.FeatureFilter;
-import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.MergeFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.AbstractSequenceDB;
 import org.biojava.bio.seq.db.IllegalIDException;

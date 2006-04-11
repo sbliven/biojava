@@ -31,7 +31,6 @@ import org.biojava.bio.MergeAnnotation;
 import org.biojava.bio.seq.ComponentFeature;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.seq.projection.ReparentContext;
 import org.biojava.utils.ChangeVetoException;
 

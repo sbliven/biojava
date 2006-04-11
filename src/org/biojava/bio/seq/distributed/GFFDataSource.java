@@ -22,11 +22,11 @@
 package org.biojava.bio.seq.distributed;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Set;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
@@ -36,7 +36,6 @@ import org.biojava.bio.program.gff.GFFRecord;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.FilterUtils;
 import org.biojava.bio.seq.MergeFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.impl.SimpleSequence;

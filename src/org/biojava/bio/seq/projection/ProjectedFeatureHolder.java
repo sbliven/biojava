@@ -25,12 +25,13 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.projection.*;
 import org.biojava.bio.seq.AbstractFeatureHolder;
-import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
-import org.biojava.utils.*;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Helper class for projecting Feature objects into an alternative
