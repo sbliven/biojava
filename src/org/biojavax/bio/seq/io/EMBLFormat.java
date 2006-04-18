@@ -605,18 +605,27 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             //                                          ......"
                             line = line.substring(5); // chomp off "FT   "
                             if (!line.startsWith(" ")) {
+                                // dump current tag if exists
+                                if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                                 // case 1 : word value - splits into key-value on its own
-                                section.add(line.split("\\s+"));
+                                String[] parts = line.split("\\s+");
+                                currentTag = parts[0];
+                                currentVal = new StringBuffer();
+                                currentVal.append(parts[1]);
                             } else {
                                 line = line.trim();
                                 if (line.startsWith("/")) {
                                     // dump current tag if exists
                                     if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                                     // case 2 : /word[=.....]
-                                    String[] parts = line.split("=");
-                                    currentTag = parts[0];
                                     currentVal = new StringBuffer();
-                                    if (parts.length>1) currentVal.append(parts[1]);
+                                    int equalIndex = line.indexOf('=');
+                                    if (equalIndex>=0) {
+                                        currentTag = line.substring(0, equalIndex);
+                                        currentVal.append(line.substring(equalIndex+1));
+                                    } else {
+                                        currentTag = line;
+                                    }
                                 } else {
                                     // case 3 : ...."
                                     currentVal.append("\n");
@@ -625,6 +634,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             }
                         }
                     }
+                    // dump current tag if exists
+                    if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                 }
                 // READ END OF SEQUENCE
                 else if (token.equals(END_SEQUENCE_TAG)) {

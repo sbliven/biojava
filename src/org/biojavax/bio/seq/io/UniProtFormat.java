@@ -507,7 +507,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         else {
                             // should never happen - but here just in case
                             rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
-                        }    
+                        }
                     } else {
                         // new feature!
                         // end previous feature
@@ -667,10 +667,14 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                                     // dump current tag if exists
                                     if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                                     // case 3 : /word=.....
-                                    String[] parts = line.split("=");
-                                    currentTag = parts[0].trim();
                                     currentVal = new StringBuffer();
-                                    currentVal.append(parts[1]);
+                                    int equalIndex = line.indexOf('=');
+                                    if (equalIndex>=0) {
+                                        currentTag = line.substring(0, equalIndex);
+                                        currentVal.append(line.substring(equalIndex+1));
+                                    } else {
+                                        currentTag = line;
+                                    }
                                 } else {
                                     // case 2 : ...."
                                     currentVal.append("\n");
@@ -679,6 +683,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             }
                         }
                     }
+                    // dump current tag if exists
+                    if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                 }
                 // READ DOCREF
                 else if (token.equals(DATABASE_XREF_TAG)) {
