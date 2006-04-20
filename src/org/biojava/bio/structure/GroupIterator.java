@@ -25,8 +25,9 @@
 package org.biojava.bio.structure;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.ArrayList ;
+
 
 /** an iterator over all groups of a structure.
  * @author Andreas Prlic
@@ -94,7 +95,7 @@ public class GroupIterator implements Iterator {
 	    return false;
 	}
 	
-	ArrayList model = (ArrayList) structure.getModel(tmp_model);
+	List model =  structure.getModel(tmp_model);
 	
 	if ( tmp_chain >= model.size() ){
 	    return hasSubGroup(tmp_model+1,0,0);
@@ -135,7 +136,7 @@ public class GroupIterator implements Iterator {
 	    throw new NoSuchElementException("arrived at end of structure!");
 	}
 	
-	ArrayList model = (ArrayList) structure.getModel(tmp_model);
+	List model = structure.getModel(tmp_model);
 	
 	if ( tmp_chain >= model.size() ){
 	    return getNextGroup(tmp_model+1,0,0);
