@@ -72,6 +72,14 @@ public interface Chain {
      */
     public Group getGroupByPDB(String pdbresnum) throws StructureException;
     
+    /** get all groups that are located between two PDB residue numbers
+     * 
+     * @param pdbresnumStart PDB residue number of start
+     * @param pdbresnumEnd PDB residue number of end
+     * @return Groups in between. or throws a StructureException if either start or end can not be found,
+     */
+    public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) throws StructureException;
+
     
     /** get total length of chain, including HETATMs..
      * @return an int representing the length of the whole chain including HETATMs

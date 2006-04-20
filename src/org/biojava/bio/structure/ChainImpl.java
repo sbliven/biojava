@@ -26,6 +26,7 @@ package org.biojava.bio.structure;
 
 import java.util.ArrayList ;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.AminoAcid;
@@ -171,6 +172,44 @@ public class ChainImpl implements Chain {
       }
         
     }
+    
+    public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) 
+    throws StructureException {
+
+    List retlst = new ArrayList();
+    
+    Iterator iter = groups.iterator();
+    boolean adding = false;
+    boolean foundStart = false;
+    
+    while ( iter.hasNext()){
+        Group g = (Group) iter.next();
+        if ( g.getPDBCode().equals(pdbresnumStart)) {
+            adding = true;
+            foundStart = true;
+        }
+        
+        if ( adding)
+            retlst.add(g);
+        
+        if ( g.getPDBCode().equals(pdbresnumEnd)) {
+            if ( ! adding)
+                throw new StructureException("did not find start PDB residue number " + pdbresnumStart + " in chain " + name);
+            adding = false;
+            break;
+        }
+    }
+    
+    if ( ! foundStart){
+        throw new StructureException("did not find start PDB residue number " + pdbresnumStart + " in chain " + name);
+    }
+    if ( adding) {
+        throw new StructureException("did not find end PDB residue number " + pdbresnumEnd + " in chain " + name);
+    }
+    
+    return (Group[]) retlst.toArray(new Group[retlst.size()] );
+}
+
 
 
     public int getLength() {return groups.size();  }
