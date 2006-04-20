@@ -173,6 +173,32 @@ public class SVDSuperimposer {
         }
         
         calculate(coordSet1,coordSet2);
+        
+        
+    }
+    
+    /** calculate the RMS (root mean square) of two sets of atoms
+     * 
+     * @param atomSet1
+     * @param atomSet2
+     */
+    public static double getRMS(Atom[] atomSet1, Atom[] atomSet2) throws StructureException {
+        if ( atomSet1.length != atomSet2.length ){
+            throw new StructureException("The two atom sets are not of same length!");
+        }
+        
+        double sum = 0.0;
+        for ( int i =0 ; i < atomSet1.length;i++){
+            double d = Calc.getDistance(atomSet1[i],atomSet2[i]);
+            sum += (d*d);
+            
+        }
+        
+        double avd = ( sum/ atomSet1.length);
+        //System.out.println("av dist" + avd);
+        return Math.sqrt(avd);
+        
+        
     }
     
     /** do the a ctual calculation
