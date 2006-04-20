@@ -608,7 +608,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                                 // dump current tag if exists
                                 if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                                 // case 1 : word value - splits into key-value on its own
-                                String[] parts = line.split("\\s+");
+                                String[] parts = line.trim().split("\\s+");
                                 currentTag = parts[0];
                                 currentVal = new StringBuffer();
                                 currentVal.append(parts[1]);
@@ -634,8 +634,6 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             }
                         }
                     }
-                    // dump current tag if exists
-                    if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                 }
                 // READ END OF SEQUENCE
                 else if (token.equals(END_SEQUENCE_TAG)) {

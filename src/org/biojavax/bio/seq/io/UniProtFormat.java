@@ -660,7 +660,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                                 // case 1 : word value - splits into key-value based on first 8 chars
                                 currentTag = line.substring(0,8).trim();
                                 currentVal = new StringBuffer();
-                                currentVal.append(line.substring(8));
+                                currentVal.append(line.substring(8).trim());
                             } else {
                                 line = line.trim();
                                 if (line.startsWith("/")) {
@@ -683,8 +683,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             }
                         }
                     }
-                    // dump current tag if exists
-                    if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                 }
                 // READ DOCREF
                 else if (token.equals(DATABASE_XREF_TAG)) {
