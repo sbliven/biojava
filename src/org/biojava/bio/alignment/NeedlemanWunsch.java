@@ -122,21 +122,21 @@ public class NeedlemanWunsch extends SequenceAlignment
   
   /** Sets the penalty for an extension of any gap (insert or delete) to the 
     * specified value. 
-    * @param del costs for any gap extension
+    * @param ge costs for any gap extension
     */
   public void setGapExt(double ge) {
   	this.gapExt = ge;
   }
   
   /** Sets the penalty for a match operation to the specified value. 
-    * @param del costs for a single match operation
+    * @param ma costs for a single match operation
     */
   public void setMatch(double ma) {
   	this.match = ma;
   }
   
   /** Sets the penalty for a replace operation to the specified value. 
-    * @param del costs for a single replace operation
+    * @param rep costs for a single replace operation
     */
   public void setReplace(double rep) {
   	this.replace = rep;

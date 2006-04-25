@@ -109,7 +109,7 @@ public class SmithWaterman extends NeedlemanWunsch
     * specified value.
     * Reason: internaly scores are used instead of penalties so that 
     * the value is muliplied with -1. 
-    * @param del costs for any gap extension
+    * @param ge costs for any gap extension
     */
   public void setGapExt(double ge) {
   	this.gapExt = -ge;
@@ -119,7 +119,7 @@ public class SmithWaterman extends NeedlemanWunsch
     * sets the penalty for a match operation to the specified value. 
     * Reason: internaly scores are used instead of penalties so that 
     * the value is muliplied with -1.
-    * @param del costs for a single match operation
+    * @param ma costs for a single match operation
     */
   public void setMatch(double ma) {
   	this.match = -ma;
@@ -129,7 +129,7 @@ public class SmithWaterman extends NeedlemanWunsch
     * sets the penalty for a replace operation to the specified value. 
     * Reason: internaly scores are used instead of penalties so that 
     * the value is muliplied with -1.
-    * @param del costs for a single replace operation
+    * @param rep costs for a single replace operation
     */
   public void setReplace(double rep) {
   	this.replace = -rep;
