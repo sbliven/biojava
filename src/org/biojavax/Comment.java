@@ -27,7 +27,7 @@ package org.biojavax;
  * in BioSQL. The interface is immutable, the fields are intended to 
  * be set by the constructor.
  * @author Richard Holland
- * @see org.biojavax.BioEntry
+ * @see org.biojavax.bio.BioEntry
  */
 public interface Comment extends Comparable {
     
