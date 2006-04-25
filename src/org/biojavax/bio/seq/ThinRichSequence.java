@@ -67,7 +67,6 @@ public class ThinRichSequence extends SimpleBioEntry implements RichSequence {
      * @param name the name of the sequence.
      * @param accession the accession of the sequence.
      * @param version the version of the sequence.
-     * @param symList the symbols for the sequence.
      * @param seqversion the version of the symbols for the sequence.
      */
     public ThinRichSequence(Namespace ns, String name, String accession, int version, Alphabet alpha, Double seqversion) {
