@@ -167,9 +167,9 @@ public class RichObjectFactory {
     public static void setDefaultCrossReferenceResolver(CrossReferenceResolver crr) { defaultCrossRefResolver = crr; }
     
     /**
-     * Sets the default sequence resolver to use when resolving sequence data.
+     * Sets the default sequence handler to use when performing sequence manipulation.
      * Defaults to the DummyRichSequenceHandler.
-     * @param crr the resolver to use.
+     * @param rsh the resolver to use.
      * @see org.biojavax.bio.seq.RichSequenceHandler
      * @see org.biojavax.bio.seq.DummyRichSequenceHandler
      */
