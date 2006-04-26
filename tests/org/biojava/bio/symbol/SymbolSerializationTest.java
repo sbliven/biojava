@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.biojava.bio.seq.DNATools;
 
 import java.io.*;
+import java.util.Collections;
 
 /**
  * Tests that serilization works as advertised.
@@ -45,5 +46,14 @@ public class SymbolSerializationTest extends TestCase {
         throws Exception
     {
         doSymbolTest(DNATools.n());
+    }
+    
+    public void testSpecialGap() throws Exception{
+        doSymbolTest(AlphabetManager.getGapSymbol());
+    }
+    
+    public void testNormalGap() throws Exception{
+        doSymbolTest(
+                AlphabetManager.getGapSymbol(Collections.singletonList(DNATools.getDNA())));
     }
 }
