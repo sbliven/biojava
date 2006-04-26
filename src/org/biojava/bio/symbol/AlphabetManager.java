@@ -56,7 +56,6 @@ import org.biojava.utils.ClassTools;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.OverlayMap;
 import org.biojava.utils.Unchangeable;
 import org.biojava.utils.cache.WeakValueHashMap;
 import org.biojava.utils.lsid.Identifiable;
@@ -337,11 +336,7 @@ public final class AlphabetManager {
           symList.add(getGapSymbol(a.getAlphabets()));
         }
         try {
-          s = new SimpleBasisSymbol(
-            Annotation.EMPTY_ANNOTATION,
-            symList,
-            Alphabet.EMPTY_ALPHABET
-          );
+          s = new WellKnownGapSymbol(symList, sq);
         } catch (IllegalSymbolException ise) {
           throw new BioError(
             "Assertion Failure: Should be able to make gap basis", ise
@@ -353,6 +348,8 @@ public final class AlphabetManager {
 
     return s;
   }
+  
+  
 
   /**
    * <p>
@@ -1615,6 +1612,24 @@ public final class AlphabetManager {
         }
     }
 
+    
+    /**
+     * A well-known gap. Resolved in serialized data
+     */
+    private static class WellKnownGapSymbol extends AbstractSimpleBasisSymbol implements Serializable{
+        private SizeQueen sq;
+        public WellKnownGapSymbol(List symList, SizeQueen sq) throws IllegalSymbolException{
+            super(Annotation.EMPTY_ANNOTATION,
+            symList,
+            Alphabet.EMPTY_ALPHABET);
+            this.sq = sq;
+        }
+        
+        private Object readResolve() throws ObjectStreamException{
+            System.out.println("ping!!");
+            return AlphabetManager.getGapSymbol(sq.getAlphas());
+        }
+    }
     /**
      * A well-known symbol.  Replaced by a placeholder in
      * serialized data.
@@ -1640,9 +1655,12 @@ public final class AlphabetManager {
         }
 
         private Object writeReplace() {
-            return new OPH(getIdentifier());
+            return new WellKnownAtomicSymbol.OPH(getIdentifier());
         }
 
+        /**
+         * Object Place Holder
+         */
         private static class OPH implements Serializable {
             private LifeScienceIdentifier name;
 
@@ -1768,7 +1786,13 @@ public final class AlphabetManager {
       public Alphabet getMatches() {
           return Alphabet.EMPTY_ALPHABET;
       }
+      
+      
+       private Object readResolve() throws ObjectStreamException {
+           return AlphabetManager.getGapSymbol();
+       }
   }
+  
 
   /**
    * Get an indexer for a specified alphabet.
@@ -1828,6 +1852,10 @@ public final class AlphabetManager {
 
     public int size() {
       return alphas.size();
+    }
+    
+    public List getAlphas(){
+        return this.alphas;
     }
 
     public Object get(int pos) {

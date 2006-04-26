@@ -1,10 +1,13 @@
 package org.biojava.bio.symbol;
 
+import java.util.ArrayList;
 import junit.framework.TestCase;
+import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.DNATools;
 
 import java.io.*;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Tests that serilization works as advertised.
@@ -48,12 +51,13 @@ public class SymbolSerializationTest extends TestCase {
         doSymbolTest(DNATools.n());
     }
     
+    
     public void testSpecialGap() throws Exception{
         doSymbolTest(AlphabetManager.getGapSymbol());
     }
     
     public void testNormalGap() throws Exception{
         doSymbolTest(
-                AlphabetManager.getGapSymbol(Collections.singletonList(DNATools.getDNA())));
+                DNATools.getDNA().getGapSymbol());
     }
 }
