@@ -1626,7 +1626,7 @@ public final class AlphabetManager {
         }
         
         private Object readResolve() throws ObjectStreamException{
-            System.out.println("ping!!");
+            //System.out.println("ping!!");
             return AlphabetManager.getGapSymbol(sq.getAlphas());
         }
     }
@@ -1843,7 +1843,7 @@ public final class AlphabetManager {
     return new LinearAlphabetIndex(syms);
   }
 
-  private static final class SizeQueen extends AbstractList {
+  private static final class SizeQueen extends AbstractList implements Serializable{
     private final List alphas;
 
     public SizeQueen(List alphas) {
