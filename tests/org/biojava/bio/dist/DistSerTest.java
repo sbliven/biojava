@@ -70,13 +70,14 @@ public class DistSerTest extends TestCase {
   }
 
     public void testSimpleSerialization()throws Exception{
-      File f = File.createTempFile("DistSerTest",".tmp");
-      ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(os);
       oos.writeObject(dist);
       oos.flush();
       oos.close();
 
-      ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+      ObjectInputStream ois = new ObjectInputStream(
+              new ByteArrayInputStream(os.toByteArray()));
       dist2 = (Distribution)ois.readObject();
       ois.close();
 
@@ -85,13 +86,14 @@ public class DistSerTest extends TestCase {
     }
     
     public void testGapSerialization()throws Exception{
-      File f = File.createTempFile("DistSerTest",".tmp");
-      ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(os);
       oos.writeObject(gap);
       oos.flush();
       oos.close();
 
-      ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+      ObjectInputStream ois = new ObjectInputStream(
+              new ByteArrayInputStream(os.toByteArray()));
       dist2 = (Distribution)ois.readObject();
       ois.close();
 
@@ -99,13 +101,14 @@ public class DistSerTest extends TestCase {
     }
     
     public void testPairSerialization()throws Exception{
-      File f = File.createTempFile("DistSerTest",".tmp");
-      ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(os);
       oos.writeObject(pair);
       oos.flush();
       oos.close();
 
-      ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+      ObjectInputStream ois = new ObjectInputStream(
+              new ByteArrayInputStream(os.toByteArray()));
       dist2 = (Distribution)ois.readObject();
       ois.close();
 
@@ -113,13 +116,14 @@ public class DistSerTest extends TestCase {
     }
 
     public void testOrderNSerialization()throws Exception{
-      File f = File.createTempFile("DistSerTest",".tmp");
-      ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(os);
       oos.writeObject(orderN);
       oos.flush();
       oos.close();
 
-      ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+      ObjectInputStream ois = new ObjectInputStream(
+              new ByteArrayInputStream(os.toByteArray()));
       dist2 = (Distribution)ois.readObject();
       ois.close();
 

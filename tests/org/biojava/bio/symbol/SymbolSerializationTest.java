@@ -9,6 +9,7 @@ import java.io.*;
  * Tests that serilization works as advertised.
  *
  * @author Thomas Down
+ * @author Mark Schreiber
  * @since 1.3
  */
 
@@ -20,13 +21,14 @@ public class SymbolSerializationTest extends TestCase {
     private void doSymbolTest(Symbol s)
         throws Exception
     {
-        File f = File.createTempFile("SymbolSerializationTest", ".jo");
-        ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream((os));
         oos.writeObject(s);
         oos.flush();
         oos.close();
 
-        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+        ObjectInputStream ois = new ObjectInputStream(
+                new ByteArrayInputStream(os.toByteArray()));
         Symbol s2 = (Symbol) ois.readObject();
         ois.close();
 

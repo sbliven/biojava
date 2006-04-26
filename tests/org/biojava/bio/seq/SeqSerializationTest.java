@@ -23,12 +23,10 @@ package org.biojava.bio.seq;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.HashSet;
 import java.util.Iterator;
 
 import org.biojava.bio.Annotation;
@@ -71,12 +69,13 @@ public class SeqSerializationTest extends TestCase
         sft.location = new RangeLocation(10, 12);
         seq.createFeature(sft);
 
-        File f = File.createTempFile("SeqSerTest",".tmp");
-        ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(os));
         oos.writeObject(seq);
         oos.flush();
         oos.close();
-        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+        ObjectInputStream ois = new ObjectInputStream(
+                new BufferedInputStream(new ByteArrayInputStream(os.toByteArray())));
         seq2 = (Sequence)ois.readObject();
     }
 

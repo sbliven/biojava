@@ -154,13 +154,14 @@ public class AlphabetSerializationTest extends TestCase {
     }
 
     private Object serialize(Object alpha) throws Exception{
-        File f = File.createTempFile("biojava",".tmp");
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(os);
         oos.writeObject(alpha);
         oos.flush();
         oos.close();
 
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+        ObjectInputStream ois = new ObjectInputStream(
+                new ByteArrayInputStream(os.toByteArray()));
         Object o = ois.readObject();
         ois.close();
         return o;
