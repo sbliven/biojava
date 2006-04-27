@@ -30,6 +30,7 @@ import org.biojavax.RankedCrossRefable;
 /**
  * Makes Term objects comparable properly and adds some extra features to them.
  * @author Richard Holland
+ * @since 1.5
  */
 public interface ComparableTerm extends Term,RankedCrossRefable,Comparable,Changeable {
     

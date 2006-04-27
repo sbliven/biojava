@@ -31,6 +31,7 @@ import org.biojava.utils.Changeable;
  * @author Mark Schreiber
  * @author Richard Holland
  * @see RankedDocRef
+ * @since 1.5
  */
 public interface DocRef extends Comparable,Changeable {
     

@@ -34,9 +34,10 @@ import org.biojavax.bio.BioEntry;
  * finite number of BioEntrys stored under unique keys.
  *
  * @author Matthew Pocock
- * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
+ * @author Gerald Loeffler
  * @author Thomas Down
  * @author Richard Holland
+ * @since 1.5
  */
 public interface BioEntryDBLite {
     /**

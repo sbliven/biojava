@@ -28,6 +28,7 @@ import java.util.List;
  * name and some parameters. The idea is to allow maintenance of a singleton
  * map.
  * @author Richard Holland
+ * @since 1.5
  */
 public interface RichObjectBuilder {
     

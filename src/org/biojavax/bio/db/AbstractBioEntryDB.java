@@ -36,6 +36,7 @@ import org.biojavax.bio.BioEntryIterator;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Richard Holland
+ * @since 1.5
  */
 public abstract class AbstractBioEntryDB extends AbstractChangeable implements BioEntryDB {
     

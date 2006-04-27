@@ -29,6 +29,7 @@ import org.biojavax.bio.seq.RichSequence;
 /**
  * An interface for objects that can build RichSequences.
  * @author Mark Schreiber
+ * @since 1.5
  */
 public interface RichSequenceBuilder extends RichSeqIOListener, SequenceBuilder {
     

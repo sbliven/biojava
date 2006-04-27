@@ -41,6 +41,7 @@ import org.biojavax.Comment;
  * Equality is the combination of namespace, name, accession and version.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     

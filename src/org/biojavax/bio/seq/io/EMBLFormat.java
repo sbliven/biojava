@@ -76,6 +76,7 @@ import org.biojavax.utils.StringTools;
  *
  * @author Richard Holland
  * @author Jolyon Holdstock
+ * @since 1.5
  */
 public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     

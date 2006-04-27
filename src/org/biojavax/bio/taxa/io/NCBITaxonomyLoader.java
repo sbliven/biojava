@@ -30,6 +30,7 @@ import org.biojavax.bio.taxa.NCBITaxon;
  * Implementors are able to load taxonomy files and generate sets of NCBITaxon objects
  * that represent them. Taxon objects should be generated using RichObjectFactory.
  * @author Richard Holland
+ * @since 1.5
  */
 public interface NCBITaxonomyLoader {
     

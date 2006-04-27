@@ -24,6 +24,7 @@ package org.biojavax.bio.taxa;
 /**
  * Represents a name class plus name combination for an NCBITaxon object.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleNCBITaxonName implements Comparable {
     

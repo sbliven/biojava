@@ -38,6 +38,7 @@ import org.biojavax.bio.taxa.SimpleNCBITaxon;
  * any that may already exist.
  *
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleNCBITaxonomyLoader implements NCBITaxonomyLoader {
     

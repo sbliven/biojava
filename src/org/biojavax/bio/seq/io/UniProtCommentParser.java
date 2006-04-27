@@ -31,6 +31,7 @@ import org.biojavax.Comment;
 /**
  *
  * @author Richard Holland
+ * @since 1.5
  */
 public class UniProtCommentParser {
         

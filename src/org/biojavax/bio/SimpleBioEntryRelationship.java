@@ -38,6 +38,7 @@ import org.biojavax.ontology.ComparableTerm;
  * and given a rank.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class SimpleBioEntryRelationship extends AbstractChangeable implements BioEntryRelationship {
     

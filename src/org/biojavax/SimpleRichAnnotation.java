@@ -46,6 +46,7 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  * Simple annotation wrapper. All non-Note annotations get a rank of zero.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleRichAnnotation extends AbstractChangeable implements RichAnnotation {
     

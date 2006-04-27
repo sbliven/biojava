@@ -29,6 +29,7 @@ import org.biojava.utils.*;
  * implementations should inherit from here.
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 public abstract class AbstractMutationFunction
     extends AbstractChangeable implements MutationFunction {

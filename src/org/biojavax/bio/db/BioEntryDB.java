@@ -32,9 +32,10 @@ import org.biojavax.bio.BioEntryIterator;
  * database contains a finite number of sequences stored under unique keys.
  *
  * @author Matthew Pocock
- * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
+ * @author Gerald Loeffler
  * @author Thomas Down
  * @author Richard Holland
+ * @since 1.5
  */
 public interface BioEntryDB extends BioEntryDBLite {
     /**

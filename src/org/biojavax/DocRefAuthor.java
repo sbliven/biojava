@@ -29,6 +29,7 @@ import org.biojava.utils.Changeable;
  * Represents an author of a documentary reference.
  * @author Richard Holland
  * @see DocRef
+ * @since 1.5
  */
 public interface DocRefAuthor extends Comparable,Changeable {
     

@@ -34,6 +34,7 @@ import org.biojava.utils.ChangeVetoException;
  * A basic Namespace implemenation.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 
 public class SimpleNamespace extends AbstractChangeable implements Namespace {

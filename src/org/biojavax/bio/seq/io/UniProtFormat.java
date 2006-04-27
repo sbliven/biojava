@@ -81,6 +81,7 @@ import org.biojavax.utils.StringTools;
  * org.biojava.bio.seq.io.EMBLLikeFormat object.
  *
  * @author Richard Holland
+ * @since 1.5
  */
 public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     

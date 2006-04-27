@@ -49,6 +49,7 @@ import org.biojavax.bio.taxa.NCBITaxon;
  * ignores sequence information completely.
  * @author Mark Schreiber
  * @author Richard Holland
+ * @since 1.5
  */
 public interface RichSeqIOListener extends SeqIOListener {
     

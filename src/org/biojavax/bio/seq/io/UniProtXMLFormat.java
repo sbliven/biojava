@@ -98,6 +98,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Alan Li (code based on his work)
  * @author Richard Holland
+ * @since 1.5
  */
 public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         

@@ -31,6 +31,7 @@ import org.biojava.utils.Changeable;
 /**
  * Comparable triples, obviously. Allows them to have descriptors. 
  * @author Richard Holland
+ * @since 1.5
  */
 public interface ComparableTriple extends Triple,Comparable,Changeable {
 

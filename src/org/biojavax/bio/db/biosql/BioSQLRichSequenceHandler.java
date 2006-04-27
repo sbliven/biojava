@@ -33,6 +33,7 @@ import org.biojavax.bio.seq.SimpleRichSequence;
  * BioSQLRichSequenceDB.getRichSequence() to convert the original sequence into a proper
  * SimpleRichSequence.
  * @author Richard Holland
+ * @since 1.5
  */
 public class BioSQLRichSequenceHandler extends DummyRichSequenceHandler {
     

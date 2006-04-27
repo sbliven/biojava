@@ -34,6 +34,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * Utility class for reading chunks of XML files and feeding them to SAX.
  * @author Richard Holland
+ * @since 1.5
  */
 public class XMLTools {
     

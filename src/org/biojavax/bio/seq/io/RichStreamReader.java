@@ -48,6 +48,7 @@ import org.biojavax.bio.seq.RichSequenceIterator;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Richard Holland
+ * @since 1.5
  */
 
 public class RichStreamReader implements RichSequenceIterator {

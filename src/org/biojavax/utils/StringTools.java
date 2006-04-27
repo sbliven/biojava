@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 /**
  * Utility class for formatting strings into regular-sized blocks.
  * @author Richard Holland
+ * @since 1.5
  */
 public class StringTools {
     

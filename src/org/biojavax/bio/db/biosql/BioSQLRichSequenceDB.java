@@ -49,6 +49,7 @@ import org.biojavax.bio.seq.SimpleRichSequence;
 /**
  *
  * @author Richard Holland
+ * @since 1.5
  */
 public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
     

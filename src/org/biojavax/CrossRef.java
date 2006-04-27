@@ -30,6 +30,7 @@ import org.biojava.utils.Changeable;
  * @author Mark Schreiber
  * @author Richard Holland
  * @see RankedCrossRef
+ * @since 1.5
  */
 public interface CrossRef extends RichAnnotatable,Comparable,Changeable {
     

@@ -38,8 +38,9 @@ import org.biojavax.bio.BioEntry;
  * RichSequence objects.
  *
  * @author Matthew Pocock
- * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
+ * @author Gerald Loeffler
  * @author Richard Holland
+ * @since 1.5
  */
 public class HashBioEntryDB extends AbstractBioEntryDB implements BioEntryDB {
     

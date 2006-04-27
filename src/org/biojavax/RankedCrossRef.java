@@ -27,6 +27,7 @@ import org.biojava.utils.Changeable;
  * @author Richard Holland
  * @see RankedCrossRefable
  * @see CrossRef
+ * @since 1.5
  */
 public interface RankedCrossRef extends Comparable,Changeable {
     

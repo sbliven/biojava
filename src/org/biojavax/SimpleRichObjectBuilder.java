@@ -32,6 +32,7 @@ import java.util.Set;
  * Creates objects and returns them, and stores them in an internal
  * map of singletons for reference. Takes up a lot of memory!
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleRichObjectBuilder implements RichObjectBuilder {
     

@@ -44,6 +44,7 @@ import org.biojava.utils.ChangeVetoException;
  * Represents an ontology that can be compared to other ontologies.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class SimpleComparableOntology extends AbstractChangeable implements ComparableOntology {
     

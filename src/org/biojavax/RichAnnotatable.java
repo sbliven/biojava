@@ -30,6 +30,7 @@ import org.biojava.utils.ChangeVetoException;
  * Annotatable objects that can have rich annotations.
  * @author Richard Holland
  * @see RichAnnotation
+ * @since 1.5
  */
 public interface RichAnnotatable extends Annotatable {
     

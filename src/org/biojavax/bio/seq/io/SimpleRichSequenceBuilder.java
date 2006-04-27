@@ -65,6 +65,7 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  * Constructs BioEntry objects by listening to events.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichSequenceBuilder {
     

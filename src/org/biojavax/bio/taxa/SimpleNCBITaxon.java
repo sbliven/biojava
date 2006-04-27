@@ -35,6 +35,7 @@ import org.biojavax.RichObjectFactory;
  * Reference implementation of NCBITaxon.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     

@@ -37,6 +37,7 @@ import org.biojavax.ga.functions.SelectionFunction;
  * 
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 
 public interface GeneticAlgorithm extends Changeable{

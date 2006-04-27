@@ -40,6 +40,7 @@ import org.biojavax.bio.db.HashBioEntryDB;
 /**
  *
  * @author Richard Holland
+ * @since 1.5
  */
 public class BioSQLBioEntryDB extends AbstractBioEntryDB {
     

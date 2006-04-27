@@ -38,6 +38,7 @@ import org.biojava.utils.Unchangeable;
  * A place holder for a RichAnnotation that prevents null having to be used
  * @author Mark Schreiber
  * @author Richard Holland
+ * @since 1.5
  */
 public class EmptyRichAnnotation extends Unchangeable implements RichAnnotation, Serializable {
     

@@ -30,6 +30,7 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  * Simple implementation of Note.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleNote extends AbstractChangeable implements Note {
     

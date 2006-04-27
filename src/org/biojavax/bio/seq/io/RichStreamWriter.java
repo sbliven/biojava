@@ -38,6 +38,7 @@ import org.biojavax.Namespace;
  * utility, or can be used to write out the sequences in a database to disk.
  * @author Matthew Pocock
  * @author Richard Holland
+ * @since 1.5
  */
 public class RichStreamWriter {
     

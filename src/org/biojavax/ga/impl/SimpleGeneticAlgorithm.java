@@ -40,6 +40,7 @@ import org.biojavax.ga.functions.MutationFunction;
  * 
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 
 public final class SimpleGeneticAlgorithm extends AbstractGeneticAlgorithm {

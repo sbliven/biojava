@@ -33,6 +33,7 @@ import org.biojava.utils.Changeable;
  * @author Richard Holland
  * @see ComparableTerm
  * @see ComparableTriple
+ * @since 1.5
  */
 public interface ComparableOntology extends Ontology,Comparable,Changeable {
     

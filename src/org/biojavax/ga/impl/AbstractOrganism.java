@@ -30,6 +30,7 @@ import org.biojavax.ga.Organism;
  *
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 
 public abstract class AbstractOrganism extends AbstractChangeable implements Organism {

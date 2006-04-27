@@ -28,6 +28,7 @@ import org.biojava.utils.*;
  * A GA 'organism' contains one or more Chromosomes
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 
 public interface Organism extends Changeable{

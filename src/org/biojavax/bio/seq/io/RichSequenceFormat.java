@@ -37,6 +37,7 @@ import org.biojavax.bio.seq.RichSequence;
 /**
  * Allows a file format to be read/written as RichSequences.
  * @author Richard Holland
+ * @since 1.5
  */
 public interface RichSequenceFormat extends SequenceFormat {
     /**

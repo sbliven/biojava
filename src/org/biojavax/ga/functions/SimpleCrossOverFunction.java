@@ -34,6 +34,7 @@ import org.biojava.bio.*;
  *
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 
 public class SimpleCrossOverFunction extends AbstractCrossOverFunction {

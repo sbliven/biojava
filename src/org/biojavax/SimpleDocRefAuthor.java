@@ -26,6 +26,7 @@ import org.biojava.utils.Unchangeable;
  * Represents an author of a documentary reference.
  * @author Richard Holland
  * @see DocRef
+ * @since 1.5
  */
 public class SimpleDocRefAuthor extends Unchangeable implements DocRefAuthor  {
     

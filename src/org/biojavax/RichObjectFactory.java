@@ -41,6 +41,7 @@ import org.biojavax.ontology.SimpleComparableOntology;
  * Runs a service that builds rich objects, and provides some default values
  * for things like default ontology, default namespace, etc.
  * @author Richard Holland
+ * @since 1.5
  */
 public class RichObjectFactory {
     

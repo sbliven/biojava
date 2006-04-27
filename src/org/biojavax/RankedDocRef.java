@@ -26,6 +26,7 @@ package org.biojavax;
  * in BioSQL.
  * @author Richard Holland
  * @see DocRef
+ * @since 1.5
  */
 public interface RankedDocRef extends Comparable {
     

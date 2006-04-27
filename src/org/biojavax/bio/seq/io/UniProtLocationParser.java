@@ -35,6 +35,7 @@ import org.biojavax.utils.StringTools;
 /**
  * Parses UniProt location strings into RichLocation objects.
  * @author Richard Holland
+ * @since 1.5
  */
 public class UniProtLocationParser {
     

@@ -37,6 +37,7 @@ import org.biojavax.RichAnnotation;
 /**
  * Basic comparable triple, BioSQL style.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleComparableTriple extends AbstractChangeable implements ComparableTriple {
     

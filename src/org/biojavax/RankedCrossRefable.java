@@ -30,6 +30,7 @@ import org.biojava.utils.Changeable;
  * with it. 
  * @author Richard Holland
  * @see RankedCrossRef
+ * @since 1.5
  */
 public interface RankedCrossRefable extends Changeable {
     

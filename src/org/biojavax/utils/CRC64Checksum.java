@@ -32,6 +32,7 @@ import java.util.zip.Checksum;
  * results if we don't allow for this.
  * @author Richard Holland
  * @author Hilmar Lapp
+ * @since 1.5
  */
 public class CRC64Checksum implements Checksum {
     

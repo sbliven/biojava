@@ -33,6 +33,7 @@ import org.biojava.utils.Changeable;
  * @author Mark Schreiber
  * @author Richard Holland
  * @see org.biojavax.bio.BioEntry
+ * @since 1.5
  */
 public interface Namespace extends Comparable,Changeable {
     

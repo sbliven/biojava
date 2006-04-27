@@ -73,8 +73,8 @@ import org.biojavax.utils.StringTools;
  * org.biojava.bio.seq.io.GenbankFormat object.
  *
  * @author Richard Holland
- * bugfixes
  * @author MarkSchreiber
+ * @since 1.5
  */
 public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 

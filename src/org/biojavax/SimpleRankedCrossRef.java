@@ -26,6 +26,7 @@ import org.biojava.utils.Unchangeable;
 /**
  * Simple implementation of RankedCrossRef.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef {
     

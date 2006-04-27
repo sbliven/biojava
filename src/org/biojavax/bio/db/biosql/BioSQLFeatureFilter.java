@@ -72,6 +72,7 @@ import org.biojavax.ontology.ComparableTerm;
  * @author Thomas Down
  * @author Richard Holland
  * @since 1.5
+ * @since 1.5
  */
 
 public interface BioSQLFeatureFilter extends FeatureFilter {

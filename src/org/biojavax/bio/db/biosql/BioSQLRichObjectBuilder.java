@@ -41,6 +41,7 @@ import org.biojavax.ontology.SimpleComparableOntology;
  * a lot of Hibernate queries if used frequently, but on the plus side this
  * makes it memory-efficient.
  * @author Richard Holland
+ * @since 1.5
  */
 public class BioSQLRichObjectBuilder implements RichObjectBuilder {
     

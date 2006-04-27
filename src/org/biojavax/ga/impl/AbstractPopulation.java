@@ -36,6 +36,7 @@ import org.biojavax.ga.exception.IllegalOrganismException;
  *
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 
 public abstract class AbstractPopulation extends AbstractChangeable implements Population {

@@ -31,6 +31,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Mark Schreiber
  * @see Note
  * @see RichAnnotatable
+ * @since 1.5
  */
 public interface RichAnnotation extends Annotation {
         

@@ -51,6 +51,7 @@ import org.biojavax.bio.seq.RichSequence;
  * @author Greg Cox
  * @author Lukas Kall
  * @author Richard Holland
+ * @since 1.5
  */
 
 public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {

@@ -45,6 +45,7 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  * Parses Genbank location strings into RichLocation objects.
  * @author Richard Holland
+ * @since 1.5
  */
 public class GenbankLocationParser {
     

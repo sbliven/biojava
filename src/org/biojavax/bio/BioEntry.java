@@ -38,6 +38,7 @@ import org.biojavax.Comment;
  * @author Mark Schreiber
  * @author Richard Holland
  * @see BioEntryRelationship
+ * @since 1.5
  */
 public interface BioEntry extends RichAnnotatable,RankedCrossRefable,Comparable,Changeable {
     

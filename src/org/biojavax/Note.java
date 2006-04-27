@@ -32,6 +32,7 @@ import org.biojavax.ontology.ComparableTerm;
  * objects to represent annotations.
  * @author Richard Holland
  * @see RichAnnotation
+ * @since 1.5
  */
 public interface Note extends Comparable,Changeable {
     

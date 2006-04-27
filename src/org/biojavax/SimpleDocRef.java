@@ -33,6 +33,7 @@ import org.biojavax.utils.CRC64Checksum;
  * A basic DocRef implementation.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 
 public class SimpleDocRef extends AbstractChangeable implements DocRef {

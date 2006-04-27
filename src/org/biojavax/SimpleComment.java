@@ -24,6 +24,7 @@ package org.biojavax;
 /**
  * An implementaion of Comment.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleComment implements Comment {
     

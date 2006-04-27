@@ -28,6 +28,7 @@ package org.biojavax;
  * be set by the constructor.
  * @author Richard Holland
  * @see org.biojavax.bio.BioEntry
+ * @since 1.5
  */
 public interface Comment extends Comparable {
     

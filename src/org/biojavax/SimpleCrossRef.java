@@ -30,6 +30,7 @@ import org.biojava.utils.ChangeVetoException;
  * A basic CrossRef implementation.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     

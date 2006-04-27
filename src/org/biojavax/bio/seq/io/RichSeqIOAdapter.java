@@ -51,6 +51,7 @@ import org.biojavax.bio.taxa.NCBITaxon;
  * a small subset of events.
  *
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class RichSeqIOAdapter implements RichSeqIOListener {
     

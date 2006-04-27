@@ -35,6 +35,7 @@ import java.util.*;
  *
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 
 public class WeightedSet extends AbstractSet implements java.io.Serializable{

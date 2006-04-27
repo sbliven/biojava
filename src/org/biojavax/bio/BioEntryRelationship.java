@@ -32,6 +32,7 @@ import org.biojavax.ontology.ComparableTerm;
  * @author Mark Schreiber
  * @author Richard Holland
  * @see BioEntry
+ * @since 1.5
  */
 public interface BioEntryRelationship extends Comparable,Changeable {
     

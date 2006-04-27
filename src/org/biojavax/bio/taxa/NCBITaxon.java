@@ -30,6 +30,7 @@ import org.biojava.utils.Changeable;
  * tables in BioSQL.
  * @author Mark Schreiber
  * @author Richard Holland
+ * @since 1.5
  */
 public interface NCBITaxon extends Comparable,Changeable {
     

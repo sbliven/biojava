@@ -31,6 +31,7 @@ import org.biojavax.ga.GeneticAlgorithm;
  *
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 
 public interface FitnessFunction {

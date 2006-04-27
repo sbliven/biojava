@@ -30,6 +30,7 @@ import org.biojava.bio.symbol.SymbolListFactory;
  * @author Mark Schreiber
  * @author Richard Holland
  * @see RichSequenceBuilder
+ * @since 1.5
  */
 public class SimpleRichSequenceBuilderFactory implements RichSequenceBuilderFactory {
     private SymbolListFactory fact = null;

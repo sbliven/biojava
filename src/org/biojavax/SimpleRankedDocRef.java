@@ -24,6 +24,7 @@ package org.biojavax;
 /**
  * Represents a documentary reference. 
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleRankedDocRef implements RankedDocRef {
     

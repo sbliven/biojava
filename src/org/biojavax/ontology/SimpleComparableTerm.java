@@ -37,6 +37,7 @@ import org.biojavax.RichAnnotation;
 /**
  * A Term object that can be compared and thus sorted.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleComparableTerm extends AbstractChangeable implements ComparableTerm {
     

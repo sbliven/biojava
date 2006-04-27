@@ -36,6 +36,7 @@ import org.biojava.utils.*;
  *
  * @author Mark Schreiber
  * @version 1.0
+ * @since 1.5
  */
 
 public final class SimpleMutationFunction extends AbstractMutationFunction {
