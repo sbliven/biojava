@@ -1,12 +1,10 @@
 package org.biojava.bio.symbol;
 
-import java.util.ArrayList;
 import junit.framework.TestCase;
-import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.DNATools;
 
 import java.io.*;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -54,6 +52,11 @@ public class SymbolSerializationTest extends TestCase {
     
     public void testSpecialGap() throws Exception{
         doSymbolTest(AlphabetManager.getGapSymbol());
+    }
+    
+    public void testCompoundGap() throws Exception{
+        List alphas = Arrays.asList(new Alphabet[]{DNATools.getDNA(), DNATools.getDNA()});
+        doSymbolTest(AlphabetManager.getGapSymbol(alphas));
     }
     
     public void testNormalGap() throws Exception{
