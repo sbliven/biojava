@@ -90,6 +90,88 @@ import org.xml.sax.XMLReader;
  */
 
 public final class AlphabetManager {
+  static private Map nameToAlphabet;
+  //static private Map nameToSymbol;
+  static private Map lsidToSymbol;
+  static private Map crossProductAlphabets;
+  static private Map ambiguitySymbols;
+  static private GapSymbol gapSymbol;
+  static private Map gapBySize;
+  static private Map alphabetToIndex = new WeakHashMap();
+  static private Map symListToSymbol;
+    
+  /**
+   * <p>
+   * Initialize the static AlphabetManager resources.
+   * </p>
+   *
+   * <p>
+   * This parses the resource
+   * <code>org/biojava/bio/seq/tools/AlphabetManager.xml</code>
+   * and builds a basic set of alphabets.
+   * </p>
+   */
+  static {
+    nameToAlphabet = new HashMap();
+    //nameToSymbol = new HashMap();
+    lsidToSymbol = new HashMap();
+    ambiguitySymbols = new HashMap();
+
+    gapSymbol = new GapSymbol();
+    gapBySize = new HashMap();
+    gapBySize.put(new SizeQueen(new ArrayList()), gapSymbol);
+
+    nameToAlphabet.put("INTEGER", IntegerAlphabet.getInstance());
+    nameToAlphabet.put("DOUBLE", DoubleAlphabet.getInstance());
+
+    symListToSymbol = new WeakValueHashMap();
+
+    try {
+      SizeQueen sq = new SizeQueen(Arrays.asList(
+                new Alphabet[] { DoubleAlphabet.getInstance() }));  
+      gapBySize.put(sq, 
+                    new WellKnownGapSymbol(
+                         Arrays.asList(new Symbol[] { gapSymbol}), sq));
+    } catch (IllegalSymbolException ise) {
+      throw new BioError(
+
+        "Assertion Failure: Should be able to make gap basis", ise
+      );
+    }
+
+    ambiguitySymbols.put(new HashSet(), gapSymbol);
+    try {
+      InputStream alphabetStream = ClassTools.getClassLoader(AlphabetManager.class).getResourceAsStream(
+        "org/biojava/bio/symbol/AlphabetManager.xml"
+      );
+      if (alphabetStream == null) {
+          throw new BioError("Couldn't locate AlphabetManager.xml.  This probably means that your biojava.jar file is corrupt or incorrectly built.");
+      }
+      InputSource is = new InputSource(alphabetStream);
+      loadAlphabets(is);
+    } catch (Exception t) {
+      throw new BioError( "Unable to initialize AlphabetManager", t);
+    }
+  }
+
+    /**
+   * Singleton instance.
+   */
+  static private AlphabetManager am;
+
+  /**
+   * Retrieve the singleton instance.
+   *
+   * @return the AlphabetManager instance
+   * @deprecated all AlphabetManager methods have become static
+   */
+  static public AlphabetManager instance() {
+    if(am == null)
+      am = new AlphabetManager();
+    return am;
+  }
+
+  
     /**
      * Return the ambiguity symbol which matches all symbols in
      * a given alphabet.
@@ -147,32 +229,7 @@ public final class AlphabetManager {
         return allSymbols;
     }
 
-  /**
-   * Singleton instance.
-   */
-  static private AlphabetManager am;
 
-  /**
-   * Retrieve the singleton instance.
-   *
-   * @return the AlphabetManager instance
-   * @deprecated all AlphabetManager methods have become static
-   */
-  static public AlphabetManager instance() {
-    if(am == null)
-      am = new AlphabetManager();
-    return am;
-  }
-
-  static private Map nameToAlphabet;
-  //static private Map nameToSymbol;
-  static private Map lsidToSymbol;
-  static private Map crossProductAlphabets;
-  static private Map ambiguitySymbols;
-  static private GapSymbol gapSymbol;
-  static private Map gapBySize;
-  static private Map alphabetToIndex = new WeakHashMap();
-  static private Map symListToSymbol;
 
   /**
    * Retrieve the alphabet for a specific name.
@@ -956,64 +1013,6 @@ public final class AlphabetManager {
 
 
 
-  /**
-   * <p>
-   * Initialize the static AlphabetManager resources.
-   * </p>
-   *
-   * <p>
-   * This parses the resource
-   * <code>org/biojava/bio/seq/tools/AlphabetManager.xml</code>
-   * and builds a basic set of alphabets.
-   * </p>
-   */
-  static {
-    nameToAlphabet = new HashMap();
-    //nameToSymbol = new HashMap();
-    lsidToSymbol = new HashMap();
-    ambiguitySymbols = new HashMap();
-
-    gapSymbol = new GapSymbol();
-    gapBySize = new HashMap();
-    gapBySize.put(new SizeQueen(new ArrayList()), gapSymbol);
-
-    nameToAlphabet.put("INTEGER", IntegerAlphabet.getInstance());
-    nameToAlphabet.put("DOUBLE", DoubleAlphabet.getInstance());
-
-    symListToSymbol = new WeakValueHashMap();
-
-    try {
-      gapBySize.put(
-        new SizeQueen(Arrays.asList(
-                new Alphabet[] { DoubleAlphabet.getInstance() }
-        )),
-        new SimpleBasisSymbol(
-                Annotation.EMPTY_ANNOTATION,
-                Arrays.asList(new Symbol[] { gapSymbol }),
-                Alphabet.EMPTY_ALPHABET
-        )
-      );
-    } catch (IllegalSymbolException ise) {
-      throw new BioError(
-
-        "Assertion Failure: Should be able to make gap basis", ise
-      );
-    }
-
-    ambiguitySymbols.put(new HashSet(), gapSymbol);
-    try {
-      InputStream alphabetStream = ClassTools.getClassLoader(AlphabetManager.class).getResourceAsStream(
-        "org/biojava/bio/symbol/AlphabetManager.xml"
-      );
-      if (alphabetStream == null) {
-          throw new BioError("Couldn't locate AlphabetManager.xml.  This probably means that your biojava.jar file is corrupt or incorrectly built.");
-      }
-      InputSource is = new InputSource(alphabetStream);
-      loadAlphabets(is);
-    } catch (Exception t) {
-      throw new BioError( "Unable to initialize AlphabetManager", t);
-    }
-  }
 
     /**
      * Load additional Alphabets, defined in XML format, into the AlphabetManager's registry.
