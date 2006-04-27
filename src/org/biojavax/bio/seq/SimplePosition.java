@@ -25,6 +25,7 @@ package org.biojavax.bio.seq;
 /**
  * A simple implementation of the Position interface.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimplePosition implements Position {
     

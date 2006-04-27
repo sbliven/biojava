@@ -36,6 +36,7 @@ import org.biojavax.bio.BioEntryIterator;
  * @author Mark Schreiber
  * @author Richard Holland
  * @see org.biojava.bio.seq.SequenceIterator
+ * @since 1.5
  */
 public interface RichSequenceIterator extends BioEntryIterator,SequenceIterator {
     public RichSequence nextRichSequence() throws NoSuchElementException, BioException;

@@ -43,6 +43,7 @@ import org.biojavax.ontology.ComparableTerm;
  * but on the same strand of the same (optionally circular) sequence.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class CompoundRichLocation extends SimpleRichLocation implements RichLocation {
     

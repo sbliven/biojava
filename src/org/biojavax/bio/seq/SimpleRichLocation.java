@@ -52,6 +52,7 @@ import org.biojavax.ontology.ComparableTerm;
  * A simple implementation of RichLocation.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class SimpleRichLocation extends AbstractChangeable implements RichLocation {
     

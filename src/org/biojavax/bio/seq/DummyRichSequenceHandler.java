@@ -20,6 +20,7 @@ import org.biojava.bio.symbol.PackedSymbolListFactory;
 /**
  *
  * @author Richard Holland
+ * @since 1.5
  */
 public class DummyRichSequenceHandler implements RichSequenceHandler {
     /**

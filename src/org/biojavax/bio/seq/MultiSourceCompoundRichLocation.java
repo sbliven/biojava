@@ -35,6 +35,7 @@ import org.biojavax.ontology.ComparableTerm;
  * on different strands, different circular lengths, or different sequences.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class MultiSourceCompoundRichLocation extends CompoundRichLocation implements RichLocation {
     

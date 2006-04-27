@@ -24,6 +24,7 @@ package org.biojavax.bio.seq;
 /**
  * Holds info about base positions.
  * @author Richard Holland
+ * @since 1.5
  */
 public interface Position {
         

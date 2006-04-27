@@ -39,6 +39,7 @@ import org.biojavax.SimpleRichAnnotation;
  * Represents a feature that can be given name and rank and be
  * moved from one sequence to another.
  * @author Richard Holland
+ * @since 1.5
  */
 public interface RichFeature extends StrandedFeature,RankedCrossRefable,RichAnnotatable,RichFeatureHolder,Comparable {
     

@@ -32,6 +32,7 @@ import org.biojavax.Namespace;
 /**
  * A simple implementation of RichSequence.
  * @author Richard Holland
+ * @since 1.5
  */
 public class SimpleRichSequence extends ThinRichSequence {
     

@@ -39,6 +39,7 @@ import org.biojava.utils.ChangeVetoException;
  * bounds and always returns ambiguity symbols for everything.
  * @author Richard Holland
  * @author MarkSchreiber
+ * @since 1.5
  */
 public class InfinitelyAmbiguousSymbolList implements SymbolList {
     

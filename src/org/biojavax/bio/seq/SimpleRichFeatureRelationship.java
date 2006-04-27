@@ -32,6 +32,7 @@ import org.biojavax.ontology.ComparableTerm;
  * Represents a relationship between two features that is described by a term.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  *
  */
 public class SimpleRichFeatureRelationship extends AbstractChangeable implements RichFeatureRelationship {

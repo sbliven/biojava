@@ -40,6 +40,7 @@ import org.biojavax.ontology.ComparableTerm;
  * that do not overlap so that null need not be returned.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @since 1.5
  */
 public class EmptyRichLocation extends Unchangeable implements RichLocation {
            

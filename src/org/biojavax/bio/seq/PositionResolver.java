@@ -25,6 +25,7 @@ package org.biojavax.bio.seq;
  * Resolves a position that is fuzzy or covers a range of bases by
  * converting it to a single base.
  * @author Richard Holland
+ * @since 1.5
  */
 public interface PositionResolver {
     

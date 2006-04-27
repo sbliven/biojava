@@ -53,6 +53,7 @@ import org.biojavax.bio.SimpleBioEntry;
  * A simple implementation of RichSequence. It has no sequence data, 
  * and delegates to a RichSequenceHandler to do sequence handling.
  * @author Richard Holland
+ * @since 1.5
  */
 public class ThinRichSequence extends SimpleBioEntry implements RichSequence {
     

@@ -30,6 +30,7 @@ import org.biojavax.ontology.ComparableTerm;
  * BioSQL is what this is based on.
  * @author Mark Schreiber
  * @author Richard Holland
+ * @since 1.5
  */
 public interface RichFeatureRelationship extends Comparable,Changeable {
         

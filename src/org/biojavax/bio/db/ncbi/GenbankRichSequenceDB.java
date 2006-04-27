@@ -60,6 +60,7 @@ import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
  * @author Shuvankar Mukherjee
  * @author Mark Schreiber
  * @author Richard Holland
+ * @since 1.5
  */
 public class GenbankRichSequenceDB extends AbstractRichSequenceDB implements RichSequenceDBLite {
     

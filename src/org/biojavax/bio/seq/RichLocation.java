@@ -42,6 +42,7 @@ import org.biojavax.ontology.ComparableTerm;
  * Describes locations, and adds the concepts of circularity, fuzziness,
  * annotations, and cross-references to other databases. Also includes strands.
  * @author Richard Holland
+ * @since 1.5
  */
 public interface RichLocation extends Location,RichAnnotatable,Comparable {
     
