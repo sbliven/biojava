@@ -16,7 +16,7 @@
         <property name="name" node="@name"/>
         <property name="identifier"/>
         <property name="description" column="definition"/>
-        <property name="obsolete" column="is_obsolete" node="@obsolete"/>
+        <property name="obsoleteChar" column="is_obsolete" node="@obsolete"/>
         <many-to-one name="ontology" class="Ontology" column="ontology_id" not-null="true" cascade="persist,merge,save-update" node="@ontologyId" embed-xml="false"/>
         <set name="synonymSet" table="term_synonym" lazy="false" sort="natural">
             <key column="term_id"/>

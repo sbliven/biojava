@@ -284,7 +284,17 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
             }
         }
     }
-    
+
+    // Hibernate requirement - not for public use.
+    private String getObsoleteChar() {
+        return (this.getObsolete()!=null && this.getObsolete().equals(Boolean.TRUE))?"X":null;
+    }
+
+    // Hibernate requirement - not for public use.
+    private void setObsoleteChar(String obsolete) throws ChangeVetoException {
+        this.setObsolete(Boolean.valueOf(obsolete!=null && obsolete.equals("X")));
+    }
+        
     /**
      * {@inheritDoc}
      */
