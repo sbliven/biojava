@@ -34,7 +34,7 @@ import org.biojava.bio.*;
 
 public class StructureException extends BioException {
     
-    
+    public static final long serialVersionUID = 62946250941673093l;
     /**
      * Constructs a StructureException object.
      *
@@ -43,11 +43,22 @@ public class StructureException extends BioException {
     public StructureException(String s) {
 	super(s);
     }
+    
+    /**
+     * Constructs a StructureException object.
+     *
+     * @param t  a Throwable object
+     * @param message  a String ...
+     */ 
+    public StructureException(String message, Throwable t){
+        super(message, t);
+    }
     /**
      * Constructs a StructureException object.
      *
      * @param t  a Throwable object
      * @param s  a String ...
+     *  @deprecated use new StructureException(message, ex) instead
      */
     public StructureException (Throwable t, String s) {
 	super(t, s);
