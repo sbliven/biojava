@@ -12,6 +12,8 @@ package org.biojava.bio.structure.jama;
 
 public class CholeskyDecomposition implements java.io.Serializable {
 
+    static final long serialVersionUID = 224348942390823l;
+    
 /* ------------------------
    Class variables
  * ------------------------ */

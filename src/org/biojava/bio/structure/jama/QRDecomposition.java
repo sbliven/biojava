@@ -16,6 +16,8 @@ package org.biojava.bio.structure.jama;
 
 public class QRDecomposition implements java.io.Serializable {
 
+    static final long serialVersionUID = 10293720387423l;
+    
 /* ------------------------
    Class variables
  * ------------------------ */

@@ -4,7 +4,6 @@ import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
-import java.text.FieldPosition;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.StreamTokenizer;
@@ -55,6 +54,9 @@ import java.io.StreamTokenizer;
 
 public class Matrix implements Cloneable, java.io.Serializable {
 
+    static final long serialVersionUID = 8492558293015348719l;
+    
+    
 /* ------------------------
    Class variables
  * ------------------------ */

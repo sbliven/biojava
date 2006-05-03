@@ -15,6 +15,8 @@ package org.biojava.bio.structure.jama;
 
 public class LUDecomposition implements java.io.Serializable {
 
+    static final long serialVersionUID = 9271028462937843l;
+    
 /* ------------------------
    Class variables
  * ------------------------ */

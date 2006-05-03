@@ -18,6 +18,8 @@ package org.biojava.bio.structure.jama;
 
 public class EigenvalueDecomposition implements java.io.Serializable {
 
+    static final long serialVersionUID = 93489734879234789l;
+    
 /* ------------------------
    Class variables
  * ------------------------ */

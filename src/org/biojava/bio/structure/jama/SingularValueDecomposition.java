@@ -16,6 +16,8 @@ package org.biojava.bio.structure.jama;
 
 public class SingularValueDecomposition implements java.io.Serializable {
 
+    static final long serialVersionUID = 640239472093534756l;
+    
 /* ------------------------
    Class variables
  * ------------------------ */
