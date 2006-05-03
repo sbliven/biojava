@@ -101,32 +101,32 @@ public class PDBMSDReader
 	    Chain current_chain = new ChainImpl();
 	    while (row.next()) {
 	    
-		int residue_serial         = row.getInt(1);
+		//int residue_serial         = row.getInt(1);
 		int serial                 = row.getInt(2);
-		String residue_id          = row.getString(3);
+		//String residue_id          = row.getString(3);
 		String code_3_letter       = row.getString(4);
 		String CHEM_ATOM_NAME_LS   = row.getString(5);
 		String chem_atom_name      = row.getString(6);
-		String element_symbol      = row.getString(7);
-		String alt_code            = row.getString(8);
-		String chain_Code_1_Letter = row.getString(9);
-		String chain_code          = row.getString(10) ;
+		//String element_symbol      = row.getString(7);
+		//String alt_code            = row.getString(8);
+		//String chain_Code_1_Letter = row.getString(9);
+		//String chain_code          = row.getString(10) ;
 		String chain_pdb_code      = row.getString(11) ;
 		double OCCUPANCY           = row.getDouble(12);
-		String PDB_CHARGE          = row.getString(13);
+		//String PDB_CHARGE          = row.getString(13);
 		String pdb_Group           = row.getString(14);
 		double x                   = row.getDouble(15);
 		double y                   = row.getDouble(16);
 		double z                   = row.getDouble(17);
-		String ligand_code 	   = row.getString(18);
-		String chem_atom_id  	   = row.getString(19);
-		double U_ISO_OR_EQUIV      = row.getDouble(20);
+		//String ligand_code 	   = row.getString(18);
+		//String chem_atom_id  	   = row.getString(19);
+		//double U_ISO_OR_EQUIV      = row.getDouble(20);
 		int residue_pdb_seq        = row.getInt(21);
 		String insertionCode       = row.getString(22);
 		//System.out.println(U_ISO_OR_EQUIV);
 	    
 	    
-		String str = "" ;
+		//String str = "" ;
 	    
 	    
 

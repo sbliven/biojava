@@ -30,24 +30,35 @@ import org.biojava.bio.*;
  */
 
 public class PDBParseException extends BioException {
+    public static final long serialVersionUID = 219047230178423923l;
     /**
      * Constructs a PDBParseException object.
      *
      * @param s  a String ...
      */
-
+    
     public PDBParseException(String s) {
-	super(s);
+        super(s);
     }
     /**
      * Constructs a PDBParseException object.
      *
      * @param t  a Throwable object
      * @param s  a String ...
+     * @deprecated use new BioException(message, ex) instead
      */
-
+    
     public PDBParseException (Throwable t, String s) {
-	super(t, s);
+        super(t, s);
+    }
+    /**
+     * Constructs a PDBParseException object.
+     *
+     * @param t  a Throwable object
+     * @param s  a String ...
+     */ 
+    public PDBParseException ( String s,Throwable t) {
+        super(s, t);
     }
     /**
      * Constructs a PDBParseException object.
@@ -55,6 +66,6 @@ public class PDBParseException extends BioException {
      * @param t  a Throwable object
      */
     public PDBParseException (Throwable t) {
-	super(t);
+        super(t);
     }
 }

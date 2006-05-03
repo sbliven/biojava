@@ -32,7 +32,6 @@ import org.biojava.utils.xml.*      ;
 import java.io.IOException          ;
 
 // for formatting on numbers
-import java.util.Locale             ;
 import java.text.NumberFormat       ;
 
 /** Methods to convert a structure object into different file formats.
@@ -80,7 +79,7 @@ public class FileConvert {
 	
 
 	StringBuffer str = new StringBuffer();
-	int i = 0 ;
+	//int i = 0 ;
 	
 	// Locale should be english, e.g. in DE separator is "," -> PDB files have "." !
 	DecimalFormat d3 = (DecimalFormat)NumberFormat.getInstance(java.util.Locale.UK);
@@ -183,7 +182,7 @@ public class FileConvert {
     /** test if pdbserial has an insertion code */
     private boolean hasInsertionCode(String pdbserial) {
 	try {
-	    int pos = Integer.parseInt(pdbserial) ;
+	     Integer.parseInt(pdbserial) ;
 	} catch (NumberFormatException e) {
 	    return true ;
 	}

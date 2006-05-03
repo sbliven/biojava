@@ -26,7 +26,7 @@ package org.biojava.bio.structure.io;
 
 // the biojava-structure stuff
 import org.biojava.bio.structure.*;
-import org.biojava.bio.structure.io.*;
+
        
 // das communication part
 import org.biojava.bio.program.das.dasstructure.* ;
