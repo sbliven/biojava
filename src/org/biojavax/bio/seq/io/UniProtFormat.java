@@ -125,13 +125,13 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final Pattern lp = Pattern.compile("^((\\S+)_(\\S+))\\s+(\\S+);\\s+(PRT);\\s+\\d+\\s+AA\\.$");
     // RP line parser
     protected static final Pattern rppat = Pattern.compile("SEQUENCE OF (\\d+)-(\\d+)");
-    // date line
-    // date (Rel. N, Created)
-    // date (Rel. N, Last sequence update)
-    // date (Rel. N, Last annotation update)
-    protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s+\\(Rel\\.\\s+(\\d+), ([^\\)]+)\\)$");
+    // date lineDT
+    // date, integrated into UniProtKB/database_name.
+    // date, sequence version x.
+    // date, entry version x.
+    protected static final Pattern dp = Pattern.compile("([^,]+),([^\\d\\.]+)(\\d+)?\\.$");
     // feature line
-    protected static final Pattern fp = Pattern.compile("^\\s*([\\d?<]+\\s+[\\d?>]+)(\\s+(\\S.*)\\.*(\\s+\\S*)?)?$");
+    protected static final Pattern fp = Pattern.compile("^\\s*([\\d?<]+\\s+[\\d?>]+)(\\s+(.*))?$");
     
     protected static final Pattern headerLine = Pattern.compile("^ID.*");
     
@@ -140,6 +140,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public static class Terms extends RichSequence.Terms {
         private static ComparableTerm UNIPROT_TERM = null;
+        private static ComparableTerm UNIPROT_DBNAME_TERM = null;
         
         private static String GENENAME_KEY = "Name";
         private static String GENESYNONYM_KEY = "Synonyms";
@@ -153,6 +154,15 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         public static ComparableTerm getUniProtTerm() {
             if (UNIPROT_TERM==null) UNIPROT_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt");
             return UNIPROT_TERM;
+        }
+        
+        /**
+         * Getter for the UniProt combined database term
+         * @return The combined database for UniProt Term
+         */
+        public static ComparableTerm getUniProtDBNameTerm() {
+            if (UNIPROT_DBNAME_TERM==null) UNIPROT_DBNAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt database name");
+            return UNIPROT_DBNAME_TERM;
         }
     }
     
@@ -315,16 +325,20 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 String chunk = ((String[])section.get(0))[1];
                 Matcher dm = dp.matcher(chunk);
                 if (dm.matches()) {
-                    String date = dm.group(1);
-                    String rel = dm.group(2);
-                    String type = dm.group(3);
-                    if (type.equalsIgnoreCase("Created")) {
+                    String date = dm.group(1).trim();
+                    String type = dm.group(2).trim();
+                    String rel = dm.group(3);
+                    if (rel!=null) rel = rel.trim();
+                    if (type.startsWith("integrated into UniProtKB")) {
+                        String dbname = type.split("/")[1];
                         rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
-                        rlistener.addSequenceProperty(Terms.getRelCreatedTerm(), rel);
-                    } else if (type.equalsIgnoreCase("Last sequence update")) {
+                        rlistener.addSequenceProperty(Terms.getUniProtDBNameTerm(), dbname);
+                    } else if (type.equalsIgnoreCase("sequence version")) {
+                        if (rel==null) throw new ParseException("Version missing for "+type);
                         rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
-                    } else if (type.equalsIgnoreCase("Last annotation update")) {
+                    } else if (type.equalsIgnoreCase("entry version")) {
+                        if (rel==null) throw new ParseException("Version missing for "+type);
                         rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelAnnotatedTerm(), rel);
                     } else throw new ParseException("Bad date type found: "+type);
@@ -547,16 +561,14 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         templ.rankedCrossRefs = new TreeSet();
                         String desc = null;
                         String status = null;
+                        val = val.replaceAll("\n", " "); // Nasty hack but we have to do this, sadly.
                         Matcher m = fp.matcher(val);
                         if (m.matches()) {
                             String loc = m.group(1);
-                            if(m.group(4) != null){
-                                desc = m.group(3)+m.group(4);
-                            }else{
-                                desc = m.group(3);
-                            }
+                            desc = m.group(3);
                             templ.location = UniProtLocationParser.parseLocation(loc);
                         } else {
+                            System.err.println("XX"+val+"XX");
                             throw new ParseException("Bad feature value: "+val);
                         }
                         rlistener.startFeature(templ);
@@ -818,7 +830,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         String cdat = null;
         String udat = null;
         String adat = null;
-        String crel = null;
+        String dbname = "?";
         String urel = null;
         String arel = null;
         String organelle = null;
@@ -837,7 +849,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getDateAnnotatedTerm())) adat=n.getValue();
-            else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
+            else if (n.getTerm().equals(Terms.getUniProtDBNameTerm())) dbname=n.getValue();
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelAnnotatedTerm())) arel=n.getValue();
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
@@ -929,9 +941,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         StringTools.writeKeyValueLine(ACCESSION_TAG, accessions.toString(), 5, this.getLineWidth(), null, ACCESSION_TAG, this.getPrintStream());
         
         // date line
-        StringTools.writeKeyValueLine(DATE_TAG, (cdat==null?udat:cdat)+" (Rel. "+(crel==null?"0":crel)+", Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
-        StringTools.writeKeyValueLine(DATE_TAG, udat+" (Rel. "+(urel==null?"0":urel)+", Last sequence update)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
-        StringTools.writeKeyValueLine(DATE_TAG, (adat==null?udat:adat)+" (Rel. "+(arel==null?"0":arel)+", Last annotation update)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, (cdat==null?udat:cdat)+", integrated into UniProtKB/"+dbname+".", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, udat+", sequence version "+(urel==null?"0":urel)+".", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, (adat==null?udat:adat)+", entry version "+(arel==null?"0":arel)+".", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         
         // definition line
         StringTools.writeKeyValueLine(DEFINITION_TAG, rs.getDescription()+".", 5, this.getLineWidth(), null, DEFINITION_TAG, this.getPrintStream());
