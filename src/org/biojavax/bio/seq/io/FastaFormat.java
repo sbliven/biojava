@@ -21,10 +21,12 @@
 
 package org.biojavax.bio.seq.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,6 +98,37 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
         br.readLine(); // discard first line
         boolean aa = aminoAcids.matcher(br.readLine()).matches();
         br.close();
+        if (aa) return RichSequence.IOTools.getProteinParser();
+        else return RichSequence.IOTools.getDNAParser();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A stream is in FASTA format if the stream starts with ">".
+     */
+    public boolean canRead(BufferedInputStream stream) throws IOException {
+        stream.mark(2000); // some streams may not support this
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        boolean readable = br.readLine().startsWith(">");
+        // don't close the reader as it'll close the stream too.
+        // br.close();
+        stream.reset();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Returns an protein parser if the first line of sequence contains any of F/L/I/P/Q/E, 
+     * otherwise returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(BufferedInputStream stream) throws IOException {
+        stream.mark(2000); // some streams may not support this
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        br.readLine(); // discard first line
+        boolean aa = aminoAcids.matcher(br.readLine()).matches();
+        // don't close the reader as it'll close the stream too.
+        // br.close();
+        stream.reset();
         if (aa) return RichSequence.IOTools.getProteinParser();
         else return RichSequence.IOTools.getDNAParser();
     }

@@ -21,6 +21,7 @@
 
 package org.biojavax.bio.seq.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -49,18 +50,38 @@ public interface RichSequenceFormat extends SequenceFormat {
      * @throws IOException in case the file is inaccessible.
      */
     public boolean canRead(File file) throws IOException;
-
+    
     /**
      * On the assumption that the file is readable by this format (not checked),
      * attempt to guess which symbol tokenization we should use to read it.
-     * For formats that only accept one tokenization, just return it without 
-     * checking the file. For formats that accept multiple tokenizations, its 
+     * For formats that only accept one tokenization, just return it without
+     * checking the file. For formats that accept multiple tokenizations, its
      * up to you how you do it.
      * @param file  the <code>File</code> object to guess the format of.
      * @return a <code>SymbolTokenization</code> to read the file with.
      * @throws IOException if the file is unrecognisable or inaccessible.
      */
     public SymbolTokenization guessSymbolTokenization(File file) throws IOException;
+    
+    /**
+     * Check to see if a given stream is in our format. 
+     * @param stream the <code>BufferedInputStream</code> to check.
+     * @return true if the stream is readable by this format, false if not.
+     * @throws IOException in case the stream is inaccessible.
+     */
+    public boolean canRead(BufferedInputStream stream) throws IOException;
+    
+    /**
+     * On the assumption that the stream is readable by this format (not checked),
+     * attempt to guess which symbol tokenization we should use to read it.
+     * For formats that only accept one tokenization, just return it without
+     * checking the stream. For formats that accept multiple tokenizations, its
+     * up to you how you do it.
+     * @param stream the <code>BufferedInputStream</code> object to guess the format of.
+     * @return a <code>SymbolTokenization</code> to read the stream with.
+     * @throws IOException if the stream is unrecognisable or inaccessible.
+     */
+    public SymbolTokenization guessSymbolTokenization(BufferedInputStream stream) throws IOException;
     
     /**
      * Sets the stream to write to.
@@ -136,7 +157,7 @@ public interface RichSequenceFormat extends SequenceFormat {
     public void setLineWidth(int width);
     
     /**
-     * Use this method to toggle reading of sequence data. 
+     * Use this method to toggle reading of sequence data.
      * @param elideSymbols set to true if you <em>don't</em> want the sequence data.
      */
     public void setElideSymbols(boolean elideSymbols);
@@ -146,9 +167,9 @@ public interface RichSequenceFormat extends SequenceFormat {
      * @return true if it is <em>not</em> otherwise false (false is default) .
      */
     public boolean getElideSymbols();
-        
+    
     /**
-     * Use this method to toggle reading of feature data. 
+     * Use this method to toggle reading of feature data.
      * @param elideFeatures set to true if you <em>don't</em> want the feature data.
      */
     public void setElideFeatures(boolean elideFeatures);
@@ -160,7 +181,7 @@ public interface RichSequenceFormat extends SequenceFormat {
     public boolean getElideFeatures();
     
     /**
-     * Use this method to toggle reading of bibliographic reference data. 
+     * Use this method to toggle reading of bibliographic reference data.
      * @param elideReferences set to true if you <em>don't</em> want the bibliographic reference data.
      */
     public void setElideReferences(boolean elideReferences);
@@ -179,14 +200,14 @@ public interface RichSequenceFormat extends SequenceFormat {
     public void setElideComments(boolean elideComments);
     
     /**
-     * Is the format going to emit events when comments data or remarks from 
+     * Is the format going to emit events when comments data or remarks from
      * bibliographic references are read?
      * @return true if it is <em>not</em> otherwise false (false is default).
      */
     public boolean getElideComments();
     
     /**
-     * Provides a basic format with simple things like line-widths precoded. 
+     * Provides a basic format with simple things like line-widths precoded.
      */
     public abstract class BasicFormat implements RichSequenceFormat  {
         
@@ -278,10 +299,10 @@ public interface RichSequenceFormat extends SequenceFormat {
         public PrintStream getPrintStream() { return this.os; }
     }
     
-       /**
-        * Provides the basic implementation required for simple header/footer-less files such as Genbank.
-        */
-        public abstract class HeaderlessFormat extends BasicFormat {
+    /**
+     * Provides the basic implementation required for simple header/footer-less files such as Genbank.
+     */
+    public abstract class HeaderlessFormat extends BasicFormat {
         /**
          * {@inheritDoc}
          */

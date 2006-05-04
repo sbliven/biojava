@@ -20,10 +20,12 @@
  */
 
 package org.biojavax.bio.seq;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -653,6 +655,54 @@ public interface RichSequence extends BioEntry,Sequence {
         }
         // Private reference to the formats we know about.
         private static List formatClasses = new ArrayList();
+        
+        /**
+         * Guess which format a stream is then attempt to read it.
+         * @param stream the <code>BufferedInputStream</code> to attempt to read.
+         * @param seqFactory a factory used to build a <code>RichSequence</code>
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then
+         *              <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code>
+         *              over each sequence in the file
+         * @throws IOException in case the stream is unrecognisable or problems occur in reading it.
+         */
+        public static RichSequenceIterator readStream(BufferedInputStream stream, RichSequenceBuilderFactory seqFactory,
+                Namespace ns) throws IOException {
+            for (Iterator i = formatClasses.iterator(); i.hasNext(); ) {
+                Class formatClass = (Class)i.next();
+                RichSequenceFormat format;
+                try {
+                    format = (RichSequenceFormat)formatClass.newInstance();
+                } catch (Exception e) {
+                    throw new BioError(e);
+                }
+                if (format.canRead(stream)) {
+                    SymbolTokenization sTok = format.guessSymbolTokenization(stream);
+                    BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+                    return new RichStreamReader(br, format, sTok, seqFactory, ns);
+                }
+            }
+            throw new IOException("Could not recognise format of stream.");
+        }
+        
+        /**
+         * Guess which format a stream is then attempt to read it.
+         * @return a <code>RichSequenceIterator</code>
+         *              over each sequence in the file
+         * @param stream the <code>BufferedInputStream</code> to attempt to read.
+         * @param ns a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then
+         *              <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @throws java.io.IOException If the file cannot be read.
+         */
+        public static RichSequenceIterator readStream(BufferedInputStream stream, Namespace ns) throws IOException {
+            return readStream(stream, factory, ns);
+        }
         
         /**
          * Guess which format a file is then attempt to read it.

@@ -21,10 +21,12 @@
 
 package	org.biojavax.bio.seq.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -188,6 +190,29 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      * Always returns a DNA tokenizer.
      */
     public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        return RichSequence.IOTools.getDNAParser();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A stream is in EMBL format if its first line matches the EMBL format for the ID line.
+     */
+    public boolean canRead(BufferedInputStream stream) throws IOException {
+        stream.mark(2000); // some streams may not support this
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        String firstLine = br.readLine();
+        boolean readable = headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
+        // don't close the reader as it'll close the stream too.
+        // br.close();
+        stream.reset();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Always returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(BufferedInputStream stream) throws IOException {
         return RichSequence.IOTools.getDNAParser();
     }
     

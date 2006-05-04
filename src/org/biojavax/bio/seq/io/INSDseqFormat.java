@@ -21,10 +21,12 @@
 
 package	org.biojavax.bio.seq.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -88,7 +90,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @since 1.5
  */
 public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
-                    
+    
     // Register this format with the format auto-guesser.
     static {
         RichSequence.IOTools.registerFormat(INSDseqFormat.class);
@@ -174,7 +176,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             if (INSDSEQ_TERM==null) INSDSEQ_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("INSDseq");
             return INSDSEQ_TERM;
         }
-    }    
+    }
     
     /**
      * {@inheritDoc}
@@ -193,6 +195,29 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
      * Always returns a DNA tokenizer.
      */
     public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        return RichSequence.IOTools.getDNAParser();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A stream is in INSDseq format if the second XML line contains the phrase "http://www.ebi.ac.uk/dtd/INSD_INSDSeq.dtd".
+     */
+    public boolean canRead(BufferedInputStream stream) throws IOException {
+        stream.mark(2000); // some streams may not support this
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        br.readLine(); // skip first line
+        boolean readable = xmlSchema.matcher(br.readLine()).matches(); // check on second line
+        // don't close the reader as it'll close the stream too.
+        // br.close();
+        stream.reset();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Always returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(BufferedInputStream stream) throws IOException {
         return RichSequence.IOTools.getDNAParser();
     }
     
@@ -560,11 +585,11 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     xml.print("taxon:"+tax.getNCBITaxID());
                     xml.closeTag(FEATUREQUAL_VALUE_TAG);
                     
-                    xml.closeTag(FEATUREQUAL_TAG);               
+                    xml.closeTag(FEATUREQUAL_TAG);
                     
-                    String displayName = tax.getDisplayName();           
+                    String displayName = tax.getDisplayName();
                     if (displayName.indexOf('(')>-1) displayName = displayName.substring(0, displayName.indexOf('(')).trim();
-
+                    
                     xml.openTag(FEATUREQUAL_TAG);
                     
                     xml.openTag(FEATUREQUAL_NAME_TAG);
@@ -575,7 +600,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     xml.print(displayName);
                     xml.closeTag(FEATUREQUAL_VALUE_TAG);
                     
-                    xml.closeTag(FEATUREQUAL_TAG);        
+                    xml.closeTag(FEATUREQUAL_TAG);
                 }
                 // add-in other dbxrefs where present
                 for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext();) {

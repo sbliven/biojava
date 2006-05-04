@@ -21,10 +21,12 @@
 
 package	org.biojavax.bio.seq.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -382,6 +384,29 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
      * Always returns a protein tokenizer.
      */
     public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        return RichSequence.IOTools.getProteinParser();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A stream is in UniProtXML format if the second XML line contains the phrase "http://www.uniprot.org/support/docs/uniprot.xsd".
+     */
+    public boolean canRead(BufferedInputStream stream) throws IOException {
+        stream.mark(2000); // some streams may not support this
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        br.readLine(); // skip first line
+        boolean readable = xmlSchema.matcher(br.readLine()).matches(); // check on second line
+        // don't close the reader as it'll close the stream too.
+        // br.close();
+        stream.reset();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Always returns a protein tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(BufferedInputStream stream) throws IOException {
         return RichSequence.IOTools.getProteinParser();
     }
     

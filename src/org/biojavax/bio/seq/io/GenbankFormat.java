@@ -21,10 +21,12 @@
 
 package	org.biojavax.bio.seq.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -166,6 +168,37 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         String firstLine = br.readLine();
         boolean dna = (firstLine.indexOf("DNA") >0 || firstLine.indexOf("RNA") > 0);
         br.close();
+        if (dna) return RichSequence.IOTools.getDNAParser();
+        else return RichSequence.IOTools.getProteinParser();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A stream is in GenBank format if the first line of the stream starts with the word LOCUS
+     */
+    public boolean canRead(BufferedInputStream stream) throws IOException {
+        stream.mark(2000); // some streams may not support this
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        boolean readable = headerLine.matcher(br.readLine()).matches();
+        // don't close the reader as it'll close the stream too.
+        // br.close();
+        stream.reset();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Returns an dna parser if the letters DNA or RNA appear in the first line of the stream.
+     * Otherwise returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(BufferedInputStream stream) throws IOException {
+        stream.mark(2000); // some streams may not support this
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        String firstLine = br.readLine();
+        boolean dna = (firstLine.indexOf("DNA") >0 || firstLine.indexOf("RNA") > 0);
+        // don't close the reader as it'll close the stream too.
+        // br.close();
+        stream.reset();
         if (dna) return RichSequence.IOTools.getDNAParser();
         else return RichSequence.IOTools.getProteinParser();
     }

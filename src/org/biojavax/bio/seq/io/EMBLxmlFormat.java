@@ -21,10 +21,12 @@
 
 package	org.biojavax.bio.seq.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -93,7 +95,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @since 1.5
  */
 public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
-        
+    
     // Register this format with the format auto-guesser.
     static {
         RichSequence.IOTools.registerFormat(EMBLxmlFormat.class);
@@ -221,6 +223,29 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
      * Always returns a DNA tokenizer.
      */
     public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
+        return RichSequence.IOTools.getDNAParser();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * A stream is in EMBLxml format if the second XML line contains the phrase "http://www.ebi.ac.uk/schema/EMBL_schema.xsd".
+     */
+    public boolean canRead(BufferedInputStream stream) throws IOException {
+        stream.mark(2000); // some streams may not support this
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        br.readLine(); // skip first line
+        boolean readable = xmlSchema.matcher(br.readLine()).matches(); // check on second line
+        // don't close the reader as it'll close the stream too.
+        // br.close();
+        stream.reset();
+        return readable;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * Always returns a DNA tokenizer.
+     */
+    public SymbolTokenization guessSymbolTokenization(BufferedInputStream stream) throws IOException {
         return RichSequence.IOTools.getDNAParser();
     }
     
