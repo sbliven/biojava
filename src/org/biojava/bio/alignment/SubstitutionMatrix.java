@@ -36,10 +36,7 @@ import java.util.StringTokenizer;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 
 /** <p>This object is able to read a substitution matrix file and constructs an int matrix to
@@ -155,7 +152,7 @@ public class SubstitutionMatrix
     */
   protected int[][] parseMatrix(String matString) throws BioException
   {
-    int i = 0, j = 0, rows = 0, cols = 0;
+    int j = 0, rows = 0, cols = 0;
     StringTokenizer br, st;
     SymbolTokenization symtok = alphabet.getTokenization("token");
 
@@ -432,25 +429,5 @@ public class SubstitutionMatrix
     
     return null;
   }
-
-  
-  /** Just for tests.
-    * @param args
-    */
-  public static void main(String args[])
-  {
-    try {
-      new SubstitutionMatrix((FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN-TERM"), new File(args[0]));
-    } catch (IllegalSymbolException exc) {
-      exc.printStackTrace();
-    } catch (IOException exc) {
-      exc.printStackTrace();
-    } catch (IllegalAlphabetException exc) {
-      exc.printStackTrace();
-    } catch (BioException exc) {
-      exc.printStackTrace();
-    }  
-  }
-
   
 }

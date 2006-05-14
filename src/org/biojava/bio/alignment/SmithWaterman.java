@@ -280,7 +280,15 @@ public class SmithWaterman extends NeedlemanWunsch
                   queryStart  = i;
                   targetStart = j;
                   i = j = 0;
+                
+                // Match/Replace
+                } else if (scoreMatrix[i][j] == scoreMatrix[i-1][j-1] + matchReplace(query, subject, i, j)) {
+                  if (query.symbolAt(i) == subject.symbolAt(j)) path = '|' + path;
+                  else path = ' ' + path;
 
+                  align[0] = st.tokenizeSymbol(query.symbolAt(i--))   + align[0];
+                  align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                  
                 // Insert
                 } else if (scoreMatrix[i][j] == scoreMatrix[i][j-1] + insert) {
                   align[0] = '-' + align[0];
@@ -288,20 +296,11 @@ public class SmithWaterman extends NeedlemanWunsch
                   path     = ' ' + path;
 
                 // Delete
-                } else if (scoreMatrix[i][j] == scoreMatrix[i-1][j] + delete) {
+                } else {
                   align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
                   align[1] = '-' + align[1];
                   path     = ' ' + path;
-
-                // Match/Replace
-                } else {
-                  if (query.symbolAt(i) == subject.symbolAt(j)) path = '|' + path;
-                  else path = ' ' + path;
-
-                  align[0] = st.tokenizeSymbol(query.symbolAt(i--))   + align[0];
-                  align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
                 }
-
               } while (j>0);
             }
           } catch (BioException exc) {
