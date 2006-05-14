@@ -295,9 +295,14 @@ public class NeedlemanWunsch extends SequenceAlignment
     
       long time = System.currentTimeMillis();
       int   i, j;
-      double matchReplace;
-      this.CostMatrix   = new double[query.length()+1][subject.length()+1]; // Matrix CostMatrix
+      this.CostMatrix = new double[query.length()+1][subject.length()+1]; // Matrix CostMatrix
 
+      /*
+       * Variables for the traceback
+       */
+      String[] align = new String[] {"", ""};
+      String path = "";
+            
       // construct the matrix:
       CostMatrix[0][0] = 0;
     
@@ -308,130 +313,146 @@ public class NeedlemanWunsch extends SequenceAlignment
       
         double[][] E = new double[query.length()+1][subject.length()+1];	// Inserts
         double[][] F = new double[query.length()+1][subject.length()+1];	// Deletes
-        double[][] G = new double[query.length()+1][subject.length()+1];	// Match/Replace
       
-        G[0][0] = 0;
         E[0][0] = F[0][0]   = Double.MAX_VALUE;
         for (i=1; i<=query.length();   i++) {
           CostMatrix[i][0]  = CostMatrix[i-1][0] + delete;
-          G[i][0] = E[i][0] = Double.MAX_VALUE;
-          F[i][0] = delete;
+          E[i][0] = Double.POSITIVE_INFINITY;
+          F[i][0] = delete + i*gapExt;
         }
         for (j=1; j<=subject.length(); j++) {
           CostMatrix[0][j]  = CostMatrix[0][j-1] + insert;
-          G[0][j] = F[0][j] = Double.MAX_VALUE;
-          E[0][j] = insert;
+          F[0][j] = Double.POSITIVE_INFINITY;
+          E[0][j] = insert + j*gapExt;
         }
         for (i=1; i<=query.length();   i++)
           for (j=1; j<=subject.length(); j++)
           {
-            try {
-              matchReplace = subMatrix.getValueAt(query.symbolAt(i), subject.symbolAt(j));
-            } catch (Exception exc) {
-              if (query.symbolAt(i).getMatches().contains(subject.symbolAt(j)) ||
-                  subject.symbolAt(j).getMatches().contains(query.symbolAt(i)))
-                matchReplace = match; //0;
-              else matchReplace = replace; //delete/2 + insert/2;
-            }
-            G[i][j] = CostMatrix[i-1][j-1] - matchReplace;
             E[i][j] = Math.min(E[i][j-1], CostMatrix[i][j-1] + insert) + gapExt;
             F[i][j] = Math.min(F[i-1][j], CostMatrix[i-1][j] + delete) + gapExt;
-            CostMatrix[i][j] = min (E[i][j], F[i][j], G[i][j]);
+            CostMatrix[i][j] = min(E[i][j], F[i][j], CostMatrix[i-1][j-1] - matchReplace(query, subject, i, j));
           }
+        
+        /*
+         * Traceback for affine gap penalties.
+         */
+        
+        try {
+          j = this.CostMatrix[CostMatrix.length - 1].length -1;
+          SymbolTokenization st = subMatrix.getAlphabet().getTokenization("default");
+          
+          for (i = this.CostMatrix.length - 1; i>0; ) {
+            do { 
+              // only Insert.
+              if (i == 0) {
+                align[0] = '~' + align[0];
+                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                path     = ' ' + path;
+               
+              // only Delete.
+              } else if (j == 0) { 
+                align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
+                align[1] = '~' + align[1];
+                path     = ' ' + path;
+              
+              // Match/Replace
+              } else if (CostMatrix[i][j] == CostMatrix[i-1][j-1] - matchReplace(query, subject, i, j)) { 
+                if (query.symbolAt(i) == subject.symbolAt(j)) 
+                     path = '|' + path; 
+                else path = ' ' + path;
+                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
+                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                
+              // Insert
+              } else if (CostMatrix[i][j] == E[i][j]) {
+                align[0] = '-' + align[0];
+                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                path     = ' ' + path;
+              
+              // Delete
+              } else { 
+                align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
+                align[1] = '-'  + align[1];
+                path     = ' '  + path;
+              }
+            } while (j>0);
+          }
+        } catch (BioException exc) {
+          throw new BioRuntimeException(exc);
+        }
+
+     /*
+      * No affine gap penalties, constant gap penalties, which is much faster and needs less memory.
+      */
       
       } else {
-        /*
-        * No affine gap penalties, constant gap penalties, which is much faster and needs less memory.
-        */
+        
         for (i=1; i<=query.length();   i++) CostMatrix[i][0] = CostMatrix[i-1][0] + delete;
         for (j=1; j<=subject.length(); j++) CostMatrix[0][j] = CostMatrix[0][j-1] + insert;
         for (i=1; i<=query.length();   i++)
-          for (j=1; j<=subject.length(); j++)
-          {        
-            try {
-              matchReplace = subMatrix.getValueAt(query.symbolAt(i), subject.symbolAt(j));
-            } catch (Exception exc) {
-              if (query.symbolAt(i).getMatches().contains(subject.symbolAt(j)) ||
-                subject.symbolAt(j).getMatches().contains(query.symbolAt(i)))
-                matchReplace = match; //0;
-              else matchReplace = replace; //delete/2 + insert/2;
-           }
-           CostMatrix[i][j] = min (
-             CostMatrix[i-1][j]   + delete, 
-             CostMatrix[i][j-1]   + insert, 
-             CostMatrix[i-1][j-1] - matchReplace);
+          for (j=1; j<=subject.length(); j++) {        
+            CostMatrix[i][j] = min (
+              CostMatrix[i-1][j]   + delete, 
+              CostMatrix[i][j-1]   + insert, 
+              CostMatrix[i-1][j-1] - matchReplace(query, subject, i, j));
          }
-    } 
-    try {
         
-      /*StringBuffer[] align = new StringBuffer[] {new StringBuffer(CostMatrix.length), new StringBuffer(CostMatrix[0].length)};
-       StringBuffer path = new StringBuffer("");//*/
+        /*
+         * Traceback for constant gap penalties.
+         */
         
-      String[] align = new String[] {"", ""};
-      String path = "";//*/
-        
-      j = this.CostMatrix[CostMatrix.length - 1].length -1;
-      SymbolTokenization st = subMatrix.getAlphabet().getTokenization("default");
-
-       for (i = this.CostMatrix.length - 1; i>0; )
-       {
-          do { 
-            // only Insert.
-            if (i == 0) {
-              /*align[0].insert(0, '~');
-              align[1].insert(0, st.tokenizeSymbol(target.symbolAt(j--)));
-              path.insert(0, ' ');//*/
-              align[0] = '~' + align[0]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[0]; //
-              align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
-              path     = ' ' + path;//*/
+        try {
+          j = this.CostMatrix[CostMatrix.length - 1].length -1;
+          SymbolTokenization st = subMatrix.getAlphabet().getTokenization("default");
+          
+          for (i = this.CostMatrix.length - 1; i>0; ) {
+            do { 
+              // only Insert.
+              if (i == 0) {
+                align[0] = '~' + align[0];
+                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                path     = ' ' + path;
+               
+              // only Delete.
+              } else if (j == 0) { 
+                align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
+                align[1] = '~' + align[1];
+                path     = ' ' + path;
+                 
+              // Match/Replace
+              } else if (CostMatrix[i][j] == CostMatrix[i-1][j-1] - matchReplace(query, subject, i, j)) { 
               
-            // only Delete.
-            } else if (j == 0) { 
-              /*align[0].insert(0, st.tokenizeSymbol(query.symbolAt(i--)));
-              align[1].insert(0, '~');
-              path.insert(0, ' ');//*/
-              align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
-              align[1] = '~' + align[1]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[1]; //
-              path     = ' ' + path;//*/
-              
-            // Match/Replace
-            } else if (CostMatrix[i-1][j-1] == min(CostMatrix[i][j-1], CostMatrix[i-1][j-1], CostMatrix[i-1][j]))  { 
-              if (query.symbolAt(i) == subject.symbolAt(j)) {
-                /*path.insert(0, '|');//*/
-                path = '|' + path;//*/ 
-              } else {
-                path = ' ' + path;//*/
-                /*path.insert(0, ' ');//*/
-              } /*            
-              align[0].insert(0, st.tokenizeSymbol(query.symbolAt(i--)));
-              align[1].insert(0, st.tokenizeSymbol(target.symbolAt(j--)));//*/
-              align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
-              align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];//*/
-              /* ist nicht so gut, weil sonst auch Striche zwischen ambigious Symbols kommen.
-               *if (query.symbolAt(i+1).getMatches().contains(target.symbolAt(j+1))) 
-               */
-              
-            // Insert
-            } else if ((CostMatrix[i][j-1] < CostMatrix[i-1][j-1]) && (CostMatrix[i][j-1] < CostMatrix[i-1][j])) {
-             /*align[0].insert(0, '-');
-             align[1].insert(0, st.tokenizeSymbol(target.symbolAt(j--)));
-             path.insert(0, ' ');//*/
-              align[0] = '-' + align[0]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[0]; //
-              align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
-              path     = ' ' + path;//*/
-            
-            // Delete
-            } else { 
-              /*align[0].insert(0, st.tokenizeSymbol(query.symbolAt(i--)));
-              align[1].insert(0, '-');
-              path.insert(0, ' ');//*/
-              align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
-              align[1] = '-'  + align[1]; // st.tokenizeSymbol(alpha.getGapSymbol()) + align[1]; //
-              path     = ' '  + path;//*/
-            }
-          } while (j>0);
-        }
+                if (query.symbolAt(i) == subject.symbolAt(j)) 
+                     path = '|' + path; 
+                else path = ' ' + path;
+                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
+                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
                 
+              // Insert
+              } else if (CostMatrix[i][j] == CostMatrix[i-1][j] + insert) {
+                align[0] = '-' + align[0];
+                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                path     = ' ' + path;
+              
+              // Delete
+              } else { 
+                align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
+                align[1] = '-'  + align[1];
+                path     = ' '  + path;
+              }
+            } while (j>0);
+          }
+        } catch (BioException exc) {
+          throw new BioRuntimeException(exc);
+        }
+        
+    } 
+      
+    /*
+     * From here both cases are equal again.
+     */
+    try {
+                              
         query = new SimpleGappedSequence(
           new SimpleSequence(
             new SimpleSymbolList(query.getAlphabet().getTokenization("token"), align[0]), 
@@ -451,18 +472,18 @@ public class NeedlemanWunsch extends SequenceAlignment
         
         // this.printCostMatrix(queryChar, targetChar);	// only for tests important
         this.alignment = formatOutput(
-            query.getName(), 
-            subject.getName(), 
-            align, 
-            path, 
-            0, 
-            CostMatrix.length-1, 
-            CostMatrix.length-1,
-            0, 
-            CostMatrix[0].length-1,
-            CostMatrix[0].length-1,
-            getEditDistance(),
-            System.currentTimeMillis() - time) + "\n";
+            query.getName(),        // name of the query sequence 
+            subject.getName(),      // name of the target sequence
+            align,                  // the String representation of the alignment
+            path,                   // String match/missmatch representation
+            0,                      // Start position of the alignment in the query sequence
+            CostMatrix.length-1,    // End position of the alignment in the query sequence
+            CostMatrix.length-1,    // length of the query sequence
+            0,                      // Start position of the alignment in the target sequence
+            CostMatrix[0].length-1, // End position of the alignment in the target sequence
+            CostMatrix[0].length-1, // length of the target sequence
+            getEditDistance(),      // the edit distance
+            System.currentTimeMillis() - time) + "\n"; // time consumption
         
         //System.out.println(printCostMatrix(CostMatrix, query.seqString().toCharArray(), subject.seqString().toCharArray()));   
         return getEditDistance();
@@ -470,7 +491,31 @@ public class NeedlemanWunsch extends SequenceAlignment
       } catch (BioException exc) {
         throw new BioRuntimeException(exc);
       }
-    } else throw new BioRuntimeException("Alphabet missmatch occured: sequences with different alphabet cannot be aligned.");
+    } else throw new BioRuntimeException(
+      "Alphabet missmatch occured: sequences with different alphabet cannot be aligned.");
+  }
+
+
+  /** This method computes the penalies for the substution of the i-th symbol
+   * of query by the j-th symbol of subject. 
+   * 
+   * @param query
+   * @param subject
+   * @param i
+   * @param j
+   * @return penalties for the given substitution.
+   */
+  protected double matchReplace(Sequence query, Sequence subject, int i, int j) {
+    double mr;
+    try {
+      mr = subMatrix.getValueAt(query.symbolAt(i), subject.symbolAt(j));
+    } catch (Exception exc) {
+      if (query.symbolAt(i).getMatches().contains(subject.symbolAt(j)) ||
+        subject.symbolAt(j).getMatches().contains(query.symbolAt(i)))
+        mr = match;
+      else mr = replace; //delete/2 + insert/2;
+    }
+    return mr;
   }
 
 
