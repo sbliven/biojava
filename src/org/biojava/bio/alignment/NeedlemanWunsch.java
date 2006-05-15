@@ -404,6 +404,7 @@ public class NeedlemanWunsch extends SequenceAlignment
         try {
           j = this.CostMatrix[CostMatrix.length - 1].length -1;
           SymbolTokenization st = subMatrix.getAlphabet().getTokenization("default");
+          //System.out.println(printCostMatrix(CostMatrix, query.seqString().toCharArray(), subject.seqString().toCharArray()));
           
           for (i = this.CostMatrix.length - 1; i>0; ) {
             do { 
@@ -429,7 +430,7 @@ public class NeedlemanWunsch extends SequenceAlignment
                 align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
                 
               // Insert
-              } else if (CostMatrix[i][j] == CostMatrix[i-1][j] + insert) {
+              } else if (CostMatrix[i][j] == CostMatrix[i][j-1] + insert) {
                 align[0] = '-' + align[0];
                 align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
                 path     = ' ' + path;
@@ -496,26 +497,26 @@ public class NeedlemanWunsch extends SequenceAlignment
   }
 
 
-  /** This method computes the penalies for the substution of the i-th symbol
+  /** This method computes the scores for the substution of the i-th symbol
    * of query by the j-th symbol of subject. 
    * 
-   * @param query
-   * @param subject
-   * @param i
-   * @param j
-   * @return penalties for the given substitution.
+   * @param query The query sequence
+   * @param subject The target sequence
+   * @param i The position of the symbol under consideration within the 
+   *        query sequence (starting from one)
+   * @param j The position of the symbol under consideration within the
+   *        target sequence
+   * @return The score for the given substitution.
    */
-  protected double matchReplace(Sequence query, Sequence subject, int i, int j) {
-    double mr;
+  private double matchReplace(Sequence query, Sequence subject, int i, int j) {
     try {
-      mr = subMatrix.getValueAt(query.symbolAt(i), subject.symbolAt(j));
+      return subMatrix.getValueAt(query.symbolAt(i), subject.symbolAt(j));
     } catch (Exception exc) {
       if (query.symbolAt(i).getMatches().contains(subject.symbolAt(j)) ||
         subject.symbolAt(j).getMatches().contains(query.symbolAt(i)))
-        mr = match;
-      else mr = replace; //delete/2 + insert/2;
+        return -match;
+      return -replace;
     }
-    return mr;
   }
 
 

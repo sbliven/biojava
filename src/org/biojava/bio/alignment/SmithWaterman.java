@@ -382,5 +382,27 @@ public class SmithWaterman extends NeedlemanWunsch
     return z;
   }
   
+  /** This method computes the scores for the substution of the i-th symbol
+   * of query by the j-th symbol of subject. 
+   * 
+   * @param query The query sequence
+   * @param subject The target sequence
+   * @param i The position of the symbol under consideration within the 
+   *        query sequence (starting from one)
+   * @param j The position of the symbol under consideration within the
+   *        target sequence
+   * @return The score for the given substitution.
+   */
+  private double matchReplace(Sequence query, Sequence subject, int i, int j) {
+    try {
+      return subMatrix.getValueAt(query.symbolAt(i), subject.symbolAt(j));
+    } catch (Exception exc) {
+      if (query.symbolAt(i).getMatches().contains(subject.symbolAt(j)) ||
+        subject.symbolAt(j).getMatches().contains(query.symbolAt(i)))
+        return match;
+      return replace;
+    }
+  }
+  
   
 }
