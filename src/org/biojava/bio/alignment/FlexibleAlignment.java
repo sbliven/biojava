@@ -82,7 +82,6 @@ public class FlexibleAlignment
         labelOrder = new Vector();
         alignmentRange = new RangeLocation(1,1);
         
-        Alphabet lastAlpha = null;
         int k=0;
         // go through the list make sure that all seqs are GappedSymbolLists
         for (Iterator i = seqList.iterator();i.hasNext();){
@@ -531,8 +530,7 @@ debug("OOOPS something is wrong " + loc.toString() + " " + absOffset);
         return (column - loc.getMin() + 1);
     }
     
-    protected synchronized Location locInSeq(Object label,Location viewLoc)throws NoSuchElementException, IndexOutOfBoundsException {
-        Location loc = locInAlignment(label);
+    protected synchronized Location locInSeq(Object label,Location viewLoc) throws NoSuchElementException, IndexOutOfBoundsException {
         int min = posInSeq(label,viewLoc.getMin());
         int max = posInSeq(label,viewLoc.getMax());
         return  new RangeLocation(min,max);
