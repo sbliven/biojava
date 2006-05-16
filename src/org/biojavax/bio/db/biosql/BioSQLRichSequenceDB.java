@@ -49,6 +49,7 @@ import org.biojavax.bio.seq.SimpleRichSequence;
 /**
  *
  * @author Richard Holland
+ * @author David Scott
  * @since 1.5
  */
 public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
@@ -80,10 +81,10 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
         this.session = session;
         try {
             // Lazy load the Session class from Hibernate.
-            Class hibernateSession = Class.forName("org.hibernate.Session");
+            Class hibernateSession = session.getClass();
             // Test to see if our parameter is really a Session
-            if (!hibernateSession.isInstance(session))
-                throw new IllegalArgumentException("Session parameter must be a org.hibernate.Session object");
+            if (!hibernateSession.getName().equals("org.hibernate.Session"))
+                throw new IllegalArgumentException("Parameter must be a org.hibernate.Session object");
             this.session = session;
             // Lookup the createQuery method
             this.createQuery = hibernateSession.getMethod("createQuery", new Class[]{String.class});

@@ -33,6 +33,7 @@ import org.biojavax.bio.seq.SimpleRichSequence;
  * BioSQLRichSequenceDB.getRichSequence() to convert the original sequence into a proper
  * SimpleRichSequence.
  * @author Richard Holland
+ * @author David Scott
  * @since 1.5
  */
 public class BioSQLRichSequenceHandler extends DummyRichSequenceHandler {
@@ -54,9 +55,9 @@ public class BioSQLRichSequenceHandler extends DummyRichSequenceHandler {
         super();
         try {
             // Lazy load the Session class from Hibernate.
-            Class hibernateSession = Class.forName("org.hibernate.Session");
+            Class hibernateSession = session.getClass();
             // Test to see if our parameter is really a Session
-            if (!hibernateSession.isInstance(session))
+            if (!hibernateSession.getName().equals("org.hibernate.Session"))
                 throw new IllegalArgumentException("Parameter must be a org.hibernate.Session object");
             this.session = session;
             // Lookup the createQuery method

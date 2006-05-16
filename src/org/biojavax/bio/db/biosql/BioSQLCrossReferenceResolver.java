@@ -38,6 +38,7 @@ import org.biojavax.bio.seq.RichSequence;
  * A simple implementation of CrossReferenceResolver
  * @author Richard Holland
  * @author Mark Schreiber
+ * @author David Scott
  * @since 1.5
  */
 public class BioSQLCrossReferenceResolver implements CrossReferenceResolver {
@@ -57,9 +58,9 @@ public class BioSQLCrossReferenceResolver implements CrossReferenceResolver {
     public BioSQLCrossReferenceResolver(Object session) {
         try {
             // Lazy load the Session class from Hibernate.
-            Class hibernateSession = Class.forName("org.hibernate.Session");
+            Class hibernateSession = session.getClass();
             // Test to see if our parameter is really a Session
-            if (!hibernateSession.isInstance(session))
+            if (!hibernateSession.getName().equals("org.hibernate.Session"))
                 throw new IllegalArgumentException("Parameter must be a org.hibernate.Session object");
             this.session = session;
             // Lookup the createQuery method
