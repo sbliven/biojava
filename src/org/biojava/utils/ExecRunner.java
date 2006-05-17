@@ -43,7 +43,8 @@ import java.util.StringTokenizer;
    * article in JavaWorld "When Runtime.exec() Won't".</P>
    *
    * @author <a href="mailto:smccrory@users.sourceforge.net">Scott McCrory</a>.
-   * @author Francois Pepin 
+   * @author Francois Pepin
+   * @author Andreas Dr&auml;ger 
    * @version CVS $Id$
    */
   public class ExecRunner {
@@ -109,7 +110,31 @@ import java.util.StringTokenizer;
 	 }
 
      }
+      
+      /**
+       * ExecRunner constructor which also conveniently runs exec(String).
+       *
+       * @param command The program or command to run
+       * @param arguments An array of Strings in which every single String 
+       *   is exactly one of the program's arguments. So these arguments are
+       *   allowed to contain white spaces and are marked as Strings by the
+       *   system.
+       * @throws ExceptionInInitializerError thrown if a problem occurs
+       * @since 1.5
+       */
+      public ExecRunner(String command, String[] arguments) 
+        throws ExceptionInInitializerError {
+        this();
+        try {
+          exec(command, arguments);
+        } catch (IOException ioe) {
+          throw new ExceptionInInitializerError(ioe.getMessage());
+        } catch (InterruptedException inte) {
+          throw new ExceptionInInitializerError(inte.getMessage());
+        }
+      }
 
+      
      /**
       * We override the <code>clone</code> method here to prevent cloning of our class.
       *
@@ -126,7 +151,13 @@ import java.util.StringTokenizer;
       * The <B>exec(String)</B> method runs a process inside of a watched thread.
       * It returns the client's exit code and feeds its STDOUT and STDERR to
       * ExecRunner's out and err strings, where you then use getOutString()
-      * and getErrString() to obtain these values.  Example:
+      * and getErrString() to obtain these values. 
+      * If the command String contains arguments which are Strings containing white 
+      * spaces, the method <pre>exec(program, arguments)</pre> should be used 
+      * instead, where <code>arguments</code> is a <code>String[]</code> array 
+      * containing the arguments of the program.
+      * 
+      * Example:
       *
       * <pre>
       * // Execute the program and grab the results
@@ -174,6 +205,38 @@ import java.util.StringTokenizer;
 	 return rc;
 
      }
+     
+     
+  /** Sometimes special cases may occur that the arguments of an external program 
+   * are Strings containing white spaces. Another example are external processes 
+   * needing the String arguments to be characterized in a special way. 
+   * In this cases it is sensefull to write every single argument in an String 
+   * array. The system itselfe will mark these arguments as Strings so that these 
+   * special encoding can be omitted. 
+   * @param command The external program to be executed.
+   * @param arguments An array of Strings. Every entry of this array is an argument
+   *   of the external program to be executed.
+   * @return The command's return code
+   * @throws IOException thrown if a problem occurs
+   * @throws InterruptedException thrown if a problem occurs
+   * @since 1.5
+   */
+  public int exec(String command, String[] arguments) 
+    throws IOException, InterruptedException {
+
+     StringWriter swOut = new StringWriter();
+     PrintWriter pwOut = new PrintWriter(swOut, true);
+
+     StringWriter swErr = new StringWriter();
+     PrintWriter pwErr = new PrintWriter(swErr, true);
+
+     int rc = exec(command, arguments, pwOut, pwErr);
+
+     out = swOut.toString();
+     err = swErr.toString();
+
+     return rc;
+   }
 
      /**
       * Convenience method for calling exec with OutputStreams.
@@ -195,7 +258,32 @@ import java.util.StringTokenizer;
 	 PrintWriter pwErr = new PrintWriter(stderrStream, true);
 
 	 return exec(command, pwOut, pwErr);
+     }
+     
+     
+     /**
+      * Convenience method for calling exec with OutputStreams.
+      *
+      * @return The command's return code
+      * @param command The program or command to run
+      * @param arguments An array of Strings containing the program's arguments.
+      * @param stdoutStream java.io.OutputStream
+      * @param stderrStream java.io.OutputStream
+      * @throws IOException thrown if a problem occurs
+      * @throws InterruptedException thrown if a problem occurs
+      * @since 1.5
+      **/
+     public int exec(
+       String command,
+       String[] arguments,
+       OutputStream stdoutStream,
+       OutputStream stderrStream)
+     throws IOException, InterruptedException {
 
+       PrintWriter pwOut = new PrintWriter(stdoutStream, true);
+       PrintWriter pwErr = new PrintWriter(stderrStream, true);
+
+       return exec(command, arguments, pwOut, pwErr);
      }
 
      /**
@@ -304,27 +392,144 @@ import java.util.StringTokenizer;
 
 		     }
 		     else {
-			 // Time is not up yet so wait 100 ms before testing again
-			 Thread.sleep(100);
+    			 // Time is not up yet so wait 100 ms before testing again
+		   	 Thread.sleep(100);
 		     }
-		 }
+		 }}}
+   
+   ////////////////////////////////////////////////////////////////
+   // Wait for output gobblers to finish forwarding the output
+   while (outputGobbler.isAlive() || errorGobbler.isAlive()) {
+   }
 
-	     }
+   ////////////////////////////////////////////////////////////////
+   // All done, flush the streams and return the exit value
+   stdoutWriter.flush();
+   stderrWriter.flush();
+   return exitVal;
 
 	 }
+   
+   
+   /**
+    * The <code>exec(String, PrintWriter, PrintWriter)</code> method runs
+    * a process inside of a watched thread.  It returns the client's exit code
+    * and feeds its STDOUT and STDERR to the passed-in streams.
+    * The arguments for the external program or command are passed as an array
+    * of Strings. This has the advantage that the arguments are allowed to 
+    * contain white spaces and are marked to be Strings by the System itselfe, 
+    * which is sometimes important. Every single argument has to be exactly one
+    * dimension of the arguments array.
+    *
+    * @return The command's return code
+    * @param command The program or command to run
+    * @param arguments An array of Strings containing the program's arguments/options.
+    * @param stdoutWriter java.io.PrintWriter
+    * @param stderrWriter java.io.PrintWriter
+    * @throws IOException thrown if a problem occurs
+    * @throws InterruptedException thrown if a problem occurs
+    * @since 1.5
+    **/
+   public int exec(
+     String command,
+     String[] arguments,
+     PrintWriter stdoutWriter,
+     PrintWriter stderrWriter)
+     throws IOException, InterruptedException {
 
-	 ////////////////////////////////////////////////////////////////
-	 // Wait for output gobblers to finish forwarding the output
-	 while (outputGobbler.isAlive() || errorGobbler.isAlive()) {
-	 }
+     // Default exit value is non-zero to indicate a problem.
+     int exitVal = 1;
 
-	 ////////////////////////////////////////////////////////////////
-	 // All done, flush the streams and return the exit value
-	 stdoutWriter.flush();
-	 stderrWriter.flush();
-	 return exitVal;
+     ////////////////////////////////////////////////////////////////
+     Runtime rt = Runtime.getRuntime();
+     Process proc;
+     String[] cmd = null;
 
+     // First get the start time & calculate comparison numbers
+     Date startTime = new Date();
+     long startTimeMs = startTime.getTime();
+     long maxTimeMs = startTimeMs + (maxRunTimeSecs * 1000);
+     int i = 0;
+
+     ////////////////////////////////////////////////////////////////
+     // First determine the OS to build the right command string
+     String osName = System.getProperty("os.name");
+     if (osName.startsWith("Windows")) {
+       cmd = new String[3+arguments.length];
+       if (osName.endsWith("NT") || osName.endsWith("2000")) {
+         cmd[0] = WINDOWS_NT_2000_COMMAND_1;
+         cmd[1] = WINDOWS_NT_2000_COMMAND_2;  
+       } else if (osName.endsWith("95") || osName.endsWith("98") || osName.endsWith("ME")) {
+         cmd[0] = WINDOWS_9X_ME_COMMAND_1;
+         cmd[1] = WINDOWS_9X_ME_COMMAND_2;  
+       }
+       cmd[2] = command;
+       for (i = 3; i<arguments.length; i++)
+         cmd[i] = arguments[i-3];
+     } else {
+       // Linux (and probably other *nixes) prefers to be called
+       // with each argument supplied separately.
+       cmd = new String[arguments.length+1];
+       cmd[0] = command;
+       for (i=1; i<cmd.length; i++) 
+         cmd[i] = arguments[i-1];
      }
+
+     // Execute the command and start the two output gobblers
+     if (cmd != null && cmd.length > 0) {
+       //System.out.println("**Checkpoint** :" + cmd.length);
+       proc = rt.exec(cmd);
+     } else {
+       throw new IOException("Insufficient commands!");
+     }
+
+     StreamGobbler outputGobbler =
+       new StreamGobbler(proc.getInputStream(), stdoutWriter);
+     StreamGobbler errorGobbler =
+       new StreamGobbler(proc.getErrorStream(), stderrWriter);
+     outputGobbler.start();
+     errorGobbler.start();
+
+     // Wait for the program to finish running and return the
+     // exit value obtained from the executable
+     while (true) {
+       try {
+         exitVal = proc.exitValue();
+         break;
+       } catch (IllegalThreadStateException e) {
+         // If we get this exception, then the process isn't
+         // done executing and we determine if our time is up.
+         if (maxRunTimeSecs > 0) {
+           Date endTime = new Date();
+           long endTimeMs = endTime.getTime();
+           if (endTimeMs > maxTimeMs) {
+             // Time's up - kill the process and the gobblers and return
+             proc.destroy();
+             maxRunTimeExceeded = true;
+             stderrWriter.println(MAX_RUN_TIME_EXCEEDED_STRING);
+             outputGobbler.quit();
+             errorGobbler.quit();
+             return exitVal;
+           } else {
+             // Time is not up yet so wait 100 ms before testing again
+             Thread.sleep(100);
+           }
+         }
+       }
+     }
+
+  	 ////////////////////////////////////////////////////////////////
+	   // Wait for output gobblers to finish forwarding the output
+	   while (outputGobbler.isAlive() || errorGobbler.isAlive()) {
+	   }
+
+  	 ////////////////////////////////////////////////////////////////
+	   // All done, flush the streams and return the exit value
+	   stdoutWriter.flush();
+	   stderrWriter.flush();
+	   return exitVal;
+
+   }
 
      /**
       * Returns the error string if exec(String) was invoked.
