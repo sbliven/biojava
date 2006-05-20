@@ -511,6 +511,22 @@ public class Calc {
         }
     }
     
+    /** shift a vector
+     * 
+     * @param a vector a
+     * @param b vector b
+     */
+    public static void shift(Atom a, Atom b){
+
+        Atom natom = add(a,b);      
+        double x = natom.getX();
+        double y = natom.getY() ;
+        double z = natom.getZ();
+        a.setX(x);
+        a.setY(y);
+        a.setZ(z);
+    }
+    
     /** shift a Group with a vector.
     *
     * @param group   a group object
