@@ -212,7 +212,8 @@ public class SmithWaterman extends NeedlemanWunsch
                 i = j = 0;
 
               // Match/Replace
-              } else if (scoreMatrix[i][j] == scoreMatrix[i-1][j-1] + matchReplace(query, subject, i, j)) {
+              } else if ((scoreMatrix[i][j] == scoreMatrix[i-1][j-1] + matchReplace(query, subject, i, j)) 
+                         && !(gap_extend[0] || gap_extend[1])) {
                 if (query.symbolAt(i) == subject.symbolAt(j)) path = '|' + path;
                 else path = ' ' + path;
 
@@ -222,8 +223,9 @@ public class SmithWaterman extends NeedlemanWunsch
               // Insert || finish gap if extended gap is opened
               } else if (scoreMatrix[i][j] == E[i][j] || gap_extend[0]) {
                 //check if gap has been extended or freshly opened
-                gap_extend[0] = (scoreMatrix[i][j] == E[i][j-1] + gapExt && gapExt != insert);
-
+                //gap_extend[0] = (scoreMatrix[i][j] == E[i][j-1] + gapExt && gapExt != insert);
+                gap_extend[0] = (E[i][j] != scoreMatrix[i][j-1] + insert + gapExt);
+                
                 align[0] = '-' + align[0];
                 align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
                 path     = ' ' + path;
@@ -231,8 +233,9 @@ public class SmithWaterman extends NeedlemanWunsch
               // Delete || finish gap if extended gap is opened
               } else {
                 //check if gap has been extended or freshly opened
-                gap_extend[1] = (scoreMatrix[i][j] == F[i-1][j] + gapExt && gapExt != delete);
-
+                //gap_extend[1] = (scoreMatrix[i][j] == F[i-1][j] + gapExt && gapExt != delete);
+                gap_extend[1] = (F[i][j] != scoreMatrix[i][j-1] + delete + gapExt);
+                
                 align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
                 align[1] = '-' + align[1];
                 path     = ' ' + path;
