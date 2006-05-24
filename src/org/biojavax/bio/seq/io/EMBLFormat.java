@@ -75,6 +75,11 @@ import org.biojavax.utils.StringTools;
  * Format reader for EMBL files. This version of EMBL format will generate
  * and write RichSequence objects. Loosely Based on code from the old, deprecated,
  * org.biojava.bio.seq.io.EmblLikeFormat object.
+ * <p>
+ * This format will read both Pre-87 and 87+ versions of EMBL. It will also write
+ * them both. By default, it will write the most recent version. If you want
+ * an earlier one, you must specify the format by passing one of the constants
+ * defined in this class to {@link #writeSequence(Sequence, String, Namespace)}.
  *
  * @author Richard Holland
  * @author Jolyon Holdstock
@@ -88,7 +93,12 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     }
     
     /**
-     * The name of this format
+     * The name of the Pre-87 format
+     */
+    public static final String EMBL_PRE87_FORMAT = "EMBL_PRE87";
+
+    /**
+     * The name of the current format
      */
     public static final String EMBL_FORMAT = "EMBL";
     
@@ -125,6 +135,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s*(\\(Rel\\.\\s+(\\d+), ([^\\)\\d]+)\\d*\\))?$");
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+standard;\\s+(circular)?\\s*(genomic)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$");
+    protected static final Pattern lpPre87 = Pattern.compile("^(\\S+);\\s+SV\\s+(\\d+);\\s+(linear|circular);\\s+(\\S+);\\s+(\\S+);\\s+(\\S+);\\s+(\\d+)\\s+BP\\.$");
     // version line
     protected static final Pattern vp = Pattern.compile("^(\\S+?)\\.(\\d+)$");
     // reference position line
@@ -142,6 +153,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         private static ComparableTerm EMBL_TERM = null;
         private static ComparableTerm GENOMIC_TERM = null;
         private static ComparableTerm VERSION_LINE_TERM = null;
+        private static ComparableTerm DATA_CLASS_TERM = null;
         
         /**
          * Getter for the EMBL term
@@ -169,6 +181,15 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             if (VERSION_LINE_TERM==null) VERSION_LINE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("versionLine");
             return VERSION_LINE_TERM;
         }
+        
+        /**
+         * Getter for the Ensembl-specific 'dataClass' term
+         * @return The data class Term
+         */
+        public static ComparableTerm getDataClassTerm() {
+            if (DATA_CLASS_TERM==null) DATA_CLASS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataClass");
+            return DATA_CLASS_TERM;
+        }
     }
     
     /**
@@ -180,7 +201,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         if (readableFileNames.matcher(file.getName()).matches()) return true;
         BufferedReader br = new BufferedReader(new FileReader(file));
         String firstLine = br.readLine();
-        boolean readable = headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
+        boolean readable = headerLine.matcher(firstLine).matches() && 
+        	(lp.matcher(firstLine.substring(3).trim()).matches() || 
+        		lpPre87.matcher(firstLine.substring(3).trim()).matches() 
+           	 		);
         br.close();
         return readable;
     }
@@ -201,7 +225,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         stream.mark(2000); // some streams may not support this
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         String firstLine = br.readLine();
-        boolean readable = headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
+        boolean readable = headerLine.matcher(firstLine).matches() && 
+        	(lp.matcher(firstLine.substring(3).trim()).matches() || 
+        			lpPre87.matcher(firstLine.substring(3).trim()).matches()
+        			);
         // don't close the reader as it'll close the stream too.
         // br.close();
         stream.reset();
@@ -263,7 +290,24 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 // entryname  dataclass; [circular] molecule; division; sequencelength BP.
                 String loc = ((String[])section.get(0))[1];
                 Matcher m = lp.matcher(loc);
+                Matcher mPre87 = lpPre87.matcher(loc);
                 if (m.matches()) {
+                	// first token is both name and primary accession
+                    rlistener.setName(m.group(1));
+                    rlistener.setAccession(m.group(1));
+                    // second token is version
+                    rlistener.setVersion(Integer.parseInt(m.group(2)));
+                    // third token is circular/linear
+                    rlistener.setCircular(m.group(3).equals("circular"));
+                    // fourth token is moltype
+                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(4));
+                    // fifth token is data class
+                    rlistener.addSequenceProperty(Terms.getDataClassTerm(),m.group(5));
+                    // sixth token is taxonomic division
+                    rlistener.setDivision(m.group(6));
+                    // seventh token is sequence length, which is ignored
+                    // as it is calculated from the sequence data later.
+                } else if (mPre87.matches()) {
                     rlistener.setName(m.group(1));
                     if (m.group(3)!=null) {
                         // add annotation for 'genomic' (Ensembl-specific term)
@@ -274,7 +318,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     // Optional extras
                     String circular = m.group(2);
                     if (circular!=null) rlistener.setCircular(true);
-                } else {
+            	} else {
                     throw new ParseException("Bad ID line found: "+loc);
                 }
             } else if (sectionKey.equals(DEFINITION_TAG)) {
@@ -743,8 +787,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public void writeSequence(Sequence seq, String format, PrintStream os) throws IOException {
         if (this.getPrintStream()==null) this.setPrintStream(os);
-        if (!format.equals(this.getDefaultFormat())) throw new IllegalArgumentException("Unknown format: "+format);
-        this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
+        this.writeSequence(seq, format, RichObjectFactory.getDefaultNamespace());
     }
     
     /**
@@ -752,6 +795,22 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      * Namespace is ignored as EMBL has no concept of it.
      */
     public void writeSequence(Sequence seq, Namespace ns) throws IOException {
+    	this.writeSequence(seq, this.getDefaultFormat(), ns);
+    }
+
+    /**
+     * As per {@link #writeSequence(Sequence, Namespace)}, except
+     * that it also takes a format parameter. This can be any of the formats
+     * defined as constants in this class.
+     * @param seq see {@link #writeSequence(Sequence, Namespace)}
+     * @param format the format to use.
+     * @param ns see {@link #writeSequence(Sequence, Namespace)}
+     * @throws IOException see {@link #writeSequence(Sequence, Namespace)}
+     */
+    public void writeSequence(Sequence seq, String format, Namespace ns) throws IOException {
+    	if (!format.equals(EMBL_FORMAT) && !format.equals(EMBL_PRE87_FORMAT))
+    		throw new IllegalArgumentException("Format "+format+" not recognised.");  	
+    	
         RichSequence rs;
         try {
             if (seq instanceof RichSequence) rs = (RichSequence)seq;
@@ -780,6 +839,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         String urel = null;
         String organelle = null;
         String versionLine = null;
+        String dataClass = null;
         boolean genomic = false;
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
@@ -791,26 +851,42 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getVersionLineTerm())) versionLine=n.getValue();
             else if (n.getTerm().equals(Terms.getGenomicTerm())) genomic = true;
+            else if (n.getTerm().equals(Terms.getDataClassTerm())) dataClass = n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                 accessions.append(" ");
                 accessions.append(n.getValue());
                 accessions.append(";");
             } else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle=n.getValue();
         }
-        
-        // entryname  dataclass; [circular] molecule; division; sequencelength BP.
+
         StringBuffer locusLine = new StringBuffer();
-        locusLine.append(StringTools.rightPad(rs.getName(),9));
-        locusLine.append(" standard; ");
-        locusLine.append(rs.getCircular()?"circular ":"");
-        // if it is Ensembl genomic, add that in too
-        if (genomic==true) locusLine.append("genomic ");
-        locusLine.append(moltype);
-        locusLine.append("; ");
-        locusLine.append(rs.getDivision()==null?"":rs.getDivision());
-        locusLine.append("; ");
-        locusLine.append(rs.length());
-        locusLine.append(" BP.");
+        if (format.equals(EMBL_FORMAT)) {
+        	// accession; SV version; circular/linear; moltype; dataclass; division; length BP.
+        	locusLine.append(rs.getAccession());
+        	locusLine.append("; ");
+        	locusLine.append(rs.getCircular()?"circular; ":"linear; ");
+        	locusLine.append(moltype);
+        	locusLine.append("; ");
+        	locusLine.append(dataClass);
+        	locusLine.append("; ");
+        	locusLine.append(rs.getDivision());
+        	locusLine.append("; ");
+            locusLine.append(rs.length());
+            locusLine.append(" BP.");
+        } else if (format.equals(EMBL_PRE87_FORMAT)) {
+            // entryname  dataclass; [circular] molecule; division; sequencelength BP.
+        	locusLine.append(StringTools.rightPad(rs.getName(),9));
+        	locusLine.append(" standard; ");
+        	locusLine.append(rs.getCircular()?"circular ":"");
+        	// if it is Ensembl genomic, add that in too
+        	if (genomic==true) locusLine.append("genomic ");
+        	locusLine.append(moltype);
+        	locusLine.append("; ");
+        	locusLine.append(rs.getDivision()==null?"":rs.getDivision());
+        	locusLine.append("; ");
+        	locusLine.append(rs.length());
+        	locusLine.append(" BP.");
+        }
         StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 5, this.getLineWidth(), null, LOCUS_TAG, this.getPrintStream());
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         

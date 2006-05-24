@@ -35,6 +35,7 @@ import org.biojavax.RichObjectFactory;
  * Reference implementation of NCBITaxon.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @author David Scott
  * @since 1.5
  */
 public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
@@ -418,8 +419,12 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
                 if (!first) sb.insert(0,"; ");
                 else first = false;
                 sb.insert(0,(String)sciNames.iterator().next());
-                parent = t.getParentNCBITaxID();
-            } else parent = null;
+                // Don't get into endless loop if child's parent is itself.
+                if (t.getParentNCBITaxID().equals(new Integer(t.getNCBITaxID()))) parent = null;
+                else parent = t.getParentNCBITaxID();
+            }
+            // Also don't go up past a parent that doesn't have a name.
+            else parent = null;
         }
         sb.append(".");
         return sb.toString();
