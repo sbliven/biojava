@@ -118,7 +118,25 @@ public class ChainImpl implements Chain {
         String pdbResnum = group.getPDBCode();
         if ( pdbResnum != null) {
             Integer pos = new Integer(groups.size()-1);
-            pdbResnumMap.put(pdbResnum,pos);
+            // ARGH sometimes numbering in PDB files is confusing.
+            // e.g. PDB: 1sfe 
+            /*
+             * ATOM    620  N   GLY    93     -24.320  -6.591   4.210  1.00 46.82           N  
+             * ATOM    621  CA  GLY    93     -24.960  -6.849   5.497  1.00 47.35           C  
+             * ATOM    622  C   GLY    93     -26.076  -5.873   5.804  1.00 47.24           C  
+             * ATOM    623  O   GLY    93     -26.382  -4.986   5.006  1.00 47.56           O  
+             and ...
+             * HETATM 1348  O   HOH    92     -21.853 -16.886  19.138  1.00 66.92           O  
+             * HETATM 1349  O   HOH    93     -26.126   1.226  29.069  1.00 71.69           O  
+             * HETATM 1350  O   HOH    94     -22.250 -18.060  -6.401  1.00 61.97           O 
+             */
+            
+            // this check is to give in this case the entry priority that is an AminoAcid / comes first...
+            if (  pdbResnumMap.containsKey(pdbResnum)) {
+                if ( group instanceof AminoAcid)
+                    pdbResnumMap.put(pdbResnum,pos);
+            } else                
+                pdbResnumMap.put(pdbResnum,pos);
         }
         
     }
