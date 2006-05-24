@@ -75,7 +75,8 @@ import org.biojavax.utils.StringTools;
  * org.biojava.bio.seq.io.GenbankFormat object.
  *
  * @author Richard Holland
- * @author MarkSchreiber
+ * @author Mark Schreiber
+ * @author David Scott
  * @since 1.5
  */
 public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
@@ -223,7 +224,6 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             Namespace ns)
             throws IllegalSymbolException, IOException, ParseException {
         
-        String line;
         boolean hasAnotherSequence = true;
         //boolean hasInternalWhitespace = false;
         
@@ -596,15 +596,18 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         
         // locus(name) + length + alpha + div + date line
         StringBuffer locusLine = new StringBuffer();
-        locusLine.append(StringTools.rightPad(rs.getName(),10));
-        locusLine.append(" ");
-        locusLine.append(StringTools.leftPad(""+rs.length(),6));
-        locusLine.append(" bp ");
-        locusLine.append(StringTools.leftPad(stranded,3));
-        locusLine.append(StringTools.rightPad(moltype,6));
-        locusLine.append(StringTools.rightPad(rs.getCircular()?"circular":"",10));
-        locusLine.append(StringTools.rightPad(rs.getDivision()==null?"":rs.getDivision(),10));
-        locusLine.append(udat);
+        locusLine.append(StringTools.rightPad(rs.getName(),16));//13->28=15+1=16
+        locusLine.append(" ");//29
+        locusLine.append(StringTools.leftPad(""+rs.length(),11));//30->40=10+1=11
+        locusLine.append(" bp ");//41->44
+        locusLine.append(StringTools.leftPad(stranded,3));//45->47=2+1=3
+        locusLine.append(StringTools.rightPad(moltype,6));//48->53=5+1=6
+        locusLine.append("  ");//54->55
+        locusLine.append(StringTools.rightPad(rs.getCircular()?"circular":"linear",8));//56->63=7+1=8
+        locusLine.append(" ");//64->64
+        locusLine.append(StringTools.rightPad(rs.getDivision()==null?"":rs.getDivision(),3));//65->67=2+1=3
+        locusLine.append(" ");//68->68
+        locusLine.append(StringTools.rightPad(udat,11));//69->79=10+1=11
         StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 12, this.getLineWidth(), this.getPrintStream());
         
         // definition line
