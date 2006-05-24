@@ -339,14 +339,14 @@ import java.util.StringTokenizer;
 	     // Linux (and probably other *nixes) prefers to be called
 	     // with each argument supplied separately, so we first
 	     // Tokenize it across spaces as the boundary.
-	     StringTokenizer st = new StringTokenizer(command, " ");
-	     cmd = new String[st.countTokens()];
-	     int token = 0;
-	     while (st.hasMoreTokens()) {
-		 String tokenString = st.nextToken();
-		 //System.out.println(tokenString);
-		 cmd[token++] = tokenString;
-	     }
+     StringTokenizer st = new StringTokenizer(command, " ");
+     cmd = new String[st.countTokens()];
+     int token = 0;
+     while (st.hasMoreTokens()) {
+   String tokenString = st.nextToken();
+   //System.out.println(tokenString);
+   cmd[token++] = tokenString;
+     }
 	 }
 
 	 // Execute the command and start the two output gobblers
