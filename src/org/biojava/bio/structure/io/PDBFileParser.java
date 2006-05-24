@@ -592,36 +592,42 @@ public class PDBFileParser  {
      */  
     private void pdb_CONECT_Handler(String line) {
         //System.out.println(line);
-        int atomserial = Integer.parseInt (line.substring(6 ,11).trim());
-        Integer bond1      = conect_helper(line,11,16);
-        Integer bond2      = conect_helper(line,16,21);
-        Integer bond3      = conect_helper(line,21,26);
-        Integer bond4      = conect_helper(line,26,31);
-        Integer hyd1       = conect_helper(line,31,36);
-        Integer hyd2       = conect_helper(line,36,41);
-        Integer salt1      = conect_helper(line,41,46);
-        Integer hyd3       = conect_helper(line,46,51);
-        Integer hyd4       = conect_helper(line,51,56);
-        Integer salt2      = conect_helper(line,56,61);
-        
-        //System.out.println(atomserial+ " "+ bond1 +" "+bond2+ " " +bond3+" "+bond4+" "+
-        //		   hyd1+" "+hyd2 +" "+salt1+" "+hyd3+" "+hyd4+" "+salt2);
-        HashMap cons = new HashMap();
-        cons.put("atomserial",new Integer(atomserial));
-        // stupid to re-convert the ints to string, but hashmap does not allow to put ints ...
-        // shout they be converted to Integer ?
-        if ( bond1 != null) cons.put("bond1",bond1);
-        if ( bond2 != null) cons.put("bond2",bond2);
-        if ( bond3 != null) cons.put("bond3",bond3);
-        if ( bond4 != null) cons.put("bond4",bond4);
-        if ( hyd1  != null) cons.put("hydrogen1",hyd1);
-        if ( hyd2  != null) cons.put("hydrogen2",hyd2);
-        if ( salt1 != null) cons.put("salt1",salt1);
-        if ( hyd3  != null) cons.put("hydrogen3",hyd3);
-        if ( hyd4  != null) cons.put("hydrogen4",hyd4);
-        if ( salt1 != null) cons.put("salt2",salt2);
-        
-        connects.add(cons);
+        // this try .. catch is e.g. to catch 1gte which has wrongly formatted lines...
+        try {
+            int atomserial = Integer.parseInt (line.substring(6 ,11).trim());
+            Integer bond1      = conect_helper(line,11,16);
+            Integer bond2      = conect_helper(line,16,21);
+            Integer bond3      = conect_helper(line,21,26);
+            Integer bond4      = conect_helper(line,26,31);
+            Integer hyd1       = conect_helper(line,31,36);
+            Integer hyd2       = conect_helper(line,36,41);
+            Integer salt1      = conect_helper(line,41,46);
+            Integer hyd3       = conect_helper(line,46,51);
+            Integer hyd4       = conect_helper(line,51,56);
+            Integer salt2      = conect_helper(line,56,61);
+            
+            //System.out.println(atomserial+ " "+ bond1 +" "+bond2+ " " +bond3+" "+bond4+" "+
+            //		   hyd1+" "+hyd2 +" "+salt1+" "+hyd3+" "+hyd4+" "+salt2);
+            HashMap cons = new HashMap();
+            cons.put("atomserial",new Integer(atomserial));
+            // stupid to re-convert the ints to string, but hashmap does not allow to put ints ...
+            // shout they be converted to Integer ?
+            if ( bond1 != null) cons.put("bond1",bond1);
+            if ( bond2 != null) cons.put("bond2",bond2);
+            if ( bond3 != null) cons.put("bond3",bond3);
+            if ( bond4 != null) cons.put("bond4",bond4);
+            if ( hyd1  != null) cons.put("hydrogen1",hyd1);
+            if ( hyd2  != null) cons.put("hydrogen2",hyd2);
+            if ( salt1 != null) cons.put("salt1",salt1);
+            if ( hyd3  != null) cons.put("hydrogen3",hyd3);
+            if ( hyd4  != null) cons.put("hydrogen4",hyd4);
+            if ( salt1 != null) cons.put("salt2",salt2);
+            
+            connects.add(cons);
+        } catch (Exception e){
+            e.printStackTrace();
+            return;
+        }
     }
     
     /*
