@@ -82,8 +82,9 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
         try {
             // Lazy load the Session class from Hibernate.
             Class hibernateSession = session.getClass();
+            Class realHibernateSession = Class.forName("org.hibernate.Session");
             // Test to see if our parameter is really a Session
-            if (!hibernateSession.getName().equals("org.hibernate.Session"))
+            if (!realHibernateSession.isAssignableFrom(hibernateSession))
                 throw new IllegalArgumentException("Parameter must be a org.hibernate.Session object");
             this.session = session;
             // Lookup the createQuery method
