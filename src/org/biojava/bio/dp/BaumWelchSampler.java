@@ -44,14 +44,23 @@ import org.biojava.bio.symbol.SymbolList;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Richard Holland
  * @since 1.0
  */
 public class BaumWelchSampler extends AbstractTrainer implements Serializable {
+
+	  protected double singleSequenceIteration(
+			    ModelTrainer trainer,
+			    SymbolList symList
+			  ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
+			    return this.singleSequenceIteration(trainer, symList, ScoreType.PROBABILITY);
+	  }
+
   protected double singleSequenceIteration(
     ModelTrainer trainer,
-    SymbolList symList
+    SymbolList symList,
+    ScoreType scoreType
   ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
-    ScoreType scoreType = ScoreType.PROBABILITY;
     SingleDP dp = (SingleDP) getDP();
     State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();
