@@ -100,6 +100,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String REFERENCE_TAG = "REFERENCE";
     protected static final String KEYWORDS_TAG = "KEYWORDS";
     protected static final String AUTHORS_TAG = "AUTHORS";
+    protected static final String CONSORTIUM_TAG = "CONSRTM";
     protected static final String TITLE_TAG = "TITLE";
     protected static final String JOURNAL_TAG = "JOURNAL";
     protected static final String PUBMED_TAG = "PUBMED";
@@ -322,6 +323,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 // rest can be in any order
                 String authors = null;
+                String consortium = null;
                 String title = null;
                 String journal = null;
                 String medline = null;
@@ -331,6 +333,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
                     if (key.equals(AUTHORS_TAG)) authors = val;
+                    if (key.equals(CONSORTIUM_TAG)) consortium = val;
                     if (key.equals(TITLE_TAG)) title = val;
                     if (key.equals(JOURNAL_TAG)) journal = val;
                     if (key.equals(MEDLINE_TAG)) medline = val;
@@ -353,6 +356,10 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 // create the docref object
                 try {
+                	// Use consortium as well if present.
+                	if (authors==null) authors = consortium;
+                	else if (consortium!=null) authors = authors + ", " + consortium + " (consortium)";
+                	// Create docref.
                     DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{DocRefAuthor.Tools.parseAuthorString(authors),journal});
                     if (title!=null) dr.setTitle(title);
                     // assign either the pubmed or medline to the docref - medline gets priority
@@ -642,6 +649,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             Integer rend = rdr.getEnd();
             if (rend==null) rend = new Integer(rs.length());
             StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+"  (bases "+rstart+" to "+rend+")", 12, this.getLineWidth(), this.getPrintStream());
+            // Any authors that were in the input as CONSRTM tags will
+            // be merged into the AUTHORS tag on output.
             StringTools.writeKeyValueLine("  "+AUTHORS_TAG, d.getAuthors(), 12, this.getLineWidth(), this.getPrintStream());
             StringTools.writeKeyValueLine("  "+TITLE_TAG, d.getTitle(), 12, this.getLineWidth(), this.getPrintStream());
             StringTools.writeKeyValueLine("  "+JOURNAL_TAG, d.getLocation(), 12, this.getLineWidth(), this.getPrintStream());
