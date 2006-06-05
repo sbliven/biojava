@@ -307,15 +307,15 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     // seventh token is sequence length, which is ignored
                     // as it is calculated from the sequence data later.
                 } else if (mPre87.matches()) {
-                    rlistener.setName(m.group(1));
-                    if (m.group(3)!=null) {
+                    rlistener.setName(mPre87.group(1));
+                    if (mPre87.group(3)!=null) {
                         // add annotation for 'genomic' (Ensembl-specific term)
                         rlistener.addSequenceProperty(Terms.getGenomicTerm(),null);
                     }
-                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(4));
-                    rlistener.setDivision(m.group(5));
+                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),mPre87.group(4));
+                    rlistener.setDivision(mPre87.group(5));
                     // Optional extras
-                    String circular = m.group(2);
+                    String circular = mPre87.group(2);
                     if (circular!=null) rlistener.setCircular(true);
             	} else {
                     throw new ParseException("Bad ID line found: "+loc);
