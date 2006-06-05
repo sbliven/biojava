@@ -634,7 +634,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 
                 xml.closeTag(LOCATION_ELEMENT_TAG);
             }
-            // TODO
+
             xml.closeTag(LOCATION_TAG);
             
             xml.closeTag(FEATURE_TAG);
