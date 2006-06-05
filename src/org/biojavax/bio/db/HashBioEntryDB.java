@@ -117,7 +117,7 @@ public class HashBioEntryDB extends AbstractBioEntryDB implements BioEntryDB {
     }
     
     protected void addBioEntry(String id, BioEntry seq) throws IllegalIDException, BioException, ChangeVetoException {
-        if(!hasListeners()) {
+        if(!hasListeners(BioEntryDB.BIOENTRYS)) {
             sequenceByID.put(id, seq);
         } else {
             ChangeSupport changeSupport = getChangeSupport(BioEntryDB.BIOENTRYS);
@@ -136,7 +136,7 @@ public class HashBioEntryDB extends AbstractBioEntryDB implements BioEntryDB {
     
     public void removeBioEntry(String id) throws IllegalIDException, BioException, ChangeVetoException {
         if (!sequenceByID.containsKey(id)) throw new IllegalIDException("BioEntry with ID " + id + " could not be found");
-        if(!hasListeners()) {
+        if(!hasListeners(BioEntryDB.BIOENTRYS)) {
             sequenceByID.remove(id);
         } else {
             ChangeSupport changeSupport = getChangeSupport(BioEntryDB.BIOENTRYS);

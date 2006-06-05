@@ -47,7 +47,6 @@ import org.biojavax.ontology.SimpleComparableOntology;
 public class BioSQLRichObjectBuilder implements RichObjectBuilder {
     
     private Object session;
-    private Class query;
     private Method createQuery;
     private Method setParameter;
     private Method uniqueResult;

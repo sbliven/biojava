@@ -154,7 +154,7 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
     }
     
     protected void addRichSequence(String id, RichSequence seq) throws IllegalIDException, BioException, ChangeVetoException {
-        if(!hasListeners()) {
+        if(!hasListeners(RichSequenceDB.SEQUENCES)) {
             sequenceByID.put(id, seq);
         } else {
             ChangeSupport changeSupport = getChangeSupport(RichSequenceDB.SEQUENCES);
@@ -173,7 +173,7 @@ public class HashRichSequenceDB extends AbstractRichSequenceDB implements RichSe
     
     public void removeSequence(String id) throws IllegalIDException, BioException, ChangeVetoException {
         if (!sequenceByID.containsKey(id)) throw new IllegalIDException("Sequence with ID " + id + " could not be found");
-        if(!hasListeners()) {
+        if(!hasListeners(RichSequenceDB.SEQUENCES)) {
             sequenceByID.remove(id);
         } else {
             ChangeSupport changeSupport = getChangeSupport(RichSequenceDB.SEQUENCES);

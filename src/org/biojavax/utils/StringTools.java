@@ -21,7 +21,6 @@
 
 package org.biojavax.utils;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;

@@ -263,7 +263,6 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             Namespace ns)
             throws IllegalSymbolException, IOException, ParseException {
         
-        String line;
         boolean hasAnotherSequence = true;
         //boolean hasInternalWhitespace = false;
         
@@ -622,10 +621,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     private List readSection(BufferedReader br) throws ParseException {
         List section = new ArrayList();
         String line;
-        String currKey = null;
-        StringBuffer currVal = new StringBuffer();
         boolean done = false;
-        int linecount = 0;
         
         // while not done
         try {

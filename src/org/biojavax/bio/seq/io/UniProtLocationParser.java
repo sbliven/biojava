@@ -20,15 +20,17 @@
  */
 
 package org.biojavax.bio.seq.io;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.biojava.bio.seq.io.ParseException;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.Position;
 import org.biojavax.bio.seq.RichLocation;
-import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.bio.seq.SimplePosition;
 import org.biojavax.bio.seq.SimpleRichLocation;
+import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.utils.StringTools;
 
 
@@ -71,7 +73,6 @@ public class UniProtLocationParser {
         boolean startsFuzzy = ((startfuzz!=null && startfuzz.equals("<")) || (endfuzz!=null && endfuzz.equals("<")));
         boolean endsFuzzy = ((endfuzz!=null && endfuzz.equals(">")) || (startfuzz!=null && startfuzz.equals(">")));
         
-        Position endPos = null;
         return new SimplePosition(startsFuzzy,endsFuzzy,Integer.parseInt(point));
     }
     

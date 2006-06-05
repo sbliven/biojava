@@ -22,7 +22,7 @@
 package org.biojavax;
 
 import java.net.URI;
-import java.util.Set;
+
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;

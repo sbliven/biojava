@@ -243,7 +243,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public void setCircularLength(int sourceSeqLength) throws ChangeVetoException {
+    public void setCircularLength(int circularLength) throws ChangeVetoException {
         if(!this.hasListeners(RichLocation.CIRCULAR)) {
             this.circularLength = circularLength;
         } else {

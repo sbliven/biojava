@@ -27,10 +27,7 @@
 
 package org.biojavax.bio.seq.io;
 
-import java.util.TreeSet;
-import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
@@ -38,11 +35,8 @@ import org.biojava.bio.symbol.Symbol;
 import org.biojavax.Namespace;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
-import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.seq.RichFeature;
-import org.biojavax.bio.seq.RichLocation;
-import org.biojavax.bio.seq.SimpleRichFeature;
 import org.biojavax.bio.taxa.NCBITaxon;
 
 /**

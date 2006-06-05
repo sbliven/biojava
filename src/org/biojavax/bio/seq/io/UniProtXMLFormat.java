@@ -511,25 +511,16 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             throw e2;
         }
         
-        SymbolTokenization tok;
-        try {
-            tok = rs.getAlphabet().getTokenization("token");
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to get alphabet tokenizer",e);
-        }
-        
         int key = 1;
         
         Set notes = rs.getNoteSet();
         List accessions = new ArrayList();
         List kws = new ArrayList();
-        String stranded = null;
         String cdat = null;
         String udat = null;
         String adat = null;
         String copyright = null;
         String proteinType = null;
-        String moltype = rs.getAlphabet().getName();
         Map genenames = new TreeMap();
         Map genesynonyms = new TreeMap();
         Map orfnames = new TreeMap();
@@ -547,11 +538,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         Map plasmidRecs = new TreeMap();
         for (Iterator i = notes.iterator(); i.hasNext();) {
             Note n = (Note)i.next();
-            if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
-            else if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
+            if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getDateAnnotatedTerm())) adat=n.getValue();
-            else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions.add(n.getValue());
             else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelles.add(n.getValue());
             else if (n.getTerm().equals(Terms.getKeywordTerm())) {
@@ -1464,8 +1453,6 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         private StringBuffer m_currentString;
         
         private NCBITaxon tax;
-        private String organism;
-        private String accession;
         private RichFeature.Template templ;
         private StringBuffer proteinDesc;
         private boolean firstNameInProteinGroup;
@@ -1500,7 +1487,6 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         private String currNameIsFor;
         private int interactantCount;
         private StringBuffer currLocStr;
-        private boolean firstLocationElement;
         private int featNoteRank;
         
         // construct a new handler that will populate the given list of sequences

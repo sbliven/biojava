@@ -353,7 +353,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
     public void addFeatureProperty(Object key, Object value) throws ParseException {
         if (this.featureStack.size() == 0) throw new ParseException("Assertion failed: Not within a feature");
         if (!(key instanceof ComparableTerm)) key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
-        if (!(value instanceof String)) value = value.toString();
+        if ((value != null) && !(value instanceof String)) value = value.toString();
         RichFeature f = this.getCurrentFeature();
         try {
             Note n = new SimpleNote((ComparableTerm)key,(String)value,this.featPropCount++);

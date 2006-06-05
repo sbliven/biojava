@@ -271,7 +271,6 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         String endStart = pm.group(2);
         String endRangeType = pm.group(4);
         String endEnd = pm.group(5);
-        Position endPos = null;
         if (endRangeType!=null) {
             // fuzziest
             return new SimplePosition(endStartsFuzzy,endEndsFuzzy,Integer.parseInt(endStart),Integer.parseInt(endEnd),endRangeType);

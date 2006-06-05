@@ -335,18 +335,10 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             e2.initCause(e);
             throw e2;
         }
-        
-        SymbolTokenization tok;
-        try {
-            tok = rs.getAlphabet().getTokenization("token");
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to get alphabet tokenizer",e);
-        }
-        
+                
         Set notes = rs.getNoteSet();
         List accessions = new ArrayList();
         List kws = new ArrayList();
-        String stranded = null;
         String cdat = null;
         String udat = null;
         String crel = null;
@@ -354,8 +346,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext();) {
             Note n = (Note)i.next();
-            if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
-            else if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
+            if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
@@ -561,12 +552,14 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 Note n = (Note)j.next();
                 xml.openTag(QUALIFIER_TAG);
                 xml.attribute(QUALIFIER_NAME_ATTR,n.getTerm().getName());
-                if (n.getTerm().getName().equalsIgnoreCase("translation")) {
-                    String[] lines = StringTools.wordWrap(n.getValue(), "\\s+", this.getLineWidth());
-                    for (int k = 0; k < lines.length; k++) xml.println(lines[k]);
-                } else {
-                    xml.print(n.getValue());
-                }
+                if (n.getValue()!=null && !n.getValue().equals("")) {
+                	if (n.getTerm().getName().equalsIgnoreCase("translation")) {
+                		String[] lines = StringTools.wordWrap(n.getValue(), "\\s+", this.getLineWidth());
+                		for (int k = 0; k < lines.length; k++) xml.println(lines[k]);
+                	} else {	
+                		xml.print(n.getValue());
+                	}
+                }	
                 xml.closeTag(QUALIFIER_TAG);
             }
             
@@ -671,7 +664,6 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         private StringBuffer m_currentString;
         
         private NCBITaxon tax;
-        private String organism;
         private String accession;
         private RichFeature.Template templ;
         private String currFeatQual;

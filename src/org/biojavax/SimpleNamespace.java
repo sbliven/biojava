@@ -23,8 +23,7 @@ package org.biojavax;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Set;
-import java.util.TreeSet;
+
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
@@ -44,7 +43,6 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     private String authority;
     private String description;
     private URI URI;
-    private Set members = new TreeSet();
     
     /**
      * Creates a new instance of SimpleNamespace with the given name,

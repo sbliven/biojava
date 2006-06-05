@@ -581,7 +581,6 @@ public interface RichSequence extends BioEntry,Sequence {
                     newVersion, 
                     symList, 
                     seqVersion);
-            Set features = new TreeSet();
             RichLocation subLoc = new SimpleRichLocation(
                     new SimplePosition(from), new SimplePosition(to), 0);
             try{

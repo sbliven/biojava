@@ -20,21 +20,21 @@
  */
 
 package org.biojavax.bio;
-import java.util.TreeSet;
 import java.util.Set;
+import java.util.TreeSet;
+
 import org.biojava.bio.Annotation;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
+import org.biojavax.Comment;
 import org.biojavax.Namespace;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
 import org.biojavax.RichAnnotation;
 import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.taxa.NCBITaxon;
-import org.biojavax.Comment;
 
 /**
  * Reference implementation of a BioEntry object which has no features or sequence.
@@ -58,7 +58,6 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     private NCBITaxon taxon;
     private Namespace ns;
     private RichAnnotation notes = new SimpleRichAnnotation();
-    private ChangeForwarder annFor;
     
     /**
      * Creates a new bioentry representing the sequence in the given namespace

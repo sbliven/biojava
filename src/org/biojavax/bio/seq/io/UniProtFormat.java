@@ -229,7 +229,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             Namespace ns)
             throws IllegalSymbolException, IOException, ParseException {
         
-        String line;
         boolean hasAnotherSequence = true;
         //boolean hasInternalWhitespace = false;
         
@@ -241,7 +240,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         // Get an ordered list of key->value pairs in array-tuples
         String sectionKey = null;
         NCBITaxon tax = null;
-        String organism = null;
         String accession = null;
         int xrefCount = 0;
         do {
@@ -560,7 +558,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         templ.featureRelationshipSet = new TreeSet();
                         templ.rankedCrossRefs = new TreeSet();
                         String desc = null;
-                        String status = null;
                         val = val.replaceAll("\n", " "); // Nasty hack but we have to do this, sadly.
                         Matcher m = fp.matcher(val);
                         if (m.matches()) {
@@ -620,10 +617,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     private List readSection(BufferedReader br) throws ParseException {
         List section = new ArrayList();
         String line;
-        String currKey = null;
-        StringBuffer currVal = new StringBuffer();
         boolean done = false;
-        int linecount = 0;
         
         // while not done
         try {

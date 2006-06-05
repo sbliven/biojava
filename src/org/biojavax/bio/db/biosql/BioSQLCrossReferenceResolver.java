@@ -44,7 +44,6 @@ import org.biojavax.bio.seq.RichSequence;
 public class BioSQLCrossReferenceResolver implements CrossReferenceResolver {
     
     private Object session;
-    private Class query;
     private Method createQuery;
     private Method setParameter;
     private Method uniqueResult;

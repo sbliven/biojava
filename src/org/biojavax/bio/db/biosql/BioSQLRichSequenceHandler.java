@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.Alphabet;
@@ -20,12 +21,10 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
-import org.biojavax.bio.seq.RichSequence;
-import org.biojavax.bio.seq.RichLocation.Tools;
-import org.biojava.bio.seq.io.ChunkedSymbolListFactory;
-import org.biojava.bio.symbol.PackedSymbolListFactory;
 import org.biojavax.bio.seq.DummyRichSequenceHandler;
+import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.SimpleRichSequence;
+import org.biojavax.bio.seq.RichLocation.Tools;
 
 /**
  * A handler which loads sequence data from a BioSQL database, caching it where possible.
@@ -40,7 +39,6 @@ public class BioSQLRichSequenceHandler extends DummyRichSequenceHandler {
     
     // the Hibernate session.
     private Object session;
-    private Class query;
     private Method createQuery;
     private Method setParameter;
     private Method uniqueResult;
@@ -115,8 +113,6 @@ public class BioSQLRichSequenceHandler extends DummyRichSequenceHandler {
             int seqLength = seq.length();
             if (modStart==0) modStart = seqLength;
             if (modEnd==0) modEnd = seqLength;
-            // Use the packed symbol factory
-            ChunkedSymbolListFactory symsf = new ChunkedSymbolListFactory(new PackedSymbolListFactory());
             if (modEnd>seqLength) {
                 // add it in chunks
                 int remaining = modLength;

@@ -21,8 +21,6 @@
 
 package org.biojavax.bio.seq;
 
-import java.util.Set;
-import java.util.TreeSet;
 import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
@@ -37,7 +35,6 @@ import org.biojavax.Namespace;
 public class SimpleRichSequence extends ThinRichSequence {
     
     private SymbolList symList;
-    private Set features = new TreeSet();
         
     /**
      * Creates a new instance of SimpleRichSequence. Note the use of Double for

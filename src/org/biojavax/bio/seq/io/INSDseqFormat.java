@@ -306,13 +306,6 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             throw e2;
         }
         
-        SymbolTokenization tok;
-        try {
-            tok = rs.getAlphabet().getTokenization("token");
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to get alphabet tokenizer",e);
-        }
-        
         Set notes = rs.getNoteSet();
         List accessions = new ArrayList();
         List kws = new ArrayList();
@@ -563,11 +556,13 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     xml.closeTag(FEATUREQUAL_NAME_TAG);
                     
                     xml.openTag(FEATUREQUAL_VALUE_TAG);
-                    if (n.getTerm().getName().equalsIgnoreCase("translation")) {
-                        String[] lines = StringTools.wordWrap(n.getValue(), "\\s+", this.getLineWidth());
-                        for (int k = 0; k < lines.length; k++) xml.println(lines[k]);
-                    } else {
-                        xml.print(n.getValue());
+                    if (n.getValue()!=null && !n.getValue().equals("")) {
+                    	if (n.getTerm().getName().equalsIgnoreCase("translation")) {
+                    		String[] lines = StringTools.wordWrap(n.getValue(), "\\s+", this.getLineWidth());
+                    		for (int k = 0; k < lines.length; k++) xml.println(lines[k]);
+                    	} else {
+                    		xml.print(n.getValue());
+                    	}
                     }
                     xml.closeTag(FEATUREQUAL_VALUE_TAG);
                     

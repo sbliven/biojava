@@ -159,7 +159,7 @@ public class BioSQLBioEntryDB extends AbstractBioEntryDB {
     }
     
     public void removeBioEntry(String id) throws IllegalIDException, BioException, ChangeVetoException {
-        if(!hasListeners()) {
+        if(!hasListeners(BioEntryDBLite.BIOENTRYS)) {
             this._removeBioEntry(id);
         } else {
             ChangeSupport changeSupport = getChangeSupport(BioEntryDBLite.BIOENTRYS);
@@ -190,7 +190,7 @@ public class BioSQLBioEntryDB extends AbstractBioEntryDB {
     }
     
     public void addBioEntry(BioEntry seq) throws IllegalIDException, BioException, ChangeVetoException {
-        if(!hasListeners()) {
+        if(!hasListeners(BioEntryDBLite.BIOENTRYS)) {
             this._addBioEntry(seq);
         } else {
             ChangeSupport changeSupport = getChangeSupport(BioEntryDBLite.BIOENTRYS);

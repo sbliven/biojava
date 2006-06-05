@@ -20,7 +20,7 @@
  */
 
 package org.biojavax.bio.seq.io;
-import org.biojava.bio.BioException;
+
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojavax.Namespace;
@@ -28,7 +28,6 @@ import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
 import org.biojavax.bio.BioEntryRelationship;
 import org.biojavax.bio.seq.RichFeature;
-import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.taxa.NCBITaxon;
 
 /**

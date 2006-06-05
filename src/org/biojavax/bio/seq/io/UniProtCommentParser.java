@@ -264,7 +264,6 @@ CC         Comment=Free text;
             Event event = null;
             Isoform isoform = null;
             String[] parts = c.split(";");
-            Interaction interact = null;
             for (int i = 0; i < parts.length; i++) {
                 String[] subparts = parts[i].split("=");
                 String key = subparts[0].trim();

@@ -241,7 +241,7 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
     }
     
     public void removeRichSequence(String id) throws IllegalIDException, BioException, ChangeVetoException {
-        if(!hasListeners()) {
+        if(!hasListeners(RichSequenceDB.SEQUENCES)) {
             this._removeRichSequence(id);
         } else {
             ChangeSupport changeSupport = getChangeSupport(RichSequenceDB.SEQUENCES);
@@ -272,7 +272,7 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
     }
     
     public void addRichSequence(RichSequence seq) throws IllegalIDException, BioException, ChangeVetoException {
-        if(!hasListeners()) {
+        if(!hasListeners(RichSequenceDB.SEQUENCES)) {
             this._addRichSequence(seq);
         } else {
             ChangeSupport changeSupport = getChangeSupport(RichSequenceDB.SEQUENCES);
