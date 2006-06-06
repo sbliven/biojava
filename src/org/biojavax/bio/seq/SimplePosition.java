@@ -45,6 +45,16 @@ public class SimplePosition implements Position {
     }
     
     /**
+     * Constructs a range position, with no fuzzy start or
+     * end. (eg. 1..2, 2..5, or 3..8).
+     * @param s the start position
+     * @param e the end position
+     */
+    public SimplePosition(int s, int e) {
+        this(false,false,s,e,null);
+    }
+    
+    /**
      * Constructs a point position, with optionally fuzzy start and
      * end. (eg. <1 or 3> or 2 or even <5>).
      * @param fs fuzzy start?

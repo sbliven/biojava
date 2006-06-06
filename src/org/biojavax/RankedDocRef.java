@@ -21,6 +21,8 @@
 
 package org.biojavax;
 
+import org.biojavax.bio.seq.RichLocation;
+
 /**
  * Represents a documentary reference. Relates to the bioentryreference table 
  * in BioSQL.
@@ -52,6 +54,17 @@ public interface RankedDocRef extends Comparable {
      * @return the end position.
      */
     public Integer getEnd();
+    
+    /**
+     * If this object was constructed using a location instead of two integers,
+     * then this method will return that location. The getStart() and getEnd()
+     * methods will then return the min and max of that location, using the
+     * default location position resolver to resolve them to exact positions.
+     * If this object was constructed using two integers, then this method will
+     * return a simple location whose min and max correspond to those integers.
+     * @return the location of this reference on the sequence. 
+     */
+    public RichLocation getLocation();
     
     /**
      * The rank of this reference. This value is intended to be set by the constructor

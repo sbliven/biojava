@@ -21,6 +21,11 @@
 
 package org.biojavax;
 
+import org.biojavax.bio.seq.Position;
+import org.biojavax.bio.seq.RichLocation;
+import org.biojavax.bio.seq.SimplePosition;
+import org.biojavax.bio.seq.SimpleRichLocation;
+
 /**
  * Represents a documentary reference. 
  * @author Richard Holland
@@ -31,19 +36,35 @@ public class SimpleRankedDocRef implements RankedDocRef {
     private DocRef docref;
     private Integer start;
     private Integer end;
+    private RichLocation location;
     private int rank;
     
     /**
-     * Constructs a new docref for a given location.
+     * Constructs a new docref for a given location. If one or the other
+     * of start and end are null, only the non-null value is used. If both
+     * are null, no value is used for the location. 
      * @param docref the document reference. Must not be null.
-     * @param start the start position of the location
-     * @param end the end position of the location
+     * @param start the start position of the location. 
+     * @param end the end position of the location.
      */
     public SimpleRankedDocRef(DocRef docref, Integer start, Integer end, int rank) {
         if (docref==null) throw new IllegalArgumentException("Document reference cannot be null");
         this.docref = docref;
-        this.start = start;
-        this.end = end;
+        this.setStart(start);
+        this.setEnd(end);
+        this.rank = rank;
+    }
+    
+    /**
+     * Constructs a new docref for a given location.
+     * @param docref the document reference. Must not be null.
+     * @param location the position of the document reference. Must not be null.
+     */
+    public SimpleRankedDocRef(DocRef docref, RichLocation location, int rank) {
+        if (docref==null) throw new IllegalArgumentException("Document reference cannot be null");
+        if (location==null) throw new IllegalArgumentException("Document location cannot be null");
+        this.docref = docref;
+        this.setLocation(location);
         this.rank = rank;
     }
     
@@ -75,12 +96,39 @@ public class SimpleRankedDocRef implements RankedDocRef {
     
     // Hibernate requirement - not for public use.
     private void setDocumentReference(DocRef docref) { this.docref = docref; }
+        
+    // Hibernate requirement - not for public use.
+    private void setStart(Integer start) { 
+    	this.start = start; 
+    	this.createLocation();
+   	}
     
     // Hibernate requirement - not for public use.
-    private void setStart(Integer start) { this.start = start; }
+    private void setEnd(Integer end) { 
+    	this.end = end; 
+    	this.createLocation();
+	}
     
-    // Hibernate requirement - not for public use.
-    private void setEnd(Integer end) { this.end = end; }
+    // Internal use only.
+    private void createLocation() {
+    	Position position;
+    	if (this.start==null && this.end==null) position = null;
+    	else if (this.start==null) position = new SimplePosition(this.end.intValue());
+    	else if (this.end==null) position = new SimplePosition(this.start.intValue());
+    	else position = new SimplePosition(this.start.intValue(), this.end.intValue());
+        this.location = position == null ? RichLocation.EMPTY_LOCATION : new SimpleRichLocation(position, 0);
+    }
+    
+    // Internal use only.
+    private void setLocation(RichLocation location) {
+    	this.location = location;
+    	this.start = new Integer(location.getMin());
+    	this.end = new Integer(location.getMax());
+    }
+    
+    public RichLocation getLocation() {
+    	return this.location;
+    }
     
     /**
      * {@inheritDoc}
