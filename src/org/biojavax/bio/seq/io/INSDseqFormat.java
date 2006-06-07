@@ -30,12 +30,13 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.biojava.bio.seq.Sequence;
@@ -46,6 +47,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.ontology.Term;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.xml.PrettyXMLWriter;
 import org.biojava.utils.xml.XMLWriter;
@@ -58,17 +60,20 @@ import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
 import org.biojavax.RichAnnotation;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.SimpleCrossRef;
 import org.biojavax.SimpleDocRef;
+import org.biojavax.SimpleDocRefAuthor;
+import org.biojavax.SimpleNote;
 import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
-import org.biojavax.RichObjectFactory;
-import org.biojavax.SimpleDocRefAuthor;
-import org.biojavax.SimpleNote;
+import org.biojavax.bio.seq.Position;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.SimplePosition;
+import org.biojavax.bio.seq.SimpleRichLocation;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
@@ -83,7 +88,18 @@ import org.xml.sax.helpers.DefaultHandler;
  * and write RichSequence objects. Loosely Based on code from the old, deprecated,
  * org.biojava.bio.seq.io.GenbankXmlFormat object.
  *
- * Understands http://www.ebi.ac.uk/embl/Documentation/DTD/INSDSeq_v1.3.dtd.txt
+ * Understands http://www.ebi.ac.uk/embl/Documentation/DTD/INSDC_V1.4.dtd.txt
+ * 
+ * Does NOT understand the "sites" keyword in INSDReference_position. Interprets
+ * this instead as an empty location. This is because
+ * there is no obvious way of representing the "sites" keyword in BioSQL.
+ * 
+ * Note also that the INSDInterval tags and associate stuff are not read, as
+ * this is duplicate information to the INSDFeature_location tag which is
+ * already fully parsed. However, they are written on output, although there is
+ * no guarantee that the INSDInterval tags will exactly match the 
+ * INSDFeature_location tag as it is not possible to exactly reflect its contents
+ * using these.
  *
  * @author Alan Li (code based on his work)
  * @author Richard Holland
@@ -116,6 +132,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     protected static final String CREATE_REL_TAG = "INSDSeq_create-release";
     protected static final String DEFINITION_TAG = "INSDSeq_definition";
     protected static final String DATABASE_XREF_TAG = "INSDSeq_database-reference";
+    protected static final String XREF_TAG = "INSDXref";
     
     protected static final String ACCESSION_TAG = "INSDSeq_primary-accession";
     protected static final String ACC_VERSION_TAG = "INSDSeq_accession-version";
@@ -132,21 +149,34 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     protected static final String REFERENCES_GROUP_TAG = "INSDSeq_references";
     protected static final String REFERENCE_TAG = "INSDReference";
     protected static final String REFERENCE_LOCATION_TAG = "INSDReference_reference";
+    protected static final String REFERENCE_POSITION_TAG = "INSDReference_position";
     protected static final String TITLE_TAG = "INSDReference_title";
     protected static final String JOURNAL_TAG = "INSDReference_journal";
     protected static final String PUBMED_TAG = "INSDReference_pubmed";
-    protected static final String MEDLINE_TAG = "INSDReference_medline";
+    protected static final String XREF_DBNAME_TAG = "INSDXref_dbname";
+    protected static final String XREF_ID_TAG = "INSDXref_id";
     protected static final String REMARK_TAG = "INSDReference_remark";
     protected static final String AUTHORS_GROUP_TAG = "INSDReference_authors";
     protected static final String AUTHOR_TAG = "INSDAuthor";
     protected static final String CONSORTIUM_TAG = "INSDReference_consortium";
     
     protected static final String COMMENT_TAG = "INSDSeq_comment";
-    
+
     protected static final String FEATURES_GROUP_TAG = "INSDSeq_feature-table";
     protected static final String FEATURE_TAG = "INSDFeature";
     protected static final String FEATURE_KEY_TAG = "INSDFeature_key";
     protected static final String FEATURE_LOC_TAG = "INSDFeature_location";
+    protected static final String FEATURE_INTERVALS_TAG = "INSDFeature_intervals";
+    protected static final String FEATURE_INTERVAL_TAG = "INSDInterval";
+    protected static final String FEATURE_FROM_TAG = "INSDInterval_from";
+    protected static final String FEATURE_TO_TAG = "INSDInterval_to";
+    protected static final String FEATURE_POINT_TAG = "INSDInterval_point";
+    protected static final String FEATURE_ISCOMP_TAG = "INSDInterval_iscomp";
+    protected static final String FEATURE_INTERBP_TAG = "INSDInterval_interbp";
+    protected static final String FEATURE_ACCESSION_TAG = "INSDInterval_accession";
+    protected static final String FEATURE_OPERATOR_TAG = "INSDFeature_operator";
+    protected static final String FEATURE_PARTIAL5_TAG = "INSDFeature_partial5";
+    protected static final String FEATURE_PARTIAL3_TAG = "INSDFeature_partial3";
     protected static final String FEATUREQUALS_GROUP_TAG = "INSDFeature_quals";
     protected static final String FEATUREQUAL_TAG = "INSDQualifier";
     protected static final String FEATUREQUAL_NAME_TAG = "INSDQualifier_name";
@@ -326,7 +356,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions.add(n.getValue());
             else if (n.getTerm().equals(Terms.getKeywordTerm())) kws.add(n.getValue());
         }
-        
+               
         xml.openTag(INSDSEQ_TAG);
         
         xml.openTag(LOCUS_TAG);
@@ -445,6 +475,15 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 xml.print(rdr.getRank()+"  (bases "+rstart+" to "+rend+")");
                 xml.closeTag(REFERENCE_LOCATION_TAG);
                 
+                xml.openTag(REFERENCE_POSITION_TAG);
+                RichLocation rdrl = rdr.getLocation();
+                for (Iterator i = rdrl.blockIterator(); i.hasNext(); ) {
+                	RichLocation l = (RichLocation)i.next();
+                	xml.print(l.getMin()+".."+l.getMax());
+                	if (i.hasNext()) xml.print("; ");
+                }
+                xml.closeTag(REFERENCE_POSITION_TAG);
+                
                 xml.openTag(AUTHORS_GROUP_TAG);
                 List auths = d.getAuthorList();
                 for (Iterator i = auths.iterator(); i.hasNext(); ) {
@@ -480,10 +519,15 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                         xml.openTag(PUBMED_TAG);
                         xml.print(c.getAccession());
                         xml.closeTag(PUBMED_TAG);
-                    } else if (c.getDbname().equals(Terms.MEDLINE_KEY)) {
-                        xml.openTag(MEDLINE_TAG);
+                    } else {
+                        xml.openTag(XREF_TAG);
+                        xml.openTag(XREF_DBNAME_TAG);
+                        xml.print(c.getDbname());
+                        xml.closeTag(XREF_DBNAME_TAG);
+                        xml.openTag(XREF_ID_TAG);
                         xml.print(c.getAccession());
-                        xml.closeTag(MEDLINE_TAG);
+                        xml.closeTag(XREF_ID_TAG);
+                        xml.closeTag(XREF_TAG);
                     }
                 }
                 
@@ -544,6 +588,70 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 xml.openTag(FEATURE_LOC_TAG);
                 xml.print(GenbankLocationParser.writeLocation((RichLocation)f.getLocation()));
                 xml.closeTag(FEATURE_LOC_TAG);
+                
+                // New in 1.4 - duplicate the location as a 
+                // tree of XML tags.
+                xml.openTag(FEATURE_INTERVALS_TAG);
+
+                RichLocation loc = (RichLocation)f.getLocation();
+                boolean first = true;
+                boolean partial5 = false;
+                boolean partial3 = false;
+                Term operator = loc.getTerm();
+                for (Iterator j = loc.blockIterator(); j.hasNext(); ) {
+                    xml.openTag(FEATURE_INTERVAL_TAG);
+                    
+                	RichLocation rl = (RichLocation)j.next();                    
+                	if (rl.getMin()==rl.getMax()) {
+                		xml.openTag(FEATURE_POINT_TAG);
+                		xml.print(""+rl.getMin());
+                		xml.closeTag(FEATURE_POINT_TAG);
+                	} else {
+                		xml.openTag(FEATURE_FROM_TAG);
+                		xml.print(""+rl.getMin());
+                		xml.closeTag(FEATURE_FROM_TAG);
+                		xml.openTag(FEATURE_TO_TAG);
+                		xml.print(""+rl.getMax());
+                		xml.closeTag(FEATURE_TO_TAG);
+                	}
+                	boolean iscomp = rl.getStrand().equals(RichLocation.Strand.NEGATIVE_STRAND);
+                	boolean interbp = 
+                		rl.getMinPosition().getType().equals(Position.BETWEEN_BASES) || 
+                		rl.getMaxPosition().getType().equals(Position.BETWEEN_BASES);
+                	if (first && rl.getMinPosition().getFuzzyStart()) partial5 = true;
+                	if (!j.hasNext() && rl.getMaxPosition().getFuzzyEnd()) partial3 = true;
+                	first = false;
+                	
+                    xml.openTag(FEATURE_ISCOMP_TAG);
+                    xml.print(""+iscomp);
+                    xml.closeTag(FEATURE_ISCOMP_TAG);
+                    
+                    xml.openTag(FEATURE_INTERBP_TAG);
+                    xml.print(""+interbp);
+                    xml.closeTag(FEATURE_INTERBP_TAG);
+                    
+                    xml.openTag(FEATURE_ACCESSION_TAG);
+                    xml.print(((RichSequence)f.getSequence()).getAccession());
+                    xml.closeTag(FEATURE_ACCESSION_TAG);
+                    
+                    xml.closeTag(FEATURE_INTERVAL_TAG);
+                }
+                
+                if (operator!=null) {
+                	xml.openTag(FEATURE_OPERATOR_TAG);
+                	xml.print(operator.getName());
+                	xml.closeTag(FEATURE_OPERATOR_TAG);
+                }
+                
+                xml.openTag(FEATURE_PARTIAL5_TAG);
+                xml.print(""+partial5);
+                xml.closeTag(FEATURE_PARTIAL5_TAG);
+                
+                xml.openTag(FEATURE_PARTIAL3_TAG);
+                xml.print(""+partial3);
+                xml.closeTag(FEATURE_PARTIAL3_TAG);
+                
+                xml.closeTag(FEATURE_INTERVALS_TAG);
                 
                 xml.openTag(FEATUREQUALS_GROUP_TAG);
                 
@@ -655,9 +763,12 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         private List currRefAuthors;
         private String currRefTitle;
         private String currRefJournal;
-        private String currRefMedline;
         private String currRefPubmed;
         private String currRefRemark;
+        private String currRefPosition;
+        private String currRefXrefDBName;
+        private String currRefXrefID;
+        private List currRefXrefs;
         
         // construct a new handler that will populate the given list of sequences
         private INSDseqHandler(RichSequenceFormat parent,
@@ -683,12 +794,16 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 }
             } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
                 currRefLocation = null;
+                currRefPosition = null;
                 currRefAuthors = new ArrayList();
                 currRefTitle = null;
                 currRefJournal = null;
-                currRefMedline = null;
                 currRefPubmed = null;
                 currRefRemark = null;
+                currRefXrefs = new ArrayList();
+            } else if (qName.equals(XREF_TAG) && !this.parent.getElideReferences()) {
+                currRefXrefDBName = null;
+                currRefXrefID = null;
             } else if (qName.equals(FEATURE_TAG) && !this.parent.getElideFeatures()) {
                 templ = new RichFeature.Template();
                 templ.annotation = new SimpleRichAnnotation();
@@ -771,6 +886,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 
                 else if (qName.equals(REFERENCE_LOCATION_TAG) && !this.parent.getElideReferences()) {
                     currRefLocation = val;
+                } else if (qName.equals(REFERENCE_POSITION_TAG) && !this.parent.getElideReferences()) {
+                    currRefPosition = val;
                 } else if (qName.equals(AUTHOR_TAG) && !this.parent.getElideReferences()) {
                     currRefAuthors.add(new SimpleDocRefAuthor(val,false,false));
                 } else if (qName.equals(CONSORTIUM_TAG) && !this.parent.getElideReferences()) {
@@ -779,8 +896,15 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     currRefTitle = val;
                 } else if (qName.equals(JOURNAL_TAG) && !this.parent.getElideReferences()) {
                     currRefJournal = val;
-                } else if (qName.equals(MEDLINE_TAG) && !this.parent.getElideReferences()) {
-                    currRefMedline = val;
+                } else if (qName.equals(XREF_DBNAME_TAG) && !this.parent.getElideReferences()) {
+                    currRefXrefDBName = val;
+                } else if (qName.equals(XREF_ID_TAG) && !this.parent.getElideReferences()) {
+                    currRefXrefID = val;
+                } else if (qName.equals(XREF_TAG) && !this.parent.getElideReferences()) {
+                	CrossRef xr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{
+                			RichObjectFactory.getDefaultOntology().getOrCreateTerm(currRefXrefDBName), 
+                			currRefXrefID, new Integer(0)});
+                        currRefXrefs.add(xr);
                 } else if (qName.equals(PUBMED_TAG) && !this.parent.getElideReferences()) {
                     currRefPubmed = val;
                 } else if (qName.equals(REMARK_TAG) && !this.parent.getElideReferences() && !this.parent.getElideComments()) {
@@ -809,28 +933,48 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                         RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
                         rlistener.setRankedCrossRef(rpcr);
                     }
-                    // create the medline crossref and assign to the bioentry
-                    CrossRef mcr = null;
-                    if (currRefMedline!=null) {
-                        mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, currRefMedline, new Integer(0)});
-                        RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
+                    // create the other crossrefs and assign to the bioentry
+                    for (int i = 0; i < currRefXrefs.size(); i++) {
+                        RankedCrossRef rmcr = new SimpleRankedCrossRef((CrossRef)currRefXrefs.get(i), i);
                         rlistener.setRankedCrossRef(rmcr);
                     }
                     // create the docref object
                     try {
                         DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefJournal});
                         if (currRefTitle!=null) dr.setTitle(currRefTitle);
-                        // assign either the pubmed or medline to the docref - medline gets priority
-                        if (mcr!=null) dr.setCrossref(mcr);
-                        else if (pcr!=null) dr.setCrossref(pcr);
+                        // assign the pubmed to the docref 
+                        if (pcr!=null) dr.setCrossref(pcr);
                         // assign the remarks
                         dr.setRemark(currRefRemark);
                         // assign the docref to the bioentry
-                        RankedDocRef rdr = new SimpleRankedDocRef(dr,
-                                (ref_start != -999 ? new Integer(ref_start) : null),
+                        if (currRefPosition!=null) {
+                        	// Use the actual location specified.
+                        	RichLocation loc;
+                        	if (currRefPosition.equals("sites")) loc = RichLocation.EMPTY_LOCATION;
+                        	else {
+                        		List members = new ArrayList();
+                        	String[] parts = currRefPosition.split(";\\s+");
+                        	for (int i = 0; i < parts.length; i++) {
+                        		String[] parts2 = parts[i].split("\\.\\.");
+                        		RichLocation newLoc = new SimpleRichLocation(
+                        				new SimplePosition(Integer.parseInt(parts2[0]), 
+                        						Integer.parseInt(parts2[1])), i);
+                        		members.add(newLoc);
+                        	}
+                        	loc = RichLocation.Tools.construct(members);
+                        	}
+                        	RankedDocRef rdr = new SimpleRankedDocRef(dr,
+                            		loc, 
+                            		ref_rank);
+                            rlistener.setRankedDocRef(rdr);
+                        } else {
+                        	// Use the start/end
+                        	RankedDocRef rdr = new SimpleRankedDocRef(dr,
+                        		(ref_start != -999 ? new Integer(ref_start) : null),
                                 (ref_end != -999 ? new Integer(ref_end) : null),
                                 ref_rank);
-                        rlistener.setRankedDocRef(rdr);
+                            rlistener.setRankedDocRef(rdr);
+                        }
                     } catch (ChangeVetoException e) {
                         throw new ParseException(e);
                     }
@@ -843,6 +987,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     String tidyLocStr = val.replaceAll("\\s+","");
                     templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
                     rlistener.startFeature(templ);
+                    // We don't read the hierarchy of tags for location as they
+                    // should contain the same information.
                 } else if (qName.equals(FEATUREQUAL_NAME_TAG) && !this.parent.getElideFeatures()) {
                     if (currFeatQual!=null) {
                         rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(currFeatQual),null);
