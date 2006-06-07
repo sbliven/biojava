@@ -580,7 +580,6 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void removeFeature(Feature f) throws ChangeVetoException, BioException {
-        Set features = new TreeSet();
         for (Iterator i = this.relations.iterator(); i.hasNext(); ) {
             RichFeatureRelationship r = (RichFeatureRelationship)i.next();
             if (r.getSubject().equals(f)) i.remove();
