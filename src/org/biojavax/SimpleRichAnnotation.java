@@ -101,20 +101,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
             }
         }
     }
-    
-    // A dummy note is a Note object with the given key and no value. It is used
-    // for purposes of comparing/converting non-Note annotations. The string
-    // value of the key is created in the default ontology as a Term, unless the key
-    // is already a term, in which case the Term is imported to the default ontology.
-    private Note dummyNote(Object key) {
-        if (key==null) throw new IllegalArgumentException("Key cannot be null"); 
-        if (!(key instanceof ComparableTerm)) {
-            if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
-            else key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
-        }
-        return new SimpleNote((ComparableTerm)key,null,0); 
-    }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -123,7 +110,15 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     /**
      * {@inheritDoc}
      */
-    public boolean containsProperty(Object key) { return this.contains(this.dummyNote(key)); }
+    public boolean containsProperty(Object key) { 
+        if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
+        else key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
+        for(Iterator i = notes.iterator(); i.hasNext();){
+            Note n = (Note)i.next();
+            if(n.getTerm().equals(key)) return true;
+        }
+    	return false; 
+    }
     
     /**
      * {@inheritDoc}
@@ -139,24 +134,32 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     /**
      * {@inheritDoc}
-     * Strictly it will return the <code>Note</code> which matches the 
-     * <code>key</code> (or a <code>Term</code> made with a <code>String</code> key)
-     * with a rank of 0.
+     * Strictly it will return the first <code>Note</code> which matches the 
+     * <code>key</code> (or a <code>Term</code> made with a <code>String</code> key)..
      * @see #getProperties(Object key)
      */
-    public Object getProperty(Object key) throws NoSuchElementException { return this.getNote(this.dummyNote(key)).getValue(); }
+    public Object getProperty(Object key) throws NoSuchElementException { 
+        if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
+        else key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
+        for(Iterator i = notes.iterator(); i.hasNext();){
+            Note n = (Note)i.next();
+            if (n.getTerm().equals(key)) return n.getValue();
+        }
+        throw new NoSuchElementException("No such property: "+key); 
+  	}
     
     /**
      * {@inheritDoc}
+     * Strictly it will return all <code>Note</code>s which match the 
+     * <code>key</code> (or a <code>Term</code> made with a <code>String</code> key)..
      */
     public Note[] getProperties(Object key){
-        ComparableTerm term = dummyNote(key).getTerm();
+        if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
+        else key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
         List l = new LinkedList();
         for(Iterator i = notes.iterator(); i.hasNext();){
             Note n = (Note)i.next();
-            if(n.getTerm().equals(term)){
-                l.add(n);
-            }
+            if (n.getTerm().equals(key)) l.add(n);
         }
         Collections.sort(l);
         Note[] na = new Note[l.size()];
@@ -194,16 +197,29 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     /**
      * {@inheritDoc}
+     * Strictly it will remove the first <code>Note</code> which matches the 
+     * <code>key</code> (or a <code>Term</code> made with a <code>String</code> key)..
      */
-    public void removeProperty(Object key) throws NoSuchElementException, ChangeVetoException { this.removeNote(this.dummyNote(key)); }
+    public void removeProperty(Object key) throws NoSuchElementException, ChangeVetoException { 
+        if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
+        else key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
+        for(Iterator i = notes.iterator(); i.hasNext();){
+            Note n = (Note)i.next();
+            if (n.getTerm().equals(key)) {
+            	this.removeNote(n); 
+            	return;
+            }
+        }
+        throw new NoSuchElementException("No such property: "+key); 
+    }
     
     /**
      * {@inheritDoc}
      */
     public void setProperty(Object key, Object value) throws IllegalArgumentException, ChangeVetoException {
-        Note n = this.dummyNote(key);
-        n.setValue(value.toString());
-        this.addNote(n);
+        if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
+        else key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
+        this.addNote(new SimpleNote((ComparableTerm)key, (String)(value==null?value:value.toString()), 0));
     }
     
     /**
