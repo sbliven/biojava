@@ -138,6 +138,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     protected static final String ACC_VERSION_TAG = "INSDSeq_accession-version";
     protected static final String SECONDARY_ACCESSIONS_GROUP_TAG = "INSDSeq_secondary-accessions";
     protected static final String SECONDARY_ACCESSION_TAG = "INSDSecondary-accn";
+    protected static final String OTHER_SEQIDS_GROUP_TAG = "INSDSeq_other-seqids";
+    protected static final String OTHER_SEQID_TAG = "INSDSeqId";
     
     protected static final String KEYWORDS_GROUP_TAG = "INSDSeq_keywords";
     protected static final String KEYWORD_TAG = "INSDKeyword";
@@ -166,7 +168,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     protected static final String FEATURE_TAG = "INSDFeature";
     protected static final String FEATURE_KEY_TAG = "INSDFeature_key";
     protected static final String FEATURE_LOC_TAG = "INSDFeature_location";
-    protected static final String FEATURE_INTERVALS_TAG = "INSDFeature_intervals";
+    protected static final String FEATURE_INTERVALS_GROUP_TAG = "INSDFeature_intervals";
     protected static final String FEATURE_INTERVAL_TAG = "INSDInterval";
     protected static final String FEATURE_FROM_TAG = "INSDInterval_from";
     protected static final String FEATURE_TO_TAG = "INSDInterval_to";
@@ -196,7 +198,18 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
      * Implements some INSDseq-specific terms.
      */
     public static class Terms extends RichSequence.Terms {
+        private static ComparableTerm OTHER_SEQID_TERM = null;
+        
         private static ComparableTerm INSDSEQ_TERM = null;
+               
+        /**
+         * Getter for the INSDseq term
+         * @return The INSDseq Term
+         */
+        public static ComparableTerm getOtherSeqIdTerm() {
+            if (OTHER_SEQID_TERM==null) OTHER_SEQID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("OtherSeqID");
+            return OTHER_SEQID_TERM;
+        }
         
         /**
          * Getter for the INSDseq term
@@ -338,6 +351,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         
         Set notes = rs.getNoteSet();
         List accessions = new ArrayList();
+        List otherSeqIDs = new ArrayList();
         List kws = new ArrayList();
         String stranded = null;
         String udat = null;
@@ -354,6 +368,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getOtherSeqIdTerm())) otherSeqIDs.add(n.getValue());
             else if (n.getTerm().equals(Terms.getKeywordTerm())) kws.add(n.getValue());
         }
                
@@ -430,6 +445,18 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 
             }
             xml.closeTag(SECONDARY_ACCESSIONS_GROUP_TAG);
+        }
+        
+        if (!otherSeqIDs.isEmpty()) {
+            xml.openTag(OTHER_SEQIDS_GROUP_TAG);
+            for (Iterator i = otherSeqIDs.iterator(); i.hasNext(); ) {
+                
+                xml.openTag(OTHER_SEQID_TAG);
+                xml.print((String)i.next());
+                xml.closeTag(OTHER_SEQID_TAG);
+                
+            }
+            xml.closeTag(OTHER_SEQIDS_GROUP_TAG);
         }
         
         if (!kws.isEmpty()) {
@@ -591,7 +618,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 
                 // New in 1.4 - duplicate the location as a 
                 // tree of XML tags.
-                xml.openTag(FEATURE_INTERVALS_TAG);
+                xml.openTag(FEATURE_INTERVALS_GROUP_TAG);
 
                 RichLocation loc = (RichLocation)f.getLocation();
                 boolean first = true;
@@ -651,7 +678,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 xml.print(""+partial3);
                 xml.closeTag(FEATURE_PARTIAL3_TAG);
                 
-                xml.closeTag(FEATURE_INTERVALS_TAG);
+                xml.closeTag(FEATURE_INTERVALS_GROUP_TAG);
                 
                 xml.openTag(FEATUREQUALS_GROUP_TAG);
                 
@@ -830,6 +857,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     if (parts.length>1) rlistener.setVersion(Integer.parseInt(parts[1]));
                 } else if (qName.equals(SECONDARY_ACCESSION_TAG)) {
                     rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),val);
+                } else if (qName.equals(OTHER_SEQID_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getOtherSeqIdTerm(),val);
                 } else if (qName.equals(DIVISION_TAG)) {
                     rlistener.setDivision(val);
                 } else if (qName.equals(MOLTYPE_TAG)) {
@@ -956,10 +985,16 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                         	String[] parts = currRefPosition.split(";\\s+");
                         	for (int i = 0; i < parts.length; i++) {
                         		String[] parts2 = parts[i].split("\\.\\.");
-                        		RichLocation newLoc = new SimpleRichLocation(
-                        				new SimplePosition(Integer.parseInt(parts2[0]), 
+                        		if (parts2.length>1) {
+                        			RichLocation newLoc = new SimpleRichLocation(
+                        					new SimplePosition(Integer.parseInt(parts2[0]), 
                         						Integer.parseInt(parts2[1])), i);
-                        		members.add(newLoc);
+                        			members.add(newLoc);
+                        		} else {
+                            		RichLocation newLoc = new SimpleRichLocation(
+                            				new SimplePosition(Integer.parseInt(parts2[0])), i);
+                            		members.add(newLoc);
+                        		}
                         	}
                         	loc = RichLocation.Tools.construct(members);
                         	}
