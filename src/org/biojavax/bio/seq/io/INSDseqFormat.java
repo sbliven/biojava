@@ -139,7 +139,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     protected static final String SECONDARY_ACCESSIONS_GROUP_TAG = "INSDSeq_secondary-accessions";
     protected static final String SECONDARY_ACCESSION_TAG = "INSDSecondary-accn";
     protected static final String OTHER_SEQIDS_GROUP_TAG = "INSDSeq_other-seqids";
-    protected static final String OTHER_SEQID_TAG = "INSDSeqId";
+    protected static final String OTHER_SEQID_TAG = "INSDSeqid";
     
     protected static final String KEYWORDS_GROUP_TAG = "INSDSeq_keywords";
     protected static final String KEYWORD_TAG = "INSDKeyword";
