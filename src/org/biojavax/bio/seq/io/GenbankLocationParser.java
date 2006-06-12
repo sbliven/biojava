@@ -188,17 +188,18 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 
                 // Get the parsed contents of the complement 'group'
                 List resultBlocks = new ArrayList(RichLocation.Tools.flatten(parseLocString(featureNS,featureAccession,crossRef,strand,subLocStr)));
+                // Work out the rank of the first block.
+                int firstRank = ((RichLocation)resultBlocks.get(0)).getRank();
                 // Reverse the order of its members c(j(x,y)) = j(cy,cx)
                 Collections.reverse(resultBlocks);
-                // Construct new ranks so that it persists and retrieves to BioSQL in the correct order.
-                int newRank = 0;
+                // Reset ranks so that they persist and retrieve to BioSQL in the correct order.
                 for (Iterator i = resultBlocks.iterator(); i.hasNext(); ) {
                     RichLocation rl = (RichLocation)i.next();
-		    try {
-                        rl.setRank(++newRank);
-		    } catch (ChangeVetoException e) {
-			throw new ParseException(e);
-		    }
+                    try {
+                        rl.setRank(firstRank++);
+                    } catch (ChangeVetoException e) {
+                    	throw new ParseException(e);
+                    }
                 }
                 return RichLocation.Tools.construct(resultBlocks);
             } 
