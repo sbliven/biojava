@@ -105,6 +105,13 @@ public class RichObjectFactory {
     }
     
     /**
+     * Removes all objects from the LRU cache.
+     */
+    public static synchronized void clearLRUCache(){
+        cache.clear();
+    }
+    
+    /**
      * Removes all objects of the specified class from the LRU cache.
      * @param clazz The class of the objects to remove.
      */
