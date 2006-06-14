@@ -52,6 +52,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
   * if the computer needs to swap.
   *
   * @author Andreas Dr&auml;ger
+  * @author Gero Greiner
   * @since 1.5
   */
 
@@ -338,6 +339,7 @@ public class NeedlemanWunsch extends SequenceAlignment
          */
         
         try {
+          boolean[] gap_extend = {false, false};
           j = this.CostMatrix[CostMatrix.length - 1].length -1;
           SymbolTokenization st = subMatrix.getAlphabet().getTokenization("default");
           
@@ -356,21 +358,28 @@ public class NeedlemanWunsch extends SequenceAlignment
                 path     = ' ' + path;
               
               // Match/Replace
-              } else if (CostMatrix[i][j] == CostMatrix[i-1][j-1] - matchReplace(query, subject, i, j)) { 
+              } else if ((CostMatrix[i][j] == CostMatrix[i-1][j-1] - matchReplace(query, subject, i, j))
+                         && !(gap_extend[0] || gap_extend[1])) { 
                 if (query.symbolAt(i) == subject.symbolAt(j)) 
                      path = '|' + path; 
                 else path = ' ' + path;
                 align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
                 align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
                 
-              // Insert
-              } else if (CostMatrix[i][j] == E[i][j]) {
+              // Insert || finish gap if extended gap is opened
+              } else if (CostMatrix[i][j] == E[i][j] || gap_extend[0]) {
+                // check if gap has been extended or freshly opened
+                gap_extend[0] = (E[i][j] != CostMatrix[i][j-1] + insert + gapExt);
+                
                 align[0] = '-' + align[0];
                 align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
                 path     = ' ' + path;
               
-              // Delete
+              // Delete || finish gap if extended gap is opened
               } else { 
+                // check if gap has been extended or freshly opened
+                gap_extend[1] = (F[i][j] != CostMatrix[i-1][j] + delete + gapExt);
+                
                 align[0] = st.tokenizeSymbol(query.symbolAt(i--))  + align[0];
                 align[1] = '-'  + align[1];
                 path     = ' '  + path;
