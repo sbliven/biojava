@@ -40,21 +40,6 @@ public interface DocRef extends Comparable,Changeable {
             "org.biojavax.DocRef",
             "CROSSREF"
             );
-    public static final ChangeType AUTHORS = new ChangeType(
-            "This reference's authors have changed",
-            "org.biojavax.DocRef",
-            "AUTHORS"
-            );
-    public static final ChangeType LOCATION = new ChangeType(
-            "This reference's location has changed",
-            "org.biojavax.DocRef",
-            "LOCATION"
-            );
-    public static final ChangeType TITLE = new ChangeType(
-            "This reference's title has changed",
-            "org.biojavax.DocRef",
-            "TITLE"
-            );
     public static final ChangeType REMARK = new ChangeType(
             "This reference's remark has changed",
             "org.biojavax.DocRef",
@@ -88,13 +73,6 @@ public interface DocRef extends Comparable,Changeable {
      * @return Value of property title.
      */
     public String getTitle();
-    
-    /**
-     * Sets the title of the document reference. Null will unset it.
-     * @param title New value of property title.
-     * @throws ChangeVetoException in case of objections.
-     */
-    public void setTitle(String title) throws ChangeVetoException;
     
     /**
      * Returns the authors of the document reference. 

@@ -508,8 +508,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         if(auths == null) auths = new ArrayList();
                         auths.add(new SimpleDocRefAuthor(consortium,true,false));
                     }
-                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{auths,locator});
-                    if (title!=null) dr.setTitle(title);
+                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{auths,locator,title});
                     // assign either the pubmed or medline to the docref - medline gets priority, then pubmed, then doi
                     if (mcr!=null) dr.setCrossref(mcr);
                     else if (pcr!=null) dr.setCrossref(pcr);

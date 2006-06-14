@@ -969,8 +969,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     }
                     // create the docref object
                     try {
-                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefJournal});
-                        if (currRefTitle!=null) dr.setTitle(currRefTitle);
+                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefJournal,currRefTitle});
                         // assign the pubmed to the docref 
                         if (pcr!=null) dr.setCrossref(pcr);
                         // assign the remarks

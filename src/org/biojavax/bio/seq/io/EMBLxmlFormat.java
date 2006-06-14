@@ -916,8 +916,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     if (currComments.size()>0) currRefRemark = (String)currComments.iterator().next();
                     // create the docref object
                     try {
-                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefLocation});
-                        if (currRefTitle!=null) dr.setTitle(currRefTitle);
+                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefLocation,currRefTitle});
                         // assign the pubmed or medline to the docref - medline gets priority
                         if (useForDocRef!=null) dr.setCrossref(useForDocRef);
                         // assign the remarks

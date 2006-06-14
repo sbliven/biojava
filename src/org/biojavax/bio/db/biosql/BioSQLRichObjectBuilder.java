@@ -106,7 +106,7 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
             queryText = "from CrossRef as cr where cr.dbname = ? and cr.accession = ? and cr.version = ?";
             queryType = "CrossRef";
         } else if (clazz==SimpleDocRef.class) {
-            queryText = "from DocRef as cr where cr.authors = ? and cr.location = ?";
+            queryText = "from DocRef as cr where cr.authors = ? and cr.location = ? and cr.title = ?";
             queryType = "DocRef";
             // convert List constructor to String representation for query
             queryParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((List)queryParamsList.get(0)));

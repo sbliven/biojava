@@ -46,17 +46,19 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     /**
      * Creates a new document reference from the given immutable authors and
-     * location. Will throw exceptions if either are null.
+     * location and title. Will throw exceptions if either authors or
+     * location are null, but a null title is allowable.
      * @param authors The authors of the referenced document, as a set of DocRefAuthor instances.
      * @param location The location of the document, eg. the journal name and page range.
+     * @param title The title of the document.
      */
-    public SimpleDocRef(List authors, String location) {
+    public SimpleDocRef(List authors, String location, String title) {
         if (authors==null || authors.isEmpty()) throw new IllegalArgumentException("Authors cannot be null or empty");
         if (location==null) throw new IllegalArgumentException("Location cannot be null");
         this.crossref = null;
         this.authors = new ArrayList();
         this.authors.addAll(authors);
-        this.title = null;
+        this.title = title;
         this.location = location;
         this.remark = null;
     }
@@ -88,29 +90,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     // Hibernate requirement - not for public use.
     private void setCRC(String CRC) {} // ignore as field is a calculated value
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setTitle(String title) throws ChangeVetoException {
-        if(!this.hasListeners(DocRef.TITLE)) {
-            this.title = title;
-        } else {
-            ChangeEvent ce = new ChangeEvent(
-                    this,
-                    DocRef.TITLE,
-                    title,
-                    this.title
-                    );
-            ChangeSupport cs = this.getChangeSupport(DocRef.TITLE);
-            synchronized(cs) {
-                cs.firePreChangeEvent(ce);
-                this.title = title;
-                cs.firePostChangeEvent(ce);
-            }
-        }
-    }
-    
+        
     /**
      * {@inheritDoc}
      */
@@ -138,6 +118,9 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     // Hibernate requirement - not for public use.
     private void setLocation(String location) { this.location = location; }
+
+    // Hibernate requirement - not for public use.
+    private void setTitle(String title) { this.title = title; }
     
     /**
      * {@inheritDoc}
@@ -188,7 +171,8 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     
     /**
      * {@inheritDoc}
-     * Document references are compared first by author, then by location.
+     * Document references are compared first by author, then by location, then
+     * by title. If this title is null, and theirs isn't, then this will return -1.
      */
     public int compareTo(Object o) {
         if(o == this) return 0;
@@ -197,12 +181,17 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         // Normal comparison
         DocRef them = (DocRef)o;
         if (!this.getAuthors().equals(them.getAuthors())) return this.getAuthors().compareTo(them.getAuthors());
-        return this.location.compareTo(them.getLocation());
+        else if (!this.getLocation().equals(them.getLocation())) return this.getLocation().compareTo(them.getLocation());
+        else if (this.getTitle()==null) {
+        	if (them.getTitle()==null) return 0;
+            else return -1;
+        }
+        else return this.getTitle().compareTo(them.getTitle());
     }
     
     /**
      * {@inheritDoc}
-     * Document references are equal if they have the same author and location.
+     * Document references are equal if they have the same author and location and title.
      */
     public boolean equals(Object obj) {
         if(this == obj) return true;
@@ -212,7 +201,12 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         // Normal comparison
         DocRef them = (DocRef)obj;
         return (this.getAuthors().equals(them.getAuthors()) &&
-                this.getLocation().equals(them.getLocation()));
+                this.getLocation().equals(them.getLocation()) &&
+                (
+                		(this.getTitle()==them.getTitle()) ||
+                		(this.getTitle()!=null && this.getTitle().equals(them.getTitle()))
+                )
+                );
     }
     
     /**
@@ -225,6 +219,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         // Normal comparison
         code = 37*code + this.getAuthors().hashCode();
         code = 37*code + this.location.hashCode();
+        if (this.title!=null) code = 37*code + this.title.hashCode();
         return code;
     }
     

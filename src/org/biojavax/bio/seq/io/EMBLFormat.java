@@ -488,8 +488,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 try {
                     List authSet = DocRefAuthor.Tools.parseAuthorString(authors);
                     if (consortium!=null) authSet.add(new SimpleDocRefAuthor(consortium, true, false));
-                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authSet,locator});
-                    if (title!=null) dr.setTitle(title);
+                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{authSet,locator,title});
                     // assign either the pubmed or medline to the docref - medline gets priority, then pubmed, then doi
                     if (mcr!=null) dr.setCrossref(mcr);
                     else if (pcr!=null) dr.setCrossref(pcr);

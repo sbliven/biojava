@@ -360,8 +360,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 	if (authors==null) authors = consortium;
                 	else if (consortium!=null) authors = authors + ", " + consortium + " (consortium)";
                 	// Create docref.
-                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{DocRefAuthor.Tools.parseAuthorString(authors),journal});
-                    if (title!=null) dr.setTitle(title);
+                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{DocRefAuthor.Tools.parseAuthorString(authors),journal,title});
                     // assign either the pubmed or medline to the docref - medline gets priority
                     if (mcr!=null) dr.setCrossref(mcr);
                     else if (pcr!=null) dr.setCrossref(pcr);
