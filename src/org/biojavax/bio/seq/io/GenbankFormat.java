@@ -546,7 +546,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         if (line.startsWith(START_SEQUENCE_TAG) || line.startsWith(END_SEQUENCE_TAG)) currKey = line;
                         else {
                             currVal.append("\n"); // newline in between lines - can be removed later
-                            currVal.append(line.trim());
+                            currVal.append(currKey.charAt(0)=='/'?line.substring(21):line.substring(12));
                         }
                     }
                 }
