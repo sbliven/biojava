@@ -279,7 +279,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     if (stranded!=null) rlistener.addSequenceProperty(Terms.getStrandedTerm(),stranded);
                     if (circular!=null && circular.equalsIgnoreCase("circular")) rlistener.setCircular(true);
                 } else {
-                    throw new ParseException("Bad locus line found: "+loc);
+                    throw new ParseException("Bad locus line found: "+loc+", accession:"+accession);
                 }
             } else if (sectionKey.equals(DEFINITION_TAG)) {
                 rlistener.setDescription(((String[])section.get(0))[1]);
@@ -308,7 +308,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     if (m.group(3)!=null) rlistener.setVersion(Integer.parseInt(m.group(3)));
                     if (m.group(5)!=null) rlistener.setIdentifier(m.group(5));
                 } else {
-                    throw new ParseException("Bad version line found: "+ver);
+                    throw new ParseException("Bad version line found: "+ver+", accession:"+accession);
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String val = ((String[])section.get(0))[1];
@@ -338,7 +338,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                             ref_end = Integer.parseInt(m.group(4));
                     }
                 } else {
-                    throw new ParseException("Bad reference line found: "+ref);
+                    throw new ParseException("Bad reference line found: "+ref+", accession:"+accession);
                 }
                 // rest can be in any order
                 String authors = null;
@@ -392,7 +392,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                             ref_rank);
                     rlistener.setRankedDocRef(rdr);
                 } catch (ChangeVetoException e) {
-                    throw new ParseException(e);
+                    throw new ParseException(e+", accession:"+accession);
                 }
             } else if (sectionKey.equals(COMMENT_TAG) && !this.getElideComments()) {
                 // Set up some comments
@@ -421,7 +421,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                                     try {
                                         if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism.replace('\n', ' '));// readSection can embed new lines
                                     } catch (ChangeVetoException e) {
-                                        throw new ParseException(e);
+                                        throw new ParseException(e+", accession:"+accession);
                                     }
                                 } else {
                                     try {
@@ -429,18 +429,18 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                                         RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
                                         rlistener.getCurrentFeature().addRankedCrossRef(rcr);
                                     } catch (ChangeVetoException e) {
-                                        throw new ParseException(e);
+                                        throw new ParseException(e+", accession:"+accession);
                                     }
                                 }
                             } else {
-                                throw new ParseException("Bad dbxref found: "+val);
+                                throw new ParseException("Bad dbxref found: "+val+", accession:"+accession);
                             }
                         } else if (key.equalsIgnoreCase("organism")) {
                             try {
                                 organism = val;
                                 if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism.replace('\n', ' '));// readSection can embed new lines
                             } catch (ChangeVetoException e) {
-                                throw new ParseException(e);
+                                throw new ParseException(e+", accession:"+accession);
                             }
                         } else {
                             if (key.equalsIgnoreCase("translation")) {
@@ -484,7 +484,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                             (Symbol[])(sl.toList().toArray(new Symbol[0])),
                             0, sl.length());
                 } catch (Exception e) {
-                    throw new ParseException(e);
+                    throw new ParseException(e+", accession:"+accession);
                 }
             }
         } while (!sectionKey.equals(END_SEQUENCE_TAG));
@@ -712,13 +712,19 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 String displayName = tax.getDisplayName();           
                 if (displayName.indexOf('(')>-1) displayName = displayName.substring(0, displayName.indexOf('(')).trim();
                 StringTools.writeKeyValueLine("", "/organism=\""+displayName+"\"", 21, this.getLineWidth()-1, this.getPrintStream());// AF252370 fits in exactly 80 - but is wrapped
+                for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
+                    RankedCrossRef rcr = (RankedCrossRef)j.next();
+                    CrossRef cr = rcr.getCrossRef();
+                    StringTools.writeKeyValueLine("", "/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", 21, this.getLineWidth(), this.getPrintStream());
+                }
                 StringTools.writeKeyValueLine("", "/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", 21, this.getLineWidth(), this.getPrintStream());
-            }
-            // add-in other dbxrefs where present
-            for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
-                RankedCrossRef rcr = (RankedCrossRef)j.next();
-                CrossRef cr = rcr.getCrossRef();
-                StringTools.writeKeyValueLine("", "/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", 21, this.getLineWidth(), this.getPrintStream());
+            } else {
+	            // add-in other dbxrefs where present
+	            for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
+	                RankedCrossRef rcr = (RankedCrossRef)j.next();
+	                CrossRef cr = rcr.getCrossRef();
+	                StringTools.writeKeyValueLine("", "/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", 21, this.getLineWidth(), this.getPrintStream());
+	            }
             }
         }
         
