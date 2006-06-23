@@ -400,7 +400,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                                     tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
                                     rlistener.setTaxon(tax);
                                     try {
-                                        if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
+                                        if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism.replace('\n', ' '));// readSection can embed new lines
                                     } catch (ChangeVetoException e) {
                                         throw new ParseException(e);
                                     }
@@ -419,7 +419,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         } else if (key.equalsIgnoreCase("organism")) {
                             try {
                                 organism = val;
-                                if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
+                                if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism.replace('\n', ' '));// readSection can embed new lines
                             } catch (ChangeVetoException e) {
                                 throw new ParseException(e);
                             }
