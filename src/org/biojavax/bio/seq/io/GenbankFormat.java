@@ -646,10 +646,10 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
             Integer rstart = rdr.getStart();
-            if (rstart==null) rstart = new Integer(1);
+//          if (rstart==null) rstart = new Integer(1);
             Integer rend = rdr.getEnd();
-            if (rend==null) rend = new Integer(rs.length());
-            StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+"  (bases "+rstart+" to "+rend+")", 12, this.getLineWidth(), this.getPrintStream());
+//             if (rend==null) rend = new Integer(rs.length());
+            StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+(rstart==null?"":"  (bases "+rstart+" to "+rend+")"), 12, this.getLineWidth(), this.getPrintStream());
             // Any authors that were in the input as CONSRTM tags will
             // be merged into the AUTHORS tag on output.
             StringTools.writeKeyValueLine("  "+AUTHORS_TAG, d.getAuthors(), 12, this.getLineWidth(), this.getPrintStream());
