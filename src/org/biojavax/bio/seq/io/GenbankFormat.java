@@ -650,7 +650,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         
         // keywords line
         keywords.append(".");
-        StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords.toString(), 12, this.getLineWidth(), this.getPrintStream());
+        StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords.toString(), 12, this.getLineWidth()-1, this.getPrintStream());
         
         // source line (from taxon)
         //   organism line
