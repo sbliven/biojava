@@ -595,8 +595,10 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 accessions.append(n.getValue());
             }
             else if (n.getTerm().equals(Terms.getKeywordTerm())) {
-                if (keywords.length()>0) keywords.append("; ");
-                keywords.append(n.getValue());
+            	if (n.getValue() != null) {
+	                if (keywords.length()>0) keywords.append("; ");
+	                keywords.append(n.getValue());
+            	}
             }
         }
         
