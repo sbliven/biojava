@@ -113,13 +113,11 @@ public class StringTools {
         Pattern p = Pattern.compile(sepRegex);
         int start = 0;
         while (start < input.length()) {
-            //skip leading newline symbol as it is a waste of space
-            if (input.charAt(start)=='\n') start++;
             //begin from start+width
             int splitPoint = start+width;
             //if has newline before end, use it
-            int newline = input.indexOf('\n',start);
-            if (newline>start && newline<splitPoint) {
+           int newline = input.indexOf('\n',start);
+           if (newline>=start && newline<splitPoint) {
                 splitPoint = newline;
             }
             //easy case where only small portion of line remains
@@ -127,22 +125,33 @@ public class StringTools {
             //hard case, have to split it!
             else {
                 //if not match sep, find first point that does
-                while (splitPoint>start) {
+                while (splitPoint>=start) {
                     char c = input.charAt(splitPoint);
                     Matcher m = p.matcher(""+c);
-                    if (m.matches()) break;
+                    if (m.matches()) {
+                    	splitPoint+=1;// splitpoint is index of separator - include on this line - assumes a single character separator
+                    	break;
+                    }
                     splitPoint--;
                 }
                 //if ended up at splitPoint=start, splitPoint=start+width
                 //in order to break word mid-way through
-                if (splitPoint==start) splitPoint = start+width;
+                if (splitPoint<=start) splitPoint = start+width;
             }
-            //output chunk from start to splitPoint
-            lines.add(input.substring(start, splitPoint).trim());
-            //start = splitPoint
-            start=splitPoint;
+            //trailing blanks - which may include the separator - are not in genbank lines - so they are removed
+            //output chunk from start to splitPoint - do not include trailing newline - it will be added by writeKeyValueLine
+            lines.add(trimTrailingBlanks(newline==splitPoint-1?input.substring(start, splitPoint-1):input.substring(start, splitPoint)));
+            start=splitPoint;// start right after the separator
         }
         return (String[])lines.toArray(new String[0]);
+    }
+    
+    private final static String trimTrailingBlanks(final String theString) {
+    	if (theString.length() ==0 || theString.charAt(theString.length()-1) != ' ') return theString;
+    	int len = theString.length();
+    	final char[] val = theString.toCharArray();
+    	while ((val[len - 1] <= ' ')) len--;
+    	return ((len <  theString.length())) ? theString.substring(0, len) : theString;
     }
     
     /**
@@ -193,7 +202,7 @@ public class StringTools {
         if (key==null || text==null) return; // skip blank lines
         if (wrappedKey==null) wrappedKey=""; // stop null pointer exceptions on wrapped keys
         if (sep==null) sep="\\s+"; // stop null pointer exceptions on the separator
-        text = text.trim(); // trim leading/trailing whitespace from text
+//        text = text.trim(); // trim leading/trailing whitespace from text - this deletes leading blank lines from comments: e.g. AC140936
         String[] lines = StringTools.wordWrap(text, sep, lineWidth-keyWidth);
         if (lines.length==0) os.println(StringTools.rightPad(key,keyWidth));
         else {
