@@ -57,6 +57,7 @@ public class RichObjectFactory {
     private static int defaultLRUcacheSize = 20;
     private static Map LRUcacheSizes = new HashMap();
     private static Map cache = new HashMap();
+    private final static Map applicationClassMap = new HashMap();
     
     // Constructor is private as this is all static.
     private RichObjectFactory() {}
@@ -87,21 +88,41 @@ public class RichObjectFactory {
      */
     public static synchronized Object getObject(final Class clazz, Object[] params) {
         List paramsList = Arrays.asList(params);
-        if (!cache.containsKey(clazz)) {
+        final Class applicationClass = getApplicationClass(clazz);
+        if (!cache.containsKey(applicationClass)) {
             int LRUcacheSize = defaultLRUcacheSize;
-            if (LRUcacheSizes.containsKey(clazz)) LRUcacheSize = ((Integer)LRUcacheSizes.get(clazz)).intValue();
-            else LRUcacheSizes.put(clazz,new Integer(LRUcacheSize));
-            cache.put(clazz, new LinkedHashMap(LRUcacheSize, 0.75f, true) {
+            if (LRUcacheSizes.containsKey(applicationClass)) LRUcacheSize = ((Integer)LRUcacheSizes.get(applicationClass)).intValue();
+            else LRUcacheSizes.put(applicationClass,new Integer(LRUcacheSize));
+            cache.put(applicationClass, new LinkedHashMap(LRUcacheSize, 0.75f, true) {
                 protected boolean removeEldestEntry(Map.Entry eldest) {
-                    return this.size() > ((Integer)LRUcacheSizes.get(clazz)).intValue();
+                    return this.size() > ((Integer)LRUcacheSizes.get(applicationClass)).intValue();
                 }
             });
         }
-        Map m = (Map)cache.get(clazz);
-        if (!m.containsKey(paramsList)) {
-            m.put(paramsList,builder.buildObject(clazz, paramsList));
-        }
+        Map m = (Map)cache.get(applicationClass);
+       if (!m.containsKey(paramsList)) {
+           m.put(paramsList,builder.buildObject(applicationClass, paramsList));
+       }
         return m.get(paramsList);
+    }
+    
+    private final static Map getApplicationClassMap() {
+    	return applicationClassMap;
+    }
+    
+	/**
+	 * Allow application to override the default biojava class created in getObject - subclass restriction is checked in the builder.
+	 * @param theBiojavaClass: one of the well-known builder classes: SimpleNamespace, SimpleComparableOntology, SimpleNCBITaxon, SimpleCrossRef, or SimpleDocRef
+	 * @param theApplicationClass - a subclass of theBiojavaClass
+	 */
+    public final static void setApplicationClass(final Class theBiojavaClass, final Class theApplicationClass) {
+    	if (theApplicationClass==null || theBiojavaClass.isAssignableFrom(theApplicationClass) == false) throw new IllegalArgumentException("RichObjectFactory.setApplicationClass-theApplicationClass: <"+theApplicationClass+"> must be assignable to the biojava class: <"+theBiojavaClass+">");
+    	getApplicationClassMap().put(theBiojavaClass, theApplicationClass);
+    }
+    
+    private final static Class getApplicationClass(final Class theBiojavaClass) {
+    	final Class applicationClass = (Class) getApplicationClassMap().get(theBiojavaClass);
+    	return applicationClass!=null?applicationClass:theBiojavaClass;
     }
     
     /**
