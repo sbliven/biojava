@@ -711,7 +711,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             if (f.getType().equals("source") && tax!=null) {     
                 String displayName = tax.getDisplayName();           
                 if (displayName.indexOf('(')>-1) displayName = displayName.substring(0, displayName.indexOf('(')).trim();
-                StringTools.writeKeyValueLine("", "/organism=\""+displayName+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
+                StringTools.writeKeyValueLine("", "/organism=\""+displayName+"\"", 21, this.getLineWidth()-1, this.getPrintStream());// AF252370 fits in exactly 80 - but is wrapped
                 StringTools.writeKeyValueLine("", "/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", 21, this.getLineWidth(), this.getPrintStream());
             }
             // add-in other dbxrefs where present
