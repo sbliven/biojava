@@ -246,6 +246,7 @@ public class RichObjectFactory {
      * @param session an object containing a Hibernate session.
      */
     public static void connectToBioSQL(Object session) {
+    	clearLRUCache();
         RichObjectFactory.setRichObjectBuilder(new BioSQLRichObjectBuilder(session));
         RichObjectFactory.setDefaultCrossReferenceResolver(new BioSQLCrossReferenceResolver(session));      
         RichObjectFactory.setDefaultRichSequenceHandler(new BioSQLRichSequenceHandler(session));        
