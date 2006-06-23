@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
@@ -131,6 +132,24 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final Pattern readableFiles = Pattern.compile(".*(g[bp]k*$|\\u002eg[bp].*)");
     protected static final Pattern headerLine = Pattern.compile("^LOCUS.*");
     
+    private final static HashSet isNotQuoted = new HashSet();
+    static {
+    	isNotQuoted.add("codon_start");
+    	isNotQuoted.add("number");
+    	isNotQuoted.add("transl_table");
+    	isNotQuoted.add("label");
+    	isNotQuoted.add("rpt_type");
+    	isNotQuoted.add("anticodon");
+    	isNotQuoted.add("rpt_unit_range");
+    	isNotQuoted.add("citation");
+    	isNotQuoted.add("estimated_length");
+    	isNotQuoted.add("transl_except");
+    	isNotQuoted.add("mod_base");
+    	isNotQuoted.add("cons_splice");
+    	isNotQuoted.add("compare");
+    	isNotQuoted.add("direction");
+    }
+
     /**
      * Implements some GenBank-specific terms.
      */
@@ -656,7 +675,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             StringTools.writeKeyValueLine("  "+TITLE_TAG, d.getTitle(), 12, this.getLineWidth(), this.getPrintStream());
             StringTools.writeKeyValueLine("  "+JOURNAL_TAG, d.getLocation(), 12, this.getLineWidth(), this.getPrintStream());
             CrossRef c = d.getCrossref();
-            if (c!=null) StringTools.writeKeyValueLine("  "+c.getDbname(), c.getAccession(), 12, this.getLineWidth(), this.getPrintStream());
+            if (c!=null) StringTools.writeKeyValueLine(StringTools.leftPad(c.getDbname(),9), c.getAccession(), 12, this.getLineWidth(), this.getPrintStream());
             StringTools.writeKeyValueLine("  "+REMARK_TAG, d.getRemark(), 12, this.getLineWidth(), this.getPrintStream());
         }
         
@@ -680,7 +699,13 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 Note n = (Note)j.next();
                 // /key="val" or just /key if val==""
                 if (n.getValue()==null || n.getValue().length()==0) StringTools.writeKeyValueLine("", "/"+n.getTerm().getName(), 21, this.getLineWidth(), this.getPrintStream());
-                else StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), this.getPrintStream());
+                else if (isNotQuoted(n)) {// doesn't have the value enclosed in quotes
+                	StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"="+n.getValue(), 21, this.getLineWidth(), this.getPrintStream());
+                } else if (n.getTerm().getName().equals("translation")) {
+                	StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth()-1, this.getPrintStream());
+                } else {
+                	StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), this.getPrintStream());
+                }
             }
             // add-in to source feature only organism and db_xref="taxon:xyz" where present
             if (f.getType().equals("source") && tax!=null) {     
@@ -782,6 +807,15 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     		}
     	}
     	return false;
+    }
+
+    private final static boolean isNotQuoted(final Note theNote) {
+    	return isNotQuoted(theNote.getTerm().getName(), theNote.getValue());
+    }
+    
+    private final static boolean isNotQuoted(final String theName, final String theValue) {
+//    	System.out.println("GenbankFormat.isNumeric-theName:"+theName+", isNumeric? "+isNumeric.contains(theName));
+    	return isNotQuoted.contains(theName);
     }
 }
 
