@@ -93,19 +93,19 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
         String queryText;
         String queryType;
         List queryParamsList = new ArrayList(paramsList);
-        if (clazz==SimpleNamespace.class) {
+        if (SimpleNamespace.class.isAssignableFrom(clazz)) {
             queryText = "from Namespace as ns where ns.name = ?";
             queryType = "Namespace";
-        } else if (clazz==SimpleComparableOntology.class) {
+        } else if (SimpleComparableOntology.class.isAssignableFrom(clazz)) {
             queryText = "from Ontology as o where o.name = ?";
             queryType = "Ontology";
-        } else if (clazz==SimpleNCBITaxon.class) {
+        } else if (SimpleNCBITaxon.class.isAssignableFrom(clazz)) {
             queryText = "from Taxon as o where o.NCBITaxID = ?";
             queryType = "Taxon";
-        } else if (clazz==SimpleCrossRef.class) {
+        } else if (SimpleCrossRef.class.isAssignableFrom(clazz)) {
             queryText = "from CrossRef as cr where cr.dbname = ? and cr.accession = ? and cr.version = ?";
             queryType = "CrossRef";
-        } else if (clazz==SimpleDocRef.class) {
+        } else if (SimpleDocRef.class.isAssignableFrom(clazz)) {
             queryText = "from DocRef as cr where cr.authors = ? and cr.location = ? and cr.title = ?";
             queryType = "DocRef";
             // convert List constructor to String representation for query
