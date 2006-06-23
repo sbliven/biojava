@@ -638,7 +638,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         NCBITaxon tax = rs.getTaxon();
         if (tax!=null) {
             StringTools.writeKeyValueLine(SOURCE_TAG, (isMitochondrial(rs)?"mitochondrion ":"")+tax.getDisplayName(), 12, this.getLineWidth(), this.getPrintStream());
-            StringTools.writeKeyValueLine("  "+ORGANISM_TAG, tax.getDisplayName().split("\\s+\\(")[0]+"\n"+tax.getNameHierarchy(), 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine("  "+ORGANISM_TAG, tax.getDisplayName().split("\\s+\\(")[0]+"\n"+tax.getNameHierarchy(), 12, this.getLineWidth()-1, this.getPrintStream());
         }
         
         // references - rank (bases x to y)
