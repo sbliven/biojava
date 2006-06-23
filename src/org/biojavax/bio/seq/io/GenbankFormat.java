@@ -117,7 +117,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     // version line
     protected static final Pattern vp = Pattern.compile("^(\\S+?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
-    protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\((?:bases|residues)\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
+    protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\((?:bases|residues)\\s+(\\d+)\\s+to\\s+(\\d+)((\\s*;\\s*(\\d+)\\s+to\\s+(\\d+))*)\\)|\\(sites\\))?");
     // dbxref line
     protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
     //sections start at a line and continue till the first line afterwards with a
