@@ -44,6 +44,7 @@ public class SimpleNCBITaxonName implements Comparable {
     public SimpleNCBITaxonName(String nameClass, String name) {
         if (nameClass==null) throw new IllegalArgumentException("Name class cannot be null");
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
+        if (name.indexOf('\n') >= 0) throw new IllegalArgumentException("NCBI taxonomy names cannot embed new lines - at:"+name.indexOf('\n')+", in name: <"+name+">");
         this.nameClass = nameClass;
         this.name = name; 
     }
