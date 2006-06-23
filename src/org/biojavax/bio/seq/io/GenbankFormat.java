@@ -637,7 +637,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         //   organism line
         NCBITaxon tax = rs.getTaxon();
         if (tax!=null) {
-            StringTools.writeKeyValueLine(SOURCE_TAG, tax.getDisplayName(), 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine(SOURCE_TAG, (isMitochondrial(rs)?"mitochondrion ":"")+tax.getDisplayName(), 12, this.getLineWidth(), this.getPrintStream());
             StringTools.writeKeyValueLine("  "+ORGANISM_TAG, tax.getDisplayName().split("\\s+\\(")[0]+"\n"+tax.getNameHierarchy(), 12, this.getLineWidth(), this.getPrintStream());
         }
         
@@ -765,6 +765,23 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public String getDefaultFormat() {
         return GENBANK_FORMAT;
+    }
+
+    private final static boolean isMitochondrial(final RichSequence theSequence) {
+    	final Set featureSet = theSequence.getFeatureSet();
+    	final Iterator i = featureSet.iterator();
+    	while (i.hasNext()) {
+    		final RichFeature feature = (RichFeature) i.next();
+    		if (feature.getType().equals("source")) {
+    			final Set noteSet = feature.getNoteSet();
+    			final Iterator n = noteSet.iterator();
+    			while(n.hasNext()) {
+    				final Note note = (Note) n.next();
+        	    	if (note.getTerm().getName().equals("organelle")) return note.getValue().equals("mitochondrion");
+    			}
+    		}
+    	}
+    	return false;
     }
 }
 
