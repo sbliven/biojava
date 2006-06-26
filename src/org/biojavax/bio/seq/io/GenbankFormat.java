@@ -30,10 +30,10 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,16 +55,19 @@ import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.SimpleComment;
 import org.biojavax.SimpleCrossRef;
 import org.biojavax.SimpleDocRef;
 import org.biojavax.SimpleRankedCrossRef;
 import org.biojavax.SimpleRankedDocRef;
 import org.biojavax.SimpleRichAnnotation;
-import org.biojavax.RichObjectFactory;
+import org.biojavax.bio.seq.CompoundRichLocation;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.SimplePosition;
+import org.biojavax.bio.seq.SimpleRichLocation;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
@@ -118,7 +121,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     // version line
     protected static final Pattern vp = Pattern.compile("^(\\S+?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
-    protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\((?:bases|residues)\\s+(\\d+)\\s+to\\s+(\\d+)((\\s*;\\s*(\\d+)\\s+to\\s+(\\d+))*)\\)|\\(sites\\))?");
+    protected static final Pattern refRange = Pattern.compile("^\\s*(\\d+)\\s+to\\s+(\\d+)$");
+    protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(?:(\\((?:bases|residues)\\s+(\\d+\\s+to\\s+\\d+(\\s*;\\s*\\d+\\s+to\\s+\\d+)*)\\))|\\(sites\\))?");
     // dbxref line
     protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
     //sections start at a line and continue till the first line afterwards with a
@@ -324,19 +328,12 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             } else if (sectionKey.equals(REFERENCE_TAG) && !this.getElideReferences()) {
                 // first line of section has rank and location
                 int ref_rank;
-                int ref_start = -999;
-                int ref_end = -999;
+                List baseRangeList=null;
                 String ref = ((String[])section.get(0))[1];
                 Matcher m = refp.matcher(ref);
                 if (m.matches()) {
                     ref_rank = Integer.parseInt(m.group(1));
-                    if(m.group(2) != null){
-                        if (m.group(3)!= null)
-                            ref_start = Integer.parseInt(m.group(3));
-                        
-                        if(m.group(4) != null)
-                            ref_end = Integer.parseInt(m.group(4));
-                    }
+                    if (m.group(3) != null) baseRangeList=buildBaseRanges(m.group(3));
                 } else {
                     throw new ParseException("Bad reference line found: "+ref+", accession:"+accession);
                 }
@@ -385,11 +382,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     else if (pcr!=null) dr.setCrossref(pcr);
                     // assign the remarks
                     if (!this.getElideComments()) dr.setRemark(remark);
-                    // assign the docref to the bioentry
-                    RankedDocRef rdr = new SimpleRankedDocRef(dr,
-                            (ref_start != -999 ? new Integer(ref_start) : null),
-                            (ref_end != -999 ? new Integer(ref_end) : null),
-                            ref_rank);
+                    // assign the docref to the bioentry: null if no base ranges, Integers if 1 base range - the normal case, joined RichLocation if more than 1
+                    RankedDocRef rdr = baseRangeList == null?new SimpleRankedDocRef(dr, null, null, ref_rank):(baseRangeList.size()==1?new SimpleRankedDocRef(dr, new Integer(((RichLocation)baseRangeList.get(0)).getMin()), new Integer(((RichLocation)baseRangeList.get(0)).getMax()), ref_rank):new SimpleRankedDocRef(dr, new CompoundRichLocation(baseRangeList), ref_rank));
                     rlistener.setRankedDocRef(rdr);
                 } catch (ChangeVetoException e) {
                     throw new ParseException(e+", accession:"+accession);
@@ -555,6 +549,23 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             throw new ParseException(e);
         }
         return section;
+    }
+    
+    private final static List buildBaseRanges(final String theBaseRangeList) throws ParseException {
+        if (theBaseRangeList == null) return null;
+        final List baseRangeList = new ArrayList();
+    	final String[] baseRange = theBaseRangeList.split(";");
+    	for (int r=0; r<baseRange.length; r++) {
+    		final Matcher rangeMatch = refRange.matcher(baseRange[r]);
+    		if (rangeMatch.matches()) {
+    			final int rangeStart = Integer.parseInt(rangeMatch.group(1));
+    			final int rangeEnd = Integer.parseInt(rangeMatch.group(2));
+    			baseRangeList.add(new SimpleRichLocation(new SimplePosition(rangeStart), new SimplePosition(rangeEnd), r));
+    		} else {
+                throw new ParseException("Bad reference range found["+r+"]: <"+baseRange[r]+">, theBaseRangeList: <"+theBaseRangeList+">");
+    		}
+    	}
+    	return baseRangeList;
     }
     
     /**
