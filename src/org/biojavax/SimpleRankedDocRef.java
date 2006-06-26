@@ -111,12 +111,16 @@ public class SimpleRankedDocRef implements RankedDocRef {
     
     // Internal use only.
     private void createLocation() {
-    	Position position;
-    	if (this.start==null && this.end==null) position = null;
-    	else if (this.start==null) position = new SimplePosition(this.end.intValue());
-    	else if (this.end==null) position = new SimplePosition(this.start.intValue());
-    	else position = new SimplePosition(this.start.intValue(), this.end.intValue());
-        this.location = position == null ? RichLocation.EMPTY_LOCATION : new SimpleRichLocation(position, 0);
+//    	Position position;
+//    	if (this.start==null && this.end==null) position = null;
+//    	else if (this.start==null) position = new SimplePosition(this.end.intValue());
+//    	else if (this.end==null) position = new SimplePosition(this.start.intValue());
+//    	else position = new SimplePosition(this.start.intValue(), this.end.intValue());
+//        this.location = position == null ? RichLocation.EMPTY_LOCATION : new SimpleRichLocation(position, 0);
+    	if (this.start==null && this.end==null) location = RichLocation.EMPTY_LOCATION;
+    	else if (this.start==null) location = new SimpleRichLocation(null, new SimplePosition(this.end.intValue()), 0);
+    	else if (this.end==null) location = new SimpleRichLocation(new SimplePosition(this.start.intValue()), null, 0);
+    	else location = new SimpleRichLocation(new SimplePosition(this.start.intValue()), new SimplePosition(this.end.intValue()), 0);
     }
     
     // Internal use only.
