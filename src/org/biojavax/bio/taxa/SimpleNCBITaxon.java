@@ -40,7 +40,7 @@ import org.biojavax.RichObjectFactory;
  */
 public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     
-    private Set names = new TreeSet();
+    protected Set names = new TreeSet();
     private Map namesMap = new TreeMap();
     private Integer parent;
     private int NCBITaxID;
@@ -49,7 +49,11 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     private Integer mitoGeneticCode;
     private Integer leftValue;
     private Integer rightValue;
-    
+	private boolean isTaxonHidden = false;
+	 
+	private final static String TAXONISHIDDEN = "X";
+	private final static int ROOTNCBIID = 1;
+   
     /**
      * Creates a new instance of SimpleNCBITaxon based on the given taxon ID.
      * @param NCBITaxID the underlying taxon ID from NCBI.
@@ -117,7 +121,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     }
     
     // Hibernate requirement - not for public use.
-    private Set getNameSet() { return this.names; } // original for Hibernate
+    protected Set getNameSet() { return this.names; } // original for Hibernate
     
     // Hibernate requirement - not for public use.
     private void setNameSet(Set names) {
@@ -202,6 +206,10 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
         if (!this.namesMap.containsKey(nameClass)) return false;
         SimpleNCBITaxonName n = new SimpleNCBITaxonName(nameClass, name);
         return ((Set)this.namesMap.get(nameClass)).contains(n);
+    }
+    
+    protected final Map getNamesMap() {
+    	return namesMap;
     }
     
     /**
@@ -408,26 +416,82 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
      * If this taxon entry has no scientific name, you will get the string ".".
      * @return the display name as described above.
      */
-    public String getNameHierarchy() {
-        StringBuffer sb = new StringBuffer();
-        boolean first = true;
-        Integer parent = this.getParentNCBITaxID();
-        while (parent!=null) {
-            NCBITaxon t = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{parent});
-            Set sciNames = t.getNames(NCBITaxon.SCIENTIFIC);
-            if (sciNames.size()>0) {
-                if (!first) sb.insert(0,"; ");
-                else first = false;
-                sb.insert(0,(String)sciNames.iterator().next());
-                // Don't get into endless loop if child's parent is itself.
-                if (t.getParentNCBITaxID().equals(new Integer(t.getNCBITaxID()))) parent = null;
-                else parent = t.getParentNCBITaxID();
+    /*
+     * (non-Javadoc)
+     * @see com.bioperception.bio.taxa.NCBITaxon2#isTaxonHidden()
+     */
+    public final boolean isTaxonHidden() {
+    	return isTaxonHidden;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see com.bioperception.bio.taxa.NCBITaxon2#setTaxonHidden(boolean)
+     */
+    public final void setTaxonHidden(final boolean isTaxonHidden) throws ChangeVetoException {
+        if(!this.hasListeners(HIDDEN)) {
+            this.isTaxonHidden = isTaxonHidden;
+        } else {
+            final ChangeEvent ce = new ChangeEvent( this, HIDDEN, new Boolean(isTaxonHidden), new Boolean(this.isTaxonHidden));
+            final ChangeSupport cs = this.getChangeSupport(HIDDEN);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.isTaxonHidden = isTaxonHidden;
+                cs.firePostChangeEvent(ce);
             }
-            // Also don't go up past a parent that doesn't have a name.
-            else parent = null;
         }
-        sb.append(".");
-        return sb.toString();
+    }
+    
+    // Hibernate requirement - not for public use.
+    private String getTaxonHiddenChar() {
+        return isTaxonHidden()?TAXONISHIDDEN:null;
+    }
+
+    // Hibernate requirement - not for public use.
+    private void setTaxonHiddenChar(final String isHiddenChar) throws ChangeVetoException {
+        setTaxonHidden(isHiddenChar!=null || (isHiddenChar!=null && isHiddenChar.length() > 0));// any character will set
+    }
+
+    /**
+     * Returns the taxonomy hierarchy of this taxon entry in the form:
+     *   most specific; less specific; ...; least specific.
+     * It follows the chain up the tree as far as it can, and will stop
+     * at the first one it comes to that returns null for getParentNCBITaxID().
+     * If this taxon entry has no scientific name, you will get the string ".".
+     * @return the display name as described above.
+     */
+    public String getNameHierarchy() {
+    	StringBuffer sb = new StringBuffer();
+    	boolean first = true;
+    	Integer parent = this.getParentNCBITaxID();
+    	while (parent!=null) {
+    		NCBITaxon t = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{parent});
+    		Set sciNames = t.getNames(NCBITaxon.SCIENTIFIC);
+//    		System.out.println("SimpleNCBITaxon2.getNameHierarchy-t:"+t+", t.isTaxonHidden? "+t.isTaxonHidden()+", isRoot? "+isRoot(t)+", sciNames:"+sciNames);
+    		if (sciNames.size()>0) {
+    			if (!t.isTaxonHidden() && !isRoot(t)) {// root is NOT hidden - but also not displayed
+    				if (!first) sb.insert(0,"; ");
+    				else first = false;
+    				sb.insert(0,(String)sciNames.iterator().next());
+    			}
+    			// Don't get into endless loop if child's parent is itself.
+    			if (t.getParentNCBITaxID().equals(new Integer(t.getNCBITaxID()))) parent = null;
+    			else parent = t.getParentNCBITaxID();
+    		}
+    		// Also don't go up past a parent that doesn't have a name.
+    		else parent = null;
+    	}
+    	sb.append(".");
+    	return sb.toString();
+    }
+    
+    
+    private final static boolean isRoot(final NCBITaxon theTaxon) {
+    	return isRoot(theTaxon.getNCBITaxID());
+    }
+    
+    private final static boolean isRoot(final int theNCBIId) {
+    	return theNCBIId==ROOTNCBIID;
     }
     
     /**
