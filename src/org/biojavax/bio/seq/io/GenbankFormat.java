@@ -675,11 +675,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         for (Iterator r = rs.getRankedDocRefs().iterator(); r.hasNext(); ) {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
-            Integer rstart = rdr.getStart();
-//          if (rstart==null) rstart = new Integer(1);
-            Integer rend = rdr.getEnd();
-//             if (rend==null) rend = new Integer(rs.length());
-            StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+(rstart==null?"":"  (bases "+rstart+" to "+rend+")"), 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+(rdr.getStart()==null?"":"  (bases "+makeBaseRange(rdr)+")"), 12, this.getLineWidth(), this.getPrintStream());
             // Any authors that were in the input as CONSRTM tags will
             // be merged into the AUTHORS tag on output.
             StringTools.writeKeyValueLine("  "+AUTHORS_TAG, d.getAuthors(), 12, this.getLineWidth()-1, this.getPrintStream());
@@ -831,8 +827,22 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     }
     
     private final static boolean isNotQuoted(final String theName, final String theValue) {
-//    	System.out.println("GenbankFormat.isNumeric-theName:"+theName+", isNumeric? "+isNumeric.contains(theName));
     	return isNotQuoted.contains(theName);
+    }
+    
+    private final static String makeBaseRange(final RankedDocRef theReference) {
+    	return theReference.getLocation()==null?theReference.getStart()+" to "+theReference.getEnd():toString(theReference.getLocation());
+    }
+    
+    private final static String toString(final RichLocation theLocation) {
+    	final StringBuffer list = new StringBuffer();
+    	final Iterator b = theLocation.blockIterator();
+    	while (b.hasNext()) {
+    		final RichLocation location = (RichLocation) b.next();
+    		list.append(location.getMin()+" to "+location.getMax());
+    		if (b.hasNext()) list.append("; ");
+    	}
+    	return list.toString();
     }
 }
 
