@@ -21,10 +21,14 @@
 
 package org.biojavax;
 
+import java.util.Iterator;
+
+import org.biojava.bio.seq.io.ParseException;
 import org.biojavax.bio.seq.Position;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.SimplePosition;
 import org.biojavax.bio.seq.SimpleRichLocation;
+import org.biojavax.bio.seq.io.GenbankLocationParser;
 
 /**
  * Represents a documentary reference. 
@@ -124,7 +128,7 @@ public class SimpleRankedDocRef implements RankedDocRef {
     }
     
     // Internal use only.
-    private void setLocation(RichLocation location) {
+    protected void setLocation(RichLocation location) {
     	this.location = location;
     	this.start = new Integer(location.getMin());
     	this.end = new Integer(location.getMax());
@@ -134,6 +138,35 @@ public class SimpleRankedDocRef implements RankedDocRef {
     	return this.location;
     }
     
+    private final void setLocationText(final String theLocation) throws ParseException {
+    	if (theLocation == null) {
+//    		setLocation(RichLocation.EMPTY_LOCATION);
+    	} else {
+        	final RichLocation location = GenbankLocationParser.parseLocation(RichObjectFactory.getDefaultNamespace(), null, theLocation);
+        	setLocation(location);
+    	}
+    }
+    
+    private final String getLocationText() {
+    	return  getLocation() == RichLocation.EMPTY_LOCATION?null:toString(getLocation());
+    }
+    
+    private final String toString(final RichLocation theLocation) {
+    	final StringBuffer sb = new StringBuffer();
+    	if (theLocation.getTerm() == null) {
+    		sb.append("join");
+    	} else {
+    		sb.append(theLocation.getTerm().getName());
+    	}
+    	sb.append("(");
+    	for (Iterator i = theLocation.blockIterator(); i.hasNext(); ) {
+    		sb.append(i.next());
+    		if (i.hasNext()) sb.append(",");
+    	}
+    	sb.append(")");
+    	return sb.toString();
+    }
+
     /**
      * {@inheritDoc}
      * Two ranked document references are equal if they have the same rank 
