@@ -72,20 +72,26 @@ public class SimpleNCBITaxonomyLoader implements NCBITaxonomyLoader {
             String rank = parts[2].trim();
             Integer genetic_code = new Integer(parts[6].trim());
             Integer mito_code = new Integer(parts[8].trim());
+            String isTaxonHidden = parts[10].trim();// either "0" or "1"
             // by getting it from the factory, it auto-creates. If the user is using the
             // HibernateRichObjectFactory, then it even auto-persists. Magic!
-            NCBITaxon t = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class,new Object[]{tax_id});
+            NCBITaxon t = findTaxon(new Object[]{tax_id});
             try {
                 t.setParentNCBITaxID(parent_tax_id);
                 t.setNodeRank(rank);
                 t.setGeneticCode(genetic_code);
                 t.setMitoGeneticCode(mito_code);
+                t.setTaxonHidden(Integer.parseInt(isTaxonHidden)==1);
             } catch (ChangeVetoException e) {
                 throw new ParseException(e);
             }
             // return the node
             return t;
         } else return null;
+    }
+    
+    protected NCBITaxon findTaxon(final Object[] theKeys) {// allows subclass to override and cast
+    	return (SimpleNCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, theKeys);
     }
     
     /**
