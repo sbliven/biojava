@@ -70,6 +70,12 @@ public interface NCBITaxon extends Comparable,Changeable {
             "RIGHTVALUE"
             );
     
+	public static final ChangeType HIDDEN = new ChangeType(
+			"This taxon's visibility in genbank hierarchy has changed",
+			"org.biojavax.bio.taxa.NCBITaxon",
+			"HIDDEN"
+	);
+	
     /**
      * Use this to define scientific names for things. There should
      * usually only be one scientific name for an organism.
@@ -249,5 +255,16 @@ public interface NCBITaxon extends Comparable,Changeable {
      */
     public String getNameHierarchy();
     
+	/**
+	 * used in getNameHierarchy() to determine whether this taxonomy level is displayed
+	 */
+	public boolean isTaxonHidden();
+	
+	/**
+	 * determines whether this taxonomy level is displayed in etNameHierarchy()
+	 * @param isTaxonHidden - if true it is displayed
+	 * @throws ChangeVetoException
+	 */
+    public void setTaxonHidden(final boolean isTaxonHidden) throws ChangeVetoException;
 }
 
