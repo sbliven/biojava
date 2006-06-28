@@ -115,12 +115,6 @@ public class SimpleRankedDocRef implements RankedDocRef {
     
     // Internal use only.
     private void createLocation() {
-//    	Position position;
-//    	if (this.start==null && this.end==null) position = null;
-//    	else if (this.start==null) position = new SimplePosition(this.end.intValue());
-//    	else if (this.end==null) position = new SimplePosition(this.start.intValue());
-//    	else position = new SimplePosition(this.start.intValue(), this.end.intValue());
-//        this.location = position == null ? RichLocation.EMPTY_LOCATION : new SimpleRichLocation(position, 0);
     	if (this.start==null && this.end==null) location = RichLocation.EMPTY_LOCATION;
     	else if (this.start==null) location = new SimpleRichLocation(null, new SimplePosition(this.end.intValue()), 0);
     	else if (this.end==null) location = new SimpleRichLocation(new SimplePosition(this.start.intValue()), null, 0);
@@ -138,36 +132,22 @@ public class SimpleRankedDocRef implements RankedDocRef {
     	return this.location;
     }
     
+    // Internal use only.
     private final void setLocationText(final String theLocation) throws ParseException {
     	if (theLocation == null) {
-//    		setLocation(RichLocation.EMPTY_LOCATION);
+    		setLocation(RichLocation.EMPTY_LOCATION);
     	} else {
         	final RichLocation location = GenbankLocationParser.parseLocation(RichObjectFactory.getDefaultNamespace(), null, theLocation);
         	setLocation(location);
     	}
     }
     
+    // Internal use only.
     private final String getLocationText() {
-    	return  getLocation() == RichLocation.EMPTY_LOCATION?null:toString(getLocation());
+    	return  getLocation() == RichLocation.EMPTY_LOCATION?null:GenbankLocationParser.writeLocation(getLocation());
     }
     
-    private final String toString(final RichLocation theLocation) {
-    	final StringBuffer sb = new StringBuffer();
-    	if (theLocation.getTerm() == null) {
-    		sb.append("join");
-    	} else {
-    		sb.append(theLocation.getTerm().getName());
-    	}
-    	sb.append("(");
-    	for (Iterator i = theLocation.blockIterator(); i.hasNext(); ) {
-    		sb.append(i.next());
-    		if (i.hasNext()) sb.append(",");
-    	}
-    	sb.append(")");
-    	return sb.toString();
-    }
-
-    /**
+   /**
      * {@inheritDoc}
      * Two ranked document references are equal if they have the same rank 
      * and refer to the same document reference.
