@@ -305,20 +305,21 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         String t = p.getType();
         boolean fs = p.getFuzzyStart();
         boolean fe = p.getFuzzyEnd();
+//    	System.out.println("GenbankLocationParser._writePosition-p: ["+p+"], s:"+s+", e:"+e+", t: ["+t+"], fs? "+fs+", fe? "+fe);
         if (s!=e) {
             // a range - put in brackets
             sb.append("(");
             if (fs) sb.append("<");
             sb.append(s);
             sb.append(t);
-            sb.append(e);
             if (fe) sb.append(">");
+            sb.append(e);
             sb.append(")");
         } else {
             // not a range - no brackets
             if (fs) sb.append("<");
-            sb.append(s);
             if (fe) sb.append(">");
+            sb.append(s);
         }
         return sb.toString();
     }
