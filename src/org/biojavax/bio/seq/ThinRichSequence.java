@@ -57,6 +57,8 @@ import org.biojavax.bio.SimpleBioEntry;
  */
 public class ThinRichSequence extends SimpleBioEntry implements RichSequence {
     
+	private final static String ISCIRCULAR = "X";
+	
     private Set features = new TreeSet();
     private Double symListVersion;
     private boolean circular;
@@ -136,6 +138,16 @@ public class ThinRichSequence extends SimpleBioEntry implements RichSequence {
         return this.circular;
     }
     
+    // Hibernate requirement - not for public use.
+    private String getCircularChar() {
+        return getCircular()?ISCIRCULAR:null;
+    }
+
+    // Hibernate requirement - not for public use.
+    private void setCircularChar(final String isHiddenChar) throws ChangeVetoException {
+        setCircular(isHiddenChar!=null || (isHiddenChar!=null && isHiddenChar.length() > 0));// any character will set
+    }
+
     /**
      * {@inheritDoc}
      */
