@@ -675,7 +675,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         for (Iterator r = rs.getRankedDocRefs().iterator(); r.hasNext(); ) {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
-            StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+(rdr.getStart()==null?"":"  (bases "+makeBaseRange(rdr)+")"), 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+((rdr.getLocation()==null || rdr.getLocation() ==RichLocation.EMPTY_LOCATION)?"":"  (bases "+makeBaseRange(rdr)+")"), 12, this.getLineWidth(), this.getPrintStream());
             // Any authors that were in the input as CONSRTM tags will
             // be merged into the AUTHORS tag on output.
             StringTools.writeKeyValueLine("  "+AUTHORS_TAG, d.getAuthors(), 12, this.getLineWidth()-1, this.getPrintStream());
