@@ -30,6 +30,7 @@ import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.RNATools;
+import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.IllegalAlphabetException;
@@ -46,6 +47,7 @@ import org.biojavax.Namespace;
 import org.biojavax.RichAnnotation;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.SimpleRichAnnotation;
+import org.biojavax.bio.seq.io.GenbankLocationParser;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
@@ -707,6 +709,26 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
         } else {
             return this.min+".."+this.max;
         }
+    }
+    
+    // Internal use only.
+    private void setLocationText(final String theLocation) throws ParseException {
+//    	System.out.println("SimpleRichLocation.setLocationText-theLocation: ["+theLocation+"]");
+    	if (theLocation == null) {
+    		setMinPosition(RichLocation.EMPTY_LOCATION.getMinPosition());
+    		setMaxPosition(RichLocation.EMPTY_LOCATION.getMaxPosition());
+    	} else {
+        	final RichLocation location = GenbankLocationParser.parseLocation(RichObjectFactory.getDefaultNamespace(), null, theLocation);
+    		setMinPosition(location.getMinPosition());
+    		setMaxPosition(location.getMaxPosition());
+    	}
+//    	System.out.println("SimpleRichLocation.setLocationText-this: ["+this+"]");
+    }
+    
+    // Internal use only.
+    private String getLocationText() {
+//    	System.out.println("SimpleRichLocation.getLocationText-returns: ["+GenbankLocationParser.writeLocation(new SimpleRichLocation(getMinPosition(), getMaxPosition(), getRank()))+"], this: ["+this+"]");
+    	return  GenbankLocationParser.writeLocation(new SimpleRichLocation(getMinPosition(), getMaxPosition(), getRank()));
     }
     
     // Hibernate requirement - not for public use.
