@@ -305,16 +305,17 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         String t = p.getType();
         boolean fs = p.getFuzzyStart();
         boolean fe = p.getFuzzyEnd();
+        boolean useParenthesis=isUsingParenthesis(p);
 //    	System.out.println("GenbankLocationParser._writePosition-p: ["+p+"], s:"+s+", e:"+e+", t: ["+t+"], fs? "+fs+", fe? "+fe);
         if (s!=e) {
             // a range - put in brackets
-            sb.append("(");
+            if (useParenthesis) sb.append("(");
             if (fs) sb.append("<");
             sb.append(s);
             sb.append(t);
             if (fe) sb.append(">");
             sb.append(e);
-            sb.append(")");
+            if (useParenthesis) sb.append(")");
         } else {
             // not a range - no brackets
             if (fs) sb.append("<");
@@ -364,5 +365,13 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         }
         sb.append(")");
         return sb.toString();
+    }
+    
+    private final static boolean isUsingParenthesis(final Position thePosition) {
+    	return !isBetweenBases(thePosition);
+    }
+    
+    private final static boolean isBetweenBases(final Position thePosition) {
+    	return thePosition.getType() != null && thePosition.getType().equals(Position.BETWEEN_BASES);
     }
 }
