@@ -291,7 +291,8 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         //use crossrefs to calculate remote location positions
         //one big join (or order?) with complemented parts
         if (l instanceof CompoundRichLocation) {
-            return _writeGroupLocation(l.blockIterator(),l.getTerm());
+//            return _writeGroupLocation(l.blockIterator(),l.getTerm());
+            return writeCompoundLocation((CompoundRichLocation) l);
         } else {
             return _writeSingleLocation(l);
         }
@@ -374,6 +375,59 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         }
         sb.append(")");
         return sb.toString();
+    }
+    
+    private final static String writeCompoundLocation(final CompoundRichLocation theLocation) {
+    	if (isAnyLocationComplemented(theLocation)) {
+    		return writeComplementLocation(theLocation.blockIterator());
+    	} else {
+    		return _writeGroupLocation(theLocation.blockIterator(), theLocation.getTerm());
+    	}
+    	
+    }
+    
+    private final static String writeComplementLocation(Iterator i) {
+        StringBuffer sb = new StringBuffer();
+        while (i.hasNext()) {
+            RichLocation l = (RichLocation)i.next();
+            if (l instanceof CompoundRichLocation) {
+                sb.insert(0, writeCompoundLocation((CompoundRichLocation) l));
+            } else {
+                sb.insert(0, writeSingleLocation(l));
+            }
+            if (i.hasNext()) sb.insert(0, ",");
+        }
+    	sb.insert(0, "complement(join(");
+        sb.append("))");
+        return sb.toString();
+    }
+
+    private final static String writeSingleLocation(final RichLocation theRichLocation) {
+        StringBuffer loc = new StringBuffer();
+        if (theRichLocation.getCrossRef()!=null) {
+            loc.append(theRichLocation.getCrossRef().getAccession());
+            final int version = theRichLocation.getCrossRef().getVersion();
+            if (version!=0) {
+                loc.append(".");
+                loc.append(version);
+            }
+            loc.append(":");
+        }
+        loc.append(_writePosition(theRichLocation.getMinPosition()));
+        if (!theRichLocation.getMinPosition().equals(theRichLocation.getMaxPosition())) {
+            loc.append("..");
+            loc.append(_writePosition(theRichLocation.getMaxPosition()));
+        }
+        return loc.toString();
+    }
+    
+    private final static boolean isAnyLocationComplemented(final CompoundRichLocation theLocation) {
+    	final Iterator c = theLocation.blockIterator();
+    	while (c.hasNext()) {
+    		final RichLocation location = (RichLocation) c.next();
+    		if (location.getStrand()==Strand.NEGATIVE_STRAND) return true;
+    	}
+    	return false;
     }
     
     private final static boolean isUsingParenthesis(final Position thePosition) {
