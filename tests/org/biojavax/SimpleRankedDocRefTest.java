@@ -27,7 +27,7 @@ public class SimpleRankedDocRefTest extends TestCase {
         start = new Integer(1);
         end = new Integer(25);
         dr = new SimpleDocRef(Collections.singletonList(
-                new SimpleDocRefAuthor("Hubert Hubertson", false, false)), "Journal of Voodoo Virology");
+                new SimpleDocRefAuthor("Hubert Hubertson", false, false)), "Journal of Voodoo Virology", "Viruses, what are they good for?");
     }
 
     protected void setUp() throws Exception {
@@ -105,7 +105,7 @@ public class SimpleRankedDocRefTest extends TestCase {
         
         ref2 = new SimpleRankedDocRef(new SimpleDocRef(
                 Collections.singletonList(new SimpleDocRefAuthor("Rev. Falliwell", false, false)), 
-                "Kansas Journal of Creationism"), start, end, 1); //not equal
+                "Kansas Journal of Creationism", "Un-intelligent design"), start, end, 1); //not equal
         assertFalse(ref.equals(ref2));
         assertFalse(ref2.equals(ref));
     }
@@ -134,7 +134,7 @@ public class SimpleRankedDocRefTest extends TestCase {
         
         ref2 = new SimpleRankedDocRef(new SimpleDocRef(
                 Collections.singletonList(new SimpleDocRefAuthor("Rev. Falliwell", false, false)), 
-                "Kansas Journal of Creationism"), start, end, 1); //not equal
+                "Kansas Journal of Creationism", "Evidence for the giant spaghetti monster"), start, end, 1); //not equal
         assertTrue(ref.compareTo(ref2) < 0);
         assertTrue(ref2.compareTo(ref) > 0);
     }

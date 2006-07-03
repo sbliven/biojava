@@ -22,16 +22,18 @@ public class SimpleDocRefTest extends TestCase {
     SimpleDocRef ref;
     List authors;
     String location;
+    String title;
     
     public SimpleDocRefTest(String testName) {
         super(testName);
         authors = Collections.singletonList(
                 new SimpleDocRefAuthor("Hubert Hubertson", false, false));
         location = "Journal of Voodo Virology (7) 222-265";
+        title = "ADE, myth or lie?";
     }
 
     protected void setUp() throws Exception {
-        ref = new SimpleDocRef(authors, location);
+        ref = new SimpleDocRef(authors, location, title);
     }
 
     protected void tearDown() throws Exception {
@@ -70,25 +72,27 @@ public class SimpleDocRefTest extends TestCase {
     /**
      * Test of setTitle method, of class org.biojavax.SimpleDocRef.
      */
-    public void testSetTitle() {
-        System.out.println("testSetTitle");
-        
-        //should be able to do this
-        try{
-            ref.setTitle(null);
-        }catch(Exception e){
-            fail("Should be able to set title to null without"+
-                    e.getClass().getName());
-        }
-        try{
-            String title = "Title";
-            ref.setTitle(title);
-            assertEquals(title, ref.getTitle());
-        }catch(Exception e){
-            fail("Should be able to set title without"+
-                    e.getClass().getName());
-        }
-    }
+    
+    //this method is now private. don't need to test it
+//    public void testSetTitle() {
+//        System.out.println("testSetTitle");
+//        
+//        //should be able to do this
+//        try{
+//            ref.setTitle(null);
+//        }catch(Exception e){
+//            fail("Should be able to set title to null without"+
+//                    e.getClass().getName());
+//        }
+//        try{
+//            String title = "Title";
+//            ref.setTitle(title);
+//            assertEquals(title, ref.getTitle());
+//        }catch(Exception e){
+//            fail("Should be able to set title without"+
+//                    e.getClass().getName());
+//        }
+//    }
 
     /**
      * Test of setCrossref method, of class org.biojavax.SimpleDocRef.
@@ -138,7 +142,7 @@ public class SimpleDocRefTest extends TestCase {
     public void testGetCRC() {
         System.out.println("testGetCRC");
         
-        SimpleDocRef ref2 = new SimpleDocRef(authors, location);
+        SimpleDocRef ref2 = new SimpleDocRef(authors, location, title);
         assertNotNull(ref.getCRC());
         assertEquals(ref.getCRC(), ref2.getCRC());
         
@@ -196,15 +200,21 @@ public class SimpleDocRefTest extends TestCase {
     public void testCompareTo() {
         System.out.println("testCompareTo");
         
-        DocRef before = new SimpleDocRef(authors, "A");
+        DocRef before = new SimpleDocRef(authors, "A", title);
         assertTrue(before.compareTo(ref) < 1);
         assertTrue(ref.compareTo(before) > 1);
         before = new SimpleDocRef(Collections.singletonList(
-                new SimpleDocRefAuthor("A", false, false)), location);
+                new SimpleDocRefAuthor("A", false, false)), location, title);
+        assertTrue(before.compareTo(ref) < 1);
+        assertTrue(ref.compareTo(before) > 1);
+        before = new SimpleDocRef(authors, location, "AAA");
+        assertTrue(before.compareTo(ref) < 1);
+        assertTrue(ref.compareTo(before) > 1);
+        before = new SimpleDocRef(authors, location, null);
         assertTrue(before.compareTo(ref) < 1);
         assertTrue(ref.compareTo(before) > 1);
         
-        DocRef equal = new SimpleDocRef(authors, location);
+        DocRef equal = new SimpleDocRef(authors, location, title);
         assertTrue(ref.compareTo(ref) ==0);
         assertTrue(ref.compareTo(equal) ==0);
         assertTrue(equal.compareTo(ref) ==0);
@@ -217,11 +227,12 @@ public class SimpleDocRefTest extends TestCase {
         System.out.println("testEquals");
         
         assertTrue(ref.equals(ref));
-        assertTrue(ref.equals(new SimpleDocRef(authors, location)));
-        assertTrue(new SimpleDocRef(authors, location).equals(ref));
+        assertTrue(ref.equals(new SimpleDocRef(authors, location, title)));
+        assertTrue(new SimpleDocRef(authors, location, title).equals(ref));
         
-        assertFalse(new SimpleDocRef(authors, "A").equals(ref));
-        assertFalse(ref.equals(new SimpleDocRef(authors, "A")));
+        assertFalse(new SimpleDocRef(authors, "A", title).equals(ref));
+        assertFalse(ref.equals(new SimpleDocRef(authors, "A", title)));
+        assertFalse(ref.equals(new SimpleDocRef(authors, location, "The long awaited biojava book!")));
     }
 
     /**
@@ -229,7 +240,7 @@ public class SimpleDocRefTest extends TestCase {
      */
     public void testHashCode() {
         System.out.println("testHashCode");
-        assertEquals(ref.hashCode(), new SimpleDocRef(authors, location).hashCode());
+        assertEquals(ref.hashCode(), new SimpleDocRef(authors, location, title).hashCode());
     }
 
     /**
