@@ -608,7 +608,7 @@ public class SimpleBioEntryTest extends TestCase {
         
         DocRefAuthor author = new SimpleDocRefAuthor("Hemmingway");
         RankedDocRef ref = new SimpleRankedDocRef(
-                new SimpleDocRef(Collections.singletonList(author), "a book"),
+                new SimpleDocRef(Collections.singletonList(author), "a book", "a title"),
                 new Integer(1), new Integer(10), 0);
         try{
             be.addRankedDocRef(ref);
@@ -646,7 +646,7 @@ public class SimpleBioEntryTest extends TestCase {
         
         DocRefAuthor author = new SimpleDocRefAuthor("Hemmingway");
         RankedDocRef ref = new SimpleRankedDocRef(
-                new SimpleDocRef(Collections.singletonList(author), "a book"),
+                new SimpleDocRef(Collections.singletonList(author), "a book", "a title"),
                 new Integer(1), new Integer(10), 0);
         
         
