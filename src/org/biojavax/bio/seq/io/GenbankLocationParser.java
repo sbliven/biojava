@@ -328,6 +328,15 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
     // write out a single location
     private static String _writeSingleLocation(RichLocation l) {
         StringBuffer loc = new StringBuffer();
+        if (l.getCrossRef()!=null) {
+            loc.append(l.getCrossRef().getAccession());
+            final int version = l.getCrossRef().getVersion();
+            if (version!=0) {
+                loc.append(".");
+                loc.append(version);
+            }
+            loc.append(":");
+        }
         loc.append(_writePosition(l.getMinPosition()));
         if (!l.getMinPosition().equals(l.getMaxPosition())) {
             loc.append("..");
@@ -337,15 +346,15 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
             loc.insert(0,"complement(");
             loc.append(")");
         }
-        if (l.getCrossRef()!=null) {
-            loc.insert(0,":");
-            int version = l.getCrossRef().getVersion();
-            if (version!=0) {
-                loc.insert(0,version);
-                loc.insert(0,".");
-            }
-            loc.insert(0,l.getCrossRef().getAccession());
-        }
+//        if (l.getCrossRef()!=null) {
+//            loc.insert(0,":");
+//            int version = l.getCrossRef().getVersion();
+//            if (version!=0) {
+//                loc.insert(0,version);
+//                loc.insert(0,".");
+//            }
+//            loc.insert(0,l.getCrossRef().getAccession());
+//        }
         return loc.toString();
     }
     
