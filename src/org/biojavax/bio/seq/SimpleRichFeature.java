@@ -147,10 +147,27 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     // Hibernate use only
     private Set getLocationSet() {
         // Convert the location into a set of BioSQL-compatible simple locations
+//        System.out.println("SimpleRichFeature.getLocationSet-featureId:"+featureId+", locsSet:"+locsSet+", getLocation:"+getLocation());
+        setTerm(locsSet, null);
         Collection newlocs = RichLocation.Tools.flatten(this.location);
         this.locsSet.retainAll(newlocs); // clear out forgotten ones
         this.locsSet.addAll(newlocs); // add in new ones
+        setTerm(locsSet, ((RichLocation) getLocation()).getTerm());
+//        System.out.println("SimpleRichFeature.getLocationSet-featureId:"+featureId+", locsSet:"+locsSet+", this:"+this+", getLocation:"+getLocation());
         return this.locsSet; // original for Hibernate purposes
+    }
+    
+    
+    private final static void setTerm(final Collection theCollection, final ComparableTerm theTerm) {
+    	final Iterator l = theCollection.iterator();
+    	while(l.hasNext()) {
+    		final RichLocation location = (RichLocation) l.next();
+			try {
+				location.setTerm(theTerm);
+			} catch (Exception e) {
+				throw new RuntimeException("SimpleRichFeature.setTerm-unable to set term <"+theTerm+"> in location <"+location+">"+e);
+			}			
+    	}
     }
     
     // Hibernate use only
@@ -158,6 +175,8 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         this.locsSet = locs; // original kept for Hibernate purposes
         // Construct a nice BioJavaX location from the set of BioSQL-compatible simple ones
         this.location = RichLocation.Tools.construct(RichLocation.Tools.merge(locs));
+        if(locs.size() > 0)((RichLocation) location).setTerm(((RichLocation)locs.iterator().next()).getTerm());
+//        System.out.println("SimpleRichFeature.SETLocationSet-featureId:"+featureId+", locs:"+locs+", location:"+location);
     }
     private Set locsSet = new TreeSet();
     
@@ -328,6 +347,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      * {@inheritDoc}
      */
     public void setLocation(Location loc) throws ChangeVetoException {
+//        System.out.println("SimpleRichFeature.setLocation-featureId:"+featureId+", loc:"+loc);
         if (loc==null) throw new IllegalArgumentException("Location cannot be null");
         if (!(loc instanceof RichLocation)) loc = RichLocation.Tools.enrich(loc);
         if(!this.hasListeners(RichFeature.LOCATION)) {
@@ -347,6 +367,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
             }
         }
         this.location.setFeature(this);
+//        System.out.println("SimpleRichFeature.setLocation-location:"+location+(location instanceof RichLocation?", term:"+((RichLocation) location).getTerm():""));
     }
     
     /**
