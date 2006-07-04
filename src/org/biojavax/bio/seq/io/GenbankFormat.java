@@ -81,6 +81,7 @@ import org.biojavax.utils.StringTools;
  * @author Richard Holland
  * @author Mark Schreiber
  * @author David Scott
+ * @author Bubba Puryear
  * @since 1.5
  */
 public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
@@ -274,6 +275,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 Matcher m = lp.matcher(loc);
                 if (m.matches()) {
                     rlistener.setName(m.group(1));
+                    accession = m.group(1); // default if no accession found
                     rlistener.setDivision(m.group(5));
                     rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
                     rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),m.group(6));
