@@ -217,6 +217,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
      * {@inheritDoc}
      */
     public void setProperty(Object key, Object value) throws IllegalArgumentException, ChangeVetoException {
+        if(key == null) throw new IllegalArgumentException("Property keys cannot be null");
         if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
         else key = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key.toString());
         this.addNote(new SimpleNote((ComparableTerm)key, (String)(value==null?value:value.toString()), 0));
