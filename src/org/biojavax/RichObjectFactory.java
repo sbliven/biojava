@@ -112,7 +112,7 @@ public class RichObjectFactory {
     
 	/**
 	 * Allow application to override the default biojava class created in getObject - subclass restriction is checked in the builder.
-	 * @param theBiojavaClass: one of the well-known builder classes: SimpleNamespace, SimpleComparableOntology, SimpleNCBITaxon, SimpleCrossRef, or SimpleDocRef
+	 * @param theBiojavaClass one of the well-known builder classes: SimpleNamespace, SimpleComparableOntology, SimpleNCBITaxon, SimpleCrossRef, or SimpleDocRef
 	 * @param theApplicationClass - a subclass of theBiojavaClass
 	 */
     public final static void setApplicationClass(final Class theBiojavaClass, final Class theApplicationClass) {
