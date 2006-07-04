@@ -190,8 +190,8 @@ public class SimpleDocRefTest extends TestCase {
     public void testGetTitle() {
         System.out.println("testGetTitle");
         
-        //should be null until set
-        assertNull(ref.getTitle());
+        //should be equal to the set value
+        assertEquals(this.title ,ref.getTitle());
     }
 
     /**
@@ -201,18 +201,18 @@ public class SimpleDocRefTest extends TestCase {
         System.out.println("testCompareTo");
         
         DocRef before = new SimpleDocRef(authors, "A", title);
-        assertTrue(before.compareTo(ref) < 1);
-        assertTrue(ref.compareTo(before) > 1);
+        assertTrue(before.compareTo(ref) < 0);
+        assertTrue(ref.compareTo(before) > 0);
         before = new SimpleDocRef(Collections.singletonList(
                 new SimpleDocRefAuthor("A", false, false)), location, title);
-        assertTrue(before.compareTo(ref) < 1);
-        assertTrue(ref.compareTo(before) > 1);
+        assertTrue(before.compareTo(ref) < 0);
+        assertTrue(ref.compareTo(before) > 0);
         before = new SimpleDocRef(authors, location, "AAA");
-        assertTrue(before.compareTo(ref) < 1);
-        assertTrue(ref.compareTo(before) > 1);
+        assertTrue(before.compareTo(ref) < 0);
+        assertTrue(ref.compareTo(before) > 0);
         before = new SimpleDocRef(authors, location, null);
-        assertTrue(before.compareTo(ref) < 1);
-        assertTrue(ref.compareTo(before) > 1);
+        assertTrue(before.compareTo(ref) < 0);
+        assertTrue(ref.compareTo(before) > 0);
         
         DocRef equal = new SimpleDocRef(authors, location, title);
         assertTrue(ref.compareTo(ref) ==0);

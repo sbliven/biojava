@@ -172,7 +172,10 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     /**
      * {@inheritDoc}
      * Document references are compared first by author, then by location, then
-     * by title. If this title is null, and theirs isn't, then this will return -1.
+     * by title. If Author and location are equal and this title is null, 
+     * and theirs isn't, then this will return -1.
+     * For symmetry if our title is not null and theirs is then we return 1. If
+     * both are null then we return 0.
      */
     public int compareTo(Object o) {
         if(o == this) return 0;
@@ -186,6 +189,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
         	if (them.getTitle()==null) return 0;
             else return -1;
         }
+        else if (this.getTitle() != null && them.getTitle() == null) return 1; //other cases are handled above.
         else return this.getTitle().compareTo(them.getTitle());
     }
     
