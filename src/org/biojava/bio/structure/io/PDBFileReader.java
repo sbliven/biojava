@@ -185,8 +185,8 @@ public class PDBFileReader implements StructureIOFile {
         return struc ;
     }
     
-    /** open filename  and returns
-     * a PDBStructure object .
+    /** opens filename, parses it and returns
+     * aStructure object .
      * @param filename  a String
      * @return the Structure object
      * @throws IOException ...
@@ -194,6 +194,19 @@ public class PDBFileReader implements StructureIOFile {
     public Structure getStructure(String filename) 
     throws IOException
     {
+        File f = new File(filename);
+        return getStructure(f);
+                
+    }
+    
+    /** opens filename, parses it and returns a Structure object
+     * 
+     * @param filename, a File object
+     * @return the Structure object
+     * @throws IOException ...
+     */
+    public Structure getStructure(File filename) throws IOException {
+
         InputStreamProvider isp = new InputStreamProvider();
         
         InputStream inStream = isp.getInputStream(filename);
@@ -201,7 +214,7 @@ public class PDBFileReader implements StructureIOFile {
         PDBFileParser pdbpars = new PDBFileParser();
         Structure struc = pdbpars.parsePDBFile(inStream) ;
         return struc ;
-        
+
     }
     
 }
