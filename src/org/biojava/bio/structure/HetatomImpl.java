@@ -24,7 +24,6 @@
 package org.biojava.bio.structure;
 import org.biojava.bio.structure.io.PDBParseException;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList ;
 import java.util.List ;
 import java.util.HashMap ;
@@ -63,8 +62,8 @@ public class HetatomImpl implements Group {
     
     ArrayList atoms ;
     
-    WeakReference parent;
-    
+    //WeakReference parent;
+    Chain parent;
     /* Construct a Hetatom instance. */
     public HetatomImpl() {
         super();
@@ -75,7 +74,7 @@ public class HetatomImpl implements Group {
         pdb_code = null ;
         atoms    = new ArrayList();    
         properties = new HashMap();
-        parent = new WeakReference(null);
+        parent = null;
     }
     
     /* returns an identical copy of this structure 
@@ -359,11 +358,11 @@ public class HetatomImpl implements Group {
     }
     
     /** Set the back-reference (to its parent Chain)
-     * @param parent a WeakReference to the parent Chain 
+     * @param parent the parent Chain 
      */
     
     public void setParent(Chain parent) {
-        this.parent = new WeakReference(parent) ;
+        this.parent = parent ;
     }
     
     /** Returns the parent Chain of the Group 
@@ -374,8 +373,7 @@ public class HetatomImpl implements Group {
      */
     
     public Chain getParent() {
-        if (parent.get() instanceof Chain) return (Chain) parent.get();
-        else return null;
+        return parent;
     }
     
     

@@ -23,7 +23,6 @@
  */
 package org.biojava.bio.structure;
 
-import java.lang.ref.WeakReference;
 
 /**
  * Implementation of an Atom of a PDB file.
@@ -44,7 +43,7 @@ public class AtomImpl implements Atom {
     double tempfactor;
     
     Character altLoc ;
-    WeakReference parent;
+    Group parent;
     
     public AtomImpl () {
         name     = null        ;
@@ -54,7 +53,7 @@ public class AtomImpl implements Atom {
         occupancy  = 0.0       ;
         tempfactor = 0.0       ;
         altLoc = new Character(' ');
-        parent = new WeakReference(null);
+        parent = null;
     }
     
     /** trimmed version of atom name, e.g. "CA" 
@@ -177,12 +176,13 @@ public class AtomImpl implements Atom {
     }
     
     public void setParent(Group parent) {
-        this.parent = new WeakReference(parent);
+        
+        this.parent = parent;
     }
   
     public Group getParent() {
-        if (parent.get() instanceof Group) return (Group) parent.get();
-        else return null;
+        return parent;
+       
     }   
     
     
