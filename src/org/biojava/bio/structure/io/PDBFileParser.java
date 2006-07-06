@@ -750,10 +750,10 @@ public class PDBFileParser  {
         header        = init_header();
         connects      = new ArrayList();
         
-        
+        String line = null;
         try {
             
-            String line = buf.readLine ();
+            line = buf.readLine ();
             String recordName = "";
             
             // if line is null already for the first time, the bufferede Reader had a problem
@@ -822,7 +822,7 @@ public class PDBFileParser  {
             structure.setHeader(header);
             structure.setConnections(connects);
         } catch (Exception e) {
-            
+            System.err.println(line);
             e.printStackTrace();
             throw new IOException ("Error parsing PDB file");
         }
