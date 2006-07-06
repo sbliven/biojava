@@ -973,7 +973,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
          }
          output.println();
       }
-      output.println();   // end with blank line.
+      //output.println();   // end with blank line.
    }
 
    /** Read a matrix from a stream.  The format is the same the print method,
