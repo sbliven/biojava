@@ -169,6 +169,10 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
             return GENBANK_TERM;
         }
+        
+        public final static void reset() {
+        	GENBANK_TERM=null;
+        }
     }
     
     /**
@@ -703,7 +707,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
-            StringTools.writeKeyValueLine("     "+f.getTypeTerm().getName(), GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), 21, this.getLineWidth(), ",", this.getPrintStream());
+            StringTools.writeKeyValueLine("     "+f.getTypeTerm().getName(), GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), 21, this.getLineWidth()-2, ",", this.getPrintStream());
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
                 // /key="val" or just /key if val==""
