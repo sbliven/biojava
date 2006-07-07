@@ -21,12 +21,11 @@
 
 package org.biojava.bio.molbio;
 
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import junit.framework.TestCase;
-
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.IllegalAlphabetException;
@@ -38,6 +37,7 @@ import org.biojava.bio.symbol.SymbolList;
  * functionality.
  *
  * @author Keith James
+ * @author G. Waldon
  */
 public class RestrictionEnzymeManagerTest extends TestCase
 {
@@ -145,5 +145,64 @@ public class RestrictionEnzymeManagerTest extends TestCase
         }
 
         fail("Expected IllegalArgumentException");
+    }
+    
+    /**
+     * @author G. Waldon
+     * @since 1.5
+     */
+    public void testGetRecognitionSequence() {
+        String recognition = RestrictionEnzymeManager.getRecognitionSequence("EcoRI");
+        assertEquals("G^AATTC",recognition);
+    }
+    
+    /** Note: suppliers vary between REBASE releases.
+     *
+     * @author G. Waldon
+     * @since 1.5
+     */
+    public void testgetSuppliers() {
+        RestrictionEnzyme ecoRI = RestrictionEnzymeManager.getEnzyme("EcoRI");
+        String suppliers = RestrictionEnzymeManager.getSuppliers(ecoRI);
+        assertEquals("ABCEFGHIJKLMNOQRSTUVX",suppliers);
+    }
+    
+    /**
+     * @author G. Waldon
+     * @since 1.5
+     */
+    public void testloadEnzymeFile() {
+        String rebaseDataFileName = "/org/biojava/bio/molbio/rebase.dat";
+        InputStream is = getClass().getClassLoader().getResourceAsStream(rebaseDataFileName);
+        RestrictionEnzymeManager.loadEnzymeFile(is,true);
+        Set re = RestrictionEnzymeManager.getAllEnzymes();
+        assertEquals(re.size(),1);
+        try
+        {
+            RestrictionEnzyme hind3 = RestrictionEnzymeManager.getEnzyme("HindIII");
+            assertEquals("HindIII", hind3.getName());
+        }
+        catch (IllegalArgumentException iae)
+        {
+            fail("IllegalArgumentException not expected");
+        }
+        is = getClass().getClassLoader().getResourceAsStream(rebaseDataFileName);
+        RestrictionEnzymeManager.loadEnzymeFile(is,false);
+        re = RestrictionEnzymeManager.getAllEnzymes();
+        assertEquals(re.size(),2);
+        try
+        {
+            RestrictionEnzyme hind3 = RestrictionEnzymeManager.getEnzyme("HindIII");
+            assertEquals("HindIII", hind3.getName());
+            RestrictionEnzyme ecor1 = RestrictionEnzymeManager.getEnzyme("EcoRI");
+            assertEquals("EcoRI", ecor1.getName());
+        }
+        catch (IllegalArgumentException iae)
+        {
+            fail("IllegalArgumentException not expected");
+        }
+        rebaseDataFileName = "/org/biojava/bio/molbio/rebase_common.dat";
+        is = RestrictionEnzymeManager.class.getResourceAsStream(rebaseDataFileName);
+        RestrictionEnzymeManager.loadEnzymeFile(is,false);
     }
 }

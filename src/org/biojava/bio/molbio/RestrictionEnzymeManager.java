@@ -53,6 +53,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ChangeType;
 import org.biojava.utils.ParserException;
 import org.biojava.utils.SmallSet;
 
@@ -66,14 +67,18 @@ import org.biojava.utils.SmallSet;
  * <code>RestrictionEnzymeManager</code> <code>ClassLoader</code>. The
  * properties are loaded as a <code>ResourceBundle</code>, so the file
  * should be named "RestrictionEnzymeManager.properties".</p>
- *
+ * <p>Since 1.5, a format #31 REBASE file can be loaded at anytime
+ * using the method <code>loadEnzymeFile</code> and optionally filtered
+ * for commercially available enzymes.</p>
+ *  
  * @author Keith James
  * @author George Waldon
  * @since 1.3
+
  */
 public final class RestrictionEnzymeManager
 {
-    /**
+     /**
      * <code>REBASE_DATA_KEY</code> the ResourceBundle key which
      * specifies the location of the REBASE flat file.
      */
@@ -126,6 +131,9 @@ public final class RestrictionEnzymeManager
      * references.
      */
     public static final String REBASE_TAG_REFS = "<8>";
+    
+    
+    private static boolean loadCommercialOnly = false;
 
     private static ResourceBundle bundle =
         ResourceBundle.getBundle(RestrictionEnzymeManager.class.getName());
@@ -137,17 +145,34 @@ public final class RestrictionEnzymeManager
         loadData(is);
     }
 
+    private static Map nameToSite;
     private static Map nameToEnzyme;
     private static Map nameToIsoschizomers;
     private static Map sizeToCutters;
     private static Map enzymeToPattern;
     private static Map enzymeToAnnotation;
+    private static Map enzymeToSuppliers;
 
     /**
      * <code>RestrictionEnzymeManager</code> is a static utility
      * method class and no instances should be created.
      */
     private RestrictionEnzymeManager() { }
+    
+    /**
+     * <code>loadEnzymeFile</code> loads a new REBASE file (or any file using
+     * REBASE format #31).
+     *
+     * @param is an InputStream over the file to load.
+     * @param commercialOnly indicates whether or not only commercially available 
+     * enzymes are loaded.
+     *
+     * @since 1.5
+     */
+    public static synchronized void loadEnzymeFile(InputStream is, boolean commercialOnly) {
+        loadCommercialOnly = commercialOnly;
+        loadData(is);
+    }
 
     /**
      * <code>getAllEnzymes</code> returns an unmodifable set of all
@@ -193,8 +218,30 @@ public final class RestrictionEnzymeManager
             throw new IllegalArgumentException("Unknown RestrictionEnzyme name '"
                                                + name
                                                + "'");
+        Set result = (Set) nameToIsoschizomers.get(name);
+        if(result.contains(null))
+            return Collections.EMPTY_SET;
+        return Collections.unmodifiableSet(result);
+    }
 
-        return Collections.unmodifiableSet((Set) nameToIsoschizomers.get(name));
+    /**
+     * <code>getRecognitionSequence</code> returns a string that describes
+     * the recognition site of this enzyme. It corresponds to the field <3>
+     * of the REBASE file.
+     *
+     * @param name a <code>String</code> such as EcoRI, case
+     * sensitive.
+     * @return a <code>String</code> describing the recognition sequence, 
+     * e.g. "G^AATTC" for EcoRI.
+     * @since 1.5
+     */
+    public static String getRecognitionSequence(String name)
+    {
+        if (! nameToSite.containsKey(name))
+            throw new IllegalArgumentException("Unknown RestrictionEnzyme name '"
+                                               + name
+                                               + "'");
+        return (String) nameToSite.get(name);
     }
 
     /**
@@ -258,6 +305,47 @@ public final class RestrictionEnzymeManager
                                                + "' is not registered. No Annotation is available");
 
         return (Annotation) enzymeToAnnotation.get(enzyme);
+    }
+
+
+    /**
+     * <code>getSuppliers</code> returns a string describing the suppliers
+     * of this enzyme according to REBASE encoding for commercial sources 
+     * or an empty String if the enzyme is not commecially available.
+     *
+     * <P>REBASE #31 version 604 code: </P>
+     * <P>A GE Healthcare (8/05) <BR>
+     * B Invitrogen Corporation(8/05)<BR>
+     * C Minotech Biotechnology (9/05)<BR>
+     * E Stratagene (9/05)<BR>
+     * F Fermentas International Inc. (2/06)<BR>
+     * G Qbiogene (9/05)<BR>
+     * H American Allied Biochemical, Inc. (9/05)<BR>
+     * I SibEnzyme Ltd. (2/06)<BR>
+     * J Nippon Gene Co., Ltd. (8/05)<BR>
+     * K Takara Bio Inc. (9/05)<BR>
+     * M Roche Applied Science (8/05)<BR>
+     * N New England Biolabs (2/06)<BR>
+     * O Toyobo Biochemicals (9/05)<BR>
+     * Q Molecular Biology Resources (8/05)<BR>
+     * R Promega Corporation (9/05)<BR>
+     * S Sigma Chemical Corporation (9/05)<BR>
+     * U Bangalore Genei (9/05)<BR>
+     * V Vivantis Technologies (1/06)<BR>
+     * X EURx Ltd. (9/05)<BR>
+     * Y CinnaGen Inc. (9/05)
+     * </P>
+     *
+     * @param enzyme a <code>RestrictionEnzyme</code>.
+     *
+     * @return a <code>String</code>.
+     * @since 1.5
+     */
+    public static String getSuppliers(RestrictionEnzyme enzyme)
+    {
+        if (! enzymeToSuppliers.containsKey(enzyme))
+            return "";
+        return (String) enzymeToSuppliers.get(enzyme);
     }
 
     /**
@@ -334,20 +422,19 @@ public final class RestrictionEnzymeManager
             throw new BioError("Assertion Failure: failed to modify Annotation", cve);
         }
 
-        annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+        annotation.addChangeListener(ChangeListener.ALWAYS_VETO,ChangeType.UNKNOWN);
         enzymeToAnnotation.put(enzyme, annotation);
     }
 
-    private static void loadData(InputStream is)
-    {
+    private static void loadData(InputStream is) {
+        nameToSite          = new HashMap();
         nameToEnzyme        = new HashMap();
         nameToIsoschizomers = new HashMap();
         sizeToCutters       = new HashMap();
         enzymeToPattern     = new HashMap();
         enzymeToAnnotation  = new HashMap();
-
-        try
-        {
+        enzymeToSuppliers   = new HashMap();
+        try {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
             // Basic linesplit parser
@@ -380,6 +467,10 @@ public final class RestrictionEnzymeManager
             rebaseTags.addTag(REBASE_TAG_ISZR);
             // Retain recognition sequence
             rebaseTags.addTag(REBASE_TAG_SITE);
+            // Retain commercial supplier
+            rebaseTags.addTag(REBASE_TAG_COMM);
+
+
 
             Parser parser = new Parser();
             while (parser.read(br, lsParser, rebaseTags))
@@ -425,14 +516,17 @@ public final class RestrictionEnzymeManager
      */
     private static class RebaseEnzymeBuilder implements TagValueListener
     {
+        private String recseq;
         private String name;
         private Set isoschizomers;
         private List isoBuffer;
         private SymbolList site;
         private int [] usCutPositions;
         private int [] dsCutPositions;
+        private boolean isCommerciallyAvailable;
 
         private String tagState;
+        private String suppliers;
         private boolean unknownSite;
 
         RebaseEnzymeBuilder() { }
@@ -440,10 +534,12 @@ public final class RestrictionEnzymeManager
         public void startRecord() throws ParserException
         {
             isoBuffer = new ArrayList(30);
+            recseq         = "";
             site           = null;
             dsCutPositions = null;
             usCutPositions = null;
             unknownSite = false;
+            isCommerciallyAvailable = false;
         }
 
         public void endRecord() throws ParserException
@@ -465,8 +561,13 @@ public final class RestrictionEnzymeManager
                 isoschizomers = new HashSet(isoBuffer);
             }
 
-            registerEnzyme(createEnzyme());
-            nameToIsoschizomers.put(name, isoschizomers);
+            if(!loadCommercialOnly || isCommerciallyAvailable) {
+                RestrictionEnzyme re = createEnzyme();
+                registerEnzyme(re);
+                nameToIsoschizomers.put(name, isoschizomers);
+                enzymeToSuppliers.put(re,suppliers);
+                nameToSite.put(name,recseq);
+            }
         }
 
         public void startTag(Object tag) throws ParserException
@@ -483,8 +584,11 @@ public final class RestrictionEnzymeManager
                 name = (String) value;
             else if (tagState.equals(REBASE_TAG_ISZR))
                 isoBuffer.add(value);
-            else if (tagState.equals(REBASE_TAG_SITE))
+            else if (tagState.equals(REBASE_TAG_SITE)) {
+                recseq += (String) value;
                 processSite(value);
+            } else if (tagState.equals(REBASE_TAG_COMM))
+                processSuppliers(value);
             else
                 throw new ParserException("Unable to handle value for tag '"
                                           + tagState
@@ -523,6 +627,12 @@ public final class RestrictionEnzymeManager
             }
 
             return enzyme;
+        }
+
+        private void processSuppliers(Object value) throws ParserException {
+            suppliers = (String) value;
+            if(suppliers.length()!=0)
+                isCommerciallyAvailable = true;
         }
 
         private void processSite(Object value) throws ParserException
