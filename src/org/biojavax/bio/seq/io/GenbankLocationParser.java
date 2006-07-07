@@ -379,7 +379,11 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
     
     private final static String writeCompoundLocation(final CompoundRichLocation theLocation) {
     	if (isAnyLocationComplemented(theLocation)) {
-    		return writeComplementLocation(theLocation.blockIterator());
+    		if (isAnyLocationOnDifferentStrand(theLocation)) {
+        		return _writeGroupLocation(theLocation.blockIterator(), theLocation.getTerm());
+    		} else {
+        		return writeComplementLocation(theLocation.blockIterator());
+    		}
     	} else {
     		return _writeGroupLocation(theLocation.blockIterator(), theLocation.getTerm());
     	}
@@ -426,6 +430,16 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
     	while (c.hasNext()) {
     		final RichLocation location = (RichLocation) c.next();
     		if (location.getStrand()==Strand.NEGATIVE_STRAND) return true;
+    	}
+    	return false;
+    }
+    
+    private final static boolean isAnyLocationOnDifferentStrand(final CompoundRichLocation theLocation) {
+    	final Iterator c = theLocation.blockIterator();
+    	final Strand firstStrand = ((RichLocation) c.next()).getStrand();
+    	while (c.hasNext()) {
+    		final RichLocation location = (RichLocation) c.next();
+    		if (location.getStrand() != firstStrand) return true;
     	}
     	return false;
     }
