@@ -70,6 +70,11 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
         return ORDER_TERM;
     }
     
+    public final static void reset() {
+    	JOIN_TERM=null;
+    	ORDER_TERM=null;
+    }
+    
     /**
      * Constructs a CompoundRichLocation from the given set of members, with
      * the default term of "join". Note that you really shouldn't use this if
