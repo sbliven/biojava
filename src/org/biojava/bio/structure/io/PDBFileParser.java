@@ -610,8 +610,7 @@ public class PDBFileParser  {
             //		   hyd1+" "+hyd2 +" "+salt1+" "+hyd3+" "+hyd4+" "+salt2);
             HashMap cons = new HashMap();
             cons.put("atomserial",new Integer(atomserial));
-            // stupid to re-convert the ints to string, but hashmap does not allow to put ints ...
-            // shout they be converted to Integer ?
+         
             if ( bond1 != null) cons.put("bond1",bond1);
             if ( bond2 != null) cons.put("bond2",bond2);
             if ( bond3 != null) cons.put("bond3",bond3);
@@ -621,7 +620,7 @@ public class PDBFileParser  {
             if ( salt1 != null) cons.put("salt1",salt1);
             if ( hyd3  != null) cons.put("hydrogen3",hyd3);
             if ( hyd4  != null) cons.put("hydrogen4",hyd4);
-            if ( salt1 != null) cons.put("salt2",salt2);
+            if ( salt2 != null) cons.put("salt2",salt2);
             
             connects.add(cons);
         } catch (Exception e){
