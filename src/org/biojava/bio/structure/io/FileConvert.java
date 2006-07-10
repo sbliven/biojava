@@ -407,6 +407,8 @@ public class FileConvert {
             xw.attribute("type",connType);
             for (int i=0;i<atomids.size();i++){
                 Integer atomid = (Integer)atomids.get(i);
+                if ( atomid == null)
+                    continue;
                 int aid = atomid.intValue();
                 xw.openTag("atomID");
                 xw.attribute("atomID",Integer.toString(aid));
