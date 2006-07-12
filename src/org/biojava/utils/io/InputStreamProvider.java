@@ -43,6 +43,7 @@ import java.util.zip.ZipFile;
  * <li>Gzip (extension .gz)</li>
  * <li>Zip (extension .zip) in this case a stream to the first entry in the zip file is returned </li> 
  * <li>Jar (extension .jar) same as .Zip; only stream to first entry is returned </li>
+ * <li>Z (extension .Z) compressed using the unix compress command </li>
  * <li>for any other extension, no compression is assumed </li>
  * </ul>
  * 
@@ -122,6 +123,13 @@ public class InputStreamProvider {
             } else {
                 throw new IOException ("Jar file has no entries");
             }
+        } 
+        
+        else if ( fileName.endsWith(".Z")) {
+            // unix compressed 
+            InputStream is = new FileInputStream(f);
+            inputStream =  new UncompressInputStream(is);
+            
         }
         
         else {

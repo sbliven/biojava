@@ -73,6 +73,8 @@ public class PDBFileReader implements StructureIOFile {
         extensions.add(".pdb");
         extensions.add(".ent.gz");
         extensions.add(".pdb.gz");
+        extensions.add(".ent.Z");
+        extensions.add(".pdb.Z");
         
     }
     
