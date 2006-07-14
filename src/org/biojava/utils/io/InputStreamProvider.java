@@ -64,6 +64,7 @@ public class InputStreamProvider {
      * 
      * @param pathToFile the path of the file.
      * @return an InputStream for the file located at the path.
+     * @throws IOException
      */
     public InputStream getInputStream(String pathToFile)
     throws IOException
@@ -74,8 +75,9 @@ public class InputStreamProvider {
     
     /** get an InputStream for the file
      * 
-     * @param f
+     * @param f a File
      * @return an InputStream for the file
+     * @throws IOException
      */
     public InputStream getInputStream(File f) 
     throws IOException

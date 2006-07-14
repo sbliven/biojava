@@ -35,9 +35,9 @@ public class AligNPE {
     
     /** Align w/o penalizing endpags. Return alignment and score
      * 
-     * @param sim the similarity matrix
-     * @param gapOpen
-     * @param gapExtension
+     * @param sim the similarity matrix   
+     * @param params the structure alignment parameters to be used
+     * @return an Alignable
      */
     public static Alignable align_NPE(Matrix sim,StrucAligParameters params){
         //System.out.println("align_NPE");

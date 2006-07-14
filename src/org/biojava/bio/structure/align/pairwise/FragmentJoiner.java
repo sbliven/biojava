@@ -274,7 +274,7 @@ public class FragmentJoiner {
      * 
      * @param ca1subset
      * @param ca2subset
-     * @return
+     * @return a double
      * @throws StructureException
      */
     private double getDensity(Atom[] ca1subset, Atom[] ca2subset ) throws StructureException{
@@ -427,8 +427,11 @@ public class FragmentJoiner {
      they have compatible rotation and translation parameters.
      
     
-     * @param parameters
-     * @param fraglst
+     * @param fraglst FragmentPair[] array
+     * @param angleDiff angle cutoff
+     * @param fragCompatDist distance cutoff
+     * @param maxRefine max number of solutions to keep
+     * @return JointFragments[] 
      */
     public JointFragments[] frag_pairwise_compat(FragmentPair[] fraglst,
             int angleDiff,

@@ -111,7 +111,7 @@ public class AlternativeAlignment {
     
     /** print the idx positions of this alignment
      * 
-     * @return
+     * @return a String representation
      */
     public String toString(){
         StringBuffer s = new StringBuffer();
@@ -130,7 +130,7 @@ public class AlternativeAlignment {
     
     /** return the number of gaps in this alignment
      * 
-     * @return
+     * @return the number of Gaps
      */
     public int getGaps(){
         return gaps0;
@@ -138,7 +138,7 @@ public class AlternativeAlignment {
     
     /** returns the number of euqivalent residues in this alignment
      * 
-     * @return
+     * @return the number of equivalent residues
      */
     public int getEqr(){
        return eqr0 ; 
@@ -171,7 +171,7 @@ public class AlternativeAlignment {
 
     /** Set apairs according to a list of (i,j) tuples.
      * 
-     * @param il
+     * @param jf a JoingFragment
      */
     public void apairs_from_idxlst(JointFragments jf) {
         List il = jf.getIdxlist();
@@ -197,7 +197,7 @@ public class AlternativeAlignment {
     
     /** returns the sequential number of this alternative alignment
      * 
-     * @return
+     * @return the sequential number of this alternative alignment 
      */
     public int getAltAligNumber() {
         return fromia;
@@ -273,6 +273,11 @@ public class AlternativeAlignment {
      * e.g. CE or ProSup. Here we additionally test for circular permutation,
      * which are in the same frame of superposition as the optimal alignment.
      * This feature may be switched off by setting permsize to -1.
+     * 
+     * @param params the parameters
+     * @param ca1 atoms of structure 1
+     * @param ca2 atoms of structure 2
+     * @throws StructureException
      */
          
     public void refine(StrucAligParameters params,Atom[]ca1,Atom[]ca2) throws StructureException{
@@ -488,7 +493,7 @@ public class AlternativeAlignment {
      * 
      * @param idx1
      * @param idx2
-     * @return
+     * @return the number of gaps in this alignment
      */
     private int count_gaps(int[] i1, int[] i2){
   
@@ -561,7 +566,7 @@ public class AlternativeAlignment {
     
     /** returns the rotation matrix that needs to be applied to structure 2 to rotate on structure 1
      * 
-     * @return
+     * @return the rotation Matrix
      */
     public Matrix getRotationMatrix(){
         return currentRotMatrix;
@@ -569,7 +574,7 @@ public class AlternativeAlignment {
     
     /** returns the shift vector that has to be applied on structure to to shift on structure one
      * 
-     * @return
+     * @return the shift vector
      */
     public Atom getShift(){
         return currentTranMatrix;
@@ -589,7 +594,7 @@ public class AlternativeAlignment {
 
     /** the alignment score
      * 
-     * @return
+     * @return the score of this alignment
      */
     public float getScore() {
         return score;
@@ -605,7 +610,7 @@ public class AlternativeAlignment {
      *  
      * @param s1
      * @param s2
-     * @return
+     * @return a PDB file as a String
      */
     public String toPDB(Structure s1, Structure s2){
         
