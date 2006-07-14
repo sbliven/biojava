@@ -160,6 +160,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    /** Construct a matrix from a copy of a 2-D array.
    @param A    Two-dimensional array of doubles.
    @exception  IllegalArgumentException All rows must have the same length
+   @return a Matrix
    */
 
    public static Matrix constructWithCopy(double[][] A) {
@@ -180,6 +181,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    }
 
    /** Make a deep copy of a matrix
+    * @return a identical copy of the Matrix
    */
 
    public Matrix copy () {
@@ -982,6 +984,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
      * whitespace, all the elements for each row appear on a single line,
      * the last row is followed by a blank line.
    @param input the input stream.
+   @return a Matrix
+   @throws java.io.IOException
    */
 
    public static Matrix read (BufferedReader input) throws java.io.IOException {

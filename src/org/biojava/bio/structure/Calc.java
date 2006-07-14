@@ -554,7 +554,8 @@ public class Calc {
     
     
     /** returns the center  of mass of the set of atoms
-     * 
+     * @param atomSet a set of Atoms
+     * @return an Atom representing the Centroid of the set of atoms
      */
     public static Atom getCentroid(Atom[] atomSet){
         
@@ -597,6 +598,9 @@ public class Calc {
     }
     
     /** center the atoms at the Centroid 
+     * @param atomSet a set of Atoms
+     * @return an Atom representing the Centroid of the set of atoms
+     * @throws StructureException 
      * */
     public static Atom[] centerAtoms(Atom[] atomSet) throws StructureException {
        
@@ -618,6 +622,7 @@ public class Calc {
      * thanks to Peter Lackner for a python template of this method.
      * @param amino
      * @return a "virtual" CB atom
+     * @throws StructureException
      */
     public static Atom createVirtualCBAtom(AminoAcid amino) 
     throws StructureException{

@@ -34,7 +34,7 @@ public class AlignTools {
      *  
      * @param caall
      * @param idx an array where each element is a position of all the Atoms to return
-     * @return
+     * @return at Atom[] array
      */
     public static Atom[] getFragmentFromIdxList(Atom[] caall, int[] idx){
         Atom[] subset = new Atom[idx.length];
@@ -52,7 +52,7 @@ public class AlignTools {
      * @param caall
      * @param pos ... the start position
      * @param fragmentLength .. the length of the subset to extract.
-     * @return
+     * @return an Atom[] array
      */
     public static Atom[] getFragment(Atom[] caall, int pos, int fragmentLength){
      
@@ -72,7 +72,7 @@ public class AlignTools {
      * @param ca
      * @param pos
      * @param fragmentLength
-     * @return
+     * @return an Atom
      */
     public static Atom getCenter(Atom[] ca, int pos, int fragmentLength){
         Atom center = new AtomImpl();
@@ -122,7 +122,7 @@ public class AlignTools {
      * @param j position in structure 2
      * @param l length of the fragments
      * @param k diagonal used
-     * @return
+     * @return a double
      */
     public static double rms_dk_diag(double[] dk1, double[] dk2, int i, int j, int l, int k) {
 //        dk = 0
@@ -144,7 +144,7 @@ public class AlignTools {
      * 
      * @param ca1
      * @param ca2
-     * @return
+     * @return a Matrixd
      */
     public static Matrix getDistanceMatrix(Atom[] ca1, Atom[]ca2){
         

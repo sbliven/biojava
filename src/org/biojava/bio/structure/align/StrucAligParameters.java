@@ -273,7 +273,7 @@ public class StrucAligParameters {
      * is increased. - particular for large structures this increases calc. time a lot.
      * advantage: more combinations of fragments are used.
      * 
-     * @return
+     * @return a flag if the inital fragments should be reduced
      */
     public boolean reduceInitialFragments() {
         return reduceInitialFragments;

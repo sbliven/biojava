@@ -69,6 +69,7 @@ public interface Chain {
      * 
      * @param pdbresnum the PDB residue number of the group
      * @return the matching group
+     * @throws StructureException
      */
     public Group getGroupByPDB(String pdbresnum) throws StructureException;
     
@@ -77,6 +78,7 @@ public interface Chain {
      * @param pdbresnumStart PDB residue number of start
      * @param pdbresnumEnd PDB residue number of end
      * @return Groups in between. or throws a StructureException if either start or end can not be found,
+     * @throws StructureException
      */
     public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) throws StructureException;
 

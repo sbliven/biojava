@@ -242,6 +242,8 @@ public class SVDSuperimposer {
      * 
      * @param atomSet1
      * @param atomSet2
+     * @return the RMS of two atom sets
+     * @throws StructureException
      */
     public static double getRMS(Atom[] atomSet1, Atom[] atomSet2) throws StructureException {
         if ( atomSet1.length != atomSet2.length ){

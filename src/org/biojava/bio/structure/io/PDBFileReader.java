@@ -203,7 +203,7 @@ public class PDBFileReader implements StructureIOFile {
     
     /** opens filename, parses it and returns a Structure object
      * 
-     * @param filename, a File object
+     * @param filename a File object
      * @return the Structure object
      * @throws IOException ...
      */

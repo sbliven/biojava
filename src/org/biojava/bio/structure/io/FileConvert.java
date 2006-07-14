@@ -78,6 +78,7 @@ public class FileConvert {
     
     /** returns if the Connections should be added
      * default is true;
+     * @return if the printConnections flag is set
      */
     public boolean doPrintConnections() {
         return printConnections;

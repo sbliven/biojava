@@ -147,7 +147,7 @@ public class   AminoAcidImpl
  /** set three character name of AminoAcid. 
      *
      * @param s  a String specifying the PDBName value
-     * @see #getPDBName
+     * @see #getPDBName()
      * @throws PDBParseException ...
      */
     public void setPDBName(String s) 

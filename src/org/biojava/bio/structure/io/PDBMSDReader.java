@@ -53,6 +53,7 @@ public class PDBMSDReader
 	@param dbUrl connection string 
 	@param dbUsername the username in the db
 	@param dbPassword password to use
+    @throws SQLException
     */
     public void setDBConnection( String dbDriver,String dbUrl,String dbUsername, String dbPassword)
 	throws SQLException

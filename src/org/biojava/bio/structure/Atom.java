@@ -173,9 +173,8 @@ public interface Atom {
     public void setParent(Group parent) ; 
 
      /** Returns the parent Group of the Atom
-     * 
-     * @return Group the parent Group of the Atom 
-     * @return null if the referenced object is not Group 
+     * returns null if the referenced object is not Group 
+     * @return Group the parent Group of the Atom, or null     
      */
     public Group getParent();
     

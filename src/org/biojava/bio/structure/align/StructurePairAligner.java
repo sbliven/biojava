@@ -166,7 +166,7 @@ public class StructurePairAligner {
     
     
     /** get the results of step 1 - the FragmentPairs used for seeding the alignment
-     * 
+     * @return a FragmentPair[] array
      */
     
     public FragmentPair[] getFragmentPairs() {
@@ -182,7 +182,7 @@ public class StructurePairAligner {
 
     /** return the alternative alignments that can be found for the two structures
      * 
-     * @return
+     * @return AlternativeAlignment[] array
      */
     public AlternativeAlignment[] getAlignments() {
         return alts;
@@ -190,7 +190,7 @@ public class StructurePairAligner {
     
     /** return the difference of distance matrix between the two structures
      * 
-     * @return
+     * @return a Matrix
      */
     public Matrix getDistMat(){
         return distanceMatrix;
@@ -239,6 +239,7 @@ public class StructurePairAligner {
      * @param ca1 set of Atoms of structure 1
      * @param ca2 set of Atoms of structure 2
      * @param params the parameters to use for the alignment
+     * @throws StructureException
      */
     public void align(Atom[] ca1, Atom[] ca2, StrucAligParameters params) 
     throws StructureException {

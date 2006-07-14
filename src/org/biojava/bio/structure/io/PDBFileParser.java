@@ -154,6 +154,9 @@ public class PDBFileParser  {
     
     /** convert three character amino acid codes into single character
      *  e.g. convert CYS to C 
+     *  @return a character
+     *  @param code3 a three character amino acid representation String
+     *  @throws IllegalSymbolException
      */
     
     public Character convert_3code_1code(String code3) 
@@ -704,8 +707,7 @@ public class PDBFileParser  {
      *
      * @param inStream  an InputStream object
      * @return a Structure object
-     * @throws IOException ...
-     * @throws PDBParseException ...
+     * @throws IOException     
      */
     public Structure parsePDBFile(InputStream inStream) 
     throws IOException
@@ -732,7 +734,6 @@ public class PDBFileParser  {
      * @param buf  a BufferedReader object
      * @return the Structure object
      * @throws IOException ...
-     * @throws PDBParseException ...
      */
     
     public Structure parsePDBFile(BufferedReader buf) 

@@ -31,7 +31,7 @@ import java.util.List      ;
 
 import org.biojava.bio.structure.io.FileConvert ;
 /**
- * Implementation of a PDBStructure. This class
+ * Implementation of a PDB Structure. This class
  * provides the data contained in a PDB file.
  * to get structure objects from different sources
  * see io package.

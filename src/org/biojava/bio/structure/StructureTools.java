@@ -47,7 +47,7 @@ public class StructureTools {
      * @param s the structure to get the atoms from 
      * 
      * @param atomNames  contains the atom names to be used.
-     * @return
+     * @return an Atom[] array
      */ 
     public static Atom[] getAtomArray(Structure s, String[] atomNames){
         Iterator iter = new GroupIterator(s);
@@ -91,7 +91,7 @@ public class StructureTools {
     
     /** returns an Atom array of the CA atoms
      * @param s
-     * @return
+     * @return an Atom[] array
      */
     public static Atom[] getAtomCAArray(Structure s){
         String[] atomNames = {caAtomName};
@@ -101,7 +101,7 @@ public class StructureTools {
     /** returns an Atom array of the MainChain atoms
     
      * @param s
-     * @return
+     * @return an Atom[] array
      */
     public static Atom[] getBackboneAtomArray(Structure s){
         String[] atomNames = backboneAtomNames;

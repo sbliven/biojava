@@ -303,18 +303,28 @@ public interface Structure {
     
     /** request a particular chain from a structure.
      * by default considers only the first model.
+     * @param chainId the ID of a chain that should be returned
+     * @return Chain the requested chain
+     * @throws StructureException
      */
     public Chain findChain(String chainId)
     throws StructureException;
     
     /** request a particular chain from a particular model
-     * 
+     * @param modelnr the number of the model to use
+     * @param chainId the ID of a chain that should be returned
+     * @return Chain the requested chain
+     * @throws StructureException 
      */
     public Chain findChain(String chainId, int modelnr)
     throws StructureException;
 
     /** request a particular group from a structure.
     * by default considers only the first model in the structure.
+    * @param chainId the ID of the chain to use
+    * @param pdbResnum the PDB residue number of the requested group
+    * @return Group the requested Group
+    * @throws StructureException 
     * 
     */
     public  Group findGroup(String chainId, String pdbResnum)
@@ -322,6 +332,11 @@ public interface Structure {
     
     /** request a particular group from a structure.
      * considers only model nr X. count starts with 0.
+     * @param chainId the ID of the chain to use
+     * @param pdbResnum the PDB residue number of the requested group
+     * @param modelnr the number of the model to use
+     * @return Group the requested Group
+     * @throws StructureException  
      */
      public  Group findGroup(String chainId, String pdbResnum, int modelnr)
      throws StructureException;
@@ -332,6 +347,7 @@ public interface Structure {
       * 
       * @param chainId the chain identifier 
       * @return the Chain that matches the chainID
+      * @throws StructureException 
       */
      public Chain getChainByPDB(String chainId)
          throws StructureException;
@@ -342,6 +358,7 @@ public interface Structure {
       * @param chainId the chain identifier
       * @param modelnr request a particular model; 
       * @return the Chain that matches the chainID in the model
+      * @throws StructureException 
       */
      public Chain getChainByPDB(String chainId, int modelnr)
          throws StructureException;

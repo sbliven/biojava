@@ -163,6 +163,7 @@ public class Mutator{
      * @param oldAmino
      * @param newType
      * @return a new, mutated, residue 
+     * @throws PDBParseException
      */
     public AminoAcid mutateResidue(AminoAcid oldAmino, String newType)
     throws PDBParseException {
