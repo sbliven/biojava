@@ -379,7 +379,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 // create the docref object
                 try {
                 	// Use consortium as well if present.
-                	if (authors==null) authors = consortium;
+                	if (authors==null) authors = consortium + " (consortium)";
                 	else if (consortium!=null) authors = authors + ", " + consortium + " (consortium)";
                 	// Create docref.
                     DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{DocRefAuthor.Tools.parseAuthorString(authors),journal,title});

@@ -24,7 +24,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
 import org.biojavax.DocRefAuthor;
 import org.biojavax.RichObjectBuilder;
 import org.biojavax.SimpleCrossRef;
@@ -130,6 +132,7 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
                 // Find its constructor with given params
                 for (int i = 0; i < paramsList.size(); i++) {
                     if (paramsList.get(i) instanceof Set) types[i] = Set.class;
+                    else if (paramsList.get(i) instanceof Map) types[i] = Map.class;
                     else if (paramsList.get(i) instanceof List) types[i] = List.class;
                     else types[i] = paramsList.get(i).getClass();
                 }
