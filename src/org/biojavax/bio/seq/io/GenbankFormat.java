@@ -118,7 +118,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String END_SEQUENCE_TAG = "//";
     
     // locus line
-    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(?:bp|aa)\\s+([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)\\s+(\\S+)$");
+    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(?:bp|aa)\\s+([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)\\s*(\\S+)?$");
     // version line
     protected static final Pattern vp = Pattern.compile("^(\\S+?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
