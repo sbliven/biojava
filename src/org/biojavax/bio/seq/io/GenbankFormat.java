@@ -526,7 +526,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         
         try {
             while (!done) {
-                br.mark(160);
+                br.mark(320);
                 line = br.readLine();
                 if (line==null || line.length()==0 || (!line.startsWith(" ") && linecount++>0)) {
                     // dump out last part of section
