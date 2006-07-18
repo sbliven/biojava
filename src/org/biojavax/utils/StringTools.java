@@ -150,7 +150,7 @@ public class StringTools {
     	if (theString.length() ==0 || theString.charAt(theString.length()-1) != ' ') return theString;
     	int len = theString.length();
     	final char[] val = theString.toCharArray();
-    	while ((val[len - 1] <= ' ')) len--;
+    	while (len > 0 && (val[len - 1] <= ' ')) len--;
     	return ((len <  theString.length())) ? theString.substring(0, len) : theString;
     }
     
