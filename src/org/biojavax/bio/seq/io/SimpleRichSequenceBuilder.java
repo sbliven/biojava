@@ -315,7 +315,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
             if(! this.taxon.equals(taxon)){
                 System.err.println(
                         "Warning: attempted to set taxon twice with different values. Keeping first value. "+
-                        "old value (retained): "+this.taxon+" new value: "+taxon);
+                        "old value (retained): "+this.taxon+" new value: "+taxon+", accession: <"+accession+">, version:"+version);
             }
         }
         this.taxon = taxon;
