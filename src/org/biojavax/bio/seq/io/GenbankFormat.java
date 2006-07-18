@@ -281,9 +281,10 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 if (m.matches()) {
                     rlistener.setName(m.group(1));
                     accession = m.group(1); // default if no accession found
+                    rlistener.setAccession(accession);
                     rlistener.setDivision(m.group(5));
                     rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
-                    rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),m.group(6));
+                    if (m.groupCount()==6) rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),m.group(6));
                     // Optional extras
                     String stranded = m.group(2);
                     String circular = m.group(4);
