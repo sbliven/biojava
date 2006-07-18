@@ -139,20 +139,21 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     
     private final static HashSet isNotQuoted = new HashSet();
     static {
-    	isNotQuoted.add("codon_start");
-    	isNotQuoted.add("number");
-    	isNotQuoted.add("transl_table");
-    	isNotQuoted.add("label");
-    	isNotQuoted.add("rpt_type");
     	isNotQuoted.add("anticodon");
-    	isNotQuoted.add("rpt_unit_range");
     	isNotQuoted.add("citation");
-    	isNotQuoted.add("estimated_length");
-    	isNotQuoted.add("transl_except");
-    	isNotQuoted.add("mod_base");
-    	isNotQuoted.add("cons_splice");
+    	isNotQuoted.add("codon");
+    	isNotQuoted.add("codon_start");
     	isNotQuoted.add("compare");
+    	isNotQuoted.add("cons_splice");
     	isNotQuoted.add("direction");
+    	isNotQuoted.add("estimated_length");
+    	isNotQuoted.add("label");
+    	isNotQuoted.add("mod_base");
+    	isNotQuoted.add("number");
+    	isNotQuoted.add("rpt_type");
+    	isNotQuoted.add("rpt_unit_range");
+    	isNotQuoted.add("transl_except");
+    	isNotQuoted.add("transl_table");
     }
 
     /**
@@ -707,7 +708,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         // feature_type     location
         for (Iterator i = rs.getFeatureSet().iterator(); i.hasNext(); ) {
             RichFeature f = (RichFeature)i.next();
-            StringTools.writeKeyValueLine("     "+f.getTypeTerm().getName(), GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), 21, this.getLineWidth()-2, ",", this.getPrintStream());
+            StringTools.writeKeyValueLine("     "+f.getTypeTerm().getName(), GenbankLocationParser.writeLocation((RichLocation)f.getLocation()), 21, this.getLineWidth()-1, ",", this.getPrintStream());
             for (Iterator j = f.getNoteSet().iterator(); j.hasNext(); ) {
                 Note n = (Note)j.next();
                 // /key="val" or just /key if val==""
