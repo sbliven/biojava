@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.AtomImpl;
 import org.biojava.bio.structure.Calc;
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.SVDSuperimposer;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
@@ -59,6 +61,8 @@ public class AlternativeAlignment {
     
     int[] idx1;
     int[] idx2;
+    String[] pdbresnum1;
+    String[] pdbresnum2;
     //short[] alig1;
     //short[] alig2;
     
@@ -239,6 +243,8 @@ public class AlternativeAlignment {
         eqr0 = idx1.length;
         gaps0 = count_gaps(idx1,idx2);
        logger.fine("eqr " + eqr0 + " " + gaps0 + " "  +idx1[0] + " " +idx1[1]);
+       
+       getPdbRegions(ca1,ca2);
         
     }
     
@@ -485,10 +491,71 @@ public class AlternativeAlignment {
        eqr0 = idx1.length;
        gaps0 = count_gaps(idx1,idx2);
        
-      
+      getPdbRegions(ca1,ca2);
        //System.out.println("eqr " + eqr0 + " aligpath len:"+aligpath.length+ " gaps:" + gaps0 + " score " + score);
     }
     
+    private void getPdbRegions(Atom[] ca1, Atom[] ca2){
+        pdbresnum1 = new String[idx1.length];
+        pdbresnum2 = new String[idx2.length];
+        
+        for (int i =0 ; i < idx1.length;i++){
+            Atom a1 = ca1[idx1[i]];
+            Atom a2 = ca2[idx2[i]];
+            Group p1 = a1.getParent();
+            Group p2 = a2.getParent();
+            Chain c1 = p1.getParent();
+            Chain c2 = p2.getParent();
+            
+            String cid1 = c1.getName();
+            String cid2 = c2.getName();
+            
+            String pdb1 = p1.getPDBCode();
+            String pdb2 = p2.getPDBCode();
+           
+
+            if ( ! cid1.equals(" "))
+                pdb1 += ":" + cid1;
+           
+            
+            if ( ! cid2.equals(" "))
+                pdb2 += ":" + cid2;
+            
+
+            pdbresnum1[i] = pdb1;
+            pdbresnum2[i] = pdb2;
+        }
+    }
+    
+    
+    public String[] getPDBresnum1() {
+        return pdbresnum1;
+    }
+
+
+
+
+    public void setPDBresnum1(String[] pdbresnum1) {
+        this.pdbresnum1 = pdbresnum1;
+    }
+
+
+
+
+    public String[] getPDBresnum2() {
+        return pdbresnum2;
+    }
+
+
+
+
+    public void setPDBresnum2(String[] pdbresnum2) {
+        this.pdbresnum2 = pdbresnum2;
+    }
+
+
+
+
     /** Count the number of gaps in an alignment represented by idx1,idx2.
      * 
      * @param idx1
