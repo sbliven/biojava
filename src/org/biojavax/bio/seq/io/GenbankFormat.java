@@ -554,7 +554,12 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             }
         } catch (IOException e) {
-            throw new ParseException(e);
+        	// try to provide some context in the stack trace
+        	String key = null;
+        	if (!section.isEmpty()) {
+        		key = ((String[]) section.get(0))[0];
+        	}
+        	throw new ParseException(e, "Problem parsing section "+key);
         }
         return section;
     }
