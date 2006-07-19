@@ -108,10 +108,19 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
             queryText = "from CrossRef as cr where cr.dbname = ? and cr.accession = ? and cr.version = ?";
             queryType = "CrossRef";
         } else if (SimpleDocRef.class.isAssignableFrom(clazz)) {
-            queryText = "from DocRef as cr where cr.authors = ? and cr.location = ? and cr.title = ?";
-            queryType = "DocRef";
-            // convert List constructor to String representation for query
-            queryParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((List)queryParamsList.get(0)));
+        	queryType = "DocRef";
+        	// convert List constructor to String representation for query
+        	queryParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((List)queryParamsList.get(0)));
+        	if (queryParamsList.size()<3 || queryParamsList.get(2)==null) {
+        		queryText = "from DocRef as cr where cr.authors = ? and cr.location = ? and cr.title is null";
+        		if (queryParamsList.size()>=3) {
+        			queryParamsList.remove(2);
+        			paramsList=new ArrayList(paramsList);
+        			paramsList.remove(2);
+        		}       
+        	} else {
+        		queryText = "from DocRef as cr where cr.authors = ? and cr.location = ? and cr.title = ?";
+        	}        
         } else throw new IllegalArgumentException("Don't know how to handle objects of type "+clazz);
         // Run the query.
         try {
