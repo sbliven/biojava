@@ -44,6 +44,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Jason Stajich
  * @author Matthew Pocock
  * @author Mark Schreiber
+ * @author Richard Holland
  */
 
 public abstract class WebSequenceDB
@@ -72,7 +73,7 @@ implements SequenceDBLite {
 
     try {
       URL queryURL = getAddress(id);
-      System.err.println("query is "+ queryURL.toString());
+      //System.err.println("query is "+ queryURL.toString());
       URLConnection connection = queryURL.openConnection();
       SequenceFormat sFormat = getSequenceFormat();
 
@@ -83,7 +84,7 @@ implements SequenceDBLite {
       Alphabet alpha = getAlphabet();
       SequenceBuilderFactory sFact = SeqIOTools.formatToFactory(sFormat,alpha);
       SymbolTokenization rParser = alpha.getTokenization("token");
-      System.err.println("got data from "+ queryURL);
+      //System.err.println("got data from "+ queryURL);
       SequenceIterator seqI = new StreamReader(
         connection.getInputStream(),
         sFormat, rParser, sFact
