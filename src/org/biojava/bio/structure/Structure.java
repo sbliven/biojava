@@ -310,6 +310,14 @@ public interface Structure {
     public Chain findChain(String chainId)
     throws StructureException;
     
+    
+    /** check if a chain with the id chainId is contained in this structure.
+     * 
+     * @param chainId the name of the chain
+     * @return true if a chain with the id (name) chainId is found
+     */
+    public boolean hasChain(String chainId);
+    
     /** request a particular chain from a particular model
      * @param modelnr the number of the model to use
      * @param chainId the ID of a chain that should be returned

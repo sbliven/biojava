@@ -438,6 +438,21 @@ public class StructureImpl implements Structure {
         return str ;
         
     }
+
+
+    public boolean hasChain(String chainId) {
+        int modelnr = 0;
+        
+        List chains = getChains(modelnr);
+        Iterator iter = chains.iterator();
+        while ( iter.hasNext()){
+            Chain c = (Chain) iter.next();
+            // we check here with equals because we might want to distinguish between upper and lower case chains!
+            if ( c.getName().equals(chainId))
+                return true;
+        }
+        return false;
+    }
     
     
 }
