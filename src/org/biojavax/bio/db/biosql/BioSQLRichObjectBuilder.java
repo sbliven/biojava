@@ -23,6 +23,7 @@ package org.biojavax.bio.db.biosql;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,10 +92,13 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
      * wrapper object it made to do the search with and returns that.
      */
     public Object buildObject(Class clazz, List paramsList) {
+        // convert the params list to remove nulls as we can't process those.
+        List ourParamsList = new ArrayList(paramsList);
+        for (Iterator i = ourParamsList.iterator(); i.hasNext(); ) 
+        	if (i.next()==null) i.remove();
         // Create the Hibernate query to look it up with
         String queryText;
         String queryType;
-        List queryParamsList = new ArrayList(paramsList);
         if (SimpleNamespace.class.isAssignableFrom(clazz)) {
             queryText = "from Namespace as ns where ns.name = ?";
             queryType = "Namespace";
@@ -110,14 +114,9 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
         } else if (SimpleDocRef.class.isAssignableFrom(clazz)) {
         	queryType = "DocRef";
         	// convert List constructor to String representation for query
-        	queryParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((List)queryParamsList.get(0)));
-        	if (queryParamsList.size()<3 || queryParamsList.get(2)==null) {
+        	ourParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((List)ourParamsList.get(0)));
+        	if (ourParamsList.size()<3) {
         		queryText = "from DocRef as cr where cr.authors = ? and cr.location = ? and cr.title is null";
-        		if (queryParamsList.size()>=3) {
-        			queryParamsList.remove(2);
-        			paramsList=new ArrayList(paramsList);
-        			paramsList.remove(2);
-        		}       
         	} else {
         		queryText = "from DocRef as cr where cr.authors = ? and cr.location = ? and cr.title = ?";
         	}        
@@ -127,8 +126,8 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
             // Build the query object
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             // Set the parameters
-            for (int i = 0; i < queryParamsList.size(); i++) {
-                query = this.setParameter.invoke(query, new Object[]{new Integer(i), queryParamsList.get(i)});
+            for (int i = 0; i < ourParamsList.size(); i++) {
+                query = this.setParameter.invoke(query, new Object[]{new Integer(i), ourParamsList.get(i)});
             }
             // Get the results
             Object result = this.uniqueResult.invoke(query, null);
@@ -137,17 +136,17 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
             // Create, persist and return the new object otherwise
             else {
                 // Load the class
-                Class[] types = new Class[paramsList.size()];
+                Class[] types = new Class[ourParamsList.size()];
                 // Find its constructor with given params
-                for (int i = 0; i < paramsList.size(); i++) {
-                    if (paramsList.get(i) instanceof Set) types[i] = Set.class;
-                    else if (paramsList.get(i) instanceof Map) types[i] = Map.class;
-                    else if (paramsList.get(i) instanceof List) types[i] = List.class;
-                    else types[i] = paramsList.get(i).getClass();
+                for (int i = 0; i < ourParamsList.size(); i++) {
+                    if (ourParamsList.get(i) instanceof Set) types[i] = Set.class;
+                    else if (ourParamsList.get(i) instanceof Map) types[i] = Map.class;
+                    else if (ourParamsList.get(i) instanceof List) types[i] = List.class;
+                    else types[i] = ourParamsList.get(i).getClass();
                 }
                 Constructor c = clazz.getConstructor(types);
                 // Instantiate it with the parameters
-                Object o = c.newInstance(paramsList.toArray());
+                Object o = c.newInstance(ourParamsList.toArray());
                 // Persist and return it.
                 this.persist.invoke(this.session, new Object[]{queryType,o});
                 return o;
@@ -158,10 +157,9 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
             StringBuffer paramsstuff = new StringBuffer();
             paramsstuff.append(clazz);
             paramsstuff.append("(");
-            for (int i = 0; i < paramsList.size(); i++) {
-                if (paramsList.get(i)==null) paramsstuff.append("null");
-                else paramsstuff.append(paramsList.get(i).getClass());
-                if (i<(paramsList.size()-1)) paramsstuff.append(",");
+            for (int i = 0; i < ourParamsList.size(); i++) {
+                if (i>0) paramsstuff.append(",");
+            	paramsstuff.append(ourParamsList.get(i).getClass());
             }
             paramsstuff.append(")");
             // Throw the exception with our nice message
