@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 
 /**
@@ -46,33 +48,37 @@ public class SimpleRichObjectBuilder implements RichObjectBuilder {
         // put the class into the hashmap if not there already
         if (!objects.containsKey(clazz)) objects.put(clazz,new HashMap());
         Map contents = (Map)objects.get(clazz);
+        // convert the params list to remove nulls as we can't process those.
+        List ourParamsList = new ArrayList(paramsList);
+        for (Iterator i = ourParamsList.iterator(); i.hasNext(); ) 
+        	if (i.next()==null) i.remove();
         // return the constructed object from the hashmap if there already
-        if (contents.containsKey(paramsList)) return contents.get(paramsList);
+        if (contents.containsKey(ourParamsList)) return contents.get(ourParamsList);
         // otherwise build it.
         try {
             // Load the class
-            Class[] types = new Class[paramsList.size()];
+            Class[] types = new Class[ourParamsList.size()];
             // Find its constructor with given params
-            for (int i = 0; i < paramsList.size(); i++) {
-                if (paramsList.get(i) instanceof Set) types[i] = Set.class;
-                else if (paramsList.get(i) instanceof List) types[i] = List.class;
-                else types[i] = paramsList.get(i).getClass();
+            for (int i = 0; i < ourParamsList.size(); i++) {
+                if (ourParamsList.get(i) instanceof Set) types[i] = Set.class;
+                else if (ourParamsList.get(i) instanceof Map) types[i] = Map.class;
+                else if (ourParamsList.get(i) instanceof List) types[i] = List.class;
+                else types[i] = ourParamsList.get(i).getClass();
             }
             Constructor c = clazz.getConstructor(types);
             // Instantiate it with the parameters
-            Object o = c.newInstance(paramsList.toArray());
+            Object o = c.newInstance(ourParamsList.toArray());
             // store it for later in the singleton map
-            contents.put(paramsList, o);
+            contents.put(ourParamsList, o);
             // return it
             return o;
         } catch (Exception e) {
             StringBuffer paramsstuff = new StringBuffer();
             paramsstuff.append(clazz);
             paramsstuff.append("(");
-            for (int i = 0; i < paramsList.size(); i++) {
-                if (paramsList.get(i)==null) paramsstuff.append("null");
-                else paramsstuff.append(paramsList.get(i).getClass());
-                if (i<(paramsList.size()-1)) paramsstuff.append(",");
+            for (int i = 0; i < ourParamsList.size(); i++) {
+                if (i>0) paramsstuff.append(",");
+            	paramsstuff.append(ourParamsList.get(i).getClass());
             }
             paramsstuff.append(")");
             IllegalArgumentException ie = new IllegalArgumentException("Could not find constructor for "+paramsstuff);
