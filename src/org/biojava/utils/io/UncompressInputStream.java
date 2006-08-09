@@ -51,6 +51,7 @@ import java.io.*;
  * @version 0.3-3 06/05/2001
  * @author  Ronald Tschalar
  * @author  Unidata Program Center
+ * @author  Richard Holland - making LZW_MAGIC package-visible.
  */
 public class UncompressInputStream extends FilterInputStream {
   /**
@@ -350,7 +351,7 @@ public class UncompressInputStream extends FilterInputStream {
   }
 
 
-  private static final int LZW_MAGIC = 0x1f9d;
+  static final int LZW_MAGIC = 0x1f9d;
   private static final int MAX_BITS = 16;
   private static final int INIT_BITS = 9;
   private static final int HDR_MAXBITS = 0x1f;
