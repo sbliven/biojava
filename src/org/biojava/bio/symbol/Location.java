@@ -222,7 +222,7 @@ public interface Location {
    * <p>
    * Every day, in every way, empty becomes more and more boring.
    */
-  static final Location empty = new EmptyLocation();
+  public static final Location empty = new EmptyLocation();
   
   /**
    * The <code>Location</code> which contains all points.
@@ -233,7 +233,7 @@ public interface Location {
    * everything.
    * </p>
    */
-  static final Location full = new RangeLocation(Integer.MIN_VALUE, Integer.MAX_VALUE);
+  public static final Location full = new RangeLocation(Integer.MIN_VALUE, Integer.MAX_VALUE);
 
   /**
    * Comparator which orders Locations naturally.  Locations
