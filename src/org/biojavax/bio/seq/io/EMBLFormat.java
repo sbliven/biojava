@@ -141,7 +141,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     // reference position line
     protected static final Pattern rpp = Pattern.compile("^(\\d+)(-(\\d+))?,?(\\s\\d+-\\d+,?)*$");
     // dbxref line
-    protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
+    protected static final Pattern dbxp = Pattern.compile("^([^:]+):(\\S+)$");
     
     protected static final Pattern readableFileNames = Pattern.compile(".*\\u002e(em|dat).*");
     protected static final Pattern headerLine = Pattern.compile("^ID.*");

@@ -125,7 +125,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final Pattern refRange = Pattern.compile("^\\s*(\\d+)\\s+to\\s+(\\d+)$");
     protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(?:(\\((?:bases|residues)\\s+(\\d+\\s+to\\s+\\d+(\\s*;\\s*\\d+\\s+to\\s+\\d+)*)\\))|\\(sites\\))?");
     // dbxref line
-    protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
+    protected static final Pattern dbxp = Pattern.compile("^([^:]+):(\\S+)$");
     //sections start at a line and continue till the first line afterwards with a
     //non-whitespace first character
     //we want to match any of the following as a new section within a section

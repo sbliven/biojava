@@ -190,7 +190,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     // reference line
     protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
     // dbxref line
-    protected static final Pattern dbxp = Pattern.compile("^(\\S+?):(\\S+)$");
+    protected static final Pattern dbxp = Pattern.compile("^([^:]+):(\\S+)$");
     
     protected static final Pattern xmlSchema = Pattern.compile(".*http://www\\.ebi\\.ac\\.uk/dtd/INSD_INSDSeq\\.dtd.*");
     
