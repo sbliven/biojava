@@ -1,1 +1,5 @@
 biojava-live.jpx
+ant-build
+.settings
+.classpath
+.project
