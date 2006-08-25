@@ -82,6 +82,7 @@ import org.biojavax.utils.StringTools;
  * @author Mark Schreiber
  * @author David Scott
  * @author Bubba Puryear
+ * @author George Waldon
  * @since 1.5
  */
 public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
@@ -96,26 +97,29 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public static final String GENBANK_FORMAT = "GENBANK";
     
-    protected static final String LOCUS_TAG = "LOCUS";
-    protected static final String ACCESSION_TAG = "ACCESSION";
-    protected static final String VERSION_TAG = "VERSION";
-    protected static final String DEFINITION_TAG = "DEFINITION";
-    protected static final String SOURCE_TAG = "SOURCE";
-    protected static final String ORGANISM_TAG = "ORGANISM";
-    protected static final String REFERENCE_TAG = "REFERENCE";
-    protected static final String KEYWORDS_TAG = "KEYWORDS";
-    protected static final String AUTHORS_TAG = "AUTHORS";
-    protected static final String CONSORTIUM_TAG = "CONSRTM";
-    protected static final String TITLE_TAG = "TITLE";
-    protected static final String JOURNAL_TAG = "JOURNAL";
-    protected static final String PUBMED_TAG = "PUBMED";
-    protected static final String MEDLINE_TAG = "MEDLINE";
-    protected static final String REMARK_TAG = "REMARK";
-    protected static final String COMMENT_TAG = "COMMENT";
-    protected static final String FEATURE_TAG = "FEATURES";
-    protected static final String BASE_COUNT_TAG = "BASE";
-    protected static final String START_SEQUENCE_TAG = "ORIGIN";
-    protected static final String END_SEQUENCE_TAG = "//";
+    protected static final String LOCUS_TAG =           "LOCUS";
+    protected static final String DEFINITION_TAG =      "DEFINITION";
+    protected static final String ACCESSION_TAG =       "ACCESSION";
+    protected static final String VERSION_TAG =         "VERSION";
+    protected static final String KEYWORDS_TAG =        "KEYWORDS";
+    //                                                  "SEGMENT"
+    protected static final String SOURCE_TAG =          "SOURCE";
+    protected static final String ORGANISM_TAG =           "ORGANISM";
+    protected static final String REFERENCE_TAG =       "REFERENCE";
+    protected static final String AUTHORS_TAG =            "AUTHORS";
+    protected static final String CONSORTIUM_TAG =         "CONSRTM";
+    protected static final String TITLE_TAG =              "TITLE";
+    protected static final String JOURNAL_TAG =            "JOURNAL";
+    protected static final String PUBMED_TAG =             "PUBMED";
+    protected static final String MEDLINE_TAG =            "MEDLINE"; //deprecated
+    protected static final String REMARK_TAG =             "REMARK";
+    protected static final String COMMENT_TAG =         "COMMENT";
+    protected static final String FEATURE_TAG =         "FEATURES";
+    protected static final String BASE_COUNT_TAG_FULL = "BASE COUNT"; //deprecated
+    protected static final String BASE_COUNT_TAG =      "BASE";
+    //                                                  "CONTIG"
+    protected static final String START_SEQUENCE_TAG =  "ORIGIN";
+    protected static final String END_SEQUENCE_TAG =    "//";
     
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(?:bp|aa)\\s+([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)\\s*(\\S+)?$");
@@ -779,7 +783,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         oCount++;
                 }
             }
-            this.getPrintStream().print(BASE_COUNT_TAG+"    ");
+            this.getPrintStream().print(BASE_COUNT_TAG_FULL+"    ");
             this.getPrintStream().print(aCount + " a   ");
             this.getPrintStream().print(cCount + " c   ");
             this.getPrintStream().print(gCount + " g   ");
