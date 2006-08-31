@@ -752,44 +752,46 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             }
         }
         
-        if (rs.getAlphabet()==AlphabetManager.alphabetForName("DNA")) {
-            // BASE COUNT     1510 a   1074 c    835 g   1609 t
-            int aCount = 0;
-            int cCount = 0;
-            int gCount = 0;
-            int tCount = 0;
-            int oCount = 0;
-            for (int i = 1; i <= rs.length(); i++) {
-                char c;
-                try {
-                    c = tok.tokenizeSymbol(rs.symbolAt(i)).charAt(0);
-                } catch (Exception e) {
-                    throw new RuntimeException("Unable to get symbol at position "+i,e);
-                }
-                switch (c) {
-                    case 'a': case 'A':
-                        aCount++;
-                        break;
-                    case 'c': case 'C':
-                        cCount++;
-                        break;
-                    case 'g': case 'G':
-                        gCount++;
-                        break;
-                    case 't': case 'T':
-                        tCount++;
-                        break;
-                    default:
-                        oCount++;
-                }
-            }
-            this.getPrintStream().print(BASE_COUNT_TAG_FULL+"    ");
-            this.getPrintStream().print(aCount + " a   ");
-            this.getPrintStream().print(cCount + " c   ");
-            this.getPrintStream().print(gCount + " g   ");
-            this.getPrintStream().print(tCount + " t    ");
-            this.getPrintStream().println(oCount + " others");
-        }
+        //BASE COUNT obsolete in Genbank flatfile format since October 2003
+        //if (rs.getAlphabet()==AlphabetManager.alphabetForName("DNA")) {
+        //    // BASE COUNT     1510 a   1074 c    835 g   1609 t
+        //    int aCount = 0;
+        //    int cCount = 0;
+        //    int gCount = 0;
+        //    int tCount = 0;
+        //    int oCount = 0;
+        //    for (int i = 1; i <= rs.length(); i++) {
+        //        char c;
+        //        try {
+        //            c = tok.tokenizeSymbol(rs.symbolAt(i)).charAt(0);
+        //        } catch (Exception e) {
+        //            throw new RuntimeException("Unable to get symbol at position "+i,e);
+        //        }
+        //        switch (c) {
+        //            case 'a': case 'A':
+        //                aCount++;
+        //                break;
+        //            case 'c': case 'C':
+        //                cCount++;
+        //                break;
+        //            case 'g': case 'G':
+        //                gCount++;
+        //                break;
+        //            case 't': case 'T':
+        //                tCount++;
+        //                break;
+        //            default:
+        //                oCount++;
+        //        }
+        //    }
+        //    
+        //    this.getPrintStream().print(BASE_COUNT_TAG_FULL+"    ");
+        //    this.getPrintStream().print(aCount + " a   ");
+        //    this.getPrintStream().print(cCount + " c   ");
+        //    this.getPrintStream().print(gCount + " g   ");
+        //    this.getPrintStream().print(tCount + " t    ");
+        //    this.getPrintStream().println(oCount + " others");
+        //}
         
         this.getPrintStream().println(START_SEQUENCE_TAG);
         // sequence stuff
