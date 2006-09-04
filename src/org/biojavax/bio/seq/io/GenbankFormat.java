@@ -411,7 +411,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     String val = ((String[])section.get(i))[1];
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
-                        val = val.trim();
+                        val = val.replaceAll("\\s*[\\n\\r]+\\s*"," ").trim();
                         if (val.endsWith("\"")) val = val.substring(1,val.length()-1); // strip quotes
                         // parameter on old feature
                         if (key.equals("db_xref")) {
@@ -451,11 +451,6 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                             if (key.equalsIgnoreCase("translation")) {
                                 // strip spaces from sequence
                                 val = val.replaceAll("\\s+","");
-                            } else {
-                                // replace newlines with single spaces,
-                            	// removing any surrounding spaces at the
-                            	// same time.
-                                val = val.replaceAll("\\s*[\\n\\r]+\\s*"," ");
                             }
                             rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
                         }

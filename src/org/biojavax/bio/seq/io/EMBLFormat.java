@@ -516,7 +516,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     String val = ((String[])section.get(i))[1];
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
-                        val = val.trim();
+                        val = val.replaceAll("\\s*[\\n\\r]+\\s*"," ").trim();
                         if (val.startsWith("\"")) val = val.substring(1,val.length()-1); // strip quotes
                         // parameter on old feature
                         if (key.equalsIgnoreCase("db_xref")) {

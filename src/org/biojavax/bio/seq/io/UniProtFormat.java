@@ -536,7 +536,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 for (int i = 1 ; i < section.size(); i++) {
                     String key = ((String[])section.get(i))[0];
                     String val = ((String[])section.get(i))[1];
-                    val = val.trim();
+                    val = val.replaceAll("\\s*[\\n\\r]+\\s*", " ").trim();
                     if (val.endsWith(".")) val = val.substring(0,val.length()-1); // chomp dot
                     if (key.startsWith("/")) {
                         key = key.substring(1); // strip leading slash
@@ -557,14 +557,12 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         templ.featureRelationshipSet = new TreeSet();
                         templ.rankedCrossRefs = new TreeSet();
                         String desc = null;
-                        val = val.replaceAll("\n", " "); // Nasty hack but we have to do this, sadly.
                         Matcher m = fp.matcher(val);
                         if (m.matches()) {
                             String loc = m.group(1);
                             desc = m.group(3);
                             templ.location = UniProtLocationParser.parseLocation(loc);
                         } else {
-                            System.err.println("XX"+val+"XX");
                             throw new ParseException("Bad feature value: "+val);
                         }
                         rlistener.startFeature(templ);
