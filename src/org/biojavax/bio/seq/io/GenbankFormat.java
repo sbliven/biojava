@@ -41,7 +41,6 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
@@ -104,15 +103,15 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String KEYWORDS_TAG =        "KEYWORDS";
     //                                                  "SEGMENT"
     protected static final String SOURCE_TAG =          "SOURCE";
-    protected static final String ORGANISM_TAG =           "ORGANISM";
+    protected static final String ORGANISM_TAG =        "ORGANISM";
     protected static final String REFERENCE_TAG =       "REFERENCE";
-    protected static final String AUTHORS_TAG =            "AUTHORS";
-    protected static final String CONSORTIUM_TAG =         "CONSRTM";
-    protected static final String TITLE_TAG =              "TITLE";
-    protected static final String JOURNAL_TAG =            "JOURNAL";
-    protected static final String PUBMED_TAG =             "PUBMED";
-    protected static final String MEDLINE_TAG =            "MEDLINE"; //deprecated
-    protected static final String REMARK_TAG =             "REMARK";
+    protected static final String AUTHORS_TAG =         "AUTHORS";
+    protected static final String CONSORTIUM_TAG =      "CONSRTM";
+    protected static final String TITLE_TAG =           "TITLE";
+    protected static final String JOURNAL_TAG =         "JOURNAL";
+    protected static final String PUBMED_TAG =          "PUBMED";
+    protected static final String MEDLINE_TAG =         "MEDLINE"; //deprecated
+    protected static final String REMARK_TAG =          "REMARK";
     protected static final String COMMENT_TAG =         "COMMENT";
     protected static final String FEATURE_TAG =         "FEATURES";
     protected static final String BASE_COUNT_TAG_FULL = "BASE COUNT"; //deprecated
@@ -452,6 +451,11 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                             if (key.equalsIgnoreCase("translation")) {
                                 // strip spaces from sequence
                                 val = val.replaceAll("\\s+","");
+                            } else {
+                                // replace newlines with single spaces,
+                            	// removing any surrounding spaces at the
+                            	// same time.
+                                val = val.replaceAll("\\s*[\\n\\r]+\\s*"," ");
                             }
                             rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
                         }
@@ -864,4 +868,3 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     	return list.toString();
     }
 }
-
