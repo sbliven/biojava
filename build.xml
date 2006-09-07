@@ -13,7 +13,6 @@
     compile-tests     compiles JUnit tests
     compile-demos     compiles the demo files
     compile-apps      compiles the application files
-    docbook           builds HTML from docbook xml files
     package-biojava   builds the biojava.jar file (default)
     package-demos     builds the demos.jar file
     package-apps      builds the jar.apps file
@@ -31,9 +30,10 @@
        ant -Dtest.subtree=org/biojava/bio/seq/** runtests
 
   author:  Michael Heuer,
-           Keith James (JUnit support, DocBook support)
+           Keith James (JUnit support)
            Greg Cox (fixed documentation)
-           Thomas Down (clean up, remove source-copying steps
+           Thomas Down (clean up, remove source-copying steps)
+           Mark Schreiber
   version: $Id$
 
   portions Copyright (c) 1999-2000 The Apache Software Foundation.
@@ -45,7 +45,7 @@
   <!-- Checks environment and setup variables -->
   <target name="init" description="Checks environment and setup variables">
     <tstamp />
-    <property name="version" value="live" />
+    <property name="version" value="1.5 beta" />
 
     <property name="build.compiler" value="javac1.4" />
 
@@ -95,7 +95,6 @@
     <property name="demos.dir" value="./demos" />
     <property name="apps.dir" value="./apps" />
     <property name="docs.dir" value="./docs" />
-    <property name="docbook.dir" value="./docs/docbook" />
     <property name="doc.css.file" value="biojava-doc.css" />
     <property name="reports.dir" value="./reports" />
     <property name="manifest.dir" value="./manifest" />
@@ -528,7 +527,7 @@
 
   <target
     name="javadocs-all"
-    depends="javadocs-taglets,javadocs-biojava,javadocs-demos,javadocs-apps,docbook"
+    depends="javadocs-taglets,javadocs-biojava,javadocs-demos,javadocs-apps"
     description="Creates the javadocs for all components"
   />
 
@@ -581,59 +580,9 @@
     </javadoc>
   </target>
   
-  <!-- Prepares DocBook environment and encloses it from older Ant versions --> 	 
-  <target name="prepare-docbook" depends="prepare" if="outputproperty.support" 	 
-          description="Prepares DocBook environment"> 	 
-     <!-- Check the current system classpath for Trax --> 	 
-     <available classpath="${java.class.path}" 	 
-                classname="javax.xml.transform.Transformer" 	 
-                property="trax.present"> 	 
-     </available> 	 
-     <echo message="Trax API present:                ${trax.present}" /> 	 
- 
-     <!-- Jar file with all DTD and XSL needed -->
-     <property name="docbook.tools.file" value="${docbook.dir}/docbook.jar"/>
-      
-     <!-- DocBook XML DTD path --> 	 
-     <property name="docbook.dir" value="${build.lib}/xml-dtd-4.3" /> 	 
-     <property name="docbook.dtd" value="${docbook.dir}/docbookx.dtd" /> 	 
-  	 
-     <!-- DocBook XML stylesheet path --> 	 
-     <property name="stylesheet.dir" value="${build.lib}/docbook-xsl-1.69.1" /> 	 
-     <property name="docbook.xsl" value="${stylesheet.dir}/html/docbook.xsl" /> 	 
-  	 
-     <!-- DocBook Public ID -->	 
-     <property name="docbook.public.id" value="-//OASIS//DTD DocBook XML V4.3//EN" /> 	 
-  	 
-     <!-- Setup DocBook XML catalog --> 	 
-     <xmlcatalog id="docbook.cat">
-       <dtd publicId="${docbook.public.id}" location="${docbook.dtd}" /> 
-     </xmlcatalog>
-  	 
-     <!-- unjar the DTD and stylesheets for use --> 	 
-     <unjar src="${docbook.tools.file}" dest="${build.lib}"> 	 
-       <patternset> 	 
-         <include name="**" /> 	 
-         <exclude name="META-INF/*" /> 	 
-       </patternset> 	 
-     </unjar> 	 
-  </target>
-  
-  <target name="docbook" depends="prepare-docbook" 
-          description="Converts docbook docs to HTML">
-    <xslt 
-      basedir="${docbook.dir}" 
-      destdir="${build.dest.docs}"
-      includes="*.xml"
-      style="${docbook.xsl}"
-      classpath="${docbook.dir}/saxon.jar"
-      processor="trax"
-     />
-  </target>
-
   <!-- Cleans everything -->
   <target name="clean" depends="init"
-  description="Cleans everything">
+  description="Cleans everything in the build directory">
     <delete dir="${build.dir}" />
   </target>
 </project>
