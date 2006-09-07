@@ -1,5 +1,15 @@
 Biojava & BioSQL Readme
 
+We STRONGLY recommend that you use biojavax and hibernate to interact with biosql
+databases from version 1.5 on. Please refer to 
+http://biojava.org/wiki/BioJava:BioJavaXDocs#BioSQL_and_Hibernate. for details.
+
+Legacy information for biojava 1.4 is provided below. Note that we no longer actively
+support the old biojava-biosql bindings.
+
+
+##LEGACY INFORMATION##
+
 External dependencies
 
 BioJava uses the DBCP, Pool & Collections components of the Jakarta Commons project for its
