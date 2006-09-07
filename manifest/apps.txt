@@ -1,4 +1,3 @@
 Manifest-Version: 1.0
-Class-Path: biojava.jar
+Class-Path: biojava.jar commons-cli.jar  commons-collections-2.1.jar commons-dbcp-1.1.jar  commons-pool-1.1.jar 
 
-Name: resources/org/biojava/bio/seq/tools/AlphabetManager.xml

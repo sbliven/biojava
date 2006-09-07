@@ -1,4 +1,3 @@
 Manifest-Version: 1.0
-Class-Path: bytecode.jar grammars.jar
+Class-Path: bytecode.jar
 
-Name: resources/org/biojava/bio/seq/tools/AlphabetManager.xml
