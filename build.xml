@@ -45,7 +45,7 @@
   <!-- Checks environment and setup variables -->
   <target name="init" description="Checks environment and setup variables">
     <tstamp />
-    <property name="version" value="1.5 beta" />
+    <property name="version" value="1.5-beta" />
 
     <property name="build.compiler" value="javac1.4" />
 
@@ -144,8 +144,6 @@
     <property name="build.docs.apps" value="${build.dest.docs}/${name.apps}" />
     <property name="jar.apps" value="${build.dir}/${name.apps}.jar" />
     <property name="manifest.file.apps" value="${manifest.dir}/${name.apps}.txt" />
-    <!-- Subdirectory for libraries used during build -->
-    <property name="build.lib" value="${build.dir}/lib" />
     <!-- Subdirectory for taglets -->
     <property name="name.taglets" value="taglets" />
     <property name="Name.taglets" value="BioJava Taglets" />
@@ -167,7 +165,6 @@
   <target name="prepare" depends="init" description="creates basic directories">
     <!-- Creates directories -->
     <mkdir dir="${build.dir}" />
-    <mkdir dir="${build.lib}" />
 
     <!-- Copies jars -->
     <copy todir="${build.dir}">
@@ -582,7 +579,92 @@
   
   <!-- Cleans everything -->
   <target name="clean" depends="init"
-  description="Cleans everything in the build directory">
+  description="Cleans everything">
     <delete dir="${build.dir}" />
   </target>
+  
+  <!-- Cleans the dist directory -->
+  <target name="clean-dist" depends="init" description="Cleans the dist root directory">
+      <delete dir="${dist.root}" />
+  </target>
+  
+  
+  <target name="dist" depends="clean-dist, init, javadocs-all, package-all" description="copy all the files for a distribution">
+      <mkdir dir="${dist.root}"/>
+      <mkdir dir="${dist.dir}"/>
+      
+      <!-- copy the biojava-jar -->
+      <copy file="${jar.biojava}" tofile="${dist.dir}/${name.biojava}-${version}.jar"/>
+      
+      <!-- copy the apps-jar -->
+      <copy file="${jar.apps}" tofile="${dist.dir}/apps-${version}.jar"/>
+      
+      <!-- copy the demos.jar -->
+      <copy file="${jar.demos}" tofile="${dist.dir}/demos-${version}.jar"/>
+      
+      <!-- copy the lib jars -->
+      <copy todir="${dist.dir}/lib">
+        <fileset dir=".">
+          <include name="*.jar" />
+        </fileset>
+      </copy>
+      
+      <!-- copy the docs -->
+      <copy todir="${dist.dir}/doc">
+          <fileset dir="${build.dest.docs}"/>
+      </copy>
+      
+      <!-- copy biojava src -->
+      <copy todir="${dist.dir}/src">
+          <fileset dir="${src.dir}"/>
+      </copy>
+      
+      <!-- copy READMEs -->
+      <copy tofile="${dist.dir}/README" file="./README"/>
+      <copy tofile="${dist.dir}/README.biosql" file="./README.biosql"/>
+      
+      <!-- copy tests -->
+      <copy todir="${dist.dir}/tests">
+          <fileset dir="${tests.dir}"/>
+      </copy>
+      
+      <!-- copy demo src -->
+      <copy todir="${dist.dir}/demos">
+          <fileset dir="${demos.dir}"/>
+      </copy>
+      
+      <!-- copy apps src -->
+      <copy todir="${dist.dir}/apps">
+          <fileset dir="${apps.dir}"/>
+      </copy>
+      
+      <!-- copy licenses -->
+      <copy tofile="${dist.dir}/LICENSE" file="./LICENSE"/>
+      <copy tofile="${dist.dir}/LICENSE.COMMONS" file="./LICENSE.COMMONS"/>
+      
+      <!-- copy manifest -->
+      <copy todir="${dist.dir}/manifest">
+          <fileset dir="${manifest.dir}"/>
+      </copy>
+      
+      <!-- copy dtd -->
+      <copy todir="${dist.dir}/dtd">
+          <fileset dir="./dtd"/>
+      </copy>
+      
+      <!-- copy taglets -->
+      <copy todir="${dist.dir}/taglets">
+          <fileset dir="${taglets.dir}"/>
+      </copy>
+      
+      <!-- copy resources -->
+      <copy todir="${dist.dir}/resources">
+          <fileset dir="${resources.dir}"/>
+      </copy>
+      
+      <!-- copy this build file -->
+      <copy file="${ant.file}" tofile="${dist.dir}/build.xml"/>
+      
+  </target>
+  
 </project>
