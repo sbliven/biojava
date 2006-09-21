@@ -45,7 +45,7 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.ManyToOneTranslationTable;
 import org.biojava.bio.symbol.ReversibleTranslationTable;
-import org.biojava.bio.symbol.SimpleManyToOneTranslationTable;
+import org.biojava.bio.symbol.SimpleGeneticCodeTable;
 import org.biojava.bio.symbol.SimpleReversibleTranslationTable;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
@@ -67,6 +67,7 @@ import org.xml.sax.InputSource;
  * @author Greg Cox
  * @author Mark Schreiber
  * @author David Huen (refactoring)
+ * @author gwaldon (update genetic code translation tables)
  */
 public final class RNATools {
   private static final ReversibleTranslationTable complementTable;
@@ -354,18 +355,21 @@ public final class RNATools {
    *
    * <ul>
    * <li>"UNIVERSAL"</li>
-   * <li>"BACTERIAL"</li>
-   * <li>"YEAST_MITOCHONDRIAL"</li>
    * <li>"VERTEBRATE_MITOCHONDRIAL"</li>
+   * <li>"YEAST_MITOCHONDRIAL"</li>
    * <li>"MOLD_MITOCHONDRIAL"</li>
    * <li>"INVERTEBRATE_MITOCHONDRIAL"</li>
+   * <li>"CILIATE_NUCLEAR"</li>
    * <li>"ECHINODERM_MITOCHONDRIAL"</li>
+   * <li>"EUPLOTID_NUCLEAR"</li>
+   * <li>"BACTERIAL"</li>
+   * <li>"ALTERNATIVE_YEAST_NUCLEAR"</li>
    * <li>"ASCIDIAN_MITOCHONDRIAL"</li>
    * <li>"FLATWORM_MITOCHONDRIAL"</li>
-   * <li>"CILIATE_NUCLEAR"</li>
-   * <li>"EUPLOTID_NUCLEAR"</li>
-   * <li>"ALTERNATIVE_YEAST_NUCLEAR"</li>
    * <li>"BLEPHARISMA_MACRONUCLEAR"</li>
+   * <li>"CHLOROPHYCEAN_MITOCHONDRIAL"</li>
+   * <li>"TREMATODE_MITOCHONDRIAL"</li>
+   * <li>"SCENEDESMUS_MITOCHONDRIAL"</li>
    * </ul>
    *
    * There are public static final fields in the TranslationTable
@@ -380,7 +384,51 @@ public final class RNATools {
   public static ManyToOneTranslationTable getGeneticCode(String name) {
     return (ManyToOneTranslationTable) geneticCodes.get(name);
   }
-
+  
+  /**
+   * Retrieve a TranslationTable by number.
+   * These numbers correspond to the transl_table qualifier in the
+   * DDBJ/EMBL/GenBank Feature Table (Version 6.5  Apr 2006): transl_table
+   * defines the genetic code table used if other than the universal 
+   * genetic code table. Tables are described in appendix V,
+   * section 7.5.5:
+   *
+   * <ul>
+   * <li>" 1 - UNIVERSAL"</li>
+   * <li>" 2 - VERTEBRATE_MITOCHONDRIAL"</li>
+   * <li>" 3 - YEAST_MITOCHONDRIAL"</li>
+   * <li>" 4 - MOLD_MITOCHONDRIAL"</li>
+   * <li>" 5 - INVERTEBRATE_MITOCHONDRIAL"</li>
+   * <li>" 6 - CILIATE_NUCLEAR"</li>
+   * <li>" 9 - ECHINODERM_MITOCHONDRIAL"</li>
+   * <li>"10 - EUPLOTID_NUCLEAR"</li>
+   * <li>"11 - BACTERIAL"</li>
+   * <li>"12 - ALTERNATIVE_YEAST_NUCLEAR"</li>
+   * <li>"13 - ASCIDIAN_MITOCHONDRIAL"</li>
+   * <li>"14 - FLATWORM_MITOCHONDRIAL"</li>
+   * <li>"15 - BLEPHARISMA_MACRONUCLEAR"</li>
+   * <li>"16 - 2CHLOROPHYCEAN_MITOCHONDRIAL"</li>
+   * <li>"21 - TREMATODE_MITOCHONDRIAL"</li>
+   * <li>"23 - SCENEDESMUS_MITOCHONDRIAL"</li>
+   * </ul>
+   *
+   * @throw IllegalArgumentException if there is no table with that number.
+   *
+   * @author gwaldon
+   * @since 1.5
+   */
+  public static ManyToOneTranslationTable getGeneticCode(int table_num) {
+      Set tables = getGeneticCodeNames();
+      Iterator it = tables.iterator();
+      while(it.hasNext()) {
+          String tableName = (String) it.next();
+          SimpleGeneticCodeTable table = (SimpleGeneticCodeTable) geneticCodes.get(tableName);
+          if(table.getTableNumber()==table_num)
+              return table;
+      }
+      throw new IllegalArgumentException("There is no genetic code table at that number");
+  }
+  
   /**
    * Retrieve a Set containing the name of each genetic code.
    *
@@ -439,7 +487,7 @@ public final class RNATools {
             (FiniteAlphabet) AlphabetManager.alphabetForName(target);
           SymbolTokenization sourceP = sourceA.getTokenization("name");
           SymbolTokenization targetP = targetA.getTokenization("name");
-          SimpleManyToOneTranslationTable table = new SimpleManyToOneTranslationTable(
+          SimpleGeneticCodeTable table = new SimpleGeneticCodeTable (
             sourceA,
             targetA
           );
@@ -449,6 +497,13 @@ public final class RNATools {
             Node tn = translates.item(j);
             if(tn instanceof Element) {
               Element te = (Element) tn;
+              if(te.getTagName().equals("transl_table")) {
+                  int num = Integer.valueOf(te.getAttribute("value")).intValue();
+                  String description = te.getAttribute("description");
+                  table.setTableNumber(num);
+                  table.setDescription(description);
+                  continue;
+              }
               String from = te.getAttribute("from");
               String to = te.getAttribute("to");
 

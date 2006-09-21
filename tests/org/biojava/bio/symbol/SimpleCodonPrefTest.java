@@ -106,7 +106,9 @@ public class SimpleCodonPrefTest extends TestCase
 
                 // filter out selenocysteine!
                 if (residue.getName().equals("SEC")) continue;
-
+                // filter out pyrrolysine!
+                if (residue.getName().equals("PYL")) continue;
+                
                 Distribution synonymUse = testPref.getFrequencyForSynonyms(residue);
                 assertNotNull(synonymUse);
 

@@ -37,6 +37,7 @@ import junit.framework.TestCase;
  * tests.
  *
  * @author Mark Schreiber
+ * @author gwaldon (pyrrolysine)
  */
 public class ProteinToolsTest extends TestCase
 {
@@ -73,7 +74,7 @@ public class ProteinToolsTest extends TestCase
     public void testCreateProtein() throws Exception
     {
         SymbolList aa = ProteinTools.createProtein(
-          "arndcqeghilkmfpstwyvu*x");
+          "arndcqeghilkmfpstwyvuo*x");
 
         assertTrue(aa.symbolAt(1) == ProteinTools.a());
         assertTrue(aa.symbolAt(1) == ProteinTools.ala());
@@ -138,7 +139,10 @@ public class ProteinToolsTest extends TestCase
         assertTrue(aa.symbolAt(21) == ProteinTools.u());
         assertTrue(aa.symbolAt(21) == ProteinTools.sec());
 
-        assertTrue(aa.symbolAt(22) == ProteinTools.ter());
+        assertTrue(aa.symbolAt(22) == ProteinTools.o());
+        assertTrue(aa.symbolAt(22) == ProteinTools.pyl());
+        
+        assertTrue(aa.symbolAt(23) == ProteinTools.ter());
     }
 }
 

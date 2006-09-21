@@ -61,6 +61,7 @@ import org.xml.sax.InputSource;
  * @author Thomas Down
  * @author MarkSchreiber
  * @author Jonathan Warren
+ * @author gwaldon (pyrrolysine)
  */
 public class ProteinTools {
     private static final FiniteAlphabet proteinAlpha;
@@ -496,6 +497,38 @@ public class ProteinTools {
 
   /**
    * Returns the <code>AtomicSymbol</code> for the amino acid
+   * Pyrrolysine (O)
+   */
+  public static AtomicSymbol pyl() {
+    return (AtomicSymbol) tokenToSymbol.get("O");
+  }
+
+  /**
+   * Returns the <code>AtomicSymbol</code> for the amino acid
+   * Pyrrolysine
+   */
+  public static AtomicSymbol o() {
+    return pyl();
+  }
+
+  /**
+   * Returns the <code>AtomicSymbol</code> for the amino acid
+   * Selenocysteine (U)
+   */
+  public static AtomicSymbol sec() {
+    return (AtomicSymbol) tokenToSymbol.get("U");
+  }
+
+  /**
+   * Returns the <code>AtomicSymbol</code> for the amino acid
+   * Selenocysteine
+   */
+   public static AtomicSymbol u(){
+     return sec();
+   }
+   
+  /**
+   * Returns the <code>AtomicSymbol</code> for the amino acid
    * Serine (S)
    */
   public static AtomicSymbol ser() {
@@ -572,23 +605,6 @@ public class ProteinTools {
   public static AtomicSymbol v() {
     return val();
   }
-
-
-  /**
-   * Returns the <code>AtomicSymbol</code> for the amino acid
-   * Selenocysteine (U)
-   */
-  public static AtomicSymbol sec() {
-    return (AtomicSymbol) tokenToSymbol.get("U");
-  }
-
-  /**
-   * Returns the <code>AtomicSymbol</code> for the amino acid
-   * Selenocysteine
-   */
-   public static AtomicSymbol u(){
-     return sec();
-   }
 
 
    /**

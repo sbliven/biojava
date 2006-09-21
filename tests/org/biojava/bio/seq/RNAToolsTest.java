@@ -44,6 +44,7 @@ import java.util.*;
  * be tested in their own unit tests.
  *
  * @author Moses Hohman
+ * @author gwaldon
  */
 public class RNAToolsTest extends TestCase {
     public RNAToolsTest(String name){
@@ -253,6 +254,22 @@ public class RNAToolsTest extends TestCase {
                     assertEquals(residue, xlatedResidue);
                 }
             }
+            
+            // The following test is dependant of the DDBJ/EMBL/GenBank Feature Table,
+            // Version 6.5  Apr 2006.
+            // get all table names
+            Set tableNames = RNATools.getGeneticCodeNames();
+            assertEquals(17,tableNames.size()); //total 17 tables
+            
+            //test standard table
+            ManyToOneTranslationTable geneticCode1 = RNATools.getGeneticCode(TranslationTable.UNIVERSAL);
+            ManyToOneTranslationTable geneticCode2 = RNATools.getGeneticCode(1);
+            assertEquals((Object)geneticCode1, (Object)geneticCode2);
+            String description = ((SimpleGeneticCodeTable)geneticCode2).getDescription();
+            assertEquals(description,"Standard Code");
+            int number = ((SimpleGeneticCodeTable)geneticCode2).getTableNumber();
+            assertEquals(1,number);
+     
         }
         catch (IllegalSymbolException ise) {
         }

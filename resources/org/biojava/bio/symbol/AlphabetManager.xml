@@ -4,6 +4,7 @@
    -
    - @author Matthew Pocock
    - @author Thomas Down 
+   - @author gwaldon
   -->
 
 <!DOCTYPE alphabetManager [
@@ -430,13 +431,16 @@
     <symbol name="urn:lsid:biojava.org:symbol:PRO">
     </symbol>
 
+    <symbol name="urn:lsid:biojava.org:symbol:PYL">
+    </symbol>
+
+    <symbol name="urn:lsid:biojava.org:symbol:SEC">
+    </symbol>
+
     <symbol name="urn:lsid:biojava.org:symbol:SER">
     </symbol>
 
     <symbol name="urn:lsid:biojava.org:symbol:THR">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:SEC">
     </symbol>
 
     <symbol name="urn:lsid:biojava.org:symbol:TRP">
@@ -509,16 +513,20 @@
         <symbolref name="urn:lsid:biojava.org:symbol:PRO" />
       </atomicMapping>
 
+      <atomicMapping token="O">
+        <symbolref name="urn:lsid:biojava.org:symbol:PYL" />
+      </atomicMapping>
+
+      <atomicMapping token="U">
+        <symbolref name="urn:lsid:biojava.org:symbol:SEC" />
+      </atomicMapping>
+
       <atomicMapping token="S">
         <symbolref name="urn:lsid:biojava.org:symbol:SER" />
       </atomicMapping>
 
       <atomicMapping token="T">
         <symbolref name="urn:lsid:biojava.org:symbol:THR" />
-      </atomicMapping>
-
-      <atomicMapping token="U">
-        <symbolref name="urn:lsid:biojava.org:symbol:SEC" />
       </atomicMapping>
 
       <atomicMapping token="W">
@@ -549,9 +557,10 @@
         <symbolref name="urn:lsid:biojava.org:symbol:MET"/>
         <symbolref name="urn:lsid:biojava.org:symbol:PHE"/>
         <symbolref name="urn:lsid:biojava.org:symbol:PRO"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:PYL"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:SEC"/>
         <symbolref name="urn:lsid:biojava.org:symbol:SER"/>
         <symbolref name="urn:lsid:biojava.org:symbol:THR"/>
-        <symbolref name="urn:lsid:biojava.org:symbol:SEC"/>
         <symbolref name="urn:lsid:biojava.org:symbol:TRP"/>
         <symbolref name="urn:lsid:biojava.org:symbol:TYR"/>
         <symbolref name="urn:lsid:biojava.org:symbol:VAL"/>
@@ -560,6 +569,11 @@
       <ambiguityMapping token="B">
         <symbolref name="urn:lsid:biojava.org:symbol:ASP" />
 	<symbolref name="urn:lsid:biojava.org:symbol:ASN" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="J">
+        <symbolref name="urn:lsid:biojava.org:symbol:ILE" />
+	<symbolref name="urn:lsid:biojava.org:symbol:LEU" />
       </ambiguityMapping>
 
       <ambiguityMapping token="Z">
@@ -649,16 +663,20 @@
         <symbolref name="urn:lsid:biojava.org:symbol:PRO" />
       </atomicMapping>
 
+      <atomicMapping token="O">
+        <symbolref name="urn:lsid:biojava.org:symbol:PYL" />
+      </atomicMapping>
+
+      <atomicMapping token="U">
+        <symbolref name="urn:lsid:biojava.org:symbol:SEC" />
+      </atomicMapping>
+
       <atomicMapping token="S">
         <symbolref name="urn:lsid:biojava.org:symbol:SER" />
       </atomicMapping>
 
       <atomicMapping token="T">
         <symbolref name="urn:lsid:biojava.org:symbol:THR" />
-      </atomicMapping>
-
-      <atomicMapping token="U">
-        <symbolref name="urn:lsid:biojava.org:symbol:SEC" />
       </atomicMapping>
 
       <atomicMapping token="W">
@@ -689,9 +707,10 @@
         <symbolref name="urn:lsid:biojava.org:symbol:MET"/>
         <symbolref name="urn:lsid:biojava.org:symbol:PHE"/>
         <symbolref name="urn:lsid:biojava.org:symbol:PRO"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:PYL"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:SEC"/>
         <symbolref name="urn:lsid:biojava.org:symbol:SER"/>
         <symbolref name="urn:lsid:biojava.org:symbol:THR"/>
-        <symbolref name="urn:lsid:biojava.org:symbol:SEC"/>
         <symbolref name="urn:lsid:biojava.org:symbol:TRP"/>
         <symbolref name="urn:lsid:biojava.org:symbol:TYR"/>
         <symbolref name="urn:lsid:biojava.org:symbol:VAL"/>
@@ -713,9 +732,10 @@
         <symbolref name="urn:lsid:biojava.org:symbol:MET"/>
         <symbolref name="urn:lsid:biojava.org:symbol:PHE"/>
         <symbolref name="urn:lsid:biojava.org:symbol:PRO"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:PYL"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:SEC"/>
         <symbolref name="urn:lsid:biojava.org:symbol:SER"/>
         <symbolref name="urn:lsid:biojava.org:symbol:THR"/>
-        <symbolref name="urn:lsid:biojava.org:symbol:SEC"/>
         <symbolref name="urn:lsid:biojava.org:symbol:TRP"/>
         <symbolref name="urn:lsid:biojava.org:symbol:TYR"/>
         <symbolref name="urn:lsid:biojava.org:symbol:VAL"/>
@@ -725,6 +745,11 @@
       <ambiguityMapping token="B">
         <symbolref name="urn:lsid:biojava.org:symbol:ASP" />
 	<symbolref name="urn:lsid:biojava.org:symbol:ASN" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="J">
+        <symbolref name="urn:lsid:biojava.org:symbol:ILE" />
+	<symbolref name="urn:lsid:biojava.org:symbol:LEU" />
       </ambiguityMapping>
 
       <ambiguityMapping token="Z">

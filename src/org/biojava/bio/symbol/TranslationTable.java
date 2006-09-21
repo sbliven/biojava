@@ -56,16 +56,16 @@ public interface TranslationTable {
     public static final String UNIVERSAL = "UNIVERSAL";
 
     /**
-     * Translation table name for the yeast mitochondrial genetic
-     * code.
-     */
-    public static final String YEAST_MITO = "YEAST_MITOCHONDRIAL";
-
-    /**
      * Translation table name for the vertebrate mitochondrial genetic
      * code.
      */
     public static final String VERT_MITO = "VERTEBRATE_MITOCHONDRIAL";
+
+    /**
+     * Translation table name for the yeast mitochondrial genetic
+     * code.
+     */
+    public static final String YEAST_MITO = "YEAST_MITOCHONDRIAL";
 
     /**
      * Translation table name for the mold mitochondrial genetic code.
@@ -79,10 +79,31 @@ public interface TranslationTable {
     public static final String INVERT_MITO = "INVERTEBRATE_MITOCHONDRIAL";
 
     /**
+     * Translation table name for the ciliate nuclear genetic code.
+     */
+    public static final String CILIATE_NUC = "CILIATE_NUCLEAR";
+
+    /**
      * Translation table name for the echinoderm mitochondrial genetic
      * code.
      */
     public static final String ECHIN_MITO = "ECHINODERM_MITOCHONDRIAL";
+
+    /**
+     * Translation table name for the euplotid nuclear genetic code.
+     */
+    public static final String EUPL_NUC = "EUPLOTID_NUCLEAR";
+    
+    /**
+     * Translation table name for the bacterial and plant plastid genetic code.
+     */
+    public static final String BACTERIAL = "BACTERIAL";
+
+    /**
+     * Translation table name for the alternative yeast nuclear
+     * genetic code.
+     */
+    public static final String ALT_YEAST_NUC = "ALTERNATIVE_YEAST_NUCLEAR";
 
     /**
      * Translation table name for the ascidian mitochondrial genetic
@@ -97,26 +118,25 @@ public interface TranslationTable {
     public static final String FWORM_MITO = "FLATWORM_MITOCHONDRIAL";
 
     /**
-     * Translation table name for the ciliate nuclear genetic code.
-     */
-    public static final String CILIATE_NUC = "CILIATE_NUCLEAR";
-
-    /**
-     * Translation table name for the euplotid nuclear genetic code.
-     */
-    public static final String EUPL_NUC = "EUPLOTID_NUCLEAR";
-
-    /**
-     * Translation table name for the alternative yeast nuclear
-     * genetic code.
-     */
-    public static final String ALT_YEAST_NUC = "ALTERNATIVE_YEAST_NUCLEAR";
-
-    /**
      * Translation table name for the blepharisma macronuclear genetic
      * code.
      */
     public static final String BLEPH_MNUC = "BLEPHARISMA_MACRONUCLEAR";
+    /**
+     * Translation table name for the chlorophycean mitochondrial genetic
+     * code.
+     */
+    public static final String CHLORO_MITO = "CHLOROPHYCEAN_MITOCHONDRIAL";
+    /**
+     * Translation table name for the trematode mitochondrial genetic
+     * code.
+     */
+    public static final String TREMA_MITO = "TREMATODE_MITOCHONDRIAL";
+    /**
+     * Translation table name for the scenedesmus obliquus mitochondrial genetic
+     * code.
+     */
+    public static final String SCENE_MITO = "SCENEDESMUS_MITOCHONDRIAL";
 
   /**
    * The alphabet of Symbols that can be translated.

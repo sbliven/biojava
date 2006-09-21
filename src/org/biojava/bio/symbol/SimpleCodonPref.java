@@ -46,6 +46,7 @@ import org.biojava.utils.ChangeListener;
  * codon preference data.
  *
  * @author David Huen
+ * @author gwaldon pyrrolysine
  * @since 1.3
  */
 public class SimpleCodonPref
@@ -122,9 +123,12 @@ public class SimpleCodonPref
             for (Iterator residueI = ProteinTools.getTAlphabet().iterator(); residueI.hasNext(); ) {
                 Symbol residue = (Symbol) residueI.next();
 
+                
                 // filter out selenocysteine!
                 if (residue.getName().equals("SEC")) continue;
-
+                // filter out pyrrolysine!
+                if (residue.getName().equals("PYL")) continue;
+                
                 // get the synonymous codons and sum their frequencies
                 double residueFreq = 0.0;
                 Set synonyms = getGeneticCode().untranslate(residue);
@@ -170,7 +174,9 @@ public class SimpleCodonPref
 
                 // filter out selenocysteine!
                 if (residue.getName().equals("SEC")) continue;
-
+                // filter out pyrrolysine!
+                if (residue.getName().equals("PYL")) continue;
+                
                 // create bins keyed on non-wobble bases
                 IndexedCount nonWobbleCounts = new IndexedCount(nonWobbleAlfa);;
                 IndexedCount wobbleCounts;
