@@ -32,111 +32,116 @@ import java.util.NoSuchElementException;
  * @author Andreas Prlic
  * @since 1.4
  * @version %I% %G%
-*/
+ */
 
 public class AtomIterator implements Iterator {
     Structure structure     ;
     Group     group         ;
     int current_atom_pos    ;
     GroupIterator groupiter ;
-
+    
     /**
      * Constructs an AtomIterator object.
      *
      * @param struct  a Structure object
      */
     public AtomIterator(Structure struct) {
-	structure = struct;
-	current_atom_pos = -1 ;
-	
-	groupiter = new GroupIterator(structure) ;
-	if ( groupiter.hasNext() ) {
-	    group = (Group) groupiter.next() ;
-	}
-	else 
-	    group = null ;
+        structure = struct;
+        current_atom_pos = -1 ;
+        
+        groupiter = new GroupIterator(structure) ;
+        if ( groupiter.hasNext() ) {
+            group = (Group) groupiter.next() ;
+        }
+        else 
+            group = null ;
     }
-
+    
     /**
      * Constructs an AtomIterator object.
      *
      * @param g  a Group object
      */
     public AtomIterator(Group g) {
-	structure = null;
-	group = g ;
-	current_atom_pos = -1 ;
-	groupiter = null ;
-	
-
+        structure = null;
+        group = g ;
+        current_atom_pos = -1 ;
+        groupiter = null ;
+        
+        
     }
-
+    
     /** is there a next atom ? */
     public boolean hasNext() {
-	
-	// if there is another group ...
-	if ( current_atom_pos < group.size()-1 ) {	    
-	    return true ;
-	} else { 
-	    // search through the next groups if they contain an atom
-	    if (groupiter != null) {
-		GroupIterator tmp = (GroupIterator) groupiter.clone() ;
-		while (tmp.hasNext()) {
-		    Group tmpg = (Group) tmp.next() ;
-		    
-		    if ( tmpg.size() > 0 ) {
-			return true ;
-		    }
-		    
-		}
-	    } else {
-		// just an iterator over one group ...
-		return false ;
-	    }
-	}
-	return false ;
+        
+        // trying to iterate over an empty structure...
+        
+        if ( group == null)
+            return false;
+        
+        // if there is another group ...
+        if ( current_atom_pos < group.size()-1 ) {	    
+            return true ;
+        } else { 
+            // search through the next groups if they contain an atom
+            if (groupiter != null) {
+                GroupIterator tmp = (GroupIterator) groupiter.clone() ;
+                while (tmp.hasNext()) {
+                    Group tmpg = (Group) tmp.next() ;
+                    
+                    if ( tmpg.size() > 0 ) {
+                        return true ;
+                    }
+                    
+                }
+            } else {
+                // just an iterator over one group ...
+                return false ;
+            }
+        }
+        return false ;
     }
-
+    
     /** return next atom.
      *
      * @return the next Atom
      * @throws NoSuchElementException ...
      */
     public Object next() 
-	throws NoSuchElementException
+    throws NoSuchElementException
     {
-	current_atom_pos++ ;
-	if ( current_atom_pos >= group.size() ) {
-	    if ( groupiter == null ) {
-		throw new NoSuchElementException("no more atoms found in group!");
-		
-	    }
-	    if ( groupiter.hasNext() ) {
-		group = (Group) groupiter.next() ;
-		current_atom_pos = -1 ;
-		return next();
-	    } else {
-		throw new NoSuchElementException("no more atoms found in structure!");
-	    }
-	} 
-
-	Atom a ;
-	
-	try {
-	    a = group.getAtom(current_atom_pos);
-	} catch (StructureException e) {
-	    System.out.println("current_atom_pos " + current_atom_pos + " group " + group + "size:" + group.size());
-	    e.printStackTrace();
-	    throw new NoSuchElementException("error wile trying to retrieve atom");
-	}
-	
-	return a ;
-	
+        current_atom_pos++ ;
+        if ( current_atom_pos >= group.size() ) {
+            if ( groupiter == null ) {
+                throw new NoSuchElementException("no more atoms found in group!");
+                
+            }
+            if ( groupiter.hasNext() ) {
+                group = (Group) groupiter.next() ;
+                current_atom_pos = -1 ;
+                return next();
+            } else {
+                throw new NoSuchElementException("no more atoms found in structure!");
+            }
+        } 
+        
+        Atom a ;
+        
+        try {
+            a = group.getAtom(current_atom_pos);
+        } catch (StructureException e) {
+            System.out.println("current_atom_pos " + current_atom_pos + " group " + group + "size:" + group.size());
+            e.printStackTrace();
+            throw new NoSuchElementException("error wile trying to retrieve atom");
+        }
+        
+        return a ;
+        
     }
-
+    
     /** does nothing. */
     public void remove() {
     }
-
-}
     
+}
+
