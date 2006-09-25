@@ -44,4 +44,10 @@ public interface Comment extends Comparable {
      */
     public int getRank();
     
+    /**
+     * Sets the rank of this comment.
+     * @param rank the rank.
+     */
+    public void setRank(int rank);
+    
 }

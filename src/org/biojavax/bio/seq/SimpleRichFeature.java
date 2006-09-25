@@ -663,19 +663,31 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     
     /**
      * {@inheritDoc}
-     * Features are sorted by rank only. However, equal ranks are
-     * acceptable, so -1 is returned if the ranks are equal.
+     * Features are sorted in order of parent, type, source
+     * and rank. If both parents are not comparable then this part 
+     * of the sorting is skipped. If it comes down to rank and the
+     * object is not a RichFeature then we cannot assume identity,
+     * so we always return -1.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
         if (this.parent==null) return -1;
         // Normal comparison
         Feature them = (Feature)o;
+        if (this.parent instanceof Comparable && 
+        		them.getParent() instanceof Comparable && 
+        		!this.parent.equals(them.getParent())) 
+        	return ((Comparable)this.parent).compareTo(them.getParent());
+        if (! this.typeTerm.equals(them.getTypeTerm())) 
+        	this.typeTerm.compareTo(them.getTypeTerm());
+        if (! this.sourceTerm.equals(them.getSourceTerm())) 
+        	this.sourceTerm.compareTo(them.getSourceTerm());
         if (them instanceof RichFeature) {
             RichFeature rfo = (RichFeature)them;
-            if (this.rank!=rfo.getRank()) return this.rank-rfo.getRank();
+            return this.rank-rfo.getRank();
         }
-        return -1; // because multiple equal items are allowed
+        return -1;  // because if we can't sort by rank, then we
+        			// can't assume identity
     }
     
     /**

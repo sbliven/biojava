@@ -75,8 +75,10 @@ public class SimpleRankedDocRef implements RankedDocRef {
     // Hibernate requirement - not for public use.
     protected SimpleRankedDocRef() {}
     
-    // Hibernate requirement - not for public use.
-    private void setRank(int rank) { this.rank = rank; }
+    /**
+     * {@inheritDoc}
+     */
+    public void setRank(int rank) { this.rank = rank; }
     
     /**
      * {@inheritDoc}
@@ -150,7 +152,7 @@ public class SimpleRankedDocRef implements RankedDocRef {
    /**
      * {@inheritDoc}
      * Two ranked document references are equal if they have the same rank 
-     * and refer to the same document reference.
+     * and refer to the same location and same document reference.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -160,13 +162,14 @@ public class SimpleRankedDocRef implements RankedDocRef {
         // Normal comparison
         RankedDocRef them = (RankedDocRef)obj;
         return (this.rank==them.getRank() &&
+        		this.location.equals(them.getLocation()) && 
                 this.docref.equals(them.getDocumentReference()));
     }
     
     /**
      * {@inheritDoc}
-     * Ranked document references are sorted first by rank then by actual
-     * document reference.
+     * Ranked document references are sorted first by rank then location
+     * then by actual document reference.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
@@ -174,6 +177,7 @@ public class SimpleRankedDocRef implements RankedDocRef {
         // Normal comparison
         RankedDocRef them = (RankedDocRef)o;
         if (this.rank!=them.getRank()) return this.rank - them.getRank();
+        if (this.location!=them.getLocation()) return this.location.compareTo(them.getLocation());
         return this.docref.compareTo(them.getDocumentReference());
     }
     
@@ -186,6 +190,7 @@ public class SimpleRankedDocRef implements RankedDocRef {
         if (this.docref==null) return code;
         // Normal comparison
         code = 37*code + this.docref.hashCode();
+        code = 37*code + this.location.hashCode();
         code = 37*code + this.rank;
         return code;
     }

@@ -55,8 +55,10 @@ public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef
      */
     public CrossRef getCrossRef() { return this.crossref; }
     
-    // Hibernate requirement - not for public use.
-    private void setRank(int rank) { this.rank = rank; }
+    /**
+     * {@inheritDoc}
+     */
+    public void setRank(int rank) { this.rank = rank; }
     
     /**
      * {@inheritDoc}

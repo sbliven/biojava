@@ -43,4 +43,10 @@ public interface RankedCrossRef extends Comparable,Changeable {
      */
     public int getRank();
     
+    /**
+     * Set the rank associated with the cross reference.
+     * @param rank the rank.
+     */
+    public void setRank(int rank);
+    
 }

@@ -53,8 +53,10 @@ public class SimpleComment implements Comment {
      */
     public String getComment() { return this.comment; }
     
-    // Hibernate requirement - not for public use.
-    private void setRank(int rank) { this.rank = rank; }
+    /**
+     * {@inheritDoc}
+     */
+    public void setRank(int rank) { this.rank = rank; }
     
     /**
      * {@inheritDoc}

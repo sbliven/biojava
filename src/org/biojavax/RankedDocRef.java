@@ -72,6 +72,12 @@ public interface RankedDocRef extends Comparable {
      * @return the rank.
      */
     public int getRank();
+    
+    /**
+     * Sets the rank of this reference.
+     * @param rank the rank.
+     */
+    public void setRank(int rank);
 }
 
 
