@@ -50,6 +50,10 @@ public class Calc {
     // 180 / pi
     static double RADIAN = 57.29577951 ;
     
+    public final static float radiansPerDegree = (float) (2 * Math.PI / 360);
+    public final static float degreesPerRadian = (float) (360 / (2 * Math.PI));
+    
+    
     /**
      
      *    
@@ -659,6 +663,11 @@ public class Calc {
         
         return virtualCB;
     }    
+    
+    
+    
+   
+
 }
 
 
