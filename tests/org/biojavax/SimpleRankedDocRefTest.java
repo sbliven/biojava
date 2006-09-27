@@ -95,9 +95,9 @@ public class SimpleRankedDocRefTest extends TestCase {
         assertTrue(ref.equals(ref2));
         assertTrue(ref2.equals(ref));
         
-        ref2 = new SimpleRankedDocRef(dr, new Integer(30), new Integer(60), 1); //equal
-        assertTrue(ref.equals(ref2));
-        assertTrue(ref2.equals(ref));
+        ref2 = new SimpleRankedDocRef(dr, new Integer(30), new Integer(60), 1); //not equal
+        assertFalse(ref.equals(ref2));
+        assertFalse(ref2.equals(ref));
         
         ref2 = new SimpleRankedDocRef(dr, start, end, 100); //not equal
         assertFalse(ref.equals(ref2));
@@ -118,15 +118,15 @@ public class SimpleRankedDocRefTest extends TestCase {
         
         assertTrue(ref.compareTo(ref) == 0);
 
-        //Two ranked document references are equal if they have the same rank 
+        //Two ranked document references are equal if they have the same rank and location 
         //and refer to the same document reference.
         ref2 = new SimpleRankedDocRef(dr, start, end, 1); //equal
         assertTrue(ref.compareTo(ref2) == 0);
         assertTrue(ref2.compareTo(ref) == 0);
         
-        ref2 = new SimpleRankedDocRef(dr, new Integer(30), new Integer(60), 1); //equal
-        assertTrue(ref.compareTo(ref2) == 0);
-        assertTrue(ref2.compareTo(ref) == 0);
+        ref2 = new SimpleRankedDocRef(dr, new Integer(30), new Integer(60), 1); //not equal
+        assertTrue(ref.compareTo(ref2) < 0);
+        assertTrue(ref2.compareTo(ref) > 0);
         
         ref2 = new SimpleRankedDocRef(dr, start, end, 100); //not equal
         assertTrue(ref.compareTo(ref2) < 0);
@@ -135,8 +135,8 @@ public class SimpleRankedDocRefTest extends TestCase {
         ref2 = new SimpleRankedDocRef(new SimpleDocRef(
                 Collections.singletonList(new SimpleDocRefAuthor("Rev. Falliwell", false, false)), 
                 "Kansas Journal of Creationism", "Evidence for the giant spaghetti monster"), start, end, 1); //not equal
-        assertTrue(ref.compareTo(ref2) < 0);
-        assertTrue(ref2.compareTo(ref) > 0);
+        assertTrue(ref.compareTo(ref2) == ref.getDocumentReference().compareTo(ref2.getDocumentReference())); //everything else is the same
+        assertTrue(ref2.compareTo(ref) == ref2.getDocumentReference().compareTo(ref.getDocumentReference())); //everything else is the same
     }
 
     /**
@@ -148,8 +148,8 @@ public class SimpleRankedDocRefTest extends TestCase {
         ref2 = new SimpleRankedDocRef(dr, start, end, 1); //equal
         assertTrue(ref.hashCode() == ref2.hashCode());
         
-        ref2 = new SimpleRankedDocRef(dr, new Integer(30), new Integer(60), 1); //equal
-        assertTrue(ref.hashCode() == ref2.hashCode());
+        ref2 = new SimpleRankedDocRef(dr, new Integer(30), new Integer(60), 1); //not equal
+        assertTrue(ref.hashCode() != ref2.hashCode());
     }
 
     /**
