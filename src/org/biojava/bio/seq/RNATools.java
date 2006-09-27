@@ -412,9 +412,7 @@ public final class RNATools {
    * <li>"23 - SCENEDESMUS_MITOCHONDRIAL"</li>
    * </ul>
    *
-   * @throw IllegalArgumentException if there is no table with that number.
-   *
-   * @author gwaldon
+   * @throws IllegalArgumentException if there is no table with that number.
    * @since 1.5
    */
   public static ManyToOneTranslationTable getGeneticCode(int table_num) {
