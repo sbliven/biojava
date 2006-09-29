@@ -1,0 +1,9 @@
+Testsuite: org.biojava.bio.symbol.MergeLocationTest
+Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 0.008 sec
+
+Testcase: testInstantiation took 0 sec
+Testcase: testBlocks took 0 sec
+Testcase: testTouchingMerge took 0 sec
+Testcase: testCompoundABC took 0.001 sec
+Testcase: testCompoundABCD took 0 sec
+Testcase: testNested took 0.001 sec

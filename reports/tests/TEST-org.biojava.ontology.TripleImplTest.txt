@@ -1,0 +1,11 @@
+Testsuite: org.biojava.ontology.TripleImplTest
+Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.003 sec
+
+Testcase: testEqualsWhenEqual took 0.001 sec
+Testcase: testEqualsWhenSubjectsUnequal took 0 sec
+Testcase: testEqualsWhenObjectsUnequal took 0 sec
+Testcase: testEqualsWhenRelationsUnequal took 0 sec
+Testcase: testHashcodesEqualWhenEqual took 0 sec
+Testcase: testCannotConstructWithNullSubject took 0 sec
+Testcase: testCannotConstructWithNullObject took 0.001 sec
+Testcase: testCannotConstructWithNullRelation took 0 sec

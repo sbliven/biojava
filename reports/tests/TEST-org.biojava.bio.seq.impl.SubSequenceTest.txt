@@ -1,0 +1,11 @@
+Testsuite: org.biojava.bio.seq.impl.SubSequenceTest
+Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.17 sec
+
+Testcase: testSymbols took 0.029 sec
+Testcase: testFeatureClipping took 0.011 sec
+Testcase: testFeatureProjection took 0.023 sec
+Testcase: testRemoteFeature took 0.095 sec
+Testcase: testRemoteChildFeature took 0.002 sec
+Testcase: testCreateOnSubsequence took 0.008 sec
+Testcase: testCreateOnSubsequenceFeature took 0.001 sec
+Testcase: testRemoveFeatureFromSubsequence took 0.001 sec

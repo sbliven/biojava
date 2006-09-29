@@ -1,0 +1,10 @@
+Testsuite: org.biojava.bio.program.ssbind.SSBindNCBIblastp2_0_11Test
+Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 4.645 sec
+
+Testcase: testBlastResultHitCount took 0.853 sec
+Testcase: testResultCount took 0.569 sec
+Testcase: testResultGetQuerySequence took 1.096 sec
+Testcase: testResultGetSequenceDB took 0.489 sec
+Testcase: testResultGetAnnotation took 0.559 sec
+Testcase: testTopHit took 0.479 sec
+Testcase: testBotHit took 0.599 sec

@@ -1,0 +1,8 @@
+Testsuite: org.biojava.bio.search.SimpleSeqSimilaritySearchResultTest
+Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.01 sec
+
+Testcase: testAnnotation took 0.008 sec
+Testcase: testEquals took 0 sec
+Testcase: testSequenceDB took 0 sec
+Testcase: testSearchParameters took 0 sec
+Testcase: testQuerySequence took 0 sec

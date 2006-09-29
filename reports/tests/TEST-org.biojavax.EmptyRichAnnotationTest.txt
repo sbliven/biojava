@@ -1,0 +1,33 @@
+Testsuite: org.biojavax.EmptyRichAnnotationTest
+Tests run: 14, Failures: 0, Errors: 0, Time elapsed: 0.012 sec
+------------- Standard Output ---------------
+testKeys
+testEquals
+testContains
+testGetProperty
+testGetNote
+testSetProperty
+testSetNoteSet
+testAddNote
+testClear
+testRemoveProperty
+testRemoveNote
+testContainsProperty
+testGetNoteSet
+testAsMap
+------------- ---------------- ---------------
+
+Testcase: testKeys took 0.003 sec
+Testcase: testEquals took 0.002 sec
+Testcase: testContains took 0 sec
+Testcase: testGetProperty took 0 sec
+Testcase: testGetNote took 0 sec
+Testcase: testSetProperty took 0.001 sec
+Testcase: testSetNoteSet took 0 sec
+Testcase: testAddNote took 0.001 sec
+Testcase: testClear took 0 sec
+Testcase: testRemoveProperty took 0.001 sec
+Testcase: testRemoveNote took 0.001 sec
+Testcase: testContainsProperty took 0 sec
+Testcase: testGetNoteSet took 0 sec
+Testcase: testAsMap took 0.001 sec

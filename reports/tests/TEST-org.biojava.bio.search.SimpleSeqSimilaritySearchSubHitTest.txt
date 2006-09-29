@@ -1,0 +1,8 @@
+Testsuite: org.biojava.bio.search.SimpleSeqSimilaritySearchSubHitTest
+Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.003 sec
+
+Testcase: testAnnotation took 0.001 sec
+Testcase: testEquals took 0 sec
+Testcase: testScores took 0.001 sec
+Testcase: testQuery took 0 sec
+Testcase: testSubject took 0.001 sec

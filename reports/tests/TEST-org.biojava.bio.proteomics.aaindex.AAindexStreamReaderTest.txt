@@ -1,0 +1,4 @@
+Testsuite: org.biojava.bio.proteomics.aaindex.AAindexStreamReaderTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.449 sec
+
+Testcase: testReading took 0.449 sec

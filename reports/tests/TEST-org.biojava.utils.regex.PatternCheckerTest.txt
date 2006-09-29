@@ -1,0 +1,4 @@
+Testsuite: org.biojava.utils.regex.PatternCheckerTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.011 sec
+
+Testcase: testPatternChecker took 0.011 sec

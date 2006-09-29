@@ -1,0 +1,140 @@
+Testsuite: org.biojava.naming.ObdaInitialContextFactoryTest
+Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.169 sec
+------------- Standard Output ---------------
+Reached 
+  Attributes: No attributes
+Binding: urn -> org.biojava.naming.ObdaContext@fbf107
+Reached urn
+  Attributes: No attributes
+Binding: open-bio.org -> org.biojava.naming.ObdaContext@8d116e
+Reached urn:open-bio.org
+  Attributes: {description=description: 
+This is the root namespace for all OBDA URNs. All OBDA URNs should be prefixed
+by urn:open-bio.org as described in the file naming/open-bio_urns.txt in the
+module obda-specs in the cvs repository located at
+pub.open-bio.org:/home/repository/obf-common.
+    }
+Binding: type -> org.biojava.naming.ObdaContext@1737e47
+Reached urn:open-bio.org:type
+  Attributes: {description=description: 
+The namespace for URNs that identify data types. It is expected that the types
+that are given IDs will be very general in nature, such as Sequence and
+File Format. All types are of type urn:open-bio.org:type:type. Any URN in the
+type namespace that is not of this type is not conforming to the OBDA
+specification for this namespace.
+    }
+Binding: type -> org.biojava.naming.ObdaContext@1678f0a
+Reached urn:open-bio.org:type:type
+  Attributes: {description=description: 
+The OBDA URN that identifies the concept of 'type'. In a given language, this
+may map to the types of data structures, or objects. Alternativel, it may
+map to a particular set of keys being present in a map, or a term in an
+ontology. This is not important. The important thing is that we have unique
+identifiers for common types that all projects use and interact with.
+    }
+Binding: format -> org.biojava.naming.ObdaContext@1e00761
+Reached urn:open-bio.org:type:format
+  Attributes: {description=description: 
+A file format. Many file formats are used in bioinformatics. Entities of this
+type identify a format. The format can be used to choose how to treat a file.
+The format is not expected to be resolvable to a formal deffinition of the
+file structure using OBDA-supplied functionality. Different applications may
+chose to process a stream with the same format URN in different ways. This
+type of URN is purely there to identify the format of the stream, not the
+manner in which it should be processed.
+    }
+Binding: alphabet -> org.biojava.naming.ObdaContext@1048099
+Reached urn:open-bio.org:type:alphabet
+  Attributes: {description=description: 
+A biological sequence alphabet. Biological sequences are often represented as
+strings of characters. However, in differnt circumstances, the same characters
+can represent different things. For example, in DNA, the 't' character
+represents tyrosine. In Protein, this same character represents tryptophan.
+
+Associating alphabets with these sequences disambiguates their interpretation.
+Alphabets do not define a mapping to or from strings, but should be used
+wherever the type of the content of a sequence needs to be stated.
+    }
+Binding: format -> org.biojava.naming.ObdaContext@96ed8b
+Reached urn:open-bio.org:format
+  Attributes: {description=description: 
+A namespace for OBDA URNs that define formats. All URNs within this namespace
+must be of the type urn:open-bio.org:type:format. Any URN in this namespace that
+is not of that type is not a valid OBDA URN.
+    }
+Binding: enzyme -> org.biojava.naming.ObdaContext@c55164
+Reached urn:open-bio.org:format:enzyme
+  Attributes: {description=description: 
+The Enzyme database entry format. The enzyme database can be downloaded from
+the ebi at:
+
+  ftp://ftp.ebi.ac.uk/pub/databases/enzyme/
+
+For an example of a file in this format, see:
+
+  ftp://ftp.ebi.ac.uk/pub/databases/enzyme/enzyme.dat
+
+The format is described more fully in
+
+  ftp://ftp.ebi.ac.uk/pub/databases/enzyme/enzyser.txt
+    }
+Binding: genbank -> org.biojava.naming.ObdaContext@6286e3
+Reached urn:open-bio.org:format:genbank
+  Attributes: {description=description: 
+The GENBANK file format associated with the GENBANK sequence database.
+    }
+Binding: swissprot -> org.biojava.naming.ObdaContext@85b4c5
+Reached urn:open-bio.org:format:swissprot
+  Attributes: {description=description: 
+The SWISSPROT file format as used in the SWISSPROT sequence database.
+    }
+Binding: embl -> org.biojava.naming.ObdaContext@1ef8f5
+Reached urn:open-bio.org:format:embl
+  Attributes: {description=description: 
+The EMBL file format associated with entries in the EMBL sequence database.
+    }
+Binding: alphabet -> org.biojava.naming.ObdaContext@16ad447
+Reached urn:open-bio.org:alphabet
+  Attributes: {description=description: 
+A namespace within which to store alphabet identifiers. Alphabets should
+represent URNs that represent objects of the type identified by
+urn:open-bio.org:type:alphabet, and any useage outside of this is not supported.
+    }
+Binding: rna -> org.biojava.naming.ObdaContext@96b555
+Reached urn:open-bio.org:alphabet:rna
+  Attributes: {description=description: 
+The RNA alphabet. RNA is composed from four nucleotides. Read a biochemistry
+or genetics introductory textbook to find out more. Commonly, the nucleotides
+are reprsented by the four letters a, g, c and u. However, this is not a
+formal requirement for a resource to declare this alphabet as its type.
+    }
+Binding: protein -> org.biojava.naming.ObdaContext@5b04ae
+Reached urn:open-bio.org:alphabet:protein
+  Attributes: {description=description: 
+The protein alphabet. Proteins are composed from amino-acids. To find out more,
+read a biochemistry or genetics text book. It is common for protein sequences
+to be represented by characters, but this is not a formal requirement for
+a resource to publish an alphabet equal to this identifier.
+    }
+Binding: dna -> org.biojava.naming.ObdaContext@1904b13
+Reached urn:open-bio.org:alphabet:dna
+  Attributes: {description=description: 
+The DNA alphabet. DNA is composed from four nucleotides. Read a biochemistry
+or genetics introductory textbook to find out more. Commonly, the nucleotides
+are reprsented by the four letters a, g, c and t. However, this is not a
+formal requirement for a resource to declare this alphabet as its type.
+    }
+------------- ---------------- ---------------
+------------- Standard Error -----------------
+lookup: 'urn:open-bio.org:format:embl' for {urn=org.biojava.naming.ObdaContext@a866a9}
+My component is urn:open-bio.org:format:embl
+lookup: 'open-bio.org:format:embl' for {open-bio.org=org.biojava.naming.ObdaContext@19ffd6f}
+My component is open-bio.org:format:embl
+lookup: 'format:embl' for {type=org.biojava.naming.ObdaContext@b799cf, format=org.biojava.naming.ObdaContext@1d317ab, alphabet=org.biojava.naming.ObdaContext@1b6dd83}
+My component is format:embl
+lookup: 'embl' for {enzyme=org.biojava.naming.ObdaContext@88cf9e, genbank=org.biojava.naming.ObdaContext@1f6c2a9, swissprot=org.biojava.naming.ObdaContext@165f5a4, embl=org.biojava.naming.ObdaContext@e1e2b3}
+My component is embl
+------------- ---------------- ---------------
+
+Testcase: testLookup took 0.1 sec
+Testcase: testWalk took 0.069 sec

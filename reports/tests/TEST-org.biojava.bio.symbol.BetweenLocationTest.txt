@@ -1,0 +1,37 @@
+Testsuite: org.biojava.bio.symbol.BetweenLocationTest
+Tests run: 34, Failures: 0, Errors: 0, Time elapsed: 0.012 sec
+
+Testcase: testIntersectionOneTenBetweenFiveSix took 0.002 sec
+Testcase: testIntersectionOneTenBetweenFiveSeven took 0.001 sec
+Testcase: testIntersectionOneTenBetweenTenEleven took 0 sec
+Testcase: testIntersectionOneTenBetweenNineEleven took 0 sec
+Testcase: testIntersectionBetweenFiveSixBetweenFiveSix took 0.001 sec
+Testcase: testIntersectionBetweenFiveTenBetweenFiveSix took 0 sec
+Testcase: testIntersectionBetweenFiveTenBetweenSevenTwelve took 0 sec
+Testcase: testOverlapsOneTenBetweenFiveSix took 0.001 sec
+Testcase: testOverlapsOneTenBetweenFiveSeven took 0 sec
+Testcase: testOverlapsOneTenBetweenTenEleven took 0 sec
+Testcase: testOverlapsOneTenBetweenNineEleven took 0.001 sec
+Testcase: testOverlapsBetweenFiveSixBetweenFiveSix took 0 sec
+Testcase: testOverlapsBetweenFiveTenBetweenFiveSix took 0.001 sec
+Testcase: testOverlapsBetweenFiveTenBetweenSevenTwelve took 0 sec
+Testcase: testAreEqualRangeFiveSixBetweenFiveSix took 0 sec
+Testcase: testAreEqualBetweenFiveSixBetweenFiveSix took 0.001 sec
+Testcase: testAreEqualBetweenFiveSixBetweenFiveTen took 0 sec
+Testcase: testContainsOneTenBetweenFiveSix took 0 sec
+Testcase: testContainsBetweenFiveSixOneTen took 0 sec
+Testcase: testContainsOneTenBetweenFiveSeven took 0.001 sec
+Testcase: testContainsOneTenBetweenTenEleven took 0 sec
+Testcase: testContainsOneTenBetweenNineEleven took 0 sec
+Testcase: testContainsBetweenFiveSixBetweenFiveSix took 0 sec
+Testcase: testContainsBetweenFiveTenBetweenFiveSix took 0.001 sec
+Testcase: testContainsBetweenFiveSixBetweenFiveTen took 0 sec
+Testcase: testContainsBetweenFiveTenBetweenSevenTwelve took 0.001 sec
+Testcase: testContainsBetweenSevenTwelveBetweenFiveTen took 0 sec
+Testcase: testUnionRangeOneTenBetweenFiveSix took 0 sec
+Testcase: testUnionRangeOneTenBetweenFiveSeven took 0 sec
+Testcase: testUnionRangeOneTenBetweenTenEleven took 0 sec
+Testcase: testUnionRangeOneTenBetweenNineEleven took 0 sec
+Testcase: testUnionBetweenFiveSixBetweenFiveSix took 0 sec
+Testcase: testUnionBetweenFiveTenBetweenFiveSix took 0 sec
+Testcase: testUnionBetweenFiveTenBetweenSevenTwelve took 0 sec

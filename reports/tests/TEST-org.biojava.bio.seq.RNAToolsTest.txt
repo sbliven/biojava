@@ -1,0 +1,37 @@
+Testsuite: org.biojava.bio.seq.RNAToolsTest
+Tests run: 34, Failures: 0, Errors: 0, Time elapsed: 0.168 sec
+
+Testcase: testSymbols took 0.001 sec
+Testcase: testReverseComplement took 0.001 sec
+Testcase: testCreateRNASequenceGetName took 0.001 sec
+Testcase: testCreateRNASequenceAnnotationIsEmpty took 0 sec
+Testcase: testCreateRNASequenceURNIsBlank took 0.001 sec
+Testcase: testCreateRNASequenceSequenceCorrect took 0 sec
+Testcase: testGetCodonAlphabet took 0.001 sec
+Testcase: testCreateRNA took 0.001 sec
+Testcase: testComplementA took 0 sec
+Testcase: testComplementC took 0 sec
+Testcase: testComplementG took 0 sec
+Testcase: testComplementU took 0 sec
+Testcase: testComplementSymbolFromAnotherAlphabet took 0.001 sec
+Testcase: testComplementBadSymbol took 0.003 sec
+Testcase: testComplementList took 0 sec
+Testcase: testTranscribe took 0 sec
+Testcase: testTranslate took 0.153 sec
+Testcase: testForSymbolA took 0 sec
+Testcase: testForSymbolC took 0 sec
+Testcase: testForSymbolG took 0 sec
+Testcase: testForSymbolU took 0 sec
+Testcase: testForSymbolWithBadChar took 0 sec
+Testcase: testForIndex0 took 0 sec
+Testcase: testForIndex1 took 0 sec
+Testcase: testForIndex2 took 0.001 sec
+Testcase: testForIndex3 took 0 sec
+Testcase: testForIndexWithBadIndex took 0 sec
+Testcase: testIndexA took 0 sec
+Testcase: testIndexG took 0.001 sec
+Testcase: testIndexC took 0 sec
+Testcase: testIndexU took 0 sec
+Testcase: testIndexSymbolFromAnotherAlphabet took 0 sec
+Testcase: testIndexBadSymbol took 0 sec
+Testcase: testGeneticCode took 0.001 sec

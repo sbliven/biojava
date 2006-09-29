@@ -1,0 +1,4 @@
+Testsuite: org.biojava.bio.program.sax.blastxml.BlastXMLTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.39 sec
+
+Testcase: testHitCount took 0.39 sec

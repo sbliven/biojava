@@ -1,0 +1,10 @@
+Testsuite: org.biojava.bio.symbol.AlphabetSerializationTest
+Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.278 sec
+
+Testcase: testIntegerSerialization took 0.01 sec
+Testcase: testDoubleSerialization took 0.005 sec
+Testcase: testSubInt took 0.014 sec
+Testcase: testSubDouble took 0.024 sec
+Testcase: testDNASerialization took 0 sec
+Testcase: testPhredSerialization took 0.221 sec
+Testcase: testCustom took 0.001 sec

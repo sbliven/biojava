@@ -1,0 +1,25 @@
+Testsuite: org.biojava.utils.walker.WalkerTest
+Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.086 sec
+------------- Standard Error -----------------
+Increasing counter: Overlaps([20,50])
+Increasing counter: Overlaps([20,50])
+Increasing counter: ByClass(org.biojava.bio.seq.StrandedFeature)
+Increasing counter: And(Overlaps([20,50]) , ByClass(org.biojava.bio.seq.StrandedFeature))
+Increasing counter: Overlaps([20,50])
+Increasing counter: ByClass(org.biojava.bio.seq.StrandedFeature)
+Increasing counter: ByClass(org.biojava.bio.seq.ComponentFeature)
+Increasing counter: Or(ByClass(org.biojava.bio.seq.StrandedFeature) , ByClass(org.biojava.bio.seq.ComponentFeature))
+Increasing counter: And(Overlaps([20,50]) , Or(ByClass(org.biojava.bio.seq.StrandedFeature) , ByClass(org.biojava.bio.seq.ComponentFeature)))
+OverlapsLocation: Overlaps([20,50])
+Feature: ByClass(org.biojava.bio.seq.StrandedFeature)
+OverlapsLocation: Overlaps([20,50])
+Feature: ByClass(org.biojava.bio.seq.StrandedFeature)
+Feature: ByClass(org.biojava.bio.seq.ComponentFeature)
+Feature: Or(ByClass(org.biojava.bio.seq.StrandedFeature) , ByClass(org.biojava.bio.seq.ComponentFeature))
+Feature: And(Overlaps([20,50]) , Or(ByClass(org.biojava.bio.seq.StrandedFeature) , ByClass(org.biojava.bio.seq.ComponentFeature)))
+------------- ---------------- ---------------
+
+Testcase: testCountAll took 0.013 sec
+Testcase: testCountSome took 0.018 sec
+Testcase: testCountWithFallback took 0.035 sec
+Testcase: testReturnAll took 0.018 sec

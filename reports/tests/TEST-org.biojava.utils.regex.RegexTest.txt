@@ -1,0 +1,4 @@
+Testsuite: org.biojava.utils.regex.RegexTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.008 sec
+
+Testcase: testRegex took 0.008 sec

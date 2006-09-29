@@ -1,0 +1,4 @@
+Testsuite: org.biojava.bio.symbol.CodonPrefToolsTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.489 sec
+
+Testcase: testGetCodonPreference took 0.489 sec

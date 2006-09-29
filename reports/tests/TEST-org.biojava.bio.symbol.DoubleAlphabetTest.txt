@@ -1,0 +1,6 @@
+Testsuite: org.biojava.bio.symbol.DoubleAlphabetTest
+Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.002 sec
+
+Testcase: testCanonicalSymbols took 0.001 sec
+Testcase: testCanonicalSubAlphabets took 0 sec
+Testcase: testSubAlphabetSymbolsCanonical took 0 sec

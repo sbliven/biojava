@@ -1,0 +1,8 @@
+Testsuite: org.biojava.bio.proteomics.MassCalcTest
+Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.009 sec
+
+Testcase: testStaticGetMass took 0.004 sec
+Testcase: testGetMass took 0.001 sec
+Testcase: testGetTermMass took 0.001 sec
+Testcase: testSetSymbolModification took 0.001 sec
+Testcase: testAlphabetTolerance took 0 sec

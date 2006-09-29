@@ -1,0 +1,29 @@
+Testsuite: org.biojava.bio.seq.io.LocationFormatterTest
+Tests run: 26, Failures: 0, Errors: 0, Time elapsed: 0.204 sec
+
+Testcase: testSimplePointLocationGenbank took 0.189 sec
+Testcase: testRangedPointLocationGenbank took 0.001 sec
+Testcase: testBoundedPointLocationGenbank took 0.001 sec
+Testcase: testSimpleRangedLocationGenbank took 0.001 sec
+Testcase: testBoundedRangedLocationGenbank took 0 sec
+Testcase: testBoundedPointRangedPointRangedLocationGenbank took 0.001 sec
+Testcase: testRangedPointSimplePointRangedLocationGenbank took 0 sec
+Testcase: testRangedPointRangedPointRangedLocationGenbank took 0.001 sec
+Testcase: testCircularSimpleRangedLocationGenbank took 0 sec
+Testcase: testCircularBoundedRangedLocationGenbank took 0 sec
+Testcase: testCircularBoundedPointRangedPointRangedLocationGenbank took 0 sec
+Testcase: testCircularRangedPointSimplePointRangedLocationGenbank took 0.001 sec
+Testcase: testCircularRangedPointRangedPointRangedLocationGenbank took 0 sec
+Testcase: testComplementSimplePointLocationGenbank took 0.001 sec
+Testcase: testComplementRangedPointLocationGenbank took 0.001 sec
+Testcase: testComplementBoundedPointLocationGenbank took 0 sec
+Testcase: testComplementSimpleRangedLocationGenbank took 0 sec
+Testcase: testComplementBoundedRangedLocationGenbank took 0 sec
+Testcase: testComplementBoundedPointRangedPointRangedLocationGenbank took 0 sec
+Testcase: testComplementRangedPointSimplePointRangedLocationGenbank took 0 sec
+Testcase: testComplementRangedPointRangedPointRangedLocationGenbank took 0.001 sec
+Testcase: testComplementCircularSimpleRangedLocationGenbank took 0 sec
+Testcase: testComplementCircularBoundedRangedLocationGenbank took 0 sec
+Testcase: testComplementCircularBoundedPointRangedPointRangedLocationGenbank took 0 sec
+Testcase: testComplementCircularRangedPointSimplePointRangedLocationGenbank took 0.001 sec
+Testcase: testComplementCircularRangedPointRangedPointRangedLocationGenbank took 0 sec

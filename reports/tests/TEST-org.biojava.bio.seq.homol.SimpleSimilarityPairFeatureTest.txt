@@ -1,0 +1,11 @@
+Testsuite: org.biojava.bio.seq.homol.SimpleSimilarityPairFeatureTest
+Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.011 sec
+
+Testcase: testGetType took 0.003 sec
+Testcase: testGetSource took 0.001 sec
+Testcase: testGetLocation took 0 sec
+Testcase: testGetStrand took 0.001 sec
+Testcase: testGetScore took 0.001 sec
+Testcase: testGetAnnotation took 0.001 sec
+Testcase: testGetAlignment took 0 sec
+Testcase: testGetSibling took 0.004 sec

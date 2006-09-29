@@ -1,0 +1,7 @@
+Testsuite: org.biojava.bio.seq.FeatureHolderUtilsTest
+Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.029 sec
+
+Testcase: testUnion took 0.024 sec
+Testcase: testIntersect took 0.001 sec
+Testcase: testNot took 0.001 sec
+Testcase: testFeatureHolderAsSet took 0.003 sec

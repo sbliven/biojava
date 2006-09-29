@@ -1,0 +1,7 @@
+Testsuite: org.biojava.bio.seq.impl.GappedSequenceTest
+Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.02 sec
+
+Testcase: testNonSplit took 0.016 sec
+Testcase: testSplit took 0.001 sec
+Testcase: testRemoveRemoteFeature took 0.001 sec
+Testcase: testRemoveLocalFeature took 0.002 sec

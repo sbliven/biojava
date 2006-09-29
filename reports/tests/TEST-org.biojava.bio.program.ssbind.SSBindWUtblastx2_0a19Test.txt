@@ -1,0 +1,10 @@
+Testsuite: org.biojava.bio.program.ssbind.SSBindWUtblastx2_0a19Test
+Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.468 sec
+
+Testcase: testBlastResultHitCount took 0.085 sec
+Testcase: testResultCount took 0.11 sec
+Testcase: testResultGetQuerySequence took 0.05 sec
+Testcase: testResultGetSequenceDB took 0.055 sec
+Testcase: testResultGetAnnotation took 0.057 sec
+Testcase: testTopHit took 0.054 sec
+Testcase: testBotHit took 0.055 sec

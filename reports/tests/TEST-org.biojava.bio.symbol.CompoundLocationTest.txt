@@ -1,0 +1,14 @@
+Testsuite: org.biojava.bio.symbol.CompoundLocationTest
+Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 0.18 sec
+
+Testcase: testEquals took 0.018 sec
+Testcase: testUnion took 0.002 sec
+Testcase: testAreEqual took 0.002 sec
+Testcase: testOverlaps took 0.002 sec
+Testcase: testContains took 0.005 sec
+Testcase: testIntersection took 0.003 sec
+Testcase: testIsContiguous took 0.028 sec
+Testcase: testOverlapsBig took 0.031 sec
+Testcase: testContainsBig took 0.005 sec
+Testcase: testIntersectionBig took 0.082 sec
+Testcase: testSubtract took 0.002 sec

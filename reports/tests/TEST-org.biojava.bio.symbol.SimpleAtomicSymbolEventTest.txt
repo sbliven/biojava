@@ -1,0 +1,10 @@
+Testsuite: org.biojava.bio.symbol.SimpleAtomicSymbolEventTest
+Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.002 sec
+
+Testcase: testAnnotation took 0.001 sec
+Testcase: testUnknown took 0 sec
+Testcase: testProperty took 0 sec
+Testcase: testUnknownAnnotation took 0 sec
+Testcase: testUnknownProptery took 0.001 sec
+Testcase: testUnknownAnnotationProperty took 0 sec
+Testcase: testAnnotationUnknown took 0 sec

@@ -1,0 +1,12 @@
+Testsuite: org.biojava.bio.symbol.UkkonenSuffixTreeTest
+Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.333 sec
+------------- Standard Output ---------------
+Adding symbol list taccaccagga$
+Adding symbol list taccaccagga$
+------------- ---------------- ---------------
+
+Testcase: testNumberNodes took 0.077 sec
+Testcase: testSymbolListAddition took 0.006 sec
+Testcase: testDuplicateAddition took 0.001 sec
+Testcase: testGetterMethods took 0.003 sec
+Testcase: testlongAddition took 0.246 sec

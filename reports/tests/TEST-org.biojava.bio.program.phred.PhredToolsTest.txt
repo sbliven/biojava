@@ -1,0 +1,5 @@
+Testsuite: org.biojava.bio.program.phred.PhredToolsTest
+Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.038 sec
+
+Testcase: testGetPhredSymbol took 0.036 sec
+Testcase: testGetPhredSymbolAmbiguous took 0.002 sec

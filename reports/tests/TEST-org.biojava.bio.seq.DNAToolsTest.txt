@@ -1,0 +1,13 @@
+Testsuite: org.biojava.bio.seq.DNAToolsTest
+Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 0.003 sec
+
+Testcase: testSymbols took 0 sec
+Testcase: testGetDNA took 0.001 sec
+Testcase: testGetCodon took 0 sec
+Testcase: testCreateDNA took 0 sec
+Testcase: testIndex took 0.001 sec
+Testcase: testForIndex took 0 sec
+Testcase: testComplement took 0 sec
+Testcase: testForSymbol took 0 sec
+Testcase: testReverseComplement took 0 sec
+Testcase: testDNAToken took 0 sec

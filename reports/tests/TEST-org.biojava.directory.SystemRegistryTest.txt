@@ -1,0 +1,5 @@
+Testsuite: org.biojava.directory.SystemRegistryTest
+Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.431 sec
+
+Testcase: testInstance took 0.43 sec
+Testcase: testGetRegistryPath took 0 sec

@@ -1,0 +1,6 @@
+Testsuite: org.biojava.bio.dist.DistributionToolsTest
+Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.372 sec
+
+Testcase: testDistOverAlignment took 0.013 sec
+Testcase: testInformationContent took 0.002 sec
+Testcase: testGenerateSequence took 0.357 sec

@@ -1,0 +1,6 @@
+Testsuite: org.biojava.bio.structure.StructureTest
+Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.339 sec
+
+Testcase: testReadPDBFile took 0.171 sec
+Testcase: testStandardAmino took 0.089 sec
+Testcase: testMutation took 0.078 sec

@@ -1,0 +1,15 @@
+Testsuite: org.biojava.naming.ObdaUriParserTest
+Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.005 sec
+------------- Standard Output ---------------
+
+oneName
+:trail
+lead:
+urn:obda.org:format:embl/ac
+------------- ---------------- ---------------
+
+Testcase: testEmpty took 0.001 sec
+Testcase: testSingle took 0.002 sec
+Testcase: testLeading took 0.001 sec
+Testcase: testTrailing took 0 sec
+Testcase: testLots took 0.001 sec

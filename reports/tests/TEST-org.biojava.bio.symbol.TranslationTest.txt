@@ -1,0 +1,5 @@
+Testsuite: org.biojava.bio.symbol.TranslationTest
+Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.001 sec
+
+Testcase: testTranscribe took 0.001 sec
+Testcase: testTranslate took 0 sec

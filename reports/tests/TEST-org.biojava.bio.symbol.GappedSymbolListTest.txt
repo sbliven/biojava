@@ -1,0 +1,13 @@
+Testsuite: org.biojava.bio.symbol.GappedSymbolListTest
+Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 0.013 sec
+
+Testcase: testIndividualInsertBlockRemove took 0.001 sec
+Testcase: testBlockedInsertIndividualRemove took 0.001 sec
+Testcase: testBlockedInsertBlockRemove took 0.001 sec
+Testcase: testBeginningGap took 0.001 sec
+Testcase: testBeginningGaps took 0 sec
+Testcase: testTrailingGap took 0.001 sec
+Testcase: testTrailingGaps took 0 sec
+Testcase: testInternalGap took 0.001 sec
+Testcase: testInternalGaps took 0.001 sec
+Testcase: testDavidBug took 0.001 sec

@@ -1,0 +1,31 @@
+Testsuite: org.biojavax.SimpleNamespaceTest
+Tests run: 13, Failures: 0, Errors: 0, Time elapsed: 0.015 sec
+------------- Standard Output ---------------
+testGetName
+testGetDescription
+testSetDescription
+testEquals
+testToString
+testCompareTo
+testHashCode
+testSetAcronym
+testSetAuthority
+testSetURI
+testGetAcronym
+testGetAuthority
+testGetURI
+------------- ---------------- ---------------
+
+Testcase: testGetName took 0.005 sec
+Testcase: testGetDescription took 0.004 sec
+Testcase: testSetDescription took 0 sec
+Testcase: testEquals took 0.001 sec
+Testcase: testToString took 0 sec
+Testcase: testCompareTo took 0.001 sec
+Testcase: testHashCode took 0 sec
+Testcase: testSetAcronym took 0 sec
+Testcase: testSetAuthority took 0 sec
+Testcase: testSetURI took 0.001 sec
+Testcase: testGetAcronym took 0.001 sec
+Testcase: testGetAuthority took 0 sec
+Testcase: testGetURI took 0.001 sec

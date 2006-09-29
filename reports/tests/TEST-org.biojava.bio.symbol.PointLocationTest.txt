@@ -1,0 +1,10 @@
+Testsuite: org.biojava.bio.symbol.PointLocationTest
+Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.001 sec
+
+Testcase: testEquals took 0 sec
+Testcase: testUnion took 0 sec
+Testcase: testAreEqual took 0.001 sec
+Testcase: testOverlaps took 0 sec
+Testcase: testContains took 0 sec
+Testcase: testIntersection took 0 sec
+Testcase: testIsContiguous took 0 sec

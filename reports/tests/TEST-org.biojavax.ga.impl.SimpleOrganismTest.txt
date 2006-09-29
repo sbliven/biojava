@@ -1,0 +1,5 @@
+Testsuite: org.biojavax.ga.impl.SimpleOrganismTest
+Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.002 sec
+
+Testcase: testIsHaploid took 0.001 sec
+Testcase: testReplicate took 0.001 sec

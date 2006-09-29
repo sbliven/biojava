@@ -1,0 +1,8 @@
+Testsuite: org.biojava.bio.symbol.SymbolSerializationTest
+Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.092 sec
+
+Testcase: testAtomic took 0.005 sec
+Testcase: testAmbiguous took 0.011 sec
+Testcase: testSpecialGap took 0.03 sec
+Testcase: testCompoundGap took 0.043 sec
+Testcase: testNormalGap took 0.002 sec

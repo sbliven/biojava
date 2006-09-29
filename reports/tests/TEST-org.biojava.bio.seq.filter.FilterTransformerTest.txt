@@ -1,0 +1,5 @@
+Testsuite: org.biojava.bio.seq.filter.FilterTransformerTest
+Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.218 sec
+
+Testcase: testIdentity took 0.202 sec
+Testcase: testReplace took 0.016 sec

@@ -1,0 +1,4 @@
+Testsuite: org.biojava.utils.automata.NfaTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.014 sec
+
+Testcase: testNfa took 0.014 sec

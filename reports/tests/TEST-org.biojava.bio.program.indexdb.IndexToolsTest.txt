@@ -1,0 +1,9 @@
+Testsuite: org.biojava.bio.program.indexdb.IndexToolsTest
+Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 0.556 sec
+
+Testcase: testIndexFastaDNA took 0.204 sec
+Testcase: testIndexFastaRNA took 0.023 sec
+Testcase: testIndexFastaProtein took 0.022 sec
+Testcase: testIndexEmblDNA took 0.173 sec
+Testcase: testIndexGenbankDNA took 0.07 sec
+Testcase: testIndexSwissprot took 0.064 sec

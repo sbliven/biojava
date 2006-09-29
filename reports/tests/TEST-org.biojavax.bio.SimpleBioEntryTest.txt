@@ -1,0 +1,69 @@
+Testsuite: org.biojavax.bio.SimpleBioEntryTest
+Tests run: 32, Failures: 0, Errors: 0, Time elapsed: 0.094 sec
+------------- Standard Output ---------------
+testGetName
+testGetDescription
+testSetDescription
+testEquals
+testGetAnnotation
+testToString
+testSetNoteSet
+testGetNoteSet
+testCompareTo
+testHashCode
+testGetAccession
+testGetVersion
+testGetRankedCrossRefs
+testSetTaxon
+testGetComments
+testGetRankedDocRefs
+testGetRelationships
+testSetIdentifier
+testSetDivision
+testGetDivision
+testGetIdentifier
+testGetNamespace
+testGetTaxon
+testAddRankedCrossRef
+testRemoveRankedCrossRef
+testAddRankedDocRef
+testRemoveRankedDocRef
+testAddComment
+testRemoveComment
+testAddRelationship
+testRemoveRelationship
+testSetRankedCrossRefs
+------------- ---------------- ---------------
+
+Testcase: testGetName took 0.011 sec
+Testcase: testGetDescription took 0.001 sec
+Testcase: testSetDescription took 0.002 sec
+Testcase: testEquals took 0.051 sec
+Testcase: testGetAnnotation took 0.001 sec
+Testcase: testToString took 0.001 sec
+Testcase: testSetNoteSet took 0.001 sec
+Testcase: testGetNoteSet took 0.001 sec
+Testcase: testCompareTo took 0 sec
+Testcase: testHashCode took 0.001 sec
+Testcase: testGetAccession took 0 sec
+Testcase: testGetVersion took 0.001 sec
+Testcase: testGetRankedCrossRefs took 0 sec
+Testcase: testSetTaxon took 0.007 sec
+Testcase: testGetComments took 0 sec
+Testcase: testGetRankedDocRefs took 0.001 sec
+Testcase: testGetRelationships took 0 sec
+Testcase: testSetIdentifier took 0.001 sec
+Testcase: testSetDivision took 0 sec
+Testcase: testGetDivision took 0.001 sec
+Testcase: testGetIdentifier took 0 sec
+Testcase: testGetNamespace took 0 sec
+Testcase: testGetTaxon took 0.001 sec
+Testcase: testAddRankedCrossRef took 0.001 sec
+Testcase: testRemoveRankedCrossRef took 0 sec
+Testcase: testAddRankedDocRef took 0.001 sec
+Testcase: testRemoveRankedDocRef took 0.001 sec
+Testcase: testAddComment took 0 sec
+Testcase: testRemoveComment took 0 sec
+Testcase: testAddRelationship took 0.003 sec
+Testcase: testRemoveRelationship took 0.002 sec
+Testcase: testSetRankedCrossRefs took 0.001 sec

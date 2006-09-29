@@ -1,0 +1,20 @@
+Testsuite: org.biojavax.SimpleDocRefAuthorTest
+Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.117 sec
+------------- Standard Output ---------------
+testGetName
+testEquals
+testToString
+testCompareTo
+testHashCode
+testGetExtendedName
+testIsConsortium
+------------- ---------------- ---------------
+
+Testcase: testGetName took 0.003 sec
+Testcase: testEquals took 0.001 sec
+Testcase: testToString took 0.004 sec
+Testcase: testCompareTo took 0.106 sec
+Testcase: testHashCode took 0.001 sec
+Testcase: testGetExtendedName took 0 sec
+Testcase: testIsEditor took 0.001 sec
+Testcase: testIsConsortium took 0 sec

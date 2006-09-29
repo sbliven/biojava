@@ -69,7 +69,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
     public static final String FASTA_FORMAT = "FASTA";
     
     // header line
-    protected static final Pattern hp = Pattern.compile(">(\\S+)(\\s+(.*))?");
+    protected static final Pattern hp = Pattern.compile(">\\s*(\\S+)(\\s+(.*))?");
     // description chunk
     protected static final Pattern dp = Pattern.compile( "^(gi\\|(\\d+)\\|)*(\\S+)\\|(\\S+?)(\\.(\\d+))*\\|(\\S+)$");
     

@@ -1,0 +1,5 @@
+Testsuite: org.biojava.bio.seq.MergeFeatureHolderTest
+Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.005 sec
+
+Testcase: testTopLevelAccess took 0.003 sec
+Testcase: testRecursiveAccess took 0 sec

@@ -1,0 +1,15 @@
+Testsuite: org.biojava.bio.seq.io.filterxml.FilterXMLTest
+Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 0.184 sec
+
+Testcase: testHasAnnotation took 0.065 sec
+Testcase: testByAnnotation took 0.005 sec
+Testcase: testByType took 0.013 sec
+Testcase: testNot took 0.01 sec
+Testcase: testByClass took 0.012 sec
+Testcase: testLocation took 0.011 sec
+Testcase: testAnd took 0.005 sec
+Testcase: testMultiAnd took 0.01 sec
+Testcase: testStrandFilter took 0.021 sec
+Testcase: testFrameFilter took 0.011 sec
+Testcase: testByParent took 0.01 sec
+Testcase: testAnnotationContains took 0.007 sec

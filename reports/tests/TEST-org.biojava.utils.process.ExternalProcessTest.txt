@@ -1,0 +1,8 @@
+Testsuite: org.biojava.utils.process.ExternalProcessTest
+Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.448 sec
+
+Testcase: testExecuteStreams took 0.05 sec
+Testcase: testExecuteMore took 0.049 sec
+Testcase: testStaticExecute took 0.082 sec
+Testcase: testResolveCommands took 0.267 sec
+Testcase: testJoinCommands took 0 sec
