@@ -21,6 +21,8 @@
 
 package org.biojava.utils.lsid;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -285,12 +287,13 @@ public class LifeScienceIdentifierTest
         ObjectInputStream ois = null;
         try 
         {
-            File f = File.createTempFile("lsid", ".ser");
-            oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+            //File f = File.createTempFile("lsid", ".ser");
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            oos = new ObjectOutputStream(new BufferedOutputStream(baos));
             oos.writeObject(lsid0);
             oos.flush();
             
-            ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+            ois = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(baos.toByteArray())));
             lsid1 = (LifeScienceIdentifier) ois.readObject();
             
             assertTrue(lsid0 != lsid1);
