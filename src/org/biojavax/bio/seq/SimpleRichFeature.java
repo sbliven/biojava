@@ -52,6 +52,7 @@ import org.biojavax.ontology.ComparableTerm;
  * A simple implementation of RichFeature.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @author Bubba Puryear
  * @since 1.5
  */
 public class SimpleRichFeature extends AbstractChangeable implements RichFeature {
@@ -269,20 +270,25 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setSourceTerm(Term t) throws ChangeVetoException, InvalidTermException {
         if (t==null) throw new IllegalArgumentException("Term cannot be null");
-        if (!(t instanceof ComparableTerm)) t = RichObjectFactory.getDefaultOntology().getOrImportTerm(t);
+        ComparableTerm comparableT;
+        if (t instanceof ComparableTerm) {
+        	comparableT = (ComparableTerm) t;
+        } else {
+        	comparableT = RichObjectFactory.getDefaultOntology().getOrImportTerm(t);
+        }
         if(!this.hasListeners(RichFeature.SOURCETERM)) {
-            this.sourceTerm = (ComparableTerm)t;
+            this.sourceTerm = comparableT;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     RichFeature.SOURCETERM,
-                    t,
+                    comparableT,
                     this.sourceTerm
                     );
             ChangeSupport cs = this.getChangeSupport(RichFeature.SOURCETERM);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                this.sourceTerm = (ComparableTerm)t;
+                this.sourceTerm = comparableT;
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -314,20 +320,25 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
      */
     public void setTypeTerm(Term t) throws ChangeVetoException, InvalidTermException {
         if (t==null) throw new IllegalArgumentException("Term cannot be null");
-        if (!(t instanceof ComparableTerm)) t = RichObjectFactory.getDefaultOntology().getOrImportTerm(t);
+        ComparableTerm comparableT;
+        if (t instanceof ComparableTerm) {
+        	comparableT = (ComparableTerm) t;
+        } else {
+        	comparableT = RichObjectFactory.getDefaultOntology().getOrImportTerm(t);
+        }
         if(!this.hasListeners(RichFeature.TYPETERM)) {
-            this.typeTerm = (ComparableTerm)t;
+            this.typeTerm = comparableT;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     RichFeature.TYPETERM,
-                    t,
+                    comparableT,
                     this.typeTerm
                     );
             ChangeSupport cs = this.getChangeSupport(RichFeature.TYPETERM);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                this.typeTerm = (ComparableTerm)t;
+                this.typeTerm = comparableT;
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -349,20 +360,25 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     public void setLocation(Location loc) throws ChangeVetoException {
 //        System.out.println("SimpleRichFeature.setLocation-featureId:"+featureId+", loc:"+loc);
         if (loc==null) throw new IllegalArgumentException("Location cannot be null");
-        if (!(loc instanceof RichLocation)) loc = RichLocation.Tools.enrich(loc);
+        RichLocation richLoc;
+        if (loc instanceof RichLocation) {
+        	richLoc = (RichLocation) loc;
+        } else {
+        	richLoc = RichLocation.Tools.enrich(loc);
+        }
         if(!this.hasListeners(RichFeature.LOCATION)) {
-            this.location = (RichLocation)loc;
+            this.location = richLoc;
         } else {
             ChangeEvent ce = new ChangeEvent(
                     this,
                     RichFeature.LOCATION,
-                    loc,
+                    richLoc,
                     this.location
                     );
             ChangeSupport cs = this.getChangeSupport(RichFeature.LOCATION);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                this.location = (RichLocation)loc;
+                this.location = richLoc;
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -679,9 +695,9 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         		!this.parent.equals(them.getParent())) 
         	return ((Comparable)this.parent).compareTo(them.getParent());
         if (! this.typeTerm.equals(them.getTypeTerm())) 
-        	this.typeTerm.compareTo(them.getTypeTerm());
+        	return this.typeTerm.compareTo(them.getTypeTerm());
         if (! this.sourceTerm.equals(them.getSourceTerm())) 
-        	this.sourceTerm.compareTo(them.getSourceTerm());
+        	return this.sourceTerm.compareTo(them.getSourceTerm());
         if (them instanceof RichFeature) {
             RichFeature rfo = (RichFeature)them;
             return this.rank-rfo.getRank();

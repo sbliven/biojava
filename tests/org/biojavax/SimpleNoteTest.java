@@ -8,7 +8,6 @@
 package org.biojavax;
 
 import junit.framework.*;
-import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.ComparableTerm;
 

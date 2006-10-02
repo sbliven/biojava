@@ -704,8 +704,9 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         
         // comments - if any
         if (!rs.getComments().isEmpty()) {
+            Set comments = rs.getComments();
             StringBuffer sb = new StringBuffer();
-            for (Iterator i = rs.getComments().iterator(); i.hasNext(); ) {
+            for (Iterator i = comments.iterator(); i.hasNext(); ) {
                 Comment c = (SimpleComment)i.next();
                 sb.append(c.getComment());
                 if (i.hasNext()) sb.append("\n");

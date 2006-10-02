@@ -30,6 +30,7 @@ import org.biojavax.Namespace;
 /**
  * A simple implementation of RichSequence.
  * @author Richard Holland
+ * @author Bubba Puryear
  * @since 1.5
  */
 public class SimpleRichSequence extends ThinRichSequence {
@@ -48,10 +49,9 @@ public class SimpleRichSequence extends ThinRichSequence {
      */
     public SimpleRichSequence(Namespace ns, String name, String accession, int version, SymbolList symList, Double seqversion) {
         super(ns,name,accession,version,symList.getAlphabet(),seqversion);
-        if (symList==null) this.symList = SymbolList.EMPTY_LIST;
-        else this.symList = symList;
+        this.symList = symList;
     }
-    
+
     // Hibernate requirement - not for public use.
     protected SimpleRichSequence() {} 
                     
