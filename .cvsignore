@@ -1,6 +1,7 @@
 ant-build
 .classpath
 .settings
+biojava-live.jpx
+reports
 .project
 dist
-biojava-live.jpx
