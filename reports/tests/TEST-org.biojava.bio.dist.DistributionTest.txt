@@ -1,7 +1,0 @@
-Testsuite: org.biojava.bio.dist.DistributionTest
-Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.005 sec
-
-Testcase: testSimpleDistribution took 0.002 sec
-Testcase: testAmbiguities took 0 sec
-Testcase: testGapDistribution took 0.001 sec
-Testcase: testGapDist took 0.001 sec

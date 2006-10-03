@@ -1,5 +1,0 @@
-Testsuite: org.biojava.bio.dp.EmissionStateEventTest
-Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.015 sec
-
-Testcase: testDistribution_setWeight took 0.013 sec
-Testcase: testSetDistribution took 0.002 sec

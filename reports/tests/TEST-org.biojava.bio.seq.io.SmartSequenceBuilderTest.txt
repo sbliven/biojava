@@ -1,4 +1,0 @@
-Testsuite: org.biojava.bio.seq.io.SmartSequenceBuilderTest
-Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 5.707 sec
-
-Testcase: testSmartSequenceBuilder took 5.706 sec

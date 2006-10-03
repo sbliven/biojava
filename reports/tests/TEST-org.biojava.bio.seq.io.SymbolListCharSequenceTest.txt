@@ -1,6 +1,0 @@
-Testsuite: org.biojava.bio.seq.io.SymbolListCharSequenceTest
-Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.008 sec
-
-Testcase: testCharAt took 0.006 sec
-Testcase: testLength took 0.001 sec
-Testcase: testSubSequence took 0 sec

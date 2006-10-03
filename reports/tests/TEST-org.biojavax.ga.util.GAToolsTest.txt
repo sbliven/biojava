@@ -1,7 +1,0 @@
-Testsuite: org.biojavax.ga.util.GAToolsTest
-Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.002 sec
-
-Testcase: testStandardMutationDistribution took 0.001 sec
-Testcase: testUniformMutationDistribution took 0 sec
-Testcase: testBinaryAlphabet took 0 sec
-Testcase: testCreateBinary took 0.001 sec

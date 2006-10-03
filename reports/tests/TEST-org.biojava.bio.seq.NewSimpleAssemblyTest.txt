@@ -1,5 +1,0 @@
-Testsuite: org.biojava.bio.seq.NewSimpleAssemblyTest
-Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.382 sec
-
-Testcase: testAssembledSymbols took 0.022 sec
-Testcase: testProjectedFeatures took 0.36 sec

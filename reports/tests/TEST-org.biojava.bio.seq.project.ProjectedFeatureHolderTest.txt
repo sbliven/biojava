@@ -1,9 +1,0 @@
-Testsuite: org.biojava.bio.seq.project.ProjectedFeatureHolderTest
-Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 0.014 sec
-
-Testcase: testReparentContext took 0.001 sec
-Testcase: testReparentContext_create took 0.002 sec
-Testcase: testTranslateFlipContext_translateOnly took 0.001 sec
-Testcase: testTranslateFlipContext_translateAndFlip took 0 sec
-Testcase: testTranslateFlipContext_translateAndFlip_create took 0.003 sec
-Testcase: testFeatureChangeEvent took 0.004 sec

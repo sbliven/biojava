@@ -1,7 +1,0 @@
-Testsuite: org.biojava.bio.symbol.CrossProductAlphabetIndexTest
-Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 26.935 sec
-
-Testcase: testIndex2Symbol took 2.705 sec
-Testcase: testSymbol2Index took 3.471 sec
-Testcase: testISI took 7.424 sec
-Testcase: testSIS took 13.335 sec

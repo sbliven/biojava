@@ -1,7 +1,0 @@
-Testsuite: org.biojava.bio.dist.DistSerTest
-Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.442 sec
-
-Testcase: testSimpleSerialization took 0.208 sec
-Testcase: testGapSerialization took 0.051 sec
-Testcase: testPairSerialization took 0.09 sec
-Testcase: testOrderNSerialization took 0.093 sec

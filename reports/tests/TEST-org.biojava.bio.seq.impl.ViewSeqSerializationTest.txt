@@ -1,6 +1,0 @@
-Testsuite: org.biojava.bio.seq.impl.ViewSeqSerializationTest
-Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.227 sec
-
-Testcase: testSymbols took 0.089 sec
-Testcase: testAlphabet took 0.094 sec
-Testcase: testFeatures took 0.044 sec

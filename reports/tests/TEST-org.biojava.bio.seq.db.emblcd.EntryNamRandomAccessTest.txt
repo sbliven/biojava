@@ -1,5 +1,0 @@
-Testsuite: org.biojava.bio.seq.db.emblcd.EntryNamRandomAccessTest
-Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.096 sec
-
-Testcase: testFindRecord took 0.004 sec
-Testcase: testGetFile took 0.092 sec

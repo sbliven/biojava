@@ -1,7 +1,0 @@
-Testsuite: org.biojava.bio.symbol.SymbolListTest
-Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 3.396 sec
-
-Testcase: testPackedSymbolListWithAmbiguitySymbols took 1.033 sec
-Testcase: testSimpleSymbolListWithAmbiguitySymbols took 0.579 sec
-Testcase: testPackedSymbolListWithoutAmbiguitySymbols took 0.732 sec
-Testcase: testChunkedPackedSymbolListWithAmbiguitySymbols took 1.05 sec

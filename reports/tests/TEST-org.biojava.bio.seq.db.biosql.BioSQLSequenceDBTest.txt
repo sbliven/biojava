@@ -1,6 +1,0 @@
-Testsuite: org.biojava.bio.seq.db.biosql.BioSQLSequenceDBTest
-Tests run: 0, Failures: 0, Errors: 0, Time elapsed: 0 sec
-------------- Standard Error -----------------
-No hsqldb driver found.
-------------- ---------------- ---------------
-

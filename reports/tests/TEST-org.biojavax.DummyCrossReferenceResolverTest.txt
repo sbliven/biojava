@@ -1,9 +1,0 @@
-Testsuite: org.biojavax.DummyCrossReferenceResolverTest
-Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.006 sec
-------------- Standard Output ---------------
-testGetRemoteSymbolList
-testGetRemoteBioEntry
-------------- ---------------- ---------------
-
-Testcase: testGetRemoteSymbolList took 0.004 sec
-Testcase: testGetRemoteBioEntry took 0.002 sec

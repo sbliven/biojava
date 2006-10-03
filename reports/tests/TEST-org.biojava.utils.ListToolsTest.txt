@@ -1,5 +1,0 @@
-Testsuite: org.biojava.utils.ListToolsTest
-Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.001 sec
-
-Testcase: testDoublet took 0.001 sec
-Testcase: testTriplet took 0 sec

@@ -1,5 +1,0 @@
-Testsuite: org.biojava.bio.dp.MarkovModelEventTest
-Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.143 sec
-
-Testcase: testAddRemoveState took 0.045 sec
-Testcase: testSetWeights took 0.098 sec
