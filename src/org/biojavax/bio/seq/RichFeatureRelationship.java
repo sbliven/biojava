@@ -26,8 +26,8 @@ import org.biojava.utils.Changeable;
 import org.biojavax.ontology.ComparableTerm;
 
 /**
- * Represents the relation between two bioentries. The bioentry_relationship in
- * BioSQL is what this is based on.
+ * Represents the relation between two features. The seqfeature_relationship 
+ * in BioSQL is what this is based on.
  * @author Mark Schreiber
  * @author Richard Holland
  * @since 1.5
