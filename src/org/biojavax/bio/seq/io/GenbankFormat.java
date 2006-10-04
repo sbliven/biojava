@@ -121,7 +121,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String END_SEQUENCE_TAG =    "//";
     
     // locus line
-    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(?:bp|aa)\\s+([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)\\s*(\\S+)?$");
+    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(?:bp|aa)\\s+([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)?\\s*(\\S+)?$");
     // version line
     protected static final Pattern vp = Pattern.compile("^(\\S+?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
@@ -285,14 +285,20 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     rlistener.setName(m.group(1));
                     accession = m.group(1); // default if no accession found
                     rlistener.setAccession(accession);
-                    rlistener.setDivision(m.group(5));
                     rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
-                    if (m.groupCount()==6) rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),m.group(6));
                     // Optional extras
                     String stranded = m.group(2);
                     String circular = m.group(4);
+                    String fifth = m.group(5);
+                    String sixth = m.group(6);
                     if (stranded!=null) rlistener.addSequenceProperty(Terms.getStrandedTerm(),stranded);
                     if (circular!=null && circular.equalsIgnoreCase("circular")) rlistener.setCircular(true);
+                    if (sixth != null) {
+                    	rlistener.setDivision(fifth);
+                    	rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),sixth);
+                    } else if (fifth!=null) {
+                    	rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),fifth);
+                    }
                 } else {
                     throw new ParseException("Bad locus line found: "+loc+", accession:"+accession);
                 }
