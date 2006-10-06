@@ -23,14 +23,17 @@ package org.biojava.utils;
 /**
  *  
  * Exception which is thrown when a ChangeListener does not
- * wish a change to take place.
+ * wish a change to take place. Since BioJava 1.5 the <code>ChangeVetoException</code>
+ * has been changed to extend <code>RuntimeException</code>. It is therefore an
+ * unchecked exception.
  *
  * @author     Thomas Down
  * @author     Matthew Pocock
+ * @author     Mark Schreiber
  * @since      1.1 
  */
 
-public class ChangeVetoException extends Exception {
+public class ChangeVetoException extends RuntimeException {
   private final ChangeEvent change;
 
   public ChangeVetoException() {
