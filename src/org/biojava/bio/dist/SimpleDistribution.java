@@ -74,6 +74,8 @@ extends AbstractDistribution implements Serializable{
     throws IOException, ClassNotFoundException
   {
     stream.defaultReadObject();
+    
+    //System.out.println("Alphabet for this dist is: "+alpha.getName());
     indexer = AlphabetManager.getAlphabetIndex(alpha);
     indexer.addChangeListener(
       new ChangeAdapter(){
@@ -94,7 +96,7 @@ extends AbstractDistribution implements Serializable{
         try {
             weights[indexer.indexForSymbol(swm[m].symbol)] = swm[m].weight;
         } catch (IllegalSymbolException ex) {
-            throw new IOException("Symbol in serialized stream can't be found in the alphabet");
+            throw new IOException("Symbol in serialized stream: "+swm[m].symbol.getName()+" can't be found in the alphabet");
         }
     }
   }

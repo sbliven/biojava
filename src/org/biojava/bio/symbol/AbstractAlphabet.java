@@ -59,6 +59,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Francois Pepin
+ * @author Mark Schreiber
  * @since 1.1
  */
 public abstract class AbstractAlphabet
@@ -70,11 +71,33 @@ public abstract class AbstractAlphabet
 {
   private final Map tokenizationsByName;
   private final Map ambCache;
-
-
+  public static final long serialVersionUID = -3043128839927615753l;
+  
+  /*
+   * this field records if the alpha has been registered with the AlphabetManager
+   * in the current VM. It is important for serialization, if the alpha has been registered
+   * it needs to be registered at the other end.
+   */
+  private boolean registered;
+  
+  /**
+   * Used by the AlphabetManager to inform an Alphabet that is has been
+   * registered and that is should be registered if it is transported to a new
+   * AlphabetManager on another VM
+   */
+  void setRegistered(boolean value){
+      this.registered = value;
+  }
+  boolean getRegsitered(){
+      return(registered);
+  }
+  
+  
+  
   {
     tokenizationsByName = new HashMap();
     ambCache = new HashMap();
+    registered = false;
   }
 
 
@@ -86,14 +109,15 @@ public abstract class AbstractAlphabet
    * with care.
    */
   protected Object readResolve() throws ObjectStreamException{
-    try{
-      return AlphabetManager.alphabetForName(this.getName());
-    }catch(NoSuchElementException nse){
-      //a custom alphabet has been sent to your VM, register it.
-      AlphabetManager.registerAlphabet(this.getName(), this);
-      return this;
-    }
-
+      
+      if(AlphabetManager.registered(this.getName())){
+          return AlphabetManager.alphabetForName(this.getName());
+      }else{
+          if(this.registered){
+              AlphabetManager.registerAlphabet(this.getName(), this);
+          }
+          return this;
+      }
   }
 
   /**

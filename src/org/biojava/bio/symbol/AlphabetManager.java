@@ -292,6 +292,9 @@ public final class AlphabetManager {
    */
   static public void registerAlphabet(String name, Alphabet alphabet) {
     nameToAlphabet.put(name, alphabet);
+    if(alphabet instanceof AbstractAlphabet){ //this might be needed for serialization
+          ((AbstractAlphabet)alphabet).setRegistered(true);
+    }
   }
   
   /**
