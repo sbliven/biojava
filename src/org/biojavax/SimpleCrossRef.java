@@ -23,16 +23,17 @@ package org.biojavax;
 
 import java.util.Set;
 import org.biojava.bio.Annotation;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
 
 /**
  * A basic CrossRef implementation.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @author gwaldon (made Unchangeable)
+ * @gwaldon
  * @since 1.5
  */
-public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
+public class SimpleCrossRef extends Unchangeable implements CrossRef {
     
     private RichAnnotation notes = new SimpleRichAnnotation();
     private String accession;
@@ -84,7 +85,7 @@ public class SimpleCrossRef extends AbstractChangeable implements CrossRef {
     /**
      * {@inheritDoc}
      */
-    public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
+    public void setNoteSet(Set notes) { this.notes.setNoteSet(notes); }
     
     /**
      * {@inheritDoc}

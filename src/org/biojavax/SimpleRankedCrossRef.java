@@ -21,14 +21,17 @@
 
 package org.biojavax;
 
-import org.biojava.utils.Unchangeable;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
 
 /**
  * Simple implementation of RankedCrossRef.
  * @author Richard Holland
+ * @author gwaldon
  * @since 1.5
  */
-public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef {
+public class SimpleRankedCrossRef extends AbstractChangeable implements RankedCrossRef {
     
     private CrossRef crossref;
     private int rank;
@@ -58,7 +61,26 @@ public class SimpleRankedCrossRef extends Unchangeable implements RankedCrossRef
     /**
      * {@inheritDoc}
      */
-    public void setRank(int rank) { this.rank = rank; }
+    public void setRank(int rank) {
+        if(rank==this.rank)
+            return;
+        if(!this.hasListeners(RankedCrossRef.RANK)) {
+            this.rank = rank;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    RankedCrossRef.RANK,
+                    new Integer(rank),
+                    new Integer(this.rank)
+                    );
+            ChangeSupport cs = this.getChangeSupport(RankedCrossRef.RANK);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.rank = rank;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
     
     /**
      * {@inheritDoc}

@@ -21,16 +21,26 @@
 
 package org.biojavax;
 
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.Changeable;
+
 
 /**
- * A simple ranked comment designed to be used for BioEntry comments 
- * in BioSQL. The interface is immutable, the fields are intended to 
- * be set by the constructor.
+ * A simple ranked comment designed to be used for BioEntry comments
+ * in BioSQL. The Comment field is intended to be set by the constructor
+ * and is immuntable; the Rank field is changeable.
  * @author Richard Holland
+ * @author gwaldon
  * @see org.biojavax.bio.BioEntry
  * @since 1.5
  */
-public interface Comment extends Comparable {
+public interface Comment extends Comparable, Changeable {
+    
+    public static final ChangeType RANK = new ChangeType(
+            "This comment's rank has changed",
+            "org.biojavax.Comment",
+            "RANK"
+            );
     
     /**
      * Returns the comment part of this comment.
@@ -46,7 +56,7 @@ public interface Comment extends Comparable {
     
     /**
      * Sets the rank of this comment.
-     * @param rank the rank.
+     * @param rank the rank to use.
      */
     public void setRank(int rank);
     

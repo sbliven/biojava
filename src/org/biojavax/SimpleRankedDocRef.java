@@ -21,10 +21,11 @@
 
 package org.biojavax;
 
-import java.util.Iterator;
 
 import org.biojava.bio.seq.io.ParseException;
-import org.biojavax.bio.seq.Position;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.SimplePosition;
 import org.biojavax.bio.seq.SimpleRichLocation;
@@ -33,9 +34,10 @@ import org.biojavax.bio.seq.io.GenbankLocationParser;
 /**
  * Represents a documentary reference. 
  * @author Richard Holland
+ * @author gwaldon
  * @since 1.5
  */
-public class SimpleRankedDocRef implements RankedDocRef {
+public class SimpleRankedDocRef extends AbstractChangeable implements RankedDocRef {
     
     private DocRef docref;
     private Integer start;
@@ -66,9 +68,8 @@ public class SimpleRankedDocRef implements RankedDocRef {
      */
     public SimpleRankedDocRef(DocRef docref, RichLocation location, int rank) {
         if (docref==null) throw new IllegalArgumentException("Document reference cannot be null");
-        if (location==null) throw new IllegalArgumentException("Document location cannot be null");
         this.docref = docref;
-        this.setLocation(location);
+        this.makeLocation(location);
         this.rank = rank;
     }
     
@@ -78,7 +79,26 @@ public class SimpleRankedDocRef implements RankedDocRef {
     /**
      * {@inheritDoc}
      */
-    public void setRank(int rank) { this.rank = rank; }
+    public void setRank(int rank) {
+        if(rank==this.rank)
+            return;
+        if(!this.hasListeners(RankedDocRef.RANK)) {
+            this.rank = rank;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    RankedDocRef.RANK,
+                    new Integer(rank),
+                    new Integer(this.rank)
+                    );
+            ChangeSupport cs = this.getChangeSupport(RankedDocRef.RANK);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.rank = rank;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -124,10 +144,34 @@ public class SimpleRankedDocRef implements RankedDocRef {
     }
     
     // Internal use only.
-    protected void setLocation(RichLocation location) {
-    	this.location = location;
+    private void makeLocation(RichLocation location) {
+        if (location==null) 
+            throw new IllegalArgumentException("Document location cannot be null");
+        this.location = location;
     	this.start = new Integer(location.getMin());
     	this.end = new Integer(location.getMax());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setLocation(RichLocation location) {
+        if(!this.hasListeners(RankedDocRef.LOCATION)) {
+            makeLocation(location);
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    RankedDocRef.LOCATION,
+                    location,
+                    this.location
+                    );
+            ChangeSupport cs = this.getChangeSupport(RankedDocRef.LOCATION);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                makeLocation(location);
+                cs.firePostChangeEvent(ce);
+            }
+        }
     }
     
     public RichLocation getLocation() {
@@ -137,10 +181,10 @@ public class SimpleRankedDocRef implements RankedDocRef {
     // Internal use only.
     private final void setLocationText(final String theLocation) throws ParseException {
     	if (theLocation == null) {
-    		setLocation(RichLocation.EMPTY_LOCATION);
+    		makeLocation(RichLocation.EMPTY_LOCATION);
     	} else {
         	final RichLocation location = GenbankLocationParser.parseLocation(RichObjectFactory.getDefaultNamespace(), null, theLocation);
-        	setLocation(location);
+        	makeLocation(location);
     	}
     }
     

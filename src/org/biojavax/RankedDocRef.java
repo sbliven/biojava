@@ -21,6 +21,8 @@
 
 package org.biojavax;
 
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.Changeable;
 import org.biojavax.bio.seq.RichLocation;
 
 /**
@@ -28,9 +30,22 @@ import org.biojavax.bio.seq.RichLocation;
  * in BioSQL.
  * @author Richard Holland
  * @see DocRef
+ * @author gwaldon
  * @since 1.5
  */
-public interface RankedDocRef extends Comparable {
+public interface RankedDocRef extends Comparable,Changeable {
+    
+    public static final ChangeType RANK = new ChangeType(
+            "This ranked docreference's rank has changed",
+            "org.biojavax.RankedDocRef",
+            "RANK"
+            );
+    
+    public static final ChangeType LOCATION = new ChangeType(
+            "This ranked docreference's location has changed",
+            "org.biojavax.RankedDocRef",
+            "RANK"
+            );
     
     /**
      * Represents a reference to a document. This value is intended to be set by 
@@ -67,6 +82,12 @@ public interface RankedDocRef extends Comparable {
     public RichLocation getLocation();
     
     /**
+     * Sets the location of this reference.
+     * @param location the location to use.
+     */
+    public void setLocation(RichLocation location);
+
+    /**
      * The rank of this reference. This value is intended to be set by the constructor
      * of the implementing class.
      * @return the rank.
@@ -75,7 +96,7 @@ public interface RankedDocRef extends Comparable {
     
     /**
      * Sets the rank of this reference.
-     * @param rank the rank.
+     * @param rank the rank to use.
      */
     public void setRank(int rank);
 }

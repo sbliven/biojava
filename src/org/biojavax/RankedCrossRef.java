@@ -20,16 +20,24 @@
  */
 
 package org.biojavax;
+import org.biojava.utils.ChangeType;
 import org.biojava.utils.Changeable;
 
 /**
  * Allows cross-references to other databases to be ranked.
  * @author Richard Holland
+ * @author gwaldon
  * @see RankedCrossRefable
  * @see CrossRef
  * @since 1.5
  */
 public interface RankedCrossRef extends Comparable,Changeable {
+    
+    public static final ChangeType RANK = new ChangeType(
+            "This ranked crossreference's rank has changed",
+            "org.biojavax.RankedCrossRef",
+            "RANK"
+            );
     
     /**
      * Return the cross reference associated with this object.
@@ -45,7 +53,7 @@ public interface RankedCrossRef extends Comparable,Changeable {
     
     /**
      * Set the rank associated with the cross reference.
-     * @param rank the rank.
+     * @param rank the rank to use.
      */
     public void setRank(int rank);
     

@@ -21,12 +21,19 @@
 
 package org.biojavax;
 
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+
 /**
  * An implementaion of Comment.
  * @author Richard Holland
+ * @author gwaldon
  * @since 1.5
  */
-public class SimpleComment implements Comment {
+public class SimpleComment extends AbstractChangeable implements Comment {
     
     private String comment;
     private int rank;
@@ -56,7 +63,26 @@ public class SimpleComment implements Comment {
     /**
      * {@inheritDoc}
      */
-    public void setRank(int rank) { this.rank = rank; }
+    public void setRank(int rank) {
+        if(rank==this.rank)
+            return;
+        if(!this.hasListeners(Comment.RANK)) {
+            this.rank = rank;
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                    this,
+                    Comment.RANK,
+                    new Integer(rank),
+                    new Integer(this.rank)
+                    );
+            ChangeSupport cs = this.getChangeSupport(Comment.RANK);
+            synchronized(cs) {
+                cs.firePreChangeEvent(ce);
+                this.rank = rank;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+    }
     
     /**
      * {@inheritDoc}
@@ -110,8 +136,8 @@ public class SimpleComment implements Comment {
      * {@inheritDoc}
      * Form: "(#rank) comment"
      */
-    public String toString() { 
-        return "(#"+this.rank+") "+this.comment; 
+    public String toString() {
+        return "(#"+this.rank+") "+this.comment;
     }
     
     // Hibernate requirement - not for public use.
