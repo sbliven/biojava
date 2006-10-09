@@ -29,8 +29,7 @@ import org.biojava.utils.Unchangeable;
  * A basic CrossRef implementation.
  * @author Richard Holland
  * @author Mark Schreiber
- * @author gwaldon (made Unchangeable)
- * @gwaldon
+ * @author George Waldon (made Unchangeable)
  * @since 1.5
  */
 public class SimpleCrossRef extends Unchangeable implements CrossRef {
