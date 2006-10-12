@@ -52,6 +52,7 @@ import org.biojava.utils.SmallMap;
  * http://www-2.cs.cmu.edu/afs/cs/project/genome/WWW/Papers/clark.html</a></kbd>
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Richard Holland
  * @see ABIFParser
  */
 public class ABIFChromatogram extends AbstractChromatogram implements Serializable {
@@ -158,13 +159,11 @@ public class ABIFChromatogram extends AbstractChromatogram implements Serializab
             if (dataPtr.numberOfElements > Integer.MAX_VALUE)
                 throw new UnsupportedChromatogramFormatException("Chromatogram has more than " + Integer.MAX_VALUE + " trace samples -- can't handle it");
             int count = (int) dataPtr.numberOfElements;
-            getDataAccess().seek(dataPtr.dataRecord);
             int[] trace = new int[count];
             int max = -1;
             setBits(8*dataPtr.elementLength);
             if (dataPtr.elementLength == 2) {
-                byte[] shortArray = new byte[2 * count];
-                getDataAccess().readFully(shortArray);
+                byte[] shortArray = dataPtr.offsetData;
                 int i = 0;
                 for (int s = 0; s < shortArray.length; s += 2) {
                     trace[i] =  ((short)((shortArray[s] << 8) | (shortArray[s + 1] & 0xff))) & 0xffff;
@@ -172,8 +171,7 @@ public class ABIFChromatogram extends AbstractChromatogram implements Serializab
                 }
             }
             else if (dataPtr.elementLength == 1) {
-                byte[] byteArray = new byte[count];
-                getDataAccess().readFully(byteArray);
+                byte[] byteArray = dataPtr.offsetData;
                 for (int i = 0; i < byteArray.length; i++) {
                     trace[i] = byteArray[i] & 0xff;
                     max = Math.max(trace[i], max);
@@ -207,18 +205,15 @@ public class ABIFChromatogram extends AbstractChromatogram implements Serializab
             // the list of offsets
             List offsets = new ArrayList(count);
             // start reading offsets, creating SimpleBaseCalls along the way
-            getDataAccess().seek(offsetsPtr.dataRecord);
             if (offsetsPtr.elementLength == 2) {
-                byte[] shortArray = new byte[2 * count];
-                getDataAccess().readFully(shortArray);
+                byte[] shortArray = offsetsPtr.offsetData;
                 IntegerAlphabet integerAlphabet = IntegerAlphabet.getInstance();
                 for (int s = 0; s < shortArray.length; s += 2) {
                     offsets.add(integerAlphabet.getSymbol(((short)((shortArray[s] << 8) | (shortArray[s + 1] & 0xff))) & 0xffff));
                 }
             }
             else if (offsetsPtr.elementLength == 1) {
-                byte[] byteArray = new byte[count];
-                getDataAccess().readFully(byteArray);
+                byte[] byteArray = offsetsPtr.offsetData;
                 IntegerAlphabet integerAlphabet = IntegerAlphabet.getInstance();
                 for (int i = 0 ; i < byteArray.length; i++) {
                     offsets.add(integerAlphabet.getSymbol(byteArray[i] & 0xff));
@@ -230,9 +225,7 @@ public class ABIFChromatogram extends AbstractChromatogram implements Serializab
 
             // then read the base calls
             try {
-                getDataAccess().seek(basesPtr.dataRecord);
-                byte[] byteArray = new byte[(int) basesPtr.numberOfElements];
-                getDataAccess().readFully(byteArray);
+                byte[] byteArray = basesPtr.offsetData;
                 for (int i = 0; i < byteArray.length; i++) {
                     dna.add(ABIFParser.decodeDNAToken((char) byteArray[i]));
                 }

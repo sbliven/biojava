@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.biojava.bio.seq.DNATools;
@@ -53,22 +54,17 @@ import org.biojava.utils.io.Seekable;
  * {@link TaggedDataRecord} instances.
  * </p>
  * <p>
- * If a record only contains a pointer to the desired data, subclasses may get
- * at the raw data by:
+ * If a record only contains a pointer to the desired data (see 
+ * {@link TaggedDataRecord#hasOffsetData}, subclasses may get
+ * at the raw data by using {@link TaggedDataRecord#offsetData}:
  * </p>
- * <ol>
- *   <li>Acquiring the appropriate {@link DataAccess} object by calling
- *       {#link getDataAccess}</li>
- *   <li>Seeking in it to the appropriate offset ({@link DataAccess#seek})</li>
- *   <li>Using the {@link java.io.DataInput} methods to read bytes, ints,
- *       etc.</li>
- * </ol>
  * <p>
  * This parser provides methods and classes for dealing with the files as
  * streams or local files (local files being more memory-efficient).
  * </p>
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Richard Holland
  */
 public class ABIFParser {
     private ABIFParser.DataAccess din;
@@ -124,6 +120,13 @@ public class ABIFParser {
             tdr = new TaggedDataRecord(din);
             label = new StringBuffer(6).append(tdr.tagName).append(tdr.tagNumber);
             records.put(label.substring(0), tdr);
+        }
+        for (Iterator i = records.values().iterator(); i.hasNext(); ) {
+        	TaggedDataRecord record = (TaggedDataRecord)i.next();
+        	if (record.hasOffsetData) {
+        		din.seek(record.dataRecord);
+        		din.readFully(record.offsetData);
+        	}
         }
         parsed = true;
     }
@@ -195,7 +198,9 @@ public class ABIFParser {
         public final long   recordLength;
         public final long   dataRecord;
         public final long   crypticVariable;
-
+        public final boolean hasOffsetData;
+        public final byte[] offsetData;
+        
         /**
          * Creates a new TaggedDataRecord from the next 28 bytes of
          * <code>din</code>.
@@ -216,6 +221,12 @@ public class ABIFParser {
             recordLength     = 0xffffffff & din.readInt();
             dataRecord       = 0xffffffff & din.readInt();
             crypticVariable  = 0xffffffff & din.readInt();
+            
+            hasOffsetData = recordLength>4L;
+            if (hasOffsetData)
+            	offsetData = new byte[(int)recordLength];
+            else 
+            	offsetData = new byte[0];
         }
 
         /**
@@ -272,6 +283,7 @@ public class ABIFParser {
             else {
                 hexStringify((int)dataRecord, sb);
             }
+            sb.append("  hasOffsetData   = ").append(hasOffsetData).append('\n');
             sb.append('\n');
             sb.append("  crypticVariable = ").append(crypticVariable).append('\n');
             sb.append(']');
