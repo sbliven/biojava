@@ -7,16 +7,21 @@
 
 package org.biojavax;
 
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener.ChangeEventRecorder;
+import org.biojava.utils.ChangeVetoException;
 import junit.framework.*;
 
 /**
  *
  * @author Mark Schreiber
+ * @author gwaldon
  */
 public class SimpleCommentTest extends TestCase {
     SimpleComment comment;
     String com = "Test comment";
     int rank = 1;
+    ChangeEventRecorder cr;
     
     public SimpleCommentTest(String testName) {
         super(testName);
@@ -24,9 +29,12 @@ public class SimpleCommentTest extends TestCase {
 
     protected void setUp() throws Exception {
         comment = new SimpleComment(com, rank);
+        cr = new ChangeEventRecorder();
+        comment.addChangeListener(cr);
     }
 
     protected void tearDown() throws Exception {
+        comment.removeChangeListener(cr);
         comment = null;
     }
 
@@ -54,7 +62,29 @@ public class SimpleCommentTest extends TestCase {
         
         assertEquals(com, comment.getComment());
     }
-
+    
+    /**
+     * Test of setRank method, of class org.biojavax.SimpleComment.
+     */ 
+    public void testSetRank() {
+        System.out.println("testSetRank");
+        try {
+            comment.setRank(2);
+            //should generate an event
+            ChangeEvent ev = cr.getEvent();
+            assertNotNull(ev);
+            //of the correct type
+            assertEquals(comment.RANK, ev.getType());
+            //old value should be Integer(1);
+            assertEquals(new Integer(1), ev.getPrevious());
+            //new value should be Integer(2);
+             assertEquals(new Integer(2), ev.getChange());
+             comment.setRank(1);
+        } catch (ChangeVetoException cve) {
+            fail("Unexpected exception: "+ cve);
+        }
+    }
+    
     /**
      * Test of getRank method, of class org.biojavax.SimpleComment.
      */

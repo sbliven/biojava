@@ -8,11 +8,19 @@
 package org.biojavax;
 
 import java.util.Collections;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener.ChangeEventRecorder;
+import org.biojava.utils.ChangeVetoException;
+import org.biojavax.bio.seq.Position;
+import org.biojavax.bio.seq.SimplePosition;
+import org.biojavax.bio.seq.RichLocation;
+import org.biojavax.bio.seq.SimpleRichLocation;
 import junit.framework.*;
 
 /**
  *
  * @author Mark Schreiber
+ * @author gwaldon
  */
 public class SimpleRankedDocRefTest extends TestCase {
     DocRef dr;
@@ -21,6 +29,7 @@ public class SimpleRankedDocRefTest extends TestCase {
     int rank = 1;
     Integer start;
     Integer end;
+    ChangeEventRecorder cr;
     
     public SimpleRankedDocRefTest(String testName) {
         super(testName);
@@ -32,9 +41,12 @@ public class SimpleRankedDocRefTest extends TestCase {
 
     protected void setUp() throws Exception {
         ref = new SimpleRankedDocRef(dr, start, end, rank);
+        cr = new ChangeEventRecorder();
+        ref.addChangeListener(cr);
     }
 
     protected void tearDown() throws Exception {
+        ref.removeChangeListener(cr);
         ref = null;
     }
 
@@ -42,6 +54,28 @@ public class SimpleRankedDocRefTest extends TestCase {
         TestSuite suite = new TestSuite(SimpleRankedDocRefTest.class);
         
         return suite;
+    }
+    
+    /**
+     * Test of setRank method, of class org.biojavax.SimpleRankedDocRef.
+     */ 
+    public void testSetRank() {
+        System.out.println("testSetRank");
+        try {
+            ref.setRank(2);
+            //should generate an event
+            ChangeEvent ev = cr.getEvent();
+            assertNotNull(ev);
+            //of the correct type
+            assertEquals(RankedDocRef.RANK, ev.getType());
+            //old value should be Integer(1);
+            assertEquals(new Integer(1), ev.getPrevious());
+            //new value should be Integer(2);
+             assertEquals(new Integer(2), ev.getChange());
+             ref.setRank(1);
+        } catch (ChangeVetoException cve) {
+            fail("Unexpected exception: "+ cve);
+        }
     }
 
     /**
@@ -79,7 +113,45 @@ public class SimpleRankedDocRefTest extends TestCase {
         
         assertEquals(end, ref.getEnd());
     }
-
+    
+    /**
+     * Test of setLocation method, of class org.biojavax.SimpleRankedDocRef.
+     */ 
+    public void testSetLocation() {
+        System.out.println("testSetLocation");
+        try {
+            Position p1 = new SimplePosition(2);
+            Position p2 = new SimplePosition(4);
+            RichLocation loc = new SimpleRichLocation(p1,p2,0);
+            ref.setLocation(loc);
+            //should generate an event
+            ChangeEvent ev = cr.getEvent();
+            assertNotNull(ev);
+            //of the correct type
+            assertEquals(RankedDocRef.LOCATION, ev.getType());
+            //old value;
+            Object o = ev.getPrevious();
+            assertTrue(o instanceof RichLocation);
+            RichLocation l = (RichLocation) o;
+            assertTrue(l.getMin()==1);
+            assertTrue(l.getMax()==25);
+            //new value;
+            o = ev.getChange();
+            assertTrue(o instanceof RichLocation);
+            l = (RichLocation) o;
+            assertTrue(l.getMin()==2);
+            assertTrue(l.getMax()==4);
+             
+            p1 = new SimplePosition(1);
+            p2 = new SimplePosition(25);
+            loc = new SimpleRichLocation(p1,p2,0);
+            ref.setLocation(loc);
+            
+        } catch (ChangeVetoException cve) {
+            fail("Unexpected exception: "+ cve);
+        }
+    }
+    
     /**
      * Test of equals method, of class org.biojavax.SimpleRankedDocRef.
      */

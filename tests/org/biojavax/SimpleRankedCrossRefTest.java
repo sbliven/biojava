@@ -7,30 +7,38 @@
 
 package org.biojavax;
 
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener.ChangeEventRecorder;
+import org.biojava.utils.ChangeVetoException;
 import junit.framework.*;
 
 
 /**
  *
  * @author Mark Schreiber
+ * @author gwaldon
  */
 public class SimpleRankedCrossRefTest extends TestCase {
     SimpleCrossRef ref;
     RankedCrossRef xref;
     RankedCrossRef xref2;
     int rank = 1;
+    ChangeEventRecorder cr;
     
     public SimpleRankedCrossRefTest(String testName) {
-        super(testName);
+        super(testName);ChangeEventRecorder cr;
     }
 
     protected void setUp() throws Exception {
         ref = new SimpleCrossRef("dbname", "AC123456", 1);
         xref = new SimpleRankedCrossRef(ref, rank);
+        cr = new ChangeEventRecorder();
+        xref.addChangeListener(cr);
     }
 
     protected void tearDown() throws Exception {
         ref = null;
+        xref.removeChangeListener(cr);
         xref = null;
     }
 
@@ -49,6 +57,28 @@ public class SimpleRankedCrossRefTest extends TestCase {
         assertEquals(ref, xref.getCrossRef());
     }
 
+    /**
+     * Test of setRank method, of class org.biojavax.SimpleRankedCrossRef.
+     */ 
+    public void testSetRank() {
+        System.out.println("testSetRank");
+        try {
+            xref.setRank(2);
+            //should generate an event
+            ChangeEvent ev = cr.getEvent();
+            assertNotNull(ev);
+            //of the correct type
+            assertEquals(RankedCrossRef.RANK, ev.getType());
+            //old value should be Integer(1);
+            assertEquals(new Integer(1), ev.getPrevious());
+            //new value should be Integer(2);
+             assertEquals(new Integer(2), ev.getChange());
+             xref.setRank(1);
+        } catch (ChangeVetoException cve) {
+            fail("Unexpected exception: "+ cve);
+        }
+    }
+    
     /**
      * Test of getRank method, of class org.biojavax.SimpleRankedCrossRef.
      */
