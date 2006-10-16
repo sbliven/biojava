@@ -73,6 +73,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author David Waring
  * @author David Huen (another constructor)
+ * @author George Waldon
  */
 
 public class SimpleSymbolList extends AbstractSymbolList implements ChangeListener, Serializable {
@@ -334,49 +335,50 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
          // create a new change event ->the EDIT is a static final variable of type ChangeType in SymbolList interface
         cevt = new ChangeEvent(this, SymbolList.EDIT, edit);
         cs = getChangeSupport(SymbolList.EDIT);
+        synchronized(cs) {
+            // let the listeners know what we want to do
+            cs.firePreChangeEvent(cevt);
 
-        // let the listeners know what we want to do
-        cs.firePreChangeEvent(cevt);
+            // if nobody complained lets continue
+            // if we are a view we convert to a real SimpleSymbolList
+            if (isView){
+                makeReal();
+            }
+            // now for the edit
+            int posRightFragInSourceArray5 = edit.pos + edit.length - 1;
+            int rightFragLength = length - posRightFragInSourceArray5;
+            int posRightFragInDestArray5 = posRightFragInSourceArray5 + edit.replacement.length() - edit.length;
+            int posReplaceFragInDestArray5 = edit.pos - 1;
+            int replaceFragLength = edit.replacement.length();
 
-        // if nobody complained lets continue
-        // if we are a view we convert to a real SimpleSymbolList
-        if (isView){
-            makeReal();
+            if ((length + replaceFragLength - edit.length) > symbols.length){
+                // extend the array
+                dest = new Symbol[(length + replaceFragLength - edit.length + INCREMENT)];
+
+                // copy symbols before the edit no need to do this if we didn't have to build a new array
+                System.arraycopy(symbols,0,dest,0,(edit.pos -1));
+            }else{
+                dest = symbols;  // array copy works when copying from an array to itself
+            }
+
+            // copy the symbols after the edit
+            if (rightFragLength > 0){
+                System.arraycopy(symbols, posRightFragInSourceArray5, dest, posRightFragInDestArray5,rightFragLength);
+            }
+            // copy the symbols within the edit
+            for (int i = 1; i <= replaceFragLength; i++){
+                dest[posReplaceFragInDestArray5 + i - 1] = edit.replacement.symbolAt(i);
+            }
+
+            // if there was a net deletion we have to get rid of the remaining symbols
+            newLength = length + replaceFragLength - edit.length;
+            for (int j = newLength; j < length; j++){
+                dest[j] = null;
+            }
+            length = newLength;
+            symbols = dest;
+            cs.firePostChangeEvent(cevt);
         }
-        // now for the edit
-        int posRightFragInSourceArray5 = edit.pos + edit.length - 1;
-        int rightFragLength = length - posRightFragInSourceArray5;
-        int posRightFragInDestArray5 = posRightFragInSourceArray5 + edit.replacement.length() - edit.length;
-        int posReplaceFragInDestArray5 = edit.pos - 1;
-        int replaceFragLength = edit.replacement.length();
-
-        if ((length + replaceFragLength - edit.length) > symbols.length){
-            // extend the array
-            dest = new Symbol[(length + replaceFragLength - edit.length + INCREMENT)];
-
-            // copy symbols before the edit no need to do this if we didn't have to build a new array
-            System.arraycopy(symbols,0,dest,0,(edit.pos -1));
-        }else{
-            dest = symbols;  // array copy works when copying from an array to itself
-        }
-
-        // copy the symbols after the edit
-        if (rightFragLength > 0){
-            System.arraycopy(symbols, posRightFragInSourceArray5, dest, posRightFragInDestArray5,rightFragLength);
-        }
-        // copy the symbols within the edit
-        for (int i = 1; i <= replaceFragLength; i++){
-            dest[posReplaceFragInDestArray5 + i - 1] = edit.replacement.symbolAt(i);
-        }
-
-        // if there was a net deletion we have to get rid of the remaining symbols
-        newLength = length + replaceFragLength - edit.length;
-        for (int j = newLength; j < length; j++){
-            dest[j] = null;
-        }
-        length = newLength;
-        symbols = dest;
-        cs.firePostChangeEvent(cevt);
     }
 
     /**
