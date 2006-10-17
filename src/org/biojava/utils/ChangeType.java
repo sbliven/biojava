@@ -129,7 +129,7 @@ public final class ChangeType implements Serializable {
   }
 
   /**
-   *  Construct a new ChangeType with supertype UNKNOWN
+   *  Construct a new ChangeType.
    *
    * @param  name   The name of this change.
    * @param  clazz  The class which is going to contain this change.
