@@ -24,6 +24,7 @@ package org.biojavax;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Simple implementation of RankedCrossRef.
@@ -61,7 +62,7 @@ public class SimpleRankedCrossRef extends AbstractChangeable implements RankedCr
     /**
      * {@inheritDoc}
      */
-    public void setRank(int rank) {
+    public void setRank(int rank)  throws ChangeVetoException {
         if(rank==this.rank)
             return;
         if(!this.hasListeners(RankedCrossRef.RANK)) {

@@ -26,6 +26,7 @@ import org.biojava.bio.seq.io.ParseException;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.SimplePosition;
 import org.biojavax.bio.seq.SimpleRichLocation;
@@ -79,7 +80,7 @@ public class SimpleRankedDocRef extends AbstractChangeable implements RankedDocR
     /**
      * {@inheritDoc}
      */
-    public void setRank(int rank) {
+    public void setRank(int rank)  throws ChangeVetoException {
         if(rank==this.rank)
             return;
         if(!this.hasListeners(RankedDocRef.RANK)) {
@@ -155,7 +156,7 @@ public class SimpleRankedDocRef extends AbstractChangeable implements RankedDocR
     /**
      * {@inheritDoc}
      */
-    public void setLocation(RichLocation location) {
+    public void setLocation(RichLocation location)  throws ChangeVetoException {
         if(!this.hasListeners(RankedDocRef.LOCATION)) {
             makeLocation(location);
         } else {

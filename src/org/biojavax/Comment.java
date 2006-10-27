@@ -22,6 +22,7 @@
 package org.biojavax;
 
 import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 
@@ -58,6 +59,6 @@ public interface Comment extends Comparable, Changeable {
      * Sets the rank of this comment.
      * @param rank the rank to use.
      */
-    public void setRank(int rank);
+    public void setRank(int rank) throws ChangeVetoException;
     
 }

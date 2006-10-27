@@ -21,6 +21,7 @@
 
 package org.biojavax;
 import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
@@ -55,6 +56,6 @@ public interface RankedCrossRef extends Comparable,Changeable {
      * Set the rank associated with the cross reference.
      * @param rank the rank to use.
      */
-    public void setRank(int rank);
+    public void setRank(int rank) throws ChangeVetoException;
     
 }

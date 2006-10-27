@@ -22,6 +22,7 @@
 package org.biojavax;
 
 import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 import org.biojavax.bio.seq.RichLocation;
 
@@ -85,7 +86,7 @@ public interface RankedDocRef extends Comparable,Changeable {
      * Sets the location of this reference.
      * @param location the location to use.
      */
-    public void setLocation(RichLocation location);
+    public void setLocation(RichLocation location) throws ChangeVetoException;
 
     /**
      * The rank of this reference. This value is intended to be set by the constructor
@@ -98,7 +99,7 @@ public interface RankedDocRef extends Comparable,Changeable {
      * Sets the rank of this reference.
      * @param rank the rank to use.
      */
-    public void setRank(int rank);
+    public void setRank(int rank)  throws ChangeVetoException;
 }
 
 

@@ -65,6 +65,7 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  * Constructs BioEntry objects by listening to events.
  * @author Richard Holland
+ * @author George Waldon
  * @since 1.5
  */
 public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichSequenceBuilder {
@@ -109,7 +110,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
         try{
             this.version = 0;
             this.versionSeen = false;
-            this.seqVersion = 0;
+            this.seqVersion = 0.0;
             this.seqVersionSeen = false;
             this.accession = null;
             this.description = null;
@@ -120,6 +121,11 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
             this.symbols = null;
             this.namespace = null;
             this.taxon = null;
+            this.seqPropCount = 1;   //annotation rank
+            this.referenceCount = 1; //doc reference rank
+            this.commentRank = 1;    //comment rank
+            this.featureRank = 1;    //feature rank
+            this.featPropCount = 1;  //feature annotation rank
             this.comments.clear();
             this.relations.clear();
             this.references.clear();
@@ -282,9 +288,10 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
             else {
                 RichFeature parent = (RichFeature)this.featureStack.get(this.featureStack.size() - 1);
                 parent.addFeatureRelationship(
-                        new SimpleRichFeatureRelationship(parent, f, SimpleRichFeatureRelationship.getContainsTerm(), this.featureRank++)
+                        new SimpleRichFeatureRelationship(parent, f, SimpleRichFeatureRelationship.getContainsTerm(), 0)
                         );
             }
+            this.featPropCount = 1; //reset feature anotation rank
             this.featureStack.add(f);
         } catch (ChangeVetoException e) {
             throw new ParseException(e);
@@ -296,7 +303,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
     private Set rootFeatures = new TreeSet();
     private List allFeatures = new ArrayList();
     private List featureStack = new ArrayList();
-    private int featureRank = 0;
+    private int featureRank = 1;
     
     /**
      * {@inheritDoc}
@@ -336,9 +343,11 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
      */
     public void setRankedDocRef(RankedDocRef ref) throws ParseException {
         if (ref==null) throw new ParseException("Reference cannot be null");
+        ref.setRank(referenceCount++);
         this.references.add(ref);
     }
     private Set references = new TreeSet();
+    private int referenceCount = 1;
     
     /**
      * {@inheritDoc}
@@ -362,7 +371,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
             throw new ParseException(e);
         }
     }
-    int featPropCount = 0;
+    int featPropCount = 1;
     
     /**
      * {@inheritDoc}
@@ -379,7 +388,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
             throw new ParseException(e);
         }
     }
-    int seqPropCount = 0;
+    int seqPropCount = 1;
     
     /**
      * {@inheritDoc}

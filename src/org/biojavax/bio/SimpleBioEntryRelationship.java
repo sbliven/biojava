@@ -38,6 +38,7 @@ import org.biojavax.ontology.ComparableTerm;
  * and given a rank.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @author George Waldon
  * @since 1.5
  */
 public class SimpleBioEntryRelationship extends AbstractChangeable implements BioEntryRelationship {
@@ -120,7 +121,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     
     /**
      * {@inheritDoc}
-     * A relationship is compared first by rank, then object, subject, then term. If
+     * A relationship is compared first by rank, then object, subject, and term. If
      * ranks are null, they are treated as zero for comparison's sake.
      */
     public int compareTo(Object o) {
@@ -130,8 +131,8 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
         if (this == o) return 0;
         // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)o;
-        int ourRank = (this.getRank()==null?0:this.rank.intValue());
-        int theirRank = (them.getRank()==null?0:them.getRank().intValue());
+        int ourRank =   (this.getRank() == null ? 0 : this.rank.intValue());
+        int theirRank = (them.getRank() == null ? 0 : them.getRank().intValue());
         if (ourRank!=theirRank) return ourRank-theirRank;
         if (!this.object.equals(them.getObject())) return this.object.compareTo(them.getObject());
         if (!this.subject.equals(them.getSubject())) return this.subject.compareTo(them.getSubject());
@@ -140,7 +141,8 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     
     /**
      * {@inheritDoc} 
-     * Relationships are equal if they share the same object, subject, rank and term.
+     * Relationships are equal if they share the same rank, object, subject and term. If
+     * ranks are null, they are treated as zero for consistency with comparison.
      */
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -149,18 +151,12 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
         if (this.object==null) return false;
         // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)obj;
-        if(this.getRank() == null && them.getRank() == null){
-           return (this.subject.equals(them.getSubject()) &&
-                this.object.equals(them.getObject()) &&
-                this.term.equals(them.getTerm())); 
-        }
-        if(this.getRank() != null && them.getRank() != null){
-            return (this.subject.equals(them.getSubject()) &&
+        int ourRank =   (this.getRank() == null ? 0 : this.rank.intValue());
+        int theirRank = (them.getRank() == null ? 0 : them.getRank().intValue());
+        return (this.subject.equals(them.getSubject()) &&
                     this.object.equals(them.getObject()) &&
                     this.term.equals(them.getTerm()) &&
-                    this.rank.equals(them.getRank()));
-        }
-        return false;
+                    ourRank==theirRank);
     }
     
     /**
@@ -171,10 +167,10 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
         // Hibernate comparison - we haven't been populated yet
         if (this.subject==null) return code;
         // Normal comparison
+        code = code*37 + (this.getRank() == null ? 0 : this.rank.hashCode());
         code = code*37 + this.object.hashCode();
         code = code*37 + this.subject.hashCode();
         code = code*37 + this.term.hashCode();
-        code = code*37 + (this.getRank() == null ? 0 : this.rank.hashCode());
         return code;
     }
     

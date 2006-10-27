@@ -53,6 +53,7 @@ import org.biojavax.ontology.ComparableTerm;
  * @author Richard Holland
  * @author Mark Schreiber
  * @author Bubba Puryear
+ * @George Waldon
  * @since 1.5
  */
 public class SimpleRichFeature extends AbstractChangeable implements RichFeature {
@@ -649,17 +650,18 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         // Hibernate comparison - we haven't been populated yet
         if (this.parent==null) return code;
         // Normal comparison
+        code = 31*code + this.rank;
         code = 31*code + this.parent.hashCode();
         code = 31*code + this.sourceTerm.hashCode();
         code = 31*code + this.typeTerm.hashCode();
-        code = 31*code + this.rank;
         return code;
     }
     
     /**
      * {@inheritDoc}
-     * Features are equal when they have the same parent, type, source
-     * and rank.
+     * Features are equal when they have the same rank, parent, type, and source.
+     * Features which are not instance of RichFeature are given a 
+     * rank of zero.
      */
     public boolean equals(Object o) {
         if (! (o instanceof Feature)) return false;
@@ -667,29 +669,30 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         if (this.parent==null) return false;
         // Normal comparison
         Feature fo = (Feature) o;
+        int ourRank = this.getRank();
+        int theirRank = fo instanceof RichFeature? ((RichFeature)fo).getRank() : 0;
+        if ( ourRank!=theirRank) return false;
         if (! this.parent.equals(fo.getParent())) return false;
         if (! this.typeTerm.equals(fo.getTypeTerm())) return false;
         if (! this.sourceTerm.equals(fo.getSourceTerm())) return false;
-        if (fo instanceof RichFeature) {
-            RichFeature rfo = (RichFeature)fo;
-            return rfo.getRank()==this.getRank();
-        }
-        return false;
+        return true;
     }
     
     /**
      * {@inheritDoc}
-     * Features are sorted in order of parent, type, source
-     * and rank. If both parents are not comparable then this part 
-     * of the sorting is skipped. If it comes down to rank and the
-     * object is not a RichFeature then we cannot assume identity,
-     * so we always return -1.
+     * Features are sorted first by rank, then parent, type, and source.
+     * If both parents are not comparable then this part of the sorting
+     * is skipped. Features which are not instance of RichFeature are 
+     * given a rank of zero.
      */
     public int compareTo(Object o) {
         // Hibernate comparison - we haven't been populated yet
         if (this.parent==null) return -1;
         // Normal comparison
         Feature them = (Feature)o;
+        int ourRank = this.getRank();
+        int theirRank = them instanceof RichFeature? ((RichFeature)them).getRank():0;
+        if (ourRank!=theirRank) return ourRank-theirRank;
         if (this.parent instanceof Comparable && 
         		them.getParent() instanceof Comparable && 
         		!this.parent.equals(them.getParent())) 
@@ -698,12 +701,10 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
         	return this.typeTerm.compareTo(them.getTypeTerm());
         if (! this.sourceTerm.equals(them.getSourceTerm())) 
         	return this.sourceTerm.compareTo(them.getSourceTerm());
-        if (them instanceof RichFeature) {
-            RichFeature rfo = (RichFeature)them;
-            return this.rank-rfo.getRank();
-        }
-        return -1;  // because if we can't sort by rank, then we
-        			// can't assume identity
+        if(this.parent.equals(them.getParent()))
+            return 0;  // equality on non-comparable parents
+        else
+            return -1;
     }
     
     /**
