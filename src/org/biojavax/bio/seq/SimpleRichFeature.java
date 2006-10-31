@@ -53,7 +53,7 @@ import org.biojavax.ontology.ComparableTerm;
  * @author Richard Holland
  * @author Mark Schreiber
  * @author Bubba Puryear
- * @George Waldon
+ * @author George Waldon
  * @since 1.5
  */
 public class SimpleRichFeature extends AbstractChangeable implements RichFeature {
