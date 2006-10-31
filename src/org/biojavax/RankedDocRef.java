@@ -83,8 +83,9 @@ public interface RankedDocRef extends Comparable,Changeable {
     public RichLocation getLocation();
     
     /**
-     * Sets the location of this reference.
+     * Set the location of this reference.
      * @param location the location to use.
+     * @throws ChangeVetoException if the new location is unacceptable.
      */
     public void setLocation(RichLocation location) throws ChangeVetoException;
 
@@ -96,8 +97,9 @@ public interface RankedDocRef extends Comparable,Changeable {
     public int getRank();
     
     /**
-     * Sets the rank of this reference.
+     * Set the rank of this reference.
      * @param rank the rank to use.
+     * @throws ChangeVetoException if the new rank is unacceptable.
      */
     public void setRank(int rank)  throws ChangeVetoException;
 }

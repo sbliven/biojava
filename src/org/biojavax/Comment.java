@@ -58,6 +58,7 @@ public interface Comment extends Comparable, Changeable {
     /**
      * Sets the rank of this comment.
      * @param rank the rank to use.
+     * @throws ChangeVetoException if the new rank is unacceptable.
      */
     public void setRank(int rank) throws ChangeVetoException;
     
