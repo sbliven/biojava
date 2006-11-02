@@ -305,10 +305,11 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
         
         /**
          * Constructs a RichLocation object based on the given collection of
-         * members. It first tries to merge them together. If the merge results in
-         * a single location, that is returned. If it results in multiple locations
-         * it returns a CompoundRichLocation covering them all, with the default
-         * term associated. Else, it returns the empty location if the set was empty.
+         * members. It the collection contains a single location, that is 
+         * returned. If it contains multiple locations it returns a 
+         * CompoundRichLocation covering them all, with the default
+         * term associated. It returns the empty location if the 
+         * collection was empty.
          * @param members the members to construct a location from.
          * @return the corresponding RichLocation
          */
@@ -396,7 +397,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
             List flattened = new ArrayList(members);
             for (int i = 0; i < flattened.size(); i++) {
                 RichLocation member = (RichLocation)flattened.get(i);
-                if (!(member instanceof SimpleRichLocation)) {
+                if (!member.isContiguous()) {
                     flattened.remove(i);
                     int insertPos = i;
                     for (Iterator j = member.blockIterator(); j.hasNext(); ) flattened.add(insertPos++,j.next());

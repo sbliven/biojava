@@ -48,6 +48,7 @@ import org.biojavax.ontology.ComparableTerm;
 public class CompoundRichLocation extends SimpleRichLocation implements RichLocation {
     
     protected List members;
+    protected List sortedMembers;
     protected int size = 0;
     private static ComparableTerm JOIN_TERM = null;
     private static ComparableTerm ORDER_TERM = null;
@@ -126,6 +127,8 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
             if (this.getMaxPosition()==null) this.setMaxPosition(rl.getMaxPosition());
             else this.setMaxPosition(this.posmax(this.getMaxPosition(),rl.getMaxPosition()));
         }
+        this.sortedMembers = new ArrayList(this.members);
+        Collections.sort(this.sortedMembers);
     }
             
     // for internal use only
@@ -178,7 +181,9 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
     /**
      * {@inheritDoc}
      */
-    public Iterator blockIterator() { return Collections.unmodifiableCollection(this.members).iterator(); }
+    public Iterator blockIterator() { 
+    	return Collections.unmodifiableCollection(this.sortedMembers).iterator(); 
+    }
     
     /**
      * {@inheritDoc}
