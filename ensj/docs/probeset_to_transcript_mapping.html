@@ -1,0 +1,411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.1.3  (Linux)">
+	<META NAME="CREATED" CONTENT="20050823;13413200">
+	<META NAME="CHANGED" CONTENT="20050823;19030200">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Mapping microarray probe sets to Ensembl transcripts</H1>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm"><A HREF="#introduction">Introduction</A>
+		</P>
+
+	<LI><P STYLE="margin-bottom: 0cm"><A HREF="#require">Requirements</A> 
+	</P>
+
+	<LI><P STYLE="margin-bottom: 0cm"><A HREF="#install">Installation</A> 
+	</P>
+
+	<LI><P STYLE="margin-bottom: 0cm"><A HREF="#run">Running</A> 
+	</P>
+
+	<LI><P STYLE="margin-bottom: 0cm"><A HREF="#probeset2transcriptlog">probeset2transcript.log</A>
+		</P>
+	<LI><P><A HREF="#usefulsql">Useful SQL</A> 
+	</P>
+</UL>
+<H2><A NAME="introduction"></A>Introduction</H2>
+<P>Microarray probe sets (aka composites) are mapped to transcripts
+by the Java program org.ensembl.probemapping.ProbeMapper which reads
+and writes data to/from an ensembl core database. The probe sets are
+read from the “oligo_*” tables and the transcripts from the
+“transcript” table. Mappings are stored as standard ensembl xrefs
+in the “xref” and “object_xref” tables. The probe sets and
+transcripts must be populated <B>before</B> this program is run. 
+</P>
+<P>In addition to storing xrefs the program produces a
+<A HREF="#probeset2transcriptlog">probeset2transcript.log</A> file
+which details why every overlapping transcript and probe set pair
+were or were not mapped.</P>
+<P>Mapping works by finding overlapping probesets and transcripts
+where at least 50% of the probes in the set overlap the transcript's
+cDNA or 2000 bases downstream of it. A probe is considered to hit the
+transcript if it's 25 bases match exactly or there is at most a 1
+base substitution. Probes which cross exon boundaries are currently
+ignored. 
+</P>
+
+
+<a name="require"></a>
+<h2>Requirements</h2>
+
+
+J2SDK 1.4 or later (see http://java.sun.com/ for downloads); this is
+already installed on the Sanger system in /usr/opt/java142/.  Make
+sure that your JAVA_HOME environment variable is pointing to the
+correct directory and that the *correct* Java executables are in your
+path; put something like the following in your .cshrc:
+<pre>
+     setenv JAVA_HOME /usr/opt/java142
+     setenv PATH ${JAVA_HOME}/bin:${PATH}
+</pre>
+
+
+<p>
+These tables need to be populated:
+<ul>
+<li>transcript
+<li>gene
+<li>exon
+<li>exon_transcript
+<li>oligo_*
+<li>assembly
+<li>assembly exception
+<li>attrib_type
+<li>coord _system
+<li>meta_coord
+<li>seq_region
+<li>seq_region_attrib
+</ul>
+
+These values need to be set:
+<ul>
+<li>The <a href="#sql_oligo_array.probeset_size">oligo_array.probeset_size</a> for each array.
+<li>A <a href="#sql_meta_coord">meta_coord</a> entry(s) for each
+coordinate system oligo features are stored in. Normally just one.
+<li>An <a href="#sql_external_db">external_db</a> entry for each array.
+</ul>
+
+</p>
+
+
+<a name="install"></a><h2>Installation</h2>
+
+<ol>
+
+  <li>Download the latest "ensj-web" module from CVS. This module
+  contains a compliled java library containing the mapping program and
+  a runner script for starting it.</li>
+
+  <li>Download the latest "ensj-healthcheck" CVS module. This contains
+  the healthchecks to be run before and after the mapping
+  program is run. </li>
+
+
+  <li>[Optional] Download the latest "ensj-core" CVS module. This
+  contains some optional code for doing additional post-mapping checks.
+  </li>
+
+</ol>
+
+<H2><A NAME="run"></A>Running</H2>
+
+<P>We will we assume that there is a single database that contains the
+source miroarray and transcript data and that we want to write the
+mappings to that same database.  If you want to read and write
+information from/to multiple databases use the online help (--help)
+for the relevant parameters.
+</P>
+
+<OL>
+
+
+        </li>
+
+	<LI><P>Create a directory for the mapping session. It is helpful to
+	name it after the database to be mapped. 
+	</P>
+	<PRE># e.g.
+mkdir my_database_mapping
+cd my_database_mapping
+</PRE>
+
+
+	<LI><P>Create a configuration file that specifies the database connection
+	parameters.</P>
+
+	<PRE># my_database_mapping/database.properties
+database my_database
+host ecs2
+port 3364
+user ensadmin
+password XXXXXX
+driver com.mysql.jdbc.Driver
+</PRE>
+
+	<LI><P>[Optional] Backup “object_xref” and “xref” tables in case you
+	need to restore them later. 
+	</P>
+	<PRE># e.g. in my_database_mapping
+mkdir backup
+cd backup
+mysqldump -h ecs2 -P3364 -u ensro -t my_database xref &gt; xref.txt
+mysqldump -h ecs2 -P3364 -u ensro -t my_database object_xref &gt; object_xref.txt
+</PRE>
+</li>
+
+        <li>Run the <b>OligoProbes2Genome</b> healthcheck which checks
+        for common data problems that prevent the mapping from
+        running. Pass it the configuration file you just created.
+
+	  <ol>
+	    
+	    <li><b>cd ensj-healthcheck</b></li>
+	    
+	    <li><pre><b>java -classpath	"lib/ensj-healthcheck.jar:lib/mysql-connector-java-3.0.15-ga-bin.jar" 
+org.ensembl.healthcheck.TextTestRunner -config my_database_mapping/database.properties -d my_database OligoProbes2Genome
+</b></pre>
+</li>
+
+            <li>Tip: If your database name does not correspond to the
+            ensembl database naming convention then you might need to
+            tell the healthcheck program the species and database
+            type via additional command line parameters: e.g. <b>
+            -type core -species mus_musculus</b></li>
+
+            <li>If any problems are reported then you will need to fix
+	    the database before continuing with the mapping. See
+	    useful SQL below.</li>
+
+	</ol>
+
+	</li>
+
+
+
+
+	<LI>Run the mapping using the run_probeset_2_transcript_mapping.sh runner script.
+	   <ul>
+	   <li>"-v" means show verbose output and "database.properties" is the config file we created earlier.<pre><code>
+cd my_database_mapping
+ensj-web/bin/run_probeset_2_transcript_mapping.sh -v database.properties
+</code></pre> </li>
+	   <li>Tip: run <code>run_probeset_2_transcript_mapping.sh --help</code> for more options.</li>
+	   <li>Tip: Use "nohup" if you want the program to continue to run after you log out.</li>
+	   <li>If there are any problems then you might need to fix the
+		database by <A HREF="#missing">adding missing data</A>.</li>
+	   </ul>
+	
+	</LI>
+
+
+        <li>Run the <b>OligoXrefs</b> healthcheck which checks
+        for problems with the xrefs we just generated.
+
+	  <ol>
+	    
+	    <li><b>cd ensj-healthcheck</b></li>
+	    
+	    <li><pre><b>java -classpath	"lib/ensj-healthcheck.jar:lib/mysql-connector-java-3.0.15-ga-bin.jar" org.ensembl.healthcheck.TextTestRunner -config my_database_mapping/database.properties -d	my_database OligoXrefs
+</b></pre>
+</li>
+          </ol>
+
+	<LI>[Optional] Perform additional checks on the xref data we generated. These scripts are available
+	in the separate ensj-core/scripts CVS module:
+	<OL>
+
+	  <LI>Run <I>ensj-core/scripts/oligo_report.sql</I> against the database we just populated to generate
+	  some <A HREF="#status">status
+	  information</A>	  
+	  
+	  <LI>Run the <I>ensj-core/scripts/oligo_compare_dbs.py</I>
+	  python script to compare the results to a previous  mapping
+	  for this species if one exists.  In addition to printing the
+	  results to the console they are written to
+	  <I>report.txt. </I>&gt;Note that several intermediate files
+	  are also written to the directory. 
+	  
+	  <PRE>mkdir comparison
+cd comparison ensj-core/scripts/oligo_compare_ds.py
+</PRE>
+
+</OL> 
+
+<H2><A NAME="probeset2transcriptlog"></A>probeset2transcript.log</H2>
+<P>The output file “probeset2transcript.log” produced by the
+ProbeMapper lists every overlapping probeset and transcript pair and
+why they where or where not mapped. The format of the file is as
+follows:</P>
+<PRE>LINE = PROBESET_NAME    TRANSCRIPT_STABLE_ID    MAPPED_STATE     STATS   DESCRIPTION[,DESCRIPTION]* 
+
+MAPPED_STATE = {0 | 1} # 0 = unmapped, 1 = mapped, quick to search if loaded into db
+
+STATS = PROBE_SET_SIZE    NUM_EXON_HITS    NUM_INTRON_HITS    NUM_HITS_ON_REVERSE_STRAND
+
+PROBE_SET_SIZE = number of probes in the microarray(s) this composite appears in
+
+NUM__HITS = number of times a probe from the composite hits an exon in the transcript (same strand)
+
+NUM_INTRON = number of times a probe from the composite hits an intron in the transcript (same strand)
+
+NUM_HITS_ON_REVERSE_STRAND = number of times a probe from the
+                             composite hits any where on the reverse strand of the extent transcript+flank
+
+DESCRIPTION = {mapped | intronic | insufficient | antisense | promiscuous}+
+
+Example lines:
+--------------
+comp_at_1    ENST1    1    11    10    0    0    mapped
+comp_at_2    ENST2    1    11    9     1    0    mapped,intronic
+comp_at_3    ENST3    0    16    0     12   0    insufficient,intronic
+comp_at_3    ENST4    0    16    0     0    10   insufficient,antisense
+comp_at_4    ENST4    0    16    2     2    10
+insufficient,intronic,antisense</PRE><H2>
+
+
+
+
+
+<A NAME="usefulsql"></A>Useful SQL</H2>
+<H3><A NAME="status"></A>Status information</H3>
+<UL>
+	<LI><P>Run ensj-core/scripts/oligo_report.sql against the database to
+	get some useful stats.</P>
+	<LI><P>Find the number of oligo xref entries.</P>
+	<PRE>  select count(*) from xref where external_db_id&gt;3000 and
+    external_db_id&lt;3200</PRE>
+	<LI><P>Find the number of transcript-probeset mappings in the
+	database.</P>
+	<PRE>  select count(*) from xref x, object_xref ox where
+   external_db_id&gt;3000 and external_db_id&lt;3200 and
+   x.xref_id=ox.xref_id;</PRE>
+	<LI><P>Find the number of probesets each transcript is mapped to
+	(ignores unmapped transcripts). 
+	</P>
+	<PRE>  select count(*) as count_unique_transcript2probeset_mappings from
+    object_xref ox, xref x 
+    where ox.xref_id=x.xref_id and external_db_id&gt;3000 and
+    external_db_id&lt;3200 
+    group by ensembl_id,display_label;</PRE>
+	<LI><P>Find any (broken) object_xref entries that lack corresponding
+	from xref entries. 
+	</P>
+	<PRE>  select count(*) from object_xref left join xref on
+    object_xref.xref_id=xref.xref_id where xref.xref_id is NULL;</PRE>
+</UL>
+
+
+<H3><A NAME="delete"></A>Delete existing mappings</H3>
+<ul>
+
+  <li>Delete all existing oligo entries in the xref and object_xref tables.
+      <p><code>delete xref, object_xref from xref, object_xref where xref.xref_id=object_xref.xref_id and external_db_id>3000 and external_db_id<3200;</code></p></li>
+
+      <p><code>delete xref from xref where external_db_id>3000 and external_db_id<3200;</code></p></li>
+
+</ul>
+
+<H3><A NAME="missing"></A>Add missing data</H3>
+<UL>
+	<LI><a name="sql_meta_coord"/><P>Database fix: Add an oligo_feature entry to the meta_coord
+	table if it is missing. 
+	</P>
+	<PRE>  select coord_system_id from oligo_feature af, seq_region sr where
+  af.seq_region_id=sr.seq_region_id limit 1;
+
+  insert into meta_coord values ('oligo_feature', COORD_SYSTEM_ID, 25);</PRE>
+
+	<LI><a name="sql_oligo_array.probeset_size"/><P>Database fix: Set the probeset_size for each
+	array. </P>
+
+
+        <P>You can get the probeset sizes for the microarrays from the
+	array specification sheets. For affymetrix these are avaiable
+	<a
+	href="http://www.affymetrix.com/products/arrays/index.affx">here</a>
+	and the probeset size is called "Probe pairs/sequence". </P>
+
+	<P>Note that probes are grouped into probesets and each probeset
+	in principle will map to one transcript.</P>
+
+
+	<PRE>  update oligo_array set probe_setsize=16 where name='HG-U95B';
+  update oligo_array set probe_setsize=16 where name='HG-U95D';
+  update oligo_array set probe_setsize=11 where name='U133_X3P';
+  update oligo_array set probe_setsize=11 where name='HG-U133A';
+  update oligo_array set probe_setsize=16 where name='HG-U95Av2';
+  update oligo_array set probe_setsize=11 where name='HG-U133B';
+  update oligo_array set probe_setsize=11 where name='HG-U133A_2';
+  update oligo_array set probe_setsize=11 where name='HG-Focus';
+  update oligo_array set probe_setsize=11 where name='HG-U133_Plus_2';
+  update oligo_array set probe_setsize=16 where name='HG-U95E';
+  update oligo_array set probe_setsize=16 where name='HG-U95C';
+  update oligo_array set probe_setsize=20 where name='HuGeneFL';
+  update oligo_array set probe_setsize=16 where name='HC-G110';
+
+  update oligo_array set probe_setsize=11 where name='Canine';
+
+  update oligo_array set probe_setsize=16 where name='RG-U34C';
+  update oligo_array set probe_setsize=16 where name='RG-U34B';
+  update oligo_array set probe_setsize=16 where name='RG-U34A';
+  update oligo_array set probe_setsize=11 where name='Rat230_2';
+
+  update oligo_array set probe_setsize=11 where name='Mouse430_2';
+  update oligo_array set probe_setsize=20 where name='Mu11KsubA';
+
+  update oligo_array set probe_setsize=20 where name='Mu11KsubB';
+  update oligo_array set probe_setsize=11 where name='Mouse430A_2'; 
+  update oligo_array set probe_setsize=16 where name='MG-U74Bv2';
+  update oligo_array set probe_setsize=16 where name='MG-U74Cv2';
+  update oligo_array set probe_setsize=16 where name='MG-U74Av2';
+
+  update oligo_array set probe_setsize=14 where name='DrosGenome1';
+  update oligo_array set probe_setsize=14 where
+  name='Drosophila_2';
+
+
+  # replace "-" by "_" to match naming conventions
+  update oligo_array set name="HG_U95E" where name="HG-U95E";
+  update oligo_array set name="HG_U133A_2" where name="HG-U133A_2";
+  update oligo_array set name="HG_U95B" where name="HG-U95B";
+  update oligo_array set name="HG_U95C" where name="HG-U95C";
+  update oligo_array set name="HG_U133B" where name="HG-U133B";
+  update oligo_array set name="HG_U95Av2" where name="HG-U95Av2";
+  update oligo_array set name="HC_G110" where name="HC-G110";
+  update oligo_array set name="HG_Focus" where name="HG-Focus";
+  update oligo_array set name="HG_U133A" where name="HG-U133A";
+  update oligo_array set name="HG_U95D" where name="HG-U95D";
+  update oligo_array set name="HG_U133_Plus_2" where name="HG-U133_Plus_2";
+
+</PRE>
+
+  <LI><a name="sql_external_db"/>Database fix: Add an entry for the microarray in the external_db table:
+      <ul>
+
+        <li>insert into external_db values (ZZZZ, "AFFY_XXXXX",1,"XREF",1,0,1,"Affymx Microarray XXXX");
+
+        <li> Also, add corresponding entry to file
+      ensembl/misc-scripts/external_db/external_db.txt and commit to CVS. <PRE>
+      </ul>
+
+
+
+</UL>
+<H3>Update internal ids (if built in temporary database) 
+</H3>
+<UL>
+	<LI><P>Increment xref_id and object_xref_id values. This is usually
+	only necessary if we created the output in a temporary database and
+	need to change the ids so that they do not clash with ids in the
+	release database. 
+	</P>
+	<PRE>update xref set xref_id=xref_id+2558994;
+update object_xref set xref_id=xref_id+2558994;
+update object_xref set object_xref_id=object_xref_id+5672274; </PRE>
+</UL>
+</BODY>
+</HTML>

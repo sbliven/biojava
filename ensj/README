@@ -1,0 +1,19 @@
+ENSJ
+====
+
+Ensj provides Java and Jython programmers with a library for
+conveniently accessing Ensembl databases. The distribution also
+includes some applications and a module that makes the library even
+easier to use for jython programmers (ensembl.py).
+
+The main page coordinating this project is at
+
+   http://www.ensembl.org/info/software/java/index.html
+
+
+The Ensembl project as a whole is coordinated from
+
+   http://www.ensembl.org
+
+
+

@@ -1,0 +1,103 @@
+RUNTIME PROBLEMS:
+-----------------
+
+Problem: 
+	 java.sql.SQLException: login timeout reached, loginTimeout == ???
+Possible solution:
+	 increase connection pool size.
+
+
+
+CODING STANDARDS:
+-----------------
+
+ SQL:
+
+ - QUOTES in SQL: Use single quotes (') rather than double quotes (")
+ for delimiting strings in SQL statements because the later break some
+ JDBC drivers (e.g. jDTS). For example: 
+   - Correct: "SELECT ... WHERE stable_id='ENSG01' ...  "
+   - Wrong: 'SELECT ... WHERE stable_id="ENSG01" ...'  
+   - Wrong: "SELECT ... WHERE stable_id=\"ENSG01\" ..."
+
+ - brackets around some FROM clause arguements so overcome MySQL5 bug.
+   Otherwise results in SQL errors like "Unknown column 'xref.xref_id'
+   in 'on clause'".
+
+   e.g. 
+   FROM (xref, external_db exDB)
+   instead of :
+   FROM xref, external_db exDB
+
+   http://bugs.mysql.com/bug.php?id=15823
+   http://dev.mysql.com/doc/refman/5.0/en/join.html
+
+   ".....Before MySQL 5.0.12, the comma operator (,) and JOIN both had
+   the same precedence, so the join expression t1, t2 JOIN t3 was
+   interpreted as ((t1, t2) JOIN t3). Now JOIN has higher precedence,
+   so the expression is interpreted as (t1, (t2 JOIN t3)). This change
+   affects statements that use an ON clause, because that clause can
+   refer only to columns in the operands of the join, and the change
+   in precedence changes interpretation of what those operands are.
+   ....  This change also applies to INNER JOIN, CROSS JOIN, LEFT
+   JOIN, and RIGHT JOIN."
+
+
+ JDBC: 
+
+ - Getting values from ResultSets: specify the column index (fastest)
+ or column name when calling resultSet.getXXX(COLUMN). Do not use
+ "table.column" or "table_alias.name format as they break some JDBC
+ drivers (e.g. jDTS).
+ 
+
+RUNNING UNIT TESTS:
+-------------------
+
+Ensj uses the junit test framework so junit.jar must be included in
+the classpath.
+
+All adaptors and some other classes have unit tests in one of the
+"test" packages which currently include:
+
+ - org.ensembl.test (core db and types classes)
+ - org.ensembl.compara.test (compara classes)
+ - org.ensembl.variation.test (variation classes). 
+
+There is class called AllTests in each of these packages that runs all
+of the tests in the package.
+
+The tests can be run in variety of ways:
+
+1) Ant.
+All of the tests or those for individual packages can be run via
+the ant build tool from the ensj-core root directory:
+
+"ant TEST-TARGET" where TEST-TARGET = {tests-all | tests-core |
+tests-variation | tests-compara }
+
+2) Via main() methods.
+Directly from the command line: e.g. java org.ensembl.test.AllTests
+(all core tests), java org.ensembl.test.GeneAdaptorTest (just the
+GeneAdaptor tests)
+
+3) IDE.
+e.g Eclipse: Run | Run As | Junit Test
+
+
+
+Debugging SQL
+-------------
+
+The p6spy driver can be used to print SQL statements sent to real
+database drivers. To do this:
+
+ - ensure ensj-core/spy.properties is checked out and ensj-core/ is on
+   your classpath.
+
+ - add "jdbc_driver=com.p6spy.engine.spy.P6SpyDriver" to your
+   driver/registry config file. This forces the SQL statments to pass
+   through p6spy enroute to the real driver.
+
+ - Results are written to ensj-core/spy.log. Note that this can get
+   very big so may need deleting periodically.

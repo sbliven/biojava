@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Class-Path: MYSQL-JAR-FILENAME junit.jar
+Main-Class: org.ensembl.Example
+
+Name: org/ensembl/
+Specification-Title: Ensj API and implementation
+Specification-Version: SPECIFICATION-VERSION
+Specification-Vendor: EBI, GRL
+Implementation-Title: org.ensembl 
+Implementation-Version: IMPLEMENTATION-VERSION
+Implementation-Vendor: EBI, GRL

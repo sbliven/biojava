@@ -1,0 +1,86 @@
+Brainstorming of improved id archive 14/09/05 by Arne 
+
+
+The goal of the archive rebuild project is to achieve more reliable tracking of old gene ids.
+Users with the question "I have gene id X, where can I find it now?" should get a better answer than 
+now. 
+
+Following things will need doing for the archive rebuild.
+
+1. A reference id mapping programm needs to be build
+2. The reference id mapping needs to be run between old databases.
+3. Beginning from the newest we run it between pairs of gradually older
+   databases.
+4. The results will be compared with the idmapping that actually happened and 
+   the comparison should result in a richer populated stable_id_event table.
+5. This will hold the following data.
+
+From the original mapped ids:
+ - Which ids were mapped in the original mapping. 
+ - Which were deleted.
+ - Which were newly created.
+
+From the revised mapping process:
+ - Which old ids should have been mapped and what name did the
+   mapped gene/transcript actually get (from the original mapping).
+ - Which old ids should have been deleted.
+ - Which new gene (identified by their original mapping name) should have had a new id. 
+ - In case of deleted transcripts, genes, which other gene/transcript is similar (score> x.x).
+
+Each stable_id_event line needs flags as following. 
+
+original_mapping_revised_mapping_same
+original_mapping_incorrect
+new_mapping
+new_similarity
+
+Lines from the original stable_id_event which are not mapping, creation or deletions 
+(split/merge information) are not needed any more. 
+
+The result is buildable with no previous entry in stable_id_event, just by comparing the ids in the new 
+database with the revised id mapping and taking into account scoring from the revised mapping.   
+
+6. From this any old id should be traceable through the revisions illustrated by the following example:
+
+Let there be id mappings (mapping sessions) M1 M2 M3. X is the id before M1 that we want to find.
+
+Lets assume X was deleted in M1 as stated by a old id deleted line with flag original_mapping_incorrect.
+The event table states that X M1 should have been mapped to the gene then identified as Ga (flag new_mapping).
+
+Ga in M2 was mapped, and the flag states original_mapping_revised_mapping_same.
+
+Ga in M3 was mapped to Gb but flagged original_mapping_incorrect and the event table
+says Gb deleted (new_mapping) and Gc,Gd are marked as similar (new_similarity).
+
+7. Genes with the same name from different releases of the database may have different tracks through the history.
+
+See the following example R1 M1 R2 M2 R3.
+
+G in R1 mapped to G in R2 (incorrect, should be Ga). G in R2 mapped to Gb in R3 (correct). Ga in R2 mapped Ga in R3
+(correct). => G R1 ==> Ga R3; G R2 ==> Gb R3
+
+8. "Recovery mapping"
+
+Is the process by which a gene / transcript disappears (proabably due to mapping artefact or genebuild problem) from one
+release to the next. It then reappears after a new genebuild or a "patch" build. There is the following approach to a 
+patched mapping:
+
+Assume: R1 M1 R2 M2 R3
+
+Do a mapping as normal M2, do R1 M12 R3. Look at the result from M1. For every id that is deleted, check M12. If it maps to
+R3 and doesnt conflict with M2, "recover" the id, otherwise stick with M2 result.
+
+However, although this can potentially recover some ids, there will be many conflicts, few ids can be recovered.
+
+Based on the requirements the following approach seems more reasonable:
+
+Gene_archive and peptide archive tables seem overly complicated and probably not that useful apart from the 
+very basic functionality of retrieving old peptide sequences. Old gene structures are generally not so interesting.
+Simplify by having one archive for gene id, transcript id, translation id and peptide sequence + mapping session.
+Provide as well a closest id (or a list thereof) from the blasted (exonerated) peptide to current database as fallback
+when id mapping couldnt track the id. 
+ 
+
+
+
+  

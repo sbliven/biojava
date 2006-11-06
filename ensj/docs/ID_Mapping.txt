@@ -1,0 +1,351 @@
+Stable ID Mapping
+=================
+
+
+
+Executive Summary
+-----------------
+
+1. Check out ensj-core
+2. Edit ensj-core/src/resources/data/idmapping.properties
+3. cd ensj-core/bin
+4. bsub -I -m bc-3-3-13 ./run_idmapping.sh
+5. Wait
+6. Look at results
+
+
+
+
+Introduction
+------------
+
+The stable ID mapping process maps stable IDs for genes, exons, transcripts and
+translations between databases. The original database is referred to as the
+"source", the new database as the "target".
+
+The program has three modes:
+
+ - Normal mode: Does a complete mapping, finds similarities and
+   updates archive.
+
+ - Similarity mode: Finds similarities between two previously mapped
+   gene sets. This is useful for retrofitting similarities generated
+   by the latest IDMapping program to previously mapped datasets.
+
+ - Archive mode: Dumps gene_archive and peptide_archive for
+   entries from source database that were deleted or changed.
+
+
+Usage
+-----
+
+Essentially the ID mapping process involves setting some parameters in a
+configuration file, then running a Java program which uses these settings in
+order to perform the mapping, and update the archive and event tables.
+
+
+CVS
+---
+
+Check out the module ensj-core from CVS. You don't need to compile anything.
+
+
+Java setup
+----------
+
+The ID mapping process needs at least Java 1.4 to run. This should be
+installed in /usr/opt/java (which is probably actually a symbolic link
+to the latest version).
+
+There is a shell script, run-idmapping.sh, which sets the appropriate variables
+and runs the ID mapping application. Set the home and java variables if required.
+
+Note that if you're getting errors about classes not being found, it probably
+means that one of the variables in this script is not set correctly.
+
+Note the -Xmx=1500m argument to the Java VM is the maximum memory allocation;
+don't set this to more than 2000m as (currently) the version of Linux used on
+the farm doesn't support jobs that require more than 2Gb.
+
+
+LSF setup
+---------
+
+ID mapping runs exonerate on the farm via LSF as part of the exon
+mapping process. Make sure you are set up to use the farm before
+trying this. In particular, make sure you have the LSB_DEFAULTPROJECT environment 
+variable set to the correct value.
+
+
+Healthchecks
+------------
+
+There is an "id_mapping" healthcheck group that can be run after the
+program to ensure all the ID and archive data is correct. 
+
+Simple example (default database.properties, standard database name):
+       ~/dev/ensj-healthcheck/run-healthcheck.sh -d danio_rerio_core_38_5e id_mapping
+
+Complex example (user defined config file, non-standard database name):
+   ~/dev/ensj-healthcheck/run-healthcheck.sh -debug -d is1_zv6_core -type core -species zebrafish -config `pwd`/healthcheck.properties id_mapping
+
+
+Configuration
+-------------
+
+The file src/resources/data/idmapping.properties is where you should set
+values specific to the current ID mapping run.
+
+Standard parameters:
+
+  idmapping.source.* - parameters for connecting to the source database
+  idmapping.target.* - parameters for connecting to the target database
+
+  idmapping.base_directory - where to write outut. Files produced will be in a
+  subdirectory named according to a combination of the source and target
+  database names
+
+  idmapping.use_exonerate - if true, exonerate (on LSF) will be used 
+
+  idmapping.upload.* - if set to yes, target 
+
+
+Normal mode:
+
+  idmapping.mode=normal - default value for idmapping.mode
+
+
+Similarity mode:
+
+  idmapping.mode=similarity
+  # X is the mapping_session_id for the mapping_session we are
+  # recreating similarity data for
+   idmapping.retrofit_mapping_session_id=X 
+
+ In similarity mode, the application outputs a text file (stable_id_event_retrofit.txt)
+ containing the new similarity stable_id_events for mapping_session_id=X. 
+ It also produces a SQL script (stable_id_event_retrofit_patch.sql) which 
+ deletes the previous similarity entries for this mapping session and uploads
+ the new ones from the text file. These files are written into the output
+ directory. 
+
+Archive mode:
+
+  idmapping.mode=archive
+
+
+Advanced options:
+
+  # Load target sequence from a different database to the genes. This
+  # is useful if running on a new gene build that lies in a different 
+  # database to the sequence.
+  idmapping.target.sequence.host=XXX
+  idmapping.target.sequence.port=XXX
+  idmapping.target.sequence.database=XXX
+  idmapping.target.sequence.user=XXX
+  idmapping.target.sequence.password=XXX 
+
+
+Partial idmappings
+
+There are several options to assist in doing partial ID mappings, e.g.
+mapping 2 databases that only contain ncRNAs, which can then be merged
+into a full database. This requires that the starting stable IDs for 
+genes, transcripts, translations and exons be manually set, as well as
+the ID for the current mapping session, to avoid clashes.
+
+The properties involved are
+
+idmapping.starting.gene.stable_id=ENSG0000206581
+idmapping.starting.transcript.stable_id=ENST00000383854
+idmapping.starting.translation.stable_id=ENSP00000373361
+idmapping.starting.exon.stable_id=ENSE00001498864
+idmapping.mapping_session_id=362
+
+Biotype restriction
+
+If you only want to map a certain subset of biotypes, you can specify 
+these in a comma-separated list as follows:
+
+idmapping.biotypes=miRNA,misc_RNA,Mt-tRNA,Mt-rRNA,rRNA,snoRNA,snRNA
+
+Note that the starting point for newly-generated stable IDs is based
+upon the highest stable ID *of any biotype* in the original database,
+to avoid clashes.
+
+
+
+GUI
+---
+
+There is a GUI to assist in configuring your ID mapping run. To start it, cd to
+ensj-core/bin and run the script run_idmapping_gui.sh
+
+Select the source & target host and port (together with user and password if
+required) and click the "Show >>" button which will show a list of databases on
+each host. Select one of these. 
+
+The other options should be self-explanatory.
+
+Note that any existing idmapping.properties file will be read and the various
+options will use it for their default values.
+
+Once you've set the various values, press the "Run" button and the configuration
+will be written to resources/data/auto.idmapping.properties. This properties
+file will then be used as input to the ID mapping application which will
+automatically started. Output will go to the terminal window from which the GUI
+was started.
+
+Do *not* kill the GUI window until the ID mapping application has finished.
+
+
+Running
+-------
+
+The bin/ directory contains a shell script called run_idmapping.sh which will
+run the Java program with the appropriate settings.
+
+Note that due to bugs in the Tru64 JVM, it is *not* recommended to try to run ID
+mapping on any of the ecs nodes. It's best to run it under Linux on one of the
+bcs nodes. To do this you can either ssh directly into one of the bc- nodes or
+use bsub -I:
+
+  # Simple example: Run mapping on bc-3-3-13: 
+  cd ensj-core/bin
+  bsub -I -m bc-3-3-13 ./run_idmapping.sh 
+
+  # Advanced example: Run mapping on any linux node. 
+  bsub -I -R linux /ENSJ_CORE_PATH/run_idmapping.sh /SOME_PATH/my_idmapping.properties 
+
+
+
+
+Pre-run checks
+--------------
+
+Several checks are made before the ID mapping application proper starts running,
+in order to avoid problems due to misconfiguration. These are:
+
+ - that connections can be made to the source and target databases
+ - that there is write access to the target database
+ - that the working directory is valid
+ - that the exonerate executable exists and is executable
+ - that the source and target databases have DNA sequence
+ - that the follwing tables are empty in the target database:
+   *_stable_id, mapping_session, gene_archive, peptide_archive, stable_id_event
+
+If the configuration check reports any problems, you should stop the process 
+(via ctrl-C), correct the problems and re-start the ID mapping process.
+
+
+Overview of ID mapping process
+------------------------------
+
+1. Read gene, transcript, translation, exon data and sequences from source and
+target databases.
+
+2. Build a set of scores for exons based on exon overlap (if there is any)
+and/or exon sequence matching using exonerate. If exonerate is used, the
+appropriate LSF jobs are created and submitted to the farm.
+
+3. Calculate a set of scores for transcripts based on the exon scores.
+
+4. Calculate a set of scores for genes based on the transcript scores.
+
+5. Perform transcript internal ID mappings based on transcript scores.
+
+6. Perform exon internal ID mapping based on exon scores and the transcript
+internal ID mappings.
+
+7. Perform translation internal ID mapping based on the transcript internal ID
+mappings.
+
+8. Perform gene internal ID mapping based on gene scores.
+
+9. Map exon, transcript, translation and gene stable IDs based on their
+respective internal ID mapppings. Generate "stable ID events" for new, mapped
+and lost items.
+
+10. Upload mapped stable IDs to target database (if configured)
+
+11. Generate stable ID events for merged & split items.
+
+12. Upload stable ID events to target database (if configured)
+
+13. Propagate ALL/LATEST stable ID events (if configured)
+
+14. Update gene and peptide archive tables for genes / translations that have
+been lost as part of the mapping process.
+
+
+Output
+------
+
+Once the ID mapping is successfully complete, the output directory will contain
+several output files.
+
+  [gene|transcript|translation|exon]_stable_id.txt 
+
+  The new stable IDs for genes, transcripts, translations and exons. If you set
+  the upload.stableids property, these will have already been loaded into the
+  target database. If not, they can be manually loaded via mysqlimport from the
+  commandline or LOAD DATA INFILE from the MySQL client.
+
+  mapping_session.txt, stable_id_event_[existing|new|propagated].txt
+
+  The new data for the mapping_session and stable_id_event tables. As above, if
+  you've set upload.events, these will already have been loaded into the target
+  database. If not they can be loaded manually. Note that there may be
+  duplicates so you should use the "IGNORE" option to LOAD DATA INFILE if
+  loading stable_id_event_propagated.txt. 
+  Note that if upload.events is not set, stable ID events from previous sessions 
+  will NOT be propagated.
+
+  gene_archive_[existing|new].txt, peptide_archive_[existing|new].txt
+
+  Contain the old gene and peptide archive tables plus any new entries for
+  genes/translations that have been deleted during this ID mapping run. Will be
+  loaded into target database automatically if upload.archive has been set.
+  
+  [gene|transcript|translation|mapping]_mapping_statistics.txt 
+  
+  Contain summaries of the success rates of the mapping process for each type of
+  object mapped. For all except exons, the percentages are further broken down
+  into whether the source objects were known or novel.
+
+  [gene|transcript]_lost_[deleted|merged].txt
+
+  Contain lists of the genes and transcripts which were lost due to deletion or
+  due to being merged into another gene or transcript, and whether the original
+  object was known or novel. In the case of merges, the stable ID of the target
+  object into which the source object was merged is given in the second column.
+
+  summary_email.txt
+
+  Contains a summary of the ID mapping process suitable for sending to ensadmin
+  and/or Ewan. It contains the mapping statistics and links to the files of
+  deleted objects. At the end of the file a sample of the first 20 known genes
+  which were deleted is printed, along with links to the appropriate GeneView
+  page on ensembl.org.
+
+
+  The following files are probably only useful to developers
+
+  *.out, *.err, *.exonmap, *.fasta
+
+  LSF standard out and standard err, exonerate output files and fasta files used
+  as input to exonerate.
+ 
+  *.ser 
+
+  Serialised Java objects. If present, these will be used instead of
+  re-loading/re-calculating. The most useful is cache.ser which contains the
+  genes, transcripts, translations, exons and sequence read from the source and
+  target databases in the first stage of the process.
+  *Note* if you want to re-run a "fresh" ID mapping you'll need to delete the
+  appropriate .ser files, otherwise the old ones will be used.
+
+  debug/[gene|transcript_[scores|mappings].txt
+
+  Contains the raw scores and internal ID mappings (the latter with stable IDs
+  as well).

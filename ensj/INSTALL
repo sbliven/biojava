@@ -1,0 +1,53 @@
+This document details how to install the ensj.jar library. 
+
+
+
+1 - Download ensj.jar or ensj.tgz/ensj.zip from 
+
+  http://www.ensembl.org/java
+
+If you downloaded ensj.tgz or ensj.zip file uncompress it and then
+locate the ensj.jar file.
+
+
+2 - Install ensj.jar plus it's supporting jars; either add them to
+your classpath or put them in your .../jre/lib/ext directory.
+
+The ensj.jar needs the following jars
+
+   mysql-connector-XXXXX-jar   			- MySQL JDBC driver
+
+
+You might also need to install these
+
+   junit.jar                                   - Test framework, only needed if you 
+                                                 intend to run the regression tests.
+   java-getopt-1.0.9.jar                       	- Command line utility class.
+
+
+Best place to pick these up is web site above. Searching google will
+also probably work.
+
+
+
+3 - Test the installation by running the Example program. This
+makes test connections to the public MySQL daemon running on a
+computer at the Sanger Center
+
+    java org.ensembl.Example
+
+It will print some data that was read from the database. If this does
+not happen then your setup is incorrect. By examining the error
+messages it should be possible to determine the fault. 
+
+	-"Class not found" means that the jars are not properly installed. 
+
+	-Database connection problems might indicate a firewall
+	problem, can you connect to ensembldb.ensembl.org using a normal mysql
+	client? On un*x try
+
+           mysql -h ensembldb.ensembl.org -u anonymous
+
+
+4 - Once the library is installed you can use the classes and
+interfaces as normal in your programs.
