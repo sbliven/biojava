@@ -71,7 +71,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
     // header line
     protected static final Pattern hp = Pattern.compile(">\\s*(\\S+)(\\s+(.*))?");
     // description chunk
-    protected static final Pattern dp = Pattern.compile( "^(gi\\|(\\d+)\\|)?(\\S+)\\|(\\S+?)(\\.(\\d+))?\\|(\\S+)?$");
+    protected static final Pattern dp = Pattern.compile( "^(gi\\|(\\d+)\\|)?(\\w+)\\|(\\w+?)(\\.(\\d+))?\\|(\\w+)?$");
     
     protected static final Pattern readableFiles = Pattern.compile(".*(fa|fas)$");
     protected static final Pattern aminoAcids = Pattern.compile(".*[FLIPQE].*");
