@@ -822,20 +822,25 @@ public class PDBFileParser  {
 				
 				//System.out.println(recordName);
 				
-				if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler  ( line ) ;
-				else if ( recordName.equals("HETATM")) pdb_ATOM_Handler  ( line ) ;
-				else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler ( line ) ;
-				else if ( recordName.equals("HEADER")) pdb_HEADER_Handler( line ) ;
-				else if ( recordName.equals("TITLE") ) pdb_TITLE_Handler ( line ) ;
-				else if ( recordName.equals("EXPDTA")) pdb_EXPDTA_Handler( line ) ;
-				else if ( recordName.equals("REMARK")) pdb_REMARK_Handler( line ) ;
-				else if ( recordName.equals("CONECT")) pdb_CONECT_Handler( line ) ;
-				else if ( recordName.equals("REVDAT")) pdb_REVDAT_Handler( line ) ;
-				else {
-					// this line type is not supported, yet.
-					// we ignore it
+				try {
+					if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler  ( line ) ;
+					else if ( recordName.equals("HETATM")) pdb_ATOM_Handler  ( line ) ;
+					else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler ( line ) ;
+					else if ( recordName.equals("HEADER")) pdb_HEADER_Handler( line ) ;
+					else if ( recordName.equals("TITLE") ) pdb_TITLE_Handler ( line ) ;
+					else if ( recordName.equals("EXPDTA")) pdb_EXPDTA_Handler( line ) ;
+					else if ( recordName.equals("REMARK")) pdb_REMARK_Handler( line ) ;
+					else if ( recordName.equals("CONECT")) pdb_CONECT_Handler( line ) ;
+					else if ( recordName.equals("REVDAT")) pdb_REVDAT_Handler( line ) ;
+					else {
+						// this line type is not supported, yet.
+						// we ignore it
+					}
+				} catch (Exception e){
+					// the line is badly formatted, ignore it!
+					e.printStackTrace();					
+					System.err.println("badly formatted line ... " + line);
 				}
-												
 				line = buf.readLine ();
 			}
 			
