@@ -23,6 +23,7 @@
 package org.biojava.bio.structure.align.pairwise;
 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -71,10 +72,15 @@ public class AlternativeAlignment {
     Atom center;
     Matrix rot;
     Atom tr;
+    
+    
+    // the scores...
     int gaps0;
     int eqr0;
     int rms0;
     int joined;
+    int percId;
+    int cluster;
     float score;
     IndexPair[] aligpath;
     int fromia;
@@ -118,7 +124,21 @@ public class AlternativeAlignment {
      * @return a String representation
      */
     public String toString(){
+    	 	DecimalFormat d2 = new DecimalFormat();
+    	 	// the result can be localized. To change this and enforce UK local do...
+    	 	//(DecimalFormat)NumberFormat.getInstance(java.util.Locale.UK);
+         d2.setMaximumIntegerDigits(2);	
+         d2.setMinimumFractionDigits(2);
+         d2.setMaximumFractionDigits(2);
         StringBuffer s = new StringBuffer();
+        s.append("#" + getAltAligNumber() +
+        		" cluster:" + cluster +
+        		" eqr:" + getEqr() + 
+        		" rmsd:" + d2.format(getRmsd()) +
+        		" %id:" + getPercId() + 
+        		" gaps:" + getGaps() + 
+        		" score:" + d2.format(score)	);
+        /*
         s.append("idx1:");
         for (int i=0;i< idx1.length;i++){
             s.append(" " + idx1[i] );
@@ -126,10 +146,56 @@ public class AlternativeAlignment {
         s.append( "\nidx2:");
         for (int i=0;i< idx2.length;i++){
             s.append(" " + idx2[i]) ;
-        }
+        }*/
         return s.toString();
     }
     
+
+    /** get the number of the cluster this alignment belongs to
+     * 
+     * @return an int giving the number of the cluster
+     */
+    public int getCluster() {
+		return cluster;
+	}
+
+
+
+    /** set the number of the cluster this alignment belongs to.
+     * All alignments in a cluster are quite similar.
+     * 
+     * @param cluster the number of the cluster
+     */
+	public void setCluster(int cluster) {
+		this.cluster = cluster;
+	}
+
+
+
+
+	public double getRmsd() {
+        return rms;
+    }
+
+    /** the rms in the structurally equivalent regions
+     * 
+     * @param rms
+     */
+    public void setRms(double rms) {
+        this.rms = rms;
+    }
+
+    /** the alignment score
+     * 
+     * @return the score of this alignment
+     */
+    public float getScore() {
+        return score;
+    }
+
+    public void setScore(float score) {
+        this.score = score;
+    }
     
     
     /** return the number of gaps in this alignment
@@ -148,15 +214,31 @@ public class AlternativeAlignment {
        return eqr0 ; 
     }
     
+    /** the positions of the structure equivalent positions in atom set 1
+     * 
+     * @return the array of the positions
+     */
     public int[] getIdx1(){
         return idx1;
     }
     
+    /** the positions of the structure equivalent atoms in atom set 2
+     * 
+     * @return the array of the positions
+     */
     public int[] getIdx2(){
         return idx2;
     }
     
-    /** Set apairs according to a seed position.
+    public int getPercId() {
+		return percId;
+	}
+
+    public void setPercId(int percId) {
+		this.percId = percId;
+	}
+
+	/** Set apairs according to a seed position.
      * 
      * @param l
      * @param i
@@ -240,8 +322,7 @@ public class AlternativeAlignment {
         super_pos_alig(ca1,ca3,idx1,idx2,true);
         rotateShiftAtoms(ca3);
         
-        eqr0 = idx1.length;
-        gaps0 = count_gaps(idx1,idx2);
+        calcScores(ca1,ca2);
        logger.fine("eqr " + eqr0 + " " + gaps0 + " "  +idx1[0] + " " +idx1[1]);
        
        getPdbRegions(ca1,ca2);
@@ -647,31 +728,33 @@ public class AlternativeAlignment {
         return currentTranMatrix;
     }
 
-    public double getRms() {
-        return rms;
-    }
+    
+    
+    /** calculates varios scores for this alignment like %id
+     * @param ca1 set of Atoms for molecule 1 
+     * @param ca2 set of Atoms for molecule 2
 
-    /** the rms in the structurally equivalent regions
-     * 
-     * @param rms
      */
-    public void setRms(double rms) {
-        this.rms = rms;
-    }
-
-    /** the alignment score
-     * 
-     * @return the score of this alignment
-     */
-    public float getScore() {
-        return score;
-    }
-
-    public void setScore(float score) {
-        this.score = score;
+    public void calcScores(Atom[] ca1, Atom[] ca2){
+    		eqr0 = idx1.length;
+    		gaps0 = count_gaps(idx1,idx2);
+    		
+    		percId = 0;
+    		// calc the % id
+    		for (int i=0 ; i< idx1.length; i++){
+    			 Atom a1 = ca1[idx1[i]];
+    			 Atom a2 = ca2[idx2[i]];
+    			 
+    			 Group g1 = a1.getParent();
+    			 Group g2 = a2.getParent();
+    			 if ( g1.getPDBName().equals(g2.getPDBName())){
+    				 percId++;
+    			 }
+    			 
+    		}
     }
     
-    /** converts th alignment to a PDB file
+    /** converts the alignment to a PDB file
      * each of the structures will be represented as a model.
      * 
      *  
