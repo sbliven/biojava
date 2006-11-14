@@ -46,7 +46,7 @@ public class HetatomImpl implements Group {
     /** this is a "hetatm".
      *
      */
-    public static String type = "hetatm" ;
+    public static final String type = "hetatm" ;
     
     HashMap properties ;
     
