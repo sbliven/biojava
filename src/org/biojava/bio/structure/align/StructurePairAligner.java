@@ -57,6 +57,7 @@ import org.biojava.bio.structure.jama.Matrix;
  * @version %I% %G%
  */
 public class StructurePairAligner {
+	
     AlternativeAlignment[] alts;
     Matrix distanceMatrix;
     StrucAligParameters params;
@@ -86,6 +87,11 @@ public class StructurePairAligner {
 
             PDBFileReader pdbr = new PDBFileReader();          
             pdbr.setPath("/Users/ap3/WORK/PDB/20051205");
+            
+            
+            //String pdb1 = "1crl";
+            //String pdb2 = "1ede";
+            
             String pdb1 = "1boo";
             String pdb2 = "1xva";            
             String outputfile = "/Users/ap3/tmp/alig_"+pdb1+"_"+pdb2+".pdb";
@@ -97,9 +103,8 @@ public class StructurePairAligner {
             
             // step1 : read molecules
             
-            
-            
             System.out.println("aligning " + pdb1 + " vs. " + pdb2);
+            
             Structure s1 = pdbr.getStructureById(pdb1);
             Structure s2 = pdbr.getStructureById(pdb2);                       
           
@@ -107,16 +112,21 @@ public class StructurePairAligner {
             sc.align(s1,s2);
           
             
-            // print the result:
-            // the AlternativeAlignment object gives also access to rotation matrices / shift vectors.
             AlternativeAlignment[] aligs = sc.getAlignments();
-            for (int i=0 ; i< aligs.length; i ++){
-                AlternativeAlignment aa = aligs[i];
-                String txt = "alig " + (i+1) + " eqr: " + aa.getEqr() + " rms: " + aa.getRms() + " gaps: " + aa.getGaps() + " score:" + aa.getScore();
-                System.out.println(txt);
-               
-            }
             
+            //cluster similar results together 
+            ClusterAltAligs.cluster(aligs);
+
+            
+           // print the result:
+           // the AlternativeAlignment object gives also access to rotation matrices / shift vectors.
+           for (int i=0 ; i< aligs.length; i ++){
+               AlternativeAlignment aa = aligs[i];
+               System.out.println(aa);              
+           }
+            
+           
+           
             // convert AlternativeAlignemnt 1 to PDB file, so it can be opened with a viewer (e.g. Jmol, Rasmol)
             
             if ( aligs.length > 0) {
@@ -134,20 +144,8 @@ public class StructurePairAligner {
             }
             
             
-            
-//          TODO: commit the MatrixJPanel class
-            
-            //Structure s3 = (Structure)s2.clone();
-            // finally: display the results...           
-           /*Atom[]ca1 = StructureTools.getAtomCAArray(s1);
-            Atom[] ca2 = StructureTools.getAtomCAArray(s2);
-            StrucAligParameters params = sc.getParams();
-            int fragmentLength = params.getFragmentLength();
-            FragmentPair[] fragPairs = sc.getFragmentPairs();
-           // AlternativeAlignment[] aligs = sc.getAlignments();
-            
-            MatrixJPanel.show(sc.getDistMat(), s1,s2,ca1,ca2,fragmentLength, fragPairs, aligs);
-            */
+            // TODO: do  visualization of alignment
+
             
         } catch (Exception e){
             e.printStackTrace();
@@ -382,6 +380,7 @@ public class StructurePairAligner {
             } catch (StructureException e){
                 e.printStackTrace();
             }
+            a.calcScores(ca1,ca2);
            // a.getRotationMatrix().print(3,3);
             aas.add(a);
         }
@@ -401,11 +400,9 @@ public class StructurePairAligner {
             a.setAltAligNumber(aanbr);
             //System.out.println(aanbr);
             //a.getRotationMatrix().print(3,3);
-        }
-        
+        }        
         //System.out.println("calc done");
     }
-    
-   
+     
    
 }
