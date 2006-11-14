@@ -124,10 +124,10 @@ public class AlternativeAlignment {
      * @return a String representation
      */
     public String toString(){
-    	 	DecimalFormat d2 = new DecimalFormat();
+    	DecimalFormat d2 = new DecimalFormat();
     	 	// the result can be localized. To change this and enforce UK local do...
     	 	//(DecimalFormat)NumberFormat.getInstance(java.util.Locale.UK);
-         d2.setMaximumIntegerDigits(2);	
+         d2.setMaximumIntegerDigits(3);	
          d2.setMinimumFractionDigits(2);
          d2.setMaximumFractionDigits(2);
         StringBuffer s = new StringBuffer();
