@@ -70,9 +70,13 @@ public class Calc {
     public static double getDistance(Atom a, Atom b) 
     throws StructureException
     {
+        double x = a.getX() - b.getX();
+        double y = a.getY() - b.getY();
+        double z = a.getZ() - b.getZ();
         
-        Atom   c    = substract(b,a);
-        double dist = amount(c)     ;
+        double s  = x * x  + y * y + z * z;
+        
+        double dist = Math.sqrt(s);
         
         return dist ;
     }
