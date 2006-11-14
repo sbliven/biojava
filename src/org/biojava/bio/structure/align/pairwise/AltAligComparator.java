@@ -47,15 +47,14 @@ public class AltAligComparator implements Comparator {
         
         // seem to have the same length
         
-        double rms1 = a.getRms();
-        double rms2 = a.getRms();
+        double rms1 = a.getRmsd();
+        double rms2 = b.getRmsd();
         
         if ( rms1 < rms2)
             return 1;
         if ( rms1 < rms2)
             return -1;
         
-        // TODO Auto-generated method stub
         return 0;
     }
    
