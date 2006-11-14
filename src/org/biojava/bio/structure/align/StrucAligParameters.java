@@ -38,11 +38,6 @@ public class StrucAligParameters {
     int fragmentLength;
     int diagonalDistance;
     int diagonalDistance2; // set to < 1 if not used.
-    
-   
-   
-    
-    
     boolean reduceInitialFragments;
     
     // step 2 
@@ -85,11 +80,11 @@ public class StrucAligParameters {
         
         // step 1
         seedFragmentLength      = 8;
-        seedRmsdCutoff          = 3.0f; // orig 2.0
+        seedRmsdCutoff          = 3.0f; // orig 2.0 - better?
         fragmentLength          = 10;
-        diagonalDistance        = 9;
-        diagonalDistance2       = 3; // this helps a lot in 1buz vs 1aua 
-        fragmentMiniDistance    = 3.0f; // orig 2
+        diagonalDistance        = 3; 
+        diagonalDistance2       = 9; // this helps a lot in 1buz vs 1aua 
+        fragmentMiniDistance    = 3.5f; // orig 2
         angleDiff               = 10;
         fragCompat              = 6.0f; // orig 4.0
         maxrefine               = 20; // orig 20
@@ -115,7 +110,31 @@ public class StrucAligParameters {
         permutationSize     = 20;
         evalCutoff          = 6.0f;
     }
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        String t = " ";
+        	
+        Object[] params = new Object[]{new Integer(initialK) ,new Integer(seedFragmentLength),
+        		new Float(seedRmsdCutoff),
+        		new Integer(fragmentLength),
+                new Integer(diagonalDistance), new Integer(diagonalDistance2), new Float(fragmentMiniDistance),
+                new Integer(angleDiff), 
+                new Float(fragCompat), new Integer(maxrefine), 
+                new Boolean(reduceInitialFragments), new Double(joinRMSCutoff), new Boolean(joinPlo),
+                new Boolean(doAngleCheck), new Boolean(doDistanceCheck), new Boolean(doRMSCheck), 
+                new Boolean(doDensityCheck), new Float(densityCutoff), new Float(create_co), new Integer(maxIter),
+                new Float(gapOpen), new Float(gapExtension), new Integer(permutationSize), new Float(evalCutoff)};
+        
+        for (int i=0 ; i< params.length ; i++){
+            buf.append(params[i]);
+            buf.append(t);
+        }
+        
+        
+        return buf.toString();
 
+    }
+    
     public static StrucAligParameters getDBSearchParameters(){
         StrucAligParameters params = new StrucAligParameters();
         
