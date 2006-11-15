@@ -25,6 +25,12 @@ package org.biojava.bio.structure.align.helper;
 public class IndexPair {
         short row;
         short col;
+        
+        public IndexPair(){
+        	row = -1;
+        	col = -1;
+        }
+        
         public IndexPair(short row, short col){
             this.row = row;
             this.col=col;

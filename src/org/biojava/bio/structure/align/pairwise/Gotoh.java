@@ -108,16 +108,12 @@ public class Gotoh {
             for(int colCounter=1;colCounter<colDim;colCounter++) {
                 
                 currentCell = aligmat[rowCounter][colCounter];
-                //System.out.print("prev " + aligmat[rowCounter-1][colCounter-1].getValue());
-                //System.out.println("curr " + currentCell.getValue());
-               
+
                 // no gap 
                 currentCell.setValue( aligmat[rowCounter-1][colCounter-1].getValue() + currentCell.getValue());
-                currentCell.getTrack().setRow((short)(rowCounter-1));
-                currentCell.getTrack().setCol((short)(colCounter-1));
+                currentCell.setRow((short)(rowCounter-1));
+                currentCell.setCol((short)(colCounter-1));
                 
-                //System.out.println(currentCell.getTrack() + " " +i + " " + j );
-                //System.exit(0);
                 // scan column j for gap, gap in seqB
                 openVal = aligmat[rowCounter-1][colCounter].getValue() - (openPen+elgPen);
                 elgVal  = gapCol[colCounter].getValue()-elgPen;
@@ -137,8 +133,8 @@ public class Gotoh {
                     if ( currentGap.getIndex() >= rowDim)
                         System.err.println("col gap at" + rowCounter + " " + colCounter + " to " + currentGap.getIndex());
                     currentCell.setValue( currentGap.getValue());
-                    currentCell.getTrack().setRow((short)currentGap.getIndex());
-                    currentCell.getTrack().setCol((short)colCounter);
+                    currentCell.setRow((short)currentGap.getIndex());
+                    currentCell.setCol((short)colCounter);
                 }
                 
 //              scan row i for gap, gap in row
@@ -161,8 +157,8 @@ public class Gotoh {
                     if ( currentGap.getIndex() >= colDim)
                         System.err.println("row gap at" + rowCounter + " " + colCounter + " to " + currentGap.getIndex());
                     currentCell.setValue(currentGap.getValue());
-                    currentCell.getTrack().setRow((short)rowCounter);
-                    currentCell.getTrack().setCol((short)currentGap.getIndex());
+                    currentCell.setRow((short)rowCounter);
+                    currentCell.setCol((short)currentGap.getIndex());
                 }
                 
                 //System.out.println("aligmat " + i + " " + j + " " + currentCell.getValue() + 
@@ -184,8 +180,8 @@ public class Gotoh {
        
         // no gap
         currentCell.setValue(aligmat[rowCount-1][colCount-1].getValue() + lastValue);
-        currentCell.getTrack().setRow((short)(rowCount-1));
-        currentCell.getTrack().setCol((short)(colCount-1));
+        currentCell.setRow((short)(rowCount-1));
+        currentCell.setCol((short)(colCount-1));
         
         // scan last column j for gap, gap in seqB
         // do not penalyze gaps
@@ -194,8 +190,8 @@ public class Gotoh {
             if ( val>currentCell.getValue()){
                 currentCell.setValue(val);
                 //System.out.println("setting row to " + (rowCount ) );
-                currentCell.getTrack().setRow((short)(rowCount-k ));
-                currentCell.getTrack().setCol((short)(colCount  ));
+                currentCell.setRow((short)(rowCount-k ));
+                currentCell.setCol((short)(colCount  ));
             }
         }
         
@@ -205,8 +201,8 @@ public class Gotoh {
             int val = aligmat[rowCount][colCount-k].getValue();
             if ( val > currentCell.getValue()){
                 currentCell.setValue(val);
-                currentCell.getTrack().setRow((short) (rowCount ) );
-                currentCell.getTrack().setCol((short)(colCount-k  ));
+                currentCell.setRow((short) (rowCount ) );
+                currentCell.setCol((short)(colCount-k  ));
             }
         }
         //aligmat[rowCount][colCount]=currentCell;
@@ -302,7 +298,7 @@ public class Gotoh {
                     System.out.println("el = null! x:"+ x + " y " + y);
                 //if ( n>=( backId.length-10))
                     //System.out.println("setPath:"+ el + " n:" + n + " " + backId.length);   
-                backId[n] = el.getTrack();
+                backId[n] = el;
             } catch (Exception e){
                 e.printStackTrace();
                 System.out.println("x " + x);

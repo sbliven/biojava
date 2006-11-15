@@ -22,17 +22,18 @@
  */
 package org.biojava.bio.structure.align.helper;
 
-public class AligMatEl {
+public class AligMatEl 
+extends IndexPair{
 
    
    
-        int value;
-        IndexPair track;
+        int value;       
         int contig;
+       
         
         public AligMatEl(){
-            track = new IndexPair((short)-1,(short)-1);
-            value = -1;
+            super();
+            value  = -1;
             contig = -1;
         }
 
@@ -42,12 +43,7 @@ public class AligMatEl {
         public void setContig(int contig) {
             this.contig = contig;
         }
-        public IndexPair getTrack() {
-            return track;
-        }
-        public void setTrack(IndexPair track) {
-            this.track = track;
-        }
+     
         public int getValue() {
             return value;
         }
@@ -57,7 +53,7 @@ public class AligMatEl {
         
         public String toString(){
             String ret = "AligMatEl val:" + value + " contig:" + contig + 
-            " trackrow:" + track.getRow() + " trackcol:" + track.getCol();
+            " trackrow:" + getRow() + " trackcol:" + getCol();
             return ret;
         }
         
