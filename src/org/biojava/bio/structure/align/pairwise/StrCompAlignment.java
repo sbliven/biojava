@@ -47,12 +47,12 @@ implements Alignable
         this.rows = rows;
         this.cols = cols;
         aligmat = new AligMatEl[rows+1][cols+1];
-        // same as create_al
-        for (int i=0;i<rows+1;i++){
+    
+        /*for (int i=0;i<rows+1;i++){
             for(int j=0;j<cols+1;j++){
                 aligmat[i][j] = new AligMatEl();
             }
-        }
+        }*/
         path = new IndexPair[0];
         score = 0;
     }
