@@ -73,8 +73,12 @@ public class LayeredRenderer {
 
         while (srcI.hasNext() && i.hasNext()) {
             SequenceRenderContext src = (SequenceRenderContext) srcI.next();
-            SequenceRenderer sRend = (SequenceRenderer) i.next();
-            depth += sRend.getDepth(src);
+            SequenceRenderer sRend = (SequenceRenderer) i.next();            
+            if(sRend instanceof OverlayMarker){
+                depth += 0.0; // maybe just do nothing here
+            }else {
+                depth += sRend.getDepth(src);                   
+            }
         }
         return depth;
     }
