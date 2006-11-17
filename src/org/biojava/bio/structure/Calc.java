@@ -669,8 +669,99 @@ public class Calc {
     }    
     
     
+    /** get euler angles for a matrix given in ZYZ convention.
+     * (as e.g. used by Jmol)
+     * 
+     * @param m
+     * @return the euler values for a rotation around Z, Y, Z in degrees...
+     */
+    public static double[] getZYZEuler(Matrix m) {
+        double m22 = m.get(2,2);
+        double rY = (float) Math.acos(m22) * degreesPerRadian;
+        double rZ1, rZ2;
+        if (m22 > .999d || m22 < -.999d) {
+          rZ1 = (double) Math.atan2(m.get(1,0),  m.get(1,1)) * degreesPerRadian;
+          rZ2 = 0;
+        } else {
+          rZ1 = (double) Math.atan2(m.get(2,1), -m.get(2,0)) * degreesPerRadian;
+          rZ2 = (double) Math.atan2(m.get(1,2),  m.get(0,2)) * degreesPerRadian;
+        }
+        return new double[] {rZ1,rY,rZ2};
+    }
     
-   
+    
+    /** Convert a rotation Matrix to Euler angles.
+     *   This conversion uses conventions as described on page:
+     *   http://www.euclideanspace.com/maths/geometry/rotations/euler/index.htm
+     *   Coordinate System: right hand
+     *   Positive angle: right hand
+     *   Order of euler angles: heading first, then attitude, then bank
+     *   
+     * @param m the rotation matrix
+     * @return a array of three doubles containing the three euler angles in radians
+     */   
+    public static double[] getXYZEuler(Matrix m){
+        double heading, attitude, bank;
+        
+        // Assuming the angles are in radians.
+        if (m.get(1,0) > 0.998) { // singularity at north pole
+            heading = Math.atan2(m.get(0,2),m.get(2,2));
+            attitude = Math.PI/2;
+            bank = 0;
+            
+        } else if  (m.get(1,0) < -0.998) { // singularity at south pole
+            heading = Math.atan2(m.get(0,2),m.get(2,2));
+            attitude = -Math.PI/2;
+            bank = 0;
+            
+        } else {
+            heading = Math.atan2(-m.get(2,0),m.get(0,0));
+            bank = Math.atan2(-m.get(1,2),m.get(1,1));
+            attitude = Math.asin(m.get(1,0));
+        }
+        return new double[] { heading, attitude, bank };
+    }
+    
+    
+    
+    
+    
+    /** this conversion uses NASA standard aeroplane conventions as described on page:
+    *   http://www.euclideanspace.com/maths/geometry/rotations/euler/index.htm
+    *   Coordinate System: right hand
+    *   Positive angle: right hand
+    *   Order of euler angles: heading first, then attitude, then bank
+    *   matrix row column ordering:
+    *   [m00 m01 m02]
+    *   [m10 m11 m12]
+    *   [m20 m21 m22]
+     * @param heading in radians
+     * @param attitude  in radians
+     * @param bank  in radians
+     * @return the rotation matrix */
+    public static Matrix matrixFromEuler(double heading, double attitude, double bank) {
+        // Assuming the angles are in radians.
+        double ch = Math.cos(heading);
+        double sh = Math.sin(heading);
+        double ca = Math.cos(attitude);
+        double sa = Math.sin(attitude);
+        double cb = Math.cos(bank);
+        double sb = Math.sin(bank);
+
+        Matrix m = new Matrix(3,3);
+        m.set(0,0, ch * ca);
+        m.set(0,1, sh*sb - ch*sa*cb);
+        m.set(0,2, ch*sa*sb + sh*cb);
+        m.set(1,0, sa);
+        m.set(1,1, ca*cb);
+        m.set(1,2, -ca*sb);
+        m.set(2,0, -sh*ca);
+        m.set(2,1, sh*sa*cb + ch*sb);
+        m.set(2,2, -sh*sa*sb + ch*cb);
+        
+        return m;
+    }
+    
 
 }
 
