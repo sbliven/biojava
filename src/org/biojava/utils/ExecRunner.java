@@ -354,9 +354,7 @@ import java.util.StringTokenizer;
 	     //System.out.println("**Checkpoint** :" + cmd.length);
 	     proc = rt.exec(cmd);
 	 }
-	 else {
-	     throw new IOException("Insufficient commands!");
-	 }
+	 else throw new IOException("Insufficient commands!");
 
 	 StreamGobbler outputGobbler =
 	     new StreamGobbler(proc.getInputStream(), stdoutWriter);
@@ -367,35 +365,35 @@ import java.util.StringTokenizer;
 
 	 // Wait for the program to finish running and return the
 	 // exit value obtained from the executable
-	 while (true) {
-
-	     try {
-		 exitVal = proc.exitValue();
-		 break;
-	     }
-	     catch (IllegalThreadStateException e) {
-
-		 // If we get this exception, then the process isn't
-		 // done executing and we determine if our time is up.
-		 if (maxRunTimeSecs > 0) {
-
-		     Date endTime = new Date();
-		     long endTimeMs = endTime.getTime();
-		     if (endTimeMs > maxTimeMs) {
-			 // Time's up - kill the process and the gobblers and return
-			 proc.destroy();
-			 maxRunTimeExceeded = true;
-			 stderrWriter.println(MAX_RUN_TIME_EXCEEDED_STRING);
-			 outputGobbler.quit();
-			 errorGobbler.quit();
-			 return exitVal;
-
+   while (true) {
+     try {
+	  	 exitVal = proc.exitValue();
+		   break;
+	   }
+	   catch (IllegalThreadStateException e) {
+		   // If we get this exception, then the process isn't
+		   // done executing and we determine if our time is up.
+		   if (maxRunTimeSecs > 0) {
+	      Date endTime = new Date();
+	       long endTimeMs = endTime.getTime();
+	       if (endTimeMs > maxTimeMs) {
+			     // Time's up - kill the process and the gobblers and return
+			     proc.destroy();
+			     maxRunTimeExceeded = true;
+			     stderrWriter.println(MAX_RUN_TIME_EXCEEDED_STRING);
+			     outputGobbler.quit();
+			     errorGobbler.quit();
+           stdoutWriter.close();
+           stderrWriter.close();
+           proc.getOutputStream().close();
+			     return exitVal;
+	       } else {
+    		   // Time is not up yet so wait 100 ms before testing again
+		   	   Thread.sleep(100);
 		     }
-		     else {
-    			 // Time is not up yet so wait 100 ms before testing again
-		   	 Thread.sleep(100);
-		     }
-		 }}}
+		   }
+     }
+   }
    
    ////////////////////////////////////////////////////////////////
    // Wait for output gobblers to finish forwarding the output
@@ -406,6 +404,9 @@ import java.util.StringTokenizer;
    // All done, flush the streams and return the exit value
    stdoutWriter.flush();
    stderrWriter.flush();
+   stdoutWriter.close();
+   stderrWriter.close();
+   proc.getOutputStream().close();
    return exitVal;
 
 	 }
@@ -509,6 +510,9 @@ import java.util.StringTokenizer;
              stderrWriter.println(MAX_RUN_TIME_EXCEEDED_STRING);
              outputGobbler.quit();
              errorGobbler.quit();
+             stdoutWriter.close();
+             proc.getOutputStream().close();
+             stderrWriter.close();
              return exitVal;
            } else {
              // Time is not up yet so wait 100 ms before testing again
@@ -527,6 +531,9 @@ import java.util.StringTokenizer;
 	   // All done, flush the streams and return the exit value
 	   stdoutWriter.flush();
 	   stderrWriter.flush();
+     stdoutWriter.close();
+     stderrWriter.close();
+     proc.getOutputStream().close();
 	   return exitVal;
 
    }
@@ -766,24 +773,20 @@ import java.util.StringTokenizer;
      public void run() {
 
 	 try {
-
 	     // Set up the input stream
-	     InputStreamReader isr = new InputStreamReader(in);
-	     BufferedReader br = new BufferedReader(isr);
+	     BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
 	     // Initialize the temporary results containers
 	     String line = null;
 
 	     // Main processing loop which captures the output
 	     while ((line = br.readLine()) != null) {
-		 if (quit) {
-		     break;
-		 }
-		 else {
-		     pwOut.println(line);
-		 }
+		     if (quit) 
+		       break;
+  		   else 
+		       pwOut.println(line);
 	     }
-
+       this.in.close();
 	 }
 	 catch (Exception e) {
 	     e.printStackTrace();
