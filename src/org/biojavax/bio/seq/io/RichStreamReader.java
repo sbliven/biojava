@@ -95,7 +95,7 @@ public class RichStreamReader implements RichSequenceIterator {
      * {@inheritDoc}
      */
     public BioEntry nextBioEntry() throws NoSuchElementException, BioException {
-        return this.nextBioEntry();
+        return this.nextRichSequence();
     }
     
     /**
