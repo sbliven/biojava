@@ -1,14 +1,15 @@
 package org.biojava.naming;
 
-import junit.framework.TestCase;
+import java.util.Properties;
 
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.Attributes;
+import javax.naming.Binding;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
-import javax.naming.Binding;
-import java.util.Properties;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+
+import junit.framework.TestCase;
 
 /**
  *

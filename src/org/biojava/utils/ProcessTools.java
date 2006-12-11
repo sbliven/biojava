@@ -22,8 +22,14 @@
  
 package org.biojava.utils;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
+import java.util.StringTokenizer;
 
 
 /**

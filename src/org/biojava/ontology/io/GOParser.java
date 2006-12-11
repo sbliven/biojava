@@ -28,13 +28,13 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.biojava.bio.BioError;
+import org.biojava.bio.seq.io.ParseException;
 import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.ontology.OntoTools;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.OntologyException;
 import org.biojava.ontology.OntologyFactory;
 import org.biojava.ontology.Term;
-import org.biojava.bio.seq.io.ParseException;
 import org.biojava.utils.ChangeVetoException;
 
 /**

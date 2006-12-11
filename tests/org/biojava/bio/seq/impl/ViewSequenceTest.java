@@ -1,14 +1,15 @@
 package org.biojava.bio.seq.impl;
 
 import junit.framework.TestCase;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceTools;
-import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.DummySymbolList;
 import org.biojava.bio.symbol.LocationTools;
-import org.biojava.bio.SmallAnnotation;
-import org.biojava.bio.Annotation;
 import org.biojava.ontology.OntoTools;
 
 /**

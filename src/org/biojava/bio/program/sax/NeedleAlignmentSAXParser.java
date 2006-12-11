@@ -102,7 +102,6 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
 
     private AttributesImpl          oAtts      = new AttributesImpl();
-    private ArrayList               oHeader    = new ArrayList();
     private QName                   oAttQName  = new QName(this);
     private char[]                  aoChars;
 

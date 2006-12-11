@@ -21,7 +21,8 @@
 
 package org.biojavax.ga.functions;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * <p>Holds the results of a CrossOver event, objects of this type are made by

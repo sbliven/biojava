@@ -20,10 +20,9 @@
  */
 package org.biojava.bio.gui.glyph;
 
-import java.awt.*;
-import java.awt.geom.*;
-
-import java.util.*;
+import java.awt.Shape;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.util.List;
 
 

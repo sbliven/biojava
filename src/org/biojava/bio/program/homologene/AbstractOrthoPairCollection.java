@@ -22,9 +22,6 @@
 package org.biojava.bio.program.homologene;
 
 
-import java.util.Set;
-import java.util.HashSet;
-
 import org.biojava.utils.ChangeVetoException;
 
 /**

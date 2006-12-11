@@ -21,7 +21,6 @@
 package org.biojava.bio.search;
 
 import java.io.PrintStream;
-import org.biojava.bio.search.SearchContentHandler;
 
 /**
  * This class prints to a PrintStream
@@ -36,14 +35,12 @@ public class SearchContentHandlerDebugger
     private String [] margin = {"", "\t", "\t\t", "\t\t\t"};
     private int nesting = 0;
     private boolean moreSearches = false;
-    private PrintStream pStream;
 
     /**
      * Create an instance that dumps to System.out.
      */
     public SearchContentHandlerDebugger()
     {
-        pStream = System.out;
     }
 
     /**
@@ -51,7 +48,6 @@ public class SearchContentHandlerDebugger
      */
     public SearchContentHandlerDebugger(PrintStream pStream)
     {
-        this.pStream = pStream;
     }
 
     public void addHitProperty(Object key, Object value)

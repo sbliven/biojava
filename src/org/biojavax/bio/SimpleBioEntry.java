@@ -508,25 +508,25 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     }
     
     // Hibernate requirement - not for public use.
-    private void setRelationships(Set relationships) { this.relationships = relationships; }  // must be original for Hibernate
+    void setRelationships(Set relationships) { this.relationships = relationships; }  // must be original for Hibernate
     
     // Hibernate requirement - not for public use.
-    private void setNamespace(Namespace ns) { this.ns = ns; }
+    void setNamespace(Namespace ns) { this.ns = ns; }
     
     // Hibernate requirement - not for public use.
-    private void setName(String name) { this.name = name; }
+    void setName(String name) { this.name = name; }
     
     // Hibernate requirement - not for public use.
-    private void setAccession(String acc) { this.accession = acc; }
+    void setAccession(String acc) { this.accession = acc; }
     
     // Hibernate requirement - not for public use.
-    private void setVersion(int v) { this.version = v; }
+    void setVersion(int v) { this.version = v; }
     
     // Hibernate requirement - not for public use.
-    private void setRankedDocRefs(Set docrefs) { this.rankeddocrefs = docrefs; } // must be original for Hibernate
+    void setRankedDocRefs(Set docrefs) { this.rankeddocrefs = docrefs; } // must be original for Hibernate
     
     // Hibernate requirement - not for public use.
-    private void setComments(Set comments) { this.comments = comments; }  // must be original for Hibernate
+    void setComments(Set comments) { this.comments = comments; }  // must be original for Hibernate
     
     // Hibernate requirement - not for public use.
     public void setRankedCrossRefs(Set rankedcrossrefs) { this.rankedcrossrefs = rankedcrossrefs; } // original for Hibernate
@@ -535,10 +535,10 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
     
 }
 

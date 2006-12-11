@@ -32,7 +32,13 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.SingletonAlphabet;
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.SingletonList;
 
 /**
  * @author Matthew Pocock

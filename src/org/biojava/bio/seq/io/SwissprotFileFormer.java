@@ -28,9 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.FuzzyLocation;
@@ -52,8 +50,6 @@ import org.biojava.bio.symbol.Symbol;
 public class SwissprotFileFormer extends AbstractGenEmblFileFormer
     implements SeqFileFormer
 {
-    // Main sequence formatting buffer
-    private StringBuffer sq = new StringBuffer();
     // Main qualifier formatting buffer
     private StringBuffer qb = new StringBuffer();
     // Utility formatting buffer
@@ -70,16 +66,6 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer ocb = null;
     private StringBuffer ccb = null;
     private StringBuffer ftb = new StringBuffer();
-
-    private SymbolTokenization proteinTokenization;
-
-    {
-        try {
-            proteinTokenization = ProteinTools.getTAlphabet().getTokenization("token");
-        } catch (Exception ex) {
-            throw new BioError("Couldn't initialize tokenizer for the DNA alphabet",ex);
-        }
-    }
 
     // Static variables
     static int LOCATION_WIDTH = 6;
@@ -316,10 +302,6 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
     {
         // There are 19 spaces in the leader
         String leader = "FT                   ";
-        int    strand = 0;
-
-        if (templ instanceof StrandedFeature.Template)
-            strand = ((StrandedFeature.Template) templ).strand.getValue();
 
         ub.setLength(0);
         ub.append(leader);

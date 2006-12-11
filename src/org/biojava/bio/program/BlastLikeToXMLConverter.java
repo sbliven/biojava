@@ -240,7 +240,6 @@ public class BlastLikeToXMLConverter {
 
     FileInputStream           oInputFileStream;
     BufferedReader            oContents;
-    String                    oLine            = null;
 
     //Test parsing using ByteSteam as InputSource
         // Open file and read all lines from file sequentially

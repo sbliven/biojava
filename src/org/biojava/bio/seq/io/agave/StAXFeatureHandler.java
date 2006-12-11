@@ -40,21 +40,23 @@
 
 package org.biojava.bio.seq.io.agave;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
-import org.biojava.bio.*;
-
-import org.biojava.bio.seq.*;
-
-import org.biojava.bio.seq.io.*;
-
-import org.biojava.bio.symbol.*;
-
-import org.biojava.utils.*;
-
-//import org.biojava.utils.stax.*;
-
-import org.xml.sax.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.ChangeVetoException;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 
 

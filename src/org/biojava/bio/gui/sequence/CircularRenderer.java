@@ -1,6 +1,6 @@
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 
 /**
  * Render information from a CircularRendererContext onto a graphics context.

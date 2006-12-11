@@ -21,11 +21,24 @@
 
 package org.biojava.bio.dist;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetIndex;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ChangeAdapter;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A simple implementation of a distribution, which works with any finite alphabet.

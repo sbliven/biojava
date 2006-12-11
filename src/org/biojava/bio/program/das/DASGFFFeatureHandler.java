@@ -58,7 +58,6 @@ class DASGFFFeatureHandler extends StAXContentHandlerBase {
     private String method = "unknown";
     private int start = -1, end = -1;
     private String orientation="0";
-    private String phase="-";
     private Location loc = null;
     private boolean isReferenceFeature = false;
     private String category = null;

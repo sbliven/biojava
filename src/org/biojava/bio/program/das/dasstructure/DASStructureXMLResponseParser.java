@@ -23,19 +23,27 @@
  */
 package org.biojava.bio.program.das.dasstructure ;
 
-import org.biojava.bio.structure.* ;
-import org.biojava.bio.structure.io.* ;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-import org.xml.sax.helpers.DefaultHandler;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.structure.AminoAcidImpl;
+import org.biojava.bio.structure.AtomImpl;
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
+import org.biojava.bio.structure.HetatomImpl;
+import org.biojava.bio.structure.NucleotideImpl;
+import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureImpl;
+import org.biojava.bio.structure.io.PDBFileReader;
+import org.biojava.bio.structure.io.PDBParseException;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 import org.xml.sax.Attributes;
-
-import java.util.ArrayList ;
-import java.util.HashMap ;
-
-// for conversion
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.SymbolTokenization ;
+import org.xml.sax.helpers.DefaultHandler;
 
 
 /** a class to Parse the XML response of a DAS structure service. 

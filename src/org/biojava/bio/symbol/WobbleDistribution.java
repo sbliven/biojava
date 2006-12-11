@@ -23,7 +23,6 @@ package org.biojava.bio.symbol;
 
 import java.util.Set;
 
-import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.dist.Distribution;
 
 /**

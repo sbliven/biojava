@@ -22,7 +22,6 @@
 
 package org.biojava.bio.symbol;
 
-import java.io.Serializable;
 
 
 /**

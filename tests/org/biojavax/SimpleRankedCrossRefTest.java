@@ -7,10 +7,13 @@
 
 package org.biojavax;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener.ChangeEventRecorder;
 import org.biojava.utils.ChangeVetoException;
-import junit.framework.*;
+import org.biojava.utils.ChangeListener.ChangeEventRecorder;
 
 
 /**
@@ -26,7 +29,7 @@ public class SimpleRankedCrossRefTest extends TestCase {
     ChangeEventRecorder cr;
     
     public SimpleRankedCrossRefTest(String testName) {
-        super(testName);ChangeEventRecorder cr;
+        super(testName);
     }
 
     protected void setUp() throws Exception {

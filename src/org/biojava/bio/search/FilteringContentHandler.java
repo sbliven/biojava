@@ -21,20 +21,17 @@
 
 package org.biojava.bio.search;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-
-import org.biojava.utils.walker.Walker;
-import org.biojava.utils.walker.WalkerFactory;
-import org.biojava.utils.walker.Visitor;
-import org.biojava.utils.TriState;
+import java.util.List;
+import java.util.Map;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.search.SearchContentAdapter;
-import org.biojava.bio.search.SearchContentHandler;
+import org.biojava.utils.TriState;
+import org.biojava.utils.walker.Visitor;
+import org.biojava.utils.walker.Walker;
+import org.biojava.utils.walker.WalkerFactory;
 
 public class FilteringContentHandler
     extends SearchContentAdapter
@@ -44,47 +41,25 @@ public class FilteringContentHandler
     private Map searchProperty = new HashMap();
     private Map hitProperty = new HashMap();
     private Map subHitProperty = new HashMap();
-    private String databaseId;
 
     // these store the filter objects
     private List searchFilters = new ArrayList();
     private List hitFilters = new ArrayList();
     private List subHitFilters = new ArrayList();
 
-    // parsing states
-    private static final int UNINITTED = 0;
-    private static final int IN_HEADER = 1;
-    private static final int IN_SEARCH = 2;
-    private static final int IN_HIT = 3;
-    private static final int IN_SUBHIT = 4;
-    private static final int OUT_SUBHIT = 5;
-    private static final int OUT_HIT = 6;
-
-    private boolean parsingError = false;
-
     // these keep track of what this class has issued
     // to its downstream filters.
-    private boolean emittedStartHeader;
     private boolean emittedStartSearch;
     private boolean emittedStartHit;
-    private boolean emittedStartSubHit;
 
     // these determine whether to skip the lower ranked levels
     private boolean skipHits =false;
     private boolean skipSubHits = false;
 
-    // these keep track of how many objects of each kind were matched and accepted.
-    private int matchedSubHit = 0;
-    private int matchedHit =0;
-    private int matchedSearch = 0;
-
     // these keep track of whether the test for the outcome at a certain level has
     // been done.
     private boolean firstSubHit = true;
     private boolean firstHit = true;    // first hit in a search
-    private boolean firstSearch = true; // first subhit in a hit
-
-    private int state = UNINITTED;
 
     public Object getSearchProperty(Object key) { return searchProperty.get(key); }
     public Object getHitProperty(Object key) { return hitProperty.get(key); }
@@ -148,46 +123,37 @@ public class FilteringContentHandler
 
     public void startHeader()
     {
-        state = IN_HEADER;
         delegate.startHeader();
     }
 
     public void setDatabaseID(String id)
     {
-        if (state != IN_HEADER) parsingError= true;
-        databaseId =  id;
         delegate.setDatabaseID(id);
-        emittedStartHeader =false;
     }
 
     public void endHeader()
     {
-        state = UNINITTED;
         delegate.endHeader();
     }
 
     public void startSearch()
     {
-        state = IN_SEARCH;
         emittedStartSearch = false;
         firstHit = true;
     }
 
     public void setQueryID(String queryID)
     {
-        if (state != IN_SEARCH) parsingError= true;
         addSearchProperty(BlastLikeSearchFilter.KEY_QUERY_ID, queryID);
     }
 
     public void addSearchProperty(Object key, Object value)
     {
-        if (state != IN_SEARCH) parsingError= true;
         searchProperty.put(key, value);
     }
 
     public void startHit()
     {
-        state = IN_HIT;
         emittedStartHit = false;
         firstSubHit = true;
 
@@ -214,15 +180,12 @@ public class FilteringContentHandler
     public void addHitProperty(Object key, Object value)
     {
         if (skipHits) return;
-        if (state != IN_HIT) parsingError= true;
         hitProperty.put(key, value);
     }
 
     public void startSubHit()
     {
         if (skipSubHits) return;
-        state = IN_SUBHIT;
-        emittedStartSubHit = false;
 
 
         // clear outcomes that depend on the properties
@@ -256,13 +219,11 @@ public class FilteringContentHandler
     public void addSubHitProperty(Object key, Object value)
     {
         if (skipSubHits) return;
-        if (state != IN_SUBHIT) parsingError= true;
         subHitProperty.put(key, value);
     }
 
     public void endSubHit()
     {
-        state = OUT_SUBHIT;
 
         // test filter at subhit level here
         // this will be a decision on whether to emit events or not
@@ -321,8 +282,6 @@ public class FilteringContentHandler
 
     public void endHit()
     {
-        state = OUT_HIT;
-
         if (emittedStartHit) {
             delegate.endHit();
             emittedStartHit = false;
@@ -331,8 +290,6 @@ public class FilteringContentHandler
 
     public void endSearch()
     {
-        state = UNINITTED;
-
         if (emittedStartSearch) {
             delegate.endSearch();
             emittedStartSearch = false;

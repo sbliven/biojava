@@ -25,13 +25,24 @@
 
 package org.biojava.bio.structure.io;
 
-import org.biojava.bio.structure.*;
-import java.io.IOException ;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-// DB connectivity
-import java.sql.*;
+import javax.sql.DataSource;
+
+import org.biojava.bio.structure.AminoAcidImpl;
+import org.biojava.bio.structure.Atom;
+import org.biojava.bio.structure.AtomImpl;
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
+import org.biojava.bio.structure.HetatomImpl;
+import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureImpl;
 import org.biojava.utils.JDBCPooledDataSource;
-import javax.sql.DataSource ;
 
 
 /** retreive a structure from an installation of the MSD - search

@@ -26,7 +26,6 @@ package org.biojava.utils.process;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -57,11 +56,6 @@ public class ExternalProcessTest extends TestCase {
      * OS-specific string for the more command.
      */
     private static String commandMore = null;
-
-    /**
-     * The current working directory.
-     */
-    private static File currentDir = new File(".");
     
     static {
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {

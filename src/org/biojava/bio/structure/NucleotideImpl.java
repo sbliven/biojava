@@ -22,7 +22,7 @@
  *
  */
 package org.biojava.bio.structure;
-import  org.biojava.bio.structure.io.PDBParseException;
+import org.biojava.bio.structure.io.PDBParseException;
 
 
 /**

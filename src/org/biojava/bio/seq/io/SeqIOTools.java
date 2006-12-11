@@ -790,7 +790,6 @@ public final class SeqIOTools  {
         //Reads the file to guess based on content
         BufferedReader br = new BufferedReader(new FileReader(seqFile));
         String line1 = br.readLine();
-        String line2 = br.readLine();
         br.close();
 
         if (line1.startsWith(">")) {

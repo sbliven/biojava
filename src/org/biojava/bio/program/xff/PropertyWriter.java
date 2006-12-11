@@ -20,12 +20,12 @@
  */
 package org.biojava.bio.program.xff;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Iterator;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.xml.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.utils.xml.XMLWriter;
 
 /**
  * @author Thomas Down

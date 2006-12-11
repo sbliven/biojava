@@ -21,7 +21,7 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
+import java.awt.Font;
 import java.awt.geom.Point2D;
 
 import javax.swing.SwingConstants;
@@ -181,7 +181,6 @@ public interface SequenceRenderContext extends SwingConstants {
         case LEADING:
         case TRAILING:
         case CENTER:
-          int old = this.alignment;
           this.alignment = alignment;
           break;
         default:

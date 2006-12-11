@@ -21,12 +21,21 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.*;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import junit.framework.TestCase;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.GappedSequence;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  * Test for GappedSequence.  By dependancy, this also tests

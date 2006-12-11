@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
@@ -40,8 +41,8 @@ import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
-import org.biojavax.SimpleNamespace;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.SimpleNamespace;
 import org.biojavax.bio.seq.RichSequence;
 
 

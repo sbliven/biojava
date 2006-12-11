@@ -21,10 +21,16 @@
 
 package org.biojava.bio.alignment;
 
-import junit.framework.*;
-import java.util.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.GappedSequence;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.symbol.BasisSymbol;
+import org.biojava.bio.symbol.LocationTools;
 
 /* @author Lachlan Coin */
 public class FlexibleAlignmentTest extends TestCase {

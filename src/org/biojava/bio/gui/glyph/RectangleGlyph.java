@@ -20,8 +20,10 @@
  */
 package org.biojava.bio.gui.glyph;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -33,7 +35,6 @@ import java.awt.geom.*;
 public class RectangleGlyph implements Glyph {
     private Paint forePaint;
     private Rectangle2D.Float bounds = new Rectangle2D.Float(0, 0, 0, 0);
-    private Shape rectangleShape;
 
     public RectangleGlyph() {
         forePaint = Color.RED.brighter();

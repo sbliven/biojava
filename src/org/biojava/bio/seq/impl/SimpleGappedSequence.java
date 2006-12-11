@@ -25,14 +25,19 @@ import java.util.Iterator;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.impl.FeatureImpl;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.projection.ReparentContext;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.GappedSequence;
+import org.biojava.bio.seq.MergeFeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
+import org.biojava.bio.seq.projection.ReparentContext;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SimpleGappedSymbolList;
-import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Simple implementation of GappedSequence. Please note that this is a view onto 

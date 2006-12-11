@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.NoSuchElementException;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.SymbolTokenization;

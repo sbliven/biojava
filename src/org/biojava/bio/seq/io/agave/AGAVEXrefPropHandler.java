@@ -19,14 +19,9 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-//import org.biojava.utils.stax.*;
-import org.xml.sax.*;
-import java.util.* ;
+import java.util.ListIterator;
+
+import org.xml.sax.SAXException;
 
 /**
  * handle AGAVE xref

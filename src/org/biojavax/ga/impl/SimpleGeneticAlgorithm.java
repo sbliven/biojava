@@ -22,16 +22,21 @@
 
 package org.biojavax.ga.impl;
 
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ga.GAStoppingCriteria;
-import org.biojavax.ga.Population;
 import org.biojavax.ga.Organism;
+import org.biojavax.ga.Population;
 import org.biojavax.ga.functions.CrossOverFunction;
-import org.biojavax.ga.functions.SelectionFunction;
 import org.biojavax.ga.functions.MutationFunction;
+import org.biojavax.ga.functions.SelectionFunction;
 
 /**
  * A simple implementation of the <code>GeneticAlgorithm</code> interface

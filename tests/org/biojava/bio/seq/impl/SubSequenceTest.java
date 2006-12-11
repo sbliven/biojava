@@ -21,17 +21,20 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.util.*;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
+import java.util.Iterator;
 
-import org.biojava.bio.*;
-import org.biojava.bio.program.xff.XFFTools;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.StreamWriter;
 import junit.framework.TestCase;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.RemoteFeature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Tests for SimpleAssembly.  By dependancy, this also

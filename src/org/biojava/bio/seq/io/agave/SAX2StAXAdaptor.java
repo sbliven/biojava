@@ -19,8 +19,13 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import org.xml.sax.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 /**
  * Lightweight adaptor which translates SAX content events into
  * StAX form, and provides delegation services.
@@ -161,7 +166,6 @@ public class SAX2StAXAdaptor implements ContentHandler {
         current.handler.endElement(nsURI, localName, qName, null);
         current.count--;
         while (current.count == 0 && stack.size() > 1) {
-            StAXContentHandler oldHandler = current.handler;
             current.handler.endTree();
             stack.remove(stack.size() - 1);
             current = (HandlerBinding) stack.get(stack.size() - 1);

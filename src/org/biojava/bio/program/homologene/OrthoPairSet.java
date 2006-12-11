@@ -23,8 +23,8 @@ package org.biojava.bio.program.homologene;
 
 import java.util.Set;
 
-import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * represents the Homologene Group.

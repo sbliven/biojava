@@ -23,15 +23,8 @@ package org.biojava.bio.gui.sequence;
 import org.biojava.bio.gui.glyph.ArrowGlyph;
 import org.biojava.bio.gui.glyph.HelixGlyph;
 import org.biojava.bio.gui.glyph.TurnGlyph;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-
-import java.awt.*;
-import java.awt.event.MouseEvent;
-
-import java.util.*;
-import java.util.List;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.utils.ChangeVetoException;
 
 
 /**

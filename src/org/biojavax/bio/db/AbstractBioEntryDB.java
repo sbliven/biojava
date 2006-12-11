@@ -22,6 +22,7 @@
 package org.biojavax.bio.db;
 
 import java.util.Iterator;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.utils.AbstractChangeable;

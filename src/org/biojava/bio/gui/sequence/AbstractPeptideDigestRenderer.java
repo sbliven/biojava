@@ -20,10 +20,21 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.seq.*;
-import org.biojava.utils.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*;
+import org.biojava.bio.seq.ByLocationMinMaxFeatureComparator;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 
 /**

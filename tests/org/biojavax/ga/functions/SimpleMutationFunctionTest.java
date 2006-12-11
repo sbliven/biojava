@@ -21,10 +21,14 @@
 
 package org.biojavax.ga.functions;
 
-import java.util.*;
-import junit.framework.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojavax.ga.util.GATools;
 
 
@@ -48,7 +52,7 @@ public class SimpleMutationFunctionTest extends TestCase {
     SimpleMutationFunction func = new SimpleMutationFunction();
     try {
       SymbolList seq=  DNATools.createDNA("aaaaaaaaa");
-      SymbolList symbollistRet = func.mutate(seq);
+      func.mutate(seq);
 
       func.setMutationProbs(new double[]{0.0, 0.0, 1.0, 0.0});
       func.setMutationSpectrum(

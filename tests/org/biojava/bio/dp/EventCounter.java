@@ -1,11 +1,11 @@
 package org.biojava.bio.dp;
 
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeVetoException;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Utility class for event handler tests.

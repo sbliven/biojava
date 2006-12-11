@@ -1,10 +1,12 @@
 package org.biojava.bio.structure;
 
-import java.util.*;
-import java.io.*;
-import org.biojava.bio.structure.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+
+import junit.framework.TestCase;
+
+import org.biojava.bio.structure.io.PDBFileParser;
 import org.biojava.bio.structure.jama.Matrix;
-import junit.framework.*;
 
 
 /**

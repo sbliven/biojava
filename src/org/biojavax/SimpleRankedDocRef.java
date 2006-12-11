@@ -122,7 +122,7 @@ public class SimpleRankedDocRef extends AbstractChangeable implements RankedDocR
     public Integer getEnd() { return this.end; }
     
     // Hibernate requirement - not for public use.
-    private void setDocumentReference(DocRef docref) { this.docref = docref; }
+    void setDocumentReference(DocRef docref) { this.docref = docref; }
         
     // Hibernate requirement - not for public use.
     private void setStart(Integer start) { 
@@ -180,7 +180,7 @@ public class SimpleRankedDocRef extends AbstractChangeable implements RankedDocR
     }
     
     // Internal use only.
-    private final void setLocationText(final String theLocation) throws ParseException {
+    final void setLocationText(final String theLocation) throws ParseException {
     	if (theLocation == null) {
     		makeLocation(RichLocation.EMPTY_LOCATION);
     	} else {
@@ -190,7 +190,7 @@ public class SimpleRankedDocRef extends AbstractChangeable implements RankedDocR
     }
     
     // Internal use only.
-    private final String getLocationText() {
+    final String getLocationText() {
     	return  getLocation() == RichLocation.EMPTY_LOCATION?null:GenbankLocationParser.writeLocation(getLocation());
     }
     

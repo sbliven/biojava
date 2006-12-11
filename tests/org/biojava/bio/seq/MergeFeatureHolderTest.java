@@ -21,10 +21,6 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
 import junit.framework.TestCase;
 
 /**

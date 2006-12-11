@@ -32,13 +32,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.WeakHashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -52,10 +52,10 @@ import org.biojava.bio.seq.io.NameTokenization;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.StreamParser;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.utils.ClassTools;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ClassTools;
 import org.biojava.utils.Unchangeable;
 import org.biojava.utils.cache.WeakValueHashMap;
 import org.biojava.utils.lsid.Identifiable;
@@ -756,7 +756,6 @@ public final class AlphabetManager {
     List aList = new ArrayList(); // the alphabets
     int i = 0;
     while(i < name.length()) {
-      String alpha = null;
       if(name.charAt(i) == '(') {
         int depth = 1;
         int j = i+1;

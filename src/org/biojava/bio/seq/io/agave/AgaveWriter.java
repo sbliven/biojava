@@ -19,13 +19,19 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.io.*;
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.*;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SimpleAssembly;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.impl.SimpleSequence;
 
 /**
  * Writes Sequence into AGAVE XML document.  The AGAVE
@@ -225,7 +231,6 @@ public class AgaveWriter
                   sequence? , sequence_map* ,  map_location* )>
     <!ATTLIST contig length NMTOKEN  #REQUIRED >
     */
-        String s;
         mIndent.indent();
         mOut.print(mIndent);
         mOut.print("<contig");
@@ -1169,30 +1174,6 @@ public class AgaveWriter
         mOut.print(min + ".." + max);
         mOut.println("</seq_location>");
         mIndent.unIndent();
-    }
-
-    /**
-     *
-     *
-     */
-    private void
-    writeKeyword( Annotatable f) throws IOException
-    {
-       String  s =   mAnnotFilter.getKeyword(f.getAnnotation());
-       if( s != null )
-       {
-           if( s.startsWith("<keyword") )
-           {
-               mFilter.write( s );
-           }else{
-                mIndent.indent();
-                mOut.print(mIndent);
-                mOut.print("<keyword>");
-                mFilter.write( s );
-                mOut.println("</keyword>");
-                mIndent.unIndent();
-           }
-       }
     }
 
     /**

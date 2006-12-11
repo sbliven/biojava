@@ -24,7 +24,6 @@ package org.biojava.bio.dp;
 
 import java.io.Serializable;
 
-import org.biojava.bio.BioError;
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.dp.onehead.SingleDP;
 import org.biojava.bio.dp.onehead.SingleDPMatrix;
@@ -33,14 +32,6 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.dp.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
 
 /**
 * <p>
@@ -64,8 +55,6 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
    ScoreType scoreType = ScoreType.PROBABILITY;
    SingleDP dp = (SingleDP) getDP();
    State [] states = dp.getStates();
-   int [][] forwardTransitions = dp.getForwardTransitions();
-   double [][] forwardTransitionScores = dp.getForwardTransitionScores(scoreType);
    int [][] backwardTransitions = dp.getBackwardTransitions();
    double [][] backwardTransitionScores = dp.getBackwardTransitionScores(scoreType);
    MarkovModel model = dp.getModel();
@@ -79,7 +68,6 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
 
    // System.out.print("Backward... ");
    SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll, scoreType);
-   double bs = bm.getScore();
    // System.out.println("Score = " + bs);
 
    Symbol gap = AlphabetManager.getGapSymbol();

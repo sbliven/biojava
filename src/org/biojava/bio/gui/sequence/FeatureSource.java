@@ -20,7 +20,7 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.FeatureHolder;
 
 
 /**

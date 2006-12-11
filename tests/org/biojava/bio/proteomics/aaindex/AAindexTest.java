@@ -24,11 +24,11 @@
  */
 package org.biojava.bio.proteomics.aaindex;
 
+import junit.framework.TestCase;
+
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.IllegalSymbolException;
-
-import junit.framework.TestCase;
 
 /**
  * Test class for {@link org.biojava.bio.proteomics.aaindex.AAindex}.

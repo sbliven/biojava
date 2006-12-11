@@ -1,10 +1,11 @@
 package org.biojava.bio.search;
 
 import junit.framework.TestCase;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.SymbolList;
+
 import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Test the MaxMismatchPattern and MaxMismatchMatcher classes.
@@ -18,12 +19,8 @@ extends TestCase {
   throws IllegalSymbolException, IllegalAlphabetException{
     SymbolList zero = DNATools.createDNA("");
     SymbolList one = DNATools.createDNA("a");
-    SymbolList five = DNATools.createDNA("aaaaa");
-    SymbolList agct3 = DNATools.createDNA("agctagctagct");
     SymbolList agct = DNATools.createDNA("agct");
     SymbolList aggt = DNATools.createDNA("aggt");
-    SymbolList gcta = DNATools.createDNA("gcta");
-    SymbolList gctt = DNATools.createDNA("gctt");
 
     MaxMismatchPattern mmp = new MaxMismatchPattern(agct, 0);
     assertFalse("Zero length string has no matches", mmp.matcher(zero).find());

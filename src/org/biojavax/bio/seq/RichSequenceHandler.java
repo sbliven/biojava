@@ -8,6 +8,7 @@ package org.biojavax.bio.seq;
 
 import java.util.Iterator;
 import java.util.List;
+
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.Symbol;

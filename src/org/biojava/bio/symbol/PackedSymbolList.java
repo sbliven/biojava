@@ -291,17 +291,6 @@ public class PackedSymbolList
     }
   }
 
-  /**
-   * Dump out the long as a binary string.
-   *
-   * @param l the long to print
-   */
-  private void binary(long l) {
-    for(int i = 63; i >= 0; i--) {
-      System.out.print( ((((l >> i) & 1) == 1) ? 1 : 0) );
-    }
-    System.out.println();
-  }
 
   private static byte calcMask(Packing packing) {
     byte mask = 0;

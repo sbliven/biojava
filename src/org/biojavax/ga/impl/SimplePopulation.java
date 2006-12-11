@@ -22,7 +22,12 @@
 
 package org.biojavax.ga.impl;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.biojavax.ga.Organism;
 import org.biojavax.ga.exception.IllegalOrganismException;
 

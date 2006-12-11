@@ -26,21 +26,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.AlphabetManager;
-import org.biojava.bio.symbol.AtomicSymbol;
-import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.IntegerAlphabet;
-import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ListTools;
-import junit.framework.TestCase;
-import org.biojava.bio.symbol.SimpleSymbolList;
-import org.biojava.bio.symbol.SymbolList;
 
 
 public class TestSoftMaskedAlphabet extends TestCase {
@@ -104,6 +96,7 @@ public class TestSoftMaskedAlphabet extends TestCase {
     Set s = null;
     try{
       Symbol actualReturn = softMaskedAlphabet.getAmbiguity(s);
+      actualReturn=actualReturn==null?null:actualReturn; // trick
     }catch(UnsupportedOperationException ex){
       return;
     }

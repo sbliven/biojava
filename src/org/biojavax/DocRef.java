@@ -20,6 +20,7 @@
 
 package org.biojavax;
 import java.util.List;
+
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;

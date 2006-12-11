@@ -89,7 +89,6 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
     private Map hitData;
     private Map subHitData;
 
-    private AlphabetResolver   alphaResolver;
     private SymbolTokenization tokenParser;
     private StringBuffer       tokenBuffer;
 
@@ -103,7 +102,6 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
         subHitData       = new HashMap();
         queryViewCache   = new HashMap();
         subjectViewCache = new HashMap();
-        alphaResolver    = new AlphabetResolver();
         tokenBuffer      = new StringBuffer(1024);
     }
 
@@ -268,10 +266,7 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
             sEnd   = swap;
         }
 
-        String subjectID = (String) hitData.get("subjectId");
-
         Sequence   queryView = makeQueryViewSequence(queryID);
-        Sequence subjectView = makeSubjectViewSequence(subjectID);
 
         // Map of Alignment sequences
         Map labelMap = new HashMap();

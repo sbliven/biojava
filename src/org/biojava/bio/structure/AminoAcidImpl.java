@@ -22,9 +22,10 @@
  *
  */
 package org.biojava.bio.structure;
-import  org.biojava.bio.structure.io.PDBParseException;
-import java.util.HashMap   ;
-import java.util.Map   ;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.biojava.bio.structure.io.PDBParseException;
 
 /**
  *

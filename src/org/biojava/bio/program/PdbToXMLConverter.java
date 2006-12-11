@@ -57,7 +57,6 @@ public class PdbToXMLConverter {
 
     private String            oInput;
     private XMLReader         oParser;
-    private boolean           tStrict         = true;
 
     /**
      * Creates a new <code>BlastToXMLConverter</code> instance.

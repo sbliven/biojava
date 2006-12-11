@@ -147,7 +147,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     public void setNoteSet(Set notes) throws ChangeVetoException { this.notes.setNoteSet(notes); }
     
     // Hibernate use only
-    private Set getLocationSet() {
+    Set getLocationSet() {
         // Convert the location into a set of BioSQL-compatible simple locations
 //        System.out.println("SimpleRichFeature.getLocationSet-featureId:"+featureId+", locsSet:"+locsSet+", getLocation:"+getLocation());
         setTerm(locsSet, null);
@@ -173,7 +173,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     }
     
     // Hibernate use only
-    private void setLocationSet(Set locs) throws ChangeVetoException {
+    void setLocationSet(Set locs) throws ChangeVetoException {
         this.locsSet = locs; // original kept for Hibernate purposes
         // Construct a nice BioJavaX location from the set of BioSQL-compatible simple ones
         this.location = RichLocation.Tools.construct(RichLocation.Tools.merge(locs));
@@ -719,10 +719,10 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
 
 }
 

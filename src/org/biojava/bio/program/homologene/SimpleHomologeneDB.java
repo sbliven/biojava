@@ -21,12 +21,11 @@
 
 package org.biojava.bio.program.homologene;
 
-import java.util.Set;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Collections;
+import java.util.Set;
 
 import org.biojava.utils.ChangeVetoException;
 
@@ -126,16 +125,6 @@ public class SimpleHomologeneDB
         indexSet.add(orthology);
     }
 
-    private void removeFromTaxonIDIndex(int taxonID, OrthoPair orthology)
-    {
-        Integer taxonIDIndex = new Integer(taxonID);
-        Set indexSet = (Set) orthologyByTaxonID.get(taxonIDIndex);
-
-        if (indexSet != null) {
-            indexSet.remove(orthology);
-        }
-    }
-
     private void indexBySimilarityType(SimilarityType type, OrthoPair orthology)
     {
         Set indexSet = (Set) orthologyBySimilarityType.get(type);
@@ -146,15 +135,5 @@ public class SimpleHomologeneDB
         }
 
         indexSet.add(orthology);
-    }
-
-    private void removeFromSimilarityTypeIndex(SimilarityType type, OrthoPair orthology)
-    {
-        Set indexSet = (Set) orthologyBySimilarityType.get(type);
-
-        if (indexSet != null) {
-            indexSet = new HashSet();
-            orthologyBySimilarityType.remove(orthology);
-        }
     }
 }

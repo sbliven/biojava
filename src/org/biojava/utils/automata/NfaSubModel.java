@@ -4,11 +4,11 @@
 
 package org.biojava.utils.automata;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
-import java.util.HashSet;
 
 import org.biojava.bio.symbol.Symbol;
 

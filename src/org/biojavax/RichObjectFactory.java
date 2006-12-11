@@ -26,13 +26,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.biojavax.bio.db.biosql.BioSQLCrossReferenceResolver;
 import org.biojavax.bio.db.biosql.BioSQLRichObjectBuilder;
 import org.biojavax.bio.db.biosql.BioSQLRichSequenceHandler;
 import org.biojavax.bio.seq.DummyRichSequenceHandler;
 import org.biojavax.bio.seq.PositionResolver;
-import org.biojavax.bio.seq.PositionResolver.AverageResolver;
 import org.biojavax.bio.seq.RichSequenceHandler;
+import org.biojavax.bio.seq.PositionResolver.AverageResolver;
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.SimpleComparableOntology;
 

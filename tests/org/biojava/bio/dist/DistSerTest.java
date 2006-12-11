@@ -1,13 +1,24 @@
 package org.biojava.bio.dist;
 
-import java.util.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import junit.framework.*;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Tests that serilization works as advertised.
@@ -23,7 +34,6 @@ public class DistSerTest extends TestCase {
 
     private Distribution dist;
     private Distribution dist2;
-    private Distribution uniform;
     private Distribution gap;
     private Distribution pair;
     private OrderNDistribution orderN;
@@ -37,7 +47,6 @@ public class DistSerTest extends TestCase {
     // create distributions
     try {
       dist = DistributionFactory.DEFAULT.createDistribution(DNATools.getDNA());
-      uniform = new UniformDistribution(DNATools.getDNA());
       gap = new GapDistribution(DNATools.getDNA());
       pair =  new PairDistribution(dist,gap);
       List l = Collections.nCopies(3,DNATools.getDNA());

@@ -23,11 +23,11 @@ package org.biojava.bio.seq.impl;
 
 import java.util.Iterator;
 
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
-import org.biojava.bio.BioException;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeSupport;

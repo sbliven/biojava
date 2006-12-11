@@ -28,13 +28,12 @@ import junit.framework.TestCase;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleAlignment;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.SimpleSymbolList;
 
 /**
  * <code>SimpleSeqSimilaritySearchSubHitTest</code> tests the

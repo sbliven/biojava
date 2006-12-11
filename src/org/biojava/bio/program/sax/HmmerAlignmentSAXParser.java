@@ -53,7 +53,6 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 class HmmerAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
-    private BlastLikeVersionSupport     oVersion;
 
     private BufferedReader       oContents;
     private AttributesImpl       oAtts              = new AttributesImpl();
@@ -68,7 +67,6 @@ class HmmerAlignmentSAXParser extends AbstractNativeAppSAXParser {
      */
     HmmerAlignmentSAXParser( BlastLikeVersionSupport poVersion,
 			    String poNamespacePrefix ) {
-	oVersion = poVersion;
 	this.setNamespacePrefix(poNamespacePrefix);
 	//For XSLT Parser Compliance
 	this.addPrefixMapping("biojava","http://www.biojava.org");
@@ -163,7 +161,7 @@ class HmmerAlignmentSAXParser extends AbstractNativeAppSAXParser {
 				new StringTokenizer
 				    (oLine.substring( oLine.indexOf(":") +1 ),
 				     ",:" );
-			    String metaData = st.nextToken();
+			    st.nextToken(); // metadata
 
 			    String lenString = st.nextToken(); // from x to y
 			    String scoreString = st.nextToken();

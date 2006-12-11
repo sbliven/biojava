@@ -619,11 +619,9 @@ class FeaturesSQL {
 	    conn.commit();
 	    conn.close();
 	} catch (SQLException ex) {
-	    boolean rolledback = false;
 	    if (conn != null) {
 		try {
 		    conn.rollback();
-		    rolledback = true;
 		} catch (SQLException ex2) {}
 	          try {conn.close();} catch (SQLException ex3) {}
 	    }
@@ -650,11 +648,9 @@ class FeaturesSQL {
 	    conn.commit();
 	    conn.close();
 	} catch (SQLException ex) {
-	    boolean rolledback = false;
 	    if (conn != null) {
 		try {
 		    conn.rollback();
-		    rolledback = true;
 		} catch (SQLException ex2) {}
                 try {conn.close();} catch (SQLException ex3) {}
 	    }
@@ -708,11 +704,9 @@ class FeaturesSQL {
 	    conn.commit();
 	    conn.close();
 	} catch (SQLException ex) {
-	    boolean rolledback = false;
 	    if (conn != null) {
 		try {
 		    conn.rollback();
-		    rolledback = true;
 		} catch (SQLException ex2) {}
             try {conn.close();} catch (SQLException ex3) {}
 	    }

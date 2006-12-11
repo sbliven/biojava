@@ -20,9 +20,10 @@
  */
 package org.biojavax.ga.impl;
 
-import junit.framework.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojavax.ga.Organism;
 
 

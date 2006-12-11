@@ -25,10 +25,10 @@ import java.util.Map;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.impl.ViewSequence;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.db.SequenceDBLite;
+import org.biojava.bio.seq.impl.ViewSequence;
 
 /**
  * <code>ViewSequenceFactory</code> is a base class for creating

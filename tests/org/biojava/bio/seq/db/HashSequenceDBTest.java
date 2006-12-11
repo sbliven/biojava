@@ -23,8 +23,6 @@ package org.biojava.bio.seq.db;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.biojava.bio.seq.db.HashSequenceDB;
-import org.biojava.bio.seq.db.SequenceDB;
 
 /**
  * Runs SequenceDB tests using HashSequenceDB.

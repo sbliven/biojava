@@ -22,7 +22,6 @@ package org.biojava.bio.program.sax;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import org.xml.sax.Attributes;
@@ -68,7 +67,6 @@ public class FastaSequenceSAXParser extends AbstractNativeAppSAXParser {
 
 
     private AttributesImpl          oAtts     = new AttributesImpl();
-    private ArrayList               oHeader   = new ArrayList();
     private QName                   oAttQName = new QName(this);
     private char[]                  aoChars;
 

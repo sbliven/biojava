@@ -26,9 +26,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.LinkedHashMap;
 import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +41,6 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.SymbolList;
 
 /**
  * @author raemig
@@ -164,7 +162,6 @@ public class MSFAlignmentFormat
             }
             //check DNA, RNA or Prot
             StringBuffer testString = new StringBuffer();
-            int agct = 0;
             for (currSeqCount = 0; currSeqCount < sequenceNames.size(); currSeqCount++) {
                 testString.append(sequenceData[currSeqCount]);
             }
@@ -173,7 +170,6 @@ public class MSFAlignmentFormat
 
             //now parse through them and create gapped symbol lists
             LinkedHashMap sequenceDataMap = new LinkedHashMap();
-            Symbol sym = null;
             FiniteAlphabet alph = null;
 
             for (int i = 0; i < testStringUpper.length(); i++) {

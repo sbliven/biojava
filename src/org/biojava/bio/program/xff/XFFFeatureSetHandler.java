@@ -61,8 +61,6 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
   // Current parse status
   //
 
-  private boolean inFeatureSet = false;
-
   /**
    * Construct a new XFFFeatureSetHandler with the default set of handlers.
    */
@@ -158,7 +156,6 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
   {
     //System.err.println("Processing startElement(" + nsURI + ", " + localName + ", " + qName + ", " + pretify(attrs));
     if (localName.equals("featureSet")) {
-      inFeatureSet = true;
       return;
     }
 
@@ -181,7 +178,6 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
                          StAXContentHandler handler)
   {
     if (localName.equals("featureSet")) {
-      inFeatureSet = false;
     }
   }
 
@@ -196,7 +192,6 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
   }
 
   private class XFFDetailsHandler extends StAXContentHandlerBase {
-    private boolean inDetails;
 
     public void startElement(String nsURI,
                              String localName,
@@ -206,7 +201,6 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
             throws SAXException
     {
       if (localName.equals("details")) {
-        inDetails = true;
         return;
       }
 
@@ -226,37 +220,7 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
                            String qName)
     {
       if (localName.equals("details")) {
-        inDetails = false;
       }
     }
-  }
-
-  private static final String pretify(Attributes attr) {
-    StringBuffer res = new StringBuffer();
-    res.append("{");
-
-    if(attr.getLength() > 0) {
-      res.append(attr.getURI(0));
-      res.append("'");
-      res.append(attr.getLocalName(0));
-      res.append("'");
-      res.append(attr.getQName(0));
-      res.append("=>");
-      res.append(attr.getValue(0));
-    }
-
-    for(int i = 1; i < attr.getLength(); i++) {
-      res.append(", ");
-      res.append(attr.getURI(i));
-      res.append("'");
-      res.append(attr.getLocalName(i));
-      res.append("'");
-      res.append(attr.getQName(i));
-      res.append("=>");
-      res.append(attr.getValue(i));
-    }
-
-    res.append("}");
-    return res.toString();
   }
 }

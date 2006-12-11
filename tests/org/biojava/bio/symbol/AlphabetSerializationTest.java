@@ -21,14 +21,18 @@
 
 package org.biojava.bio.symbol;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.HashSet;
+import java.util.Set;
+
 import junit.framework.TestCase;
+
 import org.biojava.bio.Annotation;
 import org.biojava.bio.program.phred.PhredTools;
 import org.biojava.bio.seq.DNATools;
-
-import java.io.*;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * <p>Title: AlphabetSerializationTest</p>
@@ -57,8 +61,8 @@ public class AlphabetSerializationTest extends TestCase {
 
         integer = IntegerAlphabet.getInstance();
         subint = IntegerAlphabet.getSubAlphabet(20,99);
-        subdoub = DoubleAlphabet.getInstance().getSubAlphabet(20.0,99.0);
         doub = DoubleAlphabet.getInstance();
+        subdoub = DoubleAlphabet.getSubAlphabet(20.0,99.0);
         phred = PhredTools.getPhredAlphabet();
         dna = DNATools.getDNA();
 
@@ -80,24 +84,31 @@ public class AlphabetSerializationTest extends TestCase {
         IntegerAlphabet integer2 = (IntegerAlphabet)serialize(integer);
 
         assertTrue(integer == integer2);
-        assertTrue(integer.getInstance() == integer2.getInstance());
+        // static ref
+        //assertTrue(integer.getInstance() == integer2.getInstance());
         assertTrue(integer.equals(integer2));
         assertTrue(integer.getSymbol(12) == integer2.getSymbol(12));
         assertTrue(integer.getSymbol(12).equals(integer2.getSymbol(12)));
         assertTrue(!(integer.getSymbol(12).equals(integer2.getSymbol(13))));
 
         //test tokenization
+        /*
         int[] ints = {25,26,27,28,29};
         SymbolList sl = integer.fromArray(ints);
         SymbolList sl2 = integer2.fromArray(ints);
+        sl=sl==null?null:sl;//trick
+        sl2=sl2==null?null:sl2;//trick
         // assertEquals(sl.seqString(),sl2.seqString());
+         * tests all wonky as mixing static and non static stuff
+         */
     }
 
     public void testDoubleSerialization()throws Exception{
         DoubleAlphabet doub2 = (DoubleAlphabet)serialize(doub);
 
         assertTrue(doub == doub2);
-        assertTrue(doub.getInstance() == doub2.getInstance());
+        // static methods are invalid from non static context
+        //assertTrue(doub.getInstance() == doub2.getInstance());
         assertTrue(doub.equals(doub2));
         assertTrue(doub.getSymbol(12.0) == doub2.getSymbol(12.0));
         assertTrue(doub.getSymbol(12.0).equals(doub2.getSymbol(12.0)));

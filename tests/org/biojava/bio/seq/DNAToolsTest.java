@@ -21,12 +21,14 @@
 
 package org.biojava.bio.seq;
 
+import java.util.Collections;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.SymbolList;
-import java.util.*;
 
 /**
  * <code>DNAToolsTest</code> tests are to ensure that the class can be

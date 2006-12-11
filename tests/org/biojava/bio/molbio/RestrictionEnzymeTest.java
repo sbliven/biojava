@@ -21,16 +21,11 @@
 
 package org.biojava.bio.molbio;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import junit.framework.TestCase;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SymbolList;
 
@@ -145,7 +140,7 @@ public class RestrictionEnzymeTest extends TestCase
         RestrictionEnzyme ecoRI = RestrictionEnzymeManager.getEnzyme("EcoRI");
         try
         {
-            int type = ecoRI.getUpstreamEndType();
+            ecoRI.getUpstreamEndType();
         }
         catch (BioException be)
         {

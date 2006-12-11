@@ -22,11 +22,16 @@
 
 package org.biojavax.ga.impl;
 
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojavax.ga.Population;
-import org.biojavax.ga.Organism;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ga.GeneticAlgorithm;
+import org.biojavax.ga.Organism;
+import org.biojavax.ga.Population;
 import org.biojavax.ga.exception.IllegalOrganismException;
 
 /**

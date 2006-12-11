@@ -50,7 +50,6 @@ public class GAMEAnnotationHandler
   };
 
   private Location range = Location.empty;
-  private StrandedFeature.Strand strand = StrandedFeature.UNKNOWN;
 
   GAMEAnnotationHandler(StAXFeatureHandler staxenv) {
     // setup up environment stuff

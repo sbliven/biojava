@@ -37,7 +37,6 @@ public class GAMEFeatureSpanHandler
 
     // database columns
     private String featureSpanId;
-    private String featureSpanName;
     String featureSpanType;
     Location featureSpanLoc;
     StrandedFeature.Strand featureSpanStrand;
@@ -121,7 +120,6 @@ public class GAMEFeatureSpanHandler
          *@param  s  The new stringValue value
          */
         protected void setStringValue(String s) {
-            featureSpanName = s.trim();
         }
     }
 

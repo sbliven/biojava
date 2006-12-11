@@ -39,7 +39,6 @@ import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.align.StrucAligParameters;
 import org.biojava.bio.structure.align.helper.AligMatEl;
-import org.biojava.bio.structure.align.helper.AlignTools;
 import org.biojava.bio.structure.align.helper.IndexPair;
 import org.biojava.bio.structure.align.helper.JointFragments;
 import org.biojava.bio.structure.jama.Matrix;

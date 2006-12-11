@@ -27,14 +27,14 @@ package org.biojava.bio.proteomics.aaindex;
 import java.util.ArrayList;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.symbol.SimpleSymbolPropertyTable;
 import org.biojava.bio.symbol.SymbolPropertyTable;
-
-import junit.framework.TestCase;
 
 /**
  * Test class for {@link org.biojava.bio.proteomics.aaindex.SimpleSymbolPropertyTableDB}.

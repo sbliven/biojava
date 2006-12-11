@@ -128,14 +128,14 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     
     // Hibernate requirement - not for public use.
     // Converts a String object representing a URI into an actual URI object.
-    private void setURIString(String URI) throws ChangeVetoException, URISyntaxException {
+    void setURIString(String URI) throws ChangeVetoException, URISyntaxException {
         if (URI!=null) this.setURI(new URI(URI));
         else this.URI=null;
     }
     
     // Hibernate requirement - not for public use.
     // Converts a URI object into a String representation of that URI
-    private String getURIString() {
+    String getURIString() {
         if (this.URI==null) return null;
         else return this.URI.toASCIIString();
     }
@@ -163,7 +163,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     }
     
     // Hibernate requirement - not for public use.
-    private void setName(String name) { this.name = name; }
+    void setName(String name) { this.name = name; }
     
     /**
      * {@inheritDoc}
@@ -239,8 +239,8 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
 }

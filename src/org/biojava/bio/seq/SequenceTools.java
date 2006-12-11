@@ -28,11 +28,17 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.seq.impl.DummySequence;
 import org.biojava.bio.seq.impl.RevCompSequence;
-import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
+import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.impl.SubSequence;
 import org.biojava.bio.seq.impl.ViewSequence;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.DummySymbolList;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
 
 /**

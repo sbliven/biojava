@@ -21,11 +21,12 @@
 
 package org.biojava.bio.program.phred;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.*;
 import junit.framework.TestCase;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.IntegerAlphabet;
+import org.biojava.utils.AssertionFailure;
 
 /**
  * @author Matthew Pocock

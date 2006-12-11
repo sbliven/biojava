@@ -24,24 +24,22 @@ package org.biojava.bio.program.gff3;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
+import org.biojava.bio.program.gff.GFFErrorHandler;
+import org.biojava.bio.program.gff.GFFTools;
+import org.biojava.bio.program.gff.IgnoreRecordException;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.ontology.OntoTools;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.OntologyException;
 import org.biojava.ontology.Term;
-import org.biojava.bio.program.gff.GFFErrorHandler;
-import org.biojava.bio.program.gff.GFFTools;
-import org.biojava.bio.program.gff.IgnoreRecordException;
-import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ParserException;
 
@@ -123,7 +121,6 @@ public class GFF3Parser {
   )
   throws IOException, BioException, ParserException
   {
-    Set featureIDs = new HashSet();
     Ontology fallBack;
     try {
         fallBack = OntoTools.getDefaultFactory().createOntology(

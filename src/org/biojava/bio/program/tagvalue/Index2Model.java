@@ -21,8 +21,10 @@
 
 package org.biojava.bio.program.tagvalue;
 
-import java.util.*;
-import org.biojava.utils.*;
+import java.util.Map;
+import java.util.Set;
+
+import org.biojava.utils.SmallMap;
 
 public class Index2Model {
   private final Map keys;

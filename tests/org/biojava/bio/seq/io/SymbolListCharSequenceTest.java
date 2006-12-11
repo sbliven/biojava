@@ -20,15 +20,9 @@
  */
 package org.biojava.bio.seq.io;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import junit.framework.TestCase;
 
 import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.symbol.SymbolList;
 
 /**
  * JUnit test for SymbolListCharSequence.

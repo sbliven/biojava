@@ -1,13 +1,21 @@
 package org.biojava.bio.dist;
 
-import java.util.*;
-import java.io.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-import junit.framework.*;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Tests that simple distributions work as advertised.
@@ -25,7 +33,6 @@ public class DistributionTest extends TestCase {
   private Distribution dist;
   private Distribution gap;
   private Distribution gapDist;
-  private Distribution distGap;
   
   public DistributionTest(String name) {
     super(name);
@@ -37,7 +44,6 @@ public class DistributionTest extends TestCase {
       dist = DistributionFactory.DEFAULT.createDistribution(DNATools.getDNA());
       gap = new GapDistribution(DNATools.getDNA());
       gapDist = new PairDistribution(gap, dist);
-      distGap = new PairDistribution(dist, gap);
     } catch (IllegalAlphabetException iae) {
       throw new AssertionFailedError("Can't initialize test distributions " + iae.getMessage());
     }

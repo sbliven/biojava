@@ -22,22 +22,14 @@
 package org.biojava.bio.program.ssbind;
 
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
-
-import org.xml.sax.XMLReader;
-import org.xml.sax.InputSource;
-
-import junit.framework.TestCase;
 
 import org.biojava.bio.program.sax.BlastLikeSAXParser;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.seq.StrandedFeature;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
  * <code>SSBindWUblastx2_0a19Test</code> tests object bindings for

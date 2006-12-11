@@ -21,24 +21,23 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Set;
 
-import org.biojava.bio.dist.IndexedCount;
 import org.biojava.bio.dist.Distribution;
-import org.biojava.bio.dist.DistributionTools;
 import org.biojava.bio.dist.DistributionFactory;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.bio.seq.RNATools;
+import org.biojava.bio.dist.DistributionTools;
+import org.biojava.bio.dist.IndexedCount;
 import org.biojava.bio.seq.ProteinTools;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.bio.seq.RNATools;
+import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * a simple no-frills implementation of the
@@ -118,7 +117,6 @@ public class SimpleCodonPref
             codonPrefByResidue = new HashMap();
 
             // what we want is to create residue-specific distributions
-            FiniteAlphabet aaAlfa = ProteinTools.getTAlphabet();
 
             for (Iterator residueI = ProteinTools.getTAlphabet().iterator(); residueI.hasNext(); ) {
                 Symbol residue = (Symbol) residueI.next();
@@ -166,7 +164,6 @@ public class SimpleCodonPref
             wobbleDistributions = new HashMap();
 
             // what we want is to create residue-specific distributions
-            FiniteAlphabet aaAlfa = ProteinTools.getTAlphabet();
             FiniteAlphabet nonWobbleAlfa = CodonPrefTools.getDinucleotideAlphabet();
 
             for (Iterator residueI = ProteinTools.getTAlphabet().iterator(); residueI.hasNext(); ) {

@@ -21,11 +21,9 @@
 
 package org.biojava.bio.program.gff;
 
-import java.io.*;
-import java.util.Map;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Comparator;
-
-import org.biojava.bio.seq.StrandedFeature;
 
 class GFFComparator implements Comparator {
     public int compare(Object o1, Object o2) {

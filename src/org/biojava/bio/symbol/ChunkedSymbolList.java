@@ -1,13 +1,9 @@
 package org.biojava.bio.symbol;
 
-import org.biojava.bio.symbol.AbstractSymbolList;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.utils.ChangeListener;
-
-import java.io.Serializable;
 import java.io.IOException;
+import java.io.Serializable;
+
+import org.biojava.utils.ChangeListener;
 
 /**
  * SymbolList implementation using constant-size chunks. Each chunk provides

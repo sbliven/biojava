@@ -1,10 +1,11 @@
 package org.biojava.naming;
 
-import javax.naming.Name;
-import javax.naming.CompoundName;
-import javax.naming.NamingException;
-import javax.naming.NameParser;
 import java.util.Properties;
+
+import javax.naming.CompoundName;
+import javax.naming.Name;
+import javax.naming.NameParser;
+import javax.naming.NamingException;
 
 /**
  * Singleton class for parsers that understand OBDA URIs.

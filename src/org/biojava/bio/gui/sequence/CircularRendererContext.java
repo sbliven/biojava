@@ -1,9 +1,8 @@
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.symbol.SymbolList;
 
-import java.awt.*;
 
 /**
  * A context providing information for rendering sequences into circular coordinate systems.

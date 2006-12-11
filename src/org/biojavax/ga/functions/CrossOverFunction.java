@@ -22,8 +22,12 @@
 
 package org.biojavax.ga.functions;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 
 /**

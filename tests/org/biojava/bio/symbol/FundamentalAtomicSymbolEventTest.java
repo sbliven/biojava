@@ -1,7 +1,7 @@
 package org.biojava.bio.symbol;
 
 import org.biojava.bio.Annotation;
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeSupport;
 
 /**
  * @author Matthew Pocock

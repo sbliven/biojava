@@ -21,6 +21,7 @@
 
 package org.biojavax.bio.seq;
 import java.util.Set;
+
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.utils.ChangeVetoException;
 

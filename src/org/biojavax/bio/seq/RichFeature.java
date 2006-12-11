@@ -23,6 +23,7 @@ package org.biojavax.bio.seq;
 
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;

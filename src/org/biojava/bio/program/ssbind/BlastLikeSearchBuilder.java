@@ -176,7 +176,6 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     private String queryID;
 
     // Hit and Result annotation
-    private Annotation hitAnnotation;
     private Annotation resultAnnotation;
 
     // Data holders for search result properties

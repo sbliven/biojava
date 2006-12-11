@@ -24,16 +24,15 @@
 
 package org.biojava.bio.program.das.dasalignment ;
 
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.Attributes;
-
-import java.util.ArrayList ;
-import java.util.HashMap ;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import org.biojava.bio.* ;
-import org.biojava.bio.program.ssbind.* ;
-import org.biojava.bio.structure.AtomImpl ;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.program.ssbind.AnnotationFactory;
+import org.biojava.bio.structure.AtomImpl;
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.DefaultHandler;
 
 /** A class to Parse the XML response of a DAS Alignment service. 
  * returns an Alignment object.
@@ -49,7 +48,6 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
     HashMap current_block  ;
     HashMap  current_segment ;
     ArrayList segments ;
-    AnnotationFactory annf ;
     
     ArrayList vectors ;
     ArrayList matrices ;
@@ -122,7 +120,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
         
         if (qName.equals("alignObject")) {
             try {
-                Annotation oba = annf.makeAnnotation(current_object) ;
+                Annotation oba = AnnotationFactory.makeAnnotation(current_object) ;
                 alignment.addObject(oba);
             } catch ( DASException  e) {
                 e.printStackTrace() ;
@@ -132,7 +130,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
             current_object.put("details",details);
         }	
         if (qName.equals("segment")) {
-            Annotation sega = annf.makeAnnotation(current_segment);
+            Annotation sega = AnnotationFactory.makeAnnotation(current_segment);
             //current_block.add(current_segment);
             segments.add(sega) ;
             current_segment = new HashMap() ;
@@ -141,7 +139,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
         if (qName.equals("block")) {
             try {
                 current_block.put("segments",segments);
-                Annotation bloa = annf.makeAnnotation(current_block);
+                Annotation bloa = AnnotationFactory.makeAnnotation(current_block);
                 alignment.addBlock(bloa);
             } catch ( DASException  e) {
                 e.printStackTrace() ;
@@ -165,7 +163,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
             detail.put("property", current_detailProperty);
             detail.put("detail",  detailValue);
             
-            Annotation a = annf.makeAnnotation(detail);
+            Annotation a = AnnotationFactory.makeAnnotation(detail);
             List details = (List) current_object.get("details");
             details.add(a);
             current_object.put("details",details);
@@ -241,7 +239,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
         String value  = atts.getValue("value");
         score.put("methodName",metnam);
         score.put("value",value);
-        Annotation s = annf.makeAnnotation(score);
+        Annotation s = AnnotationFactory.makeAnnotation(score);
         try {
             alignment.addScore(s);
         } catch (DASException e ) {
@@ -270,7 +268,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
         vector.put("vector",atom);
         
         try {
-            Annotation oba = annf.makeAnnotation(vector) ;
+            Annotation oba = AnnotationFactory.makeAnnotation(vector) ;
             alignment.addVector(oba);
         } catch ( DASException  e) {
             e.printStackTrace() ;
@@ -292,7 +290,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
         }
         
         try {
-            Annotation oba = annf.makeAnnotation(matrix) ;
+            Annotation oba = AnnotationFactory.makeAnnotation(matrix) ;
             alignment.addMatrix(oba);
         } catch ( DASException  e) {
             e.printStackTrace() ;

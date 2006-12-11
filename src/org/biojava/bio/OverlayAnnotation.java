@@ -185,13 +185,6 @@ public class OverlayAnnotation
      }
    }
 
-    private Object getPropertySilent(Object key) {
-	try {
-	    return getProperty(key);
-	} catch (NoSuchElementException ex) {
-	    return null;
-	}
-    }
 
   /**
    * Return a <code>Set</code> containing all key objects

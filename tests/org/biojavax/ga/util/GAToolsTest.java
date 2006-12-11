@@ -20,10 +20,15 @@
  */
 package org.biojavax.ga.util;
 
-import junit.framework.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import junit.framework.TestCase;
+
+import org.biojava.bio.dist.OrderNDistribution;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 
 /**
@@ -31,7 +36,6 @@ import org.biojava.bio.symbol.*;
  */
 public class GAToolsTest
     extends TestCase {
-  private GATools gATools = null;
   Symbol a = DNATools.a();
   Symbol c = DNATools.c();
   Symbol g = DNATools.g();
@@ -44,11 +48,11 @@ public class GAToolsTest
   protected void setUp() throws Exception {
     super.setUp();
     /**don't really need to do this but hey, why not*/
-    gATools = new GATools();
+   // gATools = new GATools();
   }
 
   protected void tearDown() throws Exception {
-    gATools = null;
+   // gATools = null;
     super.tearDown();
   }
 

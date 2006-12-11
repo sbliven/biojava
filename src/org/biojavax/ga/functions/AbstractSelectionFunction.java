@@ -22,7 +22,10 @@
 
 package org.biojavax.ga.functions;
 
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p> Abstract implementation of <code>FitnessFunction</code>.

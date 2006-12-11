@@ -71,7 +71,6 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
     private int              iModelStop;
 
     private AttributesImpl          oAtts     = new AttributesImpl();
-    private ArrayList               oHeader   = new ArrayList();
     private QName                   oAttQName = new QName(this);
 
     /**
@@ -479,46 +478,6 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 
     /**
-     * Parses an ATOM record.  This does the following:
-     *
-     *    o Identifies which chain the atom belongs to
-     *    o Creates a new Atom object and adds it to the chain
-     *
-     * @param poRecord	 -
-     */
-    private void parseAtomRecord(String poRecord) {
-
-	String oChainId;
-
-	String oAtomId;
-	String oAtomType;
-
-	String  oResidueId;
-	String  oResidueType;
-
-	double dX;
-	double dY;
-	double dZ;
-	double dOccupancy;
-	double dBFactor;
-
-	System.out.println(poRecord);
-
-	//parse atom line
-	oChainId = poRecord.substring(21,23);
-	oResidueId = poRecord.substring(23,27);
-
-	//trim white-space from all parsed fields
-
-	oChainId     = oChainId.trim();
-	oResidueId   = oResidueId.trim();
-
-	System.out.println("ChainId>" + oChainId + "<");
-	//System.out.println("ResidueId>" + oResidueId + "<");
-
-    }
-
-    /**
      * Checks to see if a given residue type is part of a protein.
      * NB at the moment, this doesn't work - just returns true.
      * FIX THIS
@@ -530,22 +489,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 	return true;
     }
-    /**
-     * Avoid returning empty strings in the output.
-     * If an empty string, return "missing", else
-     * return back the input value unchanged.
-     *
-     * @param poValue a <code>String</code> value
-     * @return a <code>String</code> value
-     */
-    private String checkMissing(String poValue) {
 
-	if (poValue.equals("")) {
-	    return "missing";
-	}
-
-	return poValue;
-    }
 
     /**
      * Takes a a line. If shorted that 80 characters

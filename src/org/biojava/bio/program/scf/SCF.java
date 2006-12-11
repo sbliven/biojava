@@ -21,11 +21,25 @@
 
 package org.biojava.bio.program.scf;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
+
+import org.biojava.bio.BioError;
 import org.biojava.bio.chromatogram.AbstractChromatogram;
 import org.biojava.bio.chromatogram.Chromatogram;
 import org.biojava.bio.chromatogram.UnsupportedChromatogramFormatException;
-
-import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
@@ -34,23 +48,6 @@ import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.SymbolListViews;
 import org.biojava.utils.SmallMap;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
 
 
 

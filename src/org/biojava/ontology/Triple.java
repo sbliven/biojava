@@ -21,11 +21,12 @@
 
 package org.biojava.ontology;
 
-import org.biojava.bio.Annotation;
-import org.biojava.utils.Unchangeable;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Arrays;
+
+import org.biojava.bio.Annotation;
+import org.biojava.utils.Unchangeable;
 
 /**
  * A triple in an ontology.  This is two terms and a relationship between

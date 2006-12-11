@@ -60,9 +60,6 @@ class GenericSAXParserTest {
 
 	String oInput = null;
 	String oClassName = null;
-	String oMode  = null;
-
-	boolean tStrict = true;
 
         // Catch wrong number of arguments or help requests
 

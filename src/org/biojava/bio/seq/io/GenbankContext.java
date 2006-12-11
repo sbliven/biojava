@@ -21,13 +21,13 @@
 
 package	org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.util.*;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ParseErrorEvent;
+import org.biojava.utils.ParseErrorListener;
+import org.biojava.utils.ParseErrorSource;
 
 /**
  * Encapsulate state used while	reading	data from a specific
@@ -42,14 +42,11 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     private final static int HEADER = 1;
     private final static int FEATURES = 2;
     private final static int SEQUENCE = 3;
-    private final static int VERSION_LENGTH = 11;
     private final static int TAG_LENGTH = 12;
 
     private int status;
     private SymbolTokenization symParser;
     private StreamParser streamParser;
-    private List symbols;
-    private String accession;
     private String headerTag = "";
     private StringBuffer headerTagText = new StringBuffer();
     private SeqIOListener listener;
@@ -66,7 +63,6 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     protected GenbankContext(SymbolTokenization theSymbolParser,
 			     SeqIOListener theListener)
     {
-	this.symbols = new ArrayList();
 	this.status = HEADER;
 	this.listener = theListener;
 

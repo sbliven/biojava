@@ -23,6 +23,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.biojava.bio.Annotatable;

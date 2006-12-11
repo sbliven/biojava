@@ -21,10 +21,15 @@
 
 package org.biojava.bio.search;
 
-import java.util.*;
+import java.util.Iterator;
 
+import org.biojava.bio.symbol.AlphabetIndex;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.AssertionFailure;
-import org.biojava.bio.symbol.*;
 
 /**
  * Matcher class that pairs with SeqContentPattern.

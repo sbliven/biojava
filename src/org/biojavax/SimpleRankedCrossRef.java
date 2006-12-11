@@ -52,7 +52,7 @@ public class SimpleRankedCrossRef extends AbstractChangeable implements RankedCr
     protected SimpleRankedCrossRef() {}
     
     // Hibernate requirement - not for public use.
-    private void setCrossRef(CrossRef crossref) { this.crossref = crossref; }
+    void setCrossRef(CrossRef crossref) { this.crossref = crossref; }
     
     /**
      * {@inheritDoc}

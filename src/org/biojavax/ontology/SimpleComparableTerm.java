@@ -24,6 +24,7 @@ package org.biojavax.ontology;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.biojava.bio.Annotation;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
@@ -131,10 +132,10 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     public Object[] getSynonyms() { return this.synonyms.toArray(); }
     
     // Hibernate requirement - not for public use.
-    private Set getSynonymSet() { return this.synonyms; }
+    Set getSynonymSet() { return this.synonyms; }
     
     // Hibernate requirement - not for public use.
-    private void setSynonymSet(Set synonyms) { this.synonyms = synonyms; }
+    void setSynonymSet(Set synonyms) { this.synonyms = synonyms; }
     
     /**
      * {@inheritDoc}
@@ -206,7 +207,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     public String getName() { return this.name; }
     
     // Hibernate requirement - not for public use.
-    private void setName(String name) { this.name = name; }
+    void setName(String name) { this.name = name; }
     
     /**
      * {@inheritDoc}
@@ -241,7 +242,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     public Ontology getOntology() { return this.ontology; }
     
     // Hibernate requirement - not for public use.
-    private void setOntology(ComparableOntology ontology) { this.ontology = ontology; }
+    void setOntology(ComparableOntology ontology) { this.ontology = ontology; }
     
     /**
      * {@inheritDoc}
@@ -286,12 +287,12 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     }
 
     // Hibernate requirement - not for public use.
-    private String getObsoleteChar() {
+    String getObsoleteChar() {
         return (this.getObsolete()!=null && this.getObsolete().equals(Boolean.TRUE))?"X":null;
     }
 
     // Hibernate requirement - not for public use.
-    private void setObsoleteChar(String obsolete) throws ChangeVetoException {
+    void setObsoleteChar(String obsolete) throws ChangeVetoException {
         this.setObsolete(Boolean.valueOf(obsolete!=null && obsolete.equals("X")));
     }
         
@@ -326,8 +327,8 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
 }

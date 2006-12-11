@@ -1,11 +1,15 @@
 package org.biojava.bio.symbol;
 
-import junit.framework.TestCase;
-import org.biojava.bio.seq.DNATools;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.DNATools;
 
 /**
  * Tests that serilization works as advertised.

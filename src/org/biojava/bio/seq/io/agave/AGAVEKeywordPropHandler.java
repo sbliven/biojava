@@ -20,8 +20,7 @@
  */
 package org.biojava.bio.seq.io.agave;
 import org.biojava.utils.ChangeVetoException;
-import org.xml.sax.*;
-import java.util.*;
+import org.xml.sax.SAXException;
 
 /**
  * Deals with AGAVE keywords

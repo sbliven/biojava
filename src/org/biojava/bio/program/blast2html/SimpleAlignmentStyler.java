@@ -156,8 +156,6 @@ public class SimpleAlignmentStyler extends AbstractAlignmentStyler {
 	    return;
 	}
 
-	    StringBuffer sb = new StringBuffer();
-
 	    for (Iterator i=oColourProps.entrySet().iterator(); 
 		 i.hasNext(); ) {
 		Map.Entry e = (Map.Entry) i.next();

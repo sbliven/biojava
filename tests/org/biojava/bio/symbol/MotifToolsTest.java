@@ -21,12 +21,17 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import junit.framework.TestCase;
+
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.utils.AssertionFailure;
-
-import java.util.*;
 
 public class MotifToolsTest
     extends TestCase {

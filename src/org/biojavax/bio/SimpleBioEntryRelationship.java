@@ -101,7 +101,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     public BioEntry getObject() { return this.object; }
     
     // Hibernate requirement - not for public use.
-    private void setObject(BioEntry object) { this.object = object; }
+    void setObject(BioEntry object) { this.object = object; }
         
     /**
      * {@inheritDoc}
@@ -109,7 +109,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     public BioEntry getSubject() { return this.subject; }
     
     // Hibernate requirement - not for public use.
-    private void setSubject(BioEntry subject) { this.subject = subject; }
+    void setSubject(BioEntry subject) { this.subject = subject; }
     
     /**
      * {@inheritDoc}
@@ -117,7 +117,7 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     public ComparableTerm getTerm() { return this.term; }
     
     // Hibernate requirement - not for public use.
-    private void setTerm(ComparableTerm term) { this.term = term; }
+    void setTerm(ComparableTerm term) { this.term = term; }
     
     /**
      * {@inheritDoc}
@@ -186,9 +186,9 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
 }
 

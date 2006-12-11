@@ -47,7 +47,6 @@ public class IsoelectricPointCalc
     public static double PK_COOH = 3.56;
 
     private static Map pKCache = new HashMap();
-    private static ComputeObject computeObj = null;
 
     public IsoelectricPointCalc()
     {
@@ -92,11 +91,6 @@ public class IsoelectricPointCalc
             counts = residueCount(peptide);
             this.hasFreeNTerm = hasFreeNTerm;
             this.hasFreeCTerm = hasFreeCTerm;
-        }
-
-        private ChargeCalculator(SymbolList peptide)
-        {
-            counts = residueCount(peptide);
         }
 
         /**

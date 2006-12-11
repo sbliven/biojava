@@ -2,6 +2,7 @@ package org.biojava.bio.symbol;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.biojava.bio.seq.DNATools;
 
 /** List of tests for for UkkonenSuffixTree.

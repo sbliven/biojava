@@ -28,15 +28,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.taxa.EbiFormat;
 import org.biojava.bio.taxa.Taxon;
-import org.biojava.bio.BioException;
 
 /**
  * <p><code>EmblFileFormer</code> performs the detailed formatting of
@@ -93,7 +93,6 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 
     private PrintStream stream;
 
-    private String idLine;
     private String accLine;
 
     /**
@@ -129,7 +128,6 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 
     public void setName(String id) throws ParseException
     {
-        idLine = id;
     }
 
     public void startSequence() throws ParseException

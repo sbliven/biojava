@@ -7,8 +7,9 @@
 
 package org.biojavax;
 
-import junit.framework.*;
-import org.biojava.utils.Unchangeable;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  *

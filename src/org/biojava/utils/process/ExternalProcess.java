@@ -32,7 +32,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import org.biojava.utils.SimpleThreadPool;
 import org.biojava.utils.ThreadPool;
@@ -125,11 +124,6 @@ public final class ExternalProcess {
     private static final ThreadPool THREAD_POOL = 
         new SimpleThreadPool(THREAD_POOL_SIZE, true);
     
-    /**
-     * The logger for this class.
-     */
-    private static final Logger LOGGER = 
-        Logger.getLogger(ExternalProcess.class.getName());
     
     /* MAIN METHOD */
     

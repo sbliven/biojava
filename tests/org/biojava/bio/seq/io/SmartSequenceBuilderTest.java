@@ -20,16 +20,23 @@
  */
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.dist.*;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
-import java.util.*;
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.AlphabetIndex;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleAlphabet;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * JUnit test for SymbolList objects

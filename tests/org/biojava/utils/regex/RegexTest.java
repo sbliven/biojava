@@ -4,8 +4,8 @@ package org.biojava.utils.regex;
 
 import junit.framework.TestCase;
 
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.SymbolList;
 
 public class RegexTest
     extends TestCase

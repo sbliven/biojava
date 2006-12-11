@@ -23,7 +23,7 @@
  */
 package org.biojava.bio.structure;
 
-import java.util.Map   ;
+import java.util.Map;
 
 /**
  *

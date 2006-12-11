@@ -22,18 +22,12 @@
 
 package org.biojava.bio.symbol;
 
-import java.io.NotSerializableException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
-import org.biojava.utils.StaticMemberPlaceHolder;
-import org.biojava.utils.Unchangeable;
 
 /**
  * A sequence of symbols that belong to an alphabet.

@@ -21,9 +21,6 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-
-import org.biojava.utils.*;
 
 /**
  * Hidden implementation detail. Damn those interfaces not having private

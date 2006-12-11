@@ -273,10 +273,10 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     protected void setStrand(Strand strand) { this.strand = strand; }
     
     // Hibernate requirement - not for public use.
-    private int getStrandNum() { return this.strand.intValue(); }
+    int getStrandNum() { return this.strand.intValue(); }
     
     // Hibernate requirement - not for public use.
-    private void setStrandNum(int token) { this.strand = Strand.forValue(token); }
+    void setStrandNum(int token) { this.strand = Strand.forValue(token); }
     
     /**
      * {@inheritDoc}
@@ -314,7 +314,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     // Hibernate requirement - not for public use.
-    private void setMax(int max) {  this.max = new SimplePosition(false,false,max); }
+    void setMax(int max) {  this.max = new SimplePosition(false,false,max); }
     
     /**
      * {@inheritDoc}
@@ -322,7 +322,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public int getMin() { return this.pr.getMin(this.min); }
     
     // Hibernate requirement - not for public use.
-    private void setMin(int min) {  this.min = new SimplePosition(false,false,min); }
+    void setMin(int min) {  this.min = new SimplePosition(false,false,min); }
     
     /**
      * {@inheritDoc}
@@ -712,7 +712,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     // Internal use only.
-    private void setLocationText(final String theLocation) throws ParseException {
+    void setLocationText(final String theLocation) throws ParseException {
 //    	System.out.println("SimpleRichLocation.setLocationText-theLocation: ["+theLocation+"]");
     	if (theLocation == null) {
     		setMinPosition(RichLocation.EMPTY_LOCATION.getMinPosition());
@@ -726,7 +726,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     }
     
     // Internal use only.
-    private String getLocationText() {
+    String getLocationText() {
 //    	System.out.println("SimpleRichLocation.getLocationText-returns: ["+GenbankLocationParser.writeLocation(new SimpleRichLocation(getMinPosition(), getMaxPosition(), getRank()))+"], this: ["+this+"]");
     	return  GenbankLocationParser.writeLocation(new SimpleRichLocation(getMinPosition(), getMaxPosition(), getRank()));
     }
@@ -735,9 +735,9 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
 }
 

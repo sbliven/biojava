@@ -22,6 +22,7 @@
 package org.biojavax;
 
 import java.util.Set;
+
 import org.biojava.bio.Annotation;
 import org.biojava.utils.Unchangeable;
 
@@ -92,7 +93,7 @@ public class SimpleCrossRef extends Unchangeable implements CrossRef {
     public String getAccession() { return this.accession; }
     
     // Hibernate requirement - not for public use.
-    private void setAccession(String accession) { this.accession = accession; }
+    void setAccession(String accession) { this.accession = accession; }
     
     /**
      * {@inheritDoc}
@@ -100,7 +101,7 @@ public class SimpleCrossRef extends Unchangeable implements CrossRef {
     public String getDbname() { return this.dbname; }
     
     // Hibernate requirement - not for public use.
-    private void setDbname(String dbname) { this.dbname = dbname; }
+    void setDbname(String dbname) { this.dbname = dbname; }
     
     /**
      * {@inheritDoc}
@@ -108,7 +109,7 @@ public class SimpleCrossRef extends Unchangeable implements CrossRef {
     public int getVersion() { return this.version; }
     
     // Hibernate requirement - not for public use.
-    private void setVersion(int version) { this.version = version; }
+    void setVersion(int version) { this.version = version; }
     
     /**
      * {@inheritDoc}
@@ -169,9 +170,9 @@ public class SimpleCrossRef extends Unchangeable implements CrossRef {
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
 }
 

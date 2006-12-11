@@ -25,9 +25,9 @@ package org.biojava.bio.symbol;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeForwarder;
 
 /**
  * The base-class for Symbol implementations.

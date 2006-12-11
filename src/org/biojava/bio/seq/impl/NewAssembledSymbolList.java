@@ -23,22 +23,20 @@ package org.biojava.bio.seq.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
-import org.biojava.bio.BioError;
 import org.biojava.bio.seq.ComponentFeature;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.AbstractSymbolList;
 import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 
 /**
@@ -63,7 +61,6 @@ public class NewAssembledSymbolList extends AbstractSymbolList {
     private List componentList; // an ordered list of component locations in assembly space
 
     private final Symbol noninformativeSymbol = DNATools.n();
-    private final char noninformativeToken = 'n';
 
 
     private class TranslatedSymbolList extends AbstractSymbolList
@@ -268,7 +265,6 @@ public class NewAssembledSymbolList extends AbstractSymbolList {
             // have a match, remove from both componentList
             // and component
             // loc is now the mapping range of the to-be-removed feature
-            ComponentFeature removedCF = ((TranslatedSymbolList) components.remove(loc)).getFeature();
             componentList.remove(i);
 
             // at this point the former left and right neighbours of the
@@ -427,40 +423,6 @@ public class NewAssembledSymbolList extends AbstractSymbolList {
             // when there are no entries
             return NOTFOUND;
         }
-    }
-
-    // search for first range that is to right
-    // of specified point.  Returns null on failure.
-    private Location locationUpstreamOfPoint(int p) {
-	int first = 0;
-	int last = componentList.size() - 1;
-
-	int check = 0;
-	Location checkL = null;
-	while (first <= last) {
-	    check = (first + last) / 2;
-	    checkL = (Location) componentList.get(check);
-	    if (checkL.contains(p))
-		return checkL;
-
-	    if (p < checkL.getMin())
-		last = check - 1;
-	    else
-		first = check + 1;
-	}
-
-	try {
-	    if (p < checkL.getMin()) {
-		return checkL;
-	    } else {
-                // doesn't look right, how about p so large that it is beyond any range here?!
-		return (Location) componentList.get(check + 1);
-	    }
-	} catch (IndexOutOfBoundsException ex) {
-	    return null;
-	} catch (NullPointerException ex) {
-	    return null;
-	}
     }
 
     public Alphabet getAlphabet() {

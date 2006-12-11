@@ -32,7 +32,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
 import javax.sql.DataSource;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
@@ -364,19 +366,6 @@ class OntologySQL {
       Term intTerm = internalOntology.getTerm(extTerm.getName());
       blessedExternalAliases.put(extTerm, intTerm);
       blessedExternalTerms.put(intTerm, extTerm);
-    }
-  }
-
-  private Term localize(Ontology ont, Term t)
-          throws ChangeVetoException
-  {
-    if (t.getOntology() == ont) {
-      return t;
-    } else {
-      if (blessedExternalTerms.containsKey(t)) {
-        t = (Term) blessedExternalTerms.get(t);
-      }
-      return ont.importTerm(t, null);
     }
   }
 

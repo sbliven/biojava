@@ -7,9 +7,13 @@
 
 package org.biojavax;
 
-import java.util.HashSet;
-import junit.framework.*;
 import java.util.Collections;
+import java.util.HashSet;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojava.utils.ChangeVetoException;
 
 

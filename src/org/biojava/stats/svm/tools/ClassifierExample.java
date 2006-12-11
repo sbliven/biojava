@@ -96,7 +96,7 @@ public class ClassifierExample {
     bGroup.add(rbNeg);
     ActionListener addTypeAction = new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        JRadioButton rb = (JRadioButton) ae.getSource();
+        //JRadioButton rb = (JRadioButton) ae.getSource();
         pc.setAddPos(rbPos.isSelected());
       }
     };

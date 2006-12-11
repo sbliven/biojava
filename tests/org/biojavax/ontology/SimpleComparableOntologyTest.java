@@ -10,7 +10,11 @@ package org.biojavax.ontology;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
-import junit.framework.*;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.ontology.Term;
 import org.biojava.ontology.Triple;
@@ -200,7 +204,7 @@ public class SimpleComparableOntologyTest extends TestCase {
             
             assertNotNull(cr.getEvent());
             ChangeEvent ce = cr.getEvent();
-            assertEquals(ont.TERM, ce.getType());
+            assertEquals(ComparableOntology.TERM, ce.getType());
             assertEquals(term, ce.getChange());
             assertNull(ce.getPrevious());
             
@@ -261,7 +265,7 @@ public class SimpleComparableOntologyTest extends TestCase {
             
             assertNotNull(cr.getEvent());
             ChangeEvent ce = cr.getEvent();
-            assertEquals(ont.TRIPLE, ce.getType());
+            assertEquals(ComparableOntology.TRIPLE, ce.getType());
             assertEquals(trip, ce.getChange());
             assertNull(ce.getPrevious());
             
@@ -295,7 +299,7 @@ public class SimpleComparableOntologyTest extends TestCase {
             
             assertNotNull(cr.getEvent());
             ChangeEvent ce = cr.getEvent();
-            assertEquals(ont.TERM, ce.getType());
+            assertEquals(ComparableOntology.TERM, ce.getType());
             assertEquals(term, ce.getPrevious());
             assertNull(ce.getChange());
             
@@ -440,7 +444,7 @@ public class SimpleComparableOntologyTest extends TestCase {
             
             assertNotNull(cr.getEvent());
             ChangeEvent ce = cr.getEvent();
-            assertEquals(ont.DESCRIPTION, ce.getType());
+            assertEquals(ComparableOntology.DESCRIPTION, ce.getType());
             assertEquals(desc, ce.getChange());
             assertNull(ce.getPrevious());
             

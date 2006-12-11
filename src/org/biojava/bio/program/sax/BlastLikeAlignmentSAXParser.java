@@ -71,9 +71,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
     private String               oParsedSeq;
     private int                  iOffset;
     private int                  iEnd;
-    private boolean              tJustDoneQuery;
     private boolean              tJustDoneConsensus;
-    private boolean              tJustDoneHit;
 
     private static final int STARTUP             = 0;
     private static final int ON_FIRST_SEGMENT    = 1;
@@ -109,9 +107,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
     oHitStopId.setLength(0);
     oMatchConsensus.setLength(0);
 
-    tJustDoneQuery     = false;
     tJustDoneConsensus = false;
-    tJustDoneHit       = false;
     //Loop over all alignment lines
     int iAlSize = oAlignment.size();
     for (int i = 0; i < iAlSize;i++) {
@@ -303,9 +299,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	    oQueryStartId.append(oStartId);
 	    oQueryStopId.append(oStopId);
 	    oQuery.append(oParsedSeq);
-	    tJustDoneQuery     = true;
 	    tJustDoneConsensus = false;
-	    tJustDoneHit       = false;
 	    return;
         }
         if (poLine.startsWith("SBJCT:")) {
@@ -325,9 +319,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 		oMatchConsensus.append( new String( oPadding) );
 	    }
 
-	    tJustDoneQuery     = false;
 	    tJustDoneConsensus = false;
-	    tJustDoneHit       = true;
 
 	    //here finished with block
 	    this.changeState(DONE_FIRST_SEGMENT);
@@ -335,9 +327,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
         }
         oMatchConsensus.append(oParsedSeq);
 
-        tJustDoneQuery     = false;
         tJustDoneConsensus = true;
-        tJustDoneHit       = false;
 
     } //end if onFirstSegment
 
@@ -349,7 +339,6 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	    oQueryStopId.setLength(0);
 	    oQueryStopId.append(oStopId);
 	    oQuery.append(oParsedSeq);
-	    tJustDoneQuery     = true;
 	    tJustDoneConsensus = false;
 	    return;
         }
@@ -370,13 +359,11 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 		oMatchConsensus.append( new String( oPadding) );
 
 	    }
-	    tJustDoneQuery     = false;
 	    tJustDoneConsensus = false;
 	    return;
         }
         //get here if on a match consensus
         oMatchConsensus.append(oParsedSeq);
-        tJustDoneQuery     = false;
         tJustDoneConsensus = true;
         return;
     } //end if inAlignment

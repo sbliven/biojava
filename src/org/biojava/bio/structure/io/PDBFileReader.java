@@ -27,10 +27,13 @@
  */
 package org.biojava.bio.structure.io;
 
-import org.biojava.bio.structure.*;
-import org.biojava.utils.io.InputStreamProvider;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+
+import org.biojava.bio.structure.Structure;
+import org.biojava.utils.io.InputStreamProvider;
 
 
 

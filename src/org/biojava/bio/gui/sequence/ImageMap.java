@@ -192,7 +192,6 @@ public interface ImageMap
     public static class ClientSide implements ImageMap, Serializable
     {
         private String name;
-        private URL url;
         private List hotSpots;
 
         /**

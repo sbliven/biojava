@@ -52,7 +52,6 @@ import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleGappedSymbolList;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
-
 import org.biojava.utils.SmallMap;
 
 /**
@@ -92,8 +91,6 @@ public class PairwiseDP extends DP implements Serializable {
   private EmissionCache getEmissionCache(ScoreType scoreType) {
     return (EmissionCache) emissionCache.get(scoreType);
   }
-
-  private final static int[] ia00 = {0, 0};
 
   //
   // BACKWARD
@@ -260,12 +257,10 @@ public class PairwiseDP extends DP implements Serializable {
     BackPointer[] bpCol = currentCell.backPointers;
     BackPointer bp = bpCol[l];
     List statel = new ArrayList();
-    List scorel = new ArrayList();
     GappedSymbolList gap0 = new SimpleGappedSymbolList(seq0);
     GappedSymbolList gap1 = new SimpleGappedSymbolList(seq1);
     int i0 = seq0.length()+1;
     int i1 = seq1.length()+1;
-    DoubleAlphabet dAlpha = DoubleAlphabet.getInstance();
   
     // parse 1
     //System.out.println("Parse 1");

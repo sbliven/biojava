@@ -42,27 +42,34 @@ package org.biojava.bio.program.xff;
 
 
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-import javax.xml.parsers.*;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.xml.sax.*;
-
-
-
-import org.biojava.utils.xml.*;
-
-import org.biojava.utils.stax.*;
-
-import org.biojava.bio.*;
-
-import org.biojava.bio.symbol.*;
-
-import org.biojava.bio.seq.*;
-
-import org.biojava.bio.seq.io.*;
-
-import org.biojava.bio.seq.impl.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.bio.seq.io.SequenceBuilderBase;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.DummySymbolList;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.biojava.utils.xml.PrettyXMLWriter;
+import org.biojava.utils.xml.XMLWriter;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 
 

@@ -26,11 +26,11 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.SymbolList;
-
-import junit.framework.TestCase;
 
 /**
  * Test class for {@link org.biojava.bio.proteomics.aaindex.AAindexStreamReader}. 

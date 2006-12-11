@@ -21,9 +21,11 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.NotSerializableException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import org.biojava.utils.StaticMemberPlaceHolder;
 

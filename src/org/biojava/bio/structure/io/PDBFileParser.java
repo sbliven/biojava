@@ -22,15 +22,28 @@
  */
 package org.biojava.bio.structure.io;
 
-import org.biojava.bio.structure.*;
-
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.SymbolTokenization ;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Calendar;
+import java.util.HashMap;
+
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.structure.AminoAcidImpl;
+import org.biojava.bio.structure.AtomImpl;
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
+import org.biojava.bio.structure.HetatomImpl;
+import org.biojava.bio.structure.NucleotideImpl;
+import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureImpl;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 
 

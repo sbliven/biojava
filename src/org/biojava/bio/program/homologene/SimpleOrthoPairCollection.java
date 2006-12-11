@@ -22,11 +22,8 @@
 package org.biojava.bio.program.homologene;
 
 
-import java.util.Iterator;
-import java.util.Set;
 import java.util.HashSet;
-
-import org.biojava.utils.ChangeVetoException;
+import java.util.Set;
 
 public class SimpleOrthoPairCollection
     extends AbstractOrthoPairCollection

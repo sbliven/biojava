@@ -21,9 +21,7 @@
 
 package org.biojava.bio.symbol;
 
-import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.dist.Distribution;
-import org.biojava.bio.symbol.IllegalSymbolException;
 
 public interface CodonPref
 {

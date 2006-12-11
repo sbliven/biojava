@@ -159,10 +159,6 @@ public class Parser {
     return stack.remove(stack.size() - 1);
   }
   
-  private Object peek(List stack) {
-    return stack.get(stack.size() - 1);
-  }
-  
   private static class Frame {
     public final TagValueParser parser;
     public final TagValueListener listener;

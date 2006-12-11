@@ -20,10 +20,11 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Paint;
 
-import org.biojava.bio.seq.*;
-import org.biojava.utils.*;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.utils.ChangeType;
 
 /**
  * A concrete AbstractPeptideDigestRenderer. The features matching the given FeatureFilter

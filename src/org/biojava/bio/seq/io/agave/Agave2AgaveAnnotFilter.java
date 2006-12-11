@@ -19,8 +19,10 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.util.*;
-import org.biojava.bio.*;
+import java.util.Iterator;
+import java.util.List;
+
+import org.biojava.bio.Annotation;
 
 /**
  * Dumping the data from biojava with source of agave into agave format

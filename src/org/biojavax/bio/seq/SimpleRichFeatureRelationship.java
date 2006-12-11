@@ -105,7 +105,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     public RichFeature getObject() { return this.object; }
     
     // Hibernate requirement - not for public use.
-    private void setObject(RichFeature object) { this.object = object; }
+    void setObject(RichFeature object) { this.object = object; }
         
     /**
      * {@inheritDoc}
@@ -113,7 +113,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     public RichFeature getSubject() { return this.subject; }
     
     // Hibernate requirement - not for public use.
-    private void setSubject(RichFeature subject) { this.subject = subject; }
+    void setSubject(RichFeature subject) { this.subject = subject; }
     
     /**
      * {@inheritDoc}
@@ -121,7 +121,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     public ComparableTerm getTerm() { return this.term; }
     
     // Hibernate requirement - not for public use.
-    private void setTerm(ComparableTerm term) { this.term = term; }
+    void setTerm(ComparableTerm term) { this.term = term; }
     
     /**
      * {@inheritDoc}
@@ -180,9 +180,9 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
 }
 

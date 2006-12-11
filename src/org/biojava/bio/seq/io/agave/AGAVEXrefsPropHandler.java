@@ -19,9 +19,11 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.biojava.utils.ChangeVetoException;
-import org.xml.sax.*;
-import java.util.*;
+import org.xml.sax.SAXException;
 
 /**
  * Deals with database crossreferences (xrefs)

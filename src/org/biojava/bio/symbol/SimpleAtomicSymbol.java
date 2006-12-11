@@ -22,10 +22,10 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.List;
-import java.io.Serializable;
-import java.io.ObjectStreamException;
 import java.io.InvalidObjectException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.List;
 
 import org.biojava.bio.Annotation;
 

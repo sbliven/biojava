@@ -313,7 +313,6 @@ public class SingleDP extends DP implements Serializable {
   private void forward_recurse(DPCursor dpCursor, ScoreType scoreType)
     throws IllegalSymbolException {
     State [] states = getStates();
-    int stateCount = states.length;
     int [][] transitions = getForwardTransitions();
     double [][] transitionScore = getForwardTransitionScores(scoreType);
 
@@ -517,7 +516,6 @@ public class SingleDP extends DP implements Serializable {
   throws IllegalSymbolException {
     lockModel();
     
-    int seqLength = dpCursor.length();
     State [] states = getStates();
 
     int [][] transitions = getForwardTransitions();

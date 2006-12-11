@@ -8,7 +8,11 @@
 package org.biojavax.ontology;
 import java.util.Set;
 import java.util.TreeSet;
-import junit.framework.*;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojava.ontology.Triple;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener.ChangeEventRecorder;
@@ -213,7 +217,7 @@ public class SimpleComparableTripleTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the correct type
-            assertEquals(trip.DESCRIPTOR, ce.getType());
+            assertEquals(ComparableTriple.DESCRIPTOR, ce.getType());
             //old was
             assertNull(ce.getPrevious());
             //new is
@@ -252,7 +256,7 @@ public class SimpleComparableTripleTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the correct type
-            assertEquals(trip.DESCRIPTOR, ce.getType());
+            assertEquals(ComparableTriple.DESCRIPTOR, ce.getType());
             //old was
             assertEquals(term, ce.getPrevious());
             //new is

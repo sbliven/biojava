@@ -2,12 +2,24 @@ package org.biojava.bio.seq.projection;
 
 
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.*;
-
-import java.util.*;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
 
 
 

@@ -20,28 +20,23 @@
  */
 package org.biojava.bio.program.sax.blastxml;
 
-import org.biojava.utils.ClassTools;
-import org.biojava.utils.stax.SAX2StAXAdaptor;
-import org.biojava.bio.BioException;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.DTDHandler;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
-import org.xml.sax.SAXException;
-
-import java.io.InputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.net.MalformedURLException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.biojava.bio.BioException;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.DTDHandler;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * A facade class that wraps the NCBI Blast XML 

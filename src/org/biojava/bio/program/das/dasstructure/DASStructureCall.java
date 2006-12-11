@@ -29,23 +29,21 @@
 
 package org.biojava.bio.program.das.dasstructure ;
 
-import org.biojava.bio.structure.* ;
-import org.biojava.bio.structure.io.* ;
-
-// for applets ...
-//import java.security.*;
-
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.io.*;
 import java.net.URL;
-import java.util.Properties ;
+import java.util.Calendar;
 import java.util.zip.GZIPInputStream;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.xml.sax.helpers.*;
-import org.xml.sax.*;
-import javax.xml.parsers.*;
-import java.util.Calendar;
+import org.biojava.bio.structure.Structure;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  *  Calls a DAS - Structure server.

@@ -25,12 +25,12 @@ import java.util.Iterator;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.projection.TranslateFlipContext;
 import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
-import org.biojava.ontology.OntoTools;
-import org.biojava.ontology.Term;
+import org.biojava.bio.seq.projection.TranslateFlipContext;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.ontology.OntoTools;
+import org.biojava.ontology.Term;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Unchangeable;

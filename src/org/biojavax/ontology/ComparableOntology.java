@@ -22,6 +22,7 @@
 package org.biojavax.ontology;
 
 import java.util.Set;
+
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
 import org.biojava.utils.ChangeType;

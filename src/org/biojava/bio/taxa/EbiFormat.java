@@ -24,6 +24,7 @@ package org.biojava.bio.taxa;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.biojava.bio.Annotation;
 import org.biojava.utils.ChangeVetoException;
 

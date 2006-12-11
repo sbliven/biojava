@@ -23,9 +23,7 @@ package org.biojavax;
 
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -145,8 +143,8 @@ public class SimpleComment extends AbstractChangeable implements Comment {
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id;}
+    void setId(Integer id) { this.id = id;}
 }

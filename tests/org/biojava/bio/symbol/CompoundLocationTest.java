@@ -21,10 +21,10 @@
 
 package org.biojava.bio.symbol;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.TestCase;
 
 /**
  * <code>CompoundLocationTest</code> tests the behaviour of

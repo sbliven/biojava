@@ -104,7 +104,6 @@ public class Meme {
 
    OUTER:
     while( true ) {
-      int motifNo = 0;
       int width = 0;
 
      FINDMOTIF:
@@ -115,7 +114,6 @@ public class Meme {
         } else if (nt == StreamTokenizer.TT_WORD) {
             if(st.sval.startsWith("MOTIF")) {
               st.nextToken();			// MOTIF x
-              motifNo = (int) st.nval;	// x
               while(st.nextToken() != StreamTokenizer.TT_NUMBER) {} // width = w
               width = (int) st.nval;		// w
               break FINDMOTIF;

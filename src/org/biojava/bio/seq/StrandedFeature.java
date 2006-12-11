@@ -25,8 +25,8 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.StaticMemberPlaceHolder;
 
 /**

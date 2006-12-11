@@ -48,10 +48,10 @@ import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.AssertionFailure;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.AssertionFailure;
 
 /**
  * Sequence keyed off a BioSQL biosequence.
@@ -195,7 +195,6 @@ class BioSQLAssembly
 		    int assembly_end = rs.getInt(4);
 		    int fragment_start = rs.getInt(5);
 		    int fragment_end = rs.getInt(6);
-		    int strand = rs.getInt(7); // do we use this?
 
 		    ComponentFeature.Template temp = new ComponentFeature.Template();
 		    temp.type = "component";

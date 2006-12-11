@@ -483,7 +483,6 @@ public final class RNATools {
             (FiniteAlphabet) AlphabetManager.alphabetForName(source);
           FiniteAlphabet targetA =
             (FiniteAlphabet) AlphabetManager.alphabetForName(target);
-          SymbolTokenization sourceP = sourceA.getTokenization("name");
           SymbolTokenization targetP = targetA.getTokenization("name");
           SimpleGeneticCodeTable table = new SimpleGeneticCodeTable (
             sourceA,

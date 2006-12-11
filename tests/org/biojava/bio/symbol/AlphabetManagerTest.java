@@ -22,11 +22,16 @@
 package org.biojava.bio.symbol;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import junit.framework.TestCase;
+
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
-
-import java.util.*;
 
 
 public class AlphabetManagerTest extends TestCase {
@@ -104,7 +109,6 @@ public class AlphabetManagerTest extends TestCase {
     throws Exception
   {
       Alphabet protein = ProteinTools.getAlphabet();
-      Alphabet proteinT = ProteinTools.getTAlphabet();
       String protString = "RVQZ";
       SymbolList sl_protein = new SimpleSymbolList(
         protein.getTokenization("token"),

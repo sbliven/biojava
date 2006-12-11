@@ -1,14 +1,11 @@
 package org.biojava.bio.program.unigene;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.biojava.bio.BioException;
 import org.biojava.utils.JDBCConnectionPool;
-import org.biojava.utils.ClassTools;
 
 /**
  * <p>An implementatoin of UnigeneFactory that manages it's data in an SQL
@@ -31,6 +28,7 @@ implements UnigeneFactory {
 
   private static String getCreateDBStatement() {
     if(CREATE_DB_STATEMENT == null) {
+    	/*
       StringBuffer stmt = new StringBuffer();
       BufferedReader stmtIn = new BufferedReader(
         new InputStreamReader(
@@ -39,6 +37,8 @@ implements UnigeneFactory {
           )
         )
       );
+      */
+    	// commented as does not assign loaded class and is unclear what should do.
     }
     return CREATE_DB_STATEMENT;
   }

@@ -7,7 +7,10 @@
 
 package org.biojavax;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojava.bio.seq.DNATools;
 import org.biojavax.bio.seq.InfinitelyAmbiguousSymbolList;
 

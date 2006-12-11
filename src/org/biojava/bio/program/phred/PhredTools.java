@@ -53,7 +53,6 @@ import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
-import org.biojava.bio.symbol.AtomicSymbol;
 import org.biojava.bio.symbol.BasisSymbol;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
@@ -345,7 +344,6 @@ public final class PhredTools {
      */
     public static Distribution[] phredAlignmentToDistArray(Alignment a){
       List labels = a.getLabels();
-      int depth = labels.size();
       Distribution [] average = new Distribution[a.length()];
 
       Distribution[][] matrix = new Distribution[labels.size()][];

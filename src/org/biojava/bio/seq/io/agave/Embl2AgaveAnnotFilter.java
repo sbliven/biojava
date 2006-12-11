@@ -19,8 +19,7 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.util.*;
-import org.biojava.bio.*;
+import org.biojava.bio.Annotation;
 
 /**
  * Map EMBL data into AGAVE format

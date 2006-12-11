@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import junit.framework.TestCase;
+
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
@@ -208,5 +209,7 @@ public class GappedSymbolListTest extends TestCase {
     gappedSequence.removeGaps(11, 6);
 
     String seqStr = gappedSequence.seqString();
+
+    seqStr=seqStr==null?null:seqStr;//trick
   }
 }

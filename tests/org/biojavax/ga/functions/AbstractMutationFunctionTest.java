@@ -21,8 +21,9 @@
 
 package org.biojavax.ga.functions;
 
-import junit.framework.*;
-import org.biojava.utils.*;
+import junit.framework.TestCase;
+
+import org.biojava.utils.ChangeVetoException;
 
 
 /**

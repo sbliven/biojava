@@ -22,13 +22,15 @@
 
 package org.biojavax.ga.impl;
 
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojavax.ga.Population;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ga.GeneticAlgorithm;
+import org.biojavax.ga.Population;
 import org.biojavax.ga.functions.CrossOverFunction;
-import org.biojavax.ga.functions.SelectionFunction;
 import org.biojavax.ga.functions.MutationFunction;
+import org.biojavax.ga.functions.SelectionFunction;
 
 /**
  * Base class from which most implementations of GeneticAlgorithm will inherit.

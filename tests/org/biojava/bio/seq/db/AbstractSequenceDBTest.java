@@ -22,7 +22,9 @@
 package org.biojava.bio.seq.db;
 
 import java.util.Iterator;
+
 import junit.framework.TestCase;
+
 import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
@@ -79,7 +81,7 @@ public abstract class AbstractSequenceDBTest extends TestCase {
         template.location = LocationTools.makeLocation(10, 15);
         template.type = "noTS";
         template.source = "asource";
-        Feature noTS = seq.createFeature(template);
+        seq.createFeature(template);
         assertTrue(seq.countFeatures() == 1);
     }
         
@@ -91,7 +93,7 @@ public abstract class AbstractSequenceDBTest extends TestCase {
         assertTrue(mSequenceDB.ids().contains(name));
 
         Sequence seq = mSequenceDB.getSequence(name);
-        seq = null;
+        seq = seq==null?null:seq;//trick
 
         mSequenceDB.removeSequence(name);
         assertTrue(!mSequenceDB.ids().contains(name));

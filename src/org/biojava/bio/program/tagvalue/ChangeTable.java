@@ -42,8 +42,6 @@ public class ChangeTable {
     }
   };
 
-  private Changer defaultC;
-  private Splitter defaultS;
   private final Map changers;
   private final Map splitters;
 

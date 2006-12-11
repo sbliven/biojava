@@ -21,15 +21,16 @@
 
 package org.biojava.ontology; 
  
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.biojava.bio.Annotation;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeType;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Arrays;
 
 /**
  * A term in an ontology which identifies another ontology.

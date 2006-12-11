@@ -215,7 +215,6 @@ public interface BlastLikeSearchFilter
     {
     static { WalkerFactory.getInstance().addTypeWithParent(And.class); }
 
-        private AbstractBlastLikeSearchFilter filter;
         private AbstractBlastLikeSearchFilter filter0;
         private AbstractBlastLikeSearchFilter filter1;
 
@@ -248,7 +247,6 @@ public interface BlastLikeSearchFilter
     {
     static { WalkerFactory.getInstance().addTypeWithParent(Or.class); }
 
-        private AbstractBlastLikeSearchFilter filter;
         private AbstractBlastLikeSearchFilter filter0;
         private AbstractBlastLikeSearchFilter filter1;
 

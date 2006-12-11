@@ -1,6 +1,5 @@
 package org.biojava.utils.walker;
 
-import org.biojava.bio.seq.FeatureFilter;
 
 /**
  * Objects that can walk over a filter expression, showing each element to a

@@ -1,10 +1,10 @@
 package org.biojava.bio.symbol;
 
-import junit.framework.TestCase;
-import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.program.homologene.OrthologueSet;
-
 import java.util.Iterator;
+
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.ProteinTools;
 
 /**
  * @author Matthew Pocock

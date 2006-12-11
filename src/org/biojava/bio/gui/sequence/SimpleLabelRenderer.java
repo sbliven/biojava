@@ -27,7 +27,6 @@ import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
@@ -135,7 +134,7 @@ implements LabelRenderer{
       renderLabel(g, labelGlyph, labelBox, sp, side);
     }*/
   }
-
+/*
   private void renderLabel(
       Graphics2D g,
       Shape gv, Rectangle2D labelBox,
@@ -177,5 +176,5 @@ implements LabelRenderer{
         g.draw(gv);
         g.setTransform(at);
       }
-    }
+    }*/
 }

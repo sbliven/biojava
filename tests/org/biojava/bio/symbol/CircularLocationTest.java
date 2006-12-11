@@ -21,10 +21,10 @@
 
 package org.biojava.bio.symbol;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import junit.framework.TestCase;
 
 /**
  * <code>CircularLocationTest</code> tests the behaviour of

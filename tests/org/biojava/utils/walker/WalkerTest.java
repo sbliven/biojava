@@ -2,11 +2,11 @@ package org.biojava.utils.walker;
 
 import junit.framework.TestCase;
 
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.ComponentFeature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.ComponentFeature;
 import org.biojava.bio.symbol.RangeLocation;
-import org.biojava.bio.BioException;
 
 /**
  * Test some walkers for some viewers, ensuring that they get the events we
@@ -18,19 +18,15 @@ public class WalkerTest
 extends TestCase {
   private FeatureFilter booring1;
   private FeatureFilter booring2;
-  private FeatureFilter booring3;
   private FeatureFilter booring4;
   private FeatureFilter and;
-  private FeatureFilter or;
   private FeatureFilter andOr;
 
   protected void setUp() {
     booring1 = new FeatureFilter.OverlapsLocation(new RangeLocation(20, 50));
     booring2 = new FeatureFilter.ByClass(StrandedFeature.class);
-    booring3 = new FeatureFilter.BySequenceName("unrepeatable");
     booring4 = new FeatureFilter.ByClass(ComponentFeature.class);
     and = new FeatureFilter.And(booring1, booring2);
-    or = new FeatureFilter.Or(booring3, booring4);
     andOr = new FeatureFilter.And(booring1,
                                   new FeatureFilter.Or(booring2, booring4));
   }

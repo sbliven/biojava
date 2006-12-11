@@ -1,13 +1,10 @@
 package org.biojava.bio.dist;
 
-import java.util.*;
-import java.io.*;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
-import junit.framework.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * Tests that check whether translated distributions behave properly.

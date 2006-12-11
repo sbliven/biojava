@@ -21,9 +21,9 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.HashSet;
 
 /**
  * an abstract class implementing basic functionality

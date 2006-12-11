@@ -21,9 +21,9 @@
 
 package org.biojava.bio.search;
 
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.BasisSymbol;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * A BioMatcher class returned by MaxMismatchPattern.matcher() that implements
@@ -39,7 +39,6 @@ implements BioMatcher {
     // primary data
     private final Symbol [] patternSymbol; // an array containing the pattern symbols in reversed order
     private final SymbolList seq;
-    private final int mismatches;
 
     // precomputed constants
     private final int patLength;
@@ -59,7 +58,6 @@ implements BioMatcher {
                       int mismatches)
     {
         this.seq = seq;
-        this.mismatches = mismatches;
 
         patLength = pattern.length();
         maxPatternSymbolIdx = patLength - 1;
@@ -86,7 +84,6 @@ implements BioMatcher {
 
     public boolean find() 
     {
-        int patLength = matches.length;
 
         if (pos >= seq.length()) {
             return false;

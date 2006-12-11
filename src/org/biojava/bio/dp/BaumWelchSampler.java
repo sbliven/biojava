@@ -63,8 +63,6 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
   ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
     SingleDP dp = (SingleDP) getDP();
     State [] states = dp.getStates();
-    int [][] forwardTransitions = dp.getForwardTransitions();
-    double [][] forwardTransitionScores = dp.getForwardTransitionScores(scoreType);
     int [][] backwardTransitions = dp.getBackwardTransitions();
     double [][] backwardTransitionScores = dp.getBackwardTransitionScores(scoreType);
     MarkovModel model = dp.getModel();
@@ -78,7 +76,6 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
 
     // System.out.print("Backward... ");
     SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll, scoreType);
-    double bs = bm.getScore();
     // System.out.println("Score = " + bs);
 
     Symbol gap = AlphabetManager.getGapSymbol();

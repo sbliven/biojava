@@ -20,8 +20,8 @@
  */
 package org.biojava.bio.gui.sequence.tracklayout;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.RangeLocation;
 
 
 /**
@@ -31,7 +31,6 @@ import org.biojava.bio.symbol.*;
  * @since 1.5
  */
 public class SimpleTrackLayout implements TrackLayout {
-    private Sequence seq;
     private RangeLocation loc;
     private int wrap = 50;
     private int wrapInc = 10;
@@ -45,7 +44,6 @@ public class SimpleTrackLayout implements TrackLayout {
     }
 
     public void setSequence(Sequence seq) {
-        this.seq = seq;
     }
 
     public void setRange(RangeLocation loc) {

@@ -603,7 +603,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_createDate = createDate;
         }
         
-        private String getCreateDate()
+        String getCreateDate()
         {
             return m_createDate;
         }
@@ -613,7 +613,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_updateRelease = updateRelease;
         }
         
-        private String getUpdateRelease()
+        String getUpdateRelease()
         {
             return m_updateRelease;
         }
@@ -623,7 +623,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_createRelease = createRelease;
         }
         
-        private String getCreateRelease()
+        String getCreateRelease()
         {
             return m_createRelease;
         }
@@ -653,7 +653,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_entryVersion = entryVersion;
         }
         
-        private String getEntryVersion()
+        String getEntryVersion()
         {
             return m_entryVersion;
         }
@@ -683,7 +683,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_secondaryAccessions.add( secondaryAccession );
         }
         
-        private ArrayList getSecondaryAccessions()
+        ArrayList getSecondaryAccessions()
         {
             return new ArrayList( m_secondaryAccessions );
         }
@@ -703,7 +703,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_segment = segment;
         }
         
-        private String getSegment()
+        String getSegment()
         {
             return m_segment;
         }
@@ -769,7 +769,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_primary = primary;
         }
         
-        private String getPrimary()
+        String getPrimary()
         {
             return m_primary;
         }
@@ -779,7 +779,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_sourceDb = sourceDb;
         }
         
-        private String getSourceDb()
+        String getSourceDb()
         {
             return m_sourceDb;
         }
@@ -789,7 +789,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_databaseReference = databaseReference;
         }
         
-        private String getDatabaseReference()
+        String getDatabaseReference()
         {
             return m_databaseReference;
         }
@@ -825,7 +825,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_contig = contig;
         }
         
-        private String getContig()
+        String getContig()
         {
             return m_contig;
         }
@@ -873,7 +873,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_consortium = consortium;
         }
         
-        private String getConsortium()
+        String getConsortium()
         {
             return m_consortium;
         }
@@ -923,7 +923,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_remark = remark;
         }
         
-        private String getRemark()
+        String getRemark()
         {
             return m_remark;
         }
@@ -976,7 +976,7 @@ public class GenbankXmlFormat extends GenbankFormat
             return m_currInterval;
         }
         
-        private ArrayList getIntervals()
+        ArrayList getIntervals()
         {
             return new ArrayList( m_intervals );
         }
@@ -1038,7 +1038,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_from = from;
         }
         
-        private String getFrom()
+        String getFrom()
         {
             return m_from;
         }
@@ -1048,7 +1048,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_to = to;
         }
         
-        private String getTo()
+        String getTo()
         {
             return m_to;
         }
@@ -1058,7 +1058,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_point = point;
         }
         
-        private String getPoint()
+        String getPoint()
         {
             return m_point;
         }
@@ -1068,7 +1068,7 @@ public class GenbankXmlFormat extends GenbankFormat
             m_accession = accession;
         }
         
-        private String getAccession()
+        String getAccession()
         {
             return m_accession;
         }

@@ -3,21 +3,19 @@
 package org.biojava.utils.automata;
 
 import java.util.Iterator;
-import java.util.Set;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.AtomicSymbol;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 public class PatternMaker
 {
     // the NFA that will be the result of parsing the specified pattern.
     private Nfa nfa;
     private Tokenizer toke;
-    private FiniteAlphabet alfa;
     private SymbolTokenization symtoke;
 
     private static class Tokenizer
@@ -121,8 +119,6 @@ public class PatternMaker
         private int max = 1;
         private int getMin() { return min; }
         private int getMax() { return max; }
-        private void setMin(int min) { this.min = min; }
-        private void setMax(int max) { this.max = max; }
 
         private Range(int min, int max)
         {
@@ -136,7 +132,6 @@ public class PatternMaker
     PatternMaker(String patternString, FiniteAlphabet alfa)
         throws BioException
     {
-        this.alfa = alfa;
         toke = new Tokenizer(patternString);
         nfa = new Nfa(patternString, alfa);
         symtoke = alfa.getTokenization("token");

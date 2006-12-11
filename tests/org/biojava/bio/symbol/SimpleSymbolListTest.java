@@ -21,10 +21,11 @@
 
 package org.biojava.bio.symbol;
 
-import junit.framework.TestCase;
-import org.biojava.bio.seq.DNATools;
-
 import java.util.Iterator;
+
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.DNATools;
 
 /**
  * Tests for SimpleSymbolList

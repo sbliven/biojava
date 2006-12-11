@@ -29,7 +29,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-//import org.apache.regexp.*;
 
 /**
  * Class to parse NCBI Blast-XML output.

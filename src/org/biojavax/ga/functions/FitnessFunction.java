@@ -21,9 +21,9 @@
 
 
 package org.biojavax.ga.functions;
-import org.biojavax.ga.Population;
-import org.biojavax.ga.Organism;
 import org.biojavax.ga.GeneticAlgorithm;
+import org.biojavax.ga.Organism;
+import org.biojavax.ga.Population;
 
 /**
  * Calculates the fitness of an <code>Organism</code>

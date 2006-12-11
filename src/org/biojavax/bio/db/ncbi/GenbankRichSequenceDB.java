@@ -33,6 +33,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.db.FetchURL;

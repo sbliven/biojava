@@ -2,9 +2,7 @@ package org.biojava.bio.symbol;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.DNATools;
-import org.biojava.utils.*;
-
-import java.util.Collections;
+import org.biojava.utils.ListTools;
 
 /**
  * @author Matthew Pocock

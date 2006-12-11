@@ -25,8 +25,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.biojava.bio.seq.db.SequenceDBLite;
-
 /**
  * <code>SystemRegistryTest</code> tests that a registry can be
  * created and that it will look in the correct places for a

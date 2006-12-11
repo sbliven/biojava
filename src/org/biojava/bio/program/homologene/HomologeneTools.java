@@ -21,15 +21,14 @@
 
 package org.biojava.bio.program.homologene;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.regex.Pattern;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -124,7 +123,6 @@ public class HomologeneTools
                         // pick up the groups
                         int taxonID = Integer.parseInt(m.group(1));
                         String homologeneID = m.group(2);
-                        String sym = m.group(3);
                         String title = m.group(4);
 
                         builder.addTitle(taxonID, homologeneID.trim(), title.trim());

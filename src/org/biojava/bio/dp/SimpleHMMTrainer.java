@@ -23,15 +23,14 @@ package org.biojava.bio.dp;
 
 import java.util.Iterator;
 
-import org.biojava.bio.dist.DistributionTrainerContext;
+import org.biojava.bio.BioException;
 import org.biojava.bio.dist.Distribution;
-import org.biojava.bio.dist.SimpleDistribution;
+import org.biojava.bio.dist.DistributionTrainerContext;
 import org.biojava.bio.dist.SimpleDistributionTrainerContext;
-import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.ChangeVetoException;
-import org.biojava.bio.BioException;
 
 public class SimpleHMMTrainer
     implements HMMTrainer

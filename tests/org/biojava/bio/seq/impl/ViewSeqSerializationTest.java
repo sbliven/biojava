@@ -21,13 +21,13 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
+
+import junit.framework.TestCase;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.CircularView;
@@ -36,8 +36,6 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
-
-import junit.framework.TestCase;
 
 /**
  * Tests for Serialization

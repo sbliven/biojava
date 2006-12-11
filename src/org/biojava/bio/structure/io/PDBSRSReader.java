@@ -25,9 +25,14 @@
 
 package org.biojava.bio.structure.io;
 
-import org.biojava.bio.structure.* ;
-import java.io.*;
-import java.net.Socket ;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
+
+import org.biojava.bio.structure.Structure;
 
 /** reads a PDB file from a local SRS installation using getz Actually
  * is the same as PDBFileReader, but instead of reading from a file stream, reads from a

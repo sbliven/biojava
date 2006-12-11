@@ -21,10 +21,7 @@
 
 package org.biojava.bio.seq.db;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,9 +32,13 @@ import junit.framework.TestCase;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.io.FastaDescriptionLineParser;
+import org.biojava.bio.seq.io.FastaFormat;
+import org.biojava.bio.seq.io.SequenceBuilderFactory;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.seq.io.SimpleSequenceBuilder;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.AlphabetManager;
 
 /**
  * <code>EmblCDROMIndexStoreTest</code> contains unit tests for EMBL
@@ -143,6 +144,7 @@ public class EmblCDROMIndexStoreTest extends TestCase
         try
         {
             Index i = emblCDIndexStore.fetch("xxxxx");
+           i = i==null?null:i; //trick
         }
         catch (IllegalIDException iie)
         {

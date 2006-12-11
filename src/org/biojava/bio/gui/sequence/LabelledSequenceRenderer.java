@@ -21,14 +21,12 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
@@ -37,7 +35,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 
 /**
@@ -287,7 +292,6 @@ public class LabelledSequenceRenderer extends AbstractChangeable implements Sequ
         Paint           selectedFill        = fillColor;
         Paint           textCol             = textColor;
         Paint           notSelectedFill     = g.getBackground();
-        Stroke          beadStroke          = new BasicStroke();
 
         Shape           originalClip        = g.getClip();
         AffineTransform originalTransform   = g.getTransform();

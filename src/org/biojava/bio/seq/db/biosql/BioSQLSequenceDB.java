@@ -66,7 +66,6 @@ import org.biojava.utils.JDBCPooledDataSource;
 import org.biojava.utils.cache.Cache;
 import org.biojava.utils.cache.FixedSizeCache;
 import org.biojava.utils.cache.WeakValueHashMap;
-//import org.apache.commons.dbcp.BasicDataSource;
 
 /**
  * SequenceDB keyed off a BioSQL database.  This is an almost-complete

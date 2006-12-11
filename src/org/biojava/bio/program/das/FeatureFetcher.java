@@ -29,7 +29,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -97,8 +96,6 @@ class FeatureFetcher implements Fetcher {
     public void runFetch()
 	throws BioException, ParseException
     {
-        // get time
-        long startFetch = (new Date()).getTime();
 	DAS.startedActivity(this);
 	URL fURL = null;
 
@@ -357,13 +354,11 @@ class FeatureFetcher implements Fetcher {
     private class DASSegmentHandler extends StAXContentHandlerBase {
 	private SeqIOListener siol;
 	private int level = 0;
-	private String fetchEncoding;
 
 	public DASSegmentHandler(SeqIOListener siol,
 				 String fetchEncoding)
 	{
 	    this.siol = siol;
-	    this.fetchEncoding = fetchEncoding;
 	}
 
 	public void startElement(String nsURI,

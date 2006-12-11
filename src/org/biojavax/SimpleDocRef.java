@@ -23,6 +23,7 @@ package org.biojavax;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Checksum;
+
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
@@ -100,7 +101,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     }
     
     // Hibernate requirement - not for public use.
-    private void setCRC(String CRC) {} // ignore as field is a calculated value
+    void setCRC(String CRC) {} // ignore as field is a calculated value
         
     /**
      * {@inheritDoc}
@@ -125,13 +126,13 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     }
     
     // Hibernate requirement - not for public use.
-    private void setAuthors(String authors) { this.authors = DocRefAuthor.Tools.parseAuthorString(authors); }
+    void setAuthors(String authors) { this.authors = DocRefAuthor.Tools.parseAuthorString(authors); }
     
     // Hibernate requirement - not for public use.
-    private void setLocation(String location) { this.location = location; }
+    void setLocation(String location) { this.location = location; }
 
     // Hibernate requirement - not for public use.
-    private void setTitle(String title) { this.title = title; }
+    void setTitle(String title) { this.title = title; }
     
     /**
      * {@inheritDoc}
@@ -250,10 +251,10 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
     
 }
 

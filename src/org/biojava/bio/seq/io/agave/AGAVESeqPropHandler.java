@@ -40,15 +40,9 @@
 
 package org.biojava.bio.seq.io.agave;
 
-import org.biojava.utils.ChangeVetoException;
+import java.util.ListIterator;
 
-//import org.biojava.utils.stax.*;
-
-import org.xml.sax.*;
-
-import org.biojava.bio.seq.* ;
-
-import java.util.*;
+import org.xml.sax.SAXException;
 
 
 

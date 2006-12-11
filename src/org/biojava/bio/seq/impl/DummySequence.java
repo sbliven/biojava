@@ -26,10 +26,10 @@ import java.util.List;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.IllegalAlphabetException;

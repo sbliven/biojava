@@ -82,7 +82,6 @@ public class MotifTools
                 throw new IllegalArgumentException("SymbolList alphabet did not have a character token type");
 
             int motifLen = motif.length();
-            Symbol gap = AlphabetManager.getGapSymbol();
 
             for (int i = 1; i <= motifLen; i++)
             {

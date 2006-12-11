@@ -1,9 +1,9 @@
 package org.biojava.bio.seq.projection;
 
-import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.Location;
 
 /**

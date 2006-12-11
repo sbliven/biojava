@@ -22,10 +22,11 @@
 package org.biojavax.bio.seq.io;
 
 import java.util.ArrayList;
-import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
@@ -42,17 +43,17 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.SymbolListFactory;
 import org.biojava.ontology.InvalidTermException;
 import org.biojava.utils.ChangeVetoException;
-import org.biojavax.Namespace;
-import org.biojavax.RankedDocRef;
-import org.biojavax.RichAnnotation;
-import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.Comment;
+import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
+import org.biojavax.RankedDocRef;
+import org.biojavax.RichAnnotation;
+import org.biojavax.RichObjectFactory;
 import org.biojavax.SimpleComment;
 import org.biojavax.SimpleNote;
+import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.BioEntryRelationship;
-import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.SimpleRichFeature;

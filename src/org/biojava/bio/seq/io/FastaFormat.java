@@ -146,7 +146,6 @@ public class FastaFormat implements SequenceFormat,
         }
         
         String name = m.group(1);
-        String desc = m.group(3);
         
         siol.setName(name);
         siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);

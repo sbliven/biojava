@@ -1,21 +1,17 @@
 package org.biojava.bio.dp;
 
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.ChangeType;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.dist.DistributionFactory;
-import org.biojava.bio.dist.UniformDistribution;
-import org.biojava.bio.dist.Distribution;
-import org.biojava.bio.Annotation;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.FiniteAlphabet;
 import junit.framework.TestCase;
 
-import java.util.List;
-import java.util.ArrayList;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.DistributionFactory;
+import org.biojava.bio.dist.UniformDistribution;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Test the event forwarding mess in MarkovModel & impls.

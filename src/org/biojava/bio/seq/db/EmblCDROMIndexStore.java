@@ -95,7 +95,6 @@ public class EmblCDROMIndexStore implements IndexStore
     private String name;
 
     // Details of the master index records
-    private int divRecordLength;
     private long divRecordCount;
     // Details of the ID/offset records
     private int entryRecordLength;
@@ -377,7 +376,6 @@ public class EmblCDROMIndexStore implements IndexStore
             bis = new BufferedInputStream(new FileInputStream(divisionLkp));
             EmblCDROMIndexReader div = new DivisionLkpReader(bis);
 
-            divRecordLength = div.readRecordLength();
             divRecordCount  = div.readRecordCount();
 
             // The database name is the same in all the index headers
@@ -480,12 +478,6 @@ public class EmblCDROMIndexStore implements IndexStore
         {
             System.err.println("Failed to find file "
                                + entryNamIdx.getName());
-            // Rethrow
-            throw fnfe;
-        }
-        // File was opened, so try to close it
-        catch (IOException ioe)
-        {
             try
             {
                 bis.close();
@@ -495,11 +487,8 @@ public class EmblCDROMIndexStore implements IndexStore
                 System.err.println("Failed to close random access file "
                                    + entryNamIdx.getName());
             }
-
-            System.err.println("Failed to read random access file "
-                               + entryNamIdx.getName());
             // Rethrow
-            throw ioe;
+            throw fnfe;
         }
     }
 }

@@ -27,14 +27,15 @@
 
 package org.biojavax;
 import java.util.Collections;
-import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.biojava.bio.Annotatable;
 import org.biojava.ontology.Term;
 import org.biojava.utils.AbstractChangeable;

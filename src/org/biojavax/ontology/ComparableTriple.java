@@ -22,6 +22,7 @@
 package org.biojavax.ontology;
 
 import java.util.Set;
+
 import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.ontology.Triple;
 import org.biojava.utils.ChangeType;

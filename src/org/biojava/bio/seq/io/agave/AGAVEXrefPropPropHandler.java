@@ -19,13 +19,10 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.xml.sax.*;
+import java.util.ListIterator;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * xref_property
@@ -42,7 +39,6 @@ public class AGAVEXrefPropPropHandler  extends StAXPropertyHandler{
     }
    };
 
-   private AGAVEProperty xprop ;
    private String prop_type;
    private String data_type ;
    private String value ;

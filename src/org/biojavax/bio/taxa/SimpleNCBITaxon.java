@@ -20,11 +20,12 @@
  */
 
 package org.biojavax.bio.taxa;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
@@ -124,7 +125,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     protected Set getNameSet() { return this.names; } // original for Hibernate
     
     // Hibernate requirement - not for public use.
-    private void setNameSet(Set names) {
+    void setNameSet(Set names) {
         this.names = names; // original for Hibernate
         // convert set to map
         this.namesMap.clear();
@@ -245,7 +246,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     public int getNCBITaxID() { return this.NCBITaxID; }
     
     // Hibernate requirement - not for public use.
-    private void setNCBITaxID(int NCBITaxID) { this.NCBITaxID = NCBITaxID; }
+    void setNCBITaxID(int NCBITaxID) { this.NCBITaxID = NCBITaxID; }
     
     /**
      * {@inheritDoc}
@@ -443,12 +444,12 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     }
     
     // Hibernate requirement - not for public use.
-    private String getTaxonHiddenChar() {
+    String getTaxonHiddenChar() {
         return isTaxonHidden()?TAXONISHIDDEN:null;
     }
 
     // Hibernate requirement - not for public use.
-    private void setTaxonHiddenChar(final String isHiddenChar) throws ChangeVetoException {
+    void setTaxonHiddenChar(final String isHiddenChar) throws ChangeVetoException {
         setTaxonHidden(isHiddenChar!=null || (isHiddenChar!=null && isHiddenChar.length() > 0));// any character will set
     }
 
@@ -516,10 +517,10 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
     
 }
 

@@ -20,10 +20,13 @@
  */
 package org.biojava.bio.dist;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetIndex;
 import org.biojava.bio.symbol.AlphabetManager;
@@ -46,7 +49,6 @@ extends AbstractOrderNDistribution implements Serializable {
     
     private transient Distribution[] dists;
     private transient AlphabetIndex index;
-    private DistributionFactory df;
 
 
   IndexedNthOrderDistribution(Alphabet alpha, DistributionFactory df)
@@ -56,7 +58,6 @@ extends AbstractOrderNDistribution implements Serializable {
     FiniteAlphabet conditioning = (FiniteAlphabet) getConditioningAlphabet();
     index = AlphabetManager.getAlphabetIndex(conditioning);
     index.addChangeListener(ChangeListener.ALWAYS_VETO, AlphabetIndex.INDEX);
-    this.df = df;
     // Throws if alpha isn't indexable
     dists = new Distribution[conditioning.size()];
 

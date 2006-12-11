@@ -47,7 +47,6 @@ class InfiniteCrossProductAlphabet
     Serializable
 {
   private final List alphas;
-  private char tokenSeed = 'A';
 
   InfiniteCrossProductAlphabet(List alphas) {
     this.alphas = alphas;

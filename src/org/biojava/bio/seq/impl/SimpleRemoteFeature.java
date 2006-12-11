@@ -35,7 +35,6 @@ import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.RemoteFeature;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.SimpleAssembly;
 import org.biojava.bio.seq.db.SequenceDB;
 
 /**
@@ -141,7 +140,6 @@ implements RemoteFeature, java.io.Serializable {
           nameBuff.append(nextSeq.getName());
         }
       }
-      Sequence assembly = new SimpleAssembly(nameBuff.substring(0), "");
 
 
 

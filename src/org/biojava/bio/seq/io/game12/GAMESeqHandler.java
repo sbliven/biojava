@@ -36,10 +36,7 @@ public class GAMESeqHandler
     // risking that some nested element within it goes wrong.
 
     //database columns
-    private String release;
     private String seqId;
-    private String seqName;
-    private String description;
 
     private int seqLength = 0;
 //    private byte[] buffer = null;
@@ -106,7 +103,6 @@ public class GAMESeqHandler
          *@param  s  The new stringValue value
          */
         protected void setStringValue(String s) {
-            seqName = s.trim();
         }
     }
 
@@ -124,7 +120,6 @@ public class GAMESeqHandler
          *@param  s  The new stringValue value
          */
         protected void setStringValue(String s) {
-            description = s.trim();
         }
     }
 

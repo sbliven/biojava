@@ -21,12 +21,13 @@
 
 package org.biojava.bio.symbol;
 
-import junit.framework.TestCase;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.seq.ProteinTools;
-
 import java.util.Arrays;
 import java.util.Iterator;
+
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
 
 /**
  * <p>Title: CrossProductSybmolIndexTest</p>

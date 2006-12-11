@@ -193,7 +193,6 @@ public class ProfileHMM extends SimpleMarkovModel {
         advance,
         insertFactory.createDistribution(alpha)
       );
-      DotState dO = null;
 
       matchStates[0] = mO;
       insertStates[0] = iO;
@@ -228,7 +227,6 @@ public class ProfileHMM extends SimpleMarkovModel {
 
         mO = mN;
         iO = iN;
-        dO = dN;
       }
       matchStates[columns+1] = magicalState();
       connectModel();

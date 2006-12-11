@@ -1,11 +1,12 @@
 package org.biojava.bio.seq.filter;
 
 import junit.framework.TestCase;
+
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FilterUtils;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
-import org.biojava.bio.BioException;
 
 /**
  * Checks that FilterTransformer is not totaly nuts.

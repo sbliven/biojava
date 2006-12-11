@@ -19,7 +19,9 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 /**
  * Interface for StAX content handlers.  This interface is

@@ -28,6 +28,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.biojava.ontology.AlreadyExistsException;
 import org.biojava.ontology.DefaultOps;
 import org.biojava.ontology.Ontology;
@@ -472,7 +473,7 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     public String getName() { return this.name; }
     
     // Hibernate requirement - not for public use.
-    private void setName(String name) { this.name = name; }
+    void setName(String name) { this.name = name; }
     
     /**
      * {@inheritDoc}
@@ -483,10 +484,10 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
         
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
     
 }
 

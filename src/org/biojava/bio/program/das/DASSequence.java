@@ -49,7 +49,6 @@ import org.biojava.bio.seq.FeatureRealizer;
 import org.biojava.bio.seq.FilterUtils;
 import org.biojava.bio.seq.LazyFeatureHolder;
 import org.biojava.bio.seq.MergeFeatureHolder;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.db.IllegalIDException;
@@ -65,7 +64,12 @@ import org.biojava.bio.symbol.LocationTools;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.cache.CacheReference;
 import org.xml.sax.XMLReader;
 
@@ -233,7 +237,6 @@ public class DASSequence
             throws ParseException
         {
             if (temp instanceof ComponentFeature.Template) {
-                String id = (String) temp.annotation.getProperty("sequence.id");
 
                 try {
                     ComponentFeature.Template ctemp = (ComponentFeature.Template) temp;
@@ -666,8 +669,8 @@ public class DASSequence
             if (FilterUtils.areProperSubset(ff, structureMembershipFilter)) {
                 if (recurse) {
                     for (Iterator fi = structure.features(); fi.hasNext(); ) {
-                        ComponentFeature cf = (ComponentFeature) fi.next();
-                        Sequence cseq = cf.getComponentSequence();
+                        //ComponentFeature cf = (ComponentFeature) fi.next();
+                        //Sequence cseq = cf.getComponentSequence();
                         // Just ensuring that the sequence is instantiated should be sufficient.
                     }
                 }

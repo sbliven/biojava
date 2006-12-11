@@ -69,7 +69,6 @@ public class SymbolListCharSequence implements CharSequence
         this.syms = syms;
         alphaTokens = new HashMap(Math.round(alphabet.size() / 0.75f) + 1);
 
-        int sIndex;
 
         try
         {

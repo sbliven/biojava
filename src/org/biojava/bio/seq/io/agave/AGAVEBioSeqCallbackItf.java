@@ -19,9 +19,8 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.lang.String;
-import org.biojava.bio.symbol.Location;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
 
 /**
  * An interface that can be tested for by nested handlers

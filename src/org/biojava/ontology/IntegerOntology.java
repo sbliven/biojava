@@ -1,11 +1,18 @@
 package org.biojava.ontology;
 
-import org.biojava.utils.Unchangeable;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.cache.WeakValueHashMap;
-import org.biojava.bio.Annotation;
+import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.TreeSet;
 
-import java.util.*;
+import org.biojava.bio.Annotation;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
+import org.biojava.utils.cache.WeakValueHashMap;
 
 /**
  *

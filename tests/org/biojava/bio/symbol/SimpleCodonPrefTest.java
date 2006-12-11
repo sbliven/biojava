@@ -21,13 +21,14 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import junit.framework.TestCase;
+
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.RNATools;
-
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Tests the CodonPrefTools class and

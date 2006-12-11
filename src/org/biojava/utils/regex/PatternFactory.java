@@ -7,16 +7,16 @@ package org.biojava.utils.regex;
 import java.util.Iterator;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.seq.io.CharacterTokenization;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AbstractAlphabet;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
-import org.biojava.bio.symbol.AbstractAlphabet;
+import org.biojava.bio.symbol.AtomicSymbol;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.seq.io.CharacterTokenization;
 
 /**
  * A class that creates Patterns for regex matching on 

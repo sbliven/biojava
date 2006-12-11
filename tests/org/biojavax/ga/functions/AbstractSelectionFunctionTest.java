@@ -21,11 +21,12 @@
 
 package org.biojavax.ga.functions;
 
-import junit.framework.*;
-import org.biojava.utils.*;
-import org.biojavax.ga.Population;
-import org.biojavax.ga.Organism;
+import junit.framework.TestCase;
+
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ga.GeneticAlgorithm;
+import org.biojavax.ga.Organism;
+import org.biojavax.ga.Population;
 
 
 /**

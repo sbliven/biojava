@@ -1,15 +1,15 @@
 package org.biojava.bio.symbol;
 
-import org.biojava.utils.Unchangeable;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.StaticMemberPlaceHolder;
-
-import java.io.Serializable;
-import java.io.ObjectStreamException;
 import java.io.NotSerializableException;
-import java.util.List;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.StaticMemberPlaceHolder;
+import org.biojava.utils.Unchangeable;
 
 /**
  * The empty immutable implementation.

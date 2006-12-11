@@ -22,12 +22,14 @@
 
 package org.biojavax.ga.functions;
 
-import java.util.*;
+import java.util.Random;
 
-
-import org.biojava.bio.dist.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.dist.OrderNDistribution;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p> Simple no frills Implementation of the MutationFunction interface</p>

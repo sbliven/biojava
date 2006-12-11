@@ -75,7 +75,6 @@ class RestrictionSiteFinder implements Runnable
         try
         {
             Pattern [] patterns = RestrictionEnzymeManager.getPatterns(enzyme);
-            String name = enzyme.getName();
 
             int siteLen = enzyme.getRecognitionSite().length();
             int seqLen  = target.length();

@@ -1,9 +1,9 @@
 package org.biojava.bio.gui.sequence;
 
-import java.util.List;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.awt.*;
+import java.util.List;
 
 
 /**

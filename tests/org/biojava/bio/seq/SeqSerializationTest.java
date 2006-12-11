@@ -29,12 +29,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
 
+import junit.framework.TestCase;
+
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
-
-import junit.framework.TestCase;
 
 /**
  * Tests for Serialization

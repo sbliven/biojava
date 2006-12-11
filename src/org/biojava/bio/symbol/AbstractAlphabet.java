@@ -222,7 +222,6 @@ public abstract class AbstractAlphabet
     }
 
     Iterator si = syms.iterator();
-    Iterator ai = getAlphabets().iterator();
     int atomic = 0;
     while(si.hasNext()) {
       Symbol s = (Symbol) si.next();

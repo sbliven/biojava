@@ -21,10 +21,11 @@
 
 package org.biojava.ontology;
 
-import org.biojava.bio.Annotation;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Arrays;
+
+import org.biojava.bio.Annotation;
 
 /**
  * A term in another ontology.

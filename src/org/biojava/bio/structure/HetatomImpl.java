@@ -22,13 +22,13 @@
  *
  */
 package org.biojava.bio.structure;
-import org.biojava.bio.structure.io.PDBParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import java.util.ArrayList ;
-import java.util.List ;
-import java.util.HashMap ;
-import java.util.Map ;
-import java.util.Iterator ;
+import org.biojava.bio.structure.io.PDBParseException;
 
 /**
  *

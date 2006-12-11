@@ -22,14 +22,30 @@
 
 package org.biojavax.ga.util;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-
-import org.biojava.bio.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.OrderNDistribution;
+import org.biojava.bio.dist.OrderNDistributionFactory;
+import org.biojava.bio.dist.UniformDistribution;
+import org.biojava.bio.seq.io.CharacterTokenization;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetIndex;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleAlphabet;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 
 /**

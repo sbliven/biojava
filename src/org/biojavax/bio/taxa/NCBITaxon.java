@@ -21,6 +21,7 @@
 
 package org.biojavax.bio.taxa;
 import java.util.Set;
+
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;

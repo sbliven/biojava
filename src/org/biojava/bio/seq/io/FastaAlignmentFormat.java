@@ -24,13 +24,11 @@ package org.biojava.bio.seq.io;
 import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.symbol.Alignment;
@@ -101,13 +99,12 @@ public class FastaAlignmentFormat implements AlignmentFormat {
         Object curLabel = null;
         SymbolList curSeq = null;
         int lineWidth = 60;
-        SymbolTokenization toke = null;
 
         if (fileType == DNA) {
-            toke = DNATools.getDNA().getTokenization("token");
+            //toke = DNATools.getDNA().getTokenization("token");
         }
         else if (fileType == PROTEIN) {
-            toke = ProteinTools.getTAlphabet().getTokenization("token");
+            //toke = ProteinTools.getTAlphabet().getTokenization("token");
         }
         else {
             System.out.println("FastaAlignment.write -- File type not recognized.");

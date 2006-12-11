@@ -20,16 +20,20 @@
  */
 package org.biojava.bio.seq.db;
 
-import java.net.*;
-import java.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.Sequence;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.io.GenbankFormat;
+import org.biojava.bio.seq.io.SeqIOTools;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.symbol.Alphabet;
 
 /**
  * @author Lei Lai
@@ -37,14 +41,10 @@ import org.biojava.bio.seq.io.*;
  * @author Shuvankar Mukherjee
  */
 public class GenpeptSequenceDB {
-  private static SequenceFormat format;
+  private static SequenceFormat format = new GenbankFormat();
   private static String DBName = "Genpept";
   private boolean IOExceptionFound = false;
   private boolean ExceptionFound = false;
-
-  static {
-    SequenceFormat format = new GenbankFormat();
-  }
 
   protected SequenceFormat getSequenceFormat() {
     return format;
@@ -59,7 +59,6 @@ public class GenpeptSequenceDB {
     FetchURL seqURL = new FetchURL(DBName, defaultReturnFormat);
     String baseurl = seqURL.getbaseURL();
     String db = seqURL.getDB();
-    String returnFormat = seqURL.getReturnFormat();
 
     String url = baseurl + db + "&id=" + id + "&rettype=gb";
 
@@ -91,13 +90,6 @@ public class GenpeptSequenceDB {
       ExceptionFound = false;
       URL queryURL = getAddress(id); //achieve URL based on ID
 
-      //   System.err.println("query is "+ queryURL.toString());
-      SequenceFormat sFormat = getSequenceFormat(); //get incoming sequence format
-      SequenceBuilder sbuilder = new SimpleSequenceBuilder(); //create a sequence builder
-      SequenceBuilderFactory sFact = new GenbankProcessor.Factory(
-          SimpleSequenceBuilder.FACTORY);
-      Alphabet alpha = getAlphabet(); //get alphabet
-      SymbolTokenization rParser = alpha.getTokenization("token"); //get SymbolTokenization
 
       //System.err.println("got data from " + queryURL);
       DataInputStream in = new DataInputStream(queryURL.openStream());

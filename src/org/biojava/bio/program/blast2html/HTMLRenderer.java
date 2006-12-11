@@ -712,7 +712,6 @@ public class HTMLRenderer  {
      */
     void drawCurrentAlignment( BlastLikeAlignment oAlignment ) {
 
-	int iCurrentEnd = 0;
 	int i = 0;
 
 	int iCurrentQueryStart = Integer.parseInt

@@ -94,7 +94,6 @@ class FastaSearchParser
     private boolean searchParsed = false;
 
     private SearchContentHandler handler;
-    private BufferedReader       reader;
     private String               line;
     private int                  lineNumber;
 

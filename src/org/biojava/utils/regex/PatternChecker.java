@@ -13,9 +13,9 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.AtomicSymbol;
 import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 class PatternChecker
 {
@@ -53,14 +53,6 @@ class PatternChecker
         {
             if (hasNext())
                  return packedTxt.charAt(ptr++);
-            else
-                throw new IndexOutOfBoundsException("text length: " + packedTxt.length() + " index: " + ptr);
-        }
-        private char peekToken()
-            throws IndexOutOfBoundsException
-        {
-            if (hasNext())
-                 return packedTxt.charAt(ptr);
             else
                 throw new IndexOutOfBoundsException("text length: " + packedTxt.length() + " index: " + ptr);
         }

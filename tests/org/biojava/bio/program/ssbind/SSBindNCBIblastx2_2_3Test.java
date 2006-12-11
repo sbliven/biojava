@@ -25,14 +25,11 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
-import org.xml.sax.XMLReader;
-import org.xml.sax.InputSource;
-
-import junit.framework.TestCase;
-
 import org.biojava.bio.program.sax.BlastLikeSAXParser;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.seq.StrandedFeature;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
  * <code>SSBindNCBIblastx2_2_3Test</code> tests object bindings for

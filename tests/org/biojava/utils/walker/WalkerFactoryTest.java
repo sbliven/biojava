@@ -22,8 +22,8 @@
 package org.biojava.utils.walker;
 
 import junit.framework.TestCase;
+
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.FeatureFilter;
 
 /**
  * Tests just the basics of loading classes for viewers. Doesn't use the
@@ -44,11 +44,7 @@ extends TestCase {
 
   public void testAllVisitorNoReturn() {
     try {
-      WalkerFactory.getInstance().getWalker(new Visitor() {
-        public void featureFilter(FeatureFilter filter) {
-          return;
-        }
-      });
+      WalkerFactory.getInstance().getWalker(new Visitor() {});
     } catch (BioException be) {
       throw (AssertionError) new AssertionError(
               "Could not instantiate all visitor with no return").initCause(be);
@@ -59,9 +55,6 @@ extends TestCase {
   public void testAllVisitorWithReturn() {
     try {
       WalkerFactory.getInstance().getWalker(new Visitor() {
-        public Integer featureFilter(FeatureFilter filter) {
-          return new Integer(1);
-        }
       });
     } catch (BioException be) {
       throw (AssertionError) new AssertionError(

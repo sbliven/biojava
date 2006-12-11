@@ -22,8 +22,13 @@
 package org.biojava.bio.seq.projection;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Interface that defines the projection between original features and

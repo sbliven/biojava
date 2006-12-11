@@ -30,14 +30,12 @@ import junit.framework.TestCase;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
-import org.biojava.bio.symbol.AlphabetManager;
 
 /**
  * <code>SimpleSeqSimilaritySearchHitTest</code> tests the behaviour
@@ -49,9 +47,6 @@ public class SimpleSeqSimilaritySearchHitTest extends TestCase
 {
     private SeqSimilaritySearchHit h1;
     private SeqSimilaritySearchHit h2;
-
-    private Annotation an1;
-    private Annotation an2;
 
     private List subHits1;
     private List subHits2;

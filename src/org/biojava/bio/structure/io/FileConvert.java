@@ -21,19 +21,19 @@
  */
 package org.biojava.bio.structure.io;
 
-import org.biojava.bio.structure.*  ;
-
-import java.util.ArrayList          ;
-import java.util.HashMap            ;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.text.DecimalFormat      ;
 
-//xml writer ...
-import org.biojava.utils.xml.*      ;
-import java.io.IOException          ;
-
-//for formatting on numbers
-import java.text.NumberFormat       ;
+import org.biojava.bio.structure.Atom;
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.Group;
+import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureException;
+import org.biojava.utils.xml.XMLWriter;
 
 /** Methods to convert a structure object into different file formats.
  * @author Andreas Prlic

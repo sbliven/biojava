@@ -22,7 +22,6 @@
 package org.biojava.ontology;
 
 import junit.framework.TestCase;
-import org.biojava.utils.ChangeVetoException;
 
 /**
  * <code>TermImplTest</code>

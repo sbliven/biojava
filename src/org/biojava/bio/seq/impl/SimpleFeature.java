@@ -29,8 +29,6 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
-import org.biojava.ontology.OntoTools;
-import org.biojava.ontology.Term;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
@@ -40,6 +38,8 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.ontology.OntoTools;
+import org.biojava.ontology.Term;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeForwarder;
@@ -218,12 +218,12 @@ implements
                 ChangeEvent ce_name = new ChangeEvent(this, TYPE, t.getName(), this.getType());
                 cs.firePreChangeEvent(ce_term);
                 cs.firePreChangeEvent(ce_name);
-                this.typeTerm = typeTerm;
+                this.typeTerm = t;
                 cs.firePostChangeEvent(ce_term);
                 cs.firePostChangeEvent(ce_name);
             }
         } else {
-            this.typeTerm = typeTerm;
+            this.typeTerm = t;
         }
     }
 
@@ -276,7 +276,7 @@ implements
                 cs.firePostChangeEvent(ce_name);
             }
         } else {
-            this.sourceTerm = sourceTerm;
+            this.sourceTerm = t;
         }
     }
 

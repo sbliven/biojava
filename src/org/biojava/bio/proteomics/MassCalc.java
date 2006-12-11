@@ -170,7 +170,6 @@ public class MassCalc {
     public void setSymbolModification(char symbolToken, double mass)
         throws IllegalSymbolException
     {
-        Iterator list = ProteinTools.getAlphabet().iterator();
         SymbolTokenization toke;
 
         try {
@@ -434,7 +433,6 @@ public class MassCalc {
 
      private Symbol getSymbolForChar(char symbolToken)
          throws IllegalSymbolException{
-        Iterator list = ProteinTools.getAlphabet().iterator();
          SymbolTokenization toke;
          try {
              toke = ProteinTools.getAlphabet().getTokenization("token");

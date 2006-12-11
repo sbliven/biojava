@@ -21,8 +21,10 @@
 
 package org.biojavax.ga;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * A GA 'organism' contains one or more Chromosomes

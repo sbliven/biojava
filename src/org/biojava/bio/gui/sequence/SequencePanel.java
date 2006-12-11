@@ -26,7 +26,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.geom.Point2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.MouseAdapter;
@@ -34,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -46,9 +46,9 @@ import javax.swing.SwingConstants;
 
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.LocationTools;
 import org.biojava.utils.ChangeAdapter;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
@@ -631,10 +631,6 @@ public class SequencePanel
 
     public double getSize() {
       return size;
-    }
-
-    private void setSize(double size) {
-      this.size = size;
     }
 
     public int getAlignment() {

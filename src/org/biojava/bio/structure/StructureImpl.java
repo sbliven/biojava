@@ -23,13 +23,13 @@
  */
 package org.biojava.bio.structure;
 
-import java.util.ArrayList ;
-import java.util.HashMap   ;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map       ;
-import java.util.List      ;
+import java.util.List;
+import java.util.Map;
 
-import org.biojava.bio.structure.io.FileConvert ;
+import org.biojava.bio.structure.io.FileConvert;
 /**
  * Implementation of a PDB Structure. This class
  * provides the data contained in a PDB file.

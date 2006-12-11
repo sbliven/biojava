@@ -28,7 +28,6 @@ import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.impl.SimpleSequence;
-import org.biojava.bio.seq.homol.SimilarityPairFeature;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.ChangeListener;
 

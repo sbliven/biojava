@@ -38,9 +38,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.xml.parsers.ParserConfigurationException;
-import org.biojava.bio.proteomics.MassCalc;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.biojava.bio.proteomics.MassCalc;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;

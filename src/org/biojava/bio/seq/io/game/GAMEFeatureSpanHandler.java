@@ -44,8 +44,6 @@ public class GAMEFeatureSpanHandler extends StAXFeatureHandler {
   // this element could be a start codon feature or an exon.
   // Also, the lower value coordinate is one less than than the equivalent
   // EMBL coordinate but the higher value is the same.
-  private int start = 0;
-  private int end = 0;
   private StAXFeatureHandler staxenv;
 
   public static final StAXHandlerFactory GAME_FEATURESPAN_HANDLER_FACTORY

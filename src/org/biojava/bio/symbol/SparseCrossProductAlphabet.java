@@ -51,7 +51,6 @@ implements Serializable {
   private final int size;
   private final List alphas;
   private final Map knownSymbols;
-  private char tokenSeed = 'A';
 
   SparseCrossProductAlphabet(List alphas) {
     this.alphas = alphas;

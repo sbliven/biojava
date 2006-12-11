@@ -21,8 +21,8 @@
 
 package org.biojava.bio.search;
 
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * This class permits searching a SymbolList with another SymbolList while

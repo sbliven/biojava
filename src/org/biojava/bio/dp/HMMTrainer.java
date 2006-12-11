@@ -21,9 +21,9 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * interface implemented by objects that train HMMs.

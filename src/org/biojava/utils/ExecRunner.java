@@ -20,9 +20,9 @@ package org.biojava.utils;
 ///////////////////////////////////////////////////////////////////////////////
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -76,12 +76,6 @@ import java.util.StringTokenizer;
 
       /** Flag to indicate if we've exceeded max run time **/
       private boolean maxRunTimeExceeded = false;
-
-      /** The name of this class to log context without introspection **/
-      private static final String CLASS_NAME = "ExecRunner";
-
-      /** The version of this class (filled in by CVS) **/
-      private static final String VERSION = "CVS $Revision$";
 
       /**
        * Basic ExecRunner constructor.
@@ -682,11 +676,6 @@ import java.util.StringTokenizer;
       /** Our flag to allow us to safely terminate the monitoring thread **/
       private boolean quit = false;
 
-      /** The name of this class to log context without introspection **/
-      private static final String CLASS_NAME = "StreamGobbler";
-
-      /** The version of this class (filled in by CVS) **/
-      private static final String VERSION = "CVS $Revision$";
 
       /**
        * A simpler constructor for StreamGobbler - defaults to stdout.

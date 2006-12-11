@@ -21,14 +21,13 @@
 
 package org.biojava.bio.symbol;
 
-import java.io.PrintWriter;
 import java.io.IOException;
-import java.util.List;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.biojava.bio.symbol.CodonPref;
-import org.biojava.utils.xml.PrettyXMLWriter;
 import org.biojava.bio.BioException;
+import org.biojava.utils.xml.PrettyXMLWriter;
 
 
 public interface CodonPrefFilter

@@ -20,10 +20,11 @@
  */
 package org.biojava.bio.symbol;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.lang.ref.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.utils.AbstractChangeable;

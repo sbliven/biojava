@@ -22,6 +22,7 @@
 package org.biojavax;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
 import org.biojava.bio.Annotation;
 import org.biojava.utils.ChangeVetoException;
 

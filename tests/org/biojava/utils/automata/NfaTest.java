@@ -2,6 +2,7 @@
 package org.biojava.utils.automata;
 
 import junit.framework.TestCase;
+
 import org.biojava.bio.seq.DNATools;
 
 public class NfaTest

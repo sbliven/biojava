@@ -130,19 +130,18 @@ public class SVM_Light {
 	throws IOException
     {
 	BufferedReader r = new BufferedReader(new FileReader(fileName));
-	String format = firstToken(r.readLine());
+	r.readLine(); // format
 	String kType = firstToken(r.readLine());
 	String dParam = firstToken(r.readLine());
 	String gParam = firstToken(r.readLine());
-	String sParam = firstToken(r.readLine());
-	String rParam = firstToken(r.readLine());
-	String uParam = r.readLine();
-	String numSV = firstToken(r.readLine());
+	r.readLine(); // s
+	r.readLine(); // r
+	r.readLine(); // u
+	r.readLine(); // numSV
 	String threshString = firstToken(r.readLine());
 
 	SVMKernel kernel = null;
 	try {
-	    int size = Integer.parseInt(numSV);
 	    switch (Integer.parseInt(kType)) {
 	    case 0:
 		kernel = SparseVector.kernel;

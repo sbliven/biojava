@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
@@ -139,12 +140,12 @@ public class ThinRichSequence extends SimpleBioEntry implements RichSequence {
     }
     
     // Hibernate requirement - not for public use.
-    private String getCircularChar() {
+    String getCircularChar() {
         return getCircular()?ISCIRCULAR:null;
     }
 
     // Hibernate requirement - not for public use.
-    private void setCircularChar(final String isHiddenChar) throws ChangeVetoException {
+    void setCircularChar(final String isHiddenChar) throws ChangeVetoException {
         setCircular(isHiddenChar!=null || (isHiddenChar!=null && isHiddenChar.length() > 0));// any character will set
     }
 

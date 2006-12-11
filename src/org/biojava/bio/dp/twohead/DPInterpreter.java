@@ -261,7 +261,6 @@ public class DPInterpreter implements CellCalculatorFactory {
 
             double[] sourceScores = new double[tr.length];
         for (int ci = 0; ci < tr.length; ++ci) {
-          double[] sCol;
           double weight;
 
           int destI = tr[ci];
@@ -275,7 +274,6 @@ public class DPInterpreter implements CellCalculatorFactory {
               curCol[l] = Double.NaN;
               continue STATELOOP;
             }
-            sCol = targetCell.scores;
           } else {
             targetCell = curCell;
             weight = 0.0;
@@ -297,7 +295,6 @@ public class DPInterpreter implements CellCalculatorFactory {
           ci < tr.length;
           ci++
         ) {
-          int trc = tr[ci];
           double skc = sourceScores[ci];
           if(skc != Double.NEGATIVE_INFINITY && !Double.isNaN(skc)) {
             if(Double.isNaN(constant)) {

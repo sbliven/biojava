@@ -23,13 +23,27 @@ package org.biojava.bio.seq.projection;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
-import org.biojava.utils.ClassTools;
-import org.biojava.utils.bytecode.*;
 import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ClassTools;
+import org.biojava.utils.bytecode.ByteCode;
+import org.biojava.utils.bytecode.CodeClass;
+import org.biojava.utils.bytecode.CodeException;
+import org.biojava.utils.bytecode.CodeField;
+import org.biojava.utils.bytecode.CodeMethod;
+import org.biojava.utils.bytecode.CodeUtils;
+import org.biojava.utils.bytecode.GeneratedClassLoader;
+import org.biojava.utils.bytecode.GeneratedCodeClass;
+import org.biojava.utils.bytecode.GeneratedCodeMethod;
+import org.biojava.utils.bytecode.InstructionVector;
+import org.biojava.utils.bytecode.IntrospectedCodeClass;
+import org.biojava.utils.bytecode.LocalVariable;
 
 /**
  * Factory for proxy objects which project BioJava features

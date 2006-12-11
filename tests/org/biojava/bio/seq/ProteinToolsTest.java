@@ -21,12 +21,12 @@
 
 package org.biojava.bio.seq;
 
+import junit.framework.TestCase;
+
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SymbolList;
-
-import junit.framework.TestCase;
 
 /**
  * <code>ProteinToolsTest</code> tests are to ensure that the class can be

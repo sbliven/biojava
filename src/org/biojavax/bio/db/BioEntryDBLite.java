@@ -21,6 +21,7 @@
 
 package org.biojavax.bio.db;
 import java.util.Set;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.utils.ChangeType;

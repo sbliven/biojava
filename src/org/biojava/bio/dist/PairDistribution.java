@@ -95,8 +95,6 @@ implements Serializable, Distribution {
   private Distribution second;
   private Alphabet alphabet;
 
-  private Distribution nullModel;
-
   public Alphabet getAlphabet() {
     return alphabet;
   }

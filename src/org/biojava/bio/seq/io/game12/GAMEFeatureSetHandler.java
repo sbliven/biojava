@@ -40,9 +40,7 @@ public class GAMEFeatureSetHandler
     // database columns
 //    private String id;
 //    private String produces_seq;
-    private String featureSetName;
     private String featureSetType;
-    private String author;
 
     StrandedFeature.Template template;
 
@@ -173,7 +171,6 @@ public class GAMEFeatureSetHandler
          *@param  s  The new stringValue value
          */
         protected void setStringValue(String s) {
-            featureSetName = s.trim();
         }
     }
 
@@ -195,7 +192,6 @@ public class GAMEFeatureSetHandler
          *@param  s  The new stringValue value
          */
         protected void setStringValue(String s) {
-            author = s.trim();
         }
     }
 

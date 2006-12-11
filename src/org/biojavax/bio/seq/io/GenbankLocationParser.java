@@ -27,18 +27,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.CrossRef;
 import org.biojavax.Namespace;
-import org.biojavax.SimpleCrossRef;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.SimpleCrossRef;
 import org.biojavax.bio.seq.CompoundRichLocation;
 import org.biojavax.bio.seq.Position;
 import org.biojavax.bio.seq.RichLocation;
-import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.bio.seq.SimplePosition;
 import org.biojavax.bio.seq.SimpleRichLocation;
+import org.biojavax.bio.seq.RichLocation.Strand;
 import org.biojavax.ontology.ComparableTerm;
 
 

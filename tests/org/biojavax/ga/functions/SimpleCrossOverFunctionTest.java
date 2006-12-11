@@ -21,10 +21,11 @@
 
 package org.biojavax.ga.functions;
 
-import junit.framework.*;
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 
 /**

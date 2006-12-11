@@ -7,10 +7,13 @@
 
 package org.biojavax;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener.ChangeEventRecorder;
 import org.biojava.utils.ChangeVetoException;
-import junit.framework.*;
+import org.biojava.utils.ChangeListener.ChangeEventRecorder;
 
 /**
  *
@@ -74,7 +77,7 @@ public class SimpleCommentTest extends TestCase {
             ChangeEvent ev = cr.getEvent();
             assertNotNull(ev);
             //of the correct type
-            assertEquals(comment.RANK, ev.getType());
+            assertEquals(Comment.RANK, ev.getType());
             //old value should be Integer(1);
             assertEquals(new Integer(1), ev.getPrevious());
             //new value should be Integer(2);

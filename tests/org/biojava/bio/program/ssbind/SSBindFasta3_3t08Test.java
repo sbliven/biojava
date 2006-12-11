@@ -22,20 +22,13 @@
 package org.biojava.bio.program.ssbind;
 
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-import org.xml.sax.XMLReader;
-import org.xml.sax.InputSource;
-
 import org.biojava.bio.program.sax.FastaSearchSAXParser;
-import org.biojava.bio.search.SeqSimilaritySearchHit;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
-import org.biojava.bio.seq.StrandedFeature;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
  * <code>SSBindFasta3_3t08Test</code> tests object bindings for

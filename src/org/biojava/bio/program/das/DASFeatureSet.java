@@ -82,7 +82,6 @@ class DASFeatureSet
     private DASSequenceI                   refSequence;
     private URL                            dataSource;
     private String                         sourceID;
-    private String                         dataSourceString;
 
     DASFeatureSet(DASSequenceI seq, URL ds, String id)
         throws BioException
@@ -90,7 +89,6 @@ class DASFeatureSet
         refSequence = seq;
         dataSource = ds;
         sourceID = id;
-        dataSourceString = dataSource.toString();
     }
 
     private final static int TILE_THRESHOLD_LENGTH   = 1000000;

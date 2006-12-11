@@ -22,12 +22,15 @@
 
 package org.biojavax.ga.functions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Random;
 
-
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>Simple Implementation of the <code>CrossOverFunction</code> interface</p>

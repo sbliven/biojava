@@ -37,10 +37,10 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.AssertionFailure;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.AssertionFailure;
 
 /**
  * Internal class used by ProjectionEngine to wrap Feature objects.

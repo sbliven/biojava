@@ -67,10 +67,8 @@ public class IntegerAlphabetTest extends TestCase
     int min = 200;
     int max = 300;
  
-    IntegerAlphabet alpha = IntegerAlphabet.getInstance();
- 
-    Alphabet a1 = alpha.getSubAlphabet(min, max);
-    Alphabet a2 = alpha.getSubAlphabet(min, max);
+    Alphabet a1 = IntegerAlphabet.getSubAlphabet(min, max);
+    Alphabet a2 = IntegerAlphabet.getSubAlphabet(min, max);
  
     assertEquals(a1, a2);
   }
@@ -82,7 +80,7 @@ public class IntegerAlphabetTest extends TestCase
 
     IntegerAlphabet alpha = IntegerAlphabet.getInstance();
 
-    IntegerAlphabet.SubIntegerAlphabet a1 = alpha.getSubAlphabet(min, max);
+    IntegerAlphabet.SubIntegerAlphabet a1 = IntegerAlphabet.getSubAlphabet(min, max);
     for(int i = min; i <= max; i++) {
       assertEquals(
         a1.getSymbol(i),

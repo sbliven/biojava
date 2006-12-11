@@ -25,7 +25,12 @@ import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ObjectUtil;
 
 /**
  * <p><code>SequenceDBSearchSubHit</code> objects represent sub-hits

@@ -21,23 +21,41 @@
 
 package org.biojava.bio.seq.impl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.ontology.Term;
-import org.biojava.ontology.InvalidTermException;
-import org.biojava.bio.seq.projection.TranslateFlipContext;
-import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
-import org.biojava.bio.seq.projection.ReparentContext;
-import org.biojava.bio.seq.projection.Projection;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.RemoteFeature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.db.IllegalIDException;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
+import org.biojava.bio.seq.projection.Projection;
+import org.biojava.bio.seq.projection.ReparentContext;
+import org.biojava.bio.seq.projection.TranslateFlipContext;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.FuzzyLocation;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.ontology.InvalidTermException;
+import org.biojava.ontology.Term;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * View a sub-section of a given sequence object, including all the

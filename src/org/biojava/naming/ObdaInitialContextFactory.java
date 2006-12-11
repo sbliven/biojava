@@ -1,16 +1,20 @@
 package org.biojava.naming;
 
-import org.xml.sax.*;
-import org.xml.sax.helpers.DefaultHandler;
-
-import javax.naming.spi.InitialContextFactory;
-import javax.naming.Context;
-import javax.naming.NamingException;
-import javax.naming.Name;
-import javax.naming.directory.BasicAttributes;
-import javax.xml.parsers.SAXParserFactory;
-import org.biojava.utils.ClassTools;
 import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NamingException;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.spi.InitialContextFactory;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.biojava.utils.ClassTools;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *

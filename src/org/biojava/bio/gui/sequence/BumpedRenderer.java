@@ -31,7 +31,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.AssertionFailure;

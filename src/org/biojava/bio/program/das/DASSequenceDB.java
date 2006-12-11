@@ -75,7 +75,6 @@ public class DASSequenceDB
   implements
     SequenceDB
 {
-    private static final int MAX_CAPACITY = 3000;
     private URL dataSourceURL;
     private Map sequences;
     private Cache symbolsCache;
@@ -268,7 +267,6 @@ public class DASSequenceDB
                 Element el = parser.parse(is).getDocumentElement();
 
                 NodeList segl = el.getElementsByTagName("SEGMENT");
-                Element segment = null;
                 for (int i = 0; i < segl.getLength(); ++i) {
                     el = (Element) segl.item(i);
                     String id = el.getAttribute("id");

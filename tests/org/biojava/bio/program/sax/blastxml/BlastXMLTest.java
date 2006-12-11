@@ -21,23 +21,19 @@
 
 package org.biojava.bio.program.sax.blastxml;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
-import org.xml.sax.InputSource;
-
+import org.biojava.bio.program.ssbind.BlastLikeSearchBuilder;
+import org.biojava.bio.program.ssbind.SeqSimilarityAdapter;
+import org.biojava.bio.search.SearchContentHandler;
+import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.seq.db.DummySequenceDB;
 import org.biojava.bio.seq.db.DummySequenceDBInstallation;
-
-import org.biojava.bio.program.ssbind.SeqSimilarityAdapter;
-import org.biojava.bio.program.ssbind.BlastLikeSearchBuilder;
-
-import org.biojava.bio.search.SeqSimilaritySearchResult;
-import org.biojava.bio.search.SearchContentHandler;
-
-import java.io.InputStream;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.xml.sax.InputSource;
 
 public class BlastXMLTest
     extends TestCase

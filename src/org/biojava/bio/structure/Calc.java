@@ -24,7 +24,6 @@
 
 package org.biojava.bio.structure ;
 
-import org.biojava.bio.structure.StructureException ;
 import org.biojava.bio.structure.jama.Matrix;
 
 

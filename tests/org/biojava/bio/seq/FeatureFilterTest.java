@@ -21,11 +21,15 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
 import junit.framework.TestCase;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  * Tests for FeatureFilters.

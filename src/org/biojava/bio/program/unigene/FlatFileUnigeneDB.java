@@ -39,8 +39,6 @@ class FlatFileUnigeneDB
 extends Unchangeable
 implements UnigeneDB {
   private final BioStore dataStore;
-  private final BioStore liStore;
-  private final BioStore uniqueStore;
   private final BioStore allStore;
 
   private final Map clusterCache;
@@ -57,8 +55,6 @@ implements UnigeneDB {
     BioStore allStore
   ) throws BioException {
     this.dataStore = dataStore;
-    this.liStore = liStore;
-    this.uniqueStore = uniqueStore;
     this.allStore = allStore;
 
     try {
@@ -176,12 +172,10 @@ implements UnigeneDB {
   private static class BioIndexSequenceDB
   extends AbstractSequenceDB {
     private final BioStore store;
-    private final SequenceFormat format;
     private Set ids = null;
 
     public BioIndexSequenceDB(BioStore store, SequenceFormat format) {
       this.store = store;
-      this.format = format;
     }
 
     public Set ids() {

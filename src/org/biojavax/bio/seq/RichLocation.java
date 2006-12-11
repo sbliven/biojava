@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
 import org.biojava.bio.symbol.FuzzyLocation;
 import org.biojava.bio.symbol.FuzzyPointLocation;
 import org.biojava.bio.symbol.Location;

@@ -21,7 +21,7 @@
 
 package org.biojava.bio.program.das.dasalignment;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 
 /**
  * An exception of one of the DAS classes.

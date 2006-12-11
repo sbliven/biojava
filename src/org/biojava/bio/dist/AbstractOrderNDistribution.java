@@ -32,8 +32,6 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.Annotation;
-import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeType;

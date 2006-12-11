@@ -2,8 +2,10 @@ package org.biojava.bio.search;
 
 import junit.framework.TestCase;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SymbolList;
 
 public class SeqContentPatternTest
 extends TestCase {

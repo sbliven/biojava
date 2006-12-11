@@ -21,13 +21,25 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.util.*;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.projection.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceTools;
+import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
+import org.biojava.bio.seq.projection.Projection;
+import org.biojava.bio.seq.projection.TranslateFlipContext;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A reverse complement view onto <code>Sequence</code> interface.

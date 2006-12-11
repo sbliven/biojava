@@ -25,13 +25,11 @@
 package org.biojava.bio.structure.io;
 
 // the biojava-structure stuff
-import org.biojava.bio.structure.*;
+import java.io.IOException;
 
-       
-// das communication part
-import org.biojava.bio.program.das.dasstructure.* ;
-
-import java.io.*;
+import org.biojava.bio.program.das.dasstructure.DASStructureCall;
+import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureImpl;
 
 /**
  * A DAS client that connects to a DAS structure service and

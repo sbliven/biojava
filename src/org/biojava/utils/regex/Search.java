@@ -3,15 +3,15 @@
 
 package org.biojava.utils.regex;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.HashSet;
 
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * A utility class to make searching a Sequence with many regex patterns
@@ -60,14 +60,12 @@ public class Search
         }
     }
 
-    private FiniteAlphabet alfa;
     private Listener listener = null;
     private PatternFactory factory;
     private Set patterns = new HashSet();
 
     public Search(FiniteAlphabet alfa)
     {
-        this.alfa = alfa;
         factory = PatternFactory.makeFactory(alfa);
     }
 

@@ -26,9 +26,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.biojava.bio.BioException;
-
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.ChunkedSymbolList;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SimpleSymbolListFactory;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolListFactory;
+import org.biojava.bio.symbol.SymbolListViews;
 
 /**
  * class that makes ChunkedSymbolLists with the chunks

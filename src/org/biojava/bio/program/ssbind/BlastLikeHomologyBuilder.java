@@ -84,7 +84,6 @@ public class BlastLikeHomologyBuilder extends ViewSequenceFactory
     private Map hitData;
     private Map subHitData;
 
-    private AlphabetResolver   alphaResolver;
     private SymbolTokenization tokenParser;
     private StringBuffer       tokenBuffer;
 

@@ -30,9 +30,7 @@ import org.biojava.bio.AnnotationType;
 import org.biojava.bio.CardinalityConstraint;
 import org.biojava.bio.CollectionConstraint;
 import org.biojava.bio.PropertyConstraint;
-
-// for structure alignments
-import org.biojava.bio.structure.Atom ;
+import org.biojava.bio.structure.Atom;
 
 /**
  * Alignment object to contain/manage a DAS alignment.  

@@ -214,13 +214,4 @@ public class FeatureTableParser {
                 ++cnt;
         return cnt;
     }
-
-    private int countChar(String s, char c) {
-        int cnt = 0;
-        int length = s.length();
-        for (int i = 0; i < length; ++i)
-            if (s.charAt(i) == c)
-                ++cnt;
-        return cnt;
-    }
 }

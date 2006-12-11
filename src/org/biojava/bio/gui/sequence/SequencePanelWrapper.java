@@ -20,18 +20,21 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.gui.sequence.tracklayout.SimpleTrackLayout;
-import org.biojava.bio.gui.sequence.tracklayout.TrackLayout;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-
-import java.awt.*;
-
-import java.util.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+
+import org.biojava.bio.gui.sequence.tracklayout.SimpleTrackLayout;
+import org.biojava.bio.gui.sequence.tracklayout.TrackLayout;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ChangeVetoException;
 
 
 /**
@@ -49,7 +52,6 @@ public class SequencePanelWrapper extends JPanel {
 
     private RangeLocation range;
     private Sequence sequence;
-    private RangeLocation[] ranges = new RangeLocation[ 0 ];
     private SequencePanel[] seqPanels = new SequencePanel[ 0 ];
     private SequenceRenderer renderer;
     private double scale = 14.0;

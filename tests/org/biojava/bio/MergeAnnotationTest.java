@@ -22,9 +22,8 @@
 package org.biojava.bio;
 
 
-import org.biojava.bio.*;
-import junit.framework.*;
-import java.util.*;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /** List of tests for for MergeAnnotationTree.
  * @author Francois Pepin

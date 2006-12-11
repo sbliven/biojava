@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
-import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.impl.NewAssembledSymbolList;
@@ -36,7 +35,11 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A Sequence which is assembled from other sequences contained

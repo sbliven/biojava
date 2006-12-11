@@ -113,19 +113,19 @@ public class SimplePosition implements Position {
     public String getType() { return this.t; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void setFuzzyStart(boolean fs) { this.fs = fs; }
+    void setFuzzyStart(boolean fs) { this.fs = fs; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void setFuzzyEnd(boolean fe) { this.fe = fe; }
+    void setFuzzyEnd(boolean fe) { this.fe = fe; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void setStart(int s) { this.s = s; }
+    void setStart(int s) { this.s = s; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void setEnd(int e) { this.e = e; }
+    void setEnd(int e) { this.e = e; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void setType(String t) { this.t = t; }
+    void setType(String t) { this.t = t; }
     
     /** 
      * {@inheritDoc}
@@ -174,9 +174,9 @@ public class SimplePosition implements Position {
     private Integer id;
     
     // Hibernate requirement - not for public use - futureproofing
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use - futureproofing
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
     
 }

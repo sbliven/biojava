@@ -21,12 +21,14 @@
 
 package org.biojava.bio.seq;
 
+import java.util.ArrayList;
+
 import junit.framework.TestCase;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
-import java.util.*;
+import org.biojava.bio.symbol.CircularLocation;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * <code>CircularSequenceTest</code> tests are to ensure that the <code>CircularView</code>

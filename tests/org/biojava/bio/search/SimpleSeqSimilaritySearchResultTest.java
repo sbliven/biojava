@@ -23,7 +23,6 @@ package org.biojava.bio.search;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -35,10 +34,7 @@ import org.biojava.bio.seq.db.HashSequenceDB;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.AlphabetManager;
-import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
-import org.biojava.bio.symbol.SymbolList;
 
 /**
  * <code>SimpleSeqSimilaritySearchResultTest</code> tests the

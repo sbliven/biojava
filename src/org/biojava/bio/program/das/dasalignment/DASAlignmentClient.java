@@ -27,8 +27,7 @@
 package org.biojava.bio.program.das.dasalignment ;
 
 
-import java.io.*   ;
-import java.util.* ;
+import java.io.IOException;
 
 /**
  * A DAS client that connects to a DAS aligmnent service and

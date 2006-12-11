@@ -21,18 +21,27 @@
 
 package org.biojava.bio.seq.io.filterxml;
 
-import junit.framework.*;
+import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
+import java.io.PrintWriter;
 
-import java.util.*;
-import java.io.*;
-import javax.xml.parsers.*;
-import org.xml.sax.*;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.xml.*;
-import org.biojava.utils.stax.*;
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.FramedFeature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.biojava.utils.xml.PrettyXMLWriter;
+import org.biojava.utils.xml.XMLWriter;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
  * Test round-tripping of FeatureFilters via the FilterXML language 

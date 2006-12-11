@@ -21,40 +21,36 @@
 
 package org.biojava.bio.symbol;
 
-import java.io.InputStream;
 import java.io.BufferedReader;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.List;
-import java.util.HashMap;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.biojava.bio.BioException;
+import org.biojava.bio.dist.Count;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.DistributionTools;
+import org.biojava.bio.dist.IndexedCount;
+import org.biojava.bio.seq.RNATools;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ClassTools;
+import org.biojava.utils.xml.PrettyXMLWriter;
+import org.biojava.utils.xml.XMLWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import org.biojava.bio.BioError;
-import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.seq.RNATools;
-import org.biojava.bio.dist.DistributionTools;
-import org.biojava.bio.dist.Distribution;
-import org.biojava.bio.dist.SimpleDistribution;
-import org.biojava.bio.dist.Count;
-import org.biojava.bio.dist.IndexedCount;
-import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.utils.ClassTools;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.xml.XMLWriter;
-import org.biojava.utils.xml.PrettyXMLWriter;
 
 /**
  * An utility class for codon preferences

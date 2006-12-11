@@ -21,10 +21,12 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-import org.biojava.bio.symbol.Location;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
+
+import org.biojava.bio.symbol.Location;
 
 /**
  * Tests for AnnotationType.

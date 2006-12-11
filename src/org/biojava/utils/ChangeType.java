@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.biojava.bio.BioError;
+
 /**
  *
  * Class for all constants which are used to indicate change

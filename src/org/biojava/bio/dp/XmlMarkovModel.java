@@ -217,7 +217,6 @@ public class XmlMarkovModel {
       Element transitionE = (Element) transitions.item(i);
       State from = (State) nameToState.get(transitionE.getAttribute("from"));
       State to = (State) nameToState.get(transitionE.getAttribute("to"));
-      double prob = Double.parseDouble(transitionE.getAttribute("prob"));
       try {
         model.createTransition(from, to);
       } catch (IllegalSymbolException ite) {

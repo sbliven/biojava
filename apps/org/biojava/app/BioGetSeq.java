@@ -21,15 +21,19 @@
 
 package org.biojava.app;
 
-import java.util.Iterator;
-
-import org.apache.commons.cli.*;
-
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.db.SequenceDBLite;
-import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SeqIOTools;
+import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.directory.Registry;
 import org.biojava.directory.SystemRegistry;
 

@@ -18,7 +18,6 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-//import org.biojava.bio.program.sql.DBObject;
 
 /**
  *  Handles the root GAME element

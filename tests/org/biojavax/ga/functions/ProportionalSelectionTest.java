@@ -21,15 +21,17 @@
 
 package org.biojavax.ga.functions;
 
-import junit.framework.*;
-import org.biojava.utils.*;
-import java.util.*;
-import org.biojavax.ga.Population;
-import org.biojavax.ga.Organism;
+import java.util.Iterator;
+
+import junit.framework.TestCase;
+
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ga.GeneticAlgorithm;
-import org.biojavax.ga.impl.SimplePopulation;
-import org.biojavax.ga.impl.SimpleOrganism;
+import org.biojavax.ga.Organism;
+import org.biojavax.ga.Population;
 import org.biojavax.ga.impl.SimpleGeneticAlgorithm;
+import org.biojavax.ga.impl.SimpleOrganism;
+import org.biojavax.ga.impl.SimplePopulation;
 
 
 

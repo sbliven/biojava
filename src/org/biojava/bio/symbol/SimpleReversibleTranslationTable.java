@@ -24,10 +24,7 @@ package org.biojava.bio.symbol;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A no-frills implementation of TranslationTable that uses a Map to map from

@@ -37,13 +37,11 @@ package org.biojava.stats.svm;
 public class SMORegressionTrainer {
   private double C = 1000;
   private double epsilon = 0.000001;
-  private double minimumNumChanged = 2;
     
   // Working variables for the trainer: protected by the
   // synchronization on trainModel.
 
   private SVMRegressionModel model;
-  private SVMKernel kernel;
   private double[] target;
   private double[] E;
 
@@ -86,10 +84,6 @@ public class SMORegressionTrainer {
     System.out.println("eta=" + eta);
     
     boolean case1, case2, case3, case4, finnished, changed;
-    double alpha1old = alpha1;
-    double alpha1starold = alpha1star;
-    double alpha2old = alpha2;
-    double alpha2starold = alpha2star;
     double deltaphi = phi2 - phi1;
     case1 = case2 = case3 = case4 = finnished = changed = false;
 
@@ -303,7 +297,6 @@ public class SMORegressionTrainer {
   }
   
   private int examineExample(int i2) {
-    double y2 = target[i2];
     double alpha2 = model.getAlpha(i2);
     double alpha2star = model.getAlphaStar(i2);
     double phi2 = getError(i2);
@@ -388,7 +381,6 @@ public class SMORegressionTrainer {
   public synchronized void trainModel(SVMRegressionModel m, double[] t) {
     model = m;
     target = t;
-    kernel = m.getKernel();
 
     E = new double[model.size()];
     for (int i = 0; i < t.length; ++i) {

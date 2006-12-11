@@ -21,8 +21,6 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;

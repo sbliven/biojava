@@ -368,7 +368,6 @@ public class SMOTrainer {
     }
     
     public double getError(int i) {
-      double target = getTarget(i);
       double alpha = getAlpha(i);
       if (isBound(alpha)) {
         return E[i] = getModel().classify(getItem(i)) - getTarget(i);

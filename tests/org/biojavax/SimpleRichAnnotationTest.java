@@ -9,13 +9,16 @@ package org.biojavax;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import junit.framework.*;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojavax.ontology.ComparableOntology;
 import org.biojavax.ontology.ComparableTerm;
-import org.biojavax.ontology.SimpleComparableTerm;
 
 /**
  *

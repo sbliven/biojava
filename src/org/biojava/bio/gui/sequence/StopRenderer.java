@@ -175,7 +175,6 @@ public class StopRenderer implements SequenceRenderer {
       Graphics2D g,
       SequenceRenderContext src
     ) {
-      SymbolList seq = src.getSymbols();
       double scale = src.getScale();
 
       // this is a completely arbitrary limit to stop my viewer

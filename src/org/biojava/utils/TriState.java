@@ -14,11 +14,9 @@ public final class TriState
     public static final TriState FALSE = new TriState("FALSE");
     public static final TriState INDETERMINATE = new TriState("INDETERMINATE");
 
-    private String description;
 
     private TriState(String description)
     {
-        this.description = description;
     }
 }
 

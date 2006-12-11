@@ -23,6 +23,7 @@ package org.biojavax.bio.db;
 
 import java.util.Iterator;
 import java.util.Set;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;

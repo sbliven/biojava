@@ -22,15 +22,16 @@
 package org.biojavax.bio;
 
 import java.util.Set;
+
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
-import org.biojavax.RankedCrossRefable;
-import org.biojavax.bio.taxa.NCBITaxon;
+import org.biojavax.Comment;
 import org.biojavax.Namespace;
+import org.biojavax.RankedCrossRefable;
 import org.biojavax.RankedDocRef;
 import org.biojavax.RichAnnotatable;
-import org.biojavax.Comment;
+import org.biojavax.bio.taxa.NCBITaxon;
 
 /**
  * This class relates to the bioentry table in BioSQL. It holds everything you need

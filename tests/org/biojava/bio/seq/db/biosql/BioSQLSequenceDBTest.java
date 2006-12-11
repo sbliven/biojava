@@ -24,15 +24,16 @@ package org.biojava.bio.seq.db.biosql;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
 import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
@@ -41,7 +42,6 @@ import org.biojava.bio.seq.db.AbstractSequenceDBTest;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.symbol.BetweenLocation;
-import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
 

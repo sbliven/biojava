@@ -1,7 +1,7 @@
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * A renderer context that allows some or all properties of another context to

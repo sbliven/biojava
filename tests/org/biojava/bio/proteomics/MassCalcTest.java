@@ -24,6 +24,7 @@ package org.biojava.bio.proteomics;
 import junit.framework.TestCase;
 
 import org.biojava.bio.BioException;
+import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
@@ -31,7 +32,6 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.SymbolPropertyTable;
-import org.biojava.bio.seq.ProteinTools;
 
 /**
  * <code>MassCalcTest</code> tests molecular mass calculation.

@@ -47,8 +47,8 @@ import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>

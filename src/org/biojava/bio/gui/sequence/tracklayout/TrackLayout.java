@@ -20,8 +20,8 @@
  */
 package org.biojava.bio.gui.sequence.tracklayout;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.RangeLocation;
 
 
 /**

@@ -44,17 +44,28 @@ package org.biojava.bio.seq;
 
 
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-
-
-import org.biojava.bio.*;
-
-import org.biojava.bio.seq.io.*;
-
-import org.biojava.bio.seq.impl.*;
-
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.impl.SimpleSequenceFactory;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.ReversibleTranslationTable;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolListViews;
 
 
 

@@ -25,13 +25,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.utils.walker.WalkerFactory;
-import org.biojava.utils.walker.Visitor;
-import org.biojava.utils.walker.Walker;
+import org.biojava.bio.AnnotationTools;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.BioException;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.PropertyConstraint;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
-import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.walker.Visitor;
+import org.biojava.utils.walker.Walker;
+import org.biojava.utils.walker.WalkerFactory;
 
 /**
  * A set of FeatureFilter algebraic operations.

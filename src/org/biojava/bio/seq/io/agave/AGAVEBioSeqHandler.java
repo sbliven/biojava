@@ -49,8 +49,6 @@ public class AGAVEBioSeqHandler
     }
   };
 
-  private Location range = Location.empty;
-  private StrandedFeature.Strand strand = StrandedFeature.UNKNOWN;
   //dna sequence,
   private SymbolList dna ;
   protected Sequence sequence ;

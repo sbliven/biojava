@@ -21,11 +21,15 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
+import java.util.Iterator;
+
 import junit.framework.TestCase;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Tests for SimpleAssembly.  By dependancy, this also

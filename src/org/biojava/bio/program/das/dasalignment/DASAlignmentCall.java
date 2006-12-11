@@ -28,19 +28,20 @@
 
 package org.biojava.bio.program.das.dasalignment ;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.io.*;
 import java.net.URL;
-import java.util.Properties ;
 import java.util.zip.GZIPInputStream;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
-
-import org.xml.sax.helpers.*;
-import org.xml.sax.*;
-import javax.xml.parsers.*;
-
-import java.util.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.XMLReader;
 
 /** takes care of the communication with a DAS Alignment service.
  *

@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Stack;
+
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
@@ -1015,7 +1016,6 @@ public class TaxonSQL {
     */
   public static void removeRank(Connection conn, DBHelper helper, Taxon tdb) throws BioRuntimeException
   {
-    DBHelper.DeleteStyle del = helper.getDeleteStyle();
     PreparedStatement ps = null;
     try {
       ps = conn.prepareStatement("UPDATE taxon SET node_rank = NULL WHERE taxon_id = ?");
@@ -1064,7 +1064,6 @@ public class TaxonSQL {
     */
   public static void removeGeneticCodeID(Connection conn, DBHelper helper, Taxon tdb) throws BioRuntimeException
   {
-    DBHelper.DeleteStyle del = helper.getDeleteStyle();
     PreparedStatement ps = null;
     try {
       ps = conn.prepareStatement("UPDATE taxon SET genetic_code = NULL WHERE taxon_id = ?");
@@ -1114,7 +1113,6 @@ public class TaxonSQL {
     */
   public static void removeMitochondrialGeneticCodeID(Connection conn, DBHelper helper, Taxon tdb) throws BioRuntimeException
   {
-    DBHelper.DeleteStyle del = helper.getDeleteStyle();
     PreparedStatement ps = null;
     try {
       ps = conn.prepareStatement("UPDATE taxon SET mito_genetic_code = NULL WHERE taxon_id = ?");
@@ -1163,7 +1161,6 @@ public class TaxonSQL {
     */
   public static void removeLeftValue(Connection conn, DBHelper helper, Taxon tdb) throws BioRuntimeException
   {
-    DBHelper.DeleteStyle del = helper.getDeleteStyle();
     PreparedStatement ps = null;
     try {
       ps = conn.prepareStatement("UPDATE taxon SEQ left_value = NULL WHERE taxon_id = ?");
@@ -1212,7 +1209,6 @@ public class TaxonSQL {
     */
   public static void removeRightValue(Connection conn, DBHelper helper, Taxon tdb) throws BioRuntimeException
   {
-    DBHelper.DeleteStyle del = helper.getDeleteStyle();
     PreparedStatement ps = null;
     try {
       ps = conn.prepareStatement("UPDATE taxon SEQ right_value = NULL WHERE taxon_id = ?");

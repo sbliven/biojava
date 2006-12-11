@@ -20,11 +20,11 @@
 
 package org.biojava.bio.seq.io;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.biojava.bio.AbstractAnnotation;
 import org.biojava.utils.ChangeVetoException;
-
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * @author Lorna Morris

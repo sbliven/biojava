@@ -21,9 +21,8 @@
 
 package org.biojava.bio.program.homologene;
 
-import java.util.Set;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Set;
 
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;

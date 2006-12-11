@@ -20,7 +20,7 @@
  */
 package org.biojava.bio.seq.io.agave;
 
-import org.xml.sax.*;
+import org.xml.sax.SAXException;
 
 /**
  * Interface which exposes delegation services offered by a StAX

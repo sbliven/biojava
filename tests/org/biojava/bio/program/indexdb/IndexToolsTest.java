@@ -21,14 +21,12 @@
 
 package org.biojava.bio.program.indexdb;
 
-import junit.framework.TestCase;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 
-import org.biojava.bio.BioException;
+import junit.framework.TestCase;
+
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.SequenceDBLite;
 import org.biojava.bio.seq.db.flat.FlatSequenceDB;

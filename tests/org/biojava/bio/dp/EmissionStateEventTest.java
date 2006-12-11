@@ -1,14 +1,15 @@
 package org.biojava.bio.dp;
 
+import junit.framework.TestCase;
+
+import org.biojava.bio.Annotation;
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.dist.DistributionFactory;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.Annotation;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
-import junit.framework.TestCase;
 
 /**
  * Test emission state events.

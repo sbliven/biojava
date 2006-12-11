@@ -21,7 +21,13 @@
 
 package org.biojava.bio.search;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.AlphabetIndex;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * A pattern that can be used to find regions with given sequence content.

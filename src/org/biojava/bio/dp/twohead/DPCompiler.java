@@ -890,9 +890,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
   {
     CodeClass _Cell = IntrospectedCodeClass.forClass(Cell.class);
     CodeField _Cell_score = _Cell.getFieldByName("scores");
-    CodeField _Cell_backpointer = _Cell.getFieldByName("backPointers");
     CodeField _Cell_emissions = _Cell.getFieldByName("emissions");
-    CodeClass _State = IntrospectedCodeClass.forClass(State.class);
     CodeClass _double_A = IntrospectedCodeClass.forClass(double [].class);
     CodeClass _Math = IntrospectedCodeClass.forClass(Math.class);
     CodeMethod _Math_exp = _Math.getMethod("exp", new CodeClass[] { CodeUtils.TYPE_DOUBLE });
@@ -1149,9 +1147,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
   {
     CodeClass _Cell = IntrospectedCodeClass.forClass(Cell.class);
     CodeField _Cell_score = _Cell.getFieldByName("scores");
-    CodeField _Cell_backpointer = _Cell.getFieldByName("backPointers");
     CodeField _Cell_emissions = _Cell.getFieldByName("emissions");
-    CodeClass _State = IntrospectedCodeClass.forClass(State.class);
     CodeClass _double_A = IntrospectedCodeClass.forClass(double [].class);
     CodeClass _Math = IntrospectedCodeClass.forClass(Math.class);
     CodeMethod _Math_exp = _Math.getMethod("exp", new CodeClass[] { CodeUtils.TYPE_DOUBLE });
@@ -1434,16 +1430,12 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
       CodeClass _Symbol = IntrospectedCodeClass.forClass(Symbol.class);
       CodeClass _State = IntrospectedCodeClass.forClass(State.class);
       CodeClass _State_A = IntrospectedCodeClass.forClass(State [].class);
-      CodeClass _CellCalculator = IntrospectedCodeClass.forClass(CellCalculator.class);
       CodeClass _double_A = IntrospectedCodeClass.forClass(double [].class);
       CodeClass _DP = IntrospectedCodeClass.forClass(DP.class);
       CodeMethod _DP_getStates = _DP.getMethod("getStates", CodeUtils.EMPTY_LIST);
       CodeMethod _DP_getModel = _DP.getMethod("getModel", CodeUtils.EMPTY_LIST);
-      CodeClass _BackPointer = IntrospectedCodeClass.forClass(BackPointer.class);
       CodeClass _Distribution = IntrospectedCodeClass.forClass(Distribution.class);
       CodeMethod _Distribution_getAlphabet = _Distribution.getMethod("getAlphabet", CodeUtils.EMPTY_LIST);
-      CodeMethod _Distribution_getWeight = _Distribution.getMethod("getWeight", new CodeClass[] {_Symbol});
-      CodeClass _Cell = IntrospectedCodeClass.forClass(Cell.class);
       CodeClass _ScoreType = IntrospectedCodeClass.forClass(ScoreType.class);
       CodeMethod _ScoreType_calculateScore = _ScoreType.getMethod("calculateScore", new CodeClass[] {_Distribution, _Symbol});
       CodeClass _MarkovModel = IntrospectedCodeClass.forClass(MarkovModel.class);
@@ -1620,7 +1612,6 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
       CodeField _System_out = _System.getFieldByName("out");
       CodeClass _PrintStream = IntrospectedCodeClass.forClass(PrintStream.class);
       CodeMethod _PrintStream_print = _PrintStream.getMethod("print", new CodeClass[] { _String });
-      CodeMethod _PrintStream_println = _PrintStream.getMethod("println", new CodeClass[] { _String });
 
       InstructionVector iv = new InstructionVector();
 

@@ -19,8 +19,8 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Packing;
 import org.biojava.bio.symbol.Symbol;
-import org.biojava.utils.Constants;
 import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.Constants;
 
 /**
  * <p>
@@ -539,23 +539,4 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     }
   }
   
-  private void validateNames(int nameCount, IntBuffer nameArray, MappedByteBuffer nameTable) {
-    for(int ni = 0; ni < nameCount; ni++) {
-      int pos = nameArray.get(ni + 1);
-      if(pos < 0) {
-        throw new Error("Negative pos at index: " + ni);
-      }
-      
-      int length = nameTable.getInt(Constants.BYTES_IN_INT + pos);
-      if(length < 1 || length > 100) {
-        throw new Error("Silly sequence length for " + ni + " : " + length);
-      }
-      
-      StringBuffer buff = new StringBuffer(length);
-      for(int ci = 0; ci < length; ci++) {
-        buff.append(nameTable.getChar(Constants.BYTES_IN_INT + pos + Constants.BYTES_IN_INT + Constants.BYTES_IN_CHAR * ci));
-      }
-      System.out.println(ni + " " + buff);
-    }
-  }
 }

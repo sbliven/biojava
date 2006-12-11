@@ -21,7 +21,7 @@
 
 package org.biojava.bio.structure;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 
 /**
  * An exception during the parsing of a PDB file.

@@ -8,14 +8,18 @@
 package org.biojavax;
 
 import java.util.Collections;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener.ChangeEventRecorder;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ChangeListener.ChangeEventRecorder;
 import org.biojavax.bio.seq.Position;
-import org.biojavax.bio.seq.SimplePosition;
 import org.biojavax.bio.seq.RichLocation;
+import org.biojavax.bio.seq.SimplePosition;
 import org.biojavax.bio.seq.SimpleRichLocation;
-import junit.framework.*;
 
 /**
  *

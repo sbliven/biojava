@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.Alphabet;
@@ -64,7 +62,6 @@ public final class IndexedCount
   //must be transient as indices may vary between VM's
   private transient AlphabetIndex indexer;
   private transient double[] counts;
-  private Map symbolIndices = null; //for serialization
   private FiniteAlphabet alpha;
 
   public Alphabet getAlphabet() {

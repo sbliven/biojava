@@ -121,8 +121,7 @@ public class Formats {
   extends SimpleTagValueWrapper {
     private TagValueParser featurePropertyParser = new FeaturePropertyParser();
     private int depth = 0;
-
-    private TagValueListener childListener;
+    
     private boolean inLocation;
 
     public FeatureTableListener() {

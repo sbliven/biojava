@@ -1,12 +1,12 @@
 package org.biojava.bio.seq.impl;
 
-import org.biojava.bio.seq.Feature;
-import org.biojava.bio.BioException;
-import org.biojava.bio.BioError;
-import org.biojava.utils.AssertionFailure;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Feature;
+import org.biojava.utils.AssertionFailure;
 
 /**
  * Common things you may want to do with feature templates.

@@ -27,9 +27,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import javax.sql.DataSource;
+
 import org.biojava.bio.BioRuntimeException;
-//import org.biojava.utils.JDBCConnectionPool;
 
 /**
  * This is a <code>DBHelper</code> that provides support for the

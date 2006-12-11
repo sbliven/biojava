@@ -382,7 +382,6 @@ public class XMLFilterWriter {
                                 XMLFilterWriter config)
             throws ClassCastException, IllegalArgumentException, IOException
         {
-            FeatureFilter.And ffa = (FeatureFilter.And) ff;
             xw.openTag(XML_FILTER_NS, "and");
             writeSubFilter(ff, xw, config);
             xw.closeTag(XML_FILTER_NS, "and");
@@ -409,7 +408,6 @@ public class XMLFilterWriter {
                                 XMLFilterWriter config)
             throws ClassCastException, IllegalArgumentException, IOException
         {
-            FeatureFilter.Or ffa = (FeatureFilter.Or) ff;
             xw.openTag(XML_FILTER_NS, "or");
             writeSubFilter(ff, xw, config);
             xw.closeTag(XML_FILTER_NS, "or");

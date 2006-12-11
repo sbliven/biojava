@@ -20,18 +20,20 @@
  */
 package org.biojava.bio.seq.io;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * JUnit test for SeqIOTools objects

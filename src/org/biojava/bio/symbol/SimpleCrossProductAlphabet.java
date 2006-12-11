@@ -51,7 +51,6 @@ implements Serializable {
   private final Alphabet parent;
   private final List alphas;
   private final HashMap ourSymbols;
-  private char tokenSeed = 'A';
 
   /**
    * Create a cross-product alphabet over the list of alphabets in 'a'.

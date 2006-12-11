@@ -36,7 +36,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.biojava.utils.ClassTools;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
@@ -52,6 +51,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.PointLocation;
 import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ClassTools;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

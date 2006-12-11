@@ -21,16 +21,11 @@
 package org.biojava.utils;
 
 import javax.sql.DataSource;
-import org.apache.commons.dbcp.PoolingDataSource;
-import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.DataSourceConnectionFactory;
-import org.apache.commons.dbcp.DriverConnectionFactory;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.dbcp.ConnectionFactory;
+
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp.PoolingDataSource;
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
 * Returns a DataSource that implements connection pooling
@@ -64,9 +59,6 @@ public class JDBCPooledDataSource {
   
     // Create a PoolableDataSource as described in http://jakarta.apache.org/commons/dbcp/api/overview-summary.html#overview_description
     ObjectPool connectionPool = new GenericObjectPool(null);
-    ConnectionFactory connectionFactory = new DataSourceConnectionFactory(ds);
-    PoolableObjectFactory poolableConnectionFactory = new 
-      PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
     PoolingDataSource dataSource = new MyPoolingDataSource(connectionPool, url + user);
 
     return dataSource;

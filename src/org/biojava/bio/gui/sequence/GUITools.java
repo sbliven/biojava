@@ -1,12 +1,11 @@
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.RangeLocation;
-
-
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  *

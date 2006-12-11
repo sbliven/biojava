@@ -8,9 +8,13 @@
 package org.biojavax;
 
 import java.util.Collections;
-import junit.framework.*;
 import java.util.List;
 import java.util.zip.Checksum;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojavax.utils.CRC64Checksum;
 
 

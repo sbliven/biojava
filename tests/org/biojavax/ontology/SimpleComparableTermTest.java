@@ -10,7 +10,11 @@ package org.biojavax.ontology;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
-import junit.framework.*;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeListener.ChangeEventRecorder;
@@ -202,7 +206,7 @@ public class SimpleComparableTermTest extends TestCase {
             ChangeEvent ev = cr.getEvent();
             assertNotNull(ev);
             //of the correct type
-            assertEquals(t1.RANKEDCROSSREF, ev.getType());
+            assertEquals(ComparableTerm.RANKEDCROSSREF, ev.getType());
             //old value should be null
             assertNull(ev.getPrevious());
             //new should be xref
@@ -228,7 +232,7 @@ public class SimpleComparableTermTest extends TestCase {
             ChangeEvent ev = cr.getEvent();
             assertNotNull(ev);
             //of the correct type
-            assertEquals(t1.RANKEDCROSSREF, ev.getType());
+            assertEquals(ComparableTerm.RANKEDCROSSREF, ev.getType());
             //old value should be xref
             assertEquals(xref, ev.getPrevious());
             //new should be null
@@ -275,7 +279,7 @@ public class SimpleComparableTermTest extends TestCase {
             ChangeEvent ev = cr.getEvent();
             assertNotNull(ev);
             //of the correct type
-            assertEquals(t1.DESCRIPTION, ev.getType());
+            assertEquals(ComparableTerm.DESCRIPTION, ev.getType());
             //old value should be null
             assertNull(ev.getPrevious());
             //new should be desc
@@ -345,7 +349,7 @@ public class SimpleComparableTermTest extends TestCase {
             ChangeEvent ev = cr.getEvent();
             assertNotNull(ev);
             //of the correct type
-            assertEquals(t1.IDENTIFIER, ev.getType());
+            assertEquals(ComparableTerm.IDENTIFIER, ev.getType());
             //old value should be null
             assertNull(ev.getPrevious());
             //new should be desc
@@ -378,7 +382,7 @@ public class SimpleComparableTermTest extends TestCase {
             ChangeEvent ev = cr.getEvent();
             assertNotNull(ev);
             //of the correct type
-            assertEquals(t1.OBSOLETE, ev.getType());
+            assertEquals(ComparableTerm.OBSOLETE, ev.getType());
             //old value should be null
             assertEquals(Boolean.FALSE, ev.getPrevious());
             //new should be true

@@ -19,10 +19,8 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import org.biojava.utils.ChangeVetoException;
-import org.xml.sax.*;
-import java.util.List;
-import java.util.Vector;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Deals with match_region

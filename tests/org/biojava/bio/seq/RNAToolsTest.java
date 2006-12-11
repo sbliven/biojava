@@ -21,18 +21,31 @@
 
 package org.biojava.bio.seq;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import junit.framework.TestCase;
+
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.ManyToOneTranslationTable;
+import org.biojava.bio.symbol.SimpleGeneticCodeTable;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.TranslationTable;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
-
-import java.util.*;
 
 /**
  * <code>RNAToolsTest</code> tests are to ensure that the static methods

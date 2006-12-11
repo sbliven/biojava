@@ -21,12 +21,13 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.Iterator;
+
 import junit.framework.TestCase;
+
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.RNATools;
-
-import java.util.Iterator;
 
 public class TranslationTest extends TestCase {
     private SymbolList dnaForm;

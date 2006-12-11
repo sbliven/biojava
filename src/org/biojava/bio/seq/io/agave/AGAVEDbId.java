@@ -40,9 +40,6 @@
 
 package org.biojava.bio.seq.io.agave;
 
-import java.util.*;
-
-
 
 /**
 

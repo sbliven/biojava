@@ -4,17 +4,17 @@
 package org.biojava.utils.automata;
 
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.AlphabetIndex;
+import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.AlphabetIndex;
-import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.SymbolList;
 
 public class PatternBlitz
 {

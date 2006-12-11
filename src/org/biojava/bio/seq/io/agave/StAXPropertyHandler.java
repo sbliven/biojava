@@ -19,13 +19,15 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.xml.sax.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.utils.ChangeVetoException;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * StAX handler shamelessly ripped off from Thomas Down's

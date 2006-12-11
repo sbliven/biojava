@@ -68,7 +68,6 @@ public class BioIndex implements IndexStore {
   private File[] fileIDToFile;
 
   private FileAsList indxList;
-  private Map secondaryKeyToFileAsList;
 
   private Set idSet = new ListAsSet();
 
@@ -450,7 +449,7 @@ public class BioIndex implements IndexStore {
           bs = (String) b;
         }
 
-        return STRING_CASE_SENSITIVE_ORDER.compare(a, b);
+        return STRING_CASE_SENSITIVE_ORDER.compare(as, bs);
       }
     };
 
@@ -529,96 +528,6 @@ public class BioIndex implements IndexStore {
 
     public Comparator getComparator() {
       return INDEX_COMPARATOR;
-    }
-  }
-
-  private static final class Record {
-    private final String key;
-    private final String value;
-
-    public Record(String key, String value) {
-      this.key = key;
-      this.value = value;
-    }
-
-    public String getKey() {
-      return key;
-    }
-
-    public String getValue() {
-      return value;
-    }
-
-    public int hashCode() {
-      return key.hashCode();
-    }
-  }
-
-  private class SecondaryIDFileAsList extends FileAsList {
-    private Comparator RECORD_COMPARATOR = new Comparator() {
-      public int compare(Object a, Object b) {
-        String as;
-        String bs;
-
-        if(a instanceof Record) {
-          as = ((Record) a).getKey();
-        } else {
-          as = (String) a;
-        }
-
-        if(b instanceof Index) {
-          bs = ((Record) b).getKey();
-        } else {
-          bs = (String) b;
-        }
-
-        return STRING_CASE_SENSITIVE_ORDER.compare(a, b);
-      }
-    };
-
-    public SecondaryIDFileAsList(RandomAccessFile file, int recordLength) {
-      super(file, recordLength);
-    }
-
-    public Object parseRecord(byte[] buffer) {
-      int tab = 0;
-
-      while(buffer[tab] != '\t') {
-        tab++;
-      }
-
-      String key = new String(buffer, 0, tab);
-      String value = new String(buffer, tab + 1, buffer.length).trim();
-
-      return new Record(key, value);
-    }
-
-    protected void generateRecord(byte[] buffer, Object item) {
-      Record rec = (Record) item;
-      byte[] str;
-      int indx = 0;
-
-      str = rec.getKey().getBytes();
-      for(int i = 0; i < str.length; i++) {
-        buffer[indx++] = str[i];
-      }
-
-      buffer[indx++] = '\t';
-
-      str = rec.getValue().getBytes();
-      for(int i = 0; i < str.length; i++) {
-        buffer[indx++] = str[i];
-      }
-
-      while(indx < buffer.length - 1) {
-        buffer[indx++] = ' ';
-      }
-
-      buffer[buffer.length - 1] = '\n';
-    }
-
-    protected Comparator getComparator() {
-      return RECORD_COMPARATOR;
     }
   }
 

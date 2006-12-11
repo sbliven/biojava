@@ -38,7 +38,6 @@ import org.xml.sax.SAXException;
 public class SequenceContentHandlerBase extends StAXContentHandlerBase 
 {
     private int level = 0;
-    private StringBuffer data = new StringBuffer();
     private StreamParser parser;
 
     public void startElement(String nsURI,

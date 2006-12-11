@@ -20,16 +20,28 @@
  */
 package org.biojava.bio.seq.db;
 
-import java.net.*;
-import java.io.*;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.URL;
 import java.util.Iterator;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.*;
+import java.util.Set;
+
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.io.GenbankFormat;
+import org.biojava.bio.seq.io.SeqIOTools;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.symbol.Alphabet;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -44,7 +56,7 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class GenbankSequenceDB
 {
-  private static SequenceFormat format;//return format of the sequence
+  private static SequenceFormat format = new GenbankFormat();;//return format of the sequence
   private static String DBName="Genbank";//predefined the database name -- Genbank
   protected boolean IOExceptionFound=false;//check if IOException is found
   protected boolean ExceptionFound=false;//check if any exception is found
@@ -52,7 +64,6 @@ public class GenbankSequenceDB
     "http://www.ncbi.nlm.nih.gov:80/entrez/eutils/efetch.fcgi";
 
   public GenbankSequenceDB() {
-      this.format = new GenbankFormat();
   }
 
   protected SequenceFormat getSequenceFormat()
@@ -112,13 +123,6 @@ public class GenbankSequenceDB
       URL queryURL = getAddress(id); //get URL based on ID
 
       //  System.err.println("query is "+ queryURL.toString());
-
-      SequenceFormat sFormat = getSequenceFormat(); //get incoming sequence format
-      SequenceBuilder sbuilder = new SimpleSequenceBuilder(); //create a sequence builder
-      SequenceBuilderFactory sFact = new GenbankProcessor.Factory(
-          SimpleSequenceBuilder.FACTORY);
-      Alphabet alpha = getAlphabet(); //get alphabet
-      SymbolTokenization rParser = alpha.getTokenization("token"); //get SymbolTokenization
 
       //System.err.println("got data from " + queryURL);
 

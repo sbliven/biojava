@@ -1,6 +1,6 @@
 package org.biojava.bio.program.ssaha;
 
-import java.io.PrintStream; // for the Echo impl
+import java.io.PrintStream;
 
 /**
  * The interface used to inform interested parties that some sequence has

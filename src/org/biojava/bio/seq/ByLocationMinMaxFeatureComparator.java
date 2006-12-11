@@ -20,7 +20,6 @@
  */
 package org.biojava.bio.seq;
 
-import org.biojava.bio.symbol.Location;
 
 
 /**

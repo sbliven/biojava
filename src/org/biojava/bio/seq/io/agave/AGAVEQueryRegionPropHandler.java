@@ -19,13 +19,11 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.xml.sax.*;
+import java.util.ListIterator;
+
+import org.biojava.bio.symbol.RangeLocation;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * 
@@ -41,7 +39,6 @@ public class AGAVEQueryRegionPropHandler extends StAXFeatureHandler
       return new AGAVEQueryRegionPropHandler(staxenv);
     }
   };
-   private int start , end ;
    private AGAVEQueryRegion region ;
    AGAVEQueryRegionPropHandler(StAXFeatureHandler staxenv) {
     // execute superclass method to setup environment

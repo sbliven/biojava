@@ -21,6 +21,7 @@
 
 package org.biojavax.bio.seq;
 import java.util.NoSuchElementException;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojavax.bio.BioEntryIterator;

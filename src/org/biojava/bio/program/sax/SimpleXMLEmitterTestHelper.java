@@ -20,6 +20,7 @@
  */
 package org.biojava.bio.program.sax;
 
+import org.biojava.bio.program.xml.BaseXMLWriter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;

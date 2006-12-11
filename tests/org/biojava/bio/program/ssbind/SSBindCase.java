@@ -25,12 +25,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xml.sax.InputSource;
-
 import junit.framework.TestCase;
 
-import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.search.SeqSimilaritySearchHit;
+import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.db.DummySequenceDB;
 import org.biojava.bio.seq.db.DummySequenceDBInstallation;
@@ -78,6 +76,7 @@ public class SSBindCase extends TestCase
 
     protected void setUp() throws Exception
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         queryDB        = new DummySequenceDB("query");
         dbInstallation = new DummySequenceDBInstallation();
         searchResults  = new ArrayList();
@@ -99,6 +98,7 @@ public class SSBindCase extends TestCase
 
     protected void tearDown() throws Exception
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         searchStream.close();
         
         searchStream = null;
@@ -109,14 +109,16 @@ public class SSBindCase extends TestCase
         topHitSeqID = null;
         botHitSeqID = null;
     }
-
+    
     public void testResultCount()
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         assertEquals(1, searchResults.size());
     }
 
     public void testResultGetQuerySequence() throws Exception
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
@@ -125,6 +127,7 @@ public class SSBindCase extends TestCase
 
     public void testResultGetSequenceDB()
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
@@ -133,6 +136,7 @@ public class SSBindCase extends TestCase
 
     public void testResultGetAnnotation()
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
@@ -141,6 +145,7 @@ public class SSBindCase extends TestCase
 
     public void testTopHit()
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
@@ -161,6 +166,7 @@ public class SSBindCase extends TestCase
 
     public void testBotHit()
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
@@ -185,6 +191,7 @@ public class SSBindCase extends TestCase
                                    int qStart, int qEnd, Strand qStrand,
                                    int sStart, int sEnd, Strand sStrand)
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         topHitScore   = score;
         topHitSeqID   = id;
         topHitQStart  = qStart;
@@ -199,6 +206,7 @@ public class SSBindCase extends TestCase
                                    int qStart, int qEnd, Strand qStrand,
                                    int sStart, int sEnd, Strand sStrand)
     {
+    	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         botHitScore   = score;
         botHitSeqID   = id;
         botHitQStart  = qStart;

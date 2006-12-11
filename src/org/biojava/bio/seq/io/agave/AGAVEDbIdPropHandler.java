@@ -19,9 +19,10 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import org.biojava.utils.ChangeVetoException;
-import org.xml.sax.*;
-import java.util.*;
+import java.util.ListIterator;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Deals with database crossreferences

@@ -1,8 +1,9 @@
 package org.biojava.naming;
 
-import junit.framework.TestCase;
+import javax.naming.Name;
+import javax.naming.NamingException;
 
-import javax.naming.*;
+import junit.framework.TestCase;
 
 /**
  *

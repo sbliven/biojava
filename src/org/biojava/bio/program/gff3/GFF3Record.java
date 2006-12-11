@@ -3,12 +3,11 @@ package org.biojava.bio.program.gff3;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SmallAnnotation;
-import org.biojava.ontology.OntoTools;
-import org.biojava.ontology.Term;
 import org.biojava.bio.program.gff.GFFTools;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.ontology.OntoTools;
+import org.biojava.ontology.Term;
 import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeListener;
 
 /**
  * A record in a GFF3 formatted file.
@@ -36,7 +35,6 @@ extends Annotatable {
   public static final class Impl
   extends AbstractChangeable
   implements GFF3Record {
-    private transient ChangeListener forwarder;
     
     private String sequenceID;
     private Term source;

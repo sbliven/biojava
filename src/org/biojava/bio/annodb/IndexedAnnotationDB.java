@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,7 +39,6 @@ import org.biojava.utils.io.RandomAccessReader;
 import org.biojava.utils.stax.SAX2StAXAdaptor;
 import org.biojava.utils.xml.PrettyXMLWriter;
 import org.biojava.utils.xml.XMLWriter;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -161,14 +159,6 @@ implements AnnotationDB {
     this.plFactory = (ParserListenerFactory) xmlDec.readObject();
     xmlDec.close();
     
-    File schemaFile = new File(store.getLocation(), "schema.xml");
-    InputSource is = new InputSource(
-      new BufferedReader(
-        new FileReader(
-          schemaFile
-        )
-      )
-    );
     XMLReader parser = XMLReaderFactory.createXMLReader();
     XMLAnnotationTypeHandler annTypeH = new XMLAnnotationTypeHandler();
     parser.setContentHandler(

@@ -6,14 +6,32 @@
  */
 package org.biojava.utils.walker;
 
-import org.biojava.bio.seq.FeatureFilter;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.biojava.bio.BioException;
-import org.biojava.utils.bytecode.*;
+import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.utils.AssertionFailure;
 import org.biojava.utils.ClassTools;
-
-import java.util.*;
-import java.lang.reflect.Method;
+import org.biojava.utils.bytecode.ByteCode;
+import org.biojava.utils.bytecode.CodeClass;
+import org.biojava.utils.bytecode.CodeException;
+import org.biojava.utils.bytecode.CodeField;
+import org.biojava.utils.bytecode.CodeMethod;
+import org.biojava.utils.bytecode.CodeUtils;
+import org.biojava.utils.bytecode.GeneratedClassLoader;
+import org.biojava.utils.bytecode.GeneratedCodeClass;
+import org.biojava.utils.bytecode.GeneratedCodeMethod;
+import org.biojava.utils.bytecode.IfExpression;
+import org.biojava.utils.bytecode.InstructionVector;
+import org.biojava.utils.bytecode.IntrospectedCodeClass;
+import org.biojava.utils.bytecode.LocalVariable;
 
 public class WalkerFactory {
   private static Map factories = new HashMap();

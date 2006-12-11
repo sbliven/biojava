@@ -36,9 +36,9 @@ import org.biojava.bio.seq.io.StreamParser;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.IntegerAlphabet;
-import org.biojava.utils.ParseErrorSource;
-import org.biojava.utils.ParseErrorListener;
 import org.biojava.utils.ParseErrorEvent;
+import org.biojava.utils.ParseErrorListener;
+import org.biojava.utils.ParseErrorSource;
 
 /**
  * Format object representing Phred Quality files.
@@ -197,7 +197,7 @@ public class PhredFormat implements SequenceFormat, ParseErrorSource, ParseError
     StringBuffer line = new StringBuffer();
     int seqLen = seq.length();
 
-    for (int i = 1, linesPrinted = 1; i <= seqLen; i++) {
+    for (int i = 1; i <= seqLen; i++) {
       int val = ((IntegerAlphabet.IntegerSymbol)seq.symbolAt(i)).intValue();
       String s = Integer.toString(val);
       if ((line.length() + s.length()) > lineWidth) {

@@ -20,9 +20,9 @@
  */
 package org.biojava.bio.seq;
 
-import org.biojava.bio.symbol.Location;
-
 import java.util.Comparator;
+
+import org.biojava.bio.symbol.Location;
 
 
 /**

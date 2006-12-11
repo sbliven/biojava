@@ -3,8 +3,8 @@
 
 package org.biojava.utils.regex;
 
-import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.SymbolList;
 
 /**

@@ -25,10 +25,14 @@ import java.io.NotSerializableException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.SimpleSymbolListFactory;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.StaticMemberPlaceHolder;
 
 /**

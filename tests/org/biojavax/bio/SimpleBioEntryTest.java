@@ -10,7 +10,11 @@ package org.biojavax.bio;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
-import junit.framework.*;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener.ChangeEventRecorder;
 import org.biojavax.Comment;
@@ -102,7 +106,7 @@ public class SimpleBioEntryTest extends TestCase {
             //should have fired an event;
             assertNotNull(cr.getEvent());
             //type should be TAXON
-            assertEquals(be.TAXON, cr.getEvent().getType());
+            assertEquals(BioEntry.TAXON, cr.getEvent().getType());
             //old should be null
             assertNull(cr.getEvent().getPrevious());
             //new should be tax
@@ -214,7 +218,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.IDENTIFIER, ce.getType());
+            assertEquals(BioEntry.IDENTIFIER, ce.getType());
             //was null
             assertNull(ce.getPrevious());
             //now id
@@ -241,7 +245,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.DIVISION, ce.getType());
+            assertEquals(BioEntry.DIVISION, ce.getType());
             //was null
             assertNull(ce.getPrevious());
             //now div
@@ -268,7 +272,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.DESCRIPTION, ce.getType());
+            assertEquals(BioEntry.DESCRIPTION, ce.getType());
             //was null
             assertNull(ce.getPrevious());
             //now d
@@ -536,7 +540,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.RANKEDCROSSREF, ce.getType());
+            assertEquals(BioEntry.RANKEDCROSSREF, ce.getType());
             //was null
             assertNull(ce.getPrevious());
             //now xref
@@ -580,7 +584,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.RANKEDCROSSREF, ce.getType());
+            assertEquals(BioEntry.RANKEDCROSSREF, ce.getType());
             //was xref
             assertEquals(xref, ce.getPrevious());
             //now null
@@ -618,7 +622,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.RANKEDDOCREF, ce.getType());
+            assertEquals(BioEntry.RANKEDDOCREF, ce.getType());
             //was null
             assertNull(ce.getPrevious());
             //now xref
@@ -666,7 +670,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.RANKEDDOCREF, ce.getType());
+            assertEquals(BioEntry.RANKEDDOCREF, ce.getType());
             //was ref
             assertEquals(ref, ce.getPrevious());
             //now null
@@ -701,7 +705,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.COMMENT, ce.getType());
+            assertEquals(BioEntry.COMMENT, ce.getType());
             //was null
             assertNull(ce.getPrevious());
             //now com
@@ -746,7 +750,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.COMMENT, ce.getType());
+            assertEquals(BioEntry.COMMENT, ce.getType());
             //was com
             assertEquals(com, ce.getPrevious());
             //now null
@@ -787,7 +791,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.RELATIONS, ce.getType());
+            assertEquals(BioEntry.RELATIONS, ce.getType());
             //was null
             assertNull(ce.getPrevious());
             //now rel
@@ -837,7 +841,7 @@ public class SimpleBioEntryTest extends TestCase {
             ChangeEvent ce = cr.getEvent();
             assertNotNull(ce);
             //of the right type
-            assertEquals(be.RELATIONS, ce.getType());
+            assertEquals(BioEntry.RELATIONS, ce.getType());
             //was rel
             assertEquals(rel, ce.getPrevious());
             //now null

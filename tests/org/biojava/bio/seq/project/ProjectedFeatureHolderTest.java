@@ -21,15 +21,23 @@
 
 package org.biojava.bio.seq.project;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.projection.TranslateFlipContext;
+import junit.framework.TestCase;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.seq.projection.ReparentContext;
-import org.biojava.bio.seq.*;
-import junit.framework.TestCase;
+import org.biojava.bio.seq.projection.TranslateFlipContext;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Tests for ProjectedFeatureHolder

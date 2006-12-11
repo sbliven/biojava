@@ -1,13 +1,13 @@
 package org.biojava.bio.gui.sequence;
 
+import java.awt.Graphics2D;
+import java.util.Iterator;
+
+import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.symbol.GappedSymbolList;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.seq.FeatureHolder;
-
-import java.util.Iterator;
-import java.awt.*;
 
 /**
  * A renderer that will display a gapped sequence as a discontinuous series of

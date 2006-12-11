@@ -1,9 +1,9 @@
 package org.biojava.bio.annodb;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.AnnotationType;
 
 class EmptyAnnotationDB implements AnnotationDB {
   public String getName() { return "EMPTY"; }

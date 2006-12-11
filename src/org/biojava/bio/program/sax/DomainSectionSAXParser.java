@@ -52,7 +52,6 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 class DomainSectionSAXParser extends AbstractNativeAppSAXParser {
 
-    private BlastLikeVersionSupport     oVersion;
 
     private BufferedReader       oContents;
     private AttributesImpl       oAtts              = new AttributesImpl();
@@ -67,7 +66,6 @@ class DomainSectionSAXParser extends AbstractNativeAppSAXParser {
      */
     DomainSectionSAXParser( BlastLikeVersionSupport poVersion,
 			    String poNamespacePrefix ) {
-	oVersion = poVersion;
 	this.setNamespacePrefix(poNamespacePrefix);
 	//For XSLT Parser Compliance
 	this.addPrefixMapping("biojava","http://www.biojava.org");

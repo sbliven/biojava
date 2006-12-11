@@ -52,8 +52,6 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
 
     // Main sequence formatting buffer
     private StringBuffer sq = new StringBuffer();
-    // Main qualifier formatting buffer
-    private StringBuffer qb = new StringBuffer();
     // Utility formatting buffer
     private StringBuffer ub = new StringBuffer();
 
@@ -136,7 +134,6 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
         throws IllegalAlphabetException
     {
         try {
-            int end = start + length - 1;
 
             // My Changes are here
             locusLineCreator(length);

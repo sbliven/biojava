@@ -99,10 +99,6 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
         return ++instanceCount;
     }
 
-    private static synchronized int decCount() {
-        return --instanceCount;
-    }
-
     protected void finalize() throws Throwable {
         super.finalize();
         // System.err.println("Finalizing a SimpleSymbolList: " + decCount());
@@ -386,8 +382,6 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
     */
 
     public void preChange(ChangeEvent cev) throws ChangeVetoException{
-        // let the listeners know that they have to be converted or veto the change;
-        ChangeSupport cs = getChangeSupport(SymbolList.EDIT);
 
         // lets not bother making any changes if the edit would not effect us or our children
         Object change = cev.getChange();

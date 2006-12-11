@@ -25,7 +25,9 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 import junit.framework.TestCase;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.IllegalAlphabetException;
@@ -60,6 +62,7 @@ public class RestrictionEnzymeManagerTest extends TestCase
         try
         {
             RestrictionEnzyme invalid = RestrictionEnzymeManager.getEnzyme("xxxx");
+            invalid=invalid==null?null:invalid;//trick
         }
         catch (IllegalArgumentException iae)
         {
@@ -86,6 +89,7 @@ public class RestrictionEnzymeManagerTest extends TestCase
         try
         {
             Set invalid = RestrictionEnzymeManager.getIsoschizomers("xxxx");
+            invalid=invalid==null?null:invalid;//trick
         }
         catch (IllegalArgumentException iae)
         {
@@ -172,7 +176,7 @@ public class RestrictionEnzymeManagerTest extends TestCase
      * @since 1.5
      */
     public void testloadEnzymeFile() {
-        String rebaseDataFileName = "/org/biojava/bio/molbio/rebase.dat";
+        String rebaseDataFileName = "org/biojava/bio/molbio/rebase.dat";
         InputStream is = getClass().getClassLoader().getResourceAsStream(rebaseDataFileName);
         RestrictionEnzymeManager.loadEnzymeFile(is,true);
         Set re = RestrictionEnzymeManager.getAllEnzymes();

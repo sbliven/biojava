@@ -2,9 +2,8 @@
 
 package org.biojava.utils.regex;
 
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.seq.io.SymbolListCharSequence;
-import org.biojava.utils.regex.Pattern;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * This class is analogous to java.util.Matcher except that it works

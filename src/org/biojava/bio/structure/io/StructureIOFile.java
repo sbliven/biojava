@@ -23,8 +23,9 @@
  */
 package org.biojava.bio.structure.io;
 
-import org.biojava.bio.structure.Structure ;
-import java.io.IOException ;
+import java.io.IOException;
+
+import org.biojava.bio.structure.Structure;
 
 /**
  * interface StructureIOFile extends the StructureIO interface

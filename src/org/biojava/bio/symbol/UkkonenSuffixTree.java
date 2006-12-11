@@ -1,25 +1,23 @@
 package org.biojava.bio.symbol;
 
-import java.io.Serializable;
-import java.util.*;
-import org.biojava.bio.Annotation;
-import org.biojava.bio.BioRuntimeException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.seq.io.CharacterTokenization;
 import org.biojava.bio.seq.io.SymbolListCharSequence;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.Edit;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.utils.Changeable;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.utils.AssertionFailure;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.Unchangeable;
 
 
 /**
@@ -62,7 +60,6 @@ public class UkkonenSuffixTree{
 
   private CharSequence sequences;
 
-  private FiniteAlphabet alpha;
 
   /** Describes the rule that needs to be applied after walking down a tree. Put as a class variable because it can only return a single object (and I don't want to extend Node any further.
    * rule 1: ended up at a leaf.
@@ -83,7 +80,6 @@ public class UkkonenSuffixTree{
     root = new SimpleNode();
     e=0;
     sequences = "";
-    alpha=null;
   }
 
   public UkkonenSuffixTree(String seqs){
@@ -93,7 +89,6 @@ public class UkkonenSuffixTree{
 
   public UkkonenSuffixTree(FiniteAlphabet alpha){
     this();
-    this.alpha=alpha;
   }
 
   public void addSymbolList(SymbolList list, String name, boolean doNotTerminate) throws IllegalSymbolException{
@@ -319,7 +314,6 @@ public class UkkonenSuffixTree{
     int edgeLength;
     int original=from;
     SuffixNode originalNode=starting;
-    int i=0;
 
 
     currentNode=starting;
@@ -357,7 +351,6 @@ public class UkkonenSuffixTree{
 
       edgeLength = getEdgeLength(arrivedAt);
       if (edgeLength>=to-from){
-	int before = currentNode.labelEnd+to-from+1;
 	int after = getPathEnd(arrivedAt)-getEdgeLength(arrivedAt)+to-from-1;
 	if (sequences.charAt(after)==
 	    source.charAt(to-1)){
@@ -636,30 +629,6 @@ public class UkkonenSuffixTree{
       return (children==null)?null:(SuffixNode)children.get(x);
     }
     public SuffixNode getParent(){return parent;}
-  }
-
-  /** This is simply a debugging method to check that a node was created
-   *  normally. it doesn't return anything but prints to System.err if a bad
-   * addition was made.
-   *
-   * @param child a <code>SuffixNode</code> value
-   */
-  private void checkParent(SuffixNode child){
-    SuffixNode parent=child.parent;
-    CharSequence parentLabel=getLabel(parent);
-    CharSequence label =getLabel(child);
-
-    if (parentLabel.equals("root"))
-        parentLabel="";
-
-    if (parentLabel.length()>=label.length()||!parentLabel.equals(label.subSequence(0,parentLabel.length())))
-    {
-      System.err.println("bad addition on rule "+rule);
-      System.err.println(parentLabel+" against "+ label);
-      System.err.println("child ("+child.labelStart+","+((child.labelEnd==-1)?e:child.labelEnd)+")");
-      System.err.println("parent ("+parent.labelStart+","+parent.labelEnd+")");
-
-    }
   }
 
   public boolean subStringExists(String str)

@@ -90,7 +90,6 @@ public class StackedLogoPainter implements LogoPainter {
 
   public void paintLogo(LogoContext lCtxt) {
     Distribution dis = lCtxt.getDistribution();
-    SymbolStyle style = lCtxt.getStyle();
     SymbolTokenization toke = null;
     try {
         toke = dis.getAlphabet().getTokenization("token");
@@ -99,9 +98,7 @@ public class StackedLogoPainter implements LogoPainter {
     }
 
     Rectangle bounds = lCtxt.getBounds();
-    double width = bounds.getWidth();
     double height = bounds.getHeight();
-    double base = height;
 
     SortedSet info = new TreeSet(new ResValComparator(toke));
 

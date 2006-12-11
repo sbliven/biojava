@@ -16,7 +16,6 @@ import org.biojava.bio.AnnotationType;
  */
 public class LazySearchedAnnotationDB
 implements AnnotationDB {
-  private final String name;
   private final AnnotationDB source;
   private final AnnotationType schema;
   private AnnotationDB result;
@@ -29,7 +28,6 @@ implements AnnotationDB {
    * @param schema  the schema AnnotationType to apply
    */
   public LazySearchedAnnotationDB(String name, AnnotationDB source, AnnotationType schema) {
-    this.name = name;
     this.source = source;
     this.schema = schema;
   }

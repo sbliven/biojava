@@ -79,7 +79,6 @@ public class ABITrace
                          //is invisible to the user.
   private static int AbsIndexBase=26; //The file location of the Index pointer
   private int IndexBase,  PLOC;
-  private int ATraceStart, CTraceStart, GTraceStart, TTraceStart;
 
   //the next declaration is for the actual file pointers
   private  int DATA9, DATA10, DATA11, DATA12, PBAS2, FWO;

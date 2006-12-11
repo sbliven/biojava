@@ -22,12 +22,13 @@
 
 package org.biojavax.ga.functions;
 
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojavax.ga.Population;
-import org.biojavax.ga.Organism;
+import java.util.Iterator;
+
+import org.biojava.bio.BioError;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ga.GeneticAlgorithm;
+import org.biojavax.ga.Organism;
+import org.biojavax.ga.Population;
 import org.biojavax.ga.exception.IllegalOrganismException;
 import org.biojavax.ga.util.WeightedSet;
 

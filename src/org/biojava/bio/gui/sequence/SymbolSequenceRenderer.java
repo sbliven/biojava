@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.geom.Point2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -33,8 +32,8 @@ import java.util.List;
 
 import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * <code>SymbolSequenceRenderer</code> renders symbols of a

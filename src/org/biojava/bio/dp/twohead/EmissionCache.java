@@ -29,15 +29,13 @@ import java.util.Map;
 
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.dp.EmissionState;
+import org.biojava.bio.dp.MagicalState;
 import org.biojava.bio.dp.ScoreType;
 import org.biojava.bio.dp.State;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
-
-import org.biojava.bio.dp.MagicalState;
-
 import org.biojava.utils.ListTools;
 
 /**

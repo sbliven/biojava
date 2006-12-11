@@ -46,7 +46,7 @@ package org.biojava.bio.alignment;
 
 
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioRuntimeException;
 
 
 

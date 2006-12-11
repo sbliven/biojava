@@ -25,9 +25,10 @@ package org.biojava.bio.seq.db.biosql;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
+
 import org.biojava.bio.BioRuntimeException;
-//import org.biojava.utils.JDBCConnectionPool;
 
 /**
  * Isolates all code that is specific to a particular RDBMS. To add

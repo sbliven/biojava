@@ -50,8 +50,6 @@ public class XMLAnnotationTypeWriter {
      */
 
     public static final String XML_ANNOTATIONTYPE_NS = "http://www.biojava.org/AnnotationType";
-    private static final Class[] NO_ARGS = new Class[0];
-    private static final Object[] NO_ARGS_VAL = new Object[0];
 
     private Map constraintWritersByObject = new HashMap();
     private Map constraintWritersByClass = new HashMap();

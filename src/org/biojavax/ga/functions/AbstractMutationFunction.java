@@ -21,8 +21,11 @@
 
 package org.biojavax.ga.functions;
 
-import org.biojava.bio.dist.*;
-import org.biojava.utils.*;
+import org.biojava.bio.dist.OrderNDistribution;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Abstract implementation of <code>MutationFunction</code> all custom

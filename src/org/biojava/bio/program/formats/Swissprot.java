@@ -14,7 +14,6 @@ import org.biojava.bio.program.tagvalue.SimpleTagValueWrapper;
 import org.biojava.bio.program.tagvalue.TagDelegator;
 import org.biojava.bio.program.tagvalue.TagValueContext;
 import org.biojava.bio.program.tagvalue.TagValueListener;
-import org.biojava.bio.program.tagvalue.TagValueWrapper;
 import org.biojava.bio.program.tagvalue.ValueChanger;
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.ParserException;

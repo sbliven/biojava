@@ -22,13 +22,10 @@ package org.biojava.bio.program.sax;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * A SAX2 parser for dealing with a sequence alignments.  The format
@@ -62,20 +59,6 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class SequenceAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
-
-    private AttributesImpl          oAtts      = new AttributesImpl();
-    private ArrayList               oHeader    = new ArrayList();
-    private QName                   oAttQName  = new QName(this);     
-    private char[]                  aoChars;
-
-    private String                  oSeqName;
-    private String                  oTmpSeq;
-    private StringBuffer            oSeq         = new StringBuffer();
-    private HashMap                 oAlignment   = new HashMap();
-    private ArrayList               oSeqNameList = new ArrayList();
-
-    private static final int        STARTUP            = 0;
-    private static final int        IN_STREAM          = 1;
 
     private static final int        CLUSTALW           = 2;
     private static final int        NEEDLE             = 3;
@@ -159,14 +142,4 @@ public class SequenceAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
     }
 
-    /**
-     * <code>interpret</code> is an empty method.
-     *
-     * @param poContents a <code>BufferedReader</code> value
-     * @param poLine a <code>String</code> value
-     * @exception SAXException if an error occurs
-     */
-    private void interpret(BufferedReader poContents, String poLine)
-	throws SAXException {
-    }
 }

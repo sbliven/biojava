@@ -21,12 +21,16 @@
 
 package org.biojava.bio.seq.io;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.io.SeqFileFormer;
+import org.biojava.bio.symbol.BetweenLocation;
+import org.biojava.bio.symbol.CircularLocation;
+import org.biojava.bio.symbol.FuzzyLocation;
+import org.biojava.bio.symbol.FuzzyPointLocation;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  * This test suite is built on JUnit (www.junit.org).  It tests the
@@ -119,7 +123,7 @@ public class LocationFormatterTest extends TestCase
 
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mSimplePointLocation, PLUS).toString();
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -133,7 +137,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mRangedPointLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -146,7 +150,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mBoundedPointLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -160,7 +164,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mSimpleRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -173,7 +177,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mBoundedRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -187,7 +191,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mBoundedPointRangedPointRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -201,7 +205,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mRangedPointSimplePointRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -215,7 +219,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mRangedPointRangedPointRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -229,7 +233,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularSimpleRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -243,7 +247,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularBoundedRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -257,7 +261,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularBoundedPointRangedPointRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -271,7 +275,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularRangedPointSimplePointRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -285,7 +289,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularRangedPointRangedPointRangedLocation, PLUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -347,7 +351,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mSimplePointLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -361,7 +365,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mRangedPointLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -375,7 +379,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mBoundedPointLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -389,7 +393,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length() );
         String actual = fileFormer.formatLocation(sb, mSimpleRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -403,7 +407,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mBoundedRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -417,7 +421,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mBoundedPointRangedPointRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -431,7 +435,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mRangedPointSimplePointRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -445,7 +449,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mRangedPointRangedPointRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -459,7 +463,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularSimpleRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -473,7 +477,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularBoundedRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -488,7 +492,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularBoundedPointRangedPointRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -503,7 +507,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularRangedPointSimplePointRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -518,7 +522,7 @@ public class LocationFormatterTest extends TestCase
         sb.delete(0, sb.length());
         String actual = fileFormer.formatLocation(sb, mCircularRangedPointRangedPointRangedLocation, MINUS).toString();
 
-        this.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     //	/**
@@ -530,7 +534,7 @@ public class LocationFormatterTest extends TestCase
     //
     //		String actual = fileFormer.formatLocation(mJoinCompoundLocation, MINUS);
     //
-    //		this.assertEquals(expected, actual);
+    //		assertEquals(expected, actual);
     //	}
     //
     //	/**
@@ -542,7 +546,7 @@ public class LocationFormatterTest extends TestCase
     //
     //		String actual = fileFormer.formatLocation(mOrderCompoundLocation, MINUS);
     //
-    //		this.assertEquals(expected, actual);
+    //		assertEquals(expected, actual);
     //	}
 
     /**

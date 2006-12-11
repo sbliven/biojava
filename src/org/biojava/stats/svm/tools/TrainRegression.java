@@ -48,7 +48,6 @@ public class TrainRegression {
 	    throw new Exception("usage: stats.svm.tools.TrainRegression <train_examples> <model_file>");
     }
     String trainFile = args[0];
-    String modelFile = args[1];
 
     List examples = new ArrayList();
     BufferedReader r = new BufferedReader(new FileReader(trainFile));

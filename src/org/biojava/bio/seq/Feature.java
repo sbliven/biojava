@@ -29,10 +29,10 @@ import java.util.Iterator;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
-import org.biojava.ontology.InvalidTermException;
-import org.biojava.ontology.Term;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.ontology.InvalidTermException;
+import org.biojava.ontology.Term;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 

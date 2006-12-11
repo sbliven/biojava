@@ -20,24 +20,24 @@
 
 package org.biojava.bio.seq.db;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
+import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
+import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
-import org.biojava.utils.ChangeVetoException;
-
-import junit.framework.TestCase;
 import org.biojava.bio.seq.SequenceTools;
-import org.biojava.bio.Annotation;
-import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.SymbolList;
-import java.util.*;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.IOException;
+import org.biojava.utils.ChangeVetoException;
 
 
 /**

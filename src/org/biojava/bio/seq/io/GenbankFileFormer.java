@@ -353,7 +353,6 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
                 List rfbs = new ArrayList();
                 List refs = (List)value;
                 Iterator i = refs.iterator();
-                int count = 1;
                 while (i.hasNext()) {
                     String v = (String)i.next();
                     StringBuffer rfb1 = new StringBuffer(sequenceBufferCreator("REFERENCE  ",v));
@@ -370,7 +369,6 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
                 List refs = (List)value;
                 Iterator i = refs.iterator();
                 Iterator j = rfbs.iterator();
-                int count = 1;
                 while (i.hasNext()) {
                     String v = (String)i.next();
                     StringBuffer rfb1 = (StringBuffer)j.next();
@@ -390,7 +388,6 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
                 List refs = (List)value;
                 Iterator i = refs.iterator();
                 Iterator j = rfbs.iterator();
-                int count = 1;
                 while (i.hasNext()) {
                     String v = (String)i.next();
                     StringBuffer rfb1 = (StringBuffer)j.next();
@@ -410,7 +407,6 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
                 List refs = (List)value;
                 Iterator i = refs.iterator();
                 Iterator j = rfbs.iterator();
-                int count = 1;
                 while (i.hasNext()) {
                     String v = (String)i.next();
                     StringBuffer rfb1 = (StringBuffer)j.next();
@@ -430,7 +426,6 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
                 List refs = (List)value;
                 Iterator i = refs.iterator();
                 Iterator j = rfbs.iterator();
-                int count = 1;
                 while (i.hasNext()) {
                     String v = (String)i.next();
                     StringBuffer rfb1 = (StringBuffer)j.next();
@@ -450,7 +445,6 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
                 List refs = (List)value;
                 Iterator i = refs.iterator();
                 Iterator j = rfbs.iterator();
-                int count = 1;
                 while (i.hasNext()) {
                     String v = (String)i.next();
                     StringBuffer rfb1 = (StringBuffer)j.next();

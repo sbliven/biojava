@@ -125,6 +125,7 @@ public class TabDelimParser {
             Term relT = resolveTerm(predicate, onto);
 
             Triple trip = resolveTriple(subT, objT, relT, onto);
+            trip = trip==null?null:trip; // prevent unused field error
           } catch (StringIndexOutOfBoundsException e) {
             throw new IOException("Could not parse line: " + line);
           }

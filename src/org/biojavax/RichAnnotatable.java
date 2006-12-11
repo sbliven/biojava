@@ -22,6 +22,7 @@
 package org.biojavax;
 
 import java.util.Set;
+
 import org.biojava.bio.Annotatable;
 import org.biojava.utils.ChangeVetoException;
 

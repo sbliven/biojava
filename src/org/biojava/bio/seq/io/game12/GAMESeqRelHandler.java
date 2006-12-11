@@ -16,7 +16,6 @@ import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.io.game.ElementRecognizer;
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.stax.StAXContentHandler;
-import org.biojava.utils.stax.StringElementHandlerBase;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -49,8 +48,6 @@ public class GAMESeqRelHandler
     // database columns
     private String type = null;
     private String seq;
-    private int start;
-    private int end;
 //    private String alignment = null;
     Location seqRelLoc;
     StrandedFeature.Strand seqRelStrand;
@@ -115,17 +112,6 @@ public class GAMESeqRelHandler
 //                }
 //            }
 //                );
-    }
-
-    private class TypeHandler extends StringElementHandlerBase {
-        /**
-         *  Sets the stringValue attribute of the TypeHandler object
-         *
-         *@param  s  The new stringValue value
-         */
-        protected void setStringValue(String s) {
-            type = s.trim();
-        }
     }
 
 

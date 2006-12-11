@@ -16,11 +16,9 @@ import org.biojava.utils.cache.WeakValueHashMap;
 class SQLUnigeneDB
 extends AbstractChangeable
 implements UnigeneDB {
-  private final JDBCConnectionPool connPool;
   private final Map clusterCache;
   
   public SQLUnigeneDB(JDBCConnectionPool connPool) {
-    this.connPool = connPool;
     this.clusterCache = new WeakValueHashMap();
   }
   

@@ -21,11 +21,11 @@
 
 package org.biojava.bio.symbol;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import junit.framework.TestCase;
 
 /**
  * <p>Title: MergeLocationTest</p>

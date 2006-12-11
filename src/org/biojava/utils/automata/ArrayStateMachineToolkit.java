@@ -24,8 +24,8 @@ package org.biojava.utils.automata;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.AlphabetIndex;
+import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
@@ -124,12 +124,10 @@ public class ArrayStateMachineToolkit
             private int start;
             private int end;
             boolean gotTerminationState = false;
-            private int  lastEnd;
     
             private GreedyInstance(int start, int end, int statePointer)
             {
                 this.start = start;
-                lastEnd = end;
                 this.statePointer = statePointer;
             }
 
@@ -160,7 +158,6 @@ public class ArrayStateMachineToolkit
                     if (dest <0) {
                         // got a valid termination state, save it
                         gotTerminationState = true;
-                        lastEnd = end;
                         return false;
                     }
                     else

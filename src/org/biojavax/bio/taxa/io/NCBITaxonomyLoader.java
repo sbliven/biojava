@@ -23,6 +23,7 @@ package org.biojavax.bio.taxa.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+
 import org.biojava.bio.seq.io.ParseException;
 import org.biojavax.bio.taxa.NCBITaxon;
 

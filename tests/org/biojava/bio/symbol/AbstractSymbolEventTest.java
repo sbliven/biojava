@@ -1,10 +1,15 @@
 package org.biojava.bio.symbol;
 
 import junit.framework.TestCase;
+
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SmallAnnotation;
-import org.biojava.utils.*;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Regression test for event forwarding bug found by James Worthington.

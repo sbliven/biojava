@@ -66,6 +66,7 @@ class DASDistDataSource implements DistDataSource {
 	try {
 	    Sequence seq = db.allEntryPointsDB().getSequence(id);
 	    int size = seq.length();
+	    size = size+1-1; // trick to prevent unused field warning
 	} catch (IllegalIDException ex) {
 	    return false;
 	}

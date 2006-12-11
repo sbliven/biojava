@@ -24,6 +24,7 @@ package org.biojavax.ontology;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.biojava.bio.Annotation;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
@@ -130,7 +131,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     public Term getSubject() { return this.subject; }
     
     // Hibernate requirement - not for public use.
-    private void setSubject(ComparableTerm subject) { this.subject = subject; }
+    void setSubject(ComparableTerm subject) { this.subject = subject; }
     
     /**
      * {@inheritDoc}
@@ -138,7 +139,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     public Term getObject() { return this.object; }
     
     // Hibernate requirement - not for public use.
-    private void setObject(ComparableTerm object) { this.object = object; }
+    void setObject(ComparableTerm object) { this.object = object; }
     
     /**
      * {@inheritDoc}
@@ -146,7 +147,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     public Term getPredicate() { return this.predicate; }
     
     // Hibernate requirement - not for public use.
-    private void setPredicate(ComparableTerm predicate) { this.predicate = predicate; }
+    void setPredicate(ComparableTerm predicate) { this.predicate = predicate; }
     
     /**
      * {@inheritDoc}
@@ -242,7 +243,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     public Ontology getOntology() { return this.ontology; }
     
     // Hibernate requirement - not for public use.
-    private void setOntology(ComparableOntology ontology) { this.ontology = ontology; }
+    void setOntology(ComparableOntology ontology) { this.ontology = ontology; }
     
     /**
      * {@inheritDoc}
@@ -268,8 +269,8 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     private Integer id;
     
     // Hibernate requirement - not for public use.
-    private Integer getId() { return this.id; }
+    Integer getId() { return this.id; }
     
     // Hibernate requirement - not for public use.
-    private void setId(Integer id) { this.id = id; }
+    void setId(Integer id) { this.id = id; }
 }

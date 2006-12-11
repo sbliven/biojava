@@ -41,7 +41,7 @@ public class ChangeableCache {
   private ChangeType changeType;
   private Map cache = new HashMap();
   private ChangeListener listener = new ChangeAdapter() {
-    public void postChangeEvent(ChangeEvent ce) {
+    public void postChange(ChangeEvent ce) {
       Changeable source = (Changeable) ce.getSource();
       cache.remove(source);
       source.removeChangeListener(listener);

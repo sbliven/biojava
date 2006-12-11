@@ -45,10 +45,8 @@ public final class MagicalState extends SimpleEmissionState {
    * thing twice.
    */
   private static final Map stateCache;
-  private static final Map symbolCache;
   static {
     stateCache = new HashMap();
-    symbolCache = new HashMap();
   }
   
   public static MagicalState getMagicalState(Alphabet alphabet, int heads) {

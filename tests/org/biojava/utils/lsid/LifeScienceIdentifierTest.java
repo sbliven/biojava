@@ -21,18 +21,15 @@
 
 package org.biojava.utils.lsid;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -143,6 +140,7 @@ public class LifeScienceIdentifierTest
         try
         {
             LifeScienceIdentifier lsid = LifeScienceIdentifier.valueOf(value);
+            lsid=lsid==null?null:lsid;//trick
         }
         catch (LifeScienceIdentifierParseException e)
         {
@@ -185,6 +183,7 @@ public class LifeScienceIdentifierTest
             LifeScienceIdentifier lsid = LifeScienceIdentifier.valueOf(authorityId,
                                                                        namespaceId,
                                                                        objectId);
+            lsid=lsid==null?null:lsid;//trick
         }
         catch (NullPointerException e)
         {

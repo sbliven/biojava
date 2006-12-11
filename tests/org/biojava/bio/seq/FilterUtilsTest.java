@@ -21,10 +21,15 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.homol.*;
 import junit.framework.TestCase;
+
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.PropertyConstraint;
+import org.biojava.bio.seq.homol.HomologyFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  * Tests for FeatureFilters.  Currently concentrating on
@@ -449,9 +454,6 @@ public class FilterUtilsTest extends TestCase
       
       // pull out a feature by transcript.id
       FeatureFilter aTranscript = FilterUtils.byAnnotation("transcript.id", "ts:42");
-      
-      // pull out a feature by id
-      FeatureFilter hasID = FilterUtils.hasAnnotation("id");
       
       // let the fun commence
       optimizeEquals(FilterUtils.and(tsSchema, aTranscript), FilterUtils.and(transcript, aTranscript));

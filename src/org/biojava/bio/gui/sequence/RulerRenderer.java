@@ -21,16 +21,15 @@
 
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.symbol.Location;
-
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
-import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.util.List;
+
+import org.biojava.bio.symbol.Location;
 
 /**
  * <p><code>RulerRenderer</code> renders numerical scales in sequence
@@ -62,7 +61,6 @@ public class RulerRenderer implements SequenceRenderer
     public static final int TICKS_DOWN = 1;
 
     private Line2D            line;
-    private FontRenderContext fontRx;
     private double            depth;
     private AffineTransform   antiQuarter;
     private int               tickDirection;
@@ -89,7 +87,6 @@ public class RulerRenderer implements SequenceRenderer
     public RulerRenderer(int tickDirection) throws IllegalArgumentException
     {
         line   = new Line2D.Double();
-        fontRx = new FontRenderContext(null, true, true);
         antiQuarter = AffineTransform.getRotateInstance(Math.toRadians(-90));
 
         if (tickDirection == TICKS_UP || tickDirection == TICKS_DOWN)

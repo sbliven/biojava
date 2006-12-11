@@ -23,7 +23,8 @@
  */
 package org.biojava.bio.structure;
 
-import java.util.List ;
+import java.util.List;
+
 import org.biojava.bio.Annotation;
 
 /**

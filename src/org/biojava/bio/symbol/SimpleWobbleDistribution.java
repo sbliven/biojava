@@ -21,12 +21,11 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.Collections;
 
 import org.biojava.bio.dist.Distribution;
-import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.seq.ProteinTools;
 
 /**

@@ -34,7 +34,6 @@ import org.biojava.bio.seq.FramedFeature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceAnnotator;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.FramedFeature.Template;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.ChangeVetoException;
 

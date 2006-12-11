@@ -1,8 +1,8 @@
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.seq.FeatureFilter;
+import java.awt.Graphics2D;
 
-import java.awt.*;
+import org.biojava.bio.seq.FeatureFilter;
 
 /**
  *

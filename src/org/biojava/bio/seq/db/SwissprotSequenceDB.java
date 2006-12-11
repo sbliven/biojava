@@ -32,12 +32,7 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.EmblLikeFormat;
 import org.biojava.bio.seq.io.SeqIOTools;
-import org.biojava.bio.seq.io.SequenceBuilder;
-import org.biojava.bio.seq.io.SequenceBuilderFactory;
 import org.biojava.bio.seq.io.SequenceFormat;
-import org.biojava.bio.seq.io.SimpleSequenceBuilder;
-import org.biojava.bio.seq.io.SwissprotProcessor;
-import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
 
 /**
@@ -48,14 +43,10 @@ import org.biojava.bio.symbol.Alphabet;
  */
 public class SwissprotSequenceDB
 {
-  private static SequenceFormat format;
+  private static SequenceFormat format = new EmblLikeFormat();
   private static String DBName="swiss-prot";
   private boolean IOExceptionFound=false;
   
-  static 
-  {
-    SequenceFormat format = new EmblLikeFormat();
-  }
   
   protected SequenceFormat getSequenceFormat() 
   {
@@ -88,14 +79,7 @@ public class SwissprotSequenceDB
     try 
 	{
 	  IOExceptionFound=false;
-      URL queryURL = getAddress(id);//achieve URL based on ID      
-    //  System.err.println("query is "+ queryURL.toString());
-      SequenceFormat sFormat = getSequenceFormat();//get incoming sequence format
-      SequenceBuilder sbuilder = new SimpleSequenceBuilder();//create a sequence builder
-	  SequenceBuilderFactory sFact=new SwissprotProcessor.Factory(SimpleSequenceBuilder.FACTORY);
-      Alphabet alpha = getAlphabet();//get alphabet
-      SymbolTokenization rParser = alpha.getTokenization("token");//get SymbolTokenization
-      System.err.println("got data from "+ queryURL);
+      URL queryURL = getAddress(id);//achieve URL based on ID  
 	  DataInputStream in=new DataInputStream(queryURL.openStream());
 	  BufferedReader reader = new BufferedReader (new InputStreamReader (in));
 	  SequenceIterator seqI= SeqIOTools.readSwissprot(reader);

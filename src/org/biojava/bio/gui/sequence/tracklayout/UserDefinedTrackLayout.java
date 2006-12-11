@@ -20,10 +20,13 @@
  */
 package org.biojava.bio.gui.sequence.tracklayout;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.RangeLocation;
 
 
 /**
@@ -33,7 +36,6 @@ import java.util.*;
  * @since 1.5
  */
 public class UserDefinedTrackLayout implements TrackLayout {
-    private Sequence sequence;
     private RangeLocation globalLocation;
     private RangeLocation[] ranges;
     private int wrap = 6;
@@ -44,7 +46,6 @@ public class UserDefinedTrackLayout implements TrackLayout {
     }
 
     public void setSequence(Sequence seq) {
-        this.sequence = seq;
     }
 
     public void setRange(RangeLocation loc) {

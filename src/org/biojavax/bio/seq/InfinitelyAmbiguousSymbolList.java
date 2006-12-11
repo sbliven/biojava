@@ -23,6 +23,7 @@ package org.biojavax.bio.seq;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.Edit;

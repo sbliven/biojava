@@ -35,7 +35,8 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.seq.SequenceFactory;
+import org.biojava.bio.seq.impl.SimpleSequenceFactory;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetIndex;
@@ -47,20 +48,16 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.PackedSymbolListFactory;
 import org.biojava.bio.symbol.PointLocation;
-import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SimpleSymbolListFactory;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolListFactory;
 import org.biojava.bio.symbol.SymbolListViews;
 import org.biojava.utils.AssertionFailure;
 import org.biojava.utils.ChangeVetoException;
 import org.xml.sax.SAXException;
-import org.biojava.bio.symbol.SymbolListFactory;
-import org.biojava.bio.symbol.SimpleSymbolListFactory;
-import org.biojava.bio.symbol.PackedSymbolListFactory;
-import org.biojava.bio.seq.impl.SimpleSequenceFactory;
-import org.biojava.bio.seq.SequenceFactory;
-import java.util.*;
 
 
 /**

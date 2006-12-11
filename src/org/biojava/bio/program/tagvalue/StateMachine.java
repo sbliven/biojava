@@ -21,15 +21,10 @@
 
 package org.biojava.bio.program.tagvalue;
 
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 
 import org.biojava.utils.ParserException;
-import org.biojava.bio.program.tagvalue.TagValueListener;
-import org.biojava.bio.program.tagvalue.TagValueContext;
-import org.biojava.bio.program.tagvalue.TagValueWrapper;
-import org.biojava.bio.program.tagvalue.SimpleTagValueWrapper;
 
 /**
  * This class implements a state machine for parsing events from

@@ -27,9 +27,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
@@ -134,7 +132,7 @@ public class BasicImapRenderer implements ImageMapRenderer, Serializable
             max = loc.getMax();
             dif = max - min;
 
-            if (context.getDirection() == context.HORIZONTAL)
+            if (context.getDirection() == SequenceRenderContext.HORIZONTAL)
             {
                 posXW  = context.sequenceToGraphics(min);
                 posYN  = 0.0;

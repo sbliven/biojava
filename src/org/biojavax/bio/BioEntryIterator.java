@@ -21,6 +21,7 @@
 
 package org.biojavax.bio;
 import java.util.NoSuchElementException;
+
 import org.biojava.bio.BioException;
 
 

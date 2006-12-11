@@ -21,8 +21,8 @@
 
 package org.biojava.bio.program.homologene;
 
-import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeVetoException;
 
 public abstract class AbstractOrthologueSet 
     extends AbstractChangeable

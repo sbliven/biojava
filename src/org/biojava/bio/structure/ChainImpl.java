@@ -24,12 +24,11 @@
 package org.biojava.bio.structure;
 
 
-import java.util.ArrayList ;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import org.biojava.bio.structure.Group;
-import org.biojava.bio.structure.AminoAcid;
+
 import org.biojava.bio.Annotation;
 
 /**

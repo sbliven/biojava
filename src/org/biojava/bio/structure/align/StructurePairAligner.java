@@ -38,7 +38,6 @@ import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.StructureTools;
 import org.biojava.bio.structure.align.helper.AlignTools;
 import org.biojava.bio.structure.align.helper.JointFragments;
-//import org.biojava.bio.structure.align.jmol.MatrixJPanel;
 import org.biojava.bio.structure.align.pairwise.AltAligComparator;
 import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
 import org.biojava.bio.structure.align.pairwise.FragmentJoiner;

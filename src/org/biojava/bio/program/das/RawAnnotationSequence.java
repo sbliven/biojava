@@ -70,7 +70,6 @@ class RawAnnotationSequence
 {
     private URL dataSourceURL;
     private String seqID;
-    private String version = null;
     private FeatureRealizer featureRealizer = FeatureImpl.DEFAULT;
     private SymbolList nullSymbols;
     private DASSequenceDB dummyDB;

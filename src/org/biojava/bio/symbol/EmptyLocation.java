@@ -21,12 +21,15 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.NotSerializableException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioError;
+import org.biojava.utils.StaticMemberPlaceHolder;
 
 /**
  * Package-private location iml for empty locations.

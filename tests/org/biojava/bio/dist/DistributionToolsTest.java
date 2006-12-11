@@ -1,13 +1,17 @@
 package org.biojava.bio.dist;
 
-import java.util.*;
-import java.io.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * Tests that methods from DistributionTools work as advertised.

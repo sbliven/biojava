@@ -254,11 +254,4 @@ public class XMLDistributionReader extends DefaultHandler {
         }
     } //end processDistElement
 
-    private boolean one_element(String s) {
-        if (s.indexOf(" ") > 0) {
-            return false;
-        }
-
-        return true;
-    } //end one_element
 }

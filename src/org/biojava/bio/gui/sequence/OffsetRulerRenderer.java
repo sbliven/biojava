@@ -20,15 +20,19 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.gui.sequence.*;
-import org.biojava.utils.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.font.*;
-import java.awt.geom.*;
-
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.util.List;
+
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 
 /**
@@ -53,7 +57,6 @@ public class OffsetRulerRenderer extends AbstractChangeable implements SequenceR
     public static final int TICKS_UP = 0;
     public static final int TICKS_DOWN = 1;
     private Line2D line;
-    private FontRenderContext fontRx;
     private double depth;
     private AffineTransform antiQuarter;
     private int tickDirection;
@@ -71,7 +74,6 @@ public class OffsetRulerRenderer extends AbstractChangeable implements SequenceR
         this.sequenceOffset = sequenceOffset;
 
         line = new Line2D.Double();
-        fontRx = new FontRenderContext(null, true, true);
         antiQuarter = AffineTransform.getRotateInstance(Math.toRadians(-90));
 
         if ((tickDirection == TICKS_UP) || (tickDirection == TICKS_DOWN)) {

@@ -25,13 +25,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -521,8 +521,6 @@ public class SequencePoster
 
     int min = minP;
     for(int l = minOffset; l < realLines; l++) {
-      int max = Math.min(min + symbolsPerLine - 1, sequence.length());
-      RangeLocation pos = new RangeLocation(min, max);
 
       if (direction == HORIZONTAL) {
           clip.x = l * alongDim;
@@ -650,7 +648,6 @@ public class SequencePoster
       + alongDim);
       acrossDim = 0.0;
 
-      RangeLocation range = new RangeLocation(1, sequence.length());
       double insetBefore = renderer.getMinimumLeader(this);
       double insetAfter = renderer.getMinimumTrailer(this);
 
@@ -692,7 +689,6 @@ public class SequencePoster
       int li = 0;
       while(min <= sequence.length()) {
         int max = min + symbolsPerLine - 1;
-        RangeLocation pos = new RangeLocation(min, max);
         double depth = renderer.getDepth(this);
         acrossDim += depth + spacer;
         offsets[li] = acrossDim;
@@ -791,10 +787,6 @@ public class SequencePoster
 
     public double getSize() {
       return size;
-    }
-
-    private void setSize(double size) {
-      this.size = size;
     }
 
     public int getAlignment() {

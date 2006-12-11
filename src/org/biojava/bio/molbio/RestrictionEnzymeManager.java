@@ -52,8 +52,8 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ParserException;
 import org.biojava.utils.SmallSet;
 

@@ -140,7 +140,6 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
  	    FileReader oFileReader = new FileReader( oFile );
  	    in = new BufferedReader( oFileReader );
 
- 	    StringBuffer sb = new StringBuffer();
  	    String oLine = in.readLine();
 
  	    boolean isFirst = true;

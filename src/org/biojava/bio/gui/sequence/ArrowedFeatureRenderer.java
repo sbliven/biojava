@@ -20,17 +20,6 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.gui.sequence.*;
-import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.symbol.Location;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -39,6 +28,10 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
+
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.symbol.Location;
 
 
 /**

@@ -24,6 +24,7 @@ package org.biojava.ontology;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SmallAnnotation;

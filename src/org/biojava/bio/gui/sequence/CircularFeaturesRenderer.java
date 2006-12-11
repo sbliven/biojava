@@ -1,10 +1,11 @@
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.seq.Feature;
-
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.util.Iterator;
+
+import org.biojava.bio.seq.Feature;
 
 /**
  *

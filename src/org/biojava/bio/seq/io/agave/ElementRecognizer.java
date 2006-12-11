@@ -19,7 +19,7 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
 
 /**
  * This class is copied to agave package

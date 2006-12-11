@@ -52,7 +52,6 @@ public abstract class EmblCDROMRandomAccess
     private int headerLength;
     private int recordLength;
     private long recordCount;
-    private long lastRecord;
 
     /**
      * A <code>recParser</code> for implementing

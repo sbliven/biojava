@@ -25,15 +25,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.util.Vector;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ParseErrorEvent;
 import org.biojava.utils.ParseErrorListener;
 import org.biojava.utils.ParseErrorSource;
-import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>

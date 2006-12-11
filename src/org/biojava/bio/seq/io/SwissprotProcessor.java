@@ -23,7 +23,6 @@ package org.biojava.bio.seq.io;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -90,7 +89,6 @@ public class SwissprotProcessor
 	}
 
 	private SwissprotFeatureTableParser features;
-	private static HashSet featureKeys = null;
 	private List accessions;
 	{
 		accessions = new ArrayList();

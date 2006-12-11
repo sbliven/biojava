@@ -27,11 +27,11 @@ import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.seq.impl.DummySequence;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.biosql.BioSQLSequenceDB;
+import org.biojava.bio.seq.impl.DummySequence;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.ChangeVetoException;
@@ -62,8 +62,6 @@ public class SequenceDBSequenceBuilder extends SequenceBuilderBase
     // the DB on which I will be working
     private SequenceDB db;
     int mode;
-
-    private String seqName;
 
     /**
      * constructor

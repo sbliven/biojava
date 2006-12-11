@@ -38,7 +38,6 @@ public class SimpleSymbolPropertyTable implements SymbolPropertyTable {
     //Finite ? 
     private final Alphabet source;
     private String name;
-    private double value;
     
     private final Map doublePropMap;
     

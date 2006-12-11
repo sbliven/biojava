@@ -21,11 +21,14 @@
 
 package org.biojavax.ga.impl;
 
-import java.util.*;
-import junit.framework.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import java.util.Iterator;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 import org.biojavax.ga.Organism;
 import org.biojavax.ga.exception.IllegalOrganismException;
 

@@ -22,7 +22,6 @@
 
 package org.biojava.bio.gui;
 
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
@@ -41,9 +40,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  */
 public class BarLogoPainter implements LogoPainter {
   public void paintLogo(LogoContext lCtxt) {
-    Graphics2D g2 = lCtxt.getGraphics();
     Distribution dis = lCtxt.getDistribution();
-    SymbolStyle style = lCtxt.getStyle();
     BlockPainter blockPainter = lCtxt.getBlockPainter();
 
     Rectangle bounds = lCtxt.getBounds();

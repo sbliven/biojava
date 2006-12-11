@@ -1,10 +1,12 @@
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.seq.FeatureHolder;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Renders a sequence as a circle using a CircularRenderer.

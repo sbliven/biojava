@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.utils.ChangeEvent;

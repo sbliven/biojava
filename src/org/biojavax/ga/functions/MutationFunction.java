@@ -20,9 +20,14 @@
  */
 package org.biojavax.ga.functions;
 
-import org.biojava.bio.dist.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.dist.OrderNDistribution;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * <p>A class that mutates a <code>SymbolList</code></p>

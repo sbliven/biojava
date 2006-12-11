@@ -21,19 +21,19 @@
 
 package org.biojava.utils.automata;
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.bio.BioException;
 import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.AlphabetIndex;
 import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 
 /**
@@ -475,21 +475,20 @@ public class FiniteAutomaton
         output.append("\n");
 
         // dump transitions
-        try {
-            SymbolTokenization toke = alfa.getTokenization("token");
+       // try {
             output.append("Transitions: source, dest, symbol\n");
             for (Iterator tranI = transitions.iterator(); tranI.hasNext(); ) {
                 Transition trans = (Transition) tranI.next();
                 output.append(trans.toString());
                 output.append("\n");
             }
-        }
+        /*}
         catch (IllegalSymbolException ise) {
             throw new AssertionError(ise);
         }
         catch (BioException be) {
             throw new AssertionError(be);
-        }
+        }*/
         return output.toString();
     }
 

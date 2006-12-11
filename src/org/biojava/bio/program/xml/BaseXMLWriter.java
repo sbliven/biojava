@@ -61,13 +61,6 @@ public class BaseXMLWriter {
     private boolean tLastWriteStartElement;
     private String oAttName;
     private String oAttValue;
-    private static final String oLt = "<";
-    private static final String oGt = ">";
-    private static final String oLtS = "</";
-    private static final String oGtS = "/>";
-    private static final String oSp = " ";
-    private static final String oEqQuote = "=\"";
-    private static final String oQuote = "\"";
     static final String oHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
     public BaseXMLWriter()

@@ -20,7 +20,8 @@
  */
 package org.biojavax.ga.functions;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * <p>Simple implementation of the <code>GACross</code> interface. Basically a

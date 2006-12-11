@@ -12,12 +12,10 @@
 
 package org.biojava.bio.seq.io.game12;
 
-import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.game.ElementRecognizer;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StringElementHandlerBase;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  *  Handles the GAME &lt;annotation&gt; element
@@ -31,11 +29,6 @@ public class GAMEGeneHandler
     // the only important property of this container is its id
     // which I need to capture and supply nested classes.
 
-    // database columns
-    private String release;
-    private String name;
-    private String association;
-    private String synonym;
 
     // set up factory method
     /**
@@ -48,37 +41,6 @@ public class GAMEGeneHandler
                 return new GAMEGeneHandler(staxenv);
             }
         };
-
-    // subclass <dbxref> handler to pick modify the form of the entry
-    // subclass <dbxref> to write a feature property here
-    private class DbxrefHandler extends GAMEDbxrefHandler
-    {
-        private DbxrefHandler(StAXFeatureHandler staxenv)
-        {
-            super(staxenv);
-        }
-
-        public void endElementHandler(
-                String nsURI,
-                String localName,
-                String qName,
-                StAXContentHandler contentHandler)
-            throws SAXException
-        {
-            // validate before going further
-            if ((db_xref_db == null) || (db_xref_id == null)) {
-                return;
-            }
-
-            try {
-                listener.addFeatureProperty(db_xref_db, db_xref_id);
-            }
-            catch (ParseException pe) {
-                pe.printStackTrace();
-                throw new SAXException("unexpected exception while add <dbxref> as a feature property.");
-            }
-        }
-    }
 
     /**
      *  Constructor for the GAMEGeneHandler object
@@ -125,7 +87,6 @@ public class GAMEGeneHandler
          *@param  s  The new stringValue value
          */
         protected void setStringValue(String s) {
-            name = s.trim();
         }
     }
 
@@ -145,7 +106,6 @@ public class GAMEGeneHandler
             String localName,
             String qName,
             Attributes attrs) {
-        association = attrs.getValue("association");
     }
 
     public void endElementHandler(

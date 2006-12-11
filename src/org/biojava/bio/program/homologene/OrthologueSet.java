@@ -21,8 +21,8 @@
 
 package org.biojava.bio.program.homologene;
 
-import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Interface for classes that store and manipulate

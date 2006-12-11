@@ -20,15 +20,15 @@
  */
 package org.biojava.bio.symbol;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.lang.ref.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeAdapter;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeListener;
@@ -49,8 +49,6 @@ class LinearAlphabetIndex
 {
   private /*final*/ Reference alphaRef;
   private Symbol[] symbols;
-  private ChangeListener indexBuilder; // todo: not used - can we nuke this? MRP
-  private ChangeListener adapter;      // todo: not used - can we nuke this? MRP
 
   // hack for bug in compaq 1.2?
   protected ChangeSupport getChangeSupport(ChangeType ct) {
@@ -64,20 +62,6 @@ class LinearAlphabetIndex
     this.alphaRef = new WeakReference(alpha);
 
     this.symbols = buildIndex(alpha);
-
-    alpha.addChangeListener(
-      indexBuilder = new IndexRebuilder(),
-      Alphabet.SYMBOLS
-    );
-
-    this.addChangeListener(
-      adapter = new ChangeAdapter() {
-        public void postChange(ChangeEvent ce) {
-          symbols = (Symbol[] ) ce.getChange();
-        }
-      },
-      AlphabetIndex.INDEX
-    );
 
     // unlock the alphabet
     alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);

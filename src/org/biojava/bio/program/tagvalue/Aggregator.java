@@ -1,6 +1,5 @@
 package org.biojava.bio.program.tagvalue;
 
-import java.lang.StringBuffer;
 import org.biojava.utils.ParserException;
 
 /**
@@ -24,7 +23,6 @@ public class Aggregator extends SimpleTagValueWrapper {
 
   // state
   //
-  private Object tag;
   private StringBuffer value;
   private boolean inValue;
 
