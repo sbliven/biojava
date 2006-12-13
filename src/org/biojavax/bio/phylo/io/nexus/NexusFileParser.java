@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 import org.biojava.bio.seq.io.ParseException;
@@ -171,12 +172,13 @@ public class NexusFileParser {
 		boolean expectingBeginName = false;
 		int inComment = 0;
 		boolean inQuotes = false;
-		boolean potentialDoubleQuote = false;
+		boolean doubleQuoteOpened = false;
 		boolean expectingBlockContents = false;
 		NexusBlockParser blockParser = null;
 
 		// Read the file line-by-line.
-		final StringBuffer parsedTokBuffer = new StringBuffer();
+		final Stack parsedTokBufferStack = new Stack();
+		StringBuffer parsedTokBuffer = new StringBuffer();
 		String line;
 		while ((line = reader.readLine()) != null) {
 			final StringTokenizer tokenizer = new StringTokenizer(line,
@@ -188,32 +190,57 @@ public class NexusFileParser {
 				if (allDelims.indexOf(tok) >= 0) {
 					// Process double quotes by flipping inside quote
 					// status and appending the quote to the end of
-					// the current token buffer.
-					if (potentialDoubleQuote) {
-						if (quote.equals(tok)) {
-							inQuotes = !inQuotes;
-							parsedTokBuffer.append(quote);
-						}
-						potentialDoubleQuote = false;
+					// the current token buffer then skipping to the
+					// next parsed token.
+					if (doubleQuoteOpened && quote.equals(tok)) {
+						inQuotes = !inQuotes;
+						parsedTokBuffer.append(quote);
 					}
 					// Stuff inside comments.
 					else if (inComment > 0) {
+						// Start or end quotes?
+						if (quote.equals(tok)) 
+							inQuotes = !inQuotes;
+						// Nested comment.
+						else if (beginComment.equals(tok) && !inQuotes) {
+							// Flush any existing comment text.
+							if (parsedTokBuffer.length() > 0) {
+								if (expectingBlockContents)
+									blockParser.commentText(parsedTokBuffer
+											.toString());
+								else
+									listener.commentText(parsedTokBuffer
+											.toString());
+								parsedTokBuffer.setLength(0);
+							}
+							// Start the new comment.
+							inComment++;
+							if (expectingBlockContents)
+								blockParser.beginComment();
+							else
+								listener.beginComment();
+							parsedTokBufferStack.push(parsedTokBuffer);
+							parsedTokBuffer = new StringBuffer();
+						}
 						// Closing comment, not inside quotes. This
 						// fires the current token buffer contents
 						// as plain text at the listener, then clears
 						// the buffer.
-						if (endComment.equals(tok) && !inQuotes) {
+						else if (endComment.equals(tok) && !inQuotes) {
 							inComment--;
 							if (expectingBlockContents) {
-								blockParser.commentText(parsedTokBuffer
-										.toString());
+								if (parsedTokBuffer.length() > 0)
+									blockParser.commentText(parsedTokBuffer
+											.toString());
 								blockParser.endComment();
 							} else {
-								listener
-										.commentText(parsedTokBuffer.toString());
+								if (parsedTokBuffer.length() > 0)
+									listener.commentText(parsedTokBuffer
+											.toString());
 								listener.endComment();
 							}
-							parsedTokBuffer.setLength(0);
+							parsedTokBuffer = (StringBuffer) parsedTokBufferStack
+									.pop();
 						}
 						// All other tokens are appended to the comment
 						// buffer.
@@ -223,10 +250,8 @@ public class NexusFileParser {
 					// Delimiter inside quotes.
 					else if (inQuotes) {
 						// Closing quote puts us outside quotes.
-						if (quote.equals(tok)) {
+						if (quote.equals(tok))
 							inQuotes = false;
-							potentialDoubleQuote = true;
-						}
 						// All other delimiters copied verbatim.
 						else
 							parsedTokBuffer.append(tok);
@@ -235,31 +260,19 @@ public class NexusFileParser {
 					else {
 						// Begin comment.
 						if (beginComment.equals(tok)) {
-							// Flush any existing comment.
-							if (inComment > 0 && parsedTokBuffer.length() > 0) {
-								if (expectingBlockContents) {
-									blockParser.commentText(parsedTokBuffer
-											.toString());
-									blockParser.endComment();
-								} else {
-									listener.commentText(parsedTokBuffer
-											.toString());
-									listener.endComment();
-								}
-							}
 							// Start the new comment.
 							inComment++;
 							if (expectingBlockContents)
 								blockParser.beginComment();
 							else
 								listener.beginComment();
-							parsedTokBuffer.setLength(0);
+							// Preserve any existing part-built tag.
+							parsedTokBufferStack.push(parsedTokBuffer);
+							parsedTokBuffer = new StringBuffer();
 						}
-						// End quoted string.
-						else if (quote.equals(tok)) {
+						// Start quoted string.
+						else if (quote.equals(tok))
 							inQuotes = true;
-							potentialDoubleQuote = true;
-						}
 						// Convert underscores to spaces.
 						else if (underscore.equals(tok))
 							parsedTokBuffer.append(space);
@@ -275,20 +288,18 @@ public class NexusFileParser {
 								parsedTokBuffer.setLength(0);
 
 								// Expecting header?
-								if (expectingHeader) {
-									if ("#NEXUS".equals(parsedTok)) {
-										expectingHeader = false;
-										expectingBeginTag = true;
-										listener.startFile();
-									}
+								if (expectingHeader
+										&& "#NEXUS".equals(parsedTok)) {
+									expectingHeader = false;
+									expectingBeginTag = true;
+									listener.startFile();
 								}
 
 								// Expecting a BEGIN tag?
-								else if (expectingBeginTag) {
-									if ("BEGIN".equalsIgnoreCase(parsedTok)) {
-										expectingBeginTag = false;
-										expectingBeginName = true;
-									}
+								else if (expectingBeginTag
+										&& "BEGIN".equalsIgnoreCase(parsedTok)) {
+									expectingBeginTag = false;
+									expectingBeginName = true;
 								}
 
 								// Expecting a name for a BEGIN block?
@@ -327,10 +338,10 @@ public class NexusFileParser {
 											"Parser in unknown state when parsing token \""
 													+ parsedTok + "\"");
 							}
-							
+
 							// If this was an end-line, let the listeners know.
 							if (endLine.equals(tok)) {
-								if (expectingBlockContents) 
+								if (expectingBlockContents)
 									blockParser.newLine();
 								else
 									listener.newLine();
@@ -343,6 +354,11 @@ public class NexusFileParser {
 					// Add token to buffer so far.
 					parsedTokBuffer.append(tok);
 				}
+
+				// Update double quote status. The next token is a potential
+				// double
+				// quote if the previous token was NOT a quote but this one IS.
+				doubleQuoteOpened = !doubleQuoteOpened && quote.equals(tok);
 			}
 		}
 
