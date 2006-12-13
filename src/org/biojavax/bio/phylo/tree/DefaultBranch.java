@@ -30,9 +30,9 @@ public class DefaultBranch implements Branch {
     public final Node getOtherNode(Node node) throws IllegalArgumentException {
         Node nodeA = getNodeA(), nodeB = getNodeB();
         if (nodeA.equals(node)) {
-            return nodeA;
-        } else if (nodeB.equals(node)) {
             return nodeB;
+        } else if (nodeB.equals(node)) {
+            return nodeA;
         } else {
             throw new IllegalArgumentException("Node " + node + " is not part of the branch " + this);
         }

@@ -11,7 +11,7 @@ import java.util.*;
 public class DefaultRootedTreeNode implements RootedTreeNode {
     private Branch parentBranch = null;
     private List childBranches = new LinkedList();
-    private int currentSubtreeSize = 0;
+    private int currentSubtreeSize = 1;
 
     private Collection children = new AbstractCollection() {
         public Iterator iterator() {
