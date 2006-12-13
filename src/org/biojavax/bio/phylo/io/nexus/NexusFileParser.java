@@ -270,7 +270,7 @@ public class NexusFileParser {
 
 								// Expecting a BEGIN tag?
 								else if (expectingBeginTag
-										&& "BEGIN".equalsIgnoreCase(parsedTok)) {
+										&& "BEGIN".equals(parsedTok)) {
 									expectingBeginTag = false;
 									expectingBeginName = true;
 								}
@@ -285,7 +285,7 @@ public class NexusFileParser {
 								// Looking for block contents?
 								else if (expectingBlockContents) {
 									// End tag?
-									if ("END".equalsIgnoreCase(parsedTok)) {
+									if ("END".equals(parsedTok)) {
 										listener.endBlock();
 										expectingBlockContents = false;
 										expectingBeginTag = true;
