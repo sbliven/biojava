@@ -90,10 +90,13 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 		}
 	}
 
+	// This class builds unknown blocks by remembering all tokens and
+	// comments in the order they were received, and writing them out
+	// again in that order when requested.
 	private static class UnknownBlockParser extends NexusBlockParser.Abstract {
 		private UnknownBlockBuilder builder;
 
-		public UnknownBlockParser() {
+		private UnknownBlockParser() {
 			super(new UnknownBlockBuilder());
 			this.builder = (UnknownBlockBuilder) this.getBlockListener();
 		}
@@ -131,17 +134,12 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 				return this.block;
 			}
 
+			// Holds unknown block data.
 			private static class UnknownBlock extends NexusBlock.Abstract {
 
 				private List components = new ArrayList();
 
-				/**
-				 * Construct a new unknown block.
-				 * 
-				 * @param blockName
-				 *            the name of it.
-				 */
-				public UnknownBlock(String blockName) {
+				private UnknownBlock(String blockName) {
 					super(blockName);
 				}
 
