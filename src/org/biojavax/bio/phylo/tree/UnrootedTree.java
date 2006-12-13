@@ -1,4 +1,4 @@
-package org.biojavax.bio.phylo;
+package org.biojavax.bio.phylo.tree;
 
 /**
  * @author Tobias Thierer

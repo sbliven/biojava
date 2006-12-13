@@ -1,4 +1,4 @@
-package org.biojavax.bio.phylo;
+package org.biojavax.bio.phylo.tree;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -16,5 +16,5 @@ public interface RootedTree extends Tree {
     Tree asUnrooted();
 
     Iterator postOrderIterator();
-    Iterator preOrderIterator();
+    //Iterator preOrderIterator();
 }

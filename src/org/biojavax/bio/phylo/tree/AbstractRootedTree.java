@@ -1,4 +1,4 @@
-package org.biojavax.bio.phylo;
+package org.biojavax.bio.phylo.tree;
 
 import java.util.Collection;
 import java.util.AbstractCollection;
@@ -10,7 +10,7 @@ import java.util.Iterator;
  *          <p/>
  *          created on 12.12.2006 14:44:10
  */
-public abstract class AbstractRootedTree implements RootedTree {
+public class AbstractRootedTree implements RootedTree {
     private RootedTreeNode rootNode;
 
     /**
@@ -83,6 +83,14 @@ public abstract class AbstractRootedTree implements RootedTree {
 
     public final Iterator postOrderIterator() {
         return new PostOrderTreeIterator(this);
+    }
+
+    /**
+     * @return An iterator over this tree's nodes. The default implementation
+     *  returns {@link #postOrderIterator()}
+     */
+    public Iterator iterator() {
+        return postOrderIterator();
     }
 
     public void addBranch(Branch branch) {

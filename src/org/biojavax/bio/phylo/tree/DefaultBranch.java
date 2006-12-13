@@ -1,4 +1,4 @@
-package org.biojavax.bio.phylo;
+package org.biojavax.bio.phylo.tree;
 
 import java.util.Collection;
 import java.util.AbstractCollection;
@@ -11,7 +11,22 @@ import java.util.NoSuchElementException;
  *          <p/>
  *          created on 12.12.2006 14:16:54
  */
-public abstract class AbstractBranch implements Branch {
+public class DefaultBranch implements Branch {
+    private final Node nodeA, nodeB;
+
+    protected DefaultBranch(Node nodeA, Node nodeB) {
+        this.nodeA = nodeA;
+        this.nodeB = nodeB;
+    }
+
+    public Node getNodeA() {
+        return nodeA;
+    }
+
+    public Node getNodeB() {
+        return nodeB;
+    }
+
     public final Node getOtherNode(Node node) throws IllegalArgumentException {
         Node nodeA = getNodeA(), nodeB = getNodeB();
         if (nodeA.equals(node)) {

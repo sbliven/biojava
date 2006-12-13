@@ -1,4 +1,4 @@
-package org.biojavax.bio.phylo;
+package org.biojavax.bio.phylo.tree;
 
 import java.util.*;
 
@@ -43,7 +43,7 @@ public class AbstractRootedTreeNode implements RootedTreeNode {
      * @param node New child node to add
      */
     public void addChild(Node node) {
-        addBranch(new SimpleBranch(this, node));
+        addBranch(new DefaultBranch(this, node));
     }
 
     public Collection getChildren() {
