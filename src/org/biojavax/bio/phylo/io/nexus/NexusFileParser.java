@@ -20,19 +20,13 @@
  */
 package org.biojavax.bio.phylo.io.nexus;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import org.biojava.bio.seq.io.ParseException;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
-
-import org.biojava.bio.seq.io.ParseException;
 
 /**
  * Parses Nexus files and fires events at a NexusFileListener object. Blocks are
@@ -119,7 +113,7 @@ public class NexusFileParser {
 	 * 
 	 * @param listener
 	 *            the listener that will receive events.
-	 * @param inputFile
+	 * @param inputStream
 	 *            the stream to parse.
 	 * @throws IOException
 	 *             if anything goes wrong with reading the stream.
@@ -136,8 +130,8 @@ public class NexusFileParser {
 	 * 
 	 * @param listener
 	 *            the listener that will receive events.
-	 * @param inputFile
-	 *            the file to parse.
+	 * @param inputReader
+	 *            the reader to read input from
 	 * @throws IOException
 	 *             if anything goes wrong with reading the reader.
 	 * @throws ParseException
@@ -156,7 +150,10 @@ public class NexusFileParser {
 	private void parse(final NexusFileListener listener,
 			final BufferedReader reader) throws IOException, ParseException {
 		// What are our delims?
-		String space = " ";
+        // Tobias: From JEBL: Delimiters are '[', ']', '\0', '!', '&'
+        // ! defines a comment to be written out to a log file
+        // & defines a meta comment
+        String space = " ";
 		String tab = "\t";
 		String beginComment = "[";
 		String endComment = "]";
