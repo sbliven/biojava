@@ -109,7 +109,9 @@ class RestrictionSiteFinder implements Runnable
                     continue;
 
                 t.location = new RangeLocation(idx, idx + siteLen - 1);
-                target.createFeature(t);
+                synchronized (target) {
+                	target.createFeature(t);
+                }
             }
 
             // If not palindromic we have to search reverse strand too
@@ -127,7 +129,9 @@ class RestrictionSiteFinder implements Runnable
                         continue;
 
                     t.location = new RangeLocation(idx, idx + siteLen - 1);
-                    target.createFeature(t);
+                    synchronized (target) {
+                    	target.createFeature(t);
+                    }
                 }
             }
         }
