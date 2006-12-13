@@ -35,8 +35,9 @@ public interface NexusBlockListener {
 
 	/**
 	 * Notifies the parser that a new block is starting.
+	 * @param blockName the name of the newly started block.
 	 */
-	public void startBlock();
+	public void startBlock(String blockName);
 
 	/**
 	 * Notifies the parser that a block is ending.
@@ -57,7 +58,7 @@ public interface NexusBlockListener {
 	 * Closing a line (semi-colon encountered). This indicates that anything
 	 * received after it is on the next logical line of the block.
 	 */
-	public void newLine();
+	public void endTokenGroup();
 
 	/**
 	 * Receiving free text inside a comment tag.

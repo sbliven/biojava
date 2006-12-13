@@ -35,8 +35,15 @@ import org.biojava.bio.seq.io.ParseException;
 public interface NexusBlockParser {
 
 	/**
+	 * The name for an unknown block parser.
+	 */
+	public static final String UNKNOWN_BLOCK = "__UNKNOWN";
+
+	/**
 	 * Notifies the parser that a new block is starting.
-	 * @param blockName the name of the block.
+	 * 
+	 * @param blockName
+	 *            the name of the block.
 	 */
 	public void startBlock(String blockName);
 
@@ -73,7 +80,7 @@ public interface NexusBlockParser {
 	 * Closing a line (semi-colon encountered). This indicates that anything
 	 * received after it is on the next logical line of the block.
 	 */
-	public void newLine();
+	public void endTokenGroup();
 
 	/**
 	 * Receiving free text inside a comment tag.
@@ -84,31 +91,34 @@ public interface NexusBlockParser {
 	public void commentText(String comment) throws ParseException;
 
 	/**
+	 * Obtain the listener for this parser.
+	 * 
+	 * @return the listener.
+	 */
+	public NexusBlockListener getBlockListener();
+
+	/**
 	 * All block parsers should derive from this abstract parser.
 	 */
 	public abstract class Abstract implements NexusBlockParser {
 		private NexusBlockListener blockListener;
-		
+
 		private String blockName;
 
 		public Abstract(final NexusBlockListener blockListener) {
 			this.blockListener = blockListener;
 			this.blockName = null;
 		}
-		
-		/**
-		 * Obtain the listener for this parser.
-		 * @return the listener.
-		 */
-		protected NexusBlockListener getBlockListener() {
+
+		public NexusBlockListener getBlockListener() {
 			return this.blockListener;
 		}
 
 		public void startBlock(final String blockName) {
 			this.blockName = blockName;
-			this.blockListener.startBlock();
+			this.blockListener.startBlock(blockName);
 		}
-		
+
 		protected String getBlockName() {
 			return this.blockName;
 		}
@@ -126,44 +136,15 @@ public interface NexusBlockParser {
 			this.blockListener.endComment();
 		}
 
-		public void newLine() {
-			this.blockListener.newLine();
+		public void endTokenGroup() {
+			this.blockListener.endTokenGroup();
 		}
 
-		public abstract void commentText(final String comment)
-				throws ParseException;
+		public void commentText(final String comment) throws ParseException {
+			this.blockListener.commentText(comment);
+		}
 
 		public abstract void parseToken(final String token)
 				throws ParseException;
 	}
-
-	/**
-	 * Use this constant for the block name when you want to override the
-	 * unknown block handler.
-	 */
-	public static final String UNKNOWN_BLOCK = "__UNKNOWN";
-
-	public static final NexusBlockParser unknownBlockParser = new NexusBlockParser() {
-
-		public void startBlock(final String blockName) {
-		}
-
-		public void endBlock() {
-		}
-
-		public void parseToken(final String token) throws ParseException {
-		}
-
-		public void beginComment() {
-		}
-
-		public void endComment() {
-		}
-
-		public void newLine() {
-		}
-
-		public void commentText(final String comment) throws ParseException {
-		}
-	};
 }
