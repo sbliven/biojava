@@ -8,7 +8,7 @@ import java.util.*;
  *          <p/>
  *          created on 12.12.2006 15:13:22
  */
-public class AbstractRootedTreeNode implements RootedTreeNode {
+public class DefaultRootedTreeNode implements RootedTreeNode {
     private Branch parentBranch = null;
     private List childBranches = new LinkedList();
     private int currentSubtreeSize = 0;
@@ -23,7 +23,7 @@ public class AbstractRootedTreeNode implements RootedTreeNode {
 
                 public Object next() {
                     Branch nextBranch = (Branch) itChildBranches.next();
-                    return nextBranch.getOtherNode(AbstractRootedTreeNode.this);
+                    return nextBranch.getOtherNode(DefaultRootedTreeNode.this);
                 }
 
                 public void remove() {

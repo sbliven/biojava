@@ -10,13 +10,13 @@ import java.util.Iterator;
  *          <p/>
  *          created on 12.12.2006 14:44:10
  */
-public class AbstractRootedTree implements RootedTree {
+public class DefaultRootedTree implements RootedTree {
     private RootedTreeNode rootNode;
 
     /**
      * Constructs an empty rooted tree
      */
-    public AbstractRootedTree() {
+    public DefaultRootedTree() {
         this(null);
     }
 
@@ -32,7 +32,7 @@ public class AbstractRootedTree implements RootedTree {
      * tree's root, this will just create a new view on the other
      * tree, i.e. a new tree that shares all nodes with the old one.
      */
-    public AbstractRootedTree(RootedTreeNode root) {
+    public DefaultRootedTree(RootedTreeNode root) {
         this.rootNode = root;
     }
 
@@ -40,7 +40,7 @@ public class AbstractRootedTree implements RootedTree {
         final RootedTreeNode root = getRoot();
         return new AbstractCollection() {
             public Iterator iterator() {
-                return AbstractRootedTree.this.iterator();
+                return DefaultRootedTree.this.iterator();
             }
 
             public int size() {
@@ -63,7 +63,7 @@ public class AbstractRootedTree implements RootedTree {
     public Tree asUnrooted() {
         return new UnrootedTree() {
             public void addBranch(Branch branch) {
-                AbstractRootedTree.this.addBranch(branch);
+                DefaultRootedTree.this.addBranch(branch);
             }
 
             public Iterator iterator() {
@@ -76,7 +76,7 @@ public class AbstractRootedTree implements RootedTree {
             }
 
             public boolean isEmpty() {
-                return AbstractRootedTree.this.isEmpty();
+                return DefaultRootedTree.this.isEmpty();
             }
         };
     }
