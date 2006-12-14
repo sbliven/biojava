@@ -8,7 +8,7 @@ import java.util.Iterator;
  *          <p/>
  *          created on 12.12.2006 13:23:41
  */
-public interface Tree extends Iterable {
+public interface Tree {
     /**
      * Adds a branch to the tree. branch.getNodeA() must
      * already be in this tree; branch.getNodeB()
