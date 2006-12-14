@@ -47,15 +47,11 @@ public class TaxaBlock extends NexusBlock.Abstract {
 
 	private List taxLabels = new ArrayList();
 
-	private List preDimensionComments = new ArrayList();
-
-	private List preLabelComments = new ArrayList();
-
-	private List postLabelComments = new ArrayList();
+	private List comments = new ArrayList();
 
 	/**
-	 * Delegates to NexusBlock.Abstract constructor using TaxaBlock.TAXA as the
-	 * name.
+	 * Delegates to NexusBlock.Abstract constructor using TaxaBlock.TAXA_BLOCK
+	 * as the name.
 	 */
 	public TaxaBlock() {
 		super(TaxaBlock.TAXA_BLOCK);
@@ -152,113 +148,47 @@ public class TaxaBlock extends NexusBlock.Abstract {
 	}
 
 	/**
-	 * Adds a comment before the DIMENSIONS tag.
+	 * Adds a comment.
 	 * 
 	 * @param comment
 	 *            the comment to add.
 	 */
-	public void addPreDimensionComment(final NexusComment comment) {
-		this.preDimensionComments.add(comment);
+	public void addComment(final NexusComment comment) {
+		this.comments.add(comment);
 	}
 
 	/**
-	 * Removes a comment from before the DIMENSIONS tag.
+	 * Removes a comment.
 	 * 
 	 * @param comment
 	 *            the comment to remove.
 	 */
-	public void removePreDimensionComment(final NexusComment comment) {
-		this.preDimensionComments.remove(comment);
+	public void removeComment(final NexusComment comment) {
+		this.comments.remove(comment);
 	}
 
 	/**
-	 * Returns all comments from before the DIMENSIONS tag.
+	 * Returns all comments.
 	 * 
 	 * @return all the selected comments.
 	 */
-	public List getPreDimensionComments() {
-		return this.preDimensionComments;
-	}
-
-	/**
-	 * Adds a comment before the TAXLABELS tag.
-	 * 
-	 * @param comment
-	 *            the comment to add.
-	 */
-	public void addPreLabelComment(final NexusComment comment) {
-		this.preLabelComments.add(comment);
-	}
-
-	/**
-	 * Removes a comment from before the TAXLABELS tag.
-	 * 
-	 * @param comment
-	 *            the comment to remove.
-	 */
-	public void removePreLabelComment(final NexusComment comment) {
-		this.preLabelComments.remove(comment);
-	}
-
-	/**
-	 * Returns all comments from before the TAXLABELS tag.
-	 * 
-	 * @return all the selected comments.
-	 */
-	public List getPreLabelComments() {
-		return this.preLabelComments;
-	}
-
-	/**
-	 * Adds a comment after the TAXLABELS tag.
-	 * 
-	 * @param comment
-	 *            the comment to add.
-	 */
-	public void addPostLabelComment(final NexusComment comment) {
-		this.postLabelComments.add(comment);
-	}
-
-	/**
-	 * Removes a comment from after the TAXLABELS tag.
-	 * 
-	 * @param comment
-	 *            the comment to remove.
-	 */
-	public void removePostLabelComment(final NexusComment comment) {
-		this.postLabelComments.remove(comment);
-	}
-
-	/**
-	 * Returns all comments from after the TAXLABELS tag.
-	 * 
-	 * @return all the selected comments.
-	 */
-	public List getPostLabelComments() {
-		return this.postLabelComments;
-	}
-
-	// Write a list of comments one per line.
-	private void writeComments(final Writer writer, final List comments)
-			throws IOException {
-		for (final Iterator i = comments.iterator(); i.hasNext();) {
-			((NexusComment) i.next()).writeObject(writer);
-			writer.write(NexusFileParser.NEW_LINE);
-		}
+	public List getComments() {
+		return this.comments;
 	}
 
 	protected void writeBlockContents(Writer writer) throws IOException {
-		this.writeComments(writer, this.preDimensionComments);
+		for (final Iterator i = this.comments.iterator(); i.hasNext();) {
+			((NexusComment) i.next()).writeObject(writer);
+			writer.write(NexusFileParser.NEW_LINE);
+		}
 		writer.write(" DIMENSIONS NTAX=" + this.dimensionsNTax + ";"
 				+ NexusFileParser.NEW_LINE);
-		this.writeComments(writer, this.preLabelComments);
 		writer.write(" TAXLABELS");
 		for (final Iterator i = this.taxLabels.iterator(); i.hasNext();) {
 			writer.write(' ');
 			this.writeToken(writer, (String) i.next());
 		}
 		writer.write(";" + NexusFileParser.NEW_LINE);
-		this.writeComments(writer, this.postLabelComments);
 	}
 
 }

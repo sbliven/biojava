@@ -20,7 +20,7 @@
  */
 package org.biojavax.bio.phylo.io.nexus;
 
-import org.biojava.bio.seq.io.ParseException;
+import org.biojavax.bio.phylo.io.nexus.TreesBlock.NewickTreeString;
 
 /**
  * Builds Nexus taxa blocks.
@@ -30,24 +30,16 @@ import org.biojava.bio.seq.io.ParseException;
  * @author Jim Balhoff
  * @since 1.6
  */
-public class TaxaBlockBuilder extends NexusBlockBuilder.Abstract implements TaxaBlockListener {
+public class TreesBlockBuilder extends NexusBlockBuilder.Abstract implements TreesBlockListener {
 
-	private TaxaBlock block;
-	
-	public void addTaxLabel(final String taxLabel) throws ParseException {
-		this.block.addTaxLabel(taxLabel);
-	}
-
-	public void setDimensionsNTax(final int dimensionsNTax) {
-		this.block.setDimensionsNTax(dimensionsNTax);
-	}
+	private TreesBlock block;
 
 	protected void addComment(final NexusComment comment) {
 		this.block.addComment(comment);
 	}
 
 	protected NexusBlock startBlockObject() {
-		this.block = new TaxaBlock();
+		this.block = new TreesBlock();
 		this.resetStatus();
 		return this.block;
 	}
@@ -62,6 +54,14 @@ public class TaxaBlockBuilder extends NexusBlockBuilder.Abstract implements Taxa
 
 	public void endTokenGroup() {
 		// Nothing to do.
+	}
+
+	public void addTranslation(String label, String taxa) {
+		this.block.addTranslation(label, taxa);
+	}
+
+	public void addTree(String label, NewickTreeString tree) {
+		this.block.addTree(label, tree);
 	}
 
 }
