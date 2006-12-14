@@ -56,10 +56,10 @@ public interface NexusBlock extends NexusObject {
 		
 		public void writeObject(final Writer writer) throws IOException {
 			writer.write("BEGIN "+this.blockName+";");
-			writer.write(NexusFileParser.NEW_LINE);
+			writer.write(NexusFileFormat.NEW_LINE);
 			this.writeBlockContents(writer);
 			writer.write("END;");
-			writer.write(NexusFileParser.NEW_LINE);
+			writer.write(NexusFileFormat.NEW_LINE);
 		}
 		
 		/**

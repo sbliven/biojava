@@ -239,9 +239,9 @@ public class TreesBlock extends NexusBlock.Abstract {
 	protected void writeBlockContents(Writer writer) throws IOException {
 		for (final Iterator i = this.comments.iterator(); i.hasNext();) {
 			((NexusComment) i.next()).writeObject(writer);
-			writer.write(NexusFileParser.NEW_LINE);
+			writer.write(NexusFileFormat.NEW_LINE);
 		}
-		writer.write(" TRANSLATE" + NexusFileParser.NEW_LINE);
+		writer.write(" TRANSLATE" + NexusFileFormat.NEW_LINE);
 		for (final Iterator i = this.translations.entrySet().iterator(); i
 				.hasNext();) {
 			final Map.Entry entry = (Map.Entry) i.next();
@@ -253,7 +253,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 				writer.write(',');
 			else
 				writer.write(';');
-			writer.write(NexusFileParser.NEW_LINE);
+			writer.write(NexusFileFormat.NEW_LINE);
 		}
 		for (final Iterator i = this.trees.entrySet().iterator(); i.hasNext();) {
 			final Map.Entry entry = (Map.Entry) i.next();
@@ -267,7 +267,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 			if (treeStr.getRootType() != null)
 				writer.write("[" + treeStr.getRootType() + "]");
 			this.writeToken(writer, treeStr.getTreeString());
-			writer.write(";" + NexusFileParser.NEW_LINE);
+			writer.write(";" + NexusFileFormat.NEW_LINE);
 		}
 	}
 

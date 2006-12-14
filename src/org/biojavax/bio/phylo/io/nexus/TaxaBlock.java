@@ -179,16 +179,16 @@ public class TaxaBlock extends NexusBlock.Abstract {
 	protected void writeBlockContents(Writer writer) throws IOException {
 		for (final Iterator i = this.comments.iterator(); i.hasNext();) {
 			((NexusComment) i.next()).writeObject(writer);
-			writer.write(NexusFileParser.NEW_LINE);
+			writer.write(NexusFileFormat.NEW_LINE);
 		}
 		writer.write(" DIMENSIONS NTAX=" + this.dimensionsNTax + ";"
-				+ NexusFileParser.NEW_LINE);
+				+ NexusFileFormat.NEW_LINE);
 		writer.write(" TAXLABELS");
 		for (final Iterator i = this.taxLabels.iterator(); i.hasNext();) {
 			writer.write(' ');
 			this.writeToken(writer, (String) i.next());
 		}
-		writer.write(";" + NexusFileParser.NEW_LINE);
+		writer.write(";" + NexusFileFormat.NEW_LINE);
 	}
 
 }

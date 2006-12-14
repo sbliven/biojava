@@ -23,37 +23,41 @@ package org.biojavax.bio.phylo.io.nexus;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
+import java.util.Iterator;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
 import org.biojava.bio.seq.io.ParseException;
 
 /**
- * Parses Nexus files and fires events at a NexusFileListener object. Blocks are
- * parsed using NexusBlockParser objects provided at runtime. Each of those
- * objects should probably have a NexusBlockListener object associated with them
- * that receives events generated from the processed data in the block.
+ * Reads/writes Nexus files and fires events at a NexusFileListener object.
+ * Blocks are parsed using NexusBlockParser objects provided at runtime. Each of
+ * those objects should probably have a NexusBlockListener object associated
+ * with them that receives events generated from the processed data in the
+ * block.
  * 
  * @author Richard Holland
  * @author Tobias Thierer
  * @author Jim Balhoff
  * @since 1.6
  */
-public class NexusFileParser {
+public class NexusFileFormat {
 
 	/**
 	 * New-line symbol.
 	 */
 	public static final String NEW_LINE = System.getProperty("line.separator");
 
-	/**
-	 * Set up a new reader object.
-	 */
-	public NexusFileParser() {
+	// Prevent instances.
+	private NexusFileFormat() {
 	}
 
 	/**
@@ -68,11 +72,11 @@ public class NexusFileParser {
 	 * @throws ParseException
 	 *             if the file format is incorrect.
 	 */
-	public void parseFile(final NexusFileListener listener, final File inputFile)
-			throws IOException, ParseException {
+	public static void parseFile(final NexusFileListener listener,
+			final File inputFile) throws IOException, ParseException {
 		final FileReader fr = new FileReader(inputFile);
 		try {
-			this.parseReader(listener, fr);
+			NexusFileFormat.parseReader(listener, fr);
 		} finally {
 			fr.close();
 		}
@@ -90,9 +94,10 @@ public class NexusFileParser {
 	 * @throws ParseException
 	 *             if the stream format is incorrect.
 	 */
-	public void parseInputStream(final NexusFileListener listener,
+	public static void parseInputStream(final NexusFileListener listener,
 			final InputStream inputStream) throws IOException, ParseException {
-		this.parseReader(listener, new InputStreamReader(inputStream));
+		NexusFileFormat.parseReader(listener,
+				new InputStreamReader(inputStream));
 	}
 
 	/**
@@ -107,9 +112,9 @@ public class NexusFileParser {
 	 * @throws ParseException
 	 *             if the reader format is incorrect.
 	 */
-	public void parseReader(final NexusFileListener listener,
+	public static void parseReader(final NexusFileListener listener,
 			final Reader inputReader) throws IOException, ParseException {
-		this
+		NexusFileFormat
 				.parse(
 						listener,
 						inputReader instanceof BufferedReader ? (BufferedReader) inputReader
@@ -117,7 +122,7 @@ public class NexusFileParser {
 	}
 
 	// Do the work!
-	private void parse(final NexusFileListener listener,
+	private static void parse(final NexusFileListener listener,
 			final BufferedReader reader) throws IOException, ParseException {
 		// What are our delims?
 		String space = " ";
@@ -127,9 +132,9 @@ public class NexusFileParser {
 		String singleQuote = "'";
 		String underscore = "_";
 		String endTokenGroup = ";";
-		String newLine = NexusFileParser.NEW_LINE;
-		String allDelims = space + tab + beginComment + endComment + singleQuote
-				+ underscore + endTokenGroup + newLine;
+		String newLine = NexusFileFormat.NEW_LINE;
+		String allDelims = space + tab + beginComment + endComment
+				+ singleQuote + underscore + endTokenGroup + newLine;
 
 		// Reset status flags.
 		boolean expectingHeader = true;
@@ -146,8 +151,8 @@ public class NexusFileParser {
 		StringBuffer parsedTokBuffer = new StringBuffer();
 		String line;
 		while ((line = reader.readLine()) != null) {
-			final StringTokenizer tokenizer = new StringTokenizer(line+NexusFileParser.NEW_LINE,
-					allDelims, true);
+			final StringTokenizer tokenizer = new StringTokenizer(line
+					+ NexusFileFormat.NEW_LINE, allDelims, true);
 			while (tokenizer.hasMoreTokens()) {
 				final String tok = tokenizer.nextToken();
 
@@ -167,7 +172,8 @@ public class NexusFileParser {
 						if (singleQuote.equals(tok))
 							inSingleQuotes = !inSingleQuotes;
 						// Nested comment.
-						else if (beginComment.equals(tok) && !inSingleQuotes && !inDoubleQuotes) {
+						else if (beginComment.equals(tok) && !inSingleQuotes
+								&& !inDoubleQuotes) {
 							// Flush any existing comment text.
 							if (parsedTokBuffer.length() > 0) {
 								listener
@@ -184,7 +190,8 @@ public class NexusFileParser {
 						// fires the current token buffer contents
 						// as plain text at the listener, then clears
 						// the buffer.
-						else if (endComment.equals(tok) && !inSingleQuotes && !inDoubleQuotes) {
+						else if (endComment.equals(tok) && !inSingleQuotes
+								&& !inDoubleQuotes) {
 							inComment--;
 							if (expectingBlockContents) {
 								if (parsedTokBuffer.length() > 0)
@@ -234,7 +241,8 @@ public class NexusFileParser {
 						// Use whitespace/semi-colon to indicate end
 						// of current token.
 						else if (space.equals(tok) || tab.equals(tok)
-								|| endTokenGroup.equals(tok) || newLine.equals(tok)) {
+								|| endTokenGroup.equals(tok)
+								|| newLine.equals(tok)) {
 							// Don't bother checking token buffer contents if
 							// the buffer is empty.
 							if (parsedTokBuffer.length() > 0) {
@@ -282,30 +290,89 @@ public class NexusFileParser {
 									throw new ParseException(
 											"Parser in unknown state when parsing token \""
 													+ parsedTok + "\"");
-							} 
+							}
 
 							// If this was an end-line, let the listeners know.
 							if (endTokenGroup.equals(tok))
 								listener.endTokenGroup();
-							// Otherwise pass all whitespace through as additional tokens.
-							else 
+							// Otherwise pass all whitespace through as
+							// additional tokens.
+							else
 								listener.parseToken(tok);
 						}
 					}
 				}
 				// Process all non-delimiter tokens.
-				else 
+				else
 					// Add token to buffer so far.
 					parsedTokBuffer.append(tok);
 
 				// Update double quote status. The next token is a potential
 				// double
 				// quote if the previous token was NOT a quote but this one IS.
-				singleQuoteOpened = !singleQuoteOpened && singleQuote.equals(tok);
+				singleQuoteOpened = !singleQuoteOpened
+						&& singleQuote.equals(tok);
 			}
 		}
 
 		// End the listener.
 		listener.endFile();
+	}
+
+	/**
+	 * Writes the given Nexus output to a file.
+	 * 
+	 * @param file
+	 *            the file to write to.
+	 * @param nexusFile
+	 *            the Nexus output to write.
+	 * @throws IOException
+	 *             if there is a problem during writing.
+	 */
+	public static void writeFile(final File file, final NexusFile nexusFile)
+			throws IOException {
+		final FileWriter fw = new FileWriter(file);
+		try {
+			NexusFileFormat.writeWriter(fw, nexusFile);
+		} finally {
+			fw.close();
+		}
+	}
+
+	/**
+	 * Writes the given Nexus output to a stream.
+	 * 
+	 * @param os
+	 *            the stream to write to.
+	 * @param nexusFile
+	 *            the Nexus output to write.
+	 * @throws IOException
+	 *             if there is a problem during writing.
+	 */
+	public static void writeStream(final OutputStream os,
+			final NexusFile nexusFile) throws IOException {
+		final OutputStreamWriter ow = new OutputStreamWriter(os);
+		NexusFileFormat.writeWriter(ow, nexusFile);
+	}
+
+	/**
+	 * Writes the given Nexus output to a writer.
+	 * 
+	 * @param writer
+	 *            the writer to write to.
+	 * @param nexusFile
+	 *            the Nexus output to write.
+	 * @throws IOException
+	 *             if there is a problem during writing.
+	 */
+	public static void writeWriter(final Writer writer,
+			final NexusFile nexusFile) throws IOException {
+		writer.write("#NEXUS");
+		writer.write(NexusFileFormat.NEW_LINE);
+		for (final Iterator i = nexusFile.objectIterator(); i.hasNext();) {
+			((NexusObject) i.next()).writeObject(writer);
+			writer.write(NexusFileFormat.NEW_LINE);
+		}
+		writer.flush();
 	}
 }
