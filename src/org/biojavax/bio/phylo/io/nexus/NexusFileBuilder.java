@@ -154,16 +154,8 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 						final Object obj = (Object) i.next();
 						if (obj instanceof NexusComment)
 							((NexusComment) obj).writeObject(writer);
-						else {
-							String text = (String) obj;
-							text = text.replaceAll("'", "''");
-							if (text.trim().length() > 0)
-								text = text.replaceAll(" ", "_");
-							if (text.indexOf('[') >= 0
-									|| text.indexOf(']') >= 0)
-								text = "'" + text + "'";
-							writer.write(text);
-						}
+						else 
+							this.writeToken(writer, (String)obj);
 					}
 				}
 			}

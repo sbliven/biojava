@@ -125,12 +125,11 @@ public class NexusFileParser {
 		String beginComment = "[";
 		String endComment = "]";
 		String singleQuote = "'";
-		String doubleQuote = "\"";
 		String underscore = "_";
 		String endTokenGroup = ";";
 		String newLine = NexusFileParser.NEW_LINE;
 		String allDelims = space + tab + beginComment + endComment + singleQuote
-				+ doubleQuote + underscore + endTokenGroup + newLine;
+				+ underscore + endTokenGroup + newLine;
 
 		// Reset status flags.
 		boolean expectingHeader = true;
@@ -140,7 +139,6 @@ public class NexusFileParser {
 		boolean inSingleQuotes = false;
 		boolean inDoubleQuotes = false;
 		boolean singleQuoteOpened = false;
-		boolean doubleQuoteOpened = false;
 		boolean expectingBlockContents = false;
 
 		// Read the file line-by-line.
@@ -163,17 +161,11 @@ public class NexusFileParser {
 						inSingleQuotes = !inSingleQuotes;
 						parsedTokBuffer.append(singleQuote);
 					}
-					else if (doubleQuoteOpened && doubleQuote.equals(tok)) {
-						inDoubleQuotes = !inDoubleQuotes;
-						parsedTokBuffer.append(doubleQuote);
-					}
 					// Stuff inside comments.
 					else if (inComment > 0) {
 						// Start or end quotes?
 						if (singleQuote.equals(tok))
 							inSingleQuotes = !inSingleQuotes;
-						else if (doubleQuote.equals(tok))
-							inDoubleQuotes = !inDoubleQuotes;
 						// Nested comment.
 						else if (beginComment.equals(tok) && !inSingleQuotes && !inDoubleQuotes) {
 							// Flush any existing comment text.
@@ -222,14 +214,6 @@ public class NexusFileParser {
 						else
 							parsedTokBuffer.append(tok);
 					}
-					else if (inDoubleQuotes) {
-						// Closing quote puts us outside quotes.
-						if (doubleQuote.equals(tok))
-							inDoubleQuotes = false;
-						// All other delimiters copied verbatim.
-						else
-							parsedTokBuffer.append(tok);
-					}
 					// Delimiter outside quote or comment.
 					else {
 						// Begin comment.
@@ -244,8 +228,6 @@ public class NexusFileParser {
 						// Start quoted string.
 						else if (singleQuote.equals(tok))
 							inSingleQuotes = true;
-						else if (doubleQuote.equals(tok))
-							inDoubleQuotes = true;
 						// Convert underscores to spaces.
 						else if (underscore.equals(tok))
 							parsedTokBuffer.append(space);
@@ -320,7 +302,6 @@ public class NexusFileParser {
 				// double
 				// quote if the previous token was NOT a quote but this one IS.
 				singleQuoteOpened = !singleQuoteOpened && singleQuote.equals(tok);
-				doubleQuoteOpened = !doubleQuoteOpened && doubleQuote.equals(tok);
 			}
 		}
 

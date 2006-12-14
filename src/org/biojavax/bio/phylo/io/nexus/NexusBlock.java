@@ -61,6 +61,23 @@ public interface NexusBlock extends NexusObject {
 		}
 		
 		/**
+		 * Writes a token and correctly substitutes all symbols in it.
+		 * @param writer the writer to write to.
+		 * @param token the token to write.
+		 * @throws IOException if writing failed.
+		 */
+		protected void writeToken(final Writer writer, String token) throws IOException {
+			token = token.replaceAll("'", "''");
+			token = token.replaceAll("_","'_'");
+			if (token.trim().length() > 0)
+				token = token.replaceAll(" ", "_");
+			if (token.indexOf('[') >= 0
+					|| token.indexOf(']') >= 0)
+				token = "'" + token + "'";
+			writer.write(token);
+		}
+		
+		/**
 		 * Implement this to write out block contents, not including the BEGIN and END tags.
 		 * @param writer the writer to write to.
 		 * @throws IOException if writing failed.
