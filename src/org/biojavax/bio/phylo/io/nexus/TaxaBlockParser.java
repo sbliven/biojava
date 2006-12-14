@@ -46,7 +46,9 @@ public class TaxaBlockParser extends NexusBlockParser.Abstract {
 
 	/**
 	 * Delegates to NexusBlockParser.Abstract.
-	 * @param blockListener the listener to send parse events to.
+	 * 
+	 * @param blockListener
+	 *            the listener to send parse events to.
 	 */
 	public TaxaBlockParser(TaxaBlockListener blockListener) {
 		super(blockListener);
@@ -65,44 +67,57 @@ public class TaxaBlockParser extends NexusBlockParser.Abstract {
 		final String trimmed = token.trim();
 		if (trimmed.length() == 0)
 			return;
-		else {
-			if (this.expectingDimension && "DIMENSIONS".equals(trimmed)) {
-				this.expectingDimension = false;
-				this.expectingNTax = true;
-			} else if (this.expectingNTax && trimmed.startsWith("NTAX")) {
-				this.expectingNTax = false;
-				if (trimmed.indexOf('=') >= 0) {
-					final String[] parts = trimmed.split("=");
-					if (parts.length > 1) {
-						this.expectingTaxLabel = true;
-						((TaxaBlockListener) this.getBlockListener())
-								.setDimensionsNTax(Integer.parseInt(parts[1]));
-					} else
-						this.expectingNTaxValue = true;
-				} else
-					this.expectingNTaxEquals = true;
-			} else if (this.expectingNTaxEquals && trimmed.startsWith("=")) {
-				this.expectingNTaxEquals = false;
+		else if (this.expectingDimension && "DIMENSIONS".equals(trimmed)) {
+			this.expectingDimension = false;
+			this.expectingNTax = true;
+		} else if (this.expectingNTax && trimmed.startsWith("NTAX")) {
+			this.expectingNTax = false;
+			if (trimmed.indexOf('=') >= 0) {
 				final String[] parts = trimmed.split("=");
 				if (parts.length > 1) {
 					this.expectingTaxLabel = true;
-					((TaxaBlockListener) this.getBlockListener())
-							.setDimensionsNTax(Integer.parseInt(parts[1]));
+					try {
+						((TaxaBlockListener) this.getBlockListener())
+								.setDimensionsNTax(Integer.parseInt(parts[1]));
+					} catch (NumberFormatException e) {
+						throw new ParseException("Invalid NTAX value: "
+								+ parts[1]);
+					}
 				} else
 					this.expectingNTaxValue = true;
-			} else if (this.expectingNTaxValue) {
-				this.expectingNTaxValue = false;
+			} else
+				this.expectingNTaxEquals = true;
+		} else if (this.expectingNTaxEquals && trimmed.startsWith("=")) {
+			this.expectingNTaxEquals = false;
+			final String[] parts = trimmed.split("=");
+			if (parts.length > 1) {
+				this.expectingTaxLabel = true;
+				try {
+					((TaxaBlockListener) this.getBlockListener())
+							.setDimensionsNTax(Integer.parseInt(parts[1]));
+				} catch (NumberFormatException e) {
+					throw new ParseException("Invalid NTAX value: " + parts[1]);
+				}
+			} else
+				this.expectingNTaxValue = true;
+		} else if (this.expectingNTaxValue) {
+			this.expectingNTaxValue = false;
+			try {
 				((TaxaBlockListener) this.getBlockListener())
 						.setDimensionsNTax(Integer.parseInt(trimmed));
-				this.expectingTaxLabel = true;
-			} else if (this.expectingTaxLabel && "TAXLABELS".equals(trimmed)) {
-				this.expectingTaxLabel = false;
-				this.expectingTaxLabelValue = true;
-			} else if (this.expectingTaxLabelValue) {
-				((TaxaBlockListener) this.getBlockListener())
-						.addTaxLabel(token); // Use untrimmed version to preserve spaces.
+			} catch (NumberFormatException e) {
+				throw new ParseException("Invalid NTAX value: " + trimmed);
 			}
-		}
+			this.expectingTaxLabel = true;
+		} else if (this.expectingTaxLabel && "TAXLABELS".equals(trimmed)) {
+			this.expectingTaxLabel = false;
+			this.expectingTaxLabelValue = true;
+		} else if (this.expectingTaxLabelValue)
+			// Use untrimmed version to preserve spaces.
+			((TaxaBlockListener) this.getBlockListener()).addTaxLabel(token);
+		else
+			throw new ParseException("Found unexpected token " + token
+					+ " in TAXA block");
 	}
 
 }
