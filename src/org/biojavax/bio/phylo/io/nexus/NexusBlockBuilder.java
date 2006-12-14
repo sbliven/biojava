@@ -65,7 +65,7 @@ public interface NexusBlockBuilder extends NexusBlockListener {
 		}
 
 		public void commentText(String comment) {
-			this.comment.addText(comment);
+			this.comment.addCommentText(comment);
 		}
 
 		public void endComment() {

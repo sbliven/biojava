@@ -45,6 +45,8 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 	public void setDefaultBlockParsers() {
 		this.setBlockParser(NexusBlockParser.UNKNOWN_BLOCK,
 				new UnknownBlockParser());
+		this.setBlockParser(TaxaBlock.TAXA_BLOCK, new TaxaBlockParser(
+				new TaxaBlockBuilder()));
 	}
 
 	protected void blockEnded(final NexusBlockParser blockParser) {
@@ -78,7 +80,7 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 	}
 
 	public void fileCommentText(String comment) {
-		this.comment.addText(comment);
+		this.comment.addCommentText(comment);
 	}
 
 	public void endFileComment() {
@@ -94,15 +96,16 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 	// comments in the order they were received, and writing them out
 	// again in that order when requested.
 	private static class UnknownBlockParser extends NexusBlockParser.Abstract {
-		private UnknownBlockBuilder builder;
-
 		private UnknownBlockParser() {
 			super(new UnknownBlockBuilder());
-			this.builder = (UnknownBlockBuilder) this.getBlockListener();
+		}
+		
+		public void resetStatus() {
+			// Ignore.
 		}
 
 		public void parseToken(final String token) throws ParseException {
-			this.builder.getComponents().add(token);
+			((UnknownBlockBuilder) this.getBlockListener()).getComponents().add(token);
 		}
 
 		private static class UnknownBlockBuilder extends
@@ -154,8 +157,8 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 						final Object obj = (Object) i.next();
 						if (obj instanceof NexusComment)
 							((NexusComment) obj).writeObject(writer);
-						else 
-							this.writeToken(writer, (String)obj);
+						else
+							this.writeToken(writer, (String) obj);
 					}
 				}
 			}

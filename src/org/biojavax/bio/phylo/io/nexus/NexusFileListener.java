@@ -146,6 +146,8 @@ public interface NexusFileListener {
 					public void startBlock(final String blockName) {
 					}
 				}) {
+			public void resetStatus() {
+			}
 			public void parseToken(final String token) throws ParseException {
 			}
 		};

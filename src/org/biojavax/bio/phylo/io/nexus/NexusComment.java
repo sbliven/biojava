@@ -60,9 +60,9 @@ public class NexusComment implements NexusObject {
 			this.nestedComment = null;
 	}
 	
-	public void addText(final String text) {
+	public void addCommentText(final String text) {
 		if (this.hasOpenSubComment())
-			this.nestedComment.addText(text);
+			this.nestedComment.addCommentText(text);
 		else
 			this.components.add(text);
 	}

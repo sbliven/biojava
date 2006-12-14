@@ -115,9 +115,15 @@ public interface NexusBlockParser {
 		}
 
 		public void startBlock(final String blockName) {
+			this.resetStatus();
 			this.blockName = blockName;
 			this.blockListener.startBlock(blockName);
 		}
+		
+		/**
+		 * This function is called when the parser is reset before starting a new block.
+		 */
+		protected abstract void resetStatus();
 
 		protected String getBlockName() {
 			return this.blockName;
