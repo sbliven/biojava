@@ -89,7 +89,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 
 	private Map stateLabels = new LinkedHashMap(); // values are lists
 
-	// values are lists, containing mix of strings and other lists
+	// values are lists, containing nested mix of strings and lists and sets
 	private Map matrix = new LinkedHashMap();
 
 	private List comments = new ArrayList();
