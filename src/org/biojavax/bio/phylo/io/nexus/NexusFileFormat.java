@@ -252,7 +252,7 @@ public class NexusFileFormat {
 
 								// Expecting header?
 								if (expectingHeader
-										&& "#NEXUS".equals(parsedTok)) {
+										&& "#NEXUS".equalsIgnoreCase(parsedTok)) {
 									expectingHeader = false;
 									expectingBeginTag = true;
 									listener.startFile();
@@ -260,7 +260,7 @@ public class NexusFileFormat {
 
 								// Expecting a BEGIN tag?
 								else if (expectingBeginTag
-										&& "BEGIN".equals(parsedTok)) {
+										&& "BEGIN".equalsIgnoreCase(parsedTok)) {
 									expectingBeginTag = false;
 									expectingBeginName = true;
 								}
@@ -275,7 +275,7 @@ public class NexusFileFormat {
 								// Looking for block contents?
 								else if (expectingBlockContents) {
 									// End tag?
-									if ("END".equals(parsedTok)) {
+									if ("END".equalsIgnoreCase(parsedTok)) {
 										listener.endBlock();
 										expectingBlockContents = false;
 										expectingBeginTag = true;

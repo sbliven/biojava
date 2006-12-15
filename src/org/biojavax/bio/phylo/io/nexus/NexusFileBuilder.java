@@ -49,6 +49,8 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 				new TaxaBlockBuilder()));
 		this.setBlockParser(TreesBlock.TREES_BLOCK, new TreesBlockParser(
 				new TreesBlockBuilder()));
+		this.setBlockParser(CharactersBlock.CHARACTERS_BLOCK, new CharactersBlockParser(
+				new CharactersBlockBuilder()));
 	}
 
 	protected void blockEnded(final NexusBlockParser blockParser) {

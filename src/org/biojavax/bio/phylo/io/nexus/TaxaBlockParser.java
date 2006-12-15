@@ -67,10 +67,12 @@ public class TaxaBlockParser extends NexusBlockParser.Abstract {
 		final String trimmed = token.trim();
 		if (trimmed.length() == 0)
 			return;
-		else if (this.expectingDimension && "DIMENSIONS".equals(trimmed)) {
+		else if (this.expectingDimension
+				&& "DIMENSIONS".equalsIgnoreCase(trimmed)) {
 			this.expectingDimension = false;
 			this.expectingNTax = true;
-		} else if (this.expectingNTax && trimmed.startsWith("NTAX")) {
+		} else if (this.expectingNTax
+				&& trimmed.toUpperCase().startsWith("NTAX")) {
 			this.expectingNTax = false;
 			if (trimmed.indexOf('=') >= 0) {
 				final String[] parts = trimmed.split("=");
@@ -109,7 +111,8 @@ public class TaxaBlockParser extends NexusBlockParser.Abstract {
 				throw new ParseException("Invalid NTAX value: " + trimmed);
 			}
 			this.expectingTaxLabel = true;
-		} else if (this.expectingTaxLabel && "TAXLABELS".equals(trimmed)) {
+		} else if (this.expectingTaxLabel
+				&& "TAXLABELS".equalsIgnoreCase(trimmed)) {
 			this.expectingTaxLabel = false;
 			this.expectingTaxLabelValue = true;
 		} else if (this.expectingTaxLabelValue)

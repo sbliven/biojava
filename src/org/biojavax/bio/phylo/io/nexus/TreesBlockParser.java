@@ -90,7 +90,7 @@ public class TreesBlockParser extends NexusBlockParser.Abstract {
 		this.expectingTranslate = true;
 		this.expectingTaxLabel = false;
 		this.expectingTaxName = false;
-		this.expectingTree = false;
+		this.expectingTree = true;
 		this.expectingTreeName = false;
 		this.expectingTreeEquals = false;
 		this.expectingTreeRooted = false;
@@ -106,7 +106,8 @@ public class TreesBlockParser extends NexusBlockParser.Abstract {
 		final String trimmed = token.trim();
 		if (trimmed.length() == 0)
 			return;
-		else if (this.expectingTranslate && "TRANSLATE".equals(trimmed)) {
+		else if (this.expectingTranslate
+				&& "TRANSLATE".equalsIgnoreCase(trimmed)) {
 			this.expectingTranslate = false;
 			this.expectingTaxLabel = true;
 		} else if (this.expectingTaxLabel) {
@@ -124,7 +125,7 @@ public class TreesBlockParser extends NexusBlockParser.Abstract {
 				this.expectingTree = true;
 			else
 				this.expectingTaxLabel = true;
-		} else if (this.expectingTree) {
+		} else if (this.expectingTree && "TREE".equalsIgnoreCase(trimmed)) {
 			this.expectingTree = false;
 			this.expectingTreeName = true;
 		} else if (this.expectingTreeName) {
