@@ -266,8 +266,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			}
 			this.expectingMatrixContent = false;
 			this.expectingMatrixKey = true;
-		} else if (this.expectingMatrixKey && NexusFileFormat.NEW_LINE.equals(token)) {
-			if (this.matrixFirstLineKey!=null)
+		} else if (this.expectingMatrixKey
+				&& NexusFileFormat.NEW_LINE.equals(token)) {
+			if (this.matrixFirstLineKey != null)
 				this.matrixPrependNulls = this.matrixFirstLineLength;
 		} else if (token.trim().length() == 0)
 			return;
@@ -1179,7 +1180,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			// Update first line info and set up stack for entry.
 			if (!this.matrixStack.containsKey(token)) {
 				this.matrixStack.put(token, new Stack());
-				if (this.matrixPrependNulls>0)
+				if (this.matrixPrependNulls > 0)
 					for (int i = 0; i < this.matrixPrependNulls; i++)
 						((CharactersBlockListener) this.getBlockListener())
 								.appendMatrixData(this.currentMatrixKey, null);
@@ -1207,8 +1208,15 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 					((CharactersBlockListener) this.getBlockListener())
 							.appendMatrixData(this.currentMatrixKey, newSet);
 				stack.push(newSet);
-			} else if ((")".equals(token) || "}".equals(token))
-					&& !stack.isEmpty()) {
+			} else if (")".equals(token) && !stack.isEmpty()
+					&& (stack.peek() instanceof List)) {
+				stack.pop();
+				if (stack.isEmpty()
+						&& this.currentMatrixKey
+								.equals(this.matrixFirstLineKey))
+					this.matrixFirstLineLength++;
+			} else if ("}".equals(token) && !stack.isEmpty()
+					&& (stack.peek() instanceof Set)) {
 				stack.pop();
 				if (stack.isEmpty()
 						&& this.currentMatrixKey
