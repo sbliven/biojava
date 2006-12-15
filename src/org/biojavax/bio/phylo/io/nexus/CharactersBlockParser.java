@@ -170,7 +170,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 
 	private String matrixFirstLineKey;
 
-	private boolean matrixPrependNulls;
+	private int matrixPrependNulls;
 
 	/**
 	 * Delegates to NexusBlockParser.Abstract.
@@ -247,7 +247,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		this.matrixStack.clear();
 		this.matrixFirstLineKey = null;
 		this.matrixFirstLineLength = 0;
-		this.matrixPrependNulls = false;
+		this.matrixPrependNulls = 0;
 	}
 
 	public boolean wantsBracketsAndBraces() {
@@ -266,6 +266,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			}
 			this.expectingMatrixContent = false;
 			this.expectingMatrixKey = true;
+		} else if (this.expectingMatrixKey && NexusFileFormat.NEW_LINE.equals(token)) {
+			if (this.matrixFirstLineKey!=null)
+				this.matrixPrependNulls = this.matrixFirstLineLength;
 		} else if (token.trim().length() == 0)
 			return;
 		else if (this.expectingDimension
@@ -1176,15 +1179,13 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			// Update first line info and set up stack for entry.
 			if (!this.matrixStack.containsKey(token)) {
 				this.matrixStack.put(token, new Stack());
-				if (this.matrixPrependNulls)
-					for (int i = 0; i < this.matrixFirstLineLength; i++)
+				if (this.matrixPrependNulls>0)
+					for (int i = 0; i < this.matrixPrependNulls; i++)
 						((CharactersBlockListener) this.getBlockListener())
 								.appendMatrixData(this.currentMatrixKey, null);
 			}
 			if (this.matrixFirstLineKey == null)
 				this.matrixFirstLineKey = this.currentMatrixKey;
-			else if (this.matrixFirstLineKey.equals(this.currentMatrixKey))
-				this.matrixPrependNulls = true;
 		}
 
 		else if (this.expectingMatrixContent) {
@@ -1197,8 +1198,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 				else
 					((CharactersBlockListener) this.getBlockListener())
 							.appendMatrixData(this.currentMatrixKey, newList);
-				((Stack) this.matrixStack.get(this.currentMatrixKey))
-						.push(newList);
+				stack.push(newList);
 			} else if ("{".equals(token)) {
 				final Set newSet = new LinkedHashSet();
 				if (!stack.isEmpty())
@@ -1206,13 +1206,15 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 				else
 					((CharactersBlockListener) this.getBlockListener())
 							.appendMatrixData(this.currentMatrixKey, newSet);
-				((Stack) this.matrixStack.get(this.currentMatrixKey))
-						.push(newSet);
+				stack.push(newSet);
 			} else if ((")".equals(token) || "}".equals(token))
-					&& !((Stack) this.matrixStack.get(this.currentMatrixKey))
-							.isEmpty())
+					&& !stack.isEmpty()) {
 				stack.pop();
-			else {
+				if (stack.isEmpty()
+						&& this.currentMatrixKey
+								.equals(this.matrixFirstLineKey))
+					this.matrixFirstLineLength++;
+			} else {
 				final boolean reallyUseTokens = (this.tokenizedMatrix || "CONTINUOUS"
 						.equals(this.specifiedDataType))
 						&& !("DNA".equals(this.specifiedDataType)
@@ -1221,24 +1223,27 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 				if (reallyUseTokens) {
 					if (!stack.isEmpty())
 						((Collection) stack.peek()).add(token);
-					else
+					else {
 						((CharactersBlockListener) this.getBlockListener())
 								.appendMatrixData(this.currentMatrixKey, token);
-					if (this.currentMatrixKey.equals(this.matrixFirstLineKey))
-						this.matrixFirstLineLength++;
+						if (this.currentMatrixKey
+								.equals(this.matrixFirstLineKey))
+							this.matrixFirstLineLength++;
+					}
 				} else {
 					final String[] toks = token.split("");
 					for (int i = 0; i < toks.length; i++) {
 						final String tok = toks[i];
 						if (!stack.isEmpty())
 							((Collection) stack.peek()).add(tok);
-						else
+						else {
 							((CharactersBlockListener) this.getBlockListener())
 									.appendMatrixData(this.currentMatrixKey,
 											tok);
-						if (this.currentMatrixKey
-								.equals(this.matrixFirstLineKey))
-							this.matrixFirstLineLength++;
+							if (this.currentMatrixKey
+									.equals(this.matrixFirstLineKey))
+								this.matrixFirstLineLength++;
+						}
 					}
 				}
 			}

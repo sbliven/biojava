@@ -648,12 +648,9 @@ public class CharactersBlock extends NexusBlock.Abstract {
 
 	private void writeMatrixEntry(final Writer writer, final Object obj,
 			final boolean reallyUseTokens) throws IOException {
-		if (obj == null) {
-			if (this.gap != null)
-				this.writeToken(writer, this.gap);
-			else
-				writer.write(' ');
-		} else if (obj instanceof String)
+		if (obj == null)
+			this.writeToken(writer, this.missing);
+		else if (obj instanceof String)
 			this.writeToken(writer, (String) obj);
 		else if (obj instanceof List) {
 			writer.write('(');
