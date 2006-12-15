@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.biojava.bio.seq.io.ParseException;
@@ -257,7 +258,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			}
 			this.expectingMatrixContent = false;
 			this.expectingMatrixKey = true;
-		} else if (trimmed.length() == 0) 
+		} else if (trimmed.length() == 0)
 			return;
 		else if (this.expectingDimension
 				&& "DIMENSIONS".equalsIgnoreCase(trimmed)) {
@@ -1174,19 +1175,30 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingMatrixContent) {
-			if ("(".equals(token))
+			final Stack stack = (Stack) this.matrixStack
+					.get(this.currentMatrixKey);
+			if ("(".equals(token)) {
+				final List newList = new ArrayList();
+				if (!stack.isEmpty())
+					((Collection) stack.peek()).add(newList);
+				else
+					((CharactersBlockListener) this.getBlockListener())
+							.appendMatrixData(this.currentMatrixKey, newList);
 				((Stack) this.matrixStack.get(this.currentMatrixKey))
-						.push(new ArrayList());
-			else if ("{".equals(token))
+						.push(newList);
+			} else if ("{".equals(token)) {
+				final Set newSet = new LinkedHashSet();
+				if (!stack.isEmpty())
+					((Collection) stack.peek()).add(newSet);
+				else
+					((CharactersBlockListener) this.getBlockListener())
+							.appendMatrixData(this.currentMatrixKey, newSet);
 				((Stack) this.matrixStack.get(this.currentMatrixKey))
-						.push(new LinkedHashSet());
-			else if ((")".equals(token) || "}".equals(token))
+						.push(newSet);
+			} else if ((")".equals(token) || "}".equals(token))
 					&& !((Stack) this.matrixStack.get(this.currentMatrixKey))
 							.isEmpty())
-					((CharactersBlockListener) this.getBlockListener())
-							.appendMatrixData(this.currentMatrixKey,
-									((Stack) this.matrixStack
-											.get(this.currentMatrixKey)).pop());
+				stack.pop();
 			else {
 				final boolean reallyUseTokens = (this.tokenizedMatrix || "CONTINUOUS"
 						.equals(this.specifiedDataType))
@@ -1194,10 +1206,8 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 								|| "RNA".equals(this.specifiedDataType) || "NUCLEOTIDE"
 								.equals(this.specifiedDataType));
 				if (reallyUseTokens) {
-					if (!((Stack) this.matrixStack.get(this.currentMatrixKey))
-							.isEmpty())
-						((Collection) ((Stack) this.matrixStack
-								.get(this.currentMatrixKey)).peek()).add(token);
+					if (!stack.isEmpty())
+						((Collection) stack.peek()).add(token);
 					else
 						((CharactersBlockListener) this.getBlockListener())
 								.appendMatrixData(this.currentMatrixKey, token);
@@ -1205,11 +1215,8 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 					final String[] toks = token.split("");
 					for (int i = 0; i < toks.length; i++) {
 						final String tok = toks[i];
-						if (!((Stack) this.matrixStack
-								.get(this.currentMatrixKey)).isEmpty())
-							((Collection) ((Stack) this.matrixStack
-									.get(this.currentMatrixKey)).peek())
-									.add(tok);
+						if (!stack.isEmpty())
+							((Collection) stack.peek()).add(tok);
 						else
 							((CharactersBlockListener) this.getBlockListener())
 									.appendMatrixData(this.currentMatrixKey,
