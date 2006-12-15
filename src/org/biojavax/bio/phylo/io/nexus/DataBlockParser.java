@@ -20,35 +20,23 @@
  */
 package org.biojavax.bio.phylo.io.nexus;
 
-import org.biojavax.bio.phylo.io.nexus.TreesBlock.NewickTreeString;
-
 /**
- * Listens to events that represent Nexus trees blocks.
+ * Parses Nexus data blocks.
  * 
  * @author Richard Holland
  * @author Tobias Thierer
  * @author Jim Balhoff
  * @since 1.6
  */
-public interface TreesBlockListener extends NexusBlockListener {
+public class DataBlockParser extends CharactersBlockParser {
 
 	/**
-	 * Add a translation.
+	 * Delegates to CharactersBlockParser.
 	 * 
-	 * @param label
-	 *            the label to add.
-	 * @param taxa
-	 *            the taxa name this label will represent.
+	 * @param blockListener
+	 *            the listener to send parse events to.
 	 */
-	public void addTranslation(final String label, final String taxa);
-
-	/**
-	 * Adds a tree.
-	 * 
-	 * @param label
-	 *            the label to give the tree.
-	 * @param tree
-	 *            the tree to add.
-	 */
-	public void addTree(final String label, final NewickTreeString tree);
+	public DataBlockParser(DataBlockListener blockListener) {
+		super(blockListener);
+	}
 }

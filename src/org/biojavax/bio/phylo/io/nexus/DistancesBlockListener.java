@@ -20,19 +20,17 @@
  */
 package org.biojavax.bio.phylo.io.nexus;
 
-import java.util.List;
-
 import org.biojava.bio.seq.io.ParseException;
 
 /**
- * Listens to events that represent Nexus characters blocks.
+ * Listens to events that represent Nexus distances blocks.
  * 
  * @author Richard Holland
  * @author Tobias Thierer
  * @author Jim Balhoff
  * @since 1.6
  */
-public interface CharactersBlockListener extends NexusBlockListener {
+public interface DistancesBlockListener extends NexusBlockListener {
 
 	/**
 	 * Set the NTAX value.
@@ -50,35 +48,15 @@ public interface CharactersBlockListener extends NexusBlockListener {
 	 */
 	public void setDimensionsNChar(int dimensionsNChar);
 
-	public void setDataType(final String dataType);
+	public void setTriangle(final String triangle);
 
-	public void setRespectCase(final boolean respectCase);
-
-	public void setMissing(final String missing);
-
-	public void setGap(final String gap);
-
-	public void addSymbol(final String symbol);
-
-	public void addEquate(final String symbol, final List symbols);
-
-	public void setMatchChar(final String matchChar);
+	public void setDiagonal(final boolean diagonal);
 
 	public void setLabels(final boolean labels);
 
-	public void setTransposed(final boolean transposed);
+	public void setMissing(final String missing);
 
 	public void setInterleaved(final boolean interleaved);
-
-	public void addItem(final String item);
-
-	public void setStatesFormat(final String statesFormat);
-
-	public void setTokens(final boolean tokens);
-
-	public void setEliminateStart(final int eliminateStart);
-
-	public void setEliminateEnd(final int eliminateEnd);
 
 	/**
 	 * Add a TAXLABEL. If it already exists, or is a number that refers to an
@@ -90,18 +68,6 @@ public interface CharactersBlockListener extends NexusBlockListener {
 	 *             if the label cannot be added.
 	 */
 	public void addTaxLabel(final String taxLabel) throws ParseException;
-
-	public void addCharState(final String charState);
-
-	public void setCharStateLabel(final String charState, final String label);
-
-	public void addCharStateKeyword(final String charState, final String keyword);
-
-	public void addCharLabel(final String charLabel);
-
-	public void addState(final String state);
-
-	public void addStateLabel(final String state, final String label);
 
 	public void addMatrixEntry(final String taxa);
 

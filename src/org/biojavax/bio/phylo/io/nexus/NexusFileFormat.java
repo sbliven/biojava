@@ -196,9 +196,9 @@ public class NexusFileFormat {
 								&& !inDoubleQuotes) {
 							inComment--;
 							if (parsedTokBuffer.length() > 0)
-									listener.commentText(parsedTokBuffer
-											.toString());
-								listener.endComment();
+								listener
+										.commentText(parsedTokBuffer.toString());
+							listener.endComment();
 							parsedTokBuffer = (StringBuffer) parsedTokBufferStack
 									.pop();
 						}
@@ -293,17 +293,21 @@ public class NexusFileFormat {
 	}
 
 	private static class TokenParser {
-		
+
 		private boolean expectingHeader = true;
+
 		private boolean expectingBeginTag = false;
+
 		private boolean expectingBeginName = false;
+
 		private boolean expectingBlockContents = false;
+
 		private NexusFileListener listener;
-		
+
 		private TokenParser(final NexusFileListener listener) {
 			this.listener = listener;
 		}
-		
+
 		private void parseToken(final String parsedTok) throws ParseException {
 
 			// Expecting header?
@@ -314,7 +318,8 @@ public class NexusFileFormat {
 			}
 
 			// Expecting a BEGIN tag?
-			else if (this.expectingBeginTag && "BEGIN".equalsIgnoreCase(parsedTok)) {
+			else if (this.expectingBeginTag
+					&& "BEGIN".equalsIgnoreCase(parsedTok)) {
 				this.expectingBeginTag = false;
 				this.expectingBeginName = true;
 			}
@@ -342,8 +347,8 @@ public class NexusFileFormat {
 			// All other situations.
 			else
 				throw new ParseException(
-						"Parser in unknown state when parsing token \"" + parsedTok
-								+ "\"");
+						"Parser in unknown state when parsing token \""
+								+ parsedTok + "\"");
 		}
 	}
 

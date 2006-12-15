@@ -64,18 +64,16 @@ public class TaxaBlockParser extends NexusBlockParser.Abstract {
 	}
 
 	public void parseToken(String token) throws ParseException {
-		final String trimmed = token.trim();
-		if (trimmed.length() == 0)
+		if (token.trim().length() == 0)
 			return;
 		else if (this.expectingDimension
-				&& "DIMENSIONS".equalsIgnoreCase(trimmed)) {
+				&& "DIMENSIONS".equalsIgnoreCase(token)) {
 			this.expectingDimension = false;
 			this.expectingNTax = true;
-		} else if (this.expectingNTax
-				&& trimmed.toUpperCase().startsWith("NTAX")) {
+		} else if (this.expectingNTax && token.toUpperCase().startsWith("NTAX")) {
 			this.expectingNTax = false;
-			if (trimmed.indexOf('=') >= 0) {
-				final String[] parts = trimmed.split("=");
+			if (token.indexOf('=') >= 0) {
+				final String[] parts = token.split("=");
 				if (parts.length > 1) {
 					this.expectingTaxLabel = true;
 					try {
@@ -89,9 +87,9 @@ public class TaxaBlockParser extends NexusBlockParser.Abstract {
 					this.expectingNTaxValue = true;
 			} else
 				this.expectingNTaxEquals = true;
-		} else if (this.expectingNTaxEquals && trimmed.startsWith("=")) {
+		} else if (this.expectingNTaxEquals && token.startsWith("=")) {
 			this.expectingNTaxEquals = false;
-			final String[] parts = trimmed.split("=");
+			final String[] parts = token.split("=");
 			if (parts.length > 1) {
 				this.expectingTaxLabel = true;
 				try {
@@ -106,17 +104,17 @@ public class TaxaBlockParser extends NexusBlockParser.Abstract {
 			this.expectingNTaxValue = false;
 			try {
 				((TaxaBlockListener) this.getBlockListener())
-						.setDimensionsNTax(Integer.parseInt(trimmed));
+						.setDimensionsNTax(Integer.parseInt(token));
 			} catch (NumberFormatException e) {
-				throw new ParseException("Invalid NTAX value: " + trimmed);
+				throw new ParseException("Invalid NTAX value: " + token);
 			}
 			this.expectingTaxLabel = true;
 		} else if (this.expectingTaxLabel
-				&& "TAXLABELS".equalsIgnoreCase(trimmed)) {
+				&& "TAXLABELS".equalsIgnoreCase(token)) {
 			this.expectingTaxLabel = false;
 			this.expectingTaxLabelValue = true;
 		} else if (this.expectingTaxLabelValue)
-			// Use untrimmed version to preserve spaces.
+			// Use untoken version to preserve spaces.
 			((TaxaBlockListener) this.getBlockListener()).addTaxLabel(token);
 		else
 			throw new ParseException("Found unexpected token " + token

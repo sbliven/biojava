@@ -166,6 +166,12 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 
 	private Map matrixStack = new HashMap();
 
+	private int matrixFirstLineLength;
+
+	private String matrixFirstLineKey;
+
+	private boolean matrixPrependNulls;
+
 	/**
 	 * Delegates to NexusBlockParser.Abstract.
 	 * 
@@ -239,6 +245,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		this.currentMatrixKey = null;
 		this.currentMatrixBracket = null;
 		this.matrixStack.clear();
+		this.matrixFirstLineKey = null;
+		this.matrixFirstLineLength = 0;
+		this.matrixPrependNulls = false;
 	}
 
 	public boolean wantsBracketsAndBraces() {
@@ -246,7 +255,6 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 	}
 
 	public void parseToken(String token) throws ParseException {
-		final String trimmed = token.trim();
 		if (this.expectingMatrixContent
 				&& NexusFileFormat.NEW_LINE.equals(token)) {
 			// Special handling for new lines inside matrix data.
@@ -258,22 +266,21 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			}
 			this.expectingMatrixContent = false;
 			this.expectingMatrixKey = true;
-		} else if (trimmed.length() == 0)
+		} else if (token.trim().length() == 0)
 			return;
 		else if (this.expectingDimension
-				&& "DIMENSIONS".equalsIgnoreCase(trimmed)) {
+				&& "DIMENSIONS".equalsIgnoreCase(token)) {
 			this.expectingDimension = false;
 			this.expectingNewTaxa = true;
 			this.expectingNChar = true;
-		} else if (this.expectingNewTaxa && "NEWTAXA".equalsIgnoreCase(trimmed)) {
+		} else if (this.expectingNewTaxa && "NEWTAXA".equalsIgnoreCase(token)) {
 			this.expectingNewTaxa = false;
 			this.expectingNTax = true;
 			this.expectingNChar = false;
-		} else if (this.expectingNTax
-				&& trimmed.toUpperCase().startsWith("NTAX")) {
+		} else if (this.expectingNTax && token.toUpperCase().startsWith("NTAX")) {
 			this.expectingNTax = false;
-			if (trimmed.indexOf('=') >= 0) {
-				final String[] parts = trimmed.split("=");
+			if (token.indexOf('=') >= 0) {
+				final String[] parts = token.split("=");
 				if (parts.length > 1) {
 					this.expectingNChar = true;
 					try {
@@ -287,9 +294,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 					this.expectingNTaxValue = true;
 			} else
 				this.expectingNTaxEquals = true;
-		} else if (this.expectingNTaxEquals && trimmed.startsWith("=")) {
+		} else if (this.expectingNTaxEquals && token.startsWith("=")) {
 			this.expectingNTaxEquals = false;
-			final String[] parts = trimmed.split("=");
+			final String[] parts = token.split("=");
 			if (parts.length > 1) {
 				this.expectingNChar = true;
 				try {
@@ -304,16 +311,16 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingNTaxValue = false;
 			try {
 				((CharactersBlockListener) this.getBlockListener())
-						.setDimensionsNTax(Integer.parseInt(trimmed));
+						.setDimensionsNTax(Integer.parseInt(token));
 			} catch (NumberFormatException e) {
-				throw new ParseException("Invalid NTAX value: " + trimmed);
+				throw new ParseException("Invalid NTAX value: " + token);
 			}
 			this.expectingNChar = true;
 		} else if (this.expectingNChar
-				&& trimmed.toUpperCase().startsWith("NCHAR")) {
+				&& token.toUpperCase().startsWith("NCHAR")) {
 			this.expectingNChar = false;
-			if (trimmed.indexOf('=') >= 0) {
-				final String[] parts = trimmed.split("=");
+			if (token.indexOf('=') >= 0) {
+				final String[] parts = token.split("=");
 				if (parts.length > 1) {
 					this.expectingFormat = true;
 					this.expectingEliminate = true;
@@ -333,9 +340,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 					this.expectingNCharValue = true;
 			} else
 				this.expectingNCharEquals = true;
-		} else if (this.expectingNCharEquals && trimmed.startsWith("=")) {
+		} else if (this.expectingNCharEquals && token.startsWith("=")) {
 			this.expectingNCharEquals = false;
-			final String[] parts = trimmed.split("=");
+			final String[] parts = token.split("=");
 			if (parts.length > 1) {
 				this.expectingFormat = true;
 				this.expectingEliminate = true;
@@ -356,9 +363,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingNCharValue = false;
 			try {
 				((CharactersBlockListener) this.getBlockListener())
-						.setDimensionsNChar(Integer.parseInt(trimmed));
+						.setDimensionsNChar(Integer.parseInt(token));
 			} catch (NumberFormatException e) {
-				throw new ParseException("Invalid NCHAR value: " + trimmed);
+				throw new ParseException("Invalid NCHAR value: " + token);
 			}
 			this.expectingFormat = true;
 			this.expectingEliminate = true;
@@ -369,7 +376,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingMatrix = true;
 		}
 
-		else if (this.expectingFormat && "FORMAT".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingFormat && "FORMAT".equalsIgnoreCase(token)) {
 			this.expectingFormat = false;
 			this.expectingDataType = true;
 			this.expectingRespectCase = true;
@@ -387,10 +394,10 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingDataType
-				&& trimmed.toUpperCase().startsWith("DATATYPE")) {
+				&& token.toUpperCase().startsWith("DATATYPE")) {
 			this.expectingDataType = false;
 
-			if (trimmed.indexOf("=") >= 0) {
+			if (token.indexOf("=") >= 0) {
 				final String[] parts = token.split("=");
 				if (parts.length > 1) {
 					this.specifiedDataType = parts[1];
@@ -421,7 +428,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingRespectCase
-				&& "RESPECTCASE".equalsIgnoreCase(trimmed)) {
+				&& "RESPECTCASE".equalsIgnoreCase(token)) {
 			((CharactersBlockListener) this.getBlockListener())
 					.setRespectCase(true);
 			this.expectingDataType = false;
@@ -429,12 +436,12 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingMissing
-				&& trimmed.toUpperCase().startsWith("MISSING")) {
+				&& token.toUpperCase().startsWith("MISSING")) {
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
 			this.expectingMissing = false;
 
-			if (trimmed.indexOf("=") >= 0) {
+			if (token.indexOf("=") >= 0) {
 				final String[] parts = token.split("=");
 				if (parts.length > 1)
 					((CharactersBlockListener) this.getBlockListener())
@@ -460,13 +467,13 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingMissingContent = false;
 		}
 
-		else if (this.expectingGap && trimmed.toUpperCase().startsWith("GAP")) {
+		else if (this.expectingGap && token.toUpperCase().startsWith("GAP")) {
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
 			this.expectingMissing = false;
 			this.expectingGap = false;
 
-			if (trimmed.indexOf("=") >= 0) {
+			if (token.indexOf("=") >= 0) {
 				final String[] parts = token.split("=");
 				if (parts.length > 1)
 					((CharactersBlockListener) this.getBlockListener())
@@ -492,14 +499,14 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingSymbols
-				&& trimmed.toUpperCase().startsWith("SYMBOLS")) {
+				&& token.toUpperCase().startsWith("SYMBOLS")) {
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
 			this.expectingMissing = false;
 			this.expectingGap = false;
 			this.expectingSymbols = false;
 
-			if (trimmed.indexOf("=") >= 0) {
+			if (token.indexOf("=") >= 0) {
 				final String[] parts = token.split("=");
 				if (parts.length > 1) {
 					if (!parts[1].startsWith("\""))
@@ -551,7 +558,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingEquate
-				&& trimmed.toUpperCase().startsWith("EQUATE")) {
+				&& token.toUpperCase().startsWith("EQUATE")) {
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
 			this.expectingMissing = false;
@@ -559,7 +566,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingSymbols = false;
 			this.expectingEquate = false;
 
-			if (trimmed.indexOf("=") >= 0) {
+			if (token.indexOf("=") >= 0) {
 				final String[] parts = token.split("=");
 				if (parts.length > 1) {
 					if (!parts[1].startsWith("\""))
@@ -655,7 +662,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingMatchChar
-				&& trimmed.toUpperCase().startsWith("MATCHCHAR")) {
+				&& token.toUpperCase().startsWith("MATCHCHAR")) {
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
 			this.expectingMissing = false;
@@ -664,7 +671,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingEquate = false;
 			this.expectingMatchChar = false;
 
-			if (trimmed.indexOf("=") >= 0) {
+			if (token.indexOf("=") >= 0) {
 				final String[] parts = token.split("=");
 				if (parts.length > 1)
 					((CharactersBlockListener) this.getBlockListener())
@@ -690,7 +697,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingMatchCharContent = false;
 		}
 
-		else if (this.expectingLabels && "LABELS".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingLabels && "LABELS".equalsIgnoreCase(token)) {
 			((CharactersBlockListener) this.getBlockListener()).setLabels(true);
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
@@ -702,7 +709,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingLabels = false;
 		}
 
-		else if (this.expectingLabels && "NOLABELS".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingLabels && "NOLABELS".equalsIgnoreCase(token)) {
 			((CharactersBlockListener) this.getBlockListener())
 					.setLabels(false);
 			this.expectingDataType = false;
@@ -715,8 +722,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingLabels = false;
 		}
 
-		else if (this.expectingTranspose
-				&& "TRANSPOSE".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingTranspose && "TRANSPOSE".equalsIgnoreCase(token)) {
 			((CharactersBlockListener) this.getBlockListener())
 					.setTransposed(true);
 			this.expectingDataType = false;
@@ -731,7 +737,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingInterleave
-				&& "INTERLEAVE".equalsIgnoreCase(trimmed)) {
+				&& "INTERLEAVE".equalsIgnoreCase(token)) {
 			((CharactersBlockListener) this.getBlockListener())
 					.setInterleaved(true);
 			this.expectingDataType = false;
@@ -746,8 +752,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingInterleave = false;
 		}
 
-		else if (this.expectingItems
-				&& trimmed.toUpperCase().startsWith("ITEMS")) {
+		else if (this.expectingItems && token.toUpperCase().startsWith("ITEMS")) {
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
 			this.expectingMissing = false;
@@ -760,7 +765,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingInterleave = false;
 			this.expectingItems = false;
 
-			if (trimmed.indexOf("=") >= 0) {
+			if (token.indexOf("=") >= 0) {
 				final String[] parts = token.split("=");
 				if (parts.length > 1) {
 					if (parts[1].startsWith("(")) {
@@ -818,7 +823,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingStatesFormat
-				&& trimmed.toUpperCase().startsWith("STATESFORMAT")) {
+				&& token.toUpperCase().startsWith("STATESFORMAT")) {
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
 			this.expectingMissing = false;
@@ -832,7 +837,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingItems = false;
 			this.expectingStatesFormat = false;
 
-			if (trimmed.indexOf("=") >= 0) {
+			if (token.indexOf("=") >= 0) {
 				final String[] parts = token.split("=");
 				if (parts.length > 1)
 					((CharactersBlockListener) this.getBlockListener())
@@ -858,7 +863,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingStatesFormatContent = false;
 		}
 
-		else if (this.expectingTokens && "TOKENS".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingTokens && "TOKENS".equalsIgnoreCase(token)) {
 			((CharactersBlockListener) this.getBlockListener()).setTokens(true);
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
@@ -876,7 +881,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.tokenizedMatrix = true;
 		}
 
-		else if (this.expectingTokens && "NOTOKENS".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingTokens && "NOTOKENS".equalsIgnoreCase(token)) {
 			((CharactersBlockListener) this.getBlockListener())
 					.setTokens(false);
 			this.expectingDataType = false;
@@ -895,8 +900,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.tokenizedMatrix = false;
 		}
 
-		else if (this.expectingEliminate
-				&& "ELIMINATE".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingEliminate && "ELIMINATE".equalsIgnoreCase(token)) {
 			this.expectingFormat = false;
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
@@ -916,9 +920,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingEliminateRange) {
-			final String parts[] = trimmed.split("-");
+			final String parts[] = token.split("-");
 			if (parts.length != 2)
-				throw new ParseException("Eliminate range " + trimmed
+				throw new ParseException("Eliminate range " + token
 						+ " not in form X-Y");
 			try {
 				final int eliminateStart = Integer.parseInt(parts[0]);
@@ -928,14 +932,13 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 				((CharactersBlockListener) this.getBlockListener())
 						.setEliminateEnd(eliminateEnd);
 			} catch (NumberFormatException e) {
-				throw new ParseException("Values in eliminate range " + trimmed
+				throw new ParseException("Values in eliminate range " + token
 						+ " not parseable integers");
 			}
 			this.expectingEliminateRange = false;
 		}
 
-		else if (this.expectingTaxLabel
-				&& "TAXLABELS".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingTaxLabel && "TAXLABELS".equalsIgnoreCase(token)) {
 			this.expectingFormat = false;
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
@@ -957,7 +960,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingCharStateLabel
-				&& "CHARSTATELABELS".equalsIgnoreCase(trimmed)) {
+				&& "CHARSTATELABELS".equalsIgnoreCase(token)) {
 			this.expectingFormat = false;
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
@@ -981,7 +984,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingCharLabel
-				&& "CHARLABELS".equalsIgnoreCase(trimmed)) {
+				&& "CHARLABELS".equalsIgnoreCase(token)) {
 			this.expectingFormat = false;
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
@@ -1009,7 +1012,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingStateLabel
-				&& "STATELABELS".equalsIgnoreCase(trimmed)) {
+				&& "STATELABELS".equalsIgnoreCase(token)) {
 			this.expectingFormat = false;
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
@@ -1037,7 +1040,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingStateLabelKey = true;
 		}
 
-		else if (this.expectingMatrix && "MATRIX".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingMatrix && "MATRIX".equalsIgnoreCase(token)) {
 			this.expectingFormat = false;
 			this.expectingDataType = false;
 			this.expectingRespectCase = false;
@@ -1069,13 +1072,13 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingTaxLabelValue)
-			// Use untrimmed version to preserve spaces.
+			// Use untoken version to preserve spaces.
 			((CharactersBlockListener) this.getBlockListener())
 					.addTaxLabel(token);
 
 		else if (this.expectingCharStateLabelKey) {
 			this.currentCharStateLabelKey = token;
-			// Use untrimmed version to preserve spaces.
+			// Use untoken version to preserve spaces.
 			((CharactersBlockListener) this.getBlockListener())
 					.addCharState(token);
 			this.expectingCharStateLabelKey = false;
@@ -1100,7 +1103,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 					actualName = actualName.substring(0,
 							actualName.length() - 1);
 			}
-			// Use untrimmed version to preserve spaces.
+			// Use untoken version to preserve spaces.
 			((CharactersBlockListener) this.getBlockListener())
 					.setCharStateLabel(this.currentCharStateLabelKey,
 							actualName);
@@ -1122,7 +1125,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			if (skipSynonyms)
 				token = token.substring(0, token.length() - 1);
 			if (!"/".equals(token))
-				// Use untrimmed version to preserve spaces.
+				// Use untoken version to preserve spaces.
 				((CharactersBlockListener) this.getBlockListener())
 						.addCharStateKeyword(this.currentCharStateLabelKey,
 								token);
@@ -1133,7 +1136,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingCharLabelValue)
-			// Use untrimmed version to preserve spaces.
+			// Use untoken version to preserve spaces.
 			((CharactersBlockListener) this.getBlockListener())
 					.addCharLabel(token);
 
@@ -1142,7 +1145,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			if (skipContent)
 				token = token.substring(0, token.length() - 1);
 			this.currentStateLabelKey = token;
-			// Use untrimmed version to preserve spaces.
+			// Use untoken version to preserve spaces.
 			((CharactersBlockListener) this.getBlockListener()).addState(token);
 			if (!skipContent) {
 				this.expectingStateLabelKey = false;
@@ -1154,7 +1157,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			final boolean skipContent = token.endsWith(",");
 			if (skipContent)
 				token = token.substring(0, token.length() - 1);
-			// Use untrimmed version to preserve spaces.
+			// Use untoken version to preserve spaces.
 			((CharactersBlockListener) this.getBlockListener()).addStateLabel(
 					this.currentStateLabelKey, token);
 			if (skipContent) {
@@ -1165,13 +1168,23 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 
 		else if (this.expectingMatrixKey) {
 			this.currentMatrixKey = token;
-			if (!this.matrixStack.containsKey(token))
-				this.matrixStack.put(token, new Stack());
-			// Use untrimmed version to preserve spaces.
+			// Use untoken version to preserve spaces.
 			((CharactersBlockListener) this.getBlockListener())
 					.addMatrixEntry(token);
 			this.expectingMatrixKey = false;
 			this.expectingMatrixContent = true;
+			// Update first line info and set up stack for entry.
+			if (!this.matrixStack.containsKey(token)) {
+				this.matrixStack.put(token, new Stack());
+				if (this.matrixPrependNulls)
+					for (int i = 0; i < this.matrixFirstLineLength; i++)
+						((CharactersBlockListener) this.getBlockListener())
+								.appendMatrixData(this.currentMatrixKey, null);
+			}
+			if (this.matrixFirstLineKey == null)
+				this.matrixFirstLineKey = this.currentMatrixKey;
+			else if (this.matrixFirstLineKey.equals(this.currentMatrixKey))
+				this.matrixPrependNulls = true;
 		}
 
 		else if (this.expectingMatrixContent) {
@@ -1211,6 +1224,8 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 					else
 						((CharactersBlockListener) this.getBlockListener())
 								.appendMatrixData(this.currentMatrixKey, token);
+					if (this.currentMatrixKey.equals(this.matrixFirstLineKey))
+						this.matrixFirstLineLength++;
 				} else {
 					final String[] toks = token.split("");
 					for (int i = 0; i < toks.length; i++) {
@@ -1221,6 +1236,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 							((CharactersBlockListener) this.getBlockListener())
 									.appendMatrixData(this.currentMatrixKey,
 											tok);
+						if (this.currentMatrixKey
+								.equals(this.matrixFirstLineKey))
+							this.matrixFirstLineLength++;
 					}
 				}
 			}

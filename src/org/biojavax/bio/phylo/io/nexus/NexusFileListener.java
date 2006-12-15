@@ -71,9 +71,9 @@ public interface NexusFileListener {
 	public void endTokenGroup();
 
 	/**
-	 * Causes the default block parsers to be assigned. This is called by
-	 * the constructor of the abstract implementation. If it is not called,
-	 * then at least the unknown block parser must be set by other means.
+	 * Causes the default block parsers to be assigned. This is called by the
+	 * constructor of the abstract implementation. If it is not called, then at
+	 * least the unknown block parser must be set by other means.
 	 */
 	public void setDefaultBlockParsers();
 
@@ -121,8 +121,9 @@ public interface NexusFileListener {
 	public void parseToken(String token) throws ParseException;
 
 	/**
-	 * Does the listener want to know about brackets and braces as
-	 * separate tokens?
+	 * Does the listener want to know about brackets and braces as separate
+	 * tokens?
+	 * 
 	 * @return <tt>true</tt> if it does.
 	 */
 	public boolean wantsBracketsAndBraces();
@@ -155,6 +156,7 @@ public interface NexusFileListener {
 				}) {
 			public void resetStatus() {
 			}
+
 			public void parseToken(final String token) throws ParseException {
 			}
 		};
@@ -162,7 +164,7 @@ public interface NexusFileListener {
 		private Map blockParsers = new HashMap();
 
 		private NexusBlockParser blockParser;
-		
+
 		public Abstract() {
 			this.setDefaultBlockParsers();
 		}
@@ -225,15 +227,17 @@ public interface NexusFileListener {
 		protected abstract void blockEnded(NexusBlockParser blockParser);
 
 		public boolean wantsBracketsAndBraces() {
-			return this.blockParser!=null && this.blockParser.wantsBracketsAndBraces();
+			return this.blockParser != null
+					&& this.blockParser.wantsBracketsAndBraces();
 		}
-		
+
 		public void setDefaultBlockParsers() {
 			this.setBlockParser(NexusBlockParser.UNKNOWN_BLOCK,
 					NexusFileListener.Abstract.ignoreUnknownBlocks);
 		}
 
 		public NexusBlockParser getBlockParser(String blockName) {
+			blockName = blockName.toUpperCase();
 			return blockParser = this.blockParsers.containsKey(blockName) ? (NexusBlockParser) this.blockParsers
 					.get(blockName)
 					: (NexusBlockParser) this.blockParsers
@@ -253,7 +257,7 @@ public interface NexusFileListener {
 		}
 
 		public void setBlockParser(String blockName, NexusBlockParser parser) {
-			this.blockParsers.put(blockName, parser);
+			this.blockParsers.put(blockName.toUpperCase(), parser);
 		}
 
 		public void startBlock(String blockName) {

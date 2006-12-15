@@ -30,10 +30,11 @@ import org.biojava.bio.seq.io.ParseException;
  * @author Jim Balhoff
  * @since 1.6
  */
-public class TaxaBlockBuilder extends NexusBlockBuilder.Abstract implements TaxaBlockListener {
+public class TaxaBlockBuilder extends NexusBlockBuilder.Abstract implements
+		TaxaBlockListener {
 
 	private TaxaBlock block;
-	
+
 	public void addTaxLabel(final String taxLabel) throws ParseException {
 		this.block.addTaxLabel(taxLabel);
 	}
@@ -55,7 +56,7 @@ public class TaxaBlockBuilder extends NexusBlockBuilder.Abstract implements Taxa
 	private void resetStatus() {
 		// Nothing to do.
 	}
-	
+
 	public void endBlock() {
 		// Don't care.
 	}

@@ -103,13 +103,12 @@ public class TreesBlockParser extends NexusBlockParser.Abstract {
 	}
 
 	public void parseToken(String token) throws ParseException {
-		final String trimmed = token.trim();
-		if (trimmed.length() == 0)
+		if (token.trim().length() == 0)
 			return;
-		else if (this.expectingTranslate
-				&& "TRANSLATE".equalsIgnoreCase(trimmed)) {
+		else if (this.expectingTranslate && "TRANSLATE".equalsIgnoreCase(token)) {
 			this.expectingTranslate = false;
 			this.expectingTaxLabel = true;
+			this.expectingTree = false;
 		} else if (this.expectingTaxLabel) {
 			this.currentTaxLabel = token; // In case it includes spaces.
 			this.expectingTaxLabel = false;
@@ -123,13 +122,13 @@ public class TreesBlockParser extends NexusBlockParser.Abstract {
 			this.expectingTaxName = false;
 			if (!endsWithComma)
 				this.expectingTree = true;
-			else
+			else 
 				this.expectingTaxLabel = true;
-		} else if (this.expectingTree && "TREE".equalsIgnoreCase(trimmed)) {
+		} else if (this.expectingTree && "TREE".equalsIgnoreCase(token)) {
 			this.expectingTree = false;
 			this.expectingTreeName = true;
 		} else if (this.expectingTreeName) {
-			if ("*".equals(trimmed))
+			if ("*".equals(token))
 				this.currentTreeStarred = true;
 			else {
 				this.expectingTreeName = false;

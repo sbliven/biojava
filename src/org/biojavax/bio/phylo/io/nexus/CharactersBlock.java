@@ -99,7 +99,17 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	 * CharactersBlock.CHARACTERS_BLOCK as the name.
 	 */
 	public CharactersBlock() {
-		super(CharactersBlock.CHARACTERS_BLOCK);
+		this(CharactersBlock.CHARACTERS_BLOCK);
+	}
+
+	/**
+	 * For the DATA block subclass.
+	 * 
+	 * @param replacementLabel
+	 *            the different label to use.
+	 */
+	protected CharactersBlock(final String replacementLabel) {
+		super(replacementLabel);
 	}
 
 	/**
@@ -143,7 +153,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setDataType(final String dataType) {
 		this.dataType = dataType;
 	}
-	
+
 	public String getDataType() {
 		return this.dataType;
 	}
@@ -151,7 +161,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setRespectCase(final boolean respectCase) {
 		this.respectCase = respectCase;
 	}
-	
+
 	public boolean isRespectCase() {
 		return this.respectCase;
 	}
@@ -159,7 +169,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setMissing(final String missing) {
 		this.missing = missing;
 	}
-	
+
 	public String getMissing() {
 		return this.missing;
 	}
@@ -167,20 +177,20 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setGap(final String gap) {
 		this.gap = gap;
 	}
-	
+
 	public String getGap() {
 		return this.gap;
 	}
-	
+
 	public void addSymbol(final String symbol) {
 		if (!this.symbols.contains(symbol))
 			this.symbols.add(symbol);
 	}
-	
+
 	public void removeSymbol(final String symbol) {
 		this.symbols.remove(symbol);
 	}
-	
+
 	public void removeAllSymbols() {
 		this.symbols.clear();
 	}
@@ -188,15 +198,15 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public List getSymbols() {
 		return this.symbols;
 	}
-	
+
 	public void addEquate(final String symbol, final List symbols) {
 		this.equate.put(symbol, symbols);
 	}
-	
+
 	public void removeEquate(final String symbol) {
 		this.equate.remove(symbol);
 	}
-	
+
 	public Map getEquates() {
 		return this.equate;
 	}
@@ -204,7 +214,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setMatchChar(final String matchChar) {
 		this.matchChar = matchChar;
 	}
-	
+
 	public String getMatchChar() {
 		return this.matchChar;
 	}
@@ -212,7 +222,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setLabels(final boolean labels) {
 		this.labels = labels;
 	}
-	
+
 	public boolean isLabels() {
 		return this.labels;
 	}
@@ -220,7 +230,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setTransposed(final boolean transposed) {
 		this.transposed = transposed;
 	}
-	
+
 	public boolean isTransposed() {
 		return this.transposed;
 	}
@@ -228,20 +238,20 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setInterleaved(final boolean interleaved) {
 		this.interleaved = interleaved;
 	}
-	
+
 	public boolean isInterleaved() {
 		return this.interleaved;
 	}
-	
+
 	public void addItem(final String item) {
 		if (!this.items.contains(item))
 			this.items.add(item);
 	}
-	
+
 	public void removeItem(final String item) {
 		this.items.remove(item);
 	}
-	
+
 	public void removeAllItems() {
 		this.items.clear();
 	}
@@ -253,7 +263,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setStatesFormat(final String statesFormat) {
 		this.statesFormat = statesFormat;
 	}
-	
+
 	public String getStatesFormat() {
 		return this.statesFormat;
 	}
@@ -261,7 +271,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setTokens(final boolean tokens) {
 		this.tokens = tokens;
 	}
-	
+
 	public boolean isTokens() {
 		return this.tokens;
 	}
@@ -269,7 +279,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setEliminateStart(final int eliminateStart) {
 		this.eliminateStart = eliminateStart;
 	}
-	
+
 	public int getEliminateStart() {
 		return this.eliminateStart;
 	}
@@ -277,11 +287,11 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void setEliminateEnd(final int eliminateEnd) {
 		this.eliminateEnd = eliminateEnd;
 	}
-	
+
 	public int getEliminateEnd() {
 		return this.eliminateEnd;
 	}
-	
+
 	/**
 	 * Add a TAXLABEL. If it already exists, or is a number that refers to an
 	 * index position that already exists, an exception is thrown.
@@ -354,33 +364,35 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	}
 
 	public void addCharState(final String charState) {
-		this.charStateLabels.put(charState, new Object[]{null,new ArrayList()});
+		this.charStateLabels.put(charState, new Object[] { null,
+				new ArrayList() });
 	}
-	
+
 	public void setCharStateLabel(final String charState, final String label) {
 		if (!this.charStateLabels.containsKey(charState))
 			this.addCharState(charState);
-		((Object[])this.charStateLabels.get(charState))[0]=label;
+		((Object[]) this.charStateLabels.get(charState))[0] = label;
 	}
-	
+
 	public void addCharStateKeyword(final String charState, final String keyword) {
 		if (!this.charStateLabels.containsKey(charState))
 			this.addCharState(charState);
-		((List)((Object[])this.charStateLabels.get(charState))[1]).add(keyword);
+		((List) ((Object[]) this.charStateLabels.get(charState))[1])
+				.add(keyword);
 	}
-	
+
 	public String getCharStateLabel(final String charState) {
-		return (String)(((Object[])this.charStateLabels.get(charState))[0]);
+		return (String) (((Object[]) this.charStateLabels.get(charState))[0]);
 	}
-	
+
 	public List getCharStateLabelKeywords(final String charState) {
-		return (List)(((Object[])this.charStateLabels.get(charState))[1]);
+		return (List) (((Object[]) this.charStateLabels.get(charState))[1]);
 	}
-	
+
 	public void removeCharState(final String charState) {
 		this.charStateLabels.remove(charState);
 	}
-	
+
 	public Set getAllCharStates() {
 		return this.charStateLabels.keySet();
 	}
@@ -388,33 +400,33 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	public void addCharLabel(final String charLabel) {
 		this.charLabels.add(charLabel);
 	}
-	
+
 	public void removeCharLabel(final String charLabel) {
 		this.charLabels.remove(charLabel);
 	}
-	
+
 	public boolean containsCharLabel(final String charLabel) {
 		return this.charLabels.contains(charLabel);
 	}
-	
+
 	public List getCharLabels() {
 		return this.charLabels;
 	}
 
 	public void addState(final String state) {
-		this.stateLabels.put(state, new Object[]{null,new ArrayList()});
+		this.stateLabels.put(state, new Object[] { null, new ArrayList() });
 	}
-	
+
 	public void addStateLabel(final String state, final String label) {
 		if (!this.stateLabels.containsKey(state))
 			this.addState(state);
-		((List)this.stateLabels.get(state)).add(label);
+		((List) this.stateLabels.get(state)).add(label);
 	}
-	
+
 	public List getStateLabels(final String state) {
-		return (List)this.stateLabels.get(state);
+		return (List) this.stateLabels.get(state);
 	}
-	
+
 	public void removeState(final String state) {
 		this.stateLabels.remove(state);
 	}
@@ -423,15 +435,15 @@ public class CharactersBlock extends NexusBlock.Abstract {
 		if (!this.matrix.containsKey(taxa))
 			this.matrix.put(taxa, new ArrayList());
 	}
-	
+
 	public void appendMatrixData(final String taxa, final Object data) {
-		((List)this.matrix.get(taxa)).add(data);
+		((List) this.matrix.get(taxa)).add(data);
 	}
-	
+
 	public List getMatrixData(final String taxa) {
-		return (List)this.matrix.get(taxa);
+		return (List) this.matrix.get(taxa);
 	}
-	
+
 	/**
 	 * Adds a comment.
 	 * 
@@ -517,16 +529,16 @@ public class CharactersBlock extends NexusBlock.Abstract {
 		// if (this.interleaved)
 		// writer.write(" INTERLEAVED");
 		writer.write(" ITEMS=");
-		if (this.items.isEmpty()) 
+		if (this.items.isEmpty())
 			this.items.add("STATES");
-		if (this.items.size()>1)
+		if (this.items.size() > 1)
 			writer.write('(');
 		for (final Iterator i = this.items.iterator(); i.hasNext();) {
 			this.writeToken(writer, "" + i.next());
 			if (i.hasNext())
 				writer.write(' ');
 		}
-		if (this.items.size()>1)
+		if (this.items.size() > 1)
 			writer.write(')');
 		writer.write(" STATESFORMAT=");
 		this.writeToken(writer, this.statesFormat);
@@ -543,7 +555,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 			writer.write(";" + NexusFileFormat.NEW_LINE);
 		}
 
-		if (this.taxLabels.size()>0) {
+		if (this.taxLabels.size() > 0) {
 			writer.write(" TAXLABELS");
 			for (final Iterator i = this.taxLabels.iterator(); i.hasNext();) {
 				writer.write(' ');
@@ -634,13 +646,18 @@ public class CharactersBlock extends NexusBlock.Abstract {
 
 	}
 
-	private void writeMatrixEntry(final Writer writer,final Object obj, final boolean reallyUseTokens) throws IOException {
-		if (obj instanceof String) 
+	private void writeMatrixEntry(final Writer writer, final Object obj,
+			final boolean reallyUseTokens) throws IOException {
+		if (obj == null) {
+			if (this.gap != null)
+				this.writeToken(writer, this.gap);
+			else
+				writer.write(' ');
+		} else if (obj instanceof String)
 			this.writeToken(writer, (String) obj);
 		else if (obj instanceof List) {
 			writer.write('(');
-			for (final Iterator k = ((List) obj).iterator(); k
-					.hasNext();) {
+			for (final Iterator k = ((List) obj).iterator(); k.hasNext();) {
 				this.writeMatrixEntry(writer, k.next(), reallyUseTokens);
 				if (k.hasNext() && reallyUseTokens)
 					writer.write(' ');
@@ -648,8 +665,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 			writer.write(')');
 		} else if (obj instanceof Set) {
 			writer.write('{');
-			for (final Iterator k = ((Set) obj).iterator(); k
-					.hasNext();) {
+			for (final Iterator k = ((Set) obj).iterator(); k.hasNext();) {
 				this.writeMatrixEntry(writer, k.next(), reallyUseTokens);
 				if (k.hasNext() && reallyUseTokens)
 					writer.write(' ');

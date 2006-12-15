@@ -31,17 +31,22 @@ import org.biojava.bio.seq.io.ParseException;
  * @since 1.6
  */
 public interface TaxaBlockListener extends NexusBlockListener {
-	
+
 	/**
 	 * Set the DIMENSIONS NTAX value.
-	 * @param dimensionsNTax the new value.
+	 * 
+	 * @param dimensionsNTax
+	 *            the new value.
 	 */
 	public void setDimensionsNTax(int dimensionsNTax);
-	
+
 	/**
 	 * Add another value after the TAXLABEL tag.
-	 * @param taxLabel the new taxa to add.
-	 * @throws ParseException if the label is invalid.
+	 * 
+	 * @param taxLabel
+	 *            the new taxa to add.
+	 * @throws ParseException
+	 *             if the label is invalid.
 	 */
 	public void addTaxLabel(final String taxLabel) throws ParseException;
 }

@@ -49,8 +49,12 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 				new TaxaBlockBuilder()));
 		this.setBlockParser(TreesBlock.TREES_BLOCK, new TreesBlockParser(
 				new TreesBlockBuilder()));
-		this.setBlockParser(CharactersBlock.CHARACTERS_BLOCK, new CharactersBlockParser(
-				new CharactersBlockBuilder()));
+		this.setBlockParser(CharactersBlock.CHARACTERS_BLOCK,
+				new CharactersBlockParser(new CharactersBlockBuilder()));
+		this.setBlockParser(DataBlock.DATA_BLOCK, new DataBlockParser(
+				new DataBlockBuilder()));
+		this.setBlockParser(DistancesBlock.DISTANCES_BLOCK,
+				new DistancesBlockParser(new DistancesBlockBuilder()));
 	}
 
 	protected void blockEnded(final NexusBlockParser blockParser) {
@@ -103,7 +107,7 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 		private UnknownBlockParser() {
 			super(new UnknownBlockBuilder());
 		}
-		
+
 		public void resetStatus() {
 			// Ignore.
 		}
@@ -113,7 +117,8 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 		}
 
 		public void parseToken(final String token) throws ParseException {
-			((UnknownBlockBuilder) this.getBlockListener()).getComponents().add(token);
+			((UnknownBlockBuilder) this.getBlockListener()).getComponents()
+					.add(token);
 		}
 
 		private static class UnknownBlockBuilder extends

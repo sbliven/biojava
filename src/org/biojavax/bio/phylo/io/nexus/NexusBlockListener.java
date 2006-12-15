@@ -35,7 +35,9 @@ public interface NexusBlockListener {
 
 	/**
 	 * Notifies the parser that a new block is starting.
-	 * @param blockName the name of the newly started block.
+	 * 
+	 * @param blockName
+	 *            the name of the newly started block.
 	 */
 	public void startBlock(String blockName);
 

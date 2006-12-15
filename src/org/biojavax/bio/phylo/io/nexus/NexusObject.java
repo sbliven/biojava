@@ -34,8 +34,11 @@ import java.io.Writer;
 public interface NexusObject {
 	/**
 	 * Writes this object to the given writer.
-	 * @param writer the writer to write to.
-	 * @throws IOException if it could not be written.
+	 * 
+	 * @param writer
+	 *            the writer to write to.
+	 * @throws IOException
+	 *             if it could not be written.
 	 */
 	public void writeObject(Writer writer) throws IOException;
 }

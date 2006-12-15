@@ -35,11 +35,11 @@ import java.util.List;
  * @since 1.6
  */
 public class NexusComment implements NexusObject {
-	
+
 	private List components = new ArrayList();
-	
+
 	private NexusComment nestedComment = null;
-	
+
 	public void openSubComment() {
 		if (this.hasOpenSubComment())
 			this.nestedComment.openSubComment();
@@ -48,46 +48,46 @@ public class NexusComment implements NexusObject {
 			this.components.add(this.nestedComment);
 		}
 	}
-	
+
 	public boolean hasOpenSubComment() {
-		return this.nestedComment!=null;
+		return this.nestedComment != null;
 	}
-	
+
 	public void closeSubComment() {
 		if (this.hasOpenSubComment() && this.nestedComment.hasOpenSubComment())
 			this.nestedComment.closeSubComment();
 		else
 			this.nestedComment = null;
 	}
-	
+
 	public void addCommentText(final String text) {
 		if (this.hasOpenSubComment())
 			this.nestedComment.addCommentText(text);
 		else
 			this.components.add(text);
 	}
-	
+
 	/**
-	 * This iterator iterates over all parts
-	 * of the comment. Each item returned is either
-	 * a String or a NexusComment.
+	 * This iterator iterates over all parts of the comment. Each item returned
+	 * is either a String or a NexusComment.
+	 * 
 	 * @return an iterator over the comment components.
 	 */
 	public Iterator commentIterator() {
 		return this.components.iterator();
 	}
-	
+
 	public void writeObject(final Writer writer) throws IOException {
 		writer.write('[');
-		for (final Iterator i = this.components.iterator(); i.hasNext(); ) {
-			final Object obj = (Object)i.next();
+		for (final Iterator i = this.components.iterator(); i.hasNext();) {
+			final Object obj = (Object) i.next();
 			if (obj instanceof NexusComment)
-				((NexusComment)obj).writeObject(writer);
+				((NexusComment) obj).writeObject(writer);
 			else {
-				String text = (String)obj;
-				text = text.replaceAll("'","''");
-				if (text.indexOf('[')>=0 || text.indexOf(']')>=0)
-					text = "'"+text+"'";
+				String text = (String) obj;
+				text = text.replaceAll("'", "''");
+				if (text.indexOf('[') >= 0 || text.indexOf(']') >= 0)
+					text = "'" + text + "'";
 				writer.write(text);
 			}
 		}

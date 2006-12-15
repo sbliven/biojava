@@ -60,7 +60,7 @@ public interface NexusBlockBuilder extends NexusBlockListener {
 		public void beginComment() {
 			if (this.comment != null)
 				this.comment.openSubComment();
-			else 
+			else
 				this.comment = new NexusComment();
 		}
 

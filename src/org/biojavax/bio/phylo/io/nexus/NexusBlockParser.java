@@ -96,10 +96,11 @@ public interface NexusBlockParser {
 	 * @return the listener.
 	 */
 	public NexusBlockListener getBlockListener();
-	
+
 	/**
-	 * Does the listener want to know about brackets and braces as
-	 * separate tokens?
+	 * Does the listener want to know about brackets and braces as separate
+	 * tokens?
+	 * 
 	 * @return <tt>true</tt> if it does.
 	 */
 	public boolean wantsBracketsAndBraces();
@@ -126,9 +127,10 @@ public interface NexusBlockParser {
 			this.blockName = blockName;
 			this.blockListener.startBlock(blockName);
 		}
-		
+
 		/**
-		 * This function is called when the parser is reset before starting a new block.
+		 * This function is called when the parser is reset before starting a
+		 * new block.
 		 */
 		protected abstract void resetStatus();
 

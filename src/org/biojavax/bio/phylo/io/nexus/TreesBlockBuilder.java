@@ -30,7 +30,8 @@ import org.biojavax.bio.phylo.io.nexus.TreesBlock.NewickTreeString;
  * @author Jim Balhoff
  * @since 1.6
  */
-public class TreesBlockBuilder extends NexusBlockBuilder.Abstract implements TreesBlockListener {
+public class TreesBlockBuilder extends NexusBlockBuilder.Abstract implements
+		TreesBlockListener {
 
 	private TreesBlock block;
 
@@ -47,7 +48,7 @@ public class TreesBlockBuilder extends NexusBlockBuilder.Abstract implements Tre
 	private void resetStatus() {
 		// Nothing to do.
 	}
-	
+
 	public void endBlock() {
 		// Don't care.
 	}

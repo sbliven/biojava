@@ -47,7 +47,10 @@ public class CharactersBlockBuilder extends NexusBlockBuilder.Abstract
 		return this.block;
 	}
 
-	private void resetStatus() {
+	/**
+	 * Allowed to be called by DATA subclass.
+	 */
+	protected void resetStatus() {
 		// Nothing to do.
 	}
 
