@@ -106,7 +106,5 @@ public interface CharactersBlockListener extends NexusBlockListener {
 
 	public void addMatrixEntry(final String taxa);
 	
-	public void appendMatrixData(final String taxa, final String data);
-	
-	public void appendMatrixData(final String taxa, final List data);
+	public void appendMatrixData(final String taxa, final Object data);
 }

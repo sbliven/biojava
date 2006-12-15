@@ -121,6 +121,13 @@ public interface NexusFileListener {
 	public void parseToken(String token) throws ParseException;
 
 	/**
+	 * Does the listener want to know about brackets and braces as
+	 * separate tokens?
+	 * @return <tt>true</tt> if it does.
+	 */
+	public boolean wantsBracketsAndBraces();
+
+	/**
 	 * Example abstract implementation which all others should extend.
 	 */
 	public abstract class Abstract implements NexusFileListener {
@@ -217,6 +224,10 @@ public interface NexusFileListener {
 		 */
 		protected abstract void blockEnded(NexusBlockParser blockParser);
 
+		public boolean wantsBracketsAndBraces() {
+			return this.blockParser!=null && this.blockParser.wantsBracketsAndBraces();
+		}
+		
 		public void setDefaultBlockParsers() {
 			this.setBlockParser(NexusBlockParser.UNKNOWN_BLOCK,
 					NexusFileListener.Abstract.ignoreUnknownBlocks);

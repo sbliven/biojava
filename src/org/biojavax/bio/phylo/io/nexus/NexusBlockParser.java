@@ -96,6 +96,13 @@ public interface NexusBlockParser {
 	 * @return the listener.
 	 */
 	public NexusBlockListener getBlockListener();
+	
+	/**
+	 * Does the listener want to know about brackets and braces as
+	 * separate tokens?
+	 * @return <tt>true</tt> if it does.
+	 */
+	public boolean wantsBracketsAndBraces();
 
 	/**
 	 * All block parsers should derive from this abstract parser.
@@ -152,5 +159,9 @@ public interface NexusBlockParser {
 
 		public abstract void parseToken(final String token)
 				throws ParseException;
+
+		public boolean wantsBracketsAndBraces() {
+			return false;
+		}
 	}
 }

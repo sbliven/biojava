@@ -132,19 +132,21 @@ public class NexusFileFormat {
 		String singleQuote = "'";
 		String underscore = "_";
 		String endTokenGroup = ";";
+		String openBracket = "(";
+		String closeBracket = ")";
+		String openBrace = "{";
+		String closeBrace = "}";
 		String newLine = NexusFileFormat.NEW_LINE;
 		String allDelims = space + tab + beginComment + endComment
-				+ singleQuote + underscore + endTokenGroup + newLine;
+				+ singleQuote + underscore + endTokenGroup + newLine
+				+ openBracket + closeBracket + openBrace + closeBrace;
 
 		// Reset status flags.
-		boolean expectingHeader = true;
-		boolean expectingBeginTag = false;
-		boolean expectingBeginName = false;
 		int inComment = 0;
 		boolean inSingleQuotes = false;
 		boolean inDoubleQuotes = false;
 		boolean singleQuoteOpened = false;
-		boolean expectingBlockContents = false;
+		TokenParser parser = new TokenParser(listener);
 
 		// Read the file line-by-line.
 		final Stack parsedTokBufferStack = new Stack();
@@ -193,17 +195,10 @@ public class NexusFileFormat {
 						else if (endComment.equals(tok) && !inSingleQuotes
 								&& !inDoubleQuotes) {
 							inComment--;
-							if (expectingBlockContents) {
-								if (parsedTokBuffer.length() > 0)
+							if (parsedTokBuffer.length() > 0)
 									listener.commentText(parsedTokBuffer
 											.toString());
 								listener.endComment();
-							} else {
-								if (parsedTokBuffer.length() > 0)
-									listener.commentText(parsedTokBuffer
-											.toString());
-								listener.endComment();
-							}
 							parsedTokBuffer = (StringBuffer) parsedTokBufferStack
 									.pop();
 						}
@@ -238,6 +233,24 @@ public class NexusFileFormat {
 						// Convert underscores to spaces.
 						else if (underscore.equals(tok))
 							parsedTokBuffer.append(space);
+						// Brackets. Pass through as tokens if
+						// the client wishes, or just append to buffer
+						// if client doesn't care.
+						else if (openBracket.equals(tok)
+								|| closeBracket.equals(tok)
+								|| openBrace.equals(tok)
+								|| closeBrace.equals(tok)) {
+							if (listener.wantsBracketsAndBraces()) {
+								// Dump buffer so far.
+								final String parsedTok = parsedTokBuffer
+										.toString();
+								parsedTokBuffer.setLength(0);
+								parser.parseToken(parsedTok);
+								// Parse bracket/brace itself.
+								listener.parseToken(tok);
+							} else
+								parsedTokBuffer.append(tok);
+						}
 						// Use whitespace/semi-colon to indicate end
 						// of current token.
 						else if (space.equals(tok) || tab.equals(tok)
@@ -249,47 +262,7 @@ public class NexusFileFormat {
 								final String parsedTok = parsedTokBuffer
 										.toString();
 								parsedTokBuffer.setLength(0);
-
-								// Expecting header?
-								if (expectingHeader
-										&& "#NEXUS".equalsIgnoreCase(parsedTok)) {
-									expectingHeader = false;
-									expectingBeginTag = true;
-									listener.startFile();
-								}
-
-								// Expecting a BEGIN tag?
-								else if (expectingBeginTag
-										&& "BEGIN".equalsIgnoreCase(parsedTok)) {
-									expectingBeginTag = false;
-									expectingBeginName = true;
-								}
-
-								// Expecting a name for a BEGIN block?
-								else if (expectingBeginName) {
-									listener.startBlock(parsedTok);
-									expectingBeginName = false;
-									expectingBlockContents = true;
-								}
-
-								// Looking for block contents?
-								else if (expectingBlockContents) {
-									// End tag?
-									if ("END".equalsIgnoreCase(parsedTok)) {
-										listener.endBlock();
-										expectingBlockContents = false;
-										expectingBeginTag = true;
-									}
-									// Or just normal token.
-									else
-										listener.parseToken(parsedTok);
-								}
-
-								// All other situations.
-								else
-									throw new ParseException(
-											"Parser in unknown state when parsing token \""
-													+ parsedTok + "\"");
+								parser.parseToken(parsedTok);
 							}
 
 							// If this was an end-line, let the listeners know.
@@ -317,6 +290,61 @@ public class NexusFileFormat {
 
 		// End the listener.
 		listener.endFile();
+	}
+
+	private static class TokenParser {
+		
+		private boolean expectingHeader = true;
+		private boolean expectingBeginTag = false;
+		private boolean expectingBeginName = false;
+		private boolean expectingBlockContents = false;
+		private NexusFileListener listener;
+		
+		private TokenParser(final NexusFileListener listener) {
+			this.listener = listener;
+		}
+		
+		private void parseToken(final String parsedTok) throws ParseException {
+
+			// Expecting header?
+			if (this.expectingHeader && "#NEXUS".equalsIgnoreCase(parsedTok)) {
+				this.expectingHeader = false;
+				this.expectingBeginTag = true;
+				this.listener.startFile();
+			}
+
+			// Expecting a BEGIN tag?
+			else if (this.expectingBeginTag && "BEGIN".equalsIgnoreCase(parsedTok)) {
+				this.expectingBeginTag = false;
+				this.expectingBeginName = true;
+			}
+
+			// Expecting a name for a BEGIN block?
+			else if (this.expectingBeginName) {
+				this.listener.startBlock(parsedTok);
+				this.expectingBeginName = false;
+				this.expectingBlockContents = true;
+			}
+
+			// Looking for block contents?
+			else if (this.expectingBlockContents) {
+				// End tag?
+				if ("END".equalsIgnoreCase(parsedTok)) {
+					this.listener.endBlock();
+					this.expectingBlockContents = false;
+					this.expectingBeginTag = true;
+				}
+				// Or just normal token.
+				else
+					this.listener.parseToken(parsedTok);
+			}
+
+			// All other situations.
+			else
+				throw new ParseException(
+						"Parser in unknown state when parsing token \"" + parsedTok
+								+ "\"");
+		}
 	}
 
 	/**

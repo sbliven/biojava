@@ -99,11 +99,7 @@ public class CharactersBlockBuilder extends NexusBlockBuilder.Abstract
 		this.block.addTaxLabel(taxLabel);
 	}
 
-	public void appendMatrixData(String taxa, String data) {
-		this.block.appendMatrixData(taxa, data);
-	}
-
-	public void appendMatrixData(String taxa, List data) {
+	public void appendMatrixData(String taxa, Object data) {
 		this.block.appendMatrixData(taxa, data);
 	}
 

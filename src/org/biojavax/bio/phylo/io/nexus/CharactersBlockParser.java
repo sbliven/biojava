@@ -22,7 +22,12 @@ package org.biojavax.bio.phylo.io.nexus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 import org.biojava.bio.seq.io.ParseException;
 
@@ -158,6 +163,8 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 
 	private List currentMatrixBracket;
 
+	private Map matrixStack = new HashMap();
+
 	/**
 	 * Delegates to NexusBlockParser.Abstract.
 	 * 
@@ -230,6 +237,11 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		this.currentStateLabelKey = null;
 		this.currentMatrixKey = null;
 		this.currentMatrixBracket = null;
+		this.matrixStack.clear();
+	}
+
+	public boolean wantsBracketsAndBraces() {
+		return this.expectingMatrixContent;
 	}
 
 	public void parseToken(String token) throws ParseException {
@@ -245,7 +257,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			}
 			this.expectingMatrixContent = false;
 			this.expectingMatrixKey = true;
-		} else if (trimmed.length() == 0)
+		} else if (trimmed.length() == 0) 
 			return;
 		else if (this.expectingDimension
 				&& "DIMENSIONS".equalsIgnoreCase(trimmed)) {
@@ -1152,6 +1164,8 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 
 		else if (this.expectingMatrixKey) {
 			this.currentMatrixKey = token;
+			if (!this.matrixStack.containsKey(token))
+				this.matrixStack.put(token, new Stack());
 			// Use untrimmed version to preserve spaces.
 			((CharactersBlockListener) this.getBlockListener())
 					.addMatrixEntry(token);
@@ -1160,54 +1174,48 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingMatrixContent) {
-			final boolean reallyUseTokens = (this.tokenizedMatrix || "CONTINUOUS"
-					.equals(this.specifiedDataType))
-					&& !("DNA".equals(this.specifiedDataType)
-							|| "RNA".equals(this.specifiedDataType) || "NUCLEOTIDE"
-							.equals(this.specifiedDataType));
-			final String[] toks = token.split("");
-			StringBuffer buff = new StringBuffer();
-			// Iterate over chars in token
-			// If bracket, open new matrix entry.
-			// else if close bracket, save current entry and open new matrix
-			// entry.
-			// else if not tokenized, output char in current entry.
-			// else if tokenized, output all remaining chars in current entry
-			// till close bracket or end of token.
-			for (int i = 0; i < toks.length; i++) {
-				final String tok = toks[i];
-				if ("(".equals(tok))
-					this.currentMatrixBracket = new ArrayList();
-				else if (")".equals(tok)) {
-					if (reallyUseTokens) {
-						if (this.currentMatrixBracket != null)
-							this.currentMatrixBracket.add(buff.toString());
+			if ("(".equals(token))
+				((Stack) this.matrixStack.get(this.currentMatrixKey))
+						.push(new ArrayList());
+			else if ("{".equals(token))
+				((Stack) this.matrixStack.get(this.currentMatrixKey))
+						.push(new LinkedHashSet());
+			else if ((")".equals(token) || "}".equals(token))
+					&& !((Stack) this.matrixStack.get(this.currentMatrixKey))
+							.isEmpty())
+					((CharactersBlockListener) this.getBlockListener())
+							.appendMatrixData(this.currentMatrixKey,
+									((Stack) this.matrixStack
+											.get(this.currentMatrixKey)).pop());
+			else {
+				final boolean reallyUseTokens = (this.tokenizedMatrix || "CONTINUOUS"
+						.equals(this.specifiedDataType))
+						&& !("DNA".equals(this.specifiedDataType)
+								|| "RNA".equals(this.specifiedDataType) || "NUCLEOTIDE"
+								.equals(this.specifiedDataType));
+				if (reallyUseTokens) {
+					if (!((Stack) this.matrixStack.get(this.currentMatrixKey))
+							.isEmpty())
+						((Collection) ((Stack) this.matrixStack
+								.get(this.currentMatrixKey)).peek()).add(token);
+					else
+						((CharactersBlockListener) this.getBlockListener())
+								.appendMatrixData(this.currentMatrixKey, token);
+				} else {
+					final String[] toks = token.split("");
+					for (int i = 0; i < toks.length; i++) {
+						final String tok = toks[i];
+						if (!((Stack) this.matrixStack
+								.get(this.currentMatrixKey)).isEmpty())
+							((Collection) ((Stack) this.matrixStack
+									.get(this.currentMatrixKey)).peek())
+									.add(tok);
 						else
 							((CharactersBlockListener) this.getBlockListener())
 									.appendMatrixData(this.currentMatrixKey,
-											buff.toString());
+											tok);
 					}
-					if (this.currentMatrixBracket != null) {
-						((CharactersBlockListener) this.getBlockListener())
-								.appendMatrixData(this.currentMatrixKey,
-										this.currentMatrixBracket);
-						this.currentMatrixBracket = null;
-					}
-				} else if (reallyUseTokens)
-					buff.append(tok);
-				else if (this.currentMatrixBracket != null)
-					this.currentMatrixBracket.add(tok);
-				else
-					((CharactersBlockListener) this.getBlockListener())
-							.appendMatrixData(this.currentMatrixKey, tok);
-			}
-			if (reallyUseTokens) {
-				if (this.currentMatrixBracket != null)
-					this.currentMatrixBracket.add(buff.toString());
-				else
-					((CharactersBlockListener) this.getBlockListener())
-							.appendMatrixData(this.currentMatrixKey, buff
-									.toString());
+				}
 			}
 		}
 

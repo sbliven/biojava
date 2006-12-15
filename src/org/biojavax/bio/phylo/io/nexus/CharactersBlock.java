@@ -424,11 +424,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 			this.matrix.put(taxa, new ArrayList());
 	}
 	
-	public void appendMatrixData(final String taxa, final String data) {
-		((List)this.matrix.get(taxa)).add(data);
-	}
-	
-	public void appendMatrixData(final String taxa, final List data) {
+	public void appendMatrixData(final String taxa, final Object data) {
 		((List)this.matrix.get(taxa)).add(data);
 	}
 	
@@ -628,26 +624,8 @@ public class CharactersBlock extends NexusBlock.Abstract {
 			writer.write('\t');
 			for (final Iterator j = ((List) entry.getValue()).iterator(); j
 					.hasNext();) {
-				final Object obj = j.next();
-				if (obj instanceof String) {
-					if (!"STATESPRESENT".equals(this.statesFormat)
-							&& this.items.size() == 1)
-						writer.write('(');
-					this.writeToken(writer, (String) obj);
-					if (!"STATESPRESENT".equals(this.statesFormat)
-							&& this.items.size() == 1)
-						writer.write(')');
-				} else if (obj instanceof List) {
-					writer.write('(');
-					for (final Iterator k = ((List) obj).iterator(); k
-							.hasNext();) {
-						this.writeToken(writer, (String)k.next());
-						if (k.hasNext())
-							writer.write(' ');
-					}
-					writer.write(')');
-				}
-				if (reallyUseTokens)
+				this.writeMatrixEntry(writer, j.next(), reallyUseTokens);
+				if (reallyUseTokens && j.hasNext())
 					writer.write(' ');
 			}
 			writer.write(NexusFileFormat.NEW_LINE);
@@ -656,4 +634,27 @@ public class CharactersBlock extends NexusBlock.Abstract {
 
 	}
 
+	private void writeMatrixEntry(final Writer writer,final Object obj, final boolean reallyUseTokens) throws IOException {
+		if (obj instanceof String) 
+			this.writeToken(writer, (String) obj);
+		else if (obj instanceof List) {
+			writer.write('(');
+			for (final Iterator k = ((List) obj).iterator(); k
+					.hasNext();) {
+				this.writeMatrixEntry(writer, k.next(), reallyUseTokens);
+				if (k.hasNext() && reallyUseTokens)
+					writer.write(' ');
+			}
+			writer.write(')');
+		} else if (obj instanceof Set) {
+			writer.write('{');
+			for (final Iterator k = ((Set) obj).iterator(); k
+					.hasNext();) {
+				this.writeMatrixEntry(writer, k.next(), reallyUseTokens);
+				if (k.hasNext() && reallyUseTokens)
+					writer.write(' ');
+			}
+			writer.write('}');
+		}
+	}
 }

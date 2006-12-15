@@ -108,6 +108,10 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 			// Ignore.
 		}
 
+		public boolean wantsBracketsAndBraces() {
+			return false;
+		}
+
 		public void parseToken(final String token) throws ParseException {
 			((UnknownBlockBuilder) this.getBlockListener()).getComponents().add(token);
 		}
@@ -126,6 +130,10 @@ public class NexusFileBuilder extends NexusFileListener.Abstract {
 				// from after the BEGIN statement.
 				if (this.getComponents().size() > 0)
 					this.getComponents().add(";");
+			}
+
+			public boolean wantsBracketsAndBraces() {
+				return false;
 			}
 
 			public void endBlock() {
