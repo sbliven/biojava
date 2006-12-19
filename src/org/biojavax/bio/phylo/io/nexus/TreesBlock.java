@@ -62,7 +62,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 		/**
 		 * Make the tree (un)rooted.
 		 * 
-		 * @param rooted
+		 * @param rootType
 		 *            'U' for unrooted, 'R' for rooted, <tt>null</tt> for
 		 *            unsure.
 		 */

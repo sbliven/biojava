@@ -87,7 +87,7 @@ public class NexusFileFormat {
 	 * 
 	 * @param listener
 	 *            the listener that will receive events.
-	 * @param inputFile
+	 * @param inputStream
 	 *            the stream to parse.
 	 * @throws IOException
 	 *             if anything goes wrong with reading the stream.
@@ -105,7 +105,7 @@ public class NexusFileFormat {
 	 * 
 	 * @param listener
 	 *            the listener that will receive events.
-	 * @param inputFile
+	 * @param inputReader
 	 *            the file to parse.
 	 * @throws IOException
 	 *             if anything goes wrong with reading the reader.

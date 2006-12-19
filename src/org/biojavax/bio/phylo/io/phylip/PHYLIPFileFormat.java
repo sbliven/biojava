@@ -117,8 +117,6 @@ public class PHYLIPFileFormat {
    *            the file to write to.
    * @param alignment
    *            the Alignment object to write.
-   * @param lineWidth
-   *            the number of sequence characters per line
    * @throws IOException
    *             if there is a problem during writing.
    */
@@ -139,8 +137,6 @@ public class PHYLIPFileFormat {
    *            the stream to write to.
    * @param alignment
    *            the Alignment object to write.
-   * @param lineWidth
-   *            the number of sequence characters per line
    * @throws IOException
    *             if there is a problem during writing.
    */
@@ -157,8 +153,6 @@ public class PHYLIPFileFormat {
    *            the writer to write to.
    * @param alignment
    *            the Alignment object to write.
-   * @param lineWidth
-   *            the number of sequence characters per line
    * @throws IOException
    *             if there is a problem during writing.
    */
