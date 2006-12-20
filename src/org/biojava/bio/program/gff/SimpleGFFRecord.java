@@ -36,6 +36,7 @@ import org.biojava.utils.SmallMap;
  * @author Greg Cox
  * @author Aroul Ramadass
  * @author Len Trigg
+ * @author Richard Holland
  */
 public class SimpleGFFRecord implements GFFRecord {
   /**
@@ -318,9 +319,8 @@ public class SimpleGFFRecord implements GFFRecord {
           sBuff.append(" " + value);
         }
       }
-      sBuff.append(";");
       if (ki.hasNext()) {
-        sBuff.append(" ");
+        sBuff.append(" ;");
       }
     }
     return sBuff.substring(0);
