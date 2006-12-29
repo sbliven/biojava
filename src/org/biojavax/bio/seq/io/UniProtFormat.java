@@ -929,7 +929,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         locusLine.append(StringTools.rightPad(rs.getName()+"_"+rs.getDivision(),11));
         locusLine.append(" ");
         locusLine.append(StringTools.leftPad(dataclass,12));
-        locusLine.append(";      PRT; ");
+        //locusLine.append(";      PRT; "); //Uniprot no longer uses the PRT;
+        locusLine.append(";           ");
         locusLine.append(StringTools.leftPad(""+rs.length(),5));
         locusLine.append(" AA.");
         StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 5, this.getLineWidth(), null, LOCUS_TAG, this.getPrintStream());
