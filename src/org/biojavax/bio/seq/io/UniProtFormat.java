@@ -83,6 +83,7 @@ import org.biojavax.utils.StringTools;
  * org.biojava.bio.seq.io.EMBLLikeFormat object.
  *
  * @author Richard Holland
+ * @author Mark Schreiber
  * @since 1.5
  */
 public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
@@ -122,7 +123,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String END_SEQUENCE_TAG = "//";
     
     // locus line
-    protected static final Pattern lp = Pattern.compile("^((\\S+)_(\\S+))\\s+(\\S+);\\s+(PRT);\\s+\\d+\\s+AA\\.$");
+    protected static final Pattern lp = Pattern.compile("^((\\S+)_(\\S+))\\s+(\\S+);\\s+(PRT)?;?\\s*\\d+\\s+AA\\.$");
     // RP line parser
     protected static final Pattern rppat = Pattern.compile("SEQUENCE OF (\\d+)-(\\d+)");
     // date lineDT
@@ -257,8 +258,13 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 if (m.matches()) {
                     rlistener.setName(m.group(2));
                     rlistener.setDivision(m.group(3));
-                    rlistener.addSequenceProperty(Terms.getDataClassTerm(),m.group(4));
-                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(5));
+                    if (m.groupCount() > 4){
+                        rlistener.addSequenceProperty(Terms.getDataClassTerm(),m.group(4));
+                        rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(5));
+                    }else{
+                        rlistener.addSequenceProperty(Terms.getDataClassTerm(), m.group(4));
+                        rlistener.addSequenceProperty(Terms.getMolTypeTerm(), "");
+                    }
                 } else {
                     throw new ParseException("Bad ID line found: "+loc);
                 }
