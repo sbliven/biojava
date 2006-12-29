@@ -460,7 +460,9 @@
               packages="org.biojavax:org.biojavax.bio:org.biojavax.bio.db:org.biojavax.bio.db.biosql:org.biojavax.bio.db.ncbi:org.biojavax.bio.seq:org.biojavax.bio.seq.io:org.biojavax.bio.taxa:org.biojavax.bio.taxa.io:org.biojavax.ontology:org.biojavax.utils" />
               
        <group title="Genetic Algorithm Framework"
-              packages="org.biojavax.ga:org.biojavax.ga.exception:org.biojavax.ga.functions:org.biojavax.ga.impl:org.biojavax.ga.util" />   
+              packages="org.biojavax.ga:org.biojavax.ga.exception:org.biojavax.ga.functions:org.biojavax.ga.impl:org.biojavax.ga.util" />
+       <group title="Experimental Phylogeny packages"
+              packages="org.biojavax.bio.phylo:org.biojavax.bio.phylo.io:org.biojavax.bio.phylo.io.nexus:org.biojavax.bio.phylo.io.phylip:org.biojavax.bio.phylo.tree" />
        
       <taglet name="UserLevel" path="${build.dest.taglets}" />
       <taglet name="MetaData" path="${build.dest.taglets}:${classpath}:${jar.biojava}" />
