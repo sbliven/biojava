@@ -269,10 +269,6 @@ public class MassCalc {
                                        boolean MH_PLUS)
         throws IllegalSymbolException
     {
-//        if ((! proteinSeq.getAlphabet().getName().equals("PROTEIN"))&&
-//            (! proteinSeq.getAlphabet().getName().equals("PROTEIN-TERM"))) {
-//            throw new IllegalSymbolException("The SymbolList was not using the protein alphabet");
-//        }
 
         double pepMass = 0.0;
 
@@ -305,16 +301,17 @@ public class MassCalc {
     public double getMass(SymbolList proteinSeq)
         throws IllegalSymbolException
     {
-//        if (! proteinSeq.getAlphabet().getName().equals("PROTEIN")){
-//            throw new IllegalSymbolException("The SymbolList was not using the protein alphabet");
-//        }
 
         double pepMass = 0.0;
 
         HashMap symbolPropertyMap = getSymbolPropertyMap();
 
         for (Iterator it = proteinSeq.iterator(); it.hasNext(); ) {
-            Double mass = (Double) symbolPropertyMap.get((Symbol) it.next());
+            Symbol s = (Symbol) it.next();
+            if(! symbolPropertyMap.containsKey(s)){
+                throw new IllegalSymbolException(s, "The mass of the symbol "+s.getName()+" is unknown");
+            }
+            Double mass = (Double) symbolPropertyMap.get(s);
             pepMass += mass.doubleValue();
         }
         pepMass += getTermMass();
