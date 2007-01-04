@@ -387,11 +387,11 @@ public class SCF extends AbstractChromatogram {
             out.privateData = new byte[(int)header.private_size];
             int privRead = 0;
             int thisRead = 0;
-            while (privRead < out.privateData.length) {
+            while (privRead < out.privateData.length && thisRead >= 0) {
                 thisRead = din.read(out.privateData, privRead,
                         out.privateData.length - privRead);
-                offset += thisRead;
-                privRead += thisRead;
+               	offset += thisRead;
+               	privRead += thisRead;
             }
         }
         
