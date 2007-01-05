@@ -137,7 +137,11 @@ public class SCF extends AbstractChromatogram {
     protected void load(File f) throws IOException,
             UnsupportedChromatogramFormatException {
         FileInputStream fin = new FileInputStream(f);
-        load(fin, 0);
+        try {
+        	load(fin, 0);
+        } finally {
+        	fin.close();
+        }
     }
     
     protected void load(InputStream in, long initOffset)
