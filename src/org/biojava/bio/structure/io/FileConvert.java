@@ -298,8 +298,8 @@ public class FileConvert {
         xw.attribute("objectVersion",modificationDate);	    
         xw.attribute("type","protein structure");	    
         xw.attribute("dbSource","PDB");	    
-        xw.attribute("dbVersion","20060707");
-        xw.attribute("dbCoordSys","PDBresnum");
+        xw.attribute("dbVersion","20070116");
+        xw.attribute("dbCoordSys","PDBresnum,Protein Structure");
         
         // do we need object details ???
         xw.closeTag("object");
