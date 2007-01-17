@@ -616,8 +616,9 @@ public class SCF extends AbstractChromatogram {
                         offset++;
                     }
                 } catch (IllegalSymbolException ise) {
-                    ise.printStackTrace(System.err);
-                    throw new UnsupportedChromatogramFormatException("Base call decoding failure");
+                	UnsupportedChromatogramFormatException ue = new UnsupportedChromatogramFormatException("Base call decoding failure");
+                	ue.initCause(ise);
+                	throw ue;
                 }
                 // read 'spare' probs
                 for (int j = 4 ; j < 7 ; j++) {
@@ -707,9 +708,10 @@ public class SCF extends AbstractChromatogram {
                     dna.add(decoder.decode(din.readByte()));
                     offset += 1;
                 } catch (IllegalSymbolException ise) {
-                    ise.printStackTrace(System.err);
-                    throw new UnsupportedChromatogramFormatException(
+                	UnsupportedChromatogramFormatException ue = new UnsupportedChromatogramFormatException(
                             "Base call decoding failure");
+                	ue.initCause(ise);
+                	throw ue;
                 }
                 // read the spare probability fields
                 din.read(probTmp, 4, 3);
