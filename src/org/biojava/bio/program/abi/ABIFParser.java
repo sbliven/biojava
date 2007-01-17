@@ -129,6 +129,7 @@ public class ABIFParser {
         	}
         }
         parsed = true;
+        din.finishedReading();
     }
 
     /**
@@ -302,12 +303,23 @@ public class ABIFParser {
     /**
      * Concatenation of the {@link Seekable} and {@link DataInput} interfaces.
      */
-    public static interface DataAccess extends Seekable, DataInput { }
+    public static interface DataAccess extends Seekable, DataInput { 
+    	/**
+    	 * Called when the parser has finished reading. The access
+    	 * may choose to close itself at this point, e.g. if it is
+    	 * using a RandomAccessFile.
+    	 * @throws IOException if it could not do what it needs to.
+    	 */
+    	public void finishedReading() throws IOException;
+    }
 
     private static class RandomAccessFile
     extends java.io.RandomAccessFile implements DataAccess {
         public RandomAccessFile(File f) throws FileNotFoundException {
             super(f, "r");
+        }
+        public void finishedReading() throws IOException {
+        	this.close();
         }
     }
 
@@ -328,6 +340,10 @@ public class ABIFParser {
 
         public DataStream(CachingInputStream cin) throws IOException {
             this((InputStream) cin);
+        }
+        
+        public void finishedReading() throws IOException {
+        	// We don't care.
         }
 
         public boolean readBoolean() throws IOException { return din.readBoolean(); }
