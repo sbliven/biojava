@@ -40,6 +40,44 @@ public class StructureTools {
     public static final String[] backboneAtomNames = {"N","CA","C","O","CB"};
        
     
+    /** count how many number of Atoms are contained within a Structure object.
+     * 
+     * @param s
+     * @return the number of Atoms in this Structure
+     */
+    public static int getNrAtoms(Structure s){
+       
+        int nrAtoms = 0;
+        
+        Iterator iter = new GroupIterator(s);
+        
+        while ( iter.hasNext()){
+            Group g = (Group) iter.next();
+            nrAtoms += g.size();
+        }
+        
+        return nrAtoms;
+    }
+    
+    
+    /** count how many groups are contained within a structure object
+     * 
+     * @param s
+     * @return the number of groups
+     */
+    public static int getNrGroups(Structure s){
+        int nrGroups = 0;
+        Iterator iter = new GroupIterator(s);
+        
+        while ( iter.hasNext()){
+            Group g = (Group) iter.next();
+            nrGroups++;
+        }
+        
+        return nrGroups;
+    }
+    
+    
     /** returns an array of the requested Atoms from the Structure object. Iterates over all groups
      * and checks if the requested atoms are in this group, no matter if this is a AminoAcid or Hetatom group.
      *
