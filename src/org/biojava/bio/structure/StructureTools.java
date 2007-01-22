@@ -67,13 +67,13 @@ public class StructureTools {
      */
     public static int getNrGroups(Structure s){
         int nrGroups = 0;
-        Iterator iter = new GroupIterator(s);
         
-        while ( iter.hasNext()){
-            Group g = (Group) iter.next();
-            nrGroups++;
+        List chains = s.getChains(0);
+        Iterator iter = chains.iterator();
+        while (iter.hasNext()){
+            Chain c = (Chain) iter.next();
+            nrGroups += c.getLength();
         }
-        
         return nrGroups;
     }
     
