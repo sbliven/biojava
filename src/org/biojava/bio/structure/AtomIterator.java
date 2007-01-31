@@ -65,6 +65,15 @@ public class AtomIterator implements Iterator {
         return groupiter.getCurrentChain();
     }
     
+    
+    /** get the model number of the model containing the current atom
+     * 
+     * @return the number of the model
+     */
+    public int getCurrentModel(){
+        return groupiter.getCurrentModel();
+    }
+    
     /**
      * Constructs an AtomIterator object.
      *

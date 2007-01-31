@@ -112,6 +112,15 @@ public class GroupIterator implements Iterator {
         
     }
     
+    /** get the model number of the model containing the current atom
+     * 
+     * @return the number of the model
+     */
+    public int getCurrentModel(){
+        
+        return current_model_pos;
+    }
+    
     
     public Chain getCurrentChain(){
         if ( current_model_pos >= structure.nrModels()){
