@@ -57,6 +57,14 @@ public class AtomIterator implements Iterator {
             group = null ;
     }
     
+    /** get the  chain that contains the current atom
+     * 
+     * @return a Chain object
+     */
+    public Chain getCurrentChain(){
+        return groupiter.getCurrentChain();
+    }
+    
     /**
      * Constructs an AtomIterator object.
      *
@@ -133,6 +141,12 @@ public class AtomIterator implements Iterator {
             System.out.println("current_atom_pos " + current_atom_pos + " group " + group + "size:" + group.size());
             e.printStackTrace();
             throw new NoSuchElementException("error wile trying to retrieve atom");
+        }
+        
+        if ( a.getPDBserial() < 2){
+            Group g = a.getParent();
+            Chain c = g.getParent();
+            System.out.println("c " + c.getName());
         }
         
         return a ;
