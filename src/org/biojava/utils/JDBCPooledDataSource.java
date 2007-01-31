@@ -23,13 +23,8 @@ package org.biojava.utils;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DataSourceConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDataSource;
 import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
 * Returns a DataSource that implements connection pooling
@@ -40,6 +35,8 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 *
 * @author Simon Foote
 * @author Len Trigg
+* @author Andy Yates
+* @author Thomas Down
 */
 
 public class JDBCPooledDataSource {
@@ -60,15 +57,8 @@ public class JDBCPooledDataSource {
     ds.setMaxActive(10);
     ds.setMaxIdle(5);
     ds.setMaxWait(10000);
-  
-    // Create a PoolableDataSource as described in http://jakarta.apache.org/commons/dbcp/api/overview-summary.html#overview_description
-    ObjectPool connectionPool = new GenericObjectPool(null);
-    ConnectionFactory connectionFactory = new DataSourceConnectionFactory(ds); 	 
-    PoolableObjectFactory poolableConnectionFactory = new 	 
-       PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true); 	 
-    PoolingDataSource dataSource = new MyPoolingDataSource(connectionPool, url + user);
 
-    return dataSource;
+    return ds;
   }
 
 
@@ -76,6 +66,10 @@ public class JDBCPooledDataSource {
   // two connections are to the same database. This will fail if the
   // DataSource is redirected to another database etc (I doubt this is
   // ever likely to be used).
+  /**
+   * @depercated This is no longer used in favor of {@link BasicDataSource}
+   * from DBCP
+   */
   static class MyPoolingDataSource extends PoolingDataSource {
     final String source;
     public MyPoolingDataSource(ObjectPool connectionPool, String source) {
