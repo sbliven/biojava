@@ -34,6 +34,7 @@ import java.util.Map;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.cache.WeakValueHashMap;
 
 /**
  * Cross product of a list of arbitrary alphabets.  This is a memory efficient
@@ -54,7 +55,7 @@ implements Serializable {
 
   SparseCrossProductAlphabet(List alphas) {
     this.alphas = alphas;
-    knownSymbols = new HashMap();
+    knownSymbols = new WeakValueHashMap();
     int size = 1;
     for(Iterator i = alphas.iterator(); i.hasNext(); ) {
       FiniteAlphabet a = (FiniteAlphabet) i.next();
