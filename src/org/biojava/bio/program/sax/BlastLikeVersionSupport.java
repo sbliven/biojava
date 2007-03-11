@@ -78,7 +78,7 @@ final class BlastLikeVersionSupport {
     public static final int    V2_0_11           = 100;
     public static final int    V2_2_2            = 101;
     public static final int    V2_2_3            = 102;
-
+    public static final int    V2_2_15            = 103;
     // GCG Blast
     public static final int    V2_0_10           = 150;
     public static final int    V2_1_2            = 151;
@@ -117,7 +117,7 @@ final class BlastLikeVersionSupport {
      * @return boolean   -
      */
      public boolean isSupported() {
-
+         
          //Check version support for NCBI Blast
          if ( (iProgram == NCBI_BLASTN) ||
               (iProgram == NCBI_BLASTX) ||
@@ -125,7 +125,8 @@ final class BlastLikeVersionSupport {
               (iProgram == NCBI_TBLASTN) ||
               (iProgram == NCBI_TBLASTX) ) {
 
-             if (iVersion == V2_0_11 || iVersion == V2_2_2 || iVersion == V2_2_3) {
+             if (iVersion == V2_0_11 || iVersion == V2_2_2 || iVersion == V2_2_3 
+                     || iVersion == V2_2_15) {
                  return true;
              }
 
@@ -194,8 +195,8 @@ final class BlastLikeVersionSupport {
 
     /**
      * Describe 'isStartOfDataSet' method here.
-     *
-     * @return boolean   -
+     * @param poLine line to process     
+     * @return boolean -
      */
     public boolean isStartOfDataSet(String poLine) {
 
@@ -235,7 +236,7 @@ final class BlastLikeVersionSupport {
     /**
      * Assign program and version from by parsing a line
      * from the raw output.
-     * 
+     * @param poLine line to process
      * @return true if format recognised (could be wrong versioN), false
      * if the format not recognised at all.
      */
@@ -301,6 +302,9 @@ final class BlastLikeVersionSupport {
         }
         if (oVersionString.equals("2.2.3")) {
             iVersion = V2_2_3;
+        }
+        if (oVersionString.equals("2.2.15")) {
+            iVersion = V2_2_15;
         }
 
         //wu-blast

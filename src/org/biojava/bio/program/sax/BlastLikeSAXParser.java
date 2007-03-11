@@ -139,7 +139,7 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
      * @exception SAXException if an error occurs.
      */
     public void parse(InputSource poSource ) 
-        throws IOException, SAXException {
+    throws IOException, SAXException {
 
         BufferedReader            oContents;
         String                    oLine;
@@ -155,19 +155,19 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
             // loop over file
             oLine = oContents.readLine();
             while (oLine != null) {
-
+              
                 //interpret line and send messages accordingly        
                 this.interpret(oContents,oLine);
-		//do extra interpretation of lines reached by subparser
-		//objects
-		if (iState == INSIDE_FILE) {
-		    oLine = oStoredLine;
-		    if (oStoredLine != null) {
-			this.interpret(oContents,oLine);
-		    }
-		} else {
-		    oLine = oContents.readLine();
-		}
+                //do extra interpretation of lines reached by subparser
+                //objects
+                if (iState == INSIDE_FILE) {
+                    oLine = oStoredLine;
+                    if (oStoredLine != null) {
+                        this.interpret(oContents,oLine);
+                    }
+                } else {
+                    oLine = oContents.readLine();
+                }
 
             } // end while
         } catch (IOException x) {
@@ -180,11 +180,11 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 
         if (!tValidFormat) {
             throw (new SAXException("Could not recognise the format " +
-                                    "of this file as one supported by the framework."));
+            "of this file as one supported by the framework."));
         }
-    
+
         this.endElement(new QName(this,
-                                  this.prefix("BlastLikeDataSetCollection")));
+                this.prefix("BlastLikeDataSetCollection")));
     }
 
     /**
@@ -215,7 +215,7 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
      * @param poLine     A line of Blast output
      */
     private void interpret(BufferedReader poContents, String poLine)
-        throws SAXException {
+    throws SAXException {
 
         //For a brand new collection,
         //check for the start of a new BlastDataSet
@@ -239,11 +239,11 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 
                 if (!oVersion.isSupported()) {
                     throw (new SAXException("Program "
-                                            + oVersion.getProgramString()
-                                            + " Version "
-                                            + oVersion.getVersionString()
-                                            + " is not supported by the biojava blast-like "
-                                            + "parsing framework"));
+                            + oVersion.getProgramString()
+                            + " Version "
+                            + oVersion.getVersionString()
+                            + " is not supported by the biojava blast-like "
+                            + "parsing framework"));
                 }
 
                 oAtts.clear();
@@ -252,9 +252,9 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
                 //should not be reported.
                 if (!oAttQName.getLocalName().equals("")) {
                     oAtts.addAttribute(oAttQName.getURI(),
-                                       oAttQName.getLocalName(),
-                                       oAttQName.getQName(),
-                                       "CDATA","");
+                            oAttQName.getLocalName(),
+                            oAttQName.getQName(),
+                            "CDATA","");
                 }
 
                 oAttQName.setQName("xmlns:biojava");
@@ -262,14 +262,14 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
                 //should not be reported.
                 if (!oAttQName.getLocalName().equals("")) {
                     oAtts.addAttribute(oAttQName.getURI(),
-                                       oAttQName.getLocalName(),
-                                       oAttQName.getQName(),
-                                       "CDATA","http://www.biojava.org");
+                            oAttQName.getLocalName(),
+                            oAttQName.getQName(),
+                            "CDATA","http://www.biojava.org");
                 }
 
                 this.startElement(new QName(this,
-                                            this.prefix("BlastLikeDataSetCollection")),
-                                  (Attributes)oAtts);
+                        this.prefix("BlastLikeDataSetCollection")),
+                        (Attributes)oAtts);
 
                 this.onNewDataSet(poContents,poLine);
                 return;
@@ -300,7 +300,7 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
      * @param poLine     -
      */
     private void onNewDataSet(BufferedReader poContents, String poLine)
-        throws SAXException {
+    throws SAXException {
 
         //choose according to version...
         oBlast = new BlastSAXParser(oVersion,this.getNamespacePrefix());
@@ -313,14 +313,14 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
         this.changeState(INSIDE_FILE);
 
         //now make sure to interpret the line the BlastSAXParser returned from
-	//in top-level parse method.
+        //in top-level parse method.
         if (oLine != null) {
-	    oStoredLine = oLine;
-	    return;
-	    //           this.interpret(poContents,oLine);
+            oStoredLine = oLine;
+            return;
+            //           this.interpret(poContents,oLine);
         } else {
             //here if at the EOF
-	    oStoredLine = null;
+            oStoredLine = null;
             return;
         }
     }
