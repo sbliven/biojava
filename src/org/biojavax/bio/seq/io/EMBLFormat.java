@@ -834,7 +834,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         String urel = null;
         String organelle = null;
         String versionLine = null;
-        String dataClass = null;
+        String dataClass = "STD";
         boolean genomic = false;
         String moltype = rs.getAlphabet().getName();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
