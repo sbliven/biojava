@@ -428,7 +428,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     if (key.equals(TITLE_TAG)) {
                         if (val.length()>1) {
                             if (val.endsWith(";")) val = val.substring(0,val.length()-1); // chomp semicolon
-                            if (val.endsWith("\"")) val = val.substring(1,val.length()-2); // chomp quotes
+                            if (val.endsWith("\"")) val = val.substring(1,val.length()-1); // chomp quotes
                             title = val;
                         } else title=null; // single semi-colon indicates no title
                     }
@@ -858,8 +858,11 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         if (format.equals(EMBL_FORMAT)) {
         	// accession; SV version; circular/linear; moltype; dataclass; division; length BP.
         	locusLine.append(rs.getAccession());
+        	locusLine.append("; SV ");
+        	locusLine.append(rs.getVersion());
         	locusLine.append("; ");
-        	locusLine.append(rs.getCircular()?"circular; ":"linear; ");
+        	locusLine.append(rs.getCircular()?"circular":"linear");
+        	locusLine.append("; ");
         	locusLine.append(moltype);
         	locusLine.append("; ");
         	locusLine.append(dataClass);
@@ -890,12 +893,14 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // version line
-        if (versionLine!=null) StringTools.writeKeyValueLine(VERSION_TAG, versionLine, 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
-        else StringTools.writeKeyValueLine(VERSION_TAG, accession+"."+rs.getVersion(), 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
-        this.getPrintStream().println(DELIMITER_TAG+"   ");
+        if (format.equals(EMBL_PRE87_FORMAT)) {
+        	if (versionLine!=null) StringTools.writeKeyValueLine(VERSION_TAG, versionLine, 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
+        	else StringTools.writeKeyValueLine(VERSION_TAG, accession+"."+rs.getVersion(), 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
+        	this.getPrintStream().println(DELIMITER_TAG+"   ");
+        }
         
         // date line
-        StringTools.writeKeyValueLine(DATE_TAG, (cdat==null?udat:cdat)+" (Rel. "+(crel==null?"0":crel)+" Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, (cdat==null?udat:cdat)+" (Rel. "+(crel==null?"0":crel)+", Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         StringTools.writeKeyValueLine(DATE_TAG, udat+" (Rel. "+(urel==null?"0":urel)+", Last updated, Version "+rs.getVersion()+")", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
@@ -1016,7 +1021,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
                 RankedCrossRef rcr = (RankedCrossRef)j.next();
                 CrossRef cr = rcr.getCrossRef();
-                StringTools.writeKeyValueLine(FEATURE_TAG, "/db_xref=\"taxon:"+cr.getDbname()+":"+cr.getAccession()+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
+                StringTools.writeKeyValueLine(FEATURE_TAG, "/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", 21, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
             }
         }
         this.getPrintStream().println(DELIMITER_TAG+"   ");
