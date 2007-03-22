@@ -108,6 +108,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String TAXON_TAG = "OX";
     protected static final String GENE_TAG = "GN";
     protected static final String DATABASE_XREF_TAG = "DR";
+    protected static final String PROTEIN_EXIST_TAG = "PE";
     protected static final String REFERENCE_TAG = "RN";
     protected static final String RP_LINE_TAG = "RP";
     protected static final String REFERENCE_XREF_TAG = "RX";
@@ -142,6 +143,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     public static class Terms extends RichSequence.Terms {
         private static ComparableTerm UNIPROT_TERM = null;
         private static ComparableTerm UNIPROT_DBNAME_TERM = null;
+        private static ComparableTerm UNIPROT_PROTEIN_EXISTS_TERM = null;
         
         private static String GENENAME_KEY = "Name";
         private static String GENESYNONYM_KEY = "Synonyms";
@@ -164,6 +166,15 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         public static ComparableTerm getUniProtDBNameTerm() {
             if (UNIPROT_DBNAME_TERM==null) UNIPROT_DBNAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt database name");
             return UNIPROT_DBNAME_TERM;
+        }
+        
+        /**
+         * Getter for the protein exists term
+         * @return The protein exists Term
+         */
+        public static ComparableTerm getProteinExistsTerm() {
+            if (UNIPROT_PROTEIN_EXISTS_TERM==null) UNIPROT_PROTEIN_EXISTS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt protein exists");
+            return UNIPROT_PROTEIN_EXISTS_TERM;
         }
     }
     
@@ -356,6 +367,10 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 for (int i = 1; i < accs.length; i++) {
                     rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accs[i].trim());
                 }
+            } else if (sectionKey.equals(PROTEIN_EXIST_TAG)) {
+                String val = ((String[])section.get(0))[1];
+                if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
+                rlistener.addSequenceProperty(Terms.getProteinExistsTerm(),val.trim());
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String val = ((String[])section.get(0))[1];
                 if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
@@ -831,6 +846,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         String urel = null;
         String arel = null;
         String organelle = null;
+        String protExists = null;
         String dataclass = "STANDARD";
         Map speciesRecs = new TreeMap();
         Map strainRecs = new TreeMap();
@@ -847,6 +863,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getDateAnnotatedTerm())) adat=n.getValue();
             else if (n.getTerm().equals(Terms.getUniProtDBNameTerm())) dbname=n.getValue();
+            else if (n.getTerm().equals(Terms.getProteinExistsTerm())) protExists=n.getValue();
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelAnnotatedTerm())) arel=n.getValue();
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
@@ -1117,6 +1134,11 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             if (!hasSecondary) sb.append("; -");
             sb.append(".");
             StringTools.writeKeyValueLine(DATABASE_XREF_TAG, sb.toString(), 5, this.getLineWidth(), null, DATABASE_XREF_TAG, this.getPrintStream());
+        }
+        
+        // protein exists line
+        if (protExists!=null) {
+            StringTools.writeKeyValueLine(PROTEIN_EXIST_TAG, protExists+";", 5, this.getLineWidth(), null, PROTEIN_EXIST_TAG, this.getPrintStream());
         }
         
         // keywords line

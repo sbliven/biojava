@@ -45,6 +45,7 @@ public class UniProtCommentParser {
         this.events = new ArrayList();
         this.KMs = new ArrayList();
         this.VMaxes = new ArrayList();
+        this.seqCautions = new ArrayList();
     }
     
     // the prefix for comments
@@ -79,6 +80,11 @@ public class UniProtCommentParser {
      * A name for a comment type.
      */
     public static final String PTM = "PTM";
+    
+    /**
+     * A name for a comment type.
+     */
+    public static final String SEQUENCE_CAUTION = "SEQUENCE CAUTION";
     
     /**
      * Parses the comment string from the given comment and populates
@@ -301,6 +307,26 @@ CC         Comment=Free text;
                     event.setComment(value);
                 }
             }
+        } else if (this.getCommentType().equalsIgnoreCase(SEQUENCE_CAUTION)) {
+            /*
+CC   -!- SEQUENCE_CAUTION: Sequence=Sequence; Type=Type;[ Positions=Positions;][ Note=Note;]
+             */
+            SeqCaution seqc = null;
+            c = c.substring(0,c.length()-1); // chomp trailing dot
+            String[] parts = c.split(";");
+            for (int i = 0; i < parts.length; i++) {
+                String[] subparts = parts[i].split("=");
+                String key = subparts[0].trim();
+                String value = subparts[1].trim();
+                if (key.equalsIgnoreCase("SEQUENCE")) {
+                	seqc = new SeqCaution();
+                	this.getSeqCautions().add(seqc);
+                	seqc.setSequence(value);
+                }
+                else if (key.equalsIgnoreCase("TYPE")) seqc.setType(value);
+                else if (key.equalsIgnoreCase("POSITIONS")) seqc.setPositions(value);
+                else if (key.equalsIgnoreCase("NOTE")) seqc.setNote(value);
+            }
         } else {
             // all others are just free text.
             this.setText(c);
@@ -518,6 +544,27 @@ CC         Comment=Free text;
                         sb.append(";");
                     }
                 }
+            }
+        } else if (this.getCommentType().equalsIgnoreCase(SEQUENCE_CAUTION)) {
+        	/*
+CC   -!- SEQUENCE_CAUTION: Sequence=Sequence; Type=Type;[ Positions=Positions;][ Note=Note;]
+             */
+            for (Iterator i = this.getSeqCautions().iterator(); i.hasNext(); ) {
+                SeqCaution seqc = (SeqCaution)i.next();
+                sb.append("\n"); // each one starts on a new line
+                sb.append("Sequence=");
+                sb.append(seqc.getSequence());
+                sb.append("; Type=");
+                sb.append(seqc.getType());
+                if (seqc.getPositions()!=null) {
+                	sb.append("; Positions=");
+                	sb.append(seqc.getPositions());
+                }
+                if (this.getNote()!=null) {
+                	sb.append("; Note=");
+                	sb.append(seqc.getNote());
+                }
+                sb.append(";");  
             }
         } else {
             // just append free text for all others.
@@ -780,6 +827,29 @@ CC         Comment=Free text;
     public void setInteractions(List interactions) {
         
         this.interactions = interactions;
+    }
+    
+    /**
+     * Holds value of property seqCautions.
+     */
+    private List seqCautions;
+    
+    /**
+     * Getter for property seqCautions.
+     * @return Value of property seqCautions.
+     */
+    public List getSeqCautions() {
+        
+        return this.seqCautions;
+    }
+    
+    /**
+     * Setter for property seqCautions.
+     * @param seqCautions New value of property seqCautions.
+     */
+    public void setSeqCautions(List seqCautions) {
+        
+        this.seqCautions = seqCautions;
     }
     
     /**
@@ -1357,6 +1427,83 @@ CC         Comment=Free text;
             
             this.note = note;
         }
+        
+    }
+    
+    /**
+     * A class to describe seq caution entries.
+     */
+    public static class SeqCaution {
+        
+    	private String sequence;
+    	
+    	private String type;
+    	
+    	private String positions;
+    	
+    	private String note;
+    	
+        /**
+         * Creates a new instance.
+         */
+        public SeqCaution() {
+        }
+
+		/**
+		 * @return the note
+		 */
+		public String getNote() {
+			return note;
+		}
+
+		/**
+		 * @param note the note to set
+		 */
+		public void setNote(String note) {
+			this.note = note;
+		}
+
+		/**
+		 * @return the positions
+		 */
+		public String getPositions() {
+			return positions;
+		}
+
+		/**
+		 * @param positions the positions to set
+		 */
+		public void setPositions(String positions) {
+			this.positions = positions;
+		}
+
+		/**
+		 * @return the sequence
+		 */
+		public String getSequence() {
+			return sequence;
+		}
+
+		/**
+		 * @param sequence the sequence to set
+		 */
+		public void setSequence(String sequence) {
+			this.sequence = sequence;
+		}
+
+		/**
+		 * @return the type
+		 */
+		public String getType() {
+			return type;
+		}
+
+		/**
+		 * @param type the type to set
+		 */
+		public void setType(String type) {
+			this.type = type;
+		}
         
     }
 }
