@@ -121,7 +121,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String END_SEQUENCE_TAG =    "//";
     
     // locus line
-    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(?:bp|aa)\\s+([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)?\\s*(\\S+)?$");
+    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(bp|aa)\\s([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)?\\s*(\\S+)?$");
     // version line
     protected static final Pattern vp = Pattern.compile("^(\\S+?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
@@ -165,6 +165,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     public static class Terms extends RichSequence.Terms {
         private static ComparableTerm GENBANK_TERM = null;
         
+        private static ComparableTerm LENGTH_TYPE_TERM = null;
+        
         /**
          * Getter for the Genbank term
          * @return The genbank Term
@@ -172,6 +174,15 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         public static ComparableTerm getGenBankTerm() {
             if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
             return GENBANK_TERM;
+        }
+        
+        /**
+         * Getter for the length type term
+         * @return The length type Term
+         */
+        public static ComparableTerm getLengthTypeTerm() {
+            if (LENGTH_TYPE_TERM==null) LENGTH_TYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("Length type");
+            return LENGTH_TYPE_TERM;
         }
         
         public final static void reset() {
@@ -285,12 +296,13 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     rlistener.setName(m.group(1));
                     accession = m.group(1); // default if no accession found
                     rlistener.setAccession(accession);
-                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(3));
+                    rlistener.addSequenceProperty(Terms.getLengthTypeTerm(),m.group(2));
+                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(4));
                     // Optional extras
-                    String stranded = m.group(2);
-                    String circular = m.group(4);
-                    String fifth = m.group(5);
-                    String sixth = m.group(6);
+                    String stranded = m.group(3);
+                    String circular = m.group(5);
+                    String fifth = m.group(6);
+                    String sixth = m.group(7);
                     if (stranded!=null) rlistener.addSequenceProperty(Terms.getStrandedTerm(),stranded);
                     if (circular!=null && circular.equalsIgnoreCase("circular")) rlistener.setCircular(true);
                     if (sixth != null) {
@@ -635,6 +647,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         accessions.append(accession);
         String stranded = "";
         String udat = "";
+        String lengthType = "bp";
         String moltype = rs.getAlphabet().getName();
         StringBuffer keywords = new StringBuffer();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
@@ -642,6 +655,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
+            else if (n.getTerm().equals(Terms.getLengthTypeTerm())) lengthType=n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                 accessions.append(" ");
                 accessions.append(n.getValue());
@@ -659,9 +673,9 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         locusLine.append(StringTools.rightPad(rs.getName(),16));//13->28=15+1=16
         locusLine.append(" ");//29
         locusLine.append(StringTools.leftPad(""+rs.length(),11));//30->40=10+1=11
-        locusLine.append(" bp ");//41->44
+        locusLine.append(" "+lengthType+" ");//41->44
         locusLine.append(StringTools.leftPad(stranded,3));//45->47=2+1=3
-        locusLine.append(StringTools.rightPad(moltype,6));//48->53=5+1=6
+        locusLine.append(StringTools.rightPad(moltype==null?"":moltype,6));//48->53=5+1=6
         locusLine.append("  ");//54->55
         locusLine.append(StringTools.rightPad(rs.getCircular()?"circular":"linear",8));//56->63=7+1=8
         locusLine.append(" ");//64->64
