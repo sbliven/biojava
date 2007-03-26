@@ -267,7 +267,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             RichSeqIOListener rlistener,
             Namespace ns)
             throws IllegalSymbolException, IOException, ParseException {
-        
+        tax = null;
+        organism = null;
+        accession = null;
         boolean hasAnotherSequence = true;
         //boolean hasInternalWhitespace = false;
         
@@ -786,7 +788,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                                 }
                             } catch (Exception e) {
                                 String message = ParseException.newMessage(this.getClass(), accession, "not set","",sectionToString(section));
-                                throw new ParseException (e, message);
+                                throw new ParseException(e, message);
                             }
                         }
                     }
