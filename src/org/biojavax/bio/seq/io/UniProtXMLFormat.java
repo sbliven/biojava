@@ -80,6 +80,7 @@ import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.io.UniProtCommentParser.Event;
 import org.biojavax.bio.seq.io.UniProtCommentParser.Interaction;
 import org.biojavax.bio.seq.io.UniProtCommentParser.Isoform;
+import org.biojavax.bio.seq.io.UniProtFormat.Terms;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableOntology;
@@ -437,7 +438,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         Pattern copyright = Pattern.compile(".*<"+COPYRIGHT_TAG+".*");
         
         try {
-            rlistener.startSequence();
+            rlistener.startSequence();                   
+        	rlistener.addSequenceProperty(Terms.getLengthTypeTerm(),"aa");
             DefaultHandler m_handler = new UniProtXMLHandler(this,symParser,rlistener,ns);
             boolean hasMore=XMLTools.readXMLChunk(reader, m_handler, ENTRY_TAG);
             // deal with copyright chunk

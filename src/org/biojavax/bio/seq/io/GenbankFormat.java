@@ -121,7 +121,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String END_SEQUENCE_TAG =    "//";
     
     // locus line
-    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(bp|aa)\\s([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)?\\s*(\\S+)?$");
+    protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(bp|aa)\\s{1,4}([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)?\\s*(\\S+)?$");
     // version line
     protected static final Pattern vp = Pattern.compile("^(\\S+?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
@@ -165,8 +165,6 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     public static class Terms extends RichSequence.Terms {
         private static ComparableTerm GENBANK_TERM = null;
         
-        private static ComparableTerm LENGTH_TYPE_TERM = null;
-        
         /**
          * Getter for the Genbank term
          * @return The genbank Term
@@ -174,15 +172,6 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         public static ComparableTerm getGenBankTerm() {
             if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
             return GENBANK_TERM;
-        }
-        
-        /**
-         * Getter for the length type term
-         * @return The length type Term
-         */
-        public static ComparableTerm getLengthTypeTerm() {
-            if (LENGTH_TYPE_TERM==null) LENGTH_TYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("Length type");
-            return LENGTH_TYPE_TERM;
         }
         
         public final static void reset() {
@@ -304,7 +293,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     accession = m.group(1); // default if no accession found
                     rlistener.setAccession(accession);
                     rlistener.addSequenceProperty(Terms.getLengthTypeTerm(),m.group(2));
-                    rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(4));
+                    if (m.group(4)!=null)
+                    	rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(4));
                     // Optional extras
                     String stranded = m.group(3);
                     String circular = m.group(5);

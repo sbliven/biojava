@@ -71,6 +71,7 @@ import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.io.GenbankFormat.Terms;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
@@ -264,7 +265,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 throw new ParseException(message);
             }
             // process section-by-section
-            if (sectionKey.equals(LOCUS_TAG)) {
+            if (sectionKey.equals(LOCUS_TAG)) {                   
+            	rlistener.addSequenceProperty(Terms.getLengthTypeTerm(),"aa");
                 // entryname  dataclass; moltype; sequencelength AA.
                 String loc = ((String[])section.get(0))[1];
                 Matcher m = lp.matcher(loc);
@@ -1063,9 +1065,10 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             DocRef d = rdr.getDocumentReference();
             // RN, RP, RC, RX, RG, RA, RT, RL
             StringTools.writeKeyValueLine(REFERENCE_TAG, "["+rdr.getRank()+"]", 5, this.getLineWidth(), null, REFERENCE_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(RP_LINE_TAG, d.getRemark()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
+            if (d.getRemark()!=null)
+            	StringTools.writeKeyValueLine(RP_LINE_TAG, d.getRemark()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
             // Print out ref position if present
-            if (rdr.getStart()!=null && rdr.getEnd()!=null && !rppat.matcher(d.getRemark()).matches()) StringTools.writeKeyValueLine(RP_LINE_TAG, "SEQUENCE OF "+rdr.getStart()+"-"+rdr.getEnd()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
+            if (rdr.getStart()!=null && rdr.getEnd()!=null && d.getRemark()!=null && !rppat.matcher(d.getRemark()).matches()) StringTools.writeKeyValueLine(RP_LINE_TAG, "SEQUENCE OF "+rdr.getStart()+"-"+rdr.getEnd()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
             // RC lines
             StringBuffer rcline = new StringBuffer();
             Integer rank = new Integer(rdr.getRank());
@@ -1259,4 +1262,3 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         return parseBlock.toString();
     }
 }
-
