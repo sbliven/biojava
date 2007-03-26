@@ -147,7 +147,10 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
     private static RichLocation parseLocString(Namespace featureNS, String featureAccession, CrossRef parentXref, Strand parentStrand, String locStr) throws ParseException {
         // First attempt to find the group enclosing everything we've been passed        
         Matcher gm = gp.matcher(locStr);
-        if (!gm.matches()) throw new ParseException("Bad location string found: "+locStr);
+        if (!gm.matches()) {
+            String message = ParseException.newMessage(GenbankLocationParser.class, featureAccession, "unknown", "Bad location string found", locStr);
+            throw new ParseException(message);
+        }
         String xrefName = gm.group(1);
         String groupType = gm.group(2);
         String subLocStr = gm.group(3);
@@ -158,7 +161,10 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
             
             // Try and find an accession (crossref)
             Matcher xm = xp.matcher(xrefName);
-            if (!xm.matches()) throw new ParseException("Bad location xref found: "+xrefName);
+            if (!xm.matches()) {
+                String message = ParseException.newMessage(GenbankLocationParser.class, featureAccession, "unknown", "Bad location xref found", locStr);
+                throw new ParseException(message);
+            }
             String xrefAccession = xm.group(1);
             String xrefVersion = xm.group(3);
             if (xrefAccession.equals(featureAccession)) crossRef = null;
@@ -210,7 +216,10 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 ComparableTerm groupTypeTerm = null;
                 if (groupType.equalsIgnoreCase("order")) groupTypeTerm = CompoundRichLocation.getOrderTerm();
                 else if (groupType.equalsIgnoreCase("join")) groupTypeTerm = CompoundRichLocation.getJoinTerm();
-                else throw new ParseException("Unknown group type "+groupType+" received");
+                else {
+                    String message = ParseException.newMessage(GenbankLocationParser.class, featureAccession, "unknown", "Unknown group type found", locStr);
+                    throw new ParseException(message);
+                }
                 
                 // recurse on each block and return the compounded result
                 List members = new ArrayList();                
@@ -247,7 +256,10 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
         
         // Process a simple location.
         Matcher rm = rp.matcher(subLocStr);
-        if (!rm.matches()) throw new ParseException("Bad location description found: "+subLocStr);
+        if (!rm.matches()) {
+            String message = ParseException.newMessage(GenbankLocationParser.class, featureAccession, "unknown", "Bad location description found", subLocStr);
+            throw new ParseException(message);
+        }
         String start = rm.group(1);
         String end = rm.group(3);
         
