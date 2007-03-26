@@ -83,6 +83,7 @@ import org.biojavax.utils.StringTools;
  *
  * @author Richard Holland
  * @author Jolyon Holdstock
+ * @author Mark Schreiber
  * @since 1.5
  */
 public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
@@ -96,7 +97,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      * The name of the Pre-87 format
      */
     public static final String EMBL_PRE87_FORMAT = "EMBL_PRE87";
-
+    
     /**
      * The name of the current format
      */
@@ -145,6 +146,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     
     protected static final Pattern readableFileNames = Pattern.compile(".*\\u002e(em|dat).*");
     protected static final Pattern headerLine = Pattern.compile("^ID.*");
+    
+    private NCBITaxon tax = null;
+    private String organism = null;
+    private String accession = null;
     
     /**
      * Implements some EMBL-specific terms.
@@ -201,10 +206,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         if (readableFileNames.matcher(file.getName()).matches()) return true;
         BufferedReader br = new BufferedReader(new FileReader(file));
         String firstLine = br.readLine();
-        boolean readable = headerLine.matcher(firstLine).matches() && 
-        	(lp.matcher(firstLine.substring(3).trim()).matches() || 
-        		lpPre87.matcher(firstLine.substring(3).trim()).matches() 
-           	 		);
+        boolean readable = headerLine.matcher(firstLine).matches() &&
+                (lp.matcher(firstLine.substring(3).trim()).matches() ||
+                lpPre87.matcher(firstLine.substring(3).trim()).matches()
+                );
         br.close();
         return readable;
     }
@@ -225,10 +230,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         stream.mark(2000); // some streams may not support this
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         String firstLine = br.readLine();
-        boolean readable = headerLine.matcher(firstLine).matches() && 
-        	(lp.matcher(firstLine.substring(3).trim()).matches() || 
-        			lpPre87.matcher(firstLine.substring(3).trim()).matches()
-        			);
+        boolean readable = headerLine.matcher(firstLine).matches() &&
+                (lp.matcher(firstLine.substring(3).trim()).matches() ||
+                lpPre87.matcher(firstLine.substring(3).trim()).matches()
+                );
         // don't close the reader as it'll close the stream too.
         // br.close();
         stream.reset();
@@ -273,16 +278,14 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         
         // Get an ordered list of key->value pairs in array-tuples
         String sectionKey = null;
-        NCBITaxon tax = null;
-        String organism = null;
-        String accession = null;
         int xrefCount = 0;
         do {
             List section = this.readSection(reader);
             sectionKey = ((String[])section.get(0))[0];
             if(sectionKey == null){
-                throw new ParseException("Section key was null. Accession:"+
-                        accession == null ? "Not set" : accession);
+                
+                String message = ParseException.newMessage(this.getClass(), accession, "No section key", "Not set", sectionToString(section));
+                throw new ParseException(message);
             }
             // process section-by-section
             if (sectionKey.equals(LOCUS_TAG)) {
@@ -291,7 +294,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 Matcher m = lp.matcher(loc);
                 Matcher mPre87 = lpPre87.matcher(loc);
                 if (m.matches()) {
-                	// first token is both name and primary accession
+                    // first token is both name and primary accession
                     rlistener.setName(m.group(1));
                     rlistener.setAccession(m.group(1));
                     // second token is version
@@ -317,8 +320,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     // Optional extras
                     String circular = mPre87.group(2);
                     if (circular!=null) rlistener.setCircular(true);
-            	} else {
-                    throw new ParseException("Bad ID line found: "+loc);
+                } else {
+                    String message = ParseException.newMessage(this.getClass(),accession,"Not Set","Bad ID line found", sectionToString(section));
+                    throw new ParseException(message);
                 }
             } else if (sectionKey.equals(DEFINITION_TAG)) {
                 rlistener.setDescription(((String[])section.get(0))[1]);
@@ -344,8 +348,15 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     } else if (type.equals("Last updated, Version ")) {
                         rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
-                    } else throw new ParseException("Bad date type found: "+type);
-                } else throw new ParseException("Bad date line found: "+chunk);
+                    } else {
+                        String message = ParseException.newMessage(this.getClass(),accession,"not set", "Bad date type found",sectionToString(section));
+                        throw new ParseException(message);
+                    }
+                } else {
+                    String message = ParseException.newMessage(this.getClass(),accession,"not set", "Bad date line found",sectionToString(section));
+                    throw new ParseException(message);
+                    
+                }
             } else if (sectionKey.equals(ACCESSION_TAG)) {
                 // if multiple accessions, store only first as accession,
                 // and store rest in annotation
@@ -392,7 +403,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     try {
                         ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
                     } catch (ChangeVetoException ce) {
-                        ParseException pe = new ParseException("Could not annotate identifier terms");
+                        String message = ParseException.newMessage(this.getClass(),accession,"not set", "Could not annotate identifier terms",sectionToString(section));
+                        ParseException pe = new ParseException(message);
                         pe.initCause(ce);
                         throw pe;
                     }
@@ -459,7 +471,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             if(m.group(2) != null)
                                 ref_end = Integer.parseInt(m.group(3));
                         } else {
-                            throw new ParseException("Bad reference line found: "+val);
+                            String message = ParseException.newMessage(this.getClass(),accession,"not set", "Bad reference line found",sectionToString(section));
+                            throw new ParseException(message);
                         }
                     }
                 }
@@ -502,7 +515,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             ref_rank);
                     rlistener.setRankedDocRef(rdr);
                 } catch (ChangeVetoException e) {
-                    throw new ParseException(e);
+                    String message = ParseException.newMessage(this.getClass(),accession,"not set", "",sectionToString(section));
+                    throw new ParseException(e, message);
                 }
             } else if (sectionKey.equals(COMMENT_TAG) && !this.getElideComments()) {
                 // Set up some comments
@@ -531,7 +545,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                                     try {
                                         if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
                                     } catch (ChangeVetoException e) {
-                                        throw new ParseException(e);
+                                        String message = ParseException.newMessage(this.getClass(),accession,"not set", "",sectionToString(section));
+                                        throw new ParseException(e, message);
                                     }
                                 } else {
                                     try {
@@ -539,17 +554,20 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                                         RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
                                         rlistener.getCurrentFeature().addRankedCrossRef(rcr);
                                     } catch (ChangeVetoException e) {
-                                        throw new ParseException(e);
+                                        String message = ParseException.newMessage(this.getClass(),accession,"not set", "",sectionToString(section));
+                                        throw new ParseException(e, message);
                                     }
                                 }
                             } else {
-                                throw new ParseException("Bad dbxref found: "+val);
+                                String message = ParseException.newMessage(this.getClass(),accession,"not set", "Bad dbxref found",sectionToString(section));
+                                throw new ParseException(message);
                             }
                         } else if (key.equalsIgnoreCase("organism")) {
                             try {
                                 organism = val;
                                 if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
                             } catch (ChangeVetoException e) {
+                                String message = ParseException.newMessage(this.getClass(),accession,"not set", "",sectionToString(section));
                                 throw new ParseException(e);
                             }
                         } else {
@@ -587,7 +605,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             (Symbol[])(sl.toList().toArray(new Symbol[0])),
                             0, sl.length());
                 } catch (Exception e) {
-                    throw new ParseException(e);
+                    String message = ParseException.newMessage(this.getClass(),accession,"not set", "Bad sequence",sectionToString(section));
+                    throw new ParseException(e, message);
                 }
             }
         } while (!sectionKey.equals(END_SEQUENCE_TAG));
@@ -629,7 +648,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 br.mark(160);
                 // read token
                 line = br.readLine();
-                if (line.length()<2) throw new ParseException("Bad line found: "+line);
+                if (line.length()<2) {
+                    String message = ParseException.newMessage(this.getClass(),accession,"not set", "Bad line found",line);
+                    throw new ParseException("Bad line found: "+line);
+                }
                 String token = line.substring(0,2);
                 // READ SEQUENCE SECTION
                 if (token.equals(START_SEQUENCE_TAG)) {
@@ -713,12 +735,14 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 // READ THIRD PARTY ANNOTATION SECTION
                 else if (token.equals(TPA_TAG)) {
                     //      exception = don't know how to do TPA yet
-                    throw new ParseException("Unable to handle TPAs just yet");
+                    String message = ParseException.newMessage(this.getClass(),accession,"not set", "Unable to handle TPAs just yet",sectionToString(section));
+                    throw new ParseException(message);
                 }
                 // READ CONTIG SECTION
                 else if (token.equals(CONTIG_TAG)) {
                     //      exception = don't know how to do contigs yet
-                    throw new ParseException("Unable to handle contig assemblies just yet");
+                    String message = ParseException.newMessage(this.getClass(),accession,"not set", "Unable to handle contig assemblies just yet",sectionToString(section));
+                    throw new ParseException("message");
                 }
                 // READ DOCREF
                 else if (token.equals(DATABASE_XREF_TAG)) {
@@ -744,26 +768,32 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             // dump current tag if exists
                             if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                         } else {
-                            //      merge neighbouring repeated tokens by concatting values
-                            //      return tag->value pairs
-                            String tag = line.substring(0,2);
-                            String value = line.substring(5);
-                            if (currentTag==null || !tag.equals(currentTag)) {
-                                // dump current tag if exists
-                                if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
-                                // start new tag
-                                currentTag = tag;
-                                currentVal = new StringBuffer();
-                                currentVal.append(value);
-                            } else {
-                                currentVal.append("\n");
-                                currentVal.append(value);
+                            try {
+                                //      merge neighbouring repeated tokens by concatting values
+                                //      return tag->value pairs
+                                String tag = line.substring(0,2);
+                                String value = line.substring(5);
+                                if (currentTag==null || !tag.equals(currentTag)) {
+                                    // dump current tag if exists
+                                    if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
+                                    // start new tag
+                                    currentTag = tag;
+                                    currentVal = new StringBuffer();
+                                    currentVal.append(value);
+                                } else {
+                                    currentVal.append("\n");
+                                    currentVal.append(value);
+                                }
+                            } catch (Exception e) {
+                                String message = ParseException.newMessage(this.getClass(), accession, "not set","",sectionToString(section));
+                                throw new ParseException (e, message);
                             }
                         }
                     }
                 }
             }
         } catch (IOException e) {
+            String message = ParseException.newMessage(this.getClass(),accession,"not set", "Unable to handle TPAs just yet",sectionToString(section));
             throw new ParseException(e);
         }
         return section;
@@ -790,9 +820,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      * Namespace is ignored as EMBL has no concept of it.
      */
     public void writeSequence(Sequence seq, Namespace ns) throws IOException {
-    	this.writeSequence(seq, this.getDefaultFormat(), ns);
+        this.writeSequence(seq, this.getDefaultFormat(), ns);
     }
-
+    
     /**
      * As per {@link #writeSequence(Sequence, Namespace)}, except
      * that it also takes a format parameter. This can be any of the formats
@@ -803,9 +833,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      * @throws IOException see {@link #writeSequence(Sequence, Namespace)}
      */
     public void writeSequence(Sequence seq, String format, Namespace ns) throws IOException {
-    	if (!format.equals(EMBL_FORMAT) && !format.equals(EMBL_PRE87_FORMAT))
-    		throw new IllegalArgumentException("Format "+format+" not recognised.");  	
-    	
+        if (!format.equals(EMBL_FORMAT) && !format.equals(EMBL_PRE87_FORMAT))
+            throw new IllegalArgumentException("Format "+format+" not recognised.");
+        
         RichSequence rs;
         try {
             if (seq instanceof RichSequence) rs = (RichSequence)seq;
@@ -853,37 +883,37 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 accessions.append(";");
             } else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelle=n.getValue();
         }
-
+        
         StringBuffer locusLine = new StringBuffer();
         if (format.equals(EMBL_FORMAT)) {
-        	// accession; SV version; circular/linear; moltype; dataclass; division; length BP.
-        	locusLine.append(rs.getAccession());
-        	locusLine.append("; SV ");
-        	locusLine.append(rs.getVersion());
-        	locusLine.append("; ");
-        	locusLine.append(rs.getCircular()?"circular":"linear");
-        	locusLine.append("; ");
-        	locusLine.append(moltype);
-        	locusLine.append("; ");
-        	locusLine.append(dataClass);
-        	locusLine.append("; ");
-        	locusLine.append(rs.getDivision());
-        	locusLine.append("; ");
+            // accession; SV version; circular/linear; moltype; dataclass; division; length BP.
+            locusLine.append(rs.getAccession());
+            locusLine.append("; SV ");
+            locusLine.append(rs.getVersion());
+            locusLine.append("; ");
+            locusLine.append(rs.getCircular()?"circular":"linear");
+            locusLine.append("; ");
+            locusLine.append(moltype);
+            locusLine.append("; ");
+            locusLine.append(dataClass);
+            locusLine.append("; ");
+            locusLine.append(rs.getDivision());
+            locusLine.append("; ");
             locusLine.append(rs.length());
             locusLine.append(" BP.");
         } else if (format.equals(EMBL_PRE87_FORMAT)) {
             // entryname  dataclass; [circular] molecule; division; sequencelength BP.
-        	locusLine.append(StringTools.rightPad(rs.getName(),9));
-        	locusLine.append(" standard; ");
-        	locusLine.append(rs.getCircular()?"circular ":"");
-        	// if it is Ensembl genomic, add that in too
-        	if (genomic==true) locusLine.append("genomic ");
-        	locusLine.append(moltype);
-        	locusLine.append("; ");
-        	locusLine.append(rs.getDivision()==null?"":rs.getDivision());
-        	locusLine.append("; ");
-        	locusLine.append(rs.length());
-        	locusLine.append(" BP.");
+            locusLine.append(StringTools.rightPad(rs.getName(),9));
+            locusLine.append(" standard; ");
+            locusLine.append(rs.getCircular()?"circular ":"");
+            // if it is Ensembl genomic, add that in too
+            if (genomic==true) locusLine.append("genomic ");
+            locusLine.append(moltype);
+            locusLine.append("; ");
+            locusLine.append(rs.getDivision()==null?"":rs.getDivision());
+            locusLine.append("; ");
+            locusLine.append(rs.length());
+            locusLine.append(" BP.");
         }
         StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 5, this.getLineWidth(), null, LOCUS_TAG, this.getPrintStream());
         this.getPrintStream().println(DELIMITER_TAG+"   ");
@@ -894,9 +924,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         
         // version line
         if (format.equals(EMBL_PRE87_FORMAT)) {
-        	if (versionLine!=null) StringTools.writeKeyValueLine(VERSION_TAG, versionLine, 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
-        	else StringTools.writeKeyValueLine(VERSION_TAG, accession+"."+rs.getVersion(), 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
-        	this.getPrintStream().println(DELIMITER_TAG+"   ");
+            if (versionLine!=null) StringTools.writeKeyValueLine(VERSION_TAG, versionLine, 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
+            else StringTools.writeKeyValueLine(VERSION_TAG, accession+"."+rs.getVersion(), 5, this.getLineWidth(), null, VERSION_TAG, this.getPrintStream());
+            this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         
         // date line
@@ -1096,6 +1126,24 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public String getDefaultFormat() {
         return EMBL_FORMAT;
+    }
+    
+    
+    /**
+     * Converts the current parse section to a String. Useful for debugging.
+     */
+    String sectionToString(List section){
+        StringBuffer parseBlock = new StringBuffer();
+        for(Iterator i = section.listIterator(); i.hasNext();){
+            String[] part = (String[])i.next();
+            for(int x = 0; x < part.length; x++){
+                parseBlock.append(part[x]);
+                if(x == 0){
+                    parseBlock.append("   "); //the gap will have been trimmed
+                }
+            }
+        }
+        return parseBlock.toString();
     }
 }
 
