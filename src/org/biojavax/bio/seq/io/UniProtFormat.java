@@ -232,6 +232,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener,null);
     }
     
+    private String accession = null;
+    
     /**
      * {@inheritDoc}
      */
@@ -252,14 +254,14 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         // Get an ordered list of key->value pairs in array-tuples
         String sectionKey = null;
         NCBITaxon tax = null;
-        String accession = null;
+        accession = null;
         int xrefCount = 0;
         do {
             List section = this.readSection(reader);
             sectionKey = ((String[])section.get(0))[0];
             if(sectionKey == null){
-                throw new ParseException("Section key was null. Accession:"+
-                        accession == null ? "Not set" : accession);
+                String message = ParseException.newMessage(this.getClass(),accession, "", "Section key was null", sectionToString(section));
+                throw new ParseException(message);
             }
             // process section-by-section
             if (sectionKey.equals(LOCUS_TAG)) {
@@ -277,7 +279,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         rlistener.addSequenceProperty(Terms.getMolTypeTerm(), "");
                     }
                 } else {
-                    throw new ParseException("Bad ID line found: "+loc);
+                    String message = ParseException.newMessage(this.getClass(),accession, "", "Bad ID line", sectionToString(section));
+                    throw new ParseException(message);
                 }
             } else if (sectionKey.equals(DEFINITION_TAG)) {
                 String val = ((String[])section.get(0))[1];
@@ -349,15 +352,27 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getUniProtDBNameTerm(), dbname);
                     } else if (type.equalsIgnoreCase("sequence version")) {
-                        if (rel==null) throw new ParseException("Version missing for "+type);
+                        if (rel==null){
+                            String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
+                            throw new ParseException(message);
+                        }
                         rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
                     } else if (type.equalsIgnoreCase("entry version")) {
-                        if (rel==null) throw new ParseException("Version missing for "+type);
+                        if (rel==null) {
+                            String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
+                            throw new ParseException(message);
+                        }
                         rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelAnnotatedTerm(), rel);
-                    } else throw new ParseException("Bad date type found: "+type);
-                } else throw new ParseException("Bad date line found: "+chunk);
+                    } else {
+                        String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date type "+type, sectionToString(section));
+                        throw new ParseException(message);
+                    }
+                } else {
+                    String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date line", sectionToString(section));
+                    throw new ParseException(message);
+                }
             } else if (sectionKey.equals(ACCESSION_TAG)) {
                 // if multiple accessions, store only first as accession,
                 // and store rest in annotation
@@ -493,7 +508,10 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             else if (termName.equalsIgnoreCase(Terms.TISSUE_KEY)) t = Terms.getTissueTerm();
                             else if (termName.equalsIgnoreCase(Terms.TRANSPOSON_KEY)) t = Terms.getTransposonTerm();
                             else if (termName.equalsIgnoreCase(Terms.PLASMID_KEY)) t = Terms.getPlasmidTerm();
-                            else throw new ParseException("Invalid RC term found: "+termName);
+                            else {
+                                String message = ParseException.newMessage(this.getClass(),accession, "", "Invalid RC term found: "+termName, sectionToString(section));
+                                throw new ParseException(message);
+                            }
                             // assign notes using term and rank:second section as value
                             // nasty hack - we really should have notes on the reference itself.
                             rlistener.addSequenceProperty(t, ref_rank+":"+subparts[1].trim());
@@ -584,6 +602,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             desc = m.group(3);
                             templ.location = UniProtLocationParser.parseLocation(loc);
                         } else {
+                            String message = ParseException.newMessage(this.getClass(),accession, "", "Bad feature value: "+val, sectionToString(section));
                             throw new ParseException("Bad feature value: "+val);
                         }
                         rlistener.startFeature(templ);
@@ -602,6 +621,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             (Symbol[])(sl.toList().toArray(new Symbol[0])),
                             0, sl.length());
                 } catch (Exception e) {
+                    String message = ParseException.newMessage(this.getClass(),accession, "", "", sectionToString(section));
                     throw new ParseException(e);
                 }
             }
@@ -644,7 +664,10 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 br.mark(160);
                 // read token
                 line = br.readLine();
-                if (line.length()<2) throw new ParseException("Bad line found: "+line);
+                if (line.length()<2) {
+                    String message = ParseException.newMessage(this.getClass(),accession, "", "Bad line found: "+line, sectionToString(section));
+                    throw new ParseException(message);
+                }
                 String token = line.substring(0,2);
                 // READ SEQUENCE SECTION
                 if (token.equals(START_SEQUENCE_TAG)) {
@@ -770,27 +793,33 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             // dump current tag if exists
                             if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
                         } else {
-                            //      merge neighbouring repeated tokens by concatting values
-                            //      return tag->value pairs
-                            String tag = line.substring(0,2);
-                            String value = line.substring(5);
-                            if (currentTag==null || !tag.equals(currentTag)) {
-                                // dump current tag if exists
-                                if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
-                                // start new tag
-                                currentTag = tag;
-                                currentVal = new StringBuffer();
-                                currentVal.append(value);
-                            } else {
-                                currentVal.append("\n");
-                                currentVal.append(value);
+                            try {
+                                //      merge neighbouring repeated tokens by concatting values
+                                //      return tag->value pairs
+                                String tag = line.substring(0,2);
+                                String value = line.substring(5);
+                                if (currentTag==null || !tag.equals(currentTag)) {
+                                    // dump current tag if exists
+                                    if (currentTag!=null) section.add(new String[]{currentTag,currentVal.toString()});
+                                    // start new tag
+                                    currentTag = tag;
+                                    currentVal = new StringBuffer();
+                                    currentVal.append(value);
+                                } else {
+                                    currentVal.append("\n");
+                                    currentVal.append(value);
+                                }
+                            } catch (Exception e) {
+                                String message = ParseException.newMessage(this.getClass(),accession, "", "", sectionToString(section));
+                                throw new ParseException(e, message);
                             }
                         }
                     }
                 }
             }
         } catch (IOException e) {
-            throw new ParseException(e);
+            String message = ParseException.newMessage(this.getClass(),accession, "", "", sectionToString(section));
+            throw new ParseException(e, message);
         }
         return section;
     }
@@ -1211,6 +1240,23 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public String getDefaultFormat() {
         return UNIPROT_FORMAT;
+    }
+    
+    /**
+     * Converts the current parse section to a String. Useful for debugging.
+     */
+    String sectionToString(List section){
+        StringBuffer parseBlock = new StringBuffer();
+        for(Iterator i = section.listIterator(); i.hasNext();){
+            String[] part = (String[])i.next();
+            for(int x = 0; x < part.length; x++){
+                parseBlock.append(part[x]);
+                if(x == 0){
+                    parseBlock.append("   "); //the gap will have been trimmed
+                }
+            }
+        }
+        return parseBlock.toString();
     }
 }
 
