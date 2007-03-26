@@ -238,7 +238,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
                         (Symbol[])(sl.toList().toArray(new Symbol[0])),
                         0, sl.length());
             } catch (Exception e) {
-                String message = ParseException.newMessage(this.getClass(), name, gi, seq.toString());
+                String message = ParseException.newMessage(this.getClass(), name, gi, "problem parsing symbols", seq.toString());
                 throw new ParseException(e, message);
             }
         }
