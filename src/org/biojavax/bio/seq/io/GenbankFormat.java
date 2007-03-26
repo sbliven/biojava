@@ -85,7 +85,7 @@ import org.biojavax.utils.StringTools;
  * @since 1.5
  */
 public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
-                
+    
     // Register this format with the format auto-guesser.
     static {
         RichSequence.IOTools.registerFormat(GenbankFormat.class);
@@ -142,23 +142,23 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     
     private final static HashSet isNotQuoted = new HashSet();
     static {
-    	isNotQuoted.add("anticodon");
-    	isNotQuoted.add("citation");
-    	isNotQuoted.add("codon");
-    	isNotQuoted.add("codon_start");
-    	isNotQuoted.add("compare");
-    	isNotQuoted.add("cons_splice");
-    	isNotQuoted.add("direction");
-    	isNotQuoted.add("estimated_length");
-    	isNotQuoted.add("label");
-    	isNotQuoted.add("mod_base");
-    	isNotQuoted.add("number");
-    	isNotQuoted.add("rpt_type");
-    	isNotQuoted.add("rpt_unit_range");
-    	isNotQuoted.add("transl_except");
-    	isNotQuoted.add("transl_table");
+        isNotQuoted.add("anticodon");
+        isNotQuoted.add("citation");
+        isNotQuoted.add("codon");
+        isNotQuoted.add("codon_start");
+        isNotQuoted.add("compare");
+        isNotQuoted.add("cons_splice");
+        isNotQuoted.add("direction");
+        isNotQuoted.add("estimated_length");
+        isNotQuoted.add("label");
+        isNotQuoted.add("mod_base");
+        isNotQuoted.add("number");
+        isNotQuoted.add("rpt_type");
+        isNotQuoted.add("rpt_unit_range");
+        isNotQuoted.add("transl_except");
+        isNotQuoted.add("transl_table");
     }
-
+    
     /**
      * Implements some GenBank-specific terms.
      */
@@ -186,7 +186,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         }
         
         public final static void reset() {
-        	GENBANK_TERM=null;
+            GENBANK_TERM=null;
         }
     }
     
@@ -259,6 +259,11 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         return this.readRichSequence(reader,symParser,(RichSeqIOListener)listener,null);
     }
     
+    private String sectionKey = null;
+    private NCBITaxon tax = null;
+    private String organism = null;
+    private String accession = null;
+    private String identifier = null;
     /**
      * {@inheritDoc}
      */
@@ -268,6 +273,11 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             Namespace ns)
             throws IllegalSymbolException, IOException, ParseException {
         
+        sectionKey = null;
+        tax = null;
+        organism = null;
+        accession = null;
+        identifier = null;
         boolean hasAnotherSequence = true;
         //boolean hasInternalWhitespace = false;
         
@@ -277,16 +287,13 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         rlistener.setNamespace(ns);
         
         // Get an ordered list of key->value pairs in array-tuples
-        String sectionKey = null;
-        NCBITaxon tax = null;
-        String organism = null;
-        String accession = null;
+        
         do {
             List section = this.readSection(reader);
             sectionKey = ((String[])section.get(0))[0];
             if(sectionKey == null){
-                throw new ParseException("Section key was null. Accession:"+
-                        accession == null ? "Not set" : accession);
+                String message = ParseException.newMessage(this.getClass(), accession, identifier, "Section key was null", sectionToString(section));
+                throw new ParseException(message);
             }
             // process section-by-section
             if (sectionKey.equals(LOCUS_TAG)) {
@@ -306,13 +313,14 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     if (stranded!=null) rlistener.addSequenceProperty(Terms.getStrandedTerm(),stranded);
                     if (circular!=null && circular.equalsIgnoreCase("circular")) rlistener.setCircular(true);
                     if (sixth != null) {
-                    	rlistener.setDivision(fifth);
-                    	rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),sixth);
+                        rlistener.setDivision(fifth);
+                        rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),sixth);
                     } else if (fifth!=null) {
-                    	rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),fifth);
+                        rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),fifth);
                     }
                 } else {
-                    throw new ParseException("Bad locus line found: "+loc+", accession:"+accession);
+                    String message = ParseException.newMessage(this.getClass(), accession, identifier, "Bad locus line", sectionToString(section));
+                    throw new ParseException(message);
                 }
             } else if (sectionKey.equals(DEFINITION_TAG)) {
                 rlistener.setDescription(((String[])section.get(0))[1]);
@@ -339,9 +347,13 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         rlistener.setAccession(accession);
                     }
                     if (m.group(3)!=null) rlistener.setVersion(Integer.parseInt(m.group(3)));
-                    if (m.group(5)!=null) rlistener.setIdentifier(m.group(5));
+                    if (m.group(5)!=null) {
+                        identifier = m.group(5);
+                        rlistener.setIdentifier(identifier);
+                    }
                 } else {
-                    throw new ParseException("Bad version line found: "+ver+", accession:"+accession);
+                    String message = ParseException.newMessage(this.getClass(), accession, identifier, "Bad version line", sectionToString(section));
+                    throw new ParseException(message);
                 }
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String val = ((String[])section.get(0))[1];
@@ -364,7 +376,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     ref_rank = Integer.parseInt(m.group(1));
                     if (m.group(3) != null) baseRangeList=buildBaseRanges(m.group(3));
                 } else {
-                    throw new ParseException("Bad reference line found: "+ref+", accession:"+accession);
+                    String message = ParseException.newMessage(this.getClass(), accession, identifier, "Bad reference line", sectionToString(section));
+                    throw new ParseException(message);
                 }
                 // rest can be in any order
                 String authors = null;
@@ -401,10 +414,10 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 // create the docref object
                 try {
-                	// Use consortium as well if present.
-                	if (authors==null) authors = consortium + " (consortium)";
-                	else if (consortium!=null) authors = authors + ", " + consortium + " (consortium)";
-                	// Create docref.
+                    // Use consortium as well if present.
+                    if (authors==null) authors = consortium + " (consortium)";
+                    else if (consortium!=null) authors = authors + ", " + consortium + " (consortium)";
+                    // Create docref.
                     DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{DocRefAuthor.Tools.parseAuthorString(authors),journal,title});
                     // assign either the pubmed or medline to the docref - medline gets priority
                     if (mcr!=null) dr.setCrossref(mcr);
@@ -456,7 +469,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                                     }
                                 }
                             } else {
-                                throw new ParseException("Bad dbxref found: "+val+", accession:"+accession);
+                                String message = ParseException.newMessage(this.getClass(), accession, identifier, "Bad dbxref", sectionToString(section));
+                                throw new ParseException(message);
                             }
                         } else if (key.equalsIgnoreCase("organism")) {
                             try {
@@ -507,6 +521,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                             (Symbol[])(sl.toList().toArray(new Symbol[0])),
                             0, sl.length());
                 } catch (Exception e) {
+                    String message = ParseException.newMessage(this.getClass(), accession, identifier, "Bad sequence section", sectionToString(section));
                     throw new ParseException(e+", accession:"+accession);
                 }
             }
@@ -575,31 +590,33 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             }
         } catch (IOException e) {
-        	// try to provide some context in the stack trace
-        	String key = null;
-        	if (!section.isEmpty()) {
-        		key = ((String[]) section.get(0))[0];
-        	}
-        	throw new ParseException(e, "Problem parsing section "+key);
+            // try to provide some context in the stack trace
+            String key = null;
+            if (!section.isEmpty()) {
+                key = ((String[]) section.get(0))[0];
+            }
+            String message = ParseException.newMessage(this.getClass(), accession, identifier, "", sectionToString(section));
+            throw new ParseException(e, message);
         }
         return section;
     }
     
-    private final static List buildBaseRanges(final String theBaseRangeList) throws ParseException {
+    private final List buildBaseRanges(final String theBaseRangeList) throws ParseException {
         if (theBaseRangeList == null) return null;
         final List baseRangeList = new ArrayList();
-    	final String[] baseRange = theBaseRangeList.split(";");
-    	for (int r=0; r<baseRange.length; r++) {
-    		final Matcher rangeMatch = refRange.matcher(baseRange[r]);
-    		if (rangeMatch.matches()) {
-    			final int rangeStart = Integer.parseInt(rangeMatch.group(1));
-    			final int rangeEnd = Integer.parseInt(rangeMatch.group(2));
-    			baseRangeList.add(new SimpleRichLocation(new SimplePosition(rangeStart), new SimplePosition(rangeEnd), r));
-    		} else {
-                throw new ParseException("Bad reference range found["+r+"]: <"+baseRange[r]+">, theBaseRangeList: <"+theBaseRangeList+">");
-    		}
-    	}
-    	return baseRangeList;
+        final String[] baseRange = theBaseRangeList.split(";");
+        for (int r=0; r<baseRange.length; r++) {
+            final Matcher rangeMatch = refRange.matcher(baseRange[r]);
+            if (rangeMatch.matches()) {
+                final int rangeStart = Integer.parseInt(rangeMatch.group(1));
+                final int rangeEnd = Integer.parseInt(rangeMatch.group(2));
+                baseRangeList.add(new SimpleRichLocation(new SimplePosition(rangeStart), new SimplePosition(rangeEnd), r));
+            } else {
+                String message = ParseException.newMessage(this.getClass(), accession, identifier, "Bad reference range found", theBaseRangeList);
+                throw new ParseException(message);
+            }
+        }
+        return baseRangeList;
     }
     
     /**
@@ -659,12 +676,11 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                 accessions.append(" ");
                 accessions.append(n.getValue());
-            }
-            else if (n.getTerm().equals(Terms.getKeywordTerm())) {
-            	if (n.getValue() != null) {
-	                if (keywords.length()>0) keywords.append("; ");
-	                keywords.append(n.getValue());
-            	}
+            } else if (n.getTerm().equals(Terms.getKeywordTerm())) {
+                if (n.getValue() != null) {
+                    if (keywords.length()>0) keywords.append("; ");
+                    keywords.append(n.getValue());
+                }
             }
         }
         
@@ -744,16 +760,16 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 // /key="val" or just /key if val==""
                 if (n.getValue()==null || n.getValue().length()==0) StringTools.writeKeyValueLine("", "/"+n.getTerm().getName(), 21, this.getLineWidth(), this.getPrintStream());
                 else if (isNotQuoted(n)) {// doesn't have the value enclosed in quotes
-                	StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"="+n.getValue(), 21, this.getLineWidth(), this.getPrintStream());
+                    StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"="+n.getValue(), 21, this.getLineWidth(), this.getPrintStream());
                 } else if (n.getTerm().getName().equals("translation")) {
-                	StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth()-1, this.getPrintStream());
+                    StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth()-1, this.getPrintStream());
                 } else {
-                	StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), this.getPrintStream());
+                    StringTools.writeKeyValueLine("", "/"+n.getTerm().getName()+"=\""+n.getValue()+"\"", 21, this.getLineWidth(), this.getPrintStream());
                 }
             }
             // add-in to source feature only organism and db_xref="taxon:xyz" where present
-            if (f.getType().equals("source") && tax!=null) {     
-                String displayName = tax.getDisplayName();           
+            if (f.getType().equals("source") && tax!=null) {
+                String displayName = tax.getDisplayName();
                 if (displayName.indexOf('(')>-1) displayName = displayName.substring(0, displayName.indexOf('(')).trim();
                 StringTools.writeKeyValueLine("", "/organism=\""+displayName+"\"", 21, this.getLineWidth()-1, this.getPrintStream());// AF252370 fits in exactly 80 - but is wrapped
                 for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
@@ -763,12 +779,12 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 StringTools.writeKeyValueLine("", "/db_xref=\"taxon:"+tax.getNCBITaxID()+"\"", 21, this.getLineWidth(), this.getPrintStream());
             } else {
-	            // add-in other dbxrefs where present
-	            for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
-	                RankedCrossRef rcr = (RankedCrossRef)j.next();
-	                CrossRef cr = rcr.getCrossRef();
-	                StringTools.writeKeyValueLine("", "/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", 21, this.getLineWidth(), this.getPrintStream());
-	            }
+                // add-in other dbxrefs where present
+                for (Iterator j = f.getRankedCrossRefs().iterator(); j.hasNext(); ) {
+                    RankedCrossRef rcr = (RankedCrossRef)j.next();
+                    CrossRef cr = rcr.getCrossRef();
+                    StringTools.writeKeyValueLine("", "/db_xref=\""+cr.getDbname()+":"+cr.getAccession()+"\"", 21, this.getLineWidth(), this.getPrintStream());
+                }
             }
         }
         
@@ -804,7 +820,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         //                oCount++;
         //        }
         //    }
-        //    
+        //
         //    this.getPrintStream().print(BASE_COUNT_TAG_FULL+"    ");
         //    this.getPrintStream().print(aCount + " a   ");
         //    this.getPrintStream().print(cCount + " c   ");
@@ -843,44 +859,61 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     public String getDefaultFormat() {
         return GENBANK_FORMAT;
     }
-
+    
     private final static boolean isMitochondrial(final RichSequence theSequence) {
-    	final Set featureSet = theSequence.getFeatureSet();
-    	final Iterator i = featureSet.iterator();
-    	while (i.hasNext()) {
-    		final RichFeature feature = (RichFeature) i.next();
-    		if (feature.getType().equals("source")) {
-    			final Set noteSet = feature.getNoteSet();
-    			final Iterator n = noteSet.iterator();
-    			while(n.hasNext()) {
-    				final Note note = (Note) n.next();
-        	    	if (note.getTerm().getName().equals("organelle")) return note.getValue().equals("mitochondrion");
-    			}
-    		}
-    	}
-    	return false;
+        final Set featureSet = theSequence.getFeatureSet();
+        final Iterator i = featureSet.iterator();
+        while (i.hasNext()) {
+            final RichFeature feature = (RichFeature) i.next();
+            if (feature.getType().equals("source")) {
+                final Set noteSet = feature.getNoteSet();
+                final Iterator n = noteSet.iterator();
+                while(n.hasNext()) {
+                    final Note note = (Note) n.next();
+                    if (note.getTerm().getName().equals("organelle")) return note.getValue().equals("mitochondrion");
+                }
+            }
+        }
+        return false;
     }
-
+    
     private final static boolean isNotQuoted(final Note theNote) {
-    	return isNotQuoted(theNote.getTerm().getName(), theNote.getValue());
+        return isNotQuoted(theNote.getTerm().getName(), theNote.getValue());
     }
     
     private final static boolean isNotQuoted(final String theName, final String theValue) {
-    	return isNotQuoted.contains(theName);
+        return isNotQuoted.contains(theName);
     }
     
     private final static String makeBaseRange(final RankedDocRef theReference) {
-    	return theReference.getLocation()==null?theReference.getStart()+" to "+theReference.getEnd():toString(theReference.getLocation());
+        return theReference.getLocation()==null?theReference.getStart()+" to "+theReference.getEnd():toString(theReference.getLocation());
     }
     
     private final static String toString(final RichLocation theLocation) {
-    	final StringBuffer list = new StringBuffer();
-    	final Iterator b = theLocation.blockIterator();
-    	while (b.hasNext()) {
-    		final RichLocation location = (RichLocation) b.next();
-    		list.append(location.getMin()+" to "+location.getMax());
-    		if (b.hasNext()) list.append("; ");
-    	}
-    	return list.toString();
+        final StringBuffer list = new StringBuffer();
+        final Iterator b = theLocation.blockIterator();
+        while (b.hasNext()) {
+            final RichLocation location = (RichLocation) b.next();
+            list.append(location.getMin()+" to "+location.getMax());
+            if (b.hasNext()) list.append("; ");
+        }
+        return list.toString();
+    }
+    
+    /**
+     * Converts the current parse section to a String. Useful for debugging.
+     */
+    String sectionToString(List section){
+        StringBuffer parseBlock = new StringBuffer();
+        for(Iterator i = section.listIterator(); i.hasNext();){
+            String[] part = (String[])i.next();
+            for(int x = 0; x < part.length; x++){
+                parseBlock.append(part[x]);
+                if(x == 0){
+                    parseBlock.append("   "); //the gap will have been trimmed
+                }
+            }
+        }
+        return parseBlock.toString();
     }
 }
