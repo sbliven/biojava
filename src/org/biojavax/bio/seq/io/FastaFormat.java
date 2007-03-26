@@ -54,6 +54,7 @@ import org.biojavax.bio.seq.RichSequence;
  * @author Greg Cox
  * @author Lukas Kall
  * @author Richard Holland
+ * @author Mark Schreiber
  * @since 1.5
  */
 
@@ -188,10 +189,11 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
         
         String name = m.group(1);
         String desc = m.group(3);
+        String gi = null;
         
         m = dp.matcher(name);
         if (m.matches()) {
-            String gi = m.group(2);
+            gi = m.group(2);
             String namespace = m.group(3);
             String accession = m.group(4);
             String verString = m.group(6);
@@ -236,7 +238,8 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
                         (Symbol[])(sl.toList().toArray(new Symbol[0])),
                         0, sl.length());
             } catch (Exception e) {
-                throw new ParseException(e);
+                String message = ParseException.newMessage(this.getClass(), name, gi, seq.toString());
+                throw new ParseException(e, message);
             }
         }
         
