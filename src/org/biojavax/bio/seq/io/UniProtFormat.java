@@ -43,6 +43,7 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
@@ -257,377 +258,384 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         NCBITaxon tax = null;
         accession = null;
         int xrefCount = 0;
-        do {
-            List section = this.readSection(reader);
-            sectionKey = ((String[])section.get(0))[0];
-            if(sectionKey == null){
-                String message = ParseException.newMessage(this.getClass(),accession, "", "Section key was null", sectionToString(section));
-                throw new ParseException(message);
-            }
-            // process section-by-section
-            if (sectionKey.equals(LOCUS_TAG)) {                   
-            	rlistener.addSequenceProperty(Terms.getLengthTypeTerm(),"aa");
-                // entryname  dataclass; moltype; sequencelength AA.
-                String loc = ((String[])section.get(0))[1];
-                Matcher m = lp.matcher(loc);
-                if (m.matches()) {
-                    rlistener.setName(m.group(2));
-                    rlistener.setDivision(m.group(3));
-                    if (m.groupCount() > 4){
-                        rlistener.addSequenceProperty(Terms.getDataClassTerm(),m.group(4));
-                        rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(5));
-                    }else{
-                        rlistener.addSequenceProperty(Terms.getDataClassTerm(), m.group(4));
-                        rlistener.addSequenceProperty(Terms.getMolTypeTerm(), "");
-                    }
-                } else {
-                    String message = ParseException.newMessage(this.getClass(),accession, "", "Bad ID line", sectionToString(section));
+        List section = null;
+        try{
+            do {
+                
+                section = this.readSection(reader);
+                sectionKey = ((String[])section.get(0))[0];
+                if(sectionKey == null){
+                    String message = ParseException.newMessage(this.getClass(),accession, "", "Section key was null", sectionToString(section));
                     throw new ParseException(message);
                 }
-            } else if (sectionKey.equals(DEFINITION_TAG)) {
-                String val = ((String[])section.get(0))[1];
-                if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
-                rlistener.setDescription(val);
-            } else if (sectionKey.equals(SOURCE_TAG)) {
-                // use SOURCE_TAG and TAXON_TAG values
-                String sciname = null;
-                String comname = null;
-                List synonym = new ArrayList();
-                int taxid = 0;
-                for (int i = 0; i < section.size(); i++) {
-                    String tag = ((String[])section.get(i))[0];
-                    String value = ((String[])section.get(i))[1].trim();
-                    if (tag.equals(SOURCE_TAG)) {
-                        if (value.endsWith(".")) value = value.substring(0,value.length()-1); // chomp trailing dot
-                        String[] parts = value.split("\\(");
-                        sciname = parts[0].trim();
-                        if (parts.length>1) {
-                            comname = parts[1].trim();
-                            if (comname.endsWith(")")) comname = comname.substring(0,comname.length()-1); // chomp trailing bracket
-                            if (parts.length>2) {
-                                // synonyms
-                                for (int j = 2 ; j < parts.length; j++) {
-                                    String syn = parts[j].trim();
-                                    if (syn.endsWith(")")) syn = syn.substring(0,syn.length()-1); // chomp trailing bracket
-                                    synonym.add(syn);
-                                }
-                            }
+                // process section-by-section
+                if (sectionKey.equals(LOCUS_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getLengthTypeTerm(),"aa");
+                    // entryname  dataclass; moltype; sequencelength AA.
+                    String loc = ((String[])section.get(0))[1];
+                    Matcher m = lp.matcher(loc);
+                    if (m.matches()) {
+                        rlistener.setName(m.group(2));
+                        rlistener.setDivision(m.group(3));
+                        if (m.groupCount() > 4){
+                            rlistener.addSequenceProperty(Terms.getDataClassTerm(),m.group(4));
+                            rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(5));
+                        }else{
+                            rlistener.addSequenceProperty(Terms.getDataClassTerm(), m.group(4));
+                            rlistener.addSequenceProperty(Terms.getMolTypeTerm(), "");
                         }
-                    } else if (tag.equals(TAXON_TAG)) {
-                        String[] parts = value.split(";");
-                        for (int j = 0; j < parts.length; j++) {
-                            String[] bits = parts[j].split("=");
-                            if (bits[0].equals("NCBI_TaxID")) {
-                                String[] morebits = bits[1].split(",");
-                                taxid = Integer.parseInt(morebits[0].trim());
-                            }
-                        }
-                    } else if (tag.equals(ORGANELLE_TAG)) {
-                        if (value.endsWith(".")) value = value.substring(0,value.length()-1); // chomp trailing dot
-                        String[] parts = value.split(";");
-                        for (int j = 0; j < parts.length; j++) {
-                            parts[j]=parts[j].trim();
-                            rlistener.addSequenceProperty(Terms.getOrganelleTerm(),parts[j]);
-                        }
-                    }
-                }
-                // Set the Taxon
-                tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{new Integer(taxid)});
-                rlistener.setTaxon(tax);
-                try {
-                    if (sciname!=null) tax.addName(NCBITaxon.SCIENTIFIC,sciname);
-                    if (comname!=null) tax.addName(NCBITaxon.COMMON,comname);
-                    for (Iterator j = synonym.iterator(); j.hasNext(); ) tax.addName(NCBITaxon.SYNONYM, (String)j.next());
-                } catch (ChangeVetoException e) {
-                    throw new ParseException(e);
-                }
-            } else if (sectionKey.equals(DATE_TAG)) {
-                String chunk = ((String[])section.get(0))[1];
-                Matcher dm = dp.matcher(chunk);
-                if (dm.matches()) {
-                    String date = dm.group(1).trim();
-                    String type = dm.group(2).trim();
-                    String rel = dm.group(3);
-                    if (rel!=null) rel = rel.trim();
-                    if (type.startsWith("integrated into UniProtKB")) {
-                        String dbname = type.split("/")[1];
-                        rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
-                        rlistener.addSequenceProperty(Terms.getUniProtDBNameTerm(), dbname);
-                    } else if (type.equalsIgnoreCase("sequence version")) {
-                        if (rel==null){
-                            String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
-                            throw new ParseException(message);
-                        }
-                        rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
-                        rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
-                    } else if (type.equalsIgnoreCase("entry version")) {
-                        if (rel==null) {
-                            String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
-                            throw new ParseException(message);
-                        }
-                        rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), date);
-                        rlistener.addSequenceProperty(Terms.getRelAnnotatedTerm(), rel);
                     } else {
-                        String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date type "+type, sectionToString(section));
+                        String message = ParseException.newMessage(this.getClass(),accession, "", "Bad ID line", sectionToString(section));
                         throw new ParseException(message);
                     }
-                } else {
-                    String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date line", sectionToString(section));
-                    throw new ParseException(message);
-                }
-            } else if (sectionKey.equals(ACCESSION_TAG)) {
-                // if multiple accessions, store only first as accession,
-                // and store rest in annotation
-                String[] accs = ((String[])section.get(0))[1].split(";");
-                accession = accs[0].trim();
-                rlistener.setAccession(accession);
-                for (int i = 1; i < accs.length; i++) {
-                    rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accs[i].trim());
-                }
-            } else if (sectionKey.equals(PROTEIN_EXIST_TAG)) {
-                String val = ((String[])section.get(0))[1];
-                if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
-                rlistener.addSequenceProperty(Terms.getProteinExistsTerm(),val.trim());
-            } else if (sectionKey.equals(KEYWORDS_TAG)) {
-                String val = ((String[])section.get(0))[1];
-                if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
-                String[] kws = val.split(";");
-                for (int i = 0; i < kws.length; i++) {
-                    String kw = kws[i].trim();
-                    if (kw.length()==0) continue;
-                    rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
-                }
-            } else if (sectionKey.equals(GENE_TAG)) {
-                String[] genes = ((String[])section.get(0))[1].split("\\s+(or|and)\\s+");
-                for (int geneID = 0; geneID < genes.length; geneID++) {
-                    String[] parts = genes[geneID].split(";");
-                    for (int j = 0; j < parts.length; j++) {
-                        String[] moreparts = parts[j].split("=");
-                        String[] values = moreparts[1].split(",");
-                        // nasty hack - we really should have notes on the gene object itself... if such a thing existed...
-                        if (moreparts[0].trim().equals(Terms.GENENAME_KEY)) rlistener.addSequenceProperty(Terms.getGeneNameTerm(),geneID+":"+values[0].trim());
-                        else if (moreparts[0].trim().equals(Terms.GENESYNONYM_KEY)) {
-                            for (int k = 0; k < values.length; k++) rlistener.addSequenceProperty(Terms.getGeneSynonymTerm(),geneID+":"+values[k].trim());
-                        } else if (moreparts[0].trim().equals(Terms.ORDLOCNAME_KEY)) {
-                            for (int k = 0; k < values.length; k++) rlistener.addSequenceProperty(Terms.getOrderedLocusNameTerm(),geneID+":"+values[k].trim());
-                        } else if (moreparts[0].trim().equals(Terms.ORFNAME_KEY)) {
-                            for (int k = 0; k < values.length; k++) rlistener.addSequenceProperty(Terms.getORFNameTerm(),geneID+":"+values[k].trim());
+                } else if (sectionKey.equals(DEFINITION_TAG)) {
+                    String val = ((String[])section.get(0))[1];
+                    if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
+                    rlistener.setDescription(val);
+                } else if (sectionKey.equals(SOURCE_TAG)) {
+                    // use SOURCE_TAG and TAXON_TAG values
+                    String sciname = null;
+                    String comname = null;
+                    List synonym = new ArrayList();
+                    int taxid = 0;
+                    for (int i = 0; i < section.size(); i++) {
+                        String tag = ((String[])section.get(i))[0];
+                        String value = ((String[])section.get(i))[1].trim();
+                        if (tag.equals(SOURCE_TAG)) {
+                            if (value.endsWith(".")) value = value.substring(0,value.length()-1); // chomp trailing dot
+                            String[] parts = value.split("\\(");
+                            sciname = parts[0].trim();
+                            if (parts.length>1) {
+                                comname = parts[1].trim();
+                                if (comname.endsWith(")")) comname = comname.substring(0,comname.length()-1); // chomp trailing bracket
+                                if (parts.length>2) {
+                                    // synonyms
+                                    for (int j = 2 ; j < parts.length; j++) {
+                                        String syn = parts[j].trim();
+                                        if (syn.endsWith(")")) syn = syn.substring(0,syn.length()-1); // chomp trailing bracket
+                                        synonym.add(syn);
+                                    }
+                                }
+                            }
+                        } else if (tag.equals(TAXON_TAG)) {
+                            String[] parts = value.split(";");
+                            for (int j = 0; j < parts.length; j++) {
+                                String[] bits = parts[j].split("=");
+                                if (bits[0].equals("NCBI_TaxID")) {
+                                    String[] morebits = bits[1].split(",");
+                                    taxid = Integer.parseInt(morebits[0].trim());
+                                }
+                            }
+                        } else if (tag.equals(ORGANELLE_TAG)) {
+                            if (value.endsWith(".")) value = value.substring(0,value.length()-1); // chomp trailing dot
+                            String[] parts = value.split(";");
+                            for (int j = 0; j < parts.length; j++) {
+                                parts[j]=parts[j].trim();
+                                rlistener.addSequenceProperty(Terms.getOrganelleTerm(),parts[j]);
+                            }
                         }
                     }
-                }
-            } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
-                // database_identifier; primary_identifier; secondary_identifier....
-                String val = ((String[])section.get(0))[1];
-                if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
-                String[] parts = val.split(";");
-                // construct a DBXREF out of the dbname part[0] and accession part[1]
-                String dbname = parts[0].trim();
-                String acc = parts[1].trim();
-                CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname,acc,new Integer(0)});
-                // assign remaining bits of info as additional accession annotations
-                for (int j = 2; j < parts.length; j++) {
-                    ComparableTerm t = (ComparableTerm)Terms.getAdditionalAccessionTerm();
-                    Note note = new SimpleNote(t,parts[j].trim(),j);
+                    // Set the Taxon
+                    tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{new Integer(taxid)});
+                    rlistener.setTaxon(tax);
                     try {
-                        ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
-                    } catch (ChangeVetoException ce) {
-                        ParseException pe = new ParseException("Could not annotate additional accession terms");
-                        pe.initCause(ce);
-                        throw pe;
+                        if (sciname!=null) tax.addName(NCBITaxon.SCIENTIFIC,sciname);
+                        if (comname!=null) tax.addName(NCBITaxon.COMMON,comname);
+                        for (Iterator j = synonym.iterator(); j.hasNext(); ) tax.addName(NCBITaxon.SYNONYM, (String)j.next());
+                    } catch (ChangeVetoException e) {
+                        throw new ParseException(e);
                     }
-                }
-                RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, ++xrefCount);
-                rlistener.setRankedCrossRef(rcrossRef);
-            } else if (sectionKey.equals(REFERENCE_TAG) && !this.getElideReferences()) {
-                // first line of section has rank and location
-                String refrank = ((String[])section.get(0))[1];
-                int ref_rank = Integer.parseInt(refrank.substring(1,refrank.length()-1));
-                // rest can be in any order
-                String authors = null;
-                String consortium = null;
-                String title = null;
-                String locator = null;
-                String pubmed = null;
-                String medline = null;
-                String doi = null;
-                String remark = null;
-                Integer rstart = null;
-                Integer rend = null;
-                for (int i = 1; i < section.size(); i++) {
-                    String key = ((String[])section.get(i))[0];
-                    String val = ((String[])section.get(i))[1];
-                    //System.err.println(key+": "+val);
-                    if (key.equals(AUTHORS_TAG)) {
-                        if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
-                        authors = val;
-                    }
-                    if (key.equals(CONSORTIUM_TAG)) {
-                        if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
-                        consortium = val;
-                    }
-                    if (key.equals(TITLE_TAG)) {
-                        if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
-                        if (val.endsWith("\"")) val = val.trim().substring(1, val.length()-2); // chomp quotes
-                        title = val;
-                    }
-                    if (key.equals(LOCATION_TAG)) {
-                        if (val.endsWith(".")) val = val.trim().substring(0, val.length()-1); // chomp dot
-                        locator = val;
-                    }
-                    if (key.equals(REFERENCE_XREF_TAG)) {
-                        // database_identifier=primary_identifier;
-                        String[] refs = val.split(";");
-                        for (int j = 0 ; j < refs.length; j++) {
-                            if (refs[j].trim().length()==0) continue;
-                            String[] parts = refs[j].split("=");
-                            String db = parts[0];
-                            String ref = parts[1];
-                            if (db.equalsIgnoreCase(Terms.PUBMED_KEY)) pubmed = ref;
-                            else if (db.equalsIgnoreCase(Terms.MEDLINE_KEY)) medline = ref;
-                            else if (db.equalsIgnoreCase(Terms.DOI_KEY)) doi = ref;
-                        }
-                    }
-                    if (key.equals(RP_LINE_TAG)) {
-                        remark = val;
-                        if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
-                        // Try to use it to find the location of the reference, if we have one.
-                        Matcher m = rppat.matcher(val);
-                        if (m.matches()) {
-                            rstart = Integer.valueOf(m.group(1));
-                            rend = Integer.valueOf(m.group(2));
-                        }
-                    }
-                    if (key.equals(RC_LINE_TAG)) {
-                        // Split into key=value pairs separated by semicolons and terminated with semicolon.
-                        String[] parts = val.split(";");
-                        for (int j = 0; j < parts.length; j++) {
-                            String[] subparts = parts[j].split("=");
-                            // get term for first section
-                            String termName = subparts[0].trim();
-                            Term t;
-                            if (termName.equalsIgnoreCase(Terms.SPECIES_KEY)) t = Terms.getSpeciesTerm();
-                            else if (termName.equalsIgnoreCase(Terms.STRAIN_KEY)) t = Terms.getStrainTerm();
-                            else if (termName.equalsIgnoreCase(Terms.TISSUE_KEY)) t = Terms.getTissueTerm();
-                            else if (termName.equalsIgnoreCase(Terms.TRANSPOSON_KEY)) t = Terms.getTransposonTerm();
-                            else if (termName.equalsIgnoreCase(Terms.PLASMID_KEY)) t = Terms.getPlasmidTerm();
-                            else {
-                                String message = ParseException.newMessage(this.getClass(),accession, "", "Invalid RC term found: "+termName, sectionToString(section));
+                } else if (sectionKey.equals(DATE_TAG)) {
+                    String chunk = ((String[])section.get(0))[1];
+                    Matcher dm = dp.matcher(chunk);
+                    if (dm.matches()) {
+                        String date = dm.group(1).trim();
+                        String type = dm.group(2).trim();
+                        String rel = dm.group(3);
+                        if (rel!=null) rel = rel.trim();
+                        if (type.startsWith("integrated into UniProtKB")) {
+                            String dbname = type.split("/")[1];
+                            rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
+                            rlistener.addSequenceProperty(Terms.getUniProtDBNameTerm(), dbname);
+                        } else if (type.equalsIgnoreCase("sequence version")) {
+                            if (rel==null){
+                                String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
                                 throw new ParseException(message);
                             }
-                            // assign notes using term and rank:second section as value
-                            // nasty hack - we really should have notes on the reference itself.
-                            rlistener.addSequenceProperty(t, ref_rank+":"+subparts[1].trim());
-                        }
-                    }
-                }
-                // create the pubmed crossref and assign to the bioentry
-                CrossRef pcr = null;
-                if (pubmed!=null) {
-                    pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed, new Integer(0)});
-                    RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
-                    rlistener.setRankedCrossRef(rpcr);
-                }
-                // create the medline crossref and assign to the bioentry
-                CrossRef mcr = null;
-                if (medline!=null) {
-                    mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline, new Integer(0)});
-                    RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
-                    rlistener.setRankedCrossRef(rmcr);
-                }
-                // create the doi crossref and assign to the bioentry
-                CrossRef dcr = null;
-                if (doi!=null) {
-                    dcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.DOI_KEY, doi, new Integer(0)});
-                    RankedCrossRef rdcr = new SimpleRankedCrossRef(dcr, 0);
-                    rlistener.setRankedCrossRef(rdcr);
-                }
-                // create the docref object
-                try {
-                    List auths = null;
-                    if(authors != null) auths = DocRefAuthor.Tools.parseAuthorString(authors);
-                    if (consortium!=null){
-                        if(auths == null) auths = new ArrayList();
-                        auths.add(new SimpleDocRefAuthor(consortium,true,false));
-                    }
-                    DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{auths,locator,title});
-                    // assign either the pubmed or medline to the docref - medline gets priority, then pubmed, then doi
-                    if (mcr!=null) dr.setCrossref(mcr);
-                    else if (pcr!=null) dr.setCrossref(pcr);
-                    else if (dcr!=null) dr.setCrossref(dcr);
-                    // assign the remarks
-                    if (!this.getElideComments()) dr.setRemark(remark);
-                    // assign the docref to the bioentry
-                    RankedDocRef rdr = new SimpleRankedDocRef(dr,rstart,rend,ref_rank);
-                    rlistener.setRankedDocRef(rdr);
-                } catch (ChangeVetoException e) {
-                    throw new ParseException(e);
-                }
-            } else if (sectionKey.equals(COMMENT_TAG) && !this.getElideComments()) {
-                // Set up some comments
-                String val = ((String[])section.get(0))[1];
-                if (UniProtCommentParser.isParseable(val)) rlistener.setComment(val);
-                else {
-                    // copyright message
-                    rlistener.addSequenceProperty(Terms.getCopyrightTerm(), val);
-                }
-            } else if (sectionKey.equals(FEATURE_TAG) && !this.getElideFeatures()) {
-                // starting from second line of input, start a new feature whenever we come across
-                // a key that does not start with /
-                boolean seenAFeature = false;
-                for (int i = 1 ; i < section.size(); i++) {
-                    String key = ((String[])section.get(i))[0];
-                    String val = ((String[])section.get(i))[1];
-                    val = val.replaceAll("\\s*[\\n\\r]+\\s*", " ").trim();
-                    if (val.endsWith(".")) val = val.substring(0,val.length()-1); // chomp dot
-                    if (key.startsWith("/")) {
-                        key = key.substring(1); // strip leading slash
-                        if (key.equals("FTId")) rlistener.addFeatureProperty(Terms.getFTIdTerm(),val);
-                        else {
-                            // should never happen - but here just in case
-                            rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
+                            rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
+                            rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
+                        } else if (type.equalsIgnoreCase("entry version")) {
+                            if (rel==null) {
+                                String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
+                                throw new ParseException(message);
+                            }
+                            rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), date);
+                            rlistener.addSequenceProperty(Terms.getRelAnnotatedTerm(), rel);
+                        } else {
+                            String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date type "+type, sectionToString(section));
+                            throw new ParseException(message);
                         }
                     } else {
-                        // new feature!
-                        // end previous feature
-                        if (seenAFeature) rlistener.endFeature();
-                        // start next one, with lots of lovely info in it
-                        RichFeature.Template templ = new RichFeature.Template();
-                        templ.annotation = new SimpleRichAnnotation();
-                        templ.sourceTerm = Terms.getUniProtTerm();
-                        templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key);
-                        templ.featureRelationshipSet = new TreeSet();
-                        templ.rankedCrossRefs = new TreeSet();
-                        String desc = null;
-                        Matcher m = fp.matcher(val);
-                        if (m.matches()) {
-                            String loc = m.group(1);
-                            desc = m.group(3);
-                            templ.location = UniProtLocationParser.parseLocation(loc);
-                        } else {
-                            String message = ParseException.newMessage(this.getClass(),accession, "", "Bad feature value: "+val, sectionToString(section));
-                            throw new ParseException("Bad feature value: "+val);
+                        String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date line", sectionToString(section));
+                        throw new ParseException(message);
+                    }
+                } else if (sectionKey.equals(ACCESSION_TAG)) {
+                    // if multiple accessions, store only first as accession,
+                    // and store rest in annotation
+                    String[] accs = ((String[])section.get(0))[1].split(";");
+                    accession = accs[0].trim();
+                    rlistener.setAccession(accession);
+                    for (int i = 1; i < accs.length; i++) {
+                        rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accs[i].trim());
+                    }
+                } else if (sectionKey.equals(PROTEIN_EXIST_TAG)) {
+                    String val = ((String[])section.get(0))[1];
+                    if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
+                    rlistener.addSequenceProperty(Terms.getProteinExistsTerm(),val.trim());
+                } else if (sectionKey.equals(KEYWORDS_TAG)) {
+                    String val = ((String[])section.get(0))[1];
+                    if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
+                    String[] kws = val.split(";");
+                    for (int i = 0; i < kws.length; i++) {
+                        String kw = kws[i].trim();
+                        if (kw.length()==0) continue;
+                        rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
+                    }
+                } else if (sectionKey.equals(GENE_TAG)) {
+                    String[] genes = ((String[])section.get(0))[1].split("\\s+(or|and)\\s+");
+                    for (int geneID = 0; geneID < genes.length; geneID++) {
+                        String[] parts = genes[geneID].split(";");
+                        for (int j = 0; j < parts.length; j++) {
+                            String[] moreparts = parts[j].split("=");
+                            String[] values = moreparts[1].split(",");
+                            // nasty hack - we really should have notes on the gene object itself... if such a thing existed...
+                            if (moreparts[0].trim().equals(Terms.GENENAME_KEY)) rlistener.addSequenceProperty(Terms.getGeneNameTerm(),geneID+":"+values[0].trim());
+                            else if (moreparts[0].trim().equals(Terms.GENESYNONYM_KEY)) {
+                                for (int k = 0; k < values.length; k++) rlistener.addSequenceProperty(Terms.getGeneSynonymTerm(),geneID+":"+values[k].trim());
+                            } else if (moreparts[0].trim().equals(Terms.ORDLOCNAME_KEY)) {
+                                for (int k = 0; k < values.length; k++) rlistener.addSequenceProperty(Terms.getOrderedLocusNameTerm(),geneID+":"+values[k].trim());
+                            } else if (moreparts[0].trim().equals(Terms.ORFNAME_KEY)) {
+                                for (int k = 0; k < values.length; k++) rlistener.addSequenceProperty(Terms.getORFNameTerm(),geneID+":"+values[k].trim());
+                            }
                         }
-                        rlistener.startFeature(templ);
-                        if (desc!=null) rlistener.addFeatureProperty(Terms.getFeatureDescTerm(),desc);
-                        seenAFeature = true;
+                    }
+                } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
+                    // database_identifier; primary_identifier; secondary_identifier....
+                    String val = ((String[])section.get(0))[1];
+                    if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
+                    String[] parts = val.split(";");
+                    // construct a DBXREF out of the dbname part[0] and accession part[1]
+                    String dbname = parts[0].trim();
+                    String acc = parts[1].trim();
+                    CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname,acc,new Integer(0)});
+                    // assign remaining bits of info as additional accession annotations
+                    for (int j = 2; j < parts.length; j++) {
+                        ComparableTerm t = (ComparableTerm)Terms.getAdditionalAccessionTerm();
+                        Note note = new SimpleNote(t,parts[j].trim(),j);
+                        try {
+                            ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
+                        } catch (ChangeVetoException ce) {
+                            ParseException pe = new ParseException("Could not annotate additional accession terms");
+                            pe.initCause(ce);
+                            throw pe;
+                        }
+                    }
+                    RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, ++xrefCount);
+                    rlistener.setRankedCrossRef(rcrossRef);
+                } else if (sectionKey.equals(REFERENCE_TAG) && !this.getElideReferences()) {
+                    // first line of section has rank and location
+                    String refrank = ((String[])section.get(0))[1];
+                    int ref_rank = Integer.parseInt(refrank.substring(1,refrank.length()-1));
+                    // rest can be in any order
+                    String authors = null;
+                    String consortium = null;
+                    String title = null;
+                    String locator = null;
+                    String pubmed = null;
+                    String medline = null;
+                    String doi = null;
+                    String remark = null;
+                    Integer rstart = null;
+                    Integer rend = null;
+                    for (int i = 1; i < section.size(); i++) {
+                        String key = ((String[])section.get(i))[0];
+                        String val = ((String[])section.get(i))[1];
+                        //System.err.println(key+": "+val);
+                        if (key.equals(AUTHORS_TAG)) {
+                            if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                            authors = val;
+                        }
+                        if (key.equals(CONSORTIUM_TAG)) {
+                            if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                            consortium = val;
+                        }
+                        if (key.equals(TITLE_TAG)) {
+                            if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                            if (val.endsWith("\"")) val = val.trim().substring(1, val.length()-2); // chomp quotes
+                            title = val;
+                        }
+                        if (key.equals(LOCATION_TAG)) {
+                            if (val.endsWith(".")) val = val.trim().substring(0, val.length()-1); // chomp dot
+                            locator = val;
+                        }
+                        if (key.equals(REFERENCE_XREF_TAG)) {
+                            // database_identifier=primary_identifier;
+                            String[] refs = val.split(";");
+                            for (int j = 0 ; j < refs.length; j++) {
+                                if (refs[j].trim().length()==0) continue;
+                                String[] parts = refs[j].split("=");
+                                String db = parts[0];
+                                String ref = parts[1];
+                                if (db.equalsIgnoreCase(Terms.PUBMED_KEY)) pubmed = ref;
+                                else if (db.equalsIgnoreCase(Terms.MEDLINE_KEY)) medline = ref;
+                                else if (db.equalsIgnoreCase(Terms.DOI_KEY)) doi = ref;
+                            }
+                        }
+                        if (key.equals(RP_LINE_TAG)) {
+                            remark = val;
+                            if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
+                            // Try to use it to find the location of the reference, if we have one.
+                            Matcher m = rppat.matcher(val);
+                            if (m.matches()) {
+                                rstart = Integer.valueOf(m.group(1));
+                                rend = Integer.valueOf(m.group(2));
+                            }
+                        }
+                        if (key.equals(RC_LINE_TAG)) {
+                            // Split into key=value pairs separated by semicolons and terminated with semicolon.
+                            String[] parts = val.split(";");
+                            for (int j = 0; j < parts.length; j++) {
+                                String[] subparts = parts[j].split("=");
+                                // get term for first section
+                                String termName = subparts[0].trim();
+                                Term t;
+                                if (termName.equalsIgnoreCase(Terms.SPECIES_KEY)) t = Terms.getSpeciesTerm();
+                                else if (termName.equalsIgnoreCase(Terms.STRAIN_KEY)) t = Terms.getStrainTerm();
+                                else if (termName.equalsIgnoreCase(Terms.TISSUE_KEY)) t = Terms.getTissueTerm();
+                                else if (termName.equalsIgnoreCase(Terms.TRANSPOSON_KEY)) t = Terms.getTransposonTerm();
+                                else if (termName.equalsIgnoreCase(Terms.PLASMID_KEY)) t = Terms.getPlasmidTerm();
+                                else {
+                                    String message = ParseException.newMessage(this.getClass(),accession, "", "Invalid RC term found: "+termName, sectionToString(section));
+                                    throw new ParseException(message);
+                                }
+                                // assign notes using term and rank:second section as value
+                                // nasty hack - we really should have notes on the reference itself.
+                                rlistener.addSequenceProperty(t, ref_rank+":"+subparts[1].trim());
+                            }
+                        }
+                    }
+                    // create the pubmed crossref and assign to the bioentry
+                    CrossRef pcr = null;
+                    if (pubmed!=null) {
+                        pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed, new Integer(0)});
+                        RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
+                        rlistener.setRankedCrossRef(rpcr);
+                    }
+                    // create the medline crossref and assign to the bioentry
+                    CrossRef mcr = null;
+                    if (medline!=null) {
+                        mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline, new Integer(0)});
+                        RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
+                        rlistener.setRankedCrossRef(rmcr);
+                    }
+                    // create the doi crossref and assign to the bioentry
+                    CrossRef dcr = null;
+                    if (doi!=null) {
+                        dcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.DOI_KEY, doi, new Integer(0)});
+                        RankedCrossRef rdcr = new SimpleRankedCrossRef(dcr, 0);
+                        rlistener.setRankedCrossRef(rdcr);
+                    }
+                    // create the docref object
+                    try {
+                        List auths = null;
+                        if(authors != null) auths = DocRefAuthor.Tools.parseAuthorString(authors);
+                        if (consortium!=null){
+                            if(auths == null) auths = new ArrayList();
+                            auths.add(new SimpleDocRefAuthor(consortium,true,false));
+                        }
+                        DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{auths,locator,title});
+                        // assign either the pubmed or medline to the docref - medline gets priority, then pubmed, then doi
+                        if (mcr!=null) dr.setCrossref(mcr);
+                        else if (pcr!=null) dr.setCrossref(pcr);
+                        else if (dcr!=null) dr.setCrossref(dcr);
+                        // assign the remarks
+                        if (!this.getElideComments()) dr.setRemark(remark);
+                        // assign the docref to the bioentry
+                        RankedDocRef rdr = new SimpleRankedDocRef(dr,rstart,rend,ref_rank);
+                        rlistener.setRankedDocRef(rdr);
+                    } catch (ChangeVetoException e) {
+                        throw new ParseException(e);
+                    }
+                } else if (sectionKey.equals(COMMENT_TAG) && !this.getElideComments()) {
+                    // Set up some comments
+                    String val = ((String[])section.get(0))[1];
+                    if (UniProtCommentParser.isParseable(val)) rlistener.setComment(val);
+                    else {
+                        // copyright message
+                        rlistener.addSequenceProperty(Terms.getCopyrightTerm(), val);
+                    }
+                } else if (sectionKey.equals(FEATURE_TAG) && !this.getElideFeatures()) {
+                    // starting from second line of input, start a new feature whenever we come across
+                    // a key that does not start with /
+                    boolean seenAFeature = false;
+                    for (int i = 1 ; i < section.size(); i++) {
+                        String key = ((String[])section.get(i))[0];
+                        String val = ((String[])section.get(i))[1];
+                        val = val.replaceAll("\\s*[\\n\\r]+\\s*", " ").trim();
+                        if (val.endsWith(".")) val = val.substring(0,val.length()-1); // chomp dot
+                        if (key.startsWith("/")) {
+                            key = key.substring(1); // strip leading slash
+                            if (key.equals("FTId")) rlistener.addFeatureProperty(Terms.getFTIdTerm(),val);
+                            else {
+                                // should never happen - but here just in case
+                                rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
+                            }
+                        } else {
+                            // new feature!
+                            // end previous feature
+                            if (seenAFeature) rlistener.endFeature();
+                            // start next one, with lots of lovely info in it
+                            RichFeature.Template templ = new RichFeature.Template();
+                            templ.annotation = new SimpleRichAnnotation();
+                            templ.sourceTerm = Terms.getUniProtTerm();
+                            templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key);
+                            templ.featureRelationshipSet = new TreeSet();
+                            templ.rankedCrossRefs = new TreeSet();
+                            String desc = null;
+                            Matcher m = fp.matcher(val);
+                            if (m.matches()) {
+                                String loc = m.group(1);
+                                desc = m.group(3);
+                                templ.location = UniProtLocationParser.parseLocation(loc);
+                            } else {
+                                String message = ParseException.newMessage(this.getClass(),accession, "", "Bad feature value: "+val, sectionToString(section));
+                                throw new ParseException(message);
+                            }
+                            rlistener.startFeature(templ);
+                            if (desc!=null) rlistener.addFeatureProperty(Terms.getFeatureDescTerm(),desc);
+                            seenAFeature = true;
+                        }
+                    }
+                    if (seenAFeature) rlistener.endFeature();
+                } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.getElideSymbols()) {
+                    StringBuffer seq = new StringBuffer();
+                    for (int i = 0 ; i < section.size(); i++) seq.append(((String[])section.get(i))[1]);
+                    try {
+                        SymbolList sl = new SimpleSymbolList(symParser,
+                                seq.toString().replaceAll("\\s+","").replaceAll("[\\.|~]","-"));
+                        rlistener.addSymbols(symParser.getAlphabet(),
+                                (Symbol[])(sl.toList().toArray(new Symbol[0])),
+                                0, sl.length());
+                    } catch (IllegalAlphabetException e) {
+                        String message = ParseException.newMessage(this.getClass(),accession, "", "", sectionToString(section));
+                        throw new ParseException(e, message);
                     }
                 }
-                if (seenAFeature) rlistener.endFeature();
-            } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.getElideSymbols()) {
-                StringBuffer seq = new StringBuffer();
-                for (int i = 0 ; i < section.size(); i++) seq.append(((String[])section.get(i))[1]);
-                try {
-                    SymbolList sl = new SimpleSymbolList(symParser,
-                            seq.toString().replaceAll("\\s+","").replaceAll("[\\.|~]","-"));
-                    rlistener.addSymbols(symParser.getAlphabet(),
-                            (Symbol[])(sl.toList().toArray(new Symbol[0])),
-                            0, sl.length());
-                } catch (Exception e) {
-                    String message = ParseException.newMessage(this.getClass(),accession, "", "", sectionToString(section));
-                    throw new ParseException(e);
-                }
-            }
-        } while (!sectionKey.equals(END_SEQUENCE_TAG));
+            } while (!sectionKey.equals(END_SEQUENCE_TAG));
+        }catch (RuntimeException e){
+            String message = ParseException.newMessage(this.getClass(),accession, "", "", sectionToString(section));
+            throw new ParseException(e, message);
+        }
         
         // Allows us to tolerate trailing whitespace without
         // thinking that there is another Sequence to follow
@@ -820,6 +828,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             }
         } catch (IOException e) {
+            String message = ParseException.newMessage(this.getClass(),accession, "", "", sectionToString(section));
+            throw new ParseException(e, message);
+        } catch (RuntimeException e){
             String message = ParseException.newMessage(this.getClass(),accession, "", "", sectionToString(section));
             throw new ParseException(e, message);
         }
@@ -1066,7 +1077,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             // RN, RP, RC, RX, RG, RA, RT, RL
             StringTools.writeKeyValueLine(REFERENCE_TAG, "["+rdr.getRank()+"]", 5, this.getLineWidth(), null, REFERENCE_TAG, this.getPrintStream());
             if (d.getRemark()!=null)
-            	StringTools.writeKeyValueLine(RP_LINE_TAG, d.getRemark()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
+                StringTools.writeKeyValueLine(RP_LINE_TAG, d.getRemark()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
             // Print out ref position if present
             if (rdr.getStart()!=null && rdr.getEnd()!=null && d.getRemark()!=null && !rppat.matcher(d.getRemark()).matches()) StringTools.writeKeyValueLine(RP_LINE_TAG, "SEQUENCE OF "+rdr.getStart()+"-"+rdr.getEnd()+".", 5, this.getLineWidth(), null, RP_LINE_TAG, this.getPrintStream());
             // RC lines
