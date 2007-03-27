@@ -226,6 +226,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                 StringBuffer sb = new StringBuffer();
                 char[] chars = subLocStr.toCharArray();
                 int bracketCount = 0;
+                try{
                 for (int i = 0; i < chars.length; i++) {
                     char c = chars[i];
                     if (c=='(') bracketCount++;
@@ -235,6 +236,10 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
                         members.add(parseLocString(featureNS,featureAccession,crossRef,parentStrand,subStr));
                         sb.setLength(0); // reset buffer
                     } else sb.append(c);
+                }
+                }catch(RuntimeException e){
+                    String message = ParseException.newMessage(GenbankLocationParser.class, featureAccession, "unknown", "Problem with location format", locStr);
+                    throw new ParseException(message);
                 }
                 if (sb.length()>0) members.add(parseLocString(featureNS,featureAccession,crossRef,parentStrand,sb.toString()));
                 
