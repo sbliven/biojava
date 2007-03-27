@@ -51,10 +51,14 @@ public class UniProtLocationParser {
      * @throws ParseException if the parsing failed.
      */
     public static RichLocation parseLocation(String loc) throws ParseException {
+        try{
         String parts[] = loc.trim().split("\\s+");
         Position startPos = parsePosition(parts[0].trim());
         Position endPos = parsePosition(parts[1].trim());
         return new SimpleRichLocation(startPos,endPos,1,Strand.POSITIVE_STRAND,null);
+        }catch (RuntimeException ex){
+            throw new ParseException(ex, "Cannot parse location: "+loc);
+        }
     }
     
     // O beautiful regex, we worship you.

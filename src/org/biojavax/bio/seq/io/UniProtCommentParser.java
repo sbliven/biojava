@@ -35,7 +35,7 @@ import org.biojavax.Comment;
  * @since 1.5
  */
 public class UniProtCommentParser {
-        
+    
     /**
      * Creates a new instance of UniProtCommentParser.
      */
@@ -107,18 +107,21 @@ public class UniProtCommentParser {
      * @throws ParseException if the comment was not parseable.
      */
     public void parseComment(String c) throws ParseException {
-        if (!isParseable(c)) throw new ParseException("Comment is not a UniProt structured comment");
-        // do the parsing here.
-        c = c.replaceAll("\\s+", " ").trim(); // replace all multi-spaces and newlines with single spaces
-        // our comment is now one long string, -!- TYPE: [prefix: key=value; | key=value; | text]
-        c = c.substring(PREFIX.length()+1); // chomp "-!- "
-        String type = c.substring(0,c.indexOf(':')); // find type
-        this.setCommentType(type); // remember type
-        c = c.substring(c.indexOf(':')+1); // chomp type and colon
-        if (c.endsWith(".")) c=c.substring(0,c.length()-1); // chomp trailing full stop
+        if (!isParseable(c)) throw new ParseException("Comment is not a UniProt structured comment. Comment was "+c);
         
-        // what we have left is the [prefix: key=value; | key=value; | text.] section
-        if (this.getCommentType().equalsIgnoreCase(BIOPHYSICOCHEMICAL_PROPERTIES)) {
+        String comment = new String(c); //keep the original just in case...
+        // do the parsing here.
+        try{
+            c = c.replaceAll("\\s+", " ").trim(); // replace all multi-spaces and newlines with single spaces
+            // our comment is now one long string, -!- TYPE: [prefix: key=value; | key=value; | text]
+            c = c.substring(PREFIX.length()+1); // chomp "-!- "
+            String type = c.substring(0,c.indexOf(':')); // find type
+            this.setCommentType(type); // remember type
+            c = c.substring(c.indexOf(':')+1); // chomp type and colon
+            if (c.endsWith(".")) c=c.substring(0,c.length()-1); // chomp trailing full stop
+            
+            // what we have left is the [prefix: key=value; | key=value; | text.] section
+            if (this.getCommentType().equalsIgnoreCase(BIOPHYSICOCHEMICAL_PROPERTIES)) {
             /*
 CC   -!- BIOPHYSICOCHEMICAL PROPERTIES:
 CC       Absorption:
@@ -135,124 +138,124 @@ CC         free_text;
 CC       Temperature dependence:
 CC         free_text;
              */
-            do {
-                String[] parts = c.split(";");
-                if (parts.length==1) {
-                    // we are one of the last three options on the list
-                    int firstColon = parts[0].indexOf(':');
-                    String key = parts[0].substring(0,firstColon).trim();
-                    String value = parts[0].substring(firstColon+1).trim();
-                    if (key.equalsIgnoreCase("pH dependence")) this.setPHDependence(value);
-                    else if (key.equalsIgnoreCase("Redox potential")) this.setRedoxPotential(value);
-                    else if (key.equalsIgnoreCase("Temperature dependence")) this.setTemperatureDependence(value);
-                    // skip to next chunk
-                    c = c.substring(c.indexOf(";")+1);
-                } else {
-                    // we are one of the first two options on the list
-                    int skippos = -1;
-                    String key = parts[0].split(":")[0].trim();
-                    if (key.equalsIgnoreCase("Absorption")) {
-                        String[] subparts = parts[0].split(":")[1].split("=");
-                        this.setAbsorptionMax(subparts[1].trim());
-                        subparts = parts[1].split("=");
-                        this.setAbsorptionNote(subparts[1].trim());
-                        skippos = 2;
-                    } else if (key.equalsIgnoreCase("Kinetic parameters")) {
-                        int partCount = 0;
-                        String[] subparts = parts[partCount].split(":")[1].split("=");
-                        key = subparts[0].trim();
-                        String value = subparts[1].trim();
-                        while (!key.equalsIgnoreCase("Note")) {
-                            if (key.equalsIgnoreCase("KM")) this.getKMs().add(value);
-                            else if (key.equalsIgnoreCase("VMax")) this.getVMaxes().add(value);
-                            subparts = parts[++partCount].split("=");
+                do {
+                    String[] parts = c.split(";");
+                    if (parts.length==1) {
+                        // we are one of the last three options on the list
+                        int firstColon = parts[0].indexOf(':');
+                        String key = parts[0].substring(0,firstColon).trim();
+                        String value = parts[0].substring(firstColon+1).trim();
+                        if (key.equalsIgnoreCase("pH dependence")) this.setPHDependence(value);
+                        else if (key.equalsIgnoreCase("Redox potential")) this.setRedoxPotential(value);
+                        else if (key.equalsIgnoreCase("Temperature dependence")) this.setTemperatureDependence(value);
+                        // skip to next chunk
+                        c = c.substring(c.indexOf(";")+1);
+                    } else {
+                        // we are one of the first two options on the list
+                        int skippos = -1;
+                        String key = parts[0].split(":")[0].trim();
+                        if (key.equalsIgnoreCase("Absorption")) {
+                            String[] subparts = parts[0].split(":")[1].split("=");
+                            this.setAbsorptionMax(subparts[1].trim());
+                            subparts = parts[1].split("=");
+                            this.setAbsorptionNote(subparts[1].trim());
+                            skippos = 2;
+                        } else if (key.equalsIgnoreCase("Kinetic parameters")) {
+                            int partCount = 0;
+                            String[] subparts = parts[partCount].split(":")[1].split("=");
                             key = subparts[0].trim();
-                            value = subparts[1].trim();
+                            String value = subparts[1].trim();
+                            while (!key.equalsIgnoreCase("Note")) {
+                                if (key.equalsIgnoreCase("KM")) this.getKMs().add(value);
+                                else if (key.equalsIgnoreCase("VMax")) this.getVMaxes().add(value);
+                                subparts = parts[++partCount].split("=");
+                                key = subparts[0].trim();
+                                value = subparts[1].trim();
+                            }
+                            this.setKineticsNote(value);
                         }
-                        this.setKineticsNote(value);
+                        // skip to next chunk
+                        int chunkpos = c.indexOf(parts[skippos]);
+                        c = c.substring(chunkpos);
                     }
-                    // skip to next chunk
-                    int chunkpos = c.indexOf(parts[skippos]);
-                    c = c.substring(chunkpos);
-                }
-                c = c.trim();
-            } while (c.length()>0);
-        } else if (this.getCommentType().equalsIgnoreCase(DATABASE)) {
+                    c = c.trim();
+                } while (c.length()>0);
+            } else if (this.getCommentType().equalsIgnoreCase(DATABASE)) {
             /*
 CC   -!- DATABASE: NAME=Text[; NOTE=Text][; WWW="Address"][; FTP="Address"].
              */
-            c = c.substring(0,c.length()-1); // chomp trailing dot
-            String[] parts = c.split(";");
-            for (int i = 0; i < parts.length; i++) {
-                String[] subparts = parts[i].split("=");
-                String key = subparts[0].trim();
-                String value = subparts[1].trim();
-                if (key.equalsIgnoreCase("NAME")) this.setDatabaseName(value);
-                else if (key.equalsIgnoreCase("NOTE")) this.setNote(value);
-                else if (key.equalsIgnoreCase("WWW") || key.equalsIgnoreCase("FTP")) this.setUri(value);
-            }
-        } else if (this.getCommentType().equalsIgnoreCase(MASS_SPECTROMETRY)) {
+                c = c.substring(0,c.length()-1); // chomp trailing dot
+                String[] parts = c.split(";");
+                for (int i = 0; i < parts.length; i++) {
+                    String[] subparts = parts[i].split("=");
+                    String key = subparts[0].trim();
+                    String value = subparts[1].trim();
+                    if (key.equalsIgnoreCase("NAME")) this.setDatabaseName(value);
+                    else if (key.equalsIgnoreCase("NOTE")) this.setNote(value);
+                    else if (key.equalsIgnoreCase("WWW") || key.equalsIgnoreCase("FTP")) this.setUri(value);
+                }
+            } else if (this.getCommentType().equalsIgnoreCase(MASS_SPECTROMETRY)) {
             /*
 CC   -!- MASS SPECTROMETRY: MW=XXX[; MW_ERR=XX]; METHOD=XX; RANGE=XX-XX[ (Name)]; NOTE={Free text (Ref.n)|Ref.n}.
              */
-            c = c.substring(0,c.length()-1); // chomp trailing dot
-            String[] parts = c.split(";");
-            for (int i = 0; i < parts.length; i++) {
-                String[] subparts = parts[i].split("=");
-                String key = subparts[0].trim();
-                String value = subparts[1].trim();
-                if (key.equalsIgnoreCase("MW")) this.setMolecularWeight(Integer.parseInt(value));
-                else if (key.equalsIgnoreCase("MW_ERR")) this.setMolWeightError(new Integer(value));
-                else if (key.equalsIgnoreCase("METHOD")) this.setMolWeightMethod(value);
-                else if (key.equalsIgnoreCase("RANGE")) {
-                    if (value.indexOf(' ')>-1) value = value.substring(0, value.indexOf(' ')); // drop name
-                    String[] locs = value.split("-");
-                    this.setMolWeightRangeStart(Integer.parseInt(locs[0]));
-                    this.setMolWeightRangeEnd(Integer.parseInt(locs[1]));
-                } else if (key.equalsIgnoreCase("NOTE")) this.setNote(value);
-            }
-        } else if (this.getCommentType().equalsIgnoreCase(INTERACTION)) {
+                c = c.substring(0,c.length()-1); // chomp trailing dot
+                String[] parts = c.split(";");
+                for (int i = 0; i < parts.length; i++) {
+                    String[] subparts = parts[i].split("=");
+                    String key = subparts[0].trim();
+                    String value = subparts[1].trim();
+                    if (key.equalsIgnoreCase("MW")) this.setMolecularWeight(Integer.parseInt(value));
+                    else if (key.equalsIgnoreCase("MW_ERR")) this.setMolWeightError(new Integer(value));
+                    else if (key.equalsIgnoreCase("METHOD")) this.setMolWeightMethod(value);
+                    else if (key.equalsIgnoreCase("RANGE")) {
+                        if (value.indexOf(' ')>-1) value = value.substring(0, value.indexOf(' ')); // drop name
+                        String[] locs = value.split("-");
+                        this.setMolWeightRangeStart(Integer.parseInt(locs[0]));
+                        this.setMolWeightRangeEnd(Integer.parseInt(locs[1]));
+                    } else if (key.equalsIgnoreCase("NOTE")) this.setNote(value);
+                }
+            } else if (this.getCommentType().equalsIgnoreCase(INTERACTION)) {
             /*
 CC   -!- INTERACTION:
 CC       {{SP_Ac:identifier[ (xeno)]}|Self}; NbExp=n; IntAct=IntAct_Protein_Ac, IntAct_Protein_Ac;
              */
-            String[] parts = c.split(";");
-            Interaction interact = null;
-            for (int i = 0; i < parts.length; i++) {
-                String[] subparts = parts[i].split("=");
-                String key = subparts[0].trim();
-                String value = null;
-                if (key.equalsIgnoreCase("Self")) {
-                    // start new self-self interaction
-                    interact = new Interaction();
-                    interact.setID("Self");
-                    interact.setOrganismsDiffer(false);
-                    this.getInteractions().add(interact);
-                } else if (subparts.length==1) {
-                    // start new protein-protein interaction
-                    subparts = key.split(":");
-                    boolean differ = false;
-                    if (subparts[1].indexOf("(xeno)")>-1) {
-                        differ = true;
-                        subparts[1] = subparts[1].substring(0,subparts[1].indexOf("(xeno)"));
-                    }
-                    interact = new Interaction();
-                    interact.setID(subparts[0].trim());
-                    interact.setLabel(subparts[1].trim());
-                    interact.setOrganismsDiffer(differ);
-                    this.getInteractions().add(interact);
-                } else {
-                    value = subparts[1].trim();
-                    // continue existing interaction
-                    if (key.equalsIgnoreCase("NbExp")) interact.setNumberExperiments(Integer.parseInt(value));
-                    else if (key.equalsIgnoreCase("IntAct")) {
-                        subparts = value.split(",");
-                        interact.setFirstIntActID(subparts[0].trim());
-                        interact.setSecondIntActID(subparts[1].trim());
+                String[] parts = c.split(";");
+                Interaction interact = null;
+                for (int i = 0; i < parts.length; i++) {
+                    String[] subparts = parts[i].split("=");
+                    String key = subparts[0].trim();
+                    String value = null;
+                    if (key.equalsIgnoreCase("Self")) {
+                        // start new self-self interaction
+                        interact = new Interaction();
+                        interact.setID("Self");
+                        interact.setOrganismsDiffer(false);
+                        this.getInteractions().add(interact);
+                    } else if (subparts.length==1) {
+                        // start new protein-protein interaction
+                        subparts = key.split(":");
+                        boolean differ = false;
+                        if (subparts[1].indexOf("(xeno)")>-1) {
+                            differ = true;
+                            subparts[1] = subparts[1].substring(0,subparts[1].indexOf("(xeno)"));
+                        }
+                        interact = new Interaction();
+                        interact.setID(subparts[0].trim());
+                        interact.setLabel(subparts[1].trim());
+                        interact.setOrganismsDiffer(differ);
+                        this.getInteractions().add(interact);
+                    } else {
+                        value = subparts[1].trim();
+                        // continue existing interaction
+                        if (key.equalsIgnoreCase("NbExp")) interact.setNumberExperiments(Integer.parseInt(value));
+                        else if (key.equalsIgnoreCase("IntAct")) {
+                            subparts = value.split(",");
+                            interact.setFirstIntActID(subparts[0].trim());
+                            interact.setSecondIntActID(subparts[1].trim());
+                        }
                     }
                 }
-            }
-        } else if (this.getCommentType().equalsIgnoreCase(ALTERNATIVE_PRODUCTS)) {
+            } else if (this.getCommentType().equalsIgnoreCase(ALTERNATIVE_PRODUCTS)) {
             /*
 CC   -!- ALTERNATIVE PRODUCTS:
 CC       Event=Alternative promoter;
@@ -268,70 +271,71 @@ CC         Note=Free text;
 CC       Event=Alternative initiation;
 CC         Comment=Free text;
              */
-            Event event = null;
-            Isoform isoform = null;
-            String[] parts = c.split(";");
-            for (int i = 0; i < parts.length; i++) {
-                String[] subparts = parts[i].split("=");
-                String key = subparts[0].trim();
-                String value = subparts[1].trim();
-                if (key.equalsIgnoreCase("Event")) {
-                    // new event
-                    event = new Event();
-                    this.getEvents().add(event);
-                    event.setType(value);
-                } else if (key.equalsIgnoreCase("Name")) {
-                    // new isoform
-                    isoform = new Isoform();
-                    this.getIsoforms().add(isoform);
-                    isoform.getNames().add(value);
-                } else if (key.equalsIgnoreCase("Synonyms")) {
-                    subparts = value.split(",");
-                    for (int j = 0; j < subparts.length; j++) isoform.getNames().add(subparts[j].trim());
-                } else if (key.equalsIgnoreCase("IsoId")) {
-                    subparts = value.split(",");
-                    for (int j = 0; j < subparts.length; j++) isoform.getIsoIDs().add(subparts[j].trim());
-                } else if (key.equalsIgnoreCase("Sequence")) {
-                    if (value.equalsIgnoreCase("Displayed")) isoform.setSequenceType("Displayed");
-                    else if (value.equalsIgnoreCase("Not described")) isoform.setSequenceType("Not described");
-                    else if (value.equalsIgnoreCase("External")) isoform.setSequenceType("External");
-                    else {
-                        isoform.setSequenceType("Described");
-                        isoform.setSequenceRef(value);
+                Event event = null;
+                Isoform isoform = null;
+                String[] parts = c.split(";");
+                for (int i = 0; i < parts.length; i++) {
+                    String[] subparts = parts[i].split("=");
+                    String key = subparts[0].trim();
+                    String value = subparts[1].trim();
+                    if (key.equalsIgnoreCase("Event")) {
+                        // new event
+                        event = new Event();
+                        this.getEvents().add(event);
+                        event.setType(value);
+                    } else if (key.equalsIgnoreCase("Name")) {
+                        // new isoform
+                        isoform = new Isoform();
+                        this.getIsoforms().add(isoform);
+                        isoform.getNames().add(value);
+                    } else if (key.equalsIgnoreCase("Synonyms")) {
+                        subparts = value.split(",");
+                        for (int j = 0; j < subparts.length; j++) isoform.getNames().add(subparts[j].trim());
+                    } else if (key.equalsIgnoreCase("IsoId")) {
+                        subparts = value.split(",");
+                        for (int j = 0; j < subparts.length; j++) isoform.getIsoIDs().add(subparts[j].trim());
+                    } else if (key.equalsIgnoreCase("Sequence")) {
+                        if (value.equalsIgnoreCase("Displayed")) isoform.setSequenceType("Displayed");
+                        else if (value.equalsIgnoreCase("Not described")) isoform.setSequenceType("Not described");
+                        else if (value.equalsIgnoreCase("External")) isoform.setSequenceType("External");
+                        else {
+                            isoform.setSequenceType("Described");
+                            isoform.setSequenceRef(value);
+                        }
+                    } else if (key.equalsIgnoreCase("Note")) {
+                        isoform.setNote(value);
+                    } else if (key.equalsIgnoreCase("Named isoforms")) {
+                        event.setNamedIsoforms(Integer.parseInt(value));
+                    } else if (key.equalsIgnoreCase("Comment")) {
+                        event.setComment(value);
                     }
-                } else if (key.equalsIgnoreCase("Note")) {
-                    isoform.setNote(value);
-                } else if (key.equalsIgnoreCase("Named isoforms")) {
-                    event.setNamedIsoforms(Integer.parseInt(value));
-                } else if (key.equalsIgnoreCase("Comment")) {
-                    event.setComment(value);
                 }
-            }
-        } else if (this.getCommentType().equalsIgnoreCase(SEQUENCE_CAUTION)) {
+            } else if (this.getCommentType().equalsIgnoreCase(SEQUENCE_CAUTION)) {
             /*
 CC   -!- SEQUENCE_CAUTION: Sequence=Sequence; Type=Type;[ Positions=Positions;][ Note=Note;]
              */
-            SeqCaution seqc = null;
-            c = c.substring(0,c.length()-1); // chomp trailing dot
-            String[] parts = c.split(";");
-            for (int i = 0; i < parts.length; i++) {
-                String[] subparts = parts[i].split("=");
-                String key = subparts[0].trim();
-                String value = subparts[1].trim();
-                if (key.equalsIgnoreCase("SEQUENCE")) {
-                	seqc = new SeqCaution();
-                	this.getSeqCautions().add(seqc);
-                	seqc.setSequence(value);
+                SeqCaution seqc = null;
+                c = c.substring(0,c.length()-1); // chomp trailing dot
+                String[] parts = c.split(";");
+                for (int i = 0; i < parts.length; i++) {
+                    String[] subparts = parts[i].split("=");
+                    String key = subparts[0].trim();
+                    String value = subparts[1].trim();
+                    if (key.equalsIgnoreCase("SEQUENCE")) {
+                        seqc = new SeqCaution();
+                        this.getSeqCautions().add(seqc);
+                        seqc.setSequence(value);
+                    } else if (key.equalsIgnoreCase("TYPE")) seqc.setType(value);
+                    else if (key.equalsIgnoreCase("POSITIONS")) seqc.setPositions(value);
+                    else if (key.equalsIgnoreCase("NOTE")) seqc.setNote(value);
                 }
-                else if (key.equalsIgnoreCase("TYPE")) seqc.setType(value);
-                else if (key.equalsIgnoreCase("POSITIONS")) seqc.setPositions(value);
-                else if (key.equalsIgnoreCase("NOTE")) seqc.setNote(value);
+            } else {
+                // all others are just free text.
+                this.setText(c);
             }
-        } else {
-            // all others are just free text.
-            this.setText(c);
+        }catch(RuntimeException ex){
+            throw new ParseException(ex, "Cannot parse the comment: "+comment);
         }
-        
         // all done
     }
     
@@ -546,9 +550,9 @@ CC         Comment=Free text;
                 }
             }
         } else if (this.getCommentType().equalsIgnoreCase(SEQUENCE_CAUTION)) {
-        	/*
+                /*
 CC   -!- SEQUENCE_CAUTION: Sequence=Sequence; Type=Type;[ Positions=Positions;][ Note=Note;]
-             */
+                 */
             for (Iterator i = this.getSeqCautions().iterator(); i.hasNext(); ) {
                 SeqCaution seqc = (SeqCaution)i.next();
                 sb.append("\n"); // each one starts on a new line
@@ -557,14 +561,14 @@ CC   -!- SEQUENCE_CAUTION: Sequence=Sequence; Type=Type;[ Positions=Positions;][
                 sb.append("; Type=");
                 sb.append(seqc.getType());
                 if (seqc.getPositions()!=null) {
-                	sb.append("; Positions=");
-                	sb.append(seqc.getPositions());
+                    sb.append("; Positions=");
+                    sb.append(seqc.getPositions());
                 }
                 if (this.getNote()!=null) {
-                	sb.append("; Note=");
-                	sb.append(seqc.getNote());
+                    sb.append("; Note=");
+                    sb.append(seqc.getNote());
                 }
-                sb.append(";");  
+                sb.append(";");
             }
         } else {
             // just append free text for all others.
@@ -1435,75 +1439,75 @@ CC   -!- SEQUENCE_CAUTION: Sequence=Sequence; Type=Type;[ Positions=Positions;][
      */
     public static class SeqCaution {
         
-    	private String sequence;
-    	
-    	private String type;
-    	
-    	private String positions;
-    	
-    	private String note;
-    	
+        private String sequence;
+        
+        private String type;
+        
+        private String positions;
+        
+        private String note;
+        
         /**
          * Creates a new instance.
          */
         public SeqCaution() {
         }
-
-		/**
-		 * @return the note
-		 */
-		public String getNote() {
-			return note;
-		}
-
-		/**
-		 * @param note the note to set
-		 */
-		public void setNote(String note) {
-			this.note = note;
-		}
-
-		/**
-		 * @return the positions
-		 */
-		public String getPositions() {
-			return positions;
-		}
-
-		/**
-		 * @param positions the positions to set
-		 */
-		public void setPositions(String positions) {
-			this.positions = positions;
-		}
-
-		/**
-		 * @return the sequence
-		 */
-		public String getSequence() {
-			return sequence;
-		}
-
-		/**
-		 * @param sequence the sequence to set
-		 */
-		public void setSequence(String sequence) {
-			this.sequence = sequence;
-		}
-
-		/**
-		 * @return the type
-		 */
-		public String getType() {
-			return type;
-		}
-
-		/**
-		 * @param type the type to set
-		 */
-		public void setType(String type) {
-			this.type = type;
-		}
+        
+        /**
+         * @return the note
+         */
+        public String getNote() {
+            return note;
+        }
+        
+        /**
+         * @param note the note to set
+         */
+        public void setNote(String note) {
+            this.note = note;
+        }
+        
+        /**
+         * @return the positions
+         */
+        public String getPositions() {
+            return positions;
+        }
+        
+        /**
+         * @param positions the positions to set
+         */
+        public void setPositions(String positions) {
+            this.positions = positions;
+        }
+        
+        /**
+         * @return the sequence
+         */
+        public String getSequence() {
+            return sequence;
+        }
+        
+        /**
+         * @param sequence the sequence to set
+         */
+        public void setSequence(String sequence) {
+            this.sequence = sequence;
+        }
+        
+        /**
+         * @return the type
+         */
+        public String getType() {
+            return type;
+        }
+        
+        /**
+         * @param type the type to set
+         */
+        public void setType(String type) {
+            this.type = type;
+        }
         
     }
 }
