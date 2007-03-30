@@ -389,7 +389,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 String val = ((String[])section.get(0))[1];
                 val = val.substring(0,val.length()-1); // chomp dot
                 String[] kws = val.split(";");
-                for (int i = 1; i < kws.length; i++) {
+                for (int i = 0; i < kws.length; i++) {
                     rlistener.addSequenceProperty(Terms.getKeywordTerm(), kws[i].trim());
                 }
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
@@ -570,7 +570,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                                 if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism);
                             } catch (ChangeVetoException e) {
                                 String message = ParseException.newMessage(this.getClass(),accession,"not set", "",sectionToString(section));
-                                throw new ParseException(e);
+                                throw new ParseException(message);
                             }
                         } else {
                             if (key.equalsIgnoreCase("translation")) {
@@ -652,7 +652,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 line = br.readLine();
                 if (line.length()<2) {
                     String message = ParseException.newMessage(this.getClass(),accession,"not set", "Bad line found",line);
-                    throw new ParseException("Bad line found: "+line);
+                    throw new ParseException(message);
                 }
                 String token = line.substring(0,2);
                 // READ SEQUENCE SECTION
@@ -744,7 +744,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 else if (token.equals(CONTIG_TAG)) {
                     //      exception = don't know how to do contigs yet
                     String message = ParseException.newMessage(this.getClass(),accession,"not set", "Unable to handle contig assemblies just yet",sectionToString(section));
-                    throw new ParseException("message");
+                    throw new ParseException(message);
                 }
                 // READ DOCREF
                 else if (token.equals(DATABASE_XREF_TAG)) {
@@ -796,7 +796,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             }
         } catch (IOException e) {
             String message = ParseException.newMessage(this.getClass(),accession,"not set", "Unable to handle TPAs just yet",sectionToString(section));
-            throw new ParseException(e);
+            throw new ParseException(message);
         }
         return section;
     }
@@ -1088,7 +1088,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     oCount++;
             }
         }
-        this.getPrintStream().print(START_SEQUENCE_TAG+"   "+rs.length()+" BP; ");
+        this.getPrintStream().print(START_SEQUENCE_TAG+"   Sequence "+rs.length()+" BP; ");
         this.getPrintStream().print(aCount + " A; ");
         this.getPrintStream().print(cCount + " C; ");
         this.getPrintStream().print(gCount + " G; ");
