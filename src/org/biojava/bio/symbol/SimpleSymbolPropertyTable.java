@@ -67,6 +67,10 @@ public class SimpleSymbolPropertyTable implements SymbolPropertyTable {
         source.validate(s);
         
         Double  value = (Double)doublePropMap.get(s);
+        if(value==null) {
+            throw new IllegalSymbolException(
+                    "Symbol " + s.getName() + " not found in property table " + this.getName());
+        }
         return  value.doubleValue();
     }
 }

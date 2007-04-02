@@ -1410,7 +1410,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         // sequence
         int mw = 0;
         try {
-            mw = (int)MassCalc.getMass(rs, SymbolPropertyTable.AVG_MASS, false);
+            mw = (int)MassCalc.getMolecularWeight(rs);
         } catch (IllegalSymbolException e) {
             throw new RuntimeException("Found illegal symbol", e);
         }

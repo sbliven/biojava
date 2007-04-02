@@ -32,6 +32,9 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
@@ -43,10 +46,12 @@ import org.biojava.bio.symbol.SymbolPropertyTable;
  * <code>Symbol</code>sfrom the protein <code>Alphabet</code>. It uses
  * the mono-isotopic and average-isotopic masses identical to those
  * specified at www.micromass.co.uk
+ * Note: This class does not handle selenocysteine and pyrrolysine.
  *
  * @author M. Jones sdfsd
  * @author Keith James (minor changes)
  * @author Mark Schreiber
+ * @author George Waldon - getEstimatedMass
  */
 public class MassCalc {
     //Possibly these should be put in a configurable table somewhere
@@ -136,6 +141,9 @@ public class MassCalc {
         for(; symbolList.hasNext(); )
         {
             Symbol sym = (Symbol) symbolList.next();
+            //SELENOCYSTEINE and PYRROLYSINE
+            if(sym==ProteinTools.o() || sym==ProteinTools.u())
+                continue;
             try {
                 try {
                     Double value =
@@ -240,7 +248,64 @@ public class MassCalc {
         }
      }
 
+     /** Calculate the molecular weight of a protein, making estimates whenever it is 
+      * possible like averaging mass values for ambiguity symbols or counting
+      * zero when gaps are encountered. 
+      * The method is tolerant for ambiguity symbols as long as they can be
+      * resolved to a series of atomic symbols whose mass is available in the 
+      * ResidueProperties.xml configuration file or they are gaps.
+      * The method returns the same value as getMass(SymbolList proteinSeq,
+      * SymbolPropertyTable.AVG_MASS, false) when only atomic symbols are found
+      * in the polypeptide.
+      *
+      * @since 1.5
+      */
+     public static final double getMolecularWeight(SymbolList proteinSeq)
+     throws IllegalSymbolException {
+        double pepMass = 0.0;
+        Symbol gap = AlphabetManager.alphabetForName("PROTEIN").getGapSymbol();
+        SymbolPropertyTable sPT =
+            ProteinTools.getSymbolPropertyTable(SymbolPropertyTable.AVG_MASS);
 
+        for (Iterator it = proteinSeq.iterator(); it.hasNext(); ) {
+            Symbol s = (Symbol) it.next();
+            if( s instanceof AtomicSymbol) {
+                pepMass += sPT.getDoubleValue(s);
+            } else {
+                FiniteAlphabet matches = (FiniteAlphabet) s.getMatches();
+                if(matches.size() == 0) {
+                    if(s.equals(gap)) {
+                        continue;
+                    }
+                    throw new IllegalSymbolException(
+                        "Symbol " + s.getName() + " has no mass associated");
+                } else {
+                    int count = 0;
+                    double mass = 0.0;
+                    for(Iterator i = matches.iterator(); i.hasNext(); ) {
+                        AtomicSymbol as = (AtomicSymbol) i.next();
+                        //SELENOCYSTEINE and PYRROLYSINE
+                        if(as==ProteinTools.o() ||
+                                as==ProteinTools.u())
+                            continue;
+                        mass += sPT.getDoubleValue(as);
+                        count++;
+                    }
+                    pepMass += mass/((double)count);
+                }
+            }
+        }
+
+        //Calculate hydroxyl mass
+        double termMass = calcTermMass(SymbolPropertyTable.AVG_MASS, false);
+
+        if (pepMass != 0.0) {
+            pepMass += termMass;
+        }
+
+        return pepMass;
+     }
+     
     /**
      * <code>getMass</code> calculates the mass of this peptide. This
      * only works for the values in the ResidueProperties.xml
@@ -264,9 +329,9 @@ public class MassCalc {
      * <code>SymbolList</code> contains illegal
      * <code>Symbol</code>s.
      */
-    public static final double getMass(SymbolList proteinSeq,
-                                       String isotopicType,
-                                       boolean MH_PLUS)
+     public static final double getMass(SymbolList proteinSeq,
+             String isotopicType,
+             boolean MH_PLUS)
         throws IllegalSymbolException
     {
 
@@ -276,7 +341,12 @@ public class MassCalc {
             ProteinTools.getSymbolPropertyTable(isotopicType);
 
         for (Iterator it = proteinSeq.iterator(); it.hasNext(); ) {
-            pepMass += sPT.getDoubleValue((Symbol) it.next());
+            Symbol s = (Symbol) it.next();
+            if(!(s instanceof AtomicSymbol)) {
+                throw new IllegalSymbolException(
+                    "Symbol " + s.getName() + " is not atomic");
+            }
+            pepMass += sPT.getDoubleValue(s);
         }
 
         //Calculate hydroxyl mass

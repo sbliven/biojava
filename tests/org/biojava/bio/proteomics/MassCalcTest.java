@@ -37,6 +37,7 @@ import org.biojava.bio.symbol.SymbolPropertyTable;
  * <code>MassCalcTest</code> tests molecular mass calculation.
  *
  * @author Keith James
+ * @author George Waldon - EstimatedMass
  */
 public class MassCalcTest extends TestCase
 {
@@ -66,7 +67,27 @@ public class MassCalcTest extends TestCase
     {
         super(name);
     }
-
+    
+    public void testStaticgetMolecularWeight() {
+      try {
+        SymbolList pro = ProteinTools.createProtein("arndceqghilkmfpstwyv");
+        double m1 = MassCalc.getMolecularWeight(pro);
+        double m2 = MassCalc.getMass(pro,SymbolPropertyTable.AVG_MASS,false);
+        assertTrue(m1==m2);
+        
+        SymbolList proX = ProteinTools.createProtein("xxxxxxxxxxxxxxxxxxxx");
+        double m3 = MassCalc.getMolecularWeight(proX);
+        assertTrue( Math.abs(m3-m1)<0.000000000001 );
+        
+        SymbolList proX2 = ProteinTools.createProtein("xxxxxx-xxxxxxxxxxxxxx");
+        double m4 = MassCalc.getMolecularWeight(proX2);
+        assertTrue( Math.abs(m4-m1)<0.000000000001 );
+        
+      } catch (IllegalSymbolException ex) {
+            fail(ex.getMessage());
+      } 
+    }
+    
     /**
      * <code>testStaticGetMass</code> tests the static
      * <code>getMass</code> method.
@@ -202,4 +223,5 @@ public class MassCalcTest extends TestCase
         fail(ex.getMessage());
       }
     }
+
 }
