@@ -39,7 +39,9 @@ import org.biojava.utils.math.ComputeObject;
  * class that computes isoelectric point for proteins
  *
  * @author David Huen
+ * @author George Waldon
  * @since 1.22
+ *
  */
 public class IsoelectricPointCalc
 {
@@ -54,28 +56,21 @@ public class IsoelectricPointCalc
         SymbolPropertyTable pKTable = ProteinTools.getSymbolPropertyTable(SymbolPropertyTable.PK);
 
         Iterator aaSyms = ProteinTools.getAlphabet().iterator();
-
-        try {
-            // iterate thru' all AA symbols and cache the non-zero pKs
-            while (aaSyms.hasNext()) {
-                Symbol sym = (Symbol) aaSyms.next();
-
-                // only cache symbols that have a non-zero pK
-                try {
+        
+        // iterate thru' all AA symbols and cache the non-zero pKs
+        while (aaSyms.hasNext()) {
+            Symbol sym = (Symbol) aaSyms.next();
+            
+            // only cache symbols that have a non-zero pK
+            try {
                 double pK = pKTable.getDoubleValue(sym);
-                    if (Math.abs(pK) > 0.01) {
-                        pKCache.put(sym, new Double(pK));
-                    }
+                if (Math.abs(pK) > 0.01) {
+                    pKCache.put(sym, new Double(pK));
                 }
-                catch (NullPointerException npe) {
-                    // SimpleSymbolPropertyTable throws this if there is no value for the symbol
-                    // just ignore.
-                }        
+            } catch (IllegalSymbolException ise) {
+                // SimpleSymbolPropertyTable throws this if there is no value for the symbol
+                // just ignore.
             }
-        }
-        catch (IllegalSymbolException ise) {
-            // shouldn't happen!
-                ise.printStackTrace();
         }
     }
 
@@ -199,6 +194,23 @@ public class IsoelectricPointCalc
             // not a peptide
             throw new IllegalAlphabetException();
         }
+    }
+    
+    private static IsoelectricPointCalc calculator;
+    
+    /** Static public method to compute the pI for a given polypeptide. Various
+     * ambiguity symbols, symbols for which pK data are not available, or 
+     * illegal symbols are given a pK of value zero.
+     *
+     * @since 1.5
+     */
+    public static double getIsoelectricPoint(SymbolList peptide, 
+            boolean hasFreeNTerm, boolean hasFreeCTerm) 
+    throws IllegalAlphabetException, BioException {
+        if(calculator==null) {
+            calculator = new IsoelectricPointCalc();
+        }
+        return calculator.getPI(peptide,hasFreeNTerm,hasFreeCTerm);
     }
 }
 
