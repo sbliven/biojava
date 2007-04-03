@@ -26,6 +26,7 @@
  */
 
 package org.biojavax;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -60,7 +61,9 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
      * {@inheritDoc}
      */
     public void clear() throws ChangeVetoException{ 
-        for(Iterator i = this.notes.iterator(); i.hasNext(); ){
+    	// Use copy of list in order to prevent concurrent modifications.
+    	// Fix for bug #2258.
+        for(Iterator i = (new ArrayList(this.notes)).iterator(); i.hasNext(); ){
             this.removeNote((Note)i.next());
         }
     }

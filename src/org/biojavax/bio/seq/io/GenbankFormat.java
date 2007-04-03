@@ -665,6 +665,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         String udat = "";
         String lengthType = "bp";
         String moltype = rs.getAlphabet().getName();
+        if ("PROTEIN_TERM".equals(moltype))
+        	moltype = null;
         StringBuffer keywords = new StringBuffer();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();

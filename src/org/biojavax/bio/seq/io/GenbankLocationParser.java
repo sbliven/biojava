@@ -127,7 +127,7 @@ J00194:100..202           Points to bases 100 to 202, inclusive, in the entry
          
          */
         
-        rank = 1;
+        rank = 0;
         return parseLocString(featureNS, featureAccession, null, Strand.POSITIVE_STRAND, locationString);
     }
     

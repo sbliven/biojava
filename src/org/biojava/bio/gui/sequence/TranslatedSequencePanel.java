@@ -82,6 +82,7 @@ import org.biojava.utils.Changeable;
  * @author Keith James
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Jolyon Holdstock
  * @since 1.2
  */
 public class TranslatedSequencePanel extends JComponent
@@ -703,20 +704,18 @@ public class TranslatedSequencePanel extends JComponent
         }
 
          Rectangle2D.Double clip = new Rectangle2D.Double();
-
-         if (direction == HORIZONTAL)
-         {
-             // Clip x to edge of delegate renderer's leader
-             clip.x = renderer.getMinimumLeader(this);
-             clip.y = 0.0;
-             // Set the width to visible symbols + the delegate
-             // renderer's minimum trailer (which may have something in
-             // it to render).
-             clip.width = sequenceToGraphics(getVisibleSymbolCount() + 1)
-                 + renderer.getMinimumTrailer(this);
-             clip.height = renderer.getDepth(this);
-
-             g2.translate(leadingBorder.getSize() + insets.left, insets.top);
+         if (direction == HORIZONTAL) {
+        	  // Clip x to edge of delegate renderer's leader
+        	  //clip.x = renderer.getMinimumLeader(this);
+        	  clip.x = 0 - renderer.getMinimumLeader(this);
+        	  clip.y = 0.0;
+        	  // Set the width to visible symbols + the delegate
+        	  // renderer's minimum trailer (which may have something in
+        	  // it to render).
+        	  clip.width = sequenceToGraphics(getVisibleSymbolCount() + 1) +
+        	renderer.getMinimumLeader(this) + renderer.getMinimumTrailer(this);
+        	  clip.height = renderer.getDepth(this);
+        	  g2.translate(leadingBorder.getSize() - clip.x + insets.left, insets.top); 
          }
          else
          {

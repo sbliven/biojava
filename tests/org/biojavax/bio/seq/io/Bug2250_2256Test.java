@@ -20,16 +20,17 @@ import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RichObjectFactory;
+import org.biojavax.bio.seq.RichFeature;
+import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
-import org.biojavax.bio.seq.io.GenbankFormat;
-import org.biojavax.bio.seq.io.SimpleRichSequenceBuilder;
 import org.biojavax.bio.seq.io.GenbankFormat.Terms;
 
 /**
- * Test for locus line parsing bug #2250
+ * Test for locus line parsing bug #2250 and #2256
  * @author Mark Schreiber
+ * @author Richard Holland
  */
-public class Bug2250Test extends TestCase{
+public class Bug2250_2256Test extends TestCase{
     private GenbankFormat gbFormat;
 
     /**
@@ -44,14 +45,14 @@ public class Bug2250Test extends TestCase{
     }    
 
     
-    /** Creates a new instance of Bug2250Test */
-    public Bug2250Test() {
+    /** Creates a new instance of Bug2250_2256Test */
+    public Bug2250_2256Test() {
     }
     
     /**
      * Mainly tests the parsing of the locus line.
      */
-    public void testBug2250(){
+    public void testBug2250_2256(){
         String filename = "/files/AL121964.gb";
         RichSequence seq = readFile(filename);
         
@@ -71,6 +72,8 @@ public class Bug2250Test extends TestCase{
         assertEquals("18-MAY-2005", udat);
         assertNotNull(molType);
         assertEquals("DNA", molType);
+        assertEquals(1,
+        		((RichLocation)((RichFeature)seq.getFeatureSet().iterator().next()).getLocation()).getRank());
     }
     
     /**
