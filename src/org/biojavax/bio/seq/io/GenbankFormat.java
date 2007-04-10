@@ -383,26 +383,12 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         String key = ((String[])section.get(i))[0];
                         String val = ((String[])section.get(i))[1];
                         if (key.equals(AUTHORS_TAG)) authors = val;
-                        if (key.equals(CONSORTIUM_TAG)) consortium = val;
-                        if (key.equals(TITLE_TAG)) title = val;
-                        if (key.equals(JOURNAL_TAG)) journal = val;
-                        if (key.equals(MEDLINE_TAG)) medline = val;
-                        if (key.equals(PUBMED_TAG)) pubmed = val;
-                        if (key.equals(REMARK_TAG)) remark = val;
-                    }
-                    // create the pubmed crossref and assign to the bioentry
-                    CrossRef pcr = null;
-                    if (pubmed!=null) {
-                        pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed, new Integer(0)});
-                        RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
-                        rlistener.setRankedCrossRef(rpcr);
-                    }
-                    // create the medline crossref and assign to the bioentry
-                    CrossRef mcr = null;
-                    if (medline!=null) {
-                        mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline, new Integer(0)});
-                        RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
-                        rlistener.setRankedCrossRef(rmcr);
+                        else if (key.equals(CONSORTIUM_TAG)) consortium = val;
+                        else if (key.equals(TITLE_TAG)) title = val;
+                        else if (key.equals(JOURNAL_TAG)) journal = val;
+                        else if (key.equals(MEDLINE_TAG)) medline = val;
+                        else if (key.equals(PUBMED_TAG)) pubmed = val;
+                        else if (key.equals(REMARK_TAG)) remark = val;
                     }
                     // create the docref object
                     try {
@@ -412,8 +398,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         // Create docref.
                         DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{DocRefAuthor.Tools.parseAuthorString(authors),journal,title});
                         // assign either the pubmed or medline to the docref - medline gets priority
-                        if (mcr!=null) dr.setCrossref(mcr);
-                        else if (pcr!=null) dr.setCrossref(pcr);
+                        if (medline!=null) dr.setCrossref((CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline, new Integer(0)}));
+                        else if (pubmed!=null) dr.setCrossref((CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed, new Integer(0)}));
                         // assign the remarks
                         if (!this.getElideComments()) dr.setRemark(remark);
                         // assign the docref to the bioentry: null if no base ranges, Integers if 1 base range - the normal case, joined RichLocation if more than 1

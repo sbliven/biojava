@@ -48,7 +48,6 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.SymbolPropertyTable;
 import org.biojava.ontology.Term;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Comment;
@@ -72,7 +71,6 @@ import org.biojavax.SimpleRichAnnotation;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
-import org.biojavax.bio.seq.io.GenbankFormat.Terms;
 import org.biojavax.bio.taxa.NCBITaxon;
 import org.biojavax.bio.taxa.SimpleNCBITaxon;
 import org.biojavax.ontology.ComparableTerm;
@@ -524,27 +522,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             }
                         }
                     }
-                    // create the pubmed crossref and assign to the bioentry
-                    CrossRef pcr = null;
-                    if (pubmed!=null) {
-                        pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed, new Integer(0)});
-                        RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
-                        rlistener.setRankedCrossRef(rpcr);
-                    }
-                    // create the medline crossref and assign to the bioentry
-                    CrossRef mcr = null;
-                    if (medline!=null) {
-                        mcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline, new Integer(0)});
-                        RankedCrossRef rmcr = new SimpleRankedCrossRef(mcr, 0);
-                        rlistener.setRankedCrossRef(rmcr);
-                    }
-                    // create the doi crossref and assign to the bioentry
-                    CrossRef dcr = null;
-                    if (doi!=null) {
-                        dcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.DOI_KEY, doi, new Integer(0)});
-                        RankedCrossRef rdcr = new SimpleRankedCrossRef(dcr, 0);
-                        rlistener.setRankedCrossRef(rdcr);
-                    }
+                    
                     // create the docref object
                     try {
                         List auths = null;
@@ -555,9 +533,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         }
                         DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{auths,locator,title});
                         // assign either the pubmed or medline to the docref - medline gets priority, then pubmed, then doi
-                        if (mcr!=null) dr.setCrossref(mcr);
-                        else if (pcr!=null) dr.setCrossref(pcr);
-                        else if (dcr!=null) dr.setCrossref(dcr);
+                        if (medline!=null) dr.setCrossref((CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.MEDLINE_KEY, medline, new Integer(0)}));
+                        else if (pubmed!=null) dr.setCrossref((CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, pubmed, new Integer(0)}));
+                        else if (doi!=null) dr.setCrossref((CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.DOI_KEY, doi, new Integer(0)}));
                         // assign the remarks
                         if (!this.getElideComments()) dr.setRemark(remark);
                         // assign the docref to the bioentry
