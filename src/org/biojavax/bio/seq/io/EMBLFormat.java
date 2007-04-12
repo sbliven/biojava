@@ -401,7 +401,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 CrossRef crossRef = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{parts[0].trim(),parts[1].trim(), new Integer(0)});
                 // assign remaining bits of info as annotations
                 for (int j = 2; j < parts.length; j++) {
-                    Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j);
+                    Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j-1);
                     try {
                         ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
                     } catch (ChangeVetoException ce) {

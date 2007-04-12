@@ -1633,7 +1633,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     String val = attributes.getValue(i);
                     if (name.equals(VALUE_ATTR)) id = val;
                 }
-                Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),id,0);
+                Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),id,1);
                 try {
                     int last = this.currDBXrefs.size();
                     ((RichAnnotation)((CrossRef)this.currDBXrefs.get(last-1)).getAnnotation()).addNote(note);

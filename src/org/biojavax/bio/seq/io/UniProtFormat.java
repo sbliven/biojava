@@ -429,7 +429,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     // assign remaining bits of info as additional accession annotations
                     for (int j = 2; j < parts.length; j++) {
                         ComparableTerm t = (ComparableTerm)Terms.getAdditionalAccessionTerm();
-                        Note note = new SimpleNote(t,parts[j].trim(),j);
+                        Note note = new SimpleNote(t,parts[j].trim(),j-1);
                         try {
                             ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
                         } catch (ChangeVetoException ce) {
