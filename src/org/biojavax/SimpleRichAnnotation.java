@@ -48,6 +48,7 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  * Simple annotation wrapper. All non-Note annotations get a rank of zero.
  * @author Richard Holland
+ * @author George Waldon - adapted note change firing
  * @since 1.5
  */
 public class SimpleRichAnnotation extends AbstractChangeable implements RichAnnotation {
@@ -85,6 +86,8 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     /**
      * {@inheritDoc}
+     * In case the note was already here, a call to ChangeEvent.getPrevious()
+     * in the firePostChangeEvent method will return a copy of the original note.
      */
     public void addNote(Note note) throws ChangeVetoException {
         if (note==null) throw new IllegalArgumentException("Note cannot be null");
@@ -100,7 +103,24 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
             ChangeSupport cs = this.getChangeSupport(Annotatable.ANNOTATION);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                this.notes.add(note);
+                boolean change = this.notes.add(note);
+                if(!change) {
+                    Note current = null;
+                    Iterator it = notes.iterator();
+                    while(it.hasNext()) {
+                        current = (Note)it.next();
+                        if(note.equals(current))
+                            break;
+                    }
+                    Note clone = new SimpleNote(current.getTerm(),current.getValue(),current.getRank());
+                    current.setValue(note.getValue()); //will fire Note.VALUE
+                    ce = new ChangeEvent(
+                    this,
+                    Annotatable.ANNOTATION,
+                    current,
+                    clone
+                    );
+                }
                 cs.firePostChangeEvent(ce);
             }
         }
@@ -178,6 +198,8 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     /**
      * {@inheritDoc}
+     * In case the note is not found, a call to ChangeEvent.getPrevious()
+     * in the firePostChangeEvent method will return null.
      */
     public void removeNote(Note note) throws ChangeVetoException {
         if (note==null) throw new IllegalArgumentException("Note cannot be null");
@@ -193,7 +215,14 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
             ChangeSupport cs = this.getChangeSupport(Annotatable.ANNOTATION);
             synchronized(cs) {
                 cs.firePreChangeEvent(ce);
-                this.notes.remove(note);
+                boolean removed = this.notes.remove(note);
+                if(!removed)
+                    ce = new ChangeEvent(
+                    this,
+                    Annotatable.ANNOTATION,
+                    null,
+                    null
+                    );
                 cs.firePostChangeEvent(ce);
             }
         }

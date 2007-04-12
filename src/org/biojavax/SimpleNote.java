@@ -30,6 +30,7 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  * Simple implementation of Note.
  * @author Richard Holland
+ * @author George Waldon - limited firing
  * @since 1.5
  */
 public class SimpleNote extends AbstractChangeable implements Note {
@@ -64,6 +65,8 @@ public class SimpleNote extends AbstractChangeable implements Note {
      */
     public void setTerm(ComparableTerm term) throws ChangeVetoException {
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
+        if(this.term.equals(term))
+            return;
         if(!this.hasListeners(Note.TERM)) {
             this.term = term;
         } else {
@@ -91,6 +94,9 @@ public class SimpleNote extends AbstractChangeable implements Note {
      * {@inheritDoc}
      */
     public void setValue(String value) throws ChangeVetoException {
+        if(this.value!=null && this.value.equals(value)) return;
+        else if(this.value==null && value==null) return;
+        
         if(!this.hasListeners(Note.VALUE)) {
             this.value = value;
         } else {
@@ -118,6 +124,8 @@ public class SimpleNote extends AbstractChangeable implements Note {
      * {@inheritDoc}
      */
     public void setRank(int rank) throws ChangeVetoException {
+        if(this.rank==rank) 
+            return;
         if(!this.hasListeners(Note.RANK)) {
             this.rank = rank;
         } else {

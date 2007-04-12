@@ -34,6 +34,7 @@ import org.biojavax.utils.CRC64Checksum;
  * A basic DocRef implementation.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @author George Waldon
  * @since 1.5
  */
 
@@ -82,6 +83,9 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
      * {@inheritDoc}
      */
     public void setRemark(String remark) throws ChangeVetoException {
+        if(this.remark!=null && this.remark.equals(remark)) return;
+        else if(this.remark==null && remark==null) return;
+                
         if(!this.hasListeners(DocRef.REMARK)) {
             this.remark = remark;
         } else {
@@ -107,6 +111,9 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
      * {@inheritDoc}
      */
     public void setCrossref(CrossRef crossref) throws ChangeVetoException {
+        if(this.crossref!=null && this.crossref.equals(crossref)) return;
+        else if(this.crossref==null && crossref==null) return;
+        
         if(!this.hasListeners(DocRef.CROSSREF)) {
             this.crossref = crossref;
         } else {
