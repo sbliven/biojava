@@ -30,7 +30,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Richard Holland
  * @since 1.5
  */
-public interface RichFeatureHolder extends FeatureHolder {
+public interface RichFeatureRelationshipHolder extends FeatureHolder {
     
     /**
      * Adds a relationship to this feature holder.

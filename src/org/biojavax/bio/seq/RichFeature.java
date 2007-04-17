@@ -42,7 +42,7 @@ import org.biojavax.SimpleRichAnnotation;
  * @author Richard Holland
  * @since 1.5
  */
-public interface RichFeature extends StrandedFeature,RankedCrossRefable,RichAnnotatable,RichFeatureHolder,Comparable {
+public interface RichFeature extends StrandedFeature,RankedCrossRefable,RichAnnotatable,RichFeatureRelationshipHolder,Comparable {
     
     public static final ChangeType NAME = new ChangeType(
             "This feature's name has changed",
