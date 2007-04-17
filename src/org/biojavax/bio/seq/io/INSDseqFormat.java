@@ -643,8 +643,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 	}
                 	boolean iscomp = rl.getStrand().equals(RichLocation.Strand.NEGATIVE_STRAND);
                 	boolean interbp = 
-                		rl.getMinPosition().getType().equals(Position.BETWEEN_BASES) || 
-                		rl.getMaxPosition().getType().equals(Position.BETWEEN_BASES);
+                		(rl.getMinPosition().getType()!=null && rl.getMinPosition().getType().equals(Position.BETWEEN_BASES)) || 
+                		(rl.getMaxPosition().getType()!=null && rl.getMaxPosition().getType().equals(Position.BETWEEN_BASES));
                 	if (first && rl.getMinPosition().getFuzzyStart()) partial5 = true;
                 	if (!j.hasNext() && rl.getMaxPosition().getFuzzyEnd()) partial3 = true;
                 	first = false;
@@ -930,10 +930,9 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 } else if (qName.equals(XREF_ID_TAG) && !this.parent.getElideReferences()) {
                     currRefXrefID = val;
                 } else if (qName.equals(XREF_TAG) && !this.parent.getElideReferences()) {
-                	CrossRef xr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{
-                			RichObjectFactory.getDefaultOntology().getOrCreateTerm(currRefXrefDBName), 
-                			currRefXrefID, new Integer(0)});
-                        currRefXrefs.add(xr);
+                    CrossRef xr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{
+                        currRefXrefDBName,currRefXrefID, new Integer(0)});
+                    currRefXrefs.add(xr);
                 } else if (qName.equals(PUBMED_TAG) && !this.parent.getElideReferences()) {
                     currRefPubmed = val;
                 } else if (qName.equals(REMARK_TAG) && !this.parent.getElideReferences() && !this.parent.getElideComments()) {
