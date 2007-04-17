@@ -460,20 +460,20 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         String val = ((String[])section.get(i))[1];
                         //System.err.println(key+": "+val);
                         if (key.equals(AUTHORS_TAG)) {
-                            if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                            if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
                             authors = val;
                         }
                         if (key.equals(CONSORTIUM_TAG)) {
-                            if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
+                            if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
                             consortium = val;
                         }
                         if (key.equals(TITLE_TAG)) {
-                            if (val.endsWith(";")) val = val.trim().substring(0, val.length()-1); // chomp semicolon
-                            if (val.endsWith("\"")) val = val.trim().substring(1, val.length()-2); // chomp quotes
+                            if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
+                            if (val.endsWith("\"")) val = val.substring(1, val.length()-1); // chomp quotes
                             title = val;
                         }
                         if (key.equals(LOCATION_TAG)) {
-                            if (val.endsWith(".")) val = val.trim().substring(0, val.length()-1); // chomp dot
+                            if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
                             locator = val;
                         }
                         if (key.equals(REFERENCE_XREF_TAG)) {
@@ -963,12 +963,12 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         
         // entryname  dataclass; [circular] molecule; division; sequencelength BP.
         StringBuffer locusLine = new StringBuffer();
-        locusLine.append(StringTools.rightPad(rs.getName()+"_"+rs.getDivision(),11));
+        locusLine.append(StringTools.rightPad(rs.getName()+"_"+rs.getDivision(),12));
         locusLine.append(" ");
-        locusLine.append(StringTools.leftPad(dataclass,12));
+        locusLine.append(StringTools.leftPad(dataclass,19));
         //locusLine.append(";      PRT; "); //Uniprot no longer uses the PRT;
-        locusLine.append(";           ");
-        locusLine.append(StringTools.leftPad(""+rs.length(),5));
+        locusLine.append("; ");
+        locusLine.append(StringTools.leftPad(""+rs.length(),11));
         locusLine.append(" AA.");
         StringTools.writeKeyValueLine(LOCUS_TAG, locusLine.toString(), 5, this.getLineWidth(), null, LOCUS_TAG, this.getPrintStream());
         
@@ -1187,8 +1187,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             }
             String kw = f.getTypeTerm().getName();
             String leader = StringTools.rightPad(kw,8)+" "+UniProtLocationParser.writeLocation((RichLocation)f.getLocation());
-            StringTools.writeKeyValueLine(FEATURE_TAG+"   "+leader, desc+".", 29, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
-            if (ftid!=null) StringTools.writeKeyValueLine(FEATURE_TAG, "/FTId="+ftid+".", 29, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(FEATURE_TAG+"   "+leader, desc+".", 34, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
+            if (ftid!=null) StringTools.writeKeyValueLine(FEATURE_TAG, "/FTId="+ftid+".", 34, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
         }
         
         // sequence header
@@ -1201,8 +1201,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         CRC64Checksum crc = new CRC64Checksum();
         String seqstr = rs.seqString();
         crc.update(seqstr.getBytes(),0,seqstr.length());
-        this.getPrintStream().print(START_SEQUENCE_TAG+"   SEQUENCE "+StringTools.rightPad(""+rs.length(),4)+" AA; ");
-        this.getPrintStream().print(StringTools.rightPad(""+mw,5)+" MW; ");
+        this.getPrintStream().print(START_SEQUENCE_TAG+"   SEQUENCE "+StringTools.leftPad(""+rs.length(),4)+" AA; ");
+        this.getPrintStream().print(StringTools.leftPad(""+mw,5)+" MW; ");
         this.getPrintStream().println(crc+" CRC64;");
         
         // sequence stuff

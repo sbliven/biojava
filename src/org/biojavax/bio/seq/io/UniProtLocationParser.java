@@ -114,9 +114,9 @@ public class UniProtLocationParser {
     // write out a single location
     private static String _writeSingleLocation(RichLocation l) {
         StringBuffer loc = new StringBuffer();
-        loc.append(StringTools.leftPad(_writePosition(l.getMinPosition(),false),5));
+        loc.append(StringTools.leftPad(_writePosition(l.getMinPosition(),false),6));
         loc.append(" ");
-        loc.append(StringTools.leftPad(_writePosition(l.getMaxPosition(),true),5));
+        loc.append(StringTools.leftPad(_writePosition(l.getMaxPosition(),true),6));
         return loc.toString();
     }
 }
