@@ -22,7 +22,6 @@
 package org.biojavax.bio.seq;
 import java.util.Set;
 
-import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -30,7 +29,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Richard Holland
  * @since 1.5
  */
-public interface RichFeatureRelationshipHolder extends FeatureHolder {
+public interface RichFeatureRelationshipHolder {
     
     /**
      * Adds a relationship to this feature holder.
