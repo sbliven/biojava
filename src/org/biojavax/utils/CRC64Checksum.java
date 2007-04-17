@@ -24,92 +24,69 @@ package org.biojavax.utils;
 import java.util.zip.Checksum;
 
 /**
- * Utility class that calculates a CRC64 checksum on a stream
- * of bytes. Code was based on some from BioPerl.
- * Note that we use longs then cast them to avoid the lack of an
- * unsigned int in Java. Longs are 64-bit but we are only using the
- * bottom 32 bits. An int is 32-bit but encodes sign so we can get amusing
+ * Utility class that calculates a CRC64 checksum on a stream of bytes. Code was
+ * based on some from BioPerl. Note that we use longs then cast them to avoid
+ * the lack of an unsigned int in Java. Longs are 64-bit but we are only using
+ * the bottom 32 bits. An int is 32-bit but encodes sign so we can get amusing
  * results if we don't allow for this.
- * @author Richard Holland
- * @author Hilmar Lapp
+ * 
+ * @author Unknown. Copied from Expasy4J for convenience. See <a
+ *         href="http://dev.isb-sib.ch/projects/expasy4j/">http://dev.isb-sib.ch/projects/expasy4j/</a>
  * @since 1.5
  */
 public class CRC64Checksum implements Checksum {
-    
-    private final static long[] CRC64Tableh = new long[256];
-    private final static long[] CRC64Tablel = new long[256];
-    
-    // Construct the CRC64Checksum lookup tables.
-    static {
-        long POLY64REVh = 0xd8000000;
-        for (int i = 0; i < 256; i++) {
-            long partl = (long)i;
-            long parth = 0;
-            for (int j = 0; j < 8; j++) {
-                boolean rflag = (partl & 1L) > 0L;
-                partl >>= 1L;
-                if ((parth & 1L) > 0L) partl |= (1L << 31L);
-                parth >>= 1L;
-                if (rflag) parth ^= POLY64REVh;
-            }
-            CRC64Tableh[i] = parth;
-            CRC64Tablel[i] = partl;
-        }
-    }
-    
-    private long crcl;
-    private long crch;
-    
-    /**
-     * Creates a new instance of CRC64Checksum.
-     */
-    public CRC64Checksum() {
-        this.reset();
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void reset() {
-        this.crcl = 0L;
-        this.crch = 0L;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void update(int c) {
-        long shr = (this.crch & 0xff) << 24L;
-        long templh = (this.crch >> 8L);
-        long templl = (this.crcl >> 8L) | shr;
-        int tableindex = (int)((this.crcl ^ (long)c) & 0xff);
-        this.crch = templh ^ CRC64Tableh[tableindex];
-        this.crcl = templl ^ CRC64Tablel[tableindex];
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void update(byte[] values, int offset, int len) {
-        for (int i = offset; i < offset+len; i++) this.update((int)values[i]);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public long getValue() {
-        return (this.crch<<32L) | this.crcl;
-    }
-    
-    /**
-     * {@inheritDoc}
-     * Form: the current CRC64Checksum checksum as a 16-digit hex string.
-     */
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(StringTools.leftPad(Long.toHexString(crch), '0', 8));
-        sb.append(StringTools.leftPad(Long.toHexString(crcl), '0', 8));
-        return sb.toString();
-    }
-    
+	private static final long POLY64 = 0xD800000000000000L;
+
+	private static final long[] crcTable = new long[256];
+
+	private long crc;
+
+	static {
+		for (int i = 0; i < 256; ++i) {
+			long part = i;
+			for (int j = 0; j < 8; ++j)
+				part = ((part & 1) != 0) ? (part >>> 1) ^ POLY64 : (part >>> 1);
+			crcTable[i] = part;
+		}
+	}
+
+	public void update(int b) {
+		long low = crc >>> 8;
+		long high = crcTable[(int) ((crc ^ b) & 0xFF)];
+		crc = low ^ high;
+	}
+
+	public void update(byte[] b, int offset, int length) {
+		for (int i = offset; i < length; ++i)
+			update(b[i]);
+	}
+
+	public void update(String s) {
+		// update(s.getBytes(), 0, s.length());
+		int size = s.length();
+		for (int i = 0; i < size; ++i)
+			update(s.charAt(i));
+
+	}
+
+	public long getValue() {
+		return crc;
+	}
+
+	/**
+	 * Returns a zero-padded 16 character wide string containing the current
+	 * value of this checksum in uppercase hexadecimal format.
+	 */
+	public String toString() {
+		StringBuffer builder = new StringBuffer();
+		builder.append(Long.toHexString(crc >>> 4));
+		builder.append(Long.toHexString(crc & 0xF));
+		for (int i = 16 - builder.length(); i > 0; --i)
+			builder.insert(0, '0');
+		return builder.toString().toUpperCase();
+	}
+
+	public void reset() {
+		crc = 0;
+	}
 }
