@@ -385,11 +385,12 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         if (key.equals(AUTHORS_TAG)) authors = val;
                         else if (key.equals(CONSORTIUM_TAG)) consortium = val;
                         else if (key.equals(TITLE_TAG)) title = val;
-                        else if (key.equals(JOURNAL_TAG)) journal = val;
+                        else if (key.equals(JOURNAL_TAG)) journal = val.replace('\n',' '); //see #2276
                         else if (key.equals(MEDLINE_TAG)) medline = val;
                         else if (key.equals(PUBMED_TAG)) pubmed = val;
-                        else if (key.equals(REMARK_TAG)) remark = val;
+                        else if (key.equals(REMARK_TAG)) remark = val.replace('\n',' '); //see #2276
                     }
+                    
                     // create the docref object
                     try {
                         // Use consortium as well if present.

@@ -443,7 +443,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                         if (val.length()>1) {
                             if (val.endsWith(";")) val = val.substring(0,val.length()-1); // chomp semicolon
                             if (val.endsWith("\"")) val = val.substring(1,val.length()-1); // chomp quotes
-                            title = val;
+                            title = val.replace('\n',' '); //see #2276
                         } else title=null; // single semi-colon indicates no title
                     }
                     if (key.equals(LOCATOR_TAG)) {
@@ -463,7 +463,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                             else if (db.equalsIgnoreCase(Terms.DOI_KEY)) doi = ref;
                         }
                     }
-                    if (key.equals(REMARK_TAG)) remark = val;
+                    if (key.equals(REMARK_TAG)) remark = val.replace('\n',' '); //see #2276
                     if (key.equals(REFERENCE_POSITION_TAG)) {
                         // only the first group is taken
                         // if we have multiple lines, only the last line is taken

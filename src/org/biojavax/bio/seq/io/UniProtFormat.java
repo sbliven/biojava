@@ -471,7 +471,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         if (key.equals(TITLE_TAG)) {
                             if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
                             if (val.endsWith("\"")) val = val.substring(1, val.length()-1); // chomp quotes
-                            title = val;
+                            title = val.replace('\n',' '); //see #2276
                         }
                         if (key.equals(LOCATION_TAG)) {
                             if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
