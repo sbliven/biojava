@@ -124,7 +124,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+)\\s+\\d+\\s+(bp|aa)\\s{1,4}([dms]s-)?(\\S+)?\\s+(circular|linear)?\\s*(\\S+)?\\s*(\\S+)?$");
     // version line
-    protected static final Pattern vp = Pattern.compile("^(\\S+?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
+    protected static final Pattern vp = Pattern.compile("^(\\S*?)(\\.(\\d+))?(\\s+GI:(\\S+))?$");
     // reference line
     protected static final Pattern refRange = Pattern.compile("^\\s*(\\d+)\\s+to\\s+(\\d+)$");
     protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(?:(\\((?:bases|residues)\\s+(\\d+\\s+to\\s+\\d+(\\s*;\\s*\\d+\\s+to\\s+\\d+)*)\\))|\\(sites\\))?");
@@ -836,7 +836,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             }
             symCount++;
         }
-        this.getPrintStream().print("\n");
+        if(syms.length>0) //do not create an empty line
+            this.getPrintStream().print("\n");
         this.getPrintStream().println(END_SEQUENCE_TAG);
     }
     

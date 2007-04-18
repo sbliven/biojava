@@ -84,6 +84,7 @@ import org.biojavax.utils.StringTools;
  *
  * @author Richard Holland
  * @author Mark Schreiber
+ * @author George Waldon
  * @since 1.5
  */
 public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
@@ -381,7 +382,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     // if multiple accessions, store only first as accession,
                     // and store rest in annotation
                     String[] accs = ((String[])section.get(0))[1].split(";");
-                    accession = accs[0].trim();
+                    if(accs.length>0) accession = accs[0].trim(); else accession = "";
                     rlistener.setAccession(accession);
                     for (int i = 1; i < accs.length; i++) {
                         rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),accs[i].trim());
