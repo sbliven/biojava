@@ -1130,7 +1130,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             for (Iterator i = rs.getComments().iterator(); i.hasNext(); ) {
                 Comment c = (SimpleComment)i.next();
                 String text = c.getComment().trim();
-                if (text.length()>3 && text.substring(0,3).equals("-!-")) StringTools.writeKeyValueLine(COMMENT_TAG+"   -!- ", text.substring(4), 9, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
+                if (text.length()>3 && text.substring(0,3).equals("-!-")) StringTools.writeKeyValueLine(COMMENT_TAG+"   ", text, 5, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
                 else StringTools.writeKeyValueLine(COMMENT_TAG, text, 5, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
             }
         }
