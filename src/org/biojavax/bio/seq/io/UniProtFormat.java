@@ -491,8 +491,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             }
                         }
                         if (key.equals(RP_LINE_TAG)) {
-                            remark = val;
                             if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
+                            remark = val;
                             // Try to use it to find the location of the reference, if we have one.
                             Matcher m = rppat.matcher(val);
                             if (m.matches()) {
