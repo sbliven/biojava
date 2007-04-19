@@ -193,7 +193,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
                     this,
                     RichFeature.NAME,
                     name,
-                    null
+                    this.name
                     );
             ChangeSupport cs = this.getChangeSupport(RichFeature.NAME);
             synchronized(cs) {
@@ -361,12 +361,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     public void setLocation(Location loc) throws ChangeVetoException {
 //        System.out.println("SimpleRichFeature.setLocation-featureId:"+featureId+", loc:"+loc);
         if (loc==null) throw new IllegalArgumentException("Location cannot be null");
-        RichLocation richLoc;
-        if (loc instanceof RichLocation) {
-        	richLoc = (RichLocation) loc;
-        } else {
-        	richLoc = RichLocation.Tools.enrich(loc);
-        }
+        RichLocation richLoc = RichLocation.Tools.enrich(loc);
         if(!this.hasListeners(RichFeature.LOCATION)) {
             this.location = richLoc;
         } else {
