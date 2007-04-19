@@ -591,7 +591,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                                 throw new ParseException(message);
                             }
                             rlistener.startFeature(templ);
-                            if (desc!=null) rlistener.addFeatureProperty(Terms.getFeatureDescTerm(),desc);
+                            if (desc!=null && desc.length()>0) rlistener.addFeatureProperty(Terms.getFeatureDescTerm(),desc);
                             seenAFeature = true;
                         }
                     }
@@ -1188,7 +1188,10 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             }
             String kw = f.getTypeTerm().getName();
             String leader = StringTools.rightPad(kw,8)+" "+UniProtLocationParser.writeLocation((RichLocation)f.getLocation());
-            StringTools.writeKeyValueLine(FEATURE_TAG+"   "+leader, desc+".", 34, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
+            if(desc.length()==0)
+                this.getPrintStream().println(FEATURE_TAG+"   "+leader); //see #2277
+            else
+                StringTools.writeKeyValueLine(FEATURE_TAG+"   "+leader, desc+".", 34, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
             if (ftid!=null) StringTools.writeKeyValueLine(FEATURE_TAG, "/FTId="+ftid+".", 34, this.getLineWidth(), null, FEATURE_TAG, this.getPrintStream());
         }
         
@@ -1202,8 +1205,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         CRC64Checksum crc = new CRC64Checksum();
         String seqstr = rs.seqString();
         crc.update(seqstr.getBytes(),0,seqstr.length());
-        this.getPrintStream().print(START_SEQUENCE_TAG+"   SEQUENCE "+StringTools.leftPad(""+rs.length(),4)+" AA; ");
-        this.getPrintStream().print(StringTools.leftPad(""+mw,5)+" MW; ");
+        this.getPrintStream().print(START_SEQUENCE_TAG+"   SEQUENCE  "+StringTools.leftPad(""+rs.length(),4)+" AA;  ");
+        this.getPrintStream().print(StringTools.leftPad(""+mw,5)+" MW;  ");
         this.getPrintStream().println(crc+" CRC64;");
         
         // sequence stuff
