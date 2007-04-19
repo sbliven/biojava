@@ -462,11 +462,11 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         //System.err.println(key+": "+val);
                         if (key.equals(AUTHORS_TAG)) {
                             if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
-                            authors = val;
+                            authors = val.replace('\n',' '); //see #2276
                         }
                         if (key.equals(CONSORTIUM_TAG)) {
                             if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
-                            consortium = val;
+                            consortium = val.replace('\n',' '); //see #2276
                         }
                         if (key.equals(TITLE_TAG)) {
                             if (val.endsWith(";")) val = val.substring(0, val.length()-1); // chomp semicolon
@@ -475,7 +475,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         }
                         if (key.equals(LOCATION_TAG)) {
                             if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
-                            locator = val;
+                            locator = val.replace('\n',' '); //see #2276
                         }
                         if (key.equals(REFERENCE_XREF_TAG)) {
                             // database_identifier=primary_identifier;
@@ -492,7 +492,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         }
                         if (key.equals(RP_LINE_TAG)) {
                             if (val.endsWith(".")) val = val.substring(0, val.length()-1); // chomp dot
-                            remark = val;
+                            remark = val.replace('\n',' '); //see #2276
                             // Try to use it to find the location of the reference, if we have one.
                             Matcher m = rppat.matcher(val);
                             if (m.matches()) {

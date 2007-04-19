@@ -382,9 +382,9 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     for (int i = 1; i < section.size(); i++) {
                         String key = ((String[])section.get(i))[0];
                         String val = ((String[])section.get(i))[1];
-                        if (key.equals(AUTHORS_TAG)) authors = val;
-                        else if (key.equals(CONSORTIUM_TAG)) consortium = val;
-                        else if (key.equals(TITLE_TAG)) title = val;
+                        if (key.equals(AUTHORS_TAG)) authors = val.replace('\n',' '); //see #2276
+                        else if (key.equals(CONSORTIUM_TAG)) consortium = val.replace('\n',' '); //see #2276
+                        else if (key.equals(TITLE_TAG)) title = val.replace('\n',' '); //see #2276
                         else if (key.equals(JOURNAL_TAG)) journal = val.replace('\n',' '); //see #2276
                         else if (key.equals(MEDLINE_TAG)) medline = val;
                         else if (key.equals(PUBMED_TAG)) pubmed = val;

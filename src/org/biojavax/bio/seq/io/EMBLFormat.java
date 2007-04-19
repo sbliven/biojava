@@ -433,11 +433,11 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     String val = ((String[])section.get(i))[1];
                     if (key.equals(AUTHORS_TAG)) {
                         if (val.endsWith(";")) val = val.substring(0,val.length()-1); // chomp semicolon
-                        authors = val;
+                        authors = val.replace('\n',' '); //see #2276
                     }
                     if (key.equals(CONSORTIUM_TAG)) {
                         if (val.endsWith(";")) val = val.substring(0,val.length()-1); // chomp semicolon
-                        consortium = val;
+                        consortium = val.replace('\n',' '); //see #2276
                     }
                     if (key.equals(TITLE_TAG)) {
                         if (val.length()>1) {
@@ -448,7 +448,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     }
                     if (key.equals(LOCATOR_TAG)) {
                         if (val.endsWith(".")) val = val.substring(0,val.length()-1); // chomp dot
-                        locator = val;
+                        locator = val.replace('\n',' '); //see #2276
                     }
                     if (key.equals(REFERENCE_XREF_TAG)) {
                         // database_identifier; primary_identifier.
