@@ -354,6 +354,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     
                     for (int i = 0; i < kws.length; i++) {
                         String kw = kws[i].trim();
+                        if (kw.length()==0) continue;
                         rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
                     }
                 } else if (sectionKey.equals(SOURCE_TAG)) {

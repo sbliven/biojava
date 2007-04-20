@@ -390,7 +390,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 val = val.substring(0,val.length()-1); // chomp dot
                 String[] kws = val.split(";");
                 for (int i = 0; i < kws.length; i++) {
-                    rlistener.addSequenceProperty(Terms.getKeywordTerm(), kws[i].trim());
+                    String kw = kws[i].trim();
+                    if (kw.length()==0) continue;
+                    rlistener.addSequenceProperty(Terms.getKeywordTerm(), kw);
                 }
             } else if (sectionKey.equals(DATABASE_XREF_TAG)) {
                 String val = ((String[])section.get(0))[1];
@@ -931,6 +933,9 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         if (keywords.length()>0) {
             keywords.append(".");
             StringTools.writeKeyValueLine(KEYWORDS_TAG, keywords.toString(), 5, this.getLineWidth(), null, KEYWORDS_TAG, this.getPrintStream());
+            this.getPrintStream().println(DELIMITER_TAG+"   ");
+        } else {
+            this.getPrintStream().println(KEYWORDS_TAG+"   .");
             this.getPrintStream().println(DELIMITER_TAG+"   ");
         }
         
