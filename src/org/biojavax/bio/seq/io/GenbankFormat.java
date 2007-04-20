@@ -417,6 +417,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     // starting from second line of input, start a new feature whenever we come across
                     // a key that does not start with /
                     boolean seenAFeature = false;
+                    int rcrossrefCount = 0;
                     for (int i = 1 ; i < section.size(); i++) {
                         String key = ((String[])section.get(i))[0];
                         String val = ((String[])section.get(i))[1];
@@ -442,7 +443,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                                     } else {
                                         try {
                                             CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession, new Integer(0)});
-                                            RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
+                                            RankedCrossRef rcr = new SimpleRankedCrossRef(cr, ++rcrossrefCount);
                                             rlistener.getCurrentFeature().addRankedCrossRef(rcr);
                                         } catch (ChangeVetoException e) {
                                             throw new ParseException(e+", accession:"+accession);
@@ -481,6 +482,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                             templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
                             rlistener.startFeature(templ);
                             seenAFeature = true;
+                            rcrossrefCount = 0;
                         }
                     }
                     if (seenAFeature) rlistener.endFeature();

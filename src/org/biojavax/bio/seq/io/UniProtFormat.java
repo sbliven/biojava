@@ -256,7 +256,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         String sectionKey = null;
         NCBITaxon tax = null;
         accession = null;
-        int xrefCount = 0;
         List section = null;
         try{
             do {
@@ -439,7 +438,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             throw pe;
                         }
                     }
-                    RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, ++xrefCount);
+                    RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, 0);
                     rlistener.setRankedCrossRef(rcrossRef);
                 } else if (sectionKey.equals(REFERENCE_TAG) && !this.getElideReferences()) {
                     // first line of section has rank and location

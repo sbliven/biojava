@@ -796,6 +796,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         private String currRefXrefDBName;
         private String currRefXrefID;
         private List currRefXrefs;
+        private int rcrossrefCount;
         
         // construct a new handler that will populate the given list of sequences
         private INSDseqHandler(RichSequenceFormat parent,
@@ -897,7 +898,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                             throw pe;
                         }
                     }
-                    RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, 1);
+                    RankedCrossRef rcrossRef = new SimpleRankedCrossRef(crossRef, 0);
                     rlistener.setRankedCrossRef(rcrossRef);
                 } else if (qName.equals(SEQUENCE_TAG) && !this.parent.getElideSymbols()) {
                     try {
@@ -963,7 +964,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     }
                     // create the other crossrefs and assign to the bioentry
                     for (int i = 0; i < currRefXrefs.size(); i++) {
-                        RankedCrossRef rmcr = new SimpleRankedCrossRef((CrossRef)currRefXrefs.get(i), i);
+                        RankedCrossRef rmcr = new SimpleRankedCrossRef((CrossRef)currRefXrefs.get(i), 0);
                         rlistener.setRankedCrossRef(rmcr);
                     }
                     // create the docref object
@@ -1020,6 +1021,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     String tidyLocStr = val.replaceAll("\\s+","");
                     templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
                     rlistener.startFeature(templ);
+                    rcrossrefCount = 0;
                     // We don't read the hierarchy of tags for location as they
                     // should contain the same information.
                 } else if (qName.equals(FEATUREQUAL_NAME_TAG) && !this.parent.getElideFeatures()) {
@@ -1045,7 +1047,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                             } else {
                                 try {
                                     CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession, new Integer(0)});
-                                    RankedCrossRef rcr = new SimpleRankedCrossRef(cr, 0);
+                                    RankedCrossRef rcr = new SimpleRankedCrossRef(cr, ++rcrossrefCount);
                                     rlistener.getCurrentFeature().addRankedCrossRef(rcr);
                                 } catch (ChangeVetoException e) {
                                     throw new ParseException(e);

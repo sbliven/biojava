@@ -896,11 +896,10 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     currRefLocation = val;
                 } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
                     // do the crossrefs
-                    int rank = 0;
                     CrossRef useForDocRef = null;
                     for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
                         CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, rank++);
+                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx,0);
                         rlistener.setRankedCrossRef(rdbx);
                         if (useForDocRef==null) useForDocRef = dbx;
                         else {
@@ -987,10 +986,10 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                         rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(qualName),qualVal);
                     }
                     // do the crossrefs
-                    int k = 0;
+                    int rcrossrefCount = 0;
                     for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
                         CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, k++);
+                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, ++rcrossrefCount);
                         try {
                             rlistener.getCurrentFeature().addRankedCrossRef(rdbx);
                         } catch (ChangeVetoException ce) {
@@ -1060,10 +1059,9 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                         rlistener.setComment((String)j.next());
                     }
                     // do the crossrefs
-                    int rank = 0;
                     for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
                         CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, rank++);
+                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, 0);
                         rlistener.setRankedCrossRef(rdbx);
                     }
                     // end the sequence

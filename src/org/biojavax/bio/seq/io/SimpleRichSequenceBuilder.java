@@ -236,9 +236,11 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
      */
     public void setRankedCrossRef(RankedCrossRef ref) throws ParseException {
         if (ref==null) throw new ParseException("Reference cannot be null");
+        ref.setRank(crossRefsRank++);
         this.crossRefs.add(ref);
     }
     private Set crossRefs = new TreeSet();
+    private int crossRefsRank = 1;
     
     /**
      * {@inheritDoc}

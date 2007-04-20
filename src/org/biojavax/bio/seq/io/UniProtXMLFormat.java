@@ -2000,11 +2000,10 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     }
                 } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
                     // do the crossrefs
-                    int rank = 0;
                     CrossRef useForDocRef = null;
                     for (Iterator j = this.currDBXrefs.iterator(); j.hasNext();) {
                         CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, rank++);
+                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx,0);
                         rlistener.setRankedCrossRef(rdbx);
                         if (useForDocRef==null) useForDocRef = dbx;
                         else {
@@ -2144,10 +2143,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         rlistener.setComment((String)j.next());
                     }
                     // do the crossrefs
-                    int rank = 0;
                     for (Iterator j = currDBXrefs.iterator(); j.hasNext();) {
                         CrossRef dbx = (CrossRef)j.next();
-                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, rank++);
+                        RankedCrossRef rdbx = new SimpleRankedCrossRef(dbx, 0);
                         rlistener.setRankedCrossRef(rdbx);
                     }
                     // end the sequence
