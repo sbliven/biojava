@@ -294,7 +294,6 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                         rlistener.setName(m.group(1));
                         accession = m.group(1); // default if no accession found
                         rlistener.setAccession(accession);
-                        rlistener.addSequenceProperty(Terms.getLengthTypeTerm(),m.group(2));
                         if (m.group(4)!=null)
                             rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(4));
                         // Optional extras
@@ -646,24 +645,20 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         } catch (Exception e) {
             throw new RuntimeException("Unable to get alphabet tokenizer",e);
         }
-        
         Set notes = rs.getNoteSet();
         String accession = rs.getAccession();
         StringBuffer accessions = new StringBuffer();
         accessions.append(accession);
         String stranded = "";
         String udat = "";
-        String lengthType = "bp";
         String moltype = rs.getAlphabet().getName();
-        if ("PROTEIN-TERM".equals(moltype))
-        	moltype = null;
+        if ("PROTEIN-TERM".equals(moltype) || "PROTEIN".equals(moltype)) moltype = null; //a genpept curiosity
         StringBuffer keywords = new StringBuffer();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
-            else if (n.getTerm().equals(Terms.getLengthTypeTerm())) lengthType=n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                 accessions.append(" ");
                 accessions.append(n.getValue());
@@ -680,7 +675,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         locusLine.append(StringTools.rightPad(rs.getName(),16));//13->28=15+1=16
         locusLine.append(" ");//29
         locusLine.append(StringTools.leftPad(""+rs.length(),11));//30->40=10+1=11
-        locusLine.append(" "+lengthType+" ");//41->44
+        locusLine.append(" "+ (moltype==null? "aa":"bp") +" ");//41->44
         locusLine.append(StringTools.leftPad(stranded,3));//45->47=2+1=3
         locusLine.append(StringTools.rightPad(moltype==null?"":moltype,6));//48->53=5+1=6
         locusLine.append("  ");//54->55
@@ -718,7 +713,7 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         for (Iterator r = rs.getRankedDocRefs().iterator(); r.hasNext(); ) {
             RankedDocRef rdr = (RankedDocRef)r.next();
             DocRef d = rdr.getDocumentReference();
-            StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+((rdr.getLocation()==null || rdr.getLocation() ==RichLocation.EMPTY_LOCATION)?"":"  (bases "+makeBaseRange(rdr)+")"), 12, this.getLineWidth(), this.getPrintStream());
+            StringTools.writeKeyValueLine(REFERENCE_TAG, rdr.getRank()+((rdr.getLocation()==null || rdr.getLocation() ==RichLocation.EMPTY_LOCATION)?"": (moltype==null? "  (residues ":"  (bases ")+makeBaseRange(rdr)+")"), 12, this.getLineWidth(), this.getPrintStream());
             // Any authors that were in the input as CONSRTM tags will
             // be merged into the AUTHORS tag on output.
             StringTools.writeKeyValueLine("  "+AUTHORS_TAG, d.getAuthors(), 12, this.getLineWidth()-1, this.getPrintStream());

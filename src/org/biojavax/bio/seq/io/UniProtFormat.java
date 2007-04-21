@@ -268,7 +268,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
                 // process section-by-section
                 if (sectionKey.equals(LOCUS_TAG)) {
-                    rlistener.addSequenceProperty(Terms.getLengthTypeTerm(),"aa");
                     // entryname  dataclass; moltype; sequencelength AA.
                     String loc = ((String[])section.get(0))[1];
                     Matcher m = lp.matcher(loc);

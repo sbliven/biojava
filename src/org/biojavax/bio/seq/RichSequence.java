@@ -175,7 +175,6 @@ public interface RichSequence extends BioEntry,Sequence {
         private static ComparableTerm FTID_TERM = null;
         private static ComparableTerm FEATUREDESC_TERM = null;
         private static ComparableTerm COPYRIGHT_TERM = null;        
-        private static ComparableTerm LENGTH_TYPE_TERM = null;
         
         public static String SPECIES_KEY = "SPECIES";
         public static String STRAIN_KEY = "STRAIN";
@@ -205,15 +204,6 @@ public interface RichSequence extends BioEntry,Sequence {
         public static ComparableTerm getAdditionalAccessionTerm() {
             if (SEC_ACCESSION_TERM==null) SEC_ACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("acc");
             return SEC_ACCESSION_TERM;
-        }
-        
-        /**
-         * Getter for the length type term
-         * @return The length type Term
-         */
-        public static ComparableTerm getLengthTypeTerm() {
-            if (LENGTH_TYPE_TERM==null) LENGTH_TYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("Length type");
-            return LENGTH_TYPE_TERM;
         }
         
         /**

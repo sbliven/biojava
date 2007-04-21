@@ -437,7 +437,6 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         
         try {
             rlistener.startSequence();                   
-        	rlistener.addSequenceProperty(Terms.getLengthTypeTerm(),"aa");
             DefaultHandler m_handler = new UniProtXMLHandler(this,symParser,rlistener,ns);
             boolean hasMore=XMLTools.readXMLChunk(reader, m_handler, ENTRY_TAG);
             // deal with copyright chunk

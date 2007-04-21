@@ -65,10 +65,8 @@ public class Bug2249_2248Test extends TestCase{
         String molType = null;
         for (Iterator i = seq.getNoteSet().iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
-            if (n.getTerm().equals(Terms.getLengthTypeTerm())) lengthType=n.getValue();
-            else if (n.getTerm().equals(Terms.getMolTypeTerm())) molType=n.getValue();
+            if (n.getTerm().equals(Terms.getMolTypeTerm())) molType=n.getValue();
         }
-        assertEquals("aa",lengthType);
         assertNull(molType);
 
         // Make sure we can convert.
