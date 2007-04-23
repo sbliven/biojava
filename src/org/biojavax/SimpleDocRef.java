@@ -61,6 +61,31 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
      * Creates a new document reference from the given immutable authors and
      * location and title. Will throw exceptions if either authors or
      * location are null, but a null title is allowable.
+     * @param authors The authors of the referenced document, as a string to be parsed
+     * with {@link DocRefAuthor.Tools#parseAuthorString(String)}.
+     * @param location The location of the document, eg. the journal name and page range.
+     */
+    public SimpleDocRef(String authors, String location) {
+    	this(DocRefAuthor.Tools.parseAuthorString(authors), location, null);
+    }
+    
+    /**
+     * Creates a new document reference from the given immutable authors and
+     * location and title. Will throw exceptions if either authors or
+     * location are null, but a null title is allowable.
+     * @param authors The authors of the referenced document, as a string to be parsed
+     * with {@link DocRefAuthor.Tools#parseAuthorString(String)}.
+     * @param location The location of the document, eg. the journal name and page range.
+     * @param title The title of the document.
+     */
+    public SimpleDocRef(String authors, String location, String title) {
+    	this(DocRefAuthor.Tools.parseAuthorString(authors), location, title);
+    }
+    
+    /**
+     * Creates a new document reference from the given immutable authors and
+     * location and title. Will throw exceptions if either authors or
+     * location are null, but a null title is allowable.
      * @param authors The authors of the referenced document, as a set of DocRefAuthor instances.
      * @param location The location of the document, eg. the journal name and page range.
      * @param title The title of the document.
