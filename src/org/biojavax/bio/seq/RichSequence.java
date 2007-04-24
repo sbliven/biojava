@@ -73,6 +73,7 @@ import org.biojavax.ontology.ComparableTerm;
  * to Sequence.
  * @author Mark Schreiber
  * @author Richard Holland
+ * @author George Waldon
  * @since 1.5
  */
 public interface RichSequence extends BioEntry,Sequence {
@@ -279,7 +280,8 @@ public interface RichSequence extends BioEntry,Sequence {
         }
         
         /**
-         * Getter for the Strand term
+         * Getter for the Strand term; legal values are "single", "double", and
+         * "mixed".
          * @return a Term that represents the Strand tag
          */
         public static ComparableTerm getStrandedTerm() {

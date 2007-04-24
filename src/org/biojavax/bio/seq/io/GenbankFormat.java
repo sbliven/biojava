@@ -298,6 +298,12 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                             rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(4));
                         // Optional extras
                         String stranded = m.group(3);
+                        if(stranded!=null && stranded.equals("ss-"))
+                            stranded = "single";
+                        else if(stranded!=null && stranded.equals("ms-"))
+                            stranded = "mixed";
+                        else if(stranded!=null && stranded.equals("ds-"))
+                            stranded = "double";
                         String circular = m.group(5);
                         String fifth = m.group(6);
                         String sixth = m.group(7);
@@ -656,7 +662,13 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         StringBuffer keywords = new StringBuffer();
         for (Iterator i = notes.iterator(); i.hasNext(); ) {
             Note n = (Note)i.next();
-            if (n.getTerm().equals(Terms.getStrandedTerm())) stranded=n.getValue();
+            if (n.getTerm().equals(Terms.getStrandedTerm())) {
+                String value = n.getValue();
+                if(value != null && value.equals("single"))
+                    stranded= "ss-";
+                else if(value != null && value.equals("mixed"))
+                    stranded= "ms-";
+            }
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {

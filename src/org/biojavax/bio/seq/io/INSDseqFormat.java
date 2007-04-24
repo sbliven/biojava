@@ -103,6 +103,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Alan Li (code based on his work)
  * @author Richard Holland
+ * @author George Waldon
  * @since 1.5
  */
 public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
