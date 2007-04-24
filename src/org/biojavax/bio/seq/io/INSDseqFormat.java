@@ -187,8 +187,6 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     protected static final String SEQUENCE_TAG = "INSDSeq_sequence";
     protected static final String CONTIG_TAG = "INSDSeq_contig";
     
-    // reference line
-    protected static final Pattern refp = Pattern.compile("^(\\d+)\\s*(\\(bases\\s+(\\d+)\\s+to\\s+(\\d+)\\)|\\(sites\\))?");
     // dbxref line
     protected static final Pattern dbxp = Pattern.compile("^([^:]+):(\\S+)$");
     
@@ -502,13 +500,9 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 
                 RankedDocRef rdr = (RankedDocRef)r.next();
                 DocRef d = rdr.getDocumentReference();
-                Integer rstart = rdr.getStart();
-                if (rstart==null) rstart = new Integer(1);
-                Integer rend = rdr.getEnd();
-                if (rend==null) rend = new Integer(rs.length());
                 
                 xml.openTag(REFERENCE_LOCATION_TAG);
-                xml.print(rdr.getRank()+"  (bases "+rstart+" to "+rend+")");
+                xml.print(Integer.toString(rdr.getRank()));
                 xml.closeTag(REFERENCE_LOCATION_TAG);
                 
                 xml.openTag(REFERENCE_POSITION_TAG);
@@ -921,8 +915,6 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     }
                 } else if (qName.equals(CONTIG_TAG))
                     throw new SAXException("Cannot handle contigs yet");
-                
-                
                 else if (qName.equals(REFERENCE_LOCATION_TAG) && !this.parent.getElideReferences()) {
                     currRefLocation = val;
                 } else if (qName.equals(REFERENCE_POSITION_TAG) && !this.parent.getElideReferences()) {
@@ -948,22 +940,6 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 } else if (qName.equals(REMARK_TAG) && !this.parent.getElideReferences() && !this.parent.getElideComments()) {
                     currRefRemark = val;
                 } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
-                    int ref_rank;
-                    int ref_start = -999;
-                    int ref_end = -999;
-                    Matcher m = refp.matcher(currRefLocation);
-                    if (m.matches()) {
-                        ref_rank = Integer.parseInt(m.group(1));
-                        if(m.group(2) != null){
-                            if (m.group(3)!= null)
-                                ref_start = Integer.parseInt(m.group(3));
-                            
-                            if(m.group(4) != null)
-                                ref_end = Integer.parseInt(m.group(4));
-                        }
-                    } else {
-                        throw new ParseException("Bad reference line found: "+currRefLocation);
-                    }
                     // create the pubmed crossref and assign to the bioentry
                     CrossRef pcr = null;
                     if (currRefPubmed!=null) {
@@ -985,45 +961,39 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                         dr.setRemark(currRefRemark);
                         // assign the docref to the bioentry
                         if (currRefPosition!=null) {
-                        	// Use the actual location specified.
-                        	RichLocation loc;
-                        	if (currRefPosition.equals("sites")) loc = RichLocation.EMPTY_LOCATION;
-                        	else {
-                        		List members = new ArrayList();
-                        	String[] parts = currRefPosition.split(";\\s+");
-                        	for (int i = 0; i < parts.length; i++) {
-                        		String[] parts2 = parts[i].split("\\.\\.");
-                        		if (parts2.length>1) {
-                        			RichLocation newLoc = new SimpleRichLocation(
-                        					new SimplePosition(Integer.parseInt(parts2[0]), 
-                        						Integer.parseInt(parts2[1])), i);
-                        			members.add(newLoc);
-                        		} else {
-                            		RichLocation newLoc = new SimpleRichLocation(
-                            				new SimplePosition(Integer.parseInt(parts2[0])), i);
-                            		members.add(newLoc);
-                        		}
-                        	}
-                        	loc = RichLocation.Tools.construct(members);
-                        	}
-                        	RankedDocRef rdr = new SimpleRankedDocRef(dr,
-                            		loc, 
-                            		ref_rank);
+                            // Use the actual location specified.
+                            RichLocation loc;
+                            if (currRefPosition.equals("sites")) loc = RichLocation.EMPTY_LOCATION;
+                            else {
+                                List members = new ArrayList();
+                                String[] parts = currRefPosition.split(";\\s+");
+                                for (int i = 0; i < parts.length; i++) {
+                                    String[] parts2 = parts[i].split("\\.\\.");
+                                    if (parts2.length>1) {
+                                        RichLocation newLoc = new SimpleRichLocation(
+                                                new SimplePosition(Integer.parseInt(parts2[0])),
+                                                new SimplePosition(Integer.parseInt(parts2[1])),
+                                                i);
+                                        members.add(newLoc);
+                                    } else {
+                                        RichLocation newLoc = new SimpleRichLocation(
+                                                new SimplePosition(Integer.parseInt(parts2[0])), i);
+                                        members.add(newLoc);
+                                    }
+                                }
+                                loc = RichLocation.Tools.construct(members);
+                            }
+                            RankedDocRef rdr = new SimpleRankedDocRef(dr,loc,0); //rank set in listener
                             rlistener.setRankedDocRef(rdr);
                         } else {
-                        	// Use the start/end
-                        	RankedDocRef rdr = new SimpleRankedDocRef(dr,
-                        		(ref_start != -999 ? new Integer(ref_start) : null),
-                                (ref_end != -999 ? new Integer(ref_end) : null),
-                                ref_rank);
+                            //by default location on first position, full span would be better
+                            RankedDocRef rdr = new SimpleRankedDocRef(dr,new Integer(1),new Integer(1),0);
                             rlistener.setRankedDocRef(rdr);
                         }
                     } catch (ChangeVetoException e) {
                         throw new ParseException(e);
                     }
                 }
-                
-                
                 else if (qName.equals(FEATURE_KEY_TAG) && !this.parent.getElideFeatures()) {
                     templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(val);
                 } else if (qName.equals(FEATURE_LOC_TAG) && !this.parent.getElideFeatures()) {
