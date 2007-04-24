@@ -295,15 +295,22 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     }
     
     private PrintWriter pw;
-    private XMLWriter xml;
+    private XMLWriter xmlWriter;
+    
+    private XMLWriter getXMLWriter() {
+        if(xmlWriter==null) {
+            // make an XML writer
+            pw = new PrintWriter(this.getPrintStream());
+            xmlWriter = new PrettyXMLWriter(pw);
+        }
+        return xmlWriter;
+    }
     
     /**
      * {@inheritDoc}
      */
     public void beginWriting() throws IOException {
-        // make an XML writer
-        pw = new PrintWriter(this.getPrintStream());
-        xml = new PrettyXMLWriter(pw);
+        XMLWriter xml = getXMLWriter();
         xml.printRaw("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
         xml.printRaw("<!DOCTYPE INSDSeq PUBLIC \"-//EMBL-EBI//INSD INSDSeq/EN\" \"http://www.ebi.ac.uk/dtd/INSD_INSDSeq.dtd\">");
         xml.openTag(INSDSEQS_GROUP_TAG);
@@ -313,6 +320,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
      * {@inheritDoc}
      */
     public void finishWriting() throws IOException {
+        XMLWriter xml = getXMLWriter();
         xml.closeTag(INSDSEQS_GROUP_TAG);
         pw.flush();
     }
@@ -372,6 +380,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
             else if (n.getTerm().equals(Terms.getKeywordTerm())) kws.add(n.getValue());
         }
                
+        XMLWriter xml = getXMLWriter();
         xml.openTag(INSDSEQ_TAG);
         
         xml.openTag(LOCUS_TAG);
