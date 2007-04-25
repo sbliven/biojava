@@ -25,6 +25,7 @@ import org.biojava.utils.Unchangeable;
 /**
  * Represents an author of a documentary reference.
  * @author Richard Holland
+ * @author George Waldon
  * @see DocRef
  * @since 1.5
  */
@@ -44,7 +45,17 @@ public class SimpleDocRefAuthor extends Unchangeable implements DocRefAuthor  {
         if (name==null) throw new IllegalArgumentException("Name cannot be null");
         this.name = name;
         this.editor = editor;
+        if(editor==true) {
+            int idx = name.lastIndexOf(" (ed.)");
+            if(idx!=-1 && idx==(name.length()-6))
+                this.name = name.substring(0,name.length()-6);
+        }
         this.consortium = consortium;
+        if(consortium==true) {
+            int idx = name.lastIndexOf(" (consortium)");
+            if(idx!=-1 && idx==(name.length()-13))
+                this.name = name.substring(0,name.length()-13);
+        }
     }
     
     /**
@@ -74,6 +85,16 @@ public class SimpleDocRefAuthor extends Unchangeable implements DocRefAuthor  {
         } else {
             this.editor = false;
             this.consortium = false;
+        }
+        if(editor==true) {
+            int idx = this.name.lastIndexOf(" (ed.)");
+            if(idx!=-1 && idx==(this.name.length()-6))
+                this.name = this.name.substring(0,this.name.length()-6);
+        }
+        if(consortium==true) {
+            int idx = this.name.lastIndexOf(" (consortium)");
+            if(idx!=-1 && idx==(this.name.length()-13))
+                this.name = this.name.substring(0,this.name.length()-13);
         }
     }
     
