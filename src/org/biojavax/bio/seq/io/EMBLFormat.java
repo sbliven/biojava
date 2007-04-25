@@ -997,8 +997,10 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     hasSecondary = true;
                 }
             }
-            if (!hasSecondary) sb.append("; -");
-            sb.append(".");
+            //if (!hasSecondary) sb.append("; -"); 
+            //sb.append(".");
+            if (!hasSecondary) sb.append(";");
+            else sb.append(".");
             StringTools.writeKeyValueLine(DATABASE_XREF_TAG, sb.toString(), 5, this.getLineWidth(), null, DATABASE_XREF_TAG, this.getPrintStream());
         }
         this.getPrintStream().println(DELIMITER_TAG+"   ");
