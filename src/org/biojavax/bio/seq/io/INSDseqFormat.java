@@ -443,18 +443,6 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         xml.print(rs.getAccession()+"."+rs.getVersion());
         xml.closeTag(ACC_VERSION_TAG);
         
-        if (!accessions.isEmpty()) {
-            xml.openTag(SECONDARY_ACCESSIONS_GROUP_TAG);
-            for (Iterator i = accessions.iterator(); i.hasNext(); ) {
-                
-                xml.openTag(SECONDARY_ACCESSION_TAG);
-                xml.print((String)i.next());
-                xml.closeTag(SECONDARY_ACCESSION_TAG);
-                
-            }
-            xml.closeTag(SECONDARY_ACCESSIONS_GROUP_TAG);
-        }
-        
         if (!otherSeqIDs.isEmpty()) {
             xml.openTag(OTHER_SEQIDS_GROUP_TAG);
             for (Iterator i = otherSeqIDs.iterator(); i.hasNext(); ) {
@@ -465,6 +453,18 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 
             }
             xml.closeTag(OTHER_SEQIDS_GROUP_TAG);
+        }
+        
+        if (!accessions.isEmpty()) {
+            xml.openTag(SECONDARY_ACCESSIONS_GROUP_TAG);
+            for (Iterator i = accessions.iterator(); i.hasNext(); ) {
+                
+                xml.openTag(SECONDARY_ACCESSION_TAG);
+                xml.print((String)i.next());
+                xml.closeTag(SECONDARY_ACCESSION_TAG);
+                
+            }
+            xml.closeTag(SECONDARY_ACCESSIONS_GROUP_TAG);
         }
         
         if (!kws.isEmpty()) {
