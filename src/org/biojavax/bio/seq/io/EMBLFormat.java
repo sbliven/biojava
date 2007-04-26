@@ -387,6 +387,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             } else if (sectionKey.equals(KEYWORDS_TAG)) {
                 String val = ((String[])section.get(0))[1];
                 val = val.substring(0,val.length()-1); // chomp dot
+                val = val.replace('\n',' '); //remove newline
                 String[] kws = val.split(";");
                 for (int i = 0; i < kws.length; i++) {
                     String kw = kws[i].trim();
