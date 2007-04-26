@@ -599,7 +599,8 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     hasSecondary = true;
                 }
             }
-            if (!hasSecondary) sb.append("; -");
+            //create unnecessary event firing
+            //if (!hasSecondary) sb.append("; -");
             
             xml.openTag(DATABASE_XREF_TAG);
             xml.print(sb.toString());
@@ -941,23 +942,29 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 } else if (qName.equals(REMARK_TAG) && !this.parent.getElideReferences() && !this.parent.getElideComments()) {
                     currRefRemark = val;
                 } else if (qName.equals(REFERENCE_TAG) && !this.parent.getElideReferences()) {
-                    // create the pubmed crossref and assign to the bioentry
-                    CrossRef pcr = null;
+                    // create the crossref - medline gets priority, then pubmed, then doi
+                    CrossRef dcr = null;
                     if (currRefPubmed!=null) {
-                        pcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, currRefPubmed, new Integer(0)});
-                        RankedCrossRef rpcr = new SimpleRankedCrossRef(pcr, 0);
-                        rlistener.setRankedCrossRef(rpcr);
-                    }
-                    // create the other crossrefs and assign to the bioentry
-                    for (int i = 0; i < currRefXrefs.size(); i++) {
-                        RankedCrossRef rmcr = new SimpleRankedCrossRef((CrossRef)currRefXrefs.get(i), 0);
-                        rlistener.setRankedCrossRef(rmcr);
+                        dcr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{Terms.PUBMED_KEY, currRefPubmed, new Integer(0)});
+                    } else {
+                        CrossRef pubmed = null;
+                        CrossRef doi = null;
+                        CrossRef other = null;
+                        for (int i = 0; i < currRefXrefs.size(); i++) {
+                            CrossRef cr = (CrossRef)currRefXrefs.get(i);
+                            if(cr.getDbname().equals("pubmed")) pubmed = cr;
+                            else if(cr.getDbname().equals("doi")) doi = cr;
+                            else other = cr;
+                        }
+                        if(pubmed!=null) dcr = pubmed;
+                        else if(doi!=null) dcr = doi;
+                        else dcr = other;
                     }
                     // create the docref object
                     try {
                         DocRef dr = (DocRef)RichObjectFactory.getObject(SimpleDocRef.class,new Object[]{currRefAuthors,currRefJournal,currRefTitle});
-                        // assign the pubmed to the docref 
-                        if (pcr!=null) dr.setCrossref(pcr);
+                        // assign the crossref to the docref 
+                        if (dcr!=null) dr.setCrossref(dcr);
                         // assign the remarks
                         dr.setRemark(currRefRemark);
                         // assign the docref to the bioentry
