@@ -417,9 +417,11 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
         xml.print(udat);
         xml.closeTag(UPDATE_DATE_TAG);
         
-        xml.openTag(CREATE_DATE_TAG);
-        xml.print(cdat==null?udat:cdat);
-        xml.closeTag(CREATE_DATE_TAG);
+        if(cdat!=null) {
+            xml.openTag(CREATE_DATE_TAG);
+            xml.print(cdat);
+            xml.closeTag(CREATE_DATE_TAG);
+        }
         
         if (urel!=null) {
             xml.openTag(UPDATE_REL_TAG);
