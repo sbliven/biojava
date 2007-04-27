@@ -506,14 +506,16 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                 xml.print(Integer.toString(rdr.getRank()));
                 xml.closeTag(REFERENCE_LOCATION_TAG);
                 
-                xml.openTag(REFERENCE_POSITION_TAG);
                 RichLocation rdrl = rdr.getLocation();
-                for (Iterator i = rdrl.blockIterator(); i.hasNext(); ) {
-                	RichLocation l = (RichLocation)i.next();
-                	xml.print(l.getMin()+".."+l.getMax());
-                	if (i.hasNext()) xml.print("; ");
+                if(!rdrl.equals(RichLocation.EMPTY_LOCATION)) {
+                    xml.openTag(REFERENCE_POSITION_TAG);
+                    for (Iterator i = rdrl.blockIterator(); i.hasNext(); ) {
+                            RichLocation l = (RichLocation)i.next();
+                            xml.print(l.getMin()+".."+l.getMax());
+                            if (i.hasNext()) xml.print("; ");
+                    }
+                    xml.closeTag(REFERENCE_POSITION_TAG);
                 }
-                xml.closeTag(REFERENCE_POSITION_TAG);
                 
                 xml.openTag(AUTHORS_GROUP_TAG);
                 List auths = d.getAuthorList();
@@ -971,7 +973,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                         if (currRefPosition!=null) {
                             // Use the actual location specified.
                             RichLocation loc;
-                            if (currRefPosition.equals("sites")) loc = RichLocation.EMPTY_LOCATION;
+                            if (currRefPosition.equals("") || currRefPosition.equals("sites")) loc = RichLocation.EMPTY_LOCATION;
                             else {
                                 List members = new ArrayList();
                                 String[] parts = currRefPosition.split(";\\s+");
