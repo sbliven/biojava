@@ -77,7 +77,8 @@ public interface DocRefAuthor extends Comparable,Changeable {
             if (authors==null) throw new IllegalArgumentException("Authors string cannot be null");
             String[] parts = authors.split("(,|\\sand)\\s+");
             List authSet = new ArrayList();
-            for (int i = 0; i < parts.length; i++) authSet.add(new SimpleDocRefAuthor(parts[i]));
+            for (int i = 0; i < parts.length; i++) 
+                if(parts[i].length()>0) authSet.add(new SimpleDocRefAuthor(parts[i]));
             return authSet;
         }
         

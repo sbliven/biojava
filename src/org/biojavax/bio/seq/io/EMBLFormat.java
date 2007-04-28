@@ -423,7 +423,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 int ref_end = -999;
                 // rest can be in any order
                 String consortium = null;
-                String authors = null;
+                String authors = "";
                 String title = null;
                 String locator = null;
                 String pubmed = null;
@@ -974,6 +974,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 }
             }
             if (!auths.isEmpty()) StringTools.writeKeyValueLine(AUTHORS_TAG, DocRefAuthor.Tools.generateAuthorString(auths)+";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
+            else StringTools.writeKeyValueLine(AUTHORS_TAG, ";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
             if (d.getTitle()!=null && d.getTitle().length()!=0) StringTools.writeKeyValueLine(TITLE_TAG, "\""+d.getTitle()+"\";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
             else StringTools.writeKeyValueLine(TITLE_TAG, ";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(LOCATOR_TAG, d.getLocation()+".", 5, this.getLineWidth(), null, LOCATOR_TAG, this.getPrintStream());
