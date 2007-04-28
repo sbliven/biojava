@@ -684,10 +684,10 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
         }
         
         //adjust molecule type during format conversion
-        if(moltype.length()>6) {
+        if(moltype!=null && moltype.length()>6) {
             if(moltype.indexOf("DNA")!=-1) moltype = "DNA";
             else if(moltype.indexOf("RNA")!=-1) moltype = "RNA";
-            else moltype = "NA"; //assume empty moltype is for proteins!
+            else moltype = "NA";
         }
         
         // locus(name) + length + alpha + div + date line
