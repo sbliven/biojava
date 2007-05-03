@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -176,6 +177,18 @@ public class ABIFParser {
         if (tagName.length() != 4)
             throw new IllegalArgumentException("tagName must be 4 characters long");
         return (ABIFParser.TaggedDataRecord) records.get(tagName + tagNumber);
+    }
+    
+    /**
+     * Obtain all data records. Keys of the map are strings consisting of
+     * tag names with tag numbers concatenated immediately afterwards. Values
+     * are TaggedDataRecord objects. The map has no particular order and so 
+     * cannot be relied on to iterate over records in the same order they
+     * were read from the file.
+     * @return the map of all data records.
+     */
+    public Map getAllDataRecords() {
+    	return Collections.unmodifiableMap(records);
     }
 
     /**
