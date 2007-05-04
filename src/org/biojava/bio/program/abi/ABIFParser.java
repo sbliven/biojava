@@ -269,11 +269,11 @@ public class ABIFParser {
             if (recordLength <= 4) {
                 switch (dataType) {
                 case DATA_TYPE_ASCII_ARRAY:
-                    if (elementLength > 3)
+                    if (recordLength > 3)
                         sb.append((char) ((dataRecord >>> 24) & 0xFF));
-                    if (elementLength > 2)
+                    if (recordLength > 2)
                         sb.append((char) ((dataRecord >>> 16) & 0xFF));
-                    if (elementLength > 1)
+                    if (recordLength > 1)
                         sb.append((char) ((dataRecord >>> 8 ) & 0xFF));
                     sb.append((char) ((dataRecord) & 0xFF));
                     break;
