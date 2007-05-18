@@ -89,7 +89,6 @@ public class XMLDistributionWriter{
 
         out.write("</Distribution>");
         out.flush();
-        out.close();
     } //end writeXML
 
 
@@ -118,7 +117,6 @@ public class XMLDistributionWriter{
          }
          out.write("</Distribution>");
          out.flush();
-         out.close();
 
     } //end writeXML
 
