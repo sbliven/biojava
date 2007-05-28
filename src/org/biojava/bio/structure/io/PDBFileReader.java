@@ -31,11 +31,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Map;
 
+import org.biojava.bio.structure.AminoAcid;
+import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.Group;
+import org.biojava.bio.structure.GroupIterator;
 import org.biojava.bio.structure.Structure;
 import org.biojava.utils.io.InputStreamProvider;
-
-
 
 
 /**
@@ -66,7 +69,34 @@ public class PDBFileReader implements StructureIOFile {
     
     String path                     ;
     ArrayList extensions            ;
+    boolean parseSecStruc;
     
+    public static void main(String[] args){
+        String filename =  "/path/to/5pti.pdb" ;
+        
+        PDBFileReader pdbreader = new PDBFileReader();
+        pdbreader.setParseSecStruc(true);
+        
+        try{
+            Structure struc = pdbreader.getStructure(filename);
+            System.out.println(struc);
+            
+            GroupIterator gi = new GroupIterator(struc);
+            while (gi.hasNext()){
+                Group g = (Group) gi.next();
+                Chain  c = g.getParent();
+                if ( g instanceof AminoAcid ){
+                    AminoAcid aa = (AminoAcid)g;
+                    Map sec = aa.getSecStruc();
+                    System.out.println(c.getName() + " " + g + " " + sec);
+                }
+                
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
     
     public PDBFileReader() {
@@ -78,9 +108,22 @@ public class PDBFileReader implements StructureIOFile {
         extensions.add(".pdb.gz");
         extensions.add(".ent.Z");
         extensions.add(".pdb.Z");
+        parseSecStruc = false;
         
     }
     
+    
+    
+    public boolean isParseSecStruc() {
+        return parseSecStruc;
+    }
+
+
+    public void setParseSecStruc(boolean parseSecStruc) {
+        this.parseSecStruc = parseSecStruc;
+    }
+
+
     /** directory where to find PDB files */
     public void setPath(String p){
         path = p ;
@@ -186,6 +229,7 @@ public class PDBFileReader implements StructureIOFile {
         InputStream inStream = getInputStream(pdbId);
                 
         PDBFileParser pdbpars = new PDBFileParser();
+        pdbpars.setParseSecStruc(parseSecStruc);
         Structure struc = pdbpars.parsePDBFile(inStream) ;
         return struc ;
     }
@@ -217,6 +261,7 @@ public class PDBFileReader implements StructureIOFile {
         InputStream inStream = isp.getInputStream(filename);
 
         PDBFileParser pdbpars = new PDBFileParser();
+        pdbpars.setParseSecStruc(parseSecStruc);
         Structure struc = pdbpars.parsePDBFile(inStream) ;
         return struc ;
 
