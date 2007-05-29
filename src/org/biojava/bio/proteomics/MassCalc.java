@@ -51,7 +51,7 @@ import org.biojava.bio.symbol.SymbolPropertyTable;
  * @author M. Jones sdfsd
  * @author Keith James (minor changes)
  * @author Mark Schreiber
- * @author George Waldon - getEstimatedMass
+ * @author George Waldon - getMolecularWeight
  */
 public class MassCalc {
     //Possibly these should be put in a configurable table somewhere
