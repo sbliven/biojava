@@ -45,8 +45,9 @@ import org.biojava.bio.structure.align.pairwise.FragmentPair;
 import org.biojava.bio.structure.io.PDBFileReader;
 import org.biojava.bio.structure.jama.Matrix;
 
-/* Perform a pairwise protein structure superimposition.
- * The algorithm is based and heavily influenced by the StrComPy package by Peter Lackner.
+/** Perform a pairwise protein structure superimposition.
+ * The algorithm is based on a variation of the PSC++ algorithm provided by Peter Lackner
+ * (Peter.Lackner@sbg.ac.at, personal communication) . 
  * 
  * It is a distance matrix based, rigid body protein structure superimposition.
  *  
@@ -91,8 +92,8 @@ public class StructurePairAligner {
             //String pdb1 = "1crl";
             //String pdb2 = "1ede";
             
-            String pdb1 = "1boo";
-            String pdb2 = "1xva";            
+            String pdb1 = "1buz";
+            String pdb2 = "1ali";            
             String outputfile = "/Users/ap3/tmp/alig_"+pdb1+"_"+pdb2+".pdb";
           
             // NO NEED TO DO CHANGE ANYTHING BELOW HERE...
