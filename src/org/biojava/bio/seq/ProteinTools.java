@@ -61,7 +61,7 @@ import org.xml.sax.InputSource;
  * @author Thomas Down
  * @author MarkSchreiber
  * @author Jonathan Warren
- * @author gwaldon (pyrrolysine)
+ * @author gwaldon (pyrrolysine, pKs)
  */
 public class ProteinTools {
     private static final FiniteAlphabet proteinAlpha;
@@ -126,11 +126,21 @@ public class ProteinTools {
             SymbolPropertyTable.AVG_MASS
             );
 
+            SimpleSymbolPropertyTable pK_NtermPropertyTable = new SimpleSymbolPropertyTable(
+            getAlphabet(),
+            SymbolPropertyTable.PK_Nterm
+            );
+            
             SimpleSymbolPropertyTable pKPropertyTable = new SimpleSymbolPropertyTable(
             getAlphabet(),
             SymbolPropertyTable.PK
             );
 
+            SimpleSymbolPropertyTable pK_CtermPropertyTable = new SimpleSymbolPropertyTable(
+            getAlphabet(),
+            SymbolPropertyTable.PK_Cterm
+            );
+            
             SymbolTokenization tokens = getAlphabet().getTokenization("token");
 
             NodeList children = doc.getDocumentElement().getChildNodes();
@@ -158,10 +168,15 @@ public class ProteinTools {
                         } else if (name.equals(SymbolPropertyTable.AVG_MASS)) {
                             String value = el.getAttribute("value");
                             avgMassPropertyTable.setDoubleProperty(s, value);
+                        } else if (name.equals(SymbolPropertyTable.PK_Nterm)) {
+                            String value = el.getAttribute("value");
+                            pK_NtermPropertyTable.setDoubleProperty(s, value);
                         } else if (name.equals(SymbolPropertyTable.PK)) {
                             String value = el.getAttribute("value");
                             pKPropertyTable.setDoubleProperty(s, value);
-                            break;
+                        } else if (name.equals(SymbolPropertyTable.PK_Cterm)) {
+                            String value = el.getAttribute("value");
+                            pK_CtermPropertyTable.setDoubleProperty(s, value);
                         }
                     }
                 }
@@ -169,7 +184,9 @@ public class ProteinTools {
 
             propertyTableMap.put(SymbolPropertyTable.MONO_MASS, (SymbolPropertyTable) monoMassPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.AVG_MASS, (SymbolPropertyTable) avgMassPropertyTable);
+            propertyTableMap.put(SymbolPropertyTable.PK_Nterm, (SymbolPropertyTable) pK_NtermPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.PK, (SymbolPropertyTable) pKPropertyTable);
+            propertyTableMap.put(SymbolPropertyTable.PK_Cterm, (SymbolPropertyTable) pK_CtermPropertyTable);
         } catch (Exception e) {
             throw new BioError(" Could not initialize ProteinTools", e);
         }

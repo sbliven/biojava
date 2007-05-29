@@ -27,7 +27,8 @@ package org.biojava.bio.symbol;
 
 /**
  * class for maintaining properties associated with a symbol
- * @author  Mike Jones
+ * @author Mike Jones
+ * @author George Waldon
  */
 public interface SymbolPropertyTable {
   
@@ -35,7 +36,11 @@ public interface SymbolPropertyTable {
 
   public static String MONO_MASS = "monoMass";
 
+  public static String PK_Nterm = "pK_Nterm";
+  
   public static String PK = "pK";
+  
+  public static String PK_Cterm = "pK_Cterm";
 
   // the name of the property e.g. "isotopic mass"
   public String getName();

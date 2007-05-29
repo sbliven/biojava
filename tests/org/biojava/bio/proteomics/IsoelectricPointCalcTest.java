@@ -24,17 +24,23 @@ public class IsoelectricPointCalcTest extends TestCase {
 
         try {
             SymbolList pro = ProteinTools.createProtein("hhhhhher");
-            double p1 = IsoelectricPointCalc.getIsoelectricPoint(pro,false,false);  
+            double p1 = IsoelectricPointCalc.getIsoelectricPoint(pro); 
             pro = ProteinTools.createProtein("h-hhhhher");
-            double p2 = IsoelectricPointCalc.getIsoelectricPoint(pro,false,false);
+            double p2 = IsoelectricPointCalc.getIsoelectricPoint(pro);
             pro = ProteinTools.createProtein("hxhhhhher");
-            double p3 = IsoelectricPointCalc.getIsoelectricPoint(pro,false,false);
+            double p3 = IsoelectricPointCalc.getIsoelectricPoint(pro);
             assertTrue(p1==p2);
             assertTrue(p1==p3);
-            
-            //will fail in BinarySearch
-            //pro = ProteinTools.createProtein("hhhhhh");
-            //IsoelectricPointCalc.getIsoelectricPoint(pro,false,false);
+
+            pro = ProteinTools.createProtein("cdehkry");
+            double p4 = IsoelectricPointCalc.getIsoelectricPoint(pro);
+            assert(p4==6.74);
+            pro = ProteinTools.createProtein("da");
+            p4 = IsoelectricPointCalc.getIsoelectricPoint(pro);
+            assert(p4==3.80);
+            pro = ProteinTools.createProtein("ad");
+            p4 = IsoelectricPointCalc.getIsoelectricPoint(pro);
+            assert(p4==4.30);
             
         } catch (IllegalSymbolException ex) {
             fail(ex.getMessage());
