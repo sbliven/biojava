@@ -269,9 +269,9 @@ public class PDBFileParser  {
 
         String classification  = line.substring (10, 50).trim() ;
         String deposition_date = line.substring (50, 59).trim() ;
-        String idCode          = line.substring (62, 66).trim() ;       
+        String pdbCode          = line.substring (62, 66).trim() ;       
 
-        header.put(idCode,idCode);
+        header.put(idCode,pdbCode);
         structure.setPDBCode(idCode);
         header.put("classification",classification);
         header.put("depDate",deposition_date);
