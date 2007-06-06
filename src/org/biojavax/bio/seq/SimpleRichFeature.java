@@ -58,6 +58,8 @@ import org.biojavax.ontology.ComparableTerm;
  */
 public class SimpleRichFeature extends AbstractChangeable implements RichFeature {
     
+	private static int nextRank = 0;
+	
     private RichAnnotation notes = new SimpleRichAnnotation();
     private ComparableTerm typeTerm;
     private ComparableTerm sourceTerm;
@@ -66,7 +68,7 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     private Set crossrefs = new TreeSet();
     private Set relations = new TreeSet();
     private String name;
-    private int rank;
+    private int rank = SimpleRichFeature.nextRank++; // Auto-rank!
     
     /**
      * Creates a new instance of SimpleRichFeature based on a template.

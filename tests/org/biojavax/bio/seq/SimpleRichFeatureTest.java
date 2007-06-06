@@ -37,6 +37,7 @@ public class SimpleRichFeatureTest extends TestCase {
         templ.typeTerm = makeTerm("CDS");
         templ.annotation = new SimpleRichAnnotation();
         this.richFeature = new SimpleRichFeature(parent, templ);
+        this.richFeature.setRank(0);
     }
    
     /**
@@ -51,6 +52,7 @@ public class SimpleRichFeatureTest extends TestCase {
         SimpleRichFeature richFeature2 = null;
         try {
 			richFeature2 = new SimpleRichFeature(this.richFeature.getParent(), this.richFeature.makeTemplate());
+	        richFeature2.setRank(0);
 		} catch (Exception e) {
 			fail("Unexpected exception: "+e);
 		}
@@ -72,6 +74,7 @@ public class SimpleRichFeatureTest extends TestCase {
         SimpleRichSequence otherParent = new SimpleRichSequence(new SimpleNamespace("anotherns"), "foo", "another_acc", 2, SymbolList.EMPTY_LIST, null);
         try {
 			richFeature2 = new SimpleRichFeature(otherParent, this.richFeature.makeTemplate());
+	        richFeature2.setRank(0);
 		} catch (Exception e) {
             fail("Not expecting "+e.getClass().getName());
 		}
@@ -88,6 +91,7 @@ public class SimpleRichFeatureTest extends TestCase {
         
         try {
 			richFeature2 = new SimpleRichFeature(this.richFeature.getParent(), otherTempl);
+	        richFeature2.setRank(0);
 		} catch (Exception e) {
 			fail("Unexpected exception: "+e);
 		}
@@ -109,6 +113,7 @@ public class SimpleRichFeatureTest extends TestCase {
         SimpleRichFeature richFeature2 = null;
         try {
         	richFeature2 = new SimpleRichFeature(this.richFeature.getParent(), this.richFeature.makeTemplate());
+	        richFeature2.setRank(0);
         } catch (Exception e) {
 			fail("Unexpected exception: "+e);
         }
@@ -130,6 +135,7 @@ public class SimpleRichFeatureTest extends TestCase {
         SimpleRichSequence otherParent = new SimpleRichSequence(new SimpleNamespace("anotherns"), "foo", "another_acc", 2, SymbolList.EMPTY_LIST, null);
         try {
         	richFeature2 = new SimpleRichFeature(otherParent, this.richFeature.makeTemplate());
+	        richFeature2.setRank(0);
         } catch(Exception ex){
             fail("Not expecting "+ex.getClass().getName());
         }
@@ -145,6 +151,7 @@ public class SimpleRichFeatureTest extends TestCase {
         otherTempl.annotation = new SimpleRichAnnotation();
         try {
         	richFeature2 = new SimpleRichFeature(this.richFeature.getParent(), otherTempl);
+	        richFeature2.setRank(0);
         } catch(Exception ex){
             fail("Not expecting "+ex.getClass().getName());
         }
@@ -157,6 +164,7 @@ public class SimpleRichFeatureTest extends TestCase {
         otherTempl.sourceTerm = makeTerm("known");
         try {
         	richFeature2 = new SimpleRichFeature(this.richFeature.getParent(), otherTempl);
+	        richFeature2.setRank(0);
         } catch(Exception ex){
             fail("Not expecting "+ex.getClass().getName());
         }
@@ -171,6 +179,7 @@ public class SimpleRichFeatureTest extends TestCase {
         SimpleRichFeature richFeature2 = null;
         try {
         	richFeature2 = new SimpleRichFeature(this.richFeature.getParent(), this.richFeature.makeTemplate());
+	        richFeature2.setRank(0);
         } catch (Exception e) {
 			fail("Unexpected exception: "+e);
         }
