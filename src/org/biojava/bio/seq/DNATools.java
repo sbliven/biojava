@@ -57,6 +57,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Keith James (docs)
  * @author Mark Schreiber
  * @author David Huen
+ * @author Richard Holland
  */
 public final class DNATools {
   private static final ReversibleTranslationTable complementTable;
@@ -190,14 +191,15 @@ public final class DNATools {
     if(dna.indexOf('-') != -1 || dna.indexOf('~') != -1){//there is a gap
         return createGappedDNASequence(dna, name);
     }
-    try {
+    // No need to wrap in try-catch as throws IllegalSymbolException already.
+    //try {
       return new SimpleSequenceFactory().createSequence(
         createDNA(dna),
         "", name, new SimpleAnnotation()
       );
-    } catch (BioException se) {
-      throw new BioError("Something has gone badly wrong with DNA", se);
-    }
+    //} catch (BioException se) {
+    //  throw new BioError("Something has gone badly wrong with DNA", se);
+    //}
   }
 
 
