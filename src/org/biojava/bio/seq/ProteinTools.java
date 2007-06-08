@@ -141,6 +141,11 @@ public class ProteinTools {
             SymbolPropertyTable.PK_Cterm
             );
             
+            SimpleSymbolPropertyTable HydropathicityTable = new SimpleSymbolPropertyTable(
+            getAlphabet(),
+            SymbolPropertyTable.HYDROPATHICITY
+            );
+            
             SymbolTokenization tokens = getAlphabet().getTokenization("token");
 
             NodeList children = doc.getDocumentElement().getChildNodes();
@@ -177,6 +182,9 @@ public class ProteinTools {
                         } else if (name.equals(SymbolPropertyTable.PK_Cterm)) {
                             String value = el.getAttribute("value");
                             pK_CtermPropertyTable.setDoubleProperty(s, value);
+                        }else if (name.equals(SymbolPropertyTable.HYDROPATHICITY)) {
+                            String value = el.getAttribute("value");
+                            HydropathicityTable.setDoubleProperty(s, value);
                         }
                     }
                 }
@@ -186,7 +194,8 @@ public class ProteinTools {
             propertyTableMap.put(SymbolPropertyTable.AVG_MASS, (SymbolPropertyTable) avgMassPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.PK_Nterm, (SymbolPropertyTable) pK_NtermPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.PK, (SymbolPropertyTable) pKPropertyTable);
-            propertyTableMap.put(SymbolPropertyTable.PK_Cterm, (SymbolPropertyTable) pK_CtermPropertyTable);
+            propertyTableMap.put(SymbolPropertyTable.PK_Cterm, (SymbolPropertyTable) HydropathicityTable);
+            propertyTableMap.put(SymbolPropertyTable.HYDROPATHICITY, (SymbolPropertyTable) HydropathicityTable);
         } catch (Exception e) {
             throw new BioError(" Could not initialize ProteinTools", e);
         }

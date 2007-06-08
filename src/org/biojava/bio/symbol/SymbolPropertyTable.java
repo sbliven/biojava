@@ -32,16 +32,21 @@ package org.biojava.bio.symbol;
  */
 public interface SymbolPropertyTable {
   
+  //amino acid mass properties
   public static String AVG_MASS = "avgMass";
 
   public static String MONO_MASS = "monoMass";
 
+  //amino acid pK properties
   public static String PK_Nterm = "pK_Nterm";
   
   public static String PK = "pK";
   
   public static String PK_Cterm = "pK_Cterm";
 
+  //amino acid Hydropathicity properties
+  public static String HYDROPATHICITY = "hydropathicity";
+  
   // the name of the property e.g. "isotopic mass"
   public String getName();
 
