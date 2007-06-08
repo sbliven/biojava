@@ -45,7 +45,7 @@
   <!-- Checks environment and setup variables -->
   <target name="init" description="Checks environment and setup variables">
     <tstamp />
-    <property name="version" value="1.5-beta" />
+    <property name="version" value="1.5-beta3" />
 
     <property name="build.compiler" value="javac1.4" />
 
@@ -591,6 +591,7 @@
   </target>
   
   
+  <!-- This task is mainly for BioJava admins to build a distribution, not needed for normal use -->
   <target name="dist" depends="clean-dist, init, javadocs-all, package-all" description="copy all the files for a distribution">
       <mkdir dir="${dist.root}"/>
       <mkdir dir="${dist.dir}"/>
@@ -604,8 +605,8 @@
       <!-- copy the demos.jar -->
       <copy file="${jar.demos}" tofile="${dist.dir}/demos-${version}.jar"/>
       
-      <!-- copy the lib jars -->
-      <copy todir="${dist.dir}/lib">
+      <!-- copy the other jars -->
+      <copy todir="${dist.dir}">
         <fileset dir=".">
           <include name="*.jar" />
         </fileset>
