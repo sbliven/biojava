@@ -48,7 +48,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.2
- * @see org.biojavax.bio.seq.RichFeatureHolder
+ * @see org.biojavax.bio.seq.RichFeatureRelationshipHolder 
  */
 
 public abstract class LazyFeatureHolder

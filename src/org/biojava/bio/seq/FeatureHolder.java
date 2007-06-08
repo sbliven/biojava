@@ -37,7 +37,7 @@ import org.biojava.utils.Unchangeable;
  * that implements both the real container or the features. FeatureHolders are
  * like sets of features.
  * </p>
- * @see org.biojavax.bio.seq.RichFeatureHolder
+ * @see org.biojavax.bio.seq.RichFeatureRelationshipHolder
  * @author Matthew Pocock
  * @author Thomas Down
  */
