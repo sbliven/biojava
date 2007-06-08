@@ -581,7 +581,7 @@ public class PDBFileParser  {
     /** Handler for REMARK lines 
      */
     private void pdb_REMARK_Handler(String line) {
-        String l = line.substring(0,10).trim();
+        String l = line.substring(0,11).trim();
         if (l.equals("REMARK   2"))pdb_REMARK_2_Handler(line);
 
     }
@@ -742,7 +742,7 @@ public class PDBFileParser  {
                     } else {
                         // does not seem to be so let's assume it is 
                         //  nonstandard aminoacid and label it "X"
-                        System.out.println("unknown amino acid"+groupCode3 );
+                        System.out.println("unknown amino acid "+groupCode3 );
                         aminoCode1 = new Character('x');
                     }
                 }
