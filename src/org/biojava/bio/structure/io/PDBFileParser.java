@@ -272,14 +272,10 @@ public class PDBFileParser  {
         String pdbCode          = line.substring (62, 66).trim() ;       
 
         header.put(idCode,pdbCode);
-        structure.setPDBCode(idCode);
+        structure.setPDBCode(pdbCode);
         header.put("classification",classification);
         header.put("depDate",deposition_date);
-
-
-        structure.setPDBCode(idCode);
-        //setId(idCode);
-
+      
     }
     
     
