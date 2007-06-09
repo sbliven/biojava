@@ -352,7 +352,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
    */
 	public List alignAll(SequenceIterator source, SequenceDB subjectDB)
 			throws NoSuchElementException, BioException {
-		List<Alignment> l = new LinkedList<Alignment>();
+		List l = new LinkedList();
 		while (source.hasNext()) {
 			Sequence query = source.nextSequence();
 			// compare all the sequences of both sets.
@@ -574,7 +574,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
 						new SimpleSymbolList(
 								subject.getAlphabet().getTokenization("token"), align[1]),
 						subject.getURN(), subject.getName(), subject.getAnnotation()));
-				Map<String, Sequence> m = new HashMap<String, Sequence>();
+				Map m = new HashMap();
 				m.put(query.getName(), query);
 				m.put(subject.getName(), subject);
 				pairalign = new SimpleAlignment(m);
