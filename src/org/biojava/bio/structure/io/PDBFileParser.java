@@ -167,7 +167,7 @@ public class PDBFileParser  {
         header.put ("depDate","0000-00-00");
         header.put ("title","");
         header.put ("technique","");
-        header.put ("resolution","");
+        header.put ("resolution",null);
         header.put ("modDate","0000-00-00");
         //header.put ("journalRef","");
         //header.put ("author","");
@@ -896,7 +896,8 @@ public class PDBFileParser  {
 
             connects.add(cons);
         } catch (Exception e){
-            e.printStackTrace();
+            System.err.println("could not parse CONECT line correctly.");
+            System.err.println(e.getMessage() + " at line " + line);
             return;
         }
     }
@@ -1008,8 +1009,7 @@ public class PDBFileParser  {
     public Structure parsePDBFile(BufferedReader buf) 
     throws IOException 
     {
-
-
+        
         // (re)set structure 
 
         structure     = new StructureImpl() ;
