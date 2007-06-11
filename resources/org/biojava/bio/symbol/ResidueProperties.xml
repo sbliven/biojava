@@ -24,7 +24,7 @@
     -->
   
   <residue token="A">
-    <property name="monoMass" value="71.03711"/>
+    <property name="monoMass" value="71.037114"/>
     <property name="avgMass" value="71.0788"/>
     <property name="pK_Nterm" value="7.59"/>
     <property name="pK" value="0.0"/>
@@ -64,7 +64,7 @@
     <property name="hydropathicity" value="2.8"/>
   </residue>
   <residue token="G">
-    <property name="monoMass" value="57.02146"/>
+    <property name="monoMass" value="57.021464"/>
     <property name="avgMass" value="57.0520"/>
     <property name="pK_Nterm" value="7.50"/>
     <property name="pK" value="0.0"/>
@@ -120,7 +120,7 @@
     <property name="hydropathicity" value="-3.5"/>
   </residue>
   <residue token="P">
-    <property name="monoMass" value="97.05276"/>
+    <property name="monoMass" value="97.052764"/>
     <property name="avgMass" value="97.1167"/>
     <property name="pK_Nterm" value="8.36"/>
     <property name="pK" value="0.0"/>
@@ -144,7 +144,7 @@
     <property name="hydropathicity" value="-4.5"/>
   </residue>
   <residue token="S">
-    <property name="monoMass" value="87.03203"/>
+    <property name="monoMass" value="87.032029"/>
     <property name="avgMass" value="87.0782"/>
     <property name="pK_Nterm" value="6.93"/>
     <property name="pK" value="0.0"/>
@@ -160,7 +160,7 @@
     <property name="hydropathicity" value="-0.7"/>
   </residue>
   <residue token="V">
-    <property name="monoMass" value="99.0684"/>
+    <property name="monoMass" value="99.06814"/>
     <property name="avgMass" value="99.1326"/>
     <property name="pK_Nterm" value="7.44"/>
     <property name="pK" value="0.0"/>
