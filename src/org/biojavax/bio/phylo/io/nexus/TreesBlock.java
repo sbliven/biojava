@@ -27,6 +27,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+import java.util.*;
+
+import org.jgrapht.*;
+import org.jgrapht.graph.*;
 
 /**
  * Represents Nexus trees blocks.
@@ -48,6 +53,9 @@ public class TreesBlock extends NexusBlock.Abstract {
 	private List comments = new ArrayList();
 
 	private Map trees = new LinkedHashMap();
+
+	private UndirectedGraph<String, DefaultEdge> jgrapht =  new Pseudograph<String, DefaultEdge>(DefaultEdge.class);
+
 
 	/**
 	 * A simple representation of a Newick tree as a single string.
@@ -207,6 +215,144 @@ public class TreesBlock extends NexusBlock.Abstract {
 		return this.trees;
 	}
 
+
+	/**
+	 * Returns a tree for given label
+         */
+     	public Object getTree(final String label) {
+		return this.trees.get(label);
+	}
+
+	/**
+	 * Add a tree, converting JGraphT to NewickString
+        */
+
+	public void addTree(final String label, UndirectedGraph<String, DefaultEdge> treegraph) {
+	
+		final NewickTreeString tree = new NewickTreeString();
+		String temp = treegraph.toString();
+		String [] tokens = null; 
+		int len = 0;
+
+		tokens = temp.split("\\[");             // extract the tree string part from JGraphT
+		temp = tokens[2];
+		tokens = temp.split("\\]");	
+		temp = tokens[0];
+		
+		temp = temp.replace("{", "");
+		temp = temp.replace("}", "");
+		temp = temp.replace(" ", "");
+		tokens = temp.split(",");               // parse all vertices and store it in the string array tokens
+		temp = "";
+	
+		for(int i = 0; ; i++){                                 // find the number of vertices in a tree		
+			try{	
+				temp = tokens[i];	
+				//System.out.println(tokens[i]);
+			}catch(ArrayIndexOutOfBoundsException e){len = i; break;}
+		}
+		//System.out.println(len);
+		
+		for(int i = 0 ; i < len; i = i + 4){
+			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
+				temp = "("+tokens[i]+ ", "+ tokens[i+3] + ")";
+				for(int j = i +4; j < len; j++){
+
+					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])){
+						tokens[j] = temp;
+					}
+				}
+			}
+		}
+		
+		System.out.println(temp);
+		tree.setTreeString(temp);                           //set TreeString for the tree
+		this.trees.put(label, tree);                        //add Tree to the Map with given label
+	}
+	
+	
+	/**
+	 * gets the given Newick String tree by label, converts it to JGraphT, and returns it.
+         */
+	public UndirectedGraph<String, DefaultEdge> getTreeAsJGraphT(final String label) {
+	
+	String temp, v1, v2, v3;
+	String [] tokens;
+	int len = 0, p_index=0; 
+	Object s_temp1, s_temp2, s_temp3;
+	TreesBlock.NewickTreeString t = new TreesBlock.NewickTreeString();
+	Stack stack = new Stack();
+	
+	t = (TreesBlock.NewickTreeString) this.trees.get(label);
+	//System.out.println(t.getTreeString());
+
+	temp = t.getTreeString();
+	len = temp.length();                  //
+	tokens = temp.split("");              //
+	temp = "";
+	
+	for(int i = 0; i<= len; i++){
+		if(tokens[i].equals("(")){
+			p_index++;
+		}
+	}
+	System.out.println(p_index);
+
+	for(int i = 0; i <= len; i++)               // How to generate Tree Objects for JGraphT 
+	{
+		System.out.println(tokens[i]);
+		if( tokens[i].equals(",") ){          // 1. push into stack if it is a word, or comma
+			stack.push("p" + p_index);
+			p_index--;
+		}else if ( tokens[i].equals("(") || tokens[i].equals(" ") ){    // 2. ignore "(" or " "
+			// ignore		
+		}else if(tokens[i].equals(")")){	  // 3. pop 3 elements if you see ")"
+								
+			try{
+				s_temp3 = stack.pop();    // 4. If you have two species, add them as vertices
+				v3 = s_temp3.toString();  // 5. and push "*" (mark for the common ancester) to stack  
+									
+				try{
+					s_temp2 = stack.pop();
+					v2 = s_temp2.toString();
+			
+					try{
+						s_temp1 = stack.pop();
+						v1 = s_temp1.toString();
+									
+						this.jgrapht.addVertex(v1);
+						this.jgrapht.addVertex(v2);
+						this.jgrapht.addVertex(v3);	
+						this.jgrapht.addEdge(v1,v2);
+						this.jgrapht.addEdge(v2,v3);		
+									
+						stack.push(v2);
+					}catch(EmptyStackException e){}
+				}catch(EmptyStackException e){}												
+			}catch(EmptyStackException e){}
+								
+		}else{
+			// if it is a letter, concatenate for the name, and push it to the stack
+ 								
+			if(tokens[i].equals(" ")){
+				//temp = temp + "_";
+			}else if(tokens[i+1].equals("(") || tokens[i+1].equals(")") || tokens[i+1].equals(",")) {
+				temp = temp + tokens[i];
+				stack.push(temp);
+				temp = "";
+			}else{
+				temp = temp + tokens[i];
+			}
+		}
+	}			
+			
+	System.out.println(jgrapht.toString());
+
+		return this.jgrapht;
+	}
+
+      
+	/************************************************************************************************/
 	/**
 	 * Adds a comment.
 	 * 
