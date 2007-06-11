@@ -482,8 +482,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             for (int j = 0 ; j < refs.length; j++) {
                                 if (refs[j].trim().length()==0) continue;
                                 String[] parts = refs[j].split("=");
-                                String db = parts[0];
-                                String ref = parts[1];
+                                String db = parts[0].trim();
+                                String ref = parts[1].trim();
                                 if (db.equalsIgnoreCase(Terms.PUBMED_KEY)) pubmed = ref;
                                 else if (db.equalsIgnoreCase(Terms.MEDLINE_KEY)) medline = ref;
                                 else if (db.equalsIgnoreCase(Terms.DOI_KEY)) doi = ref;
