@@ -635,7 +635,7 @@ public interface RichSequence extends BioEntry,Sequence {
     public final class IOTools {
         
         private static RichSequenceBuilderFactory factory =
-                RichSequenceBuilderFactory.THRESHOLD;
+                RichSequenceBuilderFactory.FACTORY;
         
         // This can't be instantiated.
         private IOTools() {}
