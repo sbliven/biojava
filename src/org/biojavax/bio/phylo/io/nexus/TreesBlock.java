@@ -232,8 +232,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 		final NewickTreeString tree = new NewickTreeString();
 		String temp = treegraph.toString();
 		String [] tokens = null; 
-		int len = 0;
-
+		
 		tokens = temp.split("\\[");             // extract the tree string part from JGraphT
 		temp = tokens[2];
 		tokens = temp.split("\\]");	
@@ -245,14 +244,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 		tokens = temp.split(",");               // parse all vertices and store it in the string array tokens
 		temp = "";
 	
-		for(int i = 0; ; i++){                                 // find the number of vertices in a tree		
-			try{	
-				temp = tokens[i];	
-				//System.out.println(tokens[i]);
-			}catch(ArrayIndexOutOfBoundsException e){len = i; break;}
-		}
-		//System.out.println(len);
-		
+		int len = tokens.length;
 		for(int i = 0 ; i < len; i = i + 4){
 			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
 				temp = "("+tokens[i]+ ", "+ tokens[i+3] + ")";
@@ -265,7 +257,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 			}
 		}
 		
-		System.out.println(temp);
+		//System.out.println(temp);
 		tree.setTreeString(temp);                           //set TreeString for the tree
 		this.trees.put(label, tree);                        //add Tree to the Map with given label
 	}
@@ -287,8 +279,8 @@ public class TreesBlock extends NexusBlock.Abstract {
 	//System.out.println(t.getTreeString());
 
 	temp = t.getTreeString();
-	len = temp.length();                  //
-	tokens = temp.split("");              //
+	len = temp.length();                  
+	tokens = temp.split("");             
 	temp = "";
 	
 	for(int i = 0; i<= len; i++){
@@ -310,7 +302,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 								
 			try{
 				s_temp3 = stack.pop();    // 4. If you have two species, add them as vertices
-				v3 = s_temp3.toString();  // 5. and push "*" (mark for the common ancester) to stack  
+				v3 = s_temp3.toString();  // 5. and push "p[number]" to stack  
 									
 				try{
 					s_temp2 = stack.pop();
