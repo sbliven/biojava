@@ -41,6 +41,8 @@ import org.biojava.bio.symbol.SymbolPropertyTable;
  */
 public class MassCalcTest extends TestCase
 {
+    private final double delta = 0.000000001;
+    
     protected FiniteAlphabet protAlpha;
 
     protected double monoH = 1.0078250;
@@ -49,7 +51,7 @@ public class MassCalcTest extends TestCase
     protected double monoO = 15.9949146;
     protected double  avgO = 15.9994;
 
-    protected double monoAla = 71.03711;
+    protected double monoAla = 71.037114;
     protected double  avgAla = 71.0788;
 
     protected SymbolList syms1;
@@ -97,7 +99,7 @@ public class MassCalcTest extends TestCase
     public void testStaticGetMass() throws IllegalSymbolException
     {
         double  mass = 0.0;
-        double delta = 0.0;
+        //double delta = 0.0;
 
         mass = MassCalc.getMass(syms1,
                                 SymbolPropertyTable.MONO_MASS,
@@ -132,7 +134,7 @@ public class MassCalcTest extends TestCase
      */
     public void testGetMass() throws IllegalSymbolException
     {
-        double delta = 0.0;
+        //double delta = 0.0;
         MassCalc mCalc;
 
         mCalc = new MassCalc(SymbolPropertyTable.MONO_MASS, false);
@@ -158,7 +160,7 @@ public class MassCalcTest extends TestCase
      */
     public void testGetTermMass() throws IllegalSymbolException
     {
-        double delta = 0.0;
+        //double delta = 0.0;
         MassCalc mCalc;
 
         mCalc = new MassCalc(SymbolPropertyTable.MONO_MASS, false);
@@ -186,7 +188,7 @@ public class MassCalcTest extends TestCase
      */
     public void testSetSymbolModification() throws IllegalSymbolException
     {
-        double delta = 0.0;
+        //double delta = 0.0;
         double newAla = 1.0;
         MassCalc mCalc;
 
