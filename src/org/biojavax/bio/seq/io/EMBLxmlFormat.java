@@ -214,7 +214,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
     public boolean canRead(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         br.readLine(); // skip first line
-        boolean readable = xmlSchema.matcher(br.readLine()).matches(); // check on second line
+        String secondLine = br.readLine();
+        boolean readable = secondLine!=null && xmlSchema.matcher(secondLine).matches(); // check on second line
         br.close();
         return readable;
     }
@@ -235,7 +236,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         stream.mark(2000); // some streams may not support this
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         br.readLine(); // skip first line
-        boolean readable = xmlSchema.matcher(br.readLine()).matches(); // check on second line
+        String secondLine = br.readLine();
+        boolean readable = secondLine!=null && xmlSchema.matcher(secondLine).matches(); // check on second line
         // don't close the reader as it'll close the stream too.
         // br.close();
         stream.reset();

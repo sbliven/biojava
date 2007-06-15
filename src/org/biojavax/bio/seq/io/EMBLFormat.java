@@ -206,7 +206,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         if (readableFileNames.matcher(file.getName()).matches()) return true;
         BufferedReader br = new BufferedReader(new FileReader(file));
         String firstLine = br.readLine();
-        boolean readable = headerLine.matcher(firstLine).matches() &&
+        boolean readable = firstLine!=null && headerLine.matcher(firstLine).matches() &&
                 (lp.matcher(firstLine.substring(3).trim()).matches() ||
                 lpPre87.matcher(firstLine.substring(3).trim()).matches()
                 );
@@ -230,7 +230,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         stream.mark(2000); // some streams may not support this
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         String firstLine = br.readLine();
-        boolean readable = headerLine.matcher(firstLine).matches() &&
+        boolean readable = firstLine!=null && headerLine.matcher(firstLine).matches() &&
                 (lp.matcher(firstLine.substring(3).trim()).matches() ||
                 lpPre87.matcher(firstLine.substring(3).trim()).matches()
                 );

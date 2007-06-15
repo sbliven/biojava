@@ -85,7 +85,8 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
     public boolean canRead(File file) throws IOException {
         if (readableFiles.matcher(file.getName()).matches()) return true;
         BufferedReader br = new BufferedReader(new FileReader(file));
-        boolean readable = br.readLine().startsWith(">");
+        String firstLine = br.readLine();
+        boolean readable = firstLine!=null && firstLine.startsWith(">");
         br.close();
         return readable;
     }
@@ -111,7 +112,8 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
     public boolean canRead(BufferedInputStream stream) throws IOException {
         stream.mark(2000); // some streams may not support this
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-        boolean readable = br.readLine().startsWith(">");
+        String firstLine = br.readLine();
+        boolean readable = firstLine!=null && firstLine.startsWith(">");
         // don't close the reader as it'll close the stream too.
         // br.close();
         stream.reset();

@@ -186,7 +186,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     public boolean canRead(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         String firstLine = br.readLine();
-        boolean readable = headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
+        boolean readable = firstLine!=null && headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
         br.close();
         return readable;
     }
@@ -207,7 +207,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         stream.mark(2000); // some streams may not support this
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         String firstLine = br.readLine();
-        boolean readable = headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
+        boolean readable = firstLine!=null && headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
         // don't close the reader as it'll close the stream too.
         // br.close();
         stream.reset();
