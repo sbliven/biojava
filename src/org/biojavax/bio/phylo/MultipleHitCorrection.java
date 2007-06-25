@@ -1,9 +1,4 @@
-
-import java.io.*;
-import java.lang.*;
-import java.util.*;
-
-import org.biojavax.bio.phylo.io.nexus.*;
+package org.biojavax.bio.phylo;
 
 public class MultipleHitCorrection {
 	
