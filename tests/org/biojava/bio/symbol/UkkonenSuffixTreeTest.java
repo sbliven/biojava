@@ -25,6 +25,15 @@ public class UkkonenSuffixTreeTest extends TestCase {
   public static void main(String args[]){
     junit.textui.TestRunner.run(new TestSuite(UkkonenSuffixTreeTest.class));
   }
+  
+  public void testMultiple() {
+	  // Bug #2260
+	  try {
+		  new UkkonenSuffixTree(mississippi+"$"+mississippi);
+	  } catch (NullPointerException e) {
+		  e.printStackTrace();
+	  }
+  }
 
   public void testNumberNodes(){
     test.addSequence(mississippi, "name", false);

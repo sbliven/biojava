@@ -128,6 +128,7 @@ public class UkkonenSuffixTree{
     //count how many termination Chars in in.
     start =0;
     for (i=0;seq.indexOf(terminationChar, i)!=-1;i=seq.indexOf(terminationChar, i)+1){
+      start=i;
       end=seq.indexOf(terminationChar, i);
       toBeAdded.add(seq.substring(start,end+1));
     }
