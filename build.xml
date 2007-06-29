@@ -18,6 +18,7 @@
     package-apps      builds the jar.apps file
     runtests          runs all tests (requires Ant 1.6.0 or later)
     runtests-fork     runs all tests in separate virtual machines
+    sign              signs the biojava.jar with jarsigner
     javadocs-biojava  builds biojava API documentation
     javadocs-taglets  builds taglets API documentation
     javadocs-demos    builds demos API documentation
@@ -34,6 +35,7 @@
            Greg Cox (fixed documentation)
            Thomas Down (clean up, remove source-copying steps)
            Mark Schreiber
+	   Andreas Prlic 
   version: $Id$
 
   portions Copyright (c) 1999-2000 The Apache Software Foundation.
@@ -377,6 +379,26 @@
     depends="package-biojava,package-demos,package-apps"
     description="create all the jar files" />
 
+ <!-- sign the biojava.jar file -->
+ <target
+    name="sign"
+    depends="package-biojava"
+    description="sign the biojava.jar file with jarsigner"
+    >
+
+    <copy file="${jar.biojava}" tofile="${build.dir}/biojavaUnsigned.jar" />
+
+    <signjar jar="${build.dir}/biojavaUnsigned.jar"
+             signedjar="${jar.biojava}"
+             keystore="selfSignedCertificate/selfSignedCertificate.store"
+             storepass="biojavaCVS" 
+	     alias="biojavaCVS" />
+
+     <!-- to verify that a .jar file is signed: jarsigner -verify biojava.jar -->
+     
+     <delete file="${build.dir}/biojavaUnsigned.jar"/>
+
+  </target>
 
   <!--
     Create Javadoc and other documentation for each distribution package.
