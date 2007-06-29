@@ -30,12 +30,14 @@ biojava-live
  |
  |- src : Java source files and package documentation
  |
+ |- selfSignedCertificate : key required for self-signing of biojava.jar
+ |
  |- taglets : Custom javadoc taglets for biojava
  |
  |- tests : Java unit test source files
  |
 
-BioJava requires Java >= 1.4 to build.
+BioJava requires Java >= 1.5 to build. 
   
 BioJava uses the CLI component of the Jakarta Commons project for its
 user application components.  We currently include CLI 1.0 in the
@@ -68,8 +70,19 @@ To check for edits type:
 and then for each directory under src with at least one modified file, build
 the package.
 
-To use biojava, put biojava.jar, bytecode.jar and commons-cli.jar into your
+To use biojava, put biojava.jar, bytecode.jar, jgrapht-jdk1.5.jar and commons-cli.jar into your
 classpath.
+
+
+To sign biojava.jar using a self signed certificate do:
+
+ant sign
+
+to verify that a biojava.jar has a valid signature do:
+
+jarsigner -verify biojava.jar
+
+
 
 BioJava uses Ant to build the demos. To build the demos, change
 directory to biojava-live and type:
