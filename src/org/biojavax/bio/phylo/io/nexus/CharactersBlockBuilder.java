@@ -40,9 +40,13 @@ public class CharactersBlockBuilder extends NexusBlockBuilder.Abstract
 	protected void addComment(final NexusComment comment) {
 		this.block.addComment(comment);
 	}
+	
+	protected CharactersBlock makeNewBlock() {
+		return new CharactersBlock();
+	}
 
 	protected NexusBlock startBlockObject() {
-		this.block = new CharactersBlock();
+		this.block = this.makeNewBlock();
 		this.resetStatus();
 		return this.block;
 	}

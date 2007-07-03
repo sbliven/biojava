@@ -414,7 +414,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 	}
 
 	public void addState(final String state) {
-		this.stateLabels.put(state, new Object[] { null, new ArrayList() });
+		this.stateLabels.put(state, new ArrayList());
 	}
 
 	public void addStateLabel(final String state, final String label) {

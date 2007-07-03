@@ -274,36 +274,27 @@ public class DistancesBlockParser extends NexusBlockParser.Abstract {
 		else if (this.expectingDiagonal && "DIAGONAL".equalsIgnoreCase(token)) {
 			((DistancesBlockListener) this.getBlockListener())
 					.setDiagonal(true);
-			this.expectingTriangle = false;
 			this.expectingDiagonal = false;
 		}
 
 		else if (this.expectingDiagonal && "NODIAGONAL".equalsIgnoreCase(token)) {
 			((DistancesBlockListener) this.getBlockListener())
 					.setDiagonal(false);
-			this.expectingTriangle = false;
 			this.expectingDiagonal = false;
 		}
 
 		else if (this.expectingLabels && "LABELS".equalsIgnoreCase(token)) {
 			((DistancesBlockListener) this.getBlockListener()).setLabels(true);
-			this.expectingDiagonal = false;
 			this.expectingLabels = false;
-			this.expectingTriangle = false;
 		}
 
 		else if (this.expectingLabels && "NOLABELS".equalsIgnoreCase(token)) {
 			((DistancesBlockListener) this.getBlockListener()).setLabels(false);
-			this.expectingDiagonal = false;
 			this.expectingLabels = false;
-			this.expectingTriangle = false;
 		}
 
 		else if (this.expectingMissing
 				&& token.toUpperCase().startsWith("MISSING")) {
-			this.expectingTriangle = false;
-			this.expectingLabels = false;
-			this.expectingDiagonal = false;
 			this.expectingMissing = false;
 
 			if (token.indexOf("=") >= 0) {
@@ -336,10 +327,6 @@ public class DistancesBlockParser extends NexusBlockParser.Abstract {
 				&& "INTERLEAVE".equalsIgnoreCase(token)) {
 			((DistancesBlockListener) this.getBlockListener())
 					.setInterleaved(true);
-			this.expectingTriangle = false;
-			this.expectingLabels = false;
-			this.expectingDiagonal = false;
-			this.expectingMissing = false;
 			this.expectingInterleave = false;
 		}
 

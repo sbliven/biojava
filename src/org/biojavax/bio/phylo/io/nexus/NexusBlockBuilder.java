@@ -20,7 +20,6 @@
  */
 package org.biojavax.bio.phylo.io.nexus;
 
-import org.biojava.bio.seq.io.ParseException;
 
 /**
  * Builds a Nexus block from listening to events.

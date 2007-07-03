@@ -31,11 +31,7 @@ package org.biojavax.bio.phylo.io.nexus;
 public class DataBlockBuilder extends CharactersBlockBuilder implements
 		DataBlockListener {
 
-	private DataBlock block;
-
-	protected NexusBlock startBlockObject() {
-		this.block = new DataBlock();
-		this.resetStatus();
-		return this.block;
+	protected CharactersBlock makeNewBlock() {
+		return new DataBlock();
 	}
 }
