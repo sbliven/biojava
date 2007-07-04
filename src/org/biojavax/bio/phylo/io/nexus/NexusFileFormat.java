@@ -154,7 +154,7 @@ public class NexusFileFormat {
 		String line;
 		while ((line = reader.readLine()) != null) {
 			final StringTokenizer tokenizer = new StringTokenizer(
-					line.replaceAll("[\\n\\r]+", "\n")
+					line.replaceAll("\\r\\n|\\r", "\n")
 					+ "\n", allDelims, true);
 			while (tokenizer.hasMoreTokens()) {
 				final String tok = tokenizer.nextToken();
