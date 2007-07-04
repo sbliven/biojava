@@ -23,6 +23,8 @@ package org.biojavax.bio.phylo.io.nexus;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -442,6 +444,10 @@ public class CharactersBlock extends NexusBlock.Abstract {
 
 	public List getMatrixData(final String taxa) {
 		return (List) this.matrix.get(taxa);
+	}
+	
+	public Collection getMatrixLabels() {
+		return Collections.unmodifiableSet(this.matrix.keySet());
 	}
 
 	/**
