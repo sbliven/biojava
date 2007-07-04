@@ -259,7 +259,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 
 	public void parseToken(String token) throws ParseException {
 		if (this.expectingMatrixContent
-				&& NexusFileFormat.NEW_LINE.equals(token)) {
+				&& "\n".equals(token)) {
 			// Special handling for new lines inside matrix data.
 			if (this.currentMatrixBracket != null) {
 				((CharactersBlockListener) this.getBlockListener())
@@ -270,7 +270,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			this.expectingMatrixContent = false;
 			this.expectingMatrixKey = true;
 		} else if (this.expectingMatrixKey
-				&& NexusFileFormat.NEW_LINE.equals(token)) {
+				&& "\n".equals(token)) {
 			if (this.matrixFirstLineKey != null)
 				this.matrixPrependNulls = this.matrixFirstLineLength;
 		} else if (token.trim().length() == 0)

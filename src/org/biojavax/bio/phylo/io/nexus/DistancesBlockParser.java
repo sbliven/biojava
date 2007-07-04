@@ -135,7 +135,7 @@ public class DistancesBlockParser extends NexusBlockParser.Abstract {
 
 	public void parseToken(String token) throws ParseException {
 		if (this.expectingMatrixContent
-				&& NexusFileFormat.NEW_LINE.equals(token)) {
+				&& "\n".equals(token)) {
 			// Special handling for new lines inside matrix data.
 			this.expectingMatrixContent = false;
 			this.expectingMatrixKey = true;

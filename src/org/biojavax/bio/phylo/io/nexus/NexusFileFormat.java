@@ -136,7 +136,7 @@ public class NexusFileFormat {
 		String closeBracket = ")";
 		String openBrace = "{";
 		String closeBrace = "}";
-		String newLine = NexusFileFormat.NEW_LINE;
+		String newLine = "\n";
 		String allDelims = space + tab + beginComment + endComment
 				+ singleQuote + underscore + endTokenGroup + newLine
 				+ openBracket + closeBracket + openBrace + closeBrace;
@@ -153,8 +153,9 @@ public class NexusFileFormat {
 		StringBuffer parsedTokBuffer = new StringBuffer();
 		String line;
 		while ((line = reader.readLine()) != null) {
-			final StringTokenizer tokenizer = new StringTokenizer(line
-					+ NexusFileFormat.NEW_LINE, allDelims, true);
+			final StringTokenizer tokenizer = new StringTokenizer(
+					line.replaceAll("[\\n\\r]+", "\n")
+					+ "\n", allDelims, true);
 			while (tokenizer.hasMoreTokens()) {
 				final String tok = tokenizer.nextToken();
 
