@@ -138,15 +138,7 @@ public class AlternativeAlignment {
 				" %id:" + getPercId() + 
 				" gaps:" + getGaps() + 
 				" score:" + d2.format(score)	);
-		/*
-        s.append("idx1:");
-        for (int i=0;i< idx1.length;i++){
-            s.append(" " + idx1[i] );
-        }
-        s.append( "\nidx2:");
-        for (int i=0;i< idx2.length;i++){
-            s.append(" " + idx2[i]) ;
-        }*/
+		
 		return s.toString();
 	}
 
@@ -341,10 +333,6 @@ public class AlternativeAlignment {
 			for (int j=0;j<c;j++){
 				Atom b1 = ca2[j];
 
-//				double d = Math.sqrt(
-//				(a1.getX()-b1.getX()) * (a1.getX()-b1.getX()) + 
-//				(a1.getY()-b1.getY()) * (a1.getY()-b1.getY()) +
-//				(a1.getZ()-b1.getZ()) * (a1.getZ()-b1.getZ()));    
 				try {
 					double d = Calc.getDistance(a1,b1);
 					out.set(i,j,d);
