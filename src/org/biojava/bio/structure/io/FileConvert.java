@@ -158,7 +158,7 @@ public class FileConvert {
      * @return a String representing a PDB file.
      */
     public String toPDB() {
-        
+        String newline = System.getProperty("line.separator");
         
         StringBuffer str = new StringBuffer();
         //int i = 0 ;
@@ -178,13 +178,13 @@ public class FileConvert {
         // do for all models
         int nrModels = structure.nrModels() ;
         if ( structure.isNmr()) {
-            str.append("EXPDTA    NMR, "+ nrModels+" STRUCTURES\n") ;
+            str.append("EXPDTA    NMR, "+ nrModels+" STRUCTURES"+newline) ;
         }
         for (int m = 0 ; m < nrModels ; m++) {
             ArrayList model = (ArrayList)structure.getModel(m);
             // todo support NMR structures ...
             if ( structure.isNmr()) {
-                str.append("MODEL      " + (m+1)+"\n");
+                str.append("MODEL      " + (m+1)+ newline);
             }
             // do for all chains
             int nrChains = model.size();
@@ -245,14 +245,14 @@ public class FileConvert {
                         + resName + " " + chainID + resseq 
                         + "   " + x+y+z 
                         + occupancy + tempfactor;
-                        str.append(line + "\n");
+                        str.append(line + newline);
                         //System.out.println(line);
                     }
                 }
             }
             
             if ( structure.isNmr()) {
-                str.append("ENDMDL\n");
+                str.append("ENDMDL"+newline);
             }
             
             
@@ -357,7 +357,7 @@ public class FileConvert {
         if ( doPrintConnections() ) {
             // do connectivity for all chains:
             
-            List cons = (ArrayList) structure.getConnections();
+            List cons = structure.getConnections();
             for (int cnr = 0; cnr<cons.size();cnr++){
                 
                 
