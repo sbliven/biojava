@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.biojava.bio.Annotation;
 
@@ -43,10 +44,10 @@ public class ChainImpl implements Chain {
     
     String swissprot_id ; 
     String name ; // like in PDBfile
-    List groups;
+    List <Group> groups;
     Annotation annotation ;
     
-    HashMap pdbResnumMap;
+    Map<String, Integer> pdbResnumMap;
     /**
      *  Constructs a ChainImpl object.
      */
@@ -54,10 +55,10 @@ public class ChainImpl implements Chain {
         super();
         
         name = DEFAULT_CHAIN_ID;
-        groups = new ArrayList() ;
+        groups = new ArrayList<Group>() ;
         annotation = Annotation.EMPTY_ANNOTATION;
         
-        pdbResnumMap = new HashMap();
+        pdbResnumMap = new HashMap<String,Integer>();
         
     }
     
@@ -157,8 +158,8 @@ public class ChainImpl implements Chain {
      * @return an List object containing the groups of type...
      
      */
-    public List getGroups( String type) {
-        List tmp = new ArrayList() ;
+    public List<Group> getGroups( String type) {
+        List<Group> tmp = new ArrayList<Group>() ;
         for (int i=0;i<groups.size();i++){
             Group g = (Group)groups.get(i);
             if (g.getType().equals(type)){
@@ -172,7 +173,7 @@ public class ChainImpl implements Chain {
     /** return all groups of this chain .
      * @return an ArrayList object representing the Groups of this Chain.
      */
-    public List getGroups(){
+    public List<Group> getGroups(){
         return groups ;
     }
     
@@ -193,7 +194,7 @@ public class ChainImpl implements Chain {
     public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) 
     throws StructureException {
 
-    List retlst = new ArrayList();
+    List<Group> retlst = new ArrayList<Group>();
     
     Iterator iter = groups.iterator();
     boolean adding = false;
@@ -256,13 +257,13 @@ public class ChainImpl implements Chain {
     
     /** string representation. */
     public String toString(){
-        
+        String newline = System.getProperty("line.separator");
         String str = "Chain >"+getName() + "< total length:" + getLength() + " residues";
         // loop over the residues
         
         for ( int i = 0 ; i < groups.size();i++){
             Group gr = (Group) groups.get(i);
-            str += gr.toString() + "\n" ;
+            str += gr.toString() + newline ;
     } 
     return str ;
     

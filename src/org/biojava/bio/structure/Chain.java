@@ -57,13 +57,13 @@ public interface Chain {
      * @param type  a String
      * @return an ArrayList object
      */
-    public List getGroups (String type);
+    public List<Group> getGroups (String type);
 
     /** return all groups of this chain.
      * @return an ArrayList of all Group objects of this chain
 
      */
-    public List getGroups ();
+    public List<Group> getGroups ();
 
     /** get a group by its PDB residue numbering. if the PDB residue number is not know,
      * throws a StructureException.
