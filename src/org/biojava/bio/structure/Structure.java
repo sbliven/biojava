@@ -203,14 +203,14 @@ public interface Structure {
        * @param connections  a List object specifying the connections 
        * @see #getConnections
     */
-    public void setConnections(List connections);
+    public void setConnections(List<Map> connections);
 
     /**
      * Returns the connections value.
      * @return a List object representing the connections value
      * @see #setConnections
      */
-    public List getConnections();
+    public List<Map> getConnections();
 
     /** return number of Chains in this Structure.
      * @return an int representing the number of Chains in this Structure

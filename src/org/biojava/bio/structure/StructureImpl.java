@@ -49,7 +49,7 @@ public class StructureImpl implements Structure {
     List<List> models;
     
     Map<String,String> header ;
-    List connections ;
+    List<Map> connections ;
     String name ;
     
     boolean nmrflag ;
@@ -246,7 +246,7 @@ public class StructureImpl implements Structure {
      *
      
      */
-    public void      setConnections(List conns) { connections = (ArrayList)conns ; }
+    public void      setConnections(List<Map> conns) { connections = conns ; }
     /** 
      * Returns the connections value.
      *
@@ -254,7 +254,7 @@ public class StructureImpl implements Structure {
      * @see Structure interface 
      * @see #setConnections
      */
-    public List getConnections()                { return connections ;}
+    public List<Map> getConnections()                { return connections ;}
     
     /** add a new chain.
      *
