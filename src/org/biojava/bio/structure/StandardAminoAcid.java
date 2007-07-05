@@ -41,7 +41,7 @@ import org.biojava.utils.ClassTools;
  */
 public final class StandardAminoAcid {
     
-    static private Map aminoAcids;
+    static private Map<String,AminoAcid> aminoAcids;
     
     public StandardAminoAcid() {
         super();
@@ -61,7 +61,7 @@ public final class StandardAminoAcid {
      * @author Tamas Horvath provided the standard amino acids 
      */
     static {
-        aminoAcids = new HashMap();
+        aminoAcids = new HashMap<String,AminoAcid>();
     
         try {
             InputStream fileStream = ClassTools.getClassLoader(StandardAminoAcid.class).getResourceAsStream(

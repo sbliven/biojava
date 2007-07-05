@@ -67,10 +67,10 @@ import org.biojava.bio.structure.io.PDBParseException;
   * @version %I% %G%
   */       
 public class Mutator{
-    List supportedAtoms;
+    List<String> supportedAtoms;
     
     public Mutator(){
-        supportedAtoms = new ArrayList();
+        supportedAtoms = new ArrayList<String>();
         supportedAtoms.add("N");
         supportedAtoms.add("CA");
         supportedAtoms.add("C");

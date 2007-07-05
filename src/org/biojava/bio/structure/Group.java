@@ -104,7 +104,7 @@ public interface Group {
      *
      * @return an List object representing the atoms 
      */
-    public List getAtoms() ;
+    public List<Atom> getAtoms() ;
     
     /** remove all atoms from this group
      * 
@@ -188,7 +188,7 @@ public interface Group {
      
      */
     
-    public void setProperties(Map properties) ;
+    public void setProperties(Map<String,Object> properties) ;
     
     /** return properties. 
      * @see #setProperties
@@ -218,7 +218,7 @@ public interface Group {
      *
      * @return an Iterator object
      */
-    public Iterator iterator() ;
+    public Iterator<AtomIterator> iterator() ;
     
     
     /** returns and identical copy of this Group object .
