@@ -105,10 +105,10 @@ public abstract class SequenceAlignment
     */
    public static String formatOutput(String queryName, String targetName, String[] align, String path, int queryStart, int queryEnd, long queryLength, int targetStart, int targetEnd, long targetLength, double editdistance, long time)
    {
-     String output = "\n  Time (ms):\t"+time+"\n  Length:\t"+align[0].length()+"\n";
-     output += "  Score:\t"  +(-1)*editdistance+"\n";
-     output += "  Query:\t"  + queryName + ",\tLength:\t"+ queryLength +"\n";
-     output += "  Target:\t" + targetName + ",\tLength:\t"+ targetLength +"\n\n";
+     String output = System.getProperty("line.separator") + " Time (ms):\t"+time+ System.getProperty("line.separator") + " Length:\t"+align[0].length()+ System.getProperty("line.separator");
+     output += "  Score:\t"  +(-1)*editdistance+ System.getProperty("line.separator");
+     output += "  Query:\t"  + queryName + ",\tLength:\t"+ queryLength + System.getProperty("line.separator");
+     output += "  Target:\t" + targetName + ",\tLength:\t"+ targetLength + System.getProperty("line.separator") + System.getProperty("line.separator");
        
      int currline = Math.min(60, align[0].length()), i, j, k, l; 
      // counts the absolute position within the String
@@ -119,28 +119,28 @@ public abstract class SequenceAlignment
    
      i = k = queryStart;
      j = l = targetStart;
-     output += "\nQuery:\t" + kspace + (k+1) + " ";
+     output += System.getProperty("line.separator") + "Query:\t" + kspace + (k+1) + " ";
      for (i=currline-Math.min(60, align[0].length()); i<currline; i++) {
        if ((align[0].charAt(i) != '-') && (align[0].charAt(i) != '~')) k++;
        if ((align[1].charAt(i) != '-') && (align[1].charAt(i) != '~')) j++;
      }
      output +=                                         align[0].substring(0, currline) + " " + k; 
-     output += " \n        "  + space                + path.substring(0, currline);
-     output += " \nTarget:\t" + jspace + (l+1) + " " + align[1].substring(0, currline) + " " + j + " \n";
+     output += " "+System.getProperty("line.separator")+"        "  + space                + path.substring(0, currline);
+     output += " "+System.getProperty("line.separator")+"Target:\t" + jspace + (l+1) + " " + align[1].substring(0, currline) + " " + j + " "+System.getProperty("line.separator");
    
      for (; currline+60 < path.length(); currline+=60) {
        l = Math.min(j+1, targetEnd);
        kspace = jspace = "";
        for (int n= new Integer(k+1).toString().length()-1; n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) kspace += " ";
        for (int n= new Integer(j).toString().length()-1;   n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) jspace += " ";
-       output += " \nQuery:\t" + kspace + Math.min(k+1, queryEnd) + " ";
+       output += " "+System.getProperty("line.separator")+"Query:\t" + kspace + Math.min(k+1, queryEnd) + " ";
        for (i=currline; i<currline+60; i++) {
          if ((align[0].charAt(i) != '-') && (align[0].charAt(i) != '~')) k++;
          if ((align[1].charAt(i) != '-') && (align[1].charAt(i) != '~')) j++;
        }
        output +=                                     align[0].substring(currline, currline+60) + " " + k;
-       output += " \n        "  + space            + path.substring(currline, currline+60);
-       output += " \nTarget:\t" + jspace + l + " " + align[1].substring(currline, currline+60) + " " + j + " \n";
+       output += " "+System.getProperty("line.separator")+"        "  + space            + path.substring(currline, currline+60);
+       output += " "+System.getProperty("line.separator")+"Target:\t" + jspace + l + " " + align[1].substring(currline, currline+60) + " " + j + " "+System.getProperty("line.separator");
      }
      align[0] += " " + queryEnd;
      align[1] += " " + targetEnd;
@@ -148,12 +148,12 @@ public abstract class SequenceAlignment
       kspace = jspace = "";
       for (int n= new Integer(k).toString().length()-1; n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) kspace += " ";
       for (int n= new Integer(j).toString().length()-1; n< new Integer(Math.max(queryEnd, targetEnd)).toString().length(); n++) jspace += " ";
-      output += " \nQuery:\t" + kspace + Math.min(k+1, queryEnd) + " " + align[0].substring(currline, align[0].length());
-      output += " \n        " + space  + path.substring(currline, path.length());
-      output += " \nTarget:\t"+ jspace + Math.min(j+1, targetEnd) + " " + align[1].substring(currline, align[1].length())+"\n";
+      output += " "+System.getProperty("line.separator")+"Query:\t" + kspace + Math.min(k+1, queryEnd) + " " + align[0].substring(currline, align[0].length());
+      output += " "+System.getProperty("line.separator")+"        " + space  + path.substring(currline, path.length());
+      output += " "+System.getProperty("line.separator")+"Target:\t"+ jspace + Math.min(j+1, targetEnd) + " " + align[1].substring(currline, align[1].length())+System.getProperty("line.separator");
     }
 
-    return output += "\n";
+    return output += System.getProperty("line.separator");
   }
   
   

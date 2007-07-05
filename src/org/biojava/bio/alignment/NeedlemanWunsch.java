@@ -268,13 +268,13 @@ public class NeedlemanWunsch extends SequenceAlignment {
 				output += "[" + targetChar[col - 1] + "]\t";
 		for (line = 0; line <= queryChar.length; line++) {
 			if (line == 0)
-				output += "\n[" + line + "]\t";
+				output += System.getProperty("line.separator") + "[" + line + "]\t";
 			else
-				output += "\n[" + queryChar[line - 1] + "]\t";
+				output += System.getProperty("line.separator") + "[" + queryChar[line - 1] + "]\t";
 			for (col = 0; col <= targetChar.length; col++)
 				output += CostMatrix[line][col] + "\t";
 		}
-		output += "\ndelta[Edit] = " + CostMatrix[line - 1][col - 1] + "\n";
+		output += System.getProperty("line.separator") + "delta[Edit] = " + CostMatrix[line - 1][col - 1] + System.getProperty("line.separator");
 		return output;
 	}
 
@@ -595,7 +595,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
                                       // target sequence
 						CostMatrix[0].length - 1, // length of the target sequence
 						getEditDistance(), // the edit distance
-						System.currentTimeMillis() - time) + "\n"; // time consumption
+						System.currentTimeMillis() - time) + System.getProperty("line.separator"); // time consumption
 
 				// System.out.println(printCostMatrix(CostMatrix,
         // query.seqString().toCharArray(), subject.seqString().toCharArray()));

@@ -80,7 +80,7 @@ public class SubstitutionMatrix
     String matString  = "";
     BufferedReader br = new BufferedReader(new FileReader(matrixFile));
     while(br.ready()) 
-      matString      += br.readLine() + "\n";
+      matString      += br.readLine() + System.getProperty("line.separator");
     this.matrix       = this.parseMatrix(matString);
     //this.printMatrix();
   }
@@ -88,7 +88,7 @@ public class SubstitutionMatrix
   
   /** With this constructor it is possible to construct a SubstitutionMatrix object from a
     * substitution matrix file. The given String contains a number of lines separated by 
-    * <code>\n</code>. Everything else is the same than for the constructor above.
+    * <code>System.getProperty("line.separator")</code>. Everything else is the same than for the constructor above.
     * 
     * @param alpha The <code>FiniteAlphabet</code> to use
     * @param matrixString
@@ -161,7 +161,7 @@ public class SubstitutionMatrix
     /* First: count how many elements are in the matrix
      * fill lines and rows
      */
-    br = new StringTokenizer(matString, "\n");
+    br = new StringTokenizer(matString, System.getProperty("line.separator"));
     while (br.hasMoreElements()) {
       String line = br.nextElement().toString();
       if (line.startsWith("#")) {
@@ -173,7 +173,7 @@ public class SubstitutionMatrix
           colSymbols.put(symtok.parseToken(st.nextElement().toString()), new Integer(j));
         }
         cols = j;
-      } else if (!line.startsWith("\n")) { // the matrix.
+      } else if (!line.startsWith(System.getProperty("line.separator"))) { // the matrix.
         st = new StringTokenizer(line, " ");
         if (st.hasMoreElements()) 
           rowSymbols.put(symtok.parseToken(st.nextElement().toString()), new Integer(rows++));
@@ -183,7 +183,7 @@ public class SubstitutionMatrix
     int[][] matrix = new int[rows][cols];
     
     rows = 0;
-    br = new StringTokenizer(matString, "\n");
+    br = new StringTokenizer(matString, System.getProperty("line.separator"));
     /* Second reading. Fill the matrix.
      */
     while (br.hasMoreElements())
@@ -191,7 +191,7 @@ public class SubstitutionMatrix
       String line = br.nextElement().toString();
       if      (line.startsWith("#")) continue;
       else if (line.startsWith(" ")) continue;
-      else if (!line.startsWith("\n")) { // lines:
+      else if (!line.startsWith(System.getProperty("line.separator"))) { // lines:
         st = new StringTokenizer(line, " ");
         if (st.hasMoreElements()) st.nextElement(); // throw away Symbol at beginning.
         for (j=0; st.hasMoreElements(); j++) {// cols:
@@ -299,7 +299,7 @@ public class SubstitutionMatrix
         colSyms[i]    = (Symbol) colKeys.next(); 
         matrixString += symtok.tokenizeSymbol(colSyms[i++]).toUpperCase() + " ";
       }
-      matrixString += "\n";
+      matrixString += System.getProperty("line.separator");
     
       Iterator rowKeys = rowSymbols.keySet().iterator();
       while (rowKeys.hasNext()) {
@@ -308,7 +308,7 @@ public class SubstitutionMatrix
         for (i=0; i<colSyms.length; i++) {
           matrixString += getValueAt(rowSym, colSyms[i]) + " ";
         }
-        matrixString += "\n";
+        matrixString += System.getProperty("line.separator");
       }  
     } catch (BioException exc) {
       exc.printStackTrace();
@@ -320,7 +320,7 @@ public class SubstitutionMatrix
   
   /** Stringnifies the description of the matrix.
     * @return Gives a description with approximately 60 letters on every line 
-    *   separated by <code>\n</code>. Every line starts with <code>#</code>.
+    *   separated by <code>System.getProperty("line.separator")</code>. Every line starts with <code>#</code>.
     */
   public String stringnifyDescription()
   {
@@ -329,10 +329,10 @@ public class SubstitutionMatrix
     while(st.hasMoreElements()) {
       line += st.nextElement().toString()+" ";
       if (line.length() >= 60) {
-        desc += line + "\n";
+        desc += line + System.getProperty("line.separator");
         if (st.hasMoreElements()) line = "# ";
       } else if (!st.hasMoreElements())
-        desc += line + "\n";
+        desc += line + System.getProperty("line.separator");
     }    
     return desc;
   }
@@ -350,10 +350,10 @@ public class SubstitutionMatrix
     while(st.hasMoreElements()) {
       line += st.nextElement().toString()+" ";
       if (line.length() >= 60) {
-        desc += line + "\n";
+        desc += line + System.getProperty("line.separator");
         if (st.hasMoreElements()) line = "# ";
       } else if (!st.hasMoreElements())
-        desc += line + "\n";
+        desc += line + System.getProperty("line.separator");
     }    
     
     return desc + stringnifyMatrix();
@@ -376,7 +376,7 @@ public class SubstitutionMatrix
         int y = ((Integer) colSymbols.get(colSym)).intValue();
         System.out.print(colSym.getName()+" "+" "+x+" "+y+" "+matrix[x][y]+"\t");
       }
-      System.out.println("\n");
+      System.out.println(System.getProperty("line.separator"));
     }
     System.out.println(toString());
   }
@@ -416,12 +416,12 @@ public class SubstitutionMatrix
       for (i=0; i<cols.length; i++) 
         matString += symtok.tokenizeSymbol((Symbol) cols[i])+" ";
       for (i=0; i<rows.length; i++) {
-        matString += "\n" + symtok.tokenizeSymbol((Symbol) rows[i]) + " ";
+        matString += System.getProperty("line.separator") + symtok.tokenizeSymbol((Symbol) rows[i]) + " ";
         for (j=0; j<cols.length; j++) {
           matString += mat[((Integer) rowMap.get((Symbol) rows[i])).intValue()][((Integer) colMap.get((Symbol) cols[j])).intValue()] + " ";
         }
       }
-      matString += "\n";
+      matString += System.getProperty("line.separator");
       return new SubstitutionMatrix(alphabet, matString, name);
     } catch (BioException exc) {
       exc.printStackTrace();
