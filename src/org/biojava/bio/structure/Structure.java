@@ -157,14 +157,14 @@ public interface Structure {
      * @param h  a Map object specifying the header
      * @see #getHeader
      */
-    public void setHeader(Map h) ;
+    public void setHeader(Map<String,String> h) ;
 
     /** get Header data .
      *
      * @return a Map object representing the header value
      * @see #setHeader
      */
-    public Map getHeader() ;
+    public Map<String,String> getHeader() ;
 
     /** 
        sets/gets an List of  Maps which corresponds to the CONECT lines in the PDB file:
@@ -251,7 +251,7 @@ public interface Structure {
      *
      * @param model  a List object containing the Chains of the new Model
      */
-    public void addModel(List model);
+    public void addModel(List<Chain> model);
 
     /** retrieve all Chains belonging to a model .
      * @see #getChains
@@ -260,7 +260,7 @@ public interface Structure {
      * @return a List object containing the Chains of Model nr. modelnr
 
      */
-    public List getModel(int modelnr);
+    public List<Chain> getModel(int modelnr);
 
     /** retrieve all chains of a model.
      * @see #getModel
@@ -268,7 +268,7 @@ public interface Structure {
      * @param modelnr  an int
      * @return a List object containing the Chains of Model nr. modelnr
      */
-    public List getChains(int modelnr);
+    public List<Chain> getChains(int modelnr);
 
 
     /** add a new chain.

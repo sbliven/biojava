@@ -42,16 +42,19 @@ import org.biojava.bio.structure.io.FileConvert;
  */
 public class StructureImpl implements Structure {
     
+		
     
     String pdb_id ;
     /* models is an ArrayList of ArrayLists */
-    ArrayList models;
+    List<List> models;
     
-    HashMap header ;
-    ArrayList connections ;
+    Map<String,String> header ;
+    List connections ;
     String name ;
     
     boolean nmrflag ;
+    
+    
     
     /**
      *  Constructs a StructureImpl object.
@@ -59,10 +62,10 @@ public class StructureImpl implements Structure {
     public StructureImpl() {
         super();
         
-        models         = new ArrayList();
+        models         = new ArrayList<List>();
         name           = "";
         nmrflag        = false;
-        header         = new HashMap();
+        header         = new HashMap<String,String>();
         connections    = new ArrayList();
     }
     
@@ -107,7 +110,7 @@ public class StructureImpl implements Structure {
         
         // go through each chain and clone chain
         for (int i=0;i<nrModels();i++){
-            ArrayList cloned_model = new ArrayList();
+            List<Chain> cloned_model = new ArrayList<Chain>();
             
             for (int j=0;j<size(i);j++){
                 
@@ -229,14 +232,14 @@ public class StructureImpl implements Structure {
      *
      * @see #getHeader
      */
-    public void    setHeader(Map h){ header = (HashMap) h;    }
+    public void    setHeader(Map<String,String> h){ header = h;    }
     /** get Header data.
      *
      * @return a Map object representing the header of the Structure
      *
      * @see #setHeader
      */
-    public Map getHeader()         { return header ;}
+    public Map<String,String> getHeader()         { return header ;}
     
     /** @see Structure interface.
      *
@@ -267,12 +270,12 @@ public class StructureImpl implements Structure {
     public void addChain(Chain chain, int modelnr) {
         // if model has not been initialized, init it!
         if ( models.size() == 0  ) {
-            ArrayList model = new ArrayList() ;
+            List<Chain> model = new ArrayList<Chain>() ;
             model.add(chain);
             models.add(model);
             
         } else {
-            ArrayList model = (ArrayList)models.get(modelnr);	    
+            List<Chain> model = models.get(modelnr);	    
             model.add(chain);
         }
     }
@@ -297,9 +300,9 @@ public class StructureImpl implements Structure {
      */
     public Chain getChain(int modelnr,int number) {
      
-        ArrayList model  = ( ArrayList ) models.get(modelnr);
+        List model  = models.get(modelnr);
        
-        Chain chain = ( Chain ) model.get (number );
+        Chain chain =  (Chain) model.get (number );
        
         return chain ;
     }
@@ -308,17 +311,18 @@ public class StructureImpl implements Structure {
     /** add a new model.
      *
      */
-    public void addModel(List model){
+    public void addModel(List<Chain> model){
         
-        models.add((ArrayList)model);
+        models.add(model);
     }
     
     /** string representation.
      *
      */
     public String toString(){
+    	String newline = System.getProperty("line.separator");
         String str = "structure "+name+ " " + pdb_id ;
-        if ( isNmr() ) str += " models: "+nrModels()+"\n" ;
+        if ( isNmr() ) str += " models: "+nrModels()+newline ;
         str += header ;
         
         for (int i=0;i<nrModels();i++){
@@ -327,7 +331,7 @@ public class StructureImpl implements Structure {
             
             str += "\n";
             for (int j=0;j<size(i);j++){
-                //System.out.println("getting chain "+i+" "+j); 
+              
                 Chain cha = (Chain)getChain(i,j); 
                 List agr = cha.getGroups("amino");
                 List hgr = cha.getGroups("hetatm");
@@ -337,7 +341,7 @@ public class StructureImpl implements Structure {
                 " length: " +cha.getLength()+
                 " aminos: " +agr.size()+
                 " hetatms: "+hgr.size()+
-                " nucleotides: "+ngr.size() +"\n";
+                " nucleotides: "+ngr.size() + newline;
             }
         }
         
@@ -386,7 +390,7 @@ public class StructureImpl implements Structure {
      * @param modelnr  an int
      * @return a List object     
      */
-    public List getChains(int modelnr){
+    public List<Chain> getChains(int modelnr){
         return getModel(modelnr);
     }
     
@@ -395,9 +399,9 @@ public class StructureImpl implements Structure {
      * @param modelnr  an int
      * @return a List object
      */
-    public List getModel(int modelnr) {
+    public List<Chain> getModel(int modelnr) {
         
-        ArrayList model = (ArrayList)models.get(modelnr);		
+        List<Chain> model = (ArrayList<Chain>)models.get(modelnr);		
         return model;
     }    
     

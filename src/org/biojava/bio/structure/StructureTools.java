@@ -89,12 +89,12 @@ public class StructureTools {
      */ 
     public static Atom[] getAtomArray(Structure s, String[] atomNames){
         Iterator iter = new GroupIterator(s);
-        List atoms = new ArrayList();
+        List<Atom> atoms = new ArrayList<Atom>();
         while ( iter.hasNext()){
             Group g = (Group) iter.next();
            
             // a temp container for the atoms of this group
-            List thisGroupAtoms = new ArrayList();
+            List<Atom> thisGroupAtoms = new ArrayList<Atom>();
             // flag to check if this group contains all the requested atoms.
             boolean thisGroupAllAtoms = true;
             for ( int i = 0 ; i < atomNames.length; i++){
