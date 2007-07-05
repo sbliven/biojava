@@ -27,6 +27,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.Chain;
@@ -98,7 +99,7 @@ public class FileConvert {
      * Thanks to Tamas Horvath for this one
      */
     private String printPDBConnections(){
-        
+        String newline = System.getProperty("line.separator");
         
         StringBuffer str = new StringBuffer();
         
@@ -148,7 +149,7 @@ public class FileConvert {
             String connectLine = "CONECT" + atomserial + bond1 + bond2 + bond3 + 
             bond4 + hyd1 + hyd2 + salt1 + hyd3 + hyd4 + salt2;
             
-            str.append(connectLine + "\n");
+            str.append(connectLine + newline);
         }
         return str.toString();
     }
@@ -288,6 +289,11 @@ public class FileConvert {
         
         /*xmlns="http://www.sanger.ac.uk/xml/das/2004/06/17/dasalignment.xsd" xmlns:align="http://www.sanger.ac.uk/xml/das/2004/06/17/alignment.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:schemaLocation="http://www.sanger.ac.uk/xml/das/2004/06/17/dasalignment.xsd http://www.sanger.ac.uk/xml/das//2004/06/17/dasalignment.xsd"*/
         
+    	if ( structure == null){
+    		System.err.println("can not convert structure null");
+    		return;
+    	}
+    	
         HashMap header = (HashMap) structure.getHeader();
         
         xw.openTag("object");
@@ -365,12 +371,12 @@ public class FileConvert {
                  </ul>
                  */
                 
-                HashMap con = (HashMap)cons.get(cnr);
+                Map<String, Integer> con = (Map<String, Integer>)cons.get(cnr);
                 Integer as = (Integer)con.get("atomserial");
                 int atomserial = as.intValue();
                 
                 
-                ArrayList atomids = new ArrayList() ;
+                List<Integer> atomids = new ArrayList<Integer>() ;
                 
                 // test salt and hydrogen first //
                 if (con.containsKey("salt1")) atomids.add(con.get("salt1"));
@@ -378,7 +384,7 @@ public class FileConvert {
                 
                 if (atomids.size()!=0){
                     addConnection(xw,"salt",atomserial,atomids);
-                    atomids = new ArrayList() ;		    
+                    atomids = new ArrayList<Integer>() ;		    
                 }
                 if (con.containsKey("hydrogen1")) atomids.add(con.get("hydrogen1"));
                 if (con.containsKey("hydrogen2")) atomids.add(con.get("hydrogen2"));		
@@ -386,7 +392,7 @@ public class FileConvert {
                 if (con.containsKey("hydrogen4")) atomids.add(con.get("hydrogen4"));
                 if (atomids.size()!=0){
                     addConnection(xw,"hydrogen",atomserial,atomids);
-                    atomids = new ArrayList() ;		    
+                    atomids = new ArrayList<Integer>() ;		    
                 }
                 
                 if (con.containsKey("bond1")) atomids.add(con.get("bond1"));
@@ -401,13 +407,13 @@ public class FileConvert {
         }
     }
     
-    private void addConnection(XMLWriter xw,String connType, int atomserial, ArrayList atomids){
+    private void addConnection(XMLWriter xw,String connType, int atomserial, List<Integer> atomids){
         try{
             xw.openTag("connect");
             xw.attribute("atomSerial",Integer.toString(atomserial));
             xw.attribute("type",connType);
             for (int i=0;i<atomids.size();i++){
-                Integer atomid = (Integer)atomids.get(i);
+                Integer atomid = atomids.get(i);
                 if ( atomid == null)
                     continue;
                 int aid = atomid.intValue();
