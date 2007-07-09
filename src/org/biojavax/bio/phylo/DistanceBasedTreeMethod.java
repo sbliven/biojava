@@ -15,7 +15,7 @@ public class DistanceBasedTreeMethod {
 	
 	private static WeightedGraph<String, DefaultWeightedEdge> jgrapht =  new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 	
-	public static void Upgma(TaxaBlock t, CharactersBlock ch){
+	public static WeightedGraph<String, DefaultWeightedEdge> Upgma(TaxaBlock t, CharactersBlock ch){
 	
 		String v1, v2, v3;
 		int index_x = 0, index_y = 0, p_index = 0;
@@ -92,7 +92,7 @@ public class DistanceBasedTreeMethod {
 
 			p_index++;
 			
-			System.out.println(jgrapht.toString());
+			//System.out.println(jgrapht.toString());
 
 			//collapse a min_distance pair and re-build distance matrix
 			for(int i = 0; i < NTax; i++){
@@ -124,10 +124,12 @@ public class DistanceBasedTreeMethod {
 
 		//iterate until tree is completed!
 		}while(NTax > 1); 		
+		
+		return jgrapht;
 	}	
 
 
-	public static void NeighborJoining(TaxaBlock t, CharactersBlock ch){
+	public static WeightedGraph<String, DefaultWeightedEdge> NeighborJoining(TaxaBlock t, CharactersBlock ch){
 
 		String v1, v2, v3;
 		int index_x = 0, index_y = 0, p_index = 0;
@@ -225,7 +227,7 @@ public class DistanceBasedTreeMethod {
 			
 			p_index++;
 			
-			System.out.println(jgrapht.toString());
+			//System.out.println(jgrapht.toString());
 
 			//collapse a min_distance pair and re-build distance matrix
 			for(int i = 0; i < NTax; i++){
@@ -257,9 +259,8 @@ public class DistanceBasedTreeMethod {
 			NTax--;
 
 		//iterate until tree is completed!
-		}while(NTax > 1); 		
+		}while(NTax > 1);
+	return jgrapht; 		
 	}	
-
-
 }
 
