@@ -13,13 +13,13 @@ import org.jgrapht.graph.*;
 
 public class DistanceBasedTreeMethod {
 	
-	private static WeightedGraph<String, DefaultWeightedEdge> jgrapht =  new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 	
 	public static WeightedGraph<String, DefaultWeightedEdge> Upgma(TaxaBlock t, CharactersBlock ch){
 	
 		String v1, v2, v3;
 		int index_x = 0, index_y = 0, p_index = 0;
-
+		WeightedGraph<String, DefaultWeightedEdge> jgrapht =  new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+	
       	int NTax = t.getDimensionsNTax();
       	List labels = t.getTaxLabels();
 		
@@ -133,7 +133,8 @@ public class DistanceBasedTreeMethod {
 
 		String v1, v2, v3;
 		int index_x = 0, index_y = 0, p_index = 0;
-
+		WeightedGraph<String, DefaultWeightedEdge> jgrapht =  new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+	
       	int NTax = t.getDimensionsNTax();
       	List labels = t.getTaxLabels();
 		
