@@ -54,7 +54,10 @@ public class TreesBlock extends NexusBlock.Abstract {
 
 	private Map trees = new LinkedHashMap();
 
-	private UndirectedGraph<String, DefaultEdge> jgrapht =  new Pseudograph<String, DefaultEdge>(DefaultEdge.class);
+	private UndirectedGraph<String, DefaultEdge> unweighted = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+
+	private WeightedGraph<String, DefaultWeightedEdge> weighted =  new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+
 
 
 	/**
@@ -215,136 +218,291 @@ public class TreesBlock extends NexusBlock.Abstract {
 		return this.trees;
 	}
 
-
 	/**
 	 * Returns a tree for given label
-         */
+	 * @param label
+       * 		 the label to select.
+	 *
+	 * @return selected tree.
+       */
      	public Object getTree(final String label) {
 		return this.trees.get(label);
 	}
 
-	/**
-	 * Add a tree, converting JGraphT to NewickString
-        */
-
+/**
+	 * Add a tree, converting unweighted graph (JGraphT) to NewickString
+	 *
+	 * @param label
+	 * 		  the label to add
+	 *
+	 * @param treegraph
+	 * 		  the treegraph to convert.
+       */
 	public void addTree(final String label, UndirectedGraph<String, DefaultEdge> treegraph) {
 	
 		final NewickTreeString tree = new NewickTreeString();
 		String temp = treegraph.toString();
-		String [] tokens = null; 
-		
-		tokens = temp.split("\\[");             // extract the tree string part from JGraphT
+		String [] tokens = null;
+	
+		// extract the tree string part from JGraphT
+		tokens = temp.split("\\[");            
 		temp = tokens[2];
 		tokens = temp.split("\\]");	
 		temp = tokens[0];
 		
+		// parse all vertices and store it in the string array tokens
 		temp = temp.replace("{", "");
 		temp = temp.replace("}", "");
 		temp = temp.replace(" ", "");
-		tokens = temp.split(",");               // parse all vertices and store it in the string array tokens
+		tokens = temp.split(",");               
 		temp = "";
 	
-		int len = tokens.length;
-		for(int i = 0 ; i < len; i = i + 4){
+		for(int i = 0 ; i < tokens.length; i = i + 4){			
 			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
-				temp = "("+tokens[i]+ ", "+ tokens[i+3] + ")";
-				for(int j = i +4; j < len; j++){
-
+				temp = "(" + tokens[i] +", " + tokens[i+3] + ")";
+				for(int j = i+4; j < tokens.length; j++){
 					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])){
-						tokens[j] = temp;
+						tokens[j] = temp; 
 					}
 				}
 			}
-		}
+		} 
 		
-		//System.out.println(temp);
-		tree.setTreeString(temp);                           //set TreeString for the tree
-		this.trees.put(label, tree);                        //add Tree to the Map with given label
+		tree.setTreeString(temp);                           
+		this.trees.put(label, tree);
+	}
+
+	/**
+	 * Add a tree, converting weighted graph (JGraphT) to NewickString
+	 *
+	 * @param label
+	 * 		  the label to add
+	 *
+	 * @param treegraph
+	 * 		  the treegraph to convert.
+       */
+	public void addTree(final String label, WeightedGraph<String, DefaultWeightedEdge> treegraph) {
+	
+		final NewickTreeString tree = new NewickTreeString();
+		String temp = treegraph.toString();
+		String [] tokens = null;
+	
+		// extract the tree string part from JGraphT
+		tokens = temp.split("\\[");            
+		temp = tokens[2];
+		tokens = temp.split("\\]");	
+		temp = tokens[0];
+		
+		// parse all vertices and store it in the string array tokens
+		temp = temp.replace("{", "");
+		temp = temp.replace("}", "");
+		temp = temp.replace(" ", "");
+		tokens = temp.split(",");               
+		temp = "";
+	
+		for(int i = 0 ; i < tokens.length; i = i + 4){
+		
+			if(tokens[i].startsWith("(") == false)
+				tokens[i] = tokens[i] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i], tokens[i+1]));
+			if(tokens[i+3].startsWith("(") == false)
+				tokens[i+3] = tokens[i+3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i+2], tokens[i+3]));
+			
+			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
+				
+				temp = "(" + tokens[i] +", " + tokens[i+3] + ")";
+				for(int j = i+4; j < tokens.length; j++){
+					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])){
+						
+						double weight = 0.0;
+						if(j%4 == 0)
+							weight = treegraph.getEdgeWeight(treegraph.getEdge(tokens[j], tokens[j+1]));
+						else if(j%4 == 3)
+							weight = treegraph.getEdgeWeight(treegraph.getEdge(tokens[j], tokens[j-1]));
+						tokens[j] = temp + ":" + weight; 
+					}
+				}
+			}
+		} 
+		
+		tree.setTreeString(temp);                           
+		this.trees.put(label, tree);
 	}
 	
 	
 	/**
-	 * gets the given Newick String tree by label, converts it to JGraphT, and returns it.
-         */
+	 * Get given (NewieckString) tree by label, converts it to unweighted graph (JGraphT).
+       *
+	 * @param label
+	 * 		 label for tree selection 
+	 *
+	 * @return converted tree as undirectedGraph
+	 */
 	public UndirectedGraph<String, DefaultEdge> getTreeAsJGraphT(final String label) {
 	
-	String temp, v1, v2, v3;
-	String [] tokens;
-	int len = 0, p_index=0; 
-	Object s_temp1, s_temp2, s_temp3;
-	TreesBlock.NewickTreeString t = new TreesBlock.NewickTreeString();
-	Stack stack = new Stack();
+		String temp, v1, v2, v3;
+		String [] tokens;
+		int len = 0, p_index=0; 
+		Object s_temp1, s_temp2, s_temp3;
+		TreesBlock.NewickTreeString t = new TreesBlock.NewickTreeString();
+		Stack stack = new Stack();
 	
-	t = (TreesBlock.NewickTreeString) this.trees.get(label);
-	//System.out.println(t.getTreeString());
+		t = (TreesBlock.NewickTreeString) this.trees.get(label);
 
-	temp = t.getTreeString();
-	len = temp.length();                  
-	tokens = temp.split("");             
-	temp = "";
-	
-	for(int i = 0; i<= len; i++){
-		if(tokens[i].equals("(")){
-			p_index++;
-		}
-	}
-	System.out.println(p_index);
-
-	for(int i = 0; i <= len; i++)               // How to generate Tree Objects for JGraphT 
-	{
-		System.out.println(tokens[i]);
-		if( tokens[i].equals(",") ){          // 1. push into stack if it is a word, or comma
-			stack.push("p" + p_index);
-			p_index--;
-		}else if ( tokens[i].equals("(") || tokens[i].equals(" ") ){    // 2. ignore "(" or " "
-			// ignore		
-		}else if(tokens[i].equals(")")){	  // 3. pop 3 elements if you see ")"
-								
-			try{
-				s_temp3 = stack.pop();    // 4. If you have two species, add them as vertices
-				v3 = s_temp3.toString();  // 5. and push "p[number]" to stack  
-									
-				try{
-					s_temp2 = stack.pop();
-					v2 = s_temp2.toString();
-			
-					try{
-						s_temp1 = stack.pop();
-						v1 = s_temp1.toString();
-									
-						this.jgrapht.addVertex(v1);
-						this.jgrapht.addVertex(v2);
-						this.jgrapht.addVertex(v3);	
-						this.jgrapht.addEdge(v1,v2);
-						this.jgrapht.addEdge(v2,v3);		
-									
-						stack.push(v2);
-					}catch(EmptyStackException e){}
-				}catch(EmptyStackException e){}												
-			}catch(EmptyStackException e){}
-								
-		}else{
-			// if it is a letter, concatenate for the name, and push it to the stack
- 								
-			if(tokens[i].equals(" ")){
-				//temp = temp + "_";
-			}else if(tokens[i+1].equals("(") || tokens[i+1].equals(")") || tokens[i+1].equals(",")) {
-				temp = temp + tokens[i];
-				stack.push(temp);
-				temp = "";
-			}else{
-				temp = temp + tokens[i];
+		temp = t.getTreeString();
+		len = temp.length();                  
+		tokens = temp.split("");             
+		temp = "";
+		
+		for(int i = 0; i <= len; i++){
+			if(tokens[i].equals("(")){
+				p_index++;
 			}
 		}
-	}			
-			
-	System.out.println(jgrapht.toString());
 
-		return this.jgrapht;
+		for(int i = 0; i <= len; i++)              
+		{
+			if( tokens[i].equals(",") ){          
+				//push into stack if it is a word, or comma
+				stack.push("p" + p_index);
+				p_index--;
+			}else if ( tokens[i].equals("(") || tokens[i].equals(" ") ){    
+				// ignore "(" or " "
+			}else if(tokens[i].equals(")")){	  
+			 	//pop 3 elements if you see ")"					
+				try{
+					s_temp3 = stack.pop();    
+					v3 = s_temp3.toString(); 
+										
+					try{
+						s_temp2 = stack.pop();
+						v2 = s_temp2.toString();
+				
+						try{
+							s_temp1 = stack.pop();
+							v1 = s_temp1.toString();
+									
+							this.unweighted.addVertex(v1);
+							this.unweighted.addVertex(v2);
+							this.unweighted.addVertex(v3);	
+							this.unweighted.addEdge(v1,v2);
+							this.unweighted.addEdge(v2,v3);		
+										
+							stack.push(v2);
+						}catch(EmptyStackException e){}
+					}catch(EmptyStackException e){}												
+				}catch(EmptyStackException e){}
+									
+			}else{
+				// if it is a letter, concatenate for the name, and push it to the stack 								
+				if(tokens[i].equals(" ")){
+					//ignore
+				}else if(tokens[i+1].equals("(") || tokens[i+1].equals(")") || tokens[i+1].equals(",")) {
+					temp = temp + tokens[i];
+					stack.push(temp);
+					temp = "";
+				}else{
+					temp = temp + tokens[i];
+				}
+			}
+		}			
+		return this.unweighted;
 	}
 
+	/**
+	 * Get given (NewieckString) tree by label, converts it to weighted graph (JGraphT).
+       *
+	 * @param label
+	 * 		 label for tree selection 
+	 *
+	 * @return converted tree as undirectedGraph
+	 */
+	public WeightedGraph<String, DefaultWeightedEdge> getTreeAsWeightedJGraphT(final String label) {
+	
+		int len = 0, p_index=0; 
+		String temp, v1, v2, v3, w1, w3;
+		String [] tokens, temp_token;
+		Object s_temp1, s_temp2, s_temp3;
+		Object weight1, weight3;
+		Stack stack = new Stack();
+		Stack weight_stack = new Stack();
+	
+		TreesBlock.NewickTreeString t = new TreesBlock.NewickTreeString();
+	
+		t = (TreesBlock.NewickTreeString) this.trees.get(label);
+
+		temp = t.getTreeString();
+		len = temp.length();                  
+		tokens = temp.split("");             
+		temp = "";
+		
+		for(int i = 0; i <= len; i++)              
+		{
+			if( tokens[i].equals(",") ){          
+				//push into stack if it is a word, or comma
+				stack.push("p" + p_index);
+				p_index++;
+			}else if ( tokens[i].equals("(") || tokens[i].equals(" ") ){    
+				// ignore "(" or " "
+			}else if(tokens[i].equals(")")){	  
+			 	//pop 3 elements if you see ")"					
+				try{
+					s_temp3 = stack.pop();    
+					v3 = s_temp3.toString(); 
+					weight3 = weight_stack.pop();
+					w3 = weight3.toString();
+					
+					try{
+						s_temp2 = stack.pop();
+						v2 = s_temp2.toString();
+						
+						try{
+							s_temp1 = stack.pop();
+							v1 = s_temp1.toString();
+							weight1 = weight_stack.pop();
+							w1 = weight1.toString();
+
+							this.weighted.addVertex(v1);
+							this.weighted.addVertex(v2);
+							this.weighted.addVertex(v3);	
+							this.weighted.addEdge(v1,v2);
+							this.weighted.addEdge(v2,v3);
+
+							this.weighted.setEdgeWeight(this.weighted.getEdge(v1,v2), Double.parseDouble(w1));	
+							this.weighted.setEdgeWeight(this.weighted.getEdge(v2,v3), Double.parseDouble(w3));	
+									
+							stack.push(v2);
+						}catch(EmptyStackException e){}
+					}catch(EmptyStackException e){}												
+				}catch(EmptyStackException e){}
+									
+			}else{
+				// if it is a letter, concatenate for the name, and push it to the stack 								
+				if(tokens[i].equals(" ")){
+					//ignore
+				}else if(tokens[i+1].equals("(") || tokens[i+1].equals(")") || tokens[i+1].equals(",")) {
+					temp = temp + tokens[i];
+					
+					if(temp.startsWith(":")){
+
+						temp = temp.replace(":", "");
+						weight_stack.push(temp);
+
+					}else if(temp.startsWith(":") == false && temp.contains(":")){
+						
+						temp_token = temp.split(":");
+						stack.push(temp_token[0]);
+						weight_stack.push(temp_token[1]);
+					}
+					temp = "";
+				}else{
+					temp = temp + tokens[i];
+				}
+			}
+		}	
+
+		return this.weighted;
+	}
       
-	/************************************************************************************************/
 	/**
 	 * Adds a comment.
 	 * 
