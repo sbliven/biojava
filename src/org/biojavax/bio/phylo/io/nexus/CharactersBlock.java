@@ -68,7 +68,7 @@ public class CharactersBlock extends NexusBlock.Abstract {
 
 	private boolean labels = true;
 
-	private boolean transposed = true;
+	private boolean transposed = false;
 
 	private boolean interleaved = false;
 
