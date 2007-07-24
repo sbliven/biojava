@@ -93,7 +93,7 @@ public class TaxaBlock extends NexusBlock.Abstract {
 				// Try it as a number to see if it refers to
 				// position we already have.
 				final int i = Integer.parseInt(taxLabel);
-				if (i <= this.taxLabels.size() + 1)
+				if (i <= this.taxLabels.size())
 					throw new ParseException("Taxa label " + i
 							+ " refers to already extant taxa position");
 			} catch (NumberFormatException e) {
