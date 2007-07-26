@@ -171,7 +171,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 	private String matrixFirstLineKey;
 
 	private int matrixPrependNulls;
-	
+
 	private boolean seenSymbol;
 
 	/**
@@ -258,8 +258,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 	}
 
 	public void parseToken(String token) throws ParseException {
-		if (this.expectingMatrixContent
-				&& "\n".equals(token)) {
+		if (this.expectingMatrixContent && "\n".equals(token)) {
 			// Special handling for new lines inside matrix data.
 			if (this.currentMatrixBracket != null) {
 				((CharactersBlockListener) this.getBlockListener())
@@ -269,8 +268,7 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			}
 			this.expectingMatrixContent = false;
 			this.expectingMatrixKey = true;
-		} else if (this.expectingMatrixKey
-				&& "\n".equals(token)) {
+		} else if (this.expectingMatrixKey && "\n".equals(token)) {
 			if (this.matrixFirstLineKey != null)
 				this.matrixPrependNulls = this.matrixFirstLineLength;
 		} else if (token.trim().length() == 0)
@@ -517,8 +515,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 						parts[1] = parts[1].substring(0, parts[1].length() - 1);
 						this.expectingSymbolsContent = false;
 					}
-					((CharactersBlockListener) this.getBlockListener())
-							.addSymbol(parts[1]);
+					for (int i = 0; i < parts[1].length(); i++)
+						((CharactersBlockListener) this.getBlockListener())
+								.addSymbol("" + parts[1].charAt(i));
 				} else
 					this.expectingSymbolsContent = true;
 			} else
@@ -539,8 +538,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 					token = token.substring(0, token.length() - 1);
 					this.expectingSymbolsContent = false;
 				}
-				((CharactersBlockListener) this.getBlockListener())
-						.addSymbol(token);
+				for (int i = 0; i < token.length(); i++)
+					((CharactersBlockListener) this.getBlockListener())
+							.addSymbol("" + token.charAt(i));
 			} else
 				this.expectingSymbolsContent = true;
 		}
@@ -555,8 +555,9 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 			if (token.equals(""))
 				this.expectingSymbolsContent = !this.seenSymbol;
 			else {
-				((CharactersBlockListener) this.getBlockListener())
-					.addSymbol(token);
+				for (int i = 0; i < token.length(); i++)
+					((CharactersBlockListener) this.getBlockListener())
+							.addSymbol("" + token.charAt(i));
 				this.seenSymbol = true;
 			}
 		}
