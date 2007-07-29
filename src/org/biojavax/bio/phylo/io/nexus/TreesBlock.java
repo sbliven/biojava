@@ -221,15 +221,15 @@ public class TreesBlock extends NexusBlock.Abstract {
 	/**
 	 * Returns a tree for given label
 	 * @param label
-       * 		 the label to select.
+             * 	 the label to select.
 	 *
 	 * @return selected tree.
-       */
+             */
      	public Object getTree(final String label) {
 		return this.trees.get(label);
 	}
 
-/**
+	/**
 	 * Add a tree, converting unweighted graph (JGraphT) to NewickString
 	 *
 	 * @param label
@@ -237,7 +237,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 	 *
 	 * @param treegraph
 	 * 		  the treegraph to convert.
-       */
+     	 */
 	public void addTree(final String label, UndirectedGraph<String, DefaultEdge> treegraph) {
 	
 		final NewickTreeString tree = new NewickTreeString();
@@ -256,18 +256,21 @@ public class TreesBlock extends NexusBlock.Abstract {
 		temp = temp.replace(" ", "");
 		tokens = temp.split(",");               
 		temp = "";
-	
-		for(int i = 0 ; i < tokens.length; i = i + 4){			
-			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
-				temp = "(" + tokens[i] +", " + tokens[i+3] + ")";
-				for(int j = i+4; j < tokens.length; j++){
-					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])){
-						tokens[j] = temp; 
+		
+		for(int i = 0 ; i < tokens.length; i = i + 4){
+			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false && tokens[i].equals(tokens[i+3]) == false){
+				temp = "(" + tokens[i] +", " + tokens[i+3] + ")" ;	
+				for(int j = 0; j < tokens.length; j++){
+					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])  && j != i+1 && j!= i+2){
+						if(j > i+3) 
+							tokens[j] = temp;
+						else if(j < i) 
+							temp = "(" + tokens[j-3] + ", " + temp + ")";		
 					}
 				}
 			}
-		} 
-		
+		}	 
+
 		tree.setTreeString(temp);                           
 		this.trees.put(label, tree);
 	}
@@ -280,7 +283,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 	 *
 	 * @param treegraph
 	 * 		  the treegraph to convert.
-       */
+             */
 	public void addTree(final String label, WeightedGraph<String, DefaultWeightedEdge> treegraph) {
 	
 		final NewickTreeString tree = new NewickTreeString();
@@ -299,26 +302,33 @@ public class TreesBlock extends NexusBlock.Abstract {
 		temp = temp.replace(" ", "");
 		tokens = temp.split(",");               
 		temp = "";
-	
-		for(int i = 0 ; i < tokens.length; i = i + 4){
-		
-			if(tokens[i].startsWith("(") == false)
-				tokens[i] = tokens[i] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i], tokens[i+1]));
-			if(tokens[i+3].startsWith("(") == false)
-				tokens[i+3] = tokens[i+3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i+2], tokens[i+3]));
+
+		for(int i = 0 ; i < tokens.length; i = i + 4){	
 			
-			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
-				
-				temp = "(" + tokens[i] +", " + tokens[i+3] + ")";
-				for(int j = i+4; j < tokens.length; j++){
-					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])){
+			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false && tokens[i].equals(tokens[i+3]) == false){
+	
+				if(tokens[i].startsWith("(") == false && tokens[i+3].startsWith("(") == false)
+					temp = "(" + tokens[i]+ ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i], tokens[i+1])) +", " + tokens[i+3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i+2], tokens[i+3])) + ")" ;
+				else if (tokens[i].startsWith("(") && tokens[i+3].startsWith("(") == false)
+					temp = "(" + tokens[i] +", " + tokens[i+3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i+2], tokens[i+3])) + ")" ;
+				else if (tokens[i].startsWith("(") == false && tokens[i+3].startsWith("("))
+					temp = "(" + tokens[i]+ ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i], tokens[i+1])) +", " + tokens[i+3] +  ")" ;
+				else if (tokens[i].startsWith("(")  && tokens[i+3].startsWith("("))
+					temp = "(" + tokens[i]+ ", " + tokens[i+3] +  ")" ;
+												
+				for(int j = 0; j < tokens.length; j++){
+					if(tokens[j].matches(tokens[i+1]) && tokens[j].matches(tokens[i+2]) && j != i+1 && j != i+2){
 						
 						double weight = 0.0;
 						if(j%4 == 0)
 							weight = treegraph.getEdgeWeight(treegraph.getEdge(tokens[j], tokens[j+1]));
 						else if(j%4 == 3)
 							weight = treegraph.getEdgeWeight(treegraph.getEdge(tokens[j], tokens[j-1]));
-						tokens[j] = temp + ":" + weight; 
+						
+						if(j > i+3) 
+							tokens[j] = temp + ":" + weight; 
+						else if(j < i) 
+							temp = "(" + tokens[j-3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[j-3], tokens[j-2])) + ", " + temp + ":" + weight + ")";	
 					}
 				}
 			}
@@ -326,12 +336,11 @@ public class TreesBlock extends NexusBlock.Abstract {
 		
 		tree.setTreeString(temp);                           
 		this.trees.put(label, tree);
-	}
-	
+	}	
 	
 	/**
 	 * Get given (NewieckString) tree by label, converts it to unweighted graph (JGraphT).
-       *
+             *
 	 * @param label
 	 * 		 label for tree selection 
 	 *
@@ -410,7 +419,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 
 	/**
 	 * Get given (NewieckString) tree by label, converts it to weighted graph (JGraphT).
-       *
+             *
 	 * @param label
 	 * 		 label for tree selection 
 	 *
