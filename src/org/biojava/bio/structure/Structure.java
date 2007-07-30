@@ -157,14 +157,14 @@ public interface Structure {
      * @param h  a Map object specifying the header
      * @see #getHeader
      */
-    public void setHeader(Map<String,String> h) ;
+    public void setHeader(Map<String,Object> h) ;
 
     /** get Header data .
      *
      * @return a Map object representing the header value
      * @see #setHeader
      */
-    public Map<String,String> getHeader() ;
+    public Map<String,Object> getHeader() ;
 
     /** 
        sets/gets an List of  Maps which corresponds to the CONECT lines in the PDB file:
@@ -203,14 +203,14 @@ public interface Structure {
        * @param connections  a List object specifying the connections 
        * @see #getConnections
     */
-    public void setConnections(List<Map> connections);
+    public void setConnections(List<Map<String,Integer>> connections);
 
     /**
      * Returns the connections value.
      * @return a List object representing the connections value
      * @see #setConnections
      */
-    public List<Map> getConnections();
+    public List<Map<String,Integer>> getConnections();
 
     /** return number of Chains in this Structure.
      * @return an int representing the number of Chains in this Structure

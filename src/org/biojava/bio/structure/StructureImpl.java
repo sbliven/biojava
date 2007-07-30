@@ -48,8 +48,8 @@ public class StructureImpl implements Structure {
     /* models is an ArrayList of ArrayLists */
     List<List> models;
     
-    Map<String,String> header ;
-    List<Map> connections ;
+    Map<String,Object> header ;
+    List<Map <String,Integer>> connections ;
     String name ;
     
     boolean nmrflag ;
@@ -65,8 +65,8 @@ public class StructureImpl implements Structure {
         models         = new ArrayList<List>();
         name           = "";
         nmrflag        = false;
-        header         = new HashMap<String,String>();
-        connections    = new ArrayList();
+        header         = new HashMap<String,Object>();
+        connections    = new ArrayList<Map<String,Integer>>();
     }
     
     
@@ -105,7 +105,7 @@ public class StructureImpl implements Structure {
         
         n.setPDBCode(getPDBCode());
         n.setName(getName());
-        n.setHeader(getHeader());
+        n.setHeader(getHeader());        
         n.setConnections(getConnections());
         
         // go through each chain and clone chain
@@ -232,21 +232,21 @@ public class StructureImpl implements Structure {
      *
      * @see #getHeader
      */
-    public void    setHeader(Map<String,String> h){ header = h;    }
+    public void    setHeader(Map<String,Object> h){ header = h;    }
     /** get Header data.
      *
      * @return a Map object representing the header of the Structure
      *
      * @see #setHeader
      */
-    public Map<String,String> getHeader()         { return header ;}
+    public Map<String,Object> getHeader()         { return header ;}
     
     /** @see Structure interface.
      *
      *
      
      */
-    public void      setConnections(List<Map> conns) { connections = conns ; }
+    public void      setConnections(List<Map<String,Integer>> conns) { connections = conns ; }
     /** 
      * Returns the connections value.
      *
@@ -254,7 +254,7 @@ public class StructureImpl implements Structure {
      * @see Structure interface 
      * @see #setConnections
      */
-    public List<Map> getConnections()                { return connections ;}
+    public List<Map<String,Integer>> getConnections()                { return connections ;}
     
     /** add a new chain.
      *
@@ -275,7 +275,7 @@ public class StructureImpl implements Structure {
             models.add(model);
             
         } else {
-            List<Chain> model = models.get(modelnr);	    
+            List<Chain> model = (ArrayList<Chain>)models.get(modelnr);	    
             model.add(chain);
         }
     }
@@ -298,11 +298,11 @@ public class StructureImpl implements Structure {
      * @param number   an int
      * @return a Chain object
      */
-    public Chain getChain(int modelnr,int number) {
+	public Chain getChain(int modelnr,int number) {
      
-        List model  = models.get(modelnr);
+        List<Chain> model  = (ArrayList<Chain>) models.get(modelnr);
        
-        Chain chain =  (Chain) model.get (number );
+        Chain chain =   model.get (number );
        
         return chain ;
     }
