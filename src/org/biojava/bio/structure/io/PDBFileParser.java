@@ -84,21 +84,21 @@ public class PDBFileParser  {
 
     // required for parsing:
     StructureImpl structure      ;
-    List     current_model  ;
-    ChainImpl     current_chain  ;
+    List<Chain>   current_model  ;
+    Chain         current_chain  ;
     Group         current_group  ;
 
     // for conversion 3code 1code
     SymbolTokenization threeLetter ;
     SymbolTokenization oneLetter ;
 
-    String nucleotides[] ;
+    //String nucleotides[] ;
     String NEWLINE;
-    Map   header ;
-    List connects ;
-    List helixList;
-    List strandList;
-    List turnList;
+    Map <String,Object>  header ;
+    List<Map<String, Integer>> connects ;
+    List<Map> helixList;
+    List<Map> strandList;
+    List<Map> turnList;
     
     boolean parseSecStruc;
     
@@ -109,18 +109,65 @@ public class PDBFileParser  {
     public static final String STRAND = "STRAND";
     public static final String TURN   = "TURN";
     
+    // there is a file format change in PDB 3.0 and nucleotides are being renamed
+    
+   static private Map<String, Integer> nucleotides30 ;
+   static private Map<String, Integer> nucleotides23 ;
+
+   static {
+	   nucleotides30 = new HashMap<String,Integer>();
+	   nucleotides30.put("DA",1);
+	   nucleotides30.put("DC",1);
+	   nucleotides30.put("DG",1);
+	   nucleotides30.put("DT",1);
+	   nucleotides30.put("DI",1);
+	   nucleotides30.put("A",1);
+	   nucleotides30.put("G",1);
+	   nucleotides30.put("C",1);
+	   nucleotides30.put("U",1);
+	   nucleotides30.put("I",1);
+
+	   //TODO: check if they are always HETATMs, in that case this will not be necessary
+	   // the DNA linkers - the +C , +G, +A  +T +U and +I have been replaced with these:
+	   nucleotides30.put("TAF",1); // 2'-DEOXY-2'-FLUORO-ARABINO-FURANOSYL THYMINE-5'-PHOSPHATE
+	   nucleotides30.put("TC1",1); // 3-(5-PHOSPHO-2-DEOXY-BETA-D-RIBOFURANOSYL)-2-OXO-1,3-DIAZA-PHENOTHIAZINE
+	   nucleotides30.put("TFE",1); // 2'-O-[2-(TRIFLUORO)ETHYL] THYMIDINE-5'-MONOPHOSPHATE
+	   nucleotides30.put("TFO",1); // [2-(6-AMINO-9H-PURIN-9-YL)-1-METHYLETHOXY]METHYLPHOSPHONIC ACID"
+	   nucleotides30.put("TGP",1); // 5'-THIO-2'-DEOXY-GUANOSINE PHOSPHONIC ACID
+	   nucleotides30.put("THX",1); // PHOSPHONIC ACID 6-({6-[6-(6-CARBAMOYL-3,6,7,8-TETRAHYDRO-3,6-DIAZA-AS-INDACENE-2-CARBONYL)-3,6,7,8-TETRAHYDRO-3,6-DIAZA-AS-INDOCENE-2-CARBONYL]-3,6,7,8-TETRAHYDRO-3,6-DIAZA-AS-INDACENE-2-CARBONL}-AMINO)-HEXYL ESTER 5-(5-METHYL-2,4-DIOXO-3,4-DIHYDRO-2H-PYRIMIDIN-1-YL)-TETRAHYDRO-FURAN-2-YLMETHYL ESTER
+	   nucleotides30.put("TLC",1); // 2-O,3-ETHDIYL-ARABINOFURANOSYL-THYMINE-5'-MONOPHOSPHATE
+	   nucleotides30.put("TLN",1); //  [(1R,3R,4R,7S)-7-HYDROXY-3-(THYMIN-1-YL)-2,5-DIOXABICYCLO[2.2.1]HEPT-1-YL]METHYL DIHYDROGEN PHOSPHATE"
+	   nucleotides30.put("TP1",1); // 2-(METHYLAMINO)-ETHYLGLYCINE-CARBONYLMETHYLENE-THYMINE
+	   nucleotides30.put("TPC",1); // 5'-THIO-2'-DEOXY-CYTOSINE PHOSPHONIC ACID
+	   nucleotides30.put("TPN",1); // 2-AMINOETHYLGLYCINE-CARBONYLMETHYLENE-THYMINE
+	   
+ 
+	   
+	   // store nucleic acids (C, G, A, T, U, and I), and 
+       // the modified versions of nucleic acids (+C, +G, +A, +T, +U, and +I), and
+	   nucleotides23  = new HashMap<String,Integer>();
+	   String[] names = {"C","G","A","T","U","I","+C","+G","+A","+T","+U","+I"};
+	   for (int i = 0; i < names.length; i++) {
+		   String n = names[i];
+		   nucleotides23.put(n,1);		
+	   }
+	   
+   }
+   
+   
+   
     public PDBFileParser() {
         extensions    = new ArrayList();
         structure     = null           ;
-        current_model = new ArrayList();
+        current_model = new ArrayList<Chain>();
         current_chain = null           ;
         current_group = null           ;
         header        = init_header() ;
-        connects      = new ArrayList() ;
+        connects      = new ArrayList<Map<String,Integer>>() ;
         parseSecStruc = false;
-        helixList     = new ArrayList();
-        strandList    = new ArrayList();
-        turnList      = new ArrayList();
+        helixList     = new ArrayList<Map>();
+        strandList    = new ArrayList<Map>();
+        turnList      = new ArrayList<Map>();
         
         NEWLINE = System.getProperty("line.separator");
 
@@ -132,10 +179,6 @@ public class PDBFileParser  {
         } catch (Exception e) {
             e.printStackTrace() ;
         }
-
-        // store nucleic acids (C, G, A, T, U, and I), and 
-        // the modified versions of nucleic acids (+C, +G, +A, +T, +U, and +I), and 
-        nucleotides = new String[]{"C","G","A","T","U","I","+C","+G","+A","+T","+U","+I"};
 
 
     }
@@ -158,10 +201,10 @@ public class PDBFileParser  {
 
 
     /** initialize the header. */
-    private HashMap init_header(){
+    private Map<String,Object> init_header(){
 
 
-        HashMap header = new HashMap ();
+        HashMap<String,Object> header = new HashMap<String,Object> ();
         header.put (idCode,"");		
         header.put ("classification","")         ;
         header.put ("depDate","0000-00-00");
@@ -237,15 +280,15 @@ public class PDBFileParser  {
      */
     private boolean isNucleotide(String groupCode3){
 
-        for (int i=0;i<nucleotides.length;i++){
-            String n=nucleotides[i];
-            //System.out.print("isNucleotide?"+groupCode3.trim()+" "+n);
-            if (groupCode3.trim().equals(n))	{
-                //System.out.println("yes!") ;
-                return true ;
-            }
-            //System.out.println("no...") ;
-        }
+    	String code = groupCode3.trim();
+    	if ( nucleotides30.containsKey(code)){    	
+    		return true;    		
+    	}
+    	
+    	if ( nucleotides23.containsKey(code)){
+    		return true;
+    	}
+        
         return false ;
     }
 
@@ -327,7 +370,7 @@ public class PDBFileParser  {
         //System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " + initICode + " " +
         //        endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
         
-        Map m = new HashMap();
+        Map<String,Object> m = new HashMap<String,Object>();
         
         m.put("initResName",initResName);
         m.put("initChainId", initChainId);
@@ -410,7 +453,7 @@ public class PDBFileParser  {
         //System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " + initICode + " " +
         //        endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
         
-        Map m = new HashMap();
+        Map<String,Object> m = new HashMap<String,Object>();
         
         m.put("initResName",initResName);
         m.put("initChainId", initChainId);
@@ -468,7 +511,7 @@ public class PDBFileParser  {
         //System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " + initICode + " " +
         //        endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
         
-        Map m = new HashMap();
+        Map<String,Object> m = new HashMap<String,Object>();
         
         m.put("initResName",initResName);
         m.put("initChainId", initChainId);
@@ -880,7 +923,7 @@ public class PDBFileParser  {
 
             //System.out.println(atomserial+ " "+ bond1 +" "+bond2+ " " +bond3+" "+bond4+" "+
             //		   hyd1+" "+hyd2 +" "+salt1+" "+hyd3+" "+hyd4+" "+salt2);
-            HashMap cons = new HashMap();
+            HashMap<String, Integer> cons = new HashMap<String, Integer>();
             cons.put("atomserial",new Integer(atomserial));
 
             if ( bond1 != null) cons.put("bond1",bond1);
@@ -925,7 +968,7 @@ public class PDBFileParser  {
                 current_model.add(current_chain);
             }
             structure.addModel(current_model);
-            current_model = new ArrayList();
+            current_model = new ArrayList<Chain>();
             current_chain = null;
             current_group = null;
         }
@@ -1013,11 +1056,11 @@ public class PDBFileParser  {
         // (re)set structure 
 
         structure     = new StructureImpl() ;
-        current_model = new ArrayList();
+        current_model = new ArrayList<Chain>();
         current_chain = null           ;
         current_group = null           ;
         header        = init_header();
-        connects      = new ArrayList();
+        connects      = new ArrayList<Map<String,Integer>>();
         helixList.clear();
         strandList.clear();
         turnList.clear();
@@ -1190,7 +1233,7 @@ public class PDBFileParser  {
                     if ( g instanceof AminoAcid) {
                         AminoAcid aa = (AminoAcid)g;
                        
-                        Map assignmentMap = new HashMap();
+                        Map<String,String> assignmentMap = new HashMap<String,String>();
                         assignmentMap.put(assignment,type);
                         aa.setSecStruc(assignmentMap);                        
                     }
