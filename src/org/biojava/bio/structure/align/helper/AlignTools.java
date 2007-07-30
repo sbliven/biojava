@@ -67,6 +67,30 @@ public class AlignTools {
         return tmp;
         
     }
+    
+    
+    /** get a continue subset of Atoms based by the starting position and the length
+     * does not clone the original atoms.
+     * 
+     * @param caall
+     * @param pos ... the start position
+     * @param fragmentLength .. the length of the subset to extract.
+     * @return an Atom[] array
+     */
+    public static Atom[] getFragmentNoClone(Atom[] caall, int pos, int fragmentLength){
+     
+        if ( pos+fragmentLength > caall.length)
+            return null;
+        
+        Atom[] tmp = new Atom[fragmentLength];
+        
+        for (int i=0;i< fragmentLength;i++){
+            tmp[i] = (Atom)caall[i+pos];
+        }
+        return tmp;
+        
+    }
+    
     /** get the centroid for the set of atoms starting fromposition pos, length fragmentLenght
      * 
      * @param ca
@@ -82,7 +106,7 @@ public class AlignTools {
             return center;
         }
         
-        Atom[] tmp = getFragment(ca,pos,fragmentLength);
+        Atom[] tmp = getFragmentNoClone(ca,pos,fragmentLength);
         
         return Calc.getCentroid(tmp);
     }
