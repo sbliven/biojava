@@ -48,7 +48,7 @@ public class HetatomImpl implements Group {
      */
     public static final String type = "hetatm" ;
     
-    HashMap properties ;
+    Map<String, Object> properties ;
     
     
     /* stores if 3d coordinates are available. */
@@ -60,7 +60,7 @@ public class HetatomImpl implements Group {
     /* pdb numbering. */
     String pdb_code ;
     
-    ArrayList atoms ;
+    List<Atom> atoms ;
     
     //WeakReference parent;
     Chain parent;
@@ -72,8 +72,8 @@ public class HetatomImpl implements Group {
         pdb_flag = false;
         pdb_name = null ;
         pdb_code = null ;
-        atoms    = new ArrayList();    
-        properties = new HashMap();
+        atoms    = new ArrayList<Atom>();    
+        properties = new HashMap<String,Object>();
         parent = null;
     }
     
@@ -168,7 +168,7 @@ public class HetatomImpl implements Group {
      * returns a List of all atoms in this Group
      * @return an List object representing the atoms value
      */
-    public List getAtoms(){
+    public List<Atom> getAtoms(){
         //Atom[] atms = (Atom[])atoms.toArray(new Atom[atoms.size()]);
         
         return atoms ;
@@ -184,7 +184,7 @@ public class HetatomImpl implements Group {
     {
         
         for (int i=0;i<atoms.size();i++){
-            Atom atom = (Atom)atoms.get(i);
+            Atom atom = atoms.get(i);
             if (atom.getName().equals(name)){
                 return atom;
             }
@@ -206,14 +206,14 @@ public class HetatomImpl implements Group {
         if ((position < 0)|| ( position >= atoms.size())) {
             throw new StructureException("No atom found at position "+position);
         }
-        Atom a = (Atom)atoms.get(position);
+        Atom a = atoms.get(position);
         return a ;	
     }
     
     /** test is an Atom with name is existing. */
     public boolean hasAtom(String name){
         for (int i=0;i<atoms.size();i++){
-            Atom atom = (Atom)atoms.get(i);
+            Atom atom = atoms.get(i);
             if (atom.getName().equals(name)){
                 return true;
             }
@@ -294,8 +294,8 @@ public class HetatomImpl implements Group {
      * 
      * @see #getProperties
      */
-    public void setProperties(Map props) {
-        properties = (HashMap) props ;
+    public void setProperties(Map<String,Object> props) {
+        properties =  props ;
     }
     
     /** return properties. 
@@ -303,7 +303,7 @@ public class HetatomImpl implements Group {
      * @return a HashMap object representing the properties value
      * @see #setProperties
      */
-    public Map getProperties() {
+    public Map<String, Object> getProperties() {
         return properties ;
     }
     
@@ -332,7 +332,7 @@ public class HetatomImpl implements Group {
      * @return an Iterator object
      */
     public Iterator iterator() {
-        AtomIterator iter = new AtomIterator(this);
+        Iterator iter = new AtomIterator(this);
         return iter ;
     }
     
@@ -351,7 +351,7 @@ public class HetatomImpl implements Group {
         }
         // copy the atoms
         for (int i=0;i<atoms.size();i++){
-            Atom atom = (Atom)atoms.get(i);
+            Atom atom = atoms.get(i);
             n.addAtom((Atom)atom.clone());
         }
         return n;

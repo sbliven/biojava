@@ -218,7 +218,7 @@ public interface Group {
      *
      * @return an Iterator object
      */
-    public Iterator<AtomIterator> iterator() ;
+    public Iterator iterator() ;
     
     
     /** returns and identical copy of this Group object .

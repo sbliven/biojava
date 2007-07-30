@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.biojava.bio.structure.AminoAcid;
@@ -68,7 +69,7 @@ import org.biojava.utils.io.InputStreamProvider;
 public class PDBFileReader implements StructureIOFile {
     
     String path                     ;
-    ArrayList extensions            ;
+    List<String> extensions            ;
     boolean parseSecStruc;
     
     public static void main(String[] args){
@@ -100,7 +101,7 @@ public class PDBFileReader implements StructureIOFile {
     
     
     public PDBFileReader() {
-        extensions    = new ArrayList();
+        extensions    = new ArrayList<String>();
         path = "" ;
         extensions.add(".ent");
         extensions.add(".pdb");
