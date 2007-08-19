@@ -35,13 +35,18 @@ import java.util.Map;
  * 
  */
 public interface AminoAcid extends Group {
+	
+	// to distribguish AminoAcids that have been created from SEQRES records and ATOM records
+	public static final String ATOMRECORD = "ATOM";
+	public static final String SEQRESRECORD = "SEQRES";
+	
     /**
      * Specifies the secondary structure as a Map.
      *
      * @param secstr  a Map object specifying the sec struc 
      * @see #getSecStruc
      */
-    public void setSecStruc(Map secstr) ;
+    public void setSecStruc(Map<String,String> secstr) ;
     
     /** get secondary structure data .
      *
@@ -49,7 +54,7 @@ public interface AminoAcid extends Group {
      *
      * @see #setSecStruc
      */
-    public Map getSecStruc() ;
+    public Map<String,String> getSecStruc() ;
 
     /** get N atom.
      *
@@ -98,6 +103,16 @@ public interface AminoAcid extends Group {
      * @see #getAminoType
      */
     public void setAminoType(Character aa) ;
+
+	/** allows to distinguish between amino acids that are provided
+		as ATOM records and a SEQRES records.
+	*/
+	public void setRecordType(String recordName);
+
+	/** allows to distinguish between amino acids that are provided
+		as ATOM records and a SEQRES records.
+	*/
+    public String getRecordType();
 
     /** string representation. */
     public String toString() ;

@@ -32,6 +32,7 @@ import org.biojava.bio.structure.io.PDBParseException;
  *  AminoAcid inherits most from Hetatom.  Adds a few AminoAcid
  *  specific methods.
  * @author Andreas Prlic
+ * @author Jules Jacobsen
  * @since 1.4
  * @version %I% %G%
  * 
@@ -43,13 +44,18 @@ implements AminoAcid
 	/** this is an Amino acid. type is "amino". */
 	public static final String type = "amino";
 
+	
 	/* IUPAC amino acid residue names 
 	 */
 	Character amino_char ;
 
-	HashMap   secstruc   ;
+	Map<String,String>   secstruc;
+	
+	String recordType; // allows to distinguish between AAs that have been created from SEQRES records and ATOM records
+	
 
-
+	
+	
 	/*
 	 * inherits most from Hetero and has just a few extensions.
 	 */
@@ -57,9 +63,9 @@ implements AminoAcid
 		super();
 
 		amino_char = null;
-		secstruc = new HashMap();
+		secstruc = new HashMap<String,String>();
+		recordType = ATOMRECORD;
 	}
-
 
 	public String getType(){ return type;}
 
@@ -69,8 +75,8 @@ implements AminoAcid
 	 * @param secstr  a Map object specifying the sec struc value
 	 * @see #getSecStruc
 	 */
-	public void setSecStruc(Map secstr) {
-		secstruc = (HashMap) secstr ;
+	public void setSecStruc(Map<String,String> secstr) {
+		this.secstruc = secstr ;
 	}
 
 	/** get secondary structure data .
@@ -79,7 +85,7 @@ implements AminoAcid
 	 *
 	 * @see #setSecStruc
 	 */
-	public Map getSecStruc(){
+	public Map<String,String> getSecStruc(){
 		return secstruc ;
 	}
 
@@ -135,10 +141,19 @@ implements AminoAcid
 		amino_char  = aa ;
 	}
 
+    public void setRecordType(String recordName) {
+        recordType = recordName; 
+    }
+
+    public String getRecordType() {
+        return recordType; 
+	}    
+
 	/** string representation. */
 	public String toString(){
-
-		String str = "PDB: "+ pdb_name + " " + amino_char + " " + pdb_code +  " "+ pdb_flag;
+		
+		String str = "AminoAcid "+ recordType + ":"+ pdb_name + " " + amino_char + 
+		" " + pdb_code +  " "+ pdb_flag + " " + recordType  ;
 		if (pdb_flag) {
 			str = str + "atoms: "+atoms.size();
 		}
@@ -174,7 +189,8 @@ implements AminoAcid
 			e.printStackTrace();
 		}
 		n.setAminoType(getAminoType());
-
+		n.setRecordType(recordType);
+		
 		// copy the atoms
 		for (int i=0;i<atoms.size();i++){
 			Atom atom = (Atom)atoms.get(i);
