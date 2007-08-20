@@ -238,11 +238,6 @@ public class PDBFileReader implements StructureIOFile {
 	}
 
 
-	public void gzipCompress(Structure s){
-
-	}
-
-
 	private File downloadPDB(String pdbId){
 	
 		File tempFile = new File(path+"/"+pdbId+".pdb.gz");		
