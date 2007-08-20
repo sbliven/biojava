@@ -377,4 +377,9 @@ public interface Structure {
      * @return a String that looks like a PDB file
      */
     public String toPDB();
+    
+    
+    public void setCompoundList(List<Compound>molList);
+    public List<Compound> getCompoundList();
+    public Compound getCompoundById(String molId);
 }

@@ -36,6 +36,7 @@ import org.biojava.bio.Annotation;
  * A Chain in a PDB file. It contains several groups which can be of
  * type "amino", "hetatm", "nucleotide".
  * @author Andreas Prlic
+ * @author Jules Jacobsen
  * @since 1.4
  */
 public class ChainImpl implements Chain {

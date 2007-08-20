@@ -37,6 +37,7 @@ import org.biojava.bio.structure.io.FileConvert;
  * see io package.
  *
  * @author Andreas Prlic
+ * @author Jules Jacobsen
  * @since 1.4
  * @version %I% %G%
  */
@@ -46,10 +47,11 @@ public class StructureImpl implements Structure {
     
     String pdb_id ;
     /* models is an ArrayList of ArrayLists */
-    List<List> models;
+    List<List<Chain>> models;
     
     Map<String,Object> header ;
     List<Map <String,Integer>> connections ;
+    List<Compound> compounds;
     String name ;
     
     boolean nmrflag ;
@@ -62,11 +64,12 @@ public class StructureImpl implements Structure {
     public StructureImpl() {
         super();
         
-        models         = new ArrayList<List>();
+        models         = new ArrayList<List<Chain>>();
         name           = "";
         nmrflag        = false;
         header         = new HashMap<String,Object>();
         connections    = new ArrayList<Map<String,Integer>>();
+        compounds      = new ArrayList<Compound>();
     }
     
     
@@ -138,14 +141,14 @@ public class StructureImpl implements Structure {
         
         Chain c = findChain(chainId,modelnr);
         
-        List groups = c.getGroups();
+        List<Group> groups = c.getGroups();
         
         // now iterate over all groups in this chain.
         // in order to find the amino acid that has this pdbRenum.               
         
-        Iterator giter = groups.iterator();
+        Iterator<Group> giter = groups.iterator();
         while (giter.hasNext()){
-            Group g = (Group) giter.next();
+            Group g =  giter.next();
             String rnum = g.getPDBCode();
             
             // we only mutate amino acids
@@ -170,12 +173,12 @@ public class StructureImpl implements Structure {
     
     public Chain findChain(String chainId, int modelnr) throws StructureException {
         
-        List chains = getChains(modelnr);
+        List<Chain> chains = getChains(modelnr);
         
         // iterate over all chains.
-        Iterator iter = chains.iterator();
+        Iterator<Chain> iter = chains.iterator();
         while (iter.hasNext()){
-            Chain c = (Chain)iter.next();
+            Chain c = iter.next();
             
             if (c.getName().equals(chainId)) {
                 return c;
@@ -321,32 +324,41 @@ public class StructureImpl implements Structure {
      */
     public String toString(){
     	String newline = System.getProperty("line.separator");
-        String str = "structure "+name+ " " + pdb_id ;
-        if ( isNmr() ) str += " models: "+nrModels()+newline ;
-        str += header ;
+        StringBuffer str = new StringBuffer();
+        str.append("structure "+name+ " " + pdb_id) ;
+        if ( isNmr() ) str.append( " models: "+nrModels()+newline) ;
+        str.append(header) ;
         
         for (int i=0;i<nrModels();i++){
-            if (isNmr() ) str += " model["+i+"]:";
-            str +=" chains:";
+            if (isNmr() ) str.append(" model["+i+"]:");
+            str.append(" chains:");
             
-            str += "\n";
+            str.append( "\n");
             for (int j=0;j<size(i);j++){
               
                 Chain cha = (Chain)getChain(i,j); 
-                List agr = cha.getGroups("amino");
-                List hgr = cha.getGroups("hetatm");
-                List ngr = cha.getGroups("nucleotide");
+                List<Group> agr = cha.getGroups("amino");
+                List<Group> hgr = cha.getGroups("hetatm");
+                List<Group> ngr = cha.getGroups("nucleotide");
                 
-                str += "chain: >"+cha.getName()+"<"+
-                " length: " +cha.getLength()+
-                " aminos: " +agr.size()+
-                " hetatms: "+hgr.size()+
-                " nucleotides: "+ngr.size() + newline;
+                str.append("chain: >"+cha.getName()+"<");
+                str.append(" length: " +cha.getLength());
+                str.append(" aminos: " +agr.size());
+                str.append(" hetatms: "+hgr.size());
+                str.append(" nucleotides: "+ngr.size() + newline);                
             }
+            
+        }
+        
+        str.append("Molecules: " + newline);
+        Iterator<Compound> iter = compounds.iterator();
+        while (iter.hasNext()){
+        	Compound mol = iter.next();
+        	str.append(mol);
         }
         
         
-        return str ;
+        return str.toString() ;
     }
     
     /** return number of chains , if NMR return number of chains of first model .
@@ -354,15 +366,14 @@ public class StructureImpl implements Structure {
      */
     public int size() {
         int modelnr = 0 ;
-        ArrayList model = null ;
+       
         if ( models.size() > 0) {
-            model = (ArrayList)models.get(modelnr);
+            return models.get(modelnr).size();
         }
         else {
             return 0 ;
         }
-        
-        return model.size() ; 
+                
     } 
     
     /** return number of chains  of model.
@@ -401,7 +412,7 @@ public class StructureImpl implements Structure {
      */
     public List<Chain> getModel(int modelnr) {
         
-        List<Chain> model = (ArrayList<Chain>)models.get(modelnr);		
+        List<Chain> model = models.get(modelnr);		
         return model;
     }    
     
@@ -411,10 +422,10 @@ public class StructureImpl implements Structure {
     public Chain getChainByPDB(String chainId, int modelnr) 
     throws StructureException{
         
-        List chains = getChains(modelnr);
-        Iterator iter = chains.iterator();
+        List<Chain> chains = getChains(modelnr);
+        Iterator<Chain> iter = chains.iterator();
         while ( iter.hasNext()){
-            Chain c = (Chain) iter.next();
+            Chain c = iter.next();
             if ( c.getName().equals(chainId))
                 return c;
         }
@@ -447,15 +458,32 @@ public class StructureImpl implements Structure {
     public boolean hasChain(String chainId) {
         int modelnr = 0;
         
-        List chains = getChains(modelnr);
-        Iterator iter = chains.iterator();
+        List<Chain> chains = getChains(modelnr);
+        Iterator<Chain> iter = chains.iterator();
         while ( iter.hasNext()){
-            Chain c = (Chain) iter.next();
+            Chain c = iter.next();
             // we check here with equals because we might want to distinguish between upper and lower case chains!
             if ( c.getName().equals(chainId))
                 return true;
         }
         return false;
+    }
+    
+    public void setCompoundList(List<Compound>molList){
+        this.compounds = molList;
+    }
+
+    public List<Compound> getCompoundList() {
+        return compounds;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Compound getCompoundById(String molId) {
+        for (Compound mol : this.compounds){
+            if (mol.getMolId().equals(molId)){
+                return mol;
+            }
+        }
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
     
     
