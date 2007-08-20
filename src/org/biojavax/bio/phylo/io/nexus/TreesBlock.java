@@ -256,6 +256,25 @@ public class TreesBlock extends NexusBlock.Abstract {
 		temp = temp.replace(" ", "");
 		tokens = temp.split(",");               
 		temp = "";
+
+	
+		//consider the tree as a string that contains all nodes (as in the JGraphT tree string, without ",", "(", and ")")
+		for(int i = 0 ; i < tokens.length; i = i + 4){
+			
+			//it it is a terminal node, for instance (1, p1) and (p1, 2), that is connected by an internal node			
+			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
+				
+				//remove internal node and generate a NewickString type sub-tree, (1,2) in the above example
+				temp = "(" + tokens[i] +", " + tokens[i+3] + ")";
+				
+				// for the rest of the string
+				for(int j = i+4; j < tokens.length; j++){
+
+					// see if there is a node that internal node, p1 in this case, is used for a terminal node, something like (p1, p2) and (p2, 3)
+					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])){
+						
+						// if so, remove p1 and replace a subtree that had been just generated, ((1,2), p2) and (p2, 3) will be generated in this case
+						tokens[j] = temp; 
 		
 		for(int i = 0 ; i < tokens.length; i = i + 4){
 			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false && tokens[i].equals(tokens[i+3]) == false){
@@ -307,6 +326,31 @@ public class TreesBlock extends NexusBlock.Abstract {
 			
 			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false && tokens[i].equals(tokens[i+3]) == false){
 	
+
+		for(int i = 0 ; i < tokens.length; i = i + 4){
+		
+			// if left-hand side node dose not start with "(", which means it's an internal node p[0-9] or a terminal node,
+			if(tokens[i].startsWith("(") == false)
+				// then, get an edge weight for this node and add it to the node string
+				tokens[i] = tokens[i] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i], tokens[i+1]));
+			
+			// if right-hand side node dose not start with "(", which means it's an internal node p[0-9] or a terminal node,
+			if(tokens[i+3].startsWith("(") == false)
+				//then, get an edge wieght for this node and add it to the node string 
+				tokens[i+3] = tokens[i+3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i+2], tokens[i+3]));
+			
+			//if both nodes are terminal nodes, (1, p1):10.0 and (p1, 2):20.0
+			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
+				
+				//build a sub-tree containing both of them. (wieghts are already included in the token)- something like (1:10.0, 2:20.0)
+				temp = "(" + tokens[i] +", " + tokens[i+3] + ")";
+		
+				//for the rest of the string
+				for(int j = i+4; j < tokens.length; j++){
+					
+					// see if there is a node that internal node, p1 in this case, is used for a terminal node, something like (p1, p2) and (p2, 3)
+					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])){
+
 				if(tokens[i].startsWith("(") == false && tokens[i+3].startsWith("(") == false)
 					temp = "(" + tokens[i]+ ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i], tokens[i+1])) +", " + tokens[i+3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i+2], tokens[i+3])) + ")" ;
 				else if (tokens[i].startsWith("(") && tokens[i+3].startsWith("(") == false)
@@ -318,17 +362,28 @@ public class TreesBlock extends NexusBlock.Abstract {
 												
 				for(int j = 0; j < tokens.length; j++){
 					if(tokens[j].matches(tokens[i+1]) && tokens[j].matches(tokens[i+2]) && j != i+1 && j != i+2){
+
 						
+						//find a weight for that edge
 						double weight = 0.0;
+
+						// when it is a left-hand side node
 						if(j%4 == 0)
 							weight = treegraph.getEdgeWeight(treegraph.getEdge(tokens[j], tokens[j+1]));
+						//when it is a right-hand side node
 						else if(j%4 == 3)
 							weight = treegraph.getEdgeWeight(treegraph.getEdge(tokens[j], tokens[j-1]));
+
+						
+						//then, remove p1 from the string and replace (1:10.0, 2:20.0) and add its original weight- something like (1:10.0, 2:20.0):30.0
+						tokens[j] = temp + ":" + weight; 
+
 						
 						if(j > i+3) 
 							tokens[j] = temp + ":" + weight; 
 						else if(j < i) 
 							temp = "(" + tokens[j-3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[j-3], tokens[j-2])) + ", " + temp + ":" + weight + ")";	
+
 					}
 				}
 			}
@@ -355,61 +410,94 @@ public class TreesBlock extends NexusBlock.Abstract {
 		TreesBlock.NewickTreeString t = new TreesBlock.NewickTreeString();
 		Stack stack = new Stack();
 	
+		//get tree from the Map by its label
 		t = (TreesBlock.NewickTreeString) this.trees.get(label);
-
+		
+		//store tree as a string 
 		temp = t.getTreeString();
-		len = temp.length();                  
+		//get its length
+		len = temp.length();     
+		//parse the tree by "" so that every single characther in the tree can be separated             
 		tokens = temp.split("");             
+		//initialize temp variable
 		temp = "";
 		
+		//predict the number of internal(parental) nodes by the number of "(" in the tree string
 		for(int i = 0; i <= len; i++){
 			if(tokens[i].equals("(")){
 				p_index++;
 			}
 		}
 
+		//for the every single characters in the tree
 		for(int i = 0; i <= len; i++)              
 		{
 			if( tokens[i].equals(",") ){          
-				//push into stack if it is a word, or comma
+				
+				//if it is a ",", consider this as an internal node, so that push the p[0-9] into the stack.
+            	      // index for the internal node is being decreased as it is in JGraphT
+			
 				stack.push("p" + p_index);
 				p_index--;
+
 			}else if ( tokens[i].equals("(") || tokens[i].equals(" ") ){    
 				// ignore "(" or " "
-			}else if(tokens[i].equals(")")){	  
-			 	//pop 3 elements if you see ")"					
+
+			}else if(tokens[i].equals(")")){
+
+			 	//if it is the ")", which means the closure of a node
+				//pop 3 elements (nodes) from the stack to generate a subtree by JGraphT format				
+				
 				try{
+					//pop 1st item which will be a left-hand side node
 					s_temp3 = stack.pop();    
 					v3 = s_temp3.toString(); 
 										
 					try{
+						//pop 2nd item which will be an internal(parental) node
 						s_temp2 = stack.pop();
 						v2 = s_temp2.toString();
 				
 						try{
+							//pop 3rd item which will be a right-hand side node
 							s_temp1 = stack.pop();
 							v1 = s_temp1.toString();
 									
+							//register those items as vertices
 							this.unweighted.addVertex(v1);
 							this.unweighted.addVertex(v2);
 							this.unweighted.addVertex(v3);	
+				
+							//and add weights to those edges between vertices
 							this.unweighted.addEdge(v1,v2);
 							this.unweighted.addEdge(v2,v3);		
 										
+							//Then, push 2nd item back into the stack, to keep track of that internal node to other nodes
 							stack.push(v2);
+
 						}catch(EmptyStackException e){}
 					}catch(EmptyStackException e){}												
 				}catch(EmptyStackException e){}
 									
 			}else{
-				// if it is a letter, concatenate for the name, and push it to the stack 								
+
+				// if it is a alphabet character, concatenate it for the (node/taxa) name 	
+							
 				if(tokens[i].equals(" ")){
-					//ignore
+					//ignore the space within taxa name
+
 				}else if(tokens[i+1].equals("(") || tokens[i+1].equals(")") || tokens[i+1].equals(",")) {
+
+					//if you see any characters indicating the end of taxa name, 
 					temp = temp + tokens[i];
+
+					//push the name into the stack and initialize temp variable for the next taxa name.
 					stack.push(temp);
 					temp = "";
+
 				}else{
+
+					//concatenate
 					temp = temp + tokens[i];
 				}
 			}
@@ -433,7 +521,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 		Object s_temp1, s_temp2, s_temp3;
 		Object weight1, weight3;
 		Stack stack = new Stack();
-		Stack weight_stack = new Stack();
+		Stack weight_stack = new Stack();  //additional stack for the weight
 	
 		TreesBlock.NewickTreeString t = new TreesBlock.NewickTreeString();
 	
@@ -447,13 +535,17 @@ public class TreesBlock extends NexusBlock.Abstract {
 		for(int i = 0; i <= len; i++)              
 		{
 			if( tokens[i].equals(",") ){          
-				//push into stack if it is a word, or comma
+				
 				stack.push("p" + p_index);
 				p_index++;
 			}else if ( tokens[i].equals("(") || tokens[i].equals(" ") ){    
 				// ignore "(" or " "
-			}else if(tokens[i].equals(")")){	  
-			 	//pop 3 elements if you see ")"					
+			}else if(tokens[i].equals(")")){
+	  
+			 	//if it is the ")", which means the closure of a node
+				//pop 3 elements (nodes) from the stack to generate a subtree by JGraphT format				
+				//also, pop 2 elements (Weights) from the weight_stack to add weight to the edge.
+				
 				try{
 					s_temp3 = stack.pop();    
 					v3 = s_temp3.toString(); 
@@ -475,7 +567,8 @@ public class TreesBlock extends NexusBlock.Abstract {
 							this.weighted.addVertex(v3);	
 							this.weighted.addEdge(v1,v2);
 							this.weighted.addEdge(v2,v3);
-
+							
+							//add weight to the edge
 							this.weighted.setEdgeWeight(this.weighted.getEdge(v1,v2), Double.parseDouble(w1));	
 							this.weighted.setEdgeWeight(this.weighted.getEdge(v2,v3), Double.parseDouble(w3));	
 									
@@ -492,18 +585,26 @@ public class TreesBlock extends NexusBlock.Abstract {
 					temp = temp + tokens[i];
 					
 					if(temp.startsWith(":")){
-
+					//if it is only a weight without a taxa name, than remove ":" and push it into the wieght stack
+						
 						temp = temp.replace(":", "");
 						weight_stack.push(temp);
 
 					}else if(temp.startsWith(":") == false && temp.contains(":")){
+					//if it contains both taxa name & weight
 						
+						//separate the string	
 						temp_token = temp.split(":");
+						//and push taxa name & weight into the separte stacks
 						stack.push(temp_token[0]);
 						weight_stack.push(temp_token[1]);
 					}
+
+					//initialize the variable
 					temp = "";
 				}else{
+
+					//concatenation
 					temp = temp + tokens[i];
 				}
 			}
