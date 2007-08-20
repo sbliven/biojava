@@ -34,7 +34,7 @@ import java.util.NoSuchElementException;
  * @version %I% %G%
  */
 
-public class AtomIterator implements Iterator {
+public class AtomIterator implements Iterator<Atom> {
 	Structure structure     ;
 	Group     group         ;
 	int current_atom_pos    ;
@@ -125,7 +125,7 @@ public class AtomIterator implements Iterator {
 	 * @return the next Atom
 	 * @throws NoSuchElementException ...
 	 */
-	public Object next() 
+	public Atom next() 
 	throws NoSuchElementException
 	{
 		current_atom_pos++ ;
