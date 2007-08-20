@@ -111,7 +111,12 @@ public interface Chain {
      *  @return the Annotation of this chain
      */
     public Annotation getAnnotation();
-    
+
+    /** set the Header from the PDB file
+    */
+    public void setHeader(Compound molId);
+
+    public Compound getHeader();
     /** get and set the name of this chain (Chain id in PDB file ).
      * @param name  a String specifying the name value
      * @see #getName
@@ -147,6 +152,81 @@ public interface Chain {
      * @see #setSwissprotId
      */
     public String getSwissprotId() ;
+    
+    public void addSeqResGroup(Group group);
+
+    /** return the amino acid at position X.
+     * @param position  an int
+     * @return a Group object
+     */
+    public Group getSeqResGroup (int position);
+
+    /** return an ArrayList of all groups of a special type (e.g. amino,
+     * hetatm, nucleotide).
+     * @param type  a String
+     * @return an ArrayList object
+     */
+    public List getSeqResGroups (String type);
+
+    /** return all groups of this chain.
+     * @return an ArrayList of all Group objects of this chain
+
+     */
+    public List getSeqResGroups ();
+
+    /** get a group by its PDB residue numbering. if the PDB residue number is not know,
+     * throws a StructureException.
+     *
+     * @param pdbresnum the PDB residue number of the group
+     * @return the matching group
+     * @throws StructureException
+     */
+    public Group getSeqResGroupByPDB(String pdbresnum) throws StructureException;
+
+    /** get all groups that are located between two PDB residue numbers
+     *
+     * @param pdbresnumStart PDB residue number of start
+     * @param pdbresnumEnd PDB residue number of end
+     * @return Groups in between. or throws a StructureException if either start or end can not be found,
+     * @throws StructureException
+     */
+    public Group[] getSeqResGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) throws StructureException;
+
+
+    /** get total length of chain, including HETATMs..
+     * @return an int representing the length of the whole chain including HETATMs
+     */
+
+    public void setSeqRes(String seq);
+
+
+    /**returns the SEQRES of the chain
+     * @return*/
+
+    public String getSeqRes();
+
+    /**sets the organism in which the sequence is naturally found.
+     * @param organismScientific*/
+
+    public void setOrganismScientific(String organismScientific);
+
+    /** gets the organism in which the sequence is naturally found.
+     * @return
+     */
+
+    public String getOrganismScientific();
+
+    public void setMolName(String moleculeName);
+
+    public String getMolName();
+
+
+    public void setMolId(String molType);
+
+    public String getMolId();
+
+    public int getLengthSeqRes();
+    
 
     
 }
