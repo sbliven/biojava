@@ -1009,59 +1009,39 @@ public class PDBFileParser  {
 
     private void pdb_COMPND_Handler(String line) {
 //        System.out.println("PDBFileParser.pdb_COMPND_Handler: BEGIN");
-
-
-
-
 //        System.out.println("PDBFileParser.pdb_COMPND_Handler: Parsing: " + line);
 
-        if (line.substring(9, 10).contains(" ")) {
-//            System.out.println(line.substring(9, 10));
+        if (line.substring(9, 10).contains(" ")) 
             continuationNo = 0;
-        }
-
-        if (!line.substring(9, 10).contains(" ")) {
-//            System.out.println(line.substring(9, 10));
+         else 
             continuationNo = Integer.valueOf(line.substring(9, 10));
-        }
+        
 
-//        System.out.println("current continuationNo is " + continuationNo);
-//        System.out.println("current continuationField is " + continuationField);
-//        System.out.println("current continuationString is " + continuationString);
-
+        /*
+        System.out.println("current continuationNo     is " + continuationNo);
+        System.out.println("current continuationField  is " + continuationField);
+        System.out.println("current continuationString is " + continuationString);
+        System.out.println("current compount           is " + current_molId);
+        */
         StringTokenizer compndTokens = new StringTokenizer(line.substring(10,70));
 
         while (compndTokens.hasMoreTokens()) {
             String token = compndTokens.nextToken();
-            //StringTokenizer lineTokens = new StringTokenizer(line, ":");
-            //String[] values = line.split(":");
-            //int valueLength = values.length;
-            
+         
             //TODO: value needed?
             //String value = values[valueLength - 1].trim().replace(";", "");
 
-            //System.out.println(lineTokens.countTokens()  + " " + value);
-
-//            System.out.println("PDBFileParser.pdb_COMPND_Handler: current token is: " + token);
             if (compndFieldValues.contains(token)) {
 
-//                System.out.println("Found field " + token);
                 if (continuationString.equals("")) {
                     continuationField = token;
-//                    System.out.println("First field (should be 'MOL_ID:')");
                 } else {
-                    System.out.println("PDBFileParser.pdb_COMPND_Handler: Found new field - " + token + " Passing field and values to compndValueSetter: " + continuationField + " " + continuationString);
-                    System.out.println(line);
+
                     compndValueSetter(continuationField, continuationString);
-//                    System.out.println("resetting continuationString and continuationField");
                     continuationField = token;
                     continuationString = "";
-//                    System.out.println("continuationField = " + continuationField);
-//                    System.out.println("continuationString = " + continuationString);
                 }
-            }
-
-            if (!compndFieldValues.contains(token)) {
+            } else {            
 //                System.out.println("Still in field " + continuationField);
                 continuationString = continuationString.concat(token + " ");
 //                System.out.println("continuationString = " + continuationString);
@@ -1077,20 +1057,16 @@ public class PDBFileParser  {
      * @param value
      */
     private void compndValueSetter(String field, String value) {
-//        System.out.println("PDBFileParser.compndValueSetter: BEGIN");
+
         value = value.trim().replace(";", "");
         if (field.equals("MOL_ID:")) {
-
-//            System.out.println("MolID found: " + value);
             
               //todo: find out why an extra mol or chain gets added  and why 1H1J, 1J1H ATOM records are missing, but not 1H1H....
 
             if (molTypeCounter != Integer.valueOf(value)) {
                 molTypeCounter++;
-//                System.out.println("PDBFileParser.compndValueSetter: New header!!!\n Adding:");
-//                current_molId.showCompound();
+
                 compounds.add(current_molId);
-//                System.out.println("PDBFileParser.compndValueSetter: Adding new header to molIdLists " + molIdLists.size());
                 current_molId = null;
                 current_molId = new Compound();
 
@@ -1099,26 +1075,24 @@ public class PDBFileParser  {
             current_molId.setMolId(value);
         }
         if (field.equals("MOLECULE:")) {
-//            System.out.println("Adding molecule info: " + value);
             current_molId.setMolName(value);
-//            current_molId.showCompound();
+
         }
         if (field.equals("CHAIN:")) {
 
-            // Synonyms for this molecule (comma-separated)
             StringTokenizer chainTokens = new StringTokenizer(value, ",");
             List<String> chains = new ArrayList<String>();
 
             while (chainTokens.hasMoreTokens()) {
                 chains.add(chainTokens.nextToken().trim());
-//                System.out.println("Adding chains " + chains + " to current_molId");
+
 
                 current_molId.setchainId(chains);
-//                current_molId.showCompound();
+
             }
         }
         if (field.equals("SYNONYM:")) {
-//            System.out.println("Adding synonym info" + value);
+
             StringTokenizer synonyms = new StringTokenizer(value, ",");
             List<String> names = new ArrayList<String>();
 
@@ -1127,11 +1101,11 @@ public class PDBFileParser  {
 
                 current_molId.setSynonyms(names);
             }
-//            current_molId.showCompound();
+
         }
 
         if (field.equals("EC:")) {
-//            System.out.println("Adding EC numbers: " + value);
+
             StringTokenizer ecNumTokens = new StringTokenizer(value, ",");
             List<String> ecNums = new ArrayList<String>();
 
@@ -1140,35 +1114,35 @@ public class PDBFileParser  {
 
                 current_molId.setEcNums(ecNums);
             }
-//            current_molId.showCompound();
+
         }
         if (field.equals("FRAGMENT:")) {
-//            System.out.println("Adding FRAGMENT: " + value);
+
             current_molId.setFragment(value);
-//            current_molId.showCompound();
+
         }
         if (field.equals("ENGINEERED:")) {
-//            System.out.println("Adding ENGINEERED: " + value);
+
             current_molId.setEngineered(value);
-//            current_molId.showCompound();
+
         }
         if (field.equals("MUTATION:")) {
-//            System.out.println("Adding MUTATION: " + value);
+
             current_molId.setMutation(value);
-//            current_molId.showCompound();
+
         }
         if (field.equals("BIOLOGICAL_UNIT:")) {
-//            System.out.println("Adding BIOLOGICAL_UNIT: " + value);
+
             current_molId.setBiologicalUnit(value);
-//            current_molId.showCompound();
+
         }
         if (field.equals("OTHER_DETAILS:")) {
-//            System.out.println("Adding OTHER_DETAILS: " + value);
+
             current_molId.setDetails(value);
-//            current_molId.showCompound();
+
         }
         
-//        System.out.println("PDBFileParser.compndValueSetter: END");
+
 
     }
 
@@ -1186,26 +1160,34 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
  9 - 10   Continuation      continuation   Allows concatenation of multiple records.                         
 11 - 70   Specification     srcName        Identifies the source of the macromolecule in 
            list                            a token: value format.                        
+     * @param line the line to be parsed
 
      */
-    public void pdb_SOURCE_Handler(String line) {
-//      System.out.println("PDBFileParser.pdb_SOURCE_Handler: BEGIN");
+    private void pdb_SOURCE_Handler(String line) {
+        
+        
       // this is horrible! The order of the handlers have to be maintained and 
     	//this method actually finishes off the
       //  job of the COMPND_Handler. :(
       try {
-          //System.out.println(String.format("PDBFileParser.pdb_SOURCE_Handler:" + 
-        	//	  " trying to add final current_molId %s to header_list (%s MolIDs)", 
-        	//	  current_molId.getMolId(), molIdLists.size()));
-         
     	  
     	  
     	  if (compounds.size() < Integer.valueOf(current_molId.getMolId())) {
 //              System.out.println("Finishing off final MolID header.");
               compndValueSetter(continuationField, continuationString);
-//          System.out.println(String.format("PDBFileParser.pdb_SOURCE_Handler: adding final current_molId %s to header_list", current_molId.getMolId()));
+              continuationString = "";   
               compounds.add(current_molId.clone());
           }
+          
+          if ( continuationString != ""){
+              // looks like an old style PDB file header
+              if ( (current_molId == null) || ( current_molId.equals(""))) {
+                  current_molId.setMolName(continuationString);
+                  compounds.add(current_molId);
+              }
+              continuationString = "";   
+          }
+          
       } catch (CloneNotSupportedException e) {
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
@@ -1249,7 +1231,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
               current_molId.setOrganismScientific(value);
           } else if (code.equals("ORGANISM_COMMON:")) {
               current_molId.setOrganismCommon(value);
-          } else if (code.equals("STRAIN:")) {
+          } else if (code.equals("STRAIN:")) {  
               current_molId.setStrain(value);
           } else if (code.equals("VARIANT:")) {
               current_molId.setVariant(value);
@@ -1346,6 +1328,10 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
     /** Handler for REMARK lines 
      */
     private void pdb_REMARK_Handler(String line) {
+        // finish off the compound handler!
+       
+        
+        
         String l = line.substring(0,11).trim();
         if (l.equals("REMARK   2"))pdb_REMARK_2_Handler(line);
 
@@ -1773,7 +1759,11 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
         current_group = null           ;
         header        = init_header();
         connects      = new ArrayList<Map<String,Integer>>();
+        continuationField = "";
+        continuationString = "";
+        current_molId = new Compound();
         
+        compounds.clear();
         helixList.clear();
         strandList.clear();
         turnList.clear();
