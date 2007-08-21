@@ -977,6 +977,7 @@ public class PDBFileParser  {
      * <p/>
      * 1         2         3         4         5         6         7
      * 1234567890123456789012345678901234567890123456789012345678901234567890
+     * COMPND    MOL_ID: 1;                                                    1ALI   4
      * COMPND    MOL_ID: 1;
      * COMPND   2 MOLECULE: HEMOGLOBIN;
      * COMPND   3 CHAIN: A, B, C, D;
@@ -1028,7 +1029,7 @@ public class PDBFileParser  {
 //        System.out.println("current continuationField is " + continuationField);
 //        System.out.println("current continuationString is " + continuationString);
 
-        StringTokenizer compndTokens = new StringTokenizer(line.substring(10));
+        StringTokenizer compndTokens = new StringTokenizer(line.substring(10,70));
 
         while (compndTokens.hasMoreTokens()) {
             String token = compndTokens.nextToken();
@@ -1049,7 +1050,8 @@ public class PDBFileParser  {
                     continuationField = token;
 //                    System.out.println("First field (should be 'MOL_ID:')");
                 } else {
-//                    System.out.println("PDBFileParser.pdb_COMPND_Handler: Found new field - " + token + " Passing field and values to compndValueSetter: " + continuationField + " " + continuationString);
+                    System.out.println("PDBFileParser.pdb_COMPND_Handler: Found new field - " + token + " Passing field and values to compndValueSetter: " + continuationField + " " + continuationString);
+                    System.out.println(line);
                     compndValueSetter(continuationField, continuationString);
 //                    System.out.println("resetting continuationString and continuationField");
                     continuationField = token;
@@ -1210,11 +1212,14 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
       int molTypeCounter = 0;
 
+      // ignore trailing bits of data in PDB file format < v3.0      
+      String data = line.substring(0,70);
+      
       //System.out.println("Parsing: "+ line);
-      StringTokenizer sourceTokens = new StringTokenizer(line);
+      StringTokenizer sourceTokens = new StringTokenizer(data);
       while (sourceTokens.hasMoreTokens()) {
           String code = sourceTokens.nextToken();
-          String[] values = line.split(":");
+          String[] values = data.split(":");
           int valueLength = values.length;
           String value = values[valueLength - 1].trim().replace(";", "");
           //System.out.println(lineTokens.countTokens()  + " " + value);
