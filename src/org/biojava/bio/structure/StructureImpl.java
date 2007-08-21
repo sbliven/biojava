@@ -354,7 +354,7 @@ public class StructureImpl implements Structure {
         Iterator<Compound> iter = compounds.iterator();
         while (iter.hasNext()){
         	Compound mol = iter.next();
-        	str.append(mol);
+        	str.append(mol+newline);
         }
         
         
