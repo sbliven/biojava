@@ -24,8 +24,9 @@
 
 package org.biojava.bio.structure;
 
+
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -67,7 +68,7 @@ public class Compound implements Cloneable {
     String fragment = null;
     String organismScientific = null;
     String organismCommon = null;
-    String strain = "";
+    String strain = null;
     String variant = null;
     String cellLine = null;
     String atcc = null;
@@ -96,16 +97,46 @@ public class Compound implements Cloneable {
 
     public String toString(){
     	StringBuffer buf = new StringBuffer();
-    	buf.append("Compound: " + molId + " " +molName);
-    	buf.append(" chains: " );
+    	buf.append("Compound: " + molId + " " +molName + " ");
+    	/* disabled for the moment
+          
+    	 buf.append(" chains: " );
     	Iterator<Chain> iter = chainList.iterator();
     	while (iter.hasNext()){
     		Chain c = iter.next();
     		buf.append (c.getName() + " ");
     	}
-    	
-    	if ( organismScientific != null)
-    		buf.append(" organism scientific: " + organismScientific);
+    	*/
+        try {
+            Class c = Class.forName("org.biojava.bio.structure.Compound");
+            Method[] methods  = c.getMethods();
+            
+            for (int i = 0; i < methods.length; i++) {
+                Method m = methods[i];     
+                
+                String name = m.getName();
+                if ( name.substring(0,3).equals("get")) {
+                   if (name.equals("getMolId"))
+                       continue;
+                   if ( name.equals("getMolName"))
+                       continue;
+                   
+                    Object o  = m.invoke(this, new Object[]{});
+                    if ( o instanceof String){
+                        if ( o != null)
+                            buf.append(name.substring(3, name.length())+": "+ o + " ");
+                    }
+                }
+                
+            }
+            
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        
+        
+    	//if ( organismScientific != null)
+    	//	buf.append(" organism scientific: " + organismScientific);
     	
     	return buf.toString();
     }
