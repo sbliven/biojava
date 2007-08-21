@@ -83,6 +83,8 @@ import org.biojava.bio.symbol.Symbol;
  */
 public class PDBFileParser  {
 
+    private final boolean DEBUG = false;
+    
     String path                     ;
     List<String> extensions            ;
 
@@ -103,9 +105,9 @@ public class PDBFileParser  {
     List<Map<String,String>> helixList;
     List<Map<String,String>> strandList;
     List<Map<String,String>> turnList;
-    Compound current_molId;
+    Compound current_compound;
     List<Compound> compounds = new ArrayList<Compound>();
-    
+
     // for parsing COMPOUND and SOURCE Header lines
     int molTypeCounter = 1;
     int continuationNo;
@@ -117,65 +119,65 @@ public class PDBFileParser  {
             "EC:", "FRAGMENT:", "ENGINEERED:", "MUTATION:",
             "BIOLOGICAL_UNIT:", "OTHER_DETAILS:"));
 
-    
-   
+
+
     boolean parseSecStruc;
-   
-    
+
+
     public static String idCode = "idCode";
 
     public static final String PDB_AUTHOR_ASSIGNMENT = "PDB_AUTHOR_ASSIGNMENT";
     public static final String HELIX  = "HELIX";
     public static final String STRAND = "STRAND";
     public static final String TURN   = "TURN";
-    
+
     // there is a file format change in PDB 3.0 and nucleotides are being renamed
-    
-   static private Map<String, Integer> nucleotides30 ;
-   static private Map<String, Integer> nucleotides23 ;
 
-   static {
-	   nucleotides30 = new HashMap<String,Integer>();
-	   nucleotides30.put("DA",1);
-	   nucleotides30.put("DC",1);
-	   nucleotides30.put("DG",1);
-	   nucleotides30.put("DT",1);
-	   nucleotides30.put("DI",1);
-	   nucleotides30.put("A",1);
-	   nucleotides30.put("G",1);
-	   nucleotides30.put("C",1);
-	   nucleotides30.put("U",1);
-	   nucleotides30.put("I",1);
+    static private Map<String, Integer> nucleotides30 ;
+    static private Map<String, Integer> nucleotides23 ;
 
-	   //TODO: check if they are always HETATMs, in that case this will not be necessary
-	   // the DNA linkers - the +C , +G, +A  +T +U and +I have been replaced with these:
-	   nucleotides30.put("TAF",1); // 2'-DEOXY-2'-FLUORO-ARABINO-FURANOSYL THYMINE-5'-PHOSPHATE
-	   nucleotides30.put("TC1",1); // 3-(5-PHOSPHO-2-DEOXY-BETA-D-RIBOFURANOSYL)-2-OXO-1,3-DIAZA-PHENOTHIAZINE
-	   nucleotides30.put("TFE",1); // 2'-O-[2-(TRIFLUORO)ETHYL] THYMIDINE-5'-MONOPHOSPHATE
-	   nucleotides30.put("TFO",1); // [2-(6-AMINO-9H-PURIN-9-YL)-1-METHYLETHOXY]METHYLPHOSPHONIC ACID"
-	   nucleotides30.put("TGP",1); // 5'-THIO-2'-DEOXY-GUANOSINE PHOSPHONIC ACID
-	   nucleotides30.put("THX",1); // PHOSPHONIC ACID 6-({6-[6-(6-CARBAMOYL-3,6,7,8-TETRAHYDRO-3,6-DIAZA-AS-INDACENE-2-CARBONYL)-3,6,7,8-TETRAHYDRO-3,6-DIAZA-AS-INDOCENE-2-CARBONYL]-3,6,7,8-TETRAHYDRO-3,6-DIAZA-AS-INDACENE-2-CARBONL}-AMINO)-HEXYL ESTER 5-(5-METHYL-2,4-DIOXO-3,4-DIHYDRO-2H-PYRIMIDIN-1-YL)-TETRAHYDRO-FURAN-2-YLMETHYL ESTER
-	   nucleotides30.put("TLC",1); // 2-O,3-ETHDIYL-ARABINOFURANOSYL-THYMINE-5'-MONOPHOSPHATE
-	   nucleotides30.put("TLN",1); //  [(1R,3R,4R,7S)-7-HYDROXY-3-(THYMIN-1-YL)-2,5-DIOXABICYCLO[2.2.1]HEPT-1-YL]METHYL DIHYDROGEN PHOSPHATE"
-	   nucleotides30.put("TP1",1); // 2-(METHYLAMINO)-ETHYLGLYCINE-CARBONYLMETHYLENE-THYMINE
-	   nucleotides30.put("TPC",1); // 5'-THIO-2'-DEOXY-CYTOSINE PHOSPHONIC ACID
-	   nucleotides30.put("TPN",1); // 2-AMINOETHYLGLYCINE-CARBONYLMETHYLENE-THYMINE
-	   
- 
-	   
-	   // store nucleic acids (C, G, A, T, U, and I), and 
-       // the modified versions of nucleic acids (+C, +G, +A, +T, +U, and +I), and
-	   nucleotides23  = new HashMap<String,Integer>();
-	   String[] names = {"C","G","A","T","U","I","+C","+G","+A","+T","+U","+I"};
-	   for (int i = 0; i < names.length; i++) {
-		   String n = names[i];
-		   nucleotides23.put(n,1);		
-	   }
-	   
-   }
-   
-   
-   
+    static {
+        nucleotides30 = new HashMap<String,Integer>();
+        nucleotides30.put("DA",1);
+        nucleotides30.put("DC",1);
+        nucleotides30.put("DG",1);
+        nucleotides30.put("DT",1);
+        nucleotides30.put("DI",1);
+        nucleotides30.put("A",1);
+        nucleotides30.put("G",1);
+        nucleotides30.put("C",1);
+        nucleotides30.put("U",1);
+        nucleotides30.put("I",1);
+
+        //TODO: check if they are always HETATMs, in that case this will not be necessary
+        // the DNA linkers - the +C , +G, +A  +T +U and +I have been replaced with these:
+        nucleotides30.put("TAF",1); // 2'-DEOXY-2'-FLUORO-ARABINO-FURANOSYL THYMINE-5'-PHOSPHATE
+        nucleotides30.put("TC1",1); // 3-(5-PHOSPHO-2-DEOXY-BETA-D-RIBOFURANOSYL)-2-OXO-1,3-DIAZA-PHENOTHIAZINE
+        nucleotides30.put("TFE",1); // 2'-O-[2-(TRIFLUORO)ETHYL] THYMIDINE-5'-MONOPHOSPHATE
+        nucleotides30.put("TFO",1); // [2-(6-AMINO-9H-PURIN-9-YL)-1-METHYLETHOXY]METHYLPHOSPHONIC ACID"
+        nucleotides30.put("TGP",1); // 5'-THIO-2'-DEOXY-GUANOSINE PHOSPHONIC ACID
+        nucleotides30.put("THX",1); // PHOSPHONIC ACID 6-({6-[6-(6-CARBAMOYL-3,6,7,8-TETRAHYDRO-3,6-DIAZA-AS-INDACENE-2-CARBONYL)-3,6,7,8-TETRAHYDRO-3,6-DIAZA-AS-INDOCENE-2-CARBONYL]-3,6,7,8-TETRAHYDRO-3,6-DIAZA-AS-INDACENE-2-CARBONL}-AMINO)-HEXYL ESTER 5-(5-METHYL-2,4-DIOXO-3,4-DIHYDRO-2H-PYRIMIDIN-1-YL)-TETRAHYDRO-FURAN-2-YLMETHYL ESTER
+        nucleotides30.put("TLC",1); // 2-O,3-ETHDIYL-ARABINOFURANOSYL-THYMINE-5'-MONOPHOSPHATE
+        nucleotides30.put("TLN",1); //  [(1R,3R,4R,7S)-7-HYDROXY-3-(THYMIN-1-YL)-2,5-DIOXABICYCLO[2.2.1]HEPT-1-YL]METHYL DIHYDROGEN PHOSPHATE"
+        nucleotides30.put("TP1",1); // 2-(METHYLAMINO)-ETHYLGLYCINE-CARBONYLMETHYLENE-THYMINE
+        nucleotides30.put("TPC",1); // 5'-THIO-2'-DEOXY-CYTOSINE PHOSPHONIC ACID
+        nucleotides30.put("TPN",1); // 2-AMINOETHYLGLYCINE-CARBONYLMETHYLENE-THYMINE
+
+
+
+        // store nucleic acids (C, G, A, T, U, and I), and 
+        // the modified versions of nucleic acids (+C, +G, +A, +T, +U, and +I), and
+        nucleotides23  = new HashMap<String,Integer>();
+        String[] names = {"C","G","A","T","U","I","+C","+G","+A","+T","+U","+I"};
+        for (int i = 0; i < names.length; i++) {
+            String n = names[i];
+            nucleotides23.put(n,1);		
+        }
+
+    }
+
+
+
     public PDBFileParser() {
         extensions    = new ArrayList<String>();
         structure     = null           ;
@@ -184,15 +186,15 @@ public class PDBFileParser  {
         current_group = null           ;
         header        = init_header() ;
         connects      = new ArrayList<Map<String,Integer>>() ;
-        
+
         parseSecStruc = false;
-      
-        
+
+
         helixList     = new ArrayList<Map<String,String>>();
         strandList    = new ArrayList<Map<String,String>>();
         turnList      = new ArrayList<Map<String,String>>();
-        current_molId = new Compound();
-        
+        current_compound = new Compound();
+
         NEWLINE = System.getProperty("line.separator");
 
         Alphabet alpha_prot = ProteinTools.getAlphabet();
@@ -206,7 +208,7 @@ public class PDBFileParser  {
 
 
     }
-    
+
     /** is secondary structure assignment being parsed from the file?
      * default is null
      * @return boolean if HELIX STRAND and TURN fields are being parsed
@@ -222,8 +224,8 @@ public class PDBFileParser  {
     public void setParseSecStruc(boolean parseSecStruc) {
         this.parseSecStruc = parseSecStruc;
     }
-    
-	/** initialize the header. */
+
+    /** initialize the header. */
     private Map<String,Object> init_header(){
 
 
@@ -274,8 +276,8 @@ public class PDBFileParser  {
         return new Character(code1.charAt(0)) ;
 
     }
-    
-    
+
+
     /** convert a three letter code into single character.
      * catches for unusual characters
      * 
@@ -283,9 +285,9 @@ public class PDBFileParser  {
      * @return null if group is a nucleotide code
      */
     private Character get1LetterCode(String groupCode3){
-    	
-    	Character aminoCode1 = null;
-    	try {
+
+        Character aminoCode1 = null;
+        try {
             // is it a standard amino acid ?
             aminoCode1 = convert_3code_1code(groupCode3);
         } catch (IllegalSymbolException e){
@@ -301,9 +303,9 @@ public class PDBFileParser  {
                 aminoCode1 = new Character('x');
             }
         }
-        
+
         return aminoCode1;
-    	
+
     }
 
     /** initiale new group, either Hetatom or AminoAcid */
@@ -334,15 +336,15 @@ public class PDBFileParser  {
      */
     private boolean isNucleotide(String groupCode3){
 
-    	String code = groupCode3.trim();
-    	if ( nucleotides30.containsKey(code)){    	
-    		return true;    		
-    	}
-    	
-    	if ( nucleotides23.containsKey(code)){
-    		return true;
-    	}
-        
+        String code = groupCode3.trim();
+        if ( nucleotides30.containsKey(code)){    	
+            return true;    		
+        }
+
+        if ( nucleotides23.containsKey(code)){
+            return true;
+        }
+
         return false ;
     }
 
@@ -372,11 +374,11 @@ public class PDBFileParser  {
         structure.setPDBCode(pdbCode);
         header.put("classification",classification);
         header.put("depDate",deposition_date);
-      
+
     }
-    
-    
-    
+
+
+
     /** parses the following record:
 
 	 <pre>
@@ -420,12 +422,12 @@ public class PDBFileParser  {
         String endChainId  = line.substring(31,32);
         String endSeqNum   = line.substring(33,37).trim();
         String endICode    = line.substring(37,38);
-        
+
         //System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " + initICode + " " +
         //        endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
-        
+
         Map<String,String> m = new HashMap<String,String>();
-        
+
         m.put("initResName",initResName);
         m.put("initChainId", initChainId);
         m.put("initSeqNum", initSeqNum);
@@ -434,11 +436,11 @@ public class PDBFileParser  {
         m.put("endChainId", endChainId);
         m.put("endSeqNum",endSeqNum);
         m.put("endICode",endICode);
-        
+
         helixList.add(m);
-        
+
     }
-    
+
     /** 
       Handler for
       <pre>
@@ -490,11 +492,11 @@ public class PDBFileParser  {
                                               previous strand.
 </pre>
 
-     
+
      */
     private void pdb_SHEET_Handler( String line){
- 
-        
+
+
         String initResName = line.substring(17,20).trim();
         String initChainId = line.substring(21,22);
         String initSeqNum  = line.substring(22,26).trim();
@@ -503,12 +505,12 @@ public class PDBFileParser  {
         String endChainId  = line.substring(32,33);
         String endSeqNum   = line.substring(33,37).trim();
         String endICode    = line.substring(37,38);
-        
+
         //System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " + initICode + " " +
         //        endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
-        
+
         Map<String,String> m = new HashMap<String,String>();
-        
+
         m.put("initResName",initResName);
         m.put("initChainId", initChainId);
         m.put("initSeqNum", initSeqNum);
@@ -517,11 +519,11 @@ public class PDBFileParser  {
         m.put("endChainId", endChainId);
         m.put("endSeqNum",endSeqNum);
         m.put("endICode",endICode);
-        
+
         strandList.add(m);
     }
-    
-    
+
+
     /** 
      * Handler for TURN lines
      <pre>
@@ -561,12 +563,12 @@ public class PDBFileParser  {
         String endChainId  = line.substring(30,31);
         String endSeqNum   = line.substring(31,35).trim();
         String endICode    = line.substring(35,36);
-        
+
         //System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " + initICode + " " +
         //        endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
-        
+
         Map<String,String> m = new HashMap<String,String>();
-        
+
         m.put("initResName",initResName);
         m.put("initChainId", initChainId);
         m.put("initSeqNum", initSeqNum);
@@ -575,7 +577,7 @@ public class PDBFileParser  {
         m.put("endChainId", endChainId);
         m.put("endSeqNum",endSeqNum);
         m.put("endICode",endICode);
-        
+
         turnList.add(m);
     }
 
@@ -616,7 +618,7 @@ public class PDBFileParser  {
             header.put("modDate",modificationDate);
         }
     }
-    
+
     /** @author Jules Jacobsen
      * Handler for
      * SEQRES record format
@@ -669,9 +671,9 @@ public class PDBFileParser  {
      * 68 - 70        Residue name    resName       Residue name.
      */
     private void pdb_SEQRES_Handler(String line)
-            throws PDBParseException {
-//        System.out.println("PDBFileParser.pdb_SEQRES_Handler: BEGIN");
-//        System.out.println(line);
+    throws PDBParseException {
+//      System.out.println("PDBFileParser.pdb_SEQRES_Handler: BEGIN");
+//      System.out.println(line);
 
         //TODO: treat the following residues as amino acids?
         /*
@@ -699,15 +701,15 @@ public class PDBFileParser  {
         SEQRES   1 D   30  PHE VAL ASN GLN HIS LEU CYS GLY SER HIS LEU VAL GLU
         SEQRES   2 D   30  ALA LEU TYR LEU VAL CYS GLY GLU ARG GLY PHE PHE TYR
         SEQRES   3 D   30  THR PRO LYS ALA
-        */
+         */
         String recordName = line.substring(0, 6).trim();
         //int pdbnumber = Integer.parseInt(line.substring(6, 11).trim());
         String chain_id    = line.substring(11, 12);  
         String subSequence = line.substring(18, 70);
-              
+
         //Atom atom = new AtomImpl(); 
         //atom.setPDBserial(pdbnumber);     
-        
+
         //TODO: is this needed?
         //Character altLoc = new Character(line.substring(16, 17).charAt(0));
         String residueNumber = line.substring(22, 27).trim();
@@ -715,7 +717,7 @@ public class PDBFileParser  {
 
         Character aminoCode1 = null;
         if (recordName.equals(AminoAcid.SEQRESRECORD)) {
-//            System.out.println("PDBFileParser.pdb_SEQRES_Handler: Now parsing chain: " + chain_id + ", " + subSequence);
+//          System.out.println("PDBFileParser.pdb_SEQRES_Handler: Now parsing chain: " + chain_id + ", " + subSequence);
 
 
             while (subSequenceResidues.hasMoreTokens()) {
@@ -724,19 +726,19 @@ public class PDBFileParser  {
                 //System.out.println("Current three letter code is " + threeLetter);
 
                 aminoCode1 = get1LetterCode(threeLetter);
-                
+
 
                 if (current_chain == null) {
                     current_chain = new ChainImpl();
                     current_chain.setName(chain_id);
                     if (compounds != null) {
-//                        System.out.println("PDBFileParser.pdb_SEQRES_Handler: Initializing new chain: " + current_chain.getName());
+//                      System.out.println("PDBFileParser.pdb_SEQRES_Handler: Initializing new chain: " + current_chain.getName());
                         for (Compound compound : compounds) {
-//                            System.out.println("PDBFileParser.pdb_SEQRES_Handler: Matching header " + head.getMolId());
+//                          System.out.println("PDBFileParser.pdb_SEQRES_Handler: Matching header " + head.getMolId());
                             if (compound.getChainId().contains(current_chain.getName())) {
-//                                System.out.println("PDBFileParser.pdb_SEQRES_Handler: Chains match! Setting chain header information to: ");
-//                                head.showCompound();
-//                                head.showSource();
+//                              System.out.println("PDBFileParser.pdb_SEQRES_Handler: Chains match! Setting chain header information to: ");
+//                              head.showCompound();
+//                              head.showSource();
                                 current_chain.setHeader(compound);  //todo:might not be the best place
                                 current_chain.setOrganismScientific(String.format("%s %s",compound.getOrganismScientific(), compound.getStrain()).trim());
                                 current_chain.setMolId(compound.getMolId());
@@ -747,7 +749,7 @@ public class PDBFileParser  {
                     }
                 }
                 if (current_group == null) {
-//                    System.out.println("PDBFileParser.pdb_SEQRES_Handler: current_group is null. Creating new group");
+//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: current_group is null. Creating new group");
                     current_group = getNewGroup(recordName, aminoCode1);
 
                     current_group.setPDBCode(residueNumber);
@@ -755,18 +757,18 @@ public class PDBFileParser  {
                     current_group.toString();
                 }
 
-//                System.out.println("chainid: >"+chain_id+"<, current_chain.id: "+ current_chain.getName() );
+//              System.out.println("chainid: >"+chain_id+"<, current_chain.id: "+ current_chain.getName() );
                 // check if chain id is the same
                 if (!chain_id.equals(current_chain.getName())) {
-//                    System.out.println("PDBFileParser.pdb_SEQRES_Handler: end of chain: " + current_chain.getName() + " >" + chain_id + "<");
+//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: end of chain: " + current_chain.getName() + " >" + chain_id + "<");
                     //current_chain.setHeader(current_molId);  //todo:might not be the best place
                     // end up old chain...
-//                    System.out.println("PDBFileParser.pdb_SEQRES_Handler: Adding last group " + current_group + " to chain " + current_chain.getName());
+//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: Adding last group " + current_group + " to chain " + current_chain.getName());
                     current_chain.addSeqResGroup(current_group);
 
                     // see if old chain is known ...
                     Chain testchain;
-//                    System.out.println("PDBFileParser.pdb_SEQRES_Handler: trying if chain name is known.");
+//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: trying if chain name is known.");
                     testchain = isKnownChain(current_chain.getName());
                     if (testchain == null) {
                         current_model.add(current_chain);
@@ -775,23 +777,23 @@ public class PDBFileParser  {
                     //see if chain_id of new residue is one of the previous chains ...
                     testchain = isKnownChain(chain_id);
                     if (testchain != null) {
-//                        System.out.println("PDBFileParser.pdb_SEQRES_Handler: chain already known..." + chain_id);
+//                      System.out.println("PDBFileParser.pdb_SEQRES_Handler: chain already known..." + chain_id);
                         current_chain = (ChainImpl) testchain;
 
                     } else {
-//                        System.out.println("PDBFileParser.pdb_SEQRES_Handler: chain not known: creating new chain..." + chain_id);
+//                      System.out.println("PDBFileParser.pdb_SEQRES_Handler: chain not known: creating new chain..." + chain_id);
 
                         //current_model.add(current_chain);
                         current_chain = new ChainImpl();
                         current_chain.setName(chain_id);
-//                        System.out.println("PDBFileParser.pdb_SEQRES_Handler: Initialized new chain: " + current_chain.getName());
+//                      System.out.println("PDBFileParser.pdb_SEQRES_Handler: Initialized new chain: " + current_chain.getName());
                         for (Compound compound : compounds) {
-//                            System.out.println("PDBFileParser.pdb_SEQRES_Handler: Matching header " + head.getMolId() + " chains " + head.getChainId() + " with new chainId " + current_chain.getName());
+//                          System.out.println("PDBFileParser.pdb_SEQRES_Handler: Matching header " + head.getMolId() + " chains " + head.getChainId() + " with new chainId " + current_chain.getName());
                             if (compound.getChainId().contains(current_chain.getName())) {
-//                                System.out.println("PDBFileParser.pdb_SEQRES_Handler: Chains match! Setting chain header information to: ");
-//                                head.showCompound();
-//                                head.showSource();
-//                                System.out.println("setting OS to: " + head.getOrganismScientific());
+//                              System.out.println("PDBFileParser.pdb_SEQRES_Handler: Chains match! Setting chain header information to: ");
+//                              head.showCompound();
+//                              head.showSource();
+//                              System.out.println("setting OS to: " + head.getOrganismScientific());
                                 current_chain.setHeader(compound);  //todo:might not be the best place
                                 current_chain.setOrganismScientific(String.format("%s %s",compound.getOrganismScientific(), compound.getStrain()).trim());
                                 current_chain.setMolId(compound.getMolId());
@@ -811,7 +813,7 @@ public class PDBFileParser  {
                 // check if residue number is the same ...
                 // insertion code is part of residue number
                 if (! residueNumber.equals(current_group.getPDBCode())) {
-//                    System.out.println("PDBFileParser.pdb_SEQRES_Handler: end of residue: " + current_group.getPDBCode() + " " + residueNumber);
+//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: end of residue: " + current_group.getPDBCode() + " " + residueNumber);
                     current_chain.addSeqResGroup(current_group);
 
                     current_group = getNewGroup(recordName, aminoCode1);
@@ -825,20 +827,20 @@ public class PDBFileParser  {
                 //current_group.addAtom(atom);
                 //System.out.println(current_group);
                 //current_group.addAtom(atom);
-                
+
                 current_group = getNewGroup(recordName, aminoCode1);
                 //current_group.setPDBCode(residueNumber);
                 current_group.setPDBName(threeLetter);
-//                System.out.println("PDBFileParser.pdb_SEQRES_Handler: Adding group: " + recordName + " residue= " + aminoCode1);
-//                System.out.println("PDBFileParser.pdb_SEQRES_Handler: " + current_group);
+//              System.out.println("PDBFileParser.pdb_SEQRES_Handler: Adding group: " + recordName + " residue= " + aminoCode1);
+//              System.out.println("PDBFileParser.pdb_SEQRES_Handler: " + current_group);
 
 
             }
         }
-//        System.out.println("PDBFileParser.pdb_SEQRES_Handler: END");
+//      System.out.println("PDBFileParser.pdb_SEQRES_Handler: END");
     }
 
-    
+
 
     /** Handler for
 	 TITLE Record Format
@@ -858,7 +860,7 @@ public class PDBFileParser  {
         t += title + " ";
         header.put("title",t);
     }
-    
+
     /**
      * Handler for
      * COMPND
@@ -1008,26 +1010,26 @@ public class PDBFileParser  {
      */
 
     private void pdb_COMPND_Handler(String line) {
-//        System.out.println("PDBFileParser.pdb_COMPND_Handler: BEGIN");
-//        System.out.println("PDBFileParser.pdb_COMPND_Handler: Parsing: " + line);
+//      System.out.println("PDBFileParser.pdb_COMPND_Handler: BEGIN");
+//      System.out.println("PDBFileParser.pdb_COMPND_Handler: Parsing: " + line);
 
         if (line.substring(9, 10).contains(" ")) 
             continuationNo = 0;
-         else 
+        else 
             continuationNo = Integer.valueOf(line.substring(9, 10));
-        
 
-        /*
-        System.out.println("current continuationNo     is " + continuationNo);
-        System.out.println("current continuationField  is " + continuationField);
-        System.out.println("current continuationString is " + continuationString);
-        System.out.println("current compount           is " + current_molId);
-        */
+
+        if (DEBUG) {
+            //System.out.println("current continuationNo     is " + continuationNo);
+            System.out.println("current continuationField  is " + continuationField);
+            System.out.println("current continuationString is " + continuationString);
+            System.out.println("current compount           is " + current_compound);
+        }
         StringTokenizer compndTokens = new StringTokenizer(line.substring(10,70));
 
         while (compndTokens.hasMoreTokens()) {
             String token = compndTokens.nextToken();
-         
+
             //TODO: value needed?
             //String value = values[valueLength - 1].trim().replace(";", "");
 
@@ -1042,15 +1044,15 @@ public class PDBFileParser  {
                     continuationString = "";
                 }
             } else {            
-//                System.out.println("Still in field " + continuationField);
+//              System.out.println("Still in field " + continuationField);
                 continuationString = continuationString.concat(token + " ");
-//                System.out.println("continuationString = " + continuationString);
+//              System.out.println("continuationString = " + continuationString);
             }
-//            System.out.println("PDBFileParser.pdb_COMPND_Handler: END");
+//          System.out.println("PDBFileParser.pdb_COMPND_Handler: END");
         }
     }
 
-    
+
     /** set the value in the currrent molId object
      * 
      * @param field
@@ -1060,22 +1062,23 @@ public class PDBFileParser  {
 
         value = value.trim().replace(";", "");
         if (field.equals("MOL_ID:")) {
-            
-              //todo: find out why an extra mol or chain gets added  and why 1H1J, 1J1H ATOM records are missing, but not 1H1H....
 
+            //todo: find out why an extra mol or chain gets added  and why 1H1J, 1J1H ATOM records are missing, but not 1H1H....
+            if ( DEBUG )
+                System.out.println("molTYpeCounter " + molTypeCounter+ " "+ value);
             if (molTypeCounter != Integer.valueOf(value)) {
                 molTypeCounter++;
 
-                compounds.add(current_molId);
-                current_molId = null;
-                current_molId = new Compound();
+                compounds.add(current_compound);
+                current_compound = null;
+                current_compound = new Compound();
 
             }
 
-            current_molId.setMolId(value);
+            current_compound.setMolId(value);
         }
         if (field.equals("MOLECULE:")) {
-            current_molId.setMolName(value);
+            current_compound.setMolName(value);
 
         }
         if (field.equals("CHAIN:")) {
@@ -1087,7 +1090,7 @@ public class PDBFileParser  {
                 chains.add(chainTokens.nextToken().trim());
 
 
-                current_molId.setchainId(chains);
+                current_compound.setchainId(chains);
 
             }
         }
@@ -1099,7 +1102,7 @@ public class PDBFileParser  {
             while (synonyms.hasMoreTokens()) {
                 names.add(synonyms.nextToken());
 
-                current_molId.setSynonyms(names);
+                current_compound.setSynonyms(names);
             }
 
         }
@@ -1112,42 +1115,42 @@ public class PDBFileParser  {
             while (ecNumTokens.hasMoreTokens()) {
                 ecNums.add(ecNumTokens.nextToken());
 
-                current_molId.setEcNums(ecNums);
+                current_compound.setEcNums(ecNums);
             }
 
         }
         if (field.equals("FRAGMENT:")) {
 
-            current_molId.setFragment(value);
+            current_compound.setFragment(value);
 
         }
         if (field.equals("ENGINEERED:")) {
 
-            current_molId.setEngineered(value);
+            current_compound.setEngineered(value);
 
         }
         if (field.equals("MUTATION:")) {
 
-            current_molId.setMutation(value);
+            current_compound.setMutation(value);
 
         }
         if (field.equals("BIOLOGICAL_UNIT:")) {
 
-            current_molId.setBiologicalUnit(value);
+            current_compound.setBiologicalUnit(value);
 
         }
         if (field.equals("OTHER_DETAILS:")) {
 
-            current_molId.setDetails(value);
+            current_compound.setDetails(value);
 
         }
-        
+
 
 
     }
 
-    
-    
+
+
     /** Handler for
      * SOURCE Record format
      * 
@@ -1164,131 +1167,137 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
      */
     private void pdb_SOURCE_Handler(String line) {
-        
-        
-      // this is horrible! The order of the handlers have to be maintained and 
-    	//this method actually finishes off the
-      //  job of the COMPND_Handler. :(
-      try {
-    	  
-    	  
-    	  if (compounds.size() < Integer.valueOf(current_molId.getMolId())) {
+
+
+        // this is horrible! The order of the handlers have to be maintained and 
+        //this method actually finishes off the
+        //  job of the COMPND_Handler. :(
+        try {
+
+
+            if (compounds.size() < Integer.valueOf(current_compound.getMolId())) {
 //              System.out.println("Finishing off final MolID header.");
-              compndValueSetter(continuationField, continuationString);
-              continuationString = "";   
-              compounds.add(current_molId.clone());
-          }
-          
-          if ( continuationString != ""){
-              // looks like an old style PDB file header
-              if ( (current_molId == null) || ( current_molId.equals(""))) {
-                  current_molId.setMolName(continuationString);
-                  compounds.add(current_molId);
-              }
-              continuationString = "";   
-          }
-          
-      } catch (CloneNotSupportedException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-      }
+                compndValueSetter(continuationField, continuationString);
+                continuationString = "";   
+                compounds.add(current_compound.clone());
+            }
 
-      int molTypeCounter = 0;
+            if ( ! continuationString.equals("")){
+                if (DEBUG) {
+                    System.out.println("continuationString is not empty. " + current_compound);
+                }
+                // looks like an old style PDB file header
+                if ( current_compound.getMolId().equals("0") ) {
+                    if (DEBUG){
+                        System.out.println("looks like an old PDB file header");
+                    }
+                    current_compound.setMolName(continuationString);
+                    compounds.add(current_compound);
+                }
+                continuationString = "";   
+            }
 
-      // ignore trailing bits of data in PDB file format < v3.0      
-      String data = line.substring(0,70);
-      
-      //System.out.println("Parsing: "+ line);
-      StringTokenizer sourceTokens = new StringTokenizer(data);
-      while (sourceTokens.hasMoreTokens()) {
-          String code = sourceTokens.nextToken();
-          String[] values = data.split(":");
-          int valueLength = values.length;
-          String value = values[valueLength - 1].trim().replace(";", "");
-          //System.out.println(lineTokens.countTokens()  + " " + value);
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
 
-          if (code.equals("MOL_ID:")) {
-              if (molTypeCounter != Integer.valueOf(value)) {
+        int molTypeCounter = 0;
 
-                  //System.out.println("New MOL!!!");
+        // ignore trailing bits of data in PDB file format < v3.0      
+        String data = line.substring(0,70);
 
-                  for (Compound molId : compounds) {
-                      if (molId.getMolId().equals(value)) {
-                          current_molId = molId;
-                      }
-                  }
-                  //System.out.println("Setting current_molId to :" + current_molId.getMolId());
-                  molTypeCounter++;
+        //System.out.println("Parsing: "+ line);
+        StringTokenizer sourceTokens = new StringTokenizer(data);
+        while (sourceTokens.hasMoreTokens()) {
+            String code = sourceTokens.nextToken();
+            String[] values = data.split(":");
+            int valueLength = values.length;
+            String value = values[valueLength - 1].trim().replace(";", "");
+            //System.out.println(lineTokens.countTokens()  + " " + value);
 
-              }
+            if (code.equals("MOL_ID:")) {
+                if (molTypeCounter != Integer.valueOf(value)) {
 
-              //current_molId.showSource();
-          }
-          if (code.equals("SYNTHETIC:")) {
-              current_molId.setSynthetic(value);
-          } else if (code.equals("FRAGMENT:")) {
-              current_molId.setFragment(value);
-          } else if (code.equals("ORGANISM_SCIENTIFIC:")) {
-              current_molId.setOrganismScientific(value);
-          } else if (code.equals("ORGANISM_COMMON:")) {
-              current_molId.setOrganismCommon(value);
-          } else if (code.equals("STRAIN:")) {  
-              current_molId.setStrain(value);
-          } else if (code.equals("VARIANT:")) {
-              current_molId.setVariant(value);
-          } else if (code.equals("CELL_LINE:")) {
-              current_molId.setCellLine(value);
-          } else if (code.equals("ATCC:")) {
-              current_molId.setAtcc(value);
-          } else if (code.equals("ORGAN:")) {
-              current_molId.setOrgan(value);
-          } else if (code.equals("TISSUE:")) {
-              current_molId.setTissue(value);
-          } else if (code.equals("CELL:")) {
-              current_molId.setCell(value);
-          } else if (code.equals("ORGANELLE:")) {
-              current_molId.setOrganelle(value);
-          } else if (code.equals("SECRETION:")) {
-              current_molId.setSecretion(value);
-          } else if (code.equals("GENE:")) {
-              current_molId.setGene(value);
-          } else if (code.equals("CELLULAR_LOCATION:")) {
-              current_molId.setCellularLocation(value);
-          } else if (code.equals("EXPRESSION_SYSTEM:")) {
-              current_molId.setExpressionSystem(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_STRAIN:")) {
-              current_molId.setExpressionSystemStrain(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_VARIANT:")) {
-              current_molId.setExpressionSystemVariant(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_CELL_LINE:")) {
-              current_molId.setExpressionSystemCellLine(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_ATCC_NUMBER:")) {
-              current_molId.setExpressionSystemAtccNumber(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_ORGAN:")) {
-              current_molId.setExpressionSystemOrgan(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_TISSUE:")) {
-              current_molId.setExpressionSystemTissue(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_CELL:")) {
-              current_molId.setExpressionSystemCell(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_ORGANELLE:")) {
-              current_molId.setExpressionSystemOrganelle(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_CELLULAR_LOCATION:")) {
-              current_molId.setExpressionSystemCellularLocation(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_VECTOR_TYPE:")) {
-              current_molId.setExpressionSystemVectorType(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_VECTOR:")) {
-              current_molId.setExpressionSystemVector(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_PLASMID:")) {
-              current_molId.setExpressionSystemPlasmid(value);
-          } else if (code.equals("EXPRESSION_SYSTEM_GENE:")) {
-              current_molId.setExpressionSystemGene(value);
-          } else if (code.equals("OTHER_DETAILS:")) {
-              current_molId.setExpressionSystemOtherDetails(value);
-          }
+                    //System.out.println("New MOL!!!");
 
-      }
+                    for (Compound molId : compounds) {
+                        if (molId.getMolId().equals(value)) {
+                            current_compound = molId;
+                        }
+                    }
+                    //System.out.println("Setting current_molId to :" + current_molId.getMolId());
+                    molTypeCounter++;
+
+                }
+
+                //current_molId.showSource();
+            }
+            if (code.equals("SYNTHETIC:")) {
+                current_compound.setSynthetic(value);
+            } else if (code.equals("FRAGMENT:")) {
+                current_compound.setFragment(value);
+            } else if (code.equals("ORGANISM_SCIENTIFIC:")) {
+                current_compound.setOrganismScientific(value);
+            } else if (code.equals("ORGANISM_COMMON:")) {
+                current_compound.setOrganismCommon(value);
+            } else if (code.equals("STRAIN:")) {  
+                current_compound.setStrain(value);
+            } else if (code.equals("VARIANT:")) {
+                current_compound.setVariant(value);
+            } else if (code.equals("CELL_LINE:")) {
+                current_compound.setCellLine(value);
+            } else if (code.equals("ATCC:")) {
+                current_compound.setAtcc(value);
+            } else if (code.equals("ORGAN:")) {
+                current_compound.setOrgan(value);
+            } else if (code.equals("TISSUE:")) {
+                current_compound.setTissue(value);
+            } else if (code.equals("CELL:")) {
+                current_compound.setCell(value);
+            } else if (code.equals("ORGANELLE:")) {
+                current_compound.setOrganelle(value);
+            } else if (code.equals("SECRETION:")) {
+                current_compound.setSecretion(value);
+            } else if (code.equals("GENE:")) {
+                current_compound.setGene(value);
+            } else if (code.equals("CELLULAR_LOCATION:")) {
+                current_compound.setCellularLocation(value);
+            } else if (code.equals("EXPRESSION_SYSTEM:")) {
+                current_compound.setExpressionSystem(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_STRAIN:")) {
+                current_compound.setExpressionSystemStrain(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_VARIANT:")) {
+                current_compound.setExpressionSystemVariant(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_CELL_LINE:")) {
+                current_compound.setExpressionSystemCellLine(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_ATCC_NUMBER:")) {
+                current_compound.setExpressionSystemAtccNumber(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_ORGAN:")) {
+                current_compound.setExpressionSystemOrgan(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_TISSUE:")) {
+                current_compound.setExpressionSystemTissue(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_CELL:")) {
+                current_compound.setExpressionSystemCell(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_ORGANELLE:")) {
+                current_compound.setExpressionSystemOrganelle(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_CELLULAR_LOCATION:")) {
+                current_compound.setExpressionSystemCellularLocation(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_VECTOR_TYPE:")) {
+                current_compound.setExpressionSystemVectorType(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_VECTOR:")) {
+                current_compound.setExpressionSystemVector(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_PLASMID:")) {
+                current_compound.setExpressionSystemPlasmid(value);
+            } else if (code.equals("EXPRESSION_SYSTEM_GENE:")) {
+                current_compound.setExpressionSystemGene(value);
+            } else if (code.equals("OTHER_DETAILS:")) {
+                current_compound.setExpressionSystemOtherDetails(value);
+            }
+
+        }
 //      System.out.println("PDBFileParser.pdb_SOURCE_Handler: END");
-  }
-    
+    }
+
 
     /** Handler for
 	 REMARK  2 
@@ -1329,9 +1338,9 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
      */
     private void pdb_REMARK_Handler(String line) {
         // finish off the compound handler!
-       
-        
-        
+
+
+
         String l = line.substring(0,11).trim();
         if (l.equals("REMARK   2"))pdb_REMARK_2_Handler(line);
 
@@ -1481,8 +1490,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
             Character aminoCode1 = null;
             if ( recordName.equals("ATOM") ){
 
-            	aminoCode1 = get1LetterCode(groupCode3);
-                
+                aminoCode1 = get1LetterCode(groupCode3);
+
             }
 
 
@@ -1750,7 +1759,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
     public Structure parsePDBFile(BufferedReader buf) 
     throws IOException 
     {
-        
+
         // (re)set structure 
 
         structure     = new StructureImpl() ;
@@ -1761,13 +1770,13 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
         connects      = new ArrayList<Map<String,Integer>>();
         continuationField = "";
         continuationString = "";
-        current_molId = new Compound();
-        
+        current_compound = new Compound();
+        molTypeCounter = 1;
         compounds.clear();
         helixList.clear();
         strandList.clear();
         turnList.clear();
-        
+
         String line = null;
         try {
 
@@ -1824,8 +1833,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
                 try {
                     if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler  ( line ) ;
-                   
-                   	//else if ( parseHeader && recordName.equals("SEQRES") ) pdb_SEQRES_Handler(line);
+
+                    //else if ( parseHeader && recordName.equals("SEQRES") ) pdb_SEQRES_Handler(line);
                     else if ( recordName.equals("HETATM")) pdb_ATOM_Handler  ( line ) ;
                     else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler ( line ) ;
                     else if ( recordName.equals("HEADER")) pdb_HEADER_Handler( line ) ;
@@ -1884,7 +1893,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
         if ( parseSecStruc) 
             setSecStruc();
-        
+
 
         return structure;
 
@@ -1892,73 +1901,73 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 
     private void setSecStruc(){
-        
+
         setSecElement(helixList,  PDB_AUTHOR_ASSIGNMENT, HELIX  );
         setSecElement(strandList, PDB_AUTHOR_ASSIGNMENT, STRAND );
         setSecElement(turnList,   PDB_AUTHOR_ASSIGNMENT, TURN   );
-        
+
     }
-    
+
     private void setSecElement(List<Map<String,String>> secList, String assignment, String type){
-        
-        
+
+
         Iterator<Map<String,String>> iter = secList.iterator();
         nextElement:
-        while (iter.hasNext()){
-            Map<String,String> m = iter.next();
-            
-            // assign all residues in this range to this secondary structure type
-            // String initResName = (String)m.get("initResName");
-            String initChainId = (String)m.get("initChainId");
-            String initSeqNum  = (String)m.get("initSeqNum" );
-            String initICode   = (String)m.get("initICode" );
-            // String endResName  = (String)m.get("endResName" );
-            String endChainId  = (String)m.get("endChainId" );
-            String endSeqNum   = (String)m.get("endSeqNum");
-            String endICode    = (String)m.get("endICode");
-            
-            if (initICode.equals(" "))
-               initICode = "";
-            if (endICode.equals(" "))
-                  endICode = "";
-            
-           
-           
-            GroupIterator gi = new GroupIterator(structure);
-            boolean inRange = false;
-            while (gi.hasNext()){
-                Group g = (Group)gi.next();
-                Chain c = g.getParent();
-                
-                if (c.getName().equals(initChainId)){
-                    
-                    String pdbCode = initSeqNum + initICode;
-                    if ( g.getPDBCode().equals(pdbCode)  ) {
-                        inRange = true;
+            while (iter.hasNext()){
+                Map<String,String> m = iter.next();
+
+                // assign all residues in this range to this secondary structure type
+                // String initResName = (String)m.get("initResName");
+                String initChainId = (String)m.get("initChainId");
+                String initSeqNum  = (String)m.get("initSeqNum" );
+                String initICode   = (String)m.get("initICode" );
+                // String endResName  = (String)m.get("endResName" );
+                String endChainId  = (String)m.get("endChainId" );
+                String endSeqNum   = (String)m.get("endSeqNum");
+                String endICode    = (String)m.get("endICode");
+
+                if (initICode.equals(" "))
+                    initICode = "";
+                if (endICode.equals(" "))
+                    endICode = "";
+
+
+
+                GroupIterator gi = new GroupIterator(structure);
+                boolean inRange = false;
+                while (gi.hasNext()){
+                    Group g = (Group)gi.next();
+                    Chain c = g.getParent();
+
+                    if (c.getName().equals(initChainId)){
+
+                        String pdbCode = initSeqNum + initICode;
+                        if ( g.getPDBCode().equals(pdbCode)  ) {
+                            inRange = true;
+                        }
                     }
-                }
-                if ( inRange){
-                    if ( g instanceof AminoAcid) {
-                        AminoAcid aa = (AminoAcid)g;
-                       
-                        Map<String,String> assignmentMap = new HashMap<String,String>();
-                        assignmentMap.put(assignment,type);
-                        aa.setSecStruc(assignmentMap);                        
+                    if ( inRange){
+                        if ( g instanceof AminoAcid) {
+                            AminoAcid aa = (AminoAcid)g;
+
+                            Map<String,String> assignmentMap = new HashMap<String,String>();
+                            assignmentMap.put(assignment,type);
+                            aa.setSecStruc(assignmentMap);                        
+                        }
+
                     }
-                   
-                }
-                if ( c.getName().equals(endChainId)){
-                    String pdbCode = endSeqNum + endICode;
-                    if (pdbCode.equals(g.getPDBCode())){
-                        inRange = false;
-                        continue nextElement;
+                    if ( c.getName().equals(endChainId)){
+                        String pdbCode = endSeqNum + endICode;
+                        if (pdbCode.equals(g.getPDBCode())){
+                            inRange = false;
+                            continue nextElement;
+                        }
                     }
+
                 }
-                
+
             }
-            
-        }
-        
+
     }
 
 
