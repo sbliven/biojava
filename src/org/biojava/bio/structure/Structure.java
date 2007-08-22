@@ -379,7 +379,7 @@ public interface Structure {
     public String toPDB();
     
     
-    public void setCompoundList(List<Compound>molList);
-    public List<Compound> getCompoundList();
+    public void setCompounds(List<Compound>molList);
+    public List<Compound> getCompounds();
     public Compound getCompoundById(String molId);
 }

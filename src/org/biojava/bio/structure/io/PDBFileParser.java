@@ -1884,7 +1884,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
             structure.addModel(current_model);
             structure.setHeader(header);
             structure.setConnections(connects);
-            structure.setCompoundList(compounds);
+            structure.setCompounds(compounds);
         } catch (Exception e) {
             System.err.println(line);
             e.printStackTrace();

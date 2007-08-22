@@ -469,11 +469,11 @@ public class StructureImpl implements Structure {
         return false;
     }
     
-    public void setCompoundList(List<Compound>molList){
+    public void setCompounds(List<Compound>molList){
         this.compounds = molList;
     }
 
-    public List<Compound> getCompoundList() {
+    public List<Compound> getCompounds() {
         return compounds;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
