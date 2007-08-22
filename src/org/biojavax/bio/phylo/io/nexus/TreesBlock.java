@@ -230,6 +230,10 @@ public class TreesBlock extends NexusBlock.Abstract {
 	}
 
 	/**
+	 * 
+	 *   this method does not compile
+	 *  
+	 *
 	 * Add a tree, converting unweighted graph (JGraphT) to NewickString
 	 *
 	 * @param label
@@ -237,7 +241,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 	 *
 	 * @param treegraph
 	 * 		  the treegraph to convert.
-     	 */
+     	
 	public void addTree(final String label, UndirectedGraph<String, DefaultEdge> treegraph) {
 	
 		final NewickTreeString tree = new NewickTreeString();
@@ -293,8 +297,11 @@ public class TreesBlock extends NexusBlock.Abstract {
 		tree.setTreeString(temp);                           
 		this.trees.put(label, tree);
 	}
+	*/
 
 	/**
+	 *  this method does not compile
+	 * 
 	 * Add a tree, converting weighted graph (JGraphT) to NewickString
 	 *
 	 * @param label
@@ -302,7 +309,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 	 *
 	 * @param treegraph
 	 * 		  the treegraph to convert.
-             */
+             
 	public void addTree(final String label, WeightedGraph<String, DefaultWeightedEdge> treegraph) {
 	
 		final NewickTreeString tree = new NewickTreeString();
@@ -392,6 +399,8 @@ public class TreesBlock extends NexusBlock.Abstract {
 		tree.setTreeString(temp);                           
 		this.trees.put(label, tree);
 	}	
+	
+	*/
 	
 	/**
 	 * Get given (NewieckString) tree by label, converts it to unweighted graph (JGraphT).
