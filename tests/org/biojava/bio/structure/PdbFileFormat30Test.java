@@ -25,6 +25,7 @@ package org.biojava.bio.structure;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.biojava.bio.structure.io.PDBFileParser;
 
@@ -59,7 +60,10 @@ public class PdbFileFormat30Test extends TestCase {
 		int shouldNr2 = 24;
 		assertEquals("structure does not contain the right number of nucleotides ", shouldNr2 , nrNuc2);	
 		
-		
+		List<Compound> compounds= s.getCompounds();
+		assertTrue(compounds.size() == 1);
+		Compound mol = compounds.get(0);		
+		assertTrue(mol.getMolName().startsWith("DNA"));
 		
 	}
 	
@@ -76,7 +80,11 @@ public class PdbFileFormat30Test extends TestCase {
 		int shouldNr2 = 24;
 		assertEquals("structure does not contain the right number of nucleotides ", shouldNr2 , nrNuc2);	
 		
+		List<Compound> compounds= s.getCompounds();
+		assertTrue(compounds.size() == 1);
+		Compound mol = compounds.get(0);
 		
+		assertTrue(mol.getMolName().startsWith("DNA"));
 	}
 	
 	private Structure getStructure(String fileName){

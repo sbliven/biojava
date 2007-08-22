@@ -2,6 +2,7 @@ package org.biojava.bio.structure;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -56,6 +57,12 @@ public class StructureTest extends TestCase {
 
         assertTrue(c.getGroups("hetatm").size()     == 65);
         assertTrue(c.getGroups("nucelotide").size() == 0 );
+        
+        
+        List<Compound> compounds= structure.getCompounds();
+        assertTrue(compounds.size() == 1);
+        Compound mol = compounds.get(0);       
+        assertTrue(mol.getMolName().startsWith("TRYPSIN INHIBITOR"));
     }
 
 
