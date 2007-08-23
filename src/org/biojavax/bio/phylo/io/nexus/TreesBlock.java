@@ -231,7 +231,6 @@ public class TreesBlock extends NexusBlock.Abstract {
 
 	/**
 	 * 
-	 *   this method does not compile
 	 *  
 	 *
 	 * Add a tree, converting unweighted graph (JGraphT) to NewickString
@@ -241,8 +240,8 @@ public class TreesBlock extends NexusBlock.Abstract {
 	 *
 	 * @param treegraph
 	 * 		  the treegraph to convert.
-     	
-	public void addTree(final String label, UndirectedGraph<String, DefaultEdge> treegraph) {
+     	 */
+	public void addTree(final String label, UndirectedGraph<String, DefaultEdge> treegraph){
 	
 		final NewickTreeString tree = new NewickTreeString();
 		String temp = treegraph.toString();
@@ -262,33 +261,31 @@ public class TreesBlock extends NexusBlock.Abstract {
 		temp = "";
 
 	
-		//consider the tree as a string that contains all nodes (as in the JGraphT tree string, without ",", "(", and ")")
+		// consider the tree as a string 
+		//that contains all nodes 
+		//as in the JGraphT tree string, without ",", "(", and ")"
 		for(int i = 0 ; i < tokens.length; i = i + 4){
 			
-			//it it is a terminal node, for instance (1, p1) and (p1, 2), that is connected by an internal node			
+			// it it is a terminal node, for instance (1, p1) and (p1, 2), 
+			//that is connected by an internal node 			
 			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
 				
-				//remove internal node and generate a NewickString type sub-tree, (1,2) in the above example
+				// remove internal node and generate a NewickString type sub-tree, 
+				// (1,2) in the above example 
 				temp = "(" + tokens[i] +", " + tokens[i+3] + ")";
 				
 				// for the rest of the string
 				for(int j = i+4; j < tokens.length; j++){
 
-					// see if there is a node that internal node, p1 in this case, is used for a terminal node, something like (p1, p2) and (p2, 3)
+					// see if there is a node that internal node, 
+					// p1 in this case, is used for a terminal node, 
+					//something like (p1, p2) and (p2, 3) 
 					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])){
 						
-						// if so, remove p1 and replace a subtree that had been just generated, ((1,2), p2) and (p2, 3) will be generated in this case
+						// if so, remove p1 and replace a subtree 
+						//that had been just generated, ((1,2), p2) and (p2, 3) 
+						//will be generated in this case
 						tokens[j] = temp; 
-		
-		for(int i = 0 ; i < tokens.length; i = i + 4){
-			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false && tokens[i].equals(tokens[i+3]) == false){
-				temp = "(" + tokens[i] +", " + tokens[i+3] + ")" ;	
-				for(int j = 0; j < tokens.length; j++){
-					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])  && j != i+1 && j!= i+2){
-						if(j > i+3) 
-							tokens[j] = temp;
-						else if(j < i) 
-							temp = "(" + tokens[j-3] + ", " + temp + ")";		
 					}
 				}
 			}
@@ -297,10 +294,9 @@ public class TreesBlock extends NexusBlock.Abstract {
 		tree.setTreeString(temp);                           
 		this.trees.put(label, tree);
 	}
-	*/
+	
 
 	/**
-	 *  this method does not compile
 	 * 
 	 * Add a tree, converting weighted graph (JGraphT) to NewickString
 	 *
@@ -309,7 +305,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 	 *
 	 * @param treegraph
 	 * 		  the treegraph to convert.
-             
+       */      
 	public void addTree(final String label, WeightedGraph<String, DefaultWeightedEdge> treegraph) {
 	
 		final NewickTreeString tree = new NewickTreeString();
@@ -329,35 +325,14 @@ public class TreesBlock extends NexusBlock.Abstract {
 		tokens = temp.split(",");               
 		temp = "";
 
+		// consider the tree as a string 
+		//that contains all nodes 
+		//as in the JGraphT tree string, without ",", "(", and ")"
 		for(int i = 0 ; i < tokens.length; i = i + 4){	
 			
 			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false && tokens[i].equals(tokens[i+3]) == false){
 	
-
-		for(int i = 0 ; i < tokens.length; i = i + 4){
-		
-			// if left-hand side node dose not start with "(", which means it's an internal node p[0-9] or a terminal node,
-			if(tokens[i].startsWith("(") == false)
-				// then, get an edge weight for this node and add it to the node string
-				tokens[i] = tokens[i] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i], tokens[i+1]));
-			
-			// if right-hand side node dose not start with "(", which means it's an internal node p[0-9] or a terminal node,
-			if(tokens[i+3].startsWith("(") == false)
-				//then, get an edge wieght for this node and add it to the node string 
-				tokens[i+3] = tokens[i+3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i+2], tokens[i+3]));
-			
-			//if both nodes are terminal nodes, (1, p1):10.0 and (p1, 2):20.0
-			if( tokens[i].matches("p[0-9]") == false && tokens[i+3].matches("p[0-9]")== false){
-				
-				//build a sub-tree containing both of them. (wieghts are already included in the token)- something like (1:10.0, 2:20.0)
-				temp = "(" + tokens[i] +", " + tokens[i+3] + ")";
-		
-				//for the rest of the string
-				for(int j = i+4; j < tokens.length; j++){
-					
-					// see if there is a node that internal node, p1 in this case, is used for a terminal node, something like (p1, p2) and (p2, 3)
-					if(tokens[j].equals(tokens[i+1]) && tokens[j].equals(tokens[i+2])){
-
+				// add an edge weight to the node 
 				if(tokens[i].startsWith("(") == false && tokens[i+3].startsWith("(") == false)
 					temp = "(" + tokens[i]+ ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i], tokens[i+1])) +", " + tokens[i+3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i+2], tokens[i+3])) + ")" ;
 				else if (tokens[i].startsWith("(") && tokens[i+3].startsWith("(") == false)
@@ -366,31 +341,25 @@ public class TreesBlock extends NexusBlock.Abstract {
 					temp = "(" + tokens[i]+ ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[i], tokens[i+1])) +", " + tokens[i+3] +  ")" ;
 				else if (tokens[i].startsWith("(")  && tokens[i+3].startsWith("("))
 					temp = "(" + tokens[i]+ ", " + tokens[i+3] +  ")" ;
-												
-				for(int j = 0; j < tokens.length; j++){
-					if(tokens[j].matches(tokens[i+1]) && tokens[j].matches(tokens[i+2]) && j != i+1 && j != i+2){
-
 						
-						//find a weight for that edge
+				// for the entire tree						
+				for(int j = 0; j < tokens.length; j++){
+		
+					//see if there is any terminal nodes that is repeated as the internal nodes
+					if(tokens[j].matches(tokens[i+1]) && tokens[j].matches(tokens[i+2]) && j != i+1 && j != i+2){
+						
+						//if so, find their weight
 						double weight = 0.0;
-
-						// when it is a left-hand side node
 						if(j%4 == 0)
 							weight = treegraph.getEdgeWeight(treegraph.getEdge(tokens[j], tokens[j+1]));
-						//when it is a right-hand side node
 						else if(j%4 == 3)
 							weight = treegraph.getEdgeWeight(treegraph.getEdge(tokens[j], tokens[j-1]));
-
 						
-						//then, remove p1 from the string and replace (1:10.0, 2:20.0) and add its original weight- something like (1:10.0, 2:20.0):30.0
-						tokens[j] = temp + ":" + weight; 
-
-						
+						// and, add it to the tokens
 						if(j > i+3) 
 							tokens[j] = temp + ":" + weight; 
 						else if(j < i) 
 							temp = "(" + tokens[j-3] + ":"+ treegraph.getEdgeWeight(treegraph.getEdge(tokens[j-3], tokens[j-2])) + ", " + temp + ":" + weight + ")";	
-
 					}
 				}
 			}
@@ -400,7 +369,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 		this.trees.put(label, tree);
 	}	
 	
-	*/
+	
 	
 	/**
 	 * Get given (NewieckString) tree by label, converts it to unweighted graph (JGraphT).
@@ -410,7 +379,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 	 *
 	 * @return converted tree as undirectedGraph
 	 */
-	public UndirectedGraph<String, DefaultEdge> getTreeAsJGraphT(final String label) {
+	public UndirectedGraph<String, DefaultEdge> getTreeAsJGraphT(final String label){
 	
 		String temp, v1, v2, v3;
 		String [] tokens;
@@ -522,7 +491,7 @@ public class TreesBlock extends NexusBlock.Abstract {
 	 *
 	 * @return converted tree as undirectedGraph
 	 */
-	public WeightedGraph<String, DefaultWeightedEdge> getTreeAsWeightedJGraphT(final String label) {
+	public WeightedGraph<String, DefaultWeightedEdge> getTreeAsWeightedJGraphT(final String label){
 	
 		int len = 0, p_index=0; 
 		String temp, v1, v2, v3, w1, w3;
