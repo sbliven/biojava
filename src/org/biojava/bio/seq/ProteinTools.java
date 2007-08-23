@@ -194,7 +194,7 @@ public class ProteinTools {
             propertyTableMap.put(SymbolPropertyTable.AVG_MASS, (SymbolPropertyTable) avgMassPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.PK_Nterm, (SymbolPropertyTable) pK_NtermPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.PK, (SymbolPropertyTable) pKPropertyTable);
-            propertyTableMap.put(SymbolPropertyTable.PK_Cterm, (SymbolPropertyTable) HydropathicityTable);
+            propertyTableMap.put(SymbolPropertyTable.PK_Cterm, (SymbolPropertyTable) pK_CtermPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.HYDROPATHICITY, (SymbolPropertyTable) HydropathicityTable);
         } catch (Exception e) {
             throw new BioError(" Could not initialize ProteinTools", e);
