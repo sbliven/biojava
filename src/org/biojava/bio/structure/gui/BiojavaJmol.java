@@ -60,8 +60,8 @@ public class BiojavaJmol {
 		try {
 
 			PDBFileReader pdbr = new PDBFileReader();   
-			pdbr.setAutoFetch(true);
-			pdbr.setPath("/Users/andreas/WORK/PDB/");
+			//pdbr.setAutoFetch(true);
+			pdbr.setPath("/Path/To/PDB/DIR/");
 
 			String pdbCode = "5pti";
 
