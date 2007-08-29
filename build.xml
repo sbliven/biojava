@@ -24,6 +24,7 @@
     javadocs-demos    builds demos API documentation
     javadocs-all      builds API documentation for all the above
     clean             cleans up the build & dist directories
+    cruise            build target to be used together with CruiseControl
 
   The 'runtests' target can be restricted to portions of the tree, e.g.:
 
@@ -35,7 +36,7 @@
            Greg Cox (fixed documentation)
            Thomas Down (clean up, remove source-copying steps)
            Mark Schreiber
-	   Andreas Prlic 
+	   Andreas Prlic  (jarsigner, cruise, cleanup)
   version: $Id$
 
   portions Copyright (c) 1999-2000 The Apache Software Foundation.
@@ -47,12 +48,9 @@
   <!-- Checks environment and setup variables -->
   <target name="init" description="Checks environment and setup variables">
     <tstamp />
-    <property name="version" value="live" />
-
+    <property name="version"        value="live" />
     <property name="build.compiler" value="javac1.5" />
-
-    <property name="classpath" value="bytecode.jar:commons-cli.jar:commons-collections-2.1.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar:jgrapht-jdk1.5.jar" />
-
+    <property name="classpath"      value="bytecode.jar:commons-cli.jar:commons-collections-2.1.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar:jgrapht-jdk1.5.jar" />
     <property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
 
 
@@ -90,70 +88,70 @@
     <echo message="HSQLDB driver present:           ${sqlDriver.hsqldb}" />
     <echo message="XSLT support:                    ${outputproperty.support}"/>
 
-    <property name="readme" value="./README" />
-    <property name="license" value="./LICENSE" />
-    <property name="src.dir" value="./src" />
-    <property name="tests.dir" value="./tests" />
-    <property name="demos.dir" value="./demos" />
-    <property name="apps.dir" value="./apps" />
-    <property name="docs.dir" value="./docs" />
-    <property name="doc.css.file" value="biojava-doc.css" />
-    <property name="reports.dir" value="./reports" />
-    <property name="manifest.dir" value="./manifest" />
+    <property name="readme"        value="./README" />
+    <property name="license"       value="./LICENSE" />
+    <property name="src.dir"       value="./src" />
+    <property name="tests.dir"     value="./tests" />
+    <property name="demos.dir"     value="./demos" />
+    <property name="apps.dir"      value="./apps" />
+    <property name="docs.dir"      value="./docs" />
+    <property name="doc.css.file"  value="biojava-doc.css" />
+    <property name="reports.dir"   value="./reports" />
+    <property name="manifest.dir"  value="./manifest" />
     <property name="resources.dir" value="./resources" />
-    <property name="taglets.dir" value="./taglets" />
+    <property name="taglets.dir"   value="./taglets" />
 
     <!-- Main build directory -->
-    <property name="build.dir" value="./ant-build" />
+    <property name="build.dir"         value="./ant-build" />
     <property name="build.classes.dir" value="${build.dir}/classes" />
 
     <!-- Javac properties -->
-    <property name="javac.depend" value="false" />
-    <property name="javac.debug" value="true" />
+    <property name="javac.depend"      value="false" />
+    <property name="javac.debug"       value="true" />
     <property name="javac.deprecation" value="false" />
-    <property name="javac.source" value="1.5" />
-    <property name="javac.target" value="1.5" />
+    <property name="javac.source"      value="1.5" />
+    <property name="javac.target"      value="1.5" />
 
     <!-- Javadoc properties -->
-    <property name="build.dest.docs" value="${build.dir}/docs" />
+    <property name="build.dest.docs"     value="${build.dir}/docs" />
     <property name="build.dest.doccheck" value="${build.dir}/docs/check" />
-    <property name="packages" value="org.*" />
+    <property name="packages"            value="org.*" />
 
     <!-- Subdirectories for main source and classes -->
-    <property name="name.biojava" value="biojava" />
-    <property name="Name.biojava" value="BioJava" />
-    <property name="build.dest.biojava" value="${build.classes.dir}/${name.biojava}" />
-    <property name="build.docs.biojava" value="${build.dest.docs}/${name.biojava}" />
+    <property name="name.biojava"           value="biojava" />
+    <property name="Name.biojava"           value="BioJava" />
+    <property name="build.dest.biojava"     value="${build.classes.dir}/${name.biojava}" />
+    <property name="build.docs.biojava"     value="${build.dest.docs}/${name.biojava}" />
     <property name="build.doccheck.biojava" value="${build.dest.doccheck}/${name.biojava}" />
-    <property name="jar.biojava" value="${build.dir}/${name.biojava}.jar" />
-    <property name="manifest.file.biojava" value="${manifest.dir}/${name.biojava}.txt" />
+    <property name="jar.biojava"            value="${build.dir}/${name.biojava}.jar" />
+    <property name="manifest.file.biojava"  value="${manifest.dir}/${name.biojava}.txt" />
     <!-- Subdirectories for tests source and classes -->
-    <property name="name.tests" value="tests" />
+    <property name="name.tests"       value="tests" />
     <property name="build.dest.tests" value="${build.classes.dir}/${name.tests}" />
     <property name="build.docs.tests" value="${build.dest.docs}/${name.tests}" />
-    <property name="reports.tests" value="./reports/tests" />
+    <property name="reports.tests"    value="./reports/tests" />
     <!-- Subdirectories for demos source and classes -->
-    <property name="name.demos" value="demos" />
-    <property name="Name.demos" value="BioJava Demos" />
-    <property name="build.dest.demos" value="${build.classes.dir}/${name.demos}" />
-    <property name="build.docs.demos" value="${build.dest.docs}/${name.demos}" />
-    <property name="jar.demos" value="${build.dir}/${name.demos}.jar" />
+    <property name="name.demos"          value="demos" />
+    <property name="Name.demos"          value="BioJava Demos" />
+    <property name="build.dest.demos"    value="${build.classes.dir}/${name.demos}" />
+    <property name="build.docs.demos"    value="${build.dest.docs}/${name.demos}" />
+    <property name="jar.demos"           value="${build.dir}/${name.demos}.jar" />
     <property name="manifest.file.demos" value="${manifest.dir}/${name.demos}.txt" />
     <!-- Subdirectories for apps source and classes -->
-    <property name="name.apps" value="apps" />
-    <property name="Name.apps" value="BioJava Applications" />
-    <property name="build.dest.apps" value="${build.classes.dir}/${name.apps}" />
-    <property name="build.docs.apps" value="${build.dest.docs}/${name.apps}" />
-    <property name="jar.apps" value="${build.dir}/${name.apps}.jar" />
+    <property name="name.apps"          value="apps" />
+    <property name="Name.apps"          value="BioJava Applications" />
+    <property name="build.dest.apps"    value="${build.classes.dir}/${name.apps}" />
+    <property name="build.docs.apps"    value="${build.dest.docs}/${name.apps}" />
+    <property name="jar.apps"           value="${build.dir}/${name.apps}.jar" />
     <property name="manifest.file.apps" value="${manifest.dir}/${name.apps}.txt" />
     <!-- Subdirectory for taglets -->
-    <property name="name.taglets" value="taglets" />
-    <property name="Name.taglets" value="BioJava Taglets" />
+    <property name="name.taglets"       value="taglets" />
+    <property name="Name.taglets"       value="BioJava Taglets" />
     <property name="build.dest.taglets" value="${build.classes.dir}/${name.taglets}" />
     <property name="build.docs.taglets" value="${build.dest.docs}/${name.taglets}" />
 
-    <property name="dist.root" value="./dist" />
-    <property name="dist.dir" value="${dist.root}/${name.biojava}-${version}" />
+    <property name="dist.root"          value="./dist" />
+    <property name="dist.dir"           value="${dist.root}/${name.biojava}-${version}" />
   </target>
 
 
@@ -552,9 +550,11 @@
     description="Creates the javadocs for all components"
   />
 
+
   <!-- Runs tests if the Ant optional JUnit support is available -->
-  <target name="runtests" depends="compile-tests"
-  description="Run all tests, can be quite slow">
+  <target name="runtests" 
+  	  depends="compile-tests"
+  	  description="Run all tests, can be quite slow">
     <property name="test.subtree" value="**" />
     <echo message="Running tests:           ${test.subtree}" />
     <junit maxmemory="128m" printsummary="yes" haltonfailure="no" reloading="no">
@@ -600,11 +600,56 @@
       maxmemory="96m">
     </javadoc>
   </target>
+
+  <!-- Runs the CruiseControl checks only needed for admins who want to trace the compile state of biojava -->
+  <!-- does the same as runtests, but with XML output, so CruiseControl can parse the outcome -->
+  <target name="cruise" 
+          depends="clean,package-biojava,compile-tests"
+          description="Run clean, build and tests for CruiseControl">
+    <property name="test.subtree" value="**" />
+    <echo message="Running tests:           ${test.subtree}" />
+    <junit 	maxmemory="128m" 
+    		printsummary="yes" 
+		haltonfailure="no" 
+		reloading="no"
+		errorProperty="test.failed"
+		>
+      <formatter type="xml" />
+      <classpath>
+        <!-- main classes from build -->
+        <pathelement path="${build.dest.biojava}" />
+        <!-- resources -->
+        <pathelement path="${resources.dir}" />
+        <!-- test classes from build -->
+        <pathelement path="${build.dest.tests}" />
+        <!-- test data from build -->
+        <pathelement path="${tests.dir}/files" />
+        <!-- currently the move isn't complete -->
+        <pathelement path="${tests.dir}" />
+        <!-- classes specified in this file -->
+        <pathelement path="${classpath}" />
+        <!-- classes specified in system classpath -->
+        <pathelement path="${java.class.path}" />
+      </classpath>
+      <!-- The junit task doesn't support 'if' so we test for JUnit here -->
+      <batchtest fork="no" todir="${reports.tests}" if="junit.present">
+        <fileset dir="${build.dest.tests}">
+          <include name="${test.subtree}/*Test.class" />
+          <include name="${test.subtree}/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
+        </fileset>
+      </batchtest>      
+    </junit>
+    <fail message="Tests failed: check test reports." if="test.failed" />
+  </target>
+
   
   <!-- Cleans everything -->
-  <target name="clean" depends="init"
-  description="Cleans everything">
+  <target name="clean" 
+  	  depends="init"
+  	  description="Cleans everything">
     <delete dir="${build.dir}" />
+    <delete dir="${reports.tests}" />
   </target>
   
   <!-- Cleans the dist directory -->
@@ -618,7 +663,7 @@
       <mkdir dir="${dist.root}"/>
       <mkdir dir="${dist.dir}"/>
       
-      <!-- copy the biojava-jar -->
+     <!-- copy the biojava-jar -->
       <copy file="${jar.biojava}" tofile="${dist.dir}/${name.biojava}-${version}.jar"/>
       
       <!-- copy the apps-jar -->
