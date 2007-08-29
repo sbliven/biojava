@@ -106,6 +106,7 @@ public class Compound implements Cloneable {
     		Chain c = iter.next();
     		buf.append (c.getName() + " ");
     	}
+
     	*/
         try {
             Class c = Class.forName("org.biojava.bio.structure.Compound");
@@ -126,6 +127,15 @@ public class Compound implements Cloneable {
                         if ( o != null)
                             buf.append(name.substring(3, name.length())+": "+ o + " ");
                     }
+                    if ( o instanceof List){
+                        if ( o != null)
+                            buf.append(name.substring(3,name.length())+": ");
+                            List<Object> lst = (List<Object>)o;
+                            for (Object obj : lst){
+                                buf.append(obj + " ");
+                            }
+                        
+                    }
                 }
                 
             }
@@ -137,6 +147,7 @@ public class Compound implements Cloneable {
         
     	//if ( organismScientific != null)
     	//	buf.append(" organism scientific: " + organismScientific);
+
     	
     	return buf.toString();
     }
@@ -293,7 +304,7 @@ public class Compound implements Cloneable {
         return chainId;
     }
 
-    public void setchainId(List<String> chainId) {
+    public void setChainId(List<String> chainId) {
         this.chainId = chainId;
     }
 
@@ -647,11 +658,19 @@ public class Compound implements Cloneable {
        return newMolId;
     }
 
-    public List<Chain> getChainList(){
+    /** get the chains that are part of this Compound
+     * 
+     * @return a List of Chain objects
+     */
+    public List<Chain> getChains(){
        return this.chainList;   
     }
 
     public void addChain(Chain chain){
         this.chainList.add(chain);
+    }
+    
+    public void setChains(List<Chain> chains){
+        this.chainList = chains;
     }
 }

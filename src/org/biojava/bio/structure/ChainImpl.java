@@ -41,377 +41,353 @@ import org.biojava.bio.Annotation;
  */
 public class ChainImpl implements Chain {
 
-	public static String DEFAULT_CHAIN_ID = " ";
+    public static String DEFAULT_CHAIN_ID = " ";
 
-	String swissprot_id ; 
-	String name ; // like in PDBfile
-	List <Group> groups;
-	Annotation annotation ;
+    String swissprot_id ; 
+    String name ; // like in PDBfile
+    List <Group> groups;
+    Annotation annotation ;
 
-	List<Group> seqResGroups;
+    List<Group> seqResGroups;
 
-	String seqRes;
-	String molId;
-	Compound mol;
-	String organismScientific;
-	String molName;
+    Compound mol;
 
-	Map<String, Integer> pdbResnumMap;
-	/**
-	 *  Constructs a ChainImpl object.
-	 */
-	public ChainImpl() {
-		super();
+    Map<String, Integer> pdbResnumMap;
 
-		name = DEFAULT_CHAIN_ID;
-		groups = new ArrayList<Group>() ;
-		annotation = Annotation.EMPTY_ANNOTATION;
-		seqResGroups = new ArrayList<Group>();
-		pdbResnumMap = new HashMap<String,Integer>();
+    /**
+     *  Constructs a ChainImpl object.
+     */
+    public ChainImpl() {
+        super();
 
-	}
+        name = DEFAULT_CHAIN_ID;
+        groups = new ArrayList<Group>() ;
+        annotation = Annotation.EMPTY_ANNOTATION;
+        seqResGroups = new ArrayList<Group>();
+        pdbResnumMap = new HashMap<String,Integer>();
+
+    }
 
 
-	/** returns an identical copy of this Chain .
-	 * @return an identical copy of this Chain 
-	 */
-	public Object clone() {
-		// go through all groups and add to new Chain.
-		Chain n = new ChainImpl();
-		// copy chain data:
+    /** returns an identical copy of this Chain .
+     * @return an identical copy of this Chain 
+     */
+    public Object clone() {
+        // go through all groups and add to new Chain.
+        Chain n = new ChainImpl();
+        // copy chain data:
 
-		n.setName( getName());
-		n.setSwissprotId ( getSwissprotId());
-		for (int i=0;i<groups.size();i++){
-			Group g = (Group)groups.get(i);
-			n.addGroup((Group)g.clone());
-		}
-		n.setSeqRes(this.getSeqRes());
-		n.setMolId(this.getMolId());
-		n.setHeader(this.getHeader());
-		n.setOrganismScientific(this.getOrganismScientific());
-		return n ;
-	}
+        n.setName( getName());
+        n.setSwissprotId ( getSwissprotId());
+        for (int i=0;i<groups.size();i++){
+            Group g = (Group)groups.get(i);
+            n.addGroup((Group)g.clone());
+        }		
+        n.setHeader(this.getHeader());
+
+        return n ;
+    }
 
 
-	public void setAnnotation(Annotation anno){
-		annotation = anno;
-	}
+    public void setAnnotation(Annotation anno){
+        annotation = anno;
+    }
 
-	public Annotation getAnnotation(){
-		return annotation;
-	}
+    public Annotation getAnnotation(){
+        return annotation;
+    }
 
-	public void setHeader(Compound mol) {
-		this.mol = mol;
-	}
+    public void setHeader(Compound mol) {
+        this.mol = mol;
+    }
 
-	public Compound getHeader() {
-		return this.mol;
-	}
+    public Compound getHeader() {
+        return this.mol;
+    }
 
-	/** set the Swissprot id of this chains .
-	 * @param sp_id  a String specifying the swissprot id value
-	 * @see #getSwissprotId
-	 */
+    /** set the Swissprot id of this chains .
+     * @param sp_id  a String specifying the swissprot id value
+     * @see #getSwissprotId
+     */
 
-	public void setSwissprotId(String sp_id){
-		swissprot_id = sp_id ;
-	}
+    public void setSwissprotId(String sp_id){
+        swissprot_id = sp_id ;
+    }
 
-	/** get the Swissprot id of this chains .
-	 * @return a String representing the swissprot id value
-	 * @see #setSwissprotId
-	 */
-	public String getSwissprotId() {
-		return swissprot_id ;
-	}
+    /** get the Swissprot id of this chains .
+     * @return a String representing the swissprot id value
+     * @see #setSwissprotId
+     */
+    public String getSwissprotId() {
+        return swissprot_id ;
+    }
 
 
-	public void addGroup(Group group) {
+    public void addGroup(Group group) {
 
-		group.setParent(this);
+        group.setParent(this);
 
-		groups.add(group);
+        groups.add(group);
 
-		// store the position internally for quick access of this group
-		String pdbResnum = group.getPDBCode();
-		if ( pdbResnum != null) {
-			Integer pos = new Integer(groups.size()-1);
-			// ARGH sometimes numbering in PDB files is confusing.
-			// e.g. PDB: 1sfe 
-			/*
-			 * ATOM    620  N   GLY    93     -24.320  -6.591   4.210  1.00 46.82           N  
-			 * ATOM    621  CA  GLY    93     -24.960  -6.849   5.497  1.00 47.35           C  
-			 * ATOM    622  C   GLY    93     -26.076  -5.873   5.804  1.00 47.24           C  
-			 * ATOM    623  O   GLY    93     -26.382  -4.986   5.006  1.00 47.56           O  
+        // store the position internally for quick access of this group
+        String pdbResnum = group.getPDBCode();
+        if ( pdbResnum != null) {
+            Integer pos = new Integer(groups.size()-1);
+            // ARGH sometimes numbering in PDB files is confusing.
+            // e.g. PDB: 1sfe 
+            /*
+             * ATOM    620  N   GLY    93     -24.320  -6.591   4.210  1.00 46.82           N  
+             * ATOM    621  CA  GLY    93     -24.960  -6.849   5.497  1.00 47.35           C  
+             * ATOM    622  C   GLY    93     -26.076  -5.873   5.804  1.00 47.24           C  
+             * ATOM    623  O   GLY    93     -26.382  -4.986   5.006  1.00 47.56           O  
              and ...
-			 * HETATM 1348  O   HOH    92     -21.853 -16.886  19.138  1.00 66.92           O  
-			 * HETATM 1349  O   HOH    93     -26.126   1.226  29.069  1.00 71.69           O  
-			 * HETATM 1350  O   HOH    94     -22.250 -18.060  -6.401  1.00 61.97           O 
-			 */
+             * HETATM 1348  O   HOH    92     -21.853 -16.886  19.138  1.00 66.92           O  
+             * HETATM 1349  O   HOH    93     -26.126   1.226  29.069  1.00 71.69           O  
+             * HETATM 1350  O   HOH    94     -22.250 -18.060  -6.401  1.00 61.97           O 
+             */
 
-			// this check is to give in this case the entry priority that is an AminoAcid / comes first...
-			if (  pdbResnumMap.containsKey(pdbResnum)) {
-				if ( group instanceof AminoAcid)
-					pdbResnumMap.put(pdbResnum,pos);
-			} else                
-				pdbResnumMap.put(pdbResnum,pos);
-		}
+            // this check is to give in this case the entry priority that is an AminoAcid / comes first...
+            if (  pdbResnumMap.containsKey(pdbResnum)) {
+                if ( group instanceof AminoAcid)
+                    pdbResnumMap.put(pdbResnum,pos);
+            } else                
+                pdbResnumMap.put(pdbResnum,pos);
+        }
 
-	}
+    }
 
-	/** return the amino acid at position .
-	 * 
-	 *
-	 * @param position  an int
-	 * @return a Group object
-	 */
-	public Group getGroup(int position) {
+    /** return the group at position .
+     * 
+     *
+     * @param position  an int
+     * @return a Group object
+     * @deprecated use getAtomGroup or getSeqResGroup instead
+     */
+    public Group getGroup(int position) {
 
-		return (Group)groups.get(position);
-	}
+        return (Group)groups.get(position);
+    }
+    
+   
+    
+    /** return the group at position .
+     * 
+     *
+     * @param position  an int
+     * @return a Group object    
+     */
+    public Group getAtomGroup(int position) {
 
-	/** return an array of all groups of a special type (e.g. amino,
-	 * hetatm, nucleotide).
-	 * @param type  a String
-	 * @return an List object containing the groups of type...
+        return (Group)groups.get(position);
+    }
 
-	 */
-	public List<Group> getGroups( String type) {
-		List<Group> tmp = new ArrayList<Group>() ;
-		for (int i=0;i<groups.size();i++){
-			Group g = (Group)groups.get(i);
-			if (g.getType().equals(type)){
-				tmp.add(g);
-			}
-		}
-		//Group[] g = (Group[])tmp.toArray(new Group[tmp.size()]);
-		return tmp ;
-	}
+    /** return an array of all groups of a special type (e.g. amino,
+     * hetatm, nucleotide).
+     * @param type  a String
+     * @return an List object containing the groups of type...
+     * @deprecated use getAtomGroups instead
+     */
+    public List<Group> getGroups( String type) {
+     return getAtomGroups(type);
+    }
+    
+    public List<Group> getAtomGroups(String type){
+        List<Group> tmp = new ArrayList<Group>() ;
+        for (int i=0;i<groups.size();i++){
+            Group g = (Group)groups.get(i);
+            if (g.getType().equals(type)){
+                tmp.add(g);
+            }
+        }
+        //Group[] g = (Group[])tmp.toArray(new Group[tmp.size()]);
+        return tmp ;
+    }
 
-	/** return all groups of this chain .
-	 * @return an ArrayList object representing the Groups of this Chain.
-	 */
-	public List<Group> getGroups(){
-		return groups ;
-	}
+    /** return all groups of this chain .
+     * @return an ArrayList object representing the Groups of this Chain.
+     * @deprecated use getAtomGroups instead
+     */
+    public List<Group> getGroups(){
+        return groups ;
+    }
 
 
-
-
-
-	public Group getGroupByPDB(String pdbresnum) throws StructureException {
-		if ( pdbResnumMap.containsKey(pdbresnum)) {
-			Integer pos = (Integer) pdbResnumMap.get(pdbresnum);
-			return (Group) groups.get(pos.intValue());
-		} else {
-			throw new StructureException("unknown PDB residue number " + pdbresnum + " in chain " + name);
-		}
-
-	}
-
-	public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) 
-	throws StructureException {
-
-		List<Group> retlst = new ArrayList<Group>();
-
-		Iterator iter = groups.iterator();
-		boolean adding = false;
-		boolean foundStart = false;
-
-		while ( iter.hasNext()){
-			Group g = (Group) iter.next();
-			if ( g.getPDBCode().equals(pdbresnumStart)) {
-				adding = true;
-				foundStart = true;
-			}
-
-			if ( adding)
-				retlst.add(g);
-
-			if ( g.getPDBCode().equals(pdbresnumEnd)) {
-				if ( ! adding)
-					throw new StructureException("did not find start PDB residue number " + pdbresnumStart + " in chain " + name);
-				adding = false;
-				break;
-			}
-		}
-
-		if ( ! foundStart){
-			throw new StructureException("did not find start PDB residue number " + pdbresnumStart + " in chain " + name);
-		}
-		if ( adding) {
-			throw new StructureException("did not find end PDB residue number " + pdbresnumEnd + " in chain " + name);
-		}
-
-		return (Group[]) retlst.toArray(new Group[retlst.size()] );
-	}
+    /** return all groups that have been specified in the ATOM section of this chain .
+     * @return an ArrayList object representing the Groups of this Chain.
+     */
+    public List<Group> getAtomGroups(){
+        return groups ;
+    }
 
 
 
-	public int getLength() {return groups.size();  }
+
+    public Group getGroupByPDB(String pdbresnum) throws StructureException {
+        if ( pdbResnumMap.containsKey(pdbresnum)) {
+            Integer pos = (Integer) pdbResnumMap.get(pdbresnum);
+            return (Group) groups.get(pos.intValue());
+        } else {
+            throw new StructureException("unknown PDB residue number " + pdbresnum + " in chain " + name);
+        }
+
+    }
+
+    public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) 
+    throws StructureException {
+
+        List<Group> retlst = new ArrayList<Group>();
+
+        Iterator<Group> iter = groups.iterator();
+        boolean adding = false;
+        boolean foundStart = false;
+
+        while ( iter.hasNext()){
+            Group g = (Group) iter.next();
+            if ( g.getPDBCode().equals(pdbresnumStart)) {
+                adding = true;
+                foundStart = true;
+            }
+
+            if ( adding)
+                retlst.add(g);
+
+            if ( g.getPDBCode().equals(pdbresnumEnd)) {
+                if ( ! adding)
+                    throw new StructureException("did not find start PDB residue number " + pdbresnumStart + " in chain " + name);
+                adding = false;
+                break;
+            }
+        }
+
+        if ( ! foundStart){
+            throw new StructureException("did not find start PDB residue number " + pdbresnumStart + " in chain " + name);
+        }
+        if ( adding) {
+            throw new StructureException("did not find end PDB residue number " + pdbresnumEnd + " in chain " + name);
+        }
+
+        return (Group[]) retlst.toArray(new Group[retlst.size()] );
+    }
 
 
-	public int getLengthAminos() {
 
-		List g = getGroups("amino");
-		return g.size() ;
-	}
-
-	public int getLengthSeqRes() {
-		//new method returns the length of the sequence defined in the SEQRES records
-		String g = this.getSeqRes();
-		return g.length();
-	}
-
-	/** get and set the name of this chain (Chain id in PDB file ).
-	 * @param nam a String specifying the name value
-	 * @see #getName
-	 * 
-	 */
-
-	public void   setName(String nam) { name = nam;   }
-
-	/** get and set the name of this chain (Chain id in PDB file ).
-	 * @return a String representing the name value
-	 * @see #setName
-	 */
-	public String getName()           {	return name;  }
+    /**
+     * @deprecated use getAtomLength instead
+     */
+    public int getLength() {
+        return getAtomLength();
+    }
 
 
-	/** string representation. */
-	public String toString(){
-		String newline = System.getProperty("line.separator");
-		String str = "Chain >"+getName() + "< total length:" + getLength() + " residues";
-		// loop over the residues
+    public int getLengthAminos() {
 
-		for ( int i = 0 ; i < groups.size();i++){
-			Group gr = (Group) groups.get(i);
-			str += gr.toString() + newline ;
-		} 
-		return str ;
+        List<Group> g = getAtomGroups("amino");
+        return g.size() ;
+    }
 
-	}
+    public int getLengthSeqRes() {
+        //new method returns the length of the sequence defined in the SEQRES records
+        return seqResGroups.size();
+    }
 
-	/** get amino acid sequence.
-	 * @return a String representing the sequence.	    
-	 */
-	public String getSequence(){
+    /** get and set the name of this chain (Chain id in PDB file ).
+     * @param nam a String specifying the name value
+     * @see #getName
+     * 
+     */
 
-		List aminos = getGroups("amino");
-		StringBuffer sequence = new StringBuffer() ;
-		for ( int i=0 ; i< aminos.size(); i++){
-			AminoAcid a = (AminoAcid)aminos.get(i);
-			sequence.append( a.getAminoType());
-		}
+    public void   setName(String nam) { name = nam;   }
 
-		String s = sequence.toString();
-
-		return s ;
-	}
-	public void setSeqRes(String seq) {
-		this.seqRes = seq;
-	}
-
-	public String getSeqRes() {
-		String s = "";
-		StringBuffer sequence = null;
-		try {
-			List aminos = getSeqResGroups("amino");
-			//System.out.println(aminos);
-			sequence = new StringBuffer();
-			for (int i = 0; i < aminos.size(); i++) {
-				AminoAcid a = (AminoAcid) aminos.get(i);
-				if (a.getRecordType().equals("SEQRES")) {
-					//System.out.println(a.toString());
-					sequence.append(a.getAminoType());
-				}
-				s = sequence.toString();
-			}
-		} catch (Exception e) {
-			return s;
-		}
-		return s;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	public void setOrganismScientific(String os) {
-		this.organismScientific = os;
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+    /** get and set the name of this chain (Chain id in PDB file ).
+     * @return a String representing the name value
+     * @see #setName
+     */
+    public String getName()           {	return name;  }
 
 
-	public String getOrganismScientific() {
-		return organismScientific;  //To change body of implemented methods use File | Settings | File Templates.
-	}
+    /** string representation. */
+    public String toString(){
+        String newline = System.getProperty("line.separator");
+        String str = "Chain >"+getName() + 
+        "< total SEQRES length: " + getSeqResGroups().size() + 
+        " total ATOM length:" + getAtomLength() + " residues " + newline;
 
-	public void setMolName(String moleculeName){
-		this.molName = moleculeName;
-	}
+        // loop over the residues
 
-	public String getMolName(){
-		return molName;
-	}
+        for ( int i = 0 ; i < seqResGroups.size();i++){
+            Group gr = (Group) seqResGroups.get(i);
+            str += gr.toString() + newline ;
+        } 
+        return str ;
 
-	public void setMolId(String molId) {
-		this.molId = molId;
-	}
+    }
 
-	public String getMolId() {
-		return this.molId;
-	}
+    
+    
+    /** get amino acid sequence.
+     * @return a String representing the sequence.	    
+     * @deprecated use getAtomSequence instead
+     */
+    public String getSequence(){
+        return getAtomSequence();
+    }
 
-	public void addSeqResGroup(Group group) {
-		//To change body of implemented methods use File | Settings | File Templates.
-		group.setParent(this);
+    
+    
+    public String getAtomSequence(){
 
-		seqResGroups.add(group);
+        List<Group> aminos = getAtomGroups("amino");
+        StringBuffer sequence = new StringBuffer() ;
+        for ( int i=0 ; i< aminos.size(); i++){
+            AminoAcid a = (AminoAcid)aminos.get(i);
+            sequence.append( a.getAminoType());
+        }
 
-		// store the position internally for quick access of this group
-		String pdbResnum = group.getPDBCode();
-		if (pdbResnum != null) {
-			Integer pos = new Integer(seqResGroups.size() - 1);
-			// ARGH sometimes numbering in PDB files is confusing.
-			// e.g. PDB: 1sfe
-			/*
-			 * ATOM    620  N   GLY    93     -24.320  -6.591   4.210  1.00 46.82           N
-			 * ATOM    621  CA  GLY    93     -24.960  -6.849   5.497  1.00 47.35           C
-			 * ATOM    622  C   GLY    93     -26.076  -5.873   5.804  1.00 47.24           C
-			 * ATOM    623  O   GLY    93     -26.382  -4.986   5.006  1.00 47.56           O
-            and ...
-			 * HETATM 1348  O   HOH    92     -21.853 -16.886  19.138  1.00 66.92           O
-			 * HETATM 1349  O   HOH    93     -26.126   1.226  29.069  1.00 71.69           O
-			 * HETATM 1350  O   HOH    94     -22.250 -18.060  -6.401  1.00 61.97           O
-			 */
+        return sequence.toString();
 
-			// this check is to give in this case the entry priority that is an AminoAcid / comes first...
-			if (pdbResnumMap.containsKey(pdbResnum)) {
-				if (group instanceof AminoAcid)
-					pdbResnumMap.put(pdbResnum, pos);
-			} else
-				pdbResnumMap.put(pdbResnum, pos);
-		}
-	}
+    }
 
-	public Group getSeqResGroup(int position) {
+    /** get the sequence for all amino acids as it is specified in the SEQRES residues
+     * 
+     * @return the amino acid sequence as a string
+     */
+    public String getSeqResSequence(){
+
+        StringBuffer str = new StringBuffer();
+        for (Group group : seqResGroups) {
+            if (group instanceof AminoAcid) {
+                AminoAcid aa = (AminoAcid)group;
+                str.append(aa.getAminoType()) ;
+            }
+        }
+        return str.toString();
+
+    }
+
+ 
+
+    public Group getSeqResGroup(int position) {
 
         return seqResGroups.get(position);
-   }
+    }
 
-   public List<Group> getSeqResGroups(String type) {
-	   //TODO: this is missing still
-       return seqResGroups;
-   }
+    public List<Group> getSeqResGroups(String type) {	   
+        return seqResGroups;
+    }
 
-   public List<Group> getSeqResGroups() {
-       return seqResGroups;
-   }
+    public List<Group> getSeqResGroups() {
+        return seqResGroups;
+    }
 
-   public Group getSeqResGroupByPDB(String pdbresnum) throws StructureException {
-       return null; 
-   }
+    public void setSeqResGroups(List<Group> groups){
+        this.seqResGroups = groups;
+    }
 
-   public Group[] getSeqResGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) throws StructureException {
-       return new Group[0];  
-   }
+
+    public int getAtomLength() {
+
+        return groups.size();
+    }
+
+
 }

@@ -270,7 +270,12 @@ public interface Structure {
      */
     public List<Chain> getChains(int modelnr);
 
-
+    /** set the chains for a model
+     * @param chains       
+     * @param modelnr
+     */
+    public void setChains( int modelnr, List<Chain> chains);
+    
     /** add a new chain.
      *
      * @param chain  a Chain object
@@ -378,8 +383,52 @@ public interface Structure {
      */
     public String toPDB();
     
-    
+    /** set the compounts
+     * 
+     * @param molList
+     */
     public void setCompounds(List<Compound>molList);
+    
+    /** get all the Compounds that are defined in the PDB Header
+     * 
+     * @return a list of compound
+     */
     public List<Compound> getCompounds();
+    
+    
+    /** request a particular compound by its id
+     * 
+     * @param molId
+     * @return a compound
+     */
     public Compound getCompoundById(String molId);
+    
+    
+    /** set the the SEQRES chains in the structure
+     * @param seqResList list of seqres chains
+     * 
+     *
+     */
+   // public void setSeqRes(List<Chain> seqResList);
+    
+    
+    /** get the list of aminoacids as it is defined in the SEQRES Header lines.
+     * During parsing the SEQRES will be aligned against the ATOM records to map
+     * the biological sequences to the one which was actually possible to observe.
+     * 
+     * @return a list of chains
+     */
+    //public List<Chain> getSeqRes();
+    
+    /** request a Chain of sequence residues by its chain identifier
+     * 
+     * @param chainID
+     * @return the SEQRES chain with this ID
+     * @throws StructureException if no matchin chain is found
+     */
+   // public Chain getSeqResByPDB(String chainID) throws StructureException;
+    
+    
+    	
+    
 }
