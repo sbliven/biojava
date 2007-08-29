@@ -129,9 +129,13 @@ public class Compound implements Cloneable {
                     }
                     if ( o instanceof List){
                         if ( o != null)
+                        	
                             buf.append(name.substring(3,name.length())+": ");
                             List<Object> lst = (List<Object>)o;
                             for (Object obj : lst){
+                            	if ( obj instanceof Chain){
+                            		continue;
+                            	}
                                 buf.append(obj + " ");
                             }
                         
