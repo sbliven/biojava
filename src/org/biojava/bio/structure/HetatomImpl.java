@@ -331,8 +331,8 @@ public class HetatomImpl implements Group {
      *
      * @return an Iterator object
      */
-    public Iterator iterator() {
-        Iterator iter = new AtomIterator(this);
+    public Iterator<Atom> iterator() {
+        Iterator<Atom> iter = new AtomIterator(this);
         return iter ;
     }
     

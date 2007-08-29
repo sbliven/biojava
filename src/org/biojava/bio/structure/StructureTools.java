@@ -49,7 +49,7 @@ public class StructureTools {
        
         int nrAtoms = 0;
         
-        Iterator iter = new GroupIterator(s);
+        Iterator<Group> iter = new GroupIterator(s);
         
         while ( iter.hasNext()){
             Group g = (Group) iter.next();
@@ -68,11 +68,11 @@ public class StructureTools {
     public static int getNrGroups(Structure s){
         int nrGroups = 0;
         
-        List chains = s.getChains(0);
-        Iterator iter = chains.iterator();
+        List<Chain> chains = s.getChains(0);
+        Iterator<Chain> iter = chains.iterator();
         while (iter.hasNext()){
             Chain c = (Chain) iter.next();
-            nrGroups += c.getLength();
+            nrGroups += c.getAtomLength();
         }
         return nrGroups;
     }
@@ -88,7 +88,7 @@ public class StructureTools {
      * @return an Atom[] array
      */ 
     public static Atom[] getAtomArray(Structure s, String[] atomNames){
-        Iterator iter = new GroupIterator(s);
+        Iterator<Group> iter = new GroupIterator(s);
         List<Atom> atoms = new ArrayList<Atom>();
         while ( iter.hasNext()){
             Group g = (Group) iter.next();
@@ -112,7 +112,7 @@ public class StructureTools {
             }
             if ( thisGroupAllAtoms){
                 // add the atoms of this group to the array.
-                Iterator aIter = thisGroupAtoms.iterator();
+                Iterator<Atom> aIter = thisGroupAtoms.iterator();
                 while(aIter.hasNext()){
                     Atom a = (Atom) aIter.next();
                     atoms.add(a);

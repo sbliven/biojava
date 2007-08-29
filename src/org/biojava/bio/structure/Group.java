@@ -195,7 +195,7 @@ public interface Group {
      *
      * @return a HashMap object representing the properties value
      */
-    public Map getProperties() ;
+    public Map<String,Object> getProperties() ;
     
     /** set a single property .
      *
@@ -218,7 +218,7 @@ public interface Group {
      *
      * @return an Iterator object
      */
-    public Iterator iterator() ;
+    public Iterator<Atom> iterator() ;
     
     
     /** returns and identical copy of this Group object .
