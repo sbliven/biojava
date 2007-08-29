@@ -47,6 +47,7 @@ import org.biojava.bio.structure.HetatomImpl;
 import org.biojava.bio.structure.Compound;
 import org.biojava.bio.structure.NucleotideImpl;
 import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
@@ -84,15 +85,17 @@ import org.biojava.bio.symbol.Symbol;
 public class PDBFileParser  {
 
     private final boolean DEBUG = false;
-    
+
     String path                     ;
     List<String> extensions            ;
 
     // required for parsing:
-    StructureImpl structure      ;
-    List<Chain>   current_model  ;
-    Chain         current_chain  ;
-    Group         current_group  ;
+    Structure     structure;
+    List<Chain>   current_model; // contains the ATOM records for each model
+    Chain         current_chain;
+    Group         current_group;
+
+    List<Chain>   seqResChains; // contains all the chains for the SEQRES records
 
     // for conversion 3code 1code
     SymbolTokenization threeLetter ;
@@ -105,6 +108,9 @@ public class PDBFileParser  {
     List<Map<String,String>> helixList;
     List<Map<String,String>> strandList;
     List<Map<String,String>> turnList;
+
+    int lengthCheck ;
+
     Compound current_compound;
     List<Compound> compounds = new ArrayList<Compound>();
 
@@ -122,7 +128,7 @@ public class PDBFileParser  {
 
 
     boolean parseSecStruc;
-
+    boolean alignSeqRes;
 
     public static String idCode = "idCode";
 
@@ -188,7 +194,7 @@ public class PDBFileParser  {
         connects      = new ArrayList<Map<String,Integer>>() ;
 
         parseSecStruc = false;
-
+        alignSeqRes   = true;
 
         helixList     = new ArrayList<Map<String,String>>();
         strandList    = new ArrayList<Map<String,String>>();
@@ -208,6 +214,29 @@ public class PDBFileParser  {
 
 
     }
+
+
+
+    /** flag if the SEQRES amino acids shouldbe aligned with the ATOM amino acids
+     * 
+     * @return flag
+     */
+    public boolean isAlignSeqRes() {
+        return alignSeqRes;
+    }
+
+
+
+    /** define if the SEQRES in the structure shouldbe aligned with the ATOM records
+     * if yes, the AminoAcids in structure.getSeqRes will have the coordinates set.
+     * @param alignSeqRes
+     */
+    public void setAlignSeqRes(boolean alignSeqRes) {
+        this.alignSeqRes = alignSeqRes;
+    }
+
+
+
 
     /** is secondary structure assignment being parsed from the file?
      * default is null
@@ -691,6 +720,7 @@ public class PDBFileParser  {
         GLA gamma-carboxy-glutamic acid
                  1         2         3         4         5         6         7
         1234567890123456789012345678901234567890123456789012345678901234567890
+        SEQRES   1 A  376  LYS PRO VAL THR VAL LYS LEU VAL ASP SER GLN ALA THR 
         SEQRES   1 A   21  GLY ILE VAL GLU GLN CYS CYS THR SER ILE CYS SER LEU
         SEQRES   2 A   21  TYR GLN LEU GLU ASN TYR CYS ASN
         SEQRES   1 B   30  PHE VAL ASN GLN HIS LEU CYS GLY SER HIS LEU VAL GLU
@@ -702,142 +732,76 @@ public class PDBFileParser  {
         SEQRES   2 D   30  ALA LEU TYR LEU VAL CYS GLY GLU ARG GLY PHE PHE TYR
         SEQRES   3 D   30  THR PRO LYS ALA
          */
+
+        //System.out.println(line);
         String recordName = line.substring(0, 6).trim();
-        //int pdbnumber = Integer.parseInt(line.substring(6, 11).trim());
-        String chain_id    = line.substring(11, 12);  
+        String chainID    = line.substring(11, 12);  
+        String newLength   = line.substring(13,17).trim();
         String subSequence = line.substring(18, 70);
 
-        //Atom atom = new AtomImpl(); 
-        //atom.setPDBserial(pdbnumber);     
+        //System.out.println("newLength " + newLength );
 
-        //TODO: is this needed?
-        //Character altLoc = new Character(line.substring(16, 17).charAt(0));
-        String residueNumber = line.substring(22, 27).trim();
+        if ( lengthCheck == -1 ){
+            lengthCheck = Integer.parseInt(newLength);
+        }
+
+        //String residueNumber = line.substring(22, 27).trim() ;
         StringTokenizer subSequenceResidues = new StringTokenizer(subSequence);
 
         Character aminoCode1 = null;
-        if (recordName.equals(AminoAcid.SEQRESRECORD)) {
-//          System.out.println("PDBFileParser.pdb_SEQRES_Handler: Now parsing chain: " + chain_id + ", " + subSequence);
-
-
-            while (subSequenceResidues.hasMoreTokens()) {
-                //System.out.println(subSequenceResidues.nextToken());
-                String threeLetter = subSequenceResidues.nextToken();
-                //System.out.println("Current three letter code is " + threeLetter);
-
-                aminoCode1 = get1LetterCode(threeLetter);
-
-
-                if (current_chain == null) {
-                    current_chain = new ChainImpl();
-                    current_chain.setName(chain_id);
-                    if (compounds != null) {
-//                      System.out.println("PDBFileParser.pdb_SEQRES_Handler: Initializing new chain: " + current_chain.getName());
-                        for (Compound compound : compounds) {
-//                          System.out.println("PDBFileParser.pdb_SEQRES_Handler: Matching header " + head.getMolId());
-                            if (compound.getChainId().contains(current_chain.getName())) {
-//                              System.out.println("PDBFileParser.pdb_SEQRES_Handler: Chains match! Setting chain header information to: ");
-//                              head.showCompound();
-//                              head.showSource();
-                                current_chain.setHeader(compound);  //todo:might not be the best place
-                                current_chain.setOrganismScientific(String.format("%s %s",compound.getOrganismScientific(), compound.getStrain()).trim());
-                                current_chain.setMolId(compound.getMolId());
-                                current_chain.setMolName(compound.getMolName());
-                                compound.addChain(current_chain);
-                            }
-                        }
-                    }
-                }
-                if (current_group == null) {
-//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: current_group is null. Creating new group");
-                    current_group = getNewGroup(recordName, aminoCode1);
-
-                    current_group.setPDBCode(residueNumber);
-                    current_group.setPDBName(threeLetter);
-                    current_group.toString();
-                }
-
-//              System.out.println("chainid: >"+chain_id+"<, current_chain.id: "+ current_chain.getName() );
-                // check if chain id is the same
-                if (!chain_id.equals(current_chain.getName())) {
-//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: end of chain: " + current_chain.getName() + " >" + chain_id + "<");
-                    //current_chain.setHeader(current_molId);  //todo:might not be the best place
-                    // end up old chain...
-//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: Adding last group " + current_group + " to chain " + current_chain.getName());
-                    current_chain.addSeqResGroup(current_group);
-
-                    // see if old chain is known ...
-                    Chain testchain;
-//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: trying if chain name is known.");
-                    testchain = isKnownChain(current_chain.getName());
-                    if (testchain == null) {
-                        current_model.add(current_chain);
-                    }
-
-                    //see if chain_id of new residue is one of the previous chains ...
-                    testchain = isKnownChain(chain_id);
-                    if (testchain != null) {
-//                      System.out.println("PDBFileParser.pdb_SEQRES_Handler: chain already known..." + chain_id);
-                        current_chain = (ChainImpl) testchain;
-
-                    } else {
-//                      System.out.println("PDBFileParser.pdb_SEQRES_Handler: chain not known: creating new chain..." + chain_id);
-
-                        //current_model.add(current_chain);
-                        current_chain = new ChainImpl();
-                        current_chain.setName(chain_id);
-//                      System.out.println("PDBFileParser.pdb_SEQRES_Handler: Initialized new chain: " + current_chain.getName());
-                        for (Compound compound : compounds) {
-//                          System.out.println("PDBFileParser.pdb_SEQRES_Handler: Matching header " + head.getMolId() + " chains " + head.getChainId() + " with new chainId " + current_chain.getName());
-                            if (compound.getChainId().contains(current_chain.getName())) {
-//                              System.out.println("PDBFileParser.pdb_SEQRES_Handler: Chains match! Setting chain header information to: ");
-//                              head.showCompound();
-//                              head.showSource();
-//                              System.out.println("setting OS to: " + head.getOrganismScientific());
-                                current_chain.setHeader(compound);  //todo:might not be the best place
-                                current_chain.setOrganismScientific(String.format("%s %s",compound.getOrganismScientific(), compound.getStrain()).trim());
-                                current_chain.setMolId(compound.getMolId());
-                                current_chain.setMolName(compound.getMolName());
-                                compound.addChain(current_chain);
-                            }
-                        }
-
-                    }
-
-                    current_group = getNewGroup(recordName, aminoCode1);
-
-                    current_group.setPDBCode(residueNumber);
-                    current_group.setPDBName(threeLetter);
-                }
-
-                // check if residue number is the same ...
-                // insertion code is part of residue number
-                if (! residueNumber.equals(current_group.getPDBCode())) {
-//                  System.out.println("PDBFileParser.pdb_SEQRES_Handler: end of residue: " + current_group.getPDBCode() + " " + residueNumber);
-                    current_chain.addSeqResGroup(current_group);
-
-                    current_group = getNewGroup(recordName, aminoCode1);
-
-                    //current_group.setPDBCode(residueNumber);
-                    current_group.setPDBName(threeLetter);
-
-                }
-
-                //see if chain_id is one of the previous chains ...
-                //current_group.addAtom(atom);
-                //System.out.println(current_group);
-                //current_group.addAtom(atom);
-
-                current_group = getNewGroup(recordName, aminoCode1);
-                //current_group.setPDBCode(residueNumber);
-                current_group.setPDBName(threeLetter);
-//              System.out.println("PDBFileParser.pdb_SEQRES_Handler: Adding group: " + recordName + " residue= " + aminoCode1);
-//              System.out.println("PDBFileParser.pdb_SEQRES_Handler: " + current_group);
-
-
-            }
+        if (! recordName.equals(AminoAcid.SEQRESRECORD)) {
+            // should not have been called
+            return;
         }
-//      System.out.println("PDBFileParser.pdb_SEQRES_Handler: END");
+
+        current_chain = isKnownChain(chainID, seqResChains);
+        if ( current_chain == null) {
+
+            current_chain = new ChainImpl();
+            current_chain.setName(chainID);				
+
+        }
+
+
+        while (subSequenceResidues.hasMoreTokens()) {
+
+            String threeLetter = subSequenceResidues.nextToken();
+
+            aminoCode1 = get1LetterCode(threeLetter);
+            //System.out.println(aminoCode1);
+            //if (aminoCode1 == null) {
+            // could be a nucleotide...
+            // but getNewGroup takes care of that and converts ATOM records with aminoCode1 == nnull to nucleotide...
+            //System.out.println(line);
+            // b
+            //} 
+            current_group = getNewGroup("ATOM", aminoCode1);				
+            current_group.setPDBName(threeLetter);
+            if ( current_group instanceof AminoAcid){
+                AminoAcid aa = (AminoAcid)current_group;
+                aa.setRecordType(AminoAcid.SEQRESRECORD);
+            }
+            // add the current group to the new chain.
+            current_chain.addGroup(current_group);
+
+        }
+        Chain test = isKnownChain(chainID, seqResChains);
+
+        if ( test == null)
+            seqResChains.add(current_chain);
+
+        current_group = null;	
+        current_chain = null;
+        //structure.setSeqRes(seqResChains);
+
+        //		 the current chain is finished!
+        //if ( current_chain.getLength() != lengthCheck ){
+        //	System.err.println("the length of chain " + current_chain.getName() + "(" + 
+        //			current_chain.getLength() + ") does not match the expected " + lengthCheck);
+        //}
+
+        lengthCheck = Integer.parseInt(newLength);
+
     }
 
 
@@ -1082,17 +1046,14 @@ public class PDBFileParser  {
 
         }
         if (field.equals("CHAIN:")) {
-
+            //System.out.println(value);
             StringTokenizer chainTokens = new StringTokenizer(value, ",");
             List<String> chains = new ArrayList<String>();
 
             while (chainTokens.hasMoreTokens()) {
                 chains.add(chainTokens.nextToken().trim());
-
-
-                current_compound.setchainId(chains);
-
             }
+            current_compound.setChainId(chains);
         }
         if (field.equals("SYNONYM:")) {
 
@@ -1520,14 +1481,14 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
                 // see if old chain is known ...
                 Chain testchain ;
-                testchain = isKnownChain(current_chain.getName());
+                testchain = isKnownChain(current_chain.getName(),current_model);
                 if ( testchain == null) {
                     current_model.add(current_chain);		
                 }
 
 
                 //see if chain_id of new residue is one of the previous chains ...
-                testchain = isKnownChain(chain_id);
+                testchain = isKnownChain(chain_id,current_model);
                 if (testchain != null) {
                     //System.out.println("already known..."+ chain_id);
                     current_chain = (ChainImpl)testchain ;
@@ -1670,7 +1631,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
             }
             //System.out.println("starting new model "+(structure.nrModels()+1));
 
-            Chain ch = isKnownChain(current_chain.getName()) ;
+            Chain ch = isKnownChain(current_chain.getName(),current_model) ;
             if ( ch == null ) {
                 current_model.add(current_chain);
             }
@@ -1686,25 +1647,20 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
      * ArrayList) and if yes, returns the chain 
      * if no -> returns null
      */
-    private Chain isKnownChain(String chainID){
-        Chain testchain =null;
-        Chain retchain =null;
-        //System.out.println("isKnownCHain: >"+chainID+"< current_chains:"+current_model.size());
+    private Chain isKnownChain(String chainID, List<Chain> chains){
 
-        for (int i = 0; i< current_model.size();i++){
-            testchain = (Chain) current_model.get(i);
+        for (int i = 0; i< chains.size();i++){
+            Chain testchain =  chains.get(i);
             //System.out.println("comparing chainID >"+chainID+"< against testchain " + i+" >" +testchain.getName()+"<");
             if (chainID.equals(testchain.getName())) {
                 //System.out.println("chain "+ chainID+" already known ...");
-                retchain = testchain;
-                break ;
+                return testchain;
             }
         }
-        //if (retchain == null) {
-        //    System.out.println("unknownCHain!");
-        //}
-        return retchain;
+
+        return null;
     }
+
 
 
     private BufferedReader getBufferedReader(InputStream inStream) 
@@ -1764,6 +1720,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
         structure     = new StructureImpl() ;
         current_model = new ArrayList<Chain>();
+        seqResChains  = new ArrayList<Chain>();
         current_chain = null           ;
         current_group = null           ;
         header        = init_header();
@@ -1776,7 +1733,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
         helixList.clear();
         strandList.clear();
         turnList.clear();
-
+        lengthCheck = -1;
         String line = null;
         try {
 
@@ -1834,7 +1791,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
                 try {
                     if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler  ( line ) ;
 
-                    //else if ( parseHeader && recordName.equals("SEQRES") ) pdb_SEQRES_Handler(line);
+                    else if ( recordName.equals("SEQRES")) pdb_SEQRES_Handler(line);
                     else if ( recordName.equals("HETATM")) pdb_ATOM_Handler  ( line ) ;
                     else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler ( line ) ;
                     else if ( recordName.equals("HEADER")) pdb_HEADER_Handler( line ) ;
@@ -1862,29 +1819,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
                 line = buf.readLine ();
             }
 
-            // finish and add ...
+            triggerEndFileChecks();
 
-            String modDate = (String) header.get("modDate");
-            if ( modDate.equals("0000-00-00") ) {
-                // modification date = deposition date
-                String depositionDate = (String) header.get("depDate");
-                header.put("modDate",depositionDate) ;
-            }
-
-            // a problem occured earlier so current_chain = null ...
-            // most likely the buffered reader did not provide data ...
-            if ( current_chain != null ) {
-                current_chain.addGroup(current_group);
-                if (isKnownChain(current_chain.getName()) == null) {
-                    current_model.add(current_chain);
-                }
-            }
-
-
-            structure.addModel(current_model);
-            structure.setHeader(header);
-            structure.setConnections(connects);
-            structure.setCompounds(compounds);
         } catch (Exception e) {
             System.err.println(line);
             e.printStackTrace();
@@ -1896,6 +1832,42 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 
         return structure;
+
+    }
+
+    private void triggerEndFileChecks(){
+
+        // finish and add ...
+
+        String modDate = (String) header.get("modDate");
+        if ( modDate.equals("0000-00-00") ) {
+            // modification date = deposition date
+            String depositionDate = (String) header.get("depDate");
+            header.put("modDate",depositionDate) ;
+        }
+
+        // a problem occured earlier so current_chain = null ...
+        // most likely the buffered reader did not provide data ...
+        if ( current_chain != null ) {
+            current_chain.addGroup(current_group);
+            if (isKnownChain(current_chain.getName(),current_model) == null) {
+                current_model.add(current_chain);
+            }
+        }
+
+        structure.addModel(current_model);
+        structure.setHeader(header);
+        structure.setConnections(connects);
+        structure.setCompounds(compounds);
+
+
+        if ( alignSeqRes ){
+
+            SeqRes2AtomAligner aligner = new SeqRes2AtomAligner();
+            aligner.align(structure,seqResChains);
+        }
+
+        linkChains2Compound(structure);
 
     }
 
@@ -1967,7 +1939,43 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
                 }
 
             }
+    }
 
+    public void linkChains2Compound(Structure s){
+        List<Compound> compounds = s.getCompounds();
+       
+        for(Compound comp : compounds){
+            List<Chain> chains = new ArrayList<Chain>();
+            List<String> chainIds = comp.getChainId();
+            if ( chainIds == null)
+                continue;
+            for ( String chainId : chainIds) {
+                try {
+                    Chain c = s.findChain(chainId);
+                    chains.add(c);
+                    
+                } catch (StructureException e){
+                    e.printStackTrace();
+                }
+            }
+            comp.setChains(chains);
+        }
+       
+        if ( compounds.size() == 1) {
+            Compound comp = compounds.get(0);
+            if ( comp.getChainId() == null){
+                List<Chain> chains = s.getChains(0);
+                if ( chains.size() == 1) {
+                    // this is an old style PDB file - add the ChainI
+                    Chain ch = chains.get(0);
+                    List <String> chainIds = new ArrayList<String>();
+                    chainIds.add(ch.getName());
+                    comp.setChainId(chainIds);
+                    comp.addChain(ch);
+                } 
+            }
+        }
+        
     }
 
 
