@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
  * @version %I% %G%
  */
 
-public class GroupIterator implements Iterator {
+public class GroupIterator implements Iterator<Group> {
     
     Structure structure   ;
     int current_model_pos ;
@@ -95,7 +95,7 @@ public class GroupIterator implements Iterator {
             return false;
         }
         
-        List model =  structure.getModel(tmp_model);
+        List<Chain> model =  structure.getModel(tmp_model);
         
         if ( tmp_chain >= model.size() ){
             return hasSubGroup(tmp_model+1,0,0);
@@ -103,7 +103,7 @@ public class GroupIterator implements Iterator {
         
         Chain     chain = (Chain)model.get(tmp_chain);
         
-        if (tmp_group  >= chain.getLength()){	   
+        if (tmp_group  >= chain.getAtomLength()){	   
             // start search at beginning of next chain.	    
             return hasSubGroup(tmp_model,tmp_chain+1,0);
         } else {
@@ -127,7 +127,7 @@ public class GroupIterator implements Iterator {
             return null;
         }
         
-        List model =  structure.getModel(current_model_pos);
+        List<Chain> model =  structure.getModel(current_model_pos);
         
         if ( current_chain_pos >= model.size() ){
             return null;
@@ -142,7 +142,7 @@ public class GroupIterator implements Iterator {
      * @return next Group 
      * @throws NoSuchElementException ... 
      */
-    public Object next()
+    public Group next()
     throws NoSuchElementException
     {
         
@@ -161,7 +161,7 @@ public class GroupIterator implements Iterator {
             throw new NoSuchElementException("arrived at end of structure!");
         }
         
-        List model = structure.getModel(tmp_model);
+        List<Chain> model = structure.getModel(tmp_model);
         
         if ( tmp_chain >= model.size() ){
             return getNextGroup(tmp_model+1,0,0);
@@ -169,14 +169,14 @@ public class GroupIterator implements Iterator {
         
         Chain     chain = (Chain) model.get(tmp_chain);
         
-        if (tmp_group  >= chain.getLength()){	   
+        if (tmp_group  >= chain.getAtomLength()){	   
             // start search at beginning of next chain.	    
             return getNextGroup(tmp_model,tmp_chain+1,0);
         } else {
             current_model_pos = tmp_model;
             current_chain_pos = tmp_chain;
             current_group_pos = tmp_group;
-            Group group = chain.getGroup(current_group_pos);
+            Group group = chain.getAtomGroup(current_group_pos);
             return group;
         }
         
