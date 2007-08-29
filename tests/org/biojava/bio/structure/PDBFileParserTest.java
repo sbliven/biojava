@@ -52,8 +52,8 @@ public class PDBFileParserTest extends TestCase {
         Object resolution = null;
         
         Structure s = parser.parsePDBFile(br);
-        Map m = s.getHeader();
-        resolution = (Object) m.get("resolution");
+        Map<String, Object> m = s.getHeader();
+        resolution =  m.get("resolution");
 
         return resolution;
     }
