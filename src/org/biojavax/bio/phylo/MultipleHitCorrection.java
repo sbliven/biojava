@@ -1,7 +1,23 @@
 package org.biojavax.bio.phylo;
 
+ /*
+  *   MultipleHitCorrection methods for phylogeny inference
+  *
+  *   @author Bohyun Lee
+  */
 public class MultipleHitCorrection {
-	
+	 
+
+       /*		calculate distance between two sequences (pairwise comparison) based on Jukes-Cantor model
+	  *
+	  *		@param taxa1
+	  *				first sequence 
+	  *
+	  *		@param taxa2
+	  *				second sequnce 
+	  *
+	  *		@returns	the calculated number in double type
+	  */
 	 public static double JukesCantor(String taxa1, String taxa2){
 			
 		taxa1 = taxa1.replace(" ", "");
@@ -32,7 +48,17 @@ public class MultipleHitCorrection {
 			return 0.0;
 		}
 	}	
-
+	
+	 /*		calculate distance between two sequences (pairwise comparison) based on kimura's-2parameter model
+	  *
+	  *		@param taxa1
+	  *				first sequence 
+	  *
+	  *		@param taxa2
+	  *				second sequnce 
+	  *
+	  *		@returns	the calculated number in double type
+	  */
 	public static double KimuraTwoParameter(String taxa1, String taxa2){
 		
 		taxa1 = taxa1.replace(" ","");
