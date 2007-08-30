@@ -29,6 +29,7 @@ import java.util.Set;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeAdapter;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeListener;
@@ -50,6 +51,9 @@ class LinearAlphabetIndex
   private /*final*/ Reference alphaRef;
   private Symbol[] symbols;
 
+  private ChangeListener indexBuilder; // do not remove these 	 
+  private ChangeListener adapter;      // do not remove these
+   
   // hack for bug in compaq 1.2?
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     return super.getChangeSupport(ct);
@@ -63,6 +67,21 @@ class LinearAlphabetIndex
 
     this.symbols = buildIndex(alpha);
 
+    //these change listeners are needed to rebuild the index when the alphabet changes. 
+    alpha.addChangeListener( 	 
+       indexBuilder = new IndexRebuilder(), 	 
+       Alphabet.SYMBOLS 	 
+     ); 	 
+  	 
+     this.addChangeListener( 	 
+       adapter = new ChangeAdapter() { 	 
+         public void postChange(ChangeEvent ce) { 	 
+           symbols = (Symbol[] ) ce.getChange(); 	 
+         } 	 
+       }, 	 
+       AlphabetIndex.INDEX 	 
+     ); 	 
+     
     // unlock the alphabet
     alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
   }
@@ -100,6 +119,7 @@ class LinearAlphabetIndex
   }
 
   public Symbol symbolForIndex(int i) throws IndexOutOfBoundsException {
+
     try {
       return symbols[i];
     } catch (IndexOutOfBoundsException e) {
@@ -108,6 +128,7 @@ class LinearAlphabetIndex
   }
 
   public int indexForSymbol(Symbol s) throws IllegalSymbolException {
+
     for(int i = 0; i < symbols.length; i++) {
       if(s == symbols[i]) {
         return i;
