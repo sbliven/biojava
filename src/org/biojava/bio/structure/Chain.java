@@ -54,6 +54,8 @@ public interface Chain {
      * @param position  an int
      * @return a Group object
      * @deprecated use getAtomGroup or getSeqResGroup instead
+     * @see #getAtomGroup(int)
+     * @see #getSeqResGroup(int)
      */
     public Group getGroup (int position);
 	
@@ -120,7 +122,9 @@ public interface Chain {
     
     /** get total length of chain, including HETATMs..
      * @return an int representing the length of the whole chain including HETATMs
-     * @deprecated please use getAtomLength or getSeqResLength instead
+     * @deprecated please use getAtomLength or getLengthSeqRes instead
+     * @see #getAtomLength()
+     * @see #getLengthSeqRes()
      */
     public int getLength();
     
@@ -183,36 +187,37 @@ public interface Chain {
     /** string representation.  */
     public String toString();
 	
-    /** return the amino acid sequqence of this chain
+    /** return the amino acid sequence of this chain
      * ( all aminos even if they do not have 3D data ...).
      * @return the sequence as a string
      * @deprecated use getAtomSequence instead
+     * @see #getAtomSequence()
      */
     public String getSequence() ;
 
     /** return the sequence of amino acids as it has been provided in the ATOM records
      * 
      * @return amino acid sequence as string
-     * @see getSeqResSequence
+     * @see #getSeqResSequence()
      */
     public String getAtomSequence();
     
     /** get the sequence for all amino acids as it is specified in the SEQRES residues
      * 
      * @return the amino acid sequence of the SEQRES sequence as a string
-     * @see getAtomSequence
+     * @see #getAtomSequence()
      */
     public String getSeqResSequence();
     
     /** set the Swissprot id of this chains .
      * @param sp_id  a String specifying the swissprot id value
-     * @see #getSwissprotId
+     * @see #getSwissprotId()
      */
     public void setSwissprotId(String sp_id);
 
     /** get the Swissprot id of this chains .
      * @return a String representing the swissprot id value
-     * @see #setSwissprotId
+     * @see #setSwissprotId(String sp_id)
      */
     public String getSwissprotId() ;
     
@@ -230,6 +235,10 @@ public interface Chain {
      */
     public List<Group> getSeqResGroups ();
  
+    /** set the list of SeqResGroups for this chain
+     * 
+     * @param seqResGroups
+     */
     public void setSeqResGroups(List<Group> seqResGroups);
 
     
