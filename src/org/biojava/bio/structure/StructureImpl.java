@@ -52,6 +52,7 @@ public class StructureImpl implements Structure {
 	Map<String,Object> header ;
 	List<Map <String,Integer>> connections ;
 	List<Compound> compounds;
+    List<DBRef> dbrefs;
 	String name ;
 
 	boolean nmrflag ;
@@ -70,7 +71,7 @@ public class StructureImpl implements Structure {
 		header         = new HashMap<String,Object>();
 		connections    = new ArrayList<Map<String,Integer>>();
 		compounds      = new ArrayList<Compound>();
-		//seqResList     = new ArrayList<Chain>();
+        dbrefs        = new ArrayList<DBRef>();
 	}
 
 
@@ -496,6 +497,17 @@ public class StructureImpl implements Structure {
 		}
 		return null; 
 	}
+
+
+    public List<DBRef> getDBRefs() {
+       return dbrefs;
+    }
+
+
+    public void setDBRefs(List<DBRef> dbrefs) {
+        this.dbrefs = dbrefs;
+        
+    }
 
 
 }

@@ -395,6 +395,18 @@ public interface Structure {
      */
     public List<Compound> getCompounds();
     
+    /** set the list of database references for this structure
+     * @param dbrefs list of DBRef objects
+     * 
+     *
+     */
+    public void setDBRefs(List<DBRef> dbrefs);
+    
+    /** get the list of database references
+     * 
+     * @return list of DBRef objects
+     */
+    public List<DBRef> getDBRefs();
     
     /** request a particular compound by its id
      * 

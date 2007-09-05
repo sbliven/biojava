@@ -41,6 +41,7 @@ import org.biojava.bio.structure.AminoAcidImpl;
 import org.biojava.bio.structure.AtomImpl;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.DBRef;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.GroupIterator;
 import org.biojava.bio.structure.HetatomImpl;
@@ -85,40 +86,39 @@ import org.biojava.bio.symbol.Symbol;
 public class PDBFileParser  {
 
     private final boolean DEBUG = false;
-
-    String path                     ;
-    List<String> extensions            ;
-
+        
     // required for parsing:
-    Structure     structure;
-    List<Chain>   current_model; // contains the ATOM records for each model
-    Chain         current_chain;
-    Group         current_group;
+    private Structure     structure;
+    private List<Chain>   current_model; // contains the ATOM records for each model
+    private Chain         current_chain;
+    private Group         current_group;
 
-    List<Chain>   seqResChains; // contains all the chains for the SEQRES records
+    private List<Chain>   seqResChains; // contains all the chains for the SEQRES records
 
     // for conversion 3code 1code
-    SymbolTokenization threeLetter ;
-    SymbolTokenization oneLetter ;
+    private static  SymbolTokenization threeLetter ;
+    private static  SymbolTokenization oneLetter ;
+    
+    // for printing
+    private static final String NEWLINE;
+    
+    private Map <String,Object>  header ;
+    private List<Map<String, Integer>> connects ;
+    private List<Map<String,String>> helixList;
+    private List<Map<String,String>> strandList;
+    private List<Map<String,String>> turnList;
 
-    //String nucleotides[] ;
-    String NEWLINE;
-    Map <String,Object>  header ;
-    List<Map<String, Integer>> connects ;
-    List<Map<String,String>> helixList;
-    List<Map<String,String>> strandList;
-    List<Map<String,String>> turnList;
+    private int lengthCheck ;
 
-    int lengthCheck ;
-
-    Compound current_compound;
-    List<Compound> compounds = new ArrayList<Compound>();
-
+    private Compound current_compound;
+    private List<Compound> compounds = new ArrayList<Compound>();
+    private List<DBRef> dbrefs;
+    
     // for parsing COMPOUND and SOURCE Header lines
-    int molTypeCounter = 1;
-    int continuationNo;
-    String continuationField;
-    String continuationString = "";
+    private int molTypeCounter = 1;
+    private int continuationNo;
+    private String continuationField;
+    private String continuationString = "";
 
     private static  final List<String> compndFieldValues = new ArrayList<String>(Arrays.asList(
             "MOL_ID:", "MOLECULE:", "CHAIN:", "SYNONYM:",
@@ -179,13 +179,23 @@ public class PDBFileParser  {
             String n = names[i];
             nucleotides23.put(n,1);		
         }
+        
+        try {
+            Alphabet alpha_prot = ProteinTools.getAlphabet();
+            threeLetter = alpha_prot.getTokenization("name");
+            oneLetter  = alpha_prot.getTokenization("token");
+        } catch (Exception e) {
+            e.printStackTrace() ;
+        }
+        
+        NEWLINE = System.getProperty("line.separator");
 
     }
 
 
 
     public PDBFileParser() {
-        extensions    = new ArrayList<String>();
+        
         structure     = null           ;
         current_model = new ArrayList<Chain>();
         current_chain = null           ;
@@ -200,19 +210,10 @@ public class PDBFileParser  {
         strandList    = new ArrayList<Map<String,String>>();
         turnList      = new ArrayList<Map<String,String>>();
         current_compound = new Compound();
-
-        NEWLINE = System.getProperty("line.separator");
-
-        Alphabet alpha_prot = ProteinTools.getAlphabet();
-
-        try {
-            threeLetter = alpha_prot.getTokenization("name");
-            oneLetter  = alpha_prot.getTokenization("token");
-        } catch (Exception e) {
-            e.printStackTrace() ;
-        }
-
-
+        dbrefs        = new ArrayList<DBRef>();
+        
+        
+       
     }
 
 
@@ -1642,6 +1643,79 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
         }
 
     }
+    
+    
+    /**
+    COLUMNS       DATA TYPE          FIELD          DEFINITION
+    ----------------------------------------------------------------
+     1 - 6        Record name        "DBREF "
+     8 - 11       IDcode             idCode         ID code of this entry.
+    13            Character          chainID        Chain identifier.
+    15 - 18       Integer            seqBegin       Initial sequence number 
+                                                    of the PDB sequence segment.
+    19            AChar              insertBegin    Initial insertion code 
+                                                    of the PDB sequence segment.
+    21 - 24       Integer            seqEnd         Ending sequence number 
+                                                    of the PDB sequence segment.
+    25            AChar              insertEnd      Ending insertion code 
+                                                    of the PDB sequence segment.
+    27 - 32       LString            database       Sequence database name. 
+    34 - 41       LString            dbAccession    Sequence database accession code.
+    43 - 54      LString            dbIdCode        Sequence database 
+                                                    identification code.
+    56 - 60      Integer            dbseqBegin      Initial sequence number of the
+                                                    database seqment.
+    61           AChar              idbnsBeg        Insertion code of initial residue
+                                                    of the segment, if PDB is the
+                                                    reference.
+    63 - 67      Integer            dbseqEnd        Ending sequence number of the
+                                                    database segment.
+    68           AChar              dbinsEnd        Insertion code of the ending
+                                                    residue of the segment, if PDB is
+                                                    the reference.
+    */
+    private void pdb_DBREF_Handler(String line){
+        DBRef dbref = new DBRef();
+        String chainId     = line.substring(12,13);                      
+        String seqBegin    = line.substring(14,18);        
+        String insertBegin = line.substring(18,19);
+        String seqEnd      = line.substring(20,24);
+        String insertEnd   = line.substring(24,25);
+        String database    = line.substring(26,32);
+        String dbAccession = line.substring(33,41);
+        String dbIdCode    = line.substring(42,54);
+        String dbseqBegin  = line.substring(55,60);
+        String idbnsBeg    = line.substring(60,61);
+        String dbseqEnd    = line.substring(62,67);
+        String dbinsEnd    = line.substring(67,68);
+        
+        dbref.setChainId(chainId.charAt(0));
+        dbref.setSeqbegin(intFromString(seqBegin));        
+        dbref.setInsertBegin(insertBegin.charAt(0));
+        dbref.setSeqEnd(intFromString(seqEnd));
+        dbref.setInsertEnd(insertEnd.charAt(0));
+        dbref.setDatabase(database.trim());
+        dbref.setDbAcession(dbAccession.trim());
+        dbref.setDbIdCode(dbIdCode.trim());
+        dbref.setDbSeqBegin(intFromString(dbseqBegin));
+        dbref.setIdbnsBegin(idbnsBeg.charAt(0));
+        dbref.setDbSeqEnd(intFromString(dbseqEnd));
+        dbref.setInsertEnd(dbinsEnd.charAt(0));
+        //System.out.println(dbref.toPDB());
+        dbrefs.add(dbref);
+    }
+    
+    private int intFromString(String intString){
+        int val = Integer.MIN_VALUE; 
+        try {
+            val = Integer.parseInt(intString.trim());
+        } catch (NumberFormatException ex){
+            ex.printStackTrace();
+        }
+        return val;
+    }
+    
+    
 
     /** test if the chain is already known (is in current_model
      * ArrayList) and if yes, returns the chain 
@@ -1792,16 +1866,17 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
                     if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler  ( line ) ;
 
                     else if ( recordName.equals("SEQRES")) pdb_SEQRES_Handler(line);
-                    else if ( recordName.equals("HETATM")) pdb_ATOM_Handler  ( line ) ;
-                    else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler ( line ) ;
-                    else if ( recordName.equals("HEADER")) pdb_HEADER_Handler( line ) ;
-                    else if ( recordName.equals("TITLE") ) pdb_TITLE_Handler ( line ) ;
-                    else if ( recordName.equals("SOURCE")) pdb_SOURCE_Handler(line);
-                    else if ( recordName.equals("COMPND")) pdb_COMPND_Handler(line);
-                    else if ( recordName.equals("EXPDTA")) pdb_EXPDTA_Handler( line ) ;
-                    else if ( recordName.equals("REMARK")) pdb_REMARK_Handler( line ) ;
-                    else if ( recordName.equals("CONECT")) pdb_CONECT_Handler( line ) ;
-                    else if ( recordName.equals("REVDAT")) pdb_REVDAT_Handler( line ) ;
+                    else if ( recordName.equals("HETATM")) pdb_ATOM_Handler  ( line );
+                    else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler ( line );
+                    else if ( recordName.equals("HEADER")) pdb_HEADER_Handler( line );
+                    else if ( recordName.equals("TITLE") ) pdb_TITLE_Handler ( line );
+                    else if ( recordName.equals("SOURCE")) pdb_SOURCE_Handler( line );
+                    else if ( recordName.equals("COMPND")) pdb_COMPND_Handler( line );
+                    else if ( recordName.equals("EXPDTA")) pdb_EXPDTA_Handler( line );
+                    else if ( recordName.equals("REMARK")) pdb_REMARK_Handler( line );
+                    else if ( recordName.equals("CONECT")) pdb_CONECT_Handler( line );
+                    else if ( recordName.equals("REVDAT")) pdb_REVDAT_Handler( line );
+                    else if ( recordName.equals("DBREF" )) pdb_DBREF_Handler ( line );
                     else if ( parseSecStruc) {
                         if ( recordName.equals("HELIX") ) pdb_HELIX_Handler (  line ) ;
                         else if (recordName.equals("SHEET")) pdb_SHEET_Handler(line ) ;
@@ -1859,7 +1934,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
         structure.setHeader(header);
         structure.setConnections(connects);
         structure.setCompounds(compounds);
-
+        structure.setDBRefs(dbrefs);
 
         if ( alignSeqRes ){
 
