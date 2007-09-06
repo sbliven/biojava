@@ -31,6 +31,7 @@ import java.util.Set;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SimpleAnnotation;
+import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeType;
@@ -99,17 +100,33 @@ implements Serializable {
   public void removeSymbol(Symbol s)
   throws IllegalSymbolException {
     validate(s);
-    if(s instanceof AtomicSymbol) {
-      symbols.remove(s);
-    } else {
-      FiniteAlphabet sa = (FiniteAlphabet) s.getMatches();
-      Iterator i = sa.iterator();
-      while(i.hasNext()) {
-        Symbol sym = (Symbol) i.next();
-        symbols.remove(sym);
+    //change checking should probably happen in AbstractAlphabet but oh well.
+    if(hasListeners(Alphabet.SYMBOLS)) {
+      ChangeSupport cs = getChangeSupport(Alphabet.SYMBOLS);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this, Alphabet.SYMBOLS, null, s);
+        cs.firePreChangeEvent(ce);
+        _removeSymbol(s);
+        cs.firePostChangeEvent(ce);
       }
+    }else{
+        _removeSymbol(s);
     }
   }
+
+    private void _removeSymbol(final Symbol s) {
+        
+        if(s instanceof AtomicSymbol) {
+          symbols.remove(s);
+        } else {
+          FiniteAlphabet sa = (FiniteAlphabet) s.getMatches();
+          Iterator i = sa.iterator();
+          while(i.hasNext()) {
+            Symbol sym = (Symbol) i.next();
+            symbols.remove(sym);
+          }
+        }
+    }
 
   public List getAlphabets() {
     if(this.alphabets == null) {

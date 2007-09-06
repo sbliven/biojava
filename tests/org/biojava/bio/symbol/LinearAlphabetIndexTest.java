@@ -34,6 +34,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
@@ -108,6 +109,28 @@ public class LinearAlphabetIndexTest extends TestCase {
           int result = instance.indexForSymbol(s);
           assertTrue(result >= 0);
         }
+        
+    }
+    
+    /**
+     * Tests that the index rebuilds when it's size changes
+     */
+    public void testBugFix2330() throws Exception{
+        SimpleAlphabet alpha = new SimpleAlphabet();
+        LinearAlphabetIndex index = new LinearAlphabetIndex(alpha);
+        
+        Symbol s0 = AlphabetManager.createSymbol("s0");
+        alpha.addSymbol(s0);
+        assertNotNull(index.symbolForIndex(0));
+        assertTrue(index.symbolForIndex(0) == s0);
+        assertTrue(index.indexForSymbol(s0) == 0);
+        
+        
+        alpha.removeSymbol(s0);
+        try{
+            index.symbolForIndex(0);
+            fail("Expected exception, there should be no Symbol at index 0");
+        }catch (Exception ex){}
         
     }
     
