@@ -25,6 +25,8 @@
     javadocs-all      builds API documentation for all the above
     clean             cleans up the build & dist directories
     cruise            build target to be used together with CruiseControl
+    dist              builds a full BioJava distributions
+    dist-src          builds a BioJava source distributions
 
   The 'runtests' target can be restricted to portions of the tree, e.g.:
 
@@ -45,199 +47,206 @@
 
 <project name="biojava" default="package-biojava" basedir=".">
 
-  <!-- Checks environment and setup variables -->
-  <target name="init" description="Checks environment and setup variables">
-    <tstamp />
-    <property name="version"        value="live" />
-    <property name="build.compiler" value="javac1.5" />
-    <property name="classpath"      value="bytecode.jar:commons-cli.jar:commons-collections-2.1.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar:jgrapht-jdk1.5.jar" />
-    <property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
+	<!-- Checks environment and setup variables -->
+	<target name="init" description="Checks environment and setup variables">
+		<tstamp />
+		<property name="version"        value="live" />
+		<property name="build.compiler" value="javac1.5" />
+		<property name="classpath"      value="bytecode.jar:commons-cli.jar:commons-collections-2.1.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar:jgrapht-jdk1.5.jar" />
+		<property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
 
 
-    <!-- Check the current system classpath for JUnit -->
-    <available classpath="${java.class.path}"
+		<!-- Check the current system classpath for JUnit -->
+		<available classpath="${java.class.path}"
                classname="junit.framework.TestCase"
                property="junit.present" />
 
-    <!-- Check for XSLT OutputProperty support in Ant (only in Ant >= 1.5) -->
-    <available classpath="${java.class.path}"
+		<!-- Check for XSLT OutputProperty support in Ant (only in Ant >= 1.5) -->
+		<available classpath="${java.class.path}"
                classname="org.apache.tools.ant.taskdefs.XSLTProcess$OutputProperty"
                property="outputproperty.support" />
 
-    <!-- Check for JUnit support in Ant (only in >= 1.3) -->
-    <available classpath="${java.class.path}"
+		<!-- Check for JUnit support in Ant (only in >= 1.3) -->
+		<available classpath="${java.class.path}"
                classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTest"
                property="junit.support" />
 
-    <!-- Check for Java 1.4 -->
-    <available classpath="${java.class.path}"
+		<!-- Check for Java 1.4 -->
+		<available classpath="${java.class.path}"
                classname="java.nio.Buffer"
                property="java14">
-    </available>
+		</available>
 
-    <available classpath="${classpath}"
+		<available classpath="${classpath}"
                classname="org.hsqldb.jdbcDriver"
                property="sqlDriver.hsqldb">
-    </available>
+		</available>
 
-    <!-- Echo information -->
-    <echo message="Building biojava-${version}" />
-    <echo message="Java Home:                       ${java.home}"/>
-    <echo message="JUnit present:                   ${junit.present}" />
-    <echo message="JUnit supported by Ant:          ${junit.support}" />
-    <echo message="HSQLDB driver present:           ${sqlDriver.hsqldb}" />
-    <echo message="XSLT support:                    ${outputproperty.support}"/>
+		<!-- Echo information -->
+		<echo message="Building biojava-${version}" />
+		<echo message="Java Home:                       ${java.home}"/>
+		<echo message="JUnit present:                   ${junit.present}" />
+		<echo message="JUnit supported by Ant:          ${junit.support}" />
+		<echo message="HSQLDB driver present:           ${sqlDriver.hsqldb}" />
+		<echo message="XSLT support:                    ${outputproperty.support}"/>
 
-    <property name="readme"        value="./README" />
-    <property name="license"       value="./LICENSE" />
-    <property name="src.dir"       value="./src" />
-    <property name="tests.dir"     value="./tests" />
-    <property name="demos.dir"     value="./demos" />
-    <property name="apps.dir"      value="./apps" />
-    <property name="docs.dir"      value="./docs" />
-    <property name="doc.css.file"  value="biojava-doc.css" />
-    <property name="reports.dir"   value="./reports" />
-    <property name="manifest.dir"  value="./manifest" />
-    <property name="resources.dir" value="./resources" />
-    <property name="taglets.dir"   value="./taglets" />
+		<property name="readme"        value="./README" />
+		<property name="license"       value="./LICENSE" />
+		<property name="src.dir"       value="./src" />
+		<property name="tests.dir"     value="./tests" />
+		<property name="demos.dir"     value="./demos" />
+		<property name="apps.dir"      value="./apps" />
+		<property name="docs.dir"      value="./docs" />
+		<property name="doc.css.file"  value="biojava-doc.css" />
+		<property name="reports.dir"   value="./reports" />
+		<property name="manifest.dir"  value="./manifest" />
+		<property name="resources.dir" value="./resources" />
+		<property name="taglets.dir"   value="./taglets" />
+		<property name="signature.dir" value="./selfSignedCertificate" />
 
-    <!-- Main build directory -->
-    <property name="build.dir"         value="./ant-build" />
-    <property name="build.classes.dir" value="${build.dir}/classes" />
+		<!-- Main build directory -->
+		<property name="build.dir"         value="./ant-build" />
+		<property name="build.classes.dir" value="${build.dir}/classes" />
 
-    <!-- Javac properties -->
-    <property name="javac.depend"      value="false" />
-    <property name="javac.debug"       value="true" />
-    <property name="javac.deprecation" value="false" />
-    <property name="javac.source"      value="1.5" />
-    <property name="javac.target"      value="1.5" />
+		<!-- Javac properties -->
+		<property name="javac.depend"      value="false" />
+		<property name="javac.debug"       value="true" />
+		<property name="javac.deprecation" value="false" />
+		<property name="javac.source"      value="1.5" />
+		<property name="javac.target"      value="1.5" />
 
-    <!-- Javadoc properties -->
-    <property name="build.dest.docs"     value="${build.dir}/docs" />
-    <property name="build.dest.doccheck" value="${build.dir}/docs/check" />
-    <property name="packages"            value="org.*" />
+		<!-- Javadoc properties -->
+		<property name="build.dest.docs"     value="${build.dir}/docs" />
+		<property name="build.dest.doccheck" value="${build.dir}/docs/check" />
+		<property name="packages"            value="org.*" />
 
-    <!-- Subdirectories for main source and classes -->
-    <property name="name.biojava"           value="biojava" />
-    <property name="Name.biojava"           value="BioJava" />
-    <property name="build.dest.biojava"     value="${build.classes.dir}/${name.biojava}" />
-    <property name="build.docs.biojava"     value="${build.dest.docs}/${name.biojava}" />
-    <property name="build.doccheck.biojava" value="${build.dest.doccheck}/${name.biojava}" />
-    <property name="jar.biojava"            value="${build.dir}/${name.biojava}.jar" />
-    <property name="manifest.file.biojava"  value="${manifest.dir}/${name.biojava}.txt" />
-    <!-- Subdirectories for tests source and classes -->
-    <property name="name.tests"       value="tests" />
-    <property name="build.dest.tests" value="${build.classes.dir}/${name.tests}" />
-    <property name="build.docs.tests" value="${build.dest.docs}/${name.tests}" />
-    <property name="reports.tests"    value="./reports/tests" />
-    <!-- Subdirectories for demos source and classes -->
-    <property name="name.demos"          value="demos" />
-    <property name="Name.demos"          value="BioJava Demos" />
-    <property name="build.dest.demos"    value="${build.classes.dir}/${name.demos}" />
-    <property name="build.docs.demos"    value="${build.dest.docs}/${name.demos}" />
-    <property name="jar.demos"           value="${build.dir}/${name.demos}.jar" />
-    <property name="manifest.file.demos" value="${manifest.dir}/${name.demos}.txt" />
-    <!-- Subdirectories for apps source and classes -->
-    <property name="name.apps"          value="apps" />
-    <property name="Name.apps"          value="BioJava Applications" />
-    <property name="build.dest.apps"    value="${build.classes.dir}/${name.apps}" />
-    <property name="build.docs.apps"    value="${build.dest.docs}/${name.apps}" />
-    <property name="jar.apps"           value="${build.dir}/${name.apps}.jar" />
-    <property name="manifest.file.apps" value="${manifest.dir}/${name.apps}.txt" />
-    <!-- Subdirectory for taglets -->
-    <property name="name.taglets"       value="taglets" />
-    <property name="Name.taglets"       value="BioJava Taglets" />
-    <property name="build.dest.taglets" value="${build.classes.dir}/${name.taglets}" />
-    <property name="build.docs.taglets" value="${build.dest.docs}/${name.taglets}" />
+		<!-- Subdirectories for main source and classes -->
+		<property name="name.biojava"           value="biojava" />
+		<property name="Name.biojava"           value="BioJava" />
+		<property name="build.dest.biojava"     value="${build.classes.dir}/${name.biojava}" />
+		<property name="build.docs.biojava"     value="${build.dest.docs}/${name.biojava}" />
+		<property name="build.doccheck.biojava" value="${build.dest.doccheck}/${name.biojava}" />
+		<property name="jar.biojava"            value="${build.dir}/${name.biojava}.jar" />
+		<property name="manifest.file.biojava"  value="${manifest.dir}/${name.biojava}.txt" />
 
-    <property name="dist.root"          value="./dist" />
-    <property name="dist.dir"           value="${dist.root}/${name.biojava}-${version}" />
-  </target>
+		<!-- Subdirectories for tests source and classes -->
+		<property name="name.tests"       value="tests" />
+		<property name="build.dest.tests" value="${build.classes.dir}/${name.tests}" />
+		<property name="build.docs.tests" value="${build.dest.docs}/${name.tests}" />
+		<property name="reports.tests"    value="./reports/tests" />
+
+		<!-- Subdirectories for demos source and classes -->
+		<property name="name.demos"          value="demos" />
+		<property name="Name.demos"          value="BioJava Demos" />
+		<property name="build.dest.demos"    value="${build.classes.dir}/${name.demos}" />
+		<property name="build.docs.demos"    value="${build.dest.docs}/${name.demos}" />
+		<property name="jar.demos"           value="${build.dir}/${name.demos}.jar" />
+		<property name="manifest.file.demos" value="${manifest.dir}/${name.demos}.txt" />
+
+		<!-- Subdirectories for apps source and classes -->
+		<property name="name.apps"          value="apps" />
+		<property name="Name.apps"          value="BioJava Applications" />
+		<property name="build.dest.apps"    value="${build.classes.dir}/${name.apps}" />
+		<property name="build.docs.apps"    value="${build.dest.docs}/${name.apps}" />
+		<property name="jar.apps"           value="${build.dir}/${name.apps}.jar" />
+		<property name="manifest.file.apps" value="${manifest.dir}/${name.apps}.txt" />
+
+		<!-- Subdirectory for taglets -->
+		<property name="name.taglets"       value="taglets" />
+		<property name="Name.taglets"       value="BioJava Taglets" />
+		<property name="build.dest.taglets" value="${build.classes.dir}/${name.taglets}" />
+		<property name="build.docs.taglets" value="${build.dest.docs}/${name.taglets}" />
+
+		<!-- Subdirectory for creating a distribution -->
+		<property name="dist.root"          value="./dist" />
+		<property name="dist.dir"           value="${dist.root}/${name.biojava}-${version}" />
+
+	</target>
 
 
-  <!--
+	<!--
     Prepare each part of the project.
 
     Each preparation creates working directories and copies files over.
   -->
 
-  <!-- Prepares the basic stuff -->
-  <target name="prepare" depends="init" description="creates basic directories">
-    <!-- Creates directories -->
-    <mkdir dir="${build.dir}" />
+	<!-- Prepares the basic stuff -->
+	<target name="prepare" depends="init" description="creates basic directories">
+		<!-- Creates directories -->
+		<mkdir dir="${build.dir}" />
 
-    <!-- Copies jars -->
-    <copy todir="${build.dir}">
-      <fileset dir=".">
-        <include name="*.jar" />
-      </fileset>
-    </copy>
+		<!-- Copies jars -->
+		<copy todir="${build.dir}">
+			<fileset dir=".">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
 
-  </target>
+	</target>
 
-  <!-- Copies taglet files -->
-  <target name="prepare-taglets" depends="prepare" description="Copies taglet files">
-    <mkdir dir="${build.dest.taglets}" />
-    <mkdir dir="${build.docs.taglets}" />
-  </target>
+	<!-- Copies taglet files -->
+	<target name="prepare-taglets" depends="prepare" description="Copies taglet files">
+		<mkdir dir="${build.dest.taglets}" />
+		<mkdir dir="${build.docs.taglets}" />
+	</target>
 
-  <!-- Prepares the biojava source code -->
-  <target name="prepare-biojava" depends="prepare"
+	<!-- Prepares the biojava source code -->
+	<target name="prepare-biojava" depends="prepare"
   description="Prepares biojava source files">
-    <!-- Creates directories -->
-    <mkdir dir="${build.dest.biojava}" />
-    <mkdir dir="${build.docs.biojava}" />
-    <mkdir dir="${build.doccheck.biojava}" />
-  </target>
+		<!-- Creates directories -->
+		<mkdir dir="${build.dest.biojava}" />
+		<mkdir dir="${build.docs.biojava}" />
+		<mkdir dir="${build.doccheck.biojava}" />
+	</target>
 
-  <!-- Prepares the test source code -->
-  <target name="prepare-tests" depends="prepare"
+	<!-- Prepares the test source code -->
+	<target name="prepare-tests" depends="prepare"
   description="Prepares the test source code">
 
-    <!-- Creates directories -->
-    <mkdir dir="${build.dest.tests}" />
-    <mkdir dir="${build.docs.tests}" />
-    <mkdir dir="${reports.tests}" />
-  </target>
+		<!-- Creates directories -->
+		<mkdir dir="${build.dest.tests}" />
+		<mkdir dir="${build.docs.tests}" />
+		<mkdir dir="${reports.tests}" />
+	</target>
 
-  <!-- Prepares the demos code -->
-  <target name="prepare-demos" depends="prepare"
+	<!-- Prepares the demos code -->
+	<target name="prepare-demos" depends="prepare"
   description="Prepares the demos code">
 
-    <!-- Creates directories -->
-    <mkdir dir="${build.dest.demos}" />
-    <mkdir dir="${build.docs.demos}" />
-  </target>
+		<!-- Creates directories -->
+		<mkdir dir="${build.dest.demos}" />
+		<mkdir dir="${build.docs.demos}" />
+	</target>
 
-  <!-- Prepares the apps code -->
-  <target name="prepare-apps" depends="prepare"
+	<!-- Prepares the apps code -->
+	<target name="prepare-apps" depends="prepare"
   description="Prepares the apps code">
 
-    <!-- Creates directories -->
-    <mkdir dir="${build.dest.apps}" />
-    <mkdir dir="${build.docs.apps}" />
-  </target>
+		<!-- Creates directories -->
+		<mkdir dir="${build.dest.apps}" />
+		<mkdir dir="${build.docs.apps}" />
+	</target>
 
-  <!-- Prepares the javadocs -->
-  <target name="prepare-javadocs" depends="prepare" description="Prepares the javadocs">
+	<!-- Prepares the javadocs -->
+	<target name="prepare-javadocs" depends="prepare" description="Prepares the javadocs">
 
-    <!-- Creates directories -->
-    <mkdir dir="${build.dest.docs}" />
-  </target>
+		<!-- Creates directories -->
+		<mkdir dir="${build.dest.docs}" />
+	</target>
 
-  
 
-  <!--
+
+	<!--
     Compile each part of the project.
 
     This runs javac or any other tasks necisary to turn the source code into
     .class files.
   -->
 
-  <!-- Compiles the taglets directory -->
-  <target name="compile-taglets" depends="init,prepare-taglets"
+	<!-- Compiles the taglets directory -->
+	<target name="compile-taglets" depends="init,prepare-taglets"
   description="Compiles the taglets directory">
-    <javac
+		<javac
       encoding="ISO-8859-1"
       srcdir="${taglets.dir}"
       destdir="${build.dest.taglets}"
@@ -246,16 +255,16 @@
       source="${javac.source}"
       target="${javac.target}"
       debug="${javac.debug}">
-      <classpath>
-        <pathelement path="${classpath}" />
-      </classpath>
-    </javac>
-  </target>
+			<classpath>
+				<pathelement path="${classpath}" />
+			</classpath>
+		</javac>
+	</target>
 
-  <!-- Compiles the source directory -->
-  <target name="compile-biojava" depends="prepare-biojava"
+	<!-- Compiles the source directory -->
+	<target name="compile-biojava" depends="prepare-biojava"
   description="Compiles the source directory">
-    <javac
+		<javac
       encoding="ISO-8859-1"
       srcdir="${src.dir}"
       destdir="${build.dest.biojava}"
@@ -264,16 +273,16 @@
       source="${javac.source}"
       target="${javac.target}"
       debug="${javac.debug}">
-      <classpath>
-        <pathelement path="${classpath}" />
-      </classpath>
-    </javac>
-  </target>
+			<classpath>
+				<pathelement path="${classpath}" />
+			</classpath>
+		</javac>
+	</target>
 
-  <!-- Compiles the tests directory -->
-  <target name="compile-tests" depends="prepare-tests,package-biojava"
+	<!-- Compiles the tests directory -->
+	<target name="compile-tests" depends="prepare-tests,package-biojava"
   description="Compiles the tests directory">
-    <javac
+		<javac
       encoding="ISO-8859-1"
       srcdir="${tests.dir}"
       destdir="${build.dest.tests}"
@@ -282,17 +291,17 @@
       source="${javac.source}"
       target="${javac.target}"
       debug="${javac.debug}">
-      <classpath>
-        <pathelement path="${classpath}" />
-        <pathelement path="${jar.biojava}" />
-      </classpath>
-    </javac>
-  </target>
+			<classpath>
+				<pathelement path="${classpath}" />
+				<pathelement path="${jar.biojava}" />
+			</classpath>
+		</javac>
+	</target>
 
-  <!-- Compiles the demos directory -->
-  <target name="compile-demos" depends="prepare-demos,package-biojava"
+	<!-- Compiles the demos directory -->
+	<target name="compile-demos" depends="prepare-demos,package-biojava"
   description="Compiles the demos directory">
-    <javac
+		<javac
       encoding="ISO-8859-1"
       srcdir="${demos.dir}"
       destdir="${build.dest.demos}"
@@ -301,17 +310,17 @@
       source="${javac.source}"
       target="${javac.target}"
       debug="${javac.debug}">
-      <classpath>
-        <pathelement path="${classpath}" />
-        <pathelement path="${jar.biojava}" />
-      </classpath>
-    </javac>
-  </target>
+			<classpath>
+				<pathelement path="${classpath}" />
+				<pathelement path="${jar.biojava}" />
+			</classpath>
+		</javac>
+	</target>
 
-  <!-- Compiles the apps directory -->
-  <target name="compile-apps" depends="prepare-apps,package-biojava"
+	<!-- Compiles the apps directory -->
+	<target name="compile-apps" depends="prepare-apps,package-biojava"
   description="Compiles the apps directory">
-    <javac
+		<javac
       encoding="ISO-8859-1"
       srcdir="${apps.dir}"
       destdir="${build.dest.apps}"
@@ -320,94 +329,94 @@
       source="${javac.source}"
       target="${javac.target}"
       debug="${javac.debug}">
-      <classpath>
-        <pathelement path="${classpath}" />
-        <pathelement path="${jar.biojava}" />
-      </classpath>
-    </javac>
-  </target>
+			<classpath>
+				<pathelement path="${classpath}" />
+				<pathelement path="${jar.biojava}" />
+			</classpath>
+		</javac>
+	</target>
 
 
-  <!--
+	<!--
     Creates the .jar files containing each distributable component.
 
     This probably just jars up the .class files and any resources as well as
     a manifest for each distributable component.
   -->
 
-  <!-- Creates the biojava package (tests are left in the parallel tree) -->
+	<!-- Creates the biojava package (tests are left in the parallel tree) -->
 
 
-  <target name="package-biojava" depends="compile-biojava"
+	<target name="package-biojava" depends="compile-biojava"
   description="create biojava class jar file">
-    <jar
+		<jar
       jarfile="${jar.biojava}"
       manifest="${manifest.dir}/biojava.txt"
     >
-      <fileset dir="${build.dest.biojava}" />
-      <fileset dir="${resources.dir}" />
-    </jar>
-  </target>
+			<fileset dir="${build.dest.biojava}" />
+			<fileset dir="${resources.dir}" />
+		</jar>
+	</target>
 
-  <!-- Create the demo package -->
-  <target name="package-demos" depends="init,package-biojava,compile-demos"
+	<!-- Create the demo package -->
+	<target name="package-demos" depends="init,package-biojava,compile-demos"
   description="create the demo jar file">
-    <jar
+		<jar
       jarfile="${jar.demos}"
       manifest="${manifest.dir}/demos.txt"
     >
-      <fileset dir="${build.dest.demos}" />
-    </jar>
-  </target>
+			<fileset dir="${build.dest.demos}" />
+		</jar>
+	</target>
 
-  <!-- Create the apps package -->
-  <target name="package-apps" depends="init,package-biojava,compile-apps"
+	<!-- Create the apps package -->
+	<target name="package-apps" depends="init,package-biojava,compile-apps"
   description="create the apps jar file">
-    <jar
+		<jar
       jarfile="${jar.apps}"
       manifest="${manifest.dir}/apps.txt"
     >
-      <fileset dir="${build.dest.apps}" />
-    </jar>
-  </target>
+			<fileset dir="${build.dest.apps}" />
+		</jar>
+	</target>
 
 
-  <target
+	<target
     name="package-all"
     depends="package-biojava,package-demos,package-apps"
     description="create all the jar files" />
 
- <!-- sign the biojava.jar file -->
- <target
+	<!-- sign the biojava.jar file -->
+	<target
     name="sign"
     depends="package-biojava"
     description="sign the biojava.jar file with jarsigner"
     >
 
-    <copy file="${jar.biojava}" tofile="${build.dir}/biojavaUnsigned.jar" />
+		<copy file="${jar.biojava}" tofile="${build.dir}/biojavaUnsigned.jar" />
 
-    <signjar jar="${build.dir}/biojavaUnsigned.jar"
+		<signjar jar="${build.dir}/biojavaUnsigned.jar"
              signedjar="${jar.biojava}"
-             keystore="selfSignedCertificate/selfSignedCertificate.store"
+             keystore="${signature.dir}/selfSignedCertificate.store"
              storepass="biojavaCVS" 
 	     alias="biojavaCVS" />
 
-     <!-- to verify that a .jar file is signed: jarsigner -verify biojava.jar -->
-     
-     <delete file="${build.dir}/biojavaUnsigned.jar"/>
+		<!-- to verify that a .jar file is signed: jarsigner -verify biojava.jar -->
 
-  </target>
+		<delete file="${build.dir}/biojavaUnsigned.jar"/>
 
-  <!--
+	</target>
+
+	<!--
     Create Javadoc and other documentation for each distribution package.
 
     This probably just calls javadoc, but may call other documentation gubbins.
   -->
 
-  <!-- Create taglet API documentation -->
-  <target name="javadocs-taglets" depends="prepare-taglets"
+	<!-- Create taglet API documentation -->
+	<target name="javadocs-taglets" depends="prepare-taglets"
   description="Create taglet API documentation">
-    <javadoc
+		<javadoc
       encoding="ISO-8859-1"
       sourcepath="${taglets.dir}"
       classpath="${classpath}:${java.home}/../lib/tools.jar"
@@ -419,16 +428,16 @@
       windowtitle="${Name.taglets} API"
       doctitle="${Name.taglets}"
       maxmemory="96m">
-      <fileset dir="${taglets.dir}" />
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false" />
-      <link href="http://java.sun.com/j2se/1.5.0/docs/tooldocs/javadoc/doclet/"  offline="false"/>
-    </javadoc>
-  </target>
+			<fileset dir="${taglets.dir}" />
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false" />
+			<link href="http://java.sun.com/j2se/1.5.0/docs/tooldocs/javadoc/doclet/"  offline="false"/>
+		</javadoc>
+	</target>
 
-  <!-- Creates the API documentation -->
-  <target name="javadocs-biojava" depends="prepare-biojava,compile-taglets"
+	<!-- Creates the API documentation -->
+	<target name="javadocs-biojava" depends="prepare-biojava,compile-taglets"
   description="Creates the API documentation">
-    <javadoc
+		<javadoc
       encoding="ISO-8859-1"
       packagenames="${packages}"
       sourcepath="${src.dir}"
@@ -441,60 +450,60 @@
       windowtitle="${Name.biojava}-${version} API"
       doctitle="${Name.biojava}-${version}"
       maxmemory="192m">
-       <link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false"/>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false"/>
 
-       <group title="Core biological packages"
+			<group title="Core biological packages"
               packages="org.biojava.bio:org.biojava.bio.dist:org.biojava.bio.search:org.biojava.bio.seq:org.biojava.bio.seq.db:org.biojava.bio.seq.genomic:org.biojava.bio.seq.io:org.biojava.bio.symbol:org.biojava.bio.alignment:org.biojava.directory:org.biojava.bibliography:org.biojava.bio.taxa:org.biojava.bio.seq.filter" />
 
-       <group title="User interface components"
+			<group title="User interface components"
               packages="org.biojava.bio.gui:org.biojava.bio.gui.glyph:org.biojava.bio.gui.sequence:org.biojava.bio.gui.sequence.tracklayout" />
 
-       <group title="Sequence databases and formats"
+			<group title="Sequence databases and formats"
               packages="org.biojava.bio.seq.io.agave:org.biojava.bio.program.das:org.biojava.bio.seq.ragbag:org.biojava.bio.seq.db.emblcd:org.biojava.bio.program.xff:org.biojava.bio.seq.dist:org.biojava.bio.seq.io.game:org.biojava.bio.seq.io.game12:org.biojava.bio.seq.db.biofetch:org.biojava.bio.seq.db.flat:org.biojava.bio.seq.db.biosql:org.biojava.bio.program.indexdb:org.biojava.bio.program.das.dasalignment:org.biojava.bio.program.homologene" />
 
-       <group title="Handling output from external tools"
+			<group title="Handling output from external tools"
               packages="org.biojava.bio.program:org.biojava.bio.program.gff:org.biojava.bio.program.gff3:org.biojava.bio.program.sax:org.biojava.bio.program.xml:org.biojava.bio.program.blast2html:org.biojava.bio.program.search:org.biojava.bio.program.ssbind:org.biojava.bio.program.phred:org.biojava.bio.program.hmmer:org.biojava.bio.program.sax.blastxml" />
 
-       <group title="Dynamic programming packages"
+			<group title="Dynamic programming packages"
               packages="org.biojava.bio.dp:org.biojava.bio.dp.onehead:org.biojava.bio.dp.twohead" />
 
-       <group title="Chromatogram and trace file support"
+			<group title="Chromatogram and trace file support"
               packages="org.biojava.bio.chromatogram:org.biojava.bio.program.abi:org.biojava.bio.program.scf:org.biojava.bio.chromatogram.graphic" />
 
-       <group title="Macromolecular structure"
-              packages="org.biojava.bio.structure:org.biojava.bio.structure.io:org.biojava.bio.program.das.dasstructure:org.biojava.bio.structure.align:org.biojava.bio.structure.align.helper:org.biojava.bio.structure.align.pairwise:org.biojava.bio.structure.jama" />    
-              
-       <group title="Utilities and developers' packages"
+			<group title="Macromolecular structure"
+              packages="org.biojava.bio.structure:org.biojava.bio.structure.io:org.biojava.bio.program.das.dasstructure:org.biojava.bio.structure.align:org.biojava.bio.structure.align.helper:org.biojava.bio.structure.align.pairwise:org.biojava.bio.structure.jama" />
+
+			<group title="Utilities and developers' packages"
               packages="org.biojava.utils.process:org.biojava.bio.seq.impl:org.biojava.bio.seq.projection:org.biojava.utils:org.biojava.utils.cache:org.biojava.utils.xml:org.biojava.utils.stax:org.biojava.utils.io:org.biojava.utils.math:org.biojava.utils.net:org.biojava.utils.candy:org.biojava.bio.seq.io.filterxml:org.biojava.bio.program.tagvalue:org.biojava.ontology:org.biojava.ontology.io:org.biojava.utils.automata:org.biojava.utils.regex:org.biojava.naming:org.biojava.utils.walker" />
 
-       <group title="Molecular biology packages"
+			<group title="Molecular biology packages"
               packages = "org.biojava.bio.proteomics:org.biojava.bio.proteomics.aaindex:org.biojava.bio.molbio" />
-              
-       <group title="Ontology packages"
+
+			<group title="Ontology packages"
               packages = "org.biojava.bio.ontology:org.biojava.bio.ontology.io"/>
-                      
-       <group title="Experimental packages"
+
+			<group title="Experimental packages"
               packages="org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.utils.lsid:org.biojava.bio.program.unigene:org.biojava.bio.program.ssaha:org.biojava.bio.seq.distributed:org.biojava.bio.annodb:org.biojava.bio.program.formats" />
 
-       <group title="Biojava extension (biojavax) packages"
+			<group title="Biojava extension (biojavax) packages"
               packages="org.biojavax:org.biojavax.bio:org.biojavax.bio.db:org.biojavax.bio.db.biosql:org.biojavax.bio.db.ncbi:org.biojavax.bio.seq:org.biojavax.bio.seq.io:org.biojavax.bio.taxa:org.biojavax.bio.taxa.io:org.biojavax.ontology:org.biojavax.utils" />
-              
-       <group title="Genetic Algorithm Framework"
-              packages="org.biojavax.ga:org.biojavax.ga.exception:org.biojavax.ga.functions:org.biojavax.ga.impl:org.biojavax.ga.util" />
-       <group title="Experimental Phylogeny packages"
-              packages="org.biojavax.bio.phylo:org.biojavax.bio.phylo.io:org.biojavax.bio.phylo.io.nexus:org.biojavax.bio.phylo.io.phylip:org.biojavax.bio.phylo.tree" />
-       
-      <taglet name="UserLevel" path="${build.dest.taglets}" />
-      <taglet name="MetaData" path="${build.dest.taglets}:${classpath}:${jar.biojava}" />
-      <taglet name="Useage" path="${build.dest.taglets}"/>
-      <taglet name="Option" path="${build.dest.taglets}"/>
-    </javadoc>
-  </target>
 
-  <!-- Create demos API documentation -->
-  <target name="javadocs-demos" depends="prepare-demos,compile-biojava,compile-taglets"
+			<group title="Genetic Algorithm Framework"
+              packages="org.biojavax.ga:org.biojavax.ga.exception:org.biojavax.ga.functions:org.biojavax.ga.impl:org.biojavax.ga.util" />
+			<group title="Experimental Phylogeny packages"
+              packages="org.biojavax.bio.phylo:org.biojavax.bio.phylo.io:org.biojavax.bio.phylo.io.nexus:org.biojavax.bio.phylo.io.phylip:org.biojavax.bio.phylo.tree" />
+
+			<taglet name="UserLevel" path="${build.dest.taglets}" />
+			<taglet name="MetaData" path="${build.dest.taglets}:${classpath}:${jar.biojava}" />
+			<taglet name="Useage" path="${build.dest.taglets}"/>
+			<taglet name="Option" path="${build.dest.taglets}"/>
+		</javadoc>
+	</target>
+
+	<!-- Create demos API documentation -->
+	<target name="javadocs-demos" depends="prepare-demos,compile-biojava,compile-taglets"
   description="Create the demos API documentation">
-    <javadoc
+		<javadoc
       encoding="ISO-8859-1"
       packagenames="**"
       sourcepath="${demos.dir}"
@@ -507,19 +516,19 @@
       windowtitle="${Name.demos} API"
       doctitle="${Name.demos}"
       maxmemory="96m">
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false"/>
-      <link href="../biojava" offline="true" packagelistLoc="${build.docs.biojava}/package-list}"/>
-      <taglet name="UserLevel" path="${build.dest.taglets}" />
-      <taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
-      <taglet name="Useage" path="${build.dest.taglets}"/>
-      <taglet name="Option" path="${build.dest.taglets}"/>
-    </javadoc>
-  </target>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false"/>
+			<link href="../biojava" offline="true" packagelistLoc="${build.docs.biojava}/package-list}"/>
+			<taglet name="UserLevel" path="${build.dest.taglets}" />
+			<taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
+			<taglet name="Useage" path="${build.dest.taglets}"/>
+			<taglet name="Option" path="${build.dest.taglets}"/>
+		</javadoc>
+	</target>
 
-  <!-- Create apps API documentation -->
-  <target name="javadocs-apps" depends="prepare-apps,compile-biojava,compile-taglets"
+	<!-- Create apps API documentation -->
+	<target name="javadocs-apps" depends="prepare-apps,compile-biojava,compile-taglets"
   description="Create the apps API documentation">
-    <javadoc
+		<javadoc
       encoding="ISO-8859-1"
       packagenames="org.*"
       sourcepath="${apps.dir}"
@@ -532,63 +541,63 @@
       windowtitle="${Name.apps} API"
       doctitle="${Name.apps}"
       maxmemory="96m">
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false"/>
-      <link href="../biojava" offline="true" packagelistLoc="${build.docs.biojava}/package-list}"/>
-      <taglet name="UserLevel" path="${build.dest.taglets}" />
-      <taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
-      <taglet name="Useage" path="${build.dest.taglets}"/>
-      <taglet name="Option" path="${build.dest.taglets}"/>
-      <taglet name="Values" path="${build.dest.taglets}"/>
-    </javadoc>
-  </target>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false"/>
+			<link href="../biojava" offline="true" packagelistLoc="${build.docs.biojava}/package-list}"/>
+			<taglet name="UserLevel" path="${build.dest.taglets}" />
+			<taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
+			<taglet name="Useage" path="${build.dest.taglets}"/>
+			<taglet name="Option" path="${build.dest.taglets}"/>
+			<taglet name="Values" path="${build.dest.taglets}"/>
+		</javadoc>
+	</target>
 
-  
 
-  <target
+
+	<target
     name="javadocs-all"
     depends="javadocs-taglets,javadocs-biojava,javadocs-demos,javadocs-apps"
     description="Creates the javadocs for all components"
   />
 
 
-  <!-- Runs tests if the Ant optional JUnit support is available -->
-  <target name="runtests" 
+	<!-- Runs tests if the Ant optional JUnit support is available -->
+	<target name="runtests" 
   	  depends="compile-tests"
   	  description="Run all tests, can be quite slow">
-    <property name="test.subtree" value="**" />
-    <echo message="Running tests:           ${test.subtree}" />
-    <junit maxmemory="128m" printsummary="yes" haltonfailure="no" reloading="no">
-      <formatter type="plain" usefile="true" />
-      <classpath>
-        <!-- main classes from build -->
-        <pathelement path="${build.dest.biojava}" />
-        <!-- resources -->
-        <pathelement path="${resources.dir}" />
-        <!-- test classes from build -->
-        <pathelement path="${build.dest.tests}" />
-        <!-- test data from build -->
-        <pathelement path="${tests.dir}/files" />
-        <!-- currently the move isn't complete -->
-        <pathelement path="${tests.dir}" />
-        <!-- classes specified in this file -->
-        <pathelement path="${classpath}" />
-        <!-- classes specified in system classpath -->
-        <pathelement path="${java.class.path}" />
-      </classpath>
-      <!-- The junit task doesn't support 'if' so we test for JUnit here -->
-      <batchtest fork="no" todir="${reports.tests}" if="junit.present">
-        <fileset dir="${build.dest.tests}">
-          <include name="${test.subtree}/*Test.class" />
-          <include name="${test.subtree}/*TestSuite.class" />
-          <exclude name="**/Abstract*Test.class" />
-        </fileset>
-      </batchtest>
-    </junit>
-  </target>
+		<property name="test.subtree" value="**" />
+		<echo message="Running tests:           ${test.subtree}" />
+		<junit maxmemory="128m" printsummary="yes" haltonfailure="no" reloading="no">
+			<formatter type="plain" usefile="true" />
+			<classpath>
+				<!-- main classes from build -->
+				<pathelement path="${build.dest.biojava}" />
+				<!-- resources -->
+				<pathelement path="${resources.dir}" />
+				<!-- test classes from build -->
+				<pathelement path="${build.dest.tests}" />
+				<!-- test data from build -->
+				<pathelement path="${tests.dir}/files" />
+				<!-- currently the move isn't complete -->
+				<pathelement path="${tests.dir}" />
+				<!-- classes specified in this file -->
+				<pathelement path="${classpath}" />
+				<!-- classes specified in system classpath -->
+				<pathelement path="${java.class.path}" />
+			</classpath>
+			<!-- The junit task doesn't support 'if' so we test for JUnit here -->
+			<batchtest fork="no" todir="${reports.tests}" if="junit.present">
+				<fileset dir="${build.dest.tests}">
+					<include name="${test.subtree}/*Test.class" />
+					<include name="${test.subtree}/*TestSuite.class" />
+					<exclude name="**/Abstract*Test.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
 
-  <target name="doccheck-biojava" depends="prepare-biojava"
+	<target name="doccheck-biojava" depends="prepare-biojava"
     description="Checks the API documentation">
-    <javadoc
+		<javadoc
       encoding="ISO-8859-1"
       doclet="com.sun.tools.doclets.doccheck.DocCheck"
       docletpath="doccheck.jar"
@@ -598,143 +607,211 @@
       destdir="${build.doccheck.biojava}"
       source="1.5"
       maxmemory="96m">
-    </javadoc>
-  </target>
+		</javadoc>
+	</target>
 
-  <!-- Runs the CruiseControl checks only needed for admins who want to trace the compile state of biojava -->
-  <!-- does the same as runtests, but with XML output, so CruiseControl can parse the outcome -->
-  <target name="cruise" 
+	<!-- Runs the CruiseControl checks only needed for admins who want to trace the compile state of biojava -->
+	<!-- does the same as runtests, but with XML output, so CruiseControl can parse the outcome -->
+	<target name="cruise" 
           depends="clean,package-biojava,compile-tests"
           description="Run clean, build and tests for CruiseControl">
-    <property name="test.subtree" value="**" />
-    <echo message="Running tests:           ${test.subtree}" />
-    <junit 	maxmemory="128m" 
+		<property name="test.subtree" value="**" />
+		<echo message="Running tests:           ${test.subtree}" />
+		<junit 	maxmemory="128m" 
     		printsummary="yes" 
 		haltonfailure="no" 
 		reloading="no"
 		errorProperty="test.failed"
 		>
-      <formatter type="xml" />
-      <classpath>
-        <!-- main classes from build -->
-        <pathelement path="${build.dest.biojava}" />
-        <!-- resources -->
-        <pathelement path="${resources.dir}" />
-        <!-- test classes from build -->
-        <pathelement path="${build.dest.tests}" />
-        <!-- test data from build -->
-        <pathelement path="${tests.dir}/files" />
-        <!-- currently the move isn't complete -->
-        <pathelement path="${tests.dir}" />
-        <!-- classes specified in this file -->
-        <pathelement path="${classpath}" />
-        <!-- classes specified in system classpath -->
-        <pathelement path="${java.class.path}" />
-      </classpath>
-      <!-- The junit task doesn't support 'if' so we test for JUnit here -->
-      <batchtest fork="no" todir="${reports.tests}" if="junit.present">
-        <fileset dir="${build.dest.tests}">
-          <include name="${test.subtree}/*Test.class" />
-          <include name="${test.subtree}/*TestSuite.class" />
-          <exclude name="**/Abstract*Test.class" />
-        </fileset>
-      </batchtest>      
-    </junit>
-    <fail message="Tests failed: check test reports." if="test.failed" />
-  </target>
+			<formatter type="xml" />
+			<classpath>
+				<!-- main classes from build -->
+				<pathelement path="${build.dest.biojava}" />
+				<!-- resources -->
+				<pathelement path="${resources.dir}" />
+				<!-- test classes from build -->
+				<pathelement path="${build.dest.tests}" />
+				<!-- test data from build -->
+				<pathelement path="${tests.dir}/files" />
+				<!-- currently the move isn't complete -->
+				<pathelement path="${tests.dir}" />
+				<!-- classes specified in this file -->
+				<pathelement path="${classpath}" />
+				<!-- classes specified in system classpath -->
+				<pathelement path="${java.class.path}" />
+			</classpath>
+			<!-- The junit task doesn't support 'if' so we test for JUnit here -->
+			<batchtest fork="no" todir="${reports.tests}" if="junit.present">
+				<fileset dir="${build.dest.tests}">
+					<include name="${test.subtree}/*Test.class" />
+					<include name="${test.subtree}/*TestSuite.class" />
+					<exclude name="**/Abstract*Test.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<fail message="Tests failed: check test reports." if="test.failed" />
+	</target>
 
-  
-  <!-- Cleans everything -->
-  <target name="clean" 
+
+	<!-- Cleans everything -->
+	<target name="clean" 
   	  depends="init"
   	  description="Cleans everything">
-    <delete dir="${build.dir}" />
-    <delete dir="${reports.tests}" />
-  </target>
-  
-  <!-- Cleans the dist directory -->
-  <target name="clean-dist" depends="init" description="Cleans the dist root directory">
-      <delete dir="${dist.root}" />
-  </target>
-  
-  
-  <!-- This task is mainly for BioJava admins to build a distribution, not needed for normal use -->
-  <target name="dist" depends="clean-dist, init, javadocs-all, package-all" description="copy all the files for a distribution">
-      <mkdir dir="${dist.root}"/>
-      <mkdir dir="${dist.dir}"/>
-      
-     <!-- copy the biojava-jar -->
-      <copy file="${jar.biojava}" tofile="${dist.dir}/${name.biojava}-${version}.jar"/>
-      
-      <!-- copy the apps-jar -->
-      <copy file="${jar.apps}" tofile="${dist.dir}/apps-${version}.jar"/>
-      
-      <!-- copy the demos.jar -->
-      <copy file="${jar.demos}" tofile="${dist.dir}/demos-${version}.jar"/>
-      
-      <!-- copy the other jars -->
-      <copy todir="${dist.dir}">
-        <fileset dir=".">
-          <include name="*.jar" />
-        </fileset>
-      </copy>
-      
-      <!-- copy the docs -->
-      <copy todir="${dist.dir}/doc">
-          <fileset dir="${build.dest.docs}"/>
-      </copy>
-      
-      <!-- copy biojava src -->
-      <copy todir="${dist.dir}/src">
-          <fileset dir="${src.dir}"/>
-      </copy>
-      
-      <!-- copy READMEs -->
-      <copy tofile="${dist.dir}/README" file="./README"/>
-      <copy tofile="${dist.dir}/README.biosql" file="./README.biosql"/>
-      
-      <!-- copy tests -->
-      <copy todir="${dist.dir}/tests">
-          <fileset dir="${tests.dir}"/>
-      </copy>
-      
-      <!-- copy demo src -->
-      <copy todir="${dist.dir}/demos">
-          <fileset dir="${demos.dir}"/>
-      </copy>
-      
-      <!-- copy apps src -->
-      <copy todir="${dist.dir}/apps">
-          <fileset dir="${apps.dir}"/>
-      </copy>
-      
-      <!-- copy licenses -->
-      <copy tofile="${dist.dir}/LICENSE" file="./LICENSE"/>
-      <copy tofile="${dist.dir}/LICENSE.COMMONS" file="./LICENSE.COMMONS"/>
-      
-      <!-- copy manifest -->
-      <copy todir="${dist.dir}/manifest">
-          <fileset dir="${manifest.dir}"/>
-      </copy>
-      
-      <!-- copy dtd -->
-      <copy todir="${dist.dir}/dtd">
-          <fileset dir="./dtd"/>
-      </copy>
-      
-      <!-- copy taglets -->
-      <copy todir="${dist.dir}/taglets">
-          <fileset dir="${taglets.dir}"/>
-      </copy>
-      
-      <!-- copy resources -->
-      <copy todir="${dist.dir}/resources">
-          <fileset dir="${resources.dir}"/>
-      </copy>
-      
-      <!-- copy this build file -->
-      <copy file="${ant.file}" tofile="${dist.dir}/build.xml"/>
-      
-  </target>
-  
+		<delete dir="${build.dir}" />
+		<delete dir="${reports.tests}" />
+	</target>
+
+	<!-- Cleans the dist directory -->
+	<target name="clean-dist" depends="init" description="Cleans the dist root directory">
+		<delete dir="${dist.root}" />
+	</target>
+
+
+	<!-- This task is mainly for BioJava admins to build a distribution, not needed for normal use -->
+	<target name="dist" depends="clean-dist, init, javadocs-all, package-all" description="copy all the files for a distribution">
+		<mkdir dir="${dist.root}"/>
+		<mkdir dir="${dist.dir}"/>
+
+		<!-- copy the biojava-jar -->
+		<copy file="${jar.biojava}" tofile="${dist.dir}/${name.biojava}-${version}.jar"/>
+
+		<!-- copy the apps-jar -->
+		<copy file="${jar.apps}" tofile="${dist.dir}/apps-${version}.jar"/>
+
+		<!-- copy the demos.jar -->
+		<copy file="${jar.demos}" tofile="${dist.dir}/demos-${version}.jar"/>
+
+		<!-- copy the other jars -->
+		<copy todir="${dist.dir}">
+			<fileset dir=".">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+
+		<!-- copy the docs -->
+		<copy todir="${dist.dir}/doc">
+			<fileset dir="${build.dest.docs}"/>
+		</copy>
+
+		<!-- copy biojava src -->
+		<copy todir="${dist.dir}/src">
+			<fileset dir="${src.dir}"/>
+		</copy>
+
+		<!-- copy READMEs -->
+		<copy tofile="${dist.dir}/README" file="./README"/>
+		<copy tofile="${dist.dir}/README.biosql" file="./README.biosql"/>
+
+		<!-- copy tests -->
+		<copy todir="${dist.dir}/tests">
+			<fileset dir="${tests.dir}"/>
+		</copy>
+
+		<!-- copy demo src -->
+		<copy todir="${dist.dir}/demos">
+			<fileset dir="${demos.dir}"/>
+		</copy>
+
+		<!-- copy apps src -->
+		<copy todir="${dist.dir}/apps">
+			<fileset dir="${apps.dir}"/>
+		</copy>
+
+		<!-- copy licenses -->
+		<copy tofile="${dist.dir}/LICENSE" file="./LICENSE"/>
+
+		<!-- why do this need this license? isn't all of BioJava LGPL? -->
+		<copy tofile="${dist.dir}/LICENSE.COMMONS" file="./LICENSE.COMMONS"/>
+
+		<!-- copy manifest -->
+		<copy todir="${dist.dir}/manifest">
+			<fileset dir="${manifest.dir}"/>
+		</copy>
+
+		<!-- copy dtd -->
+		<copy todir="${dist.dir}/dtd">
+			<fileset dir="./dtd"/>
+		</copy>
+
+		<!-- copy taglets -->
+		<copy todir="${dist.dir}/taglets">
+			<fileset dir="${taglets.dir}"/>
+		</copy>
+
+		<!-- copy resources -->
+		<copy todir="${dist.dir}/resources">
+			<fileset dir="${resources.dir}"/>
+		</copy>
+
+		<!-- copy this build file -->
+		<copy file="${ant.file}" tofile="${dist.dir}/build.xml"/>
+
+	</target>
+
+	<target name="dist-src" depends="clean-dist, init, prepare,javadocs-biojava"
+  	        description="create a jar file of the biojava source">
+
+		<mkdir dir="${dist.root}"/>
+		<mkdir dir="${dist.dir}"/>
+
+		<!-- copy biojava src -->
+		<copy todir="${dist.dir}/src">
+			<fileset dir="${src.dir}"/>
+		</copy>
+
+		<!-- copy resources -->
+		<copy todir="${dist.dir}/resources">
+			<fileset dir="${resources.dir}"/>
+		</copy>
+
+		<!-- copy this build file -->
+		<copy file="${ant.file}" tofile="${dist.dir}/build.xml"/>
+
+		<!-- copy licenses -->
+		<copy tofile="${dist.dir}/LICENSE" file="./LICENSE"/>		
+
+		<!-- copy manifest -->
+		<copy todir="${dist.dir}/manifest">
+			<fileset dir="${manifest.dir}"/>
+		</copy>
+
+
+		<!-- copy READMEs -->
+		<copy tofile="${dist.dir}/README" file="./README"/>
+		<copy tofile="${dist.dir}/README.biosql" file="./README.biosql"/>
+
+		<!-- copy tests -->
+		<copy todir="${dist.dir}/tests">
+			<fileset dir="${tests.dir}"/>
+		</copy>
+
+		<!-- copy the docs -->
+		<copy todir="${dist.dir}/doc">
+			<fileset dir="${build.dest.docs}"/>
+		</copy>
+		
+		<!-- jarsign -->
+		<copy todir="${dist.dir}/selfSignedCertificate">
+			<fileset dir="${signature.dir}"/>
+		</copy>
+
+
+		<!-- copy the jar files -->
+		<copy todir="${dist.dir}">
+			<fileset dir=".">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+
+
+		<jar
+	      jarfile="${build.dir}/biojava-src.jar"
+    	  manifest="${manifest.dir}/biojava.txt">
+			
+			<fileset dir="${dist.dir}" />
+
+		</jar>
+
+	</target>
+
 </project>
