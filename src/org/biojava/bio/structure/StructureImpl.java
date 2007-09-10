@@ -54,7 +54,7 @@ public class StructureImpl implements Structure {
 	List<Compound> compounds;
     List<DBRef> dbrefs;
 	String name ;
-
+	private PDBHeader pdbHeader;
 	boolean nmrflag ;
 
 
@@ -100,7 +100,7 @@ public class StructureImpl implements Structure {
 	/** returns an identical copy of this structure .
 	 * @return an identical Structure object     
 	 */
-	public Object clone() {
+	public Structure clone() {
 
 		Structure n = new StructureImpl();
 		// go through whole substructure and clone ...
@@ -110,7 +110,10 @@ public class StructureImpl implements Structure {
 
 		n.setPDBCode(getPDBCode());
 		n.setName(getName());
-		n.setHeader(getHeader());        
+		n.setHeader(getHeader());
+		//TODO: do deep copying of data!
+		n.setPDBHeader(pdbHeader);
+		n.setDBRefs(this.getDBRefs());
 		n.setConnections(getConnections());
 
 		// go through each chain and clone chain
@@ -332,7 +335,7 @@ public class StructureImpl implements Structure {
         
 		if ( isNmr() ) str.append( " models: "+nrModels()+newline) ;
 		
-        str.append(header) ;
+        str.append(pdbHeader.toString()) ;
 
         for (int i=0;i<nrModels();i++){
 			if (isNmr() ) str.append(" model["+i+"]:");
@@ -347,7 +350,7 @@ public class StructureImpl implements Structure {
 				List<Group> ngr = cha.getAtomGroups("nucleotide");
 
 				str.append("chain: >"+cha.getName()+"<");
-                str.append(" length SEQRES: " +cha.getLengthSeqRes());
+                str.append(" length SEQRES: " +cha.getSeqResLength());
 				str.append(" length ATOM: " +cha.getAtomLength());
 				str.append(" aminos: " +agr.size());
 				str.append(" hetatms: "+hgr.size());
@@ -508,6 +511,15 @@ public class StructureImpl implements Structure {
         this.dbrefs = dbrefs;
         
     }
+
+
+	public PDBHeader getPDBHeader() {
+		return pdbHeader;
+	}
+	
+	public void setPDBHeader(PDBHeader pdbHeader){
+		this.pdbHeader = pdbHeader;
+	}
 
 
 }

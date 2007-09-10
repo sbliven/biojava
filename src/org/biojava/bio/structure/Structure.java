@@ -106,14 +106,15 @@ A:
  * @since 1.4
  * @version %I% %G%
  */
-public interface Structure {
+public interface Structure extends Cloneable{
 	
-    /** returns an identical copy of this structure .
-     * @return an identical Structure object     
-     */
-    public Object clone();
-
     
+	/** returns an identical copy of this Structure object
+	 * 
+	 * @return identical copy of this Structure object
+	 */
+	public Structure clone();
+	
     /**
      * String representation of object.
      */
@@ -163,6 +164,8 @@ public interface Structure {
      *
      * @return a Map object representing the header value
      * @see #setHeader
+     * @deprecated use getPDBHeader instead
+     * @see #getPDBHeader
      */
     public Map<String,Object> getHeader() ;
 
@@ -416,31 +419,17 @@ public interface Structure {
     public Compound getCompoundById(String molId);
     
     
-    /** set the the SEQRES chains in the structure
-     * @param seqResList list of seqres chains
+    /** return the header information for this PDB file
      * 
-     *
+     * @return the PDBHeader object
      */
-   // public void setSeqRes(List<Chain> seqResList);
-    
-    
-    /** get the list of aminoacids as it is defined in the SEQRES Header lines.
-     * During parsing the SEQRES will be aligned against the ATOM records to map
-     * the biological sequences to the one which was actually possible to observe.
+    public PDBHeader getPDBHeader();
+
+    /** the the header information for this PDB file
      * 
-     * @return a list of chains
+     * @param header the PDBHeader object
      */
-    //public List<Chain> getSeqRes();
-    
-    /** request a Chain of sequence residues by its chain identifier
-     * 
-     * @param chainID
-     * @return the SEQRES chain with this ID
-     * @throws StructureException if no matchin chain is found
-     */
-   // public Chain getSeqResByPDB(String chainID) throws StructureException;
-    
-    
+    public void setPDBHeader(PDBHeader header);
     	
     
 }
