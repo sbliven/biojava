@@ -3,7 +3,6 @@ package org.biojava.bio.structure;
 import java.lang.reflect.Method;
 import java.util.Date;
 
-import org.biojava.bio.structure.server.FlatFileInstallation;
 
 /** a class that takes care of the Header information
  * 
@@ -43,11 +42,12 @@ public class PDBHeader {
                     Object o  = m.invoke(this, new Object[]{});
                     if ( o != null){
                         buf.append(name.substring(3,name.length()));
-                        if ( o instanceof Date) {
-                            buf.append(": " + FlatFileInstallation.dateFormat.format(o) + " ");     
-                        } else  {
-                            buf.append(": " + o + " ");
-                        }
+                        buf.append(": " + o + " ");
+                        //if ( o instanceof Date) {
+                        //    buf.append(": " + FlatFileInstallation.dateFormat.format(o) + " ");     
+                        //} else  {
+                        //    buf.append(": " + o + " ");
+                        //}
                     }
                 }
             }
