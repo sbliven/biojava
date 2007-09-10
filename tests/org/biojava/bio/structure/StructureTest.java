@@ -133,8 +133,28 @@ public class StructureTest extends TestCase {
 
 		assertEquals("the number of chain ids and chains did not match!",chainIds.size(),chains.size());
 		assertEquals("the chain ID did not match", chainIds.get(0),chains.get(0).getName());
+
+	
 	}
 
+	
+	public void testPDBHeader(){
+		Map<String, Object> m = structure.getHeader();
+		PDBHeader header = structure.getPDBHeader();
+		String classification = (String)m.get("classification");
+		assertTrue(classification.equals(header.getClassification()));
+
+		String idCode = (String)m.get("idCode");
+		assertTrue(idCode.equals(header.getIdCode()));
+		
+		Float resolution = (Float) m.get("resolution");
+		assertTrue(resolution.floatValue() == header.getResolution());
+		
+		String technique = (String) m.get("technique");
+		assertTrue(technique.equals(header.getTechnique()));
+				
+	}
+	
 	public void testCreateVirtualCBAtom(){
 
 		Group g1 = structure.getChain(0).getAtomGroup(11);
