@@ -285,7 +285,7 @@ public class ChainImpl implements Chain {
         return g.size() ;
     }
 
-    public int getLengthSeqRes() {
+    public int getSeqResLength() {
         //new method returns the length of the sequence defined in the SEQRES records
         return seqResGroups.size();
     }

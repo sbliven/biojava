@@ -124,7 +124,7 @@ public interface Chain {
      * @return an int representing the length of the whole chain including HETATMs
      * @deprecated please use getAtomLength or getLengthSeqRes instead
      * @see #getAtomLength()
-     * @see #getLengthSeqRes()
+     * @see #getSeqResLength()
      */
     public int getLength();
     
@@ -139,7 +139,7 @@ public interface Chain {
      * 
      * @return the length
      */
-    public int getLengthSeqRes();
+    public int getSeqResLength();
     
     /** returns the length of the AminoAcids in the ATOM records of this chain.
      * note: not all amino acids need to have 3D coords, in fact in could be that none
