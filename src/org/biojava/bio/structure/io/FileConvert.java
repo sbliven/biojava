@@ -193,10 +193,10 @@ public class FileConvert {
                 String chainID = chain.getName();
                 //if ( chainID.equals(DEFAULTCHAIN) ) chainID = " ";
                 // do for all groups
-                int nrGroups = chain.getLength();
+                int nrGroups = chain.getAtomLength();
                 for ( int h=0; h<nrGroups;h++){
                     
-                    Group g= chain.getGroup(h);
+                    Group g= chain.getAtomGroup(h);
                     String type = g.getType() ;
                     
                     String record = "" ;
@@ -325,8 +325,10 @@ public class FileConvert {
                 }
                 
                 //do for all groups:
-                for (int groupnr =0;groupnr<chain.getLength();groupnr++){
-                    Group gr = chain.getGroup(groupnr);
+                for (int groupnr =0;
+                        groupnr<chain.getAtomLength()
+                ;groupnr++){
+                    Group gr = chain.getAtomGroup(groupnr);
                     xw.openTag("group");
                     xw.attribute("name",gr.getPDBName());
                     xw.attribute("type",gr.getType());
@@ -357,7 +359,7 @@ public class FileConvert {
         if ( doPrintConnections() ) {
             // do connectivity for all chains:
             
-            List cons = structure.getConnections();
+            List<Map<String,Integer>> cons = structure.getConnections();
             for (int cnr = 0; cnr<cons.size();cnr++){
                 
                 
