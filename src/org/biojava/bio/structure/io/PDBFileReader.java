@@ -31,8 +31,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
@@ -71,11 +73,40 @@ import org.biojava.utils.io.InputStreamProvider;
  */
 public class PDBFileReader implements StructureIOFile {
 
+// a list of big pdb files for testing
+//  "1htq",
+//  "1c2w",
+//  "1ffk",
+//  "1giy",
+//  "1j5a",
+//  "1jj2",
+//  "1jzx",
+//  "1jzy",
+//  "1jzz",
+//  "1k01",
+//  "1k73",
+//  "1k8a",
+//  "1k9m",
+//  "1kc8",
+//  "1kd1",
+//  "1kqs",
+//  "1m1k",
+//  "1m90",
+//  "1mkz",
+//  "1ml5",
+//  "1n8r",
+  
+  
+  
+    
 	String path                     ;
 	List<String> extensions            ;
 	boolean parseSecStruc;
 	boolean autoFetch;
-
+	boolean parseCAOnly;
+    boolean alignSeqRes;
+  
+    
 	public static void main(String[] args){
 		String filename =  "/path/to/5pti.pdb" ;
 
@@ -115,10 +146,46 @@ public class PDBFileReader implements StructureIOFile {
 		extensions.add(".pdb.Z");
 		parseSecStruc = false;
 		autoFetch     = false;
+        parseCAOnly   = false;
+        alignSeqRes   = true;
 	}
 
 
-	/** should the parser to fetch missing PDB files from the EBI FTP server automatically?
+    /** return the flag if only the CA atoms should be parsed
+     * 
+     * @return
+     */
+	public boolean isParseCAOnly() {
+        return parseCAOnly;
+    }
+
+	/** only the CA atoms should be parsed from the PDB file
+     * 
+     * @param parseCAOnly
+	 */
+    public void setParseCAOnly(boolean parseCAOnly) {
+        this.parseCAOnly = parseCAOnly;
+    }
+
+    /** get the flag if the SEQRES and ATOM amino acids are going to be aligned
+     * 
+     * @return flag
+     */
+    public boolean isAlignSeqRes() {
+        return alignSeqRes;
+    }
+
+
+    /** set the flag if the SEQRES and ATOM amino acids should be aligned and linked
+     * 
+     * @param alignSeqRes
+     */
+    public void setAlignSeqRes(boolean alignSeqRes) {
+        this.alignSeqRes = alignSeqRes;
+    }
+
+
+    /** should the parser to fetch missing PDB files from the EBI FTP server automatically?
 	 *  default is false
 	 * @return flag
 	 */
@@ -309,11 +376,16 @@ public class PDBFileReader implements StructureIOFile {
 	throws IOException
 	{
 
-
+	    
 		InputStream inStream = getInputStream(pdbId);
 
 		PDBFileParser pdbpars = new PDBFileParser();
 		pdbpars.setParseSecStruc(parseSecStruc);
+        pdbpars.setAlignSeqRes(alignSeqRes);
+        
+        pdbpars.setParseCAOnly(parseCAOnly);
+        
+        
 		Structure struc = pdbpars.parsePDBFile(inStream) ;
 		return struc ;
 	}
@@ -346,6 +418,8 @@ public class PDBFileReader implements StructureIOFile {
 
 		PDBFileParser pdbpars = new PDBFileParser();
 		pdbpars.setParseSecStruc(parseSecStruc);
+        pdbpars.setAlignSeqRes(alignSeqRes);
+        pdbpars.setParseCAOnly(parseCAOnly);
 		Structure struc = pdbpars.parsePDBFile(inStream) ;
 		return struc ;
 
