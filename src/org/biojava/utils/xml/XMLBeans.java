@@ -203,7 +203,7 @@ public class XMLBeans {
 			try {
 			    desc.getWriteMethod().invoke(bean, obj);
 			} catch (Exception ex) {
-			    throw new AppException("Invocation failed");
+			    throw new AppException("Invocation failed, could not invoke " + prop + " " + value);
 			}
 			return;
 		    }
