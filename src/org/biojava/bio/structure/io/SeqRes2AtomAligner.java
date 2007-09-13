@@ -66,7 +66,7 @@ public class SeqRes2AtomAligner {
     private static final FiniteAlphabet alphabet;
     private static final Symbol gapSymbol ;
     private static  SubstitutionMatrix matrix;
-    private static  NeedlemanWunsch aligner;
+   
     
     String alignmentString;
     static {
@@ -80,7 +80,7 @@ public class SeqRes2AtomAligner {
         
         try {
             matrix = getSubstitutionMatrix(alphabet);
-            aligner = new NeedlemanWunsch(-2, 5, 3, 3, 0,matrix);
+         
         } catch (BioException e){
             e.printStackTrace();
         } catch (IOException e){
@@ -117,7 +117,7 @@ public class SeqRes2AtomAligner {
                 return atom;
             }
         }
-        throw new StructureException("could not match seqres ChainID " + seqRes.getName() + " to ATOM chains!");
+        throw new StructureException("could not match seqres chainID >" + seqRes.getName() + "< to ATOM chains!");
     }
     public void align(Structure s, List<Chain> seqResList){
 
@@ -193,14 +193,19 @@ public class SeqRes2AtomAligner {
      * @throws StructureException 
      */
     public boolean align(List<Group> seqRes, List<Group> atomRes) throws StructureException{
-
+       /** int MAX_SIZE = 1000;
+        if ( (seqRes.size() > MAX_SIZE) 
+                ||( atomRes.size() > MAX_SIZE) ) {
+                    System.err.println("can not align chains, length size exceeds limits!");
+                    return false;
+                }
+        */
         String seq1 = getFullAtomSequence(seqRes);
         //String seq1 = seqRes.getSeqResSequence();
         String seq2 = getFullAtomSequence(atomRes);
 
         //System.out.println("align seq1 " + seq1);
         //System.out.println("align seq2 " + seq2);
-
 
 
         SimpleAlignment simpleAli = null;
@@ -211,7 +216,7 @@ public class SeqRes2AtomAligner {
             Sequence bjseq2 = ProteinTools.createProteinSequence(seq2,"seq2");
 
             //System.out.println(bjseq1.getAlphabet());
-
+            NeedlemanWunsch aligner = new NeedlemanWunsch(-2, 5, 3, 3, 0,matrix);
             org.biojava.bio.symbol.Alignment ali = aligner.getAlignment(bjseq1,bjseq2);
             if ( ! (ali instanceof SimpleAlignment )) {
                 throw new Exception ("Alignment is not a SimpleAlignment!");
@@ -225,6 +230,9 @@ public class SeqRes2AtomAligner {
                 System.out.println(alignmentString);
         } catch (Exception e){
             e.printStackTrace();
+            System.err.println("align seq1 " + seq1);
+            System.err.println("align seq2 " + seq2);
+
         }
        
         if ( simpleAli == null)
@@ -321,7 +329,7 @@ public class SeqRes2AtomAligner {
         
     }
 
-    private static SubstitutionMatrix getSubstitutionMatrix(FiniteAlphabet alphabet) 
+    public static SubstitutionMatrix getSubstitutionMatrix(FiniteAlphabet alphabet) 
     throws IOException,BioException {
 
         InputStream inStream = SeqRes2AtomAligner.class.getResourceAsStream("/files/blosum62.mat");
