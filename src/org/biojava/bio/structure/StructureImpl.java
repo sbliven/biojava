@@ -325,6 +325,11 @@ public class StructureImpl implements Structure {
 		models.add(model);
 	}
 
+    
+    public void setModel(int position, List<Chain> model){
+        models.set(position, model);
+    }
+    
 	/** string representation.
 	 *
 	 */

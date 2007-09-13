@@ -256,6 +256,15 @@ public interface Structure extends Cloneable{
      */
     public void addModel(List<Chain> model);
 
+    
+    /** a convenience function if one wants to edit and replace the
+     * models in a structure. allows to set (replace) the model at position 
+     * with the new List of Chains.
+     * @param position starting at 0
+     * @param model
+     */
+    public void setModel(int position, List<Chain> model);
+    
     /** retrieve all Chains belonging to a model .
      * @see #getChains
      *
