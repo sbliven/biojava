@@ -55,8 +55,9 @@ BioJava now uses the Java based build tool Ant, supplied by the Apache
 Jakarta Project (see http://ant.apache.org/). To build the project,
 change to biojava-live and type:
 
-ant package
-ant javadocs
+  ant clean;
+  ant ;
+  ant javadocs-biojava;
 
 If you have Ant >= 1.3 and the Java based unit testing tool JUnit (see
 http://www.junit.org) you can run the supplied tests. To build and run
