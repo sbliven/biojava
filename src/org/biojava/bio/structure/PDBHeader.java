@@ -20,8 +20,14 @@ public class PDBHeader {
     String technique;
     float resolution;
 
-
-    public PDBHeader(){}
+    private Long id;
+    
+    public PDBHeader(){
+    	
+    	depDate = new Date(0);
+    	modDate = new Date(0);
+    	
+    }
 
     public String toString(){
         StringBuffer buf = new StringBuffer();
@@ -57,7 +63,22 @@ public class PDBHeader {
 
         return buf.toString();
     }
+    
+    /** get the ID used by Hibernate
+     * 
+     * @return the ID used by Hibernate
+     */
+    public Long getId() {
+        return id;
+    }
 
+    /** set the ID used by Hibernate
+     * 
+     * @param id
+     */ 
+    private void setId(Long id) {
+        this.id = id;
+    }
 
     public boolean equals(PDBHeader other){
         try {
