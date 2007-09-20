@@ -34,7 +34,7 @@ public class DemoStructureServer implements Runnable,StructureListener{
 	public static void main(String[] args){
 
 		// init the installation
-		File pdbLocation = new File("/Users/ap3/WORK/PDB/20051205");
+		File pdbLocation = new File("/path/to/PDB/files");
 		FlatFileInstallation installation = new FlatFileInstallation(pdbLocation);
 		
 		SimpleStructureServer server = new SimpleStructureServer();
@@ -57,7 +57,7 @@ public class DemoStructureServer implements Runnable,StructureListener{
 	}
 	
 	public void run(){
-		//System.out.println("starting new Thread in Demo");
+	
 		server.requestNextStructure(this);
 	}
 
@@ -75,12 +75,8 @@ public class DemoStructureServer implements Runnable,StructureListener{
 			System.out.println(s.getPDBCode());
             PDBInstallation installation = server.getPDBInstallation();
             PDBHeader header = installation.getPDBHeader(s.getPDBCode());
+            System.out.println(header);
             
-            if ( ! header.equals(s.getPDBHeader())) {
-                System.out.println(header);
-                System.out.println(s.getPDBHeader());
-                System.exit(0);
-            }
             
 		}
 		//System.out.println("server has more:" + server.hasNextStructure());

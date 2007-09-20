@@ -21,7 +21,6 @@
  */
 package org.biojava.bio.structure.server;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.biojava.bio.structure.PDBHeader;
@@ -64,13 +63,13 @@ public interface PDBInstallation{
 	/** request a structure by its PDB identifier
 	 * 
 	 * @param pdbId
-	 * @return
+	 * @return the structure for the pdbId
 	 */
 	public Structure getStructure(String pdbId);
 
 	/** iterate over all structures in this Installation that pass the provided filters and 
 	 * return the next one in the list.
-	 * @return
+	 * @return the next structure 
 	 */
 	public Structure next();
 	

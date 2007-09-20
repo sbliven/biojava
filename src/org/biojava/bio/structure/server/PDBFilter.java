@@ -33,7 +33,7 @@ public interface PDBFilter {
 	/** return true if this PDBHeader is passing this filter.
 	 * 
 	 * @param header
-	 * @return
+	 * @return flag if this PDBHeader is accepted by this filter
 	 */
 	public boolean accept(PDBHeader header);
 }

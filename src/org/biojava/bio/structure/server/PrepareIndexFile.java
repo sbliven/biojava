@@ -274,8 +274,8 @@ public class PrepareIndexFile {
 	
 	/** get all PDBfiles from a directory
 	 * 
-	 * @param directory
-	 * @return
+	 * @param dir the directory that contains all PDB files
+	 * @return an array of PDB Files
 	 */
 	public  File[] getAllPDB(File dir)  {
 

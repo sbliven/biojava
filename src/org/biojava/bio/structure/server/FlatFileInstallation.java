@@ -50,7 +50,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * <br/>
  * In particular these files are:
  * <ul>
- * <li>pdbinfo.txt - contains resolution, experimenal technique, deposition and 
+ * <li>pdbinfo.txt - contains resolution, experimetnal technique, deposition and 
  *     modification date, biological description of the structure</li>
  * <li>chaininfo.txt - contains information about every chain, like the compound information from the header, the nr of amino acids in chain,
  *     The alignment to the SEQRES residues </li>
@@ -147,11 +147,11 @@ implements PDBInstallation
 
     }
 
-    private void resetIterator() {
+    /*private void resetIterator() {
         if ( ! filtersApplied )
             applyFilters();
         filterIterator = filteredPDBs.iterator();       
-    }
+    }*/
 
     public void applyFilters(){
 
@@ -169,9 +169,7 @@ implements PDBInstallation
                     line = indexReader.readLine();
                     continue;
                 }
-                String[] spl = line.split("\t");
-
-               
+                               
 
                 PDBHeader header = getPDBHeaderFromLine(line);
                 // if no filters have been configured, add all PDBs
