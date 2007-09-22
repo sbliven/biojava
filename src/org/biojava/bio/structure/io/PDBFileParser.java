@@ -2199,6 +2199,11 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		}
 
 		for (Compound comp: compounds){
+			if ( comp.getChainId() == null) {
+				// could not link to chain 
+				// TODO: should this be allowed to happen?
+				continue;
+			}
 			for ( String chainId : comp.getChainId()){
 				try {
 					Chain c = s.getChainByPDB(chainId);
