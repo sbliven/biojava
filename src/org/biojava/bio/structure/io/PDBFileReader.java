@@ -112,6 +112,9 @@ public class PDBFileReader implements StructureIOFile {
 
 		PDBFileReader pdbreader = new PDBFileReader();
 		pdbreader.setParseSecStruc(true);
+		pdbreader.setAlignSeqRes(true);
+		pdbreader.setParseCAOnly(false);
+		pdbreader.setAutoFetch(true);
 
 		try{
 			Structure struc = pdbreader.getStructure(filename);
@@ -153,7 +156,7 @@ public class PDBFileReader implements StructureIOFile {
 
     /** return the flag if only the CA atoms should be parsed
      * 
-     * @return
+     * @return flag if CA only should be read
      */
 	public boolean isParseCAOnly() {
         return parseCAOnly;
