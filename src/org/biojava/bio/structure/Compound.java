@@ -95,6 +95,8 @@ public class Compound implements Cloneable {
     String expressionSystemGene = null;
     String expressionSystemOtherDetails = null;
 
+    private Long id;
+    
     public String toString(){
     	StringBuffer buf = new StringBuffer();
     	buf.append("Compound: " + molId + " " +molName + " ");
@@ -154,6 +156,22 @@ public class Compound implements Cloneable {
 
     	
     	return buf.toString();
+    }
+    
+    /** get the ID used by Hibernate
+     * 
+     * @return the ID used by Hibernate
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /** set the ID used by Hibernate
+     * 
+     * @param id
+     */ 
+    private void setId(Long id) {
+        this.id = id;
     }
     
     

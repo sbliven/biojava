@@ -266,7 +266,7 @@ public interface Structure extends Cloneable{
     public void setModel(int position, List<Chain> model);
     
     /** retrieve all Chains belonging to a model .
-     * @see #getChains
+     * @see #getChains(int modelnr)
      *
      * @param modelnr  an int
      * @return a List object containing the Chains of Model nr. modelnr
@@ -274,6 +274,25 @@ public interface Structure extends Cloneable{
      */
     public List<Chain> getModel(int modelnr);
 
+    /** retrieve all chains - if it is a NMR structure will return the chains of the first model.
+     * This is the same as getChains(0);
+     * @see #getModel(int modelnr)
+     * @see #getChains(int modelnr)
+     *     
+     * @return a List object containing the Chains of Model nr. modelnr
+     */
+    public List<Chain> getChains();
+    
+    
+    /** set the chains of a structure, if this is a NMR structure,
+     * this will only set model 0.
+     * 
+     * @see #setChains(int, List)
+     * 
+     * @param chains the list of chains for this structure.
+     */
+    public void setChains(List<Chain> chains);
+    
     /** retrieve all chains of a model.
      * @see #getModel
      *
@@ -439,6 +458,18 @@ public interface Structure extends Cloneable{
      * @param header the PDBHeader object
      */
     public void setPDBHeader(PDBHeader header);
+    
+    /** get the ID used by Hibernate
+     * 
+     * @return the ID used by Hibernate
+     */
+    public Long getId() ;
+
+    /** set the ID used by Hibernate
+     * 
+     * @param id
+     */ 
+    public void setId(Long id) ;
     	
     
 }

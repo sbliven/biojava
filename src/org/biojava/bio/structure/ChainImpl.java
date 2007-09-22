@@ -49,9 +49,9 @@ public class ChainImpl implements Chain {
     Annotation annotation ;
 
     List<Group> seqResGroups;
-
+    private Long id;
     Compound mol;
-
+    Structure parent;
     Map<String, Integer> pdbResnumMap;
 
     /**
@@ -68,6 +68,39 @@ public class ChainImpl implements Chain {
 
     }
 
+    /** get the ID used by Hibernate
+     * 
+     * @return the ID used by Hibernate
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /** set the ID used by Hibernate
+     * 
+     * @param id
+     */ 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /** Set the back-reference (to its parent Structure)
+     * @param parent 
+     *  
+     */
+    public void setParent(Structure parent) {
+    	this.parent = parent;
+    }
+    
+    /** Returns the parent Structure of this chain
+     * 
+     * @return the parent Structure object
+     */
+    
+    public Structure getParent() {
+    	return parent;
+    }
+    
 
     /** returns an identical copy of this Chain .
      * @return an identical copy of this Chain 
@@ -308,17 +341,23 @@ public class ChainImpl implements Chain {
     /** string representation. */
     public String toString(){
         String newline = System.getProperty("line.separator");
-        String str = "Chain >"+getName() + 
-        "< total SEQRES length: " + getSeqResGroups().size() + 
-        " total ATOM length:" + getAtomLength() + " residues " + newline;
+        StringBuffer str = new StringBuffer();
+        str.append("Chain >"+getName()+"<"+newline) ;
+        if ( mol != null ){
+        	if ( mol.getMolName() != null){
+        		str.append(mol.getMolName()+newline); 
+        	}
+        }
+        str.append("total SEQRES length: " + getSeqResGroups().size() + 
+        " total ATOM length:" + getAtomLength() + " residues " + newline);
 
         // loop over the residues
 
         for ( int i = 0 ; i < seqResGroups.size();i++){
             Group gr = (Group) seqResGroups.get(i);
-            str += gr.toString() + newline ;
+            str.append(gr.toString() + newline) ;
         } 
-        return str ;
+        return str.toString() ;
 
     }
 

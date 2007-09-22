@@ -48,7 +48,18 @@ public interface Chain {
      */
     public void addGroup(Group group);
     
- 
+    /** get the ID used by Hibernate
+     * 
+     * @return the ID used by Hibernate
+     */
+    public Long getId() ;
+
+    /** set the ID used by Hibernate
+     * 
+     * @param id
+     */ 
+    public void setId(Long id) ;
+
 	
     /** return the amino acid at position X.
      * @param position  an int
@@ -241,5 +252,17 @@ public interface Chain {
      */
     public void setSeqResGroups(List<Group> seqResGroups);
 
+    /** Set the back-reference (to its parent Structure)
+     * @param parent 
+     *  
+     */
+    public void setParent(Structure parent) ; 
+    
+    /** Returns the parent Structure of this chain
+     * 
+     * @return the parent Structure object
+     */
+    
+    public Structure getParent() ;
     
 }

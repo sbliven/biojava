@@ -36,6 +36,8 @@ import java.util.Locale;
  */
 public class DBRef {
 
+	Structure parent;
+	String idCode;
     Character chainId;
     int seqbegin;
     char insertBegin;
@@ -51,18 +53,43 @@ public class DBRef {
     int dbSeqEnd;
     char idbnsEnd;
 
-
+    private Long id;
+    
     public DBRef() {
 
+    }
+    
+    /** get the ID used by Hibernate
+     * 
+     * @return the ID used by Hibernate
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /** set the ID used by Hibernate
+     * 
+     * @param id
+     */ 
+    private void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setParent(Structure s){
+    	parent = s;
+    
+    }
+    public Structure getParent(){
+    	return parent;
     }
     
     public String toPDB(){
         
         StringBuilder build = new StringBuilder();
         Formatter form = new Formatter(build,Locale.UK);
-        //TODO: add iDcode;
-         form.format("DBREF %4s %1s %4d%1s %4d%1s %6s %8s %12s %5d%1c %5d%1c", 
-                 " ", chainId,seqbegin,insertBegin,seqEnd,insertEnd,
+        
+         form.format("DBREF %4s %1s %4d%1s %4d%1s %6s %8s %12s %5d%1c %5d%1c ", 
+                 idCode, chainId,seqbegin,insertBegin,seqEnd,insertEnd,
                  database,dbAcession,dbIdCode,
                  dbSeqBegin,idbnsBegin,dbSeqEnd,idbnsEnd
                  );
@@ -102,7 +129,23 @@ public class DBRef {
     }
     
     
-    /** the chain ID of the corresponding chain
+    /** get the idCode for this entry
+     * 
+     * @return the idCode
+     */
+    public String getIdCode() {
+		return idCode;
+	}
+
+    /** set the idCode for this entry
+     * 
+     * @param idCode
+     */
+	public void setIdCode(String idCode) {
+		this.idCode = idCode;
+	}
+
+	/** the chain ID of the corresponding chain
      * 
      * @return chainId
      */
@@ -207,7 +250,7 @@ public class DBRef {
     the reference.
      * @return idbnsEnd
      */
-    public char getIdbnsEnd() {
+    public char getIdbnsEnd() {    	
         return idbnsEnd;
     }
 
@@ -234,7 +277,7 @@ public class DBRef {
      * 
      * @return insertEnd
      */
-    public char getInsertEnd() {
+    public char getInsertEnd() {    
         return insertEnd;
     }
 

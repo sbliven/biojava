@@ -43,8 +43,6 @@ import org.biojava.bio.structure.io.FileConvert;
  */
 public class StructureImpl implements Structure {
 
-
-
 	String pdb_id ;
 	/* models is an ArrayList of ArrayLists */
 	List<List<Chain>> models;
@@ -56,7 +54,7 @@ public class StructureImpl implements Structure {
 	String name ;
 	private PDBHeader pdbHeader;
 	boolean nmrflag ;
-
+	private Long id;
 
 
 	/**
@@ -74,7 +72,23 @@ public class StructureImpl implements Structure {
         dbrefs        = new ArrayList<DBRef>();
 	}
 
+	/** get the ID used by Hibernate
+     * 
+     * @return the ID used by Hibernate
+     */
+    public Long getId() {
+        return id;
+    }
 
+    /** set the ID used by Hibernate
+     * 
+     * @param id
+     */ 
+    public void setId(Long id) {
+        this.id = id;
+    }
+	
+	
 	/** construct a Structure object that only contains a single group
 	 * 
 	 * @param g
@@ -278,6 +292,7 @@ public class StructureImpl implements Structure {
 	 */
 	public void addChain(Chain chain, int modelnr) {
 		// if model has not been initialized, init it!
+		chain.setParent(this);
 		if ( models.size() == 0  ) {
 			List<Chain> model = new ArrayList<Chain>() ;
 			model.add(chain);
@@ -287,8 +302,14 @@ public class StructureImpl implements Structure {
 			List<Chain> model = (ArrayList<Chain>)models.get(modelnr);	    
 			model.add(chain);
 		}
+		
+		
+		
 	}
 
+
+	
+	
 	/** retrieve a chain by it's position within the Structure.
 	 *
 	 * @param number  an int
@@ -321,12 +342,24 @@ public class StructureImpl implements Structure {
 	 *
 	 */
 	public void addModel(List<Chain> model){
-
+		for (Chain c: model){
+    		c.setParent(this);
+    	}
 		models.add(model);
 	}
 
+	
+	public void setChains(List<Chain> chains){
+		
+		setModel(0,chains);
+	}
+	
+	
     
     public void setModel(int position, List<Chain> model){
+    	for (Chain c: model){
+    		c.setParent(this);
+    	}
         models.set(position, model);
     }
     
@@ -354,7 +387,17 @@ public class StructureImpl implements Structure {
 				List<Group> hgr = cha.getAtomGroups("hetatm");
 				List<Group> ngr = cha.getAtomGroups("nucleotide");
 
-				str.append("chain: >"+cha.getName()+"<");
+				str.append("chain: >"+cha.getName()+"< ");
+				if ( cha.getHeader() != null){
+					Compound comp = cha.getHeader();
+					String molName = comp.getMolName();
+					if ( molName != null){
+						str.append(molName);
+					}
+				}
+				
+				
+				str.append(newline);
                 str.append(" length SEQRES: " +cha.getSeqResLength());
 				str.append(" length ATOM: " +cha.getAtomLength());
 				str.append(" aminos: " +agr.size());
@@ -363,7 +406,10 @@ public class StructureImpl implements Structure {
 			}
 
 		}
-
+        str.append("DBRefs: "+ dbrefs.size()+ newline);
+        for (DBRef dbref: dbrefs){
+        	str.append(dbref.toPDB() + newline);
+        }
 		str.append("Molecules: " + newline);
 		Iterator<Compound> iter = compounds.iterator();
 		while (iter.hasNext()){
@@ -419,7 +465,14 @@ public class StructureImpl implements Structure {
 		return getModel(modelnr);
 	}
     
+	public List<Chain> getChains(){
+		return getModel(0);
+	}
+	
     public void setChains(int modelnr, List<Chain> chains){
+    	for (Chain c: chains){
+    		c.setParent(this);
+    	}
         models.remove(modelnr);
         models.add(modelnr, chains);
 
@@ -513,8 +566,10 @@ public class StructureImpl implements Structure {
 
 
     public void setDBRefs(List<DBRef> dbrefs) {
-        this.dbrefs = dbrefs;
-        
+    	for (DBRef ref: dbrefs){
+    		ref.setParent(this);
+    	}
+        this.dbrefs = dbrefs;        
     }
 
 
