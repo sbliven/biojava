@@ -69,7 +69,9 @@ public class StructureImpl implements Structure {
 		header         = new HashMap<String,Object>();
 		connections    = new ArrayList<Map<String,Integer>>();
 		compounds      = new ArrayList<Compound>();
-        dbrefs        = new ArrayList<DBRef>();
+        dbrefs         = new ArrayList<DBRef>();
+        pdbHeader      = new PDBHeader();
+        
 	}
 
 	/** get the ID used by Hibernate
@@ -330,7 +332,7 @@ public class StructureImpl implements Structure {
 	 */
 	public Chain getChain(int modelnr,int number) {
 
-		List<Chain> model  = (ArrayList<Chain>) models.get(modelnr);
+		List<Chain> model  =  models.get(modelnr);
 
 		Chain chain =   model.get (number );
 
@@ -357,10 +359,19 @@ public class StructureImpl implements Structure {
 	
     
     public void setModel(int position, List<Chain> model){
-    	for (Chain c: model){
+    	if (model == null)     		
+    		throw new IllegalArgumentException("trying to set model to null!");    		
+    	
+    	for (Chain c: model)    		  		
     		c.setParent(this);
+    	
+    	//System.out.println("model size:" + models.size());
+    	
+    	if (models.size() ==0){
+    		models.add(model);
+    	} else {
+    		models.set(position, model);
     	}
-        models.set(position, model);
     }
     
 	/** string representation.
@@ -369,7 +380,7 @@ public class StructureImpl implements Structure {
 	public String toString(){
 		String newline = System.getProperty("line.separator");
 		StringBuffer str = new StringBuffer();
-		str.append("structure "+name+ " " + pdb_id) ;
+		str.append("structure "+name+ " " + pdb_id + " ") ;
         
 		if ( isNmr() ) str.append( " models: "+nrModels()+newline) ;
 		
