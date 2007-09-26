@@ -332,8 +332,7 @@ public class SeqRes2AtomAligner {
     public static SubstitutionMatrix getSubstitutionMatrix(FiniteAlphabet alphabet) 
     throws IOException,BioException {
 
-        InputStream inStream = SeqRes2AtomAligner.class.getResourceAsStream("/files/blosum62.mat");
-
+        InputStream inStream = SeqRes2AtomAligner.class.getResourceAsStream("/org/biojava/bio/structure/blosum62.mat");
 
         String newline = System.getProperty("line.separator");
         BufferedReader reader = new BufferedReader(new InputStreamReader( inStream));
