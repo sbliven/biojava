@@ -22,6 +22,7 @@
 
 package org.biojava.bio.dp.twohead;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +46,7 @@ import org.biojava.utils.ListTools;
  * @author Matthew Pocock
  * @author David Huen (fixes for magical state)
  */
-public class EmissionCache {
+public class EmissionCache implements Serializable{
   private final Map eMap;
   private final Alphabet alpha;
   private final State[] states;

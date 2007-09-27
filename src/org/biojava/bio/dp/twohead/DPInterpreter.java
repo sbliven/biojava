@@ -22,6 +22,7 @@
 
 package org.biojava.bio.dp.twohead;
 
+import java.io.Serializable;
 import org.biojava.bio.BioError;
 import org.biojava.bio.dp.BackPointer;
 import org.biojava.bio.dp.DP;
@@ -36,7 +37,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public class DPInterpreter implements CellCalculatorFactory {
+public class DPInterpreter implements CellCalculatorFactory, Serializable {
   private final DP dp;
 
   public DPInterpreter(DP dp) {

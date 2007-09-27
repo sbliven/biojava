@@ -496,12 +496,21 @@ public abstract class DP {
     }
   }
 
-  public DP(MarkovModel model)
-          throws IllegalSymbolException, IllegalTransitionException, BioException {
+  public DP(MarkovModel model){
+    this.setModel(model);
+  }
+  
+  /**
+   * This method will result in a DP with no model. Use the setModel() method
+   * to set the model before use.
+   */
+  public DP(){}
+  
+  public void setModel(MarkovModel model){
     this.model = model;
     this.forwardTransitionScores = new HashMap();
     this.backwardTransitionScores = new HashMap();
-    update();
+    this.update();
 
     model.addChangeListener(UPDATER, ChangeType.UNKNOWN);
   }
