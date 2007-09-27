@@ -24,7 +24,6 @@ package org.biojava.bio.program.abi;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +40,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.IntegerAlphabet;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.SmallMap;
+
 
 /**
  * An implementation of {@link org.biojava.bio.chromatogram.Chromatogram} to
@@ -151,7 +151,7 @@ public class ABIFChromatogram extends AbstractChromatogram implements Serializab
                 parseTrace((AtomicSymbol) sym, i+9);
             }
             parseBaseCalls();
-            ((RandomAccessFile)getDataAccess()).close();
+            getDataAccess().finishedReading();
         }
 
         private void parseTrace(AtomicSymbol sym, int whichData) throws IOException, UnsupportedChromatogramFormatException {
