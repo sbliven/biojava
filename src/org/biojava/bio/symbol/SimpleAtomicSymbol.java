@@ -32,11 +32,9 @@ import org.biojava.bio.Annotation;
 /**
  * A basic implementation of AtomicSymbol.
  *
- * @for.user
  * If you wish to construct new Symbols, you should normally do so via utility methods
  * on <code>AlphabetManager</code>.
  *
- * @for.developer
  * This may be a useful base class for custom implementations.
  *
  * @author Matthew Pocock

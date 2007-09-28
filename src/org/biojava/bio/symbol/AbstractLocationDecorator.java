@@ -31,7 +31,7 @@ import java.util.Iterator;
  * the location has some kind of special semantics.
  * </p>
  *
- * @for.developer When implementing a new Location decorator.
+ * When implementing a new Location decorator.
  * @author Matthew Pocock
  */
 public abstract class AbstractLocationDecorator implements Location {

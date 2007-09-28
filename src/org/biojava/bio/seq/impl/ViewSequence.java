@@ -54,9 +54,8 @@ import org.biojava.utils.Unchangeable;
  * features and annotations to be overlaid onto an existing
  * Sequence without modifying it.
  *
- * @for.user
  * You will almost certainly want to be calling
- * {@link org.biojava.bio.seq.SequenceTools.view} instead of instantiating this
+ * {@link org.biojava.bio.seq.SequenceTools#view(Sequence seq)} instead of instantiating this
  * class directly.
  *
  * @author Thomas Down

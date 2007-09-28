@@ -80,11 +80,11 @@ public class WalkerFactory {
    * Container classes will be scanned for methods for retrieving child
    * instances that can be walked to.
    *
-   * @for.user
+   * 
    * You should never need to call this. The library authors should take care
    * of this for you.
    *
-   * @for.developer
+   * 
    * Register 'structural' classes here - those with children.
    *
    * @param type  the Class of the type with children

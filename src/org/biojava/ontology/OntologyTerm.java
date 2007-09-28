@@ -60,7 +60,7 @@ public interface OntologyTerm extends Term {
     /**
      * Simple in-memory implementation of a remote ontology term.
      *
-     * @for.developer This can be used to implement Ontology.importTerm
+     * This can be used to implement Ontology.importTerm
      */
     
     public final static class Impl

@@ -29,11 +29,7 @@ package org.biojava.bio;
  * an interface which doesn't support checked exceptions.  If you do this,
  * please document this clearly in the implementing class.
  * </p>
- *
- * @author Matthew Pocock
- * @author Thomas Down
- *
- * @for.powerUser
+ * 
  * Occasionaly methods will document that the object they return may emit
  * BioRuntimeExceptions. If you know what you are doing, you can catch these
  * and do something sensible with them. An example would be an iterator() method
@@ -42,13 +38,19 @@ package org.biojava.bio;
  * It would then not be unreasonable for the code calling next() to catch this
  * BioRuntimeException and extract the cause.
  *
- * @for.developer
+ * 
  * Occasionaly it is necisary to abuse the exception system by throwing BioError
  * to get arround limitations in APIs that you do not control. For example, when
  * implementing Iterator.next(), you may need to call a method that can fail.
  * Catch the failure and throw it as a BioError. If you want people to handle
  * this gracefully in their scripts, then document this behavior and hope they
  * catch the error.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ *
+ * 
+ * 
  *
  * @since 1.0
  */

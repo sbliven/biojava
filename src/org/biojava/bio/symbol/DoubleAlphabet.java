@@ -227,7 +227,6 @@ public final class DoubleAlphabet
   /**
    * A single double value.
    *
-   * @for.user
    *  Get these via <code>DoubleAlphabet.getSymbol(double)</code>.
    *
    * @author Matthew Pocock
@@ -278,7 +277,6 @@ public final class DoubleAlphabet
   /**
    * A range of double values.
    *
-   * @for.user
    *  Get these via <code>DoubleAlphabet.getSymbol(double, double)</code>.
    *
    * @author Matthew Pocock

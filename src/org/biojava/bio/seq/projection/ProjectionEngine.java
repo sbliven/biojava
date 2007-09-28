@@ -53,24 +53,20 @@ import org.biojava.utils.bytecode.LocalVariable;
  * New feature-projection wrapper classes are generated
  * automatically as they are required.
  *
- * @for.user
  * Don't use this class directly. This class contains deep voodoo code. Run
  * away while you still can.
  *
- * @for.powerUser
  * You may find that for some bizaare reason you need to manually project a feature
  * through a ProjectionContext. You should be using @link
  * ProjectionContext.projectFeature(). If this is not practical for some reason,
  * use this class. However, this probably indicates that you are doing something
  * mad.
  *
- * @for.powerUser
  * Projected feature classes will be named as
  * org.biojava.bio.seq.projection.{$ctxt}.{$feat} where $ctxt and $feat are the
  * full class names of the context and feature respectively with each "."
  * character replaced with "_".
  *
- * @for.developer
  * Delegate into this from your ProjectionContext to do the dirty work of
  * actually projecting features from the underlying data. This factory
  * generate a new class that is unique to the combination of your

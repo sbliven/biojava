@@ -44,7 +44,7 @@ public interface Commitable {
      * initial (or prior commit) state. This always succededs or raises an
      * unchecked exception.
      *
-     * @for.developer
+     * 
      * If the rollback fails, you <em>must</em> raise an AssertionFailure.
      */
     public void rollback();

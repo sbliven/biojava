@@ -35,10 +35,10 @@ import org.biojava.utils.SmallMap;
  * @author Matthew Pocock
  * @since 1.2
  *
- * @for.user
+ * 
  * A minimal-memory alternative to SimpleAnnotation
  *
- * @for.powerUser
+ * 
  * When creating a large number of small Annotation instances, it is worth
  * instantiating SmallAnnotation. Small is anything up to at least 30 properties
  * but will vary with the JavaVM and underlying platform.

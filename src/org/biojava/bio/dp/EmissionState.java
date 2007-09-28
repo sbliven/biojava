@@ -87,8 +87,7 @@ public interface EmissionState extends State, Trainable, Changeable {
    * than 1 or 0, but you should consider the consequences for
    * HMM architecture very carefully, and contact the authors.
    *
-   * @for.developer
-   * you may wish to return a copy of some underlying array from this method
+   * Developers may wish to return a copy of some underlying array from this method
    * as code outside could modify the array you give
    */
   public int[] getAdvance();

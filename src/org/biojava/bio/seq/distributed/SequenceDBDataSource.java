@@ -33,11 +33,11 @@ import org.biojava.bio.seq.db.SequenceDB;
 
 /**
  * Turn an entire SequenceDB instance into a DistDataSource.
- *
- * @author Thomas Down
- * @for.user
  * This is very usefull for providing the 'reference' sequence and feature set
  * upon which you can layer any other features you have.
+ * 
+ * @author Thomas Down
+ * 
  */
 public class SequenceDBDataSource implements DistDataSource {
     private SequenceDB db;

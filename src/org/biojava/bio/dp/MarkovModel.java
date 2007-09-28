@@ -115,10 +115,8 @@ public interface MarkovModel extends Changeable {
    * give the maximum advance in each direction.
    * </p>
    *
-   * @for.developer
    * Be sure to return a new array each time this is called. This protects the
    * internal state of the object from someone modifying the advance array.
-   * @for.developer
    * Be sure to update this as/when states modify their advance arrays and
    * as/when states are added or removed
    *

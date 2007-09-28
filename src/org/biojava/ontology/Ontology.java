@@ -108,7 +108,7 @@ public interface Ontology extends Changeable {
   /**
    * Return the associated OntologyOps.
    *
-   * @for.developer  This method should be implemented by ontology
+   * This method should be implemented by ontology
    * implementors to allow OntoTools
    * to get optimized access to some usefull ontology operations. It is not
    * intended that users will ever invoke this. A sensible dumb implementation

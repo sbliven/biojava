@@ -24,20 +24,21 @@ package org.biojava.bio;
 /**
  * A nestable biological exception.
  *
- * @author Matthew Pocock
+ * 
  *
- * @for.user
+ * 
  * Catch this whenever a method throws it, and you want to handle the exception.
  *
- * @for.user
+ * 
  * Throw this whenever you have caught a Throwable and need to throw an
  * Exception or BioException in your method.
  *
- * @for.powerUser
+ * 
  * Be sure to wrap up any causual throwable. It makes debugging your (and
  * other peoples') code much easier.
  *
  * @since 1.0
+ * @author Matthew Pocock
  */
 public class BioException extends Exception {
   /**

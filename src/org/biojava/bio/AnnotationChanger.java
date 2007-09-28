@@ -35,12 +35,13 @@ import org.biojava.utils.ParserException;
  * <code>Annotation</code> to new values specified by a
  * <code>ValueChanger</code>. This will modify the values
  * associated with properties, but not the property names.
+ * 
+ * For writing light-weigth adaptors to project one type of
+ * Annotation to another using a ChangeTable.
  *
  * @since 1.3
  * @author Matthew Pocock
  *
- * @for.powerUser For writing light-weigth adaptors to project one type of
- * Annotation to another using a ChangeTable.
  */
 public class AnnotationChanger extends AbstractAnnotation
 {

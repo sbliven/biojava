@@ -51,13 +51,13 @@ import org.biojava.utils.Changeable;
  * It is perfectly possible to wrap up almost any tree-like or flat data
  * structure as Annotation.
  * </p>
+ * Other than when using the constructor, you should be able to
+ * interact with nearly all Annotation implementations via this API.
  *
  * @author Matthew Pocock
  * @author Thomas Down
  * @see org.biojavax.RichAnnotation
  *
- * @for.user Other than when using the constructor, you should be able to
- * interact with nearly all Annotation implementations via this API.
  *
  * @since 1.0
  */
@@ -79,14 +79,14 @@ public interface Annotation extends Changeable {
    * <p>
    * Unlike the Map collections, it will complain if the key does not exist. It
    * will only return null if the key is defined and has value null.
-   * </p>
+   * </p> Normal raw access to the property. For cleverer access, use
+   * methods in AnnotationType.
    *
    * @param key  the key of the property to retrieve
    * @return  the object associated with that key
    * @throws NoSuchElementException if there is no property with the key
    *
-   * @for.user Normal raw access to the property. For cleverer access, use
-   * methods in AnnotationType.
+   * 
    */
   Object getProperty(Object key) throws NoSuchElementException;
   
@@ -99,45 +99,39 @@ public interface Annotation extends Changeable {
    * This method throws an exception if either properties can not be
    * added to this object, or that this particular property is immutable or
    * illegal within the implementation.
-   * </p>
+   * </p> Normal raw access to the property. For cleverer access, use
+   * methods in AnnotationType.
    *
    * @param key the key object
    * @param value the new value for this key
    * @throws IllegalArgumentException if the property <code>key</code> is not
    *         legal
    * @throws ChangeVetoException if this annotation object can't be changed, or
-   *         if the change was vetoed
-   *
-   * @for.user Normal raw access to the property. For cleverer access, use
-   * methods in AnnotationType.
+   *         if the change was vetoed. 
    */
   void setProperty(Object key, Object value)
       throws IllegalArgumentException, ChangeVetoException;
       
   /**
-   * Delete a property.
+   * Delete a property. Normal raw access to the property. For cleverer access, use
+   * methods in AnnotationType.
    *
    * @param key the key object
    * @throws NoSuchElementException if the property doesn't exist
    * @throws ChangeVetoException if the change is vetoed
    * @since 1.3
-   *
-   * @for.user
-   * Normal raw access to the property. For cleverer access, use
-   * methods in AnnotationType.
+   * 
    */
    
   public void removeProperty(Object key)
       throws NoSuchElementException, ChangeVetoException;
   
   /**
-   * Returns whether there the property is defined.
+   * Returns whether there the property is defined. Normal raw access to the property. For cleverer access, use
+   * methods in AnnotationType.
    *
    * @param key the key Object to search for
    * @return true if this Annotation knows about the key, false otherwise
-   *
-   * @for.user Normal raw access to the property. For cleverer access, use
-   * methods in AnnotationType.
    */
   boolean containsProperty(Object key);
   
@@ -163,13 +157,13 @@ public interface Annotation extends Changeable {
    * A really useful empty and immutable annotation object.
    * </p>
    *
-   * @for.developer Be careful when stooring Annotation arguments to
+   * Be careful when stooring Annotation arguments to
    *  constructors. It is possible that you have been passed EMPTY_ANNOTATION but
    * that code later on will access this object believing it to be
    * mutable. For example, the SeqIO factory code clones some
    * Annotations passed in on Feature.Template instances
    *
-   * @for.user Use this instead of null when you really don't want an object or
+   * Use this instead of null when you really don't want an object or
    * an implementation to have annotation even though it should implement
    * Annotatable.
    */

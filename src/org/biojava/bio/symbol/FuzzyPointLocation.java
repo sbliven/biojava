@@ -237,12 +237,10 @@ public class FuzzyPointLocation extends AbstractLocation
      * Determines how a <code>FuzzyPointLocation</code> should be treated when used
      * as a normal <code>Location</code>.
      *
-     * @for.user
      * Use one of the implementations of this interface when creating a <code>FuzzyPointLocation</code>
      * to specify how the fuzzy (inner/outer) properties are translated into the standard
      * Location min and max properties.
      *
-     * @for.powerUser
      * It is possible to write custom implementations of this to create <code>FuzzyLocations</code>
      * with exotic behaviour.
      */

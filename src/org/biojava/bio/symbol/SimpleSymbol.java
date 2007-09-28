@@ -33,11 +33,9 @@ import org.biojava.bio.SimpleAnnotation;
 /**
  * A basic implementation of Symbol.
  *
- * @for.user
  * If you wish to construct new Symbols, you should normally do so via utility methods
  * on <code>AlphabetManager</code>.
  *
- * @for.developer
  * This may be a useful base class for custom implementations.
  *
  * @author Matthew Pocock

@@ -29,7 +29,7 @@ import org.biojava.bio.symbol.RangeLocation;
  * @author Matthew Pocock
  * @since 1.3
  *
- * @for.user Usefull constants for whenever you need one of the common
+ * Usefull constants for whenever you need one of the common
  * cardinalitites. Otherwise, build a Location using the normal Location
  * APIs.:
  */

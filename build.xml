@@ -20,7 +20,6 @@
     runtests-fork     runs all tests in separate virtual machines
     sign              signs the biojava.jar with jarsigner
     javadocs-biojava  builds biojava API documentation
-    javadocs-taglets  builds taglets API documentation
     javadocs-demos    builds demos API documentation
     javadocs-all      builds API documentation for all the above
     clean             cleans up the build & dist directories
@@ -101,7 +100,6 @@
 		<property name="reports.dir"   value="./reports" />
 		<property name="manifest.dir"  value="./manifest" />
 		<property name="resources.dir" value="./resources" />
-		<property name="taglets.dir"   value="./taglets" />
 		<property name="signature.dir" value="./selfSignedCertificate" />
 
 		<!-- Main build directory -->
@@ -151,12 +149,7 @@
 		<property name="jar.apps"           value="${build.dir}/${name.apps}.jar" />
 		<property name="manifest.file.apps" value="${manifest.dir}/${name.apps}.txt" />
 
-		<!-- Subdirectory for taglets -->
-		<property name="name.taglets"       value="taglets" />
-		<property name="Name.taglets"       value="BioJava Taglets" />
-		<property name="build.dest.taglets" value="${build.classes.dir}/${name.taglets}" />
-		<property name="build.docs.taglets" value="${build.dest.docs}/${name.taglets}" />
-
+		
 		<!-- Subdirectory for creating a distribution -->
 		<property name="dist.root"          value="./dist" />
 		<property name="dist.dir"           value="${dist.root}/${name.biojava}-${version}" />
@@ -184,11 +177,7 @@
 
 	</target>
 
-	<!-- Copies taglet files -->
-	<target name="prepare-taglets" depends="prepare" description="Copies taglet files">
-		<mkdir dir="${build.dest.taglets}" />
-		<mkdir dir="${build.docs.taglets}" />
-	</target>
+	
 
 	<!-- Prepares the biojava source code -->
 	<target name="prepare-biojava" depends="prepare"
@@ -242,24 +231,6 @@
     This runs javac or any other tasks necisary to turn the source code into
     .class files.
   -->
-
-	<!-- Compiles the taglets directory -->
-	<target name="compile-taglets" depends="init,prepare-taglets"
-  description="Compiles the taglets directory">
-		<javac
-      encoding="ISO-8859-1"
-      srcdir="${taglets.dir}"
-      destdir="${build.dest.taglets}"
-      depend="${javac.depend}"
-      deprecation="${javac.deprecation}"
-      source="${javac.source}"
-      target="${javac.target}"
-      debug="${javac.debug}">
-			<classpath>
-				<pathelement path="${classpath}" />
-			</classpath>
-		</javac>
-	</target>
 
 	<!-- Compiles the source directory -->
 	<target name="compile-biojava" depends="prepare-biojava"
@@ -413,29 +384,10 @@
     This probably just calls javadoc, but may call other documentation gubbins.
   -->
 
-	<!-- Create taglet API documentation -->
-	<target name="javadocs-taglets" depends="prepare-taglets"
-  description="Create taglet API documentation">
-		<javadoc
-      encoding="ISO-8859-1"
-      sourcepath="${taglets.dir}"
-      classpath="${classpath}:${java.home}/../lib/tools.jar"
-      destdir="${build.docs.taglets}"
-      author="true"
-      version="true"
-      use="true"
-      source="1.5"
-      windowtitle="${Name.taglets} API"
-      doctitle="${Name.taglets}"
-      maxmemory="96m">
-			<fileset dir="${taglets.dir}" />
-			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false" />
-			<link href="http://java.sun.com/j2se/1.5.0/docs/tooldocs/javadoc/doclet/"  offline="false"/>
-		</javadoc>
-	</target>
+	
 
 	<!-- Creates the API documentation -->
-	<target name="javadocs-biojava" depends="prepare-biojava,compile-taglets"
+	<target name="javadocs-biojava" depends="prepare-biojava"
   description="Creates the API documentation">
 		<javadoc
       encoding="ISO-8859-1"
@@ -493,15 +445,12 @@
 			<group title="Experimental Phylogeny packages"
               packages="org.biojavax.bio.phylo:org.biojavax.bio.phylo.io:org.biojavax.bio.phylo.io.nexus:org.biojavax.bio.phylo.io.phylip:org.biojavax.bio.phylo.tree" />
 
-			<taglet name="UserLevel" path="${build.dest.taglets}" />
-			<taglet name="MetaData" path="${build.dest.taglets}:${classpath}:${jar.biojava}" />
-			<taglet name="Useage" path="${build.dest.taglets}"/>
-			<taglet name="Option" path="${build.dest.taglets}"/>
+			
 		</javadoc>
 	</target>
 
 	<!-- Create demos API documentation -->
-	<target name="javadocs-demos" depends="prepare-demos,compile-biojava,compile-taglets"
+	<target name="javadocs-demos" depends="prepare-demos,compile-biojava"
   description="Create the demos API documentation">
 		<javadoc
       encoding="ISO-8859-1"
@@ -518,15 +467,11 @@
       maxmemory="96m">
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false"/>
 			<link href="../biojava" offline="true" packagelistLoc="${build.docs.biojava}/package-list}"/>
-			<taglet name="UserLevel" path="${build.dest.taglets}" />
-			<taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
-			<taglet name="Useage" path="${build.dest.taglets}"/>
-			<taglet name="Option" path="${build.dest.taglets}"/>
 		</javadoc>
 	</target>
 
 	<!-- Create apps API documentation -->
-	<target name="javadocs-apps" depends="prepare-apps,compile-biojava,compile-taglets"
+	<target name="javadocs-apps" depends="prepare-apps,compile-biojava"
   description="Create the apps API documentation">
 		<javadoc
       encoding="ISO-8859-1"
@@ -543,11 +488,7 @@
       maxmemory="96m">
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false"/>
 			<link href="../biojava" offline="true" packagelistLoc="${build.docs.biojava}/package-list}"/>
-			<taglet name="UserLevel" path="${build.dest.taglets}" />
-			<taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
-			<taglet name="Useage" path="${build.dest.taglets}"/>
-			<taglet name="Option" path="${build.dest.taglets}"/>
-			<taglet name="Values" path="${build.dest.taglets}"/>
+			
 		</javadoc>
 	</target>
 
@@ -555,7 +496,7 @@
 
 	<target
     name="javadocs-all"
-    depends="javadocs-taglets,javadocs-biojava,javadocs-demos,javadocs-apps"
+    depends="javadocs-biojava,javadocs-demos,javadocs-apps"
     description="Creates the javadocs for all components"
   />
 
@@ -731,11 +672,6 @@
 		<!-- copy dtd -->
 		<copy todir="${dist.dir}/dtd">
 			<fileset dir="./dtd"/>
-		</copy>
-
-		<!-- copy taglets -->
-		<copy todir="${dist.dir}/taglets">
-			<fileset dir="${taglets.dir}"/>
 		</copy>
 
 		<!-- copy resources -->

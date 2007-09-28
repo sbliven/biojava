@@ -105,7 +105,7 @@ public interface Triple
   /**
    * Basic in-memory implementation of a Triple in an ontology
    *
-   * @for.developer This can be used to implement Ontology.createTriple
+   * This can be used to implement Ontology.createTriple
    * @see org.biojavax.ontology.SimpleComparableTriple
    */
 

@@ -26,10 +26,10 @@ import java.util.regex.Pattern;
 /**
  * An ec (enzyme classification) number.
  *
- * @for.developer
+ *
  * Implementations of this interface should be imutable. This makes them much
  * more usefull as keys in maps.
- * @for.developer
+ * 
  * it is a good idea to validate that the data being passed in is a sane ec
  * number.
  *

@@ -31,19 +31,17 @@ package org.biojava.bio;
 /**
  * A nestable biological error.
  *
- * @author Matthew Pocock
- *
- * @for.powerUser
+
  * Catch this whenever it, or one of it's sub-classes are thrown and you know
  * what to do once you've got it. Note: in general, you should not be catching
  * errors. However, there are cases where it is necisary e.g. for logging. You
  * will nearly always want to either re-throw the Error, throw a new Error
  * or exit the current thread.
  *
- * @for.developer
+ * 
  * Throw this when something has gone wrong and in general people should not be
  * handeling it.
- *
+ * @author Matthew Pocock
  * @since 1.0
  */
 public class BioError extends Error {

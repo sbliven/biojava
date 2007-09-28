@@ -118,27 +118,24 @@ import org.biojava.utils.ChangeVetoException;
  * will not have a strand property.
  * </p>
  *
- * @for.user
  * You should probably not be implementing these yourself. Use the standard
  * factory methods in SequenceTools to create new sequences that are altered
  * views of other sequences.
  *
- * @for.powerUser
  * You will probably want to instantiate @link ReparentContext or @link
  * TranslateFlipContext to achieve the most commonly needed transformations.
  * If you do have to implement this, extend one of these two classes.
  *
- * @for.developer
  * Consider extending @link ReparentContext or @link TranslateFlipContex. They
  * do a lot of complex work for you.
  *
- * @for.developer
+ * 
  * When projecting an original location <code>origLoc</code> to your new
  * location <code>yourLoc</code>, be sure to make sure the decorations match.
  * The easiest way to do this is return
  * <code>origLoc.newInstance(yourLoc)</code>. 
  *
- * @for.developer
+ * 
  * Every ProjectionContext implementation must be a public or package-private
  * class. This is
  * because ProjectionEngine wires method calls from the projected features back

@@ -46,12 +46,13 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * Use a GFFEntrySet as a DataSource for adding annotation to sequences.
  *
- * @author Thomas Down
- * @author Matthew Pocock
- * @for.user
  * Instantiate this and add it to an instance of DistributeSequenceDB. All
  * of the GFF features that have sequence fields matching sequence IDs in the
  * db will be merged in.
+ * 
+ * @author Thomas Down
+ * @author Matthew Pocock
+
  */
 public class GFFDataSource implements DistDataSource {
     private GFFEntrySet gffe;

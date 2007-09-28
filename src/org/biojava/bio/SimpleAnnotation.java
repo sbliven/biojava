@@ -32,12 +32,14 @@ import java.util.Map;
  * if you try to retrieve a property that is not set. Because of the use of
  * a <code>LinkedHashMap</code> properties are iterated in the order they 
  * are entered.</p>
+ * When you need to make a new Annotation instance and will want to populate
+ * it with properties, use this class.
+ * 
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Mark Schreiber
  * @since 1.0
- * @for.user When you need to make a new Annotation instance and will want to populate
- * it with properties, use this class.
+ * 
  * @see org.biojavax.SimpleRichAnnotation
  */
 public class SimpleAnnotation extends AbstractAnnotation {

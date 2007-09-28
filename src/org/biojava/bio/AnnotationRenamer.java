@@ -34,13 +34,12 @@ import org.biojava.bio.program.tagvalue.PropertyChanger;
  * <code>Annotation</code> to new keys specified by a
  * <code>TagMapper</code>. This will rename properties, but not alter their
  * values.
- *
+ * For writing light-weigth adaptors to project one type of
+ * Annotation to another using a TagMapper.
  * @since 1.3
  * @author Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs)
  *
- * @for.powerUser For writing light-weigth adaptors to project one type of
- * Annotation to another using a TagMapper.
  */
 public class AnnotationRenamer extends AbstractAnnotation
 {

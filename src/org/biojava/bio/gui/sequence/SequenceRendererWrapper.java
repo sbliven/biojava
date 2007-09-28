@@ -62,7 +62,6 @@ implements SequenceRenderer, Serializable {
   /**
    *  Create a new renderer with no wrapped renderer.
    *
-   * @for.user
    * It is important that you call setRenderer() on this instance before
    * trying to use it to display anything.
    */

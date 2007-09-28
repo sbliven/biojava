@@ -32,11 +32,9 @@ import org.biojava.bio.Annotation;
  * An atomic symbol consisting only of itself.  This is the
  * fundamental type of symbol, and needs a special implementation.
  *
- * @for.user
  * If you wish to construct new Symbols, you should normally do so via utility methods
  * on <code>AlphabetManager</code>.
  *
- * @for.developer
  * This may be useful as a base-class for other <code>Symbol</code> implementations.
  *
  * @author Thomas Down

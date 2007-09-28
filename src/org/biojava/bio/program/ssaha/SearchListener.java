@@ -52,15 +52,11 @@ public interface SearchListener {
    * <p>Extend this and over-ride any of the interface methods to implement
    * SearchListeners that filter hits before passing them on to an
    * underlying listener.</p>
-   *
-   * @for.powerUser
    * You can modify the search events the delegate sees by over-riding any of
    * the SearchListener methods, modify the arguments
    * and then call the method on super with the new arguments.
-   * @for.powerUser
    * You can drop hits by just not passing them onto the delegate using
    * super.hits().
-   * @for.powerUser
    * <em>Note:</em> Be sure to maintain the nesting of start/stop search and
    * hit, or you will confuse the delegate.
    *

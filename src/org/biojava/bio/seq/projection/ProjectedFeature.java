@@ -45,10 +45,8 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * Internal class used by ProjectionEngine to wrap Feature objects.
  *
- * @for.user
  * This is not for you.
  *
- * @for.developer
  * This is the base class that the projection engine extends. If you modify this
  * you will modify every projected feature. That is probably a bad thing.
  *

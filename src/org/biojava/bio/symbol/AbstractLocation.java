@@ -26,7 +26,7 @@ import java.io.Serializable;
 /**
  * An abstract implementation of <code>Location</code>.
  *
- * @for.developer This provides implementations of the binary operators which delegate to
+ * This provides implementations of the binary operators which delegate to
  *                the <code>LocationTools</code> class.
  * @author Matthew Pocock
  */

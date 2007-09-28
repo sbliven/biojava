@@ -44,7 +44,6 @@ public class FormatTools {
    *
    * <p>It is not specified if the format returned is a new instance or not.</p>
    *
-   * @for.powerUser
    * This method uses the service providor framework to find format providers.
    * If you add formats to the core biojava distribution, you must add the
    * class name to the file <code>biojava-live/resources/META-INF/services/org.biojava.bio.program.formats.Format</code>/ If you implement formats and

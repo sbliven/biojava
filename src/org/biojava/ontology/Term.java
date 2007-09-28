@@ -105,7 +105,7 @@ public interface Term extends Annotatable {
     /**
      * Simple in-memory implementation of an ontology term.
      * @see org.biojavax.ontology.SimpleComparableTerm
-     * @for.developer This can be used to implement Ontology.createTerm
+     * This can be used to implement Ontology.createTerm
      */
 
     public static class Impl

@@ -42,12 +42,10 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  * @since 1.2
  *
- * @for.user
  * Once you've made one of these and populated it with a few DistDataSource instances,
  * you should be able to prety much forget about it and use it directly as a normal
  * SequenceDB implementation.
  *
- * @for.powerUser
  * DataSources can be added and removed while the object is live. 
  */
 

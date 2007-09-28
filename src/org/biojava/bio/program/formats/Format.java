@@ -23,11 +23,9 @@ public interface Format {
    * Retrieve a ParserListener pair for the format that will pass all events
    * on to a listener.
    *
-   * @for.user
    * Call this method to get a working parser that can be fed into a tag-value
    * parsing pipeline.
    *
-   * @for.developer
    * This method may well be called many times during the lifetime of an
    * applications.. You should make this threadsafe. To avoid buring too much
    * memory, and to facilitate the comparrison of object by the == operator,
@@ -42,19 +40,16 @@ public interface Format {
   /**
    * Get the AnnotationType that constrains the events that will be fired.
    *
-   * @for.user
    * If you feed the events from the ParserListener into somethign that builds
    * Annotation bundles, this is the AnnotationType that those bundles will
    * conform to.
    *
-   * @for.powerUser
    * In the cases where the events have been sensibly crafted, it will be
    * possible to introspect a great deal about the parsing events from this
    * AnntoationType. Use it to dynamicaly bind events to object models, generate
    * gui componets, and to work out which formats contain cross-refferenceable
    * information.
    *
-   * @for.developer
    * It is polite to return a full and constrained description of the types of
    * oevents that may be generated, how many of them could come (cardinality)
    * and what types of values will be associated with them. The use of

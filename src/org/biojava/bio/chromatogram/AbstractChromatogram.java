@@ -47,13 +47,14 @@ import org.biojava.utils.ChangeListener;
  * protected setters so that subclasses may set the value of the various
  * properties of a chromatogram.
  *
+ * Chromatograms should be created using {@link ChromatogramFactory} or a
+ * parser for a particular file format.
+ * 
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  * @author Matthew Pocock
  * @since 1.3
  *
- * @for.user
- * Chromatograms should be created using {@link ChromatogramFactory} or a
- * parser for a particular file format.
+ * 
  */
 public abstract class AbstractChromatogram implements Chromatogram {
     private static int A = 0; // Array index for 'A'-related material

@@ -55,7 +55,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Francois Pepin
  * @since 1.2
  *
- * @for.developer Use these when you have a list of Annotation instances that
+ * Use these when you have a list of Annotation instances that
  * need to be viewed as one. For example, if you have annotation for a feature
  * from a local database, in-memory objects and a web-page, you could build
  * three Annotation instances and merge them using a MergeAnnotation.
@@ -115,7 +115,7 @@ public class MergeAnnotation
   /**
    * Add a new Annotation to to the end of the list to be merged.
    *
-   * @for.powerUser  Use this to alter the Annotations being merged
+   * Use this to alter the Annotations being merged
    *
    * @param ann  the Annotation to add
    * @throws ChangeVetoException if the annotation could not be added

@@ -98,9 +98,7 @@ public class TranslatedDistribution
   private transient ChangeListener delegateUpdate;
 
   /**
-   * Create a new TranslatedDistribution.
-   *
-   * @for.user make these thigs via getDistribuiton.
+   * Create a new TranslatedDistribution. Make these things via getDistribuiton.
    *
    * @param table    a ReversibleTranslationTable used to map the symbols
    * @param other    the underlying ditribution

@@ -63,26 +63,23 @@ import org.biojava.utils.Changeable;
  *   }
  * }
  * </pre>
+ * Check if BioJava classes and interfaces extend Annotatable. This
+ * will tell  you if you should look for associated annotation.
  *
+ *  If an object implements Annotatable, it may well propagate
+ * ChangeEvent notifications from the associated Annotation. You may
+ * need to track these to maintain the state of your applications.
+ *
+ * Be careful to hook up the appropriate event forwarders.
+ *
+ * The getAnnotation() method can be implemented lazily
+ * (instantiate the Annotation instance and event forwarders when the first
+ * request comes in). It can also be implemented by returning throw-away
+ * immutable Annotation instances that are built from scratch each time.
  * @author  Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
  * @author  Kalle N�slund (docs)
  * @see org.biojavax.RichAnnotatable
- *
- * @for.user Check if BioJava classes and interfaces extend Annotatable. This
- * will tell  you if you should look for associated annotation.
- *
- * @for.powerUser If an object implements Annotatable, it may well propagate
- * ChangeEvent notifications from the associated Annotation. You may
- * need to track these to maintain the state of your applications.
- *
- * @for.developer Be careful to hook up the appropriate event forwarders.
- *
- * @for.developer The getAnnotation() method can be implemented lazily
- * (instantiate the Annotation instance and event forwarders when the first
- * request comes in). It can also be implemented by returning throw-away
- * immutable Annotation instances that are built from scratch each time.
- *
  * @since 1.0
  */
 public interface Annotatable extends Changeable {
@@ -113,12 +110,10 @@ public interface Annotatable extends Changeable {
    * interested in ANNOTATION events, then instantiate one of these
    * and add it as a listener to the annotation object. It will
    * forward the events to your listeners and translate them
-   * accordingly.</p>
-   *
-   * @author Matthew Pocock
-   *
-   * @for.developer This will ease the pain of letting your Annotatable tell its
+   * accordingly.</p> This will ease the pain of letting your Annotatable tell its
    * listeners about changes in the Annotation.
+   *
+   * @author Matthew Pocock 
    *
    * @deprecated use
    *   <code>new ChangeForwarder.Retyper(source, cs, Annotation.PROPERTY)</code>

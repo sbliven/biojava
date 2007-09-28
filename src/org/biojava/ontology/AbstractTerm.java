@@ -33,7 +33,7 @@ import org.biojava.utils.ChangeType;
 /**
  * Abstract implementation of term
  *
- * @for.developer This provides basic change-forwarding functionality from
+ * This provides basic change-forwarding functionality from
  *                the annotation and ontology properties.
  *
  * @author Thomas Down

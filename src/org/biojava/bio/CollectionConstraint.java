@@ -32,7 +32,7 @@ import org.biojava.bio.symbol.Location;
  * CollectionConstraints usually use a <code>PropertyConstraint</code>
  * to validate the individual elements.
  *
- * @for.user
+ * 
  * Use one or more of the built-in implementations to build new
  * <code>AnnotationTypes</code>.
  *
@@ -48,7 +48,7 @@ public interface CollectionConstraint {
      * @param values a <code>Collection</code> to check.
      * @return true if the values are acceptable
      *
-     * @for.powerUser Manually compare items with the CollectionConstraint. Node:
+     * powerUser Manually compare items with the CollectionConstraint. Node:
      * this will ususaly be done for you in an AnnotationType instance
      */
     public boolean accept(Object values);
@@ -75,7 +75,7 @@ public interface CollectionConstraint {
      * @param subConstraint a <code>CollectionConstraint</code> to check.
      * @return a <code>boolean</code>.
      *
-     * @for.developer
+     * 
      * Usefull when attempting to compare two constraints to see
      * if it is necisary to retain both. You may want to check the more
      * general or the more specific constraint only.
@@ -88,7 +88,7 @@ public interface CollectionConstraint {
      * <code>newValue</code> to <code>current</code> would be accepted
      * by this constraint.
      *
-     * @for.developer
+     * 
      * Implementations may <em>not</em> assume that <code>current</code>
      * is valid.
      *
@@ -105,7 +105,7 @@ public interface CollectionConstraint {
      * <code>newValue</code> from <code>current</code> would be accepted
      * by this constraint.
      *
-     * @for.developer
+     * 
      * Implementations may <em>not</em> assume that <code>current</code>
      * is valid.  However, <code>current</code> will already have been
      * checked to ensure that it contains <code>victim</code>.
@@ -122,7 +122,7 @@ public interface CollectionConstraint {
      * <code>ANY</code> is a constraint which accepts a property for
      * addition under all conditions.
      *
-     * @for.user Whenever a CollectionConstraint is needed and you want to allow
+     * Whenever a CollectionConstraint is needed and you want to allow
      * any value there
      */
     public static final CollectionConstraint ANY = new AllValuesIn(PropertyConstraint.ANY, CardinalityConstraint.ANY);
@@ -131,7 +131,7 @@ public interface CollectionConstraint {
      * <code>EMPTY</code> is a constraint which only accepts the empty
      * set.
      * 
-     * @for.user Use this to indicate that a property must be undefined
+     * Use this to indicate that a property must be undefined
      */
      
     public static final CollectionConstraint EMPTY = new AllValuesIn(PropertyConstraint.NONE, CardinalityConstraint.ZERO);
@@ -140,7 +140,7 @@ public interface CollectionConstraint {
      * <code>NONE</code> is a constraint which accepts no value for a property
      * under any condition.
      *
-     * @for.developer This value indicates an impossible condition.  It may be
+     * This value indicates an impossible condition.  It may be
      *                 returned by methods such as <code>AnnotationTools.intersection</code>
      *                 to indicate that <code>NO</code> values of a property (include undefined)
      *                 are valid.
@@ -419,12 +419,11 @@ public interface CollectionConstraint {
      * child constraints. This effectively matches the intersection of the items
      * matched by the two constraints.
      *
-     * @author Matthew Pocock
-     * @author Thomas Down
-     *
-     * @for.powerUser Use this to combine multiple constraints. You can make one
+     * Use this to combine multiple constraints. You can make one
      *            or both of the children And instances if you need a tighter
      *            intersection.
+     * @author Matthew Pocock
+     * @author Thomas Down
      */
     public class And implements CollectionConstraint {
       private CollectionConstraint c1;
@@ -435,7 +434,6 @@ public interface CollectionConstraint {
        *
        * @param c1 the first child
        * @param c2 the seccond child
-       * @for.user
        */
       public And(CollectionConstraint c1, CollectionConstraint c2) {
         this.c1 = c1;
@@ -447,7 +445,6 @@ public interface CollectionConstraint {
        *
        * @return the first child CollectionConstraint
        *
-       * @for.powerUser Introspect this constraint
        */
       public CollectionConstraint getChild1() {
         return c1;
@@ -458,7 +455,6 @@ public interface CollectionConstraint {
        *
        * @return the seccond child CollectionConstraint
        *
-       * @for.powerUser Introspect this constraint
        */
       public CollectionConstraint getChild2() {
         return c2;
@@ -489,13 +485,12 @@ public interface CollectionConstraint {
     /**
      * A collection constraint that accepts items iff they are accepted by either
      * child constraints. This effectively matches the union of the items
-     * matched by the two constraints.
+     * matched by the two constraints. Use this to combine multiple constraints. You can make one
+     *            or both of the children Or instances if you need a wider
+     *            union.
      *
      * @author Matthew Pocock
      * @author Thomas Down
-     * @for.powerUser Use this to combine multiple constraints. You can make one
-     *            or both of the children Or instances if you need a wider
-     *            union.
      */
     public class Or implements CollectionConstraint {
       private CollectionConstraint c1;
@@ -506,7 +501,6 @@ public interface CollectionConstraint {
        *
        * @param c1 the first child
        * @param c2 the seccond child
-       * @for.user
        */
       public Or(CollectionConstraint c1, CollectionConstraint c2) {
         this.c1 = c1;
@@ -517,7 +511,6 @@ public interface CollectionConstraint {
        * Get the first child CollectionConstraint.
        *
        * @return the first child CollectionConstraint
-       * @for.powerUser Introspect this constraint
        */
       public CollectionConstraint getChild1() {
         return c1;
@@ -527,7 +520,7 @@ public interface CollectionConstraint {
        * Get the seccond child CollectionConstraint.
        *
        * @return the seccond child CollectionConstraint
-       * @for.powerUser Introspect this constraint
+       * 
        */
       public CollectionConstraint getChild2() {
         return c2;

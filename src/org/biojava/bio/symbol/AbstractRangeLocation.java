@@ -26,7 +26,7 @@ import java.util.Iterator;
 /**
  * Base class for simple contiguous Location implementations.
  *
- * @for.developer Just implement <code>getMin</code> and <code>getMax</code>, and <code>translate</code>..
+ * Just implement <code>getMin</code> and <code>getMax</code>, and <code>translate</code>..
  *
  * @author Matthew Pocock
  * @author Keith James

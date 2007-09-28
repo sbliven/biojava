@@ -4,7 +4,7 @@ package org.biojava.ontology;
 /**
  * Default implementation of OntologyOps.
  *
- * @for.developer
+ * 
  * Sub-class this and implement the getOntology() method when implementing
  * an Ontolgy class that can't provide optimized access for these routines.
  *

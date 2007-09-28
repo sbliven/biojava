@@ -30,7 +30,6 @@ import java.io.Serializable;
  * the non-informative symbol for the alphabet in question (i.e.
  * 'n' for DNA, 'X' for protein, etc.).
  *
- * @for.user
  * If you wish to work with <code>Feature</code> objects, but don't
  * have the actual sequence data available, you can construct a
  * <code>SimpleSequence</code> from a <code>DummySequence</code>,

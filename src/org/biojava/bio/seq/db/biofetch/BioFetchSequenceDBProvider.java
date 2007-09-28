@@ -31,7 +31,7 @@ import org.biojava.directory.SequenceDBProvider;
 /**
  * Directory-services plugin for biofetch databases.
  *
- * @for.developer This class is instantiated automatically by the
+ * This class is instantiated automatically by the
  *                directory-services code, and is not of direct
  *                interest to users.
  *

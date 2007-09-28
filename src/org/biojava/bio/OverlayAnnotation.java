@@ -53,7 +53,6 @@ import org.biojava.utils.ChangeVetoException;
  * @author Greg Cox
  * @since 1.1
  *
- * @for.powerUser
  * In the case where you wish to wrap an underlying Annotation in a view that
  * will allow it to be edited without altering the original object, but also
  * reflect changes in the original object.

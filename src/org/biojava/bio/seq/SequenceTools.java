@@ -235,10 +235,9 @@ public final class SequenceTools {
    * Create a new Sequence that has no annotation, no features and a zero-length
    * symbol list.
    *
-   * @for.user
    * Instantiate this if an API requres a sequence, but you can't be bothered
    * or are not able to provide full sequence information.
-   * @for.powerUser
+   * 
    * It is sometimes usefull to create a dummy sequence and then wrap this in
    * a view.
    *

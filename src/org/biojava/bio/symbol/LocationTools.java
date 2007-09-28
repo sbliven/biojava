@@ -39,7 +39,7 @@ import org.biojava.bio.BioException;
  * calculate the intersection of two locations.
  * </p>
  *
- * @for.user This class provides helpful methods for set-wise manipulation of Location objects.
+ * This class provides helpful methods for set-wise manipulation of Location objects.
  *
  * @author Matthew Pocock
  * @author Greg Cox

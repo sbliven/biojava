@@ -43,9 +43,8 @@ import org.biojava.utils.ChangeVetoException;
  * A Sequence implementation that has a name and URI but no features,
  * and a zero length symbol list.
  *
- * @for.user
  * You will probably want to use
- * {@link org.biojava.bio.seq.SequenceTools.createDummy} instead of using this
+ * {@link org.biojava.bio.seq.SequenceTools#createDummy(String uri, String name)} instead of using this
  * class directly
  *
  * A better alternative may be a {@link org.biojavax.bio.seq.RichSequence RichSequence}

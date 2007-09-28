@@ -33,12 +33,10 @@ import org.biojava.bio.seq.io.SymbolTokenization;
  * database state, such as name, format, sequence builder and the actual file
  * offsets.
  *
- * @for.user
  * You should only ever have to instantiate an implementation of this. Don't
  * call any of the inerface methods directly. They are intended for
  * IndexedSequenceDB, not you.
  *
- * @for.developer
  * In general, these objects should be transactional. Calls to store should add
  * the index to temporary storage. When commit is invoked, these indices should
  * all be added to the permanent storage. When rollback is invoked, these

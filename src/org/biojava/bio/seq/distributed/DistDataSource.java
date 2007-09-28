@@ -39,17 +39,14 @@ import org.biojava.bio.seq.Sequence;
  * @author Thomas Down
  * @since 1.2
  *
- * @for.user
  * Take an instance of this interface and add it to a DistributedSequenceDB.
  *
- * @for.developer
  * Implement this if you have information about some seqeunces but do not wish to or can
  * not integrate this with the main sequence at source. For example, if you have some
  * locally annotated features for SwissProt entries, you could create a DistDataSource
  * providing just your features and let the DistDataSource API integrate these in software
  * with a SwissProt sequence db provider.
  *
- * @for.developer
  * DistDataSource instances can provided sequence information and feature information. These
  * are integrated seperately. To provide sequences, implement hasSequence(), getSequence() and
  * ids(). ids(false).contains(id) should equal hasSequence(id). Features are provided by implementing
@@ -78,18 +75,17 @@ public interface DistDataSource {
 
   /**
    * Get all features matching a FeatureFilter provided by this DistDataSource.
-   *
+   * You can simulate getFeatures(id, ff, recurse) by using the advanced FeatureFilter
+   * implementations.
    * @param ff  the FeatureFilter to search with
    * @return a FeatureHolder with all matching filters
    *
-   * @for.powerUser
-   * You can simulate getFeatures(id, ff, recurse) by using the advanced FeatureFilter
-   * implementations.
    **/
   public FeatureHolder getFeatures(FeatureFilter ff) throws BioException;
   
   /**
    * Get all features matching a FeatureFilter on a Sequence with an ID and recurse flats.
+   * You can simulate getFeatures(ff) by adding the apropreate FeatureFilter implementations.
    *
    * @param id  the ID of the Sequence
    * @param ff  the FeatureFilter to search with
@@ -97,8 +93,6 @@ public interface DistDataSource {
    * @return a FeatureHolder containing all feature matching
    * @throws BioException if the features could not be fetched
    *
-   * @for.powerUser
-   * You can simulate getFeatures(ff) by adding the apropreate FeatureFilter implementations.
    */
   public FeatureHolder getFeatures(String id, FeatureFilter ff, boolean recurse) throws BioException;
   
