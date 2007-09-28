@@ -40,8 +40,6 @@ import org.biojava.bio.structure.PDBHeader;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.PDBFileReader;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 
 
 /** a PDB installation that reads all files from one directory in the file system.
@@ -176,7 +174,7 @@ implements PDBInstallation
                 if ( filters.size() == 0){
                     filteredPDBs.add(header);
                 } else {
-                    throw new NotImplementedException();
+                    throw new UnsupportedOperationException("can not sort PDBHeaders yet");
                 }
 
 
@@ -238,7 +236,7 @@ implements PDBInstallation
         if ( ! filtersApplied)
             applyFilters();
 
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("can not get all PDBHeaders yet");
 
     }
 
