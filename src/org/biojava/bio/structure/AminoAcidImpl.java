@@ -25,6 +25,7 @@ package org.biojava.bio.structure;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.biojava.bio.structure.io.PDBFileParser;
 import org.biojava.bio.structure.io.PDBParseException;
 
 /**
@@ -173,6 +174,7 @@ implements AminoAcid
 			throw new PDBParseException("amino acid name is not of length 3! (" + s +")");
 		}
 		pdb_name =s ;
+				
 	}
 
 

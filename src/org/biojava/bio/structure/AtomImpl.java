@@ -44,6 +44,7 @@ public class AtomImpl implements Atom {
     
     Character altLoc ;
     Group parent;
+    long id;
     
     public AtomImpl () {
         name     = null        ;
@@ -55,6 +56,21 @@ public class AtomImpl implements Atom {
         altLoc = new Character(' ');
         parent = null;
     }
+    /** the Hibernate database ID
+     * 
+     * @return the id
+     */
+	public long getId() {
+		return id;
+	}
+
+	/** the Hibernate database ID
+     * 
+     * @param id the hibernate id
+     */
+	public void setId(long id) {
+		this.id = id;
+	}
     
     /** trimmed version of atom name, e.g. "CA" 
      * @see #getName
