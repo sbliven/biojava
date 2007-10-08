@@ -301,7 +301,7 @@ public class StructureImpl implements Structure {
 			models.add(model);
 
 		} else {
-			List<Chain> model = (ArrayList<Chain>)models.get(modelnr);	    
+			List<Chain> model = models.get(modelnr);	    
 			model.add(chain);
 		}
 		
@@ -577,7 +577,10 @@ public class StructureImpl implements Structure {
 
 
     public void setDBRefs(List<DBRef> dbrefs) {
-    	for (DBRef ref: dbrefs){
+    	if ( dbrefs == null)
+    		throw new IllegalArgumentException("trying to set dbrefs to null!");
+    	
+    	for( DBRef ref : dbrefs){
     		ref.setParent(this);
     	}
         this.dbrefs = dbrefs;        
