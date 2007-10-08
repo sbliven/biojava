@@ -130,6 +130,19 @@ public interface Chain {
      */
     public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) throws StructureException;
 
+    /** get all groups that are located between two PDB residue numbers. In contrast to getGroupsByPDB
+     * this method call ignores if the exact outer groups are not found. This is useful e.g. when requesting the range
+     * of groups as specified by the DBREF records - these frequently are rather inaccurate.
+     * 
+     * 
+     * @param pdbresnumStart PDB residue number of start
+     * @param pdbresnumEnd PDB residue number of end
+     * @param ignoreMissing ignore missing groups in this range.
+     * @return Groups in between. or throws a StructureException if either start or end can not be found,
+     * @throws StructureException
+     */
+    public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd,boolean ignoreMissing) throws StructureException;
+
     
     /** get total length of chain, including HETATMs..
      * @return an int representing the length of the whole chain including HETATMs
