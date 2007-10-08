@@ -1816,7 +1816,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 		dbref.setIdCode(idCode);
 		dbref.setChainId(chainId.charAt(0));
-		dbref.setSeqbegin(intFromString(seqBegin));        
+		dbref.setSeqBegin(intFromString(seqBegin));        
 		dbref.setInsertBegin(insertBegin.charAt(0));
 		dbref.setSeqEnd(intFromString(seqEnd));
 		dbref.setInsertEnd(insertEnd.charAt(0));
@@ -2205,6 +2205,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 				continue;
 			}
 			for ( String chainId : comp.getChainId()){
+				if ( chainId.equals("NULL"))
+					continue;
 				try {
 					Chain c = s.getChainByPDB(chainId);
 					c.setHeader(comp);

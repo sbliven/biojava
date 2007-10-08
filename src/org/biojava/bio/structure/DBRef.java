@@ -56,7 +56,10 @@ public class DBRef {
     private Long id;
     
     public DBRef() {
-
+    	insertBegin = ' ';
+    	insertEnd   = ' ';
+    	idbnsBegin  = ' ';
+    	idbnsEnd    = ' ';
     }
     
     /** get the ID used by Hibernate
@@ -71,7 +74,7 @@ public class DBRef {
      * 
      * @param id
      */ 
-    private void setId(Long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -290,12 +293,12 @@ public class DBRef {
      * 
      * @return start seq. position
      */
-    public int getSeqbegin() {
+    public int getSeqBegin() {
         return seqbegin;
     }
 
 
-    public void setSeqbegin(int seqbegin) {
+    public void setSeqBegin(int seqbegin) {
         this.seqbegin = seqbegin;
     }
 
