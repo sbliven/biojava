@@ -26,7 +26,13 @@ import java.util.List;
 
 import org.biojava.bio.structure.Structure;
 
-
+/** a Runnable class that talks to a PDBInstallation and requests a new protein 
+ * structure. Once the structure has been loaded, the StructureListeners
+ * are notified of the new structure.
+ * 
+ * @author Andreas Prlic
+ *
+ */
 public class StructureFetcherRunnable 
 implements Runnable{
 
