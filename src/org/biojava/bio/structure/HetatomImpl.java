@@ -50,6 +50,7 @@ public class HetatomImpl implements Group {
     
     Map<String, Object> properties ;
     
+    long id;
     
     /* stores if 3d coordinates are available. */
     boolean pdb_flag ;
@@ -82,6 +83,8 @@ public class HetatomImpl implements Group {
      Hetatom n = new Hetatom();	
      }
      */
+    
+    
     
     
     /**
@@ -174,6 +177,23 @@ public class HetatomImpl implements Group {
         return atoms ;
     }
     
+    
+    /** set the atoms of this group
+     * @see org.biojava.bio.structure.Atom
+     * @param atoms a list of atoms
+     */
+    public void setAtoms(List<Atom> atoms){
+    	for (Atom a: atoms){
+    		a.setParent(this);
+    	}
+    	this.atoms = atoms;
+    	if ( atoms.size() > 0) {
+    		pdb_flag = true;
+    	}
+    		
+    }
+    
+    
     /**  get an atom throws StructureException if atom not found.	 
      * @param name  a String
      * @return an Atom object
@@ -230,7 +250,7 @@ public class HetatomImpl implements Group {
     
     public String toString(){
         
-        String str = "PDB: "+ pdb_name + " " + pdb_code +  " "+ pdb_flag;
+        String str = "Hetatom "+ pdb_code + " " + pdb_name +  " "+ pdb_flag;
         if (pdb_flag) {
             str = str + "atoms: "+atoms.size();
         }
@@ -375,6 +395,22 @@ public class HetatomImpl implements Group {
     public Chain getParent() {
         return parent;
     }
+
+    /** the Hibernate database ID
+     * 
+     * @return the id
+     */
+	public long getId() {		
+		return id;
+	}
+
+	/** the Hibernate database ID
+     * 
+     * @param id the hibernate id
+     */
+	public void setId(long id) {		
+		this.id = id;
+	}
     
     
     

@@ -106,6 +106,13 @@ public interface Group {
      */
     public List<Atom> getAtoms() ;
     
+    
+    /** set the atoms of this group
+     * @see org.biojava.bio.structure.Atom
+     * @param atoms a list of atoms
+     */
+    public void setAtoms(List<Atom> atoms);
+    
     /** remove all atoms from this group
      * 
      *
