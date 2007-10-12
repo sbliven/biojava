@@ -401,7 +401,7 @@
       source="1.5"
       windowtitle="${Name.biojava}-${version} API"
       doctitle="${Name.biojava}-${version}"
-      maxmemory="192m">
+      maxmemory="96m">
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false"/>
 
 			<group title="Core biological packages"
@@ -684,7 +684,7 @@
 
 	</target>
 
-	<target name="dist-src" depends="clean-dist, init, prepare,javadocs-biojava"
+	<target name="dist-src" depends="clean-dist, init, prepare"
   	        description="create a jar file of the biojava source">
 
 		<mkdir dir="${dist.root}"/>
