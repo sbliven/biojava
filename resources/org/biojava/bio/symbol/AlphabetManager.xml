@@ -4,7 +4,7 @@
    -
    - @author Matthew Pocock
    - @author Thomas Down 
-   - @author gwaldon
+   - @author George Waldon
   -->
 
 <!DOCTYPE alphabetManager [
@@ -64,7 +64,7 @@
   </symbol>
 
   <alphabet name="DNA">
-    <description>Deoxy-Ribose Nucleic Acid. The stuff of life.</description>
+    <description>Deoxyribose Nucleic Acid.</description>
     <symbolref name="urn:lsid:biojava.org:symbol:adenine"/>
     <symbolref name="urn:lsid:biojava.org:symbol:guanine"/>
     <symbolref name="urn:lsid:biojava.org:symbol:cytosine"/>
@@ -167,9 +167,101 @@
       <ambiguityMapping token=" ">
       </ambiguityMapping>
 
-      <gapSymbolMapping token="~" />>
-    </characterTokenization>
-  </alphabet>
+      <gapSymbolMapping token="~" />
+    </characterTokenization><!-- token -->
+    
+    <characterTokenization name="alternate" caseSensitive="false">
+      <atomicMapping token="A">
+        <symbolref name="urn:lsid:biojava.org:symbol:adenine"/>
+      </atomicMapping>
+
+      <atomicMapping token="G">
+        <symbolref name="urn:lsid:biojava.org:symbol:guanine"/>
+      </atomicMapping>
+
+      <atomicMapping token="C">
+        <symbolref name="urn:lsid:biojava.org:symbol:cytosine"/>
+      </atomicMapping>
+
+      <atomicMapping token="T">
+        <symbolref name="urn:lsid:biojava.org:symbol:thymine"/>
+      </atomicMapping>
+
+      <ambiguityMapping token="R">
+        <symbolref name="urn:lsid:biojava.org:symbol:adenine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:guanine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="Y">
+        <symbolref name="urn:lsid:biojava.org:symbol:cytosine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="M">
+        <symbolref name="urn:lsid:biojava.org:symbol:cytosine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:adenine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="K">
+        <symbolref name="urn:lsid:biojava.org:symbol:guanine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="S">
+        <symbolref name="urn:lsid:biojava.org:symbol:guanine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:cytosine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="W">
+        <symbolref name="urn:lsid:biojava.org:symbol:adenine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="H">
+        <symbolref name="urn:lsid:biojava.org:symbol:adenine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:cytosine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="B">
+        <symbolref name="urn:lsid:biojava.org:symbol:guanine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:cytosine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="V">
+        <symbolref name="urn:lsid:biojava.org:symbol:guanine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:adenine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:cytosine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="D">
+        <symbolref name="urn:lsid:biojava.org:symbol:guanine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:adenine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:thymine" />
+      </ambiguityMapping>
+    
+      <ambiguityMapping token="N">
+        <symbolref name="urn:lsid:biojava.org:symbol:guanine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:adenine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:cytosine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="X">
+        <symbolref name="urn:lsid:biojava.org:symbol:guanine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:adenine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:cytosine" />
+	<symbolref name="urn:lsid:biojava.org:symbol:thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="-"/>         
+      <ambiguityMapping token="~"/>      
+      <ambiguityMapping token=" "/>
+
+      <gapSymbolMapping token="." />
+    </characterTokenization><!-- alternate -->
+  </alphabet><!-- DNA -->
 
   <alphabet name="RNA">
     <description>Ribose Nucleic Acid. Intermediate between genomic DNA and protein.</description>
@@ -270,9 +362,9 @@
       <ambiguityMapping token=".">
       </ambiguityMapping>
 
-      <gapSymbolMapping token="~" />>
-    </characterTokenization>
-  </alphabet>
+      <gapSymbolMapping token="~" />
+    </characterTokenization><!-- token -->
+  </alphabet><!-- RNA -->
 
   <alphabet name="NUCLEOTIDE">
     <description>All nucleic acids.</description>
@@ -380,77 +472,34 @@
       <ambiguityMapping token=".">
       </ambiguityMapping>
 
-      <gapSymbolMapping token="~" />>
-    </characterTokenization>
-  </alphabet>
+      <gapSymbolMapping token="~" />
+    </characterTokenization><!-- token -->
+  </alphabet><!-- NUCLEOTIDE -->
 
   <alphabet name="PROTEIN">
-    <description>Unmodified Amino-acids commonly found in proteins</description>
-    <symbol name="urn:lsid:biojava.org:symbol:ALA">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:ARG">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:ASN">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:ASP">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:CYS">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:GLN">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:GLU">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:GLY">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:HIS">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:ILE">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:LEU">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:LYS">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:MET">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:PHE">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:PRO">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:PYL">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:SEC">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:SER">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:THR">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:TRP">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:TYR">
-    </symbol>
-
-    <symbol name="urn:lsid:biojava.org:symbol:VAL">
-    </symbol>
+    <description>Amino-acids commonly found in proteins</description>
+    <symbol name="urn:lsid:biojava.org:symbol:ALA"/>
+    <symbol name="urn:lsid:biojava.org:symbol:ARG"/>
+    <symbol name="urn:lsid:biojava.org:symbol:ASN"/>
+    <symbol name="urn:lsid:biojava.org:symbol:ASP"/>
+    <symbol name="urn:lsid:biojava.org:symbol:CYS"/>
+    <symbol name="urn:lsid:biojava.org:symbol:GLN"/>
+    <symbol name="urn:lsid:biojava.org:symbol:GLU"/>
+    <symbol name="urn:lsid:biojava.org:symbol:GLY"/>
+    <symbol name="urn:lsid:biojava.org:symbol:HIS"/>
+    <symbol name="urn:lsid:biojava.org:symbol:ILE"/>
+    <symbol name="urn:lsid:biojava.org:symbol:LEU"/>
+    <symbol name="urn:lsid:biojava.org:symbol:LYS"/>
+    <symbol name="urn:lsid:biojava.org:symbol:MET"/>
+    <symbol name="urn:lsid:biojava.org:symbol:PHE"/>
+    <symbol name="urn:lsid:biojava.org:symbol:PRO"/>
+    <symbol name="urn:lsid:biojava.org:symbol:PYL"/>
+    <symbol name="urn:lsid:biojava.org:symbol:SEC"/>
+    <symbol name="urn:lsid:biojava.org:symbol:SER"/>
+    <symbol name="urn:lsid:biojava.org:symbol:THR"/>
+    <symbol name="urn:lsid:biojava.org:symbol:TRP"/>
+    <symbol name="urn:lsid:biojava.org:symbol:TYR"/>
+    <symbol name="urn:lsid:biojava.org:symbol:VAL"/>
 
     <characterTokenization name="token" caseSensitive="false">
       <atomicMapping token="A">
@@ -587,16 +636,14 @@
       <ambiguityMapping token=".">
       </ambiguityMapping>
 
-      <gapSymbolMapping token="~" />>
-    </characterTokenization>
-  </alphabet>
+      <gapSymbolMapping token="~" />
+    </characterTokenization><!-- token -->
+  </alphabet><!-- PROTEIN -->
 
   <alphabet name="PROTEIN-TERM" parent="PROTEIN">
     <symbol name="urn:lsid:biojava.org:symbol:TER">
       <description>Termination signal during translation</description>
     </symbol>
-
-    <!-- THOMASD we surely shouldn't need to replicated this -->
 
     <characterTokenization name="token" caseSensitive="false">
       <atomicMapping token="*">
@@ -763,10 +810,180 @@
       <ambiguityMapping token=".">
       </ambiguityMapping>
 
-      <gapSymbolMapping token="~" />>
-    </characterTokenization>
+      <gapSymbolMapping token="~" />
+    </characterTokenization><!-- token -->
 
-  </alphabet>
+    <characterTokenization name="alternate" caseSensitive="false">
+      <atomicMapping token="*  ">
+        <symbolref name="urn:lsid:biojava.org:symbol:TER" />
+      </atomicMapping>
+
+      <atomicMapping token="Ala">
+        <symbolref name="urn:lsid:biojava.org:symbol:ALA" />
+      </atomicMapping>
+
+      <atomicMapping token="Arg">
+        <symbolref name="urn:lsid:biojava.org:symbol:ARG" />
+      </atomicMapping>
+
+      <atomicMapping token="Asn">
+        <symbolref name="urn:lsid:biojava.org:symbol:ASN" />
+      </atomicMapping>
+
+      <atomicMapping token="Asp">
+        <symbolref name="urn:lsid:biojava.org:symbol:ASP" />
+      </atomicMapping>
+
+      <atomicMapping token="Cys">
+        <symbolref name="urn:lsid:biojava.org:symbol:CYS" />
+      </atomicMapping>
+
+      <atomicMapping token="Gln">
+        <symbolref name="urn:lsid:biojava.org:symbol:GLN" />
+      </atomicMapping>
+
+      <atomicMapping token="Glu">
+        <symbolref name="urn:lsid:biojava.org:symbol:GLU" />
+      </atomicMapping>
+
+      <atomicMapping token="Gly">
+        <symbolref name="urn:lsid:biojava.org:symbol:GLY" />
+      </atomicMapping>
+      
+      <atomicMapping token="His">
+        <symbolref name="urn:lsid:biojava.org:symbol:HIS" />
+      </atomicMapping>
+
+      <atomicMapping token="Ile">
+        <symbolref name="urn:lsid:biojava.org:symbol:ILE" />
+      </atomicMapping>
+
+      <atomicMapping token="Leu">
+        <symbolref name="urn:lsid:biojava.org:symbol:LEU" />
+      </atomicMapping>
+
+      <atomicMapping token="Lys">
+        <symbolref name="urn:lsid:biojava.org:symbol:LYS" />
+      </atomicMapping>
+
+      <atomicMapping token="Met">
+        <symbolref name="urn:lsid:biojava.org:symbol:MET" />
+      </atomicMapping>
+
+      <atomicMapping token="Phe">
+        <symbolref name="urn:lsid:biojava.org:symbol:PHE" />
+      </atomicMapping>
+
+      <atomicMapping token="Pro">
+        <symbolref name="urn:lsid:biojava.org:symbol:PRO" />
+      </atomicMapping>
+
+      <atomicMapping token="Pyl">
+        <symbolref name="urn:lsid:biojava.org:symbol:PYL" />
+      </atomicMapping>
+
+      <atomicMapping token="Sec">
+        <symbolref name="urn:lsid:biojava.org:symbol:SEC" />
+      </atomicMapping>
+
+      <atomicMapping token="Ser">
+        <symbolref name="urn:lsid:biojava.org:symbol:SER" />
+      </atomicMapping>
+
+      <atomicMapping token="Thr">
+        <symbolref name="urn:lsid:biojava.org:symbol:THR" />
+      </atomicMapping>
+
+      <atomicMapping token="Trp">
+        <symbolref name="urn:lsid:biojava.org:symbol:TRP" />
+      </atomicMapping>
+
+      <atomicMapping token="Tyr">
+        <symbolref name="urn:lsid:biojava.org:symbol:TYR" />
+      </atomicMapping>
+
+      <atomicMapping token="Val">
+        <symbolref name="urn:lsid:biojava.org:symbol:VAL" />
+      </atomicMapping>
+
+      <ambiguityMapping token="Xxx">
+        <symbolref name="urn:lsid:biojava.org:symbol:ALA"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:ARG"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:ASN"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:ASP"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:CYS"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:GLN"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:GLU"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:GLY"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:HIS"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:ILE"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:LEU"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:LYS"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:MET"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:PHE"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:PRO"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:PYL"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:SEC"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:SER"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:THR"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:TRP"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:TYR"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:VAL"/>
+      </ambiguityMapping>
+
+      <ambiguityMapping token="Xxx">
+        <symbolref name="urn:lsid:biojava.org:symbol:ALA"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:ARG"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:ASN"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:ASP"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:CYS"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:GLN"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:GLU"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:GLY"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:HIS"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:ILE"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:LEU"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:LYS"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:MET"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:PHE"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:PRO"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:PYL"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:SEC"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:SER"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:THR"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:TRP"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:TYR"/>
+        <symbolref name="urn:lsid:biojava.org:symbol:VAL"/>
+	<symbolref name="urn:lsid:biojava.org:symbol:TER" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="Asx">
+        <symbolref name="urn:lsid:biojava.org:symbol:ASP" />
+	<symbolref name="urn:lsid:biojava.org:symbol:ASN" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="Jxx">
+        <symbolref name="urn:lsid:biojava.org:symbol:ILE" />
+	<symbolref name="urn:lsid:biojava.org:symbol:LEU" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="Glx">
+        <symbolref name="urn:lsid:biojava.org:symbol:GLU" />
+	<symbolref name="urn:lsid:biojava.org:symbol:GLN" />
+      </ambiguityMapping>
+
+      <!-- Not used for writing! -->
+      <ambiguityMapping token="---"/>
+      <ambiguityMapping token="-  "/>
+      <ambiguityMapping token="..."/>
+      <ambiguityMapping token=".  "/>
+      <ambiguityMapping token="~~~"/>
+      <ambiguityMapping token="~  "/>
+
+      <gapSymbolMapping token=".  " />
+    </characterTokenization><!-- alternate -->
+
+  </alphabet><!-- PROTEIN TERM -->
 
   <alphabet name="STRUCTURE">
     <symbol name="urn:lsid:biojava.org:symbol:nothing">
@@ -842,9 +1059,9 @@
       <ambiguityMapping token="-">
       </ambiguityMapping>
 
-      <gapSymbolMapping token="~" />>
-    </characterTokenization>
-  </alphabet>
+      <gapSymbolMapping token="~" />
+    </characterTokenization><!-- token -->
+  </alphabet><!-- STRUCTURE -->
 
 </alphabetManager>
 

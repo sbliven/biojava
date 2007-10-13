@@ -47,6 +47,7 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.io.AlternateTokenization;
 import org.biojava.bio.seq.io.CharacterTokenization;
 import org.biojava.bio.seq.io.NameTokenization;
 import org.biojava.bio.seq.io.SeqIOListener;
@@ -87,6 +88,7 @@ import org.xml.sax.XMLReader;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Mark Schreiber
+ * @author George Waldon (alternate tokenization)
  */
 
 public final class AlphabetManager {
@@ -1282,7 +1284,8 @@ public final class AlphabetManager {
          private class CharacterTokenizationHandler extends StAXContentHandlerBase {
              private String name;
              private Map localSymbols;
-             private CharacterTokenization toke;
+             private SymbolTokenization toke;
+             private boolean isAlternate;
 
              String getName() {
                  return name;
@@ -1304,7 +1307,11 @@ public final class AlphabetManager {
                      WellKnownAtomicSymbol sym = (WellKnownAtomicSymbol) i.next();
                      this.localSymbols.put(sym.getIdentifier(), sym);
                  }
-                 toke = new CharacterTokenization(alpha, caseSensitive);
+                 if(name.indexOf("alternate")==0) {
+                     toke = new AlternateTokenization(alpha, caseSensitive);
+                     isAlternate = true;
+                 } else
+                     toke = new CharacterTokenization(alpha, caseSensitive);
              }
 
              public void startElement(String nsURI,
@@ -1341,6 +1348,7 @@ public final class AlphabetManager {
                  boolean isPureGap;
                  Set symbols = new HashSet();
                  char c = '\0';
+                 String str = "";
                  int level = 0;
 
                  public void startElement(String nsURI,
@@ -1352,6 +1360,8 @@ public final class AlphabetManager {
                  {
                      if (level == 0) {
                          c = attrs.getValue("token").charAt(0);
+                         if(isAlternate)
+                             str = attrs.getValue("token");
                      } else {
                          if (localName.equals("symbolref")) {
                              String name = attrs.getValue("name");
@@ -1374,7 +1384,7 @@ public final class AlphabetManager {
                  }
 
                  public void endElement(String nsURI,
-                                                    String localName,
+                                        String localName,
                                         String qName,
                                         StAXContentHandler delegate)
                      throws SAXException
@@ -1396,7 +1406,10 @@ public final class AlphabetManager {
                                      new SAXException("IllegalSymbolException binding mapping for " + c).initCause(ex);
                          }
                      }
-                     toke.bindSymbol(ambiSym, c);
+                     if(isAlternate)
+                        ((AlternateTokenization)toke).bindSymbol(ambiSym, str);
+                     else
+                        ((CharacterTokenization)toke).bindSymbol(ambiSym, c);
                  }
              }
          }
