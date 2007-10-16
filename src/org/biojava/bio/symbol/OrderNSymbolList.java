@@ -32,16 +32,18 @@ import org.biojava.bio.BioError;
  * <p>
  * In practice, what this means is that you can view a DNA sequence into an
  * overlapping dinucleotide sequence without having to do any work yourself.
- * <p>  Example
- * <p>  1 2 3 4 5 6 7      Index
- * <p>  a t c g g a t      Source SymbolList
- * <P>  a t
- * <P>    t c
- * <P>      c g...         Order 2 OrderNSymbolList
- * <p>
- * <p> Or overlapping trinucleotide sequence:
- * <P>  a t c
- * <p>    t c g...         Order 3 OrderNSymbolList
+ * <p>  Example:
+ * <pre>
+ *   1 2 3 4 5 6 7      Index
+ *   a t c g g a t      Source SymbolList
+ *   a t
+ *     t c
+ *       c g...         Order 2 OrderNSymbolList
+ * 
+ *   a t c
+ *     t c g
+ *       c g g...       Order 3 OrderNSymbolList
+ * </pre>
  *
  * @author Matthew Pocock
  * @author George Waldon (javadoc)
