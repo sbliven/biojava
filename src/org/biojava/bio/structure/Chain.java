@@ -26,6 +26,8 @@ package org.biojava.bio.structure;
 import java.util.List;
 
 import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * Defines the interface for a Chain.
@@ -211,6 +213,15 @@ public interface Chain {
     /** string representation.  */
     public String toString();
 	
+    
+    /** Convert the SEQRES groups of a Chain to a Biojava Sequence object.
+     * 
+     * @return the SEQRES groups of the Chain as a Sequence object.
+     * @throws IllegalSymbolException 
+     */
+    public Sequence getBJSequence() throws IllegalSymbolException ;
+    
+    
     /** return the amino acid sequence of this chain
      * ( all aminos even if they do not have 3D data ...).
      * @return the sequence as a string

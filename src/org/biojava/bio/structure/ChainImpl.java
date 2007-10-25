@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * A Chain in a PDB file. It contains several groups which can be of
@@ -447,11 +450,33 @@ public class ChainImpl implements Chain {
 
 	}
 
+	/** Convert the SEQRES groups of a Chain to a Biojava Sequence object.
+     * 
+     * @return the SEQRES groups of the Chain as a Sequence object.
+     * @throws IllegalSymbolException 
+     */
+    public Sequence getBJSequence() throws IllegalSymbolException {
+    	
+    	//List<Group> groups = c.getSeqResGroups();
+    	String seq = getSeqResSequence();
+    	
+    	String name = "";
+    	if ( this.getParent() != null )
+    		name = getParent().getPDBCode();
+    	name += "." + getName();
+    	    	
+    	return ProteinTools.createProteinSequence(seq, name );
+    	
+    }
+	
 
 
-	/** get amino acid sequence.
+	/** get amino acid sequence of the chain. for backwards compatibility this returns
+	 * the Atom sequence of the chain. 
 	 * @return a String representing the sequence.	    
 	 * @deprecated use getAtomSequence instead
+	 * @see #getAtomSequence()
+	 * @see #getSeqResSequence()
 	 */
 	public String getSequence(){
 		return getAtomSequence();
@@ -516,8 +541,5 @@ public class ChainImpl implements Chain {
 
 		return groups.size();
 	}
-
-
-
 
 }
