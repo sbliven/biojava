@@ -30,14 +30,14 @@ public class JointFragments {
 
     
         double rms;
-        List idxlist;
+        List<int[]> idxlist;
         public JointFragments(){
-            idxlist = new ArrayList();
+            idxlist = new ArrayList<int[]>();
             rms = 999;
         }
         
-        public void setIdxlist(List idxs) {
-            Iterator iter = idxs.iterator();
+        public void setIdxlist(List<int[]> idxs) {
+            Iterator<int[]> iter = idxs.iterator();
             while (iter.hasNext()){
                 int[] e = (int[])iter.next();
                 idxlist.add(e);
@@ -54,7 +54,7 @@ public class JointFragments {
             this.rms = rms;
         }
 
-        public List getIdxlist(){
+        public List<int[]> getIdxlist(){
             return idxlist;
         }
         public void add(int p1, int p2,int start,int end){
@@ -65,7 +65,7 @@ public class JointFragments {
                 int[] e = new int[] {p1+k,p2+k};
                 
                 // check if already known ...
-                Iterator iter = idxlist.iterator();
+                Iterator<int[]> iter = idxlist.iterator();
                 while (iter.hasNext()){
                     int[] kno = (int[])iter.next();
                     if ((kno[0] == e[0]) && ( kno[1] == e[1])){
