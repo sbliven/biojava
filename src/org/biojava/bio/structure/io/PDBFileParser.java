@@ -64,30 +64,64 @@ import org.biojava.bio.symbol.Symbol;
 
 
 /**
- * A PDB file parser.
- * @author Andreas Prlic
- * @author Jules Jacobsen
- * @since 1.4
+ * This class implements the actual PDB file parsing. Do not access it directly, but
+ * via the PDBFileReader class.
  * 
+ * <h2>Parsing</h2>
+ * 
+ * During the PDBfile parsing several Flags can be set:
+ * <ul>
+ * <li> {@link #setParseCAOnly(boolean)} - parse only the Atom records for C-alpha atoms</li>
+ * <li> {@link #setParseSecStruc(boolean)} - a flag if the secondary structure information from the PDB file (author's assignment) should be parsed.
+ *      If true the assignment can be accessed through {@link AminoAcid}.getSecStruc(); </li>
+ * <li> {@link #setAlignSeqRes(boolean)} - should the AminoAcid sequences from the SEQRES
+ *      and ATOM records of a PDB file be aligned? (default:yes)</li>
+ * </ul>
+ * 
+ * <p>
+ * To provide excessive memory usage for large PDB files, there is the ATOM_CA_THRESHOLD.
+ * If more Atoms than this threshold are being parsed in a PDB file, the parser will automatically
+ * switch to a C-alpha only representation.
+ * </p>
+ * 
+ * <p>
+ * The result of the parsing of the PDB file is a new {@link Structure} object.
+ * </p>
+ * 
+ * 
+ * For more documentation on how to work with the Structure API please
+ * see <a href="http://biojava.org/wiki/BioJava:CookBook#Protein_Structure" target="_top">
+ * http://biojava.org/wiki/BioJava:CookBook#Protein_Structure</a> 
+ * 
+ * 
+ * 
+ * 
+ * <h2>Example</h2>
  * <p>
  * Q: How can I get a Structure object from a PDB file?
  * </p>
  * <p>
  * A:
  * <pre>
- String filename =  "path/to/pdbfile.ent" ;
+ public {@link Structure} loadStructure(String pathToPDBFile){
+ 	    // The PDBFileParser is wrapped by the PDBFileReader 
+		{@link PDBFileReader} pdbreader = new {@link PDBFileReader}();
 
- PDBFileReader pdbreader = new PDBFileReader();
-
- try{
- Structure struc = pdbreader.getStructure(filename);
- System.out.println(struc);
- } catch (Exception e) {
- e.printStackTrace();
- }
+		{@link Structure} structure = null;
+		try{
+			structure = pdbreader.getStructure(pathToPDBFile);
+			System.out.println(structure);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return structure;
+	}
  </pre>
  *
  * 
+ * @author Andreas Prlic
+ * @author Jules Jacobsen
+ * @since 1.4
  */
 public class PDBFileParser  {
 
@@ -143,9 +177,22 @@ public class PDBFileParser  {
 	boolean parseSecStruc;
 	boolean alignSeqRes;
 
+	
 	public static final String PDB_AUTHOR_ASSIGNMENT = "PDB_AUTHOR_ASSIGNMENT";
+	
+	/** Helix secondary structure assignment
+	 * 
+	 */
 	public static final String HELIX  = "HELIX";
+	
+	/** Strand secondary structure assignment
+	 * 
+	 */
 	public static final String STRAND = "STRAND";
+	
+	/** Turn secondary structure assignment
+	 * 
+	 */
 	public static final String TURN   = "TURN";
 
 	// there is a file format change in PDB 3.0 and nucleotides are being renamed
@@ -154,14 +201,15 @@ public class PDBFileParser  {
 	static private Map<String, Integer> nucleotides23 ;
 
 	int atomCount;
+	
 	/** the maximum number of atoms that will be parsed before the parser switches to a CA-only 
 	 * representation of the PDB file. If this limit is exceeded also the SEQRES groups will be 
 	 * ignored.
 	 */
 	public static final int ATOM_CA_THRESHOLD = 500000; 
 
-	/**  the maximum nuber of atoms we will add to a structure
-     this protects from memory overflows in the few eally big protein structures.
+	/**  the maximum number of atoms we will add to a structure
+     this protects from memory overflows in the few really big protein structures.
 	 */
 	public static final int MAX_ATOMS = 700000; // tested with java -Xmx300M
 
@@ -251,16 +299,24 @@ public class PDBFileParser  {
 		parseCAOnly = false;
 
 	}
+	/** the flag if only the C-alpha atoms of the structure should be parsed
+	 * 
+	 * @return the flag
+	 */
 	public boolean isParseCAOnly() {
 		return parseCAOnly;
 	}
+	/** the flag if only the C-alpha atoms of the structure should be parsed
+	 * 
+	 * @param parseCAOnly
+	 */
 	public void setParseCAOnly(boolean parseCAOnly) {
 		this.parseCAOnly = parseCAOnly;
 	}
 
 
 
-	/** flag if the SEQRES amino acids shouldbe aligned with the ATOM amino acids
+	/** flag if the SEQRES amino acids should be aligned with the ATOM amino acids
 	 * 
 	 * @return flag
 	 */
@@ -270,7 +326,7 @@ public class PDBFileParser  {
 
 
 
-	/** define if the SEQRES in the structure shouldbe aligned with the ATOM records
+	/** define if the SEQRES in the structure should be aligned with the ATOM records
 	 * if yes, the AminoAcids in structure.getSeqRes will have the coordinates set.
 	 * @param alignSeqRes
 	 */
@@ -2158,6 +2214,12 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 			}
 	}
 
+	
+	/** After the parsing of a PDB file the {@link Chain} and  {@link Compound}
+	 * objects need to be linked to each other. 
+	 * 
+	 * @param s the structure
+	 */
 	public void linkChains2Compound(Structure s){
 		List<Compound> compounds = s.getCompounds();
 

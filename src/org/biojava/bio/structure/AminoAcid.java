@@ -39,7 +39,7 @@ import java.util.Map;
  * </p>
  * 
  *<p>
- *  AminoAcid inherits most from {@link Hetatom}.  Adds a few AminoAcid
+ *  AminoAcid inherits most from {@link HetatomImpl }.  Adds a few AminoAcid
  *  specific methods.
  *  </p>
  *  

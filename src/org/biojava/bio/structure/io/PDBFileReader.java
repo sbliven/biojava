@@ -31,10 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
@@ -48,27 +46,67 @@ import org.biojava.utils.io.InputStreamProvider;
 
 
 /**
- * A PDB file parser.
- * @author Andreas Prlic
+ * <p>
+ *  The wrapper class for parsing a PDB file.
+ *  </p>
+ *  
+ *  
+ *  <p>
+ *  Several flags can be set for this class
+ *  <ul>
+ *  <li> {@link #setParseCAOnly} - parse only the Atom records for C-alpha atoms (default:false)</li>
+ * <li> {@link #setParseSecStruc} - a flag if the secondary structure information from the PDB file (author's assignment) should be parsed.
+ *      If true the assignment can be accessed through {@link AminoAcid}.getSecStruc(); (default:false)</li>
+ * <li> {@link #setAlignSeqRes(boolean)} - should the AminoAcid sequences from the SEQRES
+ *      and ATOM records of a PDB file be aligned? (default:true)</li>    
+ * <li> {@link #setAutoFetch(boolean)} - if the PDB file can not be found locally, should it be fetched
+ *  from the EBI - ftp server? (default:false)</li>
+ *  </ul>
+ *  </p>
+ * 
  *
+ *
+ *<h2>Example</h2>
  * <p>
  * Q: How can I get a Structure object from a PDB file?
  * </p>
  * <p>
  * A:
  * <pre>
- String filename =  "path/to/pdbfile.ent" ;
+ public {@link Structure} loadStructure(String pathToPDBFile){
+		{@link PDBFileReader} pdbreader = new {@link PDBFileReader}();
 
- PDBFileReader pdbreader = new PDBFileReader();
-
- try{
-     Structure struc = pdbreader.getStructure(filename);
-     System.out.println(struc);
- } catch (Exception e) {
-     e.printStackTrace();
- }
+		{@link Structure} structure = null;
+		try{
+			structure = pdbreader.getStructure(pathToPDBFile);
+			System.out.println(structure);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return structure;
+	}
  </pre>
  *
+ * Access PDB files from a directory, take care of compressed PDB files
+ * <pre>
+ * public {@link Structure} loadStructureById() {
+		String path = "/path/to/PDB/directory/";
+
+		{@link PDBFileReader} pdbreader = new {@link PDBFileReader}();
+		pdbreader.setPath(path);
+		{@link Structure} structure = null;
+		try {
+			structure = pdbreader.getStructureById("5pti");
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+		return structure;
+		
+	}
+	</pre>
+ * 
+ *
+ * @author Andreas Prlic
  *
  */
 public class PDBFileReader implements StructureIOFile {
@@ -108,8 +146,10 @@ public class PDBFileReader implements StructureIOFile {
   
     
 	public static void main(String[] args){
-		String filename =  "/path/to/5pti.pdb" ;
+		String filename =  "/path/to/PDBFile.pdb" ;
 
+		// also see the demos
+		
 		PDBFileReader pdbreader = new PDBFileReader();
 		pdbreader.setParseSecStruc(true);
 		pdbreader.setAlignSeqRes(true);
@@ -206,12 +246,19 @@ public class PDBFileReader implements StructureIOFile {
 		this.autoFetch = autoFetch;
 	}
 
-
+	/* A flag to tell the parser to parse the Author's secondary structure assignment from the file
+	 * default is set to false, i.e. do NOT parse.
+	 * @param parseSecStruc
+	 */
 	public boolean isParseSecStruc() {
 		return parseSecStruc;
 	}
 
 
+	/*  A flag to tell the parser to parse the Author's secondary structure assignment from the file
+	 *  
+	 */
+	 
 	public void setParseSecStruc(boolean parseSecStruc) {
 		this.parseSecStruc = parseSecStruc;
 	}
