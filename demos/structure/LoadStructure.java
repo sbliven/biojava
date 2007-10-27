@@ -46,9 +46,34 @@ public class LoadStructure {
 			// the user provided a Path to a PDB file
 			demo.loadStructure(args[0]);
 		}
+		
+		demo.loadStructureById();
 
 	}
 
+	
+	/** access a structure from a directory by using a PDB code.
+	 * The PDBFileReader class takes care of compressed PDB files
+	 * 
+	 * @param pdbCode
+	 * @return
+	 */
+	public Structure loadStructureById() {
+		String path = "/path/to/PDB/directory";
+
+		PDBFileReader pdbreader = new PDBFileReader();
+		pdbreader.setPath(path);
+		Structure structure = null;
+		try {
+			structure = pdbreader.getStructureById("5pti");
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+		return structure;
+		
+	}
+	
+	
 	public Structure loadStructure(String pathToPDBFile){
 		PDBFileReader pdbreader = new PDBFileReader();
 
