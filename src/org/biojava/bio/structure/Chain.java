@@ -30,7 +30,19 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
- * Defines the interface for a Chain.
+ * <p>
+ * Defines the interface for a Chain. A Chain corresponds to a Chain in a PDB file.
+ * A chain consists out of a list of {@link Group} objects. A Group can either be 
+ * an {@link AminoAcid}, {@link HetatomImpl Hetatom} or {@link NucleotideImpl Nucleotide}.
+ * </p>
+ * 
+ * <p>
+ * The BioJava API provides access to both the ATOM and SEQRES records in a PDB file.
+ * During parsing of a PDB file it aligns the ATOM and SEQRES groups and joins them.
+ * The SEQRES sequence can be accessed via  {@link #getSeqResGroups()} and the
+ * ATOM groups via {@link #getAtomGroups()}. Groups that have been observed
+ * (i.e. they are in the ATOM records) can be detected by {@link Group}.has3D()
+ *  </p>
  *
  * @author Andreas Prlic
  * @version %I% %G%
@@ -87,29 +99,29 @@ public interface Chain {
     public Group getSeqResGroup (int position);
     
     
-    /** return an ArrayList of all groups of a special type (e.g. amino,
+    /** return a List of all groups of a special type (e.g. amino,
      * hetatm, nucleotide).
      * @param type  a String
-     * @return an ArrayList object
+     * @return a List object
      * @deprecated use getAtomGroups or getSeqResGroups instead
      */
     public List<Group> getGroups (String type);
 
     /** return all groups of this chain.
-     * @return an ArrayList of all Group objects of this chain
+     * @return a List of all Group objects of this chain
      * @deprecated use getAtomGroups or getSeqResGroups instead
      */
     public List<Group> getGroups ();
     /** return all groups that have been specified in the ATOM section of this chain .
-     * @return an ArrayList object representing the Groups of this Chain.
+     * @return a List object representing the Groups of this Chain.
      */
     public List<Group> getAtomGroups();
     
 
-    /** return an ArrayList of all groups of a special type (e.g. amino,
+    /** return a List of all groups of a special type (e.g. amino,
      * hetatm, nucleotide).
      * @param type  a String
-     * @return an ArrayList object
+     * @return a List object
      * 
      */
     public List<Group> getAtomGroups (String type);
@@ -257,15 +269,15 @@ public interface Chain {
     public String getSwissprotId() ;
     
     
-    /** return an ArrayList of all groups of a special type (e.g. amino,
+    /** return a List of all groups of a special type (e.g. amino,
      * hetatm, nucleotide).
      * @param type  a String
-     * @return an ArrayList object
+     * @return an List object
      */
     public List<Group> getSeqResGroups (String type);
 
     /** return all groups of this chain.
-     * @return an ArrayList of all Group objects of this chain
+     * @return a List of all Group objects of this chain
 
      */
     public List<Group> getSeqResGroups ();

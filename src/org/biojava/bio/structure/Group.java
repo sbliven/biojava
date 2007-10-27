@@ -31,12 +31,17 @@ import org.biojava.bio.structure.io.PDBParseException;
 
 /**
  *  
- * This is the datastructure for a single Group of atoms.  A protein
- * sequence (Chain in PDB file) is represented as a list of this kind
- * of objects. Groups can be of type
- * "amino","hetatm","nucleotide". There are corresponding classes for
- * each of this type which implement interface Group.
+ * This is the data structure for a single Group of atoms.  A protein
+ * sequence ({@link Chain} in PDB file) is represented as a list of Groups.
+ * There are 3 types of Groups:
  * 
+ * <ul>
+ * <li>{@link AminoAcid}</li>
+ * <li>{@link HetatomImpl Hetatom}</li>
+ * <li>{@link NucleotideImpl Nucleotide}</li>
+ * </ul>
+ *  
+ *   
  * @see HetatomImpl
  * @see AminoAcidImpl
  * @see NucleotideImpl
