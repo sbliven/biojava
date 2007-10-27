@@ -26,11 +26,44 @@ package org.biojava.bio.structure;
 import java.util.List;
 import java.util.Map;
 
+import org.biojava.bio.structure.io.FileConvert;
+import org.biojava.bio.structure.io.PDBFileReader;
+import org.biojava.bio.structure.HetatomImpl;
+import org.biojava.bio.structure.NucleotideImpl;
+
 /**
  * 
  * Interface for a structure object. Provides access to the data of a PDB file.
+ * 
+ * A structure object allows to access the PDB header information as well
+ * as to the data from the ATOM records. The header information is
+ * currently available through the following objects:
+ * <ul>
+ * <li>{@link PDBHeader}</li>
+ * <li>{@link DBRef}</li>
+ * <li>{@link Compound}</li>
+ * </ul>
+ * 
+ * The structure object provides access to the data from the ATOM records through
+ * a hierarchy of sub-object:
+ * <pre>
+ * Structure
+ *         |
+ *         {@link Chain}
+ *             |
+ *             {@link Group}
+ *                 |
+ *                 {@link Atom}
+ * </pre>
+ * 
+ * For more documentation on how to work with the Structure API please
+ * see <a href="http://biojava.org/wiki/BioJava:CookBook#Protein_Structure" target="_top">
+ * http://biojava.org/wiki/BioJava:CookBook#Protein_Structure</a>
+ * 
+ * 
+ * 
  *
-<hr>
+<hr/>
 </hr>
  * <p>
  * Q: How can I get a Structure object from a PDB file?
@@ -39,68 +72,94 @@ import java.util.Map;
  * A:
  </p>
  * <pre>
- String filename =  "path/to/pdbfile.ent" ;
+public {@link Structure} loadStructure(String pathToPDBFile){
+		{@link PDBFileReader} pdbreader = new {@link PDBFileReader}();
 
- PDBFileReader pdbreader = new PDBFileReader();
-
- try{
-      	Structure struc = pdbreader.getStructure(filename);
-	System.out.println(struc);
- } catch (Exception e) {
- 	e.printStackTrace();
- }
+		{@link Structure} structure = null;
+		try{
+			structure = pdbreader.getStructure(pathToPDBFile);
+			System.out.println(structure);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return structure;
+	}
  </pre>
 
 <hr>
 </hr>
 <p>
-Q: How can I calculate Phi and Psi angles of the AminoAcids?
+Q: How can I calculate Phi and Psi angles of AminoAcids?
 </p>
 <p>
 A:
 </p>
 <pre>
-	ArrayList chains = (ArrayList)struc.getModel(0);
-	Chain tmpchn  = (Chain)chains.get(0) ;
-	ArrayList aminos = tmpchn.getGroups("amino");
-	
-	AminoAcid a;
-	AminoAcid b;
-	AminoAcid c ;
+public void calcPhiPsi({@link Structure} structure){
 
-	for ( int i=0; i < aminos.size(); i++){
 
-	    b = (AminoAcid)aminos.get(i);
-	    double phi =360.0;
-	    double psi =360.0;
+		// get the first chain from the structure
 
-	    if ( i > 0) {
-		a = (AminoAcid)aminos.get(i-1) ;
-		try {
-		    phi = Calc.getPhi(a,b);	   			   
-		} catch (StructureException e){		    
-		    e.printStackTrace();
-		    phi = 360.0 ;
+		{@link Chain} chain  = structure.getChain(0);
+
+		// A protein chain consists of a number of groups. These can be either
+		// {@link AminoAcid}, {@link HetatomImpl Hetatom} or {@link NucleotideImpl Nucleotide} groups.
+		//
+		// Note: BioJava provides access to both the ATOM and SEQRES data in a PDB file.
+		// since we are interested in doing calculations here, we only request the groups 
+		// from the ATOM records
+
+		//  get the Groups of the chain that are AminoAcids.
+		List<Group> groups = chain.getAtomGroups("amino");
+
+		{@link AminoAcid} a;
+		{@link AminoAcid} b;
+		{@link AminoAcid} c ;
+
+		for ( int i=0; i < groups.size(); i++){
+
+			// since we requested only groups of type "amino" they will always be amino acids
+			// Nucleotide and Hetatom groups will not be present in the groups list.
+
+			b = ({@link AminoAcid})groups.get(i);
+
+			double phi =360.0;
+			double psi =360.0;
+
+			if ( i > 0) {
+				a = ({@link AminoAcid})groups.get(i-1) ;
+				try {
+
+					// the Calc class provides utility methods for various calculations on
+					// structures, groups and atoms
+
+					phi = {@link Calc}.getPhi(a,b);	   			   
+				} catch ({@link StructureException} e){		    
+					e.printStackTrace();
+					phi = 360.0 ;
+				}
+			}
+			if ( i < groups.size()-1) {
+				c = ({@link AminoAcid})groups.get(i+1) ;
+				try {
+					psi = {@link Calc}.getPsi(b,c);
+				}catch ({@link StructureException} e){
+					e.printStackTrace();
+					psi = 360.0 ;
+				}
+			}
+
+			System.out.print(b.getPDBCode() + " " + b.getPDBName() + ":"  );
+
+			System.out.println(String.format("\tphi: %+7.2f psi: %+7.2f", phi, psi));
+
 		}
-	    }
-	    if ( i < aminos.size()-1) {
-		c = (AminoAcid)aminos.get(i+1) ;
-		try {
-		    psi = Calc.getPsi(b,c);
-		}catch (StructureException e){
-		    e.printStackTrace();
-		    psi = 360.0 ;
-		}
-	    }
-
-	    String str = b.getPDBCode() + " " + b.getPDBName() + ":"  ;
-	    str += "\tphi: " + phi + "\tpsi: " + psi;
-	    System.out.println(str);
 </pre>
 <hr>
 </hr> 
 
  *
+ * 
  *
  * @author Andreas Prlic
  * @since 1.4
@@ -411,6 +470,7 @@ public interface Structure extends Cloneable{
     /** create a String that contains the contents of a PDB file .
      *
      * @return a String that looks like a PDB file
+     * @see FileConvert
      */
     public String toPDB();
     
