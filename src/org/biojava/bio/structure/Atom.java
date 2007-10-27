@@ -24,7 +24,12 @@
 package org.biojava.bio.structure;
 
 /**
- * simple interface of an Atom.
+ * A simple interface for an Atom.
+ * The coordinates can be accessed via the
+ * {@link #getCoords()}, or the 
+ * {@link #getX()}, {@link #getY()}, {@link #getZ()} methods.
+ * There are a few additional methods here to provide some PDB specific information.
+ * 
  
  * @author Andreas Prlic
  * @author Horvath Tamas

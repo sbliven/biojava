@@ -26,7 +26,7 @@ package org.biojava.bio.structure;
 
 /**
  * Implementation of an Atom of a PDB file.
- * currently the coordinates of an atom are represented by a doubl[3] array.
+ * currently the coordinates of an atom are represented by a double[3] array.
  * @author Andreas Prlic
  * @since 1.4
  * @version %I% %G%
