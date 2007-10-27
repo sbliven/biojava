@@ -1,5 +1,32 @@
 <BODY>
 <P>
 Interfaces and classes for protein structure (PDB).
+
+To load a PDB file see the <a href="io/PDBFileReader.html">PDBFileReader</a> class.
+
+The <a href="Structure.html">Structure</a> object allows to access the PDB header information as well
+as to the data from the ATOM records. The header information is currently available through the following objects:
+  <ul>
+  <li><a href="PDBHeader.html">PDBHeader</a></li>
+  <li><a href="DBRef">DBRef</a></li>
+  <li><a href="Compound">Compound</a></li>
+  </ul>
+  
+  The structure object provides access to the data from the ATOM records through
+  a hierarchy of sub-object:
+  <pre>
+  <a href="Structure.html">Structure</a>
+          |
+          <a href="Chain.html">Chain</a>
+              |
+              <a href="Group.html">Group</a>
+                  |
+                  <a href="Atom.html">Atom</a>
+  </pre>
+  
+  For more documentation on how to work with the Structure API please
+  see <a href="http://biojava.org/wiki/BioJava:CookBook#Protein_Structure" target="_top">
+  http://biojava.org/wiki/BioJava:CookBook#Protein_Structure</a>
+
 </P>
 </BODY>
