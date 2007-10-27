@@ -26,9 +26,23 @@ package org.biojava.bio.structure;
 import java.util.Map;
 
 /**
- *
- *  AminoAcid inherits most from Hetatom.  Adds a few AminoAcid
+ * <p>
+ * A {@link Group} that represents an AminoAcid.
+ * </p>
+ * 
+ * <p>
+ * In PDB files information on AminoAcids can be observed in the SEQRES and in the ATOM records.
+ * Since frequently coordinates for some of the amino acids are missing, during parsing of the PDB
+ * files the SEQRES and the ATOM records are aligned and a whenever possible the AminoAcid objects 
+ * are combined. Access to the SEQRES and ATOM sequence is possible through the {@link Chain} object.
+ * It is possible to distinguish between SEQRES and ATOM derived AminoAcids by {@link #getRecordType()}.
+ * </p>
+ * 
+ *<p>
+ *  AminoAcid inherits most from {@link Hetatom}.  Adds a few AminoAcid
  *  specific methods.
+ *  </p>
+ *  
  * @author Andreas Prlic
  * @since 1.4
  * @version %I% %G%
