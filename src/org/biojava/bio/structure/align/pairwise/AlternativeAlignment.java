@@ -24,7 +24,7 @@ package org.biojava.bio.structure.align.pairwise;
 
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -68,7 +68,6 @@ public class AlternativeAlignment {
 	//short[] alig2;
 
 	int nfrags;
-	List flist;
 	Atom center;
 	Matrix rot;
 	Atom tr;
@@ -102,7 +101,7 @@ public class AlternativeAlignment {
 		//alig2 = new short[0];
 		idx1 = new int[0];
 		idx2 = new int[0];
-		flist = new ArrayList();
+		
 		center = new AtomImpl();
 		rot = null;
 		tr = new AtomImpl();
@@ -252,7 +251,7 @@ public class AlternativeAlignment {
 	 * @param jf a JoingFragment
 	 */
 	public void apairs_from_idxlst(JointFragments jf) {
-		List il = jf.getIdxlist();
+		List<int[]> il = jf.getIdxlist();
 		//System.out.println("Alt Alig apairs_from_idxlst");
 
 		aligpath = new IndexPair[il.size()];
@@ -746,8 +745,6 @@ public class AlternativeAlignment {
 
 
 
-
-
 	public void calculateSuperpositionByIdx(Atom[] ca1, Atom[] ca2)throws StructureException {
 
 		super_pos_alig(ca1,ca2,idx1,idx2,false);
@@ -814,7 +811,7 @@ public class AlternativeAlignment {
 
 
 
-	/** calculates varios scores for this alignment like %id
+	/** calculates  scores for this alignment ( %id )
 	 * @param ca1 set of Atoms for molecule 1 
 	 * @param ca2 set of Atoms for molecule 2
 
@@ -838,17 +835,17 @@ public class AlternativeAlignment {
 		}
 	}
 
-	/** converts the alignment to a PDB file
-	 * each of the structures will be represented as a model.
+	
+	
+	/** create an artifical Structure object that contains the two
+	 * structures superimposed onto each other. Each structure is in a separate model.
+	 * Model 1 is structure 1 and Model 2 is structure 2.
 	 * 
-	 *  
-	 * @param s1
-	 * @param s2
-	 * @return a PDB file as a String
+	 * @param s1 the first structure. its coordinates will not be changed
+	 * @param s2 the second structure, it will be cloned and the cloned coordinates will be rotated according to the alignment results.
+	 * @return composite structure containing the 2 aligned structures as a models 1 and 2
 	 */
-	public String toPDB(Structure s1, Structure s2){
-
-
+	public Structure getAlignedStructure(Structure s1, Structure s2){
 		// do not change the original coords ..
 		Structure s3 = (Structure)s2.clone();
 
@@ -862,8 +859,26 @@ public class AlternativeAlignment {
 		newpdb.setName("Aligned with BioJava");
 		newpdb.setNmr(true);
 
+		
 		newpdb.addModel(s1.getChains(0));
 		newpdb.addModel(s3.getChains(0));
+		
+		return newpdb;
+		
+	}
+	
+	/** converts the alignment to a PDB file
+	 * each of the structures will be represented as a model.
+	 * 
+	 *  
+	 * @param s1
+	 * @param s2
+	 * @return a PDB file as a String
+	 */
+	public String toPDB(Structure s1, Structure s2){
+
+
+		Structure newpdb = getAlignedStructure(s1, s2);
 
 		return newpdb.toPDB();
 	}
