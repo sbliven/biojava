@@ -35,8 +35,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.PDBFileReader;
 
@@ -61,7 +64,7 @@ public class BiojavaJmol {
 
 			PDBFileReader pdbr = new PDBFileReader();   
 			//pdbr.setAutoFetch(true);
-			pdbr.setPath("/Path/To/PDB/DIR/");
+			pdbr.setPath("/Users/andreas/WORK/PDB/");
 
 			String pdbCode = "5pti";
 
@@ -85,6 +88,9 @@ public class BiojavaJmol {
 		frame = new JFrame();
 		frame.addWindowListener(new ApplicationCloser());
 		Container contentPane = frame.getContentPane();
+		
+		Box vBox = Box.createVerticalBox();
+		
 		try {
 			jmolPanel = new JmolPanel();
 		} catch (ClassNotFoundException e){
@@ -93,8 +99,20 @@ public class BiojavaJmol {
 			return;
 		}
 		jmolPanel.setPreferredSize(new Dimension(200,200));
-		contentPane.add(jmolPanel);
+		vBox.add(jmolPanel);
+		
 
+		JTextField field = new JTextField();
+		
+		field.setMaximumSize(new Dimension(Short.MAX_VALUE,30));   
+		field.setText("enter RASMOL like command...");
+        RasmolCommandListener listener = new RasmolCommandListener(jmolPanel,field) ;
+        
+        field.addActionListener(listener);
+        field.addMouseListener(listener);
+        field.addKeyListener(listener);
+		vBox.add(field);
+		contentPane.add(vBox);
 		frame.pack();
 		frame.setVisible(true); 
 
@@ -120,8 +138,9 @@ public class BiojavaJmol {
 		// actually this is very simple
 		// just convert the structure to a PDB file
 
-		String pdb = s.toPDB();		
-
+		String pdb = s.toPDB();	
+		System.out.println(s.isNmr());
+		//System.out.println(pdb);
 		// Jmol could also read the file directly from your file system
 		//viewer.openFile("/Path/To/PDB/1tim.pdb");
 
