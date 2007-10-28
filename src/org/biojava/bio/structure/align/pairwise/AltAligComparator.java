@@ -25,7 +25,13 @@ package org.biojava.bio.structure.align.pairwise;
 import java.util.Comparator;
 
 
-public class AltAligComparator implements Comparator {
+/** a comparator to sort AlternativeAlignments based on their number of equivalent residues
+ * and RMSD.
+ * 
+ * @author Andreas Prlic
+ *
+ */
+public class AltAligComparator implements Comparator<AlternativeAlignment> {
 
 
     public AltAligComparator() {
@@ -33,9 +39,7 @@ public class AltAligComparator implements Comparator {
 
     }
 
-    public int compare(Object arg0, Object arg1) {
-        AlternativeAlignment a = (AlternativeAlignment) arg0;
-        AlternativeAlignment b = (AlternativeAlignment) arg1;
+    public int compare(AlternativeAlignment a, AlternativeAlignment b) {
         
         int s1 = a.getIdx1().length;
         int s2 = b.getIdx1().length;
