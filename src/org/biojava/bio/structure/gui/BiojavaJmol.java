@@ -44,7 +44,13 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.PDBFileReader;
 
 
-
+/** A class that provides a simple GUI for Jmol
+ * 
+ * @author Andreas Prlic
+ *
+ *
+ *
+ */
 public class BiojavaJmol {
 
 	public static final String viewer = "org.jmol.api.JmolSimpleViewer";
@@ -71,9 +77,9 @@ public class BiojavaJmol {
 			Structure struc = pdbr.getStructureById(pdbCode);
 
 			BiojavaJmol jmolPanel = new BiojavaJmol();
-			
+
 			jmolPanel.setStructure(struc);
-			
+
 			// send some RASMOL style commands to Jmol
 			jmolPanel.evalString("select * ; color chain;");
 			jmolPanel.evalString("select *; spacefill off; wireframe off; backbone 0.4;  ");
@@ -88,9 +94,9 @@ public class BiojavaJmol {
 		frame = new JFrame();
 		frame.addWindowListener(new ApplicationCloser());
 		Container contentPane = frame.getContentPane();
-		
+
 		Box vBox = Box.createVerticalBox();
-		
+
 		try {
 			jmolPanel = new JmolPanel();
 		} catch (ClassNotFoundException e){
@@ -100,24 +106,38 @@ public class BiojavaJmol {
 		}
 		jmolPanel.setPreferredSize(new Dimension(200,200));
 		vBox.add(jmolPanel);
-		
+
 
 		JTextField field = new JTextField();
-		
+
 		field.setMaximumSize(new Dimension(Short.MAX_VALUE,30));   
 		field.setText("enter RASMOL like command...");
-        RasmolCommandListener listener = new RasmolCommandListener(jmolPanel,field) ;
-        
-        field.addActionListener(listener);
-        field.addMouseListener(listener);
-        field.addKeyListener(listener);
+		RasmolCommandListener listener = new RasmolCommandListener(jmolPanel,field) ;
+
+		field.addActionListener(listener);
+		field.addMouseListener(listener);
+		field.addKeyListener(listener);
 		vBox.add(field);
 		contentPane.add(vBox);
 		frame.pack();
 		frame.setVisible(true); 
 
 	}
-	
+
+	/** returns true if Jmol can be found in the classpath, otherwise false.
+	 * 
+	 * @return
+	 */
+	public static boolean jmolInClassPath(){
+		try {
+			Class.forName(viewer);		
+		} catch (ClassNotFoundException e){
+			e.printStackTrace();			
+			return false;
+		}
+		return true;
+	}
+
 	public void evalString(String rasmolScript){
 		if ( jmolPanel == null ){
 			System.err.println("please install Jmol first");
@@ -125,14 +145,14 @@ public class BiojavaJmol {
 		}
 		jmolPanel.evalString(rasmolScript);
 	}
-	
+
 	public void setStructure(Structure s) {
-		
+
 		if ( jmolPanel == null ){
 			System.err.println("please install Jmol first");
 			return;
 		}
-		
+
 		frame.setName(s.getPDBCode());
 
 		// actually this is very simple
@@ -140,20 +160,21 @@ public class BiojavaJmol {
 
 		String pdb = s.toPDB();	
 		System.out.println(s.isNmr());
+
 		//System.out.println(pdb);
 		// Jmol could also read the file directly from your file system
 		//viewer.openFile("/Path/To/PDB/1tim.pdb");
 
 		//System.out.println(pdb);
 		jmolPanel.openStringInline(pdb);
-		
+
 		// send the PDB file to Jmol.
 		// there are also other ways to interact with Jmol, e.g make it directly
 		// access the biojava structure object, but they require more
 		// code. See the SPICE code repository for how to do this.
-		
-		
-		
+
+
+
 
 	}
 
@@ -161,7 +182,7 @@ public class BiojavaJmol {
 		frame.setTitle(label);
 	}
 
-	
+
 
 
 	static class ApplicationCloser extends WindowAdapter {
@@ -179,14 +200,14 @@ public class BiojavaJmol {
 		Class viewerC;
 		Class adapterC;
 		Class smartAdapterC;
-		
+
 		Object viewerO;
 		Object adapterO;
-		
+
 		Method evalString;
 		Method renderScreenImage;
 		Method openStringInline;
-		
+
 		//JmolSimpleViewer viewer;
 		//JmolAdapter adapter;
 		JmolPanel() throws ClassNotFoundException {
@@ -196,22 +217,22 @@ public class BiojavaJmol {
 
 				adapterC = Class.forName(adapter);
 				smartAdapterC = Class.forName(smartAdapter);
-				 
+
 				Method m = viewerC.getMethod("allocateSimpleViewer", new Class[]{Component.class,adapterC});
 
 				Constructor constructor = smartAdapterC.getConstructor(new Class[]{});
 				adapterO = constructor.newInstance(new Object[]{});
-				
+
 				//viewerC = JmolSimpleViewer.allocateSimpleViewer(this, adapter);
 				viewerO = m.invoke(viewerC, this, adapterO);
 
 				evalString = viewerC.getMethod("evalString",String.class);
-				
+
 				renderScreenImage = viewerC.getMethod("renderScreenImage",
 						new Class[]{Graphics.class,Dimension.class, Rectangle.class});
-				
+
 				openStringInline = viewerC.getMethod("openStringInline", new Class[]{String.class});
-				
+
 			} catch (InstantiationException e){
 				e.printStackTrace();
 			} catch (NoSuchMethodException e){
@@ -235,7 +256,7 @@ public class BiojavaJmol {
 				e.printStackTrace();
 			}
 		}
-		
+
 		public void openStringInline(String pdbFile){
 			try {
 				openStringInline.invoke(viewerO, pdbFile);
@@ -243,7 +264,7 @@ public class BiojavaJmol {
 				e.printStackTrace();
 			}
 		}
-		
+
 		public void executeCmd(String rasmolScript){
 			try {
 				evalString.invoke(viewerO, rasmolScript);
@@ -260,7 +281,7 @@ public class BiojavaJmol {
 			getSize(currentSize);
 			g.getClipBounds(rectClip);
 			//viewer.renderScreenImage(g, currentSize, rectClip);
-			
+
 			try {
 				renderScreenImage.invoke(viewerO,g,currentSize,rectClip);
 			} catch (Exception e){
