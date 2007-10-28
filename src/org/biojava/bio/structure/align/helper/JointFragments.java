@@ -26,6 +26,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+
+/** A utility class that defines which set of atoms are considered 
+ * to be on equivalent positions.
+ * 
+ *
+ */
 public class JointFragments {
 
     
