@@ -86,7 +86,7 @@ public class FragmentJoiner {
      * @param rmsmat
      * @return true - if this is a better representant for a group of locala fragments.
      */
-    public static boolean reduceFragments(List fragments, FragmentPair f, Matrix rmsmat){
+    public static boolean reduceFragments(List<FragmentPair> fragments, FragmentPair f, Matrix rmsmat){
         //logger.info("reducing fragments");
         boolean doNotAdd =false;
         int i = f.getPos1();
@@ -120,7 +120,7 @@ public class FragmentJoiner {
            StrucAligParameters params){
         
         //the final list of joined fragments stores as apairs
-        List fll = new ArrayList();
+        List<JointFragments> fll = new ArrayList<JointFragments>();
         
         FragmentPair[] tmpfidx = new FragmentPair[fraglst.length];
         for ( int i=0 ; i < fraglst.length; i++){
@@ -207,11 +207,11 @@ public class FragmentJoiner {
         //System.out.println("");
         
         
-        Comparator comp = new JointFragmentsComparator();
+        Comparator<JointFragments> comp = new JointFragmentsComparator();
         Collections.sort(fll,comp);
         Collections.reverse(fll);
         int m = Math.min(params.getMaxrefine(),fll.size());
-        List retlst = new ArrayList();
+        List<JointFragments> retlst = new ArrayList<JointFragments>();
         for ( int i = 0 ; i < m ; i++){
             JointFragments jf = (JointFragments)fll.get(i);
             //System.out.println(jf);
@@ -222,7 +222,7 @@ public class FragmentJoiner {
         
     }
     
-    private boolean densityCheckOk(Atom[] aa1, Atom[] aa2, List idxlist, 
+    private boolean densityCheckOk(Atom[] aa1, Atom[] aa2, List<int[]> idxlist, 
             int p2i, int p2j, int l2, 
             double densityCutoff){
         JointFragments ftmp = new JointFragments();
@@ -322,7 +322,8 @@ public class FragmentJoiner {
         //return Math.abs(avd1-avd2);
         return Math.min(avd1,avd2);
     }
-    private double rmsCheck(Atom[] a1, Atom[] a2,List idxlist, int p2i, int p2j, int l2){
+    
+    private double rmsCheck(Atom[] a1, Atom[] a2,List<int[]> idxlist, int p2i, int p2j, int l2){
 
         //System.out.println(dd);
         // check if a joint fragment has low rms ...
@@ -337,6 +338,13 @@ public class FragmentJoiner {
         return rms;
     }
     
+    /** get the RMS of the JointFragments pair frag
+     * 
+     * @param ca1 the array of all atoms of structure1
+     * @param ca2 the array of all atoms of structure1
+     * @param frag the JointFragments object that contains the list of identical positions
+     * @return the rms
+     */
     public static double getRMS(Atom[] ca1, Atom[]ca2,JointFragments frag){
 //      now svd ftmp and check if the rms is < X ...
         AlternativeAlignment ali = new AlternativeAlignment();
@@ -450,7 +458,7 @@ public class FragmentJoiner {
         int[] used = new int[n];
         
         //the final list of joined fragments stores as apairs
-        List fll = new ArrayList();
+        List<JointFragments> fll = new ArrayList<JointFragments>();
         
         int cnt = 0;
         double adiff = angleDiff * Math.PI / 180d;
@@ -526,18 +534,17 @@ public class FragmentJoiner {
         }
         
         
-        Comparator comp = new JointFragmentsComparator();
+        Comparator<JointFragments> comp = new JointFragmentsComparator();
         Collections.sort(fll,comp);
         Collections.reverse(fll);
         int m = Math.min(maxRefine,fll.size());
-        List retlst = new ArrayList();
+        List<JointFragments> retlst = new ArrayList<JointFragments>();
         for ( int i = 0 ; i < m ; i++){
-            JointFragments jf = (JointFragments)fll.get(i);
-            //System.out.println(jf);
+            JointFragments jf = (JointFragments)fll.get(i);          
             retlst.add(jf);
         }
-        //return (JointFragments[])retlst.toArray(new JointFragments[retlst.size()]);
-        return (JointFragments[])retlst.toArray(new JointFragments[retlst.size()]);
+        
+        return retlst.toArray(new JointFragments[retlst.size()]);
        
     }
     
@@ -549,12 +556,11 @@ public class FragmentJoiner {
 
 
 class JointFragmentsComparator
-implements Comparator {
+implements Comparator<JointFragments> {
 
-    public int compare(Object arg0, Object arg1) {
+    public int compare(JointFragments one, JointFragments two) {
     
-        JointFragments one = (JointFragments)arg0;
-        JointFragments two = (JointFragments)arg1;
+       
         int s1 = one.getIdxlist().size();
         int s2 = two.getIdxlist().size();
         
