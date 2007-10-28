@@ -79,6 +79,11 @@ public class SuperimposeStructures {
 			AlternativeAlignment a = aligs[0];          
 			System.out.println(a);
 			
+			
+			if (! BiojavaJmol.jmolInClassPath()){
+				 System.err.println("Could not find Jmol in classpath, please install first!");
+				 return;
+			 }
 			// display the alignment in Jmol
 			
 			// first get an artificial structure for the alignment
