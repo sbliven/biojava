@@ -126,7 +126,7 @@ public class BiojavaJmol {
 
 	/** returns true if Jmol can be found in the classpath, otherwise false.
 	 * 
-	 * @return
+	 * @return true/false depending if Jmol can be found
 	 */
 	public static boolean jmolInClassPath(){
 		try {
