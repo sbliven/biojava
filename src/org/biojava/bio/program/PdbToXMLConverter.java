@@ -34,7 +34,7 @@ import org.xml.sax.XMLReader;
  * </b>
  * <p>
  * Copyright &copy; 2000 Cambridge Antibody Technology.
- * All Rights Reserved.
+ *
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)
