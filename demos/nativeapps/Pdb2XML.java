@@ -52,7 +52,7 @@ import org.biojava.bio.program.PdbToXMLConverter;
  * for the BlastLikeSAXParser.
  * <p>
  * Copyright &copy; 2000 Cambridge Antibody Technology.
- * All Rights Reserved.
+ * 
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)

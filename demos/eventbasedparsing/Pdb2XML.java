@@ -46,7 +46,7 @@ import org.biojava.bio.program.PdbToXMLConverter;
  * -mode is optional paramater.
  * <p>
  * Copyright &copy; 2000 Cambridge Antibody Technology.
- * All Rights Reserved.
+ * 
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)
