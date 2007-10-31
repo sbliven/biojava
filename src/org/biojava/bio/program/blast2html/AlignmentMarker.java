@@ -74,7 +74,6 @@ package org.biojava.bio.program.blast2html;
  *                 Neil Benn          (CAT)
  *
  * Copyright 2001 Cambridge Antibody Technology Group plc.
- * All Rights Reserved.
  * </pre></p>
  *
  * <p>

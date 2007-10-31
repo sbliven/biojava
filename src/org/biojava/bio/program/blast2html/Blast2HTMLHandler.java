@@ -44,7 +44,6 @@ import org.xml.sax.helpers.DefaultHandler;
  *                 Neil Benn          (CAT)
  *
  * Copyright 2001 Cambridge Antibody Technology Group plc.
- * All Rights Reserved.
  *
  * This code released to the biojava project, May 2001
  * under the LGPL license.
