@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
  *                 Stuart Johnston    (CAT)
  *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
- * All Rights Reserved.
+ * 
  *
  * This code released to the biojava project, May 2000
  * under the LGPL license.

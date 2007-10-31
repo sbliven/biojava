@@ -39,7 +39,7 @@ import java.util.StringTokenizer;
  *
  * <p>
  * Copyright &copy; 2000 Cambridge Antibody Technology Group plc.
- * All Rights Reserved.
+ * 
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)

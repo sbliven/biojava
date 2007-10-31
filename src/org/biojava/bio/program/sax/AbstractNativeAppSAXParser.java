@@ -73,7 +73,6 @@ import org.xml.sax.SAXNotSupportedException;
  * for an example of how these utility methods can be used.
  * <p>
  * Copyright &copy; 2000 Cambridge Antibody Technology Group plc.
- * All Rights Reserved.
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)

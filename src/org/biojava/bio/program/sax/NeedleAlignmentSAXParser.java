@@ -78,7 +78,7 @@ TGFBG4_frame2
  * This restriction is easy to remove, just haven't done it.
  *
  * Copyright &copy; 2001,2002 Cambridge Antibody Technology.
- * All Rights Reserved.
+ * 
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)

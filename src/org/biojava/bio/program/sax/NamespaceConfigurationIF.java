@@ -26,7 +26,7 @@ package org.biojava.bio.program.sax;
  * Support for SAX2 configuration of namespace support
  * <p>
  * Copyright &copy; 2000 Cambridge Antibody Technology Group plc.
- * All Rights Reserved.
+ *
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)

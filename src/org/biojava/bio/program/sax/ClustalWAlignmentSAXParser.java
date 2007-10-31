@@ -55,7 +55,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * many version of CLUSTAL W.
  *
  * Copyright &copy; 2000,2001 Cambridge Antibody Technology.
- * All Rights Reserved.
+ * 
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)

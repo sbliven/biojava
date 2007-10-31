@@ -30,7 +30,7 @@ import org.xml.sax.XMLReader;
  * packages.This is useful in complex development/build environments
  * <p>
  * Copyright &copy; 2001 Cambridge Antibody Technology.
- * All Rights Reserved.
+ * 
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)

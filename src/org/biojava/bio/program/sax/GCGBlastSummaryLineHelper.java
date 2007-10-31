@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
  * <li>Mathieu Wiepert (Mayo Foundation)
  * </ul>>
  * Copyright &copy; 2001 Mayo Foundation
- * All Rights Reserved.
+ *
  *
  * This code released to the biojava project, April 2001
  * under the LGPL license.
