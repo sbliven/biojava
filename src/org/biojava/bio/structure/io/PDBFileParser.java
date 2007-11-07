@@ -126,7 +126,7 @@ import org.biojava.bio.symbol.Symbol;
 public class PDBFileParser  {
 
 	private final boolean DEBUG = false;
-
+	
 	// required for parsing:
 	private Structure     structure;
 	private List<Chain>   current_model; // contains the ATOM records for each model
@@ -166,30 +166,36 @@ public class PDBFileParser  {
 			Arrays.asList(
 					"MOL_ID:", "MOLECULE:", "CHAIN:", "SYNONYM:",
 					"EC:", "FRAGMENT:", "ENGINEERED:", "MUTATION:",
-					"BIOLOGICAL_UNIT:", "OTHER_DETAILS:"));
+					"BIOLOGICAL_UNIT:", "OTHER_DETAILS:"
+					));
 
 
 	private static final List<String> ignoreCompndFieldValues = new ArrayList<String>(
-			Arrays.asList("HETEROGEN:","ENGINEEREED:","FRAGMENT,",
-					"MUTANT:","SYNTHETIC:"));
+			Arrays.asList(
+					"HETEROGEN:","ENGINEEREED:","FRAGMENT,",
+					"MUTANT:","SYNTHETIC:"
+					));
 	// ENGINEEREED in pdb219d
 
+	
 	boolean parseSecStruc;
+
 	boolean alignSeqRes;
 
-	
+	private String previousContinuationField = "";
+
 	public static final String PDB_AUTHOR_ASSIGNMENT = "PDB_AUTHOR_ASSIGNMENT";
-	
+
 	/** Helix secondary structure assignment
 	 * 
 	 */
 	public static final String HELIX  = "HELIX";
-	
+
 	/** Strand secondary structure assignment
 	 * 
 	 */
 	public static final String STRAND = "STRAND";
-	
+
 	/** Turn secondary structure assignment
 	 * 
 	 */
@@ -201,7 +207,7 @@ public class PDBFileParser  {
 	static private Map<String, Integer> nucleotides23 ;
 
 	int atomCount;
-	
+
 	/** the maximum number of atoms that will be parsed before the parser switches to a CA-only 
 	 * representation of the PDB file. If this limit is exceeded also the SEQRES groups will be 
 	 * ignored.
@@ -1093,44 +1099,50 @@ public class PDBFileParser  {
 	 */
 
 	private void pdb_COMPND_Handler(String line) {
-//		System.out.println("PDBFileParser.pdb_COMPND_Handler: BEGIN");
-//		System.out.println("PDBFileParser.pdb_COMPND_Handler: Parsing: " + line);
-
-		/* do we need the continuation number?
-        if (line.substring(9, 10).contains(" ")) 
-            continuationNo = 0;
-        else 
-            continuationNo = Integer.valueOf(line.substring(9, 10));
-		 */
 
 		if (DEBUG) {
 			//System.out.println("current continuationNo     is " + continuationNo);
+			System.out.println("previousContinuationField  is " + previousContinuationField);
 			System.out.println("current continuationField  is " + continuationField);
 			System.out.println("current continuationString is " + continuationString);
-			System.out.println("current compount           is " + current_compound);
+			System.out.println("current compound           is " + current_compound);
 		}
-		StringTokenizer compndTokens = new StringTokenizer(line.substring(10,70));
+		String beginningOfLine = line.substring(0, 10);
 
-		while (compndTokens.hasMoreTokens()) {
+		line = line.replace(beginningOfLine, "");
+
+		String[] fieldList = line.split("\\s+");
+
+		if (!fieldList[0].equals("") && compndFieldValues.contains(fieldList[0])) {
+//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[0] + "'");
+			continuationField = fieldList[0];
+			if (previousContinuationField.equals("")) {
+				previousContinuationField = continuationField;
+			}
+
+		} else if (compndFieldValues.contains(fieldList[1])) {
+//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[1] + "'");
+			continuationField = fieldList[1];
+			if ( previousContinuationField.equals("")) {
+				previousContinuationField = continuationField;
+			}
+
+		}
+
+		line = line.replace(continuationField, "").trim();
+
+		StringTokenizer compndTokens = new StringTokenizer(line);
+
+//		System.out.println("PDBFileParser.pdb_COMPND_Handler: Tokenizing '" + line + "'");
+
+		while (compndTokens.hasMoreTokens ()) {
 			String token = compndTokens.nextToken();
 
+			if (previousContinuationField.equals("")) {
+				previousContinuationField = continuationField;
+			}
 
-
-			if (compndFieldValues.contains(token)) {
-
-				if (continuationString.equals("")) {
-					continuationField = token;
-				} else {
-
-					compndValueSetter(continuationField, continuationString);
-					continuationField = token;
-					continuationString = "";
-				}
-			} else if ( ignoreCompndFieldValues.contains(token)){
-				// this field shall be ignored
-				continuationField = token;
-			} else {         
-
+			if (previousContinuationField.equals(continuationField) && compndFieldValues.contains(continuationField)) {
 				if (DEBUG)
 					System.out.println("Still in field " + continuationField);
 
@@ -1138,8 +1150,22 @@ public class PDBFileParser  {
 				if (DEBUG)
 					System.out.println("continuationString = " + continuationString);
 			}
-//			System.out.println("PDBFileParser.pdb_COMPND_Handler: END");
-		}
+			if (!continuationField.equals(previousContinuationField)) {
+
+				if (continuationString.equals("")) {
+					continuationString = token;
+
+				} else {
+
+					compndValueSetter(previousContinuationField, continuationString);
+					previousContinuationField = continuationField;
+					continuationString = token + " ";
+				}
+			} else if (ignoreCompndFieldValues.contains(token)) {
+				// this field shall be ignored
+				//continuationField = token;
+			}
+		}		
 	}
 
 
@@ -1771,7 +1797,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 			Integer salt2      = conect_helper(line,56,61);
 
 			//System.out.println(atomserial+ " "+ bond1 +" "+bond2+ " " +bond3+" "+bond4+" "+
-					//		   hyd1+" "+hyd2 +" "+salt1+" "+hyd3+" "+hyd4+" "+salt2);
+			//		   hyd1+" "+hyd2 +" "+salt1+" "+hyd3+" "+hyd4+" "+salt2);
 			HashMap<String, Integer> cons = new HashMap<String, Integer>();
 			cons.put("atomserial",new Integer(atomserial));
 
@@ -2214,7 +2240,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 			}
 	}
 
-	
+
 	/** After the parsing of a PDB file the {@link Chain} and  {@link Compound}
 	 * objects need to be linked to each other. 
 	 * 
