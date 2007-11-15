@@ -65,7 +65,7 @@ public class SimpleNote extends AbstractChangeable implements Note {
      */
     public void setTerm(ComparableTerm term) throws ChangeVetoException {
         if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        if(this.term.equals(term))
+        if(term.equals(this.term))
             return;
         if(!this.hasListeners(Note.TERM)) {
             this.term = term;
