@@ -127,7 +127,7 @@ import org.biojava.bio.symbol.Symbol;
 public class PDBFileParser  {
 
 	private final boolean DEBUG = false;
-	
+
 	// required for parsing:
 	private Structure     structure;
 	private List<Chain>   current_model; // contains the ATOM records for each model
@@ -168,17 +168,17 @@ public class PDBFileParser  {
 					"MOL_ID:", "MOLECULE:", "CHAIN:", "SYNONYM:",
 					"EC:", "FRAGMENT:", "ENGINEERED:", "MUTATION:",
 					"BIOLOGICAL_UNIT:", "OTHER_DETAILS:"
-					));
+			));
 
 
 	private static final List<String> ignoreCompndFieldValues = new ArrayList<String>(
 			Arrays.asList(
 					"HETEROGEN:","ENGINEEREED:","FRAGMENT,",
 					"MUTANT:","SYNTHETIC:"
-					));
+			));
 	// ENGINEEREED in pdb219d
 
-	
+
 	boolean parseSecStruc;
 
 	boolean alignSeqRes;
@@ -1067,8 +1067,9 @@ public class PDBFileParser  {
 	 * <p/>
 	 * Example
 	 * <p/>
-	 * 1         2         3         4         5         6         7
-	 * 1234567890123456789012345678901234567890123456789012345678901234567890
+	 * 1         2         3         4         5         6         7        8
+	 * 12345678901234567890123456789012345678901234567890123456789012345678901234567890
+	 * COMPND    MOL_ID: 1;                                                    1BNJ   4
 	 * COMPND    MOL_ID: 1;                                                    1ALI   4
 	 * COMPND    MOL_ID: 1;
 	 * COMPND   2 MOLECULE: HEMOGLOBIN;
@@ -1108,10 +1109,23 @@ public class PDBFileParser  {
 			System.out.println("current continuationString is " + continuationString);
 			System.out.println("current compound           is " + current_compound);
 		}
-		String beginningOfLine = line.substring(0, 10);
+		
 
-		line = line.replace(beginningOfLine, "");
-
+		String continuationNr = line.substring(9,10).trim();
+		
+		// in some PDB files the line ends with the PDB code and a serial number, chop those off!
+		if (line.length() > 72){
+			line = line.substring(0,72);
+		}
+		
+		//String beginningOfLine = line.substring(0, 10);
+		//line = line.replace(beginningOfLine, "");
+		line = line.substring(10,line.length());
+		
+		
+		if (DEBUG) {
+			System.out.println("LINE: >"+line+"<");
+		}
 		String[] fieldList = line.split("\\s+");
 
 		if (!fieldList[0].equals("") && compndFieldValues.contains(fieldList[0])) {
@@ -1128,6 +1142,17 @@ public class PDBFileParser  {
 				previousContinuationField = continuationField;
 			}
 
+		} else {
+			if ( continuationNr.equals("")){
+				if (DEBUG) {
+					System.out.println("looks like an old PDB file");
+				}
+				continuationField = "MOLECULE:";	
+				if ( previousContinuationField.equals("")) {
+					previousContinuationField = continuationField;
+				}
+			}
+			
 		}
 
 		line = line.replace(continuationField, "").trim();
@@ -1204,7 +1229,11 @@ public class PDBFileParser  {
 			List<String> chains = new ArrayList<String>();
 
 			while (chainTokens.hasMoreTokens()) {
-				chains.add(chainTokens.nextToken().trim());
+				String chainID =chainTokens.nextToken().trim();
+				// NULL is used in old PDB files to represent empty chain DI
+				if ( chainID.equals("NULL"))
+					chainID = " ";
+				chains.add(chainID);
 			}
 			current_compound.setChainId(chains);            
 
@@ -1636,7 +1665,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 
 			String chain_id      = line.substring(21,22);
-			
+
 			// join residue numbers and insertion codes together
 			String residueNumber = line.substring(22,27).trim();
 			String groupCode3     = line.substring(17,20);
@@ -1934,7 +1963,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	36             AChar           icode2       Insertion code.
 	60 - 65        SymOP           sym1         Symmetry oper for 1st resid
 	67 - 72        SymOP           sym2         Symmetry oper for 2nd resid
-	*/
+	 */
 	private void pdb_SSBOND_Handler(String line){
 		String chain1      = line.substring(15,16);
 		String seqNum1     = line.substring(18,21).trim();                      
@@ -1942,14 +1971,14 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		String chain2      = line.substring(29,30);
 		String seqNum2     = line.substring(31,35).trim();                      
 		String icode2      = line.substring(35,36);  
-		
+
 		if (icode1.equals(" "))
 			icode1 = "";
 		if (icode2.equals(" "))
 			icode2 = "";
-		
+
 		SSBond ssbond = new SSBond();
-		
+
 		ssbond.setChainID1(chain1);
 		ssbond.setResnum1(seqNum1);
 		ssbond.setChainID2(chain2);
@@ -1957,11 +1986,11 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		ssbond.setInsCode1(icode1);
 		ssbond.setInsCode2(icode2);
 		structure.addSSBond(ssbond);
-		
-		
+
+
 	}
-	
-	
+
+
 	private int intFromString(String intString){
 		int val = Integer.MIN_VALUE; 
 		try {
