@@ -39,7 +39,6 @@ import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleAlignment;
-import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 
 /**
@@ -187,14 +186,15 @@ public class MSFAlignmentFormat
             if (alph == null) {
                 alph = DNATools.getDNA();
             }
-            SymbolTokenization parse = alph.getTokenization("token");
             for (currSeqCount = 0; currSeqCount < sequenceNames.size(); currSeqCount++) {
                 String sd = sequenceData[currSeqCount].toString();
                 //change stop codons to specified symbols
                 sd = sd.replace('~', '-');              //sometimes this is a term signal not a gap
                 sd = sd.replace('.', '-');              //sometimes this is a term signal not a gap
                 sequenceDataMap.put((String)sequenceNames.get(currSeqCount),
-                        new SimpleSymbolList(parse, sd));
+                        alph==ProteinTools.getTAlphabet()?
+                        		ProteinTools.createGappedProteinSequence(sd, (String)sequenceNames.get(currSeqCount))
+                        		:DNATools.createGappedDNASequence(sd, (String)sequenceNames.get(currSeqCount)));
             }
             SimpleAlignment sa=new SimpleAlignment(sequenceDataMap);
             return  (sa);
