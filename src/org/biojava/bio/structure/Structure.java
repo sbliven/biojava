@@ -512,7 +512,26 @@ public interface Structure extends Cloneable{
      * @return the PDBHeader object
      */
     public PDBHeader getPDBHeader();
+    
+    
+    /** get the list of SSBonds as they have been defined in the PDB files
+     * 
+     * @return a list of SSBonds
+     */
+    public List<SSBond> getSSBonds();
 
+    /** set the list of SSBonds for this structure
+     * 
+     * @param ssbonds
+     */
+    public void setSSBonds(List<SSBond> ssbonds);
+    
+    /** add a single SSBond to this structure
+     * 
+     * @param ssbond
+     */
+    public void addSSBond(SSBond ssbond);
+    
     /** the the header information for this PDB file
      * 
      * @param header the PDBHeader object

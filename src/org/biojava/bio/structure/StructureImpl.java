@@ -51,6 +51,7 @@ public class StructureImpl implements Structure {
 	List<Map <String,Integer>> connections ;
 	List<Compound> compounds;
     List<DBRef> dbrefs;
+    List<SSBond> ssbonds;
 	String name ;
 	private PDBHeader pdbHeader;
 	boolean nmrflag ;
@@ -71,6 +72,7 @@ public class StructureImpl implements Structure {
 		compounds      = new ArrayList<Compound>();
         dbrefs         = new ArrayList<DBRef>();
         pdbHeader      = new PDBHeader();
+        ssbonds        = new ArrayList<SSBond>();
         
 	}
 
@@ -146,6 +148,11 @@ public class StructureImpl implements Structure {
 			n.addModel(cloned_model);
 
 		}
+		
+		for (SSBond ssbond: ssbonds){
+			n.addSSBond(ssbond.clone());
+		}
+		
 		//n.setSeqRes(this.getSeqRes());
 		return n ;
 	}
@@ -594,6 +601,32 @@ public class StructureImpl implements Structure {
 	public void setPDBHeader(PDBHeader pdbHeader){
 		this.pdbHeader = pdbHeader;
 	}
+	
+    /** get the list of SSBonds as they have been defined in the PDB files
+     * 
+     * @return a list of SSBonds
+     */
+    public List<SSBond> getSSBonds(){
+    	return ssbonds;
+    	
+    }
+    /** set the list of SSBonds for this structure
+     * 
+     * @param ssbonds
+     */
+    public void setSSBonds(List<SSBond> ssbonds){
+    	this.ssbonds = ssbonds;
+    }
+    
+    /** add a single SSBond to this structure
+     * 
+     * @param ssbond
+     */
+    public void addSSBond(SSBond ssbond){
+    	ssbonds.add(ssbond);
+    	ssbond.setSerNum(ssbonds.size());
+    }
+    
 
 
 }
