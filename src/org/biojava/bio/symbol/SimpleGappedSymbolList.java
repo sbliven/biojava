@@ -560,6 +560,23 @@ implements GappedSymbolList, Serializable {
   }
 
   /**
+   * Create a new SimpleGappedSymbolList that will view source,
+   * inheriting all existing gaps.
+   *
+   * @param gappedSource  the underlying sequence
+   */
+  public SimpleGappedSymbolList(GappedSymbolList gappedSource) {
+    this.source = gappedSource.getSourceSymbolList();
+    this.alpha = this.source.getAlphabet();
+    this.blocks = new ArrayList();
+    this.length = this.source.length();
+    for (int i = 1; i <= gappedSource.length(); i++) {
+    	if (this.alpha.getGapSymbol().equals(gappedSource.symbolAt(i)))
+    		this.addGapInSource(i);
+    }
+  }
+
+  /**
    * Create a new SimpleGappedSymbolList that will view source.
    *
    * @param source  the underlying sequence
