@@ -52,6 +52,7 @@ import org.biojava.bio.structure.HetatomImpl;
 import org.biojava.bio.structure.Compound;
 import org.biojava.bio.structure.NucleotideImpl;
 import org.biojava.bio.structure.PDBHeader;
+import org.biojava.bio.structure.SSBond;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.StructureImpl;
@@ -1635,6 +1636,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 
 			String chain_id      = line.substring(21,22);
+			
+			// join residue numbers and insertion codes together
 			String residueNumber = line.substring(22,27).trim();
 			String groupCode3     = line.substring(17,20);
 
@@ -1914,6 +1917,51 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		dbrefs.add(dbref);
 	}
 
+	/* process the disulfid bond info provided by an SSBOND record
+	 * 
+	 * 
+	COLUMNS        DATA TYPE       FIELD         DEFINITION
+	-------------------------------------------------------------------
+	 1 -  6        Record name     "SSBOND"
+	 8 - 10        Integer         serNum       Serial number.
+	12 - 14        LString(3)      "CYS"        Residue name.
+	16             Character       chainID1     Chain identifier.
+	18 - 21        Integer         seqNum1      Residue sequence number.
+	22             AChar           icode1       Insertion code.
+	26 - 28        LString(3)      "CYS"        Residue name.
+	30             Character       chainID2     Chain identifier.
+	32 - 35        Integer         seqNum2      Residue sequence number.
+	36             AChar           icode2       Insertion code.
+	60 - 65        SymOP           sym1         Symmetry oper for 1st resid
+	67 - 72        SymOP           sym2         Symmetry oper for 2nd resid
+	*/
+	private void pdb_SSBOND_Handler(String line){
+		String chain1      = line.substring(15,16);
+		String seqNum1     = line.substring(18,21).trim();                      
+		String icode1      = line.substring(21,22);  
+		String chain2      = line.substring(29,30);
+		String seqNum2     = line.substring(31,35).trim();                      
+		String icode2      = line.substring(35,36);  
+		
+		if (icode1.equals(" "))
+			icode1 = "";
+		if (icode2.equals(" "))
+			icode2 = "";
+		
+		SSBond ssbond = new SSBond();
+		
+		ssbond.setChainID1(chain1);
+		ssbond.setResnum1(seqNum1);
+		ssbond.setChainID2(chain2);
+		ssbond.setResnum2(seqNum2);
+		ssbond.setInsCode1(icode1);
+		ssbond.setInsCode2(icode2);
+		structure.addSSBond(ssbond);
+		
+		
+	}
+	
+	
 	private int intFromString(String intString){
 		int val = Integer.MIN_VALUE; 
 		try {
@@ -2074,9 +2122,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 				//System.out.println(recordName);
 
 				try {
-					if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler  ( line ) ;
-
-					else if ( recordName.equals("SEQRES")) pdb_SEQRES_Handler(line);
+					if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler  ( line );
+					else if ( recordName.equals("SEQRES")) pdb_SEQRES_Handler( line );
 					else if ( recordName.equals("HETATM")) pdb_ATOM_Handler  ( line );
 					else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler ( line );
 					else if ( recordName.equals("HEADER")) pdb_HEADER_Handler( line );
@@ -2088,6 +2135,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 					else if ( recordName.equals("CONECT")) pdb_CONECT_Handler( line );
 					else if ( recordName.equals("REVDAT")) pdb_REVDAT_Handler( line );
 					else if ( recordName.equals("DBREF" )) pdb_DBREF_Handler ( line );
+					else if ( recordName.equals("SSBOND")) pdb_SSBOND_Handler( line );
 					else if ( parseSecStruc) {
 						if ( recordName.equals("HELIX") ) pdb_HELIX_Handler (  line ) ;
 						else if (recordName.equals("SHEET")) pdb_SHEET_Handler(line ) ;
