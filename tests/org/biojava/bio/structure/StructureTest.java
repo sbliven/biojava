@@ -81,7 +81,6 @@ public class StructureTest extends TestCase {
 		Chain c = structure.getChain(0);
 		assertEquals("did not find the expected 58 amino acids!",58,c.getAtomGroups("amino").size());
 
-
 		assertTrue(c.getAtomGroups("hetatm").size()     == 65);
 		assertTrue(c.getAtomGroups("nucleotide").size() == 0 );
 
@@ -89,6 +88,31 @@ public class StructureTest extends TestCase {
 		assertTrue(compounds.size() == 1);
 		Compound mol = compounds.get(0);       
 		assertTrue(mol.getMolName().startsWith("TRYPSIN INHIBITOR"));
+	}
+	
+	
+	public void testSSBondParsing() throws Exception {
+		assertNotNull(structure);
+		
+		List<SSBond> ssbonds = structure.getSSBonds();
+		assertEquals("did not find the correct nr of SSBonds ",3,ssbonds.size());
+	
+		 
+		String pdb1 = "SSBOND   1 CYS      5    CYS     55";
+		String pdb2 = "SSBOND   2 CYS     14    CYS     38"; 
+	
+		SSBond bond1 = ssbonds.get(0);		
+		String b1 = bond1.toPDB();
+		assertTrue("PDB representation incorrect",pdb1.equals(b1.trim()));		
+		assertTrue("not right resnum1 " , bond1.getResnum1().equals("5"));
+		assertTrue("not right resnum2 " , bond1.getResnum2().equals("55"));
+		
+		SSBond bond2 = ssbonds.get(1);
+		String b2 = bond2.toPDB();
+		assertTrue("not right resnum1 " , bond2.getResnum1().equals("14"));
+		assertTrue("not right resnum2 " , bond2.getResnum2().equals("38"));
+		assertTrue("PDB representation incorrect",pdb2.equals(b2.trim()));
+		
 	}
 
 	/** Tests that standard amino acids are working properly 
