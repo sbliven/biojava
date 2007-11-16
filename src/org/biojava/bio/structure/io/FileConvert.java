@@ -31,7 +31,10 @@ import java.util.Map;
 
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.Chain;
+import org.biojava.bio.structure.DBRef;
 import org.biojava.bio.structure.Group;
+import org.biojava.bio.structure.PDBHeader;
+import org.biojava.bio.structure.SSBond;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.utils.xml.XMLWriter;
@@ -174,6 +177,21 @@ public class FileConvert {
         d3.setMinimumFractionDigits(3);
         d3.setMaximumFractionDigits(3);
         
+        // TODO: print all the PDB header informaton in PDB style
+        // some objects (PDBHeader, Compound) are still missing
+        //
+        for (SSBond ssbond : structure.getSSBonds()){
+        	str.append(ssbond.toPDB()+newline);
+        }
+        
+        for (DBRef dbref : structure.getDBRefs()){
+        	str.append(dbref.toPDB()+newline);
+        }
+               
+        
+        //
+        // print the atom records
+        //
         
         // do for all models
         int nrModels = structure.nrModels() ;
