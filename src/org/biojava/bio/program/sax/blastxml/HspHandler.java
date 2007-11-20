@@ -319,8 +319,7 @@ class HspHandler
             case -1: return "minus1";
             case 1: return "plus1";
             case 2: return "plus2";
-            case 3: return "plus3";
-            case 0: return "protein";
+            case 3: return "plus3";           
             default: throw new SAXException("illegal frame number encountered. ("+frame+")");
         }
     }
