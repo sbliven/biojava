@@ -210,14 +210,19 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
                 int i = poLine.indexOf(":");
                 oDatabaseId = poLine.substring(i + 1);
                 while(true){
-                    try{
+                    try {
                         poLine = oContents.readLine();
-                        if(poLine.startsWith("Searching")){
-                          break;
-                        }else{
-                            oDatabaseId = oDatabaseId.concat(poLine);
-                        }
-                    }catch(java.io.IOException x){
+                        if (poLine.startsWith("Searching")) {
+							break;
+						} else if (poLine.startsWith("Results of")) {
+							// in PSI-blast is this line...
+							System.err.println("this looks like a PSI-blast file, this is currently not supported, yet!");
+							break;
+
+						} else {
+							oDatabaseId = oDatabaseId.concat(poLine);
+						}
+                    } catch(java.io.IOException x){
                         System.err.println(x.getMessage());
                         System.err.println("File read interrupted");
                     }
