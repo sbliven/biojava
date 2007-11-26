@@ -570,10 +570,14 @@ implements GappedSymbolList, Serializable {
     this.alpha = this.source.getAlphabet();
     this.blocks = new ArrayList();
     this.length = this.source.length();
-    for (int i = 1; i <= gappedSource.length(); i++) {
-    	if (this.alpha.getGapSymbol().equals(gappedSource.symbolAt(i)))
-    		this.addGapInSource(i);
-    }
+    Block b = new Block(1, length, 1, length);
+    blocks.add(b);
+    int n=1;
+    for(int i=1;i<=this.length();i++) 
+        if(this.alpha.getGapSymbol().equals(gappedSource.symbolAt(i)))
+          this.addGapInSource(n);
+        else
+          n++;
   }
 
   /**

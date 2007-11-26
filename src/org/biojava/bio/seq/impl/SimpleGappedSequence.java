@@ -67,6 +67,12 @@ implements GappedSequence {
     createOnUnderlying = false;
   }
 
+  public SimpleGappedSequence(GappedSequence seq) {
+    super(seq);
+    this.sequence = seq;
+    createOnUnderlying = false;
+  }
+
   public boolean getCreateOnUnderlyingSequence() {
     return createOnUnderlying;
   }
