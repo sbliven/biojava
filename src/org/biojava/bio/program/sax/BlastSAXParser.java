@@ -212,7 +212,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
                 while(true){
                     try {
                         poLine = oContents.readLine();
-                        if (poLine.startsWith("Searching")) {
+                        if (poLine.startsWith("Searching") || poLine.startsWith("Sequences")) {
 							break;
 						} else if (poLine.startsWith("Results of")) {
 							// in PSI-blast is this line...
