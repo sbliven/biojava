@@ -129,6 +129,8 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
         //the setting is cascaded everywhere else
         this.setNamespacePrefix("biojava");
         this.addPrefixMapping("biojava","http://www.biojava.org");
+        
+        oVersion.setMode(BlastLikeVersionSupport.LAZY);
     }
 
     /**
