@@ -1,4 +1,5 @@
 
+package game;
 
 import java.io.*;
 import javax.xml.parsers.SAXParser;

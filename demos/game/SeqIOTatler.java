@@ -18,6 +18,7 @@
  *      http://www.biojava.org/
  *
  */
+package game;
 
 import java.util.*;
 
