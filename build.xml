@@ -423,7 +423,7 @@
               packages="org.biojava.bio.chromatogram:org.biojava.bio.program.abi:org.biojava.bio.program.scf:org.biojava.bio.chromatogram.graphic" />
 
 			<group title="Macromolecular structure (PDB)"
-              packages="org.biojava.bio.structure:org.biojava.bio.structure.io:org.biojava.bio.program.das.dasstructure:org.biojava.bio.structure.align:org.biojava.bio.structure.align.helper:org.biojava.bio.structure.align.pairwise:org.biojava.bio.structure.jama:org.biojava.bio.structure.gui" />
+              packages="org.biojava.bio.structure:org.biojava.bio.structure.io:org.biojava.bio.program.das.dasstructure:org.biojava.bio.structure.align:org.biojava.bio.structure.align.helper:org.biojava.bio.structure.align.pairwise:org.biojava.bio.structure.jama:org.biojava.bio.structure.gui:org.biojava.bio.structure.server" />
 
 			<group title="Utilities and developers' packages"
               packages="org.biojava.utils.process:org.biojava.bio.seq.impl:org.biojava.bio.seq.projection:org.biojava.utils:org.biojava.utils.cache:org.biojava.utils.xml:org.biojava.utils.stax:org.biojava.utils.io:org.biojava.utils.math:org.biojava.utils.net:org.biojava.utils.candy:org.biojava.bio.seq.io.filterxml:org.biojava.bio.program.tagvalue:org.biojava.ontology:org.biojava.ontology.io:org.biojava.utils.automata:org.biojava.utils.regex:org.biojava.naming:org.biojava.utils.walker" />
