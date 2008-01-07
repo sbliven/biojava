@@ -139,8 +139,10 @@ public class SSBindCase extends TestCase
     	if (this.getClass().getName().equals("org.biojava.bio.program.ssbind.SSBindCase")) return;
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
-
-        assertEquals(4, result.getAnnotation().keys().size());
+        int nrAnnotations = result.getAnnotation().keys().size();
+        // there are either 4 or 5 annotations now with the new support for query length
+        assertTrue( nrAnnotations > 3);
+        assertTrue( nrAnnotations < 6);
     }
 
     public void testTopHit()
