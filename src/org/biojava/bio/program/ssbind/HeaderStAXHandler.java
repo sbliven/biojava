@@ -102,6 +102,11 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
         throws SAXException
         {
             ssContext.getSearchContentHandler().setQueryID(attr.getValue("id"));
+            if (attr.getValue("queryLength") != null)
+            {
+            	ssContext.getSearchContentHandler().addSearchProperty("queryLength",
+            			attr.getValue("queryLength"));
+            }
         }
     }
 
