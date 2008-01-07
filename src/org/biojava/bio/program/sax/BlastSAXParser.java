@@ -83,7 +83,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 
     private String                       oQueryId;
     private String                       oDatabaseId;
-
+    private String 					     oQueryLength; // patch from Michael Gang
     private static final int STARTUP             = 0;
     private static final int IN_TRAILER          = 1;
     private static final int AT_END              = 2;
@@ -206,6 +206,11 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
                     oQueryId = st.nextToken();
             }
 
+            if (poLine.matches("^\\s+\\(\\d+\\sletters\\)\\s*$")) {           
+           	 	StringTokenizer st = new StringTokenizer(poLine);
+           	 	oQueryLength = st.nextToken().substring(1);
+            }
+            
             if (poLine.startsWith("Database:")) {
                 int i = poLine.indexOf(":");
                 oDatabaseId = poLine.substring(i + 1);
@@ -568,6 +573,13 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
                            oAttQName.getQName(),
                            "CDATA", "none");
 
+        oAttQName.setQName("queryLength");
+        oAtts.addAttribute(oAttQName.getURI(),
+                           oAttQName.getLocalName(),
+                           oAttQName.getQName(),
+                           "CDATA", oQueryLength);
+
+        
         // Fire the QueryId element
         this.startElement(new QName(this,this.prefix("QueryId")),
                           (Attributes) oAtts);
