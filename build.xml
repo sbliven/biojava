@@ -46,6 +46,7 @@
 
 <project name="biojava" default="package-biojava" basedir=".">
 
+    
 	<!-- Checks environment and setup variables -->
 	<target name="init" description="Checks environment and setup variables">
 		<tstamp />
