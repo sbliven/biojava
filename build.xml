@@ -45,19 +45,18 @@
 -->
 
 <project name="biojava" default="package-biojava" basedir=".">
-
-    
+   
 	<!-- Checks environment and setup variables -->
 	<target name="init" description="Checks environment and setup variables">
 		<tstamp />
 		<property name="version"        value="live" />
 		<property name="build.compiler" value="javac1.5" />
-		<property name="classpath"      value="bytecode.jar:commons-cli.jar:commons-collections-2.1.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar:jgrapht-jdk1.5.jar" />
+		<property name="classpath"      value="bytecode.jar:commons-cli.jar:commons-collections-2.1.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar:hsqldb.jar:jgrapht-jdk1.5.jar:junit-4.4.jar" />
 		<property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
 
 
 		<!-- Check the current system classpath for JUnit -->
-		<available classpath="${java.class.path}"
+		<available classpath="${classpath}"
                classname="junit.framework.TestCase"
                property="junit.present" />
 
