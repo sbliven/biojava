@@ -490,15 +490,34 @@ public final class DNATools {
     * is not from the DNA alphabet.
     * @since 1.5.1
     */
-   public static SymbolList toProtein(SymbolList syms) 
+   public static SymbolList toProtein(final SymbolList syms) 
            throws IllegalAlphabetException{
-       syms = toRNA(syms);
+       SymbolList symz = new SimpleSymbolList(syms);
+       symz = toRNA(symz);
        //truncate to a length divisible by three.
-       syms = syms.subList(1, syms.length() - (syms.length() %3));
-       return RNATools.translate(syms);
+       symz = symz.subList(1, symz.length() - (symz.length() %3));
+       return RNATools.translate(symz);
    }
    
-   
+   /**
+    * Convenience method to translate a region of a DNA sequence directly into
+    * protein. While the start and end can be specified if the length of the 
+    * specified region is not evenly divisible by three then the translated 
+    * region will be truncated until a full terminal codon can be formed.
+    * @param syms the DNA sequence to be translated.
+    * @param start the location to begin translation.
+    * @param end the end of the translated region.
+    * @return the translated protein sequence.
+    * @throws org.biojava.bio.symbol.IllegalAlphabetException if <code>syms
+    * </code> is not from the DNA alphabet.
+    * @since 1.5.1
+    */
+   public static SymbolList toProtein(final SymbolList syms, int start, int end)
+           throws IllegalAlphabetException{
+       SymbolList symz = new SimpleSymbolList(syms);
+       symz = symz.subList(start, end);
+       return toProtein(syms);
+   }
 }
 
 
