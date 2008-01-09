@@ -477,6 +477,28 @@ public final class DNATools {
      syms = reverseComplement(syms);
      return toRNA(syms);
    }
+   
+   /**
+    * Convenience method that directly converts a DNA sequence to RNA then to
+    * protein. The translated protein is from the +1 reading frame of the
+    * <code>SymbolList</code>. The whole <code>SymbolList</code> is translated
+    * although up to 2 DNA residues may be truncated if full codons cannot be 
+    * formed.
+    * @param syms the sequence to be translated.
+    * @return the translated protein sequence.
+    * @throws org.biojava.bio.symbol.IllegalAlphabetException if <code>syms</code>
+    * is not from the DNA alphabet.
+    * @since 1.5.1
+    */
+   public static SymbolList toProtein(SymbolList syms) 
+           throws IllegalAlphabetException{
+       syms = toRNA(syms);
+       //truncate to a length divisible by three.
+       syms = syms.subList(1, syms.length() - (syms.length() %3));
+       return RNATools.translate(syms);
+   }
+   
+   
 }
 
 
