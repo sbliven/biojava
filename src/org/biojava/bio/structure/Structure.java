@@ -31,6 +31,7 @@ import org.biojava.bio.structure.io.PDBFileReader;
 import org.biojava.bio.structure.HetatomImpl;
 import org.biojava.bio.structure.NucleotideImpl;
 
+
 /**
  * 
  * Interface for a structure object. Provides access to the data of a PDB file.
