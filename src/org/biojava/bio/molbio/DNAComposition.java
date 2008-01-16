@@ -29,6 +29,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  * Computes composition statistics about a DNA <code>SymbolList</code>.
  * 
  * @author Mark Schreiber
+ * @since 1.6
  */
 public class DNAComposition extends Composition{
 

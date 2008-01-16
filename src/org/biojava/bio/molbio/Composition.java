@@ -16,19 +16,13 @@ import org.biojava.bio.symbol.SymbolList;
  * Computes composition statistics about a <code>SymbolList</code>.
  * Essentially a conveniece wrapper around a Distribution.
  * @author Mark Schreiber
+ * @since 1.6
  */
 public class Composition {
     private SymbolList symbolList;
     private Distribution distribution;
     private DistributionTrainerContext dtc;
 
-    /**
-     * Gets the <code>SymbolList</code> currently being used.
-     * @return the <code>SymbolList</code>.
-     */
-    public SymbolList getSymbolList() {
-        return symbolList;
-    }
     
     /**
      * Set the <code>SymbolList</code> to calculation the composition of.
@@ -41,7 +35,7 @@ public class Composition {
         train(symbolList);
     }
 
-    private void train(final SymbolList symbolList) throws IllegalSymbolException {
+    private synchronized void train(final SymbolList symbolList) throws IllegalSymbolException {
         dtc.registerDistribution(getDistribution());
         for(Iterator i = symbolList.iterator(); i.hasNext();){
             dtc.addCount(getDistribution(), (Symbol)i.next(), 1.0);
