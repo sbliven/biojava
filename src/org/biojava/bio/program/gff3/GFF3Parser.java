@@ -243,7 +243,7 @@ public class GFF3Parser {
           throw new BioError("Assertion Failure: Unable to create term", cve);
         }
       }
-      record.setSource(tt);
+      record.setType(tt);
     }
 
     int start = -1;
@@ -341,7 +341,7 @@ public class GFF3Parser {
         attName = attVal;
       } else {
         attName = attVal.substring(0, spaceIndx);
-        attValList = attVal.substring(spaceIndx).trim();
+        attValList = attVal.substring(spaceIndx+1).trim();
         while(attValList.length() > 0) {
           if(attValList.startsWith("\"")) {
             // System.out.println("Quoted");
