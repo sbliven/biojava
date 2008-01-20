@@ -76,11 +76,13 @@ extends AbstractDistribution implements Serializable{
   {
       oos.defaultWriteObject();
       
-      SymbolWeightMemento[] swm = new SymbolWeightMemento[weights.length];
-      for (int w = 0; w < swm.length; ++w) {
-          swm[w] = new SymbolWeightMemento(indexer.symbolForIndex(w), weights[w]);
+      if (weights != null) {// fix for bug 2360
+          SymbolWeightMemento[] swm = new SymbolWeightMemento[weights.length];
+          for (int w = 0; w < swm.length; ++w) {
+              swm[w] = new SymbolWeightMemento(indexer.symbolForIndex(w), weights[w]);
+          }
+          oos.writeObject(swm);
       }
-      oos.writeObject(swm);
   }
 
   private void readObject(ObjectInputStream stream)

@@ -155,5 +155,16 @@ public class DistSerTest extends TestCase {
 	assertTrue(DistributionTools.areEmissionSpectraEqual(orderN.getDistribution(s), ((OrderNDistribution)dist2).getDistribution(s)));
       }
     }
+    
+    public void testBug2360() throws Exception{
+        Distribution d = DistributionFactory.DEFAULT.createDistribution(DNATools.getDNA());
+        ByteArrayOutputStream boas = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(boas);
+        try{
+            oos.writeObject(d);
+        }catch(NullPointerException npe){
+            fail("Failed to write Distribution");
+        }
+    }
 
 }
