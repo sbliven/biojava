@@ -57,7 +57,8 @@ public class SimpleThreadPool implements ThreadPool
     /**
      * Creates a new <code>SimpleThreadPool</code> containing 4
      * non-daemon threads and starts them. The threads have priority
-     * Thread.NORM_PRIORITY.
+     * Thread.NORM_PRIORITY.  Because threads are non-deamon you will need
+     * to call stopThreads() to terminate them.
      */
     public SimpleThreadPool()
     {
@@ -71,7 +72,8 @@ public class SimpleThreadPool implements ThreadPool
      *
      * @param threadCount an <code>int</code> thread count.
      * @param daemon a <code>boolean</code> indicating whether the
-     * threads should be daemons.
+     * threads should be daemons. If threads are non-deamon you will need
+     * to call stopThreads() to terminate them.
      */
     public SimpleThreadPool(int threadCount, boolean daemon)
     {
@@ -84,7 +86,8 @@ public class SimpleThreadPool implements ThreadPool
      *
      * @param threadCount an <code>int</code> thread count.
      * @param daemon a <code>boolean</code> indicating whether the
-     * threads should be daemons.
+     * threads should be daemons. If threads are non-deamon you will need
+     * to call stopThreads() to terminate them.
      * @param priority an <code>int</code> priority for the threads.
      */
     public SimpleThreadPool(int threadCount, boolean daemon, int priority)
@@ -131,6 +134,12 @@ public class SimpleThreadPool implements ThreadPool
         }
     }
 
+    /**
+     * Waits for all working threads to return and then stops them. If the
+     * thread pool contains non-daemon threads you will have to call this method
+     * to make your program return.
+     * @throws IllegalStateException if the pool is already stopped.
+     */
     public void stopThreads()
     {
         if (stopped)
