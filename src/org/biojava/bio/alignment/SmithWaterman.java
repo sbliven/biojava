@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
@@ -36,6 +37,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
  * Created on 05.09.2005
  * 
  */
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Smith and Waterman developed an efficient dynamic programing algorithm to
@@ -49,13 +51,14 @@ import org.biojava.bio.symbol.SimpleSymbolList;
  * 
  * @author Andreas Dr&auml;ger
  * @author Gero Greiner
+ * @author Mark Schreiber
  * @since 1.5
  */
 public class SmithWaterman extends NeedlemanWunsch {
 
   private double match, replace, insert, delete, gapExt;
 
-  private double[][] scoreMatrix;
+  
 
   /**
    * Constructs the new SmithWaterman alignment object. Alignments are only
@@ -102,6 +105,7 @@ public class SmithWaterman extends NeedlemanWunsch {
    * @param ins
    *          costs for a single insert operation
    */
+    @Override
   public void setInsert(double ins) {
     this.insert = -ins;
   }
@@ -115,6 +119,7 @@ public class SmithWaterman extends NeedlemanWunsch {
    * @param del
    *          costs for a single deletion operation
    */
+    @Override
   public void setDelete(double del) {
     this.delete = -del;
   }
@@ -128,6 +133,7 @@ public class SmithWaterman extends NeedlemanWunsch {
    * @param ge
    *          costs for any gap extension
    */
+    @Override
   public void setGapExt(double ge) {
     this.gapExt = -ge;
   }
@@ -141,6 +147,7 @@ public class SmithWaterman extends NeedlemanWunsch {
    * @param ma
    *          costs for a single match operation
    */
+    @Override
   public void setMatch(double ma) {
     this.match = -ma;
   }
@@ -154,6 +161,7 @@ public class SmithWaterman extends NeedlemanWunsch {
    * @param rep
    *          costs for a single replace operation
    */
+    @Override
   public void setReplace(double rep) {
     this.replace = -rep;
   }
@@ -165,17 +173,35 @@ public class SmithWaterman extends NeedlemanWunsch {
    * than only one hit within the score matrix. Therfore one should only define
    * the k-th best hit, where k is somehow related to the number of hits.
    * 
-   * @see SequenceAlignment#pairwiseAlignment(org.biojava.bio.seq.Sequence,
-   *      org.biojava.bio.seq.Sequence)
+   * @see SequenceAlignment#pairwiseAlignment(org.biojava.bio.symbol.SymbolList,
+   *      org.biojava.bio.symbol.SymbolList)
    */
-  public double pairwiseAlignment(Sequence query, Sequence subject)
+    @Override
+  public double pairwiseAlignment(SymbolList query, SymbolList subject)
       throws BioRuntimeException {
-    if (query.getAlphabet().equals(subject.getAlphabet())
-        && query.getAlphabet().equals(subMatrix.getAlphabet())) {
+    double[][] scoreMatrix;
+    Sequence squery = null;
+    Sequence ssubject = null;
+    
+    if(query instanceof Sequence){
+        squery = (Sequence)query;
+    }else{
+        //make it a sequence
+        squery = new SimpleSequence(query, "", "query", new SimpleAnnotation());
+    }
+    if(subject instanceof Sequence){
+        ssubject = (Sequence)subject;
+    }else{
+        //make it a sequence
+        ssubject = new SimpleSequence(subject, "", "subject", new SimpleAnnotation());
+    }
+    
+    if (squery.getAlphabet().equals(ssubject.getAlphabet())
+        && squery.getAlphabet().equals(subMatrix.getAlphabet())) {
 
       long time = System.currentTimeMillis();
       int i, j, maxI = 0, maxJ = 0, queryStart = 0, targetStart = 0;
-      this.scoreMatrix = new double[query.length() + 1][subject.length() + 1];
+      scoreMatrix = new double[squery.length() + 1][ssubject.length() + 1];
 
       /*
        * Variables needed for traceback
@@ -184,7 +210,7 @@ public class SmithWaterman extends NeedlemanWunsch {
       String path = "";
       SymbolTokenization st;
       try {
-        st = query.getAlphabet().getTokenization("default");
+        st = squery.getAlphabet().getTokenization("default");
       } catch (BioException exc) {
         throw new BioRuntimeException(exc);
       }
@@ -194,27 +220,27 @@ public class SmithWaterman extends NeedlemanWunsch {
        */
       if ((gapExt != delete) || (gapExt != insert)) {
 
-        double[][] E = new double[query.length() + 1][subject.length() + 1]; // Inserts
-        double[][] F = new double[query.length() + 1][subject.length() + 1]; // Deletes
+        double[][] E = new double[squery.length() + 1][ssubject.length() + 1]; // Inserts
+        double[][] F = new double[squery.length() + 1][ssubject.length() + 1]; // Deletes
 
         scoreMatrix[0][0] = 0;
         E[0][0] = F[0][0] = Double.NEGATIVE_INFINITY;
-        for (i = 1; i <= query.length(); i++) {
+        for (i = 1; i <= squery.length(); i++) {
           scoreMatrix[i][0] = F[i][0] = 0;
           E[i][0] = Double.NEGATIVE_INFINITY;
         }
-        for (j = 1; j <= subject.length(); j++) {
+        for (j = 1; j <= ssubject.length(); j++) {
           scoreMatrix[0][j] = E[0][j] = 0;
           F[0][j] = Double.NEGATIVE_INFINITY;
         }
-        for (i = 1; i <= query.length(); i++)
-          for (j = 1; j <= subject.length(); j++) {
+        for (i = 1; i <= squery.length(); i++)
+          for (j = 1; j <= ssubject.length(); j++) {
             E[i][j] = Math.max(E[i][j - 1], scoreMatrix[i][j - 1] + insert)
                 + gapExt;
             F[i][j] = Math.max(F[i - 1][j], scoreMatrix[i - 1][j] + delete)
                 + gapExt;
             scoreMatrix[i][j] = max(0.0, E[i][j], F[i][j],
-                scoreMatrix[i - 1][j - 1] + matchReplace(query, subject, i, j));
+                scoreMatrix[i - 1][j - 1] + matchReplace(squery, ssubject, i, j));
 
             if (scoreMatrix[i][j] > scoreMatrix[maxI][maxJ]) {
               maxI = i;
@@ -241,15 +267,15 @@ public class SmithWaterman extends NeedlemanWunsch {
 
                 // Match/Replace
               } else if ((scoreMatrix[i][j] == scoreMatrix[i - 1][j - 1]
-                  + matchReplace(query, subject, i, j))
+                  + matchReplace(squery, ssubject, i, j))
                   && !(gap_extend[0] || gap_extend[1])) {
-                if (query.symbolAt(i) == subject.symbolAt(j))
+                if (squery.symbolAt(i) == ssubject.symbolAt(j))
                   path = '|' + path;
                 else
                   path = ' ' + path;
 
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
 
                 // Insert || finish gap if extended gap is opened
               } else if (scoreMatrix[i][j] == E[i][j] || gap_extend[0]) {
@@ -258,7 +284,7 @@ public class SmithWaterman extends NeedlemanWunsch {
                     + gapExt);
 
                 align[0] = '-' + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
                 path = ' ' + path;
 
                 // Delete || finish gap if extended gap is opened
@@ -267,7 +293,7 @@ public class SmithWaterman extends NeedlemanWunsch {
                 gap_extend[1] = (F[i][j] != scoreMatrix[i - 1][j] + delete
                     + gapExt);
 
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
                 align[1] = '-' + align[1];
                 path = ' ' + path;
               }
@@ -282,16 +308,16 @@ public class SmithWaterman extends NeedlemanWunsch {
          */
       } else {
 
-        for (i = 0; i <= query.length(); i++)
+        for (i = 0; i <= squery.length(); i++)
           scoreMatrix[i][0] = 0;
-        for (j = 0; j <= subject.length(); j++)
+        for (j = 0; j <= ssubject.length(); j++)
           scoreMatrix[0][j] = 0;
-        for (i = 1; i <= query.length(); i++)
-          for (j = 1; j <= subject.length(); j++) {
+        for (i = 1; i <= squery.length(); i++)
+          for (j = 1; j <= ssubject.length(); j++) {
 
             scoreMatrix[i][j] = max(0.0, scoreMatrix[i - 1][j] + delete,
                 scoreMatrix[i][j - 1] + insert, scoreMatrix[i - 1][j - 1]
-                    + matchReplace(query, subject, i, j));
+                    + matchReplace(squery, ssubject, i, j));
 
             if (scoreMatrix[i][j] > scoreMatrix[maxI][maxJ]) {
               maxI = i;
@@ -315,24 +341,24 @@ public class SmithWaterman extends NeedlemanWunsch {
 
                 // Match/Replace
               } else if (scoreMatrix[i][j] == scoreMatrix[i - 1][j - 1]
-                  + matchReplace(query, subject, i, j)) {
-                if (query.symbolAt(i) == subject.symbolAt(j))
+                  + matchReplace(squery, ssubject, i, j)) {
+                if (squery.symbolAt(i) == ssubject.symbolAt(j))
                   path = '|' + path;
                 else
                   path = ' ' + path;
 
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
 
                 // Insert
               } else if (scoreMatrix[i][j] == scoreMatrix[i][j - 1] + insert) {
                 align[0] = '-' + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
                 path = ' ' + path;
 
                 // Delete
               } else {
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
                 align[1] = '-' + align[1];
                 path = ' ' + path;
               }
@@ -354,25 +380,25 @@ public class SmithWaterman extends NeedlemanWunsch {
         this.CostMatrix = new double[1][1];
         CostMatrix[0][0] = -scoreMatrix[maxI][maxJ];
 
-        query = new SimpleGappedSequence(new SimpleSequence(
-            new SimpleSymbolList(query.getAlphabet().getTokenization("token"),
-                align[0]), query.getURN(), query.getName(), query
+        squery = new SimpleGappedSequence(new SimpleSequence(
+            new SimpleSymbolList(squery.getAlphabet().getTokenization("token"),
+                align[0]), squery.getURN(), squery.getName(), squery
                 .getAnnotation()));
-        subject = new SimpleGappedSequence(new SimpleSequence(
+        ssubject = new SimpleGappedSequence(new SimpleSequence(
             new SimpleSymbolList(
-                subject.getAlphabet().getTokenization("token"), align[1]),
-            subject.getURN(), subject.getName(), subject.getAnnotation()));
+                ssubject.getAlphabet().getTokenization("token"), align[1]),
+            ssubject.getURN(), ssubject.getName(), ssubject.getAnnotation()));
         Map m = new HashMap();
-        m.put(query.getName(), query);
-        m.put(subject.getName(), subject);
+        m.put(squery.getName(), squery);
+        m.put(ssubject.getName(), ssubject);
         pairalign = new SimpleAlignment(m);
 
         /*
          * Construct the output with only 60 symbols in each line.
          */
-        this.alignment = formatOutput(query.getName(), // name of the query
+        this.alignment = formatOutput(squery.getName(), // name of the query
                                                         // sequence
-            subject.getName(), // name of the target sequence
+            ssubject.getName(), // name of the target sequence
             align, // the String representation of the alignment
             path, // String match/missmatch representation
             queryStart, // Start position of the alignment in the query sequence
@@ -388,7 +414,7 @@ public class SmithWaterman extends NeedlemanWunsch {
         // Don't waste any memory.
         double value = scoreMatrix[maxI][maxJ];
         scoreMatrix = null;
-        Runtime.getRuntime().gc();
+        //Runtime.getRuntime().gc();
         return value;
 
       } catch (BioException exc) {

@@ -26,18 +26,16 @@
 package org.biojava.bio.alignment;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-
-import org.biojava.bio.BioException;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * This Interface provides methods for the alignment of biosequences.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Mark Schreiber
  * 
  */
 public abstract class SequenceAlignment {
@@ -69,7 +67,7 @@ public abstract class SequenceAlignment {
    * @return score of the alignment or the distance.
    * @throws Exception
    */
-  public abstract double pairwiseAlignment(Sequence query, Sequence subject)
+  public abstract double pairwiseAlignment(SymbolList query, SymbolList subject)
       throws Exception;
 
   /**
@@ -80,7 +78,7 @@ public abstract class SequenceAlignment {
    * @param subject
    * @return Alignment
    */
-  public abstract Alignment getAlignment(Sequence query, Sequence subject)
+  public abstract Alignment getAlignment(SymbolList query, SymbolList subject)
       throws Exception;
 
   /**

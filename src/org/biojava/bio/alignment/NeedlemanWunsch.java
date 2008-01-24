@@ -28,6 +28,7 @@ import java.util.NoSuchElementException;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.db.SequenceDB;
@@ -41,6 +42,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 /*
  * Created on 23.06.2005
  */
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Needleman and Wunsch definied the problem of global sequence alignments, from
@@ -53,6 +55,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
  * 
  * @author Andreas Dr&auml;ger
  * @author Gero Greiner
+ * @author Mark Schreiber
  * @since 1.5
  */
 
@@ -299,7 +302,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
   /**
    * This method is good if one wants to reuse the alignment calculated by this
    * class in another BioJava class. It just performs
-   * {@link #pairwiseAlignment(Sequence, Sequence) pairwiseAlignment} and
+   * {@link #pairwiseAlignment(SymbolList, SymbolList) pairwiseAlignment} and
    * returns an <code>Alignment</code> instance containing the two aligned
    * sequences.
    * 
@@ -307,7 +310,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
    *         from query and target.
    * @throws Exception
    */
-  public Alignment getAlignment(Sequence query, Sequence target)
+  public Alignment getAlignment(SymbolList query, SymbolList target)
       throws Exception {
     pairwiseAlignment(query, target);
     return pairalign;
@@ -379,17 +382,33 @@ public class NeedlemanWunsch extends SequenceAlignment {
    * Global pairwise sequence alginment of two BioJava-Sequence objects
    * according to the Needleman-Wunsch-algorithm.
    * 
-   * @see org.biojava.bio.alignment.SequenceAlignment#pairwiseAlignment(org.biojava.bio.seq.Sequence,
-   *      org.biojava.bio.seq.Sequence)
+   * @see org.biojava.bio.alignment.SequenceAlignment#pairwiseAlignment(org.biojava.bio.symbol.SymbolList,
+   *      org.biojava.bio.symbol.SymbolList)
    */
-  public double pairwiseAlignment(Sequence query, Sequence subject)
+  public double pairwiseAlignment(SymbolList query, SymbolList subject)
       throws BioRuntimeException {
-    if (query.getAlphabet().equals(subject.getAlphabet())
-        && query.getAlphabet().equals(subMatrix.getAlphabet())) {
+    Sequence squery = null;
+    Sequence ssubject = null;
+    
+    if(query instanceof Sequence){
+        squery = (Sequence)query;
+    }else{
+        //make it a sequence
+        squery = new SimpleSequence(query, "", "query", new SimpleAnnotation());
+    }
+    if(subject instanceof Sequence){
+        ssubject = (Sequence)subject;
+    }else{
+        //make it a sequence
+        ssubject = new SimpleSequence(subject, "", "subject", new SimpleAnnotation());
+    }
+    
+    if (squery.getAlphabet().equals(ssubject.getAlphabet())
+        && squery.getAlphabet().equals(subMatrix.getAlphabet())) {
 
       long time = System.currentTimeMillis();
       int i, j;
-      this.CostMatrix = new double[query.length() + 1][subject.length() + 1]; // Matrix
+      this.CostMatrix = new double[squery.length() + 1][ssubject.length() + 1]; // Matrix
       // CostMatrix
 
       /*
@@ -408,28 +427,28 @@ public class NeedlemanWunsch extends SequenceAlignment {
        */
       if ((gapExt != delete) || (gapExt != insert)) {
 
-        double[][] E = new double[query.length() + 1][subject.length() + 1]; // Inserts
-        double[][] F = new double[query.length() + 1][subject.length() + 1]; // Deletes
+        double[][] E = new double[squery.length() + 1][ssubject.length() + 1]; // Inserts
+        double[][] F = new double[squery.length() + 1][ssubject.length() + 1]; // Deletes
 
         E[0][0] = F[0][0] = Double.MAX_VALUE;
-        for (i = 1; i <= query.length(); i++) {
+        for (i = 1; i <= squery.length(); i++) {
           // CostMatrix[i][0] = CostMatrix[i-1][0] + delete;
           E[i][0] = Double.POSITIVE_INFINITY;
           CostMatrix[i][0] = F[i][0] = delete + i * gapExt;
         }
-        for (j = 1; j <= subject.length(); j++) {
+        for (j = 1; j <= ssubject.length(); j++) {
           // CostMatrix[0][j] = CostMatrix[0][j - 1] + insert;
           F[0][j] = Double.POSITIVE_INFINITY;
           CostMatrix[0][j] = E[0][j] = insert + j * gapExt;
         }
-        for (i = 1; i <= query.length(); i++)
-          for (j = 1; j <= subject.length(); j++) {
+        for (i = 1; i <= squery.length(); i++)
+          for (j = 1; j <= ssubject.length(); j++) {
             E[i][j] = Math.min(E[i][j - 1], CostMatrix[i][j - 1] + insert)
                 + gapExt;
             F[i][j] = Math.min(F[i - 1][j], CostMatrix[i - 1][j] + delete)
                 + gapExt;
             CostMatrix[i][j] = min(E[i][j], F[i][j], CostMatrix[i - 1][j - 1]
-                - matchReplace(query, subject, i, j));
+                - matchReplace(squery, ssubject, i, j));
           }
 
         /*
@@ -447,25 +466,25 @@ public class NeedlemanWunsch extends SequenceAlignment {
               // only Insert.
               if (i == 0) {
                 align[0] = '~' + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
                 path = ' ' + path;
 
                 // only Delete.
               } else if (j == 0) {
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
                 align[1] = '~' + align[1];
                 path = ' ' + path;
 
                 // Match/Replace
               } else if ((CostMatrix[i][j] == CostMatrix[i - 1][j - 1]
-                  - matchReplace(query, subject, i, j))
+                  - matchReplace(squery, ssubject, i, j))
                   && !(gap_extend[0] || gap_extend[1])) {
-                if (query.symbolAt(i) == subject.symbolAt(j))
+                if (squery.symbolAt(i) == ssubject.symbolAt(j))
                   path = '|' + path;
                 else
                   path = ' ' + path;
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
 
                 // Insert || finish gap if extended gap is opened
               } else if (CostMatrix[i][j] == E[i][j] || gap_extend[0]) {
@@ -474,7 +493,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
                     + gapExt);
 
                 align[0] = '-' + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
                 path = ' ' + path;
 
                 // Delete || finish gap if extended gap is opened
@@ -483,7 +502,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
                 gap_extend[1] = (F[i][j] != CostMatrix[i - 1][j] + delete
                     + gapExt);
 
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
                 align[1] = '-' + align[1];
                 path = ' ' + path;
               }
@@ -500,15 +519,15 @@ public class NeedlemanWunsch extends SequenceAlignment {
 
       } else {
 
-        for (i = 1; i <= query.length(); i++)
+        for (i = 1; i <= squery.length(); i++)
           CostMatrix[i][0] = CostMatrix[i - 1][0] + delete;
-        for (j = 1; j <= subject.length(); j++)
+        for (j = 1; j <= ssubject.length(); j++)
           CostMatrix[0][j] = CostMatrix[0][j - 1] + insert;
-        for (i = 1; i <= query.length(); i++)
-          for (j = 1; j <= subject.length(); j++) {
+        for (i = 1; i <= squery.length(); i++)
+          for (j = 1; j <= ssubject.length(); j++) {
             CostMatrix[i][j] = min(CostMatrix[i - 1][j] + delete,
                 CostMatrix[i][j - 1] + insert, CostMatrix[i - 1][j - 1]
-                    - matchReplace(query, subject, i, j));
+                    - matchReplace(squery, ssubject, i, j));
           }
 
         /*
@@ -528,35 +547,35 @@ public class NeedlemanWunsch extends SequenceAlignment {
               // only Insert.
               if (i == 0) {
                 align[0] = '~' + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
                 path = ' ' + path;
 
                 // only Delete.
               } else if (j == 0) {
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
                 align[1] = '~' + align[1];
                 path = ' ' + path;
 
                 // Match/Replace
               } else if (CostMatrix[i][j] == CostMatrix[i - 1][j - 1]
-                  - matchReplace(query, subject, i, j)) {
+                  - matchReplace(squery, ssubject, i, j)) {
 
-                if (query.symbolAt(i) == subject.symbolAt(j))
+                if (squery.symbolAt(i) == ssubject.symbolAt(j))
                   path = '|' + path;
                 else
                   path = ' ' + path;
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
 
                 // Insert
               } else if (CostMatrix[i][j] == CostMatrix[i][j - 1] + insert) {
                 align[0] = '-' + align[0];
-                align[1] = st.tokenizeSymbol(subject.symbolAt(j--)) + align[1];
+                align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
                 path = ' ' + path;
 
                 // Delete
               } else {
-                align[0] = st.tokenizeSymbol(query.symbolAt(i--)) + align[0];
+                align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
                 align[1] = '-' + align[1];
                 path = ' ' + path;
               }
@@ -573,24 +592,24 @@ public class NeedlemanWunsch extends SequenceAlignment {
        */
       try {
 
-        query = new SimpleGappedSequence(new SimpleSequence(
-            new SimpleSymbolList(query.getAlphabet().getTokenization("token"),
-                align[0]), query.getURN(), query.getName(), query
+        squery = new SimpleGappedSequence(new SimpleSequence(
+            new SimpleSymbolList(squery.getAlphabet().getTokenization("token"),
+                align[0]), squery.getURN(), squery.getName(), squery
                 .getAnnotation()));
-        subject = new SimpleGappedSequence(new SimpleSequence(
+        ssubject = new SimpleGappedSequence(new SimpleSequence(
             new SimpleSymbolList(
-                subject.getAlphabet().getTokenization("token"), align[1]),
-            subject.getURN(), subject.getName(), subject.getAnnotation()));
+                ssubject.getAlphabet().getTokenization("token"), align[1]),
+            ssubject.getURN(), ssubject.getName(), ssubject.getAnnotation()));
         Map m = new HashMap();
-        m.put(query.getName(), query);
-        m.put(subject.getName(), subject);
+        m.put(squery.getName(), squery);
+        m.put(ssubject.getName(), ssubject);
         pairalign = new SimpleAlignment(m);
 
         // this.printCostMatrix(queryChar, targetChar); // only for tests
         // important
-        this.alignment = formatOutput(query.getName(), // name of the query
+        this.alignment = formatOutput(squery.getName(), // name of the query
             // sequence
-            subject.getName(), // name of the target sequence
+            ssubject.getName(), // name of the target sequence
             align, // the String representation of the alignment
             path, // String match/missmatch representation
             0, // Start position of the alignment in the query sequence
