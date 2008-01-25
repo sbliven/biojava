@@ -78,6 +78,8 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final Pattern readableFiles = Pattern.compile(".*(fa|fas)$");
     protected static final Pattern aminoAcids = Pattern.compile(".*[FLIPQE].*");
     
+    private FastaHeader header = new FastaHeader();
+    
     /**
      * {@inheritDoc}
      * A file is in FASTA format if the name ends with fa or fas, or the file starts with ">".
@@ -266,6 +268,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
         if (!format.equals(this.getDefaultFormat())) throw new IllegalArgumentException("Unknown format: "+format);
         this.writeSequence(seq, RichObjectFactory.getDefaultNamespace());
     }
+
     
     /**
      * {@inheritDoc}
@@ -282,24 +285,43 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
             throw e2;
         }
         
-        this.getPrintStream().print(">");
+        StringBuilder sb = new StringBuilder();
+        sb.append(">");
         
         String identifier = rs.getIdentifier();
-        if (identifier!=null && !"".equals(identifier)) {
-            this.getPrintStream().print("gi|");
-            this.getPrintStream().print(identifier);
-            this.getPrintStream().print("|");
+        if (header.isShowIdentifier() && identifier!=null && !"".equals(identifier)) {
+            sb.append("gi|");
+            sb.append(identifier);
+            sb.append("|");
         }
-        this.getPrintStream().print((ns==null?rs.getNamespace().getName():ns.getName()));
-        this.getPrintStream().print("|");
-        this.getPrintStream().print(rs.getAccession());
-        this.getPrintStream().print(".");
-        this.getPrintStream().print(rs.getVersion());
-        this.getPrintStream().print("|");
-        this.getPrintStream().print(rs.getName());
-        this.getPrintStream().print(" ");
-        String desc = rs.getDescription();
-        if (desc!=null && !"".equals(desc)) this.getPrintStream().print(desc.replaceAll("\\n"," "));
+        if(header.isShowNamespace()){
+            sb.append((ns==null?rs.getNamespace().getName():ns.getName()));
+            sb.append("|");
+        }
+        if(header.isShowAccession()){
+            sb.append(rs.getAccession());
+            if(header.isShowVersion()){
+                sb.append(".");
+            }
+        }
+        if(header.isShowVersion()){
+            sb.append(rs.getVersion());
+            sb.append("|");
+        }
+        if(header.isShowName()){
+            sb.append(rs.getName());
+            sb.append(" ");
+        }else{
+            sb.append(" "); //in case the show the description there needs to be space
+        }
+        if(header.isShowDescription()){
+            String desc = rs.getDescription();
+            if (desc!=null && !"".equals(desc)) sb.append(desc.replaceAll("\\n"," "));
+        }
+        if(sb.charAt(sb.length() -1) == '|'){
+            sb.deleteCharAt(sb.length() -1);
+        }
+        this.getPrintStream().print(sb.toString());
         this.getPrintStream().println();
         
         int length = rs.length();
@@ -315,5 +337,13 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
      */
     public String getDefaultFormat() {
         return FASTA_FORMAT;
+    }
+
+    public FastaHeader getHeader() {
+        return header;
+    }
+
+    public void setHeader(FastaHeader header) {
+        this.header = header;
     }
 }

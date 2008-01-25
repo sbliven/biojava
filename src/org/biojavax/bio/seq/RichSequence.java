@@ -54,6 +54,7 @@ import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.seq.io.EMBLFormat;
 import org.biojavax.bio.seq.io.EMBLxmlFormat;
 import org.biojavax.bio.seq.io.FastaFormat;
+import org.biojavax.bio.seq.io.FastaHeader;
 import org.biojavax.bio.seq.io.GenbankFormat;
 import org.biojavax.bio.seq.io.INSDseqFormat;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
@@ -1273,10 +1274,29 @@ public interface RichSequence extends BioEntry,Sequence {
          * use the namespace specified in the individual sequence.
          * @throws java.io.IOException if there is an IO problem
          */
+        public static void writeFasta(OutputStream os, SequenceIterator in, Namespace ns, FastaHeader header)
+        throws IOException {
+            FastaFormat fastaFormat = new FastaFormat();
+            if(header != null){
+                fastaFormat.setHeader(header);
+            }
+            RichStreamWriter sw = new RichStreamWriter(os,fastaFormat);
+            sw.writeStream(in,ns);
+        }
+        
+        /**
+         * Writes <CODE>Sequence</CODE>s from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
+         * Fasta Format.  This makes for a useful format filter where a
+         * <code>StreamReader</code> can be sent to the <code>RichStreamWriter</code> after formatting.
+         * @param os The stream to write fasta formatted data to
+         * @param in The source of input <CODE>RichSequence</CODE>s
+         * @param ns a <code>Namespace</code> to write the <CODE>RichSequence</CODE>s to. <CODE>Null</CODE> implies that it should
+         * use the namespace specified in the individual sequence.
+         * @throws java.io.IOException if there is an IO problem
+         */
         public static void writeFasta(OutputStream os, SequenceIterator in, Namespace ns)
         throws IOException {
-            RichStreamWriter sw = new RichStreamWriter(os,new FastaFormat());
-            sw.writeStream(in,ns);
+            writeFasta(os, in, ns, null);
         }
         
         /**
@@ -1289,9 +1309,22 @@ public interface RichSequence extends BioEntry,Sequence {
          */
         public static void writeFasta(OutputStream os, Sequence seq, Namespace ns)
         throws IOException {
-            writeFasta(os, new SingleRichSeqIterator(seq),ns);
+            writeFasta(os, new SingleRichSeqIterator(seq),ns, null);
         }
         
+        /**
+         * Writes a single <code>Sequence</code> to an <code>OutputStream</code> in Fasta format.
+         * @param os the <code>OutputStream</code>.
+         * @param seq the <code>Sequence</code>.
+         * @param ns a <code>Namespace</code> to write the sequences to. Null implies that it should
+         *              use the namespace specified in the individual sequence.
+         * @param header a <code>FastaHeader</code> that controls the fields in the header.
+         * @throws java.io.IOException if there is an IO problem
+         */
+        public static void writeFasta(OutputStream os, Sequence seq, Namespace ns, FastaHeader header)
+        throws IOException {
+            writeFasta(os, new SingleRichSeqIterator(seq),ns, header);
+        }
         
         /**
          * Writes sequences from a <code>SequenceIterator</code> to an <code>OutputStream </code>in
