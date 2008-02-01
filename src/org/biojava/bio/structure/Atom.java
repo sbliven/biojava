@@ -87,34 +87,39 @@ public interface Atom {
      */    
     public double[] getCoords() ;
     
-    /** set the X coordinate
+    /** Set the X coordinate.
      * @param x  a double
+     * @see #getX()
      */
     public void setX(double x);
     
-    /** set the Y coordinate
+    /** Set the Y coordinate.
      * @param y  a double
+     * @see #getY()
      */
     public void setY(double y);
     
-    /** set the Z coordinate
+    /** Set the Z coordinate.
      * @param z  a double
-     
+     * @see #getZ()     
      */
     public void setZ(double z);
     
-    /** get cordinate X. 
+    /** Get coordinate X. 
      * @return a double
+     * @see #setX(double)
      */    
     public double getX() ;
     
-    /** get cordinate Y. 
+    /** Get coordinate Y. 
      * @return a double
+     * @see #setY(double)
      */    
     public double getY() ;
     
-    /** get cordinate Z. 
+    /** Get coordinate Z. 
      * @return a double
+     * @see #setZ(double)
      */    
     public double getZ() ;
     
@@ -172,14 +177,16 @@ public interface Atom {
      */
     public Object clone();
     
-    /** Sets the back-reference to its parent Group
+    /** Sets the back-reference to its parent Group.
      * @param parent the parent Group
+     * @see #getParent()
      */
     public void setParent(Group parent) ; 
 
-     /** Returns the parent Group of the Atom
+     /** Returns the parent Group of the Atom.
      * returns null if the referenced object is not Group 
-     * @return Group the parent Group of the Atom, or null     
+     * @return Group the parent Group of the Atom, or null
+     * @see #setParent(Group)     
      */
     public Group getParent();
     
