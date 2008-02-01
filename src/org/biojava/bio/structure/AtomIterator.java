@@ -57,7 +57,7 @@ public class AtomIterator implements Iterator<Atom> {
 			group = null ;
 	}
 
-	/** get the  chain that contains the current atom
+	/** Get the  chain that contains the current atom.
 	 * 
 	 * @return a Chain object
 	 */
@@ -66,7 +66,7 @@ public class AtomIterator implements Iterator<Atom> {
 	}
 
 
-	/** get the model number of the model containing the current atom
+	/** Get the model number of the model containing the current atom.
 	 * 
 	 * @return the number of the model
 	 */
@@ -88,7 +88,8 @@ public class AtomIterator implements Iterator<Atom> {
 
 	}
 
-	/** is there a next atom ? 
+	/** Is there a next atom ?
+	 * @return true if there is an atom after the current one 
 	 * */
 	public boolean hasNext() {
 
@@ -120,10 +121,10 @@ public class AtomIterator implements Iterator<Atom> {
 		return false ;
 	}
 
-	/** return next atom.
+	/** Return next atom.
 	 *
 	 * @return the next Atom
-	 * @throws NoSuchElementException ...
+	 * @throws NoSuchElementException if there is no atom after the current one
 	 */
 	public Atom next() 
 	throws NoSuchElementException
