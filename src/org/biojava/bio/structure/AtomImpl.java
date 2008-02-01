@@ -56,17 +56,19 @@ public class AtomImpl implements Atom {
         altLoc = new Character(' ');
         parent = null;
     }
-    /** the Hibernate database ID
+    /** Get the Hibernate database ID.
      * 
      * @return the id
+     * @see #setId(long)
      */
 	public long getId() {
 		return id;
 	}
 
-	/** the Hibernate database ID
+	/** Set the Hibernate database ID.
      * 
      * @param id the hibernate id
+     * @see #getId()
      */
 	public void setId(long id) {
 		this.id = id;
@@ -126,13 +128,20 @@ public class AtomImpl implements Atom {
         coords[2] = z ;
     }
     
-    /** get the X coordinate. */
+    /** Get the X coordinate. 
+     * @see #setX(double)
+     * */
     public double getX() { return coords[0]; }
     
-    /** get the Y coordinate. */
+    /** Get the Y coordinate. 
+     * @see #setY(double)
+     * */
     public double getY() { return coords[1]; }
     
-    /** get the Z coordinate. */
+    /** Get the Z coordinate. 
+     * @see #setZ(double)
+     * 
+     * */
     public double getZ() { return coords[2]; }
     
     /** set alternate Location. 
