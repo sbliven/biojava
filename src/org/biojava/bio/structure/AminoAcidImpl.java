@@ -25,7 +25,6 @@ package org.biojava.bio.structure;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.biojava.bio.structure.io.PDBFileParser;
 import org.biojava.bio.structure.io.PDBParseException;
 
 /**
