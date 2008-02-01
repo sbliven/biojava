@@ -49,7 +49,14 @@ public class Calc {
     // 180 / pi
     static double RADIAN = 57.29577951 ;
     
+    /** radians per degree
+     * 
+     */ 
     public final static float radiansPerDegree = (float) (2 * Math.PI / 360);
+    
+    /** degrees per radian
+     * 
+     */
     public final static float degreesPerRadian = (float) (360 / (2 * Math.PI));
     
     
@@ -324,8 +331,8 @@ public class Calc {
     
     /** rotate a single atom aroud a rotation matrix.
      * matrix must be a 3x3 matrix.
-     * @param atom
-     * @param m
+     * @param atom atom to be rotated
+     * @param m a rotation matrix represented as a double[3][3] array
      */
     public static void rotate(Atom atom, double[][] m){
 
@@ -345,9 +352,9 @@ public class Calc {
         atom.setCoords(coords);
     }
     
-    /** rotate a structure .
+    /** Rotate a structure.
      *
-     * @param structure  a Structure object
+     * @param structure a Structure object
      * @param rotationmatrix an array (3x3) of double representing the rotation matrix. 
      * @throws StructureException ...
      */
@@ -388,10 +395,10 @@ public class Calc {
        }
    }
     
-   /** rotate an atom around a Matrix object
+   /** Rotate an atom around a Matrix object.
     * 
-    * @param atom
-    * @param m
+    * @param atom atom to be rotated
+    * @param m rotation matrix to be applied to the atom
     */
    public static void rotate(Atom atom, Matrix m){
 
@@ -411,7 +418,7 @@ public class Calc {
    
    }
    
-   /** rotate a group object
+   /** Rotate a group object.
     * 
     * @param group  a group to be rotated
     * @param m a Matrix object representing the translation matrix
@@ -428,10 +435,10 @@ public class Calc {
       
    }
    
-    /** rotate a structure object
+    /** Rotate a structure object.
      * 
-     * @param structure
-     * @param m
+     * @param structure the structure to be rotated
+     * @param m rotation matrix to be applied 
      */
     public static void rotate(Structure structure, Matrix m){
         
@@ -590,6 +597,11 @@ public class Calc {
         
     }
     
+    /** returns the Vector that needs to be applied to shift a set of atoms
+     * into to the Centroid.
+     * @param atomSet
+     * @return the vector needed to shift the set of atoms to its geometric center
+     */
     public static Atom getCenterVector(Atom[] atomSet){
         Atom centroid = getCentroid(atomSet);
         
@@ -627,7 +639,7 @@ public class Calc {
     /** creates a virtual C-beta atom. this might be needed when working with GLY
      * 
      * thanks to Peter Lackner for a python template of this method.
-     * @param amino
+     * @param amino the amino acid for which a "virtual" CB atom should be calculated 
      * @return a "virtual" CB atom
      * @throws StructureException
      */
@@ -668,10 +680,10 @@ public class Calc {
     }    
     
     
-    /** get euler angles for a matrix given in ZYZ convention.
+    /**Gget euler angles for a matrix given in ZYZ convention.
      * (as e.g. used by Jmol)
      * 
-     * @param m
+     * @param m the rotation matrix
      * @return the euler values for a rotation around Z, Y, Z in degrees...
      */
     public static double[] getZYZEuler(Matrix m) {
@@ -723,13 +735,11 @@ public class Calc {
     
     
     
-    
-    
-    /** this conversion uses NASA standard aeroplane conventions as described on page:
+    /** This conversion uses NASA standard aeroplane conventions as described on page:
     *   http://www.euclideanspace.com/maths/geometry/rotations/euler/index.htm
     *   Coordinate System: right hand
     *   Positive angle: right hand
-    *   Order of euler angles: heading first, then attitude, then bank
+    *   Order of euler angles: heading first, then attitude, then bank.
     *   matrix row column ordering:
     *   [m00 m01 m02]
     *   [m10 m11 m12]
