@@ -25,6 +25,7 @@ package org.biojava.bio.structure;
 
 import java.util.Map;
 
+
 /**
  * <p>
  * A {@link Group} that represents an AminoAcid.
@@ -50,8 +51,14 @@ import java.util.Map;
  */
 public interface AminoAcid extends Group {
 	
-	// to distribguish AminoAcids that have been created from SEQRES records and ATOM records
+	/* field to distribguish AminoAcids that have been created from SEQRES records and ATOM records
+	 * 
+	 */
 	public static final String ATOMRECORD = "ATOM";
+	
+	/* field to distribguish AminoAcids that have been created from SEQRES records and ATOM records
+	 * 
+	 */
 	public static final String SEQRESRECORD = "SEQRES";
 	
     /**
@@ -120,11 +127,15 @@ public interface AminoAcid extends Group {
 
 	/** allows to distinguish between amino acids that are provided
 		as ATOM records and a SEQRES records.
+	 * @param recordName 
+	 * @see #getRecordType
 	*/
 	public void setRecordType(String recordName);
 
-	/** allows to distinguish between amino acids that are provided
+	/** Allows to distinguish between amino acids that are provided
 		as ATOM records and a SEQRES records.
+	 * @return the origin of this amino acid (ATOM or SEQRES records)
+	 * @see #setRecordType(String)
 	*/
     public String getRecordType();
 
