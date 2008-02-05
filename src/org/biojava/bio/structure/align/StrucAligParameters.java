@@ -28,6 +28,7 @@ import org.biojava.bio.structure.StructureTools;
  * 
  * @author Andreas Prlic
  * @since 1.5
+ * @version %I% %G%
  */
 public class StrucAligParameters {
 
