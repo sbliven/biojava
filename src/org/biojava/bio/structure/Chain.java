@@ -114,12 +114,19 @@ public interface Chain {
      * @deprecated use getAtomGroups or getSeqResGroups instead
      */
     public List<Group> getGroups ();
+    
     /** return all groups that have been specified in the ATOM section of this chain .
      * @return a List object representing the Groups of this Chain.
+     * @see #setAtomGroups(List)
      */
     public List<Group> getAtomGroups();
     
-
+    /** Set all groups that have been specified in the ATOM section of this chain .
+     * @param groups a List object representing the Groups of this Chain.
+     * @see #getAtomGroups()
+     */
+    public void setAtomGroups(List<Group> groups);
+    
     /** return a List of all groups of a special type (e.g. amino,
      * hetatm, nucleotide).
      * @param type  a String
@@ -260,20 +267,20 @@ public interface Chain {
      */
     public String getAtomSequence();
     
-    /** get the sequence for all amino acids as it is specified in the SEQRES residues
+    /** Get the sequence for all amino acids as it is specified in the SEQRES residues.
      * 
      * @return the amino acid sequence of the SEQRES sequence as a string
      * @see #getAtomSequence()
      */
     public String getSeqResSequence();
     
-    /** set the Swissprot id of this chains .
+    /** Set the Swissprot id of this chain.
      * @param sp_id  a String specifying the swissprot id value
      * @see #getSwissprotId()
      */
     public void setSwissprotId(String sp_id);
 
-    /** get the Swissprot id of this chains .
+    /** Get the Swissprot id of this chain.
      * @return a String representing the swissprot id value
      * @see #setSwissprotId(String sp_id)
      */

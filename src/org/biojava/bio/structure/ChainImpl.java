@@ -44,6 +44,9 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  */
 public class ChainImpl implements Chain {
 
+	/** The default chain identifier 
+	 * 
+	 */
 	public static String DEFAULT_CHAIN_ID = " ";
 
 	String swissprot_id ; 
@@ -71,25 +74,22 @@ public class ChainImpl implements Chain {
 
 	}
 
-	/** get the ID used by Hibernate
+	/** {@inheritDoc}
 	 * 
-	 * @return the ID used by Hibernate
 	 */
 	public Long getId() {
 		return id;
 	}
 
-	/** set the ID used by Hibernate
+	/** {@inheritDoc}
 	 * 
-	 * @param id
-	 */ 
+	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-	/** Set the back-reference (to its parent Structure)
-	 * @param parent 
-	 *  
+	/** {@inheritDoc}
+	 * 
 	 */
 	public void setParent(Structure parent) {
 		this.parent = parent;
@@ -107,7 +107,7 @@ public class ChainImpl implements Chain {
 	}
 
 
-	/** returns an identical copy of this Chain .
+	/** Returns an identical copy of this Chain .
 	 * @return an identical copy of this Chain 
 	 */
 	public Object clone() {
@@ -126,19 +126,30 @@ public class ChainImpl implements Chain {
 		return n ;
 	}
 
-
+	/** {@inheritDoc}
+	 * 
+	 */
 	public void setAnnotation(Annotation anno){
 		annotation = anno;
 	}
 
+	/** {@inheritDoc}
+	 * 
+	 */
 	public Annotation getAnnotation(){
 		return annotation;
 	}
 
+	/** {@inheritDoc}
+	 * 
+	 */
 	public void setHeader(Compound mol) {
 		this.mol = mol;
 	}
 
+	/** {@inheritDoc}
+	 * 
+	 */
 	public Compound getHeader() {
 		return this.mol;
 	}
@@ -160,7 +171,9 @@ public class ChainImpl implements Chain {
 		return swissprot_id ;
 	}
 
-
+	/** {@inheritDoc}
+	 * 
+	 */
 	public void addGroup(Group group) {
 
 		group.setParent(this);
@@ -229,6 +242,10 @@ public class ChainImpl implements Chain {
 		return getAtomGroups(type);
 	}
 
+	/**  Get the Groups of a certain type, that are listed int the ATOM records of the PDB file.
+	 *  @param type the type of the groups to return. 
+	 *  @return a list of group objects
+	 */
 	public List<Group> getAtomGroups(String type){
 		List<Group> tmp = new ArrayList<Group>() ;
 		for (int i=0;i<groups.size();i++){
@@ -250,13 +267,16 @@ public class ChainImpl implements Chain {
 	}
 
 
-	/** return all groups that have been specified in the ATOM section of this chain .
-	 * @return an ArrayList object representing the Groups of this Chain.
+	/** {@inheritDoc}
+	 * 
 	 */
 	public List<Group> getAtomGroups(){
 		return groups ;
 	}
 
+	/** {@inheritDoc}
+	 * 
+	 */
 	public void setAtomGroups(List<Group> groups){
 		for (Group g:groups){
 			g.setParent(this);
@@ -264,6 +284,9 @@ public class ChainImpl implements Chain {
 		this.groups = groups;
 	}
 	
+	/** {@inheritDoc}
+	 * 
+	 */
 	public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd, boolean ignoreMissing) 
 	throws StructureException {
 
@@ -353,7 +376,11 @@ public class ChainImpl implements Chain {
 		}
 
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) 
 	throws StructureException {
 
@@ -400,7 +427,9 @@ public class ChainImpl implements Chain {
 		return getAtomLength();
 	}
 
-
+	/** {@inheritDoc}
+	 * 
+	 */
 	public int getLengthAminos() {
 
 		List<Group> g = getAtomGroups("amino");
@@ -427,7 +456,9 @@ public class ChainImpl implements Chain {
 	public String getName()           {	return name;  }
 
 
-	/** string representation. */
+	/** String representation.
+	 * @return String representation of the Chain
+	 *  */
 	public String toString(){
 		String newline = System.getProperty("line.separator");
 		StringBuffer str = new StringBuffer();
@@ -483,7 +514,9 @@ public class ChainImpl implements Chain {
 	}
 
 
-
+	/** {@inheritDoc}
+	 * 
+	 */
 	public String getAtomSequence(){
 
 		List<Group> aminos = getAtomGroups("amino");
@@ -497,9 +530,8 @@ public class ChainImpl implements Chain {
 
 	}
 
-	/** get the sequence for all amino acids as it is specified in the SEQRES residues
+	/** {@inheritDoc}
 	 * 
-	 * @return the amino acid sequence as a string
 	 */
 	public String getSeqResSequence(){
 
@@ -515,20 +547,31 @@ public class ChainImpl implements Chain {
 	}
 
 
-
+	/** {@inheritDoc}
+	 * 
+	 */
 	public Group getSeqResGroup(int position) {
 
 		return seqResGroups.get(position);
 	}
 
+	/** {@inheritDoc}
+	 * 
+	 */
 	public List<Group> getSeqResGroups(String type) {	   
 		return seqResGroups;
 	}
 
+	/** {@inheritDoc}
+	 * 
+	 */
 	public List<Group> getSeqResGroups() {
 		return seqResGroups;
 	}
 
+	/** {@inheritDoc}
+	 * 
+	 */
 	public void setSeqResGroups(List<Group> groups){
 		for (Group g: groups){
 			g.setParent(this);
@@ -537,6 +580,9 @@ public class ChainImpl implements Chain {
 	}
 
 
+	/** {@inheritDoc}
+	 * 
+	 */
 	public int getAtomLength() {
 
 		return groups.size();
