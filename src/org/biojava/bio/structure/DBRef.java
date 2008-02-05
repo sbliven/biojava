@@ -45,7 +45,7 @@ public class DBRef {
     char insertEnd;
 
     String database;
-    String dbAcession;
+    String dbAccession;
     String dbIdCode;
 
     int dbSeqBegin;
@@ -62,30 +62,47 @@ public class DBRef {
     	idbnsEnd    = ' ';
     }
     
-    /** get the ID used by Hibernate
+    /** Get the ID used by Hibernate.
      * 
      * @return the ID used by Hibernate
+     * @see #setId(Long)
      */
     public Long getId() {
         return id;
     }
 
-    /** set the ID used by Hibernate
+    /** Set the ID used by Hibernate.
      * 
-     * @param id
+     * @param id the id assigned by Hibernate
+     * @see #getId()
      */ 
     public void setId(Long id) {
         this.id = id;
     }
 
+    /** Set the structure object that this DBRef relates to.
+     * 
+     * @param s a structure object
+     * @see #getParent()
+     */
     public void setParent(Structure s){
     	parent = s;
     
     }
+    
+    /** Get the structure object that this DBRef relates to.
+     * 
+     * @return s a structure object
+     * @see #setParent(Structure)
+     */
     public Structure getParent(){
     	return parent;
     }
     
+    /** Convert the DBRef object to a DBREF record as it is used in PDB files
+     * 
+     * @return a PDB - DBREF formatted line
+     */
     public String toPDB(){
         
         StringBuilder build = new StringBuilder();
@@ -93,7 +110,7 @@ public class DBRef {
         
          form.format("DBREF %4s %1s %4d%1s %4d%1s %6s %8s %12s %5d%1c %5d%1c ", 
                  idCode, chainId,seqbegin,insertBegin,seqEnd,insertEnd,
-                 database,dbAcession,dbIdCode,
+                 database,dbAccession,dbIdCode,
                  dbSeqBegin,idbnsBegin,dbSeqEnd,idbnsEnd
                  );
         
@@ -101,6 +118,9 @@ public class DBRef {
         
     }
 
+    /** String representation of a DBRef.
+     * @return a String
+     */
     public String toString(){
         StringBuffer buf = new StringBuffer();
         
@@ -135,34 +155,42 @@ public class DBRef {
     /** get the idCode for this entry
      * 
      * @return the idCode
+     * @see #setIdCode(String)
      */
     public String getIdCode() {
 		return idCode;
 	}
 
-    /** set the idCode for this entry
+    /** Set the idCode for this entry.
      * 
-     * @param idCode
+     * @param idCode the idCode for this entry
+     * @see #getIdCode()
      */
 	public void setIdCode(String idCode) {
 		this.idCode = idCode;
 	}
 
-	/** the chain ID of the corresponding chain
+	/** The chain ID of the corresponding chain.
      * 
-     * @return chainId
+     * @return chainId the ID of the corresponding chain.
+     * @see #setChainId(Character)
      */
     public Character getChainId() {
         return chainId;
     }
 
 
+    /** The chain ID of the corresponding chain.
+     * 
+     * @param chainId the ID of the corresponding chain
+     * @see #getChainId()
+     */
     public void setChainId(Character chainId) {
         this.chainId = chainId;
     }
 
 
-    /** the database of the db-ref. 
+    /** The database of the db-ref. 
      * uses the abbreviation as provided in the PDB files:
      * 
      *<pre>   Database name                         database 
@@ -176,36 +204,52 @@ public class DBRef {
     UNIPROT                               UNP
     </pre>
      * @return name of database of this DBRef
+     * @see #setDatabase(String)
      */
     public String getDatabase() {
         return database;
     }
 
-
+    /** Specifies the database value.
+     * 
+     * @param database the database
+     * @see #getDatabase()
+     */
     public void setDatabase(String database) {
         this.database = database;
     }
 
-    /* Sequence database accession code */
-    public String getDbAcession() {
-        return dbAcession;
+    /** Sequence database accession code.
+     * @return the dbAccession
+     * @see #setDbAccession(String) 
+     * */
+    public String getDbAccession() {
+        return dbAccession;
     }
 
-
-    public void setDbAcession(String dbAcession) {
-        this.dbAcession = dbAcession;
+    /** Sequence database accession code.
+     * @param dbAccession the dbAccession
+     * @see #getDbAccession() 
+     * */
+    public void setDbAccession(String dbAccession) {
+        this.dbAccession = dbAccession;
     }
 
 
     /** Sequence database          identification code.
      * 
      * @return the dbIdCode
+     * @see #setDbIdCode(String)
      */
     public String getDbIdCode() {
         return dbIdCode;
     }
 
-
+    /** Sequence database          identification code.
+     * 
+     * @param dbIdCode identification code
+     * @see #getDbIdCode()
+     */
     public void setDbIdCode(String dbIdCode) {
         this.dbIdCode = dbIdCode;
     }
@@ -213,37 +257,56 @@ public class DBRef {
     /** Initial sequence number of the
     database seqment.
      * @return position
+     * @see #setDbSeqBegin(int)
      */
     public int getDbSeqBegin() {
         return dbSeqBegin;
     }
 
 
+    /** Initial sequence number of the
+    database seqment.
+     * @param dbSeqBegin a sequence position
+     * @see #getDbSeqBegin()
+     * 
+     */
     public void setDbSeqBegin(int dbSeqBegin) {
         this.dbSeqBegin = dbSeqBegin;
     }
 
 
-    /** Ending sequence number of the database segment.
+    /** Ending sequence position  of the database segment.
      * @return dbSeqEnd
+     * @see #setDbSeqEnd(int)
      */
     public int getDbSeqEnd() {
         return dbSeqEnd;
     }
 
 
+    /** The begin of the sequence position in the database
+     * 
+     * @param dbSeqEnd sequence position
+     * @see #getDbSeqEnd()
+     */
     public void setDbSeqEnd(int dbSeqEnd) {
         this.dbSeqEnd = dbSeqEnd;
     }
 
     /** Insertion code of initial residue of the segment, if PDB is the
     reference. 
-     * @return idbnsBegin*/
+     * @return idbnsBegin isnertion code
+     * @see #setIdbnsBegin(char)
+     * */
     public char getIdbnsBegin() {
         return idbnsBegin;
     }
 
-
+    /** Insertion code of initial residue of the segment, if PDB is the
+    reference. 
+     * @param idbnsBegin insertion code
+     * @see #getIdbnsBegin()
+     * */
     public void setIdbnsBegin(char idbnsBegin) {
         this.idbnsBegin = idbnsBegin;
     }
@@ -251,13 +314,20 @@ public class DBRef {
     /** Insertion code of the ending
     residue of the segment, if PDB is
     the reference.
-     * @return idbnsEnd
+     * @return idbnsEnd insertion code
+     * @see #setIdbnsEnd(char)
      */
     public char getIdbnsEnd() {    	
         return idbnsEnd;
     }
 
 
+    /** Insertion code of the ending
+    residue of the segment, if PDB is
+    the reference.
+     * @param idbnsEnd the insertion code
+     * @see #setIdbnsEnd(char)
+     */
     public void setIdbnsEnd(char idbnsEnd) {
         this.idbnsEnd = idbnsEnd;
     }
@@ -265,12 +335,18 @@ public class DBRef {
     /** Initial insertion code of the PDB sequence segment.
      * 
      * @return insertBegin
+     * @see #setInsertBegin(char)
      */
 
     public char getInsertBegin() {
         return insertBegin;
     }
 
+    /** Initial insertion code of the PDB sequence segment.
+     * 
+     * @param insertBegin
+     * @see #getInsertBegin()
+     */
 
     public void setInsertBegin(char insertBegin) {
         this.insertBegin = insertBegin;
@@ -278,13 +354,19 @@ public class DBRef {
 
     /** Ending insertion code of the PDB sequence segment.
      * 
-     * @return insertEnd
+     * @return insertEnd insertion code
+     * @see #setInsertEnd(char)
      */
     public char getInsertEnd() {    
         return insertEnd;
     }
 
-
+    /** Ending insertion code of the PDB sequence segment.
+     * 
+     * @param insertEnd insertEnd
+     * @see #getInsertEnd()
+     * 
+     */
     public void setInsertEnd(char insertEnd) {
         this.insertEnd = insertEnd;
     }
@@ -292,12 +374,17 @@ public class DBRef {
     /**   Initial sequence number of the PDB sequence segment.
      * 
      * @return start seq. position
+     * @see #setSeqBegin
      */
     public int getSeqBegin() {
         return seqbegin;
     }
 
-
+    /**   Initial sequence number of the PDB sequence segment.
+     * 
+     * @param seqbegin start seq. position
+     * @see #getSeqBegin()
+     */
     public void setSeqBegin(int seqbegin) {
         this.seqbegin = seqbegin;
     }
@@ -305,19 +392,20 @@ public class DBRef {
     /**Ending sequence number   of the PDB sequence segment.
      * 
      * @return sequence end position
+     * @see #getSeqEnd()
      */
     public int getSeqEnd() {
         return seqEnd;
     }
 
-
+    /**Ending sequence number   of the PDB sequence segment.
+     * 
+     * @param seqEnd sequence end position
+     * @see #setSeqEnd(int)
+     * 
+     */
     public void setSeqEnd(int seqEnd) {
         this.seqEnd = seqEnd;
     }
-
-
-
-
-
 
 }
