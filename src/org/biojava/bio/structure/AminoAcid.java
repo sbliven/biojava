@@ -125,7 +125,7 @@ public interface AminoAcid extends Group {
      */
     public void setAminoType(Character aa) ;
 
-	/** allows to distinguish between amino acids that are provided
+	/** Allows to distinguish between amino acids that are provided
 		as ATOM records and a SEQRES records.
 	 * @param recordName either ATOMRECORD or SEQRESRECORD
 	 * @see #getRecordType()
