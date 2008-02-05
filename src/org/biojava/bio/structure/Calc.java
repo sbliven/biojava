@@ -49,12 +49,12 @@ public class Calc {
     // 180 / pi
     static double RADIAN = 57.29577951 ;
     
-    /** radians per degree
+    /** Radians per degree.
      * 
      */ 
     public final static float radiansPerDegree = (float) (2 * Math.PI / 360);
     
-    /** degrees per radian
+    /** Degrees per radian.
      * 
      */
     public final static float degreesPerRadian = (float) (360 / (2 * Math.PI));
@@ -454,8 +454,8 @@ public class Calc {
     
     /** calculate structure + Matrix coodinates ... 
      * 
-     * @param s
-     * @param matrix
+     * @param s the structure to operate on
+     * @param matrix a Matrix object
      */
     public static void plus(Structure s, Matrix matrix){
         AtomIterator iter = new AtomIterator(s) ;
@@ -525,7 +525,7 @@ public class Calc {
         }
     }
     
-    /** shift a vector
+    /** Shift a vector.
      * 
      * @param a vector a
      * @param b vector b
@@ -541,7 +541,7 @@ public class Calc {
         a.setZ(z);
     }
     
-    /** shift a Group with a vector.
+    /** Shift a Group with a vector.
     *
     * @param group   a group object
     * @param a          an Atom object representing a shift vector
@@ -567,7 +567,7 @@ public class Calc {
     
     
     
-    /** returns the center  of mass of the set of atoms
+    /** Returns the center  of mass of the set of atoms.
      * @param atomSet a set of Atoms
      * @return an Atom representing the Centroid of the set of atoms
      */
@@ -616,7 +616,7 @@ public class Calc {
         
     }
     
-    /** center the atoms at the Centroid 
+    /** Center the atoms at the Centroid. 
      * @param atomSet a set of Atoms
      * @return an Atom representing the Centroid of the set of atoms
      * @throws StructureException 
