@@ -24,6 +24,11 @@ package org.biojava.bio.structure.align;
 
 import org.biojava.bio.structure.StructureTools;
 
+/** A class that contains all the parameters of the structure alignment algorithm.
+ * 
+ * @author Andreas Prlic
+ * @since 1.5
+ */
 public class StrucAligParameters {
 
  
