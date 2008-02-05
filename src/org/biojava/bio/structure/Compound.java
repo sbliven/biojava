@@ -45,63 +45,64 @@ import java.util.List;
  */
 public class Compound implements Cloneable {
 
-    List<Chain> chainList = new ArrayList<Chain>();
-    List<String> chainId = null;
-    String refChainId = null;
-    String molId = "0";
-    //String molId = null;
-    String molName = null;
-    String title = null;
-    List<String> synonyms = null;
-    List<String> ecNums = null;
-    String engineered = null;
-    String mutation = null;
-    String biologicalUnit = null;
-    String details = null;
+	List<Chain> chainList = new ArrayList<Chain>();
+	List<String> chainId = null;
+	String refChainId = null;
+	String molId = "0";
+	//String molId = null;
+	String molName = null;
+	String title = null;
+	List<String> synonyms = null;
+	List<String> ecNums = null;
+	String engineered = null;
+	String mutation = null;
+	String biologicalUnit = null;
+	String details = null;
 
-    String numRes = null;
-    String resNames = null;
+	String numRes = null;
+	String resNames = null;
 
-    String headerVars = null;
+	String headerVars = null;
 
-    String synthetic = null;
-    String fragment = null;
-    String organismScientific = null;
-    String organismCommon = null;
-    String strain = null;
-    String variant = null;
-    String cellLine = null;
-    String atcc = null;
-    String organ = null;
-    String tissue = null;
-    String cell = null;
-    String organelle = null;
-    String secretion = null;
-    String gene = null;
-    String cellularLocation = null;
-    String expressionSystem = null;
-    String expressionSystemStrain = null;
-    String expressionSystemVariant = null;
-    String expressionSystemCellLine = null;
-    String expressionSystemAtccNumber = null;
-    String expressionSystemOrgan = null;
-    String expressionSystemTissue = null;
-    String expressionSystemCell = null;
-    String expressionSystemOrganelle = null;
-    String expressionSystemCellularLocation = null;
-    String expressionSystemVectorType = null;
-    String expressionSystemVector = null;
-    String expressionSystemPlasmid = null;
-    String expressionSystemGene = null;
-    String expressionSystemOtherDetails = null;
+	String synthetic = null;
+	String fragment = null;
+	String organismScientific = null;
+	String organismCommon = null;
+	String strain = null;
+	String variant = null;
+	String cellLine = null;
+	String atcc = null;
+	String organ = null;
+	String tissue = null;
+	String cell = null;
+	String organelle = null;
+	String secretion = null;
+	String gene = null;
+	String cellularLocation = null;
+	String expressionSystem = null;
+	String expressionSystemStrain = null;
+	String expressionSystemVariant = null;
+	String expressionSystemCellLine = null;
+	String expressionSystemAtccNumber = null;
+	String expressionSystemOrgan = null;
+	String expressionSystemTissue = null;
+	String expressionSystemCell = null;
+	String expressionSystemOrganelle = null;
+	String expressionSystemCellularLocation = null;
+	String expressionSystemVectorType = null;
+	String expressionSystemVector = null;
+	String expressionSystemPlasmid = null;
+	String expressionSystemGene = null;
+	String expressionSystemOtherDetails = null;
 
-    private Long id;
-    
-    public String toString(){
-    	StringBuffer buf = new StringBuffer();
-    	buf.append("Compound: " + molId + " " +molName + " ");
-    	/* disabled for the moment
-          
+	private Long id;
+
+	@SuppressWarnings("unchecked")
+	public String toString(){
+		StringBuffer buf = new StringBuffer();
+		buf.append("Compound: " + molId + " " +molName + " ");
+		/* disabled for the moment
+
     	 buf.append(" chains: " );
     	Iterator<Chain> iter = chainList.iterator();
     	while (iter.hasNext()){
@@ -109,590 +110,623 @@ public class Compound implements Cloneable {
     		buf.append (c.getName() + " ");
     	}
 
-    	*/
-        try {
-            Class c = Class.forName("org.biojava.bio.structure.Compound");
-            Method[] methods  = c.getMethods();
-            
-            for (int i = 0; i < methods.length; i++) {
-                Method m = methods[i];     
-                
-                String name = m.getName();
-                if ( name.substring(0,3).equals("get")) {
-                   if (name.equals("getMolId"))
-                       continue;
-                   if ( name.equals("getMolName"))
-                       continue;
-                   
-                    Object o  = m.invoke(this, new Object[]{});
-                    if ( o instanceof String){
-                        if ( o != null)
-                            buf.append(name.substring(3, name.length())+": "+ o + " ");
-                    }
-                    if ( o instanceof List){
-                        if ( o != null)
-                        	
-                            buf.append(name.substring(3,name.length())+": ");
-                            List<Object> lst = (List<Object>)o;
-                            for (Object obj : lst){
-                            	if ( obj instanceof Chain){
-                            		continue;
-                            	}
-                                buf.append(obj + " ");
-                            }
-                        
-                    }
-                }
-                
-            }
-            
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        
-        
-    	//if ( organismScientific != null)
-    	//	buf.append(" organism scientific: " + organismScientific);
-
-    	
-    	return buf.toString();
-    }
-    
-    /** get the ID used by Hibernate
-     * 
-     * @return the ID used by Hibernate
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /** set the ID used by Hibernate
-     * 
-     * @param id
-     */ 
-    private void setId(Long id) {
-        this.id = id;
-    }
-    
-    
-    public void showHeader(){
-        this.showCompound();
-        this.showSource();
-    }
-
-    public void showCompound() {
-        System.out.println("COMPOUND INFO:");
-        if (this.molId != null) {
-                    System.out.println("Mol ID: " + this.molId);
-                }
-        if (this.chainId != null) {
-            System.out.println("Chain: " + this.chainId);
-            //this.refChainId = chainId
-        }
-        if (this.molName != null) {
-            System.out.println("Mol Name: " + this.molName);
-        }
-        if (this.title != null) {
-            System.out.println("Title: " + this.title);
-        }
-        if (this.synonyms != null) {
-            for (String x : this.synonyms) {
-                System.out.println("Synomym: " + x);
-            }
-        }
-        if (this.ecNums != null) {
-            for (String x : this.ecNums) {
-                System.out.println("EC: " + x);
-            }
-        }
-        if (this.fragment != null) {
-            System.out.println("Fragment? " + this.fragment);
-        }
-        if (this.engineered != null) {
-            System.out.println("Engineered? " + this.engineered);
-        }
-        if (this.mutation != null) {
-            System.out.println("Mutation? " + this.mutation);
-        }
-        if (this.biologicalUnit != null) {
-            System.out.println("Biological Unit: " + this.biologicalUnit);
-        }
-        if (this.details != null) {
-            System.out.println("Details: " + this.details);
-        }
-        if (this.numRes != null) {
-            System.out.println("No. Residues: " + this.numRes);
-        }
-        //System.out.println( "\n"
-
-    }
-
-
-    public void showSource() {
-        System.out.println("SOURCE INFO:");
-        if (this.synthetic != null) {
-            System.out.println("Synthetic? " + this.synthetic);
-        }
-        if (this.fragment != null) {
-            System.out.println("Fragment? " + this.fragment);
-        }
-        if (this.organismScientific != null) {
-            System.out.println("Organism Scientific: " + this.organismScientific);
-        }
-        if (this.organismCommon != null) {
-            System.out.println("Organism Common: " + this.organismCommon);
-        }
-        if (this.strain != null) {
-            System.out.println("Strain: " + this.strain);
-        }
-        if (this.variant != null) {
-            System.out.println("Variant: " + this.variant);
-        }
-        if (this.cellLine != null) {
-            System.out.println("Cell Line: " + this.cellLine);
-        }
-        if (this.atcc != null) {
-            System.out.println("ATCC: " + this.atcc);
-        }
-        if (this.organ != null) {
-            System.out.println("Organ: " + this.organ);
-        }
-        if (this.tissue != null) {
-            System.out.println("Tissue: " + this.tissue);
-        }
-        if (this.cell != null) {
-            System.out.println("Cell: " + this.cell);
-        }
-        if (this.organelle != null) {
-            System.out.println("Organelle: " + this.organelle);
-        }
-        if (this.secretion != null) {
-            System.out.println("Secretion: " + this.secretion);
-        }
-        if (this.gene != null) {
-            System.out.println("Gene: " + this.gene);
-        }
-        if (this.cellularLocation != null) {
-            System.out.println("Cellular Location: " + this.cellularLocation);
-        }
-        if (this.expressionSystem != null) {
-            System.out.println("Expression System: " + this.expressionSystem);
-        }
-        if (this.expressionSystemStrain != null) {
-            System.out.println("Expression System Strain: " + this.expressionSystemStrain);
-        }
-        if (this.expressionSystemVariant != null) {
-            System.out.println("Expression System Variant: " + this.expressionSystemVariant);
-        }
-        if (this.expressionSystemCellLine != null) {
-            System.out.println("Expression System Cell Line: " + this.expressionSystemCellLine);
-        }
-        if (this.expressionSystemAtccNumber != null) {
-            System.out.println("Expression System ATCC Number: " + this.expressionSystemAtccNumber);
-        }
-        if (this.expressionSystemOrgan != null) {
-            System.out.println("Expression System Organ: " + this.expressionSystemOrgan);
-        }
-        if (this.expressionSystemTissue != null) {
-            System.out.println("Expression System Tissue: " + this.expressionSystemTissue);
-        }
-        if (this.expressionSystemCell != null) {
-            System.out.println("Expression System Cell: " + this.expressionSystemCell);
-        }
-        if (this.expressionSystemOrganelle != null) {
-            System.out.println("Expression System Organelle: " + this.expressionSystemOrganelle);
-        }
-        if (this.expressionSystemCellularLocation != null) {
-            System.out.println("Expression System Cellular Location: " + this.expressionSystemCellularLocation);
-        }
-        if (this.expressionSystemVectorType != null) {
-            System.out.println("Expression System Vector Type: " + this.expressionSystemVectorType);
-        }
-        if (this.expressionSystemVector != null) {
-            System.out.println("Expression System Vector: " + this.expressionSystemVector);
-        }
-        if (this.expressionSystemPlasmid != null) {
-            System.out.println("Expression System Plasmid: " + this.expressionSystemPlasmid);
-        }
-        if (this.expressionSystemGene != null) {
-            System.out.println("Expression System Gene: " + this.expressionSystemGene);
-        }
-        if (this.expressionSystemOtherDetails != null) {
-            System.out.println("Expression System Other Details: " + this.expressionSystemOtherDetails);
-        }
-    }
-
-    public List<String> getChainId() {
-        return chainId;
-    }
-
-    public void setChainId(List<String> chainId) {
-        this.chainId = chainId;
-    }
-
-
-    public String getRefChainId() {
-        return refChainId;
-    }
-
-    public void setRefChainId(String refChainId) {
-        this.refChainId = refChainId;
-    }
-
-    public String getMolId() {
-        return molId;
-    }
-
-    public void setMolId(String molId) {
-        this.molId = molId;
-    }
-
-    public String getMolName() {
-        return molName;
-    }
-
-    public void setMolName(String molName) {
-        this.molName = molName;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<String> getSynonyms() {
-        return synonyms;
-    }
-
-    public void setSynonyms(List<String> synonyms) {
-        this.synonyms = synonyms;
-    }
-
-    public List<String> getEcNums() {
-        return ecNums;
-    }
-
-    public void setEcNums(List<String> ecNums) {
-        this.ecNums = ecNums;
-    }
-
-    public String getEngineered() {
-        return engineered;
-    }
-
-    public void setEngineered(String engineered) {
-        this.engineered = engineered;
-    }
-
-    public String getMutation() {
-        return mutation;
-    }
-
-    public void setMutation(String mutation) {
-        this.mutation = mutation;
-    }
-
-    public String getBiologicalUnit() {
-        return biologicalUnit;
-    }
-
-    public void setBiologicalUnit(String biologicalUnit) {
-        this.biologicalUnit = biologicalUnit;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
-    }
-
-    public String getNumRes() {
-        return numRes;
-    }
-
-    public void setNumRes(String numRes) {
-        this.numRes = numRes;
-    }
-
-    public String getResNames() {
-        return resNames;
-    }
-
-    public void setResNames(String resNames) {
-        this.resNames = resNames;
-    }
-
-    public String getHeaderVars() {
-        return headerVars;
-    }
-
-    public void setHeaderVars(String headerVars) {
-        this.headerVars = headerVars;
-    }
-
-    public String getSynthetic() {
-        return synthetic;
-    }
-
-    public void setSynthetic(String synthetic) {
-        this.synthetic = synthetic;
-    }
-
-    public String getFragment() {
-        return fragment;
-    }
-
-    public void setFragment(String fragment) {
-        this.fragment = fragment;
-    }
-
-    public String getOrganismScientific() {
-        return organismScientific;
-    }
-
-    public void setOrganismScientific(String organismScientific) {
-        this.organismScientific = organismScientific;
-    }
-
-    public String getOrganismCommon() {
-        return organismCommon;
-    }
-
-    public void setOrganismCommon(String organismCommon) {
-        this.organismCommon = organismCommon;
-    }
-
-    public String getStrain() {
-        return strain;
-    }
-
-    public void setStrain(String strain) {
-        this.strain = strain;
-    }
-
-    public String getVariant() {
-        return variant;
-    }
-
-    public void setVariant(String variant) {
-        this.variant = variant;
-    }
-
-    public String getCellLine() {
-        return cellLine;
-    }
-
-    public void setCellLine(String cellLine) {
-        this.cellLine = cellLine;
-    }
-
-    public String getAtcc() {
-        return atcc;
-    }
-
-    public void setAtcc(String atcc) {
-        this.atcc = atcc;
-    }
-
-    public String getOrgan() {
-        return organ;
-    }
-
-    public void setOrgan(String organ) {
-        this.organ = organ;
-    }
-
-    public String getTissue() {
-        return tissue;
-    }
-
-    public void setTissue(String tissue) {
-        this.tissue = tissue;
-    }
-
-    public String getCell() {
-        return cell;
-    }
-
-    public void setCell(String cell) {
-        this.cell = cell;
-    }
-
-    public String getOrganelle() {
-        return organelle;
-    }
-
-    public void setOrganelle(String organelle) {
-        this.organelle = organelle;
-    }
-
-    public String getSecretion() {
-        return secretion;
-    }
-
-    public void setSecretion(String secretion) {
-        this.secretion = secretion;
-    }
-
-    public String getGene() {
-        return gene;
-    }
-
-    public void setGene(String gene) {
-        this.gene = gene;
-    }
-
-    public String getCellularLocation() {
-        return cellularLocation;
-    }
-
-    public void setCellularLocation(String cellularLocation) {
-        this.cellularLocation = cellularLocation;
-    }
-
-    public String getExpressionSystem() {
-        return expressionSystem;
-    }
-
-    public void setExpressionSystem(String expressionSystem) {
-        this.expressionSystem = expressionSystem;
-    }
-
-    public String getExpressionSystemStrain() {
-        return expressionSystemStrain;
-    }
-
-    public void setExpressionSystemStrain(String expressionSystemStrain) {
-        this.expressionSystemStrain = expressionSystemStrain;
-    }
-
-    public String getExpressionSystemVariant() {
-        return expressionSystemVariant;
-    }
-
-    public void setExpressionSystemVariant(String expressionSystemVariant) {
-        this.expressionSystemVariant = expressionSystemVariant;
-    }
-
-    public String getExpressionSystemCellLine() {
-        return expressionSystemCellLine;
-    }
-
-    public void setExpressionSystemCellLine(String expressionSystemCellLine) {
-        this.expressionSystemCellLine = expressionSystemCellLine;
-    }
-
-    public String getExpressionSystemAtccNumber() {
-        return expressionSystemAtccNumber;
-    }
-
-    public void setExpressionSystemAtccNumber(String expressionSystemAtccNumber) {
-        this.expressionSystemAtccNumber = expressionSystemAtccNumber;
-    }
-
-    public String getExpressionSystemOrgan() {
-        return expressionSystemOrgan;
-    }
-
-    public void setExpressionSystemOrgan(String expressionSystemOrgan) {
-        this.expressionSystemOrgan = expressionSystemOrgan;
-    }
-
-    public String getExpressionSystemTissue() {
-        return expressionSystemTissue;
-    }
-
-    public void setExpressionSystemTissue(String expressionSystemTissue) {
-        this.expressionSystemTissue = expressionSystemTissue;
-    }
-
-    public String getExpressionSystemCell() {
-        return expressionSystemCell;
-    }
-
-    public void setExpressionSystemCell(String expressionSystemCell) {
-        this.expressionSystemCell = expressionSystemCell;
-    }
-
-    public String getExpressionSystemOrganelle() {
-        return expressionSystemOrganelle;
-    }
-
-    public void setExpressionSystemOrganelle(String expressionSystemOrganelle) {
-        this.expressionSystemOrganelle = expressionSystemOrganelle;
-    }
-
-    public String getExpressionSystemCellularLocation() {
-        return expressionSystemCellularLocation;
-    }
-
-    public void setExpressionSystemCellularLocation(String expressionSystemCellularLocation) {
-        this.expressionSystemCellularLocation = expressionSystemCellularLocation;
-    }
-
-    public String getExpressionSystemVectorType() {
-        return expressionSystemVectorType;
-    }
-
-    public void setExpressionSystemVectorType(String expressionSystemVectorType) {
-        this.expressionSystemVectorType = expressionSystemVectorType;
-    }
-
-    public String getExpressionSystemVector() {
-        return expressionSystemVector;
-    }
-
-    public void setExpressionSystemVector(String expressionSystemVector) {
-        this.expressionSystemVector = expressionSystemVector;
-    }
-
-    public String getExpressionSystemPlasmid() {
-        return expressionSystemPlasmid;
-    }
-
-    public void setExpressionSystemPlasmid(String expressionSystemPlasmid) {
-        this.expressionSystemPlasmid = expressionSystemPlasmid;
-    }
-
-    public String getExpressionSystemGene() {
-        return expressionSystemGene;
-    }
-
-    public void setExpressionSystemGene(String expressionSystemGene) {
-        this.expressionSystemGene = expressionSystemGene;
-    }
-
-    public String getExpressionSystemOtherDetails() {
-        return expressionSystemOtherDetails;
-    }
-
-    public void setExpressionSystemOtherDetails(String expressionSystemOtherDetails) {
-        this.expressionSystemOtherDetails = expressionSystemOtherDetails;
-    }
-
-    public Compound clone() throws CloneNotSupportedException {
-       Compound newMolId = (Compound) super.clone();
-       return newMolId;
-    }
-
-    /** get the chains that are part of this Compound
-     * 
-     * @return a List of Chain objects
-     */
-    public List<Chain> getChains(){
-       return this.chainList;   
-    }
-
-    public void addChain(Chain chain){
-        this.chainList.add(chain);
-    }
-    
-    public void setChains(List<Chain> chains){
-        this.chainList = chains;
-    }
+		 */
+		try {
+			Class c = Class.forName("org.biojava.bio.structure.Compound");
+			Method[] methods  = c.getMethods();
+
+			for (int i = 0; i < methods.length; i++) {
+				Method m = methods[i];     
+
+				String name = m.getName();
+				if ( name.substring(0,3).equals("get")) {
+					if (name.equals("getMolId"))
+						continue;
+					if ( name.equals("getMolName"))
+						continue;
+
+					Object o  = m.invoke(this, new Object[]{});
+					if ( o instanceof String){
+						if ( o != null)
+							buf.append(name.substring(3, name.length())+": "+ o + " ");
+					}
+					if ( o instanceof List){
+						if ( o != null)                        	
+							buf.append(name.substring(3,name.length())+": ");
+
+						List<Object>lst = (List<Object>)o;
+						for (Object obj : lst){
+							if ( obj instanceof Chain){
+								continue;
+							}
+							buf.append(obj + " ");
+						}
+
+					}
+				}
+
+			}
+
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+
+
+		//if ( organismScientific != null)
+		//	buf.append(" organism scientific: " + organismScientific);
+
+
+		return buf.toString();
+	}
+
+	/** get the ID used by Hibernate
+	 * 
+	 * @return the ID used by Hibernate
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/** set the ID used by Hibernate
+	 * 
+	 * @param id
+	 */ 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * Print some debug statements to System.out
+	 * 
+	 *
+	 */
+	public void showHeader(){
+		this.showCompound();
+		this.showSource();
+	}
+
+	public void showCompound() {
+		System.out.println("COMPOUND INFO:");
+		if (this.molId != null) {
+			System.out.println("Mol ID: " + this.molId);
+		}
+		if (this.chainId != null) {
+			System.out.println("Chain: " + this.chainId);
+			//this.refChainId = chainId
+		}
+		if (this.molName != null) {
+			System.out.println("Mol Name: " + this.molName);
+		}
+		if (this.title != null) {
+			System.out.println("Title: " + this.title);
+		}
+		if (this.synonyms != null) {
+			for (String x : this.synonyms) {
+				System.out.println("Synomym: " + x);
+			}
+		}
+		if (this.ecNums != null) {
+			for (String x : this.ecNums) {
+				System.out.println("EC: " + x);
+			}
+		}
+		if (this.fragment != null) {
+			System.out.println("Fragment? " + this.fragment);
+		}
+		if (this.engineered != null) {
+			System.out.println("Engineered? " + this.engineered);
+		}
+		if (this.mutation != null) {
+			System.out.println("Mutation? " + this.mutation);
+		}
+		if (this.biologicalUnit != null) {
+			System.out.println("Biological Unit: " + this.biologicalUnit);
+		}
+		if (this.details != null) {
+			System.out.println("Details: " + this.details);
+		}
+		if (this.numRes != null) {
+			System.out.println("No. Residues: " + this.numRes);
+		}
+		//System.out.println( "\n"
+
+	}
+
+
+	public void showSource() {
+		System.out.println("SOURCE INFO:");
+		if (this.synthetic != null) {
+			System.out.println("Synthetic? " + this.synthetic);
+		}
+		if (this.fragment != null) {
+			System.out.println("Fragment? " + this.fragment);
+		}
+		if (this.organismScientific != null) {
+			System.out.println("Organism Scientific: " + this.organismScientific);
+		}
+		if (this.organismCommon != null) {
+			System.out.println("Organism Common: " + this.organismCommon);
+		}
+		if (this.strain != null) {
+			System.out.println("Strain: " + this.strain);
+		}
+		if (this.variant != null) {
+			System.out.println("Variant: " + this.variant);
+		}
+		if (this.cellLine != null) {
+			System.out.println("Cell Line: " + this.cellLine);
+		}
+		if (this.atcc != null) {
+			System.out.println("ATCC: " + this.atcc);
+		}
+		if (this.organ != null) {
+			System.out.println("Organ: " + this.organ);
+		}
+		if (this.tissue != null) {
+			System.out.println("Tissue: " + this.tissue);
+		}
+		if (this.cell != null) {
+			System.out.println("Cell: " + this.cell);
+		}
+		if (this.organelle != null) {
+			System.out.println("Organelle: " + this.organelle);
+		}
+		if (this.secretion != null) {
+			System.out.println("Secretion: " + this.secretion);
+		}
+		if (this.gene != null) {
+			System.out.println("Gene: " + this.gene);
+		}
+		if (this.cellularLocation != null) {
+			System.out.println("Cellular Location: " + this.cellularLocation);
+		}
+		if (this.expressionSystem != null) {
+			System.out.println("Expression System: " + this.expressionSystem);
+		}
+		if (this.expressionSystemStrain != null) {
+			System.out.println("Expression System Strain: " + this.expressionSystemStrain);
+		}
+		if (this.expressionSystemVariant != null) {
+			System.out.println("Expression System Variant: " + this.expressionSystemVariant);
+		}
+		if (this.expressionSystemCellLine != null) {
+			System.out.println("Expression System Cell Line: " + this.expressionSystemCellLine);
+		}
+		if (this.expressionSystemAtccNumber != null) {
+			System.out.println("Expression System ATCC Number: " + this.expressionSystemAtccNumber);
+		}
+		if (this.expressionSystemOrgan != null) {
+			System.out.println("Expression System Organ: " + this.expressionSystemOrgan);
+		}
+		if (this.expressionSystemTissue != null) {
+			System.out.println("Expression System Tissue: " + this.expressionSystemTissue);
+		}
+		if (this.expressionSystemCell != null) {
+			System.out.println("Expression System Cell: " + this.expressionSystemCell);
+		}
+		if (this.expressionSystemOrganelle != null) {
+			System.out.println("Expression System Organelle: " + this.expressionSystemOrganelle);
+		}
+		if (this.expressionSystemCellularLocation != null) {
+			System.out.println("Expression System Cellular Location: " + this.expressionSystemCellularLocation);
+		}
+		if (this.expressionSystemVectorType != null) {
+			System.out.println("Expression System Vector Type: " + this.expressionSystemVectorType);
+		}
+		if (this.expressionSystemVector != null) {
+			System.out.println("Expression System Vector: " + this.expressionSystemVector);
+		}
+		if (this.expressionSystemPlasmid != null) {
+			System.out.println("Expression System Plasmid: " + this.expressionSystemPlasmid);
+		}
+		if (this.expressionSystemGene != null) {
+			System.out.println("Expression System Gene: " + this.expressionSystemGene);
+		}
+		if (this.expressionSystemOtherDetails != null) {
+			System.out.println("Expression System Other Details: " + this.expressionSystemOtherDetails);
+		}
+	}
+
+	/**
+	 * Returns the chain id value.
+	 * @return the list of ChainIDs that are described by this Compound
+	 * @see #setChainId(List)
+	 */
+	public List<String> getChainId() {
+		return chainId;
+	}
+
+	/**
+	 * Sets the list of chain IDs.
+	 * @param chainId  the list of ChainIDs that are described by this Compound
+	 * @see #getChainId()
+	 */
+	public void setChainId(List<String> chainId) {
+		this.chainId = chainId;
+	}
+
+	/**
+	 * Returns the ref chain id value.
+	 * @return the RefChainID
+	 * @see #setRefChainId(String)
+	 */
+	public String getRefChainId() {
+		return refChainId;
+	}
+
+	/**
+	 * Returns the ref chain id value.
+	 * @param refChainId the RefChainID
+	 * @see #getRefChainId()
+	 */
+	public void setRefChainId(String refChainId) {
+		this.refChainId = refChainId;
+	}
+
+	/**
+	 * Returns the mol id value.
+	 * @return the MolId value
+	 * @see #setMolId(String)
+	 */
+	public String getMolId() {
+		return molId;
+	}
+
+	/**
+	 * Set the mol id value.
+	 * @param molId the MolId value
+	 * @see #getMolId()
+	 */
+	public void setMolId(String molId) {
+		this.molId = molId;
+	}
+
+	public String getMolName() {
+		return molName;
+	}
+
+	public void setMolName(String molName) {
+		this.molName = molName;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public List<String> getSynonyms() {
+		return synonyms;
+	}
+
+	public void setSynonyms(List<String> synonyms) {
+		this.synonyms = synonyms;
+	}
+
+	public List<String> getEcNums() {
+		return ecNums;
+	}
+
+	public void setEcNums(List<String> ecNums) {
+		this.ecNums = ecNums;
+	}
+
+	public String getEngineered() {
+		return engineered;
+	}
+
+	public void setEngineered(String engineered) {
+		this.engineered = engineered;
+	}
+
+	public String getMutation() {
+		return mutation;
+	}
+
+	public void setMutation(String mutation) {
+		this.mutation = mutation;
+	}
+
+	public String getBiologicalUnit() {
+		return biologicalUnit;
+	}
+
+	public void setBiologicalUnit(String biologicalUnit) {
+		this.biologicalUnit = biologicalUnit;
+	}
+
+	public String getDetails() {
+		return details;
+	}
+
+	public void setDetails(String details) {
+		this.details = details;
+	}
+
+	public String getNumRes() {
+		return numRes;
+	}
+
+	public void setNumRes(String numRes) {
+		this.numRes = numRes;
+	}
+
+	public String getResNames() {
+		return resNames;
+	}
+
+	public void setResNames(String resNames) {
+		this.resNames = resNames;
+	}
+
+	public String getHeaderVars() {
+		return headerVars;
+	}
+
+	public void setHeaderVars(String headerVars) {
+		this.headerVars = headerVars;
+	}
+
+	public String getSynthetic() {
+		return synthetic;
+	}
+
+	public void setSynthetic(String synthetic) {
+		this.synthetic = synthetic;
+	}
+
+	public String getFragment() {
+		return fragment;
+	}
+
+	public void setFragment(String fragment) {
+		this.fragment = fragment;
+	}
+
+	public String getOrganismScientific() {
+		return organismScientific;
+	}
+
+	public void setOrganismScientific(String organismScientific) {
+		this.organismScientific = organismScientific;
+	}
+
+	public String getOrganismCommon() {
+		return organismCommon;
+	}
+
+	public void setOrganismCommon(String organismCommon) {
+		this.organismCommon = organismCommon;
+	}
+
+	public String getStrain() {
+		return strain;
+	}
+
+	public void setStrain(String strain) {
+		this.strain = strain;
+	}
+
+	public String getVariant() {
+		return variant;
+	}
+
+	public void setVariant(String variant) {
+		this.variant = variant;
+	}
+
+	public String getCellLine() {
+		return cellLine;
+	}
+
+	public void setCellLine(String cellLine) {
+		this.cellLine = cellLine;
+	}
+
+	public String getAtcc() {
+		return atcc;
+	}
+
+	public void setAtcc(String atcc) {
+		this.atcc = atcc;
+	}
+
+	public String getOrgan() {
+		return organ;
+	}
+
+	public void setOrgan(String organ) {
+		this.organ = organ;
+	}
+
+	public String getTissue() {
+		return tissue;
+	}
+
+	public void setTissue(String tissue) {
+		this.tissue = tissue;
+	}
+
+	public String getCell() {
+		return cell;
+	}
+
+	public void setCell(String cell) {
+		this.cell = cell;
+	}
+
+	public String getOrganelle() {
+		return organelle;
+	}
+
+	public void setOrganelle(String organelle) {
+		this.organelle = organelle;
+	}
+
+	public String getSecretion() {
+		return secretion;
+	}
+
+	public void setSecretion(String secretion) {
+		this.secretion = secretion;
+	}
+
+	public String getGene() {
+		return gene;
+	}
+
+	public void setGene(String gene) {
+		this.gene = gene;
+	}
+
+	public String getCellularLocation() {
+		return cellularLocation;
+	}
+
+	public void setCellularLocation(String cellularLocation) {
+		this.cellularLocation = cellularLocation;
+	}
+
+	public String getExpressionSystem() {
+		return expressionSystem;
+	}
+
+	public void setExpressionSystem(String expressionSystem) {
+		this.expressionSystem = expressionSystem;
+	}
+
+	public String getExpressionSystemStrain() {
+		return expressionSystemStrain;
+	}
+
+	public void setExpressionSystemStrain(String expressionSystemStrain) {
+		this.expressionSystemStrain = expressionSystemStrain;
+	}
+
+	public String getExpressionSystemVariant() {
+		return expressionSystemVariant;
+	}
+
+	public void setExpressionSystemVariant(String expressionSystemVariant) {
+		this.expressionSystemVariant = expressionSystemVariant;
+	}
+
+	public String getExpressionSystemCellLine() {
+		return expressionSystemCellLine;
+	}
+
+	public void setExpressionSystemCellLine(String expressionSystemCellLine) {
+		this.expressionSystemCellLine = expressionSystemCellLine;
+	}
+
+	public String getExpressionSystemAtccNumber() {
+		return expressionSystemAtccNumber;
+	}
+
+	public void setExpressionSystemAtccNumber(String expressionSystemAtccNumber) {
+		this.expressionSystemAtccNumber = expressionSystemAtccNumber;
+	}
+
+	public String getExpressionSystemOrgan() {
+		return expressionSystemOrgan;
+	}
+
+	public void setExpressionSystemOrgan(String expressionSystemOrgan) {
+		this.expressionSystemOrgan = expressionSystemOrgan;
+	}
+
+	public String getExpressionSystemTissue() {
+		return expressionSystemTissue;
+	}
+
+	public void setExpressionSystemTissue(String expressionSystemTissue) {
+		this.expressionSystemTissue = expressionSystemTissue;
+	}
+
+	public String getExpressionSystemCell() {
+		return expressionSystemCell;
+	}
+
+	public void setExpressionSystemCell(String expressionSystemCell) {
+		this.expressionSystemCell = expressionSystemCell;
+	}
+
+	public String getExpressionSystemOrganelle() {
+		return expressionSystemOrganelle;
+	}
+
+	public void setExpressionSystemOrganelle(String expressionSystemOrganelle) {
+		this.expressionSystemOrganelle = expressionSystemOrganelle;
+	}
+
+	public String getExpressionSystemCellularLocation() {
+		return expressionSystemCellularLocation;
+	}
+
+	public void setExpressionSystemCellularLocation(String expressionSystemCellularLocation) {
+		this.expressionSystemCellularLocation = expressionSystemCellularLocation;
+	}
+
+	public String getExpressionSystemVectorType() {
+		return expressionSystemVectorType;
+	}
+
+	public void setExpressionSystemVectorType(String expressionSystemVectorType) {
+		this.expressionSystemVectorType = expressionSystemVectorType;
+	}
+
+	public String getExpressionSystemVector() {
+		return expressionSystemVector;
+	}
+
+	public void setExpressionSystemVector(String expressionSystemVector) {
+		this.expressionSystemVector = expressionSystemVector;
+	}
+
+	public String getExpressionSystemPlasmid() {
+		return expressionSystemPlasmid;
+	}
+
+	public void setExpressionSystemPlasmid(String expressionSystemPlasmid) {
+		this.expressionSystemPlasmid = expressionSystemPlasmid;
+	}
+
+	public String getExpressionSystemGene() {
+		return expressionSystemGene;
+	}
+
+	public void setExpressionSystemGene(String expressionSystemGene) {
+		this.expressionSystemGene = expressionSystemGene;
+	}
+
+	public String getExpressionSystemOtherDetails() {
+		return expressionSystemOtherDetails;
+	}
+
+	public void setExpressionSystemOtherDetails(String expressionSystemOtherDetails) {
+		this.expressionSystemOtherDetails = expressionSystemOtherDetails;
+	}
+
+	public Compound clone() throws CloneNotSupportedException {
+		Compound newMolId = (Compound) super.clone();
+		return newMolId;
+	}
+
+	/** get the chains that are part of this Compound
+	 * 
+	 * @return a List of Chain objects
+	 */
+	 public List<Chain> getChains(){
+		return this.chainList;   
+	}
+
+	public void addChain(Chain chain){
+		this.chainList.add(chain);
+	}
+
+	public void setChains(List<Chain> chains){
+		this.chainList = chains;
+	}
 }
