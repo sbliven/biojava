@@ -51,12 +51,12 @@ import java.util.Map;
  */
 public interface AminoAcid extends Group {
 	
-	/* field to distribguish AminoAcids that have been created from SEQRES records and ATOM records
+	/** field to distribguish AminoAcids that have been created from SEQRES records and ATOM records
 	 * 
 	 */
 	public static final String ATOMRECORD = "ATOM";
 	
-	/* field to distribguish AminoAcids that have been created from SEQRES records and ATOM records
+	/** field to distribguish AminoAcids that have been created from SEQRES records and ATOM records
 	 * 
 	 */
 	public static final String SEQRESRECORD = "SEQRES";
@@ -127,8 +127,8 @@ public interface AminoAcid extends Group {
 
 	/** allows to distinguish between amino acids that are provided
 		as ATOM records and a SEQRES records.
-	 * @param recordName 
-	 * @see #getRecordType
+	 * @param recordName either ATOMRECORD or SEQRESRECORD
+	 * @see #getRecordType()
 	*/
 	public void setRecordType(String recordName);
 
