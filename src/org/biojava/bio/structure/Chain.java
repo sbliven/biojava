@@ -62,15 +62,17 @@ public interface Chain {
      */
     public void addGroup(Group group);
     
-    /** get the ID used by Hibernate
+    /** Get the ID used by Hibernate.
      * 
      * @return the ID used by Hibernate
+     * @see #setId(Long)
      */
     public Long getId() ;
 
-    /** set the ID used by Hibernate
+    /** Set the ID used by Hibernate.
      * 
-     * @param id
+     * @param id assigned by Hibernate
+     * @see #getId()
      */ 
     public void setId(Long id) ;
 
@@ -135,7 +137,7 @@ public interface Chain {
      */
     public Group getGroupByPDB(String pdbresnum) throws StructureException;
     
-    /** get all groups that are located between two PDB residue numbers
+    /** Get all groups that are located between two PDB residue numbers.
      * 
      * @param pdbresnumStart PDB residue number of start
      * @param pdbresnumEnd PDB residue number of end
@@ -144,7 +146,7 @@ public interface Chain {
      */
     public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) throws StructureException;
 
-    /** get all groups that are located between two PDB residue numbers. In contrast to getGroupsByPDB
+    /** Get all groups that are located between two PDB residue numbers. In contrast to getGroupsByPDB
      * this method call ignores if the exact outer groups are not found. This is useful e.g. when requesting the range
      * of groups as specified by the DBREF records - these frequently are rather inaccurate.
      * 
@@ -167,13 +169,13 @@ public interface Chain {
     public int getLength();
     
     
-    /** return the number of Groups in the ATOM records of the chain
+    /** Return the number of Groups in the ATOM records of the chain.
      * 
      * @return the length
      */
     public int getAtomLength();
     
-    /** returns the number of groups in the SEQRES records of the chain
+    /** Returns the number of groups in the SEQRES records of the chain.
      * 
      * @return the length
      */
@@ -192,6 +194,7 @@ public interface Chain {
     /** get/set the Annotation of a Chain.
      *  allows to annotate a protein chain, e.g. molecule description "AZURIN" for pdb 1a4a.A
      *  @param anno the Annotation to be provided.
+     *  @see #getAnnotation()
      *  
      */
     public void setAnnotation(Annotation anno);
@@ -199,15 +202,23 @@ public interface Chain {
     /** get/set the Annotation of a Chain.
      *  allows to annotate a protein chain, e.g. molecule description "AZURIN" for pdb 1a4a.A
      *  @return the Annotation of this chain
+     *  @see #setAnnotation(Annotation)
      */
     public Annotation getAnnotation();
 
-    /** set the Header from the PDB file
+    /** Set the Header from the PDB file.
      * @param molId the Compound that contains the header information for this chain
+     * @see #getHeader()
     */
     public void setHeader(Compound molId);
 
+    /** Returns the Header ( a Compound object) for this chain.
+     * 
+     * @return the Compound object that contains the Header information
+     * @see #setHeader(Compound)
+     */
     public Compound getHeader();
+    
     /** get and set the name of this chain (Chain id in PDB file ).
      * @param name  a String specifying the name value
      * @see #getName
@@ -269,27 +280,30 @@ public interface Chain {
     public String getSwissprotId() ;
     
     
-    /** return a List of all groups of a special type (e.g. amino,
+    /** Return a List of all groups of a special type (e.g. amino,
      * hetatm, nucleotide).
      * @param type  a String
      * @return an List object
+     * @see #setSeqResGroups(List)
      */
     public List<Group> getSeqResGroups (String type);
 
-    /** return all groups of this chain.
+    /** Return all groups of this chain.
      * @return a List of all Group objects of this chain
-
+     * @see #setSeqResGroups(List)
      */
     public List<Group> getSeqResGroups ();
  
-    /** set the list of SeqResGroups for this chain
+    /** Set the list of SeqResGroups for this chain.
      * 
-     * @param seqResGroups
+     * @param seqResGroups a List of Group objects that from the SEQRES groups of this chain.
+     * 
      */
     public void setSeqResGroups(List<Group> seqResGroups);
 
     /** Set the back-reference (to its parent Structure)
-     * @param parent 
+     * @param parent the parent Structure object for this Chain
+     * @see #getParent()
      *  
      */
     public void setParent(Structure parent) ; 
@@ -297,6 +311,7 @@ public interface Chain {
     /** Returns the parent Structure of this chain
      * 
      * @return the parent Structure object
+     * @see #setParent(Structure)
      */
     
     public Structure getParent() ;
