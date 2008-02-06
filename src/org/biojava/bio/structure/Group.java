@@ -105,42 +105,42 @@ public interface Group {
      */
     public void addAtom(Atom atom);
     
-    /** get list of atoms.
+    /** Get list of atoms.
      *
-     * @return an List object representing the atoms 
+     * @return an List object representing the atoms
+     * @see #setAtoms(List) 
      */
     public List<Atom> getAtoms() ;
     
     
-    /** set the atoms of this group
+    /** Set the atoms of this group.
      * @see org.biojava.bio.structure.Atom
      * @param atoms a list of atoms
      */
     public void setAtoms(List<Atom> atoms);
     
-    /** remove all atoms from this group
+    /** Remove all atoms from this group.
      * 
-     *
      */
     public void clearAtoms();
     
-    /** get an atom throws StructureException if atom not found.
+    /** Get an atom.  Throws StructureException if atom not found.
      *
      * @param name  a String
      * @return an Atom object
-     * @throws StructureException ...     
+     * @throws StructureException if atom not found.
      */
     public Atom getAtom(String name) throws StructureException;
     
-    /** get at atom by position.
+    /** Get at atom by position.
      *
      * @param position  an int
      * @return an Atom object
-     * @throws StructureException ...     
+     * @throws StructureException if not atom at this position     
      */
     public Atom getAtom(int position) throws StructureException;
     
-    /** returns flag whether a particular atom is existing within this group .
+    /** Teturns flag whether a particular atom is existing within this group .
      *
      * @param name  a String ...
      * @return true if Atom with name is existing within this group
@@ -239,15 +239,17 @@ public interface Group {
     public Object clone();
     
     
-    /** Set the back-reference (to its parent Chain)
-     * @param parent a WeakReference to the parent Chain
+    /** Set the back-reference (to its parent Chain).
+     * @param parent the parent Chain
+     * @see #getParent()
      * 
      */
     public void setParent(Chain parent) ; 
     
-    /** Returns the parent Chain of the Group
+    /** Returns the parent Chain of the Group.
      * 
      * @return Chain the Chain object that contains the Group
+     * @see #setParent(Chain)
      */
     
     public Chain getParent() ;
