@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 
-/** an iterator over all groups of a structure.
+/** An iterator over all groups of a structure.
  * @author Andreas Prlic
  * @since 1.4
  * @version %I% %G%
@@ -112,7 +112,7 @@ public class GroupIterator implements Iterator<Group> {
         
     }
     
-    /** get the model number of the model containing the current atom
+    /** Get the model number of the current model.
      * 
      * @return the number of the model
      */
@@ -121,7 +121,10 @@ public class GroupIterator implements Iterator<Group> {
         return current_model_pos;
     }
     
-    
+    /** Get the current Chain. Returns null if we are at the end of the iteration.
+     * 
+     * @return the Chain of the current position 
+     */
     public Chain getCurrentChain(){
         if ( current_model_pos >= structure.nrModels()){
             return null;
