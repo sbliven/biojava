@@ -597,9 +597,9 @@ public class Calc {
         
     }
     
-    /** returns the Vector that needs to be applied to shift a set of atoms
-     * into to the Centroid.
-     * @param atomSet
+    /** Returns the Vector that needs to be applied to shift a set of atoms
+     * to the Centroid.
+     * @param atomSet array of Atoms  
      * @return the vector needed to shift the set of atoms to its geometric center
      */
     public static Atom getCenterVector(Atom[] atomSet){
