@@ -30,7 +30,7 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.structure.io.PDBFileParser;
 import org.biojava.utils.ClassTools;
 
-/** A class that provides a set of standard amino acids
+/** A class that provides a set of standard amino acids.
  * 
  * 
  * 
