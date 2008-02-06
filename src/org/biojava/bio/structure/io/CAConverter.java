@@ -32,7 +32,7 @@ import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.Group;
 
-/** converts full atom representations to Calpha only ones
+/** Converts full atom representations to Calpha only ones.
  * 
  * @author Andreas Prlic
  * @version %I% %G%
@@ -40,6 +40,11 @@ import org.biojava.bio.structure.Group;
 public class CAConverter {
 
     
+	/** Convert a List of chain objects to another List of chains, containing C-alpha atoms only.
+	 * 
+	 * @param chains list of chains
+	 * @return a list of chains
+	 */
     public static List<Chain> getCAOnly(List<Chain> chains){
         List<Chain> newChains = new ArrayList<Chain>();
        
@@ -55,6 +60,11 @@ public class CAConverter {
         
     }
     
+    /** Convert a Chain to a new Chain containing C-alpha atoms only.
+     * 
+     * @param chain to convert
+     * @return a new chain containing Amino acids with C-alpha only. 
+     */
     public static Chain getCAOnly(Chain chain){
 
         Chain newChain = new ChainImpl();
