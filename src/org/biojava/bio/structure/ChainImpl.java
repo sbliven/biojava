@@ -44,7 +44,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  */
 public class ChainImpl implements Chain {
 
-	/** The default chain identifier 
+	/** The default chain identifier is an empty space.
 	 * 
 	 */
 	public static String DEFAULT_CHAIN_ID = " ";
@@ -95,7 +95,7 @@ public class ChainImpl implements Chain {
 		this.parent = parent;
 	}
 
-	/** Returns the parent Structure of this chain
+	/** Returns the parent Structure of this chain.
 	 * 
 	 * @return the parent Structure object
 	 */

@@ -115,7 +115,7 @@ public interface Chain {
      */
     public List<Group> getGroups ();
     
-    /** return all groups that have been specified in the ATOM section of this chain .
+    /** Return all groups that have been specified in the ATOM section of this chain .
      * @return a List object representing the Groups of this Chain.
      * @see #setAtomGroups(List)
      */
