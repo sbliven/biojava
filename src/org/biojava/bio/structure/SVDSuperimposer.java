@@ -26,7 +26,7 @@ import org.biojava.bio.structure.jama.Matrix;
 import org.biojava.bio.structure.jama.SingularValueDecomposition;
 
 
-/** a class that calculates the superimposition between two sets of atoms
+/** A class that calculates the superimposition between two sets of atoms
  * inspired by the biopython SVDSuperimposer class...
  * 
  *
@@ -140,6 +140,12 @@ public class SVDSuperimposer {
     Matrix centroidA;
     Matrix centroidB;
 
+    /** Create a SVDSuperimposer object and calculate a SVD superimposition of two sets of atoms.
+     * 
+     * @param atomSet1 Atom array 1
+     * @param atomSet2 Atom array 2
+     * @throws StructureException
+     */
     public SVDSuperimposer(Atom[] atomSet1,Atom[]atomSet2)
     throws StructureException{
         
@@ -181,10 +187,10 @@ public class SVDSuperimposer {
     
     
     
-    /** do the actual calculation
+    /** Do the actual calculation.
      * 
-     * @param coordSet1
-     * @param coordSet2
+     * @param coordSet1 coordinates for atom array 1 
+     * @param coordSet2 coordiantes for atom array 2
      */
     private void calculate(double[][] coordSet1, double[][]coordSet2){
         // now this is the bridge to the Jama package:
@@ -238,10 +244,10 @@ public class SVDSuperimposer {
        
     }
     
-    /** calculate the RMS (root mean square) of two sets of atoms
+    /** Calculate the RMS (root mean square) of two sets of atoms.
      * 
-     * @param atomSet1
-     * @param atomSet2
+     * @param atomSet1 atom array 1
+     * @param atomSet2 atom array 2
      * @return the RMS of two atom sets
      * @throws StructureException
      */
@@ -264,11 +270,18 @@ public class SVDSuperimposer {
         
     }
     
-    
+    /**  Get the Rotation matrix that is required to superimpose the two atom sets.
+     * 
+     * @return a rotation matrix.
+     */
     public Matrix getRotation(){
         return rot;
     }
     
+    /** Get the shift vector.
+     * 
+     * @return the shift vector
+     */
     public Atom getTranslation(){
       
         Atom a = new AtomImpl();
@@ -277,6 +290,7 @@ public class SVDSuperimposer {
         a.setZ(tran.get(0,2));
         return a;
     }
+
     
     public void printMatrix(Matrix m){
         for (int i = 0 ; i < m.getRowDimension(); i++){
