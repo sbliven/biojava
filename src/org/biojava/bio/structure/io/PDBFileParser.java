@@ -185,19 +185,22 @@ public class PDBFileParser  {
 
 	private String previousContinuationField = "";
 
+	/** Secondary strucuture assigned by the PDB author/
+	 * 
+	 */
 	public static final String PDB_AUTHOR_ASSIGNMENT = "PDB_AUTHOR_ASSIGNMENT";
 
-	/** Helix secondary structure assignment
+	/** Helix secondary structure assignment.
 	 * 
 	 */
 	public static final String HELIX  = "HELIX";
 
-	/** Strand secondary structure assignment
+	/** Strand secondary structure assignment.
 	 * 
 	 */
 	public static final String STRAND = "STRAND";
 
-	/** Turn secondary structure assignment
+	/** Turn secondary structure assignment.
 	 * 
 	 */
 	public static final String TURN   = "TURN";
@@ -222,7 +225,7 @@ public class PDBFileParser  {
 
 	private boolean atomOverflow;
 
-	/** set the flag to only read in Ca atoms - this is useful for parsing large structures like 1htq
+	/** Set the flag to only read in Ca atoms - this is useful for parsing large structures like 1htq.
 	 * 
 	 */
 	public boolean parseCAOnly;
@@ -306,16 +309,16 @@ public class PDBFileParser  {
 		parseCAOnly = false;
 
 	}
-	/** the flag if only the C-alpha atoms of the structure should be parsed
+	/** the flag if only the C-alpha atoms of the structure should be parsed.
 	 * 
 	 * @return the flag
 	 */
 	public boolean isParseCAOnly() {
 		return parseCAOnly;
 	}
-	/** the flag if only the C-alpha atoms of the structure should be parsed
+	/** the flag if only the C-alpha atoms of the structure should be parsed.
 	 * 
-	 * @param parseCAOnly
+	 * @param parseCAOnly boolean flag to enable or disable C-alpha only parsing
 	 */
 	public void setParseCAOnly(boolean parseCAOnly) {
 		this.parseCAOnly = parseCAOnly;
@@ -323,9 +326,9 @@ public class PDBFileParser  {
 
 
 
-	/** flag if the SEQRES amino acids should be aligned with the ATOM amino acids
+	/** Flag if the SEQRES amino acids should be aligned with the ATOM amino acids.
 	 * 
-	 * @return flag
+	 * @return flag if SEQRES - ATOM amino acids alignment is enabled
 	 */
 	public boolean isAlignSeqRes() {
 		return alignSeqRes;
@@ -354,7 +357,7 @@ public class PDBFileParser  {
 
 	/** a flag to tell the parser to parse the Author's secondary structure assignment from the file
 	 * default is set to false, i.e. do NOT parse.
-	 * @param parseSecStruc
+	 * @param parseSecStruc if HELIX STRAND and TURN fields are being parsed
 	 */
 	public void setParseSecStruc(boolean parseSecStruc) {
 		this.parseSecStruc = parseSecStruc;
@@ -1935,7 +1938,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		dbref.setSeqEnd(intFromString(seqEnd));
 		dbref.setInsertEnd(insertEnd.charAt(0));
 		dbref.setDatabase(database.trim());
-		dbref.setDbAcession(dbAccession.trim());
+		dbref.setDbAccession(dbAccession.trim());
 		dbref.setDbIdCode(dbIdCode.trim());
 		dbref.setDbSeqBegin(intFromString(dbseqBegin));
 		dbref.setIdbnsBegin(idbnsBeg.charAt(0));
