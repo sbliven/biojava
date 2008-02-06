@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 
-/** a class that provides some tool methods
+/** A class that provides some tool methods.
  * 
  * @author Andreas Prlic
  * @since 1.0
@@ -35,14 +35,20 @@ import java.util.List;
  */
 public class StructureTools {
 
+	/** The Atom name of C-alpha atoms.
+	 * 
+	 */
     public static final String   caAtomName         = "CA" ;
  
+    /** The names of the Atoms that form the backbone.
+     * 
+     */
     public static final String[] backboneAtomNames = {"N","CA","C","O","CB"};
        
     
-    /** count how many number of Atoms are contained within a Structure object.
+    /** Count how many number of Atoms are contained within a Structure object.
      * 
-     * @param s
+     * @param s the structure object
      * @return the number of Atoms in this Structure
      */
     public static int getNrAtoms(Structure s){
@@ -60,10 +66,10 @@ public class StructureTools {
     }
     
     
-    /** count how many groups are contained within a structure object
+    /** Count how many groups are contained within a structure object.
      * 
-     * @param s
-     * @return the number of groups
+     * @param s the structure object
+     * @return the number of groups in the structure
      */
     public static int getNrGroups(Structure s){
         int nrGroups = 0;
@@ -78,7 +84,7 @@ public class StructureTools {
     }
     
     
-    /** returns an array of the requested Atoms from the Structure object. Iterates over all groups
+    /** Returns an array of the requested Atoms from the Structure object. Iterates over all groups
      * and checks if the requested atoms are in this group, no matter if this is a AminoAcid or Hetatom group.
      *
      * 
@@ -127,8 +133,8 @@ public class StructureTools {
    
     
     
-    /** returns an Atom array of the CA atoms
-     * @param s
+    /** Returns an Atom array of the CA atoms.
+     * @param s the structure object
      * @return an Atom[] array
      */
     public static Atom[] getAtomCAArray(Structure s){
@@ -136,9 +142,9 @@ public class StructureTools {
         return getAtomArray(s,atomNames);
     }
     
-    /** returns an Atom array of the MainChain atoms
+    /** Returns an Atom array of the MainChain atoms.
     
-     * @param s
+     * @param s the structure object
      * @return an Atom[] array
      */
     public static Atom[] getBackboneAtomArray(Structure s){
