@@ -4,9 +4,10 @@ import java.lang.reflect.Method;
 import java.util.Date;
 
 
-/** a class that takes care of the Header information
+/** A class that contains PDB Header information.
  * 
  * @author Andreas Prlic
+ * @since 1.6
  *
  */
 public class PDBHeader {
@@ -29,6 +30,9 @@ public class PDBHeader {
     	
     }
 
+    /** String representation
+     * 
+     */
     public String toString(){
         StringBuffer buf = new StringBuffer();
 
@@ -64,22 +68,30 @@ public class PDBHeader {
         return buf.toString();
     }
     
-    /** get the ID used by Hibernate
+    /** Get the ID used by Hibernate.
      * 
      * @return the ID used by Hibernate
+     * @see #setId(Long)
      */
     public Long getId() {
         return id;
     }
 
-    /** set the ID used by Hibernate
+    /** Set the ID used by Hibernate.
      * 
-     * @param id
+     * @param id the id assigned by Hibernate
+     * @see #getId()
+     * 
      */ 
     private void setId(Long id) {
         this.id = id;
     }
 
+    /** Compare two PDBHeader objects
+     * 
+     * @param other a PDBHeader object to compare this one to.
+     * @return true if they are equal or false if they are not.
+     */
     public boolean equals(PDBHeader other){
         try {
 
@@ -121,18 +133,25 @@ public class PDBHeader {
     }
 
 
-    /** the PDB code for this protein structure
+    /** The PDB code for this protein structure.
      * 
      * @return the PDB identifier
+     * @see #setIdCode(String)
      */
     public String getIdCode() {
         return idCode;
     }
-
+    /** The PDB code for this protein structure.
+     * 
+     * @param idCode the PDB identifier
+     * @see #getIdCode()
+     * 
+     */ 
     public void setIdCode(String idCode) {
         this.idCode = idCode;
     }
 
+    
     public String getClassification() {
         return classification;
     }
