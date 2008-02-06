@@ -291,7 +291,10 @@ public class SVDSuperimposer {
         return a;
     }
 
-    
+    /** Simple debug method to print a Matrix object on System.out.
+     * 
+     * @param m a Matrix
+     */
     public void printMatrix(Matrix m){
         for (int i = 0 ; i < m.getRowDimension(); i++){
             for (int j = 0 ; j< m.getColumnDimension(); j++){
