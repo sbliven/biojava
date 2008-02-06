@@ -127,10 +127,11 @@ public interface Chain {
      */
     public void setAtomGroups(List<Group> groups);
     
-    /** return a List of all groups of a special type (e.g. amino,
+    /** Return a List of all groups of a special type (e.g. amino,
      * hetatm, nucleotide).
      * @param type  a String
      * @return a List object
+     * @see #setAtomGroups(List)
      * 
      */
     public List<Group> getAtomGroups (String type);
@@ -260,7 +261,7 @@ public interface Chain {
      */
     public String getSequence() ;
 
-    /** return the sequence of amino acids as it has been provided in the ATOM records
+    /** Return the sequence of amino acids as it has been provided in the ATOM records.
      * 
      * @return amino acid sequence as string
      * @see #getSeqResSequence()
@@ -304,18 +305,19 @@ public interface Chain {
     /** Set the list of SeqResGroups for this chain.
      * 
      * @param seqResGroups a List of Group objects that from the SEQRES groups of this chain.
+     * @see #getSeqResGroups()
      * 
      */
     public void setSeqResGroups(List<Group> seqResGroups);
 
-    /** Set the back-reference (to its parent Structure)
+    /** Set the back-reference to its parent Structure.
      * @param parent the parent Structure object for this Chain
      * @see #getParent()
      *  
      */
     public void setParent(Structure parent) ; 
     
-    /** Returns the parent Structure of this chain
+    /** Returns the parent Structure of this chain.
      * 
      * @return the parent Structure object
      * @see #setParent(Structure)
