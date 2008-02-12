@@ -84,6 +84,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
      * {@inheritDoc}
      * A file is in FASTA format if the name ends with fa or fas, or the file starts with ">".
      */
+    @Override
     public boolean canRead(File file) throws IOException {
         if (readableFiles.matcher(file.getName()).matches()) return true;
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -98,6 +99,7 @@ public class FastaFormat extends RichSequenceFormat.HeaderlessFormat {
      * Returns an protein parser if the first line of sequence contains any of F/L/I/P/Q/E, 
      * otherwise returns a DNA tokenizer.
      */
+    @Override
     public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         br.readLine(); // discard first line

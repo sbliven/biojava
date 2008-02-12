@@ -7,7 +7,10 @@ package org.biojavax.bio.seq.io;
 
 /**
  * This class is used by <code>FastaFormat</code> to determine which fields are in the 
- * fasta header. By default they all are. The class can be used to customise
+ * fasta header. By default they all are except for the sequence name. This is for
+ * compliance with fasta files that come from Genbank where the name is derived
+ * from the accession number so need not be repeated.
+ * The class can be used to customise
  * what appears. Eg if you only want the accession set everything else false.
  * Note that if fields in the <code>RichSequence</code> being parsed by the 
  * <code>FastaFormat</code> object then they may not be in the header even if
@@ -20,7 +23,7 @@ public class FastaHeader {
     private boolean showNamespace = true;
     private boolean showAccession = true;
     private boolean showVersion = true;
-    private boolean showName = true;
+    private boolean showName = false;
     private boolean showDescription = true;
 
     public boolean isShowIdentifier() {
