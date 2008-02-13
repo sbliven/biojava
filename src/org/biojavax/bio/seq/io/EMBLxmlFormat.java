@@ -738,8 +738,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         xml.openTag(SEQUENCE_TAG);
         xml.attribute(SEQUENCE_TYPE_ATTR,moltype);
         xml.attribute(SEQUENCE_LENGTH_ATTR,""+rs.length());
-        if (rs.getCircular()) xml.attribute(SEQUENCE_TOPOLOGY_ATTR,"circular");
-        xml.attribute(SEQUENCE_VER_ATTR,""+rs.getSeqVersion());
+        xml.attribute(SEQUENCE_TOPOLOGY_ATTR,rs.getCircular()?"circular":"linear");
+        xml.attribute(SEQUENCE_VER_ATTR,""+rs.getSeqVersion().intValue());
         String[] lines = StringTools.wordWrap(rs.seqString(), "\\s+", this.getLineWidth());
         for (int i = 0; i < lines.length; i ++) xml.println(lines[i]);
         xml.closeTag(SEQUENCE_TAG);
