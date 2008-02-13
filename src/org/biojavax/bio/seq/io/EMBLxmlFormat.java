@@ -93,6 +93,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Alan Li (code based on his work)
  * @author Richard Holland
+ * @author Mark Schreiber
  * @since 1.5
  */
 public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
@@ -211,6 +212,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
      * {@inheritDoc}
      * A file is in EMBLxml format if the second XML line contains the phrase "http://www.ebi.ac.uk/schema/EMBL_schema.xsd".
      */
+    @Override
     public boolean canRead(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         br.readLine(); // skip first line
@@ -224,6 +226,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
      * {@inheritDoc}
      * Always returns a DNA tokenizer.
      */
+    @Override
     public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
         return RichSequence.IOTools.getDNAParser();
     }
@@ -701,6 +704,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         }
         
         // process an opening tag
+        @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             if (qName.equals(ENTRY_TAG)) {
                 try {
@@ -872,6 +876,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         }
         
         // process a closing tag - we will have read the text already
+        @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             String val = this.m_currentString.toString().trim();
             
@@ -1081,6 +1086,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         }
         
         // process text inside tags
+        @Override
         public void characters(char[] ch, int start, int length) {
             this.m_currentString.append(ch, start, length);
         }
