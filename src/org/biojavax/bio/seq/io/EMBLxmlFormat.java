@@ -565,9 +565,13 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             xml.closeTag(LOCATOR_TAG);
             xml.closeTag(CITATION_TAG);
             
-            xml.openTag(CITATION_LOCATION_TAG);
-            xml.attribute(REF_POS_BEGIN_ATTR,""+rdr.getStart());
-            xml.attribute(REF_POS_END_ATTR,""+rdr.getEnd());
+            xml.openTag(CITATION_LOCATION_TAG);     
+            Integer rstart = rdr.getStart();
+            if (rstart==null) rstart = new Integer(1);
+            Integer rend = rdr.getEnd();
+            if (rend==null) rend = new Integer(rs.length());
+            xml.attribute(REF_POS_BEGIN_ATTR,""+rstart);
+            xml.attribute(REF_POS_END_ATTR,""+rend);
             if (dr.getRemark()!=null) {
                 xml.openTag(COMMENT_TAG);
                 xml.print(dr.getRemark());
