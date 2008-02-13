@@ -371,6 +371,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
      * {@inheritDoc}
      * A file is in UniProtXML format if the second XML line contains the phrase "http://www.uniprot.org/support/docs/uniprot.xsd".
      */
+    @Override
     public boolean canRead(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         br.readLine(); // skip first line
@@ -384,6 +385,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
      * {@inheritDoc}
      * Always returns a protein tokenizer.
      */
+    @Override
     public SymbolTokenization guessSymbolTokenization(File file) throws IOException {
         return RichSequence.IOTools.getProteinParser();
     }
@@ -469,8 +471,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         xml.printRaw("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
         xml.openTag(ENTRY_GROUP_TAG);
         xml.attribute("xmlns","http://uniprot.org/uniprot");
-        xml.attribute("xmlns","xsi","http://www.w3.org/2001/XMLSchema-instancee");
-        xml.attribute("xsi","schemaLocation","http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd");
+        xml.attribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+        xml.attribute("xsi:schemaLocation","http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd");
     }
     
     /**
@@ -1076,6 +1078,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         xml.openTag(NOTE_TAG);
                         xml.print(isoform.getNote());
                         xml.closeTag(NOTE_TAG);
+                        xml.closeTag(COMMENT_ISOFORM_TAG);
                     }
                 }
                 // biophysicoblahblah stuff
@@ -1505,6 +1508,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         
         
         // process an opening tag
+        @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             
             if (qName.equals(ENTRY_TAG)) {
@@ -1905,6 +1909,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         }
         
         // process a closing tag - we will have read the text already
+        @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             String val = this.m_currentString.toString().trim();
             
@@ -2163,6 +2168,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         }
         
         // process text inside tags
+        @Override
         public void characters(char[] ch, int start, int length) {
             this.m_currentString.append(ch, start, length);
         }
