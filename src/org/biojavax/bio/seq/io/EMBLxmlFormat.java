@@ -89,7 +89,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * and write RichSequence objects. Loosely Based on code from the old, deprecated,
  * org.biojava.bio.seq.io.GenbankXmlFormat object.
  *
- * Understands http://www.ebi.ac.uk/embl/Documentation/DTD/EMBL_dtd.txt
+ * Understands http://www.ebi.ac.uk/embl/dtd/EMBL_Services_V1.1.dtd
  *
  * @author Alan Li (code based on his work)
  * @author Richard Holland
@@ -108,18 +108,24 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
      */
     public static final String EMBLXML_FORMAT = "EMBLxml";
     
-    protected static final String ENTRY_GROUP_TAG = "EMBL";
+    protected static final String ENTRY_GROUP_TAG = "EMBL_Services";
     protected static final String ENTRY_TAG = "entry";
     protected static final String ENTRY_ACCESSION_ATTR = "accession";
-    protected static final String ENTRY_NAME_ATTR = "name";
-    protected static final String ENTRY_DIVISION_ATTR = "division";
+    protected static final String ENTRY_TAX_DIVISION_ATTR = "taxonomicDivision";
+    protected static final String ENTRY_DATACLASS_ATTR = "dataClass";
     protected static final String ENTRY_CREATED_ATTR = "created";
     protected static final String ENTRY_RELCREATED_ATTR = "releaseCreated";
     protected static final String ENTRY_UPDATED_ATTR = "lastUpdated";
     protected static final String ENTRY_RELUPDATED_ATTR = "releaseLastUpdated";
     protected static final String ENTRY_VER_ATTR = "version";
+    protected static final String ENTRY_SUBACC_ATTR = "submitterAccession";
+    protected static final String ENTRY_SUBVER_ATTR = "submitterVersion";
+    protected static final String ENTRY_SUBWGSVER_ATTR = "submitterWgsVersion";
+    protected static final String ENTRY_STATUS_ATTR = "status";
+    protected static final String ENTRY_STATUS_DATE_ATTR = "statusDate";
     
     protected static final String SEC_ACC_TAG = "secondaryAccession";
+    protected static final String PROJ_ACC_TAG = "projectAccession";
     protected static final String DESC_TAG = "description";
     protected static final String KEYWORD_TAG = "keyword";
     protected static final String REFERENCE_TAG = "reference";
@@ -150,7 +156,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
     protected static final String PATENT_TAG = "patentApplicant";
     protected static final String LOCATOR_TAG = "locator";
     
-    protected static final String REFERENCE_POSITION_TAG = "refPosition";
+    protected static final String CITATION_LOCATION_TAG = "citationLocation";
     protected static final String REF_POS_BEGIN_ATTR = "begin";
     protected static final String REF_POS_END_ATTR = "end";
     
@@ -160,12 +166,12 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
     protected static final String FEATURE_NAME_ATTR = "name";
     
     protected static final String ORGANISM_TAG = "organism";
-    protected static final String NAMESET_TAG = "nameSet";
     protected static final String SCINAME_TAG = "scientificName";
     protected static final String COMNAME_TAG = "preferredCommonName";
     protected static final String TAXID_TAG = "taxId";
     protected static final String LINEAGE_TAG = "lineage";
     protected static final String TAXON_TAG = "taxon";
+    protected static final String ORGANELLE_TAG = "organelle";
     
     protected static final String QUALIFIER_TAG = "qualifier";
     protected static final String QUALIFIER_NAME_ATTR = "name";
@@ -182,8 +188,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
     
     protected static final String BASEPOSITION_TAG = "basePosition";
     protected static final String BASEPOSITION_TYPE_ATTR = "type";
-    protected static final String BASEPOSITION_EXTENT_ATTR = "extent";
     
+    protected static final String CONTIG_TAG = "contig";
     protected static final String SEQUENCE_TAG = "sequence";
     protected static final String SEQUENCE_TYPE_ATTR = "type";
     protected static final String SEQUENCE_LENGTH_ATTR = "length";
@@ -196,7 +202,75 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
      * Implements some EMBLxml-specific terms.
      */
     public static class Terms extends RichSequence.Terms {
+        private static ComparableTerm DATA_CLASS_TERM = null;
+        
         private static ComparableTerm EMBLXML_TERM = null;
+        
+        private static ComparableTerm PROJACCESSION_TERM = null;
+        
+        private static ComparableTerm SUBACC_TERM = null;
+        
+        private static ComparableTerm SUBVER_TERM = null;
+        
+        private static ComparableTerm SUBWGSVER_TERM = null;
+        
+        private static ComparableTerm STATUS_TERM = null;
+        
+        private static ComparableTerm STATUSDATE_TERM = null;
+        
+        /**
+         * Getter for the SubmitterAccession term
+         * @return The SubmitterAccession Term
+         */
+        public static ComparableTerm getSubmitterAccessionTerm() {
+            if (SUBACC_TERM==null) SUBACC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("SubmitterAccession");
+            return SUBACC_TERM;
+        }
+        
+        /**
+         * Getter for the SubmitterVersion term
+         * @return The SubmitterVersion Term
+         */
+        public static ComparableTerm getSubmitterVersionTerm() {
+            if (SUBVER_TERM==null) SUBVER_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("SubmitterVersion");
+            return SUBVER_TERM;
+        }
+        
+        /**
+         * Getter for the SubmitterWgsVersion term
+         * @return The SubmitterWgsVersion Term
+         */
+        public static ComparableTerm getSubmitterWgsVersionTerm() {
+            if (SUBWGSVER_TERM==null) SUBWGSVER_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("SubmitterWgsVersion");
+            return SUBWGSVER_TERM;
+        }
+        
+        /**
+         * Getter for the Status term
+         * @return The Status Term
+         */
+        public static ComparableTerm getStatusTerm() {
+            if (STATUS_TERM==null) STATUS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("Status");
+            return STATUS_TERM;
+        }
+        
+        /**
+         * Getter for the StatusDate term
+         * @return The StatusDate Term
+         */
+        public static ComparableTerm getStatusDateTerm() {
+            if (STATUSDATE_TERM==null) STATUSDATE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("StatusDate");
+            return STATUSDATE_TERM;
+        }
+        
+        /**
+         * Getter for the ProjectAccession term
+         * @return The ProjectAccession Term
+         */
+        public static ComparableTerm getProjectAccessionTerm() {
+            if (PROJACCESSION_TERM==null) PROJACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("ProjectAccession");
+            return PROJACCESSION_TERM;
+        }
         
         /**
          * Getter for the EMBLxml term
@@ -205,6 +279,15 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         public static ComparableTerm getEMBLxmlTerm() {
             if (EMBLXML_TERM==null) EMBLXML_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBLxml");
             return EMBLXML_TERM;
+        }
+        
+        /**
+         * Getter for the Ensembl-specific 'dataClass' term
+         * @return The data class Term
+         */
+        public static ComparableTerm getDataClassTerm() {
+            if (DATA_CLASS_TERM==null) DATA_CLASS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataClass");
+            return DATA_CLASS_TERM;
         }
     }
     
@@ -297,9 +380,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         xml = new PrettyXMLWriter(pw);
         xml.printRaw("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
         xml.openTag(ENTRY_GROUP_TAG);
-        xml.attribute("xmlns","ebi","http://www.ebi.ac.uk/xml");
-        xml.attribute("xmlns","xsi","http://www.w3.org/2001/XMLSchema-instance");
-        xml.attribute("xsi","noNamespaceSchemaLocation","http://www.ebi.ac.uk/schema/EMBL_schema.xsd");
+        xml.attribute("xsi:noNamespaceSchemaLocation","http://www.ebi.ac.uk/embl/schema/EMBL_Services_V1.1.xsd");
     }
     
     /**
@@ -344,12 +425,20 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 
         Set notes = rs.getNoteSet();
         List accessions = new ArrayList();
+        List projAccessions = new ArrayList();
         List kws = new ArrayList();
+        List organelles = new ArrayList();
         String cdat = null;
         String udat = null;
         String crel = null;
         String urel = null;
+        String dataClass = null;
         String moltype = rs.getAlphabet().getName();
+        String subWgsVer = null;
+        String subAcc = null;
+        String subVer = null;
+        String status = null;
+        String statusDate = null;
         for (Iterator i = notes.iterator(); i.hasNext();) {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
@@ -358,23 +447,47 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getProjectAccessionTerm())) projAccessions.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelles.add(n.getValue());
             else if (n.getTerm().equals(Terms.getKeywordTerm())) kws.add(n.getValue());
+            else if (n.getTerm().equals(Terms.getDataClassTerm())) dataClass = n.getValue();
+            else if (n.getTerm().equals(Terms.getSubmitterAccessionTerm())) subAcc = n.getValue();
+            else if (n.getTerm().equals(Terms.getSubmitterVersionTerm())) subVer = n.getValue();
+            else if (n.getTerm().equals(Terms.getSubmitterWgsVersionTerm())) subWgsVer = n.getValue();
+            else if (n.getTerm().equals(Terms.getStatusTerm())) status = n.getValue();
+            else if (n.getTerm().equals(Terms.getStatusDateTerm())) statusDate = n.getValue();
         }
         
         xml.openTag(ENTRY_TAG);
         xml.attribute(ENTRY_ACCESSION_ATTR,rs.getAccession());
-        xml.attribute(ENTRY_NAME_ATTR,rs.getName());
-        xml.attribute(ENTRY_DIVISION_ATTR,rs.getDivision());
+        xml.attribute(ENTRY_TAX_DIVISION_ATTR,rs.getDivision());
+        xml.attribute(ENTRY_DATACLASS_ATTR,dataClass);
         xml.attribute(ENTRY_CREATED_ATTR,cdat==null?udat:cdat);
         xml.attribute(ENTRY_RELCREATED_ATTR,crel==null?"0":crel);
         xml.attribute(ENTRY_UPDATED_ATTR,udat);
         xml.attribute(ENTRY_RELUPDATED_ATTR,urel==null?"0":urel);
         xml.attribute(ENTRY_VER_ATTR,""+rs.getVersion());
+        if (subAcc!=null)
+            xml.attribute(ENTRY_SUBACC_ATTR,subAcc);
+        if (subVer!=null)
+            xml.attribute(ENTRY_SUBVER_ATTR,subVer);
+        if (subWgsVer!=null)
+            xml.attribute(ENTRY_SUBWGSVER_ATTR,subWgsVer);
+        if (status!=null)
+            xml.attribute(ENTRY_STATUS_ATTR,status);
+        if (statusDate!=null)
+            xml.attribute(ENTRY_STATUS_DATE_ATTR,statusDate);
         
         for (Iterator i = accessions.iterator(); i.hasNext(); ) {
             xml.openTag(SEC_ACC_TAG);
             xml.print((String)i.next());
             xml.closeTag(SEC_ACC_TAG);
+        }
+        
+        for (Iterator i = projAccessions.iterator(); i.hasNext(); ) {
+            xml.openTag(PROJ_ACC_TAG);
+            xml.print((String)i.next());
+            xml.closeTag(PROJ_ACC_TAG);
         }
         
         xml.openTag(DESC_TAG);
@@ -450,16 +563,15 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             xml.closeTag(LOCATOR_TAG);
             xml.closeTag(CITATION_TAG);
             
-            xml.openTag(REFERENCE_POSITION_TAG);
+            xml.openTag(CITATION_LOCATION_TAG);
             xml.attribute(REF_POS_BEGIN_ATTR,""+rdr.getStart());
             xml.attribute(REF_POS_END_ATTR,""+rdr.getEnd());
-            xml.closeTag(REFERENCE_POSITION_TAG);
-            
             if (dr.getRemark()!=null) {
                 xml.openTag(COMMENT_TAG);
                 xml.print(dr.getRemark());
                 xml.closeTag(COMMENT_TAG);
             }
+            xml.closeTag(CITATION_LOCATION_TAG);
             
             xml.closeTag(REFERENCE_TAG);
         }
@@ -502,7 +614,6 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 xml.openTag(ORGANISM_TAG);
                 
                 String[] parts = tax.getDisplayName().split("(\\(|\\))");
-                xml.openTag(NAMESET_TAG);
                 xml.openTag(SCINAME_TAG);
                 xml.print(parts[0].trim());
                 xml.closeTag(SCINAME_TAG);
@@ -511,7 +622,6 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     xml.print(parts[1].trim());
                     xml.closeTag(COMNAME_TAG);
                 }
-                xml.closeTag(NAMESET_TAG);
                 
                 xml.openTag(TAXID_TAG);
                 xml.print(""+tax.getNCBITaxID());
@@ -528,6 +638,13 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                         xml.closeTag(TAXON_TAG);
                     }
                     xml.closeTag(LINEAGE_TAG);
+                }
+                
+                for (final Iterator j = organelles.iterator(); j.hasNext(); ) {
+                    final String organelle = (String)j.next();
+                    xml.openTag(ORGANELLE_TAG);
+                    xml.print(organelle);
+                    xml.closeTag(ORGANELLE_TAG);
                 }
                 
                 xml.closeTag(ORGANISM_TAG);
@@ -591,45 +708,18 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 }
                 
                 Position start = rl.getMinPosition();
-                Position end = rl.getMaxPosition();
+                // EMBLxml does not support fuzzy locations so we only ever
+                // use the start coordinate.
                 
-                if (start.equals(end)) {
-                    // output first base only
-                    xml.attribute(LOC_ELEMENT_TYPE_ATTR,"site");
+                // output first base only
+                xml.attribute(LOC_ELEMENT_TYPE_ATTR,"site");
                     
-                    xml.openTag(BASEPOSITION_TAG);
-                    if (start.getFuzzyStart()) xml.attribute(BASEPOSITION_TYPE_ATTR,"<");
-                    else if (start.getFuzzyEnd()) xml.attribute(BASEPOSITION_TYPE_ATTR,"<");
-                    else if (start.getType()!=null) {
-                        xml.attribute(BASEPOSITION_TYPE_ATTR,"fuzzy");
-                        xml.attribute(BASEPOSITION_EXTENT_ATTR,"+"+(start.getEnd()-start.getStart()));
-                    } else xml.attribute(BASEPOSITION_TYPE_ATTR,"simple");
-                    xml.print(""+start.getStart());
-                    xml.closeTag(BASEPOSITION_TAG);
-                } else {
-                    // output both bases
-                    xml.attribute(LOC_ELEMENT_TYPE_ATTR,"range");
-                    
-                    xml.openTag(BASEPOSITION_TAG);
-                    if (start.getFuzzyStart()) xml.attribute(BASEPOSITION_TYPE_ATTR,"<");
-                    else if (start.getFuzzyEnd()) xml.attribute(BASEPOSITION_TYPE_ATTR,"<");
-                    else if (start.getType()!=null) {
-                        xml.attribute(BASEPOSITION_TYPE_ATTR,"fuzzy");
-                        xml.attribute(BASEPOSITION_EXTENT_ATTR,"+"+(start.getEnd()-start.getStart()));
-                    } else xml.attribute(BASEPOSITION_TYPE_ATTR,"simple");
-                    xml.print(""+start.getStart());
-                    xml.closeTag(BASEPOSITION_TAG);
-                    
-                    xml.openTag(BASEPOSITION_TAG);
-                    if (end.getFuzzyStart()) xml.attribute(BASEPOSITION_TYPE_ATTR,"<");
-                    else if (end.getFuzzyEnd()) xml.attribute(BASEPOSITION_TYPE_ATTR,"<");
-                    else if (end.getType()!=null) {
-                        xml.attribute(BASEPOSITION_TYPE_ATTR,"fuzzy");
-                        xml.attribute(BASEPOSITION_EXTENT_ATTR,"+"+(end.getEnd()-end.getStart()));
-                    } else xml.attribute(BASEPOSITION_TYPE_ATTR,"simple");
-                    xml.print(""+end.getStart());
-                    xml.closeTag(BASEPOSITION_TAG);
-                }
+                xml.openTag(BASEPOSITION_TAG);
+                if (start.getFuzzyStart()) xml.attribute(BASEPOSITION_TYPE_ATTR,"<");
+                else if (start.getFuzzyEnd()) xml.attribute(BASEPOSITION_TYPE_ATTR,"<");
+                else xml.attribute(BASEPOSITION_TYPE_ATTR,"simple");
+                xml.print(""+start.getStart());
+                xml.closeTag(BASEPOSITION_TAG);
                 
                 xml.closeTag(LOCATION_ELEMENT_TAG);
             }
@@ -684,7 +774,6 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         private int currLocElemBrackets;
         private StringBuffer currLocStr;
         private String currBaseType;
-        private String currBaseExtent;
         private boolean firstBase; // oooh err!
         private boolean firstLocationElement;
         private List currDBXrefs = new ArrayList();
@@ -717,13 +806,19 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                         if (name.equals(ENTRY_ACCESSION_ATTR)) {
                             accession = val;
                             rlistener.setAccession(accession);
-                        } else if (name.equals(ENTRY_NAME_ATTR)) rlistener.setName(val);
-                        else if (name.equals(ENTRY_DIVISION_ATTR)) rlistener.setDivision(val);
+                            rlistener.setName(accession);
+                        } else if (name.equals(ENTRY_TAX_DIVISION_ATTR)) rlistener.setDivision(val);
+                        else if (name.equals(ENTRY_DATACLASS_ATTR)) rlistener.addSequenceProperty(Terms.getDataClassTerm(),val);
                         else if (name.equals(ENTRY_CREATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateCreatedTerm(),val);
                         else if (name.equals(ENTRY_UPDATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),val);
                         else if (name.equals(ENTRY_RELCREATED_ATTR)) rlistener.addSequenceProperty(Terms.getRelCreatedTerm(),val);
                         else if (name.equals(ENTRY_RELUPDATED_ATTR)) rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(),val);
                         else if (name.equals(ENTRY_VER_ATTR)) rlistener.setVersion(Integer.parseInt(val));
+                        else if (name.equals(ENTRY_SUBACC_ATTR)) rlistener.addSequenceProperty(Terms.getSubmitterAccessionTerm(),val);
+                        else if (name.equals(ENTRY_SUBVER_ATTR)) rlistener.addSequenceProperty(Terms.getSubmitterVersionTerm(),val);
+                        else if (name.equals(ENTRY_SUBWGSVER_ATTR)) rlistener.addSequenceProperty(Terms.getSubmitterWgsVersionTerm(),val);
+                        else if (name.equals(ENTRY_STATUS_ATTR)) rlistener.addSequenceProperty(Terms.getStatusTerm(),val);
+                        else if (name.equals(ENTRY_STATUS_DATE_ATTR)) rlistener.addSequenceProperty(Terms.getStatusDateTerm(),val);
                     }
                     currNames.clear();
                     currComments.clear();
@@ -742,7 +837,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 currRefRank = 0;
                 currDBXrefs.clear();
                 currComments.clear();
-            } else if (qName.equals(REFERENCE_POSITION_TAG) && !this.parent.getElideReferences()) {
+            } else if (qName.equals(CITATION_LOCATION_TAG) && !this.parent.getElideReferences()) {
                 for (int i = 0; i < attributes.getLength(); i++) {
                     String name = attributes.getQName(i);
                     String val = attributes.getValue(i);
@@ -854,8 +949,15 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                     String name = attributes.getQName(i);
                     String val = attributes.getValue(i);
                     if (name.equals(BASEPOSITION_TYPE_ATTR)) currBaseType = val;
-                    else if (name.equals(BASEPOSITION_EXTENT_ATTR)) currBaseExtent = val;
                 }
+            }
+            
+            else if (qName.equals(CONTIG_TAG))  {
+                String message = ParseException.newMessage(this.getClass(),accession,"not set", "Unable to handle contig assemblies just yet", qName);
+                ParseException e = new ParseException(message);
+                SAXException pe = new SAXException("Could not set contig properties");
+                pe.initCause(e);
+                throw pe;
             }
             
             else if (qName.equals(SEQUENCE_TAG)) {
@@ -883,6 +985,10 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
             try {
                 if (qName.equals(SEC_ACC_TAG)) {
                     rlistener.addSequenceProperty(Terms.getAdditionalAccessionTerm(),val);
+                } else if (qName.equals(PROJ_ACC_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getProjectAccessionTerm(),val);
+                } else if (qName.equals(ORGANELLE_TAG)) {
+                    rlistener.addSequenceProperty(Terms.getOrganelleTerm(),val);
                 } else if (qName.equals(DESC_TAG)) {
                     rlistener.setDescription(val);
                 } else if (qName.equals(KEYWORD_TAG)) {
@@ -959,22 +1065,6 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                         currLocStr.append(">");
                     } else if (currBaseType.equalsIgnoreCase("simple")) {
                         currLocStr.append(val);
-                    } else if (currBaseType.equalsIgnoreCase("fuzzy")) {
-                        int refVal = Integer.parseInt(val);
-                        int extentVal = Integer.parseInt(currBaseExtent);
-                        if (refVal + extentVal < refVal) {
-                            currLocStr.append("(");
-                            currLocStr.append(""+extentVal);
-                            currLocStr.append(".");
-                            currLocStr.append(""+refVal);
-                            currLocStr.append(")");
-                        } else {
-                            currLocStr.append("(");
-                            currLocStr.append(""+refVal);
-                            currLocStr.append(".");
-                            currLocStr.append(""+extentVal);
-                            currLocStr.append(")");
-                        }
                     }
                     firstBase = false;
                 } else if (qName.equals(QUALIFIER_TAG) && !this.parent.getElideFeatures()) {
