@@ -380,6 +380,8 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
         xml = new PrettyXMLWriter(pw);
         xml.printRaw("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
         xml.openTag(ENTRY_GROUP_TAG);
+        xml.attribute("xmlns:ebi", "http://www.ebi.ac.uk/embl/schema");
+        xml.attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         xml.attribute("xsi:noNamespaceSchemaLocation","http://www.ebi.ac.uk/embl/schema/EMBL_Services_V1.1.xsd");
     }
     
