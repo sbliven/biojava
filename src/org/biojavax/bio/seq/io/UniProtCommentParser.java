@@ -276,6 +276,8 @@ CC         Comment=Free text;
                 String[] parts = c.split(";");
                 for (int i = 0; i < parts.length; i++) {
                     String[] subparts = parts[i].split("=");
+                    if (subparts.length<2)
+                        continue;
                     String key = subparts[0].trim();
                     String value = subparts[1].trim();
                     if (key.equalsIgnoreCase("Event")) {
