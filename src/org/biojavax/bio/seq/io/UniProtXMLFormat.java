@@ -116,6 +116,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     
     protected static final String ENTRY_GROUP_TAG = "uniprot";
     protected static final String ENTRY_TAG = "entry";
+    protected static final String ENTRY_VERSION_ATTR = "version";
     protected static final String ENTRY_NAMESPACE_ATTR = "dataset";
     protected static final String ENTRY_CREATED_ATTR = "created";
     protected static final String ENTRY_UPDATED_ATTR = "modified";
@@ -659,6 +660,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         }
         
         xml.openTag(ENTRY_TAG);
+        xml.attribute(ENTRY_VERSION_ATTR,""+rs.getVersion());
         xml.attribute(ENTRY_NAMESPACE_ATTR,(ns==null?rs.getNamespace().getName():ns.getName()));
         xml.attribute(ENTRY_CREATED_ATTR,cdat);
         xml.attribute(ENTRY_UPDATED_ATTR,(adat==null?cdat:adat)); // annotation update
@@ -849,11 +851,37 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 xml.closeTag(TITLE_TAG);
             }
             
-            List auths = dr.getAuthorList();
-            xml.openTag(EDITOR_LIST_TAG);
-            for (Iterator j = auths.iterator(); j.hasNext(); ) {
+            List auths = new ArrayList(dr.getAuthorList());
+            List editors = new ArrayList(auths);
+            for (final Iterator j = editors.iterator(); j.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)j.next();
-                if (a.isEditor()) {
+                if (!a.isEditor())
+                    j.remove();
+                else
+                    auths.remove(a);
+            }
+            if (!editors.isEmpty()) {
+                xml.openTag(EDITOR_LIST_TAG);
+                for (Iterator j = editors.iterator(); j.hasNext(); ) {
+                    DocRefAuthor a = (DocRefAuthor)j.next();
+                    if (a.isEditor()) {
+                        if (a.isConsortium()) {
+                            xml.openTag(CONSORTIUM_TAG);
+                            xml.attribute(NAME_ATTR,a.getName());
+                            xml.closeTag(CONSORTIUM_TAG);
+                        } else {
+                            xml.openTag(PERSON_TAG);
+                            xml.attribute(NAME_ATTR,a.getName());
+                            xml.closeTag(PERSON_TAG);
+                        }
+                    }
+                }
+                xml.closeTag(EDITOR_LIST_TAG);
+            }
+            if (!auths.isEmpty()) {
+                xml.openTag(AUTHOR_LIST_TAG);
+                for (Iterator j = auths.iterator(); j.hasNext(); ) {
+                    DocRefAuthor a = (DocRefAuthor)j.next();
                     if (a.isConsortium()) {
                         xml.openTag(CONSORTIUM_TAG);
                         xml.attribute(NAME_ATTR,a.getName());
@@ -863,24 +891,9 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         xml.attribute(NAME_ATTR,a.getName());
                         xml.closeTag(PERSON_TAG);
                     }
-                    j.remove();
                 }
+                xml.closeTag(AUTHOR_LIST_TAG);
             }
-            xml.closeTag(EDITOR_LIST_TAG);
-            xml.openTag(AUTHOR_LIST_TAG);
-            for (Iterator j = auths.iterator(); j.hasNext(); ) {
-                DocRefAuthor a = (DocRefAuthor)j.next();
-                if (a.isConsortium()) {
-                    xml.openTag(CONSORTIUM_TAG);
-                    xml.attribute(NAME_ATTR,a.getName());
-                    xml.closeTag(CONSORTIUM_TAG);
-                } else {
-                    xml.openTag(PERSON_TAG);
-                    xml.attribute(NAME_ATTR,a.getName());
-                    xml.closeTag(PERSON_TAG);
-                }
-            }
-            xml.closeTag(AUTHOR_LIST_TAG);
             
             xml.openTag(LOCATOR_TAG);
             xml.print(dr.getLocation());
@@ -903,6 +916,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 }
                 xml.closeTag(DBXREF_TAG);
             }
+            
+            xml.closeTag(CITATION_TAG);
             
             // RP
             xml.openTag(RP_LINE_TAG);
@@ -955,7 +970,6 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             }
             xml.closeTag(RC_LINE_TAG);
             
-            xml.closeTag(CITATION_TAG);
             xml.closeTag(REFERENCE_TAG);
         }
         
@@ -1516,7 +1530,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     for (int i = 0; i < attributes.getLength(); i++) {
                         String name = attributes.getQName(i);
                         String val = attributes.getValue(i);
-                        if (name.equals(ENTRY_NAMESPACE_ATTR) && this.ns!=null) ns=(Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{val});
+                        if (name.equals(ENTRY_NAMESPACE_ATTR) && this.ns==null) ns=(Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{val});
+                        else if (name.equals(ENTRY_VERSION_ATTR)) rlistener.setVersion(Integer.parseInt(val));
                         else if (name.equals(ENTRY_CREATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), val);
                         else if (name.equals(ENTRY_UPDATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), val);
                     }

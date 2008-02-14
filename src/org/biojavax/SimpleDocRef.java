@@ -169,7 +169,7 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     /**
      * {@inheritDoc}
      */
-    public String getAuthors() { return DocRefAuthor.Tools.generateAuthorString(this.authors); }
+    public String getAuthors() { return DocRefAuthor.Tools.generateAuthorString(this.authors, true); }
     
     /**
      * {@inheritDoc}

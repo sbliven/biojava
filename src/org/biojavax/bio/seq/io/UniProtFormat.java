@@ -868,6 +868,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         String organelle = null;
         String protExists = null;
         String dataclass = "STANDARD";
+        String copyright = null;
         Map speciesRecs = new TreeMap();
         Map strainRecs = new TreeMap();
         Map tissueRecs = new TreeMap();
@@ -887,6 +888,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelAnnotatedTerm())) arel=n.getValue();
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
+            else if (n.getTerm().equals(Terms.getCopyrightTerm())) copyright = n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) {
                 accessions.append(" ");
                 accessions.append(n.getValue());
@@ -1044,7 +1046,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             source.append(".");
             StringTools.writeKeyValueLine(SOURCE_TAG, source.toString(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
             if (organelle!=null) StringTools.writeKeyValueLine(ORGANELLE_TAG, organelle+".", 5, this.getLineWidth(), null, ORGANELLE_TAG, this.getPrintStream());
-            StringTools.writeKeyValueLine(ORGANISM_TAG, tax.getNameHierarchy(), 5, this.getLineWidth(), null, SOURCE_TAG, this.getPrintStream());
+            StringTools.writeKeyValueLine(ORGANISM_TAG, tax.getNameHierarchy(), 5, this.getLineWidth(), null, ORGANISM_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(TAXON_TAG, "NCBI_TaxID="+tax.getNCBITaxID()+";", 5, this.getLineWidth(), this.getPrintStream());
         }
         
@@ -1119,7 +1121,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     j.remove();
                 }
             }
-            if (!auths.isEmpty()) StringTools.writeKeyValueLine(AUTHORS_TAG, DocRefAuthor.Tools.generateAuthorString(auths)+";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
+            if (!auths.isEmpty()) StringTools.writeKeyValueLine(AUTHORS_TAG, DocRefAuthor.Tools.generateAuthorString(auths, false)+";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
             if (d.getTitle()!=null && d.getTitle().length()!=0) StringTools.writeKeyValueLine(TITLE_TAG, "\""+d.getTitle()+"\";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
             StringTools.writeKeyValueLine(LOCATION_TAG, d.getLocation()+".", 5, this.getLineWidth(), null, LOCATION_TAG, this.getPrintStream());
         }
@@ -1129,10 +1131,14 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             for (Iterator i = rs.getComments().iterator(); i.hasNext(); ) {
                 Comment c = (SimpleComment)i.next();
                 String text = c.getComment().trim();
-                if (text.length()>3 && text.substring(0,3).equals("-!-")) StringTools.writeKeyValueLine(COMMENT_TAG+"   ", text, 5, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
+                if (text.length()>3 && text.substring(0,3).equals("-!-")) StringTools.writeKeyValueLine(COMMENT_TAG, text, 5, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
                 else StringTools.writeKeyValueLine(COMMENT_TAG, text, 5, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
             }
         }
+        
+        // copyright - if any
+        if (copyright!=null)
+            StringTools.writeKeyValueLine(COMMENT_TAG, copyright, 5, this.getLineWidth(), null, COMMENT_TAG, this.getPrintStream());
         
         // db references - ranked
         for (Iterator r = rs.getRankedCrossRefs().iterator(); r.hasNext(); ) {

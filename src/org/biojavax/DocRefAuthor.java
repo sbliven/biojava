@@ -86,17 +86,19 @@ public interface DocRefAuthor extends Comparable,Changeable {
          * Takes a set of authors and creates a comma-separated string.
          * For the final comma, it replaces it with the word "and".
          * @param authors set of authors
+         * @param useAnd whether or not to do the and thing, otherwise
+         * use all commas.
          * @return a comma-separated string with the word "and" in 
          * place of the final comma.
          */
-        public static String generateAuthorString(List authors) {
+        public static String generateAuthorString(List authors, boolean useAnd) {
             StringBuffer sb = new StringBuffer();
             int authCount = 1;
             for (Iterator i = authors.iterator(); i.hasNext(); ) {
                 DocRefAuthor a = (DocRefAuthor)i.next();
                 sb.append(a.getExtendedName());
                 if (i.hasNext()) {
-                    if (authCount++==authors.size()-1) sb.append(" and ");
+                    if (authCount++==authors.size()-1 && useAnd) sb.append(" and ");
                     else sb.append(", ");
                 }
             }

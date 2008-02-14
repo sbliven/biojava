@@ -114,7 +114,7 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
         } else if (SimpleDocRef.class.isAssignableFrom(clazz)) {
         	queryType = "DocRef";
         	// convert List constructor to String representation for query
-        	ourParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((List)ourParamsList.get(0)));
+        	ourParamsList.set(0, DocRefAuthor.Tools.generateAuthorString((List)ourParamsList.get(0), true));
         	if (ourParamsList.size()<3) {
         		queryText = "from DocRef as cr where cr.authors = ? and cr.location = ? and cr.title is null";
         	} else {

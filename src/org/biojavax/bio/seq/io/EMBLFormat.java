@@ -133,7 +133,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
     // the date pattern
     // date (Rel. N, Created)
     // date (Rel. N, Last updated, Version M)
-    protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s*(\\(Rel\\.\\s+(\\d+), ([^\\)\\d]+)\\d*\\))?$");
+    protected static final Pattern dp = Pattern.compile("([^\\s]+)\\s*(\\(Rel\\.\\s+(\\d+), ([^\\)\\d]+)(\\d*)\\))?$");
     // locus line
     protected static final Pattern lp = Pattern.compile("^(\\S+);\\s+SV\\s+(\\d+);\\s+(linear|circular);\\s+(\\S+\\s?\\S+?);\\s+(\\S+);\\s+(\\S+);\\s+(\\d+)\\s+BP\\.$");
     protected static final Pattern lpPre87 = Pattern.compile("^(\\S+)\\s+standard;\\s+(circular)?\\s*(genomic)?\\s*(\\S+);\\s+(\\S+);\\s+\\d+\\s+BP\\.$");
@@ -159,6 +159,17 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         private static ComparableTerm GENOMIC_TERM = null;
         private static ComparableTerm VERSION_LINE_TERM = null;
         private static ComparableTerm DATA_CLASS_TERM = null;
+        
+        private static ComparableTerm REL_UPDATED_RECV_TERM = null;
+        
+        /**
+         * Getter for the RelUpdatedRecordVersion term
+         * @return The RelUpdatedRecordVersion Term
+         */
+        public static ComparableTerm getRelUpdatedRecordVersionTerm() {
+            if (REL_UPDATED_RECV_TERM==null) REL_UPDATED_RECV_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("RelUpdatedRecordVersion");
+            return REL_UPDATED_RECV_TERM;
+        }
         
         /**
          * Getter for the EMBL term
@@ -349,6 +360,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     } else if (type.equals("Last updated, Version ")) {
                         rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
+                        rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), dm.group(5));
                     } else {
                         String message = ParseException.newMessage(this.getClass(),accession,"not set", "Bad date type found",sectionToString(section));
                         throw new ParseException(message);
@@ -847,6 +859,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         String udat = null;
         String crel = null;
         String urel = null;
+        String urecv = null;
         String organelle = null;
         String versionLine = null;
         String dataClass = "STD";
@@ -858,6 +871,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
             else if (n.getTerm().equals(Terms.getRelCreatedTerm())) crel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelUpdatedRecordVersionTerm())) urecv=n.getValue();
             else if (n.getTerm().equals(Terms.getMolTypeTerm())) moltype=n.getValue();
             else if (n.getTerm().equals(Terms.getVersionLineTerm())) versionLine=n.getValue();
             else if (n.getTerm().equals(Terms.getGenomicTerm())) genomic = true;
@@ -916,7 +930,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
         
         // date line
         StringTools.writeKeyValueLine(DATE_TAG, (cdat==null?udat:cdat)+" (Rel. "+(crel==null?"0":crel)+", Created)", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
-        StringTools.writeKeyValueLine(DATE_TAG, udat+" (Rel. "+(urel==null?"0":urel)+", Last updated, Version "+rs.getVersion()+")", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, udat+" (Rel. "+(urel==null?"0":urel)+", Last updated, Version "+(urecv==null?"0":urecv)+")", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // definition line
@@ -973,7 +987,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     j.remove();
                 }
             }
-            if (!auths.isEmpty()) StringTools.writeKeyValueLine(AUTHORS_TAG, DocRefAuthor.Tools.generateAuthorString(auths)+";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
+            if (!auths.isEmpty()) StringTools.writeKeyValueLine(AUTHORS_TAG, DocRefAuthor.Tools.generateAuthorString(auths, true)+";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
             else StringTools.writeKeyValueLine(AUTHORS_TAG, ";", 5, this.getLineWidth(), null, AUTHORS_TAG, this.getPrintStream());
             if (d.getTitle()!=null && d.getTitle().length()!=0) StringTools.writeKeyValueLine(TITLE_TAG, "\""+d.getTitle()+"\";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
             else StringTools.writeKeyValueLine(TITLE_TAG, ";", 5, this.getLineWidth(), null, TITLE_TAG, this.getPrintStream());
@@ -1005,7 +1019,8 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
             else sb.append(".");
             StringTools.writeKeyValueLine(DATABASE_XREF_TAG, sb.toString(), 5, this.getLineWidth(), null, DATABASE_XREF_TAG, this.getPrintStream());
         }
-        this.getPrintStream().println(DELIMITER_TAG+"   ");
+        if (!rs.getRankedCrossRefs().isEmpty())
+            this.getPrintStream().println(DELIMITER_TAG+"   ");
         
         // comments - if any
         if (!rs.getComments().isEmpty()) {
