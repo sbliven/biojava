@@ -360,7 +360,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                     } else if (type.equals("Last updated, Version ")) {
                         rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
                         rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
-                        rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), dm.group(5));
+                        rlistener.addSequenceProperty(Terms.getRelUpdatedRecordVersionTerm(), dm.group(5));
                     } else {
                         String message = ParseException.newMessage(this.getClass(),accession,"not set", "Bad date type found",sectionToString(section));
                         throw new ParseException(message);
