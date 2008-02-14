@@ -182,7 +182,6 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     protected static final String COMMENT_LINK_TAG = "link";
     protected static final String COMMENT_LINK_URI_ATTR = "uri";
     protected static final String COMMENT_EVENT_TAG = "event";
-    protected static final String COMMENT_EVENT_ISOFORMS_ATTR = "namedIsoforms";
     protected static final String COMMENT_ISOFORM_TAG = "isoform";
     protected static final String COMMENT_INTERACTANT_TAG = "interactant";
     protected static final String COMMENT_INTERACT_INTACT_ATTR = "intactId";
@@ -192,6 +191,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     
     protected static final String NOTE_TAG = "note";
     protected static final String KEYWORD_TAG = "keyword";
+    protected static final String PROTEIN_EXISTS_TAG = "proteinExistence";
     protected static final String ID_TAG = "id";
     
     protected static final String FEATURE_TAG = "feature";
@@ -212,6 +212,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     protected static final String LOCATION_POSITION_TAG = "position";
     
     protected static final String SEQUENCE_TAG = "sequence";
+    protected static final String SEQUENCE_VERSION_ATTR = "version";
     protected static final String SEQUENCE_LENGTH_ATTR = "length";
     protected static final String SEQUENCE_MASS_ATTR = "mass";
     protected static final String SEQUENCE_CHECKSUM_ATTR = "checksum";
@@ -237,6 +238,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         private static ComparableTerm FEATURE_ORIGINAL_TERM = null;
         private static ComparableTerm FEATURE_VARIATION_TERM = null;
         private static ComparableTerm LOCATION_SEQUENCE_TERM = null;
+        private static ComparableTerm UNIPROT_PROTEIN_EXISTS_TERM = null;
         
         public static final String CONTAINS_PREFIX = "Contains:";
         public static final String INCLUDES_PREFIX = "Includes:";
@@ -258,6 +260,15 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         
         // Ontology for uniprot keywords (because they have identifiers, aaargh...)
         private static ComparableOntology uniprotKWOnto = null;
+        
+        /**
+         * Getter for the protein exists term
+         * @return The protein exists Term
+         */
+        public static ComparableTerm getProteinExistsTerm() {
+            if (UNIPROT_PROTEIN_EXISTS_TERM==null) UNIPROT_PROTEIN_EXISTS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt protein exists");
+            return UNIPROT_PROTEIN_EXISTS_TERM;
+        }
         
         /**
          * Getter for the private uniprot ontology.
@@ -523,9 +534,11 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         List kws = new ArrayList();
         String cdat = null;
         String udat = null;
+        String arel = null;
         String adat = null;
         String copyright = null;
         String proteinType = null;
+        String proteinExists = null;
         Map genenames = new TreeMap();
         Map genesynonyms = new TreeMap();
         Map orfnames = new TreeMap();
@@ -545,6 +558,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             Note n = (Note)i.next();
             if (n.getTerm().equals(Terms.getDateCreatedTerm())) cdat=n.getValue();
             else if (n.getTerm().equals(Terms.getDateUpdatedTerm())) udat=n.getValue();
+            else if (n.getTerm().equals(Terms.getRelAnnotatedTerm())) arel=n.getValue();
             else if (n.getTerm().equals(Terms.getDateAnnotatedTerm())) adat=n.getValue();
             else if (n.getTerm().equals(Terms.getAdditionalAccessionTerm())) accessions.add(n.getValue());
             else if (n.getTerm().equals(Terms.getOrganelleTerm())) organelles.add(n.getValue());
@@ -560,6 +574,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 kws.add(t);
             } else if (n.getTerm().equals(Terms.getCopyrightTerm())) copyright=n.getValue();
             else if (n.getTerm().equals(Terms.getProteinTypeTerm())) proteinType=n.getValue();
+            else if (n.getTerm().equals(Terms.getProteinExistsTerm())) proteinExists=n.getValue();
             // use the nasty hack to split the reference rank away from the actual value in this field
             else if (n.getTerm().equals(Terms.getGeneNameTerm()))  {
                 String ref = n.getValue();
@@ -660,7 +675,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         }
         
         xml.openTag(ENTRY_TAG);
-        xml.attribute(ENTRY_VERSION_ATTR,""+rs.getVersion());
+        xml.attribute(ENTRY_VERSION_ATTR,""+(arel==null?""+rs.getVersion():arel));
         xml.attribute(ENTRY_NAMESPACE_ATTR,(ns==null?rs.getNamespace().getName():ns.getName()));
         xml.attribute(ENTRY_CREATED_ATTR,cdat);
         xml.attribute(ENTRY_UPDATED_ATTR,(adat==null?cdat:adat)); // annotation update
@@ -931,9 +946,13 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             }
             
             // RC
-            xml.openTag(RC_LINE_TAG);
+            boolean rcOpened = false;
             Integer rank = new Integer(rdr.getRank());
             if (speciesRecs.get(rank)!=null) {
+                if (!rcOpened) {
+                    xml.openTag(RC_LINE_TAG);
+                    rcOpened = true;
+                }
                 for (Iterator j = ((List)speciesRecs.get(rank)).iterator(); j.hasNext(); ) {
                     xml.openTag(RC_SPECIES_TAG);
                     xml.print((String)j.next());
@@ -941,6 +960,10 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 }
             }
             if (strainRecs.get(rank)!=null) {
+                if (!rcOpened) {
+                    xml.openTag(RC_LINE_TAG);
+                    rcOpened = true;
+                }
                 for (Iterator j = ((List)strainRecs.get(rank)).iterator(); j.hasNext(); ) {
                     xml.openTag(RC_STRAIN_TAG);
                     xml.print((String)j.next());
@@ -948,6 +971,10 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 }
             }
             if (tissueRecs.get(rank)!=null) {
+                if (!rcOpened) {
+                    xml.openTag(RC_LINE_TAG);
+                    rcOpened = true;
+                }
                 for (Iterator j = ((List)tissueRecs.get(rank)).iterator(); j.hasNext(); ) {
                     xml.openTag(RC_TISSUE_TAG);
                     xml.print((String)j.next());
@@ -955,6 +982,10 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 }
             }
             if (transpRecs.get(rank)!=null) {
+                if (!rcOpened) {
+                    xml.openTag(RC_LINE_TAG);
+                    rcOpened = true;
+                }
                 for (Iterator j = ((List)transpRecs.get(rank)).iterator(); j.hasNext(); ) {
                     xml.openTag(RC_TRANSP_TAG);
                     xml.print((String)j.next());
@@ -962,13 +993,18 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 }
             }
             if (plasmidRecs.get(rank)!=null) {
+                if (!rcOpened) {
+                    xml.openTag(RC_LINE_TAG);
+                    rcOpened = true;
+                }
                 for (Iterator j = ((List)plasmidRecs.get(rank)).iterator(); j.hasNext(); ) {
                     xml.openTag(RC_PLASMID_TAG);
                     xml.print((String)j.next());
                     xml.closeTag(RC_PLASMID_TAG);
                 }
             }
-            xml.closeTag(RC_LINE_TAG);
+            if (rcOpened)
+                xml.closeTag(RC_LINE_TAG);
             
             xml.closeTag(REFERENCE_TAG);
         }
@@ -1066,8 +1102,6 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         Event event = (Event)j.next();
                         xml.openTag(COMMENT_EVENT_TAG);
                         xml.attribute(TYPE_ATTR,event.getType().toLowerCase()); // uniprotxml requires lowercase
-                        if (event.getType().equals("Alternative splicing")) xml.attribute(COMMENT_EVENT_ISOFORMS_ATTR,""+event.getNamedIsoforms());
-                        xml.print(event.getComment());
                         xml.closeTag(COMMENT_EVENT_TAG);
                     }
                     for (Iterator j = ucp.getIsoforms().iterator(); j.hasNext(); ) {
@@ -1326,6 +1360,11 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
             xml.closeTag(DBXREF_TAG);
         }
         
+        // protein exists
+        xml.openTag(PROTEIN_EXISTS_TAG);
+        xml.attribute(TYPE_ATTR,proteinExists);
+        xml.closeTag(PROTEIN_EXISTS_TAG);
+        
         // keywords
         for (Iterator j = kws.iterator(); j.hasNext(); ) {
             ComparableTerm t = (ComparableTerm)j.next();
@@ -1434,6 +1473,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
         String seqstr = rs.seqString();
         crc.update(seqstr.getBytes(),0,seqstr.length());
         xml.openTag(SEQUENCE_TAG);
+        xml.attribute(SEQUENCE_VERSION_ATTR,""+rs.getVersion());
         xml.attribute(SEQUENCE_LENGTH_ATTR,""+rs.length());
         xml.attribute(SEQUENCE_MASS_ATTR,""+mw);
         xml.attribute(SEQUENCE_CHECKSUM_ATTR,""+crc);
@@ -1531,7 +1571,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                         String name = attributes.getQName(i);
                         String val = attributes.getValue(i);
                         if (name.equals(ENTRY_NAMESPACE_ATTR) && this.ns==null) ns=(Namespace)RichObjectFactory.getObject(SimpleNamespace.class,new Object[]{val});
-                        else if (name.equals(ENTRY_VERSION_ATTR)) rlistener.setVersion(Integer.parseInt(val));
+                        else if (name.equals(ENTRY_VERSION_ATTR)) rlistener.addSequenceProperty(Terms.getRelAnnotatedTerm(), val);
                         else if (name.equals(ENTRY_CREATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), val);
                         else if (name.equals(ENTRY_UPDATED_ATTR)) rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), val);
                     }
@@ -1724,6 +1764,20 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 this.currRCID++;
             }
             
+            else if (qName.equals(PROTEIN_EXISTS_TAG)) {
+                try {
+                    for (int i = 0; i < attributes.getLength(); i++) {
+                        String name = attributes.getQName(i);
+                        String val = attributes.getValue(i);
+                        if (name.equals(TYPE_ATTR)) rlistener.addSequenceProperty(Terms.getProteinExistsTerm(),val);
+                    }
+                } catch (ParseException e) {
+                    SAXException pe = new SAXException("Could not annotate protein exists terms");
+                    pe.initCause(e);
+                    throw pe;
+                }
+            }
+            
             else if (qName.equals(KEYWORD_TAG)) {
                 for (int i = 0; i < attributes.getLength(); i++) {
                     String name = attributes.getQName(i);
@@ -1864,12 +1918,13 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                     if (name.equals(TYPE_ATTR)) {
                         val = val.toUpperCase().charAt(0)+val.substring(1); // make first letter upper case for flat uniprot
                         this.currUCParserEvent.setType(val);
-                    } else if (name.equals(COMMENT_EVENT_ISOFORMS_ATTR)) this.currUCParserEvent.setNamedIsoforms(Integer.parseInt(val));
+                    }
                 }
                 currUCParser.getEvents().add(currUCParserEvent);
             } else if (qName.equals(COMMENT_ISOFORM_TAG)) {
                 this.currUCParserIsoform = new Isoform();
                 this.currUCParser.getIsoforms().add(currUCParserIsoform);
+                this.currUCParserEvent.setNamedIsoforms(this.currUCParser.getIsoforms().size());
                 this.currNameIsFor="ISOFORM";
                 this.currNoteIsFor="ISOFORM";
                 this.currSeqIsFor="ISOFORM";
@@ -1900,6 +1955,8 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                             if (name.equals(SEQUENCE_MODIFIED_ATTR)) {
                                 rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(),val);
                             }
+                            else if (name.equals(SEQUENCE_VERSION_ATTR))
+                                rlistener.setVersion(Integer.parseInt(val));
                         }
                     } catch (ParseException e) {
                         SAXException pe = new SAXException("Could not set sequence properties");

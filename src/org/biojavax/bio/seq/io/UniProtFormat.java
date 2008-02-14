@@ -360,7 +360,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                                 throw new ParseException(message);
                             }
                             rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
-                            rlistener.addSequenceProperty(Terms.getRelUpdatedTerm(), rel);
+                            rlistener.setVersion(Integer.parseInt(rel));
                         } else if (type.equalsIgnoreCase("entry version")) {
                             if (rel==null) {
                                 String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
@@ -863,7 +863,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         String udat = null;
         String adat = null;
         String dbname = "?";
-        String urel = null;
         String arel = null;
         String organelle = null;
         String protExists = null;
@@ -885,7 +884,6 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
             else if (n.getTerm().equals(Terms.getDateAnnotatedTerm())) adat=n.getValue();
             else if (n.getTerm().equals(Terms.getUniProtDBNameTerm())) dbname=n.getValue();
             else if (n.getTerm().equals(Terms.getProteinExistsTerm())) protExists=n.getValue();
-            else if (n.getTerm().equals(Terms.getRelUpdatedTerm())) urel=n.getValue();
             else if (n.getTerm().equals(Terms.getRelAnnotatedTerm())) arel=n.getValue();
             else if (n.getTerm().equals(Terms.getDataClassTerm())) dataclass = n.getValue();
             else if (n.getTerm().equals(Terms.getCopyrightTerm())) copyright = n.getValue();
@@ -979,7 +977,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         
         // date line
         StringTools.writeKeyValueLine(DATE_TAG, (cdat==null?udat:cdat)+", integrated into UniProtKB/"+dbname+".", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
-        StringTools.writeKeyValueLine(DATE_TAG, udat+", sequence version "+(urel==null?"0":urel)+".", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
+        StringTools.writeKeyValueLine(DATE_TAG, udat+", sequence version "+rs.getVersion()+".", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         StringTools.writeKeyValueLine(DATE_TAG, (adat==null?udat:adat)+", entry version "+(arel==null?"0":arel)+".", 5, this.getLineWidth(), null, DATE_TAG, this.getPrintStream());
         
         // definition line
