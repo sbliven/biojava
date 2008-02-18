@@ -136,7 +136,7 @@ public class SimpleDocRefTest extends TestCase {
     public void testGetAuthorList() {
         System.out.println("testGetAuthorList");
         
-        assertEquals(DocRefAuthor.Tools.generateAuthorString(authors),
+        assertEquals(DocRefAuthor.Tools.generateAuthorString(authors,true),
                 ref.getAuthors());
     }
 
