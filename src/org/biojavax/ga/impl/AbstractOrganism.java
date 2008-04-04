@@ -32,7 +32,7 @@ public abstract class AbstractOrganism extends AbstractChangeable implements
 
 	private double[]	fitness;
 
-	SymbolList[]	   chromosomes;
+	protected SymbolList[]	   chromosomes;
 
 	String	         name;
 

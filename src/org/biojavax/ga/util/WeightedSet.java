@@ -122,7 +122,7 @@ public class WeightedSet extends AbstractSet implements java.io.Serializable{
       remove(o);
     }
     totalWeight += w;
-    key2Weight.put(o, new Double(w));
+    key2Weight.put(o, Double.valueOf(w));
   }
 
   public boolean contains(Object o) {
@@ -199,7 +199,7 @@ public class WeightedSet extends AbstractSet implements java.io.Serializable{
     key2Weight = new HashMap();
     totalWeight = 0.0;
   }
-  
+
   /**
    * Returns an unmodifiable iterator over the keys of the set.
    * @return an Iterator
