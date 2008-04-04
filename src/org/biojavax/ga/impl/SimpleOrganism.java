@@ -27,14 +27,15 @@ import org.biojavax.ga.Organism;
 
 /**
  * A Simple Haploid Organism implementation
- * 
+ *
  * @author Mark Schreiber
  * @version 1.0
  * @since 1.5
  */
 
 public class SimpleOrganism extends AbstractOrganism {
-  public SimpleOrganism(){
+
+	public SimpleOrganism(){
     super();
   }
   public SimpleOrganism(String name){
@@ -73,4 +74,5 @@ public class SimpleOrganism extends AbstractOrganism {
     o.setChromImpl(symls);
     return o;
   }
+
 }

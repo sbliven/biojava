@@ -32,7 +32,7 @@ import org.biojavax.ga.exception.IllegalOrganismException;
 
 /**
  * A collection of GA organisms
- * 
+ *
  * @author Mark Schreiber
  * @version 1.0
  * @since 1.5
