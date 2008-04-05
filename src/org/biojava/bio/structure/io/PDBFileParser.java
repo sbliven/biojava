@@ -152,8 +152,12 @@ public class PDBFileParser  {
 
 	private int lengthCheck ;
 
+	private boolean isLastCompndLine = false;
+	private boolean isLastSourceLine = false;
 	private Compound current_compound;
 	private List<Compound> compounds = new ArrayList<Compound>();
+	private List<String> compndLines = new ArrayList<String>();
+	private List<String> sourceLines = new ArrayList<String>();
 	private List<DBRef> dbrefs;
 
 	// for parsing COMPOUND and SOURCE Header lines
@@ -177,6 +181,22 @@ public class PDBFileParser  {
 					"MUTANT:","SYNTHETIC:"
 			));
 	// ENGINEEREED in pdb219d
+
+	private static final List<String> sourceFieldValues = new ArrayList<String>(
+			Arrays.asList("ENGINEERED:", "MOL_ID:", "SYNTHETIC:", "FRAGMENT:",
+					"ORGANISM_SCIENTIFIC:", "ORGANISM_COMMON:", "STRAIN:",
+					"VARIANT:", "CELL_LINE:", "ATCC:", "ORGAN:", "TISSUE:",
+					"CELL:", "ORGANELLE:", "SECRETION:", "GENE:",
+					"CELLULAR_LOCATION:", "EXPRESSION_SYSTEM:",
+					"EXPRESSION_SYSTEM_STRAIN:", "EXPRESSION_SYSTEM_VARIANT:",
+					"EXPRESSION_SYSTEM_CELL_LINE:",
+					"EXPRESSION_SYSTEM_ATCC_NUMBER:",
+					"EXPRESSION_SYSTEM_ORGAN:", "EXPRESSION_SYSTEM_TISSUE:",
+					"EXPRESSION_SYSTEM_CELL:", "EXPRESSION_SYSTEM_ORGANELLE:",
+					"EXPRESSION_SYSTEM_CELLULAR_LOCATION:",
+					"EXPRESSION_SYSTEM_VECTOR_TYPE:",
+					"EXPRESSION_SYSTEM_VECTOR:", "EXPRESSION_SYSTEM_PLASMID:",
+					"EXPRESSION_SYSTEM_GENE:", "OTHER_DETAILS:"));
 
 
 	boolean parseSecStruc;
@@ -955,229 +975,94 @@ public class PDBFileParser  {
 	}
 
 	/**
-	 * Handler for
-	 * COMPND
-	 * <p/>
-	 * Overview
-	 * <p/>
-	 * The COMPND record describes the macromolecular contents of an entry. Each macromolecule found in the entry is described by a set of token: value pairs, and is referred to as a COMPND record component. Since the concept of a molecule is difficult to specify exactly, PDB staff may exercise editorial judgment in consultation with depositors in assigning these names.
-	 * <p/>
-	 * For each macromolecular component, the molecule name, synonyms, number assigned by the Enzyme Commission (EC), and other relevant details are specified.
-	 * <p/>
-	 * Record Format
-	 * <p/>
-	 * COLUMNS        DATA TYPE         FIELD          DEFINITION
-	 * ----------------------------------------------------------------------------------
-	 * 1 -  6        Record name       "COMPND"
-	 * <p/>
-	 * 9 - 10        Continuation      continuation   Allows concatenation of multiple
-	 * records.
-	 * <p/>
-	 * 11 - 70        Specification     compound       Description of the molecular
-	 * list                             components.
-	 * <p/>
-	 * Details
-	 * <p/>
-	 * The compound record is a Specification list. The specifications, or tokens, that may be used are listed below:
-	 * <p/>
-	 * TOKEN                   VALUE DEFINITION
-	 * ---------------------------------------------------------------------------------
-	 * MOL_ID                  Numbers each component; also used in SOURCE to associate
-	 * the information.
-	 * <p/>
-	 * MOLECULE                Name of the macromolecule.
-	 * <p/>
-	 * CHAIN                   Comma-separated list of chain identifier(s). "NULL" is
-	 * used to indicate a blank chain identifier.
-	 * <p/>
-	 * FRAGMENT                Specifies a domain or region of the molecule.
-	 * <p/>
-	 * SYNONYM                 Comma-separated list of synonyms for the MOLECULE.
-	 * <p/>
-	 * EC                      The Enzyme Commission number associated with the
-	 * molecule. If there is more than one EC number, they
-	 * are presented as a comma-separated list.
-	 * <p/>
-	 * ENGINEERED              Indicates that the molecule was produced using
-	 * recombinant technology or by purely chemical synthesis.
-	 * <p/>
-	 * MUTATION                Describes mutations from the wild type molecule.
-	 * <p/>
-	 * BIOLOGICAL_UNIT         If the MOLECULE functions as part of a larger
-	 * biological unit, the entire functional unit may be
-	 * described.
-	 * <p/>
-	 * OTHER_DETAILS           Additional comments.
-	 * <p/>
-	 * In the general case the PDB tends to reflect the biological/functional view of the molecule. For example, the hetero-tetramer hemoglobin molecule is treated as a discrete component in COMPND.
-	 * <p/>
-	 * In the case of synthetic molecules, e. g., hybrids, the description will be provided by the depositor.
-	 * <p/>
-	 * No specific rules apply to the ordering of the tokens, except that the occurrence of MOL_ID or FRAGMENT indicates that the subsequent tokens are related to that specific molecule or fragment of the molecule.
-	 * <p/>
-	 * Physical layout of these items may be altered by PDB staff to improve human readability of the COMPND record.
-	 * <p/>
-	 * Asterisks in nucleic acid names (in MOLECULE) are for ease of reading.
-	 * <p/>
-	 * When insertion codes are given as part of the residue name, they must be given within square brackets, i.e., H57[A]N. This might occur when listing residues in FRAGMENT, MUTATION, or OTHER_DETAILS.
-	 * <p/>
-	 * For multi-chain molecules, e.g., the hemoglobin tetramer, a comma-separated list of CHAIN identifiers is used.
-	 * <p/>
-	 * When non-blank chain identifiers occur in the entry, they must be specified.
-	 * <p/>
-	 * NULL is used to indicate blank chain identifiers. E.g., CHAIN: NULL, CHAIN: NULL, B, C.
-	 * <p/>
-	 * For enzymes, if no EC number has been assigned, "EC: NOT ASSIGNED" is used.
-	 * <p/>
-	 * ENGINEERED is followed either by "YES" or by a comment.
-	 * <p/>
-	 * For the token MUTATION, the following set of examples illustrate the conventions used by PDB to represent various types of mutations.
-	 * <p/>
-	 * MUTATION TYPE         DESCRIPTION                     FORM
-	 * ------------------------------------------------------------------------------
-	 * Simple substitution   His 57 replaced by Asn          H57N
-	 * <p/>
-	 * His 57A replaced by Asn, in
-	 * chain C only                    Chain C, H57[A]N
-	 * <p/>
-	 * Insertion             His and Pro inserted before
-	 * Lys 48                          INS(HP-K48)
-	 * <p/>
-	 * Deletion              Arg 141 of chains A and C
-	 * deleted, not deleted in
-	 * chain B                         Chain A, C, DEL(R141)
-	 * <p/>
-	 * His 23 through ARG 26 deleted   DEL(23-26)
-	 * <p/>
-	 * His 23C and Arg 26 deleted
-	 * from chain B only               Chain B, DEL(H23[C],R26)
-	 * <p/>
-	 * When there are more than ten mutations:
-	 * <p/>
-	 * - All the mutations are listed in the SEQADV record.
-	 * <p/>
-	 * - Some mutations may be listed in MUTATION in COMPND to highlight the most important ones, at the depositor's discretion.
-	 * <p/>
-	 * New tokens may be added by the PDB as needed.
-	 * <p/>
-	 * Verification/Validation/Value Authority Control
-	 * <p/>
-	 * CHAIN must match the chain identifiers(s) of the molecule(s). EC numbers are checked against the Enzyme Data Bank.
-	 * <p/>
-	 * Relationships to Other Record Types
-	 * <p/>
-	 * Each molecule given a MOL_ID in COMPND must be listed and given the biological source information in SOURCE. In the case of mutations, the SEQADV records will present differences from the reference molecule. REMARK record may further describe the contents of the entry. Also see verification above.
-	 * <p/>
-	 * Example
-	 * <p/>
-	 * 1         2         3         4         5         6         7        8
-	 * 12345678901234567890123456789012345678901234567890123456789012345678901234567890
-	 * COMPND    MOL_ID: 1;                                                    1BNJ   4
-	 * COMPND    MOL_ID: 1;                                                    1ALI   4
-	 * COMPND    MOL_ID: 1;
-	 * COMPND   2 MOLECULE: HEMOGLOBIN;
-	 * COMPND   3 CHAIN: A, B, C, D;
-	 * COMPND   4 ENGINEERED: YES;
-	 * COMPND   5 MUTATION: CHAIN B, D, V1A;
-	 * COMPND   6 BIOLOGICAL_UNIT: HEMOGLOBIN EXISTS AS AN A1B1/A2B2
-	 * COMPND   7 TETRAMER;
-	 * COMPND   8 OTHER_DETAILS: DEOXY FORM
-	 * <p/>
-	 * COMPND    MOL_ID: 1;
-	 * COMPND   2 MOLECULE: COWPEA CHLOROTIC MOTTLE VIRUS;
-	 * COMPND   3 CHAIN: A, B, C;
-	 * COMPND   4 SYNONYM: CCMV;
-	 * COMPND   5 MOL_ID: 2;
-	 * COMPND   6 MOLECULE: RNA (5'-(*AP*UP*AP*U)-3');
-	 * COMPND   7 CHAIN: D, F;
-	 * COMPND   8 ENGINEERED: YES;
-	 * COMPND   9 MOL_ID: 3;
-	 * COMPND  10 MOLECULE: RNA (5'-(*AP*U)-3');
-	 * COMPND  11 CHAIN: E;
-	 * COMPND  12 ENGINEERED: YES
-	 * <p/>
-	 * COMPND    MOL_ID: 1;
-	 * COMPND   2 MOLECULE: HEVAMINE A;
-	 * COMPND   3 CHAIN: NULL;
-	 * COMPND   4 EC: 3.2.1.14, 3.2.1.17;
-	 * COMPND   5 OTHER_DETAILS: PLANT ENDOCHITINASE/LYSOZYME
+	 * This should not be accessed directly, other than by </code>makeCompounds</code>. It still deals with the same
+	 * lines in a similar manner but if not accessed from </code>makeCompounds</code> the last element will be
+	 * missing. Don't say I didn't warn you.
+	 *
+	 * @param line
 	 */
-
 	private void pdb_COMPND_Handler(String line) {
 
+		String continuationNr = line.substring(9, 10).trim();
 		if (DEBUG) {
-			//System.out.println("current continuationNo     is " + continuationNo);
-			System.out.println("previousContinuationField  is " + previousContinuationField);
-			System.out.println("current continuationField  is " + continuationField);
-			System.out.println("current continuationString is " + continuationString);
-			System.out.println("current compound           is " + current_compound);
+			System.out.println("current continuationNo     is "
+					+ continuationNr);
+			System.out.println("previousContinuationField  is "
+					+ previousContinuationField);
+			System.out.println("current continuationField  is "
+					+ continuationField);
+			System.out.println("current continuationString is "
+					+ continuationString);
+			System.out.println("current compound           is "
+					+ current_compound);
 		}
-		
 
-		String continuationNr = line.substring(9,10).trim();
-		
 		// in some PDB files the line ends with the PDB code and a serial number, chop those off!
-		if (line.length() > 72){
-			line = line.substring(0,72);
+		if (line.length() > 72) {
+			line = line.substring(0, 72);
 		}
-		
+
 		//String beginningOfLine = line.substring(0, 10);
 		//line = line.replace(beginningOfLine, "");
-		line = line.substring(10,line.length());
-		
-		
+		line = line.substring(10, line.length());
+
 		if (DEBUG) {
-			System.out.println("LINE: >"+line+"<");
+			System.out.println("LINE: >" + line + "<");
 		}
 		String[] fieldList = line.split("\\s+");
 
-		if (!fieldList[0].equals("") && compndFieldValues.contains(fieldList[0])) {
-//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[0] + "'");
+		if (!fieldList[0].equals("")
+				&& compndFieldValues.contains(fieldList[0])) {
+			//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[0] + "'");
 			continuationField = fieldList[0];
 			if (previousContinuationField.equals("")) {
 				previousContinuationField = continuationField;
 			}
 
 		} else if (compndFieldValues.contains(fieldList[1])) {
-//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[1] + "'");
+			//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[1] + "'");
 			continuationField = fieldList[1];
-			if ( previousContinuationField.equals("")) {
+			if (previousContinuationField.equals("")) {
 				previousContinuationField = continuationField;
 			}
 
 		} else {
-			if ( continuationNr.equals("")){
+			if (continuationNr.equals("")) {
 				if (DEBUG) {
 					System.out.println("looks like an old PDB file");
 				}
-				continuationField = "MOLECULE:";	
-				if ( previousContinuationField.equals("")) {
+				continuationField = "MOLECULE:";
+				if (previousContinuationField.equals("")) {
 					previousContinuationField = continuationField;
 				}
 			}
-			
+
 		}
 
 		line = line.replace(continuationField, "").trim();
 
 		StringTokenizer compndTokens = new StringTokenizer(line);
 
-//		System.out.println("PDBFileParser.pdb_COMPND_Handler: Tokenizing '" + line + "'");
+		//		System.out.println("PDBFileParser.pdb_COMPND_Handler: Tokenizing '" + line + "'");
 
-		while (compndTokens.hasMoreTokens ()) {
+		while (compndTokens.hasMoreTokens()) {
 			String token = compndTokens.nextToken();
 
 			if (previousContinuationField.equals("")) {
 				previousContinuationField = continuationField;
 			}
 
-			if (previousContinuationField.equals(continuationField) && compndFieldValues.contains(continuationField)) {
-				if (DEBUG)
+			if (previousContinuationField.equals(continuationField)
+					&& compndFieldValues.contains(continuationField)) {
+				if (DEBUG) {
 					System.out.println("Still in field " + continuationField);
-
+					System.out.println("token = " + token);
+				}
 				continuationString = continuationString.concat(token + " ");
-				if (DEBUG)
-					System.out.println("continuationString = " + continuationString);
+				if (DEBUG) {
+					System.out.println("continuationString = "
+							+ continuationString);
+				}
 			}
 			if (!continuationField.equals(previousContinuationField)) {
 
@@ -1186,7 +1071,8 @@ public class PDBFileParser  {
 
 				} else {
 
-					compndValueSetter(previousContinuationField, continuationString);
+					compndValueSetter(previousContinuationField,
+							continuationString);
 					previousContinuationField = continuationField;
 					continuationString = token + " ";
 				}
@@ -1194,9 +1080,15 @@ public class PDBFileParser  {
 				// this field shall be ignored
 				//continuationField = token;
 			}
-		}		
+		}
+		if (isLastCompndLine) {
+			// final line in the section - finish off the compound
+			//			System.out.println("[pdb_COMPND_Handler] Final COMPND line - Finishing off final MolID header.");
+			compndValueSetter(continuationField, continuationString);
+			continuationString = "";
+			compounds.add(current_compound);
+		}
 	}
-
 
 	/** set the value in the currrent molId object
 	 * 
@@ -1209,8 +1101,9 @@ public class PDBFileParser  {
 		if (field.equals("MOL_ID:")) {
 
 			//todo: find out why an extra mol or chain gets added  and why 1H1J, 1J1H ATOM records are missing, but not 1H1H....
-			if ( DEBUG )
-				System.out.println("molTypeCounter " + molTypeCounter+ " "+ value);
+			if (DEBUG)
+				System.out.println("molTypeCounter " + molTypeCounter + " "
+						+ value);
 			if (molTypeCounter != Integer.valueOf(value)) {
 				molTypeCounter++;
 
@@ -1232,14 +1125,13 @@ public class PDBFileParser  {
 			List<String> chains = new ArrayList<String>();
 
 			while (chainTokens.hasMoreTokens()) {
-				String chainID =chainTokens.nextToken().trim();
+				String chainID = chainTokens.nextToken().trim();
 				// NULL is used in old PDB files to represent empty chain DI
-				if ( chainID.equals("NULL"))
+				if (chainID.equals("NULL"))
 					chainID = " ";
 				chains.add(chainID);
 			}
-			current_compound.setChainId(chains);            
-
+			current_compound.setChainId(chains);
 
 		}
 		if (field.equals("SYNONYM:")) {
@@ -1293,10 +1185,7 @@ public class PDBFileParser  {
 
 		}
 
-
-
 	}
-
 
 
 	/** Handler for
@@ -1315,135 +1204,193 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 	 */
 	private void pdb_SOURCE_Handler(String line) {
+		// works in the same way as the pdb_COMPND_Handler.
+		boolean sourceDebug = false;
 
+		String continuationNr = line.substring(9, 10).trim();
 
-		// this is horrible! The order of the handlers have to be maintained and 
-		//this method actually finishes off the
-		//  job of the COMPND_Handler. :(
-		try {
-
-
-			if (compounds.size() < Integer.valueOf(current_compound.getMolId())) {
-//				System.out.println("Finishing off final MolID header.");
-				compndValueSetter(continuationField, continuationString);
-				continuationString = "";   
-				compounds.add(current_compound.clone());
-			}
-
-			if ( ! continuationString.equals("")){
-				if (DEBUG) {
-					System.out.println("continuationString is not empty. " + current_compound);
-				}
-				// looks like an old style PDB file header
-				if ( current_compound.getMolId().equals("0") ) {
-					if (DEBUG){
-						System.out.println("looks like an old PDB file header");
-					}
-					current_compound.setMolName(continuationString);
-					compounds.add(current_compound);
-				}
-				continuationString = "";   
-			}
-
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		if (sourceDebug) {
+			System.out.println("current continuationNo     is "
+					+ continuationNr);
+			System.out.println("previousContinuationField  is "
+					+ previousContinuationField);
+			System.out.println("current continuationField  is "
+					+ continuationField);
+			System.out.println("current continuationString is "
+					+ continuationString);
+			System.out.println("current compound           is "
+					+ current_compound);
 		}
 
-		int molTypeCounter = 0;
+		// in some PDB files the line ends with the PDB code and a serial number, chop those off!
+		if (line.length() > 72) {
+			line = line.substring(0, 72);
+		}
 
-		// ignore trailing bits of data in PDB file format < v3.0      
-		String data = line.substring(0,70);
+		line = line.substring(10, line.length());
 
-		//System.out.println("Parsing: "+ line);
-		StringTokenizer sourceTokens = new StringTokenizer(data);
-		while (sourceTokens.hasMoreTokens()) {
-			String code = sourceTokens.nextToken();
-			String[] values = data.split(":");
-			int valueLength = values.length;
-			String value = values[valueLength - 1].trim().replace(";", "");
-			//System.out.println(lineTokens.countTokens()  + " " + value);
+		if (sourceDebug) {
+			System.out.println("LINE: >" + line + "<");
+		}
+		String[] fieldList = line.split("\\s+");
 
-			if (code.equals("MOL_ID:")) {
-				if (molTypeCounter != Integer.valueOf(value)) {
-
-					//System.out.println("New MOL!!!");
-
-					for (Compound molId : compounds) {
-						if (molId.getMolId().equals(value)) {
-							current_compound = molId;
-						}
-					}
-					//System.out.println("Setting current_molId to :" + current_molId.getMolId());
-					molTypeCounter++;
-
-				}
-
-				//current_molId.showSource();
+		if (!fieldList[0].equals("")
+				&& sourceFieldValues.contains(fieldList[0])) {
+			//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[0] + "'");
+			continuationField = fieldList[0];
+			if (previousContinuationField.equals("")) {
+				previousContinuationField = continuationField;
 			}
-			if (code.equals("SYNTHETIC:")) {
-				current_compound.setSynthetic(value);
-			} else if (code.equals("FRAGMENT:")) {
-				current_compound.setFragment(value);
-			} else if (code.equals("ORGANISM_SCIENTIFIC:")) {
-				current_compound.setOrganismScientific(value);
-			} else if (code.equals("ORGANISM_COMMON:")) {
-				current_compound.setOrganismCommon(value);
-			} else if (code.equals("STRAIN:")) {  
-				current_compound.setStrain(value);
-			} else if (code.equals("VARIANT:")) {
-				current_compound.setVariant(value);
-			} else if (code.equals("CELL_LINE:")) {
-				current_compound.setCellLine(value);
-			} else if (code.equals("ATCC:")) {
-				current_compound.setAtcc(value);
-			} else if (code.equals("ORGAN:")) {
-				current_compound.setOrgan(value);
-			} else if (code.equals("TISSUE:")) {
-				current_compound.setTissue(value);
-			} else if (code.equals("CELL:")) {
-				current_compound.setCell(value);
-			} else if (code.equals("ORGANELLE:")) {
-				current_compound.setOrganelle(value);
-			} else if (code.equals("SECRETION:")) {
-				current_compound.setSecretion(value);
-			} else if (code.equals("GENE:")) {
-				current_compound.setGene(value);
-			} else if (code.equals("CELLULAR_LOCATION:")) {
-				current_compound.setCellularLocation(value);
-			} else if (code.equals("EXPRESSION_SYSTEM:")) {
-				current_compound.setExpressionSystem(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_STRAIN:")) {
-				current_compound.setExpressionSystemStrain(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_VARIANT:")) {
-				current_compound.setExpressionSystemVariant(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_CELL_LINE:")) {
-				current_compound.setExpressionSystemCellLine(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_ATCC_NUMBER:")) {
-				current_compound.setExpressionSystemAtccNumber(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_ORGAN:")) {
-				current_compound.setExpressionSystemOrgan(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_TISSUE:")) {
-				current_compound.setExpressionSystemTissue(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_CELL:")) {
-				current_compound.setExpressionSystemCell(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_ORGANELLE:")) {
-				current_compound.setExpressionSystemOrganelle(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_CELLULAR_LOCATION:")) {
-				current_compound.setExpressionSystemCellularLocation(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_VECTOR_TYPE:")) {
-				current_compound.setExpressionSystemVectorType(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_VECTOR:")) {
-				current_compound.setExpressionSystemVector(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_PLASMID:")) {
-				current_compound.setExpressionSystemPlasmid(value);
-			} else if (code.equals("EXPRESSION_SYSTEM_GENE:")) {
-				current_compound.setExpressionSystemGene(value);
-			} else if (code.equals("OTHER_DETAILS:")) {
-				current_compound.setExpressionSystemOtherDetails(value);
+
+		} else if ((fieldList.length > 1) && ( sourceFieldValues.contains(fieldList[1]))) {
+			//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[1] + "'");
+			continuationField = fieldList[1];
+			if (previousContinuationField.equals("")) {
+				previousContinuationField = continuationField;
+			}
+
+		} else {
+			if (continuationNr.equals("")) {
+				if (sourceDebug) {
+					System.out.println("looks like an old PDB file");
+				}
+				continuationField = "MOLECULE:";
+				if (previousContinuationField.equals("")) {
+					previousContinuationField = continuationField;
+				}
 			}
 
 		}
-//		System.out.println("PDBFileParser.pdb_SOURCE_Handler: END");
+
+		line = line.replace(continuationField, "").trim();
+
+		StringTokenizer compndTokens = new StringTokenizer(line);
+
+		//		System.out.println("PDBFileParser.pdb_COMPND_Handler: Tokenizing '" + line + "'");
+
+		while (compndTokens.hasMoreTokens()) {
+			String token = compndTokens.nextToken();
+
+			if (previousContinuationField.equals("")) {
+				//				System.out.println("previousContinuationField is empty. Setting to : " + continuationField);
+				previousContinuationField = continuationField;
+			}
+
+			if (previousContinuationField.equals(continuationField)
+					&& sourceFieldValues.contains(continuationField)) {
+				if (sourceDebug)
+					System.out.println("Still in field " + continuationField);
+
+				continuationString = continuationString.concat(token + " ");
+				if (sourceDebug)
+					System.out.println("continuationString = "
+							+ continuationString);
+			}
+			if (!continuationField.equals(previousContinuationField)) {
+
+				if (continuationString.equals("")) {
+					continuationString = token;
+
+				} else {
+
+					sourceValueSetter(previousContinuationField,
+							continuationString);
+					previousContinuationField = continuationField;
+					continuationString = token + " ";
+				}
+			} else if (ignoreCompndFieldValues.contains(token)) {
+				// this field shall be ignored
+				//continuationField = token;
+			}
+		}
+		if (isLastSourceLine) {
+			// final line in the section - finish off the compound
+			//			System.out.println("[pdb_SOURCE_Handler] Final SOURCE line - Finishing off final MolID header.");
+			sourceValueSetter(continuationField, continuationString);
+			continuationString = "";
+			//compounds.add(current_compound);
+		}
+
+	}
+
+
+	/** set the value in the currrent molId object
+	 *
+	 * @param field
+	 * @param value
+	 */
+	private void sourceValueSetter(String field, String value) {
+
+		value = value.trim().replace(";", "");
+		//		System.out.println("[sourceValueSetter] " + field);
+		if (field.equals("MOL_ID:")) {
+
+			current_compound = compounds.get(Integer.valueOf(value) - 1);
+			//			System.out.println("[sourceValueSetter] Fetching compound " + value + " " + current_compound.getMolId());
+
+		}
+		if (field.equals("SYNTHETIC:")) {
+			current_compound.setSynthetic(value);
+		} else if (field.equals("FRAGMENT:")) {
+			current_compound.setFragment(value);
+		} else if (field.equals("ORGANISM_SCIENTIFIC:")) {
+			current_compound.setOrganismScientific(value);
+		} else if (field.equals("ORGANISM_COMMON:")) {
+			current_compound.setOrganismCommon(value);
+		} else if (field.equals("STRAIN:")) {
+			current_compound.setStrain(value);
+		} else if (field.equals("VARIANT:")) {
+			current_compound.setVariant(value);
+		} else if (field.equals("CELL_LINE:")) {
+			current_compound.setCellLine(value);
+		} else if (field.equals("ATCC:")) {
+			current_compound.setAtcc(value);
+		} else if (field.equals("ORGAN:")) {
+			current_compound.setOrgan(value);
+		} else if (field.equals("TISSUE:")) {
+			current_compound.setTissue(value);
+		} else if (field.equals("CELL:")) {
+			current_compound.setCell(value);
+		} else if (field.equals("ORGANELLE:")) {
+			current_compound.setOrganelle(value);
+		} else if (field.equals("SECRETION:")) {
+			current_compound.setSecretion(value);
+		} else if (field.equals("GENE:")) {
+			current_compound.setGene(value);
+		} else if (field.equals("CELLULAR_LOCATION:")) {
+			current_compound.setCellularLocation(value);
+		} else if (field.equals("EXPRESSION_SYSTEM:")) {
+			current_compound.setExpressionSystem(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_STRAIN:")) {
+			current_compound.setExpressionSystemStrain(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_VARIANT:")) {
+			current_compound.setExpressionSystemVariant(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_CELL_LINE:")) {
+			current_compound.setExpressionSystemCellLine(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_ATCC_NUMBER:")) {
+			current_compound.setExpressionSystemAtccNumber(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_ORGAN:")) {
+			current_compound.setExpressionSystemOrgan(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_TISSUE:")) {
+			current_compound.setExpressionSystemTissue(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_CELL:")) {
+			current_compound.setExpressionSystemCell(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_ORGANELLE:")) {
+			current_compound.setExpressionSystemOrganelle(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_CELLULAR_LOCATION:")) {
+			current_compound.setExpressionSystemCellularLocation(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_VECTOR_TYPE:")) {
+			current_compound.setExpressionSystemVectorType(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_VECTOR:")) {
+			current_compound.setExpressionSystemVector(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_PLASMID:")) {
+			current_compound.setExpressionSystemPlasmid(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_GENE:")) {
+			current_compound.setExpressionSystemGene(value);
+		} else if (field.equals("OTHER_DETAILS:")) {
+			current_compound.setExpressionSystemOtherDetails(value);
+		}
+
 	}
 
 
@@ -2091,6 +2038,10 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		continuationField = "";
 		continuationString = "";
 		current_compound = new Compound();
+		sourceLines.clear();
+		compndLines.clear();
+		isLastCompndLine = false;
+		isLastSourceLine = false;		
 		molTypeCounter = 1;
 		compounds.clear();
 		helixList.clear();
@@ -2154,20 +2105,34 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 				//System.out.println(recordName);
 
 				try {
-					if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler  ( line );
-					else if ( recordName.equals("SEQRES")) pdb_SEQRES_Handler( line );
-					else if ( recordName.equals("HETATM")) pdb_ATOM_Handler  ( line );
-					else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler ( line );
-					else if ( recordName.equals("HEADER")) pdb_HEADER_Handler( line );
-					else if ( recordName.equals("TITLE") ) pdb_TITLE_Handler ( line );
-					else if ( recordName.equals("SOURCE")) pdb_SOURCE_Handler( line );
-					else if ( recordName.equals("COMPND")) pdb_COMPND_Handler( line );
-					else if ( recordName.equals("EXPDTA")) pdb_EXPDTA_Handler( line );
-					else if ( recordName.equals("REMARK")) pdb_REMARK_Handler( line );
-					else if ( recordName.equals("CONECT")) pdb_CONECT_Handler( line );
-					else if ( recordName.equals("REVDAT")) pdb_REVDAT_Handler( line );
-					else if ( recordName.equals("DBREF" )) pdb_DBREF_Handler ( line );
-					else if ( recordName.equals("SSBOND")) pdb_SSBOND_Handler( line );
+					if (recordName.equals("ATOM"))
+						pdb_ATOM_Handler(line);
+					else if (recordName.equals("SEQRES"))
+						pdb_SEQRES_Handler(line);
+					else if (recordName.equals("HETATM"))
+						pdb_ATOM_Handler(line);
+					else if (recordName.equals("MODEL"))
+						pdb_MODEL_Handler(line);
+					else if (recordName.equals("HEADER"))
+						pdb_HEADER_Handler(line);
+					else if (recordName.equals("TITLE"))
+						pdb_TITLE_Handler(line);
+					else if (recordName.equals("SOURCE"))
+						sourceLines.add(line); //pdb_SOURCE_Handler
+					else if (recordName.equals("COMPND"))
+						compndLines.add(line); //pdb_COMPND_Handler
+					else if (recordName.equals("EXPDTA"))
+						pdb_EXPDTA_Handler(line);
+					else if (recordName.equals("REMARK"))
+						pdb_REMARK_Handler(line);
+					else if (recordName.equals("CONECT"))
+						pdb_CONECT_Handler(line);
+					else if (recordName.equals("REVDAT"))
+						pdb_REVDAT_Handler(line);
+					else if (recordName.equals("DBREF"))
+						pdb_DBREF_Handler(line);
+					else if (recordName.equals("SSBOND"))
+						pdb_SSBOND_Handler(line);
 					else if ( parseSecStruc) {
 						if ( recordName.equals("HELIX") ) pdb_HELIX_Handler (  line ) ;
 						else if (recordName.equals("SHEET")) pdb_SHEET_Handler(line ) ;
@@ -2185,6 +2150,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 				line = buf.readLine ();
 			}
 
+			makeCompounds(compndLines, sourceLines);
+
 			triggerEndFileChecks();
 
 		} catch (Exception e) {
@@ -2200,6 +2167,42 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		return structure;
 
 	}
+
+	/**
+	 * This is the new method for building the COMPND and SOURCE records. Now each method is self-contained.
+	 * @author Jules Jacobsen
+	 * @param  compoundList
+	 * @param  sourceList
+	 */
+	private void makeCompounds(List<String> compoundList,
+			List<String> sourceList) {
+		//		System.out.println("[makeCompounds] making compounds from compoundLines");
+
+		for (String line : compoundList) {
+			if (compoundList.indexOf(line) + 1 == compoundList.size()) {
+				//				System.out.println("[makeCompounds] Final line in compoundLines.");
+				isLastCompndLine = true;
+			}
+			pdb_COMPND_Handler(line);
+
+		}
+		//		System.out.println("[makeCompounds] adding sources to compounds from sourceLines");
+		// since we're starting again from the first compound, reset it here
+		if ( compounds.size() == 0){
+			current_compound = new Compound();
+		} else {
+			current_compound = compounds.get(0);
+		}
+		for (String line : sourceList) {
+			if (sourceList.indexOf(line) + 1 == sourceList.size()) {
+				//				System.out.println("[makeCompounds] Final line in sourceLines.");
+				isLastSourceLine = true;
+			}
+			pdb_SOURCE_Handler(line);
+		}
+
+	}
+
 
 	private void triggerEndFileChecks(){
 
