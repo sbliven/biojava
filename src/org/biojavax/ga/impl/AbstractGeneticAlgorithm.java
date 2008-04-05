@@ -52,49 +52,42 @@ public abstract class AbstractGeneticAlgorithm extends AbstractChangeable
 		population = new SimplePopulation();
 	}
 
-	public final void setPopulation(Population pop) throws ChangeVetoException {
-		if (!hasListeners()) {
-			population = pop;
-			for (Iterator i = population.getOrganisms().iterator(); i.hasNext();) {
-				Organism o = (Organism) i.next();
-				if (fit != null) o.setFitness(fit.fitness(o, population, this));
-			}
-		} else {
-			ChangeEvent ce = new ChangeEvent(this, GeneticAlgorithm.POPULATION, pop,
-			    this.population);
-			ChangeSupport changeSupport = super
-			    .getChangeSupport(GeneticAlgorithm.POPULATION);
-			synchronized (changeSupport) {
-				changeSupport.firePreChangeEvent(ce);
-				population = pop;
-				changeSupport.firePostChangeEvent(ce);
-			}
-		}
+	public final CrossOverFunction getCrossOverFunction() {
+		return crossF;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.biojavax.ga.GeneticAlgorithm#getFitnessFunction()
+	 */
+	public FitnessFunction getFitnessFunction() {
+		return fit;
+	}
+
+	public final MutationFunction getMutationFunction() {
+		return mutF;
 	}
 
 	public final Population getPopulation() {
 		return population;
 	}
 
-	public final void setSelectionFunction(SelectionFunction function)
-	    throws ChangeVetoException {
-		if (!hasListeners()) {
-			this.selectF = function;
-		} else {
-			ChangeEvent ce = new ChangeEvent(this, GeneticAlgorithm.POPULATION,
-			    function, this.selectF);
-			ChangeSupport changeSupport = super
-			    .getChangeSupport(GeneticAlgorithm.POPULATION);
-			synchronized (changeSupport) {
-				changeSupport.firePreChangeEvent(ce);
-				this.selectF = function;
-				changeSupport.firePostChangeEvent(ce);
-			}
-		}
-	}
-
 	public final SelectionFunction getSelectionFunction() {
 		return selectF;
+	}
+
+	/**
+	 * Assigns a fitness value to each organism within the population according to
+	 * the currently set fitness function. If no population or no fitness function
+	 * is set, nothing will happen.
+	 */
+	public void initPopulation() {
+		if ((population != null) && (fit != null))
+		  for (Iterator i = population.getOrganisms().iterator(); i.hasNext();) {
+			  Organism o = (Organism) i.next();
+			  o.setFitness(fit.fitness(o, population, this));
+		  }
 	}
 
 	public final void setCrossOverFunction(CrossOverFunction function)
@@ -114,8 +107,27 @@ public abstract class AbstractGeneticAlgorithm extends AbstractChangeable
 		}
 	}
 
-	public final CrossOverFunction getCrossOverFunction() {
-		return crossF;
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.biojavax.ga.GeneticAlgorithm#setFitnessFunction(org.biojavax.ga.functions.FitnessFunction)
+	 */
+	public final void setFitnessFunction(FitnessFunction func)
+	    throws ChangeVetoException {
+		if (!hasListeners()) {
+			fit = func;
+			initPopulation();
+		} else {
+			ChangeEvent ce = new ChangeEvent(this, GeneticAlgorithm.FITNESS_FUNCTION,
+			    func, fit);
+			ChangeSupport changeSupport = super
+			    .getChangeSupport(GeneticAlgorithm.FITNESS_FUNCTION);
+			synchronized (changeSupport) {
+				changeSupport.firePreChangeEvent(ce);
+				fit = func;
+				changeSupport.firePostChangeEvent(ce);
+			}
+		}
 	}
 
 	public final void setMutationFunction(MutationFunction function)
@@ -135,40 +147,35 @@ public abstract class AbstractGeneticAlgorithm extends AbstractChangeable
 		}
 	}
 
-	public final MutationFunction getMutationFunction() {
-		return mutF;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.biojavax.ga.GeneticAlgorithm#getFitnessFunction()
-	 */
-	public FitnessFunction getFitnessFunction() {
-		return fit;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.biojavax.ga.GeneticAlgorithm#setFitnessFunction(org.biojavax.ga.functions.FitnessFunction)
-	 */
-	public final void setFitnessFunction(FitnessFunction func)
-	    throws ChangeVetoException {
+	public final void setPopulation(Population pop) throws ChangeVetoException {
 		if (!hasListeners()) {
-			fit = func;
-			for (Iterator i = population.getOrganisms().iterator(); i.hasNext();) {
-				Organism o = (Organism) i.next();
-				if (population != null) o.setFitness(fit.fitness(o, population, this));
-			}
+			population = pop;
+			initPopulation();
 		} else {
-			ChangeEvent ce = new ChangeEvent(this, GeneticAlgorithm.FITNESS_FUNCTION,
-			    func, fit);
+			ChangeEvent ce = new ChangeEvent(this, GeneticAlgorithm.POPULATION, pop,
+			    this.population);
 			ChangeSupport changeSupport = super
-			    .getChangeSupport(GeneticAlgorithm.FITNESS_FUNCTION);
+			    .getChangeSupport(GeneticAlgorithm.POPULATION);
 			synchronized (changeSupport) {
 				changeSupport.firePreChangeEvent(ce);
-				fit = func;
+				population = pop;
+				changeSupport.firePostChangeEvent(ce);
+			}
+		}
+	}
+
+	public final void setSelectionFunction(SelectionFunction function)
+	    throws ChangeVetoException {
+		if (!hasListeners()) {
+			this.selectF = function;
+		} else {
+			ChangeEvent ce = new ChangeEvent(this, GeneticAlgorithm.POPULATION,
+			    function, this.selectF);
+			ChangeSupport changeSupport = super
+			    .getChangeSupport(GeneticAlgorithm.POPULATION);
+			synchronized (changeSupport) {
+				changeSupport.firePreChangeEvent(ce);
+				this.selectF = function;
 				changeSupport.firePostChangeEvent(ce);
 			}
 		}
