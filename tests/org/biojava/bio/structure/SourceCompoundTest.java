@@ -28,7 +28,7 @@ import org.biojava.bio.structure.io.PDBFileParser;
 
 import junit.framework.TestCase;
 
-public class SourceCompoundTests extends TestCase{
+public class SourceCompoundTest extends TestCase{
 
 	private Structure getStructure(String fileName){
 
