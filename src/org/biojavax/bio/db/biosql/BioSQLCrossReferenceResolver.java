@@ -102,7 +102,7 @@ public class BioSQLCrossReferenceResolver implements CrossReferenceResolver {
             query = this.setParameter.invoke(query, new Object[]{new Integer(1), cr.getAccession()}); 
             query = this.setParameter.invoke(query, new Object[]{new Integer(2), new Integer(cr.getVersion())}); 
             // Get the results
-            Object result = this.uniqueResult.invoke(query, null);
+            Object result = this.uniqueResult.invoke(query, (Object[])null);
             // Return the found object, if found - null if not.
             return (BioEntry)result;
         } catch (Exception e) {

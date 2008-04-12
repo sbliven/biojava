@@ -967,10 +967,10 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
                 // Conjunction of criteria for each member of the query location.
                 Collection members = RichLocation.Tools.flatten(loc);
                 // some combo of Tools.flatten(loc), min(loc.start,feat.start) and min(loc.end,feat.end)
-                Object parentConjunct = this.conjunction.invoke(null,null);
+                Object parentConjunct = this.conjunction.invoke((Object[])null,(Object[])null);
                 for (Iterator i = members.iterator(); i.hasNext(); ) {
                     RichLocation loc = (RichLocation)i.next();
-                    Object childDisjunct = this.disjunction.invoke(null,null);
+                    Object childDisjunct = this.disjunction.invoke((Object[])null,(Object[])null);
                     // for each member, find features that have start>=member.start,
                     // end<=member.end and strand=member.strand and crossref=member.crossref
                     this.disjunctAdd.invoke(childDisjunct,new Object[]{this.eq.invoke(null, new Object[]{"l.strandNum",new Integer(loc.getStrand().intValue())})});
@@ -1123,10 +1123,10 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
                 // Conjunction of criteria for each member of the query location.
                 Collection members = RichLocation.Tools.flatten(loc);
                 // some combo of Tools.flatten(loc), min(loc.start,feat.start) and min(loc.end,feat.end)
-                Object parentConjunct = this.conjunction.invoke(null,null);
+                Object parentConjunct = this.conjunction.invoke((Object[])null,(Object[])null);
                 for (Iterator i = members.iterator(); i.hasNext(); ) {
                     RichLocation loc = (RichLocation)i.next();
-                    Object childDisjunct = this.disjunction.invoke(null,null);
+                    Object childDisjunct = this.disjunction.invoke((Object[])null,(Object[])null);
                     // for each member, find features that have start<=member.end,  end>=member.start,
                     // strand=member.strand and crossref=member.crossref
                     this.disjunctAdd.invoke(childDisjunct,new Object[]{this.eq.invoke(null, new Object[]{"l.strandNum",new Integer(loc.getStrand().intValue())})});
@@ -1199,7 +1199,7 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         
         public Object asCriterion() {
             try {
-                Object conjunct = this.conjunction.invoke(null,null);
+                Object conjunct = this.conjunction.invoke((Object[])null,(Object[])null);
                 this.conjunctAdd.invoke(conjunct,new Object[]{this.eq.invoke(null, new Object[]{"n.term",note.getTerm()})});
                 this.conjunctAdd.invoke(conjunct,new Object[]{this.eq.invoke(null, new Object[]{"n.value",note.getValue()})});
                 this.conjunctAdd.invoke(conjunct,new Object[]{this.eq.invoke(null, new Object[]{"n.rank",new Integer(note.getRank())})});

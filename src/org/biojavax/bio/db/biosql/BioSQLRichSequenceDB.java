@@ -135,7 +135,7 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
                 String alias = (String)aliases.get(property);
                 this.createAlias.invoke(criteria,new Object[]{property,alias});
             }
-            List cats = (List)this.listCriteria.invoke(criteria, null);
+            List cats = (List)this.listCriteria.invoke(criteria, (Object[])null);
             for (Iterator i = cats.iterator(); i.hasNext(); ) results.addFeature((Feature)i.next());
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -172,7 +172,7 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
             String queryText = "select distinct name from Sequence";
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             // Get the results
-            List result = (List)this.list.invoke(query, null);
+            List result = (List)this.list.invoke(query, (Object[])null);
             // Return the found object, if found - null if not.
             return new HashSet(result);
         } catch (Exception e) {
@@ -201,7 +201,7 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
             // Set the parameters
             query = this.setParameter.invoke(query, new Object[]{new Integer(0), id});
             // Get the results
-            List result = (List)this.list.invoke(query, null);
+            List result = (List)this.list.invoke(query,(Object[]) null);
             // If the result doesn't just have a single entry, throw an exception
             if (result.size()==0) throw new IllegalIDException("Id not found: "+id);
             else if (result.size()>1) throw new IllegalIDException("Multiple records found with that id - use getRichSequences: "+id);
@@ -228,7 +228,7 @@ public class BioSQLRichSequenceDB extends AbstractRichSequenceDB {
                 // Set the parameters
                 query = this.setParameter.invoke(query, new Object[]{new Integer(0), id});
                 // Get the results
-                List result = (List)this.list.invoke(query, null);
+                List result = (List)this.list.invoke(query,(Object[]) null);
                 // If the result doesn't just have a single entry, throw an exception
                 if (result.size()==0) throw new IllegalIDException("Id not found: "+id);
                 // Add the results to the results db.

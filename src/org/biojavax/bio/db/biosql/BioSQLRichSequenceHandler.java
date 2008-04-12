@@ -162,7 +162,7 @@ public class BioSQLRichSequenceHandler extends DummyRichSequenceHandler {
             query = this.setParameter.invoke(query, new Object[]{new Integer(0), seq.getNamespace()});
             query = this.setParameter.invoke(query, new Object[]{new Integer(1), seq.getName()});
             // Get the results
-            Object result = this.uniqueResult.invoke(query, null);
+            Object result = this.uniqueResult.invoke(query,(Object[]) null);
             // Return the found object, if found - null if not.
             return (String)result;
         } catch (Exception e) {
@@ -183,7 +183,7 @@ public class BioSQLRichSequenceHandler extends DummyRichSequenceHandler {
             query = this.setParameter.invoke(query, new Object[]{new Integer(2), seq.getNamespace()});
             query = this.setParameter.invoke(query, new Object[]{new Integer(3), seq.getName()});
             // Get the results
-            Object result = this.uniqueResult.invoke(query, null);
+            Object result = this.uniqueResult.invoke(query,(Object[]) null);
             // Return the found object, if found - null if not.
             return (String)result;
         } catch (Exception e) {

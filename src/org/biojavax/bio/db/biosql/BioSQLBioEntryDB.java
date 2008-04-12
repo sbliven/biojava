@@ -102,7 +102,7 @@ public class BioSQLBioEntryDB extends AbstractBioEntryDB {
             String queryText = "select distinct name from BioEntry";
             Object query = this.createQuery.invoke(this.session, new Object[]{queryText});
             // Get the results
-            List result = (List)this.list.invoke(query, null);
+            List result = (List)this.list.invoke(query, (Object[])null);
             // Return the found object, if found - null if not.
             return new HashSet(result);
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class BioSQLBioEntryDB extends AbstractBioEntryDB {
             // Set the parameters
             query = this.setParameter.invoke(query, new Object[]{new Integer(0), id});
             // Get the results
-            List result = (List)this.list.invoke(query, null);
+            List result = (List)this.list.invoke(query, (Object[])null);
             // If the result doesn't just have a single entry, throw an exception
             if (result.size()==0) throw new IllegalIDException("Id not found: "+id);
             else if (result.size()>1) throw new IllegalIDException("Multiple records found with that id - use getBioEntrys: "+id);
@@ -146,7 +146,7 @@ public class BioSQLBioEntryDB extends AbstractBioEntryDB {
                 // Set the parameters
                 query = this.setParameter.invoke(query, new Object[]{new Integer(0), id});
                 // Get the results
-                List result = (List)this.list.invoke(query, null);
+                List result = (List)this.list.invoke(query, (Object[])null);
                 // If the result doesn't just have a single entry, throw an exception
                 if (result.size()==0) throw new IllegalIDException("Id not found: "+id);
                 // Add the results to the results db.

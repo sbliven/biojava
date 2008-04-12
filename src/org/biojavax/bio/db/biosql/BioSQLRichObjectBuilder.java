@@ -130,7 +130,7 @@ public class BioSQLRichObjectBuilder implements RichObjectBuilder {
                 query = this.setParameter.invoke(query, new Object[]{new Integer(i), ourParamsList.get(i)});
             }
             // Get the results
-            Object result = this.uniqueResult.invoke(query, null);
+            Object result = this.uniqueResult.invoke(query, (Object[])null);
             // Return the found object, if found
             if (result!=null) return result;
             // Create, persist and return the new object otherwise
