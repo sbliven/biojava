@@ -45,7 +45,7 @@ public interface Organism extends Changeable {
 	 * multi-objective optimization it is necessary to store multiple fitness
 	 * values.
 	 *
-	 * @return
+	 * @return the fitness of the organism
 	 */
 	public double[] getFitness();
 

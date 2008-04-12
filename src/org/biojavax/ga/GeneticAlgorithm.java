@@ -56,7 +56,7 @@ public interface GeneticAlgorithm extends Changeable {
 	 * Returns the fitness function, i.e. the class that computes the fitness of
 	 * each organism in a population.
 	 *
-	 * @return
+	 * @return the fitness function
 	 */
 	public FitnessFunction getFitnessFunction();
 
