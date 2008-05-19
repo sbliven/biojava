@@ -14,7 +14,7 @@
         </id>
 
         <many-to-one name="term" class="Term" column="term_id" not-null="true" cascade="persist,merge,save-update" node="@termId" embed-xml="false"/>
-        <many-to-one name="object" class="Feature" column="object_bioentry_id" not-null="true" cascade="persist,merge,save-update" node="@objectFeatureId" embed-xml="false"/>
+        <many-to-one name="object" class="BioEntry" column="object_bioentry_id" not-null="true" cascade="persist,merge,save-update" node="@objectFeatureId" embed-xml="false"/>
         <many-to-one name="subject" class="BioEntry" column="subject_bioentry_id" not-null="true" cascade="persist,merge,save-update" node="@subjectBioEntryId" embed-xml="false"/>
         <property name="rank" node="@rank"/>
         
