@@ -24,11 +24,15 @@
 
 package org.biojava.bio.structure.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
@@ -36,9 +40,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.event.HyperlinkListener;
 
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.PDBFileReader;
@@ -64,13 +76,14 @@ public class BiojavaJmol {
 
 	JmolPanel jmolPanel;
 	JFrame frame ;
-
+	JMenuBar menu;
+	
 	public static void main(String[] args){
 		try {
 
 			PDBFileReader pdbr = new PDBFileReader();   
 			//pdbr.setAutoFetch(true);
-			pdbr.setPath("/Users/andreas/WORK/PDB/");
+			pdbr.setPath("/nfs/team71/phd/ap3/WORK/PDB/");
 
 			String pdbCode = "5pti";
 
@@ -89,16 +102,25 @@ public class BiojavaJmol {
 		}
 	}
 
+	
+	
 
-	public BiojavaJmol() {
+	public BiojavaJmol() {		
+		
 		frame = new JFrame();
+		
+		//initMenu();
+		
 		frame.addWindowListener(new ApplicationCloser());
+		
 		Container contentPane = frame.getContentPane();
-
+				
 		Box vBox = Box.createVerticalBox();
 
 		try {
+			
 			jmolPanel = new JmolPanel();
+			
 		} catch (ClassNotFoundException e){
 			e.printStackTrace();
 			System.err.println("could not find Jmol in classpath, please install first");
@@ -118,12 +140,63 @@ public class BiojavaJmol {
 		field.addMouseListener(listener);
 		field.addKeyListener(listener);
 		vBox.add(field);
+
 		contentPane.add(vBox);
+
+
+
 		frame.pack();
 		frame.setVisible(true); 
 
 	}
 
+	private void initMenu(){
+
+		// show a menu
+		
+		menu = new JMenuBar();
+		
+		JMenu file= new JMenu("File");
+		file.getAccessibleContext().setAccessibleDescription("exit the application");
+		JMenuItem exitI = new JMenuItem("Exit");
+		exitI.setMnemonic(KeyEvent.VK_X);
+		exitI.addActionListener(new ActionListener(){
+
+			public void actionPerformed(ActionEvent e) {
+				 String cmd = e.getActionCommand();
+			        
+			        if ( cmd.equals("Exit")){
+			        	System.exit(0);
+			        }				
+			}			
+		});
+		
+		JMenu about = new JMenu("About");
+		JMenuItem aboutI = new JMenuItem("PDBview");
+		aboutI.addActionListener(new ActionListener(){
+
+			public void actionPerformed(ActionEvent e) {
+				 String cmd = e.getActionCommand();
+			        
+			        if ( cmd.equals("PDBview")){
+			        	showAboutDialog();
+			        }				
+			}			
+		});
+		
+		about.add(aboutI);
+		
+		file.add(exitI);
+		menu.add(file);
+		
+		menu.add(Box.createGlue());
+		menu.add(about);
+		frame.setJMenuBar(menu);
+		
+		frame.repaint();
+
+	}
+	
 	/** returns true if Jmol can be found in the classpath, otherwise false.
 	 * 
 	 * @return true/false depending if Jmol can be found
@@ -152,14 +225,14 @@ public class BiojavaJmol {
 			System.err.println("please install Jmol first");
 			return;
 		}
-
-		frame.setName(s.getPDBCode());
-
+		
+		setTitle(s.getPDBCode());
+		
 		// actually this is very simple
 		// just convert the structure to a PDB file
 
 		String pdb = s.toPDB();	
-		System.out.println(s.isNmr());
+		//System.out.println(s.isNmr());
 
 		//System.out.println(pdb);
 		// Jmol could also read the file directly from your file system
@@ -180,6 +253,7 @@ public class BiojavaJmol {
 
 	public void setTitle(String label){
 		frame.setTitle(label);
+		frame.repaint();
 	}
 
 
@@ -289,5 +363,48 @@ public class BiojavaJmol {
 			}
 		}
 	}
+	private void showAboutDialog(){
+		JDialog dialog = new JDialog();
 
+		dialog.setSize(new Dimension(800,600));
+
+		String msg = "A simple PDB viewer based on BioJava and Jmol. Author: Andreas Prlic";
+		
+		
+		JEditorPane txt = new JEditorPane("text/html", msg);
+		txt.setEditable(false);
+
+		
+		 JScrollPane scroll = new JScrollPane(txt);
+
+		 Box vBox = Box.createVerticalBox();
+		 vBox.add(scroll);
+
+		 JButton close = new JButton("Close");
+
+		 close.addActionListener(new ActionListener(){
+			 public void actionPerformed(ActionEvent event) {
+				 Object source = event.getSource();
+				 //System.out.println(source);
+				 JButton but = (JButton)source;
+				 Container parent = but.getParent().getParent().getParent().getParent().getParent().getParent() ;
+				 //System.out.println(parent);
+				 JDialog dia = (JDialog) parent;
+				 dia.dispose();
+			 }
+		 });
+
+		 Box hBoxb = Box.createHorizontalBox();
+		 hBoxb.add(Box.createGlue());
+		 hBoxb.add(close,BorderLayout.EAST);
+
+		 vBox.add(hBoxb);
+
+		 dialog.getContentPane().add(vBox);
+		 dialog.setVisible(true);
+		
+		
+	}
+	
+	
 }
