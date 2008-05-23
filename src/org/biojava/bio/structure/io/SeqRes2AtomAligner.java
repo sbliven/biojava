@@ -129,10 +129,23 @@ public class SeqRes2AtomAligner {
        // List<Chain> chains = new ArrayList<Chain>();
         while ( iter.hasNext()){
             Chain seqRes = iter.next();
+            
+            if ( seqRes.getAtomGroups("amino").size() < 1) {
+            	if (DEBUG){
+            		System.out.println("chain " + seqRes.getName() + " does not contain amino acids, ignoring...");
+            	}
+            	continue;
+            }
+            
             try {
                 
                 Chain atomRes = getMatchingAtomRes(seqRes,atomList);
-                
+                if ( atomRes.getAtomGroups("amino").size() < 1) {
+                	if (DEBUG){
+                		System.out.println("chain " + atomRes.getName() + " does not contain amino acids, ignoring...");
+                	}
+                	continue;
+                }
                 if ( DEBUG )
                     System.out.println("Alignment for chain "+ atomRes.getName());
                 
@@ -217,6 +230,12 @@ public class SeqRes2AtomAligner {
 
             //System.out.println(bjseq1.getAlphabet());
             NeedlemanWunsch aligner = new NeedlemanWunsch(-2, 5, 3, 3, 0,matrix);
+            
+            if (DEBUG){
+            	System.out.println("seq lengths: " + bjseq1.seqString().length() + " " + bjseq2.seqString().length());
+            	System.out.println("seq1: " + bjseq1.seqString());
+            	System.out.println("seq2: " + bjseq2.seqString());
+            }
             org.biojava.bio.symbol.Alignment ali = aligner.getAlignment(bjseq1,bjseq2);
             if ( ! (ali instanceof SimpleAlignment )) {
                 throw new Exception ("Alignment is not a SimpleAlignment!");
