@@ -102,10 +102,10 @@ public class Mutator{
         
         // get the chains for model nr. 0
         // if structure is xray there will be only one "model".
-        List chains = struc.getChains(0);
+        List<Chain> chains = struc.getChains(0);
         
         // iterate over all chains.
-        Iterator iter = chains.iterator();
+        Iterator<Chain> iter = chains.iterator();
         while (iter.hasNext()){
             Chain c = (Chain)iter.next();
             if (c.getName().equals(chainId)) {
@@ -114,12 +114,12 @@ public class Mutator{
                 Chain newchain = new ChainImpl();
                 newchain.setName(c.getName());
                 
-                List groups = c.getGroups();
+                List<Group> groups = c.getAtomGroups();
                 
                 // now iterate over all groups in this chain.
                 // in order to find the amino acid that has this pdbRenum.               
                 
-                Iterator giter = groups.iterator();
+                Iterator<Group> giter = groups.iterator();
                 while (giter.hasNext()){
                     Group g = (Group) giter.next();
                     String rnum = g.getPDBCode();
