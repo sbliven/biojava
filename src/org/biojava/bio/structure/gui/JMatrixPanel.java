@@ -137,6 +137,10 @@ public class JMatrixPanel extends JPanel{
 		return matrix;
 	}
 
+	/** sets the distance matrix to be displayed
+	 * 
+	 * @param matrix
+	 */
 	public void setMatrix(Matrix matrix) {
 		this.matrix = matrix;
 		setPreferredSize();

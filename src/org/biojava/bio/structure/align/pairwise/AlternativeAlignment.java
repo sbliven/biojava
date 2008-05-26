@@ -88,7 +88,8 @@ public class AlternativeAlignment {
 
 	double rms;
 
-
+	Matrix distanceMatrix;
+	
 	public static Logger logger =  Logger.getLogger("org.biojava.bio.structure.align");
 
 
@@ -113,6 +114,8 @@ public class AlternativeAlignment {
 
 		currentRotMatrix = new Matrix(0,0);
 		currentTranMatrix = new AtomImpl();
+		
+		distanceMatrix = new Matrix(0,0);
 	}
 
 
@@ -881,6 +884,26 @@ public class AlternativeAlignment {
 		Structure newpdb = getAlignedStructure(s1, s2);
 
 		return newpdb.toPDB();
+	}
+
+
+
+	/** The distance matrix this alignment is based on
+	 * 
+	 * @return
+	 */
+	public Matrix getDistanceMatrix() {
+		return distanceMatrix;
+	}
+
+
+
+	/** The distance matrix this alignment is based on
+	 * 
+	 * @param distanceMatrix
+	 */
+	public void setDistanceMatrix(Matrix distanceMatrix) {
+		this.distanceMatrix = distanceMatrix;
 	}
 
 

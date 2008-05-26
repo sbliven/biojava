@@ -514,7 +514,7 @@ public class StructurePairAligner {
 			 //a.setRms(f.getRms());
 			 a.apairs_from_idxlst(f);
 			 a.setAltAligNumber(i+1);
-
+			 a.setDistanceMatrix(distanceMatrix);
 
 			 try {
 				 if ( params.getMaxIter() > 0 ){

@@ -98,7 +98,7 @@ public class StructureTools {
         List<Atom> atoms = new ArrayList<Atom>();
         while ( iter.hasNext()){
             Group g = (Group) iter.next();
-           
+            
             // a temp container for the atoms of this group
             List<Atom> thisGroupAtoms = new ArrayList<Atom>();
             // flag to check if this group contains all the requested atoms.
@@ -108,7 +108,7 @@ public class StructureTools {
                 try {
                     Atom a = g.getAtom(atomName);
                     thisGroupAtoms.add(a);
-                } catch (StructureException e){
+                } catch (StructureException e){                	
                     // this group does not have a required atom, skip it...
                     thisGroupAllAtoms = false;
                     continue;
