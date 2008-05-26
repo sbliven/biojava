@@ -71,15 +71,14 @@ public class MenuCreator {
 		
 		file.add(exitI);
 		menu.add(file);
-		
-		
+			
 		JMenu align = new JMenu("Align");
-		JMenuItem pairI = new JMenuItem("2 proteins");
+		JMenuItem pairI = new JMenuItem("2 protein structures");
 		pairI.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				 String cmd = e.getActionCommand();
 			        
-			        if ( cmd.equals("2 proteins")){
+			        if ( cmd.equals("2 protein structures")){
 			        	MenuCreator.showPairDialog();
 			        }				
 			}
@@ -104,8 +103,6 @@ public class MenuCreator {
 		
 		about.add(aboutI);
 		
-		
-		
 		menu.add(Box.createGlue());
 		menu.add(about);
 		
@@ -129,9 +126,10 @@ public class MenuCreator {
 		
 		JDialog dialog = new JDialog();
 
-		dialog.setSize(new Dimension(200,200));
+		dialog.setSize(new Dimension(300,300));
 
-		String msg = "A simple PDB viewer based on BioJava and Jmol. Author: Andreas Prlic";
+		String msg = "This viewer is based on <b>BioJava</b> and <b>Jmol</>. <br>Author: Andreas Prlic <br> ";
+		msg += "Structure Alignment algorithm based on a variation of the PSC++ algorithm by Peter Lackner.";
 		
 		
 		JEditorPane txt = new JEditorPane("text/html", msg);
@@ -148,10 +146,10 @@ public class MenuCreator {
 		 close.addActionListener(new ActionListener(){
 			 public void actionPerformed(ActionEvent event) {
 				 Object source = event.getSource();
-				 //System.out.println(source);
+				 
 				 JButton but = (JButton)source;
 				 Container parent = but.getParent().getParent().getParent().getParent().getParent().getParent() ;
-				 //System.out.println(parent);
+				 
 				 JDialog dia = (JDialog) parent;
 				 dia.dispose();
 			 }

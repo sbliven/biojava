@@ -70,8 +70,7 @@ implements StructurePairSelector{
 	/** the system property PDB_DIR can be used to configure the 
 	 * default location for PDB files.
 	 */
-	public static final String PDBDIR = "PDB_DIR";
-
+	public static final String PDB_DIR = "PDB_DIR";
 
 
 	public static Logger logger =  Logger.getLogger("org.biojava");
@@ -81,13 +80,11 @@ implements StructurePairSelector{
 	 */
 	public PDBDirPanel() {
 		
-
-
 		Box vBox = Box.createVerticalBox();
 
 		pdbDir = new JTextField(20);
 		
-		String conf = System.getProperty(PDBDIR);
+		String conf = System.getProperty(PDB_DIR);
 		if ( conf != null){
 			pdbDir.setText(conf);
 		}
@@ -134,7 +131,7 @@ implements StructurePairSelector{
 		
 		String dir = pdbDir.getText();
 		if ( dir != null){
-			System.setProperty(PDBDIR, dir);
+			System.setProperty(PDB_DIR, dir);
 		}
 		reader.setPath(dir);
 		
