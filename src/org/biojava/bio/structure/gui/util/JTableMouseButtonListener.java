@@ -20,7 +20,7 @@
  * Created on Jul 17, 2006
  *
  */
-package org.biojava.bio.structure.gui;
+package org.biojava.bio.structure.gui.util;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;

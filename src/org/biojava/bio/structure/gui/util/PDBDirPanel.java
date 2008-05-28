@@ -20,7 +20,7 @@
  * Created on Feb 9, 2007
  *
  */
-package org.biojava.bio.structure.gui;
+package org.biojava.bio.structure.gui.util;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

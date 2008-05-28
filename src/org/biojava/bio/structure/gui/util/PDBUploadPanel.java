@@ -19,7 +19,7 @@
  *
  * created at May 25, 2008
  */
-package org.biojava.bio.structure.gui;
+package org.biojava.bio.structure.gui.util;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;

@@ -17,23 +17,18 @@
  *
  *      http://www.biojava.org/
  *
- * created at May 25, 2008
+ * created at May 28, 2008
  */
-package org.biojava.bio.structure.gui;
+package org.biojava.bio.structure.gui.events;
 
-import org.biojava.bio.structure.Structure;
-import org.biojava.bio.structure.StructureException;
+import org.biojava.bio.structure.gui.util.AlignedPosition;
 
-/** To be implemented by JPanels that are part of the GUI to trigger structure aligmnents.
- * 
- * 
- * @author Andreas Prlic
- * @since 1.7
- *
- */
-public interface StructurePairSelector {
+public interface AlignmentPositionListener {
 
-	public Structure getStructure1() throws StructureException;
-	public Structure getStructure2() throws StructureException;
+	public void mouseOverPosition(AlignedPosition p);
+	public void positionSelected(AlignedPosition p);
+	public void rangeSelected(AlignedPosition start , AlignedPosition end);
+	public void selectionLocked();
+	public void selectionUnlocked();
 	
 }

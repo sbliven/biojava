@@ -73,8 +73,6 @@ public class JMatrixPanel extends JPanel{
 		matrix = new Matrix(0,0);
 		params = new StrucAligParameters();
 	}
-	
-	
 
 	public int getSelectedAlignmentPos() {
 		return selectedAlignmentPos;
@@ -84,13 +82,9 @@ public class JMatrixPanel extends JPanel{
 		this.selectedAlignmentPos = selectedAlignmentPos;
 	}
 
-
-
 	public AlternativeAlignment[] getAlternativeAligs() {
 		return aligs;
 	}
-
-
 
 	public void setAlternativeAligs(AlternativeAlignment[] aligs) {
 		this.aligs = aligs;

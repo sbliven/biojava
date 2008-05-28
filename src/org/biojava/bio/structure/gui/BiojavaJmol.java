@@ -44,6 +44,7 @@ import javax.swing.JTextField;
 
 
 import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.gui.util.MenuCreator;
 import org.biojava.bio.structure.io.PDBFileReader;
 
 

@@ -20,7 +20,7 @@
  * Created on Jul 16, 2006
  *
  */
-package org.biojava.bio.structure.gui;
+package org.biojava.bio.structure.gui.util;
 
 
 import java.util.logging.Logger;
@@ -29,6 +29,7 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.align.StructurePairAligner;
 import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
+import org.biojava.bio.structure.gui.AlignmentGui;
 
 
 /** A class that obtains two structures via DAS and aligns them
@@ -90,7 +91,7 @@ public class AlignmentCalc implements Runnable {
         
         AlternativeAlignment[] aligs = aligner.getAlignments();
         
-        showAlignment(aligs);
+        showAlignment(aligner,aligs);
 
         logger.info("done!");
         
@@ -100,8 +101,9 @@ public class AlignmentCalc implements Runnable {
     
  
     
-    private void showAlignment(AlternativeAlignment[] aligs) {
+    private void showAlignment(StructurePairAligner alignment, AlternativeAlignment[] aligs) {
         AlternativeAlignmentFrame frame = new AlternativeAlignmentFrame(structure1, structure2);
+        frame.setStructurePairAligner(alignment);
         frame.setAlternativeAlignments(aligs);
         frame.pack();
         frame.setVisible(true);

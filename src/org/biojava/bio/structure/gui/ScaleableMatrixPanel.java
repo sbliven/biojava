@@ -47,7 +47,7 @@ import org.biojava.bio.structure.jama.Matrix;
 
 /** A JPanel that can display the underlying distance matrix 
  * data of the protein structure alignment algorithm. It adds a 
- * JSLider to a JMatrixPanel.
+ * JSlider to a JMatrixPanel.
  * 
  * see also JMatrixPanel.
  * 
@@ -138,7 +138,7 @@ implements ChangeListener{
 	public ScaleableMatrixPanel(){
 
 		mPanel   = new JMatrixPanel();
-		Box hBox = Box.createVerticalBox();
+		Box vBox = Box.createVerticalBox();
 		
 		int RES_MIN  = 1;
 		int RES_MAX  = 8;
@@ -151,15 +151,15 @@ implements ChangeListener{
 		slider.addChangeListener(this);
 		slider.setPreferredSize(new Dimension(100,15));
 
-		hBox.add(slider);
+		vBox.add(slider);
 
 		scroll = new JScrollPane(mPanel);
-		hBox.add(scroll);
+		vBox.add(scroll);
 		this.setPreferredSize(new Dimension(400,400));
-		this.add(hBox);
+		this.add(vBox);
 		
 		
-		 mPanel.setLayout(new BoxLayout(mPanel,BoxLayout.Y_AXIS));
+		mPanel.setLayout(new BoxLayout(mPanel,BoxLayout.Y_AXIS));
 		 this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 
 

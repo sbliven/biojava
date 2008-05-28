@@ -36,6 +36,10 @@ import javax.swing.JTabbedPane;
 
 
 import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.gui.util.AlignmentCalc;
+import org.biojava.bio.structure.gui.util.PDBDirPanel;
+import org.biojava.bio.structure.gui.util.PDBUploadPanel;
+import org.biojava.bio.structure.gui.util.StructurePairSelector;
 
 
 /** A JFrame that allows to trigger a pairwise structure alignment, 

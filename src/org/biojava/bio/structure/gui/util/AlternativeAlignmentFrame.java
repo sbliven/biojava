@@ -20,7 +20,7 @@
  * Created on Jul 16, 2006
  *
  */
-package org.biojava.bio.structure.gui;
+package org.biojava.bio.structure.gui.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,7 +44,12 @@ import org.biojava.bio.structure.Calc;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureImpl;
+import org.biojava.bio.structure.align.StructurePairAligner;
 import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
+import org.biojava.bio.structure.gui.BiojavaJmol;
+import org.biojava.bio.structure.gui.ScaleableMatrixPanel;
+import org.biojava.bio.structure.gui.SequenceDisplay;
+import org.biojava.bio.structure.gui.events.JmolAlignedPositionListener;
 import org.biojava.bio.structure.jama.Matrix;
 
 
@@ -69,7 +74,7 @@ extends JFrame{
 
 	Structure structure1;
 	Structure structure2;
-
+	StructurePairAligner structurePairAligner;
 
 	public AlternativeAlignmentFrame(Structure s1, Structure s2) {
 		super();
@@ -90,6 +95,10 @@ extends JFrame{
 		this.setTitle(title);
 	}
 
+	public void setStructurePairAligner(StructurePairAligner aligner){
+		this.structurePairAligner = aligner;
+	}
+	
 	public void setAlternativeAlignments(AlternativeAlignment[] aligs) {
 		this.aligs = aligs;
 		panel.removeAll();
@@ -114,6 +123,7 @@ extends JFrame{
 		scrollPane.setPreferredSize(new Dimension(800,400));
 		//vBox.add(e);
 		panel.add(scrollPane);
+		
 
 	}
 
@@ -189,8 +199,6 @@ extends JFrame{
 		// create the structure alignment object and tell the listeners ...
 
 
-
-
 //		Matrix m1 = Matrix.identity(3,3);
 		Matrix m2 = alig.getRotationMatrix();
 
@@ -225,8 +233,40 @@ extends JFrame{
 		jmol.evalString("model 0 ; select * ; wireframe off ; spacefill off; backbone 0.3;");
 		jmol.evalString(cmds[0]);
 		jmol.evalString(cmds[1]);
+		
+		
+		JFrame frame = new JFrame("Sequences for AlternativeAlignment ["+position+"]");
+		
+		SequenceDisplay seqdisp;
+		seqdisp =  new SequenceDisplay(structurePairAligner);
+		seqdisp.setStructure1(structure1);
+		seqdisp.setStructure2(structure2);
+	
+		seqdisp.setAlternativeAlignment(alig);
+		
+		frame.getContentPane().add(seqdisp);
+		
+		frame.pack();
+		frame.setVisible(true);
+		frame.addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				JFrame f = (JFrame) e.getSource();
+				f.setVisible(false);
+				f.dispose();
+			}
 
-
+					
+			
+		});
+		
+		seqdisp.updateDisplay();
+		
+		JmolAlignedPositionListener jmolBridge = new JmolAlignedPositionListener(jmol,structurePairAligner);
+		jmolBridge.setStructure1(structure1);
+		jmolBridge.setStructure2(structure2);
+		
+		seqdisp.addAlignmentPositionListener(jmolBridge);
+		
 	}
 
 	private String[] createRasmolScripts(AlternativeAlignment alig){

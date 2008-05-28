@@ -19,7 +19,7 @@
  *
  * created at May 24, 2008
  */
-package org.biojava.bio.structure.gui;
+package org.biojava.bio.structure.gui.util;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -36,6 +36,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
+
+import org.biojava.bio.structure.gui.AlignmentGui;
 
 /**
  *  Create the menu for BiojavaJmol

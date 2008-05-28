@@ -370,14 +370,19 @@ public class StructurePairAligner {
 	 throws StructureException {
 		 // step 1 convert the structures to Atom Arrays
 
-		 String[] atomNames = params.getUsedAtomNames();
-		 Atom[] ca1 = StructureTools.getAtomArray(s1,atomNames);
-		 Atom[] ca2 = StructureTools.getAtomArray(s2,atomNames);
+		 
+		 Atom[] ca1 = getAlignmentAtoms(s1);
+		 Atom[] ca2 = getAlignmentAtoms(s2);
 
 		 align(ca1,ca2,params);
 	 }
 
 
+	 public  Atom[] getAlignmentAtoms(Structure s){
+		 String[] atomNames = params.getUsedAtomNames();
+		 return StructureTools.getAtomArray(s,atomNames);
+	 }
+	 
 	 /** calculate the  protein structure superimposition, between two sets of atoms.
 	  * 
 	  * 
