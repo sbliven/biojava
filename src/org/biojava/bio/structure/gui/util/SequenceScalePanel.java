@@ -33,9 +33,7 @@ import java.awt.RenderingHints;
 import java.util.logging.*;
 import javax.swing.JPanel;
 import org.biojava.bio.structure.*;
-import org.biojava.bio.structure.gui.events.AlignmentPositionListener;
 
-import com.sun.tools.javac.util.Position;
 
 import java.awt.Color;
 import java.util.*;
