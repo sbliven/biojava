@@ -890,7 +890,7 @@ public class AlternativeAlignment {
 
 	/** The distance matrix this alignment is based on
 	 * 
-	 * @return
+	 * @return a Matrix object.
 	 */
 	public Matrix getDistanceMatrix() {
 		return distanceMatrix;
