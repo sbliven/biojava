@@ -268,7 +268,7 @@ public class SequenceDisplay extends JPanel implements ChangeListener {
 	}
 	/** get the identical position in the alignment
 	 * 
-	 * @return
+	 * @return identical positions for structure1
 	 */
 	public int[] getIdx1() {
 		return idx1;
@@ -276,7 +276,7 @@ public class SequenceDisplay extends JPanel implements ChangeListener {
 
 	/** set the identical positions in the alignment
 	 * 
-	 * @param idx
+	 * @param idx identical positions for structure1
 	 */
 	private void setIdx1(int[] idx) {
 		this.idx1 = idx;
@@ -284,7 +284,7 @@ public class SequenceDisplay extends JPanel implements ChangeListener {
 	}
 	/** get the identical position in the alignment
 	 * 
-	 * @return
+	 * @return identical positions for structure2
 	 */
 	public int[] getIdx2() {
 		return idx2;
@@ -292,7 +292,7 @@ public class SequenceDisplay extends JPanel implements ChangeListener {
 
 	/** set the identical positions in the alignment
 	 * 
-	 * @param idx
+	 * @param idx identical positions for structure2
 	 */
 	private void setIdx2(int[] idx) {
 		this.idx2 = idx;
