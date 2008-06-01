@@ -23,9 +23,13 @@ package org.biojava.bio.structure.io.mmcif;
 
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
+import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
+import org.biojava.bio.structure.io.mmcif.model.Exptl;
+import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
+import org.biojava.bio.structure.io.mmcif.model.StructRef;
 
 /** An interface for the events triggered by a MMcifParser.
  * The Consumer listens to the events and builds up the protein structure.
@@ -34,17 +38,26 @@ import org.biojava.bio.structure.io.mmcif.model.Struct;
  *
  */
 public interface MMcifConsumer {
+	/** called at start of document
+	 * 
+	 */
 	public void documentStart();
+	/** A new AtomSite record has been read. Contains the Atom data
+	 * 
+	 * @param atom
+	 */
 	public void newAtomSite(AtomSite atom);
 	public void newEntity(Entity entity);
 	public void setStruct(Struct struct);
 	public void newDatabasePDBrev(DatabasePDBrev dbrev);
-	
+	public void newDatabasePDBremark(DatabasePDBremark remark);
+	public void newExptl(Exptl exptl);
+	public void newStructRef(StructRef sref);
+	public void newStructRefSeq(StructRefSeq sref);
+	/** called at end of document
+	 * 
+	 */
 	public void documentEnd();
 	
-	/** This method will return the parsed protein structure, once the parsing has been finished
-	 * 
-	 * @return a BioJava protein structure object
-	 */
-	public Structure getStructure();
+	
 }

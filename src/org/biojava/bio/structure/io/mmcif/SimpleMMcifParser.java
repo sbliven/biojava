@@ -31,15 +31,37 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
+import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
+import org.biojava.bio.structure.io.mmcif.model.Exptl;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
+import org.biojava.bio.structure.io.mmcif.model.StructRef;
+import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 
 /** A simple mmCif file parser
  * 
  * @author Andreas Prlic
- * @since 1.6
+ * @since 1.7
+ * Usage: 
+ * <pre>
+   		String file = "path/to/mmcif/file";
+  		MMcifParser parser = new SimpleMMcifParser();
+		MMcifConsumer consumer = new SimpleMMcifConsumer();
+		parser.addMMcifConsumer(consumer);
+
+		try {
+			
+			BufferedReader buf = new BufferedReader(new InputStreamReader (new FileInputStream(file)));
+			parser.parse(buf);
+			Structure s = consumer.getStructure();
+			System.out.println(s);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+ * </pre>
  */
 public class SimpleMMcifParser implements MMcifParser {
 
@@ -76,19 +98,25 @@ public class SimpleMMcifParser implements MMcifParser {
 	}
 
 	public static void main(String[] args){
-		String file = "/Users/andreas/WORK/PDB/MMCIF/1gav.mmcif";
+		//String file = "/Users/andreas/WORK/PDB/MMCIF/1gav.mmcif";
+		String file = "/Users/andreas/WORK/PDB/MMCIF/5pti.cif";
+		
 		System.out.println("parsing " + file);
+		
 		MMcifParser parser = new SimpleMMcifParser();
-		MMcifConsumer consumer = new SimpleMMcifConsumer();
+		SimpleMMcifConsumer consumer = new SimpleMMcifConsumer();
 		parser.addMMcifConsumer(consumer);
 
 		try {
-			File f = new File(file);
+			
 			BufferedReader buf = new BufferedReader(new InputStreamReader (new FileInputStream(file)));
 			parser.parse(buf);
+			Structure s = consumer.getStructure();
+			System.out.println(s);
 		} catch (Exception e){
 			e.printStackTrace();
 		}
+		
 	}
 
 	public void parse(BufferedReader buf) 
@@ -364,14 +392,40 @@ public class SimpleMMcifParser implements MMcifParser {
 					loopFields, lineData);
 
 			triggerNewAtomSite(a);
+			
 		} else if ( category.equals("_database_PDB_rev")){
 			DatabasePDBrev dbrev = (DatabasePDBrev) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev",
 					loopFields, lineData);
 			
 			triggerNewDatabasePDBrev(dbrev);
+		
+		} else if (  category.equals("_database_PDB_remark")){
+			DatabasePDBremark remark = (DatabasePDBremark) buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark",
+					loopFields, lineData);
+			
+			triggerNewDatabasePDBremark(remark);
+			
+		} else if ( category.equals("_exptl")){
+			Exptl exptl  = (Exptl) buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.Exptl",
+					loopFields,lineData);
+			
+			triggerExptl(exptl);						
+		} else if ( category.equals("_struct_ref")){
+			StructRef sref  = (StructRef) buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.StructRef",
+					loopFields,lineData);
+			
+			triggerNewStrucRef(sref);		
+		} else if ( category.equals("_struct_ref_seq")){
+			StructRefSeq sref  = (StructRefSeq) buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.StructRefSeq",
+					loopFields,lineData);
+			
+			triggerNewStrucRefSeq(sref);		
 		}
-
 	}
 
 	private void setPair(Object o, List<String> lineData){
@@ -445,11 +499,7 @@ public class SimpleMMcifParser implements MMcifParser {
 
 
 
-	public void triggerDocumentStart(){
-		for(MMcifConsumer c : consumers){
-			c.documentStart();	
-		}
-	}
+	
 
 
 	public void triggerNewEntity(Entity entity){
@@ -473,6 +523,36 @@ public class SimpleMMcifParser implements MMcifParser {
 	private void triggerNewDatabasePDBrev(DatabasePDBrev dbrev){
 		for(MMcifConsumer c : consumers){
 			c.newDatabasePDBrev(dbrev);
+		}
+	}
+	
+	private void triggerNewDatabasePDBremark(DatabasePDBremark remark){
+		for(MMcifConsumer c : consumers){
+			c.newDatabasePDBremark(remark);
+		}
+	}
+	
+	private void triggerExptl(Exptl exptl){
+		for(MMcifConsumer c : consumers){
+			c.newExptl(exptl);
+		}
+	}
+	
+	private void triggerNewStrucRef(StructRef sref){
+		for(MMcifConsumer c : consumers){
+			c.newStructRef(sref);
+		}
+	}
+	
+	private void triggerNewStrucRefSeq(StructRefSeq sref){
+		for(MMcifConsumer c : consumers){
+			c.newStructRefSeq(sref);
+		}
+	}
+	
+	public void triggerDocumentStart(){
+		for(MMcifConsumer c : consumers){
+			c.documentStart();	
 		}
 	}
 	

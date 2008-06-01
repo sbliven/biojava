@@ -391,21 +391,20 @@ public class StructureImpl implements Structure {
         
 		if ( isNmr() ) str.append( " models: "+nrModels()+newline) ;
 		
-        str.append(pdbHeader.toString()) ;
+        str.append(pdbHeader.toString()+newline) ;
 
         for (int i=0;i<nrModels();i++){
-			if (isNmr() ) str.append(" model["+i+"]:");
-			str.append(" chains:");
-
-			str.append( "\n");
+			if (isNmr() ) str.append(" model["+i+"]:+newline");
+			str.append(" chains:"+newline);
+			
 			for (int j=0;j<size(i);j++){
-
+				
 				Chain cha = (Chain)getChain(i,j); 
 				List<Group> agr = cha.getAtomGroups("amino");
 				List<Group> hgr = cha.getAtomGroups("hetatm");
 				List<Group> ngr = cha.getAtomGroups("nucleotide");
 
-				str.append("chain: >"+cha.getName()+"< ");
+				str.append("chain " + j + ": >"+cha.getName()+"< ");
 				if ( cha.getHeader() != null){
 					Compound comp = cha.getHeader();
 					String molName = comp.getMolName();

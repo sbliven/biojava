@@ -28,7 +28,7 @@ package org.biojava.bio.structure.io.mmcif.model;
  */
 public class Entity {
 	String id;
-	String entity_id; 
+	
 	String type; 
 	String src_method; 
 	String pdbx_description; 
@@ -43,7 +43,7 @@ public class Entity {
 		StringBuffer buf = new StringBuffer();
 		
 		buf.append("Entity - id:" + id);
-		buf.append(" entity_id:"+ entity_id);
+		
 		buf.append(" type:"+type);
 		buf.append(" src_method:"+src_method);
 		buf.append(" pdbx_description:"+pdbx_description);
@@ -62,12 +62,7 @@ public class Entity {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getEntity_id() {
-		return entity_id;
-	}
-	public void setEntity_id(String id) {
-		this.entity_id = id;
-	}
+	
 	public String getType() {
 		return type;
 	}

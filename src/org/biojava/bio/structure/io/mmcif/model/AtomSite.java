@@ -21,7 +21,7 @@
  */
 package org.biojava.bio.structure.io.mmcif.model;
 
-public class AtomSite {
+public class AtomSite extends AbstractBean{
 	String group_PDB;
 	String id;
 	String type_symbol;
