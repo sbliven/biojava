@@ -24,12 +24,8 @@ public class StructureTest extends TestCase {
 
 	protected void setUp()
 	{
-
-
-
 		InputStream inStream = this.getClass().getResourceAsStream("/files/5pti.pdb");
 		assertNotNull(inStream);
-
 
 		PDBFileParser pdbpars = new PDBFileParser();
 		try {
@@ -40,14 +36,14 @@ public class StructureTest extends TestCase {
 
 		assertNotNull(structure);
 
-		assertEquals("structure does not contain one chain ", 1 ,structure.size());	
+		assertEquals("structure does not contain one chain ", 2 ,structure.size());	
 	}
 
 	public void testSeqResParsing() {
 
 		// System.out.println(structure);
 		List<Chain> chains = structure.getChains(0);
-		assertEquals(" nr of found chains not correct!",1,chains.size());
+		assertEquals(" nr of found chains not correct!",2,chains.size());
 		Chain c = chains.get(0);
 		//System.out.println(c);
 		List<Group> seqResGroups = c.getSeqResGroups();
@@ -64,7 +60,9 @@ public class StructureTest extends TestCase {
 		Group g5 = atomGroups.get(5);
 		assertEquals("The ATOM group can not be fond in the SEQRES list", 5,seqResGroups.indexOf(g5));
 
-		Group g58 = atomGroups.get(58);
+		Chain c2 = chains.get(1);
+		List<Group>atomGroups2 = c2.getAtomGroups();
+		Group g58 = atomGroups2.get(0);
 		assertEquals("The group is not PO4","PO4", g58.getPDBName());
 		assertEquals("The group P04 should not be in the SEQRES list", -1 , seqResGroups.indexOf(g58));
 
@@ -76,13 +74,15 @@ public class StructureTest extends TestCase {
 	public void testReadPDBFile() throws Exception {
 
 		assertEquals("pdb code not set!","5PTI",structure.getPDBCode());
-
-
+		
 		Chain c = structure.getChain(0);
 		assertEquals("did not find the expected 58 amino acids!",58,c.getAtomGroups("amino").size());
 
-		assertTrue(c.getAtomGroups("hetatm").size()     == 65);
-		assertTrue(c.getAtomGroups("nucleotide").size() == 0 );
+		assertTrue(c.getAtomGroups("hetatm").size()     == 0);
+		
+		Chain c2 = structure.getChain(1);
+		assertTrue(c2.getAtomGroups("hetatm").size()     == 65);
+		assertTrue(c2.getAtomGroups("nucleotide").size() == 0 );
 
 		List<Compound> compounds= structure.getCompounds();
 		assertTrue(compounds.size() == 1);
@@ -96,13 +96,14 @@ public class StructureTest extends TestCase {
 		
 		List<SSBond> ssbonds = structure.getSSBonds();
 		assertEquals("did not find the correct nr of SSBonds ",3,ssbonds.size());
+			 
+		String pdb1 = "SSBOND   1 CYS A    5    CYS A   55";
+		String pdb2 = "SSBOND   2 CYS A   14    CYS A   38"; 
 	
-		 
-		String pdb1 = "SSBOND   1 CYS      5    CYS     55";
-		String pdb2 = "SSBOND   2 CYS     14    CYS     38"; 
-	
-		SSBond bond1 = ssbonds.get(0);		
+		SSBond bond1 = ssbonds.get(0);
+		
 		String b1 = bond1.toPDB();
+		
 		assertTrue("PDB representation incorrect",pdb1.equals(b1.trim()));		
 		assertTrue("not right resnum1 " , bond1.getResnum1().equals("5"));
 		assertTrue("not right resnum2 " , bond1.getResnum2().equals("55"));
@@ -140,10 +141,10 @@ public class StructureTest extends TestCase {
 		assertEquals("the idCode in the Header is " + idCode + " and not 5PTI, as expected","5PTI",idCode);
 
 		Float resolution = (Float) m.get("resolution");
-		assertEquals("the resolution in the Header is " + resolution + " and not 1.8, as expected",new Float(1.8),resolution);
+		assertEquals("the resolution in the Header is " + resolution + " and not 1.0, as expected",new Float(1.0),resolution);
 
 		String technique = (String) m.get("technique");
-		String techShould = "NEUTRON DIFFRACTION, X-RAY DIFFRACTION ";
+		String techShould = "X-RAY DIFFRACTION ";
 		assertEquals("the technique in the Header is " + technique, techShould,technique);
 
 		List <Compound> compounds = structure.getCompounds();

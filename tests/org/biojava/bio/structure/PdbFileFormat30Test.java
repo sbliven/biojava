@@ -56,6 +56,7 @@ public class PdbFileFormat30Test extends TestCase {
 		assertEquals("structure does not contain the right number of nucleotides ", shouldNr ,nrNuc);	
 		
 		Structure s2 = getStructure("/files/104D_v30.pdb");		
+		
 		int nrNuc2 = getNrNucleotides(s2);		
 		int shouldNr2 = 24;
 		assertEquals("structure does not contain the right number of nucleotides ", shouldNr2 , nrNuc2);	
@@ -73,9 +74,9 @@ public class PdbFileFormat30Test extends TestCase {
 		int nrNuc = getNrNucleotides(s);		
 		int shouldNr = 24;
 		assertEquals("structure does not contain the right number of nucleotides ", shouldNr , nrNuc);	
+				
+		Structure s2 = getStructure("/files/104D_v23.pdb");	
 		
-		
-		Structure s2 = getStructure("/files/104D_v23.pdb");		
 		int nrNuc2 = getNrNucleotides(s2);		
 		int shouldNr2 = 24;
 		assertEquals("structure does not contain the right number of nucleotides ", shouldNr2 , nrNuc2);	

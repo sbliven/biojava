@@ -53,7 +53,7 @@ public class StructurePairAlignerTest extends TestCase {
 
         assertNotNull(structure1);
         assertNotNull(structure2);
-        assertEquals("structure does not contain one chain ", 1 ,structure1.size());
+        assertEquals("structure does not contain one chain ", 2 ,structure1.size());
           
     }
 

@@ -48,7 +48,7 @@ public class StructureToolsTest extends TestCase {
 
         assertNotNull(structure);
 
-        assertEquals("structure does not contain one chain ", 1 ,structure.size()); 
+        assertEquals("structure does not contain one chain ", 2 ,structure.size()); 
     }
     
     
