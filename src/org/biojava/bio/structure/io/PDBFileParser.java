@@ -38,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.AminoAcidImpl;
 import org.biojava.bio.structure.AtomImpl;
@@ -57,12 +55,6 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.StructureTools;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.Symbol;
-
-
-
 
 
 /**
@@ -896,8 +888,8 @@ public class PDBFileParser  {
 			System.out.println("LINE: >" + line + "<");
 		}
 		String[] fieldList = line.split("\\s+");
-
-		if (!fieldList[0].equals("")
+		int fl = fieldList.length;
+		if ((fl >0 ) && (!fieldList[0].equals(""))
 				&& compndFieldValues.contains(fieldList[0])) {
 			//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[0] + "'");
 			continuationField = fieldList[0];
@@ -905,7 +897,7 @@ public class PDBFileParser  {
 				previousContinuationField = continuationField;
 			}
 
-		} else if (compndFieldValues.contains(fieldList[1])) {
+		} else if ((fl >1 ) && compndFieldValues.contains(fieldList[1])) {
 			//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[1] + "'");
 			continuationField = fieldList[1];
 			if (previousContinuationField.equals("")) {
@@ -1499,7 +1491,6 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 			atom.setOccupancy(  occu  );
 			atom.setTempFactor( tempf );		
 
-
 			String chain_id      = line.substring(21,22);
 
 			// join residue numbers and insertion codes together
@@ -1507,14 +1498,10 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 			String groupCode3     = line.substring(17,20);
 
 			Character aminoCode1 = null;
+
 			if ( recordName.equals("ATOM") ){
-
 				aminoCode1 = StructureTools.get1LetterCode(groupCode3);
-
 			}
-
-
-
 
 			if (current_chain == null) {
 				current_chain = new ChainImpl();
@@ -1527,7 +1514,6 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 				current_group.setPDBCode(residueNumber);
 				current_group.setPDBName(groupCode3);
 			}
-
 
 			//System.out.println("chainid: >"+chain_id+"<, current_chain.id:"+ current_chain.getName() );
 			// check if chain id is the same
@@ -1544,7 +1530,6 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 					current_model.add(current_chain);		
 				}
 
-
 				//see if chain_id of new residue is one of the previous chains ...
 				testchain = isKnownChain(chain_id,current_model);
 				if (testchain != null) {
@@ -1553,7 +1538,6 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 				} else {
 					//System.out.println("creating new chain..."+ chain_id);
-
 					//current_model.add(current_chain);
 					current_chain = new ChainImpl();
 					current_chain.setName(chain_id);
@@ -1578,14 +1562,9 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 				current_group.setPDBName(groupCode3);
 
 			}
-
 			//see if chain_id is one of the previous chains ...
-
-
 			current_group.addAtom(atom);
 			//System.out.println(current_group);
-
-
 	}
 
 
