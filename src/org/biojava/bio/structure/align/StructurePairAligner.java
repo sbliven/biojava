@@ -152,6 +152,7 @@ public class StructurePairAligner {
 	StrucAligParameters params;
 	FragmentPair[]  fragPairs;
 
+	boolean debug = false;
 
 	public StructurePairAligner() {
 		super();
@@ -168,394 +169,425 @@ public class StructurePairAligner {
 	 * 
 	 * @param args
 	 */
-	 public static void main(String[] args){
-		 try {
+	public static void main(String[] args){
+		try {
 
 
-			 // UPDATE THE FOLLOWING LINES TO MATCH YOUR SETUP
+			// UPDATE THE FOLLOWING LINES TO MATCH YOUR SETUP
 
-			 PDBFileReader pdbr = new PDBFileReader();          
-			 pdbr.setPath("/Users/andreas/WORK/PDB/");
+			PDBFileReader pdbr = new PDBFileReader();          
+			pdbr.setPath("/Users/andreas/WORK/PDB/");
 
 
-			 //String pdb1 = "1crl";
-			 //String pdb2 = "1ede";
+			//String pdb1 = "1crl";
+			//String pdb2 = "1ede";
 
-			 String pdb1 = "1buz";
-			 String pdb2 = "1ali";            
-			 String outputfile = "/tmp/alig_"+pdb1+"_"+pdb2+".pdb";
+			String pdb1 = "1buz";
+			String pdb2 = "1ali";            
+			String outputfile = "/tmp/alig_"+pdb1+"_"+pdb2+".pdb";
 
-			 // NO NEED TO DO CHANGE ANYTHING BELOW HERE...
+			// NO NEED TO DO CHANGE ANYTHING BELOW HERE...
 
-			 StructurePairAligner sc = new StructurePairAligner();
+			StructurePairAligner sc = new StructurePairAligner();
 
 
-			 // step1 : read molecules
+			// step1 : read molecules
 
-			 System.out.println("aligning " + pdb1 + " vs. " + pdb2);
+			System.out.println("aligning " + pdb1 + " vs. " + pdb2);
 
-			 Structure s1 = pdbr.getStructureById(pdb1);
-			 Structure s2 = pdbr.getStructureById(pdb2);                       
+			Structure s1 = pdbr.getStructureById(pdb1);
+			Structure s2 = pdbr.getStructureById(pdb2);                       
 
-			 // step 2 : do the calculations
-			 sc.align(s1,s2);
+			// step 2 : do the calculations
+			sc.align(s1,s2);
 
 
-			 AlternativeAlignment[] aligs = sc.getAlignments();
+			AlternativeAlignment[] aligs = sc.getAlignments();
 
-			 //cluster similar results together 
-			 ClusterAltAligs.cluster(aligs);
+			//cluster similar results together 
+			ClusterAltAligs.cluster(aligs);
 
 
-			 // print the result:
-			 // the AlternativeAlignment object gives also access to rotation matrices / shift vectors.
-			 for (int i=0 ; i< aligs.length; i ++){
-				 AlternativeAlignment aa = aligs[i];
-				 System.out.println(aa);              
-			 }
+			// print the result:
+			// the AlternativeAlignment object gives also access to rotation matrices / shift vectors.
+			for (int i=0 ; i< aligs.length; i ++){
+				AlternativeAlignment aa = aligs[i];
+				System.out.println(aa);              
+			}
 
 
 
-			 // convert AlternativeAlignemnt 1 to PDB file, so it can be opened with a viewer (e.g. Jmol, Rasmol)
+			// convert AlternativeAlignemnt 1 to PDB file, so it can be opened with a viewer (e.g. Jmol, Rasmol)
 
-			 if ( aligs.length > 0) {
-				 AlternativeAlignment aa1 =aligs[0];
-				 String pdbstr = aa1.toPDB(s1,s2);
+			if ( aligs.length > 0) {
+				AlternativeAlignment aa1 =aligs[0];
+				String pdbstr = aa1.toPDB(s1,s2);
 
-				 System.out.println("writing alignment to " + outputfile);
-				 FileOutputStream out= new FileOutputStream(outputfile); 
-				 PrintStream p =  new PrintStream( out );
+				System.out.println("writing alignment to " + outputfile);
+				FileOutputStream out= new FileOutputStream(outputfile); 
+				PrintStream p =  new PrintStream( out );
 
-				 p.println (pdbstr);
+				p.println (pdbstr);
 
-				 p.close();
-				 out.close();
-			 }
+				p.close();
+				out.close();
+			}
 
-			 
-			 // display the alignment in Jmol
-			 // only will work if Jmol is in the Classpath
-			 			 
-			 if ( aligs.length > 0) {
-				 
-				 if (! BiojavaJmol.jmolInClassPath()){
-					 System.err.println("Could not find Jmol in classpath, please install first!");
-					 return;
-				 }
-				 
-				 AlternativeAlignment aa1 =aligs[0];
-				 
-				 // first get an artificial structure for the alignment
-				 Structure artificial = aa1.getAlignedStructure(s1, s2);
 
+			// display the alignment in Jmol
+			// only will work if Jmol is in the Classpath
 
-				 // and then send it to Jmol (only will work if Jmol is in the Classpath) 
-				 BiojavaJmol jmol = new BiojavaJmol();
-				 jmol.setTitle(artificial.getName());
-				 jmol.setStructure(artificial);
+			if ( aligs.length > 0) {
 
-				 // color the two structures
+				if (! BiojavaJmol.jmolInClassPath()){
+					System.err.println("Could not find Jmol in classpath, please install first!");
+					return;
+				}
 
-				 jmol.evalString("select *; backbone 0.4; wireframe off; spacefill off; " + 
-				 "select not protein and not solvent; spacefill on;");
-				 jmol.evalString("select */1 ; color red; model 1; ");
+				AlternativeAlignment aa1 =aligs[0];
 
+				// first get an artificial structure for the alignment
+				Structure artificial = aa1.getAlignedStructure(s1, s2);
 
-				 // now color the equivalent residues ...
 
-				 String[] pdbs1 = aa1.getPDBresnum1();
-				 for (String res : pdbs1 ){		
-					 jmol.evalString("select " + res + "/1 ; backbone 0.6; color white;");
-				 }
+				// and then send it to Jmol (only will work if Jmol is in the Classpath) 
+				BiojavaJmol jmol = new BiojavaJmol();
+				jmol.setTitle(artificial.getName());
+				jmol.setStructure(artificial);
 
-				 jmol.evalString("select */2; color blue; model 2;");
-				 String[] pdbs2 = aa1.getPDBresnum2();
-				 for (String res :pdbs2 ){
-					 jmol.evalString("select " + res + "/2 ; backbone 0.6; color yellow;");
-				 }
-
-				 // now show both models again.
-				 jmol.evalString("model 0;");
-				 
-				 jmol.evalString("echo done.");
-			 }
+				// color the two structures
 
+				jmol.evalString("select *; backbone 0.4; wireframe off; spacefill off; " + 
+				"select not protein and not solvent; spacefill on;");
+				jmol.evalString("select */1 ; color red; model 1; ");
 
-		 } catch (Exception e){
-			 e.printStackTrace();
-		 }
 
-	 }
-
-
-
-	 private void reset(){
-		 alts = new AlternativeAlignment[0];
-		 distanceMatrix = new Matrix(0,0);
-		 fragPairs = new FragmentPair[0];
-
-	 }
-
-
-	 /** get the results of step 1 - the FragmentPairs used for seeding the alignment
-	  * @return a FragmentPair[] array
-	  */
-
-	 public FragmentPair[] getFragmentPairs() {
-		 return fragPairs;
-	 }
-
-
-
-	 public void setFragmentPairs(FragmentPair[] fragPairs) {
-		 this.fragPairs = fragPairs;
-	 }
-
-
-	 /** return the alternative alignments that can be found for the two structures
-	  * 
-	  * @return AlternativeAlignment[] array
-	  */
-	 public AlternativeAlignment[] getAlignments() {
-		 return alts;
-	 }
-
-	 /** return the difference of distance matrix between the two structures
-	  * 
-	  * @return a Matrix
-	  */
-	 public Matrix getDistMat(){
-		 return distanceMatrix;
-	 }
-
-	 /** get the parameters.
-	  * 
-	  * @return the Parameters.
-	  */
-	 public StrucAligParameters getParams() {
-		 return params;
-	 }
-
-	 /** set the parameters to be used for the algorithm
-	  * 
-	  * @param params the Parameter object
-	  */
-	 public void setParams(StrucAligParameters params) {
-		 this.params = params;
-	 }
-
-
-
-	 /** calculate the alignment between the two full structures with default parameters
-	  * 
-	  * @param s1
-	  * @param s2
-	  * @throws StructureException
-	  */
-	 public void align(Structure s1, Structure s2)
-	 throws StructureException {
-
-		 align(s1,s2,params);
-	 }
-
-
-	 /** calculate the alignment between the two full structures with user provided parameters
-	  * 
-	  * @param s1
-	  * @param s2
-	  * @param params
-	  * @throws StructureException
-	  */
-	 public void align(Structure s1, Structure s2, StrucAligParameters params)
-	 throws StructureException {
-		 // step 1 convert the structures to Atom Arrays
-
-		 
-		 Atom[] ca1 = getAlignmentAtoms(s1);
-		 Atom[] ca2 = getAlignmentAtoms(s2);
-
-		 align(ca1,ca2,params);
-	 }
-
-
-	 public  Atom[] getAlignmentAtoms(Structure s){
-		 String[] atomNames = params.getUsedAtomNames();
-		 return StructureTools.getAtomArray(s,atomNames);
-	 }
-	 
-	 /** calculate the  protein structure superimposition, between two sets of atoms.
-	  * 
-	  * 
-	  * 
-	  * @param ca1 set of Atoms of structure 1
-	  * @param ca2 set of Atoms of structure 2
-	  * @param params the parameters to use for the alignment
-	  * @throws StructureException
-	  */
-	 public void align(Atom[] ca1, Atom[] ca2, StrucAligParameters params) 
-	 throws StructureException {
+				// now color the equivalent residues ...
 
-		 reset();
+				String[] pdbs1 = aa1.getPDBresnum1();
+				for (String res : pdbs1 ){		
+					jmol.evalString("select " + res + "/1 ; backbone 0.6; color white;");
+				}
 
-//		 step 1 get all Diagonals of length X that are similar between both structures
+				jmol.evalString("select */2; color blue; model 2;");
+				String[] pdbs2 = aa1.getPDBresnum2();
+				for (String res :pdbs2 ){
+					jmol.evalString("select " + res + "/2 ; backbone 0.6; color yellow;");
+				}
 
-		 //System.out.println("step 1 - get fragments with similar intramolecular distances ");
-		 int k  = params.getDiagonalDistance();
-		 int k2 = params.getDiagonalDistance2();
-		 int fragmentLength = params.getFragmentLength();
+				// now show both models again.
+				jmol.evalString("model 0;");
 
-		 if ( ca1.length < (fragmentLength + 1) || ca2.length < (fragmentLength + 1))  {
-			 throw new StructureException("structure too short, can not align");
-		 }
-		 int rows = ca1.length - fragmentLength + 1;
-		 int cols = ca2.length - fragmentLength + 1;
-		 //System.out.println("rows "  + rows + " " + cols + 
-		 //      " ca1 l " + ca1.length + " ca2 l " + ca2.length);
-		 distanceMatrix = new Matrix(rows,cols,0.0);
+				jmol.evalString("echo done.");
+			}
 
-		 double[] dist1 = AlignTools.getDiagonalAtK(ca1, k);
-
-		 double[] dist2 = AlignTools.getDiagonalAtK(ca2, k);
-		 double[] dist3 = new double[0];
-		 double[] dist4 = new double[0];
-		 if ( k2 > 0) { 
-			 dist3 = AlignTools.getDiagonalAtK(ca1, k2);
-			 dist4 = AlignTools.getDiagonalAtK(ca2, k2);
-		 }
-
-		 double[][] utmp = new double[][] {{0,0,1}};
-		 //Matrix unitv = new Matrix(utmp);
-		 Atom unitvector = new AtomImpl();
-		 unitvector.setCoords(utmp[0]);
-
-
-		 List<FragmentPair> fragments = new ArrayList<FragmentPair>();
-
-		 for ( int i = 0 ; i< rows; i++){
-
-			 Atom[] catmp1  = AlignTools.getFragment( ca1,  i, fragmentLength);
-			 Atom   center1 = AlignTools.getCenter( ca1, i, fragmentLength);
-
-			 for ( int j = 0 ; j < cols ; j++){
-
-				 double rdd1 = AlignTools.rms_dk_diag(dist1,dist2,i,j,fragmentLength,k);
-				 double rdd2 = 0;
-				 if ( k2 > 0) 
-					 rdd2 = AlignTools.rms_dk_diag(dist3,dist4,i,j,fragmentLength,k2);
-				 double rdd = rdd1 + rdd2;
-				 distanceMatrix.set(i,j,rdd);
-
-
-				 if ( rdd < params.getFragmentMiniDistance()) {
-					 FragmentPair f = new FragmentPair(fragmentLength,i,j);                                       
-					 //System.out.println("i " + i + " " + j );
-					 try {
-
-						 Atom[] catmp2 = AlignTools.getFragment(ca2, j, fragmentLength);                        
-						 Atom  center2 = AlignTools.getCenter(ca2,j,fragmentLength);
-
-						 //System.out.println("c1 : " + center1 + " c2: " + center2);
-						 f.setCenter1(center1);
-						 f.setCenter2(center2);
-
-						 SVDSuperimposer svd = new SVDSuperimposer(catmp1,catmp2);
-						 Matrix rotmat = svd.getRotation();
-						 //rotmat.print(3,3);
-						 f.setRot(rotmat);
-
-						 Atom aunitv = (Atom)unitvector.clone();
-						 Calc.rotate(aunitv,rotmat);
-						 f.setUnitv(aunitv);
-
-						 boolean doNotAdd = false;
-						 if ( params.reduceInitialFragments()) {
-							 doNotAdd = FragmentJoiner.reduceFragments(fragments,f, distanceMatrix);
-
-						 }
-						 if ( doNotAdd)
-							 continue;
-
-						 fragments.add(f);
-
-					 } catch (StructureException e){
-						 e.printStackTrace();
-						 break;
-					 }
-				 }
-			 }
-		 }
-
-		 FragmentPair[] fp = (FragmentPair[]) fragments.toArray(new FragmentPair[fragments.size()]);
-		 setFragmentPairs(fp);
-
-		 //System.out.println("step 2 - join fragments");
-
-		 // step 2 combine them to possible models
-		 FragmentJoiner joiner = new FragmentJoiner();
-
-
-		 JointFragments[] frags;
-
-		 if ( ! params.isJoinPlo() ){
-			 frags =  joiner.approach_ap3(
-					 ca1,ca2, fp, params);
-		 } else {
-
-			 // this approach by StrComPy (peter lackner):
-			 frags =  joiner.frag_pairwise_compat(fp,
-					 params.getAngleDiff(),
-					 params.getFragCompat(),
-					 params.getMaxrefine());
-		 }
-
-		 //logger.info("number joint fragments:"+frags.length);
-
-		 //System.out.println("step 3 - refine alignments");
-		 List<AlternativeAlignment> aas = new ArrayList<AlternativeAlignment>();
-		 for ( int i = 0 ; i < frags.length;i++){
-			 JointFragments f = frags[i];
-			 AlternativeAlignment a = new AlternativeAlignment();
-			 //System.out.println(f.getRms());
-			 //a.setRms(f.getRms());
-			 a.apairs_from_idxlst(f);
-			 a.setAltAligNumber(i+1);
-			 a.setDistanceMatrix(distanceMatrix);
-
-			 try {
-				 if ( params.getMaxIter() > 0 ){
-
-					 a.refine(params,ca1,ca2);
-				 }
-				 else {
-					 a.finish(params,ca1,ca2);
-
-				 }
-			 } catch (StructureException e){
-				 e.printStackTrace();
-			 }
-			 a.calcScores(ca1,ca2);
-			 // a.getRotationMatrix().print(3,3);
-			 aas.add(a);
-		 }
-
-
-		 // sort the alternative alignments
-		 Comparator<AlternativeAlignment> comp = new AltAligComparator();
-		 Collections.sort(aas,comp);
-		 Collections.reverse(aas);
-
-		 alts = (AlternativeAlignment[])aas.toArray(new AlternativeAlignment[aas.size()]);     
-		 // do final numbering of alternative solutions
-		 int aanbr = 0;       
-		 for ( int i = 0 ; i < alts.length; i++){
-			 AlternativeAlignment a = alts[i];
-			 aanbr++;
-			 a.setAltAligNumber(aanbr);
-			 //System.out.println(aanbr);
-			 //a.getRotationMatrix().print(3,3);
-		 }        
-		 //System.out.println("calc done");
-	 }
+
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+
+	}
+
+
+
+	private void reset(){
+		alts = new AlternativeAlignment[0];
+		distanceMatrix = new Matrix(0,0);
+		fragPairs = new FragmentPair[0];
+
+	}
+
+
+	/** get the results of step 1 - the FragmentPairs used for seeding the alignment
+	 * @return a FragmentPair[] array
+	 */
+
+	public FragmentPair[] getFragmentPairs() {
+		return fragPairs;
+	}
+
+
+
+	public void setFragmentPairs(FragmentPair[] fragPairs) {
+		this.fragPairs = fragPairs;
+	}
+
+
+	/** return the alternative alignments that can be found for the two structures
+	 * 
+	 * @return AlternativeAlignment[] array
+	 */
+	public AlternativeAlignment[] getAlignments() {
+		return alts;
+	}
+
+	/** return the difference of distance matrix between the two structures
+	 * 
+	 * @return a Matrix
+	 */
+	public Matrix getDistMat(){
+		return distanceMatrix;
+	}
+
+	/** get the parameters.
+	 * 
+	 * @return the Parameters.
+	 */
+	public StrucAligParameters getParams() {
+		return params;
+	}
+
+	/** set the parameters to be used for the algorithm
+	 * 
+	 * @param params the Parameter object
+	 */
+	public void setParams(StrucAligParameters params) {
+		this.params = params;
+	}
+
+
+	/** check if debug mode is set on
+	 * 
+	 * @return debug flag
+	 */
+	public boolean isDebug() {
+		return debug;
+	}
+
+	/** set the debug flag
+	 * 
+	 * @param debug flag
+	 */
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
+
+
+
+	/** calculate the alignment between the two full structures with default parameters
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @throws StructureException
+	 */
+	public void align(Structure s1, Structure s2)
+	throws StructureException {
+
+		align(s1,s2,params);
+	}
+
+
+	/** calculate the alignment between the two full structures with user provided parameters
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @param params
+	 * @throws StructureException
+	 */
+	public void align(Structure s1, Structure s2, StrucAligParameters params)
+	throws StructureException {
+		// step 1 convert the structures to Atom Arrays
+
+
+		Atom[] ca1 = getAlignmentAtoms(s1);
+		Atom[] ca2 = getAlignmentAtoms(s2);
+
+		align(ca1,ca2,params);
+	}
+
+
+	public  Atom[] getAlignmentAtoms(Structure s){
+		String[] atomNames = params.getUsedAtomNames();
+		return StructureTools.getAtomArray(s,atomNames);
+	}
+
+	/** calculate the  protein structure superimposition, between two sets of atoms.
+	 * 
+	 * 
+	 * 
+	 * @param ca1 set of Atoms of structure 1
+	 * @param ca2 set of Atoms of structure 2
+	 * @param params the parameters to use for the alignment
+	 * @throws StructureException
+	 */
+	public void align(Atom[] ca1, Atom[] ca2, StrucAligParameters params) 
+	throws StructureException {
+
+		reset();
+
+//		step 1 get all Diagonals of length X that are similar between both structures
+		if ( debug ) {
+			System.out.println(" length atoms1:" + ca1.length);
+			System.out.println(" length atoms2:" + ca2.length);
+
+			System.out.println("step 1 - get fragments with similar intramolecular distances ");
+		}
+		int k  = params.getDiagonalDistance();
+		int k2 = params.getDiagonalDistance2();
+		int fragmentLength = params.getFragmentLength();
+
+		if ( ca1.length < (fragmentLength + 1) || ca2.length < (fragmentLength + 1))  {
+			throw new StructureException("structure too short, can not align");
+		}
+		int rows = ca1.length - fragmentLength + 1;
+		int cols = ca2.length - fragmentLength + 1;
+		//System.out.println("rows "  + rows + " " + cols + 
+		//      " ca1 l " + ca1.length + " ca2 l " + ca2.length);
+		distanceMatrix = new Matrix(rows,cols,0.0);
+
+		double[] dist1 = AlignTools.getDiagonalAtK(ca1, k);
+
+		double[] dist2 = AlignTools.getDiagonalAtK(ca2, k);
+		double[] dist3 = new double[0];
+		double[] dist4 = new double[0];
+		if ( k2 > 0) { 
+			dist3 = AlignTools.getDiagonalAtK(ca1, k2);
+			dist4 = AlignTools.getDiagonalAtK(ca2, k2);
+		}
+
+		double[][] utmp = new double[][] {{0,0,1}};
+		//Matrix unitv = new Matrix(utmp);
+		Atom unitvector = new AtomImpl();
+		unitvector.setCoords(utmp[0]);
+
+
+		List<FragmentPair> fragments = new ArrayList<FragmentPair>();
+
+		for ( int i = 0 ; i< rows; i++){
+
+			Atom[] catmp1  = AlignTools.getFragment( ca1,  i, fragmentLength);
+			Atom   center1 = AlignTools.getCenter( ca1, i, fragmentLength);
+
+			for ( int j = 0 ; j < cols ; j++){
+
+				double rdd1 = AlignTools.rms_dk_diag(dist1,dist2,i,j,fragmentLength,k);
+				double rdd2 = 0;
+				if ( k2 > 0) 
+					rdd2 = AlignTools.rms_dk_diag(dist3,dist4,i,j,fragmentLength,k2);
+				double rdd = rdd1 + rdd2;
+				distanceMatrix.set(i,j,rdd);
+
+
+				if ( rdd < params.getFragmentMiniDistance()) {
+					FragmentPair f = new FragmentPair(fragmentLength,i,j);                                       
+					//System.out.println("i " + i + " " + j );
+					try {
+
+						Atom[] catmp2 = AlignTools.getFragment(ca2, j, fragmentLength);                        
+						Atom  center2 = AlignTools.getCenter(ca2,j,fragmentLength);
+
+						//System.out.println("c1 : " + center1 + " c2: " + center2);
+						f.setCenter1(center1);
+						f.setCenter2(center2);
+
+						SVDSuperimposer svd = new SVDSuperimposer(catmp1,catmp2);
+						Matrix rotmat = svd.getRotation();
+						//rotmat.print(3,3);
+						f.setRot(rotmat);
+
+						Atom aunitv = (Atom)unitvector.clone();
+						Calc.rotate(aunitv,rotmat);
+						f.setUnitv(aunitv);
+
+						boolean doNotAdd = false;
+						if ( params.reduceInitialFragments()) {
+							doNotAdd = FragmentJoiner.reduceFragments(fragments,f, distanceMatrix);
+
+						}
+						if ( doNotAdd)
+							continue;
+
+						fragments.add(f);
+
+					} catch (StructureException e){
+						e.printStackTrace();
+						break;
+					}
+				}
+			}
+		}
+
+		FragmentPair[] fp = (FragmentPair[]) fragments.toArray(new FragmentPair[fragments.size()]);
+		setFragmentPairs(fp);
+
+		if (  debug )
+			System.out.println( " got # fragment pairs: " + fp.length);
+
+		if ( debug )
+			System.out.println("step 2 - join fragments");
+
+		// step 2 combine them to possible models
+		FragmentJoiner joiner = new FragmentJoiner();
+
+
+		JointFragments[] frags;
+
+		if ( ! params.isJoinPlo() ){
+			frags =  joiner.approach_ap3(
+					ca1,ca2, fp, params);
+		} else {
+
+			// this approach by StrComPy (peter lackner):
+			frags =  joiner.frag_pairwise_compat(fp,
+					params.getAngleDiff(),
+					params.getFragCompat(),
+					params.getMaxrefine());
+		}
+
+		if ( debug ) 
+			System.out.println(" number joint fragments:"+frags.length);
+			
+		
+
+		if ( debug )
+			System.out.println("step 3 - refine alignments");
+
+		List<AlternativeAlignment> aas = new ArrayList<AlternativeAlignment>();
+		for ( int i = 0 ; i < frags.length;i++){
+			JointFragments f = frags[i];
+			AlternativeAlignment a = new AlternativeAlignment();
+			//System.out.println(f.getRms());
+			//a.setRms(f.getRms());
+			a.apairs_from_idxlst(f);
+			a.setAltAligNumber(i+1);
+			a.setDistanceMatrix(distanceMatrix);
+
+			try {
+				if ( params.getMaxIter() > 0 ){
+
+					a.refine(params,ca1,ca2);
+				}
+				else {
+					a.finish(params,ca1,ca2);
+
+				}
+			} catch (StructureException e){
+				e.printStackTrace();
+			}
+			a.calcScores(ca1,ca2);
+			// a.getRotationMatrix().print(3,3);
+			aas.add(a);
+		}
+
+
+		// sort the alternative alignments
+		Comparator<AlternativeAlignment> comp = new AltAligComparator();
+		Collections.sort(aas,comp);
+		Collections.reverse(aas);
+
+		alts = (AlternativeAlignment[])aas.toArray(new AlternativeAlignment[aas.size()]);     
+		// do final numbering of alternative solutions
+		int aanbr = 0;       
+		for ( int i = 0 ; i < alts.length; i++){
+			AlternativeAlignment a = alts[i];
+			aanbr++;
+			a.setAltAligNumber(aanbr);
+			//System.out.println(aanbr);
+			//a.getRotationMatrix().print(3,3);
+		}        
+		//System.out.println("calc done");
+	}
 
 
 }
