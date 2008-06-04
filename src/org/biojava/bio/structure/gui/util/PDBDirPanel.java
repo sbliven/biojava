@@ -61,6 +61,7 @@ implements StructurePairSelector{
 	 */
 	private static final long serialVersionUID = -5682120627824627408L;
 
+	boolean debug = true;
 	JTextField pdbDir;
 	JTextField f1;
 	JTextField f2;
@@ -79,19 +80,19 @@ implements StructurePairSelector{
 	 * 
 	 */
 	public PDBDirPanel() {
-		
+
 		Box vBox = Box.createVerticalBox();
 
 		pdbDir = new JTextField(20);
-		
+
 		String conf = System.getProperty(PDB_DIR);
 		if ( conf != null){
 			pdbDir.setText(conf);
 		}
 		JPanel dir = getPDBDirPanel(pdbDir);
 		vBox.add(dir);
-		
-		
+
+
 		int pdbfSize = 4;
 
 		f1 = new JTextField(pdbfSize);
@@ -111,46 +112,51 @@ implements StructurePairSelector{
 
 
 	private Structure fromPDB(JTextField f, JTextField c) throws StructureException{
-		String pdb1 = f.getText();
+		String pdb = f.getText();
 
 
-		if ( pdb1.length() < 4) {
+		if ( pdb.length() < 4) {
 			f.setText("!!!");
 			return null;
 		}
 
-		String chain1 = c.getText();
-
-		//System.out.print("file :" + pdb1 + " " +  chain1);
+		String chain = c.getText();
+		if ( debug )
+			System.out.println("file :" + pdb + " " +  chain);
 		/// prepare structures
 
 		// load them from the file system
 
 		PDBFileReader reader = new PDBFileReader();
-		
-		
+
+
 		String dir = pdbDir.getText();
 		if ( dir != null){
 			System.setProperty(PDB_DIR, dir);
 		}
 		reader.setPath(dir);
-		
-		System.out.println("dir: " + dir);
-		
+
+		if ( debug )
+			System.out.println("dir: " + dir);
+
 		Structure tmp1 = new StructureImpl();
 
 		try {
-			Structure structure1 = reader.getStructureById(pdb1);
+			Structure structure1 = reader.getStructureById(pdb);
 
 			// no chain has been specified
 			// return whole structure
-			if (( chain1 != null) || (chain1.length()==0)){
+			if (( chain == null) || (chain.length()==0)){
 				return structure1;
 			}
-
-			Chain c1 = structure1.findChain(chain1);
+			if ( debug)
+				System.out.println("using chain " + chain +  " for structure " + structure1.getPDBCode());
+			Chain c1 = structure1.findChain(chain);
+			tmp1.setPDBCode(structure1.getPDBCode());
+			tmp1.setPDBHeader(structure1.getPDBHeader());
 			tmp1.setPDBCode(structure1.getPDBCode());
 			tmp1.addChain(c1);
+			System.out.println("ok");
 
 		} catch (IOException e){
 			logger.warning(e.getMessage());
@@ -171,17 +177,17 @@ implements StructurePairSelector{
 
 
 	private JPanel getPDBDirPanel(JTextField f){
-		 JPanel panel = new JPanel();
-		 panel.setBorder(BorderFactory.createLineBorder(Color.black));
-	        
-		
+		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createLineBorder(Color.black));
+
+
 		JLabel l01 = new JLabel("Select PDB directory");
 		panel.add(l01);
-	
+
 		panel.add(f);
-		
+
 		Action action = new ChooseDirAction(pdbDir);
-		
+
 		JButton chooser = new JButton(action);
 		panel.add(chooser);
 		return panel;
@@ -192,7 +198,7 @@ implements StructurePairSelector{
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createLineBorder(Color.black));
 
-		
+
 
 		JLabel l01 = new JLabel("PDB code ");
 
@@ -201,7 +207,7 @@ implements StructurePairSelector{
 
 		JLabel l11 = new JLabel(pos + ":");
 
-		
+
 
 		f.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 
@@ -215,7 +221,7 @@ implements StructurePairSelector{
 
 		Box hBox21 = Box.createHorizontalBox();
 		JLabel l21 = new JLabel("Chain" + pos + ":");
-		
+
 		c.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
 		hBox21.add(l21);
 		hBox21.add(Box.createGlue());
@@ -230,7 +236,7 @@ implements StructurePairSelector{
 }
 
 class ChooseDirAction extends AbstractAction{
-	
+
 	JTextField textField;
 	public ChooseDirAction (JTextField textField){
 		super("Choose");
@@ -245,16 +251,16 @@ class ChooseDirAction extends AbstractAction{
 		if ( txt != null){
 			chooser.setCurrentDirectory(new java.io.File(txt));
 		} 
-	    chooser.setDialogTitle("Choose directory that contains your PDB files");
-	    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-	    //
-	    // disable the "All files" option.
-	    //
-	    chooser.setAcceptAllFileFilterUsed(false);
-	    //    
-	    
-	
-		
+		chooser.setDialogTitle("Choose directory that contains your PDB files");
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		//
+		// disable the "All files" option.
+		//
+		chooser.setAcceptAllFileFilterUsed(false);
+		//    
+
+
+
 //		In response to a button click:
 		int returnVal = chooser.showOpenDialog(null);
 		if ( returnVal == JFileChooser.APPROVE_OPTION) {
