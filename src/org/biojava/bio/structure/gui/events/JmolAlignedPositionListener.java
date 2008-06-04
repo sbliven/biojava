@@ -22,6 +22,7 @@
 package org.biojava.bio.structure.gui.events;
 
 import org.biojava.bio.structure.Atom;
+import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.align.StructurePairAligner;
@@ -75,7 +76,14 @@ public class JmolAlignedPositionListener implements AlignmentPositionListener{
 		if ( p1 >-1) {
 			Atom a = ca1[p1];
 			Group parent = a.getParent();
+			Chain c = parent.getParent();
 			pdbpos1 = parent.getPDBCode();
+			//System.out.println("chainid 1 is >"+c.getName()+"<");
+			if (! c.getName().equals( " ")) {
+				pdbpos1 += ":" + c.getName();
+			} 
+				
+			
 			//System.out.println("1:" + parent);
 			s += pdbpos1 +"/1";
 		}
@@ -83,8 +91,13 @@ public class JmolAlignedPositionListener implements AlignmentPositionListener{
 		if ( p2 >-1) {
 			Atom a = ca2[p2];
 			Group parent = a.getParent();
+			Chain c = parent.getParent();
 			pdbpos2 = parent.getPDBCode();
-			System.out.println("2:" + parent);
+			//System.out.println("2:" + parent);
+			//System.out.println("chainid 2 is >"+c.getName()+"<");
+			if (! c.getName().equals( " ")) {
+				pdbpos2 += ":" + c.getName();
+			}
 			if ( p1 > -1)
 				s +=",";
 			s += pdbpos2 +"/2";
