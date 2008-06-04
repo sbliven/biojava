@@ -27,17 +27,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.gui.SequenceDisplay;
 import org.biojava.bio.structure.gui.events.AlignmentPositionListener;
-
-import sun.security.krb5.internal.APOptions;
-
-
-
 
 
 /** a mouse listener for the AbstractChainRenderer class
@@ -143,7 +137,7 @@ MouseMotionListener
 
 	public void setChain(Chain c){
 
-		chainLength = c.getLength();
+		chainLength = c.getAtomLength();
 		coordManager.setLength(chainLength);
 	}
 
