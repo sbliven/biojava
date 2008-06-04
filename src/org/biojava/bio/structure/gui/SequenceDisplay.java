@@ -26,9 +26,7 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
@@ -44,6 +42,7 @@ import javax.swing.event.ChangeListener;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
+import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.align.StructurePairAligner;
 import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
@@ -315,7 +314,7 @@ public class SequenceDisplay extends JPanel implements ChangeListener {
 
 			int end = Math.max(p1,p2);
 
-			System.out.println("p1: " + p1 + " p2: " + p2 );
+			//System.out.println("p1: " + p1 + " p2: " + p2 );
 			// fill up  gaps...
 			for (;gap<end;gap++){
 
@@ -332,7 +331,7 @@ public class SequenceDisplay extends JPanel implements ChangeListener {
 				}
 				m.setEquivalent(AlignedPosition.NOT_ALIGNED);
 
-				System.out.println(m + " => " + end);
+				//System.out.println(m + " => " + end);
 				apos.add(m);				
 			}
 
@@ -343,7 +342,7 @@ public class SequenceDisplay extends JPanel implements ChangeListener {
 			m.setPos2(p2);
 			m.setEquivalent(AlignedPosition.EQUIVALENT);
 
-			System.out.println(m);
+			//System.out.println(m);
 			apos.add(m);
 			gpos1++;
 			gpos2++;
@@ -351,7 +350,7 @@ public class SequenceDisplay extends JPanel implements ChangeListener {
 
 		}
 
-		System.out.println(apos);
+		//System.out.println(apos);
 
 	}
 
@@ -365,7 +364,14 @@ public class SequenceDisplay extends JPanel implements ChangeListener {
 		Chain c = new ChainImpl();
 		c.setName("1");
 		for (Atom atom : ca1) {
-			c.addGroup(atom.getParent());
+			
+			Group g = atom.getParent();
+			
+			Chain parentChain = g.getParent();
+			
+			c.addGroup(g);
+			// hack for Jmol?			
+			g.setParent(parentChain);
 		}
 		panel.setChain(c);
 
