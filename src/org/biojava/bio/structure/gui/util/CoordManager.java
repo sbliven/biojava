@@ -69,9 +69,7 @@ public class CoordManager {
     }
     
     protected int getPanelPos(int seqPos){
-        int length = chainLength;
-        
-
+       
         if ( seqPos < 0 )
             seqPos = 0;
         

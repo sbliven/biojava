@@ -138,7 +138,7 @@ extends JPanel{
 			return;
 
 		AlignedPosition last = apos.get(apos.size()-1);
-		System.out.println("got last aligned:" +last);
+		//System.out.println("got last aligned:" +last);
 		if ( last.getPos(position) != -1){
 			// add the end of the chain...
 			int idxlast = last.getPos(position);

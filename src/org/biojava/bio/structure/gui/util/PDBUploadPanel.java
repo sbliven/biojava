@@ -120,10 +120,6 @@ public Structure getStructure2() throws StructureException{
 		return panel;
 
 	}
-	
-	
-	
-
 }
 
 class ChooseAction extends AbstractAction{
