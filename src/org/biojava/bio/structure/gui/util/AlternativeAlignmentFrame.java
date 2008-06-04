@@ -67,7 +67,7 @@ extends JFrame{
 
 	public static Logger logger =  Logger.getLogger("org.biojava");
 
-	private static String[] columnNames = new String[]{"#","eqr","score", "rms", "gaps","show distance matrix","show alignment"};
+	private static String[] columnNames = new String[]{"#","eqr","score", "rms", "gaps","cluster", "show distance matrix","show alignment"};
 
 	AlternativeAlignment[] aligs;
 	JPanel panel;
@@ -140,17 +140,17 @@ extends JFrame{
 			data[i][2] = new Double(alig.getScore());
 			data[i][3] = new Double(alig.getRmsd());
 			data[i][4] = new Integer(alig.getGaps());
-
+			data[i][5] = new Integer(alig.getCluster());
 			JButton maxb = new JButton("Distance Matrix");
 			maxb.addMouseListener(new MatrixMouseListener(this,i));
 
-			data[i][5] = maxb;
+			data[i][6] = maxb;
 			
 
 			//Action action1 = new MyButtonAction(t,this,i);
 			JButton but = new JButton("Show in Jmol");
 			but.addMouseListener(new MyButtonMouseListener(this,i));
-			data[i][6] = but;
+			data[i][7] = but;
 
 			
 		}
@@ -221,6 +221,7 @@ extends JFrame{
 		Structure n = new StructureImpl();
 		
 		List<Chain> chains1 = structure1.getChains();
+		
 		n.addModel(chains1);
 		
 		List<Chain> chains3 = s3.getChains();
@@ -263,12 +264,14 @@ extends JFrame{
 		
 		JmolAlignedPositionListener jmolBridge = new JmolAlignedPositionListener(jmol,structurePairAligner);
 		jmolBridge.setStructure1(structure1);
-		jmolBridge.setStructure2(structure2);
+		jmolBridge.setStructure2(s3);
 		
 		seqdisp.addAlignmentPositionListener(jmolBridge);
 		
 	}
 
+	
+	
 	private String[] createRasmolScripts(AlternativeAlignment alig){
 		String[] scripts = new String[2];
 
