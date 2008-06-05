@@ -22,7 +22,6 @@
 package org.biojava.bio.structure.io.mmcif;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,8 +35,10 @@ import org.biojava.bio.structure.io.mmcif.model.AtomSite;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
+import org.biojava.bio.structure.io.mmcif.model.EntityPolySeq;
 import org.biojava.bio.structure.io.mmcif.model.Exptl;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
+import org.biojava.bio.structure.io.mmcif.model.StructAsym;
 import org.biojava.bio.structure.io.mmcif.model.StructRef;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 
@@ -98,9 +99,9 @@ public class SimpleMMcifParser implements MMcifParser {
 	}
 
 	public static void main(String[] args){
-		//String file = "/Users/andreas/WORK/PDB/MMCIF/1gav.mmcif";
-		String file = "/Users/andreas/WORK/PDB/MMCIF/5pti.cif";
-		
+		String file = "/Users/andreas/WORK/PDB/MMCIF/1gav.mmcif";
+		//String file = "/Users/andreas/WORK/PDB/MMCIF/5pti.cif";
+		//String file = "/Users/andreas/WORK/PDB/MMCIF/1a4a.mmcif";
 		System.out.println("parsing " + file);
 		
 		MMcifParser parser = new SimpleMMcifParser();
@@ -413,19 +414,36 @@ public class SimpleMMcifParser implements MMcifParser {
 					loopFields,lineData);
 			
 			triggerExptl(exptl);						
+
 		} else if ( category.equals("_struct_ref")){
 			StructRef sref  = (StructRef) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.StructRef",
 					loopFields,lineData);
 			
 			triggerNewStrucRef(sref);		
+		
 		} else if ( category.equals("_struct_ref_seq")){
 			StructRefSeq sref  = (StructRefSeq) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.StructRefSeq",
 					loopFields,lineData);
 			
 			triggerNewStrucRefSeq(sref);		
+		} else if ( category.equals("_entity_poly_seq")){
+			EntityPolySeq exptl  = (EntityPolySeq) buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.EntityPolySeq",
+					loopFields,lineData);
+			
+			triggerNewEntityPolySeq(exptl);						
+
+		} else if ( category.equals("_struct_asym")){
+			StructAsym sasym  = (StructAsym) buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.StructAsym",
+					loopFields,lineData);
+			
+			triggerNewStructAsym(sasym);					
+
 		}
+		
 	}
 
 	private void setPair(Object o, List<String> lineData){
@@ -497,14 +515,20 @@ public class SimpleMMcifParser implements MMcifParser {
 		return o;
 	}
 
-
-
-	
-
-
 	public void triggerNewEntity(Entity entity){
 		for(MMcifConsumer c : consumers){
 			c.newEntity(entity);			
+		}
+	}
+	
+	public void triggerNewEntityPolySeq(EntityPolySeq epolseq){
+		for(MMcifConsumer c : consumers){
+			c.newEntityPolySeq(epolseq);			
+		}
+	}
+	public void triggerNewStructAsym(StructAsym sasym){
+		for(MMcifConsumer c : consumers){
+			c.newStructAsym(sasym);			
 		}
 	}
 

@@ -26,7 +26,9 @@ import org.biojava.bio.structure.io.mmcif.model.AtomSite;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
+import org.biojava.bio.structure.io.mmcif.model.EntityPolySeq;
 import org.biojava.bio.structure.io.mmcif.model.Exptl;
+import org.biojava.bio.structure.io.mmcif.model.StructAsym;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
 import org.biojava.bio.structure.io.mmcif.model.StructRef;
@@ -48,6 +50,8 @@ public interface MMcifConsumer {
 	 */
 	public void newAtomSite(AtomSite atom);
 	public void newEntity(Entity entity);
+	public void newEntityPolySeq(EntityPolySeq epolseq);
+	public void newStructAsym(StructAsym sasym);
 	public void setStruct(Struct struct);
 	public void newDatabasePDBrev(DatabasePDBrev dbrev);
 	public void newDatabasePDBremark(DatabasePDBremark remark);

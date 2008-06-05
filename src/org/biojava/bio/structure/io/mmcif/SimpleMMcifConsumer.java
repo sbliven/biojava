@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.AminoAcidImpl;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.AtomImpl;
@@ -42,14 +43,18 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.StructureTools;
 import org.biojava.bio.structure.io.PDBParseException;
+import org.biojava.bio.structure.io.SeqRes2AtomAligner;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
+import org.biojava.bio.structure.io.mmcif.model.EntityPolySeq;
 import org.biojava.bio.structure.io.mmcif.model.Exptl;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
+import org.biojava.bio.structure.io.mmcif.model.StructAsym;
 import org.biojava.bio.structure.io.mmcif.model.StructRef;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /** A MMcifConsumer implementation that build a in-memory representation of the 
  * content of a mmcif file as a BioJava Structure object.
@@ -65,14 +70,21 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	Group current_group;
 	int atomCount;
 	boolean parseCAOnly;
+	boolean alignSeqRes;
+	
 	List<Chain>   current_model;
 	List<Entity> entities;
 	List<StructRef> strucRefs;
-
+	List<Chain>   seqResChains; 
+	List<Chain>   entityChains; // needed to link entities, chains and compounds...
+	List<StructAsym> structAsyms; // needed to link entities, chains and compounds...
 	
-
 	public  SimpleMMcifConsumer(){
+	
 		documentStart();
+		
+		alignSeqRes = true;
+		parseCAOnly = false;
 
 	}
 
@@ -86,8 +98,22 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 	public void newEntity(Entity entity) {
 		if (DEBUG)
-			System.out.println(entity);	
+			System.out.println(entity);		
 		entities.add(entity);
+	}
+	
+	public void newStructAsym(StructAsym sasym){
+		
+		structAsyms.add(sasym);
+	}
+
+	private Entity getEntity(String entity_id){
+		for (Entity e: entities){			
+			if  (e.getId().equals(entity_id)){
+				return e;
+			}
+		}
+		return null;
 	}
 
 	public void setStruct(Struct struct) {
@@ -178,7 +204,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		String fullname = fixFullAtomName(atom.getLabel_atom_id());
 
-		if ( parseCAOnly){
+		if ( parseCAOnly ){
 			// yes , user wants to get CA only
 			// only parse CA atoms...
 			if (! fullname.equals(" CA ")){
@@ -188,9 +214,11 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 			}
 		}
 
-		String chain_id      = atom.getLabel_asym_id();
+		// Warning: getLabel_asym_id is not the "chain id" in the PDB file
+		// TODO: need to map the asym id to the pdb_strand_id later on  
+		String chain_id      = atom.getLabel_asym_id(); 
+		
 		String recordName    = atom.getGroup_PDB();
-		//String residueNumber = atom.getLabel_seq_id();
 		String residueNumber = atom.getAuth_seq_id();
 		String groupCode3    = atom.getLabel_comp_id();
 
@@ -300,8 +328,12 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		double occupancy = Double.parseDouble(atom.getOccupancy());
 		a.setOccupancy(occupancy);
-
+		
+		double temp = Double.parseDouble(atom.getB_iso_or_equiv());
+		a.setTempFactor(temp);
+				
 		a.setFullName(atom.getLabel_atom_id());
+		
 		String alt = atom.getLabel_alt_id();
 		if (( alt != null ) && ( alt.length() > 0)){
 			a.setAltLoc(new Character(alt.charAt(0)));
@@ -312,21 +344,47 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 	}
 
+	/** Start the parsing
+	 * 
+	 */
 	public void documentStart() {
 		structure = new StructureImpl();
 
 		current_chain = null;
 		current_group = null;
-		atomCount = 0;
-		parseCAOnly = false;
+		atomCount     = 0;
+	
 		current_model = new ArrayList<Chain>();
-		entities = new ArrayList<Entity>();
-		strucRefs = new ArrayList<StructRef>();
-
+		entities      = new ArrayList<Entity>();
+		strucRefs     = new ArrayList<StructRef>();
+		seqResChains  = new ArrayList<Chain>();
+		entityChains  = new ArrayList<Chain>();
+		structAsyms   = new ArrayList<StructAsym>();
+		
 	}
 
+
+	/** Flag if the SEQRES amino acids should be aligned with the ATOM amino acids.
+	 * 
+	 * @return flag if SEQRES - ATOM amino acids alignment is enabled
+	 */
+	public boolean isAlignSeqRes() {
+		return alignSeqRes;
+	}
+
+
+
+	/** define if the SEQRES in the structure should be aligned with the ATOM records
+	 * if yes, the AminoAcids in structure.getSeqRes will have the coordinates set.
+	 * @param alignSeqRes
+	 */
+	public void setAlignSeqRes(boolean alignSeqRes) {
+		this.alignSeqRes = alignSeqRes;
+	}
+	
+	
 	public void documentEnd() {
-		// a problem occured earlier so current_chain = null ...
+		// a problem ocured earlier so current_chain = null ...
 		// most likely the buffered reader did not provide data ...
 		if ( current_chain != null ) {
 			current_chain.addGroup(current_group);
@@ -337,18 +395,32 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		structure.addModel(current_model);
 
+		// TODO: use _pdbx_poly_seq_scheme
+		// to map  _pdbx_poly_seq_scheme.asym_id to the Chain ids (called pdb_strand_id)
+		//
+		
+		// map entities to Chains and Compound objects...
+		for (StructAsym asym : structAsyms) {
+			if ( DEBUG )
+				System.out.println("entity " + asym.getEntity_id() + " matches chain:" + asym.getId());
+			Chain s = getEntityChain(asym.getEntity_id());
+			Chain seqres = (Chain)s.clone();
+			seqres.setName(asym.getId());
+			seqResChains.add(seqres);
+			
+		}
+		
+		if ( alignSeqRes ){
+
+			SeqRes2AtomAligner aligner = new SeqRes2AtomAligner();
+			aligner.align(structure,seqResChains);
+		}
+		
 		//TODO: add support for these:
 
 		//structure.setConnections(connects);
 		//structure.setCompounds(compounds);
-		//structure.setDBRefs(dbrefs);
-
-		//if ( alignSeqRes ){
-
-		//SeqRes2AtomAligner aligner = new SeqRes2AtomAligner();
-		//aligner.align(structure,seqResChains);
-		//}
-
+		
 		//linkChains2Compound(structure);
 
 
@@ -491,8 +563,8 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		DBRef r = new DBRef();
 
 		
-		if (DEBUG)
-			System.out.println( " " + sref.getPdbx_PDB_id_code() + " " + sref.getPdbx_db_accession());
+		//if (DEBUG)
+		//	System.out.println( " " + sref.getPdbx_PDB_id_code() + " " + sref.getPdbx_db_accession());
 		r.setIdCode(sref.getPdbx_PDB_id_code());
 		r.setDbAccession(sref.getPdbx_db_accession());
 		r.setDbIdCode(sref.getPdbx_db_accession());
@@ -550,6 +622,67 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		
 		structure.setDBRefs(dbrefs);
 
+	}
+
+	private Chain getChainFromList(List<Chain> chains, String name){
+		for (Chain chain : chains) {
+			if ( chain.getName().equals(name)){
+				
+				return chain;
+			}
+		}
+		// does not exist yet, so create...
+		
+		Chain	chain = new ChainImpl();
+		chain.setName(name);
+		chains.add(chain);
+		
+		return chain;
+	}
+	
+	private Chain getEntityChain(String entity_id){
+		
+		return getChainFromList(entityChains,entity_id);
+	}
+	
+	private Chain getSeqResChain(String chainID){
+		return getChainFromList(seqResChains, chainID);
+	}
+	
+	/** The EntityPolySeq object provide the amino acid sequence objects for the Entities.
+	 * Later on the entities are mapped to the BioJava Chain and Compound objects.
+	 * @param epolseq the EntityPolySeq record for one amino acid 
+	 */
+	public void newEntityPolySeq(EntityPolySeq epolseq) {	
+		
+		Entity e = getEntity(epolseq.getEntity_id());
+		
+		if (e == null){
+			System.err.println("could not find entity "+ epolseq.getEntity_id()+". Can not match sequence to it.");
+			return;
+		}
+		
+		Chain entityChain = getEntityChain(epolseq.getEntity_id());
+		
+		// create group from epolseq;
+		AminoAcid g = new AminoAcidImpl();
+		try {
+			g.setPDBName(epolseq.getMon_id());
+			
+			Character code1 = StructureTools.convert_3code_1code(epolseq.getMon_id());
+			g.setAminoType(code1);
+			g.setPDBCode(epolseq.getNum());
+			entityChain.addGroup(g);
+			
+		} catch (PDBParseException ex) {
+			ex.printStackTrace();
+		} catch (IllegalSymbolException ex){
+			ex.printStackTrace();
+		}
+		
+		
+		
+		
 	}
 
 
