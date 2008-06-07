@@ -482,6 +482,12 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             for (int j = 0 ; j < refs.length; j++) {
                                 if (refs[j].trim().length()==0) continue;
                                 String[] parts = refs[j].split("=");
+                                if ( parts.length <2) {
+                                	// some DOI lines look like this and are causing problems:
+                                	//DOI=10.1002/(SICI)1097-0215(19990702)82:1<137::AID-IJC23>3.0.CO;2-F;ignoring
+                                	System.err.println("warning: problems while parsing: " + val);
+                                	continue;
+                                }
                                 String db = parts[0].trim();
                                 String ref = parts[1].trim();
                                 if (db.equalsIgnoreCase(Terms.PUBMED_KEY)) pubmed = ref;
