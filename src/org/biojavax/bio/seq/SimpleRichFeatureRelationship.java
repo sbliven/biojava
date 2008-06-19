@@ -128,6 +128,7 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
      * Relations are compared first by rank, then object, subject, then finally term.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.object==null) return -1;
         // Normal comparison

@@ -109,6 +109,7 @@ public class SimpleRankedCrossRef extends AbstractChangeable implements RankedCr
      * Ranked cross references are sorted first by rank, then by cross reference.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.crossref==null) return -1;
         // Normal comparison

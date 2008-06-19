@@ -105,6 +105,7 @@ public class SimpleComparableTerm extends AbstractChangeable implements Comparab
      * Terms are sorted by ontology first, then name.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.ontology==null) return -1;
         // Normal comparison

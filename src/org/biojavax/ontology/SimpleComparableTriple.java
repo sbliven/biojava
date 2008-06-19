@@ -76,6 +76,7 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
      * predicate.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         Triple them = (Triple)o;
         // Hibernate comparison - we haven't been populated yet
         if (this.ontology==null) return -1;

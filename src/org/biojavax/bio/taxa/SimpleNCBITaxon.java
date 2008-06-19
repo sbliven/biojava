@@ -80,6 +80,7 @@ public class SimpleNCBITaxon extends AbstractChangeable implements NCBITaxon {
      * NCBITaxon objects are compared only by their NCBITaxID fields.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         NCBITaxon them = (NCBITaxon)o;
         return this.NCBITaxID-them.getNCBITaxID();
     }

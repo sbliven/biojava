@@ -125,10 +125,9 @@ public class SimpleBioEntryRelationship extends AbstractChangeable implements Bi
      * ranks are null, they are treated as zero for comparison's sake.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.object==null) return -1;
-        //simple
-        if (this == o) return 0;
         // Normal comparison
         BioEntryRelationship them = (BioEntryRelationship)o;
         int ourRank =   (this.getRank() == null ? 0 : this.rank.intValue());

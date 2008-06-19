@@ -217,6 +217,7 @@ public class SimpleRankedDocRef extends AbstractChangeable implements RankedDocR
      * then by actual document reference.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.docref==null) return -1;
         // Normal comparison

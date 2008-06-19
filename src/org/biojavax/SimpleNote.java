@@ -149,6 +149,7 @@ public class SimpleNote extends AbstractChangeable implements Note {
      * Notes are compared first by rank, then by the term.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.term==null) return -1;
         // Normal comparison

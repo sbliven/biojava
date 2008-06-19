@@ -290,6 +290,7 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
      * finally version.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.ns==null) return -1;
         // Normal comparison

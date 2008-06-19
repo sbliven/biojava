@@ -135,6 +135,7 @@ public class SimpleDocRefAuthor extends Unchangeable implements DocRefAuthor  {
      * Document authors are compared first by name, then consortium status, then editor status.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         DocRefAuthor them = (DocRefAuthor)o;
         if (!this.name.equals(them.getName())) return this.name.compareTo(them.getName());
         if (this.consortium!=them.isConsortium()) return this.consortium?-1:1;

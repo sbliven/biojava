@@ -117,6 +117,7 @@ public class SimpleCrossRef extends Unchangeable implements CrossRef {
      * then by version.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.dbname==null) return -1;
         // Normal comparison

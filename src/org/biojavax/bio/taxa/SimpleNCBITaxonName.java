@@ -99,6 +99,7 @@ public class SimpleNCBITaxonName implements Comparable {
      * Taxon names are sorted by class first, then name.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.nameClass==null) return -1;
         // Normal comparison

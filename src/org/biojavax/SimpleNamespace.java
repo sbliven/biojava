@@ -195,6 +195,7 @@ public class SimpleNamespace extends AbstractChangeable implements Namespace {
      * Namespaces are compared only by name.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.name==null) return -1;
         // Normal comparison

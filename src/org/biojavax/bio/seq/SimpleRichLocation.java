@@ -679,6 +679,7 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
      * strand, then term, then min, then max.
      */
     public int compareTo(Object o) {
+        if (o==this) return 0;
         // Hibernate comparison - we haven't been populated yet
         if (this.strand==null) return -1;
         // Check if we can really compare at all
