@@ -516,7 +516,9 @@ public final class DNATools {
            throws IllegalAlphabetException{
        SymbolList symz = new SimpleSymbolList(syms);
        symz = symz.subList(start, end);
-       return toProtein(syms);
+       //return toProtein(syms);
+       //changed to fix bug 2521
+       return toProtein(symz);
    }
 }
 
