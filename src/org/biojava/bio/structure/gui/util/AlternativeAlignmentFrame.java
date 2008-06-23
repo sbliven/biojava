@@ -157,7 +157,7 @@ extends JFrame{
 		return data;
 	}
 
-	protected void showDistanceMatrix(int position){
+	public void showDistanceMatrix(int position){
 		if ( position > aligs.length){
 			return;
 		}
@@ -189,7 +189,7 @@ extends JFrame{
 
 	}
 
-	protected void showAlternative(int position){
+	public void showAlternative(int position){
 		if ( position > aligs.length){
 			return;
 		}
@@ -233,8 +233,7 @@ extends JFrame{
 		String[] cmds = createRasmolScripts(alig);
 		jmol.evalString("model 0 ; select * ; wireframe off ; spacefill off; backbone 0.3;");
 		jmol.evalString(cmds[0]);
-		jmol.evalString(cmds[1]);
-		
+		jmol.evalString(cmds[1]);		
 		
 		JFrame frame = new JFrame("Sequences for AlternativeAlignment ["+position+"]");
 		
@@ -263,7 +262,7 @@ extends JFrame{
 		seqdisp.updateDisplay();
 		
 		JmolAlignedPositionListener jmolBridge = new JmolAlignedPositionListener(jmol,structurePairAligner);
-		jmolBridge.setStructure1(structure1);
+		jmolBridge.setStructure1(structure1);		
 		jmolBridge.setStructure2(s3);
 		
 		seqdisp.addAlignmentPositionListener(jmolBridge);
