@@ -166,7 +166,11 @@ extends JPanel{
 		int i = 0;
 		while (iter.hasNext()){
 			AminoAcid aa = (AminoAcid) iter.next();
+
+			// preserver original hierarchy ... for highlighting in Jmol
+			Chain old = aa.getParent();
 			chain.addGroup(aa);
+			aa.setParent(old);
 			seqArr[i] = aa.getAminoType();
 			i++;
 		}
