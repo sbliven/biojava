@@ -51,6 +51,12 @@ import org.biojavax.bio.seq.io.FastaFormat;
 import org.biojavax.bio.seq.io.RichSeqIOListener;
 import org.biojavax.bio.taxa.NCBITaxon;
 
+/** Demo class that reads all chromosomes of Drosophila and prints out their sizes.
+ * See <a href="http://biojava.org/wiki/BioJava:Performance">http://biojava.org/wiki/BioJava:Performance</a>
+ * 
+ * @author Andreas Prlic
+ * @since 1.7
+ */
 public class ReadFastaX2 {
 
 	public static void main (String[] args){
@@ -137,121 +143,4 @@ public class ReadFastaX2 {
 	}
 }
 
-class QuickFastaListener implements RichSeqIOListener{
-
-	public RichFeature getCurrentFeature() throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void setAccession(String accession) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setCircular(boolean circular) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setComment(String comment) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setDescription(String description) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setDivision(String division) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setIdentifier(String identifier) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setNamespace(Namespace namespace) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setRankedCrossRef(RankedCrossRef crossRef) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setRankedDocRef(RankedDocRef ref) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setRelationship(BioEntryRelationship relationship) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setSeqVersion(String version) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setTaxon(NCBITaxon taxon) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setURI(String uri) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setVersion(int version) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void addFeatureProperty(Object key, Object value) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void addSequenceProperty(Object key, Object value) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length) throws IllegalAlphabetException {
-		System.out.println("adding " + syms.length + " symbols " + length);
-		
-	}
-
-	public void endFeature() throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void endSequence() throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setName(String name) throws ParseException {
-		System.out.println("set name " + name);
-		
-	}
-
-	public void startFeature(Template templ) throws ParseException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void startSequence() throws ParseException {
-	System.out.println("start sequence");
-		
-	}
 	
-}
