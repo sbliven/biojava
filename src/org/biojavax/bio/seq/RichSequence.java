@@ -43,6 +43,7 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeType;
@@ -56,6 +57,7 @@ import org.biojavax.bio.seq.io.EMBLxmlFormat;
 import org.biojavax.bio.seq.io.FastaFormat;
 import org.biojavax.bio.seq.io.FastaHeader;
 import org.biojavax.bio.seq.io.GenbankFormat;
+import org.biojavax.bio.seq.io.HashedFastaIterator;
 import org.biojavax.bio.seq.io.INSDseqFormat;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
 import org.biojavax.bio.seq.io.RichSequenceFormat;
@@ -811,6 +813,7 @@ public interface RichSequence extends BioEntry,Sequence {
          *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
          *              is used.
          * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         * @see #readHashedFastaDNA(BufferedReader, Namespace) for a speeded up version that can access sequences from memory.
          */
         public static RichSequenceIterator readFastaDNA(BufferedReader br, Namespace ns) {
             return new RichStreamReader(br,
@@ -818,6 +821,26 @@ public interface RichSequence extends BioEntry,Sequence {
                     getDNAParser(),
                     factory,
                     ns);
+        }
+        
+        /**
+         * Iterate over the sequences in an FASTA-format stream of DNA sequences.
+         * In contrast to readFastaDNA, this provides a speeded up implementation where all sequences are accessed from memory.
+         * 
+         * @param is the <code>BufferedInputStream</code> to read data from
+         * @param ns    a <code>Namespace</code> to load the sequences into. Null implies that it should
+         *              use the namespace specified in the file. If no namespace is
+         *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
+         *              is used.
+         * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
+         * @throws BioException if somethings goes wrong while reading the file. 
+         * @see #readFastaDNA
+         */
+        public static RichSequenceIterator readHashedFastaDNA(BufferedInputStream is, Namespace ns) throws BioException{
+        	
+        	Alphabet alpha = AlphabetManager.alphabetForName("DNA");
+        	return new HashedFastaIterator(is,alpha,ns);
+        	
         }
         
         /**
