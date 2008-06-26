@@ -38,6 +38,12 @@ import org.biojava.bio.structure.gui.util.AlternativeAlignmentFrame;
 import org.biojava.bio.structure.io.PDBFileParser;
 
 
+/** An example that aligns two protein structures.
+ * @author Andreas Prlic
+ *  @since 1.7
+ *  @date Jun 23, 2008
+ *
+ */
 public class AlignProteins {
 
 	public static void main (String[] args){
@@ -52,18 +58,20 @@ public class AlignProteins {
 		display.setTitle("BioJava performance example");
 		display.setVisible(true);
 
-		String txt = "<body>";
-		txt += "<h1>BioJava performance example</h1>";
-		txt += "Superimpose the protein structures of Myoglobin (2jho) and Haemoglobin (2hhb)<br><br> ";
+		StringBuffer txt = new StringBuffer();
+		txt.append("<body>");
+		txt.append( "<h1>BioJava performance example</h1>");
+		txt.append("Superimpose the protein structures of Myoglobin (2jho) and Haemoglobin (2hhb)<br><br> ");
 		
-		txt += "20 alternative alignments are calculated and clustered according to the similarity between the alignments.";
-		txt += "See how the alternative alignments of the first 4 clusters find the matches of Myoglobin to the different chains of Haemoglobin.<br><br>";
+		txt.append("20 alternative alignments are calculated and clustered according to the similarity between the alignments.");
+		txt.append("See how the alternative alignments of the first 4 clusters find the matches of Myoglobin to the different chains of Haemoglobin.<br><br>");
 		
-		txt += "The algorithm is based on a variation of the PSC++ algorithm provided by Peter Lackner,  Univ. Salzburg.";
-		txt += "It calculates a a distance matrix based, rigid body protein structure superimposition.<br><br>";
+		txt.append("The algorithm is based on a variation of the PSC++ algorithm provided by Peter Lackner,  Univ. Salzburg.");
+		txt.append("It calculates a a distance matrix based, rigid body protein structure superimposition.<br><br>");
 		
-
-		txt += "Loading ... " + fileName1 + "<br>";
+		txt.append("Loading ... ");
+		txt.append(fileName1);
+		txt.append("<br>");
 		display.setText(txt + "</body>");	
 
 		try {
@@ -72,7 +80,7 @@ public class AlignProteins {
 			if (mem0 >  maxMem) 
 				maxMem = mem0;		
 
-			txt += "Loading ... " + fileName2 + "<br>";
+			txt.append("Loading ... " + fileName2 + "<br>");
 			display.setText(txt + "</body>");	
 			Structure s2 = getStructureFromFile(fileName2);
 			mem0 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -81,11 +89,11 @@ public class AlignProteins {
 
 			StructurePairAligner aligner = new StructurePairAligner();
 
-			txt += "Calculating alignment ... ";
+			txt.append("Calculating alignment ... ");
 			display.setText(txt + "</body>");	
 			aligner.align(s1, s2);
 
-			txt += "done. <br>";
+			txt.append("done. <br>");
 
 			long time = System.currentTimeMillis() - start;
 			mem0 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -93,9 +101,9 @@ public class AlignProteins {
 				maxMem = mem0;	
 
 
-			txt += "total processing time: " + (time / 1000) + " sec. " + "<br>";
+			txt.append( "total processing time: " + (time / 1000) + " sec. " + "<br>");
 			//txt += "mamimum memory: " + (maxMem /1024/1024) + " MB" + "<br>";
-			txt += "now starting visualisation.<br><br>";
+			txt.append("now starting visualisation.<br><br>");
 						
 			display.setText(txt + "</body>");
 			
@@ -117,7 +125,7 @@ public class AlignProteins {
 
 			
 		} catch (Exception e){
-			txt += "ERROR: " + e.getMessage();
+			txt.append("ERROR: " + e.getMessage());
 			display.setText(txt + "</body>");
 			e.printStackTrace();
 		}

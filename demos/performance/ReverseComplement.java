@@ -39,6 +39,16 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+/** Read DNA sequence and write their reverse complement. 
+ * This is based on the benchmark provided at:
+ * http://shootout.alioth.debian.org/gp4/benchmark.php?test=revcomp&lang=all
+
+ * 
+ * @author Andy Yates
+ * @author Andreas Prlic
+ * @date Jun 23, 2008
+ * @since 1.7
+ */
 public class ReverseComplement {
 	
 	public static void main(String[] args) throws Exception {
@@ -55,17 +65,17 @@ public class ReverseComplement {
 		display.setTitle("Reverse complement - BioJava");
 		display.setVisible(true);
 
-		String txt = "<body>";
-		txt += "<h1>BioJava - Reverse Complement</h1>";
-		txt += "Read DNA sequence and write their reverse complement.<br>";
-		txt += "This is based on the benchmark  provided at:";
-		txt += "http://shootout.alioth.debian.org/gp4/benchmark.php?test=revcomp&amp;lang=all <br>";
-		txt += " in short the rules are :    <br>"; 
-		txt += "<ul><li> read line-by-line a redirected FASTA format file from stdin</li>";
-		txt += "<li>for each sequence:";
-		txt += "<ul>write the id, description, and the reverse-complement sequence in FASTA format to stdout</ul></li></ul>";
+		StringBuffer txt = new StringBuffer("<body>");
+		txt .append( "<h1>BioJava - Reverse Complement</h1>");
+		txt.append( "Read DNA sequence and write their reverse complement.<br>");
+		txt.append( "This is based on the benchmark  provided at:");
+		txt.append( "http://shootout.alioth.debian.org/gp4/benchmark.php?test=revcomp&amp;lang=all <br>");
+		txt.append( " in short the rules are :    <br>"); 
+		txt.append( "<ul><li> read line-by-line a redirected FASTA format file from stdin</li>");
+		txt.append( "<li>for each sequence:");
+		txt.append( "<ul>write the id, description, and the reverse-complement sequence in FASTA format to stdout</ul></li></ul>");
 
-		txt += "Loading ... " + fastaLocation + "<br>";
+		txt.append( "Loading ... " + fastaLocation + "<br>");
 		display.setText(txt + "</body>");	
 		
 		long start = System.currentTimeMillis();
@@ -89,7 +99,7 @@ public class ReverseComplement {
 		PrintStream ps = new PrintStream(baos);
 
 		
-		txt += "Output:<br>";
+		txt.append( "Output:<br>");
 		display.setText(txt + "</body>");	
 
 		
@@ -101,10 +111,10 @@ public class ReverseComplement {
 		}
 		
 		
-		txt += "<br><pre>" + baos.toString() +"<pre><br>";		
+		txt.append( "<br><pre>" + baos.toString() +"<pre><br>");		
 		long time = System.currentTimeMillis() - start;
-		txt += "total processing time: " + (time ) + " milli sec. " + "<br><br>";
-		txt += " BioJava provides a very fast and competetive implementation of this benchmark problem.<br>";
+		txt.append( "total processing time: " + (time ) + " milli sec. " + "<br><br>");
+		txt.append( " BioJava provides a very fast and competetive implementation of this benchmark problem.<br>");
 		
 		display.setText(txt + "</body>");
 		

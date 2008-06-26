@@ -35,11 +35,20 @@ import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 
+
+/** Read a FASTA file and print the length of all sequences in the file.
+ * 
+ * @author David Huen
+ * @author Andreas Prlic
+ *  @since 1.7
+ *  @date Jun 19, 2008
+ *
+ */
 public class ReadFasta {
 
 	/**
-	 * * The program takes two args: the first is the file name of the Fasta file.
-	 * * The second is the name of the Alphabet. Acceptable names are DNA RNA or PROTEIN.
+	 *  The program takes two args: the first is the file name of the Fasta file.
+	 *  The second is the name of the Alphabet. Acceptable names are DNA RNA or PROTEIN.
 	 * @param args parameter array
 	 **/
 	public static void main(String[] args) {
@@ -49,34 +58,35 @@ public class ReadFasta {
 			UserDisplay display = new UserDisplay();
 			display.setTitle("BioJava performance example");
 			display.setVisible(true);
-			
-			String txt = "<body>";
-			txt += "<h1>BioJava performance example</h1> Read all chromosomes of Drosophila and print the length of each.<br> ";
-			
+
+			StringBuffer txt = new StringBuffer();
+			txt.append("<body>");
+			txt.append("<h1>BioJava performance example</h1> Read all chromosomes of Drosophila and print the length of each.<br> ");
+
 			long start = System.currentTimeMillis();
 
 
 //			setup file input
 			String fileName = "/dmel-all-chromosome-r5.8.fasta.gz";
 			URL u = ReadFasta.class.getResource(fileName);
-			
-			
+
+
 			System.out.println(u);
-		
-			
+
+
 			String alphabet = "DNA";
 
-			txt += "reading " + fileName + " (47 MB)";
+			txt.append("reading " + fileName + " (47 MB)");
 			System.out.println(txt);
 			display.setText(txt + "</body>");
 
 			URLConnection urlc = u.openConnection();
-			
+
 			InputStream inStream = urlc.getInputStream();
 
 			if (inStream == null){
 				System.err.println("could not find file " + fileName);
-				txt += "could not find file " + fileName;
+				txt.append("could not find file " + fileName);
 				display.setText(txt + "</body>");
 				return;
 			}
@@ -92,40 +102,40 @@ public class ReadFasta {
 			SequenceDB db = SeqIOTools.readFasta(is, alpha);
 
 			long maxMem = 0;
-			
+
 			//list sequences and length
 			SequenceIterator sI = db.sequenceIterator();
 			long total = 0;
-			txt += "<table><tr><td><b>name</b></td><td><b>length</b></td></th>";
+			txt.append("<table><tr><td><b>name</b></td><td><b>length</b></td></th>");
 			while (sI.hasNext()) {
 				Sequence seq = sI.nextSequence();
 				System.out.println(seq.getName() + "\t" + seq.length());
-				txt += "<tr><td>" + seq.getName() + "</td><td>" + seq.length() + "</td></tr>";
+				txt.append("<tr><td>" + seq.getName() + "</td><td>" + seq.length() + "</td></tr>");
 				display.setText(txt + "</body>");
 				total += seq.length();
-				
-				
+
+
 				long mem0 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 				if (mem0 >  maxMem) 
 					maxMem = mem0;							
-				
+
 			}
-			txt += "</table>";
-			
+			txt.append( "</table>");
+
 			long mem0 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 			if (mem0 >  maxMem) 
 				maxMem = mem0;	
-			txt += "Total length is " + total + "<br>";
-			
+			txt.append("Total length is " + total + "<br>");
+
 			long time = System.currentTimeMillis() - start;
-			
-			
-			 
-			txt += "total processing time: " + (time / 1000) + " sec. " + "<br>";
-			txt += "mamimum memory: " + (maxMem /1024/1024) + " MB" + "<br>";
-			
+
+
+
+			txt.append( "total processing time: " + (time / 1000) + " sec. " + "<br>");
+			txt.append( "mamimum memory: " + (maxMem /1024/1024) + " MB" + "<br>");
+
 			display.setText(txt + "</body>");
-			
+
 		} catch (Exception ex) {
 			ex.printStackTrace();			
 			//not in fasta format or wrong alphabet

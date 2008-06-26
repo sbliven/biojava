@@ -24,38 +24,25 @@
 package performance;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 
-
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.seq.Feature.Template;
-import org.biojava.bio.seq.io.ParseException;
-import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.Symbol;
-import org.biojavax.Namespace;
-import org.biojavax.RankedCrossRef;
-import org.biojavax.RankedDocRef;
 import org.biojavax.SimpleNamespace;
-import org.biojavax.bio.BioEntryRelationship;
-import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.RichSequenceIterator;
-import org.biojavax.bio.seq.io.FastaFormat;
-import org.biojavax.bio.seq.io.RichSeqIOListener;
-import org.biojavax.bio.taxa.NCBITaxon;
+
 
 /** Demo class that reads all chromosomes of Drosophila and prints out their sizes.
  * See <a href="http://biojava.org/wiki/BioJava:Performance">http://biojava.org/wiki/BioJava:Performance</a>
  * 
+ *  
+ * Uses the quicker biojavax implementation.
+ * 
  * @author Andreas Prlic
  * @since 1.7
+ * @date Jun 17, 2008
  */
 public class ReadFastaX2 {
 
@@ -66,8 +53,8 @@ public class ReadFastaX2 {
 			display.setTitle("BioJava performance example - BioJavaX");
 			display.setVisible(true);
 			
-			String txt = "<body>";
-			txt += "<h1>BioJava performance example</h1> Read all chromosomes of Drosophila and print the length of each using BioJavaX.<br> ";
+			StringBuffer txt = new StringBuffer("<body>");
+			txt.append( "<h1>BioJava performance example</h1> Read all chromosomes of Drosophila and print the length of each using BioJavaX.<br> ");
 			
 			
 			long start = System.currentTimeMillis();
@@ -79,7 +66,7 @@ public class ReadFastaX2 {
 			System.out.println(u);
 			
 							
-			txt += "reading " + fileName + " (47 MB)";
+			txt.append( "reading " + fileName + " (47 MB)");
 			System.out.println(txt);
 			display.setText(txt + "</body>");
 			
@@ -88,7 +75,7 @@ public class ReadFastaX2 {
 			InputStream inStream = urlc.getInputStream();
 			if (inStream == null){
 				System.err.println("could not find file " + fileName);
-				txt += "could not find file " + fileName;
+				txt.append("could not find file " + fileName);
 				display.setText(txt + "</body>");
 				return;
 			}
@@ -109,13 +96,13 @@ public class ReadFastaX2 {
 			long maxMem = 0;
 			// Since a single file can contain more than a sequence, you need to iterate over
 			// rsi to get the information.
-			txt += "<table><tr><td><b>name</b></td><td><b>length</b></td></th>";
+			txt .append( "<table><tr><td><b>name</b></td><td><b>length</b></td></th>");
 			while(rsi.hasNext()){
 				RichSequence seq = rsi.nextRichSequence();
 				total += seq.length();
 				
 				System.out.println(seq.getName() + "\t" + seq.length());
-				txt += "<tr><td>" + seq.getName() + "</td><td>" + seq.length() + "</td></tr>";
+				txt .append( "<tr><td>" + seq.getName() + "</td><td>" + seq.length() + "</td></tr>");
 				display.setText(txt + "</body>");
 				
 				long mem0 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -123,14 +110,14 @@ public class ReadFastaX2 {
 					maxMem = mem0;	
 			}
 		
-			txt += "</table>";
+			txt.append( "</table>");
 			
-			txt += "Total length is " + total + "<br>";
+			txt .append( "Total length is " + total + "<br>");
 			
 			long time = System.currentTimeMillis() - start;
 			
-			txt += "total processing time: " + (time / 1000) + " sec. " + "<br>";
-			txt += "mamimum memory: " + (maxMem /1024/1024) + " MB" + "<br>";
+			txt .append( "total processing time: " + (time / 1000) + " sec. " + "<br>");
+			txt .append("mamimum memory: " + (maxMem /1024/1024) + " MB" + "<br>");
 			display.setText(txt + "</body>");
 			
 			
