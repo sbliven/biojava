@@ -178,10 +178,8 @@ public class StructureTools {
                 } catch (StructureException e){                	
                     // this group does not have a required atom, skip it...
                     thisGroupAllAtoms = false;
-                    continue;
-                    
-                }
-            
+                    break;                   
+                }            
             }
             if ( thisGroupAllAtoms){
                 // add the atoms of this group to the array.
@@ -240,7 +238,7 @@ public class StructureTools {
     /** convert a three letter code into single character.
 	 * catches for unusual characters
 	 * 
-	 * @param code3
+	 * @param groupCode3 three letter representation
 	 * @return null if group is a nucleotide code
 	 */
 	public static Character get1LetterCode(String groupCode3){
