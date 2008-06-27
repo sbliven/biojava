@@ -229,7 +229,7 @@ public class SeqRes2AtomAligner {
             Sequence bjseq2 = ProteinTools.createProteinSequence(seq2,"seq2");
 
             //System.out.println(bjseq1.getAlphabet());
-            NeedlemanWunsch aligner = new NeedlemanWunsch(-2, 5, 3, 3, 0,matrix);
+            NeedlemanWunsch aligner = new NeedlemanWunsch((short)-2,(short) 5,(short) 3,(short) 3,(short) 0,matrix);
             
             if (DEBUG){
             	System.out.println("seq lengths: " + bjseq1.seqString().length() + " " + bjseq2.seqString().length());
