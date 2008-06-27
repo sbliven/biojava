@@ -813,7 +813,7 @@ public interface RichSequence extends BioEntry,Sequence {
          *              specified in the file, then <code>RichObjectFactory.getDefaultNamespace()</code>
          *              is used.
          * @return      a <code>RichSequenceIterator</code> over each sequence in the fasta file
-         * @see #readHashedFastaDNA(BufferedReader, Namespace) for a speeded up version that can access sequences from memory.
+         * @see #readHashedFastaDNA(BufferedInputStream, Namespace) for a speeded up version that can access sequences from memory.
          */
         public static RichSequenceIterator readFastaDNA(BufferedReader br, Namespace ns) {
             return new RichStreamReader(br,
@@ -1295,6 +1295,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @param in The source of input <CODE>RichSequence</CODE>s
          * @param ns a <code>Namespace</code> to write the <CODE>RichSequence</CODE>s to. <CODE>Null</CODE> implies that it should
          * use the namespace specified in the individual sequence.
+         * @param header the FastaHeader
          * @throws java.io.IOException if there is an IO problem
          */
         public static void writeFasta(OutputStream os, SequenceIterator in, Namespace ns, FastaHeader header)
