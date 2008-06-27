@@ -107,11 +107,11 @@ public class SmithWatermanExample {
 				txt.append("Calculating SmithWaterman of <br>" );
 				txt.append("query  : " +query.getDescription() +" (" + query.getName()+")<br>");
 				txt.append("subject: " +subject.getDescription() +" (" + subject.getName()+")<br>");
-				double match     = 0;
-				double replace   = 5;
-				double insert    = 2;
-				double delete    = 2;
-				double gapExtend = 1;
+				short match     = 0;
+				short replace   = 5;
+				short insert    = 2;
+				short delete    = 2;
+				short gapExtend = 1;
 				txt.append("using penalties: match ("+match +"), replace ("+ replace+"),"+
 						" insert ("+ insert +" ) delete (" + delete + ")," +
 						" gapExtend (" +gapExtend +") <br>");
