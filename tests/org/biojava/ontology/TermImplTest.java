@@ -66,11 +66,12 @@ public class TermImplTest extends TestCase {
         }
     }
 
-    public void testCannotConstructWithNullDescription() {
-        try {
-            new Term.Impl(onto, "", null);
-            fail("Should have thrown a NullPointerException");
-        } catch (NullPointerException expected) {
-        }
-    }
+    // Description of terms from now on can change!
+//    public void testCannotConstructWithNullDescription() {
+//        try {
+//            new Term.Impl(onto, "", null);
+//            fail("Should have thrown a NullPointerException");
+//        } catch (NullPointerException expected) {
+//        }
+//    }
 }
