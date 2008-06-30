@@ -40,6 +40,7 @@ public class ParseOBOFileTest extends TestCase{
 		OboParser parser = new OboParser();
 		InputStream inStream = this.getClass().getResourceAsStream("/files/ontology/biosapiens.obo");
 
+		assertNotNull("could not find biosapiens.obo file",inStream);
 		BufferedReader oboFile = new BufferedReader ( new InputStreamReader ( inStream ) );
 		try {
 			Ontology ontology = parser.parseOBO(oboFile, "BioSapiens", "the BioSapiens ontology");
