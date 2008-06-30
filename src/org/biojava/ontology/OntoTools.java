@@ -23,6 +23,7 @@ public final class OntoTools {
   public static final Term ANY;
   public static final Term NONE;
   public static final Term IS_A;
+  public static final Term PART_OF;
   // public static final Term SUB_TYPE_OF;
   // public static final Term INSTANCE_OF;
   // public static final Term DOMAIN;
@@ -76,6 +77,8 @@ public final class OntoTools {
       ANY = CORE_ONTOLOGY.getTerm("any");
       NONE = CORE_ONTOLOGY.getTerm("none");
       IS_A = CORE_ONTOLOGY.getTerm("is-a");
+      PART_OF = CORE_ONTOLOGY.getTerm("part-of");
+      
       // SUB_TYPE_OF = CORE_ONTOLOGY.getTerm("sub_type_of");
       // INSTANCE_OF = CORE_ONTOLOGY.getTerm("instance_of");
       // DOMAIN = CORE_ONTOLOGY.getTerm("domain");

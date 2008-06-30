@@ -55,6 +55,7 @@ import org.biojava.bio.Annotation;
 public interface RemoteTerm extends Term {
     /**
      * Return the imported term
+     * @return the term
      */
 
     public Term getRemoteTerm();
@@ -68,7 +69,11 @@ public interface RemoteTerm extends Term {
     public final static class Impl
     extends AbstractTerm
     implements RemoteTerm, java.io.Serializable {
-        private final Ontology ontology;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 922700041939183676L;
+		private final Ontology ontology;
         private final Term remoteTerm;
         private final String name;
         private Set synonyms;

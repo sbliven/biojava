@@ -104,9 +104,12 @@ public interface OntologyTerm extends Term {
         public String getName() {
             return target.getName();
         }
-        
+                
         public String getDescription() {
             return target.getDescription();
+        }
+        public void setDescription(String description) {
+             target.setDescription(description);
         }
         
         public Ontology getOntology() {

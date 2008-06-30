@@ -45,203 +45,213 @@ import org.biojava.utils.Unchangeable;
  */
 
 public interface Triple
-        extends Term {
-  /**
-   * Return the subject term of this triple
-   */
+extends Term {
+	/**
+	 * Return the subject term of this triple
+	 * @return the subject term
+	 */
 
-  public Term getSubject();
+	public Term getSubject();
 
-  /**
-   * Return the object term of this triple.
-   */
+	/**
+	 * Return the object term of this triple.
+	 * @return the object term
+	 */
 
-  public Term getObject();
+	public Term getObject();
 
-  /**
-   * Return a Term which defines the type of relationship between the subject and object terms.
-   */
+	/**
+	 * Return a Term which defines the type of relationship between the subject and object terms.
+	 * @return the predicate
+	 */
 
-  public Term getPredicate();
+	public Term getPredicate();
 
-  /**
-   * The hashcode for a Triple.
-   *
-   * <p>This <em>must</em> be implemented as:
-   * <pre>
-   * return getSubject().hashCode() +
+	/**
+	 * The hashcode for a Triple.
+	 *
+	 * <p>This <em>must</em> be implemented as:
+	 * <pre>
+	 * return getSubject().hashCode() +
    31 * getObject().hashCode() +
    31 * 31 * getPredicate().hashCode();
-   * </pre>
-   * If you do not implement hashcode in this way then you have no guarantee
-   * that your Triple objects will be found in an ontology and that they will
-   * not be duplicated.
-   * </p>
-   */
-  public int hashCode();
+	 * </pre>
+	 * If you do not implement hashcode in this way then you have no guarantee
+	 * that your Triple objects will be found in an ontology and that they will
+	 * not be duplicated.
+	 * </p>
+	 */
+	public int hashCode();
 
-  /**
-   * Check to see if an object is an equivalent Triple.
-   *
-   * <p>
-   * Two triples are equivalent if they have the same subject, object and
-   * predicate fields.
-   * <pre>
-   * if (! (o instanceof Triple)) {
-   *     return false;
-   * }
-   * Triple to = (Triple) o;
-   * return to.getSubject() == getSubject() &&
-   *        to.getObject() == getObject() &&
-   *        to.getPredicate() == getPredicate();
-   * </pre>
-   * If you do not implement equals in this way then you have no guarantee
-   * that your Triple objects will be found in an ontology and that they will
-   * not be duplicated.
-   * </p>
-   */
-  public boolean equals(Object obj);
+	/**
+	 * Check to see if an object is an equivalent Triple.
+	 *
+	 * <p>
+	 * Two triples are equivalent if they have the same subject, object and
+	 * predicate fields.
+	 * <pre>
+	 * if (! (o instanceof Triple)) {
+	 *     return false;
+	 * }
+	 * Triple to = (Triple) o;
+	 * return to.getSubject() == getSubject() &&
+	 *        to.getObject() == getObject() &&
+	 *        to.getPredicate() == getPredicate();
+	 * </pre>
+	 * If you do not implement equals in this way then you have no guarantee
+	 * that your Triple objects will be found in an ontology and that they will
+	 * not be duplicated.
+	 * </p>
+	 */
+	public boolean equals(Object obj);
 
-  /**
-   * Basic in-memory implementation of a Triple in an ontology
-   *
-   * This can be used to implement Ontology.createTriple
-   * @see org.biojavax.ontology.SimpleComparableTriple
-   */
+	/**
+	 * Basic in-memory implementation of a Triple in an ontology
+	 *
+	 * This can be used to implement Ontology.createTriple
+	 * @see org.biojavax.ontology.SimpleComparableTriple
+	 */
 
-  public static final class Impl
-          extends Unchangeable
-          implements Triple, java.io.Serializable {
-    private final Term subject;
-    private final Term object;
-    private final Term predicate;
-    private /*final*/ String name;
-    private final String description;
-    private Set synonyms;
+	public static final class Impl
+	extends Unchangeable
+	implements Triple, java.io.Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3807331980372839221L;
+		private final Term subject;
+		private final Term object;
+		private final Term predicate;
+		private /*final*/ String name;
+		private /*final*/ String description;
+		private Set synonyms;
 
-    public Impl(Term subject, Term object, Term predicate) {
-      this(subject, object, predicate, null, null, null);
-    }
-    
-    public Impl(Term subject, Term object, Term predicate, Object[] synonyms) {
-      this(subject, object, predicate, null, null, synonyms);
-    }
+		public Impl(Term subject, Term object, Term predicate) {
+			this(subject, object, predicate, null, null, null);
+		}
 
-    public Impl(Term subject,
-                Term object,
-                Term predicate,
-                String name,
-                String description) {
-        this(subject,object,predicate,name,description,null);
-    }
-                
-    public Impl(Term subject,
-                Term object,
-                Term predicate,
-                String name,
-                String description,
-                Object[] synonyms)
-    {
-      if (subject == null) {
-        throw new NullPointerException("Subject must not be null");
-      }
-      if (object == null) {
-        throw new NullPointerException("Object must not be null");
-      }
-      if (predicate == null) {
-        throw new NullPointerException("predicate must not be null");
-      }
+		public Impl(Term subject, Term object, Term predicate, Object[] synonyms) {
+			this(subject, object, predicate, null, null, synonyms);
+		}
 
-      if(
-              subject.getOntology() != object.getOntology() ||
-              subject.getOntology() != predicate.getOntology()
-      ) {
-        throw new IllegalArgumentException(
-                "All terms must be from the same ontology: " +
-                subject.getOntology().getName() + ", " +
-                object.getOntology().getName() + ", " +
-                predicate.getOntology().getName());
-      }
+		public Impl(Term subject,
+				Term object,
+				Term predicate,
+				String name,
+				String description) {
+			this(subject,object,predicate,name,description,null);
+		}
 
-      if(description == null) {
-        description = "";
-      }
+		public Impl(Term subject,
+				Term object,
+				Term predicate,
+				String name,
+				String description,
+				Object[] synonyms)
+		{
+			if (subject == null) {
+				throw new NullPointerException("Subject must not be null");
+			}
+			if (object == null) {
+				throw new NullPointerException("Object must not be null");
+			}
+			if (predicate == null) {
+				throw new NullPointerException("predicate must not be null");
+			}
 
-      this.subject = subject;
-      this.object = object;
-      this.predicate = predicate;
-      this.name = name;
-      this.description = description;
-    
-      this.synonyms = new TreeSet();
-      if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
-    }
+			if(
+					subject.getOntology() != object.getOntology() ||
+					subject.getOntology() != predicate.getOntology()
+			) {
+				throw new IllegalArgumentException(
+						"All terms must be from the same ontology: " +
+						subject.getOntology().getName() + ", " +
+						object.getOntology().getName() + ", " +
+						predicate.getOntology().getName());
+			}
 
-    public void addSynonym(Object synonym) {
-        this.synonyms.add(synonym);
-    }
-        
-    public void removeSynonym(Object synonym) {
-        this.synonyms.remove(synonym);
-    }
-        
-    public Object[] getSynonyms() {
-        return this.synonyms.toArray();
-    }
-    
-    public String getName() {
-      if(name == null) {
-        name = predicate + "(" + subject + ", " + object + ")";
-      }
-      return name;
-    }
+			if(description == null) {
+				description = "";
+			}
 
-    public String getDescription() {
-      return description;
-    }
+			this.subject = subject;
+			this.object = object;
+			this.predicate = predicate;
+			this.name = name;
+			this.description = description;
 
-    public Ontology getOntology() {
-      return subject.getOntology();
-    }
+			this.synonyms = new TreeSet();
+			if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+		}
 
-    public Term getSubject() {
-      return subject;
-    }
+		public void addSynonym(Object synonym) {
+			this.synonyms.add(synonym);
+		}
 
-    public Term getObject() {
-      return object;
-    }
+		public void removeSynonym(Object synonym) {
+			this.synonyms.remove(synonym);
+		}
 
-    public Term getPredicate() {
-      return predicate;
-    }
+		public Object[] getSynonyms() {
+			return this.synonyms.toArray();
+		}
 
-    public Annotation getAnnotation() {
-      return Annotation.EMPTY_ANNOTATION;
-    }
+		public String getName() {
+			if(name == null) {
+				name = predicate + "(" + subject + ", " + object + ")";
+			}
+			return name;
+		}
 
-    /**
-     * Two triples are equal if all their fields are identical.
-     */
+		public String getDescription() {
+			return description;
+		}
+		public void setDescription(String desc){
+			this.description = desc;
+		}
 
-    public boolean equals(Object o) {
-      if (! (o instanceof Triple)) {
-        return false;
-      }
-      Triple to = (Triple) o;
-      return to.getSubject().equals(getSubject()) &&
-              to.getObject().equals(getObject()) &&
-              to.getPredicate().equals(getPredicate());
-    }
+		public Ontology getOntology() {
+			return subject.getOntology();
+		}
 
-    public int hashCode() {
-      return getSubject().hashCode() +
-              31 * getObject().hashCode() +
-              31 * 31 * getPredicate().hashCode();
-    }
+		public Term getSubject() {
+			return subject;
+		}
 
-    public String toString() {
-      return getName();
-    }
-  }
+		public Term getObject() {
+			return object;
+		}
+
+		public Term getPredicate() {
+			return predicate;
+		}
+
+		public Annotation getAnnotation() {
+			return Annotation.EMPTY_ANNOTATION;
+		}
+
+		/**
+		 * Two triples are equal if all their fields are identical.
+		 */
+
+		public boolean equals(Object o) {
+			if (! (o instanceof Triple)) {
+				return false;
+			}
+			Triple to = (Triple) o;
+			return to.getSubject().equals(getSubject()) &&
+			to.getObject().equals(getObject()) &&
+			to.getPredicate().equals(getPredicate());
+		}
+
+		public int hashCode() {
+			return getSubject().hashCode() +
+			31 * getObject().hashCode() +
+			31 * 31 * getPredicate().hashCode();
+		}
+
+		public String toString() {
+			return getName();
+		}
+	}
 }

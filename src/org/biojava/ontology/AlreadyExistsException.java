@@ -30,7 +30,9 @@ package org.biojava.ontology;
  */
 
 public class AlreadyExistsException extends OntologyException {
-    public AlreadyExistsException() {
+  
+
+	public AlreadyExistsException() {
         super();
     }
     

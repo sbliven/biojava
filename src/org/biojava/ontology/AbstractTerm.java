@@ -42,6 +42,7 @@ import org.biojava.utils.ChangeType;
  
 public abstract class AbstractTerm extends AbstractChangeable implements Term {
     private transient ChangeForwarder forwarder;
+    protected String description;
     
     public ChangeSupport getChangeSupport(ChangeType ct) {
             ChangeSupport cs = super.getChangeSupport(ct);
@@ -71,5 +72,9 @@ public abstract class AbstractTerm extends AbstractChangeable implements Term {
             getAnnotation().addChangeListener(forwarder, ChangeType.UNKNOWN);
             getOntology().addChangeListener(forwarder, ChangeType.UNKNOWN);
             return cs;
+    }
+    
+    public  void setDescription(String description){
+    	this.description = description;
     }
 }

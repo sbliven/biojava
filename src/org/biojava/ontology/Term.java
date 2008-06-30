@@ -67,6 +67,7 @@ public interface Term extends Annotatable {
 
     /**
      * Return the name of this term.
+     * @return the name of the term
      */
 
     public String getName();
@@ -74,30 +75,42 @@ public interface Term extends Annotatable {
     /**
      * Return a human-readable description of this term, or the empty string if
      * none is available.
+     * @return the description of the term
      */
 
     public String getDescription();
+    
+    /** set the description of the term;
+     * 
+     * @param description
+     * 
+     */
+    public void setDescription(String description);
 
     /**
      * Return the ontology in which this term exists.
+     * @return the ontology
      */
 
     public Ontology getOntology();
 
     /**
      * Return the synonyms for this term.
+     * @return the synonyms
      */
 
     public Object[] getSynonyms();
 
     /**
      * Add a synonym for this term.
+     * @param synonym the synonym
      */
 
     public void addSynonym(Object synonym);
 
     /**
      * Remove a synonym for this term.
+     * @param synonym 
      */
 
     public void removeSynonym(Object synonym);
@@ -111,12 +124,21 @@ public interface Term extends Annotatable {
     public static class Impl
     extends AbstractTerm
     implements Term, java.io.Serializable {
-        private final String name;
-        private final String description;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 6561668917514377417L;
+
+		private final String name;
+        
         private final Ontology ontology;
         private Annotation annotation;
         private Set synonyms;
 
+        public Impl(Ontology ontology, String name) {
+            this(ontology,name,null,null);
+        }
+        
         public Impl(Ontology ontology, String name, String description) {
             this(ontology,name,description,null);
         }
@@ -125,9 +147,10 @@ public interface Term extends Annotatable {
             if (name == null) {
                 throw new NullPointerException("Name must not be null");
             }
-            if (description == null) {
-                throw new NullPointerException("Description must not be null");
-            }
+            // by AP - description can change from now on...
+            //if (description == null) {
+            //    throw new NullPointerException("Description must not be null");
+            //}
             if (ontology == null) {
                 throw new NullPointerException("Ontology must not be null");
             }
@@ -154,9 +177,17 @@ public interface Term extends Annotatable {
 
         public String getName() {
             return name;
-        }
+        }                        
 
-        public String getDescription() {
+		public void setAnnotation(Annotation annotation) {
+			this.annotation = annotation;
+		}
+
+		public void setSynonyms(Set synonyms) {
+			this.synonyms = synonyms;
+		}
+
+		public String getDescription() {
             return description;
         }
 
