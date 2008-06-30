@@ -429,6 +429,13 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     /**
      * {@inheritDoc}
      */
+    public Term createTerm(String name) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException {
+        return this.createTerm(name,null,null);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public Term createTerm(String name, String description) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException {
         return this.createTerm(name,description,null);
     }
@@ -474,7 +481,7 @@ public class SimpleComparableOntology extends AbstractChangeable implements Comp
     public String getName() { return this.name; }
     
     // Hibernate requirement - not for public use.
-    void setName(String name) { this.name = name; }
+    public void setName(String name) { this.name = name; }
     
     /**
      * {@inheritDoc}

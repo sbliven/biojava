@@ -254,6 +254,12 @@ public class SimpleComparableTriple extends AbstractChangeable implements Compar
     
     /**
      * {@inheritDoc}
+     * does not do anything
+     */
+    public void setDescription(String desc) { }
+    
+    /**
+     * {@inheritDoc}
      * ALWAYS RETURNS THE EMPTY ANNOTATION
      */
     public Annotation getAnnotation() { return RichAnnotation.EMPTY_ANNOTATION; }
