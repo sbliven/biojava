@@ -67,6 +67,7 @@ public interface Ontology extends Changeable {
 
 	/**
 	 * Return the name of this ontology
+	 * @return the name of the ontology
 	 */
 
 	public String getName();
@@ -81,6 +82,7 @@ public interface Ontology extends Changeable {
 	/**
 	 * Return a human-readable description of this ontology, or the empty
 	 * string if none is available
+	 * @return the description of the term
 	 */
 
 	public String getDescription();
@@ -95,18 +97,20 @@ public interface Ontology extends Changeable {
 	
 	/**
 	 * Return all the terms in this ontology
+	 * @return a Set of all Terms of the ontology.
 	 */
 
-	public Set getTerms();
+	public Set<Term> getTerms();
 
 	/**
 	 * Fetch the term with the specified name.
+	 * @param name the name of the term
 	 *
 	 * @return The term named <code>name</code>
 	 * @throws NoSuchElementException if no term exists with that name
 	 */
 
-	public Term getTerm(String s) throws NoSuchElementException;
+	public Term getTerm(String name) throws NoSuchElementException;
 
 	/**
 	 * Return all triples from this ontology which match the supplied
@@ -116,9 +120,10 @@ public interface Ontology extends Changeable {
 	 * @param subject The subject to search for, or <code>null</code>
 	 * @param object The object to search for, or <code>null</code>
 	 * @param predicate The relationship to search for, or <code>null</code>.
+	 * @return a Set of triples
 	 */
 
-	public Set getTriples(Term subject, Term object, Term predicate);
+	public Set<Triple> getTriples(Term subject, Term object, Term predicate);
 
 	/**
 	 * Return the associated OntologyOps.
@@ -137,13 +142,13 @@ public interface Ontology extends Changeable {
 	/**
 	 * Create a new term in this ontology.
 	 *
-	 * @param name The name of the term (must be unique)
-	 * @param description A human-readable description (may be empty)
+	 * @param name The name of the term (must be unique))
 	 * @throws IllegalArgumentException if either <code>name</code> or
 	 *         <code>description</code> is <code>null</code>, or violates
 	 *         some other constraint of this implementation.
 	 * @throws AlreadyExistsException if a term of this name already exists
 	 * @return The newly created term.
+	 * @throws ChangeVetoException 
 	 */
 
 	public Term createTerm(String name)
@@ -162,6 +167,7 @@ public interface Ontology extends Changeable {
 	 *         some other constraint of this implementation.
 	 * @throws AlreadyExistsException if a term of this name already exists
 	 * @return The newly created term.
+	 * @throws ChangeVetoException 
 	 */
 
 	public Term createTerm(String name, String description)
@@ -181,6 +187,7 @@ public interface Ontology extends Changeable {
 	 *         some other constraint of this implementation.
 	 * @throws AlreadyExistsException if a term of this name already exists
 	 * @return The newly created term.
+	 * @throws ChangeVetoException 
 	 */
 
 	public Term createTerm(String name, String description, Object[] synonyms)
@@ -199,6 +206,7 @@ public interface Ontology extends Changeable {
 	 *         some other constraint of this implementation.
 	 * @throws AlreadyExistsException if a term of this name already exists
 	 * @return The newly created term.
+	 * @throws ChangeVetoException 
 	 */
 
 	public Variable createVariable(String name, String description)
@@ -218,6 +226,9 @@ public interface Ontology extends Changeable {
 	 *
 	 * @param t  the Term to import
 	 * @param localName  the local name to import it under, optionally null
+	 * @return a Term
+	 * @throws ChangeVetoException 
+	 * @throws IllegalArgumentException 
 	 */
 
 	public Term importTerm(Term t, String localName)
@@ -248,18 +259,26 @@ public interface Ontology extends Changeable {
 
 	/**
 	 * See if a triple exists in this ontology
+	 * @param subject 
+	 * @param object 
+	 * @param predicate 
+	 * @return true if contained
 	 */
 
 	public boolean containsTriple(Term subject, Term object, Term predicate);
 
 	/**
 	 * Remove a term from an ontology, together with all triples which refer to it.
+	 * @param t 
+	 * @throws ChangeVetoException 
 	 */
 
 	public void deleteTerm(Term t) throws ChangeVetoException;
 
 	/**
 	 * Determines if this ontology currently contains a term named <code>name</code>
+	 * @param name 
+	 * @return true is contained
 	 */
 
 	public boolean containsTerm(String name);
@@ -277,32 +296,41 @@ public interface Ontology extends Changeable {
 	public final class Impl
 	extends AbstractChangeable
 	implements Ontology, java.io.Serializable {
-		private final Map terms;
-		private final Set triples;
-		private final Map subjectTriples;
-		private final Map objectTriples;
-		private final Map relationTriples;
-		private final Map remoteTerms;
-		private final Set localRemoteTerms;
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -8064461497813727957L;
+		private final Map<String,Term> terms;
+		private final Set<Triple> triples;
+		private final Map<Term, Set<Triple>> subjectTriples;
+		private final Map<Term, Set<Triple>> objectTriples;
+		private final Map<Term, Set<Triple>> relationTriples;
+		private final Map<Term,RemoteTerm> remoteTerms;
+		private final Set<Term> localRemoteTerms;
 
 		private /*final*/ String name;
 		private /*final*/ String description;
 		private final OntologyOps ops;
 
 		{
-			terms = new HashMap();
-			triples = new HashSet();
-			subjectTriples = new HashMap();
-			objectTriples = new HashMap();
-			relationTriples = new HashMap();
-			remoteTerms = new HashMap();
-			localRemoteTerms = new HashSet();
+			terms            = new HashMap<String, Term>();
+			triples          = new HashSet<Triple>();
+			subjectTriples   = new HashMap<Term, Set<Triple>>();
+			objectTriples    = new HashMap<Term, Set<Triple>>();
+			relationTriples  = new HashMap<Term, Set<Triple>>();
+			remoteTerms      = new HashMap<Term, RemoteTerm>();
+			localRemoteTerms = new HashSet<Term>();
 		}
 
 		public Impl(String name, String description) {
 			this.name = name;
 			this.description = description;
 			ops = new DefaultOps() {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = -2135777733685713181L;
+
 				public Set getRemoteTerms() {
 					return localRemoteTerms;
 				}
@@ -322,8 +350,8 @@ public interface Ontology extends Changeable {
 			this.description = description;
 		}
 
-		public Set getTerms() {
-			return new HashSet(terms.values());
+		public Set<Term> getTerms() {
+			return new HashSet<Term>(terms.values());
 		}
 
 		public Term getTerm(String name)
@@ -337,7 +365,7 @@ public interface Ontology extends Changeable {
 			}
 		}
 
-		public Set getTriples(Term subject, Term object, Term predicate) {
+		public Set<Triple> getTriples(Term subject, Term object, Term predicate) {
 			if(subject != null && subject.getOntology() != this) {
 				throw new IllegalArgumentException("Subject is not in this ontology: " + subject + " " + this);
 			}
@@ -351,24 +379,24 @@ public interface Ontology extends Changeable {
 			}
 
 			if (subject != null) {
-				return filterTriples((Set) subjectTriples.get(subject), null, object, predicate);
+				return filterTriples( subjectTriples.get(subject), null, object, predicate);
 			} else if (object != null) {
-				return filterTriples((Set) objectTriples.get(object), subject, null, predicate);
+				return filterTriples( objectTriples.get(object), subject, null, predicate);
 			} else if (predicate != null) {
-				return filterTriples((Set) relationTriples.get(predicate), subject, object, null);
+				return filterTriples( relationTriples.get(predicate), subject, object, null);
 			} else {
 				return filterTriples(triples, subject, object, predicate);
 			}
 		}
 
-		private Set filterTriples(Set base, Term subject, Term object, Term predicate) {
+		private Set<Triple> filterTriples(Set<Triple> base, Term subject, Term object, Term predicate) {
 			if (base == null) {
 				return Collections.EMPTY_SET;
 			} else if (subject == null && object == null && predicate == null) {
-				return Collections.unmodifiableSet(new HashSet(base));
+				return Collections.unmodifiableSet(new HashSet<Triple>(base));
 			}
 
-			Set retval = new HashSet();
+			Set<Triple> retval = new HashSet<Triple>();
 			for (Iterator i = base.iterator(); i.hasNext(); ) {
 				Triple t = (Triple) i.next();
 				if (subject != null && t.getSubject() != subject) {
@@ -582,10 +610,10 @@ public interface Ontology extends Changeable {
 			pushTriple(relationTriples, t.getPredicate(), t);
 		}
 
-		private void pushTriple(Map m, Term key, Triple t) {
-			Set s = (Set) m.get(key);
+		private void pushTriple(Map<Term,Set<Triple>> m, Term key, Triple t) {
+			Set<Triple> s = m.get(key);
 			if (s == null) {
-				s = new HashSet();
+				s = new HashSet<Triple>();
 				m.put(key, s);
 			}
 			s.add(t);
