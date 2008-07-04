@@ -34,10 +34,13 @@ public class GenbankFormatTest extends TestCase {
     protected void setUp() {
         this.gbFormat = new GenbankFormat();
     }
-
+		
+		public void testGenbankParsingWithBondFeatures() {
+				readProteinFile("/files/BondFeature.gb");
+		}
 
     public void testGenbankParsing_oldStyleFile() {
-		RichSequence sequence = readFile("/files/NoAccession.gb");
+		RichSequence sequence = readDNAFile("/files/NoAccession.gb");
         assertEquals("NoAccess", sequence.getName());
         assertTrue(sequence.getCircular());
         assertEquals(null, sequence.getDescription());
@@ -63,7 +66,7 @@ public class GenbankFormatTest extends TestCase {
 
 
     public void testGenbankParsing_contemporaryApp() {
-		RichSequence sequence = readFile("/files/AY069118.gb");
+		RichSequence sequence = readDNAFile("/files/AY069118.gb");
         assertEquals("AY069118", sequence.getName());
         assertFalse(sequence.getCircular());
         assertEquals("Drosophila melanogaster GH13089 full length cDNA.", sequence.getDescription());
@@ -91,14 +94,14 @@ public class GenbankFormatTest extends TestCase {
 
 
     public void testGenbankWithNoAccession() {
-    	RichSequence sequence = readFile("/files/NoAccession.gb");
+    	RichSequence sequence = readDNAFile("/files/NoAccession.gb");
         assertNotNull(sequence);
         assertEquals("NoAccess", sequence.getAccession());
     }
 
     public void testCanReadWhatIsWritten() {
     	// Read a genbank file
-    	RichSequence sequence = readFile("/files/AY069118.gb");
+    	RichSequence sequence = readDNAFile("/files/AY069118.gb");
         assertNotNull(sequence);
 
         // Write the file to an in-memory buffer
@@ -136,7 +139,7 @@ public class GenbankFormatTest extends TestCase {
      * (">testempty no sequence") under the tested format.
      */
     public void testReadEmptySequence() {
-        RichSequence sequence = readFile("/files/empty_genbank.gb");
+        RichSequence sequence = readDNAFile("/files/empty_genbank.gb");
         assertNotNull(sequence);
         assertEquals(sequence.getName(), "testempty");
         assertEquals(sequence.getAccession(), "");
@@ -150,10 +153,27 @@ public class GenbankFormatTest extends TestCase {
      * @param filename name of file to read
      * @return a RichSequence instance
      */
-    private RichSequence readFile(String filename) {
+    private RichSequence readDNAFile(String filename) {
 		InputStream inStream = this.getClass().getResourceAsStream(filename);
         BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
         SymbolTokenization tokenization = RichSequence.IOTools.getDNAParser();
+        Namespace namespace = RichObjectFactory.getDefaultNamespace();
+        SimpleRichSequenceBuilder builder = new SimpleRichSequenceBuilder();
+        RichSequence sequence = null;
+        try {
+            this.gbFormat.readRichSequence(br, tokenization, builder, namespace);
+            sequence = builder.makeRichSequence();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Unexpected exception: "+e);
+        }
+		return sequence;
+	}
+	
+	private RichSequence readProteinFile(String filename) {
+		InputStream inStream = this.getClass().getResourceAsStream(filename);
+        BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
+        SymbolTokenization tokenization = RichSequence.IOTools.getProteinParser();
         Namespace namespace = RichObjectFactory.getDefaultNamespace();
         SimpleRichSequenceBuilder builder = new SimpleRichSequenceBuilder();
         RichSequence sequence = null;
