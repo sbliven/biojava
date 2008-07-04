@@ -426,74 +426,92 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
                     // a key that does not start with /
                     boolean seenAFeature = false;
                     int rcrossrefCount = 0;
+                    boolean skippingBond = false;
                     for (int i = 1 ; i < section.size(); i++) {
                         String key = ((String[])section.get(i))[0];
                         String val = ((String[])section.get(i))[1];
                         if (key.startsWith("/")) {
-                            key = key.substring(1); // strip leading slash
-                            val = val.replaceAll("\\s*[\\n\\r]+\\s*"," ").trim();
-                            if (val.endsWith("\"")) val = val.substring(1,val.length()-1); // strip quotes
-                            // parameter on old feature
-                            if (key.equals("db_xref")) {
-                                Matcher m = dbxp.matcher(val);
-                                if (m.matches()) {
-                                    String dbname = m.group(1);
-                                    String raccession = m.group(2);
-                                    if (dbname.equalsIgnoreCase("taxon")) {
-                                        // Set the Taxon instead of a dbxref
-                                        tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
-                                        rlistener.setTaxon(tax);
-                                        try {
-                                            if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism.replace('\n', ' '));// readSection can embed new lines
-                                        } catch (ChangeVetoException e) {
-                                            throw new ParseException(e+", accession:"+accession);
-                                        }
-                                    } else {
-                                        try {
-                                            CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession, new Integer(0)});
-                                            RankedCrossRef rcr = new SimpleRankedCrossRef(cr, ++rcrossrefCount);
-                                            rlistener.getCurrentFeature().addRankedCrossRef(rcr);
-                                        } catch (ChangeVetoException e) {
-                                            throw new ParseException(e+", accession:"+accession);
-                                        }
-                                    }
-                                } else {
-                                    String message = ParseException.newMessage(this.getClass(), accession, identifier, "Bad dbxref", sectionToString(section));
-                                    throw new ParseException(message);
-                                }
-                            } else if (key.equalsIgnoreCase("organism")) {
-                                try {
-                                    organism = val;
-                                    if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism.replace('\n', ' '));// readSection can embed new lines
-                                } catch (ChangeVetoException e) {
-                                    throw new ParseException(e+", accession:"+accession);
-                                }
-                            } else {
-                                if (key.equalsIgnoreCase("translation")) {
-                                    // strip spaces from sequence
-                                    val = val.replaceAll("\\s+","");
-                                }
-                                rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
-                            }
+                        	  if(!skippingBond)
+                        	  {
+	                            key = key.substring(1); // strip leading slash
+	                            val = val.replaceAll("\\s*[\\n\\r]+\\s*"," ").trim();
+	                            if (val.endsWith("\"")) val = val.substring(1,val.length()-1); // strip quotes
+	                            // parameter on old feature
+	                            if (key.equals("db_xref")) {
+	                                Matcher m = dbxp.matcher(val);
+	                                if (m.matches()) {
+	                                    String dbname = m.group(1);
+	                                    String raccession = m.group(2);
+	                                    if (dbname.equalsIgnoreCase("taxon")) {
+	                                        // Set the Taxon instead of a dbxref
+	                                        tax = (NCBITaxon)RichObjectFactory.getObject(SimpleNCBITaxon.class, new Object[]{Integer.valueOf(raccession)});
+	                                        rlistener.setTaxon(tax);
+	                                        try {
+	                                            if (organism!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism.replace('\n', ' '));// readSection can embed new lines
+	                                        } catch (ChangeVetoException e) {
+	                                            throw new ParseException(e+", accession:"+accession);
+	                                        }
+	                                    } else {
+	                                        try {
+	                                            CrossRef cr = (CrossRef)RichObjectFactory.getObject(SimpleCrossRef.class,new Object[]{dbname, raccession, new Integer(0)});
+	                                            RankedCrossRef rcr = new SimpleRankedCrossRef(cr, ++rcrossrefCount);
+	                                            rlistener.getCurrentFeature().addRankedCrossRef(rcr);
+	                                        } catch (ChangeVetoException e) {
+	                                            throw new ParseException(e+", accession:"+accession);
+	                                        }
+	                                    }
+	                                } else {
+	                                    String message = ParseException.newMessage(this.getClass(), accession, identifier, "Bad dbxref", sectionToString(section));
+	                                    throw new ParseException(message);
+	                                }
+	                            } else if (key.equalsIgnoreCase("organism")) {
+	                                try {
+	                                    organism = val;
+	                                    if (tax!=null) tax.addName(NCBITaxon.SCIENTIFIC,organism.replace('\n', ' '));// readSection can embed new lines
+	                                } catch (ChangeVetoException e) {
+	                                    throw new ParseException(e+", accession:"+accession);
+	                                }
+	                            } else {
+	                                if (key.equalsIgnoreCase("translation")) {
+	                                    // strip spaces from sequence
+	                                    val = val.replaceAll("\\s+","");
+	                                }
+	                                rlistener.addFeatureProperty(RichObjectFactory.getDefaultOntology().getOrCreateTerm(key),val);
+	                            }
+                          	}
                         } else {
                             // new feature!
                             // end previous feature
-                            if (seenAFeature) rlistener.endFeature();
-                            // start next one, with lots of lovely info in it
-                            RichFeature.Template templ = new RichFeature.Template();
-                            templ.annotation = new SimpleRichAnnotation();
-                            templ.sourceTerm = Terms.getGenBankTerm();
-                            templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key);
-                            templ.featureRelationshipSet = new TreeSet();
-                            templ.rankedCrossRefs = new TreeSet();
-                            String tidyLocStr = val.replaceAll("\\s+","");
-                            templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
-                            rlistener.startFeature(templ);
-                            seenAFeature = true;
-                            rcrossrefCount = 0;
+                            if(key.equalsIgnoreCase("bond"))
+                            {
+                            	skippingBond = true;
+                            }
+                            else
+                            {
+                            	skippingBond = false;
+                            	if (seenAFeature) {
+                            		rlistener.endFeature();
+                            	}
+	                            // start next one, with lots of lovely info in it
+	                            RichFeature.Template templ = new RichFeature.Template();
+	                            templ.annotation = new SimpleRichAnnotation();
+	                            templ.sourceTerm = Terms.getGenBankTerm();
+	                            templ.typeTerm = RichObjectFactory.getDefaultOntology().getOrCreateTerm(key);
+	                            templ.featureRelationshipSet = new TreeSet();
+	                            templ.rankedCrossRefs = new TreeSet();
+	                            String tidyLocStr = val.replaceAll("\\s+","");
+	                            templ.location = GenbankLocationParser.parseLocation(ns, accession, tidyLocStr);
+	                            rlistener.startFeature(templ);
+	                            seenAFeature = true;
+	                            rcrossrefCount = 0;
+                            }
+                            
                         }
                     }
-                    if (seenAFeature) rlistener.endFeature();
+                    
+                    if (seenAFeature) {
+                    	rlistener.endFeature();
+                    }
                 } else if (sectionKey.equals(BASE_COUNT_TAG)) {
                     // ignore - can calculate from sequence content later if needed
                 } else if (sectionKey.equals(START_SEQUENCE_TAG) && !this.getElideSymbols()) {
