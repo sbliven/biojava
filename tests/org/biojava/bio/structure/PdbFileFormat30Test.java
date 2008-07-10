@@ -94,6 +94,7 @@ public class PdbFileFormat30Test extends TestCase {
 		assertNotNull(inStream);
 		
 		PDBFileParser pdbpars = new PDBFileParser();
+		pdbpars.setAlignSeqRes(false);
 		Structure structure = null;
 		try {
 			structure = pdbpars.parsePDBFile(inStream) ;
