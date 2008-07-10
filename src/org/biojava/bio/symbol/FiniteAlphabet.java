@@ -47,7 +47,7 @@ public interface FiniteAlphabet extends Alphabet {
    * @return the size of the alphabet
    */
   int size();
-  
+
   /**
    * Retrieve an Iterator over the AtomicSymbols in this FiniteAlphabet.
    * <p>
@@ -56,8 +56,8 @@ public interface FiniteAlphabet extends Alphabet {
    *
    * @return an Iterator over the contained AtomicSymbol objects
    */
-  Iterator iterator();
-  
+  Iterator<Symbol> iterator();
+
 
   /**
    * Adds a symbol to this alphabet.
@@ -73,15 +73,15 @@ public interface FiniteAlphabet extends Alphabet {
    */
   public void addSymbol(Symbol s)
   throws IllegalSymbolException, ChangeVetoException;
-  
-  
+
+
   /**
    * Remove a symbol from this alphabet.
    * <p>
    * If the symbol matches multiple AtomicSymbols, then each matching symbol it
    * will be removed.
    *
-   * @param s the Symbol to removeintGot 
+   * @param s the Symbol to removeintGot
    * @throws IllegalSymbolException if the symbol is null, or if for any reason
    *         it can't be removed
    * @throws ChangeVetoException  if either the alphabet doesn't allow symbols
