@@ -40,6 +40,7 @@ public class StructureToolsTest extends TestCase {
 
 
         PDBFileParser pdbpars = new PDBFileParser();
+        pdbpars.setAlignSeqRes(false);
         try {
             structure = pdbpars.parsePDBFile(inStream) ;
         } catch (IOException e) {
