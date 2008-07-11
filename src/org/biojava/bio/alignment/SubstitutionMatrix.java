@@ -18,10 +18,8 @@
  *      http://www.biojava.org/
  *
  */
-
 /*
  * Created on 2005-08-01
- *
  */
 
 package org.biojava.bio.alignment;
@@ -35,11 +33,14 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 
 /**
@@ -163,6 +164,135 @@ public class SubstitutionMatrix {
 	}
 
 	/**
+	 * This constructor can be used to guess the alphabet of this substitution
+	 * matrix. However, it is recommended to apply another constructor if the
+	 * alphabet is known.
+	 *
+	 * @param file
+	 *          A file containing a substitution matrix.
+	 * @throws NumberFormatException
+	 * @throws NoSuchElementException
+	 * @throws BioException
+	 * @throws IOException
+	 */
+	public SubstitutionMatrix(File file) throws NumberFormatException,
+	    NoSuchElementException, BioException, IOException {
+		this(guessAlphabet(file), file);
+	}
+
+	/**
+	 * This constructor can be used to guess the alphabet of this substitution
+	 * matrix. However, it is recommended to apply another constructor if the
+	 * alphabet is known.
+	 *
+	 * @param reader
+	 * @throws NumberFormatException
+	 * @throws BioException
+	 * @throws IOException
+	 */
+	public SubstitutionMatrix(BufferedReader reader)
+	    throws NumberFormatException, BioException, IOException {
+		this(guessAlphabet(reader), reader.toString(), "unknown");
+		reader.close();
+	}
+
+	/**
+	 * This method constructs new substitution matrix objects by guessing
+	 * the alphabet in the file. If the alphabet is known, you should better
+	 * use one of the constructors where you can make use of this knowledge.
+	 *
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 * @throws BioException
+	 * @throws NumberFormatException
+	 */
+	public static SubstitutionMatrix getSubstituionMatrix(File file)
+	    throws NumberFormatException, BioException, IOException {
+		return new SubstitutionMatrix(file);
+	}
+
+	/**
+	 * This method tries to identify the alphabet within a matrix file. This is
+	 * necessary in cases where we do not know if this is a matrix for DNA, RNA or
+	 * PROTEIN/PROTEIN-TERM.
+	 *
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 * @throws BioException
+	 * @throws NoSuchElementException
+	 * @throws BioException
+	 */
+	private static FiniteAlphabet guessAlphabet(File file) throws IOException,
+	    NoSuchElementException, BioException {
+		String fileName = file.getName().toLowerCase();
+		if (fileName.contains("pam") || fileName.contains("blosum"))
+		  return (FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN-TERM");
+		return guessAlphabet(new BufferedReader(new FileReader(file)));
+	}
+
+	/**
+	 * This method guesses the alphabet of the given substitution matrix and
+	 * parses the given buffered reader. It then returns a new substitution
+	 * matrix.
+	 *
+	 * @param reader
+	 * @return
+	 * @throws IOException
+	 * @throws BioException
+	 * @throws NumberFormatException
+	 */
+	public static SubstitutionMatrix getSubstituionMatrix(BufferedReader reader)
+	    throws NumberFormatException, BioException, IOException {
+		return new SubstitutionMatrix(guessAlphabet(reader), reader.toString(),
+		    "unknown");
+	}
+
+	/**
+	 * This method guesses the alphabet of the given substituttion matrix which is
+	 * required for the parser.
+	 *
+	 * @param reader
+	 * @return
+	 * @throws IOException
+	 * @throws BioException
+	 */
+	private static FiniteAlphabet guessAlphabet(BufferedReader reader)
+	    throws IOException, BioException {
+		String line, trim;
+		FiniteAlphabet alphabet = null;
+		while (reader.ready()) {
+			line = reader.readLine();
+			if (line == null) break;
+			trim = line.trim();
+			if (trim.charAt(0) == '#')
+				continue;
+			else if ((line.charAt(0) == ' ') || (line.charAt(0) == '\t')) {
+				String alphabets[] = new String[] {"DNA", "RNA", "PROTEIN",
+				    "PROTEIN-TERM"};
+				SymbolTokenization symtok;
+				for (int i = 0; i < alphabets.length; i++) {
+					alphabet = (FiniteAlphabet) AlphabetManager
+					    .alphabetForName(alphabets[i]);
+					symtok = alphabet.getTokenization("token");
+					StringTokenizer st = new StringTokenizer(trim);
+					boolean noError = true;
+					for (int j = 0; st.hasMoreElements(); j++)
+						try {
+							symtok.parseToken(st.nextElement().toString());
+						} catch (IllegalSymbolException exc) {
+							noError = false;
+							break;
+						}
+					if (noError) return alphabet;
+				}
+			}
+		}
+		throw new BioException("Unknow alphabet used in this substitution matrix");
+	}
+
+	/**
 	 * Reads a String representing the contents of a substitution matrix file.
 	 *
 	 * @param matrixObj
@@ -193,12 +323,13 @@ public class SubstitutionMatrix {
 
 		while (br.ready()) {
 			line = br.readLine();
+			if (line == null) break;
 			trim = line.trim();
 			if (trim.charAt(0) == '#') {
 				description += line.substring(1);
 				continue;
 			} else if (!trim.startsWith(newLine)) {
-				if (line.charAt(0) == ' ') {
+				if ((line.charAt(0) == ' ') || (line.charAt(0) == '\t')) {
 					st = new StringTokenizer(trim);
 					for (j = 0; st.hasMoreElements(); j++) {
 						colSymbols.put(symtok.parseToken(st.nextElement().toString()),
@@ -214,6 +345,7 @@ public class SubstitutionMatrix {
 				}
 			}
 		}
+		br.close();
 
 		short[][] matrix = new short[rows][cols];
 
@@ -230,15 +362,16 @@ public class SubstitutionMatrix {
 		 */
 		while (br.ready()) {
 			line = br.readLine();
+			if (line == null) break;
 			trim = line.trim();
 			if (trim.charAt(0) == '#')
 				continue;
-			else if (line.charAt(0) == ' ')
+			else if ((line.charAt(0) == ' ') || (line.charAt(0) == '\t'))
 				continue;
 			else if (!trim.startsWith(newLine)) { // lines:
 				st = new StringTokenizer(trim);
 				if (st.hasMoreElements()) st.nextElement(); // throw away Symbol at
-																										// beginning.
+				// beginning.
 				for (j = 0; st.hasMoreElements(); j++) {// cols:
 					matrix[rows][j] = (short) Math.round(Double.parseDouble(st
 					    .nextElement().toString()));
@@ -248,6 +381,7 @@ public class SubstitutionMatrix {
 				rows++;
 			}
 		}
+		br.close();
 
 		return matrix;
 	}
@@ -465,7 +599,8 @@ public class SubstitutionMatrix {
 	 * @throws IOException
 	 * @throws NumberFormatException
 	 */
-	public SubstitutionMatrix normalizeMatrix() throws BioException, NumberFormatException, IOException {
+	public SubstitutionMatrix normalizeMatrix() throws BioException,
+	    NumberFormatException, IOException {
 		int i, j;
 		short min = getMin(), newMax = Short.MIN_VALUE;
 		short[][] mat = new short[matrix.length][matrix[matrix.length - 1].length];

@@ -1,12 +1,22 @@
 /*
- * BioJava development code This code may be freely distributed and modified
- * under the terms of the GNU Lesser General Public Licence. This should be
- * distributed with the code. If you do not have a copy, see:
- * http://www.gnu.org/copyleft/lesser.html Copyright for this code is held
- * jointly by the individual authors. These should be listed in @author doc
- * comments. For more information on the BioJava project and its aims, or to
- * join the biojava-l mailing list, visit the home page at:
- * http://www.biojava.org/
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
  */
 
 /*
@@ -21,9 +31,9 @@ import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.SymbolList;
 
 /**
- * This Interface provides methods for the alignment of biosequences.
+ * This Interface provides methods for the alignment of bio-sequences.
  *
- * @author Andreas Dr&auml;ger
+ * @author Andreas Dr&auml;ger <andreas.draeger@uni-tuebingen.de>
  * @author Mark Schreiber
  */
 public abstract class SequenceAlignment {
@@ -105,7 +115,7 @@ public abstract class SequenceAlignment {
 	 * @param time
 	 *          The time in milliseconds, which was needed to generate the
 	 *          alignment.
-	 * @return formatierten String.
+	 * @return formated String.
 	 */
 	public static StringBuffer formatOutput(String queryName, String targetName,
 	    String[] align, String path, int queryStart, int queryEnd,

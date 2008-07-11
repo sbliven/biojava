@@ -45,12 +45,12 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
 
 /**
- * Needleman and Wunsch definied the problem of global sequence alignments, from
+ * Needleman and Wunsch defined the problem of global sequence alignments, from
  * the first till the last symbol of a sequence. This class is able to perform
- * such global sequence comparisons efficiently by dynamic programing. If
+ * such global sequence comparisons efficiently by dynamic programming. If
  * inserts and deletes are equally expensive and as expensive as the extension
  * of a gap, the alignment method of this class does not use affine gap
- * panelties. Otherwise it does. Those costs need four times as much memory,
+ * penalties. Otherwise it does. Those costs need four times as much memory,
  * which has significant effects on the run time, if the computer needs to swap.
  *
  * @author Andreas Dr&auml;ger
@@ -72,17 +72,17 @@ public class NeedlemanWunsch extends SequenceAlignment {
   protected SubstitutionMatrix subMatrix;
 
   /**
-   * The result of a successfull alignment
+   * The result of a successful alignment
    */
   protected Alignment pairalign;
 
   /**
-   * The result of a successfull alignment as a simple String.
+   * The result of a successful alignment as a simple String.
    */
   protected String alignment;
 
   /**
-   * Expenses for insterts.
+   * Expenses for inserts.
    */
   private short insert;
 
@@ -257,7 +257,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
    * extensions of this class with all kinds of matrices.
    *
    * @param CostMatrix
-   *          The matrix that contains all expenses for swaping symbols.
+   *          The matrix that contains all expenses for swapping symbols.
    * @param queryChar
    *          a character representation of the query sequence (<code>mySequence.seqString().toCharArray()</code>).
    * @param targetChar
@@ -317,7 +317,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
   }
 
   /**
-   * This gives the edit distance acording to the given parameters of this
+   * This gives the edit distance according to the given parameters of this
    * certain object. It returns just the last element of the internal cost
    * matrix (left side down). So if you extend this class, you can just do the
    * following:
@@ -330,12 +330,12 @@ public class NeedlemanWunsch extends SequenceAlignment {
   }
 
   /**
-   * This just computes the minimum of three int values.
+   * This just computes the minimum of three integer values.
    *
    * @param x
    * @param y
    * @param z
-   * @return Gives the minimum of three ints
+   * @return Gives the minimum of three integers
    */
   protected static int min(int x, int y, int z) {
     if ((x < y) && (x < z))
@@ -360,9 +360,9 @@ public class NeedlemanWunsch extends SequenceAlignment {
    * @see toolbox.align.SequenceAlignment#alignAll(org.biojava.bio.seq.SequenceIterator,
    *      org.biojava.bio.seq.db.SequenceDB)
    */
-  public List alignAll(SequenceIterator source, SequenceDB subjectDB)
+  public List<Alignment> alignAll(SequenceIterator source, SequenceDB subjectDB)
       throws NoSuchElementException, BioException {
-    List l = new LinkedList();
+    List<Alignment> l = new LinkedList<Alignment>();
     while (source.hasNext()) {
       Sequence query = source.nextSequence();
       // compare all the sequences of both sets.
@@ -379,7 +379,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
   }
 
   /**
-   * Global pairwise sequence alginment of two BioJava-Sequence objects
+   * Global pairwise sequence alignment of two BioJava-Sequence objects
    * according to the Needleman-Wunsch-algorithm.
    *
    * @see org.biojava.bio.alignment.SequenceAlignment#pairwiseAlignment(org.biojava.bio.symbol.SymbolList,
@@ -600,7 +600,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
             new SimpleSymbolList(
                 ssubject.getAlphabet().getTokenization("token"), align[1]),
             ssubject.getURN(), ssubject.getName(), ssubject.getAnnotation()));
-        Map m = new HashMap();
+        Map<String, Sequence> m = new HashMap<String, Sequence>();
         m.put(squery.getName(), squery);
         m.put(ssubject.getName(), ssubject);
         pairalign = new SimpleAlignment(m);
@@ -637,7 +637,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
   }
 
   /**
-   * This method computes the scores for the substution of the i-th symbol of
+   * This method computes the scores for the substitution of the i-th symbol of
    * query by the j-th symbol of subject.
    *
    * @param query

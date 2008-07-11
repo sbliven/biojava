@@ -1,13 +1,24 @@
 /*
- * BioJava development code This code may be freely distributed and modified
- * under the terms of the GNU Lesser General Public Licence. This should be
- * distributed with the code. If you do not have a copy, see:
- * http://www.gnu.org/copyleft/lesser.html Copyright for this code is held
- * jointly by the individual authors. These should be listed in @author doc
- * comments. For more information on the BioJava project and its aims, or to
- * join the biojava-l mailing list, visit the home page at:
- * http://www.biojava.org/
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
  */
+
 package org.biojava.bio.alignment;
 
 import java.util.HashMap;
@@ -29,14 +40,14 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
 
 /**
- * Smith and Waterman developed an efficient dynamic programing algorithm to
+ * Smith and Waterman developed an efficient dynamic programming algorithm to
  * perform local sequence alignments, which returns the most conserved region of
- * two sequences (longes common substring with modifications). This algorithm is
+ * two sequences (longest common substring with modifications). This algorithm is
  * performed by the method <code>pairwiseAlignment</code> of this class. It
  * uses affine gap penalties if and only if the expenses of a delete or insert
  * operation are unequal to the expenses of gap extension. This uses
  * significantly more memory (four times as much) and increases the runtime if
- * swaping is performed.
+ * swapping is performed.
  *
  * @author Andreas Dr&auml;ger
  * @author Gero Greiner
@@ -50,10 +61,10 @@ public class SmithWaterman extends NeedlemanWunsch {
 	/**
 	 * Constructs the new SmithWaterman alignment object. Alignments are only
 	 * performed, if the alphabet of the given <code>SubstitutionMatrix</code>
-	 * equals the alpabet of both the query and the target <code>Sequence</code>.
+	 * equals the alphabet of both the query and the target <code>Sequence</code>.
 	 * The alignment parameters here are expenses and not scores as they are in
 	 * the <code>NeedlemanWunsch</code> object. scores are just given by
-	 * multipliing the expenses with <code>(-1)</code>. For example you could
+	 * multiplying the expenses with <code>(-1)</code>. For example you could
 	 * use parameters like "-2, 5, 3, 3, 0". If the expenses for gap extension are
 	 * equal to the cost of starting a gap (delete or insert), no affine gap
 	 * penalties are used, which saves memory.
@@ -85,8 +96,8 @@ public class SmithWaterman extends NeedlemanWunsch {
 
 	/**
 	 * Overrides the method inherited from the NeedlemanWunsch and sets the
-	 * penalty for an insert operation to the specified value. Reason: internaly
-	 * scores are used instead of penalties so that the value is muliplied with
+	 * penalty for an insert operation to the specified value. Reason: internally
+	 * scores are used instead of penalties so that the value is muliplyed with
 	 * -1.
 	 *
 	 * @param ins
@@ -99,8 +110,8 @@ public class SmithWaterman extends NeedlemanWunsch {
 
 	/**
 	 * Overrides the method inherited from the NeedlemanWunsch and sets the
-	 * penalty for a delete operation to the specified value. Reason: internaly
-	 * scores are used instead of penalties so that the value is muliplied with
+	 * penalty for a delete operation to the specified value. Reason: internally
+	 * scores are used instead of penalties so that the value is muliplyed with
 	 * -1.
 	 *
 	 * @param del
@@ -114,8 +125,8 @@ public class SmithWaterman extends NeedlemanWunsch {
 	/**
 	 * Overrides the method inherited from the NeedlemanWunsch and sets the
 	 * penalty for an extension of any gap (insert or delete) to the specified
-	 * value. Reason: internaly scores are used instead of penalties so that the
-	 * value is muliplied with -1.
+	 * value. Reason: internally scores are used instead of penalties so that the
+	 * value is muliplyed with -1.
 	 *
 	 * @param ge
 	 *          costs for any gap extension
@@ -127,8 +138,8 @@ public class SmithWaterman extends NeedlemanWunsch {
 
 	/**
 	 * Overrides the method inherited from the NeedlemanWunsch and sets the
-	 * penalty for a match operation to the specified value. Reason: internaly
-	 * scores are used instead of penalties so that the value is muliplied with
+	 * penalty for a match operation to the specified value. Reason: internally
+	 * scores are used instead of penalties so that the value is muliplyed with
 	 * -1.
 	 *
 	 * @param ma
@@ -141,8 +152,8 @@ public class SmithWaterman extends NeedlemanWunsch {
 
 	/**
 	 * Overrides the method inherited from the NeedlemanWunsch and sets the
-	 * penalty for a replace operation to the specified value. Reason: internaly
-	 * scores are used instead of penalties so that the value is muliplied with
+	 * penalty for a replace operation to the specified value. Reason: internally
+	 * scores are used instead of penalties so that the value is muliplyed with
 	 * -1.
 	 *
 	 * @param rep
@@ -157,7 +168,7 @@ public class SmithWaterman extends NeedlemanWunsch {
 	 * Overrides the method inherited from the NeedlemanWunsch and performs only a
 	 * local alignment. It finds only the longest common subsequence. This is good
 	 * for the beginning, but it might be better to have a system to find more
-	 * than only one hit within the score matrix. Therfore one should only define
+	 * than only one hit within the score matrix. Therefore, one should only define
 	 * the k-th best hit, where k is somehow related to the number of hits.
 	 *
 	 * @see SequenceAlignment#pairwiseAlignment(org.biojava.bio.symbol.SymbolList,
@@ -412,7 +423,7 @@ public class SmithWaterman extends NeedlemanWunsch {
 	}
 
 	/**
-	 * This just computes the maximum of four ints.
+	 * This just computes the maximum of four integers.
 	 *
 	 * @param w
 	 * @param x
@@ -428,7 +439,7 @@ public class SmithWaterman extends NeedlemanWunsch {
 	}
 
 	/**
-	 * This method computes the scores for the substution of the i-th symbol of
+	 * This method computes the scores for the substitution of the i-th symbol of
 	 * query by the j-th symbol of subject.
 	 *
 	 * @param query
