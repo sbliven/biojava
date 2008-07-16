@@ -26,81 +26,88 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.biojava.bio.gui.glyph.ArrowGlyph;
 import org.biojava.bio.gui.glyph.Glyph;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.utils.ChangeVetoException;
 
-
 /**
- * A FeatureRenderer that renders a particular Glyph for Features accepted by a particular
- * FeatureFilter
+ * A FeatureRenderer that renders a particular Glyph for Features accepted by a
+ * particular FeatureFilter
  *
  * @author Mark Southern
+ * @author <a href="mailto:andreas.draeger@uni-tuebingen.de">Andreas Dr&auml;ger</a>
  * @see org.biojava.bio.gui.glyph.Glyph
  * @since 1.5
  */
-public class GlyphFeatureRenderer extends FilteringRenderer implements FeatureRenderer {
-    private double depth = 15;
-    private List fList = new ArrayList();
-    private List gList = new ArrayList();
+public class GlyphFeatureRenderer extends FilteringRenderer implements
+    FeatureRenderer {
+	private double	            depth	= 15;
 
-    public GlyphFeatureRenderer() {
-        super();
-    }
+	private List<FeatureFilter>	fList;
 
-    public void addFilterAndGlyph(FeatureFilter ff, Glyph g)
-        throws ChangeVetoException {
-        fList.add(ff);
-        gList.add(g);
+	private List<Glyph>	        gList;
 
-        if (fList.size() == 0) {
-            setFilter(FeatureFilter.none);
-        } else {
-            FeatureFilter f = ( FeatureFilter ) fList.get(0);
+	public GlyphFeatureRenderer() {
+		super();
+		fList = new ArrayList<FeatureFilter>();
+		gList = new ArrayList<Glyph>();
+	}
 
-            if (fList.size() == 1) {
-                setFilter(f);
-            } else {
-                for (int i = 1; i < fList.size(); i++) {
-                    f = new FeatureFilter.Or(f, ( FeatureFilter ) fList.get(i));
-                }
+	public void addFilterAndGlyph(FeatureFilter ff, Glyph g)
+	    throws ChangeVetoException {
+		fList.add(ff);
+		gList.add(g);
 
-                setFilter(f);
-            }
-        }
-    }
+		if (fList.size() == 0) {
+			setFilter(FeatureFilter.none);
+		} else {
+			FeatureFilter f = fList.get(0);
 
-    public void setDepth(double depth) {
-        this.depth = depth;
-    }
+			if (fList.size() == 1) {
+				setFilter(f);
+			} else {
+				for (int i = 1; i < fList.size(); i++) {
+					f = new FeatureFilter.Or(f, fList.get(i));
+				}
 
-    public double getDepth(SequenceRenderContext src) {
-        return depth;
-    }
+				setFilter(f);
+			}
+		}
+	}
 
-    public FeatureHolder processMouseEvent(FeatureHolder fh, SequenceRenderContext src,
-        MouseEvent me
-    ) {
-        return fh;
-    }
+	public void setDepth(double depth) {
+		this.depth = depth;
+	}
 
-    public void renderFeature(Graphics2D g2, Feature f, SequenceRenderContext src) {
-        float minBounds = ( float ) src.sequenceToGraphics(f.getLocation().getMin());
-        float maxBounds = ( float ) src.sequenceToGraphics(f.getLocation().getMax() + 1);
-        Rectangle2D.Float bounds;
-        bounds = new Rectangle2D.Float(minBounds, 0, maxBounds - minBounds, ( float ) depth);
+	public double getDepth(SequenceRenderContext src) {
+		return depth;
+	}
 
-        for (int i = 0; i < fList.size(); i++) {
-            if ((( FeatureFilter ) fList.get(i)).accept(f)) {
-                Glyph g = ( Glyph ) gList.get(i);
-                g.setBounds(bounds);
+	public FeatureHolder processMouseEvent(FeatureHolder fh,
+	    SequenceRenderContext src, MouseEvent me) {
+		return fh;
+	}
 
-                if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
-                    g.render(g2);
-                }
-            }
-        }
-    }
+	public void renderFeature(Graphics2D g2, Feature f, SequenceRenderContext src) {
+		float minBounds = (float) src.sequenceToGraphics(f.getLocation().getMin());
+		float maxBounds = (float) src
+		    .sequenceToGraphics(f.getLocation().getMax() + 1);
+		Rectangle2D.Float bounds;
+		bounds = new Rectangle2D.Float(minBounds, 0, maxBounds - minBounds,
+		    (float) depth);
+
+		for (int i = 0; i < fList.size(); i++)
+			if (fList.get(i).accept(f)) {
+				Glyph g = gList.get(i);
+				g.setBounds(bounds);
+				if ((g instanceof ArrowGlyph) && (f instanceof StrandedFeature))
+					((ArrowGlyph) g).setDirection(((StrandedFeature) f).getStrand().getValue());
+				if (src.getDirection() == SequenceRenderContext.HORIZONTAL)
+				  g.render(g2);
+			}
+	}
 }

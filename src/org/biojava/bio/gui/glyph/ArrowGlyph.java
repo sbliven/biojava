@@ -27,69 +27,190 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
-
 /**
- * A Glyph that paints an arrow shape within the bounds.
- * 
- * Currently it only renders a right facing arrow.
+ * A Glyph that paints an arrow shape within the bounds. The
+ * <code>setDirection</code> method allows the decision of the direction, to
+ * which the arrow points.
  *
  * @author Mark Southern
+ * @author <a href="mailto:andreas.draeger@uni-tuebingen.de">Andreas Dr&auml;ger</a>
  * @since 1.5
  */
 public class ArrowGlyph implements Glyph {
-    private Paint fillPaint;
-    private Rectangle2D.Float bounds = new Rectangle2D.Float(0, 0, 0, 0);
-    private Shape arrowShape;
+	private Paint	            fillPaint;
 
-    public ArrowGlyph() {
-        fillPaint = Color.BLUE;
-    }
+	private Paint	            outerPaint;
 
-    public ArrowGlyph(Rectangle2D.Float bounds) {
-        this();
-        setBounds(bounds);
-    }
+	private Rectangle2D.Float	bounds;
 
-    public Rectangle2D.Float getBounds() {
-        return bounds;
-    }
+	private Shape	            arrowShape;
 
-    public void setBounds(Rectangle2D.Float r) {
-        if (bounds.equals(r)) {
-            return;
-        }
+	/**
+	 * Creates a new <code>ArrowGlyph</code>, which is filled with the color
+	 * blue by default.
+	 */
+	public ArrowGlyph() {
+		this(Color.BLUE, Color.BLACK);
+	}
 
-        float q1 = r.height * 0.25F;
-        float q2 = r.height * 0.5F;
-        float q3 = r.height * 0.75F;
-        float arrowHeadSize = r.height;
-        GeneralPath p = new GeneralPath();
+	/**
+	 * Creates a new <code>ArrowGlyph</code>, which is filled with the given
+	 * color.
+	 *
+	 * @param fillPaint Paint properties to fill this arrow.
+	 * @param outerPaint Paint properties of the outer border of this arrow.
+	 */
+	public ArrowGlyph(Paint fillPaint, Paint outerPaint) {
+		this.fillPaint = fillPaint;
+		this.outerPaint = outerPaint;
+		this.bounds = new Rectangle2D.Float(0, 0, 0, 0);
+	}
 
-        if ((r.width - arrowHeadSize) > 0) {
-            p.moveTo(r.x, r.y + q1);
-            p.lineTo((r.x + r.width) - arrowHeadSize, r.y + q1);
-            p.lineTo((r.x + r.width) - arrowHeadSize, r.y);
-            p.lineTo(r.x + r.width, r.y + q2);
-            p.lineTo((r.x + r.width) - arrowHeadSize, r.y + r.height);
-            p.lineTo((r.x + r.width) - arrowHeadSize, r.y + q3);
-            p.lineTo(r.x, (r.y + q3));
-        } else {
-            p.moveTo(r.x, r.y + q1);
-            p.lineTo(r.x + r.width, r.y + q1);
-            p.lineTo(r.x + r.width, r.y + q3);
-            p.lineTo(r.x, r.y + q3);
-        }
+	/**
+	 * This constructs an arrow in the given bounds, which is colored blue.
+	 *
+	 * @param bounds
+	 */
+	public ArrowGlyph(Rectangle2D.Float bounds) {
+		this(bounds, Color.BLUE, Color.BLACK);
+	}
 
-        p.closePath();
-        arrowShape = p;
+	/**
+	 * Constructor which sets both the size of this arrow and its color.
+	 *
+	 * @param bounds
+	 * @param fillPaint
+	 */
+	public ArrowGlyph(Rectangle2D.Float bounds, Paint fillPaint, Paint outerPaint) {
+		this(fillPaint, outerPaint);
+		setBounds(bounds);
+	}
 
-        bounds = r;
-    }
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.biojava.bio.gui.glyph.Glyph#getBounds()
+	 */
+	public Rectangle2D.Float getBounds() {
+		return bounds;
+	}
 
-    public void render(Graphics2D g) {
-        if (arrowShape != null) {
-            g.setPaint(fillPaint);
-            g.fill(arrowShape);
-        }
-    }
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.biojava.bio.gui.glyph.Glyph#setBounds(java.awt.geom.Rectangle2D.Float)
+	 */
+	public void setBounds(Rectangle2D.Float r) {
+		if (bounds.equals(r)) return;
+		bounds = r;
+	}
+
+	/**
+	 * This method allows you to decide in which direction the arrow has to point.
+	 * The definition of directions is equal to the definition of
+	 * {@see StrandedFeature}.
+	 *
+	 * @param direction
+	 *          A +1 means to the right, -1 to the left an 0 (and any other value)
+	 *          produces a rectangular shape without arrows at its end.
+	 */
+	public void setDirection(int direction) {
+		float q1 = bounds.height * 0.25F;
+		float q2 = bounds.height * 0.5F;
+		float q3 = bounds.height * 0.75F;
+		float arrowHeadSize = bounds.height;
+		GeneralPath p = new GeneralPath();
+
+		switch (direction) {
+		case +1: // to the right
+			if ((bounds.width - arrowHeadSize) > 0) {
+				p.moveTo(bounds.x, bounds.y + q1);
+				p.lineTo(bounds.x + bounds.width - arrowHeadSize, bounds.y + q1);
+				p.lineTo(bounds.x + bounds.width - arrowHeadSize, bounds.y);
+				p.lineTo(bounds.x + bounds.width, bounds.y + q2);
+				p.lineTo(bounds.x + bounds.width - arrowHeadSize, bounds.y
+				    + bounds.height);
+				p.lineTo(bounds.x + bounds.width - arrowHeadSize, bounds.y + q3);
+				p.lineTo(bounds.x, bounds.y + q3);
+			} else {
+				p.moveTo(bounds.x, bounds.y);
+				p.lineTo(bounds.x + bounds.width, bounds.y + q2);
+				p.lineTo(bounds.x, bounds.y + bounds.height);
+			}
+			break;
+		case -1: // to the left
+			if ((bounds.width - arrowHeadSize) > 0) {
+				p.moveTo(bounds.x + bounds.width, bounds.y + q1);
+				p.lineTo(bounds.x + arrowHeadSize, bounds.y + q1);
+				p.lineTo(bounds.x + arrowHeadSize, bounds.y);
+				p.lineTo(bounds.x, bounds.y + q2);
+				p.lineTo(bounds.x + arrowHeadSize, bounds.y + bounds.height);
+				p.lineTo(bounds.x + arrowHeadSize, bounds.y + q3);
+				p.lineTo(bounds.x + bounds.width, bounds.y + q3);
+			} else {
+				p.moveTo(bounds.x + bounds.width, bounds.y);
+				p.lineTo(bounds.x + bounds.width, bounds.y + bounds.height);
+				p.lineTo(bounds.x, bounds.y + q2);
+			}
+			break;
+		default: // unknown
+			// we cannot draw an arrow, we should draw a rectangle shape instead.
+			p.moveTo(bounds.x, bounds.y + q1);
+			p.lineTo(bounds.x + bounds.width, bounds.y + q1);
+			p.lineTo(bounds.x + bounds.width, bounds.y + q3);
+			p.lineTo(bounds.x, bounds.y + q3);
+			break;
+		}
+		p.closePath();
+		arrowShape = p;
+	}
+
+	public void render(Graphics2D g) {
+		if ((bounds.height > 0) && (bounds.width > 0) && (arrowShape == null))
+		  setDirection(0);
+		if (arrowShape != null) {
+			g.setPaint(fillPaint);
+			g.fill(arrowShape);
+			g.setPaint(outerPaint);
+			g.draw(arrowShape);
+		}
+	}
+
+	/**
+	 * Returns the paint properties of this glyph.
+	 *
+	 * @return
+	 */
+	public Paint getFillPaint() {
+		return fillPaint;
+	}
+
+	/**
+	 * Allows you to set the paint properties of this glyph.
+	 *
+	 * @param fillPaint
+	 */
+	public void setFillPaint(Paint fillPaint) {
+		this.fillPaint = fillPaint;
+	}
+
+	/**
+	 * Returns the paint properties of the outer line of this glyph.
+	 *
+	 * @return
+	 */
+	public Paint getOuterPaint() {
+		return outerPaint;
+	}
+
+	/**
+	 * Allows setting the paint properties of the outer line of this glyph to the
+	 * given value.
+	 *
+	 * @param outerPaint
+	 */
+	public void setOuterPaint(Paint outerPaint) {
+		this.outerPaint = outerPaint;
+	}
+
 }
