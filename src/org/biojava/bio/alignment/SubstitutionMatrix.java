@@ -190,27 +190,20 @@ public class SubstitutionMatrix {
 	 * @throws BioException
 	 * @throws IOException
 	 */
-	public SubstitutionMatrix(BufferedReader reader)
+	public static SubstitutionMatrix getSubstitutionMatrix(BufferedReader reader)
 	    throws NumberFormatException, BioException, IOException {
-		this(guessAlphabet(reader), reader.toString(), "unknown");
+		StringBuffer stringMatrix = new StringBuffer("");
+		while (reader.ready()) {
+			stringMatrix.append(reader.readLine());
+			stringMatrix.append(newLine);
+		}
 		reader.close();
+		String mat = stringMatrix.toString();
+		FiniteAlphabet alpha = guessAlphabet(new BufferedReader(new StringReader(mat)));
+		SubstitutionMatrix matrix = new SubstitutionMatrix(alpha, mat, "unknown");
+		return matrix;
 	}
 
-	/**
-	 * This method constructs new substitution matrix objects by guessing
-	 * the alphabet in the file. If the alphabet is known, you should better
-	 * use one of the constructors where you can make use of this knowledge.
-	 *
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 * @throws BioException
-	 * @throws NumberFormatException
-	 */
-	public static SubstitutionMatrix getSubstituionMatrix(File file)
-	    throws NumberFormatException, BioException, IOException {
-		return new SubstitutionMatrix(file);
-	}
 
 	/**
 	 * This method tries to identify the alphabet within a matrix file. This is
@@ -230,23 +223,6 @@ public class SubstitutionMatrix {
 		if (fileName.contains("pam") || fileName.contains("blosum"))
 		  return (FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN-TERM");
 		return guessAlphabet(new BufferedReader(new FileReader(file)));
-	}
-
-	/**
-	 * This method guesses the alphabet of the given substitution matrix and
-	 * parses the given buffered reader. It then returns a new substitution
-	 * matrix.
-	 *
-	 * @param reader
-	 * @return
-	 * @throws IOException
-	 * @throws BioException
-	 * @throws NumberFormatException
-	 */
-	public static SubstitutionMatrix getSubstituionMatrix(BufferedReader reader)
-	    throws NumberFormatException, BioException, IOException {
-		return new SubstitutionMatrix(guessAlphabet(reader), reader.toString(),
-		    "unknown");
 	}
 
 	/**
