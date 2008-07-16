@@ -51,7 +51,7 @@ public interface FeatureHolder extends Changeable {
     "org.biojava.bio.seq.FeatureHolder",
     "FEATURES"
   );
-  
+
   /**
    * Signals that the schema of this FeatureHolder has changed.
    *
@@ -62,7 +62,7 @@ public interface FeatureHolder extends Changeable {
     "org.biojava.bio.seq.FeatureHolder",
     "SCHEMA"
   );
-  
+
     /**
      * Count how many features are contained.
      *
@@ -70,13 +70,13 @@ public interface FeatureHolder extends Changeable {
      *          contained
      */
     int countFeatures();
-    
+
     /**
      * Iterate over the features in no well defined order.
      *
      * @return  an Iterator
      */
-    Iterator features();
+    Iterator<Feature> features();
 
     /**
      * Return a new FeatureHolder that contains all of the children of this one
@@ -91,16 +91,16 @@ public interface FeatureHolder extends Changeable {
      *                just immediate children should be filtered.
      */
     FeatureHolder filter(FeatureFilter fc, boolean recurse);
-  
+
     /**
      * Query this set of features using a supplied <code>FeatureFilter</code>.
      *
      * @param filter the <code>FeatureFilter</code> to apply.
      * @return all features in this container which match <code>filter</code>.
      */
-     
+
     FeatureHolder filter(FeatureFilter filter);
-  
+
     /**
      * Create a new Feature, and add it to this FeatureHolder.  This
      * method will generally only work on Sequences, and on some
@@ -108,7 +108,7 @@ public interface FeatureHolder extends Changeable {
      *
      * @throws BioException if something went wrong during creating the feature
      * @throws ChangeVetoException if this FeatureHolder does not support
-     *         creation of new features, or if the change was vetoed  
+     *         creation of new features, or if the change was vetoed
      */
     public Feature createFeature(Feature.Template ft)
         throws BioException, ChangeVetoException;
@@ -122,7 +122,7 @@ public interface FeatureHolder extends Changeable {
      */
     public void removeFeature(Feature f)
         throws ChangeVetoException, BioException;
-    
+
     /**
      * Check if the feature is present in this holder.
      *
@@ -131,7 +131,7 @@ public interface FeatureHolder extends Changeable {
      * @return true if f is in this set
      */
     public boolean containsFeature(Feature f);
-    
+
     /**
      * Return a schema-filter for this <code>FeatureHolder</code>.  This is a filter
      * which all <code>Feature</code>s <em>immediately</em> contained by this <code>FeatureHolder</code>
@@ -150,44 +150,44 @@ public interface FeatureHolder extends Changeable {
      * @since 1.3
      * @return the schema filter
      */
-     
+
     public FeatureFilter getSchema();
 
     public static final FeatureHolder EMPTY_FEATURE_HOLDER =
       new EmptyFeatureHolder();
-    
+
     final class EmptyFeatureHolder
         extends Unchangeable
-        implements FeatureHolder 
+        implements FeatureHolder
     {
       public int countFeatures() {
         return 0;
       }
-      
-      public Iterator features() {
+
+      public Iterator<Feature> features() {
         return Collections.EMPTY_SET.iterator();
       }
-      
+
       public FeatureHolder filter(FeatureFilter fc, boolean recurse) {
         return this;
       }
-      
+
       public FeatureHolder filter(FeatureFilter fc) {
         return this;
       }
-      
+
       public Feature createFeature(Feature.Template f) {
         throw new UnsupportedOperationException();
       }
-      
+
       public void removeFeature(Feature f) {
         throw new UnsupportedOperationException();
       }
-      
+
       public boolean containsFeature(Feature f) {
         return false;
       }
-      
+
       public FeatureFilter getSchema() {
           return FeatureFilter.none;
       }

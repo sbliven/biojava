@@ -231,9 +231,8 @@ public interface FeatureFilter extends Serializable {
      * @param type  the String to match type fields against
      */
     public ByType(String type) {
-        if (type == null) {
+        if (type == null)
             throw new NullPointerException("Type may not be null");
-        }
         this.type = type;
     }
 
@@ -290,9 +289,8 @@ public interface FeatureFilter extends Serializable {
      * @param source  the String to match source fields against
      */
     public BySource(String source) {
-        if (source == null) {
+        if (source == null)
             throw new NullPointerException("Source may not be null");
-        }
         this.source = source;
     }
 
