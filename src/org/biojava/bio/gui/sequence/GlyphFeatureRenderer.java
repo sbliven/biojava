@@ -1,22 +1,12 @@
 /*
- *                    BioJava development code
- *
- * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  If you do not have a copy,
- * see:
- *
- *      http://www.gnu.org/copyleft/lesser.html
- *
- * Copyright for this code is held jointly by the individual
- * authors.  These should be listed in @author doc comments.
- *
- * For more information on the BioJava project and its aims,
- * or to join the biojava-l mailing list, visit the home page
- * at:
- *
- *      http://www.biojava.org/
- *
+ * BioJava development code This code may be freely distributed and modified
+ * under the terms of the GNU Lesser General Public Licence. This should be
+ * distributed with the code. If you do not have a copy, see:
+ * http://www.gnu.org/copyleft/lesser.html Copyright for this code is held
+ * jointly by the individual authors. These should be listed in @author doc
+ * comments. For more information on the BioJava project and its aims, or to
+ * join the biojava-l mailing list, visit the home page at:
+ * http://www.biojava.org/
  */
 package org.biojava.bio.gui.sequence;
 
@@ -25,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.biojava.bio.gui.glyph.ArrowGlyph;
 import org.biojava.bio.gui.glyph.Glyph;
@@ -45,11 +36,11 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class GlyphFeatureRenderer extends FilteringRenderer implements
     FeatureRenderer {
-	private double	            depth	= 15;
+	private double	              depth	= 15;
 
-	private List<FeatureFilter>	fList;
+	protected List<FeatureFilter>	fList;
 
-	private List<Glyph>	        gList;
+	protected List<Glyph>	        gList;
 
 	public GlyphFeatureRenderer() {
 		super();
@@ -79,11 +70,82 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 		}
 	}
 
+	public void removeFilterWithGlyph(FeatureFilter ff)
+	    throws ChangeVetoException {
+		if (fList.contains(ff)) {
+			gList.remove(fList.indexOf(ff));
+			fList.remove(ff);
+			if (fList.size() == 0) {
+				setFilter(FeatureFilter.none);
+			} else {
+				FeatureFilter f = fList.get(0);
+				if (fList.size() > 1) for (int i = 1; i < fList.size(); i++)
+					f = new FeatureFilter.Or(f, fList.get(i));
+				setFilter(f);
+			}
+		}
+	}
+
+	/**
+	 * Returns the ith {@see FeatureFilter} in this renderer.
+	 *
+	 * @param i
+	 * @return
+	 */
+	public FeatureFilter getFeatureFilter(int i) {
+		return fList.get(i);
+	}
+
+	/**
+	 * Returns true if the given {@see FeatureFilter} is already contained in this
+	 * renderer.
+	 *
+	 * @param ff
+	 * @return
+	 */
+	public boolean containsFilter(FeatureFilter ff) {
+		return fList.contains(ff);
+	}
+
+	/**
+	 * Allows setting another {@see Glyph} object to be painted for the given
+	 * {@see FeatureFilter}.
+	 *
+	 * @param ff
+	 * @param glyph
+	 * @throws ChangeVetoException
+	 */
+	public void setGlyphForFilter(FeatureFilter ff, Glyph glyph)
+	    throws NoSuchElementException {
+		if (fList.contains(ff))
+			gList.set(fList.indexOf(ff), glyph);
+		else throw new NoSuchElementException(ff.toString());
+	}
+
+	/**
+	 * Returns the {@see Glyph} object which is assigned to the given feature
+	 * filter.
+	 *
+	 * @param ff
+	 * @return
+	 * @throws NoSuchElementException
+	 */
+	public Glyph getGlyphForFilter(FeatureFilter ff)
+	    throws NoSuchElementException {
+		if (fList.contains(ff)) return gList.get(fList.indexOf(ff));
+		throw new NoSuchElementException(ff.toString());
+	}
+
 	public void setDepth(double depth) {
 		this.depth = depth;
 	}
 
-	public double getDepth(SequenceRenderContext src) {
+	/**
+	 * Returns the depth property of this class.
+	 *
+	 * @return
+	 */
+	public double getDepth() {
 		return depth;
 	}
 
@@ -105,7 +167,8 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 				Glyph g = gList.get(i);
 				g.setBounds(bounds);
 				if ((g instanceof ArrowGlyph) && (f instanceof StrandedFeature))
-					((ArrowGlyph) g).setDirection(((StrandedFeature) f).getStrand().getValue());
+				  ((ArrowGlyph) g).setDirection(((StrandedFeature) f).getStrand()
+				      .getValue());
 				if (src.getDirection() == SequenceRenderContext.HORIZONTAL)
 				  g.render(g2);
 			}
