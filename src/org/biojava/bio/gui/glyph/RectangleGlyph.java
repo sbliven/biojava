@@ -25,44 +25,61 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 
-
 /**
  * A Glyph that paints a rectangle shape within the bounds.
  *
  * @author Mark Southern
+ * @author <a href="mailto:andreas.draeger@uni-tuebingen.de>Andreas Dr&auml;ger</a>
  * @since 1.5
  */
 public class RectangleGlyph implements Glyph {
-    private Paint forePaint;
-    private Rectangle2D.Float bounds = new Rectangle2D.Float(0, 0, 0, 0);
+	private Paint forePaint;
+	private Rectangle2D.Float bounds = new Rectangle2D.Float(0, 0, 0, 0);
 
-    public RectangleGlyph() {
-        forePaint = Color.RED.brighter();
-    }
+	public RectangleGlyph() {
+		forePaint = Color.RED.brighter();
+	}
 
-    public RectangleGlyph(Rectangle2D.Float bounds) {
-        this();
-        setBounds(bounds);
-    }
+	public RectangleGlyph(Rectangle2D.Float bounds) {
+		this();
+		setBounds(bounds);
+	}
 
-    public RectangleGlyph(Paint paint) {
-        this.forePaint = paint;
-    }
+	public RectangleGlyph(Paint paint) {
+		this.forePaint = paint;
+	}
 
-    public Rectangle2D.Float getBounds() {
-        return bounds;
-    }
+	public Rectangle2D.Float getBounds() {
+		return bounds;
+	}
 
-    public void setBounds(Rectangle2D.Float r) {
-        if (bounds.equals(r)) {
-            return;
-        }
+	public void setBounds(Rectangle2D.Float r) {
+		if (bounds.equals(r)) {
+			return;
+		}
 
-        bounds = r;
-    }
+		bounds = r;
+	}
 
-    public void render(Graphics2D g) {
-        g.setPaint(forePaint);
-        g.fill(bounds);
-    }
+	public void render(Graphics2D g) {
+		g.setPaint(forePaint);
+		g.fill(bounds);
+	}
+
+	/**
+	 *
+	 * @return The currently set paint properties of this glyph.
+	 */
+	public Paint getPaint() {
+		return forePaint;
+	}
+
+	/**
+	 * Allows you to set the paint properties of this glyph, i.e., its color.
+	 *
+	 * @param forePaint
+	 */
+	public void setPaint(Paint forePaint) {
+		this.forePaint = forePaint;
+	}
 }

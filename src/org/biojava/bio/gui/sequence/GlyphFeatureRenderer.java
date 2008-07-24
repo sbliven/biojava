@@ -50,21 +50,16 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 
 	public void addFilterAndGlyph(FeatureFilter ff, Glyph g)
 	    throws ChangeVetoException {
-		fList.add(ff);
-		gList.add(g);
+		if (!fList.contains(ff)) {
+			fList.add(ff);
+			gList.add(g);
 
-		if (fList.size() == 0) {
-			setFilter(FeatureFilter.none);
-		} else {
-			FeatureFilter f = fList.get(0);
-
-			if (fList.size() == 1) {
-				setFilter(f);
-			} else {
-				for (int i = 1; i < fList.size(); i++) {
+			if (fList.size() == 0)
+				setFilter(FeatureFilter.none);
+			else {
+				FeatureFilter f = fList.get(0);
+				if (fList.size() > 1) for (int i = 1; i < fList.size(); i++)
 					f = new FeatureFilter.Or(f, fList.get(i));
-				}
-
 				setFilter(f);
 			}
 		}
@@ -145,7 +140,7 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 	 *
 	 * @return
 	 */
-	public double getDepth() {
+	public double getDepth(SequenceRenderContext src) {
 		return depth;
 	}
 

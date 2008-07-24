@@ -89,4 +89,20 @@ public class TurnGlyph implements Glyph {
             g.draw(turnShape);
         }
     }
+
+    /**
+     *
+     * @return The currently set paint properties of this glyph.
+     */
+	public Paint getPaint() {
+		return forePaint;
+	}
+
+	/**
+	 * Allows you to set the paint properties of this glyph, i.e., its color.
+	 * @param forePaint
+	 */
+	public void setPaint(Paint forePaint) {
+		this.forePaint = forePaint;
+	}
 }
