@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.RNATools;
 import org.biojava.bio.seq.io.ChunkedSymbolListFactory;
 import org.biojava.utils.ChangeVetoException;
 
@@ -318,6 +319,12 @@ public class SymbolListTest extends TestCase
 
         // exercise the PackedSymbolList implementation
         assertTrue(runRepeatedSymbolListTests(symListAlpha, symListAlpha, factory));
+    }
+    
+    public void testSymbolListsEqual() throws Exception {
+        SymbolList dna = DNATools.createDNA("");
+        SymbolList rna = RNATools.createRNA("");
+        assertFalse(dna.equals(rna));
     }
 
     /**

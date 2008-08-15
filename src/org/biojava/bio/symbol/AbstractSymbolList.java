@@ -143,6 +143,10 @@ implements SymbolList {
   }
 
   private boolean compare(SymbolList sl1, SymbolList sl2){
+    if (!sl1.getAlphabet().equals(sl2.getAlphabet())) {
+        return false;
+    }
+      
     if (sl1.length() != sl2.length()) {
       return false;
     }
