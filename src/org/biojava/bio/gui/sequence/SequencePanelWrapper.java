@@ -41,7 +41,7 @@ import org.biojava.utils.ChangeVetoException;
  * Handles multiple SequencePanels and Ranges so that a Sequence can be wrapped over more than one
  * line on screen. This is particularly useful for viewing Protein sequences that would be viewed
  * at a single residue resolution.
- * 
+ *
  * The interface is very similar to that of the SequencePanels that it wraps
  *
  * @author Mark Southern
@@ -50,9 +50,9 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class SequencePanelWrapper extends JPanel {
 
+	protected SequencePanel[] seqPanels = new SequencePanel[ 0 ];
     private RangeLocation range;
     private Sequence sequence;
-    private SequencePanel[] seqPanels = new SequencePanel[ 0 ];
     private SequenceRenderer renderer;
     private double scale = 14.0;
     private java.awt.RenderingHints hints;
@@ -74,7 +74,7 @@ public class SequencePanelWrapper extends JPanel {
     }
 
     /*
-     * Sets the track (line) layout strategy. Layouts include a simple wrapping at a given 
+     * Sets the track (line) layout strategy. Layouts include a simple wrapping at a given
      * number of residues and user-defined layouts that can contain arbitrary length rows.
      */
     public void setTrackLayout(TrackLayout tl) {
