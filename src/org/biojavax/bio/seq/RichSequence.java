@@ -154,32 +154,7 @@ public interface RichSequence extends BioEntry,Sequence {
     /**
      * Stores a number of useful terms used across many sequence formats for consistency's sake.
      */
-    public static class Terms {
-        private static ComparableTerm SEC_ACCESSION_TERM = null;
-        private static ComparableTerm KEYWORDS_TERM = null;
-        private static ComparableTerm DATE_CREATED_TERM = null;
-        private static ComparableTerm DATE_UPDATED_TERM = null;
-        private static ComparableTerm DATE_ANNOTATED_TERM = null;
-        private static ComparableTerm REL_CREATED_TERM = null;
-        private static ComparableTerm REL_UPDATED_TERM = null;
-        private static ComparableTerm REL_ANNOTATED_TERM = null;
-        private static ComparableTerm MOLTYPE_TERM = null;
-        private static ComparableTerm STRANDED_TERM = null;
-        private static ComparableTerm ORGANELLE_TERM = null;
-        private static ComparableTerm GENENAME_TERM = null;
-        private static ComparableTerm GENESYNONYM_TERM = null;
-        private static ComparableTerm ORDLOCNAME_TERM = null;
-        private static ComparableTerm ORFNAME_TERM = null;
-        private static ComparableTerm SPECIES_TERM = null;
-        private static ComparableTerm STRAIN_TERM = null;
-        private static ComparableTerm TISSUE_TERM = null;
-        private static ComparableTerm TRANSPOSON_TERM = null;
-        private static ComparableTerm PLASMID_TERM = null;
-        private static ComparableTerm DATACLASS_TERM = null;
-        private static ComparableTerm FTID_TERM = null;
-        private static ComparableTerm FEATUREDESC_TERM = null;
-        private static ComparableTerm COPYRIGHT_TERM = null;        
-        
+    public static class Terms {  
         public static String SPECIES_KEY = "SPECIES";
         public static String STRAIN_KEY = "STRAIN";
         public static String TISSUE_KEY = "TISSUE";
@@ -206,8 +181,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return A Term that represents the secondary accession tag
          */
         public static ComparableTerm getAdditionalAccessionTerm() {
-            if (SEC_ACCESSION_TERM==null) SEC_ACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("acc");
-            return SEC_ACCESSION_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("acc");
         }
         
         /**
@@ -215,8 +189,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term that represents the Keyword tag
          */
         public static ComparableTerm getKeywordTerm() {
-            if (KEYWORDS_TERM==null) KEYWORDS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("kw");
-            return KEYWORDS_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("kw");
         }
         
         /**
@@ -224,8 +197,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term
          */
         public static ComparableTerm getDateCreatedTerm() {
-            if (DATE_CREATED_TERM==null) DATE_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("cdat");
-            return DATE_CREATED_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("cdat");
         }
         
         /**
@@ -233,8 +205,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term
          */
         public static ComparableTerm getDateUpdatedTerm() {
-            if (DATE_UPDATED_TERM==null) DATE_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("udat");
-            return DATE_UPDATED_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("udat");
         }
         
         /**
@@ -242,8 +213,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term
          */
         public static ComparableTerm getDateAnnotatedTerm() {
-            if (DATE_ANNOTATED_TERM==null) DATE_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("adat");
-            return DATE_ANNOTATED_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("adat");
         }
         
         /**
@@ -251,8 +221,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term
          */
         public static ComparableTerm getRelCreatedTerm() {
-            if (REL_CREATED_TERM==null) REL_CREATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("crel");
-            return REL_CREATED_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("crel");
         }
         
         /**
@@ -260,8 +229,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term
          */
         public static ComparableTerm getRelUpdatedTerm() {
-            if (REL_UPDATED_TERM==null) REL_UPDATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("urel");
-            return REL_UPDATED_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("urel");
         }
         
         /**
@@ -269,8 +237,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term
          */
         public static ComparableTerm getRelAnnotatedTerm() {
-            if (REL_ANNOTATED_TERM==null) REL_ANNOTATED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("arel");
-            return REL_ANNOTATED_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("arel");
         }
         
         /**
@@ -278,8 +245,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term that represents the molecule type
          */
         public static ComparableTerm getMolTypeTerm() {
-            if (MOLTYPE_TERM==null) MOLTYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("moltype");
-            return MOLTYPE_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("moltype");
         }
         
         /**
@@ -288,8 +254,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term that represents the Strand tag
          */
         public static ComparableTerm getStrandedTerm() {
-            if (STRANDED_TERM==null) STRANDED_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("stranded");
-            return STRANDED_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("stranded");
         }
         
         /**
@@ -297,8 +262,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return a Term that represents the Organelle tag
          */
         public static ComparableTerm getOrganelleTerm() {
-            if (ORGANELLE_TERM==null) ORGANELLE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("organelle");
-            return ORGANELLE_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("organelle");
         }
         
         /**
@@ -306,8 +270,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The GeneName Term
          */
         public static ComparableTerm getGeneNameTerm() {
-            if (GENENAME_TERM==null) GENENAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_name");
-            return GENENAME_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_name");
         }
         
         /**
@@ -315,8 +278,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The GeneSynonym Term
          */
         public static ComparableTerm getGeneSynonymTerm() {
-            if (GENESYNONYM_TERM==null) GENESYNONYM_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_synonym");
-            return GENESYNONYM_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_synonym");
         }
         
         /**
@@ -324,8 +286,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The OrderedLocusName Term
          */
         public static ComparableTerm getOrderedLocusNameTerm() {
-            if (ORDLOCNAME_TERM==null) ORDLOCNAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_ordloc");
-            return ORDLOCNAME_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_ordloc");
         }
         
         /**
@@ -333,8 +294,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The ORFName Term
          */
         public static ComparableTerm getORFNameTerm() {
-            if (ORFNAME_TERM==null) ORFNAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_orf");
-            return ORFNAME_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("gene_orf");
         }
         
         /**
@@ -342,8 +302,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The Strain Term
          */
         public static ComparableTerm getStrainTerm() {
-            if (STRAIN_TERM==null) STRAIN_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("strain");
-            return STRAIN_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("strain");
         }
         
         /**
@@ -351,8 +310,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The Species Term
          */
         public static ComparableTerm getSpeciesTerm() {
-            if (SPECIES_TERM==null) SPECIES_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("species");
-            return SPECIES_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("species");
         }
         
         /**
@@ -360,8 +318,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The Tissue Term
          */
         public static ComparableTerm getTissueTerm() {
-            if (TISSUE_TERM==null) TISSUE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("tissue");
-            return TISSUE_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("tissue");
         }
         
         /**
@@ -369,8 +326,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The Transposon Term
          */
         public static ComparableTerm getTransposonTerm() {
-            if (TRANSPOSON_TERM==null) TRANSPOSON_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("transposon");
-            return TRANSPOSON_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("transposon");
         }
         
         /**
@@ -378,8 +334,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The plasmid Term
          */
         public static ComparableTerm getPlasmidTerm() {
-            if (PLASMID_TERM==null) PLASMID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("plasmid");
-            return PLASMID_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("plasmid");
         }
         
         /**
@@ -387,8 +342,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The DataClass Term
          */
         public static ComparableTerm getDataClassTerm() {
-            if (DATACLASS_TERM==null) DATACLASS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataclass");
-            return DATACLASS_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataclass");
         }
         
         /**
@@ -396,8 +350,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The FTId Term
          */
         public static ComparableTerm getFTIdTerm() {
-            if (FTID_TERM==null) FTID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_id");
-            return FTID_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_id");
         }
         
         /**
@@ -405,8 +358,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The FeatureDesc Term
          */
         public static ComparableTerm getFeatureDescTerm() {
-            if (FEATUREDESC_TERM==null) FEATUREDESC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_desc");
-            return FEATUREDESC_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_desc");
         }
         
         /**
@@ -414,8 +366,7 @@ public interface RichSequence extends BioEntry,Sequence {
          * @return The copyright Term
          */
         public static ComparableTerm getCopyrightTerm() {
-            if (COPYRIGHT_TERM==null) COPYRIGHT_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("copyright");
-            return COPYRIGHT_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("copyright");
         }
     }
     

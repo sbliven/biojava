@@ -50,16 +50,13 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
     
     protected List members;
     protected int size = 0;
-    private static ComparableTerm JOIN_TERM = null;
-    private static ComparableTerm ORDER_TERM = null;
     
     /**
      * Getter for the "join" term
      * @return the "join" term
      */
     public static ComparableTerm getJoinTerm() {
-        if (JOIN_TERM==null) JOIN_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("join");
-        return JOIN_TERM;
+        return RichObjectFactory.getDefaultOntology().getOrCreateTerm("join");
     }
     
     /**
@@ -67,13 +64,7 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
      * @return the "order" term
      */
     public static ComparableTerm getOrderTerm() {
-        if (ORDER_TERM==null) ORDER_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("order");
-        return ORDER_TERM;
-    }
-    
-    public final static void reset() {
-    	JOIN_TERM=null;
-    	ORDER_TERM=null;
+        return RichObjectFactory.getDefaultOntology().getOrCreateTerm("order");
     }
     
     /**

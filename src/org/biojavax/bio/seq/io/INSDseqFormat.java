@@ -196,18 +196,13 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     /**
      * Implements some INSDseq-specific terms.
      */
-    public static class Terms extends RichSequence.Terms {
-        private static ComparableTerm OTHER_SEQID_TERM = null;
-        
-        private static ComparableTerm INSDSEQ_TERM = null;
-               
+    public static class Terms extends RichSequence.Terms {               
         /**
          * Getter for the INSDseq term
          * @return The INSDseq Term
          */
         public static ComparableTerm getOtherSeqIdTerm() {
-            if (OTHER_SEQID_TERM==null) OTHER_SEQID_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("OtherSeqID");
-            return OTHER_SEQID_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("OtherSeqID");
         }
         
         /**
@@ -215,8 +210,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
          * @return The INSDseq Term
          */
         public static ComparableTerm getINSDseqTerm() {
-            if (INSDSEQ_TERM==null) INSDSEQ_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("INSDseq");
-            return INSDSEQ_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("INSDseq");
         }
     }
     

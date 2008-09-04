@@ -226,20 +226,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
     /**
      * Implements some UniProtXML-specific terms.
      */
-    public static class Terms extends RichSequence.Terms {
-        private static ComparableTerm UNIPROTXML_TERM = null;
-        private static ComparableTerm PROTEINTYPE_TERM = null;
-        private static ComparableTerm EVIDENCE_CATEGORY_TERM = null;
-        private static ComparableTerm EVIDENCE_TYPE_TERM = null;
-        private static ComparableTerm EVIDENCE_DATE_TERM = null;
-        private static ComparableTerm EVIDENCE_ATTR_TERM = null;
-        private static ComparableTerm FEATURE_STATUS_TERM = null;
-        private static ComparableTerm FEATURE_REF_TERM = null;
-        private static ComparableTerm FEATURE_ORIGINAL_TERM = null;
-        private static ComparableTerm FEATURE_VARIATION_TERM = null;
-        private static ComparableTerm LOCATION_SEQUENCE_TERM = null;
-        private static ComparableTerm UNIPROT_PROTEIN_EXISTS_TERM = null;
-        
+    public static class Terms extends RichSequence.Terms {        
         public static final String CONTAINS_PREFIX = "Contains:";
         public static final String INCLUDES_PREFIX = "Includes:";
         
@@ -266,8 +253,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The protein exists Term
          */
         public static ComparableTerm getProteinExistsTerm() {
-            if (UNIPROT_PROTEIN_EXISTS_TERM==null) UNIPROT_PROTEIN_EXISTS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt protein exists");
-            return UNIPROT_PROTEIN_EXISTS_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt protein exists");
         }
         
         /**
@@ -275,8 +261,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return the ontology.
          */
         public static ComparableOntology getUniprotKWOnto() {
-            if (uniprotKWOnto==null) uniprotKWOnto = (ComparableOntology)RichObjectFactory.getObject(SimpleComparableOntology.class, new Object[]{"uniprot_kw"});
-            return uniprotKWOnto;
+            return (ComparableOntology)RichObjectFactory.getObject(SimpleComparableOntology.class, new Object[]{"uniprot_kw"});
         }
         
         /**
@@ -284,8 +269,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The UniProtXML Term
          */
         public static ComparableTerm getUniProtXMLTerm() {
-            if (UNIPROTXML_TERM==null) UNIPROTXML_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProtXML");
-            return UNIPROTXML_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProtXML");
         }
         
         /**
@@ -293,8 +277,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The protein type Term
          */
         public static ComparableTerm getProteinTypeTerm() {
-            if (PROTEINTYPE_TERM==null) PROTEINTYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("protein_type");
-            return PROTEINTYPE_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("protein_type");
         }
         
         /**
@@ -302,8 +285,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The evidence category Term
          */
         public static ComparableTerm getEvidenceCategoryTerm() {
-            if (EVIDENCE_CATEGORY_TERM==null) EVIDENCE_CATEGORY_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("evidence_category");
-            return EVIDENCE_CATEGORY_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("evidence_category");
         }
         
         /**
@@ -311,8 +293,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The evidence type Term
          */
         public static ComparableTerm getEvidenceTypeTerm() {
-            if (EVIDENCE_TYPE_TERM==null) EVIDENCE_TYPE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("evidence_type");
-            return EVIDENCE_TYPE_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("evidence_type");
         }
         
         /**
@@ -320,8 +301,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The evidence date Term
          */
         public static ComparableTerm getEvidenceDateTerm() {
-            if (EVIDENCE_DATE_TERM==null) EVIDENCE_DATE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("evidence_date");
-            return EVIDENCE_DATE_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("evidence_date");
         }
         
         /**
@@ -329,8 +309,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The evidence attr Term
          */
         public static ComparableTerm getEvidenceAttrTerm() {
-            if (EVIDENCE_ATTR_TERM==null) EVIDENCE_ATTR_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("evidence_attr");
-            return EVIDENCE_ATTR_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("evidence_attr");
         }
         
         /**
@@ -338,8 +317,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The feature ref Term
          */
         public static ComparableTerm getFeatureRefTerm() {
-            if (FEATURE_REF_TERM==null) FEATURE_REF_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_ref");
-            return FEATURE_REF_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_ref");
         }
         
         /**
@@ -347,8 +325,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The feature status Term
          */
         public static ComparableTerm getFeatureStatusTerm() {
-            if (FEATURE_STATUS_TERM==null) FEATURE_STATUS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_status");
-            return FEATURE_STATUS_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_status");
         }
         
         /**
@@ -356,8 +333,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The feature original Term
          */
         public static ComparableTerm getFeatureOriginalTerm() {
-            if (FEATURE_ORIGINAL_TERM==null) FEATURE_ORIGINAL_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_original");
-            return FEATURE_ORIGINAL_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_original");
         }
         
         /**
@@ -365,8 +341,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The feature variation Term
          */
         public static ComparableTerm getFeatureVariationTerm() {
-            if (FEATURE_VARIATION_TERM==null) FEATURE_VARIATION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_variation");
-            return FEATURE_VARIATION_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("feature_variation");
         }
         
         /**
@@ -374,8 +349,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
          * @return The location seq Term
          */
         public static ComparableTerm getLocationSequenceTerm() {
-            if (LOCATION_SEQUENCE_TERM==null) LOCATION_SEQUENCE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("locseq");
-            return LOCATION_SEQUENCE_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("locseq");
         }
     }    
     

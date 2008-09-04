@@ -201,30 +201,13 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
     /**
      * Implements some EMBLxml-specific terms.
      */
-    public static class Terms extends RichSequence.Terms {
-        private static ComparableTerm DATA_CLASS_TERM = null;
-        
-        private static ComparableTerm EMBLXML_TERM = null;
-        
-        private static ComparableTerm PROJACCESSION_TERM = null;
-        
-        private static ComparableTerm SUBACC_TERM = null;
-        
-        private static ComparableTerm SUBVER_TERM = null;
-        
-        private static ComparableTerm SUBWGSVER_TERM = null;
-        
-        private static ComparableTerm STATUS_TERM = null;
-        
-        private static ComparableTerm STATUSDATE_TERM = null;
-        
+    public static class Terms extends RichSequence.Terms {        
         /**
          * Getter for the SubmitterAccession term
          * @return The SubmitterAccession Term
          */
         public static ComparableTerm getSubmitterAccessionTerm() {
-            if (SUBACC_TERM==null) SUBACC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("SubmitterAccession");
-            return SUBACC_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("SubmitterAccession");
         }
         
         /**
@@ -232,8 +215,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
          * @return The SubmitterVersion Term
          */
         public static ComparableTerm getSubmitterVersionTerm() {
-            if (SUBVER_TERM==null) SUBVER_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("SubmitterVersion");
-            return SUBVER_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("SubmitterVersion");
         }
         
         /**
@@ -241,8 +223,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
          * @return The SubmitterWgsVersion Term
          */
         public static ComparableTerm getSubmitterWgsVersionTerm() {
-            if (SUBWGSVER_TERM==null) SUBWGSVER_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("SubmitterWgsVersion");
-            return SUBWGSVER_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("SubmitterWgsVersion");
         }
         
         /**
@@ -250,8 +231,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
          * @return The Status Term
          */
         public static ComparableTerm getStatusTerm() {
-            if (STATUS_TERM==null) STATUS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("Status");
-            return STATUS_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("Status");
         }
         
         /**
@@ -259,8 +239,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
          * @return The StatusDate Term
          */
         public static ComparableTerm getStatusDateTerm() {
-            if (STATUSDATE_TERM==null) STATUSDATE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("StatusDate");
-            return STATUSDATE_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("StatusDate");
         }
         
         /**
@@ -268,8 +247,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
          * @return The ProjectAccession Term
          */
         public static ComparableTerm getProjectAccessionTerm() {
-            if (PROJACCESSION_TERM==null) PROJACCESSION_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("ProjectAccession");
-            return PROJACCESSION_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("ProjectAccession");
         }
         
         /**
@@ -277,8 +255,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
          * @return The EMBLxml Term
          */
         public static ComparableTerm getEMBLxmlTerm() {
-            if (EMBLXML_TERM==null) EMBLXML_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBLxml");
-            return EMBLXML_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBLxml");
         }
         
         /**
@@ -286,8 +263,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
          * @return The data class Term
          */
         public static ComparableTerm getDataClassTerm() {
-            if (DATA_CLASS_TERM==null) DATA_CLASS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataClass");
-            return DATA_CLASS_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataClass");
         }
     }
     

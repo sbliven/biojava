@@ -141,11 +141,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     /**
      * Implements some UniProt-specific terms.
      */
-    public static class Terms extends RichSequence.Terms {
-        private static ComparableTerm UNIPROT_TERM = null;
-        private static ComparableTerm UNIPROT_DBNAME_TERM = null;
-        private static ComparableTerm UNIPROT_PROTEIN_EXISTS_TERM = null;
-        
+    public static class Terms extends RichSequence.Terms {        
         private static String GENENAME_KEY = "Name";
         private static String GENESYNONYM_KEY = "Synonyms";
         private static String ORDLOCNAME_KEY = "OrderedLocusNames";
@@ -156,8 +152,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
          * @return The UniProt Term
          */
         public static ComparableTerm getUniProtTerm() {
-            if (UNIPROT_TERM==null) UNIPROT_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt");
-            return UNIPROT_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt");
         }
         
         /**
@@ -165,8 +160,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
          * @return The combined database for UniProt Term
          */
         public static ComparableTerm getUniProtDBNameTerm() {
-            if (UNIPROT_DBNAME_TERM==null) UNIPROT_DBNAME_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt database name");
-            return UNIPROT_DBNAME_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt database name");
         }
         
         /**
@@ -174,8 +168,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
          * @return The protein exists Term
          */
         public static ComparableTerm getProteinExistsTerm() {
-            if (UNIPROT_PROTEIN_EXISTS_TERM==null) UNIPROT_PROTEIN_EXISTS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt protein exists");
-            return UNIPROT_PROTEIN_EXISTS_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("UniProt protein exists");
         }
     }
     

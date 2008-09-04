@@ -155,20 +155,13 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
      * Implements some EMBL-specific terms.
      */
     public static class Terms extends RichSequence.Terms {
-        private static ComparableTerm EMBL_TERM = null;
-        private static ComparableTerm GENOMIC_TERM = null;
-        private static ComparableTerm VERSION_LINE_TERM = null;
-        private static ComparableTerm DATA_CLASS_TERM = null;
-        
-        private static ComparableTerm REL_UPDATED_RECV_TERM = null;
         
         /**
          * Getter for the RelUpdatedRecordVersion term
          * @return The RelUpdatedRecordVersion Term
          */
         public static ComparableTerm getRelUpdatedRecordVersionTerm() {
-            if (REL_UPDATED_RECV_TERM==null) REL_UPDATED_RECV_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("RelUpdatedRecordVersion");
-            return REL_UPDATED_RECV_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("RelUpdatedRecordVersion");
         }
         
         /**
@@ -176,8 +169,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
          * @return The EMBL Term
          */
         public static ComparableTerm getEMBLTerm() {
-            if (EMBL_TERM==null) EMBL_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBL");
-            return EMBL_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("EMBL");
         }
         
         /**
@@ -185,8 +177,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
          * @return The genomic Term
          */
         public static ComparableTerm getGenomicTerm() {
-            if (GENOMIC_TERM==null) GENOMIC_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("genomic");
-            return GENOMIC_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("genomic");
         }
         
         /**
@@ -194,8 +185,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
          * @return The version line Term
          */
         public static ComparableTerm getVersionLineTerm() {
-            if (VERSION_LINE_TERM==null) VERSION_LINE_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("versionLine");
-            return VERSION_LINE_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("versionLine");
         }
         
         /**
@@ -203,8 +193,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
          * @return The data class Term
          */
         public static ComparableTerm getDataClassTerm() {
-            if (DATA_CLASS_TERM==null) DATA_CLASS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataClass");
-            return DATA_CLASS_TERM;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("dataClass");
         }
     }
     

@@ -163,20 +163,13 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
     /**
      * Implements some GenBank-specific terms.
      */
-    public static class Terms extends RichSequence.Terms {
-        private static ComparableTerm GENBANK_TERM = null;
-        
+    public static class Terms extends RichSequence.Terms {        
         /**
          * Getter for the Genbank term
          * @return The genbank Term
          */
         public static ComparableTerm getGenBankTerm() {
-            if (GENBANK_TERM==null) GENBANK_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
-            return GENBANK_TERM;
-        }
-        
-        public final static void reset() {
-            GENBANK_TERM=null;
+            return RichObjectFactory.getDefaultOntology().getOrCreateTerm("GenBank");
         }
     }
     

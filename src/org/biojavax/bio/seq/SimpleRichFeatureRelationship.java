@@ -42,15 +42,12 @@ public class SimpleRichFeatureRelationship extends AbstractChangeable implements
     private ComparableTerm term;
     private int rank;
     
-    private static ComparableTerm CONTAINS_TERM = null;    
-    
     /**
      * Gets the default CONTAINS term used for defining the relationship between features.
      * @return the default CONTAINS term.
      */
     public static ComparableTerm getContainsTerm() {
-        if (CONTAINS_TERM==null) CONTAINS_TERM = RichObjectFactory.getDefaultOntology().getOrCreateTerm("contains");
-        return CONTAINS_TERM;
+        return RichObjectFactory.getDefaultOntology().getOrCreateTerm("contains");
     }
     
     /**
