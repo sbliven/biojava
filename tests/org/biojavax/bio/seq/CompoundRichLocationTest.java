@@ -60,7 +60,7 @@ public class CompoundRichLocationTest extends TestCase {
         assertFalse(r1.equals(r3));
     }
 
-    public void testContains() {// Bug #2582
+    public void testContains1() {// Bug #2582
         RichLocation loc1 = new SimpleRichLocation(new SimplePosition(1), new SimplePosition(10), 0);
         RichLocation loc2 = new SimpleRichLocation(new SimplePosition(2), new SimplePosition(4), 0);
         RichLocation loc3 = new SimpleRichLocation(new SimplePosition(6), new SimplePosition(8), 0);
@@ -69,5 +69,21 @@ public class CompoundRichLocationTest extends TestCase {
         a.add(loc3);
         CompoundRichLocation loc4 = new CompoundRichLocation(a);
         assertTrue(loc1.contains(loc4));
+    }
+
+    public void testContains2() {// Bug #2582
+        RichLocation loc1a = new SimpleRichLocation(new SimplePosition(2), new SimplePosition(4), 0);
+        RichLocation loc1b = new SimpleRichLocation(new SimplePosition(6), new SimplePosition(8), 0);
+        RichLocation loc2a = new SimpleRichLocation(new SimplePosition(2), new SimplePosition(4), 0);
+        RichLocation loc2b = new SimpleRichLocation(new SimplePosition(6), new SimplePosition(8), 0);
+        ArrayList a = new ArrayList();
+        a.add(loc2a);
+        a.add(loc2b);
+        CompoundRichLocation loc2 = new CompoundRichLocation(a);
+        a.clear();
+        a.add(loc1a);
+        a.add(loc1b);
+        CompoundRichLocation loc1 = new CompoundRichLocation(a);
+        assertTrue(loc1.contains(loc2));
     }
 }

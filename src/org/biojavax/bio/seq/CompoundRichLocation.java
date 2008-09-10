@@ -18,13 +18,15 @@
  *      http://www.biojava.org/
  *
  */
-
 package org.biojavax.bio.seq;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -47,10 +49,10 @@ import org.biojavax.ontology.ComparableTerm;
  * @since 1.5
  */
 public class CompoundRichLocation extends SimpleRichLocation implements RichLocation {
-    
+
     protected List members;
     protected int size = 0;
-    
+
     /**
      * Getter for the "join" term
      * @return the "join" term
@@ -58,7 +60,7 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
     public static ComparableTerm getJoinTerm() {
         return RichObjectFactory.getDefaultOntology().getOrCreateTerm("join");
     }
-    
+
     /**
      * Getter for the "order" term
      * @return the "order" term
@@ -66,7 +68,7 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
     public static ComparableTerm getOrderTerm() {
         return RichObjectFactory.getDefaultOntology().getOrCreateTerm("order");
     }
-    
+
     /**
      * Constructs a CompoundRichLocation from the given set of members, with
      * the default term of "join". Note that you really shouldn't use this if
@@ -78,8 +80,10 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
      * @param members the members to put into the compound location.
      * @see RichLocation.Tools
      */
-    public CompoundRichLocation(Collection members) { this(getJoinTerm(), members); }
-    
+    public CompoundRichLocation(Collection members) {
+        this(getJoinTerm(), members);
+    }
+
     /**
      * Constructs a CompoundRichLocation from the given set of members.
      * Note that you really shouldn't use this if
@@ -92,17 +96,25 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
      * @see RichLocation.Tools
      */
     public CompoundRichLocation(ComparableTerm term, Collection members) {
-        if (term==null) throw new IllegalArgumentException("Term cannot be null");
-        if (members==null || members.size()<2) throw new IllegalArgumentException("Must have at least two members");   
-        if (RichLocation.Tools.isMultiSource(members)) throw new IllegalArgumentException("All members must be from the same source");
+        if (term == null) {
+            throw new IllegalArgumentException("Term cannot be null");
+        }
+        if (members == null || members.size() < 2) {
+            throw new IllegalArgumentException("Must have at least two members");
+        }
+        if (RichLocation.Tools.isMultiSource(members)) {
+            throw new IllegalArgumentException("All members must be from the same source");
+        }
         this.term = term;
-        this.members = new ArrayList();   
-        for (Iterator i = members.iterator(); i.hasNext(); ) {
+        this.members = new ArrayList();
+        for (Iterator i = members.iterator(); i.hasNext();) {
             // Convert each member into a RichLocation
             Object o = i.next();
-            if (!(o instanceof RichLocation)) o = RichLocation.Tools.enrich((Location)o);
+            if (!(o instanceof RichLocation)) {
+                o = RichLocation.Tools.enrich((Location) o);
+            }
             // Convert
-            RichLocation rl = (RichLocation)o;
+            RichLocation rl = (RichLocation) o;
             // Add in member
             this.members.add(rl);
             // Update our cross ref
@@ -112,43 +124,58 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
             // Update our strand
             this.setStrand(rl.getStrand());
             // Update our size and min/max
-            this.size += rl.getMax()-rl.getMin();
-            if (this.getMinPosition()==null) this.setMinPosition(rl.getMinPosition());
-            else this.setMinPosition(this.posmin(this.getMinPosition(),rl.getMinPosition()));
-            if (this.getMaxPosition()==null) this.setMaxPosition(rl.getMaxPosition());
-            else this.setMaxPosition(this.posmax(this.getMaxPosition(),rl.getMaxPosition()));
+            this.size += rl.getMax() - rl.getMin();
+            if (this.getMinPosition() == null) {
+                this.setMinPosition(rl.getMinPosition());
+            } else {
+                this.setMinPosition(this.posmin(this.getMinPosition(), rl.getMinPosition()));
+            }
+            if (this.getMaxPosition() == null) {
+                this.setMaxPosition(rl.getMaxPosition());
+            } else {
+                this.setMaxPosition(this.posmax(this.getMaxPosition(), rl.getMaxPosition()));
+            }
         }
     }
-            
+
     // for internal use only
-    protected CompoundRichLocation() {}
-    
+    protected CompoundRichLocation() {
+    }
+
     /**
      * {@inheritDoc} 
      */
-    public void sort() { Collections.sort(this.members); }
-    
+    public void sort() {
+        Collections.sort(this.members);
+    }
+
     /**
      * {@inheritDoc} 
      * Passes the call on to each of its members in turn.
      */
     public void setFeature(RichFeature feature) throws ChangeVetoException {
         super.setFeature(feature);
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setFeature(feature);
+        for (Iterator i = this.members.iterator(); i.hasNext();) {
+            ((RichLocation) i.next()).setFeature(feature);
+        }
     }
-        
+
     /**
      * {@inheritDoc}
      * ALWAYS RETURNS THE EMPTY ANNOTATION
      */
-    public Annotation getAnnotation() { return RichAnnotation.EMPTY_ANNOTATION; }
-    
+    public Annotation getAnnotation() {
+        return RichAnnotation.EMPTY_ANNOTATION;
+    }
+
     /**
      * {@inheritDoc}
      * ALWAYS RETURNS THE EMPTY ANNOTATION NOTE SET
      */
-    public Set getNoteSet() { return RichAnnotation.EMPTY_ANNOTATION.getNoteSet(); }
-    
+    public Set getNoteSet() {
+        return RichAnnotation.EMPTY_ANNOTATION.getNoteSet();
+    }
+
     /**
      * {@inheritDoc}
      * NOT IMPLEMENTED
@@ -157,66 +184,80 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
     public void setNoteSet(Set notes) throws ChangeVetoException {
         throw new ChangeVetoException("Cannot annotate compound locations.");
     }
-           
+
     /**
      * {@inheritDoc}
      * RECURSIVELY APPLIES CALL TO ALL MEMBERS
      */
     public void setCircularLength(int sourceSeqLength) throws ChangeVetoException {
         super.setCircularLength(sourceSeqLength);
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setCircularLength(sourceSeqLength);
+        for (Iterator i = this.members.iterator(); i.hasNext();) {
+            ((RichLocation) i.next()).setCircularLength(sourceSeqLength);
+        }
     }
-      
+
     /**
      * {@inheritDoc}
      */
-    public Iterator blockIterator() { 
-    	final List sortedMembers = new ArrayList(this.members);
-    	Collections.sort(sortedMembers);
-    	return sortedMembers.iterator(); 
+    public Iterator blockIterator() {
+        final List sortedMembers = new ArrayList(this.members);
+        Collections.sort(sortedMembers);
+        return sortedMembers.iterator();
     }
-    
+
     /**
      * {@inheritDoc}
      * ALWAYS RETURNS FALSE
      */
-    public boolean isContiguous() { return false; }
-    
+    public boolean isContiguous() {
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      * Recursively applies this call to all members.
      */
     public boolean contains(int p) {
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) if (((RichLocation)i.next()).contains(p)) return true;
+        for (Iterator i = this.members.iterator(); i.hasNext();) {
+            if (((RichLocation) i.next()).contains(p)) {
+                return true;
+            }
+        }
         return false;
     }
-    
+
     /**
      * {@inheritDoc}
      * ALWAYS RETURNS NULL
      */
-    public Location getDecorator(Class decoratorClass) { return null; }
-    
+    public Location getDecorator(Class decoratorClass) {
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      * ALWAYS RETURNS SELF
      */
-    public Location newInstance(Location loc) { return loc; }
-    
+    public Location newInstance(Location loc) {
+        return loc;
+    }
+
     /**
      * {@inheritDoc}
      * Recursively translates all members of this location.
      */
     public Location translate(int dist) {
-        if (this.members.isEmpty()) return this;
+        if (this.members.isEmpty()) {
+            return this;
+        }
         List newmembers = new ArrayList();
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) {
-            RichLocation rl = (RichLocation)i.next();
+        for (Iterator i = this.members.iterator(); i.hasNext();) {
+            RichLocation rl = (RichLocation) i.next();
             newmembers.add(rl.translate(dist));
         }
-        return new CompoundRichLocation(this.getTerm(),newmembers);
+        return new CompoundRichLocation(this.getTerm(), newmembers);
     }
-    
+
     /**
      * {@inheritDoc}
      * Recursively applies this call to all members. If passed a Location 
@@ -227,28 +268,64 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
      * wholey contains <code>l</code>.
      */
     public boolean contains(Location l) {
-        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
+        if (!(l instanceof RichLocation)) {
+            l = RichLocation.Tools.enrich(l);
+        }
         if (l instanceof EmptyRichLocation) {
             return l.contains(this); // let them do the hard work!
         } else {
-            for (Iterator i = this.members.iterator(); i.hasNext(); ) if (((RichLocation)i.next()).contains(l)) return true;
+            RichLocation rl = (RichLocation) l;
+            if (rl instanceof CompoundRichLocation) {
+                CompoundRichLocation crl = (CompoundRichLocation) rl;
+                Map matches = new HashMap();
+                for (Iterator i = crl.members.iterator(); i.hasNext();) {
+                    matches.put(i.next(), Boolean.FALSE);
+                }
+                for (Iterator i = this.members.iterator(); i.hasNext();) {
+                    RichLocation member = (RichLocation) i.next();
+                    for (Iterator j = matches.entrySet().iterator(); j.hasNext();) {
+                        Map.Entry entry = (Map.Entry)j.next();
+                        if (entry.getValue().equals(Boolean.TRUE)) {
+                            continue;
+                        }
+                        RichLocation match = (RichLocation) entry.getKey();
+                        if (member.contains(match)) {
+                            entry.setValue(Boolean.TRUE);
+                        }
+                    }
+                }
+                for (Iterator i = matches.values().iterator(); i.hasNext(); ) {
+                    if (i.next().equals(Boolean.FALSE)) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                for (Iterator i = this.members.iterator(); i.hasNext();) {
+                    if (((RichLocation) i.next()).contains(rl)) {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * Recursively applies this call to all members.
      * @return true if and only if at least on of the members overlaps <code>l</code>
      */
     public boolean overlaps(Location l) {
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) {
-            RichLocation rl = (RichLocation)i.next();
-            if (rl.overlaps(l)) return true;
+        for (Iterator i = this.members.iterator(); i.hasNext();) {
+            RichLocation rl = (RichLocation) i.next();
+            if (rl.overlaps(l)) {
+                return true;
+            }
         }
         return false;
     }
-    
+
     /**
      * {@inheritDoc} 
      * If passed a Location which is not a RichLocation, it converts it first 
@@ -261,18 +338,21 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
      * cannot be merged else a <code>SimpleRichLocation</code>
      */
     public Location union(Location l) {
-        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        if (l instanceof EmptyRichLocation) return this;
-        else {
+        if (!(l instanceof RichLocation)) {
+            l = RichLocation.Tools.enrich(l);
+        }
+        if (l instanceof EmptyRichLocation) {
+            return this;
+        } else {
             // Easy - construct a new location based on the members of both
             // ourselves and the location passed as a parameter
             List members = new ArrayList();
             members.addAll(RichLocation.Tools.flatten(this));
-            members.addAll(RichLocation.Tools.flatten((RichLocation)l));
+            members.addAll(RichLocation.Tools.flatten((RichLocation) l));
             return RichLocation.Tools.construct(RichLocation.Tools.merge(members));
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * If passed a Location which is not a RichLocation, it converts it first 
@@ -283,16 +363,19 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
      * of intersection that cannot be merged. Else a <code>SimpleRichLocation</code>.
      */
     public Location intersection(Location l) {
-        if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
-        if (l instanceof EmptyRichLocation) return l;
-        else if (l instanceof CompoundRichLocation) {
-            Collection theirMembers = RichLocation.Tools.flatten((RichLocation)l);
+        if (!(l instanceof RichLocation)) {
+            l = RichLocation.Tools.enrich(l);
+        }
+        if (l instanceof EmptyRichLocation) {
+            return l;
+        } else if (l instanceof CompoundRichLocation) {
+            Collection theirMembers = RichLocation.Tools.flatten((RichLocation) l);
             // For every member of the location passed as a parameter, intersect 
             // with ourselves. Then construct a new location from the
             // results of all the intersections.
             Set results = new TreeSet();
-            for (Iterator i = theirMembers.iterator(); i.hasNext(); ) {
-                RichLocation member = (RichLocation)i.next();
+            for (Iterator i = theirMembers.iterator(); i.hasNext();) {
+                RichLocation member = (RichLocation) i.next();
                 results.add(this.intersection(member));
             }
             return RichLocation.Tools.construct(RichLocation.Tools.merge(results));
@@ -302,22 +385,24 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
             // passed as a parameter. Then construct a new location from the
             // results of all the intersections.
             Set results = new TreeSet();
-            for (Iterator i = this.members.iterator(); i.hasNext(); ) {
-                RichLocation member = (RichLocation)i.next();
+            for (Iterator i = this.members.iterator(); i.hasNext();) {
+                RichLocation member = (RichLocation) i.next();
                 results.add(member.intersection(l));
             }
             return RichLocation.Tools.construct(RichLocation.Tools.merge(results));
-        } 
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      * Recursively applies this call to all members.
      */
     public void setCrossRefResolver(CrossReferenceResolver r) {
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) ((RichLocation)i.next()).setCrossRefResolver(r);
+        for (Iterator i = this.members.iterator(); i.hasNext();) {
+            ((RichLocation) i.next()).setCrossRefResolver(r);
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      * This function concatenates the symbols of all its child locations.
@@ -326,83 +411,100 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
      * is the contatenation of the components of a gene with multiple exons.
      */
     public SymbolList symbols(SymbolList seq) {
-        if (seq==null) throw new IllegalArgumentException("Sequence cannot be null");
+        if (seq == null) {
+            throw new IllegalArgumentException("Sequence cannot be null");
+        }
 
         List res = new ArrayList();
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) {
+        for (Iterator i = this.members.iterator(); i.hasNext();) {
             RichLocation l = (RichLocation) i.next();
             res.addAll(l.symbols(seq).toList());
         }
-        
+
         try {
             return new SimpleSymbolList(seq.getAlphabet(), res);
         } catch (IllegalSymbolException ex) {
-            throw new RuntimeException("Could not build compound sequence string",ex);
+            throw new RuntimeException("Could not build compound sequence string", ex);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void setTerm(ComparableTerm term) throws ChangeVetoException {
-        if (term==null) throw new ChangeVetoException("Cannot set term to null");
+        if (term == null) {
+            throw new ChangeVetoException("Cannot set term to null");
+        }
         super.setTerm(term);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public int hashCode() {
         int code = 17;
-        code = 31*code + this.getTerm().hashCode();
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) code = 31*i.next().hashCode();
+        code = 31 * code + this.getTerm().hashCode();
+        for (Iterator i = this.members.iterator(); i.hasNext();) {
+            code = 31 * i.next().hashCode();
+        }
         return code;
     }
-    
+
     /**
      * {@inheritDoc}
      * Compound locations are only equal to other Locations if all their
      * components are equal.
      */
     public boolean equals(Object o) {
-        if (o==this) return true;
-        if (! (o instanceof Location)) return false;
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Location)) {
+            return false;
+        }
         Location them = (Location) o;
-        
-        if(them.isContiguous()) return false; //because this is not!
-        
+
+        if (them.isContiguous()) {
+            return false;
+        } //because this is not!
+
         // ok - both compound. The blocks returned from blockIterator should each be
         // equivalent.
         Iterator i1 = this.blockIterator();
         Iterator i2 = them.blockIterator();
 
         // while there are more pairs to check...
-        while(i1.hasNext() && i2.hasNext()) {
+        while (i1.hasNext() && i2.hasNext()) {
             // check that this pair is equivalent
             Location l1 = (Location) i1.next();
             Location l2 = (Location) i2.next();
 
-            if(!(l1.equals(l2))) // not equivalent blocks so not equal
+            if (!(l1.equals(l2))) // not equivalent blocks so not equal
+            {
                 return false;
+            }
         }
-        if(i1.hasNext() || i2.hasNext()) {
+        if (i1.hasNext() || i2.hasNext()) {
             // One of the locations had more blocks than the other
             return false;
         }
         // Same number of blocks, all equivalent. Must be equal.
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
      */
     public int compareTo(Object o) {
         Location fo = (Location) o;
-        if (this.equals(fo)) return 0;
-        else return this.getMin() - fo.getMin();
+        if (this.equals(fo)) {
+            return 0;
+        } else {
+            return this.getMin() - fo.getMin();
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      * Form: "term:[location,location...]"
@@ -411,9 +513,11 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
         StringBuffer sb = new StringBuffer();
         sb.append(this.getTerm());
         sb.append(":[");
-        for (Iterator i = this.blockIterator(); i.hasNext(); ) {
+        for (Iterator i = this.blockIterator(); i.hasNext();) {
             sb.append(i.next());
-            if (i.hasNext()) sb.append(",");
+            if (i.hasNext()) {
+                sb.append(",");
+            }
         }
         sb.append("]");
         return sb.toString();
