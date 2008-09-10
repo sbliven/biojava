@@ -401,7 +401,6 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     public boolean contains(Location l) {
         if (!(l instanceof RichLocation)) l = RichLocation.Tools.enrich(l);
         if (l instanceof EmptyRichLocation) return false;
-        else if (l instanceof CompoundRichLocation) return l.contains(this);
         else {
             RichLocation rl = (RichLocation)l;
             // Simple vs. simple
