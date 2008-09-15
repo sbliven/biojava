@@ -97,9 +97,11 @@ import org.xml.sax.helpers.AttributesImpl;
  * <li>Colin Hardman      (CAT)
  * <li>Stuart Johnston    (CAT)
  * <li>Mathieu Wiepert    (Mayo Foundation)
+ * <li>Travis Banks
  *</ul>
  *
  * @author Cambridge Antibody Technology (CAT)
+ * @author Travis Banks
  * @version 1.0
  *
  * @see org.biojava.bio.program.BlastLikeToXMLConverter
@@ -152,12 +154,11 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
         oContents = this.getContentStream(poSource);
         //This sets contentHandler document for XSLT
         this.getContentHandler().startDocument();
-
+        
         try {
             // loop over file
             oLine = oContents.readLine();
             while (oLine != null) {
-              
                 //interpret line and send messages accordingly        
                 this.interpret(oContents,oLine);
                 //do extra interpretation of lines reached by subparser
@@ -218,7 +219,6 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
      */
     private void interpret(BufferedReader poContents, String poLine)
     throws SAXException {
-
         //For a brand new collection,
         //check for the start of a new BlastDataSet
         if (iState == STARTUP) {
@@ -306,11 +306,13 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 
         //choose according to version...
         oBlast = new BlastSAXParser(oVersion,this.getNamespacePrefix());
-        String oLine;
+        String oLine="";
 
         //Parse Contents stream up to end of a single BlastDataSet.
         oBlast.setContentHandler(oHandler);
-        oLine = oBlast.parse(poContents,poLine);
+        while(oLine!=null) {
+        	oLine = oBlast.parse(poContents,poLine);
+        }
 
         this.changeState(INSIDE_FILE);
 

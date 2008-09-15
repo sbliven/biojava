@@ -42,6 +42,7 @@ import java.util.StringTokenizer;
  *                 Stuart Johnston    (CAT)
  *                 Mathieu Wiepert    (Mayo Foundation)
  *                 Keith James        (Sanger Institute)
+ *                 Travis Banks
  *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
  *
@@ -49,6 +50,7 @@ import java.util.StringTokenizer;
  * under the LGPL license.
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Travis Banks
  * @version 0.1
  *
  */
@@ -77,7 +79,9 @@ final class BlastLikeVersionSupport {
     public static final int    V2_0_11           = 100;
     public static final int    V2_2_2            = 101;
     public static final int    V2_2_3            = 102;
-    public static final int    V2_2_15            = 103;
+    public static final int	   V2_2_11			 = 103;
+    public static final int    V2_2_15           = 104;
+    public static final int    V2_2_18           = 105;
     // GCG Blast
     public static final int    V2_0_10           = 150;
     public static final int    V2_1_2            = 151;
@@ -125,7 +129,7 @@ final class BlastLikeVersionSupport {
               (iProgram == NCBI_TBLASTX) ) {
 
              if (iVersion == V2_0_11 || iVersion == V2_2_2 || iVersion == V2_2_3 
-                     || iVersion == V2_2_15) {
+                     || iVersion == V2_2_11 || iVersion == V2_2_15 || iVersion == V2_2_18) {
                  return true;
              }
 
@@ -302,8 +306,14 @@ final class BlastLikeVersionSupport {
         if (oVersionString.equals("2.2.3")) {
             iVersion = V2_2_3;
         }
+        if (oVersionString.equals("2.2.11")) {
+            iVersion = V2_2_11;
+        }
         if (oVersionString.equals("2.2.15")) {
             iVersion = V2_2_15;
+        }
+        if (oVersionString.equals("2.2.18")) {
+            iVersion = V2_2_18;
         }
 
         //wu-blast
