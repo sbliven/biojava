@@ -29,7 +29,6 @@ import java.util.zip.GZIPInputStream;
 
 import junit.framework.TestCase;
 
-import org.biojava.bio.Annotation;
 import org.biojava.bio.program.ssbind.BlastLikeSearchBuilder;
 import org.biojava.bio.program.ssbind.SeqSimilarityAdapter;
 import org.biojava.bio.search.SearchContentHandler;
