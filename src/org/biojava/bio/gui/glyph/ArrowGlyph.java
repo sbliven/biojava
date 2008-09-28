@@ -179,7 +179,7 @@ public class ArrowGlyph implements Glyph {
 	/**
 	 * Returns the paint properties of this glyph.
 	 *
-	 * @return
+	 * @return the fillPaint 
 	 */
 	public Paint getFillPaint() {
 		return fillPaint;
@@ -197,7 +197,7 @@ public class ArrowGlyph implements Glyph {
 	/**
 	 * Returns the paint properties of the outer line of this glyph.
 	 *
-	 * @return
+	 * @return the outerPaint
 	 */
 	public Paint getOuterPaint() {
 		return outerPaint;
