@@ -36,6 +36,11 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class GlyphFeatureRenderer extends FilteringRenderer implements
     FeatureRenderer {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7005846487574725181L;
+
 	private double	              depth	= 15;
 
 	protected List<FeatureFilter>	fList;
@@ -82,7 +87,7 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 	}
 
 	/**
-	 * Returns the ith {@see FeatureFilter} in this renderer.
+	 * Returns the ith {@link FeatureFilter} in this renderer.
 	 *
 	 * @param i
 	 * @return the featureFilter
@@ -92,7 +97,7 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 	}
 
 	/**
-	 * Returns true if the given {@see FeatureFilter} is already contained in this
+	 * Returns true if the given {@link FeatureFilter} is already contained in this
 	 * renderer.
 	 *
 	 * @param ff
@@ -103,7 +108,7 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 	}
 
 	/**
-	 * Allows setting another {@see Glyph} object to be painted for the given
+	 * Allows setting another {@link Glyph } object to be painted for the given
 	 * {@see FeatureFilter}.
 	 *
 	 * @param ff
@@ -118,11 +123,11 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 	}
 
 	/**
-	 * Returns the {@see Glyph} object which is assigned to the given feature
+	 * Returns the {@link Glyph}  object which is assigned to the given feature
 	 * filter.
 	 *
 	 * @param ff
-	 * @return {@see Glyph} object
+	 * @return {@link Glyph} object
 	 * @throws NoSuchElementException
 	 */
 	public Glyph getGlyphForFilter(FeatureFilter ff)
