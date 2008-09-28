@@ -85,7 +85,7 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 	 * Returns the ith {@see FeatureFilter} in this renderer.
 	 *
 	 * @param i
-	 * @return
+	 * @return the featureFilter
 	 */
 	public FeatureFilter getFeatureFilter(int i) {
 		return fList.get(i);
@@ -96,7 +96,7 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 	 * renderer.
 	 *
 	 * @param ff
-	 * @return
+	 * @return flag if featurefilter is contained
 	 */
 	public boolean containsFilter(FeatureFilter ff) {
 		return fList.contains(ff);
@@ -122,7 +122,7 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 	 * filter.
 	 *
 	 * @param ff
-	 * @return
+	 * @return {@see Glyph} object
 	 * @throws NoSuchElementException
 	 */
 	public Glyph getGlyphForFilter(FeatureFilter ff)
@@ -138,7 +138,7 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 	/**
 	 * Returns the depth property of this class.
 	 *
-	 * @return
+	 * @return the depth
 	 */
 	public double getDepth(SequenceRenderContext src) {
 		return depth;
