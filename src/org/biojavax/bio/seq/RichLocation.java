@@ -368,7 +368,7 @@ public interface RichLocation extends Location,RichAnnotatable,Comparable {
                             // remove child
                             membersList.remove(c);
                             // check all children again
-                            c=p;
+                            c=p+1;
                         }
                     }
                 }
