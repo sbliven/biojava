@@ -45,7 +45,7 @@ public interface RankedDocRef extends Comparable,Changeable {
     public static final ChangeType LOCATION = new ChangeType(
             "This ranked docreference's location has changed",
             "org.biojavax.RankedDocRef",
-            "RANK"
+            "LOCATION"
             );
     
     /**
