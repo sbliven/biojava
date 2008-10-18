@@ -25,8 +25,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.AminoAcidImpl;
@@ -42,6 +44,7 @@ import org.biojava.bio.structure.PDBHeader;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.StructureTools;
+import org.biojava.bio.structure.io.PDBFileParser;
 import org.biojava.bio.structure.io.PDBParseException;
 import org.biojava.bio.structure.io.SeqRes2AtomAligner;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
@@ -50,6 +53,7 @@ import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
 import org.biojava.bio.structure.io.mmcif.model.EntityPolySeq;
 import org.biojava.bio.structure.io.mmcif.model.Exptl;
+import org.biojava.bio.structure.io.mmcif.model.PdbxPolySeqScheme;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
 import org.biojava.bio.structure.io.mmcif.model.StructAsym;
 import org.biojava.bio.structure.io.mmcif.model.StructRef;
@@ -59,30 +63,33 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 /** A MMcifConsumer implementation that build a in-memory representation of the 
  * content of a mmcif file as a BioJava Structure object.
  *  @author Andreas Prlic
+ *  @since 1.7
  */
 
 public class SimpleMMcifConsumer implements MMcifConsumer {
 
 	boolean DEBUG = false;
-	
+
 	Structure structure;
 	Chain current_chain;
 	Group current_group;
 	int atomCount;
 	boolean parseCAOnly;
 	boolean alignSeqRes;
-	
-	List<Chain>   current_model;
-	List<Entity> entities;
+
+	List<Chain>     current_model;
+	List<Entity>    entities;
 	List<StructRef> strucRefs;
 	List<Chain>   seqResChains; 
 	List<Chain>   entityChains; // needed to link entities, chains and compounds...
 	List<StructAsym> structAsyms; // needed to link entities, chains and compounds...
-	
+
+	Map<String,String> asymStrandId;
+
 	public  SimpleMMcifConsumer(){
-	
+
 		documentStart();
-		
+
 		alignSeqRes = true;
 		parseCAOnly = false;
 
@@ -101,9 +108,9 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 			System.out.println(entity);		
 		entities.add(entity);
 	}
-	
+
 	public void newStructAsym(StructAsym sasym){
-		
+
 		structAsyms.add(sasym);
 	}
 
@@ -217,7 +224,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		// Warning: getLabel_asym_id is not the "chain id" in the PDB file
 		// TODO: need to map the asym id to the pdb_strand_id later on  
 		String chain_id      = atom.getLabel_asym_id(); 
-		
+
 		String recordName    = atom.getGroup_PDB();
 		String residueNumber = atom.getAuth_seq_id();
 		String groupCode3    = atom.getLabel_comp_id();
@@ -328,12 +335,12 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		double occupancy = Double.parseDouble(atom.getOccupancy());
 		a.setOccupancy(occupancy);
-		
+
 		double temp = Double.parseDouble(atom.getB_iso_or_equiv());
 		a.setTempFactor(temp);
-				
+
 		a.setFullName(atom.getLabel_atom_id());
-		
+
 		String alt = atom.getLabel_alt_id();
 		if (( alt != null ) && ( alt.length() > 0)){
 			a.setAltLoc(new Character(alt.charAt(0)));
@@ -353,14 +360,14 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		current_chain = null;
 		current_group = null;
 		atomCount     = 0;
-	
+
 		current_model = new ArrayList<Chain>();
 		entities      = new ArrayList<Entity>();
 		strucRefs     = new ArrayList<StructRef>();
 		seqResChains  = new ArrayList<Chain>();
 		entityChains  = new ArrayList<Chain>();
 		structAsyms   = new ArrayList<StructAsym>();
-		
+		asymStrandId  = new HashMap<String, String>();
 	}
 
 
@@ -381,8 +388,8 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	public void setAlignSeqRes(boolean alignSeqRes) {
 		this.alignSeqRes = alignSeqRes;
 	}
-	
-	
+
+
 	public void documentEnd() {
 		// a problem ocured earlier so current_chain = null ...
 		// most likely the buffered reader did not provide data ...
@@ -393,35 +400,55 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 			}
 		}
 
+
 		structure.addModel(current_model);
 
 		// TODO: use _pdbx_poly_seq_scheme
 		// to map  _pdbx_poly_seq_scheme.asym_id to the Chain ids (called pdb_strand_id)
 		//
-		
+
 		// map entities to Chains and Compound objects...
 		for (StructAsym asym : structAsyms) {
 			if ( DEBUG )
-				System.out.println("entity " + asym.getEntity_id() + " matches chain:" + asym.getId());
+				System.out.println("entity " + asym.getEntity_id() + " matches asym id:" + asym.getId());
+
 			Chain s = getEntityChain(asym.getEntity_id());
 			Chain seqres = (Chain)s.clone();
 			seqres.setName(asym.getId());
 			seqResChains.add(seqres);
-			
+
 		}
-		
+
 		if ( alignSeqRes ){
 
 			SeqRes2AtomAligner aligner = new SeqRes2AtomAligner();
 			aligner.align(structure,seqResChains);
 		}
-		
+
 		//TODO: add support for these:
 
 		//structure.setConnections(connects);
 		//structure.setCompounds(compounds);
-		
+
 		//linkChains2Compound(structure);
+
+
+
+		// fix the chain IDS in the current model:
+
+		//TODO: test this with NMR structures!
+		Set<String> asymIds = asymStrandId.keySet();
+		for (String asym : asymIds) {	
+			for (int i =0; i< structure.nrModels() ; i++){
+				List<Chain>model = structure.getModel(i);
+				for (Chain chain : model) {
+					if ( chain.getName().equals(asym)){
+						chain.setName(asymStrandId.get(asym));		
+						break;
+					}
+				}
+			}
+		}
 
 
 	}
@@ -558,25 +585,25 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	 * 
 	 */
 	public void newStructRefSeq(StructRefSeq sref) {
-		if (DEBUG)
-			System.out.println(sref);
+		//if (DEBUG)
+		//	System.out.println(sref);
 		DBRef r = new DBRef();
 
-		
+
 		//if (DEBUG)
 		//	System.out.println( " " + sref.getPdbx_PDB_id_code() + " " + sref.getPdbx_db_accession());
 		r.setIdCode(sref.getPdbx_PDB_id_code());
 		r.setDbAccession(sref.getPdbx_db_accession());
 		r.setDbIdCode(sref.getPdbx_db_accession());
-			
-		
+
+
 		//TODO: make DBRef chain IDs a string for chainIDs that are longer than one char...
 		r.setChainId(new Character(sref.getPdbx_strand_id().charAt(0)));
 		StructRef structRef = getStructRef(sref.getRef_id());
 		r.setDatabase(structRef.getDb_name());
 		r.setDbIdCode(structRef.getDb_code());
 
-		
+
 		int seqbegin = Integer.parseInt(sref.getPdbx_auth_seq_align_beg());
 		int seqend   = Integer.parseInt(sref.getPdbx_auth_seq_align_end());
 		Character begin_ins_code = new Character(sref.getPdbx_seq_align_beg_ins_code().charAt(0));
@@ -584,10 +611,10 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		if (begin_ins_code == '?')
 			begin_ins_code = ' ';
-		
+
 		if (end_ins_code == '?')
 			end_ins_code = ' ';
-		
+
 		r.setSeqBegin(seqbegin);
 		r.setInsertBegin(begin_ins_code);
 
@@ -601,25 +628,25 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		if (db_begin_in_code == '?')
 			db_begin_in_code = ' ';
-		
+
 		if (db_end_in_code == '?')
 			db_end_in_code = ' ';
-		
-		
+
+
 		r.setDbSeqBegin(dbseqbegin);
 		r.setIdbnsBegin(db_begin_in_code);
 
 		r.setDbSeqEnd(dbseqend);
 		r.setIdbnsEnd(db_end_in_code);
-		
+
 		List<DBRef> dbrefs = structure.getDBRefs();
 		if ( dbrefs == null)
 			dbrefs = new ArrayList<DBRef>();
 		dbrefs.add(r);
-		
+
 		if ( DEBUG)
 			System.out.println(r.toPDB());
-		
+
 		structure.setDBRefs(dbrefs);
 
 	}
@@ -627,62 +654,87 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	private Chain getChainFromList(List<Chain> chains, String name){
 		for (Chain chain : chains) {
 			if ( chain.getName().equals(name)){
-				
+
 				return chain;
 			}
 		}
 		// does not exist yet, so create...
-		
+
 		Chain	chain = new ChainImpl();
 		chain.setName(name);
 		chains.add(chain);
-		
+
 		return chain;
 	}
-	
+
 	private Chain getEntityChain(String entity_id){
-		
+
 		return getChainFromList(entityChains,entity_id);
 	}
-	
+
 	private Chain getSeqResChain(String chainID){
 		return getChainFromList(seqResChains, chainID);
 	}
-	
+
 	/** The EntityPolySeq object provide the amino acid sequence objects for the Entities.
 	 * Later on the entities are mapped to the BioJava Chain and Compound objects.
 	 * @param epolseq the EntityPolySeq record for one amino acid 
 	 */
 	public void newEntityPolySeq(EntityPolySeq epolseq) {	
-		
+		//System.out.println(epolseq);
 		Entity e = getEntity(epolseq.getEntity_id());
-		
+
 		if (e == null){
 			System.err.println("could not find entity "+ epolseq.getEntity_id()+". Can not match sequence to it.");
 			return;
 		}
-		
+
 		Chain entityChain = getEntityChain(epolseq.getEntity_id());
+
 		
 		// create group from epolseq;
 		AminoAcid g = new AminoAcidImpl();
 		try {
 			g.setPDBName(epolseq.getMon_id());
-			
+
 			Character code1 = StructureTools.convert_3code_1code(epolseq.getMon_id());
 			g.setAminoType(code1);
 			g.setPDBCode(epolseq.getNum());
 			entityChain.addGroup(g);
-			
+
 		} catch (PDBParseException ex) {
-			ex.printStackTrace();
+			if ( StructureTools.isNucleotide(epolseq.getMon_id())) {
+				// the group is actually a nucleotide group...
+				NucleotideImpl n = new NucleotideImpl();
+				n.setPDBCode(epolseq.getNum());
+				entityChain.addGroup(n);
+			}
+			else {
+				ex.printStackTrace();
+			}
 		} catch (IllegalSymbolException ex){
 			ex.printStackTrace();
 		}
-		
-		
-		
-		
+
+
+
+
+	}
+
+	public void newPdbxPolySeqScheme(PdbxPolySeqScheme ppss) {
+
+		// merge the EntityPolySeq info and the AtomSite chains into one... 
+
+		//already known ignore:
+		if (asymStrandId.containsKey(ppss.getAsym_id()))
+			return;
+
+		//System.out.println(ppss.getAsym_id() + " = " + ppss.getPdb_strand_id());
+
+		asymStrandId.put(ppss.getAsym_id(), ppss.getPdb_strand_id());
+
+
+
 	}
 
 

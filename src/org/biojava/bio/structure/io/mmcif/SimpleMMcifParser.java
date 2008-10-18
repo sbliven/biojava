@@ -37,10 +37,12 @@ import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
 import org.biojava.bio.structure.io.mmcif.model.EntityPolySeq;
 import org.biojava.bio.structure.io.mmcif.model.Exptl;
+import org.biojava.bio.structure.io.mmcif.model.PdbxPolySeqScheme;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
 import org.biojava.bio.structure.io.mmcif.model.StructAsym;
 import org.biojava.bio.structure.io.mmcif.model.StructRef;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
+
 
 /** A simple mmCif file parser
  * 
@@ -54,7 +56,7 @@ import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 		parser.addMMcifConsumer(consumer);
 
 		try {
-			
+
 			BufferedReader buf = new BufferedReader(new InputStreamReader (new FileInputStream(file)));
 			parser.parse(buf);
 			Structure s = consumer.getStructure();
@@ -99,17 +101,18 @@ public class SimpleMMcifParser implements MMcifParser {
 	}
 
 	public static void main(String[] args){
-		String file = "/Users/andreas/WORK/PDB/MMCIF/1gav.mmcif";
-		//String file = "/Users/andreas/WORK/PDB/MMCIF/5pti.cif";
+		String file = "/Users/andreas/WORK/PDB/MMCIF/1A9N.cif";
+		//String file = "/Users/andreas/WORK/PDB/MMCIF/1gav.mmcif";
+		//String file = "/Users/andreas/WORK/PDB/MMCIF/100d.cif";
 		//String file = "/Users/andreas/WORK/PDB/MMCIF/1a4a.mmcif";
 		System.out.println("parsing " + file);
-		
+
 		MMcifParser parser = new SimpleMMcifParser();
 		SimpleMMcifConsumer consumer = new SimpleMMcifConsumer();
 		parser.addMMcifConsumer(consumer);
 
 		try {
-			
+
 			BufferedReader buf = new BufferedReader(new InputStreamReader (new FileInputStream(file)));
 			parser.parse(buf);
 			Structure s = consumer.getStructure();
@@ -117,27 +120,27 @@ public class SimpleMMcifParser implements MMcifParser {
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void parse(BufferedReader buf) 
 	throws IOException {
-		
+
 		triggerDocumentStart();
-		
-		
+
+
 		// init container objects...
 		struct = new Struct();
 		String line = null; 
 
 		boolean inLoop = false;
-		
+
 		List<String> loopFields = new ArrayList<String>();
 		List<String> lineData   = new ArrayList<String>();
-		
+
 		String category = null;
 
-		
+
 		// the first line is a data_PDBCODE line, test if this looks like a mmcif file
 		line = buf.readLine();
 		if (!line.startsWith("data_")){
@@ -148,8 +151,8 @@ public class SimpleMMcifParser implements MMcifParser {
 
 		while ( (line = buf.readLine ()) != null ){
 			//System.out.println(inLoop + " " + line);
-			
-			
+
+
 			if ( inLoop){
 
 				if (line.startsWith(LOOP_END)){
@@ -160,7 +163,7 @@ public class SimpleMMcifParser implements MMcifParser {
 					loopFields.clear();
 					continue;
 
-					
+
 				}
 				if ( line.startsWith(FIELD_LINE)){
 					// found another field.
@@ -187,7 +190,7 @@ public class SimpleMMcifParser implements MMcifParser {
 					lineData = processLine(line, buf, loopFields.size());
 					if ( lineData.size() != loopFields.size()){
 						System.err.println("did not find enough data fields...");
-						
+
 					}
 
 					endLineChecks(category, loopFields,lineData);				
@@ -197,8 +200,8 @@ public class SimpleMMcifParser implements MMcifParser {
 				}
 
 			} else {
-				
-				
+
+
 				if ( line.startsWith(LOOP_START)){
 					loopFields.clear();
 					inLoop = true;
@@ -213,7 +216,7 @@ public class SimpleMMcifParser implements MMcifParser {
 					loopFields.clear();
 					lineData.clear();
 				} else {
-					
+
 					// a boring normal line
 					List<String> data = processLine(line, buf, 2);
 					//System.out.println("got a single line " + data);
@@ -224,7 +227,7 @@ public class SimpleMMcifParser implements MMcifParser {
 					loopFields.add(key.substring(pos+1,key.length()));
 					lineData.add(value);
 
-					
+
 				}
 			}
 
@@ -249,7 +252,9 @@ public class SimpleMMcifParser implements MMcifParser {
 				return data;
 		}
 		boolean inString = false;
-		String word = "";
+		boolean inS1     = false;
+		boolean inS2     = false;
+		String word 	 = "";
 
 
 		for (int i=0; i< line.length(); i++ ){
@@ -267,20 +272,44 @@ public class SimpleMMcifParser implements MMcifParser {
 					word += c;
 				}
 
-			} else if ( (c == s1) || (c == s2)){
+			} else if (c == s1 )  {
 
 				if ( inString){
-					// at end of string
-					if ( ! word.equals(""))
-						data.add(word);
-					word = "";
-					inString = false;
+
+					if ( inS2 ){
+						word += c;
+					} else {
+						// at end of string
+						if ( ! word.equals(""))
+							data.add(word);
+						word     = "";
+						inString = false;
+						inS1     = false;
+					}
 				} else {
 					// the beginning of a new string
 					inString = true;
+					inS1     = true;
 				}
-			}
-			else {
+			} else if ( c == s2 ){
+				if ( inString){
+
+					if ( inS1 ){
+						word += c;
+					} else {
+						// at end of string
+						if ( ! word.equals(""))
+							data.add(word);
+						word     = "";
+						inString = false;
+						inS2     = false;
+					}
+				} else {
+					// the beginning of a new string
+					inString = true;
+					inS2     = true;
+				}
+			} else {
 				word += c;
 			}
 
@@ -342,8 +371,8 @@ public class SimpleMMcifParser implements MMcifParser {
 
 			if ( lineData.size() > fieldLength){
 				System.err.println("wrong data length ("+lineData.size()+
-						") should be ("+fieldLength+") at line " + line + " " + lineData);
-				throw new RuntimeException("could not parse file");
+						") should be ("+fieldLength+") at line " + line + " got lineData: " + lineData);
+
 			}
 
 			if ( lineData.size() == fieldLength)
@@ -364,17 +393,17 @@ public class SimpleMMcifParser implements MMcifParser {
 		//System.out.println("parsed the following data: " +category + " fields: "+
 		//		loopFields + " DATA: " + 
 		//		lineData);
-		
+
 		if ( loopFields.size() != lineData.size()){
 			throw new RuntimeException("data lenght ("+ lineData.size() +
 					") != fields length ("+loopFields.size()+
 					") category: " +category + " fields: "+
-				loopFields + " DATA: " + 
-				lineData );
+					loopFields + " DATA: " + 
+					lineData );
 		}
-		
+
 		if ( category.equals("_entity")){
-			
+
 			Entity e =  (Entity) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.Entity", 
 					loopFields,lineData);
@@ -385,7 +414,7 @@ public class SimpleMMcifParser implements MMcifParser {
 			struct =  (Struct) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.Struct",
 					loopFields, lineData);		
-			
+
 		} else if ( category.equals("_atom_site")){
 
 			AtomSite a = (AtomSite) buildObject(
@@ -393,57 +422,64 @@ public class SimpleMMcifParser implements MMcifParser {
 					loopFields, lineData);
 
 			triggerNewAtomSite(a);
-			
+
 		} else if ( category.equals("_database_PDB_rev")){
 			DatabasePDBrev dbrev = (DatabasePDBrev) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev",
 					loopFields, lineData);
-			
+
 			triggerNewDatabasePDBrev(dbrev);
-		
+
 		} else if (  category.equals("_database_PDB_remark")){
 			DatabasePDBremark remark = (DatabasePDBremark) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark",
 					loopFields, lineData);
-			
+
 			triggerNewDatabasePDBremark(remark);
-			
+
 		} else if ( category.equals("_exptl")){
 			Exptl exptl  = (Exptl) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.Exptl",
 					loopFields,lineData);
-			
+
 			triggerExptl(exptl);						
 
 		} else if ( category.equals("_struct_ref")){
 			StructRef sref  = (StructRef) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.StructRef",
 					loopFields,lineData);
-			
+
 			triggerNewStrucRef(sref);		
-		
+
 		} else if ( category.equals("_struct_ref_seq")){
 			StructRefSeq sref  = (StructRefSeq) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.StructRefSeq",
 					loopFields,lineData);
-			
+
 			triggerNewStrucRefSeq(sref);		
 		} else if ( category.equals("_entity_poly_seq")){
 			EntityPolySeq exptl  = (EntityPolySeq) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.EntityPolySeq",
 					loopFields,lineData);
-			
+
 			triggerNewEntityPolySeq(exptl);						
 
 		} else if ( category.equals("_struct_asym")){
 			StructAsym sasym  = (StructAsym) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.StructAsym",
 					loopFields,lineData);
-			
+
 			triggerNewStructAsym(sasym);					
 
+		} else if ( category.equals("_pdbx_poly_seq_scheme")){
+			PdbxPolySeqScheme ppss  = (PdbxPolySeqScheme) buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.PdbxPolySeqScheme",
+					loopFields,lineData);
+
+			triggerNewPdbxPolySeqScheme(ppss);					
+
 		}
-		
+
 	}
 
 	private void setPair(Object o, List<String> lineData){
@@ -520,7 +556,7 @@ public class SimpleMMcifParser implements MMcifParser {
 			c.newEntity(entity);			
 		}
 	}
-	
+
 	public void triggerNewEntityPolySeq(EntityPolySeq epolseq){
 		for(MMcifConsumer c : consumers){
 			c.newEntityPolySeq(epolseq);			
@@ -543,43 +579,49 @@ public class SimpleMMcifParser implements MMcifParser {
 			c.newAtomSite(atom);		
 		}
 	}
-	
+
 	private void triggerNewDatabasePDBrev(DatabasePDBrev dbrev){
 		for(MMcifConsumer c : consumers){
 			c.newDatabasePDBrev(dbrev);
 		}
 	}
-	
+
 	private void triggerNewDatabasePDBremark(DatabasePDBremark remark){
 		for(MMcifConsumer c : consumers){
 			c.newDatabasePDBremark(remark);
 		}
 	}
-	
+
 	private void triggerExptl(Exptl exptl){
 		for(MMcifConsumer c : consumers){
 			c.newExptl(exptl);
 		}
 	}
-	
+
 	private void triggerNewStrucRef(StructRef sref){
 		for(MMcifConsumer c : consumers){
 			c.newStructRef(sref);
 		}
 	}
-	
+
 	private void triggerNewStrucRefSeq(StructRefSeq sref){
 		for(MMcifConsumer c : consumers){
 			c.newStructRefSeq(sref);
 		}
 	}
-	
+
+	private void triggerNewPdbxPolySeqScheme(PdbxPolySeqScheme ppss){
+		for(MMcifConsumer c : consumers){
+			c.newPdbxPolySeqScheme(ppss);
+		}
+	}
+
 	public void triggerDocumentStart(){
 		for(MMcifConsumer c : consumers){
 			c.documentStart();	
 		}
 	}
-	
+
 	public void triggerDocumentEnd(){
 		for(MMcifConsumer c : consumers){
 			c.documentEnd();	

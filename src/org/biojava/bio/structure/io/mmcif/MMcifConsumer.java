@@ -21,13 +21,13 @@
  */
 package org.biojava.bio.structure.io.mmcif;
 
-import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
 import org.biojava.bio.structure.io.mmcif.model.EntityPolySeq;
 import org.biojava.bio.structure.io.mmcif.model.Exptl;
+import org.biojava.bio.structure.io.mmcif.model.PdbxPolySeqScheme;
 import org.biojava.bio.structure.io.mmcif.model.StructAsym;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
@@ -37,6 +37,7 @@ import org.biojava.bio.structure.io.mmcif.model.StructRef;
  * The Consumer listens to the events and builds up the protein structure.
  *  
  * @author Andreas Prlic
+ *  @since 1.7
  *
  */
 public interface MMcifConsumer {
@@ -58,6 +59,7 @@ public interface MMcifConsumer {
 	public void newExptl(Exptl exptl);
 	public void newStructRef(StructRef sref);
 	public void newStructRefSeq(StructRefSeq sref);
+	public void newPdbxPolySeqScheme(PdbxPolySeqScheme ppss);
 	/** called at end of document
 	 * 
 	 */

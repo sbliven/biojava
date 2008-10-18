@@ -27,7 +27,7 @@ import java.io.IOException;
 /** Interface that needs to be implemented by an MMcifParser
  * 
  * @author Andreas Prlic
- * @since 1.6 
+ * @since 1.7 
  */
 public interface MMcifParser {
 	
