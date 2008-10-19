@@ -289,6 +289,12 @@ public class PDBFileReader implements StructureIOFile {
 		extensions.add(s);
 	}
 
+	/** clear the supported file extensions
+	 * 
+	 */
+	public void clearExtensions(){
+		extensions.clear();
+	}
 
 
 
