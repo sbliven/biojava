@@ -41,6 +41,7 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.StructureTools;
 import org.biojava.bio.structure.io.PDBFileReader;
+import org.biojava.bio.structure.io.StructureIOFile;
 
 public class PrepareIndexFile {
 
@@ -48,7 +49,7 @@ public class PrepareIndexFile {
 
 	public static void main (String[] args){
 		try {
-			File pdbLocation = new File("/Users/ap3/WORK/PDB/20051205");
+			File pdbLocation = new File("/Users/andreas/WORK/PDB/mmcif_files/");
 			FlatFileInstallation installation = new FlatFileInstallation(pdbLocation);
 			
 			//File indexFile = new File("/Users/andreas/WORK/PDB/pdbindex.idx");
@@ -75,9 +76,10 @@ public class PrepareIndexFile {
 	throws FileNotFoundException,IOException{
 
 		File[] pdbfiles = getAllPDB(installation.getFilePath());
-
+		
 		createPDBInfoList(pdbfiles, installation.getPDBInfoFile(), installation.getChainInfoFile());
 
+	
 	}
 
 
@@ -111,14 +113,19 @@ public class PrepareIndexFile {
 		
 		
 		PDBFileReader pdbreader = new PDBFileReader();
-
+		
+		logPDBInfoFile(pdbWriter, chainWriter, pdbreader, pdbfiles);
+	}
+	
+	protected void logPDBInfoFile(PrintWriter pdbWriter, PrintWriter chainWriter, StructureIOFile pdbreader, File[] pdbfiles ) 
+	throws IOException{
+		
 		pdbWriter.println("//pdbId\tnrCAAtoms\ttechnique\tresolution\tdepDate\tmodDate\ttitle\tclassification\ttime");
 		chainWriter.println("//pdbId\tchainId\tseqResLength\tatomLength\taminoLength\thetLength\tnucleotideLength\tmolName\tmolId\tdbrefs");
 		int l = pdbfiles.length;
         
         
-        long loopStart = System.currentTimeMillis();
-        boolean defaultCA = pdbreader.isParseCAOnly();
+        long loopStart = System.currentTimeMillis();     
         
 		for ( int i = 0 ; i < l ; i++){
 			//if (i != 36)
@@ -135,11 +142,14 @@ public class PrepareIndexFile {
             
             String pdb = f.getName().substring(3,7);
                         
-            pdbreader.setParseCAOnly(defaultCA);
+           
 			long startTime = System.currentTimeMillis();
             System.out.println("# " + i + " / " + l + " " + f ); 
             //System.out.println("getting " + f);
-			Structure s = pdbreader.getStructure(f);
+            Structure s = null;
+            
+            s = pdbreader.getStructure(f);
+          
 			long stopTime = System.currentTimeMillis();
 
 			logPDBInfo(pdbWriter, s, startTime, stopTime);
@@ -297,6 +307,8 @@ public class PrepareIndexFile {
 
 		return (File[]) pdbFiles.toArray(new File[pdbFiles.size()]);
 	}
+	
+	
 
 
 }

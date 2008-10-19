@@ -44,7 +44,6 @@ import org.biojava.bio.structure.PDBHeader;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.StructureTools;
-import org.biojava.bio.structure.io.PDBFileParser;
 import org.biojava.bio.structure.io.PDBParseException;
 import org.biojava.bio.structure.io.SeqRes2AtomAligner;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
@@ -713,7 +712,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 				ex.printStackTrace();
 			}
 		} catch (IllegalSymbolException ex){
-			ex.printStackTrace();
+			System.err.println(ex.getMessage());
 		}
 
 

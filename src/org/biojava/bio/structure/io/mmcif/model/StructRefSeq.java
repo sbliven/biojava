@@ -38,6 +38,13 @@ public class StructRefSeq extends AbstractBean{
 	String pdbx_auth_seq_align_beg;        
 	String pdbx_auth_seq_align_end;
 	
+	public StructRefSeq(){
+		super();
+		pdbx_db_align_beg_ins_code = "?";
+		pdbx_db_align_end_ins_code = "?";
+		
+	}
+	
 	public String getAlign_id() {
 		return align_id;
 	}

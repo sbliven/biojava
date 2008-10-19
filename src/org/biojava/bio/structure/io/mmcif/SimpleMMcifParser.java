@@ -256,11 +256,14 @@ public class SimpleMMcifParser implements MMcifParser {
 		boolean inS2     = false;
 		String word 	 = "";
 
-
+		//System.out.println(line);
 		for (int i=0; i< line.length(); i++ ){
-
+			//System.out.println(word);
 			Character c = line.charAt(i);
 
+			Character nextC = null;
+			if (i < line.length() - 1)
+				nextC = line.charAt(i+1);
 			if  (c == ' ') {
 
 				if ( ! inString){
@@ -276,16 +279,30 @@ public class SimpleMMcifParser implements MMcifParser {
 
 				if ( inString){
 
-					if ( inS2 ){
-						word += c;
-					} else {
-						// at end of string
+					boolean wordEnd = false;
+					if (! inS2) {
+						if (nextC != null){
+							//System.out.println("nextC: >"+nextC+"<");
+							if ( Character.isWhitespace(nextC)){
+								i++;
+								wordEnd = true;
+							}
+						}
+					}
+					
+					
+					if ( wordEnd ) {
+					
+					// at end of string
 						if ( ! word.equals(""))
 							data.add(word);
 						word     = "";
 						inString = false;
 						inS1     = false;
+					} else {
+						word += c;
 					}
+					
 				} else {
 					// the beginning of a new string
 					inString = true;
@@ -294,15 +311,27 @@ public class SimpleMMcifParser implements MMcifParser {
 			} else if ( c == s2 ){
 				if ( inString){
 
-					if ( inS1 ){
-						word += c;
-					} else {
-						// at end of string
+					boolean wordEnd = false;
+					if (! inS1) {
+						if (nextC != null){
+							//System.out.println("nextC: >"+nextC+"<");
+							if ( Character.isWhitespace(nextC)){
+								i++;
+								wordEnd = true;
+							}
+						}
+					}
+										
+					if ( wordEnd ) {
+					
+					// at end of string
 						if ( ! word.equals(""))
 							data.add(word);
 						word     = "";
 						inString = false;
 						inS2     = false;
+					} else {
+						word += c;
 					}
 				} else {
 					// the beginning of a new string
@@ -370,9 +399,10 @@ public class SimpleMMcifParser implements MMcifParser {
 			//System.out.println("in process line : " + lineData.size() + " " + fieldLength);
 
 			if ( lineData.size() > fieldLength){
+			
 				System.err.println("wrong data length ("+lineData.size()+
 						") should be ("+fieldLength+") at line " + line + " got lineData: " + lineData);
-
+				return lineData;
 			}
 
 			if ( lineData.size() == fieldLength)
@@ -388,14 +418,15 @@ public class SimpleMMcifParser implements MMcifParser {
 	}
 
 
-	private void endLineChecks(String category,List<String> loopFields, List<String> lineData ){
+	private void endLineChecks(String category,List<String> loopFields, List<String> lineData ) throws IOException{
 
 		//System.out.println("parsed the following data: " +category + " fields: "+
 		//		loopFields + " DATA: " + 
 		//		lineData);
 
 		if ( loopFields.size() != lineData.size()){
-			throw new RuntimeException("data lenght ("+ lineData.size() +
+			System.err.println("looks like we got a problem with nested string quote characters:");
+			throw new IOException("data lenght ("+ lineData.size() +
 					") != fields length ("+loopFields.size()+
 					") category: " +category + " fields: "+
 					loopFields + " DATA: " + 
