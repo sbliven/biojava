@@ -60,7 +60,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author Mathieu Wiepert    (Mayo Foundation)
  * @author Keith James        (Sanger Institute)
  * @author Mark Schreiber     (NITD)
- * @author Travis Banks
+ * @author Travis Banks		  (AAFC)
  * @version 0.2
  *
  * @see BlastLikeSAXParser
@@ -631,7 +631,11 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 				(iProgram == BlastLikeVersionSupport.NCBI_BLASTP) ||
 				(iProgram == BlastLikeVersionSupport.NCBI_TBLASTN) ||
 				(iProgram == BlastLikeVersionSupport.NCBI_TBLASTX)) {
-			oHits.parse(oContents,poLine,"Database");
+			ArrayList<String> hitEndSymbols=new ArrayList<String>();
+			hitEndSymbols.add("Database");
+			hitEndSymbols.add("TBLAST");
+			hitEndSymbols.add("BLAST");
+			oHits.parse(oContents,poLine,hitEndSymbols);
 		}
 
 		if ((iProgram == BlastLikeVersionSupport.WU_BLASTN) ||
@@ -639,12 +643,16 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 				(iProgram == BlastLikeVersionSupport.WU_BLASTP) ||
 				(iProgram == BlastLikeVersionSupport.WU_TBLASTN) ||
 				(iProgram == BlastLikeVersionSupport.WU_TBLASTX)) {
-			oHits.parse(oContents,poLine,"Parameters:");
+			ArrayList<String> hitEndSymbols=new ArrayList<String>();
+			hitEndSymbols.add("Parameters:");
+			oHits.parse(oContents,poLine,hitEndSymbols);
 		}
 
 		//Same as NCBI, left here for organization I suppose
 		if (iProgram == BlastLikeVersionSupport.GCG_BLASTN) {
-			oHits.parse(oContents,poLine,"Database:");
+			ArrayList<String> hitEndSymbols=new ArrayList<String>();
+			hitEndSymbols.add("Database:");
+			oHits.parse(oContents,poLine,hitEndSymbols);
 		}
 
 		this.changeState(FINISHED_HITS);

@@ -62,17 +62,68 @@ public class BlastTest extends TestCase {
 
 	public void testTBLASTN2_2_18() throws Exception
 	{
-		String filename = "files/org/biojava/bio/program/sax/tblastn-2.2.18.txt.gz"
-			;
+		String filename = "files/org/biojava/bio/program/sax/tblastn-2.2.18.txt.gz";
 		parseBlastFile(filename, 2, 10, 2);
 	}
 
 	public void testSingleBLASTHit2_2_15() throws Exception
 	{
 		String filename = "files/org/biojava/bio/program/sax/single-blastp-2.2.15.txt.gz";
-			parseBlastFile(filename, 2, 2, 1);
+		parseBlastFile(filename, 2, 2, 1);
 	}
-
+	
+	public void testBug2584() throws Exception {
+		String filename="files/org/biojava/bio/program/sax/bug-2584-test_file.txt.gz";
+		InputStream resStream = new GZIPInputStream( getClass().getClassLoader().getResourceAsStream(filename));
+		assert resStream != null: "Resource " + filename + " could not be located";
+		InputSource is = new InputSource(resStream);
+		BlastLikeSAXParser parser = new BlastLikeSAXParser();
+		parser.setModeStrict();
+		SeqSimilarityAdapter adapter = new SeqSimilarityAdapter();
+		parser.setContentHandler(adapter);
+		List<SeqSimilaritySearchResult> results = new ArrayList<SeqSimilaritySearchResult>();
+		SearchContentHandler builder = new BlastLikeSearchBuilder(results,new DummySequenceDB("queries"), new DummySequenceDBInstallation());
+		adapter.setSearchContentHandler(builder);
+		parser.parse(is);
+		
+		assertEquals(10, results.size());
+		for(int i=0;i<results.size();i++) {
+			SeqSimilaritySearchResult sssr=results.get(i);
+			String queryId=(String)sssr.getAnnotation().getProperty("queryId");
+			switch(i) {
+			case(0):
+				assertEquals("BmRpP0",queryId);
+				break;
+			case(1):
+				assertEquals("BmRpP1",queryId);
+				break;
+			case(2):
+				assertEquals("BmRpP2",queryId);
+				break;
+			case(3):
+				assertEquals("BmRpL3",queryId);
+				break;
+			case(4):
+				assertEquals("BmRpL4",queryId);
+				break;
+			case(5):
+				assertEquals("BmRpL5",queryId);
+				break;
+			case(6):
+				assertEquals("BmRpL6",queryId);
+				break;
+			case(7):
+				assertEquals("BmRpL7",queryId);
+				break;
+			case(8):
+				assertEquals("BmRpL7A",queryId);
+				break;
+			case(9):
+				assertEquals("BmRpL8",queryId);
+				break;
+			};
+		}
+	}
 	private void parseBlastFile(String filename, int numberOfReports, int numberOfHits, int numberOfHsps) throws IOException, SAXException {
 		String resName = filename;
 		InputStream resStream = new GZIPInputStream( getClass().getClassLoader().getResourceAsStream(

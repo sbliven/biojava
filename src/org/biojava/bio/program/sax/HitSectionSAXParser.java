@@ -41,7 +41,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *                 Colin Hardman      (CAT)
  *                 Stuart Johnston    (CAT)
  *                 Mathieu Wiepert    (Mayo Foundation)
- *                 Travis Banks
+ *                 Travis Banks		  (AAFC)
  *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
  * 
@@ -65,7 +65,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 	private QName                oAttQName          = new QName(this);
 	private char[]               aoChars;
 	private char[]               aoLineSeparator;
-	private String		     oGlobalEndSignal;
+	private ArrayList<String>    oGlobalEndSignals;
 	private ArrayList            oBuffer            = new ArrayList();
 	private ArrayList<String>    oAlignmentBuffer   = new ArrayList<String>();
 	private StringBuffer         oStringBuffer      = new StringBuffer();
@@ -96,12 +96,10 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 		aoLineSeparator = System.getProperty("line.separator").toCharArray();
 	}
 
-	public void parse(BufferedReader poContents, String poLine, String poEndSignal) throws SAXException {
+	public void parse(BufferedReader poContents, String poLine, ArrayList<String> poEndSignals) throws SAXException {
 		oLine = null;
 		oContents = poContents;
-		ArrayList<String> temp=new ArrayList<String>();
-		temp.add(poEndSignal);
-		setOGlobalEndSignal(poEndSignal);
+		setGlobalEndSignal(poEndSignals);
 		//return immediately if this is not the start
 		//of a hit...
 		if (!poLine.startsWith(">")) return;
@@ -517,8 +515,8 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 		oAlignmentParser.parse(oAlignmentBuffer);
 	}
 
-	private void setOGlobalEndSignal(String oGlobalEndSignal) {
-		this.oGlobalEndSignal = oGlobalEndSignal;
+	private void setGlobalEndSignal(ArrayList<String> oGlobalEndSignal) {
+		this.oGlobalEndSignals = oGlobalEndSignal;
 	}
 
 
@@ -526,6 +524,11 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 		if(s==null) {
 			return true;
 		}
-		return s.trim().startsWith(this.oGlobalEndSignal);
+		for(String signal: this.oGlobalEndSignals) {
+			if(s.trim().startsWith(signal)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
