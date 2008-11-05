@@ -69,6 +69,16 @@ public final class DNATools {
   static private final AtomicSymbol c;
   static private final AtomicSymbol t;
   static private final Symbol n;
+  static private final Symbol m;
+  static private final Symbol r;
+  static private final Symbol w;
+  static private final Symbol s;
+  static private final Symbol y;
+  static private final Symbol k;
+  static private final Symbol v;
+  static private final Symbol h;
+  static private final Symbol d;
+  static private final Symbol b;
   static private final SimpleReversibleTranslationTable transcriptionTable;
 
 
@@ -78,12 +88,22 @@ public final class DNATools {
     try {
       dna = (FiniteAlphabet) AlphabetManager.alphabetForName("DNA");
       dnaTokens = dna.getTokenization("token");
-      SymbolList syms = new SimpleSymbolList(dnaTokens, "agctn");
+      SymbolList syms = new SimpleSymbolList(dnaTokens, "agctnmrwsykvhdb");
       a = (AtomicSymbol) syms.symbolAt(1);
       g = (AtomicSymbol) syms.symbolAt(2);
       c = (AtomicSymbol) syms.symbolAt(3);
       t = (AtomicSymbol) syms.symbolAt(4);
       n = syms.symbolAt(5);
+      m = syms.symbolAt(6);
+      r = syms.symbolAt(7);
+      w = syms.symbolAt(8);
+      s = syms.symbolAt(9);
+      y = syms.symbolAt(10);
+      k = syms.symbolAt(11);
+      v = syms.symbolAt(12);
+      h = syms.symbolAt(13);
+      d = syms.symbolAt(14);
+      b = syms.symbolAt(15);
 
       symbolToComplement = new HashMap();
 
@@ -123,6 +143,16 @@ public final class DNATools {
   public static AtomicSymbol c() { return c; }
   public static AtomicSymbol t() { return t; }
   public static Symbol n() { return n; }
+  public static Symbol m() { return m; }
+  public static Symbol r() { return r; }
+  public static Symbol w() { return w; }
+  public static Symbol s() { return s; }
+  public static Symbol y() { return y; }
+  public static Symbol k() { return k; }
+  public static Symbol v() { return v; }
+  public static Symbol h() { return h; }
+  public static Symbol d() { return d; }
+  public static Symbol b() { return b; }
 
   
   private DNATools() {

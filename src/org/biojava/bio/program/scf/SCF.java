@@ -266,6 +266,26 @@ public class SCF extends AbstractChromatogram {
                     return DNATools.t();
                 case 'n': case 'N':
                     return DNATools.n();
+                case 'm': case 'M':
+                    return DNATools.m();
+                case 'r': case 'R':
+                    return DNATools.r();
+                case 'w': case 'W':
+                    return DNATools.w();
+                case 's': case 'S':
+                    return DNATools.s();
+                case 'y': case 'Y':
+                    return DNATools.y();
+                case 'k': case 'K':
+                    return DNATools.k();
+                case 'v': case 'V':
+                    return DNATools.v();
+                case 'h': case 'H':
+                    return DNATools.h();
+                case 'd': case 'D':
+                    return DNATools.d();
+                case 'b': case 'B':
+                    return DNATools.b();
                 case '-':
                     return DNATools.getDNA().getGapSymbol();
                 default:
