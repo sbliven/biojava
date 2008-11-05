@@ -569,7 +569,8 @@ public class GenbankFormat extends RichSequenceFormat.HeaderlessFormat {
             while (!done) {
                 br.mark(320);
                 line = br.readLine();
-                if (line==null || line.length()==0 || (!line.startsWith(" ") && linecount++>0)) {
+                String firstSecKey = section.size() == 0 ? "" : ((String[])section.get(0))[0];
+                if (line==null || line.length()==0 || (!line.startsWith(" ") && linecount++>0 && ( !firstSecKey.equals(START_SEQUENCE_TAG)  || line.startsWith(END_SEQUENCE_TAG)))) {
                     // dump out last part of section
                     section.add(new String[]{currKey,currVal.toString()});
                     br.reset();
