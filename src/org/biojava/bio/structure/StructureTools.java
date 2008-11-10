@@ -52,7 +52,9 @@ public class StructureTools {
      * 
      */
     public static final String[] backboneAtomNames = {"N","CA","C","O","CB"};
-       
+    
+    public static final Character UNKNOWN_GROUP_LABEL = new Character('x');;
+    
 	// there is a file format change in PDB 3.0 and nucleotides are being renamed
 	static private Map<String, Integer> nucleotides30 ;
 	static private Map<String, Integer> nucleotides23 ;
@@ -256,8 +258,8 @@ public class StructureTools {
 			} else {
 				// does not seem to be so let's assume it is 
 				//  nonstandard aminoacid and label it "X"
-				System.out.println("unknown amino acid "+groupCode3 );
-				aminoCode1 = new Character('x');
+				System.out.println("unknown group name "+groupCode3 );
+				aminoCode1 = UNKNOWN_GROUP_LABEL; 
 			}
 		}
 

@@ -364,15 +364,18 @@ public class PDBFileParser  {
 
 		Group group;
 		if ( recordName.equals("ATOM") ) {
-			if (aminoCode1!=null) {
-
-				AminoAcidImpl aa = new AminoAcidImpl() ;
-				aa.setAminoType(aminoCode1);
-				group = aa ;
-			} else {
+			if (aminoCode1 == null)  {
 				// it is a nucleotidee
 				NucleotideImpl nu = new NucleotideImpl();
 				group = nu;
+			
+			} else if (aminoCode1 == StructureTools.UNKNOWN_GROUP_LABEL){
+				group = new HetatomImpl();
+			
+			} else {
+				AminoAcidImpl aa = new AminoAcidImpl() ;
+				aa.setAminoType(aminoCode1);
+				group = aa ;	
 			}
 		}
 		else {
@@ -801,8 +804,13 @@ public class PDBFileParser  {
 			//System.out.println(line);
 			// b
 			//} 
-			current_group = getNewGroup("ATOM", aminoCode1);				
-			current_group.setPDBName(threeLetter);
+			current_group = getNewGroup("ATOM", aminoCode1);
+			
+			try {
+				current_group.setPDBName(threeLetter);
+			} catch (PDBParseException p){				
+				System.err.println(p.getMessage() );
+			}
 			if ( current_group instanceof AminoAcid){
 				AminoAcid aa = (AminoAcid)current_group;
 				aa.setRecordType(AminoAcid.SEQRESRECORD);
