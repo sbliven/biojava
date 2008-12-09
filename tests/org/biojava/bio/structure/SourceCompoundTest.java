@@ -169,4 +169,23 @@ public class SourceCompoundTest extends TestCase{
 			}
 		}
 	}
+
+   /**
+     * There is a file format change in v3.2 of the PDB file format, adding the
+     * tax id.
+	 * This test makes sure that the tax id for the organism and expression
+     * systems is set correctly.
+	 */
+	public void testSourceTaxIdVersion32File(){
+		Structure structure = getStructure("/files/3dl7_v32.pdb");
+
+        Compound comp = structure.getCompoundById("1");
+
+        comp.showSource();
+
+        assertEquals("10090", comp.getOrganismTaxId());
+
+        assertEquals("9606", comp.getExpressionSystemTaxId());
+
+	}
 }

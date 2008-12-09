@@ -30,12 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An object to contain the info from the PDB header for a Molecule
+ * An object to contain the info from the PDB header for a Molecule.
+ *
+ * Now PDB file format 3.2 aware - contains the new TAX_ID fields for the
+ * organism studied and the expression system.
  *
  * @author Jules Jacobsen
  * @since 1.5
- *
- * Where all the info from the PDB header file resides once parsed.
  */
 /**
  * Created by IntelliJ IDEA.
@@ -45,55 +46,57 @@ import java.util.List;
  */
 public class Compound implements Cloneable {
 
-	List<Chain> chainList = new ArrayList<Chain>();
-	List<String> chainId = null;
-	String refChainId = null;
-	String molId = "0";
+	private List<Chain> chainList = new ArrayList<Chain>();
+	private List<String> chainId = null;
+	private String refChainId = null;
+	private String molId = "0";
 	//String molId = null;
-	String molName = null;
-	String title = null;
-	List<String> synonyms = null;
-	List<String> ecNums = null;
-	String engineered = null;
-	String mutation = null;
-	String biologicalUnit = null;
-	String details = null;
+	private String molName = null;
+	private String title = null;
+	private List<String> synonyms = null;
+	private List<String> ecNums = null;
+	private String engineered = null;
+	private String mutation = null;
+	private String biologicalUnit = null;
+	private String details = null;
 
-	String numRes = null;
-	String resNames = null;
+	private String numRes = null;
+	private String resNames = null;
 
-	String headerVars = null;
+	private String headerVars = null;
 
-	String synthetic = null;
-	String fragment = null;
-	String organismScientific = null;
-	String organismCommon = null;
-	String strain = null;
-	String variant = null;
-	String cellLine = null;
-	String atcc = null;
-	String organ = null;
-	String tissue = null;
-	String cell = null;
-	String organelle = null;
-	String secretion = null;
-	String gene = null;
-	String cellularLocation = null;
-	String expressionSystem = null;
-	String expressionSystemStrain = null;
-	String expressionSystemVariant = null;
-	String expressionSystemCellLine = null;
-	String expressionSystemAtccNumber = null;
-	String expressionSystemOrgan = null;
-	String expressionSystemTissue = null;
-	String expressionSystemCell = null;
-	String expressionSystemOrganelle = null;
-	String expressionSystemCellularLocation = null;
-	String expressionSystemVectorType = null;
-	String expressionSystemVector = null;
-	String expressionSystemPlasmid = null;
-	String expressionSystemGene = null;
-	String expressionSystemOtherDetails = null;
+	private String synthetic = null;
+	private String fragment = null;
+	private String organismScientific = null;
+    private String organismTaxId = null;
+	private String organismCommon = null;
+	private String strain = null;
+	private String variant = null;
+	private String cellLine = null;
+	private String atcc = null;
+	private String organ = null;
+	private String tissue = null;
+	private String cell = null;
+	private String organelle = null;
+	private String secretion = null;
+	private String gene = null;
+	private String cellularLocation = null;
+	private String expressionSystem = null;
+    private String expressionSystemTaxId = null;
+	private String expressionSystemStrain = null;
+	private String expressionSystemVariant = null;
+	private String expressionSystemCellLine = null;
+	private String expressionSystemAtccNumber = null;
+	private String expressionSystemOrgan = null;
+	private String expressionSystemTissue = null;
+	private String expressionSystemCell = null;
+	private String expressionSystemOrganelle = null;
+	private String expressionSystemCellularLocation = null;
+	private String expressionSystemVectorType = null;
+	private String expressionSystemVector = null;
+	private String expressionSystemPlasmid = null;
+	private String expressionSystemGene = null;
+	private String expressionSystemOtherDetails = null;
 
 	private Long id;
 
@@ -244,6 +247,9 @@ public class Compound implements Cloneable {
 		if (this.organismScientific != null) {
 			System.out.println("Organism Scientific: " + this.organismScientific);
 		}
+        if (this.organismTaxId != null) {
+			System.out.println("Organism Tax Id: " + this.organismTaxId);
+		}
 		if (this.organismCommon != null) {
 			System.out.println("Organism Common: " + this.organismCommon);
 		}
@@ -282,6 +288,9 @@ public class Compound implements Cloneable {
 		}
 		if (this.expressionSystem != null) {
 			System.out.println("Expression System: " + this.expressionSystem);
+		}
+        if (this.expressionSystemTaxId != null) {
+			System.out.println("Expression System Tax Id: " + this.expressionSystemTaxId);
 		}
 		if (this.expressionSystemStrain != null) {
 			System.out.println("Expression System Strain: " + this.expressionSystemStrain);
@@ -493,6 +502,14 @@ public class Compound implements Cloneable {
 		this.organismScientific = organismScientific;
 	}
 
+    public String getOrganismTaxId() {
+        return organismTaxId;
+    }
+
+    public void setOrganismTaxId(String organismTaxId) {
+        this.organismTaxId = organismTaxId;
+    }
+
 	public String getOrganismCommon() {
 		return organismCommon;
 	}
@@ -592,6 +609,14 @@ public class Compound implements Cloneable {
 	public String getExpressionSystem() {
 		return expressionSystem;
 	}
+
+    public String getExpressionSystemTaxId() {
+        return expressionSystemTaxId;
+    }
+
+    public void setExpressionSystemTaxId(String expressionSystemTaxId) {
+        this.expressionSystemTaxId = expressionSystemTaxId;
+    }
 
 	public void setExpressionSystem(String expressionSystem) {
 		this.expressionSystem = expressionSystem;

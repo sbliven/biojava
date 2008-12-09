@@ -175,10 +175,12 @@ public class PDBFileParser  {
 
 	private static final List<String> sourceFieldValues = new ArrayList<String>(
 			Arrays.asList("ENGINEERED:", "MOL_ID:", "SYNTHETIC:", "FRAGMENT:",
-					"ORGANISM_SCIENTIFIC:", "ORGANISM_COMMON:", "STRAIN:",
+					"ORGANISM_SCIENTIFIC:", "ORGANISM_COMMON:", 
+                    "ORGANISM_TAXID:","STRAIN:",
 					"VARIANT:", "CELL_LINE:", "ATCC:", "ORGAN:", "TISSUE:",
 					"CELL:", "ORGANELLE:", "SECRETION:", "GENE:",
 					"CELLULAR_LOCATION:", "EXPRESSION_SYSTEM:",
+                    "EXPRESSION_SYSTEM_TAXID:",
 					"EXPRESSION_SYSTEM_STRAIN:", "EXPRESSION_SYSTEM_VARIANT:",
 					"EXPRESSION_SYSTEM_CELL_LINE:",
 					"EXPRESSION_SYSTEM_ATCC_NUMBER:",
@@ -1221,6 +1223,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 			current_compound.setFragment(value);
 		} else if (field.equals("ORGANISM_SCIENTIFIC:")) {
 			current_compound.setOrganismScientific(value);
+		} else if (field.equals("ORGANISM_TAXID:")) {
+			current_compound.setOrganismTaxId(value);
 		} else if (field.equals("ORGANISM_COMMON:")) {
 			current_compound.setOrganismCommon(value);
 		} else if (field.equals("STRAIN:")) {
@@ -1247,6 +1251,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 			current_compound.setCellularLocation(value);
 		} else if (field.equals("EXPRESSION_SYSTEM:")) {
 			current_compound.setExpressionSystem(value);
+		} else if (field.equals("EXPRESSION_SYSTEM_TAXID:")) {
+			current_compound.setExpressionSystemTaxId(value);
 		} else if (field.equals("EXPRESSION_SYSTEM_STRAIN:")) {
 			current_compound.setExpressionSystemStrain(value);
 		} else if (field.equals("EXPRESSION_SYSTEM_VARIANT:")) {
