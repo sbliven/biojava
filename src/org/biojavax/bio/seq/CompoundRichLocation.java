@@ -164,7 +164,7 @@ public class CompoundRichLocation extends SimpleRichLocation implements RichLoca
      * {@inheritDoc}
      * ALWAYS RETURNS THE EMPTY ANNOTATION
      */
-    public Annotation getAnnotation() {
+    public RichAnnotation getAnnotation() {
         return RichAnnotation.EMPTY_ANNOTATION;
     }
 

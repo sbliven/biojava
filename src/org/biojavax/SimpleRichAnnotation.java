@@ -133,6 +133,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     /**
      * {@inheritDoc}
+     * @deprecated 
      */
     public boolean containsProperty(Object key) { 
         if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
@@ -161,6 +162,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
      * Strictly it will return the first <code>Note</code> which matches the 
      * <code>key</code> (or a <code>Term</code> made with a <code>String</code> key)..
      * @see #getProperties(Object key)
+     * @deprecated 
      */
     public Object getProperty(Object key) throws NoSuchElementException { 
         if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
@@ -176,6 +178,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
      * {@inheritDoc}
      * Strictly it will return all <code>Note</code>s which match the 
      * <code>key</code> (or a <code>Term</code> made with a <code>String</code> key)..
+     * @deprecated 
      */
     public Note[] getProperties(Object key){
         if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
@@ -232,6 +235,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
      * {@inheritDoc}
      * Strictly it will remove the first <code>Note</code> which matches the 
      * <code>key</code> (or a <code>Term</code> made with a <code>String</code> key)..
+     * @deprecated 
      */
     public void removeProperty(Object key) throws NoSuchElementException, ChangeVetoException { 
         if (key instanceof Term) key = RichObjectFactory.getDefaultOntology().getOrImportTerm((Term)key);
@@ -248,6 +252,7 @@ public class SimpleRichAnnotation extends AbstractChangeable implements RichAnno
     
     /**
      * {@inheritDoc}
+     * @deprecated 
      */
     public void setProperty(Object key, Object value) throws IllegalArgumentException, ChangeVetoException {
         if(key == null) throw new IllegalArgumentException("Property keys cannot be null");

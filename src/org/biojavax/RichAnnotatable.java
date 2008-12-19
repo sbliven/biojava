@@ -34,6 +34,13 @@ import org.biojava.utils.ChangeVetoException;
  * @since 1.5
  */
 public interface RichAnnotatable extends Annotatable {
+
+    /**
+      * Should return the associated annotation object.
+      *
+      * @return an Annotation object, never null
+      */
+    public RichAnnotation getAnnotation();
     
     /**
      * Returns the set of notes associated with this object. Would normally

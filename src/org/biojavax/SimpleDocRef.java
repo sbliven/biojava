@@ -282,11 +282,17 @@ public class SimpleDocRef extends AbstractChangeable implements DocRef {
     // Hibernate requirement - not for public use.
     private Integer id;
     
-    // Hibernate requirement - not for public use.
-    Integer getId() { return this.id; }
+    /**
+     * Gets the Hibernate ID. Should be used with caution.
+     * @return the Hibernate ID, if using Hibernate.
+     */
+    public Integer getId() { return this.id; }
     
-    // Hibernate requirement - not for public use.
-    void setId(Integer id) { this.id = id; }
+    /**
+     * Sets the Hibernate ID. Should be used with caution.
+     * @param id the Hibernate ID, if using Hibernate.
+     */
+    public void setId(Integer id) { this.id = id;}
     
 }
 

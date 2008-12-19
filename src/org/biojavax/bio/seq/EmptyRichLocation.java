@@ -74,7 +74,7 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      * {@inheritDoc}
      * ALWAYS RETURNS THE EMPTY ANNOTATION
      */
-    public Annotation getAnnotation() { return RichAnnotation.EMPTY_ANNOTATION; }
+    public RichAnnotation getAnnotation() { return RichAnnotation.EMPTY_ANNOTATION; }
     
     /**
      * {@inheritDoc} 
