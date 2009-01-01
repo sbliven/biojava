@@ -59,7 +59,7 @@ import org.biojava.bio.structure.io.mmcif.model.StructRef;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 import org.biojava.bio.symbol.IllegalSymbolException;
 
-/** A MMcifConsumer implementation that build a in-memory representation of the 
+/** A MMcifConsumer implementation that build a in-memory representation of the
  * content of a mmcif file as a BioJava Structure object.
  *  @author Andreas Prlic
  *  @since 1.7
@@ -79,7 +79,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	List<Chain>     current_model;
 	List<Entity>    entities;
 	List<StructRef> strucRefs;
-	List<Chain>   seqResChains; 
+	List<Chain>   seqResChains;
 	List<Chain>   entityChains; // needed to link entities, chains and compounds...
 	List<StructAsym> structAsyms; // needed to link entities, chains and compounds...
 
@@ -104,7 +104,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 	public void newEntity(Entity entity) {
 		if (DEBUG)
-			System.out.println(entity);		
+			System.out.println(entity);
 		entities.add(entity);
 	}
 
@@ -114,7 +114,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	}
 
 	private Entity getEntity(String entity_id){
-		for (Entity e: entities){			
+		for (Entity e: entities){
 			if  (e.getId().equals(entity_id)){
 				return e;
 			}
@@ -160,7 +160,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		return  group ;
 	}
 	/** test if the chain is already known (is in current_model
-	 * ArrayList) and if yes, returns the chain 
+	 * ArrayList) and if yes, returns the chain
 	 * if no -> returns null
 	 */
 	private Chain isKnownChain(String chainID, List<Chain> chains){
@@ -179,7 +179,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 
 	/** during mmcif parsing the full atom name string gets truncated, fix this...
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
@@ -190,7 +190,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		}
 		if (name.equals("CA")){
 			return " CA ";
-		} 
+		}
 		if (name.equals("C")){
 			return " C  ";
 		}
@@ -199,7 +199,19 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		}
 		if (name.equals("CB")){
 			return " CB ";
-		} 
+		}
+		if (name.equals("CG"))
+			return " CG ";
+
+		if (name.length() == 2)
+			return " " + name + " ";
+
+		if (name.length() == 1)
+			return " " + name + "  ";
+
+		if (name.length() == 3)
+			return " " + name ;
+
 		return name;
 	}
 
@@ -207,8 +219,8 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		atomCount++;
 		//TODO: add support for MAX_ATOMS
-
 		String fullname = fixFullAtomName(atom.getLabel_atom_id());
+		//System.out.println("fixing atom name for  >" + atom.getLabel_atom_id() + "< >" + fullname + "<");
 
 		if ( parseCAOnly ){
 			// yes , user wants to get CA only
@@ -221,8 +233,8 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		}
 
 		// Warning: getLabel_asym_id is not the "chain id" in the PDB file
-		// TODO: need to map the asym id to the pdb_strand_id later on  
-		String chain_id      = atom.getLabel_asym_id(); 
+		// TODO: need to map the asym id to the pdb_strand_id later on
+		String chain_id      = atom.getLabel_asym_id();
 
 		String recordName    = atom.getGroup_PDB();
 		String residueNumber = atom.getAuth_seq_id();
@@ -265,7 +277,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 				Chain testchain ;
 				testchain = isKnownChain(current_chain.getName(),current_model);
 				if ( testchain == null) {
-					current_model.add(current_chain);		
+					current_model.add(current_chain);
 				}
 
 
@@ -292,7 +304,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 			// check if residue number is the same ...
 			// insertion code is part of residue number
-			if ( ! residueNumber.equals(current_group.getPDBCode())) {	    
+			if ( ! residueNumber.equals(current_group.getPDBCode())) {
 				//System.out.println("end of residue: "+current_group.getPDBCode()+" "+residueNumber);
 				current_chain.addGroup(current_group);
 
@@ -317,14 +329,18 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	}
 
 	/** convert a MMCif AtomSite object to a BioJava Atom object
-	 * 
+	 *
 	 * @param atom the mmmcif AtomSite record
 	 * @return an Atom
 	 */
 	private Atom convertAtom(AtomSite atom){
+
 		Atom a = new AtomImpl();
+
 		a.setPDBserial(Integer.parseInt(atom.getId()));
 		a.setName(atom.getLabel_atom_id());
+		a.setFullName(fixFullAtomName(atom.getLabel_atom_id()));
+
 		double x = Double.parseDouble (atom.getCartn_x());
 		double y = Double.parseDouble (atom.getCartn_y());
 		double z = Double.parseDouble (atom.getCartn_z());
@@ -338,10 +354,10 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		double temp = Double.parseDouble(atom.getB_iso_or_equiv());
 		a.setTempFactor(temp);
 
-		a.setFullName(atom.getLabel_atom_id());
+
 
 		String alt = atom.getLabel_alt_id();
-		if (( alt != null ) && ( alt.length() > 0)){
+		if (( alt != null ) && ( alt.length() > 0) && (! alt.equals("."))){
 			a.setAltLoc(new Character(alt.charAt(0)));
 		} else {
 			a.setAltLoc(new Character(' '));
@@ -351,7 +367,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	}
 
 	/** Start the parsing
-	 * 
+	 *
 	 */
 	public void documentStart() {
 		structure = new StructureImpl();
@@ -371,7 +387,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 
 	/** Flag if the SEQRES amino acids should be aligned with the ATOM amino acids.
-	 * 
+	 *
 	 * @return flag if SEQRES - ATOM amino acids alignment is enabled
 	 */
 	public boolean isAlignSeqRes() {
@@ -437,12 +453,12 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		//TODO: test this with NMR structures!
 		Set<String> asymIds = asymStrandId.keySet();
-		for (String asym : asymIds) {	
+		for (String asym : asymIds) {
 			for (int i =0; i< structure.nrModels() ; i++){
 				List<Chain>model = structure.getModel(i);
 				for (Chain chain : model) {
 					if ( chain.getName().equals(asym)){
-						chain.setName(asymStrandId.get(asym));		
+						chain.setName(asymStrandId.get(asym));
 						break;
 					}
 				}
@@ -454,7 +470,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 
 	/** This method will return the parsed protein structure, once the parsing has been finished
-	 * 
+	 *
 	 * @return a BioJava protein structure object
 	 */
 	public Structure getStructure() {
@@ -483,7 +499,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 			} catch (ParseException e){
 				e.printStackTrace();
-			}		
+			}
 		} else {
 			try {
 
@@ -564,24 +580,24 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	/** create a DBRef record from the StrucRefSeq record:
 	 *  <pre>
   PDB record 					DBREF
-  Field Name 					mmCIF Data Item 	 
-  Section   	  				n.a.   	 
-  PDB_ID_Code   	  			_struct_ref_seq.pdbx_PDB_id_code   	 
-  Strand_ID   	 			 	_struct_ref_seq.pdbx_strand_id   	 
-  Begin_Residue_Number   	  	_struct_ref_seq.pdbx_auth_seq_align_beg   	 
-  Begin_Ins_Code   	  			_struct_ref_seq.pdbx_seq_align_beg_ins_code   	 
-  End_Residue_Number   	  		_struct_ref_seq.pdbx_auth_seq_align_end   	 
-  End_Ins_Code   	  			_struct_ref_seq.pdbx_seq_align_end_ins_code   	 
-  Database   	  				_struct_ref.db_name   	 
-  Database_Accession_No   	  	_struct_ref_seq.pdbx_db_accession   	 
-  Database_ID_Code   	  		_struct_ref.db_code   	 
-  Database_Begin_Residue_Number	_struct_ref_seq.db_align_beg   	 
-  Databaes_Begin_Ins_Code   	_struct_ref_seq.pdbx_db_align_beg_ins_code   	 
-  Database_End_Residue_Number  	_struct_ref_seq.db_align_end   	 
+  Field Name 					mmCIF Data Item
+  Section   	  				n.a.
+  PDB_ID_Code   	  			_struct_ref_seq.pdbx_PDB_id_code
+  Strand_ID   	 			 	_struct_ref_seq.pdbx_strand_id
+  Begin_Residue_Number   	  	_struct_ref_seq.pdbx_auth_seq_align_beg
+  Begin_Ins_Code   	  			_struct_ref_seq.pdbx_seq_align_beg_ins_code
+  End_Residue_Number   	  		_struct_ref_seq.pdbx_auth_seq_align_end
+  End_Ins_Code   	  			_struct_ref_seq.pdbx_seq_align_end_ins_code
+  Database   	  				_struct_ref.db_name
+  Database_Accession_No   	  	_struct_ref_seq.pdbx_db_accession
+  Database_ID_Code   	  		_struct_ref.db_code
+  Database_Begin_Residue_Number	_struct_ref_seq.db_align_beg
+  Databaes_Begin_Ins_Code   	_struct_ref_seq.pdbx_db_align_beg_ins_code
+  Database_End_Residue_Number  	_struct_ref_seq.db_align_end
   Databaes_End_Ins_Code   	  	_struct_ref_seq.pdbx_db_align_end_ins_code
-  </pre>   	  
-	 * 
-	 * 
+  </pre>
+	 *
+	 *
 	 */
 	public void newStructRefSeq(StructRefSeq sref) {
 		//if (DEBUG)
@@ -677,9 +693,9 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 	/** The EntityPolySeq object provide the amino acid sequence objects for the Entities.
 	 * Later on the entities are mapped to the BioJava Chain and Compound objects.
-	 * @param epolseq the EntityPolySeq record for one amino acid 
+	 * @param epolseq the EntityPolySeq record for one amino acid
 	 */
-	public void newEntityPolySeq(EntityPolySeq epolseq) {	
+	public void newEntityPolySeq(EntityPolySeq epolseq) {
 		//System.out.println(epolseq);
 		Entity e = getEntity(epolseq.getEntity_id());
 
@@ -690,7 +706,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		Chain entityChain = getEntityChain(epolseq.getEntity_id());
 
-		
+
 		// create group from epolseq;
 		AminoAcid g = new AminoAcidImpl();
 		try {
@@ -722,7 +738,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 	public void newPdbxPolySeqScheme(PdbxPolySeqScheme ppss) {
 
-		// merge the EntityPolySeq info and the AtomSite chains into one... 
+		// merge the EntityPolySeq info and the AtomSite chains into one...
 
 		//already known ignore:
 		if (asymStrandId.containsKey(ppss.getAsym_id()))
