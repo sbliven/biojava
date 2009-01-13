@@ -16,7 +16,7 @@
  * at:
  *
  *      http://www.biojava.org/
- * 
+ *
  * Created on Jul 16, 2006
  *
  */
@@ -38,19 +38,20 @@ import javax.swing.JTabbedPane;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.gui.util.AlignmentCalc;
 import org.biojava.bio.structure.gui.util.PDBDirPanel;
+import org.biojava.bio.structure.gui.util.PDBServerPanel;
 import org.biojava.bio.structure.gui.util.PDBUploadPanel;
 import org.biojava.bio.structure.gui.util.StructurePairSelector;
 
 
-/** A JFrame that allows to trigger a pairwise structure alignment, 
+/** A JFrame that allows to trigger a pairwise structure alignment,
  * either from files in a directory,
  * or after manual upload.
- * 
+ *
  * @author Andreas Prlic
- * 
+ *
  * @since 1.7
- * 
- * 
+ *
+ *
  *
  */
 public class AlignmentGui extends JFrame{
@@ -59,25 +60,26 @@ public class AlignmentGui extends JFrame{
 
 	public static Logger logger =  Logger.getLogger("org.biojava.spice");
 
-	
+
 	JButton abortB;
 
 	PDBDirPanel    tab1 ;
 	PDBUploadPanel tab2;
+	PDBServerPanel tab3;
 
 	Thread thread;
 	AlignmentCalc alicalc;
 	JTabbedPane tabPane;
-	JProgressBar progress;   
+	JProgressBar progress;
 
 
 	public static void main(String[] args){
 		new AlignmentGui();
-		
+
 	}
-	
+
 	public AlignmentGui() {
-		super();       
+		super();
 
 		thread = null;
 
@@ -91,11 +93,18 @@ public class AlignmentGui extends JFrame{
 			}
 		});
 
+
+		tab3 = new PDBServerPanel();
+
+
 		tab1 = new PDBDirPanel();
 
 		tab2 = new PDBUploadPanel();
 
 		tabPane = new JTabbedPane();
+
+		tabPane.addTab("Fetch files from FTP server",null,tab3,"fetch files from remote");
+
 		tabPane.addTab("From local directory", null, tab1,
 				"find files in a local directory");
 
@@ -157,7 +166,7 @@ public class AlignmentGui extends JFrame{
 		hBox.add(abortB);
 		hBox.add(closeB);
 		vBox.add(hBox);
-		this.getContentPane().add(vBox);        
+		this.getContentPane().add(vBox);
 		this.pack();
 		this.setVisible(true);
 	}
@@ -179,9 +188,11 @@ public class AlignmentGui extends JFrame{
 		//TODO: see which panel is active and get the structures ...
 		int pos = tabPane.getSelectedIndex();
 		StructurePairSelector tab = null;
-		if (pos == 0 ){
+		if (pos == 0) {
+			tab = tab3;
+		} else if (pos == 1 ){
 			tab = tab1;
-		} else if (pos == 1){
+		} else if (pos == 2){
 			tab = tab2;
 		}
 		try {
@@ -255,7 +266,7 @@ class ProgressThreadDrawer extends Thread {
 			}
 			progress.repaint();
 		}
-		progress = null;       
+		progress = null;
 	}
 
 }
