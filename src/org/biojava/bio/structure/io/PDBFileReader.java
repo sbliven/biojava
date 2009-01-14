@@ -49,8 +49,8 @@ import org.biojava.utils.io.InputStreamProvider;
  * <p>
  *  The wrapper class for parsing a PDB file.
  *  </p>
- *  
- *  
+ *
+ *
  *  <p>
  *  Several flags can be set for this class
  *  <ul>
@@ -58,12 +58,12 @@ import org.biojava.utils.io.InputStreamProvider;
  * <li> {@link #setParseSecStruc} - a flag if the secondary structure information from the PDB file (author's assignment) should be parsed.
  *      If true the assignment can be accessed through {@link AminoAcid}.getSecStruc(); (default:false)</li>
  * <li> {@link #setAlignSeqRes(boolean)} - should the AminoAcid sequences from the SEQRES
- *      and ATOM records of a PDB file be aligned? (default:true)</li>    
+ *      and ATOM records of a PDB file be aligned? (default:true)</li>
  * <li> {@link #setAutoFetch(boolean)} - if the PDB file can not be found locally, should it be fetched
  *  from the EBI - ftp server? (default:false)</li>
  *  </ul>
  *  </p>
- * 
+ *
  *
  *
  *<h2>Example</h2>
@@ -101,10 +101,10 @@ import org.biojava.utils.io.InputStreamProvider;
 			e.printStackTrace();
 		}
 		return structure;
-		
+
 	}
 	</pre>
- * 
+ *
  *
  * @author Andreas Prlic
  *
@@ -133,23 +133,23 @@ public class PDBFileReader implements StructureIOFile {
 //  "1mkz",
 //  "1ml5",
 //  "1n8r",
-  
-  
-  
-    
+
+
+
+
 	String path                     ;
 	List<String> extensions            ;
 	boolean parseSecStruc;
 	boolean autoFetch;
 	boolean parseCAOnly;
     boolean alignSeqRes;
-  
-    
+
+
 	public static void main(String[] args){
 		String filename =  "/path/to/PDBFile.pdb" ;
 
 		// also see the demos
-		
+
 		PDBFileReader pdbreader = new PDBFileReader();
 		pdbreader.setParseSecStruc(true);
 		pdbreader.setAlignSeqRes(true);
@@ -195,7 +195,7 @@ public class PDBFileReader implements StructureIOFile {
 
 
     /** return the flag if only the CA atoms should be parsed
-     * 
+     *
      * @return flag if CA only should be read
      */
 	public boolean isParseCAOnly() {
@@ -203,7 +203,7 @@ public class PDBFileReader implements StructureIOFile {
     }
 
 	/** only the CA atoms should be parsed from the PDB file
-     * 
+     *
      * @param parseCAOnly
 	 */
     public void setParseCAOnly(boolean parseCAOnly) {
@@ -211,7 +211,7 @@ public class PDBFileReader implements StructureIOFile {
     }
 
     /** get the flag if the SEQRES and ATOM amino acids are going to be aligned
-     * 
+     *
      * @return flag
      */
     public boolean isAlignSeqRes() {
@@ -220,7 +220,7 @@ public class PDBFileReader implements StructureIOFile {
 
 
     /** set the flag if the SEQRES and ATOM amino acids should be aligned and linked
-     * 
+     *
      * @param alignSeqRes
      */
     public void setAlignSeqRes(boolean alignSeqRes) {
@@ -237,9 +237,9 @@ public class PDBFileReader implements StructureIOFile {
 	}
 
 	/** tell the parser to fetch missing PDB files from the EBI FTP server automatically.
-	 * 
+	 *
 	 * default is false. If true, new PDB files will be automatically stored in the Path and gzip compressed.
-	 * 
+	 *
 	 * @param autoFetch
 	 */
 	public void setAutoFetch(boolean autoFetch) {
@@ -256,9 +256,9 @@ public class PDBFileReader implements StructureIOFile {
 
 
 	/*  A flag to tell the parser to parse the Author's secondary structure assignment from the file
-	 *  
+	 *
 	 */
-	 
+
 	public void setParseSecStruc(boolean parseSecStruc) {
 		this.parseSecStruc = parseSecStruc;
 	}
@@ -279,7 +279,7 @@ public class PDBFileReader implements StructureIOFile {
 		return path ;
 	}
 
-	/** define supported file extensions 
+	/** define supported file extensions
 	 * compressed extensions .Z,.gz do not need to be specified
 	 * they are dealt with automatically.
 
@@ -290,7 +290,7 @@ public class PDBFileReader implements StructureIOFile {
 	}
 
 	/** clear the supported file extensions
-	 * 
+	 *
 	 */
 	public void clearExtensions(){
 		extensions.clear();
@@ -298,14 +298,14 @@ public class PDBFileReader implements StructureIOFile {
 
 
 
-	/** try to find the file in the filesystem and return a filestream in order to parse it 
+	/** try to find the file in the filesystem and return a filestream in order to parse it
 	 * rules how to find file
 	 * - first check: if file is in path specified by PDBpath
 	 * - secnd check: if not found check in PDBpath/xy/ where xy is second and third char of PDBcode.
 	 * if autoFetch is set it will try to download missing PDB files automatically.
 	 */
 
-	private InputStream getInputStream(String pdbId) 
+	private InputStream getInputStream(String pdbId)
 	throws IOException
 	{
 		//System.out.println("checking file");
@@ -314,7 +314,7 @@ public class PDBFileReader implements StructureIOFile {
 		// this has been moved to InputStreamProvider ...
 
 		//String[] str = {".gz",".zip",".Z"};
-		//ArrayList  compressions = new ArrayList( Arrays.asList( str ) ); 
+		//ArrayList  compressions = new ArrayList( Arrays.asList( str ) );
 
 		InputStream inputStream =null;
 
@@ -345,12 +345,12 @@ public class PDBFileReader implements StructureIOFile {
 					break;
 				}
 
-				if ( pdbFile != null) break;        
+				if ( pdbFile != null) break;
 			}
 		}
 
 		if ( pdbFile == null ) {
-			if ( autoFetch) 
+			if ( autoFetch)
 				return downloadAndGetInputStream(pdbId);
 
 			String message = "no structure with PDB code " + pdbId + " found!" ;
@@ -362,33 +362,39 @@ public class PDBFileReader implements StructureIOFile {
 
 
 	private File downloadPDB(String pdbId){
-	
-		File tempFile = new File(path+"/"+pdbId+".pdb.gz");		
+
+		if ((path == null) || (path.equals(""))){
+			System.err.println("you did not set the path in PDBFileReader, don;t know where to write the downloaded file to");
+			System.err.println("assuming default location is local directory.");
+			path = ".";
+		}
+
+		File tempFile = new File(path+"/"+pdbId+".pdb.gz");
 		File pdbHome = new File(path);
-		
+
 		if ( ! pdbHome.canWrite() ){
 			System.err.println("can not write to " + pdbHome);
 			return null;
 		}
-		
-		String ftp = String.format("ftp://ftp.ebi.ac.uk/pub/databases/msd/pdb_uncompressed/pdb%s.ent", pdbId.toLowerCase()); 
 
-		System.out.println("Fetching " + ftp); 
+		String ftp = String.format("ftp://ftp.ebi.ac.uk/pub/databases/msd/pdb_uncompressed/pdb%s.ent", pdbId.toLowerCase());
+
+		System.out.println("Fetching " + ftp);
 		try {
 			URL url = new URL(ftp);
-			InputStream conn = url.openStream();			
+			InputStream conn = url.openStream();
 
 			// prepare destination
 			System.out.println("writing to " + tempFile);
-			
-		
+
+
 			FileOutputStream outPut = new FileOutputStream(tempFile);
 			GZIPOutputStream gzOutPut = new GZIPOutputStream(outPut);
 			PrintWriter pw = new PrintWriter(gzOutPut);
-			
+
 			BufferedReader fileBuffer = new BufferedReader(new InputStreamReader(conn));
 			String line;
-			while ((line = fileBuffer.readLine()) != null) {				
+			while ((line = fileBuffer.readLine()) != null) {
 				pw.println(line);
 			}
 			pw.flush();
@@ -397,12 +403,12 @@ public class PDBFileReader implements StructureIOFile {
 			conn.close();
 		} catch (Exception e){
 			e.printStackTrace();
-			return null; 
+			return null;
 		}
 		return tempFile;
 	}
 
-	private InputStream downloadAndGetInputStream(String pdbId) 
+	private InputStream downloadAndGetInputStream(String pdbId)
 	throws IOException{
 		//PDBURLReader reader = new PDBURLReader();
 		//Structure s = reader.getStructureById(pdbId);
@@ -410,7 +416,7 @@ public class PDBFileReader implements StructureIOFile {
 		if ( tmp != null ) {
 			InputStreamProvider prov = new InputStreamProvider();
 			return prov.getInputStream(tmp);
-			
+
 
 		} else {
 			throw new IOException("could not find PDB " + pdbId + " in file system and also could not download");
@@ -422,26 +428,26 @@ public class PDBFileReader implements StructureIOFile {
 
 
 
-	/** load a structure from local file system and return a PDBStructure object 
+	/** load a structure from local file system and return a PDBStructure object
 
 	 * @param pdbId  a String specifying the id value (PDB code)
 	 * @return the Structure object
 	 * @throws IOException ...
 	 */
-	public Structure getStructureById(String pdbId) 
+	public Structure getStructureById(String pdbId)
 	throws IOException
 	{
 
-	    
+
 		InputStream inStream = getInputStream(pdbId);
 
 		PDBFileParser pdbpars = new PDBFileParser();
 		pdbpars.setParseSecStruc(parseSecStruc);
         pdbpars.setAlignSeqRes(alignSeqRes);
-        
+
         pdbpars.setParseCAOnly(parseCAOnly);
-        
-        
+
+
 		Structure struc = pdbpars.parsePDBFile(inStream) ;
 		return struc ;
 	}
@@ -452,7 +458,7 @@ public class PDBFileReader implements StructureIOFile {
 	 * @return the Structure object
 	 * @throws IOException ...
 	 */
-	public Structure getStructure(String filename) 
+	public Structure getStructure(String filename)
 	throws IOException
 	{
 		File f = new File(filename);
@@ -461,7 +467,7 @@ public class PDBFileReader implements StructureIOFile {
 	}
 
 	/** opens filename, parses it and returns a Structure object
-	 * 
+	 *
 	 * @param filename a File object
 	 * @return the Structure object
 	 * @throws IOException ...
