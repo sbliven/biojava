@@ -318,7 +318,7 @@ public class OboFileParser {
 	}
 
 	protected Map<String,Object>[] getDbxrefList(String line, int startoffset, int endoffset) throws ParseException {
-		Vector temp = new Vector();
+		Vector<Map<String,Object>> temp = new Vector<Map<String,Object>>();
 		boolean stop = false;
 		while (!stop) {
 			int braceIndex = findUnescaped(line, '{', startoffset, endoffset);
@@ -359,9 +359,9 @@ public class OboFileParser {
 			temp.add(pair);
 			startoffset = endIndex + 1;
 		}
-		Map[] out = new HashMap[temp.size()];
+		Map<String,Object>[] out = new HashMap[temp.size()];
 		for (int i = 0; i < temp.size(); i++) {
-			Map<String, Object> pair =  (Map<String,Object>) temp.get(i);
+			Map<String, Object> pair =  temp.get(i);
 			out[i] = pair;
 		}
 		return out;
@@ -489,8 +489,10 @@ public class OboFileParser {
 				i++;
 				continue;
 			} else if (inQuotes) {
-				if (c == quoteChar)
-					continue;
+				if (c == quoteChar) 
+					inQuotes = false;
+				continue;
+				
 			} else if (c == toChar) {
 				return i;
 			} else if (honorQuotes && isQuote(c)) {
