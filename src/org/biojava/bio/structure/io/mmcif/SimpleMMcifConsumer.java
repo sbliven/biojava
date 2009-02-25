@@ -744,6 +744,12 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		if (asymStrandId.containsKey(ppss.getAsym_id()))
 			return;
 
+		// this is one of the interal mmcif rules it seems...
+		if ( ppss.getPdb_strand_id() == null) {
+			asymStrandId.put(ppss.getAsym_id(), ppss.getAsym_id());
+			return;
+		}
+		
 		//System.out.println(ppss.getAsym_id() + " = " + ppss.getPdb_strand_id());
 
 		asymStrandId.put(ppss.getAsym_id(), ppss.getPdb_strand_id());
