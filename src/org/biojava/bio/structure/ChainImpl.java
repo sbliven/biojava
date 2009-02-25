@@ -47,7 +47,7 @@ public class ChainImpl implements Chain {
 	/** The default chain identifier is an empty space.
 	 * 
 	 */
-	public static String DEFAULT_CHAIN_ID = " ";
+	public static String DEFAULT_CHAIN_ID = "A";
 
 	String swissprot_id ; 
 	String name ; // like in PDBfile
