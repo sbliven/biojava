@@ -129,7 +129,7 @@ public class PDBFileParser  {
 
 	private List<Chain>   seqResChains; // contains all the chains for the SEQRES records
 
-	
+
 
 	// for printing
 	private static final String NEWLINE;
@@ -176,11 +176,11 @@ public class PDBFileParser  {
 	private static final List<String> sourceFieldValues = new ArrayList<String>(
 			Arrays.asList("ENGINEERED:", "MOL_ID:", "SYNTHETIC:", "FRAGMENT:",
 					"ORGANISM_SCIENTIFIC:", "ORGANISM_COMMON:", 
-                    "ORGANISM_TAXID:","STRAIN:",
+					"ORGANISM_TAXID:","STRAIN:",
 					"VARIANT:", "CELL_LINE:", "ATCC:", "ORGAN:", "TISSUE:",
 					"CELL:", "ORGANELLE:", "SECRETION:", "GENE:",
 					"CELLULAR_LOCATION:", "EXPRESSION_SYSTEM:",
-                    "EXPRESSION_SYSTEM_TAXID:",
+					"EXPRESSION_SYSTEM_TAXID:",
 					"EXPRESSION_SYSTEM_STRAIN:", "EXPRESSION_SYSTEM_VARIANT:",
 					"EXPRESSION_SYSTEM_CELL_LINE:",
 					"EXPRESSION_SYSTEM_ATCC_NUMBER:",
@@ -240,7 +240,7 @@ public class PDBFileParser  {
 
 
 	static {
-		
+
 		NEWLINE = System.getProperty("line.separator");
 
 	}
@@ -370,10 +370,10 @@ public class PDBFileParser  {
 				// it is a nucleotidee
 				NucleotideImpl nu = new NucleotideImpl();
 				group = nu;
-			
+
 			} else if (aminoCode1 == StructureTools.UNKNOWN_GROUP_LABEL){
 				group = new HetatomImpl();
-			
+
 			} else {
 				AminoAcidImpl aa = new AminoAcidImpl() ;
 				aa.setAminoType(aminoCode1);
@@ -387,7 +387,7 @@ public class PDBFileParser  {
 		return  group ;
 	}
 
-	
+
 
 	// Handler methods to deal with PDB file records properly.
 	/**
@@ -732,8 +732,8 @@ public class PDBFileParser  {
 	 */
 	private void pdb_SEQRES_Handler(String line)
 	throws PDBParseException {
-//		System.out.println("PDBFileParser.pdb_SEQRES_Handler: BEGIN");
-//		System.out.println(line);
+		//		System.out.println("PDBFileParser.pdb_SEQRES_Handler: BEGIN");
+		//		System.out.println(line);
 
 		//TODO: treat the following residues as amino acids?
 		/*
@@ -807,7 +807,7 @@ public class PDBFileParser  {
 			// b
 			//} 
 			current_group = getNewGroup("ATOM", aminoCode1);
-			
+
 			try {
 				current_group.setPDBName(threeLetter);
 			} catch (PDBParseException p){				
@@ -1213,7 +1213,14 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		//		System.out.println("[sourceValueSetter] " + field);
 		if (field.equals("MOL_ID:")) {
 
-			current_compound = compounds.get(Integer.valueOf(value) - 1);
+			try {
+				current_compound = compounds.get(Integer.valueOf(value) - 1);
+			} catch (Exception e){
+				System.err.println("could not process SOURCE MOL_ID record correctly:" + e.getMessage());
+				return;
+			}
+
+
 			//			System.out.println("[sourceValueSetter] Fetching compound " + value + " " + current_compound.getMolId());
 
 		}
