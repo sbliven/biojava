@@ -89,6 +89,11 @@ public class TranslatedSequencePanel extends JComponent
     implements SequenceRenderContext, Changeable
 {
     /**
+	 * Generated Serial Version UID
+	 */
+	private static final long serialVersionUID = 3269477379497205817L;
+
+	/**
      * Constant <code>RENDERER</code> is a <code>ChangeType</code>
      * which indicates a change to the renderer, requiring a layout
      * update.

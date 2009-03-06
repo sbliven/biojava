@@ -36,286 +36,295 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.ChangeVetoException;
 
-
 /**
- * Handles multiple SequencePanels and Ranges so that a Sequence can be wrapped over more than one
- * line on screen. This is particularly useful for viewing Protein sequences that would be viewed
- * at a single residue resolution.
- *
+ * Handles multiple SequencePanels and Ranges so that a Sequence can be wrapped
+ * over more than one line on screen. This is particularly useful for viewing
+ * Protein sequences that would be viewed at a single residue resolution.
+ * 
  * The interface is very similar to that of the SequencePanels that it wraps
- *
+ * 
  * @author Mark Southern
  * @see SequencePanel
  * @since 1.5
  */
 public class SequencePanelWrapper extends JPanel {
 
-	protected SequencePanel[] seqPanels = new SequencePanel[ 0 ];
-    private RangeLocation range;
-    private Sequence sequence;
-    private SequenceRenderer renderer;
-    private double scale = 14.0;
-    private java.awt.RenderingHints hints;
-    private int direction = SequencePanel.HORIZONTAL;
-    private TrackLayout trackLayout = new SimpleTrackLayout();
-    private List viewerListeners = new ArrayList();
-    private List motionListeners = new ArrayList();
+	/**
+	 * Generated Serial Version UID
+	 */
+	private static final long serialVersionUID = 8749249181471157230L;
+	protected SequencePanel[] seqPanels = new SequencePanel[0];
+	private RangeLocation range;
+	private Sequence sequence;
+	private SequenceRenderer renderer;
+	private double scale = 14.0;
+	private java.awt.RenderingHints hints;
+	private int direction = SequencePanel.HORIZONTAL;
+	private TrackLayout trackLayout = new SimpleTrackLayout();
+	private List<SequenceViewerListener> viewerListeners = new ArrayList<SequenceViewerListener>();
+	private List<SequenceViewerMotionListener> motionListeners = new ArrayList<SequenceViewerMotionListener>();
 
-    /**
-     * Creates a new instance of WrappedSequencePanel
-     */
-    public SequencePanelWrapper() {
-        initComponents();
-    }
+	/**
+	 * Creates a new instance of WrappedSequencePanel
+	 */
+	public SequencePanelWrapper() {
+		initComponents();
+	}
 
-    protected void initComponents() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(Color.WHITE);
-    }
+	protected void initComponents() {
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setBackground(Color.WHITE);
+	}
 
-    /*
-     * Sets the track (line) layout strategy. Layouts include a simple wrapping at a given
-     * number of residues and user-defined layouts that can contain arbitrary length rows.
-     */
-    public void setTrackLayout(TrackLayout tl) {
-        this.trackLayout = tl;
-        trackLayout.setSequence(getSequence());
-        trackLayout.setRange(getRange());
+	/*
+	 * Sets the track (line) layout strategy. Layouts include a simple wrapping
+	 * at a given number of residues and user-defined layouts that can contain
+	 * arbitrary length rows.
+	 */
+	public void setTrackLayout(TrackLayout tl) {
+		this.trackLayout = tl;
+		trackLayout.setSequence(getSequence());
+		trackLayout.setRange(getRange());
 
-        if (isActive()) {
-            refreshSequencePanels();
-        }
-    }
+		if (isActive()) {
+			refreshSequencePanels();
+		}
+	}
 
-    public TrackLayout getTrackLayout() {
-        return this.trackLayout;
-    }
+	public TrackLayout getTrackLayout() {
+		return this.trackLayout;
+	}
 
-    protected boolean isActive() {
-        return (sequence != null) && (renderer != null) && (range != null);
-    }
+	protected boolean isActive() {
+		return (sequence != null) && (renderer != null) && (range != null);
+	}
 
-    public void setScale(double scale) {
-        this.scale = scale;
+	public void setScale(double scale) {
+		this.scale = scale;
 
-        for (int i = 0; i < seqPanels.length; i++) {
-            seqPanels[ i ].setScale(scale);
-        }
-    }
+		for (int i = 0; i < seqPanels.length; i++) {
+			seqPanels[i].setScale(scale);
+		}
+	}
 
-    public double getScale() {
-        return scale;
-    }
+	public double getScale() {
+		return scale;
+	}
 
-    public void setDirection(int direction) {
-        this.direction = direction;
+	public void setDirection(int direction) {
+		this.direction = direction;
 
-        for (int i = 0; i < seqPanels.length; i++) {
-            seqPanels[ i ].setDirection(direction);
-        }
+		for (int i = 0; i < seqPanels.length; i++) {
+			seqPanels[i].setDirection(direction);
+		}
 
-        if (isActive()) {
-            refreshSequencePanels();
-        }
-    }
+		if (isActive()) {
+			refreshSequencePanels();
+		}
+	}
 
-    public int getDirection() {
-        return direction;
-    }
+	public int getDirection() {
+		return direction;
+	}
 
-    /*
-     * a convenience method. The wrap is passed through to the TrackLayout implementation.
-     */
-    public synchronized void setWrap(int w) {
-        trackLayout.setWrap(w);
+	/*
+	 * a convenience method. The wrap is passed through to the TrackLayout
+	 * implementation.
+	 */
+	public synchronized void setWrap(int w) {
+		trackLayout.setWrap(w);
 
-        if (! isActive()) {
-            return;
-        }
+		if (!isActive()) {
+			return;
+		}
 
-        refreshSequencePanels();
-    }
+		refreshSequencePanels();
+	}
 
-    public int getWrap() {
-        return trackLayout.getWrap();
-    }
+	public int getWrap() {
+		return trackLayout.getWrap();
+	}
 
-    public void setRenderingHints(java.awt.RenderingHints hints) {
-        this.hints = hints;
+	public void setRenderingHints(java.awt.RenderingHints hints) {
+		this.hints = hints;
 
-        for (int i = 0; i < seqPanels.length; i++) {
-            seqPanels[ i ].setRenderingHints(hints);
-        }
-    }
+		for (int i = 0; i < seqPanels.length; i++) {
+			seqPanels[i].setRenderingHints(hints);
+		}
+	}
 
-    public java.awt.RenderingHints getRenderingHints() {
-        return hints;
-    }
+	public java.awt.RenderingHints getRenderingHints() {
+		return hints;
+	}
 
-    public void setRenderer(SequenceRenderer renderer) {
-        this.renderer = renderer;
+	public void setRenderer(SequenceRenderer renderer) {
+		this.renderer = renderer;
 
-        for (int i = 0; i < seqPanels.length; i++) {
-            try {
-                seqPanels[ i ].setRenderer(renderer);
-            } catch (ChangeVetoException e) {
-                // should never get here
-                e.printStackTrace();
-            }
-        }
-    }
+		for (int i = 0; i < seqPanels.length; i++) {
+			try {
+				seqPanels[i].setRenderer(renderer);
+			} catch (ChangeVetoException e) {
+				// should never get here
+				e.printStackTrace();
+			}
+		}
+	}
 
-    public SequenceRenderer getRenderer() {
-        return renderer;
-    }
+	public SequenceRenderer getRenderer() {
+		return renderer;
+	}
 
-    public void setSequence(Sequence seq) {
-        if (seq == null) {
-            removeSeqPanels();
+	public void setSequence(Sequence seq) {
+		if (seq == null) {
+			removeSeqPanels();
 
-            return;
-        }
+			return;
+		}
 
-        trackLayout.setSequence(sequence = seq);
-        trackLayout.setRange(range = new RangeLocation(1, seq.length()));
-        refreshSequencePanels();
-    }
+		trackLayout.setSequence(sequence = seq);
+		trackLayout.setRange(range = new RangeLocation(1, seq.length()));
+		refreshSequencePanels();
+	}
 
-    public Sequence getSequence() {
-        return sequence;
-    }
+	public Sequence getSequence() {
+		return sequence;
+	}
 
-    public void setRange(RangeLocation loc) {
-        trackLayout.setRange(range = loc);
-        refreshSequencePanels();
-    }
+	public void setRange(RangeLocation loc) {
+		trackLayout.setRange(range = loc);
+		refreshSequencePanels();
+	}
 
-    public RangeLocation getRange() {
-        return range;
-    }
+	public RangeLocation getRange() {
+		return range;
+	}
 
-    private void removeSeqPanels() {
-        for (int i = 0; i < seqPanels.length; i++) {
-            remove(seqPanels[ i ]);
-        }
+	private void removeSeqPanels() {
+		for (int i = 0; i < seqPanels.length; i++) {
+			remove(seqPanels[i]);
+		}
 
-        setSize(0, 0); // make sure view is refreshed properly
-        setLayout(null);
-        revalidate();
-    }
+		setSize(0, 0); // make sure view is refreshed properly
+		setLayout(null);
+		revalidate();
+	}
 
-    public void resizeAndValidate() {
-        for (int i = 0; i < seqPanels.length; i++) {
-            seqPanels[ i ].resizeAndValidate();
-        }
-    }
+	public void resizeAndValidate() {
+		for (int i = 0; i < seqPanels.length; i++) {
+			seqPanels[i].resizeAndValidate();
+		}
+	}
 
-    protected void refreshSequencePanels() {
-        removeSeqPanels();
+	protected void refreshSequencePanels() {
+		removeSeqPanels();
 
-        RangeLocation[] ranges = trackLayout.getRanges();
-        seqPanels = new SequencePanel[ ranges.length ];
+		RangeLocation[] ranges = trackLayout.getRanges();
+		seqPanels = new SequencePanel[ranges.length];
 
-        if (getDirection() == SequencePanel.HORIZONTAL) {
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        } else {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        }
+		if (getDirection() == SequencePanel.HORIZONTAL) {
+			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		} else {
+			setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		}
 
-        for (int i = 0; i < ranges.length; i++) {
-            //logger.debug("Setting sequence panel " + i);
-            seqPanels[ i ] = new SequencePanel();
-            seqPanels[ i ].setFont(getFont());
-            seqPanels[ i ].setAlignmentX(LEFT_ALIGNMENT);
-            seqPanels[ i ].setAlignmentY(TOP_ALIGNMENT);
-            seqPanels[ i ].setSequence(getSequence());
+		for (int i = 0; i < ranges.length; i++) {
+			// logger.debug("Setting sequence panel " + i);
+			seqPanels[i] = new SequencePanel();
+			seqPanels[i].setFont(getFont());
+			seqPanels[i].setAlignmentX(LEFT_ALIGNMENT);
+			seqPanels[i].setAlignmentY(TOP_ALIGNMENT);
+			seqPanels[i].setSequence(getSequence());
 
-            //seqPanels[i].setRange( ranges[i] );
-            // bug in biojava-1.4pre1 - add +1 to max range
-            seqPanels[ i ].setRange(new RangeLocation(ranges[ i ].getMin(), ranges[ i ].getMax() +
-                    1
-                )
-            );
-            seqPanels[ i ].setDirection(getDirection());
-            seqPanels[ i ].setScale(getScale());
+			// seqPanels[i].setRange( ranges[i] );
+			// bug in biojava-1.4pre1 - add +1 to max range
+			seqPanels[i].setRange(new RangeLocation(ranges[i].getMin(),
+					ranges[i].getMax() + 1));
+			seqPanels[i].setDirection(getDirection());
+			seqPanels[i].setScale(getScale());
 
-            for (Iterator it = viewerListeners.iterator(); it.hasNext();) {
-                seqPanels[ i ].addSequenceViewerListener(( SequenceViewerListener ) it.next());
-            }
+			for (Iterator<SequenceViewerListener> it = viewerListeners
+					.iterator(); it.hasNext();) {
+				seqPanels[i].addSequenceViewerListener(it.next());
+			}
 
-            for (Iterator jt = motionListeners.iterator(); jt.hasNext();) {
-                seqPanels[ i ].addSequenceViewerMotionListener(( SequenceViewerMotionListener ) jt.next());
-            }
+			for (Iterator<SequenceViewerMotionListener> jt = motionListeners
+					.iterator(); jt.hasNext();) {
+				seqPanels[i].addSequenceViewerMotionListener(jt.next());
+			}
 
-            add(seqPanels[ i ]);
-        }
+			add(seqPanels[i]);
+		}
 
-        setRenderer(getRenderer());
-    }
+		setRenderer(getRenderer());
+	}
 
-    public void addSequenceViewerListener(SequenceViewerListener l) {
-        viewerListeners.add(l);
+	public void addSequenceViewerListener(SequenceViewerListener l) {
+		viewerListeners.add(l);
 
-        for (int i = 0; i < seqPanels.length; i++) {
-            seqPanels[ i ].addSequenceViewerListener(l);
-        }
-    }
+		for (int i = 0; i < seqPanels.length; i++) {
+			seqPanels[i].addSequenceViewerListener(l);
+		}
+	}
 
-    public void removeSequenceViewerListener(SequenceViewerListener l) {
-        viewerListeners.remove(l);
+	public void removeSequenceViewerListener(SequenceViewerListener l) {
+		viewerListeners.remove(l);
 
-        for (int i = 0; i < seqPanels.length; i++) {
-            seqPanels[ i ].removeSequenceViewerListener(l);
-        }
-    }
+		for (int i = 0; i < seqPanels.length; i++) {
+			seqPanels[i].removeSequenceViewerListener(l);
+		}
+	}
 
-    public void addSequenceViewerMotionListener(SequenceViewerMotionListener l) {
-        motionListeners.add(l);
+	public void addSequenceViewerMotionListener(SequenceViewerMotionListener l) {
+		motionListeners.add(l);
 
-        for (int i = 0; i < seqPanels.length; i++) {
-            seqPanels[ i ].addSequenceViewerMotionListener(l);
-        }
-    }
+		for (int i = 0; i < seqPanels.length; i++) {
+			seqPanels[i].addSequenceViewerMotionListener(l);
+		}
+	}
 
-    public void removeSequenceViewerMotionListener(SequenceViewerMotionListener l) {
-        motionListeners.remove(l);
+	public void removeSequenceViewerMotionListener(
+			SequenceViewerMotionListener l) {
+		motionListeners.remove(l);
 
-        for (int i = 0; i < seqPanels.length; i++) {
-            seqPanels[ i ].removeSequenceViewerMotionListener(l);
-        }
-    }
+		for (int i = 0; i < seqPanels.length; i++) {
+			seqPanels[i].removeSequenceViewerMotionListener(l);
+		}
+	}
 
-    public void setFont(Font f) {
-        try {
-            super.setFont(f);
+	public void setFont(Font f) {
+		try {
+			super.setFont(f);
 
-            for (int i = 0; i < seqPanels.length; i++) {
-                seqPanels[ i ].setFont(f);
-                seqPanels[ i ].resizeAndValidate();
-            }
-        } catch (NullPointerException e) {
-        }
-    }
+			for (int i = 0; i < seqPanels.length; i++) {
+				seqPanels[i].setFont(f);
+				seqPanels[i].resizeAndValidate();
+			}
+		} catch (NullPointerException e) {
+		}
+	}
 
-    public void paint(Graphics g) {
-        // some wierd sequence graphics exception is going on in biojava
-        try {
-            super.paint(g);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Caught sequence graphics exception in paint() " + e.toString());
-            repaint();
-        }
-    }
+	public void paint(Graphics g) {
+		// some wierd sequence graphics exception is going on in biojava
+		try {
+			super.paint(g);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Caught sequence graphics exception in paint() "
+					+ e.toString());
+			repaint();
+		}
+	}
 
-    public void paintComponent(Graphics g) {
-        // some wierd sequence graphics exception is going on in biojava-1.3
-        try {
-            super.paintComponent(g);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Caught sequence graphics exception in paintComponent() " + e.toString());
-            repaint();
-        }
-    }
+	public void paintComponent(Graphics g) {
+		// some wierd sequence graphics exception is going on in biojava-1.3
+		try {
+			super.paintComponent(g);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out
+					.println("Caught sequence graphics exception in paintComponent() "
+							+ e.toString());
+			repaint();
+		}
+	}
 } // class

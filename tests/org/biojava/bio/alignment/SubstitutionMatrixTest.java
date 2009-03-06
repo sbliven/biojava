@@ -16,9 +16,9 @@
  * at:
  *
  *      http://www.biojava.org/
- * 
+ *
  * Created on Aug 23, 2007
- * 
+ *
  */
 
 package org.biojava.bio.alignment;
@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
@@ -37,37 +38,39 @@ import org.biojava.bio.symbol.Symbol;
 import junit.framework.TestCase;
 
 public class SubstitutionMatrixTest extends TestCase {
-	
-	
-	
+
+
+
 	public void testParseSubstitutionMatrix(){
-		
+
 		InputStream inStream = this.getClass().getResourceAsStream("/files/blosum62.mat");
         assertNotNull(inStream);
-        
+
 
         try {
             FiniteAlphabet alphabet = (FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN-TERM");
             SymbolTokenization symtok = alphabet.getTokenization("token");
-        	String file = readMatrix(inStream);
-        	SubstitutionMatrix matrix = new SubstitutionMatrix(alphabet,file,"blosum 62");
+        	//String file = readMatrix(inStream);
+        	//SubstitutionMatrix matrix = new SubstitutionMatrix(alphabet,file,"blosum 62");
+        	SubstitutionMatrix matrix = SubstitutionMatrix.getSubstitutionMatrix(
+        			new BufferedReader(new InputStreamReader(inStream)));
         	//matrix.printMatrix();
-        	
+
         	Symbol A = symtok.parseToken("A");
         	Symbol W = symtok.parseToken("W");
         	Symbol D = symtok.parseToken("D");
-        	 
-        		
+
+
         	assertEquals(matrix.getValueAt(A, A), 4);
         	assertEquals(matrix.getValueAt(W, D),-4);
         } catch (Exception e){
         	fail(e.getMessage());
         }
-        
-        
+
+
 	}
 
-	
+
 	private String readMatrix(InputStream stream) throws IOException{
 		String newline = System.getProperty("line.separator");
 		BufferedReader reader = new BufferedReader(new InputStreamReader( stream));
@@ -76,7 +79,7 @@ public class SubstitutionMatrixTest extends TestCase {
 			file.append(reader.readLine() );
 			file.append(newline);
 		}
-		
+
 		return file.toString();
 	}
 }
