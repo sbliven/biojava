@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import java.util.TreeSet;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
@@ -51,8 +52,10 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojavax.Namespace;
+import org.biojavax.Note;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.SimpleNamespace;
+import org.biojavax.SimpleNote;
 import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.seq.io.EMBLFormat;
 import org.biojavax.bio.seq.io.EMBLxmlFormat;
@@ -710,9 +713,22 @@ public interface RichSequence extends BioEntry, Sequence {
 
 				}
 
+                // clone Notes
+				if (s.getNoteSet() != null) {
+                    Set notes = s.getNoteSet();
+                    Iterator it = notes.iterator();
+                    Set ns = new TreeSet();
+                    while (it.hasNext()) {
+                        Note note = (Note) it.next();
+                        ns.add(new SimpleNote(
+                                note.getTerm(),
+                                note.getValue(),
+                                note.getRank()));
+                    }
+                    seq.setNoteSet(ns);
+                }
+
 				// copy other cruft
-				if (s.getNoteSet() != null)
-					seq.setNoteSet(s.getNoteSet());
 				if (s.getTaxon() != null)
 					seq.setTaxon(s.getTaxon());
 				if (s.getDescription() != null) {
