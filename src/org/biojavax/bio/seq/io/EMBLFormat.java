@@ -406,7 +406,7 @@ public class EMBLFormat extends RichSequenceFormat.HeaderlessFormat {
                 for (int j = 2; j < parts.length; j++) {
                     Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j-1);
                     try {
-                        ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
+                        crossRef.getRichAnnotation().addNote(note);
                     } catch (ChangeVetoException ce) {
                         String message = ParseException.newMessage(this.getClass(),accession,"not set", "Could not annotate identifier terms",sectionToString(section));
                         ParseException pe = new ParseException(message);

@@ -424,7 +424,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                         ComparableTerm t = (ComparableTerm)Terms.getAdditionalAccessionTerm();
                         Note note = new SimpleNote(t,parts[j].trim(),j-1);
                         try {
-                            ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
+                            crossRef.getRichAnnotation().addNote(note);
                         } catch (ChangeVetoException ce) {
                             ParseException pe = new ParseException("Could not annotate additional accession terms");
                             pe.initCause(ce);

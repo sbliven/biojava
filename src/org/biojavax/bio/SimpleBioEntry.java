@@ -41,6 +41,7 @@ import org.biojavax.bio.taxa.NCBITaxon;
  * Equality is the combination of namespace, name, accession and version.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @author George Waldon
  * @since 1.5
  */
 public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
@@ -118,8 +119,13 @@ public class SimpleBioEntry extends AbstractChangeable implements BioEntry {
     /**
      * {@inheritDoc}
      */
-    public RichAnnotation getAnnotation() { return this.notes; }
+    public Annotation getAnnotation() { return getRichAnnotation(); }
     
+    /**
+     * {@inheritDoc}
+     */
+    public RichAnnotation getRichAnnotation() { return this.notes; }
+
     /**
      * {@inheritDoc}
      * <b>Warning</b> this method gives access to the original 

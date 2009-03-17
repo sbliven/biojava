@@ -40,6 +40,7 @@ import org.biojavax.ontology.ComparableTerm;
  * that do not overlap so that null need not be returned.
  * @author Richard Holland
  * @author Mark Schreiber
+ * @author George Waldon
  * @since 1.5
  */
 public class EmptyRichLocation extends Unchangeable implements RichLocation {
@@ -74,8 +75,14 @@ public class EmptyRichLocation extends Unchangeable implements RichLocation {
      * {@inheritDoc}
      * ALWAYS RETURNS THE EMPTY ANNOTATION
      */
-    public RichAnnotation getAnnotation() { return RichAnnotation.EMPTY_ANNOTATION; }
-    
+    public Annotation getAnnotation() { return getRichAnnotation(); }
+
+    /**
+     * {@inheritDoc}
+     * ALWAYS RETURNS THE EMPTY ANNOTATION
+     */
+    public RichAnnotation getRichAnnotation() { return RichAnnotation.EMPTY_ANNOTATION; }
+
     /**
      * {@inheritDoc} 
      * ALWAYS RETURNS THE EMPTY ANNOTATION NOTE SET

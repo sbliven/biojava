@@ -130,7 +130,12 @@ public class SimpleRichFeature extends AbstractChangeable implements RichFeature
     /**
      * {@inheritDoc}
      */
-    public RichAnnotation getAnnotation() { return this.notes; }
+    public Annotation getAnnotation() { return getRichAnnotation(); }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public RichAnnotation getRichAnnotation() { return this.notes; }
     
     /**
      * {@inheritDoc} 

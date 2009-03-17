@@ -30,18 +30,19 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * Annotatable objects that can have rich annotations.
  * @author Richard Holland
+ * @author George Waldon
  * @see RichAnnotation
  * @since 1.5
  */
 public interface RichAnnotatable extends Annotatable {
 
     /**
-      * Should return the associated annotation object.
+      * Return the associated annotation object.
       *
-      * @return an Annotation object, never null
+      * @return a RichAnnotation object, never null
       */
-    public RichAnnotation getAnnotation();
-    
+    public RichAnnotation getRichAnnotation ();
+
     /**
      * Returns the set of notes associated with this object. Would normally
      * delegate call to internal RichAnnotation instance.

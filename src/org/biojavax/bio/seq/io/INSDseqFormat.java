@@ -896,7 +896,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
                     for (int j = 2; j < parts.length; j++) {
                         Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),parts[j].trim(),j-1);
                         try {
-                            ((RichAnnotation)crossRef.getAnnotation()).addNote(note);
+                            crossRef.getRichAnnotation().addNote(note);
                         } catch (ChangeVetoException ce) {
                             ParseException pe = new ParseException("Could not annotate identifier terms");
                             pe.initCause(ce);

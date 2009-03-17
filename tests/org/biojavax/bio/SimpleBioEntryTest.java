@@ -38,6 +38,7 @@ import org.biojavax.ontology.ComparableTerm;
 /**
  *
  * @author Mark Schreiber
+ * @autor George Waldon
  */
 public class SimpleBioEntryTest extends TestCase {
     SimpleBioEntry be;
@@ -120,13 +121,14 @@ public class SimpleBioEntryTest extends TestCase {
     }
     
     /**
-     * Test of getAnnotation method, of class org.biojavax.bio.SimpleBioEntry.
+     * Test of getAnnotation & getRichAnnotation methods of class org.biojavax.bio.SimpleBioEntry.
      */
     public void testGetAnnotation() {
         System.out.println("testGetAnnotation");
         
         //should be not null!
         assertNotNull(be.getAnnotation());
+        assertNotNull(be.getRichAnnotation());
     }
     
     /**

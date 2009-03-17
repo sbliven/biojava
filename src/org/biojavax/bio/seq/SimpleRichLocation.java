@@ -54,7 +54,7 @@ import org.biojavax.ontology.ComparableTerm;
  * A simple implementation of RichLocation.
  * @author Richard Holland
  * @author Mark Schreiber
- * @author George Waldon - bug equality
+ * @author George Waldon
  * @since 1.5
  */
 public class SimpleRichLocation extends AbstractChangeable implements RichLocation {
@@ -193,7 +193,12 @@ public class SimpleRichLocation extends AbstractChangeable implements RichLocati
     /**
      * {@inheritDoc}
      */
-    public RichAnnotation getAnnotation() { return this.notes; }
+    public Annotation getAnnotation() { return getRichAnnotation(); }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public RichAnnotation getRichAnnotation() { return this.notes; }
     
     /**
      * {@inheritDoc}

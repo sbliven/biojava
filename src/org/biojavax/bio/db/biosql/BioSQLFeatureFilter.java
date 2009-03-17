@@ -1170,6 +1170,7 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * the value and rank is checked as well.
      *
      * @author Richard Holland
+     * @author George Waldon
      * @since 1.5
      */
     public final static class ByNote extends HibernateFeatureFilter {
@@ -1186,7 +1187,7 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         
         public boolean accept(Feature f) {
             if (f instanceof RichFeature) {
-                RichAnnotation ra = (RichAnnotation)((RichFeature)f).getAnnotation();
+                RichAnnotation ra = ((RichFeature)f).getRichAnnotation();
                 try {
                     Note n = ra.getNote(note);
                     return (n.getValue()==note.getValue()) || (n.getValue()!=null && note.getValue()!=null && n.getValue().equals(note.getValue()));
@@ -1240,6 +1241,7 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
      * and rank is not checked.
      *
      * @author Richard Holland
+     * @author George Waldon
      * @since 1.5
      */
     public final static class ByNoteTermOnly extends HibernateFeatureFilter {
@@ -1256,7 +1258,7 @@ public interface BioSQLFeatureFilter extends FeatureFilter {
         
         public boolean accept(Feature f) {
             if (f instanceof RichFeature) {
-                RichAnnotation ra = (RichAnnotation)((RichFeature)f).getAnnotation();
+                RichAnnotation ra = ((RichFeature)f).getRichAnnotation();
                 try {
                     for (Iterator i = ra.getNoteSet().iterator(); i.hasNext(); ) if (((Note)i.next()).getTerm().equals(term)) return true;
                 } catch (NoSuchElementException e) {

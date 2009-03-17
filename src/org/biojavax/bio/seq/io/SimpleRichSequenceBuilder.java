@@ -369,7 +369,7 @@ public class SimpleRichSequenceBuilder extends RichSeqIOAdapter implements RichS
         RichFeature f = this.getCurrentFeature();
         try {
             Note n = new SimpleNote((ComparableTerm)key,(String)value,this.featPropCount++);
-            ((RichAnnotation)f.getAnnotation()).addNote(n);
+            f.getRichAnnotation().addNote(n);
         } catch (ChangeVetoException e) {
             throw new ParseException(e);
         }

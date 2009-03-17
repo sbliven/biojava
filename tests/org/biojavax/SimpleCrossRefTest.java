@@ -21,6 +21,7 @@ import org.biojava.utils.ChangeVetoException;
 /**
  *
  * @author Mark Schreiber
+ * @autor George Waldon
  */
 public class SimpleCrossRefTest extends TestCase {
     SimpleCrossRef xref;
@@ -47,17 +48,24 @@ public class SimpleCrossRefTest extends TestCase {
     }
 
     /**
-     * Test of getAnnotation method, of class org.biojavax.SimpleCrossRef.
+     * Test of getAnnotation  & getRichAnnotation methods of class org.biojavax.SimpleCrossRef.
      */
     public void testGetAnnotation() {
         System.out.println("testGetAnnotation");
         
         assertNotNull(xref.getAnnotation());
+        assertNotNull(xref.getRichAnnotation());
+
         //should be an editable annotation
         try{
             xref.getAnnotation().setProperty("key", "value");
         }catch(Exception e){
             fail("Was expecting to be able to edit the annotation");
+        }
+        try{
+            xref.getRichAnnotation().setProperty("key2", "value2");
+        }catch(Exception e){
+            fail("Was expecting to be able to edit the rich annotation");
         }
     }
 

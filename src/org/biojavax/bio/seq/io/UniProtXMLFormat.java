@@ -1670,7 +1670,7 @@ public class UniProtXMLFormat extends RichSequenceFormat.BasicFormat {
                 Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),id,1);
                 try {
                     int last = this.currDBXrefs.size();
-                    ((RichAnnotation)((CrossRef)this.currDBXrefs.get(last-1)).getAnnotation()).addNote(note);
+                    ((CrossRef)this.currDBXrefs.get(last-1)).getRichAnnotation().addNote(note);
                 } catch (ChangeVetoException ce) {
                     SAXException pe = new SAXException("Could not annotate identifier terms");
                     pe.initCause(ce);

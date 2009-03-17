@@ -75,8 +75,13 @@ public class SimpleCrossRef extends Unchangeable implements CrossRef {
     /**
      * {@inheritDoc}
      */
-    public RichAnnotation getAnnotation() { return this.notes; }
-    
+    public Annotation getAnnotation() { return getRichAnnotation(); }
+
+    /**
+     * {@inheritDoc}
+     */
+    public RichAnnotation getRichAnnotation() { return this.notes; }
+
     /**
      * {@inheritDoc}
      */

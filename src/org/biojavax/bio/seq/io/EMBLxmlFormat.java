@@ -856,7 +856,7 @@ public class EMBLxmlFormat extends RichSequenceFormat.BasicFormat {
                 if (secondary!=null) {
                     Note note = new SimpleNote(Terms.getAdditionalAccessionTerm(),secondary,0);
                     try {
-                        ((RichAnnotation)dbx.getAnnotation()).addNote(note);
+                        dbx.getRichAnnotation().addNote(note);
                     } catch (ChangeVetoException ce) {
                         SAXException pe = new SAXException("Could not annotate identifier terms");
                         pe.initCause(ce);
