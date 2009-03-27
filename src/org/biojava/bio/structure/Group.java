@@ -167,7 +167,7 @@ public interface Group {
 	 */
 	public String getPDBName();
 
-	/** get the PDB 3 character name for this group.
+	/** Get the PDB 3 letter name for this group. (e.g. ALA)
 	 *
 	 * @param s  a String specifying the PDBName value
 	 * @throws PDBParseException ...
