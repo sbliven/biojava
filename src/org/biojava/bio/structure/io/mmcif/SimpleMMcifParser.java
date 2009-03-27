@@ -22,9 +22,7 @@
 package org.biojava.bio.structure.io.mmcif;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -32,6 +30,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.biojava.bio.structure.Structure;
+import org.biojava.bio.structure.io.MMCIFFileReader;
+import org.biojava.bio.structure.io.StructureIOFile;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
@@ -56,20 +56,18 @@ import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
  * Usage:
  * <pre>
    		String file = "path/to/mmcif/file";
-  		MMcifParser parser = new SimpleMMcifParser();
-		MMcifConsumer consumer = new SimpleMMcifConsumer();
-		parser.addMMcifConsumer(consumer);
-
+  		StructureIOFile pdbreader = new MMCIFFileReader();
 		try {
-
-			BufferedReader buf = new BufferedReader(new InputStreamReader (new FileInputStream(file)));
-			parser.parse(buf);
-			Structure s = consumer.getStructure();
+			Structure s = pdbreader.getStructure(file);
 			System.out.println(s);
-		} catch (Exception e){
+
+			// you can convert it to a PDB file...
+			System.out.println(s.toPDB());
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
  * </pre>
+ * For more documentation see <a href="http://biojava.org/wiki/BioJava:CookBook#Protein_Structure">http://biojava.org/wiki/BioJava:CookBook#Protein_Structure</a>.
  */
 public class SimpleMMcifParser implements MMcifParser {
 
@@ -107,23 +105,19 @@ public class SimpleMMcifParser implements MMcifParser {
 	}
 
 	public static void main(String[] args){
-		String file = "/Users/andreas/WORK/PDB/MMCIF/1A9N.cif";
+		String file = "/Users/andreas/WORK/PDB/mmCif/a9/1a9n.cif.gz";
 		//String file = "/Users/andreas/WORK/PDB/MMCIF/1gav.mmcif";
 		//String file = "/Users/andreas/WORK/PDB/MMCIF/100d.cif";
 		//String file = "/Users/andreas/WORK/PDB/MMCIF/1a4a.mmcif";
 		System.out.println("parsing " + file);
 
-		MMcifParser parser = new SimpleMMcifParser();
-		SimpleMMcifConsumer consumer = new SimpleMMcifConsumer();
-		parser.addMMcifConsumer(consumer);
-
+		StructureIOFile pdbreader = new MMCIFFileReader();
 		try {
-
-			BufferedReader buf = new BufferedReader(new InputStreamReader (new FileInputStream(file)));
-			parser.parse(buf);
-			Structure s = consumer.getStructure();
+			Structure s = pdbreader.getStructure(file);
 			System.out.println(s);
-		} catch (Exception e){
+			// convert it to a PDB file...
+			System.out.println(s.toPDB());
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
